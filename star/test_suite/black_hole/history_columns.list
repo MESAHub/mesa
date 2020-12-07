@@ -185,7 +185,9 @@
       !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
    
    ! conditions near center
-   
+      log_center_T
+      log_center_Rho
+      
       log_cntr_T ! temperature
       log_cntr_Rho ! density
       log_cntr_P ! pressure

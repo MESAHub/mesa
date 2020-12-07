@@ -15,7 +15,7 @@
       save_star_job_namelist = .true.
       star_job_namelist_name = 'star_job_black_hole_to_end_core_he_burn.txt'
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 
 / ! end of star_job namelist
