@@ -654,10 +654,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! if true, set initial number of retries
+      ! if false, number of retries set from initial model info
 
       ! ::
 
-    set_initial_number_retries = .false.
+    set_initial_number_retries = .true.
     initial_number_retries = 0
 
 
