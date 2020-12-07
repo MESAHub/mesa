@@ -1021,7 +1021,7 @@
          profile_column_name(p_logE) = 'logE'
          profile_column_name(p_grada) = 'grada'
          profile_column_name(p_dE_dRho) = 'dE_dRho'
-         profile_column_name(p_Cv) = 'Cv'
+         profile_column_name(p_cv) = 'cv'
          profile_column_name(p_thermal_time_to_surface) = 'thermal_time_to_surface'
          profile_column_name(p_log_thermal_time_to_surface) = 'log_thermal_time_to_surface'
          profile_column_name(p_cp) = 'cp'

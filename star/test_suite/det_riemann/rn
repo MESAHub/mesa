@@ -32,10 +32,11 @@ else
 fi
 
 # check if can skip building done_with_edep model
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp standard_done_with_edep.mod done_with_edep.mod
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_done_with_edep.mod done_with_edep.mod
 #else
    do_one inlist_start_shock_header done_with_edep.mod
+   cp done_with_edep.mod standard_done_with_edep.mod
 #fi
 
 do_one inlist_shock_header final.mod

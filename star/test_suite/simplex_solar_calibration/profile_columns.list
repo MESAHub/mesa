@@ -86,7 +86,7 @@
    logE ! log10(specific internal energy) at center of zone
    grada ! dlnT_dlnP at constant S
    dE_dRho ! at constant T
-   dE_dT ! specific heat at constant volume
+   cv ! specific heat at constant volume
    cp ! specific heat at constant total pressure
    logS ! log10(specific entropy)
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
