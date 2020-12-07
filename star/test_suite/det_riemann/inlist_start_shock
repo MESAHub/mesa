@@ -120,7 +120,7 @@
 
 
 ! solver controls
-    convergence_ignore_equL_residuals = .treu.
+    convergence_ignore_equL_residuals = .true.
 
 
 ! output controls
