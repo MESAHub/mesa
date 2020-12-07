@@ -439,7 +439,7 @@ can update to a newer MESA:
     remove_reaction(r_h1_li7_to_he4_he4)
     add_reaction(r_li7_pa_he4)
 
-With thanks to Bradley Munson for the bug report.
+With thanks to Ian Foley for the bug report.
 
 We now define the forward reaction to always be the exothermic reaction, not the reaction as defined by REACLIB.
 This fixes an issue with exothermic photo-disintegrations which would generate wrong values when computed
