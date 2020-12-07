@@ -48,7 +48,7 @@
          integer :: iounit, i, k, nvar_hydro, nz, species, file_type
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
-         logical :: v_flag, RTI_flag, conv_vel_flag, cv_flag, &
+         logical :: v_flag, RTI_flag, conv_vel_flag, &
             Eturb_flag, u_flag, prev_flag, rotation_flag, &
             D_omega_flag, am_nu_rot_flag, write_conv_vel, &
             rsp_flag, D_smooth_flag, no_L
@@ -72,16 +72,12 @@
          u_flag = s% u_flag
          RTI_flag = s% RTI_flag
          conv_vel_flag = s% conv_vel_flag
-         cv_flag = s% cv_flag
          rotation_flag = s% rotation_flag
          D_smooth_flag = s% D_smooth_flag
          D_omega_flag = s% D_omega_flag .and. rotation_flag
          am_nu_rot_flag = s% am_nu_rot_flag .and. rotation_flag
          rsp_flag = s% rsp_flag
-         write_conv_vel = &
-            s% have_mixing_info .and. &
-            s% have_previous_conv_vel .and. &
-            s% min_T_for_acceleration_limited_conv_velocity < 1d12
+         write_conv_vel = s% have_mixing_info .and. s% have_previous_conv_vel
          species = s% species
          
          open(newunit=iounit, file=trim(filename), action='write', status='replace')
@@ -92,7 +88,6 @@
          if (Eturb_flag) file_type = file_type + 2**bit_for_Eturb
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
-         if (cv_flag) file_type = file_type + 2**bit_for_cv_var
          if (s% constant_L) file_type = file_type + 2**bit_for_constant_L
          if (prev_flag) file_type = file_type + 2**bit_for_2models
          if (v_flag) file_type = file_type + 2**bit_for_velocity
@@ -128,8 +123,6 @@
             write(iounit,'(a)',advance='no') ', with saved convection velocities (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
             write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
-         if (BTEST(file_type, bit_for_cv_var)) &
-            write(iounit,'(a)',advance='no') ', with cv solver variables (lncv_plus1)'
          if (BTEST(file_type, bit_for_D_smooth)) &
             write(iounit,'(a)',advance='no') ', with smoothed diffusion coefficients (D_smooth)'
          if (BTEST(file_type, bit_for_RSP)) &
@@ -200,6 +193,7 @@
                'log_rel_run_E_err', &
                safe_log10(abs(s% cumulative_energy_error/s% total_energy))
          write(iounit, 1) 'time', s% time
+         write(iounit, 2) 'num_retries', s% num_retries
          write(iounit, '(a)') ! blank line for end of property list      
 
          call header
@@ -246,9 +240,6 @@
             end if
             if (write_conv_vel .or. conv_vel_flag) then
                call write1(s% conv_vel(k),ierr); if (ierr /= 0) exit
-            end if
-            if (cv_flag) then
-               call write1(s% lncv_plus1(k),ierr); if (ierr /= 0) exit
             end if
             do i=1, species
                call write1(s% xa(i,k),ierr); if (ierr /= 0) exit
@@ -316,8 +307,6 @@
             if (D_smooth_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'D_smooth'
             if (write_conv_vel .or. conv_vel_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'conv_vel'
-            if (cv_flag) &
-               write(iounit, fmt='(a26, 1x)', advance='no') 'lncv_plus1'
             do i=1, species
                write(iounit, fmt='(a26, 1x)', advance='no') chem_isos% name(chem_id(i))
             end do

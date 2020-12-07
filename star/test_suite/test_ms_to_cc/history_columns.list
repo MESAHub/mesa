@@ -149,7 +149,7 @@
    ! timescales
       
       !dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
-      kh_timescale ! kelvin-helmholtz timescale (years)
+      !kh_timescale ! kelvin-helmholtz timescale (years)
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
 
    ! integrated power from hydrogen and helium burning
@@ -185,7 +185,8 @@
       !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
    
    ! conditions near center
-   
+      
+      log_max_T
       log_cntr_T ! temperature
       log_cntr_Rho ! density
       log_cntr_P ! pressure

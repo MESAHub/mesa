@@ -821,14 +821,6 @@
          call set_RTI_flag(id, RTI_flag, ierr)
       end subroutine star_set_RTI_flag
 
-      subroutine star_set_cv_flag(id, cv_flag, ierr)
-         use alloc, only: set_cv_flag
-         integer, intent(in) :: id
-         logical, intent(in) :: cv_flag
-         integer, intent(out) :: ierr
-         call set_cv_flag(id, cv_flag, ierr)
-      end subroutine star_set_cv_flag
-
       subroutine star_set_conv_vel_flag(id, conv_vel_flag, ierr)
          use alloc, only: set_conv_vel_flag
          integer, intent(in) :: id
@@ -3151,7 +3143,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
+            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          use mlt_get_results, only: Get_results
          use star_def
@@ -3179,7 +3171,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, remove_small_D_limit, &
+            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
          logical, intent(in) :: alt_scale_height
          character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
@@ -3224,7 +3216,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
+            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
             mixing_type, &
             mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
             mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &

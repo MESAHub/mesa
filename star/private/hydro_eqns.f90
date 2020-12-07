@@ -124,11 +124,11 @@
          integer, intent(out) :: ierr
 
          integer :: &
-            i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, i_dlncv_plus1_dt, &
+            i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
             i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_deturb_dt, &
             equchem1, i, k, j, nvar_hydro, nvar_chem, nz, op_err
          integer :: &
-            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, i_lncv_plus1, &
+            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             i_alpha_RTI, i_chem1, i_xh1, i_xhe4, kmax_equ(nvar), species
          real(dp) :: max_equ(nvar), dVARdot_dVAR, L_phot_old, L_start_max
          real(dp), dimension(:), pointer :: &
@@ -137,19 +137,15 @@
          logical :: v_flag, u_flag, conv_vel_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
             do_chem, do_mix, do_struct_hydro, do_struct_thermo, &
             do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_conv_vel, do_cv, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, &
+            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, &
             do_dEt_dt, do_deturb_dt
 
          include 'formats'
 
          ierr = 0
 
-         if (s% do_struct_hydro) then
-            if (s% u_flag) then
-               if (s% use_mass_corrections) &
-                  stop 'use_mass_corrections dP not supported with u_flag true'
-            end if
-         end if
+         if (s% do_struct_hydro .and. s% u_flag .and. s% use_mass_corrections) &
+            stop 'use_mass_corrections dP not supported with u_flag true'
 
          if (s% u_flag) then
             call do_uface_and_Pface(s,ierr)
@@ -178,7 +174,6 @@
          do_dlnR_dt = (i_dlnR_dt > 0 .and. i_dlnR_dt <= nvar)
          do_alpha_RTI = (i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar)
          do_conv_vel = (i_ln_cvpv0 > 0 .and. i_ln_cvpv0 <= nvar)
-         do_cv = (i_lncv_plus1 > 0 .and. i_lncv_plus1 <= nvar)
          do_w_div_wc = (i_w_div_wc > 0 .and. i_w_div_wc <= nvar)
          do_j_rot = (i_j_rot > 0 .and. i_j_rot <= nvar)
          do_dlnE_dt = (i_dlnE_dt > 0 .and. i_dlnE_dt <= nvar)
@@ -314,16 +309,6 @@
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_dln_cvpv0_dt_eqn', k
                         if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dln_cvpv0_dt_eqn'
-                        ierr = op_err
-                     end if
-                  end if
-                  if (do_cv) then
-                     call do1_dlncv_plus1_dt_eqn( &
-                        s, k, xscale, equ, &
-                        skip_partials, nvar, op_err)
-                     if (op_err /= 0) then
-                        if (s% report_ierr) write(*,2) 'ierr in do1_dlncv_plus1_dt_eqn', k
-                        if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dlncv_plus1_dt_eqn'
                         ierr = op_err
                      end if
                   end if
@@ -510,7 +495,6 @@
             i_dlnR_dt = s% i_dlnR_dt
             i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
             i_dln_cvpv0_dt = s% i_dln_cvpv0_dt
-            i_dlncv_plus1_dt = s% i_dlncv_plus1_dt
             i_equ_w_div_wc = s% i_equ_w_div_wc
             i_dj_rot_dt = s% i_dj_rot_dt
             i_deturb_dt = s% i_deturb_dt
@@ -525,7 +509,6 @@
             i_u = s% i_u
             i_alpha_RTI = s% i_alpha_RTI
             i_ln_cvpv0 = s% i_ln_cvpv0
-            i_lncv_plus1 = s% i_lncv_plus1
             i_w_div_wc = s% i_w_div_wc
             i_j_rot = s% i_j_rot
 
@@ -875,13 +858,7 @@
          logical :: test_partials
          include 'formats'
          
-         ierr = 0
-         if (s% debugging_new_conv_vel_code) then
-            call do1_dlncv_plus1_dt_eqn( &
-               s, k, xscale, equ, skip_partials, nvar, ierr)
-            return
-         end if
-         
+         ierr = 0         
          !test_partials = (k == s% solver_test_partials_k-1)
          test_partials = .false.
 
@@ -1139,223 +1116,6 @@
          end if         
                   
       end subroutine do1_dln_cvpv0_dt_eqn
-
-
-      subroutine do1_dlncv_plus1_dt_eqn(s, k, xscale, equ, skip_partials, nvar, ierr)
-         use star_utils, only: store_partials
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
-         logical, intent(in) :: skip_partials
-         integer, intent(out) :: ierr
-         
-         real(dp) :: residual, dlncv_plus1_m1, dlncv_plus1_00, dlncv_plus1_p1
-         integer :: i_dlncv_plus1_dt, i_lncv_plus1, j
-         real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1 ! for partials other than wrt lncv_plus1
-         include 'formats'
-         i_dlncv_plus1_dt = s% i_dlncv_plus1_dt
-         i_lncv_plus1 = s% i_lncv_plus1
-         call get1_dlncv_plus1_dt_eqn(s, k, xscale, equ, skip_partials, nvar, &
-            residual, dlncv_plus1_m1, dlncv_plus1_00, dlncv_plus1_p1, &
-            d_dm1, d_d00, d_dp1, ierr)
-         if (ierr /= 0) stop 'failed in get1_dlncv_plus1_dt_eqn'
-         equ(i_dlncv_plus1_dt, k) = residual
-         if (skip_partials) return
-         if (k > 1) call em1(s, xscale, i_dlncv_plus1_dt, i_lncv_plus1, k, nvar, dlncv_plus1_m1)
-         call e00(s, xscale, i_dlncv_plus1_dt, i_lncv_plus1, k, nvar, dlncv_plus1_00)
-         if (k < s% nz) call ep1(s, xscale, i_dlncv_plus1_dt, i_lncv_plus1, k, nvar, dlncv_plus1_p1)
-         if (k == 1136) then
-            write(*,2) 'nvar', nvar
-            write(*,2) 'i_dlncv_plus1_dt', i_dlncv_plus1_dt
-            write(*,2) 'i_lncv_plus1', i_lncv_plus1
-            do j=1,nvar
-               if (k > 1 .and. d_dm1(j) /= 0d0) write(*,2) 'd_dm1 ' // trim(s% nameofvar(j)), k, d_dm1(j)
-               if (d_d00(j) /= 0d0) write(*,2) 'd_d00 ' // trim(s% nameofvar(j)), k, d_d00(j)
-               if (k < s% nz .and. d_dp1(j) /= 0d0) write(*,2) 'd_dp1 ' // trim(s% nameofvar(j)), k, d_dp1(j)
-            end do            
-         end if
-         call store_partials(s, k, xscale, i_dlncv_plus1_dt, nvar, d_dm1, d_d00, d_dp1)
-         
-      end subroutine do1_dlncv_plus1_dt_eqn
-
-
-      subroutine get1_dlncv_plus1_dt_eqn( &
-            s, k, xscale, equ, skip_partials, nvar, &
-            residual, dlncv_plus1_m1, dlncv_plus1_00, dlncv_plus1_p1, &
-            d_dm1, d_d00, d_dp1, ierr)
-         use auto_diff
-         use auto_diff_support
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
-         logical, intent(in) :: skip_partials
-         real(dp), intent(out) :: residual, dlncv_plus1_m1, dlncv_plus1_00, dlncv_plus1_p1
-         real(dp), intent(out), dimension(nvar) :: d_dm1, d_d00, d_dp1
-         integer, intent(out) :: ierr
-         
-         integer :: i_dlncv_plus1_dt, i_lncv_plus1, i
-         type(auto_diff_real_18var_order1) :: resid_18, d_actual, d_expected, &
-            mlt_vc, cv_00, cv_m1, cv_p1, d_lncv_plus1_dq, a, &
-            dxh_lncv_plus1, dlncv_plus1_dt_const_q
-         real(dp) :: dt, lambda, tau, grav_start, N2_start, fraction
-         logical :: test_partials
-         include 'formats'
-         
-         ierr = 0         
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-
-         dt = s% dt
-         i_dlncv_plus1_dt = s% i_dlncv_plus1_dt
-         i_lncv_plus1 = s% i_lncv_plus1
-         d_dm1 = 0d0
-         d_d00 = 0d0
-         d_dp1 = 0d0
-         
-         call pack_for_auto_diff
-                  
-         if (k==1) then ! cv(1) -> 0 (assuming cv_v0 == 1)
-            resid_18 = log(cv_00 + 1d0)
-            residual = resid_18%val
-            s% dlncv_plus1_dt_residual(k) = residual
-            if (skip_partials) return
-            call unpack_res18
-            return
-         else if (.false. .and. k==s% nz) then ! cv(nz) -> cv(nz-1)
-            resid_18 = log(cv_00 + 1d0) - log(cv_m1 + 1d0)
-            residual = resid_18%val
-            s% dlncv_plus1_dt_residual(k) = residual
-            if (skip_partials) return
-            call unpack_res18
-            return
-         end if
-
-         ! lambda is distance scale set by MLT mixing length at start of step
-         lambda = s% scale_height_start(k)*s% mixing_length_alpha 
-
-         ! time scale for non-convective locations is set by Brunt frequency at start of step 
-         ! time scale for convective locations is lambda/mlt_vc_start
-         tau = dt
-         N2_start = -1d0
-         if (s% mlt_vc_start(k) > 0d0) then 
-            tau = lambda/s% mlt_vc_start(k)
-         else if (s% gradL_start(k) > s% gradr_start(k)) then ! use Brunt to set timescale
-            grav_start = s% cgrav(k)*s% m(k)/s% r_start(k)**2
-            N2_start = -s% chiT_start(k)/s% chiRho_start(k) &
-               *(s% gradT_start(k) - s% gradL_start(k))*grav_start/s% scale_height_start(k)
-            if (N2_start > 0d0) tau = min(tau,max(1d0/sqrt(N2_start),1d-5))
-         end if
-         fraction = min(1d0, dt/tau) ! do this fraction of change for cv to match mlt_vc
-         
-         ! for dt > tau, cv = mlt_vc
-         ! for dt < tau, cv lags behind
-         ! gradT is set to match cv rather than mlt_vc, so it also lags in this case.
-         ! MLT mixing coefficients are set by initial cv at start of step.
-         ! so it lags if cv does.
-
-         d_expected = fraction*(log(mlt_vc + 1d0) - log(s% cv_start(k) + 1d0))
-         d_actual = dxh_lncv_plus1 ! = log(s% cv(k) + 1d0) - log(s% cv_start(k) + 1d0)
-
-         resid_18 = d_actual - d_expected
-         residual = resid_18%val
-         s% dlncv_plus1_dt_residual(k) = residual
-
-         if (is_bad(residual)) then
-            ierr = -1
-            if (s% report_ierr) write(*,2) 'get1_dlncv_plus1_dt_eqn residual', k, residual
-            if (s% stop_for_bad_nums) stop 'get1_dlncv_plus1_dt_eqn'
-            return
-         end if
-
-         if (test_partials) then
-            s% solver_test_partials_val = residual
-            write(*,*)
-            write(*,3) 'residual', k, s% solver_iter, residual
-            write(*,3) 's% cv_start(k)', k, s% solver_iter, s% cv_start(k)
-            write(*,3) 's% cv(k)', k, s% solver_iter, s% cv(k)
-            write(*,3) 's% mlt_vc(k)', k, s% solver_iter, s% mlt_vc(k)
-            write(*,3) 'ln_mlt_cv_plus1', k, s% solver_iter, log(s% mlt_vc(k) + 1d0)
-            write(*,3) 'lncv_plus1', k, s% solver_iter, log(s% cv(k) + 1d0)
-            write(*,3) 'lncv_plus1_start', k, s% solver_iter, log(s% cv_start(k) + 1d0)
-            write(*,3) 'lncv_plus1 - lncv_plus1_start', k, s% solver_iter, &
-               log(s% cv(k) + 1d0) - log(s% cv_start(k) + 1d0)
-            write(*,3) 'd_actual', k, s% solver_iter, d_actual%val
-            write(*,3) 'diff', k, s% solver_iter, d_actual%val - &
-               (log(s% cv(k) + 1d0) - log(s% cv_start(k) + 1d0))
-            write(*,4) 's% mlt_mixing_type(k)', k, s% solver_iter, s% mlt_mixing_type(k)
-            write(*,3) 'fraction', k, s% solver_iter, fraction
-            write(*,3) 'd_actual', k, s% solver_iter, d_actual%val
-            write(*,3) 'd_expected', k, s% solver_iter, d_expected%val
-            write(*,3) 'ln_mltv0', k, s% solver_iter, log(s% mlt_vc(k) + 1d0)
-            write(*,*)
-         end if
-
-         if (skip_partials) return
-         call unpack_res18
-         
-         if (test_partials) then
-            s% solver_test_partials_var = s% i_lnd
-            s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
-            write(*,*) 'get1_dlncv_plus1_dt_eqn cv', s% solver_test_partials_var, s% cv(k)
-            !i = maxloc(s% cv(1:s% nz),dim=1)
-            !write(*,2) 'max cv', i, s% cv(i)
-            !stop
-         end if
-         
-         contains
-         
-         subroutine pack_for_auto_diff
-            cv_00 = wrap_v_00(s,k); cv_00%val = s% cv(k)
-            if (k > 1) then
-               cv_m1 = wrap_v_m1(s,k); cv_m1%val = s% cv(k-1)
-            else
-               cv_m1 = 0d0
-            end if
-            if (k < s% nz) then
-               cv_p1 = wrap_v_p1(s,k); cv_p1%val = s% cv(k+1)
-            else
-               cv_p1 = 0d0
-            end if
-            
-            dxh_lncv_plus1 = 0d0
-            dxh_lncv_plus1%val = s% dxh_lncv_plus1(k)
-            dxh_lncv_plus1%d1Array(i_v_00) = 1d0/(s% cv(k)+1d0)
-            
-            mlt_vc = 0d0
-            !mlt_vc%val = s% mlt_vc_start(k); return
-            
-            mlt_vc%val = s% mlt_vc(k)
-            mlt_vc%d1Array(i_lnR_00) = s% d_mlt_vc_dlnR(k)
-            mlt_vc%d1Array(i_L_00) = 0 ! s% d_mlt_vc_dL(k)           <<<<<<<<
-            mlt_vc%d1Array(i_lnd_00) = s% d_mlt_vc_dlnd00(k)
-            mlt_vc%d1Array(i_lnT_00) = s% d_mlt_vc_dlnT00(k)
-            mlt_vc%d1Array(i_lnd_m1) = s% d_mlt_vc_dlndm1(k)
-            mlt_vc%d1Array(i_lnT_m1) = s% d_mlt_vc_dlnTm1(k)
-         end subroutine pack_for_auto_diff
-         
-         subroutine unpack_res18
-            use star_utils, only: unpack_res18_partials
-            if (k > 1) then
-               dlncv_plus1_m1 = resid_18%d1Array(i_v_m1)*(s% cv(k-1) + 1d0)
-            else
-               dlncv_plus1_m1 = 0d0
-            end if
-            dlncv_plus1_00 = resid_18%d1Array(i_v_00)*(s% cv(k) + 1d0)
-            if (k < s% nz) then
-               dlncv_plus1_p1 = resid_18%d1Array(i_v_p1)*(s% cv(k+1) + 1d0)
-            else
-               dlncv_plus1_p1 = 0d0
-            end if
-            resid_18%d1Array(i_v_m1) = 0d0
-            resid_18%d1Array(i_v_00) = 0d0
-            resid_18%d1Array(i_v_p1) = 0d0
-            call unpack_res18_partials(s, k, nvar, xscale, i_dlncv_plus1_dt, &
-               resid_18, d_dm1, d_d00, d_dp1)
-         end subroutine unpack_res18
-         
-      end subroutine get1_dlncv_plus1_dt_eqn
       
 
       subroutine do1_w_div_wc_eqn( &
@@ -1594,8 +1354,8 @@
             d_kap_dlnd00, d_expected_dlnd00, dr_dlnd00, &
             d_kap_dlndm1, d_expected_dlndm1, dr_dlndm1, &
             dr_dlnT00_const_Pgas, dr_dlnTm1_const_Pgas, dr_dlnR00, dr_dln_cvpv0, &
-            dr_dlnPgas00_const_T, dr_dlnPgasm1_const_T, d_Lrad_dL, d_Lrad_dw, dr_dlncv_plus1, &
-            d_Lrad_dlnT00, d_Lrad_dlnTm1, d_Lrad_dlnd00, d_Lrad_dlndm1, d_Lrad_dlncv_plus1, &
+            dr_dlnPgas00_const_T, dr_dlnPgasm1_const_T, d_Lrad_dL, d_Lrad_dw, &
+            d_Lrad_dlnT00, d_Lrad_dlnTm1, d_Lrad_dlnd00, d_Lrad_dlndm1, &
             d_Lrad_dlnR, d_Lrad_dln_cvpv0, gradr2, dlnd, d_dlnd, d_dlnT, &
             d_dlnd_const_E, d_dlnE_const_Rho, d_T400_dlnT00, d_T4m1_dlnTm1, &
             d_expected_dL, d_expected_dw, d_expected_dlnR, d_expected_dln_cvpv0, cs
@@ -1629,7 +1389,6 @@
          d_Lrad_dlnd00 = 0d0
          d_Lrad_dlndm1 = 0d0
          d_Lrad_dln_cvpv0 = 0d0
-         d_Lrad_dlncv_plus1 = 0d0
          d_Lrad_dw = 0d0
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
@@ -1662,8 +1421,6 @@
                   - s% gradT(k)*s% d_gradr_dlndm1(k)/gradr2)
                if (s% conv_vel_flag) &
                   d_Lrad_dln_cvpv0 = L*s% d_gradT_dln_cvpv0(k)/s% gradr(k)
-               if (s% cv_flag) &
-                  d_Lrad_dlncv_plus1 = L*s% d_gradT_dlncv_plus1(k)/s% gradr(k)
             else
                L_rad = L
             end if
@@ -1799,11 +1556,6 @@
             dr_dln_cvpv0 = -dm_bar*opacity_face*d_Lrad_dln_cvpv0/(clight*area2)/scale
             call e00(s, xscale, i_equL, s% i_ln_cvpv0, k, nvar, dr_dln_cvpv0)
          end if
-            
-         if (s% cv_flag) then
-            dr_dlncv_plus1 = -dm_bar*opacity_face*d_Lrad_dlncv_plus1/(clight*area2)/scale
-            call e00(s, xscale, i_equL, s% i_lncv_plus1, k, nvar, dr_dlncv_plus1)
-         end if
 
          call e00(s, xscale, i_equL, s% i_lnT, k, nvar, dr_dlnT00)
          call em1(s, xscale, i_equL, s% i_lnT, k, nvar, dr_dlnTm1)
@@ -1853,7 +1605,7 @@
          real(dp) :: alfa, beta, r, dr_dL00, dr_dlnR00, dr_dlnd00, dr_dlnT00, &
             dr_dlndm1, dr_dlnTm1, dr_dw00, m, dlnPdm, &
             d_dlnPdm_dlnR, d_dlnPdm_dL, d_dlnPdm_dlnd00, d_dlnPdm_dlnT00, &
-            d_dlnPdm_dlndm1, d_dlnPdm_dlnTm1, dr_dlncv_plus1, &
+            d_dlnPdm_dlndm1, d_dlnPdm_dlnTm1, &
             d_dlnPdm_dlnPgas00_const_T, d_dlnPdm_dlnT00_const_Pgas, &
             d_dlnPdm_dlnPgasm1_const_T, d_dlnPdm_dlnTm1_const_Pgas, &
             dP_dlnPgas00_const_T, dP_dlnPgasm1_const_T, &
@@ -1861,7 +1613,7 @@
             d_dlnPdm_dw, &
             gradT, d_gradT_dL, d_gradT_dw, d_gradT_dlnR, d_gradT_du, &
             d_gradT_dlnd00, d_gradT_dlndm1, &
-            d_gradT_dlnT00, d_gradT_dlnTm1, d_gradT_dln_cvpv0, d_gradT_dlncv_plus1, &
+            d_gradT_dlnT00, d_gradT_dlnTm1, d_gradT_dln_cvpv0, &
             Ppoint, scale, &
             dPpoint_dlnd00, dPpoint_dlndm1, dPpoint_dlnT00, dPpoint_dlnTm1, &
             dPpoint_dlnPgas00_const_T, dPpoint_dlnPgasm1_const_T, &
@@ -1903,8 +1655,7 @@
             return
          end if
 
-         if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. &
-               (s% conv_vel_flag .and. s% debugging_new_conv_vel_code)) then
+         if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
             call do1_alt_dlnT_dm_eqn(s, k, xscale, equ, skip_partials, nvar, ierr)
             return
          end if
@@ -1935,7 +1686,7 @@
             d_gradT_dlnT00, d_gradT_dlnTm1, &
             d_gradT_dlnT00_const_Pgas, d_gradT_dlnTm1_const_Pgas, &
             d_gradT_dlnPgas00_const_T, d_gradT_dlnPgasm1_const_T, &
-            d_gradT_dln_cvpv0, d_gradT_dlncv_plus1, ierr)
+            d_gradT_dln_cvpv0, ierr)
          if (ierr /= 0) return
 
          dlnTdm = dlnPdm*gradT
@@ -2000,11 +1751,6 @@
          if (s% conv_vel_flag) then
             dr_dln_cvpv0 = delm*dlnPdm*d_gradT_dln_cvpv0*scale
             call e00(s, xscale, i_equL, s% i_ln_cvpv0, k, nvar, dr_dln_cvpv0)
-         end if
-
-         if (s% cv_flag) then
-            dr_dlncv_plus1 = delm*dlnPdm*d_gradT_dlncv_plus1*scale
-            call e00(s, xscale, i_equL, s% i_lncv_plus1, k, nvar, dr_dlncv_plus1)
          end if
 
          if (s% i_lum /= 0) &
@@ -2847,7 +2593,7 @@
             d_gradT_dlnT00, d_gradT_dlnTm1, &
             d_gradT_dlnT00_const_Pgas, d_gradT_dlnTm1_const_Pgas, &
             d_gradT_dlnPgas00_const_T, d_gradT_dlnPgasm1_const_T, &
-            d_gradT_dln_cvpv0, d_gradT_dlncv_plus1, ierr)
+            d_gradT_dln_cvpv0, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: &
@@ -2856,7 +2602,7 @@
             d_gradT_dlnT00, d_gradT_dlnTm1, &
             d_gradT_dlnT00_const_Pgas, d_gradT_dlnTm1_const_Pgas, &
             d_gradT_dlnPgas00_const_T, d_gradT_dlnPgasm1_const_T, &
-            d_gradT_dln_cvpv0, d_gradT_dlncv_plus1
+            d_gradT_dln_cvpv0
          integer, intent(out) :: ierr
          logical :: okay
 
@@ -2873,11 +2619,6 @@
             d_gradT_dln_cvpv0 = s% d_gradT_dln_cvpv0(k)
          else
             d_gradT_dln_cvpv0 = 0d0
-         end if
-         if (s% cv_flag) then
-            d_gradT_dlncv_plus1 = s% d_gradT_dlncv_plus1(k)
-         else
-            d_gradT_dlncv_plus1 = 0d0
          end if
 
          d_gradT_dlnd00 = s% d_gradT_dlnd00(k)

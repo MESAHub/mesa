@@ -292,10 +292,6 @@
          change_Eturb_flag_at_model_number, &
          new_Eturb_flag, &
          
-         change_cv_flag, &
-         change_initial_cv_flag, &
-         new_cv_flag, &
-         
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
          new_conv_vel_flag, &
@@ -338,7 +334,6 @@
          
          center_ye_limit_for_v_flag, &
          gamma1_integral_for_v_flag, &
-         logT_for_cv_flag, &
          logT_for_conv_vel_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
@@ -424,6 +419,8 @@
          initial_age, &
          set_initial_model_number, &
          initial_model_number, &
+         set_initial_number_retries, &
+         initial_number_retries, &
          set_initial_dt, &
          limit_initial_dt, &
          years_for_initial_dt, &
@@ -947,9 +944,6 @@
          s% job% change_j_rot_flag = change_j_rot_flag
          s% job% change_initial_j_rot_flag = change_initial_j_rot_flag
          s% job% new_j_rot_flag = new_j_rot_flag
-         s% job% change_cv_flag = change_cv_flag
-         s% job% change_initial_cv_flag = change_initial_cv_flag
-         s% job% new_cv_flag = new_cv_flag
          
          s% job% create_RSP_model = create_RSP_model
 
@@ -978,7 +972,6 @@
          
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
          s% job% gamma1_integral_for_v_flag = gamma1_integral_for_v_flag
-         s% job% logT_for_cv_flag = logT_for_cv_flag
          s% job% logT_for_conv_vel_flag = logT_for_conv_vel_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
@@ -1063,6 +1056,8 @@
          s% job% initial_age = initial_age
          s% job% set_initial_model_number = set_initial_model_number
          s% job% initial_model_number = initial_model_number
+         s% job% set_initial_number_retries = set_initial_number_retries
+         s% job% initial_number_retries = initial_number_retries
          s% job% set_initial_dt = set_initial_dt
          s% job% limit_initial_dt = limit_initial_dt
          s% job% years_for_initial_dt = years_for_initial_dt
@@ -1515,9 +1510,6 @@
          change_j_rot_flag = s% job% change_j_rot_flag
          change_initial_j_rot_flag = s% job% change_initial_j_rot_flag
          new_j_rot_flag = s% job% new_j_rot_flag
-         change_cv_flag = s% job% change_cv_flag
-         change_initial_cv_flag = s% job% change_initial_cv_flag
-         new_cv_flag = s% job% new_cv_flag
 
          create_RSP_model = s% job% create_RSP_model
          change_v_flag = s% job% change_v_flag
@@ -1545,7 +1537,6 @@
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
          gamma1_integral_for_v_flag = s% job% gamma1_integral_for_v_flag
-         logT_for_cv_flag = s% job% logT_for_cv_flag
          logT_for_conv_vel_flag = s% job% logT_for_conv_vel_flag
          change_rotation_flag = s% job% change_rotation_flag
          change_initial_rotation_flag = s% job% change_initial_rotation_flag
@@ -1630,6 +1621,8 @@
          initial_age = s% job% initial_age
          set_initial_model_number = s% job% set_initial_model_number
          initial_model_number = s% job% initial_model_number
+         set_initial_number_retries = s% job% set_initial_number_retries
+         initial_number_retries = s% job% initial_number_retries
          set_initial_dt = s% job% set_initial_dt
          limit_initial_dt = s% job% limit_initial_dt
          years_for_initial_dt = s% job% years_for_initial_dt

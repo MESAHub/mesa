@@ -7,19 +7,19 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_late_pre_zams.mod late_pre_zams.mod
-else
+#if [ -z "$MESA_RUN_OPTIONAL" ]; then
+#   cp standard_late_pre_zams.mod late_pre_zams.mod
+#else
    do_one inlist_make_late_pre_zams_header late_pre_zams.mod LOGS_to_late_pre_zams
    cp late_pre_zams.mod standard_late_pre_zams.mod
-fi
+#fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_start_core_collapse.mod start_core_collapse.mod
-else
+#if [ -z "$MESA_RUN_OPTIONAL" ]; then
+#   cp standard_start_core_collapse.mod start_core_collapse.mod
+#else
    do_one inlist_to_start_core_collapse_header start_core_collapse.mod LOGS_to_start_core_collapse
    cp start_core_collapse.mod standard_start_core_collapse.mod
-fi
+#fi
 
 do_one inlist_finish_core_collapse_header final.mod LOGS_to_finish
 

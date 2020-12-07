@@ -7,13 +7,7 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-    cp standard_30M_mesa_201_si_burn_test.mod 30M_mesa_201_si_burn_test.mod
-else
-   do_one inlist_initial_header 30M_mesa_201_si_burn_test.mod
-   cp 30M_mesa_201_si_burn_test.mod standard_30M_mesa_201_si_burn_test.mod
-fi
+cp standard_lgT_9.5.mod lgT_9.5.mod # comes from a run of black_hole
 
 do_one inlist_30M_big_net_header final.mod
 

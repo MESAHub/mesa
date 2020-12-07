@@ -302,7 +302,7 @@
          substep_start_time = 0d0
          
          if (s% T(k) >= min_T_for_const_density_solver) then
-            Cv0 = s% dE_dT(k)
+            Cv0 = s% Cv(k)
             eta0 = s% eta(k)
             call net_1_zone_burn_const_density( &
                s% net_handle, species, s% num_reactions, 0d0, dt, &
@@ -652,7 +652,7 @@
                k = i + kmin - 1
                dE = X_1(i) - erad_start(i)
                if (abs(dE) < s% energy(k)*1d-8) then
-                  new_T = s% T(k) + dE/s% dE_dT(k)
+                  new_T = s% T(k) + dE/s% Cv(k)
                   new_lnT = log(new_T)
                   if (dbg) write(*,2) 'dlogT new old dE/E', k, &
                      (new_lnT - s% lnT(k))/ln10, new_lnT/ln10, s% lnT(k)/ln10, dE/s% energy(k)
@@ -899,7 +899,7 @@
          tol_avg_corr = 1d-4 ! s% op_split_burn_tol_avg_correction
          tol_max_corr = 1d-5 ! s% op_split_burn_tol_max_correction
          
-         Cv0 = s% dE_dT(k)
+         Cv0 = s% Cv(k)
          lnT0 = s% lnT(k)
          dCv_dlnT = s% d_eos_dlnT(i_Cv,k)
          Cv = Cv0
@@ -1005,7 +1005,7 @@
                         if (s% report_ierr) write(*,2) 'burn1_BE failed in do_eos_for_cell', k
                         exit step_loop
                      end if
-                     Cv = s% dE_dT(k)
+                     Cv = s% Cv(k)
                      dCv_dlnT = s% d_eos_dlnT(i_Cv,k)
 
                      call do1_net(s, k, species, &
@@ -1079,7 +1079,7 @@
                   if (s% report_ierr) write(*,2) 'retry burn1_BE failed in do_eos_for_cell', k
                   exit step_loop
                end if
-               Cv = s% dE_dT(k)
+               Cv = s% Cv(k)
                dCv_dlnT = s% d_eos_dlnT(i_Cv,k)
 
                call do1_net(s, k, species, &

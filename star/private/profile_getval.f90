@@ -910,8 +910,8 @@
                val = s% grada(k)
             case (p_dE_dRho)
                val = s% dE_dRho(k)
-            case (p_dE_dT)
-               val = s% dE_dT(k)
+            case (p_Cv)
+               val = s% Cv(k)
             case (p_cp)
                val = s% cp(k)
 

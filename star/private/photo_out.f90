@@ -61,7 +61,7 @@
             s% generations, s% total_num_solver_iterations, &
             s% nz, s% nz_old, &
             s% nvar_hydro, s% nvar_chem, s% nvar, s% init_model_number, &
-            s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, s% cv_flag, &
+            s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% rsp_flag, s% D_smooth_flag, &
             s% prev_Lmax, s% species, s% num_reactions, &
@@ -155,7 +155,7 @@
             s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities
          call write_part_number(iounit)
          if (s% generations > 1 .and. .not. s% rsp_flag) then
-            if (.not. s% conv_vel_flag .and. .not. s% cv_flag) &
+            if (.not. s% conv_vel_flag) &
                write(iounit)  s% conv_vel_old(1:nz_old)
             write(iounit) &
                s% dPdr_dRhodr_info_old(1:nz_old), &
@@ -211,9 +211,9 @@
          write(iounit) &
             s% i_lnd, s% i_lnT, s% i_lnR, s% i_lum, s% i_eturb_RSP, s% i_erad_RSP, s% i_Fr_RSP, &
             s% i_v, s% i_u, s% i_alpha_RTI, s% i_ln_cvpv0, s% i_eturb, &
-            s% i_w_div_wc, s% i_j_rot, s% i_lncv_plus1, &
+            s% i_w_div_wc, s% i_j_rot, &
             s% i_dv_dt, s% i_equL, s% i_dlnd_dt, s% i_dlnE_dt, &
-            s% i_deturb_RSP_dt, s% i_derad_RSP_dt, s% i_dFr_RSP_dt, s% i_dlncv_plus1_dt, &
+            s% i_deturb_RSP_dt, s% i_derad_RSP_dt, s% i_dFr_RSP_dt, &
             s% i_du_dt, s% i_dlnR_dt, s% i_dln_cvpv0_dt, s% i_dalpha_RTI_dt, s% i_deturb_dt
 
          write(iounit) &

@@ -238,8 +238,8 @@
       integer, parameter :: p_logE = p_logP + 1
       integer, parameter :: p_grada = p_logE + 1
       integer, parameter :: p_dE_dRho = p_grada + 1
-      integer, parameter :: p_dE_dT = p_dE_dRho + 1
-      integer, parameter :: p_cp = p_dE_dT + 1
+      integer, parameter :: p_Cv = p_dE_dRho + 1
+      integer, parameter :: p_cp = p_Cv + 1
       integer, parameter :: p_thermal_time_to_surface = p_cp + 1
       integer, parameter :: p_log_thermal_time_to_surface = p_thermal_time_to_surface + 1
       integer, parameter :: p_log_CpT = p_log_thermal_time_to_surface + 1
@@ -1021,7 +1021,7 @@
          profile_column_name(p_logE) = 'logE'
          profile_column_name(p_grada) = 'grada'
          profile_column_name(p_dE_dRho) = 'dE_dRho'
-         profile_column_name(p_dE_dT) = 'dE_dT'
+         profile_column_name(p_Cv) = 'Cv'
          profile_column_name(p_thermal_time_to_surface) = 'thermal_time_to_surface'
          profile_column_name(p_log_thermal_time_to_surface) = 'log_thermal_time_to_surface'
          profile_column_name(p_cp) = 'cp'

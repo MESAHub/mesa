@@ -186,7 +186,6 @@
 
       logical :: change_RTI_flag, change_initial_RTI_flag, new_RTI_flag
       logical :: change_conv_vel_flag, change_initial_conv_vel_flag, new_conv_vel_flag
-      logical :: change_cv_flag, change_initial_cv_flag, new_cv_flag
       logical :: change_w_div_wc_flag, change_initial_w_div_wc_flag, new_w_div_wc_flag
       logical :: change_j_rot_flag, change_initial_j_rot_flag, new_j_rot_flag
       logical :: create_RSP_model
@@ -199,7 +198,7 @@
          new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
       real(dp) :: gamma1_integral_for_v_flag
-      real(dp) :: logT_for_conv_vel_flag, logT_for_cv_flag
+      real(dp) :: logT_for_conv_vel_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag
       logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
          new_reconstruction_flag
@@ -290,6 +289,9 @@
 
       logical :: set_initial_model_number
       integer :: initial_model_number
+
+      logical :: set_initial_number_retries
+      integer :: initial_number_retries
       
       logical :: set_initial_dt, limit_initial_dt
       real(dp) :: years_for_initial_dt, seconds_for_initial_dt

@@ -347,7 +347,7 @@
             s% chiT_start(k) = s% chiT(k)
             s% chiRho_start(k) = s% chiRho(k)
             s% cp_start(k) = s% cp(k)
-            s% dE_dT_start(k) = s% dE_dT(k)
+            s% Cv_start(k) = s% Cv(k)
             s% dE_dRho_start(k) = s% dE_dRho(k)
             s% gam_start(k) = s% gam(k)
             s% lnS_start(k) = s% lnS(k)

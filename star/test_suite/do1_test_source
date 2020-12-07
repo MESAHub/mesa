@@ -77,7 +77,6 @@ do_one sedov_omega_1 "All tests are okay"  "done_with_sedov.mod" auto
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one split_burn_big_net_30M "stop because have dropped below central lower limit for si28" "final.mod" skip
-do_one split_burn_big_net_30M_logT_9.8 "stop because log_center_temperature >= log_center_temp_limit" "final.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto

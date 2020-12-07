@@ -156,20 +156,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         
-         
-         if (s% x_logical_ctrl(1)) then ! We are building the initial model 
-            if(s%c_core_mass > 0) s% thermohaline_coeff = 0d0
-         
-            if(s% lnT(s%nz) > 9.5d0*ln10) then
-                call star_change_to_new_net(s%id, .false.,'mesa_201.net', ierr)
-                if (ierr/=0) call mesa_error(__FILE__,__LINE__)
-            end if
-            
-         end if
-         
-         
-         
       end function extras_finish_step
       
       

@@ -302,15 +302,6 @@
             0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
          if (failed('D_mix')) return
 
-         if (s% min_T_for_acceleration_limited_conv_velocity < 1d12 .and. &
-               s% max_T_for_acceleration_limited_conv_velocity > 0d0 .and. &
-               .not. s% conv_vel_flag) then
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% conv_vel, conv_vel_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('conv_vel')) return
-         end if
-
          do k=nzlo_old,nzhi_old  ! 1,nz_old  !
 
             ! since we must adjust things to make the sum of xa's = 1,
@@ -685,9 +676,6 @@
 
          call prune1(s% lnT, lnT_old, skip)
          call prune1(s% D_mix, D_mix_old, skip)
-
-         if (s% min_T_for_acceleration_limited_conv_velocity < 1d12) &
-            call prune1(s% conv_vel, conv_vel_old, skip)
 
          if (s% rotation_flag) then
             call prune1(s% j_rot, j_rot_old, skip)

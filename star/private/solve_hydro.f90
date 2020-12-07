@@ -129,7 +129,7 @@
             use star_solver, only: get_solver_work_sizes
             use star_solver_15066, only: get_solver_work_sizes_15066
             integer, intent(out) :: ierr
-            if (s% debugging_new_conv_vel_code) then
+            if (.not. s% conv_vel_flag) then
                call get_solver_work_sizes(s, nvar, nz, hydro_lwork, hydro_liwork, ierr)
             else
                call get_solver_work_sizes_15066(s, nvar, nz, hydro_lwork, hydro_liwork, ierr)
@@ -190,10 +190,6 @@
             else if (j1 == s% i_alpha_RTI .and. s% i_alpha_RTI <= nvar) then
                do k = 1, nz
                   s% xh(j1,k) = s% alpha_RTI(k)
-               end do
-            else if (j1 == s% i_lncv_plus1 .and. s% i_lncv_plus1 <= nvar) then
-               do k = 1, nz
-                  s% xh(j1,k) = s% lncv_plus1(k)
                end do
             else if (j1 == s% i_ln_cvpv0 .and. s% i_ln_cvpv0 <= nvar) then
                do k = 1, nz
@@ -366,7 +362,7 @@
          
          if (skip_global_corr_coeff_limit) then
             solver_work(r_min_corr_coeff) = 1
-         else if (s% conv_vel_flag .and. .not. s% debugging_new_conv_vel_code) then
+         else if (s% conv_vel_flag) then
             solver_work(r_min_corr_coeff) = s% conv_vel_corr_coeff_limit
          else
             solver_work(r_min_corr_coeff) = s% corr_coeff_limit
@@ -670,7 +666,7 @@
             s% doing_solver_iterations = .true.
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.        
-            if (s% debugging_new_conv_vel_code) then
+            if (.not. s% conv_vel_flag) then
                call solver( &
                   s, nz, nvar, dx1, &
                   gold_tolerances_level, tol_correction_norm, &

@@ -1,35 +1,64 @@
 
+! 60M stalls with Fe-bump radial pulses when core He down to 0.045    
+! watch profile wrt logtau from surface to 7.  outer convection zone moves in and out.
+! surface velocity goes up and down.
 
 &star_job
       show_log_description_at_start = .false.
 
-      relax_to_this_tau_factor = 1d3
+      relax_to_this_tau_factor = 900 ! good for 50M
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
 
-      new_omega_div_omega_crit = 0.3d0
-
       disable_pgstar_for_relax = .true.
-
-      logT_for_conv_vel_flag = 8.5d0
-
-      !pgstar_flag=.true.
+      
+      change_conv_vel_flag = .true.
+      new_conv_vel_flag = .false.
+      logT_for_conv_vel_flag = 10d0
+      
+      
+      
+      
+      
+      ! some changes to match make_pre_ccsn_IIp
+      !change_initial_net = .true.
+      !new_net_name = 'approx21_cr60_plus_co56.net'
+      !dump_missing_metals_into_heaviest = .false.      
+      
+      
+      set_rates_preference = .true.
+      new_rates_preference = 1   ! 1 = nacre ; 2 = jina reaclib
+      
+      
+      change_D_omega_flag = .true.
+      new_D_omega_flag = .true.
+      change_initial_D_smooth_flag = .true.
+      new_D_smooth_flag = .true.
+      
+      
+      
 
 / ! end of star_job namelist
 
 
 &eos
-
-
+   PC_use_Gamma_limit_instead_of_T = .false.
 / ! end of eos namelist
 
 
 
 &kap
       Zbase = 0.01
+      kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
+      kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
+
+! various timestep limits
+
       
       scale_max_correction = 0.2d0
       ignore_species_in_max_correction = .true.
@@ -55,16 +84,22 @@
       delta_lgRho_cntr_limit = 2d-2
       delta_lgT_cntr_limit = 4d-3
       dX_nuc_drop_limit_at_high_T = 1d-2
-
-      varcontrol_target = 7d-4
-
+      
+      
+      limit_for_rel_error_in_energy_conservation = 1d-7
+      hard_limit_for_rel_error_in_energy_conservation = 1d-6
+      
 
       cool_wind_RGB_scheme = 'Dutch'
       cool_wind_AGB_scheme = 'Dutch'
       hot_wind_scheme = 'Dutch'
-      Dutch_wind_lowT_scheme = 'van Loon'
-      dutch_scaling_factor=0.1d0
-      van_loon_scaling_factor=0.1d0
+      Dutch_wind_lowT_scheme = 'de Jager'
+      Dutch_scaling_factor = 0.1
+      cool_wind_full_on_T = 0.8d4
+      hot_wind_full_on_T = 1.2d4
+      
+      cool_wind_full_on_T = 0.8d4
+      hot_wind_full_on_T = 1.2d4
 
       cool_wind_full_on_T = 0.8d4
       hot_wind_full_on_T = 1.2d4
@@ -90,11 +125,11 @@
       max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
       overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'any'
-      overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
-      overshoot_f(1) = 0.004
-      overshoot_f0(1) = 0.001
+      overshoot_zone_type(1) = 'burn_Z'
+      overshoot_zone_loc(1) = 'shell'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.015
+      overshoot_f0(1) = 0.005
 
       when_to_stop_rtol = 1d-3
       when_to_stop_atol = 1d-3
@@ -104,14 +139,36 @@
 
       always_use_dedt_form_of_energy_eqn = .true. 
       use_dedt_form_of_energy_eqn = .true.
-
-      recalc_mixing_info_each_substep = .true.
+      
+      use_d_eos_dxa = .true.
+      
+      !max_abs_rel_run_E_err = 1d99
 
       he_core_boundary_h1_fraction = 0.5
       c_core_boundary_he4_fraction = 0.5
       o_core_boundary_c12_fraction = 0.5
       si_core_boundary_o16_fraction = 0.5
       fe_core_boundary_si28_fraction = 0.33
+      
+      ! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+      pulse_data_format = 'GYRE'
+      
+      x_logical_ctrl(37) = .false. ! if true, then run GYRE
+
+      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
+
+      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         ! should match gyre.in mode l
+      x_integer_ctrl(4) = 1 ! order
+      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      x_ctrl(2) = 0.33d+03 ! growth < this (days)
+      
+      
 
       photo_interval = 50
       profile_interval = 100
@@ -123,6 +180,21 @@
       !profile_interval = 5
       !history_interval = 1
       !terminal_interval = 1
+
+
+
+
+
+      use_gold2_tolerances = .false.
+      use_gold_tolerances = .true.
+      
+      varcontrol_target = 1d-3
+      warning_limit_for_max_residual = 1d99
+      
+      convergence_ignore_equL_residuals = .true. 
+
+
+
 
 
       ! op_split_burn
@@ -139,6 +211,24 @@
 
       num_trace_history_values = 1
       trace_history_value_name(1) = 'radius'
+
+
+
+
+
+
+iter_for_resid_tol2 = 10
+ignore_too_large_correction = .false.
+make_gradr_sticky_in_solver_iters = .true.
+max_tries_for_implicit_wind = 0
+never_skip_hard_limits = .true
+velocity_logT_lower_bound = -1d99
+max_dt_yrs_for_velocity_logT_lower_bound = 1d99
+mlt_make_surface_no_mixing = .true.
+use_gold2_tolerances = .true.
+
+!use_dPrad_dm_form_of_T_gradient_eqn = .true.         <<< BAD FOR 50M
+
 
 / ! end of controls namelist
 

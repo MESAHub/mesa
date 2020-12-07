@@ -18,7 +18,6 @@ if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_shock_part3.mod shock_part3.mod
 else
    do_one inlist_shock_part3_header shock_part3.mod LOGS_part3
-   cp shock_part3.mod standard_shock_part3.mod
 fi
 
 # check if can skip shock_part4
@@ -26,7 +25,6 @@ if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_shock_part4.mod shock_part4.mod
 else
    do_one inlist_shock_part4_header shock_part4.mod LOGS_part4
-   cp shock_part4.mod standard_shock_part4.mod
 fi
 
 do_one inlist_shock_part5_header shock_part5.mod LOGS_part5

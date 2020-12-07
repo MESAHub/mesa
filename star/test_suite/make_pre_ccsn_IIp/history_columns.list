@@ -179,14 +179,16 @@
       
       lum_div_Ledd
       log_L_div_Ledd
-      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
-      surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
+      v_div_cs
+      v_surf_km_s
+      !v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
    
    ! conditions near center
    
-      log_center_T ! temperature
-      log_center_Rho ! density
-      log_center_P ! pressure
+      log_cntr_T ! temperature
+      log_cntr_Rho ! density
+      log_cntr_P ! pressure
       !center_degeneracy ! the electron chemical potential in units of k*T
       !center_gamma ! plasma interaction parameter at the centermost meshpoint.
       center_omega

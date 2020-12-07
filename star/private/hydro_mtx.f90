@@ -95,7 +95,7 @@
             skip_other_cgrav = .true.
          logical :: do_chem, do_struct, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
-            i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_v, i_lncv_plus1, &
+            i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, i_chem1, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
@@ -104,7 +104,7 @@
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
          logical :: do_lnd, do_lnT, do_lnR, do_lum, do_eturb, &
-            do_u, do_v, do_alpha_RTI, do_cv, do_conv_vel, do_w_div_wc, do_j_rot
+            do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
 
          include 'formats'
 
@@ -164,7 +164,6 @@
          i_ln_cvpv0 = s% i_ln_cvpv0
          i_w_div_wc = s% i_w_div_wc
          i_j_rot = s% i_j_rot
-         i_lncv_plus1 = s% i_lncv_plus1
 
          do_lnd = i_lnd > 0 .and. i_lnd <= nvar
          do_lnT = i_lnT > 0 .and. i_lnT <= nvar
@@ -174,7 +173,6 @@
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
-         do_cv = i_lncv_plus1 > 0 .and. i_lncv_plus1 <= nvar
          do_conv_vel = i_ln_cvpv0 > 0 .and. i_ln_cvpv0 <= nvar
          do_w_div_wc = i_w_div_wc > 0 .and. i_w_div_wc <= nvar
          do_j_rot = i_j_rot > 0 .and. i_j_rot <= nvar
@@ -558,24 +556,6 @@
                      if (s% alpha_RTI(k) < 0d0) then
                         s% alpha_RTI(k) = 0d0
                         x(i_alpha_RTI) = 0d0
-                     end if
-                  end if
-
-                  if (do_cv) then
-                     s% dxh_lncv_plus1(k) = dx(i_lncv_plus1,k)
-                     s% lncv_plus1(k) = x(i_lncv_plus1)
-                     s% cv(k) = expm1(s% lncv_plus1(k))
-                     if (s% cv(k) > 1d90 .or. is_bad_num(s% cv(k))) then
-                        s% retry_message = 'bad num for cv'
-                        if (report) write(*,2) 'bad num cv', k, s% cv(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver cv', k, s% cv(k)
-                           write(*,2) 'set_vars_for_solver lncv_plus1', k, s% lncv_plus1(k)
-                           write(*,2) 'set_vars_for_solver dxh_lncv_plus1', k, s% dxh_lncv_plus1(k)
-                           write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_lncv_plus1,k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
                      end if
                   end if
 

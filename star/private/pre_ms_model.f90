@@ -819,7 +819,7 @@
             s% mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             s% MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, s% mlt_accel_g_theta, dt, tau, .false., & 
+            prev_conv_vel, max_conv_vel, dt, tau, .false., & 
             mixing_type, mlt_basics, mlt_partials1, ierr)
          if (ierr /= 0) return
          

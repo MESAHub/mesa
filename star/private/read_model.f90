@@ -47,7 +47,6 @@
       integer, parameter :: bit_for_D_smooth  = 14
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
-      integer, parameter :: bit_for_cv_var = 17
 
       integer, parameter :: increment_for_unused = 1
       integer, parameter :: increment_for_i_eturb = 1
@@ -59,7 +58,6 @@
       integer, parameter :: increment_for_D_smooth_flag = 1
       integer, parameter :: increment_for_rsp_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
-      integer, parameter :: increment_for_cv_flag = 1
       integer, parameter :: increment_for_const_L = -1
       integer, parameter :: max_increment = increment_for_unused &
                                           + increment_for_i_eturb &
@@ -70,8 +68,7 @@
                                           + increment_for_RTI_flag &
                                           + increment_for_D_smooth_flag &
                                           + increment_for_rsp_flag &
-                                          + increment_for_conv_vel_flag &
-                                          + increment_for_cv_flag
+                                          + increment_for_conv_vel_flag
 
       integer, parameter :: mesa_zams_file_type = 2**bit_for_zams_file
 
@@ -255,7 +252,7 @@
          integer, intent(out) :: ierr
 
          integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_eturb_RSP, &
-            i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_lncv_plus1, ii
+            i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
          real(dp) :: r00, rm1
@@ -280,7 +277,6 @@
          i_erad_RSP = s% i_erad_RSP
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
-         i_lncv_plus1 = s% i_lncv_plus1
          n = species + nvar_hydro + 1 ! + 1 is for dq
          if (i_eturb /= 0) n = n+increment_for_i_eturb ! read eturb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
@@ -291,7 +287,6 @@
          if (is_RSP_model) n = n+increment_for_rsp_flag ! read eturb, erad, Fr
          if (s% D_smooth_flag) n = n+increment_for_D_smooth_flag ! read D_smooth
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
-         if (s% cv_flag) n = n+increment_for_cv_flag ! read cv
          if (s% constant_L) n = n+increment_for_const_L ! do not read L
          if (is_RSP_model .and. .not. want_RSP_model) then
             if (.not. s% Eturb_flag) then
@@ -385,10 +380,6 @@
                else
                   conv_vel(i) = vec(j)
                end if
-            end if
-            if (s% cv_flag) then
-               j=j+1
-               xh(i_lncv_plus1,i) = vec(j)
             end if
             if (j+species > nvec) then
                ierr = -1
@@ -516,7 +507,7 @@
             s% model_number, s% star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             s% xmstar, s% R_center, s% L_center, s% v_center, &
-            s% cumulative_energy_error, ierr)
+            s% cumulative_energy_error, s% num_retries, ierr)
 
          if (ierr /= 0 .or. initial_mass < 0 .or. nz < 0 &
                .or. initial_z < 0 .or. species < 0 .or. &
@@ -591,7 +582,6 @@
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% constant_L = BTEST(file_type, bit_for_constant_L)
          s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
-         s% cv_flag = BTEST(file_type, bit_for_cv_var)
          s% D_smooth_flag = BTEST(file_type, bit_for_D_smooth)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
@@ -791,7 +781,7 @@
          integer, intent(out) :: ierr
          character (len=strlen) :: net_name
          integer :: species, n_shells, &
-            year_month_day_when_created
+            num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, fixed_L_for_BB_outer_BC, &
             tau_factor, Tsurf_factor, opacity_factor, &
@@ -801,7 +791,8 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
-            xmstar, R_center, L_center, v_center, cumulative_energy_error, ierr)
+            xmstar, R_center, L_center, v_center, &
+            cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_saved_model_number
 
 
@@ -811,7 +802,7 @@
          integer, intent(out) :: ierr
          character (len=strlen) :: net_name
          integer :: species, n_shells, model_number, &
-            year_month_day_when_created
+            num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, cumulative_energy_error, &
             tau_factor, Tsurf_factor, &
@@ -822,7 +813,8 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
-            xmstar, R_center, L_center, v_center, cumulative_energy_error, ierr)
+            xmstar, R_center, L_center, v_center, &
+            cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_saved_model_age
 
 
@@ -831,12 +823,13 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
-            xmstar, R_center, L_center, v_center, cumulative_energy_error, ierr)
+            xmstar, R_center, L_center, v_center, &
+            cumulative_energy_error, num_retries, ierr)
          use utils_lib
          character (len=*), intent(in) :: fname
          character (len=*), intent(inout) :: net_name
          integer, intent(inout) :: species, n_shells, &
-            year_month_day_when_created, model_number
+            year_month_day_when_created, num_retries, model_number
          real(dp), intent(inout) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
@@ -865,7 +858,8 @@
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
-            xmstar, R_center, L_center, v_center, cumulative_energy_error, ierr)
+            xmstar, R_center, L_center, v_center, &
+            cumulative_energy_error, num_retries, ierr)
          close(iounit)
       end subroutine do_read_saved_model_properties
 
@@ -875,12 +869,12 @@
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
-            xmstar, R_center, L_center, v_center, cumulative_energy_error, &
-            ierr)
+            xmstar, R_center, L_center, v_center, &
+            cumulative_energy_error, num_retries, ierr)
          integer, intent(in) :: iounit
          character (len=*), intent(inout) :: net_name
          integer, intent(inout) :: species, n_shells, &
-            year_month_day_when_created, model_number
+            year_month_day_when_created, model_number, num_retries
          real(dp), intent(inout) :: m_div_msun, initial_z, initial_y, &
             mixing_length_alpha, star_age, tau_factor, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
@@ -914,6 +908,7 @@
             if (match_keyword('year_month_day_when_created', line, tmp)) then
                year_month_day_when_created = int(tmp); cycle; end if
             if (match_keyword('tau_photosphere', line, tmp)) cycle
+            if (match_keyword('num_retries', line, tmp)) then; num_retries = int(tmp); cycle; end if
          end do
       end subroutine read_properties
 

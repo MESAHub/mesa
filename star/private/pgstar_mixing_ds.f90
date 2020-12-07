@@ -348,7 +348,7 @@
 
             call pgsch(txt_scale*s% Mixing_legend_txt_scale_factor)
             
-            if (s% D_smooth_flag .and. .not. s% conv_vel_flag .and. .not. s% cv_flag) then         
+            if (s% D_smooth_flag .and. .not. s% conv_vel_flag) then         
                do k=grid_min, grid_max
                   yvec(k) = safe_log10(s% D_smooth(k))
                end do
@@ -500,7 +500,7 @@
             call pgsvp(legend_xmin, legend_xmax, legend_ymin, legend_ymax)
             call pgswin(0.0, 1.0, ymin, ymax)
             number_of_legend_lines = 6
-            if (s% D_smooth_flag .and. .not. s% conv_vel_flag .and. .not. s% cv_flag) &
+            if (s% D_smooth_flag .and. .not. s% conv_vel_flag) &
                number_of_legend_lines = number_of_legend_lines + 1
             if (rotation .and. s% Mixing_show_rotation_details) &
                   number_of_legend_lines = number_of_legend_lines + 7
@@ -530,9 +530,9 @@
                cnt = mixing_line_legend(cnt, clr_rayleigh_taylor, &
                   lw, lw_sav, txt_scale, 'rayleigh_taylor')
             end if
-            if (s% conv_vel_flag .or. s% cv_flag) then
+            if (s% conv_vel_flag) then
                cnt = mixing_line_legend(cnt, clr_leftover_convection, &
-                  lw, lw_sav, txt_scale, 'decaying')
+                  lw, lw_sav, txt_scale, 'leftover')
             end if
             if (rotation .and. s% Mixing_show_rotation_details) then
                cnt = mixing_line_legend(cnt, clr_IndianRed, &
@@ -550,7 +550,7 @@
                cnt = mixing_line_legend(cnt, clr_MediumSlateBlue, &
                   lw, lw_sav, txt_scale, 'GSF')
             end if
-            if (s% D_smooth_flag .and. .not. s% conv_vel_flag .and. .not. s% cv_flag) then
+            if (s% D_smooth_flag .and. .not. s% conv_vel_flag) then
                cnt = mixing_line_legend(cnt, clr_D_smooth, &
                   lw, lw_sav, txt_scale, 'D_smooth')
             end if

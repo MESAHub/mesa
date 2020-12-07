@@ -355,12 +355,10 @@
             RSP_alpha_d_standard, RSP_gamma_r_standard, &
             RSP_alpha_P_factor, RSP_alpha_s_factor, RSP_alpha_c_factor, &
             RSP_alpha_d_factor, RSP_gamma_r_factor, &
-            RSP_min_tau, RSP_min_q, min_T_for_acceleration_limited_conv_velocity, &
-            max_T_for_acceleration_limited_conv_velocity, &
-            max_conv_vel_div_csound, &
+            RSP_min_tau, RSP_min_q, max_conv_vel_div_csound, &
             min_dt_for_increases_in_convection_velocity, &
             max_v_for_convection, max_q_for_convection_with_hydro_on, &
-            mlt_accel_g_theta, max_v_div_cs_for_convection, &
+            max_v_div_cs_for_convection, &
             max_abs_du_div_cs_for_convection, &
             RTI_smooth_fraction, RTI_smooth_mass, &
             alpha_RTI_diffusion_factor, &
@@ -850,7 +848,7 @@
          real(dp) :: min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on
          logical :: conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, &
                     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, &
-                    conv_vel_use_mlt_vc_start, debugging_new_conv_vel_code
+                    conv_vel_use_mlt_vc_start
 
          logical :: include_composition_in_eps_grav
          real(dp) :: accretion_entropy_at_surface, velocity_logT_lower_bound, &

@@ -9,8 +9,8 @@
       save_model_filename = 'c_burn.mod'
       required_termination_code_string = 'star_species_mass_max_limit'
 
-      change_initial_conv_vel_flag = .true.
-      new_conv_vel_flag = .true.
+      !change_initial_conv_vel_flag = .true.
+      !new_conv_vel_flag = .true.
 
       !pgstar_flag = .true.
 
@@ -33,6 +33,24 @@
       max_model_number = 3000
       
 ! solver
+
+      burn_steps_limit = 150
+      burn_steps_hard_limit = 250
+
+      op_split_burn = .true.
+      op_split_burn_min_T = 1d6
+
+      op_split_burn_eps = 1d-5
+      op_split_burn_odescal = 1d-5
+
+      make_gradr_sticky_in_solver_iters = .true.
+      
+      convergence_ignore_equL_residuals = .true.
+      
+      use_gold2_tolerances = .false.
+      use_gold_tolerances = .false.
+
+
 
 ! when to stop
       star_species_mass_max_limit = 0.4d0 ! Msun

@@ -143,11 +143,12 @@
          call unpack_res18(resid_18)
 
          if (test_partials) then  
-            s% solver_test_partials_var = i_lnT
+            s% solver_test_partials_var = s% i_lnT
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)  
             write(*,*) 'get1_energy_eqn', s% solver_test_partials_var
             if (eps_grav_form) write(*,*) 'eps_grav_form', eps_grav_form
-            if (.false. .and. s% solver_iter == s% solver_test_partials_iter_number) then
+            !if (.false. .and. s% solver_iter == s% solver_test_partials_iter_number) then
+            if (.true.) then
                write(*,2) 'scal', k, scal
                write(*,2) 'residual', k, residual
                write(*,2) 'sources*scal', k, sources_18%val*scal
@@ -156,7 +157,12 @@
                write(*,2) '-dwork_dm*scal', k, -dwork_dm_18%val*scal
                write(*,2) '-dke_dt*scal', k, -dke_dt_18%val*scal
                write(*,2) '-dpe_dt*scal', k, -dpe_dt_18%val*scal
-               write(*,2) '-de_dt*scal', k, -de_dt_18%val*scal
+               write(*,2) 'gradT', k, s% gradT(k)
+               write(*,2) 'opacity', k, s% opacity(k)
+               write(*,2) 'logT', k, s% lnT(k)/ln10
+               write(*,2) 'logRho', k, s% lnd(k)/ln10
+               write(*,2) 'X', k, s% X(k)
+               write(*,2) 'Z', k, s% Z(k)
             end if
             write(*,*)
          end if

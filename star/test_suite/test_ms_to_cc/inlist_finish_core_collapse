@@ -62,8 +62,8 @@
       
       eps_nuc_factor = 0d0
       dxdt_nuc_factor = 0d0
-      
-      velocity_logT_lower_bound = 8 
+
+      velocity_logT_lower_bound = 7 
       max_dt_yrs_for_velocity_logT_lower_bound = 0.1
 
 ! mixing controls

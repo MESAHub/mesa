@@ -826,7 +826,7 @@
             beta = 1 - alfa
 
             gamma1 = alfa*s% gamma1(k) + beta*s% gamma1(k-1)
-            Cv = alfa*s% dE_dT(k) + beta*s% dE_dT(k-1)
+            Cv = alfa*s% Cv(k) + beta*s% Cv(k-1)
             chiRho = alfa*s% chiRho(k) + beta*s% chiRho(k-1)
             chiT = alfa*s% chiT(k) + beta*s% chiT(k-1)
             Cp = alfa*s% Cp(k) + beta*s% Cp(k-1)

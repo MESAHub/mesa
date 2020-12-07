@@ -1824,22 +1824,6 @@
             end do
          end if
 
-         if (s% cv_flag) then
-            do k=1,n
-               oldval(k) = expm1(s% xh(s% i_lncv_plus1, k))
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% lncv_plus1_for_d_dt_const_m(k) = 0d0
-            end do
-            do k=k_newval,n
-               s% lncv_plus1_for_d_dt_const_m(k) = log(max(0d0,newval(k)) + 1d0)
-            end do
-         end if
-
       end subroutine set_face_stuff_for_d_dt
 
 

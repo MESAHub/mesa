@@ -750,7 +750,7 @@ contains
        lnd_save(k) = s%lnd(k)
 
        Cp_save(k) = s%Cp(k)
-       Cv_save(k) = s%dE_dT(k)
+       Cv_save(k) = s%Cv(k)
 
        gamma1_save(k) = s%gamma1(k)
        grada_save(k) = s%grada(k)
@@ -764,7 +764,7 @@ contains
        d_eos_dlnT_save(:,k) = s%d_eos_dlnT(:,k)
 
        call eval_eos(s, k, z, xh, abar, zbar, xa_mx, &
-            s%lnd(k), s%Cp(k), s%dE_dT(k), s%gamma1(k), s%grada(k), &
+            s%lnd(k), s%Cp(k), s%Cv(k), s%gamma1(k), s%grada(k), &
             s%chiRho(k), s%chiT(k), s%lnfree_e(k), &
             s%d_eos_dlnd(:,k), s%d_eos_dlnT(:,k), op_err)
        if (op_err /= 0) ierr = op_err
@@ -838,7 +838,7 @@ contains
        s%lnd(k) = lnd_save(k)
 
        s%Cp(k) = Cp_save(k)
-       s%dE_dT(k) = Cv_save(k)
+       s%Cv(k) = Cv_save(k)
 
        s%gamma1(k) = gamma1_save(k)
        s%grada(k) = grada_save(k)

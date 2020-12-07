@@ -68,7 +68,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, mixing_type, &
+            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, mixing_type, &
             gradT, d_gradT_dvb, &
             gradr, d_gradr_dvb, &
             gradL, d_gradL_dvb, &
@@ -106,7 +106,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, remove_small_D_limit, &
+            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
             
          logical, intent(in) :: alt_scale_height
@@ -163,7 +163,7 @@
          character (len=256) :: message        
          logical ::  quit
          real(dp) :: diff_grad, K, gamma0, L_ratio, frac, s, &
-            dilution_factor, conv_tau, init_conv_vel
+            dilution_factor
          real(dp) :: K_T, K_mu, nu_rad, nu_mol, nu, grad_mu, R0, r_th, H_P
 
          real(dp) :: scale_factor, interp_factor, dinterp_factor
@@ -444,8 +444,6 @@
                   d_conv_vel_dvb = 0d0
                   !mixing_type = no_mixing
                end if
-            else
-               call time_limit_conv_vel
             end if
             if (debug) write(*,1) 'remove_small_D_limit', remove_small_D_limit
             if (D < remove_small_D_limit .or. is_bad(D)) then
@@ -677,11 +675,7 @@
             conv_vel = 3*D_thrm/Lambda
             d_conv_vel_dvb = 0
             d_D_thrm_dvb = 0
-            
-            call time_limit_conv_vel
-            if (conv_vel > max_conv_vel) conv_vel = max_conv_vel
-            if (init_conv_vel /= conv_vel) D_thrm = conv_vel*Lambda/3
-            
+                        
             if (D_thrm < min_D_th .or. D_thrm <= 0) then
                call set_no_mixing
                return
@@ -690,90 +684,6 @@
             mixing_type = thermohaline_mixing 
 
          end subroutine set_thermohaline
-         
-         subroutine time_limit_conv_vel
-            real(dp), dimension(nvbs) :: d_vconv_accel_dvb, d_brunt_timescale_dvb
-            real(dp), dimension(nvbs) :: d_diff_grads_s_dvb, d_tau_dvb
-            real(dp) :: new_conv_vel, vconv_accel, l
-            real(dp) :: brunt_timescale, diff_grads_s, tau
-            include 'formats'
-
-            init_conv_vel = conv_vel
-            if (dt <= 0d0 .or. prev_conv_vel < 0d0) return
-
-            if (conv_vel <= prev_conv_vel) return
-            
-            if (g_theta > 0) then ! max accel is grav*g_theta
-               if (conv_vel > prev_conv_vel) then
-                  !increase convective velocity as needed
-                  new_conv_vel = prev_conv_vel + dt*grav*g_theta
-                  if (new_conv_vel < conv_vel) then
-                     conv_vel = new_conv_vel
-                     d_conv_vel_dvb = dt*d_grav_dvb*g_theta
-                  end if
-               else
-                  !reduce convective velocity as needed
-                  new_conv_vel = prev_conv_vel - dt*grav*g_theta
-                  if (new_conv_vel > conv_vel) then 
-                     conv_vel = new_conv_vel
-                     d_conv_vel_dvb = -dt*d_grav_dvb*g_theta
-                  end if
-               end if
-            else
-               ! Arnett, W.D., 1969, Ap. and Space Sci, 5, 180.
-               l = Lambda
-               if (conv_vel > 0d0) then
-                  vconv_accel = 2d0*(conv_vel*conv_vel - prev_conv_vel*prev_conv_vel)/l
-                  d_vconv_accel_dvb = 4d0*conv_vel*d_conv_vel_dvb/l &
-                     -2d0*(conv_vel*conv_vel-prev_conv_vel*prev_conv_vel)*d_Lambda_dvb/l*l
-                  if (conv_vel > prev_conv_vel) then
-                     !increase convective velocity as needed
-                     new_conv_vel = prev_conv_vel + dt*vconv_accel
-                     if (new_conv_vel < conv_vel) then
-                        conv_vel = new_conv_vel
-                        d_conv_vel_dvb = dt*d_vconv_accel_dvb
-                     end if
-                  else
-                     !reduce convective velocity as needed
-                     new_conv_vel = prev_conv_vel + dt*vconv_accel
-                     if (new_conv_vel > conv_vel) then
-                        conv_vel = new_conv_vel
-                        d_conv_vel_dvb = dt*d_vconv_accel_dvb
-                     end if
-                  end if
-               else ! conv_vel == 0d0
-                  if (prev_conv_vel == 0d0) return
-                  diff_grads_s = diff_grads
-                  d_diff_grads_s_dvb = d_diff_grads_dvb
-                  if (diff_grads_s < 0d0) then
-                     brunt_timescale = 1/sqrt(-chiT/chiRho*diff_grads_s*grav/scale_height)
-                  else
-                     brunt_timescale = 1d99
-                  end if
-                  if (l/prev_conv_vel > brunt_timescale) then
-                     ! reduce conv_vel on the brunt_timescale
-                     new_conv_vel = prev_conv_vel*exp(-dt/brunt_timescale)
-                     d_brunt_timescale_dvb = 0.5d0*brunt_timescale*(&
-                        -d_chiT_dvb/chiT + d_chiRho_dvb/chiRho - d_diff_grads_s_dvb/diff_grads_s &
-                        -d_grav_dvb/grav + d_scale_height_dvb/scale_height)
-                     d_conv_vel_dvb = d_brunt_timescale_dvb*&
-                        (dt*exp(-dt/brunt_timescale)*prev_conv_vel)/pow(brunt_timescale,2)
-                  else
-                     new_conv_vel = prev_conv_vel*l/(2*prev_conv_vel*dt+l)
-                     d_conv_vel_dvb = (2*dt*prev_conv_vel*prev_conv_vel)/&
-                        (4*dt*dt*prev_conv_vel*prev_conv_vel+4*dt*l*prev_conv_vel+l*l) &
-                        *d_Lambda_dvb
-                  end if
-                  conv_vel = new_conv_vel
-               end if
-            end if
-
-            if (conv_vel > max_conv_vel) then
-               conv_vel = max_conv_vel
-               d_conv_vel_dvb = 0d0
-            end if
-
-         end subroutine time_limit_conv_vel
 
          subroutine get_diff_coeffs(kt,kmu,vis)
 
@@ -1275,7 +1185,6 @@
 
             if (f1 < 0) then
                call set_no_mixing
-               call time_limit_conv_vel
                return
             end if   
             f1 = pow(f1,one_third)     
@@ -1305,7 +1214,6 @@
 
             if (Gamma < 0) then
                call set_no_mixing
-               call time_limit_conv_vel
                return
             end if
             
@@ -1325,35 +1233,6 @@
                  (-2*dA_dvb/A + 2*d_Gamma_dvb/Gamma + &
                  dP_dvb/P + dQ_dvb/Q - drho_dvb/rho)
             end if
-
-            conv_tau = 1d99
-            call time_limit_conv_vel
-            
-            if (init_conv_vel /= conv_vel .or. conv_vel == max_conv_vel) then
-               ! need to recalculate Gamma to match modified conv_vel
-               if (A <= 1d-99 .or. sqrt_x <= 1d-99) then
-                  Gamma = 1d25
-                  d_Gamma_dvb = 0
-                  if (dbg) write(*,1) 'A or sqrt_x too small', A, sqrt_x
-               else      
-                  if (dbg) write(*,*) 'recalculate Gamma to match modified conv_vel'
-                  inv_sqrt_x = 1d0/sqrt_x
-                  d_inv_sqrt_x_dvb = &
-                     (Q*P*drho_dvb/rho - Q*dP_dvb - P*dQ_dvb)/(16d0*x*sqrt_x*rho)
-                  Gamma = conv_vel*A*inv_sqrt_x/mixing_length_alpha  
-                  !d_Gamma_dvb = ( &
-                  !   d_conv_vel_dvb*A*inv_sqrt_x + &
-                  !   conv_vel*dA_dvb*inv_sqrt_x + &
-                  !   conv_vel*A*d_inv_sqrt_x_dvb)/mixing_length_alpha  
-                  ! the "correct" form breaks edep in example_ccsn_IIp.
-                  d_Gamma_dvb = 0d0
-               end if
-            end if
-
-            if (dbg) &
-               write(*,1) 'prev/init init/final conv_vel', &
-                  prev_conv_vel/init_conv_vel, &
-                  prev_conv_vel, init_conv_vel, conv_vel
             
             if (debug) write(*,1) 'conv_vel', conv_vel
             if (conv_vel < 0) then
@@ -1454,9 +1333,6 @@
             d_D_semi_dvb = 0 ! not used, so skip for now.
             conv_vel = 3*D_semi/Lambda 
             d_conv_vel_dvb = 0
-            call time_limit_conv_vel
-            if (conv_vel > max_conv_vel) conv_vel = max_conv_vel
-            if (init_conv_vel /= conv_vel) D_semi = conv_vel*Lambda/3
             if (D_semi <= 0) then
                call set_no_mixing
                return
@@ -1613,10 +1489,6 @@
               cv_var = 0.5d0*(ss% conv_vel(kz)+ss% conv_vel_start(kz))
               d_cv_var_dvb = 0
               d_cv_var_dvb(mlt_cv_var) = 0.5d0
-           else if (ss% cv_flag) then
-              cv_var = ss% cv(kz)
-              d_cv_var_dvb = 0
-              d_cv_var_dvb(mlt_cv_var) = 1d0
            end if
                         
             if (cv_var < 0d0 .or. is_bad(cv_var)) then

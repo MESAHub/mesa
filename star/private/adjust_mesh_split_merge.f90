@@ -53,7 +53,6 @@
          if (.not. s% okay_to_remesh) return
 
          if (.not. s% u_flag) stop 'remesh_split_merge requires u_flag = true'
-         if (s% cv_flag) stop 'remesh_split_merge requires cv_flag = false'
 
          if (s% rotation_flag) then
             old_J = total_angular_momentum(s)

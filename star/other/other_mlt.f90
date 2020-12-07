@@ -64,7 +64,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
+            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          
 ! UNCOMMENT THIS
@@ -95,7 +95,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, remove_small_D_limit, &
+            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
          logical, intent(in) :: alt_scale_height
          character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
@@ -118,35 +118,33 @@
          
 ! UNCOMMENT THIS
          !call star_mlt_eval(  &
-         !   id, k, cgrav, m, mstar, r, L, X, &            
-         !   T_face, rho_face, P_face, &
-         !   chiRho_face, chiT_face, &
-         !   Cp_face, opacity_face, grada_face, &            
-         !   alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
-         !   T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
-         !   chiRho_for_partials_00, chiT_for_partials_00, &
-         !   chiRho_for_partials_m1, chiT_for_partials_m1, &
-         !   chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
-         !   chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
-         !   chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
-         !   chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
-         !   Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
-         !   Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
-         !   opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
-         !   opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
-         !   grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
-         !   grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
-         !   gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
-         !   alpha_semiconvection, semiconvection_option, &
-         !   thermohaline_coeff, thermohaline_option, &
-         !   dominant_iso_for_thermohaline, &
-         !   mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
-         !   MLT_option, Henyey_y_param, Henyey_nu_param, &
-         !   normal_mlt_gradT_factor, &
-         !   prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
-         !   mixing_type, mlt_basics, mlt_partials1, ierr)
-         
-         
+            !id, k, cgrav, m, mstar, r, L, X, &            
+            !T_face, rho_face, P_face, &
+            !chiRho_face, chiT_face, &
+            !Cp_face, opacity_face, grada_face, &            
+            !alfa, beta, & ! f_face = alfa*f_00 + beta*f_m1
+            !T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
+            !chiRho_for_partials_00, chiT_for_partials_00, &
+            !chiRho_for_partials_m1, chiT_for_partials_m1, &
+            !chiRho_00, d_chiRho_00_dlnd, d_chiRho_00_dlnT, &
+            !chiRho_m1, d_chiRho_m1_dlnd, d_chiRho_m1_dlnT, &
+            !chiT_00, d_chiT_00_dlnd, d_chiT_00_dlnT, &
+            !chiT_m1, d_chiT_m1_dlnd, d_chiT_m1_dlnT, &
+            !Cp_00, d_Cp_00_dlnd, d_Cp_00_dlnT, &
+            !Cp_m1, d_Cp_m1_dlnd, d_Cp_m1_dlnT, &
+            !opacity_00, d_opacity_00_dlnd, d_opacity_00_dlnT, &
+            !opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
+            !grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
+            !grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &            
+            !gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
+            !alpha_semiconvection, semiconvection_option, &
+            !thermohaline_coeff, thermohaline_option, &
+            !dominant_iso_for_thermohaline, &
+            !mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
+            !MLT_option, Henyey_y_param, Henyey_nu_param, &
+            !normal_mlt_gradT_factor, &
+            !prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            !mixing_type, mlt_basics, mlt_partials1, ierr)
          
          ! see star_data/public/star_data_def.inc for lists of mlt_basics and mlt_partials
          

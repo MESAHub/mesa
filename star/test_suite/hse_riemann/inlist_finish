@@ -73,10 +73,10 @@
       mixing_length_alpha = 1.9
       MLT_option = 'Henyey'
       thermohaline_coeff = 0
-      min_T_for_acceleration_limited_conv_velocity = 0
+      !min_T_for_acceleration_limited_conv_velocity = 0
       okay_to_reduce_gradT_excess = .false.
-      min_dt_for_increases_in_convection_velocity = 1
-      mlt_accel_g_theta = 1d-2
+      !min_dt_for_increases_in_convection_velocity = 1
+      !mlt_accel_g_theta = 1d-2
 
 ! mesh controls
       okay_to_remesh = .true.

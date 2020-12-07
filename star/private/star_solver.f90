@@ -368,7 +368,7 @@
          end if
          if (s% trace_evolve) write(*,*) 'solver done eval_equations'
          
-         call sizequ_new(s, &
+         call sizequ(s, &
             iter, nvar, nz, equ, &
             residual_norm, max_residual, max_resid_k, max_resid_j, &
             lrpar, rpar, lipar, ipar, ierr)
@@ -448,7 +448,7 @@
             end if
 
             ! compute size of scaled correction B
-            call sizeB_new(s, iter, nvar, nz, soln, xscale, &
+            call sizeB(s, iter, nvar, nz, soln, xscale, &
                      max_correction, correction_norm, max_corr_k, max_corr_j, &
                      lrpar, rpar, lipar, ipar, ierr)
             if (ierr /= 0) then
@@ -554,7 +554,7 @@
 
             ! check the residuals for the equations
 
-            call sizequ_new(s, &
+            call sizequ(s, &
                iter, nvar, nz, equ, &
                residual_norm, max_residual, max_resid_k, max_resid_j, &
                lrpar, rpar, lipar, ipar, ierr)
@@ -1225,16 +1225,20 @@
             if (i_equ == 0 .and. len_trim(s% solver_test_partials_equ_name) > 0) then
                if (s% solver_test_partials_equ_name == 'lnE') then ! testing eos
                   i_equ = -1
-               else if (s% solver_test_partials_equ_name == 'eps_nuc') then ! testing net
+               else if (s% solver_test_partials_equ_name == 'eps_nuc') then
                   i_equ = -2
-               else if (s% solver_test_partials_equ_name == 'opacity') then ! testing kap
+               else if (s% solver_test_partials_equ_name == 'opacity') then
                   i_equ = -3
-               else if (s% solver_test_partials_equ_name == 'lnP') then ! testing eos
+               else if (s% solver_test_partials_equ_name == 'lnP') then
                   i_equ = -4
-               else if (s% solver_test_partials_equ_name == 'non_nuc_neu') then ! testing neu
+               else if (s% solver_test_partials_equ_name == 'non_nuc_neu') then
                   i_equ = -5
-               else if (s% solver_test_partials_equ_name == 'gradT') then ! testing gradT
+               else if (s% solver_test_partials_equ_name == 'gradT') then
                   i_equ = -6
+               else if (s% solver_test_partials_equ_name == 'mlt_vc') then
+                  i_equ = -7
+               else if (s% solver_test_partials_equ_name == 'grad_ad') then
+                  i_equ = -8
                end if 
             else if (i_equ /= 0) then
                write(*,1) 'equ name ' // trim(s% solver_test_partials_equ_name)
@@ -1336,102 +1340,154 @@
          end subroutine test_equ_partials
          
          
-         real(dp) function get_lnE_partial( &
-               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) result(dlnE_d)
+         subroutine get_lnE_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
             use eos_def, only: i_lnE
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
-            dlnE_d = 0d0
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var_xa_index > 0) then 
-               dlnE_d = s% d_eos_dxa(i_lnE,i_var_xa_index,k) - &
+               dvardx0_00 = s% d_eos_dxa(i_lnE,i_var_xa_index,k) - &
                         s% d_eos_dxa(i_lnE,i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
-               dlnE_d = s% dE_dRho_for_partials(k)*s% rho(k)/s% energy(k)
+               dvardx0_00 = s% dE_dRho_for_partials(k)*s% rho(k)/s% energy(k)
             else if (i_var == s% i_lnT) then
-               dlnE_d = s% Cv_for_partials(k)*s% T(k)/s% energy(k)
+               dvardx0_00 = s% Cv_for_partials(k)*s% T(k)/s% energy(k)
             end if
-         end function get_lnE_partial
+         end subroutine get_lnE_partials
          
          
-         real(dp) function get_lnP_partial( &
-               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) result(dlnP_d)
+         subroutine get_lnP_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
             use eos_def, only: i_lnPgas
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
-            dlnP_d = 0d0
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var_xa_index > 0) then 
-               dlnP_d = s% Pgas(k)/s% P(k) * &
+               dvardx0_00 = s% Pgas(k)/s% P(k) * &
                   (s% d_eos_dxa(i_lnPgas,i_var_xa_index,k) - s% d_eos_dxa(i_lnPgas,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
-               dlnP_d = s% chiRho_for_partials(k)
+               dvardx0_00 = s% chiRho_for_partials(k)
             else if (i_var == s% i_lnT) then
-               dlnP_d = s% chiT_for_partials(k)
+               dvardx0_00 = s% chiT_for_partials(k)
             end if
-         end function get_lnP_partial
+         end subroutine get_lnP_partials
          
          
-         real(dp) function get_eps_nuc_partial( &
-               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) result(deps_nuc_d)
+         subroutine get_grad_ad_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
+            use eos_def, only: i_grad_ad
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
-            deps_nuc_d = 0d0
-            if (i_var > s% nvar_hydro) then 
-               deps_nuc_d = s% d_epsnuc_dx(i_var_xa_index,k) - s% d_epsnuc_dx(i_var_sink_xa_index,k)
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
+            if (i_var_xa_index > 0) then 
+               dvardx0_00 = &
+                  (s% d_eos_dxa(i_grad_ad,i_var_xa_index,k) - s% d_eos_dxa(i_grad_ad,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
-               deps_nuc_d = s% d_epsnuc_dlnd(k)
+               dvardx0_00 = s% d_eos_dlnd(i_grad_ad,k)
             else if (i_var == s% i_lnT) then
-               deps_nuc_d = s% d_epsnuc_dlnT(k)
+               dvardx0_00 = s% d_eos_dlnT(i_grad_ad,k)
             end if
-         end function get_eps_nuc_partial
+         end subroutine get_grad_ad_partials
          
          
-         real(dp) function get_non_nuc_neu_partial( &
-               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) result(dnon_nuc_neu_d)
+         subroutine get_eps_nuc_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
-            dnon_nuc_neu_d = 0d0
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var > s% nvar_hydro) then 
-               dnon_nuc_neu_d = 0d0
+               dvardx0_00 = s% d_epsnuc_dx(i_var_xa_index,k) - s% d_epsnuc_dx(i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
-               dnon_nuc_neu_d = s% d_nonnucneu_dlnd(k)
+               dvardx0_00 = s% d_epsnuc_dlnd(k)
             else if (i_var == s% i_lnT) then
-               dnon_nuc_neu_d = s% d_nonnucneu_dlnT(k)
+               dvardx0_00 = s% d_epsnuc_dlnT(k)
             end if
-         end function get_non_nuc_neu_partial
+         end subroutine get_eps_nuc_partials
          
          
-         real(dp) function get_gradT_partial( &
-               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) result(dgradT_d)
+         subroutine get_non_nuc_neu_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
-            dgradT_d = 0d0
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var > s% nvar_hydro) then 
-               dgradT_d = 0d0
+               dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
-               dgradT_d = s% d_gradT_dlnd00(k)
+               dvardx0_00 = s% d_nonnucneu_dlnd(k)
             else if (i_var == s% i_lnT) then
-               dgradT_d = s% d_gradT_dlnT00(k)
+               dvardx0_00 = s% d_nonnucneu_dlnT(k)
+            end if
+         end subroutine get_non_nuc_neu_partials
+         
+         
+         subroutine get_gradT_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
+            integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
+            if (i_var > s% nvar_hydro) then 
+               dvardx0_00 = 0d0
+            else if (i_var == s% i_lnd) then
+               dvardx0_m1 = s% d_gradT_dlndm1(k)
+               dvardx0_00 = s% d_gradT_dlnd00(k)
+            else if (i_var == s% i_lnT) then
+               dvardx0_m1 = s% d_gradT_dlnTm1(k)
+               dvardx0_00 = s% d_gradT_dlnT00(k)
             else if (i_var == s% i_lnR) then
-               dgradT_d = s% d_gradT_dlnR(k)
+               dvardx0_00 = s% d_gradT_dlnR(k)
             else if (i_var == s% i_lum) then
-               dgradT_d = s% d_gradT_dL(k)
+               dvardx0_00 = s% d_gradT_dL(k)
             else if (i_var == s% i_ln_cvpv0) then
-               dgradT_d = s% d_gradT_dln_cvpv0(k)
-            else if (i_var == s% i_lncv_plus1) then
-               dgradT_d = s% d_gradT_dlncv_plus1(k)
+               dvardx0_00 = s% d_gradT_dln_cvpv0(k)
             else if (i_var == s% i_w_div_wc) then
-               dgradT_d = s% d_gradT_dw_div_wc(k)
+               dvardx0_00 = s% d_gradT_dw_div_wc(k)
             end if
-         end function get_gradT_partial
+         end subroutine get_gradT_partials
          
          
-         real(dp) function get_opacity_partial( &
-               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) result(dopacity_d)
+         subroutine get_mlt_vc_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
-            dopacity_d = 0d0
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var > s% nvar_hydro) then 
-               dopacity_d = 0d0 ! s% d_opacity_dx(i_var_xa_index,k) - s% d_opacity_dx(i_var_sink_xa_index,k)
+               dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
-               dopacity_d = s% d_opacity_dlnd(k)
+               dvardx0_m1 = s% d_mlt_vc_dlndm1(k)
+               dvardx0_00 = s% d_mlt_vc_dlnd00(k)
             else if (i_var == s% i_lnT) then
-               dopacity_d = s% d_opacity_dlnT(k)
+               dvardx0_m1 = s% d_mlt_vc_dlnTm1(k)
+               dvardx0_00 = s% d_mlt_vc_dlnT00(k)
+            else if (i_var == s% i_lnR) then
+               dvardx0_00 = s% d_mlt_vc_dlnR(k)
+            else if (i_var == s% i_lum) then
+               dvardx0_00 = s% d_mlt_vc_dL(k)
             end if
-         end function get_opacity_partial
+         end subroutine get_mlt_vc_partials
+         
+         
+         subroutine get_opacity_partials( &
+               k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+               dvardx0_m1, dvardx0_00, dvardx0_p1)
+            integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
+            real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
+            if (i_var > s% nvar_hydro) then 
+               dvardx0_00 = 0d0 ! s% d_opacity_dx(i_var_xa_index,k) - s% d_opacity_dx(i_var_sink_xa_index,k)
+            else if (i_var == s% i_lnd) then
+               dvardx0_00 = s% d_opacity_dlnd(k)
+            else if (i_var == s% i_lnT) then
+               dvardx0_00 = s% d_opacity_dlnT(k)
+            end if
+         end subroutine get_opacity_partials
 
 
          subroutine test3_partials( &
@@ -1456,23 +1512,37 @@
                   if (k < s% nz) dvardx0_p1 = s% ublk(i_equ,i_var,k)/xscale(i_var,k+1)
                end if
             else if (i_equ == -1) then ! 'lnE'
-               dvardx0_00 = get_lnE_partial(&
-                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index)
+               call get_lnE_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             elseif (i_equ == -2) then ! 'eps_nuc'
-               dvardx0_00 = get_eps_nuc_partial(&
-                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index)
+               call get_eps_nuc_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -3) then ! 'opacity'
-               dvardx0_00 = get_opacity_partial(&
-                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index)
+               call get_opacity_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -4) then ! 'lnP'
-               dvardx0_00 = get_lnP_partial( &
-                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) 
+               call get_lnP_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
             else if (i_equ == -5) then ! 'non_nuc_neu'
-               dvardx0_00 = get_non_nuc_neu_partial( &
-                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) 
+               call get_non_nuc_neu_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
             else if (i_equ == -6) then ! 'gradT'
-               dvardx0_00 = get_gradT_partial( &
-                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index) 
+               call get_gradT_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
+            else if (i_equ == -7) then ! 'mlt_vc'
+               call get_mlt_vc_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
+            else if (i_equ == -8) then ! 'grad_ad'
+               call get_grad_ad_partials( &
+                  k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
+                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
             end if 
             if (k > 1) then
                call test1_partial( &
@@ -1571,6 +1641,10 @@
                   equ_str = 'non_nuc_neu'
                else if (i_equ == -6) then
                   equ_str = 'gradT'
+               else if (i_equ == -7) then
+                  equ_str = 'mlt_vc'
+               else if (i_equ == -8) then
+                  equ_str = 'grad_ad'
                else
                   equ_str = 'unknown'
                end if
@@ -1621,18 +1695,22 @@
                val = equ(i_equ,k) ! testing partial of residual for cell k equation
             else if (i_equ == 0) then
                val = s% solver_test_partials_val
-            else if (i_equ == -1) then ! testing eos
+            else if (i_equ == -1) then
                val = s% lnE(k)
-            else if (i_equ == -2) then ! testing net
+            else if (i_equ == -2) then
                val = s% eps_nuc(k)
-            else if (i_equ == -3) then ! testing kap
+            else if (i_equ == -3) then
                val = s% opacity(k)
-            else if (i_equ == -4) then ! testing eos
+            else if (i_equ == -4) then
                val = s% lnP(k)
-            else if (i_equ == -5) then ! testing neu
+            else if (i_equ == -5) then
                val = s% non_nuc_neu(k)
-            else if (i_equ == -6) then ! testing gradT
+            else if (i_equ == -6) then
                val = s% gradT(k)
+            else if (i_equ == -7) then
+               val = s% mlt_vc(k)
+            else if (i_equ == -8) then
+               val = s% grada(k)
             else
                val = 0d0
             end if
@@ -1774,7 +1852,7 @@
             if (.not. dbg_msg) return
             
             if (max_resid_j < 0) then
-               call sizequ_new(s, &
+               call sizequ(s, &
                   iter, nvar, nz, equ, &
                   residual_norm, max_residual, max_resid_k, max_resid_j, &
                   lrpar, rpar, lipar, ipar, ierr)
@@ -1787,7 +1865,7 @@
             end if
             
             if (max_corr_j < 0) then
-               call sizeB_new(s, iter, nvar, nz, B, xscale, &
+               call sizeB(s, iter, nvar, nz, B, xscale, &
                   max_correction, correction_norm, max_corr_k, max_corr_j, &
                   lrpar, rpar, lipar, ipar, ierr)
             end if

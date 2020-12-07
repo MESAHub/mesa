@@ -678,8 +678,7 @@
          integer, parameter ::  lipar=2
          integer :: lrpar, max_model_number
          real(dp), pointer :: rpar(:)
-         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, &
-            min_T_for_acceleration_limited_conv_velocity, max_years_for_timestep
+         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_years_for_timestep
          logical :: do_element_diffusion, use_other_energy
          type (star_info), pointer :: s
          real(dp), pointer :: x(:), f1(:), f(:,:)
@@ -930,8 +929,7 @@
          integer, parameter ::  lipar=2
          integer :: lrpar, max_model_number
          real(dp), pointer :: rpar(:)
-         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, &
-            min_T_for_acceleration_limited_conv_velocity, max_timestep, &
+         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_timestep, &
             am_D_mix_factor
          logical :: do_element_diffusion, use_other_torque
          type (star_info), pointer :: s
@@ -984,8 +982,6 @@
          max_timestep = s% max_timestep
          s% max_timestep = s% job% max_dt_for_relax_angular_momentum * secyer
          s% dt_next = min(s% dt_next, s% job% max_dt_for_relax_angular_momentum * secyer)
-         min_T_for_acceleration_limited_conv_velocity = s% min_T_for_acceleration_limited_conv_velocity
-         s% min_T_for_acceleration_limited_conv_velocity = 0d0
          use_other_torque = s% use_other_torque
          s% use_other_torque = .true.
          other_torque => s% other_torque
@@ -1003,7 +999,6 @@
          s% am_D_mix_factor = am_D_mix_factor
          s% do_element_diffusion = do_element_diffusion
          s% max_timestep = max_timestep
-         s% min_T_for_acceleration_limited_conv_velocity = min_T_for_acceleration_limited_conv_velocity
          s% use_other_torque = use_other_torque
          s% other_torque => other_torque
 

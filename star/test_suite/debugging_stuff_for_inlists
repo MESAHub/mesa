@@ -22,11 +22,12 @@
       !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
       !solver_test_partials_show_dx_var_name = 'h1'
 
-         ! equ name can also be
-         ! 'lnE' or 'lnP' to test eos,
-         ! 'eps_nuc' to test net,
-         ! 'non_nuc_neu' to test neu, or
-         ! 'opacity' to test kap.
+         ! equ name can also be one of these
+            ! 'lnE', 'lnP', 'grad_ad' to test eos
+            ! 'eps_nuc' to test net
+            ! 'non_nuc_neu' to test neu
+            ! 'gradT', 'mlt_vc' to test mlt
+            ! 'opacity' to test kap
 
       !solver_test_partials_write_eos_call_info = .true.
       

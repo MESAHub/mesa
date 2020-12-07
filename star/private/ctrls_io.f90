@@ -153,8 +153,7 @@
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, &
-    min_T_for_acceleration_limited_conv_velocity, max_T_for_acceleration_limited_conv_velocity, &
-    min_dt_for_increases_in_convection_velocity, mlt_accel_g_theta, max_conv_vel_div_csound, &
+    min_dt_for_increases_in_convection_velocity, max_conv_vel_div_csound, &
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
     calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
@@ -357,7 +356,7 @@
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_Fraley_time_centering, include_L_in_Fraley_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
-    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, debugging_new_conv_vel_code, &
+    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
 
@@ -1129,10 +1128,7 @@
  s%overshoot_D_min = overshoot_D_min
  s%overshoot_brunt_B_max = overshoot_brunt_B_max
 
- s% min_T_for_acceleration_limited_conv_velocity = min_T_for_acceleration_limited_conv_velocity
- s% max_T_for_acceleration_limited_conv_velocity = max_T_for_acceleration_limited_conv_velocity
  s% min_dt_for_increases_in_convection_velocity = min_dt_for_increases_in_convection_velocity
- s% mlt_accel_g_theta = mlt_accel_g_theta
  s% max_conv_vel_div_csound = max_conv_vel_div_csound
  s% max_v_for_convection = max_v_for_convection
  s% max_q_for_convection_with_hydro_on = max_q_for_convection_with_hydro_on
@@ -1924,7 +1920,6 @@
  s% conv_vel_fully_lagrangian = conv_vel_fully_lagrangian
  s% conv_vel_include_homologous_term = conv_vel_include_homologous_term
  s% conv_vel_use_mlt_vc_start = conv_vel_use_mlt_vc_start
- s% debugging_new_conv_vel_code = debugging_new_conv_vel_code
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
@@ -2829,10 +2824,7 @@
  overshoot_D_min = s%overshoot_D_min
  overshoot_brunt_B_max = s%overshoot_brunt_B_max
 
- min_T_for_acceleration_limited_conv_velocity = s% min_T_for_acceleration_limited_conv_velocity
- max_T_for_acceleration_limited_conv_velocity = s% max_T_for_acceleration_limited_conv_velocity
  min_dt_for_increases_in_convection_velocity = s% min_dt_for_increases_in_convection_velocity
- mlt_accel_g_theta = s% mlt_accel_g_theta
  max_conv_vel_div_csound = s% max_conv_vel_div_csound
  max_v_for_convection = s% max_v_for_convection
  max_q_for_convection_with_hydro_on = s% max_q_for_convection_with_hydro_on
@@ -3615,7 +3607,6 @@
  conv_vel_fully_lagrangian = s% conv_vel_fully_lagrangian
  conv_vel_include_homologous_term = s% conv_vel_include_homologous_term
  conv_vel_use_mlt_vc_start = s% conv_vel_use_mlt_vc_start
- debugging_new_conv_vel_code = s% debugging_new_conv_vel_code
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound

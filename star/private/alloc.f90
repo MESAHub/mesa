@@ -182,9 +182,9 @@
          
          nullify(s% f)
 
-         call realloc_double(s% resid_weight1, nvar*(nz + nz_alloc_extra), ierr)
+         call realloc_double(s% residual_weight1, nvar*(nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
-         s% resid_weight(1:nvar,1:nz) => s% resid_weight1(1:nvar*nz)
+         s% residual_weight(1:nvar,1:nz) => s% residual_weight1(1:nvar*nz)
 
          call realloc_double(s% correction_weight1, nvar*(nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
@@ -657,8 +657,6 @@
             if (failed('dxh_Eturb')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
             if (failed('dxh_ln_cvpv0')) exit
-            call do1(s% dxh_lncv_plus1, c% dxh_lncv_plus1)
-            if (failed('dxh_lncv_plus1')) exit
 
             call do1(s% dlnd_dt, c% dlnd_dt)
             if (failed('dlnd_dt')) exit
@@ -755,8 +753,8 @@
             if (failed('grada')) exit
             call do1(s% dE_dRho, c% dE_dRho)
             if (failed('dE_dRho')) exit
-            call do1(s% dE_dT, c% dE_dT)
-            if (failed('dE_dT')) exit
+            call do1(s% Cv, c% Cv)
+            if (failed('Cv')) exit
             call do1(s% Cp, c% Cp)
             if (failed('Cp')) exit
             call do1(s% lnS, c% lnS)
@@ -1220,17 +1218,6 @@
 
             call do1(s% conv_vel_residual, c% conv_vel_residual)
             if (failed('conv_vel_residual')) exit
-
-            call do1(s% lncv_plus1, c% lncv_plus1)
-            if (failed('lncv_plus1')) exit
-            call do1(s% cv, c% cv)
-            if (failed('cv')) exit
-            call do1(s% cv_start, c% cv_start)
-            if (failed('cv_start')) exit
-            call do1(s% dlncv_plus1_dt_residual, c% dlncv_plus1_dt_residual)
-            if (failed('dlncv_plus1_dt_residual')) exit
-            call do1(s% dlncv_plus1_dt, c% dlncv_plus1_dt)
-            if (failed('dlncv_plus1_dt')) exit
             
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit
@@ -1281,8 +1268,6 @@
             if (failed('d_gradT_dL')) exit
             call do1(s% d_gradT_dln_cvpv0, c% d_gradT_dln_cvpv0)
             if (failed('d_gradT_dln_cvpv0')) exit
-            call do1(s% d_gradT_dlncv_plus1, c% d_gradT_dlncv_plus1)
-            if (failed('d_gradT_dlncv_plus1')) exit
             call do1(s% d_gradT_dw_div_wc, c% d_gradT_dw_div_wc)
             if (failed('d_gradT_dw_div_wc')) exit
 
@@ -1427,8 +1412,6 @@
             if (failed('alpha_RTI_for_d_dt_const_m')) exit
             call do1(s% ln_cvpv0_for_d_dt_const_m, c% ln_cvpv0_for_d_dt_const_m)
             if (failed('ln_cvpv0_for_d_dt_const_m')) exit
-            call do1(s% lncv_plus1_for_d_dt_const_m, c% lncv_plus1_for_d_dt_const_m)
-            if (failed('lncv_plus1_for_d_dt_const_m')) exit
 
             call do1(s% lnT_for_d_dt_const_q, c% lnT_for_d_dt_const_q)
             if (failed('lnT_for_d_dt_const_q')) exit
@@ -1549,8 +1532,8 @@
             if (failed('chiRho_start')) exit
             call do1(s% cp_start, c% cp_start)
             if (failed('cp_start')) exit
-            call do1(s% dE_dT_start, c% dE_dT_start)
-            if (failed('dE_dT_start')) exit
+            call do1(s% Cv_start, c% Cv_start)
+            if (failed('Cv_start')) exit
             call do1(s% dE_dRho_start, c% dE_dRho_start)
             if (failed('dE_dRho_start')) exit
             call do1(s% gam_start, c% gam_start)
@@ -1600,11 +1583,11 @@
                   (action /= do_check_size .and. action /= do_deallocate)) &
                s% f_old(1:nvar,1:nz) => s% f_old1(1:nvar*nz)
 
-            call do1_neq(s% resid_weight1, c% resid_weight1)
-            if (failed('resid_weight1')) exit
+            call do1_neq(s% residual_weight1, c% residual_weight1)
+            if (failed('residual_weight1')) exit
             if (action == do_remove_from_center .or. action == do_reallocate .or. &
                   (action /= do_check_size .and. action /= do_deallocate)) &
-               s% resid_weight(1:nvar,1:nz) => s% resid_weight1(1:nvar*nz)
+               s% residual_weight(1:nvar,1:nz) => s% residual_weight1(1:nvar*nz)
 
             call do1_neq(s% correction_weight1, c% correction_weight1)
             if (failed('correction_weight1')) exit
@@ -2640,13 +2623,6 @@
          end if
          s% i_dln_cvpv0_dt = s% i_ln_cvpv0
 
-         if (s% cv_flag) then
-            i = i+1; s% i_lncv_plus1 = i
-         else
-            s% i_lncv_plus1 = 0
-         end if
-         s% i_dlncv_plus1_dt = s% i_lncv_plus1
-
          if (s% w_div_wc_flag) then
             i = i+1; s% i_w_div_wc = i
          else
@@ -2693,7 +2669,6 @@
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
          if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
-         if (s% i_lncv_plus1 /= 0) s% nameofvar(s% i_lncv_plus1) = 'lncv_plus1'
          if (s% i_w_div_wc /= 0) s% nameofvar(s% i_w_div_wc) = 'w_div_wc'
          if (s% i_j_rot /= 0) s% nameofvar(s% i_j_rot) = 'j_rot'
          if (s% i_u /= 0) s% nameofvar(s% i_u) = 'u' 
@@ -2710,7 +2685,6 @@
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
          if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
-         if (s% i_dlncv_plus1_dt /= 0) s% nameofequ(s% i_dlncv_plus1_dt) = 'dlncv_plus1_dt'
          if (s% i_equ_w_div_wc /= 0) s% nameofequ(s% i_equ_w_div_wc) = 'equ_w_div_wc'
          if (s% i_dj_rot_dt /= 0) s% nameofequ(s% i_dj_rot_dt) = 'dj_rot_dt'
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'
@@ -3338,84 +3312,6 @@
          end subroutine insert
 
       end subroutine set_conv_vel_flag
-
-
-      subroutine set_cv_flag(id, cv_flag, ierr)
-         use const_def, only: no_mixing, convective_mixing
-         integer, intent(in) :: id
-         logical, intent(in) :: cv_flag
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% cv_flag .eqv. cv_flag) return
-
-         nz = s% nz
-         s% cv_flag = cv_flag
-         nvar_hydro_old = s% nvar_hydro
-
-         if (.not. cv_flag) then ! remove i_lncv_plus1's
-            call del(s% xh)
-            call del(s% xh_start)
-            if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-         end if
-
-         call set_var_info(s, ierr)
-         if (ierr /= 0) return
-
-         call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
-         if (ierr /= 0) return
-
-         call check_sizes(s, ierr)
-         if (ierr /= 0) return
-
-         if (cv_flag) then ! insert i_lncv_plus1's
-            call insert(s% xh)
-            call insert(s% xh_start)
-            if (s% have_previous_conv_vel) then
-               do k=1,nz
-                  s% xh(s% i_lncv_plus1,k) = log(s% conv_vel(k)+1d0)
-               end do
-            else
-               s% xh(s% i_lncv_plus1,1:nz) = 0d0
-            end if
-            if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-         end if
-
-         call set_chem_names(s)
-
-         contains
-
-         subroutine del(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_lncv_plus1
-            if (size(xs,dim=2) < nz) return
-            i_lncv_plus1 = s% i_lncv_plus1
-            do j = i_lncv_plus1+1, nvar_hydro_old
-               xs(j-1,1:nz) = xs(j,1:nz)
-            end do
-         end subroutine del
-
-         subroutine insert(xs)
-            real(dp) :: xs(:,:)
-            integer :: j, i_lncv_plus1
-            if (size(xs,dim=2) < nz) return
-            i_lncv_plus1 = s% i_lncv_plus1
-            do j = s% nvar_hydro, i_lncv_plus1+1, -1
-               xs(j,1:nz) = xs(j-1,1:nz)
-            end do
-            xs(i_lncv_plus1,1:nz) = 0
-         end subroutine insert
-
-      end subroutine set_cv_flag
 
 
       subroutine set_w_div_wc_flag(id, w_div_wc_flag, ierr)

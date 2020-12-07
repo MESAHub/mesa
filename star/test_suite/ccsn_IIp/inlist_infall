@@ -80,12 +80,6 @@
 
   okay_to_reduce_gradT_excess = .false.
 
-  min_dt_for_increases_in_convection_velocity = 1
-
-  min_T_for_acceleration_limited_conv_velocity = 0
-
-  mlt_accel_g_theta = 0.01
-
   use_fixed_vsurf_outer_BC = .true.
   fixed_vsurf = 0
 

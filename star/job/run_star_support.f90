@@ -506,16 +506,6 @@
             if (ierr /= 0) return
          end if
          
-         if (s% log_max_temperature >= s% job% logT_for_cv_flag &
-               .and. (.not. s% cv_flag)) then
-            write(*,1) 'have reached logT_for_cv_flag', &
-               s% log_max_temperature, s% job% logT_for_cv_flag
-            write(*,1) 'set cv_flag true'
-            call star_set_cv_flag(id, .true., ierr)
-            if (failed('star_set_cv_flag',ierr)) return
-            if (ierr /= 0) return
-         end if
-         
          if (s% job% change_Eturb_flag_at_model_number == s% model_number) then
             write(*,*) 'have reached model number for new_Eturb_flag', s% job% new_Eturb_flag
             call star_set_Eturb_flag(id, s% job% new_Eturb_flag, ierr)
@@ -2031,7 +2021,6 @@
             s% dt_next = max_timestep
          endif
 
-
          if (s% job% set_initial_model_number .and. .not. restart) then
             write(*,2) 'set_initial_model_number', s% job% initial_model_number
             s% model_number = s% job% initial_model_number
@@ -2149,13 +2138,6 @@
             write(*,*) 'new_conv_vel_flag', s% job% new_conv_vel_flag
             call star_set_conv_vel_flag(id, s% job% new_conv_vel_flag, ierr)
             if (failed('star_set_conv_vel_flag',ierr)) return
-         end if
-
-         if (s% job% change_cv_flag .or. &
-               (s% job% change_initial_cv_flag .and. .not. restart)) then
-            write(*,*) 'new_cv_flag', s% job% new_cv_flag
-            call star_set_cv_flag(id, s% job% new_cv_flag, ierr)
-            if (failed('star_set_cv_flag',ierr)) return
          end if
 
          if (s% job% change_w_div_wc_flag .or. &
@@ -2751,9 +2733,6 @@
          
          if (s% conv_vel_flag) &
             write(*,*) 'conv_vel_flag', s% conv_vel_flag
-         
-         if (s% cv_flag) &
-            write(*,*) 'cv_flag', s% cv_flag
          
          if (s% w_div_wc_flag) &
             write(*,*) 'w_div_wc_flag', s% w_div_wc_flag

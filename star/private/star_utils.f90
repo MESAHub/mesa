@@ -2937,8 +2937,7 @@
          
          if (v == 0d0) return
          
-         !if (.false. .and. j == s% i_lnT .and. k == 30) then
-         if (.true. .and. i == s% i_dlncv_plus1_dt .and. k == 1136) then
+         if (.false. .and. j == s% i_lnT .and. k == 30) then
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k)
          end if
@@ -3000,8 +2999,7 @@
          
          if (v == 0d0) return
          
-         !if (.false. .and. j == s% i_lnT .and. k == 31) then
-         if (.true. .and. i == s% i_dlncv_plus1_dt .and. k == 1136) then
+         if (.false. .and. j == s% i_lnT .and. k == 31) then
             write(*,4) 'em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k-1)
          end if
@@ -3066,8 +3064,7 @@
          if (v == 0d0) return
          
          
-         !if (.false. .and. j == s% i_lnT .and. k == 29) then
-         if (.true. .and. i == s% i_dlncv_plus1_dt .and. k == 1136) then
+         if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k+1)
          end if
@@ -3696,7 +3693,7 @@
          write(*,1) 'logE = ', s% lnE(k)/ln10
          write(*,1) 'energy = ', s% energy(k)
          write(*,1) 'grada = ', s% grada(k)
-         write(*,1) 'dE_dT = ', s% dE_dT(k)
+         write(*,1) 'Cv = ', s% Cv(k)
          write(*,1) 'dE_dRho = ', s% dE_dRho(k)
          write(*,1) 'cp = ', s% cp(k)
          write(*,1) 'gamma1 = ', s% gamma1(k)

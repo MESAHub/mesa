@@ -234,7 +234,7 @@ contains
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
 
-                if (.not. s% conv_vel_flag .and. .not. s% cv_flag) then
+                if (.not. s% conv_vel_flag) then
                    if (s%top_conv_bdy(i)) then
                       s%cz_bdy_dq(k) = find0(0._dp, D(k)-s%overshoot_D_min, s%dq(k), s%D_mix(k+1)-s%overshoot_D_min)
                       if (s%cz_bdy_dq(k) < 0._dp .OR. s%cz_bdy_dq(k) > s%dq(k)) then
@@ -287,13 +287,13 @@ contains
 
                 s%cdc(k) = cdc
                 s%D_mix(k) = D(k)
-                if (.not. s% conv_vel_flag .and. .not. s% cv_flag) s%conv_vel(k) = vc(k)
+                if (.not. s% conv_vel_flag) s%conv_vel(k) = vc(k)
 
              elseif (D(k) > s%D_mix(k)) then
 
                 s%cdc(k) = cdc
                 s%D_mix(k) = D(k)
-                if (.not. s% conv_vel_flag .and. .not. s% cv_flag) s%conv_vel(k) = vc(k)
+                if (.not. s% conv_vel_flag) s%conv_vel(k) = vc(k)
                 s%mixing_type(k) = overshoot_mixing
 
              end if
@@ -305,7 +305,7 @@ contains
 
           s%cdc(k:k_cb:dk) = 0._dp
           s%D_mix(k:k_cb:dk) = 0._dp
-          if (.not. s% conv_vel_flag .and. .not. s% cv_flag) s%conv_vel(k:k_cb:dk) = 0._dp
+          if (.not. s% conv_vel_flag) s%conv_vel(k:k_cb:dk) = 0._dp
           s%mixing_type(k:k_cb:dk) = no_mixing
           
           ! Finish (we apply at most a single overshoot scheme to each boundary)

@@ -1,4 +1,4 @@
-! inlist_to_flash
+! inlist_to_c_flash
 
 &star_job
 
@@ -15,9 +15,6 @@
 
       change_initial_net = .true.      
       new_net_name = 'approx21_plus_co56.net'
-
-      change_initial_conv_vel_flag = .true.
-      new_conv_vel_flag = .true.
       
       change_initial_v_flag = .true.
       new_v_flag = .true.
@@ -35,7 +32,7 @@
       initial_age = 0
    
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-3
+      years_for_initial_dt = 1d-1
 
       !pgstar_flag = .true.
 
@@ -61,8 +58,8 @@
       max_number_retries = 50
       max_model_number = 2000
       
-      max_years_for_timestep = 1d0
-      min_timestep_limit = 1d-12
+      !max_years_for_timestep = 1d0
+      !min_timestep_limit = 1d-12
 
          
       num_trace_history_values = 2
@@ -109,6 +106,21 @@
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
       warning_limit_for_max_residual = 1d99
+      
+      
+      ! turn these off to get past loading the saved model      
+      steps_before_use_gold2_tolerances = 1
+      steps_before_use_gold_tolerances = 1
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
       photo_interval = 50
       profile_interval = 50
@@ -116,7 +128,7 @@
       terminal_interval = 10
       write_header_frequency = 10
    
-      !photo_interval = 1
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 1

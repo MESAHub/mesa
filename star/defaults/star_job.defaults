@@ -648,6 +648,19 @@
     initial_model_number = 0
 
 
+      ! set_initial_number_retries
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! initial_number_retries
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, set initial number of retries
+
+      ! ::
+
+    set_initial_number_retries = .false.
+    initial_number_retries = 0
+
+
       ! set_initial_dt
       ! ~~~~~~~~~~~~~~
       ! years_for_initial_dt
@@ -1507,32 +1520,6 @@
     change_initial_Eturb_flag = .false.
     change_Eturb_flag_at_model_number = -111
     new_Eturb_flag = .false.
-
-
-      ! change_cv_flag
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! change_initial_cv_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_cv_flag
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! cv variables
-      ! ``cv_flag`` is true if we are using convection velocity as a solver variable
-
-      ! ::
-
-    change_cv_flag = .false.
-    change_initial_cv_flag = .false.
-    new_cv_flag = .false.
-    
-      ! logT_for_cv_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! automatically turn on cv_flag if temperature goes above this limit anywhere in the star.
-
-      ! ::
-
-    logT_for_cv_flag = 50d0
 
 
       ! change_conv_vel_flag

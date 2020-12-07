@@ -455,7 +455,7 @@ contains
     s% entropy(k) = exp(s% lnS(k))
     s% grada(k) = res(i_grad_ad)
     s% dE_dRho(k) = res(i_dE_drho)
-    s% dE_dT(k) = res(i_Cv)
+    s% Cv(k) = res(i_Cv)
     s% cp(k) = res(i_cp)
     s% chiRho(k) = res(i_chiRho)
     s% chiT(k) = res(i_chiT)
@@ -505,7 +505,7 @@ contains
        s% csound(k) <= 0 .or. is_bad(s% csound(k)) .or. &
        s% chiT(k) <= 0 .or. &
        s% chiRho(k) <= 0 .or. &
-       s% dE_dT(k) <= 0 .or. &
+       s% Cv(k) <= 0 .or. &
        s% Cp(k) <= 0) then
        ierr = -1
     end if

@@ -146,11 +146,6 @@
 
          call get_cpy(s% D_mix, d_mx, ierr1)
          if (ierr1 /= 0) ierr = -1
-
-         if (s% min_T_for_acceleration_limited_conv_velocity < 1d12) then
-            call get_cpy(s% conv_vel, cv, ierr1)
-            if (ierr1 /= 0) ierr = -1
-         end if
          
          if (ierr /= 0) return
          
@@ -213,12 +208,6 @@
          if (s% RTI_flag) then
             call restore(s% dPdr_dRhodr_info, RTI_info)
             s% have_previous_RTI_info = .true.
-         end if
-         
-         if (s% min_T_for_acceleration_limited_conv_velocity < 1d12) then
-            call restore(s% conv_vel, cv)
-            s% have_previous_conv_vel = .true.
-            s% use_previous_conv_vel_from_file = .false.
          end if
 
          call restore(s% D_mix, d_mx)
@@ -319,7 +308,7 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_eturb, i_lncv_plus1, &
+         integer :: i_lnd, i_lnT, i_lnR, i_eturb, &
             i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_eturb_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
@@ -340,7 +329,6 @@
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
          i_eturb_RSP = s% i_eturb_RSP
-         i_lncv_plus1 = s% i_lncv_plus1
          i_ln_cvpv0 = s% i_ln_cvpv0
 
          if (s% doing_finish_load_model .or. .not. s% RSP_flag) then
@@ -437,12 +425,6 @@
                else if (j == i_eturb_RSP) then
                   do k=1,nz
                      s% Et(k) = max(0d0,s% xh(i_eturb_RSP,k))
-                  end do
-               else if (j == i_lncv_plus1) then
-                  do k=1,nz
-                     s% lncv_plus1(k) = s% xh(i_lncv_plus1,k)
-                     s% cv(k) = expm1(s% lncv_plus1(k))
-                     s% dxh_lncv_plus1(k) = 0d0
                   end do
                else if (j == i_ln_cvpv0) then
                   do k=1,nz
@@ -1149,9 +1131,6 @@
             end if
             if (s% conv_vel_flag) then
                s% conv_vel_start(k) = s% conv_vel(k)
-            end if
-            if (s% cv_flag) then
-               s% cv_start(k) = s% cv(k)
             end if
             if (s% RSP_flag) then
                s% w(k) = sqrt(s% Et(k))

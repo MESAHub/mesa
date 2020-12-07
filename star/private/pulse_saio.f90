@@ -286,7 +286,7 @@ contains
         end if
         P = eval_face(s%dq, s%P, k, 1, s%nz)
         eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav, k, k_a, k_b)
-        c_V = eval_face(s%dq, s%dE_dT, k, k_a, k_b)
+        c_V = eval_face(s%dq, s%Cv, k, k_a, k_b)
         chi_rho = eval_face(s%dq, s%chiRho, k, k_a, k_b)
         chi_T = eval_face(s%dq, s%chiT, k, k_a, k_b)
         eps_rho = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)

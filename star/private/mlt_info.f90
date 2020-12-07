@@ -403,7 +403,7 @@
             end if
          end if
          
-         if (k == 1 .and. (s% mlt_make_surface_no_mixing .or. s% debugging_new_conv_vel_code)) then
+         if (k == 1 .and. s% mlt_make_surface_no_mixing) then
             call set_no_mixing
             return
          end if
@@ -456,7 +456,7 @@
          if (s% center_h1 > s% semiconvection_upper_limit_center_h1) asc = 0
 
          cv_old = -1
-         if (s% have_previous_conv_vel .and. .not. s% conv_vel_flag .and. .not. s% cv_flag) then
+         if (s% have_previous_conv_vel .and. .not. s% conv_vel_flag) then
             if (s% generations >= 2) then
                if (.not. is_bad(s% conv_vel_old(k))) &
                   cv_old = s% conv_vel_old(k)
@@ -466,19 +466,8 @@
             end if
          end if
          
-         if (s% conv_vel_flag .or. s% cv_flag) then
-            prev_conv_vel = -1
-            dt = -1
-         else if (s% mlt_accel_g_theta > 0d0 .or. &
-             (T_face >= s% min_T_for_acceleration_limited_conv_velocity &
-               .and. T_face <= s% max_T_for_acceleration_limited_conv_velocity &
-               .and. cv_old >= 0)) then
-            prev_conv_vel = cv_old
-            dt = s% dt
-         else
-            prev_conv_vel = -1
-            dt = -1
-         end if
+         prev_conv_vel = -1
+         dt = -1
 
          max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
          if (prev_conv_vel >= 0) then
@@ -534,7 +523,7 @@
             gradL_composition_term = 0d0
          end if
 
-         if (.not. s% conv_vel_flag .and. .not. s% cv_flag) then
+         if (.not. s% conv_vel_flag) then
             normal_mlt_gradT_factor = 1d0
          else if (abs(s% max_q_for_normal_mlt_gradT_full_on - &
                   s% min_q_for_normal_mlt_gradT_full_off) < 1d-10) then
@@ -576,7 +565,7 @@
             mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, s% mlt_accel_g_theta, dt, tau_face, just_gradr, &
+            prev_conv_vel, max_conv_vel, dt, tau_face, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) then
@@ -633,16 +622,6 @@
             end if
          else
             s% d_gradT_dln_cvpv0(k) = 0d0
-         end if
-         if (s% cv_flag) then
-            s% d_gradT_dlncv_plus1(k) = & ! convert from d_dcv
-               mlt_partials(mlt_cv_var, mlt_gradT)*(s% cv(k) + 1d0)
-            if (is_bad(s% d_gradT_dlncv_plus1(k))) then
-               write(*,2) 's% d_gradT_dlncv_plus1(k)', k, s% d_gradT_dlncv_plus1(k)
-               if (s% stop_for_bad_nums) stop 'mlt_info'
-            end if
-         else
-            s% d_gradT_dlncv_plus1(k) = 0d0
          end if
          s% d_gradT_dlnd00(k) = mlt_partials(mlt_dlnd00, mlt_gradT)  
          s% d_gradT_dlnT00(k) = mlt_partials(mlt_dlnT00, mlt_gradT) 
@@ -770,7 +749,7 @@
                mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
                MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
                normal_mlt_gradT_factor, &
-               prev_conv_vel, max_conv_vel, s% mlt_accel_g_theta, dt, tau_face, just_get_gradr, &
+               prev_conv_vel, max_conv_vel, dt, tau_face, just_get_gradr, &
                mixing_type, mlt_basics, mlt_partials1, ierr)
             if (ierr /= 0) return
             s% gradr(k) = mlt_basics(mlt_gradr)
@@ -1140,7 +1119,6 @@
          s% d_gradT_dL(k) = alfa*s% d_gradT_dL(k)
          s% d_gradT_dw_div_wc(k) = alfa*s% d_gradT_dw_div_wc(k)
          if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = alfa*s% d_gradT_dln_cvpv0(k)
-         if (s% cv_flag) s% d_gradT_dlncv_plus1(k) = alfa*s% d_gradT_dlncv_plus1(k)
 
          s% d_gradT_dlnd00(k) = &
             alfa*s% d_gradT_dlnd00(k) + beta*d_grada_face_dlnd00
@@ -1305,7 +1283,6 @@
          s% d_gradT_dlnR(k) = s% d_gradr_dlnR(k)
          s% d_gradT_dL(k) = s% d_gradr_dL(k)
          if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
-         if (s% cv_flag) s% d_gradT_dlncv_plus1(k) = 0d0
          s% d_gradT_dw_div_wc(k) = s% d_gradr_dw_div_wc(k)
       end subroutine switch_to_radiative
 
@@ -1322,7 +1299,6 @@
          s% d_gradT_dlnR(k) = 0
          s% d_gradT_dL(k) = 0
          if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
-         if (s% cv_flag) s% d_gradT_dlncv_plus1(k) = 0d0
          s% d_gradT_dw_div_wc(k) = 0
       end subroutine switch_to_adiabatic
 
@@ -1621,7 +1597,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
+            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
 
          type (star_info), pointer :: s
@@ -1648,7 +1624,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, remove_small_D_limit, &
+            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
          logical, intent(in) :: alt_scale_height
          character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
@@ -1689,7 +1665,7 @@
                mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
                MLT_option, Henyey_y_param, Henyey_nu_param, &
                normal_mlt_gradT_factor, &
-               prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
+               prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
                mixing_type, mlt_basics, mlt_partials1, ierr)
             return
          end if
@@ -1726,7 +1702,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, g_theta, dt, tau, just_gradr, &
+            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
             mixing_type, &
             mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
             mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &

@@ -38,9 +38,6 @@
       ! conv_vel_flag is true if we use conv_vel as a solver variable
       logical :: conv_vel_flag
 
-      ! cv_flag is true if we use lncv_plus1 as a solver variable
-      logical :: cv_flag
-
       ! w_div_wc_flag is true if we use w_div_wc as a solver variable
       logical :: w_div_wc_flag
 
@@ -128,7 +125,6 @@
          integer :: i_eturb_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
          integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at the outer face of cell.
                                ! v0 is an arbitrary user defined value.
-         integer :: i_lncv_plus1 ! ln(cv + 1) at the outer face of cell.
          integer :: i_w_div_wc ! ratio of omega to critical value without the Eddington factor
          integer :: i_j_rot ! specific angular momentum associated to cell face
          integer :: i_eturb ! cell specific turbulent energy. only when Eturb_flag is true.
@@ -148,7 +144,6 @@
          integer :: i_dalpha_RTI_dt ! alpha for Rayleigh-Taylor instabilities
          integer :: i_deturb_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
          integer :: i_dln_cvpv0_dt ! equation for convection velocities
-         integer :: i_dlncv_plus1_dt ! equation for cv variables
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for convection velocities
          integer :: i_deturb_dt ! turbulent energy equation. only when Eturb_flag is true.
@@ -300,7 +295,7 @@
       real(dp), pointer :: lnP(:) ! log(P)
       real(dp), pointer :: grada(:)   ! d ln T / d ln P | adiabatic
       real(dp), pointer :: dE_dRho(:) ! dE_dRho at constant T&abundances
-      real(dp), pointer :: dE_dT(:)   ! dE/dT at constant density&abundances
+      real(dp), pointer :: Cv(:)   ! dE/dT at constant density&abundances
       real(dp), pointer :: Cp(:)         ! heat capacity at constant pressure&abundances
          ! Cp := dh_dT at constant P, specific heat at constant pressure
          ! where h is enthalpy, h = E + P/Rho
@@ -344,7 +339,7 @@
       real(dp), pointer :: chiRho_for_partials(:) ! dlnP_dlnRho 
       real(dp), pointer :: chiT_for_partials(:) ! dlnP_dlnT
       real(dp), pointer :: dE_dRho_for_partials(:)
-      real(dp), pointer :: Cv_for_partials(:) ! dE_dT
+      real(dp), pointer :: Cv_for_partials(:) ! Cv
       real(dp), pointer :: dS_dRho_for_partials(:)
       real(dp), pointer :: dS_dT_for_partials(:)
       real(dp), pointer :: dlnE_dxa_for_partials(:,:) ! (species,nz)
@@ -656,7 +651,6 @@
          real(dp), pointer :: d_gradT_dlnR(:)
          real(dp), pointer :: d_gradT_dL(:)
          real(dp), pointer :: d_gradT_dln_cvpv0(:) ! when conv_vel_flag is true
-         real(dp), pointer :: d_gradT_dlncv_plus1(:) ! when cv_flag is true
          real(dp), pointer :: d_gradT_dw_div_wc(:) ! when w_div_wc_flag is true
    
          real(dp), pointer :: gradr(:) ! grad_rad (at boundary)
@@ -704,16 +698,6 @@
          real(dp), dimension(max_num_rsp_LINA_modes) :: &
             rsp_LINA_periods, rsp_LINA_growth_rates
       
-      ! for cv_flag variables
-      
-         real(dp), pointer :: lncv_plus1(:) ! = log(cv + 1d0)
-         real(dp), pointer :: cv(:) ! = expm1(lncv_plus1)
-         real(dp), pointer :: lncv_plus1_start(:) ! (nz)
-         real(dp), pointer :: cv_start(:) ! (nz)
-         real(dp), pointer :: dlncv_plus1_dt_residual(:) ! for dlncv_plus1_dt equation
-         !real(dp), pointer :: dlncv_plus1_dt(:) ! only set when cv_flag is true
-         !real(dp), pointer :: dxh_lncv_plus1(:) ! lncv_plus1(k) = dxh_lncv_plus1(k) + lncv_plus1_start(k)
-         
       ! convection velocity equation info
 
          real(dp), pointer, dimension(:) :: conv_vel_residual
@@ -866,7 +850,6 @@
          real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
          real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
          real(dp), pointer :: ln_cvpv0_for_d_dt_const_m(:) ! only set when conv_vel_flag is true
-         real(dp), pointer :: lncv_plus1_for_d_dt_const_m(:) ! only set when cv_flag is true
          
          ! for calculating "Eulerian" time derivatives using differences at constant q
          ! holds values from previous model interpolated to new q(k)
@@ -885,7 +868,6 @@
          real(dp), pointer :: du_dt(:) ! only set when u_flag is true
          real(dp), pointer :: dEt_dt(:) ! only used when RSP_flag is true
          real(dp), pointer :: dln_cvpv0_dt(:) ! only set when conv_vel_flag is true
-         real(dp), pointer :: dlncv_plus1_dt(:) ! only set when cv_flag is true
          real(dp), pointer :: dj_rot_dt(:) ! only set when implicit_j_rot_flag is true
          real(dp), pointer :: dalpha_RTI_dt(:) ! only set when alpha_RTI_flag is true
          
@@ -902,7 +884,6 @@
          real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
          real(dp), pointer :: dxh_Eturb(:) ! Eturb(k) = dxh_Eturb(k) + Eturb_start(k); dxh_Eturb from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
-         real(dp), pointer :: dxh_lncv_plus1(:) ! lncv_plus1(k) = dxh_lncv_plus1(k) + lncv_plus1_start(k); dxh_lncv_plus1 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
 
@@ -1367,8 +1348,8 @@
          real(dp), pointer :: grada_face_start(:) ! (nz)
          real(dp), pointer :: chiT_start(:) ! (nz)
          real(dp), pointer :: chiRho_start(:) ! (nz)
-         real(dp), pointer :: cp_start(:) ! (nz)
-         real(dp), pointer :: dE_dT_start(:) ! (nz)
+         real(dp), pointer :: Cp_start(:) ! (nz)
+         real(dp), pointer :: Cv_start(:) ! (nz)
          real(dp), pointer :: dE_dRho_start(:) ! (nz)
          real(dp), pointer :: gam_start(:) ! (nz)
          real(dp), pointer :: eta_start(:) ! (nz)
@@ -1596,11 +1577,11 @@
          real(dp), dimension(:), pointer :: f_old1 ! (nvar*nz)
          
       ! equation weights
-         ! resid_weight and correction_weight are used by the solver in deciding if have a good enough solution.
+         ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
          ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
          ! weight = 0d0 means just ignore this item in making decisions.
-         real(dp), dimension(:,:), pointer :: resid_weight, correction_weight ! (nvar,nz)
-         real(dp), dimension(:), pointer :: resid_weight1, correction_weight1 ! (nvar,nz)
+         real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
+         real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
          
       ! equation Jacobian
          real(dp), dimension(:,:), pointer :: jacobian

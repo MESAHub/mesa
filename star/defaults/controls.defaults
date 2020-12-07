@@ -3334,36 +3334,6 @@
     max_abs_du_div_cs_for_convection = 0.03d0
 
 
-      ! min_T_for_acceleration_limited_conv_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Acceleration limiting based on Wood 1974 and Arnett 1969.
-      ! Wood, P.R., ApJ, 190:609-630, 1974. (Appendix V, eqns 1-3)
-      ! Arnett, W.D., 1969, Ap. and Space Sci, 5, 180.
-
-      ! ::
-
-    min_T_for_acceleration_limited_conv_velocity = 99d9
-
-
-      ! max_T_for_acceleration_limited_conv_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    max_T_for_acceleration_limited_conv_velocity = 99d9
-
-
-      ! mlt_accel_g_theta
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! use this (if > 0) for limiting the acceleration of convection velocities.
-
-      ! ::
-
-    mlt_accel_g_theta = -1
-
-
       ! prune_bad_cz_min_Hp_height
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8505,7 +8475,6 @@
 
     conv_vel_ignore_thermohaline = .true.
     conv_vel_ignore_semiconvection = .false.
-    debugging_new_conv_vel_code = .false.
 
 
       ! conv_vel_fully_lagrangian
