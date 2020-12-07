@@ -864,7 +864,7 @@
                sum_per_cell, rC_start, rC_new, mC, tmp, v, vstart, virial, &
                sum_tot_E, sum_tot_E_start, E_new, E_start, sum_src_snk, &
                L_surf, L_center, total_E_mdot, dergs_expected, dergs_actual, &
-               dKE_dt, d_dKEdt_dv00, d_dKEdt_dvp1, total_radiation, &
+               dKE_dt, d_dKEdt_dv00, d_dKEdt_dvp1, total_radiation, total_others, &
                dPE_dt, d_dPEdt_dlnR00, d_dPEdt_dlnRp1, dEt_dt, &
                flux_out, flux_in, sources, flux_and_sources, dedt_expected, e_expected, &
                e_actual, ergs_error, eps_nuc, non_nuc_neu, total_external, total_work, &
@@ -1052,6 +1052,9 @@
                total_work = dt*(s% work_inward_at_center - s% work_outward_at_surface)
             end if
 
+            total_others = s% total_energy_start - s% total_energy_old
+               ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix, eps_drag, Eq
+
             s% total_energy_sources_and_sinks = &
                total_external + total_work + total_radiation + &
                s% non_epsnuc_energy_change_from_split_burn 
@@ -1077,7 +1080,8 @@
 
                write(*,*)
                write(*,2) 's% error_in_energy_conservation', s% model_number, s% error_in_energy_conservation
-               write(*,2) 'error/total_energy', s% model_number, s% error_in_energy_conservation/s% total_energy
+               write(*,2) 'total_energy', s% model_number, s% total_energy
+               write(*,2) 'rel_E_err = error/total_energy', s% model_number, s% error_in_energy_conservation/s% total_energy
                write(*,*)
                
                if (s% use_dedt_form_with_total_energy_conservation .and. &
@@ -1101,14 +1105,51 @@
                      - sum_cell_dEturb - sum_cell_dke - sum_cell_dpe - sum_cell_de
                   sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
+
+                  write(*,2) '(sum_cell_terms - sum_cell_ergs_error)/total_energy',  s% model_number, &
+                     (sum_cell_terms - sum_cell_ergs_error)/s% total_energy, sum_cell_terms, sum_cell_ergs_error
+                  write(*,*) 'this is small if energy equation is reporting total ergs error that matches sum of terms'
                   write(*,*)
-                  write(*,2) 'sum_cell_terms - sum_cell_ergs_error',  s% model_number, &
-                     sum_cell_terms - sum_cell_ergs_error, sum_cell_terms, sum_cell_ergs_error
-                  write(*,*) 'the following is the relative error from the solver for things known to the energy equation'
-                  write(*,2) 'sum_cell_ergs_error/total_energy',  s% model_number, &
-                     sum_cell_ergs_error/s% total_energy
-                  write(*,2) 'sum_cell_terms/total_energy',  s% model_number, &
-                     sum_cell_terms/s% total_energy
+                  write(*,2) 'sum_cell_ergs_error/total_energy',  s% model_number, sum_cell_ergs_error/s% total_energy
+                  write(*,*) 'the would match rel_E_err if the energy equation knew about all the relevant changes'
+
+
+            
+                  write(*,*)
+                  write(*,2) 'sum_cell_dL + total_radiation', s% model_number, &
+                     sum_cell_dL+total_radiation, sum_cell_dL, total_radiation
+                  write(*,2) 'sum_cell_work + total_work', s% model_number, &
+                     sum_cell_work+total_work, sum_cell_work, total_work
+                  write(*,2) 'sum_cell_sources - total_external', s% model_number, &
+                     sum_cell_sources-total_external, sum_cell_sources, total_external
+                  write(*,2) 'sum_cell_others - total_others', s% model_number, &
+                     sum_cell_others - total_others, sum_cell_others, total_others
+                  write(*,*) 'these -> 0 if solver energy equation knows what is changing'
+                  write(*,*)              
+                  
+                  
+                  
+                      
+                  write(*,2) 'sum_cell_others = WD, diffusion, pre_mix, drag, Eq', s% model_number, sum_cell_others
+                  write(*,2) 'total_others = (total_start - total_old)', s% model_number, total_others
+                     
+                     
+                     
+                     
+                  write(*,2) 'total_radiation = dt*(L_center - L(1))', s% model_number, &
+                     total_radiation, dt*s% L_center, dt*s% L(1)
+                  write(*,2) 'total_work = dt*(center - surface)', s% model_number, &
+                     total_work, dt*s% work_inward_at_center, dt*s% work_outward_at_surface
+                  write(*,2) 'total_external = nuc, neu, irrad, extra, mdot', s% model_number, total_external
+                  write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
+                  write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
+                  write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
+                  write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
+                  write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
+                  write(*,*)
+                  write(*,*) '**************'
+
+
                   write(*,*)
                   write(*,*) 'solver_error_in_energy_conservation should = sum_cell_ergs_error'
                   write(*,2) 'solver_error_in_energy_conservation - sum_cell_ergs_error', s% model_number, &
@@ -1134,7 +1175,6 @@
                      (s% total_energy_start - s% total_energy_old) + sum_cell_others, &
                      (s% total_energy_start - s% total_energy_old), sum_cell_others
                   write(*,*)
-                  write(*,2) 'sum_cell_others', s% model_number, sum_cell_others
                   
                   
             !total_external = &
@@ -1166,18 +1206,6 @@
                      !end do
                      stop 'is_bad(sum_cell_dL) okay_energy_conservation'
                   end if
-            
-                  write(*,*)
-                  write(*,2) 'sum_cell_sources - total_external', s% model_number, &
-                     sum_cell_sources-total_external, sum_cell_sources, total_external
-                  write(*,2) 'sum_cell_dL + total_radiation', s% model_number, &
-                     sum_cell_dL+total_radiation, sum_cell_dL, total_radiation
-                  write(*,2) 'sum_cell_work + total_work', s% model_number, &
-                     sum_cell_work+total_work, sum_cell_work, total_work
-                  write(*,2) 'sum_cell_sources - total_external', s% model_number, &
-                     sum_cell_sources-total_external, sum_cell_sources, total_external
-                  write(*,*)
-                  write(*,*) 'this difference -> 0 if solver energy equation is ok'
                   
                   
                   

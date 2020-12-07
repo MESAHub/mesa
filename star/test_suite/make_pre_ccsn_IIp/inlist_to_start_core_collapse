@@ -5,6 +5,9 @@
 
 &star_job
 
+      !save_star_job_namelist = .true.
+      !star_job_namelist_name = 'star_job_to_start_core_collapse.txt'
+
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
@@ -67,6 +70,9 @@
 
 
 &controls
+
+      !save_controls_namelist = .true.
+      !controls_namelist_name = 'controls_to_start_core_collapse.txt'
 
       ! limit max_model_number as part of test_suite
       max_model_number = 10000

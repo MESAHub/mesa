@@ -10136,6 +10136,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ``dX_nuc_drop_limit`` only for ``X > dX_nuc_drop_min_X_limit``.
+      ! note that this is the abundance ot the species, not the H1 abundance for the cell.
+      ! i.e., if species abundance is below this limit, then ignore it for the dX_nuc_drop limit.
 
       ! ::
 
