@@ -1116,22 +1116,40 @@
 
             
                   write(*,*)
-                  write(*,2) 'sum_cell_dL + total_radiation', s% model_number, &
-                     sum_cell_dL+total_radiation, sum_cell_dL, total_radiation
-                  write(*,2) 'sum_cell_work + total_work', s% model_number, &
-                     sum_cell_work+total_work, sum_cell_work, total_work
-                  write(*,2) 'sum_cell_sources - total_external', s% model_number, &
-                     sum_cell_sources-total_external, sum_cell_sources, total_external
-                  write(*,2) 'sum_cell_others - total_others', s% model_number, &
-                     sum_cell_others - total_others, sum_cell_others, total_others
-                  write(*,*) 'these -> 0 if solver energy equation knows what is changing'
+                  write(*,2) 'rel err sum_cell_dL + total_radiation', s% model_number, &
+                     (sum_cell_dL+total_radiation)/s% total_energy, sum_cell_dL, total_radiation
+                  write(*,2) 'rel err sum_cell_work + total_work', s% model_number, &
+                     (sum_cell_work+total_work)/s% total_energy, sum_cell_work, total_work
+                  write(*,2) 'rel err sum_cell_sources - total_external', s% model_number, &
+                     (sum_cell_sources - total_external)/s% total_energy, sum_cell_sources, total_external
+                  write(*,2) 'rel err sum_cell_others - total_others', s% model_number, &
+                     (sum_cell_others - total_others)/s% total_energy, sum_cell_others, total_others
+                  write(*,*) 'these -> 0 if energy equation knows what is changing'
                   write(*,*)              
                   
+                  ! sources for energy equation: nuclear heating, non_nuc_neu_cooling, irradiation heating, extra_heat, eps_mdot
+                  ! others for energy equation: eps_WD_sedimentation, eps_diffusion, eps_pre_mix
                   
                   
+                  ! change_before_start = lasting_changes_before_start + temporary_changes_before_start
+                  ! lasting_changes_before_start = s% total_energy_change_from_mdot
+                  ! 
+                  
+                  
+                  ! sources from start to end = 
+                  
+                  
+                  ! sum of others should = -(total_start - total_old)
+                  ! sum of equation dL, work, sources, and others should = total_end - total_start
+                  ! 
                       
                   write(*,2) 'sum_cell_others = WD, diffusion, pre_mix, drag, Eq', s% model_number, sum_cell_others
-                  write(*,2) 'total_others = (total_start - total_old)', s% model_number, total_others
+                  
+                  
+                  
+                  
+                  
+                  write(*,2) 'expected total_others = (total_start - total_old)', s% model_number, total_others
                      
                      
                      
@@ -1140,7 +1158,9 @@
                      total_radiation, dt*s% L_center, dt*s% L(1)
                   write(*,2) 'total_work = dt*(center - surface)', s% model_number, &
                      total_work, dt*s% work_inward_at_center, dt*s% work_outward_at_surface
-                  write(*,2) 'total_external = nuc, neu, irrad, extra, mdot', s% model_number, total_external
+                     
+                     
+                  write(*,2) 'sum_cell_others = sum of nuc, neu, irrad, extra, mdot', s% model_number, total_external
                   write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
                   write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
                   write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating

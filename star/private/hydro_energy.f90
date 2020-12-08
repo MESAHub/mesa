@@ -111,7 +111,7 @@
          s% energy_sources(k) = sources_18%val 
             ! nuclear heating, non_nuc_neu_cooling, irradiation heating, extra_heat, eps_mdot
          s% energy_others(k) = others_18%val
-            ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix, eps_drag, Eq
+            ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
          s% PdVdt(k) = 0d0
          
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
