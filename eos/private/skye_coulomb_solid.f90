@@ -124,14 +124,54 @@ module skye_coulomb_solid
 
    end function ocp_solid_harmonic_free_energy
 
-   !> Calculates the correction to the linear mixing rule for a Coulomb liquid mixture.
+
+   !> Computes the correction deltaG to the linear mixing rule for a two-component Coulomb solid mixture.
+   !! From Shuji Ogata, Hiroshi Iyetomi, and Setsuo Ichimaru 1993
+   !!
+   !! Based on simulations done for charge ratio 4/3 <= Rz <= 4 and 163 <= Gamma <= 383, where
+   !! Gamma here is the ionic interaction strength measured for the lower-charge species.
+   !! deltaG is defined as deltaF / (x1*x2*Gamma), where deltaF is a free energy per kT per ion
+   !! and x1 is the abundance of species 1.
+   !!
+   !! @param x2 Abundance of the higher-charge species
+   !! @param Rz Charge ratio of species (> 1 by definition).
+   real(dp) function deltaG_Ogata93(x2, Rz) result(dG)
+      ! Inputs
+      real(dp), intent(in) :: x2
+      real(dp), intent(in) :: Rz
+
+      ! Intermediates
+      real(dp) :: CR
+
+      CR = 0.05d0 * pow2(Rz - 1d0) / ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
+      dG = CR / (1 + (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
+
+   end function deltaG_Ogata93
+
+   !> Computes the correction deltaG to the linear mixing rule for a two-component Coulomb solid mixture.
    !! Originally from PhysRevE.79.016411 (Equation of state of classical Coulomb plasma mixtures)
    !! by Potekhin, Alexander Y. and Chabrier, Gilles and Rogers, Forrest J.
    !! https://link.aps.org/doi/10.1103/PhysRevE.79.016411
    !!
-   !! This implementation differs from that in the PC EOS in that we have removed all removable
-   !! singularities in the species abundances, and we explicitly group and sort species by charge.
-   !!
+   !! @param x Abundance of the higher-charge species
+   !! @param Rz Charge ratio of species (> 1 by definition).
+   real(dp) function deltaG_PC13(x2, Rz) result(dG)
+      ! Inputs
+      real(dp), intent(in) :: x2
+      real(dp), intent(in) :: Rz
+
+      ! Intermediates
+      real(dp) :: x
+
+      x = x2 / Rz + (1d0 - 1d0 / Rz) * pow(x2, Rz)
+      dG = 0.012d0 * ((x*(1d0-x)) / (x2*(1d0-x2))) * (1d0 - 1d0/pow2(Rz)) * (1d0 - x2 + x2 * pow(Rz,5d0/3d0))
+
+   end function deltaG_PC13
+
+   !> Calculates the correction to the linear mixing rule for a Coulomb solid mixture
+   !! by extending a two-component deltaG prescription to the multi-component case, using the
+   !! prescription of Medin & Cumming 2010.
+   !! 
    !! @param n Number of species
    !! @param AY Array of length NMIX holding the masses of species
    !! @param AZion Array of length NMIX holding the charges of species
@@ -148,7 +188,7 @@ module skye_coulomb_solid
       real(dp) :: unique_charges(n), charge_abundances(n)
       logical :: found
       integer :: found_index
-      real(dp) :: RZ, pref, ai, aj, abundance_sum, q, F1, F2, F3
+      real(dp) :: RZ, aj, dG
       type(auto_diff_real_2var_order3) :: GAMI
 
       ! Output
@@ -185,7 +225,7 @@ module skye_coulomb_solid
          do j=1,num_unique_charges
             if (unique_charges(j) == 0d0) cycle
 
-            ! Expression needs R >= 1.
+            ! Expression needs R > 1.
             ! From PC2013: 'dF_sol = Sum_i Sum_{j>i} ... where the indices are arranged so that Z_j < Z_{j+1}'
             ! So if j > i then Z_j > Z_i, which means R = Z_j / Z_i > 1.
             ! We extend to the case of equality by grouping equal-charge species together, as above.
@@ -193,23 +233,14 @@ module skye_coulomb_solid
 
             RZ = unique_charges(j)/unique_charges(i) ! Charge ratio
          
-            abundance_sum = charge_abundances(i) + charge_abundances(j)
-
-            pref = C * pow2(abundance_sum) * (pow2(RZ) - 1d0) / pow4(RZ) ! Prefactor in deltaG
-
             ! max avoids divergence.
             ! The contribution to F scales as abundance_sum^2, so in cases where the max returns eps
             ! we don't care much about the error this incurs.
-            ai = charge_abundances(i) / max(eps, abundance_sum)
-            aj = 1d0 - ai
-            q = pow(aj, RZ)
-
-            F1 = -(ai + aj * pow(RZ, 5d0/3d0))
-            F2 = aj + q * (RZ - 1d0)
-            F3 = (RZ - 1d0) * (q - 1d0) - ai
+            aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))! = x2 / (x1 + x2) in MC10's language
+            dG = deltaG_Ogata93(aj, RZ)
 
             GAMI=pow(unique_charges(i),5d0/3d0)*GAME
-            F = F + (pref * F1 * F2 * F3) * GAMI
+            F = F +  GAMI * (charge_abundances(i) * charge_abundances(j) * dG)
          end do
       end do
    end function solid_mixing_rule_correction
