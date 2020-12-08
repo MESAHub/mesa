@@ -4,8 +4,8 @@
 
       show_log_description_at_start = .false. 
 
-      !load_saved_model = .true.
-      !saved_model_name = 'zams.mod'
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'agb.mod'

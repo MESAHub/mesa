@@ -8,8 +8,11 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 # set MESA_RUN_OPTIONAL to run all parts of test
-if [ -n "$MESA_RUN_OPTIONAL" ]; then
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+    cp standard_zams.mod zams.mod
+else
     do_one inlist_zams_header zams.mod
+    cp zams.mod standard_zams.mod
 fi
 
 do_one inlist_to_agb_header agb.mod 

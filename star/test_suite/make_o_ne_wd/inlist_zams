@@ -20,16 +20,11 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0 
-
-      kap_file_prefix = 'gs98'
 
 / ! end of kap namelist
 
 &controls
-      initial_mass = 10
-      initial_z = 0.02d0 
-      
+
       stop_near_zams = .true.
       Lnuc_div_L_zams_limit = 0.9d0
       
