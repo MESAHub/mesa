@@ -1727,25 +1727,6 @@
                val = safe_log10(s% total_turbulent_energy_end)
            case(h_log_total_energy)
                val = safe_log10(abs(s% total_energy_end))
-               
-           case(h_phase1_delta_energy_mdot)
-               val = s% phase1_delta_energy_mdot
-           case(h_phase2_delta_energy_mdot)
-               val = s% phase2_delta_energy_mdot
-           case(h_delta_energy_mdot)
-               val = s% phase1_delta_energy_mdot + s% phase2_delta_energy_mdot
-           case(h_delta_energy_mdot_error)
-               val = s% phase1_delta_energy_mdot + s% phase2_delta_energy_mdot &
-                  - s% total_energy_change_from_mdot
-           case(h_delta_energy_mdot_error_div_total)
-               if (s% total_energy_end /= 0d0) &
-                  val = (s% phase1_delta_energy_mdot + s% phase2_delta_energy_mdot &
-                     - s% total_energy_change_from_mdot)/s% total_energy_end
-           case(h_total_energy_change_from_mdot)
-               val = s% total_energy_change_from_mdot
-           case(h_total_rel_energy_mdot)
-              if (s% total_energy_end /= 0d0) &
-                val = s% total_energy_change_from_mdot/s% total_energy_end
 
            case(h_avg_abs_v_div_cs)
                if (v_flag) &

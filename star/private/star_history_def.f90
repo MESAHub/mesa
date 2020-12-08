@@ -223,15 +223,7 @@
       integer, parameter :: h_total_energy_after_adjust_mass = &
          h_total_rotational_kinetic_energy_after_adjust_mass + 1
 
-      integer, parameter :: h_phase1_delta_energy_mdot = h_total_energy_after_adjust_mass + 1
-      integer, parameter :: h_phase2_delta_energy_mdot = h_phase1_delta_energy_mdot + 1
-      integer, parameter :: h_delta_energy_mdot = h_phase2_delta_energy_mdot + 1
-      integer, parameter :: h_delta_energy_mdot_error = h_delta_energy_mdot + 1
-      integer, parameter :: h_delta_energy_mdot_error_div_total = h_delta_energy_mdot_error + 1
-      integer, parameter :: h_total_energy_change_from_mdot = h_delta_energy_mdot_error_div_total + 1
-      integer, parameter :: h_total_rel_energy_mdot = h_total_energy_change_from_mdot + 1
-
-      integer, parameter :: h_total_internal_energy = h_total_rel_energy_mdot + 1
+      integer, parameter :: h_total_internal_energy = h_total_energy_after_adjust_mass + 1
       integer, parameter :: h_total_gravitational_energy = h_total_internal_energy + 1
       integer, parameter :: h_total_turbulent_energy = h_total_gravitational_energy + 1
       integer, parameter :: h_total_radial_kinetic_energy = h_total_turbulent_energy + 1
@@ -1067,14 +1059,6 @@
          history_column_name(h_total_rotational_kinetic_energy) = 'total_rotational_kinetic_energy'
          history_column_name(h_total_turbulent_energy) = 'total_turbulent_energy'
          history_column_name(h_total_energy) = 'total_energy'
-         
-         history_column_name(h_phase1_delta_energy_mdot) = 'phase1_delta_energy_mdot'
-         history_column_name(h_phase2_delta_energy_mdot) = 'phase2_delta_energy_mdot'
-         history_column_name(h_delta_energy_mdot) = 'delta_energy_mdot'
-         history_column_name(h_delta_energy_mdot_error) = 'delta_energy_mdot_error'
-         history_column_name(h_delta_energy_mdot_error_div_total) = 'delta_energy_mdot_error_div_total'
-         history_column_name(h_total_energy_change_from_mdot) = 'total_energy_change_from_mdot'
-         history_column_name(h_total_rel_energy_mdot) = 'total_rel_energy_mdot'
 
          history_column_name(h_log_total_internal_energy) = 'log_total_internal_energy'
          history_column_name(h_log_total_gravitational_energy) = 'log_total_gravitational_energy'

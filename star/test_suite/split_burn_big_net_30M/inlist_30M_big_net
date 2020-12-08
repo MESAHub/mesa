@@ -5,7 +5,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'lgT_9.5.mod'
+      saved_model_name = 'lgT_9.5.mod' ! from black_hole test case for 30M with no winds.
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'

@@ -1731,7 +1731,26 @@
             
          real(dp) :: &
             
-            surface_cell_specific_total_energy_old, &
+            total_internal_energy_old, &
+            total_gravitational_energy_old, &
+            total_radial_kinetic_energy_old, &
+            total_turbulent_energy_old, &
+            total_rotational_kinetic_energy_old, &
+            total_energy_old, &
+         
+            total_internal_energy_before_adjust_mass, &
+            total_gravitational_energy_before_adjust_mass, &
+            total_radial_kinetic_energy_before_adjust_mass, &
+            total_turbulent_energy_before_adjust_mass, &
+            total_rotational_kinetic_energy_before_adjust_mass, &
+            total_energy_before_adjust_mass, &      
+         
+            total_internal_energy_after_adjust_mass, &
+            total_gravitational_energy_after_adjust_mass, &
+            total_radial_kinetic_energy_after_adjust_mass, &
+            total_turbulent_energy_after_adjust_mass, &
+            total_rotational_kinetic_energy_after_adjust_mass, &
+            total_energy_after_adjust_mass, &      
             
             total_internal_energy_start, &
             total_gravitational_energy_start, &
@@ -1746,30 +1765,20 @@
             total_turbulent_energy_end, &
             total_rotational_kinetic_energy_end, &
             total_energy_end, &      
-         
-            total_internal_energy_after_adjust_mass, &
-            total_gravitational_energy_after_adjust_mass, &
-            total_radial_kinetic_energy_after_adjust_mass, &
-            total_turbulent_energy_after_adjust_mass, &
-            total_rotational_kinetic_energy_after_adjust_mass, &
-            total_energy_after_adjust_mass, &      
              
             total_internal_energy, &
-            total_internal_energy_old, &
             total_gravitational_energy, &
-            total_gravitational_energy_old, &
             total_radial_kinetic_energy, &
-            total_radial_kinetic_energy_old, &
             total_turbulent_energy, &
-            total_turbulent_energy_old, &
             total_rotational_kinetic_energy, &
-            total_rotational_kinetic_energy_old, &
             total_energy, &
-            total_energy_old, &
             
-            total_energy_change_from_mdot, &     
-            phase1_delta_energy_mdot, & ! added by adjust_mass
-            phase2_delta_energy_mdot, & ! added during evolve dt
+            surface_cell_specific_total_energy_old, &
+
+            total_energy_change_from_mdot, & 
+            energy_change_from_do_adjust_mass_and_calculate_eps_mdot, &    
+            !phase1_delta_energy_mdot, & ! added by adjust_mass
+            !phase2_delta_energy_mdot, & ! added during evolve dt
             
             total_energy_sources_and_sinks, &
             virial_thm_P_avg, &

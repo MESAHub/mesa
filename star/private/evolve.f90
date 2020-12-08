@@ -283,7 +283,8 @@
          use hydro_rotation, only: set_rotation_info, set_i_rot
          use solve_hydro, only: set_L_burn_by_category
          use winds, only: set_mdot
-         use star_utils, only: eval_integrated_total_energy_profile
+         use star_utils, only: &
+            eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals
          use profile
 
          logical, intent(in) :: first_try
@@ -364,6 +365,14 @@
 
                call calculate_eps_mdot(s, dt, ierr)
                if (failed('calculate_eps_mdot')) return
+               
+               if (s% mstar_dot /= 0d0) then
+                  s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot = &
+                     s% total_energy_after_adjust_mass - s% total_energy_before_adjust_mass
+               else
+                  s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot = 0d0
+               end if
+               
                call set_vars_if_needed(s, dt, 'after calculate_eps_mdot', ierr)
                if (failed('set_vars_if_needed after calculate_eps_mdot')) return
 
@@ -859,18 +868,14 @@
          logical function okay_energy_conservation()
             use rsp, only: rsp_total_energy_integrals
             integer :: nz, k, ierr
-            real(dp) :: alt_total_internal_energy, alt_total_gravitational_energy, &
-               alt_total_kinetic_energy, alt_total_energy, Lp1, eflux00, efluxp1, &
-               sum_per_cell, rC_start, rC_new, mC, tmp, v, vstart, virial, &
-               sum_tot_E, sum_tot_E_start, E_new, E_start, sum_src_snk, &
-               L_surf, L_center, total_E_mdot, dergs_expected, dergs_actual, &
-               dKE_dt, d_dKEdt_dv00, d_dKEdt_dvp1, total_radiation, total_others, &
-               dPE_dt, d_dPEdt_dlnR00, d_dPEdt_dlnRp1, dEt_dt, &
-               flux_out, flux_in, sources, flux_and_sources, dedt_expected, e_expected, &
-               e_actual, ergs_error, eps_nuc, non_nuc_neu, total_external, total_work, &
-               solver_error_in_energy_conservation, &
-               sum_cell_dL, sum_cell_work, sum_cell_sources, sum_cell_others, sum_cell_err, &
-               sum_cell_terms, sum_cell_ergs_error, sum_cell_dEturb, sum_cell_dke, sum_cell_dpe, sum_cell_de
+            real(dp) :: pre_split_sources_and_sinks, post_split_sources_and_sinks, post_split_work, &
+               pre_split_total_energy_from_mdot, post_split_total_energy_from_mdot, &
+               expected_sum_cell_others, expected_sum_cell_sources, &
+               diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
+               diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
+               virial, total_radiation, L_surf, sum_cell_de, sum_cell_dEturb, &
+               sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
+               sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing
                
             include 'formats'
 
@@ -921,8 +926,6 @@
             else
                s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
             end if
-            s% cumulative_eps_grav = &
-               s% cumulative_eps_grav_old + s% total_eps_grav
 
             ! When there are mass changes the total energy of the model changes.
             ! We can split this change into three parts:
@@ -955,27 +958,11 @@
             ! However it should equal the total energy at the end of the step.
 
 
-            s% work_outward_at_surface = &
-               s% work_outward_at_surface - s% mdot_acoustic_surface - s% mdot_adiabatic_surface
-
-            s% cumulative_work_outward_at_surface = &
-               s% cumulative_work_outward_at_surface_old + dt*s% work_outward_at_surface
-            s% cumulative_work_inward_at_center = &
-               s% cumulative_work_inward_at_center_old + dt*s% work_inward_at_center
 
             if (s% rotation_flag .and. &
                   (s% use_other_torque .or. s% use_other_torque_implicit .or. &
                      associated(s% binary_other_torque))) then
                ! keep track of rotational kinetic energy
-            end if
-            
-            L_surf = s% L(1)
-            L_center = s% L_center
-            if (.not. s% RSP_flag) then
-               if (s% using_Fraley_time_centering .and. &
-                     s% include_L_in_Fraley_time_centering) &
-                  L_surf = 0.5d0*(s% L(1) + s% L_start(1))
-               total_radiation = dt*(L_center - L_surf)
             end if
             
             if (s% eps_nuc_factor == 0d0 .or. &
@@ -995,8 +982,6 @@
             else
                s% total_nuclear_heating = dt*dot_product(s% dm(1:nz), s% eps_nuc(1:nz))
             end if
-            s% cumulative_nuclear_heating = &
-               s% cumulative_nuclear_heating_old + s% total_nuclear_heating
             
             if (s% RSP_flag .or. s% gamma_law_hydro > 0) then
                s% total_non_nuc_neu_cooling = 0d0
@@ -1007,91 +992,173 @@
                s% total_irradiation_heating = &
                   dt*dot_product(s% dm(1:nz), s% irradiation_heat(1:nz))
             end if
-            s% cumulative_non_nuc_neu_cooling = &
-               s% cumulative_non_nuc_neu_cooling_old + s% total_non_nuc_neu_cooling
-            s% cumulative_irradiation_heating = &
-               s% cumulative_irradiation_heating_old + s% total_irradiation_heating
             
             s% total_WD_sedimentation_heating = 0d0
             if (s% do_element_diffusion .and. s% do_WD_sedimentation_heating) then
                s% total_WD_sedimentation_heating = &
                   dt*dot_product(s% dm(1:nz), s% eps_WD_sedimentation(1:nz))
-               s% cumulative_WD_sedimentation_heating = &
-                  s% cumulative_WD_sedimentation_heating_old + s% total_WD_sedimentation_heating
             end if
             
             s% total_energy_from_diffusion = 0d0
             if (s% do_element_diffusion .and. s% do_diffusion_heating) then
                s% total_energy_from_diffusion = &
                   dt*dot_product(s% dm(1:nz), s% eps_diffusion(1:nz))
-               s% cumulative_energy_from_diffusion = &
-                  s% cumulative_energy_from_diffusion_old + s% total_energy_from_diffusion
             end if
             
+            total_energy_from_pre_mixing = 0d0
+            if (s% do_conv_premix) then
+               total_energy_from_pre_mixing = &
+                  dt*dot_product(s% dm(1:nz), s% eps_pre_mix(1:nz))
+            end if
+            
+            post_split_total_energy_from_mdot = &
+               dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
+            
             s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz))
-            s% cumulative_extra_heating = &
-               s% cumulative_extra_heating_old + s% total_extra_heating
             
-            s% cumulative_L_center = &
-               s% cumulative_L_center_old + dt*L_center
+            if (s% u_flag) then ! ignore total_work for Riemann hydro
+               s% work_outward_at_surface = 0d0
+               s% work_inward_at_center = 0d0
+            else ! these are set in energy equation
+            end if
 
-            if (.not. s% do_element_diffusion) s% total_WD_sedimentation_heating = 0
+            post_split_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
-            total_external = &
-                 s% total_nuclear_heating &
+            if (.not. s% RSP_flag) then
+               if (s% using_Fraley_time_centering .and. &
+                     s% include_L_in_Fraley_time_centering) then
+                  L_surf = 0.5d0*(s% L(1) + s% L_start(1))
+               else
+                  L_surf = s% L(1)
+               end if
+               total_radiation = dt*(L_surf - s% L_center)
+            end if
+
+            !pre_split_total_energy_from_mdot = &
+            !     s% mdot_acoustic_surface &
+            !   + s% total_energy_change_from_mdot &
+            !   + s% mdot_adiabatic_surface &
+            !   - post_split_total_energy_from_mdot
+               
+            pre_split_total_energy_from_mdot = &
+                 s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
+               + s% mdot_adiabatic_surface ! ??
+
+            pre_split_sources_and_sinks = &
+                 pre_split_total_energy_from_mdot &
+               + total_energy_from_pre_mixing &
+               + s% total_WD_sedimentation_heating &
+               + s% total_energy_from_diffusion &
+               + s% non_epsnuc_energy_change_from_split_burn
+
+            post_split_sources_and_sinks = &
+               - total_energy_from_pre_mixing &
+               - s% total_WD_sedimentation_heating &
+               - s% total_energy_from_diffusion &
+               + post_split_total_energy_from_mdot &
+               + s% total_nuclear_heating &
                - s% total_non_nuc_neu_cooling &
                + s% total_irradiation_heating &
                + s% total_extra_heating &
-               + s% total_energy_change_from_mdot
-            
-            if (s% u_flag) then ! ignore these for Riemann hydro
-               s% work_outward_at_surface = 0d0
-               s% work_inward_at_center = 0d0
-               total_work = 0d0
-            else
-               total_work = dt*(s% work_inward_at_center - s% work_outward_at_surface)
-            end if
-
-            total_others = s% total_energy_start - s% total_energy_old
-               ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix, eps_drag, Eq
+               - total_radiation & 
+               - post_split_work
 
             s% total_energy_sources_and_sinks = &
-               total_external + total_work + total_radiation + &
-               s% non_epsnuc_energy_change_from_split_burn 
-
-            s% cumulative_L_surf = &
-               s% cumulative_L_surf_old + dt*L_surf
-
-            s% cumulative_sources_and_sinks = &
-               s% cumulative_sources_and_sinks_old + s% total_energy_sources_and_sinks
+               pre_split_sources_and_sinks + post_split_sources_and_sinks
 
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
-            
-            
-            solver_error_in_energy_conservation = &
-               s% total_energy_end - (s% total_energy_start + total_external + total_work + total_radiation)
 
             s% cumulative_energy_error = s% cumulative_energy_error_old + &
                s% error_in_energy_conservation
 
          
-            if (s% model_number == s% energy_conservation_dump_model_number) then
+            if (s% model_number == s% energy_conservation_dump_model_number &
+                  .and. .not. s% doing_relax) then
 
                write(*,*)
                write(*,2) 's% error_in_energy_conservation', s% model_number, s% error_in_energy_conservation
                write(*,2) 'total_energy', s% model_number, s% total_energy
                write(*,2) 'rel_E_err = error/total_energy', s% model_number, s% error_in_energy_conservation/s% total_energy
+               write(*,2) 'rel err pre_split', s% model_number, &
+                  (s% total_energy_start - (s% total_energy_old + pre_split_sources_and_sinks))/s% total_energy
+               write(*,2) 'rel err post_split', s% model_number, &
+                  (s% total_energy_end - (s% total_energy_start + post_split_sources_and_sinks))/s% total_energy
+               write(*,*)
+               write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
+               write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
+               write(*,2) 's% total_energy_end', s% model_number, s% total_energy_end
+               write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,*)
                
                if (s% use_dedt_form_with_total_energy_conservation .and. &
                    s% always_use_dedt_form_of_energy_eqn .and. &
                    .not. s% u_flag) then
-                   
-                  ! in this case, then energy equation (unscaled) residual (ergs/gm/s) is the following
-                  ! residual = - dL_dm + energy_sources + energy_others - dwork_dm - dEturb_dt - dke_dt - dpe_dt - de_dt
-                  ! ergs_error = -dm*dt*residual
+                  
+                  write(*,*)
+                  write(*,*) 'for debugging pre_split_sources_and_sinks'
+                  write(*,*)
+                  write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
+                  write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
+                  write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
+                  write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, s% non_epsnuc_energy_change_from_split_burn
+                  write(*,2) 'post_split sum cell dt*dm*eps_mdot', s% model_number, post_split_total_energy_from_mdot
+                  write(*,2) 'pre_split_total_energy_from_mdot', s% model_number, pre_split_total_energy_from_mdot
+                  write(*,2) 'from_do_adjust_mass_and_eps_mdot', s% model_number, &
+                     s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot
+                  write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
+                  write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
+                  write(*,2) 'post_split_total_energy_from_mdot', s% model_number, post_split_total_energy_from_mdot
 
+                  write(*,*)
+                  write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
+                  write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
+                  write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
+                  write(*,2) 'pre_split_sources_and_sinks', s% model_number, pre_split_sources_and_sinks
+                  write(*,*) 
+                  write(*,2) 'energy_start - energy_old', s% model_number, s% total_energy_start - s% total_energy_old
+                  write(*,2) 'err pre_split_sources_and_sinks', s% model_number, &
+                      s% total_energy_start - (s% total_energy_old + pre_split_sources_and_sinks)
+                  write(*,2) 'rel err pre_split_sources_and_sinks', s% model_number, &
+                     (s% total_energy_start - (s% total_energy_old + pre_split_sources_and_sinks))/s% total_energy
+                  write(*,*)
+                  write(*,*)
+                  
+                  
+                  
+                  write(*,*) 'for debugging post_split_sources_and_sinks'
+                  write(*,*)
+                  
+                  write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
+                  write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
+                  write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
+                  write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
+                  write(*,*)
+                  write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
+                  write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
+                  write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
+                  write(*,*)
+                  write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
+                  write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
+                  write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
+                 ! write(*,2) 'post_split_total_energy_from_mdot', s% model_number, post_split_total_energy_from_mdot
+                  write(*,*)
+                  write(*,2) 'post_split_work', s% model_number, post_split_work
+                  write(*,2) 'total_radiation', s% model_number, total_radiation
+                  write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, &
+                     s% non_epsnuc_energy_change_from_split_burn 
+                  write(*,*)
+
+                  write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
+                  write(*,2) 's% work_inward_at_center', s% model_number, s% work_inward_at_center
+                  write(*,2) 'L_surf', s% model_number, L_surf
+                  write(*,2) 'L_center', s% model_number, s% L_center
+                  write(*,*)
+                  
+                  
+                  
+                  
+                   
                   sum_cell_dL = dt*dot_product(s% dm(1:nz), s% dL_dm(1:nz))
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
                   sum_cell_others = dt*dot_product(s% dm(1:nz), s% energy_others(1:nz))
@@ -1105,220 +1172,72 @@
                      - sum_cell_dEturb - sum_cell_dke - sum_cell_dpe - sum_cell_de
                   sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
-
-                  write(*,2) '(sum_cell_terms - sum_cell_ergs_error)/total_energy',  s% model_number, &
-                     (sum_cell_terms - sum_cell_ergs_error)/s% total_energy, sum_cell_terms, sum_cell_ergs_error
-                  write(*,*) 'this is small if energy equation is reporting total ergs error that matches sum of terms'
-                  write(*,*)
-                  write(*,2) 'sum_cell_ergs_error/total_energy',  s% model_number, sum_cell_ergs_error/s% total_energy
-                  write(*,*) 'the would match rel_E_err if the energy equation knew about all the relevant changes'
-
-
-            
-                  write(*,*)
-                  write(*,2) 'rel err sum_cell_dL + total_radiation', s% model_number, &
-                     (sum_cell_dL+total_radiation)/s% total_energy, sum_cell_dL, total_radiation
-                  write(*,2) 'rel err sum_cell_work + total_work', s% model_number, &
-                     (sum_cell_work+total_work)/s% total_energy, sum_cell_work, total_work
-                  write(*,2) 'rel err sum_cell_sources - total_external', s% model_number, &
-                     (sum_cell_sources - total_external)/s% total_energy, sum_cell_sources, total_external
-                  write(*,2) 'rel err sum_cell_others - total_others', s% model_number, &
-                     (sum_cell_others - total_others)/s% total_energy, sum_cell_others, total_others
-                  write(*,*) 'these -> 0 if energy equation knows what is changing'
-                  write(*,*)              
                   
-                  ! sources for energy equation: nuclear heating, non_nuc_neu_cooling, irradiation heating, extra_heat, eps_mdot
-                  ! others for energy equation: eps_WD_sedimentation, eps_diffusion, eps_pre_mix
+                  expected_sum_cell_others = &
+                     - total_energy_from_pre_mixing &
+                     - s% total_WD_sedimentation_heating &
+                     - s% total_energy_from_diffusion
+                  expected_sum_cell_sources = &
+                       post_split_total_energy_from_mdot &
+                     + s% total_nuclear_heating &
+                     - s% total_non_nuc_neu_cooling &
+                     + s% total_irradiation_heating &
+                     + s% total_extra_heating
                   
-                  
-                  ! change_before_start = lasting_changes_before_start + temporary_changes_before_start
-                  ! lasting_changes_before_start = s% total_energy_change_from_mdot
-                  ! 
-                  
-                  
-                  ! sources from start to end = 
-                  
-                  
-                  ! sum of others should = -(total_start - total_old)
-                  ! sum of equation dL, work, sources, and others should = total_end - total_start
-                  ! 
-                      
-                  write(*,2) 'sum_cell_others = WD, diffusion, pre_mix, drag, Eq', s% model_number, sum_cell_others
-                  
-                  
-                  
-                  
-                  
-                  write(*,2) 'expected total_others = (total_start - total_old)', s% model_number, total_others
-                     
-                     
-                     
-                     
-                  write(*,2) 'total_radiation = dt*(L_center - L(1))', s% model_number, &
-                     total_radiation, dt*s% L_center, dt*s% L(1)
-                  write(*,2) 'total_work = dt*(center - surface)', s% model_number, &
-                     total_work, dt*s% work_inward_at_center, dt*s% work_outward_at_surface
-                     
-                     
-                  write(*,2) 'sum_cell_others = sum of nuc, neu, irrad, extra, mdot', s% model_number, total_external
-                  write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
-                  write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
-                  write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
-                  write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
-                  write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
-                  write(*,*)
-                  write(*,*) '**************'
-
-
-                  write(*,*)
-                  write(*,*) 'solver_error_in_energy_conservation should = sum_cell_ergs_error'
-                  write(*,2) 'solver_error_in_energy_conservation - sum_cell_ergs_error', s% model_number, &
-                     solver_error_in_energy_conservation - sum_cell_ergs_error, &
-                     solver_error_in_energy_conservation, sum_cell_ergs_error
-                  write(*,2) 'solver_error_in_energy_conservation/total_energy',  s% model_number, &
-                     solver_error_in_energy_conservation/s% total_energy
-                  write(*,*)
-                  write(*,2) 'total_external - energy_sources', s% model_number, &
-                     total_external - sum_cell_sources, &
-                     total_external, sum_cell_sources
-                  write(*,2) 'total_work + sum_cell_work', s% model_number, &
-                     total_work + sum_cell_work, &
-                     total_work, sum_cell_work
-                  write(*,2) 'total_radiation + sum_cell_dL', s% model_number, &
-                     total_radiation + sum_cell_dL, &
-                     total_radiation, sum_cell_dL
-                  write(*,2) '(total_energy_end - total_energy_start) - (de + ...)', s% model_number, &
-                     (s% total_energy_end - s% total_energy_start) - (sum_cell_dEturb + sum_cell_dke + sum_cell_dpe + sum_cell_de), &
-                     s% total_energy_end - s% total_energy_start, (sum_cell_dEturb + sum_cell_dke + sum_cell_dpe + sum_cell_de)
-                  write(*,*)
-                  write(*,2) '(total_start - total_old) + sum_cell_others', s% model_number, &
-                     (s% total_energy_start - s% total_energy_old) + sum_cell_others, &
-                     (s% total_energy_start - s% total_energy_old), sum_cell_others
+                  !write(*,2) 'rel err sum all cell terms', s% model_number, &
+                  !   (post_split_sources_and_sinks - &
+                  !      (sum_cell_others + sum_cell_sources + sum_cell_dL + sum_cell_work))/s% total_energy
+                  write(*,2) 'rel err sum_cell_others', s% model_number, &
+                     (sum_cell_others - expected_sum_cell_others)/s% total_energy, &
+                     sum_cell_others, expected_sum_cell_others
+                  write(*,2) 'rel err sum_cell_sources', s% model_number, &
+                     (sum_cell_sources - expected_sum_cell_sources)/s% total_energy, &
+                     sum_cell_sources, expected_sum_cell_sources
+                  write(*,2) 'rel err sum_cell_dL', s% model_number, &
+                     (sum_cell_dL - total_radiation)/s% total_energy, sum_cell_dL, total_radiation
+                  write(*,2) 'rel err sum_cell_work', s% model_number, &
+                     (sum_cell_work - post_split_work)/s% total_energy, sum_cell_work, post_split_work
                   write(*,*)
                   
-                  
-            !total_external = &
-            !     s% total_nuclear_heating &
-            !   - s% total_non_nuc_neu_cooling &
-            !   + s% total_irradiation_heating &
-            !   + s% total_extra_heating &
-            !   + s% total_energy_change_from_mdot
-            !energy_sources = eps_nuc - non_nuc_neu + irradiation_heat  + extra_heat + eps_mdot + Eq + eps_drag
-               !eps_nuc = 
-               !   if (doing_op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
-               !      s% burn_avg_epsnuc(k)
-               !   else
-               !      s% eps_nuc(k)
-               !   end if
-               !non_nuc_neu = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-               
-               
-            !energy_others = eps_WD_sedimentation + eps_diffusion + eps_pre_mix
-               
-
-
-
-
-               
-                  if (is_bad(sum_cell_dL)) then
-                     !do k=1,s% nz
-                     !   if (is_bad(s% dL_dm(k))) write(*,2) 's% dL_dm(k)', k, s% dL_dm(k)
-                     !end do
-                     stop 'is_bad(sum_cell_dL) okay_energy_conservation'
-                  end if
-                  
-                  
-                  
-                  
-                  
-                  write(*,2) 'sum cell ergs_error - solver_error', s% model_number, &
-                     sum(s% ergs_error(1:nz)) - solver_error_in_energy_conservation, &
-                     sum(s% ergs_error(1:nz)), solver_error_in_energy_conservation
+                  diff_total_internal_energy = &
+                     s% total_internal_energy_end - s% total_internal_energy_start
+                  diff_total_gravitational_energy = &
+                     s% total_gravitational_energy_end - s% total_gravitational_energy_start
+                  diff_total_kinetic_energy = &
+                     s% total_radial_kinetic_energy_end - s% total_radial_kinetic_energy_start
+                  !diff_total_rotational_kinetic_energy = &
+                  !   s% total_rotational_kinetic_energy_end - s% total_rotational_kinetic_energy_start
+                  diff_total_turbulent_energy = &
+                     s% total_turbulent_energy_end - s% total_turbulent_energy_start
+                     
+                  write(*,2) 'post split rel err sum_cell_de', s% model_number, &
+                     (sum_cell_de - diff_total_internal_energy)/s% total_energy, &
+                     sum_cell_de, diff_total_internal_energy
+                  write(*,2) 'post split rel err sum_cell_dpe', s% model_number, &
+                     (sum_cell_dpe - diff_total_gravitational_energy)/s% total_energy, &
+                     sum_cell_dpe, diff_total_gravitational_energy
+                  write(*,2) 'post split rel err sum_cell_dke', s% model_number, &
+                     (sum_cell_dke - diff_total_kinetic_energy)/s% total_energy, &
+                     sum_cell_dke, diff_total_kinetic_energy
+                  !write(*,2) 'rel err ', s% model_number, &
+                  !   ( - diff_total_rotational_kinetic_energy)/s% total_energy, &
+                  !   , diff_total_rotational_kinetic_energy
+                  write(*,2) 'rel err sum_cell_dEturb', s% model_number, &
+                     (sum_cell_dEturb - diff_total_turbulent_energy)/s% total_energy, &
+                     sum_cell_dEturb, diff_total_turbulent_energy
+                  write(*,*)
                      
                      
-                     
-                     
-                     
-                     
-                     
-
-                  write(*,2) 'sum cell ergs_error - error_in_energy_conservation', s% model_number, &
-                     sum(s% ergs_error(1:nz)) - s% error_in_energy_conservation, &
-                     sum(s% ergs_error(1:nz)), s% error_in_energy_conservation
-                     
-                  write(*,2) 'total_energy_old - total_energy_start', s% model_number, &
-                     s% total_energy_old - s% total_energy_start, &
-                     s% total_energy_old, s% total_energy_start
-                  
-               end if
-
-
-               write(*,*)
-               write(*,2) 'dt', s% model_number, dt
-               write(*,2) 's% total_energy_end', s% model_number, s% total_energy_end
-               write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
-               write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
-               write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
-               write(*,*)
-               write(*,*) 'op_split_burn', s% op_split_burn
-               write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
-               write(*,2) '-s% total_non_nuc_neu_cooling', s% model_number, -s% total_non_nuc_neu_cooling
-               write(*,2) 'dt*dwork', s% model_number, s% dt*(s% work_inward_at_center - s% work_outward_at_surface)
-               write(*,*)
-               write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
-               write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
-               write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, s% non_epsnuc_energy_change_from_split_burn
-               write(*,2) 'dt*s% non_epsnuc_energy_change_from_split_burn', s% model_number, dt*s% non_epsnuc_energy_change_from_split_burn
-               write(*,*)
-               
-               write(*,2) 'IE+PE end - (IE+PE old)', s% model_number, &
-                  (s% total_internal_energy_end + s% total_gravitational_energy_end) - &
-                  (s% total_gravitational_energy_old + s% total_internal_energy_old)
-               write(*,2) 'total_energy_end - total_energy_old', s% model_number, &
-                  s% total_energy_end - s% total_energy_old
-               write(*,*)
-               
-               write(*,2) 'dt*(L_center - L_surf)', s% model_number, total_radiation
-               write(*,2) 'L_surf', s% model_number, L_surf
-               write(*,2) 'L_center', s% model_number, L_center
-               write(*,*)
-               
-               !write(*,2) '-dt*sum(dm*sources)', s% model_number, -dt*dot_product(s% dm(1:nz),s% xtra2_array(1:nz))
-               write(*,2) 'epsnuc-neu+mdot', s% model_number, s% total_nuclear_heating - &
-                   s% total_non_nuc_neu_cooling + s% total_energy_change_from_mdot
-               write(*,*)
-               
-               !write(*,2) 'dt*sum(dm*dKE_dt)', s% model_number, dt*dot_product(s% dm(1:nz),s% xtra3_array(1:nz))
-               write(*,2) 'KE end - KE old', s% model_number, &
-                  s% total_radial_kinetic_energy_end - s% total_radial_kinetic_energy_old
-               write(*,*)
-               
-               !write(*,2) 'dt*sum(dm*dPE_dt)', s% model_number, dt*dot_product(s% dm(1:nz),s% xtra4_array(1:nz))
-               write(*,2) 'PE end - PE old', s% model_number, &
-                  s% total_gravitational_energy_end - s% total_gravitational_energy_old
-               write(*,*)
-               
-               !write(*,2) 'dt*sum(dm*dedt)', s% model_number, dt*dot_product(s% dm(1:nz),s% xtra5_array(1:nz))
-               write(*,2) 'IE end - IE old', s% model_number, &
-                  s% total_internal_energy_end - s% total_internal_energy_old
-               write(*,*)
-               
-               if (s% Eturb_flag) then
-                  !write(*,2) 'dt*sum(dm*dedt)', s% model_number, dt*dot_product(s% dm(1:nz),s% xtra6_array(1:nz))
-                  write(*,2) 'Eturb end - Eturb old', s% model_number, &
-                     s% total_turbulent_energy_end - s% total_turbulent_energy_old
+                  write(*,2) 'rel sum_cell_ergs_error', s% model_number, &
+                     sum_cell_ergs_error/s% total_energy, &
+                     sum_cell_ergs_error, s% total_energy
+                  write(*,2) 'rel err post_split_sources_and_sinks', s% model_number, &
+                     (s% total_energy_end - (s% total_energy_start + post_split_sources_and_sinks))/s% total_energy
+                  write(*,2) 'total rel_E_err', s% model_number, &
+                     s% error_in_energy_conservation/s% total_energy, &
+                     s% error_in_energy_conservation, s% total_energy
                   write(*,*)
                end if
-               
-               !write(*,2) 'dt*sum(dm*all)', s% model_number, dt*dot_product(s% dm(1:nz), &
-               !   s% xtra1_array(1:nz) - s% xtra2_array(1:nz) + s% xtra3_array(1:nz) &
-               !   + s% xtra4_array(1:nz) + s% xtra5_array(1:nz) + s% xtra6_array(1:nz))
-               write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
-
-               write(*,*)
-               write(*,2) 's% error_in_energy_conservation', s% model_number, s% error_in_energy_conservation
-               write(*,2) 'error/total_energy', s% model_number, s% error_in_energy_conservation/s% total_energy
-               write(*,*)
                
                stop 'okay_energy_conservation'
 
@@ -1341,7 +1260,7 @@
                write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
                write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
                write(*,2) 'dt*L_surf', s% model_number, dt*L_surf
-               write(*,2) 'dt*L_center', s% model_number, dt*L_center
+               write(*,2) 'dt*L_center', s% model_number, dt*s% L_center
                write(*,2) 'L_surf', s% model_number, L_surf
                write(*,2) 's% Fr(1)', s% model_number, s% Fr(1)
                write(*,2) 's% Lc(1)', s% model_number, s% Lc(1)

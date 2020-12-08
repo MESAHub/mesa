@@ -69,12 +69,20 @@
       end function compute_delta_m
 
       subroutine save_for_eps_mdot(s)
-         use star_utils, only: eval_total_energy_profile
+         use star_utils, only: eval_deltaM_total_energy_integrals
          type (star_info), pointer :: s
 
          integer :: j
-
-         call eval_total_energy_profile(s, s% total_energy_profile_before_adjust_mass)
+            
+         call eval_deltaM_total_energy_integrals( &
+            s, 1, s% nz, s% mstar, .true., &
+            s% total_energy_profile_before_adjust_mass, &
+            s% total_internal_energy_before_adjust_mass, &
+            s% total_gravitational_energy_before_adjust_mass, &
+            s% total_radial_kinetic_energy_before_adjust_mass, &
+            s% total_rotational_kinetic_energy_before_adjust_mass, &
+            s% total_turbulent_energy_before_adjust_mass, &
+            s% total_energy_before_adjust_mass)
 
          do j=1,s%nz
             s% dm_before_adjust_mass(j) = s% dm(j)
