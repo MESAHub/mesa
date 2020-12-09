@@ -188,6 +188,8 @@
       log_center_T
       log_center_Rho
       
+      log_max_T
+      
       log_cntr_T ! temperature
       log_cntr_Rho ! density
       log_cntr_P ! pressure

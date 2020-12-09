@@ -867,18 +867,8 @@
          ! otherwise need small steps during core helium burning and it
          ! slows down the test_suite
          if (.not. s% lxtra(lx_hydro_has_been_on)) then
-            s% cumulative_work_outward_at_surface = 0d0
-            s% cumulative_work_inward_at_center = 0d0
-            s% cumulative_eps_grav = 0d0
-            s% cumulative_delta_total_energy = 0d0
             s% cumulative_energy_error = 0d0
-            s% cumulative_L_center = 0d0
-            s% cumulative_L_surf = 0d0
             s% cumulative_extra_heating = 0d0
-            s% cumulative_irradiation_heating = 0d0
-            s% cumulative_nuclear_heating = 0d0
-            s% cumulative_non_nuc_neu_cooling = 0d0
-            s% cumulative_sources_and_sinks = 0d0
             write(*,*) &
                "Setting energy conservation error to zero until hydro is turned on for the first time"
          end if
