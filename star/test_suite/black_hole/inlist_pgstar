@@ -271,7 +271,7 @@ show_TRho_Profile_burn_lines = .true.
 show_TRho_Profile_burn_labels = .true.
       
 ! axis limits
-TRho_Profile_xmin = -11.0
+TRho_Profile_xmin = -12.0
 TRho_Profile_xmax = 10.0
 TRho_Profile_ymin = 3.0
 TRho_Profile_ymax = 10.0        

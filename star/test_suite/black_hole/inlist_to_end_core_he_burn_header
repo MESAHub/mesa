@@ -3,14 +3,11 @@
 
       mesa_dir = '../../..'
 
+      read_extra_star_job_inlist1 = .true.
+      extra_star_job_inlist1_name = 'inlist_common'
+
       read_extra_star_job_inlist2 = .true.
-      extra_star_job_inlist2_name = 'inlist_massive_defaults'
-
-      read_extra_star_job_inlist3 = .true.
-      extra_star_job_inlist3_name = 'inlist_common'
-
-      read_extra_star_job_inlist4 = .true.
-      extra_star_job_inlist4_name = 'inlist_to_end_core_he_burn'
+      extra_star_job_inlist2_name = 'inlist_to_end_core_he_burn'
 
 / ! end of star_job namelist
 
@@ -18,13 +15,10 @@
 &eos
 
       read_extra_eos_inlist1 = .true.
-      extra_eos_inlist1_name = 'inlist_massive_defaults'
+      extra_eos_inlist1_name = 'inlist_common'
 
-      read_extra_eos_inlist3 = .true.
-      extra_eos_inlist3_name = 'inlist_common'
-
-      read_extra_eos_inlist4 = .true.
-      extra_eos_inlist4_name = 'inlist_to_end_core_he_burn'
+      read_extra_eos_inlist2 = .true.
+      extra_eos_inlist2_name = 'inlist_to_end_core_he_burn'
 
 / ! end of eos namelist
 
@@ -32,13 +26,10 @@
 &kap
 
       read_extra_kap_inlist1 = .true.
-      extra_kap_inlist1_name = 'inlist_massive_defaults'
+      extra_kap_inlist1_name = 'inlist_common'
 
-      read_extra_kap_inlist3 = .true.
-      extra_kap_inlist3_name = 'inlist_common'
-
-      read_extra_kap_inlist4 = .true.
-      extra_kap_inlist4_name = 'inlist_to_end_core_he_burn'
+      read_extra_kap_inlist2 = .true.
+      extra_kap_inlist2_name = 'inlist_to_end_core_he_burn'
 
 / ! end of kap namelist
 
@@ -46,16 +37,10 @@
 &controls
 
       read_extra_controls_inlist1 = .true.
-      extra_controls_inlist1_name = 'inlist_massive_defaults'
+      extra_controls_inlist1_name = 'inlist_common'
 
       read_extra_controls_inlist2 = .true.
-      extra_controls_inlist2_name = 'inlist_set_alpha_mlt'
-
-      read_extra_controls_inlist3 = .true.
-      extra_controls_inlist3_name = 'inlist_common'
-
-      read_extra_controls_inlist4 = .true.
-      extra_controls_inlist4_name = 'inlist_to_end_core_he_burn'
+      extra_controls_inlist2_name = 'inlist_to_end_core_he_burn'
 
 / ! end of controls namelist
 
@@ -63,15 +48,9 @@
 &pgstar
 
       read_extra_pgstar_inlist1 = .true.
-      extra_pgstar_inlist1_name = 'inlist_massive_defaults'
+      extra_pgstar_inlist1_name = 'inlist_pgstar'
 
       read_extra_pgstar_inlist2 = .true.
-      extra_pgstar_inlist2_name = 'inlist_common'
-
-      read_extra_pgstar_inlist3 = .true.
-      extra_pgstar_inlist3_name = 'inlist_pgstar'
-
-      read_extra_pgstar_inlist4 = .true.
-      extra_pgstar_inlist4_name = 'inlist_to_end_core_he_burn'
+      extra_pgstar_inlist2_name = 'inlist_to_end_core_he_burn'
 
 / ! end of pgstar namelist

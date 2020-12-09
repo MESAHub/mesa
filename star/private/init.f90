@@ -402,41 +402,11 @@
          s% astero_revised_max_yr_dt = 0
          s% astero_revised_max_yr_dt_old = 0
 
-         s% cumulative_work_outward_at_surface = 0
-         s% cumulative_work_outward_at_surface_old = 0
-
-         s% cumulative_work_inward_at_center = 0
-         s% cumulative_work_inward_at_center_old = 0
-
-         s% cumulative_eps_grav = 0
-         s% cumulative_eps_grav_old = 0
-
          s% cumulative_energy_error = 0
          s% cumulative_energy_error_old = 0
 
-         s% cumulative_L_surf = 0
-         s% cumulative_L_surf_old = 0
-
-         s% cumulative_L_center = 0
-         s% cumulative_L_center_old = 0
-
          s% cumulative_extra_heating = 0
          s% cumulative_extra_heating_old = 0
-
-         s% cumulative_irradiation_heating = 0
-         s% cumulative_irradiation_heating_old = 0
- 
-         s% cumulative_WD_sedimentation_heating = 0
-         s% cumulative_WD_sedimentation_heating_old = 0
-
-         s% cumulative_nuclear_heating = 0
-         s% cumulative_nuclear_heating_old = 0
-
-         s% cumulative_non_nuc_neu_cooling = 0
-         s% cumulative_non_nuc_neu_cooling_old = 0
-
-         s% cumulative_sources_and_sinks = 0
-         s% cumulative_sources_and_sinks_old = 0
 
          s% have_initial_energy_integrals = .false.
 
@@ -802,9 +772,6 @@
 
          s% total_angular_momentum = 0
          s% total_angular_momentum_old = 0
-         
-         s% Lsurf_m = 0
-         s% Lsurf_m_old = 0
 
          s% prev_create_atm_R0_div_R = 0
 
@@ -1358,11 +1325,7 @@
          integer :: model_number, num_trace_history_values, photo_interval
          real(dp) :: eps_nuc_factor, non_nuc_neu_factor, &
             initial_z, initial_y, initial_mass, &
-            cumulative_work_outward_at_surface, cumulative_work_inward_at_center, &
-            cumulative_eps_grav, cumulative_delta_total_energy, cumulative_energy_error, &
-            cumulative_L_center, cumulative_L_surf, cumulative_extra_heating, &
-            cumulative_irradiation_heating, cumulative_WD_sedimentation_heating, &
-            cumulative_nuclear_heating, cumulative_non_nuc_neu_cooling, cumulative_sources_and_sinks
+            cumulative_energy_error, cumulative_extra_heating
 
          real(dp), pointer :: interp_work(:), conv_vel_interp(:)
          real(dp), pointer :: q(:), xq(:), xa(:,:), j_rot(:), entropy(:)
@@ -1383,19 +1346,8 @@
          time = s% time
          model_number = s% model_number
          num_trace_history_values = s% num_trace_history_values
-         cumulative_work_outward_at_surface = s% cumulative_work_outward_at_surface
-         cumulative_work_inward_at_center = s% cumulative_work_inward_at_center
-         cumulative_eps_grav = s% cumulative_eps_grav
-         cumulative_delta_total_energy = s% cumulative_delta_total_energy
          cumulative_energy_error = s% cumulative_energy_error
-         cumulative_L_center = s% cumulative_L_center
-         cumulative_L_surf = s% cumulative_L_surf
          cumulative_extra_heating = s% cumulative_extra_heating
-         cumulative_irradiation_heating = s% cumulative_irradiation_heating
-         cumulative_WD_sedimentation_heating = s% cumulative_WD_sedimentation_heating
-         cumulative_nuclear_heating = s% cumulative_nuclear_heating
-         cumulative_non_nuc_neu_cooling = s% cumulative_non_nuc_neu_cooling
-         cumulative_sources_and_sinks = s% cumulative_sources_and_sinks
 
          ! zero model_number and time (will restore later)
          s% model_number = 0
@@ -1586,19 +1538,8 @@
          s% time = time
          s% model_number = model_number
          s% num_trace_history_values = num_trace_history_values
-         s% cumulative_work_outward_at_surface = cumulative_work_outward_at_surface
-         s% cumulative_work_inward_at_center = cumulative_work_inward_at_center
-         s% cumulative_eps_grav = cumulative_eps_grav
-         s% cumulative_delta_total_energy = cumulative_delta_total_energy
          s% cumulative_energy_error = cumulative_energy_error
-         s% cumulative_L_center = cumulative_L_center
-         s% cumulative_L_surf = cumulative_L_surf
          s% cumulative_extra_heating = cumulative_extra_heating
-         s% cumulative_irradiation_heating = cumulative_irradiation_heating
-         s% cumulative_WD_sedimentation_heating = cumulative_WD_sedimentation_heating
-         s% cumulative_nuclear_heating = cumulative_nuclear_heating
-         s% cumulative_non_nuc_neu_cooling = cumulative_non_nuc_neu_cooling
-         s% cumulative_sources_and_sinks = cumulative_sources_and_sinks
 
          s% non_nuc_neu_factor = non_nuc_neu_factor
          s% eps_nuc_factor = eps_nuc_factor

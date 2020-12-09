@@ -976,26 +976,6 @@
       !abs_rel_E_err
       !log_rel_E_err
 
-      !rel_cumulative_delta_total_energy
-      !log_rel_cumulative_delta_total_energy
-
-
-      !error_in_energy_conservation ! for this step
-         ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
-      !cumulative_energy_error ! = sum over all steps of error_in_energy_conservation
-      !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
-      !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
-      !log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
-
-      !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
-      !log_rel_error_in_energy_conservation
-
-      !total_energy_and_integrated_fluxes ! = total_energy + cumulative_sources_and_sinks
-
-      !total_radiation
-      !total_energy_plus_total_radiation
-
-
 !----------------------------------------------------------------------------------------------
 
  !# rotation

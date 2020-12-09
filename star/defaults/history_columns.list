@@ -981,18 +981,6 @@
       !total_extra_heating ! extra heat integrated over the model times dt (erg)
       !total_WD_sedimentation_heating
 
-      !cumulative_eps_grav
-      !cumulative_L_center
-      !cumulative_L_surf
-
-      !cumulative_sources_and_sinks ! sum of total_energy_sources_and_sinks
-      !cumulative_nuclear_heating
-      !cumulative_non_nuc_neu_cooling
-      !cumulative_irradiation_heating
-      !cumulative_extra_heating
-      !cumulative_WD_sedimentation_heating
-
-
       !run_deltaE
       !rel_run_E_err
 

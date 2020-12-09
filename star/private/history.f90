@@ -1555,7 +1555,7 @@
                val = safe_log10(s% power_nonnuc_neutrinos)
 
            case(h_Lsurf_m)
-               val = s% Lsurf_m/Msun
+               val = s% m(1)/Msun
            case(h_luminosity)
                val = s% L_surf
            case(h_log_L)
@@ -1762,18 +1762,10 @@
                
            case(h_total_eps_grav)
                val = s% total_eps_grav
-           case(h_cumulative_eps_grav)
-               val = s% cumulative_eps_grav
            case(h_work_outward_at_surface)
                val = s% work_outward_at_surface
-           case(h_cumulative_work_outward_at_surface)
-               val = s% cumulative_work_outward_at_surface
            case(h_work_inward_at_center)
                val = s% work_inward_at_center
-           case(h_cumulative_work_inward_at_center)
-               val = s% cumulative_work_inward_at_center
-           case(h_log_cumulative_work_inward_at_center)
-               val = safe_log10(abs(s% cumulative_work_inward_at_center))
            case(h_total_nuclear_heating)
                val = s% total_nuclear_heating
            case(h_total_non_nuc_neu_cooling)
@@ -1823,40 +1815,6 @@
            case(h_log_rel_run_E_err)
                if (s% total_energy_end /= 0d0) &
                   val = safe_log10(abs(s% cumulative_energy_error/s% total_energy_end))
-
-           case(h_cumulative_delta_total_energy)
-               val = s% cumulative_delta_total_energy
-           case(h_rel_cumulative_delta_total_energy)
-               if (s% total_energy_end /= 0d0) &
-                  val = s% cumulative_delta_total_energy/abs(s% total_energy_end)
-           case(h_log_rel_cumulative_delta_total_energy)
-               val = safe_log10(abs(s% cumulative_delta_total_energy/s% total_energy_end))
-           case(h_run_deltaE)
-               if (s% total_energy_end /= 0d0) &
-                  val = s% total_energy_end - s% total_energy_initial
-           case(h_rel_run_deltaE)
-               if (s% total_energy_end /= 0d0) &
-                  val = s% cumulative_delta_total_energy/s% total_energy_end
-           case(h_log_rel_run_deltaE)
-               val = safe_log10(abs(s% cumulative_delta_total_energy/s% total_energy_end))
-
-           case(h_cumulative_L_center)
-               val = s% cumulative_L_center
-           case(h_cumulative_L_surf)
-               val = s% cumulative_L_surf
-           case(h_cumulative_extra_heating)
-               val = s% cumulative_extra_heating
-           case(h_cumulative_irradiation_heating)
-               val = s% cumulative_irradiation_heating
-           case(h_cumulative_WD_sedimentation_heating)
-               if (s% do_element_diffusion) val = s% cumulative_WD_sedimentation_heating
-           case(h_cumulative_nuclear_heating)
-               val = s% cumulative_nuclear_heating
-           case(h_cumulative_non_nuc_neu_cooling)
-               val = s% cumulative_non_nuc_neu_cooling
-
-           case(h_cumulative_sources_and_sinks)
-               val = s% cumulative_sources_and_sinks
 
            case(h_log_residual_norm)
                val = safe_log10(s% residual_norm)

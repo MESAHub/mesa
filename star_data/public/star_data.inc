@@ -1715,7 +1715,6 @@
          real(dp) :: he_core_mass_old
          real(dp) :: c_core_mass_old
          real(dp) :: Teff_old
-         real(dp) :: Lsurf_m, Lsurf_m_old
          real(dp) :: center_eps_nuc_old
 
          ! For eps_mdot  (source term only used when mdot /= 0)
@@ -1777,8 +1776,6 @@
 
             total_energy_change_from_mdot, & 
             energy_change_from_do_adjust_mass_and_calculate_eps_mdot, &    
-            !phase1_delta_energy_mdot, & ! added by adjust_mass
-            !phase2_delta_energy_mdot, & ! added during evolve dt
             
             total_energy_sources_and_sinks, &
             virial_thm_P_avg, &
@@ -1786,9 +1783,7 @@
             total_eps_mdot, &
             total_radiation, &
             work_outward_at_surface, &
-            cumulative_work_outward_at_surface, &
             work_inward_at_center, &
-            cumulative_work_inward_at_center, &
             non_epsnuc_energy_change_from_split_burn, &
             total_nuclear_heating, &
             total_non_nuc_neu_cooling, &
@@ -1797,38 +1792,16 @@
             total_energy_from_diffusion, &
             total_extra_heating, &
             error_in_energy_conservation, &
-            cumulative_eps_grav, &
-            cumulative_delta_total_energy, &
             cumulative_energy_error, &
-            cumulative_L_center, &
-            cumulative_L_surf, &
             cumulative_extra_heating, &
-            cumulative_irradiation_heating, &
-            cumulative_WD_sedimentation_heating, &
-            cumulative_energy_from_diffusion, &
-            cumulative_nuclear_heating, &
-            cumulative_non_nuc_neu_cooling, &
-            cumulative_sources_and_sinks, &
             log_P_center, &
             min_kap_floor
          
          real(dp) :: &
             min_kap_floor_old, &
             log_P_center_old, &
-            cumulative_delta_total_energy_old, &
             cumulative_energy_error_old, &
-            cumulative_work_outward_at_surface_old, &
-            cumulative_work_inward_at_center_old, &
-            cumulative_eps_grav_old, &
-            cumulative_L_surf_old, &
-            cumulative_L_center_old, &
             cumulative_extra_heating_old, &
-            cumulative_irradiation_heating_old, &
-            cumulative_WD_sedimentation_heating_old, &
-            cumulative_energy_from_diffusion_old, &
-            cumulative_nuclear_heating_old, &
-            cumulative_non_nuc_neu_cooling_old, &
-            cumulative_sources_and_sinks_old, &
             total_radiation_old
             
          real(dp) :: mesh_adjust_IE_conservation
@@ -1895,7 +1868,6 @@
                ! change total_times function in star_utils if change this list
 
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
-      
          real(dp) :: time_total
            
          procedure(id_only_function_interface), pointer, nopass :: &

@@ -247,11 +247,8 @@
       integer, parameter :: h_virial_thm_rel_err = h_virial_thm_P_avg + 1
       integer, parameter :: h_total_eps_grav = h_virial_thm_rel_err + 1
       integer, parameter :: h_work_outward_at_surface = h_total_eps_grav + 1
-      integer, parameter :: h_cumulative_work_outward_at_surface = h_work_outward_at_surface + 1
-      integer, parameter :: h_work_inward_at_center = h_cumulative_work_outward_at_surface + 1
-      integer, parameter :: h_log_cumulative_work_inward_at_center = h_work_inward_at_center + 1
-      integer, parameter :: h_cumulative_work_inward_at_center = h_log_cumulative_work_inward_at_center + 1
-      integer, parameter :: h_total_nuclear_heating = h_cumulative_work_inward_at_center + 1
+      integer, parameter :: h_work_inward_at_center = h_work_outward_at_surface + 1
+      integer, parameter :: h_total_nuclear_heating = h_work_inward_at_center + 1
       integer, parameter :: h_total_non_nuc_neu_cooling = h_total_nuclear_heating + 1
       integer, parameter :: h_total_WD_sedimentation_heating = h_total_non_nuc_neu_cooling + 1
       integer, parameter :: h_total_irradiation_heating = h_total_WD_sedimentation_heating + 1
@@ -262,24 +259,7 @@
       integer, parameter :: h_rel_error_in_energy_conservation = h_log_rel_error_in_energy_conservation + 1
       integer, parameter :: h_error_in_energy_conservation = h_rel_error_in_energy_conservation + 1
 
-      integer, parameter :: h_cumulative_L_center = h_error_in_energy_conservation + 1
-      integer, parameter :: h_cumulative_L_surf = h_cumulative_L_center + 1
-      integer, parameter :: h_cumulative_extra_heating = h_cumulative_L_surf + 1
-      integer, parameter :: h_cumulative_irradiation_heating = h_cumulative_extra_heating + 1
-      integer, parameter :: h_cumulative_WD_sedimentation_heating = h_cumulative_irradiation_heating + 1
-      integer, parameter :: h_cumulative_nuclear_heating = h_cumulative_WD_sedimentation_heating + 1
-      integer, parameter :: h_cumulative_non_nuc_neu_cooling = h_cumulative_nuclear_heating + 1
-      integer, parameter :: h_cumulative_sources_and_sinks = h_cumulative_non_nuc_neu_cooling + 1
-      integer, parameter :: h_cumulative_eps_grav = h_cumulative_sources_and_sinks + 1
-      
-      integer, parameter :: h_cumulative_delta_total_energy = h_cumulative_eps_grav + 1
-      integer, parameter :: h_rel_cumulative_delta_total_energy = h_cumulative_delta_total_energy + 1
-      integer, parameter :: h_log_rel_cumulative_delta_total_energy = h_rel_cumulative_delta_total_energy + 1
-      integer, parameter :: h_run_deltaE = h_log_rel_cumulative_delta_total_energy + 1
-      integer, parameter :: h_rel_run_deltaE = h_run_deltaE + 1
-      integer, parameter :: h_log_rel_run_deltaE = h_rel_run_deltaE + 1
-
-      integer, parameter :: h_cumulative_energy_error = h_log_rel_run_deltaE + 1
+      integer, parameter :: h_cumulative_energy_error = h_error_in_energy_conservation + 1
       integer, parameter :: h_rel_cumulative_energy_error = h_cumulative_energy_error + 1
       integer, parameter :: h_abs_rel_E_err = h_rel_cumulative_energy_error + 1
       integer, parameter :: h_log_rel_E_err = h_abs_rel_E_err + 1
@@ -1076,10 +1056,7 @@
          history_column_name(h_virial_thm_rel_err) = 'virial_thm_rel_err'
          history_column_name(h_total_eps_grav) = 'total_eps_grav'
          history_column_name(h_work_outward_at_surface) = 'work_outward_at_surface'
-         history_column_name(h_cumulative_work_outward_at_surface) = 'cumulative_work_outward_at_surface'
          history_column_name(h_work_inward_at_center) = 'work_inward_at_center'
-         history_column_name(h_log_cumulative_work_inward_at_center) = 'log_cumulative_work_inward_at_center'
-         history_column_name(h_cumulative_work_inward_at_center) = 'cumulative_work_inward_at_center'
          history_column_name(h_total_nuclear_heating) = 'total_nuclear_heating'
          history_column_name(h_total_non_nuc_neu_cooling) = 'total_non_nuc_neu_cooling'
          history_column_name(h_total_irradiation_heating) = 'total_irradiation_heating'
@@ -1090,23 +1067,6 @@
          history_column_name(h_error_in_energy_conservation) = 'error_in_energy_conservation'
          history_column_name(h_rel_error_in_energy_conservation) = 'rel_error_in_energy_conservation'
          history_column_name(h_log_rel_error_in_energy_conservation) = 'log_rel_error_in_energy_conservation'
-
-         history_column_name(h_cumulative_L_center) = 'cumulative_L_center'
-         history_column_name(h_cumulative_L_surf) = 'cumulative_L_surf'
-         history_column_name(h_cumulative_extra_heating) = 'cumulative_extra_heating'
-         history_column_name(h_cumulative_irradiation_heating) = 'cumulative_irradiation_heating'
-         history_column_name(h_cumulative_WD_sedimentation_heating) = 'cumulative_WD_sedimentation_heating'
-         history_column_name(h_cumulative_nuclear_heating) = 'cumulative_nuclear_heating'
-         history_column_name(h_cumulative_non_nuc_neu_cooling) = 'cumulative_non_nuc_neu_cooling'
-         history_column_name(h_cumulative_sources_and_sinks) = 'cumulative_sources_and_sinks'
-         history_column_name(h_cumulative_eps_grav) = 'cumulative_eps_grav'
-
-         history_column_name(h_cumulative_delta_total_energy) = 'cumulative_delta_total_energy'
-         history_column_name(h_rel_cumulative_delta_total_energy) = 'rel_cumulative_delta_total_energy'
-         history_column_name(h_log_rel_cumulative_delta_total_energy) = 'log_rel_cumulative_delta_total_energy'
-         history_column_name(h_run_deltaE) = 'run_deltaE'
-         history_column_name(h_rel_run_deltaE) = 'rel_run_deltaE'
-         history_column_name(h_log_rel_run_deltaE) = 'log_rel_run_deltaE'
 
          history_column_name(h_cumulative_energy_error) = 'cumulative_energy_error'
          history_column_name(h_rel_cumulative_energy_error) = 'rel_cumulative_energy_error'

@@ -76,7 +76,6 @@
             s% min_kap_floor, s% min_kap_floor_old, &
             s% time, s% time_old, &
             s% total_angular_momentum, s% total_angular_momentum_old, &
-            s% Lsurf_m, s% Lsurf_m_old, &
             s% prev_create_atm_R0_div_R, s% dt, s% dt_old, &
             s% have_previous_rotation_info, s% have_previous_conv_vel, &
             s% have_previous_RTI_info, s% have_previous_D_mix, &
@@ -107,32 +106,8 @@
             s% total_rotational_kinetic_energy_old, &
             s% total_energy, &
             s% total_energy_old, &
-
-            s% cumulative_extra_heating, &
-            s% cumulative_extra_heating_old, &
-            s% cumulative_irradiation_heating, &
-            s% cumulative_irradiation_heating_old, &
-            s% cumulative_WD_sedimentation_heating, &
-            s% cumulative_WD_sedimentation_heating_old, &
-            s% cumulative_nuclear_heating, &
-            s% cumulative_nuclear_heating_old, &
-            s% cumulative_L_surf, &
-            s% cumulative_L_surf_old, &
-            s% cumulative_L_center, &
-            s% cumulative_L_center_old, &
-            s% cumulative_non_nuc_neu_cooling, &
-            s% cumulative_non_nuc_neu_cooling_old, &
-            
-            s% cumulative_sources_and_sinks, &
-            s% cumulative_sources_and_sinks_old, &
-            s% cumulative_eps_grav, &
-            s% cumulative_eps_grav_old, &
             s% cumulative_energy_error, &
             s% cumulative_energy_error_old, &
-            s% cumulative_work_outward_at_surface, &
-            s% cumulative_work_outward_at_surface_old, &
-            s% cumulative_work_inward_at_center, &
-            s% cumulative_work_inward_at_center_old, &
             s% have_initial_energy_integrals, &
             s% total_internal_energy_initial, &
             s% total_gravitational_energy_initial, &

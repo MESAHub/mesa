@@ -91,7 +91,6 @@
          
          luminosity = s% L(1)
          if (is_bad(luminosity)) luminosity = 0d0
-         s% Lsurf_m = s% m(1)         
          if (s% Teff < 0 .or. is_bad(s% Teff)) s% Teff = s% photosphere_black_body_T
          s% L_surf = luminosity/Lsun
          s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
