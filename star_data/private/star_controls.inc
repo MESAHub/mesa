@@ -1318,10 +1318,20 @@
          real(dp) :: delta_lg_XC_cntr_min
          real(dp) :: delta_lg_XC_cntr_max
 
+         real(dp) :: delta_lg_XNe_cntr_limit
+         real(dp) :: delta_lg_XNe_cntr_hard_limit
+         real(dp) :: delta_lg_XNe_cntr_min
+         real(dp) :: delta_lg_XNe_cntr_max
+
          real(dp) :: delta_lg_XO_cntr_limit
          real(dp) :: delta_lg_XO_cntr_hard_limit
          real(dp) :: delta_lg_XO_cntr_min
          real(dp) :: delta_lg_XO_cntr_max
+
+         real(dp) :: delta_lg_XSi_cntr_limit
+         real(dp) :: delta_lg_XSi_cntr_hard_limit
+         real(dp) :: delta_lg_XSi_cntr_min
+         real(dp) :: delta_lg_XSi_cntr_max
 
          real(dp) :: delta_XH_cntr_limit
          real(dp) :: delta_XH_cntr_hard_limit

@@ -464,7 +464,9 @@
     delta_lg_XH_cntr_min, delta_lg_XH_cntr_max, delta_lg_XH_cntr_limit, delta_lg_XH_cntr_hard_limit, &
     delta_lg_XHe_cntr_min, delta_lg_XHe_cntr_max, delta_lg_XHe_cntr_limit, delta_lg_XHe_cntr_hard_limit, &
     delta_lg_XC_cntr_min, delta_lg_XC_cntr_max, delta_lg_XC_cntr_limit, delta_lg_XC_cntr_hard_limit, &
+    delta_lg_XNe_cntr_limit, delta_lg_XNe_cntr_hard_limit, delta_lg_XNe_cntr_min, delta_lg_XNe_cntr_max, &
     delta_lg_XO_cntr_limit, delta_lg_XO_cntr_hard_limit, delta_lg_XO_cntr_min, delta_lg_XO_cntr_max, &
+    delta_lg_XSi_cntr_limit, delta_lg_XSi_cntr_hard_limit, delta_lg_XSi_cntr_min, delta_lg_XSi_cntr_max, &
     delta_XH_cntr_limit, delta_XH_cntr_hard_limit, delta_XHe_cntr_limit, delta_XHe_cntr_hard_limit, &
     delta_XC_cntr_limit, delta_XC_cntr_hard_limit, delta_XNe_cntr_limit, delta_XNe_cntr_hard_limit, &
     delta_XO_cntr_limit, delta_XO_cntr_hard_limit, delta_XSi_cntr_limit, delta_XSi_cntr_hard_limit, &
@@ -2344,10 +2346,20 @@
  s% delta_lg_XC_cntr_limit = delta_lg_XC_cntr_limit
  s% delta_lg_XC_cntr_hard_limit = delta_lg_XC_cntr_hard_limit
 
+ s% delta_lg_XNe_cntr_limit = delta_lg_XNe_cntr_limit
+ s% delta_lg_XNe_cntr_hard_limit = delta_lg_XNe_cntr_hard_limit
+ s% delta_lg_XNe_cntr_min = delta_lg_XNe_cntr_min
+ s% delta_lg_XNe_cntr_max = delta_lg_XNe_cntr_max
+
  s% delta_lg_XO_cntr_limit = delta_lg_XO_cntr_limit
  s% delta_lg_XO_cntr_hard_limit = delta_lg_XO_cntr_hard_limit
  s% delta_lg_XO_cntr_min = delta_lg_XO_cntr_min
  s% delta_lg_XO_cntr_max = delta_lg_XO_cntr_max
+
+ s% delta_lg_XSi_cntr_limit = delta_lg_XSi_cntr_limit
+ s% delta_lg_XSi_cntr_hard_limit = delta_lg_XSi_cntr_hard_limit
+ s% delta_lg_XSi_cntr_min = delta_lg_XSi_cntr_min
+ s% delta_lg_XSi_cntr_max = delta_lg_XSi_cntr_max
 
  s% delta_XH_cntr_limit = delta_XH_cntr_limit
  s% delta_XH_cntr_hard_limit = delta_XH_cntr_hard_limit
@@ -4030,10 +4042,20 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  delta_lg_XC_cntr_limit = s% delta_lg_XC_cntr_limit
  delta_lg_XC_cntr_hard_limit = s% delta_lg_XC_cntr_hard_limit
 
+ delta_lg_XNe_cntr_limit = s% delta_lg_XNe_cntr_limit
+ delta_lg_XNe_cntr_hard_limit = s% delta_lg_XNe_cntr_hard_limit
+ delta_lg_XNe_cntr_min = s% delta_lg_XNe_cntr_min
+ delta_lg_XNe_cntr_max = s% delta_lg_XNe_cntr_max
+
  delta_lg_XO_cntr_limit = s% delta_lg_XO_cntr_limit
  delta_lg_XO_cntr_hard_limit = s% delta_lg_XO_cntr_hard_limit
  delta_lg_XO_cntr_min = s% delta_lg_XO_cntr_min
  delta_lg_XO_cntr_max = s% delta_lg_XO_cntr_max
+
+ delta_lg_XSi_cntr_limit = s% delta_lg_XSi_cntr_limit
+ delta_lg_XSi_cntr_hard_limit = s% delta_lg_XSi_cntr_hard_limit
+ delta_lg_XSi_cntr_min = s% delta_lg_XSi_cntr_min
+ delta_lg_XSi_cntr_max = s% delta_lg_XSi_cntr_max
 
  delta_XH_cntr_limit = s% delta_XH_cntr_limit
  delta_XH_cntr_hard_limit = s% delta_XH_cntr_hard_limit

@@ -89,8 +89,8 @@
             ! approximate edges
             
             ! blue edge
-            logT1 = 3.76
-            logL1 = 4.5
+            logT1 = 3.7
+            logL1 = 5.5
             
             logT2 = 3.83
             logL2 = 2.4
@@ -100,8 +100,8 @@
             call pgdraw(logT2, logL2)
             
             ! red edge
-            logT1 = 3.65
-            logL1 = 4.5
+            logT1 = 3.6
+            logL1 = 5.5
             
             logT2 = 3.77
             logL2 = 2.4

@@ -9455,7 +9455,9 @@
       !          'lg_XC_cntr'           delta_lg_XC_cntr_limit
       !          'lg_XH_cntr'           delta_lg_XH_cntr_limit
       !          'lg_XHe_cntr'          delta_lg_XHe_cntr_limit
+      !          'lg_XNe_cntr'          delta_lg_XNe_cntr_limit
       !          'lg_XO_cntr'           delta_lg_XO_cntr_limit
+      !          'lg_XSi_cntr'          delta_lg_XSi_cntr_limit
       !          'XC_cntr'              delta_XC_cntr_limit
       !          'XH_cntr'              delta_XH_cntr_limit
       !          'XHe_cntr'             delta_XHe_cntr_limit
@@ -11195,6 +11197,48 @@
       ! Small timesteps as the center oxygen is exhausted.
 
 
+      ! delta_lg_XNe_cntr_min
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Ignore changes in ``lg_XNe_cntr`` if value is less than this.
+
+      ! ::
+
+    delta_lg_XNe_cntr_min = -5
+
+
+      ! delta_lg_XNe_cntr_max
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Ignore changes in ``lg_XNe_cntr`` if value is more than this.
+
+      ! ::
+
+    delta_lg_XNe_cntr_max = 0
+
+
+      ! delta_lg_XNe_cntr_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If max delta is greater than ``delta_lg_XNe_cntr_limit``,
+      ! reduce the next timestep by ``delta_lg_XNe_cntr_limit``/``max_delta``.
+
+      ! ::
+
+    delta_lg_XNe_cntr_limit = 1d99
+
+
+      ! delta_lg_XNe_cntr_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If max delta is greater than ``delta_lg_XNe_cntr_hard_limit``,
+      ! retry with smaller timestep.
+
+      ! ::
+
+    delta_lg_XNe_cntr_hard_limit = -1
+
+
       ! delta_lg_XO_cntr_min
       ! ~~~~~~~~~~~~~~~~~~~~
 
@@ -11235,6 +11279,48 @@
       ! ::
 
     delta_lg_XO_cntr_hard_limit = -1
+
+      ! delta_lg_XSi_cntr_min
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Ignore changes in ``lg_XSi_cntr`` if value is less than this.
+
+      ! ::
+
+    delta_lg_XSi_cntr_min = -5
+
+
+      ! delta_lg_XSi_cntr_max
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Ignore changes in ``lg_XSi_cntr`` if value is more than this.
+
+      ! ::
+
+    delta_lg_XSi_cntr_max = 0
+
+
+      ! delta_lg_XSi_cntr_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If max delta is greater than ``delta_lg_XSi_cntr_limit``,
+      ! reduce the next timestep by ``delta_lg_XSi_cntr_limit``/``max_delta``.
+
+      ! ::
+
+    delta_lg_XSi_cntr_limit = 1d99
+
+
+      ! delta_lg_XSi_cntr_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If max delta is greater than ``delta_lg_XSi_cntr_hard_limit``,
+      ! retry with smaller timestep.
+
+      ! ::
+
+    delta_lg_XSi_cntr_hard_limit = -1
+
 
 
       ! delta_XH_cntr_limit

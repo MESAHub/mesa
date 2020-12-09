@@ -65,8 +65,10 @@
       integer, parameter :: Tlim_dX_div_X_cntr = Tlim_timestep_hold + 1
       integer, parameter :: Tlim_lg_XHe_cntr = Tlim_dX_div_X_cntr + 1
       integer, parameter :: Tlim_lg_XC_cntr = Tlim_lg_XHe_cntr + 1
-      integer, parameter :: Tlim_lg_XO_cntr = Tlim_lg_XC_cntr + 1
-      integer, parameter :: Tlim_XH_cntr = Tlim_lg_XO_cntr + 1
+      integer, parameter :: Tlim_lg_XNe_cntr = Tlim_lg_XC_cntr + 1
+      integer, parameter :: Tlim_lg_XO_cntr = Tlim_lg_XNe_cntr + 1
+      integer, parameter :: Tlim_lg_XSi_cntr = Tlim_lg_XC_cntr + 1
+      integer, parameter :: Tlim_XH_cntr = Tlim_lg_XSi_cntr + 1
       integer, parameter :: Tlim_XHe_cntr = Tlim_XH_cntr + 1
       integer, parameter :: Tlim_XC_cntr = Tlim_XHe_cntr + 1
       integer, parameter :: Tlim_XNe_cntr = Tlim_XC_cntr + 1
