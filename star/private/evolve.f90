@@ -868,8 +868,8 @@
          logical function okay_energy_conservation()
             use rsp, only: rsp_total_energy_integrals
             integer :: nz, k, ierr
-            real(dp) :: pre_split_sources_and_sinks, post_split_sources_and_sinks, post_split_work, &
-               pre_split_total_energy_from_mdot, post_split_total_energy_from_mdot, &
+            real(dp) :: phase1_sources_and_sinks, phase2_sources_and_sinks, phase2_work, &
+               phase1_total_energy_from_mdot, phase2_total_energy_from_mdot, &
                expected_sum_cell_others, expected_sum_cell_sources, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
@@ -878,6 +878,27 @@
                sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing
                
             include 'formats'
+
+
+
+!   phase1 := from end of previous step until start of solver
+!   phase2 := from start of solver to end of step
+!
+!   total_energy_old = at beginning of phase1
+!   total_energy_start = at beginning of phase2
+!   total_energy_end = at end of phase2
+!
+!   phase1_energy_error = total_energy_start - (total_energy_old + phase1_sources_and_sinks)
+!   phase2_energy_error = total_energy_end - (total_energy_start + phase2_sources_and_sinks)
+!
+!   total_energy_sources_and_sinks = phase1_sources_and_sinks + phase2_sources_and_sinks
+!
+!   error_in_energy_conservation = total_energy_end - (total_energy_old + total_energy_sources_and_sinks)
+!
+!   equivalently, error_in_energy_conservation = phase1_energy_error + phase2_energy_error
+
+
+
 
             okay_energy_conservation = .false.
 
@@ -1011,7 +1032,7 @@
                   dt*dot_product(s% dm(1:nz), s% eps_pre_mix(1:nz))
             end if
             
-            post_split_total_energy_from_mdot = &
+            phase2_total_energy_from_mdot = &
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
             s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz))
@@ -1022,7 +1043,7 @@
             else ! these are set in energy equation
             end if
 
-            post_split_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
+            phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
             if (.not. s% RSP_flag) then
                if (s% using_Fraley_time_centering .and. &
@@ -1034,37 +1055,37 @@
                total_radiation = dt*(L_surf - s% L_center)
             end if
 
-            !pre_split_total_energy_from_mdot = &
+            !phase1_total_energy_from_mdot = &
             !     s% mdot_acoustic_surface &
             !   + s% total_energy_change_from_mdot &
             !   + s% mdot_adiabatic_surface &
-            !   - post_split_total_energy_from_mdot
+            !   - phase2_total_energy_from_mdot
                
-            pre_split_total_energy_from_mdot = &
+            phase1_total_energy_from_mdot = &
                  s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
                + s% mdot_adiabatic_surface ! ??
 
-            pre_split_sources_and_sinks = &
-                 pre_split_total_energy_from_mdot &
+            phase1_sources_and_sinks = &
+                 phase1_total_energy_from_mdot &
                + total_energy_from_pre_mixing &
                + s% total_WD_sedimentation_heating &
                + s% total_energy_from_diffusion &
                + s% non_epsnuc_energy_change_from_split_burn
 
-            post_split_sources_and_sinks = &
+            phase2_sources_and_sinks = &
                - total_energy_from_pre_mixing &
                - s% total_WD_sedimentation_heating &
                - s% total_energy_from_diffusion &
-               + post_split_total_energy_from_mdot &
+               + phase2_total_energy_from_mdot &
                + s% total_nuclear_heating &
                - s% total_non_nuc_neu_cooling &
                + s% total_irradiation_heating &
                + s% total_extra_heating &
                - total_radiation & 
-               - post_split_work
+               - phase2_work
 
             s% total_energy_sources_and_sinks = &
-               pre_split_sources_and_sinks + post_split_sources_and_sinks
+               phase1_sources_and_sinks + phase2_sources_and_sinks
 
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
@@ -1080,10 +1101,10 @@
                write(*,2) 's% error_in_energy_conservation', s% model_number, s% error_in_energy_conservation
                write(*,2) 'total_energy', s% model_number, s% total_energy
                write(*,2) 'rel_E_err = error/total_energy', s% model_number, s% error_in_energy_conservation/s% total_energy
-               write(*,2) 'rel err pre_split', s% model_number, &
-                  (s% total_energy_start - (s% total_energy_old + pre_split_sources_and_sinks))/s% total_energy
-               write(*,2) 'rel err post_split', s% model_number, &
-                  (s% total_energy_end - (s% total_energy_start + post_split_sources_and_sinks))/s% total_energy
+               write(*,2) 'rel err phase1', s% model_number, &
+                  (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
+               write(*,2) 'rel err phase2', s% model_number, &
+                  (s% total_energy_end - (s% total_energy_start + phase2_sources_and_sinks))/s% total_energy
                write(*,*)
                write(*,2) 's% total_energy_old', s% model_number, s% total_energy_old
                write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
@@ -1096,37 +1117,37 @@
                    .not. s% u_flag) then
                   
                   write(*,*)
-                  write(*,*) 'for debugging pre_split_sources_and_sinks'
+                  write(*,*) 'for debugging phase1_sources_and_sinks'
                   write(*,*)
                   write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
                   write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
                   write(*,2) 's% total_energy_from_diffusion', s% model_number, s% total_energy_from_diffusion
                   write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, s% non_epsnuc_energy_change_from_split_burn
-                  write(*,2) 'post_split sum cell dt*dm*eps_mdot', s% model_number, post_split_total_energy_from_mdot
-                  write(*,2) 'pre_split_total_energy_from_mdot', s% model_number, pre_split_total_energy_from_mdot
+                  write(*,2) 'phase2 sum cell dt*dm*eps_mdot', s% model_number, phase2_total_energy_from_mdot
+                  write(*,2) 'phase1_total_energy_from_mdot', s% model_number, phase1_total_energy_from_mdot
                   write(*,2) 'from_do_adjust_mass_and_eps_mdot', s% model_number, &
                      s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot
                   write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
-                  write(*,2) 'post_split_total_energy_from_mdot', s% model_number, post_split_total_energy_from_mdot
+                  write(*,2) 'phase2_total_energy_from_mdot', s% model_number, phase2_total_energy_from_mdot
 
                   write(*,*)
                   write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
                   write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
-                  write(*,2) 'pre_split_sources_and_sinks', s% model_number, pre_split_sources_and_sinks
+                  write(*,2) 'phase1_sources_and_sinks', s% model_number, phase1_sources_and_sinks
                   write(*,*) 
                   write(*,2) 'energy_start - energy_old', s% model_number, s% total_energy_start - s% total_energy_old
-                  write(*,2) 'err pre_split_sources_and_sinks', s% model_number, &
-                      s% total_energy_start - (s% total_energy_old + pre_split_sources_and_sinks)
-                  write(*,2) 'rel err pre_split_sources_and_sinks', s% model_number, &
-                     (s% total_energy_start - (s% total_energy_old + pre_split_sources_and_sinks))/s% total_energy
+                  write(*,2) 'err phase1_sources_and_sinks', s% model_number, &
+                      s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks)
+                  write(*,2) 'rel err phase1_sources_and_sinks', s% model_number, &
+                     (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
                   write(*,*)
                   write(*,*)
                   
                   
                   
-                  write(*,*) 'for debugging post_split_sources_and_sinks'
+                  write(*,*) 'for debugging phase2_sources_and_sinks'
                   write(*,*)
                   
                   write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
@@ -1141,9 +1162,9 @@
                   write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
                   write(*,2) 's% mdot_acoustic_surface', s% model_number, s% mdot_acoustic_surface
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
-                 ! write(*,2) 'post_split_total_energy_from_mdot', s% model_number, post_split_total_energy_from_mdot
+                 ! write(*,2) 'phase2_total_energy_from_mdot', s% model_number, phase2_total_energy_from_mdot
                   write(*,*)
-                  write(*,2) 'post_split_work', s% model_number, post_split_work
+                  write(*,2) 'phase2_work', s% model_number, phase2_work
                   write(*,2) 'total_radiation', s% model_number, total_radiation
                   write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, &
                      s% non_epsnuc_energy_change_from_split_burn 
@@ -1178,14 +1199,14 @@
                      - s% total_WD_sedimentation_heating &
                      - s% total_energy_from_diffusion
                   expected_sum_cell_sources = &
-                       post_split_total_energy_from_mdot &
+                       phase2_total_energy_from_mdot &
                      + s% total_nuclear_heating &
                      - s% total_non_nuc_neu_cooling &
                      + s% total_irradiation_heating &
                      + s% total_extra_heating
                   
                   !write(*,2) 'rel err sum all cell terms', s% model_number, &
-                  !   (post_split_sources_and_sinks - &
+                  !   (phase2_sources_and_sinks - &
                   !      (sum_cell_others + sum_cell_sources + sum_cell_dL + sum_cell_work))/s% total_energy
                   write(*,2) 'rel err sum_cell_others', s% model_number, &
                      (sum_cell_others - expected_sum_cell_others)/s% total_energy, &
@@ -1196,7 +1217,7 @@
                   write(*,2) 'rel err sum_cell_dL', s% model_number, &
                      (sum_cell_dL - total_radiation)/s% total_energy, sum_cell_dL, total_radiation
                   write(*,2) 'rel err sum_cell_work', s% model_number, &
-                     (sum_cell_work - post_split_work)/s% total_energy, sum_cell_work, post_split_work
+                     (sum_cell_work - phase2_work)/s% total_energy, sum_cell_work, phase2_work
                   write(*,*)
                   
                   diff_total_internal_energy = &
@@ -1231,8 +1252,8 @@
                   write(*,2) 'rel sum_cell_ergs_error', s% model_number, &
                      sum_cell_ergs_error/s% total_energy, &
                      sum_cell_ergs_error, s% total_energy
-                  write(*,2) 'rel err post_split_sources_and_sinks', s% model_number, &
-                     (s% total_energy_end - (s% total_energy_start + post_split_sources_and_sinks))/s% total_energy
+                  write(*,2) 'rel err phase2_sources_and_sinks', s% model_number, &
+                     (s% total_energy_end - (s% total_energy_start + phase2_sources_and_sinks))/s% total_energy
                   write(*,2) 'total rel_E_err', s% model_number, &
                      s% error_in_energy_conservation/s% total_energy, &
                      s% error_in_energy_conservation, s% total_energy

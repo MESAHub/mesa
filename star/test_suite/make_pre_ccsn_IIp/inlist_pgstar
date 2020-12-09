@@ -20,10 +20,10 @@ Grid1_win_width = 12
 Grid1_win_aspect_ratio = 0.666
 
 ! file output
-!Grid1_file_flag = .true.
+Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'black_hole_'
-Grid1_file_interval = 50     ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_file_interval = 25     ! output when mod(model_number,Grid1_file_interval)==0
 Grid1_file_width = -1        ! (inches) negative means use same value as for window
 Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
@@ -61,7 +61,7 @@ Grid1_plot_pad_bot(1) = 0.07     ! fraction of full window height for padding at
 Grid1_txt_scale_factor(1) = 1 ! 0.8 ! multiply txt_scale for subplot by this
 
 
-Grid1_plot_name(3) = 'HR'
+Grid1_plot_name(3) = 'TRho'
 Grid1_plot_row(3) = 2           ! number from 1 at top
 Grid1_plot_rowspan(3) = 1       ! plot spans this number of rows
 Grid1_plot_col(3) =  1          ! number from 1 at left
@@ -181,12 +181,10 @@ Profile_Panels1_title = ''
 
 Profile_Panels1_txt_scale = 0.7
 
-Profile_Panels1_num_panels = 4
+Profile_Panels1_num_panels = 5
 
 Profile_Panels1_yaxis_name(1) = 'logT'
 Profile_Panels1_other_yaxis_name(1) = 'logRho'
-Profile_Panels1_other_ymin(1) = -101d0
-Profile_Panels1_other_ymax(1) = -101d0
 
 Profile_Panels1_yaxis_name(2) = 'avg_charge_He'
 Profile_Panels1_ymin(2) = 0
@@ -195,17 +193,20 @@ Profile_Panels1_other_yaxis_name(2) = 'avg_charge_H'
 Profile_Panels1_other_ymin(2) = 0
 Profile_Panels1_other_ymax(2) = 1.1
 
-Profile_Panels1_yaxis_name(3) = 'log_opacity'
-Profile_Panels1_other_yaxis_name(3) = 'gradr'
-Profile_Panels1_other_ymin(3) = -101d0
-Profile_Panels1_other_ymax(3) = -101d0
+Profile_Panels1_yaxis_name(3) = 'gradT'
+Profile_Panels1_ymin(3) = 0.18
+Profile_Panels1_ymax(3) = 0.34
+Profile_Panels1_other_yaxis_name(3) = 'grada'
+Profile_Panels1_other_ymin(3) = 0.18
+Profile_Panels1_other_ymax(3) = 0.34
 
-Profile_Panels1_yaxis_name(4) = 'gradT'
-Profile_Panels1_ymin(4) = -101d0 ! 0.0
-Profile_Panels1_ymax(4) = -101d0 ! 0.6
-Profile_Panels1_other_yaxis_name(4) = 'grada'
-Profile_Panels1_other_ymin(4) = -101d0 ! 0.0
-Profile_Panels1_other_ymax(4) = -101d0 ! 0.6
+Profile_Panels1_yaxis_name(4) = 'log_opacity'
+Profile_Panels1_other_yaxis_name(4) = 'gradr'
+
+Profile_Panels1_yaxis_name(5) = 'entropy'
+Profile_Panels1_other_yaxis_name(5) = 'pgas_div_p'
+
+
 
 
 ! x-axis limits and properties
@@ -271,7 +272,7 @@ show_TRho_Profile_burn_lines = .true.
 show_TRho_Profile_burn_labels = .true.
       
 ! axis limits
-TRho_Profile_xmin = -11.0
+TRho_Profile_xmin = -12.0
 TRho_Profile_xmax = 10.0
 TRho_Profile_ymin = 3.0
 TRho_Profile_ymax = 10.0        
@@ -483,6 +484,22 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
 !-----------------------------------------------------------------------
 
+! TRho window
+      ! history of central temperature vs. density
+
+    TRho_txt_scale = 0.7
+    TRho_title = ''
+
+    TRho_logT_min = -101d0
+    TRho_logT_max = -101d0
+    TRho_logRho_min = -101d0
+    TRho_logRho_max = -101d0
+    show_TRho_degeneracy_line = .true.
+
+
+
+!-----------------------------------------------------------------------
+
    !# HR window
       ! history of `lg_L` vs. `lg_Teff`
 
@@ -606,7 +623,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_other_yaxis_name(3) = 'log_cntr_T'
+    History_Panels1_other_yaxis_name(3) = 'log_max_T'
     History_Panels1_other_yaxis_reversed(3) = .false.
     History_Panels1_other_ymin(3) = -101d0
     History_Panels1_other_ymax(3) = -101d0

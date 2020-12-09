@@ -1,3 +1,4 @@
+! NOTE THAT THIS DOES NOT USE inlist_common
 
 &star_job
    mesa_dir = '../../..'
