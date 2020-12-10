@@ -1018,16 +1018,16 @@
             end if
             if (pg% step <= step_max .or. step_max <= 0) then
                if (.not. associated(pg% vals)) then
-                  ierr = -1
-                  write(*,6) 'failed in get_hist_points: not associated', &
-                     s% model_number, index, numpts, step_min, step_max
+                  !ierr = -1
+                  !write(*,6) 'failed in get_hist_points: not associated', &
+                  !   s% model_number, index, numpts, step_min, step_max
                   !stop 'get_hist_points'
                   return
                end if
                if (size(pg% vals,dim=1) < index) then
-                  ierr = -1
-                  write(*,7) 'failed in get_hist_points: size < index', &
-                     s% model_number, size(pg% vals,dim=1), index, numpts, step_min, step_max
+                  !ierr = -1
+                  !write(*,7) 'failed in get_hist_points: size < index', &
+                  !   s% model_number, size(pg% vals,dim=1), index, numpts, step_min, step_max
                   !stop 'get_hist_points'
                   return
                end if
