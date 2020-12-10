@@ -133,7 +133,10 @@
 
 &pgstar
 
-   Grid1_plot_name(3) = 'HR'
+!pause = .true.
+Grid1_plot_name(3) = 'HR'
+Profile_Panels3_xmin = -101d0
+Profile_Panels3_xmax = -101d0
 
 !pause = .true.
 

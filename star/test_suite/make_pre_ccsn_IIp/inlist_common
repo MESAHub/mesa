@@ -1,4 +1,3 @@
-! inlist_common for test_ms_to_cc
 
 &star_job
       show_log_description_at_start = .false.

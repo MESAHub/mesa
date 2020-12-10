@@ -1,8 +1,4 @@
 
-! 60M stalls with Fe-bump radial pulses when core He down to 0.045    
-! watch profile wrt logtau from surface to 7.  outer convection zone moves in and out.
-! surface velocity goes up and down.
-
 &star_job
       show_log_description_at_start = .false.
 
@@ -49,8 +45,6 @@
 / ! end of kap namelist
 
 &controls
-      initial_mass = 55
-      initial_z = 0.01
 
 ! wind
       cool_wind_RGB_scheme = 'Dutch'
