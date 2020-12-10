@@ -4093,22 +4093,6 @@
             s% priority_profile_interval = 0
          end if
 
-         if( s% job% pgstar_flag .and. &
-               .not. s% job% disable_pgstar_for_relax) then
-            ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
-            call set_history_columns(id,s% job% history_columns_file, .true., ierr)
-            if (ierr /= 0) return
-            call set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
-            if (ierr /= 0) return
-         end if
-
-         if (s% doing_first_model_of_run .and. &
-               s% job% pgstar_flag .and. &
-               .not. s% job% disable_pgstar_for_relax) then
-            call do_start_new_run_for_pgstar(s, ierr)
-            if (ierr /= 0) return
-         end if
-
          call before_evolve(s, id, lipar, ipar, lrpar, rpar, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in before_evolve'
@@ -4147,7 +4131,7 @@
 
             end do step_loop
 
-            if (s% job% pgstar_flag .and. .not. s% job% disable_pgstar_for_relax) then
+            if (s% job% pgstar_flag) then
                ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
                call update_pgstar_data(s, ierr)
                if (failed()) return
@@ -4186,7 +4170,7 @@
 
          end do evolve_loop
 
-         if (s% job% pgstar_flag .and. .not. s% job% disable_pgstar_for_relax) then
+         if (s% job% pgstar_flag) then
          ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
             call update_pgstar_data(s, ierr)
             if (ierr /= 0) return

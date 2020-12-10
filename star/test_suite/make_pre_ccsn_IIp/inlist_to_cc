@@ -64,7 +64,7 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
@@ -118,6 +118,7 @@
 &pgstar
 
 !pause = .true.
-Profile_Panels3_xmax = 2.1
+Profile_Panels3_xmin = 0 ! -101d0
+Profile_Panels3_xmax = 2.1 ! -101d0
 
 / ! end of pgstar namelist

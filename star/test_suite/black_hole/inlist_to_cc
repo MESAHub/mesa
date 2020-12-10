@@ -2,14 +2,14 @@
 
 &star_job
 
-      !save_star_job_namelist = .true.
-      !star_job_namelist_name = 'star_job_black_hole_to_cc.txt'
+      save_star_job_namelist = .true.
+      star_job_namelist_name = 'star_job_to_cc.txt'
 
       load_saved_model = .true.
       saved_model_name = 'lgT_9.5.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+      save_model_filename = 'start_core_collapse.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
       set_initial_age = .false.
@@ -28,13 +28,13 @@
 
 &controls
 
-      !save_controls_namelist = .true.
-      !controls_namelist_name = 'controls_black_hole_to_cc.txt'
+      save_controls_namelist = .true.
+      controls_namelist_name = 'controls_to_cc.txt'
 
       fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 5000
+      max_model_number = 8000
       !max_number_retries = 37
 
 ! wind
@@ -67,7 +67,7 @@
       !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 

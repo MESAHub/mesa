@@ -919,10 +919,11 @@
          integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
          character (len=*) :: name
          real, dimension(:), pointer :: vec
-         integer :: i, ierr, cnt
+         integer :: i, cnt, ierr
          character (len=64) :: key_name
          include 'formats'
          cnt = 0
+         ierr = 0
          do i=1,len(key_name)
             key_name(i:i) = ' '
          end do
@@ -939,7 +940,11 @@
             get1_hist_yvec = .false.
             return
          end if
-         call get_hist_points(s, step_min, step_max, n, i, vec)
+         call get_hist_points(s, step_min, step_max, n, i, vec, ierr)
+         if (ierr /= 0) then ! didn't get them
+            get1_hist_yvec = .false.
+            return
+         end if
          get1_hist_yvec = .true.
       end function get1_hist_yvec
 
@@ -992,10 +997,11 @@
 
 
       subroutine get_hist_points( &
-            s, step_min, step_max, numpts, index, vec)
+            s, step_min, step_max, numpts, index, vec, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: step_min, step_max, numpts, index
          real, intent(out) :: vec(:)
+         integer, intent(out) :: ierr
          integer :: i, n
          type (pgstar_hist_node), pointer :: pg => null()
          include 'formats'
@@ -1003,6 +1009,7 @@
          pg => s% pgstar_hist
          i = numpts
          vec = 0
+         ierr = 0
          do ! recall that hist list is decreasing by age (and step)
             if (.not. associated(pg)) return
             if (pg% step < step_min) then
@@ -1010,8 +1017,20 @@
                return
             end if
             if (pg% step <= step_max .or. step_max <= 0) then
-               if (.not. associated(pg% vals)) return
-               if (size(pg% vals,dim=1) < index) return
+               if (.not. associated(pg% vals)) then
+                  ierr = -1
+                  write(*,6) 'failed in get_hist_points: not associated', &
+                     s% model_number, index, numpts, step_min, step_max
+                  !stop 'get_hist_points'
+                  return
+               end if
+               if (size(pg% vals,dim=1) < index) then
+                  ierr = -1
+                  write(*,7) 'failed in get_hist_points: size < index', &
+                     s% model_number, size(pg% vals,dim=1), index, numpts, step_min, step_max
+                  !stop 'get_hist_points'
+                  return
+               end if
                vec(i) = pg% vals(index)
                i = i - 1
                if (i == 0) return

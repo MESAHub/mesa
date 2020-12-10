@@ -180,16 +180,6 @@
     pgstar_flag = .false.
 
 
-      ! disable_pgstar_for_relax
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if true, turn off pgstar during relax operations
-
-      ! ::
-
-    disable_pgstar_for_relax = .false.
-
-
       ! save_pgstar_files_when_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

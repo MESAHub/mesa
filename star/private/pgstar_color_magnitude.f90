@@ -663,7 +663,7 @@
 
          n = count_hist_points(s, step_min, step_max)
 
-         allocate(xvec1(n),xvec2(n), yvec1(n),yvec2(n), other_yvec1(n),other_yvec2(n), stat=ierr)
+         allocate(xvec1(n), xvec2(n), yvec1(n), yvec2(n), other_yvec1(n), other_yvec2(n), stat=ierr)
          if (ierr /= 0) then
             write(*,*) 'allocate failed for PGSTAR'
             return
@@ -700,8 +700,22 @@
 
          color_xmin = color_xmin_in
 
-         call get_hist_points(s, step_min, step_max, n, ix1, xvec1)
-         if(have_xaxis2) call get_hist_points(s, step_min, step_max, n, ix2, xvec2)
+         call get_hist_points(s, step_min, step_max, n, ix1, xvec1, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'pgstar get_hist_points failed ' // trim(color_xaxis1_name)
+            deallocate(xvec1, xvec2)
+            call dealloc
+            ierr = 0
+            return
+         end if
+         if (have_xaxis2) call get_hist_points(s, step_min, step_max, n, ix2, xvec2, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'pgstar get_hist_points failed ' // trim(color_xaxis2_name)
+            deallocate(xvec1,xvec2)
+            call dealloc
+            ierr = 0
+            return
+         end if
 
          xvec=xvec1
          if(have_xaxis2) xvec=xvec-xvec2
@@ -850,12 +864,15 @@
             call show_xaxis_label_pgstar(s,trim(create_label(color_xaxis1_name,'')))
          end if
 
-         deallocate(xvec, yvec, other_yvec,yvec1,yvec2,other_yvec1,other_yvec2)
-
          call pgunsa
+         
+         call dealloc
 
          contains
-
+         
+         subroutine dealloc
+            deallocate(xvec, yvec, other_yvec, yvec1, yvec2, other_yvec1, other_yvec2)
+         end subroutine dealloc
 
          logical function get1_yvec(name, vec)
             character (len=*) :: name

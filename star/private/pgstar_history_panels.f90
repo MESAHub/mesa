@@ -669,7 +669,12 @@
             return
          end if
 
-         call get_hist_points(s, step_min, step_max, n, ix, xvec)
+         call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'pgstar do_history_panels_plot get_hist_points failed ' // trim(hist_xaxis_name)
+            ierr = 0
+            !return
+         end if
 
          if (hist_xaxis_log) then
             do k=1,n

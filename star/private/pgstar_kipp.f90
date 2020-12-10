@@ -168,7 +168,13 @@
             return
          end if
 
-         call get_hist_points(s, step_min, step_max, n, ix, xvec)
+         call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'pgstar get_hist_points failed ' // trim(s% kipp_xaxis_name)
+            call dealloc
+            ierr = 0
+            return
+         end if
 
          if (s% kipp_xaxis_in_seconds .and. s% kipp_xaxis_name=='star_age')THEN
             do k=1,n
@@ -272,23 +278,27 @@
          call finish_Kipp_plot
 
          call pgunsa
+         
+         call dealloc
 
-         deallocate(xvec, &
-            log_L, &
-            log_Lneu, &
-            log_LH, &
-            log_LHe, &
-            star_mass, &
-            log_xmstar, &
-            star_M_center, &
-            he_core_mass, &
-            c_core_mass, &
-            o_core_mass, &
-            si_core_mass, &
-            fe_core_mass)
 
          contains
-
+         
+         subroutine dealloc
+            deallocate(xvec, &
+               log_L, &
+               log_Lneu, &
+               log_LH, &
+               log_LHe, &
+               star_mass, &
+               log_xmstar, &
+               star_M_center, &
+               he_core_mass, &
+               c_core_mass, &
+               o_core_mass, &
+               si_core_mass, &
+               fe_core_mass)
+         end subroutine dealloc
 
          subroutine init_Kipp_plot
             call pgsvp(vp_xleft, vp_xright, vp_ybot, vp_ytop)

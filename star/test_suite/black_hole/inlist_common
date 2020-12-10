@@ -32,7 +32,8 @@
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      disable_pgstar_for_relax = .true.
+      show_retry_counts_when_terminate = .true.
+      show_timestep_limit_counts_when_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -41,7 +42,6 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.01
       kap_file_prefix = 'a09'
       kap_CO_prefix   = 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
@@ -57,10 +57,6 @@
       cool_wind_AGB_scheme = 'Dutch'
       hot_wind_scheme = 'Dutch'
       Dutch_wind_lowT_scheme = 'de Jager'
-      Dutch_scaling_factor = 0.1
-      cool_wind_full_on_T = 0.8d4
-      hot_wind_full_on_T = 1.2d4
-      
       cool_wind_full_on_T = 0.8d4
       hot_wind_full_on_T = 1.2d4
 
@@ -143,7 +139,7 @@
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
       
-      dx_nuc_drop_limit =  8d-3
+      dX_nuc_drop_limit = 1d-2
       dX_nuc_drop_limit_at_high_T = -1
       dX_nuc_drop_max_A_limit =  52  
       dX_nuc_drop_min_X_limit =  1d-3
@@ -158,20 +154,29 @@
       delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
       dHe_div_He_limit = -1
       
-      delta_lg_XH_cntr_limit = 1d-2
       delta_lg_XH_cntr_limit = 2d-2
 
       delta_lg_XHe_cntr_min = -4 
       delta_lg_XHe_cntr_limit = 1d-2
-      delta_lg_XHe_cntr_hard_limit = 2d-2
 
       delta_lg_XC_cntr_min = -2  
       delta_lg_XC_cntr_limit = 1d-2
       delta_lg_XC_cntr_hard_limit = 2d-2
 
-      delta_lg_XO_cntr_limit = 1d-2
-      delta_lg_XO_cntr_hard_limit = 2d-2
-      delta_lg_XO_cntr_min = -3
+      delta_lg_XNe_cntr_limit = 0.01d0
+      delta_lg_XNe_cntr_max   = 0.0d0
+      delta_lg_XNe_cntr_min   = -3.0d0
+      delta_lg_XNe_cntr_hard_limit = 0.02d0
+
+      delta_lg_XO_cntr_limit = 0.01d0
+      delta_lg_XO_cntr_max   = 0.0d0
+      delta_lg_XO_cntr_min   = -3.0d0
+      delta_lg_XO_cntr_hard_limit = 0.02d0
+
+      delta_lg_XSi_cntr_limit = 0.01d0
+      delta_lg_XSi_cntr_max   = 0.0d0
+      delta_lg_XSi_cntr_min   = -3.0d0
+      delta_lg_XSi_cntr_hard_limit = 0.02d0
 
 ! mesh      
       mesh_delta_coeff = 1

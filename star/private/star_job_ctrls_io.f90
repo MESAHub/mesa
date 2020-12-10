@@ -52,7 +52,6 @@
          steps_before_start_timing, &
          show_eqns_and_vars_names, &
          pgstar_flag, &
-         disable_pgstar_for_relax, &
          save_pgstar_files_when_terminate, &
          save_photo_when_terminate, &
          write_profile_when_terminate, &
@@ -691,7 +690,6 @@
          s% job% steps_before_start_timing = steps_before_start_timing
          s% job% show_eqns_and_vars_names = show_eqns_and_vars_names
          s% job% pgstar_flag = pgstar_flag
-         s% job% disable_pgstar_for_relax = disable_pgstar_for_relax
          s% job% save_pgstar_files_when_terminate = save_pgstar_files_when_terminate
          s% job% save_photo_when_terminate = save_photo_when_terminate
          s% job% write_profile_when_terminate = write_profile_when_terminate
@@ -1256,7 +1254,6 @@
          steps_before_start_timing = s% job% steps_before_start_timing
          show_eqns_and_vars_names = s% job% show_eqns_and_vars_names
          pgstar_flag = s% job% pgstar_flag
-         disable_pgstar_for_relax = s% job% disable_pgstar_for_relax
          save_pgstar_files_when_terminate = s% job% save_pgstar_files_when_terminate
          save_photo_when_terminate = s% job% save_photo_when_terminate
          write_profile_when_terminate = s% job% write_profile_when_terminate

@@ -23,7 +23,7 @@ Grid1_win_aspect_ratio = 0.666
 !Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'black_hole_'
-Grid1_file_interval = 50     ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_file_interval = 25     ! output when mod(model_number,Grid1_file_interval)==0
 Grid1_file_width = -1        ! (inches) negative means use same value as for window
 Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
@@ -529,7 +529,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
          HR_step_min = -1 ! only plot models with model number >= this
          HR_step_max = -1 ! only plot models with model number <= this
 
-         show_HR_classical_instability_strip = .false.
+         show_HR_classical_instability_strip = .true.
          show_HR_Mira_instability_region = .false.
          show_HR_WD_instabilities = .false.
 

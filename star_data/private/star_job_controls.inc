@@ -21,8 +21,7 @@
 
       logical :: show_eqns_and_vars_names
 
-      logical :: pgstar_flag, save_pgstar_files_when_terminate, &
-         disable_pgstar_for_relax
+      logical :: pgstar_flag, save_pgstar_files_when_terminate
 
       logical :: save_photo_when_terminate
       logical :: write_profile_when_terminate

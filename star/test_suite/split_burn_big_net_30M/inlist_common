@@ -9,8 +9,6 @@
 
       new_omega_div_omega_crit = 0.3d0
 
-      disable_pgstar_for_relax = .true.
-
       !pgstar_flag=.true.
 
 / ! end of star_job namelist

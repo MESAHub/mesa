@@ -1285,8 +1285,10 @@
          call update_pgstar_data(s, &
             ierr)
          if (failed('update_pgstar_data')) return
+         
          call onScreen_Plots(s, must_write_files, ierr)
          if (failed('onScreen_Plots')) return
+         
          call update_pgstar_history_file(s,ierr)
          if (failed('save_text_data')) return
          pause = s% pause

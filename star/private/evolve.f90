@@ -1249,11 +1249,13 @@
                   write(*,*)
                      
                      
-                  write(*,2) 'rel sum_cell_ergs_error', s% model_number, &
+                  write(*,2) 'expected rel sum_cell_ergs_error', s% model_number, &
                      sum_cell_ergs_error/s% total_energy, &
                      sum_cell_ergs_error, s% total_energy
-                  write(*,2) 'rel err phase2_sources_and_sinks', s% model_number, &
+                  write(*,2) 'actual rel err phase2_sources_and_sinks', s% model_number, &
                      (s% total_energy_end - (s% total_energy_start + phase2_sources_and_sinks))/s% total_energy
+                  write(*,2) 'actual/expected', s% model_number, &
+                     (s% total_energy_end - (s% total_energy_start + phase2_sources_and_sinks))/sum_cell_ergs_error
                   write(*,2) 'total rel_E_err', s% model_number, &
                      s% error_in_energy_conservation/s% total_energy, &
                      s% error_in_energy_conservation, s% total_energy

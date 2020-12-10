@@ -39,7 +39,7 @@
       controls_namelist_name = 'controls_to_end_core_he_burn.txt'
 
       xa_central_lower_limit_species(1) = 'he4'
-      xa_central_lower_limit(1) = 1d-5
+      xa_central_lower_limit(1) = 1d-4
 
       ! limit max_model_number as part of test_suite
       max_model_number = 3000
@@ -70,7 +70,7 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
       
-      !photo_interval = 1
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
@@ -133,8 +133,9 @@
 
 &pgstar
 
-   Grid1_plot_name(3) = 'HR'
-
 !pause = .true.
+Grid1_plot_name(3) = 'HR'
+Profile_Panels3_xmin = -101d0
+Profile_Panels3_xmax = -101d0
 
 / ! end of pgstar namelist

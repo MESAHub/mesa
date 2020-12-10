@@ -42,6 +42,7 @@
             Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
          use const_def, only: dp
+         !use star_lib, only: star_get_surf_PT
          integer, intent(in) :: id
          logical, intent(in) :: skip_partials
          real(dp), intent(out) :: Teff, &
@@ -60,6 +61,12 @@
          dlnP_dlnM = 0
          dlnP_dlnkap = 0
          ierr = -1
+         
+         !call star_get_surf_PT(id, &
+         !   skip_partials, &
+         !   Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+         !   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
+         
       end subroutine null_other_surface_PT
 
 

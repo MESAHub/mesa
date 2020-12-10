@@ -30,7 +30,7 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
    cp lgT_9.5.mod standard_lgT_9.5.mod
 #fi
 
-do_one inlist_to_cc_header final.mod
+do_one inlist_to_cc_header start_core_collapse.mod
 
 # check if can skip
 #if [ -z "$MESA_RUN_OPTIONAL" ]; then

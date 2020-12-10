@@ -614,7 +614,7 @@
             xname, yname, xaxis_label, yaxis_label, &
             given_xmin, given_xmax, xmargin, dxmin, &
             given_ymin, given_ymax, ymargin, dymin, &
-            step_min, step_max, &
+            step_min_in, step_max_in, &
             reverse_xaxis, reverse_yaxis, &
             log_xaxis, log_yaxis, &
             show_target_box, n_sigma, &
@@ -627,7 +627,7 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: &
-            id, device_id, step_min, step_max, n_sigma
+            id, device_id, step_min_in, step_max_in, n_sigma
          real, intent(in) :: &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
             xtarget, ytarget, xsigma, ysigma, &
@@ -648,7 +648,7 @@
          procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
          real :: xmin, xmax, ymin, ymax, xleft, xright, ybot, ytop
-         integer :: i, j, j_min, j_max
+         integer :: i, j, j_min, j_max, step_min, step_max
          real :: dx, dy, xplus, xminus, yplus, yminus
          real, dimension(:), pointer :: xvec, yvec
          character (len=strlen) :: str
@@ -683,7 +683,12 @@
             ierr = -1
          end if
          if (ierr /= 0) return
-
+         step_min = max(step_min_in, 1)
+         if (step_max_in >= 0) then
+            step_max = min(step_max_in, s% model_number)
+         else
+            step_max = s% model_number
+         end if
          n = count_hist_points(s, step_min, step_max)
          allocate(xvec(n), yvec(n), stat=ierr)
          if (ierr /= 0) then
@@ -691,8 +696,18 @@
             return
          end if
 
-         call get_hist_points(s, step_min, step_max, n, ix, xvec)
-         call get_hist_points(s, step_min, step_max, n, iy, yvec)
+         call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'pgstar do_Hist_Track get_hist_points failed ' // trim(xname)
+            ierr = 0
+            !return
+         end if
+         call get_hist_points(s, step_min, step_max, n, iy, yvec, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'pgstar do_Hist_Track get_hist_points failed ' // trim(yname)
+            ierr = 0
+            !return
+         end if
 
          if (log_xaxis) then
             do k=1,n

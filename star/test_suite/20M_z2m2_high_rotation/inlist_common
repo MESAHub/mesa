@@ -41,7 +41,6 @@
       initial_model_number = 0
 
       pgstar_flag = .false.
-      disable_pgstar_for_relax = .true.      
 
 / ! end of star_job namelist
 

@@ -138,7 +138,13 @@
             return
          end if
 
-         call get_hist_points(s, step_min, step_max, n, ix, xvec)
+         call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
+         if (ierr /= 0) then 
+            write(*,*) 'pgstar get_hist_points failed ' // trim(s% rti_xaxis_name)
+            call dealloc
+            ierr = 0
+            return
+         end if
 
          if (s% rti_xaxis_in_seconds .and. s% rti_xaxis_name=='star_age') then
             do k=1,n
@@ -217,17 +223,21 @@
          call finish_rti_plot
 
          call pgunsa
+         
+         call dealloc
 
-         deallocate(xvec, star_mass, star_M_center, log_xmstar, &
-            he_core_mass, &
-            c_core_mass, &
-            o_core_mass, &
-            si_core_mass, &
-            fe_core_mass, &
-            shock_mass)
 
          contains
-
+         
+         subroutine dealloc
+            deallocate(xvec, star_mass, star_M_center, log_xmstar, &
+               he_core_mass, &
+               c_core_mass, &
+               o_core_mass, &
+               si_core_mass, &
+               fe_core_mass, &
+               shock_mass)
+         end subroutine dealloc
 
          subroutine plot_total_mass_line
             call pgsave
