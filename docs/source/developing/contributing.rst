@@ -4,9 +4,8 @@ How to contribute
 
 .. warning::
 
-   This document is written for MESA developers.  It currently targets
-   the sandbox repository used for testing the migration to GitHub.
-   Changes to this repository will not be included in MESA.
+   This document is written for MESA developers.  Users are not yet
+   able to contribute via GitHub.
 
 Obtaining MESA
 ==============
@@ -14,8 +13,10 @@ Obtaining MESA
 Join the MESA team on GitHub
 ----------------------------
 
-You must create an account on `GitHub <https://github.com/>`_.  The MESA organization is
-called `MESAHub <https://github.com/MESAHub/>`_.  After you are registered, you can be invited.
+You must create an account on `GitHub <https://github.com/>`_.  The
+MESA organization is called `MESAHub <https://github.com/MESAHub/>`_.
+After you are registered on GitHub, you can be invited to the
+organization.
 
 
 Set up Git
@@ -26,7 +27,7 @@ Follow `this GitHub guide <https://help.github.com/en/github/getting-started-wit
 When instructed to install git, it is likely simplest to do so using your system package manager on Linux (e.g., apt, yum) or a macOS package manager (e.g., Homebrew, MacPorts).
 
 .. note::
-   The documentation will describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`_.
+   This documentation will mainly describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`_.  (See also :ref:`Graphical interfaces`).
 
    
 Install Git LFS
@@ -67,9 +68,13 @@ Making changes to MESA
    `Bitbucket <https://www.atlassian.com/git/tutorials>`_) and beyond.
 
 The conventional name of the remote repository is ``origin``.  The
-``master`` branch is the development version of MESA.
+``main`` branch is the development version of MESA.
 
+.. note::
 
+   Prior to 2020, the default branch of a git repository was often
+   canonically named ``master``.  You may still see this used in some
+   older materials.  The MESA default branch is ``main``.
 
 Making a commit
 ---------------
@@ -98,14 +103,28 @@ Sharing your changes
 
 Once you are ready to share your changes::
 
-  git push origin master
+  git push origin main
 
+The first argument is the remote repository (``origin`` = GitHub).
+The second argument is the branch name.  If you are making changes in
+the non-default branch (i.e., not ``main``), see :ref:`Branching`.
+  
 Fetching others changes
 -----------------------
 
 When you want to get others' changes::
 
-  git pull origin master
+  git pull origin main
+
+The first argument is the remote repository (``origin`` = GitHub).
+The second argument is the branch name.  If you want to get changes
+from a non-default branch (i.e., not ``main``), see :ref:`Branching`.
+
+If you want to get others' changes, but not immediately update your
+local repository to match that content::
+
+  git fetch origin
+
 
 Checking out a revision
 -----------------------
@@ -119,40 +138,83 @@ characters, you only need the enough of the hash to be unique. This is usually o
 This will return your local repository to the state is was in the commit given by ``37cbee26``, but with your current uncommitted changes
 on top.
 
-git checkout can also be used to checkout the code based on other identifiers::
+  
+Restoring a file
+----------------
 
-  git checkout path/to/file
+.. note::
 
-Resets the file to its previous committed state::
+  Recent versions of git include the new command ``git restore`` that
+  splits out some of the functionality of ``git checkout``.  (If you
+  already know how ``git checkout`` works, you can also use that
+  command to accomplish the same goal.)
 
-  git checkout mybranch
+If you want to reset a file to its most recently committed state::
 
-Will check out the branch ``mybranch``
+  git restore path/to/file
+
+The ``path/to/file`` could also be something like the current
+directory (``.``) or a list of files (``*.f90``).
+
+
+``git restore`` can also be used to restore a file from another commit::
+
+  git restore --source=37cbee26 path/to/file
+  
 
 
 Branching
 ---------
 
+.. note::
+
+  Recent versions of git include the new command ``git switch`` that
+  splits out some of the functionality of ``git checkout``.  (If you
+  already know how ``git checkout`` works, you can also use that
+  command to accomplish the same goal.)
+
+
 If you decided to make a new branch this can be done with::
 
   git branch mynewbranch
-  git checkout mynewbranch
+  git switch mynewbranch
 
 or::
 
-  git checkout -b mynewbranch
+  git switch -b mynewbranch
 
-Any changes you now make will not apply to ``master`` but instead to ``mynewbranch``
+Any changes you now make will not apply to ``main`` but instead to ``mynewbranch``.
 
-When you are ready to merge the changes from ``mynewbranch`` into ``master`` then you do
+To delete the branch::
+
+  git branch -D mynewbranch
+
+If you want to push that branch to GitHub to share it with others, do::
+
+  git push --set-upstream origin mynewbranch
+
+This will create a new branch on GitHub named ``mynewbranch`` and associate it with the local branch on your machine of the same name.  
+
+Once you have set the upstream branch, you may omit the branch name when you push additional changes to this branch::
+
+  git push origin
+
+or pull additional changes from others on this branch::
+
+  git pull origin
+
+
+When you are ready to merge the changes from ``mynewbranch`` into ``main`` then you do
 
 .. note::
   Decide on merging strategy
 
 
-To delete the branch::
+If someone else has created a new branch, you can switch to it with::
+  
+    git switch -c theirnewbranch origin/theirnewbranch
 
-  git branch -D mynewbranch
+This will check out the branch ``theirnewbranch`` and associate it with the remote branch.
 
 
 Stashing changes
