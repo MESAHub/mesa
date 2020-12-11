@@ -3976,6 +3976,7 @@
             lipar, ipar, lrpar, rpar, ierr)
          use evolve
          use star_utils, only: yrs_for_init_timestep
+         use pgstar
          use history_specs, only: set_history_columns
          use profile, only: set_profile_columns
          integer, intent(in) :: id, lipar, lrpar
@@ -4092,6 +4093,19 @@
             s% priority_profile_interval = 0
          end if
 
+         if( s% job% pgstar_flag) then
+            ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
+            call set_history_columns(id,s% job% history_columns_file, .true., ierr)
+            if (ierr /= 0) return
+            call set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
+            if (ierr /= 0) return
+         end if
+
+         if (s% doing_first_model_of_run .and. s% job% pgstar_flag) then
+            call do_start_new_run_for_pgstar(s, ierr)
+            if (ierr /= 0) return
+         end if
+
          call before_evolve(s, id, lipar, ipar, lrpar, rpar, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in before_evolve'
@@ -4129,6 +4143,16 @@
                first_try = .false.
 
             end do step_loop
+
+            if (s% job% pgstar_flag) then
+               ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
+               call update_pgstar_data(s, ierr)
+               if (failed()) return
+               call do_read_pgstar_controls(s, s% inlist_fname, ierr) 
+               if (failed()) return
+               call do_pgstar_plots( s, .false., ierr)
+               if (failed()) return
+            end if
             
             result = finish_model(s)
             if (result /= keep_going) exit evolve_loop
@@ -4158,6 +4182,16 @@
             end if
 
          end do evolve_loop
+
+         if (s% job% pgstar_flag) then
+         ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
+            call update_pgstar_data(s, ierr)
+            if (ierr /= 0) return
+            call do_read_pgstar_controls(s, s% inlist_fname, ierr)
+            if (ierr /= 0) return
+            call do_pgstar_plots(s, s% job% save_pgstar_files_when_terminate, ierr)
+            if (ierr /= 0) return
+         end if
 
          s% doing_relax = .false.
          s% need_to_setvars = .true. ! just to be safe

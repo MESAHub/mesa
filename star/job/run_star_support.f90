@@ -341,13 +341,9 @@
             if (dbg) write(*,*) 'call before_evolve'
             call before_evolve(id, ierr)
             if (failed('before_evolve',ierr)) return
-            call start_new_run_for_pgstar(s, ierr)
-            if (failed('start_new_run_for_pgstar',ierr)) return
          else
             call show_terminal_header(id, ierr)
             if (failed('show_terminal_header',ierr)) return
-            call restart_run_for_pgstar(s, ierr)
-            if (failed('restart_run_for_pgstar',ierr)) return
          end if
          
          if (dbg) write(*,*) 'call extras_startup'
@@ -1967,6 +1963,24 @@
          logical :: change_v, change_u
          include 'formats.inc'
          
+         if (len_trim(s% job% history_columns_file) > 0) &
+            write(*,*) 'read ' // trim(s% job% history_columns_file)
+         call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
+         if (failed('star_set_history_columns',ierr)) return
+         
+         if (len_trim(s% job% profile_columns_file) > 0) &
+            write(*,*) 'read ' // trim(s% job% profile_columns_file)
+         call star_set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
+         if (failed('star_set_profile_columns',ierr)) return
+
+         if (.not. restart) then
+            call start_new_run_for_pgstar(s, ierr)
+            if (failed('start_new_run_for_pgstar',ierr)) return
+         else
+            call restart_run_for_pgstar(s, ierr)
+            if (failed('restart_run_for_pgstar',ierr)) return
+         end if
+         
          if (s% job% set_tau_factor .or. &
                (s% job% set_initial_tau_factor .and. .not. restart)) then
             write(*,1) 'set_tau_factor', s% job% set_to_this_tau_factor
@@ -2701,16 +2715,6 @@
                  log10(s% max_timestep/secyer)
            end if
         end if
-         
-         if (len_trim(s% job% history_columns_file) > 0) &
-            write(*,*) 'read ' // trim(s% job% history_columns_file)
-         call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
-         if (failed('star_set_history_columns',ierr)) return
-         
-         if (len_trim(s% job% profile_columns_file) > 0) &
-            write(*,*) 'read ' // trim(s% job% profile_columns_file)
-         call star_set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
-         if (failed('star_set_profile_columns',ierr)) return
          
          ! print out info about selected non-standard parameter settings
          
