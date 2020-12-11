@@ -715,6 +715,7 @@
                end if
             end do
             write(*,2) 'misc other retries', s% num_retries - sum(s% dt_why_retry_count(1:numTlim))
+            write(*,*)
          end if
          if (s% job% show_timestep_limit_counts_when_terminate) then
             do i=1,numTlim
@@ -722,6 +723,7 @@
                   write(*,2) trim(dt_why_str(i)) // ' dt limits', s% dt_why_count(i)
                end if
             end do
+            write(*,*)
          end if
          call do_saves(id, ierr)
          if (failed('do_saves terminate_normal_evolve_loop',ierr)) return

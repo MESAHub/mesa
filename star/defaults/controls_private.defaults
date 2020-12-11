@@ -1,0 +1,186 @@
+! ================
+! controls_private
+! ================
+
+! CONTAINS THINGS NOT YET THE GIVEN GREEN LIGHT FOR GENERAL USE.
+! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
+
+
+
+      ! Eturb parameters
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         
+      !   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      !   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
+      !   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ Eturb_alfam
+      !   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar    
+      !      
+      ! Eturb time weighting is determined by the Fraley_time_centering controls.
+      !     for Pt and Lt in turbulent energy equation
+      !     for P and grav in momentum equation
+      !     for P and L in energy equation
+      !     for area when multiplied by P
+      ! Eturb_Lsurf_factor: Lsurf = Eturb_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      !   
+
+      ! ::
+
+    Eturb_alfa  = 1.5d0
+    Eturb_alfap = 0.0d0
+    Eturb_alfat = 0.0d0
+    Eturb_alfam = 0.25d0
+    Eturb_alfar = 0.0d0
+
+    Eturb_Lsurf_factor = 0.5d0
+
+
+      ! use_DGESVX_in_bcyclic
+      ! use_equilibration_in_DGESVX
+      ! report_min_rcond_from_DGESXV
+      
+      ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
+
+      ! ::
+
+    use_DGESVX_in_bcyclic = .false.
+    use_equilibration_in_DGESVX = .false.
+    report_min_rcond_from_DGESXV = .false.
+
+
+      ! mlt_make_surface_no_mixing
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! this defaults to false for (temoporary) backward compatibility.
+      ! it should be true.
+
+      ! ::
+
+    mlt_make_surface_no_mixing = .false.
+
+
+      ! drag_coefficient
+      ! ~~~~~~~~~~~~~~~~
+      ! min_q_for_drag
+      ! ~~~~~~~~~~~~~~
+
+      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
+      ! only for v(k) when q(k) > min_q_for_drag.
+      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
+
+      ! ::
+
+    drag_coefficient = 0d0
+    min_q_for_drag = 0d0
+
+
+      ! use_superad_reduction
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! superad_reduction_Gamma_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! superad_reduction_Gamma_limit_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! superad_reduction_Gamma_inv_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! superad_reduction_diff_grads_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! superad_reduction_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Implicit alternative to okay_to_reduce_gradT_excess, EXPERIMENTAL
+
+      ! ::
+
+    use_superad_reduction = .false.
+    superad_reduction_Gamma_limit = 0.5d0
+    superad_reduction_Gamma_limit_scale = 5d0
+    superad_reduction_Gamma_inv_scale = 5d0
+    superad_reduction_diff_grads_limit = 1d-3
+    superad_reduction_limit = -1d0
+
+! convection velocity equation
+! ============================
+
+
+      ! conv_vel_D
+      ! ~~~~~~~~~~
+      ! conv_vel_siglimit
+      ! ~~~~~~~~~~~~~~~~~
+      ! conv_vel_v0
+      ! ~~~~~~~~~~~
+
+      ! To avoid following tiny convective velocities to high precision
+      ! as well as accounting for several orders-of-magnitude changes of
+      ! conv_vel in individual steps, the variable included in the solver
+      ! solver is not conv_vel, but instead ln(conv_vel + v0). v0 (in cm/s)
+      ! then determines at which point relative errors in ln(conv_vel + v0)
+      ! are small (TODO: explain better).
+
+      ! ::
+
+    conv_vel_D = 0d0
+    conv_vel_siglimit = 1d99
+    conv_vel_v0 = 1d0
+
+
+      ! min_q_for_normal_mlt_gradT_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_normal_mlt_gradT_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Switches from the gradT given by standard MLT rather than conv_vel in the outer layers
+      ! gradT is smoothly blend between this range in q
+
+      ! ::
+
+    min_q_for_normal_mlt_gradT_full_off = 1d99
+    max_q_for_normal_mlt_gradT_full_on = 1d99
+
+
+      ! conv_vel_ignore_thermohaline
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! conv_vel_ignore_semiconvection
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If false, then mlt will consider a convective velocity given by 3*D/Lambda
+      ! as an additional source for the conv_vel equation (can be set for either
+      ! thermohaline or semiconvective mixing). Thermohaline mixing can change
+      ! a lot, and its inclusion makes things unstable, so by default we only keep
+      ! semiconvection. It true, then the corresponding mixing coefficient is calculated
+      ! in the regular way and added up to the final mixing coefficient.
+
+      ! ::
+
+    conv_vel_ignore_thermohaline = .true.
+    conv_vel_ignore_semiconvection = .false.
+
+
+      ! conv_vel_fully_lagrangian
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! conv_vel_include_homologous_term
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If conv_vel_fully_lagrangian is true, then time derivatives for convective
+      ! velocities are computed fully lagrangian, using values from the previous step
+      ! at constant mass. Otherwise, on the outer layers of the star the term time
+      ! derivative is computed using a time derivative at fixed mass
+      ! ratio q (so-called non-homologous term), and the derivative with respect to q
+      ! (so-called homologous term).
+      ! if conv_vel_include_homologous_term is false, then the homologous term is
+      ! ignored.
+
+      ! ::
+
+    conv_vel_fully_lagrangian = .false. 
+    conv_vel_include_homologous_term = .true.
+
+
+      ! conv_vel_use_mlt_vc_start
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, then the value of the convective velocity from mlt is used
+      ! throughout all solver iterations rather than being updated at each.
+
+      ! ::
+
+    conv_vel_use_mlt_vc_start = .true.

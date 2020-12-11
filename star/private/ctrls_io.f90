@@ -30,7 +30,8 @@
 
  implicit none
 
- include "star_controls.inc"
+ include 'star_controls.inc'
+ include 'star_controls_private.inc'
 
  logical :: read_extra_controls_inlist1
  character (len=strlen) :: extra_controls_inlist1_name
@@ -778,6 +779,7 @@
  predictive_ingestion_factor(:) = 0d0
 
  include 'controls.defaults'
+ include 'controls_private.defaults'
 
  end subroutine set_default_controls
 

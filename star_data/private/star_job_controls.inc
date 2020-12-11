@@ -30,8 +30,7 @@
       logical :: show_retry_counts_when_terminate, &
          show_timestep_limit_counts_when_terminate
 
-      logical :: create_pre_main_sequence_model, &
-         pre_ms_relax_to_start_radiative_core
+      logical :: create_pre_main_sequence_model, pre_ms_relax_to_start_radiative_core
       real(dp) :: pre_ms_check_radiative_core_Lnuc_div_L_limit, pre_ms_check_radiative_core_min_mass
       integer :: pre_ms_relax_num_steps, pre_ms_min_steps_before_check_radiative_core
       real(dp) :: pre_ms_T_c, pre_ms_guess_rho_c, pre_ms_d_log10_P
@@ -184,29 +183,20 @@
          relax_mass_change_init_mdot, relax_mass_change_final_mdot
 
       logical :: change_RTI_flag, change_initial_RTI_flag, new_RTI_flag
-      logical :: change_conv_vel_flag, change_initial_conv_vel_flag, new_conv_vel_flag
-      logical :: change_w_div_wc_flag, change_initial_w_div_wc_flag, new_w_div_wc_flag
-      logical :: change_j_rot_flag, change_initial_j_rot_flag, new_j_rot_flag
       logical :: create_RSP_model
       logical :: change_RSP_flag, change_initial_RSP_flag, new_RSP_flag
-      logical :: change_Eturb_flag, change_initial_Eturb_flag, new_Eturb_flag
-      integer :: change_Eturb_flag_at_model_number
       logical :: change_v_flag, change_initial_v_flag, new_v_flag
       logical :: change_D_omega_flag, change_initial_D_omega_flag, new_D_omega_flag
       logical :: change_am_nu_rot_flag, change_initial_am_nu_rot_flag, &
          new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
       real(dp) :: gamma1_integral_for_v_flag
-      real(dp) :: logT_for_conv_vel_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag
       logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
          new_reconstruction_flag
-      logical :: change_lnEK_flag, change_initial_lnEK_flag, new_lnEK_flag
 
       logical :: change_D_smooth_flag, change_initial_D_smooth_flag, new_D_smooth_flag
       logical :: change_rotation_flag, change_initial_rotation_flag, new_rotation_flag
-
-      logical :: use_w_div_wc_flag_with_rotation, use_j_rot_flag_with_rotation
 
       logical :: set_omega, set_initial_omega
       integer :: set_omega_step_limit, set_near_zams_omega_steps

@@ -270,16 +270,7 @@
             gradT_excess_min_log_tau_full_on, &
             gradT_excess_max_log_tau_full_off
 
-         logical :: use_superad_reduction
-         real(dp) :: &
-            superad_reduction_Gamma_limit, &
-            superad_reduction_Gamma_limit_scale, &
-            superad_reduction_Gamma_inv_scale, &
-            superad_reduction_diff_grads_limit, &
-            superad_reduction_limit
-
          real(dp) :: mlt_gradT_fraction, max_logT_for_mlt
-         logical :: mlt_make_surface_no_mixing
 
       ! mixing parameters
 
@@ -822,8 +813,6 @@
          
          real(dp) :: &
             gamma_law_hydro, &
-            drag_coefficient, &
-            min_q_for_drag, &
             v_drag_factor, &
             v_drag, &
             q_for_v_drag_full_off, &
@@ -837,21 +826,9 @@
             RTI_max_alpha, RTI_min_dm_behind_shock_for_full_on, &
             RTI_dm_for_center_eta_nondecreasing, RTI_min_m_for_D_mix_floor, &
             RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost
-            
-         real(dp) :: &
-            conv_vel_mix_factor, &
-            conv_vel_drag_factor, &
-            conv_vel_buoyancy_factor, &
-            conv_vel_D, &
-            conv_vel_siglimit, &
-            conv_vel_v0
-         real(dp) :: min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on
-         logical :: conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, &
-                    conv_vel_fully_lagrangian, conv_vel_include_homologous_term, &
-                    conv_vel_use_mlt_vc_start
 
          logical :: include_composition_in_eps_grav
-         real(dp) :: accretion_entropy_at_surface, velocity_logT_lower_bound, &
+         real(dp) :: velocity_logT_lower_bound, &
             max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound
          real(dp) :: Gamma_lnS_eps_grav_full_on, Gamma_lnS_eps_grav_full_off
          integer :: max_num_surf_revisions
@@ -926,17 +903,7 @@
 
          logical :: convergence_ignore_equL_residuals, &
             convergence_ignore_alpha_RTI_residuals, &
-            convergence_separate_equ_conv_vel_residuals, &
-            convergence_separate_equ_conv_vel_corrections, &
             include_rotation_in_total_energy
-
-         real(dp) :: &
-            conv_vel_tol_max_residual, &
-            conv_vel_tol_max_correction, &
-            conv_vel_min_correction_to_ignore_residual, &
-            conv_vel_scale_max_correction, &
-            conv_vel_corr_coeff_limit
-         integer :: conv_vel_solver_itermin_until_reduce_min_corr_coeff
 
          integer :: iter_for_resid_tol2, iter_for_resid_tol3
 
@@ -995,9 +962,6 @@
             delta_m_lower_for_sig_min_factor, &
             delta_m_upper_for_sig_min_factor
 
-         logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
-         logical :: report_min_rcond_from_DGESXV
-
          ! rotation
          logical :: set_uniform_am_nu_non_rot
          real(dp) :: uniform_am_nu_non_rot
@@ -1043,7 +1007,7 @@
             mdot_revise_factor, implicit_mdot_boost
          real(dp) :: surf_w_div_w_crit_limit, surf_w_div_w_crit_tol
          logical :: fitted_fp_ft_i_rot
-         real(dp) ::w_div_wcrit_max, w_div_wcrit_max2
+         real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
          real(dp) :: D_mix_rotation_max_logT_full_on, &
@@ -1097,15 +1061,6 @@
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
-
-      ! Eturb parameters
-      
-         real(dp) :: Eturb_Lsurf_factor
-         real(dp) :: Eturb_alfa
-         real(dp) :: Eturb_alfap
-         real(dp) :: Eturb_alfat
-         real(dp) :: Eturb_alfam
-         real(dp) :: Eturb_alfar
          
       ! timestep parameters
       
@@ -1445,7 +1400,8 @@
          logical :: use_other_torque_implicit
          logical :: use_other_wind
          logical :: use_other_accreting_state
-         logical :: use_other_after_struct_burn_mix, use_other_before_struct_burn_mix
+         logical :: use_other_after_struct_burn_mix
+         logical :: use_other_before_struct_burn_mix
          logical :: use_other_export_pulse_data
          logical :: use_other_get_pulse_data
          logical :: use_other_edit_pulse_data

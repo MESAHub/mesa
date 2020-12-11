@@ -47,6 +47,7 @@
 
       type star_job_controls
          include "star_job_controls.inc"
+         include "star_job_controls_private.inc"
          real(dp) :: &
              step_loop_timing, after_step_timing, before_step_timing, &
              check_time_start, check_time_end, elapsed_time, &
@@ -108,6 +109,7 @@
          ! controls
             type (star_job_controls) :: job ! separate type to avoid name clashes
             include "star_controls.inc"
+            include "star_controls_private.inc"
             include "pgstar_controls.inc"
          
       end type star_info
