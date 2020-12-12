@@ -32,7 +32,7 @@
       implicit none
 
       include 'star_job_controls.inc'
-      include 'star_job_controls_private.inc'
+      include 'star_job_controls_dev.inc'
 
       namelist /star_job/ &
          mesa_dir, &

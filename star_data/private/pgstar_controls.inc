@@ -855,7 +855,8 @@
          Profile_Panels1_yaxis_name, Profile_Panels1_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels1_yaxis_reversed, Profile_Panels1_other_yaxis_reversed, &
-         Profile_Panels1_yaxis_log, Profile_Panels1_other_yaxis_log
+         Profile_Panels1_yaxis_log, Profile_Panels1_other_yaxis_log, &
+         Profile_Panels1_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels1_ymin, Profile_Panels1_other_ymin, &
          Profile_Panels1_ymax, Profile_Panels1_other_ymax, &
@@ -884,7 +885,8 @@
          Profile_Panels2_yaxis_name, Profile_Panels2_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels2_yaxis_reversed, Profile_Panels2_other_yaxis_reversed, &
-         Profile_Panels2_yaxis_log, Profile_Panels2_other_yaxis_log
+         Profile_Panels2_yaxis_log, Profile_Panels2_other_yaxis_log, &
+         Profile_Panels2_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels2_ymin, Profile_Panels2_other_ymin, &
          Profile_Panels2_ymax, Profile_Panels2_other_ymax, &
@@ -913,7 +915,8 @@
          Profile_Panels3_yaxis_name, Profile_Panels3_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels3_yaxis_reversed, Profile_Panels3_other_yaxis_reversed, &
-         Profile_Panels3_yaxis_log, Profile_Panels3_other_yaxis_log
+         Profile_Panels3_yaxis_log, Profile_Panels3_other_yaxis_log, &
+         Profile_Panels3_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels3_ymin, Profile_Panels3_other_ymin, &
          Profile_Panels3_ymax, Profile_Panels3_other_ymax, &
@@ -942,7 +945,8 @@
          Profile_Panels4_yaxis_name, Profile_Panels4_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels4_yaxis_reversed, Profile_Panels4_other_yaxis_reversed, &
-         Profile_Panels4_yaxis_log, Profile_Panels4_other_yaxis_log
+         Profile_Panels4_yaxis_log, Profile_Panels4_other_yaxis_log, &
+         Profile_Panels4_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels4_ymin, Profile_Panels4_other_ymin, &
          Profile_Panels4_ymax, Profile_Panels4_other_ymax, &
@@ -970,7 +974,8 @@
          Profile_Panels5_yaxis_name, Profile_Panels5_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels5_yaxis_reversed, Profile_Panels5_other_yaxis_reversed, &
-         Profile_Panels5_yaxis_log, Profile_Panels5_other_yaxis_log
+         Profile_Panels5_yaxis_log, Profile_Panels5_other_yaxis_log, &
+         Profile_Panels5_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels5_ymin, Profile_Panels5_other_ymin, &
          Profile_Panels5_ymax, Profile_Panels5_other_ymax, &
@@ -998,7 +1003,8 @@
          Profile_Panels6_yaxis_name, Profile_Panels6_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels6_yaxis_reversed, Profile_Panels6_other_yaxis_reversed, &
-         Profile_Panels6_yaxis_log, Profile_Panels6_other_yaxis_log
+         Profile_Panels6_yaxis_log, Profile_Panels6_other_yaxis_log, &
+         Profile_Panels6_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels6_ymin, Profile_Panels6_other_ymin, &
          Profile_Panels6_ymax, Profile_Panels6_other_ymax, &
@@ -1026,7 +1032,8 @@
          Profile_Panels7_yaxis_name, Profile_Panels7_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels7_yaxis_reversed, Profile_Panels7_other_yaxis_reversed, &
-         Profile_Panels7_yaxis_log, Profile_Panels7_other_yaxis_log
+         Profile_Panels7_yaxis_log, Profile_Panels7_other_yaxis_log, &
+         Profile_Panels7_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels7_ymin, Profile_Panels7_other_ymin, &
          Profile_Panels7_ymax, Profile_Panels7_other_ymax, &
@@ -1054,7 +1061,8 @@
          Profile_Panels8_yaxis_name, Profile_Panels8_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels8_yaxis_reversed, Profile_Panels8_other_yaxis_reversed, &
-         Profile_Panels8_yaxis_log, Profile_Panels8_other_yaxis_log
+         Profile_Panels8_yaxis_log, Profile_Panels8_other_yaxis_log, &
+         Profile_Panels8_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels8_ymin, Profile_Panels8_other_ymin, &
          Profile_Panels8_ymax, Profile_Panels8_other_ymax, &
@@ -1082,7 +1090,8 @@
          Profile_Panels9_yaxis_name, Profile_Panels9_other_yaxis_name
       logical, dimension(max_num_Profile_Panels) :: &
          Profile_Panels9_yaxis_reversed, Profile_Panels9_other_yaxis_reversed, &
-         Profile_Panels9_yaxis_log, Profile_Panels9_other_yaxis_log
+         Profile_Panels9_yaxis_log, Profile_Panels9_other_yaxis_log, &
+         Profile_Panels9_same_yaxis_range
       real, dimension(max_num_Profile_Panels) :: &
          Profile_Panels9_ymin, Profile_Panels9_other_ymin, &
          Profile_Panels9_ymax, Profile_Panels9_other_ymax, &
@@ -1150,7 +1159,8 @@
          History_Panels1_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels1_yaxis_reversed, History_Panels1_other_yaxis_reversed, &
-         History_Panels1_yaxis_log, History_Panels1_other_yaxis_log
+         History_Panels1_yaxis_log, History_Panels1_other_yaxis_log, &
+         History_Panels1_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels1_ymin, History_Panels1_other_ymin, &
          History_Panels1_ymax, History_Panels1_other_ymax, &
@@ -1179,7 +1189,8 @@
          History_Panels2_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels2_yaxis_reversed, History_Panels2_other_yaxis_reversed, &
-         History_Panels2_yaxis_log, History_Panels2_other_yaxis_log
+         History_Panels2_yaxis_log, History_Panels2_other_yaxis_log, &
+         History_Panels2_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels2_ymin, History_Panels2_other_ymin, &
          History_Panels2_ymax, History_Panels2_other_ymax, &
@@ -1208,7 +1219,8 @@
          History_Panels3_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels3_yaxis_reversed, History_Panels3_other_yaxis_reversed, &
-         History_Panels3_yaxis_log, History_Panels3_other_yaxis_log
+         History_Panels3_yaxis_log, History_Panels3_other_yaxis_log, &
+         History_Panels3_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels3_ymin, History_Panels3_other_ymin, &
          History_Panels3_ymax, History_Panels3_other_ymax, &
@@ -1237,7 +1249,8 @@
          History_Panels4_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels4_yaxis_reversed, History_Panels4_other_yaxis_reversed, &
-         History_Panels4_yaxis_log, History_Panels4_other_yaxis_log
+         History_Panels4_yaxis_log, History_Panels4_other_yaxis_log, &
+         History_Panels4_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels4_ymin, History_Panels4_other_ymin, &
          History_Panels4_ymax, History_Panels4_other_ymax, &
@@ -1265,7 +1278,8 @@
          History_Panels5_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels5_yaxis_reversed, History_Panels5_other_yaxis_reversed, &
-         History_Panels5_yaxis_log, History_Panels5_other_yaxis_log
+         History_Panels5_yaxis_log, History_Panels5_other_yaxis_log, &
+         History_Panels5_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels5_ymin, History_Panels5_other_ymin, &
          History_Panels5_ymax, History_Panels5_other_ymax, &
@@ -1293,7 +1307,8 @@
          History_Panels6_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels6_yaxis_reversed, History_Panels6_other_yaxis_reversed, &
-         History_Panels6_yaxis_log, History_Panels6_other_yaxis_log
+         History_Panels6_yaxis_log, History_Panels6_other_yaxis_log, &
+         History_Panels6_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels6_ymin, History_Panels6_other_ymin, &
          History_Panels6_ymax, History_Panels6_other_ymax, &
@@ -1321,7 +1336,8 @@
          History_Panels7_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels7_yaxis_reversed, History_Panels7_other_yaxis_reversed, &
-         History_Panels7_yaxis_log, History_Panels7_other_yaxis_log
+         History_Panels7_yaxis_log, History_Panels7_other_yaxis_log, &
+         History_Panels7_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels7_ymin, History_Panels7_other_ymin, &
          History_Panels7_ymax, History_Panels7_other_ymax, &
@@ -1349,7 +1365,8 @@
          History_Panels8_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels8_yaxis_reversed, History_Panels8_other_yaxis_reversed, &
-         History_Panels8_yaxis_log, History_Panels8_other_yaxis_log
+         History_Panels8_yaxis_log, History_Panels8_other_yaxis_log, &
+         History_Panels8_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels8_ymin, History_Panels8_other_ymin, &
          History_Panels8_ymax, History_Panels8_other_ymax, &
@@ -1377,7 +1394,8 @@
          History_Panels9_points_name
       logical, dimension(max_num_History_Panels) :: &
          History_Panels9_yaxis_reversed, History_Panels9_other_yaxis_reversed, &
-         History_Panels9_yaxis_log, History_Panels9_other_yaxis_log
+         History_Panels9_yaxis_log, History_Panels9_other_yaxis_log, &
+         History_Panels9_same_yaxis_range
       real, dimension(max_num_History_Panels) :: &
          History_Panels9_ymin, History_Panels9_other_ymin, &
          History_Panels9_ymax, History_Panels9_other_ymax, &

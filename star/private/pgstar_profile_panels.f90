@@ -70,6 +70,7 @@
             s% Profile_Panels1_other_yaxis_reversed, &
             s% Profile_Panels1_yaxis_log, &
             s% Profile_Panels1_other_yaxis_log, &
+            s% Profile_Panels1_same_yaxis_range, &
             s% Profile_Panels1_xaxis_name, &
             s% Profile_Panels1_yaxis_name, &
             s% Profile_Panels1_other_yaxis_name, &
@@ -122,6 +123,7 @@
             s% Profile_Panels2_other_yaxis_reversed, &
             s% Profile_Panels2_yaxis_log, &
             s% Profile_Panels2_other_yaxis_log, &
+            s% Profile_Panels2_same_yaxis_range, &
             s% Profile_Panels2_xaxis_name, &
             s% Profile_Panels2_yaxis_name, &
             s% Profile_Panels2_other_yaxis_name, &
@@ -174,6 +176,7 @@
             s% Profile_Panels3_other_yaxis_reversed, &
             s% Profile_Panels3_yaxis_log, &
             s% Profile_Panels3_other_yaxis_log, &
+            s% Profile_Panels3_same_yaxis_range, &
             s% Profile_Panels3_xaxis_name, &
             s% Profile_Panels3_yaxis_name, &
             s% Profile_Panels3_other_yaxis_name, &
@@ -226,6 +229,7 @@
             s% Profile_Panels4_other_yaxis_reversed, &
             s% Profile_Panels4_yaxis_log, &
             s% Profile_Panels4_other_yaxis_log, &
+            s% Profile_Panels4_same_yaxis_range, &
             s% Profile_Panels4_xaxis_name, &
             s% Profile_Panels4_yaxis_name, &
             s% Profile_Panels4_other_yaxis_name, &
@@ -278,6 +282,7 @@
             s% Profile_Panels5_other_yaxis_reversed, &
             s% Profile_Panels5_yaxis_log, &
             s% Profile_Panels5_other_yaxis_log, &
+            s% Profile_Panels5_same_yaxis_range, &
             s% Profile_Panels5_xaxis_name, &
             s% Profile_Panels5_yaxis_name, &
             s% Profile_Panels5_other_yaxis_name, &
@@ -330,6 +335,7 @@
             s% Profile_Panels6_other_yaxis_reversed, &
             s% Profile_Panels6_yaxis_log, &
             s% Profile_Panels6_other_yaxis_log, &
+            s% Profile_Panels6_same_yaxis_range, &
             s% Profile_Panels6_xaxis_name, &
             s% Profile_Panels6_yaxis_name, &
             s% Profile_Panels6_other_yaxis_name, &
@@ -382,6 +388,7 @@
             s% Profile_Panels7_other_yaxis_reversed, &
             s% Profile_Panels7_yaxis_log, &
             s% Profile_Panels7_other_yaxis_log, &
+            s% Profile_Panels7_same_yaxis_range, &
             s% Profile_Panels7_xaxis_name, &
             s% Profile_Panels7_yaxis_name, &
             s% Profile_Panels7_other_yaxis_name, &
@@ -434,6 +441,7 @@
             s% Profile_Panels8_other_yaxis_reversed, &
             s% Profile_Panels8_yaxis_log, &
             s% Profile_Panels8_other_yaxis_log, &
+            s% Profile_Panels8_same_yaxis_range, &
             s% Profile_Panels8_xaxis_name, &
             s% Profile_Panels8_yaxis_name, &
             s% Profile_Panels8_other_yaxis_name, &
@@ -486,6 +494,7 @@
             s% Profile_Panels9_other_yaxis_reversed, &
             s% Profile_Panels9_yaxis_log, &
             s% Profile_Panels9_other_yaxis_log, &
+            s% Profile_Panels9_same_yaxis_range, &
             s% Profile_Panels9_xaxis_name, &
             s% Profile_Panels9_yaxis_name, &
             s% Profile_Panels9_other_yaxis_name, &
@@ -511,6 +520,7 @@
             panels_other_yaxis_reversed, &
             panels_yaxis_log, &
             panels_other_yaxis_log, &
+            panels_same_yaxis_range, &
             panels_xaxis_name, &
             panels_yaxis_name, &
             panels_other_yaxis_name, &
@@ -544,7 +554,8 @@
          logical, intent(in) :: subplot, show_mix_regions
          logical, intent(in), dimension(:) :: &
             panels_yaxis_log, &
-            panels_other_yaxis_log
+            panels_other_yaxis_log, &
+            panels_same_yaxis_range
          real, intent(in), dimension(:) :: &
             panels_ymin, panels_other_ymin, &
             panels_ymax, panels_other_ymax, &
@@ -854,33 +865,6 @@
                      panels_other_ymargin(j), panels_other_yaxis_reversed(j), &
                      panels_other_dymin(j), other_ybot, other_ytop)
                end if
-               call pgswin(xleft, xright, other_ybot, other_ytop)
-               call pgscf(1)
-               call pgsci(1)
-               call show_box_pgstar(s,'','CMSTV')
-               call pgsci(other_y_color)
-               if (panels_other_yaxis_log(j)) then
-                  call show_right_yaxis_label_pgstar(s,'log ' // other_yname)
-               else
-                  call show_right_yaxis_label_pgstar(s,other_yname)
-               end if
-               call pgslw(s% pgstar_lw)
-               call pgsci(other_y_color)
-               if (other_yfile_data_len > 0) then
-                  call pgline( &
-                     other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
-                  deallocate(other_yfile_xdata, other_yfile_ydata)
-                  nullify(other_yfile_xdata, other_yfile_ydata)
-               else
-                  call pgline(npts, xvec, other_yvec)
-                  if (panels_show_grid) then
-                     ishape = 21
-                     do k=1,npts
-                        call pgpt1(xvec(k),other_yvec(k),ishape)
-                     end do
-                  end if
-               end if
-               call pgslw(1)
             end if
 
             yaxis_id = get_profile_id(s, yname)
@@ -912,6 +896,44 @@
                   npts, yvec, panels_ymin(j), panels_ymax(j), panels_ycenter(j), panels_ymargin(j), &
                   panels_yaxis_reversed(j), panels_dymin(j), ybot, ytop)
             end if
+            
+            if (panels_same_yaxis_range(j) .and. len_trim(panels_other_yaxis_name(j)) > 0) then
+               if (other_ybot < ybot) ybot = other_ybot
+               if (ybot < other_ybot) other_ybot = ybot
+               if (other_ytop > ytop) ytop = other_ytop
+               if (ytop > other_ytop) other_ytop = ytop
+            end if
+               
+            if (len_trim(panels_other_yaxis_name(j)) > 0) then
+               call pgswin(xleft, xright, other_ybot, other_ytop)
+               call pgscf(1)
+               call pgsci(1)
+               call show_box_pgstar(s,'','CMSTV')
+               call pgsci(other_y_color)
+               if (panels_other_yaxis_log(j)) then
+                  call show_right_yaxis_label_pgstar(s,'log ' // other_yname)
+               else
+                  call show_right_yaxis_label_pgstar(s,other_yname)
+               end if
+               call pgslw(s% pgstar_lw)
+               call pgsci(other_y_color)
+               if (other_yfile_data_len > 0) then
+                  call pgline( &
+                     other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
+                  deallocate(other_yfile_xdata, other_yfile_ydata)
+                  nullify(other_yfile_xdata, other_yfile_ydata)
+               else
+                  call pgline(npts, xvec, other_yvec)
+                  if (panels_show_grid) then
+                     ishape = 21
+                     do k=1,npts
+                        call pgpt1(xvec(k),other_yvec(k),ishape)
+                     end do
+                  end if
+               end if
+               call pgslw(1)
+            end if
+            
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
             call pgsci(1)

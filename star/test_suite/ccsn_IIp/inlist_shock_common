@@ -15,9 +15,6 @@
 
       remove_center_set_zero_v_center = .true. !False
 
-      change_conv_vel_flag = .true.
-      new_conv_vel_flag = .false. ! .true.
-
       set_initial_age = .false.
       set_initial_model_number = .false.
 

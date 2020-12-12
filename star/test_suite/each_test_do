@@ -17,25 +17,6 @@ function error {
 	echo
 }
 
-
-# function do_one {
-#   echo $1
-#   cd $1  
-#   svn del mesa_dir.rb mesh.rb mesh_plan.rb mesh_plot_data plot_data plotters
-#   cd ..
-# }
-
-
-function do_one_svn {
-  echo $1
-  cd $1
-  
-  # do rm out.txt before running this
-  
-  svn diff -r 13119 inlist_* >> ../out.txt
-  cd ..
-}
-
 function do_onex {
 cd $1
 if [ -z profile_columns.list ]
@@ -89,7 +70,7 @@ fi
 cd ..
 }
 
-function do_one {
+function do_onex {
     cd $1
     if ! grep 'test_suite_helpers' rn > /dev/null; then
         echo $1
@@ -98,7 +79,14 @@ function do_one {
 }
 
 
+
+function do_one {
+  #echo $1
+  grep " $1" */inlist_*
+}
+
+
 date
-source do1_test_source
+source do1_private_controls
 echo ""
 date

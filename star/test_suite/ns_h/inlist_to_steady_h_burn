@@ -16,10 +16,6 @@
       !change_initial_v_flag = .true.
       !new_v_flag = .true.
 
-      change_initial_conv_vel_flag = .true.
-      !new_conv_vel_flag = .true.
-      new_conv_vel_flag = .false.
-
       set_tau_factor = .true.
       set_to_this_tau_factor = 100
 

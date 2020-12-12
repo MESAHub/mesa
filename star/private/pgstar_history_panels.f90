@@ -76,6 +76,7 @@
             s% History_Panels1_other_ymax, &
             s% History_Panels1_yaxis_reversed, &
             s% History_Panels1_other_yaxis_log, &
+            s% History_Panels1_same_yaxis_range, &
             s% History_Panels1_other_dymin, &
             s% History_Panels1_points_name, &
             s% History_Panels1_other_ymargin, &
@@ -136,6 +137,7 @@
             s% History_Panels2_other_ymax, &
             s% History_Panels2_yaxis_reversed, &
             s% History_Panels2_other_yaxis_log, &
+            s% History_Panels2_same_yaxis_range, &
             s% History_Panels2_other_dymin, &
             s% History_Panels2_points_name, &
             s% History_Panels2_other_ymargin, &
@@ -196,6 +198,7 @@
             s% History_Panels3_other_ymax, &
             s% History_Panels3_yaxis_reversed, &
             s% History_Panels3_other_yaxis_log, &
+            s% History_Panels3_same_yaxis_range, &
             s% History_Panels3_other_dymin, &
             s% History_Panels3_points_name, &
             s% History_Panels3_other_ymargin, &
@@ -256,6 +259,7 @@
             s% History_Panels4_other_ymax, &
             s% History_Panels4_yaxis_reversed, &
             s% History_Panels4_other_yaxis_log, &
+            s% History_Panels4_same_yaxis_range, &
             s% History_Panels4_other_dymin, &
             s% History_Panels4_points_name, &
             s% History_Panels4_other_ymargin, &
@@ -316,6 +320,7 @@
             s% History_Panels5_other_ymax, &
             s% History_Panels5_yaxis_reversed, &
             s% History_Panels5_other_yaxis_log, &
+            s% History_Panels5_same_yaxis_range, &
             s% History_Panels5_other_dymin, &
             s% History_Panels5_points_name, &
             s% History_Panels5_other_ymargin, &
@@ -376,6 +381,7 @@
             s% History_Panels6_other_ymax, &
             s% History_Panels6_yaxis_reversed, &
             s% History_Panels6_other_yaxis_log, &
+            s% History_Panels6_same_yaxis_range, &
             s% History_Panels6_other_dymin, &
             s% History_Panels6_points_name, &
             s% History_Panels6_other_ymargin, &
@@ -436,6 +442,7 @@
             s% History_Panels7_other_ymax, &
             s% History_Panels7_yaxis_reversed, &
             s% History_Panels7_other_yaxis_log, &
+            s% History_Panels7_same_yaxis_range, &
             s% History_Panels7_other_dymin, &
             s% History_Panels7_points_name, &
             s% History_Panels7_other_ymargin, &
@@ -496,6 +503,7 @@
             s% History_Panels8_other_ymax, &
             s% History_Panels8_yaxis_reversed, &
             s% History_Panels8_other_yaxis_log, &
+            s% History_Panels8_same_yaxis_range, &
             s% History_Panels8_other_dymin, &
             s% History_Panels8_points_name, &
             s% History_Panels8_other_ymargin, &
@@ -556,6 +564,7 @@
             s% History_Panels9_other_ymax, &
             s% History_Panels9_other_yaxis_reversed, &
             s% History_Panels9_other_yaxis_log, &
+            s% History_Panels9_same_yaxis_range, &
             s% History_Panels9_other_dymin, &
             s% History_Panels9_points_name, &
             s% History_Panels9_other_ymargin, &
@@ -582,6 +591,7 @@
             hist_max_width, hist_num_panels, &
             hist_other_ymin, hist_other_ymax, &
             hist_other_yaxis_reversed, hist_other_yaxis_log, &
+            hist_same_yaxis_range, &
             hist_other_dymin, hist_points_name, &
             hist_other_ymargin, hist_other_yaxis_name, &
             hist_ymin, hist_ymax, &
@@ -610,7 +620,7 @@
             hist_ymin, hist_ymax, hist_dymin, hist_ymargin
          logical, intent(in), dimension(:) :: &
             hist_other_yaxis_reversed, hist_other_yaxis_log, &
-            hist_yaxis_reversed, hist_yaxis_log
+            hist_yaxis_reversed, hist_yaxis_log, hist_same_yaxis_range
          logical, intent(in) :: use_decorator
          character (len=*), intent(in), dimension(:) :: &
             hist_points_name, hist_other_yaxis_name, hist_yaxis_name
@@ -785,27 +795,6 @@
                      hist_other_ymargin(j), hist_other_yaxis_reversed(j), &
                      hist_other_dymin(j), other_ybot, other_ytop)
                end if
-               !write(*,1) trim(other_yname), other_ybot, other_ytop
-               call pgswin(xleft, xright, other_ybot, other_ytop)
-               call pgscf(1)
-               call pgsci(1)
-               call show_box_pgstar(s,'','CMSTV')
-               call pgsci(other_y_color)
-               if (hist_other_yaxis_log(j)) then
-                  call show_right_yaxis_label_pgstar(s,'log ' // other_yname)
-               else
-                  call show_right_yaxis_label_pgstar(s,other_yname)
-               end if
-               call pgslw(s% pgstar_lw)
-               if (other_yfile_data_len > 0) then
-                  call pgline( &
-                     other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
-                  deallocate(other_yfile_xdata, other_yfile_ydata)
-                  nullify(other_yfile_xdata, other_yfile_ydata)
-               else
-                  call pgline(n, xvec, other_yvec)
-               end if
-               call pgslw(1)
             end if
 
             if (have_yaxis) then
@@ -830,6 +819,40 @@
                      hist_ymargin(j), hist_yaxis_reversed(j), &
                      hist_dymin(j), ybot, ytop)
                end if
+            end if
+
+            if (have_yaxis .and. have_other_yaxis .and. hist_same_yaxis_range(j)) then
+               if (other_ybot < ybot) ybot = other_ybot
+               if (ybot < other_ybot) other_ybot = ybot
+               if (other_ytop > ytop) ytop = other_ytop
+               if (ytop > other_ytop) other_ytop = ytop
+            end if
+            
+            if (have_other_yaxis) then
+               !write(*,1) trim(other_yname), other_ybot, other_ytop
+               call pgswin(xleft, xright, other_ybot, other_ytop)
+               call pgscf(1)
+               call pgsci(1)
+               call show_box_pgstar(s,'','CMSTV')
+               call pgsci(other_y_color)
+               if (hist_other_yaxis_log(j)) then
+                  call show_right_yaxis_label_pgstar(s,'log ' // other_yname)
+               else
+                  call show_right_yaxis_label_pgstar(s,other_yname)
+               end if
+               call pgslw(s% pgstar_lw)
+               if (other_yfile_data_len > 0) then
+                  call pgline( &
+                     other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
+                  deallocate(other_yfile_xdata, other_yfile_ydata)
+                  nullify(other_yfile_xdata, other_yfile_ydata)
+               else
+                  call pgline(n, xvec, other_yvec)
+               end if
+               call pgslw(1)
+            end if
+
+            if (have_yaxis) then
                !write(*,1) trim(yname), ybot, ytop
                call pgswin(xleft, xright, ybot, ytop)
                call pgscf(1)

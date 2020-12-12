@@ -91,3 +91,17 @@
     new_j_rot_flag = .false.
 
 
+      ! use_w_div_wc_flag_with_rotation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_j_rot_flag_with_rotation
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! allows the use of rotation corrections and am transport to be computed with the
+      ! general newton solver
+
+      ! ::
+
+    use_w_div_wc_flag_with_rotation = .false.
+    use_j_rot_flag_with_rotation = .false.
+
+

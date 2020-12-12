@@ -2610,13 +2610,17 @@
     Profile_Panels1_title = 'Profile Panels1'
 
       ! ::
-
+ 
     Profile_Panels1_xaxis_name = 'mass'
     Profile_Panels1_xaxis_reversed = .false.
     Profile_Panels1_xmin = -101d0
     Profile_Panels1_xmax = -101d0
     Profile_Panels1_xmargin = 0d0
     Profile_Panels1_show_mix_regions_on_xaxis = .false.
+
+      ! ::
+ 
+    Profile_Panels1_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -2702,6 +2706,10 @@
     Profile_Panels2_xmax = -101d0
     Profile_Panels2_xmargin = 0d0
     Profile_Panels2_show_mix_regions_on_xaxis = .false.
+
+      ! ::
+ 
+    Profile_Panels2_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -2802,6 +2810,10 @@
     Profile_Panels3_xmax = -101d0
     Profile_Panels3_xmargin = 0d0
     Profile_Panels3_show_mix_regions_on_xaxis = .false.
+
+      ! ::
+ 
+    Profile_Panels3_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -3007,6 +3019,10 @@
     Profile_Panels5_show_mix_regions_on_xaxis = .false.
 
       ! ::
+ 
+    Profile_Panels5_same_yaxis_range(:) = .false.
+
+      ! ::
 
     Profile_Panels5_num_panels = 0
 
@@ -3108,6 +3124,10 @@
     Profile_Panels6_show_mix_regions_on_xaxis = .false.
 
       ! ::
+ 
+    Profile_Panels6_same_yaxis_range(:) = .false.
+
+      ! ::
 
     Profile_Panels6_num_panels = 0
 
@@ -3185,6 +3205,10 @@
     Profile_Panels7_xmax = -101d0
     Profile_Panels7_xmargin = 0d0
     Profile_Panels7_show_mix_regions_on_xaxis = .false.
+
+      ! ::
+ 
+    Profile_Panels7_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -3266,6 +3290,10 @@
     Profile_Panels8_show_mix_regions_on_xaxis = .false.
 
       ! ::
+ 
+    Profile_Panels8_same_yaxis_range(:) = .false.
+
+      ! ::
 
     Profile_Panels8_num_panels = 0
 
@@ -3343,6 +3371,10 @@
     Profile_Panels9_xmax = -101d0
     Profile_Panels9_xmargin = 0d0
     Profile_Panels9_show_mix_regions_on_xaxis = .false.
+
+      ! ::
+ 
+    Profile_Panels9_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -4209,6 +4241,10 @@
 
       ! ::
 
+    History_Panels1_same_yaxis_range(:) = .false.
+
+      ! ::
+
     History_Panels1_yaxis_name(:) = ''
     History_Panels1_yaxis_reversed(:) = .false.
     History_Panels1_yaxis_log(:) = .false.
@@ -4338,6 +4374,10 @@
 
       ! ::
 
+    History_Panels2_same_yaxis_range(:) = .false.
+
+      ! ::
+
     History_Panels2_num_panels = 0
 
       ! ::
@@ -4414,6 +4454,10 @@
     History_Panels3_xaxis_reversed = .false.
     History_Panels3_xaxis_log = .false.
     History_Panels3_xmargin = 0.0
+
+      ! ::
+
+    History_Panels3_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -4510,6 +4554,10 @@
 
       ! ::
 
+    History_Panels4_same_yaxis_range(:) = .false.
+
+      ! ::
+
     History_Panels4_other_yaxis_name(:) = ''
     History_Panels4_other_yaxis_reversed(:) = .false.
     History_Panels4_other_yaxis_log(:) = .false.
@@ -4572,6 +4620,10 @@
     History_Panels5_xaxis_reversed = .false.
     History_Panels5_xaxis_log = .false.
     History_Panels5_xmargin = 0.0
+
+      ! ::
+
+    History_Panels5_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -4660,6 +4712,10 @@
 
       ! ::
 
+    History_Panels6_same_yaxis_range(:) = .false.
+
+      ! ::
+
     History_Panels6_num_panels = 0
 
       ! ::
@@ -4736,6 +4792,10 @@
     History_Panels7_xaxis_reversed = .false.
     History_Panels7_xaxis_log = .false.
     History_Panels7_xmargin = 0.0
+
+      ! ::
+
+    History_Panels7_same_yaxis_range(:) = .false.
 
       ! ::
 
@@ -4818,6 +4878,10 @@
 
       ! ::
 
+    History_Panels8_same_yaxis_range(:) = .false.
+
+      ! ::
+
     History_Panels8_num_panels = 0
 
       ! ::
@@ -4894,6 +4958,10 @@
     History_Panels9_xaxis_reversed = .false.
     History_Panels9_xaxis_log = .false.
     History_Panels9_xmargin = 0.0
+
+      ! ::
+
+    History_Panels9_same_yaxis_range(:) = .false.
 
       ! ::
 

@@ -80,8 +80,6 @@
       thermohaline_coeff = 2
       thermohaline_option = 'Kippenhahn'
 
-      mlt_make_surface_no_mixing = .true.
-
       okay_to_reduce_gradT_excess = .true. 
 
       gradT_excess_f1 = 1d-4

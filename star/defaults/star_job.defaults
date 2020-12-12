@@ -1611,20 +1611,6 @@
     change_rotation_flag = .false.
     change_initial_rotation_flag = .false.
 
-
-      ! use_w_div_wc_flag_with_rotation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! use_j_rot_flag_with_rotation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! allows the use of rotation corrections and am transport to be computed with the
-      ! general newton solver
-
-      ! ::
-
-    use_w_div_wc_flag_with_rotation = .false.
-    use_j_rot_flag_with_rotation = .false.
-
       ! the following only apply when rotation is already on (i.e., when ``rotation_flag`` is true),
       ! including when you have just done ``change_rotation_flag`` true.
       ! all of these initialize the model to uniform omega (i.e. "solid body")

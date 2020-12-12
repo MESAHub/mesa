@@ -140,6 +140,7 @@
             Profile_Panels1_other_yaxis_reversed, &
             Profile_Panels1_yaxis_log, &
             Profile_Panels1_other_yaxis_log, &
+            Profile_Panels1_same_yaxis_range, &
             Profile_Panels1_ymin, &
             Profile_Panels1_other_ymin, &
             Profile_Panels1_ymax, &
@@ -189,6 +190,7 @@
             Profile_Panels2_other_yaxis_reversed, &
             Profile_Panels2_yaxis_log, &
             Profile_Panels2_other_yaxis_log, &
+            Profile_Panels2_same_yaxis_range, &
             Profile_Panels2_ymin, &
             Profile_Panels2_other_ymin, &
             Profile_Panels2_ymax, &
@@ -238,6 +240,7 @@
             Profile_Panels3_other_yaxis_reversed, &
             Profile_Panels3_yaxis_log, &
             Profile_Panels3_other_yaxis_log, &
+            Profile_Panels3_same_yaxis_range, &
             Profile_Panels3_ymin, &
             Profile_Panels3_other_ymin, &
             Profile_Panels3_ymax, &
@@ -287,6 +290,7 @@
             Profile_Panels4_other_yaxis_reversed, &
             Profile_Panels4_yaxis_log, &
             Profile_Panels4_other_yaxis_log, &
+            Profile_Panels4_same_yaxis_range, &
             Profile_Panels4_ymin, &
             Profile_Panels4_other_ymin, &
             Profile_Panels4_ymax, &
@@ -337,6 +341,7 @@
             Profile_Panels5_other_yaxis_reversed, &
             Profile_Panels5_yaxis_log, &
             Profile_Panels5_other_yaxis_log, &
+            Profile_Panels5_same_yaxis_range, &
             Profile_Panels5_ymin, &
             Profile_Panels5_other_ymin, &
             Profile_Panels5_ymax, &
@@ -387,6 +392,7 @@
             Profile_Panels6_other_yaxis_reversed, &
             Profile_Panels6_yaxis_log, &
             Profile_Panels6_other_yaxis_log, &
+            Profile_Panels6_same_yaxis_range, &
             Profile_Panels6_ymin, &
             Profile_Panels6_other_ymin, &
             Profile_Panels6_ymax, &
@@ -437,6 +443,7 @@
             Profile_Panels7_other_yaxis_reversed, &
             Profile_Panels7_yaxis_log, &
             Profile_Panels7_other_yaxis_log, &
+            Profile_Panels7_same_yaxis_range, &
             Profile_Panels7_ymin, &
             Profile_Panels7_other_ymin, &
             Profile_Panels7_ymax, &
@@ -487,6 +494,7 @@
             Profile_Panels8_other_yaxis_reversed, &
             Profile_Panels8_yaxis_log, &
             Profile_Panels8_other_yaxis_log, &
+            Profile_Panels8_same_yaxis_range, &
             Profile_Panels8_ymin, &
             Profile_Panels8_other_ymin, &
             Profile_Panels8_ymax, &
@@ -537,6 +545,7 @@
             Profile_Panels9_other_yaxis_reversed, &
             Profile_Panels9_yaxis_log, &
             Profile_Panels9_other_yaxis_log, &
+            Profile_Panels9_same_yaxis_range, &
             Profile_Panels9_ymin, &
             Profile_Panels9_other_ymin, &
             Profile_Panels9_ymax, &
@@ -1743,6 +1752,7 @@
             History_Panels1_other_yaxis_reversed, &
             History_Panels1_xaxis_log, &
             History_Panels1_other_yaxis_log, &
+            History_Panels1_same_yaxis_range, &
             History_Panels1_other_ymin, &
             History_Panels1_other_ymax, &
             History_Panels1_other_dymin, &
@@ -1784,6 +1794,7 @@
             History_Panels2_other_yaxis_reversed, &
             History_Panels2_xaxis_log, &
             History_Panels2_other_yaxis_log, &
+            History_Panels2_same_yaxis_range, &
             History_Panels2_other_ymin, &
             History_Panels2_other_ymax, &
             History_Panels2_other_dymin, &
@@ -1825,6 +1836,7 @@
             History_Panels3_other_yaxis_reversed, &
             History_Panels3_xaxis_log, &
             History_Panels3_other_yaxis_log, &
+            History_Panels3_same_yaxis_range, &
             History_Panels3_other_ymin, &
             History_Panels3_other_ymax, &
             History_Panels3_other_dymin, &
@@ -1866,6 +1878,7 @@
             History_Panels4_other_yaxis_reversed, &
             History_Panels4_xaxis_log, &
             History_Panels4_other_yaxis_log, &
+            History_Panels4_same_yaxis_range, &
             History_Panels4_other_ymin, &
             History_Panels4_other_ymax, &
             History_Panels4_other_dymin, &
@@ -1907,6 +1920,7 @@
             History_Panels5_other_yaxis_reversed, &
             History_Panels5_xaxis_log, &
             History_Panels5_other_yaxis_log, &
+            History_Panels5_same_yaxis_range, &
             History_Panels5_other_ymin, &
             History_Panels5_other_ymax, &
             History_Panels5_other_dymin, &
@@ -1948,6 +1962,7 @@
             History_Panels6_other_yaxis_reversed, &
             History_Panels6_xaxis_log, &
             History_Panels6_other_yaxis_log, &
+            History_Panels6_same_yaxis_range, &
             History_Panels6_other_ymin, &
             History_Panels6_other_ymax, &
             History_Panels6_other_dymin, &
@@ -1989,6 +2004,7 @@
             History_Panels7_other_yaxis_reversed, &
             History_Panels7_xaxis_log, &
             History_Panels7_other_yaxis_log, &
+            History_Panels7_same_yaxis_range, &
             History_Panels7_other_ymin, &
             History_Panels7_other_ymax, &
             History_Panels7_other_dymin, &
@@ -2030,6 +2046,7 @@
             History_Panels8_other_yaxis_reversed, &
             History_Panels8_xaxis_log, &
             History_Panels8_other_yaxis_log, &
+            History_Panels8_same_yaxis_range, &
             History_Panels8_other_ymin, &
             History_Panels8_other_ymax, &
             History_Panels8_other_dymin, &
@@ -2071,6 +2088,7 @@
             History_Panels9_other_yaxis_reversed, &
             History_Panels9_xaxis_log, &
             History_Panels9_other_yaxis_log, &
+            History_Panels9_same_yaxis_range, &
             History_Panels9_other_ymin, &
             History_Panels9_other_ymax, &
             History_Panels9_other_dymin, &
@@ -3255,6 +3273,7 @@
          s% Profile_Panels1_other_yaxis_reversed = Profile_Panels1_other_yaxis_reversed
          s% Profile_Panels1_yaxis_log = Profile_Panels1_yaxis_log
          s% Profile_Panels1_other_yaxis_log = Profile_Panels1_other_yaxis_log
+         s% Profile_Panels1_same_yaxis_range = Profile_Panels1_same_yaxis_range
          s% Profile_Panels1_ymin = Profile_Panels1_ymin
          s% Profile_Panels1_other_ymin = Profile_Panels1_other_ymin
          s% Profile_Panels1_ymax = Profile_Panels1_ymax
@@ -3304,6 +3323,7 @@
          s% Profile_Panels2_other_yaxis_reversed = Profile_Panels2_other_yaxis_reversed
          s% Profile_Panels2_yaxis_log = Profile_Panels2_yaxis_log
          s% Profile_Panels2_other_yaxis_log = Profile_Panels2_other_yaxis_log
+         s% Profile_Panels2_same_yaxis_range = Profile_Panels2_same_yaxis_range
          s% Profile_Panels2_ymin = Profile_Panels2_ymin
          s% Profile_Panels2_other_ymin = Profile_Panels2_other_ymin
          s% Profile_Panels2_ymax = Profile_Panels2_ymax
@@ -3353,6 +3373,7 @@
          s% Profile_Panels3_other_yaxis_reversed = Profile_Panels3_other_yaxis_reversed
          s% Profile_Panels3_yaxis_log = Profile_Panels3_yaxis_log
          s% Profile_Panels3_other_yaxis_log = Profile_Panels3_other_yaxis_log
+         s% Profile_Panels3_same_yaxis_range = Profile_Panels3_same_yaxis_range
          s% Profile_Panels3_ymin = Profile_Panels3_ymin
          s% Profile_Panels3_other_ymin = Profile_Panels3_other_ymin
          s% Profile_Panels3_ymax = Profile_Panels3_ymax
@@ -3402,6 +3423,7 @@
          s% Profile_Panels4_other_yaxis_reversed = Profile_Panels4_other_yaxis_reversed
          s% Profile_Panels4_yaxis_log = Profile_Panels4_yaxis_log
          s% Profile_Panels4_other_yaxis_log = Profile_Panels4_other_yaxis_log
+         s% Profile_Panels4_same_yaxis_range = Profile_Panels4_same_yaxis_range
          s% Profile_Panels4_ymin = Profile_Panels4_ymin
          s% Profile_Panels4_other_ymin = Profile_Panels4_other_ymin
          s% Profile_Panels4_ymax = Profile_Panels4_ymax
@@ -3451,6 +3473,7 @@
          s% Profile_Panels5_other_yaxis_reversed = Profile_Panels5_other_yaxis_reversed
          s% Profile_Panels5_yaxis_log = Profile_Panels5_yaxis_log
          s% Profile_Panels5_other_yaxis_log = Profile_Panels5_other_yaxis_log
+         s% Profile_Panels5_same_yaxis_range = Profile_Panels5_same_yaxis_range
          s% Profile_Panels5_ymin = Profile_Panels5_ymin
          s% Profile_Panels5_other_ymin = Profile_Panels5_other_ymin
          s% Profile_Panels5_ymax = Profile_Panels5_ymax
@@ -3500,6 +3523,7 @@
          s% Profile_Panels6_other_yaxis_reversed = Profile_Panels6_other_yaxis_reversed
          s% Profile_Panels6_yaxis_log = Profile_Panels6_yaxis_log
          s% Profile_Panels6_other_yaxis_log = Profile_Panels6_other_yaxis_log
+         s% Profile_Panels6_same_yaxis_range = Profile_Panels6_same_yaxis_range
          s% Profile_Panels6_ymin = Profile_Panels6_ymin
          s% Profile_Panels6_other_ymin = Profile_Panels6_other_ymin
          s% Profile_Panels6_ymax = Profile_Panels6_ymax
@@ -3549,6 +3573,7 @@
          s% Profile_Panels7_other_yaxis_reversed = Profile_Panels7_other_yaxis_reversed
          s% Profile_Panels7_yaxis_log = Profile_Panels7_yaxis_log
          s% Profile_Panels7_other_yaxis_log = Profile_Panels7_other_yaxis_log
+         s% Profile_Panels7_same_yaxis_range = Profile_Panels7_same_yaxis_range
          s% Profile_Panels7_ymin = Profile_Panels7_ymin
          s% Profile_Panels7_other_ymin = Profile_Panels7_other_ymin
          s% Profile_Panels7_ymax = Profile_Panels7_ymax
@@ -3598,6 +3623,7 @@
          s% Profile_Panels8_other_yaxis_reversed = Profile_Panels8_other_yaxis_reversed
          s% Profile_Panels8_yaxis_log = Profile_Panels8_yaxis_log
          s% Profile_Panels8_other_yaxis_log = Profile_Panels8_other_yaxis_log
+         s% Profile_Panels8_same_yaxis_range = Profile_Panels8_same_yaxis_range
          s% Profile_Panels8_ymin = Profile_Panels8_ymin
          s% Profile_Panels8_other_ymin = Profile_Panels8_other_ymin
          s% Profile_Panels8_ymax = Profile_Panels8_ymax
@@ -3648,6 +3674,7 @@
          s% Profile_Panels9_other_yaxis_reversed = Profile_Panels9_other_yaxis_reversed
          s% Profile_Panels9_yaxis_log = Profile_Panels9_yaxis_log
          s% Profile_Panels9_other_yaxis_log = Profile_Panels9_other_yaxis_log
+         s% Profile_Panels9_same_yaxis_range = Profile_Panels9_same_yaxis_range
          s% Profile_Panels9_ymin = Profile_Panels9_ymin
          s% Profile_Panels9_other_ymin = Profile_Panels9_other_ymin
          s% Profile_Panels9_ymax = Profile_Panels9_ymax
@@ -4961,6 +4988,7 @@
          s% History_Panels1_other_yaxis_name = History_Panels1_other_yaxis_name
          s% History_Panels1_other_yaxis_reversed = History_Panels1_other_yaxis_reversed
          s% History_Panels1_other_yaxis_log = History_Panels1_other_yaxis_log
+         s% History_Panels1_same_yaxis_range = History_Panels1_same_yaxis_range
          s% History_Panels1_other_ymin = History_Panels1_other_ymin
          s% History_Panels1_other_ymax = History_Panels1_other_ymax
          s% History_Panels1_other_dymin = History_Panels1_other_dymin
@@ -5002,6 +5030,7 @@
          s% History_Panels2_other_yaxis_name = History_Panels2_other_yaxis_name
          s% History_Panels2_other_yaxis_reversed = History_Panels2_other_yaxis_reversed
          s% History_Panels2_other_yaxis_log = History_Panels2_other_yaxis_log
+         s% History_Panels2_same_yaxis_range = History_Panels2_same_yaxis_range
          s% History_Panels2_other_ymin = History_Panels2_other_ymin
          s% History_Panels2_other_ymax = History_Panels2_other_ymax
          s% History_Panels2_other_dymin = History_Panels2_other_dymin
@@ -5043,6 +5072,7 @@
          s% History_Panels3_other_yaxis_name = History_Panels3_other_yaxis_name
          s% History_Panels3_other_yaxis_reversed = History_Panels3_other_yaxis_reversed
          s% History_Panels3_other_yaxis_log = History_Panels3_other_yaxis_log
+         s% History_Panels3_same_yaxis_range = History_Panels3_same_yaxis_range
          s% History_Panels3_other_ymin = History_Panels3_other_ymin
          s% History_Panels3_other_ymax = History_Panels3_other_ymax
          s% History_Panels3_other_dymin = History_Panels3_other_dymin
@@ -5084,6 +5114,7 @@
          s% History_Panels4_other_yaxis_name = History_Panels4_other_yaxis_name
          s% History_Panels4_other_yaxis_reversed = History_Panels4_other_yaxis_reversed
          s% History_Panels4_other_yaxis_log = History_Panels4_other_yaxis_log
+         s% History_Panels4_same_yaxis_range = History_Panels4_same_yaxis_range
          s% History_Panels4_other_ymin = History_Panels4_other_ymin
          s% History_Panels4_other_ymax = History_Panels4_other_ymax
          s% History_Panels4_other_dymin = History_Panels4_other_dymin
@@ -5125,6 +5156,7 @@
          s% History_Panels5_other_yaxis_name = History_Panels5_other_yaxis_name
          s% History_Panels5_other_yaxis_reversed = History_Panels5_other_yaxis_reversed
          s% History_Panels5_other_yaxis_log = History_Panels5_other_yaxis_log
+         s% History_Panels5_same_yaxis_range = History_Panels5_same_yaxis_range
          s% History_Panels5_other_ymin = History_Panels5_other_ymin
          s% History_Panels5_other_ymax = History_Panels5_other_ymax
          s% History_Panels5_other_dymin = History_Panels5_other_dymin
@@ -5166,6 +5198,7 @@
          s% History_Panels6_other_yaxis_name = History_Panels6_other_yaxis_name
          s% History_Panels6_other_yaxis_reversed = History_Panels6_other_yaxis_reversed
          s% History_Panels6_other_yaxis_log = History_Panels6_other_yaxis_log
+         s% History_Panels6_same_yaxis_range = History_Panels6_same_yaxis_range
          s% History_Panels6_other_ymin = History_Panels6_other_ymin
          s% History_Panels6_other_ymax = History_Panels6_other_ymax
          s% History_Panels6_other_dymin = History_Panels6_other_dymin
@@ -5207,6 +5240,7 @@
          s% History_Panels7_other_yaxis_name = History_Panels7_other_yaxis_name
          s% History_Panels7_other_yaxis_reversed = History_Panels7_other_yaxis_reversed
          s% History_Panels7_other_yaxis_log = History_Panels7_other_yaxis_log
+         s% History_Panels7_same_yaxis_range = History_Panels7_same_yaxis_range
          s% History_Panels7_other_ymin = History_Panels7_other_ymin
          s% History_Panels7_other_ymax = History_Panels7_other_ymax
          s% History_Panels7_other_dymin = History_Panels7_other_dymin
@@ -5248,6 +5282,7 @@
          s% History_Panels8_other_yaxis_name = History_Panels8_other_yaxis_name
          s% History_Panels8_other_yaxis_reversed = History_Panels8_other_yaxis_reversed
          s% History_Panels8_other_yaxis_log = History_Panels8_other_yaxis_log
+         s% History_Panels8_same_yaxis_range = History_Panels8_same_yaxis_range
          s% History_Panels8_other_ymin = History_Panels8_other_ymin
          s% History_Panels8_other_ymax = History_Panels8_other_ymax
          s% History_Panels8_other_dymin = History_Panels8_other_dymin
@@ -5289,6 +5324,7 @@
          s% History_Panels9_other_yaxis_name = History_Panels9_other_yaxis_name
          s% History_Panels9_other_yaxis_reversed = History_Panels9_other_yaxis_reversed
          s% History_Panels9_other_yaxis_log = History_Panels9_other_yaxis_log
+         s% History_Panels9_same_yaxis_range = History_Panels9_same_yaxis_range
          s% History_Panels9_other_ymin = History_Panels9_other_ymin
          s% History_Panels9_other_ymax = History_Panels9_other_ymax
          s% History_Panels9_other_dymin = History_Panels9_other_dymin
@@ -6229,6 +6265,7 @@
          History_Panels1_other_yaxis_reversed(:) = .false.
          History_Panels1_yaxis_log(:) = .false.
          History_Panels1_other_yaxis_log(:) = .false.
+         History_Panels1_same_yaxis_range(:) = .false.
          History_Panels1_ymin(:) = 0
          History_Panels1_other_ymin(:) = 0
          History_Panels1_ymax(:) = 0
@@ -6245,6 +6282,7 @@
          History_Panels2_other_yaxis_reversed(:) = .false.
          History_Panels2_yaxis_log(:) = .false.
          History_Panels2_other_yaxis_log(:) = .false.
+         History_Panels2_same_yaxis_range(:) = .false.
          History_Panels2_ymin(:) = 0
          History_Panels2_other_ymin(:) = 0
          History_Panels2_ymax(:) = 0
@@ -6261,6 +6299,7 @@
          History_Panels3_other_yaxis_reversed(:) = .false.
          History_Panels3_yaxis_log(:) = .false.
          History_Panels3_other_yaxis_log(:) = .false.
+         History_Panels3_same_yaxis_range(:) = .false.
          History_Panels3_ymin(:) = 0
          History_Panels3_other_ymin(:) = 0
          History_Panels3_ymax(:) = 0
@@ -6277,6 +6316,7 @@
          History_Panels4_other_yaxis_reversed(:) = .false.
          History_Panels4_yaxis_log(:) = .false.
          History_Panels4_other_yaxis_log(:) = .false.
+         History_Panels4_same_yaxis_range(:) = .false.
          History_Panels4_ymin(:) = 0
          History_Panels4_other_ymin(:) = 0
          History_Panels4_ymax(:) = 0
@@ -6293,6 +6333,7 @@
          History_Panels5_other_yaxis_reversed(:) = .false.
          History_Panels5_yaxis_log(:) = .false.
          History_Panels5_other_yaxis_log(:) = .false.
+         History_Panels5_same_yaxis_range(:) = .false.
          History_Panels5_ymin(:) = 0
          History_Panels5_other_ymin(:) = 0
          History_Panels5_ymax(:) = 0
@@ -6309,6 +6350,7 @@
          History_Panels6_other_yaxis_reversed(:) = .false.
          History_Panels6_yaxis_log(:) = .false.
          History_Panels6_other_yaxis_log(:) = .false.
+         History_Panels6_same_yaxis_range(:) = .false.
          History_Panels6_ymin(:) = 0
          History_Panels6_other_ymin(:) = 0
          History_Panels6_ymax(:) = 0
@@ -6325,6 +6367,7 @@
          History_Panels7_other_yaxis_reversed(:) = .false.
          History_Panels7_yaxis_log(:) = .false.
          History_Panels7_other_yaxis_log(:) = .false.
+         History_Panels7_same_yaxis_range(:) = .false.
          History_Panels7_ymin(:) = 0
          History_Panels7_other_ymin(:) = 0
          History_Panels7_ymax(:) = 0
@@ -6341,6 +6384,7 @@
          History_Panels8_other_yaxis_reversed(:) = .false.
          History_Panels8_yaxis_log(:) = .false.
          History_Panels8_other_yaxis_log(:) = .false.
+         History_Panels8_same_yaxis_range(:) = .false.
          History_Panels8_ymin(:) = 0
          History_Panels8_other_ymin(:) = 0
          History_Panels8_ymax(:) = 0
@@ -6357,6 +6401,7 @@
          History_Panels9_other_yaxis_reversed(:) = .false.
          History_Panels9_yaxis_log(:) = .false.
          History_Panels9_other_yaxis_log(:) = .false.
+         History_Panels9_same_yaxis_range(:) = .false.
          History_Panels9_ymin(:) = 0
          History_Panels9_other_ymin(:) = 0
          History_Panels9_ymax(:) = 0

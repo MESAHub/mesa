@@ -33,10 +33,6 @@
       ion_coulomb_corrections = 'PCR2009'
       electron_coulomb_corrections = 'Itoh2002'
 
-      change_conv_vel_flag = .true.
-      new_conv_vel_flag = .false.
-      logT_for_conv_vel_flag = 10d0
-
       set_initial_dt = .true.
       years_for_initial_dt = 1
 
