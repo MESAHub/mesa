@@ -71,26 +71,18 @@
       delta_lgRho_cntr_limit = 1e-3
       delta_lgRho_cntr_hard_limit = 3e-3
 
-      limit_for_rel_error_in_energy_conservation = 1d99
-      hard_limit_for_rel_error_in_energy_conservation = 1d99
-
       varcontrol_target = 1e-3
       mesh_delta_coeff = 1.0
 
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 0d0
 
-
       accrete_same_as_surface = .true.
       mass_change = 1d-6
 
-
       use_gold2_tolerances = .false.
-      use_gold_tolerances = .false.
+
       varcontrol_target = 1d-3
-      warning_limit_for_max_residual = 1d99
-
-
 
       photo_interval = 50
       profile_interval = 50
