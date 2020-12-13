@@ -58,7 +58,7 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
+      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
       alpha_semiconvection = 0.01
       thermohaline_coeff = 2
 

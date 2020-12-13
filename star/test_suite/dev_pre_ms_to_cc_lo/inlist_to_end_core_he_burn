@@ -58,11 +58,33 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
+      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
       alpha_semiconvection = 0.01
       thermohaline_coeff = 2
 
 ! mixing
+      ! overshooting is turned on in inlist_to_end_core_he_burn, off otherwise.
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'burn_Z'
+      overshoot_zone_loc(1) = 'shell'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.01
+      overshoot_f0(1) = 0.005
+
+      overshoot_scheme(2) = 'none'
+      overshoot_zone_type(2) = 'burn_Z'
+      overshoot_zone_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'top'
+      
+      overshoot_scheme(3) = 'exponential'
+      overshoot_zone_type(3) = 'any'
+      overshoot_zone_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'any'
+      overshoot_f(3) = 0.01
+      overshoot_f0(3) = 0.005
+
+      min_overshoot_q = 0d0
+      overshoot_D_min = 100.0
 
 ! timesteps
 

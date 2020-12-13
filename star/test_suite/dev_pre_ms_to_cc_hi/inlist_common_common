@@ -21,6 +21,8 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
+      !pgstar_flag = .true.
+
 / ! end of star_job namelist
 
 &eos
@@ -65,10 +67,12 @@
       mixing_length_alpha = 1.5
       MLT_option = 'Henyey'
 
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       thermohaline_option = 'Kippenhahn'
+      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
+      alpha_semiconvection = 0
+      thermohaline_coeff = 0
 
       mlt_make_surface_no_mixing = .true.
 

@@ -37,7 +37,7 @@
       fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 8000
+      max_model_number = 4000
       !max_number_retries = 37
 
 ! wind
@@ -47,9 +47,6 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
 
 ! mixing
 
