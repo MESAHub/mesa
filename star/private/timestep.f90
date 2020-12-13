@@ -527,7 +527,7 @@
             if (i_limit == Tlim_dX) then
                write(s% retry_message, '(a, i5, i8)') &
                   'hard limit dX  ' // trim(chem_isos% name(s% chem_id(s% Tlim_dX_species))), &
-                  s% Tlim_dX_cell, s% model_number
+                  s% Tlim_dX_cell
             else if (i_limit == Tlim_dlgRho) then
                call get_dlgRho_info(s, k, max_dln)
                if (k > 0) write(s% retry_message, '(a, i5, i8, 99f16.9)') &
@@ -547,41 +547,41 @@
                write(s% retry_message, '(a, i5, i8)') &
                   'hard limit dX_div_X  ' // &
                   trim(chem_isos% name(s% chem_id(s% Tlim_dX_div_X_species))), &
-                  s% Tlim_dX_div_X_cell, s% model_number
+                  s% Tlim_dX_div_X_cell
             else if (i_limit == Tlim_dH) then
                write(s% retry_message, '(a, i5, i8)') &
-                  'hard limit dH', s% Tlim_dX_cell, s% model_number
+                  'hard limit dH', s% Tlim_dX_cell
             else if (i_limit == Tlim_dH_div_H) then
                write(s% retry_message, '(a, i5, i8)') &
                   'hard limit dH_div_H', &
-                  s% Tlim_dX_div_X_cell, s% model_number
+                  s% Tlim_dX_div_X_cell
             else if (i_limit == Tlim_dHe) then
                write(s% retry_message, '(a, i5, i8)') &
                   'hard limit dHe', &
-                  s% Tlim_dX_cell, s% model_number
+                  s% Tlim_dX_cell
             else if (i_limit == Tlim_dHe_div_He) then
                write(s% retry_message, '(a, i5, i8)') &
                   'hard limit dHe_div_He', &
-                  s% Tlim_dX_div_X_cell, s% model_number
+                  s% Tlim_dX_div_X_cell
             else if (i_limit == Tlim_dHe3) then
                write(s% retry_message, '(a, i5, i8)') &
                   'hard limit dHe3', &
-                  s% Tlim_dX_cell, s% model_number
+                  s% Tlim_dX_cell
             else if (i_limit == Tlim_dHe3_div_He3) then
                write(s% retry_message, '(a, i8)') &
                   'hard limit dHe3_div_He3', &
-                  s% Tlim_dX_div_X_cell, s% model_number
+                  s% Tlim_dX_div_X_cell
             else if (i_limit == Tlim_dlgL_nuc) then
                write(s% retry_message, '(a, i8)') &
-                  'hard limit dlgL_nuc', s% model_number
+                  'hard limit dlgL_nuc'
             else if (i_limit == Tlim_dlgL_nuc_cat) then
                write(s% retry_message, '(a, i8)') &
                   'hard limit change in lgL ' // &
                   trim(category_name(s% Tlim_dlgL_nuc_category)), &
-                  s% Tlim_dlgL_nuc_cell, s% model_number
+                  s% Tlim_dlgL_nuc_cell
             else if (i_limit > 0) then
                write(s% retry_message, '(a, i8)') 'hard limit ' // &
-                  trim(dt_why_str(i_limit)), s% model_number
+                  trim(dt_why_str(i_limit))
             !else if (len_trim(s% retry_message) == 0) then
             !   stop 'timestep i_limit = 0 but have ierr'
             end if

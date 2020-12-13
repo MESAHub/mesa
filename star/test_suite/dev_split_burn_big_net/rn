@@ -24,7 +24,7 @@ fi
 
 # check if can skip
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_after_core_he_burn.mod after_core_he_burn.mod
+   cp standard_lgT_9.55.mod lgT_9.55.mod
 else
    do_one inlist_to_lgT_9.55_header lgT_9.55.mod
    cp lgT_9.55.mod standard_lgT_9.55.mod

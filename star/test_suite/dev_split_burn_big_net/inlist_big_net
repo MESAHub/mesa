@@ -12,9 +12,14 @@
       change_initial_net = .true.
       new_net_name = 'mesa_201.net'
 
-      set_initial_age = .false.
-      set_initial_model_number = .false.
-      set_initial_number_retries = .false.
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+      
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
 
       !pgstar_flag = .true.
 
@@ -46,16 +51,17 @@
 ! mixing
 
 ! timesteps
+      ! relax for testing big net.
+      delta_XSi_cntr_limit = 0.05d0
+      delta_XSi_cntr_hard_limit = 0.10d0
 
 ! mesh
 
 ! solver
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
+      when_to_stop_rtol = 1d99
+      when_to_stop_atol = 1d99
 
 ! output
-      
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -115,6 +121,6 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 2.1 ! -101d0
+Profile_Panels3_xmax = 2.6 ! -101d0
 
 / ! end of pgstar namelist
