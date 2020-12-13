@@ -1,0 +1,31 @@
+   
+   ! some general info about the model
+   
+      model_number ! counting from the start of the run
+      star_age ! elapsed simulated time in years since the start of the run
+      star_mass ! in Msun units
+      !star_mdot ! d(star_mass)/dt (in msolar per year)
+      !time_step ! timestep in years since previous model
+      log_dt ! log10 time_step
+      num_zones ! number of zones in the model
+
+      rel_E_err
+      log_rel_E_err
+      log_rel_run_E_err
+            
+   
+   ! conditions near surface
+   
+      log_L ! log10 luminosity in Lsun units
+      log_Teff ! log10 effective temperature
+      log_R ! log10 radius in Rsun units
+   
+   ! misc
+   
+      v_surf_km_s
+      v_surf
+      v_div_cs ! velocity divided by sound speed at outermost grid point
+      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
+      num_retries ! total during the run
+      num_iters
+

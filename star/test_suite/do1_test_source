@@ -25,6 +25,11 @@ do_one create_zams "finished create main sequence" skip skip
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 do_one det_riemann "shock has reached target location" "final.mod" auto    
+do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
+do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
+#do_one dev_Eturb "" "final.mod" auto                 
+do_one dev_pre_ms_to_cc_hi "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one dev_pre_ms_to_cc_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 do_one gyre_in_mesa_bcep "matched target" skip skip
@@ -35,7 +40,6 @@ do_one gyre_in_mesa_spb "matched target" skip skip
 do_one gyre_in_mesa_wd "matched target" skip skip
 do_one hb_2M "termination code: xa_central_lower_limit" "final.mod" auto                                 
 do_one high_mass "stop because have dropped below central lower limit for h1" "final.mod" auto
-do_one high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 do_one high_z "stop because have dropped below central lower limit for he4" "final.mod" auto             
 do_one hot_cool_wind "all values are within tolerance" "final.mod" auto                                
 do_one hse_riemann "max_abs_v_div_cs is small enough" "final.mod" auto
@@ -60,7 +64,6 @@ do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.m
 do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto   
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
-do_one ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
 do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto

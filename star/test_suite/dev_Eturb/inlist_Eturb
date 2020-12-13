@@ -1,0 +1,176 @@
+! test case for save and load file
+
+&star_job
+
+   show_log_description_at_start = .false.
+
+   load_saved_model = .true.
+   !saved_model_name = 'LBV_env.mod'    ! needs Eturb_Lsurf_factor = 0.25d0 to match MLT
+   !saved_model_name = 'RSG_env.mod'    ! needs Eturb_Lsurf_factor = 0.25d0 to match MLT
+   !saved_model_name = 'Cepheid_env.mod'    ! ok with Eturb_Lsurf_factor = 0.5d0
+   saved_model_name = 'RR_Lyrae_env.mod'    ! ok with Eturb_Lsurf_factor = 0.5d0
+   
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+   
+   set_initial_age = .true.
+   initial_age = 0
+   
+   set_initial_model_number = .true.
+   initial_model_number = 0
+
+   set_initial_dt = .true.
+   !years_for_initial_dt = -1
+   seconds_for_initial_dt = 1
+
+   set_initial_tau_factor = .true.
+   set_to_this_tau_factor = 1d0
+
+   change_initial_Eturb_flag = .true.
+   new_Eturb_flag = .true.
+
+   change_initial_v_flag = .true.
+   new_v_flag = .true.
+
+   pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+      use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+      kap_file_prefix = 'a09'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      kap_CO_prefix = 'a09_co'
+/ ! end of kap namelist
+
+
+&controls  
+   !Eturb_Lsurf_factor = 0.25d0 ! for RSG and LBV
+
+   initial_z = 0.02d0
+   initial_mass = 30d0
+   
+   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with Eturb
+      
+   use_momentum_outer_BC = .true.
+
+   atm_option = 'T_tau'
+   atm_T_tau_relation = 'Eddington'
+   atm_T_tau_opacity = 'fixed'
+   Pextra_factor = 2
+   
+   max_years_for_timestep = 1d2
+   max_age = 1d6
+
+   varcontrol_target = 1d-3 
+   
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   dxdt_nuc_factor = 0
+   mix_factor = 0
+   
+   
+   max_number_retries = 0
+   max_model_number = 10000
+   
+      !   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      !   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
+      !   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq ~ Eturb_alfam
+      !   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar   
+      
+
+   !use_d_eos_dxa = .true.
+
+   okay_to_remesh = .false.
+  
+  
+  
+  ! TESTING
+  
+  !convergence_ignore_equL_residuals = .true.
+
+   !Eturb_alfa = 0d0 ! purely radiative model
+
+  !use_Fraley_time_centering = .true.
+  !use_avQ_art_visc = .true.
+
+
+! output controls
+   
+   !terminal_show_age_units = 'days'
+
+   num_trace_history_values = 2
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+
+   !photo_interval = 4000
+   !profile_interval = 4000
+   !history_interval = 10
+   !terminal_interval = 4000
+
+   photo_interval = 10
+   profile_interval = 10
+   history_interval = 1
+   terminal_interval = 1
+
+! FOR DEBUGGING
+
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      stop_for_bad_nums = .true.
+
+      !solver_save_photo_call_number = 0
+         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+
+      !solver_test_partials_k = 2
+      !solver_test_partials_call_number = 1
+      solver_test_partials_iter_number = 5
+      solver_test_partials_dx_0 = 1d-6
+      solver_test_partials_var_name = 'all' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
+      solver_test_partials_equ_name = 'equL' ! 'all' or 'dv_dt', 'dwturb_dt', 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
+         ! equ name can also be 'lnE' or 'lnP' to test eos, 'eps_nuc' to test net, or 'opacity' to test kap.
+      !solver_test_partials_sink_name = 'o16' ! iso name to use for "sink" to keep sum = 1
+         ! if possible, use he4 as sink so change Y rather than X or Z.
+      !solver_test_partials_show_dx_var_name = 'h1'
+
+      !solver_test_partials_write_eos_call_info = .true.
+      
+      !solver_test_partials_k_low = 3
+      !solver_test_partials_k_high = 9
+      
+      !solver_test_eos_partials = .true.
+      !solver_test_kap_partials = .true.
+      !solver_test_net_partials = .true.
+      !solver_test_atm_partials = .true.
+
+      !report_why_dt_limits = .true.
+      !report_all_dt_limits = .true.
+      
+      !show_mesh_changes = .true.
+      !mesh_dump_call_number = 5189
+      !okay_to_remesh = .false.
+      
+      !trace_evolve = .true.
+
+      !stop_for_bad_nums = .true.
+            
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+!pause = .true.
+
+Grid2_win_flag = .true.
+pgstar_interval = 1
+
+/ ! end of pgstar namelist
