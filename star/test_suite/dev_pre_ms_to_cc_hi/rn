@@ -32,12 +32,8 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 do_one inlist_to_cc_header start_core_collapse.mod
 
-# check if can skip
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp start_core_collapse.mod final.mod
-#else
-   do_one inlist_finish_core_collapse_header final.mod
-#fi
+# this will create a model ready for ccsn_IIp
+#do_one inlist_finish_core_collapse_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

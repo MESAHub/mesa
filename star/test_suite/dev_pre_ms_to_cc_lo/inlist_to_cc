@@ -19,7 +19,7 @@
       set_initial_dt = .true.
       years_for_initial_dt = 1d-1
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
