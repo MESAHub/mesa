@@ -157,6 +157,8 @@
    ! conditions near center
    
       log_max_T
+      
+      log_cntr_Rho
    
       log_center_T ! temperature
       log_center_Rho ! density
@@ -310,6 +312,7 @@
       gradT_excess_alpha
       
       num_retries ! total during the run
+      retries
 
 
 
