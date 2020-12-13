@@ -34,6 +34,32 @@
 !        include 'filename'
 !        include '' means include the default standard list file
 
+! items corresponding to names on terminal output lines
+
+      lg_Lnuc
+      H_rich
+      N_cntr
+      lg_Lneu
+      He_core
+      O_cntr
+      lg_Lphoto
+      C_core
+      O_core
+      Si_core
+      Fe_core
+      Ne_cntr
+      Mass
+      H_cntr
+      Si_cntr
+      lg_Mdot
+      He_cntr
+      zones
+      lg_Dsurf
+      C_cntr
+      retries
+
+
+
 
 ! the following lines of the log file contain info about 1 model per row
    
@@ -136,9 +162,12 @@
    ! conditions near surface
    
       log_L ! log10 luminosity in Lsun units
+      luminosity
       log_Teff ! log10 effective temperature
+      effective_T
       log_R ! log10 radius in Rsun units
       log_g ! log10 gravity
+
       surf_avg_j_rot
       surf_avg_omega
       surf_avg_omega_crit
@@ -148,21 +177,22 @@
       surf_avg_v_div_v_crit
       surf_avg_Lrad_div_Ledd
       
-      v_surf_div_escape_v
-      v_surf_km_s
-      v_div_csound_surf
-      
+      lum_div_Ledd
       log_L_div_Ledd
+      v_div_cs
+      v_surf_km_s
+      !v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
    
    ! conditions near center
-   
+      log_center_T
+      log_center_Rho
+      
       log_max_T
       
-      log_cntr_Rho
-   
-      log_center_T ! temperature
-      log_center_Rho ! density
-      log_center_P ! pressure
+      log_cntr_T ! temperature
+      log_cntr_Rho ! density
+      log_cntr_P ! pressure
       !center_degeneracy ! the electron chemical potential in units of k*T
       !center_gamma ! plasma interaction parameter at the centermost meshpoint.
       center_omega
@@ -176,11 +206,6 @@
       surface c12
       surface n14
       surface o16
-
-      surface c13
-      surface o17
-      surface o18
-      surface f19
 
 
       
@@ -202,21 +227,6 @@
       center cr56
       ! etc. -- do as many of these 'center' commands as desired
       
-      log_center h1
-      log_center he4
-      log_center c12
-      log_center n14
-      log_center o16
-      log_center ne20
-      log_center si28
-      log_center s32
-      log_center ar36
-      log_center ca40
-      log_center fe54
-      log_center fe56
-      log_center ni56
-      log_center cr56
-      
       
 
    ! log10 mass fractions for entire star
@@ -226,12 +236,6 @@
       log_average he3
       log_average he4
       log_average li7
-      
-      log_average ne20
-      log_average si28
-      
-      total_mass ne20
-      total_mass si28
 
    ! log10 total ergs/sec for reaction categories (Lsun units)
       
@@ -302,17 +306,10 @@
 
    ! misc
    
-      lum_div_Ledd
-      max_L_rad_div_Ledd
-      max_conv_vel_div_csound
-      max_gradT_div_grada
-      max_gradT_sub_grada
-      min_log_mlt_Gamma
-      min_Pgas_div_P
-      gradT_excess_alpha
-      
       num_retries ! total during the run
-      retries
+      
+      burn_solver_maxsteps
+      
 
 
 

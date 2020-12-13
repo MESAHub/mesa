@@ -2,15 +2,15 @@
 
 &star_job
 
-      !save_star_job_namelist = .true.
-      !star_job_namelist_name = 'star_job_to_cc.txt'
-
       load_saved_model = .true.
-      saved_model_name = 'lgT_9.5.mod'
+      saved_model_name = 'lgT_9.6.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'start_core_collapse.mod'
+      save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
+
+      !change_initial_net = .true.
+      !new_net_name = 'mesa_201.net'
 
       set_initial_age = .false.
       set_initial_model_number = .false.
@@ -31,10 +31,8 @@
 
 &controls
 
-      !save_controls_namelist = .true.
-      !controls_namelist_name = 'controls_to_cc.txt'
-
-      fe_core_infall_limit = 1d7
+      xa_central_lower_limit_species(1) = 'si28'
+      xa_central_lower_limit(1) = 0.5d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -47,9 +45,6 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
 
 ! mixing
 
@@ -64,11 +59,9 @@
 
 ! output
       
-      num_trace_history_values = 4
-      trace_history_value_name(1) = 'center fe56'
-      trace_history_value_name(2) = 'fe_core_infall'
-      trace_history_value_name(3) = 'rel_E_err'
-      trace_history_value_name(4) = 'log_rel_run_E_err'
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
 
       photo_interval = 10
       !profile_interval = 1

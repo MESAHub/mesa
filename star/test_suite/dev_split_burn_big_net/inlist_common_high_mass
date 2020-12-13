@@ -1,0 +1,44 @@
+
+&star_job
+      relax_to_this_tau_factor = 900
+      dlogtau_factor = 0.1d0
+      relax_initial_tau_factor = .true.
+      
+/ ! end of star_job namelist
+
+&eos
+      PC_use_Gamma_limit_instead_of_T = .false.
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+! wind
+
+! atmosphere
+      Pextra_factor = 4 
+      ! need this extra pressure to stabilize the atmosphere during core He burning
+
+! rotation
+
+! mlt
+      use_other_alpha_mlt = .false. ! implemented in run_star_extras
+
+! mixing
+
+! timesteps      
+
+! mesh      
+
+! solver
+      always_use_dedt_form_of_energy_eqn = .true.       
+      max_tries_for_implicit_wind = 0      
+
+! output      
+
+/ ! end of controls namelist
+
+&pgstar
+/ ! end of pgstar namelist

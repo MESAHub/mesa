@@ -32,15 +32,15 @@
       initial_age = 0
    
       set_initial_dt = .true.
-      years_for_initial_dt = 1d-1
+      years_for_initial_dt = 1d-2
 
       !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-   logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
-   logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
+      logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
+      logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
 / ! end of eos namelist
 
 &kap
@@ -51,87 +51,94 @@
 
 &controls
 
-      use_other_cgrav = .true. ! for GR factor with gravity
+! starting specifications
+      initial_z = 0.02d0
+
+! when to stop
       
       power_nuc_burn_upper_limit = 1d6
 
       max_number_retries = 50
       max_model_number = 2000
-      
-      !max_years_for_timestep = 1d0
-      !min_timestep_limit = 1d-12
 
-         
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-      
-      delta_lgL_nuc_limit = 0.01
-      delta_lgL_nuc_hard_limit = 0.15
-      lgL_nuc_burn_min = -2d0
-
+! mass change
+      mass_change = 1.7d-9  ! rate of accretion (Msun/year)
       accrete_same_as_surface = .false. 
       accrete_given_mass_fractions = .true. 
       num_accretion_species = 1
       accretion_species_xa(1) = 1
       accretion_species_id(1) = 'c12'
-      
-      mass_change = 1.7d-9  ! rate of accretion (Msun/year)
 
-      always_use_dedt_form_of_energy_eqn = .true.
-      max_abs_rel_run_E_err = 1d99
-
-      max_abar_for_burning = 55
-      
-      initial_z = 0.02d0
-
-      mixing_length_alpha = 1.5
-      MLT_option = 'Henyey'
-
-      use_Ledoux_criterion = .false.  
-      alpha_semiconvection = 0.1
-      thermohaline_coeff = 2
-      thermohaline_option = 'Kippenhahn'
-   
-      merge_if_dlnR_too_small = .true.
-      mesh_min_dlnR = 1d-9
-
+! atmosphere
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
       Pextra_factor = 2
-   
-      varcontrol_target = 1d-3 
 
+! rotation
+
+! element diffusion
+
+! mlt
+      mixing_length_alpha = 1.5
+      MLT_option = 'Henyey'
+
+      use_Ledoux_criterion = .false.  
+
+      thermohaline_coeff = 2
+      thermohaline_option = 'Kippenhahn'
+
+! mixing
+
+! timesteps
+      varcontrol_target = 1d-3 
+      delta_lgL_nuc_limit = 0.01
+      delta_lgL_nuc_hard_limit = 0.15
+      lgL_nuc_burn_min = -2d0
+      
+      ! reduce limit for rel error since total_energy is tiny
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
-      warning_limit_for_max_residual = 1d99
-      
-      
-      ! turn these off to get past loading the saved model      
-      steps_before_use_gold2_tolerances = 1
-      steps_before_use_gold_tolerances = 1
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
 
+! mesh
+      merge_if_dlnR_too_small = .true.
+      mesh_min_dlnR = 1d-9
+
+! solver    
+      always_use_dedt_form_of_energy_eqn = .true.
+
+      steps_before_use_gold2_tolerances = 1
+
+      use_other_cgrav = .true. ! for GR factor with gravity
+      
+      max_abar_for_burning = 55
+      max_abs_rel_run_E_err = 1d99
+      warning_limit_for_max_residual = 1d99
+
+      op_split_burn = .true.
+      op_split_burn_min_T = 3d8
+
+      op_split_burn_eps = 1d-7
+      op_split_burn_odescal = 1d-8
+
+      convergence_ignore_equL_residuals = .true.
+      make_gradr_sticky_in_solver_iters = .true.
+
+! output
+      !num_trace_history_values = 2
+      !trace_history_value_name(1) = 'rel_E_err'
+      !trace_history_value_name(2) = 'log_rel_run_E_err'
+      
       photo_interval = 50
       profile_interval = 50
       history_interval = 20
       terminal_interval = 10
       write_header_frequency = 10
    
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
@@ -182,13 +189,11 @@
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
-
+Profile_Panels3_xaxis_name = 'logxq'
+Profile_Panels3_xmin = -5d0
+Profile_Panels3_xmax = 0d0
+Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist
 
