@@ -43,16 +43,37 @@
     initial_mass = 15 ! in Msun units
     initial_z = 0.02
 
-  ! options for energy conservation (see MESA V, Section 3)
-     use_dedt_form_of_energy_eqn = .true.
-     use_gold_tolerances = .true.
+  ! when to stop
 
-  ! stop when the star nears ZAMS (Lnuc/L > 0.99)
+    ! stop when the star nears ZAMS (Lnuc/L > 0.99)
     Lnuc_div_L_zams_limit = 0.99d0
     stop_near_zams = .true.
 
-  ! stop when the center mass fraction of h1 drops below this limit
+    ! stop when the center mass fraction of h1 drops below this limit
     xa_central_lower_limit_species(1) = 'h1'
     xa_central_lower_limit(1) = 1d-3
+
+  ! wind
+
+  ! atmosphere
+
+  ! rotation
+
+  ! element diffusion
+
+  ! mlt
+
+  ! mixing
+
+  ! timesteps
+
+  ! mesh
+
+  ! solver
+     ! options for energy conservation (see MESA V, Section 3)
+     use_dedt_form_of_energy_eqn = .true.
+     use_gold_tolerances = .true.
+
+  ! output
 
 / ! end of controls namelist

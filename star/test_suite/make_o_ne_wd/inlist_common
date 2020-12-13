@@ -59,7 +59,6 @@
 ! timesteps
       varcontrol_target = 1d-3
       dX_nuc_drop_limit = 1d-2
-      delta_HR_limit = 0.05
 
 ! mesh
       mesh_delta_coeff = 1.5     

@@ -18,7 +18,6 @@
 / ! end of eos namelist
 
 &kap
-
 / ! end of kap namelist
 
 &controls
@@ -48,29 +47,49 @@
 
 ! mlt
 
-! mixing
+! mixing (from cburn_inward test case)
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'nonburn'
+      overshoot_zone_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'any'
+      overshoot_f(1) = 0.01
+      overshoot_f0(1) = 0.005
+
+      overshoot_scheme(2) = 'exponential'
+      overshoot_zone_type(2) = 'burn_H'
+      overshoot_zone_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'any'
+      overshoot_f(2) = 0.01
+      overshoot_f0(2) = 0.005
+
+      overshoot_scheme(3) = 'exponential'
+      overshoot_zone_type(3) = 'burn_He'
+      overshoot_zone_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'any'
+      overshoot_f(3) = 0.01
+      overshoot_f0(3) = 0.005
+
+      overshoot_scheme(3) = 'exponential'
+      overshoot_zone_type(3) = 'burn_Z'
+      overshoot_zone_loc(3) = 'shell'
+      overshoot_bdy_loc(3) = 'any'
+      overshoot_f(3) = 0.01
+      overshoot_f0(3) = 0.005
 
 ! timesteps
+      delta_HR_limit = -1
 
 ! mesh
 
 ! solver
+      op_split_burn = .true.
+      op_split_burn_min_T = 3d8
 
-      burn_steps_limit = 150
-      burn_steps_hard_limit = 250
+      op_split_burn_eps = 1d-7
+      op_split_burn_odescal = 1d-8
 
-      !op_split_burn = .true.
-      op_split_burn_min_T = 1d6
-
-      op_split_burn_eps = 1d-5
-      op_split_burn_odescal = 1d-5
-
-      make_gradr_sticky_in_solver_iters = .true.
-      
       convergence_ignore_equL_residuals = .true.
-      
-      !use_gold2_tolerances = .false.
-      !use_gold_tolerances = .false.
+      make_gradr_sticky_in_solver_iters = .true.
 
 ! output
       num_trace_history_values = 6
