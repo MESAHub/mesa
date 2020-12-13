@@ -25,7 +25,35 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 3000
-      
+
+! when to stop
+      star_species_mass_max_limit = 0.4d0 ! Msun
+      star_species_mass_max_limit_iso = 'ne20'
+
+! wind
+      cool_wind_full_on_T = 1d6
+      hot_wind_full_on_T = 1d6 
+      hot_wind_scheme = ''
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5 ! 0d0  
+      Blocker_scaling_factor = 50d0
+
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+
+! mixing
+
+! timesteps
+
+! mesh
+
 ! solver
 
       burn_steps_limit = 150
@@ -44,22 +72,7 @@
       !use_gold2_tolerances = .false.
       !use_gold_tolerances = .false.
 
-
-
-! when to stop
-      star_species_mass_max_limit = 0.4d0 ! Msun
-      star_species_mass_max_limit_iso = 'ne20'
-
-! wind
-      cool_wind_full_on_T = 1d6
-      hot_wind_full_on_T = 1d6 
-      hot_wind_scheme = ''
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5 ! 0d0  
-      Blocker_scaling_factor = 50d0
-
+! output
       num_trace_history_values = 6
       trace_history_value_name(1) = 'total_mass he4'
       trace_history_value_name(2) = 'total_mass c12'

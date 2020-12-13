@@ -29,38 +29,22 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
-      
-! solver
-      use_dedt_form_of_energy_eqn = .false.
-      always_use_eps_grav_form_of_energy_eqn = .true.
-
-      convergence_ignore_equL_residuals = .true.      
-      warning_limit_for_max_residual = 1d99
-      
-      limit_for_rel_error_in_energy_conservation = 1d-5
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 
-      burn_steps_limit = 150
-      burn_steps_hard_limit = 250
+! when to stop
+      log_L_lower_limit = 0d0
 
-      !op_split_burn = .true.
-      op_split_burn_min_T = 1d6
+! wind
+      hot_wind_scheme = ''
+      cool_wind_RGB_scheme = ''
+      cool_wind_AGB_scheme = ''
 
-      op_split_burn_eps = 1d-5
-      op_split_burn_odescal = 1d-5
+! atmosphere
 
-      make_gradr_sticky_in_solver_iters = .true.
-      
-      convergence_ignore_equL_residuals = .true.
-      
-      !use_gold2_tolerances = .false.
-      !use_gold_tolerances = .false.
-      
-      
-      
-      
-! turn on diffusion to allow He atmosphere to form
+! rotation
+
+! element diffusion
+      ! turn on diffusion to allow He atmosphere to form
       do_element_diffusion = .true.
       show_diffusion_info = .true.
       diffusion_min_dq_at_surface = 1d-8
@@ -77,16 +61,38 @@
       diffusion_class_A_max(4) = 16
       diffusion_class_A_max(5) = 10000
 
-! when to stop
+! mlt
 
-      log_L_lower_limit = 0d0
-      !Teff_lower_limit = 60d3
+! mixing
 
-! wind     
-      hot_wind_scheme = ''
-      cool_wind_RGB_scheme = ''
-      cool_wind_AGB_scheme = ''
-   
+! timesteps 
+      limit_for_rel_error_in_energy_conservation = 1d-5
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+! mesh
+
+! solver
+      use_dedt_form_of_energy_eqn = .false.
+      always_use_eps_grav_form_of_energy_eqn = .true.
+
+      convergence_ignore_equL_residuals = .true.      
+      warning_limit_for_max_residual = 1d99
+
+
+      burn_steps_limit = 150
+      burn_steps_hard_limit = 250
+
+      !op_split_burn = .true.
+      op_split_burn_min_T = 1d6
+
+      op_split_burn_eps = 1d-5
+      op_split_burn_odescal = 1d-5
+
+      make_gradr_sticky_in_solver_iters = .true.
+      
+      convergence_ignore_equL_residuals = .true.
+
+! output
       num_trace_history_values = 5
       trace_history_value_name(1) = 'total_mass c12'
       trace_history_value_name(2) = 'total_mass o16'

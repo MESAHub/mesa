@@ -26,15 +26,20 @@
       initial_mass = 10
       initial_z = 0.02d0 
 
-! solver
-      use_dedt_form_of_energy_eqn = .true.
-      
-! opacity
+! when to stop
 
-! mesh
-      mesh_delta_coeff = 1.5     
+! wind
 
-! convection
+! atmosphere
+      atm_option = 'T_tau'
+      atm_T_tau_relation = 'Eddington'
+      atm_T_tau_opacity = 'fixed'
+
+! rotation
+
+! element diffusion
+
+! mlt
       mixing_length_alpha = 2
       use_Ledoux_criterion = .true.
       alpha_semiconvection = 0.01
@@ -42,18 +47,8 @@
 
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_lambda1 = -1 ! turn on full all the time
-      
-! timesteps      
-      varcontrol_target = 1d-3
-      dX_nuc_drop_limit = 1d-2
-      delta_HR_limit = 0.05
 
-! Atm
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
-
-! Overshoot
+! mixing
        overshoot_scheme(1) = 'exponential'
        overshoot_zone_type(1) = 'burn_Z'
        overshoot_zone_loc(1) = 'shell'
@@ -61,7 +56,18 @@
        overshoot_f(1) = 0.014
        overshoot_f0(1) = 0.004
 
-! Output
+! timesteps
+      varcontrol_target = 1d-3
+      dX_nuc_drop_limit = 1d-2
+      delta_HR_limit = 0.05
+
+! mesh
+      mesh_delta_coeff = 1.5     
+
+! solver
+      use_dedt_form_of_energy_eqn = .true.
+
+! output
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'

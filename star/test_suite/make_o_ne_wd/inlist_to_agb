@@ -36,16 +36,14 @@
 / ! end of kap namelist
 
 &controls
+      log_max_temp_upper_limit = 8.6d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 1600
 
-      always_use_dedt_form_of_energy_eqn = .true.
+! when to stop
 
-      use_gold2_tolerances = .true.
-
-      log_max_temp_upper_limit = 8.6d0
-     
+! wind
       cool_wind_full_on_T = 1d6
       hot_wind_full_on_T = 1d6 
       hot_wind_scheme = ''
@@ -55,6 +53,25 @@
       Reimers_scaling_factor = 0.5 ! 0d0  
       Blocker_scaling_factor = 0.5 ! 20d0
 
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+
+! mixing
+
+! timesteps
+
+! mesh
+
+! solver
+      use_gold2_tolerances = .true.
+      always_use_dedt_form_of_energy_eqn = .true.
+
+! output
       !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1

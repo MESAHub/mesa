@@ -503,7 +503,8 @@
          end if
          
          if (s% job% change_Eturb_flag_at_model_number == s% model_number) then
-            write(*,*) 'have reached model number for new_Eturb_flag', s% job% new_Eturb_flag
+            write(*,*) 'have reached model number for new_Eturb_flag', &
+               s% model_number, s% job% new_Eturb_flag
             call star_set_Eturb_flag(id, s% job% new_Eturb_flag, ierr)
             if (failed('star_set_Eturb_flag',ierr)) return
          end if

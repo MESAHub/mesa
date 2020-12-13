@@ -1201,6 +1201,7 @@
          color_num_colors(:) = 0
          color_file_names(:) = ''
          include 'star_job.defaults'
+         include 'star_job_dev.defaults'
       end subroutine set_default_star_job_controls
 
 

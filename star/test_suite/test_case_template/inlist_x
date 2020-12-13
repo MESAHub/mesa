@@ -24,9 +24,29 @@
 &controls
       
       ! limit max_model_number as part of test_suite
-      max_model_number = 100
+      max_model_number = 1000
 
+! when to stop
 
+! wind
+
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+
+! mixing
+
+! timesteps
+
+! mesh
+
+! solver
+
+! output
 
       photo_interval = 100
       profile_interval = 100
