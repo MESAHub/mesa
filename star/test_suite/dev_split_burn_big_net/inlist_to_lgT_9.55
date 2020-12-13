@@ -9,7 +9,7 @@
       saved_model_name = 'after_core_he_burn.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'lgT_9.6.mod'
+      save_model_filename = 'lgT_9.55.mod'
       required_termination_code_string = 'log_center_temp_limit'
 
       set_initial_age = .false.
@@ -34,7 +34,7 @@
       !save_controls_namelist = .true.
       !controls_namelist_name = 'controls_to_cc.txt'
 
-      log_center_temp_limit = 9.60d0
+      log_center_temp_limit = 9.55d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
