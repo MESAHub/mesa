@@ -246,7 +246,7 @@ module skye_coulomb
 
       real(dp), parameter :: AUM = amu / me
       real(dp), parameter :: min_gamma_for_solid = 160d0
-      real(dp), parameter :: max_gamma_for_liquid = 300d0
+      real(dp), parameter :: max_gamma_for_liquid = 190d0
 
       ! Output
       type(auto_diff_real_2var_order3) :: F
