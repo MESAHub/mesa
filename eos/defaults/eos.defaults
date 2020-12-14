@@ -192,7 +192,7 @@
    ! Only expand these ranges (lower min, raise max) if you have reason to believe the OCP fits are valid in the expanded range.
    ! ::
 
-   Skye_min_gamma_for_solid = 160
+   Skye_min_gamma_for_solid = 170
    Skye_max_gamma_for_liquid = 200
 
 
