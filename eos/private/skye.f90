@@ -143,6 +143,7 @@ module skye
 
          call skye_eos( &
             T, Rho, X, abar, zbar, &
+            rq%Skye_min_gamma_for_solid, rq%Skye_max_gamma_for_liquid, &
             rq%mass_fraction_limit_for_Skye, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -189,6 +190,7 @@ module skye
       !!..been performed prior to calling this routine.
       subroutine skye_eos( &
             temp_in, den_in, Xfrac, abar, zbar,  &
+            Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
             mass_fraction_limit, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -206,7 +208,7 @@ module skye
          integer, intent(in) :: species
          integer, pointer :: chem_id(:)
          real(dp), intent(in) :: xa(:)
-         real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit
+         real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit, Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid
          real(dp), intent(in) :: Xfrac, abar, zbar
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
@@ -285,6 +287,8 @@ module skye
          call compute_ideal_ele(temp%val, den%val, din%val, logtemp%val, logden%val, zbar, ytot1, ye, ht, &
                                sele, eele, pele, etaele, xnefer, ierr)
 
+         xnefer = compute_xne(den, ytot1, zbar)
+
          ! Normalize mass fractions
          do j=1,relevant_species
             select_xa(j) = select_xa(j) / norm
@@ -292,7 +296,9 @@ module skye
 
          ! Compute non-ideal corrections
          call nonideal_corrections(relevant_species, ya(1:relevant_species), &
-                                     AZION(1:relevant_species), ACMI(1:relevant_species), den, temp, xnefer, abar, &
+                                     AZION(1:relevant_species), ACMI(1:relevant_species), &
+                                     Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
+                                     den, temp, xnefer, abar, &
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
 

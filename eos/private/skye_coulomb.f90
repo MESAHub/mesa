@@ -27,6 +27,8 @@ module skye_coulomb
    !! @param XA The mass fractions of the different species.
    !! @param AZion The charges of the different species.
    !! @param ACMI The weight of the different species in amu.
+   !! @param min_gamma_for_solid The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+   !! @param max_gamma_for_liquid The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
    !! @param RHO The density of the system in g/cm^3.
    !! @param temp The temperature of the system in K.
    !! @param xnefer The electron density in 1/cm^3.
@@ -35,9 +37,10 @@ module skye_coulomb
    !! @param phase The blended phase. 0 for liquid, 1 for solid, smoothly interpolates in between.
    !! @param latent_ddlnT The latent heat of the smoothed phase transition in lnT (T dS/dlnT)
    !! @param latent_ddlnRho The latent heat of the smoothed phase transition in lnRho (T dS/dlnRho)
-   subroutine nonideal_corrections(NMIX,AY,AZion,ACMI,RHO,temp, xnefer, abar,dF, latent_ddlnT, latent_ddlnRho,phase)
+   subroutine nonideal_corrections(NMIX,AY,AZion,ACMI, min_gamma_for_solid, max_gamma_for_liquid,&
+                                  RHO,temp, xnefer, abar,dF, latent_ddlnT, latent_ddlnRho,phase)
       integer, intent(in) :: NMIX
-      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:)
+      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: RHO, temp, xnefer
       type(auto_diff_real_2var_order3), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
 
@@ -80,12 +83,12 @@ module skye_coulomb
 
       ! Compute free energy correction for liquid and solid phase.
       LIQSOL = 0
-      dF_liq = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,temp,abar,GAME,RS,LIQSOL,&
-         Zmean, Z2mean, Z52, Z53, Z321)
+      dF_liq = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,&
+          temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
 
       LIQSOL = 1
-      dF_sol = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,temp,abar,GAME,RS,LIQSOL,&
-         Zmean, Z2mean, Z52, Z53, Z321)
+      dF_sol = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,&
+          temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
 
       ! Add electron exchange-correlation energy
       dF_liq = dF_liq + F_phase_independent
@@ -180,6 +183,8 @@ module skye_coulomb
    !! @param AY An array of the number fractions of those species.
    !! @param Azion An array of the charges in electron charges of those species.
    !! @param ACMI An array of the masses in AMU of those species.
+   !! @param min_gamma_for_solid The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+   !! @param max_gamma_for_liquid The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
    !! @param temp The temperature in K.
    !! @param abar The mean atomic mass number.
    !! @param RS Electron density parameter for component species
@@ -189,12 +194,12 @@ module skye_coulomb
    !! @param Z2mean The mean squared ion charge (mass fraction weighted)
    !! @param Z53mean The mean of ion charge to the 5/3 power (mass fraction weighted)
    !! @param Z321mean The mean of Z(Z+1)^(3/2), where Z is the ion charge (mass fraction weighted)
-   function nonideal_corrections_phase(NMIX,AY,AZion,ACMI,temp,abar,GAME,RS,LIQSOL,&
+   function nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid, temp,abar,GAME,RS,LIQSOL,&
                                        Zmean, Z2mean, Z52, Z53, Z321) result(dF)
       ! Inputs
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
-      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321
+      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: temp, GAME, RS
 
       ! Intermediates and constants
@@ -211,7 +216,7 @@ module skye_coulomb
       do i=1,nmix
          if (AY(i) > TINY .and. AZion(i) /= 0d0) then ! skip low-abundance species and neutrons
             ! Add up non-ideal corrections
-            f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i))
+            f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i), min_gamma_for_solid, max_gamma_for_liquid)
             dF = dF + AY(i) * f
 
          end if
@@ -238,19 +243,17 @@ module skye_coulomb
    !! @param Zion Charge of the species of interest in electron charges.
    !! @param CMI Mass of the species of interest in AMU. 
    !! @param F non-ideal free energy per ion per kT
-   function extrapolate_free_energy(LIQSOL, temp, RS, Zion, CMI) result(F)
+   function extrapolate_free_energy(LIQSOL, temp, RS, Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid) result(F)
       ! Inputs
       integer, intent(in) :: LIQSOL
       type(auto_diff_real_2var_order3), intent(in) :: temp, RS
-      real(dp), intent(in) :: Zion, CMI
+      real(dp), intent(in) :: Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid
 
       ! Intermediates
       real(dp) :: COTPT, gamma_boundary
       type(auto_diff_real_2var_order3) :: temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT
 
       real(dp), parameter :: AUM = amu / me
-      real(dp), parameter :: min_gamma_for_solid = 160d0
-      real(dp), parameter :: max_gamma_for_liquid = 190d0
 
       ! Output
       type(auto_diff_real_2var_order3) :: F

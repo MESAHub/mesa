@@ -108,6 +108,9 @@
    ! limits for Skye
    logical :: use_Skye
    real(dp) :: mass_fraction_limit_for_Skye
+   real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+   real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+   
 
    ! misc
    logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
@@ -230,7 +233,9 @@
       ! controls for Skye
       use_Skye, &
       mass_fraction_limit_for_Skye, &
-      
+      Skye_min_gamma_for_solid, & ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+      Skye_max_gamma_for_liquid, & ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+
       ! misc
       include_radiation, &
       always_skip_elec_pos, &
@@ -478,6 +483,8 @@
       ! controls for Skye
       rq% use_Skye = use_Skye
       rq% mass_fraction_limit_for_Skye = mass_fraction_limit_for_Skye
+      rq%Skye_min_gamma_for_solid = Skye_min_gamma_for_solid
+      rq%Skye_max_gamma_for_liquid = Skye_max_gamma_for_liquid
       ! misc
       rq% include_radiation = include_radiation
       rq% always_skip_elec_pos = always_skip_elec_pos
@@ -604,7 +611,9 @@
       PC_Gamma_full_crystal = rq% PC_Gamma_full_crystal
       ! controls for Skye
       use_Skye = rq% use_Skye
-      mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye      
+      mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye   
+      Skye_min_gamma_for_solid = rq% Skye_min_gamma_for_solid
+      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid   
       ! misc
       include_radiation = rq% include_radiation
       always_skip_elec_pos = rq% always_skip_elec_pos
