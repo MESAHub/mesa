@@ -19,7 +19,9 @@ do_one inlist_to_agb_header agb.mod
 do_one inlist_c_burn_header c_burn.mod 
 do_one inlist_o_ne_wd_header o_ne_wd.mod
 do_one inlist_settle_envelope_header settled_envelope.mod
-do_one inlist_remove_envelope_header final.mod
+
+# for producing ns test case starting models:
+#do_one inlist_remove_envelope_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

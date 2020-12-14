@@ -10,6 +10,7 @@
       required_termination_code_string = 'log_L_lower_limit'
 
       !pgstar_flag = .true.
+      pause_before_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -82,6 +83,8 @@
       trace_history_value_name(4) = 'rel_E_err'
       trace_history_value_name(5) = 'log_rel_run_E_err'
       
+      photo_interval = 20
+      
       !photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
@@ -143,5 +146,11 @@
 
 
 &pgstar
+
+        ! override the pgstar x-axis settings for this phase of evolution
+        Profile_Panels3_xaxis_name = 'logxm'
+        Profile_Panels3_xmin = -8d0
+        Profile_Panels3_xmax = 0d0 ! 2.2
+        Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist
