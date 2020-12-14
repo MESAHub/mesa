@@ -6,6 +6,10 @@ module skye_coulomb
    use skye_coulomb_liquid
 
    implicit none
+
+   logical, parameter :: dbg = .false.
+   !logical, parameter :: dbg = .true.
+
    private
 
    public :: nonideal_corrections
@@ -258,8 +262,14 @@ module skye_coulomb
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
          ! No extrapolation needed
          F = ocp_free_energy(LIQSOL, GAMI, TPT)
+         if (dbg) then
+            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val
+         end if
       else
          ! Extrapolate past the boundary
+         if (dbg) then
+            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val
+         end if
 
          ! Identify the boundary
          if (LIQSOL == 0) then
