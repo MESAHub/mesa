@@ -4,6 +4,8 @@
 
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
+      
+      D_smooth_frozen_above_this_q = 1d99
 
 
       ! Eturb parameters
