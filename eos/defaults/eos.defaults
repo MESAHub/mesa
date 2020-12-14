@@ -1,4 +1,4 @@
-! eos module controls
+a! eos module controls
 ! ===================
 
    ! The MESA/eos parameters are given default values here.
@@ -75,7 +75,7 @@
    ! Here, :math:`\Gamma` is the mean ion Coulomb coupling parameter.
    ! ::
 
-   PC_Gamma_start_crystal = 160d0
+   PC_Gamma_start_crystal = 170d0
    PC_Gamma_full_crystal = 180d0
 
 
