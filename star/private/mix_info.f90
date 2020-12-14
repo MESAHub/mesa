@@ -371,9 +371,10 @@
                      write(*,2) 'D_smooth_source', k, D_smooth_source
                      stop 'rotation mix'
                   end if
-                  if (s% q(k) >= s% D_smooth_frozen_region_bottom_q .and. &
-                      s% q(k) <= s% D_smooth_frozen_region_top_q) f = 0d0
-                  s% D_smooth(k) = (1d0 - f)*s% D_smooth(k) + f*D_smooth_source
+                  if (.not. (s% q(k) >= s% D_smooth_frozen_region_bottom_q .and. &
+                             s% q(k) <= s% D_smooth_frozen_region_top_q)) then
+                     s% D_smooth(k) = (1d0 - f)*s% D_smooth(k) + f*D_smooth_source
+                  end if
                   if (is_bad(s% D_smooth(k))) then
                      write(*,2) 's% D_smooth(k)', k, s% D_smooth(k)
                      write(*,2) 'f', k, f
