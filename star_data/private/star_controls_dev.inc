@@ -8,6 +8,7 @@
          real(dp) :: accretion_entropy_at_surface
          
          real(dp) :: D_smooth_frozen_region_bottom_q, D_smooth_frozen_region_top_q
+         logical :: set_D_mix_to_D_smooth, blend_D_smooth_between_cells_of_same_mixing_type
          
 
          logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX

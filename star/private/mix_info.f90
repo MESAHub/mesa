@@ -382,18 +382,29 @@
                   end if
                   if (s% D_smooth(k) < 10d0) s% D_smooth(k) = 0d0
                end do
-               do k=2,nz-1
-                  if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
-                      s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                      s% D_smooth(k) > 0d0) &
-                     s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
-               end do
-               do k=nz-1,2,-1
-                  if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
-                      s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                      s% D_smooth(k) > 0d0) &
-                     s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
-               end do
+               if (s% blend_D_smooth_between_cells_of_same_mixing_type) then
+                  do k=2,nz-1
+                     if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
+                         s% mixing_type(k) == s% mixing_type(k+1) .and. &
+                         s% D_smooth(k) > 0d0 .and. &
+                         .not. (s% q(k) >= s% D_smooth_frozen_region_bottom_q .and. &
+                                s% q(k) <= s% D_smooth_frozen_region_top_q)) &
+                        s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
+                  end do
+                  do k=nz-1,2,-1
+                     if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
+                         s% mixing_type(k) == s% mixing_type(k+1) .and. &
+                         s% D_smooth(k) > 0d0 .and. &
+                         .not. (s% q(k) >= s% D_smooth_frozen_region_bottom_q .and. &
+                                s% q(k) <= s% D_smooth_frozen_region_top_q)) &
+                        s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
+                  end do
+               end if
+               if (s% set_D_mix_to_D_smooth) then
+                  do k=1,nz
+                     s% D_mix(k) = s% D_smooth(k)
+                  end do
+               end if
                
             end if
          
