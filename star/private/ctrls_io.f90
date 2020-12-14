@@ -131,9 +131,9 @@
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
     redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, D_smooth_replacement_fraction, D_smooth_growth_rate, &
-    semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_smooth_frozen_above_this_q, &
+    semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_smooth_frozen_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
-    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, &
+    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, D_smooth_frozen_region_top_q, &
     gradT_excess_max_change, gradT_excess_lambda1, gradT_excess_beta1, gradT_excess_lambda2, &
     gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
     gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
@@ -1067,7 +1067,8 @@
  
  s% D_smooth_replacement_fraction = D_smooth_replacement_fraction
  s% D_smooth_growth_rate = D_smooth_growth_rate
- s% D_smooth_frozen_above_this_q = D_smooth_frozen_above_this_q
+ s% D_smooth_frozen_region_bottom_q = D_smooth_frozen_region_bottom_q
+ s% D_smooth_frozen_region_top_q = D_smooth_frozen_region_top_q
 
  s% use_superad_reduction = use_superad_reduction
  s% superad_reduction_gamma_limit = superad_reduction_gamma_limit
@@ -2767,7 +2768,8 @@
  
  D_smooth_replacement_fraction = s% D_smooth_replacement_fraction
  D_smooth_growth_rate = s% D_smooth_growth_rate
- D_smooth_frozen_above_this_q = s% D_smooth_frozen_above_this_q
+ D_smooth_frozen_region_bottom_q = s% D_smooth_frozen_region_bottom_q
+ D_smooth_frozen_region_top_q = s% D_smooth_frozen_region_top_q
 
  use_superad_reduction = s% use_superad_reduction
  superad_reduction_gamma_limit = s% superad_reduction_gamma_limit

@@ -7,7 +7,7 @@
          real(dp) :: Eturb_alfar
          real(dp) :: accretion_entropy_at_surface
          
-         real(dp) :: D_smooth_frozen_above_this_q
+         real(dp) :: D_smooth_frozen_region_bottom_q, D_smooth_frozen_region_top_q
          
 
          logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
