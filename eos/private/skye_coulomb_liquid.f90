@@ -10,12 +10,10 @@ module skye_coulomb_liquid
    !> Calculates the free energy of a classical one-component
    !! plasma in the liquid phase using the fitting form of
    !! A.Y.Potekhin and G.Chabrier,Phys.Rev.E62,8554(2000)
-   !! fit to the data of Caillol (1999).
-   !!
-   !! Based on FITION9 routine by Potekhin and Chabrier, but
-   !! with fit coefficients corrected to match those in the publication.
-   !! This ensures consistency with the quantum_ocp_liquid_free_energy_correction
-   !! routine, which was designed as a correction to the Potekhin and Chabrier fit.
+   !! fit to the data of DeWitt & Slattery (1999).
+   !! This choice ensures consistency with the quantum_ocp_liquid_free_energy_correction
+   !! routine, which is based on the fits of Baiko & Yakolev 2019 (who were correcting relative
+   !! to the DeWitt & Slattery fits).
    !!
    !! @param g ion degeneracy parameter
    !! @param F non-ideal free energy
