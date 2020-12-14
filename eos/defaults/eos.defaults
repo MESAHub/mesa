@@ -193,7 +193,7 @@
    ! ::
 
    Skye_min_gamma_for_solid = 160
-   Skye_max_gamma_for_liquid = 190
+   Skye_max_gamma_for_liquid = 200
 
 
 ! CMS controls
