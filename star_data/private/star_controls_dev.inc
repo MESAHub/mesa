@@ -9,6 +9,7 @@
          
          real(dp) :: D_smooth_frozen_region_bottom_q, D_smooth_frozen_region_top_q
          logical :: set_D_mix_to_D_smooth, blend_D_smooth_between_cells_of_same_mixing_type
+         real(dp) :: dq_D_smooth_frozen_at_H_He_crossover
          
 
          logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX

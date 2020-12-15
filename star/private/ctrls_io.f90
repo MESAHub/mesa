@@ -150,7 +150,7 @@
     predictive_bdy_q_min, predictive_bdy_q_max, T_mix_limit, RSP_report_undercorrections, &
     do_conv_premix, conv_premix_avoid_increase, conv_premix_time_factor, &
     conv_premix_fix_pgas, conv_premix_dump_snapshots, do_premix_heating, &
-    overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, &
+    overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_smooth_frozen_at_H_He_crossover, &
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, &
@@ -1069,6 +1069,7 @@
  s% D_smooth_growth_rate = D_smooth_growth_rate
  s% D_smooth_frozen_region_bottom_q = D_smooth_frozen_region_bottom_q
  s% D_smooth_frozen_region_top_q = D_smooth_frozen_region_top_q
+ s% dq_D_smooth_frozen_at_H_He_crossover = dq_D_smooth_frozen_at_H_He_crossover
  s% set_D_mix_to_D_smooth = set_D_mix_to_D_smooth
  s% blend_D_smooth_between_cells_of_same_mixing_type = blend_D_smooth_between_cells_of_same_mixing_type
 
@@ -2772,6 +2773,7 @@
  D_smooth_growth_rate = s% D_smooth_growth_rate
  D_smooth_frozen_region_bottom_q = s% D_smooth_frozen_region_bottom_q
  D_smooth_frozen_region_top_q = s% D_smooth_frozen_region_top_q
+ dq_D_smooth_frozen_at_H_He_crossover = s% dq_D_smooth_frozen_at_H_He_crossover
  set_D_mix_to_D_smooth = s% set_D_mix_to_D_smooth
  blend_D_smooth_between_cells_of_same_mixing_type = s% blend_D_smooth_between_cells_of_same_mixing_type
 

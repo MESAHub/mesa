@@ -8,6 +8,7 @@
       ! D_smooth frozen in time if q in specified region of q.
       D_smooth_frozen_region_bottom_q = 1d99
       D_smooth_frozen_region_top_q = -1d99
+      dq_D_smooth_frozen_at_H_He_crossover = -1d0
       
       set_D_mix_to_D_smooth = .false.
       blend_D_smooth_between_cells_of_same_mixing_type = .true.

@@ -7,7 +7,7 @@
       dump_missing_metals_into_heaviest = .false.
       
       set_rates_preference = .true.
-      new_rates_preference = 1   ! 1 = nacre ; 2 = jina reaclib
+      new_rates_preference = 2   ! 1 = nacre ; 2 = jina reaclib
 
       change_initial_D_omega_flag = .true.
       new_D_omega_flag = .true.
