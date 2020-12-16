@@ -278,3 +278,25 @@ By default ``gitk`` only shows the current branch ``--all`` shows all branches.
   gitk path/to/file
 
 Will only show the commits that change the file.
+
+Git testing tips
+----------------
+
+::
+
+  git fetch --all
+
+Fetches all commits over all branches
+
+Adding:
+::
+
+  fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+
+To your ``.git/config`` in the ``[remote "origin"]`` section enables fetching pull requests
+
+::
+
+  $(git log -1) == *'[ci skip]'*
+
+Tests to see we should skip a test
