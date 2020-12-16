@@ -2,6 +2,11 @@
 
 set -o pipefail
 
+# Get version number from git
+if [ -d ".git" ]; then
+    git rev-parse HEAD > data/version_number
+fi
+
 export BUILD_LOG="build.log"
 
 # Get system info

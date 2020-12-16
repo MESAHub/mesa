@@ -1,3 +1,6 @@
+## Version number
+data/version_number
+
 ## Compilation
 build.log
 .depend
