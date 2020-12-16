@@ -1,18 +1,11 @@
 #!/bin/bash
-function check_okay {
-	if [ $? -ne 0 ]; then
-		exit 1
-	fi
-}
-function do_one {
-	cp $1 inlist
-	check_okay
-	rm -rf $2
-	echo 'run' $1
-	./rn1
-	check_okay
-   echo;  echo 'finished' $1
-}
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 do_one inlist_Eturb_header final.mod
 
