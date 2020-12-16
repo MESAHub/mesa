@@ -3,7 +3,7 @@
 set -o pipefail
 
 # Get version number from git
-if [ -d ".git" ]; then
+if [ -d ".git" ] || [ -f ".git" ]; then
     git rev-parse HEAD > data/version_number
 fi
 
@@ -97,7 +97,7 @@ then
 fi
 
 # Check we are on git and if so did git lfs work?
-if [ -d ".git" ]
+if [ -d ".git" ] || [ -f ".git" ]
 then
 	FILE_LIST=$(git lfs ls-files | grep -v '*')
 
