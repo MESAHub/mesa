@@ -76,6 +76,17 @@ The conventional name of the remote repository is ``origin``.  The
    canonically named ``master``.  You may still see this used in some
    older materials.  The MESA default branch is ``main``.
 
+MESA development uses the following branching model:
+
+* **main** --- Default branch.  This is equivalent of SVN trunk.  Small/innocent changes can directly be made in ``main``. The ``main`` branch should always be passing the test suite.
+
+* **feature branches** --- Branched from ``main`` for large/significant changes. Feature branches should be pushed to GitHub and then merged via a pull request.  Confirm that the test suite passes before merging.  This also gives an opportunity for other developers to comment on the changes.
+
+* **release branches** --- Branched from main at the time of the first release candidate.  Any final fixes can be backported (cherry-picked or merged) to ``main``.
+
+The line between what should be a feature branch / pull request and what's committed straight onto the main branch can be drawn based on how disruptive a change is expected to be. If it has the potential to break test suite cases, don't commit it directly to main.  Use a branch.
+
+
 Making a commit
 ---------------
 
@@ -204,10 +215,7 @@ or pull additional changes from others on this branch::
   git pull origin
 
 
-When you are ready to merge the changes from ``mynewbranch`` into ``main`` then you do
-
-.. note::
-  Decide on merging strategy
+When you are ready to merge the changes from ``mynewbranch`` into ``main`` then push ``mynewbranch`` to GitHub and make a pull request.
 
 
 If someone else has created a new branch, you can switch to it with::
