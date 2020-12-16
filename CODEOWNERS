@@ -2,7 +2,130 @@
 # Each line is a file pattern followed by one or more owners.
 
 # By default, Bill owns all code.
-* @bill-paxton
+# * @bill-paxton 
 
-star/private/eps_mdot.f90 @adamjermyn
-auto_diff/* @adamjermyn
+### Modules ###
+
+adipls/ @rhdtownsend @warrickball
+astero/ @warrickball
+atm/ @rhdtownsend @warrickball @aarondotter
+autodiff/ @adamjermyn
+binary/ @orlox
+chem/ @rjfarmer @fxt @aarondotter
+colors/ @rjfarmer
+const/ @rjfarmer @fxt @aarondotter
+data/ @rjfarmer
+#docs/ 
+eos/ @fxt @aarondotter @jschwab @adamjermyn @evbauer
+gyre/ @rhdtownsend @warrickball
+interp_1d/ @rhdtownsend @adamjermyn
+interp_2d/ @rhdtownsend @adamjermyn
+ionization/ @evbauer
+kap/ @fxt @aarondotter @jschwab
+math/ @rhdtownsend
+mtx/ @adamjermyn @rjfarmer @mjoyceGR
+net/ @rjfarmer @fxt @jschwab
+neu/ @rjfarmer @fxt
+num/ @adamjermyn
+rates/ @rjfarmer @fxt @jschwab
+#star/
+#star_data/
+#stella/ 
+utils/ @rhdtownsend @warrickball @rjfarmer
+
+### Star ###
+
+star/private/auto_diff_support.f90 @adamjermyn
+star/private/pgstar_*.f90 @rjfarmer
+star/private/rsp_*.f90 @rsmolec
+
+
+
+### Test suite cases ###
+
+#star/test_suite/1.3M_ms_high_Z/
+#star/test_suite/1.4M_ms_op_mono/
+#star/test_suite/15M_dynamo/
+star/test_suite/1.5M_with_diffusion/ @annethoul
+#star/test_suite/16M_conv_premix/ 
+star/test_suite/16M_predictive_mix/ @annethoul
+star/test_suite/1M_pre_ms_to_wd/ @annethoul @mjoyceGR
+star/test_suite/1M_thermohaline/ @mjoyceGR
+star/test_suite/20M_z2m2_high_rotation/ 
+star/test_suite/5M_cepheid_blue_loop/ @annethoul @rsmolec
+star/test_suite/7M_prems_to_AGB/ @annethoul
+star/test_suite/8.8M_urca/ @jschwab
+#star/test_suite/accreted_material_j/ 
+star/test_suite/adjust_net/ @rjfarmer
+star/test_suite/black_hole/ @rjfarmer
+#star/test_suite/c13_pocket/ 
+#star/test_suite/carbon_acc/
+#star/test_suite/carbon_kh/
+star/test_suite/cburn_inward/ @rjfarmer @fxt
+star/test_suite/ccsn_IIp/ @rjfarmer @fxt
+#star/test_suite/check_redo/ 
+star/test_suite/conductive_flame/ @jschwab @fxt @rjfarmer
+star/test_suite/conserve_angular_momentum/ 
+#star/test_suite/create_zahb/
+#star/test_suite/create_zams/
+star/test_suite/custom_colors/ @rjfarmer
+star/test_suite/custom_rates/ @jschwab @evbauer @adamjermyn
+star/test_suite/det_riemann/ @fxt
+star/test_suite/dev_* @bill-paxton
+#star/test_suite/diffusion_smoothness/ 
+#star/test_suite/extended_convective_penetration/ 
+star/test_suite/gyre_* @rhdtownsend @annethoul
+star/test_suite/hb_2M/ @annethoul
+star/test_suite/high_mass/ @fxt @rjfarmer
+star/test_suite/high_rot_darkening/ @aarondotter
+#star/test_suite/high_z/ 
+#star/test_suite/hot_cool_wind/
+star/test_suite/hse_riemann/ @fxt @jschwab
+#star/test_suite/irradiated_planet/ 
+star/test_suite/low_z/ @aarondotter
+#star/test_suite/magnetic_braking/ 
+#star/test_suite/make_brown_dwarf/
+star/test_suite/make_co_wd/ @wmwolf @evbauer @fxt
+#star/test_suite/make_env/ 
+star/test_suite/make_he_wd/ @evbauer @fxt
+#star/test_suite/make_metals/
+star/test_suite/make_o_ne_wd/ @wmwolf @fxt
+#star/test_suite/make_planets/ 
+star/test_suite/make_pre_ccsn_IIp/ @rjfarmer @fxt
+star/test_suite/make_sdb/ @evbauer
+#star/test_suite/make_zams/ 
+#star/test_suite/make_zams_low_mass/ 
+#star/test_suite/make_zams_ultra_high_mass/
+star/test_suite/multiple_stars/ @mjoyceGR
+star/test_suite/noh_riemann/ @fxt
+star/test_suite/ns_c/ @rjfarmer
+star/test_suite/ns_h/ @rjfarmer
+star/test_suite/ns_he/ @rjfarmer
+#star/test_suite/other_physics_hooks/ 
+star/test_suite/ppisn/ @orlox @rjfarmer
+star/test_suite/radiative_levitation/ @evbauer
+star/test_suite/R_CrB_star/ @jschwab
+#star/test_suite/relax_composition_j_entropy/ 
+star/test_suite/rsp_* @rsmolec
+#star/test_suite/sample_pre_ms/ 
+star/test_suite/sedov_omega_1/ @fxt
+star/test_suite/semiconvection/ @annethoul
+star/test_suite/simplex_solar_calibration/ @mjoyceGR
+star/test_suite/split_burn_* @rjfarmer
+star/test_suite/test_case_template/ @bill-paxton
+star/test_suite/test_memory/ @rjfarmer
+star/test_suite/timing/ @rjfarmer
+star/test_suite/T_tau_gradr/ @warrickball
+star/test_suite/wd_acc_small_dm/ 
+star/test_suite/wd_aic/ @jschwab
+#star/test_suite/wd_c_core_ignition/
+star/test_suite/wd_cool_0.6M/ @evbauer @fxt
+star/test_suite/wd_diffusion/ @evbauer
+#star/test_suite/wd_he_shell_ignition/ 
+#star/test_suite/wd_nova_burst/
+#star/test_suite/wd_stable_h_burn/
+
+binary/test_suite/ @orlox
+binary/test_suite/evolve_both_stars/ @orlox @mjoyceGR
+
+astero/test_suite/ @warrickball
