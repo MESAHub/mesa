@@ -1,0 +1,50 @@
+      model_number ! counting from the start of the run
+
+      star_age ! elapsed simulated time in years since the start of the run
+      star_mass ! in Msun units
+      log_Teff ! log10 effective temperature
+      log_L ! log10 luminosity in Lsun units
+      log_R ! log10 radius in Rsun units
+      log_g ! log10 gravity
+      log_center_T ! temperature
+      log_center_Rho ! density
+
+      surface h1
+      surface he4
+      surface c12
+      surface o16
+
+      center h1
+      center he4
+      center c12
+      center o16
+
+      num_zones ! number of zones in the model
+      log_dt ! log10 time_step in years
+      log_dt_sec ! log10 time_step in seconds
+      
+      photosphere_L
+      photosphere_r
+      photosphere_T
+      photosphere_v_km_s
+      photosphere_v_div_cs
+
+
+      !surf_avg_j_rot
+      !surf_avg_omega
+      !surf_avg_omega_crit
+      !surf_avg_omega_div_omega_crit
+      !surf_avg_v_rot ! km/sec rotational velocity at equator
+      !surf_avg_v_crit ! critical rotational velocity at equator
+      !surf_avg_v_div_v_crit
+      surf_avg_Lrad_div_Ledd
+      surf_avg_logT
+      surf_avg_logRho
+      surf_avg_opacity
+      !rotational_mdot_boost ! factor for increase in mass loss mdot due to rotation
+      !log_rotational_mdot_boost ! log factor for increase in mass loss mdot due to rotation
+      !surf_r_equatorial_div_r_polar
+      !surf_r_equatorial_div_r
+      !surf_r_polar_div_r
+
+      num_retries ! total during the run

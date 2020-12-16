@@ -1,0 +1,80 @@
+   
+      model_number ! counting from the start of the run
+      day ! elapsed simulated time in days since the start of the run
+      star_age_day
+      
+      rsp_phase
+      !rsp_GRPDV
+      rsp_GREKM
+      rsp_GREKM_avg_abs
+      rsp_DeltaR
+      rsp_DeltaMag
+      rsp_period_in_days
+      rsp_num_periods
+      
+      rsp_LINA_period_F_days
+      rsp_LINA_period_O1_days
+      rsp_LINA_growth_rate_F
+      rsp_LINA_growth_rate_O1
+      
+      
+      log_dt_sec ! log10 time_step in seconds
+      
+   
+   ! conditions near surface
+      radius
+      log_R
+      v_surf_km_s ! (km/s)
+      v_surf_div_escape_v
+      !v_surf ! (cm/s)
+      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      v_div_csound_max
+
+      max_abs_v_div_cs
+      dt_div_min_dr_div_cs
+
+
+      !surf_escape_v ! cm/s
+      luminosity ! luminosity in Lsun units
+      L_center
+      !gravity 
+      !log_surf_pressure
+      !log_surf_density
+   
+      log_L ! log10 luminosity in Lsun units
+      effective_T
+      Teff
+      log_g
+      log_Teff ! log10 effective temperature
+      
+      log_center_T
+      log_center_Rho
+      
+
+   ! misc
+   
+      log_rel_run_E_err
+      rel_E_err
+      
+      tot_PE
+      log_tot_PE
+      tot_IE
+      log_tot_IE
+      tot_Et
+      log_tot_Et
+      tot_KE
+      log_tot_KE
+      tot_E
+      log_tot_E
+      
+      cumulative_sources_and_sinks
+      
+      
+      
+
+   ! misc
+      
+      
+      num_retries ! total during the run
+
+

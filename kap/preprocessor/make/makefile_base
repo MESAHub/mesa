@@ -1,0 +1,116 @@
+# This is the makefile for creating the program that builds the opacities tables
+
+PACKAGE_DIR = ../..
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+COMMON_SRCS = ferguson.f freedman.f \
+   opal_type1.f opal_type2.f \
+   kap_support.f fixed_metal.f co_enhanced.f
+
+CKAP_SRCS = $(COMMON_SRCS) create_tables.f
+
+PLOT_SRCS = $(COMMON_SRCS) plot.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_OTHER = eos chem $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# TARGETS
+
+CKAP = ../ckap
+PLOT = ../plotter
+
+CKAP_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CKAP_SRCS)))
+PLOT_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PLOT_SRCS)))
+
+all : $(CKAP) $(PLOT)
+
+$(CKAP) : $(CKAP_OBJS) $(DEPS_OTHER)
+$(PLOT) : $(PLOT_OBJS) $(DEPS_OTHER)
+
+$(CKAP) : OBJS = $(CKAP_OBJS)
+$(PLOT) : OBJS = $(PLOT_OBJS)
+
+../% :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(CKAP) $(PLOT)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+#COMPILE = $(COMPILE_NO_CHECKS)
+COMPILE = $(COMPILE_TO_TEST)
+
+INCLUDES = -I$(MESA_DIR)/include
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo COMPILE $<
+	@$(COMPILE) $(FCfree) $<
+else
+	$(COMPILE) $(FCfree) $<
+endif
+
+COMPILE_OPAL = $(COMPILE_BASIC) $(FCopt) $(FCchecks) $(FCdebug) -c
+
+COMPILE_LEGACY_OPAL =  $(filter-out -std=f2008, $(COMPILE_OPAL)) -std=legacy
+
+opal_type1.o opal_type2.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY_OPAL $<
+	@$(COMPILE_LEGACY_OPAL) $(FCfixed) -g $<
+else
+	$(COMPILE_LEGACY_OPAL) $(FCfixed) -g $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = ../src
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

@@ -1,0 +1,123 @@
+
+! note: this inlist is done after 1st doing inlist_massive_defaults
+! so can override defaults as desired.
+
+&star_job
+
+      mesa_dir = '../../..'
+
+      show_log_description_at_start = .false.
+      !show_net_species_info = .true.
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod' ! from make_zams_high_mass, 13498
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+
+
+      change_v_flag = .true.
+      new_v_flag = .true.
+
+      new_rotation_flag = .true.
+      change_rotation_flag = .false.  ! rotation off until near zams
+      new_omega_div_omega_crit = 0.4
+      near_zams_relax_omega_div_omega_crit = .true.
+      num_steps_to_relax_rotation = 20 ! 50 ! use this many steps to change value
+
+      change_D_omega_flag = .true.
+      new_D_omega_flag = .true.
+
+      set_initial_age = .true.
+      initial_age = 0 ! in years
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+  Zbase = 2d-2
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+  use_dedt_form_of_energy_eqn = .true.
+  
+
+  use_other_torque = .true.
+  x_ctrl(1) = 500.0     ! Surface Magnetic Field (Gauss). Try e.g. 5, 50, 500, 5000
+  x_logical_ctrl(1) = .false. ! true gives lots of trace output to terminal from run_star_extras
+
+  initial_mass = 15
+  initial_z = 2d-2
+
+  hot_wind_scheme = 'Dutch'
+  hot_wind_full_on_T = 1d0
+  cool_wind_full_on_T = 0d0
+  Dutch_scaling_factor = 0.8
+
+      ! limit max_model_number as part of test_suite
+         max_model_number = 250
+
+         xa_central_lower_limit_species(1) = 'h1'
+         xa_central_lower_limit(1) = 1d-2
+
+         varcontrol_target = 1d-3
+         dX_nuc_drop_limit = 1d-4
+
+         am_nu_visc_factor = 0
+         am_D_mix_factor = 0.0333333333333333d00
+         D_DSI_factor = 0
+         D_SH_factor = 1
+         D_SSI_factor = 1
+         D_ES_factor = 1
+         D_GSF_factor = 1
+         D_ST_factor = 1
+
+         num_trace_history_values = 4
+         trace_history_value_name(1) = 'rel_E_err'
+         trace_history_value_name(2) = 'log_rel_run_E_err'
+         trace_history_value_name(3) = 'surf_avg_v_div_v_crit'
+         trace_history_value_name(4) = 'surf_avg_v_rot'
+         trace_history_value_name(5) = 'avg_skipped_setvars_per_step'
+         trace_history_value_name(6) = 'avg_setvars_per_step'
+         trace_history_value_name(7) = 'avg_solver_setvars_per_step'
+
+         photo_interval = 10
+         profile_interval = 100
+         history_interval = 10
+         terminal_interval = 10
+         write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+        Grid4_win_flag = .true.
+      !  Grid5_win_flag = .true.
+
+
+         !Summary_Burn_xmax = 2 ! only used if /= -101d0
+         !Abundance_xmax = 2 ! only used if /= -101d0
+
+         !Grid6_file_flag = .true.
+         !Grid6_file_dir = 'png'
+         !Grid6_file_prefix = 'grid6_'
+         !Grid6_file_interval = 1 ! output when mod(model_number,Grid6_file_interval)==0
+         !Grid6_file_width = -1 ! (inches) negative means use same value as for window
+         !Grid6_file_aspect_ratio = -1 ! negative means use same value as for window
+
+/ ! end of pgstar namelist

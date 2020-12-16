@@ -1,0 +1,30 @@
+AESOPUS Opacities in MESA
+
+Marigo, P. and Aringer, B. (2009).
+Low-temperature gas opacity. AESOPUS: a versatile and quick computational tool.
+A&A 508, 1539–1569
+http://dx.doi.org/10.1051/0004-6361/200912598
+
+We thank Paola Marigo for providing these tables.
+
+Additional tables can be generated using the webform at
+
+  http://stev.oapd.inaf.it/cgi-bin/aesopus
+
+
+To add a new set of tables:
+
+1) Collect a set of tables for a given reference abundance pattern,
+one file per desired reference metallicity.
+
+2) Manually extract the set of relevant values from the AESOPUS files
+(logT, logR, reference CNO values, etc.).  These values are assumed to
+be the same for each file.  Record these and the list of filenames
+from Step 1 in a YAML config file.  See AGSS09.yaml for the format.
+
+3) Run the included python script ./aesopus.py <yaml-filename>.
+
+4) This will produce an HDF5 file that can be placed in your MESA work
+directory.  In the case where it will be included in MESA by default,
+copy it to the kap directory, commit it, and and update
+./build_data_and_export.

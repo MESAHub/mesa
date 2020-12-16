@@ -1,0 +1,158 @@
+# This is the makefile for the mesa opacities library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = \
+   kap_def.f90 \
+   op_def.f90 \
+   op_load.f \
+   op_common.f \
+   op_ev.f \
+   op_osc.f \
+   op_radacc.f \
+   op_eval.f \
+   kap_eval_support.f90 \
+   condint.f90 \
+   load_co_kap.f90 \
+   load_kap.f90 \
+   kap_eval_fixed.f90 \
+   kap_eval_co.f90 \
+   kap_eval.f90 \
+   kap_ctrls_io.f90 \
+   kap_lib.f90 \
+   kapcn.f90 \
+   kap_aesopus.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+    LIBS_OTHER = eos chem $(LIBS_MESA_NUMERICS)
+    DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+    LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lchem $(LOAD_MESA_NUMERICS)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libkap.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+#################################################################
+#
+# COMPILATION RULES
+
+MOD_DEFAULTS_DIR = $(MODULE_DIR)/defaults
+INCLUDE_DEFAULTS = -I$(MOD_DEFAULTS_DIR)
+
+MOD_INCLUDES = $(INCLUDE_DEFAULTS)
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(MOD_INCLUDES)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(MOD_INCLUDES)
+
+COMPILE_CMD = $(COMPILE)
+
+COMPILE_LEGACY_NOCHECKS = $(filter-out -std=f2008, $(COMPILE_NO_CHECKS))
+
+op_eval.o : op_eval.f
+ifneq ($(QUIET),)
+	@echo COMPILE_NO_CHECKS $<
+	@$(COMPILE_NO_CHECKS) $(FCfixed) $<
+else
+	$(COMPILE_NO_CHECKS) $(FCfixed) $<
+endif
+
+conduction.o : conduction.f
+ifneq ($(QUIET),)
+	@echo COMPILE_NO_CHECKS $<
+	@$(COMPILE_NO_CHECKS) $(FCfree) $<
+else
+	$(COMPILE_NO_CHECKS) $(FCfree) $<
+endif
+
+op_load.o op_common.o op_ev.o op_osc.o op_radacc.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY_NOCHECKS $<
+	@$(COMPILE_LEGACY_NOCHECKS) $(FCfixed) $<
+else
+	$(COMPILE_LEGACY_NOCHECKS) $(FCfixed) $<
+endif
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) kap_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) kap_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.defaults $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

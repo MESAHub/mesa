@@ -1,0 +1,11 @@
+If you copy a test suite case to use as a template,
+you'll need to make some changes.  
+
+1) edit the makefile to delete the MESA_DIR definition
+   that will cause make to use the environment variable for MESA_DIR
+   
+2) edit the inlist to set mesa_dir = '' for same reason.
+
+After you've done those 2 steps, you should be able to run the copied test case
+from any new directory location.
+

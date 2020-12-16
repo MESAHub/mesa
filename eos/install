@@ -1,0 +1,8 @@
+./build_and_test
+if [ $? -ne 0 ]
+then
+	exit 1
+fi
+echo "export"
+./export
+echo "done"

@@ -1,0 +1,74 @@
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'  ! from make_zams
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02      
+/ ! end of kap namelist
+
+&controls
+
+      use_dedt_form_of_energy_eqn = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 500
+
+      initial_mass = 1
+      initial_z = 0.02
+      
+      max_years_for_timestep = 6d7
+      never_skip_hard_limits = .false. ! needs to be false for other_timestep_limit to work
+      
+      xa_central_lower_limit_species(1) = 'h1'
+      xa_central_lower_limit(1) = 0.25
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 5
+      write_header_frequency = 50
+
+		use_other_mesh_functions = .true.
+      use_other_wind = .true.
+      
+      overshoot_scheme(1) = 'other'
+      overshoot_zone_type(1) = 'any' ! 'burn_Z'
+      overshoot_zone_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.010
+      overshoot_f0(1) = 0.004
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 1
+      terminal_interval = 10
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+

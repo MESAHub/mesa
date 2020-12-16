@@ -1,0 +1,75 @@
+Release checklist
+=================
+
+This is a guide to what needs to be done before a release can be made.
+
+General steps
+-------------
+
+- Pick a release date 
+- Pick a candidate release version
+- Pick someone to be a release manager
+
+
+
+Source code updates
+-------------------
+
+- Update :file:`data/version_number`
+
+
+Documentation
+-------------
+
+- The Changelog should be updated
+
+.. note::
+    At a minimum this should mention options that are removed/replaced and how to convert from a previous version to the newest version.
+
+- A release notes document should be written
+
+- Sync the reST reference documentation with the {star, binary, astero} defaults files by running the script ``defaults2rst`` (in ``/docs``) and committing the changes
+
+
+Testing
+-------
+
+
+- TestHub should report all tests pass for both Linux and macOS on multiple machines and with different OS versions
+- The previous SDK version should be tested.
+
+.. note::
+    If the previous SDK does not pass we can decide whether to bump the minimum SDK version or fix the issues.
+
+- A non-SDK machine should test the test_suite.
+- At least one Windows machine should get tested.
+- Recalibrate test suite cases (things like simplex_solar_calibration and example_astero)
+
+
+Additional Testing
+------------------
+
+Additional checks that are not essential but should be done if there is time.
+
+- Check the Brunt is smooth.
+- Check test_memory runs and reports no memory leaks.
+- Check MESA compiles with SHARED_LIBS=True
+- Run with FPE checking on.
+- Distribute the candidate version to several beta testers for science verification.
+
+
+
+Release steps
+-------------
+
+- Run the release script inside ``$MESA_DIR``
+
+.. note::
+    This checks out a version of MESA, builds a zip file, and uploads it to SourceForge
+
+- Upload release to Zenodo
+- Send email to mesa-users
+
+
+
+

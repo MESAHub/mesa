@@ -1,0 +1,3 @@
+rm -rf kap_input_data.tar.xz kap_input_data.tar
+tar -cvf kap_input_data.tar kap_input_data
+xz kap_input_data.tar

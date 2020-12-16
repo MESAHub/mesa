@@ -1,0 +1,49 @@
+! 489 isotope torch network
+
+      add_isos_and_reactions(
+         neut
+         h 1 3
+         he 3 4
+         li 6 7
+         be7
+         be9
+         b 8 11
+         c 11 14
+         n 12 15
+         o 14 19
+         f 17 21
+         ne 17 24
+         na 19 27
+         mg 20 29
+         al 22 31
+         si 23 34
+         p 27 38
+         s 28 42
+         cl 31 45
+         ar 32 46
+         k 35 49
+         ca 36 49
+         sc 40 51
+         ti 41 53
+         v 43 55
+         cr 44 58
+         mn 46 61
+         fe 47 63
+         co 50 65
+         ni 51 67
+         cu 55 69
+         zn 57 72
+         ga 59 75
+         ge 62 78
+         as 65 79
+         se 67 83
+         br 68 83
+         kr 69 87
+         rb 73 85
+         sr 74 84
+         y 75 87
+         zr 78 90
+         nb 82 90
+         mo 83 90
+         tc 89 91
+         )

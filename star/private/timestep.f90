@@ -1,0 +1,2648 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010-2019  Bill Paxton & The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
+      module timestep
+
+      use star_private_def
+      use utils_lib, only: is_bad
+      use const_def
+
+      implicit none
+
+      private
+      public :: timestep_controller, check_change, check_integer_limit
+
+      logical, parameter :: dbg_timestep = .false.
+      real(dp) :: max_dt
+      integer :: why_Tlim
+
+      contains
+
+
+      integer function timestep_controller(s, max_timestep)
+         ! if don't return keep_going, then set result_reason to say why.
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: max_timestep
+
+         include 'formats'
+
+         timestep_controller = do_timestep_limits(s, s% dt)
+         if (timestep_controller /= keep_going) s% result_reason = timestep_limits
+
+         ! strictly enforce maximum timestep
+         max_dt = max_timestep
+         if (max_dt <= 0) max_dt = 1d99
+         if (s% dt_next > max_dt) then
+            s% dt_next = max_dt
+            s% why_Tlim = Tlim_max_timestep
+         end if
+
+         if (s% timestep_hold > s% model_number .and. s% dt_next > s% dt) then
+            s% dt_next = s% dt
+            s% why_Tlim = Tlim_timestep_hold
+            if (s% report_why_dt_limits .and. timestep_controller == keep_going) &
+               write(*,3) 'timestep_hold > model_number, so no timestep increase', &
+                  s% timestep_hold, s% model_number
+         end if
+
+         if (is_bad_num(s% dt_next)) then
+            write(*, *) 'timestep_controller: dt_next', s% dt_next
+            if (s% stop_for_bad_nums) stop 'timestep_controller'
+            timestep_controller = terminate
+            s% termination_code = t_timestep_controller
+            return
+         end if
+
+         if (dbg_timestep) then
+            write(*,*) 'final result from timestep_controller for model_number', &
+               timestep_controller, s% model_number
+            write(*,1) 'lg dt/secyer', log10(s% dt/secyer)
+            write(*,1) 'lg dt_next/secyer', log10(s% dt_next/secyer)
+            write(*,1) 'dt_next/dt', s% dt_next/s% dt
+            write(*,*)
+            write(*,*)
+            stop 'timestep_controller'
+         end if
+
+      end function timestep_controller
+
+
+      integer function do_timestep_limits(s, dt)
+         use rates_def, only: i_rate
+         use chem_def, only: chem_isos, ipp, icno, category_name
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: dt ! timestep just completed
+
+         real(dp) :: dt_limit_ratio(numTlim), dt_limit, limit, order, max_timestep_factor
+         integer :: i_limit, nz, ierr
+         logical :: skip_hard_limit
+         integer :: num_mix_boundaries ! boundaries of regions with mixing_type /= no_mixing
+         real(dp), pointer :: mix_bdy_q(:) ! (num_mix_boundaries)
+         integer, pointer :: mix_bdy_loc(:) ! (num_mix_boundaries)
+
+         include 'formats'
+
+         if (s% never_skip_hard_limits) then
+            skip_hard_limit = .false.
+         else
+            skip_hard_limit = (s% timestep_hold >= s% model_number) .or. &
+               (s% relax_hard_limits_after_retry .and. &
+                s% model_number_for_last_retry == s% model_number)
+         end if
+
+         nz = s% nz
+
+         ! NOTE: when we get here, complete_model has called the report routine,
+         ! so we can use information that it has calculated
+
+         ierr = 0
+
+         num_mix_boundaries = s% num_mix_boundaries
+         mix_bdy_q => s% mix_bdy_q
+         mix_bdy_loc => s% mix_bdy_loc
+
+         dt_limit_ratio(:) = 0d0
+
+         do_timestep_limits = check_varcontrol_limit( &
+            s, dt_limit_ratio(Tlim_struc))
+         if (return_now(Tlim_struc)) return
+
+         if (.not. s% doing_first_model_of_run) then
+         
+            if (s% use_other_timestep_limit) then
+               do_timestep_limits = s% other_timestep_limit( &
+                  s% id, skip_hard_limit, dt, dt_limit_ratio(Tlim_other_timestep_limit))
+               if (return_now(Tlim_other_timestep_limit)) return
+            end if
+
+            do_timestep_limits = check_solver_iters_timestep_limit( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_solver))
+            if (return_now(Tlim_solver)) return
+
+            do_timestep_limits = check_burn_steps_limit( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_num_burn_steps))
+            if (return_now(Tlim_num_burn_steps)) return
+
+            do_timestep_limits = check_diffusion_steps_limit( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_num_diff_solver_steps))
+            if (return_now(Tlim_num_diff_solver_steps)) return
+
+            do_timestep_limits = check_diffusion_iters_limit( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_num_diff_solver_iters))
+            if (return_now(Tlim_num_diff_solver_iters)) return
+
+            do_timestep_limits = check_dX(s, 0, skip_hard_limit, dt, &
+               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
+               dt_limit_ratio(Tlim_dH), dt_limit_ratio(Tlim_dH_div_H))
+            if (return_now(Tlim_dH_div_H)) return
+
+            do_timestep_limits = check_dX(s, 1, skip_hard_limit, dt, &
+               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
+               dt_limit_ratio(Tlim_dHe), dt_limit_ratio(Tlim_dHe_div_He))
+            if (return_now(Tlim_dHe_div_He)) return
+
+            do_timestep_limits = check_dX(s, 2, skip_hard_limit, dt, &
+               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
+               dt_limit_ratio(Tlim_dHe3), dt_limit_ratio(Tlim_dHe3_div_He3))
+            if (return_now(Tlim_dHe3_div_He3)) return
+
+            do_timestep_limits = check_dX(s, -1, skip_hard_limit, dt, &
+               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
+               dt_limit_ratio(Tlim_dX), dt_limit_ratio(Tlim_dX_div_X))
+            if (return_now(Tlim_dX_div_X)) return
+
+            do_timestep_limits = check_dL_div_L( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dL_div_L))
+            if (return_now(Tlim_dL_div_L)) return
+
+            do_timestep_limits = check_dlgP_change( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_dlgP))
+            if (return_now(Tlim_dlgP)) return
+
+            do_timestep_limits = check_dlgRho_change( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_dlgRho))
+            if (return_now(Tlim_dlgRho)) return
+
+            do_timestep_limits = check_dlgT_change( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_dlgT))
+            if (return_now(Tlim_dlgT)) return
+
+            do_timestep_limits = check_dlgE_change( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_dlgE))
+            if (return_now(Tlim_dlgE)) return
+
+            do_timestep_limits = check_dlgR_change( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_dlgR))
+            if (return_now(Tlim_dlgR)) return
+
+            do_timestep_limits = check_lgL_nuc_cat_change( &
+               s, num_mix_boundaries, mix_bdy_q, &
+               skip_hard_limit, dt_limit_ratio(Tlim_dlgL_nuc_cat))
+            if (return_now(Tlim_dlgL_nuc_cat)) return
+
+            do_timestep_limits = check_lgL_H_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_H))
+            if (return_now(Tlim_dlgL_H)) return
+
+            do_timestep_limits = check_lgL_He_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_He))
+            if (return_now(Tlim_dlgL_He)) return
+
+            do_timestep_limits = check_lgL_z_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_z))
+            if (return_now(Tlim_dlgL_z)) return
+
+            do_timestep_limits = check_lgL_photo_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_photo))
+            if (return_now(Tlim_dlgL_photo)) return
+
+            do_timestep_limits = check_lgL_nuc_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_nuc))
+            if (return_now(Tlim_dlgL_nuc)) return
+
+            do_timestep_limits = check_dlgTeff_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgTeff))
+            if (return_now(Tlim_dlgTeff)) return
+
+            do_timestep_limits = check_dvsurf_kms_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dvsurf_kms))
+            if (return_now(Tlim_dvsurf_kms)) return
+
+            do_timestep_limits = check_dlgRho_cntr_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgRho_cntr))
+            if (return_now(Tlim_dlgRho_cntr)) return
+
+            do_timestep_limits = check_dlgT_cntr_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgT_cntr))
+            if (return_now(Tlim_dlgT_cntr)) return
+
+            do_timestep_limits = check_dlgT_max_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgT_max))
+            if (return_now(Tlim_dlgT_max)) return
+
+            do_timestep_limits = check_dlgT_max_at_high_T_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgT_max_at_high_T))
+            if (return_now(Tlim_dlgT_max_at_high_T)) return
+
+            do_timestep_limits = check_dlgP_cntr_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgP_cntr))
+            if (return_now(Tlim_dlgP_cntr)) return
+
+            do_timestep_limits = check_dYe_highT_change( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_delta_Ye_highT))
+            if (return_now(Tlim_delta_Ye_highT)) return
+
+            do_timestep_limits = check_dlog_eps_nuc_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlog_eps_nuc))
+            if (return_now(Tlim_dlog_eps_nuc)) return
+
+            do_timestep_limits = check_dX_div_X_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_dX_div_X_cntr))
+            if (return_now(Tlim_dX_div_X_cntr)) return
+
+            do_timestep_limits = check_lg_XH_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_lg_XH_cntr))
+            if (return_now(Tlim_lg_XH_cntr)) return
+
+            do_timestep_limits = check_lg_XHe_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_lg_XHe_cntr))
+            if (return_now(Tlim_lg_XHe_cntr)) return
+
+            do_timestep_limits = check_lg_XC_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_lg_XC_cntr))
+            if (return_now(Tlim_lg_XC_cntr)) return
+
+            do_timestep_limits = check_lg_XO_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_lg_XO_cntr))
+            if (return_now(Tlim_lg_XO_cntr)) return
+
+            do_timestep_limits = check_XH_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_XH_cntr))
+            if (return_now(Tlim_XH_cntr)) return
+
+            do_timestep_limits = check_XHe_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_XHe_cntr))
+            if (return_now(Tlim_XHe_cntr)) return
+
+            do_timestep_limits = check_XC_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_XC_cntr))
+            if (return_now(Tlim_XC_cntr)) return
+
+            do_timestep_limits = check_XNe_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_XNe_cntr))
+            if (return_now(Tlim_XNe_cntr)) return
+
+            do_timestep_limits = check_XO_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_XO_cntr))
+            if (return_now(Tlim_XO_cntr)) return
+
+            do_timestep_limits = check_XSi_cntr( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_XSi_cntr))
+            if (return_now(Tlim_XSi_cntr)) return
+
+            do_timestep_limits = check_delta_mstar( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dmstar))
+            if (return_now(Tlim_dmstar)) return
+
+            do_timestep_limits = check_delta_mdot( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_del_mdot))
+            if (return_now(Tlim_del_mdot)) return
+
+            if (s% rotation_flag .and. s% do_adjust_J_lost .and. s% mstar_dot < 0d0) then
+               do_timestep_limits = check_adjust_J_q( &
+                  s, skip_hard_limit, dt_limit_ratio(Tlim_adjust_J_q))
+               if (return_now(Tlim_adjust_J_q)) return
+            end if
+
+            do_timestep_limits = check_delta_lgL( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_lgL))
+            if (return_now(Tlim_lgL)) return
+
+            do_timestep_limits = check_delta_lgL_phot( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_lgL_phot))
+            if (return_now(Tlim_lgL_phot)) return
+
+            do_timestep_limits = check_dt_div_min_dr_div_cs( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dt_div_min_dr_div_cs))
+            if (return_now(Tlim_dt_div_min_dr_div_cs)) return
+
+            do_timestep_limits = check_delta_HR( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_delta_HR))
+            if (return_now(Tlim_delta_HR)) return
+
+            do_timestep_limits = check_rel_error_in_energy( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_error_in_energy_conservation))
+            if (return_now(Tlim_error_in_energy_conservation)) return
+
+            do_timestep_limits = check_rel_rate_in_energy( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_error_rate_energy_conservation))
+            if (return_now(Tlim_error_rate_energy_conservation)) return
+
+            do_timestep_limits = check_avg_v_residual( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_avg_v_residual))
+            if (return_now(Tlim_avg_v_residual)) return
+
+            do_timestep_limits = check_max_abs_v_residual( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_max_abs_v_residual))
+            if (return_now(Tlim_max_abs_v_residual)) return
+
+            do_timestep_limits = check_dX_nuc_drop( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dX_nuc_drop))
+            if (return_now(Tlim_dX_nuc_drop)) return
+
+         end if
+
+         i_limit = maxloc(dt_limit_ratio(1:numTlim), dim=1)
+         
+         order = 1
+         call filter_dt_next(s, order, dt_limit_ratio(i_limit)) ! sets s% dt_next
+         
+         if (s% log_max_temperature > s% min_logT_for_max_timestep_factor_at_high_T) then
+            max_timestep_factor = s% max_timestep_factor_at_high_T
+         else
+            max_timestep_factor = s% max_timestep_factor
+         end if
+         if (max_timestep_factor > 0 .and. s% dt_next > max_timestep_factor*s% dt) then
+            s% dt_next = max_timestep_factor*s% dt
+            if (i_limit == Tlim_struc) i_limit = Tlim_max_timestep_factor
+         end if
+
+         if (s% min_timestep_factor > 0 .and. s% dt_next < s% min_timestep_factor*s% dt) then
+            s% dt_next = s% min_timestep_factor*s% dt
+            if (i_limit == Tlim_struc) i_limit = Tlim_min_timestep_factor
+         end if
+
+         s% why_Tlim = i_limit
+         s% dt_why_count(i_limit) = s% dt_why_count(i_limit) + 1
+
+         if (s% dt_next < s% dt .and. s% report_why_dt_limits) call report_why
+
+         if (i_limit == Tlim_dX_nuc_drop .and. s% report_dX_nuc_drop_dt_limits) then
+            limit = s% dX_nuc_drop_limit
+            if (s% log_max_temperature >= 9.45d0 .and. s% dX_nuc_drop_limit_at_high_T > 0) &
+               limit = s% dX_nuc_drop_limit_at_high_T
+            write(*,'(a70,a15,2i8,99f12.6)') &
+               'dt dX_nuc_drop iso, j, k, dX/dX_limit, dX, dX_limit, m(k)/Msun', &
+                  trim(chem_isos% name(s% chem_id(s% dX_nuc_drop_max_j))), &
+               s% dX_nuc_drop_max_j, s% dX_nuc_drop_max_k, dt_limit_ratio(Tlim_dX_nuc_drop), &
+               s% dX_nuc_drop_max_drop, limit, s% m(s% dX_nuc_drop_max_k)/Msun
+         end if
+
+
+         contains
+
+
+         subroutine report_why
+            integer :: k
+            real(dp) :: dt_next, max_dln
+            dt_next = s% dt_next
+            if (i_limit == Tlim_dX) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt: large dX: iso, dX, model, mass loc  logdt/yr' // &
+                  trim(chem_isos% name(s% chem_id(s% Tlim_dX_species))), &
+                  s% model_number, s% Tlim_dX_cell, s% star_mass*s% q(s% Tlim_dX_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dlgRho) then
+               call get_dlgRho_info(s, k, max_dln)
+               if (k > 0) write(*, '(a, i8, i5, 99f16.9)') &
+                  'reduce dt because of dlgRho', &
+                  s% model_number, k, max_dln/ln10, s% lnd(k)/ln10, s% m(k)/Msun
+            else if (i_limit == Tlim_dlgT) then
+               call get_dlgT_info(s, k, max_dln)
+               if (k > 0) write(*, '(a, i8, i5, 99f16.9)') &
+                  'reduce dt because of dlgT', &
+                  s% model_number, k, max_dln/ln10, s% lnT(k)/ln10, s% m(k)/Msun
+            else if (i_limit == Tlim_dlgE) then
+               call get_dlgE_info(s, k, max_dln)
+               if (k > 0) write(*, '(a, i8, i5, 99f16.9)') &
+                  'reduce dt because of dlgE', &
+                  s% model_number, k, max_dln/ln10, s% lnE(k)/ln10, s% m(k)/Msun
+            else if (i_limit == Tlim_dX_nuc_drop) then
+               write(*, '(a, i8, i5, 99f16.9)') &
+                  'reduce dt because of dX_nuc_drop  ' // &
+                  trim(chem_isos% name(s% chem_id(s% Tlim_dXnuc_drop_species))), &
+                  s% model_number, s% Tlim_dXnuc_drop_cell, &
+                  s% xa(s% Tlim_dXnuc_drop_species, s% Tlim_dXnuc_drop_cell) - &
+                     s% xa_old(s% Tlim_dXnuc_drop_species, s% Tlim_dXnuc_drop_cell), &
+                  s% xa(s% Tlim_dXnuc_drop_species, s% Tlim_dXnuc_drop_cell), &
+                  s% xa_old(s% Tlim_dXnuc_drop_species, s% Tlim_dXnuc_drop_cell), &
+                  s% star_mass*s% q(s% Tlim_dXnuc_drop_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dX_div_X) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dX_div_X  ' // &
+                  trim(chem_isos% name(s% chem_id(s% Tlim_dX_div_X_species))), &
+                  s% model_number, s% Tlim_dX_div_X_cell, &
+                  s% star_mass*s% q(s% Tlim_dX_div_X_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dH) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dH', &
+                  s% model_number, s% Tlim_dX_cell, s% star_mass*s% q(s% Tlim_dX_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dH_div_H) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dH_div_H', &
+                  s% model_number, s% Tlim_dX_div_X_cell, &
+                  s% star_mass*s% q(s% Tlim_dX_div_X_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dHe) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dHe', &
+                  s% model_number, s% Tlim_dX_cell, s% star_mass*s% q(s% Tlim_dX_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dHe_div_He) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dHe_div_He', &
+                  s% model_number, s% Tlim_dX_div_X_cell, s% star_mass*s% q(s% Tlim_dX_div_X_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dHe3) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dHe3', &
+                  s% model_number, s% Tlim_dX_cell, s% star_mass*s% q(s% Tlim_dX_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dHe3_div_He3) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dHe3_div_He3', &
+                  s% model_number, s% Tlim_dX_div_X_cell, s% star_mass*s% q(s% Tlim_dX_div_X_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_dlgL_nuc) then
+               write(*, '(a, f16.9)') &
+                  'reduce dt because of dlgL_nuc', log10(dt_next/secyer)
+            else if (i_limit == Tlim_dlgL_nuc_cat) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dlgL ' // &
+                  trim(category_name(s% Tlim_dlgL_nuc_category)), &
+                  s% model_number, s% Tlim_dlgL_nuc_cell, s% star_mass*s% q(s% Tlim_dlgL_nuc_cell), &
+                  log10(dt_next/secyer)
+            else if (i_limit == Tlim_neg_X) then
+               write(*, '(a, i8, f16.9)') &
+                  'reduce dt because of negative mass fraction', &
+                  s% model_number, log10(dt_next/secyer)
+            else if (i_limit == Tlim_dt_div_min_dr_div_cs) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dt/min_dr_div_cs limit', &
+                  s% model_number, s% Tlim_dt_div_min_dr_div_cs_cell, &
+                  s% star_mass*s% q(s% Tlim_dt_div_min_dr_div_cs_cell), &
+                  log10(dt_next)
+            else if (i_limit == Tlim_dt_div_min_dr_div_cs) then
+               write(*, '(a, i8, i5, 2f16.9)') &
+                  'reduce dt because of dt/min_dr_div_cs limit', &
+                  s% model_number, s% Tlim_dt_div_min_dr_div_cs_cell, &
+                  s% star_mass*s% q(s% Tlim_dt_div_min_dr_div_cs_cell), &
+                  log10(dt_next)
+            else if (i_limit == Tlim_bad_Xsum) then
+               write(*, '(a, i8, f16.9)') &
+                  'reduce dt because of bad sum of mass fractions', &
+                  s% model_number, log10(dt_next/secyer)
+            else
+               write(*, '(a, i8)') 'reduce dt because of ' // &
+                  trim(dt_why_str(i_limit)), s% model_number
+            end if
+         end subroutine report_why
+
+
+         logical function return_now(i_limit)
+            integer, intent(in) :: i_limit
+            integer :: k
+            real(dp) :: max_dln
+
+            if (do_timestep_limits == keep_going) then
+               return_now = .false.
+               return
+            end if
+            
+            s% dt_why_retry_count(i_limit) = s% dt_why_retry_count(i_limit) + 1
+
+            if (i_limit == Tlim_dX) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dX  ' // trim(chem_isos% name(s% chem_id(s% Tlim_dX_species))), &
+                  s% Tlim_dX_cell, s% model_number
+            else if (i_limit == Tlim_dlgRho) then
+               call get_dlgRho_info(s, k, max_dln)
+               if (k > 0) write(s% retry_message, '(a, i5, i8, 99f16.9)') &
+                  'hard limit dlgRho', &
+                  k, s% model_number, max_dln/ln10, s% lnd(k)/ln10, s% m(k)/Msun
+            else if (i_limit == Tlim_dlgT) then
+               call get_dlgT_info(s, k, max_dln)
+               if (k > 0) write(s% retry_message, '(a, i5, i8, 99f16.9)') &
+                  'hard limit dlgT', &
+                  k, s% model_number, max_dln/ln10, s% lnT(k)/ln10, s% m(k)/Msun
+            else if (i_limit == Tlim_dlgE) then
+               call get_dlgE_info(s, k, max_dln)
+               if (k > 0) write(s% retry_message, '(a, i5, i8, 99f16.9)') &
+                  'hard limit dlgE', &
+                  k, s% model_number, max_dln/ln10, s% lnE(k)/ln10, s% m(k)/Msun
+            else if (i_limit == Tlim_dX_div_X) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dX_div_X  ' // &
+                  trim(chem_isos% name(s% chem_id(s% Tlim_dX_div_X_species))), &
+                  s% Tlim_dX_div_X_cell, s% model_number
+            else if (i_limit == Tlim_dH) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dH', s% Tlim_dX_cell, s% model_number
+            else if (i_limit == Tlim_dH_div_H) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dH_div_H', &
+                  s% Tlim_dX_div_X_cell, s% model_number
+            else if (i_limit == Tlim_dHe) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dHe', &
+                  s% Tlim_dX_cell, s% model_number
+            else if (i_limit == Tlim_dHe_div_He) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dHe_div_He', &
+                  s% Tlim_dX_div_X_cell, s% model_number
+            else if (i_limit == Tlim_dHe3) then
+               write(s% retry_message, '(a, i5, i8)') &
+                  'hard limit dHe3', &
+                  s% Tlim_dX_cell, s% model_number
+            else if (i_limit == Tlim_dHe3_div_He3) then
+               write(s% retry_message, '(a, i8)') &
+                  'hard limit dHe3_div_He3', &
+                  s% Tlim_dX_div_X_cell, s% model_number
+            else if (i_limit == Tlim_dlgL_nuc) then
+               write(s% retry_message, '(a, i8)') &
+                  'hard limit dlgL_nuc', s% model_number
+            else if (i_limit == Tlim_dlgL_nuc_cat) then
+               write(s% retry_message, '(a, i8)') &
+                  'hard limit change in lgL ' // &
+                  trim(category_name(s% Tlim_dlgL_nuc_category)), &
+                  s% Tlim_dlgL_nuc_cell, s% model_number
+            else if (i_limit > 0) then
+               write(s% retry_message, '(a, i8)') 'hard limit ' // &
+                  trim(dt_why_str(i_limit)), s% model_number
+            !else if (len_trim(s% retry_message) == 0) then
+            !   stop 'timestep i_limit = 0 but have ierr'
+            end if
+
+            if (i_limit > 0) s% why_Tlim = i_limit
+            return_now = .true.
+
+         end function return_now
+
+
+      end function do_timestep_limits
+
+
+      integer function check_integer_limit( &
+            s, limit, hard_limit, value, msg, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         integer, intent(in) :: limit, hard_limit, value
+         character (len=*), intent(in) :: msg
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         if (value > hard_limit .and. hard_limit > 0 .and. (.not. skip_hard_limit)) then
+            if (s% report_all_dt_limits) write(*,*) trim(msg) // ' hard limit', hard_limit, value
+            check_integer_limit = retry
+            s% retry_message = trim(msg) // ' hard limit'
+            return
+         end if
+         check_integer_limit = keep_going
+         if (value <= 0 .or. limit <= 0) return
+         dt_limit_ratio = dble(value)/dble(limit) - 0.05d0
+            ! subtract a bit so that allow dt to grow even if value == limit
+         if (dt_limit_ratio <= 1d0) then
+            dt_limit_ratio = 0
+         else if (s% report_all_dt_limits) then
+            write(*,'(a30,f20.10,99i10)') &
+               trim(msg) // ' dt_limit_ratio', dt_limit_ratio, value, limit
+         end if
+      end function check_integer_limit
+
+
+      integer function check_burn_steps_limit(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         integer :: max_steps, i
+         check_burn_steps_limit = keep_going
+         if (.not. s% op_split_burn .or. maxval(s% T_start(1:s%nz)) < s% op_split_burn_min_T) return
+         max_steps = maxval(s% burn_num_iters(1:s% nz))
+         check_burn_steps_limit = check_integer_limit( &
+           s, s% burn_steps_limit, s% burn_steps_hard_limit, max_steps,  &
+           'num_burn_solver_steps', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_burn_steps_limit
+
+
+      integer function check_solver_iters_timestep_limit(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         integer :: iters, limit, hard_limit
+         include 'formats'
+         check_solver_iters_timestep_limit = keep_going
+         iters = s% num_solver_iterations
+         limit = s% solver_iters_timestep_limit
+         hard_limit = -1
+         if (s% using_gold_tolerances) then
+            limit = s% gold_solver_iters_timestep_limit
+         end if
+         if (s% used_extra_iter_in_solver_for_accretion) iters = iters - 1
+         check_solver_iters_timestep_limit = check_integer_limit( &
+           s, limit, hard_limit, &
+           iters, 'num_solver_iterations', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_solver_iters_timestep_limit
+
+
+      integer function check_diffusion_steps_limit(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_diffusion_steps_limit = keep_going
+         if (.not. s% do_element_diffusion) return
+         check_diffusion_steps_limit = check_integer_limit( &
+           s, s% diffusion_steps_limit, s% diffusion_steps_hard_limit, &
+           s% num_diffusion_solver_steps,  &
+           'num_diffusion_solver_steps', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_diffusion_steps_limit
+
+
+      integer function check_diffusion_iters_limit(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_diffusion_iters_limit = keep_going
+         if (.not. s% do_element_diffusion) return
+         check_diffusion_iters_limit = check_integer_limit( &
+           s, s% diffusion_iters_limit, s% diffusion_iters_hard_limit, &
+           s% num_diffusion_solver_iters,  &
+           'num_diffusion_solver_iters', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_diffusion_iters_limit
+
+
+      integer function check_dX(s, which, skip_hard_limit, dt, &
+            n_mix_bdy, mix_bdy_loc, mix_bdy_q, &
+            dX_dt_limit_ratio, dX_div_X_dt_limit_ratio)
+         use chem_def
+         use num_lib, only: binary_search
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         integer, intent(in) :: which, n_mix_bdy, mix_bdy_loc(:)
+         real(dp), intent(in) :: dt
+         real(dp), intent(in), pointer :: mix_bdy_q(:)
+         real(dp), intent(inout) :: dX_dt_limit_ratio, dX_div_X_dt_limit_ratio
+
+         real(dp) :: X, X_old, delta_dX, delta_dX_div_X, max_dX, max_dX_div_X, &
+            bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit
+         integer :: j, k, cid, bdy, max_dX_j, max_dX_k, max_dX_div_X_j, max_dX_div_X_k
+         real(dp) :: D_mix_cutoff, dX_limit_min_X, dX_limit, dX_hard_limit
+         real(dp) :: dX_div_X_limit_min_X, dX_div_X_limit, dX_div_X_hard_limit
+         real(dp) :: dX_div_X_at_high_T_limit, dX_div_X_at_high_T_hard_limit
+         real(dp) :: dX_div_X_at_high_T_limit_lgT_min
+         logical :: decreases_only
+
+         include 'formats'
+
+         check_dX = keep_going
+
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+
+         if (which == 0) then ! hydrogen
+            dX_limit_min_X = s% dH_limit_min_H
+            dX_limit = s% dH_limit
+            dX_hard_limit = s% dH_hard_limit
+            dX_div_X_limit_min_X = s% dH_div_H_limit_min_H
+            dX_div_X_limit = s% dH_div_H_limit
+            dX_div_X_hard_limit = s% dH_div_H_hard_limit
+            decreases_only = s% dH_decreases_only
+         else if (which == 1) then ! helium
+            dX_limit_min_X = s% dHe_limit_min_He
+            dX_limit = s% dHe_limit
+            dX_hard_limit = s% dHe_hard_limit
+            dX_div_X_limit_min_X = s% dHe_div_He_limit_min_He
+            dX_div_X_limit = s% dHe_div_He_limit
+            dX_div_X_hard_limit = s% dHe_div_He_hard_limit
+            decreases_only = s% dHe_decreases_only
+         else if (which == 2) then ! He3
+            dX_limit_min_X = s% dHe3_limit_min_He3
+            dX_limit = s% dHe3_limit
+            dX_hard_limit = s% dHe3_hard_limit
+            dX_div_X_limit_min_X = s% dHe3_div_He3_limit_min_He3
+            dX_div_X_limit = s% dHe3_div_He3_limit
+            dX_div_X_hard_limit = s% dHe3_div_He3_hard_limit
+            decreases_only = s% dHe3_decreases_only
+         else ! metals
+            dX_limit_min_X = s% dX_limit_min_X
+            dX_limit = s% dX_limit
+            dX_hard_limit = s% dX_hard_limit
+            dX_div_X_limit_min_X = s% dX_div_X_limit_min_X
+            if (s% log_max_temperature > s% dX_div_X_at_high_T_limit_lgT_min) then
+               dX_div_X_limit = s% dX_div_X_at_high_T_limit
+               dX_div_X_hard_limit = s% dX_div_X_at_high_T_hard_limit
+            else
+               dX_div_X_limit = s% dX_div_X_limit
+               dX_div_X_hard_limit = s% dX_div_X_hard_limit
+            end if
+            decreases_only = s% dX_decreases_only
+         end if
+         
+         dX_limit = dX_limit*s% time_delta_coeff
+         dX_hard_limit = dX_hard_limit*s% time_delta_coeff
+
+         dX_div_X_limit = dX_div_X_limit*s% time_delta_coeff
+         dX_div_X_hard_limit = dX_div_X_hard_limit*s% time_delta_coeff
+
+         if (  dX_limit_min_X >= 1 .and. &
+               dX_limit >= 1 .and. &
+               dX_hard_limit >= 1 .and. &
+               dX_div_X_limit_min_X >= 1 .and. &
+               dX_div_X_limit >= 1 .and. &
+               dX_div_X_hard_limit >= 1) then
+            return
+         end if
+
+         max_dX = -1; max_dX_j = -1; max_dX_k = -1
+         max_dX_div_X = -1; max_dX_div_X_j = -1; max_dX_div_X_k = -1
+         bdy = 0
+         max_dX_bdy_dist_dm = 0
+         max_dX_div_X_bdy_dist_dm = 0
+         cz_dist_limit = s% dX_mix_dist_limit*Msun
+
+         if (s% set_min_D_mix .and. s% ye(s% nz) >= s% min_center_Ye_for_min_D_mix) then
+            D_mix_cutoff = s% min_D_mix
+         else
+            D_mix_cutoff = 0
+         end if
+
+         do k = 1, s% nz
+
+            if (s% D_mix(k) > D_mix_cutoff) then
+               cycle
+            end if
+            if (k < s% nz) then
+               if (s% D_mix(k+1) > D_mix_cutoff) then
+                  cycle
+               end if
+            end if
+            if (s% newly_nonconvective(k)) then
+               cycle
+            end if
+
+            ! find the nearest mixing boundary
+            bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
+            ! don't check cells near a mixing boundary
+            if (bdy > 0 .and. bdy < n_mix_bdy) then
+               bdy_dist_dm = s% xmstar*abs(s% q(k) - mix_bdy_q(bdy))
+               if (bdy_dist_dm < cz_dist_limit) cycle
+            else
+               bdy_dist_dm = 0
+            end if
+
+            do j = 1, s% species
+
+               cid = s% chem_id(j)
+               if (which == 0) then ! hydrogen
+                  if (cid /= ih1) cycle
+               else if (which == 1) then ! helium
+                  if (cid /= ihe4) cycle
+               else if (which == 2) then ! he3
+                  if (cid /= ihe3) cycle
+               else ! other
+                  if (chem_isos% Z(cid) <= 2) cycle
+               end if
+
+               X = s% xa(j,k)
+               X_old = s% xa_old(j,k)
+               delta_dX = X_old - X ! decrease in abundance
+
+               if ((.not. decreases_only) .and. delta_dX < 0) delta_dX = -delta_dX
+
+               if (X >= dX_limit_min_X) then
+                  if ((.not. skip_hard_limit) .and. delta_dX > dX_hard_limit) then
+                     check_dX = retry
+                     s% why_Tlim = Tlim_dX
+                     s% Tlim_dX_species = j
+                     s% Tlim_dX_cell = k
+                     s% retry_message = 'dX ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
+                     if (s% report_why_dt_limits) then
+                        write(*, '(a30, i5, 99(/,a30,e20.10))') &
+                           'dX ' // trim(chem_isos% name(s% chem_id(j))), &
+                           k, 'delta_dX', delta_dX, 'dX_hard_limit', dX_hard_limit
+                     end if
+                     return
+                  end if
+                  if (delta_dX > max_dX) then
+                     max_dX = delta_dX
+                     max_dX_j = j
+                     max_dX_k = k
+                     max_dX_bdy_dist_dm = bdy_dist_dm
+                  end if
+               end if
+               if (X >= dX_div_X_limit_min_X) then
+                  delta_dX_div_X = delta_dX/X
+                  if ((.not. skip_hard_limit) .and. delta_dX_div_X > dX_div_X_hard_limit) then
+                     check_dX = retry
+                     s% why_Tlim = Tlim_dX_div_X
+                     s% Tlim_dX_div_X_species = j
+                     s% Tlim_dX_div_X_cell = k            
+                     s% retry_message = 'dX_div_X ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
+                     if (s% report_why_dt_limits) then
+                        write(*, '(a30, i5, 99(/,a30,e20.10))') &
+                           'delta_dX_div_X ' // trim(chem_isos% name(s% chem_id(j))), &
+                           k, 'delta_dX_div_X', delta_dX_div_X, &
+                           'dX_div_X_hard_limit', dX_div_X_hard_limit
+                     end if
+                     return
+                  end if
+                  if (delta_dX_div_X > max_dX_div_X) then
+                     max_dX_div_X = delta_dX_div_X
+                     max_dX_div_X_j = j
+                     max_dX_div_X_k = k
+                     max_dX_div_X_bdy_dist_dm = bdy_dist_dm
+                  end if
+               end if
+            end do
+         end do
+
+         if (dX_limit > 0) then
+            dX_dt_limit_ratio = max_dX/dX_limit
+            if (dX_dt_limit_ratio <= 1d0) then
+               dX_dt_limit_ratio = 0
+            else
+               j = max_dX_j
+               k = max_dX_k
+               s% Tlim_dX_species = j
+               s% Tlim_dX_cell = k
+               write(*, '(a30, i5, 99e20.10)') &
+                  'dX ' // trim(chem_isos% name(s% chem_id(j))), &
+                  k, max_dX, dX_limit, (s% M_center + s% xmstar*(s% q(k) - s% dq(k)/2))/Msun, &
+                  max_dX_bdy_dist_dm/Msun
+               if (s% report_all_dt_limits) then
+                  write(*, 2) 's% D_mix(k)', k, s% D_mix(k)
+                  X_old = s% xa_old(j,k)
+                  write(*, 2) 'X_old', k, X_old
+                  write(*, 2) 's% xa(j,k)', k, s% xa(j,k)
+                  write(*, 2) 'dX', k, s% xa(j,k) - X_old
+                  do j=k-5,k+5
+                     write(*,2) 'D_mix', j, s% D_mix(j), s% q(j) - s% q(k)
+                  end do
+                  write(*,*)
+               end if
+            end if
+
+         end if
+
+         if (dX_div_X_limit > 0) then
+            dX_div_X_dt_limit_ratio = max_dX_div_X/dX_div_X_limit
+            if (dX_div_X_dt_limit_ratio <= 1d0) then
+               dX_div_X_dt_limit_ratio = 0
+            else
+               s% Tlim_dX_div_X_species = max_dX_div_X_j
+               s% Tlim_dX_div_X_cell = max_dX_div_X_k
+               if (which > 2) write(*, '(a30, i5, 99e20.10)') &
+                  'limit dt because of large dX_div_X ' // &
+                     trim(chem_isos% name(s% chem_id(max_dX_div_X_j))) // &
+                     ' k, max, lim, m ', &
+                  max_dX_div_X_k, max_dX_div_X, dX_div_X_limit, &
+                  max_dX_div_X_bdy_dist_dm/Msun
+               if (s% report_all_dt_limits) then
+                  write(*,*)
+                  k = max_dX_div_X_k
+                  j = max_dX_div_X_j
+                  X = s% xa(j,k)
+                  X_old = s% xa_old(j,k)
+                  write(*,'(a)') &
+                     '                                                X, X_old, X-X_old, (X-X_old)/X'
+                  do j = 1, s% species
+                     write(*,2) trim(chem_isos% name(s% chem_id(j))), k, &
+                        X, X_old, X - X_old, (X - X_old)/X
+                  end do
+                  write(*,2) 'which', which
+                  write(*,*) 's% report_all_dt_limits', s% report_all_dt_limits
+                  bdy = binary_search(n_mix_bdy, mix_bdy_q, 0, s% q(k))
+                  if (bdy > 0) then
+                     write(*,2) 'q', k, s% q(k)
+                     write(*,2) 'nearest cz bdy', mix_bdy_loc(bdy), mix_bdy_q(bdy)
+                     write(*,2) 'cz_dq', mix_bdy_loc(bdy), s% q(k) - mix_bdy_q(bdy)
+                     write(*,*)
+                  end if
+                  write(*,*)
+               end if
+            end if
+         end if
+
+      end function check_dX
+
+
+      integer function check_dL_div_L(s, skip_hard_limit, dt, dL_div_L_dt_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dL_div_L_dt_ratio
+
+         real(dp) :: L, abs_dL, abs_dL_div_L, max_dL_div_L
+         integer :: k, max_dL_div_L_k
+         real(dp) :: dL_div_L_limit_min_L, dL_div_L_limit, dL_div_L_hard_limit
+
+         check_dL_div_L = keep_going
+
+         dL_div_L_limit_min_L = Lsun*s% dL_div_L_limit_min_L
+         dL_div_L_limit = s% dL_div_L_limit*s% time_delta_coeff
+         dL_div_L_hard_limit = s% dL_div_L_hard_limit*s% time_delta_coeff
+
+         if (dL_div_L_limit_min_L <= 0) return
+         if (dL_div_L_limit <= 0 .and. dL_div_L_hard_limit <= 0) return
+
+         max_dL_div_L = -1
+         max_dL_div_L_k = -1
+         abs_dL_div_L = 0; L=0 ! to quiet gfortran
+
+         do k = 1, s% nz
+            L = s% L(k)
+            abs_dL = abs(L - s% L_start(k))
+            if (L >= dL_div_L_limit_min_L) then
+               abs_dL_div_L = abs_dL/L
+               if (dL_div_L_hard_limit > 0 .and. (.not. skip_hard_limit) &
+                     .and. abs_dL_div_L > dL_div_L_hard_limit) then
+                  check_dL_div_L= retry
+                  s% retry_message = 'dL_div_L hard limit'
+                  if (s% report_all_dt_limits) write(*, '(a30, i5, 99e20.10)') &
+                     'dL_div_L too large at', k, L, s% L_start(k), abs_dL_div_L, dL_div_L_limit
+                  return
+               end if
+               if (abs_dL_div_L > max_dL_div_L) then
+                  max_dL_div_L = abs_dL_div_L
+                  max_dL_div_L_k = k
+               end if
+            end if
+         end do
+
+         if (dL_div_L_limit <= 0) return
+         dL_div_L_dt_ratio = max_dL_div_L/dL_div_L_limit
+         if (dL_div_L_dt_ratio > 1d0) then
+            if (s% report_all_dt_limits) write(*, '(a30, i5, 99e20.10)') &
+               'dL_div_L too large at', max_dL_div_L_k, &
+               dL_div_L_dt_ratio, max_dL_div_L, dL_div_L_limit
+         end if
+
+      end function check_dL_div_L
+
+
+      integer function check_change( &
+            s, delta_value, lim_in, hard_lim_in, i, msg, &
+            skip_hard_limit, dt_limit_ratio, relative_excess)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: delta_value, lim_in, hard_lim_in
+         integer, intent(in) :: i
+         character (len=*), intent(in) :: msg
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp), intent(out) :: relative_excess
+         real(dp) :: abs_change, lim, hard_lim
+         include 'formats'
+         if (is_bad(delta_value)) then
+            write(*,1) trim(msg) // ' delta_value', delta_value
+            stop 'check_change'
+         end if
+         check_change = keep_going
+         abs_change = abs(delta_value)
+         lim = lim_in*s% time_delta_coeff
+         hard_lim = hard_lim_in*s% time_delta_coeff
+         if (hard_lim > 0 .and. abs_change > hard_lim .and. (.not. skip_hard_limit)) then
+            if (s% report_all_dt_limits) &
+               write(*, '(a30, i5, 99e20.10)') trim(msg) // ' hard limit', &
+                  i, delta_value, hard_lim
+            s% retry_message = trim(msg) // ' hard limit'
+            check_change = retry
+            return
+         end if
+         if (lim <= 0) return
+         relative_excess = (abs_change - lim) / lim
+         dt_limit_ratio = abs_change/lim ! 1d0/(s% timestep_dt_factor**relative_excess)
+         if (is_bad(dt_limit_ratio)) then
+            write(*,1) trim(msg) // ' dt_limit_ratio', dt_limit_ratio, abs_change, lim
+            stop 'check_change'
+         end if
+         if (dt_limit_ratio <= 1d0) then
+            dt_limit_ratio = 0
+         else if (s% report_all_dt_limits) then
+            write(*, '(a30, f20.10, i5, 99e20.10)') trim(msg), &
+               dt_limit_ratio, i, delta_value, relative_excess, abs_change, lim
+         end if
+      end function check_change
+
+
+      subroutine get_dlgP_info(s, i, max_dlnP)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         integer, intent(out) :: i
+         real(dp), intent(out) :: max_dlnP
+         real(dp) :: lim, dlnP
+         integer :: k
+         include 'formats'
+         lim = ln10*s% delta_lgP_limit_min_lgP
+         i = 0
+         max_dlnP = 0
+         do k=1,s% nz
+            if (s% lnP(k) < lim) cycle
+            dlnP = abs(s% lnP(k) - s% lnP_start(k))
+            if (dlnP > max_dlnP) then
+               max_dlnP = dlnP
+               i = k
+            end if
+         end do
+      end subroutine get_dlgP_info
+
+
+      integer function check_dlgP_change(s, skip_hard_limit, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_dlnP
+         integer :: i
+         include 'formats'
+         check_dlgP_change = keep_going
+         call get_dlgP_info(s, i, max_dlnP)
+         if (i == 0) return
+         check_dlgP_change = check_change(s, max_dlnP/ln10, &
+            s% delta_lgP_limit, s% delta_lgP_hard_limit, &
+            i, 'check_dlgP_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgP_change
+
+
+      subroutine get_dlgRho_info(s, i, max_dlnRho)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         integer, intent(out) :: i
+         real(dp), intent(out) :: max_dlnRho
+         real(dp) :: lim, dlnRho
+         integer :: k
+         include 'formats'
+         lim = ln10*s% delta_lgRho_limit_min_lgRho
+         i = 0
+         max_dlnRho = 0
+         do k=1,s% nz
+            if (s% lnd(k) < lim) cycle
+            dlnRho = abs(s% lnd(k) - s% lnd_start(k))
+            if (dlnRho > max_dlnRho) then
+               max_dlnRho = dlnRho
+               i = k
+            end if
+         end do
+      end subroutine get_dlgRho_info
+
+
+      integer function check_dlgRho_change(s, skip_hard_limit, dt_limit_ratio)
+         ! check max change in log10(density)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_dlnd
+         integer :: i
+         include 'formats'
+         check_dlgRho_change = keep_going
+         call get_dlgRho_info(s, i, max_dlnd)
+         if (i == 0) return
+         check_dlgRho_change = check_change(s, max_dlnd/ln10, &
+            s% delta_lgRho_limit, s% delta_lgRho_hard_limit, &
+            i, 'check_dlgRho_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgRho_change
+
+
+      subroutine get_dlgT_info(s, i, max_dlnT)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         integer, intent(out) :: i
+         real(dp), intent(out) :: max_dlnT
+         real(dp) :: lim, dlnT
+         integer :: k
+         include 'formats'
+         lim = ln10*s% delta_lgT_limit_min_lgT
+         i = 0
+         max_dlnT = 0
+         do k=1,s% nz
+            if (s% lnT(k) < lim) cycle
+            dlnT = abs(s% lnT(k) - s% lnT_start(k))
+            if (dlnT > max_dlnT) then
+               max_dlnT = dlnT
+               i = k
+            end if
+         end do
+      end subroutine get_dlgT_info
+
+
+      integer function check_dlgT_change(s, skip_hard_limit, dt_limit_ratio)
+         ! check max change in log10(temperature)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_dlnT
+         integer :: i
+         include 'formats'
+         check_dlgT_change = keep_going
+         call get_dlgT_info(s, i, max_dlnT)
+         if (i == 0) return
+         check_dlgT_change = check_change(s, max_dlnT/ln10, &
+            s% delta_lgT_limit, s% delta_lgT_hard_limit, &
+            i, 'check_dlgT_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgT_change
+
+
+      subroutine get_dlgE_info(s, i, max_dlnE)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         integer, intent(out) :: i
+         real(dp), intent(out) :: max_dlnE
+         real(dp) :: lim, dlnE
+         integer :: k
+         include 'formats'
+         lim = ln10*s% delta_lgE_limit_min_lgE
+         i = 0
+         max_dlnE = 0
+         do k=1,s% nz
+            if (s% lnE(k) < lim) cycle
+            dlnE = abs(s% energy(k) - s% energy_start(k))/s% energy(k)
+            if (dlnE > max_dlnE) then
+               max_dlnE = dlnE
+               i = k
+            end if
+         end do
+      end subroutine get_dlgE_info
+
+
+      integer function check_dlgE_change(s, skip_hard_limit, dt_limit_ratio)
+         ! check max change in log10(internal energy)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_dlnE
+         integer :: i
+         include 'formats'
+         check_dlgE_change = keep_going
+         call get_dlgE_info(s, i, max_dlnE)
+         if (i == 0) return
+         check_dlgE_change = check_change(s, max_dlnE/ln10, &
+            s% delta_lgE_limit, s% delta_lgE_hard_limit, &
+            i, 'check_dlgE_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgE_change
+
+
+      subroutine get_dlgR_info(s, i, max_dlnR)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         integer, intent(out) :: i
+         real(dp), intent(out) :: max_dlnR
+         real(dp) :: lim, dlnR
+         integer :: k
+         include 'formats'
+         lim = ln10*s% delta_lgR_limit_min_lgR
+         i = 0
+         max_dlnR = 0
+         do k=1,s% nz
+            if (s% lnR(k) < lim) cycle
+            dlnR = abs(s% lnR(k) - s% lnR_start(k))
+            if (dlnR > max_dlnR) then
+               max_dlnR = dlnR
+               i = k
+            end if
+         end do
+      end subroutine get_dlgR_info
+
+
+      integer function check_dlgR_change(s, skip_hard_limit, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_dlnR
+         integer :: i
+         include 'formats'
+         check_dlgR_change = keep_going
+         call get_dlgR_info(s, i, max_dlnR)
+         if (i == 0) return
+         check_dlgR_change = check_change(s, max_dlnR/ln10, &
+            s% delta_lgR_limit, s% delta_lgR_hard_limit, &
+            i, 'check_dlgR_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgR_change
+
+
+      integer function check_lgL( &
+            s, iso_in, msg, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def
+         type (star_info), pointer :: s
+         integer, intent(in) :: iso_in
+         character (len=*), intent(in) :: msg
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+
+         real(dp) :: &
+            new_L, max_other_L, old_L, lim, hard_lim, lgL_min, &
+            drop_factor, relative_limit, lgL, max_other_lgL, lgL_old, &
+            abs_change, relative_excess
+         logical, parameter :: dbg = .false.
+         integer :: iso
+         include 'formats'
+         check_lgL = keep_going
+         
+         iso = iso_in
+         if (iso == iprot) then ! check_lgL_photo_change
+            if (s% log_max_temperature < s% min_lgT_for_lgL_photo_limit) return
+            new_L = abs(s% power_photo)
+            max_other_L = 0d0
+            old_L = abs(s% power_photo_old)
+            lim = s% delta_lgL_photo_limit
+            hard_lim = s% delta_lgL_photo_hard_limit
+            lgL_min = s% lgL_photo_burn_min
+            drop_factor = s% lgL_photo_drop_factor
+            relative_limit = 0d0
+         else if (iso == ineut) then ! check_lgL_nuc_change
+            if (s% log_max_temperature > s% max_lgT_for_lgL_nuc_limit) return
+            new_L = s% power_nuc_burn
+            max_other_L = 0d0
+            old_L = s% power_nuc_burn_old
+            if (s% log_max_temperature > &
+                  s% delta_lgL_nuc_at_high_T_limit_lgT_min) then
+               lim = s% delta_lgL_nuc_at_high_T_limit
+               hard_lim = s% delta_lgL_nuc_at_high_T_hard_limit
+            else
+               lim = s% delta_lgL_nuc_limit
+               hard_lim = s% delta_lgL_nuc_hard_limit
+            end if
+            lgL_min = s% lgL_nuc_burn_min
+            drop_factor = s% lgL_nuc_drop_factor
+            relative_limit = 0d0
+         else if (iso == ih1) then
+            new_L = s% power_h_burn
+            max_other_L = max(s% power_he_burn, s% power_z_burn)
+            old_L = s% power_h_burn_old
+            lim = s% delta_lgL_H_limit
+            hard_lim = s% delta_lgL_H_hard_limit
+            lgL_min = s% lgL_H_burn_min
+            drop_factor = s% lgL_H_drop_factor
+            relative_limit = s% lgL_H_burn_relative_limit
+         else if (iso == ihe4) then
+            new_L = s% power_he_burn
+            max_other_L = max(s% power_h_burn, s% power_z_burn)
+            old_L = s% power_he_burn_old
+            lim = s% delta_lgL_He_limit
+            hard_lim = s% delta_lgL_He_hard_limit
+            lgL_min = s% lgL_He_burn_min
+            drop_factor = s% lgL_He_drop_factor
+            relative_limit = s% lgL_He_burn_relative_limit
+         else if (iso == isi28) then
+            new_L = s% power_z_burn
+            max_other_L = max(s% power_h_burn, s% power_he_burn)
+            old_L = s% power_z_burn_old
+            lim = s% delta_lgL_z_limit
+            hard_lim = s% delta_lgL_z_hard_limit
+            lgL_min = s% lgL_z_burn_min
+            drop_factor = s% lgL_z_drop_factor
+            relative_limit = s% lgL_z_burn_relative_limit
+         else
+            stop 'bad iso arg for check_lgL'
+         end if
+         
+         lim = lim*s% time_delta_coeff
+         hard_lim = hard_lim*s% time_delta_coeff
+
+         if (new_L < old_L) then
+            lim = lim*drop_factor
+            hard_lim = hard_lim*drop_factor
+         end if
+
+         if (dbg) write(*,*)
+         if (dbg) write(*,1) trim(msg) // ' new_L', new_L
+         if (dbg) write(*,1) 'old_L', old_L
+         if (new_L <= 0 .or. old_L <= 0) return
+
+         lgL = safe_log10(new_L)
+         if (dbg) write(*,1) 'lgL', lgL
+         if (lgL < lgL_min) return
+
+         if (max_other_L > 0) then
+            max_other_lgL = safe_log10(max_other_L)
+            if (dbg) write(*,1) 'max_other_lgL', max_other_lgL
+            if (max_other_lgL - relative_limit > lgL) return
+         end if
+
+         lgL_old = safe_log10(old_L)
+         if (dbg) write(*,1) 'lgL_old', lgL_old
+         abs_change = abs(lgL - lgL_old)
+         if (dbg) write(*,1) 'abs_change', abs_change
+         if (dbg) write(*,1) 'hard_lim', hard_lim
+         if (hard_lim > 0 .and. abs_change > hard_lim .and. (.not. skip_hard_limit)) then
+            if (s% report_all_dt_limits) write(*, '(a30, f20.10, 99e20.10)') trim(msg), &
+               lgL - lgL_old, hard_lim, lgL, lgL_old, s% L_nuc_burn_total, s% L_nuc_burn_total_old
+            check_lgL = retry
+            s% retry_message = 'lgL hard limit'
+            return
+         end if
+
+         if (dbg) write(*,1) 'lim', lim
+         if (lim <= 0) return
+
+         relative_excess = (abs_change - lim) / lim
+         if (dbg) write(*,1) 'relative_excess', relative_excess
+         dt_limit_ratio = 1d0/pow(s% timestep_dt_factor,relative_excess)
+         if (dt_limit_ratio <= 1d0) then
+            dt_limit_ratio = 0
+         else if (s% report_all_dt_limits) then
+            write(*, '(a30, f20.10, 99e20.10)') trim(msg), &
+               dt_limit_ratio, lgL - lgL_old, lim, lgL, lgL_old, relative_excess
+         end if
+
+      end function check_lgL
+
+
+      integer function check_lgL_H_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def, only: ih1
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_lgL_H_change = check_lgL( &
+            s, ih1, 'check_lgL_H_change', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_lgL_H_change
+
+
+      integer function check_lgL_He_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def, only: ihe4
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_lgL_He_change = check_lgL( &
+            s, ihe4, 'check_lgL_He_change', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_lgL_He_change
+
+
+      integer function check_lgL_z_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def, only: isi28
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_lgL_z_change = check_lgL( &
+            s, isi28, 'check_lgL_z_change', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_lgL_z_change
+
+
+      integer function check_lgL_photo_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def, only: iprot
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_lgL_photo_change = check_lgL( &
+            s, iprot, 'check_lgL_photo_change', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_lgL_photo_change
+
+
+      integer function check_lgL_nuc_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def, only: ineut
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         check_lgL_nuc_change = check_lgL( &
+            s, ineut, 'check_lgL_nuc_change', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_lgL_nuc_change
+
+
+      integer function check_lgL_nuc_cat_change( &
+            s, n_mix_bdy, mix_bdy_q, skip_hard_limit, dt_limit_ratio)
+         use rates_def
+         use chem_def
+         use num_lib, only: binary_search
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         integer, intent(in) :: n_mix_bdy
+         real(dp), intent(in), pointer :: mix_bdy_q(:)
+         real(dp), intent(inout) :: dt_limit_ratio
+
+         integer :: k, max_j, max_k, bdy
+         real(dp) :: max_lgL_diff, relative_excess, max_diff, cat_burn_min
+
+         include 'formats'
+
+         check_lgL_nuc_cat_change = keep_going
+
+         if (s% delta_lgL_nuc_cat_limit <= 0 .and. s% delta_lgL_nuc_cat_hard_limit <= 0) return
+
+         cat_burn_min = exp10(s% lgL_nuc_cat_burn_min)
+         max_diff = 0
+         max_j = -1
+         max_k = -1
+         bdy = -1
+
+         do k = 1, s% nz
+
+            ! find the nearest mixing boundary
+            bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
+            ! don't check cells near a mixing boundary
+            if (bdy > 0) then
+               if (abs(s% q(k) - mix_bdy_q(bdy)) < s% lgL_nuc_mix_dist_limit) cycle
+            end if
+
+            if (s% check_delta_lgL_pp) call do1_category(ipp,k)
+            if (s% check_delta_lgL_cno) call do1_category(icno,k)
+            if (s% check_delta_lgL_3alf) call do1_category(i3alf,k)
+
+            if (s% check_delta_lgL_burn_c) call do1_category(i_burn_c,k)
+            if (s% check_delta_lgL_burn_n) call do1_category(i_burn_n,k)
+            if (s% check_delta_lgL_burn_o) call do1_category(i_burn_o,k)
+            if (s% check_delta_lgL_burn_ne) call do1_category(i_burn_ne,k)
+            if (s% check_delta_lgL_burn_na) call do1_category(i_burn_na,k)
+            if (s% check_delta_lgL_burn_mg) call do1_category(i_burn_mg,k)
+            if (s% check_delta_lgL_burn_si) call do1_category(i_burn_si,k)
+            if (s% check_delta_lgL_burn_s) call do1_category(i_burn_s,k)
+            if (s% check_delta_lgL_burn_ar) call do1_category(i_burn_ar,k)
+            if (s% check_delta_lgL_burn_ca) call do1_category(i_burn_ca,k)
+            if (s% check_delta_lgL_burn_ti) call do1_category(i_burn_ti,k)
+            if (s% check_delta_lgL_burn_cr) call do1_category(i_burn_cr,k)
+            if (s% check_delta_lgL_burn_fe) call do1_category(i_burn_fe,k)
+
+            if (s% check_delta_lgL_cc) call do1_category(icc,k)
+            if (s% check_delta_lgL_co) call do1_category(ico,k)
+            if (s% check_delta_lgL_oo) call do1_category(ioo,k)
+
+         end do
+
+
+         if (max_diff <= 0) return
+
+         max_lgL_diff = log10(max_diff/Lsun)
+         s% Tlim_dlgL_nuc_category = max_j
+         s% Tlim_dlgL_nuc_cell = max_k
+
+         check_lgL_nuc_cat_change = check_change(s, max_lgL_diff, &
+            s% delta_lgL_nuc_cat_limit, s% delta_lgL_nuc_cat_hard_limit, &
+            max_j, 'check_lgL_nuc_cat_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+
+         contains
+
+         subroutine do1_category(j, k)
+            integer, intent(in) :: j, k
+            real(dp) :: diff, abs_diff
+            if (s% luminosity_by_category(j,k) < cat_burn_min) return
+            if (s% luminosity_by_category_start(j,k) < cat_burn_min) return
+            diff = s% luminosity_by_category(j,k) - s% luminosity_by_category_start(j,k)
+            abs_diff = abs(diff)
+            if (abs_diff <= max_diff) return
+            max_diff = abs_diff
+            max_j = j
+            max_k = k
+         end subroutine do1_category
+
+      end function check_lgL_nuc_cat_change
+
+
+      integer function check_dlgTeff_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess
+         include 'formats'
+         check_dlgTeff_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax .or. s% Teff_old <= 0 .or. s% Teff <= 0) return
+         check_dlgTeff_change = check_change(s, safe_log10(s% Teff/s% Teff_old), &
+            s% delta_lgTeff_limit, s% delta_lgTeff_hard_limit, &
+            1, 'check_dlgTeff_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgTeff_change
+
+
+      integer function check_dvsurf_kms_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: change, relative_excess
+         include 'formats'
+         check_dvsurf_kms_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax .or. .not. s% v_flag) return
+         change = (s% v(1) - s% v_start(1))/1d5
+         check_dvsurf_kms_change = check_change(s, change, &
+            s% delta_vsurf_kms_limit, s% delta_vsurf_kms_hard_limit, &
+            1, 'check_dvsurf_kms_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dvsurf_kms_change
+
+
+      integer function check_dYe_highT_change( &
+            s, skip_hard_limit, dt_limit_ratio) ! check max change in Ye
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_diff, ye_diff, T_limit
+         integer :: i, k
+         include 'formats'
+         check_dYe_highT_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         i = 0
+         max_diff = 0
+         T_limit = s% minT_for_highT_Ye_limit
+         do k=1, s% nz
+            if (s% T(k) < T_limit) cycle
+            ye_diff = abs(s% ye(k) - s% ye_start(k))
+            if (ye_diff <= max_diff) cycle
+            max_diff = ye_diff
+            i = k
+         end do
+         check_dYe_highT_change = check_change(s, max_diff, &
+            s% delta_Ye_highT_limit, s% delta_Ye_highT_hard_limit, &
+            i, 'check_dYe_highT_change', .false., dt_limit_ratio, relative_excess)
+      end function check_dYe_highT_change
+
+
+      integer function check_dlgT_max_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, change, lnTmax, lnTmax_start
+         include 'formats'
+         check_dlgT_max_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         if (s% delta_lgT_max_limit_lgT_min < 0d0) return
+         if (s% delta_lgT_max_limit_only_after_near_zams) then
+            if (s% X(s% nz) > 0.1d0 .and. &
+                s% L_nuc_burn_total/s% L_phot < s% Lnuc_div_L_zams_limit ) return
+         end if
+         lnTmax = maxval(s% lnT(1:s% nz))
+         if (lnTmax < s% delta_lgT_max_limit_lgT_min*ln10) return
+         lnTmax_start = maxval(s% lnT_start(1:s% nz))
+         change = (lnTmax - lnTmax_start)/ln10
+         check_dlgT_max_change = check_change(s, change, &
+            s% delta_lgT_max_limit, s% delta_lgT_max_hard_limit, &
+            s% nz, 'check_dlgT_max_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgT_max_change
+
+
+      integer function check_dlgT_max_at_high_T_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, change, lnTmax_at_high_T, lnTmax_at_high_T_start
+         include 'formats'
+         check_dlgT_max_at_high_T_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         if (s% delta_lgT_max_at_high_T_limit_lgT_min < 0d0) return
+         lnTmax_at_high_T = maxval(s% lnT(1:s% nz))
+         if (lnTmax_at_high_T < s% delta_lgT_max_at_high_T_limit_lgT_min*ln10) return
+         lnTmax_at_high_T_start = maxval(s% lnT_start(1:s% nz))
+         change = (lnTmax_at_high_T - lnTmax_at_high_T_start)/ln10
+         check_dlgT_max_at_high_T_change = check_change(s, change, &
+            s% delta_lgT_max_at_high_T_limit, s% delta_lgT_max_at_high_T_hard_limit, &
+            s% nz, 'check_dlgT_max_at_high_T_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgT_max_at_high_T_change
+
+
+      integer function check_dlgT_cntr_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, change
+         include 'formats'
+         check_dlgT_cntr_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         !write(*,2) 's% lnT(s% nz)', s% model_number, s% lnT(s% nz)
+         !write(*,2) 's% lnT_start(s% nz)', s% model_number, s% lnT_start(s% nz)
+         change = (s% lnT(s% nz) - s% lnT_start(s% nz))/ln10
+         check_dlgT_cntr_change = check_change(s, change, &
+            s% delta_lgT_cntr_limit, s% delta_lgT_cntr_hard_limit, &
+            s% nz, 'check_dlgT_cntr_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgT_cntr_change
+
+
+      integer function check_dlgP_cntr_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, change
+         include 'formats'
+         check_dlgP_cntr_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         change = (s% lnP(s% nz) - s% lnP_start(s% nz))/ln10
+         check_dlgP_cntr_change = check_change(s, change, &
+            s% delta_lgP_cntr_limit, s% delta_lgP_cntr_hard_limit, &
+            s% nz, 'check_dlgP_cntr_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgP_cntr_change
+
+
+      integer function check_dlgRho_cntr_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         use const_def, only:ln10
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, dlgRho_cntr
+         integer :: nz
+         include 'formats'
+         check_dlgRho_cntr_change = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         nz = s% nz
+         dlgRho_cntr = (s% lnd(nz) - s% lnd_start(nz))/ln10
+         check_dlgRho_cntr_change = check_change(s, dlgRho_cntr, &
+            s% delta_lgRho_cntr_limit, s% delta_lgRho_cntr_hard_limit, &
+            nz, 'check_dlgRho_cntr_change', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlgRho_cntr_change
+
+
+      integer function check_dlog_eps_nuc_change(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_ratio, ratio, delta, &
+            limit_ratio, delta_r
+         integer :: k, j, nz, k_max
+         include 'formats'
+         check_dlog_eps_nuc_change = keep_going
+         nz = s% nz
+         limit_ratio = exp10(s% delta_log_eps_nuc_limit)
+         max_ratio = limit_ratio
+         k_max = 0
+         zoneloop: do k=1,nz
+            if (s% eps_nuc_start(k) < 1) cycle zoneloop
+            ratio = s% eps_nuc(k)/s% eps_nuc_start(k)
+            if (s% mixing_type(k) /= convective_mixing .and. &
+                s% mixing_type(min(nz,k+1)) /= convective_mixing .and. &
+                ratio > max_ratio) then
+               do j = 1, s% num_conv_boundaries
+                  delta_r = abs(s% r(s% conv_bdy_loc(j)) - s% r(k))
+                  if (delta_r <= s% scale_height(k)) then
+                     cycle zoneloop ! skip ones that are too close to convection zone
+                  end if
+               end do
+               max_ratio = ratio
+               k_max = k
+            end if
+         end do zoneloop
+         if (k_max > 0) then
+            delta = log10(max_ratio)
+            if (s% report_all_dt_limits) write(*,4) 'log eps nuc ratio', &
+               k_max, nz, s% model_number, &
+               delta/s% delta_log_eps_nuc_limit, delta, &
+               s% eps_nuc(k_max), s% eps_nuc_start(k_max)
+         else
+            delta = 0
+         end if
+         check_dlog_eps_nuc_change = check_change(s, delta, &
+            s% delta_log_eps_nuc_limit, s% delta_log_eps_nuc_hard_limit, &
+            nz, 'check_dlog_eps_nuc_change', &
+            skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dlog_eps_nuc_change
+
+
+      integer function check_dX_div_X_cntr(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, max_abs_dX_div_X, X, dX, abs_dX_div_X
+         integer :: j, nz
+         include 'formats'
+         check_dX_div_X_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         nz = s% nz
+         max_abs_dX_div_X = -1
+         do j=1,s% species
+            X = s% xa(j,nz)
+            if (X > s% delta_dX_div_X_cntr_max) cycle
+            if (X < s% delta_dX_div_X_cntr_min) cycle
+            if (X <= 0d0) cycle
+            dX = X - s% xa_old(j,nz)
+            abs_dX_div_X = abs(dX/X)
+            if (abs_dX_div_X > max_abs_dX_div_X) then
+               max_abs_dX_div_X = abs_dX_div_X
+            end if
+         end do
+         if (max_abs_dX_div_X <= 0d0) return
+         check_dX_div_X_cntr = check_change(s, max_abs_dX_div_X, &
+            s% delta_dX_div_X_cntr_limit, s% delta_dX_div_X_cntr_hard_limit, &
+            1, 'check_dX_div_X_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dX_div_X_cntr
+
+
+      integer function check_lg_XH_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ih1
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, lg_XH_cntr, lg_XH_cntr_old
+         integer :: h1, nz
+         include 'formats'
+         check_lg_XH_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         h1 = s% net_iso(ih1)
+         if (h1 == 0) return
+         nz = s% nz
+         if (s% xa(h1,nz) < 1d-10) return
+         lg_XH_cntr = log10(s% xa(h1,nz))
+         if (lg_XH_cntr > s% delta_lg_XH_cntr_max) return
+         if (lg_XH_cntr < s% delta_lg_XH_cntr_min) return
+         lg_XH_cntr_old = safe_log10(s% xa_old(h1,nz))
+         check_lg_XH_cntr = check_change(s, lg_XH_cntr - lg_XH_cntr_old, &
+            s% delta_lg_XH_cntr_limit, s% delta_lg_XH_cntr_hard_limit, &
+            1, 'check_lg_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_lg_XH_cntr
+
+
+      integer function check_lg_XHe_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ih1, ihe4
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, lg_XHe_cntr, lg_XHe_cntr_old
+         integer :: h1, he4, nz
+         real(dp) :: xh1, xhe4
+         include 'formats'
+         check_lg_XHe_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         h1 = s% net_iso(ih1)
+         he4 = s% net_iso(ihe4)
+         if (h1 == 0 .or. he4 == 0) return
+         nz = s% nz
+         xh1 = s% xa(h1,nz)
+         xhe4 = s% xa(he4,nz)
+         if (xhe4 < max(xh1, 1d-10)) return
+         lg_XHe_cntr = log10(xhe4)
+         if (lg_XHe_cntr > s% delta_lg_XHe_cntr_max) return
+         if (lg_XHe_cntr < s% delta_lg_XHe_cntr_min) return
+         lg_XHe_cntr_old = safe_log10(s% xa_old(he4,nz))
+         check_lg_XHe_cntr = check_change(s, lg_XHe_cntr - lg_XHe_cntr_old, &
+            s% delta_lg_XHe_cntr_limit, s% delta_lg_XHe_cntr_hard_limit, &
+            1, 'check_lg_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_lg_XHe_cntr
+
+
+      integer function check_lg_XC_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ih1, ihe4, ic12
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, lg_XC_cntr, lg_XC_cntr_old
+         integer :: h1, he4, c12, nz
+         real(dp) :: xh1, xhe4, xc12
+         include 'formats'
+         check_lg_XC_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         h1 = s% net_iso(ih1)
+         he4 = s% net_iso(ihe4)
+         c12 = s% net_iso(ic12)
+         if (h1 == 0 .or. he4 == 0 .or. c12 == 0) return
+         nz = s% nz
+         xh1 = s% xa(h1,nz)
+         xhe4 = s% xa(he4,nz)
+         xc12 = s% xa(c12,nz)
+         if (xc12 < max(xh1, xhe4, 1d-10)) return
+         if (s% xa(c12,nz) < 1d-10) return
+         lg_XC_cntr = log10(xc12)
+         if (lg_XC_cntr > s% delta_lg_XC_cntr_max) return
+         if (lg_XC_cntr < s% delta_lg_XC_cntr_min) return
+         lg_XC_cntr_old = safe_log10(s% xa_old(c12,nz))
+         check_lg_XC_cntr = check_change(s, lg_XC_cntr - lg_XC_cntr_old, &
+            s% delta_lg_XC_cntr_limit, s% delta_lg_XC_cntr_hard_limit, &
+            1, 'check_lg_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_lg_XC_cntr
+
+
+      integer function check_lg_XO_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ih1, ihe4, ic12, io16
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, lg_XO_cntr, lg_XO_cntr_old
+         integer :: h1, he4, c12, o16, nz
+         real(dp) :: xh1, xhe4, xc12, xo16
+         include 'formats'
+         check_lg_XO_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         h1 = s% net_iso(ih1)
+         he4 = s% net_iso(ihe4)
+         c12 = s% net_iso(ic12)
+         o16 = s% net_iso(io16)
+         if (h1 == 0 .or. he4 == 0 .or. c12 == 0 .or. o16 == 0) return
+         nz = s% nz
+         xh1 = s% xa(h1,nz)
+         xhe4 = s% xa(he4,nz)
+         xc12 = s% xa(c12,nz)
+         xo16 = s% xa(o16,nz)
+         if (xo16 < max(xh1, xhe4, xc12, 1d-10)) return
+         lg_XO_cntr = log10(xo16)
+         if (lg_XO_cntr > s% delta_lg_XO_cntr_max) return
+         if (lg_XO_cntr < s% delta_lg_XO_cntr_min) return
+         lg_XO_cntr_old = safe_log10(s% xa_old(o16,nz))
+         check_lg_XO_cntr = check_change(s, lg_XO_cntr - lg_XO_cntr_old, &
+            s% delta_lg_XO_cntr_limit, s% delta_lg_XO_cntr_hard_limit, &
+            1, 'check_lg_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_lg_XO_cntr
+
+
+      integer function check_XH_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ih1
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, XH_cntr, XH_cntr_old
+         integer :: h1, nz
+         include 'formats'
+         check_XH_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         h1 = s% net_iso(ih1)
+         if (h1 == 0) return
+         nz = s% nz
+         XH_cntr = s% xa(h1,nz)
+         XH_cntr_old = s% xa_old(h1,nz)
+         check_XH_cntr = check_change(s, XH_cntr - XH_cntr_old, &
+            s% delta_XH_cntr_limit, s% delta_XH_cntr_hard_limit, &
+            1, 'check_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_XH_cntr
+
+
+      integer function check_XHe_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ihe4
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, XHe_cntr, XHe_cntr_old
+         integer :: he4, nz
+         include 'formats'
+         check_XHe_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         he4 = s% net_iso(ihe4)
+         if (he4 == 0) return
+         nz = s% nz
+         XHe_cntr = s% xa(he4,nz)
+         XHe_cntr_old = s% xa_old(he4,nz)
+         check_XHe_cntr = check_change(s, XHe_cntr - XHe_cntr_old, &
+            s% delta_XHe_cntr_limit, s% delta_XHe_cntr_hard_limit, &
+            1, 'check_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_XHe_cntr
+
+
+      integer function check_XC_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ic12
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, XC_cntr, XC_cntr_old
+         integer :: c12, nz
+         include 'formats'
+         check_XC_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         c12 = s% net_iso(ic12)
+         if (c12 == 0) return
+         nz = s% nz
+         XC_cntr = s% xa(c12,nz)
+         XC_cntr_old = s% xa_old(c12,nz)
+         check_XC_cntr = check_change(s, XC_cntr - XC_cntr_old, &
+            s% delta_XC_cntr_limit, s% delta_XC_cntr_hard_limit, &
+            1, 'check_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_XC_cntr
+
+
+      integer function check_XNe_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: ine20
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, XNe_cntr, XNe_cntr_old
+         integer :: ne20, nz
+         include 'formats'
+         check_XNe_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         ne20 = s% net_iso(ine20)
+         if (ne20 == 0) return
+         nz = s% nz
+         XNe_cntr = s% xa(ne20,nz)
+         XNe_cntr_old = s% xa_old(ne20,nz)
+         check_XNe_cntr = check_change(s, XNe_cntr - XNe_cntr_old, &
+            s% delta_XNe_cntr_limit, s% delta_XNe_cntr_hard_limit, &
+            1, 'check_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_XNe_cntr
+
+
+      integer function check_XO_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: io16
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, XO_cntr, XO_cntr_old
+         integer :: o16, nz
+         include 'formats'
+         check_XO_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         o16 = s% net_iso(io16)
+         if (o16 == 0) return
+         nz = s% nz
+         XO_cntr = s% xa(o16,nz)
+         XO_cntr_old = s% xa_old(o16,nz)
+         check_XO_cntr = check_change(s, XO_cntr - XO_cntr_old, &
+            s% delta_XO_cntr_limit, s% delta_XO_cntr_hard_limit, &
+            1, 'check_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_XO_cntr
+
+
+      integer function check_XSi_cntr(s, skip_hard_limit, dt_limit_ratio)
+         use chem_def, only: isi28
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess, XSi_cntr, XSi_cntr_old
+         integer :: si28, nz
+         include 'formats'
+         check_XSi_cntr = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+         si28 = s% net_iso(isi28)
+         if (si28 == 0) return
+         nz = s% nz
+         XSi_cntr = s% xa(si28,nz)
+         XSi_cntr_old = s% xa_old(si28,nz)
+         check_XSi_cntr = check_change(s, XSi_cntr - XSi_cntr_old, &
+            s% delta_XSi_cntr_limit, s% delta_XSi_cntr_hard_limit, &
+            1, 'check_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_XSi_cntr
+
+
+      integer function check_delta_mdot(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: mdot, mdot_old, delta_mdot, lim, hard_lim
+         check_delta_mdot = keep_going
+         mdot = s% mstar_dot
+         mdot_old = s% mstar_dot_old
+         delta_mdot = abs(mdot - mdot_old)/ &
+            (s% delta_mdot_atol*Msun/secyer + &
+               s% delta_mdot_rtol*max(abs(mdot),abs(mdot_old)))
+         if (delta_mdot == 0) return
+         lim = s% delta_mdot_limit*s% time_delta_coeff
+         hard_lim = s% delta_mdot_hard_limit*s% time_delta_coeff
+         if (hard_lim > 0 .and. (.not. skip_hard_limit)) then
+            if (delta_mdot > hard_lim) then
+               if (s% report_all_dt_limits) &
+                  write(*, '(a30, f20.10, 99e20.10)') 'delta_mdot_hard_limit', &
+                     delta_mdot, hard_lim
+               s% retry_message = 'delta_mdot_hard_limit'
+               check_delta_mdot = retry
+               return
+            end if
+         end if
+         if (lim <= 0) return
+         dt_limit_ratio = delta_mdot/lim
+         if (dt_limit_ratio <= 1d0) then
+            dt_limit_ratio = 0
+         else if (s% report_all_dt_limits) then
+            write(*, '(a30, f20.10, 99e20.10)') 'delta_mdot_limit', &
+               dt_limit_ratio, delta_mdot, lim
+         end if
+      end function check_delta_mdot
+
+
+      integer function check_delta_mstar(s, skip_hard_limit, dt, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: delta_lg_star_mass, lim, hard_lim
+         check_delta_mstar = keep_going
+         delta_lg_star_mass = abs(log10(s% mstar/s% mstar_old))
+         lim = s% delta_lg_star_mass_limit*s% time_delta_coeff
+         hard_lim = s% delta_lg_star_mass_hard_limit*s% time_delta_coeff
+         if (hard_lim > 0 .and. (.not. skip_hard_limit)) then
+            if (delta_lg_star_mass > hard_lim) then
+               if (s% report_all_dt_limits) &
+                  write(*, '(a30, f20.10, 99e20.10)') 'delta_lg_star_mass_hard_limit', &
+                     delta_lg_star_mass, hard_lim
+               check_delta_mstar = retry
+               s% retry_message = 'delta_lg_star_mass_hard_limit'
+               return
+            end if
+         end if
+         if (lim <= 0) return
+         dt_limit_ratio = delta_lg_star_mass/lim
+         if (dt_limit_ratio <= 1d0) then
+            dt_limit_ratio = 0
+         else if (s% report_all_dt_limits) then
+            write(*, '(a30, f20.10, 99e20.10)') 'delta_lg_star_mass_limit', &
+               dt_limit_ratio, delta_lg_star_mass, lim
+         end if
+      end function check_delta_mstar
+
+
+      integer function check_adjust_J_q(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: relative_excess
+         include 'formats'
+         check_adjust_J_q = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         ! we care about s% adjust_J_q remaining above a given limit
+         ! so we use 1-S% adjust_J_q
+         check_adjust_J_q = check_change(s, 1-s% adjust_J_q, &
+            1-s% adjust_J_q_limit, &
+            1-s% adjust_J_q_hard_limit, &
+            1, 'check_rel_error_in_energy', &
+            .false., dt_limit_ratio, relative_excess)
+      end function check_adjust_J_q
+
+
+      integer function check_delta_lgL_phot(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: dlgL_phot, relative_excess
+         check_delta_lgL_phot = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         if (s% L_phot < s% delta_lgL_phot_limit_L_min .or. &
+               s% L_phot_old <= 0d0 .or. s% constant_L) then
+            dlgL_phot = 0
+         else
+            dlgL_phot = log10(s% L_phot/s% L_phot_old)
+         end if
+         check_delta_lgL_phot = check_change(s, dlgL_phot, &
+            s% delta_lgL_phot_limit, s% delta_lgL_phot_hard_limit, &
+            1, 'check_delta_lgL_phot', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_delta_lgL_phot
+
+
+      integer function check_delta_lgL(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: dlgL, relative_excess
+         include 'formats'
+         check_delta_lgL = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         if (s% L_surf < s% delta_lgL_limit_L_min .or. &
+               s% L_surf_old <= 0d0 .or. s% constant_L) then
+            dlgL = 0
+         else
+            dlgL = log10(s% L_surf/s% L_surf_old)
+         end if
+         check_delta_lgL = check_change(s, dlgL, &
+            s% delta_lgL_limit, s% delta_lgL_hard_limit, &
+            1, 'check_delta_lgL', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_delta_lgL
+
+
+      integer function check_delta_HR(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: dlgL, dlgTeff, dHR, relative_excess
+         include 'formats'
+         check_delta_HR = keep_going
+         if (s% L_phot_old <= 0 .or. s% Teff_old <= 0 .or. &
+             s% L_phot <= 0 .or. s% Teff <= 0) return
+         dlgL = log10(s% L_phot/s% L_phot_old)
+         dlgTeff = log10(s% Teff/s% Teff_old)
+         dHR = sqrt(pow2(s% delta_HR_ds_L*dlgL) + pow2(s% delta_HR_ds_Teff*dlgTeff))
+         if (is_bad(dHR)) then
+            write(*,1) 's% L_phot_old', s% L_phot_old
+            write(*,1) 's% L_phot', s% L_phot
+            write(*,1) 's% Teff_old', s% Teff_old
+            write(*,1) 's% Teff', s% Teff
+            write(*,1) 'dHR', dHR
+            if (s% stop_for_bad_nums) stop 'check_delta_HR'
+         end if
+         check_delta_HR = check_change(s, dHR, &
+            s% delta_HR_limit, s% delta_HR_hard_limit, &
+            1, 'check_delta_HR', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_delta_HR
+
+
+      integer function check_avg_v_residual(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: val, relative_excess
+         include 'formats'
+         check_avg_v_residual = keep_going
+         if (.not. s% v_flag) return
+         val = abs(dot_product(s% dq(1:s% nz),s% v_residual(1:s% nz)))
+         check_avg_v_residual = check_change(s, val, &
+            s% limit_for_avg_v_residual, &
+            s% hard_limit_for_avg_v_residual, &
+            1, 'check_avg_v_residual', &
+            .false., dt_limit_ratio, relative_excess)
+      end function check_avg_v_residual
+
+
+      integer function check_max_abs_v_residual(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: val, relative_excess
+         include 'formats'
+         check_max_abs_v_residual = keep_going
+         if (.not. s% v_flag) return
+         val = maxval(abs(s% v_residual(1:s% nz)))
+         check_max_abs_v_residual = check_change(s, val, &
+            s% limit_for_max_abs_v_residual, &
+            s% hard_limit_for_max_abs_v_residual, &
+            1, 'check_max_abs_v_residual', &
+            .false., dt_limit_ratio, relative_excess)
+      end function check_max_abs_v_residual
+
+
+      integer function check_rel_rate_in_energy(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: rel_rate, relative_excess
+         include 'formats'
+         check_rel_rate_in_energy = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         rel_rate = abs(s% error_in_energy_conservation/s% total_energy_end)/s% dt
+         check_rel_rate_in_energy = check_change(s, rel_rate, &
+            s% limit_for_rel_rate_in_energy_conservation, &
+            s% hard_limit_for_rel_rate_in_energy_conservation, &
+            1, 'check_rel_rate_in_energy', &
+            .false., dt_limit_ratio, relative_excess)
+      end function check_rel_rate_in_energy
+
+
+      integer function check_rel_error_in_energy(s, skip_hard_limit, dt_limit_ratio)
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: rel_error, relative_excess
+         include 'formats'
+         check_rel_error_in_energy = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         rel_error = abs(s% error_in_energy_conservation/s% total_energy_end)
+         check_rel_error_in_energy = check_change(s, rel_error, &
+            s% limit_for_rel_error_in_energy_conservation, &
+            s% hard_limit_for_rel_error_in_energy_conservation, &
+            1, 'check_rel_error_in_energy', &
+            .false., dt_limit_ratio, relative_excess)
+      end function check_rel_error_in_energy
+
+
+      integer function check_dt_div_min_dr_div_cs(s, skip_hard_limit, dt, dt_limit_ratio)
+         use star_utils, only: min_dr_div_cs
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: ratio, dt_x, relative_excess
+         include 'formats'
+         check_dt_div_min_dr_div_cs = keep_going
+         dt_limit_ratio = 0d0
+         if (s% doing_relax) return
+         dt_x = min_dr_div_cs(s, s% Tlim_dt_div_min_dr_div_cs_cell)
+         ratio = dt/dt_x
+         check_dt_div_min_dr_div_cs = check_change(s, ratio, &
+            s% dt_div_min_dr_div_cs_limit, s% dt_div_min_dr_div_cs_hard_limit, &
+            1, 'check_dt_div_min_dr_div_cs', skip_hard_limit, dt_limit_ratio, relative_excess)
+      end function check_dt_div_min_dr_div_cs
+
+
+      integer function check_dX_nuc_drop(s, skip_hard_limit, dt, dt_limit_ratio)
+         use chem_def
+         use rates_def, only: i_rate
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+
+         integer :: k, nz, max_k, max_j
+         real(dp), pointer, dimension(:) :: sig
+         real(dp) :: max_dx_nuc_drop, X_limit, A_limit, min_dt, limit, hard_limit
+
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         check_dX_nuc_drop = keep_going
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
+
+         X_limit = s% dX_nuc_drop_min_X_limit
+         A_limit = s% dX_nuc_drop_max_A_limit
+         nz = s% nz
+         sig => s% sig
+
+         max_dx_nuc_drop = 0
+         max_k = 0
+         max_j = 0
+         do k = 1, nz
+            call do1(k)
+         end do
+
+         s% Tlim_dXnuc_drop_cell = max_k
+         s% Tlim_dXnuc_drop_species = max_j
+         
+         hard_limit = s% dX_nuc_drop_hard_limit*s% time_delta_coeff
+         if (hard_limit > 0 .and. (.not. skip_hard_limit) .and. &
+               max_dx_nuc_drop > hard_limit) then
+            if (s% report_all_dt_limits) &
+               write(*, '(a30, i6, f20.10, 99e20.10)') &
+                  'dX_nuc_drop_hard_limit ' // trim(chem_isos% name(s% chem_id(max_j))), &
+                  max_k, max_dx_nuc_drop, hard_limit
+            s% retry_message = 'dX_nuc_drop_hard_limit'
+            check_dX_nuc_drop= retry
+            return
+         end if
+         
+         limit = s% dX_nuc_drop_limit*s% time_delta_coeff
+         if (s% log_max_temperature >= 9.45d0 .and. s% dX_nuc_drop_limit_at_high_T > 0) &
+            limit = s% dX_nuc_drop_limit_at_high_T
+         if (limit <= 0 .or. max_dx_nuc_drop <= 0) return
+
+         if (dt < secyer*s% dX_nuc_drop_min_yrs_for_dt) return
+         min_dt = secyer*s% dX_nuc_drop_min_yrs_for_dt
+         dt_limit_ratio = min( &
+            max_dx_nuc_drop/limit, &
+            1d0*dt/min_dt)
+         if (dt_limit_ratio <= 1d0) then
+            dt_limit_ratio = 0
+         else if (s% report_all_dt_limits) then
+            write(*,2) 'dt limit: dX_nuc_drop ' // trim(chem_isos% name(s% chem_id(max_j))), &
+               max_k, dt_limit_ratio, max_dx_nuc_drop, limit, s% m(max_k)/Msun
+         end if
+
+         s% dX_nuc_drop_max_j = max_j
+         s% dX_nuc_drop_max_k = max_k
+         s% dX_nuc_drop_max_drop = max_dx_nuc_drop
+
+         contains
+
+         subroutine write_max(io)
+            integer, intent(in) :: io
+            if (.not. s% report_dX_nuc_drop_dt_limits) return
+            write(io,'(a,i6,a20,i6,99(1x,a,1x,1pe10.3))') &
+               'dt limit dX_nuc_drop:  model ', s% model_number, &
+               '  ' // trim(chem_isos% name(s% chem_id(max_j))) // '  at cell', &
+               max_k, '  drop', max_dx_nuc_drop, &
+               '  before', s% xa(max_j,max_k)+max_dx_nuc_drop, &
+               '  after', s% xa(max_j,max_k), &
+               '  m', s% m(max_k)/Msun
+         end subroutine write_max
+
+
+         subroutine do1(k)
+            integer, intent(in) :: k
+
+            integer :: j, jj, ii
+            real(dp) :: dx, dx_drop, dm, dt_dm, dx_burning, dx_inflow, dxdt_nuc
+            real(dp) ::dx00, dxp1, sig00, sigp1, flux00, fluxp1
+
+            include 'formats'
+
+            dm = s% dm(k)
+            dt_dm = dt/dm
+
+            do j=1, s% species
+
+               if (chem_isos% W(s% chem_id(j)) > A_limit) then
+                  if (dbg .and. k == 1387) &
+                     write(*,2) 'dX_nuc_max_A_limit ' // trim(chem_isos% name(s% chem_id(j))), &
+                        k, s% xa(j,k), chem_isos% W(s% chem_id(j)), A_limit
+                  cycle
+               end if
+
+               if (chem_isos% Z(s% chem_id(j)) <= 2) then
+                  cycle ! skip the little guys
+               end if
+
+               if (s% xa(j,k) < X_limit) then
+                  if (dbg .and. k == 1387) &
+                     write(*,2) &
+                        'dX_nuc_drop_min_X_limit ' // trim(chem_isos% name(s% chem_id(j))), &
+                        k, s% xa(j,k), X_limit
+                  cycle
+               end if
+
+               dxdt_nuc = s% dxdt_nuc(j,k)
+               if (dxdt_nuc >= 0) cycle
+
+               dx_burning = dxdt_nuc*dt
+               sig00 = sig(k)
+
+               if (k < s% nz) then
+                  sigp1 = sig(k+1)
+               else
+                  sigp1 = 0
+               end if
+               
+               if (k > 1) then
+                  dx00 = s% xa(j,k-1) - s% xa(j,k)
+                  flux00 = -sig00*dx00
+               else
+                  flux00 = 0
+               end if
+
+               if (k < s% nz) then
+                  dxp1 = s% xa(j,k) - s% xa(j,k+1)
+                  fluxp1 = -sigp1*dxp1
+               else
+                  fluxp1 = 0
+               end if
+
+               dx_inflow = max(0d0, fluxp1, -flux00)*dt_dm
+               
+               dx_drop = -(dx_burning + dx_inflow) ! dx_burning < 0 for drop
+
+               dx = s% xa_old(j,k) - s% xa(j,k) ! the actual drop
+               if (dx < dx_drop) dx_drop = dx
+
+               if (dx_drop > max_dx_nuc_drop) then
+                  max_dx_nuc_drop = dx_drop
+                  max_k = k
+                  max_j = j
+               end if
+
+            end do
+
+
+         end subroutine do1
+
+
+      end function check_dX_nuc_drop
+
+
+      integer function check_varcontrol_limit(s, dt_limit_ratio)
+         type (star_info), pointer :: s
+         real(dp), intent(inout) :: dt_limit_ratio
+
+         real(dp) :: varcontrol, vc_target
+         integer :: ierr
+
+         include 'formats'
+
+         ierr = 0
+         check_varcontrol_limit = keep_going
+
+         varcontrol = eval_varcontrol(s, ierr)
+         if (ierr /= 0) then
+            check_varcontrol_limit = retry
+            s% retry_message = 'varcontrol hard limit'
+            if (s% report_ierr) write(*, *) 'check_varcontrol_limit: eval_varcontrol ierr', ierr
+            s% result_reason = nonzero_ierr
+            return
+         end if
+         
+         if (s% varcontrol_target < s% min_allowed_varcontrol_target) then
+            check_varcontrol_limit = terminate
+            write(*, *) 'ERROR: timestep varcontrol_target < min_allowed_varcontrol_target'
+            s% result_reason = nonzero_ierr
+            return
+         end if
+
+         vc_target = max(1d-99,s% varcontrol_target)
+         dt_limit_ratio = varcontrol/vc_target
+
+         if (dt_limit_ratio > 1d0 .and. s% report_all_dt_limits) &
+            write(*, '(a30, f20.10, 99e20.10)') 'varcontrol', &
+               dt_limit_ratio, varcontrol, vc_target
+
+         if (s% report_solver_dt_info) then
+            write(*, 1) 's% varcontrol_target', s% varcontrol_target
+            write(*, 1) 'vc_target', vc_target
+            write(*, 1) 'varcontrol', varcontrol
+            write(*, 1) 'dt_limit_ratio', dt_limit_ratio
+            write(*, *)
+         end if
+
+         if (dt_limit_ratio > s% varcontrol_dt_limit_ratio_hard_max) then
+            write(*, '(a50, f20.10, 99e20.10)') 'varcontrol_dt_limit_ratio too large', &
+               dt_limit_ratio, varcontrol, vc_target
+            check_varcontrol_limit = retry
+            s% retry_message = 'varcontrol_dt_limit_ratio_hard_max'
+            return
+         end if
+
+      end function check_varcontrol_limit
+
+
+      real(dp) function eval_varcontrol(s, ierr) result(varcontrol)
+         use chem_def
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: j, nterms, nvar_hydro, nz, k, kk, &
+            skip1, skip2, skip3, skip4, iounit, i_alpha_RTI, i_eturb_RSP, i_eturb
+         real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar)
+         real(dp), pointer :: vc_data(:,:)
+         logical :: dbg
+         real(dp), parameter :: xscale_min = 1
+
+         vc_data => null()
+
+         include 'formats'
+
+         ierr = 0
+
+         varcontrol = 1d99
+         dbg = .false.
+         nvar_hydro = s% nvar_hydro
+         nz = s% nz
+
+         if (dbg) then
+            allocate(vc_data(nvar_hydro,nz),stat=ierr)
+            if (ierr /= 0) then
+               write(*,*) 'failed in alloca in eval_varcontrol'
+               return
+            end if
+         end if
+         
+         if (s% include_L_in_error_est) then
+            skip1 = 0
+         else
+            skip1 = s% i_lum
+         end if
+
+         if (s% include_v_in_error_est) then
+            skip2 = 0
+         else
+            skip2 = s% i_v
+         end if
+
+         if (s% include_u_in_error_est) then
+            skip3 = 0
+         else
+            skip3 = s% i_u
+         end if
+
+         i_alpha_RTI = s% i_alpha_RTI
+         i_eturb_RSP = s% i_eturb_RSP
+         i_eturb = s% i_eturb
+
+         nterms = 0
+         sumvar = 0
+         sumscales = 0
+         sumterm(:) = 0
+
+         if (.not. associated(s% xh_old)) then
+            stop 'not associated xh_old'
+         end if
+
+         ! use differences in smoothed old and new to filter out high frequency noise.
+         do j = 1, nvar_hydro
+
+            if (j == skip1 .or. &
+                j == skip2 .or. &
+                j == skip3 .or. &
+                j == s% i_ln_cvpv0 .or. &
+                j == s% i_j_rot .or. &
+                j == s% i_w_div_wc .or. & ! TODO: check why not including this makes restart varcontrol inconsistent
+                j == i_alpha_RTI .or. &
+                j == i_eturb .or. &
+                j == i_eturb_RSP) cycle
+
+            nterms = nterms + nz
+            do k = 3, nz-2
+               sumj = abs(sum(s% xh(j,k-2:k+2)) - sum(s% xh_old(j,k-2:k+2)))/5
+               sumterm(j) = sumterm(j) + sumj
+            end do
+            sumterm(j) = sumterm(j) + &
+               abs((2*s% xh(j,1) + s% xh(j,2)) - (2*s% xh_old(j,1) + s% xh_old(j,2)))/3 + &
+               abs((2*s% xh(j,nz) + s% xh(j,nz-1)) - (2*s% xh_old(j,nz) + s% xh_old(j,nz-1)))/3
+            k = 2
+            sumj = abs(sum(s% xh(j,k-1:k+1)) - sum(s% xh_old(j,k-1:k+1)))/3
+            sumterm(j) = sumterm(j) + sumj
+            k = nz-1
+            sumj = abs(sum(s% xh(j,k-1:k+1)) - sum(s% xh_old(j,k-1:k+1)))/3
+
+            if (j == s% i_lnd) then
+               sumterm(j) = sumterm(j)/3 ! Seems to help. from Eggleton.
+            end if
+
+            sumvar = sumvar + sumterm(j)
+            sumscales = sumscales + max(xscale_min, abs(s% xh_old(j,1)))
+
+         end do
+
+         sumterm(:) = sumterm(:)/sumscales
+         sumvar = sumvar/sumscales
+
+         if (dbg) then
+            call show_info
+            deallocate(vc_data)
+            !stop 'debug: timestep'
+         end if
+
+         varcontrol = sumvar/nterms
+
+         contains
+
+         subroutine show_info
+            character (len=64) :: filename
+            real(dp) :: newterm
+            write(*,*)
+            write(*, *) 'sumvar', sumvar
+            write(*, *) 'nterms', nterms
+            write(*, *) 'sumvar/nterms', sumvar/nterms
+            write(*,*)
+            do j=1, nvar_hydro
+               if (j == skip1 .or. &
+                   j == skip2) cycle
+               write(*, '(a40, d26.16)') &
+                  'varcontrol fraction for ' // trim(s% nameofvar(j)) // ' = ', sumterm(j)/sumvar
+            end do
+            write(*,*)
+            do j=1, s% species
+               if (sumterm(nvar_hydro + j) /= 0) &
+                  write(*, '(a40, d26.16)') 'varcontrol fraction for ' // &
+                        trim(chem_isos% name(s% chem_id(j))) // ' = ', &
+                        sumterm(nvar_hydro + j)/sumvar
+            end do
+         end subroutine show_info
+
+
+      end function eval_varcontrol
+
+
+      subroutine filter_dt_next(s, order, dt_limit_ratio_in)
+         ! H211b "low pass" controller.
+         ! Soderlind & Wang, J of Computational and Applied Math 185 (2006) 225 – 243.
+         use num_def
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: order, dt_limit_ratio_in
+
+         real(dp) :: ratio, ratio_prev, limtr, dt_limit_ratio_target, &
+            dt_limit_ratio, beta1, beta2, alpha2
+
+         include 'formats'
+
+         beta1 = 0.25d0/order
+         beta2 = 0.25d0/order
+         alpha2 = 0.25d0
+         
+         dt_limit_ratio = max(1d-10, dt_limit_ratio_in)
+         s% dt_limit_ratio = dt_limit_ratio
+         dt_limit_ratio_target = 1d0
+
+         if (s% use_dt_low_pass_controller .and. &
+               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0 .and. &
+               s% generations > 2) then ! use 2 values to do "low pass" controller
+            ratio = limiter(dt_limit_ratio_target/dt_limit_ratio)
+            ratio_prev = limiter(dt_limit_ratio_target/s% dt_limit_ratio_old)
+            limtr = limiter( &
+               pow(ratio,beta1) * pow(ratio_prev,beta2) * pow(s% dt/s% dt_old,-alpha2))
+            s% dt_next = s% dt*limtr
+
+            if (s% report_solver_dt_info) then
+               write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
+               write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio
+               write(*,2) 's% dt_limit_ratio_old', s% model_number, s% dt_limit_ratio_old
+               write(*,2) 'order', s% model_number, order
+               write(*,2) 'ratio', s% model_number, ratio
+               write(*,2) 'ratio_prev', s% model_number, ratio_prev
+               write(*,2) 'limtr', s% model_number, limtr
+               write(*,2) 's% dt_next', s% model_number, s% dt_next
+               write(*,*)
+            end if
+
+         else ! no history available, so fall back to the 1st order controller
+            s% dt_next = s% dt*dt_limit_ratio_target/dt_limit_ratio
+         end if
+
+
+         contains
+
+
+         real(dp) function limiter(x)
+            real(dp), intent(in) :: x
+            real(dp), parameter :: kappa = 10 ! 2
+            ! for x >= 0 and kappa = 2, limiter value is between 0.07 and 4.14
+            ! for x >= 0 and kappa = 10, limiter value is between 0.003 and 16.7
+            ! for x = 1, limiter = 1
+            limiter = 1 + kappa*atan((x-1)/kappa)
+         end function limiter
+
+
+      end subroutine filter_dt_next
+
+
+      end module timestep
+
+

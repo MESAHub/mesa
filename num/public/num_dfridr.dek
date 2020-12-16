@@ -1,0 +1,54 @@
+      real(dp) function dfridr(hx,func,err) ! from Frank
+         real(dp), intent(in) :: hx
+         real(dp), intent(out) :: err
+         !  this routine returns the first derivative of a function func(x)
+         !  at the point x, by ridders method of polynomial extrapolation.
+         !  value hx is the initial step size;
+         !  it should be an increment for which func changes substantially.
+         !  an estimate of the error in the first derivative is returned in err.
+         interface
+            function func(delta_x) result(val)
+              use const_def, only: dp
+              real(dp), intent(in) :: delta_x
+              real(dp) :: val
+            end function func
+         end interface
+         integer, parameter :: ntab = 20
+         integer :: i,j
+         real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum
+         real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
+         include 'formats'
+         dfridr = 0d0
+         hh = hx
+         ! 2nd order central difference
+         a(1,1) = (func(hh) - func(-hh))/(2d0*hh)
+         !write(*,2) 'dfdx hh', 1, a(1,1), hh
+         err = big
+         ! succesive columns in the neville tableu will go to smaller stepsizes
+         ! and higher orders of extrapolation
+         do i=2,ntab
+            hh = hh/con
+            a(1,i) = (func(hh) - func(-hh))/(2d0*hh)
+            !write(*,2) 'dfdx hh', i, a(1,i), hh
+            ! compute extrapolations of various orders; the error stratagy is to compare
+            ! each new extrapolation to one order lower but both at the same stepsize
+            ! and at the previous stepsize
+            fac = con2
+            do j=2,i
+               a(j,i) = (a(j-1,i)*fac - a(j-1,i-1))/(fac-1d0)
+               fac = con2*fac
+               errt = max(abs(a(j,i)-a(j-1,i)),abs(a(j,i)-a(j-1,i-1)))
+               ! write(*,3) 'a(j,i)', j, i, a(j,i), errt
+               if (errt <= err) then
+                  err = errt
+                  dfridr = a(j,i)
+                  !write(*,3) 'dfridr err', i, j, dfridr, err
+               end if
+            end do
+            ! if higher order is worse by a significant factor safe, then bail
+            if (abs(a(i,i) - a(i-1,i-1)) >= safe*err) then
+               !write(*,1) 'higher order is worse', err, a(i,i), a(i-1,i-1)
+               return
+            end if
+         end do
+      end function dfridr

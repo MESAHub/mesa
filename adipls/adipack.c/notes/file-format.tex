@@ -1,0 +1,315 @@
+%                 Plain TeX file
+%                 ==============
+%
+%-------------------------------------------------------------------------
+%
+% additional macros required
+
+\font\fourtbf=cmbx10 scaled \magstep2
+\def\ie{{\it i.e.}}
+\def\cf{{\it cf.}}
+\def\etal{{\it et al.}}
+\def\CP{{\bf CP}}
+\def\nwl{\hfill\break}
+\def\ref{\par\noindent
+	\hangindent=0.7 true cm
+	\hangafter=1}
+\def\note #1]{{\bf #1]}}
+%  section macros, designed to avoid new page after section headings.
+\def\mainsect #1\par{\interlinepenalty=100\bigskip\bigskip\noindent
+\hangindent=1 true cm
+\hangafter=1
+{#1}\par%
+\penalty10000\par\bigskip\par\penalty10000\noindent}
+%\def\mainsect #1\par{\bigskip\bigskip\noindent{#1}\par%
+%\penalty10000\par\bigskip\par\penalty10000\noindent}
+
+\def\subsect #1\par{\bigskip\noindent{#1}\par%
+\penalty10000\bigskip\par\penalty10000\noindent}
+\def\intsect #1\par{\par\penalty10000\bigskip\penalty10000\noindent{#1}\par%
+\penalty10000\par\bigskip\par\penalty10000\noindent}
+
+
+% \input /dsk2/users/jcd/tex/loc-macro.tex
+\magnification=\magstephalf
+\raggedbottom
+
+\def\solar{\odot}
+\def\Plus{{\displaystyle +}}
+\def\H{{\rm H}}
+\def\He{{\rm He}}
+\def\dd{{\rm d}}
+
+\centerline{\fourtbf File format for}
+\centerline{\fourtbf GONG solar model project.}
+
+\bigskip
+
+\centerline{J{\o}rgen Christensen-Dalsgaard}
+\centerline{Teoretisk Astrofysik Center; and Institut for Fysik og Astronomi,
+ Aarhus Universitet}
+
+\bigskip
+%
+\mainsect
+{\bf 1. Introduction.}
+
+The present notes provide a definition of the data format
+used for comparison of solar models within the GONG models team.
+They essentially correspond to Section 9 of
+{\it Computational procedures for GONG model project}
+(in the following {\CP}) and have been extracted here for
+convenience of reference.
+For details on the GONG model comparisons project, involving simplified
+physics, {\CP} should be consulted.
+The focus here is on the exchange of realistic solar models,
+involving detailed physics.
+
+\mainsect
+{\bf 2. File structure, and variables}
+
+The exchange of models will take place by means of ASCII files,
+to avoid problems with different binary formats.
+This makes it possible to send the data electronically without
+problems (other than caused by the amount).
+
+For each model the file consists of a header, with descriptive
+information, a set of global variables, and a set of variables
+given at each mesh point.
+
+The set of variables is likely to develop, particularly in the
+context of the use of the format for transferring realistic
+solar and stellar models.
+The actual set used is defined by the variable {\tt ivers}
+included in the header to the file.
+In addition, the total number of global parameters, meshpoints
+and variables at each meshpoint are given in the header,
+so that the information required to read the file is available.
+
+The variables should be given in {\it cgs} units, unless otherwise stated.
+
+\subsect
+{\it 2.1 Text header.}
+
+The first record should contain the name of the model,
+its date, and an identification of its origin (such as name or
+institute). 
+In addition the header may contain text further describing
+the calculation, and information about the remaining data.
+
+An example of a header may be the following
+(describing Model S of the {\it Science} series of articles):
+\medskip
+{\obeylines \tt
+L5BI.D.15.PRES.950912.AARHUS
+Level 5 physics, present Sun. (OPAL opacity, OPAL EOS). He, Z diffusion.
+Age of present Sun: 4.6 Gyr.
+
+}
+
+\subsect
+{\it 2.2 Global parameters.}
+
+These are set up in the array {\tt glob(i)}, {\tt i = 1, ..., iconst},
+with the following definition:
+
+\medskip
+{\obeylines
+% \ind{5.0em}
+ 1: $M$  	(total mass).
+ 2: $R$  	(photospheric radius).
+ 3: $L_{\rm s}$	(surface luminosity).
+ 4: $Z$ 	(heavy element abundance).
+ 5: $X_0$ 	(initial hydrogen abundance).
+ 6: $\alpha = \ell /H_p$ (mixing-length parameter; %
+ $H_p$ is pressure scale height)
+ 7: $\phi$  	(another convection theory parameter)$^{\rm a)}$
+ 8: $\xi$  	(yet another convection theory parameter)$^{\rm a)}$
+ 9: $\beta$	(parameter in surface pressure condition)$^{\rm b)}$
+10: $\lambda$	(parameter in surface luminosity condition)$^{\rm b)}$
+11: $\displaystyle{{R^2 \over p_{\rm c}} {\dd^2 p_{\rm c}  \over \dd r^2}}$ %
+(at centre)$^{\rm c)}$
+12: $\displaystyle{{R^2 \over \rho_{\rm c}} %
+{\dd^2 \rho_{\rm c} \over \dd r^2}}$ (at centre)$^{\rm c)}$
+13: Model age (in years)$^{\rm d)}$
+14 -- 15: Unused, so far.
+}
+\medskip\noindent
+Notes:
+\medskip
+\item{a)}
+The parameters $\phi$ and $\xi$ are defined in {\CP}.
+For the B\"ohm-Vitense formulation, $\phi = 9/4$ and $\xi = 1/162$.
+\item{b)} 
+These parameters are used in boundary conditions for
+models with simplified physics ({\cf} {\CP}).
+For realistic models, $\beta = \lambda = 1$.
+\item{c)}
+These second derivatives may be needed
+in the central boundary conditions for oscillation calculations.
+\item{d)}
+Added 30/7/96.
+If the calculation includes pre-main-sequence evolution, the definition
+of zero age must be specified, in the character header or in
+accompanying notes.
+It would be useful to arrive at a common definition;
+suggestions are welcome.
+
+\subsect
+{\it 2.3 Model variables at each mesh point.}
+
+These are set up in the array {\tt var(i, n)}, 
+{\tt i = 1, ..., ivar}, {\tt n = 1, ..., nn}.
+The current set of variables, as defined in July 1996,
+is characterized by having {\tt ivers} = 250.
+\medskip
+{\obeylines\parskip=2pt
+ 1: $r$ (distance to centre)
+ 2: $\ln q , \quad  q = m/M$ ($m$ is mass interior to $r$ and $M$ is total mass)
+ 3: $T$ (temperature)
+ 4: $p$ (pressure)
+ 5: $\rho$ (density)
+ 6: $X$ (hydrogen abundance by mass)
+ 7: $L(r)$ (luminosity at distance $r$ from centre)
+ 8: $\kappa$ (opacity)
+ 9: $\epsilon$ (energy generation rate per unit mass)
+10: $\displaystyle {\Gamma_1 = %
+\left({\partial \ln p \over \partial \ln \rho} \right)_{\rm ad}}$
+11: $\displaystyle{\nabla_{\rm ad} = %
+\left({ \partial \ln T \over \partial \ln p} \right)_{\rm ad}}$
+12: $\displaystyle{\delta = %
+- \left( {\partial \log \rho  \over \partial \log T} \right)_p}$
+13: $c_p$ (specific heat at constant pressure)
+14: $\mu_{\rm e}^{-1}$ [see note ii) below]
+15: $ \displaystyle{{1 \over \Gamma_1} {\dd  \log p  \over \dd \log r} - %
+{\dd  \log \rho  \over \dd \log r}}$
+16: $r_X$ (rate of change in $X$ from nuclear reactions)
+17: $Z$ (heavy-element abundance per unit mass)
+18: $R - r$
+19: $\epsilon_{\rm g}$ (rate of gravitational energy release)
+20: $L_{\rm g}$ (local gravitational luminosity; this has only %
+been included in J. Reiter's models so far)
+21: $X({}^3{\rm He})$ (${}^3{\rm He}$ abundance by mass)
+22: $X({}^{12}{\rm C})$ (${}^{12}{\rm C}$ abundance by mass)
+23: $X({}^{13}{\rm C})$ (${}^{13}{\rm C}$ abundance by mass)
+24: $X({}^{14}{\rm N})$ (${}^{14}{\rm N}$ abundance by mass)
+25: $X({}^{16}{\rm O})$ (${}^{16}{\rm O}$ abundance by mass)
+26: $\displaystyle \left({\partial \ln \Gamma_1 \over \partial \ln \rho} %
+     \right)_{p, Y}$
+27: $\displaystyle \left({\partial \ln \Gamma_1 \over \partial \ln p} %
+     \right)_{\rho, Y}$
+28: $\displaystyle \left({\partial \ln \Gamma_1 \over \partial Y} %
+     \right)_{p, \rho}$
+29 -- 30: Currently not used.
+}
+\medskip\noindent
+Comments:
+\medskip
+\item{i)}
+In variable 2, $\ln q$ is used instead of $m$ to give a better
+indication of variation close to the surface.
+Here ``ln'' is natural logarithm.
+\item{ii)}
+$\mu_{\rm e}^{-1} = N_{\rm e} m_{\rm u}$,
+where $N_{\rm e}$ is the number of free electrons per unit mass
+and $m_{\rm u}$ is the atomic mass unit;
+thus $\mu_{\rm e}$ is the mean molecular weight per electron.
+It has been included to give some indication of the ionization state.
+\item{iii)} 
+Variable 18 was introduced Aug. 6 1993, to avoid problems with interpolation
+in $r$ near surface. (For versions before {\tt ivers} = 210,
+but after that date, $R - r$ was set in variable 17.)
+\item{iv)}
+The derivatives of $\Gamma_1$ were introduced principally to allow
+calculation of kernels involving $Y$, in realistic models;
+they are less essential for the comparison of models.
+\item{v)}
+Calculations that do not follow all details of the CNO cycle
+may not have available some of the CNO abundances.
+In that case, the corresponding abundances can be set to zero.
+(An example might be a calculation following the conversion of
+${}^{16}{\rm O}$ into ${}^{14}{\rm N}$ but ignoring the
+details of carbon burning into ${}^{14}{\rm N}$.)
+\item{vi)}
+More generally, for a given code there might be variables that are
+difficult to obtain. 
+In that case, the above numbering should be maintained, but the
+missing variables may be set identially to zero.
+
+\medskip\noindent
+The present set of variables has been chosen to give a reasonably
+comprehensive basis for comparing evolution models, and to be
+adequate for the computation of adiabatic oscillations.
+In particular these variables should define completely
+the stellar structure equations, and so permit a check of the
+accuracy to which the equations are satisfied.
+For a more detailed comparison even more variables may be needed
+(such as ionization levels), but I suggest that that be arranged
+separately. 
+
+For non-adiabatic calculations, which we should eventually
+get to, more variables are certainly needed.
+Typical examples are the derivatives of $\kappa$ and $\epsilon$
+with respect to $p$ and $T$, and possibly variables relating
+to the perturbation of the convective flux.
+They can be included later, by extending the basic set
+given above.
+
+\subsect
+{\it 2.4 Format for data transfer.}
+
+The data exchange should be carried out by means of formatted
+ASCII files, using the following structure:
+\medskip
+{\obeylines
+{\bf Record 1:} %
+Name of model (as a character string)
+{\bf Record 2 -- 4:} %
+Explanatory text, in free format
+{\bf Record 5:} %
+{\tt nn, iconst, ivar, ivers}
+{\bf Record 6 -- 8:} %
+{\tt glob(i), i = 1, ..., iconst}
+{\bf Record 9 --  :} %
+{\tt var(i,n), i = 1, $\ldots$, ivar, n = 1, $\ldots$ nn}.
+}
+\medskip\noindent
+Here {\tt nn} is the number of mesh points in the model,
+{\tt iconst} is the number of global variables (given in the array
+{\tt glob}), and {\tt ivar} is the number of variables at each mesh point
+(given in the array {\tt var}).
+Thus with the present set {\tt iconst} = 15 and {\tt ivar} = 30, but there is
+room for expansion.
+The version number {\tt ivers} was discussed above.
+
+The integer variable Record 5 should be written with the format 
+\medskip\noindent
+\qquad {\tt 4i10}
+\medskip\noindent
+and the real variable Records 6 and up with the format
+\medskip\noindent
+\qquad {\tt 1p5e16.9}
+
+\mainsect
+{\bf 3. Summary of earlier versions}
+
+The format has been in used for almost a decade, with various extensions
+or modifications;
+these are characterized by the version number, as summarized below:
+
+\medskip
+\item{--} {\bf Version 100}:
+{\tt var(1) - var(16)} defined as above.
+In some models {\tt var(17)} was set to $R - r$, 
+and {\tt var(19)} and {\tt var(20)} were set as above;
+otherwise these variables were set to zero;
+{\tt ivar} = 20.
+\item{--} {\bf Version 200}:
+{\tt var(1) - var(16)} and {\tt var(19) - var(25)} defined as above,
+{\tt var(17)} set to $R - r$; 
+{\tt ivar} = 25.
+\item{--} {\bf Version 210}:
+{\tt var(1) - var(25)} defined as above;
+{\tt ivar} = 25.
+
+\end

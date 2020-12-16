@@ -1,0 +1,52 @@
+
+      ! single step of 4th order Runge-Kutta
+      
+      subroutine rk4(n, y, dydx, x, h, yout, derivs, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: n
+         real(dp), dimension(:), intent(inout) :: y, dydx
+         real(dp), intent(in) :: x, h
+         real(dp), dimension(:), intent(out) :: yout
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr
+         interface
+            subroutine derivs(n, x, y, dydx, lrpar, rpar, lipar, ipar, ierr)
+               use const_def, only: dp
+               integer, intent(in) :: n
+               real(dp), intent(in) :: x
+               real(dp), dimension(:), intent(inout) :: y
+               real(dp), dimension(:), intent(out) :: dydx
+               integer, intent(in) :: lrpar, lipar
+               integer, intent(inout), pointer :: ipar(:) ! (lipar)
+               real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+               integer, intent(out) :: ierr
+            end subroutine derivs
+         end interface
+         real(dp) :: hh, xh
+         real(dp), dimension(n) :: dym, dyt, yt
+         integer :: i
+         ierr = 0
+         hh = h*0.5d0
+         xh = x + hh
+         do i=1,n
+            yt(i) = y(i) + hh*dydx(i)
+         end do
+         call derivs(n, xh, yt, dyt, lrpar, rpar, lipar, ipar, ierr)
+         if (ierr /= 0) return
+         do i=1,n
+            yt(i) = y(i) + hh*dyt(i)
+         end do
+         call derivs(n, xh, yt, dym, lrpar, rpar, lipar, ipar, ierr)
+         if (ierr /= 0) return
+         do i=1,n
+            yt(i) = y(i) + h*dym(i)
+            dym(i) = dyt(i) + dym(i)
+         end do
+         call derivs(n, x + h, yt, dyt, lrpar, rpar, lipar, ipar, ierr)
+         if (ierr /= 0) return
+         do i=1,n
+            yout(i) = y(i) + (dydx(i) + dyt(i) + 2d0*dym(i))*h/6
+         end do
+      end subroutine rk4   

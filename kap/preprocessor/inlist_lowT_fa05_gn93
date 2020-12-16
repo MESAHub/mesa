@@ -1,0 +1,15 @@
+&kappa
+
+         data_dir = 'kap_input_data/wichita/gn93'		
+         lowT_flag = .true.
+         logT_file = 'logT_points_lowT_3.0'
+         logR_min = -8.00d0
+         logR_max = 1.00d0
+         logR_points = 46
+         type1_table = 'gn93'
+         output_dir = 'data/kap_data'
+         table_prefix = 'lowT_fa05_gn93'
+         header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with gn93 metals'
+         table_version= 38
+
+/

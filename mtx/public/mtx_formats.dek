@@ -1,0 +1,437 @@
+
+
+      
+      subroutine dense_to_sparse_with_diag(isparse,n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         use mtx_def
+         integer,intent(in) :: isparse,n,ndim,nzmax
+         real(dp),intent(in) :: a(ndim,n)
+         integer,intent(inout) :: rowptr(n+1),colind(nzmax)
+         real(dp),intent(out) :: values(nzmax)
+         integer,intent(out) :: nz,ierr   
+         if (isparse == compressed_row_sparse) then
+            call dense_to_row_sparse_with_diag(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         else if (isparse == compressed_column_sparse) then                   
+            call dense_to_col_sparse_with_diag(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         else if (isparse == compressed_row_sparse_0_based) then
+            call dense_to_row_with_diag_0_based(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         else if (isparse == compressed_col_sparse_0_based) then                   
+            call dense_to_col_with_diag_0_based(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         else
+            ierr = -1
+         end if      
+         !if (ierr /= 0) stop 'dense_to_sparse_with_diag'
+      end subroutine dense_to_sparse_with_diag
+
+
+
+
+      ! sparse conversion based on similar routines from sparskit_src/formats.f
+
+      
+      subroutine dense_to_row_sparse(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         !
+         ! converts a densely stored matrix into a row oriented
+         ! compactly sparse matrix.
+         ! Note: this routine does not check whether an element 
+         ! is small. It considers that a(i,j) is zero if it is exactly
+         ! equal to zero.
+         !-----------------------------------------------------------------------
+         ! on entry:
+         !---------
+         !
+         ! n      = column dimension of a
+         ! ndim   = row dimension of a. 
+         ! a      = the dense matrix.
+         ! nzmax  = maximum number of nonzero elements allowed. This
+         !
+         ! on return:
+         !---------- 
+         ! 
+         ! rowptr,colind,values = arrays for output matrix
+         !
+         ! nz     = number of nonzero entries found in a 
+         !
+         ! ierr   = integer error indicator: 
+         !         ierr == 0 means normal return
+         !         ierr == i means that the the code stopped while
+         !         processing row number i because nzmax too small.
+         !----------------------------------------------------------------------- 
+         !
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         !real(dp), intent(in) :: a(ndim,n)
+         !integer, intent(inout) :: rowptr(n+1),colind(nzmax)
+         !real(dp), intent(inout) :: values(nzmax)
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: rowptr(:) ! (n+1)
+         integer, intent(inout) :: colind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr   
+         call do_dense_to_row_sparse(n,ndim,a,nzmax,nz,rowptr,colind,values,.false.,ierr)      
+         !if (ierr /= 0) stop 'dense_to_row_sparse'
+      end subroutine dense_to_row_sparse
+
+      
+      subroutine dense_to_row_sparse_with_diag(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         ! same as dense_to_row_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         !real(dp), intent(in) :: a(ndim,n)
+         !integer, intent(inout) :: rowptr(n+1),colind(nzmax)
+         !real(dp), intent(inout) :: values(nzmax)
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: rowptr(:) ! (n+1)
+         integer, intent(inout) :: colind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr   
+         call do_dense_to_row_sparse(n,ndim,a,nzmax,nz,rowptr,colind,values,.true.,ierr)      
+         !if (ierr /= 0) stop 'dense_to_row_sparse_with_diag'
+      end subroutine dense_to_row_sparse_with_diag
+
+      
+      subroutine dense_to_row_0_based(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         ! same as dense_to_row_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         !real(dp), intent(in) :: a(ndim,n)
+         !integer, intent(inout) :: rowptr(n+1),colind(nzmax)
+         !real(dp), intent(inout) :: values(nzmax)
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: rowptr(:) ! (n+1)
+         integer, intent(inout) :: colind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr   
+         call do_dense_to_row_sparse_0_based(n,ndim,a,nzmax,nz,rowptr,colind,values,.false.,ierr)      
+         !if (ierr /= 0) stop 'dense_to_row_0_based'
+      end subroutine dense_to_row_0_based
+
+      
+      subroutine dense_to_row_with_diag_0_based(n,ndim,a,nzmax,nz,rowptr,colind,values,ierr)
+         ! same as dense_to_row_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         !real(dp), intent(in) :: a(ndim,n)
+         !integer, intent(inout) :: rowptr(n+1),colind(nzmax)
+         !real(dp), intent(inout) :: values(nzmax)
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: rowptr(:) ! (n+1)
+         integer, intent(inout) :: colind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr   
+         call do_dense_to_row_sparse_0_based(n,ndim,a,nzmax,nz,rowptr,colind,values,.true.,ierr)      
+         !if (ierr /= 0) stop 'dense_to_row_with_diag_0_based'
+      end subroutine dense_to_row_with_diag_0_based
+
+
+
+      subroutine row_sparse_0_based_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr) 
+         use mtx_support
+         integer,intent(in) :: n,ndim,nz
+         real(dp),intent(out) :: a(ndim,n)
+         integer,intent(in) :: rowptr(n+1),colind(nz)
+         real(dp),intent(in) :: values(nz)
+         integer,intent(out) :: ierr     
+         call do_row_sparse_0_based_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr) 
+         !if (ierr /= 0) stop 'row_sparse_0_based_to_dense'
+      end subroutine row_sparse_0_based_to_dense
+
+      subroutine dense_to_col_sparse_with_diag(n,ndim,a,nzmax,nz,colptr,rowind,values,ierr)
+         ! same as dense_to_column_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: colptr(:) ! (n+1)
+         integer, intent(inout) :: rowind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr     
+         call do_dense_to_column_sparse(n,ndim,a,nzmax,nz,colptr,rowind,values,.true.,ierr)    
+         !if (ierr /= 0) stop 'dense_to_col_sparse_with_diag'
+      end subroutine dense_to_col_sparse_with_diag
+
+   
+      subroutine dense_to_col_0_based(n,ndim,a,nzmax,nz,colptr,rowind,values,ierr)
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: colptr(:) ! (n+1)
+         integer, intent(inout) :: rowind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr     
+         call do_dense_to_col_sparse_0_based(n,ndim,a,nzmax,nz,colptr,rowind,values,.false.,ierr)    
+         !if (ierr /= 0) stop 'dense_to_col_0_based'
+      end subroutine dense_to_col_0_based
+
+   
+      subroutine dense_to_col_with_diag_0_based(n,ndim,a,nzmax,nz,colptr,rowind,values,ierr)
+         ! same as dense_to_column_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: colptr(:) ! (n+1)
+         integer, intent(inout) :: rowind(:) ! (nzmax)
+         real(dp), intent(inout) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr     
+         call do_dense_to_col_sparse_0_based(n,ndim,a,nzmax,nz,colptr,rowind,values,.true.,ierr)    
+         !if (ierr /= 0) stop 'dense_to_col_with_diag_0_based'
+      end subroutine dense_to_col_with_diag_0_based
+
+   
+      subroutine dense_to_col_with_diag_0_based_qp(n,ndim,a,nzmax,nz,colptr,rowind,values,ierr)
+         ! same as dense_to_column_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ndim,nzmax
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         integer, intent(inout) :: colptr(:) ! (n+1)
+         integer, intent(inout) :: rowind(:) ! (nzmax)
+         real(qp), intent(out) :: values(:) ! (nzmax)
+         integer,intent(out) :: nz,ierr     
+         call do_dense_to_col_sparse_0_based_qp(n,ndim,a,nzmax,nz,colptr,rowind,values,.true.,ierr)    
+         !if (ierr /= 0) stop 'dense_to_col_with_diag_0_based'
+      end subroutine dense_to_col_with_diag_0_based_qp
+
+   
+
+      subroutine column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
+         !
+         ! converts a column-stored sparse matrix into a densely stored one
+         !
+         ! on entry:
+         !---------- 
+         !
+         ! ndim   = row-dimension of a
+         ! n      = column dimension of a
+         ! nz     = column dimension of a
+         !
+         ! colptr,
+         ! rowind,
+         ! values  = input matrix in compressed sparse row format. 
+         !
+         ! on return: 
+         !----------- 
+         ! a     = the dense matrix
+         ! 
+         ! ierr  = integer error indicator. 
+         !         ierr == 0  means normal return
+         !         ierr == i  means that the code has stopped when processing
+         !         row number i,because it found a row number > n.
+         ! 
+         !----------------------------------------------------------------------- 
+         !
+         use mtx_support
+         integer,intent(in) :: n,ndim,nz
+         real(dp),intent(out) :: a(ndim,n)
+         integer,intent(in) :: colptr(n+1),rowind(nz)
+         real(dp),intent(in) :: values(nz)
+         integer,intent(out) :: ierr     
+         call do_column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
+         !if (ierr /= 0) stop 'column_sparse_to_dense'
+      end subroutine column_sparse_to_dense
+
+
+      subroutine col_sparse_0_based_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
+         use mtx_support
+         integer,intent(in) :: n,ndim,nz
+         real(dp),intent(out) :: a(ndim,n)
+         integer,intent(in) :: colptr(n+1),rowind(nz)
+         real(dp),intent(in) :: values(nz)
+         integer,intent(out) :: ierr     
+         call do_col_sparse_0_based_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
+         !if (ierr /= 0) stop 'col_sparse_0_based_to_dense'
+      end subroutine col_sparse_0_based_to_dense
+      
+      
+      subroutine find_loc_in_column_sparse(n,nz,colptr,rowind,i,j,hint,k,ierr)
+         ! set k to index in values of entry for row=i, column=j in dense format.
+         ! returns ierr = -1 if (i,j) not included in sparse format.
+         integer,intent(in) :: n,nz,i,j,hint
+         integer,intent(in) :: colptr(n+1),rowind(nz)
+         integer,intent(out) :: k,ierr
+         if (hint > 0) then
+            k = hint+1
+            if (k >= colptr(j) .and. k < colptr(j+1)) then
+               if (rowind(k) == i) then
+                  ierr = 0; return
+               end if
+            end if
+         end if
+         do k=colptr(j),colptr(j+1)-1
+            if (rowind(k)==i) then
+               ierr = 0; return
+            end if
+         end do
+         ierr = -1
+         !if (ierr /= 0) stop 'find_loc_in_column_sparse'
+      end subroutine find_loc_in_column_sparse
+      
+      
+      subroutine find_loc_in_column_0_based(n,nz,colptr,rowind,i,j,hint,k,ierr)
+         integer,intent(in) :: n,nz,i,j,hint
+         integer,intent(in) :: colptr(0:n),rowind(0:nz-1)
+         integer,intent(out) :: k,ierr
+         if (hint > 0) then
+            k = hint+1
+            if (k >= colptr(j) .and. k < colptr(j+1)) then
+               if (rowind(k) == i) then
+                  ierr = 0; return
+               end if
+            end if
+         end if
+         do k=colptr(j)-1,colptr(j+1)
+            if (rowind(k)==i) then
+               ierr = 0; return
+            end if
+         end do
+         ierr = -1
+         !if (ierr /= 0) stop 'find_loc_in_column_0_based'
+      end subroutine find_loc_in_column_0_based
+      
+      
+      subroutine find_loc_in_row_sparse(n,nz,rowptr,colind,i,j,hint,k,ierr)
+         ! set k to index in values of entry for row=i, column=j in dense format.
+         ! returns ierr = -1 if (i,j) not included in sparse format.
+         integer,intent(in) :: n,nz,i,j,hint
+         integer,intent(in) :: rowptr(n+1),colind(nz)
+         integer,intent(out) :: k,ierr    
+         if (hint > 0) then
+            k = hint+1
+            if (k >= rowptr(i) .and. k < rowptr(i+1)) then
+               if (colind(k) == j) then
+                  ierr = 0; return
+               end if
+            end if
+         end if
+         do k=rowptr(i),rowptr(i+1)-1
+            if (colind(k) == j) then
+               ierr = 0; return
+            end if
+         end do
+         ierr = -1
+         !if (ierr /= 0) stop 'find_loc_in_row_sparse'
+      end subroutine find_loc_in_row_sparse
+      
+      
+      subroutine find_loc_in_row_0_based(n,nz,rowptr,colind,i,j,hint,k,ierr)
+         ! set k to index in values of entry for row=i, column=j in dense format.
+         ! returns ierr = -1 if (i,j) not included in sparse format.
+         integer,intent(in) :: n,nz,i,j,hint
+         integer,intent(in) :: rowptr(0:n),colind(0:nz-1)
+         integer,intent(out) :: k,ierr    
+         if (hint > 0) then
+            k = hint+1
+            if (k >= rowptr(i) .and. k < rowptr(i+1)) then
+               if (colind(k) == j) then
+                  ierr = 0; return
+               end if
+            end if
+         end if
+         do k=rowptr(i),rowptr(i+1)-1
+            if (colind(k) == j) then
+               ierr = 0; return
+            end if
+         end do
+         ierr = -1
+         !if (ierr /= 0) stop 'find_loc_in_row_0_based'
+      end subroutine find_loc_in_row_0_based
+      
+      
+      
+      subroutine find_loc_in_sparse(isparse,n,nz,ia,ja,i,j,hint,k,ierr)
+         use mtx_def
+         ! set k to index in values of entry for row=i, column=j in dense format.
+         ! returns ierr = -1 if (i,j) not included in sparse format.
+         integer,intent(in) :: isparse,n,nz,i,j,hint
+         integer,intent(in) :: ia(n+1),ja(nz)
+         integer,intent(out) :: k,ierr
+         if (isparse==compressed_column_sparse) then
+            call find_loc_in_column_sparse(n,nz,ia,ja,i,j,hint,k,ierr)
+         else if (isparse==compressed_row_sparse) then
+            call find_loc_in_row_sparse(n,nz,ia,ja,i,j,hint,k,ierr)
+         else if (isparse==compressed_col_sparse_0_based) then
+            call find_loc_in_column_0_based(n,nz,ia,ja,i,j,hint,k,ierr)
+         else if (isparse==compressed_row_sparse_0_based) then
+            call find_loc_in_row_0_based(n,nz,ia,ja,i,j,hint,k,ierr)
+         else
+            ierr = -2
+         end if
+         !if (ierr /= 0) stop 'find_loc_in_sparse'
+      end subroutine find_loc_in_sparse
+
+
+      
+      subroutine dense_to_band(n,ndim,a,ml,mu,ab,ldab,ierr)
+         use mtx_support
+         integer,intent(in) :: n,ndim,ml,mu,ldab
+         real(dp), intent(in) :: a(:,:) ! (ndim,n)
+         real(dp), intent(inout) :: ab(:,:) ! (ldab,n)
+         integer,intent(out) :: ierr 
+         call do_dense_to_band(n,ndim,a,ml,mu,ab,ldab,ierr)
+      end subroutine dense_to_band
+
+      
+      subroutine band_to_dense(n,ml,mu,ab,ldab,ndim,a,ierr)
+         use mtx_support
+         integer,intent(in) :: n,ndim,ml,mu,ldab
+         real(dp), intent(in) :: ab(:,:) ! (ldab,n)
+         real(dp), intent(inout) :: a(:,:) ! (ndim,n)
+         integer,intent(out) :: ierr 
+         call do_band_to_dense(n,ml,mu,ab,ldab,ndim,a,ierr)
+      end subroutine band_to_dense
+
+      
+      subroutine band_to_column_sparse(n,ml,mu,ab,ldab,nzmax,nz,colptr,rowind,values,ierr)
+         use mtx_support
+         integer,intent(in) :: n,ml,mu,ldab,nzmax
+         real(dp),intent(in) :: ab(ldab,n)
+         integer,intent(out) :: colptr(n+1),rowind(nzmax)
+         real(dp),intent(out) :: values(nzmax)
+         integer,intent(out) :: nz,ierr 
+         call do_band_to_column_sparse(n,ml,mu,ab,ldab,nzmax,nz,colptr,rowind,values,.false.,ierr)
+      end subroutine band_to_column_sparse
+
+      
+      subroutine band_to_col_sparse_with_diag(n,ml,mu,ab,ldab,nzmax,nz,colptr,rowind,values,ierr)
+         ! same as band_to_column_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ml,mu,ldab,nzmax
+         real(dp),intent(in) :: ab(ldab,n)
+         integer,intent(out) :: colptr(n+1),rowind(nzmax)
+         real(dp),intent(out) :: values(nzmax)
+         integer,intent(out) :: nz,ierr 
+         call do_band_to_column_sparse(n,ml,mu,ab,ldab,nzmax,nz,colptr,rowind,values,.true.,ierr)
+      end subroutine band_to_col_sparse_with_diag
+      
+      
+      subroutine column_sparse_to_band(n,ml,mu,ab,ldab,nz,colptr,rowind,values,ierr)
+         use mtx_support
+         integer,intent(in) :: n,ml,mu,nz,ldab
+         real(dp),intent(out) :: ab(ldab,n)
+         integer,intent(in) :: colptr(n+1),rowind(nz)
+         real(dp),intent(in) :: values(nz)
+         integer,intent(out) :: ierr 
+         call do_column_sparse_to_band(n,ml,mu,ab,ldab,nz,colptr,rowind,values,ierr)
+      end subroutine column_sparse_to_band
+
+      
+      subroutine band_to_row_sparse(n,ml,mu,ab,ldab,nzmax,nz,rowptr,colind,values,ierr)
+         use mtx_support
+         integer,intent(in) :: n,ml,mu,nzmax,ldab
+         real(dp),intent(in) :: ab(ldab,n)
+         integer,intent(out) :: rowptr(n+1),colind(nzmax)
+         real(dp),intent(out) :: values(nzmax)
+         integer,intent(out) :: ierr, nz
+         call do_band_to_row_sparse(n,ml,mu,ab,ldab,nzmax,nz,rowptr,colind,values,.false.,ierr)
+      end subroutine band_to_row_sparse
+
+      
+      subroutine band_to_row_sparse_with_diag(n,ml,mu,ab,ldab,nzmax,nz,rowptr,colind,values,ierr)
+         ! same as band_to_row_sparse except includes diagonals even if are equal zero
+         use mtx_support
+         integer,intent(in) :: n,ml,mu,nzmax,ldab
+         real(dp),intent(in) :: ab(ldab,n)
+         integer,intent(out) :: rowptr(n+1),colind(nzmax)
+         real(dp),intent(out) :: values(nzmax)
+         integer,intent(out) :: ierr, nz
+         call do_band_to_row_sparse(n,ml,mu,ab,ldab,nzmax,nz,rowptr,colind,values,.true.,ierr)
+      end subroutine band_to_row_sparse_with_diag
+
+

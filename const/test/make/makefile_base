@@ -1,0 +1,82 @@
+# This is the makefile for testing the mesa const package 
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = test_const.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = const
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) -lconst
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(TEST) : $(OBJS) $(DEPS_LOCAL)
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -ggdb -o $@ $(OBJS) $(LOAD_LOCAL) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -ggdb -o $@ $(OBJS) $(LOAD_LOCAL) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(TEST)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfixed) $<
+else
+	$(TEST_COMPILE) $(FCfixed) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(TEST_SRC_DIR)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

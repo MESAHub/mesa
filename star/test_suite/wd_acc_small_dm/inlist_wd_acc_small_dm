@@ -1,0 +1,100 @@
+
+! inlist_wd_acc_small_dm
+
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'co_wd_1.00M.mod' ! from make_co_wd, 13738, initial_mass = 6.4d0
+
+      set_initial_age = .true.
+      initial_age = 0
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1e-8 ! gives single step delta mass much less than first zone size
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      !required_termination_code_string = 'max_age'
+
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+
+      use_Type2_opacities = .true.
+
+/ ! end of kap namelist
+
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 500
+      
+      max_age = 3d-4
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      initial_mass =  0.45
+      initial_z = 0.02d0
+      
+      
+      mix_factor = 0
+      
+      convergence_ignore_equL_residuals = .true.
+      
+      varcontrol_target = 1d-3
+      max_timestep_factor = 1.1d0
+
+      atm_option = 'T_tau'
+      atm_T_tau_relation = 'Eddington'
+      atm_T_tau_opacity = 'iterated'
+
+      T_mix_limit = 1d4
+
+      accrete_same_as_surface = .false. 
+      accretion_h1 = 0.4
+      accretion_h2 = 0
+      accretion_he3 = 0.0
+      accretion_he4 = 0.6
+      accretion_zfracs = 4 ! Lodders 03
+   	
+      mass_change = 5d-9 ! rate of accretion (Msun/year)
+
+      delta_lgL_H_limit = 0.05 ! limit for magnitude of change in lgL_H
+
+      photo_interval = 10
+      profile_interval = 5
+      history_interval = 5
+      terminal_interval = 5
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+         !pause = .true. 
+            ! if true, the code waits for user to enter a RETURN on the command line
+      
+
+
+/ ! end of pgstar namelist

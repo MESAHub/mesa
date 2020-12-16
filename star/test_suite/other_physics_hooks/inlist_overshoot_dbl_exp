@@ -1,0 +1,17 @@
+
+&overshoot_dbl_exp
+
+            !### overshoot_D2
+            !### overshoot_f2
+
+      !overshoot_scheme(1) = 'other' ! 'double_exponential'
+      !overshoot_zone_type(1) = 'any' ! 'burn_Z'
+      !overshoot_zone_loc(1) = 'any'
+      !overshoot_bdy_loc(1) = 'any' ! 'bottom'
+      !overshoot_f(1) = 0.010
+      !overshoot_f0(1) = 0.004
+      
+      overshoot_f2(1) = 0.1
+      overshoot_D2(1) = 1d10
+
+/ ! end of overshoot_dbl_exp

@@ -1,0 +1,18 @@
+&kappa
+
+         !directories
+         output_dir = 'data/kap_data'
+         opal_data_dir = 'kap_input_data/opal'		
+         ferg_data_dir = 'kap_input_data/wichita/gn93'
+         
+         !input file names
+         opal_type1_table = 'GN93hz'
+         ferg_prefix = 'gn93'
+
+         !output options
+         table_prefix = 'gn93'
+         header_info = 'fixed metal distribution -- based on Grevesse & Noels (1993) solar abundances'
+         co_header_info = 'C/O enriched -- based on Grevesse & Noels (1993) solar abundances'
+         table_version = 29
+
+/

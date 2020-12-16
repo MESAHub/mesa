@@ -1,0 +1,235 @@
+Installation guide for adiabatic pulsations and models package
+==============================================================
+
+The package consists of five files:
+
+this README file.
+
+the file adipack.n.tar.Z
+
+the file models.n.tar.Z
+
+the file models.bin.n.tar.Z
+
+the file models.for.n.tar.Z
+
+As discussed in more detail below, either models.bin.n.tar.Z or
+models.for.n.tar.Z should be used.
+
+The installation consists in the following steps:
+
+1) Transfer the relevant compressed tar files to the directory where you 
+   wish to place the code and models. Use the binary mode of ftp.
+   Then, uncompress and un-tar them.
+
+   To uncompress the files, type:
+       uncompress adipack.n.tar
+       uncompress models.n.tar
+       etc.
+   (NOTE: do NOT append the '.Z' to the filename for the command)
+
+   To un-tar the files, type:
+       tar xvf adipack.n.tar
+       tar xvf models.n.tar
+       etc.
+
+   adipack.n.tar will generate the following directories:
+   - adipls: contains basic pulsation code
+   - adiajobs: contains auxiliary programs
+   - bin: contains executables
+   - gensr: contains general subroutines required by programs
+   - idl_pro: contains IDL procedures for reading relevant data files
+   - notes: contains plain TeX and postscript files of notes on the 
+     programs and data.
+
+   models.n.tar will generate the following directory:
+   - models: contains solar models in various forms, and input
+     files for the programs.
+   models.bin.n.tar or models.for.n.tar will add files to the
+   models directory.
+
+   Note that as the models directory is rather large
+   (and could become quickly larger as the programs are run)
+   it may be wise to store this directory on a different disk
+   from the codes.
+
+   In the following I refer to the directory where the unpack
+   was performed as <root>. Also, reference to directories
+   is often given relative to <root>.
+
+2) It may be necessary to edit the makefile-s in the directories
+   adipls, adiajobs, adiajobs/sr and gensr, to reset the
+   name of the Fortran command and/or the flags for this command.
+   The current command is "f77", with flag "-O2".
+
+3) Compile and link the programs by the following steps:
+   cd <root>/adipls   ; make
+   cd <root>/adiajobs ; make
+
+4) Add the directory <root>/bin to the command path
+   (usually set in the .cshrc file).
+
+5) Add the line
+   set aprgdir = <root>
+   in the .cshrc file (at a point where it is invoked every
+   time a csh command is called).
+
+6) Print the documentation in the directory notes, from the following
+   files:
+   - adiab_prog.tex (or adiab_prog.ps): notes on the adiabatic pulsation code
+   - operation.tex (or operation.ps): more general notes on the programs
+     and models provided
+   - file-format.tex (or file-format.ps): notes on data structure for
+     models in the form of an extensive set of variables, in 
+     an ASCII file (the so-called FGONG format).
+
+7) If required, convert ASCII versions of binary data files
+   (see below).
+
+8) Go to the models directory and try to run the pulsation code,
+   with the command
+   adipls.n.d adipls.n.in
+
+9) If this works, compare the locally computed frequencies with the
+   the frequencies provided, by carrying out the command
+   freqdif.d freqdif.in
+   This command produces output on the screen and to the file
+   dfr.4.l5bi.d.15.new-old. The differences should be very small.
+
+10) At this point you are ready to start using the package.
+   Please send me an E-mail (to jcd@obs.aau.dk) indicating
+   that you have installed the package, and providing your
+   E-mail (and other) addresses, as well as a few details on
+   the system on which the package is being run. This will
+   enable me to notify you of bugs or updates.
+
+Notes on file formats:
+---------------------
+
+The programmes generally operate with binary input and output files.
+The binary format evidently may vary between installations.
+The binary distribution file (models.bin.n.tar.Z) uses a format
+valid on, e.g., SGI and SUN installations; this should probably
+be preferred in these cases, as providing the full double-precision accuracy.
+However, for use on installations with different binary formats
+I also include the distribution file models.for.n.tar.Z,
+which contains the same data, but converted to ASCII form with
+the commands form-amdl.d and form-agsm.d (also provided).
+
+The ASCII versions of the files are named by adding ".for" to the
+binary-file name.
+
+To convert the model files from ASCII to binary, use, e.g., the command
+
+  form-amdl.d 2 amdl.l5bi.d.15.p2.for amdl.l5bi.d.15.p2
+
+Similarly, to convert the ASCII version of the grand summary file of
+oscillation results, use, e.g., 
+
+  form-agsm.d 2 agsm.l5bi.d.15.p2.for agsm.l5bi.d.15.p2
+
+(note that this also provides a list of the modes in the file).
+
+To allow a test of consistency of the binary format, I have included
+the model file amdl.l5bi.d.15 in the models.n.tar.Z distribution file.
+Try to run the command
+
+  scan-amdl.d amdl.l5bi.d.15
+
+on this file; if the result looks reasonable, your binary format is
+probably consistent with mine.
+
+Compiler warnings:
+-----------------
+
+It is possible that compilation will produce warnings on some systems.
+These should generally be unimportant. A particular cause of warnings
+is the fact that I often dimension arrays passed as arguments into
+subroutines as, e.g.,
+
+      dimension a(1)
+
+in the subroutine, even if the true dimension of the array is bigger than one.
+This will cause a warning if the compiler attempts a check of array bounds.
+I have yet to come across a system where this causes problems.
+Please let me know if you suspect that it is a problem in the
+results of computations on your system.
+
+Disclaimer:
+----------
+
+There is no guarantee that the package will work as intended,
+although it has been used previously, in a less well-documented
+form, by several people. I am willing to consider problems,
+or suggestions for improvements, but given my schedule I cannot
+promise to act quickly on them. 
+
+I shall attempt to correct errors in the package, as they are pointed
+out to me, and post revised versions. This file (and the Web pages)
+will contain a record of such updates, with a few details of the
+problems that have been fixed. Below is a list of problems that
+have been seen of different installations, but appear to be
+of a sufficiently special nature that they should not be corrected
+in the general release: my inclination would be to leave features
+that are convenient on most machines, even if they cause problems
+in selected cases.
+
+Acknowledgements:
+----------------
+
+I am very grateful to Alan Irwin and Helmut Schlattl for their help
+in testing this version of the package, as well as to Frank Hill for
+tests of the previous release.
+
+Aarhus, October 9 1997                        Joergen Christensen-Dalsgaard
+
+-------------------------------------------------------------------------
+
+Known potential problems:
+------------------------
+
+On IBM RS6000, AIX4.1 operating system, and some Linux systems:
+  
+  In gensr/ofiles.f, line 168: The option disp='delete' is apparently
+    not allowed. (The purpose is to create a scratch file that is
+    deleted at the end of the run.) The simple fix is to remove
+    the disp, and delete the file by hand.
+
+On HP-UX:
+
+  In adipls/sigout.n.d.f, lines 312, 320, 327: The flush command
+  is apparently not known. (It empties the output buffer after
+  each write of results to file.) The statement can simply be deleted.
+
+---------------------------------------------------------------------------
+
+Notes on modifications:
+----------------------
+
+26/4/99: Fixed a number of minor problems. These were mainly related 
+	 to unset variables, at points in the programmes which would
+	 rarely be used. I am grateful to Ladislav Zejda for pointing these out.
+	 The following files were affected:
+         - adipls/adipls.n.d.f
+         - adipls/nrtssl.d.f
+         - adipls/nrkm.d.f
+         - adipls/sigout.n.d.f
+         - gensr/vintk.new.d.f
+         - adiajobs/fdif.sin.d.f
+
+11/7/00: Fixed two minor problems in adiajobs/redistrb.d.f which caused
+	 problems for Chia-Hsien Lin on a Linux installation.
+
+18/10/00: Fixed problem in adipls/sigscn.n.d.f which caused erroneous
+	  setting of limit of evanescent region in scan for sig.
+
+6/1/04:  Established directory ./gensr_linux which contains files for Linux
+         installation. Before installation this should be moved to .gensr.
+	 Currently the only differing routine is ofiles.f
+
+Notes on comments (for possible modifications):
+-----------------------------------------------
+
+26/8/99: To allow use under shells other than csh, may need to add
+	 #!/bin/csh
+	 as first line in scripts. See earn/f.rsamadi.990820.

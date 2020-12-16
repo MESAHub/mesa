@@ -1,0 +1,86 @@
+! history_columns.list -- determines the contents of star history logs
+! you can use a non-standard version by setting history_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+! reorder the following names as desired to reorder columns.
+! comment out the name to omit a column (fewer columns => less IO => faster running).
+! remove '!' to restore a column.
+
+! if you have a situation where you want a non-standard set of columns,
+! make a copy of this file, edit as desired, and give the new filename in your inlist
+! as history_columns_file.   if you are just adding columns, you can 'include' this file,
+! and just list the additions in your file.   note: to include the standard default
+! version, use include '' -- the 0 length string means include the default file.
+
+! blank lines and comments can be used freely.
+! if a column name appears more than once in the list, only the first occurrence is used.
+
+! if you need to have something added to the list of options, let me know....
+
+
+! the first few lines of the log file contain parameter values as of the start of the run
+! for completeness, those items are described here:
+   
+   ! initial_mass -- star mass at start of run (Msun units)
+   ! initial_z -- starting metallicity
+   ! h1_boundary_limit -- defines abundance limit for h1_boundary_mass 
+   ! he4_boundary_limit -- defines abundance limit for he4_boundary_mass
+   ! burn_min1 -- 1st limit for reported burning, in erg/g/s
+   ! burn_min2 -- 2nd limit for reported burning, in erg/g/s
+
+
+! note: you can include another list by doing
+!        include 'filename'
+!        include '' means include the default standard list file
+
+
+! the following lines of the log file contain info about 1 model per row
+   
+   ! some general info about the model
+   
+      model_number ! counting from the start of the run
+      star_age ! elapsed simulated time in years since the start of the run
+      star_mass ! in Msun units
+      log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
+      !time_step ! timestep in years since previous model
+      log_dt ! log10 time_step
+      num_zones ! number of zones in the model
+      
+   ! information about abundance transitions
+   
+      he_core_mass
+      c_core_mass
+      o_core_mass   
+      si_core_mass
+      fe_core_mass
+   
+   
+   ! integrated power from hydrogen and helium burning
+   
+      log_LH ! log10 power_h_burn
+      log_LHe ! log10 power_he_burn
+   
+   ! conditions near surface
+   
+      log_L ! log10 luminosity in Lsun units
+      log_Teff ! log10 effective temperature
+      log_R ! log10 radius in Rsun units
+      log_g ! log10 gravity
+      log_L_div_Ledd ! log10(L/Leddington)
+   
+   ! conditions near center
+   
+      log_center_T ! temperature
+      log_center_Rho ! density
+      log_center_P ! pressure
+      center_degeneracy ! the electron chemical potential in units of k*T
+      center_gamma ! plasma interaction parameter at the centermost meshpoint.
+      
+   ! misc
+   
+      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      num_retries ! total during the run
+
+
+

@@ -1,0 +1,939 @@
+-- _outcom;
+-- _trace '------';
+    -- EDDington factors by direct Integration.
+    -- Formal solution of radiation equation in spherical geometry
+    -- with account of Doppler shift in frequency bins.
+    -- Subroutine named Feau since formely it used the
+    -- Feautrier Method.
+    -- Momentarily steady case, but applied for Edtm=T - smoothing
+    -- Eddington factors in time.
+    -- 18.10.96 - 12.11.96 (Tokyo) start working version for Stella
+    -- prepare f - occ.number - for transformation to lab.system
+    -- Retardation effect will be treated by radiative viscosity
+    -- Rvis in traneq.trf adjusted to R(tau=1)/c time delay.
+    -- Some redshift is
+    -- accounted for by the expansion opacity tables (for
+    -- lines), but
+    -- R.Eastman does not take account of continuum.
+    -- January 2009 (Tokyo) new form of output for observer
+    -- On input use Ry, Uy, Ty from abo.inc
+    -- On exit find Eddington factors via
+    --  fsum=$(f_{+} + f_{-})/2$ saved in FS
+    --  fdif=$(f_{+} + f_{-})/2$ saved in FD
+
+-----------------------------------------------------------------
+ _Define
+   @taucut     1.d+02    -- tau cut along the ray
+   @TAULIM     0.d0      -- or:CFR=(4/3)/(UR*Urho==(Cappa unit)**-1)
+   @ffloor     1.d-50   -- f (occ.n) floor - machine dependent
+   @LEFD       1.d0      -- coeff. for left boundary at R=Rcore
+   @FJnzon     Y(NVARS*NZON+(NZON-NCND)*Lfr,1) --  FJ(Nzon,Lfr)
+--
+-- _TRACE "print*,' zerfr=', zerfr,";
+-- _TRACE "print*,Fradh(100),lfr,";
+-- _TRACE "@wterm 'Feau: incnd, Ip, kzer, tretL ',incnd,Ip,kzer,tretL,";
+-- _TRACE "@wterm 'Feau: incnd, Ip, kzer, nrdial ',incnd,Ip,kzer,nrdial,";
+-- _TRACE "@wterm' Kpl=',Kpl,'  Lfr=', Lfr,' fmin=',fmin,'  fmax=',fmax,"
+--
+ SUBROUTINE Feau(incnd,Kntold); -- new and old ncnd
+ IMPLICIT REAL*8 (A-H,O-Z);
+ _Includen snrad;
+-- Parameter(NP=@Npe+@Npc-1);   -- Total number of tangent rays
+ Parameter(tret=1.d0/3.d0);
+ -- NP must be less than NZ (in zonE INCLUDE)/(2*@NZmax)!!!
+ -- Parameter(NCNmin=3);         -- Minimum incnd
+ _Includen abo;
+ <*C:  Variables and commons *>;
+ _Include black;
+  fblack(fr,Tpbl)=(exp(-(fr/Tpbl)))/(1.d0-(exp(-(fr/Tpbl))));
+  FJr(km,L)=Y(NVARS*NZON+(NZON-NCND)*(L-1)-NCND+Km,1);    --  FJ(Km,L)
+--  dmyexp(x)=(1.d+00 / (1.d+00 - x * dtfac))**ndtfac; -- no effect
+   -- for efficiency
+
+-- Call VTIME(time1);
+-- @wterm' Entered Feau - Eddi at Nstep=',Nstep,' Nfrus=',Nfrus;
+  Ip=0; kzer=0; nrdial=0; -- for lf95 debug
+  tretL=.false.; -- not 1/3 in Edd. factors
+--  zerfr=log(freqob(1))+1.d0/dlognu(1);
+  tfeau=t; -- preserve t of call feau to use for trlx
+ <*B:  Define Rout, Rcore, wfea(.) and other local variables *>;
+-- If(incnd > 0)then;
+   NPE=@Npe*nint((Rout-Rcore)/Rout);
+   NPE=min(NPE,@Npe);
+   NPE=max(NPE,2);
+   NPC=@Npc+@Npe-NPE;
+--    @wterm' Npe  Npc:',NPE,NPC;
+-- else;
+--   NPE=@Npe+@Npc; -- used only for DPE=step in env
+--   NPC=0;
+-- endif;
+ <*D:  Define Np points for Pray grid according Rout & Rcore *>;
+ <*T:  Define RM & calculate Happal(Lfr) for all values of Radius *>;
+ NEEDBR=.True.;
+-- write(*,*) ' Eddi  Nfrus=',Nfrus;
+ _Do1 Lfr=1,NFRUS;
+ --   Knth=max(INCND, NTHICK(LFR)-1); -- oscillations in flux ?
+ --    Knth=min(INCND,Nzon-3);
+    Knth=INCND;
+                -- for high tau Feautrier method gives large error
+                -- so this choice is not OK also
+    If (Knth==0) Then;
+       FDLEFT(Lfr)=0.D0;
+       Rleft=0.d0;
+    else;
+    --   If( Knth >=  Nzon-3) Then;
+       If( Knth >  Nzon-3) Then;
+        tretL=.true.;
+         _do k=incnd+1,Nzon;
+--             FJLfr(k)=wfea(Lfr)*Black(Lfr,Ty(K));
+             FJLfr(k)=black(Lfr,Ty(K));
+             FradK(k)=tret*FJLfr(k);
+--           If(Lfr==@LM)Then;
+               FradH(k,Lfr)=0.d0;
+--               FradJ(k,Lfr)=FJLfr(k)/wfea(Lfr);
+               FradJ(k,Lfr)=FJLfr(k);
+--           endif;
+             EddN(k,Lfr)=tret;
+         _od;
+         HEdN(lfr)=0.5d0;
+         _iterate Lfr;
+       endif;
+       If(Knth==incnd) Then;
+         Rleft=Rcore;
+       else;
+         Rleft=Ry(Knth);
+       endif;
+       <*R: Define Fdleft(Lfr) at Ry(Knth) *>;
+    endif;
+    KLASTS=Nzon;
+   _Do2 Ip=NP,0,-1;      --NP=@NPC+@NPE-1
+      <*mu: Find Kzer, which, for given Ip, is equal to the first
+           number such that Pray(Ip)>=RM(Kzer).
+           Find Amu(.,.) - cosines for integration of moments.
+           Save in NMU(K) current Ip for all K such that
+           Pray(Ip) < RM(K) <= Pray(Ip+1)
+           so NMU(K) becomes the number of the last value of
+           Amu for integration over Amu and fix Krowst() *>;
+      Kz(Ip)=Kzer;
+   -- Write(Nchn,*)' Kzer=',Kzer,'  for Ip=',Ip;
+   _od2;-- loop Ip
+--  WRITE(Nchn,*)' Knth =',Knth;
+--  WRITE(Nchn,*)' Nmu  :',Nmu;
+    Krow=0; -- last Krow
+    Krowst(Np)=0; -- starting value of Krow for ray Ip
+    Jac=0;
+   _Do3 Ip=NP,0,-1;    -- NP=@NPC+@NPE-1
+      Kzer=Kz(Ip);
+   _od3;-- loop Ip
+   KZrowsc=Krow; -- zero for Krow for J
+   If(Scat)then;
+--     Write(@term,*)' Scat Eddi';
+     NEQ=KZrowsc+(Nzon-Knth); -- order of system
+   else;
+     Write(@term,*)' notScat Eddi';
+     NEQ=krow; -- KZrowsc was undefined if ^SCAT !!!
+   endif;
+   <*shiftnu: find f_{+/-} directly and their sums and difs in
+              FSdir, FDdir with account of Doppler shift
+              according to velocity difference *>;
+   <*Hdir: calculate FJLfr, FRADK, EddN , HEdN
+           using FSdir, FDdir, and
+           for Lfr=@LM also store FJLfr in FRADJ & find FRADH *>;
+--   WRITE(@term,'(A,I3)')' Eddi Lfr: ',Lfr;
+--   write(*,'(a,i5,1p,e12.4)')' Eddi HedN:', Lfr,Hedn(Lfr);
+ _Od1; -- loop Lfr
+If (incnd==ncnd .and. .not. tretL) then; -- otherwise FJ(nzon) is  wrong
+ <*obsflux: prepare arrays to correct flux to observer's frame *>;
+endif;
+-- Kntold=incnd;
+-- Call VTIME(time2);
+-- WRITE(@Wres,'('' Eddi done at step :'',I6,'' Time(S):'',1P,G12.3)')
+  --     NSTEP,time2-time1;
+-- @wterm' Leaving Feau';
+RETURN;
+END;
+%B:
+ --  @wterm' ent %B';
+--      ndtfac = 128 ; -- slow even for ndtfac = 4
+--      dtfac = 1.d+00 / dble(ndtfac) ;
+-- The following expression approximates exp(-tau) as
+-- 1. / (1. + tau * dtfac)**ndtfac, with dtfac=1/float(ndtfac).
+-- ccc DEC-alpha failed on:
+--       1.d+00 / (1.d+00 + tau * dtfac)**ndtfac; -- overflow
+-- OK:
+--       (1.d+00 / (1.d+00 + tau * dtfac))**ndtfac;
+   Rout=Ry(Nzon);                  -- Outer radius
+   If(incnd > 0)then;
+     Rcore=Ry(incnd);              -- Radius of opaque core
+   else;
+   --  Rcore=0.D0;
+       Rcore=Ry(1);  -- better for transparent core
+       Rcore=Ry(Kmnick);
+   --  Rcore=Ry(Nclast);
+   endif;
+
+--   @wterm 'log(freqob(1)), 1/dlognu:',log(freqob(1)),1.d0/dlognu(1);
+--   pause;
+   zerfr=log(freqob(1))+1.d0/dlognu(1);  -- moved here from %_shiftnu
+
+   -- @wterm' kmnick=',kmnick;
+/*   _Do Lfr=1,Nfrus;
+      wfea(Lfr)=max(1.d8,weight(Lfr));
+   _od;*/
+   -- @wterm' leav %B
+%R:
+    PL=rho(Knth); Tp=Ty(Knth);                  -- CALCULATE FL1
+   _Do i=1, Natom; Yat(i)=YABUN(i,Knth)_od;
+    RADP=.FALSE.;
+    CALL URSOS;
+    kmhap=Knth;
+    CALL OPACIT; CAP1=CAPPA;
+--    @wterm Knth, PL,TP,happal,' cappa=',cappa;
+    Tp1=Tp;
+    PL=rho(Knth+1); Tp=Ty(Knth+1);
+   _Do i=1, Natom; Yat(i)=YABUN(i,Knth+1)_od;
+    CALL URSOS;
+    kmhap=Knth+1;
+    CALL OPACIT;
+/*  IF(INCND>NCND)THEN;
+       SUMJ=0.D0;
+       _DO L=1,NFRUS; SUMJ=SUMJ+@FJ2*WEIGHT(L)_OD;
+       SUMJ=(1.5D1/PI**4)*SUMJ;
+       FLCOR1=((Ry(Knth)*Tp1)**4-SUMJ*Ry(Knth)**4)
+              *Tp1**4/(CAP1*(DM(Knth)+DM(Knth+1))*(Tp1**4+Tp**4));
+       FLCOR2=((Ry(Knth)*Tp1)**4-SUMJ*Ry(Knth)**4)*Tp**4
+          /((CAPPA*(DM(Knth)+DM(Knth+1))+@TAULIM*Ry(Knth)**2)
+          *(Tp1**4+Tp**4));
+       FL1=FLCOR1+FLCOR2;
+    ELSE; */
+       FLCOR1=((Ry(Knth)*Tp1)**4-(Ry(Knth)*Tp)**4)
+              *Tp1**4/(CAP1*(DM(Knth)+DM(Knth+1))*(Tp1**4+Tp**4));
+       FLCOR2=((Ry(Knth)*Tp1)**4-(Ry(Knth)*Tp)**4)*Tp**4
+          /((CAPPA*(DM(Knth)+DM(Knth+1))+@TAULIM*Ry(Knth)**2)
+          *(Tp1**4+Tp**4));
+       FL1=FLCOR1+FLCOR2;
+--  ENDIF;
+--  WRITE(@term,'(1X,I3,'' L, Hapw->'',1P,E13.3)') Lfr, HAPW(Knth+1,Lfr);
+    FDLEFT(Lfr)=FL1*blacKD(Lfr,(0.5D0*(Tp+Tp1)))*CAPPA/
+              (@LEFD*(0.5D0*(Tp+Tp1))**4*Rleft**2*HAPW(Knth+1,Lfr));
+--      Fdleft(Lfr)=wfea(Lfr)*Fdleft(Lfr);
+--  WRITE(0,'(1X,I3,'' Knth, Fdleft->'',1P,G9.2)') Knth, Fdleft(Lfr);
+%D:
+   Pray(0)=0.D0;
+   Pray(NP+1)=ROUT;                   -- FOR %J1
+   DPE=(Rout-Rcore)/DBLE(NPE+1);    -- Pray-step on envelope
+-- If(incnd > 0.d0)then;
+     DPC=Rcore/DBLE(NPC);             -- Pray-step on Core
+     _Do i=1,Npc;                     -- Uniform distribution
+       Pray(i)=Pray(i-1)+DPC;          -- in core
+       -- @wterm'Pray i=',i,Pray(i);
+       -- WRITE(@Wres,*)'Pray i=',i,Pray(i);
+     _od;
+     _Do i=Npc+1,Np;                  -- Uniform distribution
+       Pray(i)=Pray(i-1)+DPE;          -- in envelope
+       -- @wterm'Pray i=',i,Pray(i);
+       -- WRITE(@Wres,*)'Pray i=',i,Pray(i);
+     _od;
+--
+/* else;
+     _Do i=1,Np;                       -- Uniform distribution
+       Pray(i)=Pray(i-1)+DPE;          -- everywhere
+     _od;
+   endif;  */
+%T:
+   -- Calculate Happal for all Frequencies
+   -- and each Point and define RM
+   _Do K=incnd+1,Nzon;
+       IF(K>1) RM(K)=0.5D0*(Ry(K)+Ry(K-1));
+       PL=rho(K); Tp=Ty(K);
+      _Do i=1, Natom;  Yat(i)=YABUN(i,K)_od;
+       RADP=.FALSE.;
+       CALL URSOS;
+       kmhap=K;
+       CALL HAPPA;
+       _Do Lfr=1,NFRUS;
+          HAPW(K,Lfr)=HAPPAL(Lfr);
+          HAPabW(K,Lfr)=HAPabs(Lfr);
+       _od;
+   _od;
+   If(incnd>1)then;
+      RM(incnd)=0.5D0*(Ry(incnd)+Ry(incnd-1));
+   else;
+      RM(1)=0.5D0*Ry(1); -- incnd=0, 1
+      RM(0)=0.025*Ry(1); -- arbitrary
+   endif;
+   _Do K=incnd,Nzon;
+       IF(K>1) umr(K)=0.5D0*(uy(K)+uy(K-1))
+   _od;
+   umr(1)=0.5D0*uy(1); -- incnd=0, 1
+   umr(0)=0.025*uy(1); -- arbitrary
+
+%_mu:
+    Kzer=Nzon;
+ --   Amu(Ip,Nzon)=SQRT(1.D0-(Pray(Ip)/RM(Nzon))**2); -- was not defined
+    _While Pray(Ip)<RM(Kzer) & Kzer>Knth _do
+      Kzer=Kzer-1
+    _od; -- Pray(Ip)>=RM(Kzer) ! Kzer==Knth
+    Nrdial=max(Nzon-Kzer,1);  -- the number of rad. zones
+--    @wterm' Nzon, Kzer, Nrdial:', Nzon,Kzer,Nrdial;
+    _Do K=Kzer+1,Nzon;
+       Amu(Ip,K)=SQRT(1.D0-(Pray(Ip)/RM(K))**2);
+    _od;
+    Amu(Ip,Kzer)=0.d0; -- needed for expansion correction
+ --   MeshF=@NZmin/(Nrdial+1)+1; -- Mesh_factor
+   -- IF(MOD(MeshF,2)==0) MeshF=MeshF+1; -- must be odd
+     --   meshf=1; --test
+ --   Mesh=MeshF*Nrdial;
+-- @wterm' Nrdial,MeshF,Ip:', Nrdial,MeshF,Ip;
+   -- IF(Mesh>@NZmax)THEN;
+     -- MeshF=MeshF-2; Mesh=MeshF*Nrdial;
+  --  ENDIF;
+--  @wterm' Mesh=',Mesh;
+   K=Kzer;  -- direct way to get starting K
+   If(K<KlastS)then;
+      _Do IK=K+1,KlastS;
+        NMU(IK)=Ip;
+        --WRITE(@term,*)' Nmu ik :',Nmu(ik),ik;
+      _od;
+   -- WRITE(Nchn,*)'Kz MSF(Ip):',Kz(Ip),MSF(Ip),
+   --              'Kz MSF(Ip+1):',Kz(Ip+1),MSF(Ip+1);
+      KlastS=K;
+   Elseif(K>0)then;                           -- Core
+      Nmu(K)=Npc;
+   Endif;
+--   If(Ip>0) Krowst(Ip-1)=Krowst(Ip)+2*Mesh-1;
+%_shiftnu:
+   If(KNadap==2 .or. KNadap==3)then;
+     @wterm ' freqs not geom. progr.!! ';
+     stop 52;
+   endif;
+--   @wterm ' dlognu:',dlognu;
+   <*outward: find quadrature solution for radiation going out *>
+   <*inward:  find quadrature solution for radiation going in *>
+   _do Ip=0,Np;
+     fcom(Ip,Lfr)=2.d0*FSdir(Ip,Nzon); -- comoving outgoing f
+   _od;
+%_shiftnu_outward:
+   _do Kpl=Nzon,incnd+1,-1;
+     _Do Ip=Nmu(Kpl),0,-1;
+        fr0=freqob(Lfr); -- zero shift in zone Kpl
+        chiab=HAPabW(Kpl,Lfr); -- for SCAT=F chiab=chiex (extinction),
+        chiex=HAPW(Kpl,Lfr);   -- but we need chiex also for
+                               -- Nstep<=1 and Kpl<=Kntold
+                               --  when FJ is not known
+        dtau(Kpl,Ip)=(Amu(Ip,Kpl)*RM(Kpl)-Amu(Ip,Kpl-1)*RM(Kpl-1))
+                          *chiex*rho(Kpl);
+         -- Amu was not defined for K=Kz(Ip), now set to 0. rm defined for (0)
+        If(Scat & Nstep>1 & Kpl>Kntold)then;
+           fdirsumm=(chiab*fblack(fr0,Ty(Kpl))+
+            (chiex-chiab)*FJr(Kpl,Lfr))/HapW(Kpl,Lfr)
+           *(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
+        else;
+           fdirsumm=fblack(fr0,Ty(Kpl))*(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
+        endif;
+        tauz=dtau(Kpl,Ip)/2.d0;
+        K=Kpl-1;
+--        if(Kpl==incnd+1 & Lfr==1) @wterm ' 1 Ip Kz K:',Ip,Kz(Ip),K;
+       _while  K>Kz(Ip) _do
+        duz=Amu(Ip,Kpl)*umr(Kpl)-Amu(Ip,K)*umr(K); -- diff.vel.
+            -- must be positive for expansion in any direction
+        fr0=freqob(Lfr)*(1.d0+duz/clight);
+        fr0log=log(fr0);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+        Lfr0=min(Nfrus,max(int(xnu),1));
+--        if(Ip==0 & Kpl==incnd+1 & Lfr==1) @wterm ' Lfr Lfr0 fr fr0 ',
+  --            Lfr, Lfr0,freqob(Lfr),fr0;
+          wfr0=xnu-dble(Lfr0); -- weight (compare with fout!!!)
+          chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
+          chiex=HAPW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPW(K,min(Nfrus,Lfr0+1))*wfr0;
+--        chiab=exp(log(HAPabW(K,Lfr0))*(1.d0-wfr0)
+  --            +log(HAPabW(K,min(Nfrus,Lfr0+1)))*wfr0);
+          dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))
+                          *chiex*rho(K);
+          If(Scat & Nstep>1 & K>Kntold)then;
+            fdirsumm=fdirsumm+(chiab*fblack(fr0,Ty(K))+
+               (chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
+                                +FJr(K,min(Nfrus,Lfr0+1))*wfr0 )
+                 )/chiex
+                 *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          else;
+            fdirsumm=fdirsumm+fblack(fr0,Ty(K))
+                 *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          endif;
+          tauz=tauz+dtau(K,Ip);
+          K=K-1;
+       _od; -- K<=Kz(Ip)
+       if(K==Kz(ip) & tauz < @taucut)then;
+         -- continue for transparent ray for negative z:
+           _while tauz<@taucut & K<Nzon _do
+              K=K+1;
+              duz=Amu(Ip,Kpl)*umr(Kpl)+Amu(Ip,K)*umr(K); -- diff.vel.
+                  -- now we write '+' since mu is negative there
+              fr0=freqob(Lfr)*(1.d0+duz/clight);
+              fr0log=log(fr0);
+              xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+              Lfr0=min(Nfrus,max(int(xnu),1));
+--              if(Ip==0 & Kpl==Nzon & Lfr==1)
+  --               @wterm ' far end Lfr Lfr0 fr fr0 ',
+     --             Lfr, Lfr0,freqob(Lfr),fr0;
+              wfr0=xnu-dble(Lfr0); -- weight
+              chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
+              chiex=HAPW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPW(K,min(Nfrus,Lfr0+1))*wfr0;
+--        chiab=exp(log(HAPabW(K,Lfr0))*(1.d0-wfr0)
+  --            +log(HAPabW(K,min(Nfrus,Lfr0+1)))*wfr0);
+              dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))
+                          *chiex*rho(K);
+                If(Scat & Nstep>1  & K>Kntold)then;
+                  tauz=tauz+dtau(K,Ip);
+                  fdirsumm=fdirsumm+(chiab*fblack(fr0,Ty(K))+
+                   (chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
+                                 +FJr(K,min(Nfrus,Lfr0+1))*wfr0 )
+                     )/chiex
+                    *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+                else;
+                   tauz=tauz+dtau(K,Ip);
+                   fdirsumm=fdirsumm+fblack(fr0,Ty(K))
+                          *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+                endif;
+  --     if(Kpl==140 & Ip==29) write(@term,'()')
+            --    ' fdirsumm=',fdirsumm, '  k,Kpl,Ip=',k,Kpl,Ip;
+           _od;
+       endif;
+         If(Kpl>kz(ip))then;
+              --  ftst(Ip)=log10(max(fdirsumm,1.d-300));
+                 FSdir(Ip,Kpl)=fdirsumm; -- f_{-} must be added later!
+--       if(Kpl==incnd+1 & Lfr==1)
+--            @wterm ' 4 Fsdir Ip Kpl:',FSdir(Ip,Kpl),Ip,Kpl;
+         endif;
+     _od -- Ip
+       /*     _Do Ip=0,NP;    -- Normal order Ip here!!! for plots
+        --       xipl(Ip)=Pray(Ip);
+                 xipl(Ip)=(Ip);
+                 If(Kpl<=kz(ip))then;
+                   ftst(Ip)=ftst(max(0,Ip-1));
+                   fspl(Ip)=fspl(max(0,Ip-1));
+                 endif;
+              _od -- Ip
+                            */
+     _label @outsm ; -- to go out of sm
+     <*sm* supermongo plot ftst(.) and fspl(.) *>;
+     @outsm: continue;
+   _od -- Kpl
+%_shiftnu_outward_sm:
+    -- beam going outward, i.e. for f_{+}
+--        if(sm_device('xterm').lt.0)then;
+        if(sm_device('X11').lt.0)then;
+          @wterm  ' cannot open device for sm';
+          stop 96;
+        endif;
+        call sm_graphics;
+--  call sm_defvar("Tex_strings","1");
+        call sm_erase;
+--        call sm_expand( 1.3);
+        <*minmax: of ftst and fspl in fmin, fmax *>;
+        call sm_limits(xipl(0),xipl(Np),fmin,fmax);
+--      call sm_lweight(2);
+        call sm_box(1,2,0,0);
+        call sm_xlabel('pray');
+        call sm_ylabel('lg f');
+        call sm_conn(xipl,ftst,Np+1);
+        call sm_ltype(3);
+        call sm_conn(xipl,fspl,Np+1);
+--       call sm_points(xipl,fspl,Np+1);
+        call sm_relocate(xipl(0)+0.1*(xipl(Np)-xipl(0)),
+                        0.5*(fmin+fmax)+0.05*(fmin-fmax));
+        call sm_label('difference solution');
+        call sm_relocate(xipl(0)+0.1*(xipl(Np)-xipl(0)),0.5*(fmin+fmax));
+        call sm_draw(xipl(0)+0.4*(xipl(Np)-xipl(0)),0.5*(fmin+fmax));
+        write(chalab,'(a,f5.1,a,i3,a,1p,e8.2,a)')'t=',t*Utime/8.64d+04,
+              'd  K=',Kpl,'  wave=',CCL/freqob(Lfr),' A';
+            --  'd  L=',Lfr,'  wave=',CCL/freqob(Lfr),' A';
+        call sm_relocate(xipl(0)+0.05*(xipl(Np)-xipl(0)),
+                        0.5*(fmin+fmax)-0.05*(fmin-fmax));
+        call sm_label(chalab);
+        call sm_gflush();
+        call sm_hardcopy;
+        call sm_alpha;
+        @wterm ' hit ENTER to continue';
+        call sm_redraw(0);
+        read(@term,*,end=@outsm);
+%_shiftnu_outward_sm_minmax:
+   fmin=ftst(Irmin(Np+1,ftst,1)-1); -- -1 since function Irmin assumes x(1:nn)
+   fmin=min(fmin,fspl(Irmin(Np+1,fspl,1)-1));
+   fmax=ftst(Irmax(Np+1,ftst,1)-1);
+   fmax=max(fmax,fspl(Irmax(Np+1,fspl,1)-1));
+%_shiftnu_inward:
+   _do Kpl=incnd+1,Nzon;
+     _Do Ip=Nmu(Kpl),0,-1;    -- NP=@NPC+@NPE-1
+        Ki=max(Kpl,kz(Ip)+1);
+        fr0=freqob(Lfr); -- zero shift in zone  Ki
+        chiab=HAPabW(Ki,Lfr);
+        chiex=HAPW(Ki,Lfr);
+        dtau(Ki,Ip)=(Amu(Ip,Ki)*RM(Ki)-Amu(Ip,Ki-1)*RM(Ki-1))
+                          *chiex*rho(Ki);
+        If(Scat & Nstep>1  & Ki>Kntold)then;
+           fdirsumm=(chiab*fblack(fr0,Ty(Ki))+
+            (chiex-chiab)*FJr(Ki,Lfr))/HapW(Ki,Lfr)
+           *(1.d0-exp(-dtau(Ki,Ip)/2.d0));
+        else;
+           fdirsumm=fblack(fr0,Ty(Ki))*(1.d0-exp(-dtau(Ki,Ip)/2.d0));
+        endif;
+        tauz=dtau(Ki,Ip)/2.d0;
+        K=Ki;
+       _while  K<Nzon _do
+          K=K+1;
+          duz=Amu(Ip,K)*umr(K)-Amu(Ip,Ki)*umr(Ki); -- diff.vel.
+          -- must be positive for expansion in any direction
+          -- so here another order of subtraction
+          fr0=freqob(Lfr)*(1.d0+duz/clight);
+          fr0log=log(fr0);
+          xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+          Lfr0=min(Nfrus,max(int(xnu),1));
+--          if(Ip==0  & K==incnd+1 & Lfr==1) @wterm 'out  Lfr Lfr0 fr fr0',
+  --                     Lfr, Lfr0,freqob(Lfr),fr0;
+          wfr0=xnu-dble(Lfr0); -- weight
+          chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
+               +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
+          chiex=HAPW(K,Lfr0)*(1.d0-wfr0)
+               +HAPW(K,min(Nfrus,Lfr0+1))*wfr0;
+ --       chiab=exp(log(HAPabW(K,Lfr0))*(1.d0-wfr0)
+   --           +log(HAPabW(K,min(Nfrus,Lfr0+1)))*wfr0);
+          dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))*chiex*rho(K);
+          If(Scat & Nstep>1  & K>Kntold)then;
+              fdirsumm=fdirsumm+
+               (chiab*fblack(fr0,Ty(K))+
+               (chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
+                                +FJr(K,min(Nfrus,Lfr0+1))*wfr0 )
+                 )/chiex
+                 *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          else;
+             fdirsumm=fdirsumm+
+                 fblack(fr0,Ty(K))*exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          endif;
+          tauz=tauz+dtau(K,Ip);
+       _od; -- K==Nzon
+           If(Kpl>kz(ip))then;
+        --         ftst(Ip)=log10(max(fdirsumm,1.d-300));
+              --   fspl(Ip)=log10(max(FS(Ip,Kpl)-FD(Ip,Kpl),1.d-300));
+                 FDdir(Ip,Kpl)=(FSdir(Ip,Kpl)-fdirsumm)/2.d0;
+                 FSdir(Ip,Kpl)=(FSdir(Ip,Kpl)+fdirsumm)/2.d0; -- FSdir
+                                -- was used only for storing
+--  if(Kpl==Nzon) @wterm ' FS FD ',FSdir(Ip,Kpl),FDdir(Ip,Kpl);
+--       if(Kpl==incnd+1 & Lfr==1) @wterm ' 5 Fs Fsdir Ip Kpl:',
+  --          Fs(Ip, Kpl),FSdir(Ip,Kpl),Ip,Kpl;
+/*               if(Kpl==135)
+                   write(@term,'(a,1p,2e9.2,a,3i5,2(a,e9.2))')
+                       ' fdirsumm fs=',fdirsumm,FS(Ip,Kpl)-FD(Ip,Kpl),
+                             '  k,Kpl,Ip=',k,Kpl,Ip,'  dtau=',dtau(Kpl,Ip),
+                             '  b=',fblack(fr0,Ty(Kpl));
+               if(Kpl==135)
+                   write(@term,'(a,1p,2e15.6,a,3i5,2(a,e9.2))')
+                       ' fsum fdif=',FS(Ip,Kpl),FD(Ip,Kpl),
+                             '  k,Kpl,Ip=',k,Kpl,Ip;
+                                                     */
+           endif;
+     _od -- Ip
+     _Do Ip=0,NP;    -- Normal order Ip here!!! for plots
+--       xipl(Ip)=Pray(Ip);
+       xipl(Ip)=(Ip);
+       If(Kpl<=kz(ip))then;
+          ftst(Ip)=ftst(max(0,Ip-1));
+          fspl(Ip)=fspl(max(0,Ip-1));
+       endif;
+     _od -- Ip
+_label @outsm ; -- to go out of sm
+     <*sm* supermongo plot ftst(.) and fspl(.) *>;
+@outsm: continue;
+   _od -- Kpl
+--_od -- Lfr
+%_shiftnu_inward_sm=_shiftnu_outward_sm:
+%_Hdir:
+    _Do K=incnd+1,Nzon;
+      If (K <= Knth) Then;
+        <*tret: put EddN=1/3 *>;
+      Else;
+        <*general: *>;
+      endif;
+--      If( Lfr==@Lm )then;
+--        FradJ(K,Lfr)=FJLfr(K)/wfea(Lfr);
+        FradJ(K,Lfr)=FJLfr(K);
+--      endif;
+    _od;
+     FRADH(Nzon,Lfr)=0.D0; -- now FS==FD
+      _Do Ipnmu=NMU(Nzon)-1,0,-1;
+        FRADH(Nzon,Lfr)=FRADH(Nzon,Lfr)
+             +(FSdir(Ipnmu,Nzon)+FSdir(Ipnmu+1,Nzon))
+                 *(Amu(Ipnmu,Nzon)**2-Amu(Ipnmu+1,Nzon)**2)
+      _od;
+      FRADH(Nzon,Lfr)=0.25d0*(FRADH(Nzon,Lfr)+
+                      2.d0*FSdir(NMU(Nzon),Nzon)*Amu(NMU(Nzon),Nzon)**2);
+--                      FSdir(NMU(Nzon),Nzon)*Amu(NMU(Nzon),Nzon)**2)/wfea(Lfr);
+     RADH=0.D0; -- now FS==FD
+    _Do Ipnmu=NMU(Nzon)-1,0,-1;
+        RADH=RADH+(FSdir(Ipnmu,Nzon)+FSdir(Ipnmu+1,Nzon))
+                 *(Amu(Ipnmu,Nzon)**2-Amu(Ipnmu+1,Nzon)**2)
+    _od;
+--was    RADH=RADH+FS(NMU(Nzon),Nzon)*Amu(NMU(Nzon),Nzon)**2;
+    RADH=RADH+2.d0*FSdir(NMU(Nzon),Nzon)*Amu(NMU(Nzon),Nzon)**2;
+    If(ABS(FJLFR(Nzon))>@ffloor)then;
+       HEdN(Lfr)=RADH/(4.D0*FJLfr(Nzon));
+    else;
+       HEdN(LFR)=0.5D0;
+    endif;
+    IF(Lfr==@LM)EDDH(Nzon)=HEdN(Lfr);
+    <*Debug : *>;
+%_Hdir_tret:
+--    FJLfr(k)=wfea(Lfr)*Black(Lfr,Ty(K));
+    FJLfr(k)=black(Lfr,Ty(K));
+   -- If( Lfr==@Lm ) Then;
+      FradK(k)=tret*FJLfr(k);
+      Fradh(k,Lfr)=0.d0;
+   -- Endif;
+    EddN(k,Lfr)=tret;
+%_Hdir_GENERAL:
+        FJLfr(K)=0.D0;
+        -- If( Lfr==@Lm )
+        FRADH(K,Lfr)=0.D0;
+        FRADK(K)=0.D0;
+        FHWork(K)=0.D0; -- for EddH used in flux limiting (%ALOH in Strad.tr)
+        FJWork(K)=0.D0;
+        _DO Ipnmu=NMU(K)-1,0,-1;
+            FJLfr(K)=FJLfr(K)
+         --  +(FS(Ipnmu,(K-Kz(Ipnmu))*MSF(Ipnmu)-(MSF(Ipnmu)-1)/2)
+         --    +FS(Ipnmu+1,(K-Kz(Ipnmu+1))*MSF(Ipnmu+1)-(MSF(Ipnmu+1)-1)/2))
+               +(FSdir(Ipnmu,K)+FSdir(Ipnmu+1,K))
+                       *(Amu(Ipnmu,K)-Amu(Ipnmu+1,K));
+--            IF(K<Nzon & Lfr==@Lm)then;
+            IF(K<Nzon)then;
+              if(Hapw(K,Lfr)*rho(k)*(Ry(K+1)-Ry(K))<Fittau/Tautol)then;
+                FRADH(K,Lfr)=FRADH(K,Lfr)+(FDdir(Ipnmu,K)+FDdir(Ipnmu+1,K))
+                          *(Amu(Ipnmu,K)**2-Amu(Ipnmu+1,K)**2);
+              endif;
+            Endif;
+            /*   FHWork(K)=FHWork(K)+
+                  ((FDdir(Ipnmu,K)+FDdir(Ipnmu+1,K))
+                     +(FSdir(Ipnmu,K)+FSdir(Ipnmu+1,K)))
+                     *(Amu(Ipnmu,K)**2-Amu(Ipnmu+1,K)**2);
+                 FJWork(K)=FJWork(K)+
+                     ((FDdir(Ipnmu,K)+FDdir(Ipnmu+1,K))
+                      +(FSdir(Ipnmu,K)+FSdir(Ipnmu+1,K)))
+                     *(Amu(Ipnmu,K)-Amu(Ipnmu+1,K));
+                     */
+        --  Endif;
+            FRADK(K)=FRADK(K)
+        --   +(FS(Ipnmu,(K-Kz(Ipnmu))*MSF(Ipnmu)-(MSF(Ipnmu)-1)/2)
+        --     +FS(Ipnmu+1,(K-Kz(Ipnmu+1))*MSF(Ipnmu+1)-(MSF(Ipnmu+1)-1)/2))
+             +(FSdir(Ipnmu,K)+FSdir(Ipnmu+1,K))
+                       *(Amu(Ipnmu,K)**3-Amu(Ipnmu+1,K)**3);
+        _OD;
+        FJLfr(K)=FJLfr(K)+2.D0*FSdir(NMU(K),K)*Amu(NMU(K),K);
+--        IF(K<Nzon & Lfr==@LM)then;
+        IF(K<Nzon)then;
+          if(Hapw(K,Lfr)*rho(k)*(Ry(K+1)-Ry(K))<Fittau/Tautol)then;
+              FRADH(K,Lfr)=
+                     (FRADH(K,Lfr)+2.D0*FDdir(NMU(K),K)*Amu(NMU(K),K)**2);
+--                 /wfea(Lfr);
+          endif;
+        Endif;
+     /*       FHWork(K)=FHWork(K)+2.D0*(FDdir(NMU(K),K)+FSdir(NMU(K),K))
+                   *Amu(NMU(K),K)**2;
+              FJWork(K)=FJWork(K)+2.D0*(FDdir(NMU(K),K)+FSdir(NMU(K),K))
+                   *Amu(NMU(K),K);
+                   */
+     --   Endif;
+        FRADK(K)=FRADK(K)+2.D0*FSdir(NMU(K),K)*Amu(NMU(K),K)**3;
+--  @wterm ' FJLfr(K) ', FJLfr(K),K;
+        FJLfr(K)=FJLfr(K)*0.5D0;
+        IF(K<Nzon) FRADH(K,Lfr)=FRADH(K,Lfr)/4.D0;
+        FRADK(K)=FRADK(K)/6.D0;
+ --   If(Lfr==1 .or. Lfr==Nfrus)
+   --    WRITE(Nchn,*)'TRAP FJLfr=',FJLfr(K),'    TRAP FRADK=',FRADK(K);
+        IF(ABS(FJLFR(K))>@ffloor)THEN;
+           EddN(K,Lfr)=FRADK(K)/FJLfr(K);
+        -- IF(Lfr==@LM) EDDH(K)=FHWork(K)/(2.D0*FJWork(K));
+        ELSE;
+           EddN(K,LFR)=TRET;
+        -- IF(Lfr==@LM) EDDH(K)=0.5D0;
+        ENDIF;
+
+%_Hdir_DEBUG:
+--IF(MOD(incnd,10)==0)THEN;
+--IF(MOD(Nstep,900)==0)THEN;
+--IF(Nstep==4900 .or. Nstep==4950)THEN;
+    WRITE(@Wres,'(2(A,1P,E12.3))')' Fjl1=',FJLfr(Knth+1),
+                              '  Bl1=',Black(Lfr,Ty(Knth+1));
+    WRITE(@Wres,'(2(A,1P,E12.3))')' Fjl2=',FJLfr(Knth+2),
+                               '  Bl2=',Black(Lfr,Ty(Knth+2));
+   WRITE(@Wres,'('' DIRECT  K/    EddN:  L='',I4)') Lfr;
+   WRITE(@Wres,'(8(1X,I3,''->'',F9.5))')(K,EddN(K,Lfr),K=incnd+1,Nzon);
+   WRITE(@Wres,'(''  K/    FradH*Ry(K)**2:'')');
+   WRITE(@Wres,'(8(1X,I3,''->'',1PG9.2))')(K,FradH(K,Lfr)*Ry(K)**2,
+                          K=incnd+1,Nzon);
+   WRITE(@Wres,'(''  K/    FradJ*Ry(K)**2:'')');
+   WRITE(@Wres,'(8(1X,I3,''->'',1PG9.2))')(K,FradJ(K,Lfr)*Ry(K)**2,
+          K=incnd+1,Nzon);
+--   WRITE(@Wres,'(''  K/    FradJ:'')');
+--   WRITE(@Wres,'(8(1X,I3,''->'',1PG9.2))')(K,FradJ(K,Lfr),K=incnd+1,Nzon);
+--   WRITE(@Wres,'(''  K/    FradK:'')');
+--   WRITE(@Wres,'(8(1X,I3,''->'',1PG9.2))')(K,FradK(K),K=incnd+1,Nzon);
+   WRITE(@Wres,'(''        HEdN:'')');
+   WRITE(@Wres,'(F9.5)')HEdN(Lfr);
+--ENDIF;
+
+%_obsflux:
+
+   <*fout: for each Lfr for observer find Lfr0 comoving, weight, and then fout *>;
+   <*aberration: abermu(Ip) instead of Amu *>;
+   <*normHobs: through Hobs and abermu, normalize to L_observer
+               and save corrections in wH(Lfr) *>;
+
+%_obsflux_fout:
+
+/*
+        fr0=freqmn(1)*(1.d0-uy(Nzon)/clight);
+        fr0log=log(fr0);
+        zerfr=log(freqmn(1))+1.d0/dlognu(1);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+        xnuMax=1.d0-log(1.d0-uy(Nzon)/clight)*dlognu(1);
+--        write(*,*) 'xnu,xnuMax, int(xnu), int(xnuMax)',
+--               xnu,xnuMax, int(xnu), int(xnuMax);
+  */
+        Lfr=20; -- to find dLfrMax -- max diff in Lfr due to redshift
+        fr0=freqob(Lfr)*(1.d0-uy(Nzon)/clight);
+        fr0log=log(fr0);
+        zerfr=log(freqob(1))+1.d0/dlognu(1);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+        Lfr0=int(xnu);
+        dLfrMax=Lfr-Lfr0;
+--        write(*,*) ' xnu for Lfr=20, int(xnu), Lfr0, dLfrMax:',
+--               xnu, int(xnu), Lfr0, dLfrMax;
+        if(Nfrus+dLfrMax>Nfreq)then;
+--          write(*,*) ' Nfrus=', Nfrus,'  dLfrMax=', dLfrMax,' Nfreq=',Nfreq;
+--          write(*,*) ' increase Nfreq or freqob will be used';
+     --     stop;
+        endif;
+
+--        pause;
+
+  _do Lfr=1,Nfrus+dLfrMax;
+     _do Ipnmu=0,NP;
+        duz=-Amu(Ipnmu,Nzon)*uy(Nzon); -- velocity to observer
+            -- negative for an expanding envelope
+--        @wterm ' umr duz ', umr(Nzon), duz;
+        fr0=freqob(Lfr)*(1.d0+duz/clight);
+        fr0log=log(fr0);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+        Lfr0=max(int(xnu),1); -- may be pulled out of if_then_else
+--        if(Lfr==1) @wterm ' obsflux_fout: Lfr Lfr0 xnu ',Lfr, Lfr0, xnu;
+
+        if(Lfr>dLfrMax)then;
+          if(Lfr0<1) stop ' Lfr0 must be >= 1 in feau for Lfr>dLfrMax';
+           --Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
+           --  Lfr0=Lfr-dLfrMax;
+            wfr0=(freqob(Lfr0+1)-fr0)/(freqob(Lfr0+1)-freqob(Lfr0));
+                              -- in linear scale
+--        @wterm ' Lfr Lfr0 wfr0 ',Lfr, Lfr0,wfr0;
+  --      fout(Ipnmu,Lfr)=fcom(Ipnmu,Lfr0)*wfr0
+    --                    +fcom(Ipnmu,min(Nfrus,Lfr0+1))*(1.d0-wfr0);
+              fout(Ipnmu,Lfr)=exp(
+                log(max(fcom(Ipnmu,Lfr0),@ffloor)) *wfr0
+              +log(max(fcom(Ipnmu,min(Nfrus,Lfr0+1)),@ffloor))*(1.d0-wfr0)
+                                 );
+        else;
+          if(Lfr0>=1)then;
+            wfr0=(freqob(Lfr0+1)-fr0)/(freqob(Lfr0+1)-freqob(Lfr0));
+                              -- in linear scale
+              fout(Ipnmu,Lfr)=exp(
+                log(max(fcom(Ipnmu,Lfr0),@ffloor)) *wfr0
+              +log(max(fcom(Ipnmu,min(Nfrus,Lfr0+1)),@ffloor))*(1.d0-wfr0)
+                                 );
+          endif;
+        endif;
+--        @wterm ' fout fcomv Lfr Ipnmu ',fout(Ipnmu,Lfr),fcom(Ipnmu,Lfr),
+  --       Lfr, Ipnmu;
+     _od;
+  _od;
+
+%_obsflux_aberration:
+
+  _Do Ip=0,NP;
+     abermu(Ip)=Amu(Ip,Nzon)+(uy(Nzon)/clight)*(1.d0-Amu(Ip,Nzon)**2);
+--     @wterm ' abermu(Ip) Amu(Ip,Nzon)', abermu(Ip),Amu(Ip,Nzon);
+  _od
+
+%_obsflux_normHobs:
+
+  _do Lfr=1,Nfrus+dLfrMax;
+     Hobs(Lfr)=0.D0; Hcomov=0.d0;
+    _Do Ipnmu=NMU(Nzon)-1,0,-1;
+        Hobs(Lfr)=Hobs(Lfr)+(fout(Ipnmu,Lfr)+fout(Ipnmu+1,Lfr))
+--test                 *(amu(Ipnmu,Nzon)**2-amu(Ipnmu+1,Nzon)**2);
+                 *(abermu(Ipnmu)**2-abermu(Ipnmu+1)**2);
+        if(Lfr<=Nfrus) Hcomov=Hcomov+(fcom(Ipnmu,Lfr)+fcom(Ipnmu+1,Lfr))
+                 *(amu(Ipnmu,Nzon)**2-amu(Ipnmu+1,Nzon)**2);
+--  if(Lfr==1)@wterm ' L Hobs(Lfr) Hcomv ', Lfr,Hobs(Lfr),Hcomov;
+    _od;
+     if(Lfr<=Nfrus)
+         Hcomov=0.125d0*(Hcomov+fcom(NMU(Nzon),Lfr)*amu(NMU(Nzon),Nzon)**2);
+--tt Hobs(Lfr)=0.125d0*(Hobs(Lfr)+fout(NMU(Nzon),Lfr)*amu(NMU(Nzon),Nzon)**2);
+     Hobs(Lfr)=0.125d0*(Hobs(Lfr)+fout(NMU(Nzon),Lfr)*abermu(NMU(Nzon))**2);
+               -- instead of .25 since fcom = 2FS, and 2*FS --> fout
+     -- @wterm ' L Hobs Hcomv ', Lfr,Hobs(Lfr),Hcomov;
+  _od;
+   Hnorm=0.d0;
+   tlum=0.d0;
+  _do L=1,NFRUS+dLfrMax;
+     Hnorm=Hnorm+Hobs(L)*WEIGHT(L);
+     if(L<=Nfrus) tlum=tlum+fradH(Nzon,L)*WEIGHT(L) -- 14.124 in Mihalas
+        *(1.d0+(uy(Nzon)/clight)*(1.d0 + EddN(Nzon,L))/HEdn(L)); -- observer
+            -- fradH/HEdn(L) here gives fradJ, but 14.124 is only for
+            -- integrated J,H,K
+/*     if(Nstep==1000)then;
+       write(*,'(a,i5,1p,3e12.3)')
+         ' eddi: L, Hobs(L),  Hnorm, fradH(Nzon,L):',
+                  L, Hobs(L), Hnorm, fradH(Nzon,L);
+     endif;
+   */
+  _od;
+  _do Lfr=1,Nfrus+dLfrMax;
+        if(Hnorm>0.d0) Hobs(Lfr)=tlum/Hnorm*Hobs(Lfr);
+        fr0=freqob(Lfr)*(1.d0-uy(Nzon)/clight);
+--	write(*,*)' in Eddi uy(Nzon)/clight , freqob(Lfr), fr0';
+--      write(*,*) uy(Nzon)/clight, freqob(Lfr), fr0;
+        fr0log=log(fr0);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+/*	write(*,*)' zerfr, fr0log';
+	write(*,*) zerfr, fr0log;
+	write(*,*)' exp(fr0log),dlognu(1),xnu';
+	write(*,*) exp(fr0log),dlognu(1),xnu;
+  */
+        Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
+--        Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
+        Lfr0=int(xnu);
+        if(Lfr0>1)then;
+          wfr0=(freqob(Lfr0+1)-fr0)/(freqob(Lfr0+1)-freqob(Lfr0));
+                                     -- in linear scale
+          wfrlog=(log(freqob(Lfr0+1))-fr0log)*(-dlognu(1)); -- log scale
+          wH(Lfr)=wfrlog;
+/*	write(*,*)' wfr0,  wfrlog ';
+	write(*,*) wfr0, wfrlog;
+	write(*,*)' Lfr0, Lfr, wH(Lfr):',Lfr0, Lfr, wH(Lfr);
+        pause;
+   */
+/*        Hnorm=exp(log(max(FradH(Nzon,min(Lfr0+1,Nfrus))
+                --  *(1.d0 +(uy(Nzon)/clight)
+                --  *(1.d0 /*+ EddN(Nzon,Lfr0+1)*/)/HedN(Lfr0+1) )
+                    ,@ffloor))*(1.d0-wfr0)
+                   + log(max(FradH(Nzon,Lfr0)
+                --   *(1.d0 +(uy(Nzon)/clight)
+                --   *(1.d0/* + EddN(Nzon,Lfr0)*/)/HedN(Lfr0))
+                     ,@ffloor))*wfr0);
+        */
+          If(abs(FradH(Nzon,min(Lfr0+1,Nfrus))*Hobs(Lfr)*FradH(Nzon,Lfr0))
+                          > @ffloor**3
+            .and. FradH(Nzon,min(Lfr0+1,Nfrus))>0.d0  .and. FradH(Nzon,Lfr0)>0.d0
+             )then;
+-- @wterm ' L H+1 H Hobs ', Lfr, FradH(Nzon,min(Lfr0+1,Nfrus)),
+  --                        FradH(Nzon,Lfr0), Hobs(Lfr);
+         --cH(Lfr)=Hobs(Lfr)/((1.d0-wH(Lfr))*FradH(Nzon,min(Lfr0+1,Nfrus))+
+           --                   wH(Lfr)*FradH(Nzon,Lfr0));
+             cH(Lfr)=Hobs(Lfr)/exp((1.d0-wH(Lfr))*
+                  log(FradH(Nzon,min(Lfr0+1,Nfrus)))+
+                            wH(Lfr)*log(FradH(Nzon,Lfr0)));
+                -- here abend happens in runs for 87A in log
+           else;
+              cH(Lfr)=cH(max(1,Lfr-1));
+           endif;
+       else; -- Lfr0<=0
+          if(FradH(Nzon,Lfr)>@ffloor)then;  -- why it was 1 in place of Lfr?
+           cH(Lfr)=Hobs(Lfr)/FradH(Nzon,Lfr); -- why it was 1 in place of Lfr?
+          else;
+           cH(Lfr)=1.d0;
+          endif;
+          wH(Lfr)=1.d0;
+       endif;
+--     If(wH(Lfr)<-1.d0 .or. wH(Lfr)>+1.d0)then;
+  --       wH(Lfr)=0.d0;
+    --     @wterm 'bad wH Lfr ',wH(Lfr), Lfr;
+--         cH(Lfr)=Hobs(Lfr)/FradH(Nzon,min(Lfr0+1,Nfrus));
+      --   cH(Lfr)=1.d0;
+--     endif;
+  --   @wterm ' L wH(L) Lfr0 cH(Lfr): ',Lfr,wH(Lfr),Lfr0,cH(Lfr);
+    -- write(@term,'(a,i3,1p,3e14.4)') ' L hcomv Hobs fradh:',
+      --          Lfr,@FJnzon*HEdn(Lfr),Hobs(Lfr),fradH(Nzon,Lfr);
+      --  if(Nstep==1000)then;
+      --    write(*,'(a,i5,1p,3e12.3)')' Lfr,wH(Lfr),cH(Lfr):', Lfr, wH(Lfr),cH(Lfr);
+      --  endif;
+  _od;
+--   stop 15;
+ /*
+     If(Nstep>0)then;
+       Flum=0.D0;
+       ObsLum=0.d0;
+       _DO L=1,NFRUS;
+         Flum=Flum+@FJnzon*WEIGHT(L)*HEdn(L);-- comoving
+         Obslum=Obslum+@FJnzon*WEIGHT(L)*(HEdn(L)
+            +(uy(Nzon)/clight)*(1.d0 + EddN(Nzon,L))); -- observer
+          write(@term,'(a,i3,1p,3e14.4)') ' L hcomv Hobs fradh:',
+                L,@FJnzon*HEdn(L),Hobs(L),fradH(Nzon,L);
+       _od;
+     endif;
+        @wterm ' u/c, ob/com lum:',uy(Nzon)/clight, ObsLum/Flum;
+        @wterm ' Ob com lum CGS:', Obslum*Clumf*Ry(NZON)**2,
+                                   Flum*Clumf*Ry(NZON)**2;
+       Hnorm=0.d0;
+        tlum=0.d0;
+       _DO L=1,NFRUS;
+         Hnorm=Hnorm+Hobs(L)*WEIGHT(L);
+         tlum=tlum+fradH(Nzon,L)*WEIGHT(L)*(1.d0 -- 14.124 in Mihalas
+            +(uy(Nzon)/clight)*(1.d0 + EddN(Nzon,L))/HEdn(L)); -- observer
+                -- fradH/HEdn(L) here gives fradJ, but 14.124 is only for
+                -- integrated J,H,K
+       _od;
+        @wterm ' FradH(transformed), Hobs',tlum*Clumf*Ry(NZON)**2,
+                  Hnorm*Clumf*Ry(NZON)**2;
+     */
+
+%C:O
+
+   <*S:  Local Variables *>;
+   Common/FRAD/ FRADJ(Mzon,Nfreq),FRADH(Mzon,Nfreq);
+   Common/FSFD/FS,FD;
+   <*F*  Variables For M28Y12, M28CYN *>;
+%CS:O
+   Integer sm_device; -- for sm
+   Character*40 chalab;
+--   Dimension Pray(0:Np+1);               -- Local: Sight parameters
+   Dimension RMPray(Mzon); -- Zr-nodes for given Pray according Ry
+   Dimension dtau(Mzon,0:Np); --,tauzar(0:Mzon,0:Np);
+   Real*4 xipl(0:Np),fspl(0:Np),ftst(0:Np),fmin,fmax;
+   Dimension ZR(0:Mzon);            -- Local: Mesh-points for given PR
+   Dimension RM(0:Mzon),umr(0:Mzon); -- Local: mean radius & speed
+   Dimension RHS(2*Mzon+2);         -- Right-Hand-Side
+   Dimension FRADK(Mzon),FJLfr(Mzon),
+             FHWork(Mzon),FJWork(Mzon);
+   Dimension FS(0:NP+1,Mzon),Amu(0:NP+1,0:Mzon);
+   Dimension FD(0:NP,Mzon);
+   Dimension FSdir(0:NP+1,Mzon),FDdir(0:NP,Mzon);
+--   Dimension fout(0:NP+1,Nfreq),fcom(0:NP+1,Nfreq);
+--             Hobs(Nfreq); -- ,abermu(0:NP+1);
+--   Common/rays/Pray,fout;
+--   Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
+   Dimension Kz(0:NP+1),MsF(0:NP+1),Msh(0:NP+1),Krowst(0:NP+1);
+   Dimension NMU(Mzon);
+   Dimension FDLEFT(Nfreq);
+   Dimension HAPW(Mzon,Nfreq);-- Work array for Happa for all freq-s.
+   Dimension HAPabW(Mzon,Nfreq);-- Work array for Hapabs for all freq-s.
+   Dimension Chim(Mzon), Chiabm(Mzon), ChiabZ(Mzon);
+   Dimension ChiZ(Mzon);    -- Work array for Chi for 1 given freq.
+--   Dimension wfea(Nfreq); -- weights
+-- Integer   NJUMP(Mzon);
+   double precision xnu,xnuMax;
+   Real time1,time2;   -- for timing
+   Real tm1,tm2;       -- for timing
+   Parameter(Nchn=@Wres);-- Number of channel for output
+   Logical tretL;

@@ -1,0 +1,473 @@
+-- Equation of state for Natom atoms in Saha approximation
+-- from sahawhol.trf by Elena Sorokina
+-- according Alan H. Karp
+--     J.Quant.Spectrosc.Radiat.Transfer 23 (1980) 285-290
+-- sahaand.trf saha with analytic derivatives
+-- sahaandd.trf crude degeneracy added as in sahaz.trf S.Blinnikov
+-- but without low ionized stage if most of ions are greatly ionized
+-- input temperature Tp in 1.e+5 K, density in 1.e-6 g/cm**3
+-- in COMMON/ARG/ in STATEQ INCLUDE
+--  _TRACE "WRITE(10,*)' ZMEAN=',ZMEAN,' Xe=',Xe,'   AD(1,1)=',AD(1,1),"
+--  _TRACE "WRITE(@term,'(1p,4(a,e11.4),a)') ' V=',V,' U=',U,' Rxeold=',Rxeold,
+--                ' Rxe=',Rxe,"
+--  _TRACE "WRITE(@term,'(1p,4(a,e11.4),a)') ' ZMEAN=',ZMEAN,' Xe=',Xe,' Rxe=',Rxe,
+--           '   AD(1,1)=',AD(1,1),"
+--  _TRACE "if (NSTEP==447) @wterm' Tp = ',Tp,"
+--  _TRACE " @wterm' Tp = ',Tp,' Pl = ',Pl,"
+  _Define @GWl GWgL ;
+  SUBROUTINE URSOS;
+  IMPlICIT REAL*8 (A-H,O-Z);
+
+/* 
+  _include nstep;
+ -- with  COMMON/NSTEP/NSTEP,MAXER,IOUT, -- IOUT      LINE PRINT INTERVAL
+         --                  NOUT; -- NOUT      PRINT STEP
+        -- for debugging
+ */
+  _INCLUDE zone;
+  _INCLUDE fundrad;
+  _INCLUDE stateq;
+  <*VAR: Variables, COMMON & DATA URSOS  *>;
+  _Include sahaandd;
+  _Proc @SAHA;
+    <*SAHA: *>;
+  _Return;
+  _Proc @DEGEN;
+    <*DEGEN: *>;
+  _Return;
+--  @wterm' entering URSOS';
+--  @wterm' Pl Tp chem: ',Pl, Tp, chem;
+--  pause;
+  RPl=1.d0/Pl;
+  RTp=1.d0/Tp;
+-- @wterm' Pl before sqrt: ',Pl;
+  Tpsqrt=Tp*sqrt(Tp);
+-- @wterm' Pl after sqrt',Pl;
+  Barnum=Pl*CAvD; -- number of barions per cm**3
+  Rnbar=RPl*(1.d0/CAvD);  -- == 1.D0/Barnum;
+  YZ=0.D0;
+  _Do I=3, Natom;
+     YZ=YZ+Yat(i);
+  _Od;
+  XYZA=YZ+Yat(1)+Yat(2);
+  _SELECT
+    _ Pl <= DLOW [ _CALL @SAHA; Psicap=0.d0 ]
+    _ Pl >= DUP  [ _CALL @DEGEN; Xe=Ye; Psicap=Psi ]
+    _OTHER       [ <*INTERPOL: between @SAHA and @DEGEN *> ]
+  _END;
+  <*RADP: add radiative pressure *>;
+--  @wterm' end of URSOS';
+  RETURN;
+  END;
+%_SAHA:
+--write(*,*)'Csaha,Tpsqrt,Rnbar',Csaha,Tpsqrt,Rnbar;
+  Dsaha=log(Csaha*Tpsqrt*Rnbar);
+  Egas=0.D0; --  ZMean=0.D0; YZMean=0.D0; XeZM=0.D0;
+  If(LST^=0)Then;
+      PT=0.D0; ET=0.D0;
+      PPl=0.D0; EPl=0.D0;
+  endif;
+  <*PROD: compute
+          AD(j,i)   - product of CSaha*Tp**1.5*weights*exp(-pion/Tp)
+                      where
+          Pion(j,i) - ionization potential for atom i at stage j
+          Check validity of low ionization regime and put LOW=true
+          if it holds.
+          Check validity of high ionization regime and put HIGH=true
+          if it holds *>;
+  NIT=0;
+  If (^LOW) Then;
+    RXeold=0.d0;
+    _While <*Errtest: the error is high *> & NIT<64 _do
+--    Write (6,*)'   Rxeold=',Rxeold;
+      RXeold=RXe;
+      <*SUM:  compute sums
+              alpha(i),
+              x(i) in Karp(1980)
+              y(i) in Karp(1980)
+              V AND U *>;
+      RXe=abs((Rxeold*V+1.D0)/(V+U));
+      NIT=NIT+1;
+    _od;
+    If(NIT>=64)then;
+      Write (6,*)' Iterations in SAHAandd fail to converge';
+      Write (6,*)' Tp=',Tp,'  Pl=',Pl,'   Rxeold=',Rxeold,
+              '   Rxe=',Rxe,'  epsurs=',epsurs;
+      STOP;
+    endif;
+    Xe=1.d0/Rxe;
+  Endif;
+  Xe=max(Xe,Xeflo);
+  <*IONS: compute Ani(i) according Saha if needed *>;
+  <*PE: pressure & energy *>;
+  IF(LST^=0)THEN;
+    <*DER: derivatives of P, E & Xe over Tp
+           & derivatives over Pl (logarithmic for Egas, Xe) *>;
+  ENDIF;
+  CHEM=Xe;
+%_SAHA_PROD:
+     Asum=0.d0; -- for low ionization regime
+     -- We cannot take only one atom with low Pion here
+     -- since LOW me be true when the density is high and
+     -- all exponents are of the same order
+     _Do i=1,Natom;
+       AD(1,i)=exp(Dsaha-Pion(1,i)*RTp+@GWl(1,i));
+--       write(10,*)' i AD(1,i)',i,AD(1,i);
+       Asum=Asum+AD(1,i)*Yat(i);
+     _od;
+     If( Asum < EpsLOW) Then;
+        LOW=.TRUE.;
+        Xe=Sqrt( Asum );
+        XeLOW=Sqrt( Asum );
+        RXe=1.d0/(max(Xe,Xeflo));
+     else;
+        LOW=.FALSE.;
+        <*bounds: find the highest and the lowest existing ions
+                  and calculate corresponding AD(j,i) (see Karp)
+                  for each element *>;
+/*     _do i=1,Natom;
+          _do j=jmin(i)+1,jmax(i);
+              @wterm' AD(',j,i,') = ',AD(j,i);
+          _od;
+       _od;
+ */
+        Xe=max(CHEM,sqrt(epslow));      -- initial approximation for iterations
+        RXe=1.d0/Xe;
+     endif;
+%_SAHA_PROD_bounds:
+     jmin(1)=0;   -- for i=1 corresponds to H
+     jmax(1)=1;
+    _do i=2,Natom;
+        j=1;
+       _while AD(j,i) > 1.d0/Xiflo  &  j<Zn(i) _do;
+           j=j+1;
+           AD(j,i)=exp(Dsaha-Pion(j,i)*RTp+@GWl(j,i));
+       _od;
+        jmin(i)=j-1;
+        if (j==Zn(i) ! AD(j,i)<Xiflo*sqrt(epslow)) then;
+           jmax(i)=j;
+        else;
+           ADfact=AD(j,i);
+          _while  ADfact > Xiflo*sqrt(epslow)  &  j < Zn(i) _do
+              j=j+1;
+              ADln=Dsaha-Pion(j,i)*RTp+@GWl(j,i);
+              if ( ADln > -3.d2*log(10.d0)) then;
+                 ADfact=exp(ADln);
+              else;
+                 ADfact=0.d0;
+              endif;
+              AD(j,i)=AD(j-1,i)*ADfact;
+          _od
+           if ( ADfact < Xiflo*sqrt(epslow) ) then;
+              jmax(i)=j-1;
+           else;
+              jmax(i)=Zn(i);
+           endif;
+        endif;
+    _od;
+%_SAHA_Errtest:O
+  ABS(Rxeold-Rxe)>epsurs*Rxe
+%_SAHA_SUM:
+   U=0.d0;
+   V=0.d0;
+--   write(*,'(a,1p,3e11.4)')' Rxe=',Rxe;
+--   pause;
+  _Do i=1,Natom;
+      alpha=0.d0;
+      do j=jmin(i)+1,jmax(i);
+         if(RXe**(j-jmin(i))>huge)RXe=huge**(1.d0/dble(j-jmin(i)));
+         AR(j,i)=AD(j,i)*RXe**(j-jmin(i));
+         alpha=alpha+AR(j,i);
+      enddo;
+      alpha=1.d0/(1.d0+alpha);
+      al(i)=alpha;
+--      x=dble(jmin(i));
+--      y=dble(jmin(i)**2);
+      xa=dble(jmin(i))*alpha; -- must be multiplied by nonzero alpha
+      ya=dble(jmin(i)**2)*alpha; -- " --
+     _do j=jmin(i)+1,jmax(i);
+--         arj=dble(j)*AR(j,i);
+         arj=dble(j)*AR(j,i)*alpha;
+--         x=x+arj;
+--         y=y+dble(j)*arj;
+         xa=xa+arj;
+         ya=ya+dble(j)*arj;
+     _od;
+--      write(*,'(a,i5,1p,3e11.4)')' i Yat(i) alpha xa ', i, Yat(i), alpha, xa;
+      Yal(i)=Yat(i)*alpha;
+      xasaha(i)=xa;
+      yasaha(i)=ya;
+--      xsaha(i)=x;
+--      ysaha(i)=y;
+--      Yalx(i)=Yat(i)*(x*alpha);
+      Yalx(i)=Yat(i)*xa;
+      U=U+Yalx(i);
+--      V=V+Yal(i)*(y-x**2*alpha);
+      V=V+Yat(i)*(ya-xa**2); -- x huge, alpha tiny
+  _od;
+%_SAHA_IONS:
+  /*  Ane=Xe*Barnum;
+      _select
+       _ LOW  [ Ane=Xe*Barnum ]
+       _ HIGH [ Ane=Xe*Barnum ]
+       _other [ Xe=1.d0/Rxe; Ane=Xe*Barnum ]
+      _end; */
+  if(LOW)Then;
+     Zmean=0.d0;
+     _do i=1,Natom;
+         Xion(1,i)=AD(1,i)*RXe;
+         Xion(0,i)=1.d0-Xion(1,i);
+        _do j=2,Zn(i);
+            Xion(j,i)=0.D0;
+        _od;
+        Zmean=Zmean+Yat(i)*Xion(1,i);
+     _od;
+  else;
+     Zmean=0.d0;
+    _do i=1,Natom;
+        Sumx=0.d0;
+        Zsum=0.d0;
+       _do j=0,jmin(i)-1;
+           Xion(j,i)=0.d0;
+       _od;
+       _do j=jmax(i)+1,Zn(i);
+           Xion(j,i)=0.d0;
+       _od;
+       _do j=jmin(i)+1,jmax(i);
+           Xion(j,i)=Ar(j,i)*al(i);
+           sumx=sumx+xion(j,i);
+           Zsum=Zsum+dble(j)**2*Xion(j,i);
+       _od;
+        xion(jmin(i),i)=al(i);
+        sumx=sumx+xion(jmin(i),i);
+        Zsum=Zsum+dble(jmin(i))**2*Xion(jmin(i),i);
+        if( abs(sumx-1.d0) > epsurs )then;
+           @wterm ' sum(xion) in Saha for ',Chames(i),' =',sumx;
+           stop;
+        endif;
+        Zmean=Zmean+Yat(i)*Zsum;
+    _od;
+  endif;
+  Zmean=Zmean*RXe;
+%_SAHA_PE:
+  P=CRgas*(XYZA+Xe)*Pl*Tp; -- XYZA==Sum(Yat(i))
+  If( LOW ) Then;
+     WEgas=0.d0;
+     _Do i=1,Natom;
+       WEgas=WEgas+AD(1,i)*Psum(1,i)*Yat(i)*RXe;
+     _od;
+  Else;
+      WEgas=0.d0;
+     _Do i=1,Natom;
+         if (jmin(i)==0) then;
+            W=0.d0;
+         else;
+            W=Psum(jmin(i),i)*Yal(i);
+         endif;
+        _do j=jmin(i)+1,jmax(i);
+            W=W+Psum(j,i)*AR(j,I)*Yal(i);
+        _od;
+         WEgas=WEgas+W;
+         sigYal(i)=W;
+     _od;
+  Endif;
+  Egas=Egas+CRgas*(1.5d0*(XYZA+Xe)*Tp+WEgas);
+%_SAHA_DER:
+  if(LOW)Then;
+      yaddT=0.D0;
+      _Do i=1,Natom;
+        yad=Yat(i)*AD(1,i);
+        yaddT=yaddT+yad*(1.5D0+Psum(1,i)*RTp);
+      _od;
+      XeT=0.5d0*yaddT*(RXe*RTp);
+      XePl=0.5d0*Asum*RXe-Xe;
+      XeTl=XeT*RXe;
+      ZMT=(yaddT*RTp-Asum*XeTl)*RXe**2-Zmean*XeTl;
+      if (ZMT < 0.d0) ZMT=0.d0;
+      ZMPl=-RXe**2*(1.d0+RXe*XePl)*Asum-Zmean*RXe*XePl;  -- dZmean/d(log Pl)
+      if (ZMPl > 0.d0) ZMPl=0.d0;
+      DET=0.D0;
+      DePl=0.d0;
+      _Do i=1,Natom;
+        DET=DET+Yat(i)*(AD(1,i)*RXe)*Psum(1,i)
+                *((1.5D0+Psum(1,i)*RTp)*RTp-XeTl);
+        DEPl=DEPl+Yat(i)*(AD(1,i)*RXe)*Psum(1,i);
+      _od;
+      ET=ET+CRgas*(1.5D0*(XYZA+Xe+Tp*XeT)+DET);
+      EPl=EPl+CRgas*(1.5D0*Tp*XePl-DePl*(XePl*RXe+1.d0)); -- dE/dlog(D
+   else;
+      DGT=0.d0;
+      ZMT=0.d0;
+      dZMXe=0.d0;
+      _Do i=1,Natom;
+        alpT=0.d0;
+        xsahaT=0.d0;
+        ysahaT=0.d0;
+        sarj=0.d0;
+        sarjj2=0.d0;
+        if (jmin(i)==0) then;
+           Pmin=0.d0;
+        else;
+           Pmin=Psum(jmin(i),i);
+        endif;
+       _do j=jmin(i)+1,jmax(i);
+           arj=(dble(j)-dble(jmin(i)))*AR(j,i);
+           sarj=sarj+arj;
+           sarjj2=sarjj2+dble(j)**2*arj;
+           alT=1.5D0*arj+(Psum(j,i)-Pmin)*RTp*AR(j,i);
+           alpT=alpT+alT; -- for fixed  Xe
+           xsahaT=xsahaT+alT*dble(j); -- fixed  Xe
+           ysahaT=ysahaT+alT*dble(j)**2; -- fixed  Xe
+       _od;
+        alpT=alpT*RTp; -- for fixed  Xe
+        xsahaT=xsahaT*RTp;
+        ysahaT=ysahaT*RTp;
+        DGT=DGT+Yal(i)*xsahaT-Yalx(i)*(alpT*al(i));
+--        ZMT=ZMT+Yal(i)*ysahaT-(Yal(i)*ysaha(i)*alpT*al(i));  -- fixed Xe
+        ZMT=ZMT+Yal(i)*ysahaT-(Yal(i)*yasaha(i)*alpT);  -- fixed Xe
+--        dZMXe=dZMXe+(Yal(i)*ysaha(i))*(sarj*al(i))-(Yal(i)*sarjj2);
+        dZMXe=dZMXe+(Yat(i)*yasaha(i))*(sarj*al(i))-(Yal(i)*sarjj2);
+                                   -- coefficients of XeTl in ZMT
+                                   --          and of XePl in ZMPl
+        aldT(i)=alpT;
+      _od;
+      XeT=DGT/(V*RXe+1.D0);
+      XePl=-V/(V*RXe+1.D0);
+      XeTl=XeT*RXe;
+      ZMT=RXe*(ZMT+XeTl*dZMXe)-Zmean*XeTl;
+      if (ZMT < 0.d0) ZMT=0.d0;
+      ZMPl=RXe*(1.d0+RXe*XePl)*dZMXe-Zmean*RXe*XePl;      -- dZmean/d(log Pl)
+      if (ZMPl > 0.d0) ZMPl=0.d0;
+      DET=0.d0;
+      DEPl=0.d0;
+      _Do i=1,Natom;
+          sigmT=0.d0;
+          signe=0.d0;
+          if (jmin(i)==0) then;
+             Pmin=0.d0;
+          else;
+             Pmin=Psum(jmin(i),i);
+          endif;
+         _do j=jmin(i)+1,jmax(i);
+             sigmT=sigmT+Psum(j,i)*AR(j,i)
+                   *((1.5D0*(dble(j)-dble(jmin(i)))
+                        +(Psum(j,i)-Pmin)*RTp)*RTp
+                     -(dble(j)-dble(jmin(i)))*XeTl);
+             signe=signe+(dble(j)-dble(jmin(i)))*AR(j,i)*Psum(j,i);
+         _od;
+          DET=DET+Yal(i)*sigmT
+--                 -sigYal(i)*(aldT(i)-XeTl*(xsaha(i)-jmin(i)/al(i)))*al(i);
+                 -sigYal(i)*(aldT(i)*al(i)-XeTl*(xasaha(i)-jmin(i)));
+--          DEPl=DEPl+Yal(i)*signe-sigYal(i)*(xsaha(i)-jmin(i)/al(i))*al(i);
+          DEPl=DEPl+Yal(i)*signe-sigYal(i)*(xasaha(i)-jmin(i));
+      _od;
+      ET=ET+CRgas*(1.5D0*(XYZA+Xe+Tp*XeT)+DET);
+      EPl=EPl
+       +CRgas*(1.5D0*Tp*XePl-DePl*(XePl*RXe+1.d0)); -- dE/dlog(D)
+  endif;
+  PPl=PPl+CRgas*(XYZA+Xe+XePl)*Tp;                   -- dP/d(D)
+  PT=PT+CRgas*(XYZA+Xe+Tp*XeT)*Pl;
+%_DEGEN:
+  ZMean=Zf;  -- this is wrong in sahaz.trf
+             -- since Zf=Ztot-2 there, and Ztot was 14 for Si.
+  -- We should insert Ztot here averaged over real set of ions
+  -- for the first test leave it as is
+  XeZM=ZMean*YZ;
+  YZMean=YZ;
+  Ye=Yat(1)+2.D0*Yat(2)+XeZM;
+  dY=(Pl*Ye)**tret2;
+  PSI=Cpsi*Dy*RTp;
+  P=CPRESS*(Pl*Ye)*dY+CRgas*(XYZA+Ye/(1.D0+0.4D0*PSI))*Pl*Tp;
+  PotInt=(0.5d0*Zf)*(Tpzf+Tpzb);
+  Egas=1.5D0*P*RPl;
+  If(LST^=0)Then;
+    PPl=(5.D0*tret)*CPRESS*Ye*dY+
+        CRgas*(XYZA+Ye/(1.D0+0.4D0*PSI))*Tp-
+        CRgas*Ye/(1.D0+0.4D0*PSI)**2*(0.4D0*tret2)*PSI*Tp;
+    PT=CRgas*(XYZA+Ye/(1.D0+0.4D0*PSI))*Pl+
+       CRgas*Ye/(1.D0+0.4D0*PSI)**2*0.4D0*PSI*Pl;
+    EPl=1.5D0*PPl-Egas;
+    ET =1.5D0*PT*RPl;
+    ZMT=0.D0; ZMPl=0.D0;
+    YZMT=0.D0;YZMPl=0.D0;
+  Endif;
+  Egas=Egas+CRgas*(YZ*PotInt+Psum(1,1)*Yat(1)+Psum(Nstage,2)*Yat(2));
+  Xion(1,1)=1.D0;
+  _Do i=2,Natom;
+     Xion(1,i)=0.D0;
+     Xion(2,i)=1.D0;
+  _od;
+%_INTERPOL:
+  WW=CWW*LOG(Pl)-CLOW;
+  WD=CWW*RPl;
+  WP=WW**3*(4.D0-3.D0*WW);  -- WEIGHT
+  _CALL @DEGEN;
+  Pdeg=P;   -- SAVE ALL OUTPUT
+  Edeg=Egas;
+  IF(LST^=0)THEN;
+    PTdeg=PT; ETdeg=ET; PPldeg=PPl; EPldeg=EPl;
+  ENDIF;
+  _CALL @SAHA;
+--  PSah=P; ESah=Egas;
+  IF(LST^=0)THEN; -- WE NEED NOn-INTERPOLATED VALUES OF P, EGAS ETC.
+                  -- SO WE START WITH DERIVATIVES
+    PT=PTdeg*WP+PT*(1.D0-WP)
+       +(ETdeg-ET)*Pl**2*(12.D0*WW**2*(1.D0-WW)*WD);
+    ET=ETdeg*WP+ET*(1.D0-WP);
+    PPl=PPLdeg*WP+PPl*(1.D0-WP) -- DP/D(D),  NOT DP/DLOG(D)
+        +(Pdeg-P)*(12.D0*WW**2*(1.D0-WW)*WD)
+        +(EPLdeg-EPl)*Pl*(12.D0*WW**2*(1.D0-WW)*WD)
+        +(Edeg-Egas)*(Pl**2*12.D0*WW*(2.D0-3.D0*WW)*WD**2
+                      -12.D0*CWW*WW**2*(1.D0-WW)-- for log IN WP
+                    +24.D0*Pl*WW**2*(1.D0-WW)*WD);
+    EPl=EPLdeg*WP+EPl*(1.D0-WP)
+                 +(Edeg-Egas)*(Pl*12.D0*WW**2*(1.D0-WW)*WD);
+    ZMPl=ZMPl*(1.D0-WP)
+                 +(zF-ZMEaN)*(Pl*12.D0*WW**2*(1.D0-WW)*WD);
+    ZMT=ZMT*(1.D0-WP);
+    YZMPl=YZMPl*(1.D0-WP)
+                 +(YZ-YZMEaN)*(Pl*12.D0*WW**2*(1.D0-WW)*WD);
+    YZMT=YZMT*(1.D0-WP);
+  ENDIF;
+  P=Pdeg*WP+P   *(1.D0-WP)
+    +(Edeg-Egas)*Pl**2*(12.D0*WW**2*(1.D0-WW)*WD);
+  Egas=Edeg*WP+Egas*(1.D0-WP);
+  Zmean=Zf*WP+Zmean*(1.D0-WP);  --Zmean==Zf in DEGEN
+  YZmean=YZ*WP+YZmean*(1.D0-WP);
+  Xe=Ye*WP+Xe*(1.D0-WP);
+  Psicap=Psi*WP;
+%_RADP:
+  If(RadP)Then;
+    P=P+(RadC*Tp**4)*tret;
+    Egas=Egas+(RadC*Tp**4)*RPl;
+    If(LST^=0)Then;
+        PT=PT+4.D0*(RadC*Tp**3)*tret;
+        ET=ET+4.D0*(RadC*Tp**3)*RPl;
+        EPl=EPl-(RadC*Tp**4)*RPl;
+    Endif;
+  Endif;
+  If(LST^=0)Then;
+      DPE=(EPl+Tp*PT*RPl)*(Pl/P)-1.D0;
+      W=(PT/ET)*RPl;
+      GAM=(Pl*PPl+W*(Tp*PT))/P;
+      DA=W/GAM;
+  Endif;
+%_VAR:O
+--Parameter(itup=50); -- maximum number of iterations
+--Parameter(Pionup=6.3151d0); -- maximum ionization potential
+  Parameter(tret=1.d0/3.d0);
+  Parameter(tret2=2.d0/3.d0);
+--Parameter(epsurs=1.d-7, Xeflo=1.d-20);
+--  Parameter(epsurs=1.d-8, Xeflo=1.d-20, Xiflo=1.d-10);
+  Parameter(epsurs=1.d-8, Xeflo=1.d-20, Xiflo=1.d-7);
+--  Parameter(epslow=1.d-20); -- elka
+  Parameter(epslow=1.d-10,huge=1.d100);
+  Dimension Yal(Natom),Yalx(Natom),-- xsaha(Natom),ysaha(Natom),
+            xasaha(Natom),yasaha(Natom),
+             al(Natom),aldT(Natom),sigYal(Natom),
+            jmin(Natom), jmax(Natom),
+            AD(Nstage,Natom),
+            AR(Nstage,Natom);
+--   Dimension Xion(0:Nstage,Natom);
+   Logical LOW,HIGH;
+   COMMON/NIT/Xelow,Xion(0:Nstage,Natom),Nit,LOW,HIGH;

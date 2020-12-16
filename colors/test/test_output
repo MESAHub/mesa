@@ -1,0 +1,27 @@
+
+ color magnitude results
+
+        teff    log_teff       log_l        mass   [M_div_h]       log_g
+        5780        3.76        0.00        1.00        0.00        4.44
+
+         bol        4.74000
+         bcv       -0.11510
+         U-B       -0.14211
+         B-V       -0.61768
+         V-R       -0.36199
+         V-I       -0.68894
+         V-K       -1.46926
+         R-I       -0.32695
+         I-K       -0.78032
+         J-H       -0.39024
+         H-K        0.05223
+         K-L       -0.10512
+         J-K       -0.33801
+         J-L       -0.44312
+         J-Lp      -0.44123
+         K-M       -0.43080
+
+         vcolors    4.85510
+
+ matches expected solar results
+

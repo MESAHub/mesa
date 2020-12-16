@@ -1,0 +1,27 @@
+Aaron Dotter - 2020
+
+Notes on adapting the Chabrier et al. (2019) EOS tables to MESA.
+
+The original data release is in the tarball "DirEOS2019.tar.gz".
+
+There are two parts to building MESA tables with CMS:
+
+1. cms_mixing does the entropy of mixing calculation, blending 
+   pure-H and pure-He tables into composite tables. It also 
+   converts the original units of CMS (MJ, kg, etc.) to cgs.
+   The entropy of mixing calculation needs to be done on PT
+   tables.
+
+2. cms_resample starts with the output of cms_mixing, which is
+   a series of PT tables for a range of X,Y values. This step
+   resamples the PT tables into DT (Rho,T) tables and calculates
+   additional quantities required by the MESA EOS.
+
+Some things are not provided by CMS: mu, mu_e (ln_free_e), eta.
+
+
+
+
+
+To re-run the tables, use the build_data script.
+

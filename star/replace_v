@@ -1,0 +1,12 @@
+#!/bin/bash
+cd ../star_data
+./replace_v $1
+cd ../star
+cp defaults_$1/* defaults/
+cp job_$1/* job/
+cp other_$1/* other/
+cp private_$1/* private/
+cp public_$1/* public/
+cp make/makefile_$1 make/makefile
+cp make/makefile_base_$1 make/makefile_base
+echo star $1

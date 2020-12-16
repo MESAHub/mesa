@@ -1,0 +1,12 @@
+&kap
+      use_Zbase_for_Type1 = .false.
+
+      kap_file_prefix = 'gn93'
+      kap_CO_prefix = 'gn93_co'
+      kap_lowT_prefix = 'lowT_fa05_gn93'
+
+      cubic_interpolation_in_X = .true.
+      cubic_interpolation_in_Z = .true.
+
+
+/

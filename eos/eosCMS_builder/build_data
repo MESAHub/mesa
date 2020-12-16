@@ -1,0 +1,35 @@
+#!/bin/bash
+
+function check_okay {
+    if [ $? -ne 0 ]
+    then
+        echo 'failed in build_data'
+        exit 1
+    fi
+}
+
+function do_one {
+    ./cms_mixing $1 tmp.data
+    check_okay
+    ./cms_resample tmp.data data/eosCMS_data/mesa-CMS_$2x.data
+    check_okay
+}
+
+./mk
+check_okay
+
+#mkdir -p data/eosCMS_data
+
+do_one 0.0 000
+do_one 0.1 010
+do_one 0.2 020
+do_one 0.3 030
+do_one 0.4 040
+do_one 0.5 050
+do_one 0.6 060
+do_one 0.7 070
+do_one 0.8 080
+do_one 0.9 090
+do_one 1.0 100
+
+rm -f tmp.data

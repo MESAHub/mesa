@@ -1,0 +1,14 @@
+      
+         ! add o18 and ne22
+         
+         add_isos(o18, ne22)
+         
+         add_reactions(
+            rn14ag_to_o18      ! n14(a,g)f18(e+nu)o18
+            r_o18_ag_ne22
+            )     
+              
+         remove_reactions(
+            rn14ag_to_ne22,
+            rn14ag_lite
+            )     

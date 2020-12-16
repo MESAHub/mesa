@@ -1,0 +1,15 @@
+# This is the makefile for the mesa gyre library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+ifeq ($(USE_GYRE),NO)
+    include makefile_stub
+else
+    include makefile_full
+endif

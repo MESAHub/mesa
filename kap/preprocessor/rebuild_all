@@ -1,0 +1,91 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+function do_one_freedman {
+	echo "using" $1
+	echo
+	check_okay
+	./rn_freedman $1
+	check_okay
+	echo 'done' $1
+	echo
+}
+
+function do_one {
+	echo "using" $1
+	echo
+	check_okay
+	./rn_fixed_metal $1
+	check_okay
+	echo 'done' $1
+	echo
+}
+
+function do_one_CO {
+	echo "using" $1
+	check_okay
+	./rn_co_enhanced $1
+	check_okay
+	echo 'done' $1
+	echo
+}
+
+mkdir -p data/kap_data
+
+rm -f data/kap_data/*.data
+rm -f data/kap_data.tar.xz
+
+#As of r8118 file is empty kap_input_data/opal/A05+Ne
+# do_one inlist_a05+Ne
+
+./ckap inlist_Fe 1.0 0.0
+check_okay
+
+do_one inlist_a09
+do_one_CO inlist_a09_CO
+
+do_one inlist_OP_a09_nans_removed_by_hand
+do_one inlist_OP_gs98
+
+do_one_freedman inlist_lowT_Freedman11
+
+do_one inlist_lowT_fa05_gs98
+do_one inlist_lowT_fa05_gs98_aFe_m2
+do_one inlist_lowT_fa05_gs98_aFe_p2
+do_one inlist_lowT_fa05_gs98_aFe_p4
+do_one inlist_lowT_fa05_gs98_aFe_p6
+do_one inlist_lowT_fa05_gs98_aFe_p8
+
+do_one inlist_lowT_fa05_gn93
+do_one inlist_lowT_fa05_ags04
+do_one inlist_lowT_fa05_a09
+
+do_one inlist_lowT_af94_gn93
+
+do_one inlist_gn93 
+do_one_CO inlist_gn93_CO
+
+do_one inlist_gs98 
+do_one_CO inlist_gs98_CO
+do_one inlist_gs98_aFe_m2 
+do_one inlist_gs98_aFe_p2 
+do_one inlist_gs98_aFe_p3
+do_one inlist_gs98_aFe_p4 
+do_one_CO inlist_gs98_aFe_p4_CO
+do_one inlist_gs98_aFe_p6 
+do_one inlist_gs98_aFe_p8 
+
+
+
+echo "**************"
+echo "**************"
+echo "next step is"
+echo "./build_4_export"
+echo "**************"
+echo "**************"

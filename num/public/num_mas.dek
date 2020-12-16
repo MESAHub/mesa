@@ -1,0 +1,7 @@
+      subroutine mas(n, am, lmas, lrpar, rpar, lipar, ipar)
+         use const_def, only: dp
+         integer, intent(in) :: n, lmas, lrpar, lipar
+         real(dp), intent(inout) :: am(:,:) ! (lmas, n)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      end subroutine mas

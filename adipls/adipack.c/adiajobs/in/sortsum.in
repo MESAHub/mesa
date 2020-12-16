@@ -1,0 +1,32 @@
+Files needed:'
+Input from unit iw (default 10)'
+Output to unit 2'
+10 'agsm.l4b.d.18.p1.md'    @
+11 'agsm.l4b.d.18.p1.a'    @
+12 'agsm.l4b.d.20.p1.b'    
+2 'agsm.l4b.d.18.p1.mdm'    @
+-1 ''    @
+icasrd,iw,elw1,elw2,iordw1,iordw2?'
+1,,,,0,100,,,,,,,,,,,,    @
+mode?'
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    @
+isort,igncse,incl,eps,epssol?'
+1,,,1.e-6,,    @
+icorcl?'
+0    @
+icasrd,iw,elw1,elw2,iordw1,iordw2?'
+1,11,,,,,,,,,,,,,,    @
+mode?'
+0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    @
+isort,igncse,incl,eps,epssol?'
+1,,,1.e-6,,    @
+icorcl?'
+0    @
+icasrd,iw,elw1,elw2,iordw1,iordw2?'
+1,12,,,,,,,,,,,,,,    !
+mode?'
+0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    !
+isort,igncse,incl,eps,epssol?'
+1,,,1.e-6,,    !
+icorcl?'
+0    !

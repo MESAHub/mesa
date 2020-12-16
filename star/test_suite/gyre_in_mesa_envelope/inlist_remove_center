@@ -1,0 +1,35 @@
+&star_job
+      
+  ! load the starting model
+
+  load_saved_model = .true.
+  saved_model_name = 'tams.mod'
+
+  ! save a model at the end of the run
+
+  save_model_when_terminate = .true.
+  save_model_filename = 'removed.mod'
+
+  ! remove the core
+
+  remove_initial_center_by_temperature = 2d6
+
+  ! terminate immediately
+
+  steps_to_take_before_terminate = 0
+
+/ !end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+  Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+
+  initial_z = 0.02
+
+/ ! end of controls namelist

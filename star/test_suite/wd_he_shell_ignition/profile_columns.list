@@ -1,0 +1,287 @@
+! profile_columns.list -- determines the contents of star model profiles
+! you can use a non-standard version by setting profile_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+! reorder the following names as desired to reorder columns.
+! comment out the name to omit a column (fewer columns => less IO => faster running).
+! remove '!' to restore a column.
+
+! if you have a situation where you want a non-standard set of columns,
+! make a copy of this file, edit as desired, and give the new filename in your inlist
+! as profile_columns_file.   if you are just adding columns, you can 'include' this file,
+! and just list the additions in your file.   note: to include the standard default
+! version, use include '' -- the 0 length string means include the default file.
+
+! if you need to have something added to the list of options, let me know....
+
+
+! the first few lines of the profile contain general info about the model.
+! for completeness, those items are described at the end of this file.
+
+
+! note: you can include another list by doing
+!        include 'filename'
+!        include '' means include the default standard list file
+
+
+! the following lines of the profile contain info for 1 zone per row, surface to center.
+   
+   zone ! numbers start with 1 at the surface
+   logT ! log10(temperature) at center of zone
+   logRho ! log10(density) at center of zone
+   logP ! log10(pressure) at center of zone
+   logR ! log10(radius/Rsun) at outer boundary of zone
+   luminosity ! luminosity at outer boundary of zone (in Lsun units)
+   logL ! log(max(1d-6,L/Lsun))
+   velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
+   entropy ! specific entropy divided by (avo*kerg)
+   conv_mixing_type ! mixing types are defined in mesa/const
+   csound ! sound speed
+   v_div_csound ! velocity divided by sound speed
+   total_energy ! v^2/2 - G m / r + E (ergs/g).  negative if bound
+   v_div_r ! velocity divided by radius
+   !scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
+   eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
+   mu ! mean molecular weight per gas particle (ions + free electrons)
+   logdq ! log10(dq)
+   dq_ratio ! dq(k-1)/dq(k)
+   q ! fraction of star mass interior to outer boundary of this zone
+   radius ! radius at outer boundary of zone (in Rsun units)
+   temperature ! temperature at center of zone
+   tau ! optical depth
+   logtau ! log10(optical depth) at center of zone
+   pressure ! total pressure at center of zone (pgas + prad)
+   !pgas ! gas pressure at center of zone (electrons and ions)
+   pgas_div_ptotal ! pgas/pressure
+   logPgas ! log10(pgas)
+   !prad ! radiation pressure at center of zone
+   !energy ! internal energy (ergs/g)
+   !logE ! log10(specific internal energy) at center of zone
+   grada ! dlnT_dlnP at constant S
+   !dE_dRho ! at constant T
+   !cv ! specific heat at constant volume
+   !cp ! specific heat at constant total pressure
+   !logS ! log10(specific entropy)
+   !gamma1 ! dlnP_dlnRho at constant S
+   !gamma3 ! gamma3 - 1 = dlnT_dlnRho at constant S
+   !theta_e ! electron degeneracy factor for graboske screening
+   !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
+   free_e ! free_e is mean number of free electrons per nucleon
+   !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
+   !chiRho ! dlnP_dlnRho at constant T
+   !chiT ! dlnP_dlnT at constant Rho
+   abar ! average atomic weight (g/mole)
+   zbar ! average charge
+   !z2bar ! average charge^2
+   ye ! average charge per baryon = proton fraction
+   !opacity ! opacity measured at center of zone
+   log_opacity ! log10(opacity)
+   eps_nuc ! ergs/g/sec from nuclear reactions (neutrinos subtracted)
+   non_nuc_neu ! non-nuclear-reaction neutrino losses
+   !nonnucneu_plas ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
+   !nonnucneu_brem ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
+   !nonnucneu_phot ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
+   !nonnucneu_pair ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
+   eps_grav ! heat from gravitational contraction (negative for expansion)
+   mlt_mixing_length ! mixing length for mlt (cm)
+   log_D_mix ! log10 diffusion coefficient in units of cm^2/second (Eulerian)
+   log_conv_vel ! log10 convection velocity (cm/sec)
+   conv_vel_div_csound ! convection velocity divided by sound speed
+   log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
+   !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
+   pressure_scale_height ! in Rsun units
+   gradT ! mlt value for required temperature gradient dlnT/dlnP
+   gradr ! dlnT/dlnP required for purely radiative transport
+   dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
+   dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
+   !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
+   !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
+   mass ! m/Msun. mass coordinate of outer boundary of cell.
+   mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
+   !logM ! log10(m/Msun)
+   !xm ! mass exterior to point (Msun units)
+   !dq ! mass of zone as a fraction of total star mass
+   logxq ! log10(1-q)
+   
+   x ! hydrogen mass fraction
+   y ! helium mass fraction
+   z ! metallicity
+   
+   ergs_error_integral
+   ergs_rel_error_integral
+   eps_mdot
+   ergs_mdot
+   ergs_error
+   eps_grav_plus_eps_mdot
+   ergs_eps_grav_plus_eps_mdot
+
+   add_abundances ! this adds all of the isos that are in the current net
+   ! NOTE: you can list specific isotopes by giving their names (from chem_def)
+      
+      !h1
+      !he3
+      !he4
+      !c12
+      !n14
+      !o16
+      
+   ! change in particular abundances during hydro solve
+      !xadot h1
+      !xadot he3
+   ! particular abundances before hydro solve
+      !xaprev h1
+      !xaprev he3
+
+   ! ergs/g/sec for reaction categories
+   
+      add_reaction_categories ! this adds all the reaction categories
+      ! NOTE: you can list specific categories by giving their names (from net_def)
+      
+      !pp
+      !cno
+      !tri_alfa
+
+   ! ergs/g/sec for specific reactions (names from rates_def)
+      
+      !rpp
+
+      
+   ! misc
+
+      gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
+      !dlnR_dm ! for structure equation
+      !dlnP_dm ! for structure equation
+      !dlnT_dm ! for structure equation
+      !dL_dm ! for structure equation
+      
+      
+      !delta_r ! r(outer edge) - r(inner edge); radial extent of cell in cm.
+      !delta_v ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
+      !dt_dv_div_dr ! dt*delta_v/delta_r; need to have this << 1 for every cell
+         
+         
+      !cno_div_z ! abundance of c12, n14, and o16 as a fraction of total z
+      
+      !dlog_h1_dlogP ! (log(h1(k)) - log(h1(k-1)))/(log(P(k)) - log(P(k-1)))
+      !dlog_he3_dlogP
+      !dlog_he4_dlogP
+      !dlog_c12_dlogP
+      !dlog_c13_dlogP
+      !dlog_n14_dlogP
+      !dlog_o16_dlogP
+      !dlog_ne20_dlogP
+      !dlog_mg24_dlogP
+      !dlog_si28_dlogP
+      
+      !dlog_pp_dlogP
+      !dlog_cno_dlogP
+      !dlog_3alf_dlogP
+      
+      !dlog_burn_c_dlogP
+      !dlog_burn_n_dlogP
+      !dlog_burn_o_dlogP
+      
+      !dlog_burn_ne_dlogP
+      !dlog_burn_na_dlogP
+      !dlog_burn_mg_dlogP
+      
+      !dlog_cc_dlogP
+      !dlog_co_dlogP
+      !dlog_oo_dlogP
+      
+      !dlog_burn_si_dlogP
+      !dlog_burn_s_dlogP
+      !dlog_burn_ar_dlogP
+      !dlog_burn_ca_dlogP
+      !dlog_burn_ti_dlogP
+      !dlog_burn_cr_dlogP
+      !dlog_burn_fe_dlogP
+      
+      !dlog_pnhe4_dlogP
+      !dlog_photo_dlogP
+      !dlog_other_dlogP
+      
+      
+      
+      !brunt_N2 ! brunt-vaisala frequence squared.  only positive values shown.
+      !brunt_Astar ! Astar := r N^2 / g.  only positive values shown.
+      !brunt_B ! the composition gradient term in the brunt N^2 calculation
+      !chiY ! dlnP/dlnY used in calculate of brunt_B term
+      !dlnY_dlnP ! the actual dlnY/dlnP in the model as used in brunt_B
+      
+      logQ ! logQ = logRho - 2*logT + 12
+      
+      !cs_at_cell_bdy ! sound speed at cell boundary (csound is at cell center)
+      
+      !dlnmu_dr ! for salt-finger mixing
+      !semiconvection_criterion ! positive means stable
+         ! 1/chiRho - dlnT_dlnP*chiT/chiRho - dlnRho_dlnP
+      
+
+! the first few lines of the profile contain general info about the model.
+! for completeness, those items are described here.
+
+   ! initial mass and Z
+      ! initial_mass
+      ! initial_z
+   ! general properties of the current state
+      ! model_number
+      ! num_zones
+      ! star_age
+      ! time_step
+   ! properties at the photosphere
+      ! Teff
+      ! photosphere_L
+      ! photosphere_r
+   ! properties at the outermost zone of the model
+      ! log_surface_L
+      ! log_surface_radius
+      ! log_surface_temp
+   ! properties near the center of the model
+      ! log_center_temp
+      ! log_center_density
+      ! log_center_P
+      ! center_eta
+   ! abundances near the center
+      ! center_h1
+      ! center_he3
+      ! center_he4
+      ! center_c12
+      ! center_n14
+      ! center_o16
+      ! center_ne20
+   ! information about total mass
+      ! star_mass
+      ! star_mdot
+      ! star_mass_h1
+      ! star_mass_he3
+      ! star_mass_he4
+      ! star_mass_c12
+      ! star_mass_n14
+      ! star_mass_o16
+      ! star_mass_ne20
+   ! locations of abundance transitions
+      ! h1_boundary_mass
+      ! he4_boundary_mass
+      ! c12_boundary_mass
+   ! location of optical depths 10 and 100
+      ! tau10_mass
+      ! tau10_radius
+      ! tau100_mass
+      ! tau100_radius
+   ! time scales
+      ! dynamic_time
+      ! kh_timescale
+      ! nuc_timescale
+   ! various kinds of total power
+      ! power_nuc_burn
+      ! power_h_burn
+      ! power_he_burn
+      ! power_neu
+   ! a few control parameter values
+      ! h1_boundary_limit
+      ! he4_boundary_limit
+      ! c12_boundary_limit
+      ! burn_min1
+      ! burn_min2

@@ -1,0 +1,37 @@
+ Files needed:
+ Mode input on d/s idsin (default 11)
+ Output of results on d/s 20
+11 'agsm.l5bi.d.15.p2'   @
+20 'df.l5bi.d.15.p2.4-3'   @
+-1 ''      @
+
+Selected controls:
+itype(1 - 2): itype(i) determines type of frequency from data set no i.
+itype = 1: eigenfrequency, possibly corrected for perturbation
+   in gravitation potential by perturbation analysis
+itype = 2: uncorrected eigenfrequency (i.e. would give proper
+   eigenfrequency in the cowling approximation)
+itype = 3: variational frequency
+itype = 4: frequency from Richardson extrapolation
+Note: itype = 2 and 4 can only be used with icase = 1
+   itype is meaningless for icase = 3.
+ipfrq = 1: print results in terms of cyclic frequencies in muhz
+ipfrq = 2: print results in terms of dimensionless frequencies
+idiff = 1: relative differences
+idiff = 2: absolute differences
+iscdif: if iscdif = 1 scale differences by energy ratio at
+   fixed frequency, normalized with surface vertical displacement.
+   if iscdif = 2, use normalization with total surface displacement.
+
+iread,idsin,irew?
+,,,,,,,,,,,,   @
+lwin1,lwin2,nwin1,nwin2,frqwn1,frqwn2?
+,,,,,,,,,,,,   @
+icdata,epsdt,nmod?
+,,,,,,,,,,,,   @
+itype(1-2),ipfrq,idiff,iscdif,initsc?
+3,4,1,2,2,,,,,,,,,,,,   @
+xnorm, xftc, frftc
+,,,,,,,,,,,,,,,   @
+iprdif?
+,,,   @

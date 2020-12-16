@@ -1,0 +1,14 @@
+      subroutine decsols(iop,n,nzmax,ia,ja,sa,b,lrd,rpar_decsol,lid,ipar_decsol,ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iop, n, nzmax, lrd, lid
+            ! iop = 0 means factor
+            ! iop = 1 means solve
+            ! iop = 2 means deallocate
+         integer, intent(inout) :: ia(:) ! (n+1)
+         integer, intent(inout) :: ja(:) ! (nzmax)
+         real(dp), intent(inout) :: sa(:) ! (nzmax)
+         real(dp), intent(inout) :: b(:) ! (n)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ierr
+      end subroutine decsols

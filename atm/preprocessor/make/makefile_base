@@ -1,0 +1,135 @@
+# This is the makefile for the mesa atm preprocessor
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+CREATE_TABLE_SRCS = create_table_atm.f
+
+CREATE_TAU100_SRCS = create_tau100.f $(DEPS_LOCAL) $(DEPS_OTHER)
+
+MAKE_BT_SRCS = create_BT_Settl.f
+
+MAKE_WD_SRCS = create_wd_tau25.f
+
+PLOT_SRCS = plot.f
+
+CKREAD_SRCS = ckread.f
+
+MERGE_SRCS = table_merge.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_CONST = const
+DEPS_LOCAL = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_CONST))
+LOAD_LOCAL = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_CONST))
+
+LIBS_LOCAL = atm
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = eos kap chem $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lkap -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+
+# STEP 3: build
+
+CREATE_TABLE = ../create_table_atm
+CREATE_TAU100 = ../create_tau100
+MAKE_BT = ../make_BT_Settl
+MAKE_WD = ../make_wd_tau25
+PLOT = ../plotter
+CKREAD = ../ckread
+MERGE = ../table_merge
+
+CREATE_TABLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CREATE_TABLE_SRCS)))
+CREATE_TAU100_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CREATE_TAU100_SRCS)))
+MAKE_BT_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MAKE_BT_SRCS)))
+MAKE_WD_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MAKE_WD_SRCS)))
+PLOT_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PLOT_SRCS)))
+CKREAD_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CKREAD_SRCS)))
+MERGE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MERGE_SRCS)))
+
+all : $(CREATE_TABLE) $(CREATE_TAU100) $(MAKE_WD) $(PLOT) $(CKREAD) $(MERGE)
+
+$(CREATE_TABLE) : $(CREATE_TABLE_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(CREATE_TAU100) : $(CREATE_TAU100_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(MAKE_BT) : $(MAKE_BT_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(MAKE_WD) : $(MAKE_WD_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(PLOT) : $(PLOT_OBJS) $(DEPS_CONST)
+$(CKREAD) : $(CKREAD_OBJS) $(DEPS_CONST)
+$(MERGE) : $(MERGE_OBJS) $(DEPS_CONST)
+
+$(CREATE_TABLE) $(CREATE_TAU100) $(MAKE_BT) $(MAKE_WD) :
+ifneq ($(QUIET),)
+	@echo FC $@
+	@$(FC) $(FCopenmp) -o $@ $< $(LOAD_LOCAL) $(LOAD_OTHER)
+else
+	$(FC) $(FCopenmp) -o $@ $< $(LOAD_LOCAL) $(LOAD_OTHER)
+endif
+
+$(PLOT) $(CKREAD) $(MERGE) :
+ifneq ($(QUIET),)
+	@echo FC $@
+	@$(FC) $(FCopenmp) -o $@ $< $(LOAD_CONST)
+else
+	$(FC) $(FCopenmp) -o $@ $< $(LOAD_CONST)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(CREATE_TABLE) $(CREATE_TAU100) \
+	    $(MAKE_BT) $(MAKE_WD) $(PLOT) $(CKREAD) $(MERGE)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+INCLUDES = -I$(MESA_DIR)/include
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) -O${OPT_LEVEL} $(FCfree) $(FCchecks) $<
+else
+	$(TEST_COMPILE) -O${OPT_LEVEL} $(FCfree) $(FCchecks) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

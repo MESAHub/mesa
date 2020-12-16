@@ -1,0 +1,2106 @@
+-- _outcom ;
+-- _trace '--------';
+
+-- calling gdepos (6) each step after some time
+-- calling tt4strad and Lbol in one run
+
+/* PACKAGE STELLA: IMPLICIT HYDRODYNAMICS, KINETICS & VARIOUS TYPES
+    OF TRANSFER.
+    Version R4 continuum PHOTON TRANSFER without REZONING
+    but with dropping of outer zones for tau<@tau_floor
+    and limiting the flux for zones with jumps in tau > taujmp
+    12 Mar 1989  at ITEP, Moscow
+    27 May 1990  at  MPA, Garching
+    18 Dec 1991  at  MPA, Garching  -- scattering
+    24 Apr 2001  at UCO/Lick, Santa Cruz -- call beams -- now in eddirel.trf
+    subroutine references:
+     **** BEGRAD ****
+     BEGIN - initialization of run.
+     **** LBALRAD ****
+     LOSSEN - losses and gains of energy
+     PRIBAL - print model & balances
+     **** STIFFBGH ****
+     VTSTIF - integrates one time step
+     **** DFRAD ****
+     DIFMAT for HydroDynamics & Transfer EQUATIONS--
+     **** HAPBLA ****
+     HAPPA -- opacity in frequency bands
+     **** SAHAZ ****
+     URSOS
+     **** OPAZR ****
+     OPACIT -- Rosseland mean (Zeldovich-Rayzer approximation)
+     **** NTH ****
+     Subroutine NTH: finds in NTHICK(L) the zone numbers of
+           optically thick zones for all NFRUS frequency groups *>;
+     **** commons are included by trefor _include ****
+     fundrad include a
+     SNRAD   INCLUDE A
+     ABO     INCLUDE A
+     BLACK   INCLUDE A;
+     BLACK, BLACKD -- black-body radiation occ. number & its derivative
+                                                    */
+--  _TRACE "WRITE(@term,*)' Ncnd,Ncnew=',Ncnd,Ncnew,"
+--  _TRACE "WRITE(@term,*)' jstart=',jstart,"
+--  _TRACE --"if (nstep==319 .or. nstep==320 .or. nstep>=406)
+--  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
+--            WRITE(@term,'(a,3i5\\a,1p,4f12.5)')
+--               ' Nstep,Ncnd,Nfrus=',Nstep,Ncnd,Nfrus,
+--               ' Ty(ncnd+1...ncnd+4): ',Ty(ncnd+1),Ty(ncnd+2),
+--               Ty(ncnd+3),Ty(ncnd+4),"
+--  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
+  --          write(*,*)' Ty(ncnd+1...ncnd+4): ',Ty(ncnd+1),Ty(ncnd+2),
+    --           Ty(ncnd+3),Ty(ncnd+4),"
+--  _TRACE " if (nstep>150)
+  --          write(*,'(a,1p,3g20.12)')' Ry(Mzon-2),Ry(Mzon-1),Ry(Mzon)= ', Ry(Mzon-2),Ry(Mzon-1),Ry(Mzon),"
+--  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
+  --          write(*,*)' Y(2*Nzon+ncnd+1...+4,1): ',Y(2*Nzon+ncnd+1,1),
+    --          Y(2*Nzon+ncnd+2,1),Y(2*Nzon+ncnd+3,1),Y(2*Nzon+ncnd+4,1) ,"
+--  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
+  --          write(*,*)' Happal(last 5 Nfrus): ',
+    --           Happal(Nfrus-4),Happal(Nfrus-3),
+      --         Happal(Nfrus-2),Happal(Nfrus-1),Happal(Nfrus) ,"
+--  _TRACE "WRITE(@term,*)' Y11=',Y(1,1),"
+--  _TRACE "WRITE(@term,'(a,1p,e12.4)')' chem=',chem,"
+--  _TRACE "@wterm' Strad Ltau,Nthick=',Ltau,Nthick(Ltau),"
+--  _TRACE "@wterm' Strad Ltau,=',Ltau,"
+
+_Define
+     @Lfn ' ' -- for Unix
+     -- @Lfn ',80' -- length of the Filein, Fileout
+
+
+_DEFINE
+ @INTERRUPTION   INTRP
+ @FREQ_TOL       1.6D0
+ @FJ2    Y(NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KM+1,1)    -- FJ(Km+1,L)
+ @FJ1    Y(NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KM,1)      -- FJ(Km,L)
+ @FH1    Y(NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KM+KRAD,1)
+ @NCOND_MAX      NZON-3
+ @TIME           CT001   --    CURRENT TIME
+ @DATE           D0001   --    CURRENT DATE
+ @BEG_TIME       B0001
+ @SAVE_MODEL     SAVEM
+ @TAU_FLOOR      3.D-4
+ @Nrezone        20      -- allow to throw away  @Nrezone outer zones
+ @N_EDD          50  --   N of steps for updating Eddington factors
+ @Nrlx           25.d0 -- N of steps for Edd relaxation (real)
+ @LEFT           6.D0     --   COEFF. FOR LEFT BOUNDARY AT R=RCORE
+-- @LEFT==6*HEDD AT CORE WHERE H==.5*INTEGRAL(F*MU*DMU)==FH*HEDD
+-- @DateTime       "If(Lsystem) then;
+--                     CALL DATTIM(@DATE,@TIME);
+--                  else;
+--                     call DateTime(@Date,@Time);
+--                  endif;"
+ @DateTime ";" ;
+
+
+-- DEBUG SUBCHK,UNIT(6);ENDDEBUG;
+PROGRAM STELLA;    -- CALCULATE STELLAR MODEL
+ IMPLICIT REAL*8(A-H,O-Z);
+ REAL    LTIM,MTIM;              -- TIMER
+ REAL    @BEG_TIME,TIMEND;       -- TIMER  IBM, F90 & Ndp
+ --REAL*8      @BEG_TIME,TIMEND; -- TIMER  RISC_IBM
+ --CHARACTER*8 @DATE, @TIME*8;   -- TIMER  IBM
+ CHARACTER*10 @DATE;
+ CHARACTER*8  @TIME;            -- TIMER  F90
+    _INCLUDE snrad;
+    _INCLUDE opacity;
+    _INCLUDE abo;
+--  real*8 hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
+--          hptrbsc(Nfreq,@Ntab,@Ntab,Mzon/@skip);
+--  Parameter(Taukli=0.1d0); -- tau for flux limiter
+--  Parameter(Taujmp=0.5d0); -- tau jump for flux limiter
+--  Common/Lim/Klim(Mzon);
+    Common/Volanm/Ryzer,Kmcor;  -- emulate Ni for analyt.model
+    PARAMETER(NzMIN=Mzon*5/6);    -- minimum Nzon - number of mass zones
+    PARAMETER(NCNMIN=5);    -- minimum Ncnd - number of conduction zones
+    Parameter(TREZON=3.D18); -- allow rezoning after Trezon (sec)
+--    Parameter(TREZON=3.D1); -- allow rezoning after Trezon (sec)
+    Parameter(tsmoth=4.D6); -- smoothing/forced Ncnd=0 (sec, proper tim)
+    Parameter(tret=1.d0/3.d0);
+    Logical HOLDFR;         -- Decreasing NFRUS is forbidden
+    Logical LEXIST1,LEXIST2;
+    Character*80 Dfile,Rfile,bmfile,Nidist,swdet,balafile;
+    character*160 wordm(10),runname,filestr;
+    integer lwordm(10),lrun,nwordm,errnum;
+    Character*8 STRBAT;
+    Dimension Ysave(NYdim);
+    save Ysave;
+--    Dimension dumFreq(Nfreq+1),dumFreqmn(Nfreq),dumwavel(Nfreq);
+    -- now in opacity.inc
+    Common/FRAD/ FRADJ(Mzon,Nfreq),FRADH(Mzon,Nfreq);
+    Common/out/ tretard,tout,Yout(NYdim); -- for interpolation
+--    Dimension Wacc(3); -- for Wacc(IFL)<1. accuracy is higher
+--    Data Wacc /1.d-3, 1.d-2, 1./;
+--    DATA freqfind/.false./;
+<*C* CONVECTIVE VARIABLES *>;
+   _Include black;
+--    BLACK, BLACKD -- black-body radiation occ. number & its derivative
+--  Theta(Z)=0.5D0*(SIGN(1.D0,Z)+1.D0);
+    <*openfiles: unit=1  strad.1
+                 unit=8  dat file
+                 unit=28 Nidist  etc. *>;
+    call Vtime(@BEG_TIME);
+    If(Lsystem) then;
+   --   CALL SPM001(12);    -- underflow correction
+--      LTIM=LTIME(0);                             -- IBM
+    else;
+      Call Tremain(LTIM,@BEG_TIME); -- Run time remaining
+    endif;
+    <*I: INITIALIZATION: call BEGIN  *>;
+    If ( Givdtl ) Then;  -- for test runs
+      Open(unit=18,file='details.res');
+    Endif;
+    <*A: COMPUTE NEW MODEL CALLING VTSTIF, ANALYSE THE STEP,
+         CHECK BALANCES & PRINT CALLING PRIBAL, WRITE WHERE NEEDED.
+         For successful runs KFLAG==0 in the end *>;
+    <*closecrvfiles: check if crv flx are closed by savemodel - stradio *>;
+    <*closefiles: final closing all files *>;
+    if (KFLAG==0)then;
+      call tt4strad(runname);
+      call Lbol(runname);
+    endif;
+    <*packing: using command SYSTEM() send
+                .tt, .ph, .swd, .lbol to ~/prg/stella/res/
+                gzip .res, rm .bm, .avg etc *>;
+    STOP ' Normal stop of stella';
+END;
+
+/*
+double precision function BLACK(Lbl,Tpbl);
+implicit double precision (A-H,O-Z);
+  double precision x;
+  _include zone;
+      COMMON/BAND/FREQ(NFREQ+1),
+  /* frequency bins boundaries
+     frequency in units of h/(k*Tpunit) */
+     FREQMN(NFREQ),
+  /* frequency mean (middle of bin) */
+     WEIGHT(NFREQ),
+     HAPPAL(NFREQ),
+     HAPABSRON(NFREQ),
+     HAPABS(NFREQ),
+     DLOGNU(NFREQ); --(log step in frequency)**-1
+     x=FREQMN(Lbl)/Tpbl;
+     --write(*,*) x;
+     BLACK=exp(-x)/(1.d0-(exp(-x)));
+ return;
+end;
+
+double precision function BLACKD(Lbl,Tpbl);
+implicit double precision (A-H,O-Z);
+  double precision x;
+  _include zone;
+      COMMON/BAND/FREQ(NFREQ+1),
+  /* frequency bins boundaries
+     frequency in units of h/(k*Tpunit) */
+     FREQMN(NFREQ),
+  /* frequency mean (middle of bin) */
+     WEIGHT(NFREQ),
+     HAPPAL(NFREQ),
+     HAPABSRON(NFREQ),
+     HAPABS(NFREQ),
+     DLOGNU(NFREQ); --(log step in frequency)**-1
+     x=FREQMN(Lbl)/Tpbl;
+     BLACKD=(x)*(exp(-(x)))/(1.d0-(exp(-(x))))**2;
+ return;
+end;
+*/
+
+%_openfiles:
+    Open(unit=1,file='strad.1',status='old');
+    READ(1,'(A)'); -- header
+    read(1,'(A)') filestr;
+    close(1);
+    <*filenames: filestr contains filenames for input and output *>;
+    @wterm Dfile;
+    @wterm Rfile;
+    @wterm Model;
+    @wterm Nidist;
+    @wterm Opafile;
+    @wterm Sumprf;
+    @wterm Sumcur;
+
+     INQUIRE(FILE=Sumprf,EXIST=LEXIST1);
+     INQUIRE(FILE=sumcur,EXIST=LEXIST2);
+     IF(LEXIST1 & LEXIST2)THEN;
+        BEGRUN=.FALSE.;
+     ELSEIF(^LEXIST1 & ^LEXIST2) THEN;
+        BEGRUN=.TRUE.;
+     ELSE;
+        Write(@Term,'(A)') ' File Sumprf or SUMCUR is missing';
+        stop 28;
+     ENDIF;
+--     write(@term,*) Lexist1,Lexist2,BegRun;
+
+    Open(unit=8,file=Dfile,status='old');  -- Data file for start
+    Open(unit=@WRES,file=Rfile,status='new');  -- Results
+    Open(unit=60,file=bmfile,status='new');  -- file for beams
+--    write(@term,*) ' opened unit=60 file=',bmfile;
+--    read(*,*);
+    Open(unit=81,file=swdet,status='new');  -- SW details
+    Open(unit=28,file=Nidist,form='unformatted',status='unknown');
+--  Open(unit=7,file='delzon.res');
+    Open(unit=76,file=balafile,status='unknown');-- file for energy balance
+%_openfiles_filenames:
+
+   call words(filestr, wordm,lwordm, nwordm);
+   --@wterm filestr;
+  -- @wterm nwordm;
+   if (nwordm < 5 ) then; --
+      @wterm ' check your start file, something is missing !';
+      stop 12;
+   endif;
+   lrun=lwordm(1);
+   runname(1:)=wordm(1)(1:lrun);
+   rfile(1:lwordm(2))=wordm(2)(1:lwordm(2));
+   Narg=Iargc();
+  _Case Narg+1 _Of
+      write(*,*) ' Extra arguments.'; Stop 16;
+   _0 --write(*,*) ' using runname from strad.1 file';
+   _1 --write(*,*) ' using runname from argument';
+      call GetArg(1,wordm(1) @Lfn);
+      runname=wordm(1)(1:len_trim(wordm(1)));
+      rfile=runname(1:len_trim(runname))//'.res';
+      lrun=len_trim(runname);
+      lwordm(3)=8; -- for c******m models
+      wordm(3)=runname(1:lwordm(3))//'_2000h';
+      lwordm(3)=lwordm(3)+6; -- for '_2000h' models
+      lwordm(4)=lwordm(3);
+      wordm(4)=wordm(3);
+  _Esac;
+   dfile(1:)=runname(1:lrun)//'.dat';
+   bmfile(1:)=runname(1:lrun)//'.bm';
+   model(1:)='../../eve/run/'//wordm(3)(1:lwordm(3))//'.mod';
+   Nidist(1:)='../../eve/run/'//wordm(4)(1:lwordm(4))//'.xni';
+   Opafile(1:)='../../vladsf/'//wordm(5)(1:lwordm(5)); -- standard path
+   Sumprf(1:)=runname(1:lrun)//'.prf';
+   SumCur(1:)=runname(1:lrun)//'.crv'; -- opened in stradio unit=11
+   Depfile(1:)=runname(1:lrun)//'.dep';
+   Flxfile(1:)=runname(1:lrun)//'.flx'; -- opened in stradio unit=23
+   swdet(1:)=runname(1:lrun)//'.swd';
+   balafile(1:)=runname(1:lrun)//'.balance'; --file for energy balance
+%_closefiles:
+    Close(unit=2);
+    Close(unit=8);
+    Close(unit=@WRES);
+    Close(unit=9);
+    Close(unit=10);
+    Close(unit=11); -- crv
+    Close(unit=22); -- deposition
+    close(unit=23); -- flx
+    close(unit=60); -- bm
+    close(unit=81); -- swdet
+    close(unit=76); -- balance
+    If ( Givdtl ) Then;
+      Close(unit=18);
+    Endif;
+--    _do nf=1,@ns;
+  --    nu=30+nf;
+  --    close(nu); -- closed immediately
+  --  _od;
+--  Close(unit=7); -- delzone.res
+
+%_packing:
+
+/*
+
+  Isys = 0;
+  Isys = SYSTEM('gzip '//runname(1:lrun)//'.res');
+--  write(*,*) ' gzip res is done Isys=',Isys, '  Csys=',Csys;
+  If (Isys == -1) then;
+     errnum = ierrno( );
+     write(*,'(a,i2)') ' Error gzip res= ', errnum;
+  endif;
+
+  Isys = SYSTEM('echo HOMEStella: $HOMEStella');
+--  write(*,*) ' echo HOMEStella Isys=',Isys, '  Csys=',Csys;
+  If (Isys == -1) then;
+     errnum = ierrno( );
+     write(*,'(a,i2)') ' Error echo HOMEStella= ', errnum;
+  endif;
+
+  Isys = SYSTEM('mv  '//runname(1:lrun)//'.{ph,tt,swd,lbol,res.gz}'
+         //' ../../res/');
+*/
+  Isys = SYSTEM('mv  '//runname(1:lrun)//'.ph'
+         //' ../../res/');
+  Isys = SYSTEM('mv  '//runname(1:lrun)//'.tt'
+         //' ../../res/');
+  Isys = SYSTEM('mv  '//runname(1:lrun)//'.swd'
+         //' ../../res/');
+  Isys = SYSTEM('mv  '//runname(1:lrun)//'.lbol'
+         //' ../../res/');
+--  Isys = SYSTEM('mv  '//runname(1:lrun)//'.res.gz'
+  Isys = SYSTEM('mv  '//runname(1:lrun)//'.res' -- if gzip res is not used
+         //' ../../res/');
+--  write(*,*) ' mv to res is done Isys=',Isys, '  Csys=',Csys;
+  If (Isys == -1) then;
+     errnum = ierrno( );
+     write(*,'(a,i2)') ' Error mv to res= ', errnum;
+  endif;
+
+  Isys = SYSTEM('rm -f '//runname(1:lrun)//'.bm');
+  Isys = SYSTEM('rm -f '//runname(1:lrun)//'.avg');
+--  write(*,*) ' rm bm,avg is done Isys=',Isys, '  Csys=',Csys;
+  If (Isys == -1) then;
+     errnum = ierrno( );
+     write(*,'(a,i2)') ' Error  rm bm,avg = ', errnum;
+  endif;
+
+
+%C:O
+    EQUIVALENCE  (Y((NVARS-1)*Mzon+1,1),YAINV(1));
+    EQUIVALENCE  (Y((NVARS-2)*Mzon+1,1),UC(1));
+    COMMON/CONV/ELMX(Mzon),FLCON(Mzon);
+
+%I:
+    EIT=1.D-5;<*ACCURACY OF ITERATIONS*>   DST=1.D-4;
+    CALL BEGIN;
+    close(8); -- this is needed to detach dat file for use by ttfit
+    Close(unit=28); -- to detach xni
+
+    FLnois=Floor(NVARS+1); -- for radiation
+    If(Lsystem) CALL BASTAT('BEGIN RD');
+    --PRINT *,' JSTART=',JSTART;
+    NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+    NSTEP0=NSTEP;
+    do K=1,Nzon; -- Ry,Uy,Ty and rho must be defined before each call of Lossen or Pribal
+      -- either via Y or Yout
+      Ry(K)=Y(K,1);
+      Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+      Ty(K)=Y(2*Nzon+K,1);
+    enddo;
+    Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    do I=2,Nzon;
+      Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    enddo;
+    Call LOSSEN;
+    <*T: CHECK Ncnd & KRAD *>;
+    RTphi(0)=0.; RTphi(Nzon+1)=0.;
+    Uscale=1.d9*Utime/UR;
+    <*RT: R-T coeff. in RTphi *>;
+    <*Tpcomp: find in Tpcomp the highest Tp(i) for i>Ncnd
+              for use in approximate treatment of Compton *>
+    Ycomp=(Boltzk*UTp*Tpcomp)/(Amelec*Cs**2); -- Comptonization par.
+--    Write(@term,*)' Tpcomp   Ycomp:  ',Tpcomp,Ycomp;
+    <*N: CHECK NFRUS *>;
+    _do L=1,NFREQ;
+         _DO IK=1,NZON;  -- for EDTM==T for all later steps
+           Eddn(IK,L)=tret;
+           EddO(IK,L)=Eddn(IK,L);
+           EDDJ(IK,L)=Eddn(IK,L);
+         _OD;
+         HEdN(L)=0.5d0;
+         HEdO(L)=HEdN(L);
+         HEDD(L)=HEDN(L);
+--         write(*,'(a,i5,1p,e12.4)')' 0 step L Hedd:', L,Hedd(L);
+      _od;
+
+%IT:
+
+     tday=t*UTIME/8.64d+04; -- CRAP=1.
+     if(NSTEP==0)t_eve=tday; -- needed by happa (hapdirect)
+
+
+   /*
+    Ncnew=NTHICK(1); LTAU=1;
+   _DO L=2, NFRUS;
+      IF( NCNEW > NTHICK(L)) THEN;
+         NCNEW=NTHICK(L);
+         LTAU=L;  -- find the most transparent energy group
+      ENDIF;
+   _OD;
+   */
+--   @wterm' Ltau=',Ltau;
+   I=NZON; TAU(I)=0.D0;
+--   _WHILE  I>1 & (TAU(I)<=FitTau*TauTol  ! I>=Ncnd ) _DO
+   _WHILE  I>1  _DO
+        TP=Ty(I); Pl=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+        _Do ii=1, Natom [ Yat(ii)=YABUN(ii,I) ];
+        RADP=.FALSE.;
+        CALL URSOS;
+        Rho(I)=Pl;
+        Press(I)=P*UPI;
+        kmhap=I; CALL HAPPA;
+--        @wterm' after CALL HAPPA kmhap=',kmhap;
+        Hapmin=Happal(1);
+        Ltau=1;
+        _Do L=2,Nfrus;
+--        _Do L=2,LubvU;
+           If(Happal(L)<Hapmin)then;
+             Hapmin=Happal(L);
+             Ltau=L;
+           endif;
+        _od;
+ --@wterm' Ltau=',Ltau;
+        TAUste=(Ry(I)-Ry(I-1))*HAPPAL(LTAU)*PL;
+        If(Scat)then;
+           TAUabs=(Ry(I)-Ry(I-1))*HAPabs(LTAU)*PL;
+           TAUsca=Tauste-Tauabs;
+           ---If(Nstep>7250)then;
+--           @wterm' Ltau=',Ltau;
+--           Write(@term,'(A,1P,3E11.3)')' tau tauabs tausca',tauste,tauabs,tausca;
+           ---endif;
+           If(Tausca>1.d0)then;
+              Tauste=sqrt(Tauabs*Tausca);
+           else;
+              Tauste=Tauabs;
+           endif;
+        endif;
+        TAU(I-1)=TAU(I)+Tauste;
+        I=I-1
+   _OD; -- I=0 --old I<Ncnd & TAU(I)>FitTau*TauTol
+   Ncnew=Nthick(Ltau);
+--   _Do K=Ncnew-1,I,-1; -- old wrong for small diff. at ncnew & I
+   _Do K=Ncnew-1,1,-1;
+      tau(K)=tau(K)-tau(Ncnew); -- to try to catch transparent zones < Ncnew
+   _od;
+-- Ncnew=NZON;
+  _WHILE TAU(max(Ncnew,1)) <= FitTau  & Ncnew>=NCNMIN _DO
+   --  & TAU(Ncnew-1) <= FitTau*TauTol      _DO
+       Ncnew=Ncnew-1
+  _OD; -- TAU(Ncnew) > FitTau or Ncnew<NCNMIN or
+       -- TAU(Ncnew-1) > FitTau*TauTol
+--  WRITE(@term,*)' Ncnew=',Ncnew,'  Ncnd=',Ncnd,
+ --    ' TAU(Ncnd or 1)=',TAU(max(Ncnd,1));
+
+  /* WRITE(@term,'(2I6,I3,4(A,1P,G10.3))')
+          NSTEP,MAXER,NQUSED,' H=',H,' Hused=',HUSED,
+          '  Tp=',Ty(1),'  Rho=',Rho(1);
+  WRITE(@term,'(1X,A,1P,G11.3,A,I3,A,G11.2)')
+  ' Time(days)=',tday,'  Ncnd=',Ncnd,'    TAU(Ncnd or 1)=',TAU(max(Ncnd,1));
+  */
+--  WRITE(@term,'(2I6,I3,3(A,1P,G10.3),A,I3,A,G11.2)')
+--          NSTEP,MAXER,NQUSED,' Hu=',HUSED,' Ro=',Rho(1),
+--          ' td=',tday,' Ncnd=',Ncnd,' Tau=',TAU(max(Ncnd,1));
+  IF(Ncnew<NCNMIN) Ncnew=0;
+--If(Ncnew<NCNMIN .or. t*Utime>tsmoth) Ncnew=0; -- force Ncnd=0
+  Ncnew=MIN(Ncnew,@NCOND_MAX);
+  HOLDFR=.TRUE.;  -- forbids the decrease of NFRUS  if there is no
+                  -- change of Ncnd or if Ncnd grows (i.e. hot wave
+                  -- moves out)
+  _If (TAU(max(Ncnd,1))>TauTol*FitTau  .or. -- Ncnew==0 .or. -- for forced Ncnd
+       TAU(max(Ncnd,1))*TauTol<FitTau) & Ncnew^=Ncnd & (CHNCND .or. Nstep==0)_THEN
+    -- TAU(Ncnd)*TauTol<FitTau) & Ncnew< Ncnd & CHNCND _THEN
+      _Select
+       _ Ncnew<Ncnd
+                [ <*O: ADD FJ,FH FOR ZONES Ncnew+1:Ncnd *>;
+                       HOLDFR=.FALSE. ] -- for Ncnd moving inward
+                       -- the decrease of Nfrus is allowed
+       _ Ncnew>Ncnd & Ncnew<=@NCOND_MAX
+                [ <*U: DELETE FJ,FH FOR ZONES Ncnd+1:Ncnew *>]
+       _ Ncnew>@NCOND_MAX [ KFLAG=-3 ]  -- not active now
+      _end;
+      If(KFLAG==0)Then;
+          <*LIM*    limiting FH *>;
+          <*D* test printing*>;
+           -- test as coll:
+          JSTART=0;
+--          Hmax=max(Hmax,t*1.d-3);
+--          @wterm ' 2nd Jstart=',Jstart;
+          NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+--          Evalja=.TRUE.; -- not needed when Jstart=0;
+          <*H* CHECK FH & PUT SMALLER THAN FJ WITH JSTART=0 *>;
+    --    XJPH=RPH; -- for limiting DFJ in Dfrad %Derata
+      endif;
+  _fi;
+  -- If(Ncnd>0) Nclast=Ncnd;
+
+
+%A:
+    @DateTime;
+    WRITE(@Wres,'(1X,''   ====> STEP:'',I6,2X,A,2X,'' ON  '',A)')
+               NSTEP,@TIME,@DATE;
+--  IF(Ncnd==0)THEN;
+--      IF(t*UTIME > tsmoth) CALL SMOOTH;
+    <*eddtau: eddington factors and optical depth to start with
+              call pribal to print the first model of the run*>;
+
+--    Klim=min(I+1,Nzon);
+    <*HLIM*    *>;
+    _do kko=1,komax;
+       TO(kko)=TO(kko)*8.64d+04; -- if TO in days
+    _od;
+    KFLAG=0;
+--    KO=1; -- wrong for continuation runs
+    KNTO=1;
+--    TOO=TO(1); -- here TO in secs
+
+    nmom=1;
+    TOO=TO(1);
+/*
+   _while t*Utime > TO(nmom) _do -- this loop must be corrected for R/c
+           -- if below we output interpolation for t_observed
+           -- maybe better return to interpolation outputs in comoving time
+--       @wterm' t*Utime > TO(n)',t*Utime,TO(nmom),nmom;
+       -- pause;
+       nmom=nmom+1;
+       TOO=TO(nmom);
+   _od;
+*/ --
+   KO=nmom;
+
+ _WHILE KFLAG==0 .and. NSTEP<NSTMAX  _DO
+    <*ymax: save Y(.) in Ysave and define for all y(.) from 1 to N *>;
+     tday=t*UTIME/8.64d+04; -- CRAP=1.
+     if(NSTEP==0)t_eve=tday;
+     _If abs(KNadap)>=4  _then
+      <*haptab: read two relevant tables of hptab{ab/sc}, depending
+                on the interval in which log(tday) falls in stmlog(.)
+                array and save in hpban{ab/sc}1 & hpban{ab/sc}2
+                respectively *>;
+     _fi
+     CALL VTSTIF;
+    <*CheckDr: while there is K such as: Ry(K)<=Ry(K-1), i.e. Badste,
+               retract t, Y to t-Hused,   reduce H, and call VTSTIF again *>;
+
+     NSTEP=NSTEP+1;
+     NZM=NZMOD;
+
+     if(tday > 2.d0)  CALL GDEPOS; -- each step after 2 days
+--     CALL GDEPOS; -- each step
+     <*L: analyse the step: find new regime in NREG(1:NZON):
+          NREG(I)==1 Carbon burning
+                   2 Silicon burning
+                   3 no burning
+          find integral energy losses,
+          print & write model when needed*>;
+  --WRITE(@term,*)' NSTEP=', NSTEP;
+    IF (KFLAG==0) THEN ;
+  --  WRITE(STRBAT,'(''step'',I5)') NSTEP;
+  --  CALL BASTAT(STRBAT);
+      If(t*UTIME>=8.64D4*tcurB) NSTMAX=NSTEP;
+      IF(MOD(NSTEP,10)==0)THEN;
+         ierr = 0;
+         open(unit=77, file='stop', status='old', action='read', iostat=ierr);
+         if(ierr==0)then;
+            NSTMAX=NSTEP;
+            write(*,*) 'found file named stop, so terminating run now';
+         endif;
+      ENDIF;
+      If((MOD(NSTEP,MBATCH)==0 ! NSTEP==NSTMAX) & ^Givdtl ) then;
+         CALL @SAVE_MODEL;  -- File OUT RES
+         @DateTime;
+         WRITE(@Wres,'(1X,''   ====> SAVED:'',I6,2X,A,2X,'' ON  '',A)')
+                      NSTEP,@TIME,@DATE;
+         call Tremain(MTIM,@BEG_TIME);
+--         IF(MTIM*10<(LTIM-MTIM)*12) KFLAG=-4; --   KFLAG = -4 for time limit
+         LTIM=MTIM;
+      endif;
+    ENDIF;
+ _OD;
+ _Case -KFLAG _of
+--      Write (6,*)' finish with KFLAG=',KFLAG;
+    _1 Write (6,*)' the error test fails for H=HMIN: KFLAG=',KFLAG;
+    --   CALL PRIBAL(0) -- uncomment here if not called after _esac
+    _2  Write (6,*)' corrector iterations fail to converge for',
+                  ' H=HMIN: KFLAG=',KFLAG;
+        Write (@term,*)' corrector iterations fail to converge for',
+                  ' H=HMIN: KFLAG=',KFLAG;
+     --  CALL PRIBAL(0) -- uncomment here if not called after _esac
+    _3 WRITE(@Wres,*)' Ncnew=',Ncnew,'>=@NCOND_MAX'
+    _4 WRITE(@Wres,*)' time limit: KFLAG=',KFLAG
+ _esac;
+ tretard=Ry(NZON-1)/CLIGHT;
+ t_ob=(t-tretard)*UTIME; -- observer time in sec
+ tout=t;
+    do K=1,Nzon; -- Ry,Uy,Ty and rho must be defined before each call of Lossen or Pribal
+      -- either via Y or Yout
+      Ry(K)=Y(K,1);
+      Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+      Ty(K)=Y(2*Nzon+K,1);
+    enddo;
+    Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    do I=2,Nzon;
+      Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    enddo;
+    do I=1,N;
+      Yout(I)=Y(I,1);
+    enddo;
+
+ IF(KFLAG<0)THEN;
+   CALL PRIBAL(0);
+ ELSE;
+   CALL PRIBAL(Iout);
+ ENDIF;
+ CALL @SAVE_MODEL;  -- File OUT RES
+ @DateTime;
+ WRITE(@Wres,'(1X,''   ====> SAVED:'',I6,2X,A,2X,'' ON  '',A)')
+                      NSTEP,@TIME,@DATE;
+ CALL VTIME(TIMEND);
+ TIMEND=(TIMEND-@BEG_TIME);
+ WRITE(@Wres,'('' RUN_TIME(s):'',1P,G12.3)')TIMEND;
+ write(*,'(a,f8.1)') 'elaspsed time (minutes)', TIMEND/60.0;
+ @DateTime;
+ WRITE(@Wres,'(1X,''   ====> STEP:'',I6,2X,A,2X,'' ON  '',A)')
+               NSTEP,@TIME,@DATE;
+
+%A_CheckDr:
+
+    Badste=.true.;
+   _While Badste _do;
+     Badste=.false.;
+     K=1;
+     _while .not. Badste .and.  K<=Nzon _do
+       Ry(K)=Y(K,1);
+       Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+       if(K>1)then;
+         if(Ry(K)<=Ry(K-1) )then; -- try new smaller step
+           write(*,*)' BADSTE stradsep5tt Km=',K-1,'  R0=',Ry(K-1),'  u0=',Uy(K-1);
+           write(*,*)' BADSTE stradsep5tt Km=',K,'  R1=',Ry(K),'  u1=',Uy(K);
+ --          pause;
+           Badste=.true.;
+         endif;
+       endif;
+       Ty(K)=Y(2*Nzon+K,1);
+       if(Ty(K)<= 0.d0 )then; -- try new smaller step
+         write(*,*)' stradsep5tt: bad step - T, Km=',K,
+                    '  R1=',Ry(K),'  u1=',Uy(K),'  Ty=',Ty(K);
+         Badste=.true.;
+       endif;
+       K=K+1;
+    _od;
+     if(Badste)then;
+       t=t-Hused;
+       do I=1,N;
+          Y(I,1)=Ysave(I);
+       enddo;
+       H=Hused*1.d-1;
+       Jstart=0;
+       write(*,*)' new call of VTSTIF at BADSTE';
+       CALL VTSTIF;
+       write(*,*)' after CALL VTSTIF BADSTE=',Badste;
+--       pause;
+       Badste=.true.; -- to check again in the loop
+     endif;
+   _Od;
+
+
+%A_eddtau:
+        CALL @FEAUTRIER(Ncnd,Ncnd);
+        trlx=@Nrlx*h;
+      _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddN(IK,L);
+           EddJ(IK,L)=EddN(IK,L);
+           --if(L==25) write(*,'(a,i5,1p,3e12.4)')' L Edd{O,J,N}:', L, EddO(IK,L),
+             --EddJ(IK,L),EddN(IK,L);
+         _OD;
+         HEdO(L)=HEdN(L);
+         HEdd(L)=HEdN(L);
+      _od;
+--      pause;
+      _do L=Nfrus+1,Nfreq;
+         HEdO(L)=HEdN(Nfrus);
+         HEdN(L)=HEdN(Nfrus);
+         HEdd(L)=HEdN(Nfrus); -- to define for primag
+--         write(*,'(a,i5,1p,e12.4)')' added L Hedd:', L,Hedd(L);
+      _od;
+
+        CALL GDEPOS;
+        NEEDBR=.TRUE.;
+--  ENDIF;
+    IF(NSTEP==0 .or. NOUT>=200) THEN;
+       <*K: PRINT & WRITE FIRST MODEL OF THE RUN *>;
+    ENDIF;
+    I=NZON; TAU(I)=0.D0;
+    _WHILE  I>1 & I>=Ncnd _DO
+       TP=Ty(I); PL=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+       _Do ii=1, Natom [ Yat(ii)=YABUN(ii,I) ];
+       RADP=.FALSE.;
+       CALL URSOS; kmhap=I; CALL HAPPA;
+       TAUste=(Ry(I)-Ry(I-1))*HAPPAL(@LM)*PL;
+       If(Scat)then;
+          TAUabs=(Ry(I)-Ry(I-1))*HAPabs(@LM)*PL;
+          TAUsca=Tauste-Tauabs;
+          -- Write(@wterm,'(A,1P,3E11.3)')
+             -- ' tau tauabs tausca',tauste,tauabs,tausca;
+          If(Tausca>1.d0)then;
+             Tauste=sqrt(Tauabs*Tausca);
+          else;
+             Tauste=Tauabs;
+          endif;
+       endif;
+       TAU(I-1)=TAU(I)+Tauste;
+  /*   If(TAU(I-1)>=Taukli & TAU(I)/TAU(I-1)<Taujmp)Then;
+         Klim(I)=1;
+       Else;
+         Klim(I)=0;
+       Endif; */
+       I=I-1
+    _OD; --  I<Ncnd --& TAU(I)>Taukli
+
+%A_eddtau.K:
+--      <*A: FIND DENSITY IN Rho*>;
+    ELOST=YENTOT(1);
+
+     do K=1,Nzon; -- Ry,Uy,Ty and rho must be defined before each call of Lossen or Pribal
+      -- either via Y or Yout
+      Ry(K)=Y(K,1);
+      Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+      Ty(K)=Y(2*Nzon+K,1);
+    enddo;
+    Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    do I=2,Nzon;
+      Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    enddo;
+
+    tout=t;
+    do I=1,N;
+      Yout(I)=Y(I,1);
+    enddo;
+    tretard=Ry(NZON-1)/CLIGHT;
+    t_ob=(t-tretard)*UTIME; -- observer time in sec
+
+
+     CALL PRIBAL(IOUT);
+
+%A_eddtau.KA:
+-- this node is not needed now
+     Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    _DO I=1,NZON;
+  --   RADIUS(I)=Ry(I); VELOC(I)=Uy(I); TMPR(I)=Ty(I);
+       IF(I>1)Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    _OD;
+    ELOST=YENTOT(1);
+
+%A_ymax:
+
+     do I=1,N;
+       Ysave(I)=Y(I,1);
+     enddo;
+
+     do IFL=1,NVARS;
+        do I=1,NZON;
+          YMAX(I+(IFL-1)*NZON)=
+          MAX(ABS(Y(I+(IFL-1)*NZON,1)),FLOOR(IFL))*Wacc(IFL);
+        enddo;
+     enddo;
+  --_DO I=NZON*NVARS+1,N; -- for FJ & FH
+  --   YMAX(I)=MAX(ABS(Y(I,1)),FLOOR(NVARS+1));
+  --_OD;
+    _DO IFL=1,Nfrus;      -- for FJ
+       _DO I=1,NZON-Ncnd;
+         If(Freqmn(IFL)<1.d0)Then;
+           YMAX(I+Nvars*Nzon+(IFL-1)*(NZON-Ncnd))=
+           MAX(
+            ABS(Y(I+Nvars*Nzon+(IFL-1)*(NZON-Ncnd),1)),FLOOR(Nvars+1));
+         else;
+           YMAX(I+Nvars*Nzon+(IFL-1)*(NZON-Ncnd))=
+           MAX(
+            ABS(Y(I+Nvars*Nzon+(IFL-1)*(NZON-Ncnd),1)),
+                    FLOOR(Nvars+1)/(5.d0*Freqmn(IFL)**3));
+         endif;
+    _OD_OD;
+    _DO I=NZON*NVARS+Krad+1,N; -- for FH
+       YMAX(I)=MAX(ABS(Y(I,1)),FLOOR(NVARS+1));
+    _OD;
+
+%A_haptab:
+  -- only two sets of tables were saved in the RAM for
+  -- two values of dvdr (given by Stime)
+    -- now all tables are in hpsavsc
+  -- istim is the flag for the regime of saving the tables at given t
+  -- for istim==0 , t<t0=Stime(1)/(half of a factor of Stime step),
+  -- and istim==@ns+1, t>Stime(@ns), use only Stime(@ns) -- the
+  -- smallest dvdr without interpolation;
+  --
+  -- for istim==1 , t0<t<Stime(1), log interp
+  -- between Stime(@ns) and Stime(1) using t in (0.5, 1)*Stime(1)
+  --
+  -- for istim==2, 3, ... @ns, Stime(istim-1)<t<Stime(istim),
+  -- log interp between boundaries
+  -- actually Stime is a scalar and the vector is
+  -- stmlog(.)==log(Stime for a respective moment of time) saved in Begrad
+  --
+  tdlog = log(max(tday,hmin)); -- for Nstep=0, t=t_0 defined in EVE and
+                                -- saved in *.mod
+ _select
+   _ tdlog <= stmlog(1)-(stmlog(2)-stmlog(1))/2.d0
+            .or. tdlog > stmlog(@ns) .or. abs(Knadap)==6  [istim=0]
+   _ tdlog > stmlog(1)-(stmlog(2)-stmlog(1))/2.d0 & tdlog <= stmlog(1)
+                                                   [istim=1]
+   _other  -- here: stmlog (1) < tdlog <= stmlog(@ns)
+             [ istim=2;
+               _while stmlog(istim) < tdlog _do istim=istim+1 _od ]
+                         -- stmlog(istim) >= tdlog
+ _end
+-- @wterm ' istim=',istim; -- , ' tday=',tday;
+  if(istim^=istold)then;
+     istold=istim;
+    _case istim+1 _of
+       if(istim>1 .and. istim <= @ns)then;
+--         Opafile=Opafile(1:len_trim(Opafile)-1)//'2';
+               ihp=istim;
+               thaplog1=stmlog(istim-1); 
+               thaplog2=stmlog(istim);
+       else;
+         write(*,*)' in strad istim=',istim;
+         stop ' wrong istim in strad';
+       endif;
+      _0 ihp=@ns; -- Opafile=Opafile(1:len_trim(Opafile)-1)//'5';
+                 thaplog1=stmlog(1); thaplog2=stmlog(@ns);
+                  -- here the values of thaplog are not important
+                  -- (if they are not equal), since haptab is the same
+      _1 ihp=1;  -- Opafile=Opafile(1:len_trim(Opafile)-1)//'1';
+                 thaplog1=stmlog(1)-(stmlog(2)-stmlog(1))/2.d0;
+                 thaplog2=stmlog(1)
+/*
+      _2 Opafile=Opafile(1:len_trim(Opafile)-1)//'2';
+                 thaplog1=stmlog(1); thaplog2=stmlog(2)
+      _3 Opafile=Opafile(1:len_trim(Opafile)-1)//'3';
+                 thaplog1=stmlog(2); thaplog2=stmlog(3)
+      _4 Opafile=Opafile(1:len_trim(Opafile)-1)//'4';
+                 thaplog1=stmlog(3); thaplog2=stmlog(4)
+      _5 Opafile=Opafile(1:len_trim(Opafile)-1)//'5';
+                 thaplog1=stmlog(4); thaplog2=stmlog(5)
+    */
+    _esac;
+    _do im=1,Nzon/@skip;
+        _do iro=1,@Ntab;
+            _do itp=1,@Ntab;
+                 _do L=1,Nfreq;
+--               hpbanab1(L,itp,iro,im)=hpbanab2(L,itp,iro,im);
+                     hpbansc1(L,itp,iro,im)=hpbansc2(L,itp,iro,im);
+                     hpbansc2(L,itp,iro,im)=hpsavsc(L,itp,iro,im,ihp);
+    _od _od _od _od
+
+-- we do not need read(30) anymore - use hpsavsc
+/*    Open(unit=30,file=Opafile,form='unformatted');
+    read(30) nw,Stime,Nfreq0,Msta,Nrho,NTp,
+             dumWavel,dumFreq,dumFreqmn, -- read into dummy files
+--             TpTab,RhoTab,hpbanab2,hpbansc2;-- the first haptab (@ns)
+             TpTab,RhoTab,hpbansc2;-- the first haptab (@ns)
+    close(30); */
+ endif;
+
+%AL:O
+--  KM=1;
+--  WRITE(@Wres,'(1P,8G10.3)')(@FJ1,L=1,NFRUS);
+    --
+    Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    _DO I=2,NZON; Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3)_OD;
+    --
+    <*MaxEr* information on variables, causing max error in STIFF *>;
+    If ( Givdtl ) Then;  -- for test runs
+        write(18,'(a)')'  nstep, Ncnd, Ty(max(Ncnd,1)), Ty(Ncnd+1)';
+        write(18,'(2I5,1P,4E12.4)')
+            nstep, Ncnd, Ty(max(Ncnd,1)), Ty(Ncnd+1);
+        --    nstep,rho(10),rho(11), TY(10), TY(11);
+        -- Y(NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KM,1)      -- FJ(Km,L)
+        write(18,'(a,1P,4E12.4)')' k=max(Ncnd,1)    L=40 FJ Bb: ',
+                                      Y(NVARS*NZON+(NZON-Ncnd)*(40-1)-Ncnd+max(Ncnd,1),1),
+                                      Black(40,Ty(max(Ncnd,1)));
+        write(18,'(a,1P,4E12.4)')' k=Ncnd+1 L=40 FJ Bb: ',Y(NVARS*NZON+(NZON-Ncnd)*(40-1)+1,1),
+                                      Black(40,Ty(Ncnd+1));
+
+    Endif;
+    --
+    <*A: find integral energy losses: ELvol--volume luminosity,
+         ELsurf--surface luminosity, Tpsurf & ELtot, calling LOSSEN.
+         Find lost energy in YEntot(1)<0 for losses, >0 for gains.
+         Find optical depth from surface TAU & put Ncnd:
+         TAU(Ncnd)>Fitting_tau. If Ncnd changed then Jstart=0, N-new.
+         For the version with rezoning:
+         when number of transparent zones (with Tau < @Tau_floor)
+         exceeds @Nrezone delete out @Nrezone zones & insert
+         @Nrezone zones for I>Ncnd *>;
+    --
+    <*E* for burning put *E: find ITpmax - number of burning zone
+         of highest Tp, find in Tpmax(1) predicted Tp,
+         then: limit step H, checking the rate for Tpmax.
+         find NREG, add energy DEnuc to YEntot for burnt zones and
+         put Jstart =0 *>;
+    <*CORCN* correct convection where flcon < 0  *>;
+    --
+    <*O: print model for every NOUT step or in prescribed moments *>;
+
+%AL_MaxEr:
+        ICW=MaxEr;
+        If(ICW<=NZON*NVARS)then;
+           Izon=MOD(ICW-1,NZON)+1;
+           Ivar=(ICW-1)/NZON +1;
+           _Case Ivar _of
+              _1 WRITE(@term,'(2(A,1P,E10.3),2(A,I3))')
+                 ' Ry=',Y(MaxEr,1),'    Rydot=',Y(MaxEr,2)/H,
+                 '   Ivar=',Ivar,'  Izon=',Izon;
+              _2 WRITE(@term,'(2(A,1P,E10.3),2(A,I3))')
+                 ' Uy=',Y(MaxEr,1),'    Uydot=',Y(MaxEr,2)/H,
+                 '   Ivar=',Ivar,'  Izon=',Izon;
+              _3 Pl=Rho(Izon); Tp=Ty(Izon);
+                 _Do ii=1, Natom [ Yat(ii)=YABUN(ii,Izon) ];
+                 RADP=.FALSE.;
+                 CALL URSOS; kmhap=Izon; CALL HAPPA;
+                 WRITE(@term,'(4(A,1P,E10.3),2(A,I3))')
+                 ' Ty=',Y(MaxEr,1),'    Tydot=',Y(MaxEr,2)/H,
+                 '   Rho=',Pl,'    Haab6=',Hapabs(6),
+                 '   Ivar=',Ivar,'  Izon=',Izon;
+           _esac
+        else;
+           ICW=ICW-NZON*NVARS;
+           If(ICW<=KRAD)Then;
+              L=(ICW-1)/(NZON-Ncnd)+1;
+              Izon=Ncnd+MOD(ICW-1,(NZON-Ncnd))+1;
+              Pl=Rho(Izon); Tp=Ty(Izon);
+              _Do ii=1, Natom [ Yat(ii)=YABUN(ii,Izon) ];
+              RADP=.FALSE.;
+              CALL URSOS; kmhap=Izon; CALL HAPPA;
+              WRITE(@term,'(4(A,1P,E10.3),2(A,I3))')
+                 ' FJ=',Y(MaxEr,1),'    FJdot=',Y(MaxEr,2)/H,
+                 '   Rho=',Pl,'    Haab6=',Hapabs(6),
+                 '   in L=',L,'  Izon=',Izon;
+           else;
+              ICW=ICW-KRAD;
+              L=(ICW-1)/(NZON-Ncnd)+1;
+              Izon=Ncnd+MOD(ICW-1,(NZON-Ncnd))+1;
+              WRITE(@term,'(2(A,1P,E10.3),2(A,I3))')
+                 ' FH=',Y(MaxEr,1),'    FHdot=',Y(MaxEr,2)/H,
+                 '  in L=',L,'  Izon=',Izon;
+           endif;
+        endif;
+      km=Izon;
+   If(Km>1)Then;
+      U0=Uy(Km-1); RR0=Ry(Km-1);
+   else;
+      U0=0.D0; RR0=Rce;
+   endif;
+
+%ALA:S
+    <*Loss: find ERLUM & YENTOT *>;
+    Call NTH(Ncnd); -- find new NTHICK(L), LTHICK(L,KM)
+--  _IF Ncnd >= NCNMIN _THEN -- remove this for collapse
+       <*T: FIND TAU,Ncnd,N *>;
+       If(KFLAG==0)then;
+          <*R: REZONE WHEN NUMBER OF TRANSPARENT ZONES
+               (WITH TAU < @TAU_FLOOR) EXCEEDS @NREZONE *>;
+          <*F* REGROUPING FREQUENCY TO EMBRACE MAXIMUM FLUX *>;
+       endif;
+--  _FI;
+    <*Tpcomp: find in Tpcomp the highest Tp(i) for i>Ncnd
+              for use in approximate treatment of Compton *>
+    <*N: change NFRUS, KRAD, N if Tpcomp changes
+               & put JSTART=-JSTART*>;
+       If(N>NYDIM)then;
+          WRITE(@Wres,*)'N=',N,' > NYDIM';
+          STOP 390;
+       endif;
+    <*CORRFJ: correct negative values of FJ *>;
+--    If(^EDTM &
+    If((NSTEP-KTAIL>=@N_EDD ! MOD(NSTEP,MBATCH)==0
+        ! MOD(NSTEP,@N_EDD)==0  ) )then;
+--    If(t*UTIME > tsmoth) CALL SMOOTH;
+      <*RT: R-T coeff. in RTphi *>;
+      if( NSTEP>0)then;
+       _do L=1,NFRUSO;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddJ(IK,L);
+         _OD;
+         HEdO(L)=HEdd(L);
+      _od;
+      endif;
+--    Write(@term,*)' Call 1 Feau ';
+
+    CALL @FEAUTRIER(Ncnd,Ncnd);
+
+    _do L=NFRUSO+1,NFRUS;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=Eddn(IK,L);
+           EDDJ(IK,L)=Eddn(IK,L);
+         _OD;
+         HEdO(L)=HEdn(L);
+         HEDD(L)=HEDN(L);
+    _od;
+
+      trlx=@Nrlx*h;
+      CALL GDEPOS;
+      KTAIL=NSTEP; -- TO TRACK LAST FEAUTRIER
+      Ycomp=(Boltzk*UTp*Tpcomp)/(Amelec*Cs**2); -- Comptonization par.
+--      Write(@term,*)' Tpcomp   Ycomp after Feau:  ',Tpcomp,Ycomp;
+--      H=1.d-4*H; -- test as coll
+--      JSTART=0;
+--      Hmax=max(Hmax,t*1.d-3);
+--      @wterm ' 1st Jstart=',Jstart;
+      NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+      Evalja=.TRUE.;
+      <*Lim*    *>;
+    endif;
+    If(JSTART==0)then;
+     /* Hold=H;
+        H=MAX(H*1.D-3,1.D1*HMIN);
+        _Do iY=Nzon+1,2*Nzon;
+          Y(iY,2)=Y(iY,2)*(H/Hold); -- corrects the acceleration
+        _od;  */
+        do K=1,Nzon; -- Ry,Uy,Ty and rho must be defined before each call of Lossen or Pribal
+        -- either via Y or Yout
+         Ry(K)=Y(K,1);
+         Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+         Ty(K)=Y(2*Nzon+K,1);
+        enddo;
+        Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+        do I=2,Nzon;
+         Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+        enddo;
+        CALL LOSSEN;
+        YENTOT(2)=H*ELTOT;
+        @HOLD_BAL=H;
+    endif;
+
+%ALA_Loss:
+    RX=1.D0;
+    IF(HUSED^=@HOLD_BAL)THEN;
+      _Do  J=2,NQused+1;
+         RX=RX*(HUSED/@HOLD_BAL);
+         YENTOT(J)=YENTOT(J)*RX
+      _od;
+    endif;
+    _Do J1=1,NQUSED;
+      _Do J2=J1,NQUSED;
+         J=NQUSED-J2+J1;
+         YENTOT(J)=YENTOT(J)+YENTOT(J+1)
+      _od
+    _od;
+    do K=1,Nzon; -- Ry,Uy,Ty and rho must be defined before each call of Lossen or Pribal
+      -- either via Y or Yout
+      Ry(K)=Y(K,1);
+      Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+      Ty(K)=Y(2*Nzon+K,1);
+    enddo;
+    Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    do I=2,Nzon;
+      Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    enddo;
+
+    CALL LOSSEN;
+    ERLUM=HUSED*ELTOT-YENTOT(2);
+    CALL COSET(METH,max(NQUSED,1),EL,TQ,MAXDER,IDOUB);
+    _Do J=1,NQused+1; YENTOT(J)=YENTOT(J)+EL(J)*ERLUM _od;
+    IF(IABS(JSTART)>NQUSED)YENTOT(NQused+1+1)=
+             ERLUM*EL(NQused+1)/FLOAT(NQused+1);
+    @HOLD_BAL=HUSED;
+
+
+%ALAT:
+
+   /*Ncnew=NTHICK(1); LTAU=1;
+   _DO L=2, NFRUS;
+      IF( NCNEW > NTHICK(L)) THEN;
+         NCNEW=NTHICK(L);
+         LTAU=L;  -- find the most transparent energy group
+      ENDIF;
+   _OD; */
+--   @wterm' Ltau=',Ltau;
+   I=NZON; TAU(I)=0.D0;
+--   _WHILE  I>1 & (TAU(I)<=FitTau*TauTol  ! I>=Ncnd ) _DO
+   _WHILE  I>1  _DO
+        TP=Ty(I); Pl=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+        _Do ii=1, Natom [ Yat(ii)=YABUN(ii,I) ];
+        RADP=.FALSE.;
+        CALL URSOS;
+        Rho(I)=Pl;
+        Press(I)=P*UPI;
+        kmhap=I; CALL HAPPA;
+--        @wterm' after CALL HAPPA kmhap=',kmhap;
+        Hapmin=Happal(1);
+        Ltau=1;
+        _Do L=2,Nfrus;
+           If(Happal(L)<Hapmin)then;
+             Hapmin=Happal(L);
+             Ltau=L;
+           endif;
+        _od;
+ --@wterm' Ltau=',Ltau;
+        TAUste=(Ry(I)-Ry(I-1))*HAPPAL(LTAU)*PL;
+        If(Scat)then;
+           TAUabs=(Ry(I)-Ry(I-1))*HAPabs(LTAU)*PL;
+           TAUsca=Tauste-Tauabs;
+           ---If(Nstep>7250)then;
+           ----@wterm' Ltau=',Ltau;
+           ----Write(0,'(A,1P,3E11.3)')' tau tauabs tausca',tauste,tauabs,tausca;
+           ---endif;
+           If(Tausca>1.d0)then;
+              Tauste=sqrt(Tauabs*Tausca);
+           else;
+              Tauste=Tauabs;
+           endif;
+        endif;
+        TAU(I-1)=TAU(I)+Tauste;
+        I=I-1
+   _OD; -- I=0 --old I<Ncnd & TAU(I)>FitTau*TauTol
+--   Ncnew=max(Nthick(Ltau),Ncnd-NcnDelta);
+   Ncnew=Nthick(Ltau);
+--   _Do K=Ncnew-1,I,-1; -- old wrong for small diff. at ncnew & I
+   _Do K=Ncnew-1,1,-1;
+      tau(K)=tau(K)-tau(Ncnew); -- to try to catch transparent zones < Ncnew
+   _od;
+-- Ncnew=NZON;
+  _WHILE TAU(max(Ncnew,1)) <= FitTau  & Ncnew>=NCNMIN _DO
+   --  & TAU(Ncnew-1) <= FitTau*TauTol      _DO
+       Ncnew=Ncnew-1
+  _OD; -- TAU(Ncnew) > FitTau or Ncnew<NCNMIN or
+       -- TAU(Ncnew-1) > FitTau*TauTol
+--  WRITE(@term,*)' Ncnew=',Ncnew,'  Ncnd=',Ncnd,
+ --    ' TAU(Ncnd or 1)=',TAU(max(Ncnd,1));
+
+  /* WRITE(@term,'(2I6,I3,4(A,1P,G10.3))')
+          NSTEP,MAXER,NQUSED,' H=',H,' Hused=',HUSED,
+          '  Tp=',Ty(1),'  Rho=',Rho(1);
+  WRITE(@term,'(1X,A,1P,G11.3,A,I3,A,G11.2)')
+  ' Time(days)=',tday,'  Ncnd=',Ncnd,'    TAU(Ncnd or 1)=',TAU(max(Ncnd,1));
+  */
+  if (mod(NSTEP,50)==0) then;
+    WRITE(@term,'(I6,99(2x,a,1P,G15.5))', advance='no') NSTEP,'day',tday,
+      'v kms',Uy(Nzon)*1d3,'R e14',Ry(Nzon);
+  endif;
+  IF(Ncnew<NCNMIN) Ncnew=0;
+--If(Ncnew<NCNMIN .or. t*Utime>tsmoth) Ncnew=0; -- force Ncnd=0
+  Ncnew=MIN(Ncnew,@NCOND_MAX);
+  HOLDFR=.TRUE.;  -- forbids the decrease of NFRUS  if there is no
+                  -- change of Ncnd or if Ncnd grows (i.e. hot wave
+                  -- moves out)
+  _If (TAU(max(Ncnd,1))>TauTol*FitTau  ! -- Ncnew==0 ! -- for forced Ncnd
+       TAU(max(Ncnd,1))*TauTol<FitTau) & Ncnew^=Ncnd & (CHNCND ! Nstep==0)_THEN
+    -- TAU(Ncnd)*TauTol<FitTau) & Ncnew< Ncnd & CHNCND _THEN
+      _Select
+       _ Ncnew<Ncnd
+                [ <*O: ADD FJ,FH FOR ZONES Ncnew+1:Ncnd *>;
+                       HOLDFR=.FALSE. ] -- for Ncnd moving inward
+                       -- the decrease of Nfrus is allowed
+       _ Ncnew>Ncnd & Ncnew<=@NCOND_MAX
+                [ <*U: DELETE FJ,FH FOR ZONES Ncnd+1:Ncnew *>]
+       _ Ncnew>@NCOND_MAX [ KFLAG=-3 ]  -- not active now
+      _end;
+      If(KFLAG==0)Then;
+          <*LIM*    limiting FH *>;
+          <*D* test printing*>;
+           -- test as coll:
+          JSTART=0;
+--          Hmax=max(Hmax,t*1.d-3);
+--          @wterm ' 2nd Jstart=',Jstart;
+          NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+--          Evalja=.TRUE.; -- not needed when Jstart=0;
+          <*H* CHECK FH & PUT SMALLER THAN FJ WITH JSTART=0 *>;
+    --    XJPH=RPH; -- for limiting DFJ in Dfrad %Derata
+      endif;
+  _fi;
+  -- If(Ncnd>0) Nclast=Ncnd;
+%ALATO:
+    _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddJ(IK,L);
+         _OD;
+         HEdO(L)=HEdd(L);
+    _od;
+--    Write(@term,*)' Call 2 Feau ';
+    CALL @FEAUTRIER(Ncnew,Ncnd); -- new position of this call,
+     -- important for eddi, since it uses old Y(...ncnd), nfrus
+--    WRITE(@term,'(2(A,I4),2(A,1P,E10.2))')
+--      ' Ncnew=',Ncnew,'  Ncnd=',Ncnd,' TAU(Ncnd)=',TAU(Ncnd),
+--               '   TAU(Ncnew)=',TAU(max(Ncnew,1));
+--    pause;
+    LFR=NFRUS;
+    <*freq: increase NFRUS if needed for Ncnew
+            new NFRUS is temporarily saved in LFR*>;
+    KRAD1=(NZON-Ncnew)*LFR;
+    <*savclean: save FH and FJ in all old zones for all
+        old frequencies and clean FJ and FH for all
+        new frequencies for zones K > Ncnd (old) *>;
+/*    _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddJ(IK,L);
+         _OD;
+         HEdO(L)=HEdd(L);
+    _od;
+  */
+    NFRUSO=NFRUS;
+    NFRUS=LFR; -- will not change if not changed by ALATO_freq
+
+    Call NTH(Ncnew);
+--    Write(@term,*)' Call 2 Feau ';
+--    CALL @FEAUTRIER(Ncnew,Ncnd); -- old position, wrong for eddi
+
+    _do L=NFRUSO+1,NFRUS;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=Eddn(IK,L);
+           EDDJ(IK,L)=Eddn(IK,L);
+         _OD;
+--         HEdO(L)=HEdn(L); -- nor defined yet
+--         HEDD(L)=HEDN(L);
+         HEdO(L)= HEDD(L);
+--         write(*,'(a,i5,1p,e12.4)')' 2 L Hedd:', L,Hedd(L);
+    _od;
+    trlx=@Nrlx*h;
+--    @wterm trlx;
+--    @wterm' calling GDepos';
+    CALL GDEPOS;
+    KTAIL=NSTEP; -- TO TRACK LAST FEAUTRIER
+--
+    Tp=Ty(Ncnew+1);
+    If(Ncnew>0)Then;
+      PL=3.D0*DM(Ncnew+1)/(Ry(Ncnew+1)**3-Ry(Ncnew)**3);
+    Else;
+      PL=3.D0*DM(Ncnew+1)/(Ry(Ncnew+1)**3-Rce**3);
+    Endif;
+    RADP=.FALSE.; -- NO rad pressure
+    _Do ii=1, Natom;  Yat(ii)=YABUN(ii,Ncnew+1) _od;
+    CALL URSOS;  kmhap=Ncnew+1; CALL OPACIT; CAP2=CAPPA;
+    --
+--    WRITE(@term,'(2(A,I4),2(A,1P,E10.2))')
+--      ' before ADD NEW FJ:  Ncnew=',Ncnew,'  Ncnd=',Ncnd,' TAU(Ncnd)=',TAU(Ncnd),
+--               '   TAU(Ncnew)=',TAU(max(Ncnew,1));
+--    pause;
+ _DO K=Ncnew+1,Ncnd;           -- ADD NEW FJ ,FH
+      If(K<Nzon)Then;
+        TP1=Tp;
+        CAP1=CAP2;
+        Tp=Ty(K+1);
+        PL=3.D0*DM(K+1)/(Ry(K+1)**3-Ry(K)**3);
+        _Do ii=1, Natom;  Yat(ii)=YABUN(ii,K+1) _od;
+        CALL URSOS;  kmhap=K+1; CALL OPACIT; -- called by HAPPA ( sometimes called )
+        call HAPPA;
+        CAP2=CAPPA;
+        FLLF1=((Ry(K)*TP1)**4-(Ry(K)*TP)**4)*TP1**4/
+              (CAP1*(DM(K)+DM(K+1) )*(TP1**4+TP**4));
+        FLRT1=((Ry(K)*TP1)**4-(Ry(K)*TP)**4)*TP**4/
+              (CAP2*(DM(K)+DM(K+1) )*(TP1**4+TP**4));
+        FLUM=CLUM*(FLLF1+FLRT1);
+      Endif;
+      If(NSTEP==0 & EddJ(K,@LM)>0.25D0)Then;
+        dillm=0.75d0-0.25d0*sqrt(12.d0*EddJ(K,@LM)-3.D0);
+             -- actually another root of square equation for edd<1/3
+        Tpm=Freqmn(@LM)/LOG(1.D0+dillm/FradJ(K,@LM));
+      else;
+        dillm=0.75d0;
+        TPM=MAX(Ty(K),@TP_FLOOR);
+      endif;
+      FLUN=0.D0;
+     _DO L=1,NFRUS;
+         IX=NVARS*NZON+(NZON-Ncnew)*(L-1);
+      -- If(tau(K)>1.d0)then;
+      --   Y(IX+(K-Ncnew),1)=min(FradJ(K,L),Black(L,Ty(k))); -- FJ
+         If(K<=Nthick(L))then;
+           Y(IX+(K-Ncnew),1)=Black(L,Ty(k));
+           -- FJ
+       --    WRITE(@term,'(2(A,1P,E12.5),A,2I3)')
+         --   ' thick  YJ=',Y(IX+(K-Ncnew),1),'  Bl=',Black(L,Ty(k)),
+     --  '  Km  L:',K,L
+         else;
+           Y(IX+(K-Ncnew),1)=FradJ(K,L);
+           -- FJ
+           -- WRITE(@term,'(2(A,1P,E12.5),A,2I3)')
+             --      ' YJ=',Y(IX+(K-Ncnew),1),'  Bl=',Black(L,Ty(k)),
+            --   '  Km  L:',K,L;
+         endif;
+  /*     IF(Nstep>0)Then;
+           Y(IX+(K-Ncnew),1)=BLACK(L,TPM);-- FJ
+         Else;
+           If(EddJ(K,L)>0.25D0)Then;
+             dill=0.75d0-0.25d0*sqrt(12.d0*EddJ(K,L)-3.D0);
+             -- actually another root of square equation for edd<1/3
+           else;
+             dill=0.75d0;
+           endif;
+           Y(IX+(K-Ncnew),1)=FradJ(K,@LM)*BLACK(L,TPM)*dill
+                              /(BLACK(@LM,TPM)*dillm);
+         Endif;  */
+--         IF(K==1 & L==1)
+--            WRITE(@Wres,*)'T BL @FJ FRAD=',Ty(K),BLACK(L,TPM),
+--            Y(IX+(K-Ncnew),1),FRADJ(K,@LM);
+ -- insert here *CAPPA/HAPPAL(L)
+       If(K<Nzon)Then;
+         If(Nstep>1 & K>Nthick(L))then;
+            Y(IX+(K-Ncnew)+KRAD1,1)=FradH(K,L);          -- FH
+         elseif(Nstep>1)then;
+            Y(IX+(K-Ncnew)+KRAD1,1)=                   -- FH
+              (FLLF1+FLRT1)*Blackd(L,0.5D0*(Tp+Tp1))*CAP2
+                /(@Left*(0.5D0*(Tp+Tp1))**4*Ry(K)**2*HAPPAL(L));
+         else;
+            Y(IX+(K-Ncnew)+KRAD1,1)=0.1d0*FradH(K,L);    -- FH
+         endif;
+    /*   If(Nstep>0)Then;
+           Y(IX+(K-Ncnew)+KRAD1,1)=                   -- FH
+              (FLLF1+FLRT1)*Blackd(L,0.5D0*(Tp+Tp1))*CAP2
+                /(@Left*(0.5D0*(Tp+Tp1))**4*Ry(K)**2*HAPPAL(L));
+           -- WRITE(@Wres,'(A,1P,E11.3,A,I2)')
+           -- ' HAP=',HAPPAL(L)/(URHO*UR),'  L=',L;
+         Else;   -- Nstep==0
+           IF( K>NTHICK(L) & NTHICK(L)<Nzon-3 ) THEN;
+               Y(IX+(K-Ncnew)+KRAD1,1)=
+                   0.1d0*FRADH(K,@LM)*BLACKD(L,Tpm)*dill
+                        /(BLACKD(@LM,Tpm)*dillm);         -- FH
+                 --  print *,'K,L,Fradh(k,@LM)',K,L,Fradh(k,@LM);
+           ELSE;
+               Y(IX+(K-Ncnew)+KRAD1,1)=                   -- FH
+               0.1d0*
+              (FLLF1+FLRT1)*Blackd(L,0.5D0*(Tp+Tp1))*CAP2
+                /(@Left*(0.5D0*(Tp+Tp1))**4*Ry(K)**2*HAPPAL(L));
+           ENDIF;
+         Endif;  */
+           --   Y(IX+(K-Ncnew)+KRAD1,1)=
+           --        MIN(Y(IX+(K-Ncnew)+KRAD1,1),Y(IX+(K-Ncnew),1)*HEDD(K));
+         FLUN=FLUN+Y(IX+(K-Ncnew)+KRAD1,1)*WEIGHT(L);
+          --   print *,K,L,FLUN;
+      --  WRITE(@Wres,'(2(A,1P,E12.5),A,2I3)')
+        --' YH=',Y(IX+(K-Ncnew)+Krad1,1),'  FradH=',FradH(K,L),'  Km  L:',K,L;
+       Endif;
+       -- @wterm'K L Nth Bld @FH FRADH=',K,L,
+       --     Nthick(L),BLACKD(L,Tpm),Y(IX+(K-Ncnew)+Krad1,1),FRADH(K,L);
+     _OD;
+    If(K<Nzon)Then;
+        FLUN=CLUMF*FLUN*Ry(K)**2;
+        WRITE(@Wres,'(2(A,1P,E12.5),A,I3)')
+               ' Cond Lum=',Flum,'      New  Lum=',Flun,'   Km=',k;
+        <*CORR* correct new luminosity *>;
+    Endif;
+ _OD;
+  Ncnd=Ncnew; KRAD=KRAD1; N=NZON*NVARS+2*KRAD;
+--  @wterm' NEW Ncnd KRAD N:   ',Ncnd,KRAD,N,' AT STEP=',NSTEP;
+  WRITE(@Wres,*)' NEW Ncnd KRAD N:   ',Ncnd,KRAD,N,' AT STEP=',NSTEP;
+%ALATO_freq:
+-- find Tpcomp for for Ncnew:
+   Tpcomp=Ty(NZON);
+   _Do I=Ncnew+1,NZON;
+       If(Ty(I)>Tpcomp) Tpcomp=Ty(I)
+   _od;
+--  Tpcomp=Ty(Ncnew+Ismax(Nzon-Ncnew,Ty(Ncnew+1),1)); -- CRAY
+  _WHILE BLACK(MIN(LFR+1,NFREQ),Tpcomp)*FREQMN(MIN(LFR+1,NFREQ))**3 >
+            FLNOIS _DO
+       LFR=LFR+1;
+  _UNTIL LFR>=NFREQ;
+   LFR=min(LFR,NFREQ);
+   IF(LFR ^= NFRUS)THEN;
+       WRITE(@Wres,*)'Tpcomp=',Tpcomp;
+       WRITE(@Wres,*)' NEW NFRUS -->',LFR,' AT STEP=',NSTEP;
+--       WRITE(@term,*)' NEW NFRUS -->',LFR,' AT STEP=',NSTEP;
+   ENDIF;
+%ALATO_savclean:
+    _DO L=NFRUS,1,-1;        -- SAVE OLD FH
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+       _DO K=NZON-1,Ncnd+1,-1;
+           Y(IX+(K-Ncnd)+(Ncnd-Ncnew)*L+KRAD1,1)=Y(IX+(K-Ncnd)+KRAD,1);
+    _OD_OD;
+    _DO L=NFRUS,1,-1;        -- SAVE OLD FJ
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+       _DO K=NZON,Ncnd+1,-1;
+           Y(IX+(K-Ncnd)+(Ncnd-Ncnew)*L,1)=Y(IX+(K-Ncnd),1);
+    _OD_OD;
+
+    _DO K=Ncnd+1,NZON;           -- clean new FJ ,FH
+        _DO L=NFRUS+1,LFR;
+           IX=NVARS*NZON+(NZON-Ncnew)*(L-1);
+           Y(IX+(K-Ncnew),1)=0.D0;         -- FJ
+           Y(IX+(K-Ncnew)+KRAD1,1)= 0.D0;        -- FH
+        _OD;
+    _OD;
+%ALATO_CORR:
+  If(Nstep>0)Then;
+    Flum=Flum/Flun;
+    Flun=0.;
+    _Do L=1,NFRUS;
+      IX=NVARS*NZON+(NZON-Ncnew)*(L-1);
+      Y(IX+(K-Ncnew)+KRAD1,1)=Flum*Y(IX+(K-Ncnew)+KRAD1,1);
+      FLUN=FLUN+Y(IX+(K-Ncnew)+KRAD1,1)*WEIGHT(L);
+    _Od;
+    FLUN=CLUMF*FLUN*Ry(K)**2;
+    WRITE(@Wres,*)' Corrected New Lum=',Flun;
+  Endif;
+
+%ALATU:
+     _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddJ(IK,L);
+         _OD;
+         HEdO(L)=HEdd(L);
+     _od;
+--     Write(@term,*)' Call 3 Feau ';
+     CALL @FEAUTRIER(Ncnew,Ncnd); -- new pos.
+     KRAD1=(NZON-Ncnew)*NFRUS;
+     _DO L=1,NFRUS;        -- DEL FJ
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+        _DO K=Ncnew+1,NZON;
+           Y(NVARS*NZON+(NZON-Ncnew)*(L-1)+(K-Ncnew),1)=
+                  Y(IX+(K-Ncnd),1);
+        _OD;
+     _OD;
+     _DO L=1,NFRUS;        -- DEL FH
+-- CHECK FOR K==NZON & FH!!!
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+        _DO K=Ncnew+1,NZON-1;
+           Y(NVARS*NZON+(NZON-Ncnew)*(L-1)+(K-Ncnew)+KRAD1,1)=
+                 Y(IX+(K-Ncnd)+KRAD,1);
+        _OD
+     _OD;
+/* old     _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddJ(IK,L);
+         _OD;
+         HEdO(L)=HEdd(L);
+     _od;
+--      Write(@term,*)' Call 3 Feau ';
+     CALL @FEAUTRIER(Ncnew,Ncnd); */
+     trlx=@Nrlx*h;
+--     @wterm trlx;
+     CALL GDEPOS;
+     KTAIL=NSTEP; -- TO TRACK LAST FEAUTRIER
+     Ncnd=Ncnew; KRAD=KRAD1; N=NZON*NVARS+2*KRAD;
+     WRITE(@Wres,*)' NEW Ncnd KRAD N:   ',Ncnd,KRAD,N,' AT STEP=',NSTEP;
+     WRITE(@Wres,*)'Ty(Ncnd+1)=',Ty(Ncnd+1);
+
+%ALAT_LIM:
+  I=NZON; TAU(I)=0.D0;
+  _WHILE  I>1 & (TAU(I)<=FitTau ! I>=Ncnd) _DO
+    TP=Ty(I); PL=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    _Do ii=1, Natom [ Yat(ii)=YABUN(ii,I) ];
+    RADP=.FALSE.;
+    CALL URSOS;  kmhap=I; CALL HAPPA;
+    TAU(I-1)=TAU(I)+(Ry(I)-Ry(I-1))*HAPPAL(@LM)*PL;
+    If(TAU(I-1)>=Taukli & TAU(I)/TAU(I-1)<Taujmp)Then;
+      Klim(I)=1;
+      WRITE(@Wres,*)' New Ncnd,    Klim=1 for Km=',I;
+    Else;
+      Klim(I)=0;
+    Endif;
+    I=I-1
+  _OD; --  I<Ncnd & TAU(I)>FitTau
+  _DO KT=Ncnd+1,NZON;
+     TAUZON(KT)=TAU(KT-1)-TAU(KT);
+  _OD;
+
+%ALAR:
+-------_INCLUDE alar;
+  <*A: FIND IN NTRANS THE NUMBER OF ZONES WITH TAU < @TAU_FLOOR *>;
+  _IF Nzon>Nzmin & NTRANS >= @NREZONE & T*Utime>TREZON _THEN
+    --NDELZN=MIN(@NREZONE,(NZON-Ncnd)/2);
+    NDELZN=NTrans;
+    WRITE(@Wres,'('' ==> Dropping '',I3,'' zones at STEP:'',I5)')
+          Ndelzn, Nstep;
+    WRITE(@term,'('' ==> Dropping '',I3,'' zones at STEP:'',I5)')
+          Ndelzn, Nstep;
+    Nznew=max(Nzmin,Nzon-Ndelzn);
+    <*S* SAVE DELETED ZONES INTO FILE 'DELZON RES',CHANNEL 7
+         & CHANGE ELOST *>;
+    <*E: DELETE NDELZN OUTER ZONES *>;
+    <*D* DEBUGGER FJ,FH *>;
+    Nzon=Nznew; KRAD=KRAD1; N=NZON*NVARS+2*KRAD;
+     Call NTH(Ncnd);
+    PRINT *,' @@@>>> New Nzon Krad N:   ',Nzon,KRAD,N;
+    JSTART=0;
+    Hmax=max(Hmax,t*1.d-3);
+     _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddO(IK,L)=EddJ(IK,L);
+         _OD;
+         HEdO(L)=HEdd(L);
+     _od;
+    CALL @FEAUTRIER(Ncnd,Ncnd); -- CHANGE EDDJ & HEDD -- will not work for
+                                 --    eddi!
+    trlx=@Nrlx*h
+--    @wterm trlx;
+     CALL GDEPOS;
+    NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+  _FI
+
+%ALARD=AS:
+
+%ALARA:
+   NTRANS=NZON;
+  _WHILE TAU(NTRANS) < @TAU_FLOOR & NTRANS > Ncnd+1_DO
+    NTRANS=NTRANS-1
+  _OD;  -- TAU(NTRANS) >= @TAU_FLOOR
+  NTRANS=NZON-NTRANS;
+
+%ALARS:
+   WRITE(7,@F0) NSTEP,NDELZN,T*UTIME;
+   WRITE(7,'(5X,''R'',12X,''V'',12X,''AM'',11X,''DM'',11X,''Rho'')');
+   WRITE(7,@F1) (Ry(K)*UR,Uy(K)*UR/(UTIME*CRAP),AM(K)*UM,DM(K)*UM,
+                 Rho(K)*URHO,K=NZON,NZON-NDELZN+1,-1);
+   @F0: Format(' NSTEP:',I5,' NREZONE:',I3,
+               ' STRIPPING TIME(S):',F16.2);
+   @F1: Format(1X,1P,5E13.5);
+    ETERM=0.D0;EKIN=0.D0;EGRAV=0.D0;ERADD=0.D0;
+    ELOST=YENTOT(1);
+    _DO KM=NZON-NDELZN+1,NZON;
+       <*E: FIND PL,TP,P,Q,EGAS,ERAD,ACCEL,ACCRAD *>;
+       IF(KM^=NZON)THEN;
+         DM2=DM(KM+1);
+       ELSE;
+         DM2=DMOUT;
+       ENDIF;
+       RX=(DM(KM)+DM2)/2.D0;
+       EKIN=EKIN+RX*Uy(KM)**2;
+       EGRAV=EGRAV-RX*AM(KM)/Ry(KM);
+       ETERM=ETERM+EGAS*DM(KM)*UEI;
+       ERADD=ERADD+ERAD*DM(KM)*UEI;
+    _OD;
+    EKIN=EKIN/2.D0;
+    ELOST=ELOST+(ETERM+ERADD+EGRAV+EKIN);
+    YENTOT(1)=ELOST;
+
+%ALARSE:
+    PL=Rho(KM);TP=Ty(KM);CHEM=CHEM0(KM);
+    _Do ii=1, Natom [ Yat(ii)=YABUN(ii,KM) ];
+--   _IF PL>0.D0 & TP>0.D0_THEN
+--      NZR=KM; CALL URSOS;
+--   _FI;
+   IF(KM<=Ncnd)THEN;
+       ERAD=0.D0; RADP=.TRUE.; CALL URSOS;
+   ELSE;
+       RADP=.FALSE.; CALL URSOS;
+       SUMJ=0.D0;
+       _DO L=1,NFRUS;
+           SUMJ=SUMJ+@FJ1*WEIGHT(L);
+       _OD;
+       SUMJ=(1.5D1/PI**4)*SUMJ; --TPRAD=SUMJ**.25D0;
+       ERAD=CSIGM*4.D+13/(PL*CS)*SUMJ;
+   ENDIF;
+
+%ALARE:
+   <*R: Drop Ry, Uy, Ty in outer zones *>;
+   <*F: Compress FH & FJ on new grid *>;
+
+%ALARER:
+     -- Move Uy,Ty TO NEW positions in Y array
+        _DO K=1,Nznew;  --SAVE OLD Uy,Ty
+            Y(Nznew+K,1)=Uy(K); -- NR
+--            Y(Nznew+K,1)=Uy(K)/sqrt(1.d0-(Uy(K)/clight)**2);
+            Y(2*Nznew+K,1)=Ty(K);
+        _OD;
+
+%ALAREF:
+     KRAD1=(Nznew-Ncnd)*NFRUS;
+     _DO L=2,NFRUS;        -- DEL FJ
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+        _DO K=Ncnd+1,Nznew;
+           Y(NVARS*Nznew+(Nznew-Ncnd)*(L-1)+(K-Ncnd),1)=
+                  Y(IX+(K-Ncnd),1);
+        _OD;
+     _OD;
+     _DO L=2,NFRUS;        -- DEL FH
+-- CHECK FOR K==NZON & FH!!!
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+        _DO K=Ncnd+1,Nznew-1;
+           Y(NVARS*Nznew+(Nznew-Ncnd)*(L-1)+(K-Ncnd)+KRAD1,1)=
+                 Y(IX+(K-Ncnd)+KRAD,1);
+        _OD
+     _OD;
+
+%ALA_Tpcomp:
+      Tpcomp=Ty(NZON);
+      _Do I=Ncnd+1,NZON;
+         If(Ty(I)>Tpcomp) Tpcomp=Ty(I)
+      _od;
+--      Tpcomp=Ty(Ncnd+Ismax(Nzon-Ncnd,Ty(Ncnd+1),1)); -- CRAY
+
+%ALAN:
+     LFR=NFRUS;
+     /*                   -- for Watcom
+      _repeat [
+       Buff1=FREQMN(LFR)**3;            --=
+       Buff2=BLACK(LFR,Tpcomp);         --=
+       Buff3=Buff1*Buff2;                 --=
+        _IF (Buff3 >= FLNOIS/@FREQ_TOL .OR. HOLDFR) _Then; _leave; _FI;
+        LFR=LFR-1;
+      ]
+      */
+--pause;
+-- write(*,*) Tpcomp,LFR;
+     _WHILE BLACK(LFR,max(Tpcomp,floor(3)))*FREQMN(LFR)**3 < FLNOIS/@FREQ_TOL
+            & ^HOLDFR & Lfr>NFRMIN _DO
+ --write(*,*) Tpcomp,LFR,floor(3),FREQMN(LFR);
+        LFR=LFR-1
+     _OD;
+--pause;
+     IF(LFR < NFRMIN) LFR=NFRMIN;
+     IF(LFR ^= NFRUS)THEN;
+--     WRITE(@Wres,*)'Tpcomp=',Tpcomp;
+       NFRUS=LFR;
+       KRAD1=(NZON-Ncnd)*NFRUS;
+       _DO L=1,NFRUS;
+          IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+         _DO K=Ncnd+1,NZON-1;  -- SAVE FH
+             Y(IX+(K-Ncnd)+KRAD1,1)=Y(IX+(K-Ncnd)+KRAD,1);
+         _OD
+       _OD;
+       KRAD=KRAD1;
+       N=NZON*NVARS+2*KRAD;
+       JSTART=0;
+       Hmax=max(Hmax,t*1.d-3);
+       NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+       WRITE(@Wres,*)' NEW NFRUS KRAD N-->',NFRUS,KRAD,N,' AT STEP=',NSTEP;
+       Call NTH(Ncnd);
+       KTAIL=-@N_EDD; -- to force call FEAU
+       <*B* TEST PRINTING *>;
+     ELSEIF(LFR<NFREQ)THEN; -- LFR==NFRUS
+     /*                   -- for Watcom
+      _repeat [
+       Buff1=FREQMN(LFR+1)**3;            --=
+       Buff2=BLACK(LFR+1,Tpcomp);         --=
+       Buff3=Buff1*Buff2;                 --=
+        _IF Buff3 <= FLNOIS _Then; _leave; _FI;
+        LFR=LFR+1;
+        _IF LFR==NFREQ _THEN _leave; _FI;
+      ]
+      */
+       _WHILE BLACK(LFR+1,max(Tpcomp,floor(3)))*FREQMN(LFR+1)**3 > FLNOIS _DO
+         LFR=LFR+1;
+       _UNTIL LFR==NFREQ;
+        IF(LFR ^= NFRUS)THEN;
+           WRITE(@Wres,*)'Tpcomp=',Tpcomp;
+           KRAD1=(NZON-Ncnd)*LFR;
+          <*A: DEFINE Y FOR NEW FREQUENCIES *>;
+           NFRUSO=NFRUS;
+           NFRUS=LFR;
+           KRAD=KRAD1;
+           N=NZON*NVARS+2*KRAD;
+           JSTART=0;
+           Hmax=max(Hmax,t*1.d-3);
+           NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+        WRITE(@Wres,*)' NEW NFRUS KRAD N-->',NFRUS,KRAD,N,' AT STEP=',NSTEP;
+--        WRITE(@term,*)' NEW NFRUS KRAD N-->',NFRUS,KRAD,N,' AT STEP=',NSTEP;
+          Call NTH(Ncnd);
+          KTAIL=-@N_EDD; -- to force call FEAU
+           <*D* TEST PRINTING *>;
+        ENDIF;
+     ENDIF;
+
+%ALANA:
+    _DO L=NFRUS,1,-1;        -- SAVE OLD FH
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+        _DO K=NZON-1,Ncnd+1,-1;
+           Y(IX+(K-Ncnd)+KRAD1,1)=Y(IX+(K-Ncnd)+KRAD,1);
+    _OD_OD;
+    _DO K=Ncnd+1,NZON;           -- ADD NEW FJ ,FH
+  /*    CM1=CM2; TT1=TP;
+        If (K<NZON) Then;
+          TP=Ty(K+1);PL=3.D0*DM(K+1)/(Ry(K+1)**3-Ry(K)**3);
+          RADP=.FALSE.;
+          _Do i=1, Natom [ Yat(i)=YABUN(I,K+1) ];
+          CALL URSOS;  kmhap=K+1;CALL OPACIT;
+          CM2=CAPPA*DM(K+1);
+          FL1=((Ry(K)*TT1)**4-(Ry(K)*Tp)**4)/(CM1+CM2);
+        Endif; */
+        _DO L=NFRUS+1,LFR;
+           IX=NVARS*NZON+(NZON-Ncnd)*(L-1);
+--         Y(IX+(K-Ncnd),1)=BLACK(L,Tpcomp);
+           Y(IX+(K-Ncnd),1)=Y(IX+(K-Ncnd)-(NZON-Ncnd),1)           -- FJ
+                      *EXP((FREQMN(L-1)-FREQMN(L))/Tpcomp);
+--                    *EXP((FREQMN(L-1)-FREQMN(L))/Ty(K));
+           Y(IX+(K-Ncnd)+KRAD1,1)= 0.D0;        -- FH
+--            IF(K<NZON)
+--                 Y(IX+K+KRAD1,1)=Y(IX+K+KRAD1,1) -- FH
+--                    *EXP((FREQMN(NFREQ-1)-FREQMN(NFREQ))/Ty(Ncnd))
+        _OD;
+    _OD;
+%ALA_CORRFJ:
+ _Do K=NZON*NVARS+1,NZON*NVARS+KRAD;
+    Y(K,1)=max(0.D0,Y(K,1))  -- FJ>=0
+ _od;
+%ALA_RT:
+  Ryzer=Ry(Kmcor);
+  -- RTphi(Nzon)=0.d0; -- try to use non-zero for the last zone also
+  RTphi(Nzon+1)=0.d0;
+               -- must be done for every change of Nzon
+  EpsUq=0.d0;
+--  _Do K=1,NZON-1;
+ _Do K=1,NZON; -- try to use non-zero for the last zone also
+      EpsUq=max(EpsUq,DRT*Eps*abs(Uy(K)));
+--    EpsUq=max(EpsUq,DRT*Eps*abs(Uy(K)))/dble(NZON); 
+      -- we continue to apply nonzero QRT_cold even
+      -- for positive UU2 since we have no infinite
+      -- accuracy:  Eps is the measure of the Stiff accuracy, 
+      -- division by NZON could provide for a proportion at homologous expansion
+      -- it is better to reduce EpsUq reducing DRT, than hardcoding it here via NZON
+      -- EpsUq may give too high artificial pressure if not reduced by DRT
+    TauRT=(Amout-Am(K))*(0.4d0*Urho*UR)/Ry(K)**2; -- appr. tau
+    RTphi(K)=BQ*dM(K)*Ry(K)**(NRT-1.d0)/(1.d0+0.033d0*TauRT); -- cold
+ _od;
+-- if(mod(Nstep,1000)==0)then;
+--  write(*,'(a,i7,1p,4g12.3)')' Nstep,EpsUq,DRT,Eps,Uy(Nzon)', Nstep,EpsUq,DRT,Eps,Uy(Nzon);
+--  pause;
+-- endif;
+%ALAF:
+    _IF Ty(Ncnd+1)*@FREQ_TOL > FREQ(NFREQ+1) _THEN
+       @wterm ' >>>>> FREQUENCIES INCREASED AT STEP',NSTEP;
+       <*A: REDEFINE FREQ. GROUPS INCREASING FREQ(I) *>;
+       JSTART=0;
+       Hmax=max(Hmax,t*1.d-3);
+       NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+    _ELSE _IF Ty(Ncnd+1)*@FREQ_TOL < FREQ(NFREQ-1) _THEN
+       @wterm ' <<<<< FREQUENCIES DECREASED AT STEP',NSTEP;
+       <*E: REDEFINE FREQ. GROUPS DECREASING FREQ(I) *>;
+       JSTART=0;
+       Hmax=max(Hmax,t*1.d-3);
+       NEEDBR=.TRUE.; -- F01BRF/M28Y12 NEEDED
+    _FI_FI;
+%ALAFA:
+    _DO L=1,NFREQ;
+        FREQ(L)=FREQ(L+1)
+    _OD;
+    FREQ(NFREQ+1)=FREQ(NFREQ)*FREQ(2)/FREQ(1);
+    W1OLD=WEIGHT(1);  -- SAVE OLD W1
+    <*B: DEFINE FREQMN,DLOGNU,WEIGHT  *>;
+    IX=NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+    _DO K=Ncnd+1,NZON;
+         FJ1OLD(K)=Y(NVARS*NZON-Ncnd+K,1);       -- SAVE FJOLD
+         FH1OLD(K)=Y(NVARS*NZON-Ncnd+K+KRAD,1);  -- SAVE FHOLD
+    _OD;
+    _DO L=1,NFREQ-1;
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+        _DO K=Ncnd+1,NZON;
+           Y(IX+K,1)=Y(IX+(NZON-Ncnd)+K,1);           -- FJ
+           IF(K<NZON)
+            Y(IX+K+KRAD,1)=Y(IX+(NZON-Ncnd)+K+KRAD,1); -- FH
+        _OD;
+    _OD;
+   IX=NVARS*NZON+(NZON-Ncnd)*(NFREQ-1)-Ncnd;
+    _DO K=Ncnd+1,NZON;
+       Y(IX+K,1)=FJ1OLD(K)*W1OLD/WEIGHT(NFREQ);  -- FJ
+--     Y(IX+K,1)=Y(IX+K,1)           -- FJ
+--                    *EXP((FREQMN(NFREQ-1)-FREQMN(NFREQ))/Ty(Ncnd));
+       IF(K<NZON)
+--     Y(IX+K+KRAD,1)=Y(IX+K+KRAD,1) -- FH
+--                    *EXP((FREQMN(NFREQ-1)-FREQMN(NFREQ))/Ty(Ncnd))
+--     Y(IX+K+KRAD,1)=0.D0   -- FH
+       Y(IX+K+KRAD,1)=FH1OLD(K)*W1OLD/WEIGHT(NFREQ);  -- FH
+    _OD;
+    <*D: TEST PRINTING *>;
+%ALAFAB:
+    _DO L=1,NFREQ;
+      FREQMN(L)=SQRT(FREQ(L)*FREQ(L+1));
+--      @wterm cs/(freqmn(l)*UFreq*1.d8);
+    _OD;
+    _DO L=1,NFREQ;
+ --   IF(L==1)THEN;
+ --     WL=(FREQ(L+1)-FREQ(L))*FREQMN(L)**3;
+ --        DLOGNU(L)=1.D0/LOG(FREQMN(L)/FREQ(L));
+ --   ELSE;
+         WEIGHT(L)=(FREQ(L+1)-FREQ(L))*FREQMN(L)**3;
+         DLOGNU(L)=1.D0/LOG(FREQMN(L)/FREQMN(L-1));
+ --   ENDIF;
+    _OD;
+     TSS=0.D0;
+     _DO L=1,NFREQ-1;
+         TSS=TSS+BLACKD(L,.5D0*(Ty(Ncnd)+Ty(Ncnd+1)))*WEIGHT(L);
+     _OD;
+      WL=WEIGHT(NFREQ);
+  -- insert here *CAPPA/HAPPAL(L)
+      WEIGHT(NFREQ)=(4.D0*(PI*0.5D0*(Ty(Ncnd)+Ty(Ncnd+1)))**4/15.D0-TSS)
+         /BLACKD(NFREQ,.5D0*(Ty(Ncnd)+Ty(Ncnd+1)));
+      TSS=TSS+BLACKD(NFREQ,.5D0*(Ty(Ncnd)+Ty(Ncnd+1)))*WEIGHT(NFREQ);
+      PRINT *,' TSS=',TSS,
+              4.D0*(PI*0.5D0*(Ty(Ncnd)+Ty(Ncnd+1)))**4/15.D0;
+      PRINT *,' WL=',WL,'    WEIGHT(NFREQ)=',WEIGHT(NFREQ);
+--     @wterm ' FREQ    FREQMN';
+     PRINT'(1X,1P,10G13.3)',FREQ;
+     PRINT'(1X,1P,10G13.3)',FREQMN;
+%ALAFE:
+    _DO L=NFREQ,1,-1;
+        FREQ(L+1)=FREQ(L)
+    _OD;
+    FREQ(1)=FREQ(1)*FREQ(2)/FREQ(3);
+    <*B: DEFINE FREQMN,DLOGNU,WEIGHT  *>;
+    _DO L=NFREQ-1,1,-1;
+        IX=NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+        _DO K=Ncnd+1,NZON;
+           Y(IX+(NZON-Ncnd)+K,1)=Y(IX+K,1);           -- FJ
+           IF(K<NZON) Y(IX+(NZON-Ncnd)+K+KRAD,1)=Y(IX+K+KRAD,1); -- FH
+        _OD;
+    _OD;
+   IX=NVARS*NZON-Ncnd;  -- L==1
+    _DO K=Ncnd+1,NZON;
+       Y(IX+K,1)=Y(IX+K,1)*FREQMN(2)/FREQMN(1);           -- FJ
+       IF(K<NZON) Y(IX+K+KRAD,1)=Y(IX+K+KRAD,1)*FREQMN(2)/FREQMN(1);
+    _OD;
+    <*D: TEST PRINTING *>;
+%ALAFEB=ALAFAB:
+%ALAFAD=AS:
+%ALATD=AS:
+%ALANB=AS:
+%ALAND=AS:
+%ALAFED=AS:
+
+/* now separate node: %IT=ALAT:
+  */
+
+%ITO=ALATO:
+%ITU=ALATU:
+
+%I_RT=ALA_RT:
+%I_Tpcomp=ALA_Tpcomp:
+%IN=ALAN:
+%ALA_Lim:
+      I=NZON; TAU(I)=0.D0;
+    _WHILE  I>1 & I>=Ncnd _DO
+       TP=Ty(I); PL=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+       _Do ii=1, Natom;  Yat(ii)=YABUN(ii,I) _od;
+       RADP=.FALSE.;
+       CALL URSOS;  kmhap=I; CALL HAPPA;
+       TAU(I-1)=TAU(I)+(Ry(I)-Ry(I-1))*HAPPAL(@LM)*PL;
+       If(TAU(I-1)>=Taukli & TAU(I)/TAU(I-1)<Taujmp)Then;
+         Klim(I)=1;
+         WRITE(@Wres,*)' New Feau,    Klim=1 for Km=',I;
+       Else;
+         Klim(I)=0;
+       Endif;
+       I=I-1
+    _OD; --  I<Ncnd --& TAU(I)>Taukli
+%ALE:N
+    <*F: FIND ITPMAX *>;
+    _IF JSTART>0_THEN
+    _DO J1=1,JSTART+1;
+          TPMAX(J1)=Y(2*NZON+ITPMAX,J1)
+    _OD;
+    _DO J1=1,JSTART;
+      _DO J2=J1,JSTART;
+        J=JSTART-J2+J1;
+        TPMAX(J)=TPMAX(J)+TPMAX(J+1)
+      _OD
+    _OD;
+    _ELSE
+      TPMAX(1)=Y(2*NZON+ITPMAX,1)
+    _FI;
+    <*R: CONTROL ZONE ITPMAX & ADD ENERGY DENUC FOR BURNT ZONES *>;
+  191:FORMAT(' TP IN ZONE',I3,' FAILS TO CONVERGE IN',I3,' ITERATIONS');
+%ALEF:
+ITPMAX=NZON;
+_DO I=1,NZON;
+   IF(Ty(I)>Ty(ITPMAX) & NREG(I)==1) ITPMAX=I
+_OD;
+%ALER:
+_DO I=1,NZON;
+GOTO(101,102,103),NREG(I);
+101: Continue;
+_IF I==ITPMAX_THEN
+<*B: FOR I==ITPMAX FIND ET, TMGROW==TP/TPDOT,
+     FOR TMGROW*EPS <H: H=EPS*TMGROW *>;
+IF(TMGROW>=TMCRIT&1.D0>=YCARB*YDOT*TMCRIT*UTIME)GOTO 103;
+           JSTART=0; NPRIN=NOUT;
+IBURNT=I;
+XCARB=ACARB*YCARB;
+PRINT'('' ZONE'',I4,'' BURNT AT NSTEP='',I5,''  TIME='',G15.10,
+  '' SEC  HUSED='',E8.3)',I,NSTEP,T*UTIME,HUSED*UTIME;
+YCAR1=YCARB;
+_DO K=MAX0(1,I-1),MIN0(I+1,NZON);
+ -- RADIUS(K)=Ry(K); VELOC(K)=Uy(K); TMPR(K)=Ty(K)
+_OD;
+CALL PRIBUR(IBURNT); NREG(I)=2; TP=Ty(I); PL=Rho(I); YCARB=YCAR1;
+<*E: FIND NEW Ty(I) & DENUC - ENERGY RELEASED BY 12C - 28SI*>;
+PRINT'('' TP 28SI ='',E11.5,''   Q='',E11.5)',Ty(I),QCSI*YCARB;
+_ELSE GOTO 103_FI;
+YENTOT(1)=YENTOT(1)+DENUC;
+102: IF(Ty(I)<TPNSE)GOTO 103;
+     NREG(I)=3; JSTART=0; NPRIN=NOUT;
+     IBURNT=I;
+     <*I: =\ASEDE, BUT FOR 28SI - 56NI *>;
+     YENTOT(1)=YENTOT(1)+DENUC;
+PRINT'('' TP 56NI ='',E11.5,''   Q='',E11.5)',Ty(I),QSINI;
+103:TMGROW=1.D0<* TMGROW GT TMCRIT IS NEEDED *>;
+_OD;
+%ALERB:
+   TP=TPMAX(1);  PL=Rho(I); CALL BURNC;
+   YCARB=1.D0/YAINV(I);
+   AS=ASI/(1.D0+(ASI-ACARB)*YCARB); ZS=AS*YELECT;
+-- _Do i=1, Natom [ Yat(i)=YABUN(I,KM+1) ];
+   CALL URSOS; <* HENCE ET *>
+   TMGROW=(TP*ET*UEI)/(CK2*QNUC*YDOT*YCARB**2);
+   _IF H>(EPGROW*TMGROW)_THEN
+      H=(EPGROW*TMGROW);JSTART=-JSTART
+   _FI;
+%ALERE:
+   AS=ASI/(1.D0+(ASI-ACARB)*YCARB);
+   ZS=YELECT*AS;
+--  Xurs=XArr(Km+1); Yurs=YArr(Km+1); Zurs=ZArr(Km+1);
+   CALL URSOS;
+   EGAS0=EGAS+QCSI*YCARB;
+   AS=ASI; ZS=ZSI;
+   <*T: FIND NEW TP BY NEWTON ITERATIONS *>;
+   DENUC=QCSI*YCARB*DM(I)*UEI;
+%ALERET:
+   DELTP=(EGAS0-EGAS)/ET; ITER=0; TP=TP+DELTP;
+   _WHILE ABS(DELTP)>EIT&ITER<=10_DO
+--  Xurs=XArr(Km+1); Yurs=YArr(Km+1); Zurs=ZArr(Km+1);
+   CALL URSOS;
+   DELTP=(EGAS0-EGAS)/ET; TP=TP+DELTP;
+    IF(TP<0.D0) TP=(TP-DELTP)/2.D0;
+   ITER=ITER+1
+   _OD;
+   _IF ITER>10_THEN
+     PRINT 191,I,ITER;
+   _ELSE Ty(I)=TP_FI;
+%ALERI:
+AS=ASI; ZS=ZSI;
+--  Xurs=XArr(Km+1); Yurs=YArr(Km+1); Zurs=ZArr(Km+1);
+CALL URSOS;
+EGAS0=EGAS+QSINI; AS=ANI;    ZS=ZNI;
+<*T: FIND NEW TP BY NEWTON ITERATIONS *>;
+DENUC=QSINI*DM(I)*UEI
+%ALERIT=ALERET:
+%AL_CorCn:
+_DO IK=1,NZON;
+  IF(FLCON(IK)<0.D0 ! UC(IK)<0.D0)THEN;
+     _DO IKK=1,MAXDER+1;Y(IK+(NVARS-2)*NZON,IKK)=0.D0_OD;
+  ENDIF
+_OD
+%ALO:
+ /* TOO - moment of prescribed output in secs,
+   KO -  number of prescribed output,
+   TO(1:KOMAX) - beginning of prescribed output series,
+   STO(1:KOMAX) - steps after TO,
+   NTO(1:KOMAX) - how much outputs with step STO, if not zero,
+   KNTO - number of output done with step STO.
+   initially TOO=TO(1); KO=1; KNTO=1 */
+
+-- CORRECT below for continuation runs!!! First too's must be
+-- ignored
+
+   tretard=Ry(NZON-1)/CLIGHT;
+   t_ob=(t-tretard)*UTIME; -- observer time in sec
+
+ _WHILE t_ob >= TOO & KO<=KOMAX  &  Nstep > 10  _DO
+
+
+   <*F: INTERPOLATE FOR TIME
+          t = TOO/UTIME + Ry(NZON-1)/CLIGHT
+          AND OUTPUT MODEL *>;
+
+   if( NTO(KO)^=0 )then;
+     if( KNTO<=NTO(KO) )then;
+       TOO=TOO+STO(KO);
+       KNTO=KNTO+1;
+     else;
+       KNTO=1;
+       KO=KO+1;
+       IF(KO<=KOMAX) TOO=TO(KO); -- here TO in secs
+     endif;
+   else;
+     KO=KO+1;
+     IF(KO<=KOMAX) TOO=TO(KO); -- here TO in secs
+   endif;
+
+ _OD;
+
+-- call beams; -- now in eddirel.trf
+
+ELOST=YENTOT(1);
+if( MOD(NSTEP,NOUT)==0 )then;
+    @DateTime;
+    WRITE(@Wres,'(1X,''   ====> STEP:'',I6,2X,A,2X,'' ON  '',A)')
+               NSTEP,@TIME,@DATE;
+
+    tout=t;
+    do I=1,N;
+      Yout(I)=Y(I,1);
+    enddo;
+    do K=1,Nzon; -- Ry,Uy,Ty and rho must be defined before each call of Lossen or Pribal
+      -- either via Y or Yout
+      Ry(K)=Y(K,1);
+      Uy(K)=Y(Nzon+K,1); -- NR
+ --      Uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+      Ty(K)=Y(2*Nzon+K,1);
+    enddo;
+    Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+    do I=2,Nzon;
+      Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+    enddo;
+    CALL PRIBAL(IOUT); -- PRINT & BALANCES
+    --if(Nstep>0)
+    CALL PRIMAG;
+    -- PRIMAG IS not CALLED BY PRIBAL now
+else;
+--  @wterm' calling primag';
+    if(Nstep>1)CALL PRIMAG;
+--  @wterm' after primag';
+
+--    if(mod(Nstep,Nout/10)==0) then;
+  --    call pribal(+100); -- for swdet
+--    endif;
+--    If(Givdtl)then;
+  --       CALL PRIBAL(50);
+    --     <*Details: *>;
+  --  endif;
+endif;
+--IF(JSTART==0 & ((ITPMAX-1)/10)*10==(ITPMAX-1)) CALL PRIBAL(IOUT);
+<*H* CHECK FH & PUT SMALLER THAN FJ WITH JSTART=0 *>;
+%ALOF:
+--@wterm ' too/UTIME tretard t ', too/UTIME, tretard, t ;
+--@wterm ' TOO/UTIME+tretard-t  H ', TOO/UTIME+tretard-t, H;
+ tout=TOO/UTIME+tretard;
+_DO I=1,N;
+  Yout(I)=0.D0;
+  RX=1.D0;
+  _DO K=1,JSTART+1;
+     Yout(I)=Y(I,K)*RX+Yout(I); --interpolation using predictor
+--     RX=RX*((TOO/UTIME-t)/H)
+     RX=RX*((TOO/UTIME+tretard-t)/H)
+  _OD
+_OD;
+-- NOW WE HAVE TO EXTRACT Ry, TEMPERATURE AND VELOCITY FROM THE BUFFER Yout
+_DO I=1,NZON;
+    Ry(i)=Yout(i);
+    Uy(I)=Yout(NZON+I); -- NR
+   -- Uy(I)=Yout(NZON+I)/sqrt(1.d0+(Yout(Nzon+K,1)/clight)**2
+    Ty(I)=Yout(2*NZON+I);
+    if(Ty(I)<0.d0)then;
+       @wterm ' I, Ty =', I, Ty(I);
+       stop ' strad %ALOF: Ty<0';
+    endif;
+_OD;
+ --pause;
+RX=1.D0; ELOST=0.D0;
+_DO K=1,JSTART+1;
+  ELOST=YENTOT(K)*RX+ELOST;
+  RX=RX*((TOO/UTIME-T)/H)
+_OD;
+<*CALCULATE DENSITY IN Rho*>
+Rho(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+DO I=2,NZON;
+  Rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3);
+--  @wterm ' I rho =', I, Rho(I);
+ENDDO;
+--@wterm '('' ***TIME='',G9.3,'' SEC'')',TOO;
+CALL PRIBAL(IOUT);
+CALL PRIBAL(+100); -- for swdet
+
+%ALO_DETAILS:
+  WRITE(18,*) '  NSTEP     tobs      Mass        Rbeg         E';
+  WRITE(18,*)
+     NSTEP, (T-Ry(NZON-1)/CLIGHT)*(UTIME*CRAP)/86400.D0,
+             AMOUT*UM,RADBEG,EKO+Eburst;
+  WRITE(18,*)'   Km           Lum       accsel       QRT         UU ';
+  WRITE(18,*)Nzon;
+  _Do Km=1,NZON;
+     WRITE(18,*) Real(Km),ArrLum(Km),Acc(Km),QRTarr(Km),UUarr(Km);
+  _od;
+%ALOH:
+-- WRITE(5,*) ' OLD JSTART=',JSTART;
+IF(Ncnd==0)THEN;
+ _DO KM=Ncnd+1, NZON-1;
+   _DO L=1,NFRUS;
+     IF(@FH1<0.D0)THEN;
+        IF(ABS(@FH1)>ABS(@FJ2)*@TOLF & ABS(@FH1)>FLOOR(NVARS+1))
+        THEN;
+--             WRITE(5,'(1X,A,1P,2E11.3,3I6)')
+--           ' FH1>FJ2 NSTEP KM L ',@FH1,@FJ2,NSTEP,KM,L;
+           @FH1=-ABS(@FJ2)*EDDH(KM) ;
+    --     JSTART=0;
+        ENDIF;
+     ELSE;
+        IF(ABS(@FH1)>ABS(@FJ1)*@TOLF & ABS(@FH1)>FLOOR(NVARS+1))
+        THEN;
+--           WRITE(5,'(1X,A,1P,2E11.3,3I6)')
+--           ' FH1>FJ1 NSTEP KM L ',@FH1,@FJ1,NSTEP,KM,L;
+           @FH1=ABS(@FJ1)*EDDH(KM) ;
+    --     JSTART=0;
+        ENDIF;
+     ENDIF;
+   _OD;
+ _OD;
+ ENDIF;
+%ALATH=ALOH:
+%A_HLIM=ALOH:

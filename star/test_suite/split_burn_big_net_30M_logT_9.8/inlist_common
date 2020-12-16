@@ -1,0 +1,98 @@
+! Last ran with: r13515
+
+&star_job
+
+   show_log_description_at_start = .false.
+   
+   change_v_flag = .true.
+   new_v_flag = .true.
+   
+   set_initial_model_number = .true.
+   initial_model_number = 0
+   
+   !pgstar_flag = .true.
+   
+   dump_missing_metals_into_heaviest = .false.
+
+   logT_for_conv_vel_flag = 8.7d0
+   
+/ ! end of star_job namelist
+   
+
+&eos
+/ ! end of eos namelist
+
+
+&kap
+   Zbase = 0.02d0
+/ ! end of kap namelist
+
+&controls
+
+   initial_mass = 30
+   initial_z = 0.02d0
+
+
+   ! mesh
+   
+   ! We use these weaker limits in the test_suite to get faster finish.
+   ! That's okay for testing the code,
+   ! but for serious research, start with the converged values
+   ! and then recheck convergence for your typical cases.
+   mesh_delta_coeff = 1.0
+   mesh_delta_coeff_for_highT = 2.0
+   
+   logT_max_for_standard_mesh_delta_coeff = 9.0 
+   logT_min_for_highT_mesh_delta_coeff = 9.5 
+   
+   ! avoid over-resolving composition changes
+   min_dq_for_xa = 1d-4
+   
+   ! mixing
+
+   mixing_length_alpha = 1.5
+   MLT_option = 'Henyey'
+   
+   use_Ledoux_criterion = .true.
+   alpha_semiconvection = 0.01
+   thermohaline_coeff = 2
+   
+   thermohaline_option = 'Kippenhahn'
+   
+   overshoot_scheme(1) = 'exponential'
+   overshoot_zone_type(1) = 'any'
+   overshoot_zone_loc(1) = 'any'
+   overshoot_bdy_loc(1) = 'any'
+   overshoot_f(1) = 0.004
+   overshoot_f0(1) = 0.001
+   
+   ! Solver
+   op_split_burn = .true.
+   op_split_burn_min_T = 2d9
+
+   op_split_burn_eps = 1d-7
+   op_split_burn_odescal = 1d-8
+   
+   
+   ! timesteps
+   
+   min_xa_hard_limit = -1d-4
+   min_xa_hard_limit_for_highT = -3d-4
+   
+   delta_lgT_cntr_limit = 0.02d0
+   delta_lgRho_cntr_limit = 0.05d0
+   
+   dX_nuc_drop_limit_at_high_T = 1d-2 ! for center logT > 9.45
+   dX_nuc_drop_max_A_limit = 60
+   
+   dX_div_X_limit_min_X = 1d-1
+   dX_div_X_limit = 5d-2
+   dX_div_X_hard_limit = 5d-1
+   
+   varcontrol_target =1d-4
+   
+   
+/ ! end of controls namelist
+   
+   
+   

@@ -1,0 +1,40 @@
+
+      ! single step of 2nd order Runge-Kutta (explicit midpoint rule)
+      
+      subroutine rk2(n, y, dydx, x, h, yout, derivs, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: n
+         real(dp), dimension(:), intent(inout) :: y, dydx
+         real(dp), intent(in) :: x, h
+         real(dp), dimension(:), intent(out) :: yout
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr
+         interface
+            subroutine derivs(n, x, y, dydx, lrpar, rpar, lipar, ipar, ierr)
+               use const_def, only: dp
+               integer, intent(in) :: n
+               real(dp), intent(in) :: x
+               real(dp), dimension(:), intent(inout) :: y
+               real(dp), dimension(:), intent(out) :: dydx
+               integer, intent(in) :: lrpar, lipar
+               integer, intent(inout), pointer :: ipar(:) ! (lipar)
+               real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+               integer, intent(out) :: ierr
+            end subroutine derivs
+         end interface
+         real(dp) :: hh
+         real(dp), dimension(n) :: dyt, yt
+         integer :: i
+         ierr = 0
+         hh = h*0.5d0
+         do i=1,n
+            yt(i) = y(i) + hh*dydx(i)
+         end do
+         call derivs(n, x + hh, yt, dyt, lrpar, rpar, lipar, ipar, ierr)
+         if (ierr /= 0) return
+         do i=1,n
+            yout(i) = y(i) + h*dyt(i)
+         end do
+      end subroutine rk2   

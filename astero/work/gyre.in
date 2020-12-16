@@ -1,0 +1,28 @@
+&model
+/
+
+&mode
+  l = 0
+/
+
+&osc
+/
+
+&rot
+/
+
+&num
+  diff_scheme = 'COLLOC_GL4'
+/
+
+&scan
+  grid_type = 'LINEAR'
+  freq_min = 1
+  freq_max = 10
+  freq_min_units = 'NONE'
+  freq_max_units = 'NONE'
+  n_freq = 100
+/
+
+&grid
+/

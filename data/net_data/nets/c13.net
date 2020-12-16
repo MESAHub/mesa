@@ -1,0 +1,10 @@
+      
+         include 'basic.net'
+      
+         ! add c13 to basic net
+                  
+         add_iso(c13)
+
+         add_reactions(rc12_to_c13, r_c13_pg_n14)
+         
+         remove_reaction(rc12_to_n14) ! c12(p,g)n13(e+nu)c13(p,g)n14

@@ -1,0 +1,9 @@
+To (re)build eos tables:
+
+cd eosDT_builder
+./rn
+./build_4_export
+cd ..
+./replace_DTdata
+
+repeat for PT

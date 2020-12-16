@@ -1,0 +1,128 @@
+# This is the makefile for the mesa atm library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = \
+   atm_def.f90 \
+   atm_lib.f90 \
+   atm_t_tau_uniform.f90 \
+   atm_t_tau_varying.f90 \
+   atm_t_tau_relations.f90 \
+   atm_irradiated.f90 \
+   atm_table.f90 \
+   atm_utils.f90 \
+   table_atm.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = eos kap chem $(LIBS_MESA_NUMERICS)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lkap -lchem $(LOAD_MESA_NUMERICS)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libatm.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else	   
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif	
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) atm_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) atm_lib.mod $(MESA_DIR)/include
+ifeq ($(FC),ifort)
+	@$(CP_IF_NEWER) atm_utils.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) atm_t_tau_uniform.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) atm_t_tau_varying.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) atm_t_tau_relations.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) atm_table.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) atm_irradiated.mod $(MESA_DIR)/include
+endif
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY)
+#COMPILE = $(COMPILE_TO_TEST)
+
+#COMPILE = $(COMPILE_NO_OPENMP_NO_OPT)
+
+COMPILE_CMD = $(COMPILE) $(FCfree)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR) 
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.dek $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

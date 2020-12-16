@@ -1,0 +1,92 @@
+# This is the makefile for testing the mesa eos_plotter library
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+EOS_PLOTTER_SRCS = eos_plotter.f90
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_OTHER = net eos kap rates chem $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lnet -leos -lkap -lrates -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# TARGETS
+
+EOS_PLOTTER = ../plotter
+
+EOS_PLOTTER_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(EOS_PLOTTER_SRCS)))
+
+all: $(EOS_PLOTTER)
+
+$(EOS_PLOTTER) : $(EOS_PLOTTER_OBJS) $(DEPS_OTHER)
+
+$(EOS_PLOTTER) : OBJS = $(EOS_PLOTTER_OBJS)
+
+$(EOS_PLOTTER) :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER) $(LDFLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER) $(LDFLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(EOS_PLOTTER) *.smod
+
+install:
+	@:
+
+#################################################################
+#
+# COMPILATION RULES
+
+MY_FC_FLAGS = $(FCfree)
+
+%.o: %.f90
+ifneq ($(QUIET),)
+	@echo FC $<
+	@$(FC) $(FCbasic) $(MY_FC_FLAGS) -I$(MESA_INCLUDE_DIR) -c $<
+else
+	$(FC) $(FCbasic) $(MY_FC_FLAGS) -I$(MESA_INCLUDE_DIR) -c $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = ../src
+
+vpath %.f90 $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif
+

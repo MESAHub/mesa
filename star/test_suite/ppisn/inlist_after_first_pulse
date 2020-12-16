@@ -1,0 +1,16 @@
+
+&star_job
+
+/ !end of star_job namelist
+
+
+&controls
+    !inlist is currently unused, things can be added here
+    !to be loaded after the first pulse begins
+    max_years_for_timestep = 10d0
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

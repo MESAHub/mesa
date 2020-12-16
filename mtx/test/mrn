@@ -1,0 +1,2 @@
+#mpirun -machinefile $PBS_NODEFILE -np $1 ./test_mpi
+mpirun -np $1 ./test_mpi

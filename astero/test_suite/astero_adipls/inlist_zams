@@ -1,0 +1,118 @@
+! inlist_zams - stops when reach Lnuc_div_L_zams_limit
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      create_pre_main_sequence_model = .true.
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'zams.mod'
+      required_termination_code_string = 'Lnuc_div_L_zams_limit'
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+
+&kap
+   kap_file_prefix = 'gs98'
+   Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+
+      x_ctrl(1) = -1d0 ! target frequency
+
+      initial_mass = 1.2
+      initial_z = 0.02
+      
+      stop_near_zams = .true.
+      Lnuc_div_L_zams_limit = 0.9d0
+      
+      ! limit max_model_number as part of test_suite
+      max_model_number = 10000
+      
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 50
+   
+      !photo_interval = 1
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+      
+! FOR DEBUGGING
+
+      !report_hydro_solver_progress = .true. ! set true to see info about newton iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
+
+      ! hydro debugging
+      !hydro_check_everything = .true.
+      !hydro_inspectB_flag = .true.
+      !hydro_sizequ_flag = .true.
+      
+      ! for making logs, uncomment hydro_dump_call_number plus the following
+      ! to make residual logs, uncomment hydro_sizequ_flag
+      ! to make correction logs, uncomment hydro_inspectB_flag
+      ! to make jacobian logs, uncomment hydro_numerical_jacobian, hydro_save_numjac_plot_data
+      ! to do dfridr test, uncomment hydro_get_a_numerical_partial, hydro_test_partials_k,
+      !     hydro_numerical_jacobian, hydro_save_numjac_plot_data, hydro_dump_iter_number
+         
+      !hydro_get_a_numerical_partial = 1d-4
+      !hydro_test_partials_k = 1
+      !hydro_numerical_jacobian = .true.
+      !hydro_save_numjac_plot_data = .true.
+      !hydro_dump_call_number = 752
+      !hydro_dump_iter_number = 50
+      
+      !hydro_epsder_struct = 1d-6
+      !hydro_epsder_chem = 1d-6
+      !hydro_save_photo = .true. ! Saves a photo when hydro_call_number = hydro_dump_call_number -1
+
+      !fill_arrays_with_NaNs = .true.
+      
+      !max_years_for_timestep = 3.67628942044319d-05
+
+      !report_why_dt_limits = .true.
+      !report_all_dt_limits = .true.
+      !report_hydro_dt_info = .true.
+      !report_dX_nuc_drop_dt_limits = .true.
+      !report_bad_negative_xa = .true.
+      
+      !show_mesh_changes = .true.
+      !mesh_dump_call_number = 5189
+      !okay_to_remesh = .false.
+      
+      !trace_evolve = .true.
+
+      !trace_newton_bcyclic_solve_input = .true. ! input is "B" j k iter B(j,k)
+      !trace_newton_bcyclic_solve_output = .true. ! output is "X" j k iter X(j,k)
+
+      !trace_newton_bcyclic_matrix_input = .true.
+      !trace_newton_bcyclic_matrix_output = .true.
+      
+      !trace_newton_bcyclic_steplo = 1 ! 1st model number to trace
+      !trace_newton_bcyclic_stephi = 1 ! last model number to trace
+      
+      !trace_newton_bcyclic_iterlo = 2 ! 1st newton iter to trace
+      !trace_newton_bcyclic_iterhi = 2 ! last newton iter to trace
+      
+      !trace_newton_bcyclic_nzlo = 1 ! 1st cell to trace
+      !trace_newton_bcyclic_nzhi = 10000 ! last cell to trace; if < 0, then use nz as nzhi
+      
+      !trace_newton_bcyclic_jlo = 1 ! 1st var to trace
+      !trace_newton_bcyclic_jhi = 100 ! last var to trace; if < 0, then use nvar as jhi
+      
+      !trace_k = 0
+      !write_header_frequency = 50
+
+/ ! end of controls namelist
+

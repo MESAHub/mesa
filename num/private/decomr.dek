@@ -1,0 +1,352 @@
+      subroutine decomr(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,
+     &            m1,m2,nm1,fac1,e1_1D,lde1,ip1,ak,ier,ijob,calhes,iphes,
+     &            mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
+     &            decsol,decsols,decsolblk,
+     &            caller_id,nvar,nz,lblk1,dblk1,ublk1,uf_lblk1,uf_dblk1,uf_ublk1,
+     &            sparse_jac,nzmax,isparse,ia,ja,sa,
+     &            lrd,rpar_decsol,lid,ipar_decsol)
+      use mtx_lib,only:find_loc_in_sparse      
+      implicit none !real*8 (a-h,o-z)
+      interface
+#include "mtx_decsol.dek"
+#include "mtx_decsols.dek"
+#include "mtx_decsolblk.dek"
+      end interface
+      integer, intent(in) :: caller_id, nvar, nz
+      real(dp), dimension(:), pointer, intent(inout) :: lblk1, dblk1, ublk1 ! =(nvar,nvar,nz)
+      real(dp), dimension(:), pointer, intent(inout) :: uf_lblk1, uf_dblk1, uf_ublk1 ! =(nvar,nvar,nz)
+      integer :: ia(:) ! (n+1)
+      integer :: ja(:) ! (nzmax)
+      integer :: n, ldjac, ldmas, mlmas, mumas, m1, m2, nm1, lde1, ier, ijob
+      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lrd, lid
+      real(dp) :: sparse_jac(:) ! (nzmax)
+      real(dp) :: sa(:) ! (nzmax)
+      real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+      integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+      real(dp) :: fac1
+      real(dp) :: fjac(ldjac,n), fmas(ldmas,nm1)
+      logical :: calhes
+      integer :: iphes(n)
+      integer, pointer :: ip1(:) ! (nm1)
+      real(dp), pointer :: e1_1D(:) ! =(lde1,nm1)
+      real(dp), pointer :: ak(:)
+
+      ! LOCALS
+      integer :: j, i, k, jm1, mm, ib, hint
+      real(dp) :: sum
+      real(dp), pointer :: e1_2D(:,:)
+      real(dp), pointer, dimension(:,:,:) :: lblk, dblk, ublk
+      real(dp), pointer, dimension(:,:,:) :: uf_lblk, uf_dblk, uf_ublk
+      
+      e1_2D(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
+      
+      !write(*,*) 'decomr ijob', ijob
+      
+      ier = 0
+      if (nvar > 0) then
+         k = 1
+         dblk(1:nvar,1:nvar,1:nz) => dblk1(1:nvar*nvar*nz)
+         ublk(1:nvar,1:nvar,1:nz) => ublk1(1:nvar*nvar*nz)
+         lblk(1:nvar,1:nvar,1:nz) => lblk1(1:nvar*nvar*nz)
+         uf_dblk(1:nvar,1:nvar,1:nz) => uf_dblk1(1:nvar*nvar*nz)
+         uf_ublk(1:nvar,1:nvar,1:nz) => uf_ublk1(1:nvar*nvar*nz)
+         uf_lblk(1:nvar,1:nvar,1:nz) => uf_lblk1(1:nvar*nvar*nz)
+         do k=1,nz
+            do j=1,nvar
+               do i=1,nvar
+                  dblk(i,j,k) = -uf_dblk(i,j,k)
+                  ublk(i,j,k) = -uf_ublk(i,j,k)
+                  lblk(i,j,k) = -uf_lblk(i,j,k)
+               end do
+               dblk(j,j,k) = dblk(j,j,k) + fac1
+            end do
+         end do
+!         do j=1,nvar
+!            do i=1,nvar
+!               write(*,'(a30,2i4,e26.16)') 'input dblk(i,j,k)', i, j, dblk(i,j,k)
+!            end do
+!         end do
+!         write(*,*) 
+         call decsolblk(
+     &      0,caller_id,nvar,nz,lblk1,dblk1,ublk1,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+!         do j=1,nvar
+!            do i=1,nvar
+!               write(*,'(a30,2i4,e26.16)') 'factored dblk(i,j,k)', i, j, dblk(i,j,k)
+!            end do
+!         end do
+!         write(*,*) 
+         return
+      end if
+      
+      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+c
+c -----------------------------------------------------------
+c
+   1  continue
+c ---  b=identity, jacobian a full matrix
+!      do j=1,n
+!         do i=1,n
+!            write(*,'(a30,2i4,e26.16)') 'input fjac(i,j)', i, j, fjac(i,j)
+!         end do
+!      end do
+!      write(*,*) 'fac1', fac1
+      do j=1,n
+         do  i=1,n
+            e1_2D(i,j)=-fjac(i,j)
+         end do
+         e1_2D(j,j)=e1_2D(j,j)+fac1
+      end do
+!      do j=1,n
+!         do i=1,n
+!            write(*,'(a30,2i4,e26.16)') 'input e1(i,j)', i, j, e1_2D(i,j)
+!         end do
+!      end do
+!      write(*,*) 
+      call decsol(0,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+!      do j=1,n
+!         do i=1,n
+!            write(*,'(a30,2i4,e26.16)') 'factored e1(i,j)', i, j, e1_2D(i,j)
+!         end do
+!      end do
+!      write(*,*) 
+      return
+c
+c -----------------------------------------------------------
+c
+   8  continue
+c ---  b=identity, jacobian a sparse matrix
+      do j=1,nzmax
+         sa(j) = -sparse_jac(j)
+      end do
+      do j=1,n
+         do k=ia(j),ia(j+1)-1
+            i = ja(k)
+            if (i == j) then
+               sa(k) = sa(k) + fac1
+               exit
+            end if
+         end do
+      end do
+      !write(*,*) 'decomr call decsols'
+      call decsols(0,n,nzmax,ia,ja,sa,ak,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      !write(*,*) 'back decsols'
+      return
+c
+c -----------------------------------------------------------
+c
+  11  continue
+c ---  b=identity, jacobian a full matrix, second order
+      do j=1,nm1
+         jm1=j+m1
+         do i=1,nm1
+            e1_2D(i,j)=-fjac(i,jm1)
+         end do
+         e1_2D(j,j)=e1_2D(j,j)+fac1
+      end do
+ 45   mm=m1/m2
+      do j=1,m2
+         do i=1,nm1
+            sum=0.d0
+            do k=0,mm-1
+               sum=(sum+fjac(i,j+k*m2))/fac1
+            end do
+            e1_2D(i,j)=e1_2D(i,j)-sum
+         end do
+      end do
+      call decsol(0,nm1,lde1,e1_1D,nm1,nm1,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   2  continue
+c ---  b=identity, jacobian a banded matrix
+      do j=1,n
+         do i=1,mbjac
+            e1_2D(i+mle,j)=-fjac(i,j)
+         end do
+         e1_2D(mdiag,j)=e1_2D(mdiag,j)+fac1
+      end do
+      call decsol(0,n,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  12  continue
+c ---  b=identity, jacobian a banded matrix, second order
+      do j=1,nm1
+         jm1=j+m1
+         do i=1,mbjac
+            e1_2D(i+mle,j)=-fjac(i,jm1)
+         end do
+         e1_2D(mdiag,j)=e1_2D(mdiag,j)+fac1
+      end do
+  46  mm=m1/m2
+      do j=1,m2
+         do i=1,mbjac
+            sum=0.d0
+            do k=0,mm-1
+               sum=(sum+fjac(i,j+k*m2))/fac1
+            end do
+            e1_2D(i+mle,j)=e1_2D(i+mle,j)-sum
+         end do
+      end do
+
+      if (.false.) then
+      write(*,*) 'm2', m2
+      write(*,*) 'mm', mm
+      write(*,*) 'fjac(i,1)'
+      do i=1,ldjac
+         write(*,*) i, fjac(i,1)
+      end do
+      write(*,*) 'e1_2D(i,1)'
+      do i=1,lde1
+         write(*,*) i, e1_2D(i,1)
+      end do
+      stop
+      end if
+      
+      
+      call decsol(0,nm1,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   3  continue
+c ---  b is a banded matrix, jacobian a full matrix
+      do j=1,n
+         do i=1,n
+            e1_2D(i,j)=-fjac(i,j)
+         end do
+         do i=max(1,j-mumas),min(n,j+mlmas)
+            e1_2D(i,j)=e1_2D(i,j)+fac1*fmas(i-j+mbdiag,j)
+         end do
+      end do
+      call decsol(0,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   9  continue
+c ---  b is a banded matrix, jacobian a sparse matrix
+      do j=1,nzmax
+         sa(j) = -sparse_jac(j)
+      end do
+      do j=1,n
+         hint = 0
+         do i=max(1,j-mumas),min(n,j+mlmas)
+            ! set k = location in sa for (i,j)
+            ier = 0
+            call find_loc_in_sparse(isparse,n,nzmax,ia,ja,i,j,hint,k,ier)
+            if (ier == 0) then
+               sa(k)=sa(k)+fac1*fmas(i-j+mbdiag,j)
+            else if (fmas(i-j+mbdiag,j) /= 0) then
+               return ! bad sparsity
+            else
+               ier = 0
+            end if
+            hint = k
+         end do
+      end do
+      !write(*,*) 'decomr call decsols'
+      call decsols(0,n,nzmax,ia,ja,sa,ak,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      !write(*,*) 'decomr back decsols'
+      return
+c
+c -----------------------------------------------------------
+c
+  13  continue
+c ---  b is a banded matrix, jacobian a full matrix, second order
+      do j=1,nm1
+         jm1=j+m1
+         do i=1,nm1
+            e1_2D(i,j)=-fjac(i,jm1)
+         end do
+         do i=max(1,j-mumas),min(nm1,j+mlmas)
+            e1_2D(i,j)=e1_2D(i,j)+fac1*fmas(i-j+mbdiag,j)
+         end do
+      end do
+      goto 45
+c
+c -----------------------------------------------------------
+c
+   4  continue
+c ---  b is a banded matrix, jacobian a banded matrix
+      do j=1,n
+         do i=1,mbjac
+            e1_2D(i+mle,j)=-fjac(i,j)
+         end do
+         do i=1,mbb
+            ib=i+mdiff
+            e1_2D(ib,j)=e1_2D(ib,j)+fac1*fmas(i,j)
+         end do
+      end do
+      call decsol(0,n,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  14  continue
+c ---  b is a banded matrix, jacobian a banded matrix, second order
+      do j=1,nm1
+         jm1=j+m1
+         do i=1,mbjac
+            e1_2D(i+mle,j)=-fjac(i,jm1)
+         end do
+         do i=1,mbb
+            ib=i+mdiff
+            e1_2D(ib,j)=e1_2D(ib,j)+fac1*fmas(i,j)
+         end do
+      end do
+
+      if (.false.) then
+      write(*,*) 'decomr ijob 14'
+      write(*,*) 'nm1', nm1
+      write(*,*) 'mbjac', m1
+      write(*,*) 'fac1', mbjac
+      write(*,*) 'mle', mle
+      write(*,*)
+      end if
+
+
+
+      goto 46
+c
+c -----------------------------------------------------------
+c
+   5  continue
+c ---  b is a full matrix, jacobian a full matrix
+      do j=1,n
+         do i=1,n
+            e1_2D(i,j)=fmas(i,j)*fac1-fjac(i,j)
+         end do
+      end do
+      call decsol(0,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  15  continue
+c ---  b is a full matrix, jacobian a full matrix, second order
+      do j=1,nm1
+         jm1=j+m1
+         do i=1,nm1
+            e1_2D(i,j)=fmas(i,j)*fac1-fjac(i,jm1)
+         end do
+      end do
+      goto 45
+c
+c -----------------------------------------------------------
+c
+   6  continue
+c ---  b is a full matrix, jacobian a banded matrix
+c ---  this option is not provided
+      return
+c
+c -----------------------------------------------------------
+c
+  55  continue
+       write(*,*) 'decomr: invalid ijob', ijob
+       call mesa_error(__FILE__,__LINE__) ! decomr
+      end subroutine decomr
+c
+c ***********************************************************

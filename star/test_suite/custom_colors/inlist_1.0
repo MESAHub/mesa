@@ -1,0 +1,211 @@
+! Note this inlist is only for demonstrating how to use the colors module.
+! The underlying stellar model is arbitrary and settings in star_job and controls
+! inlists are the bare minimum needed to run a model.
+
+&star_job
+
+      create_pre_main_sequence_model = .true.
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'custom_colors_end.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+
+      !pgstar_flag = .true.
+
+      !Custom colors stuff, works better with pgstar_flag=.true.
+
+      history_columns_file = 'custom_colors_history_columns.list'
+      
+      color_num_files=3
+      
+      !Default color file
+      color_file_names(1)='lcb98cor.dat'
+      color_num_colors(1)=11 
+      
+      !custom file its a blackbody v band value
+      color_file_names(2)='data/blackbody_bc_v.txt'
+      color_num_colors(2)=1    
+
+      ! File for extinction color corrections, note this is defined in T, log g, Av (not Fe/H as the bc's are)
+      ! So see run_star_extras on how to compute this 
+      ! Never use fake_av_v.txt for real, its made up numbers!
+      color_file_names(3)='data/fake_av_v.txt'
+      color_num_colors(3)=1 
+
+      !Set an estimated Av value
+      extras_lrpar = 1
+      extras_rpar(1) = 0.58d0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      show_log_description_at_start = .false. 
+
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.014d0
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 2000
+
+      initial_mass = 1.0d0
+      initial_z = 0.014d0
+      
+      xa_central_lower_limit_species(1) = 'h1'
+      xa_central_lower_limit(1) = 0.1d0
+      
+
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 50
+
+/ ! end of controls namelist
+
+&pgstar
+         pgstar_interval = 1
+
+!# Color Magnitude Panels
+   ! Plots either color-color, color-magnitude, magnitude-color or magnitude-magnitude
+
+      !### Color_magnitude1
+
+         Color_magnitude1_win_flag = .true.
+
+         Color_magnitude1_win_width = 6
+         Color_magnitude1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+         Color_magnitude1_xleft = 0.15
+         Color_magnitude1_xright = 0.85
+         Color_magnitude1_ybot = 0.15
+         Color_magnitude1_ytop = 0.85
+         Color_magnitude1_txt_scale = 1.0
+         Color_magnitude1_title = 'Color_magnitude1'
+
+         ! setup default
+         Color_magnitude1_num_panels = 2
+
+         ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
+         Color_magnitude1_xaxis1_name = 'model_number'
+         Color_magnitude1_xaxis2_name = ''
+
+
+         ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
+         Color_magnitude1_yaxis1_name(1) = 'bc_B'
+         Color_magnitude1_yaxis2_name(1) = 'bc_U'
+         Color_magnitude1_yaxis_reversed(1) = .false.
+         
+         ! Plots `other_yaxis1-other_yaxis2` leave `other_yaxis2` blank if you only want to plot `other_yaxis1`.
+         Color_magnitude1_other_yaxis1_name(1) = 'abs_mag_V'
+         Color_magnitude1_other_yaxis2_name(1) = ''
+         Color_magnitude1_other_yaxis_reversed(1) = .true.
+
+
+         Color_magnitude1_yaxis1_name(2) = 'bc_B'
+         Color_magnitude1_other_yaxis1_name(2) = 'bc_U'
+         
+         ! Enables calling a subroutine to add extra information to a plot
+         ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
+         Color_magnitude1_use_decorator = .true.
+
+         ! file output
+         Color_magnitude1_file_flag = .false.
+         Color_magnitude1_file_dir = 'png'
+         Color_magnitude1_file_prefix = 'Color_magnitude1_'
+         Color_magnitude1_file_interval = 5 ! output when `mod(model_number,Color_magnitude1_file_interval)==0`
+         Color_magnitude1_file_width = -1 ! (inches) negative means use same value as for window
+         Color_magnitude1_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+      !### Color_magnitude2
+
+         Color_magnitude2_win_flag = .true.
+
+         Color_magnitude2_win_width = 6
+         Color_magnitude2_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+         Color_magnitude2_xleft = 0.15
+         Color_magnitude2_xright = 0.85
+         Color_magnitude2_ybot = 0.15
+         Color_magnitude2_ytop = 0.85
+         Color_magnitude2_txt_scale = 1.0
+         Color_magnitude2_title = 'Color_magnitude2'
+
+         ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
+         Color_magnitude2_xaxis1_name = 'abs_mag_B'
+         Color_magnitude2_xaxis2_name = 'abs_mag_U'
+
+         ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
+         Color_magnitude2_yaxis1_name(1) = 'abs_mag_R'
+         Color_magnitude2_yaxis2_name(1) = 'abs_mag_J'
+
+         ! setup default
+         Color_magnitude2_num_panels = 1
+         ! file output
+         Color_magnitude2_file_flag = .false.
+         Color_magnitude2_file_dir = 'png'
+         Color_magnitude2_file_prefix = 'Color_magnitude2_'
+         Color_magnitude2_file_interval = 5 ! output when `mod(model_number,Color_magnitude2_file_interval)==0`
+         Color_magnitude2_file_width = -1 ! (inches) negative means use same value as for window
+         Color_magnitude2_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+      !### Color_magnitude3
+
+         Color_magnitude3_win_flag = .true.
+
+         Color_magnitude3_win_width = 6
+         Color_magnitude3_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+         Color_magnitude3_xleft = 0.15
+         Color_magnitude3_xright = 0.85
+         Color_magnitude3_ybot = 0.15
+         Color_magnitude3_ytop = 0.85
+         Color_magnitude3_txt_scale = 1.0
+         Color_magnitude3_title = 'Color_magnitude3'
+
+         ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
+         Color_magnitude3_xaxis1_name = 'model_number'
+         Color_magnitude3_xaxis2_name = ''
+
+         ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
+         Color_magnitude3_yaxis1_name(1) = 'bc_v_bb'
+         
+         Color_magnitude3_other_yaxis1_name(1) = 'av_v'
+         
+         
+
+         ! setup default
+         Color_magnitude3_num_panels = 1
+         ! file output
+         Color_magnitude3_file_flag = .false.
+         Color_magnitude3_file_dir = 'png'
+         Color_magnitude3_file_prefix = 'Color_magnitude3_'
+         Color_magnitude3_file_interval = 5 ! output when `mod(model_number,Color_magnitude3_file_interval)==0`
+         Color_magnitude3_file_width = -1 ! (inches) negative means use same value as for window
+         Color_magnitude3_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+         
+   
+/ ! end of pgstar namelist

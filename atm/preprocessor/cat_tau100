@@ -1,0 +1,6 @@
+cd atm_data
+cat 100_Zp00_header.txt tau100_Pgas.data tau100_T.data > 100_Zp00.tbl
+cat 10_Zp00_header.txt tau10_Pgas.data tau10_T.data > 10_Zp00.tbl
+cat 1_Zp00_header.txt tau1_Pgas.data tau1_T.data > 1_Zp00.tbl
+cat 1m1_Zp00_header.txt tau1m1_Pgas.data tau1m1_T.data > 1m1_Zp00.tbl
+echo "done"

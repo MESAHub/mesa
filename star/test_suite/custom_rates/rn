@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+# set MESA_RUN_OPTIONAL to run all parts of test
+if [ -n "$MESA_RUN_OPTIONAL" ]; then
+    do_one inlist_core_header he_core.mod LOGS_core
+    do_one inlist_make_he_wd_header he_wd.mod LOGS_make_he_wd
+    do_one inlist_cool_header he_wd_cooled.mod LOGS_cool_he_wd
+    do_one inlist_NCO_hashimoto_header before_flash.mod LOGS_NCO
+fi
+
+do_one inlist_NCO_flash_header final.mod LOGS_NCO_flash
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished all inlists for custom_rates'

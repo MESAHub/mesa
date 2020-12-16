@@ -1,0 +1,2 @@
+cd make; make clean; cd ..
+cd test/make; make clean

@@ -1,0 +1,12 @@
+
+&astero_search_controls
+
+   oscillation_code = 'adipls'
+   do_redistribute_mesh = .true.
+         ! note: number of zones for redistribute is set in the redistrb.c input file
+
+/ ! end astero_search_controls
+   
+
+&astero_pgstar_controls
+/ ! end astero_pgstar_controls

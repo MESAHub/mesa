@@ -1,0 +1,7 @@
+The file n14c-hr.dat contains a table with the weak reactions linking
+n14 and c14 on a finely spaced grid in density and temperature.  This
+table was provided by Gabriel Martínez-Pinedo.
+
+The file make_rate_hdf5.py is a python script that reads in this data
+file and writes it back out as an HDF5 file conforming to the format
+described in weak_rates_list.txt.

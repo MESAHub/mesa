@@ -1,0 +1,15 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+rm -rf ../data/atm_data
+check_okay
+mkdir ../data/atm_data
+check_okay
+cp atm_data/* ../data/atm_data
+check_okay

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+function do_one {
+   echo "Doing C/O Z =" $2
+   ./ckap $1 $2 -1
+	 if [ $? -ne 0 ]
+	 then
+		 exit 1
+	 fi
+   echo ""
+}
+
+do_one $1 0.000
+do_one $1 0.001
+do_one $1 0.004
+do_one $1 0.010
+do_one $1 0.020
+do_one $1 0.030
+do_one $1 0.050
+do_one $1 0.100

@@ -1,0 +1,10 @@
+# run this from eosDT_builder to create eosOPAL_data.tar.xz in the data directory
+rm -rf ../data/eosOPAL_data/cache
+cd data
+rm -rf eosOPAL_data.tar
+rm -rf eosOPAL_data.tar.xz
+echo 'tar -cvf eosOPAL_data.tar eosOPAL_data'
+tar -cvf eosOPAL_data.tar eosOPAL_data
+echo 'xz eosOPAL_data.tar'
+xz -v eosOPAL_data.tar
+cp eosOPAL_data.tar.xz ../..

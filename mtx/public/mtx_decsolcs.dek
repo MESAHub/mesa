@@ -1,0 +1,13 @@
+      subroutine decsolcs(iop,n,nzmax,ia,ja,sar,sai,br,bi,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
+         use const_def, only: dp
+         ! complex sparse matrix
+         integer, intent(in) :: iop, n, nzmax, lcd, lrd, lid
+         integer, intent(inout) :: ia(n+1), ja(nzmax)
+         real(dp), intent(inout) :: sar(nzmax), sai(nzmax)
+         real(dp), intent(inout) :: br(n), bi(n)
+         complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ierr
+      end subroutine decsolcs
+      

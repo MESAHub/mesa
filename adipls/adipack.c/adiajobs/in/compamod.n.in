@@ -1,0 +1,14 @@
+Files needed:
+Model files on units ids1 and ids2 (defaults 2 and 3)
+Output on unit 11.
+2 'amdl.l5bi.d.15'          @
+3 'amdl.l5bi.d.24'          @
+11 'damdl.l5bi.d.24-d.15'          @
+-1 ' '     @
+
+iread,ids1,ids2
+,,,,,,,,,,,                           @
+mod1,mod2,nprt
+1,1,,,,,,,,,,,,,,,,,,,,    @
+icase,iabsci,isound
+1,1,,,,,,,,,,,,,,    @

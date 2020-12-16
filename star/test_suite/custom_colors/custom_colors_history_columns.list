@@ -1,0 +1,76 @@
+! history_columns.list -- determines the contents of star history logs
+! you can use a non-standard version by setting history_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+!----------------------------------------------------------------------------------------------
+
+!# general info about the model
+
+      model_number ! counting from the start of the run
+      num_zones ! number of zones in the model
+
+   !## age
+
+      star_age ! elapsed simulated time in years since the start of the run
+
+   !## timestep
+      log_dt ! log10 time_step in years
+      
+   !## mass
+
+      star_mass ! in Msun units
+
+!----------------------------------------------------------------------------------------------
+
+!# Color output
+
+      ! Outputs the bolometric correction (bc) for the star in filter band ``filter''
+      !bc filter
+
+      ! Outputs the absolute magnitude for the star in filter band ``filter''
+      !abs_mag filter
+
+      ! Adds all the bc's to the output
+      !add_bc
+
+      ! Adds all the absolute magnitudes to the output
+      !add_abs_mag
+
+      ! Ouputs luminosity in filter band ``filter'' (lsun)
+      ! lum_band filter
+
+      ! Adds all the filter band luminosities to the output (lsun)
+      ! add_lum_band
+
+      ! Ouputs log luminosity in filter band ``filter'' (log lsun)
+      ! log_lum_band filter
+
+      ! Adds all the filter band luminosities to the output (log lsun)
+      ! add_log_lum_band
+      
+      
+      ! Note the filter names are case sensitive and must match what is used in your color
+      ! data file
+      bc V
+      bc v_bb
+      bc B
+      bc U
+      abs_mag R
+      abs_mag J
+      abs_mag V
+      abs_mag B
+      abs_mag U
+      
+      !Custom Av values are handled in the run_star_extras
+      
+
+!----------------------------------------------------------------------------------------------
+
+!# debugging
+
+      num_retries ! total during the run
+
+   !## solver iterations
+
+      num_iters ! same as num_newton_iterations

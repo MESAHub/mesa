@@ -1,0 +1,11 @@
+         ! for nelder-mead simplex minimization
+         real(dp) function fcn(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: n
+            real(dp), intent(in) :: x(:) ! (n)
+            integer, intent(in) :: lrpar, lipar
+            integer, intent(inout), pointer :: ipar(:) ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            integer, intent(in) :: op_code ! what nelder-mead is doing for this call
+            integer, intent(out) :: ierr
+         end function fcn

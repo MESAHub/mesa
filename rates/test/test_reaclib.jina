@@ -1,0 +1,41 @@
+         ! up to A=32
+
+         !  triples are Z, A_lo, A_hi
+         !  the same Z can appear multiple times if necessary
+
+         ! n
+      	0 1 1
+         ! H
+      	1 1 3
+         ! He
+      	2 3 4
+         ! Li
+      	3 6 7
+         ! Be
+      	4 7 10
+         ! B
+      	5 8 8
+      	5 10 11
+         ! C
+      	6 12 14
+         ! N
+      	7 13 16
+         ! O
+      	8 14 19
+         ! F
+      	9 17 20
+         ! Ne
+      	10 18 23
+         ! Na
+      	11 21 24
+         ! Mg
+      	12 22 27
+         ! Al
+      	13 25 28
+         ! Si
+      	14 27 32
+         ! P
+      	15 29 32
+         ! S
+      	16 31 32
+

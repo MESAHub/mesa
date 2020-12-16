@@ -1,0 +1,116 @@
+
+! note: this inlist is done after 1st doing inlist_massive_defaults
+! so can override defaults as desired.
+
+&star_job
+
+      show_log_description_at_start = .false. 
+      !show_net_species_info = .true.
+      !list_net_reactions = .true.
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'max_age'
+
+      enable_adaptive_network = .true.
+      min_x_for_keep = 1d-9
+      min_x_for_n = 1d-6
+      min_x_for_add = 1d-5
+      
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+
+&kap
+      Zbase = 0.02d0
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+      use_dedt_form_of_energy_eqn = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 100
+      
+      max_age = 6.3d6
+
+      initial_mass = 15
+      initial_z = 0.02d0
+      
+!      xa_central_lower_limit_species(1) = 'c12'
+!      xa_central_lower_limit(1) = 1d-4
+      
+      xa_central_upper_limit_species(1) = 'c12'
+      xa_central_upper_limit(1) = 0.1
+
+      mesh_delta_coeff = 2.5
+      delta_XH_cntr_limit = 1d99
+      delta_XHe_cntr_limit = 1d99
+      delta_XH_cntr_hard_limit = -1d0
+      delta_XHe_cntr_hard_limit = -1d0
+
+      photo_interval = 10
+      profile_interval = 10
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+      !report_hydro_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+
+      !report_why_dt_limits = .true.
+      !report_all_dt_limits = .true.
+      
+      !show_mesh_changes = .true.
+      !mesh_dump_call_number = 5189
+      !okay_to_remesh = .false.
+      
+      !trace_evolve = .true.
+
+      ! hydro debugging
+      !hydro_check_everything = .true.
+      !hydro_inspectB_flag = .true.
+      
+      !hydro_numerical_jacobian = .true.
+      !hydro_save_numjac_plot_data = .true.
+      !small_mtx_decsol = 'lapack'
+      !large_mtx_decsol = 'lapack'
+      !hydro_dump_call_number = 1
+      
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+!pause = .true.
+         
+Profile_Panels1_xmax = 2.1 ! -101d0 ! only used if /= -101d0
+Abundance_xmax = 2.1 ! -101 ! only used if /= -101d0
+
+/ ! end of pgstar namelist

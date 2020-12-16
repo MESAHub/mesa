@@ -1,0 +1,18 @@
+      subroutine my_getf2_95(m, a, lda, ipiv, sfmin, info)
+         use my_lapack95_dble, only: my_getf2
+         integer :: info, lda, m
+         integer :: ipiv(:)
+         real(dp) :: a(:,:)
+         real(dp) :: sfmin
+         call my_getf2(m, a, lda, ipiv, sfmin, info)
+      end subroutine my_getf2_95
+
+      subroutine my_getrs_95( n, nrhs, a, lda, ipiv, b, ldb, info )
+         use my_lapack95_dble, only: my_getrs
+         integer :: info, lda, ldb, n, nrhs
+         integer, pointer :: ipiv(:)
+         real(dp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
+         call my_getrs( n, nrhs, a, lda, ipiv, b, ldb, info )
+      end subroutine my_getrs_95
+      
+      

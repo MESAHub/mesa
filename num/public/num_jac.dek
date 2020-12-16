@@ -1,0 +1,18 @@
+      subroutine jac(n, x, h, y, f, dfdy, ldfy, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: n, ldfy, lrpar, lipar
+         real(dp), intent(in) :: x, h
+         real(dp), intent(inout) :: y(:) ! (n)
+         real(dp), intent(inout) :: f(:) ! (n) ! dy/dx
+         real(dp), intent(inout) :: dfdy(:,:) ! (ldfy, n)
+            ! dense: dfdy(i, j) = partial f(i) / partial y(j)
+            ! banded: dfdy(i-j+mujac+1, j) = partial f(i) / partial y(j)
+               ! uses rows 1 to mljac+mujac+1 of dfdy.
+               ! The j-th column of the square matrix is stored in the j-th column of the
+               ! array dfdy as follows:
+               ! dfdy(mujac+1+i-j, j) = partial f(i) / partial y(j)
+               ! for max(1, j-mujac)<=i<=min(N, j+mljac)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr ! nonzero means terminate integration
+      end subroutine jac

@@ -1,0 +1,11 @@
+&controls
+
+      always_use_eps_grav_form_of_energy_eqn = .true.
+
+! turn off energy error related things
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
+      max_abs_rel_run_E_err = 1d99
+      warn_when_large_rel_run_E_err = 1d99
+
+/

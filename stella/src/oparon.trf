@@ -1,0 +1,56 @@
+-- Rosseland Opacity from Eastman Happa
+-- URSOS must be called prior to every call of OPACIT !
+-- this routine perturbs Happal, so must be called before HAPPA !
+_Define
+     @Cappa "SUMdwn=0.d0;
+             SUMup=0.d0;
+             Tp=@Tp;
+             call HAPPA;
+             _Do L=1,Nfreq;
+                SUMdwn=SUMdwn+BLACKD(L,@TP)*Weight(L);
+                SUMup=SUMup+BLACKD(L,@TP)*Weight(L)/HAPPAL(L);
+             _od;
+             CapRos=Sumdwn/(Sumup*UR*Urho);
+--             If (Tp<TpDust) CapRos=CapRos+DustK*(TpDust-Tp)**2;
+             ";
+
+Subroutine Opacit;
+Implicit real*8 (a-h,o-z);
+-- "Dust" added already in HAPPA!!!
+-- Parameter(DUSTK=1.d2,
+--          TpDust=0.032d0); 
+--Parameter(DUSTK=1.d1, -- coefficient for 'dust' kappa in units (cm**2/g)*UTp**2
+  --        TpDust=0.032d0); -- temperature for transition to "dust" kappa
+_include snrad;
+_include opacity;
+ dimension SaveHappal(Nfreq);
+_include black;
+
+_Define @TP Tp ;
+@Cappa; 
+Cappa=CapRos;
+do Lfr=1,Nfreq;
+  SaveHappal(Lfr)=HAPPAL(Lfr);
+enddo;
+
+TpOld=Tp; Xeold=Xe;
+DTp=TpOld*Delta;
+Xe=Xeold+XeT*DTp;
+_Define @TP "Tp+DTp";
+@Cappa; 
+CapT=(CapRos-Cappa)/DTp;
+PlOld=Pl;
+
+Pl=Pl*(1.d0+Delta);
+Xe=Xeold+XePL*Delta;
+_Define @TP TpOld ;
+@Cappa; CapPl=(CapRos-Cappa)/Delta;
+
+Pl=Plold; Xe=Xeold;  
+
+do Lfr=1,Nfreq;
+  HAPPAL(Lfr)=SaveHappal(Lfr);  -- restore HAPPAL
+enddo;
+
+return;
+end;

@@ -1,0 +1,76 @@
+      subroutine null_decsol(iop,n,ndim,a,ml,mu,b,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         integer, intent(in) :: iop, n, ndim, lrd, lid, ml, mu
+         integer, intent(inout), pointer :: ip(:) ! (n)
+         real(dp), intent(inout), pointer :: a(:) ! =(ndim,n)
+         real(dp), intent(inout), pointer :: b(:) ! (n)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ier
+         ier = -1
+      end subroutine null_decsol
+
+
+      subroutine null_decsolblk(iop,caller_id,nvar,nz,lblk,dblk,ublk,brhs,ipiv,lrd,rpar_decsol,lid,ipar_decsol,ierr)
+         integer, intent(in) :: caller_id, iop, nvar, nz, lrd, lid
+         integer, pointer, intent(inout) :: ipiv(:) ! =(nvar,nz)
+         real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+         real(dp), pointer, intent(inout)  :: brhs(:) ! =(nvar,nz)     
+         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
+         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ierr
+         ierr = -1
+      end subroutine null_decsolblk
+
+
+      subroutine null_decsolblk_quad(iop,caller_id,nvar,nz,lblk,dblk,ublk,brhs,ipiv,lrd,rpar_decsol,lid,ipar_decsol,ierr)
+         integer, intent(in) :: caller_id, iop, nvar, nz, lrd, lid
+         integer, pointer, intent(inout) :: ipiv(:) ! =(nvar,nz)
+         real(qp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+         real(qp), pointer, intent(inout)  :: brhs(:) ! =(nvar,nz)     
+         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
+         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ierr
+         ierr = -1
+      end subroutine null_decsolblk_quad
+
+
+      subroutine null_decsolc(iop,n,ndim,ar,ai,ml,mu,br,bi,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         integer, intent(in) :: iop, n, ndim, lcd, lrd, lid, ml, mu
+         integer, intent(inout) :: ip(n)
+         real(dp), intent(inout) :: ar(ndim,n), ai(ndim,n)
+         real(dp), intent(inout) :: br(n), bi(n)
+         complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ier
+         ier = -1
+      end subroutine null_decsolc
+
+
+      subroutine null_decsolcs(iop,n,nzmax,ia,ja,sar,sai,br,bi,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         integer, intent(in) :: iop, n, nzmax, lcd, lrd, lid
+         integer, intent(inout) :: ia(n+1), ja(nzmax)
+         real(dp), intent(inout) :: sar(nzmax), sai(nzmax)
+         real(dp), intent(inout) :: br(n), bi(n)
+         complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ier
+         ier = -1
+      end subroutine null_decsolcs
+
+
+      subroutine null_decsols(iop,n,nzmax,ia,ja,sa,b,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         integer, intent(in) :: iop, n, nzmax, lrd, lid
+         integer, intent(inout) :: ia(:) ! (n+1)
+         integer, intent(inout) :: ja(:) ! (nzmax)
+         real(dp), intent(inout) :: sa(:) ! (nzmax)
+         real(dp), intent(inout) :: b(:) ! (n)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ier
+         ier = -1
+      end subroutine null_decsols
+
+
+

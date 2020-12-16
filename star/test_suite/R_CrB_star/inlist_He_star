@@ -1,0 +1,31 @@
+&star_job
+
+      create_pre_main_sequence_model = .true.
+      pre_ms_relax_to_start_radiative_core = .false.
+      pre_ms_relax_num_steps = 100
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'He_star.mod'
+      required_termination_code_string = 'he_layer_mass_lower_limit'
+
+      !pgstar_flag = .true.
+
+/ !end of star_job namelist
+
+&controls
+
+      ! stop once the He layer is the max mass of a He WD
+      he_layer_mass_lower_limit = 0.45
+      
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1000
+
+      ! relax timestep constraint; these are stellar engineering phases
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
+
+      ! update nzhi inlist
+      ! used in updating envelope composition
+      x_logical_ctrl(1) = .true.
+
+/ ! end of controls namelist

@@ -1,0 +1,40 @@
+
+&star_job
+
+/ !end of star_job namelist
+
+
+&controls
+   use_other_wind = .false.
+
+   !use_ODE_var_eqn_pairing = .true.      
+   use_dPrad_dm_form_of_T_gradient_eqn = .true.
+   use_momentum_outer_BC = .true.
+   
+   use_split_merge_amr = .true.
+   !use_split_merge_amr = .false.
+   !okay_to_remesh = .false.
+
+   !v_drag is set in run_star_extras
+   !q_for_v_drag_full_off = 0.98d0
+   !q_for_v_drag_full_on = 0.99d0
+   !v_drag is set in run_star_extras
+   q_for_v_drag_full_off = 2d0
+   q_for_v_drag_full_on = 2d0
+
+   max_surface_cell_dq = 1d0
+   split_merge_amr_dq_min = 1d-16
+
+   angsmt_D_ST = 0d0
+   angsmt_nu_ST = 0d0
+
+   max_mdot_redo_cnt = 0
+
+   restore_mesh_on_retry = .true.
+   num_steps_to_hold_mesh_after_retry = 5
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

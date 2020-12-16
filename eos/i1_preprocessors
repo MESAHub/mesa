@@ -1,0 +1,29 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		pwd
+		echo "build FAILED"
+		echo
+		exit 1
+	fi
+}
+
+function do1 {
+   cd $1
+   pwd
+   mkdir -p run
+   cd make
+   make ../ceos
+   check_okay
+   cd ../..
+}
+
+do1 eosDT_builder
+
+do1 eosPT_builder
+
+do1 eosSCVH_PT_builder
+

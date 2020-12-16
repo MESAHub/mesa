@@ -1,0 +1,378 @@
+
+      subroutine isolve(
+     >      which_solver, n, fcn, x, y, xend, 
+     >     
+     >      ! step info     
+     >      h, max_step_size, max_steps, 
+     >     
+     >      ! tolerances     
+     >      rtol, atol, itol, y_min, y_max, 
+     >     
+     >      ! jacobian     
+     >      jac, ijac, sjac, nzmax, isparse, mljac, mujac, 
+     >     
+     >      ! mass matrix     
+     >      mas, imas, mlmas, mumas, 
+     >     
+     >      ! step-by-step output     
+     >      solout, iout, 
+     >     
+     >      ! linear algebra routines and parameters    
+     >      decsol, decsols, decsolblk, 
+     >      lrd, rpar_decsol, lid, ipar_decsol,  
+     >     
+     >      ! nvar > 0 means use decsolblk
+     >      ! args for bcyclic_dble
+     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, 
+     >      fcn_blk_dble, jac_blk_dble,
+     >     
+     >      ! work arrays     
+     >      work, lwork, iwork, liwork, 
+     >     
+     >      ! parameters for user supplied routines     
+     >      lrpar, rpar, lipar, ipar, 
+     >     
+     >      ! output iounit and result code     
+     >      lout, idid)
+         
+         use const_def, only: dp
+         
+         integer, intent(in) :: which_solver ! as defined in num_def.f
+         
+         integer, intent(in) :: n ! the dimension of the system
+         
+         interface ! subroutine for computing the value of f(y)
+            include "num_fcn.dek"
+            include "num_fcn_blk_dble.dek"
+         end interface
+
+         real(dp), intent(inout) :: x 
+            ! input: initial x value
+            ! output: x value for which the solution has been computed.
+         real(dp), intent(inout), pointer :: y(:) ! (n) 
+            ! input: initial values for y
+            ! output: values of y for final value of x.
+         real(dp), intent(in) :: xend ! desired final x value (positive or negative)
+         real(dp), intent(inout) :: h 
+            ! input: initial step size guess
+               ! for stiff equations with initial transient, 
+               ! h=1.d0/(norm of f'), usually 1.d-3 or 1.d-5, is good.
+               ! this choice is not very important, the step size is
+               ! quickly adapted. (if h=0.d0, the code puts h=1.d-6).
+            ! output: predicted next step size from the last accepted step
+         real(dp), intent(in) :: max_step_size ! maximal step size.
+            ! max_step_size = 0 defaults to xend-x.
+         integer, intent(in) :: max_steps ! maximal number of allowed steps.
+         
+         ! absolute and relative error tolerances
+         real(dp), intent(inout) :: rtol(*) ! relative error tolerance(s)
+         real(dp), intent(inout) :: atol(*) ! absolute error tolerance(s)
+         integer, intent(in) :: itol ! switch for rtol and atol
+            ! itol=0: both rtol and atol are scalars.
+               ! error_scale for y(i) is rtol*abs(y(i))+atol
+            ! itol=1: both rtol and atol are vectors.
+               ! error_scale for y(i) is rtol(i)*abs(y(i))+atol(i).
+            ! error = sqrt(sum((yerror/error_scale)**2)/nv)
+            ! the solution is accepted if error is less than 1.
+         real(dp), intent(in) :: y_min 
+            ! trial solution rejected if any component of y < y_min
+         real(dp), intent(in) :: y_max 
+            ! trial solution rejected if any component of y > y_max
+
+         ! information about the jacobian matrix
+         interface ! subroutines for computing the jacobian
+            include "num_jac.dek" ! for dense or banded matrix
+            include "num_jac_blk_dble.dek" ! for double block tridiagonal matrix
+            include "num_sjac.dek" ! for sparse matrix
+         end interface
+         integer, intent(in) :: ijac ! switch for the computation of the jacobian:
+            ! ijac=0: jacobian is computed internally by finite differences.
+            ! ijac=1: jacobian is supplied by subroutine jac or sjac.
+         integer, intent(in) :: nzmax ! determines whether or not have sparse matrix
+            ! if nzmax == 0, matrix is not sparse and jac is called if ijac=1.
+            ! if nzmax > 0, then jacobian is sparse and nzmax is the
+               ! max size required for vectors to hold the nonzero entries in 
+               ! the factored form of the jacobian.  the routines decs and sols
+               ! are used to factor and solve the sparse matrix.
+            ! note: when nzmax > 0, you must have ijac=1, imas=0, and mljac=n. 
+         integer, intent(in) :: isparse ! format of the sparse matrix
+            ! values are defined in num_def.
+            ! choices are compressed_column_sparse or compressed_row_sparse
+         integer, intent(in) :: mljac
+            ! if mljac=n: jacobian is a full matrix.
+            ! if 0<=mljac<n: mljac is the lower bandwith of jacobian matrix
+               ! (>= number of non-zero diagonals below the main diagonal).
+         integer, intent(in) :: mujac
+            ! upper bandwith of jacobian matrix (need not be defined if mljac=n)
+               ! (>= number of non-zero diagonals above the main diagonal).
+
+         ! information about the "mass" matrix
+            ! the 1st order ODE that the code solves is of the form M*Y' = F(X, Y)
+            ! with "mass matrix" M.  In many cases, you simply have Y' = F(X, Y), 
+            ! so M is the identity matrix (i.e., explicit form for the derivatives).
+            ! However, the code can deal with arbitrary M's, even singular ones.
+            ! The only restriction is that M must be constant -- it is evaluated
+            ! once at the start of the first step and not again.
+         interface ! subroutine for computing the mass matrix
+            include "num_mas.dek"
+         end interface
+         integer, intent(in) :: imas ! gives information on the mass-matrix:
+            ! imas=0: m is supposed to be the identity matrix, mas is never called.
+            ! imas=1: mass-matrix is supplied.
+         integer, intent(in) :: mlmas
+            ! if mlmas=n: M is a full matrix. the linear
+            !  algebra is done by full-matrix gauss-elimination.
+            ! if 0<=mlmas<n: mlmas is the lower bandwith of M
+               ! (>= number of non-zero diagonals below the main diagonal).
+         integer, intent(in) :: mumas
+            ! upper bandwith of M (need not be defined if mlmas=n)
+               ! (>= number of non-zero diagonals above the main diagonal).
+         
+         interface ! subroutine called after each successful step
+            include "num_solout.dek"
+         end interface
+         ! switch for calling the subroutine solout or not
+         integer, intent(in)  :: iout ! switch for calling the subroutine solout:
+            ! iout=0: subroutine is never called
+            ! iout=1: subroutine is available for output.
+            ! iout=2: want dense output available from solout.
+         
+         ! linear algebra routines (from mtx_lib)
+         interface
+            include "mtx_decsol.dek"
+            include "mtx_decsols.dek"
+            include "mtx_decsolblk.dek"
+         end interface
+         integer, intent(in) :: lrd, lid
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         ! typically, you'll be using lapack routines for the linear algebra.
+            ! in that case, you should pass lapack_decsol for the "decsol" arg, and
+            ! pass null_decsols for the "decsols" arg (both are defined in mtx_lib).
+            ! call lapack_work_sizes to get values for lrd and lid for use with lapack_decsol.
+         ! args for bcyclic_dble_decsolblk
+         integer, intent(in) :: caller_id, nvar, nz
+         real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+         ! lblk(:,:,1) is not used; ublk(:,:,nz) is not used.
+         
+         ! work arrays.   call isolve_work_sizes to values for lwork and liwork.
+         integer, intent(in) :: lwork, liwork
+         real(dp), pointer :: work(:) ! (lwork)
+         integer, pointer :: iwork(:) ! (liwork)
+         ! NOTE: for standard use, iwork and work must be set to zero before calling.
+         ! the only exception is for sophisticated use of special parameters.
+         ! see the comments for the individual routines for info about special parameters.
+            
+         ! parameter arrays for the caller supplied routines
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+                  
+         ! io unit for warnings and errors
+         integer, intent(in)  :: lout
+            ! if lout > 0, warnings and errors are written to this io unit.
+            ! if lout <= 0, no output is produced.
+         
+         ! result code
+         integer, intent(out)  :: idid
+            ! idid =  1  computation successful, 
+            ! idid =  2  computation successful (terminated by solout)
+            ! idid = -1  input is not consistent, 
+            ! idid = -2  reached max allowed number of steps, 
+            ! idid = -3  step size becomes too small, 
+            ! idid = -4  matrix is repeatedly singular.
+            ! idid = -5  terminated by jac returning nonzero ierr.
+            ! idid = -6  terminated by fcn returning nonzero ierr.
+            ! idid = -7  illegal arg for isolve.
+            ! idid = -8  cannot satisfy given tolerances even after reducing stepsize by 1d30.
+         
+         ! statistics
+            !   iwork(14)  nfcn    number of function evaluations (those for numerical
+            !                      evaluation of the jacobian are not counted)  
+            !   iwork(15)  njac    number of jacobian evaluations (either analytically
+            !                      or numerically)
+            !   iwork(16)  nstep   number of computed steps
+            !   iwork(17)  naccpt  number of accepted steps
+            !   iwork(18)  nrejct  number of rejected steps (after at least one step
+            !                      has been accepted)
+            !   iwork(19)  ndec    number of lu-decompositions (n-dimensional matrix)
+            !   iwork(20)  nsol    number of forward-backward substitutions, of both
+            !                      systems; the nstep forward-backward substitutions, 
+            !                      needed for step size selection, are not counted
+
+         ! ****************************************************************************
+         
+         
+         integer, parameter :: isolve_error = -7, ifcn = 0, idfx = 0
+         
+         select case(which_solver)
+         case (ros2_solver)
+            call ros2(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max,
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case (rose2_solver)
+            call rose2(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max,
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case (ros3p_solver)
+            call ros3p(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max, 
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case (ros3pl_solver)
+            call ros3pl(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max, 
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case (rodas3_solver)
+            call rodas3(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max, 
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case (rodas4_solver)
+            call rodas4(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max, 
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case (rodasp_solver)
+            call rodasp(
+     >            n, fcn, ifcn, x, y, xend, h, max_step_size, max_steps, 
+     >            rtol, atol, itol, y_min, y_max, 
+     >            jac, ijac, sjac, nzmax, isparse, 
+     >            mljac, mujac, null_dfx, idfx, 
+     >            mas, imas, mlmas, mumas, 
+     >            solout, iout, 
+     >            decsol, decsols, decsolblk, 
+     >            lrd, rpar_decsol, lid, ipar_decsol,  
+     >            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >            fcn_blk_dble, jac_blk_dble,
+     >            work, lwork, iwork, liwork, 
+     >            lrpar, rpar, lipar, ipar, 
+     >            lout, idid)
+         case default
+            idid = isolve_error
+         end select
+
+      end subroutine isolve
+      
+      
+      subroutine isolve_name(which_solver, maxlen, name)
+         integer, intent(in) :: which_solver, maxlen
+         character (len=maxlen), intent(out) :: name
+         if (maxlen < 6) return
+         select case(which_solver)
+         case (ros2_solver)
+            name = 'ros2'
+         case (rose2_solver)
+            name = 'rose2'
+         case (ros3p_solver)
+            name = 'ros3p'
+         case (ros3pl_solver)
+            name = 'ros3pl'
+         case (rodas3_solver)
+            name = 'rodas3'
+         case (rodas4_solver)
+            name = 'rodas4'
+         case (rodasp_solver)
+            name = 'rodasp'
+         case default
+            name = '????'
+         end select
+      end subroutine isolve_name
+      
+      
+      ! this subroutine calculates liwork and lwork
+      subroutine isolve_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
+         integer, intent(in) :: n, nzmax, mljac, mujac, mlmas, mumas, imas
+         integer, intent(out) :: liwork, lwork
+         
+         integer :: nrdens, max_cols_exptrap, liwork1, lwork1
+         nrdens = n
+         max_cols_exptrap = 0
+         
+         liwork = 0; lwork = 0
+         
+         call ros2_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork1, lwork1)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+         call rose2_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork1, lwork1)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+         call ros3p_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+         call ros3pl_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+         call rodas3_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork1, lwork1)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+         call rodas4_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork1, lwork1)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+         call rodasp_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork1, lwork1)
+         liwork = max(liwork1, liwork); lwork = max(lwork1, lwork)
+         
+      end subroutine isolve_work_sizes

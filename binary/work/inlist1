@@ -1,0 +1,70 @@
+
+! inlist_test_rlo
+
+
+
+&star_job
+
+      mesa_dir = ''
+      show_log_description_at_start = .true.
+
+      pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+  ! eos options
+  ! see eos/defaults/eos.defaults
+
+/ ! end of eos namelist
+
+
+&kap
+  ! kap options
+  ! see kap/defaults/kap.defaults
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+/ ! end of kap namelist
+
+
+&controls
+
+      extra_terminal_output_file = 'log1' 
+      log_directory = 'LOGS1'
+
+      profile_interval = 50
+      history_interval = 1
+      terminal_interval = 1
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+      History_Panels1_win_flag = .true.
+      History_Panels1_win_width = 5
+      History_Panels1_win_aspect_ratio = 1.0 ! aspect_ratio = height/width
+      
+      History_Panels1_title = 'Orbital evolution'
+      History_Panels1_num_panels = 2
+      
+      History_Panels1_yaxis_name(1) = 'period_days'
+      History_Panels1_other_yaxis_name(1) = 'lg_mstar_dot_1' 
+      History_Panels1_yaxis_name(2) = 'Jdot' 
+      History_Panels1_other_yaxis_name(2) = 'binary_separation' 
+
+
+      History_Track1_win_flag = .true.
+      History_Track1_title = 'P vs t'
+      History_Track1_xname = 'age'
+      History_Track1_yname = 'period_days'
+      History_Track1_xaxis_label = 't (years)'
+      History_Track1_yaxis_label = 'P (days)'
+      History_Track1_log_xaxis = .false. ! show log10 of abs value
+      History_Track1_log_yaxis = .true. ! show log10 of abs value
+      History_Track1_reverse_xaxis = .false.
+      
+/ ! end of pgstar namelist

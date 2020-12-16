@@ -1,0 +1,90 @@
+
+&star_job
+      
+      show_log_description_at_start = .false. 
+
+      create_pre_main_sequence_model = .true.
+      pre_ms_T_c = 5d5
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+
+      set_uniform_initial_composition = .true.
+      initial_h1 = 0.75
+      initial_h2 = 0
+      initial_he3 = 0
+      initial_he4 = 0.25
+      initial_zfracs = 3 ! GS98_zfracs = 3
+
+
+      !pgstar_flag = .true.
+
+
+/ ! end of star_job namelist
+
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1400
+
+      initial_mass = 3
+      initial_z = 0
+
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 1d-4
+      
+      mesh_delta_coeff = 0.7
+      
+      mixing_length_alpha = 1.89
+      MLT_option = 'Henyey'
+      
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'burn_H'
+      overshoot_zone_loc(1) = 'any'
+      overshoot_bdy_loc(1) = 'top'
+      overshoot_f(1) = 0.01
+      overshoot_f0(1) = 0.005
+      
+      overshoot_scheme(2) = 'exponential'
+      overshoot_zone_type(2) = 'burn_He'
+      overshoot_zone_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'top'
+      overshoot_f(2) = 0.01
+      overshoot_f0(2) = 0.005
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 100
+      terminal_interval = 10
+      write_header_frequency = 10
+      
+      max_age = 10d9
+      max_years_for_timestep = 1d9
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+      ! top level controls
+
+         !pause = .true. 
+            ! if true, the code waits for user to enter a RETURN on the command line
+      
+
+
+/ ! end of pgstar namelist

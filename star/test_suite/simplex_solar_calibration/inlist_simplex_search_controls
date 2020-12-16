@@ -1,0 +1,9 @@
+!! point to your simplex_search_controls inlist here
+
+&simplex_search_controls 
+
+     read_extra_simplex_search_inlist1 = .true.
+     extra_simplex_search_inlist1_name = 'inlist_simplex_search_controls_solar'
+   
+/ ! end simplex_search_controls
+

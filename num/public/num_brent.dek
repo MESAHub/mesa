@@ -1,0 +1,240 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010  Bill Paxton
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
+
+! this code was written by John Burkardt
+! see his wonderful site for lots of numerical software.
+! here's the link for his implementation that we use here.
+! http://people.sc.fsu.edu/~jburkardt/f_src/brent/brent.html
+
+
+      !  brent_global_min seeks a global minimum of a function F(X) in an interval [A,B].
+      real(dp) function brent_global_min(max_tries, a, b, c, m, machep, e, t, f, x, ierr)
+         use mod_brent, only: eval_global_min
+         integer, intent(in) :: max_tries
+         real(dp), intent(in) :: a, b, c, m, machep, e, t
+         interface
+            real(dp) function f(x)
+               use const_def, only: dp
+               real(dp), intent(in) :: x
+            end function f
+         end interface
+         real(dp), intent(out) :: x
+         integer, intent(out) :: ierr
+         brent_global_min = eval_global_min(max_tries, a, b, c, m, machep, e, t, f, x, ierr)
+      end function brent_global_min
+
+!  Discussion:
+!
+!    This function assumes that F(X) is twice continuously differentiable
+!    over [A,B] and that F''(X) <= M for all X in [A,B].
+!
+!  Author:
+!
+!    Original FORTRAN77 version by Richard Brent.
+!    FORTRAN90 version by John Burkardt.
+!
+!  Reference:
+!
+!    Richard Brent,
+!    Algorithms for Minimization Without Derivatives,
+!    Dover, 2002,
+!    ISBN: 0-486-41998-3,
+!    LC: QA402.5.B74.
+!
+!  Parameters:
+!
+!    Input, real ( kind = 8 ) A, B, the endpoints of the interval.
+!    It must be the case that A < B.
+!
+!    Input, real ( kind = 8 ) C, an initial guess for the global
+!    minimizer.  If no good guess is known, C = A or B is acceptable.
+!
+!    Input, real ( kind = 8 ) M, the bound on the second derivative.
+!
+!    Input, real ( kind = 8 ) MACHEP, an estimate for the relative machine
+!    precision.
+!
+!    Input, real ( kind = 8 ) E, a positive tolerance, a bound for the
+!    absolute error in the evaluation of F(X) for any X in [A,B].
+!
+!    Input, real ( kind = 8 ) T, a positive error tolerance.
+!
+!    Input, external real ( kind = 8 ) F, the name of a user-supplied
+!    function, of the form "FUNCTION F ( X )", which evaluates the
+!    function whose global minimum is being sought.
+!
+!    Output, real ( kind = 8 ) X, the estimated value of the abscissa
+!    for which F attains its global minimum value in [A,B].
+!
+!    Output, real ( kind = 8 ) GLOMIN, the value F(X).
+!
+
+
+
+
+
+
+
+
+      !  brent_local_min seeks a local minimum of a function F(X) in an interval [A,B].
+      real(dp) function brent_local_min(max_tries, a, b, eps, t, f, x, ierr)
+         use mod_brent, only: eval_local_min
+         integer, intent(in) :: max_tries
+         real(dp), intent(in) :: a, b, eps, t
+         interface
+            real(dp) function f(x)
+               use const_def, only: dp
+               real(dp), intent(in) :: x
+            end function f
+         end interface
+         real(dp), intent(out) :: x
+         integer, intent(out) :: ierr
+         brent_local_min = eval_local_min(max_tries, a, b, eps, t, f, x, ierr)
+      end function brent_local_min
+
+!
+!  Discussion:
+!
+!    The method used is a combination of golden section search and
+!    successive parabolic interpolation.  Convergence is never much slower
+!    than that for a Fibonacci search.  If F has a continuous second
+!    derivative which is positive at the minimum (which is not at A or
+!    B), then convergence is superlinear, and usually of the order of
+!    about 1.324....
+!
+!    The values EPS and T define a tolerance TOL = EPS * abs ( X ) + T.
+!    F is never evaluated at two points closer than TOL.
+!
+!    If F is a unimodal function and the computed values of F are always
+!    unimodal when separated by at least SQEPS * abs ( X ) + (T/3), then
+!    LOCAL_MIN approximates the abscissa of the global minimum of F on the
+!    interval [A,B] with an error less than 3*SQEPS*abs(LOCAL_MIN)+T.
+!
+!    If F is not unimodal, then LOCAL_MIN may approximate a local, but
+!    perhaps non-global, minimum to the same accuracy.
+
+!  Parameters:
+!
+!    Input, real ( kind = 8 ) A, B, the endpoints of the interval.
+!
+!    Input, real ( kind = 8 ) EPS, a positive relative error tolerance.
+!    EPS should be no smaller than twice the relative machine precision,
+!    and preferably not much less than the square root of the relative
+!    machine precision.    e.g.,  eps = 10d0*sqrt(epsilon(eps))
+!
+!    Input, real ( kind = 8 ) T, a positive absolute error tolerance.
+!
+!    Input, external real ( kind = 8 ) F, the name of a user-supplied
+!    function, of the form "FUNCTION F ( X )", which evaluates the
+!    function whose local minimum is being sought.
+!
+!    Output, real ( kind = 8 ) X, the estimated value of an abscissa
+!    for which F attains a local minimum value in [A,B].
+!
+!    Output, real ( kind = 8 ) LOCAL_MIN, the value F(X).
+!
+
+!  Author:
+!
+!    Original FORTRAN77 version by Richard Brent
+!    FORTRAN90 version by John Burkardt
+!
+!  Reference:
+!
+!    Richard Brent,
+!    Algorithms for Minimization Without Derivatives,
+!    Dover, 2002,
+!    ISBN: 0-486-41998-3,
+!    LC: QA402.5.B74.
+
+
+
+
+
+
+      real(dp) function brent_safe_zero(a, b, eps, t, epsy, f, fa, fb, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         use mod_brent, only: eval_brent_safe_zero
+         real(dp), intent(in) :: a, b, eps, t, epsy, fa, fb
+         interface
+            include 'num_root_fcn.dek' ! f provides function values
+         end interface
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr
+         brent_safe_zero = eval_brent_safe_zero(a, b, eps, t, epsy, f, fa, fb, lrpar, rpar, lipar, ipar, ierr)
+      end function brent_safe_zero
+   !! ZERO seeks the root of a function F(X) in an interval [A,B].
+   !
+   !  Discussion:
+   !
+   !    The interval [A,B] must be a change of sign interval for F.
+   !    That is, F(A) and F(B) must be of opposite signs.  Then
+   !    assuming that F is continuous implies the existence of at least
+   !    one value C between A and B for which F(C) = 0.
+   !
+   !    The location of the zero is determined to within an accuracy
+   !    of 6 * MACHEPS * abs ( C ) + 2 * T.   or abs(f(x)) < epsy
+   !
+   !  Licensing:
+   !
+   !    This code is distributed under the GNU LGPL license. 
+   !
+   !  Modified:
+   !
+   !    12 April 2008
+   !
+   !  Author:
+   !
+   !    Original FORTRAN77 version by Richard Brent.
+   !    FORTRAN90 version by John Burkardt.
+   !
+   !  Reference:
+   !
+   !    Richard Brent,
+   !    Algorithms for Minimization Without Derivatives,
+   !    Dover, 2002,
+   !    ISBN: 0-486-41998-3,
+   !    LC: QA402.5.B74.
+   !
+   !  Parameters:
+   !
+   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of 
+   !    sign interval.
+   !
+   !    Input, real ( kind = 8 ) MACHEP, an estimate for the relative machine
+   !    precision.
+   !
+   !    Input, real ( kind = 8 ) T, a positive error tolerance.
+   !
+   !    Input, external real ( kind = 8 ) F, the name of a user-supplied
+   !    function, of the form "FUNCTION F ( X )", which evaluates the
+   !    function whose zero is being sought.
+   !
+   !    Output, real ( kind = 8 ) ZERO, the estimated value of a zero of
+   !    the function F.
+   !

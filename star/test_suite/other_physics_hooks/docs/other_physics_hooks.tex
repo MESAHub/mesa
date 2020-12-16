@@ -1,0 +1,29 @@
+\documentclass{article}
+%\usepackage{geometry}
+% \geometry{top = 1in, bottom = 1in, left = 1in, right = 1in}
+\usepackage[top = 0.7in, bottom = 0.7in, left = 0.7in, right = 0.7in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathrsfs}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{float}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\rhead{\footnotesize {09/06/2012 ; MESA version 4442} }
+\chead{\footnotesize {Authors: Jared Brooks, Lars Bildsten, Bill Paxton} }
+\lhead{\footnotesize {mesa/star/test\_suite/other\_physics\_hooks} }
+
+\begin{document}
+	
+	\begin{center}
+		\begin{Large}
+		       \textbf{OTHER PHYSICS HOOKS}\\
+		\end{Large}
+	\end{center}
+
+        This test case is to show how to include your own physics code into a \texttt{MESA} run.  It loads a default 1 $M_\odot$ ZAMS model and runs until the mass fraction of center hydrogen drops below 0.5 (\texttt{xa\_central\_lower\_limit\_species(1) = 'h1' ; xa\_central\_lower\_limit\_species(1) = 'h1'}).\\
+
+        To tell \texttt{MESA} how to find your routines, you set pointers to them in the \texttt{star\_info} structure at the start of the run.  Do this in the \texttt{extras\_controls} routine in your \texttt{run\_star\_extras.f}.  Then during the run, your routines will be called from the \texttt{MESA} library at the appropriate times.  The options to use these ``other physics hooks'' are first turned on (\texttt{s\% use\_other\_eos = .true. ; s\% use\_other\_kap = .true. ; s\% use\_other\_mlt = .true.}, option for mesh turned on in \texttt{inlist\_other\_physics\_hooks: use\_other\_mesh\_functions = .true.}).  Then the pointers are set to point \texttt{MESA} to the routines that contain your added code (e.g. \texttt{s\% other\_eosDT\_get => my\_eosDT\_get ; s\% other\_kap\_get\_Type1 => my\_kap\_get\_Type1 ; s\% other\_mlt => my\_mlt ; s\% other\_mesh\_fcn\_data => other\_me\-sh\_fcn\_data}).  These routines, as they are now, call \texttt{MESA}'s default functions, but those calls need only be edited out and replaced with your own FORTRAN code.\\
+
+\end{document}

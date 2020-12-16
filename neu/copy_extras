@@ -1,0 +1,3 @@
+mkdir new/test/plot_data
+mkdir new/test/plot_out
+cp test/*.rb new/test

@@ -1,0 +1,11 @@
+      subroutine fcn(n, x, h, y, f, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: n, lrpar, lipar
+         real(dp), intent(in) :: x, h
+         real(dp), intent(inout) :: y(:) ! (n)
+         ! okay to edit y if necessary (e.g., replace negative values by zeros)
+         real(dp), intent(inout) :: f(:) ! dy/dx (n)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+      end subroutine fcn

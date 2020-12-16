@@ -1,0 +1,54 @@
+(from Radek Smolec -- Oct 25, 2013)
+
+Below is a short instruction how to create Type 2 tables and run the preprocessor, so you can use them in MESA. This was tested with ver. 5527. 
+
+
+MESA uses 40 C/O-enriched tables for 8 different Z and 5 different X. These are their names (with Z and X value):
+Gz000.x00  Gz001.x03  Gz004.x10  Gz010.x35  Gz020.x70  Gz050.x00  Gz100.x03
+Gz000.x03  Gz001.x10  Gz004.x35  Gz010.x70  Gz030.x00  Gz050.x03  Gz100.x10
+Gz000.x10  Gz001.x35  Gz004.x70  Gz020.x00  Gz030.x03  Gz050.x10  Gz100.x35
+Gz000.x35  Gz001.x70  Gz010.x00  Gz020.x03  Gz030.x10  Gz050.x35  Gz100.x70
+Gz000.x70  Gz004.x00  Gz010.x03  Gz020.x10  Gz030.x35  Gz050.x70
+Gz001.x00  Gz004.x03  Gz010.x10  Gz020.x35  Gz030.x70  Gz100.x00
+
+To generate such tables for your mixture:
+
+- go to OPAL web site:
+http://opalopacity.llnl.gov/type2inp.html
+- select C and O as enhanced elements and metallicity - one of the eight values (0.000, 0.001, 0.004, 0.01, 0.02, 0.03, 0.05, 0.1)
+- provide your number fractions for elements - the column 'My Fraction'
+- hit 'Normalize', provide your e-mail and data, wait for e-mail with the link to the created tables (2-3 minutes). 5 tables are generated automatically for 5 different values of X
+- repeat the procedure 8 times for 8 different Z. You may hit 'back' button of your browser, so you don't need to type element fractions again, only change Z
+- once your 40 tables are ready rename all of them to match the names given above
+
+Now it is time to run the preprocessor - details are in the README file and summarized below (for OPAL type 2 a09 mix as an example):
+
+- go to mesa/kap/preprocessor/
+- unpack kap_input_data.tar.xz
+- go to kap_input_data/opal/ and create a new directory for your files (Type2_A09)
+- now in mesa/kap/preprocessor/ : ./clean and ./mk to build the preprocessor
+- make the inlist for your files, as in example below (also attached):
+-----------------------------------------------------------
+&kappa
+         data_dir = 'kap_input_data/opal/Type2_A09'        
+         logT_file = 'logT_points'
+         CO_flag = .true.
+         logR_min = -8.00d0
+         logR_max = 1.00d0
+         logR_points = 37
+         ! C and O for A09
+         Zfrac_C = 0.176930
+         Zfrac_O = 0.428870
+         output_dir = 'data/kap_data'
+         table_prefix = 'a09_co'
+         header_info = 'C/O enriched -- based on Asplund et al. (2009) solar abundances'
+         table_version = 36
+/
+-------------------------------------------------------------
+- remember to set Zfrac_C and Zfrac_O according to your mixture; the table_prefix is the control you will use later in your inlist (kappa_CO_prefix in star_job)
+- edit rebuild_all and add 'do_one_CO inlist_a09_CO'
+- ./rebuild_all
+- ./build_4_export
+- cd .. (to kap) and ./build_data_and_export
+
+You are done. Your opacity tables will be used in MESA - just provide kappa_CO_prefix in your star_job inlist

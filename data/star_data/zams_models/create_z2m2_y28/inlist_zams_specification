@@ -1,0 +1,17 @@
+! inlist_zams_specification
+
+&create_zams_job
+
+   create_z = 2d-2
+   create_y = 0.28d0
+   zams_name = '../zams_z2m2_y28'
+   
+   ! do masses 10**lgm, for lgm = mlo to mhi by dmass
+   mlo = -0.9d0
+   mhi = 2.51d0
+   dmass = 0.1d0
+
+
+/ ! end of create_zams_job
+
+

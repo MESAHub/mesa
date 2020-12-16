@@ -1,0 +1,83 @@
+run inlist_rsp_find_2nd_crossing_header
+DATE: 2019-02-10
+TIME: 12:16:37
+                                         version_number       11461
+ read ../../inlist_rsp_common
+ read inlist_rsp_find_2nd_crossing
+ create initial RSP model
+ rsp_build_model_find_2nd_crossing
+ call star_do1_rsp_build model Teff L        2182   5117.8140300141204        1515.8745562683787     
+            P(days)         growth
+  0       0.69798E+01    -0.14649E-01
+ call star_do1_rsp_build model Teff L        2194   5219.7040466313892        1539.1997424184128     
+            P(days)         growth
+  0       0.65072E+01    -0.98892E-02
+ call star_do1_rsp_build model Teff L        2205   5329.1148367346050        1559.6316548920863     
+            P(days)         growth
+  0       0.60527E+01    -0.48694E-02
+ call star_do1_rsp_build model Teff L        2215   5436.9156206749303        1578.4145139831076     
+            P(days)         growth
+  0       0.56574E+01    -0.24404E-03
+ call star_do1_rsp_build model Teff L        2224   5538.1727174311181        1595.6638424589410     
+            P(days)         growth
+  0       0.53266E+01     0.40454E-02
+ call star_do1_rsp_build model Teff L        2233   5641.0704127182553        1612.9664439524834     
+            P(days)         growth
+  0       0.50226E+01     0.81414E-02
+ call star_do1_rsp_build model Teff L        2242   5747.6350132346170        1630.6922947230432     
+            P(days)         growth
+  0       0.47364E+01     0.11213E-01
+ call star_do1_rsp_build model Teff L        2251   5857.0625592381202        1648.7795368178593     
+            P(days)         growth
+  0       0.44683E+01     0.12694E-01
+ call star_do1_rsp_build model Teff L        2260   5969.3486766518199        1667.2016095385336     
+            P(days)         growth
+  0       0.42169E+01     0.11268E-01
+ call star_do1_rsp_build model Teff L        2268   6071.3044653537054        1683.9715776229857     
+            P(days)         growth
+  0       0.40071E+01     0.86899E-02
+ call star_do1_rsp_build model Teff L        2276   6176.1796013214926        1701.1729488898218     
+            P(days)         growth
+  0       0.38078E+01     0.43162E-02
+ call star_do1_rsp_build model Teff L        2284   6284.5810931202823        1718.8743749747225     
+            P(days)         growth
+  0       0.36174E+01    -0.27867E-03
+ call star_do1_rsp_build model Teff L        2292   6396.2264915205469        1737.0506101916060     
+            P(days)         growth
+  0       0.34361E+01    -0.51850E-02
+ call star_do1_rsp_build model Teff L        2299   6496.2290387706935        1753.4040832994003     
+            P(days)         growth
+  0       0.32850E+01    -0.84534E-02
+ i_red           6
+ x_old  -4.8694392136422789E-003  -2.4404256825655041E-004   4.0453557664361850E-003   8.1414421497001607E-003
+ v_old   5329.1148367346050        5436.9156206749303        5538.1727174311181        5641.0704127182553     
+
+                                          Teff_red_edge    5.4426350917927430D+03
+ i_blue          10
+ x_old   8.6899026026176201E-003   4.3162457319448370E-003  -2.7867121549701674E-004  -5.1849509372388801E-003
+ v_old   6071.3044653537054        6176.1796013214926        6284.5810931202823        6396.2264915205469     
+
+                                         Teff_blue_edge    6.2781093552290668D+03
+
+    offset                Teff                   L
+         0    0.6278109355E+04    0.1717819092E+04
+       100    0.6178109355E+04    0.1701488760E+04
+       200    0.6078109355E+04    0.1685089250E+04
+       300    0.5978109355E+04    0.1668641288E+04
+       400    0.5878109355E+04    0.1652240476E+04
+       500    0.5778109355E+04    0.1635741528E+04
+       600    0.5678109355E+04    0.1619146367E+04
+       700    0.5578109355E+04    0.1602404346E+04
+       800    0.5478109355E+04    0.1585470053E+04
+       835    0.5442635092E+04    0.1579398749E+04
+
+ done rsp_build_model_find_2nd_crossing
+ blue_edge_5M_A.data
+DATE: 2019-02-10
+TIME: 12:17:37
+
+finished inlist_rsp_find_2nd_crossing_header
+DATE: 2019-02-10
+TIME: 12:17:37
+finished inlists
+

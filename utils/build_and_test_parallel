@@ -1,0 +1,92 @@
+#!/bin/bash
+
+function error {
+	echo
+	more diff.txt
+	echo
+	pwd
+	echo "TEST FAILED -- compare test_output to tmp.txt"
+	echo
+	exit 1
+}
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		pwd
+		echo "FAILED"
+		echo
+		exit 1
+	fi
+}
+
+function enum_procs {
+    if [ -n "$NPROCS" ]; then
+	echo $NPROCS
+    else
+	case `uname -s` in
+	    Linux)
+		if [ -r /proc/cpuinfo ]; then
+		    grep -c processor /proc/cpuinfo
+		else
+		    echo 1
+		fi
+		;;
+	    Darwin)
+		sysctl hw.ncpu | awk '{print $2}'
+		;;
+	    *)
+	    echo 1
+	    ;;
+	esac
+    fi
+}
+
+function do_build {
+  cd make   
+  make -j$(enum_procs)
+  check_okay
+  cd ../test
+  ./mk
+  check_okay
+  cd ..
+}
+
+function do_test {
+  cd test
+	if [[ -x test_quietly ]];then
+		./test_quietly >& test_quietly.txt
+		check_okay
+	fi
+  ./ck >& diff.txt
+  if [ $? -eq 0 ]
+  then
+  	if [ -s diff.txt ]
+  	then
+  		error
+  	fi
+  else
+  	error
+  fi
+  cd ..
+}
+
+
+if [ ! -f ../skip_build ]
+then
+	if [ ! -f skip_build ]
+	then
+		do_build
+		check_okay
+	fi
+fi
+
+if [ ! -f ../skip_test ]
+then
+	if [ ! -f skip_test ]
+	then
+		do_test
+		check_okay
+	fi
+fi

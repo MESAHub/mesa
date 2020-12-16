@@ -1,0 +1,61 @@
+      subroutine radau5_debug_routine(
+     >      message, info, n, x0, x, y, xend, hmax, h, 
+     >      rtol, atol, itol, okay_to_reuse_jac, 
+     >      ijac, nzmax, isparse, mljac, mujac, mlmas, mumas, 
+     >      ia, ja, sparse_jac, sa, sar, sai, 
+     >      nmax, uround, safe, thet, fnewt, quot1, quot2, nit, ijob, startn, 
+     >      nind1, nind2, nind3, pred, facl, facr, m1, m2, nm1, nerror, 
+     >      implct, banded, ldjac, lde1, ldmas, z1, z2, z3, 
+     >      dydx, scal, f1, f2, f3, fjac, e1, e2r, e2i, fmas, ip1, ip2, 
+     >      rwork, nfcn, njac, nstep, naccpt, nrejct, ndec, nsol, newt, ierr_cnt,
+     >      caljac, first, last, err, theta, faccon, dyno,
+     >      lrpar, rpar, lipar, ipar, lout, ierr)
+      character (len=*), intent(in) :: message
+      integer, intent(in) :: 
+     >      info, n, itol, ijac, nzmax, 
+     >      isparse, mljac, mujac, mlmas, mumas, nit, ijob,
+     >      nmax, nind1, nind2, nind3, m1, m2, nm1, nerror, ldjac, lde1, ldmas,
+     >      nfcn, njac, nstep, naccpt, nrejct, ndec, nsol, newt, ierr_cnt, lout
+      integer, intent(in) :: 
+     >      ia(n+1), ja(nzmax), ip1(nm1), ip2(nm1)
+      logical, intent(in) :: 
+     >      startn, pred, caljac, first, last, okay_to_reuse_jac, implct, banded
+      double precision, intent(in) :: 
+     >      x0, ! initial
+     >      x, ! current
+     >      xend, ! end
+     >      hmax, ! max stepsize
+     >      h, ! step size
+     >      uround, ! smallest number s.t. not dropped by roundoff when add to 1.0
+     >      safe, ! safety factor in step size prediction  --  work 2
+     >      thet, ! decides whether the jacobian should be recomputed  --  work 3
+     >      fnewt, ! stopping criterion for newton's method  --  work 4
+     >      sparse_jac(nzmax), 
+     >      sa(nzmax), 
+     >      sar(nzmax), 
+     >      sai(nzmax),
+     >      fjac(ldjac,n), ! jacobian matrix (dense or banded)
+     >      fmas(ldmas,nm1), ! mass matrix (dense or banded)
+     >      quot1, ! if quot1 < hnew/hold < quot2, step size = const  --  work 5
+     >      quot2, ! if quot1 < hnew/hold < quot2, step size = const  --  work 6
+     >      facl, ! parameter for step size selection  --  work 8
+     >      facr, ! parameter for step size selection  --  work 9
+     >      y(n), 
+     >      z1(n), 
+     >      z2(2*n), 
+     >      z3(n), 
+     >      dydx(n), 
+     >      scal(n), 
+     >      f1(n), 
+     >      f2(n), 
+     >      f3(n),
+     >      e1(lde1,nm1), ! fac1*M - fjac after factored
+     >      e2r(lde1,nm1), ! alphn*M - fjac after factored
+     >      e2i(lde1,nm1), ! betan*M - fjac after factored
+     >      atol(*), rtol(*), err, theta, faccon, dyno
+      integer, intent(in) :: lrpar, lipar
+      double precision, intent(inout), target :: rpar(lrpar)
+      integer, intent(inout), target :: ipar(lipar)
+      double precision, target :: rwork(4 + 4*n)
+      integer, intent(out) :: ierr
+      end subroutine radau5_debug_routine

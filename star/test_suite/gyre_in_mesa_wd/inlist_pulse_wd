@@ -1,0 +1,115 @@
+
+&star_job
+      
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'co_wd_0.85M.mod' ! from make_co_wd, 13738, initial_mass = 4.7d0
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+      !pgstar_flag = .true.
+
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls      
+      
+      ! limit max_model_number as part of test_suite
+      max_model_number = 2000
+      
+      calculate_Brunt_N2 = .true.
+
+      ! GYRE output controls
+
+      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
+
+      x_integer_ctrl(3) = 1 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         ! should match gyre.in mode l
+      x_integer_ctrl(4) = -9 ! order
+      x_ctrl(1) = 0.22d-2 ! freq ~this (Hz)
+      x_ctrl(2) = -1 ! growth < this (days). < 0 means skip this check.
+      
+      log_Teff_lower_limit = 4d0
+
+      delta_lgL_limit = 0.05
+      delta_lgL_hard_limit = 0.15
+
+      delta_lgT_limit = 0.5
+      delta_lgT_hard_limit = 1
+      
+      delta_lgRho_limit = 1
+      delta_lgRho_hard_limit = -1
+
+      delta_lgTeff_limit = 0.1  
+      delta_lgTeff_hard_limit = 0.3
+
+      relax_hard_limits_after_retry = .false.
+      
+      net_logTcut_lo = 0
+      net_logTcut_lim = 0
+      
+      use_dedt_form_of_energy_eqn = .true.
+       
+      ! limit timestep based on E_err
+      limit_for_rel_error_in_energy_conservation = 1d-5
+      hard_limit_for_rel_error_in_energy_conservation = 1d-4
+
+      op_split_burn = .false.
+
+      atm_option = 'T_tau'
+      atm_T_tau_relation = 'Eddington'
+      atm_T_tau_opacity = 'fixed'
+      Pextra_factor = 1
+      
+! mesh
+      !mesh_delta_coeff = 1
+
+! diffusion
+      !do_element_diffusion = .true.      ! diffusion off for test case to make run faster
+      
+
+      num_trace_history_values = 3
+      trace_history_value_name(1) = 'center_gamma'
+      trace_history_value_name(2) = 'rel_E_err'
+      trace_history_value_name(3) = 'log_rel_run_E_err'
+
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+         HR_logT_min = 3.5 ! only used if /= -101d0
+         HR_logT_max = 5.8 ! only used if /= -101d0
+         HR_logL_min = -4.8 ! only used if /= -101d0
+         HR_logL_max = 5.2 ! only used if /= -101d0
+
+         show_HR_WD_instabilities = .true.
+         
+         Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
+         Profile_Panels3_xmax = -101d0 ! only used if /= -101d0
+      
+         !Grid2_file_flag = .true.
+
+/ ! end of pgstar namelist

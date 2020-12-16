@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export MESA_TEST_MOD="astero"
+../../star/test_suite/each_test_run $1

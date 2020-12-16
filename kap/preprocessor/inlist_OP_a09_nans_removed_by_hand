@@ -1,0 +1,15 @@
+&kappa
+
+         data_dir = 'kap_input_data/OP'
+         OP_file = .true.
+         type1_table = 'A09.nans_removed_by_hand.OP17'
+         logR_min = -8.00d0
+         logR_max = 1.00d0
+         logR_points = 37
+         logT_file = 'logT_points_highT_8.0'
+         output_dir = 'data/kap_data'
+         table_prefix = 'OP_a09_nans_removed_by_hand'
+         header_info = 'fixed metal distribution -- based on Asplund, Grevesse, Sauval, and Scott (2009) solar abundances'
+         table_version= 38
+
+/

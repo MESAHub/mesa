@@ -1,0 +1,114 @@
+# This is the makefile for the mesa math library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+ifeq ($(USE_CRMATH),YES)
+     SRCS = math_lib_crmath.f90 math_io.f90 math_pown.f90
+else
+     SRCS = math_lib_intrinsic.f90 math_io.f90 math_pown.f90
+endif
+
+ifeq ($(USE_SHARED), YES)
+    LIBS_OTHER = utils const
+    DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+ ifeq ($(USE_CRMATH), YES)
+	LOAD_OTHER = -L$(MESA_LIB_DIR) -lutils -lconst $(LOAD_CRMATH) 
+else
+	LOAD_OTHER = -L$(MESA_LIB_DIR) -lutils -lconst
+endif
+endif
+     
+#################################################################
+#
+# LIBRARIES
+
+#################################################################
+#
+# TARGETS
+
+LIB = libmath.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) math_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree)
+
+COMPILE_CMD = $(COMPILE)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f90 $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

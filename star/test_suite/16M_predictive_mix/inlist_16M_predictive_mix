@@ -1,0 +1,112 @@
+&star_job
+
+   show_log_description_at_start = .false.
+
+   pause_before_terminate = .false.
+   pgstar_flag = .false.
+
+   history_columns_file = 'history_columns.list' 
+   profile_columns_file = 'profile_columns.list'
+
+   ! Abundances
+
+   initial_zfracs = 3 ! GS98_zfracs = 3
+
+   ! Initial model
+
+   load_saved_model = .true.
+   saved_model_name = 'start.mod'
+
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
+   ! Final model
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'tams.mod'
+   required_termination_code_string = 'xa_central_lower_limit'
+
+/
+
+&eos
+/ ! end of eos namelist
+
+&kap
+   Zbase = 2d-2
+
+   use_Type2_opacities = .true.
+
+/
+
+&controls
+   
+   ! IMPORTANT NOTE: if you use these files for non-testing purposes, note
+   ! that some timestep and resolution controls may be adjusted to make the test
+   ! faster at the cost of converged results. For each of these, recommended
+   ! values are commented out. Use with caution.
+   ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
+
+   ! Mass & metalicity
+
+   initial_mass = 16d0
+   initial_z = 2d-2
+
+   ! When to stop
+
+   xa_central_lower_limit_species(1) = 'h1'
+   xa_central_lower_limit(1) = 1E-6
+
+   ! Opacities
+
+
+   ! Mixing
+
+   mixing_length_alpha = 1.8d0
+   MLT_option = 'Henyey'
+
+   num_cells_for_smooth_gradL_composition_term = 10
+   threshold_for_smooth_gradL_composition_term = 0.02
+
+   num_cells_for_smooth_brunt_B = 10
+   threshold_for_smooth_brunt_B = 0.1
+
+   use_ledoux_criterion = .true.
+
+   predictive_mix(1) = .true.
+   predictive_zone_type(1) = 'any'
+   predictive_zone_loc(1) = 'core'
+   predictive_bdy_loc(1) = 'top'
+
+   ! Timestep and grid
+
+   ! RELAXED VALUE FOR TEST SUITE
+      max_years_for_timestep = 1d5 ! 1d4
+     
+   mesh_delta_coeff = 0.5
+
+   ! Output
+
+   photo_interval = 50 ! 500
+   photo_digits = 3
+   profile_interval = 100 ! 1000
+   history_interval = 10
+   terminal_interval = 10
+   write_header_frequency = 10
+   
+   ! Eos
+   
+
+   use_dedt_form_of_energy_eqn = .true.
+
+   num_trace_history_values = 2
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+
+   ! limit max_model_number as part of test_suite
+   max_model_number = 1200
+
+/
+
+&pgstar
+
+/ ! end of pgstar namelist

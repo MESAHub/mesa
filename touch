@@ -1,0 +1,58 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+	  echo "FAILED"
+		exit 1
+	fi
+}
+
+function do_one {
+	cd $1
+	check_okay
+	echo "cleaning" $1
+	./clean
+	check_okay
+	cd ..
+}
+
+do_one adipls
+do_one astero
+do_one atm
+do_one auto_diff
+do_one binary
+do_one chem
+do_one colors
+do_one const
+do_one eos
+do_one gyre
+do_one interp_1d
+do_one interp_2d
+do_one ionization
+do_one kap
+do_one math
+do_one mtx
+do_one net
+do_one neu
+do_one num
+do_one rates
+do_one sample
+do_one star
+do_one star_data
+do_one utils
+
+echo "cleaning lib directory."
+rm -rf lib
+mkdir lib
+
+echo "cleaning include directory."
+rm -rf include
+mkdir include
+
+echo "cleaning rates_data/cache."
+rm -rf data/rates_data/cache
+
+echo
+echo "finished touch"
+echo

@@ -1,0 +1,42 @@
+
+&star_job
+
+      show_log_description_at_start = .false.
+      
+      create_pre_main_sequence_model = .true.
+      
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'start.mod'
+      required_termination_code_string = 'max_age'
+
+      change_initial_net = .true.      
+      new_net_name = 'o18_and_ne22.net'
+
+
+/ ! end of star_job namelist
+
+&kap
+      Zbase = 0.001
+      use_Type2_opacities = .true.
+/ !end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 150
+      
+      max_age = 0.5d0
+
+      initial_mass = 7.00
+      initial_z = 0.001
+      
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist
+

@@ -1,0 +1,4297 @@
+%\input /home/hao/jcd/tex/loc-macro.tex
+\magnification=\magstephalf
+\tolerance=2000
+\def\nwl{\hfill\break}
+\def\note #1]{{\bf #1]}}
+\def\etal{{\it et al.}}
+\def\eg{{\it e.g.}}
+\def\cf{{\it cf.}}
+\def\ie{{\it i.e.}}
+\def\etc{{\it etc.}}
+\def\viz{{\it viz.}}
+\def\newpage{\vfill\eject}
+\def\dd{{\rm d}}
+\def\DD{{\rm D}}
+\def\f{{\rm f}}
+\def\Msun{\,{\rm M}_\odot}
+\def\Rsun{\,{\rm R}_\odot}
+\def\pturb{p_{\rm turb}}
+\def\pg{p_{\rm g}}
+\def\Gammar{\Gamma_1^{\rm r}}
+\def\draft{\headline{\bf File: \jobname\hfill DRAFT\hfill\today}}
+%\def\source#1\par{\medskip{\obeylines\smallskip\tt\parindent=40pt #1}
+%\medskip\noindent}
+\def\ms{\medskip}
+\def\msni{\medskip\noindent}
+\def\source{\obeylines\tt\smallskip\parindent=40pt}
+\def\param{\par\noindent\hangindent\parindent\hangafter=1}
+\def\pparam{\par\indent\hangindent2\parindent\hangafter=1}
+\def\ppparam{\par\indent\indent\hangindent3\parindent\hangafter=1}
+\def\defindent{\par\indent\indent\parindent=8.5em}
+\def\defaults{\defindent \obeylines (default: \tt}
+\def\muHz{\,\mu{\rm Hz}}
+\def\fig #1
+{\midinsert
+\leftskip=3em
+\rightskip=3em
+\vskip #1
+\noindent}
+\def\gif{\endinsert}
+
+
+\def\today{\ifcase\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \space\number\day, \number\year}
+\font\twenbf=cmbx10 scaled 2000
+\font\fourtbf=cmbx10 scaled \magstep2
+\font\twelvebf=cmbx10 scaled \magstep1
+
+%  section macros, designed to avoid new page after section headings.
+\def\mainsect #1\par{\interlinepenalty=100\bigskip\bigskip\noindent
+\hangindent=1 true cm
+\hangafter=1
+{#1}\par%
+\penalty10000\par\bigskip\par\penalty10000\noindent}
+%\def\mainsect #1\par{\bigskip\bigskip\noindent{#1}\par%
+%\penalty10000\par\bigskip\par\penalty10000\noindent}
+
+\def\subsect #1\par{\bigskip\noindent{#1}\par%
+\penalty10000\bigskip\par\penalty10000\noindent}
+\def\intsect #1\par{\par\penalty10000\bigskip\penalty10000\noindent{#1}\par%
+\penalty10000\par\bigskip\par\penalty10000\noindent}
+\def\ref{\par\noindent
+	\hangindent=0.7 true cm
+	\hangafter=1}
+\def\det{{\rm det \,}}
+\def\sign{{\rm sign \,}}
+\def\xf{x_{\rm f}}
+\def\xs{x_{\rm s}}
+%\def\revision#1{{\bf --- REVISION #1 ---:}}
+\def\revision#1{\null}
+
+\def\contentfill{\leaders\hbox to 2em{\hss.\hss}\hfill}
+\def\contentitem#1#2{{\interlinepenalty=100
+\noindent
+\hangindent=1 true cm
+\hangafter=1
+{#1{\rm \hskip 2em \contentfill \hskip 2em #2}\par}}}
+
+\def\chaptercont #1 ... #2
+{\bigskip\contentitem{{#1}}{{#2}}
+\medskip}
+\def\mainsectcont #1 ... #2
+{\medskip\contentitem{#1}{#2}
+}
+\def\subsectcont #1 ... #2
+{\leftskip=15truept
+\smallskip\contentitem {#1} {#2}
+\vskip 0pt\leftskip=0pt}
+
+\pageno=-1
+\nopagenumbers
+
+\centerline {\twenbf Notes on adiabatic oscillation programme}
+\medskip
+\centerline{\fourtbf Sixth edition}
+\medskip
+\centerline{\today}
+\bigskip
+
+\centerline{ J{\o}rgen Christensen-Dalsgaard}
+\centerline{ Institut for Fysik og Astronomi, Aarhus Universitet}
+\bigskip
+\vfill
+\hrule
+\medskip
+
+\noindent
+{\bf Notes on revisions:} These notes were originally written at HAO in 1983. 
+The fourth edition was produced in September 1997,
+following a major reorganization of the code involving also
+the addition or change of several input parameters.
+This was further updated in a fifth edition in 2002,
+including the extension of the code to include rotational effects. 
+This still needs further testing, however.
+
+The present edition is aimed to correspond to the version of the code
+{\tt adipls.c.d.x}, as of May 2010.
+This is the version that is distributed in the updated distribution of
+the code ({\tt adipack.c}) and used in the general package combining the
+evolution and pulsation codes, which has a rather more restricted distribution.
+Relative to the previous distribution of the oscillation code from
+1997 ({\tt adipack.n}), several additions and updates have been made,
+including:
+\medskip
+\item{--} The use of fourth-order integration in the shooting method,
+flagged by {\tt mdintg = 5}.
+
+\item{--} The use of the Takata (2006b) scheme for labelling dipolar modes,
+flagged by {\tt irsord = 20}.
+
+\item{--} The possibility of computing first-order rotational effects on 
+frequencies and eigenfunctions, following Soufi et al. (1998). This involves a 
+new block of input parameters, {\tt rot}, and is flagged by {\tt irotsl = 1}.
+{\bf This option still needs testing.}
+
+\item{--} The option of producing (generally discontinuous) solutions
+at arbitrary frequency, flagged by {\tt itmax = 0} and {\tt nfmode $>$ 10}.
+This also includes the option for output of solutions during scan in
+frequency, with {\tt iscan $>$ 1}, if {\tt nfmode $>$ 0}.
+
+%In general, it is recommended to obtain and install the most
+%recent version of the code.
+%However, significant changes in the code and the notes
+%have been flagged in the text, indicating the time where
+%the modification was carried out.
+%\note [Probably no longer?]
+
+It is recommended to consider also the notes given
+in the source to subroutine {\tt adipls}, particularly as far as
+input parameters to the programme are concerned, since the
+notes in the programme source are generally updated when the
+programme is changed.
+
+\medskip
+\hrule
+\newpage
+\null
+\footline={\hss\tenrm\folio\hss}
+\newpage
+\centerline{\twelvebf Contents}
+\bigskip
+\chaptercont
+{\twelvebf 1 Introduction} ... 1
+\chaptercont
+{\twelvebf 2 Notation. Equations and boundary conditions} ... 2
+\mainsectcont
+{\bf 2.1 Variables and equations} ... 2
+\mainsectcont
+{\bf 2.2 Removing the $x^l$ variation near the centre} ... 3
+\mainsectcont
+{\bf 2.3 Inner boundary conditions} ... 4
+\subsectcont
+{\it 2.3.1 Full model} ... 4
+\subsectcont
+{\it 2.3.2 Truncated model} ... 4
+\mainsectcont
+{\bf 2.4 Surface conditions} ... 5
+\subsectcont
+{\it 2.4.1 Singular surface} ... 5
+\subsectcont
+{\it 2.4.2 Simple surface conditions} ... 5
+\subsectcont
+{\it 2.4.3 Match to the solution for an isothermal atmosphere} ... 6
+\chaptercont
+{\twelvebf 3 Numerical techniques}  ... 7
+\mainsectcont
+{\bf 3.1 The shooting method}  ... 7
+\mainsectcont
+{\bf 3.2 The relaxation technique} ... 9
+\mainsectcont
+{\bf 3.3 The transition from $\hat y_i$ to $y_i$}  ... 10
+\mainsectcont
+{\bf 3.4 Richardson extrapolation}  ... 11
+\mainsectcont
+{\bf 3.5 Operational experience} ... 12
+\chaptercont
+{\twelvebf 4 Results of the calculation}  ... 13
+\mainsectcont
+{\bf 4.1 Frequency correction in the Cowling approximation} ... 13
+\mainsectcont
+{\bf 4.2 Mode order} ... 13
+\mainsectcont
+{\bf 4.3 Mode energy, scaled eigenfunctions} ... 14
+\mainsectcont
+{\bf 4.4 Variational frequency} ... 15
+\mainsectcont
+{\bf 4.5 Kernels} ... 15
+\chaptercont
+{\twelvebf 5 Equilibrium model variables} ... 16
+\chaptercont
+{\twelvebf 6 Notation and data storage in the programme} ... 17
+\mainsectcont
+{\bf 6.1 Model storage} ... 17
+\mainsectcont
+{\bf 6.2 Storage of solution} ... 18
+\mainsectcont
+{\bf 6.3 Terminal input, and terminal and printed output}  ... 18
+\chaptercont
+{\twelvebf 7 Input to the programme}  ... 18
+\mainsectcont
+{\bf 7.1 The equilibrium model}  ... 18
+\mainsectcont
+{\bf 7.2 Control parameters}  ... 19
+\subsectcont
+{\it 7.2.1 Input of control parameters}  ... 19
+\subsectcont
+{\it 7.2.2 Assignment of unit numbers to files} ... 20
+\subsectcont
+{\it 7.2.3 Description of control parameters} ... 21
+\mainsectcont
+{\bf 7.3 Comments on the input parameters} ... 28
+\subsectcont
+{\it 7.3.1 Notes on model} ... 28
+\subsectcont
+{\it 7.3.2 Notes on $l$ and trial eigenfrequency} ... 28
+\subsectcont
+{\it 7.3.3 Remaining parameters}  ... 30
+\mainsectcont
+{\bf 7.4 The user-supplied routines {\tt modmod} and {\tt spcout}} ... 31
+\chaptercont
+{\twelvebf 8 Output from the programme}  ... 32
+\mainsectcont
+{\bf 8.1 Printed output} ... 32
+\mainsectcont
+{\bf 8.2 The grand summary} ... 33
+\mainsectcont
+{\bf 8.3 The short summary} ... 35
+\mainsectcont
+{\bf 8.4 Output of eigenfunction to file} ... 35
+\mainsectcont
+{\bf 8.5 Output of rotational kernel to file ({\cf} equation 4.7)} ... 36
+\mainsectcont
+{\bf 8.6 Output of $\Gamma_1$ kernel to file ({\cf} equation 4.8)} ... 36
+\mainsectcont
+{\bf 8.7 Iteration status log} ... 37
+\chaptercont
+{\twelvebf 9 The main programme}  ... 37
+\chaptercont
+{\twelvebf References} ... 38
+\chaptercont
+{\twelvebf Appendix A. Equations} ... 40
+\mainsectcont
+{\bf A.1 Equations in the standard case} ... 40
+\mainsectcont
+{\bf A.2 Equilibrium variables and oscillation equations in 
+plane-parallel case} ... 40
+\mainsectcont
+{\bf A.3 The treatment of turbulent pressure} ... 41
+\subsectcont
+{\it A.3.1 Neglect of the Eulerian perturbation in the turbulent body force
+({\tt iturpr = 1)}} ... 42
+\subsectcont
+{\it A.3.2 Neglect of the Eulerian perturbation in the turbulent pressure
+({\tt iturpr = 2)}} ... 44
+\subsectcont
+{\it A.3.3 Neglect of the Lagrangian perturbation in the turbulent pressure}
+... 45
+\mainsectcont
+{\bf A.4 Inclusion of rotational effects} ... 46
+\subsectcont
+{\it A.4.1 Equations with no explicit inclusion of rotation} ... 47
+\subsectcont
+{\it A.4.2 Including first-order rotation, according to Soufi et al.} (1998)
+... 48
+\newpage
+
+\pageno=1
+\mainsect
+\centerline{\twelvebf 1 Introduction} 
+
+These notes describes a programme for calculation of adiabatic 
+oscillations of stellar models. This has been developed over
+several years, with a number of different uses in mind, and
+is therefore fairly complex both in structure and in the
+control parameters possible. In particular it has not been
+designed for general use, and so it has not been thoroughly
+tested in all conceivable cases. On the other hand the
+programme is quite flexible, both in the physical situations
+it may consider, and in the numerical schemes it employs.
+Thus both models with vanishing surface pressure (and hence
+a singularity at the surface), and physical models terminating
+at a finite pressure can be considered; and it is possible to consider
+models truncated at a finite distance from the centre, as well
+as complete models.
+A description of the code was given by Christensen-Dalsgaard (2008).
+
+A principal goal of the present notes has been to give a precise
+definition of the calculations carried out by the programme.
+The notes also provide information intended to be sufficiently
+detailed to permit easy use of the programme, describing
+the notation used, the form needed for the equilibrium
+model that must be provided to the programme, and the output
+produced, as well as some notes on the experience gained so far
+in running the programme. 
+%No discussion is given of the organization
+%of the programme; indeed 
+%\note [Some remarks about notes on organization in Appendix].
+However, it is sufficiently complex 
+that modifications by users other than the author should 
+be attempted only with care.
+
+The programme uses equilibrium models in the form
+of so-called {\tt amdl} files, produced by the JC-D evolution code.
+They consist of an essentially minimal set of variables
+for computing adiabatic oscillations.
+The variables are described in Section 5, and the input format
+is provided in Section 7.1.
+The programme is controlled by a vast number of control parameters,
+described in Section 7.2. 
+In most cases, particularly for computing p-mode frequencies
+of solar models, these parameters barely need to be changed.
+Samples of suitable input files can be provided.
+
+The output from the programme is described in Section 8.
+The most important output is the set of frequencies and other
+mode data, and the mode eigenfunctions.
+The most extensive set of mode data is provided in
+binary form in the {\it grand summary file} (Section 8.2),
+which also gives diagnostics on the computation.
+A more compact set of mode data, also in binary form,
+is given in the {\it short summary} (Section 8.3).
+The eigenfunctions can be provided as a comprehensive set,
+a set containing just the displacement amplitudes,
+or a set giving the density-weighted displacement amplitudes
+(Section 8.4); the latter set is the most appropriate for
+setting up kernels.
+The eigenfunction data contain the grand summary.
+Note that, as the eigenfunction files are rather large,
+it is advisable to output them only if explicitly needed.
+The programme may also output kernels for frequency
+spitting caused by spherically symmetric rotation (Section 8.5)
+and, less usefully, kernels for the effect on frequencies of
+changes in the adiabatic exponent $\Gamma_1$ at fixed density $\rho$
+(Section 8.6).
+
+In case of problems, diagnostic output is provided in a 
+log file with the default name {\tt adipls-status.log}
+(see Section 8.8; the name may be changed in the input file).
+The programme also produces output summarizing the calculation,
+and providing further diagnostics.
+This is typically less useful, except for debugging;
+in particular, reports of problems should be accompanied
+by this output file (see Section 8.1).
+
+In Section 2 the equations and boundary conditions are briefly 
+discussed; this section also serves to define the notation used.
+A more detailed description of the equations is contained in
+Appendix A. Section 3 describes the numerical techniques used to
+solve the equations. Section 4 defines the quantities computed by
+the programme. 
+%Section 5 describes the equilibrium variables that
+%must be supplied to the programme. 
+Section 6 provides a brief 
+discussion of the notation and data storage used in the programme,
+mainly serving to define the terms used in Section 7.
+% which describes the input required.
+% Section 8 discusses the output from the programme.
+Finally Section 9 describes the main programme that must
+be supplied by the user to set up storage for the calculation. 
+
+Very few references are given here. This evidently does not imply that
+the methods discussed are original. Detailed discussions of non-radial
+stellar oscillations, as well as numerous references, may be found,
+{\eg}, in Unno {\etal} (1989) and Aerts {\etal} (2010).
+
+I finally note that a separate short set of notes are available
+on the use of this and other related programmes:
+{\it Notes on using the solar models and adiabatic pulsations package}.
+
+\mainsect
+\centerline{\twelvebf 2 Notation. Equations and boundary conditions} 
+
+The notation used here in general
+follows that of Christensen-Dalsgaard (1981, 1982, 2008; in the following
+CD81, CD82, CD08);
+however, it is described in part here.
+Words entirely in {\tt typewriter type} refer
+to names of variables in the programme.
+
+\subsect
+{\bf 2.1 Variables and equations} 
+
+As usual the perturbations are assumed to be separated in $\theta$ and
+$\phi$ in terms of spherical harmonics, and the time dependence
+to be given as a harmonic function. Thus the displacement vector
+is written as
+$$
+\vec{\delta r} = {\rm Re} \left\{ \left[ \xi_r (r) Y_l^m ( \theta ,
+\phi ) {{\bf a} }_r + \xi_h (r) \left( { \partial Y_l^m 
+\over \partial \theta } {{\bf a} }_{\theta} + {1 \over \sin  \theta} 
+{\partial Y_l^m  \over \partial \phi} {{\bf a} }_{\phi} \right)
+\right] \exp (-i \omega t ) \right\} \; .
+\eqno (2.1)
+$$
+Similarly the perturbation in, e.g. pressure, may be written
+$$
+\delta p  =  {\rm Re} \left[ \delta p(r) Y_l^m ( \theta , \phi ) \exp (- i 
+\omega t  ) \right] \; .
+\eqno (2.2)
+$$
+Here $Y_l^m$ is a spherical harmonic, ${{\bf a}}_r$, ${{\bf a}}_{\theta}$, and ${{\bf a}}_{\phi}$ are unit vectors in the
+$r$, $\theta$, and $\phi$ directions and $\omega$ is the frequency.
+As the oscillations are adiabatic (and only conservative boundary
+conditions are considered) $\omega$ is real, and the amplitude functions
+$\xi_r (r)$, $\xi_h (r)$, $\delta p (r)$, etc. can be chosen to be real.
+
+The equations for non-radial oscillations can be found in a number
+of references ({\eg} Unno {\etal} 1989).
+However, the programme permits a modification of 
+Poisson's equation for the perturbations, which is written as
+$$
+{1 \over r^2}   {\dd \over \dd r }\left( r^2 {\dd \Phi^{\prime}
+ \over \dd r }\right)  -  {l ( l + 1) 
+\over r^2} \Phi^{\prime} = - 4 \pi \lambda G \rho^{\prime}
+\eqno (2.3)
+$$
+(the ordinary equation clearly corresponds to having $\lambda = 1$).
+This was done to investigate the effect of making a gradual transition
+between the Cowling approximation, where $\Phi^{\prime}$ is neglected,
+to the full set of equations (Christensen-Dalsgaard \& Gough, in preparation);
+this can clearly be accomplished by varying $\lambda$ continuously from 0
+to 1.
+
+Nonradial oscillations may be considered both in the Cowling approximation
+(corresponding to a second-order system of equations) and in the full
+case (corresponding to a fourth-order set). For radial oscillations
+the perturbation in the gravitational potential can be eliminated 
+analytically, so that here the basic, complete set of equations is
+of second order. 
+
+A further restriction is that
+nonradial oscillations of a truncated model can only be treated in the
+Cowling approximation; this is almost inevitable, as there seems to
+be no natural way to specify the boundary conditions for the perturbation
+in the gravitational potential at the base of a truncated model.
+
+In some equilibrium models a contribution to the equation of hydrostatic
+support from ``turbulent pressure'' may be included. This is the case, {\eg},
+for semi-empirical models of the solar atmosphere
+or models based on averages of hydrodynamical simulations.
+This raises the
+question of the appropriate treatment of the turbulent pressure in
+the perturbation equations. 
+The programme allows various options for treating
+(or, more precisely, neglecting) effects of turbulent pressure.
+These are controlled by the definition of the equilibrium-model
+variables and/or the parameter {\tt iturpr}.
+The details are discussed in Section A.3.
+It should be noted that effects of turbulent pressure
+may well dominate the differences between the observed solar
+frequencies and frequencies of solar models where turbulent
+pressure is neglected ({\eg} Rosenthal {\etal} 1999).
+
+The degree $l$ is treated as a real variable (clearly only integer
+values have physical meaning). The transition between the nonradial
+and the radial equations is defined in the programme
+to take place at $l  =  10^{-6}$.
+
+In the calculation the frequency is expressed in terms of the dimensionless
+squared frequency 
+$$
+\sigma^2  =  {R^3 \over G M }  \omega^2 \; ,
+\eqno (2.4)
+$$
+where $M$ and $R$ are mass and photospheric radius of the equilibrium model.
+The eigenfunctions are defined in terms of a set of dimensionless functions
+$y_i (x)$ where $x  =  r / R$. For nonradial oscillations ($l > 0$)
+$$
+\eqalign{
+y_1 & = {\xi_r  \over R } \; , \cr
+y_2 & = x  \left( {p^{\prime}  \over \rho } -  \Phi^{\prime} \right)
+{l ( l + 1)  \over \omega^2 r^2} = {l ( l + 1)  \over R }  \xi_h \; , \cr
+y_3 & =  x  {\Phi^{\prime}  \over gr } \; , \cr
+y_4  & = x^2  {\dd \over \dd x }\left( {y_3   \over x }\right) \; . \cr
+}
+\eqno (2.5a)
+$$
+
+For radial oscillations only $y_1$ and $y_2$ are used, where
+$y_1$ is defined as above, and 
+$$
+y_2 = {p^{\prime}  \over \omega^2 R^2 \rho} \; .
+\eqno (2.5b)
+$$
+
+\subsect
+{\bf 2.2 Removing the $x^l$ variation near the centre} 
+
+The dependent variables $y_i $ have been chosen in such a way that
+for $l > 0$ they all vary as $x^{l - 1}$ for $x \rightarrow 0$.
+For large $l$
+a considerable (and fundamentally unnecessary) computational effort would
+be needed to represent this variation sufficiently accurately with, {\eg},
+a finite difference technique, if these variables were to be used in
+the numerical integration. Instead we introduce a new set of dependent
+variables by
+$$
+{\hat y}_i = x^{- l +1}  y_i , \qquad i  = 1, 2, 3, 4 \; .
+\eqno (2.6)
+$$
+These variables are then $O(1)$ in $x$ near the centre.
+They are used in the region where the variation in the
+$y_i$ is dominated by the $x^{l - 1}$ behaviour.
+Specifically one obtains from JWKB theory that
+$$
+y_1 (x)  \sim \exp \left( \int^x k \dd x \right) \; ,
+\eqno (2.7)
+$$
+where
+$$
+k^2 = {l ( l +1) \over x^2} \left( 1 - {{\tilde N}^2 
+\over \sigma^2} \right) \left( 1 - {\sigma^2  \over {\tilde S }_l^2} \right) 
+\; ,
+\eqno (2.8)
+$$
+and $\tilde N$ and $\tilde S_l$ are the dimensionless buoyancy and
+Lamb frequencies (see Section 5 below).
+Here ${\tilde N}^2$ and ${\tilde S}_l^{-2} \to  0$ as $x \to 0$.
+Thus close to the centre 
+$k^2 \simeq l ( l + 1)/x^2$, and, to this order,
+the JWKB result is that $y_1  \sim x^{l +1/2}$. Writing
+$k^2 = h(x) l ( l + 1)/x^2$ this behaviour is clearly
+dominant as long as $h(x) > 1/4$.
+Thus the transition from ${\hat y}_i$ to $y_i$ at a value $x_{\rm ev}$
+of $x$ where $h(x) = 1/4$, such that the exponentially
+growing solution dominates for $x > x_{\rm ev}$.
+The default is to choose the smallest value of $x$ where $h(x) = 1/4$;
+however, there is the option of restricting the search to
+be outside a given value of $x$.
+
+This transformation is applied when non-radial oscillations 
+are computed. It permits calculating modes of arbitrary high degree
+in a complete model; when the ${\hat y}_i$ are multiplied by
+$x^{l - 1}$ to obtain the $y_i$ 
+this is done in a special routine that replaces 
+$x^{l - 1}$ by zero when it is below the (machine-dependent) limit
+for underflow.
+
+\subsect
+{\bf 2.3 Inner boundary conditions} 
+
+The inner conditions depend on whether one considers a full model,
+including the centre, or an envelope model.
+In the former case, the boundary conditions are
+regularity conditions ({\eg} Christensen-Dalsgaard, Dilke \& Gough 1974).
+In the latter case, there is considerably more flexibility in
+the choice of condition.
+
+\subsect
+{\it 2.3.1 Full model}
+
+When the centre is included in the equilibrium model, the solution must
+satisfy regularity conditions at the innermost meshpoint. These are
+obtained by expansion around the centre, to terms that are $O ( x^2 )$
+times the leading terms.
+It is useful to note that it follows from the expansion that
+$$
+\xi_r \simeq l \xi_h \qquad {\rm or} \qquad
+y_2 \simeq ( l + 1) y_1 \quad {\rm for}  \quad x \to  0 \; ,
+\eqno(2.9)
+$$
+and
+$$
+{\dd \Phi '  \over \dd r } \simeq {l \over r }\Phi ' \qquad {\rm or} \qquad
+y_4 \simeq ( l - 2 ) y_3 \quad {\rm for}  \quad x  \to 0 \; .
+\eqno(2.10)
+$$
+
+\subsect
+{\it 2.3.2 Truncated model}
+
+In a model truncated at a finite distance from
+the centre it is assumed that the calculation is
+for radial oscillations, or in the Cowling approximation.
+Here the programme allows four types of conditions,
+flagged by the input parameter {\tt ibotbc} ({\cf} Section 7.2.3 below):
+
+\medskip
+\item{i)}
+({\tt ibotbc = 0})
+Applicable when the innermost meshpoint $x_1$ 
+is in an evanescent region.
+The condition sets the relation between 
+$y_1$ and $y_2$ so as to select the solution that decreases
+exponentially towards the interior.
+From the JWKB relation for $y_1$, equations (2.7) and (2.8), and
+the differential equation for $y_1$ one finds
+that approximately
+$$
+y_2 ( x_1 ) \simeq 
+{x_1 | k(x_1 ) | \over 1 - \sigma^2 / {\tilde S }_l^2 (x_1 )} y_1 (x_1 ) \; .
+\eqno (2.11)
+$$
+This condition is mainly useful for modes of relatively large degree.
+
+\medskip
+\item{ii)}
+({\tt ibotbc = 1})
+Specification of the ratio between $y_1 $ and $y_2$ 
+at the innermost mesh point $x_1$ by
+$$
+y_1 (x_1 ) = \alpha ( 1 - F_{\rm BC} ) , \qquad
+y_2 (x_1 ) = \alpha F_{\rm BC}  \; , 
+\eqno (2.12)
+$$
+where $\alpha$ is an arbitrary scale factor.
+Note that this condition can also be written as
+$$
+F_{\rm BC} y_1(x_1) - (1 - F_{\rm BC}) y_2(x_1) = 0 \; .
+\eqno(2.12a)
+$$
+Here $F_{\rm BC}$ is determined by the input parameter
+{\tt fcttbc} ({\cf} Section 7.2.3).
+
+\medskip
+\item{iii)}
+({\tt ibotbc = 2})
+Setting 
+$$
+{\dd y_1 \over \dd x} = 0 \qquad \hbox{\rm at} \quad x = x_1 \; .
+\eqno(2.13)
+$$
+This can be expressed as a relation between $y_1(x_1)$ and
+$y_2(x_1)$ by using the differential equation for $y_1$
+({\cf} Appendix A).
+
+\medskip
+\item{iv)}
+({\tt ibotbc = 3})
+Setting 
+$$
+{\dd \over \dd x}\left({ y_1 \over x} \right)  = 0
+\qquad \hbox{\rm at} \quad x = x_1 \; .
+\eqno(2.14)
+$$
+This can be expressed as a relation between $y_1(x_1)$ and
+$y_2(x_1)$ by using the differential equation for $y_1$
+({\cf} Appendix A).
+
+\subsect
+{\bf 2.4 Surface conditions}
+
+The surface conditions depend on whether or not the surface pressure of
+the model vanishes. For vanishing surface pressure 
+(as occurs, for example, in complete polytropic models)
+the surface is a singular point where regularity conditions must be imposed.
+When the pressure is non-vanishing, as in realistic stellar models
+truncated at a suitable point in the atmosphere,
+various conditions can be used. 
+These are selected by the input parameters {\tt istsbc} and {\tt fctsbc}.
+
+For nonradial oscillations the condition on the gravitational
+potential perturbation is common to the singular and nonsingular cases.
+It is obtained by demanding continuity
+of $\Phi^{\prime}$ and its first derivative; in terms of the variables
+used here this may be expressed as
+$$
+y_4 (\xs ) = -  [ l + U(\xs )]  y_3 + \lambda U(\xs ) y_1 \; ,
+\eqno (2.15)
+$$
+where $\xs$ is the value of $x$ at the surface, and 
+$U = 4 \pi \rho r^3 / m$.
+For vanishing surface density, as would normally be the case
+for a singular surface, the terms in $U(\xs)$ vanish.
+However, for the iso-pycnic model (corresponding to constant density,
+{\ie}, to a polytrope of index 0), $U(\xs) = 3$.
+
+\subsect
+{\it 2.4.1 Singular surface}
+
+When the surface pressure vanishes, the solution in the
+vicinity of the singular point is obtained by expansion
+around this singularity, retaining terms that are
+$O ( t )$ times the leading order term, where $t$ is the depth below the
+surface (it might be noted here that the expansion depends qualitatively
+on whether or not the surface density vanishes as well, {\ie},
+whether or not the effective polytropic index $\mu$ at the surface 
+is non-zero).
+Details of this procedure, including expressions for the
+expansion coefficients, were given by Christensen-Dalsgaard \& Mullan (1994).
+
+\subsect
+{\it 2.4.2 Simple surface conditions}
+
+When the surface pressure is non-vanishing, as is the case for a 
+realistic stellar model, the programme allows various simple
+expressions for the surface pressure condition.
+These are selected by setting {\tt istsbc = 0}.
+One is to use the condition $\delta p = 0$, which in terms of the
+variables used here becomes
+$$
+y_2 (\xs ) = {l ( l + 1)  \over \sigma^2} [ y_1 (\xs ) - y_3 ( \xs ) ]
+\eqno (2.16a)
+$$ 
+in the nonradial case, or
+$$
+y_2 (\xs ) = {1 \over \sigma^2} y_1 (\xs ) 
+\eqno (2.16b)
+$$
+in the radial case.
+
+To permit the use of different surface boundary conditions, 
+a boundary condition on the form
+$$
+y_2 (\xs ) = {l ( l + 1)  \over \sigma^2} 
+[ (1 - F_{\rm SBC} ) y_1 (\xs ) - y_3 ( \xs ) ]
+\eqno (2.16c)
+$$ 
+in the nonradial case, or
+$$
+y_2 (\xs ) = {1 \over \sigma^2} (1 - F_{\rm SBC} ) 
+ y_1 (\xs ) 
+\eqno (2.16d)
+$$
+in the radial case, may be used.
+Here $F_{\rm SBC}$ is an input parameter to the programme.
+For $F_{\rm SBC} = 0$ we recover the conditions (2.16a) or (2.16b),
+{\ie}, $\delta p = 0$, whereas for $F_{\rm SBC} = 1$ the condition
+is equivalent to $p ' = 0$, {\ie}, the vanishing of the Eulerian
+pressure perturbation.
+$F_{\rm SBC}$ is determined by the input parameter {\tt fctsbc}.
+
+\subsect
+{\it 2.4.3 Match to the solution for an isothermal atmosphere}
+
+A more realistic condition is obtained by matching the solution
+onto the energetically confined of the two 
+(analytically known) solutions for adiabatic waves in an isothermal
+atmosphere matched to the model ({\cf} Unno {\etal} 1989, pp 163 {\it ff}).
+This condition is selected by setting {\tt istsbc = 1}.
+It has been implemented in the following form: Introduce
+$$
+V_g = {G m \rho  \over \Gamma_1 p r} \; , \qquad
+A_{\rm i} =  V_g( \Gamma_1 - 1) \; ,
+\eqno (2.17)
+$$
+and set
+$$
+\gamma = (A_{\rm i} + 4 - V_g )^2 + 4 ( \sigma^2 
+x^3 - A_{\rm i}) \left( {l ( l + 1)  \over \sigma^2 x^3} - V_g \right) \; ,
+\eqno (2.18)
+$$
+and
+$$
+C = {{1 \over 2 }( \gamma^{1/2} + V_g - A_{\rm i} ) - 2 
+\over V_g - {\displaystyle l ( l + 1)  \over \displaystyle \sigma^2 x^3 }} \; ,
+\eqno (2.19)
+$$
+evaluated at $x = \xs$; then the condition in the nonradial case is
+$$
+y_2 (\xs )
+= {l ( l + 1)  \over \sigma^2 \xs^2}
+\left\{ C y_1 (\xs ) -
+\left[ 1 + \left( {l ( l + 1)  \over \sigma^2 \xs^3} - l - 1 \right) 
+(V_g + A_{\rm i} )^{-1} \right] y_3 (\xs ) \right\} \; , 
+\eqno (2.20a)
+$$
+and in the radial case 
+$$
+y_2 (\xs ) = {C \over x^2 \sigma^2} y_1 (\xs ) \; .
+\eqno (2.20b)
+$$
+Note that in the nonradial case the term in $y_3$ has been
+approximated by assuming that both the frequency and the degree is
+``small'' ({\cf} Unno {\etal} 1989);
+if this is not the case $y_3$ is small and
+the term is almost certainly negligible
+(it may well have negligible influence on the solution in any case). 
+
+It should be noted that the expression for $A_{\rm i}$ is the
+value of $A$ ({\cf} equation 5.1) in the isothermal case,
+where $\dd \ln \rho / \dd \ln r = \dd \ln p / \dd \ln r$.
+This is the form specifically used in the programme.
+
+To use this condition we must clearly require that 
+$\gamma \ge 0$; this approximately corresponds to requiring that
+the frequency be below the local acoustical cut-off frequency at
+$x = \xs$. If this were not the case, the solution in the
+isothermal atmosphere would have a running-wave component, and the
+system would no be longer conservative; thus the eigenfrequency and the
+eigenfunctions become complex, and the problem can no longer
+be treated with the present programme.
+If a solution is attempted above this limit,
+the condition corresponding to {\tt istsbc = 0} is used,
+and a warning message is printed.
+Furthermore, the value of {\tt istsbc} used in setting {\tt icase}
+({\cf} Section 8.2) is set to zero.
+
+\mainsect
+\centerline{\twelvebf 3 Numerical techniques} 
+
+The numerical problem can be formulated generally as that of solving
+$$
+{\dd y_i  \over \dd x} = \sum_{j=1}^I a_{ij} (x) y_j (x) \; , \qquad
+\hbox{\rm for }  i = 1, \ldots , I \; ,
+\eqno (3.1)
+$$
+with the boundary conditions
+$$
+\sum_{j=1}^I b_{ij} y_j (x_1 ) = 0 \; , \qquad
+\hbox{\rm for }  i = 1, \ldots \; ,  I/2 \; ,
+\eqno (3.2)
+$$
+$$
+\sum_{j=1}^I c_{ij} y_j (\xs ) = 0 \; , \qquad
+\hbox{\rm for }  i =  1 \; , \ldots,  I/2 \; .
+\eqno (3.3)
+$$
+Here the order $I$ of the system is 4 for the full nonradial case, and
+2 for radial oscillations or nonradial oscillations in the Cowling 
+approximation. This system only allows non-trivial solutions for
+selected values of $\sigma^2$ which is thus an eigenvalue of
+the problem.
+
+The programme permits solving these equations with two basically different
+techniques, each with some variants. The first is a shooting method,
+where solutions satisfying the boundary conditions are integrated 
+separately from the inner and outer boundary, and the eigenvalue
+is found by matching these solutions at a suitable inner fitting point
+$\xf$ (defined by the input parameter {\tt xfit}).
+The second technique is to solve the equations, together with a 
+normalization condition and either all, or all but one, of the
+boundary conditions using a relaxation technique; the eigenvalue is
+then found by requiring continuity of one of the eigenfunctions at
+an interior matching point when all the boundary conditions are
+satisfied, or by requiring that the remaining boundary condition
+be satisfied.
+The choice of integration method is controlled by the input
+parameter {\tt mdintg} ({\cf} Section 7.2.3).
+
+For simplicity we do not distinguish between $\hat y_i$ and
+$y_i$ ({\cf} Section 2.2) in the bulk of this Section.
+It is implicitly understood
+that the dependent variable (which is denoted $y_i$) is
+$\hat y_i$ for $x < x_{\rm ev}$ and $y_i$ for $x \ge x_{\rm ev}$.
+The numerical treatment of the transition between $\hat y_i$ and 
+$y_i$ is discussed in Section 3.3.
+
+\subsect
+{\bf 3.1 The shooting method} 
+
+It is convenient here to distinguish between $I$ = 2 and $I$ = 4.
+For $I$ = 2 the differential equations (3.1) have a unique (apart
+from normalization) solution $y_i^{\rm (i)}$ satisfying the
+inner boundary conditions (3.2), and a unique solution $y_i^{\rm (o)}$
+satisfying the outer boundary conditions (3.3). These may be obtained
+by numerical integration of the equations. 
+The final solution can then
+be represented as $y_j = C^{\rm (i)} y_j^{\rm (i)} = C^{\rm (o)} y_j^{\rm (o)}$.
+The eigenvalue is 
+obtained by requiring that the solutions agree at a suitable matching
+point $x = \xf$, say. Thus
+$$
+\eqalign{
+& C^{\rm (i)} y_1^{\rm (i)} (\xf ) = C^{\rm (o)} y_1^{\rm (o)} (\xf ) \; , \cr
+& C^{\rm (i)} y_2^{\rm (i)} (\xf ) = C^{\rm (o)} y_2^{\rm (o)} (\xf ) \; . \cr
+}
+\eqno (3.4)
+$$
+These equations clearly have a non-trivial solution 
+$(C^{\rm (i)} , C^{\rm (o)} )$
+only when their determinant vanishes, 
+{\ie}, when
+$$
+\Delta \equiv y_1^{\rm (i)} ( \xf ) y_2^{\rm (o)} ( \xf )
+- y_2^{\rm (i)} ( \xf ) y_1^{\rm (o)} ( \xf ) = 0 \; .
+\eqno (3.5)
+$$
+Equation (3.5) is therefore the eigenvalue equation.
+
+For $I$ = 4 there are two linearly independent solutions satisfying
+the inner boundary conditions, and two linearly independent solutions
+satisfying the outer boundary conditions. The former set $\{y_i^{\rm (i,1)} ,
+y_i^{\rm (i,2)}\}$ is chosen by setting
+$$
+\eqalign{
+& y_1^{\rm (i,1)} (x_1 ) = 1 \; , \qquad
+  y_3^{\rm (i,1)} (x_1 ) = 0 \; , \cr
+& y_1^{\rm (i,2)} (x_1 ) = 1 \; , \qquad
+  y_3^{\rm (i,2)} (x_1 ) = 1 \; , \cr
+}
+\eqno (3.6)
+$$
+and the latter set $\{y_i^{\rm (o,1)} , y_i^{\rm (o,2)}\}$ is chosen by setting
+$$
+\eqalign{
+& y_1^{\rm (o,1)} (\xs ) = 1 \; , \qquad
+  y_3^{\rm (o,1)} (\xs ) = 0 \; , \cr
+& y_1^{\rm (o,2)} (\xs ) = 1 \; , \qquad
+  y_3^{\rm (o,2)} (\xs ) = 1 \; . \cr
+}
+\eqno (3.7)
+$$
+The inner and outer boundary conditions are such that, given $y_1$
+and $y_3$, $y_2$ and $y_4$ may be calculated from them;
+thus equations (3.6) and (3.7) completely specify the solutions,
+which may then be obtained by integrating from the inner or outer
+boundary. 
+The final solution can then
+be represented as 
+$$
+y_j = C^{\rm (i,1)} y_j^{\rm (i,1)} + C^{\rm (i,2)} y_j^{\rm (i,2)} =
+C^{\rm (o,1)} y_j^{\rm (o,1)} + C^{\rm (o,2)} y_j^{\rm (o,2)} \; .
+$$
+At the fitting point $\xf$ continuity of the solution
+requires that
+$$
+C^{\rm (i,1)} y_j^{\rm (i,1)} (\xf ) + C^{\rm (i,2)} y_j^{\rm (i,2)} (\xf ) =
+C^{\rm (o,1)} y_j^{\rm (o,1)} (\xf ) + C^{\rm (o,2)} y_j^{\rm (o,2)} (\xf )
+\qquad j = 1, 2, 3, 4 \; . 
+\eqno (3.8)
+$$
+This set of equations only has a non-trivial solution if
+$$
+\Delta = \det \left\{ \matrix {
+y_{1,\f}^{\rm (i,1)}& 
+y_{1,\f}^{\rm (i,2)}& 
+y_{1,\f}^{\rm (o,1)}& 
+y_{1,\f}^{\rm (o,2)}& \cr
+\noalign{\vskip3pt}
+y_{2,\f}^{\rm (i,1)}& 
+y_{2,\f}^{\rm (i,2)}& 
+y_{2,\f}^{\rm (o,1)}& 
+y_{2,\f}^{\rm (o,2)}& \cr
+\noalign{\vskip3pt}
+y_{3,\f}^{\rm (i,1)}& 
+y_{3,\f}^{\rm (i,2)}& 
+y_{3,\f}^{\rm (o,1)}& 
+y_{3,\f}^{\rm (o,2)}& \cr
+\noalign{\vskip3pt}
+y_{4,\f}^{\rm (i,1)}& 
+y_{4,\f}^{\rm (i,2)}& 
+y_{4,\f}^{\rm (o,1)}& 
+y_{4,\f}^{\rm (o,2)}& \cr}\right\} = 0 \; ,
+\eqno(3.9)
+$$
+where, {\eg},
+$y_{j,\f}^{\rm (i,1)} \equiv y_j^{\rm (i,1)} (\xf )$.
+Thus equation (3.9) is the eigenvalue equation in this case.
+
+Clearly $\Delta$ as defined in either equation (3.5) or equation (3.9) is
+a smooth function of $\sigma^2$, and the eigenfrequencies are
+found as the zeros of this function. This is done in the programme using
+a standard secant technique: given two values $\sigma_{i-1}^2$
+and $\sigma_i^2$ of $\sigma^2$ and the associated values of
+$\Delta$, the new value of $\sigma^2$ is found as
+$$
+\sigma_{i+1}^2 = \sigma_i^2 -
+\Delta_i {\sigma_i^2 - \sigma_{i-1}^2   \over \Delta_i - \Delta_{i-1} } \; ,
+\eqno (3.10)
+$$
+where $\Delta_j \equiv \Delta ( \sigma_j^2 ) $.
+However, the
+programme also has the option for scanning through a given interval
+in $\sigma^2$ to look for change of sign of $\Delta$, possibly
+iterating for the eigenfrequency at each change of sign.
+Thus it is possible to search a given region 
+of the spectrum completely automatically.
+
+The programme allows the use of three different techniques for solving
+the differential equations. One is the standard second-order
+centred difference technique, where the differential equations are
+replaced by the difference equations
+$$
+{y_i^{n+1} - y_i^n \over x^{n+1} - x^n} = 
+{1 \over 2 } \sum_{j=1}^I \left[ a_{ij}^n  y_j^n + a_{ij}^{n+1}  y_j^{n+1}
+\right] , \quad i = 1, \ldots, I \; .
+\eqno (3.11)
+$$
+Here we have introduced a mesh 
+$x_1 = x^1 < x^2 < \cdots < x^N = \xs$ in $x$,
+where $N$ is the total number of mesh points; 
+$y_i^n \equiv y_i ( x^n )$, and 
+$a_{ij}^n \equiv a_{ij} (x^n )$. These equations allow
+the solution at $x = x^{n+1}$ to be determined from the
+solution at $x = x^n$.
+
+The second technique was
+proposed by Gabriel \& Noels (1976); here on each mesh interval
+$(x^n , x^{n+1})$ we consider the equations 
+$$
+{\dd y_i^{(n)}  \over \dd x} = \sum_{j=1}^I  {\bar a}_{ij}^n  
+y_j^{(n)} (x), \qquad
+\hbox{\rm for } i = 1 \; , \ldots, I \; ,
+\eqno (3.12)
+$$
+with constant coefficients, where 
+${\bar a}_{ij}^n \equiv 1/2 ( a_{ij}^n + a_{ij}^{n+1} )$.
+These equations may
+be solved analytically on the mesh intervals, and the complete
+solution is obtained by continuous matching at the mesh points.
+This technique clearly permits the computation of solutions varying
+arbitrarily rapidly, 
+{\ie}, the calculation of modes of arbitrarily high order. On the other
+hand solving equations (3.12) involves finding the eigenvalues
+and eigenvectors of the coefficient matrix, and therefore becomes
+very complex and time consuming for higher-order systems. Thus in
+practice it has only been implemented for systems of order 2, 
+{\ie}, radial oscillations or non-radial oscillations in the Cowling
+approximation.
+
+The third technique uses the fourth-order difference scheme developed
+by Cash \& Moore (1980).
+This involves evaluating the right-hand side of the equations at points
+intermediate between the meshpoints.
+To do so the code interpolates the model quantities linearly between
+the meshpoints (higher-order interpolation, to be formally consistent with
+the order of the scheme, would create problems in the vicinity of sharp
+variations, {\eg}, in the composition in the model).
+Although the scheme is therefore not formally of high order, in practice
+it appears to work very well for high-order modes where the variation in
+the solution is far more rapid than the variation of the equilibrium
+quantities.
+Unlike the scheme developed by Gabriel \& Noels (1976), this scheme can
+also be used for the full fourth-order system.
+
+\subsect
+{\bf 3.2 The relaxation technique} 
+
+Two variants of this technique have been implemented. In the first
+one of the boundary conditions (to be definite we assume here
+that it is the first surface condition) is set aside to be used
+for determining the eigenfrequency. The difference equations (3.11)
+for $n = 1, 2, \ldots, N - 1$, the
+boundary conditions (3.2), the normalization condition $y_1
+( \xs ) = 1$, and, for $I$ = 4, the remaining surface
+boundary condition, are then solved to give the solution
+$\{y_i^n\}$ at each mesh point. Notice that the equations
+and boundary conditions constitute a set of linear equations
+for the solution, and this set may be solved efficiently by
+forward elimination and backsubstitution 
+({\eg} Baker, Moore \& Spiegel 1974).
+The eigenvalue is then found by requiring that the remaining
+boundary condition be satisfied; thus we evaluate
+$$
+\Delta = {\sum_{j=1}^I  c_{1j}  y_j (\xs )  
+\over  \left[ \sum_{j=1}^I  \left( y_j^{\rm (norm)} \right)^2
+\right]^{1/2} } \; ,
+\eqno (3.13)
+$$
+where $y_j^{\rm (norm)} = y_j ( x^{\rm (norm)} )$ is the
+solution at a suitably chosen normalization point; in the present
+case, where a surface boundary condition is used, $x^{\rm (norm)}$
+is typically the innermost mesh point (the added flexibility of
+being able to vary $x^{\rm (norm)}$ has occasionally been found to
+be useful). $\Delta$ is then a smooth function of $\sigma^2$,
+and the eigenvalues may be found as the zeros of $\Delta$,
+essentially as described in connection with the shooting technique.
+
+As both boundaries, at least in a complete model, are either
+singular or very nearly singular, the removal of one of the
+boundary conditions tends to produce solutions that are somewhat
+ill-behaved, in particular for modes of high degree. This in turn
+is reflected in the behaviour of $\Delta$ as a function of $\sigma^2$.
+This problem is avoided in the second variant of the relaxation
+technique. Here the difference equations are solved separately
+for $x \le \xf$ and $x \ge \xf$, by introducing a double
+point $\xf^- = x^{n_f} = x^{n_f + 1} = \xf^+$ in the mesh.
+The solution is furthermore required to
+satisfy the boundary conditions (3.2) and (3.3), a suitable
+normalization condition ({\eg}
+$y_1 ( \xs ) = 1$), and continuity of all but one of the
+variables at $x = \xf$, {\ie},
+$$
+\eqalign{
+& y_1 ( \xf^- ) = y_1 ( \xf^+ ) \; , \cr
+& y_3 ( \xf^- ) = y_3 ( \xf^+ ) \; , \cr
+& y_4 ( \xf^- ) = y_4 ( \xf^+ ) \; , \cr
+}
+\eqno (3.14)
+$$
+(when $I$ = 2 clearly only the first continuity condition is used)
+We then set
+$$
+\Delta = y_2 ( \xf^- ) - y_2 (\xf^+ ) \; ,
+\eqno (3.15)
+$$
+and the eigenvalues are found as the zeros of $\Delta$, regarded as
+a function of $\sigma^2$. 
+It should be noticed, however, that with
+this definition, $\Delta$ may have singularities with discontinuous sign 
+changes that are not associated with an eigenvalue. Assuming that the
+normalization is at the outer boundary, as used above, this 
+occurs when $y_1 (\xf^- )$ is very close to a zero. Then
+the continuous fitting to $y_1 ( \xf^+ )$, which is
+in general not close to a zero, forces the interior solution, and
+hence $\Delta$, to be very large. Thus care is needed when searching for
+the eigenvalues by stepping through a range in $\sigma^2$,
+when this method is used. However, close to an eigenvalue $\Delta$ is
+generally well-behaved, and the secant iteration ({\cf}
+equation 3.10) may be used without problems.
+
+There is a third variant of the relaxation technique, which has 
+not, however, been implemented in the current version of the programme 
+({\cf} Unno {\etal} 1989, pp. 167 -- 178).
+Here the difference equations, the boundary conditions
+and a normalization condition are solved simultaneously for the
+solution $\{y_i^n\}$ and the eigenvalue $\sigma^2$. As the
+eigenvalue is included as an unknown when solving the equations, 
+the system is non-linear and must be solved by Newton-Raphson iteration.
+This method in principle gives quadratic convergence towards the
+solution (provided analytical derivatives of the equations and
+boundary conditions with respect to the $y_i^n$ and $\sigma^2$
+are used), as opposed to the somewhat slower convergence obtained with
+the secant iteration. However, it requires an initial guess for both the
+eigenvalue and the eigenfunction; experience with this method in a
+different programme suggests that this guess has to be fairly close to
+the correct solution, at least for modes that are predominantly trapped
+in a restricted region of the model. Furthermore there is no natural way to 
+scan the spectrum. Thus this method in practice almost certainly has to be
+combined with a version of one of the methods discussed above, to provide
+an initial estimate of the eigenvalue and eigenfunction. 
+It could then be used with some
+advantage for the final iterations towards the solution, where its
+faster convergence could be exploited. This would be a fairly 
+straightforward extension of the existing programme, and may be
+implemented in future.
+
+\subsect
+{\bf 3.3 The transition from $\hat y_i$ to $y_i$} 
+
+In practice, the variables $\hat y_i$ are defined as
+$$
+\hat y_i (x) = \left( {x \over x_{\rm ev}} \right)^{- l +1} y_i (x) \; ,
+\eqno (3.16)
+$$
+rather than by equation (2.6). Also the transition point $x_{\rm ev}$ is 
+taken at an existing point in the mesh. To simplify the logic in the
+programme $x_{\rm ev}$ is forced to be closer to the centre than the 
+fitting point $\xf$; if $\xf$ has been specified such that
+this puts constraints on $x_{\rm ev}$ , a
+warning is printed (note that, as discussed in Section 3.5 below,
+the fitting point should not be placed in the evanescent region).
+
+From the definition (3.16) it follows that 
+$$
+\hat y_i (x_{\rm ev} )= y_i (x_{\rm ev} ) \; .
+\eqno (3.17)
+$$
+When using the shooting technique the integration
+is carried out separately for $x$ between $x_1$ and $x_{\rm ev}$, and
+$x$ between $x_{\rm ev}$ and $\xf$, and equations (3.17) are used to
+provide initial conditions for the integration on the latter region.
+When the relaxation technique is used, the integration is carried
+out over the entire region between $x_1$ and $\xf$; to ensure
+that the conditions (3.17) are satisfied a double point 
+$(x_{\rm ev}^- , x_{\rm ev}^+)$ is introduced where $x_{\rm ev}^- = x_{\rm ev}$,
+$x_{\rm ev}^+ = x_{\rm ev} + \epsilon$, and $\epsilon$ should be
+chosen close to machine accuracy; in this way the difference
+equations (3.11) approximately ensures that equations (3.17) are
+satisfied. It would be possible, at the price of making the programme
+somewhat more complicated, to enforce equations (3.17) strictly, but
+this is unlikely to have any significant effect on the results.
+
+\subsect
+{\bf 3.4 Richardson extrapolation} 
+
+The difference scheme (3.11), which is used by one
+version of the shooting technique, and the relaxation technique,
+is of second order.
+Consequently the truncation errors in the eigenfrequency and eigenfunction
+scale as $N^{-2}$.
+If $\omega ( {1\over 2} N )$ and $\omega (N)$ are the eigenfrequencies obtained
+from solutions with ${1\over 2} N $ and $N$ meshpoints, the leading order
+error term therefore cancels in 
+$$
+\sigma_{\rm Ri} = {1 \over 3} [ 4 \sigma (N) - \sigma ( {1\over 2} N ) ] \; .
+\eqno (3.18)
+$$
+This procedure, known as {\it Richardson extrapolation},
+was used by Shibahashi \& Osaki (1981).
+It provides an estimate of the eigenfrequency that is substantially
+more accurate than $\sigma ( N )$, although of course at some
+added computational expense.
+
+%\revision{22/7/94}
+It is obviously essential that the iteration converges to the
+same mode in the calculations with $N$ and $N/2$ meshpoints.
+To check this, the order of the solution obtained in the two cases
+is calculated, according to the procedure described in 
+equation (4.1) below.
+If the two solutions have different orders, the combined solution
+should in principle be rejected.
+In practice, the situation may sometimes be more complex,
+due to problems with the definition of the order.
+It happens, particularly for $l = 1$ in evolved models,
+that the computed order jumps during evolution, due to
+a slight shift in the eigenfunction which eliminates a zero
+(see section 4.2; as discussed there this problem may largely be 
+avoided by using a determination of the order developed by Takata).
+Similarly, corresponding differences between the eigenfunctions
+computed with $N/2$ and $N$ points can lead to different orders
+being inferred in the two cases, even though this is in fact the same
+mode, and Richardson extrapolation therefore justified.
+This is handled by the programme in the following way:
+if different orders are detected, the difference between the
+eigenfunctions is estimated, in terms of the norm defined
+by the energy integral (equation 4.3), relative to the norm
+of one of the eigenfunctions.
+If this norm is comparable with the difference between the frequencies,
+in a suitable sense, the mode is accepted, otherwise it is rejected.
+In the former case a warning message, in the latter an error message,
+is written to {\tt adipls-status.log}.
+The details of the tests (which are handled by the subroutine {\tt testri})
+may still have to be fine-tuned.
+For high-order modes problems may also occur if the thinned-out mesh is
+not sufficient to resolve the eigenfunction, identifying a mode that
+is actually of different order in the vicinity of the frequency based on
+the full mesh.
+In such cases, it may be necessary to forego the Richardson extrapolation.
+
+
+\subsect
+{\bf 3.5 Operational experience} 
+
+As implemented here the shooting technique is considerably faster than
+the relaxation technique, and so should be used whenever possible
+(notice that both techniques may use the difference equations (3.11)
+and so they are numerically equivalent, in regions of the spectrum
+where they both work). For {\it second-order systems} the shooting technique can
+probably always be used; the integrations of the inner and outer solutions
+should cause no problems, and the matching determinant in equation (3.5)
+is well-behaved. For  {\it fourth-order systems},
+however, this need not be the case. For modes where the perturbation
+in the gravitational potential has little effect on the solution, the
+two solutions $y_j^{\rm (i,1)}$ and $y_j^{\rm (i,2)}$, and similarly the
+two solutions $y_j^{\rm (o,1)}$ and $y_j^{\rm (o,2)}$, are almost
+linearly dependent, and so the matching determinant nearly vanishes for any
+value of $\sigma^2$. This is therefore the situation where the relaxation
+technique may be used with advantage. 
+The point where the shooting method fails depends on the precision. 
+With 4-byte real variables, such as is used in the single-precision
+version on the Aarhus Alliant, 
+experience has shown that for a solar
+model the shooting technique may give problems for the full fourth order
+system for 5 min modes of degree higher than 4.
+On the NCAR Cray, with 8 byte real variables,
+it was possible to go as high as $l$ = 40
+for 5 min solar p modes; for strongly
+trapped g modes there were problems at degree higher than about 15.
+However, in general a little experimentation may be required to
+determine the conditions under which one method should be preferred
+over another.
+
+It should be noticed that the conditions under which the shooting technique
+for the full system gives problems are precisely the conditions where
+the Cowling approximation (of neglecting the perturbation in the
+gravitational potential) might be expected to be applicable. Thus
+here the Cowling approximation may be adequate, and the resulting
+second-order system can be solved using the shooting technique; the
+resulting eigenfrequency may, if desired, be corrected for the
+effects of the perturbations in the gravitational potential by
+using Cowling's perturbation expression, and the perturbation
+in the potential may be computed from the eigenfunction by using
+the integral solution of Poisson's equation (this option is 
+built into the programme). If a solution of the
+full system is desired, a reasonable strategy is to first compute
+the solution in the Cowling approximation with the shooting technique
+(possibly stepping in $\sigma^2$ to search for the eigenvalues),
+and to then solve the full set using the relaxation technique,
+starting from the eigenvalues found in the Cowling approximation.
+
+The ability to specify the fitting point $\xf$ gives considerably
+flexibility in the calculation, and correct choice of $\xf$ is
+often essential to obtain a solution. As a rule of thumb when
+using the shooting technique $\xf$
+should be chosen near the general maximum in the eigenfunction, so that
+the integration both from the inner and from the outer 
+boundary is in a direction where the solution is predominantly
+increasing. However, the fitting point may not placed too close to
+the surface, as otherwise the almost singular solution at the
+surface may cause problems. 
+
+%\revision{22/7/94}
+Problems are almost certain to arise if the fitting point is placed
+deep within the region where the solution is evanescent.
+In particular, in older versions of the code the point
+$x_{\rm ev}$ where the transition from scaled to
+unscaled variables takes place was restricted to lie deeper
+than the fitting point.
+For very high-degree modes, where the turning point is within
+a fraction of a per cent of the radius from the surface,
+this may easily happen, unless $\xf$ is very close to unity.
+In the present version of the code, this can be controlled in two
+slightly different ways:
+\medskip
+\item{i)} if the parameter {\tt irsevn} is set to 2,
+the fitting point is automatically reset to
+$x_{\rm ev}$ if it is found that $\xf < x_{\rm ev}$.
+The fitting point is reset to the input value before the
+next mode is calculated.
+\item{ii)}
+if the parameter {\tt xfit} is set to -1, the fitting point
+is always set to the boundary of the evanescent region.
+\medskip
+
+Roughly the same rules apply when using
+the relaxation technique with fitting, although here the rate (or even success)
+of convergence appears to somewhat more sensitive to the proper
+choice of $\xf$. 
+It has been found that the programme occasionally fails to
+converge to a single mode, out of a large sample
+or converges to a neighbouring mode.
+The missing mode can then usually be found by choosing a slightly
+different value for $\xf$.
+%The programme has an option
+%that automatically puts the fitting point at $x_{\rm ev}$.
+%However, it is not clear that this is in fact in general a useful choice.
+%There is still room for experimentation.
+%\revision{22/7/94}
+The programme has the option of automatically resetting $\xf$
+if the iteration fails or the wrong mode is obtained,
+by setting the parameter {\tt nftmax} to a value greater than one.
+If this succeeds, a warning message is written to
+{\tt adipls-status.log}.
+After completing the given mode, $\xf$ is reset to the original value.
+
+(As indicated previously the use of the relaxation technique, removing
+one of the boundary conditions, can cause problems; in particular
+it seems to give trouble for precisely the modes where the 
+relaxation technique is indicated, {\ie}, modes of high degree.
+This option was implemented before the relaxation
+technique with interior matching, and has been left in the programme to allow
+possible future experiments with its properties; however, for
+practical calculations the relaxation technique with interior matching should
+be preferred.)
+
+\mainsect
+\centerline{\twelvebf 4 Results of the calculation} 
+
+The principal results of the calculation are the eigenfrequency $\sigma$
+and the eigenfunction $y_i (x)$. However, the programme computes and
+prints a number of other quantities, which are described in this section.
+
+\subsect
+{\bf 4.1 Frequency correction in the Cowling approximation}
+
+When the equations are solved in the Cowling approximation for a
+complete model, the correction
+$\delta \sigma^2$ to $\sigma^2$ caused by the perturbation in the
+gravitational potential is calculated from Cowling's (1941) perturbation
+expression, as well as the corrected squared frequency 
+$\sigma_{\rm c}^2 = \sigma^2 + \delta \sigma^2$;
+here $\sigma^2$ denotes the value obtained as an eigenvalue.
+The calculation is carried out by the subroutine {\tt gravpo}.
+In addition the perturbation of the gravitational potential, in
+the form of $y_3$ is calculated from the integral solution to
+Poisson's equation; currently $y_4$ is not set.
+
+\subsect
+{\bf 4.2 Mode order}
+
+The programme finds the order of the mode according to the Scuflaire (1974)
+definition (see also Unno {\etal} 1989, p. 149 -- 158),
+through calling subroutine {\tt order}.
+Specifically the order is defined by
+$$
+n =
+- \sum_{x_{z1}> 0} \sign \left( y_2  {\dd y_1 \over \dd x }\right) + n_0 \; .
+\eqno (4.1)
+$$
+Here the sum is over the zeros $\{x_{z1}\}$ in $y_1$ (excluding the
+centre), and $\sign$ is the sign function, $\sign(z) = 1$ if $z > 0$
+and $\sign(z) = -1$ if $z < 0$. The value of $n_0$ depends on the
+behaviour of the solution close to the innermost boundary: if $y_1$ and
+$y_2$ have the same sign at the innermost mesh point, excluding the
+centre, $n_0 = 0$, otherwise $n_0 = 1$. In particular, for a
+complete model that includes the centre, it follows from the expansion
+of the solution at the centre that $n_0 = 1$ for radial oscillations
+and $n_0 = 0$ for non-radial oscillations. Thus the fundamental 
+radial oscillation has order $n = 1$. Although this is contrary to the
+commonly used convention of assigning order 0 to the fundamental radial
+oscillation, the convention used here is in fact the more reasonable,
+in the sense that it ensures that $n$ is invariant under a continuous
+variation of $l$ from 0 to 1. With this definition $n > 0$ for p modes, 
+$n = 0$ for f modes, and $n < 0$ for g modes.
+
+It may be shown that this labelling is mathematically satisfactory in
+the Cowling approximation, in the sense of being invariant under 
+continuous variations of the equilibrium model, or under continuous
+changes in $l$
+(Gabriel \& Scuflaire 1979; Christensen-Dalsgaard 1980).
+However, this is not always the case for modes 
+corresponding to the full set of equations. 
+In particular, for sufficiently centrally condensed models
+an unreasonable order is calculated for the lowest-order p modes with $l = 1$;
+such models include models of the present Sun and more highly evolved models, 
+as well as polytropic models of sufficiently high 
+polytropic index (see Christensen-Dalsgaard \& Mullan 1994).
+This problem affects a very broad range of dipolar modes in models
+of red giants.
+The correct mode labelling can in principle be inferred for
+such models by following the modes through
+a sequence of models starting from a less centrally condensed model, {\eg},
+from a ZAMS model where such problems apparently do not occur. 
+
+The programme contains the option for correcting the order
+set as in equation (4.1),
+controlled by the input parameter {\tt irsord}:
+if $1 \le {\tt irsord} \le 10$,
+the order 
+$n$ as calculated using equation (4.1) is replaced by $\tilde n = n + 1$
+when $l = 1$ and $0 \le n \le {\tt irsord}$.
+Thus {\tt irsord = 1} makes the correct resetting 
+in the case of a traditional model of the present Sun.
+It is important to realize, however, that the correction 
+depends strongly on the nature of the model.
+In particular, for more evolved $1 \Msun$
+models the problems extend to higher order.
+
+An alternative method for setting the order was proposed by
+Lee (1985), on the basis of $\delta \Phi$ and $p'$.
+It may be obtained in the programme by setting 
+{\tt irsord = 11} or {\tt -11}.
+The success with this approach has been less than convincing so far.
+However, in a major breakthrough Takata (2005, 2006a,b) showed that
+the eigenfunctions of dipolar modes satisfy an identity which allows
+the oscillation equations to be cast as a second-order system.
+This allows a rigorous determination of the mode order based on the
+functions
+$$
+{\cal Y}_1 = {1 \over g} \left[ {\delta \Phi \over r}
+- \delta \left({\dd \Phi \over \dd r} \right) \right] \; , \qquad
+{\cal Y}_2 = {\delta p \over p} \; .
+\eqno (4.2)
+$$
+The scheme has been implemented in the code by G\"ulnur Do{\u g}an
+and appears to produce reliable orders of dipolar modes for a broad range
+of models, including models of red giants.
+It is used by setting {\tt irsord = 20}.
+
+
+\subsect
+{\bf 4.3 Mode energy, scaled eigenfunctions}
+
+The programme calls subroutine {\tt ekin} to calculate
+a dimensionless measure of the kinetic energy of pulsation.
+Two different normalizations may be chosen, depending on the value of
+the parameter {\tt iekinr}. 
+For {\tt iekinr} $= 0$ (the default) the quantity calculated is
+$$
+E = {\int_{r_1}^{R_{\rm s}} [ \xi_r^2 + l ( l + 1) \xi_h^2 ]
+ \rho  r^2  \dd r \over M  \xi_r (R_{\rm s} )^2}
+= { \displaystyle \int_{x_1}^{\xs} \left[ y_1^2
++ y_2^2  / l ( l + 1) \right]  q U \dd x / x 
+\over 4 \pi  y_1 (\xs )^2} \; ,
+\eqno(4.3a)
+$$
+whereas for {\tt iekinr} $= 1$, 
+$$
+E = {\int_{r_1}^{R_{\rm s}} [ \xi_r^2 + l ( l + 1) \xi_h^2 ]
+ \rho  r^2  \dd r \over 
+ M [ \xi_r (R_{\rm phot} )^2 + l(l+1) \xi_h (R_{\rm phot} )^2]}
+= { \int_{x_1}^{\xs} \left[ y_1^2
++ y_2^2  / l ( l + 1) \right]  q U \dd x / x  
+\over 4 \pi [ y_1 (x_{\rm phot} )^2 + y_2 (x_{\rm phot} )^2/l(l+1)] } \; .
+\eqno(4.3b)
+$$
+(For radial modes the terms in $y_2$ are not included.)
+Here $r_1 \equiv  R  x_1$, $R_{\rm s} \equiv R  \xs$
+and $R_{\rm phot} \equiv R $ are the
+distance of the innermost mesh point from the centre and the surface
+and photospheric radii of the model, respectively; 
+$q = m/M$ and $U = 4 \pi \rho r^3 / m$.
+Note that, as defined here, $E$ is related to the commonly used 
+{\it mode mass} $M_{\rm mode}$ by $E = M_{\rm mode}/(4 \pi M)$.
+
+To indicate the region where the mode predominantly resides 
+(in an energetical sense) 
+$$
+\eqalign{
+& z_1 (x) = \left( {4 \pi r^3 \rho  \over M }\right)^{1/2}  y_1 (x) 
+= \left( {4 \pi r^3 \rho  \over M }\right)^{1/2}  {\xi_r(r) \over R} \; ,\cr
+& z_2 (x) = {1 \over \sqrt {l ( l + 1) } }
+\left( {4 \pi r^3 \rho  \over M }\right)^{1/2} y_2 (x) 
+= \sqrt {l ( l + 1) } 
+  \left( {4 \pi r^3 \rho  \over M }\right)^{1/2} { \xi_h(r) \over R} \; , \cr
+}
+\eqno (4.4)
+$$
+are calculated (for radial modes only $z_1$ is found).
+These are defined in such a way that
+$$
+E = {1 \over 4 \pi  y_1 (\xs )^2} 
+\int_{x_1}^{\xs} [ z_1^2 + z_2^2 ]  {\dd x \over x } \; 
+\eqno(4.5)
+$$
+[assuming the definition (4.3a) of $E$].
+For output purposes the normalized functions
+$$
+\hat z_1 = {z_1 \over z_{1, \rm max} } \qquad
+\hbox{\rm and } \qquad
+\hat z_2 = {z_2 \over z_{1, \rm max} } \; ,
+\eqno(4.6)
+$$
+where $z_{1, \rm max}$ is the maximum value of $z_1$,
+are generally used.
+
+\subsect
+{\bf 4.4 Variational frequency}
+
+The programme has the option of calculating the frequency and period
+based on the variational expression for $\omega^2$,
+in the subroutine {\tt varfrq}
+[see Christensen-Dalsgaard (1982) for details]. 
+As discussed there,
+different formulations have to be used for p and for g modes,
+selected by the input parameter {\tt ivarf}.
+It might also be noticed that, as implemented, the calculation
+is based on only $y_1$ and $y_2$, with the contribution
+from the perturbation in the gravitational potential being 
+calculated using the integral solution to Poisson's equation.
+Thus even for modes calculated in the Cowling approximation
+the perturbation of the gravitational potential is taken into
+account, essentially by using the perturbation technique,
+in the calculation of the variational period.
+
+Notice that the programme normally uses a different formulation
+for radial and for nonradial modes.
+There is an option (selected by setting the parameter
+{\tt ivarf} to 3), where essentially the nonradial
+formulation of the variational integral (in its p-mode form)
+may be used for radial modes; this may be useful to get strict consistency
+between the calculation for radial and non-radial modes.
+However, this formulation apparently leads to fairly severe
+cancellation and consequent loss of accuracy. 
+Thus it probably cannot be recommended, although the modes for
+which it might be of use must be investigated.
+
+\subsect
+{\bf 4.5 Kernels}
+
+For a rotation law depending on $r$ only the rotational
+splitting may be written
+$$
+\Delta \omega_{nlm} = m \beta_{nl} \int_0^{\xs}
+K_{nl} (x)  \Omega (x) \dd x \; ,
+\eqno (4.7)
+$$
+where $\Omega (x)$ is the angular velocity.
+The programme has an option of
+calculating and printing $\beta_{nl}$ and $K_{nl}$;
+this is done by subroutine {\tt rotker} when the parameter
+{\tt irotkr} is set to 1.
+
+The programme contains also the option for computing the kernel
+for computing the frequency change caused by a change in $\Gamma_1$
+at fixed $p$ and $\rho$.
+Specifically, the kernel $K_{nl}^{(\Gamma_1 )}$
+is defined such that 
+$$
+{\delta \omega  \over \omega } = \int_0^{\xs}
+K_{nl}^{( \Gamma_1 )} \delta \Gamma_1 \dd x \; .
+\eqno (4.8)
+$$
+It is calculated by subroutine {\tt gm1ker} when the parameter
+{\tt igm1kr} is set to 1.
+
+\mainsect
+\centerline{\twelvebf 5 Equilibrium model variables} 
+
+The following variables are needed at each mesh point in the model:
+$$\eqalign{
+x &\equiv r / R \; , \cr
+A_1 &\equiv q / x^3  , \qquad \hbox{\rm where } q = m / M \; , \cr
+A_2 &= V_g \equiv -  {1 \over \Gamma_1} {\dd \ln p  \over \dd \ln r}
+= {G m \rho   \over \Gamma_1 p r} \; , \cr
+A_3 &\equiv \Gamma_1 \; , \cr
+A_4 &= A \equiv {1 \over \Gamma_1} {\dd \ln p \over \dd \ln r} - 
+{\dd \ln \rho   \over \dd \ln r} \; , \cr
+A_5 &= U \equiv {4 \pi \rho r^3  \over m } \; .\cr
+}
+\eqno (5.1)
+$$
+These are clearly all dimensionless.
+In addition we use the following ``global'' quantities for the model:
+$$
+\eqalign{
+& D_1 \equiv M \; , \cr
+& D_2 \equiv R \; , \cr
+& D_3 \equiv p_{\rm c} \; , \cr
+& D_4 \equiv \rho_{\rm c} \; , \cr
+& D_5 \equiv 
+- \left( {1 \over \Gamma_1 p }  {\dd^2 p \over \dd x^2} \right)_{\rm c} \; , \cr
+& D_6  \equiv 
+- \left(  {1 \over \rho } {\dd^2 \rho  \over \dd x^2} \right)_{\rm c} \; , \cr
+& D_7  \equiv \mu \; , \cr
+& D_8: \hbox{see below} \; .\cr
+} \eqno(5.2)
+$$
+Here $R$ and $M$ are photospheric radius and mass of the model (the photosphere
+being defined as the point where the temperature equals the effective
+temperature). In a complete model 
+$p_{\rm c}$ and $\rho_{\rm c}$ are central pressure and 
+density, and $D_5$ and $D_6$ are evaluated at the centre.
+In an envelope model (that does not include the centre) $D_3$ and
+$D_4$ should be set to the values of pressure and density at the
+innermost mesh point, and $D_5$ and $D_6$ may be set to zero.
+The dimensional variables ({\ie},
+$D_1 - D_4$) must be given in $cgs$ units.
+
+For a model with vanishing surface pressure $\mu$ is the effective
+polytropic index at the surface, so that in particular $\mu$ is the
+polytropic index of a complete polytrope
+(the polytropic index elsewhere is not needed in the calculation, and
+so mixed polytropes can be considered); models with non-vanishing
+surface pressure are flagged by having $\mu < 0$.
+The notation is otherwise standard. The model may include an
+atmosphere (for solar models a simplified atmosphere
+extending out to roughly the temperature minimum is typically used). Thus
+at the surface possibly $x > 1$.
+
+These variables are convenient when the equations are formulated as
+by {\eg} Dziembowski; but it should be possible to derive any set
+of variables required for {\it adiabatic} oscillation calculations from them.
+$D_5$ and $D_6$ are needed
+for the expansion of the solution around the centre. In models with
+vanishing surface pressure $D_7$ is used in the expansion at the
+surface singular point.
+
+For a plane-parallel equilibrium model, 
+or when the equilibrium model is affected by turbulent pressure,
+the definition of the equilibrium
+variables must be somewhat modified. These modifications are discussed
+in Sections A.2 and A.3, respectively.
+
+The quantity $D_8$ is used to flag for a different number
+of variables in the file, or otherwise a different structure.
+Currently the non-standard options are to have $D_8 = 10$ or $20$.
+In both cases, the file contains 6 variables $A_1 - A_6$ at each
+mesh point.
+For $D_8 = 10$, $A_6$ is related to the gradient in turbulent pressure
+(see Section A.3.2);
+for $D_8 = 20$, $A_6$ is related to the ratio between the full and
+reduced gravitational acceleration, in cases with rotation
+(see Section A.4).
+The value of $D_8$ is checked when the file is opened in
+subroutine {\tt readml}; hence the structure must be the
+same for all models in a given file.
+
+Relations between the variables defined here and
+more ``physical'' variables are often useful.
+Here we provide relations valid when $A_6$ is not included;
+for the case including rotation, see Section A.4.
+We obtain:
+$$
+p = {G M^2  \over 4 \pi R^4}  {x^2 A_1^2 A_5 \over A_2 A_3} \; , \qquad
+{\dd p \over \dd r }= - {G M^2  \over 4 \pi R^5} x A_1^2 A_5 \; , \qquad
+\rho = {M \over 4 \pi R^3}  A_1 A_5 \; . 
+\eqno (5.3)
+$$
+We may also express the characteristic frequencies for adiabatic
+oscillations in terms of these variables. Thus if $N$ is the
+buoyancy frequency, $S_l$ is the Lamb frequency and $\omega_a$ is the acoustical cut-off frequency for an isothermal
+atmosphere, we have
+$$
+N^2 \equiv {G M \over R^3} {\tilde N}^2 =  {G M \over R^3}  A_1 A_4 \; , 
+\eqno (5.4)
+$$
+$$
+S_l^2 \equiv {l ( l + 1) c^2  \over r^2}
+\equiv {G M \over R^3} {\tilde S}_l^2 = 
+{G M \over R^3} {l ( l + 1) A_1  \over  A_2} \; , 
+\eqno (5.5)
+$$
+and
+$$
+\omega_a^2 \equiv {c^2  \over 4 H_p^2}
+= {1 \over 4 } {G M \over R^3}  A_1 A_2 A_3^2 \; , 
+\eqno (5.6)
+$$
+where $c$ is the adiabatic sound speed, and $H_p = p / ( g \rho )$ is
+the pressure scale height.
+Finally it may be noted that the squared sound speed is given by
+$$
+c^2 = {G M \over R }x^2 {A_1  \over A_2} \; .
+\eqno (5.7)
+$$
+
+\mainsect
+\centerline{\twelvebf 6 Notation and data storage in the programme} 
+
+\subsect
+{\bf 6.1 Model storage}
+
+Only a limited description of the notation in the programme is given in
+this section, aimed at facilitating the later discussion of input to
+and output from the programme.
+Further comments on the organization of the programme are given in Appendix B.
+However, a  detailed description of the code 
+is outside the scope of these notes.
+
+In the programme a mesh $\{ x^n \}$ is used, with $x^1 $
+being the point closest to the centre and 
+$x^{NN}$ at the surface; this is stored in a 
+one-dimensional array ${\tt x(n)} = x^n ,  n = 1, 2, \ldots, NN$.
+The $A_i$ are stored in the array {\tt aa(1:iaa,1:nn)}.
+Here the first dimension {\tt iaa} is currently set to 10.
+The variables are stored as
+$$
+{\tt aa(i,n)} = A_i ( x^n ) ,  \qquad i = 1,\ldots,{\tt ia}, 
+\quad n = 1,\ldots, {\tt nn} \; ,
+$$
+where {\tt ia} is normally 5, but may be 6 in models including
+one possible treatment of turbulent pressure ({\cf} section A.3.2);
+{\tt aa(10,n)} is used for additional storage related to 
+a different way of handling turbulent pressure.
+Finally the $D_i$ are stored in the array {\tt data(1:8)} as
+$$
+{\tt data(i)} = D_i , \qquad  i = 1,\ldots,7  \; ;
+$$
+{\tt data(8)} is used only as a flag on model input 
+({\cf} Section 5).
+
+\subsect
+{\bf 6.2 Storage of solution}
+
+The {\it squared} eigenfrequency $\sigma^2$ is denoted by 
+{\tt sig} (and {\tt sig1}, {\tt sig2}, {\tt sigp}, $\ldots$)
+in the programme. Furthermore the degree $l$ of the modes is stored
+in {\tt el};
+as discussed in Section 2.1 $l$ is treated as a real variable.
+
+The solution at {\tt x(n)} is set into {\tt y(i,n)}, 
+as
+$$
+{\tt y(i,n)} = y_i ( x^n ) ,  \quad
+{\tt i = 1,  \ldots,  ii, \quad  n = nw1,  \ldots,  nn} \; .
+$$
+Here {\tt ii} is the order of the system, {\ie},
+2 for radial oscillations or non-radial oscillations in the Cowling
+approximation, and 4 for non-radial oscillations with the full system.
+Further {\tt nw1} = 1 if the model is not truncated in the interior, 
+otherwise {\tt nw1 = ntrnct}, the truncation mesh point;
+{\tt nnw = nn - nw1 + 1} is used for
+the total number of points in the solution.
+
+The inner boundary conditions are applied at the point {\tt nibc}.
+When {\tt nw1} = 1, and {\tt x(1)} is at the centre of the model,
+{\tt nibc} = 2.
+Otherwise {\tt nibc = nw1}.
+
+A more detailed description of the data storage is given in the source
+for the programme.
+
+\subsect
+{\bf 6.3 Terminal input, and terminal and printed output} 
+
+The unit numbers for these types of input and output
+are defined in
+\ms
+{
+\source
+common/cstdio/ istdin, istdou, istdpr
+}\msni
+Here {\tt istdin} is the unit number for input (typically 5),
+{\tt istdou} is the unit number for output to the terminal,
+and {\tt istdpr} is the unit number for printed output.
+For batch processing, one would obviously have
+{\tt istdou = istdpr}.
+These quantities are initialized in 
+\ms
+{
+\source
+block data blstio
+}\msni
+which must be set, depending on the installation.
+{\tt istdpr} is contained in the list of control parameters,
+and may be changed during the operation of the programme.
+This allows, say, sending a short summary of the operation of
+the programme, to verify that it is successful, to the terminal,
+and the detailed printed output to a file.
+
+\mainsect
+\centerline{\twelvebf 7 Input to the programme} 
+
+\intsect
+{\bf 7.1 The equilibrium model} 
+
+The equilibrium model must be supplied to the programme in a single,
+unformatted record, to be read by the statement
+\ms
+{
+\source
+\ read(imlds) nmod, nnmodl, (data(i), i=1,8), (x(n), (aa(i,n), i=1,ia),
+*  n=1,nnmodl)
+}\msni
+Here {\tt nmod} is an identification number of the model, which is not
+used in the calculation.
+Also, {\tt ia} should be 5, unless anything else is flagged by setting
+{\tt data(8)}.
+Note that the model storage must start at the centre.
+
+It is important that the model supplied to the programme must have a reasonable
+distribution of mesh points. There is currently no possibility for
+resetting the mesh in the programme, apart from possibly reducing
+the number of points by taking every {\tt in}-th point ({\cf} Section 7.2).
+This is of course particularly important for high-order
+modes, where it is essential to use different meshes for p and
+for g modes. A separate programme exists for resetting the mesh
+from that supplied by, {\eg}, the evolution programme.
+
+\subsect
+{\bf 7.2 Control parameters} 
+
+\intsect
+{\it 7.2.1 Input of control parameters} 
+
+In the original version of the programme control parameters were 
+input by means of {\tt namelist}.
+However, {\tt namelist} is not a standard Fortran77 feature,
+unfortunately; in particular, certain implementations
+under UNIX have not permitted {\tt namelist}.
+Also {\tt namelist} may not be optimal for interactive use
+of the programme.
+
+Thus the programme uses list-directed input.
+This takes place in separate
+lines, containing up to 9 variables.
+On {\it input}, each line is prompted by printing
+the names of the variable, and the current values,
+as in
+\ms
+{
+\source
+itrsig, sig1, istsig, inomde, itrds ?
+0 10.00 1 1 10 
+}\msni
+The new values are then input.
+Note that if a value is not given for a variable, it is
+not changed.
+Thus by inputting, {\eg},
+\ms
+{
+\source
+,5.,,2,,
+}\msni
+in response, {\tt sig1} is set to 5.0, {\tt inomde} to 2, and the
+remaining variables are unchanged.
+If a line consisting solely of commas is input, all variables are unchanged.
+
+Although it is possible in this way to enter the data from the terminal,
+this is somewhat impractical, given the large number of parameters.
+The usual way of providing input to the code is through the use
+of an input file.
+This may conveniently be given the following structure:
+\ms
+{
+\source
+\qquad .
+\qquad .
+mod:
+  ifind, xmod, imlds, in, nprmod,
+,,,,,,,   @
+  xtrnct, ntrnsf, imdmod,
+0.,,,,,,,,,,,,,,,,,,,,,, @
+osc:
+  el, nsel, els1, dels, dfsig1, dfsig2, nsig1, nsig2
+   ,4,0,1,0,0,,,,,,,     @
+  itrsig, sig1, istsig, inomde, itrds,
+    1, 5   0 ,    10,10,,,,,,,,   @
+  dfsig, nsig, iscan, sig2,
+,2,50,30,,,,,,,,,,,,,,,,,,,,,,,     @
+eltrw1, eltrw2, sgtrw1, sgtrw2
+,,0,-1,,,,,,,,,,,,,,,,,,,,,,,,,,,,  @
+\qquad .
+\qquad .
+}
+\msni
+Here lines of headers giving variable names are followed by lines
+setting their values.
+The latter are indicated by the character ``{\tt @}'' at the end of the line.
+Only these data lines should be passed to the programme.
+This is achieved by passing the input file through a filter,
+before the data are read in.\footnote*
+{This extraction is trivially done under UNIX by using
+the {\tt grep} programme.
+More generally, it would be simple to write a Fortran programme
+to perform the same task.
+}
+In practice the extraction is handled automatically by the
+UNIX script which is invoked to run the programme
+({\cf} {\it Notes on using the solar models and adiabatic pulsations package}).
+
+The {\it output} gives a line with the variable names,
+and a line giving their values, as
+\ms
+{
+\source
+itrsig, sig1, istsig, inomde, itrds
+0 5.0 1 2 10    @
+}\msni
+Note the addition of the character ``{\tt @}''.
+This is included in all output lines that correspond
+to a parameter input line to the programme;
+in this way, the output contains essentially the information
+required to repeat the given run.
+
+As the programme has a very large number of control
+parameters (about 85!), these are separated into 5
+groups.
+The first control parameter, {\tt cntrd}, is a string which
+controls which of these groups are modified.
+Each group is indicated by a three-letter string, defined by
+\medskip
+{\obeylines\smallskip
+{\tt mod:} read model controls.
+{\tt osc:} read controls for mode selection.
+{\tt rot:} read controls for including rotational effects
+{\tt cst:} read new values of fundamental constants (currently %
+just gravitational constant)
+{\tt int:} read controls for type of equations or integration procedure.
+{\tt out:} read controls for output.
+{\tt dgn:} read controls for diagnostics.}
+\bigskip
+
+The fields may be separated by, e.g., ``.'' (but  {\it not} comma
+or blank, as they act as variable separators in the
+list-directed input).
+Thus if {\tt cntrd} is ``{\tt mod.osc.int}'', the groups defining the model,
+mode selection and integration procedures are read.
+Note that this input quantity {\it must} be specified explicitly
+({\ie}, it cannot be set to default values by means of ``,,,'').
+
+\subsect
+{\it 7.2.2 Assignment of unit numbers to files} 
+
+In the current version of the programme, files are 
+accessed by unit numbers which are assigned once and for all.
+This is therefore very similar to the procedure used on
+traditional main-frames, where the assignment takes place
+with the appropriate JCL statements. -- 
+In future a more flexible scheme may be implemented.
+
+The assignment takes place in the programme, to make
+it as installation independent as possible.
+It is defined by means of a list, read from normal input, on the form
+\ms
+{
+\source
+   $<$unit number$>$    $<$file name$>$
+}\msni
+and terminated by
+\ms
+{
+\source
+   -1 ''
+}\msni
+As an example, the following block of an input file
+\ms
+{
+\source
+   2    'model' \qquad @
+  10    '/usr/jcd/agsm/gsm' \qquad @
+  11    'new.gsm' \qquad @
+  15    'new.ssm' \qquad @
+ -1 '' \qquad @
+}\msni
+assigns unit number 2 to the file ``{\tt model}'', unit number 10 to the
+file {\tt /usr/jcd/agsm/gsm}, and so on
+(note that the ``{\tt \ '\ }'' are required here
+to ensure input of the entire string; the file name format is
+peculiar to UNIX).
+Notice the addition of ``{\tt @}'' to make these into input lines
+passed to the programme.
+
+The programme prompts for input of the file data,
+giving information about the files required and the format.
+The input data is echoed, with the addition to each line of the
+character ``{\tt @}'', in accordance with the usage described
+above in connection with list-directed input/output.
+
+\subsect
+{\it 7.2.3 Description of control parameters} 
+
+Below is a complete list of the control variables and their meaning.
+This is essentially copied from the list given in the programme.
+To facilitate the use of the programme a discussion of some of the
+options is given in Sections 7.3 -- 7.5.
+
+Note that to separate the variables in the programme from the
+other variables, the former have been written in {\tt typewriter type}.
+
+\bigskip
+\ref
+{\tt cntrd}: String determining which control fields are read. See description
+in Section 7.2.2 above.
+\hfil\break \qquad (default: {\tt cntrd} = {\tt 'mod.osc.int.out.dgn'}.
+  This reads all the control fields, except fundamental constants.)
+
+\subsect
+a) Equilibrium model controls (group {\tt mod}):
+
+\param
+{\tt ifind}, {\tt xmod}: determines which model is used.
+\pparam
+{\tt ifind} $<$ 0: do not read new model,
+except if no model has been read so far.
+\pparam
+{\tt ifind} = --2: possibly reset model with subroutine {\tt modmod}
+or set new truncation, even if no new model was read.
+\pparam
+{\tt ifind} = 0: rewind data set before reading model.
+\pparam
+{\tt ifind} = 1: read next model on data set.
+\pparam
+{\tt ifind} = 2: read model no. {\tt xmod} on dataset.
+\pparam
+{\tt xmod} is currently assumed be integer-valued.
+Non-integer {\tt xmod} may be implemented later, 
+with interpolation between models.
+{\defaults ifind = -1
+xmod = 0})
+\param
+{\tt imlds}: models are read from unit {\tt imlds}
+{\defaults imlds = 2})
+\param
+{\tt in}: after reading model, take every {\tt in}-th point
+{\defaults in = 1})
+\param
+{\tt nprmod}: if {\tt nprmod} $>$ 0 print the model at {\tt nprmod} points.
+{\defaults nprmod = 0})
+\param
+{\tt xtrnct}: if {\tt xtrnct} $>$ 0 truncate the model 
+fractional radius $r/R  = $ {\tt xtrnct}.
+This is only implemented for radial
+oscillations, or in the Cowling approximation. 
+Thus if $l >  $ 0 and the model is truncated, {\tt icow} = 2 is
+forced, and a diagnostics is printed.
+{\defaults xtrnct = 0})
+\param
+{\tt ntrnsf}: if {\tt ntrnsf} $>$ 1 stop model at point no. {\tt
+ntrnsf} from the
+surface.
+{\defaults ntrnsf = 0})
+\param
+{\tt imdmod}: when {\tt imdmod} $\not=$ 0 call 
+{\tt s/r modmod}, which may be user-specified
+to modify the model.
+{\defaults imdmod = 0})
+
+\subsect
+b) Controls for $l$ and the trial frequency (group {\tt osc}):
+
+\param
+{\tt el}, {\tt nsel}, {\tt els1}, {\tt dels}:
+controls for determining the value of the degree $l$.
+\pparam
+{\tt el}: when {\tt nsel} $\le$ 0 (and {\tt itrsig} $\not=$ 2;
+see below) use $l$ = {\tt el} as input.
+{\defaults el = 1})
+\pparam
+{\tt nsel}: when {\tt nsel} $\ge$ 1 step through 
+$l = {\tt els1} + i*{\tt dels}$, 
+$i = 0, \ldots, {\tt nsel}-1$. When {\tt iscan} $\le$ 1 (see below) 
+{\tt sig} is given the initial value in {\tt sig1}.
+The increment from one value of $l$ to the next may be controlled
+by the parameters {\tt dfsig1, nsig1} (see below).
+{\defaults nsel = 0
+els1 = 10
+dels = 1})
+\param
+{\tt dfsig1}, {\tt dfsig2}, {\tt nsig1}, {\tt nsig2}:
+allows resetting of the {\tt sig1} and {\tt sig2}
+during step in $l$ for {\tt nsel} $>$ 1.
+For each new value of $l$,
+{\tt sig1} and {\tt sig2} are incremented as determined by
+({\tt nsig1, dfsig1}), ({\tt nsig2, dfsig2}),
+in the same manner as in the definition of {\tt nsig} and {\tt dfsig} below.
+{\defaults dfsig1 = 0
+dfsig2 = 0
+nsig1 = 1
+nsig2 = 1})
+\param
+{\tt sig1}, {\tt sig2}, {\tt itrsig}, {\tt inomde}, {\tt istsig}, {\tt
+itrds}, {\tt dfsig}, {\tt nsig}: determine trial frequency.  
+\pparam
+{\tt itrsig} = 0: trial frequency taken from {\tt sig1}.  
+\pparam
+{\tt itrsig} = 1: {\tt sig} is found initially from {\tt sig1}, and then, 
+for {\tt jstsig} $= 2, \ldots$, {\tt istsig}, from previous value
+{\tt sigp} and {\tt dfsig}. 
+\pparam
+Meaning of {\tt dfsig} depends on {\tt nsig}:
+\ppparam
+{\tt nsig} = 1: {\tt sig} = {\tt sigp} + {\tt dfsig}
+\ppparam
+{\tt nsig} = 2: {\tt dfsig} is increment in frequency
+({\ie}, in $\sqrt {{\tt sig}}$),\nwl
+{\tt sig} = $( \sqrt { {\tt sigp}} + {\tt dfsig} )^2 $.
+\ppparam
+{\tt nsig} = 3: {\tt dfsig} is increment in 1/(frequency)
+({\ie}, in $1/ \sqrt {{\tt sig}}$),
+\nwl
+{\tt sig} = $(1/\sqrt {{\tt sigp}} +{\tt dfsig} )^{-2} $.
+\pparam
+(Note that {\tt itrsig} and {\tt nsig} have a special meaning when {\tt
+iscan} $>$ 1, see below.)
+\pparam
+{\tt itrsig} = 2 or 3: find trial frequency from values on
+grand summary residing on unit {\tt itrds}. 
+If {\tt itrsig} = 2 mode no {\tt inomde} + {\tt jstsig} - 1 is taken, 
+and {\tt el} is reset to the value for this mode.
+If {\tt itrsig} = 3 the mode with the value of $l$ input as {\tt el}
+and of order {\tt inomde} + {\tt jstsig} - 1 is used.
+Here {\tt jstsig} is stepped through $1, \ldots,{ \tt istsig}$.
+\pparam
+{\tt itrsig} = 4 or 5: find trial frequency from values on short
+summary residing on unit {\tt itrds}. Otherwise corresponds to
+{\tt itrsig} = 2 or 3 above.
+\pparam
+{\tt itrsig} = 6 or 7: find trial frequency from 
+cyclic frequencies (in $\mu$Hz) from file residing on d/s {\tt itrds};
+the file is in ASCII, each record containing $l, n, \nu$,
+where $\nu$ is the cyclic frequency in $\muHz$.
+Otherwise {\tt itrsig} = 6 and 7 corresponds to itrsig = 2 and 3 above.
+\pparam
+{\tt itrsig} = --2 --- --5: Find trial frequencies from single-precision
+files of grand or short summaries, as above for 
+{\tt itrsig} = 2 --- 5.
+\pparam
+(Note that {\tt istsig} and {\tt inomde} have special meaning 
+when {\tt iscan} $>$ 1; see below.)
+{\defaults itrsig = 0
+sig1 = 10
+sig2 = 0
+dfsig = 0.
+nsig = 1
+istsig = 1
+inomde = 1
+dfsig = 10})
+\param
+{\tt iscan}: flag for scan in {\tt sig}.
+When {\tt iscan} $>$ 1 step in {\tt sig} with {\tt iscan} 
+steps between {\tt sig1} and {\tt sig2}.
+Step is uniform in squared frequency, frequency or period, for
+{\tt nsig} = 1, 2, and 3, respectively.
+When {\tt istsig} $\le$ 1, {\tt sig1} and {\tt sig2}
+are limits in squared dimensionless frequency $\sigma^2$;
+otherwise {\tt sig1} and {\tt sig2} are the limits in
+cyclic frequency $\nu$, measured in mHz.
+When {\tt itrsig} = 1 check for change of sign in the matching determinant
+and iterate for eigenfrequency at each change of sign.
+If {\tt inomde} $\ge 2$ stop scan after diagnostics from integration.
+(Currently only for diagnostics from {\tt setbcs}, particularly when 
+the frequency exceeds the acoustical cut-off frequency.)
+{\defaults iscan = 1})
+\param
+{\tt eltrw1}, {\tt eltrw2}, {\tt sgtrw1}, {\tt sgtrw2}:
+windows applied to trial $l$ or $\sigma^2$.
+Only takes effect if {\tt eltrw1} $\le$ {\tt eltrw2}, 
+respectively {\tt sgtrw1} $\le$ {\tt sgtrw2}.
+{\defaults eltrw1 = 0
+eltrw2 = -1
+sgtrw1 = 0
+sgtrw2 = -1})
+
+\noindent
+See also note (a) below.
+
+\subsect
+c) Controls for the inclusion of rotation (group {\tt rot}):
+
+\param
+{\tt irotsl}: if {\tt irotsl = 1}, calculate solution including first-order
+rotational effects as in Soufi {\etal} (1998) for azimuthal order {\tt em}.
+{\defaults irotsl = 0
+em = 0})
+\param
+{\tt nsem}, {\tt ems1}, {\tt dems}: Controls step in azimuthal order, for
+{\tt irotsl} = 1.
+\pparam
+{\tt nsem = -1}: step with step {\tt dems}, from {\tt -el} to {\tt el}
+\pparam
+{\tt nsem .gt. 0}: take {\tt nsem} steps, starting from {\tt ems1}, 
+with step {\tt dems}
+{\defaults
+nsem = 0
+ems1 = 0
+dems = 0})
+
+\subsect
+d) Fundamental constants (group {\tt cst}):
+
+\param
+{\tt cgrav}: Value of gravitational constant (the default is value hardcoded
+in the programme before 23/3/88)
+{\defaults cgrav = $6.6732\times10^{-8}$})
+
+\subsect
+e) Controls for equations, boundary conditions and integration method
+(group {\tt int}):
+
+\param
+{\tt iplneq}: when {\tt iplneq} = 1 use equations for plane-parallel layer
+(note that model coefficients should then also correspond
+to plane-parallel case). Only implemented for non-radial
+oscillations; attempted calculations with $l$ = 0 are
+skipped, and a diagnostics is printed.
+{\defaults iplneq = 0})
+\param
+{\tt iturpr}: flag for turbulent pressure in equilibrium model
+(see Section A.3; {\bf probably requires further testing})
+{\defaults iturpr = 0})
+\param
+{\tt icow}: flag for Cowling approximation.
+\pparam
+{\tt icow} = 0: solve full equations.
+\pparam
+{\tt icow} = 1: solve equations in Cowling approximation and go back
+and solve full equations with Cowling result as trial.
+\pparam
+{\tt icow} = 2: solve equations in Cowling approximation only. Also sets
+frequencies corrected by perturbation technique.
+\pparam
+{\tt icow} = 3: as {\tt icow} = 2, except that Richardson extrapolation of
+cyclic frequency is based on uncorrected eigenfrequency.
+{\defaults icow = 0})
+\param
+{\tt alb}: fudge factor in Poisson's equation (the $\lambda$ in equation
+2.3). Should be 1, except
+when studying gradual transition between Cowling approximation
+and full case.
+{\defaults alb = 1.})
+\param
+{\tt istsbc}, {\tt fctsbc}: determines surface pressure boundary condition.
+\pparam
+{\tt istsbc} = 1: find condition by matching to exponentially
+decaying solution in an isothermal atmosphere matched to
+the outermost mesh point [{\ie}, use conditions (2.17) - (2.20)].
+This assumes that the frequency is
+below the acoustical cut-off frequency at that point.
+Otherwise a message is printed and the condition for 
+{\tt istsbc} = 0 is used.
+\pparam
+{\tt istsbc} = 0: use simple surface condition as given in
+equations (2.16c) and (2.16d).
+When {\tt fctsbc} = 0 (the default) this corresponds to $\delta p = 0$.
+\pparam
+{\tt istsbc} = 9: use $\delta r = 0$ on surface.
+\pparam
+{\tt fctsbc}: determines condition when {\tt istsbc} = 0:
+the conditions (2.16c) or (2.16d) with $F_{\rm SBC}$ = {\tt fctsbc}.
+Note that {\tt fctsbc} = 0 corresponds to using $\delta p$ = 0,
+and {\tt fctsbc} = 1 corresponds to using $p '$ = 0. 
+However, all intermediate cases are allowed.
+{\defaults istsbc = 1
+fctsbc = 0})
+\param
+{\tt ibotbc}, {\tt fcttbc}: determines bottom boundary condition in truncated
+model.
+\pparam
+{\tt ibotbc} = 0: set relation between $y_1$ and $y_2$ 
+at bottom to isolate
+solution that decreases exponentially towards the interior ({\ie},
+use condition 2.11).
+This assumes that the bottom is in an evanescent region for
+the $l$-value and frequency used. Otherwise the condition corresponding
+to {\tt ibotbc} = 1 is used.
+\pparam
+{\tt ibotbc} = 1: use condition (2.12), with $F_{\rm BC}$ = {\tt fcttbc}.
+\pparam
+{\tt ibotbc} = 2: use condition (2.13), {\ie},
+vanishing gradient of displacement.
+\pparam
+{\tt ibotbc} = 3: use condition (2.14), {\ie},
+vanishing gradient of relative displacement.
+{\defaults ibotbc = 0
+fcttbc = 0})
+\param
+{\tt mdintg}: determines type of integration used (see Sections 3.1 and 3.2).
+%{\tt mdintg} = 1 or 2 uses the
+%shooting technique (Section 3.1), {\tt mdintg} = 3 the relaxation technique
+%(Section 3.2).
+\pparam
+{\tt mdintg} = 1: use shooting method with centred
+differences equation (3.11).
+\pparam
+{\tt mdintg} = 2: use shooting method with constant coefficient integration on 
+each mesh interval (only implemented for second-order systems, {\ie},
+radial or Cowling approximation; if {\tt mdintg} = 2
+and $l > 0$ {\tt icow} = 2 is forced, and a diagnostics is printed).
+\pparam
+{\tt mdintg} = 3: use relaxation method.
+Find frequency by iterating on interior
+boundary condition for {\tt xfit} = 0, on outer boundary
+condition for {\tt xfit} = 1, or on matching at an internal point for
+$0 < {\tt xfit} < 1$.
+\pparam
+{\tt mdintg} = 5: use shooting method with fourth-order scheme
+of Cash \& More (1980).
+{\defaults mdintg = 1})
+\param
+{\tt iriche}: if {\tt iriche} = 1, Richardson extrapolation is used to
+improve the computed frequency (but not the other quantities),
+by solving initially the equations on every second meshpoint.
+Note: trial frequency is decreased by {\tt dsigre}.
+This option is currently only implemented for {\tt mdintg} = 1 or 3.
+{\defaults iriche = 0}).
+\param
+{\tt xfit}: match solution at mesh point $\xf = x^{n_{\rm f}}$ = {\tt xfit}.
+(Note that fitting point may be reset automatically by programme;
+see Section 3.5).
+For {\tt xfit} $= -1$ and $l > 0$ match solution at
+edge of inner evanescent region.
+{\defaults xfit = 0.5})
+\param
+{\tt fcnorm}: for {\tt mdintg} = 3 and {\tt xfit} = 0 or 1,
+normalize boundary condition 
+by solution at point $x^{\rm (norm)} = x^{n_{\rm norm}}$,
+where $n_{\rm norm}$ = {\tt fcnorm}*{\tt nn}.
+{\defaults fcnorm = 0.5})
+\param
+{\tt eps}: convergence of {\tt sig} assumed when relative change in 
+{\tt sig} between two iterations is less than {\tt eps}.
+\ppparam
+(default: depends on internal precision, as set in variable {\tt epsprc}
+in {\tt common/cprcns/}).
+\param
+{\tt epssol}: when {\tt mdintg} = 1, 2 or 5
+convergence criterion for eigenfunction is
+assumed to be that relative discontinuity at matching
+point is less than {\tt epsol}.
+When {\tt mdintg} = 3 convergence criterion
+is assumed to be that the mean relative
+change in the eigenfunction between two iterations is less than {\tt epssol}.
+{\defaults epssol = $10^{-5}$})
+\param
+{\tt itmax}: maximum number of iterations.
+\pparam
+When {\tt itmax} = 0 just integrates once and, when {\tt mdintg} = 1, 2 or 5,
+tests the continuity of the eigenfunction. This is useful
+for re-computing eigenfunctions when the eigenfrequency is known.
+This may also be used to output solution for given frequency, regardless
+of whether it has converged, for {\tt nfmod1} = 1 (see {\tt nfmode} below).
+{\defaults itmax = 8})
+\param
+{\tt dsigre}: 
+%\revision{8/8/91}
+when using Richardson extrapolation, decrease trial
+{\tt sig} by {\tt dsigre} before iteration on thinned-out mesh
+{\defaults dsigre = 0})
+\param
+{\tt fsig}: in the secant iteration for {\tt sig}, the second value is
+ (1+{\tt fsig})*(the first trial value)
+{\defaults fsig = 0.001})
+\param
+{\tt dsigmx}: the relative change in {\tt sig} during the iteration is limited
+to be less than {\tt dsigmx} in absolute value.
+{\defaults dsigmx = 0.1})
+\param
+{\tt irsevn}: Controls scaling of solution in evanescent region
+({\cf} Section 3.3).
+\pparam
+{\tt irsevn} $= -1$: do not use scaling in evanescent region.
+\pparam
+{\tt irsevn} $\ge 1$: reset transition
+point $x_{\rm ev}$ between modified and standard equations (at boundary
+of evanescent inner region for the trial {\tt sig}) before iterating 
+for each eigenvalue,
+when iterating for eigenfrequency during
+scan ({\ie}, for {\tt iscan} $>$ 1, {\tt itrsig} = 1).
+\pparam
+{\tt irsevn} = 2:
+%\revision{22/7/94}
+reset fitting point if it is deeper
+than the evanescent transition (the default is to shift
+instead the evanescent transition to fitting point).
+{\defaults irsevn = 2})
+\param
+{\tt xmnevn}: Search for evanescent transition is restricted to
+$x \ge$ {\tt xmnevn}.
+{\defaults xmnevn = 0})
+\param
+{\tt nftmax}, {\tt itsord}: 
+%\revision{22/7/94} 
+When ${\tt nftmax > 1}$, attempt changing fitting
+point up to {\tt nftmax} times, if iteration does not converge,
+or, if {\tt itsord = 1}, if the correct order is not obtained.
+Note that this is most likely to be effective for {\tt mdintg = 3}.
+\pparam
+{\tt itsord}: Test on order obtained from trial solution.
+This is only usable for {\tt itrsig} = 2 -- 7.
+{\defaults nftmax = 3
+itsord = 0})
+
+\subsect
+f) Controls for output (group {\tt out}):
+
+\param
+{\tt istdpr}: unit number for printed output. Default set in block data
+subprogram {\tt blstio}.
+\param
+{\tt nout}: when {\tt nout} $>$ 0 print solution at {\tt nout} points
+{\defaults nout = 50})
+\param
+{\tt nprcen}: if {\tt nprcen} $>$ 1 print solution at all the {\tt
+nprcen} points
+closest to the centre.
+{\defaults nprcen = 0})
+\param
+{\tt irsord}: Controls setting of order for modes of degree $l = 1$,
+when the Cowling approximation is not used
+({\cf} Section 4.2).
+\pparam
+{\tt irsord} between 1 and 10:
+Increment Scuflaire order between 0 and {\tt irsord} by 1.
+\pparam
+{\tt irsord} = -- 11 or 11: Set order according to Lee's scheme.
+When {\tt irsord} = --11, evaluate both values of the order,
+and write diagnostics if they differ.
+\pparam
+{\tt irsord} = 20: Use the Takata (2006b) scheme for dipolar modes.
+{\defaults irsord = 0}).
+\param
+{\tt iekinr}: Determines normalization of energy ({\cf} Section 4.3).
+\pparam
+{\tt iekinr} = 0: normalize energy with surface vertical displacement.
+\pparam
+{\tt iekinr} = 1: normalize with total photospheric displacement.
+{\defaults iekinr = 0}).
+\param
+{\tt iper}, {\tt ivarf}, {\tt kvarf}, {\tt npvarf}:
+controls for calculation of the variational frequency.
+\pparam
+{\tt iper}: when {\tt iper} = 1 calculate variational frequency.
+{\defaults iper = 0})
+\pparam
+{\tt ivarf} = 1: use p-mode formulation (equations (D2) and (D3) of CD82).
+\pparam
+{\tt ivarf} = 2: use g-mode formulation (equations (D7) and (D8) of CD82).
+\pparam
+{\tt ivarf} = 3: use nonradial p-mode formulation also for radial modes.
+(see note in Section 4.4).
+{\defaults ivarf = 1})
+\pparam
+{\tt kvarf}: numerical differentiation and integration in calculation
+of variational frequency uses polynomials of degree 2*{\tt kvarf}
+{\defaults kvarf = 2})
+\pparam
+{\tt npvarf}: for {\tt npvarf} $>$ 0 print integrands and integrals in
+variational calculation at {\tt npvarf} points.
+{\defaults npvarf = 0})
+\param
+{\tt nfmode}: {\tt nfmode = nfmod0 + 10*nfmod1} controls output of solutions
+to file. {\tt nfmod1 = 1} is used to output possibly unconverged solution
+for a given frequency, computed with {\tt itmax = 0}, to file.
+\pparam
+For {\tt nfmod0} = 1, 2 or 3 write eigenfunctions to file on unit 4.
+The output format depends on the value of {\tt nfmod0}
+(see also Section 8.4):
+\pparam
+{\tt nfmod0 = 1}: full set of variables.
+\pparam
+{\tt nfmod0 = 2}: displacement eigenfunctions $y_1(x^n), y_2(x^n)$.
+\pparam
+{\tt nfmod0 = 3}: density-weighted displacement eigenfunctions
+$\hat z_1(x^n), \hat z_2(x^n)$ ({\cf} equation 4.4).
+{\defaults nfmode = 0})
+\pparam
+Note that {\tt nfmod0} $\ge 1$ can be used to output unconverged solutions to
+file for {\tt iscan} $> 1$.
+\param
+{\tt irotkr}, {\tt nprtkr}: for {\tt irotkr} = 1 calculate rotational kernels.
+If in addition {\tt nprtkr} $> 1$ rotational kernel is printed
+at {\tt nprtkr} points.
+{\defaults irotkr = 0
+nprtkr = 50})
+\param
+{\tt igm1kr}, {\tt npgmkr}: for {\tt igm1kr} = 1 calculate $\Gamma_1$ kernels
+({\cf} equation 4.8).
+If in addition {\tt npgmkr} $> 1$, $\Gamma_1$ kernel is printed
+at {\tt npgmkr} points.
+{\defaults igm1kr = 0
+npgmkr = 50})
+\param
+{\tt ispcpr}: if {\tt ispcpr} $\not=$ 0 special output may be produced by
+call of user-supplied routine {\tt spcout}.
+{\defaults ispcpr = 0})
+\param
+{\tt icaswn}: If {\tt icaswn} $\ge$ 0, only output modes to file for which 
+{\tt icase = icaswn}
+{\defaults icaswn $= -1$)}
+\param 
+{\tt sigwn1}, {\tt sigwn2}, {\tt frqwn1}, {\tt frqwn2}, {\tt iorwn1}, 
+{\tt iorwn2}, {\tt frlwn1}, {\tt frlwn2}:
+Windows for output of modes to file.
+Windowing is applied only if first parameter is $\le$ second parameter
+({\eg} {\tt sigwn1} $\le$ {\tt sigwn2}).
+Defaults are no windowing.
+\pparam
+{\tt sigwn1, sigwn2}: Window in $\sigma^2$
+\pparam
+{\tt frqwn1, frqwn2}: Window in cyclic frequency $\nu$ (in $\muHz$) 
+\pparam
+{\tt iorwn1, iorwn2}: Window in mode order
+\pparam
+{\tt frlwn1, frlwn2}: Window in $\nu/(l + 1/2)$ ($\nu$ in $\muHz$)
+{\defaults sigwn1 = 0
+sigwn2 = $-1$
+frqwn1 = 0
+frqwn2 = $-1$
+iorwn1 = 0
+iorwn2 = $-1$
+frlwn1 = 0
+frlwn2 = $-1$})
+
+\subsect
+g) Controls for diagnostics (group {\tt dgn}):
+
+\param
+{\tt itssol}: when {\tt itssol} = 1 test solution with 
+{\tt nrkm} right hand side routine.
+For {\tt idgtss} = 1 additional details about solution etc. are printed.
+{\defaults itssol = 0
+idgtss = 0})
+\param
+{\tt moddet}, {\tt iprdet}: flags for modifying and printing 
+matching determinant, for {\tt mdintg} = 1 or 2.
+{\defaults moddet = 0
+iprdet = 0})
+\param
+{\tt npout}: when finding eigenfrequency by matching and {\tt npout} $>$ 0 
+print the separate solutions at {\tt npout} points.
+{\defaults npout = 0})
+\param
+{\tt imstsl}, {\tt imissl}, {\tt imjssl}:
+Parameters controlling the determination of the matching
+coefficients in the full case.
+The equation no. {\tt imissl} is ignored, and the coefficient no.
+{\tt imjssl} is given a fixed value.
+If {\tt imstsl} $\not=$ 1, {\tt imissl} and {\tt imjssl} are taken as input.
+Otherwise {\tt imissl} and {\tt imjssl} are determined to minimize the error.
+{\defaults imstsl = 1
+imissl = 2
+imjssl = 2})
+\param
+{\tt idgnrk}: determines level of diagnostics in nrkint solution,
+for {\tt mdintg} = 3.
+{\defaults idgnrk = 0}).
+
+\noindent
+{\bf Notes:} 
+
+\item{(a)} Notes on preference in determining trial el and sig:
+\itemitem{--}
+{\tt nsel} $\ge 1$ may be combined with {\tt iscan} $> 1$ to produce
+a scan between {\tt sig1} and {\tt sig2} in sig for each
+{\tt el = els1, els1+dels, ..., els1+(nsel-1)*dels}.
+\itemitem{--}
+Test on {\tt iscan} takes place before test on {\tt itrsig}.
+\itemitem{--}
+{\tt nsel} $> 1$ cannot currently be combined with {\tt itrsig} $> 1$.
+when {\tt itrsig} $> 1$ (or {\tt itrsig = 1} for {\tt iscan} $\le 1$) the
+value of the degree in i{\tt el} is always used.
+
+\subsect
+{\bf 7.3 Comments on the input parameters} 
+
+The number of parameters may appear overwhelming.
+They have been introduced to provide a great deal of flexibility in
+the handling of the input model, the choice of setting up trial
+frequencies, the execution of the calculation,
+and the control of the output to file.
+In practice, standard settings of most parameters are quite adequate;
+furthermore, template input files can be provided which illustrate
+the various usages.
+As a further aid, this section discusses some of the possibilities.
+
+Certain settings of the parameters are inconsistent.
+I have attempted to catch these cases.
+When the intended usage is fairly clear,
+the offending parameters is reset, with a warning message;
+otherwise an error message is written and the programme proceeds
+to the next set of input.
+There is no guarantee that all possible combinations are checked
+and caught, however.
+
+To select modes on input or output, `windowing parameters'
+are typically used.
+For example, on output modes in a selected frequency
+range $\nu_1 \le \nu \le \nu_2$ can be selected by setting
+{\tt frqwn1 =} $\nu_1$, {\tt frqwn2 =} $\nu_2$.
+Windowing is not invoked (fairly obviously) when the lower limit 
+exceeds the upper one, in the present case when
+{\tt frqwn1} $>$ {\tt frqwn2}.
+
+\subsect
+{\it 7.3.1 Notes on model} 
+
+The default {\tt ifind} =$ -1$ ensures reading the first model 
+on unit {\tt imlds} and using it in all the calculations. 
+If the unit number {\tt imlds} is changed in
+a subsequent read of control input, however,
+{\tt ifind} must be set $\ge$ 0 to force reading a new model.
+
+Modifications of the model are controlled by the parameters
+{\tt xtrnct}, {\tt ntrnsf} and {\tt imdmod}.
+These modifications may be applied to a model previously
+read in by setting {\tt ifind = $-2$}.
+
+Choosing ${\tt in} > 1$ allows using a coarser model than 
+provided on the file. 
+This may be useful, in saving computing time,
+for computing low-order modes where high resolution is not required,
+or for an initial survey of the modes in a model;
+it is also useful for estimating the effect of truncation
+errors on the eigenvalues and eigenfunctions.
+Note that the truncation parameter {\tt ntrnsf} refers to the mesh
+{\it after taking every {\tt in}-th point.}
+
+\subsect
+{\it 7.3.2 Notes on $l$ and trial eigenfrequency}
+
+The large number of parameters may make this somewhat complex. However
+the default values allow simple use, while on the other hand the parameters
+permit very efficient computation of large sets of modes.
+The two chief options are 
+\medskip
+\item {a)} To search for modes without any prior information about
+their location.
+This would typically be used for general stellar models, where
+no previously computed set of frequencies is likely to be available.
+
+\item{b)} To use a previously computed set of frequencies for trial.
+This would often be used for solar models which are likely to be quite
+similar to existing models for which extensive mode sets are 
+available.
+
+\subsect
+{a) Searching for modes}
+
+To find a mode with a given degree $l$ and near a given trial frequency
+$\sigma_{\rm tr}$,
+user only has to provide $l$ in {\tt el} $\sigma_{\rm tr}^2$ in
+in {\tt sig1},
+leaving all other parameters in the group {\tt osc}
+at their default values.
+To obtain a sequence of modes with the same $l$, for which the separation
+between consecutive modes is approximately known,
+one uses {\tt itrsig} = 1, and sets {\tt istsig} $>$ 1.
+Then the programme attempts to find {\tt istsig} modes, the first with
+$\sigma^2$ at {\tt sig1}, and the remaining determined from the last
+obtained eigenvalue and the increment {\tt dfsig}.
+The three possible 
+ways of specifying the increment, as
+determined by {\tt nsig}, reflects the
+possible asymptotic behaviour of the eigenfrequencies
+\medskip
+\item{--} {\tt nsig} $ = 1$:
+For low-order
+p modes the frequencies are approximately uniformly spaced in $\sigma^2$;
+here {\tt dfsig} provides the increment between modes in $\sigma^2$.
+\item{--} {\tt nsig} $ = 2$:
+For high-order p modes the spacing is asymptotically uniform in $\sigma$;
+here {\tt dfsig} provides the increment between modes in $\sigma$.
+\item{--} {\tt nsig} $ = 3$:
+For high-order g modes
+the spacing is asymptotically uniform in 1/$\sigma$;
+here {\tt dfsig} provides the increment between modes in $\sigma^{-1}$.
+Note that in this case the modes are obtained in the order of decreasing
+frequency and order.
+\medskip
+
+Using {\tt iscan} $>$ 1 permits searching a given region of the spectrum for
+eigenmodes,
+between $\sigma^2 =$ {\tt sig1} and $\sigma^2 =$ {\tt sig2}.
+The step is uniform in $\sigma^2$, $\sigma$ or
+$\sigma^{-1}$ depending on {\tt nsig}, as discussed above.
+When {\tt itrsig} $\not=$ 1 the programme only prints
+a table of the matching determinant $\Delta$ (defined by
+equation (3.5), (3.9), (3.13) or (3.15), depending on the 
+integration parameters), as a function of $\sigma^2$.
+This gives an initial idea about the spectrum. 
+For {\tt itrsig} = 1
+the programme in addition looks for changes of sign in $\Delta$,
+and at each change of sign (except those associated with singularities
+for {\tt mdintg} = 3; {\cf} Section 3.2) 
+it attempts to iterate for the eigenvalue.
+Thus automatic determination of all modes in a given region of the
+spectrum is possible. To ensure that all modes are found with
+reasonable certainty the number {\tt iscan} of steps should probably
+be at least about four times the number of modes expected in the
+region considered, and {\tt nsig} should of course be chosen appropriately
+for the kind of modes expected. It might also be pointed out
+that two very close eigenvalues (near an avoided crossing, say)
+may manifest themselves as a minimum in $| \Delta ( \sigma^2 ) |$,
+without changes of sign; in this case the search may be repeated
+with smaller step near the minimum (this procedure could clearly be
+automated, but that has so far not been done).
+
+Instead of considering a single value of $l$ given in {\tt el},
+the programme may be asked to step in $l$.
+This is accomplished by setting {\tt nsel} $>$ 1;
+{\tt nsel} is the number of $l$-values considered, {\tt els1}
+is the initial value of $l$ and {\tt dels} is the step in $l$.
+This may be used in connection with all the options mentioned above:
+\medskip
+\item{--}
+To follow a single mode, or step through $\sigma^2$ with
+{\tt istsig} $> 1$, {\tt itrsig} $ = 1$, the initial
+trial $\sigma^2$ must be provided in {\tt sig1}.
+For each step in $l$, the trial $\sigma^2$ is incremented
+as determined by {\tt dfsig1} and {\tt nsig1}, in the same
+way as described for {\tt dfsig}, {\tt nsig} above.
+\item{--}
+To scan in $\sigma^2$ with {\tt iscan } $> 1$, 
+the initial range in $\sigma^2$ must be provided in {\tt sig1}, {\tt sig2}.
+For each step in $l$, the end points of the range are incremented
+as determined by {\tt dfsig1}, {\tt nsig1} and {\tt dfsig2}, {\tt nsig2},
+as above.
+
+\fig{0.1truecm}
+
+\smallskip
+\hrule
+\medskip
+{
+\obeyspaces
+\source
+osc:
+  el, nsel, els1, dels, dfsig1, dfsig2, nsig1, nsig2
+    ,8,  30  ,10,   10.,    10.,   1,    1     @
+  itrsig, sig1, istsig, inomde, itrds,
+    1,    30. ,     ,      ,     ,       @
+  dfsig, nsig, iscan, sig2,
+      ,   1   ,10,  34     @
+eltrw1, eltrw2, sgtrw1, sgtrw2
+    ,        ,      ,        ,    @
+}
+\msni
+{\bf Figure 1}. Input block to scan for f mode.
+\medskip
+\hrule
+\smallskip
+\gif
+
+\medskip\noindent
+Example:
+To compute the f mode for degrees $l = 30, 40, \ldots, 100$
+by scanning in $\sigma^2$, 
+the {\tt osc} group of input shown in Figure 1 may be used.
+This will scan in $\sigma^2$ between $\sigma^2 = l$ and $\sigma^2 = l+4$
+for each value of $l$, and hence is likely to find the f mode,
+with $\sigma^2$ slightly exceeding $l$.
+
+\subsect
+{b) Using previously computed frequencies as trials}
+
+The options of having {\tt itrsig} $\ge 2$
+and {\tt istsig} $\ge 1$ allow easy computation of modes
+of a model, given results on the same modes in a slightly different model. 
+The results on the modes can be in the form of binary files 
+containing a grand or a short summary 
+(see Sections 8.2 and 8.3 below),
+or an ASCII file containing degree, order and cyclic frequency (in $\muHz$).
+(The possibility of specifying {\tt itrsig} $\le -2$ was
+introduced to allow use of older files of summaries in
+single precision; it is unlikely to be of general usefulness.)
+
+There are two different options:
+\medskip
+\item{--} When {\tt itrsig} is even,
+the modes are located according to their position on the file,
+by specifying the range 
+${\tt inomde}, {\tt inomde} + 1, \ldots, {\tt inomde} + {\tt istsig} - 1$ 
+of mode numbers in the file;
+both $\sigma^2$ and $l$ are taken from the values on the file.
+
+\item{--}
+When {\tt itrsig} is odd the
+programme searches for modes of a specified degree and with orders
+${\tt inomde}, {\tt inomde} + 1, \ldots, {\tt inomde} + {\tt istsig} - 1$.
+The degree is either provided in {\tt el} or, by setting {\tt nsel} $> 1$,
+by stepping through a sequence of degrees.
+
+\medskip
+In both cases the search can be restricted to given ranges
+{\tt eltrw1}, {\tt eltrw2} in degree and/or
+({\tt sgtrw1}, {\tt sgtrw2}) in $\sigma^2$ by having
+{\tt eltrw1} $\le$ {\tt eltrw2} and/or {\tt sgtrw1} $\le$ {\tt sgtrw2}.
+
+\fig{0.1truecm}
+\smallskip
+\hrule
+\medskip
+{
+\obeyspaces
+\source
+osc:
+  el, nsel, els1, dels, dfsig1, dfsig2, nsig1, nsig2
+    ,21,  5  ,5,   0.,    0.,   1,    1     @
+  itrsig, sig1, istsig, inomde, itrds,
+    3,       ,   9 ,    2 ,     ,       @
+  dfsig, nsig, iscan, sig2,
+      ,       ,    ,    ,    @
+eltrw1, eltrw2, sgtrw1, sgtrw2
+    ,        ,   100 ,   1.e6    ,    @
+}
+\msni
+{\bf Figure 2}. Input block to computes modes of given order,
+based on trial frequencies on file.
+\medskip
+\hrule
+\smallskip
+\gif
+
+The possibility of combining {\tt itrsig} odd with {\tt nsel} $> 1$
+allows the computation of modes of a given order for several values of $l$. 
+Figure 2 illustrates the {\tt osc} input group for computing
+modes of order $2, 4, \ldots 10$, for $l = 0, 5, \ldots , 100$,
+and restricting $\sigma^2$ to exceed 100.
+
+The choice of {\tt itrsig} $= 6$ or 7 allows convenient computation
+of frequencies on the basis of a set of observed modes.
+A possible input format is illustrated in Figure 3.
+Note that the file may contain a header, indicated by
+the character {\tt \#} in the first column.
+The data are read in using free format.
+Also, the file may contain additional columns beyond the
+degree, order and frequency, in the case illustrated the standard error.
+These columns are ignored.
+
+\fig{0.1truecm}
+\smallskip
+\hrule
+\medskip
+{
+\obeyspaces
+\source
+\# Data from Libbrecht, K.G., Woodard, M.F., and Kaufman, J.M.,
+\# ApJS, vol. 74, p. 1129 (1990).
+\#
+\#
+\# Mode Frequency Table (+/- gives 1-sigma random errors)
+\#    l     n   nu(uHz)    +/-  source  
+\#    ---   --- --------- ------- ------
+     0    12  1823.600   0.600    2
+     0    13  1957.300   0.400    2
+     0    14  2093.500   0.200    2
+     0    15  2228.600   0.100    2
+     0    16  2362.500   0.100    2
+     0    17  2496.600   0.300    2
+     0    18  2629.600   0.300    2
+                  .
+                  .
+                  .
+                  .
+}
+\msni
+{\bf Figure 3}. Possible structure of input file for the
+cases {\tt itrsig} $= 6$ and 7.
+\medskip
+\hrule
+\smallskip
+\gif
+
+
+\subsect
+{\it 7.3.3 Remaining parameters} 
+
+The meaning of most of the parameters controlling the equations and
+boundary conditions should be reasonably clear on the basis of the
+discussion in Section 2.
+The case of a plane-parallel layer ({\tt iplneq} = 1)
+is discussed in Section A.2; {\tt iturpr} is used to control 
+the treatment of turbulent pressure in a realistic model of the solar
+atmosphere, as discussed in Section A.3.
+
+The parameters controlling the integration are essentially discussed
+in Section 3, with the exception of the test on the discontinuity
+of the eigenfunction. This is based on
+the absolute value of the determinant in 
+equation (3.5) or (3.9), normalized by the product
+of the norms of the columns; thus in the case of equation (3.5) we
+introduce 
+$$ 
+\tilde \Delta \equiv 
+{| \Delta | \over 
+[ ( y_1^{\rm (i)} (\xf )^2 + y_2^{\rm (i)} (\xf )^2 )
+( y_1^{\rm (o)} (\xf )^2 + y_2^{\rm (o)} (\xf )^2 ) ]^{1/2} } \; ,
+\eqno(7.1)
+$$
+and the condition for continuity of the eigenfunction is that
+$\tilde \Delta \le {\tt epssol}$.
+
+Similarly the meaning of the parameters determining the output should
+be clear or may be inferred from Section 4 (see also Section 8
+below describing the results of the computation). Finally, the parameters
+controlling the diagnostics are unlikely to be of interest for
+general users.
+
+\subsect
+{\bf 7.4 The user-supplied routines {\tt modmod} and {\tt spcout}}
+
+If {\tt imdmod} $\not=$ 0 {\tt modmod} is called after the equilibrium model
+has been read (and, if applicable, after taking every {\tt in}-th point), as
+\ms
+{
+\source
+call modmod(x, aa, data, nn, iaa, imdmod)
+}
+\msni
+where {\tt iaa} is the first dimension of {\tt aa}, and is set by the programme
+calling {\tt modmod}; the remaining quantities are defined above. 
+It has no further effect on the calculations, but may be used by the
+user to carry out modifications to the model. Similarly,
+if {\tt ispcpr} $\not=$ 0 the routine {\tt spcout} is called at the end of the
+calculation for each mode, as
+\ms
+{
+\source
+call spcout(x, y, aa, data, nn, iy, iaa, ispcpr)
+}
+\msni
+to allow the user to produce output in addition to that
+otherwise produced by the programme;
+here {\tt iy} is the first dimension of {\tt y} and is set by the programme
+calling {\tt spcout}. When {\tt imdmod} = 0 (or {\tt ispcpr} = 0), as is the
+default, the routines are not called.
+
+The standard set-up of the code 
+supplies dummy subroutines, in the file containing the main programme
+{\tt main}.
+These must obviously be replaced by the user for these options to
+take effect.
+
+\mainsect
+\centerline{\twelvebf 8 Output from the programme} 
+
+This section contains a description of the principal output
+produced by the programme. 
+Section 8.1 describes 
+what may somewhat archaically be referred to as printed output, for each mode.
+The remaining sections gives the format of
+the output, likely to be of most use, produced on disk files.
+The unit numbers of the the output files are currently
+hardcoded into variables in the programme.
+The relevant unit numbers, with the (hardcoded) defaults
+and description of the output, are:
+\medskip
+\ref
+{\tt idsgsm} (default 11): Grand summary file 
+\nwl
+(Section 8.2; conventional name {\tt agsm.<model descriptor>}).
+\ref
+{\tt idsssm} (default 15): Short summary file 
+\nwl
+(Section 8.3; conventional name {\tt assm.<model descriptor>}).
+\ref
+{\tt idsefn} (default 4): Eigenfunction file 
+\nwl
+(Section 8.4; conventional name {\tt amde.<model descriptor>[.z]}).
+\ref
+{\tt idsrkr} (default 12): Rotational splitting kernel file (Section 8.5)
+\ref
+{\tt idsgkr} (default 13): $\Gamma_1$ kernel file (Section 8.6)
+\ref
+{\tt idslog} (default 20): 
+%\revision{22/7/94}
+Log file of error and warning messages from eigenfrequency iteration.
+If {\tt idslog} is not defined in input file,
+the default name {\tt adipls-status.log} is used (see Section 8.7).
+
+
+\subsect
+{\bf 8.1 Printed output} 
+
+This is output on unit {\tt istdpr}, which may be modified
+in the input file (group {\tt out}).
+If {\tt istdpr} $\neq$ {\tt istdou}, where {\tt istdou} is the unit number
+for the standard output, a summary of the calculation,
+including error and warning messages, is also output to {\tt istdou}.
+Note that {\tt istdou} is normally 6.
+It is defined in {\tt block data} subprogramme {\tt blstio}.
+
+After some diagnostics relating to the integration follows output
+related to the iteration for (or scan in) $\sigma^2$. For each
+iteration is given the iteration number, the current value of $\sigma^2$,
+and the corresponding values {\tt ddsig} and {\tt ddsol}
+of the matching determinant $\Delta$ and
+the normalized determinant $\tilde \Delta$ (or, when iterating with
+{\tt mdintg} = 3, the
+mean change in the solution since the previous value of $\sigma^2$).
+For {\tt mdintg} = 2 an estimate of the mode order, defined by equation (4.1),
+is also given. After the iteration has converged the final value of
+$\sigma^2$ is printed, as well as $\tilde \sigma^2$
+({\cf} equation 4.1) and the period calculated from $\sigma^2$. If the
+equations are solved in the Cowling approximation the correction 
+$\delta \sigma^2$ and the corrected value $\sigma_{\rm c}^2$
+obtained from Cowling's perturbation technique are also printed.
+
+Then follows the maximum absolute value $z_{1,\rm max}$ 
+of the energy-related eigenfunction $z_1 (x)$ 
+({\cf} equation 4.4) and the location $\hat x_{max}$ of the maximum. 
+After this comes 
+the printout of the eigenfunction, in the form of
+$$
+n, \  x^n , \  
+y_1 ( x^n ) , \ 
+y_2 ( x^n ) , \ 
+y_3 ( x^n ) , \ 
+y_4 ( x^n ) , \ \ \ 
+\hat z_1 ( x^n ) , \ 
+\hat z_2 ( x^n ) , \ 
+$$
+for non-radial oscillations, or
+$$
+n, \  x^n , \  
+y_1 ( x^n ) , \ 
+y_2 ( x^n ) , \ 
+\hat z_1 ( x^n ) , \ 
+$$
+for radial oscillations. Here $\hat z_1$ and $\hat z_2$
+are as defined in equations (4.4) and (4.6).
+
+The labelling of the mode is given next, in the form 
+\ms
+{\source
+This is a p$n$(l = $l$) mode
+This is a f(l = $l$) mode
+This is a g$|n|$(l = $l$) mode
+}
+\msni
+for the order $n > 0$, $n = 0$ or $n < 0$ respectively.
+After this follows the maximum absolute value $y_{1,\rm max}$ of
+$y_1 (x)$ and the location $x_{\rm max}$ of the maximum, and the
+dimensionless energy $E$ of pulsation ({\cf} equation 4.3).
+
+If {\tt iper} has been set to 1 there next follows output from the
+calculation of the variational frequency and the corresponding
+frequency. Here {\tt sigv} gives the value of $\sigma^2$ obtained
+from the variational expression; in addition the period $\Pi_E$ found
+from the value of $\sigma^2$ obtained as an eigenvalue is repeated,
+and the period $\Pi_V$ and cyclic frequency $\nu_V$ 
+found from the variational $\sigma^2$ are printed.
+
+If the rotational kernel is calculated 
+({\cf} equation 4.7), the value of $\beta_{nl}$ is printed and, if
+{\tt nprtkr} $>$ 0, the kernel is printed, as
+$$
+n , \  x^n , \  K_{nl} ( x^n ) \; .
+$$
+
+\subsect
+{\bf 8.2 The grand summary} 
+
+A fairly complete summary of
+the calculation is written to unit {\tt idsgsm},
+without format; this only takes
+place if the eigenvalue iteration has converged. 
+The summary consists of 38 real variables {\tt cs(1:38)}
+and 8 integer variables {\tt ics(1:8)}.
+These are defined as follows
+({\tt typewrite-type names} refer to the list of input parameters,
+{\cf} Section 7.2.3):
+\medskip
+{\obeylines\smallskip
+{\tt cs(1)}: {\tt xmod}
+{\tt cs(2:8)}: $D_1$ - $D_7$:
+\qquad {\tt cs(2)}: $M$
+\qquad {\tt cs(3)}: $R$
+\qquad {\tt cs(4)}: $p_{\rm c}$
+\qquad {\tt cs(5)}: $\rho_{\rm c}$
+\qquad {\tt cs(6)}: $- (1 /\Gamma_1 p) (\dd^2 p / \dd x^2) $ at centre
+\qquad {\tt cs(7)}: $- (1 /\rho) (\dd^2 \rho / \dd x^2) $ at centre
+\qquad {\tt cs(8)}: $\mu$
+\qquad {\tt cs(9)}: $D_8$ (flag for version of {\tt amdl file}; see Section 5).
+{\tt cs(10)}: $A_2 (\xs )$
+{\tt cs(11)}: $A_5 (\xs )$
+{\tt cs(12)}: $x_1$
+{\tt cs(13)}: $\sigma_\Omega^2$ ({\cf} Eq. A.60)
+{\tt cs(14)}: $\xf$
+{\tt cs(15:16)}: {\tt fctsbc}, {\tt fcttbc}
+{\tt cs(17)}: $\lambda$ (fudge factor in Poisson's equation)
+{\tt cs(18)}: $l$ (degree)
+{\tt cs(19)}: $n$ (order)
+{\tt cs(20)}: $\sigma^2$ 
+{\tt cs(21)}: $\sigma_{\rm c}^2$
+{\tt cs(22:23)}: $y_{1,\rm max}$, $x_{\rm max}$
+{\tt cs(24)}: $E$ (dimensionless energy)
+{\tt cs(25:27)}: $\Pi_E$, $\Pi_V$, $\nu_V$ (periods in minutes, $\nu_V$ in mHz).
+{\tt cs(28:29)}: {\tt ddsig}, {\tt ddsol}
+{\tt cs(30:33)}: $y_1 (\xs ) - y_4 (\xs )$
+{\tt cs(34:35)}: $z_{1,\rm max}$, $\hat x_{\rm max}$
+{\tt cs(36)}: $\beta_{nl}$
+{\tt cs(37)}: $\nu_{\rm Ri}$, {\ie}, cyclic frequency from %
+Richardson extrapolation, (in mHz).
+{\tt cs(38)}: $m$ (azimuthal order) for {\tt irotsl = 1} (added 3/11/02).
+}
+\bigskip
+{\obeylines
+{\tt ics(1)}: {\tt in}
+{\tt ics(2)}: {\tt nn}
+{\tt ics(3)}: {\tt mdintg + 10*iriche}
+{\tt ics(4)}: {\tt ivarf}
+{\tt ics(5)}: {\tt icase}
+{\tt ics(6)}: {\tt iorign}
+{\tt ics(7)}: {\tt iekinr}
+{\tt ics(8)}: unused.
+}
+\medskip\noindent
+Notes:
+
+\medskip
+\item{--}
+Depending on the parameters of the calculation, some variables may not be set.
+All unset variables are initialized to 0. 
+In particular {\tt cs(9)}, {\tt cs(13)},
+{\tt cs(38)} and {\tt ics(8)} are currently unused.
+
+\item{--}
+{\tt ddsig} and {\tt ddsol} [{\ie}, {\tt cs(28)} and {\tt cs(29)}]
+are set to the values of $\Delta$ and $\tilde \Delta$ in
+the last iteration, and thus provide a measure of the extent to which
+the iteration has converged.
+
+\item{--}
+When Cowling approximation is used $\Pi_E$ (in {\tt cs(25)}
+is set to the period corresponding to the {\it uncorrected}
+eigenfrequency.
+
+\item{--}
+{\tt icase} is a compressed case number for the calculation. It is defined as
+\ms
+{\source
+icase = icow1 + 10 iper + 100 irotsl + 1000 ispec + 10 000 istsbc 
+\qquad + 100 000 iplneq + 1 000 000 iturpr
+}
+\msni
+\item{}
+Here {\tt icow1} is defined as follows:
+\itemitem{-}
+{\tt icow1} = is 0 when the full set of equations is used.
+\itemitem{-}
+{\tt icow1} = 1 when the Cowling approximation is used, and the Richardson
+extrapolated frequency is based on the corrected eigenfrequency
+$\sigma_{\rm c}$.
+\itemitem{-}
+{\tt icow1} = 2 when the Cowling approximation is used, and the Richardson
+extrapolated frequency is based on the uncorrected eigenfrequency
+({\ie}, computed with the input parameter {\tt icow} = 3).
+
+\ms
+\item{}
+Furthermore
+{\tt ispec} = 1 if $\lambda \not= 1$ 
+or {\tt fctsbc} $\not=$ 1, and the remaining parameters are as defined in
+Section 7.2.3. Note that {\tt irotsl} to flag for rotational effects
+was added 3/11/02.
+
+\item{--}
+{\tt iorign} is always set to 3 in the pulsation programme (it may
+have other values for grand summaries set on the basis of other, more 
+restricted sources of information). 
+
+\medskip
+{\tt ics} is stored in the array {\tt cs(1:50)},
+by the following equivalencing
+\ms
+{\source
+equivalence(ics(1), cs(39))
+}
+\msni
+Thus if reals and integers have the same length only the
+first 46 positions in {\tt cs} are used,
+whereas (as is typically the case) if 8-byte real variables and
+4-byte integers are used, only the first 42 positions of
+{\tt cs} are used%
+\footnote*{This is a historical consequence of a previous possibility
+of storing a model name in the last part of {\tt cs};
+in future, an extension or generalization of the storage might
+be contemplated.}.
+In the programme {\tt cs} is stored in {\tt common/csumma/}.
+
+The summary is output in a single record for each mode, by the statement
+\ms
+{\source
+write(idsgsm) (cs(i), i=1,50)
+}
+\msni
+
+Various programmes are available to scan or manipulate the
+contents of the grand summary
+(see {\it Notes on using the solar models and adiabatic pulsations package}).
+In particular, the programme {\tt scan-agsm.d} scans the grand summary,
+whereas {\tt set-obs.d} outputs a file giving degree, order,
+cyclic frequency and possibly mode energy.
+
+\subsect
+{\bf 8.3 The short summary} 
+
+To save disk space, a condensed summary has been introduced.
+This contains the most essential information about the modes,
+without the details that are rarely used.
+Thus it is adequate for most purposes.
+In addition data on the model are given as special records,
+rather than being repeated in each record.
+
+The data are stored in the real array {\tt ss(1:5)} and the integer
+array {\tt iss(1:2)}.
+
+The type of the record is flagged by {\tt ss(1)}:
+\medskip\ref
+{\it Model record} :
+This is flagged by {\tt ss(1)} $<$ 0. {\tt ss(2)} is set to {\tt xmod}.
+The remaining variables are defined by
+\medskip
+{\obeylines\smallskip
+{\tt ss(3)}: $M$
+{\tt ss(4)}: $R$
+{\tt ss(5)}: $p_{\rm c}$
+{\tt ss(6)}: $\rho_{\rm c}$}
+
+\medskip\ref
+{\it Oscillation record}:
+This is flagged by {\tt ss(1)} $\ge$ 0. Here
+\medskip
+{\obeylines
+{\tt ss(1)}: $l$ (degree)
+{\tt ss(2)}: $n$ (order)
+{\tt ss(3)}: $\sigma^2$ 
+{\tt ss(4)}: $E$ (dimensionless energy)
+{\tt ss(5)}: $\nu_V$ (in mHz)
+\medskip
+{\tt iss(1)}: {\tt icase}
+{\tt iss(2)}: {\tt iorign}}
+\medskip
+
+
+Note that in the Cowling approximation
+$\sigma^2$ is taken to be the corrected value $\sigma_{\rm c}^2$
+obtained with the Cowling perturbation expression.
+Also {\tt ss(5)} is the {\it variational} frequency if this has
+been calculated; otherwise the frequency obtained as an eigenvalue
+is used.
+{\tt iss(1:2)} are stored in {\tt ss(1:7)},
+by the following equivalence statement
+\ms
+{\source
+equivalence (ss(6), iss(1))
+}
+\msni
+The summary is written in a single record, with the statement
+\ms
+{\source
+write(idsssm) (ss(i), i=1,7)
+}
+
+
+\subsect
+{\bf 8.4 Output of eigenfunction to file} 
+
+%\revision{(ca. 1991; prior to this only {\tt nfmode = 1} was implemented)}
+If {\tt nfmode} = 1, 2 or 3 and the eigenfunction iteration has converged
+the eigenfunctions are written on unit 4, as a single
+record, in binary form.
+The format depends on the value of {\tt nfmode}:
+
+\subsect
+a) {\tt nfmode = 1}, full set of eigenfunctions.
+
+Here the output is done with the statement 
+
+      {\tt write(idsefn) (cs(i), i=1,50), nnw, (x(n), (y(i,n), i=1,6), n=nw1,nn)}
+\smallskip\noindent
+Here {\tt nnw = nn - nw1 + 1},
+{\tt y(1:4,n)} contains the eigenfunctions $y_1 (x^n ) \ -\ y_4 (x^n )$
+({\cf} Section 6), and 
+$$
+{\tt y(5,n)} = \hat z_1 (x^n ) , \quad
+{\tt y(6,n)} = \hat z_2 (x^n ) \; 
+$$
+[{\cf} equations (4.4) and (4.6)].
+An eigenfunction file of this format conventionally has
+name {\tt amde.<model descriptor>}.
+
+\subsect
+b) {\tt nfmode = 2}, displacement eigenfunctions.
+
+Here the first record contains the number of mesh points and the 
+mesh, written as
+
+      {\tt write(idsefn) nnw, (x(n), n=nw1,nn)}
+\smallskip\noindent
+and the subsequent records contain the mode data, in the form
+
+      {\tt write(idsefn) (cs(i), i=1,50), ((y(i,n), i=1,2), n=nw1,nn)}
+
+\subsect
+c) {\tt nfmode = 3}, density-weighted displacement eigenfunctions.
+
+Here the first record contains the number of mesh points and the 
+mesh, written as
+
+      {\tt write(idsefn) nnw, (x(n), n=nw1,nn)}
+\smallskip\noindent
+and the subsequent records contain the mode data, in the form
+
+      {\tt write(idsefn) (cs(i), i=1,50),((z(i,n), i=1,2), n=nw1,nn)}
+\smallskip\noindent
+where
+$$
+{\tt z(1,n)} = \hat z_1 (x^n ) , \quad
+{\tt z(2,n)} = \hat z_2 (x^n ) 
+$$
+[{\cf} equations (4.4) and (4.6)].
+An eigenfunction file of this format conventionally has
+name {\tt amde.<model descriptor>.z}.
+\medskip
+
+Thus in all cases the eigenfunction record contains 
+the grand summary ({\cf} Section 8.3).
+Format a) is clearly the most space-consuming.
+Format c) produces eigenfunctions in a form suitable for
+setting up kernels.
+In particular, to compute rotational kernels no further information
+about the equilibrium model is required.
+This is therefore most likely the format of choice, unless
+the full set is explicitly needed.
+
+\subsect
+{\bf 8.5 Output of rotational kernel to file ({\cf} equation 4.7)}
+
+If {\tt irotkr} = 1 
+the rotational kernel is written on unit 12, as a single
+record, without format. This is done with the statement 
+
+      {\tt write(idsrkr) (cs(i), i=1,50),nnw, (x(n), akr(n), n=nw1,nn)}
+\medskip\noindent
+Here 
+$$
+{\tt akr(n)} = K_{nl} (x^n ) , 
+$$
+Thus the record contains the grand summary ({\cf} Section 8.3).
+
+\subsect
+{\bf 8.6 Output of $\Gamma_1$ kernel to file ({\cf} equation 4.8)}
+
+If {\tt igm1kr = 1} 
+the $\Gamma_1$ kernel is written on unit 13, as a single
+record, without format. This is done with the statement 
+
+      {\tt write(idsgkr) (cs(i), i=1,50), nnw, (x(n), akrgm1(n), n=nw1,nn)}
+\medskip\noindent
+Here 
+$$
+{\tt akrgm1(n)} = K_{nl}^{(\Gamma_1 )} (x^n ) , 
+$$
+Thus the record contains the grand summary ({\cf} Section 8.3).
+
+\subsect
+{\bf 8.7 Iteration status log}
+
+%\revision{22/7/94}
+A log of problems with the eigenfrequency calculation is
+output to unit {\tt idslog};
+if no file name is provided, the default is {\tt adipls-status.log}.
+This may contain both error and warning messages:
+\medskip
+\item{---} An error message is printed if
+\itemitem{-} 
+The iteration failed to converge, even after possible
+attempts of adjusting $\xf$ ({\cf} Section 3.5).
+\itemitem{-} 
+Significantly different eigenfunctions were found in Richardson-extrapolation 
+calculation ({\cf} Section~3.4).
+\item{}
+Note that in cases of errors, no output is made to 
+the files with grand summaries, eigenfunctions, {\etc}
+\medskip
+\item{---} A warning message is printed if
+\itemitem{-} 
+The location of $\xf$ had to be changed to obtain convergence or the
+correct order.
+\itemitem{-} 
+Different mode orders were found in Richardson-extrapolation calculation,
+but the eigenfunctions were deemed to be sufficiently similar.
+\item{}
+In cases of warnings, normal output is made to 
+the files with grand summaries, eigenfunctions, {\etc}
+Indeed, in these cases one can generally assume that the
+calculation has been successful.
+
+\mainsect
+\centerline{\twelvebf 9 The main programme} 
+
+The calculation is controlled by the call of the subroutine {\tt adipls}. 
+A small main programme is needed to set up storage for the calculation.
+This has the form
+\ms
+{\source
+\obeyspaces
+\     program runadi
+c
+c  main programme for adiabatic pulsations
+c
+c  quantities set in parameter statement:
+c  nnmax: maximum number of mesh points in integration
+c
+c  Note: as presently set up, nnmax is set also in s/r nrkint and
+c  eigin4
+c
+c  Double precision version.
+c  +++++++++++++++++++++++++
+c
+c  Dated: 10/3/90
+c
+\      implicit double precision (a-h, o-z)
+\      parameter (nnmax = 10000)
+\      parameter (nnmax1 = nnmax+1, nnmax2 = nnmax+10)
+\      common/rhsdat/ dt1(20), aa(6,nnmax) /xarr/ x(nnmax)
+\     *  /xarr1/ x1(nnmax1) /xarr2/ x2(nnmax1)
+\     *  /worksp/ aa1(9,nnmax)   /yyyyyy/ y(8,nnmax)  
+\     *  /yyyyri/ yri(4,nnmax)
+\     *  /sysord/ sysyso(4)
+\     *  /work/ wwnrk(20,nnmax2)
+\      common/wrkleq/ wwwlll(1500)
+\      common/cderst/ derc(6,nnmax)  /cintst/ aintc(6,nnmax)
+c
+c  common defining standard input and output
+c
+\      common/cstdio/ istdin, istdou, istdpr
+c
+\      write(istdou,100) nnmax
+c
+\      call adipls
+\      stop
+\        100 format(//61('*')//
+\     * ' In this version, the maximum number of mesh points is', i5//
+\     * 61('*'))
+\      end
+}
+\msni
+Here {\tt nnmax} is the maximum number of mesh points 
+{\it used in the calculation},
+and {\tt ii} is the order of the system. Furthermore {\tt common /worksp/}
+should be large enough to contain the array {\tt aain(6,nnmodl)},
+where {\tt nnmodl} is the total number of mesh points in the 
+equilibrium model read in (if {\tt in} is not equal to 1, {\tt nnmodl} is
+larger than {\tt nn}).
+%Note that I have attempted to assign all storage
+%that depends on the number of mesh points in the common blocks 
+%in the main programme. However, it is still possible that there may
+%additional storage assigned elsewhere. This needs further checking.
+
+The work space set in {\tt common/work/} is only needed
+for integration with the relaxation technique, {\ie},
+for {\tt mdintg} = 3.
+If {\tt mdintg} = 1 or 2 the line setting up this work area may be removed.
+
+\mainsect
+\centerline{\twelvebf References} 
+
+\ref
+Aerts, C., Christensen-Dalsgaard, J. \& Kurtz, D. W., 2010.
+{\it Asteroseismology},
+Springer, Heidelberg.
+\ref
+Baker, N. H., Moore, D. W. \& Spiegel, E. A., 1971.
+[Aperiodic behaviour of a non-linear oscillator].
+{\it Q. J. Mech. Appl. Math.,} 
+{\bf 24}, 391 -- 422.
+\ref
+Cash, J. R. \& Moore, D. R., 1980.
+[A high order method for the numerical solution of two-point boundary
+value problems].
+{\it BIT}, {\bf 20}, 44 -- 52.
+\ref
+Christensen-Dalsgaard, J., 1980.
+[On adiabatic non-radial oscillations with moderate or large $l$].
+{\it Mon. Not. R. astr. Soc.},
+{\bf 190}, 765 -- 791.
+\ref
+Christensen-Dalsgaard, J., 1981.
+[The effect of non-adiabaticity on avoided
+crossings of non-radial stellar oscillations].
+{\it Mon. Not. R. astr. Soc.}, 
+{\bf 194}, 229 -- 250 (CD81).
+\ref
+Christensen-Dalsgaard, J., 1982.
+[On solar models and their periods of oscillation].
+{\it Mon. Not. R. astr. Soc.},
+{\bf 199}, 735 -- 761 (CD82).
+\ref
+Christensen-Dalsgaard, J., 2008.
+[ADIPLS -- the Aarhus adiabatic pulsation package].
+{\it Astrophys. Space Sci.},  {\bf 316}, 113 -- 120 (CD08).
+\ref
+Christensen-Dalsgaard, J. \& Frandsen, S., 1983.
+[Radiative transfer and solar oscillations].
+{\it Solar Phys.},
+{\bf 82}, 165 -- 204.
+\ref
+Christensen-Dalsgaard, J. \& Mullan, D. J., 1994.
+[Accurate frequencies of polytropic models].
+{\it Mon. Not. R. astr. Soc.}, {\bf 270}, 921 -- 935.
+\ref
+Christensen-Dalsgaard, J., Dilke, F. W. W. \& Gough, D. O., 1974.
+[The stability of a solar model to non-radial oscillations].
+{\it Mon. Not. R. astr. Soc.},
+{\bf 169}, 429 -- 445.
+\ref
+Cowling, T. G., 1941.
+[The non-radial oscillations of polytropic stars].
+{\it Mon. Not. R. astr. Soc.}, 
+{\bf 101}, 367 -- 375.
+\ref
+Gabriel, M. \& Noels, A., 1976. 
+[Stability of a $30\,M_{\odot}$ star towards $g^{+}$ modes of
+high spherical harmonic values].
+{\it Astr. Astrophys.}, 
+{\bf 53}, 149 -- 157.
+\ref
+Gabriel, M. \& Scuflaire, R., 1979.
+[Properties of non-radial stellar oscillations].
+{\it Acta Astron.}, 
+{\bf 29}, 135 -- 149.
+\ref
+Lee, U., 1985.
+[Stability of the Delta Scuti stars against nonradial oscillations
+with low degree $l$].
+{\it Publ. Astron. Soc. Japan}, {\bf 37}, 279 -- 291.
+\ref
+Mihalas, B. W. \& Toomre, J., 1981.
+[Internal gravity waves in the solar atmosphere. I.
+Adiabatic waves in the chromosphere].
+{\it Astrophys. J.}, {\bf 249}, 349 -- 371.
+\ref
+Scuflaire, R., 1974.
+[The non radial oscillations of condensed polytropes].
+{\it Astr. Astrophys.}, 
+{\bf 36}, 107 -- 111.
+\ref
+Rosenthal, C. S., Christensen-Dalsgaard, J., Houdek, G, Monteiro, M.J.P.F.G.,
+Nordlund, {\AA}. \& Trampedach, R., 1995.
+[Seismology of the solar surface regions].
+In: {\it Proc. Fourth SOHO Workshop: Helioseismology},
+eds Hoeksema, J. T., Domingo, V., Fleck, B \& Battrick, B., 
+ESA SP-376, vol. 2, ESTEC, Noordwijk, p. 459 -- 464.
+\ref
+Rosenthal, C. S., Christensen-Dalsgaard, J.  Nordlund, {\AA}.,
+Stein, R. F. \& Trampedach, R., 1999.
+[Convective contributions to the frequencies of solar oscillations].
+{\it Astron. Astrophys.}, {\bf 351}, 689 -- 700.
+\ref
+Shibahashi, H. \& Osaki, Y., 1981.
+[Theoretical eigenfrequencies of solar oscillations of low harmonic
+degree $\ell$ in five-minute range].
+{\it Publ. Astron. Soc. Japan}, 
+{\bf 33}, 713 -- 719.
+\ref
+Soufi, F., Goupil, M. J. \& Dziembowski, W. A., 1998.
+[Effects of moderate rotation on stellar pulsation.
+I. Third order perturbation formalism].
+{\it Astron. Astrophys.}, {\bf 334}, 911 -- 924.
+\ref
+Takata, M., 2005.
+[Momentum conservation and model classification of the dipolar
+oscillations in stars].
+{\it Publ. Astron. Soc. Japan}, {\bf 57}, 375 -- 389.
+\ref
+Takata, M., 2006a.
+[Analysis of adiabatic dipolar oscillations of stars].
+{\it Publ. Astron. Soc. Japan}, {\bf 58}, 893 -- 908.
+\ref
+Takata, M., 2006b.
+[Rigorous analysis of dipolar oscillations of stars].
+In {\it Proc. SOHO 18 / GONG 2006 / HELAS I Conf.
+Beyond the spherical Sun},
+ed. K. Fletcher, ESA SP-624, ESA Publications Division,
+Noordwijk, The Netherlands.
+\ref
+Unno, W., Osaki, Y., Ando, H. \& Shibahashi, H., 1989.
+{\it Nonradial Oscillations of Stars} (2. ed.), University of Tokyo Press.
+
+\newpage
+\mainsect
+\centerline{\twelvebf Appendix A. Equations} 
+
+In this appendix the equations of non-radial oscillations are given in
+the form they are solved in the programme. Section~A.1 presents the equations
+in the standard case of oscillations of a spherical star with no turbulent
+pressure,
+Section~A.2 discusses the implementation used for
+oscillations of a plane-parallel layer,
+and Section~A.3 discusses the ways turbulent pressure may be treated 
+(or neglected).
+
+\subsect
+{\bf A.1 Equations in the standard case} 
+
+For non-radial oscillations the equations satisfied by the $y_i$ 
+are
+$$
+x  {\dd y_1  \over \dd x } = (V_g - 2 )  y_1 +
+\left( 1 - {V_g  \over \eta }\right)  y_2 - V_g  y_3 \; ,
+\eqno (A.1)$$
+$$
+x {\dd y_2  \over \dd x } = [ l ( l + 1) - \eta A ]  y_1 
++ (A - 1 )  y_2 + \eta A  y_3 \; ,
+\eqno (A.2)$$
+$$
+x  {\dd y_3  \over \dd x } = y_3 + y_4 \; ,
+\eqno (A.3)$$
+and
+$$
+x  {\dd y_4  \over \dd x } = - \lambda A U  y_1  - 
+\lambda U {V_g   \over \eta } y_2 
+\eqno (A.4)$$
+$$
++ [ l ( l + 1) + U(A - 2 )
++ (1 - \lambda ) U V_g ]  y_3 + 2(1 - U )  y_4 \; .
+$$
+Here $\eta = l ( l + 1) g / ( \omega^2 r )$, and the notation is otherwise
+as defined in equation (5.1). Note that the modified form of Poisson's
+equation, equation (2.3), has been used. In the Cowling approximation the
+terms in $y_3$ are neglected in equations (A.1) and (A.2), and 
+equations (A.3) and (A.4) are not used.
+
+For radial oscillations the equations are
+$$
+x  {\dd y_1  \over \dd x } = (V_g - 2 )  y_1 -
+V_g {\sigma^2 x^2   \over q } y_2 \; ,
+\eqno (A.5)$$
+and
+$$
+x {\dd y_2  \over \dd x } = \left[ x - {q \over \sigma^2 x^2 }
+(A - \lambda U) \right] y_1 + A  y_2 \; .
+\eqno (A.6)$$
+
+\subsect
+{\bf A.2 Equilibrium variables and oscillation equations in 
+plane-parallel case }
+
+The option has been built into the programme to study 
+{\it nonradial} oscillations of a plane-parallel envelope model
+with constant gravity.
+This option is invoked by setting the parameter {\tt iplneq} to 1.
+The oscillations are treated in the Cowling approximation.
+For simplicity the model and the oscillations are still put on dimensionless
+form in terms of a total mass $M$ and a radius $R$, which, however, clearly
+has no specific physical meaning (except that the results may be
+taken as approximations to envelope oscillations of a star with the
+given mass and radius). The gravity is then given by $g = G M/R^2 $.
+The horizontal wave number $k_h$ is parameterized in terms of the
+``degree'' $l$, defined such that 
+$$
+k_h = {l \over R } \; .
+\eqno (A.7)$$
+
+The equilibrium model is still given by $x$ and $A_1 - A_5$.
+Now, however, $x$ is a measure of position, in units of $R$, decreasing
+towards the interior of the model; the point $x = 1$ may still conveniently
+be chosen at or close to the surface of the model.
+The variables $A_1 \ -\ A_5$ are defined as
+$$
+\eqalign{
+& A_1 \equiv 1 \; , \cr
+& A_2 = V_g  \equiv {g \rho R   \over \Gamma_1 p} \; , \cr
+& A_3 \equiv \Gamma_1 \; , \cr
+& A_4 = A \equiv - V_g - {\dd \ln \rho  \over \dd x}  \; , \cr
+& A_5 = U \equiv {4 \pi \rho R^3  \over M } \; . \cr
+}
+\eqno (A.8)$$
+
+The oscillation equations are now
+$$
+{\dd y_1  \over \dd x } 
+= V_g y_1 + \left( 1 - {V_g  \over \eta }\right) y_2 \; ,
+\eqno (A.9)$$
+and
+$$
+{\dd y_2  \over \dd x } = ( l^2 - \eta A ) y_1 + A y_2 \; ,
+\eqno (A.10)$$
+where $\eta = l^2 / \sigma^2$. Notice that $A_1$ and $A_5$
+are not needed in the oscillation equations. However, they should still
+be defined as in equations (A.8), as they are used elsewhere in the
+calculations in the programme,  {\eg}
+in the evaluation of the energy in equation (4.3).
+
+The calculation of radial oscillations in a plane-parallel envelope
+has not been implemented.
+
+\subsect
+{\bf A.3 The treatment of turbulent pressure} 
+
+There is no doubt that turbulence contributes significantly
+to the hydrostatic balance in the outermost layers of
+stars with convective envelopes.
+This effect is often described in terms of a turbulent pressure $\pturb$;
+in solar models estimates of $\pturb$ indicate that it may
+be as high as 10 -- 15 per cent of the total pressure
+near the top of the convection zone.
+Even so, turbulent pressure is often neglected in the
+calculation of equilibrium models.
+
+If turbulent pressure is included in the equilibrium model,
+the oscillation calculations require an assumption about
+the response of $\pturb$ to the pulsations.
+This is sometimes stated by saying that ``the perturbation
+to turbulent pressure is neglected''.
+However, the effects on the frequencies might depend
+sensitively on the way in which the $\pturb$-perturbation
+is neglected, often determined by the precise form of
+the oscillation equations used for the numerical solution.
+
+This programme allows several options for the treatment
+of turbulent pressure:
+\medskip
+\item{i)}
+Neglect of the Eulerian perturbation in the turbulent body force.
+\item{ii)} 
+Neglect of the Eulerian perturbation in the turbulent pressure.
+\item{iii)} 
+Neglect of the Lagrangian perturbation in the turbulent pressure.
+\medskip
+In all three cases, the equilibrium model, defined by the
+$\{A_i\}$, must be set up appropriately.
+In addition, the first two cases must also be flagged by
+the input parameter {\tt iturpr}.
+The detailed use of these options is discussed below.
+
+The first option, i), is the original option in the code;
+it was introduced largely because of computational
+convenience, but follows the treatment used by Mihalas \& Toomre (1981).
+It was argued by Christensen-Dalsgaard \& Frandsen (1983) that neglect
+of the {\it Lagrangian} perturbation of the turbulent body force
+might be somewhat more reasonable, although in no ways satisfactory.
+This has not been implemented; however, option iii) shares some of the
+same advantages.
+Option ii) is retained in the code to allow tests of
+the sensitivity of the computed frequencies to different assumptions.
+
+The frequency effects of turbulent pressure were discussed in more detail by
+Rosenthal {\etal} (1995) who found that the effect on the
+equilibrium structure of turbulent pressure,
+and the perturbation in turbulent pressure,
+is of the same order of magnitude as other uncertain aspects
+of the mode physics, including nonadiabaticity, and 
+also of roughly the magnitude and shape of the current dominant
+component of the difference between observed frequencies
+and frequencies of adiabatic oscillation for normal solar models.
+Thus, although turbulent pressure affects a region of the
+Sun suffering from other uncertainties in the treatment of
+the oscillations, the way it is included or ignored is
+of considerable interest.
+
+The implementation of the different options has not been tested
+with great care yet, and hence some caution is required when using them.
+Also, it should be noticed that computation of variational
+frequencies has not been consistently corrected for turbulent pressure.
+As discussed below, this should have no effect for option iii)
+but is likely to influence options i) and ii).
+
+\subsect
+{\it A.3.1 Neglect of the Eulerian perturbation in the turbulent body force
+({\tt iturpr = 1})}
+
+We write the equations of motion as
+$$
+\rho {\DD  {\bf u}  \over \DD t } = - \nabla p + \rho {\bf g} +
+\rho {\bf f}_{\rm turb} \; ,
+\eqno (A.11)$$
+where ${\bf g} = \nabla \Phi $ is the gravitational acceleration, 
+$\Phi$ being the gravitational potential, and ${\bf f}_{\rm turb}$
+is the turbulent body force; furthermore $p$ is the combined gas and
+radiation pressure.
+Thus the equation of hydrostatic support, when expressed in
+terms of $p$, is
+$$
+{\dd p \over \dd r } = - \tilde g \rho \; .
+\eqno (A.12)$$
+where $\tilde g = g - f_{\rm turb}$, where $-  g$ and $f_{\rm turb}$ 
+are the radial components of the equilibrium gravity and turbulent force.
+Thus here and in the following
+$$
+g = {G m \over r^2} \; .
+\eqno(A.13)
+$$
+In the oscillation calculation the assumption is now that
+the Eulerian perturbation of ${\bf f}_{\rm turb}$ can be neglected.
+Hence the Eulerian perturbation of equation (A.11) may be written
+$$
+\rho {\partial^2 {\bf \delta r}  \over \partial t^2 } = - \nabla p^{\prime}
+- \rho^{\prime} \tilde g {\bf a}_r + \rho \nabla \Phi ' \; .
+\eqno (A.14)$$
+Evidently, the condition of adiabaticity is expressed as
+a relation between the Lagrangian perturbations in $p$ and $\rho$:
+$$
+{\delta p \over p} = \Gamma_1 {\delta \rho \over \rho} \; ,
+\eqno(A.15)
+$$
+where $\Gamma_1$ is the (usual) thermodynamic adiabatic exponent.
+
+To take the distinction between $g$ and $\tilde g$ into account, we
+modify the definitions of the equilibrium variables $A_1 , A_2 $ 
+and $A_4$. Thus, instead of equations (5.1), we use
+$$
+\eqalign{
+& A_1 \equiv {R^3  \over M } {\tilde g  \over r }
+\equiv {\tilde q  \over x^3} \; ,
+\qquad \hbox{\rm which defines} \quad  \tilde q 
+= {\tilde g  \over g } q \; , \cr
+& A_2 = \tilde V_g \equiv - {1 \over \Gamma_1 } {\dd \ln p \over \dd \ln r} 
+ \equiv {r \rho \tilde g  \over \Gamma_1 p} \; , \cr
+& A_4 = {1 \over \Gamma_1} {\dd \ln p  \over \dd \ln r} -
+{\dd \ln \rho  \over \dd \ln r} \; ,
+}
+\eqno (A.16)
+$$
+together with $A_3$ and $A_5$ which are unchanged.
+We also introduce
+$$
+V_g = {r \rho g  \over \Gamma_1 p} \; ,\qquad  
+A = - V_g - {\dd \ln \rho  \over \dd \ln r} \; .
+\eqno (A.17)$$
+Clearly in the absence of turbulent pressure these variables reduce
+to the variables defined in Section~5.
+
+Note that with these definitions the {\it structure} of the
+model file is unchanged.
+In the programme it is assumed that $\tilde g/g$ differs from
+unity only very near the surface.
+Since in this region $q = m/M$ is one with very high precision,
+$\tilde q = x^3 \tilde A_1$ can be taken as a very good approximation
+to $\tilde g/g$, allowing, {\eg}, the evaluation of $V_g$ and $A$.
+
+The dimensionless perturbation variables $y_1 - y_4$ are defined
+as in Section~2.1; in particular the actual gravitational acceleration
+$g$ is used in the definition of $y_3$ ({\cf} equation 2.5a).
+
+With these definitions,
+the equations satisfied by the $y_i$ are, for non-radial oscillations 
+$$
+x {\dd y_1  \over \dd x } = (\tilde V_g - 2 )  y_1 +
+\left( 1 - {\tilde V_g  \over \tilde \eta} \right) y_2 
+- V_g y_3 \; ,
+\eqno (A.18)$$
+$$
+x {\dd y_2  \over \dd x } = [ l ( l + 1) - \tilde \eta \tilde A ] y_1 
++ ( \tilde A - 1 ) y_2 + \eta \tilde A y_3 \; ,
+\eqno (A.19)$$
+$$
+x {\dd y_3  \over \dd x } = y_3 + y_4 \; ,
+\eqno (A.20)$$
+and
+$$
+\eqalign{
+x {\dd y_4  \over \dd x } = & - \lambda \tilde A U y_1 -
+\lambda U {\tilde V_g   \over \tilde \eta} y_2  \cr
+& + [ l ( l + 1) + U(A - 2 )
++ (1 - \lambda ) U V_g ] y_3 + 2(1 - U )  y_4 \; . \cr
+}
+\eqno (A.21)
+$$
+Here $\tilde \eta = l ( l + 1) \tilde g / ( \omega^2 r )$.
+
+For radial oscillations the equations are
+$$
+x  {\dd y_1  \over \dd x } = (\tilde V_g - 2 ) y_1 -
+\tilde V_g {\sigma^2 x^2   \over \tilde q} y_2 \; ,
+\eqno (A.22)$$
+and
+$$
+x  {\dd y_2  \over \dd x } = \left[ x - {1 \over \sigma^2 x^2 }
+( \tilde q \tilde A - \lambda q U) \right] y_1 + \tilde A y_2 \; .
+\eqno (A.23)$$
+
+To use this option, the equilibrium model must obviously
+be set up correctly, as defined in equations (A.16).
+In addition, the parameter {\tt iturpr} must be set to 1.
+
+\subsect
+{\it A.3.2 Neglect of the Eulerian perturbation in the turbulent pressure
+({\tt iturpr = 2})}
+
+Here we assume that the pressure can be written as
+$$
+p = \pg + \pturb \; ,
+\eqno(A.24)
+$$
+where $\pg$ is the thermodynamic pressure and $\pturb$
+is the turbulent pressure.
+Hence,
+the equations of motion are written as
+$$
+\rho {\DD {\bf u}  \over \DD t } = - \nabla p + \rho {\bf g} \; ,
+\eqno (A.25)$$
+with no explicit turbulent body force.
+In the equilibrium model, $p$ is assumed to be in hydrostatic
+equilibrium, so that the equation of hydrostatic support is
+$$
+{\dd p \over \dd r } = - g \rho \; .
+\eqno (A.26)$$
+
+In the oscillation calculation the assumption is now that
+the Eulerian perturbation of $\pturb$ can be neglected.
+Hence the Eulerian perturbation of equation (A.25) may be written
+$$
+\rho {\partial^2 {\bf \delta r}  \over \partial t^2 } = - \nabla \pg^{\prime}
+- \rho^{\prime} g {\bf a}_r + \rho \nabla \Phi ' \; .
+\eqno (A.27)$$
+The condition of adiabaticity is assumed to relate the Lagrangian
+perturbation of the gas pressure to the density perturbation,
+$$
+{\delta \pg \over \pg} = \Gamma_1 {\delta \rho \over \rho} \; ,
+\eqno(A.28)
+$$
+where again $\Gamma_1$ is the thermodynamic adiabatic exponent.
+
+In the oscillation equations, derived under these assumptions,
+we need to distinguish between the gradients in $\pg$ and $p$.
+Thus we introduce
+$$
+V_g^{(0)} = - {1 \over \Gamma_1} {\dd \ln \pg \over \dd \ln r} \; , 
+\qquad
+V_g^{(1)} = - {1 \over \Gamma_1} {\dd \ln p \over \dd \ln r} 
+= {\rho g r \over \Gamma_1 p} \; ,  
+\eqno(A.29) 
+$$
+and
+$$
+A^{(0)} = - V_g^{(0)} - {\dd \ln \rho \over \dd \ln r} \; , \qquad
+A^{(1)} = - V_g^{(1)} - {\dd \ln \rho \over \dd \ln r} \; .
+\eqno(A.30)
+$$
+This requires an extension of the model format defined in
+Section~5.
+Specifically, we replace the definitions of $A_2$ and $A_4$,
+and add a new variable $A_6$, in equation (5.1):
+$$
+\eqalign{
+& A_2 = V_g^{(1)} \; , \cr
+& A_4 = A^{(1)} \; , \cr
+& A_6 = V_g^{(0)} - V_g^{(1)}  = - (A^{(0)} - A^{(1)}) \; , \cr
+}
+\eqno (A.31)
+$$
+the remaining definitions being unchanged.
+To flag for a model file of this format,
+the otherwise unused variable {\tt data(8)} should be set to 10.
+
+The dimensionless perturbation variables $y_1 - y_4$ are defined
+as in Section~2.1.
+
+With these definitions,
+the equations satisfied by the $y_i$ are, for non-radial oscillations 
+(note that for the time being I have not considered the option
+of $\lambda \neq 1$ in this case)
+$$
+x {\dd y_1  \over \dd x } = (V_g^{(0)} - 2 )  y_1 +
+\left( 1 - {V_g^{(1)}  \over \eta} \right) y_2 
+- V_g^{(1)} y_3 \; ,
+\eqno (A.32)$$
+$$
+x {\dd y_2  \over \dd x } = [ l ( l + 1) - \eta A^{(0)} ] y_1 
++ ( A^{(1)} - 1 ) y_2 + \eta A^{(1)} y_3 \; ,
+\eqno (A.33)$$
+$$
+x {\dd y_3  \over \dd x } = y_3 + y_4 \; ,
+\eqno (A.34)$$
+and
+$$
+\eqalign{
+x {\dd y_4  \over \dd x } = & - A^{(0)} U y_1 -
+U {V_g^{(1)} \over \eta} y_2  \cr
+& + [ l ( l + 1) + U(A^{(1)} - 2 )] y_3 + 2(1 - U )  y_4 \; . \cr
+}
+\eqno (A.35)
+$$
+
+For radial oscillations the equations are
+$$
+x  {\dd y_1  \over \dd x } = (V_g^{(0)} - 2 ) y_1 -
+V_g^{(1)} {\sigma^2 x^2   \over q} y_2 \; ,
+\eqno (A.36)$$
+and
+$$
+x  {\dd y_2  \over \dd x } = \left[ x - {q \over \sigma^2 x^2 }
+( A^{(0)} - U) \right] y_1 + A^{(1)} y_2 \; .
+\eqno (A.37)$$
+
+To use this option, the equilibrium model must obviously
+be set up correctly, as defined in equations (A.31).
+In addition, the parameter {\tt iturpr} must be set to 2.
+
+\subsect
+{\it A.3.3 Neglect of the Lagrangian perturbation in the turbulent pressure}
+
+We still assume the separation in pressure given in equation (A.24),
+the equations of motion (A.25) and that the equilibrium
+total pressure satisfies the equation of hydrostatic support (A.26).
+However, we now assume that the Lagrangian perturbation
+$\delta \pturb = 0$
+(see also Rosenthal {\etal} 1995).
+The equations of motion are now
+$$
+\rho {\partial^2 {\bf \delta r}  \over \partial t^2 } = - \nabla p^{\prime}
+- \rho^{\prime} g {\bf a}_r + \rho \nabla \Phi ' \; .
+\eqno (A.38)$$
+Furthermore, assuming still equation (A.28) for the adiabatic
+change in the {\it thermodynamic} pressure, we obtain for the
+relation between the Lagrangian perturbations in the total pressure and
+density:
+$$
+{\delta p \over p} = 
+{\delta \pg \over p} = 
+{\delta \pg \over p} = 
+{\pg \over p} \Gamma_1 {\delta \rho \over \rho} \; ,
+\eqno(A.39)
+$$
+or
+$$
+{\delta p \over p} = \Gammar {\delta \rho \over \rho} \; ,
+\eqno(A.40)
+$$
+defining {\it the reduced $\Gammar \equiv (\pg/p) \Gamma_1$}
+(Rosenthal {\etal} 1995).
+Here, obviously, $\Gamma_1$ is the thermodynamic adiabatic exponent.
+
+With this definition, the oscillation equations are precisely
+as in the case without turbulent pressure, when expressed in
+terms of the Eulerian perturbation $p^{\prime}$ in total pressure,
+provided $\Gamma_1$ is replaced throughout by $\Gammar$.
+It should be noticed also that this is the case for {\it any}
+relation of the form (A.40), for a function $\Gammar$ defined
+in the equilibrium model.
+Indeed, it was argued by Rosenthal {\etal} (1999) that
+a more appropriate form of $\Gammar$ could be obtained by
+averaging the equations for turbulent convection.
+
+Implementation of this approximation therefore only requires
+modification of the equilibrium model.
+Specifically, the definitions of $A_2 - A_4$ are changed to
+$$
+\eqalign{
+& A_2 = - {1 \over \Gammar} {\dd \ln p \over \dd \ln r} 
+= {G m \rho \over \Gammar p r} \; , \cr
+& A_3 =  \Gammar \; , \cr
+& A_4 = {1 \over \Gammar} {\dd \ln p \over \dd \ln r} 
+- {\dd \ln \rho \over \dd \ln r} \; , \cr
+}
+\eqno(A.41)
+$$
+with the remaining definitions being unchanged.
+
+The definition of the sound speed in this case deserves a little comment.
+It is evident from the unchanged form of the oscillation equations
+that the relevant expression for the sound speed is 
+$$
+c^2 = {\Gammar p \over \rho} \; ,
+\eqno(A.42)
+$$
+expressed in terms of the modified $\Gamma_1$ and the total pressure.
+It is interesting that with the simple definition of $\Gammar$
+implied by equation (A.39) this is identical to $\Gamma_1 \pg / \rho$,
+{\ie}, the ``thermodynamic'' squared sound speed.
+However, with a more general definition of $\Gammar$ this is not 
+generally the case.
+On the other hand, it is obvious that equation (5.7) still holds.
+
+\subsect
+{\bf A.4 Inclusion of rotational effects}
+
+In this case it is assumed that the equilibrium model has been computed
+including the spherically symmetric part of the centrifugal acceleration,
+and that the model as been defined with $D_8 = 20$, to flag for the
+inclusion of $A_6$.
+This case allows calculation of the structure effects on the frequencies,
+to second order in the angular velocity $\Omega$, in preparation for
+calculation of further second-order effects according to the formalism
+of Gough \& Thompson; this is used if {\tt irotsl} $\neq 1$.
+When {\tt irotsl} $= 1$, the first-order perturbations to the
+eigenfrequencies and eigenfunctions are including, according to the
+formalism of Soufi {\etal} (1998).
+
+The equation of hydrostatic support in this case is
+$$
+{\dd p \over \dd r } = - g_{\rm e} \rho \; , \qquad {\rm with}
+\quad g_{\rm e} = g - {2 \over 3} r \Omega^2 \; .
+\eqno (A.43)$$
+Here and in the following
+$$
+g = {G m \over r^2} \; .
+\eqno(A.44)
+$$
+In accordance with the evolution code, we introduce $\tilde q$ by
+$$
+\tilde q = {g_{\rm e} \over g} q \; ,
+\eqno(A.45)
+$$
+where, as usual, $q = m/M$.
+Thus equation (A.43) may also be written
+$$
+{\dd p \over \dd r } = - {G M \tilde q \over r^2} \rho \; .
+\eqno(A.46)
+$$
+
+This redefinition of the equilibrium structure is formally equivalent
+to the case considered in Section A.3.1, of including a turbulent
+body force.
+Thus we similarly 
+modify the definitions of the equilibrium variables $A_1 , A_2 $ 
+and $A_4$; instead of equations (5.1), we use
+$$
+\eqalign{
+& A_1 \equiv {R^3  \over G M } {g_{\rm e} \over r }
+\equiv {\tilde q  \over x^3} \; , \cr
+& A_2 = \tilde V_g \equiv - {1 \over \Gamma_1 } {\dd \ln p \over \dd \ln r} 
+ \equiv {r \rho g_{\rm e}  \over \Gamma_1 p} \; , \cr
+& A_4 = \tilde A \equiv {1 \over \Gamma_1} {\dd \ln p  \over \dd \ln r} -
+{\dd \ln \rho  \over \dd \ln r} \; ,
+}
+\eqno (A.47)
+$$
+which are identical to equations (A.16),
+together with $A_3$ and $A_5$ which are unchanged.
+In addition, we introduce the new variable $A_6$ by
+$$
+A_6 = {q \over \tilde q} = {g \over g_{\rm e}} \; .
+\eqno(A.48)
+$$
+(As noted in Section 5, the inclusion of $A_6$ in the model data is
+flagged by setting $D_8 = 20$.)
+Finally, we introduce again
+$$
+V_g = {r \rho g  \over \Gamma_1 p} \; ,\qquad  
+A = - V_g - {\dd \ln \rho  \over \dd \ln r} \; .
+\eqno (A.49)$$
+Clearly in the absence of rotation $A_1 - A_5$ reduce
+to the variables defined in Section~5, and $A_6 = 1$.
+
+The relations between the variables defined here and
+more ``physical'' variables in equation (5.3) have to
+be modified in this case:
+$$
+p = {G M^2  \over 4 \pi R^4}  {x^2 A_1^2 A_5 A_6 \over A_2 A_3} \; , \qquad
+{\dd p \over \dd r }= - {G M^2  \over 4 \pi R^5} x A_1^2 A_5 A_6 \; , \qquad
+\rho = {M \over 4 \pi R^3}  A_1 A_5 A_6 \; . 
+\eqno (A.50)
+$$
+The expressions for the buoyancy frequency, Lamb frequency and
+sound speed, equations (5.4), (5.5) and (5.7), are unchanged
+in terms of $A_1 - A_5$.
+
+The dimensionless perturbation variables $y_1 - y_4$ are defined
+as in Section~2.1; in particular the actual gravitational acceleration
+$g$ is used in the definition of $y_3$ ({\cf} eq.\ 2.5a).
+
+\subsect
+{\it A.4.1 Equations with no explicit inclusion of rotation}
+
+In this case the equations are essentially identical
+to those presented in Section A.3.1;
+for completeness, they are repeated here.
+For non-radial oscillations 
+$$
+x {\dd y_1  \over \dd x } = (\tilde V_g - 2 )  y_1 +
+\left( 1 - {\tilde V_g  \over \tilde \eta} \right) y_2 
+- V_g y_3 \; ,
+\eqno (A.51)$$
+$$
+x {\dd y_2  \over \dd x } = [ l ( l + 1) - \tilde \eta \tilde A ] y_1 
++ ( \tilde A - 1 ) y_2 + \eta \tilde A y_3 \; ,
+\eqno (A.52)$$
+$$
+x {\dd y_3  \over \dd x } = y_3 + y_4 \; ,
+\eqno (A.53)$$
+and
+$$
+\eqalign{
+x {\dd y_4  \over \dd x } = & - \lambda \tilde A U y_1 -
+\lambda U {\tilde V_g   \over \tilde \eta} y_2  \cr
+& + \left[ l ( l + 1) + U(A - 2 )
++ \left({\tilde q \over q} - \lambda \right) U V_g \right] y_3 
++ 2(1 - U )  y_4 \; . \cr
+}
+\eqno (A.54)
+$$
+Here $\tilde \eta = l ( l + 1) \tilde g / ( \omega^2 r )$.
+Note that equation (A.54) differs from the corresponding equation
+(A.21), in replacing $(1 - \lambda)$ by $(\tilde q / q - \lambda)$
+in the last term multiplying $y_3$.
+This deserves an extra check in both equations.
+
+For radial oscillations the equations are
+$$
+x  {\dd y_1  \over \dd x } = (\tilde V_g - 2 ) y_1 -
+\tilde V_g {\sigma^2 x^2   \over \tilde q} y_2 \; ,
+\eqno (A.55)$$
+and
+$$
+x  {\dd y_2  \over \dd x } = \left[ x - {1 \over \sigma^2 x^2 }
+( \tilde q \tilde A - \lambda q U) \right] y_1 + \tilde A y_2 \; .
+\eqno (A.56)$$
+
+To use this option, the equilibrium model must obviously
+be set up correctly, as defined in equations (A.47).
+
+\subsect
+{\it A.4.2 Including first-order rotation, according to Soufi {\etal} (1998)}
+
+This is based on notes provided by K. Karami, translating between
+the notation used by Soufi {\etal} (1998) and the notation used here.
+We introduce
+$$
+F_r(r) = {2 \over 3} r \Omega^2 \; , \qquad
+\sigma_r = {F_r(r) \over g} \; , \qquad
+C = {x^3 \over q} \; , \qquad
+C_r = {C \over 1 - \sigma_r} \; .
+\eqno(A.57)
+$$
+Then, obviously, $1 - \sigma_r = g_{\rm e} / g = \tilde q / q$,
+and
+$$
+C_r = {x^3 \over \tilde q} = A_1^{-1} \; .
+\eqno(A.58)
+$$
+We also need $\sigma_\Omega$, defined by
+$$
+\sigma_\Omega^2 = {R^3 \over G M} \Omega^2 \; .
+\eqno(A.59)
+$$
+This is for the moment obtained by noting that
+$$
+A_6^{-1} = {g_{\rm e} \over g} = 1 - {2 \over 3} r \Omega^2 {r^2 \over G m}
+= 1 - {2 \over 3} \sigma_\Omega^2 (A_1 A_6)^{-1} \; ,
+$$
+whence
+$$
+\sigma_\Omega^2 = {3 \over 2} (A_6 - 1) A_1 \; .
+\eqno(A.60)
+$$
+(Note that this way of calculating $\sigma_\Omega$ introduces significant
+loss of precision, since $A_6$ is typically relatively close to unity.
+In future, it may be replaced by an extension to the $\{A_i\}$ to
+include explicit information about $\Omega$.)
+
+Following Soufi {\etal} (1998), and Karami, we finally introduce
+$$
+\hat \sigma = \sigma + m \sigma_\Omega \; , \qquad
+\alpha = 2 m {\sigma_\Omega \over \hat \sigma} \; , \qquad
+\zeta = {\Lambda \over \Lambda - \alpha} {\Lambda \over C_r \hat \sigma^2} \; ,
+\qquad
+h_1 = {\Lambda \alpha \over \Lambda - \alpha} \; ,
+\eqno(A.61)
+$$
+where $\Lambda = l(l+1)$.
+Here $\zeta$ may also be written
+$$
+\zeta = {\Lambda \over \Lambda - \alpha} 
+{l(l+1) \tilde q \over \hat \sigma^2 x^3}
+= {\Lambda \over \Lambda - \alpha}  
+\left(\sigma \over \hat \sigma \right)^2 \tilde \eta \; .
+\eqno(A.62)
+$$
+Then we finally obtain the relevant form of the non-radial equations:
+$$
+x {\dd y_1  \over \dd x } = (\tilde V_g - 2 +h_1)  y_1 +
+( \zeta - \tilde V_g) {y_2 \over \tilde \eta} 
+- V_g y_3 \; ,
+\eqno (A.63)$$
+and
+$$
+x {\dd y_2  \over \dd x } = 
+\left[ l ( l + 1) \left({\hat \sigma \over \sigma} \right)^2  
+- \tilde \eta \left(\tilde A + {h_1^2 \over \zeta} \right) \right] y_1 
++ ( \tilde A - 1 - h_1) y_2 + \eta \tilde A y_3 \; ;
+\eqno (A.64)$$
+equations (A.53) and (A.54) are unchanged.
+Also, of course, the equations for radial oscillation are the same
+as above.
+
+
+\end

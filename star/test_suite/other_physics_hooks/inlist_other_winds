@@ -1,0 +1,26 @@
+
+&other_winds
+
+      wind_scheme = 'Kudritzki' ! one of 'Kudritzki', 'Grafener', 'Stern51'
+
+
+      !### Kudritzki_scaling_factor
+
+      ! Radiation driven winds of hot stars.
+      ! See Kudritzki et al, Astron. Astrophys. 219, 205-218 (1989).
+
+      Kudritzki_scaling_factor = 1d0
+
+
+      !### Grafener_scaling_factor
+
+      ! Grafener, G. & Hamann, W.-R. 2008, A&A 482, 945
+      ! contributed to mesa by Nilou Afsari
+      
+      Grafener_scaling_factor = 0d0
+      
+      
+      Stern51_scaling_factor = 0d0
+      
+
+/ ! end of other_winds

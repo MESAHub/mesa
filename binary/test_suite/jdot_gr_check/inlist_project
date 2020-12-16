@@ -1,0 +1,26 @@
+&binary_job
+
+   inlist_names(1) = 'inlist1' 
+   inlist_names(2) = 'inlist2'
+
+   evolve_both_stars = .false.
+
+/ ! end of binary_job namelist
+
+&binary_controls
+
+   mdot_scheme = "roche_lobe"
+         
+   m1 = 0.5d0  ! donor mass in Msun
+   m2 = 0.8d0 ! companion mass in Msun
+   initial_period_in_days = -1
+   initial_separation_in_Rsuns = 2d0
+   do_jdot_mb = .false.
+   fj = 0.001
+
+   use_radiation_corrected_transfer_rate = .false.
+
+   max_tries_to_achieve = 20
+         
+/ ! end of binary_controls namelist
+

@@ -1,0 +1,73 @@
+&binary_job
+
+   inlist_names(1) = 'inlist1' 
+   inlist_names(2) = 'inlist2'
+
+   evolve_both_stars = .true.
+   ! rlof is turned on once star definitely settles into ZAMS
+   change_initial_ignore_rlof_flag = .true.
+   new_ignore_rlof_flag = .true.
+
+/ ! end of binary_job namelist
+
+&binary_controls
+   do_tidal_sync = .true.
+   do_j_accretion = .true.
+   ! be 100% sure MB is always off
+   do_jdot_mb = .false.
+   do_jdot_missing_wind = .true.
+
+   terminate_if_initial_overflow = .false.
+
+   mdot_scheme = "contact"
+   report_rlo_solver_progress = .true.
+
+   ! initial conditions specified in extra inlist
+   ! the initial masses and period are given there
+   read_extra_binary_controls_inlist1 = .true.
+   extra_binary_controls_inlist1_name = "inlist_extra"
+
+   terminal_interval = 10
+
+   ! timestep controls, these are relaxed for the test suite, recommended to use the commented
+   ! values or lower for serious work
+   fr = 0.1
+   !fr = 0.02
+   fr_limit = 1d-2
+   fm = 0.1
+   fm_limit = 1d-1
+   varcontrol_case_a = 1d-3
+   !varcontrol_case_a = 4d-4
+   varcontrol_case_b = 1d-3
+   !varcontrol_case_b = 5d-4
+   varcontrol_ms = 1d-3
+   !varcontrol_ms = 4d-4
+   varcontrol_post_ms = 1d-3
+   !varcontrol_post_ms = 5d-4
+   dt_softening_factor = 0.4
+
+   limit_retention_by_mdot_edd = .false.
+   implicit_scheme_tolerance = 2d-4
+   max_tries_to_achieve = 400
+   min_change_factor = 1.1d0
+   max_change_factor = 1.5d0
+   initial_change_factor = 1.2d0
+   change_factor_fraction = 0.8d0
+   implicit_lambda = 0.4d0
+   roche_min_mdot = 1d-10
+
+   sync_mode_1 = "Uniform"
+   sync_type_1 = "Hut_rad"
+   Ftid_1 = 1
+   sync_mode_2 = "Uniform"
+   sync_type_2 = "Hut_rad"
+   Ftid_2 = 1
+   do_initial_orbit_sync_1 = .true.
+   do_initial_orbit_sync_2 = .true.
+
+   min_mdot_for_implicit = 1d-10
+   roche_min_mdot = 1d-12
+   accretor_overflow_terminate = 100.0d0
+         
+/ ! end of binary_controls namelist
+

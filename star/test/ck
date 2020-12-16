@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		echo "FAILED"
+		echo
+		exit 1
+	fi
+}
+
+rm -f restart_photo
+./star > log
+grep 'stop because star_age >= max_age' log > tmp.txt
+check_okay
+diff tmp.txt test_output

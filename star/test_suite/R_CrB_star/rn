@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+# set MESA_RUN_OPTIONAL to run all parts of test
+if [ -n "$MESA_RUN_OPTIONAL" ]; then
+    do_one inlist_He_star_header He_star.mod LOGS_He_star
+    do_one inlist_change_abundances_header R_CrB_from_He_star.mod LOGS_change_abundances
+else
+    echo "Skipping R CrB creation using saved model"
+fi
+
+do_one inlist_R_CrB_star_header final.mod LOGS_R_CrB_star
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished all inlists for R_CrB_star'

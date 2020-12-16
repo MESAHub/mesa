@@ -1,0 +1,39 @@
+Files needed:
+Input on idsin (default 2)
+Input of selection modes on idssl (default 3)
+ outputs grand summary on d/s 11.
+ outputs short summary on d/s 12.
+ output l, order and frequency on d/s 13, 
+ in same form as observed results
+
+2 '<input modes>'   @
+3 '<selection dataset>'   @
+10 '<output eigenfunctions>'   @
+11 '<output grand summary>'   @
+12 '<output short summary>'   @
+13 '<output observed form>'   @
+21 '<output grand summary, selection modes>'   @
+22 '<output short summary, selection modes>'   @
+23 '<output observed form, selection modes>'   @
+-1 ''   @
+
+idsin,idssl?
+,,,   @
+
+icasin: type of eigenfunction.
+icasin = 1: Full eigenfunction, as output from adipls
+icasin = 2: Reduced eigenfunction. First record gives nn and x,
+          subsequent records give the eigenfunctions, in terms of two variables.
+icasin = 3: Kernels for spherically symmetric rotation.
+icasin,icassl?
+1,1   @
+nw1,nw2,lw1,lw2,frqw1,frqw2, sigw1, sigw2?
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,    @
+
+irange = 1, 2, 3 for ranges in record number, order or degree
+iselct,irewin,irewsl,irange?
+0,,,,,,,,,,,,,,,,,,,,,    @
+ranges 
+,,,,,,,,,,,,,,,,,,,,,,,,    
+idiag?
+0    @

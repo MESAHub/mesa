@@ -1,0 +1,79 @@
+# shellcheck shell=bash
+
+# do_one [inlist] [output model] [LOGS directory]
+
+function do_one {
+
+    # set inlist for current part of multi-part test (optional)
+    if [ -n "$1" ]; then
+        INLIST="$1"
+        if [ ! -e "${INLIST}" ]
+        then
+            echo "target file ${INLIST} does not exist"
+            exit 1
+        fi
+        cp "$1" inlist
+    else
+        INLIST=inlist
+    fi
+    echo "    - inlist: ${INLIST}" >> testhub.yml
+
+    # remove model from previous runs (may not exist)
+    rm -rf "$2"
+
+    # run test
+    echo 'run' "$1"
+    if ! ./rn1
+    then
+        echo "rn1 failed"
+        exit 1
+    fi
+
+    # check if final model was produced (optional)
+    if [ -n "$2" ]; then
+       if [ ! -r "$2" ]
+       then
+           echo
+           echo "******************************************************************"
+           echo "failed to create $2 when running $1"
+           echo "******************************************************************"
+           echo
+           exit 1
+       fi
+    fi
+
+    # move LOGS (optional)
+    if [ -n "$3" ]; then
+        rm -rf "$3"
+        mv LOGS "$3"
+    fi
+
+    echo
+    echo "finished $1"
+    echo
+    echo '***'
+    echo '***'
+    echo '***'
+    echo '***'
+    echo
+}
+
+
+function check_one {
+
+    if [ -f checks.md5 ]; then
+        if [ -s checks.md5 ]; then
+	    if ! output=$(md5sum -c checks.md5); then
+	        echo "$output"
+	        exit 1
+	    fi
+        else
+	    echo "Empty checks.md5 file"
+	    exit 1
+        fi
+    else
+        echo "Missing checks.md5 file"
+        exit 1
+    fi
+
+}

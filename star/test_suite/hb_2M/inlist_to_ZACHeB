@@ -1,0 +1,80 @@
+
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = '2.0_tams.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = '2.0_ZACHeB.mod'
+
+      history_columns_file = 'history_columns.list'
+      
+      initial_zfracs = 6
+     
+      change_initial_net = .true.      
+      new_net_name = 'pp_and_cno_extras.net'
+
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+
+      kap_file_prefix = 'a09'
+      kap_CO_prefix = 'a09_co'
+      use_Type2_opacities = .true.
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 25000
+
+      use_dedt_form_of_energy_eqn = .true.
+      convergence_ignore_equL_residuals = .true. ! needed during flash
+     
+      initial_mass = 2
+      initial_z = 0.02d0
+      
+      use_Ledoux_criterion = .true.
+     
+      mixing_length_alpha = 1.8d0
+      MLT_option = 'Henyey'
+
+      predictive_mix(1) = .true.
+      predictive_zone_type(1) = 'any'
+      predictive_zone_loc(1) = 'core'
+      predictive_bdy_loc(1) = 'any'
+      predictive_superad_thresh(1) = 0.005
+
+      predictive_mix(2) = .true.
+      predictive_zone_type(2) = 'any'
+      predictive_zone_loc(2) = 'surf'
+      predictive_bdy_loc(2) = 'any'
+      predictive_superad_thresh(2) = 0.001
+
+      num_cells_for_smooth_gradL_composition_term = 10
+      threshold_for_smooth_gradL_composition_term = 0.02
+      num_cells_for_smooth_brunt_B = 10
+      threshold_for_smooth_brunt_B = 0.1
+           
+      HB_limit = 0.98 ! Stop when the center abundance by mass of he4 drops below this limit.
+
+! output controls
+
+      log_directory = 'LOGS_POSTMS'
+      photo_interval = 500
+      photo_digits = 5
+      profile_interval = 500
+      history_interval = 1
+      terminal_interval = 20
+      write_header_frequency = 100
+
+
+/ ! end of controls namelist
+

@@ -1,0 +1,114 @@
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
+
+    save_model_when_terminate = .true.
+    save_model_filename = 'final.mod'
+    required_termination_code_string = 'xa_central_lower_limit'
+ 
+    warn_run_star_extras = .false.
+
+    save_photo_when_terminate = .false.    
+    
+    pgstar_flag = .false.
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+
+
+/ !end of star_job namelist
+
+&eos
+
+
+/ ! end of eos namelist
+
+
+&kap
+    Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+
+
+
+    xa_central_lower_limit_species(1) = 'h1'
+    xa_central_lower_limit(1) = 0.4 
+
+!SAVING   
+    write_profiles_flag = .false.
+    profile_interval = 100    
+    history_interval = 1
+    terminal_interval = 10
+    photo_interval = 25
+
+!OPTIONS
+    do_conv_premix = .true.
+    use_dedt_form_of_energy_eqn = .true.    
+    use_Ledoux_criterion = .true.    
+    
+  ! starting specifications
+    initial_mass = 5 ! in Msun units
+    initial_z = 0.02
+
+! MIXING
+    set_min_D_mix = .true.
+    min_D_mix = 10d0 ! cm^2 / sec
+    
+    overshoot_scheme(1) = 'other'
+    overshoot_zone_type(1) = 'any'
+    overshoot_zone_loc(1) = 'any'
+    overshoot_bdy_loc(1) = 'any'
+    overshoot_f(1)  = 0.055
+    overshoot_f0(1) = 0.005
+    x_ctrl(1) = 0.02
+    overshoot_D_min = 1d0
+
+
+! MESH & TIMESTEPS
+    varcontrol_target = 1d-4
+    mesh_delta_coeff = 1
+    okay_to_remesh = .true.
+
+/ ! end of controls namelist
+
+
+&pgstar
+    Grid4_win_flag = .true.
+    Kipp_mass_max = 5 ! (Msun units)
+
+    Grid4_file_flag = .false.
+    Grid4_file_interval = 20
+
+    Mixing_win_flag = .true.
+    Mixing_win_width = 9
+    Mixing_win_aspect_ratio = 0.75
+    
+    Summary_Profile_num_lines = 3
+    Summary_Profile_xmin = 0
+    Summary_Profile_xmax = 5
+
+    Summary_Profile_name(1) = 'grada'
+    Summary_Profile_legend(1) = 'grada'  
+    Summary_Profile_scaled_value(1)=.false.
+
+    Summary_Profile_name(2) = 'gradr'
+    Summary_Profile_legend(2) = 'gradr'  
+    Summary_Profile_scaled_value(2)=.false.  
+
+    Summary_Profile_name(3) = 'gradT'
+    Summary_Profile_legend(3) = 'gradT'  
+    Summary_Profile_scaled_value(3)=.false.  
+    
+/ ! end of pgstar namelist

@@ -1,0 +1,6 @@
+      
+         include 'pp_extras.net'
+      
+         add_isos(be9)
+         
+         add_reaction( r_h1_be9_to_h2_he4_he4 )     

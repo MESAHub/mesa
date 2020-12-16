@@ -1,0 +1,8 @@
+&kap
+
+  kap_co_prefix = 'gn93_co'
+
+  use_Type2_opacities = .true.
+  Zbase = 0.018
+  
+/

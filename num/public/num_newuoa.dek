@@ -1,0 +1,70 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010  Bill Paxton
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
+! by M.J.D. Powell (mjdp@cam.ac.uk)
+
+      subroutine newuoa(n,npt,x,rhobeg,rhoend,iprint,maxfun,w,calfun,max_valid_value)
+         use mod_newuoa, only: do_newuoa
+         use const_def, only: dp
+         implicit none
+         integer, intent(in) :: n, npt, iprint, maxfun
+         real(dp), intent(in) :: rhobeg, rhoend, max_valid_value
+         real(dp), intent(inout) :: x(:)
+         real(dp), intent(inout) :: w(:)
+         interface
+            include 'num_newuoa_proc.dek'
+         end interface
+         call do_newuoa(n,npt,x,rhobeg,rhoend,iprint,maxfun,w,calfun,max_valid_value)
+      end subroutine newuoa
+
+!     This subroutine seeks the least value of a function of many variables,
+!     by a trust region method that forms quadratic models by interpolation.
+!     There can be some freedom in the interpolation conditions, which is
+!     taken up by minimizing the Frobenius norm of the change to the second
+!     derivative of the quadratic model, beginning with a zero matrix. The
+!     arguments of the subroutine are as follows.
+!
+!     N must be set to the number of variables and must be at least two.
+!     NPT is the number of interpolation conditions. Its value must be in the
+!       interval [N+2,(N+1)(N+2)/2].
+!     Initial values of the variables must be set in X(1),X(2),...,X(N). They
+!       will be changed to the values that give the least calculated F.
+!     RHOBEG and RHOEND must be set to the initial and final values of a trust
+!       region radius, so both must be positive with RHOEND<=RHOBEG. Typically
+!       RHOBEG should be about one tenth of the greatest expected change to a
+!       variable, and RHOEND should indicate the accuracy that is required in
+!       the final values of the variables.
+!     The value of IPRINT should be set to 0, 1, 2 or 3, which controls the
+!       amount of printing. Specifically, there is no output if IPRINT=0 and
+!       there is output only at the return if IPRINT=1. Otherwise, each new
+!       value of RHO is printed, with the best vector of variables so far and
+!       the corresponding value of the objective function. Further, each new
+!       value of F with its variables are output if IPRINT=3.
+!     MAXFUN must be set to an upper bound on the number of calls of CALFUN.
+!     The array W will be used for working space. Its length must be at least
+!     (NPT+13)*(NPT+N)+3*N*(N+3)/2.
+!
+!     SUBROUTINE CALFUN (N,X,F) must set F to
+!     the value of the objective function for the variables X(1),X(2),...,X(N).

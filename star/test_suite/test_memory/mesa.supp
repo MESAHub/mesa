@@ -1,0 +1,213 @@
+{
+   <gfortrani_list_formatted_write_C>
+   Memcheck:Cond
+   ...
+   fun:_gfortrani_list_formatted_write
+   ...
+}
+{
+   <gfortran_st_write_done_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortran_st_write_done
+   ...
+}
+{
+   <gfortrani_write_i_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortrani_write_i
+   ...
+}
+{
+   <gfortrani_list_formatted_write_v>
+   Memcheck:Value8
+   ...
+   fun:_gfortrani_list_formatted_write
+   ...
+}
+{
+   <gfortran_st_write_done_v>
+   Memcheck:Value8
+   ...
+   fun:_gfortran_st_write_done
+   ...
+}
+{
+   <gfortrani_write_i_v>
+   Memcheck:Value8
+   ...
+   fun:_gfortrani_write_i
+   ...
+}
+{
+   <gfortran_get_environment_variable_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortran_get_environment_variable_i4
+   ...
+}
+{
+   <gfortran_get_environment_variable_v>
+   Memcheck:Value8
+   ...
+   fun:_gfortran_get_environment_variable_i4
+   ...
+}
+{
+   <gfortran_st_open_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortran_st_open
+   ...
+}
+{
+   <gfortran_st_open_v>
+   Memcheck:Value8
+   ...
+   fun:_gfortran_st_open
+   ...
+}
+{
+   <gfortran_st_write_done_p>
+   Memcheck:Param
+   write(count)
+   ...
+   fun:_gfortran_st_write_done
+   ...
+}
+{
+   <gfortran_execute_command_line_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortran_execute_command_line_i4
+   ...
+}
+{
+   <gfortran_execute_command_line_a>
+   Memcheck:Addr32
+   ...
+   fun:_gfortran_execute_command_line_i4
+   ...
+}
+{
+   <gfortrani_write_a_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortrani_write_a
+   ...
+}
+{
+   <gfortrani_parse_format_c>
+   Memcheck:Cond
+   ...
+   fun:_gfortrani_parse_format
+   ...
+}
+{
+   <gfortran_get_environment_variable_a>
+   Memcheck:Addr32
+   ...
+   fun:_gfortran_get_environment_variable_i4
+   ...
+}
+{
+   <gfortrani_new_unit_a>
+   Memcheck:Addr32
+   ...
+   fun:_gfortrani_new_unit
+   ...
+}
+{
+   <sclose_c>
+   Memcheck:Cond
+   ...
+   fun:sclose
+   ...
+}
+{
+   <gfortrani_namelist_a>
+   Memcheck:Addr8
+   ...
+   fun:_gfortrani_namelist_read
+   ...
+}
+{
+   <ssse3_strcmp_a>
+   Memcheck:Addr8
+   fun:__strcmp_ssse3
+   ...
+}
+{
+   <ssse3_strncmp_a>
+   Memcheck:Addr8
+   fun:__strncmp_ssse3
+   ...
+}
+{
+   <ssse3_strcmp_v>
+   Memcheck:Value8
+   fun:__strcmp_ssse3
+   ...
+}
+{
+   <ssse3_strcmp_a16>
+   Memcheck:Addr16
+   fun:__strcmp_ssse3
+   ...
+}
+{
+   <ssse3_strncmp_a16>
+   Memcheck:Addr16
+   fun:__strncmp_ssse3
+   ...
+}
+{
+   <pgplot_rect_c>
+   Memcheck:Cond
+   ...
+   fun:fill_rectangle
+   ...
+}
+{
+   <pgplot_pndriv_c>
+   Memcheck:Cond
+   ...
+   fun:pndriv_
+   ...
+}
+{
+   <pgplot_pndriv_memleak>
+   Memcheck:Leak
+   ...
+   fun:pndriv_
+   ...
+}
+{
+   <pgplot_image_c>
+   Memcheck:Cond
+   fun:write_image_file
+   ...
+}
+{
+   <pthread_param>
+   Memcheck:Param
+   write(buf)
+   ...
+   obj:/*libpthread-*.so
+   ...
+}
+{
+   <libgomp_leak>
+   Memcheck:Leak
+   ...
+   obj:/*libgomp.so.*
+   ...
+}
+{
+   <pgplot_color_leak>
+   Memcheck:Leak
+   ...
+   fun:loadrgbtxt.*
+   ...
+}

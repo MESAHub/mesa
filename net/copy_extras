@@ -1,0 +1,36 @@
+cp test/*.rb new/test
+
+mkdir new/test/alpha
+mkdir new/test/alpha/plot_data
+mkdir new/test/alpha/plot_out
+cp test/alpha/*.rb new/test/alpha
+
+mkdir new/test/alpha_cno
+mkdir new/test/alpha_cno/plot_data
+mkdir new/test/alpha_cno/plot_out
+cp test/alpha_cno/*.rb new/test/alpha_cno
+
+mkdir new/test/alpha_pp
+mkdir new/test/alpha_pp/plot_data
+mkdir new/test/alpha_pp/plot_out
+cp test/alpha_pp/*.rb new/test/alpha_pp
+
+mkdir new/test/basic
+mkdir new/test/basic/plot_data
+mkdir new/test/basic/plot_out
+cp test/basic/*.rb new/test/basic
+
+mkdir new/test/cno
+mkdir new/test/cno/plot_data
+mkdir new/test/cno/plot_out
+cp test/cno/*.rb new/test/cno
+
+mkdir new/test/pp
+mkdir new/test/pp/plot_data
+mkdir new/test/v/plot_out
+cp test/pp/*.rb new/test/pp
+
+mkdir new/test/pp_cno
+mkdir new/test/pp_cno/plot_data
+mkdir new/test/pp_cno/plot_out
+cp test/pp_cno/*.rb new/test/pp_cno

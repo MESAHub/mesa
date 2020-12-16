@@ -1,0 +1,110 @@
+# This is the makefile for the mesa DT equation of state builder
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+FCstandard = 
+
+#################################################################
+#
+# SOURCES
+
+SRCS = eos_def.f90 gauss_fermi.f90 azbar.f helm_alloc.f90 \
+   helm_polynomials.f90 helm.f90 \
+   eos5_xtrin_h-he.f opal_core.f scvh_core.f \
+   opal_scvh_driver.f helm_opal_scvh_driver.f \
+   create_eos_files.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_OTHER = chem $(LIBS_MESA_NUMERICS) 
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# TARGETS
+
+CEOS_DIR = ..
+
+CEOS = $(CEOS_DIR)/ceos
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(CEOS) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo FC $@
+	@$(FC) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER)
+else
+	$(FC) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER)
+endif
+
+all : $(CEOS)
+
+clean:
+	-@rm -f $(OBJS) *.o *.mod *.smod .depend $(CEOS)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+PACKAGE_DIR = ../..
+
+INCLUDES = -I$(MESA_DIR)/include
+PKG_INCLUDES = -I$(PACKAGE_DIR)/make
+
+COMPILE = $(COMPILE_NO_CHECKS) $(FCfree) $(PKG_INCLUDES)
+COMPILE_FIXED = $(COMPILE_NO_CHECKS) $(FCfixed) $(PKG_INCLUDES)
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE $<
+	@$(COMPILE) $<
+else
+	$(COMPILE) $<
+endif
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_FIXED $<
+	@$(COMPILE_FIXED) $<
+else
+	$(COMPILE_FIXED) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(CEOS_DIR)/src:$(PACKAGE_DIR)/public:$(PACKAGE_DIR)/private
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.dek $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

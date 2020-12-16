@@ -1,0 +1,1593 @@
+_outcom ;
+-- _trace '----' ;
+-- version for direct call by strad, no plots inside
+-- Sasha fits for Tbb & Av tested
+-- We need Tbb as in lbalfit (no Av), and two versions of Av function
+-- as Sasha did
+
+--  _TRACE "write(*,*)'  ymn ymx shifty=',ymn,ymx,shifty,"
+--  _TRACE "write(*,*)'  ttfit ii jstep =',ii,jstep,"
+--  _TRACE "write(*,*)'  ttfit xc05(1) NNAG=',xc05(1),"
+--  _TRACE "write(*,*)'  Flsave(1,Jsave)=',Flsave(1,Jsave),"
+_Define
+     @Lfn ' ' -- for Unix
+     -- @Lfn ',80' -- length of the Filein, Fileout
+_define @wterm write(*,*) @rterm read(*,*) @rterma read(*,'(A)')
+ @pause "@wterm ' press enter if OK'; read(*,*);"
+      @ap    "'"
+
+_define @buffer 1000000
+_define @Npictures 20
+_define @CRITVL  0.001  -- for rarefying output
+
+_define @find
+  " _do i=1, @NPTSX;
+      Lubv=NFREQ;
+      _WHILE Lubv>1 & freqob(Lubv) > CCL/@WLX(i) _DO
+         Lubv=Lubv-1;
+      _OD; -- freqob(Lubv) <= CCL/@WLX(i) OR Lubv==1
+      indfreq(i,@lband)=Lubv;
+   _od; ";
+_define @flux
+  "  FLXAVG=0.d0;
+     wlstep=(@WLX(2)-@WLX(1))/CCL;
+     sumfhx=0.d0;
+     _do i=2, @NPTSX-1;
+       Lfr=indfreq(i,@lband);
+       FHobs=max(Flsave(Lfr,Jsave),1.d-100);
+       FHobs1=max(Flsave(Lfr+1,Jsave),1.d-100);
+        If(Lfr<NFRUS)Then;
+           FHX=EXP(LOG(ABS(FHobs1))+
+               LOG(ABS(FHobs/FHobs1))*DLOGNU(Lfr)*LOG((CCL/@WLX(i))
+                  /freqob(Lfr+1)));
+       else;
+         FHX=ABS(FHobs);
+       endif;
+       FHX=FHX*@TX(i)*(CCL/@WLX(i))**5;
+       stepn=(@WLX(i+1)-@WLX(i))/CCL;
+       if (abs(wlstep-stepn)/wlstep < 1.d-4  &  i^=@NPTSX-1) then;
+          sumfhx=sumfhx+FHX;
+       else;
+          FLXAVG=FLXAVG+sumfhx*wlstep+FHX*(wlstep+stepn)/2.d0;
+          wlstep=stepn;
+          sumfhx=0.d0;
+       endif;
+     _od;
+     AMAGX=-2.5D+00 * DLOG10(FLXAVG) + @FX0 + SCALE;
+   ";
+
+subroutine tt4strad(runname);
+Implicit real*8 (a-h,o-z);
+<*varstt: *>;
+_Label @eof,@stop,@Again, @repeat;
+
+_includen snrad;
+_includen abo;
+_includen opacity;
+_include bb;
+--_includen sahaz;
+_includen sahaandd;
+<*varssh: vars. Sasha *>;
+<*varsps: vars. for ps plots *>;
+<*varubv: local variables *>;
+<*dataubv: for transmission functions *>;
+
+--real*4 ttt(MFREQ);
+ real*8 ttt(MFREQ);
+ Common/Volanm/Ryzer,Kmcor;  -- emulate Ni for analyt.model
+_includen black;
+_proc @psplot;
+   <*psplot : interactive plotting routine, real*4 workxx() and worky(,) *>;
+_return;
+
+_proc @readkey;
+  <*readkey: read from console, ignore mistyping *>;
+_return;
+/*
+ @wterm ' Check Ldel =',Ldel, ' and wbb(.) in %_flx_fits_findTb';
+ @wterm ' remember to correct nu, numn for freq, freqob';
+ @pause;
+-- @wterm ' press enter if OK';
+-- read(*,*);
+ @wterm ' remember to correct Eddirel for freqs in Edd. factors';
+ @wterm ' remember to correct Eddirel for Lorentz in chi and eta';
+ @wterm ' remember to correct Eddirel for shape_fout(ip) and save',
+        ' Amu(ip,Nzon)';
+ @pause;
+-- @wterm ' press enter if OK';
+-- read(*,*);
+*/
+<*openfiles: do not open unit=1  strad.1 -- take all from strad
+             unit=8  dat file
+             unit=28 Nidist
+             71  file='Tbba1o.res'
+             18  file='log.res'
+             14  file='Tbb1o.res'
+                 *>;
+ eit=1.d-5;
+ dst=1.d-4; -- accuracy of iterations
+ call begintt; -- here begtt.trf only to make headers
+-- close(8); -- this is needed in strad to detach dat file for use by ttfit
+ <*Init: *>
+ write(@wres,'(4a)')'  time           Tbb                   ',
+              ' Teff      Rlast_sc   R(tau2/3)',
+              '    Mbol     MU      MB      MV      MI      MR   Mbolavg',
+              '  gdepos' ;
+
+ close(10);
+ close(11);
+ close(22);
+ close(23);
+
+ -- We'll begin from the beginning:
+/* prf not needed
+--jprint=0; -- ask
+--  jstep=0; -- ask
+--@wterm ' Input jprint (1-no questions, print) and jstep (1-all records)';
+--@rterm jprint,jstep;
+--  iyes=1;
+  lunit=10;
+--  call stradio('sm',lunit,sumprf);
+--  lunit=10 sumprf still opened in strad.
+ _While lunit ^=  -1 & iyes ^= -1  _do
+  lightcurve=.false.; -- normal Y-axis, reverse for light curve
+  connect=.true.;     -- connect points
+  tburst4=sngl(t*(UTIME*CRAP)/86400.);
+  _if (jstep==0) _then;
+     @wterm ' Read step=', nstep, ' time(d)=', tburst4;
+     @wterm 'ncnd=',ncnd, ' nfrus=',nfrus;
+     @wterm ' Skip/proceed/Exit ? 0/1/-1';
+     _call @readkey; iyes=answer;
+  _fi;
+  _if (jstep==1 .or. iyes==1) _then;
+     <*prf: read data from sumprf *>;
+     <*intensity: fill real*4 arrays for supermongo *>;
+      iplot=1; _call @psplot;
+     <*density: *>;   iplot=2;  _call @psplot;
+     <*temperature: *>; iplot=3; _call @psplot;
+     <*velocity: *>;   iplot=4; _call @psplot;
+--     <*luminosity: *>; iplot=5; _call @psplot;
+  _fi;
+  lunit=10;
+  call stradio('sm',lunit,sumprf);
+ _od;
+      */
+ <*crv: read .crv file, file with observations .. *>;
+ <*flx: *>;
+@Stop: continue;
+ <*closefiles: *>; -- check what is not closed in strad
+end;
+ <*resid: subroutine *>;
+
+%_Init:
+
+   if(init==0)then;
+
+   CLUMNU=LOG10(8.D0*UR**2*(BOLTZK*UTP)**3/(CS*HPLANC)**2);
+
+     do L=1,Nfreq;
+--        freqob(L)=freqmn(L); -- defined in begin
+--       ttt(L)=SNGL(LOG10(FJNOIS))+CLUMNU;
+       ttt(L)=(LOG10(FJNOIS))+CLUMNU;
+       avglum(L)=(LOG10(FJNOIS))+CLUMNU;
+     enddo;
+
+     If(Mfreq-1>Nfreq)then;
+       do L=Nfreq+1,Mfreq-1;
+--          freqob(L)=freqmn(Nfreq)*exp(-dble(L-Nfreq)/dlognu(1)); -- defined in begin
+--         ttt(L)=SNGL(LOG10(FJNOIS))+CLUMNU;
+         ttt(L)=(LOG10(FJNOIS))+CLUMNU;
+         avglum(L)=(LOG10(FJNOIS))+CLUMNU;
+       enddo;
+     endif;
+
+-- for Sasha, correct and remove. Use freqob.
+ nu(1)=freq(1)*UFREQ;
+_do j=2,Mfreq;
+ nu(j)=sqrt(freqob(j-1)*freqob(j))*UFREQ; -- only for geom. progr. in freq, freqob
+_od;
+_do j=1,Mfreq-1;
+--  numn(j)=sqrt(nu(j)*nu(j+1));
+  numn(j)=freqob(j)*UFREQ;
+_od;
+
+    init=1;
+
+   endif;
+
+%_flx:
+   l3run=lrun+3;
+   open(50,file=PHfile(1:l3run));
+--   open(50,file=PHfile);
+   open(52,file=avgfile(1:l3run));
+--   open(52,file=avgfile);
+   write(50,@ap(999F8.4)@ap) (SNGL(log10(freqob(L)*UFREQ)),L=1,Mfreq-1);
+   write(52,@ap(999F8.4)@ap) (SNGL(log10(freqob(L)*UFREQ)),L=1,Mfreq-1);
+   nnx=0; Nrec=0;
+   CLUMNU=LOG10(8.D0*UR**2*(BOLTZK*UTP)**3/(CS*HPLANC)**2);
+   SUMOLD=0.;
+   _Do L=1,Mfreq-1;
+      sumlum(L,0)=0.d0; -- integral  L_\nu(t)dt
+   _Od;
+
+   _Repeat
+     lunit=23;
+     call stradio('sf',lunit, Flxfile);
+     if (lunit==-1) goto 99;
+     _Do Jsave=1,Lsaved;
+        nnx=nnx+1;
+        NFRUS=NFRUSED(Jsave); -- exact number of used (saved) freqs
+--        write(*,'(a,1p,3e11.3)') ' UR,flsave(Mfreq/1,JSAVE): ',
+--		UR,flsave(Mfreq,JSAVE),flsave(1,JSAVE);
+--        pause;
+        Rphtau=UR*flsave(Mfreq,JSAVE);
+        <*getttt: obtain in ttt(MFREQ) corrected output flux
+                      R**2 multiplication is already done in Lbalrad *>;
+--        SUM=SUM+tcurv(1,JSAVE)+flsave(NFRUS+1,JSAVE)+NFRUS;
+        -- flsave(NFRUS+1,.) was used for saving Tphot
+        -- now Tphot is found in this routine
+        -- and flsave(Mfreq,.) keeps Rphtau
+        SUM=SUM+tcurv(1,JSAVE)+NFRUS+0.1*nnx;
+        If ( ABS(SUMOLD-SUM) > @CRITVL*SUM
+             .or. Jsave==Lsaved  -- to make sure we take the last point
+                .or. tcurv(1,JSAVE) - time_n  > 1.d0
+                ) Then; -- eq. weights
+           write(50,@ap(F15.10,1X,I4,1X,G10.3,999F8.3)@ap)
+               tcurv(1,JSAVE),NFRUS,
+               flsave(Mfreq,JSAVE),(ttt(L),L=1,MFREQ-1);
+                                -- output all MFREQ-1 fluxes for Super Mongo
+         -- now flsave(Mfreq,JSAVE) keeps Rphtau
+           Nrec=Nrec+1;
+           <*average: find and save integral of Luminosity in sumlum and
+                      print the average for the time delay Rphtau/clight
+                      in avglum *>
+           SUMOLD=SUM;
+           time_n=tcurv(1,JSAVE);
+           <*fits: Tbb, Av for these moments *>
+        Endif;
+     _od;
+   _until Lunit==-1;
+   99: continue; close(50);
+--   @wterm ' Total Records :', Nrec, ' with relative accuracy ',@CRITVL;
+
+%_flx_getttt:
+      SUM=0.;
+     _Do L=1,NFRUS;
+--        ttt(L)=SNGL(LOG10(MAX(ABS(Flsave(L,Jsave)*FREQMN(L)**3),FJNOIS)));
+        ttt(L)=(LOG10(MAX(ABS(Flsave(L,Jsave)*freqob(L)**3),FJNOIS)));
+        ttt(L)=ttt(L)+CLUMNU; -- erg/(sec*Hz)
+        SUM=SUM+ttt(L);
+     _Od;
+     _Do L=NFRUS+1,MFREQ-1;
+--        ttt(L)=CLUMNU+SNGL(LOG10(FJNOIS));
+        ttt(L)=CLUMNU+(LOG10(FJNOIS));
+        SUM=SUM+ttt(L);
+     _Od;
+     If(Nrec==0)then;
+        time_n=tcurv(1,1);
+        timeph(0)=tcurv(1,1);
+        rphsav(0)=Rphtau;
+        Rphtau0=Rphtau;
+     endif;
+
+%_flx_average:
+
+     _Do L=1,NFRUS;
+        sumlum(L,Nrec)=
+           sumlum(L,Nrec-1)+1.d+1**ttt(L)
+               *8.64d4*max(0.d0,dble(tcurv(1,JSAVE)-time_n));
+     _Od;
+     _Do L=NFRUS+1,Mfreq-1;
+        sumlum(L,Nrec)=sumlum(L,Nrec-1);
+     _Od;
+      timeph(Nrec)=tcurv(1,JSAVE);
+      rphsav(Nrec)=Rphtau;
+
+      <*tdelay: find number of record Nrec0 for timeph(Nrec0) closest
+                to timeph(Nrec)-Rphtau/clight (cs for CGS units)
+                Nrec1 for rhtau change and Nrec2 as max(Nrec0,Nrec1)
+                and define tdelay *>;
+      if(Nrec>1 & tdelay>0.d0)then;
+        _Do L=1,Mfreq-1;
+          avglum(L)=
+             1.d+1**(-CLUMNU)*(sumlum(L,Nrec)-sumlum(L,Nrec2))/tdelay;
+          avglum(L)=(LOG10(MAX(avglum(L),FJNOIS)))+CLUMNU;
+        _Od;
+      else;
+        _Do L=1,Mfreq-1;
+          avglum(L)=ttt(L)
+        _Od;
+      endif;
+
+      write(52,@ap(F15.10,1X,I4,1X,G10.3,999F8.3)@ap)
+               tcurv(1,JSAVE),NFRUS,
+               Rphtau/UR,(avglum(L),L=1,MFREQ-1);
+
+     <*sumbins: to find Lbolavg *>;
+
+%_flx_average_sumbins:
+
+      Lbolavg=0.d0;
+      Do L=1,min(NFRUS,Nfreq); -- ignoring highest freqs
+        Lbolavg=Lbolavg+10.d0**avglum(L)*(freq(L+1)-freq(L))*Ufreq;
+      Enddo;
+ --     WRITE(@term,*)' Averaged Lum=', Lbolavg;
+      Mbolavg=4.75D0-2.5D0*LOG10(ABS(Lbolavg)/3.86d+33);
+
+%_flx_average_tdelay:
+
+     -- assume that the last Nrec0 is known and everything
+     -- goes monotonically
+--     write(*,'(a,4i5,1p,e20.10)')' Nrec Nrec0 Nrec1 Nrec2 tdelay=',
+--       Nrec, Nrec0, Nrec1, Nrec2, tdelay;
+   If(8.64d4*timeph(Nrec) > Rphtau0/cs )then;
+     _while 8.64d4*(timeph(Nrec)-timeph(Nrec0+1))  > Rphtau0/cs
+                      .and. Nrec0+1 < NrecMax _do
+         Nrec0=Nrec0+1;
+--         write(*,'(a,4i5)')' Nrec Nrec0 =', Nrec, Nrec0;
+     _od
+   else;
+     Nrec0=0;
+   endif;
+-- we have to save tcomoving in timeph!!!
+-- a crude trick to estimate real tdelay:
+   Nrec1=Nrec;
+   _while abs(rphsav(Nrec)-rphsav(Nrec1))< 0.3d0*rphsav(Nrec) & Nrec1>1 _do
+     Nrec1=Nrec1-1
+   _od;
+--   Nrec2=max(Nrec0,Nrec1);
+   Nrec2=Nrec0;
+   tdelay=8.64d4*(timeph(Nrec)-timeph(Nrec2));
+--   write(52,'(a,4i5,1p,e20.10)')' Nrec Nrec0 Nrec1 Nrec2 tdelay=',
+  --  Nrec, Nrec0, Nrec1, Nrec2, tdelay;
+
+%_flx_fits:
+ hplanck1=2.d0*pi*hplanc;
+       _do j=1,nfreq;
+--        alumnu(j)=10.D0**ttt(j);
+          alumnu(j)=10.D0**(ttt(j)-CLUMNU);
+--          alumnu(j)=10.D0**(avglum(j)-CLUMNU); -- for ttavg
+       _od;
+       <*findb* Sasha   *>;
+       <*findTb: find best fit Tb via binsearch.
+                 Find frbb as Sasha   *>;
+--    Tbb(Nrec)=Tbb;
+      rbb=0; -- get Infinity's sqrt(frbb*1.d+01**Clumnu/(4.d0*pi**2));
+--      rbb=rbb/UR;
+--      call ubv;      <* use bb ubv.trf *>
+      <*obsubv:      *>;
+--      rbb=rbb*UR;
+      Mbol=worky(4,nnx); -- from Obslum=CLUMF*Obslum*Ry(NZON-1)**2 in
+                         -- Lbalrad with account of the 1st order u/c
+      deptt=worky(8,nnx); -- gamma deposition in units 1e50 erg/s
+     -- vFe=1.0; -- velocity for location where tau_FeII_5169 = 2/3
+      write(@wres,'(F15.10,1p,5e11.3,0p,7f8.3,1p,e11.3)') time_n, Tbb, 0d0,
+-- if we write Tbb-bb for average spectrum, there is not much sense to
+-- output rbb-bb
+         1e3*worky(1,nnx),UR*worky(2,nnx), -- Teff & r last scatering -- crude
+--       Teff is saved in Tcurv in units of 1e3 K
+         UR*flsave(Mfreq,JSAVE), -- Rphtau
+         Mbol, MU, MB, MV, MI, MR, Mbolavg, deptt;
+--      write(*,*) 'Tbb=',Tbb,' rbb=', rbb;
+--      WRITE (*,99999);
+      NNAG = 2;
+      XC05(1) = Tbb; -- Tbb
+--      XC05(1) = log(Tbb);
+      XC05(2) = 0.d0; -- A_V
+      IA = 2;
+      iwbb = NNAG*(5+2*NNAG);
+--         Xtol = 1.D-6;
+         Xtol = 1.D-3;
+--    DELTAbb = DSQRT(1.D4*Xtol);
+      DELTAbb = 1.D-5;
+--    factorstep = 5.0d2;
+      factorstep = 1.05D0;
+      MAXCAL = 600;
+      IPRINT = 20;
+      ITRES=0;
+
+       <*findabs* the same only with absorbtion*>;
+
+/*
+      write(@wres,'(F15.10,1p,5e11.3,0p,6f10.3)') time_n, Tbb, rbb,
+         1e3*worky(1,nnx),UR*worky(2,nnx), -- Teff & r last scatering -- crude
+--       Teff is saved in Tcurv in units of 1e3 K
+         UR*flsave(Mfreq,JSAVE), -- Rphtau
+         Mbol, MU, MB, MV, MI, MR;
+--         Mbol, MU, MB, MV;
+  */
+--      write (*,*) Av, Tbb;
+--  _fi
+--      write (*,'(1p,e20.8,i6,0p,200f10.3)') time_n, nfrus, (alumnu(i),i=1,nfreq);
+--      write (*,'(1p,e20.8,i6,200e10.3)') time_n, nfrus, (alumnu(i),i=1,nfrus);
+
+       <*formats:         *>;
+
+%_flx_fits_findTb:
+
+    <*maxlum: find maximum alumnu(freqob) and save the frequency number in
+              Lfrmax *>;
+    <*Twien:  starting value of Tp for search *>;
+    If (Lfrmax<Nfrus)then;
+      <*dfsum:   define dfsum(Tbb) and binsearch *>;
+    else;
+      Tbbfit=Twien;
+--       write(*,'(a,i5,a,1p,e12.3)')' Nrec=',Nrec, ' Tbbfit=Twien',Tbbfit*UTp;
+    endif;
+
+    Tbb=Tbbfit*UTp;
+/*
+   If(Nrec>=357 & Nrec <=362) then;
+--     write(*,'(a,2i5,a,1p,e12.3)')' Nstep Nrec=',nnx,Nrec, ' Tbb=',Tbb;
+     read(*,*);
+   endif;
+  */
+-- finding frbb as Sasha did :
+ LB=0.D0;
+ BB=0.D0;
+ _do j=1,Mfreq-1;
+    Xpl(j)=hplanck1*numn(j)/(boltzk*Tbb);
+    bBlack=2.d0*hplanck1*(numn(j))**3*exp(-Xpl(j))/
+             (Cs**2*(1.d0-exp(-Xpl(j))));
+    LB=LB+alumnu(j)*bBlack;
+    BB=BB+(bBlack)**2;
+ _od;
+ frbb=LB/BB;
+-- write(*,*) 'frbb ',frbb;
+
+
+
+%_flx_fits_findTb_maxlum:
+
+    Lfrmax=10;
+    do L=11,Nfrus; -- later change to Nfrmaxobs
+       If (alumnu(L)>alumnu(Lfrmax)) Lfrmax=L;
+    enddo;
+
+--    write (*,*)' Nfrus  Lfrmax=', Nfrus,Lfrmax;
+
+%_flx_fits_findTb_Twien:
+
+    Twien=freqob(Lfrmax)/2.82144d0;
+    --write (*,*)'  Twien=', Twien,'  alumnu(1)=',alumnu(1);
+
+%_flx_fits_findTb_dfsum:
+
+/*
+-- when A*bb is fixed on max aLumnu. -- not debugged
+  _Define  @dfsum "
+   dfsum=0.d0;
+   _Do L=1,NFRUS; -- later change to Nfrmaxobs
+       dfsum=dfsum+freqob(L)**3
+                *Black(L,Tbbfit)*(alumnu(L) - alumnu(Lfrmax)
+                *Black(L,Tbbfit)/black(Lfrmax,Tbbfit))
+                *(BlackD(Lfrmax,Tbbfit)/Black(Lfrmax,Tbbfit)-
+                           BlackD(L,Tbbfit)/Black(L,Tbbfit));
+       --  write(*,*) ' L=',L,'   dfsum=',dfsum;
+   _od;
+   ";
+
+*/
+
+-- in old way but with weights wbb(L)
+  _Define  @dfsum "
+     LB=0.D0;
+     BB=0.D0;
+--   _Do L=max(Lfrmax-Ldel,1),min(Lfrmax+Ldel,NFRUS); -- later change to Nfrmaxobs
+   _Do L=1,NFRUS; -- later change to Nfrmaxobs
+     LB=LB+wbb(L)*alumnu(L)*freqob(L)**3*Black(L,Tbbfit);
+     BB=BB+wbb(L)*(freqob(L)**3*Black(L,Tbbfit))**2;
+   _od;
+
+    Ar2=LB/BB;   dfsum=0.d0;
+
+--   _Do L=max(Lfrmax-Ldel,1),min(Lfrmax+Ldel,NFRUS); -- later change to Nfrmaxobs
+   _Do L=1,NFRUS; -- later change to Nfrmaxobs
+     dfsum=dfsum+wbb(L)*(alumnu(L)-Ar2*freqob(L)**3*Black(L,Tbbfit))
+                *freqob(L)**3*BlackD(L,Tbbfit)/Tbbfit;
+       --write(*,*) ' L=',L,'   dfsum=',dfsum;
+   _od;
+   ";
+
+
+If(Twien>0.d0)then;
+--  do  L=max(Lfrmax-Ldel,1),min(Lfrmax+Ldel,NFRUS);
+                                -- later change to Nfrmaxob
+  do  L=1,NFRUS; -- later change to Nfrmaxob
+  --     wbb(L)=1.d+0; --test
+--stand:
+      wbb(L)=freqob(L)**4*Black(L,Twien);
+--       wbb(L)=Black(L,Twien);
+  enddo;
+--     Tbbfit=0.3d0*Twien;  -- Initial approximation Tbb
+     Tbbfit=Twien;  -- Initial approximation Tbb
+--     wbb(Lfrmax)=1.d+2;
+else;
+--  do  L=max(Lfrmax-Ldel,1),min(Lfrmax+Ldel,NFRUS);
+                                -- later change to Nfrmaxob
+  do  L=1,NFRUS; -- later change to Nfrmaxob
+       wbb(L)=1.d+0;
+  enddo;
+
+     Tbbfit=Tbba/UTp;
+endif;
+
+  @dfsum;
+  ian=0;
+  IFAIL=1; -- must be 0 if found
+  _Select
+    _  dfsum<0.
+    [
+       _While dfsum<0. _do
+         Ast=10.**(min(-12+ian,-1))*Tbbfit;
+         Tbbfit=Tbbfit-Ast;
+         @dfsum;
+--         @wterm 'Tbbfit',Tbbfit,'   dfsum=',dfsum;
+         ian=ian+1;
+       _od  ]
+    _  dfsum>0.
+    [  _While dfsum>0. _do
+         Ast=10.**(min(-12+ian,-1))*Tbbfit;
+         Tbbfit=Tbbfit+Ast;
+         @dfsum;
+--         @wterm 'Tbbfit=',Tbbfit,'   dfsum=',dfsum;
+         ian=ian+1;
+       _od  ]
+    _other   [ IFAIL=0 ]  -- Tbbfit found
+  _end
+  ITQ=0;
+--  Errest=abs(dfsum);
+  _While abs(Ast)>EpsTbb*abs(Tbbfit)
+             & ITQ < MAXIT & IFAIL^=0 _do
+--     Errest=abs(dfsum);
+     Ast=0.5D0*SIGN(Ast,dfsum);
+     Tbbfit=Tbbfit+Ast;
+     @dfsum;
+--   If(Nrec>=357 & Nrec <=362) then;
+--     write(*,'(a,1p,4e12.3)')' Tbbfit  dfsum Lb BB:',Tbbfit*UTp,dfsum,LB,BB;
+--   endif;
+--     @wterm 'Tbbfit=',Tbbfit,'   Binsearch',dfsum;
+     ITQ=ITQ+1;
+  _od;
+
+--   If(Nrec>=357 & Nrec <=362) then;
+--     write(*,'(a,i5,a,1p,3e12.3)')' Nfrus=',Nfrus, ' Tbbfit  Lb BB:',Tbbfit*UTp,LB,BB;
+--   endif;
+
+
+%_flx_fits_findb:
+
+ Tbb=Tbba; -- defined in bb.inc
+-- write (*,*) ' Tbba=',Tbba;
+ ybb=1.d0;
+ ian=0;
+ _repeat
+   <*lsm: calculate Fx from the least squares method*>;
+         if(Tbb==Tbba) Fa=Fx;
+         F=Fa*Fx;
+--         write(71,'(i8,1p,3(a,e12.3))')nnx, ' Tbb=',Tbb,' Fx=',Fx,' F=',F;
+         Ast=10.**(min(-12+ian,-1))*Tbb;
+         Tbb=Tbb+Ast;
+         ian=ian+1;
+ _until F<0;
+     b2=Tbb;
+     b1=b2-2*Ast;
+-- write(*,*) 'b1= ',b1,' b2= ',b2;
+ Tbb=b1;
+ _repeat
+   ybb=ybb*2.D0;
+   <*search: search root from calculation F (from least squares method)*>;
+   if(Tbb==b1) Fb1=Fx;
+   F=Fb1*Fx;
+-- write(*,*) 'Tbb=', Tbb,' Fx=', Fx,' F=', F;
+   _select
+       _ F>0.d0  [<*plus:   *>]
+       _ F<0.d0  [<*minus:  *>]
+   _end;
+ _until (b2-b1)/ybb <= epsbb/10.d0 .or. F==0.d0;
+-- if(Nrec==540)then; write(*,*) ' frbb=',frbb; endif;
+ write(*,*) Nrec;
+
+%_flx_fits_findb_lsm:
+ LB=0.D0;
+ BB=0.D0;
+ Fx=0.d0;
+-- _do j=15,nfrus-1; -- start from 10**4 \AA
+ _do j=1,nfrus-1;
+    <*loop1: *>;
+ _od;
+ frbb=LB/BB;
+-- write(*,*) 'frbb ',frbb;
+-- _do j=15,nfrus-1;
+ _do j=1,nfrus-1;
+    <*loop2: *>;
+ _od;
+
+%_flx_fits_findb_lsm_loop1:o
+    Xpl(j)=hplanck1*numn(j)/(boltzk*Tbb);
+    bBlack=2.d0*hplanck1*(numn(j))**3*exp(-Xpl(j))/
+             (Cs**2*(1.d0-exp(-Xpl(j))));
+    LB=LB+alumnu(j)*bBlack; --*(nu(j+1)-nu(j));
+    BB=BB+(bBlack)**2; -- *(nu(j+1)-nu(j));
+
+%_flx_fits_findb_lsm_loop2:o
+    Xpl(j)=hplanck1*numn(j)/(boltzk*Tbb);
+    bBlack=2.d0*hplanck1*(numn(j))**3*exp(-Xpl(j))/
+          (Cs**2*(1.d0-exp(-Xpl(j))));
+    Fx=Fx+(alumnu(j)-frbb*bBlack) -- *(nu(j+1)-nu(j))
+         *bBlack*Xpl(j)/(Tbb*(1.d0-exp(-Xpl(j))));
+
+%_flx_fits_findb_search=_flx_fits_findb_lsm:
+
+%_flx_fits_findb_plus:
+
+ Tbb=Tbb+(b2-b1)/ybb;
+
+%_flx_fits_findb_minus:
+
+ Tbb=Tbb-(b2-b1)/ybb;
+
+%_flx_fits_findabs:
+
+  ITRY=0;
+  ITRYD=3;
+  EPSN=5.D-1; -- step for new X
+--Epsfun=1.d-12;
+  Epsfun=0.d0;
+  _WHILE ITRY<ITRYD    _DO
+    IFAIL = 1;
+--    CALL C05NBF(RESID,2,XC05,RVEC,Xtol,W,20,IFAIL);
+    CALL C05NCF(RESID,2,XC05,RVEC,Xtol,MAXCAL,1,1,Epsfun,
+                Diag, 1,factorstep,Iprint,Nfev,Fjac,2,Rcf,3,QTF,
+                WCF,IFAIL);
+--  FNORM=F05ABF(RVEC,2);
+    FNORM=F06EJF(2,RVEC,1);
+    WRITE(*,'('' C05 AND F05 ARE CALLED IFAIL='',I4)')IFAIL;
+--  IF(FNORM>Xtol & IFAIL==0)IFAIL=7;
+    IF(IFAIL==-1)IFAIL=8;
+    IF(IFAIL==-15)IFAIL=9;
+    IF(IFAIL^=0)THEN;
+       WRITE(*,'('' Test failed'')');
+       ITRY=ITRY+1;
+       _CASE IFAIL _OF
+        -- WRITE(*,'('' C05NBF: IFAIL='',I3)')IFAIL;
+           WRITE(*,'('' C05NCF: IFAIL='',I3)')IFAIL;
+        _1 WRITE(*,'('' PAR. C05NCF OUT OF RANGE'')')
+        _2 WRITE(*,'('' MAXCAL ITERATIONS FAILED'')');
+        _3 WRITE(*,'('' NEARBY STATIONARY POINT'')');
+        _4 WRITE(*,'('' N+4 CALLS OF RESID FAILED'')');
+           Xtol=1.D-5;
+        _5 WRITE(*,'('' F FAILS TO DECREASE'')');
+           Xtol=1.D-5;
+        _6 WRITE(*,'('' JACOBIAN IS SINGULAR'')');
+        _7
+        _8 @wterm ' Bad step try next ';
+       _ESAC;
+       WRITE(@term,*)' IFAIL=',IFAIL;
+    ELSE; -- IFAIL==0
+       ITRY=ITRYD+1;
+    ENDIF;
+    WRITE (*,99998) FNORM,ITRY;
+    WRITE (*,99997) (XC05(INAG),INAG=1,NNAG);
+    WRITE (*,99996) (RVEC(INAG),INAG=1,NNAG);
+    WRITE (*,99995) IFAIL;
+    IF (IFAIL^=0) THEN;
+        WRITE(*,'(/''IFAIL='',I5, '' ITRY='',I5)') IFAIL,ITRY;
+    ENDIF;
+   _OD;
+--write(*,*) frbba;
+
+Tbb=XC05(1);
+--Tbb=exp(XC05(1));
+Av=XC05(2);
+write(*,'(1p,4(a,e12.4))')' time=', time_n,'  Av=',Av,'  Tbb=',Tbb, ' rbb=',
+--    sqrt(frbba/(4.d0*pi**2));
+    sqrt(frbba*1.d+01**Clumnu/(4.d0*pi**2));
+If(Ifail==0)
+-- write(71,'(1p,4e12.4)')  time_n, Av, Tbb, sqrt(frbba/(4.d0*pi**2));
+ write(71,'(1p,4e12.4)')  time_n, Av, Tbb,
+        sqrt(frbba*1.d+01**Clumnu/(4.d0*pi**2));
+
+%_flx_fits_formats:
+
+99999:FORMAT (' C05NCF PROGRAM RESULTS'/1X);
+99998:FORMAT (' FINAL NORM IS ', 1P,G12.5,'    ITRY=',I3);
+99997:FORMAT (' AT THE POINT ', 2G18.10);
+99996:FORMAT (' WITH RESIDS ', 12X, 2G12.5);
+99995:FORMAT (' AND WITH ERROR NUMBER ', I3);
+
+%_crv:
+
+ xlabel=' t[days]';
+ nnx=0;
+ nny=7;
+ _Repeat
+ [   lunit=11;
+     call stradio('sc', lunit, sumcur);
+     if (lunit==-1) goto 10;
+--     print *, 'Lsaved=',Lsaved;
+     _do i=1, lsaved;  -- the number of saved points;
+       nnx=nnx+1;
+       if(nnx > @buffer) stop ' @buffer too small in ttfit';
+       workxx(nnx)=tcurv(1,i);
+       _do m=1,nny;
+            worky(m,nnx)=tcurv(1+m,i); -- use worky as buffer
+/*    here:
+    Tcurv(1,*)=Time;
+    Tcurv(2,*)=TEFF*1.D-03;   -- Our Tphotosphere
+    Tcurv(3,*)=RPH;
+    Tcurv(4,*)=VPH*1.D+06/(UTIME*CRAP);
+    Tcurv(5,*)=MBOL;
+    Tcurv(6,*)=MU;
+    Tcurv(7,*)=MB;
+    Tcurv(8,*)=MV;*/
+       _od;
+     _od;
+ ];
+ 10: continue;
+ ntotx=nnx;
+       -- nny=1;
+      nnd=0;
+      nny=8; -- for depos
+      _Repeat
+      [
+      Lunit=22; -- dep file
+      call StradIO('sd',Lunit,Depfile);
+      If (Lunit==-1) goto 110;  -- EOF reached
+--          print *, 'Lsaved=',Lsaved;
+          _do i=1, lsaved;  -- the number of saved points;
+            nnd=nnd+1;
+                 worky(nny,nnd)=Depos(i); -- use worky as buffer
+--     depos(Lsaved)=ELVOL*UEPRI/UTIME;
+          _od;
+      ];
+      110: continue;
+      ntotd=nnd; nny=1;
+--       @wterm ' ntotd nnx ',ntotd, nnx;
+--      pause;
+
+
+-- @wterm ' Read ',nnx,' points..';
+  -- In Tcurv: TEFF3,RPH,VPH3,MBOL,MU,MB,MV
+/*
+ _Repeat
+   @wterm ' TEFF3, RPH, VPH3, MBOL, MU, MB, MV';
+   @wterm '   1     2     3    4     5  6   7';
+         @wterm ' Which plot ? 1/2/3/4/5/6/7/8/-1 ';
+          _call @readkey; iyes=answer;
+         _if (iyes ^= -1 & iyes <= 8) _then;
+           _do i=1,nnx;
+              ploty(i)=worky(iyes,i);
+           _od;
+     lightcurve=.false.;
+     connect=.true.;
+     _case iyes _of
+       _1 ylabel='T_{eff}*10^{3}'; iplot=6;
+       _2 ylabel='R_{ph}'; iplot=7;
+       _3 ylabel='V_{ph}*10^{3}';iplot=8;
+       _4 ylabel='Mbol'; lightcurve=.true.; connect=.false.; iplot=9;
+       _5 ylabel='M_{U}';lightcurve=.true.; connect=.false.; iplot=10;
+       _6 ylabel='M_{B}';lightcurve=.true.; connect=.false.; iplot=11;
+       _7 ylabel='M_{V}';lightcurve=.true.; connect=.false.; iplot=12;
+       _8 ylabel='depos'; iplot=13;
+     _esac;
+       nnx=1;
+       plotx(1)=workxx(1);
+       if(lightcurve)then;
+         ploty(1)=-worky(iyes,1);
+        else;
+         ploty(1)=worky(iyes,1);
+        endif;
+      _do i=2,ntotx;
+        if(lightcurve)then;
+         if(abs(-worky(iyes,i)-ploty(nnx)) > abs(ploty(nnx))*@CRITVL .or.
+            abs( workxx(i)-plotx(nnx)) > abs(plotx(nnx))*@CRITVL) then;
+          nnx=nnx+1;
+          ploty(nnx)=-worky(iyes,i);
+          plotx(nnx)=workxx(i);
+         endif;
+        else;
+         if(abs(worky(iyes,i)-ploty(nnx)) > abs(ploty(nnx))*@CRITVL .or.
+            abs( workxx(i)-plotx(nnx)) > abs(plotx(nnx))*@CRITVL) then;
+          nnx=nnx+1;
+          ploty(nnx)=worky(iyes,i);
+          plotx(nnx)=workxx(i);
+         endif;
+        endif;
+      _od;
+      @wterm ' Selected for plot ',nnx,' points..';
+    _call @psplot;
+    nnx=ntotx; -- restore nnx
+  _fi;
+ _until iyes==-1;
+   */
+%_prf:
+
+  <*find: rho, ry,uy,ty *>;
+   call lossen;
+   call @feautrier(ncnd,ncnd);
+  /*   _do L=1,Nfrus;
+         _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+           EddJ(IK,L)=EddN(IK,L);
+         _OD;
+         HEdd(L)=HEdN(L);
+     _od;
+   call gdepos; */
+   <*rt: r-t coeff. in rtphi *>;
+   <*tpcomp: find in tpcomp the highest tp(i) for i>ncnd
+        for use in approximate treatment of compton *>
+   ycomp=(boltzk*utp*tpcomp)/(amelec*cs**2); -- comptonization par.
+
+%_prf_rt:
+
+  ryzer=ry(kmcor);
+  rtphi(nzon)=0.d0; rtphi(nzon+1)=0.d0;
+               -- must be done for every change of nzon
+--  epsuq=0.d0;
+ _do k=1,nzon-1;
+--    epsuq=max(epsuq,eps*abs(uy(k)));  -- not needed in tt!
+      -- we continue to apply nonzero qrt_cold even
+      -- for positive uu2 since we have no infinite
+      -- accuracy:  eps is the measure of the stiff accuracy
+    taurt=(amout-am(k))*(0.4d0*urho*ur)/ry(k)**2; -- appr. tau
+    rtphi(k)=bq*dm(k)*ry(k)**(nrt-1)/(1.d0+taurt/drt); -- cold
+ _od;
+
+%_prf_tpcomp:
+
+      tpcomp=ty(nzon);
+      _do i=ncnd+1,nzon;
+        tpcomp=max(ty(i),tpcomp);
+      _od;
+
+%_prf_find:
+
+   _do k=1,nzon;
+       ry(k)=y(k,1);
+       uy(k)=y(nzon+k,1);
+--       Uy(K)=Y(Nzon+K,1); -- NR
+--       uy(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2);
+       ty(k)=y(2*nzon+k,1);
+    _od;
+    rho(1)=3.d0*dm(1)/(ry(1)**3-rce**3);
+    _do i=2,nzon;
+       rho(i)=3.d0*dm(i)/(ry(i)**3-ry(i-1)**3)
+    _od;
+    elost=yentot(1);
+
+%_intensity:
+
+ _DO K =NCND+1,NZON;   -- RADIATION
+    _DO L=1,NFRUS;
+      FJL=Y(NVARS*NZON+K-NCND+(NZON-NCND)*(L-1),1)*freqob(L)**3;
+      FHL=Y(NVARS*NZON+KRAD+K-NCND+(NZON-NCND)*(L-1),1)*freqob(L)**3;
+      ploty(L+(K-NCND-1)*NFRUS)=SNGL(LOG10(MAX(ABS(FJL),FJNOIS)));
+    _OD;
+ _Od;
+ _do L=1,nfrus;
+   ploty(L+(nzon-ncnd)*nfrus)=
+          SNGL(LOG10(MAX(BLACK(L,Ty(NCND+1))*freqob(L)**3,FJNOIS)));
+ _od;
+ ntotx=nfreq;       -- total number of points(frequencies) defined
+ --ntotx=nfrus;     -- nonequal scale but more resolution
+ nnx=nfrus;         -- # of used points
+ nny=nzon-ncnd+1;   -- # of functions plotted( nzon-ncnd) + 1 of BB
+ _do L=1, ntotx;
+     plotx(L)=SNGL(log10(CS/(freq(L)*UFREQ)))+8.; -- lg \lamba \AA
+--                set wave=$(3*10**$(18 - lgfreq[$bin]))
+--     plotx(L)=SNGL(log10(freq(L)*UFREQ));
+  --   plotx(L)=float(L);
+ _od;
+
+-- xlabel='Lg(Frequency)';   -- for radiation plotting
+-- xlabel='log \\lambda, \\AA';
+ xlabel=@ap log @symb l @ap;  @restore ;
+-- ylabel='log J_\\nu';
+ ylabel=@ap log J_@symb n  @ap ;-- @restore ;  -- return to standard font
+
+%_density:
+
+xlabel=' mass';
+ylabel=@ap log @symb r @ap ; @restore ;  -- return to standard font
+--ylabel=' log rho';
+ntotx=nzon;
+nny=1;
+nnx=nzon;
+_do L=1, ntotx;
+   plotx(L)=SNGL(am(L)*Um);
+   ploty(L)=SNGL(LOG10(max(1.D-50, Rho(L))));
+_od;
+
+%_temperature:
+
+xlabel=' mass';
+ylabel=' log(Tp)';
+ntotx=nzon;
+nny=1;
+nnx=nzon;
+_do L=1, ntotx;
+   plotx(L)=SNGL(am(L)*Um);
+   ploty(L)=SNGL(LOG10(Ty(L)));
+_od;
+
+%_velocity:
+
+xlabel=' mass';
+ylabel=' Velocity';
+ntotx=nzon;
+nny=1;
+nnx=nzon;
+_do L=1, ntotx;
+   plotx(L)=SNGL(am(L)*Um);
+   ploty(L)=SNGL(Uy(L));
+_od;
+
+%_luminosity:
+
+xlabel=' mass';
+ylabel=' Lg(Luminosity)';
+ntotx=nzon;
+nny=1;
+nnx=nzon;
+_do L=1, ntotx;
+--   plotx(L)=am(L)*Um;
+   dummy4=ArrLum(L);
+   print *, ' L,dummy4 ',L,dummy4;
+   _select
+      _1 dummy4==0 [ ploty(L)=-15;] -- !@#$ znaet
+      _2 dummy4>0  [ ploty(L)=LOG10(dummy4);]
+      _3 dummy4<0  [ ploty(L)=-LOG10(dummy4);]
+   _end;
+   print *, L,ploty(L);
+_od;
+
+%_psplot:
+
+--  ii=1; -- first, show the picture
+--  ii=0; -- first ask, do not show the picture
+  _repeat
+     @wterm ' Would you like to exit/view/print/psfile this 0/1/2/3 ?';
+     _call @readkey; ii=answer;
+     if(ii ^= 0) then;
+        <*ps: true Postscript Part *>;
+        <*plfiles : files for for plots outside *>;
+     endif;
+  _until ii==0;
+
+%_psplot_ps:
+
+  <*psstuff: limits xmx, xmn, ymx, ymn
+             (probably from tt.dat), form title string *>;
+  _case ii  _of
+      device='term.ps'; -- default
+    _1   device='term.ps';
+    _2   device='print.ps';
+    _3   @wterm ' Name of the psfile ?';
+         @rterma psfile;
+         if (index(psfile,'.ps')==0) then;
+           device=psfile (1:len_trim(psfile))//'.ps';
+         else;
+           device=psfile(1:len_trim(psfile));
+         endif;
+  _esac;
+  <*erase : old file *>; --  call  ps_erase;
+
+  <*psgraph: open ps file, named 'device', header etc. *>;
+
+  <*color* learn to change color of lines *>;
+
+--  call  ps_defvar('TeX_strings','1');
+--  call  ps_expand(1.3);
+
+  call ps_file_head( device, xmx, xmn, ymx, ymn );
+     -- call  ps_limits(xmn, xmx, ymx , ymn);
+  line_width = 1;
+  call ps_line_width( line_width );
+  call ps_page_head;
+
+  npoint = 5;
+
+  xps(1) = xmn;
+  yps(1) = ymn;
+  xps(2) = xmx;
+  yps(2) = ymn;
+  xps(3) = xmx;
+  yps(3) = ymx;
+  xps(4) = xmn;
+  yps(4) = ymx;
+  xps(5) = xmn;
+  yps(5) = ymn;
+
+  call ps_line( npoint, xps, yps );
+
+  nx=5;
+  ny=5;
+
+  call ps_grid_cartesian( xmn, xmx, nx, ymn, ymx, ny );
+
+  if (lightcurve) then;
+        call ps_moveto( xmn, ymn+shifty*.5);
+     -- call  ps_relocate(xmn, ymn+shifty*.5);
+  else;
+     call ps_moveto( xmn, ymn-shifty*.5);
+  endif;
+
+
+
+  font_size = 0.25E+00;
+  call ps_font_size ( font_size );
+  call ps_label(titlestr);
+
+  call ps_moveto( xmn, ymx -shifty*.5);
+  call ps_label(ylabel);
+
+  call ps_moveto( xmx-shiftx, ymn -shifty*.5);
+  call ps_label(xlabel);
+
+  line_width = 3;
+  call ps_line_width ( line_width );
+  --   open(127,file='psplot.res'); -- for debug
+  if(nny>1)then;
+   do k=1,nny;
+   /*do ipl=1,nnx;
+        write(127,'(1p,2e15.4)')  psplotx(ipl),psploty((k-1)*nnx+ipl);
+     enddo; */
+     if (connect) then;
+       if(k<=nny/2)then;
+--         blue=0.9*real(nny/2-k)/real(1+nny/2);
+--         green=0.9*real(k)/real(1+nny/2);
+         blue=0.9**real(k);
+         green=0.9**real(nny/2-k);
+         red=max(0.,1.-blue-green);
+       else;
+--         red=0.9*real(k-nny/2)/real(1+nny/2);
+--         green=0.9*real(nny-k)/real(1+nny/2);
+         red=0.9**real(nny-k);
+         green=0.9**real(k-nny/2);
+         blue=max(0.,1.-red-green);
+       endif;
+       call ps_line_rgb ( red, green, blue );
+       call ps_line ( nnx, psplotx, psploty(1+(k-1)*nnx) );
+                  -- call  ps_conn(plotx,ploty(1+(k-1)*nnx),nnx);
+     else;
+       marker_size = 2;
+       call ps_marker_size ( marker_size );
+       call ps_mark_disks ( nnx, psplotx, psploty(1+(k-1)*nnx) );
+         -- call  ps_points(plotx,ploty(1+(k-1)*nnx),nnx);
+     endif;
+    enddo;
+   else;
+     red=0.05;
+     green=0.05;
+     blue=max(0.,1.-red-green);
+     if (connect) then;
+       call ps_line_rgb ( red, green, blue );
+       call ps_line ( nnx, psplotx, psploty );
+     else;
+       marker_size = 2;
+       call ps_marker_size ( marker_size );
+       call ps_mark_disks ( nnx, psplotx, psploty);
+     endif;
+   endif;
+  close(127);
+  /*
+  k=nny; -- repeat for better plot
+  if (connect) then;
+     call ps_line ( nnx, psplotx, psploty(1+(k-1)*nnx) );
+     -- call  ps_conn(plotx,ploty(1+(k-1)*nnx),nnx);
+  endif;
+    */
+
+
+   <*label*  Try sticking a label on plot  *>;;
+
+  call ps_page_tail;
+  call ps_file_tail;
+  call ps_file_close ( iunit );
+
+--  argsys='gv '//device(1:len_trim(device));
+  argsys='gs -dBatch '//device(1:len_trim(device));
+--  argsys='gs -dNOPAUSE '//device(1:len_trim(device));
+  Isys = SYSTEM(argsys(1:(13+len_trim(device))));
+--  argsys='gs '//device(1:len_trim(device));
+--  Isys = SYSTEM(argsys(1:(3+len_trim(device))));
+  write(*,*) ' gs called, ii = ', ii, '  Isys=',Isys, '  Csys=',Csys;
+  If (Isys == -1) then;
+     errnum = ierrno( );
+     write(*,'(a,i2)') ' Error= ', errnum;
+  endif;
+
+
+%_psplot_plfiles:
+
+   write(titlestr,
+       '('' Run '',A15,'' time='',1p,E12.5,''(d) step='',I5)')
+        runname(1:lrun),tburst4,nstep;
+   open(unit=136,file='plot.tst',status='unknown');
+   write(136,'(a)') titlestr;
+   write(136,'(a)') xlabel;
+   write(136,'(a)') ylabel;
+   write(136,'(1p,2i10)') nny,nnx;
+   do k=1,nny;
+      do kkx=1,nnx;
+            write(136,'(1p,2e15.4)') plotx(kkx),ploty(kkx+(k-1)*nnx);
+      enddo;
+   enddo;
+   close(136);
+--   Isys = SYSTEM('smb.bat');
+   If (Isys .eq. -1) then;
+     errnum = ierrno( );
+     print *, 'Error ', errnum;
+   end if;
+
+
+
+%_psplot_ps_psstuff:
+
+   write(titlestr,
+       '(2X,''Run '',A15,1X,''Time='',E8.3,''(d) step='',I5)')
+        runname(1:lrun),tburst4,nstep;
+   <*read: x,y limits from tt.dat *>;
+   If (Autoy .or. ^ttopen) Then;
+     ymn=ploty(1);
+     ymx=ymn;
+       write(*,*)'  psstuff nny nnx =',nny,nnx;
+     _do k=1,nny;
+       _do L=1,nnx;
+          ymn=min(ymn,ploty(L+(k-1)*nnx));
+          ymx=max(ymx,ploty(L+(k-1)*nnx));
+       _Od;
+     _Od;
+   Endif;
+   write(*,*)'  psstuff ymn ymx =',ymn,ymx;
+   If (Autox .or. ^ttopen) Then;
+    /* xmn=plotx(1);
+     xmx=xmn;
+     _do L=1, nnx;
+        xmn=min(xmn,plotx(L));
+        xmx=max(xmx,plotx(L));
+     _od; */
+      xmn=plotx(Irmin(nnx,plotx,1));
+      xmx=plotx(Irmax(nnx,plotx,1));
+      Endif;
+   write(*,*)'  psstuff xmn xmx =',xmn,xmx;
+
+   shifty=ABS(ymx-ymn); -- *.1;
+--   ymn=ymn-shifty;
+--   ymx=ymx+shifty;
+   shiftx=ABS(xmx-xmn); -- *.1;
+
+-- scaling:
+   if (shifty>shiftx)then;
+     pscale=shiftx/shifty;
+     _do k=1,nny;
+       _do L=1,nnx;
+          psploty(L+(k-1)*nnx)=ploty(L+(k-1)*nnx)*pscale;
+          if(k==1) psplotx(L)=plotx(L);
+       _Od;
+     _Od;
+     ymx=ymx*pscale;
+     ymn=ymn*pscale;
+   else;
+     pscale=shifty/shiftx;
+     _do k=1,nny;
+       _do L=1,nnx;
+          psploty(L+(k-1)*nnx)=ploty(L+(k-1)*nnx);
+          if(k==1) psplotx(L)=plotx(L)*pscale;
+       _od;
+     _Od;
+     xmx=xmx*pscale;
+     xmn=xmn*pscale;
+   endif;
+
+   shifty=0.1*pscale*shifty; -- to use in plots
+   shiftx=0.1*pscale*shiftx;
+   xmn=xmn-shiftx;
+   xmx=xmx+shiftx;
+   ymn=ymn-shifty;
+   ymx=ymx+shifty;
+
+
+%_psplot_ps_psstuff_read:
+
+   _do i=1,@Npictures; -- default values, all boundaries calculated auto.
+      x1(i)=0.; x2(i)=x1(i);
+      y1(i)=0.; y2(i)=y1(i);
+      Auto(i)=.true.;
+   _od;
+   INQUIRE(FILE='tt.dat',EXIST=ttopen);
+   if (ttopen) Then;
+--        @wterm ' tt.dat found';
+        <*boundaries: j x1(j) x2(j) y1(j) y2(j) *>;
+        autox = Auto(iplot) .or. x1(iplot)==x2(iplot); -- !!
+        autoy = Auto(iplot) .or. y1(iplot)==y2(iplot); -- !!
+--  @wterm iplot, Auto(iplot),x1(iplot),x2(iplot),y1(iplot),y2(iplot);
+        if(^autox) Then; xmn=x1(iplot); xmx=x2(iplot); Endif;
+        If(^autoy) Then;
+          if(lightcurve)then;
+            ymn=-y1(iplot); ymx=-y2(iplot);
+          else;
+            ymn=y1(iplot); ymx=y2(iplot);
+          endif;
+        Endif;
+   endif;
+
+%_psplot_ps_psstuff_read_boundaries:
+
+   open(45,file='tt.dat',status='old');
+   _repeat
+    [
+      --@repeat: read (45,*,end=@eof,err=@repeat) -- does not work on SGI
+        --          jp,x1(ABS(jp)),x2(ABS(jp)),y1(ABS(jp)),y2(ABS(jp));
+      read (45,'(a)',end=@eof) string;
+     --  write(*,'(a)') string;
+      if (string(1:1)^='#')then;
+         read (string,*)
+              jp,x1(ABS(jp)),x2(ABS(jp)),y1(ABS(jp)),y2(ABS(jp));
+         Auto(ABS(jp))= jp<0 ;
+            -- if jp<0 then boundaries calculated automatically
+--      @wterm ' jp,  Auto(ABS(jp)):', jp,  Auto(ABS(jp));
+      endif;
+    ];
+  @eof: close(45);
+
+%_psplot_ps_psgraph:
+
+  iunit = 1;
+  device = device;
+  call ps_file_open ( device, iunit, ierror );
+  if ( ierror ^= 0 ) then;
+      write ( *, * ) ' ';
+      write ( *, * ) ' PS_TT';
+      write ( *, * ) ' File creation error ', ierror;
+      stop 8;
+  end if;
+
+%_psplot_ps_erase:
+
+--  Isys = SYSTEM(' gv /x ');
+  Isys = SYSTEM(' gs /x ');
+--  write(*,*) ' gv exits,  Isys = ', Isys;
+  If (Isys == -1) then;
+     errnum = ierrno( );
+     write(*,'(a,i2)') ' Error= ', errnum;
+  endif;
+
+%_psplot_ps_color:
+
+  if (ii==1) call  ps_ctype("white");
+  if (ii==2) call  ps_ctype("black");
+  if (ii==1) call  ps_ctype("red");
+
+%_psplot_ps_label:
+
+  call ps_label ( 'Plot tt' ); -- default font_size == 1 - huge
+  font_size = 0.25E+00;
+  call ps_font_size ( font_size );
+  call ps_moveto ( 2.8E+00, -0.3E+00 );
+  call ps_label ( ' T [K] ' ); -- default font_size == 1 - huge
+
+
+%_openfiles:
+
+--    Open(unit=1,file=filein,status='old');
+--    READ(1,'(A)'); -- header
+--    read(1,'(A)') filestr;
+--    close(1);
+    <*filenames: filestr contains filenames for input and output *>;
+--    @wterm Dfile,Rfile,Model,Nidist,Opafile,Sumprf,Sumcur;
+     INQUIRE(FILE=Sumprf,EXIST=LEXIST1);
+     INQUIRE(FILE=sumcur,EXIST=LEXIST2);
+     IF(LEXIST1 & LEXIST2)THEN;
+        BEGRUN=.FALSE.;
+     ELSEIF(^LEXIST1 & ^LEXIST2) THEN;
+        BEGRUN=.TRUE.;
+     ELSE;
+        @wterm  ' File Sumprf or SUMCUR is missing';
+     --   stop 28;
+     ENDIF;
+    Open(unit=@WRES,file=Rfile); -- here *.tt
+    Open(unit=8,file=Dfile);   -- data file
+    Open(unit=28,file=Nidist,form='unformatted',status='old');
+    open(71,file='Tbba1o.res');
+--      open(71,file='Tbba2o.res');
+     open(18,file='log.res');
+     open(14,file='Tbb1o.res');
+--      open(14,file='Tbb2o.res');
+
+%_openfiles_filenames:
+
+--   runname(1:)=wordm(1);
+   lrun=len_trim(runname);
+--   rfile(1:)='/dev/null';
+   rfile(1:)=runname(1:lrun)//'.tt';
+   dfile(1:)=runname(1:lrun)//'.dat';
+--   Sumprf(1:)=runname(1:lrun)//'.prf'; -- in common/Files/
+--   SumCur(1:)=runname(1:lrun)//'.crv';
+--   model(1:)='../../eve/run/'//wordm(3)(1:lwordm(3))//'.mod';
+              -- in common/Files/
+--   Nidist(1:)='../../eve/run/'//wordm(4)(1:lwordm(4))//'.xni';
+   Nidist(1:)='../../eve/run/'//model(1:len_trim(model)-4)//'.xni';
+   Opafile(1:)='../../vladsf/'//wordm(5)(1:lwordm(5)); -- standard path
+   Depfile(1:)=runname(1:lrun)//'.dep';
+   Flxfile(1:)=runname(1:lrun)//'.flx';
+   PHfile(1:)=runname(1:lrun)//'.ph'; -- change to .phf for the test
+   avgfile(1:)=runname(1:lrun)//'.avg';
+
+%_closefiles:
+
+   close(@WRES);  -- result file, here it's *.tt
+   close(8);      -- data file
+   close(9);      -- model file (stradio)
+   close(10);     -- prf file (stradio)
+   close(11);     -- crv file (stradio)
+   close(22);     -- deposition   (stradio)
+   close(23);     -- outgoing fluxes (stradio)
+   close(28);     -- binary file with Ni distribution
+
+%_readkey:
+
+    BadNum=.false.;
+@Again: If (BadNum) write(*,*) ' I expect integer number! Once more...';
+    BadNum=.true.;
+    read (*,*,end=@stop, err=@Again) answer;
+
+%_resid:o
+ <*N: Double Precision version  *>;
+%_resid.N:o
+<*R: Subroutine RESID - RESIDUALS OF test EQUATIONS *>;
+%_resid.NR:o
+    SUBROUTINE RESID(NNAG, XC05, RC,IFLAG);
+      IMPLICIT REAL*8 (A-H,O-Z);
+ _include snrad;
+ _include abo;
+ _include bb;
+--     CALLED BY C05NAF
+--     CALCULATES VALUES OF RESIDUALS RC AT XC05,.
+--     WHERE XC05(1)=LN(YP), XC05(2)=LN(YN)
+      INTEGER NNAG;
+      Dimension XC05(NNAG), RC(NNAG);
+      Real*8 LBa,frbba;
+       hplanck1=2.d0*pi*hplanc;
+       ITRES=ITRES+1;
+       IFLAG=0;
+    -- XC05(1) -- Tbb
+    -- XC05(2) -- A_V
+       Tbb=XC05(1);
+       -- Tbb=exp(XC05(1));
+       Av=XC05(2);
+--       if(Tbb<0.d0 .or. Tbb>1.d7 .or. abs(Av)>1.d2)then;
+--         Iflag=-1;
+--         pause;
+--       else;
+         <*findabs: residuals with absorbtion*>;
+         RC(1)=F1;
+         RC(2)=F2;
+--       endif;
+      RETURN;
+      END;
+%_resid.NR_findabs:
+_do j=1,nfrus-1;
+--  _do j=28,33;
+--  write(*,'(a,i3,1p,2e15.3)') ' in resid nfrus Tbb Av=',nfrus,Tbb,Av;
+--  write(*,'(a,i3,1p,2e15.3)') ' j Cs numn(j) ',j, Cs, numn(j);
+  Ab(j)=exp(-0.92d0*Av*(-.32d0+ 0.725d-4/Cs*numn(j)));
+ -- Ab(j)=exp(-0.92d0*(Av-1.38d0*(1.d0-5.5d-5/Cs*numn(j))));
+  --Ab(j)=1.d0;
+_od;
+
+  LBa=0.d0;
+  BBa=0.d0;
+  _do j=1,Mfreq-1;
+--  _do j=28,33;
+    Xpl(j)=hplanck1*numn(j)/(boltzk*Tbb);
+    Blc(j)=2.d0*hplanck1*(numn(j))**3*exp(-Xpl(j))/
+          (Cs**2*(1.d0-exp(-Xpl(j))));
+    LBa=LBa+alumnu(j)*Ab(j)*Blc(j)*(nu(j+1)-nu(j));
+    BBa=BBa+Blc(j)**2*Ab(j)**2*(nu(j+1)-nu(j));
+--    write(*,'(a,i5,1p,4e12.3)') ' in resid j alumnu(j)=',
+--       j,Xpl(j),Blc(j),numn(j),nu(j);
+--       j,alumnu(j),Ab(j),LBa,BBa;
+--  write(*,*) ' in resid Xpl(j)=',Xpl(j);
+  _od;
+--  pause;
+  frbba=LBa/BBa;
+  F1=0.d0;
+  F2=0.d0;
+--  snorm=0.d0;
+  snorm=1.d0;
+  _do j=1,Mfreq-1;
+--  _do j=28,33;
+--    snorm=snorm+(alumnu(j))*Blc(j)*Ab(j)*(nu(j+1)-nu(j));
+    F1=F1+(alumnu(j)-frbba*Ab(j)*Blc(j))*Blc(j)*Ab(j)*
+          (-.32d0+ .725d-4/Cs*numn(j))*(nu(j+1)-nu(j));
+    F2=F2+(alumnu(j)-frbba*Ab(j)*Blc(j))*Blc(j)*Ab(j)*(nu(j+1)-nu(j))*Xpl(j)/
+        (Tbb*(1.d0-exp(-Xpl(j))));
+  _od;
+   F1=F1/snorm;
+   F2=F2/snorm;
+--write(*,*) ' F1=',F1, '  F2=',F2;
+
+%_varstt:o
+Parameter(FJnois=1.d-30);
+Parameter(MAXIT=15);
+Parameter(EPSTbb=1.D-4);
+real*4 ploty(@buffer), plotx(@buffer), workxx(@buffer), worky(8,@buffer);
+real*4 psploty(@buffer), psplotx(@buffer);
+real*4 ymn, ymx, xmn, xmx, shifty, shiftx, pscale, tburst4, dummy4, answer;
+character*80 filein, psfile, device, titlestr, xlabel, ylabel,
+             PHfile, avgfile, string;
+
+character*(*) runname;
+character*160 wordm(10),filestr;
+integer lwordm(10),lrun,nwordm, nnx, ntotx, nny;
+/*integer iplot;
+logical autox, autoy, ttopen, Auto(@Npictures);
+real*4 x1(@Npictures),x2(@Npictures),y1(@Npictures),y2(@Npictures);
+*/
+logical lightcurve, connect;
+logical lexist1,lexist2;
+logical BadNum;
+Character*80 DFile,Rfile,Nidist;
+INTEGER errnum;
+
+%_varsps:o
+
+ real blue;
+ character*80 argsys;
+ real green;
+ integer ierror,Isys;
+ character*4 Csys;
+ equivalence (Csys,Isys);
+ integer iunit;
+ integer npoint;
+ integer line_width;
+ real red;
+ real xps(10);
+ real yps(10);
+ real font_size;
+ data Isys/0/;
+
+%_varssh:o
+--   Dimension freqob(Mfreq);
+Parameter(Ldel=Mfreq/10);
+integer      ian,j,i,n,Nrec,nfrus;
+real*8       Ast,hplanck1,b1,b2,Tbb,ybb,LB,BB,LBa,BBa,bBlack,frbb,
+             dx,dAb,F01,F02,FAb1,FAb2,Ft1,Ft2,Av,Fa,Fb1,Fx,D,
+             F1,F2,Fi,a11,a12,a21,a22,c1,c2,dummy,frbba;
+-- NAG SEARCHMIN VARIABLES
+      INTEGER NNAG, IA, iwbb, MAXCAL, IPRINT, IFAIL, INAG;
+      DOUBLE PRECISION Xtol, RR, factorstep, DELTAbb, F, X02AAF, XC05(2),
+       AJINV(2,2),RVEC(2), W(20);
+  Dimension WCF(2,4), QTF(2), RCF(3), FJAC(2,2), DIAG(2);
+      EXTERNAL RESID;  --, MONIT;
+
+%_flx_fits_obsubv:
+<*zeroflux: the flux from a star at zero magnitude *>;
+-- SCALE=-2.5D0*DLOG10(CFLUX*( RY(NZON-1)*UR/(10.d0*UPC) )**2);
+ SCALE=-2.5D0*DLOG10(CFLUX*(UR/(10.d0*UPC))**2); -- Ry**2 in Flsav
+ freqfind=.false.;
+
+If (^freqfind) then; -- only one time
+  _define @NPTSX NPTSU @WLX WLU @lband 1 ; @find;
+  _define @NPTSX NPTSB @WLX WLB @lband 2 ; @find;
+  _define @NPTSX NPTSV @WLX WLV @lband 3 ; @find;
+  _define @NPTSX NPTSR @WLX WLR @lband 4 ; @find;
+  _define @NPTSX NPTSI @WLX WLI @lband 5 ; @find;
+  freqfind=.true.;
+endif;
+
+_define @NPTSX NPTSU @WLX WLU @FX0 UF0 @TX TU @lband 1 ;@flux; MU=AMAGX;
+_define @NPTSX NPTSB @WLX WLB @FX0 BF0 @TX TB @lband 2 ;@flux; MB=AMAGX;
+_define @NPTSX NPTSV @WLX WLV @FX0 VF0 @TX TV @lband 3 ;@flux; MV=AMAGX;
+_define @NPTSX NPTSR @WLX WLR @FX0 RF0 @TX TR @lband 4 ;@flux; MR=AMAGX;
+_define @NPTSX NPTSI @WLX WLI @FX0 IF0 @TX TI @lband 5 ;@flux; MI=AMAGX;
+
+%_varubv:o
+      INTEGER NPTSU, NPTSB, NPTSV, NPTSR, NPTSI;
+      logical debug;
+--
+      PARAMETER(NPTSU=25);
+      PARAMETER(NPTSB=21);
+      PARAMETER(NPTSV=24);
+      PARAMETER(NPTSR=24);
+      PARAMETER(NPTSI=23);
+      PARAMETER(NPTSMAX=25);  -- maximum number of points
+
+      real*8 Lbolavg,Mbolavg;
+      real*8 U0,B0,V0,UF0,BF0,VF0,RF0,IF0;
+      real*8 WLU(NPTSU),TU(NPTSU),WLB(NPTSB),TB(NPTSB),WLV(NPTSV),TV(NPTSV),
+                WLR(NPTSR),TR(NPTSR),WLI(NPTSI),TI(NPTSI);
+
+      real*8 FHX, FLXAVG, AMAGX, SCALE;
+      logical freqfind;
+      integer indfreq;
+      common /ubvwrk/indfreq(NPTSMAX,5), freqfind;
+--      Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
+      parameter(NrecMax=10000);
+      real*8 sumlum(Mfreq,0:NrecMax),avglum(Mfreq),timeph(0:NrecMax),
+             rphsav(0:NrecMax);
+   integer init;
+   save init;
+   data init/0/;
+
+%_dataubv:o
+--      the response functions for UBVRI filters was taken from
+--      Bessell M.S.,PASP 102(1990)1181--1199;
+--      R & I bands are corresponding roughly to the Cousins system
+
+--      DATA freqfind/.false./; -- bad for transportability;
+
+   DATA U0/-0.7263D+00/;
+--
+      DATA WLU/3000., 3050., 3100., 3150., 3200., 3250., 3300., 3350.,
+       3400., 3450., 3500., 3550., 3600., 3650., 3700., 3750.,
+       3800., 3850., 3900., 3950., 4000., 4050., 4100., 4150., 4200./;
+--
+      DATA TU/0.000, 0.016, 0.068, 0.167, 0.287, 0.423, 0.560, 0.673,
+       0.772, 0.841, 0.905, 0.943, 0.981, 0.993, 1.000, 0.989, 0.916,
+       0.804, 0.625, 0.423, 0.238, 0.114, 0.051, 0.019, 0.000/;
+--
+      DATA B0/0.1649D+00/;
+--
+      DATA WLB/3600.,  3700.,  3800.,  3900.,
+       4000.,  4100.,  4200.,  4300.,  4400.,
+        4500.,  4600., 4700.,  4800.,  4900.,  5000.,  5100.,
+         5200.,  5300.,  5400.,  5500., 5600./;
+--
+      DATA TB/0.000, 0.030, 0.134, 0.567, 0.920, 0.978, 1.000, 0.978,
+       0.935, 0.853, 0.740, 0.640, 0.536, 0.424, 0.325, 0.235, 0.150,
+       0.095, 0.043, 0.009, 0.000/;
+--
+      DATA V0/0.0062D+00/;
+--
+      DATA WLV/4700., 4800.,  4900.,  5000.,  5100.,
+        5200.,  5300.,  5400.,  5500.,  5600.,  5700.,  5800.,  5900.,
+        6000.,  6100.,  6200.,  6300.,  6400.,
+       6500.,  6600.,  6700.,  6800.,  6900.,
+        7000./;
+--
+      DATA TV/0.000, 0.030,  0.163,  0.458,  0.780,
+       0.967,  1.000, 0.973, 0.898, 0.792, 0.684, 0.574,
+       0.461, 0.359, 0.270, 0.197, 0.135, 0.081, 0.045, 0.025, 0.017,
+       0.013, 0.009, 0.000/;
+
+--
+      data WLR/5500., 5600., 5700., 5800., 5900., 6000., 6100., 6200., 6300.,
+               6400., 6500., 6600., 6700., 6800., 6900., 7000., 7100., 7200.,
+               7300., 7400., 7500., 8000., 8500., 9000./;
+--
+      data TR/0.00,  0.23,  0.74,  0.91,  0.98,  1.00,  0.98,  0.96,  0.93,
+              0.90,  0.86,  0.81,  0.78,  0.72,  0.67,  0.61,  0.56,  0.51,
+              0.46,  0.40,  0.35,  0.14,  0.03,  0.00/;
+--
+      data WLI/7000., 7100., 7200., 7300., 7400., 7500., 7600., 7700., 7800.,
+               7900., 8000., 8100., 8200., 8300.,
+               8400., 8500., 8600., 8700., 8800., 8900., 9000., 9100., 9200./;
+--
+      data TI/0.000, 0.024, 0.232, 0.555, 0.785, 0.910, 0.965, 0.985, 0.990,
+              0.995, 1.000, 1.000, 0.990, 0.980,
+              0.950, 0.910, 0.860, 0.750, 0.560, 0.330, 0.150, 0.030, 0.000/;
+
+%_flx_fits_obsubv_zeroflux:
+-- The flux at zero magnitude for the infrared bands was taken from
+-- Wilson, Schwartz, Neugebauer, Harvey and Becklin, 1972, ApJ 177:523-540,
+-- who extrapolated the absolute spectrophotometry of Vega
+-- by Oke and Schild, ApJ 161(1970)1015
+-- using a model atmosphere by Schild, Peterson and Oke.
+--      UF0 = -48.6075 - U0;
+--      BF0 = -48.6075 - B0;
+--      VF0 = -48.6075 - V0;
+-- cf ubvri.trf by Elka Sorokina !!!
+-- from Allen
+--      UF0 = -13.87;
+--      BF0 = -12.97;
+--      VF0 = -13.74;
+-- The same derived from Eastman program
+-- as 2.5 \lg( c \int (\Phi(\lambda)/\lambda^2) d \lambda ) - 48.6075 + magcorr
+      UF0 = -13.90;
+      BF0 = -13.00;
+      VF0 = -13.72;
+      RF0 = -13.66;
+      IF0 = -14.42;
+

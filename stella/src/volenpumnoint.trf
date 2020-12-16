@@ -1,0 +1,110 @@
+  Subroutine VOLEN(KMarg);
+  -- outputs ENG in Ueng=1e12 erg/g/s
+  Implicit real*8 (a-h,o-z);
+  _Include snrad;
+  _Include nico;
+--  Parameter(Positr=4.d-2); -- energy fraction dep. loc. by e^+ from 56Co
+  Parameter(Positr=3.21d-2); -- energy fraction dep. loc. by e^+ from 56Co
+  Parameter(gamfloor=-100d0); -- ln for min FJgam
+  COMMON/ENUCOM/ENPLS,ENPAIR,ENPHO,ENURCA,ENDEP;
+  <*Anmprep:  prepare to emulate for analyt. model *>;
+--  write(*,'(a,2i5,1p,2g15.5)')' kmarg Nreg volenpumnoint  t*Utime tbeght=',KMarg, Nreg(KMarg),t*Utime,tbeght;
+--  write(*,'(a,1p,3g15.5)')'  (AM(Kmarg)-AMini)*UM, AMHT,tburst=',(AM(Kmarg)-AMini)*UM, AMHT,tburst;
+--  pause;
+   IF(NREG(Kmarg)==3)THEN;
+       --   radioactive pumping 56Ni - 56Fe     
+      If(KNadap>0)then;
+        <*Uniform:  standard uniform heating in Amni   *>;
+      else;
+        <*foreign:  56Ni profile from foreign model *>; 
+      endif;
+      <*Anmodel*  heating for separation of var. in an.mod. *>;
+      IF((AM(Kmarg)-AMini)*UM<=AMHT & t*Utime>tbeght & t*Utime<=tburst+tbeght)THEN;
+        Eng=Eng+Eburst*1.D+38/(AMHT*CMS*tburst);
+            -- for Eburst in 1e50 erg & Ueng=1e12 erg/g/s
+--  write(*,'(a,i5,1p,2g15.5)')' if1 kmarg volenpumnoint  t*Utime Eng=',KMarg,t*Utime,Eng;
+--  pause;
+      ELSEIF(Kmarg>1)then; 
+        if ( (AM(Kmarg)-AMini)*UM>AMHT & (AM(Kmarg-1)-AMini)*UM<AMHT
+            & t*Utime<=tburst )THEN;
+          Eng=Eng+Eburst*1.D+38/(AMHT*CMS*tburst)*
+              (AMHT-(AM(Kmarg-1)-AMini)*UM)/(Dm(Kmarg)*UM);
+--  write(*,'(a,i5,1p,2g15.5)')' if2 kmarg volenpumnoint  t*Utime Eng=',KMarg,t*Utime,Eng;
+--  pause;
+        endif; 
+      ENDIF;
+   ENDIF;
+   ENGT=0.D0;
+   ENGPL=0.D0;
+  RETURN;
+  END;
+%_Uniform:
+    tday=T*UTIME/8.64D4; -- CRAP=1.
+   -- ENGgam=XNi*(3.9D-2*EXP(-tday/8.8D0)+6.29D-3*(1.d0-Positr)*
+   --             (EXP(-tday/113.6D0)-EXP(-tday/8.8D0)));
+    ENGgam=XNi*(epsNi*EXP(-tday/tNi)
+                +epsCo*(EXP(-tday/tCo)-EXP(-tday/tNi)));
+    GammaJ=FJgam(Kmarg,2);
+    if( tnewg > toldg ) GammaJ=GammaJ+(FJgam(Kmarg,2)-FJgam(Kmarg,1))*
+                                       (t-tnewg)/(tnewg-toldg);
+    ENG=ENGgam*GammaJ;
+--  If((AM(Kmarg)-AMini)*UM <= AMNi*1.00000000001d0)then;
+    If(Kmarg <= KmNick)then;
+    -- Engpst=6.29D-3*Positr*XNi*(EXP(-tday/113.6D0)-EXP(-tday/8.8D0));
+       Engpst=epspst*XNi*(EXP(-tday/tCo)-EXP(-tday/tNi));
+       ENG=ENG+Engpst;
+    endif;
+--  WRITE(@WRES,*)' volen  ', Kmarg,AM(Kmarg)*UM,AMini*UM,(AM(Kmarg)-AMini)*UM;
+%_foreign:
+    tday=T*UTIME/8.64D4; -- CRAP=1.
+    ENGgam=(epsNi*EXP(-tday/tNi)
+                +epsCo*(EXP(-tday/tCo)-EXP(-tday/tNi)));
+    GammaJ=FJgam(Kmarg,2);
+/*    if( tnewg > toldg & (GammaJ>exp(gamfloor) 
+            & FJgam(Kmarg,1)>exp(gamfloor)) ) then;
+       GammaJ=exp(log(GammaJ)+(log(FJgam(Kmarg,2))-log(FJgam(Kmarg,1)))*
+               (log(t)-log(tnewg))/(log(tnewg)-log(toldg)));
+    elseif(tnewg > toldg)then;
+       GammaJ=GammaJ+(FJgam(Kmarg,2)-FJgam(Kmarg,1))*
+                                       (t-tnewg)/(tnewg-toldg);
+    endif;
+ */  
+    ENG=ENGgam*GammaJ;
+    Engpst=epspst*XNifor(Kmarg)*(EXP(-tday/tCo)-EXP(-tday/tNi));
+    ENG=ENG+Engpst;
+%_Anmprep:
+  Common/Volanm/Ryzer,Kmcor;
+  Parameter(C8=0.5133979661305,   Alp=2.784750039015);
+  Parameter(ENINT=C8*alp/9.);
+  --  ALFEXA=alp;
+  --  BETEXA=ALFEXA/3.D0;
+  --  C8=COS(ALFEXA)/((1.D0-3.D0*BETEXA**2)*SIN(BETEXA)
+  --                   -BETEXA*COS(BETEXA));
+  Data ak/8./, Ivol/0/;
+  If(Ivol==0)then;
+     Kmcor=1;
+     Ivol=1;
+     _While Am(Kmcor)<(ak-3.)/ak*Amout _do
+       Kmcor=Kmcor+1;
+     _od; -- Kmcor saves the zone number for R_0
+     XNianm=8.*XMNi/(15.*Amout*Um*ENint); -- ak/(3*(ak-3))...
+     WRITE(@WRES,*)' XNianm in Volen=', XNianm,'    Kmcor=',Kmcor;
+  endif;
+--  Ivol=Ivol+1; -- delete after testing
+%_Anmodel:
+  If(Kmarg<=Kmcor)then;
+    X=(ak/(ak-3.)*(AM(Kmarg)/Amout))**(1./3.);
+  else;
+    X=(3./(ak*(1.-AM(Kmarg)/Amout)))**(1./(ak-3.));
+  endif;
+  _Select
+    _ X<1.D-10 [ aksi=1.D0 ]
+    _ X<=1.D0  [ aksi=SIN(alp*X)/(alp*X) ]
+    _other     [ Yw=alp/(3.D0*X**3);
+                 aksi=C8*(SIN(Yw)-Yw*COS(Yw))*X**8 ]
+  _end
+--  If(Ivol<=150) WRITE(@WRES,*)' aksi=',aksi,'  Kmarg=',Kmarg,'  X=',X;
+  --   radioactive pumping 56Ni - 56Fe
+  tday=T*UTIME/8.64D4; -- CRAP=1.
+  ENG=XNianm*aksi*(3.9D-2*EXP(-tday/8.8D0)+6.29D-3*
+              (EXP(-tday/113.6D0)-EXP(-tday/8.8D0)));

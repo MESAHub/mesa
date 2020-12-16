@@ -1,0 +1,214 @@
+  **************** basic **************** 
+
+
+
+                                log temp         7.833000000
+                                 log rho         2.000000000
+
+                            log(eps_nuc)        12.924100645
+
+                                 eps_nuc     0.839654548E+13
+
+                            d_lneps_dlnT         9.328758658
+                          d_lneps_dlnRho         1.009292769
+
+
+ energy generation by category
+
+                                category   log rate (erg/g/sec)
+
+                                      pp        12.922533   0.836629E+13
+                                     cno        10.480754   0.302520E+11
+
+
+
+
+  **************** o18_and_ne22 **************** 
+
+
+
+                                log temp         7.833000000
+                                 log rho         2.000000000
+
+                            log(eps_nuc)        10.480242351
+
+                                 eps_nuc     0.302163743E+11
+
+                            d_lneps_dlnT        11.356846819
+                          d_lneps_dlnRho         1.015667296
+
+
+ energy generation by category
+
+                                category   log rate (erg/g/sec)
+
+                                     cno        10.480242   0.302164E+11
+                                      pp         3.038319   0.109224E+04
+
+
+
+
+  **************** pp_extras **************** 
+
+
+
+                                log temp         7.833000000
+                                 log rho         2.000000000
+
+                            log(eps_nuc)        12.921874802
+
+                                 eps_nuc     0.835362166E+13
+
+                            d_lneps_dlnT         9.326561130
+                          d_lneps_dlnRho         1.009292887
+
+
+ energy generation by category
+
+                                category   log rate (erg/g/sec)
+
+                                      pp        12.920299   0.832337E+13
+                                     cno        10.480754   0.302520E+11
+
+
+
+
+  **************** cno_extras **************** 
+
+
+
+                                log temp         7.833000000
+                                 log rho         2.000000000
+
+                            log(eps_nuc)         8.740188691
+
+                                 eps_nuc     0.549779689E+09
+
+                            d_lneps_dlnT        11.626775653
+                          d_lneps_dlnRho         1.013863565
+
+
+ energy generation by category
+
+                                category   log rate (erg/g/sec)
+
+                                     cno         8.740177   0.549765E+09
+                                 burn_ne         4.165965   0.146543E+05
+
+
+
+
+  **************** approx21 **************** 
+
+
+
+                                log temp         9.600000000
+                                 log rho         6.000000000
+
+                            log(eps_nuc)        24.178055700
+
+                                 eps_nuc     0.150680031E+25
+
+                            d_lneps_dlnT        -0.251306068
+                          d_lneps_dlnRho         1.008425906
+
+
+ energy generation by category
+
+                                category   log rate (erg/g/sec)
+
+                                 burn_fe        24.178013   0.150665E+25
+                                   photo        20.161509   0.145047E+21
+                                 burn_si        18.180628   0.151575E+19
+                                  burn_s        18.053619   0.113141E+19
+                                 burn_ar        17.551212   0.355805E+18
+                                 burn_mg        17.035498   0.108517E+18
+                                 burn_ti        16.444832   0.278504E+17
+                                 burn_ca        16.021612   0.105102E+17
+                                 burn_cr        15.767744   0.585792E+16
+                                  burn_o        15.265751   0.184396E+16
+                                 burn_ne        15.256717   0.180600E+16
+                                  burn_c        14.036300   0.108718E+15
+                                tri_alfa        12.066274   0.116486E+13
+                                   pnhe4        11.375501   0.237411E+12
+                                 c12_c12        11.060080   0.114836E+12
+                                 c12_o16        10.183285   0.152505E+11
+                               co56_fe56         9.915964   0.824071E+10
+                               ni56_co56         9.581681   0.381664E+10
+                                 o16_o16         7.689501   0.489216E+08
+
+
+
+
+  **************** approx21_plus_co56 **************** 
+
+
+
+                                log temp         9.600000000
+                                 log rho         6.000000000
+
+                            log(eps_nuc)        24.178055700
+
+                                 eps_nuc     0.150680031E+25
+
+                            d_lneps_dlnT        -0.251306068
+                          d_lneps_dlnRho         1.008425906
+
+
+ energy generation by category
+
+                                category   log rate (erg/g/sec)
+
+                                 burn_fe        24.178013   0.150665E+25
+                                   photo        20.161509   0.145047E+21
+                                 burn_si        18.180628   0.151575E+19
+                                  burn_s        18.053619   0.113141E+19
+                                 burn_ar        17.551212   0.355805E+18
+                                 burn_mg        17.035498   0.108517E+18
+                                 burn_ti        16.444832   0.278504E+17
+                                 burn_ca        16.021612   0.105102E+17
+                                 burn_cr        15.767744   0.585792E+16
+                                  burn_o        15.265751   0.184396E+16
+                                 burn_ne        15.256717   0.180600E+16
+                                  burn_c        14.036300   0.108718E+15
+                                tri_alfa        12.066274   0.116486E+13
+                                   pnhe4        11.375501   0.237411E+12
+                                 c12_c12        11.060080   0.114836E+12
+                                 c12_o16        10.183285   0.152505E+11
+                               ni56_co56         9.581681   0.381664E+10
+                                 o16_o16         7.689501   0.489216E+08
+
+
+
+
+  **************** approx21_cr60_plus_co56 **************** 
+
+
+                                log temp         4.623300792
+                                 log rho       -10.746410108
+
+                               rate_raw rco56ec_to_fe56    1.0402929319524918D-07
+                               rate_raw rni56ec_to_co56    1.3152697923338621D-06
+
+
+ test_one_zone_burn_small_net
+                                      number of species          21
+                                 large final abundances    1.0000000000000000D-02
+                                                    c12           1    9.8714342252602971D-01
+                                                    he4           2    1.2802186851313698D-02
+
+                                                   xsum    1.0000000000006344D+00
+
+
+ test_one_zone_burn_const_P
+                                      number of species          21
+                                 large final abundances    1.0000000000000000D-02
+                                                    o16           1    6.9306121502357232D-01
+                                                   si28           2    2.0236541638793942D-01
+                                                    s32           3    4.2712780194501518D-02
+                                                   mg24           4    4.1277788513017992D-02
+
+                                                   xsum    1.0000000000000000D+00
+
+
+

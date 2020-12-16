@@ -1,0 +1,138 @@
+   Subroutine DHAPH;
+   Implicit real*8 (a-h,o-z);
+   _INCLUDEN snrad;
+    _Include difjac;
+   Dimension HapHM(Nfreq);
+   Dimension HaplP1(Nfreq),HaplP2(Nfreq),HapHP(Nfreq);
+--   PARAMETER (delta=1.D-10);  -- DISTURBANCE CONSTANT -- was too small
+-- cannot be less ~1.d-6 since opacity is saved in single precision
+   --
+_Define
+ @R1 Fsave(Km)
+ @R0 Fsave(Km-1)
+ @R2 Fsave(Km+1)
+ @T1 Fsave(Nzon*2+Km)
+ @T2 Fsave(Nzon*2+Km+1)
+--
+   RadP=.False.;
+   Km=min(Ncnd+1,Mzon-1);
+   <*init:      *>;
+   <*zones:     *>;
+   return;
+   end;
+%_init:
+     If(Km==1)then;
+       DeltR=delta*min(@R2-@R1,@R1-Rce);
+       Pl=3.d0*dM(Km)/((@R1+DeltR)**3-Rce**3);
+     else;
+       DeltR=delta*min(@R2-@R1,@R1-@R0);
+       Pl=3.d0*dM(Km)/((@R1+DeltR)**3-@R0**3);
+     endif;
+     Tp=@T1;
+     Tp1up4=Tp**4;
+     _Do i=1, Natom;  Yat(i)=YABUN(i,Km) _od;
+     Call Ursos;
+     kmhap=km;
+     Call Happa;
+     _Do L=1,Nfrus;
+       HaplP1(L)=Happal(L)
+     _od;
+--
+     If(Km==1)then;
+       Pl=3.d0*dM(Km)/(@R1**3-Rce**3);
+     else;
+       Pl=3.d0*dM(Km)/(@R1**3-@R0**3);
+     endif;
+     Call Ursos;
+     Call Happa;
+     _Do L=1,Nfrus;
+       Hapl1(L)=Happal(L)
+     _od;
+--
+     Pl=3.d0*dM(Km+1)/(@R2**3-(@R1+DeltR)**3);
+     Tp=@T2;
+     Tp2up4=Tp**4;
+     _Do i=1, Natom;  Yat(i)=YABUN(i,Km+1) _od;
+     Call Ursos;
+     kmhap=km+1;
+     Call Happa;
+     _Do L=1,Nfrus;
+       HaplP2(L)=Happal(L);
+         tau1(L)=HapLP1(L)*(dm(km)+dm(km+1))/(@R1+DeltR)**2;
+         tau2(L)=HapLP2(L)*(dm(km)+dm(km+1))/(@R1+DeltR)**2;
+         hapHP(L)=(Tp1up4+Tp2up4)/(
+          (Tp2up4/hapLP2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+                 *exp(-tau1(L)))
+           +(Tp1up4/hapLP1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
+                 *exp(-tau2(L)))
+                                   );
+     _od;
+--
+     Pl=3.d0*dM(Km+1)/(@R2**3-@R1**3);
+     _Do i=1, Natom;  Yat(i)=YABUN(i,Km+1) _od;
+     Call Ursos;
+     Call Happa;
+     _Do L=1,Nfrus;
+       Hapl2(L)=Happal(L);
+         tau1(L)=HapL1(L)*(dm(km)+dm(km+1))/(@R1)**2;
+         tau2(L)=HapL2(L)*(dm(km)+dm(km+1))/(@R1)**2;
+         hapHM(L)=(Tp1up4+Tp2up4)/(
+          (Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+            *exp(-tau1(L)))
+           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
+            *exp(-tau2(L)))
+                                   );
+       DHaphR(Km,L)=(HapHP(L)-HapHM(L))/DeltR;
+     _od;
+%_zones:
+   _Do Km=Ncnd+2,Nzon-1;
+       DeltR=delta*min(@R2-@R1,@R1-@R0);
+       Pl=3.d0*dM(Km)/((@R1+DeltR)**3-@R0**3);
+       Tp=@T1;
+       Tp1up4=Tp2up4;
+--     _Do i=1, Natom;  Yat(i)=YABUN(i,Km) _od;  -- already there
+       Call Ursos;
+       kmhap=km;
+       Call Happa;
+       _Do L=1,Nfrus;
+         HaplP1(L)=Happal(L);
+       _od;
+ --
+     if(km<Mzon)then;  
+       Pl=3.d0*dM(Km+1)/(@R2**3-(@R1+DeltR)**3);
+       Tp=@T2;
+       Tp2up4=Tp**4;
+       _Do i=1, Natom;  Yat(i)=YABUN(i,Km+1) _od;
+       Call Ursos;
+       kmhap=km+1;
+       Call Happa;
+       _Do L=1,Nfrus;
+         HaplP2(L)=Happal(L);
+         tau1(L)=HapLP1(L)*(dm(km)+dm(km+1))/(@R1+DeltR)**2;
+         tau2(L)=HapLP2(L)*(dm(km)+dm(km+1))/(@R1+DeltR)**2;
+         hapHP(L)=(Tp1up4+Tp2up4)/(
+          (Tp2up4/hapLP2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+            *exp(-tau1(L)))
+           +(Tp1up4/hapLP1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
+            *exp(-tau2(L)))
+                                   );
+       _od;
+--
+       Pl=3.d0*dM(Km+1)/(@R2**3-@R1**3);
+       Call Ursos;
+       Call Happa;
+       _Do L=1,Nfrus;
+         Hapl1(L)=Hapl2(L);
+         Hapl2(L)=Happal(L);
+         tau1(L)=HapL1(L)*(dm(km)+dm(km+1))/(@R1)**2;
+         tau2(L)=HapL2(L)*(dm(km)+dm(km+1))/(@R1)**2;
+         hapHM(L)=(Tp1up4+Tp2up4)/(
+          (Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+                     *exp(-tau1(L)))
+           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
+                     *exp(-tau2(L)))
+                                   );
+         DHaphR(Km,L)=(HapHP(L)-HapHM(L))/DeltR;
+       _od;
+     endif; 
+   _od;

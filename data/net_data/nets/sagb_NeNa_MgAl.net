@@ -1,0 +1,77 @@
+      ! 'sagb_NeNa_MgAl.net'
+
+         add_isos(
+            neut
+            h 1 2
+            he 3 4
+            li7
+            be7
+            b8
+            c 12 13
+            n 13 15
+            o 16 18
+            f19
+            ne 20 22
+            na 21 23
+            mg 24 26
+            al 25 27
+            )     
+            
+         add_reactions(
+            r_h1_h1_wk_h2   
+            r_h2_pg_he3
+            r_he3_he3_to_h1_h1_he4 
+            r_he3_ag_be7    
+            r_be7_wk_li7
+            r_li7_pa_he4
+            r_be7_pg_b8
+            r_b8_wk_he4_he4 
+            r_b8_gp_be7 
+            r_c12_pg_n13 
+            r_n13_wk_c13
+            r_c13_pg_n14
+            rn14_to_n15
+            r_n15_pa_c12
+            r_n15_pg_o16
+            ro16_to_o17
+            r_o17_pa_n14 
+            ro17_to_o18
+            r_o18_pa_n15
+            r_o18_pg_f19
+            r_f19_pa_o16
+            r_he4_he4_he4_to_c12
+            r_c12_ag_o16
+            rn14ag_to_o18
+            r_o18_ag_ne22
+	         r_f19_ap_ne22
+	         r_c13_an_o16
+!SAGB START:
+            r_o16_ap_f19
+            r_o16_ag_ne20
+            r_c12_c12_to_he4_ne20
+            r_c12_c12_to_h1_na23
+            r_ne20_ap_na23
+            r_na23_pg_mg24
+            r_ne20_ag_mg24
+            r_he4_mg24_to_c12_o16
+            r_he4_ne20_to_c12_c12
+            r_ne20_ga_o16
+            r_mg24_ga_ne20
+            r_mg24_ap_al27
+!NeNa cycle:
+            r_ne20_pg_na21
+            r_na21_wk_ne21
+            r_ne21_pg_na22
+            r_na22_wk_ne22
+            r_ne22_pg_na23
+            r_na23_pa_ne20
+!MgAl cycle:
+            r_mg24_pg_al25
+            r_al25_wk_mg25
+            r_mg25_pg_al26
+            r_al26_wk_mg26
+            r_mg26_pg_al27
+            r_al27_pa_mg24
+            )     
+
+

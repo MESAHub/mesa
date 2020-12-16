@@ -1,0 +1,190 @@
+
+&one_zone
+
+      !show_net_reactions_info = .true.
+      !show_Qs = .true.
+      
+      mesa_dir = '../..'   	
+
+!      net_name = 'mesa_59.net' 
+!      net_name = 'mesa_78.net'   ! 4.0743951480000495D-01, ni68 2.0912884055044154D-01
+!      net_name = 'mesa_125.net'  ! 4.0635735378854265D-01, ni68 1.7476332004712114D-01
+!      net_name = 'mesa_160.net'  ! 4.0553024263780857D-01, ni68 1.3560850099527180D-01
+!      net_name = 'mesa_201.net'  ! 4.0537345731848878D-01, ni68 1.2509498160515742D-01
+!      net_name = 'mesa_330.net'  ! 
+!      net_name = 'mesa_495.net'  ! 4.0412388287762485D-01, ni68 8.1167063770290343D-02
+!      net_name = 'mesa_833.net'  !
+!      net_name = 'mesa_1508.net' !
+!      net_name = 'mesa_3335.net' !
+
+!      net_name = 'approx21_mn56.net'  ! 
+!      net_name = 'approx21_mn57.net'  ! 
+!      net_name = 'approx21_cr56.net'  ! 
+!      net_name = 'approx21_cr57.net'  ! 
+!      net_name = 'approx21_cr58.net'  ! 
+!      net_name = 'approx21_cr59.net'  ! 
+!      net_name = 'approx21_cr60.net'  ! 
+!      net_name = 'approx21_cr61.net'  ! 
+!      net_name = 'approx21_cr62.net'  ! 
+!      net_name = 'approx21_cr63.net'  ! 
+!      net_name = 'approx21_cr64.net'  ! 
+!      net_name = 'approx21_cr65.net'  ! 
+!      net_name = 'approx21_cr66.net'  ! 
+
+      net_name = 'approx21_plus_co56.net' 
+      
+      trace = .true.
+      !burn_dbg = .true.
+   	stptry = 0
+      use_pivoting = .true.
+      !use_pivoting = .false.
+
+      burn_at_constant_density = .true.
+      ! values from 20M_si_burn test case
+   	!burn_logT = 9.8 ! 9.5900600048324218D+0 ! starting temp
+   	!burn_logRho = 9.5 ! constant density
+   	!burn_eta = 1.5
+   	!burn_deta_dlnT = -3.3
+   	!burn_Cv = 2d8
+      !burn_d_Cv_dlnT = 5d8
+      
+      !num_isos_for_Xinit = 1
+      !names_of_isos_for_Xinit(1) = 'fe54'
+      !values_for_Xinit(1) = 1.0d0
+   	!burn_tend = 3d-6
+
+
+
+burn_logT = 9.7714486335232777D+00 ! starting temp
+
+burn_logT = 9.82D+00 ! <<<<<<<<<<< TEST
+
+! 9.79 614
+! 9.795 960
+! 9.8  1263
+! 9.81 1821
+
+
+
+
+burn_logRho = 8.2586740078478176D+00 ! constant density
+                                              burn_Cv =    0
+                                       burn_d_Cv_dlnT =    0
+                                             burn_eta =    0
+                                       burn_deta_dlnT =    0
+
+num_isos_for_Xinit = 21
+names_of_isos_for_Xinit( 1) = "neut"
+values_for_Xinit( 1) =     1.9615092621881698D-06
+names_of_isos_for_Xinit( 2) = "h1"
+values_for_Xinit( 2) =     0.0000000000000000D+00
+names_of_isos_for_Xinit( 3) = "prot"
+values_for_Xinit( 3) =     3.3544919533130298D-04
+names_of_isos_for_Xinit( 4) = "he3"
+values_for_Xinit( 4) =     0.0000000000000000D+00
+names_of_isos_for_Xinit( 5) = "he4"
+values_for_Xinit( 5) =     9.6491906054115388D-03
+names_of_isos_for_Xinit( 6) = "c12"
+values_for_Xinit( 6) =     4.4455299753403973D-07
+names_of_isos_for_Xinit( 7) = "n14"
+values_for_Xinit( 7) =     0.0000000000000000D+00
+names_of_isos_for_Xinit( 8) = "o16"
+values_for_Xinit( 8) =     7.0439210492179401D-07
+names_of_isos_for_Xinit( 9) = "ne20"
+values_for_Xinit( 9) =     4.5369892002182717D-09
+names_of_isos_for_Xinit(10) = "mg24"
+values_for_Xinit(10) =     8.0018732551576689D-07
+names_of_isos_for_Xinit(11) = "si28"
+values_for_Xinit(11) =     3.3697411043955434D-04
+names_of_isos_for_Xinit(12) = "s32"
+values_for_Xinit(12) =     2.7239844165292807D-04
+names_of_isos_for_Xinit(13) = "ar36"
+values_for_Xinit(13) =     1.4240894544492388D-04
+names_of_isos_for_Xinit(14) = "ca40"
+values_for_Xinit(14) =     1.5156321095874170D-04
+names_of_isos_for_Xinit(15) = "ti44"
+values_for_Xinit(15) =     4.3979509377388036D-06
+names_of_isos_for_Xinit(16) = "cr48"
+values_for_Xinit(16) =     2.8113145151721771D-05
+names_of_isos_for_Xinit(17) = "fe52"
+values_for_Xinit(17) =     1.8928784597602586D-04
+names_of_isos_for_Xinit(18) = "fe54"
+values_for_Xinit(18) =     2.6996971418369603D-01
+names_of_isos_for_Xinit(19) = "fe56"
+values_for_Xinit(19) =     0.711211d0
+names_of_isos_for_Xinit(20) = "co56"
+values_for_Xinit(20) =     6.8333792315189530D-03
+names_of_isos_for_Xinit(21) = "ni56"
+values_for_Xinit(21) =     8.7251484519146338D-04
+
+burn_tend = 4.8879254236041725D-01 ! mesa/star timestep
+
+
+
+!names_of_isos_for_Xinit(17) = "cr60"
+!values_for_Xinit(17) =     4.1810609055173498D-03
+
+
+
+eps = 1d-5
+odescal = 1d-5
+   	
+   	max_step_size = 0
+      max_steps     = 10000000        
+
+   	
+   	data_heading_line = ''
+      
+      min_for_show_peak_abundances = 0 ! 1d-6 ! output peak value if it is > this
+      max_num_for_show_peak_abundances = 21
+      show_peak_x_and_time = .false. 
+         ! if false, then shows final abundances instead of peak
+
+      data_filename = 'one_zone_burn.data'
+      !data_output_min_t = 1d-6
+      
+      save_final_abundances = .true.
+      final_abundances_filename = 'abundances.data'
+      
+      !uniform_Xinit = .true. ! for debugging
+
+!      num_isos_for_Xinit = 2
+!      names_of_isos_for_Xinit(1) = 'si28'
+!      values_for_Xinit(1) = 0.5d0
+!      names_of_isos_for_Xinit(2) = 'h1'
+!      values_for_Xinit(2) = 0.5d0
+      
+      
+      !names_of_isos_for_Xinit(2) = 'si30'
+      !values_for_Xinit(2) = 0.0d0
+
+      num_names_of_isos_to_show = -1
+
+
+      decsol_switch = 5000
+         ! if current number of species <= switch,
+            ! then use small_mtx_decsol,
+            ! else use large_mtx_decsol.
+      small_mtx_decsol = 'lapack'
+      large_mtx_decsol = 'klu'
+      
+      cache_suffix = '' ! use this only for reactions from rate_tables
+      
+      which_rates_choice = 2
+         ! nacre = 1
+         ! jina reaclib = 2
+
+      ! reaction rate factors
+         num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
+         reaction_for_special_factor(:) = ''
+         special_rate_factor(:) = 1
+         ! e.g.
+            !num_special_rate_factors = 1
+            !reaction_for_special_factor(:) = 'r_c12_ag_o16'
+            !special_rate_factor(1) = 1.1
+
+      
+      quiet = .false.
+      show_ye_stuff = .true.
+
+/ 

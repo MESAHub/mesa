@@ -1,0 +1,90 @@
+# This is the makefile for testing the mesa gyre package 
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+ifeq ($(USE_GYRE),NO)
+    SRCS = test_gyre_stub.f
+else
+    SRCS = test_gyre.f
+endif
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = gyre
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = $(LIBS_MATRIX)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX) $(LOAD_HDF5)
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(TEST) : $(OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo FC $@
+	@$(FC) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(FC) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(TEST)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
+else
+	$(TEST_COMPILE) $(FCfree) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = ../src
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

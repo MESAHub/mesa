@@ -1,0 +1,19 @@
+      subroutine decsolc(iop,n,ndim,ar,ai,ml,mu,br,bi,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         use const_def, only: dp
+         ! complex matrix
+         integer, intent(in) :: iop, n, ndim, lcd, lrd, lid
+         integer, intent(in) :: ml
+            ! if ml=n: full matrix.
+            ! if 0<=ml<n: ml is the lower bandwith of matrix
+               ! (>= number of non-zero diagonals below the main diagonal).
+         integer, intent(in) :: mu
+            ! upper bandwith of the matrix (need not be defined if ml=n)
+               ! (>= number of non-zero diagonals above the main diagonal).
+         integer, intent(inout) :: ip(n)
+         real(dp), intent(inout) :: ar(ndim,n), ai(ndim,n)
+         real(dp), intent(inout) :: br(n), bi(n)
+         complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ier
+      end subroutine decsolc

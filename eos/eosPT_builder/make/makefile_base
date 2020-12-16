@@ -1,0 +1,134 @@
+# This is the makefile for the mesa PT equation of state builder
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+COMMON_SRCS = \
+   scvh_eval.f90 \
+   eval_eospt.f90 \
+   create_eospt_files.f90
+CEOS_SRCS = ceos.f90
+PLOT_SRCS = make_ptplots.f90 plotter.f90
+
+SRCS = $(COMMON_SRCS) $(CEOS_SRCS) $(PLOT_SRCS)
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = eos
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = chem $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# SOURCES
+
+COMMON_SRCS = \
+   scvh_eval.f90 \
+   eval_eospt.f90 \
+   create_eospt_files.f90
+
+CEOS_SRCS = $(COMMON_SRCS) ceos.f90
+
+PLOT_SRCS = $(COMMON_SRCS) make_ptplots.f90 plotter.f90
+
+#################################################################
+#
+# TARGETS
+
+BUILDER_DIR = ..
+
+CEOS = $(BUILDER_DIR)/ceos
+PLOT = $(BUILDER_DIR)/plotter
+
+CEOS_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(CEOS_SRCS)))
+PLOT_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PLOT_SRCS)))
+
+$(CEOS) : $(CEOS_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(PLOT) : $(PLOT_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+
+$(CEOS) : OBJS = $(CEOS_OBJS)
+$(PLOT) : OBJS = $(PLOT_OBJS)
+
+all : $(CEOS) $(PLOTTER)
+
+$(BUILDER_DIR)/% :
+ifneq ($(QUIET),)
+	@echo FC $@
+	@$(FC) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER)
+else
+	$(FC) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f $(OBJS) *.o *.mod *.smod .depend $(CEOS) $(PLOT)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE_CMD = $(COMPILE_TO_DEPLOY)
+INCLUDES = -I$(MESA_DIR)/include
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $(FCfixed) $<
+else
+	$(COMPILE_CMD) $(FCfixed) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $(FCfree) $<
+else
+	$(COMPILE_CMD) $(FCfree) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(BUILDER_DIR)/src:$(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f90 $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(CEOS_SRCS) $(PLOT_SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(CEOS_SRCS) $(PLOT_SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

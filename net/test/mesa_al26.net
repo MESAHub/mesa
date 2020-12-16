@@ -1,0 +1,9 @@
+add_isos_and_reactions(
+   neut
+    h  1  1 ! hydrogen
+   he  4  4 ! helium
+   mg 25 25 ! magnesium
+   al26-1
+   al26-2
+   )
+

@@ -1,0 +1,82 @@
+
+! co_burn plus more complete set of cno isotopes.
+! useful if you want to follow c13 o17 o18 and f19
+
+
+
+         add_isos(
+	         h1
+            he3
+            he4
+            c12
+            c13
+            n13
+            n14
+            n15
+            o16
+            o17
+            o18
+            f19
+            ne20
+	         ne22
+	         mg24
+	         si28
+            )     
+
+
+
+         add_reactions(
+         
+         ! pp chains
+         
+            rpp_to_he3         ! p(pe+nu)h2(pg)he3
+            rpep_to_he3        ! p(e-pnu)h2(pg)he3     
+            r_he3_he3_to_h1_h1_he4                ! he3(he32p)he4 
+            r34_pp2            ! he4(he3g)be7(e-nu)li7(pa)he4 
+            r34_pp3            ! he4(he3g)be7(pg)b8(e+nu)be8(a)he4  
+            r_h1_he3_wk_he4              ! he3(pe+nu)he4     
+
+         ! cno cycles
+
+            r_c12_pg_n13
+            r_n13_wk_c13
+            r_c13_pg_n14
+            rn14_to_n15
+            r_n15_pa_c12
+            r_n15_pg_o16
+            ro16_to_o17 
+            r_o17_pa_n14
+            ro17_to_o18
+            r_o18_pa_n15
+            r_o18_pg_f19
+            r_f19_pa_o16
+            r_he4_he4_he4_to_c12
+            r_c12_ag_o16
+            rn14ag_to_o18
+            r_o18_ag_ne22 
+	         r_f19_ap_ne22
+         
+         ! advanced burning
+         
+            r_o16_ag_ne20
+            ro16ap_to_ne20     ! o16(ap)f19(pg)ne20    
+
+            r_ne20_ag_mg24
+            rne20ap_to_mg24    ! ne20(ap)na23(pg)mg24    
+
+         ! auxiliaries -- used only for computing rates of other reactions
+         
+            rbe7ec_li7_aux
+            rbe7pg_b8_aux
+            ro16ap_aux
+            rf19pg_aux
+            rf19pa_aux
+            rne20ap_aux
+            rna23pg_aux
+            rna23pa_aux
+            
+         )
+         
+         include 'add_co_burn'
+
+

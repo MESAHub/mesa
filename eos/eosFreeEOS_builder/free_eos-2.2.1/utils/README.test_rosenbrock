@@ -1,0 +1,27 @@
+This file documents test_rosenbrock, a programme to test the BFGS technique
+used by FreeEOS using the standard Rosenbrock minimization problem.
+
+* To build test_rosenbrock execute in the top of the build tree or else in
+  utils
+
+make check
+
+* To run test_rosenbrock execute
+
+./test_rosenbrock > test_rosenbrock.out_local
+
+The output file is pretty self-explanatory.  For each iteration of the BFGS
+minimization of the Rosenbrock function it give the following information:
+
+iter: iteration number
+function_count: total number of function evaluations
+gradient_count: total number of gradient evaluations
+x-solution: x vector minus (1., 1.) which is x vector minux the known minimum
+	    of Rosenbrock's function.
+dx: change in x vector from previous iteration.
+step_ratio: ratio of actual step taken by line search compared to initial
+	    estimate of that step size.
+f: function value (which should be zero at minimum because of the way the
+   	    Rosenbrock function is defined.)
+gradient: gradient vector (which should be zero at minimum)
+

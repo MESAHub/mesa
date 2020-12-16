@@ -1,0 +1,82 @@
+ ../eve/run/m030307mhomo.mod                                                     ../eve/run/m030307mhomo.xni                                                     ronfict1.res                                                                    m030307mhomo.0                                                                  
+ >>../eve/run/m030307mhomo.mod                                                     <<
+  -------->Entering Node %_readmodel:
+  StradIO opened file ../eve/run/m030307mhomo.mod                                                     
+  StradIO READ STEP=           0
+  ------<--Leaving  Node %_readmodel:
+ Yabun:          15   1.0000000000000000        4.0000000000000000        12.000000000000000        14.000000000000000        16.000000000000000        20.000000000000000        23.000000000000000        24.000000000000000        27.000000000000000        28.000000000000000        32.000000000000000        40.000000000000000        40.000000000000000        56.000000000000000        58.000000000000000     
+  time in tables and t_eve:   1.0000000000000000       0.11574074074074074     
+  Nzon=          90  @skip=          45
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 2.657E-05 6.570E-03 6.241E-02
+ Fe Co Ni abund here= 1.710E-03 6.570E-03 6.241E-02
+  Linelist linedata.dump                                                                   
+  program continues , file exists linedata.dump                                                                   
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 2.657E-05 6.570E-03 6.241E-02
+ Fe Co Ni abund here= 1.710E-03 6.570E-03 6.241E-02
+  time in tables and t_eve:   2.5118864315095801       0.11574074074074074     
+  Nzon=          90  @skip=          45
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 1.837E-04 1.626E-02 5.256E-02
+ Fe Co Ni abund here= 1.868E-03 1.626E-02 5.256E-02
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 1.837E-04 1.626E-02 5.256E-02
+ Fe Co Ni abund here= 1.868E-03 1.626E-02 5.256E-02
+  time in tables and t_eve:   6.3095734448019334       0.11574074074074074     
+  Nzon=          90  @skip=          45
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 1.062E-03 3.381E-02 3.414E-02
+ Fe Co Ni abund here= 2.746E-03 3.381E-02 3.414E-02
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 1.062E-03 3.381E-02 3.414E-02
+ Fe Co Ni abund here= 2.746E-03 3.381E-02 3.414E-02
+  time in tables and t_eve:   15.848931924611142       0.11574074074074074     
+  Nzon=          90  @skip=          45
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 4.944E-03 5.252E-02 1.155E-02
+ Fe Co Ni abund here= 6.628E-03 5.252E-02 1.155E-02
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 4.944E-03 5.252E-02 1.155E-02
+ Fe Co Ni abund here= 6.628E-03 5.252E-02 1.155E-02
+  time in tables and t_eve:   39.810717055349734       0.11574074074074074     
+  Nzon=          90  @skip=          45
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 1.662E-02 5.163E-02 7.584E-04
+ Fe Co Ni abund here= 1.830E-02 5.163E-02 7.584E-04
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 1.662E-02 5.163E-02 7.584E-04
+ Fe Co Ni abund here= 1.830E-02 5.163E-02 7.584E-04
+  time in tables and t_eve:   100.00000000000000       0.11574074074074074     
+  Nzon=          90  @skip=          45
+STOP  ronfict ends normally
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 3.846E-02 3.054E-02 8.118E-07
+ Fe Co Ni abund here= 4.015E-02 3.054E-02 8.118E-07
+ Fe abund in eve model= 7.069E-02
+ Ni stable abund in eve model= 9.999E-16
+ Ni56 abund in eve model= 6.901E-02
+ Fe Co Ni from Ni56= 3.846E-02 3.054E-02 8.118E-07
+ Fe Co Ni abund here= 4.015E-02 3.054E-02 8.118E-07

@@ -1,0 +1,24 @@
+! null inlist to accompany default astero/work
+
+! By default, this does nothing useful other than confirm that the
+! astero module has built correctly and will run.  You probably want
+! to copy inlists from another source, be that something you've set up
+! before or the `example_astero` test case.
+
+! For the sake of future readers of this file (yourself included),
+! ONLY include the controls you are actually using.  DO NOT include
+! all of the other controls that simply have their default values.
+
+&astero_search_controls
+   ! see star/astero/defaults/astero_search_controls.defaults
+   ! for current set of controls and their default values.
+   first_mass = 1.0
+   first_Y = 0.28
+   first_FeH = 0.09552790091978557 ! Z = 0.02
+   first_alpha = 2.0
+   first_f_ov = 0
+/ ! end astero_search_controls
+
+
+&astero_pgstar_controls
+/ ! end astero_pgstar_controls

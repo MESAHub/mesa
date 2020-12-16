@@ -1,0 +1,4 @@
+      
+      include 'cno_extras_o18_to_mg26.net'
+
+      add_iso(fe56)

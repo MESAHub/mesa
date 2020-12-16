@@ -1,0 +1,330 @@
+# NOTE: this default version of makefile_header
+# assumes you will be using the mesasdk.
+# if you do not want that, you can use the
+# makefile_header_non_mesasdk file as a template.
+
+# NOTE: MESA is no longer supported on 32-bit systems.  This isn't by design;
+# we simply haven't been able to get it to work!  So if you really-really want 
+# to use an antique 32-bit system for mesa, you'll have to try to make it work yourself.
+# But I think you'd be better off switching to a 64-bit machine.
+
+# Step 0) Check if you have set the correct environment variables
+ifndef MESA_DIR
+ifndef MESA_DIR_INTENTIONALLY_EMPTY
+$(error MESA_DIR enviroment variable is not set)
+endif
+endif
+
+
+ifndef MESASDK_ROOT
+ifndef MESA_DIR_INTENTIONALLY_EMPTY
+$(error MESASDK_ROOT enviroment variable is not set)
+endif
+endif
+
+#mesasdk_init adds $MESASDK_ROOT to $PATH
+ifeq ($(findstring $(MESASDK_ROOT), $(PATH)),)
+ifndef MESA_DIR_INTENTIONALLY_EMPTY
+$(error The MESASDK has not been initialized)
+endif
+endif
+
+# Check mesasdk version
+ifdef MESASDK_ROOT
+ifndef MESA_DIR_INTENTIONALLY_EMPTY
+# Check for whether the sdk ships crmath
+MINIMUM_VERSION = 20.3.1
+ifneq ($(shell $(MESA_DIR)/utils/check_sdk_version $(MINIMUM_VERSION)),passed)
+$(error Your MESASDK is too old please update to version $(MINIMUM_VERSION) or newer)
+endif
+endif
+endif
+
+# Set optimization level
+ARCH = $(shell uname -m)
+
+ifeq (${ARCH},x86_64)
+OPT_LEVEL = 2
+else ifeq (${ARCH},aarch64)
+OPT_LEVEL = 2
+SPECIAL_FC_FLAGS := ${SPECIAL_FC_FLAGS} -ffp-contract=off
+else
+OPT_LEVEL = 0
+endif
+
+
+# step 1) specify your compilers
+
+# NOTE: recent versions of mesa have required reduced optimization 
+# in order to work with ifort; we suggest using gfortran instead of ifort if possible.
+
+FC = gfortran
+CC = gcc
+
+
+# step 2) specify whether to use crmath for math library
+
+USE_CRMATH = YES
+
+ifeq ($(USE_CRMATH),YES)
+LOAD_CRMATH = `mesasdk_crmath_link`
+export MESASDK_MATH_SLOT = crmath
+endif
+
+# step 3) specify which LAPACK and BLADS libraries to use for mesa/mtx
+
+WHICH_LAPACK95 =
+WHICH_LAPACK =
+WHICH_BLAS =
+LOAD_LAPACK95 = `mesasdk_lapack95_link`
+LOAD_LAPACK = `mesasdk_lapack_link`
+LOAD_BLAS = `mesasdk_blas_link`
+
+
+# step 4) do you want to use PGPLOT with mesa/star?                                                                                     
+
+USE_PGSTAR = YES
+LOAD_PGPLOT = `mesasdk_pgplot_link` -lz
+
+
+# step 5) do you want to use SE with mesa/star?
+
+# SE is now supported using run_star_extras.  contact Falk Herwig for info.
+
+
+# step 6) do you want to use HDF5 with mesa/star? 
+# Currently we use HDF5 for weak nuclear reaction rates
+USE_HDF5 = YES
+LOAD_HDF5 = `mesasdk_hdf5_link`
+
+
+# step 7) do you want to use GYRE?
+
+# if you don't plan to use GYRE and want to skip building it, then
+#USE_GYRE = NO
+# if you want to have GYRE built along with the rest of mesa, then
+USE_GYRE = YES
+
+
+# step 8) now do the mesa install
+
+USE_OPENMP = YES
+
+
+# step 9) Build shared libraries? Needed if you want mesa to be usable in python
+
+USE_SHARED = NO
+
+
+#################################################################
+
+# Unless you are adding a new compiler to the list of options,
+# you shouldn't need to change any of the following stuff.
+# It simply defines things for use by the module makefiles.
+
+SKIP_NAN_TRAPS = YES
+#SKIP_NAN_TRAPS = NO
+# if not SKIP_NAN_TRAPS, then also add $(FCtrapNANs) to FCbasic2
+
+FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=7 $(SPECIAL_FC_FLAGS) $(FCbasic2)
+FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
+
+# Set the fortran standard to compile against, files that can't be compiled to the standard and are 
+# unfixable should add a statement like:  $(filter-out -std=f2008, $(COMPILE))
+# to filter out the option in their makefile
+FCstandard = -std=f2008 -Wno-error=tabs
+
+# set environment variable GFORTRAN_ERROR_BACKTRACE=1
+# -Warray-temporaries
+
+FCimpno = -fimplicit-none  
+FCchecks = -fbounds-check -Wuninitialized -Warray-bounds
+FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination
+#FCwarn = -Wunused-value -Werror -W -Wno-compare-reals -Wno-unused-parameter
+FCtrapNANs = -ffpe-trap=invalid,overflow,zero 
+# -Wno-unused-parameter
+ 
+# note: -Werror causes warnings to be treated as errors
+FC_fixed_preprocess = -x f77-cpp-input
+FC_free_preprocess = -x f95-cpp-input
+FCfixed = -ffixed-form -ffixed-line-length-none $(FC_fixed_preprocess)
+FCfixed72 = -ffixed-form $(FC_fixed_preprocess)
+FCfree = -ffree-form -ffree-line-length-none $(FC_free_preprocess)
+FCopt = -O${OPT_LEVEL} -ftree-vectorize
+FCdebug = -ggdb
+FCstatic =
+ifeq ($(USE_OPENMP),YES)
+FCopenmp = -fopenmp
+else
+FCopenmp = 
+endif
+
+LIB_TOOL_STATIC = ar crs
+LIB_SUFFIX_STATIC = a
+
+# Flags needed for shared libraries
+ifeq ($(USE_SHARED), YES)
+   UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+   MD := $(shell realpath $(MESA_DIR)/lib)
+   # Rpaths need to resolve relative to module/test folder plus the final location of the library
+   LIB_FLAGS = -fPIC -shared
+   LD_FLAGS = -Wl,-rpath=../make:../../lib:$(MD)
+   LIB_SUFFIX = so
+endif
+ifeq ($(UNAME_S),Darwin)
+# Macs dont have realpath so cd to dir and get its location manually
+# We check if folder exists first, to stop adipls getting confused
+# when it can't find ../../lib
+ifneq ($(wildcard $(MESA_DIR)/lib/.*),)
+   MD := $(shell cd "$(MESA_DIR)/lib"; pwd -P)
+endif
+   LIB_FLAGS = -dynamiclib
+   LD_FLAGS = -Wl,-rpath,../make,-rpath,../../lib,-rpath,$(MD)
+   LIB_SUFFIX = dylib
+endif
+   LIB_TOOL = $(FC) $(LIB_FLAGS) $(FCopenmp) $(LD_FLAGS) -o
+else
+   # Static library options
+   LIB_TOOL = $(LIB_TOOL_STATIC)
+   LIB_SUFFIX = $(LIB_SUFFIX_STATIC)
+   LIB_FLAGS = 
+   LIBS = 
+endif
+
+# Turn on all FPE options
+ifeq ($(MESA_FPE_CHECKS_ON),1) 
+   FCbasic += $(FCtrapNANs) -fbounds-check -Wuninitialized -Warray-bounds -fstack-protector-all -D_FORTIFY_SOURCE=2
+   FCopt = -O0 -ftree-vectorize 
+   SKIP_NAN_TRAPS = NO
+endif
+
+
+# some definitions used in the module makefiles
+MODULE_DIR = ..
+MOD_PUBLIC_DIR = $(MODULE_DIR)/public
+MOD_PRIVATE_DIR = $(MODULE_DIR)/private
+MODULE_INCLUDES = -I$(MOD_PUBLIC_DIR) -I$(MOD_PRIVATE_DIR)
+OTHER_INCLUDES = -I$(MESA_DIR)/include
+INCLUDES = $(MODULE_INCLUDES) $(OTHER_INCLUDES)
+
+COMPILE_BASIC_FLAGS = $(FCbasic) $(FCopenmp) $(FCstatic) $(FCstandard) $(LIB_FLAGS) $(INCLUDES)
+COMPILE_BASIC = $(FC) $(COMPILE_BASIC_FLAGS)
+
+COMPILE_TO_TEST   = $(COMPILE_BASIC) $(FCwarn) $(FCimpno) $(FCchecks) $(FCopt) $(FCdebug) -c
+COMPILE_TO_DEPLOY = $(COMPILE_BASIC) $(FCwarn) $(FCimpno) $(FCopt) -c
+
+COMPILE_NO_OPENMP_NO_OPT = \
+   $(FC) $(FCbasic) $(INCLUDES) $(FCwarn) $(FCimpno) $(FCchecks) $(FCdebug) -c -O
+COMPILE_ASAP = \
+   $(FC) $(FCbasic) $(INCLUDES) $(FCwarn) $(FCimpno) $(FCdebug) -c -O
+
+COMPILE_FAST = $(COMPILE_BASIC) -c
+COMPILE_NO_CHECKS = $(COMPILE_BASIC) $(FCopt) -c
+COMPILE_NO_OPT    = $(COMPILE_BASIC) $(FCwarn) $(FCimpno) $(FCchecks) $(FCdebug) -c -O
+COMPILE_DEVEL     = $(COMPILE_NO_OPT)
+
+
+# some definitions used in the test makefiles and client makefiles
+
+WORK_COMPILE = \
+   $(FC) $(FCbasic) $(FCopenmp) $(FCchecks) $(FCdebug) $(FCfree) \
+   -I$(MESA_INCLUDE_DIR) -I$(WORK_SRC_DIR) -c
+
+ifeq ($(USE_PGPLOT),YES)
+	WORK_COMPILE += -DUSE_PGPLOT
+endif
+
+TEST_DIR = ..
+TEST_SRC_DIR = $(TEST_DIR)/src
+PACKAGE_DIR = ../..
+LOCAL_LIB_DIR = $(PACKAGE_DIR)/make
+MESA_LIB_DIR = $(MESA_DIR)/lib
+MESA_INCLUDE_DIR = $(MESA_DIR)/include
+TEST_INCLUDES = -I$(LOCAL_LIB_DIR) -I$(PACKAGE_DIR)/public -I$(MESA_INCLUDE_DIR)
+TEST_COMPILE_FLAGS = $(FCbasic) $(FCopenmp) $(TEST_INCLUDES) $(FCchecks) $(FCdebug) $(LIB_FLAGS) -c
+TEST_COMPILE = $(FC) $(TEST_COMPILE_FLAGS) $(LD_FLAGS)
+
+# Library lists / linking commands
+
+LIBS_MATRIX = mtx const math utils
+LOAD_MATRIX_INT = $(addprefix -l,$(LIBS_MATRIX))
+LOAD_MATRIX_EXT = $(LOAD_CRMATH) $(LOAD_LAPACK95) $(LOAD_LAPACK) $(LOAD_BLAS)
+LOAD_MATRIX = $(LOAD_MATRIX_INT) $(LOAD_MATRIX_EXT)
+
+LIBS_MESA_NUMERICS = interp_2d interp_1d num auto_diff $(LIBS_MATRIX)
+LOAD_MESA_NUMERICS_INT = $(addprefix -l,$(LIBS_MESA_NUMERICS))
+LOAD_MESA_NUMERICS_EXT = $(LOAD_MATRIX_EXT) $(LOAD_HDF5)
+LOAD_MESA_NUMERICS = $(LOAD_MESA_NUMERICS_INT) $(LOAD_MESA_NUMERICS_EXT)
+
+LIBS_MESA_MICRO = star_data net eos kap rates neu chem $(LIBS_MESA_NUMERICS)
+LOAD_MESA_MICRO_INT = $(addprefix -l,$(LIBS_MESA_MICRO))
+LOAD_MESA_MICRO_EXT = $(LOAD_MESA_NUMERICS_EXT)
+LOAD_MESA_MICRO = $(LOAD_MESA_MICRO_INT) $(LOAD_MESA_MICRO_EXT)
+
+LIBS_MESA_MACRO = ionization atm colors $(LIBS_MESA_MICRO)
+LOAD_MESA_MACRO_INT = $(addprefix -l,$(LIBS_MESA_MACRO))
+LOAD_MESA_MACRO_EXT = $(LOAD_MESA_MICRO_EXT)
+LOAD_MESA_MACRO = $(LOAD_MESA_MACRO_INT) $(LOAD_MESA_MACRO_EXT)
+
+LIBS_MESA_STAR_SUPPORT = gyre $(LIBS_MESA_MACRO)
+LOAD_MESA_STAR_SUPPORT_INT = $(addprefix -l,$(LIBS_MESA_STAR_SUPPORT))
+LOAD_MESA_STAR_SUPPORT_EXT = $(LOAD_MESA_MACRO_EXT) $(LD_FLAGS)
+LOAD_MESA_STAR_SUPPORT = $(LOAD_MESA_STAR_SUPPORT_INT) $(LOAD_MESA_STAR_SUPPORT_EXT)
+
+LIBS_STAR_MODS = star $(LIBS_MESA_STAR_SUPPORT)
+LOAD_STAR_MODS_INT = $(addprefix -l,$(LIBS_STAR_MODS))
+LOAD_STAR_MODS_EXT = $(LOAD_MESA_STAR_SUPPORT_EXT)
+LOAD_STAR_MODS = $(LOAD_STAR_MODS_INT) $(LOAD_STAR_MODS_EXT)
+
+LIBS_MESA_STAR = $(LIBS_STAR_MODS)
+LOAD_MESA_STAR_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_STAR))
+ifeq ($(USE_PGSTAR),YES)
+   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
+else
+   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) 
+endif
+LOAD_MESA_STAR = $(LOAD_MESA_STAR_INT) $(LOAD_MESA_STAR_EXT)
+
+LIBS_MESA_BINARY = binary $(LIBS_MESA_STAR)
+LOAD_MESA_BINARY_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_BINARY))
+LOAD_MESA_BINARY_EXT = $(LOAD_MESA_STAR_EXT)
+LOAD_MESA_BINARY = $(LOAD_MESA_BINARY_INT) $(LOAD_MESA_BINARY_EXT)
+
+# Due to slow compile with -ggdb and -O2 we add -fno-var-tracking which speeds things up alot
+# At the expense of slightly worse debug information (but no worse than -ggdb -O0 would be, as that implies -fno-var-tracking)
+SLOW_COMPILE = -fno-var-tracking
+
+# LOADER creates executables
+LOADER = $(FC)
+
+STAR_WORK_OBJS = \
+   run_star_extras.o run_star.o 
+
+BINARY_WORK_OBJS = \
+   run_star_extras.o run_binary_extras.o run_binary.o
+
+#Test if we are on windows
+BUILD_ON_WINDOWS=NO
+ifeq ($(OS),Windows_NT)
+   BUILD_ON_WINDOWS=YES
+endif
+
+# Declare phony targets
+.PHONY: all clean install install_lib install_mod
+
+# Path to cp_if_newer script
+CP_IF_NEWER = $(MESA_DIR)/utils/cp_if_newer
+
+# Path to check_sdk_version script
+CHECK_SDK_VERSION = $(MESA_DIR)/utils/check_sdk_version
+
+# makedepf90 invocation (depends on whether we have the SDK2-patched version that
+# supports the -X flag)
+ifneq ($(shell makedepf90 -V | grep sdk2),)
+    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env ieee_arithmetic crmath hdf5
+    MAKEDEPF90 = makedepf90 -m %m.mod -X $(addprefix -u,$(MAKEDEPF90_IGNORE_MODS))
+else
+    MAKEDEPF90 = makedepf90 -m %m.mod
+endif
+    

@@ -1,0 +1,332 @@
+      subroutine estrad(n,nerror,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
+     &          h,dd1,dd2,dd3,fcn,nfcn,y0,y,ijob,x,m1,m2,nm1,
+     &          e1_1D,lde1,z1,z2,z3,cont,f1,f2,ip1,iphes,scal,err,
+     &          first,reject,fac1,lrpar,rpar,lipar,ipar,ier,
+     &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
+     &          decsol,decsols,nzmax,isparse,ia,ja,sa,
+     &          lrd,rpar_decsol,lid,ipar_decsol)
+      implicit none
+      interface
+#include "num_fcn.dek"
+#include "mtx_decsol.dek"
+#include "mtx_decsols.dek"
+      end interface
+      integer :: ia(:) ! (n+1)
+      integer :: ja(:) ! (nzmax)
+      double precision :: sa(nzmax)
+      real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+      integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+      integer, intent(inout), pointer :: ipar(:) ! (lipar)
+      real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+      
+      integer, pointer :: ip1(:) ! (nm1)
+      integer :: iphes(n), n, nerror, ldjac, mljac, mujac, ldmas, mlmas, mumas
+      integer :: nfcn, ijob, m1, m2, nm1, lde1, lrpar, lipar, ier, mle, mue
+      integer :: mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lrd, lid
+      double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
+      double precision, pointer :: e1_1D(:)
+      double precision :: x, scal(n), y0(n), y(n)
+      double precision, pointer, dimension(:) :: cont, z1, z2, z3, f1, f2
+      double precision :: dd1, dd2, dd3, h, fac1, err
+      logical :: first, reject
+      
+      ! LOCALS
+      double precision :: hee1, hee2, hee3, sum, sum1
+      integer :: i, mm, j, k, im1
+      real(dp), pointer :: e1(:,:)
+      real(dp), pointer, dimension(:) :: p1, p2, p3
+      
+      e1(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
+      p1(1:n) => cont(m1+1:m1+n)
+      
+      ier = 0
+      hee1=dd1/h
+      hee2=dd2/h
+      hee3=dd3/h
+
+      mm=m1/m2
+      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+c
+   1  continue
+c ------  b=identity, jacobian a full matrix
+      do  i=1,n 
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      goto 77
+c
+   8  continue
+c ------  b=identity, jacobian a sparse matrix
+      do  i=1,n 
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+      call decsols(1,n,nzmax,ia,ja,sa,cont,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      goto 77
+c
+  11  continue
+c ------  b=identity, jacobian a full matrix, second order
+      do i=1,n 
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+  48  continue
+      do j=1,m2
+         sum1=0.d0
+         do k=mm-1,0,-1
+            sum1=(cont(j+k*m2)+sum1)/fac1
+            do i=1,nm1
+               im1=i+m1
+               cont(im1)=cont(im1)+fjac(i,j+k*m2)*sum1
+            end do
+         end do
+      end do
+      call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      do i=m1,1,-1
+         cont(i)=(cont(i)+cont(m2+i))/fac1
+      end do
+      goto 77
+c
+   2  continue
+c ------  b=identity, jacobian a banded matrix
+      do i=1,n 
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+      call decsol(1,n,lde1,e1_1D,mle,mue,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      goto 77
+c
+  12  continue
+c ------  b=identity, jacobian a banded matrix, second order
+      do i=1,n 
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+  45  continue
+      do j=1,m2
+         sum1=0.d0
+         do k=mm-1,0,-1
+            sum1=(cont(j+k*m2)+sum1)/fac1
+            do i=max(1,j-mujac),min(nm1,j+mljac)
+               im1=i+m1
+               cont(im1)=cont(im1)+fjac(i+mujac+1-j,j+k*m2)*sum1
+            end do
+         end do
+      end do
+      call decsol(1,nm1,lde1,e1_1D,mle,mue,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      do i=m1,1,-1
+         cont(i)=(cont(i)+cont(m2+i))/fac1
+      end do
+      goto 77
+c
+   3  continue
+c ------  b is a banded matrix, jacobian a full matrix
+      do i=1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,n
+         sum=0.d0
+         do j=max(1,i-mlmas),min(n,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*f1(j)
+         end do
+         f2(i)=sum
+         cont(i)=sum+y0(i)
+      end do
+      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      goto 77
+c
+   9  continue
+c ------  b is a banded matrix, jacobian a sparse matrix
+      do i=1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,n
+         sum=0.d0
+         do j=max(1,i-mlmas),min(n,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*f1(j)
+         end do
+         f2(i)=sum
+         cont(i)=sum+y0(i)
+      end do
+      call decsols(1,n,nzmax,ia,ja,sa,z1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      goto 77
+c
+  13  continue
+c ------  b is a banded matrix, jacobian a full matrix, second order
+      do i=1,m1
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+      do i=m1+1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,nm1
+         sum=0.d0
+         do j=max(1,i-mlmas),min(nm1,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*f1(j+m1)
+         end do
+         im1=i+m1
+         f2(im1)=sum
+         cont(im1)=sum+y0(im1)
+      end do
+      goto 48
+c
+   4  continue
+c ------  b is a banded matrix, jacobian a banded matrix
+      do i=1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,n
+         sum=0.d0
+         do j=max(1,i-mlmas),min(n,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*f1(j)
+         end do
+         f2(i)=sum
+         cont(i)=sum+y0(i)
+      end do
+      call decsol(1,n,lde1,e1_1D,mle,mue,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      goto 77
+c
+  14  continue
+c ------  b is a banded matrix, jacobian a banded matrix, second order
+      do i=1,m1
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+      do i=m1+1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,nm1
+         sum=0.d0
+         do j=max(1,i-mlmas),min(nm1,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*f1(j+m1)
+         end do
+         im1=i+m1
+         f2(im1)=sum
+         cont(im1)=sum+y0(im1)
+      end do
+      goto 45
+c
+   5  continue
+c ------  b is a full matrix, jacobian a full matrix
+      do i=1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,n
+         sum=0.d0
+         do j=1,n
+            sum=sum+fmas(i,j)*f1(j)
+         end do
+         f2(i)=sum
+         cont(i)=sum+y0(i)
+      end do
+      call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+      goto 77
+c
+  15  continue
+c ------  b is a banded matrix, jacobian a full matrix, second order
+      do i=1,m1
+         f2(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+         cont(i)=f2(i)+y0(i)
+      end do
+      do i=m1+1,n
+         f1(i)=hee1*z1(i)+hee2*z2(i)+hee3*z3(i)
+      end do
+      do i=1,nm1
+         sum=0.d0
+         do j=1,nm1
+            sum=sum+fmas(i,j)*f1(j+m1)
+         end do
+         im1=i+m1
+         f2(im1)=sum
+         cont(im1)=sum+y0(im1)
+      end do
+      goto 48
+c
+   6  continue
+c ------  b is a full matrix, jacobian a banded matrix
+c ------  this option is not provided
+      return
+c
+c --------------------------------------
+c
+  77  continue
+      err=0.d0
+      do  i=1,n
+         err=err+(cont(i)/scal(i))**2
+      end do
+      err=max(sqrt(err/n),1.d-10)
+c
+      if (err.lt.1.d0) return
+      if (first.or.reject) then
+          do i=1,n
+             cont(i)=y(i)+cont(i)
+          end do
+          call fcn(n,x,h,cont,f1,lrpar,rpar,lipar,ipar,ier)
+          if (ier /= 0) return
+          nfcn=nfcn+1
+          do i=1,n
+             cont(i)=f1(i)+f2(i)
+          end do
+          goto (31,32,31,32,31,32,55,55,33,55,41,42,41,42,41), ijob
+c ------ full matrix option
+  31      continue
+          call decsol(1,n,lde1,e1_1D,n,n,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+          goto 88
+c ------ full matrix option, second order
+ 41      continue
+         do j=1,m2
+            sum1=0.d0
+            do k=mm-1,0,-1
+               sum1=(cont(j+k*m2)+sum1)/fac1
+               do i=1,nm1
+                  im1=i+m1
+                  cont(im1)=cont(im1)+fjac(i,j+k*m2)*sum1
+               end do
+            end do
+         end do
+         call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier) 
+         do i=m1,1,-1
+            cont(i)=(cont(i)+cont(m2+i))/fac1
+         end do
+         goto 88
+c ------ banded matrix option
+ 32      continue
+         call decsol(1,n,lde1,e1_1D,mle,mue,cont,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         goto 88
+c ------ banded matrix option, second order
+ 42      continue
+         do j=1,m2
+            sum1=0.d0
+            do k=mm-1,0,-1
+               sum1=(cont(j+k*m2)+sum1)/fac1
+               do i=max(1,j-mujac),min(nm1,j+mljac)
+                  im1=i+m1
+                  cont(im1)=cont(im1)+fjac(i+mujac+1-j,j+k*m2)*sum1
+               end do
+            end do
+         end do
+         call decsol(1,nm1,lde1,e1_1D,mle,mue,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         do i=m1,1,-1
+            cont(i)=(cont(i)+cont(m2+i))/fac1
+         end do
+          goto 88
+c ------ sparse matrix option
+  33      continue
+          call decsols(1,n,nzmax,ia,ja,sa,cont,lrd,rpar_decsol,lid,ipar_decsol,ier)
+          goto 88
+c -----------------------------------
+   88     continue
+          err=0.d0 
+          do i=1,nerror
+             err=err+(cont(i)/scal(i))**2
+          end do
+          err=max(sqrt(err/nerror),1.d-10)
+       end if
+       return
+c -----------------------------------------------------------
+  55   continue
+       write(*,*) 'estrad: invalid ijob', ijob
+       call mesa_error(__FILE__,__LINE__) ! estrad
+       end subroutine estrad

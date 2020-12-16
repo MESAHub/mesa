@@ -1,0 +1,38 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+
+echo 'create ionization_data'
+
+rm -rf ionization_data
+
+cp test/ionization_data.tar.xz .
+check_okay
+
+echo 'xz -d ionization_data.tar.xz'
+xz -d ionization_data.tar.xz
+check_okay
+
+tar -xf ionization_data.tar
+check_okay
+rm ionization_data.tar
+
+rm -rf ../data/ionization_data
+check_okay
+
+mkdir ../data/ionization_data
+check_okay
+
+mv ionization_data/*.data ../data/ionization_data
+check_okay
+
+mkdir ../data/ionization_data/cache
+check_okay
+
+echo "done"

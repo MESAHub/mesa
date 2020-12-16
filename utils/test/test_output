@@ -1,0 +1,35 @@
+
+ test_dict
+ okay
+
+
+ test_idict
+ okay
+
+
+ test_token_read
+
+ name_token           4 file
+ name_token           1 =
+ string_token           9 token.txt
+ name_token           5 file2
+ name_token           1 =
+ string_token          10 token2.txt
+ name_token           8 add_isos
+ left_paren_token
+ name_token           3 ih1
+ comma_token
+ name_token           4 ihe4
+ comma_token
+ name_token           4 ic12
+ right_paren_token
+ name_token          13 add_reactions
+ left_paren_token
+ name_token           6 rc12pg
+ comma_token
+ name_token           6 rc12ap
+ right_paren_token
+ eof_token
+
+ done test_token_read
+

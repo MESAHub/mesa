@@ -1,0 +1,47 @@
+&kap
+   read_extra_kap_inlist1 = .true.
+   extra_kap_inlist1_name = 'inlist_ppisn'
+/
+
+&eos
+   read_extra_eos_inlist1 = .true.
+   extra_eos_inlist1_name = 'inlist_ppisn'
+/
+
+&star_job
+   create_pre_main_sequence_model = .true.
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'he_dep.mod'
+   required_termination_code_string = 'xa_central_lower_limit'
+
+   read_extra_star_job_inlist1 = .true.
+   extra_star_job_inlist1_name = 'inlist_ppisn'
+
+/ !end of star_job namelist
+
+
+&controls
+
+   read_extra_controls_inlist1 = .true.
+   extra_controls_inlist1_name = 'inlist_ppisn'
+
+  ! stop when the center mass fraction of h1 drops below this limit
+    xa_central_lower_limit_species(1) = 'he4'
+    xa_central_lower_limit(1) = 1d-3
+
+  ! relax this or you get tiny timesteps during pre He-ZAMS
+    limit_for_rel_error_in_energy_conservation = -1d0
+    hard_limit_for_rel_error_in_energy_conservation = -1d0
+    max_abs_rel_run_E_err = 1d99
+
+    x_logical_ctrl(3) = .false.
+
+/ ! end of controls namelist
+
+&pgstar
+
+   read_extra_pgstar_inlist1 = .true.
+   extra_pgstar_inlist1_name = 'inlist_pgstar'
+
+/ ! end of pgstar namelist

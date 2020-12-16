@@ -1,0 +1,169 @@
+
+! inlist_make_sdb
+
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'standard_start_he_core_flash.mod' ! from 1M_pre_ms_to_wd, 13696.
+
+      change_initial_net = .true.      
+      new_net_name = 'basic_plus_fe56_ni58.net'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'sdb.mod'
+      required_termination_code_string = 'xa_central_upper_limit'
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      !change_initial_v_flag = .true.
+      !new_v_flag = .true.
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !change_conv_vel_flag = .true.
+      !new_conv_vel_flag = .true.
+
+      !set_initial_dt = .true.
+      !years_for_initial_dt = 1d-6
+      
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&kap
+      Zbase = 0.02d0
+
+      use_Type2_opacities = .true.
+      kap_file_prefix = 'OP_gs98'
+
+
+/ ! end of kap namelist
+
+
+&eos
+
+
+/ ! end of eos namelist
+
+
+&controls
+
+      ! The following controls turn off winds after the H envelope is reduced to a specified mass.
+      x_ctrl(1) = 5d-3 ! desired H envelope mass
+      x_ctrl(2) = 1d-2 ! tolerance for envelope mass (as fraction of x_ctrl(1))
+      
+      xa_central_upper_limit_species(1) = 'c12'
+      xa_central_upper_limit(1) = 0.05d0
+      
+      when_to_stop_rtol = 1d-3
+      when_to_stop_atol = 1d-5
+      
+
+      convergence_ignore_equL_residuals = .true. ! needed during He flash
+
+      use_dedt_form_of_energy_eqn = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 4200
+
+      varcontrol_target = 1d-3
+
+      initial_mass = 1
+      initial_z = 0.02d0
+      
+      
+      min_timestep_limit = 1d-6 ! (seconds)
+         
+      do_conv_premix = .true.
+      do_premix_heating = .true.
+
+      cool_wind_full_on_T = 9.99d9
+      hot_wind_full_on_T = 1d10
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 0.75d0
+      Reimers_scaling_factor = 200d0 ! 10 too small
+      Blocker_scaling_factor = 0.2d0  
+
+      scale_max_correction = 0.2d0
+      ignore_species_in_max_correction = .true.
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 5
+      terminal_interval = 5
+      write_header_frequency = 10
+      
+      !photo_interval = 1
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+
+! FOR DEBUGGING
+
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+
+      !solver_save_photo_call_number = 0
+         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+
+      !solver_test_partials_k = 135
+      !solver_test_partials_call_number = 313
+      !solver_test_partials_iter_number = 4
+      !solver_test_partials_dx_0 = 1d-4
+      !solver_test_partials_var_name = 'lnT'
+      !solver_test_partials_equ_name = 'dlnE_dt'
+      !solver_test_partials_k_low = 133
+      !solver_test_partials_k_high = 139
+      
+      
+      !solver_test_partials_write_eos_call_info = .true.
+
+      
+      !solver_test_eos_partials = .false.
+      !solver_test_kap_partials = .false.
+      !solver_test_net_partials = .false.
+      !solver_test_atm_partials = .false.
+
+      !report_why_dt_limits = .true.
+      !report_all_dt_limits = .true.
+      
+      !show_mesh_changes = .true.
+      !mesh_dump_call_number = 5189
+      !okay_to_remesh = .false.
+      
+      !trace_evolve = .true.
+
+      !stop_for_bad_nums = .true.
+      
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+         !pause = .true.
+         !Profile_Panels4_win_flag = .true. ! Abundance, Power, Mixing_Ds, and Dynamo    
+         Profile_Panels4_num_panels = 3
+         Profile_Panels4_title = 'Abundance-Power-Mixing'
+         !History_Panels1_win_flag = .true. ! logT, logRho, log_L, log_Teff
+         Grid8_win_flag = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
+         
+         Profile_Panels4_xaxis_name = 'mass'
+         Profile_Panels4_xaxis_reversed = .false.
+
+
+/ ! end of pgstar namelist

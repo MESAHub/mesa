@@ -1,0 +1,31 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		echo "FAILED"
+		echo
+		exit 1
+	fi
+}
+
+DIR=`pwd`
+check_okay
+aprgdir="$DIR"/../adipack.c
+check_okay
+export aprgdir="$aprgdir"
+check_okay
+export PATH="$aprgdir"/bin:"$PATH"
+check_okay
+fgong-amdl.d Gemma.fgong amdl.mesa > .list
+check_okay
+scan-amdl.d amdl.mesa >> .list
+check_okay
+adipls.c.d adipls.c.in >> .list
+check_okay
+set-obs.d 16 mesa >> .list
+check_okay
+mv obs.mesa obs.txt
+check_okay
+ndiff -quiet -relerr 1e-9 obs.txt obs.test.txt

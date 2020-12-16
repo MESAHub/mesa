@@ -1,0 +1,182 @@
+--  _TRACE "@wterm' Nth Nthick=',Nthick(1),"
+  <*NTH: find Nthick *>;
+  <*SMOold: smear RHO *>;
+  <*SMOOTH* smear RHO *>;
+%_NTH:O
+_Define
+@FJ1    Y(NVARS*NZON-NCND+(NZON-NCND)*(L-1)+KM,1)
+;
+  Subroutine NTH(INCND);
+    -- NTM: finds in Nthick(L) the zone numbers of
+    -- optically thick zones for all NFRUS frequency groups
+    Implicit real*8 (a-h,o-z);
+    _Includen snrad;
+    _Includen abo;
+    Logical Newth;
+ -- Parameter(EPTHIN= 3.D-2, EPTHIC= 1.D-5);
+    Parameter(EPTHIN= 1.D-1, EPTHIC= 1.D-3);
+ -- Parameter(EPTHIN= 1.D-99, EPTHIC= 1.D-100);
+    Parameter(FLORTH= 1.D-08);
+    Parameter(Thttau= 15.d0); -- medium value for the range of tau
+--    Parameter(Thttau= 3.d0); -- medium value for the range of tau
+        -- where the transition to "thick" values of Edd. factors occurs
+    Dimension TauL(NFREQ),TauT(NFREQ),MthNEW(Nfreq);
+    _Include black;
+--    Thttau=FitTau;
+    Newth=.False.;
+    <*TAU: find NTHICK(L) using optical depth from outer radius *>;
+--  _DO L=1,NFRUS; Nthick(L)=INCND  _od; -- test
+    <*NONEQ: put Lthick(L,KM)=.TRUE. for zones where @FJ1==BLACK *>;
+    If(Newth)then;
+      Needbr=.true.;
+      -- Evalja=.true.; -- formally is needed here but the results
+                        -- are worse with this line included
+      -- JSTART=0; -- not needed & even dangerous here
+    endif;
+    RETURN;
+    END;
+%_NTH_TAU:
+    NTM=nzon;
+     _DO L=1,NFRUS;
+         TauT(L)=0.D0;
+         Nthnew(L)=0;
+         Mthnew(L)=Nzon;
+         NTM=min(NTM,Nthick(l));
+     _OD;
+     Kmth=NZON; TauMIN=0.D0; tauste=0.d0;
+     _WHILE  Kmth>1 &
+               ( Kmth>=NTM ! TauMIN<=Tautol*ThtTau ! Kmth>=INCND) _Do
+         TP=Ty(Kmth); PL=3.D0*DM(Kmth)/(Ry(Kmth)**3-Ry(Kmth-1)**3);
+         _Do ii=1, Natom;  Yat(ii)=YABUN(ii,Kmth) _od;
+         RADP=.FALSE.;
+         CALL URSOS; kmhap=Kmth;CALL HAPPA;
+--         MTM=Nzon;
+         _Do L=1,NFRUS;
+            tauste=((Ry(Kmth)-Ry(Kmth-1))*PL)*HAPPAL(L);
+            If(Scat)then;
+              TAUabs=(Ry(Kmth)-Ry(Kmth-1))*HAPabs(L)*PL;
+              TAUsca=tauste-Tauabs;
+              If(Tausca>1.d0)then;
+                tauste=sqrt(Tauabs*Tausca);
+              else;
+                tauste=Tauabs;
+              endif;
+            endif;
+            TauT(L)=TauT(L)+tauste;
+            If(L==1 ! TauT(L)<TauMIN) TauMIN=TauT(L);
+            If(Kmth==Nthick(L)) TauL(L)=TauT(L); -- Tau last
+            If (TauT(L)>ThtTau  & NthNEW(L)==0) NthNEW(L)=Kmth;
+            If(tauste<ThtTau/TauTol) MthNEW(L)=Kmth;
+/*            If(L==11) WRITE(0,'(A,I5,1P,3E11.3)')
+               'K tauste a s:',Kmth,tauste,tauabs,tausca;
+            If(L==11) WRITE(@Wres,'(A,I5,1P,3E11.3)')
+               'K tauste a s:',Kmth,tauste,tauabs,tausca;
+               */
+       --     MTM=min(MTM,MthNEW(L));
+         _od;
+         Kmth=Kmth-1
+     _od;
+     -- @wterm' MTM=',MTM;
+     _Do L=1,NFRUS;
+            If ((Taul(L)>Tautol*ThtTau  ! Taul(L)*Tautol<ThtTau
+                 ! MthNEW(L)<Nthick(L))
+                 & MIN(MthNEW(L),NthNEW(L),NZON-3)^=Nthick(L)
+                 )Then;
+     --          & (NthNEW(L)>incnd))Then;
+               Nthick(L)=MIN(MthNEW(L),NthNEW(L),NZON-3);
+               Newth = .TRUE.;
+            endif;
+    --   IF(Newth) WRITE(0,'(A,3I5,1P,E11.3)')
+      --     'L Nthick Mth TauL(L): ',L,Nthick(L),MthNEW(L),Taul(L);
+     _od;
+%_NTH_NONEQ:
+    _Do KM=INCND+1,NZON-3;
+       TP=Ty(KM);
+       _Do L=1,NFRUS;
+         BLA=MAX(BLACK(L,TP),1.D-40);
+         If(LTHICK(L,KM))Then;
+          --If((abs(@FJ1/BLA-1.D0)>EPTHIN & @FJ1>FLORTH)
+            If(abs(@FJ1/BLA-1.D0)>EPTHIN
+                .or. KM>NTHICK(L))Then;
+               LTHICK(L,KM)=.FALSE.;
+               Newth = .TRUE.;
+    --         WRITE(5,'(A,2I5)') 'Lthick=F, L KM :',L,KM;
+            Endif;
+         Else;
+          --If((abs(@FJ1/BLA-1.D0)<EPTHIC .or. @FJ1<FLORTH)
+            If(abs(@FJ1/BLA-1.D0)<EPTHIC
+                & KM<=NTHICK(L))Then;
+               LTHICK(L,KM)=.TRUE.;
+               Newth = .TRUE.;
+            -- WRITE(5,'(A,2I5)') 'Lthick=T, L KM :',L,KM;
+            --If(@FJ1<FLORTH) WRITE(5,*)' @FJ1<FLORTH';
+            Endif;
+         Endif;
+ --             LTHICK(L,KM)=.FALSE.; -- test!!!
+       _od;
+     _od;
+%_SMOold:O
+  Subroutine SMOOTH;
+    Implicit real*8 (a-h,o-z);
+    _Includen snrad;
+    Logical PEEK,FOUNDP;
+    Parameter(DSMTH=1.3D0);
+    ISM=0;
+    _Repeat
+      FOUNDP=.FALSE.; -- is there any peek?
+      PEEK=.FALSE.;   -- are we inside some peek?
+      DNN0=DM(NCND+2)/(Y(NCND+2,1)**3-Y(NCND+1,1)**3);
+      _Do KM=NCND+3,NZON;
+        DNN=DM(KM)/(Y(KM,1)**3-Y(KM-1,1)**3);
+        If(DNN>(DNN0*DSMTH))Then;
+          FOUNDP=.TRUE.;
+          IF(^PEEK) DNBEG=DNN0; -- initial density in peek
+          PEEK  =.TRUE.;
+  --      WRITE(5,'(A,1P,G12.3)')'DEN=',DNN;
+          Y(KM-1,1)=Y(KM-2,1)+(Y(KM-1,1)-Y(KM-2,1))*((DNN0*DSMTH)/DNN);
+          DNN=DM(KM)/(Y(KM,1)**3-Y(KM-1,1)**3);
+  --      WRITE(5,'(A,1P,G12.3)')'DEN DOWN=',DNN;
+          ISM=ISM+1;
+        endif;
+        If(PEEK)Then;
+          If(DNN*DSMTH<DNN0)Then;
+       -- WRITE(5,'(A,1P,G12.3)')'DEN=',DNN;
+            Y(KM-1,1)=Y(KM,1)
+                       -(Y(KM,1)-Y(KM-1,1))*((DNN*Dsmth)/DNN0);
+            DNN=DM(KM)/(Y(KM,1)**3-Y(KM-1,1)**3);
+       -- WRITE(5,'(A,1P,G12.3)')'DEN UP=',DNN;
+          ISM=ISM+1;
+          endif;
+          IF(DNN<DNBEG) PEEK=.FALSE.;
+        endif;
+        DNN0=DNN;
+      _od;
+    _until ^FOUNDP;
+    If(ISM^=0)WRITE(@Wres,*)'Smooth done ',ISM,' times';
+  return;
+  end;
+%_SMOOTH:
+  Subroutine SMOOTH;
+    Implicit real*8 (a-h,o-z);
+    _Includen snrad;
+    Parameter(DSMTH=1.3D0,Fsmth=1.2);
+    ISM=0;
+    DNN0=DM(NCND+2)/(Y(NCND+2,1)**3-Y(NCND+1,1)**3);
+    _Do KM=NCND+3,NZON;
+        DNN=DM(KM)/(Y(KM,1)**3-Y(KM-1,1)**3);
+        If(DNN>(DNN0*Fsmth))Then;
+  --      WRITE(5,'(A,1P,G12.3)')'DEN=',DNN;
+          Y(KM-1,1)=max(
+            (Y(KM-2,1) +Y(KM,1)*(Fsmth*dM(KM-1)/dm(KM)))/
+                         (1.+(Fsmth*dM(KM-1)/dm(KM))),
+             Y(KM-2,1)+(Y(KM-1,1)-Y(KM-2,1))/(1.+0.5*(Fsmth-1.))
+                        );
+          DNN=DM(KM)/(Y(KM,1)**3-Y(KM-1,1)**3);
+  --      WRITE(5,'(A,1P,G12.3)')'DEN DOWN=',DNN;
+          ISM=ISM+1;
+        endif;
+        DNN0=DNN;
+    _od;
+    If(ISM^=0)WRITE(@Wres,*)'Smooth done ',ISM,' times';
+  return;
+  end;

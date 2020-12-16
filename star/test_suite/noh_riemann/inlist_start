@@ -1,0 +1,35 @@
+&star_job
+      
+      show_log_description_at_start = .false. 
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+      constant_L = .true.
+      zero_gravity = .true.
+      gamma_law_hydro = 1.66667d0
+
+      x_logical_ctrl(1) = .true. ! build starting model
+      x_ctrl(1) = -1d0 ! initial velocity
+      x_ctrl(3) = 1d-3 ! 1d-4 ! 1d-3  ! R_min
+      x_ctrl(4) = 1.0 ! R_max
+      x_ctrl(5) = 1d0 ! rho, gm/c^3
+      x_ctrl(6) = 1d-6 ! pressure
+
+
+/ ! end of controls namelist
+
+
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

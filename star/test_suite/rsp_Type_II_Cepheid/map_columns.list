@@ -1,0 +1,24 @@
+! map_columns.list -- determines the contents of rsp map output
+! units are cgs unless otherwise noted.
+
+   temperature
+   rsp_Hp_face
+   rsp_Y_face
+   rsp_PII_face
+   rsp_Lc_div_L
+   rsp_Lr_div_L
+   rsp_Lt_div_L
+   rsp_Et
+   energy
+   csound
+   rsp_Pt
+   pressure
+   rsp_Eq
+   rsp_src_snk
+   rsp_Uq
+   rsp_avQ
+   vel_km_per_s
+   v_div_csound
+   avg_charge_H
+   avg_charge_He
+   xq

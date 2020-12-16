@@ -1,0 +1,79 @@
+
+&star_job
+   
+      load_saved_model = .true.
+      saved_model_name = '30M_mesa_201_lgT9p78.mod'
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'log_center_temp_limit'
+            
+      
+      !pgstar_flag = .true.
+
+      !first_model_for_timing = 2
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+
+&kap
+/ ! end of kap namelist
+
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 100      
+
+! Stoppping criteria
+      log_center_temp_limit = 9.81d0
+
+
+!    This controls some options in run_stars_extras depending on whether we are running the inlist_initial or inlist_30M_big_net
+      x_logical_ctrl(1) = .false. ! Is initial run?
+   
+   
+! output
+      terminal_show_age_units = 'seconds'
+
+      num_trace_history_values = 3
+      trace_history_value_name(1) = 'burn_solver_maxsteps'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+      trace_history_value_name(3) = 'rel_E_err'
+      
+      photo_interval = 5
+      profile_interval = 5
+      history_interval = 1
+      terminal_interval = 1
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+
+!pause = .true.
+!clear_history = .true.
+         
+Grid2_win_flag = .true.
+
+
+! file output
+!Grid2_file_flag = .true.
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'grid_'
+Grid2_file_interval = 1 ! output when mod(model_number,Grid2_file_interval)==0
+Grid2_file_width = -1 ! negative means use same value as for window
+Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
+      
+
+Abundance_xmax = 2.1 ! -101 ! only used if /= -101d0
+Profile_Panels1_xmax = 2.1 ! -101d0 ! only used if /= -101d0
+kipp_file_flag=.true.
+kipp_file_dir='png'
+
+/ ! end of pgstar namelist

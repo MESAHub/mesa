@@ -1,0 +1,33 @@
+June, 2010 - Aaron Dotter
+updated April-May, 2020
+
+The eosFreeEOS_builder creates EOS tables using the FreeEOS
+code in the MESA/eos format.  If FreeEOS fails to provide
+sane values, then the code takes values from MESA's eosDT_get.
+If eosDT_get fails, then the code reverts to HELM.
+
+FreeEOS is written by Alan Irwin and distributed under the GPL,
+see ./free_eos-2.2.1/docs/COPYING. The version included here is
+based on FreeEOS v2.2.1.
+
+The controls for the program, free_eos_table, are set mostly in
+the inlist file.  The X and Z values and filenames for different
+tables are given as command line arguments. Run the program
+without any arguments to see the structure of the arguments.
+
+For example, running
+
+     ./free_eos_table   0.02   0.70   mesa-FreeEOS_02z70x.data
+
+produces a table with Z=0.02 and X=0.70.  All table files are
+written to the data/ directory.
+
+The mass fractions of Z for the 18 elements (other than H and He)
+considered by FreeEOS should be set in the file pointed to by
+mass_list in the inlist.  Any set of mass fractions for the
+18 elements listed in these files should work but not all have
+been tested.  Two examples are provided:
+
+- mass_frac_solar.txt gives a solar abundance pattern
+
+- mass_frac_CO.txt gives a 50/50 mix of carbon and oxygen

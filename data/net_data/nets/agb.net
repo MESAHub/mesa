@@ -1,0 +1,54 @@
+      ! 'agb'
+
+         add_isos(
+            neut
+	         h1
+            h2
+            he3
+            he4
+            li7
+            be7
+            b8
+            c12
+            c13
+            n13
+            n14
+            n15
+            o16
+            o17
+            o18
+            f19
+	         ne22
+            )     
+         
+         add_reactions(
+            r_h1_h1_wk_h2   
+            r_h2_pg_he3
+            r_he3_he3_to_h1_h1_he4 
+            r_he3_ag_be7    
+            r_be7_wk_li7
+            r_li7_pa_he4
+            r_be7_pg_b8
+            r_b8_wk_he4_he4 
+            r_b8_gp_be7 
+            r_c12_pg_n13 
+            r_n13_wk_c13
+            r_c13_pg_n14
+            rn14_to_n15
+            r_n15_pa_c12
+            r_n15_pg_o16
+            ro16_to_o17
+            r_o17_pa_n14 
+            ro17_to_o18
+            r_o18_pa_n15
+            r_o18_pg_f19
+            r_f19_pa_o16
+            r_he4_he4_he4_to_c12
+            r_c12_ag_o16
+            rn14ag_to_o18
+            r_o18_ag_ne22
+	         r_f19_ap_ne22
+	         r_c13_an_o16
+            )     
+
+

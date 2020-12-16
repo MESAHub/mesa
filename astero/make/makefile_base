@@ -1,0 +1,139 @@
+# This is the makefile for the mesa astero library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+	
+# define the PGSTAR files for astero
+ifeq ($(USE_PGSTAR),YES)
+PGSTAR_SRCS = pgstar_astero_plots.f90
+else
+PGSTAR_SRCS = pgstar_astero_plots_stub.f90
+endif
+
+ifeq ($(USE_GYRE),YES)
+GYRE_SRCS = gyre_support.f90
+else
+GYRE_SRCS = gyre_support_stub.f90
+endif
+	
+
+SRCS = \
+	astero_def.f90 \
+	adipls_support.f90 \
+	adipls_support_procs.f90 \
+	$(GYRE_SRCS) \
+	astero_support.f90 \
+	$(PGSTAR_SRCS) \
+	extras_support.f90 \
+	astero_run_support.f90 \
+	astero_lib.f90
+
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = $(LIBS_MESA_STAR)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR) -ladipls
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libastero.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) astero_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) astero_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+	@$(CP_IF_NEWER) ../public/*.inc $(MESA_DIR)/include
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+MOD_DEFAULTS_DIR = $(MODULE_DIR)/defaults
+MOD_OTHER_DIR = $(MODULE_DIR)/other
+
+ASTERO_INCLUDES = -I$(MOD_DEFAULTS_DIR)
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(ASTERO_INCLUDES)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(ASTERO_INCLUDES)
+
+COMPILE_CMD = $(COMPILE)
+COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE))
+
+%.o : %.mod
+
+pgstar_astero_plots.o: %.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY $<
+	@$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
+else
+	$(COMPILE_LEGACY) $(SLOW_COMPILE) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_OTHER_DIR):$(MOD_DEFAULTS_DIR)
+
+vpath %.f90 $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+vpath %.defaults $(MOD_DEFAULTS_DIR)
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

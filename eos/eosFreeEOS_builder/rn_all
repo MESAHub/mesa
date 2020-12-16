@@ -1,0 +1,122 @@
+#!/bin/bash
+
+#./free_eos_table     Z      X   table name
+# Z = 0.00
+./free_eos_table   0.00   0.00   mesa-FreeEOS_00z00x.data
+./free_eos_table   0.00   0.10   mesa-FreeEOS_00z10x.data
+./free_eos_table   0.00   0.20   mesa-FreeEOS_00z20x.data 
+./free_eos_table   0.00   0.30   mesa-FreeEOS_00z30x.data
+./free_eos_table   0.00   0.40   mesa-FreeEOS_00z40x.data 
+./free_eos_table   0.00   0.50   mesa-FreeEOS_00z50x.data
+./free_eos_table   0.00   0.60   mesa-FreeEOS_00z60x.data 
+./free_eos_table   0.00   0.70   mesa-FreeEOS_00z70x.data
+./free_eos_table   0.00   0.80   mesa-FreeEOS_00z80x.data
+./free_eos_table   0.00   0.90   mesa-FreeEOS_00z90x.data
+./free_eos_table   0.00   1.00   mesa-FreeEOS_00z100x.data
+
+# Z = 0.02
+./free_eos_table   0.02   0.00   mesa-FreeEOS_02z00x.data
+./free_eos_table   0.02   0.10   mesa-FreeEOS_02z10x.data
+./free_eos_table   0.02   0.20   mesa-FreeEOS_02z20x.data 
+./free_eos_table   0.02   0.30   mesa-FreeEOS_02z30x.data
+./free_eos_table   0.02   0.40   mesa-FreeEOS_02z40x.data 
+./free_eos_table   0.02   0.50   mesa-FreeEOS_02z50x.data
+./free_eos_table   0.02   0.60   mesa-FreeEOS_02z60x.data 
+./free_eos_table   0.02   0.70   mesa-FreeEOS_02z70x.data
+./free_eos_table   0.02   0.80   mesa-FreeEOS_02z80x.data
+./free_eos_table   0.02   0.90   mesa-FreeEOS_02z90x.data
+./free_eos_table   0.02   0.98   mesa-FreeEOS_02z98x.data
+
+# Z = 0.04
+./free_eos_table   0.04   0.00   mesa-FreeEOS_04z00x.data
+./free_eos_table   0.04   0.10   mesa-FreeEOS_04z10x.data
+./free_eos_table   0.04   0.20   mesa-FreeEOS_04z20x.data 
+./free_eos_table   0.04   0.30   mesa-FreeEOS_04z30x.data
+./free_eos_table   0.04   0.40   mesa-FreeEOS_04z40x.data 
+./free_eos_table   0.04   0.50   mesa-FreeEOS_04z50x.data
+./free_eos_table   0.04   0.60   mesa-FreeEOS_04z60x.data 
+./free_eos_table   0.04   0.70   mesa-FreeEOS_04z70x.data
+./free_eos_table   0.04   0.80   mesa-FreeEOS_04z80x.data
+./free_eos_table   0.04   0.90   mesa-FreeEOS_04z90x.data
+./free_eos_table   0.04   0.96   mesa-FreeEOS_04z96x.data
+
+# Z = 0.06
+./free_eos_table   0.06   0.00   mesa-FreeEOS_06z00x.data
+./free_eos_table   0.06   0.10   mesa-FreeEOS_06z10x.data
+./free_eos_table   0.06   0.20   mesa-FreeEOS_06z20x.data 
+./free_eos_table   0.06   0.30   mesa-FreeEOS_06z30x.data
+./free_eos_table   0.06   0.40   mesa-FreeEOS_06z40x.data 
+./free_eos_table   0.06   0.50   mesa-FreeEOS_06z50x.data
+./free_eos_table   0.06   0.60   mesa-FreeEOS_06z60x.data 
+./free_eos_table   0.06   0.70   mesa-FreeEOS_06z70x.data
+./free_eos_table   0.06   0.80   mesa-FreeEOS_06z80x.data
+./free_eos_table   0.06   0.90   mesa-FreeEOS_06z90x.data
+./free_eos_table   0.06   0.94   mesa-FreeEOS_06z94x.data
+
+# Z = 0.08
+./free_eos_table   0.08   0.00   mesa-FreeEOS_08z00x.data
+./free_eos_table   0.08   0.10   mesa-FreeEOS_08z10x.data
+./free_eos_table   0.08   0.20   mesa-FreeEOS_08z20x.data 
+./free_eos_table   0.08   0.30   mesa-FreeEOS_08z30x.data
+./free_eos_table   0.08   0.40   mesa-FreeEOS_08z40x.data 
+./free_eos_table   0.08   0.50   mesa-FreeEOS_08z50x.data
+./free_eos_table   0.08   0.60   mesa-FreeEOS_08z60x.data 
+./free_eos_table   0.08   0.70   mesa-FreeEOS_08z70x.data
+./free_eos_table   0.08   0.80   mesa-FreeEOS_08z80x.data
+./free_eos_table   0.08   0.90   mesa-FreeEOS_08z90x.data
+./free_eos_table   0.08   0.92   mesa-FreeEOS_08z92x.data
+
+
+# Z = 0.10
+./free_eos_table   0.10   0.00   mesa-FreeEOS_10z00x.data
+./free_eos_table   0.10   0.10   mesa-FreeEOS_10z10x.data
+./free_eos_table   0.10   0.40   mesa-FreeEOS_10z40x.data
+./free_eos_table   0.10   0.90   mesa-FreeEOS_10z90x.data
+
+# Z = 0.20
+./free_eos_table   0.20   0.00   mesa-FreeEOS_20z00x.data
+./free_eos_table   0.20   0.10   mesa-FreeEOS_20z10x.data
+./free_eos_table   0.20   0.80   mesa-FreeEOS_20z80x.data
+
+# Z = 0.30
+./free_eos_table   0.30   0.00   mesa-FreeEOS_30z00x.data
+./free_eos_table   0.30   0.10   mesa-FreeEOS_30z10x.data
+./free_eos_table   0.30   0.70   mesa-FreeEOS_30z70x.data
+
+# Z = 0.40
+./free_eos_table   0.40   0.00   mesa-FreeEOS_40z00x.data
+./free_eos_table   0.40   0.10   mesa-FreeEOS_40z10x.data
+./free_eos_table   0.40   0.60   mesa-FreeEOS_40z60x.data
+
+# Z = 0.50
+./free_eos_table   0.50   0.00   mesa-FreeEOS_50z00x.data
+./free_eos_table   0.50   0.10   mesa-FreeEOS_50z10x.data
+./free_eos_table   0.50   0.50   mesa-FreeEOS_50z50x.data
+
+# Z = 0.60
+./free_eos_table   0.60   0.00   mesa-FreeEOS_60z00x.data
+./free_eos_table   0.60   0.10   mesa-FreeEOS_60z10x.data
+./free_eos_table   0.60   0.40   mesa-FreeEOS_60z40x.data
+
+# Z = 0.70
+./free_eos_table   0.70   0.00   mesa-FreeEOS_70z00x.data
+./free_eos_table   0.70   0.10   mesa-FreeEOS_70z10x.data
+./free_eos_table   0.70   0.30   mesa-FreeEOS_70z30x.data
+
+# Z = 0.80
+./free_eos_table   0.80   0.00   mesa-FreeEOS_80z00x.data
+./free_eos_table   0.80   0.10   mesa-FreeEOS_80z10x.data
+./free_eos_table   0.80   0.20   mesa-FreeEOS_80z20x.data
+
+# Z = 0.90
+./free_eos_table   0.90   0.00   mesa-FreeEOS_90z00x.data
+./free_eos_table   0.90   0.10   mesa-FreeEOS_90z10x.data
+
+# Z = 1.00
+./free_eos_table   1.00   0.00   mesa-FreeEOS_100z00x.data
+
+
+# to make a 50/50 CO table,
+# 1. edit the inlist to use mass_frac_CO.txt and
+# 2. run the final line again with a new filename
+# e.g., ./free_eos_table   1.00   0.00   mesa-FreeEOS_100z00x_CO.data

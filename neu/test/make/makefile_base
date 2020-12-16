@@ -1,0 +1,92 @@
+# This is the makefile for testing the mesa neutrino losses library
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+TEST_SRCS = neu_support.f test_neu.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = neu
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+
+TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+
+all : $(TEST)
+
+$(TEST) : $(TEST_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+
+$(TEST) : OBJS = $(TEST_OBJS)
+
+$(TEST_DIR)/% :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(TEST)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfixed) $<
+else
+	$(TEST_COMPILE) $(FCfixed) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(TEST_SRC_DIR)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

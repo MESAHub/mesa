@@ -1,0 +1,2 @@
+./../../utils/test/ck3
+echo "NOTE: ck assumes ckap built with do_kappa_test = .true. in create_tables"

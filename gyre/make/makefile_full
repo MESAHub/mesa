@@ -1,0 +1,110 @@
+# This is the makefile for the mesa gyre full library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = gyre_lib.f90
+
+
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = $(LIBS_MATRIX)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libgyre.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) *.o $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) *.o $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.f90 *.fpp *.mod .depend *.so *.a ../public/gyre_lib.f
+
+install:
+	@$(CP_IF_NEWER) gyre_lib.f90 ../public/gyre_lib.f
+	@$(CP_IF_NEWER) gyre_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+#################################################################
+#
+# COMPILATION RULES
+
+GYRE_DIRS = $(subst $(eval) ,:,$(shell test -d ../gyre && find ../gyre/src -type d))
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) -Wno-uninitialized -L$(MESA_DIR)/lib -lconst $(LOAD_MATRIX)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) -Wno-uninitialized
+
+FPX3FLAGS = -DOMP -DDOUBLE_PRECISION -I.:$(GYRE_DIRS):../gyre/src/mesa
+
+ifeq ($(USE_OPENMP),YES)
+FPX3FLAGS := $(FPX3FLAGS) -DOMP
+endif
+
+ifeq ($(USE_HDF5),YES)
+FPX3FLAGS := $(FPX3FLAGS) -DHDF5
+endif
+
+.PRECIOUS : %.f90
+
+%.o : %.mod
+
+%.f90 : %.fpp
+	@fpx3 $(FPX3FLAGS) < $< > $@
+
+%.o %.mod : %.f90
+	@echo FC $<
+	@$(COMPILE) -c $<
+	@if [ -e $(basename $@).mod ]; then touch $(basename $@).mod; fi
+
+ifeq ($(USE_CRMATH),yes)
+gyre_math.fpp: gyre_math_crmath.fpp
+	@ln -sf $< $@
+else
+gyre_math.fpp: gyre_math_intrinsic.fpp
+	@ln -sf $< $@
+endif
+
+.INTERMEDIATE: gyre_math.fpp
+
+.depend: gyre_math.fpp
+
+#################################################################
+#
+# DEPENDENCIES
+
+vpath %.fpp $(GYRE_DIRS)
+vpath %.inc $(GYRE_DIRS)
+vpath %.f $(GYRE_DIRS)
+
+ifneq ($(MAKECMDGOALS),clean)
+-include .depend
+endif
+
+.depend :
+	@echo FPX3_DEPS
+	@$(shell fpx3_deps $(FPX3FLAGS) gyre_lib > .depend )

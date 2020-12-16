@@ -1,0 +1,85 @@
+! inlist_check_redo
+
+! test that models with redos give the same answer
+! via run_star_extras, the model to do a redo at model_number 10 for ./rn but not ./re
+! by restarting from model_number 5, this test will fail if a redo changed things
+
+&star_job
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod' ! from make_zams_high_mass, 13498
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+  ! save a model at the end of the run
+    save_model_when_terminate = .true.
+    save_model_filename = 'final.mod'
+
+  ! display on-screen plots
+     pgstar_flag = .false.
+
+    change_rotation_flag = .true.
+    new_rotation_flag = .true.
+    set_initial_omega = .true.
+    new_omega = 0d0
+
+/ !end of star_job namelist
+
+
+&eos
+   !dbg = .true.
+   logT_lo = 5.143802
+   logT_hi = 5.143803
+/ !end of eos namelist
+
+
+
+
+&kap
+    Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1000
+   
+    
+  ! starting specifications
+    initial_mass = 15 ! in Msun units
+    initial_z = 0.02
+
+    mass_change = -1d-10
+
+  ! options for energy conservation (see MESA V, Section 3)
+     use_dedt_form_of_energy_eqn = .true.
+
+  ! stop when the center mass fraction of h1 drops below this limit
+    xa_central_lower_limit_species(1) = 'h1'
+    xa_central_lower_limit(1) = 1d-3
+    
+   
+    num_trace_history_values = 2
+    trace_history_value_name(1) = 'rel_E_err'
+    trace_history_value_name(2) = 'log_rel_run_E_err'
+
+    photo_interval = 5
+    terminal_interval = 1
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+pgstar_interval = 1
+         Kipp_win_flag = .true.
+
+/ ! end of pgstar namelist

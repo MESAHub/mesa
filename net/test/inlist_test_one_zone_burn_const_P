@@ -1,0 +1,94 @@
+
+&one_zone
+
+      !show_net_reactions_info = .true.
+      !show_Qs = .true.
+      
+      mesa_dir = '../..'   	
+      net_name = 'approx21.net'
+
+      burn_at_constant_P = .true.
+      burn_temp = 3e9
+      burn_Rho = 1d0 !Must set to something
+      pressure = 1d24
+
+   	burn_tend = 1d-4 ! seconds
+   	max_step_size = 1
+      max_steps = 1000
+
+      burn_rtol = 1d-7
+      burn_atol = 1d-8
+      !which_solver = 'ros2_solver'
+      which_solver = 'rodas4_solver'
+   	
+   	
+   	!read_T_Rho_history = .true.
+!    	T_Rho_history_filename = 'one_zone_burn_T_Rho_history.txt'
+   	
+   	data_heading_line = ''
+      
+      min_for_show_peak_abundances = 1d-2 ! output peak value if it is > this
+      show_peak_x_and_time = .false.
+
+      data_filename = 'one_zone_burn.data'
+      !data_output_min_t = 1d-6
+      
+      !save_final_abundances = .true.
+      !final_abundances_filename = 'abundances.data'
+      
+      !read_initial_abundances = .true.
+      !initial_abundances_filename = 'x_at_1_second.data'
+      
+      !uniform_Xinit = .true. ! for debugging
+
+      num_isos_for_Xinit = 2
+      names_of_isos_for_Xinit(1) = 'c12'
+      values_for_Xinit(1) = 0.37d0
+      names_of_isos_for_Xinit(2) = 'o16'
+      values_for_Xinit(2) = 0.63d0
+
+
+      num_names_of_isos_to_show = 15
+      names_of_isos_to_show(1) = 'he4'
+      names_of_isos_to_show(2) = 'c12'
+      names_of_isos_to_show(3) = 'o16'
+      names_of_isos_to_show(4) = 'ne20'
+      names_of_isos_to_show(5) = 'mg24'
+      names_of_isos_to_show(6) = 'si28'
+      names_of_isos_to_show(7) = 's32'
+      names_of_isos_to_show(8) = 'ar36'
+      names_of_isos_to_show(9) = 'ca40'
+      names_of_isos_to_show(10) = 'ti44'
+      names_of_isos_to_show(11) = 'cr48'
+      names_of_isos_to_show(12) = 'fe52'
+      names_of_isos_to_show(13) = 'ni56'
+      names_of_isos_to_show(14) = 'fe54'
+      names_of_isos_to_show(15) = 'cr56'
+      
+      
+      decsol_switch = 50
+         ! if current number of species <= switch,
+            ! then use small_mtx_decsol,
+            ! else use large_mtx_decsol.
+      small_mtx_decsol = 'lapack'
+      large_mtx_decsol = 'klu'
+      
+      cache_suffix = '' ! use this only for reactions from rate_tables
+      
+      which_rates_choice = 2
+         ! rates_NACRE_if_available = 1
+         ! rates_JR05_if_available = 2 << for jina reaclib
+
+         
+      ! reaction rate factors
+         num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
+         reaction_for_special_factor(:) = ''
+         special_rate_factor(:) = 1
+         ! e.g.
+            !num_special_rate_factors = 1
+            !reaction_for_special_factor(:) = 'r_c12_ag_o16'
+            !special_rate_factor(1) = 1.1
+      
+      quiet = .true.
+
+/ 

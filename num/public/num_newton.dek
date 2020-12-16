@@ -1,0 +1,336 @@
+      
+      ! note: on a successful return, newton will have just called
+      ! set_primaries, set_secondaries, and eval_equations
+      ! with the new x vector.
+
+      subroutine newton(
+     >         ! primary variables         
+     >         nz, nvar, x1, xold1, 
+     >         ! matrix info
+     >         matrix_type, mljac, mujac, 
+     >         ! matrix routines and their parameters
+     >         decsol, decsolblk, 
+     >         lrd, rpar_decsol, lid, ipar_decsol, which_decsol,
+     >         ! tolerances
+     >         tol_correction_norm, 
+     >         ! procedure arguments
+     >         set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations, 
+     >         size_equ, sizeB, inspectB,
+     >         enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
+     >         ! work arrays
+     >         xscale1, equ1, ldy, nsec, y1, work, lwork, iwork, liwork, AF1,
+     >         ! parameters for caller-supplied routines     
+     >         lrpar, rpar, lipar, ipar,
+     >         ! results
+     >         convergence_failure, ierr)
+      
+         use mod_newton, only: do_newton_wrapper
+         use const_def, only: dp
+
+         ! the primary variables
+         integer, intent(in) :: nz ! number of zones
+         integer, intent(in) :: nvar ! number of variables per zone
+         ! the total number of primary variables is nvar*nz
+         real(dp), pointer, dimension(:) :: x1 ! =(nvar,nz) 
+         ! new vector of primaries
+         real(dp), pointer, dimension(:) :: xold1 ! =(nvar,nz)
+         ! old vector of primaries
+
+         ! information about the jacobian matrix
+         integer, intent(in) :: matrix_type ! see num_def.f for values
+         ! if matrix_type == banded_matrix_type, mljac and mujac give the bandwidths.
+         ! if matrix_type /= banded_matrix_type, mljac and mujac are not used.
+         
+         integer, intent(in) :: mljac ! number of subdiagonals within the band of the jacobian
+         integer, intent(in) :: mujac ! number of superdiagonals
+         ! for example if you have a centered 3 zone stencil, 
+         ! then you will have mljac and mujac both equal to 2*nvar-1
+         ! mljac and mujac are only used for matrix_type == banded matrix type
+                  
+         ! matrix routines
+         ! there are implementations of the matrix routines available in mesa/mtx.
+         ! for example, the LAPACK versions are called lapack_dec, lapack_sol, etc.
+         ! the variable 'decsol' is for the "decomposition and solution" routine for dense matrices.
+         ! similarly, 'decsols' is the routine for sparse matrices.
+         ! the flag 'which_decsol' determines which one is called.
+         ! for the one you are not using, pass the 'null' routine,
+         ! either 'null_decsols' or 'null_decsol'.   these are defined in mtx_lib
+         interface
+            include "mtx_decsol.dek"
+            include "mtx_decsolblk_dble.dek"
+         end interface
+         ! these arrays provide optional extra working storage for the matrix routines.
+         ! the implementations in mesa/mtx include routines to determine the sizes.
+         ! for example, the LAPACK version is called lapack_work_sizes.
+         integer, intent(in) :: lrd, lid
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(in) :: which_decsol ! values given in num_def
+            ! e.g., lapack or bcyclic_dble or ....
+         
+         real(dp), pointer, dimension(:) :: xscale1 ! =(nvar,nz)
+         ! typical values for x.  set by set_xscale.
+         real(dp), pointer, dimension(:) :: equ1 ! =(nvar,nz)
+         ! equ(i) has the residual for equation i, i.e., the difference between
+         ! the left and right hand sides of the equation.
+
+         ! the secondary variables
+            ! the "secondaries" for zone k depend only on the primaries of zone k
+            ! and therefore need not be recomputed is the zone k primaries have not been modified.
+            ! using this information can significantly accelerate the computation of numerical jacobians.
+            ! for stellar evolution, the secondaries include such expensive-to-compute items as equation of state, 
+            ! nuclear reaction rates, and opacities.
+         integer, intent(in) :: ldy ! leading dimension of y, >= nz
+         integer, intent(in) :: nsec ! number of secondaries per zone
+         real(dp), pointer, dimension(:) :: y1 ! the values. =(ldy,nsec)
+
+         ! work arrays. required sizes provided by the routine newton_work_sizes.
+         ! for standard use, set work and iwork to 0 before calling.
+         ! NOTE: these arrays contain some optional parameter settings and outputs.
+         ! see num_def for details.
+         integer, intent(in) :: lwork, liwork
+         real(dp), intent(inout), pointer :: work(:) ! (lwork)
+         integer, intent(inout), pointer :: iwork(:) ! (liwork)
+         real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
+            ! will be allocated or reallocated as necessary.
+            ! caller must deallocate when finished with it.  okay to reuse for multiple calls.
+
+         ! convergence criteria
+         real(dp), intent(in) :: tol_correction_norm
+            ! a trial solution is considered to have converged if
+            ! max_correction <= tol_max_correction and
+            !
+            ! either
+            !          (correction_norm <= tol_correction_norm)  
+            !    .and. (residual_norm <= tol_residual_norm)
+            ! or
+            !          (correction_norm*residual_norm <= tol_corr_resid_product)
+            !    .and. (abs(slope) <= tol_abs_slope_min)
+            !
+            ! where "slope" is slope of the line for line search in the newton solver,
+            ! and is analogous to the slope of df/dx in a 1D newton root finder.
+
+         ! parameters for caller-supplied routines
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         
+         ! output
+         logical, intent(out) :: convergence_failure
+         integer, intent(out) :: ierr ! 0 means okay.
+         
+         ! the following routines implement the problem-specific aspects of the newton solver.
+         ! see num/include/newton_procs.dek for documentation.
+         ! there are default implementations for most of the routines (see below).
+         ! the only one without a default is the "eval_equations" routine that computes
+         ! the equation residuals for your particular problem.
+         interface
+            include 'newton_procs.dek' 
+         end interface
+         
+         call do_newton_wrapper(
+     >         nz, nvar, x1, xold1, 
+     >         matrix_type, mljac, mujac, 
+     >         decsol, decsolblk, 
+     >         lrd, rpar_decsol, lid, ipar_decsol, which_decsol,
+     >         tol_correction_norm, 
+     >         set_primaries, set_secondaries, set_xscale, Bdomain, xdomain, eval_equations, 
+     >         size_equ, sizeb, inspectB, 
+     >         enter_setmatrix, exit_setmatrix, failed_in_setmatrix, force_another_iteration,
+     >         xscale1, equ1, ldy, nsec, y1, work, lwork, iwork, liwork, AF1,
+     >         lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+
+      end subroutine newton
+
+   
+      subroutine newton_work_sizes(
+     >      mljac, mujac, nvar, nz, nsec, matrix_type, lwork, liwork, ierr)
+         use mod_newton
+         ! input args are described above with newton 
+         integer, intent(in) :: nvar, nz, nsec
+         integer, intent(in) :: matrix_type
+         integer, intent(in) :: mljac, mujac
+         integer, intent(out) :: lwork, liwork
+         integer, intent(out) :: ierr
+         call get_newton_work_sizes(
+     >      mljac, mujac, nvar, nz, nsec, matrix_type, lwork, liwork, ierr)
+      end subroutine newton_work_sizes
+      
+      
+      ! you can use the following defaults for the routines required by the newton solver.
+      ! there are defaults for all the routines except "eval_equations".
+
+      subroutine default_set_primaries(nvar, nz, x, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: nvar, nz
+         real(dp), pointer :: x(:,:) ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_set_primaries
+
+
+      subroutine default_set_secondaries(ivar, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: ivar
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_set_secondaries
+
+
+      ! you might want to use a different value of xscale_min for this
+      subroutine default_set_xscale(nvar, nz, xold, xscale, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: nvar, nz
+         real(dp), pointer :: xold(:,:) ! (nvar, nz)
+         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         real(dp), parameter :: xscale_min = 1d0
+         xscale = max(xscale_min, abs(xold))
+         ierr = 0
+      end subroutine default_set_xscale
+
+
+      subroutine default_sizeB(
+     >      iter, nvar, nz, x, B, xscale, max_correction, correction_norm, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, B, xscale ! (nvar, nz)
+         real(dp), intent(out) :: correction_norm ! a measure of the average correction
+         real(dp), intent(out) :: max_correction ! magnitude of the max correction
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         max_correction = maxval(abs(B(1:nvar,1:nz)))
+         correction_norm = sum(abs(B(1:nvar,1:nz)))/dble(nvar*nz)
+         ierr = 0
+      end subroutine default_sizeB
+
+
+      subroutine default_Bdomain(iter, nvar, nz, B, x, xscale, correction_factor, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, xscale, B ! (nvar, nz)
+         real(dp), intent(inout) :: correction_factor
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_Bdomain
+
+
+      subroutine default_xdomain(iter, nvar, nz, x, dx, xold, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, dx, xold ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_xdomain
+
+
+      subroutine default_size_equ(iter, nvar, nz, equ, residual_norm, residual_max, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer :: equ(:,:) ! (nvar, nz)
+         real(dp), intent(out) :: residual_norm, residual_max
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+         residual_norm = sum(abs(equ))/(nvar*nz)
+         residual_max = maxval(abs(equ))
+      end subroutine default_size_equ
+
+
+      subroutine default_inspectB(iter, nvar, nz, x, B, xscale, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, B, xscale ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_inspectB
+
+
+      ! the default is to have the solver do a numerical jacobian approximation
+      subroutine default_enter_setmatrix(
+     >         iter, nvar, nz, neqs, x, xold, xscale, xder, need_solver_to_eval_jacobian, 
+     >         ldA, A1, idiag, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz, neqs ! (neqs = nvar*nz)
+         real(dp), pointer, dimension(:,:) :: x, xold, xscale, xder ! (nvar, nz)
+         logical, intent(out) :: need_solver_to_eval_jacobian
+         integer, intent(in) :: ldA ! leading dimension of A
+         real(dp), pointer, dimension(:) :: A1 ! =(ldA,neqs)
+         integer, intent(inout) :: idiag 
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         real(dp), parameter :: epsder = 1d-7
+         need_solver_to_eval_jacobian = .true.
+         xder=epsder*(xscale+abs(xold))
+         ierr = 0
+      end subroutine default_enter_setmatrix
+      
+      
+      subroutine default_exit_setmatrix(iter, nvar, nz, neqs, 
+     >         dx, ldA, A1, idiag, xscale, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz, neqs
+         real(dp), pointer :: dx(:,:) ! (nvar, nz)
+         integer, intent(in) :: ldA ! leading dimension of A
+         real(dp), pointer, dimension(:) :: A1 ! =(ldA,neqs)
+         integer, intent(inout) :: idiag ! row of A with the matrix diagonal entries
+         real(dp), pointer, dimension(:,:) :: xscale ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_exit_setmatrix
+
+
+      subroutine default_failed_in_setmatrix(j, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: j ! if j > 0, then is index in x of variable that caused the failure.
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ierr = 0
+      end subroutine default_failed_in_setmatrix
+      
+      
+      ! 1 means force another iteration
+      ! 0 means don't need to force another
+      ! -1 means failure. newton returns with non-convergence.
+      integer function default_force_another_iter(iter, itermin, lrpar, rpar, lipar, ipar)
+         use const_def, only: dp
+         integer, intent(in) :: iter ! have finished this many iteration and have converged
+         integer, intent(in) :: itermin ! this is the requested minimum.  iter may be < itermin.
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         if (iter < itermin) then
+            default_force_another_iter = 1
+         else
+            default_force_another_iter = 0
+         end if
+      end function default_force_another_iter

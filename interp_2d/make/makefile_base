@@ -1,0 +1,137 @@
+# This is the makefile for the mesa interp_2d library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = \
+   bicub_sg.f \
+   bicub_db.f \
+   bipm_db.f \
+   bipm_sg.f \
+   akima760_sg.f \
+   akima760_db.f \
+   renka790_sg.f \
+   renka790_db.f \
+   interp_2d_lib_db.f90 \
+   interp_2d_lib_sg.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+    LIBS_OTHER = num interp_1d $(LIBS_MATRIX)
+    DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+    LOAD_OTHER = -L$(MESA_LIB_DIR) -lnum -linterp_1d $(LOAD_MATRIX) -lauto_diff
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libinterp_2d.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) interp_2d_lib_db.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) interp_2d_lib_sg.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfixed)
+
+COMPILE_CMD = $(COMPILE)
+
+COMPILE_FIXED = $(COMPILE_NO_CHECKS) $(FCfixed)
+
+COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_FIXED))
+
+renka790_sg.o renka790_db.o bicub_sg.o bicub_db1.o bicub_db.o bicub_db2.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_NO_CHECKS $<
+	@$(COMPILE_NO_CHECKS) $(FCfixed) $<
+else
+	$(COMPILE_NO_CHECKS) $(FCfixed) $<
+endif
+
+akima760_sg.o akima760_db.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY $<
+	@$(COMPILE_LEGACY) $<
+else
+	$(COMPILE_LEGACY) $<
+endif
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

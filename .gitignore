@@ -1,0 +1,80 @@
+## Compilation
+build.log
+.depend
+.order
+*.a
+**/make/*.f
+**/make/*.f90
+**/make/*.mod
+**/make/*.smod
+*.o
+*.so
+/lib/
+/include/
+
+
+## Debugging/Profiling
+gmon.out
+callgrind.out*
+massif.out*
+valgrind.out*
+
+
+## Diffs/Patches
+*.orig
+*.patch
+*.rej
+
+
+## Documentation
+/dox/
+
+
+## Executables
+*.x
+
+
+## Output
+**/LOGS/
+**/LOGS1/
+**/LOGS2/
+**/photos/
+**/png/
+
+
+## Restarts
+.restart
+restart_photo
+
+
+## Testing
+**/test/diff.txt
+**/test/plotter
+**/test/sample
+**/test/tester
+**/test/test_quietly
+**/test/test_quietly.txt
+**/test/tmp.txt
+
+
+## Test Suite
+.running
+checks.md5
+err.txt
+mem-rn.txt
+mem-re.txt
+out.txt
+final.mod
+final_check.mod
+final_check_diff.txt
+final_profile.data
+final_profile_check.data
+test_results.yml
+testhub.yml
+
+
+## Misc
+._*
+.DS_Store
+.mesa_temp_cache/
+TAGS

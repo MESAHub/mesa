@@ -1,0 +1,117 @@
+
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'he_core_mass_limit'
+
+               
+      change_v_flag = .true.
+      new_v_flag = .true.
+               
+      change_rotation_flag = .true.
+      new_rotation_flag = .true.
+      
+      set_initial_surface_rotation_v = .true.
+      new_surface_rotation_v = 10 ! km/sec  
+
+      change_D_omega_flag = .true.
+      new_D_omega_flag = .true.
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+
+
+/ ! end of star_job namelist
+
+
+&eos
+   !dbg = .true.
+   logT_lo = 8.30088
+   logT_hi = 8.30089
+/ !end of eos namelist
+
+
+
+&kap
+         Zbase = 2d-2
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+         use_dedt_form_of_energy_eqn = .true.
+
+         num_trace_history_values = 2
+         trace_history_value_name(1) = 'rel_E_err'
+         trace_history_value_name(2) = 'log_rel_run_E_err'
+
+         ! limit max_model_number as part of test_suite
+         max_model_number = 800
+
+         initial_mass = 1.0
+         initial_z = 2d-2
+
+         mixing_D_limit_for_log = 1d4
+         
+         he_core_mass_limit = 0.22
+      
+         use_Ledoux_criterion = .true.
+         alpha_semiconvection = 4d-2
+         thermohaline_coeff = 2  
+
+         dX_mix_dist_limit = 1d-4 
+         
+         omega_function_weight = 20
+
+         am_nu_visc_factor = 0
+         am_D_mix_factor = 0.0333333333333333d00
+         D_DSI_factor = 0
+         D_SH_factor = 1
+         D_SSI_factor = 1
+         D_ES_factor = 1
+         D_GSF_factor = 1
+         D_ST_factor = 1
+
+         T_mix_limit = 1d4
+
+         clip_D_limit = 10 ! zero mixing diffusion coeffs that are smaller than this
+         
+         xa_scale = 1d-5
+
+         mass_change_full_on_dt = 1d7 ! (seconds)
+         mass_change_full_off_dt = 1d6 ! (seconds)
+
+         mixing_length_alpha = 1.6
+         
+         photo_interval = 50
+         profile_interval = 100
+         history_interval = 10
+         terminal_interval = 10
+         write_header_frequency = 10
+         
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+
+
+/ ! end of pgstar namelist

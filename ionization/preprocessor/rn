@@ -1,0 +1,5 @@
+#!/bin/bash
+# a script to call the tfdh code with an output directory
+
+mkdir ./data/$1
+./src/tfdh ./data/$1

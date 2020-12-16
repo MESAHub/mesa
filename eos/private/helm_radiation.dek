@@ -1,0 +1,67 @@
+!..pressure in erg/cm**3
+        prad    = asol * third * temp * temp * temp * temp
+
+!..first derivatives
+        dpraddd = 0.0d0 
+        dpraddt = 4.0d0 * prad * tempinv
+        dpradda = 0.0d0 
+        dpraddz = 0.0d0 
+
+!..second derivatives
+        dpradddd = 0.0d0
+        dpradddt = 0.0d0
+        dpraddda = 0.0d0
+        dpradddz = 0.0d0
+        dpraddtt = 4.0d0 * asol * temp * temp
+        dpraddta = 0.0d0
+        dpraddtz = 0.0d0
+        dpraddaa = 0.0d0
+        dpraddaz = 0.0d0
+        dpraddzz = 0.0d0
+
+
+!..energy in erg/gr
+        erad    = 3.0d0 * prad * deninv
+
+!..first derivatives
+        deraddd = -erad * deninv
+        deraddt = 3.0d0 * dpraddt * deninv
+        deradda = 0.0d0
+        deraddz = 0.0d0
+
+!..second derivatives
+        deradddd = -2.0d0 * deraddd * deninv
+        deradddt = -deraddt * deninv
+        deraddda = 0.0d0
+        deradddz = 0.0d0
+        deraddtt = 3.0d0 * dpraddtt * deninv
+        deraddta = 0.0d0
+        deraddtz = 0.0d0
+        deraddaa = 0.0d0
+        deraddaz = 0.0d0
+        deraddzz = 0.0d0
+
+
+!..entropy in erg/g/kelvin
+        srad    = (prad*deninv + erad) * tempinv
+
+!..first derivatives
+        dsraddd = ((dpraddd - prad*deninv)*deninv + deraddd) * tempinv 
+        dsraddt = (dpraddt*deninv + deraddt - srad)  * tempinv
+        dsradda = 0.0d0
+        dsraddz = 0.0d0
+
+!..second derivatives
+        dsradddd = ((dpradddd &
+                    - (2.0d0*dpraddd - 2.0d0*prad*deninv)*deninv)*deninv &
+                     + deradddd) * tempinv 
+        dsradddt = ((dpradddt - dpraddt*deninv)*deninv &
+                    + deradddt - dsraddd) * tempinv
+        dsraddda = 0.0d0
+        dsradddz = 0.0d0
+        dsraddtt = ((dpraddtt*deninv+deraddtt-dsraddt)-dsraddt)*tempinv
+        dsraddta = 0.0d0
+        dsraddtz = 0.0d0
+        dsraddaa = 0.0d0
+        dsraddaz = 0.0d0
+        dsraddzz = 0.0d0

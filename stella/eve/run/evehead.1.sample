@@ -1,0 +1,256 @@
+Data                    Result          Model                Opacity                       Rho             ExtMod
+'sn2.eve'  'res.tst'   'testh.mod'  'DummyOpafile' 'testh.rho' '../../modmake/testh.hyd' '../../modmake/testh.abn' 'testh.xni'
+'20z002v2'              'res.tst'   '20z002v2.mod'  'DummyOpafile' '20z002v2.rho' '../../modmake/250h.hyd' '../../modmake/250h.abn' '20z002v2.xni'
+'20z002E1fh.eve'  'res.tst'   '20z002E1fh3.mod'  '../../opacity/mlmc.opa' '20z002E1fh3.rho' '../../modmake/20z002E1fh.hyd' '../../modmake/20z002E1fh.abn' '20z002E1fh3.xni' 
+ -- 358 zones for Nkeep 6 cutmass=1.54 Nmult=5
+'sn2.eve'  'res.tst'   'testhCrab.mod'  'DummyOpafile' 'testhCrab.rho' '../../modmake/testhCrab.hyd' '../../modmake/testhCrab.abn' 'testhCrab.xni'
+ -- OutUni test 521 zones for Nkeep 1 cutmass=1.36 Nmult=1
+'toya1.eve'   'res.tst'   'm030307mh.mod'  'DummyOpafile' 'm030307mh.rho' '../../modmake/m030307m_2000h.hyd'  '../../modmake/m030307m_2000h.abn' 'm030307mh.xni'
+'20z002E1fh.eve'  'res.tst'   '20z002E1fh.mod'  '../../opacity/mlmc.opa' '20z002E1fh.rho' '../../modmake/20z002E1fh.hyd' '../../modmake/20z002E1fh.abn' '20z002E1fh.xni' 
+'20z002E1fh.eve'  'res.tst'   '20z002E1fh.mod'  '../../opacity/mlmc.opa' '20z002E1fh.rho' '../../modmake/20z002E1fh.hyd' '../../modmake/20z002E1fh.abn' '20z002E1fh.xni' 
+   -- direct half NTomi model
+'20z002E1fh.eve'  'res.tst'   '20z002E1fh2.mod'  '../../opacity/mlmc.opa' '20z002E1fh2.rho' '../../modmake/20z002E1fh.hyd' '../../modmake/20z002E1fh.abn' '20z002E1fh2.xni'  
+  -- more accurate direct model Nkeep 6 cutmass=1.56
+'20z002E1fh.eve'  'res.tst'   '20z002E1fh.mod'  '../../opacity/mlmc.opa' '20z002E1fh.rho' '../../modmake/20z002E1fh.hyd' '../../modmake/20z002E1fh.abn' '20z002E1fh.xni' 
+'20z002E1f.eve'  'res.tst'   '20z002E1f.mod'  '../../opacity/mlmc.opa' '20z002E1f.rho' '../../modmake/20z002E1fh.hyd' '../../modmake/20z002E1fh.abn' '20z002E1f.xni' 
+ -- as snia
+'20z002E1.eve'  'res.tst'   '20z002E1.mod'  '../../opacity/mlmc.opa' '20z002E1.rho' '../../modmake/20z002E1.wmo' '../../modmake/20z002E1_mix.wmo' '20z002E1.xni' 
+'b30b.eve'   'res.tst'    'b30_768b.mod'  '../../opacity/msun.opa'  'b30_768b.rho'   '../../modmake/b30_768.hyd'  '../../modmake/b30_768.abn'  'b30_768b.xni'
+'mr0.eve'   'res.tst'    'b30_768.mod'  '../../opacity/msun.opa'  'b30_768.rho'   '../../modmake/b30_768.hyd'  '../../modmake/b30_768.abn'  'b30_768.xni'
+'sn05bf.eve' 'res.tst'   'wr25_7p5foew.mod'  '../../opacity/mlmc.opa'  'wr25_7p5foew.rho' '../../modmake/wr25_7p5c.hyd' '../../modmake/wr25_7p5c.abn' 'wr25_7p5foew.xni'
+'toya1.eve' 'res.tst'   'wr25_7p5c.mod'  '../../opacity/mlmc.opa'  'wr25_7p5c.rho' '../../modmake/wr25_7p5c.hyd' '../../modmake/wr25_7p5c.abn' 'wr25_7p5c.xni'
+  -- 78 zones
+'toya1.eve' 'res.tst'   'wr25_7p5foehfhf.mod'  '../../opacity/mlmc.opa'  'wr25_7p5foehfhf.rho' '../../modmake/wr25_7p5foehfhf.hyd' '../../modmake/wr25_7p5foehfhf.abn' 'wr25_7p5foehfhf.xni'
+'toya1.eve' 'res.tst'   'wr25_7p5foehfhf.mod'  '../../opacity/mlmc.opa'  'wr25_7p5foehfhf.rho' '../../modmake/wr25_7p5foehfhf.hyd' '../../modmake/wr25_7p5foehfhf.abn' 'wr25_7p5foehfhf.xni'
+'toya1.eve' 'res.tst'   'o25w_2e52hfhf.mod'  '../../opacity/mlmc.opa'  'o25w_2e52hfhf.rho' '../../modmake/o25w_2e52hfhf.hyd' '../../modmake/o25w_2e52hfhf.abn' 'o25w_2e52hfhf.xni'
+'toya1.eve' 'res.tst'   'woo25nhfhf.mod'  '../../opacity/mlmc.opa'  'woo25nhfhf.rho' '../../woo/woo25nhfhf.hyd' '../../woo/woo25nhfhf.abn' 'woo25nhfhf.xni'
+'s1b7a2f.eve'  'res.tst'   's1b7a2f.mod'  '../../opacity/mlmc.opa' 's1b7a2f.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a2f.xni'
+'s1b7a2.eve'   'res.tst'   's1b7a2.mod'  '../../opacity/mlmc.opa' 's1b7a2.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a2.xni'
+'s15s7b2.eve' 'res.tst'  's15s7b2t.mod'  '../../opacity/mlmc.opa' 's15s7b2t.rho'   '../../woosley/s15s7b2.wmo'  '../../woosley/s15s7b2.wmo'  's15s7b2t.xni'
+'popiii.eve'   'res.tst'   'z12D.2p5e4hh.mod'  '../../opacity/msun.opa' 'z12D.2p5e4hh.rho' '../../woo/z12D.2p5e4hh.hyd'  '../../woo/z12D.2p5e4hh.abn'  'z12D.2p5e4hh.xni' 
+'toya1.eve'   'res.tst'   'm030201m_2000h.mod'  '../../opacity/msun.opa' 'm030201m_2000h.rho' '../../woo/m030201m_2000h.hyd'  '../../woo/m030201m_2000h.abn' 'm030201m_2000h.xni'
+ more mixed Ni 0.3 Fe 0.2 SiSArCa 0.1
+'z40D.10e5s.eve' 'res.tst'   'z40D.10e5s.mod'  '../../opacity/mlmc.opa'  'z40D.10e5s.rho' '../../woo/z40D.10e5s.wmo' '../../woo/z40D.10e5s.wmo' 'z40D.10e5s.xni'
+
+'toya1.eve'   'res.tst'   'c030201m_2000h.mod'  '../../opacity/msun.opa' 'c030201m_2000h.rho' '../../woo/c030201m_2000h.hyd'  '../../woo/c030201m_2000h.abn' 'c030201m_2000h.xni'
+ Ni 0.3 Fe 0.2 SiSArCa 0.1
+'toya1.eve'   'res.tst'   'c040207m_2000h.mod'  '../../opacity/msun.opa' 'c040207m_2000h.rho' '../../woo/c040207m_2000h.hyd'  '../../woo/c040207m_2000h.abn'  'c040207m_2000h.xni'
+ Ni 0.4 Fe 0.2 SiSArCa 0.7
+'toya1.eve'   'res.tst'   'w7b2h.mod'  '../../opacity/msun.opa' 'w7b2h.rho' '../../woo/w7b2h.hyd'  '../../woo/w7b2h.abn'  'w7b2h.xni'
+       half zones (90)
+'toya1.eve'   'res.tst'   'w7b2.mod'  '../../opacity/msun.opa' 'w7b2.rho' '../../woo/w7b2.hyd'  '../../woo/w7b2.abn'  'w7b2.xni'
+'toya1.eve'   'res.tst'   'w7b1.mod'  '../../opacity/msun.opa' 'w7b1.rho'  '../../woo/w7b1.hyd'  '../../woo/w7b1.abn'  'w7b1.xni'
+ Stan's toy w7 ; Ni56 is more close to w7 we got from Iwamoto
+'toya1.eve'   'res.tst'       'toya1m1.mod'  '../../opacity/msun.opa' 'toya1m1.rho'  '../../woo/toya1m1.hyd'  '../../woo/toya1m1.abn'  'toya1m1.xni'
+ somehow mixed toya1
+
+'w13cmn.eve' 'res.tst'   'w13cmna.mod'  '../../opacity/mlmc.opa'  'w13cmna.rho' '../../woo/w13ca.wmo' '../../woo/w13cmna.wmo' 'w13cmna.xni'
+
+'mr0.eve'   'res.tst'       'mr0_99_mgw7.mod'  '../../opacity/msun.opa'  'mr0_99_mgw7.rho'   'mr0_99_mgw7.hyd'  'mr0_99_mgw7.abn'  'mr0_99_mgw7.xni'
+
+'uniHet6m13rm6.eve' 'res.tst'   'uniHet6m13rm6.mod' '../../opacity/msun.opa' 'uniHet6m13rm6.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo' 'uniHet6m13rm6.xni'
+   T=1e6 in central half radius
+'uniHet8m13rm6.eve' 'res.tst'   'uniHet8m13rm6.mod' '../../opacity/msun.opa' 'uniHet8m13rm6.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo' 'uniHet8m13rm6.xni'
+   T=1e8 in central half radius
+'uniHet2e3m13rm6.eve' 'res.tst'   'uniHet2e3m13rm6.mod' '../../opacity/msun.opa' 'uniHet2e3m13rm6.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo' 'uniHet2e3m13rm6.xni'
+   XH=0 -- He composition
+'unit2e3m13rm6.eve'   'res.tst'       'unit2e3m13rm6.mod'  '../../opacity/msun.opa' 'unit2e3m13rm6.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo' 'unit2e3m13rm6.xni'
+ T=2e3  uniform rho=1e-13, R=6e-6 pc (1/2 R = 1e13 cm for explosion)
+'unit2e3m14rm3.eve'   'res.tst'       'unit2e3m14rm3.mod'  '../../opacity/msun.opa' 'unit2e3m14rm3.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo'  'unit2e3m14rm3.xni'
+ T=2e3  uniform rho=1e-14, R=2e-3 pc (1/2 R for explosion)
+'unim14rm3.eve'   'res.tst'       'unim14rm3.mod'  '../../opacity/msun.opa' 'unim14rm3.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo'  'unim14rm3.xni'
+  uniform rho=1e-14, R=2e-3 pc (1/2 R for explosion)
+ T=1e4
+'dm2ra.eve'   'res.tst'       'dm2ra.mod'  '../../opacity/msun.opa' 'dm2ra.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo'  'dm2ra.xni'
+	200 zones, geometric progression in dm, 
+                        with rough dm=30 solar mass in external layers
+	rho=1.d-25 g/cm^3
+
+'snrmass.eve'   'res.tst'       'snrmass.mod'  '../../opacity/msun.opa' 'snrmass.rho'   '../../woo/ut87a.wmo'  '../../woo/ut87a.wmo'  'snrmass.xni'
+	600 zones, geometric progression in dm, rho=1.d-23 g/cm^3
+
+'mr0.eve'   'res.tst'       'mr0hom.mod'  '../../opacity/msun.opa'  'mr0hom.rho'   'mr0hom.hyd'  'mr0hom.abn'  'mr0hom.xni'
+ Martin's version for homogenous velocity and E_kin=E_tot
+'s7_0a.eve'   'res.tst'       's7_0ani.mod'  '../../opacity/msun.opa'  's7_0ani.rho'   '../../woo/s7_0ani.hyd'  '../../woo/s7_0ani.abn'  's7_0ani.xni'
+'s7_0a.eve'   'res.tst'       's7_0a.mod'  '../../opacity/msun.opa'  's7_0a.rho'   's7_0a.hyd'  's7_0a.abn'  's7_0a.xni'
+
+
+'mr0.eve'   'res.tst'       'mr0hom.mod'  '../../opacity/msun.opa'  'mr0hom.rho'   'mr0hom.hyd'  'mr0hom.abn'  'mr0hom.xni'
+ Martin's version for homogenous velocity and E_kin=E_tot
+'mr0.eve'   'res.tst'       'mr0.mod'  '../../opacity/msun.opa'  'mr0.rho'   'mr0.hyd'  'mr0.abn'  'mr0.xni'
+ Martin Reinecke model (velocity is still not homogenious), averaging over whole octant of star
+'s1bm7.eve'  'res.tst'   's1bm7.mod'  '../../opacity/mlmc.opa' 's1bm7.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1bm7.xni'
+'s1b7a1f.eve'  'res.tst'   's1b7a1f.mod'  '../../opacity/mlmc.opa' 's1b7a1f.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a1f.xni'
+'s1bm7.eve'  'res.tst'   's1bm7.mod'  '../../opacity/mlmc.opa' 's1bm7.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1bm7.xni'
+'sn94w64.eve'   'res.tst'   'sn94w64.mod'  '../../opacity/msun.opa' 'sn94w64.rho'  '../../woo/s1b7a.wmo'  '../../woo/s1b7a.wmo'  'sn94w64.xni'
+  Mej=7 R=2e4 MNi=0.015 dm2=1e-2 Mzon=200
+  alpha = .310  Rce=0.1
+like 58, but no wind
+ BMFe   BMFe/O   BMO   BMO/He   BMHe   BMHe/H BMK-BMHe
+ 0.0005 0.01     0.05   0.2     0.35   2.00   1.00
+'sn94w65.eve'   'res.tst'   'sn94w65.mod'  '../../opacity/msun.opa' 'sn94w65.rho'  '../../woo/s1b7a.wmo'  '../../woo/s1b7a.wmo'  'sn94w65.xni'
+  Mej=7 R=1.28e5 MNi=0.015 dm2=1e-2 Mzon=200
+  alpha = .310  Rce=0.1  Crho=1.2d16
+  wind  rho propto r**(-1) i.e.pWind=1 RWIND=6.6d4
+ BMFe   BMFe/O   BMO   BMO/He   BMHe   BMHe/H BMK-BMHe
+ 0.0005 0.01     0.05   0.2     0.35   2.00   1.00
+'s1bm12.eve'  'res.tst'   's1bm12.mod'  '../../opacity/mlmc.opa' 's1bm12.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1bm12.xni'
+'s1b7a763.eve'  'res.tst'   's1b7a763.mod'  '../../opacity/mlmc.opa' 's1b7a763.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a763.xni'
+'s1b7a123.eve'  'res.tst'   's1b7a123.mod'  '../../opacity/mlmc.opa' 's1b7a123.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a123.xni'
+'w7jz.eve'   'res.tst'       'w7jz.mod'  '../../opacity/msun.opa'  'w7jz.rho'  'w7hydrezon'  'w7sniabn'  'w7jz.xni'
+  japanese version, but rezoned to 88 zones more correct than original -
+     with mass conservation
+'dd4day.eve'   'res.tst'       'dd4testq.mod'  '../../opacity/msun.opa'  'dd4testq.rho'   'DD4.hyd'  'DD4.abn'  'dd4testq.xni'
+'livne.eve'   'res.tst'       'livne.mod'  '../../opacity/msun.opa'  'livne.rho'  'Livne2.hyd'  'Livne2Ni.abn'  'livne.xni'
+'w7jz.eve'   'res.tst'       'w7jznoNi58o.mod'  '../../opacity/msun.opa'  'w7jznoNi58o.rho'  'w7hydrezon'  'w7sniabn'  'w7jznoNi58o.xni'
+ see w7jznoNi58; here Si and S instead of Ni58 only in outer layers of Ni58,
+ in the center all remains the same as in standard w7jz
+'w13cmn.eve' 'res.tst'   'w13cmn.mod'  '../../opacity/mlmc.opa'  'w13cmn.rho'   '../../woo/w13c.wmo' '../../woo/w13cmn.wmo' 'w13cmn.xni'
+'s1b7a2f.eve'  'res.tst'   's1b7wl2.mod'  '../../opacity/mlmc.opa' 's1b7wl2.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7wl2.xni'
+'94w.eve'   'res.tst'       '94w.mod'  '../../opacity/msun.opa' '94w.rho'   '../../woo/w13c.wmo'  '../../woo/w13cmn.wmo'  '94w.xni'
+'nmxfhes58.eve'  'res.tst'   'nmxfhes58.mod'  '../../opacity/mlmc.opa' 'nmxfhes58.rho' '../../woo/nmxfhes58.wmo' '../../woo/nmxfhes58.wmo' 'nmxfhes58.xni'
+   as nmxfhes  Kadap=+4 but with Ni58 (tot  Ni56 Mass = 0.07798 as in  1998 run)
+'nmxfheskm4.eve'  'res.tst'   'nmxfheskm4.mod'  '../../opacity/mlmc.opa' 'nmxfheskm4.rho' '../../woo/nmxfhes.wmo' '../../woo/nmxfhes.wmo' 'nmxfheskm4.xni'
+   as nmxfhes but Kadap=-4 (otherwise Ni56 was not added to Fe, but tot  Ni Mass = 0.07320)
+'nmxfhes.eve'  'res.tst'   'nmxfheskp4.mod'  '../../opacity/mlmc.opa' 'nmxfheskp4.rho' '../../woo/nmxfhes.wmo' '../../woo/nmxfhes.wmo' 'nmxfheskp4.xni'
+   as nmxfhes  Kadap=+4 (tot  Ni Mass = 0.07798 as in  1998 run)
+'s1b7a123.eve'  'res.tst'   's1b7a123.mod'  '../../opacity/mlmc.opa' 's1b7a2f.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a2f.xni'
+'w13cmn.eve' 'res.tst'   'w13cmn.mod'  '../../opacity/mlmc.opa'  'w13cmn.rho'   '../../woo/w13c.wmo' '../../woo/w13cmn.wmo' 'w13cmn.xni'
+'he15b3ff.eve'  'res.tst'   'he15b3ff.mod'  '../../opacity/mlmc.opa' 'he15b3ff.rho' '../../woo/he15b3.wmo' '../../woo/he15b3.wmo' 'he15b3ff.xni'
+'s1b7a1w.eve'  'res.tst'  's1b7a1w.mod'  '../../opacity/mlmc.opa' 's1b7a1w.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a1w.xni'
+'mt60a.eve'  'res.tst'   'mt60a.mod'  '../../opacity/mlmc.opa' 'mt60a.rho'   '../../woo/mt60a.wmo'  '../../woo/mt60a.wmo'       'mt60a.xni'
+'mt60af.eve'  'res.tst'   'mt60af.mod'  '../../opacity/mlmc.opa' 'mt60af.rho'   '../../woo/mt60a.wmo' '../../woo/mt60a.wmo'       'mt60af.xni'
+'s1b7a2f.eve'  'res.tst'   's1b7a2f.mod'  '../../opacity/mlmc.opa' 's1b7a2f.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a2f.xni'
+'s1b7a1f.eve'  'res.tst'   's1b7a1f.mod'  '../../opacity/mlmc.opa' 's1b7a1f.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a1f.xni'
+'he15bt.eve'  'res.tst'   'he15bt.mod'  '../../opacity/mlmc.opa' 'he15bt.rho' '../../woo/he15b3.wmo' '../../woo/he15b3.wmo' 'he15bt.xni'
+'s1b7a1.eve'  'res.tst'   's1b7a1.mod'  '../../opacity/mlmc.opa' 's1b7a1.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a1.xni'
+'he15b3f.eve'  'res.tst'   'he15b3f.mod'  '../../opacity/mlmc.opa' 'he15b3f.rho' '../../woo/he15b3.wmo' '../../woo/he15b3.wmo' 'he15b3f.xni'
+'s1b7a2.eve'  'res.tst'   's1b7a2.mod'  '../../opacity/mlmc.opa' 's1b7a2.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a2.xni'
+'he15b3.eve'  'res.tst'   'he15b3.mod'  '../../opacity/mlmc.opa' 'he15b3.rho' '../../woo/he15b3.wmo' '../../woo/he15b3.wmo' 'he15b3.xni'
+'s1b7acr.eve'  'res.tst'   's1b7acr.mod'  '../../opacity/mlmc.opa' 's1b7acr.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7acr.xni'
+  crude zoning
+'s1b4acr.eve'  'res.tst'   's1b4acr.mod'  '../../opacity/mlmc.opa' 's1b4acr.rho' '../../woo/s1b4a.wmo' '../../woo/s1b4a.wmo' 's1b4acr.xni'
+'s1b7a5.eve'  'res.tst'   's1b7a5.mod'  '../../opacity/mlmc.opa' 's1b7a5.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a5.xni'
+'s1b7a10.eve'  'res.tst'   's1b7a10.mod'  '../../opacity/mlmc.opa' 's1b7a10.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7a10.xni'
+'s1b7acr.eve'  'res.tst'   's1b7acr.mod'  '../../opacity/mlmc.opa' 's1b7acr.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo' 's1b7acr.xni'
+  crude zoning
+
+'s1b7a.eve'  'res.tst'   's1b7a.mod'  '../../opacity/mlmc.opa' 's1b7a.rho' '../../woo/s1b7a.wmo' '../../woo/s1b7a.wmo'       's1b7a.xni'
+'mt60af.eve'  'res.tst'   'mt60af.mod'  '../../opacity/mlmc.opa' 'mt60af.rho'   '../../woo/mt60a.wmo' '../../woo/mt60a.wmo'       'mt60af.xni'
+'mt60a.eve'  'res.tst'   'mt60a.mod'  '../../opacity/mlmc.opa' 'mt60a.rho'   '../../woo/mt60a.wmo'  '../../woo/mt60a.wmo'       'mt60a.xni'
+'mt60anif.eve'  'res.tst'   'mt60anif.mod'  '../../opacity/mlmc.opa' 'mt60anif.rho'   '../../woo/mt60a.wmo'  '../../woo/w13cmn.wmo'       'mt60anif.xni'
+    this was with H as 93J
+'mt60ani.eve'  'res.tst'   'mt60ani.mod'  '../../opacity/mlmc.opa' 'mt60ani.rho'   '../../woo/mt60a.wmo'  '../../woo/w13cmn.wmo'       'mt60ani.xni'
+
+'ec25h75.eve'   'res.tst'  'ec25h75.mod'  '../../opacity/mlmc.opa' 'ec25h75.rho'  '../../woosley/ec25.wmo' '../../woosley/ec25h.wmo' 'ec25h75.xni'
+'dd4day.eve'   'res.tst'       'dd4day.mod'  '../../opacity/msun.opa'  'dd4day.rho'   'DD4.hyd'  'DD4.abn'  'dd4day.xni'
+'livne.eve'   'res.tst'       'livne.mod'  '../../opacity/msun.opa'  'livne.rho'  'Livne2.hyd'  'Livne2Ni.abn'  'livne.xni'
+'w7jz.eve'   'res.tst'       'w7jznoNi58o.mod'  '../../opacity/msun.opa'  'w7jznoNi58o.rho'  'w7hydrezon'  'w7sniabn'  'w7jznoNi58o.xni'
+ see w7jznoNi58; here Si and S instead of Ni58 only in outer layers of Ni58,
+ in the center all remains the same as in standard w7jz
+'toya1.eve'   'res.tst'       'toye2.mod'  '../../opacity/msun.opa'  'toye2.rho'  'toye2.hyd'  'toye2.abn'  'toye2.xni'
+ low E (even lower than in toye1) and more si
+ and less fe but still 0.1 msun of ni56
+'toya1.eve'   'res.tst'       'toye1.mod'  '../../opacity/msun.opa'  'toye1.rho'  'toye1.hyd'  'toye1.abn'  'toye1.xni'
+ a first cut at a M_CH model for 91bg. It only has 0.1 Msun of ni56,
+ 0.4 Msun of fe54, and 0.1 msun of si28
+ very low explosion energy - 4.86e50
+'toya1.eve'   'res.tst'       'toyd1.mod'  '../../opacity/msun.opa'  'toyd1.rho'  'toyd1.hyd'  'toyd1.abn'  'toyd1.xni'
+ like unmixed toya1 but the energy deposition has been handled
+   differently and the density structure is smooth
+'toya1.eve'   'res.tst'       'toya1m1.mod'  '../../opacity/msun.opa'  'toya1m1.rho'  'toya1m1.hyd'  'toya1m1.abn'  'toya1m1.xni'
+ somehow mixed toya1
+'toya1.eve'   'res.tst'       'toya1.mod'  '../../opacity/msun.opa'  'toya1.rho'  'toya1.hyd'  'toya1.abn'  'toya1.xni'
+ Ron & Stan's toy model for SN Ia
+'w7jz.eve'   'res.tst'       'w7jznoNi58.mod'  '../../opacity/msun.opa'  'w7jznoNi58.rho'  'w7hydrezon'  'w7sniabn'  'w7jznoNi58.xni'
+  now Si and S instead of Ni58 in w7jz - should be much more like DD4
+'sn2lc4.eve'   'res.tst'  'sn2lc4.mod'  '../../opacity/mlmc.opa' 'sn2lc4.rho'  '../../woosley/ec25.wmo' '../../woosley/ec25hh.wmo' 'sn2lc4.xni'
+'w7jz400.eve'   'res.tst'       'w7jz400.mod'  '../../opacity/msun.opa'  'w7jz400.rho'  'w7hydrezon'  'w7sniabn'  'w7jz400.xni'
+  expfac=400, which corresponds to start time of 8000s (w7jz has only 800s)
+'l20n2am.eve'   'res.tst'  'l20n2am.mod'  '../../opacity/mlmc.opa' 'l20n2am.rho'  '../../woosley/l20n2a.wmo' '../../woosley/l20n2am.wmo' 'l20n2am.xni'
+'l20n2a.eve'   'res.tst'  'l20n2a.mod'  '../../opacity/mlmc.opa' 'l20n2a.rho'  '../../woosley/l20n2a.wmo' '../../woosley/l20n2aexp.wmo' 'l20n2a.xni'
+'ec25hh.eve'   'res.tst'  'ec25hh.mod'  '../../opacity/mlmc.opa' 'ec25hh.rho'  '../../woosley/ec25.wmo' '../../woosley/ec25hh.wmo' 'ec25hh.xni'
+'ec25h75.eve'   'res.tst'  'ec25h75.mod'  '../../opacity/mlmc.opa' 'ec25h75.rho'  '../../woosley/ec25.wmo' '../../woosley/ec25h.wmo' 'ec25h75.xni'
+'ec25hn.eve'   'res.tst'  'ec25hn.mod'  '../../opacity/mlmc.opa' 'ec25hn.rho'  '../../woosley/ec25.wmo' '../../woosley/ec25h.wmo' 'ec25hn.xni'
+
+'ec25.eve'   'res.tst'  'ec25.mod'  '../../opacity/mlmc.opa' 'ec25.rho'  '../../woosley/ec25.wmo' '../../woosley/ec25.wmo' 'ec25.xni'
+'dc25.eve'   'res.tst'  'dc25.mod'  '../../opacity/mlmc.opa' 'dc25.rho' '../../woosley/dc25.wmo' '../../woosley/dc25.wmo' 'dc25.xni'
+
+'w7jz.eve'   'res.tst'       'w7jz.mod'  '../../opacity/msun.opa'  'w7jz.rho'  'w7hydrezon'  'w7sniabn'  'w7jz.xni'
+  japanese version, but rezoned to 88 zones more correct than original -
+     with mass conservation
+'w7pgr.eve'   'res.tst'       'w7pgr.mod'  '../../opacity/msun.opa'  'w7pgr.rho'  'w7pgr.hyd'  'w7pgr.abn'  'w7pgr.xni'
+  trying grid where i-th original zone has boundaries r_i to the left
+                                                  and r_{i+1} to the right
+   (and the same about velocities)
+'s15s7b2.eve' 'res.tst'  's15s7ni.mod'  '../../opacity/mlmc.opa' 's15s7ni.rho' '../../woosley/s15s7ni.wmo' '../../woosley/s15s7ni.wmo' 's15s7ni.xni'
+'w7pil.eve'   'res.tst'       'w7pil.mod'  '../../opacity/msun.opa'  'w7pil.rho'  'w7pil.hyd'  'w7pil.abn'  'w7pil.xni'
+'dd4.eve'   'res.tst'       'dd4.mod'  '../../opacity/msun.opa' 'dd4.rho'   'DD4.hyd'  'DD4.abn'  'dd4.xni'
+'s15s7b2.eve' 'res.tst'  's15s7b2ni.mod'  '../../opacity/mlmc.opa' 's15s7b2ni.rho'   '../../woosley/s15s7b2ni.wmo'  '../../woosley/s15s7b2ni.wmo' 's15s7b2ni.xni'
+'s15s7b2.eve' 'res.tst'  's15s7b2.mod'  '../../opacity/mlmc.opa' 's15s7b2.rho'   '../../woosley/s15s7b2.wmo'  '../../woosley/s15s7b2.wmo'  's15s7b2.xni'
+'w13cmn.eve' 'res.tst'   'w13cmxns.mod'  '../../opacity/mlmc.opa' 'w13cmns.rho'   '../../woosley/w13cs.wmo'  '../../woosley/w13cmns.wmo'  'w13cmns.xni'
+'unmx.eve' 'res.tst'   'unmx.mod'  '../../opacity/mlmc.opa'  'unmx.rho'   '../../woosley/unmx.wmo'  '../../woosley/unmx.wmo'  'unmx.xni'
+'nommxfc.eve' 'res.tst'   'nommxfhe.mod'  '../../opacity/mlmc.opa' 'nommxfhe.rho'   '../../woosley/nommxfhe.wmo'  '../../woosley/nommxfhe.wmo' 'nommxfhe.xni'
+'nmxfr40.eve' 'res.tst'   'nmxfhe40.mod'  '../../opacity/mlmc.opa' 'nmxfhe40.rho'   '../../woosley/nommxfhe.wmo'  '../../woosley/nommxfhe.wmo' 'nmxfhe40.xni'
+'nommxfc.eve' 'res.tst'   'nommxfhe.mod'  '../../opacity/mlmc.opa' 'nommxfhe.rho'   '../../woosley/nommxfhe.wmo'  '../../woosley/nommxfhe.wmo' 'nommxfhe.xni'
+'nommxfc.eve' 'res.tst'   'nommxfc.mod'  '../../opacity/mlmc.opa' 'nommxfc.rho'   '../../woosley/nommxfc.wmo'  '../../woosley/nommxfc.wmo'  'nommxfc.xni'
+'nommxf.eve' 'res.tst'   'nommxf.mod'  '../../opacity/mlmc.opa'  'nommxf.rho'   '../../woosley/nommix.wmo'  '../../woosley/nommix.wmo'  'nommxf.xni'
+'nommixf.eve' 'res.tst'   'nommixf.mod'  '../../opacity/mlmc.opa'  'nommixf.rho'   '../../woosley/nommix.wmo'  '../../woosley/nommix.wmo'  'nommixf.xni'
+'mt60ani.eve'  'res.tst'   'mt60ani.mod'  '../../opacity/mlmc.opa' 'mt60ani.rho'   '../../woo/mt60a.wmo'  '../../woo/w13cmn.wmo'       'mt60ani.xni'
+'mt60a.eve'  'res.tst'   'mt60a.mod'  '../../opacity/mlmc.opa' 'mt60a.rho'   '../../woo/mt60a.wmo'  '../../woo/mt60a.wmo'       'mt60a.xni'
+'w13cmn.eve' 'res.tst'   'w13cmixn.mod'  '../../opacity/mlmc.opa'  'w13cmn.rho'   '../../woo/w13c.wmo'  '../../woo/w13cmn.wmo'  'w13cmn.xni'
+'ron13c.eve' 'res.tst'   'ron79ni.mod'  '../../opacity/mlmc.opa'  'ron79ni.rho'   '13C79.ron'  '13C79.ron'  'ron79ni.xni'
+'r02m3ni2.eve'   'res.tst'       'r02m3ni2.mod'  '../../opacity/msun.opa' 'r02m3ni2.rho'   '../../woosley/w13c.wmo'  '../../woosley/w13cmn.wmo'  'r02m3ni2.xni'
+'nommix.eve' 'res.tst'   'nommix.mod'  '../../opacity/mlmc.opa'  'nommix.rho'   '../../woosley/nommix.wmo'  '../../woosley/nommix.wmo'  'nommix.xni'
+'nom87a.eve' 'res.tst'   'nom87a.mod'  '../../opacity/mlmc.opa'  'nom87a.rho'   '../../woosley/nom87a.wmo'  '../../woosley/nom87a.wmo'  'nom87a.xni'
+'nom87a.eve' 'res.tst'   'nom87a.mod'  '../../vladsf/qq.dat' 'nom87a.rho'   '../../woo/nom87a.wmo'  '../../woo/nom87a.wmo'  'nom87a.xni'
+'ron13c.eve' 'res.tst'   'ron79ni.mod'  '../../opacity/mlmc.opa'  'ron79ni.rho'   '13C79.ron'  '13C79.ron'  'ron79ni.xni'
+'w13cmn.eve' 'res.tst'   'w13cmixn.mod'  '../../opacity/mlmc.opa'  'w13cmn.rho'   '../../woosley/w13c.wmo'  '../../woosley/w13cmn.wmo'  'w13cmn.xni'
+'ron13c.eve' 'res.tst'   'ron13c79.mod'  '../../opacity/mlmc.opa'  'ron13c79.rho'   '13C79.ron'  '13C79.ron'  'ron13c79.xni'
+'ron13c.eve' 'res.tst'   'ron13cni.mod'  '../../opacity/mlmc.opa'  'ron13cni.rho'   '13C.ron'  '13C.ron'  'ron13cni.xni'
+    Ni now 7.3 instead of 5.349 %Msun
+'ron13c.eve' 'res.tst'   'ron13c.mod'  '../../opacity/mlmc.opa'  'ron13c.rho'   '13C.ron'  '13C.ron'  'ron13c.xni'
+'glut87a.eve'   'res.tst'    'glut87a.mod'  '../../opacity/msun.opa' 'glut87a.rho'   '../../woosley/ut87a.wmo'  '../../woosley/ut87a.wmo'  'glut87a.xni'
+'ut87a.eve'   'res.tst'       'decut87a.mod'  '../../opacity/msun.opa' 'decut87a.rho'   '../../woosley/ut87a.wmo'  '../../woosley/ut87a.wmo'  'decut87a.xni'
+'tdec94w11.eve'   'res.tst'       'tdec94w11.mod'  '../../opacity/m sun.opa' 'tdec94w11.rho'   '../../woosley/94w.wmo'  '../../woosley/94w.wmo'  'tdec94w11.xni'
+'94w11rr8.eve'   'res.tst'   '94w11rr8.mod'  '../../opacity/msun.opa' '94w11rr8.rho'   '../../woosley/94w.wmo'  '../../woosley/94w.wmo'  '94w11rr8.xni'
+'94w11r8.eve'   'res.tst'   '94w11r8.mod'  '../../opacity/msun.opa' '94w11r8.rho'   '../../woosley/94w.wmo'  '../../woosley/94w.wmo'  '94w11r8.xni'
+'94w11.eve'   'res.tst'       '94w11.mod'  '../../opacity/msun.opa' '94w11.rho'   '../../woosley/94w.wmo'  '../../woosley/94w.wmo'  '94w11.xni'
+'ut87ax.eve'   'res.tst'       'ut87ax.mod'  '../../opacity/msun.opa' 'ut87ax.rho'   '../../woosley/ut87a.wmo'  '../../woosley/ut87a.wmo'  'ut87ax.xni'
+'ut87a.eve'   'res.tst'       'ut87a.mod'  '../../opacity/msun.opa' 'ut87a.rho'   '../../woosley/ut87a.wmo'  '../../woosley/ut87a.wmo'  'ut87a.xni'
+'94w12.eve'   'res.tst'       '94w12.mod'  '../../opacity/msun.opa' '94w12.rho'   '../../woosley/94w.wmo'  '../../woosley/94w.wmo'  '94w12.xni'
+'94wx.eve'   'res.tst'       '94wx.mod'  '../../opacity/msun.opa' '94wx.rho'   '../../woosley/94w.wmo'  '../../woosley/94w.wmo'  '94wx.xni'
+'94wlin.eve'   'res.tst'       '94wlintt.mod'  '../../opacity/msun.opa' '94wlintt.rho'   '../../woosley/w13c.wmo'  '../../woosley/w13cmred.wmo'  '94wlintt.xni'
+'sn87a.eve'   'res.tst'       'sn87a.mod'  '../../opacity/msun.opa' 'sn87a.rho'   '../../woosley/sn87a.wmo'  '../../woosley/sn87a.wmo'  'sn87a.xni'
+'sn87am.eve'   'res.tst'       'sn87amm.mod'  '../../opacity/msun.opa' 'sn87am.rho'   '../../woosley/sn87a.wmo'  '../../woosley/sn87am.wmo'  'sn87amm.xni'
+'sn87am.eve'   'res.tst'       'sn87am.mod'  '../../opacity/msun.opa' 'sn87am.rho'   '../../woosley/sn87a.wmo'  '../../woosley/sn87am.wmo'  'sn87a.xni'
+'87a18b.eve'   'res.tst'       '87a18b.mod'  '../../opacity/msun.opa' '87a18b.rho'   '../../woosley/sn87a18.wmo'  '../../woosley/sn87a18.wmo'  'sn87a18b.xni'
+'87a18.eve'   'res.tst'       '87a18.mod'  '../../opacity/msun.opa' '87a18.rho'   '../../woosley/sn87a18.wmo'  '../../woosley/sn87a18.wmo'  'sn87a18.xni'
+'94w.eve'   'res.tst'       '94w.mod'  '../../opacity/msun.opa' '94w.rho'   '../../woosley/w13c.wmo'  '../../woosley/w13cmn.wmo'  '94w.xni'
+'15.eve'   'res.tst'       '15.mod'  '../../opacity/msun.opa' '15.rho'     'qq.dat'          'qq.dat'    'qq.dat'
+'w13cmix.eve' 'res.tst'   'w13cm.mod'  '../../opacity/mlmc.opa'  'w13cm.rho'   '../../woosley/w13c.wmo'  '../../woosley/w13cm.wmo'  'w13cm.xni'
+'r02m3ni2.eve' 'res.tst'   'r02m3ni2.mod'  '../../opacity/msun.opa' 'r02m3ni2.rho'     'qq.dat'          'qq.dat'    'qq.dat'
+'w15dmc.eve' 'res.tst'   'w15dmc.mod'  '../../opacity/mlmc.opa'  'w15dmc.rho'   '../../woosley/w15d.wmo'   '../../woosley/w15dmc.wmo'  'w15dmc.xni'
+'w13c.eve' 'res.tst'   'w13c.mod'  '../../opacity/mlmc.opa'  'w13c.rho'   '../../woosley/w13c.wmo'
+'sn87ah.eve' 'res.tst'   'sn87ah.mod'    '../../opacity/mlmc.opa'    'sn87ah.rho'     'w15s7a.dat'
+'sn87ah.eve' 'res.tst'   'sn87ah.mod'    '/usr4/megera/mlmc.opa'       'sn87ah.rho'     'w15s7a.dat'
+'sn87a2.eve' 'res.tst'   'sn87a2.mod'    'msun.opa'                   'sn87a2.rho'     'w15s7a.dat'
+'r04m3ni2.eve' 'res.tst'   'r04m3ni2.mod'    'msun.opa'                   'r04m3ni2.rho'     'w15s7a.dat'
+'r02m6h1.eve' 'Res.tst'   'r02m6h1.mod'    '..\..\opacity\msun.opa'        'r02m6h1.rho'     'w15s7a.dat'
+'r02m6nw.eve' 'Res.tst'   'r02m6nw.mod'    '..\..\opacity\msun.opa'        'r02m6nw.rho'     'w15s7a.dat'
+'r01m3nw.eve' 'Res.tst'   'r01m3nw.mod'    '..\..\opacity\msun.opa'        'r01m3nw.rho'     'w15s7a.dat'
+'r01m4w13.eve' 'Res.tst'   'r01m4w13.mod'    '..\..\opacity\msun.opa'        'r01m4w13.rho'     'w15s7a.dat'
+'r01m4n.eve' 'Res.tst'   'r01m4n.mod'    '..\..\opacity\msun.opa'        'r01m4n.rho'     'w15s7a.dat'
+'r01m6.eve' 'Res.tst'   'r01m6.mod'    '..\..\opacity\msun.opa'        'r01m6.rho'     'w15s7a.dat'
+'r01m10.eve' 'Res.tst'   'r01m10.mod'    '..\..\opacity\msun.opa'        'r01m10.rho'     'w15s7a.dat'
+'s35cwrs.eve' 'Res.tst'   's35cwrs.mod'   '..\..\opacity\msun.opa'  's35cwrs.rho'  's35c.chm'
+'s35cwrr.eve' 'Res.tst'   's35cwrr.mod'   '..\..\opacity\msun.opa'  's35cwrr.rho'  's35c.chm'
+'s35cwr.eve' 'Res.tst'   's35cwr.mod'   '..\..\opacity\msun.opa'  's35cwr.rho'     's35c.chm'
+'s35cwr4.eve' 'Res.tst'   's35cwr4.mod'   '..\..\opacity\msun.opa'  's35cwr4.rho'  's35c.chm'
+'mt60a.eve' 'Res.tst'   'mt60a.mod'   '..\..\opacity\msun.opa'  'mt60a.rho'        'mt60a.chm'
+'s35c.eve' 'Res.tst'   's35c.mod'   '..\..\opacity\msun.opa'  's35c.rho'           's35c.chm'
+'r05m15.eve' 'Res.tst'   'r05m15.mod'   '..\..\opacity\msun.opa'  'r05m15.rho'     's15s7a.chm'
+'r6m6wh.eve' 'Res.tst'   'r6m6wh.mod'   '..\..\opacity\msun.opa'  'r6m6wh.rho'     'w15s7a.dat'
+'r05m15yy.eve' 'Res.tst'   'r05m15yy.mod'     'r05m15yy.rho'   'w15s7a.dat'
+'r06m6x.eve' 'Res.tst'   'r06m6x.mod'     'r06m6x.rho'        'w15s7a.dat'
+'s6s6w.eve' 'Res.tst'   's6s6w.mod'     's6s6w.rho'        'w15s7a.dat'

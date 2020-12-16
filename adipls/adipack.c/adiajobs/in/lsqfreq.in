@@ -1,0 +1,12 @@
+Input file:
+/obs/jcd/obsfrq/libbr.freq  
+agsm.l5bi.d.15.p2   @
+lsqf.l5bi.d.15.p2   @
+'icase, nmodel?'
+5,0   @
+'lw1,lw2,nw1,nw2,xw1,xw2,frqw1,frqw2?'
+0,4,0,1000,17,29,0,5000   @
+'x0,kpol, lmaxft?'
+23,2,3   @
+'iobsfr,irdfrq,irdiag?'
+,,,,,,,,,   @

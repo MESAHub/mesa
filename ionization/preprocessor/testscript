@@ -1,0 +1,18 @@
+#!/bin/bash
+# a script to test that compiling and linking
+# produces a code that works as expected..
+
+cd src; make test
+cd ..
+
+./src/tfdh_test ./testdir
+
+echo "checking that file matches reference"
+
+cd testdir; ndiff -relerr 1d-7 reference_file test_file > diff_file
+
+if [[ -s diff_file ]]; then
+	echo "does not match.. see testdir/diff_file for more"
+else
+	echo "matches.. success!"
+fi

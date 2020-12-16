@@ -1,0 +1,154 @@
+Subroutine TranEq;
+  IMPLICIT REAL*8 (A-H,O-Z);
+    _Include snrad;
+    _Include nstep;
+    _Include difjac.inc;
+    _Include black;
+-- the body of procedure @DERAT:
+-- EQUATIONS OF TIME-DEPENDENT RADIATIVE TRANSFER &
+-- RADIATIVE HEATING HEATRA FOR TRANSFER
+  TOTJ=0.D0; TOTJPR=0.D0;
+  TOTW=0.D0; TOTWPR=0.D0;
+--IF(Km<NZON)DURH=0.5D0*((U2-U1)/(R2-R1)+DUR);
+  IF(Km==Ncnd+1)THEN;
+--  SBL=0.D0;
+    _DO L=1,NFRUS;
+      BLCKD(L)=BLACKD(L,(0.5D0*(Tp+Tp0)));
+  --  SBL=SBL+BLCKD(L)*WEIGHT(L);
+    _OD;
+  ENDIF;
+  _DO L=1,NFRUS;
+--    IF(@FJ1*WEIGHT(L)<-1.D-04 & FRST)THEN;
+    IF(@FJ1*WEIGHT(L)<-1.D0 & FRST)THEN; -- try for Ib
+      BADSTE=.TRUE.;
+--      WRITE(@term,'('' NSTEP Km L FJ(B C) FH(B) '',3I5,1P,3E10.2)')
+--                NSTEP,Km,L,@FJ1,@FJ2,@FH1;
+      RETURN;
+    ENDIF;
+--    If(km==1 & L==LfrDebug  & FRST)THEN; 
+--      WRITE(@term,'('' NSTEP Km L FJ(B C) FH(B) '',3I5,1P,3E10.2)')
+--                NSTEP,Km,L,@FJ1,@FJ2,@FH1;
+--    ENDIF;
+    IF(FRST)THEN;
+      -- DEFINE DJNU(L)=(DFJ/DLOGNU) DEPENDING ON SIGN OF DUR(L)
+         IF(DUR(L)>0.D0) THEN;
+           _SELECT
+             _ L==1     [DJNU(1)=@FJ1C*DUR(2)*FREQMN(2)**4/WEIGHT(1)]
+             _ L==NFRUS [DJNU(L)=-@FJ1*DUR(L)*FREQMN(L)**4/WEIGHT(L)]
+             _OTHER [DJNU(L)=(@FJ1C*DUR(L+1)*FREQMN(L+1)**4
+                              -@FJ1*DUR(L)*FREQMN(L)**4)/WEIGHT(L)]
+           _END;
+         ELSE;
+           _SELECT
+             _ L==1     [DJNU(1)=@FJ1*DUR(1)*FREQMN(1)**4/WEIGHT(1)]
+             _ L==NFRUS [DJNU(L)=-@FJ1A*DUR(L-1)*FREQMN(L-1)**4/WEIGHT(L)]
+             _OTHER [DJNU(L)=(@FJ1*DUR(L)*FREQMN(L)**4
+                              -@FJ1A*DUR(L-1)*FREQMN(L-1)**4)/WEIGHT(L)]
+           _END;
+         ENDIF;
+     -- end of finding DJNU
+     --  DHNU=0.D0;
+    ENDIF;
+     IF(Km==Ncnd+1)THEN;
+       IF(Km>1)THEN;
+         FH0=FLcore*BLCKD(L)*CAPcor
+              /(@LEFT*(0.5D0*(Tp+Tp0))**4*RS0*HAPL(L));
+--            *(4.D0*PI**4)/((15.D0*@LEFT)*SBL*RS0*URHO*UR);
+       ELSE; -- Ncnd==0;
+         FH0=FLcore;--=0
+       ENDIF;
+       IF(FRST)FHcore(L)=FH0;
+     ELSE;
+       IF(ABS(@FH0)>FLOOR(NVARS+1)  & Ncnd<0)THEN;
+         IF(@FH0<0.D0)THEN;
+           FH0=-MIN(ABS(@FH0),ABS(@FJ1)*@TOLF);
+         ELSE;
+           FH0=MIN(ABS(@FH0),ABS(@FJ0)*@TOLF);
+         ENDIF;
+       ELSE;
+         FH0=@FH0;
+       ENDIF;
+     ENDIF;
+     IF(Km<NZON) THEN;
+       IF(ABS(@FH1)>FLOOR(NVARS+1)  & Ncnd<0 )THEN;
+         IF(@FH1<0.D0)THEN;
+           FH1=-MIN(ABS(@FH1),ABS(@FJ2)*@TOLF);
+     --    IF(ABS(@FH1)>ABS(@FJ2)*@TOLF & FRST)
+       --     WRITE(@Wres,*)' FH1>FJ2*@TOLF NSTEP Km L ',NSTEP,Km,L;
+         ELSE;
+     --    IF(ABS(@FH1)>ABS(@FJ1)*@TOLF & FRST)
+       --     WRITE(@Wres,*)' FH1>FJ1*@TOLF NSTEP Km L ',NSTEP,Km,L;
+           FH1=MIN(ABS(@FH1),ABS(@FJ1)*@TOLF);
+         ENDIF;
+       ELSE;
+         FH1=@FH1;
+       ENDIF;
+     ELSE; -- FOR Km=NZON BOUNDARY CONDITION FOR FH
+        FH1=HEDD(L)*@FJ1;
+     ENDIF;
+     -- HAPL and HAPH means kappa for absorption + scattering
+     -- Haab - for absorption
+     DFJ(L)=-@FJ1*
+            ((U1-U0)/(R1-R0)*(1.D0+EDDJ(Km,L))+(3.D0-EDDJ(Km,L))*UDIVR)
+            +DJNU(L)+CLIGHT*(-(FH1*RS1-FH0*RS0)*RCinv1
+            +HAAB(L)*PL*(BLACK(L,Tp)-@FJ1));
+     IF(Km<NZON) THEN;
+     -- FJ TENDS TO CONST/R**2 INWARD-OUTWARD
+       DFH(L)=-4.D0*@FH1*U1/R1+CLIGHT*(
+       -(  --Flim+
+          EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1
+         )*2.D0/(R2-R0)
+           -HAPH(L)*3.D0*(DM1+DM2)/(RC2-RC0)*@FH1
+                   -((1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1*R0
+                     +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2*R2)/RS1
+                                        );
+-- DEB:
+   If(Nstep>=NDebug .and. Km>Ncnd .and. Km<Ncnd+3 .and. L==LfrDebug)then;
+      write(@wres,'(3(A,I10))') ' LfrDebug=',LfrDebug,' Nperturb=', Nperturb; 
+      write(@wres,*)' traneq Km & L DFH(L)=',km,L,DFH(L);
+      write(@wres,'(a,1p,e12.3)')' -4.D0*@FH1*U1/R1=',-4.D0*@FH1*U1/R1;
+      write(@wres,'(a,1p,e22.12)')' FJ=',CLIGHT*(
+            (EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1)*2.D0/(R2-R0));
+      write(@wres,'(a,1p,e22.12)')' Haph=',CLIGHT*(
+           -HAPH(L)*3.D0*(DM1+DM2)/(RC2-RC0)*@FH1);
+      write(@wres,'(a,1p,e12.3)')' EddjFj=',Clight*(
+                       (1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1/RS1
+                   -((1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1*R0
+                     +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2*R2)/RS1);
+      write(@wres,*)' Nthick=',Nthick(L);
+   endif;
+
+--       IF(Km>Nthick(L)+1 & Km^=NZON-1)THEN;
+       IF(Km^=NZON-1 & Km^=Ncnd+1)THEN;
+         DFH(L)=DFH(L)+CLIGHT*RVIS*
+                (FH0*(RS0/RS1)-2.D0*FH1+@FH2*(RS2/RS1))/(2.D0*(R1-R0));
+--DEB:
+         If(Nstep>=NDebug .and. Km>Ncnd .and. Km<Ncnd+3 .and. L==LfrDebug)then;
+            write(@wres,*)' traneq after Rvis DFH(L)=',DFH(L);
+         endif;
+       ELSEIF(Km==NZON-1)THEN;
+         DFH(L)=DFH(L)+CLIGHT*RVIS*(FH0*(RS0/RS1)-2.D0*FH1+
+                        HEDD(L)*@FJ2*(RS2/RS1))/(2.D0*(R1-R0));
+       ENDIF;
+     ELSE;
+       DFH(L)=0.D0; -- NOT USED FOR Km=NZON
+     ENDIF;
+     If(LTHICK(L,Km)) Then;
+       TOTJ=TOTJ-(FH1*RS1-FH0*RS0)/DM1*WEIGHT(L); -- thick
+     ELSE;
+       TOTJ=TOTJ+(max(@FJ1,0.D0)-BLACK(L,Tp))*HAAB(L)*WEIGHT(L); -- thin
+     ENDIF;
+    TOTJPR=TOTJPR+@FJ1*WEIGHT(L);
+     TOTW=TOTW+(@FJ1-BLACK(L,Tp))*HAAB(L)*WEIGHT(L);
+  --  @wterm' Fj=',@FJ1,'     Bl=',BlacK(L,Tp);
+  --  @wterm' Fh1=',Fh1,'     Fh0=',Fh0;
+    TOTWPR=TOTWPR-(FH1*RS1-FH0*RS0)/DM1*WEIGHT(L);
+--DEB:
+   If(Nstep>=NDebug .and. Km>Ncnd .and. Km<Ncnd+3 .and. L==LfrDebug)then;
+      write(@wres,*)' traneq exit Km & L DFH(L)=',DFH(L);
+   endif;
+  _OD;
+  HEATRA= TOTJ*CKRAD;
+  return;
+ end;
+

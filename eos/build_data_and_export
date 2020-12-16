@@ -1,0 +1,55 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $1 -ne 0 ]
+	then
+	   echo FAILED for $2
+	   exit 1
+	else
+		echo Succeeded for $2
+	fi
+}
+
+#Cleanup data folders
+
+rm -rf ../data/eos*
+
+
+# we are in mesa/eos at the start of this.
+
+# Scripts to loop over
+names=(build_SCVH_PT_data_and_export build_DT_data_and_export build_PT_data_and_export build_PC_support_data_and_export build_FreeEOS_data_and_export build_CMS_data_and_export)
+
+# Loop over the length of the array
+for ((i=0;i<${#names[@]};++i))
+do
+	# Run each command
+	./${names[i]} &
+	# Store pid of last command
+	pids[${i}]=$!
+	# Pre fill failure array with 0
+	failures[${i}]=0
+done
+
+# Wait for each pid to finish, doesn't matter if the last element finishs before the first finishes,
+# we still wait for the slowest running process
+for ((i=0;i<${#names[@]};++i))
+do
+	wait ${pids[i]}
+	#Store all failures 
+	failures[${i}]=$?
+done
+
+echo
+echo
+
+for ((i=0;i<${#names[@]};++i))
+do
+	#error check all at once, and at the end so errors dont get lost in the noise
+	check_okay ${failures[i]} ${names[i]}
+done
+
+echo "done"
+
+cd ..
+

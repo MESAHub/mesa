@@ -1,0 +1,14 @@
+ Files needed:
+ Input grand summary on unit 2
+ Output short summary on unit 3
+ Output namelist on unit 4
+2 'agsm.l5bi.d.15.p2.md'   @
+3 'ttt.setex.ssm'   @
+4 'ttt.setex.exec'   @
+-1 ''   @
+ icase,ifill,l1,l2,nfill1,nfill2,ielfl1
+1,,,,0,1000,,,,,,,,,,,,,  @
+ sigmin,sigmax
+0,0  @
+ nsig,n1,n2,nsel,dels
+2,,,,,,,,,,,,,,,,,,  @

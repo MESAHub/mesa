@@ -1,0 +1,704 @@
+ ----------------------------------------------------------------
+ 
+ Testing assignment and comparison
+ 
+ ----------------------------------------------------------------
+ Test real -> auto_diff_real_1var_order1 assignment
+ Should print    3.1000000000000001D+00    0.0000000000000000D+00  :      3.1000000000000001D+00    0.0000000000000000D+00
+
+ Test auto_diff_real_1var_order1 == auto_diff_real_1var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 > auto_diff_real_1var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 < auto_diff_real_1var_order1
+ Should print F: F
+ 
+ Test auto_diff_real_1var_order1 >= auto_diff_real_1var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 <= auto_diff_real_1var_order1
+ Should print F: F
+ 
+ Test auto_diff_real_1var_order1 >= auto_diff_real_1var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 <= auto_diff_real_1var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 == real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 > real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 < real(dp)
+ Should print F: F
+ 
+ Test auto_diff_real_1var_order1 >= real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 <= real(dp)
+ Should print F: F
+ 
+ Test auto_diff_real_1var_order1 >= real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 <= real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 == integer
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 > integer
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 < integer
+ Should print F: F
+ 
+ Test auto_diff_real_1var_order1 >= integer
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 <= integer
+ Should print F: F
+ 
+ Test auto_diff_real_1var_order1 >= integer
+ Should print T: T
+ 
+ Test auto_diff_real_1var_order1 <= integer
+ Should print T: T
+ 
+ ----------------------------------------------------------------
+ 
+ Testing binary operators
+ 
+ ----------------------------------------------------------------
+ Test auto_diff_real_1var_order1+auto_diff_real_1var_order1
+ Should print    3.0000000000000000D+00    2.0000000000000000D+00  :      3.0000000000000000D+00    2.0000000000000000D+00
+
+ Test auto_diff_real_1var_order1+real(dp)
+ Should print    3.0000000000000000D+00    1.0000000000000000D+00  :      3.0000000000000000D+00    1.0000000000000000D+00
+
+ Test real(dp)+auto_diff_real_1var_order1
+ Should print    3.0000000000000000D+00    1.0000000000000000D+00  :      3.0000000000000000D+00    1.0000000000000000D+00
+
+ Test auto_diff_real_1var_order1*auto_diff_real_1var_order1
+ Should print    6.0000000000000000D+00    5.0000000000000000D+00  :      6.0000000000000000D+00    5.0000000000000000D+00
+
+ Test auto_diff_real_1var_order1*real(dp)
+ Should print    6.0000000000000000D+00    2.0000000000000000D+00  :      6.0000000000000000D+00    2.0000000000000000D+00
+
+ Test real(dp)*auto_diff_real_1var_order1
+ Should print    6.0000000000000000D+00    2.0000000000000000D+00  :      6.0000000000000000D+00    2.0000000000000000D+00
+
+ Test max(auto_diff_real_1var_order1, auto_diff_real_1var_order1)
+ Should print    2.0000000000000000D+00    2.0000000000000000D+00  :      2.0000000000000000D+00    2.0000000000000000D+00
+
+ Test max(auto_diff_real_1var_order1, real(dp))
+ Should print    2.0000000000000000D+00    0.0000000000000000D+00  :      2.0000000000000000D+00    0.0000000000000000D+00
+
+ Test max(auto_diff_real_1var_order1, real(dp))
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00
+
+ Test max(real(dp), auto_diff_real_1var_order1)
+ Should print    2.0000000000000000D+00    0.0000000000000000D+00  :      2.0000000000000000D+00    0.0000000000000000D+00
+
+ Test max(real(dp), auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00
+
+ Test dim(auto_diff_real_1var_order1, auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00
+
+ Test dim(auto_diff_real_1var_order1, auto_diff_real_1var_order1)
+ Should print    0.0000000000000000D+00    0.0000000000000000D+00  :      0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test dim(auto_diff_real_1var_order1, real(dp))
+ Should print    1.0000000000000000D+00    2.0000000000000000D+00  :      1.0000000000000000D+00    2.0000000000000000D+00
+
+ ----------------------------------------------------------------
+ 
+ Testing unary operators
+ 
+ ----------------------------------------------------------------
+ Testing exp(auto_diff_real_1var_order1)
+ Should print    2.7182818284590451D+00    2.7182818284590451D+00  :      2.7182818284590451D+00    2.7182818284590451D+00
+
+ Testing abs(auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00
+
+ Testing abs(auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00   -1.0000000000000000D+00  :      1.0000000000000000D+00   -1.0000000000000000D+00
+
+ Testing exp(auto_diff_real_1var_order1)
+ Should print    7.3890560989306495D+00    7.3890560989306495D+00  :      7.3890560989306495D+00    7.3890560989306495D+00
+
+ Testing sin(auto_diff_real_1var_order1)
+ Should print    1.2246467991473530D-16   -9.9999999999999989D-01  :      1.2246467991473530D-16   -9.9999999999999989D-01
+
+ Testing cos(auto_diff_real_1var_order1)
+ Should print   -9.9999999999999989D-01   -1.2246467991473530D-16  :     -9.9999999999999989D-01   -1.2246467991473530D-16
+
+ Testing tan(auto_diff_real_1var_order1)
+ Should print approximately   -1.2246467991473530D-16    1.0000000000000002D+00  :     -1.2246467991473530D-16    1.0000000000000002D+00
+
+ Testing sinh(auto_diff_real_1var_order1)
+ Should print    1.1548739357257746D+01    1.1591953275521519D+01  :      1.1548739357257746D+01    1.1591953275521519D+01
+
+ Testing cosh(auto_diff_real_1var_order1)
+ Should print    1.1591953275521519D+01    1.1548739357257746D+01  :      1.1591953275521519D+01    1.1548739357257746D+01
+
+ Testing tanh(auto_diff_real_1var_order1)
+ Should print approximately    9.9627207622074998D-01    7.4419501427962160D-03  :      9.9627207622074998D-01    7.4419501427962160D-03
+
+ Testing asin(auto_diff_real_1var_order1)
+ Should print    5.2359877559829882D-01    1.1547005383792517D+00  :      5.2359877559829882D-01    1.1547005383792517D+00
+
+ Testing acos(auto_diff_real_1var_order1)
+ Should print    1.0471975511965976D+00   -1.1547005383792517D+00  :      1.0471975511965976D+00   -1.1547005383792517D+00
+
+ Testing atan(auto_diff_real_1var_order1)
+ Should print approximately    4.6364760900080609D-01    8.0000000000000004D-01  :      4.6364760900080609D-01    8.0000000000000004D-01
+
+ Testing asinh(auto_diff_real_1var_order1)
+ Should print approximately    1.4436354751788103D+00    4.4721359549995793D-01  :      1.4436354751788103D+00    4.4721359549995793D-01
+
+ Testing acosh(auto_diff_real_1var_order1)
+ Should print approximately    1.3169578969248166D+00    5.7735026918962584D-01  :      1.3169578969248166D+00    5.7735026918962584D-01
+
+ Testing atanh(auto_diff_real_1var_order1)
+ Should print approximately    5.4930614433405478D-01    1.3333333333333333D+00  :      5.4930614433405478D-01    1.3333333333333333D+00
+
+ Testing unary_minus(auto_diff_real_1var_order1)
+ Should print   -1.0000000000000000D+00   -1.0000000000000000D+00  :     -1.0000000000000000D+00   -1.0000000000000000D+00
+
+ Testing unary_minus(auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00   -1.0000000000000000D+00  :      1.0000000000000000D+00   -1.0000000000000000D+00
+
+ Testing log(auto_diff_real_1var_order1)
+ Should print    0.0000000000000000D+00    1.0000000000000000D+00  :      0.0000000000000000D+00    1.0000000000000000D+00
+
+ Testing safe_log(auto_diff_real_1var_order1)
+ Should print    0.0000000000000000D+00    1.0000000000000000D+00  :      0.0000000000000000D+00    1.0000000000000000D+00
+
+ Testing log10(auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00    4.3429448190325189D-02  :      1.0000000000000000D+00    4.3429448190325189D-02
+
+ Testing safe_log10(auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00    4.3429448190325189D-02  :      1.0000000000000000D+00    4.3429448190325189D-02
+
+ Testing log(auto_diff_real_1var_order1)
+ Should print    1.0000000000000000D+00    3.6787944117144228D-01  :      9.9999999999999989D-01    3.6787944117144233D-01
+
+ Testing safe_log(auto_diff_real_1var_order1)
+ Should print approximately    1.0000000000000000D+00    3.6787944117144228D-01  :      9.9999999999999989D-01    3.6787944117144233D-01
+
+ Testing log10(auto_diff_real_1var_order1)
+ Should print approximately    2.0000000000000000D+00    4.3429448190325185D-03  :      2.0000000000000000D+00    4.3429448190325185D-03
+
+ Testing safe_log10(auto_diff_real_1var_order1)
+ Should print approximately    2.0000000000000000D+00    4.3429448190325185D-03  :      2.0000000000000000D+00    4.3429448190325185D-03
+
+ Testing pow2(auto_diff_real_1var_order1)
+ Should print approximately    9.0000000000000000D+00    6.0000000000000000D+00  :      9.0000000000000000D+00    6.0000000000000000D+00
+
+ Testing pow3(auto_diff_real_1var_order1)
+ Should print    8.0000000000000000D+00    1.2000000000000000D+01  :      8.0000000000000000D+00    1.2000000000000000D+01
+
+ Testing pow4(auto_diff_real_1var_order1)
+ Should print    1.6000000000000000D+01    3.2000000000000000D+01  :      1.6000000000000000D+01    3.2000000000000000D+01
+
+ Testing pow5(auto_diff_real_1var_order1)
+ Should print    2.4300000000000000D+02    4.0500000000000000D+02  :      2.4300000000000000D+02    4.0500000000000000D+02
+
+ Testing pow6(auto_diff_real_1var_order1)
+ Should print    6.4000000000000000D+01    1.9200000000000000D+02  :      6.4000000000000000D+01    1.9200000000000000D+02
+
+ Testing pow7(auto_diff_real_1var_order1)
+ Should print    1.2800000000000000D+02    4.4800000000000000D+02  :      1.2800000000000000D+02    4.4800000000000000D+02
+
+ Testing pow(auto_diff_real_1var_order1, real(dp))
+ Should print approximately    2.0000000000000000D+00    2.5000000000000000D-01  :      1.9999999999999998D+00    2.5000000000000000D-01
+
+ Testing pow(real(dp), auto_diff_real_1var_order1)
+ Should print approximately    7.3890560989306495D+00    7.3890560989306495D+00  :      7.3890560989306495D+00    7.3890560989306486D+00
+
+ Testing pow(auto_diff_real_1var_order1, integer)
+ Should print    1.6000000000000000D+01    8.0000000000000000D+00  :      1.6000000000000000D+01    8.0000000000000000D+00
+
+ Testing pow(integer, auto_diff_real_1var_order1)
+ Should print    4.0000000000000000D+00    2.7725887222397811D+00  :      4.0000000000000000D+00    2.7725887222397811D+00
+
+ ----------------------------------------------------------------
+ 
+ Testing assignment and comparison
+ 
+ ----------------------------------------------------------------
+ Test real -> auto_diff_real_2var_order1 assignment
+ Should print    3.1000000000000001D+00    0.0000000000000000D+00    0.0000000000000000D+00  :      3.1000000000000001D+00    0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1 == auto_diff_real_2var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 > auto_diff_real_2var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 < auto_diff_real_2var_order1
+ Should print F: F
+ 
+ Test auto_diff_real_2var_order1 >= auto_diff_real_2var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 <= auto_diff_real_2var_order1
+ Should print F: F
+ 
+ Test auto_diff_real_2var_order1 >= auto_diff_real_2var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 <= auto_diff_real_2var_order1
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 == real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 > real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 < real(dp)
+ Should print F: F
+ 
+ Test auto_diff_real_2var_order1 >= real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 <= real(dp)
+ Should print F: F
+ 
+ Test auto_diff_real_2var_order1 >= real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 <= real(dp)
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 == integer
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 > integer
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 < integer
+ Should print F: F
+ 
+ Test auto_diff_real_2var_order1 >= integer
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 <= integer
+ Should print F: F
+ 
+ Test auto_diff_real_2var_order1 >= integer
+ Should print T: T
+ 
+ Test auto_diff_real_2var_order1 <= integer
+ Should print T: T
+ 
+ ----------------------------------------------------------------
+ 
+ Testing binary operators
+ 
+ ----------------------------------------------------------------
+ Test auto_diff_real_2var_order1+auto_diff_real_2var_order1
+ Should print    3.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00  :      3.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1+real(dp)
+ Should print    3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test real(dp)+auto_diff_real_2var_order1
+ Should print    3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1+integer
+ Should print    3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test integer+auto_diff_real_2var_order1
+ Should print    3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      3.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1*auto_diff_real_2var_order1
+ Should print    6.0000000000000000D+00    2.0000000000000000D+00    3.0000000000000000D+00  :      6.0000000000000000D+00    2.0000000000000000D+00    3.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1*real(dp)
+ Should print    6.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00  :      6.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1/auto_diff_real_2var_order1
+ Should print    1.5000000000000000D+00    5.0000000000000000D-01   -7.5000000000000000D-01  :      1.5000000000000000D+00    5.0000000000000000D-01   -7.5000000000000000D-01
+
+ Test auto_diff_real_2var_order1/real(dp)
+ Should print    1.5000000000000000D+00    5.0000000000000000D-01    0.0000000000000000D+00  :      1.5000000000000000D+00    5.0000000000000000D-01    0.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1-auto_diff_real_2var_order1
+ Should print   -1.0000000000000000D+00    1.0000000000000000D+00   -1.0000000000000000D+00  :     -1.0000000000000000D+00    1.0000000000000000D+00   -1.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1-auto_diff_real_2var_order1
+ Should print   -4.0000000000000000D+00    1.0000000000000000D+00   -2.0000000000000000D+00  :     -4.0000000000000000D+00    1.0000000000000000D+00   -2.0000000000000000D+00
+
+ Test auto_diff_real_2var_order1-real(dp)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test real(dp)*auto_diff_real_2var_order1
+ Should print    6.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00  :      6.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00
+
+ Test max(auto_diff_real_2var_order1, auto_diff_real_2var_order1)
+ Should print    2.0000000000000000D+00    0.0000000000000000D+00    2.0000000000000000D+00  :      2.0000000000000000D+00    0.0000000000000000D+00    2.0000000000000000D+00
+
+ Test max(auto_diff_real_2var_order1, real(dp))
+ Should print    2.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00  :      2.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test max(auto_diff_real_2var_order1, real(dp))
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test max(real(dp), auto_diff_real_2var_order1)
+ Should print    2.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00  :      2.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test max(real(dp), auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test min(auto_diff_real_2var_order1, auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test min(auto_diff_real_2var_order1, real(dp))
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test min(auto_diff_real_2var_order1, real(dp))
+ Should print    0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00  :      0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test min(real(dp), auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Test min(real(dp), auto_diff_real_2var_order1)
+ Should print    0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00  :      0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test dim(auto_diff_real_2var_order1, auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    2.0000000000000000D+00   -1.0000000000000000D+00  :      1.0000000000000000D+00    2.0000000000000000D+00   -1.0000000000000000D+00
+
+ Test dim(auto_diff_real_2var_order1, auto_diff_real_2var_order1)
+ Should print    0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00  :      0.0000000000000000D+00    0.0000000000000000D+00    0.0000000000000000D+00
+
+ Test dim(auto_diff_real_2var_order1, real(dp))
+ Should print    1.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    2.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing pow(auto_diff_real_2var_order1, auto_diff_real_2var_order1)
+ Should print approximately    4.0000000000000000D+00    4.0000000000000000D+00    2.7725887222397811D+00  :      4.0000000000000000D+00    4.0000000000000000D+00    2.7725887222397811D+00
+
+ ----------------------------------------------------------------
+ 
+ Testing unary operators
+ 
+ ----------------------------------------------------------------
+ Testing exp(auto_diff_real_2var_order1)
+ Should print    2.7182818284590451D+00    2.7182818284590451D+00    0.0000000000000000D+00  :      2.7182818284590451D+00    2.7182818284590451D+00    0.0000000000000000D+00
+
+ Testing exp(auto_diff_real_2var_order1)
+ Should print    2.7182818284590451D+00    0.0000000000000000D+00    2.7182818284590451D+00  :      2.7182818284590451D+00    0.0000000000000000D+00    2.7182818284590451D+00
+
+ Testing exp(auto_diff_real_2var_order1)
+ Should print    7.3890560989306495D+00    7.3890560989306495D+00    0.0000000000000000D+00  :      7.3890560989306495D+00    7.3890560989306495D+00    0.0000000000000000D+00
+
+ Testing abs(auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing abs(auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00   -1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00   -1.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing sin(auto_diff_real_2var_order1)
+ Should print    1.2246467991473530D-16   -9.9999999999999989D-01    0.0000000000000000D+00  :      1.2246467991473530D-16   -9.9999999999999989D-01    0.0000000000000000D+00
+
+ Testing cos(auto_diff_real_2var_order1)
+ Should print   -9.9999999999999989D-01   -1.2246467991473530D-16    0.0000000000000000D+00  :     -9.9999999999999989D-01   -1.2246467991473530D-16    0.0000000000000000D+00
+
+ Testing tan(auto_diff_real_2var_order1)
+ Should print approximately   -1.2246467991473530D-16    1.0000000000000002D+00    0.0000000000000000D+00  :     -1.2246467991473530D-16    1.0000000000000002D+00    0.0000000000000000D+00
+
+ Testing sinh(auto_diff_real_2var_order1)
+ Should print    1.1548739357257746D+01    1.1591953275521519D+01    0.0000000000000000D+00  :      1.1548739357257746D+01    1.1591953275521519D+01    0.0000000000000000D+00
+
+ Testing cosh(auto_diff_real_2var_order1)
+ Should print    1.1591953275521519D+01    1.1548739357257746D+01    0.0000000000000000D+00  :      1.1591953275521519D+01    1.1548739357257746D+01    0.0000000000000000D+00
+
+ Testing tanh(auto_diff_real_2var_order1)
+ Should print approximately    9.9627207622074998D-01    7.4419501427962160D-03    0.0000000000000000D+00  :      9.9627207622074998D-01    7.4419501427962160D-03    0.0000000000000000D+00
+
+ Testing asin(auto_diff_real_2var_order1)
+ Should print    5.2359877559829882D-01    1.1547005383792517D+00    0.0000000000000000D+00  :      5.2359877559829882D-01    1.1547005383792517D+00    0.0000000000000000D+00
+
+ Testing acos(auto_diff_real_2var_order1)
+ Should print    1.0471975511965976D+00   -1.1547005383792517D+00    0.0000000000000000D+00  :      1.0471975511965976D+00   -1.1547005383792517D+00    0.0000000000000000D+00
+
+ Testing atan(auto_diff_real_2var_order1)
+ Should print approximately    4.6364760900080609D-01    8.0000000000000004D-01    0.0000000000000000D+00  :      4.6364760900080609D-01    8.0000000000000004D-01    0.0000000000000000D+00
+
+ Testing asinh(auto_diff_real_2var_order1)
+ Should print approximately    1.4436354751788103D+00    4.4721359549995793D-01    0.0000000000000000D+00  :      1.4436354751788103D+00    4.4721359549995793D-01    0.0000000000000000D+00
+
+ Testing acosh(auto_diff_real_2var_order1)
+ Should print approximately    1.3169578969248166D+00    5.7735026918962584D-01    0.0000000000000000D+00  :      1.3169578969248166D+00    5.7735026918962584D-01    0.0000000000000000D+00
+
+ Testing atanh(auto_diff_real_2var_order1)
+ Should print approximately    5.4930614433405478D-01    1.3333333333333333D+00    0.0000000000000000D+00  :      5.4930614433405478D-01    1.3333333333333333D+00    0.0000000000000000D+00
+
+ Testing unary_minus(auto_diff_real_2var_order1)
+ Should print   -1.0000000000000000D+00   -1.0000000000000000D+00    0.0000000000000000D+00  :     -1.0000000000000000D+00   -1.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing unary_minus(auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00   -1.0000000000000000D+00    0.0000000000000000D+00  :      1.0000000000000000D+00   -1.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing log(auto_diff_real_2var_order1)
+ Should print    0.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      0.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing safe_log(auto_diff_real_2var_order1)
+ Should print    0.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00  :      0.0000000000000000D+00    1.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing log10(auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    4.3429448190325189D-02    0.0000000000000000D+00  :      1.0000000000000000D+00    4.3429448190325189D-02    0.0000000000000000D+00
+
+ Testing safe_log10(auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    4.3429448190325189D-02    0.0000000000000000D+00  :      1.0000000000000000D+00    4.3429448190325189D-02    0.0000000000000000D+00
+
+ Testing log(auto_diff_real_2var_order1)
+ Should print    1.0000000000000000D+00    3.6787944117144228D-01    0.0000000000000000D+00  :      9.9999999999999989D-01    3.6787944117144233D-01    0.0000000000000000D+00
+
+ Testing safe_log(auto_diff_real_2var_order1)
+ Should print approximately    1.0000000000000000D+00    3.6787944117144228D-01    0.0000000000000000D+00  :      9.9999999999999989D-01    3.6787944117144233D-01    0.0000000000000000D+00
+
+ Testing log10(auto_diff_real_2var_order1)
+ Should print approximately    2.0000000000000000D+00    4.3429448190325185D-03    0.0000000000000000D+00  :      2.0000000000000000D+00    4.3429448190325185D-03    0.0000000000000000D+00
+
+ Testing safe_log10(auto_diff_real_2var_order1)
+ Should print approximately    2.0000000000000000D+00    4.3429448190325185D-03    0.0000000000000000D+00  :      2.0000000000000000D+00    4.3429448190325185D-03    0.0000000000000000D+00
+
+ Testing pow2(auto_diff_real_2var_order1)
+ Should print approximately    9.0000000000000000D+00    6.0000000000000000D+00    0.0000000000000000D+00  :      9.0000000000000000D+00    6.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing pow3(auto_diff_real_2var_order1)
+ Should print    8.0000000000000000D+00    1.2000000000000000D+01    0.0000000000000000D+00  :      8.0000000000000000D+00    1.2000000000000000D+01    0.0000000000000000D+00
+
+ Testing pow4(auto_diff_real_2var_order1)
+ Should print    1.6000000000000000D+01    3.2000000000000000D+01    0.0000000000000000D+00  :      1.6000000000000000D+01    3.2000000000000000D+01    0.0000000000000000D+00
+
+ Testing pow5(auto_diff_real_2var_order1)
+ Should print    2.4300000000000000D+02    4.0500000000000000D+02    0.0000000000000000D+00  :      2.4300000000000000D+02    4.0500000000000000D+02    0.0000000000000000D+00
+
+ Testing pow6(auto_diff_real_2var_order1)
+ Should print    6.4000000000000000D+01    1.9200000000000000D+02    0.0000000000000000D+00  :      6.4000000000000000D+01    1.9200000000000000D+02    0.0000000000000000D+00
+
+ Testing pow7(auto_diff_real_2var_order1)
+ Should print    1.2800000000000000D+02    4.4800000000000000D+02    0.0000000000000000D+00  :      1.2800000000000000D+02    4.4800000000000000D+02    0.0000000000000000D+00
+
+ Testing pow(auto_diff_real_2var_order1, real(dp))
+ Should print approximately    2.0000000000000000D+00    2.5000000000000000D-01    0.0000000000000000D+00  :      1.9999999999999998D+00    2.5000000000000000D-01    0.0000000000000000D+00
+
+ Testing pow(real(dp), auto_diff_real_2var_order1)
+ Should print approximately    7.3890560989306495D+00    7.3890560989306495D+00    0.0000000000000000D+00  :      7.3890560989306495D+00    7.3890560989306486D+00    0.0000000000000000D+00
+
+ Testing pow(auto_diff_real_2var_order1, integer)
+ Should print    1.6000000000000000D+01    8.0000000000000000D+00    0.0000000000000000D+00  :      1.6000000000000000D+01    8.0000000000000000D+00    0.0000000000000000D+00
+
+ Testing pow(integer, auto_diff_real_2var_order1)
+ Should print    4.0000000000000000D+00    2.7725887222397811D+00    0.0000000000000000D+00  :      4.0000000000000000D+00    2.7725887222397811D+00    0.0000000000000000D+00
+
+ ----------------------------------------------------------------
+ 
+ Testing assignment
+ 
+ ----------------------------------------------------------------
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    1.0000000000000000D+00  :      1.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ Should print    0.0000000000000000D+00  :      0.0000000000000000D+00
+
+ ----------------------------------------------------------------
+ 
+ Testing unary operators
+ 
+ ----------------------------------------------------------------
+ Test y = x**2
+ Should print    6.0000000000000000D+00  :      6.0000000000000000D+00
+
+ Should print    1.2000000000000000D+01  :      1.2000000000000000D+01
+
+ Should print    1.8000000000000000D+01  :      1.8000000000000000D+01
+
+ Should print    2.4000000000000000D+01  :      2.4000000000000000D+01
+
+ Should print    3.0000000000000000D+01  :      3.0000000000000000D+01
+
+ Should print    3.6000000000000000D+01  :      3.6000000000000000D+01
+
+ Should print    4.2000000000000000D+01  :      4.2000000000000000D+01
+
+ Should print    4.8000000000000000D+01  :      4.8000000000000000D+01
+
+ Should print    5.4000000000000000D+01  :      5.4000000000000000D+01
+
+ Should print    6.0000000000000000D+01  :      6.0000000000000000D+01
+
+ Should print    6.6000000000000000D+01  :      6.6000000000000000D+01
+
+ Should print    7.2000000000000000D+01  :      7.2000000000000000D+01
+
+ Should print    7.8000000000000000D+01  :      7.8000000000000000D+01
+
+ Should print    8.4000000000000000D+01  :      8.4000000000000000D+01
+
+ Should print    9.0000000000000000D+01  :      9.0000000000000000D+01
+
+ Test x = x**2
+ Should print    6.0000000000000000D+00  :      6.0000000000000000D+00
+
+ Should print    1.2000000000000000D+01  :      1.2000000000000000D+01
+
+ Should print    1.8000000000000000D+01  :      1.8000000000000000D+01
+
+ Should print    2.4000000000000000D+01  :      2.4000000000000000D+01
+
+ Should print    3.0000000000000000D+01  :      3.0000000000000000D+01
+
+ Should print    3.6000000000000000D+01  :      3.6000000000000000D+01
+
+ Should print    4.2000000000000000D+01  :      4.2000000000000000D+01
+
+ Should print    4.8000000000000000D+01  :      4.8000000000000000D+01
+
+ Should print    5.4000000000000000D+01  :      5.4000000000000000D+01
+
+ Should print    6.0000000000000000D+01  :      6.0000000000000000D+01
+
+ Should print    6.6000000000000000D+01  :      6.6000000000000000D+01
+
+ Should print    7.2000000000000000D+01  :      7.2000000000000000D+01
+
+ Should print    7.8000000000000000D+01  :      7.8000000000000000D+01
+
+ Should print    8.4000000000000000D+01  :      8.4000000000000000D+01
+
+ Should print    9.0000000000000000D+01  :      9.0000000000000000D+01
+
+ ----------------------------------------------------------------
+ 
+ Testing binary operators
+ 
+ ----------------------------------------------------------------
+ Test y = x + 1d0
+ Should print    1.0000000000000000D+00  :      1.0000000000000000D+00
+
+ Should print    2.0000000000000000D+00  :      2.0000000000000000D+00
+
+ Should print    3.0000000000000000D+00  :      3.0000000000000000D+00
+
+ Should print    4.0000000000000000D+00  :      4.0000000000000000D+00
+
+ Should print    5.0000000000000000D+00  :      5.0000000000000000D+00
+
+ Should print    6.0000000000000000D+00  :      6.0000000000000000D+00
+
+ Should print    7.0000000000000000D+00  :      7.0000000000000000D+00
+
+ Should print    8.0000000000000000D+00  :      8.0000000000000000D+00
+
+ Should print    9.0000000000000000D+00  :      9.0000000000000000D+00
+
+ Should print    1.0000000000000000D+01  :      1.0000000000000000D+01
+
+ Should print    1.1000000000000000D+01  :      1.1000000000000000D+01
+
+ Should print    1.2000000000000000D+01  :      1.2000000000000000D+01
+
+ Should print    1.3000000000000000D+01  :      1.3000000000000000D+01
+
+ Should print    1.4000000000000000D+01  :      1.4000000000000000D+01
+
+ Should print    1.5000000000000000D+01  :      1.5000000000000000D+01
+
+ Test y = x + x
+ Should print    2.0000000000000000D+00  :      2.0000000000000000D+00
+
+ Should print    4.0000000000000000D+00  :      4.0000000000000000D+00
+
+ Should print    6.0000000000000000D+00  :      6.0000000000000000D+00
+
+ Should print    8.0000000000000000D+00  :      8.0000000000000000D+00
+
+ Should print    1.0000000000000000D+01  :      1.0000000000000000D+01
+
+ Should print    1.2000000000000000D+01  :      1.2000000000000000D+01
+
+ Should print    1.4000000000000000D+01  :      1.4000000000000000D+01
+
+ Should print    1.6000000000000000D+01  :      1.6000000000000000D+01
+
+ Should print    1.8000000000000000D+01  :      1.8000000000000000D+01
+
+ Should print    2.0000000000000000D+01  :      2.0000000000000000D+01
+
+ Should print    2.2000000000000000D+01  :      2.2000000000000000D+01
+
+ Should print    2.4000000000000000D+01  :      2.4000000000000000D+01
+
+ Should print    2.6000000000000000D+01  :      2.6000000000000000D+01
+
+ Should print    2.8000000000000000D+01  :      2.8000000000000000D+01
+
+ Should print    3.0000000000000000D+01  :      3.0000000000000000D+01
+
+ Test y = exp(x) * z
+ Should print    4.0171073846375329D+01  :      4.0171073846375329D+01
+
+ Should print    6.0256610769562997D+01  :      6.0256610769562997D+01
+
+ Should print    8.0342147692750672D+01  :      8.0342147692750672D+01
+
+ Should print    1.0042768461593832D+02  :      1.0042768461593832D+02
+
+ Should print    1.2051322153912598D+02  :      1.2051322153912598D+02
+
+ Should print    1.4059875846231367D+02  :      1.4059875846231367D+02
+
+ Should print    1.6068429538550129D+02  :      1.6068429538550129D+02
+
+ Should print    1.8076983230868899D+02  :      1.8076983230868899D+02
+
+ Should print    2.0085536923187667D+02  :      2.0085536923187667D+02
+
+ Should print    2.2094090615506428D+02  :      2.2094090615506428D+02
+
+ Should print    2.4102644307825199D+02  :      2.4102644307825199D+02
+
+ Should print    2.6111198000143963D+02  :      2.6111198000143963D+02
+
+ Should print    2.8119751692462728D+02  :      2.8119751692462728D+02
+
+ Should print    3.0128305384781493D+02  :      3.0128305384781493D+02
+
+ Should print    3.2136859077100269D+02  :      3.2136859077100269D+02
+

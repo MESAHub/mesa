@@ -1,0 +1,10 @@
+
+&astero_search_controls
+
+   oscillation_code = 'gyre'
+
+/ ! end astero_search_controls
+
+
+&astero_pgstar_controls
+/ ! end astero_pgstar_controls

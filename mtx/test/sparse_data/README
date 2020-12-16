@@ -1,0 +1,11 @@
+These are from the Harwell-Boeing collection.
+http://math.nist.gov/MatrixMarket/data/Harwell-Boeing/
+
+all are real unsymmetric
+
+lns__131.rua     131^2,    536 entries    Fluid flow modeling
+nnc261.rua       261^2,   1500 entries    Nuclear reactor models
+lns__511.rua     511^2,   2796 entries    Fluid flow modeling
+nnc666.rua       666^2,   4044 entries    Nuclear reactor models
+fs_760_3.rua     760^2,   5976 entries    Chemical kinetics
+nnc1374.rua     1374^2,   8606 entries    Nuclear reactor models

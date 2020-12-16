@@ -1,0 +1,5 @@
+c
+c  Include file setting nnmax for programmes dealing with pulsation
+c  quantities
+c
+      parameter(nnmax=20001)

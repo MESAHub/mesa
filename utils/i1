@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		pwd
+		echo "./build_and_test FAILED"
+		echo
+		exit 1
+	fi
+}
+
+./build_and_test
+check_okay
+echo "export"
+./export
+check_okay
+echo "done"

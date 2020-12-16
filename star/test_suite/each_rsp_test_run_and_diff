@@ -1,0 +1,196 @@
+#!/bin/bash
+
+function check_okay {
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
+}
+
+function failure_msg {
+    echo "******************** $1 ********************" | tee -a out.txt
+}
+
+function success_msg {
+    echo "$1" | tee -a out.txt
+}
+
+function check_restart {
+
+    if [ -n "${SKIP_RESTARTS}" ]
+    then
+       echo "skip restarts"
+    # make sure we specified a restart file
+    elif [ -z $4 ]
+    then
+        pwd
+        echo missing name of restart file -- fix do1_rsp_test_source for $1
+        echo
+    elif [ "$4" != skip ]
+    then
+
+        # bail out if photo doesn't exist
+        if [ ! -e photos/$4 ]
+        then
+            if [ ! -e photos/b_$4 ]
+            then
+                failure_msg "$1 restart failed: $4 does not exist"
+                return 1
+            fi
+        fi
+
+        # do the restart
+        rm -f "$3"
+        ./re "$4" >> out.txt 2> err.txt
+        cat err.txt | tee -a out.txt
+        rm err.txt
+
+        # check that final model matches
+        ./ck >& final_check_diff.txt
+        if [ $? -ne 0 ]
+        then
+            failure_msg "$1 restart failed: checksum for "$3" does not match after ./re $4"
+            return 1
+        elif [ -s final_check_diff.txt ]
+        then
+            failure_msg "$1 restart failed: diff "$3" final_check.mod after ./re $4"
+            return 1
+        else
+            success_msg "$1 restart: checksum for "$3" matches after ./re $4"
+        fi
+    fi
+}
+
+
+function check_run {
+    # make sure we specified a final model
+    if [ -z $3 ]
+    then
+        pwd
+        echo missing name of final mod test file -- fix do1_rsp_test_source for $1
+        echo
+    fi
+
+    # do the run
+    date "+   start %H:%M:%S"
+    ./rn > out.txt 2> err.txt
+    cat err.txt | tee -a out.txt
+    rm err.txt
+    #date "+  finish %H:%M:%S"
+
+    # check that didn't get "failed to create" message
+    grep -i "failed to create" out.txt
+    if [ $? -eq 0 ]
+    then
+        failure_msg "$1 failed to create expected output model"
+        return 1
+    fi
+
+    # check that test string was printed during the run
+    grep -i "$2" out.txt
+    if [ $? -ne 0 ]
+    then
+        echo $2
+        failure_msg "$1 failed: does not match test string"
+        return 1
+    fi
+
+    if [ "$3" != skip ]
+    then
+
+        # update checks after new run
+        if [ -n "${UPDATE_CHECKS}" ]
+        then
+            md5sum "$3" > checks.md5
+            cp "$3" final_check.mod
+            return
+        fi
+
+        # display runtime message
+        grep -i runtime out.txt
+
+        # check that final model matches
+        ./ck >& final_check_diff.txt
+        if [ $? -ne 0 ]
+        then
+            failure_msg "$1 run failed: checksum for "$3" does not match after ./rn"
+            return 1
+        elif [ -s final_check_diff.txt ]
+        then
+            failure_msg "$1 run failed: diff "$3" final_check.mod after ./rn"
+            return 1
+        elif [ -r "$3" ]
+        then
+            success_msg "$1 run: checksum for "$3" matches after ./rn"
+        fi
+    fi
+}
+
+function build_and_run {
+
+    #./clean
+    #check_okay
+
+    ./mk > mk.txt
+    check_okay
+    rm mk.txt
+
+    # delete final model if it already exists
+    if [ ! -z $3 ]
+    then
+        rm -f $3
+    fi
+
+    check_run "$1" "$2" "$3" "$4"
+
+    # don't do check_restart if check_run failed
+    if [ $? -ne 0 ]
+    then
+        return
+    fi
+
+    check_restart "$1" "$2" "$3" "$4"
+
+}
+
+
+function do_one {
+
+id=$((id+1))
+if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
+    cd $1
+    touch .running
+
+    echo "build_and_run" $1
+    build_and_run "$1" "$2" "$3" "$4"
+
+    rm -f .running
+    cd ..
+
+    echo ""
+fi
+
+}
+
+
+date
+echo ""
+./each_rsp_test_clean $1
+
+echo ""
+
+DO_ALL=0
+id=0
+curr_id="$1"
+if [ ! "$1" ]; then
+   DO_ALL=1
+fi
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+echo ""
+
+source do1_rsp_test_source
+wait
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+echo ""

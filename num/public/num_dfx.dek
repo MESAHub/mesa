@@ -1,0 +1,9 @@
+      subroutine dfx(n, x, y, fx, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: n, lrpar, lipar
+         real(dp), intent(in) :: x, y(:) ! (n)
+         real(dp), intent(inout) :: fx(:) ! (n)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+      end subroutine dfx

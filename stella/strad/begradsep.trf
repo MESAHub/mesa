@@ -1,0 +1,824 @@
+_DEFINE
+   @SAVE_MODEL      SAVEM
+   @TAUPH      0.64D0
+   @HOLD_BAL   HOLDBL   --   OLD STEP FOR BALANCE
+   @ReadData "READ(Nc,'(A)'); Read(Nc,*)"
+   @U       (CCL/3.65D+03)
+   @B       (CCL/4.4D+03)
+   @V       (CCL/5.5D+03)
+   @R       (CCL/7.D+03)
+   @I       (CCL/9.D+03)
+   @Lyman   (CCL/912.D0) ;
+_LABEL @F1,@F2;
+SUBROUTINE BEGIN;
+-- _TRACE "write(*,'(2(a,i5),a,1p,g12.4,a)')' Nzon=',Nzon,' Mzon=',Mzon,' AMNi=',AMNi,"
+-- _TRACE "@wterm' Ncnd=',Ncnd,' Krad=',Krad,"
+-- _TRACE "@wterm' Natom=',Natom,' Zn(Natom)=',Zn(Natom),"
+IMPLICIT REAL*8(A-H,O-Z);
+   _INCLUDE  snrad;
+   _Include opacity;
+   _INCLUDE abo;
+ -- real*8 hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
+   --       hptrbsc(Nfreq,@Ntab,@Ntab,Mzon/@skip);
+  <*B: vars, PARAMETERS, data *>;
+  <*R: READ INPUT DATA FOR BURST *>;
+RETURN;
+  9:WRITE(@Wres,*)' BEGIN: error in read file ',Lunit;
+      stop;
+END;
+<*S: SAVE CURRENT MODEL *>;
+<*I: BLOCK DATA *>;
+%B:O
+    CHARACTER*80 STRING;
+--    Dimension dumFreq(Nfreq+1),dumFreqmn(Nfreq),dumwavel(Nfreq);
+  -- now in opacity.inc
+    Dimension indfr(6), indop(6); -- keys for freq and opacit
+                                  -- depending on Knadap
+--    PARAMETER(UFRC=2.417965D+14/1.16048D+04);
+    CHARACTER*3 status,NFILE*80;
+    Logical petread; -- is Peters's file already read?
+    Data petread/.false./;
+    Data indfr/1,2,2,3,3,3/, -- 1 geom., 2 peter, 3 ronfict
+         indop/1,1,2,3,3,3/; -- 1 opazr, 2 opahoef,hap2int, 3 hapintron
+--  DIMENSION WAVEL(NFREQ);-- WAVELENGTHS IN ANGSTREMS
+--  Now  WAVEL in Include Opacity
+--    DATA WLMAX/5.0D+04/,WLMIN/1.D+01/;
+    DATA WLMAX/5.0D+04/,WLMIN/1.D+00/;
+    -- wavelength range in Angstrems for SN1987A
+--   wlmax=5.d+04; wlmin=1.d-03; -- for *X* runs MUST be the same as in ronfshb
+--  and it will be automatically for |knadap|=4 : then wlmax, wlmin are taken from tables
+--  DATA WLMAX/5.0D+04/,WLMIN/9.D+01/; -- for SN2L
+%R:
+    <*test*  READ START_PACK DATA FOR RUN , CHANNEL - 8 *>;
+    <*D:  READ START_PACK DATA FOR RUN , CHANNEL - 8 *>;
+    <*M:  READ MODEL  CHANNEL - 9 -- begin run
+                      CHANNEL -10 -- continue run
+          READ Lcurve CHANNEL -11 *>;
+    <*U:  UNITS & CONSTANTS FOR DIMENSIONLESS EQUATIONS *>;
+    <*haptab: read tables of happa if needed *>;
+    AS=ACARB; ZS=ZCARB;
+    N=NZON*NVARS+2*KRAD;
+    HMIN=HMIN/UTIME; HMAX=HMAX/UTIME;
+    METH=METHN;
+    Haplim=1.D0/(3.D0*FitTau);
+    Uplim=1.D0+Haplim;
+    <*H: PRINT HEADER OF THE RUN *>;
+    -- For enhanced quadratic viscosity:
+    -- Initially DRT in STRAD DATA defines the mass "distance"
+    -- in Solar mass units
+    -- from AM(NCND) with enhanced pseudoviscosity determined by BQ.
+    -- Then it is used in DFRAD & LBALRAD in the following form:
+    --
+    --  DRT=(UM/DRT)**2; -- initial DRT is destroyed here, be careful!!
+                        -- for R-T do not change DRT !
+    --
+    -- For linear R-T viscosity (Hot or Cold)
+    -- DRT was the optical thickness (assuming Hydrogen & full
+    --    ionization where QRT begins to act)
+    -- later the value 30. was fixed & now
+    -- DRT determines the enhancement of EpsUq
+    -- NRT may be noninteger  in RTphi - see STRAD
+    IF(NSTEP==0)THEN;
+       H=1.D+05*HMIN;
+       @HOLD_BAL=H; -- INITIAL CONDITIONS FOR BALANCES
+       YENTOT(1)=ELOST;
+       YENTOT(2)=0.d0; --  H*ELTOT; -- ELTOT is not defined at NSTEP==0
+       <*F: PREPARE FREQUENCY ARRAYS *>;
+       NFRUS=NFREQ;
+       _Do L=1,NFRUS;
+          NTHICK(L)=ncnd;
+       _od;
+       _Do KM=NCND+1,NZON;
+          _Do L=1,NFRUS;
+              LTHICK(L,KM)=.FALSE.;
+          _od;
+       _od;
+    ENDIF;
+    <*Freqob: PREPARE FREQUENCY ARRAY freqob from freqmn *>;
+    toldg=-1.d0;
+    WRITE(@Wres, '(''   FREQ:'',1P,10E12.5)')FREQ;
+    WRITE(@Wres, '(''   FREQMN:'',1P,10E12.5)')FREQMN;
+    WRITE(@Wres, '(''  WAVE BOUNDS:'',1P,11E10.3)')
+             (CCL/FREQ(LW),LW=1,NFREQ+1);
+    WRITE(@Wres, '(''  WAVES:'',1P,10E12.5)')(CCL/FREQMN(LW),LW=1,NFREQ);
+    WRITE(@Wres, '('' WEIGHT:'',1P,10E12.5)')WEIGHT;
+    <*BANDS: find numbers of freq. groups for UBV *>;
+    LST=2;KENTR=0;
+--  RGASA=-.831434D0*(1.D0-ACARB/ASI);
+--  IBURNT=0;           -- INDICATES PRINTING IN BURNT ZONE
+    RHO(1)=3.D0*DM(1)/(Ry(1)**3-Rce**3);
+   _DO I=2,NZON;
+--  write(@term,'(a,i3,2(a,1p,e12.4))')' i=',i,' dm=',dm(i),
+  --       '  ry=',Ry(i);
+    RHO(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3)
+   _OD;
+    IF(NSTEP==0)THEN;
+       CALL LOSSEN;
+       @HOLD_BAL=H; -- INITIAL CONDITIONS FOR BALANCES
+       YENTOT(1)=ELOST;YENTOT(2)=H*ELTOT;
+    ENDIF;
+    chem=0.5d0; -- to avoid too low Xe in saha
+    <*testhappa*        *>;
+%R_testhappa:
+     pl=1.d8; K=48;
+     _do itp=1,1;
+        Tp=1.d+01**(3.4d0+(itp-1));
+       _Do i=1, Natom;  Yat(i)=YABUN(i,K)_od;
+        RADP=.FALSE.;
+        CALL URSOS;
+        kmhap=K;
+        call Happa;
+        -- write(@term,'(1p10e10.2)') happal;
+     _od
+%R_test:
+_Repeat
+    READ(8,'(A)',End=110,Iostat=kio) STRING;
+    WRITE(@Wres,'(A)') string;
+_until kio^=0;
+110: stop;
+%RD:
+    Nc=8;
+    @ReadData EPS,HMIN,HMAX;-- STIFF ACC.,MIN.STEP(SEC),MAX.STEP(SEC)
+--    @wterm ' 1';
+    @ReadData METHN,JSTART,MAXORD,KNadap;
+--    @wterm ' 1';
+        -- ADAMS(1)-GEAR(2)-BGH(3), 0-START , max order,
+        -- KNadap<0 for Ni from a foreign model
+        -- abs(KNadap): 1 freqmn - geom. progression, opazr
+        --              2 freqmn - Peter            , opazr
+        --              3 freqmn - Peter, opahoef, hap2int
+        --              4 freqmn - Ronfict, opahoef, hapintron
+        --              5 freqmn - as 4, but homolog. vel.
+        --              6 freqmn - as 4, but istim==0 always => hapron0
+    @ReadData NSTA,NSTB,TcurA,TcurB;-- Steps & time in days
+--    @wterm ' 1';
+  -- For read:
+     -- if NSTA<0 then files 10 & 11, else files 12 & 13
+     --   used by STRAD for test runs, beginning
+     --   with first saved model having NSTEP>=abs(NSTA)
+  -- For Write:
+     -- if NSTB<0 then files 10 & 11, else files 12 & 13
+  -- To begin test runs with zero step (file 9) use
+     -- NSTA<0, Begrun==T, & NSTB==1
+  -- To begin test runs with some step in file 10 use
+     -- NSTA<0, Begrun==T, NSTB>0 & NSTB^=1 & NSTB>abs(NSTA)
+  -- To begin test runs with last step in file 10 use
+     -- NSTA<0, Begrun==T, NSTB>0 & NSTB^=1 & abs(NSTB)<abs(NSTA)
+  -- To continue test runs in files 12 & 13 use
+     -- NSTA>0, Begrun==F, NSTB>0 & NSTB<abs(NSTA), e.g. NSTB=1
+  -- For STINFO: ????
+     -- use always Begrun=T & NSTB^=1 (if NSTB==1 then initial model)
+            --   ????
+    @ReadData NSTMAX,NDebug,NOUT,IOUT,MBATCH;
+     -- Max STEP number, Debug step number, INTERVAL OUTPUT, LINE PRINT
+--    @wterm ' 1';
+    Mbatch=Min(Mbatch,Lcurdm);
+                         -- MASS OF NI CORE, NI 56 ABUNDANCE
+    @ReadData AMNI,XMNI; -- contaminated and true nickel initial mass
+--    @wterm ' 1';
+    @ReadData AMHT,EBurst,tBurst,tbeght;-- Mass of Heated Core, Energy & tm
+--    @wterm ' 1';
+    @ReadData EKOB,AI1,AI2,AI3,US; -- KINETIC ENERGY(E+50)
+--    @wterm ' 1';
+          -- Mass fractions TRIANGLE VEL.PROFILE,  OUT/INWARD  +1/-1
+    -- THRESH.JAC., CK RAPID, CONVECTION, EDD TM DEPEND, CHANGE NCND
+    @ReadData THRMAT,CRAP,CONV,EDTM,CHNCND,Givdtl;
+--    @wterm ' 1';
+    -- FLOOR FOR R V TP YCARBINV FJ - FH
+    @ReadData FLOOR(1),FLOOR(2),FLOOR(3),FLOOR(4);
+--    @wterm ' 1';
+    --   Wacc(R)  Wacc(V)  Wacc(T)  Wacc(RADIAT):
+    @ReadData Wacc(1),  Wacc(2),  Wacc(3),  Wacc(4);
+--    @wterm ' 1';
+    -- FitTau TauTol Rvis AQ BQ DRT NRT SCAT
+    @ReadData FitTau,TauTol,Rvis,AQ,BQ,DRT,NRT,SCAT;
+--    @wterm ' 1';
+    @ReadData NnTO; -- number of outputs
+      _do ito=1,NnTO;
+         Read(Nc,*) TO(ito);
+      _od;
+
+ If (LSystem) then; -- for IBM the read BEGRUN is ignored and redefined here
+     READ(5,*) IRC; -- for IBM channel 5 is from stack
+     If (IRC==0) then;
+         BEGRUN=.FALSE.;
+     else;
+         BEGRUN=.TRUE.;
+     endif;
+ endif;
+%RM:
+    --   READ MODEL
+    IF(BEGRUN & IABS(NSTB)==1)THEN;
+     <*Start: read channel - 9 -- begin run *>;
+    ELSE;
+     <*Conr: read Sumprf - channel 10/12 *>;
+     <*Curv: read Lcurve - channel 11/13 *>;
+    ENDIF;
+    Z1=0.d0; Z2=0.d0;
+    _Do K=1,Nzon;
+       Ry(K)=Y(K,1);
+--  write(@term,'(a,i3,2(a,1p,e12.4))')' k=',k,' dm=',dm(k),
+  --       '  Ry=',Ry(i);
+       Uy(K)=Y(Nzon+K,1); -- standard, change for relativism!
+       If(abs(KNadap)==5)then;
+          If(K<NZON)Then;
+             DM2=DM(K+1);
+          else;
+             DM2=DMOUT;
+          endif;
+          Z1=Z1+Uy(K)**2*(DM(K)+DM2); -- kin.energy
+          Z2=Z2+Ry(K)**2*(DM(K)+DM2);
+       endif;
+       Ty(K)=Y(2*Nzon+K,1);
+    _Od;
+     If(abs(KNadap)==5)then;
+       URout=sqrt(Z1/Z2);
+      _Do K=1,Nzon;
+          Uy(K)=URout*Ry(K); -- const. homolog. vel.
+          Y(Nzon+K,1)=Uy(K);
+      _od;
+     endif;
+    <*nickel: adjust AMNI, XNI for KNadap >0
+              or read file *.xni for KNadap<0 *>;
+    IF(CONV)THEN;
+         _DO I=1,NZON;
+            Y(I+(NVARS-2)*NZON,1)=UC(I);
+            Y(I+(NVARS-1)*NZON,1)=YAINV(I)
+         _OD;
+    ENDIF;
+    NSTMAX=NSTEP+NSTMAX;
+    IF(MOD(NSTMAX,MBATCH)^=0) THEN;
+       NSTMAX=(NSTMAX/MBATCH+1)*MBATCH;
+--     CALL CMSCOM(IERR,'EXEC ST$MSG WARNING');
+       WRITE(@Wres,'( '' NSTMAX CHANGED:'',I6)') NSTMAX;
+    ENDIF;
+--    IF(JSTART > MAXORD)THEN;
+      JSTART=0; --always
+--    ELSE; -- seb changed 28 Mar 2001
+  --    JSTART=-IABS(JSTART); -- IN ORDER TO CHANGE METH, EPS, ETC.
+      -- Jstart < 0 needed to initialize EPSJ in STIFFBGH
+--    ENDIF;
+%RM_Start:
+    Lunit=9;
+    NFILE=Model;
+--    @wterm '>>',Nfile,'<<';
+    call StradIO('rm',Lunit,NFILE);
+ -- Define initial values for rad:
+--    @wterm ' Eko, Ekob: ',Eko,Ekob;
+    EKO=EKO+EKOB;   -- EKO comes from Eve in @IOSTART, but usually = 0
+    If(EKO>0.)then;
+      <*Vel: define Uy() for nonzero EKO *>;
+    endif;
+    NCND=NZON;  -- STRAD defines real NCND and NFRUS
+                -- any other value for NCND is not allowed here
+    NFRUS=NFREQ;
+    KRAD=(NZON-NCND)*NFRUS;
+    TAUOLD=0.D0;
+%RM_Conr:
+    if(NSTA<0)then;
+       Lunit=10;
+       NFILE=Sumprf;
+    else;
+       Lunit=12;
+       NFILE='test.prf';
+    endif;
+    call StradIO('cm',Lunit,NFILE);
+--    WRITE(@term,*)' Begrad  READ STEP=',NSTEP;
+%RM_Curv:
+    if(NSTA<0)then;
+       Lunit=11;
+       NFILE=Sumcur;
+    else;
+       Lunit=13;
+       NFILE='test.crv';
+    endif;
+     call StradIO('rc',Lunit,NFILE);
+%RM_nickel:
+    km=1;
+    --print *, 'AMINI=',Amini,UM;
+    _While (AM(km)-AMini)*UM <= AMNi*1.0000000001d0 & km<nzon _Do
+    --print *, km,(AM(km)-AMini)*UM, AMNi*1.0000000001d0;
+       km=km+1;
+    _Od;  -- (AM(km)-AMini)*UM  > AMNi
+    If ( km >= nzon ) then;
+     km=1;
+     --write(@term,*) ' Begrad: AMNI in error! km=',km,'>=nzon =',nzon;
+     --stop;
+    Endif;
+    kmnick=km-1;
+    AMNi=(AM(max(kmnick,1))-AMini)*UM;
+    XNI=XMNI/AMNi; --used in VOLEN
+    If ( XNI >= 1.d0 & KNadap >0 ) then;
+      write(@term,*) ' Begrad: AMNI too small ! XNI=',XNI;
+      stop;
+    Endif;
+    If(KNadap>0)then;
+      <*Fe: adjust Ni to Fe for eq.state *>;
+    else;
+      <*Nifor: Ni from a foreign model *>;
+    endif;
+%RM_nickel_Fe:
+    iferrum=1;
+    _While iferrum <= Natom & Zn(Iferrum) <> 26 _Do
+       iferrum=iferrum+1;
+    _Od;
+    If (iferrum > Natom ) Then;
+      write(@term,*) ' Begrad: Ferrum not found !';
+      stop;
+    Endif;
+    _Do  km=1,kmnick;
+       YABUN(iferrum,km)=XNI/AZ(iferrum);
+       sum=0.d0;
+       _Do j=1,Natom;
+          if(j<>iferrum) sum=sum+YABUN(j,km)*AZ(j);
+       _Od;
+       If(sum<1.d-5)Then;
+           write(@term,*) ' Begrad: Sum too small=',sum;
+           stop;
+       Endif;
+       _Do j=1,Natom;
+          if(j<>iferrum) YABUN(j,km)=YABUN(j,km)*(1.d0-XNI)/sum;
+       _Od;
+    _Od;
+%RM_nickel_Nifor:
+  --    @Wterm 'Read .XNI';
+      read(28) XNIfor;
+      /*
+      read(28)
+       IOlen1,     -- for WATCOM
+       (XNifor(i),i=1,Nzon)
+       ,IOlen2;    -- for WATCOM
+       */
+      Xmni=0.d0;
+      _Do km=1,Nzon;
+         Xmni=Xmni+Xnifor(km)*dm(km)*UM;
+      _od;
+ --     write(@term,*)' Ni mass=',Xmni;
+%RU:
+    UR=10.D0**ULGR;
+    CLIGHT=CS*UTIME/UR;
+    IF(CRAOLD^=CRAP)THEN;
+        T=T*(CRAOLD/CRAP);H=H*(CRAOLD/CRAP);
+        CK1=CK1*(CRAOLD/CRAP);CK2=CK2*(CRAOLD/CRAP);
+    ENDIF;
+    UFREQ=BOLTZK*UTP/(2.d0*PI*HPLANC);
+--  WRITE(@Wres,*)' UFRC UFREQ:',UFRC,UFREQ;
+--  UFRP=BOLTZK/(2.D0*PI*hPlanc);
+--  WRITE(@Wres,*)' UFRP UFREQ:',UFRP,UFRP*UTP;
+    CKRAD=6.D+01/PI**4*CSIGM*UTP**4*UTIME**3/(URHO*UR**3);
+    CCL=CS*1.D+08/UFREQ; -- TO TRANSFORM FROM ANGSTREMS & V.V.
+    CFLUX=60.D0*CSIGM*(UTP/PI)**4;
+    CLUM=32.D0*PI/3.D0*(CSIGM*UR*UTP**4/URHO); -- FL0 INTO LUMINOSITY
+    CLUMF=4.D0*PI*UR**2*CFLUX; -- FH INTO LUMINOSITY
+    CIMP =CFLUX*UTIME**2/(CS*UR**2*URHO);
+--    Cimp=0.d0;
+--    @wterm '!!!!!****>>>> Cimp=0 for TEST with ZERO RaD.FORCE !';
+%R_haptab:
+  -- KNadap<0 for Ni from a foreign model
+  -- abs(KNadap): 1 freqmn - geom. progression, opazr
+  --              2 freqmn - Peter            , opazr
+  --              3 freqmn - Peter, opahoef, hap2int
+  --              4,5 freqmn - Ronfict, opahoef, hapintron
+  --              6 freqmn - Ronfict, opahoef, hapron0 istim==0)
+
+  If (ABS(Knadap) <=3) then; -- see begrad for Knadap
+    Open(unit=2,file=Opafile,form='unformatted');
+  Else;
+    _do nf=1,@ns;
+       nu=30+nf;
+       app=char(ichar('0')+nf); -- nf must be <=9
+       Opafile=Opafile(1:Length(Opafile)-1)//app;
+       Open(unit=nu,file=Opafile,form='unformatted');
+      -- @wterm ' opened unit=',nu,' file=',Opafile;
+    _od;
+    Open(unit=29,file=Opafile(1:Length(Opafile)-1)//'ab',form='unformatted');
+  endif;
+ _case indop(abs(KNadap)) _of
+   _1
+   _2  If(^petread)then;
+         read(2) Nfreq0,Msta,Nrho,Ntp,YATab,(Wavel(iif),iif=1,@Nfreq),
+                 TpTab,RhoTab,STab,EpsBand,EppBand;
+         petread=.true.;
+       endif
+   _3  _do ihp=1,@ns;
+         read(30+ihp) nw,Stime,Nfreq0,Msta,Nrho,NTp,
+                      dumWavel,dumFreq,dumFreqmn,
+                      -- read into dummy files
+                                            --OLD  TpTab,RhoTab,hpbanab2,hpbansc2;
+                     TpTab,RhoTab,hpbansc2; -- actual
+               _do im=1,Nzon/@skip;
+                  _do iro=1,Nrho;
+                         _do itp=1,NTp;
+                            _do L=1,Nfreq0;
+                                hpsavsc(L,itp,iro,im,ihp)=hpbansc2(L,itp,iro,im);
+                     _od_od_od_od
+
+                   /* write(@wres,*)' nw,Stime,Nfreq0,Msta,Nrho,NTp', nw,Stime,Nfreq0,Msta,Nrho,NTp;
+            write(@wres,*)'  dumWavel';
+               write(@wres,*)dumWavel;
+               write(@wres,*)' dumFreq';
+               write(@wres,*)dumFreq;
+               write(@wres,*)' dumFreqmn',dumFreqmn;
+            stop ' test read ' */;
+      --   @wterm ' read unit=',30+ihp;
+         close(30+ihp);
+         If(ihp==nw ! ABS(knadap)==6 ! ihp==1)then; -- ignore istim
+            stmlog(ihp)=log(Stime); -- in days; m.b. better to save in Ronfict?
+           -- @wterm ' ihp stmlog=',stmlog(ihp),ihp;
+         else;
+            @wterm ' error reading haptab, ihp=',ihp,' nw=',nw;
+            stop 324;
+         endif;
+       _od
+       read(29) hpbanab2; -- read absorption separately without expansion effect
+              close(29);
+ _esac;
+ -- @wterm ' Nfreq: ',Nfreq0,Nfreq,' Msta,Nrho,Ntp: ',Msta,Nrho,Ntp;
+
+  -- only two sets of tables are in the ROM for
+  -- two values of dvdr (given by Stime)
+  -- istim is the flag for the regime of saving the tables at given t
+  -- for istim==0 , t<t0=Stime(1)/(half of a factor of Stime step),
+  -- and istim==@ns+1, t>Stime(@ns), use only Stime(@ns) -- the
+  -- smallest dvdr without interpolation;
+  --
+  -- for istim==1 , t0<t<Stime(1), log interp
+  -- between Stime(@ns) and Stime(1) using t in (0.5, 1)*Stime(1)
+  --
+  -- for istim==2, 3, ... @ns, Stime(istim-1)<t<Stime(istim),
+  -- log interp between boundaries
+  -- actually Stime is a scalar and the vector is
+  -- stmlog(.)==log(Stime for a respective moment of time) saved in Begrad
+  --
+   tdlog = log(max(t*Utime/8.6d+04,hmin)); -- for Nstep=0, t=0 defined in EVE and
+                                -- saved in *.mod
+ _select
+   _ tdlog <= stmlog(1)-(stmlog(2)-stmlog(1))/2.d0
+            .or. tdlog > stmlog(@ns) .or. abs(Knadap)==6   [istim=0]
+   _ tdlog > stmlog(1)-(stmlog(2)-stmlog(1))/2.d0 & tdlog <= stmlog(1)
+                                                   [istim=1]
+   _other  -- here: stmlog (1) < tdlog <= stmlog(@ns)
+             [ istim=2;
+               _while stmlog(istim) < tdlog _do istim=istim+1 _od ]
+                         -- stmlog(istim) >= tdlog
+ _end
+-- @wterm ' istim=',istim;
+  istold=istim; -- for Strad
+    _case istim+1 _of
+       if(istim>1 .and. istim <= @ns)then;
+                 thaplog1=stmlog(istim-1); 
+                 thaplog2=stmlog(istim);
+       else;
+         write(*,*)' in begrad istim=',istim;
+         stop ' wrong istim in begrad';
+       endif;
+      _0 _do im=1,Nzon/@skip;
+            _do iro=1,@Ntab;
+               _do itp=1,@Ntab;
+                  _do L=1,Nfreq;
+                     hpbanab1(L,itp,iro,im)=hpbanab2(L,itp,iro,im);
+                     hpbansc1(L,itp,iro,im)=hpbansc2(L,itp,iro,im);
+         _od_od_od_od
+         thaplog1=stmlog(1); 
+         thaplog2=stmlog(@ns);
+                  -- here the values of thaplog are not important
+                  -- (if they are not equal), since haptab is the same
+      _1 _do im=1,Nzon/@skip;
+            _do iro=1,@Ntab;
+               _do itp=1,@Ntab;
+                  _do L=1,Nfreq;
+                     hpbanab1(L,itp,iro,im)=hpbanab2(L,itp,iro,im);
+                     hpbansc1(L,itp,iro,im)=hpbansc2(L,itp,iro,im);
+         _od_od_od_od
+         thaplog1=stmlog(1)-(stmlog(2)-stmlog(1))/2.d0;
+         thaplog2=stmlog(1)
+
+/*    _2 thaplog1=stmlog(1); thaplog2=stmlog(2)
+      _3 thaplog1=stmlog(2); thaplog2=stmlog(3)
+      _4 thaplog1=stmlog(3); thaplog2=stmlog(4)
+      _5 thaplog1=stmlog(4); thaplog2=stmlog(5) 
+       */
+
+    _esac
+   
+     If(istim^=0)then; -- for istim==0 already read
+       app=char(ichar('0')+istim); -- istim must be <=9
+       Opafile=Opafile(1:Length(Opafile)-1)//app;
+       Open(unit=30,file=Opafile,form='unformatted');
+       read(30) nw,Stime,Nfreq0,Msta,Nrho,NTp,
+                dumWavel,dumFreq,dumFreqmn,
+                   -- read into dummy files
+--                     TpTab,RhoTab,hpbanab2,hpbansc2;
+                     TpTab,RhoTab,hpbansc2;
+       close(30);
+     endif;
+     If(istim^=0 & istim^=1)then; -- for istim==0 & 1 already read
+       app=char(ichar('0')+istim-1); -- istim must be <=9
+       Opafile=Opafile(1:Length(Opafile)-1)//app;
+       Open(unit=30,file=Opafile,form='unformatted');
+       read(30) nw,Stime,Nfreq0,Msta,Nrho,NTp,
+                dumWavel,dumFreq,dumFreqmn,
+                   -- read into dummy files
+--           TpTab,RhoTab,hpbanab1,hpbansc1;
+           TpTab,RhoTab,hpbansc1;
+       close(30);
+       close(29);
+       Open(unit=29,file=Opafile(1:Length(Opafile)-1)//'ab',form='unformatted');
+       read(29) hpbanab1;
+       close(29);
+     endif;
+     <*check: *>;
+
+%R_haptab_check:
+  -- @wterm 'check nw,  Stime,  Nfreq0,   Msta,    Nrho,    NTp:';
+  -- @wterm  nw,Stime,Nfreq0,Msta,Nrho,NTp;
+
+  _do im=1,Nzon/@skip;
+       _do iro=1,@Ntab;
+             _do itp=1,@Ntab;
+                  _do L=1,Nfreq;
+                     hbab=hpbanab2(L,itp,iro,im);
+                     hbal=hpbansc2(L,itp,iro,im);
+                     if (hbal >1.d50 .or. hbab > 1.d50)then;
+                      write(@term,'(4(a,i4),1p,2(a,e12.4))')
+                       ' L=',L,' itp=',itp,' iro=',iro,' im=',im,
+                      '  hbal=',hbal,'  hbab=',hbab;
+                --   stop ' Begrad: bad happa !!!';
+   endif;
+  _od  _od  _od  _od
+
+
+%RF:
+ _case indfr(abs(KNadap)) _of
+  _1  -- our old definition:
+     FREQ(1)=CS*1.D+08/(WLMAX*UFREQ);
+     FREQ(NFREQ+1)=CS*1.D+08/(WLMIN*UFREQ);
+     Basis=(WLMAX/WLMIN)**(1.D0/(DBLE(NFREQ)));
+     -- Geometric PROGRESSION
+    _Do i=2,NFREQ;
+       FREQ(i)=FREQ(i-1)*BASIS;
+    _OD;
+    _DO L=1,NFREQ;
+       FREQMN(L)=SQRT(FREQ(L)*FREQ(L+1))
+    _OD;
+     --
+  _2  -- from P.Hoeflich:
+     If(^petread)then;
+         read(2) Nfreq0,Msta,Nrho,Ntp,YATab,(Wavel(iif),iif=1,@Nfreq),
+                 TpTab,RhoTab,STab,EpsBand,EppBand;
+         petread=.true.;
+     endif;
+     If(Nfreq>@Nfreq)then;
+       _Do L=@Nfreq+1,Nfreq;
+          Wavel(L)=Wavel(L-1)/2.d0;
+       _od;
+     endif;
+    _Do L=1,NFREQ;
+       FREQMN(L)=CS*1.D+08/(WaveL(L)*UFREQ);
+    _od;
+     FREQ(1)=0.5d0*Freqmn(1);
+     FREQ(Nfreq+1)=2.d0*Freqmn(Nfreq);
+    _Do L=2,NFREQ;
+       FREQ(L)=0.5d0*(Freqmn(L-1)+Freqmn(L))
+    _od;
+  _3  -- from Ronfict (now the same as _1 but CAUTION here!)
+    _Do i=1,NFREQ+1;
+       FREQ(i)=dumFREQ(i)/Ufreq;
+    _od;
+    _Do L=1,NFREQ;
+       FREQMN(L)=dumFREQMN(L)/Ufreq;
+    _od;
+ _esac
+--  write(@term,'(2(a,i5))') ' KNadap=',KNadap,
+--        '  indfr(abs(KNadap))=',indfr(abs(KNadap));
+--  write(@term,'(a,1pe12.4)') ' Lam max,AA=',CS*1.D+08/(FREQ(1)*UFREQ);
+--  write(@term,'(a,1pe12.4)') ' Lam min,AA=',CS*1.D+08/(FREQ(NFREQ+1)*UFREQ);
+  -- pause;
+
+  -- for all cases:
+    _DO L=1,NFREQ;
+      WEIGHT(L)=(FREQ(L+1)-FREQ(L))*FREQMN(L)**3;
+      IF(L<NFREQ)THEN;
+        DLOGNU(L)=1.D0/LOG(FREQMN(L)/FREQMN(L+1));
+      ELSE;
+        DLOGNU(L)=1.D0/LOG(FREQMN(L)/FREQ(L+1));
+      ENDIF;
+    _OD;
+
+%R_freqob:
+
+     do L=1,Nfreq;
+       freqob(L)=freqmn(L);
+     enddo;
+     BASIS=FREQ(2)/FREQ(1);
+  --   write(*,'(a,1p2g12.4)')' basis,exp(-1.d0/dlognu(1)):',basis,exp(-1.d0/dlognu(1));
+  --   write(*,'(a)')' WEIGHT(L),freqob(L),testFreqob:';
+     If(Mfreq>Nfreq)then;
+       FREQprev=FREQ(Nfreq+1);
+       do L=Nfreq+1,Mfreq;
+         freqob(L)=freqmn(Nfreq)*exp(-dble(L-Nfreq)/dlognu(1));
+--         FREQ(i)=FREQ(I-1)*BASIS;
+         FREQnext=FREQprev*BASIS;
+         WEIGHT(L)=(FREQnext-FREQprev)*freqob(L)**3;
+         testFreqob=sqrt(FREQnext*FREQprev);
+    --     write(*,'(1p,4g12.4)')WEIGHT(L),freqob(L),testFreqob;
+--         pause;
+         FREQprev=FREQnext;
+       enddo;
+     endif;
+
+%R_BANDS:
+     LubvU=NFRUS;
+     _WHILE LubvU>1 & FREQMN(LubvU) > @U _DO
+         LubvU=LubvU-1;
+     _OD; -- FREQMN(LubvU) <= @U OR LubvU==1
+     LubvB=NFRUS;
+     _WHILE LubvB>1 & FREQMN(LubvB) > @B _DO
+         LubvB=LubvB-1;
+     _OD; -- FREQMN(LubvB) <= @B OR LubvB==1
+     LubvV=NFRUS;
+     _WHILE LubvV>1 & FREQMN(LubvV) > @V _DO
+         LubvV=LubvV-1;
+     _OD; -- FREQMN(LubvV) <= @V OR LubvV==1
+     LubvR=NFRUS;
+     _WHILE LubvR>1 & FREQMN(LubvR) > @R _DO
+         LubvR=LubvR-1;
+     _OD; -- FREQMN(LubvR) <= @R OR LubvR==1
+     LubvI=NFRUS;
+     _WHILE LubvI>1 & FREQMN(LubvI) > @I _DO
+         LubvI=LubvI-1;
+     _OD; -- FREQMN(LubvI) <= @I OR LubvI==1
+      Lyman=NFRUS;
+     _WHILE Lyman>1 & FREQMN(Lyman) > @Lyman _DO
+         Lyman=Lyman-1;
+     _OD; -- FREQMN(LubvV) <= @V OR LubvV==1
+     WRITE(@Wres,*)' L UBVRI Lyman:',LubvU,LubvB,LubvV,LubvR,LubvI,Lyman;
+%RM_Start_Vel:
+ <*tri: define initial velocity triangle profile  i1, i2, i3 *>;
+    Z1=US/(AM(I2)-AM(I1));
+    IF(I2^=I3) Z2=US/(AM(I2)-AM(I3));
+    _Do K=I1,I3;
+       If(K<=I2)then;
+         Uy(K)=Z1*(AM(K)-AM(I1));
+       else;
+         Uy(K)=Z2*(AM(K)-AM(I3));
+       endif
+    _od;
+    Z1=0.D0;
+    K1=I1+1;
+    _Do K=K1,I3;
+       if(K<Nzon)then;
+         Z1=Z1+Uy(K)**2*(DM(K)+DM(K+1));
+       else;
+         Z1=Z1+Uy(K)**2*(DM(K)+DMout);
+       endif;
+    _od;
+    _Do K=I1,I3;
+       Y(Nzon+K,1)=Uy(K)*2.D0*SQRT((EKO/UEPRI)/Z1)
+    _od;
+%RM_Start_Vel_tri:
+ i=0;
+ _repeat
+   i=i+1;
+ _until (am(i)-amini)/(amout-amini) >=ai1 .or. i==nzon;
+ i1=i;
+-- write(@term,'(a,i5,1p,e10.3)') ' i1, ai1:', i1, ai1;
+ _while i<nzon _do
+   i=i+1;
+ _until (am(i)-amini) /(amout-amini) >=ai2 .or. i==nzon;
+ i2=i;
+-- write(@term,'(a,i5,1p,e10.3)') ' i2, ai2:', i2, ai2;
+ _while i<nzon _do
+   i=i+1;
+ _until (am(i)-amini) /(amout-amini) >=ai3 .or. i==nzon;
+ i3=i;
+-- write(@term,'(a,i5,1p,e10.3)') ' i3, ai3:', i3, ai3;
+-- pause;
+
+%RH:
+    WRITE(@Wres,'(''%RUN:'')');
+    WRITE(@Wres,'(//30X,''<===== HYDRODYNAMIC RUN OF MODEL '',A,
+                    ''=====>'',/)') Sumprf;
+    WRITE(@Wres,'(30X,''MASS(SOLAR)='',F6.3,7X,''RADIUS(SOLAR)='',F9.3/,
+              30X,''EXPLOSION ENERGY(10**50 ERG)='',1P,E12.5,/)')
+                  AMOUT*UM,RADBEG,EKO+Eburst;
+    WRITE(@Wres,'(30X,''<====='',33X,''=====>'',//)');
+    WRITE(@Wres,'(''  INPUT PARAMETERS     '')');
+    WRITE(@Wres,'('' EPS   = '',F15.5,9X,'' Rce   = '',1P,E15.5,A)')
+                 EPS, RCE*UR/RSOL,' SOL.Rad.';
+    WRITE(@Wres,'('' HMIN  = '',1P,E15.5,A,7X,'' AMht  = '',1P,E15.5,A)')
+                 HMIN*UTIME,' S', AMht,' SOL.MASS';
+    WRITE(@Wres,'('' HMAX  = '',1P,E15.5,A,7X,'' Tburst= '',1P,E15.5,A)')
+                 HMAX*UTIME,' S', TBurst,' S';
+    WRITE(@Wres,'('' THRMAT= '',1P,E15.5,9X,'' Ebstht= '',1P,E15.5,A)')
+                 THRMAT,EBurst,' 1e50 ergs';
+    WRITE(@Wres,'('' METH  = '',I15,9X,'' CONV  = '',L15)')METH,CONV;
+    WRITE(@Wres,'('' JSTART= '',I15,9X,'' EDTM  = '',L15)')JSTART,EDTM;
+    WRITE(@Wres,'('' MAXORD= '',I15,9X,'' CHNCND= '',L15)')MAXORD,CHNCND;
+    WRITE(@Wres,'('' NSTA  = '',I15,9X,'' FitTau= '',1P,E15.5)')NSTA,FitTau;
+    WRITE(@Wres,'('' NSTB  = '',I15,9X,'' TauTol= '',1P,E15.5)')NSTB,TauTol;
+    WRITE(@Wres,'('' NOUT  = '',I15,9X,'' IOUT  = '',I15)')NOUT,IOUT;
+    WRITE(@Wres,'('' TcurA = '',F15.5,9X,'' Rvis   ='',F15.5)')
+                 TcurA,Rvis;
+    WRITE(@Wres,'('' TcurB = '',F15.5,9X,'' BQ    = '',1P,E15.5)')TcurB,BQ;
+    WRITE(@Wres,'('' NSTMAX= '',I15,9X,'' DRT   = '',1P,E15.5)')NSTMAX,DRT;
+    WRITE(@Wres,'('' XMNI  = '',1P,E15.5,A,'' NRT   = '',G10.3)')
+                                             XMNI,' SOL.MASS',NRT;
+    If(KNadap>0)then;
+      WRITE(@Wres,'('' XNI   = '',1P,E15.5)')XNI;
+      WRITE(@Wres,'('' CONTM.= '',1P,E15.5,A,'' SCAT  = '',L15)')
+                                           AMNI,' SOL.MASS',SCAT;
+    else;
+      WRITE(@Wres,'('' XNifor= '',1P,E15.5)')XNifor(1);
+      WRITE(@Wres,'('' MNicor= '',1P,E15.5,A,'' SCAT  = '',L15)')
+                                           AMNI,' SOL.MASS',SCAT;
+    endif;
+    --PRINT @F1,UTP,UTIME,URHO,UFREQ;
+    --PRINT @F2,CK1,CK2,CFR,CKRAD,CFLUX,CLUM,CLUMF;
+    @F2: FORMAT(' CK1  =',1P,E12.5,'  CK2=',E12.5,'   CFR=',E12.5,
+                '  CKRAD=',E12.5/
+                ' CFLUX=',E12.5,'  CLUM=',E12.5,'  CLUMF=',E12.5);
+    @F1: FORMAT(' UTP=',1P,E12.5,' UTIME=',E12.5,' URHO=',E12.5,
+                ' UFREQ=',E12.5);
+    --PRINT'('' *****CK1, CK2 INCREASED'',G8.1,'' TIMES*****'')',CRAP;
+    WRITE(@Wres,'('' FLOOR :''/1X,1P,10E10.2)') FLOOR;
+    --PRINT *,' N DIFF. EQS=',N,'   N RAD. EQS=',2*KRAD;
+%S:O
+SUBROUTINE @SAVE_MODEL;
+    IMPLICIT REAL*8 (A-H,O-Z);
+    INTEGER LUNIT;
+    Character*80 NFILE*80;
+    _INCLUDEN snrad;
+    _INCLUDEN abo;
+    if(NSTB<0)then;
+      Lunit=10;
+      NFILE=Sumprf;
+    else;
+      Lunit=12;
+      NFILE='test.prf';
+    endif;
+    call StradIO('wm',Lunit,NFILE);
+    --close(Lunit);
+    if(NSTB<0)then;
+      Lunit=11;
+      NFILE=Sumcur;
+    else;
+      Lunit=13;
+      NFILE='test.crv';
+    endif;
+    call StradIO('wc',Lunit,NFILE);
+    --close(Lunit);
+ RETURN;END;
+%I:O
+    BLOCK DATA STDATA;
+    IMPLICIT REAL*8(A-H,O-Z);
+     _include zone;
+    COMMON/QNRGYE/QNUC,RGASA,YELECT;
+    COMMON/HNUSED/HUSED,NQUSED,NFUN,NJAC,NITER,NFAIL;
+--    COMMON/AQ/AQ,BQ,DRT,NRT; -- BQ pseudo-viscosity for R-T
+    COMMON/AZNUC/ACARB,ZCARB,ASI,ZSI,ANI,ZNI,QCSI,QSINI;
+    COMMON/TOO/TOO,KO,KNTO,TO(KOMAX),STO(KOMAX),NTO(KOMAX);
+--    DATA AQ/2.D0/; -- standard
+--    DATA AQ/8.D0/; -- enhanced
+    <*A: DATA FOR TOO *>;
+    <*P* DATA FOR Peter's prescribed moments *>;
+    DATA QNUC,YELECT/8.8861D+6,0.5D0/;
+    DATA ACARB,ZCARB,ASI,ZSI,ANI,ZNI,QCSI,QSINI/12.D0,6.D0,28.D0,
+         14.D0,56.D0,28.D0,88.861D0,1.884D0/;
+    DATA NFUN,NJAC,NITER,NFAIL/4*0/;
+    END;
+%IA:O
+    DATA TO/komax*1.D+19/,STO/komax*1.D-5/,NTO/komax*0/;
+         -- no prescribed moments
+/*    DATA TO/
+    8.0000d-02, 8.0116d-02, 8.0231d-02,
+    8.0289d-02, 8.0347d-02, 8.0463d-02,
+    8.0694d-02, 8.0926d-02, 8.1157d-02,
+    8.1620d-02, 8.2083d-02, 8.2315d-02,
+    8.3000d-02, 8.5000d-02, 8.8000d-02,
+    9.2000d-02, 9.6000d-02, 1.0000d-01,
+    1.0500d-01, 1.1000d-01, 1.2000d-01,
+    1.4000d-01, 1.6000d-01, 2.0000d-01,
+    2.5000d-01, 3.0000d-01, 4.0000d-01,
+    5.0000d-01, 7.0000d-01, 1.0000d+00,
+    1.5d+00, 2.d0, 3.d+00, 4.d0, 5.d+00,
+    6.d0, 8.d0, 10.d0, 30.d0,  90.d0 -- in days
+           /, STO/komax*1.D-5/, NTO/komax*0/;
+  */          -- STO always in secs
+%IP:O
+    DATA TO/
+  8.0000d-02, 8.0116d-02, 8.0231d-02,
+ 8.0289d-02, 8.0347d-02, 8.0463d-02,
+ 8.0694d-02, 8.0926d-02, 8.1157d-02,
+ 8.1620d-02, 8.2083d-02, 8.2315d-02,
+ 8.3000d-02, 8.5000d-02, 8.8000d-02,
+ 9.2000d-02, 9.6000d-02, 1.0000d-01,
+ 1.0500d-01, 1.1000d-01, 1.2000d-01,
+ 1.4000d-01, 1.6000d-01, 2.0000d-01,
+ 2.5000d-01, 3.0000d-01, 4.0000d-01,
+ 5.0000d-01, 7.0000d-01, 1.0000d+00,
+ 1.5000d+00, 3.0000d+00, 5.0000d+00/, -- zdesj momenty v
+  -- v sutkah ili sekundah
+         STO/komax*0.D0/,
+         NTO/komax*0/;
+

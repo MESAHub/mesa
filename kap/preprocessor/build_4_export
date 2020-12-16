@@ -1,0 +1,18 @@
+# run this from kap/preprocessor to create kap_data.tar.xz in the kap directory
+rm -rf ../data/kap_data/cache
+cd data
+rm -rf kap_data.tar
+rm -rf kap_data.tar.xz
+cp ../condtabl.d kap_data/condtabl.data
+echo 'tar -cvf kap_data.tar kap_data'
+tar -cvf kap_data.tar kap_data/*.data
+echo 'xz kap_data.tar'
+xz kap_data.tar
+cp kap_data.tar.xz ../..
+
+echo "**************"
+echo "**************"
+echo "next step is"
+echo "cd .. ; ./build_data_and_export"
+echo "**************"
+echo "**************"

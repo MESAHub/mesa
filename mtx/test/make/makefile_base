@@ -1,0 +1,108 @@
+# This is the makefile for testing mesa mtx package 
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+SRCS = \
+   test_mtx_support.f test_block_tri_dble.f test_block_tri_quad.f \
+   test_square.f test_square_quad.f test_mtx.f
+
+#################################################################
+#
+# SOURCES
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = mtx
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = const utils math
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_OTHER)) $(LOAD_LAPACK) $(LOAD_BLAS) $(LOAD_CRMATH)
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+all : $(TEST)
+
+$(TEST) : $(OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(TEST) test_block_tri_dble.f test_block_tri_quad.f
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+PREPROCESS = $(FC) $(FCfree) $(FC_free_preprocess) -E
+
+test_block_tri_dble.f: test_block_tridiagonal.f
+ifneq ($(QUIET),)
+	@echo PREPROCESS $<
+	@$(PREPROCESS) -E -DDBLE $< > $@
+else
+	$(PREPROCESS) -E -DDBLE $< > $@
+endif
+
+test_block_tri_quad.f: test_block_tridiagonal.f
+ifneq ($(QUIET),)
+	@echo PREPROCESS $<
+	@$(PREPROCESS) -E $< > $@
+else
+	$(PREPROCESS) -E $< > $@
+endif
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
+else
+	$(TEST_COMPILE) $(FCfree) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend : $(SRCS)
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

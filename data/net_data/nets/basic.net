@@ -1,0 +1,72 @@
+
+      ! the basic net is for "no frills" hydrogen and helium burning.
+      ! assumes T is low enough so can ignore advanced burning and hot cno issues.
+
+      add_isos(
+         h1 
+         he3 
+         he4 
+         c12 
+         n14 
+         o16 
+         ne20 
+         mg24
+         )
+         
+      add_reactions(
+     
+         ! pp chains
+         
+         rpp_to_he3          ! p(p e+nu)h2(p g)he3
+         rpep_to_he3         ! p(e-p nu)h2(p g)he3     
+         r_he3_he3_to_h1_h1_he4       ! he3(he3 2p)he4 
+         r34_pp2             ! he4(he3 g)be7(e- nu)li7(p a)he4 
+         r34_pp3             ! he4(he3 g)be7(p g)b8(e+ nu)be8( a)he4  
+         r_h1_he3_wk_he4               ! he3(p e+nu)he4     
+
+         ! cno cycles
+         
+         rc12_to_n14         ! c12(p g)n13(e+nu)c13(p g)n14
+         rn14_to_c12         ! n14(p g)o15(e+nu)n15(p a)c12
+         rn14_to_o16         ! n14(p g)o15(e+nu)n15(p g)o16
+         ro16_to_n14         ! o16(p g)f17(e+nu)o17(p a)n14
+
+         ! helium burning
+         
+         r_he4_he4_he4_to_c12
+
+         r_c12_ag_o16
+         rc12ap_to_o16       ! c12(a p)n15(p g)o16    
+
+         rn14ag_lite         ! n14 + 1.5 alpha = ne20
+
+         r_o16_ag_ne20
+         ro16ap_to_ne20      ! o16(a p)f19(p g)ne20    
+
+         r_ne20_ag_mg24
+         rne20ap_to_mg24     ! ne20(a p)na23(p g)mg24
+
+         ! auxiliaries -- used only for computing rates of other reactions
+         
+         rbe7ec_li7_aux 
+         rbe7pg_b8_aux 
+         rn14pg_aux 
+         rn15pg_aux 
+         rn15pa_aux 
+         ro16ap_aux 
+         rf19pg_aux 
+         rf19pa_aux 
+         rne20ap_aux 
+         rna23pg_aux 
+         rna23pa_aux
+
+         rc12ap_aux               ! c12(ap)n15                 
+         rn15pg_aux               !        n15(pg)o16           
+         ro16gp_aux               ! o16(gp)n15                
+         rn15pa_aux               !        n15(pa)c12
+           
+         )     
+     
+     
+     
+     

@@ -1,0 +1,50 @@
+Run             Results             Model            Nickel             Opacity
+mesatest300f          mesatest300f.res            mesatest300f          mesatest300f           mesatest300fin.1
+ 300 freqs with inner-shell opacity
+m030307mhhc             m030307mhhc.res             m030307mhh            m030307mhh              qq.1
+ -- stellacon with const opacity
+
+W7fwindCObqeps6       W7fwindCObqeps6.res       W7fwindCO        W7fwindCO         W7fwindCO.1
+   EPS
+   0.03
+   FLOOR(RADIAT)-- success in 71209 steps with gfortran
+   1.D-00
+   rest as W7fwindCObqeps5
+
+W7fwindCObqeps5       W7fwindCObqeps5.res       W7fwindCO        W7fwindCO         W7fwindCO.1
+-- success with xstella7BQeps.exe
+   EPS
+   0.1
+   METH  ADAMS(1)-GEAR(2)   JSTART  (0-START_ELSE_ORDER) MAXORD KNadap
+   3                        0                            4        -4
+   AMNI (CONTAM. MASS)     XMNI (56NI MASS)
+   1.D0                    0.59d0
+   FLOOR(R) FLOOR(V) FLOOR(T) FLOOR(RADIAT)    FLOOR(UCONV)
+   1.D-08   1.D-03   3.D-02   1.D-01           1.D-04
+   Wacc(R)  Wacc(V)  Wacc(T)  Wacc(RADIAT)
+   1.d-4    1.d-2    3.d-02   1.d-03
+   FitTau   TAUTOL   Rvis   AQ    BQ       DRT     NRT     SCAT
+   3.D02    1.3D0    1.D0   2.D0  1.D+00   1.      1       T
+W7fhh       W7fhh.res       W7fhh        W7fhh         W7fhh.1
+
+W7fhhwindCObqeps       W7fhhwindCObqeps.res       W7fhhwindCO        W7fhhwindCO         W7fhhwindCO.1
+
+W7fhhwindCO       W7fhhwindCO.res       W7fhhwindCO        W7fhhwindCO         W7fhhwindCO.1
+
+W7fhhwind       W7fhhwind.res       W7fhhwind        W7fhhwind         W7fhhwind.1
+
+m030307mh1      m030307mh1.res      m030307mh        m030307mh          m030307mh1.1  
+-- repeat m030307mh @skip=4
+m030307mh       m030307mh.res      m030307mh        m030307mh          m030307mh.1  
+-- here @skip=1 in opacity.inc 
+
+
+20z002He   20z002He.res          20z002He          20z002He          20z002Heshb.1
+
+20z002v4   20z002v4.res          20z002v4          20z002v4          20z002v2shb.1
+
+20z002v3   20z002v3.res          20z002v3          20z002v3          20z002v2shb.1
+
+20z002v2   20z002v2.res          20z002v2          20z002v2          20z002v2shb.1
+
+20z002E1fh             20z002E1fh.res             20z002E1fh            20z002E1fh              20z002E1fh.1

@@ -1,0 +1,7 @@
+
+
+      ! this file is here for backward compatibility
+      ! in new code, you should include standard_run_star_extras.inc
+
+      include 'standard_run_star_extras.inc'
+      

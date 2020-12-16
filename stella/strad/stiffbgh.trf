@@ -1,0 +1,1131 @@
+_outcom ;
+_trace '-------' ;
+-- GEAR integrator for ODE with sparse Jacobian and option METH=3
+-- for BRAYTON, GUSTAVSON & HACHTEL method
+_Define
+        @DNAMEDVAR     DNDVAR  -- work array of derivatives
+        @STRING        STR020  -- for debugger
+        @LINE          LIN130  -- for debugger
+        @THR           1.D-12   -- Zlatev threshold
+
+--        @THR           1.D-15  -- Zlatev threshold
+
+--_TRACE "WRITE(@Wres,*)' ifail =',ifail,' NumSing=',NUMSING,"
+--_TRACE "WRITE(@Wres,*)' Y11 =',Y(1,1),' Ytp11 =',Y(301,1),"
+--_TRACE "IF(NSTEP>5755) @wterm' Stiff EVALJA=',EVALJA,"
+--_TRACE "IF(NSTEP>8000) write(*,'(a,L3,1p,2e12.3,a)')'EVALJA H Hused=',EVALJA,H,Hused,"
+--_TRACE "@wterm' lmax=',lmax,'  maxord=', maxord,"
+--_TRACE "@wterm' EVALJA=',EVALJA,'  maxer=', maxer,"
+--_TRACE "99996(@term,'(a,4L3,i4,a)')' EVALJA needbr corrco badste ifail=',
+--             EVALJA, needbr, corrco, badste, ifail,"
+--_TRACE "@wterm' EVALJA=',EVALJA,'  ifail =',ifail,'  H=',H,"
+--_TRACE "if (Nstep>16290)write( @term,'(a,L3,a,i3,2(a,1p,g12.5),a)') 
+--   ' EVALJA=',EVALJA,'  ifail =',ifail,'  H=',H,' Tp(76)=',Y(276,1),"
+--_TRACE "WRITE(*,*)' N=',N,' Nzmod=',Nzmod,"
+--  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
+  --          WRITE(@term,*)' Nstep,Ncnd,Nfrus=',Nstep,Ncnd,Nfrus,"
+--  _TRACE " if (nstep==319 .or. nstep==320 .or. nstep>=406)
+  --          write(*,*)' Y(2*Nzon+ncnd+1...+4,1): ',Y(2*Nzon+ncnd+1,1),
+    --          Y(2*Nzon+ncnd+2,1),Y(2*Nzon+ncnd+3,1),Y(2*Nzon+ncnd+4,1) ,"
+
+SUBROUTINE VTSTIF;
+   IMPLICIT REAL*8(A-H,O-Z);
+/* VTSTIF performs one step of the integration of an initial
+   value problem for a system of ordinary differential equations.
+   Communication with VTSTIF is done with the following variables:
+   Y       an NYDIM by LMAX array containing the dependent variables
+             and their scaled derivatives. LMAX is currently 13 for
+             the Adams methods and 6 for the Gear methods (though
+             LMAX=5 is recommended due to stability considerations).
+             LMAX-1 is MAXORD, the maximum order used. See subroutine
+             COSET.
+               Y(I,J+1) contains the J-th derivative of Y(I), scaled
+             by H**J/Factorial(J). Only Y(I), 1 <= I <= N, need be set
+             by the calling program on the first entry.
+               If it is desired to interpolate to non-mesh points,
+             the Y array can be used. If the current step size is H
+             and the value at t+E is needed, form  S = E/H, and then
+             compute
+                            NQ
+               Y(I)(t+E) = SUM   Y(I,J+1)*S**J .
+                           J=0
+             The Y array should not be altered by the calling program.
+             When referencing Y as a 2-dimensional array, use a column
+             length of NYDIM, as this is the value used in STIFF.
+   N       The number of first order differential equations. N may be
+             decreased on later calls if the number of active equations
+             reduces, but it must not be increased without calling with
+             JSTART=0.
+   NYDIM   A constant integer >= N, used for dimensioning purposes.
+             NYDIM must not be changed without setting JSTART=0.
+   t       The independent variable. t is updated on each step taken.
+   H       The step size to be attempted on the next step. H may be
+             adjusted up or down by the routine in order to achieve
+             an economical integration. However, if the H provided by
+             the user does not cause a larger error than requested, it
+             will be used. To save computer time, the user is advised
+             to use a fairly small step for the first call. It will be
+             automatically increased later. H can be either positive
+             or negative, but its sign must remain constant throughout
+             the problem.
+   HMIN    The minimum absolute value of the step size that will be
+             used for the problem. On starting this must be much smaller
+             than the average Abs(H) expected, since a first order
+             method is used initially.
+   HMAX    The maximum absolute value of the step size that will be
+             used for the problem.
+   EPSJ    The relative error test constant. Single step error estimates
+             divided by YMAX(I) must be less than this in the Euclidean
+             norm. The step and/or order is adjusted to achieve this.
+   METH    The method flag.
+             METH=1  means the implicit ADAMS methods
+             METH=2  means the GEAR method for stiff problems
+             METH=3  means the GEAR method, corrected by
+             R.K.Brayton, F.G.Gustavson & G.D.Hachtel in the
+             Proceedings of the IEEE v.60, No.1, January 1972, p.98-108
+   YMAX    An array of N locations which contains the maximum absolute
+             value of each Y seen so far.
+   ERROR   An array of N elements proportional to the estimated one step
+             error in each component.
+   KFLAG   A completion code with the following meanings:
+             0 the step was succesful
+            -1 the requested error could not be achieved with
+               abs(H)=HMIN
+            -2 corrector convergence could not be achieved for
+               abs(H)>HMIN.
+             On a return with KFLAG negative, the values of t and the Y
+             array are as of the beginning of the last step, and H is
+             the last step size attempted.
+   JSTART  An integer used on input and output.
+             On input it has the following values and meanings:
+              0 perform the first step. This value enables the
+                subroutine to initialize itself.
+             >0 take a new step continuing from the last.
+                Assumes the last step was succesful and user has not
+                changed any parameters.
+             <0 repeat the last step with a new value of H and/or
+                EPS and/or METH. This may be either in redoing a step
+                that failed, or in continuing from a succesful step.
+             On exit, JSTART is set to NQ, the current order of the
+                method. This is also the order of the maximum derivative
+                available in the Y array. After a succesful step, JSTART
+                need not be reset for the next call.
+   AJAC    A block used for partial derivatives. It keeps the
+             matrix AJAC=1-EL(1)*H*Jacobian & is computed by DIFMAT.
+   HL      = H*EL(1) is communicated to DIFMAT to compute AJAC.
+   FSAVE   A block of at least 2*NYDIM locations for temporary storage.
+
+ The parameters which must be input by the user are:
+   N, NYDIM, t, Y, H, HMIN, HMAX, EPS, METH, JSTART, MAXORD.
+
+ Additional Subroutines required are:
+  DIFMAT computes DY/Dt given t and Y, and if EVALJA computes AJAC,
+         stored in the form appropriate for M28Y12,
+  COSET,
+  RESCAL,
+  M28Y12, M30Y12, M28BYS - sparse matrix solvers.
+
+ The calling program must contain the common declarations given in
+ node %C:
+                                                                      */
+_INCLUDE snrad;
+   <*C: COMMONS & VAR STIFF *>;
+   <*B: DATA FOR STIFF *>;
+   <*D: DATA FOR SPARSE MATRIX SubroutineS M28Y12 *>;
+   <*F: PREPARATIONS DEPENDING ON JSTART *>;
+   HNT(1)=H;
+   CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);-- needed for continuation
+            --runs
+   RC=RC*EL(1)/OLDL0;OLDL0=EL(1);
+         -- RC is the ratio of new to old values
+         -- of the coefficient H*EL(1).
+         -- When RC differs from 1 by more than RCTEST,
+         -- EVALJA is set to .TRUE. to force
+         -- jacobian to be calculated in DIFMAT.
+   <*A: the constants E,EUP,EDN,BND *>;
+   IF(MOD(NSTEP,MBATCH)==0) NEEDBR=.TRUE.;
+   RETCOD=0;
+   <*G: GENERAL STEP OF STIFF WHILE RETCOD==0 *>;
+   <*X: ALL RETURNS ARE MADE THROUGH THIS SECTION DEPENDING ON RETCOD. 
+        H IS USED IN HOLD TO ALLOW THE CALLER TO CHANGE H ON THE NEXT STEP. *>;
+   RETURN;
+   END;
+%C:O
+_include nstep;
+-- COMMON/NSTEP/NSTEP,NDebug,MAXER,IOUT,NOUT;
+-- COMMON/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD;
+_include stsave;
+-- COMMON/STSAVE/RMAX,TREND,OLDL0,RC,HOLD,EDN,E,EUP,BND,EPSOLD,TOLD,
+   --           MEO,NOLD,NQ,LNQ,IDOUB;
+REAL*8 ERROR(NYDIM),EL(13),TQ(4);
+REAL*8 XMOD,ERREST,ERROLD;
+    PARAMETER (NCHANL=6,
+               ETA=1.D-04); -- PIVOT THRESHOLD IN M28BYS
+    PARAMETER (DeltaDeb=1.d-10);           -- FOR DEBUGGER
+    CHARACTER @STRING*20,@LINE*130;       -- FOR DEBUGGER
+    CHARACTER*20 CharVarName(5);          -- FOR DEBUGGER
+    Logical FOUNDI;                       -- FOR DEBUGGER
+    REAL*8 @DNAMEDVAR(NYDIM),DSAVE(NYDIM);-- FOR DEBUGGER
+    Integer RETCOD/0/,Ifail/0/; -- RETURN CODE
+    Real Tm1,Tm2; -- Timer for CMS -- CRAY REAL
+    LOGICAL CORRCO; -- CORRECTOR ITERATIONS HAVE CONVERGED
+    LOGICAL NUMSING; -- Numerical singularity in decomposition
+<*L: COMMON & VARIABLES FOR LINEAR EQS SOLVER F01BRF or M28Y12 *>;
+%CL:O
+   Parameter(MAXIT=15);
+   LOGICAL LBLOCK,GROW,ABORT(4);
+   COMMON/JSAVE/ASAVE(NZ),IRS(NZ),ICS(NZ);
+   Dimension DB(NYDIM), XSAVE(NYDIM);
+%B:O
+   DATA ANOISE/1.D-12/;--should be set to the noise level of the machine
+   DATA DFLTZR/1.D-75/, MAXITE/3/, MAXFAI/3/;
+   DATA RMXINI/1.D+4/, RMXNOR /10.D0/, RMXFAI/2.0D0/, IDELAY /10/;
+   DATA RHCORR/.25D0/, RHERR3/.1D0/,   RCTEST/.3D0/;
+   DATA BIAS1/1.3D0/,  BIAS2/1.2D0/,   BIAS3/1.4D0/;
+   DATA CharVarName/'radius','velocity','temperature','FJ','FH'/;
+%D:O
+   DATA LBLOCK /.True./,GROW/.TRUE./,
+        ABORT/.FALSE.,.TRUE.,.FALSE.,.TRUE./,
+        PIVOT/1.D-01/;
+%F:
+      KFLAG=0;tOLD=t; NUMSING=.FALSE.;
+  --  WRITE(@term,*)'Entering Stiff NSTEP=', NSTEP;
+   /*  On the first call, the order is set to 1 and the initial
+       derivatives are calculated. RMAX is the maximum ratio
+       by which H can be increased in a single step. It is
+       initially RMXINI to compensate for the small initial H,
+       but then is normally equal to RMXNOR. If a failure occurs
+       (in corrector convergence or error test), RMAX is set
+       at RMXFAI for the next increase. */
+       _SELECT
+         _ JSTART==0  [<*B: INITIAL *> ]
+         _ JSTART<0   [
+                       <*C: reset Y & other variables for changed
+                            METH, EPS, N, H *> ]
+      _END;
+%FB:
+      HUSED=0.D0; NQUSED=0; NOLD=N; EVALJA=.FALSE.;
+      NQ=1;
+      _DO I=1,N; FSAVE(I)=Y(I,1)_OD;
+      CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);-- needed to define EL(1)
+      HL=H*EL(1);
+      CALL DIFMAT;
+      _DO I=1,N; Y(I,2)=FSAVE(NYDIM+I)*H _OD;
+      LNQ=2; IDOUB=LNQ+1; RMAX=RMXINI; EPSJ=EPS*SQRT(Real(N));
+      TREND=1.D0; OLDL0=1.D0; RC=0.D0;
+         -- RC is the ratio of new to old values
+         -- of the coefficient H*EL(1).
+         -- When RC differs from 1 by more than RCTEST,
+         -- EVALJA is set to .TRUE. to force
+         -- Jacobian to be calculated in DIFMAT.
+      HOLD=H; MEO=METH;
+      EVALJA=.TRUE.; 
+      OLDJAC=.FALSE.;
+      NEEDBR=.TRUE.;
+      LMAX=MAXORD+1;
+      EPSOLD=EPSJ;
+%A:
+  EDN=(TQ(1)*EPSJ)**2;-- is to test for decreasing the order,
+  E=(TQ(2)*EPSJ)**2;  -- comparison for errors of current order NQ,
+  EUP=(TQ(3)*EPSJ)**2;-- is to test for increasing the order,
+  BND=(TQ(4)*EPSJ)**2;-- is used to test for convergence of the
+                     -- correction iterates
+%FC:
+ -- If the caller change EPSJ or METH , the constants E,EUP,EDN,BND
+ -- must be reseted.
+    EPSJ=EPS*SQRT(Real(N));
+      IF(METH==MEO) THEN;
+        IF(EPSJ^=EPSOLD)THEN;
+          EPSOLD=EPSJ;
+        ENDIF;
+      ELSE;
+        IDOUB=LNQ+1;
+      ENDIF;
+      <*C: TEST N==NOLD, H==HOLD ? *>;EPSOLD=EPSJ;
+%FCC:
+      IF(N^=NOLD)THEN;
+         IDOUB=LNQ+1;EVALJA=.TRUE.;OLDJAC=.FALSE.;NOLD=N;
+      ENDIF;
+      IF(H^=HOLD) THEN;
+         RH=H/HOLD;H=HOLD;
+         CALL RESCAL(Y,NYDIM,RH,RMAX,RC,LNQ);
+         IDOUB=LNQ+1;
+      ENDIF;
+
+%G:
+ _WHILE RETCOD==0 _DO
+   IF(ABS(RC-1.D0)>RCTEST .or. MOD(NSTEP,MBATCH)==0) EVALJA=.TRUE.;
+   If(ifail==13)Then;
+     Needbr=.true.;
+     Evalja=.true.;
+   Endif;
+   t=t+h;
+   <*E: Predictor.
+        This section computes the predicted values by effectively
+        multiplying the Y array by the Pascal triangle matrix *>
+   _Repeat  -- loop until .not.EVALJA
+       ITER=0;
+       _DO I=1,N; ERROR(I)=0.D0 _OD;
+       _DO I=1,N; FSAVE(I)=Y(I,1) _OD;
+       CORRCO=.FALSE.; -- Corrector convergence. It is tested
+                       -- by requiring changes relative to YMAX(I)
+                       -- to be less, in Euclidian norm, than BND,
+                       -- which is dependent on EPSJ.
+       _WHILE ^CORRCO & ITER<MAXITE _DO
+          <*Cor: Up to MAXITE corrector iterations are taken.
+                 The sum of the corrections is accumulated in the
+                 vector ERROR(i). It is approximately equal to the
+                 Lnq-th derivative of Y multiplied by
+                    H**Lnq/(factorial(Lnq-1)*EL(Lnq)),
+                 and is thus proportional to the actual errors
+                 to the lowest power of H present (H**Lnq).
+                 The Y array is not altered in the correction
+                 loop. The updated Y vector is stored temporarily
+                 in FSAVE. The norm of the iterate difference
+                 is stored in D. *>
+       _OD; -- CORRCO ! ITER==MAXITE
+       _IF CORRCO _THEN
+          <*X: The corrector has converged. OLDJAC is set to .true.
+               if partial derivatives were used, to signal that they
+               may need updating on subsequent steps. The error test
+               is made and control passes to node %GXA if it
+               succeeds. *>;
+       _ELSE -- ITER==MAXITE
+             -- The corrector iterations failed to converge in MAXITE
+             -- tries.
+          NITER=NITER+1;
+          IF(OLDJAC)THEN;
+             -- If partials are not up to date , they are
+             -- reevaluated for the next try.
+             EVALJA=.TRUE.; -- Refresh JACOBIAN
+          ELSE;
+            <*Y: Otherwise, the Y array is retracted to its values
+                 before prediction, and H is reduced, if possible.
+                 If not, a no convergence exit is taken. *>;
+          ENDIF;
+       _FI;
+   _Until ^EVALJA .or. RETCOD^=0;
+ _OD; -- while RETCOD==0
+
+%GE:
+     _DO J1=1,NQ;
+       _DO J2=J1,NQ;
+          J=NQ-J2+J1;
+          _DO I=1,N;
+            Y(I,J)=Y(I,J)+Y(I,J+1)
+    _OD_OD_OD;
+
+%G_Cor:
+    BADSTE=.FALSE.;  -- Logical variable BADSTE may be changed by DIFMAT
+    HL=H*EL(1);
+    -- if(Nstep>1750 & EVALJA)then;
+    -- if(Nstep>1586 & EVALJA)then;
+    if(Nstep>=NDebug & EVALJA)then;
+      <*DEB: full debugger of Jacobian *>;
+    end if;  
+    CALL DIFMAT;     -- if necessary (i.e. EVALJA=.true.) the partials
+                     -- are reevaluated by DIFMAT
+    <*MatrOut : output Jacobian matrix *>;
+    -- stop ' Jacobian is output'; 
+    _IF BADSTE _THEN
+       -- Something is wrong in DIFMAT (i.e. Y(I) is out of physical
+       -- range for some I)
+--       WRITE(*,*)' G_Cor: BADSTE=',BADSTE;
+       ITER=MAXITE; EVALJA=.FALSE.; OLDJAC=.FALSE.;
+       Ifail=13;
+       -- Variables are given the values such as to guarantee that
+       -- control passes to the node %GY - to try a new smaller step
+    _ELSE
+       _DO Isw=1,N;
+         XSAVE(Isw)=0.D0;
+       _OD;
+       IF(EVALJA)  THEN;
+          <*L: L-U Decomposition of matrix AJAC=1-El*H*Jacobian *>;
+          EVALJA=.FALSE.;OLDJAC=.FALSE.;RC=1.D0;
+          NJAC=NJAC+1;
+       ENDIF;
+       <*U: Find in FSAVE(1:N) the solution  X of equation
+
+                 AJAC!X>=H*F(Y)-Y(I,2)-ERROR(I),
+
+            where AJAC is the matrix AJAC=1-El*H*Jacobian,
+            then obtain in ERROR the full correction,
+            in D - the norm of the iterate difference &
+            in FSAVE a new approximation to Y *>
+     If(Ifail^=13)Then;
+      IF(ITER^=0) TREND=MAX(.9D0*TREND,D/D1);
+      -- If ITER > 0 an estimate of the convergence rate constant
+      -- is stored in TREND, and this is used in the convergence test
+      CORRCO=D*MIN(1.D0,2.D0*TREND)<=BND;
+      D1=D;
+      ITER=ITER+1;
+     Else;
+     --WRITE(@Wres,*)'Ifail=',Ifail;
+       ITER=MAXITE; EVALJA=.FALSE.; OLDJAC=.FALSE.;
+       -- Variables are given the values such as to guarantee that
+       -- control passes to the node %GY - to try a new smaller step
+     Endif;
+    _FI; -- FOR BADSTE
+%G_Cor.L:
+/*_Do I=1,NZMOD;
+      If(IRS(I)==201 & Nstep>=160 & Nstep<=180) then;
+        WRITE(NCHANL,'(2(A,I5),1P,A,E15.8,A,L3)')
+              ' ROW=',IRS(I),'   COL=',ICS(I),'   AJAC=',AJAC(I),
+              '   Needbr=',Needbr;
+      endif
+  _od; */
+--  write(Nchanl,*)' Nzmod=',Nzmod;
+  _Do Isw=1,NZMOD;
+     ASAVE(Isw)=AJAC(Isw);
+  _od;
+--_repeat 
+  If(Needbr)then;
+      <*SOLY12:   *>
+      IRW=Idisp(11);
+      IF (IFAIL==2)then;
+         NUMSING=.true.;
+         NEEDBR=.true.; 
+         ITER=MAXITE; EVALJA=.FALSE.; OLDJAC=.FALSE.;
+         Ifail=13;
+       -- Variables are given the values such as to guarantee that
+       -- control passes to the node %GY - to try a new smaller step
+      else;
+         NUMSING=.false.;
+      endif;
+  else;
+      <*SOLBSF:   *>
+      IRW=IW(1);
+      IF (IFAIL==6)then;
+         NUMSING=.true.;
+         NEEDBR=.true.; 
+       ITER=MAXITE; EVALJA=.FALSE.; OLDJAC=.FALSE.;
+       Ifail=13;
+       -- Variables are given the values such as to guarantee that
+       -- control passes to the node %GY - to try a new smaller step
+      else;
+         NUMSING=.false.;
+         NEEDBR=.false.; 
+      endif;
+  endif;
+  IF (NUMSING) THEN;
+      <*NUMSING: process the numerical singularity in row IR *>;
+--      stop 26;
+  ENDIF;
+--_until ^NUMSING ;
+
+%G_Cor.L_SOLY12:
+  --    IFAIL=110; -- hard failure
+      IFAIL=111; -- soft failure
+/*     if(NUMSING)then;
+       NZMOD=N;
+       do isw=1,N;
+         IRN(isw)=isw;
+         ICN(isw)=isw;
+         AJAC(isw)=1.d0;
+       enddo;
+     else;  
+ */
+       _DO Isw=1,NZMOD;
+         IRN(Isw)=IRS(Isw);
+         ICN(Isw)=ICS(Isw);
+       _OD;
+ /*    endif; */
+--    Call VTIME(Tm1);
+--    CALL F01BRF(N , NZMOD, AJAC, LICN, IRN, LIRN, ICN, PIVOT,
+--                IKEEP, IW, WJAC, LBLOCK, GROW, ABORT, IDISP, IFAIL);
+--      write(*,*) ' In stiffbgh.trf  NZMOD=',NZMOD;
+--      pause;
+      CALL M28Y12(N , NZMOD, AJAC, LICN, IRN, LIRN, ICN, PIVOT,
+                  IKEEP, IW, WJAC, LBLOCK, GROW, ABORT,
+                  IDISP, IFAIL, @THR);
+      NEEDBR=.FALSE.; -- F01BRF or M28Y12 NOT NEEDED
+--    Call VTIME(Tm2);
+--      IF (GROW) WRITE (NCHANL,89996) WJAC(1);
+89996:FORMAT (' ON EXIT FROM M28Y12:  W(1)  = ',1P,E12.4);
+--      WRITE (NCHANL,99996)IDISP(2), IDISP(6),
+--             IDISP(7), IDISP(3),IDISP(4);
+--      IF (LBLOCK) WRITE (NCHANL,99994) (IDISP(I),I=8,10);
+99999:FORMAT (6A4, A3);
+99998:FORMAT (4(1X/), 1X , 5A4, A3, 'RESULTS'/1X);
+99997:FORMAT (5(2X, G8.0, 2X, I1, 2X, I1));
+99996:FORMAT (' NUMBER OF NON-ZEROS IN DECOMPOSITION', 9X, '=', I9
+       /' MINIMUM SIZE OF ARRAY IRN', 20X, '=', I9
+       /' MINIMUM SIZE OF ARRAYS A AND ICN', 13X, '=', I9
+       /' NUMBER OF COMPRESSES ON IRN (IDISP(3))', 7X, '=', I7
+       /' NUMBER OF COMPRESSES ON A AND ICN (IDISP(4)) =', I7);
+99994:FORMAT (' STRUCTURAL RANK', 16X, '=', I7
+       /' NUMBER OF DIAGONAL BLOCKS', 6X, '=', I7
+       /' SIZE OF LARGEST DIAGONAL BLOCK =', I7);
+-- WRITE(NCHANL,
+-- '('' M28Y12-1 done at step :'',I6,'' Time(mS):'',I6)')
+ -- CRAY  '('' M28Y12 done at step :'',I6,'' Time(S):'',1P,G11.5)')
+--       NSTEP,Tm2-Tm1;
+
+%G_Cor.L_SOLBSF:
+      IFAIL=11;
+ --   Call VTIME(Tm1);
+      CALL M28BYS(N , NZMOD, AJAC, LICN, IRS, ICS, ICN,
+           IKEEP, IW, WJAC, GROW, ETA, RPMIN, ABORT(4), IDISP, IFAIL);
+ --   Call VTIME(Tm2);
+ --  WRITE(NCHANL,'('' M28BYS done at step :'',I6,'' Time(ms):'',I6)')
+ --      NSTEP,Tm2-Tm1;
+/*   IF (GROW) WRITE (NCHANL,89995) WJAC(1);
+      WRITE (NCHANL,89994) RPMIN;
+89995:FORMAT (' ON EXIT FROM M28BYS:  W(1)  = ',1P,E12.4);
+89994:FORMAT (' VALUE OF RPMIN = ', G12.4);                */
+      IF(IFAIL^=0 .OR. WJAC(1)>1.D50)THEN;
+      IF(IFAIL==6)THEN;
+         <*NUMSING: process the numerical singularity in row IR *>;
+      ENDIF;
+  --    IFAIL=110; -- hard failure
+      IFAIL=111; -- soft failure
+        _Do Isw=1,NZMOD;
+           IRN(Isw)=IRS(Isw);
+           ICN(Isw)=ICS(Isw);
+           AJAC(Isw)=ASAVE(Isw);
+        _od;
+--      Call VTIME(Tm1);
+        CALL M28Y12(N , NZMOD, AJAC, LICN, IRN, LIRN, ICN, PIVOT,
+                    IKEEP, IW, WJAC, LBLOCK, GROW, ABORT,
+                    IDISP, IFAIL, @THR);
+        NEEDBR=.FALSE.; -- F01BRF or M28Y12 NOT NEEDED
+--      Call VTIME(Tm2);
+--      WRITE(NCHANL,
+--        '('' M28Y12 done again at step :'',I6,'' Time(ms):'',I6)')
+ -- CRAY   '('' M28Y12 done at step :'',I6,'' Time(S):'',1P,G11.5)')
+--          NSTEP,Tm2-Tm1;
+      ENDIF;
+
+%G_Cor.L_NUMSING:
+  _DO I=1,NZMOD;
+    IF(IRS(I)==IRW)THEN;
+        WRITE(@term,'(2(A,I5),A,1P,E12.4)') 'IR=',IRS(I),
+          '  IC=',ICS(I),'   AJAC=',ASAVE(I);
+        ICW=ICS(I);
+        If(ICW<=NZON*NVARS)then;
+           Izon=MOD(ICW-1,NZON)+1;
+           Ivar=(ICW-1)/NZON +1;
+           WRITE(@term,'(2(A,I5))') 'Ivar=',Ivar,'    Izon=',Izon;
+        else;
+           ICW=ICW-NZON*NVARS;
+           If(ICW<=KRAD)Then;
+              L=(ICW-1)/(NZON-NCND)+1;
+              Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
+              WRITE(@term,'(2(A,I5))') 'FJ in L=',L,'    Izon=',Izon;
+           else;
+              ICW=ICW-KRAD;
+              L=(ICW-1)/(NZON-NCND)+1;
+              Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
+              WRITE(@term,'(2(A,I5))') 'FH in L=',L,'    Izon=',Izon;
+           endif;
+        endif;
+    ENDIF;
+  _OD;
+  WRITE(@term,'(A)') 'For Ydot of: ';
+   If(IRW<=NZON*NVARS)then;
+      Izon=MOD(IRW-1,NZON)+1;
+      Ivar=(IRW-1)/NZON +1;
+      WRITE(@term,'(2(A,I5))') 'Ivar=',Ivar,'    Izon=',Izon;
+   else;
+      IRW=IRW-NZON*NVARS;
+      If(IRW<=KRAD)Then;
+         L=(IRW-1)/(NZON-NCND)+1;
+         Izon=NCND+MOD(IRW-1,(NZON-NCND))+1;
+         WRITE(@term,'(2(A,I5))') 'FJ in L=',L,'    Izon=',Izon;
+      else;
+         IRW=IRW-KRAD;
+         L=(IRW-1)/(NZON-NCND)+1;
+         Izon=NCND+MOD(IRW-1,(NZON-NCND))+1;
+         WRITE(@term,'(2(A,I5))') 'FH in L=',L,'    Izon=',Izon;
+      endif;
+   endif;
+
+%G_Cor.L_SOLBSF_NUMSING:=G_Cor.L_NUMSING:
+
+%G_Cor.U:
+ <*K: Find solution by M28CYN  *>;
+ If (Ifail^=13) Then;
+   <*V: Find ERROR, D and put new Y in FSAVE *>;
+ Endif;
+%G_Cor.UK:
+   _DO I=1,N;
+      FSAVE(I+NYDIM)=FSAVE(I+NYDIM)*H-Y(I,2)-ERROR(I);
+                    -- R-H SIDE IN FSAVE(NYDIM+1:NYDIM+N)
+      DB(I)=FSAVE(I+NYDIM); -- TO SAVE R-H SIDE
+   _OD;
+-- ITERATIVE REFINEMENT:
+    ITQ = 0;
+ If(Ifail^=13)Then;
+   _Repeat
+        CALL M28CYN(N,AJAC,LICN,ICN,IKEEP,FSAVE(NYDIM+1),
+                    WJAC,IW,1,IDISP,RESID,Ifail);
+        -- SOLUTION IN FSAVE(NYDIM+1:NYDIM+N)
+    If(Ifail^=13)Then;
+        ERROLD=ERREST; ERREST=0.D0; XMOD=0.D0;
+      _DO ID=1,N;
+        XSAVE(ID)=XSAVE(ID)+FSAVE(ID+NYDIM);
+        XMOD=XMOD+ABS(XSAVE(ID));  -- NORMA
+        ERREST=ERREST+ABS(FSAVE(ID+NYDIM));
+        FSAVE(ID)=0.D0;
+      _OD;
+      _DO K=1,NZMOD;
+        FSAVE(IRS(K))=FSAVE(IRS(K))         -- Polish strategy
+                         +XSAVE(ICS(K))*ASAVE(K);
+      _OD;
+      _DO IL=1,N;
+        FSAVE(IL+NYDIM)=DB(IL)-FSAVE(IL);
+      _OD;
+--  WRITE(NCHANL,'(2(A,1P,G12.3))')' ERROLD=',ERROLD,' ERREST=',ERREST;
+      ITQ = ITQ+1;
+   Else;
+        _DO Isw=1,NZMOD;
+           IRN(Isw)=IRS(Isw);
+           ICN(Isw)=ICS(Isw);
+           AJAC(Isw)=ASAVE(Isw);
+        _OD;
+        NEEDBR=.TRUE.; EVALJA=.TRUE.;
+--        @wterm ' G_Cor.UK: ifail 13'; 
+   Endif;
+-- _Until ERREST<=ANOISE*XMOD ! ITQ > MAXIT;
+   _Until ERREST<=ANOISE*XMOD .or. Ifail==13
+            .or. (ITQ>2 & ERREST>ERROLD) .or. ITQ > MAXIT;
+      IF(ERREST > XMOD*.1d0*EPS) NEEDBR=.TRUE.; -- Esaulov correction
+--  IF(XMOD>EPS**3)WRITE(NCHANL,*)' RELEST=',ERREST/XMOD;
+ Endif;
+
+%G_Cor.UV:
+   D=0.D0;
+   _DO I=1,N;
+      ERROR(I)=ERROR(I)+XSAVE(I);
+      D=D+(XSAVE(I)/YMAX(I))**2;
+      FSAVE(I)=Y(I,1)+EL(1)*ERROR(I)
+   _OD;
+%GX:
+      D=0.D0;
+      ERMAX=0.D0; MAXER=0;
+     _DO I=1,N;
+         IF((ERROR(I)/YMAX(I))**2>ERMAX)THEN;
+           ERMAX=(ERROR(I)/YMAX(I))**2; MAXER=I;
+         ENDIF;
+         D=D+(ERROR(I)/YMAX(I))**2
+     _OD;
+      OLDJAC=.TRUE.;
+  _IF D<=E _THEN
+        -- After a succesful step, update the Y array and YMAX.
+        -- Consider changing H if IDOUB==1. Otherwise decrease
+        -- IDOUB by 1.
+        -- If a change in H is considered, an increase
+        -- or decrease in order by one is considered also.
+        HUSED=H;NQUSED=NQ;KFLAG=0;
+        IF(METH==3)THEN; -- Save time intervals in HNT
+            _DO J=7,3,-1;
+              HNT(J)=HNT(J-1) + H;
+              -- HNT(LNQ+1) saves old H for possible order increase
+              -- Initially HNT(2:6) is undefined here!
+            _OD;
+          HNT(2)=H;
+        ENDIF;
+        _DO J=1,LNQ;
+          _DO I=1,N;
+             Y(I,J)=Y(I,J)+EL(J)*ERROR(I)
+        _OD_OD;
+        _IF IDOUB==1 _THEN
+            <*A: Factors PR1, PR2 and PR3 are computed, by which H
+                 could be multiplied at order NQ-1, order NQ,
+                 or order NQ+1, respectively. The largest of these
+                 is determined and the new order is chosen accordingly.
+                 If the order is to be increased, we compute one
+                 additional scaled derivative. *>
+            RETCOD=3; -- EXIT
+        _ELSE
+            IDOUB=IDOUB-1;
+            IF((IDOUB==1) & (NQ^=MAXORD)) THEN;
+                  --  Error is saved for use in a possible
+                  --  order increase on the next step.
+               _DO I=1,N;Y(I,LMAX)=ERROR(I)_OD;
+            ENDIF;
+            IF(METH==3)THEN;
+              <*TWO: RESET PR2 *>;
+              RH=PR2;
+              CALL RESCAL(Y,NYDIM,RH,RMAX,RC,LNQ);
+              -- NO IDOUB HERE!!!
+            ENDIF;
+            RETCOD=4; -- EXIT
+        _FI;
+  _ELSE
+     -- The error test failed. KFLAG keeps track
+     -- of multiple failures. Restore t and the Y array to their
+     -- previous values, and prepare to try the step again.
+     -- Compute the optimum step size for this or one lower order.
+       NFAIL=NFAIL+1;KFLAG=KFLAG-1;t=tOLD;
+       _DO J1=1,NQ;
+          _DO J2=J1,NQ;
+             J=NQ-J2+J1;
+             _DO I=1,N;
+                 Y(I,J)=Y(I,J)-Y(I,J+1)
+       _OD_OD_OD;
+       RMAX=RMXFAI;
+       _IF ABS(H)<=(HMIN*1.00001D0) _THEN
+          RETCOD=1;
+       _ELSE
+          _IF KFLAG<=-MAXFAI _THEN
+           <*Z: Control reaches this section if MAXFAI or more
+                failures have occured. It is assumed that the
+                derivatives that have accumulated in the Y array
+                have errors of the wrong order.
+                Hence the first derivative is recomputed, and the order
+                is set to one. Then H is reduced by factor of RHERR3,
+                and the step is retried. *>
+          _ELSE
+           <*2: RESET PR2 *>;
+           IF(NQ==1) THEN;
+              RH=PR2;
+              CALL RESCAL (Y,NYDIM,RH,RMAX,RC,LNQ);
+              IDOUB=LNQ+1;
+           ELSE;
+              <*1: RESET PR1 *>;
+              IF(PR1<=PR2) THEN;
+                RH=PR2;
+                IF(METH==3)THEN;
+                  HNT(1)=H*RH;
+                  CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);
+                  RC=RC*EL(1)/OLDL0;OLDL0=EL(1);
+                  <*E: the constants E,EUP,EDN,BND *>;
+                  CALL RESCAL (Y,NYDIM,RH,RMAX,RC,LNQ);
+                ELSE;
+                  CALL RESCAL (Y,NYDIM,RH,RMAX,RC,LNQ);
+                  IDOUB=LNQ+1;
+                ENDIF;
+              ELSE;
+                <*R: CHANGE NQ,RESET CONST.  *>;
+              ENDIF;
+           ENDIF;
+          _FI
+       _FI
+  _FI;
+%GXE=A:
+%GX1:
+      SUM=0.D0;
+      _DO I=1,N;SUM=SUM+(Y(I,LNQ)/YMAX(I))**2 _OD;
+      PR1=1.D0/(((SUM/EDN)**(.5D0/DBLE(NQ)))*BIAS1+DFLTZR);
+%GX2:
+      PR2=1.D0/(((D/E)**(.5D0/DBLE(LNQ)))*BIAS2+DFLTZR);
+%GX_TWO=GX2:
+%GXR:
+      LNQ=NQ;NQ=NQ-1;RH=PR1;
+      HNT(1)=H*RH;
+      CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);
+      RC=RC*EL(1)/OLDL0;OLDL0=EL(1);
+      <*A: EDN,E,EUP,BND *>;
+      CALL RESCAL(Y,NYDIM,RH,RMAX,RC,LNQ);
+      IDOUB=LNQ+1;
+%GXRA=A:
+%GXZ:
+      RH=RHERR3;RH=MAX(HMIN/ABS(H),RH);H=H*RH;
+      HL=H*EL(1);
+      _DO I=1,N; FSAVE(I)=Y(I,1) _OD;
+      CALL DIFMAT;
+      _DO I=1,N; Y(I,2)=FSAVE(NYDIM+I)*H _OD;
+--      EVALJA=.TRUE.;
+      EVALJA=.False.; -- to get out the _repeat loop
+      RC=0.d0;        -- to force a new Jacobian
+      IDOUB=IDELAY;
+      IF(NQ^=1) THEN;
+        NQ=1;LNQ=2;
+        CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);
+        OLDL0=EL(1);
+        <*A: EDN,E,EUP,BND *>;
+      ENDIF;
+%GXZA=A:
+%GXA:
+      PR3=DFLTZR;
+      IF(NQ^=MAXORD) THEN;
+        <*3: RESET PR3 *>;
+      ENDIF;
+      <*2: RESET PR2 *>;
+      PR1=DFLTZR;
+      IF(NQ^=1) THEN;<*1: RESET PR1 *>;ENDIF;
+      IF((PR2>PR1) & (PR2>PR3))THEN;
+        RH=PR2;
+      ELSE;
+
+/*
+        IF(PR1>PR3) THEN;
+           NEWQ=NQ-1;RH=PR1;
+        ELSE;
+           NEWQ=LNQ;RH=PR3; -- PR3 IS GREATER
+           _DO I=1,N;Y(I,NEWQ+1)=ERROR(I)*EL(LNQ)/DBLE(LNQ)_OD;
+        ENDIF;
+*/
+     -- bug  (for METH==3) in above lines corrected:
+       IF(PR1>PR3) THEN;
+           NEWQ=NQ-1;RH=PR1;
+        ELSEIF(NQ^=MAXORD)THEN;
+           NEWQ=LNQ;RH=PR3; -- PR3 IS GREATER
+           _DO I=1,N;Y(I,NEWQ+1)=ERROR(I)*EL(LNQ)/DBLE(LNQ) _OD;
+        ELSE; -- NQ==MAXORD
+           NEWQ=NQ;RH=PR3; -- PR3 IS GREATER
+        ENDIF; 
+
+
+        -- If there is a change of order, reset NQ and LNQ.
+        -- In any case H is reset according to
+        -- RH and the Y array and the coefficients EL()
+        -- are rescaled. Then exit.
+        NQ=NEWQ;LNQ=NQ+1;
+      ENDIF;
+      CALL RESCAL(Y,NYDIM,RH,RMAX,RC,LNQ);
+      IDOUB=LNQ+1;
+%GXA3:
+   SUM=0.D0;
+   IF(METH^=3)THEN;
+      _DO I=1,N;SUM=SUM+((ERROR(I)-Y(I,LMAX))/YMAX(I))**2 _OD;
+      PR3=1.D0/(((SUM/EUP)**(.5D0/DBLE(LNQ+1)))*BIAS3+DFLTZR);
+   ELSE;
+      _DO I=1,N;
+         SUM=SUM+
+         ((ERROR(I)*EL(1)/DBLE(NQ+2)-Y(I,LMAX)/TQ(3))/YMAX(I))**2
+      _OD;
+      PR3=1.D0/(((SUM/EPSJ**2)**(.5D0/DBLE(LNQ+1)))*BIAS3+DFLTZR);
+   ENDIF;
+%GXA2=GX2:
+%GXA1=GX1:
+%GY:
+      t=tOLD;RMAX=RMXFAI;
+      _DO J1=1,NQ;
+          _DO J2=J1,NQ;
+            J=NQ-J2+J1;
+            _DO I=1,N;
+               Y(I,J)=Y(I,J)-Y(I,J+1)
+      _OD_OD_OD;
+      IF(ABS(H)<=(HMIN*1.00001D0)) THEN;
+        RETCOD=2;
+      ELSE;
+--        write(*,'(a,i7,2i3,1p,2e12.3)') ' GY: maxer, NQ, kflag, H, Hu:', 
+--                                             maxer, NQ, kflag, H, Hused;
+        RH=RHCORR;
+        if(ifail==13 .and. Kbad>0)then;
+--          @wterm ' GY: ifail 13'; 
+          -- NQ=1; LNQ=2; -- if we want 1st order
+--           @wterm' Initial from Y  R0=',Y(Kbad-1,1),'  u0=',Y(Nzon+Kbad-1,1);
+--           @wterm' Initial from Y  R1=',Y(Kbad,1),'  u1=',Y(Nzon+Kbad,1);
+--           @wterm' Initial dr=',Y(Kbad,1)-Y(Kbad-1,1),
+--                '  predicted dr=',
+--                 Y(Kbad,1)-Y(Kbad-1,1)+(Y(Nzon+Kbad,1)-Y(Nzon+Kbad-1,1))*h;
+        endif; 
+        IF(METH==3)THEN;
+           HNT(1)=H*RH;
+           CALL COSET(METH,NQ,EL,TQ,MAXORD,IDOUB);
+           <*A: the constants E,EUP,EDN,BND *>;
+           RC=RC*EL(1)/OLDL0;OLDL0=EL(1);
+           CALL RESCAL(Y,NYDIM,RH,RMAX,RC,LNQ);
+        ELSE;
+           CALL RESCAL(Y,NYDIM,RH,RMAX,RC,LNQ);
+           IDOUB=LNQ+1;
+        ENDIF;
+      ENDIF;
+
+%GYA=A:
+
+%G_COR_MatrOut:
+
+_DO JTST=1,N;      --@VAR
+
+<*ROW: put in IRN(NZ+1:ILAST) all indeces I such that
+                ICN(I)==JTST *>:
+
+     _Do KTST=1,N; --@NAMELEFT,@NAMERIGHT;
+            <*COMPR: IF in IRN(NZ+1:ILAST) there is I such that
+                     IRN(I)==KTST THEN
+                     output relevant vars          *>
+
+     _od;
+_OD
+
+%G_COR_MatrOut_ROW:
+  ILAST=0;
+  do I=1,NZMOD;
+    IF(ICS(I)==JTST)THEN;
+      ILAST=ILAST+1; 
+      IRN(NZ+ILAST)=I;
+    ENDIF;
+  enddo;
+--  WRITE(5,*)'ILAST=',ILAST;
+
+%G_COR_MatrOut_COMPR:
+  FOUNDI=.FALSE.; IL=1;
+  _WHILE IL<=ILAST & ^FOUNDI _DO
+    IF(IRS(IRN(NZ+IL))==KTST)THEN;
+      FOUNDI=.TRUE.;
+    ELSE;
+      IL=IL+1;
+    ENDIF;
+  _OD;
+  IF(FOUNDI)THEN;
+    If(KTST^=JTST)then;
+          if(AJAC(IRN(NZ+IL))>1.d-6) WRITE(@Wres,'(A,2I7,1P,3E12.3)')
+           '  K,J,AJAC :   ',
+            KTST,JTST,AJAC(IRN(NZ+IL));
+    else;
+          WRITE(@Wres,'(A,2I7,1P,3E12.3)')
+           '  K,J,AJAC,1-AJAC :   ',
+            KTST,JTST,AJAC(IRN(NZ+IL)),1.d0-AJAC(IRN(NZ+IL));
+    endif;
+  ENDIF;
+    <*PhysInfo : give info on variable number KTST *>;
+
+%G_COR_MatrOut_COMPR_PhysInfo:
+ 	do I=1,NZMOD;
+  	  if(IRS(I)==KTST .and. ICS(I)==JTST)then;   
+	    WRITE(@Wres,'(3(A,1P,E12.4))')
+        	'  Y(K)=',Y(KTST,1),'    Fsave(K)=',Fsave(KTST),
+	        '    Ydot(K)=',FSAVE(NYDIM+KTST);
+            WRITE(@Wres,'(2(A,I5),A,1P,E12.4)') ' Control IR=',KTST,
+          	'  IC=',JTST,'   AJAC=',AJAC(I);
+          endif;
+	enddo; -- this is for control of found AJAC; 
+        ICW=JTST;
+        If(ICW<=NZON*NVARS)then;
+           Izon=MOD(ICW-1,NZON)+1;
+           Ivar=(ICW-1)/NZON +1;
+           WRITE(@Wres,'(3A,I3)') 
+            ' Derivative over ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+            ' in  zon=',Izon;
+        else;
+           ICW=ICW-NZON*NVARS;
+           If(ICW<=KRAD)Then;
+              L=(ICW-1)/(NZON-NCND)+1;
+              Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
+              WRITE(@Wres,'(2(A,I3))') '  over  FJ in L=',L,'    Izon=',Izon;
+           else;
+              ICW=ICW-KRAD;
+              L=(ICW-1)/(NZON-NCND)+1;
+              Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
+              WRITE(@Wres,'(2(A,I3))') '  over  FH in L=',L,'    Izon=',Izon;
+           endif;
+        endif;  
+   If(KTST<=NZON*NVARS)then;
+      Izon=MOD(KTST-1,NZON)+1;
+      Ivar=(KTST-1)/NZON +1;
+      WRITE(@Wres,'(3A,I3)') 
+            ' for Ydot of ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+            ' in  zon=',Izon;
+   else;
+      KTST1=KTST-NZON*NVARS;
+      If(KTST1<=KRAD)Then;
+         L=(KTST1-1)/(NZON-NCND)+1;
+         Izon=NCND+MOD(KTST1-1,(NZON-NCND))+1;
+         WRITE(@Wres,'(2(A,I5))') '  Der. of dot(FJ) in L=',L,'    Izon=',Izon;
+      else;
+         KTST1=KTST1-KRAD;
+         L=(KTST1-1)/(NZON-NCND)+1;
+         Izon=NCND+MOD(KTST1-1,(NZON-NCND))+1;
+         WRITE(@Wres,'(2(A,I5))') '  Der. of dot(FH) in L=',L,'    Izon=',Izon;
+      endif;
+   endif;
+
+
+
+%G_COR_DEB:
+_DEFINE
+    @NOISE         1.D-4  -- for IBM Double Precision 3.D-8
+                -- 1.D-7 -- for Cray
+  -- input variables:
+  --         @NAME - zero starting position in FSAVE-array for testing
+  --         @VAR  - zero starting position in FSAVE-array for indep.var
+  --         @NOISE- ignore derivatives less than @NOISE
+  If(^BADSTE)Then;
+     t=tOLD;
+     _DO J1=1,NQ;
+         _DO J2=J1,NQ;
+           J=NQ-J2+J1;
+           _DO I=1,N;
+               Y(I,J)=Y(I,J)-Y(I,J+1)
+     _OD_OD_OD;
+     _Do Ich=1,Mzon;
+         Chem0(Ich)=0.1; -- check if we need this
+     _od;
+     _Do I=1,N; FSAVE(I)=Y(I,1)_od;
+--************** ************** ************** **************
+--   EVALJA=.FALSE.; -- never put it here: some errors may be lost
+--************** ************** ************** **************
+     Nperturb=0; -- index of perturbation, now NO perturbation        
+     CALL DIFMAT;
+     _Do KTST=1,N;                        -- save old YDOT
+        DSAVE(KTST)=FSAVE(NYDIM+KTST);
+     _od;
+     _DO JTST=1,N;      --@VAR
+--     _DO JTST=Ncnd+1,Ncnd+2; -- only d over dr is tested
+--      @wterm' JTST=',JTST;
+         EVALJA=.FALSE.;
+         OLD=FSAVE(JTST);
+         If(JTST<Nzon)then;  -- radius
+            If(JTST==1)then;
+               DeltY=DeltaDeb*min(FSAVE(JTST+1)-OLD,OLD-Rce);
+            else;
+               DeltY=DeltaDeb*min(FSAVE(JTST+1)-OLD,OLD-FSAVE(JTST-1));
+            endif;
+         elseIf(Nzon<JTST & JTST<2*Nzon)then;  -- velocity
+            If(JTST==Nzon+1)then;
+               DeltY=DeltaDeb*min(abs(FSAVE(JTST+1)-OLD),abs(OLD));
+            else;
+               DeltY=DeltaDeb*min(abs(FSAVE(JTST+1)-OLD),
+                               abs(OLD-FSAVE(JTST-1)));
+            endif;
+         else;
+            DeltY=OLD*DeltaDeb;
+         endif;
+         FSAVE(JTST)=OLD+DeltY;
+         _Do Ich=1,Mzon;
+            Chem0(Ich)=0.1
+         _od;
+         Nperturb=1; -- index of perturbation, now  IS perturbation        
+         CALL DIFMAT;
+         FSAVE(JTST)=OLD;
+         <*ROW: put in IRN(NZ+1:ILAST) all indeces I such that
+                ICN(I)==JTST *>;
+         _Do KTST=1,N; --@NAMELEFT,@NAMERIGHT;
+            @DNAMEDVAR(KTST) = (FSAVE(NYDIM+KTST)-DSAVE(KTST));
+            <*COMPR: IF in IRN(NZ+1:ILAST) there is I such that
+                     IRN(I)==KTST THEN
+                       IF AJAC(I) differs strongly
+                          from -HL*@DNAMEDVAR for KTST^=JTST or
+                          from 1.-HL*@DNAMEDVAR for KTST==JTST
+                       THEN output relevant vars
+                     ELSE
+                       IF @DNAMEDVAR is HIGHER than @NOISE
+                       THEN output relevant vars          *>
+         _od;
+     _OD;
+     STOP;
+  else;
+     WRITE(@Wres,*)' Testing not possible: BADSTE=',BADSTE;
+  endif;
+%G_COR_DEB_ROW:
+  ILAST=0;
+  _DO I=1,NZMOD;
+    IF(ICS(I)==JTST)THEN;
+      ILAST=ILAST+1; IRN(NZ+ILAST)=I;
+    ENDIF;
+  _OD;
+--  WRITE(5,*)'ILAST=',ILAST;
+%G_COR_DEB_COMPR:
+  FOUNDI=.FALSE.; IL=1;
+  _WHILE IL<=ILAST & ^FOUNDI _DO
+    IF(IRS(IRN(NZ+IL))==KTST)THEN;
+      FOUNDI=.TRUE.;
+    ELSE;
+      IL=IL+1;
+    ENDIF;
+  _OD;
+  IF(FOUNDI)THEN;
+    If(KTST^=JTST)THEN;
+      If( ABS(AJAC(IRN(NZ+IL))*DeltY
+                        +HL*@DNAMEDVAR(KTST)) >
+              1.D-1*ABS(AJAC(IRN(NZ+IL))*DeltY)
+         & ABS(AJAC(IRN(NZ+IL))/HL) > @NOISE ) Then;
+        If(abs(DeltY)>DFLTZR*abs(@DNAMEDVAR(KTST)))then;
+          WRITE(@Wres,'(/A/2I7,1P,3G12.3)')
+           '  K,J,AJAC,Stella df/dY,Num DN(K)/DV(J):   ',
+            KTST,JTST,AJAC(IRN(NZ+IL)),
+            -AJAC(IRN(NZ+IL))/HL,@DNAMEDVAR(KTST)/DeltY;
+        else;
+          WRITE(@Wres,'(/A/2I7,1P,3G12.3)')
+           '  K,J,AJAC,(df/dY,DN/DV)*DeltaDeb:  ',
+           KTST,JTST,AJAC(IRN(NZ+IL)),
+           -AJAC(IRN(NZ+IL))*DeltY/HL,@DNAMEDVAR(KTST);
+        endif;
+        <*PhysInfo: give info on variable number KTST *>;
+      endif;
+    else;
+      If( ABS((AJAC(IRN(NZ+IL))-1.D0)*DeltY+HL*@DNAMEDVAR(KTST)) >
+         1.D-1*ABS((AJAC(IRN(NZ+IL))-1.D0)*DeltY)
+         & ABS((AJAC(IRN(NZ+IL))-1.D0)/HL) > @NOISE ) Then;
+        If(abs(DeltY)>DFLTZR*abs(@DNAMEDVAR(KTST)))then;
+          WRITE(@Wres,'(/A/2I7,1P,3G12.3)')
+           '  K,J,AJAC,Stella df/dY,Num DN(K)/DV(J):  ',
+              KTST,JTST,AJAC(IRN(NZ+IL)),(1.D0 -AJAC(IRN(NZ+IL)) )/HL,
+                @DNAMEDVAR(KTST)/DeltY ;
+        else;
+          WRITE(@Wres,'(/A/2I7,1P,3G12.3)')
+           '  K,J,AJAC,(df/dY,DN/DV)*DeltaDeb:  ',
+              KTST,JTST,AJAC(IRN(NZ+IL)),(1.D0-AJAC(IRN(NZ+IL)))*DeltY/HL,
+                @DNAMEDVAR(KTST);
+        endif;
+        <*PhysInfo2: give info on variable number KTST *>;
+      endif;
+    endif;
+  ELSE;
+    IF(ABS(@DNAMEDVAR(KTST)) > @NOISE) then;
+        If(abs(DeltY)>DFLTZR*abs(@DNAMEDVAR(KTST)))then;
+          WRITE(@Wres,'(/A,2I7,1P,2G12.3)')' NO JAC: K,J,DN(K)/DV(J)  ',
+            KTST,JTST, @DNAMEDVAR(KTST)/DeltY;
+        else;
+          WRITE(@Wres,'(/A,2I7,1P,2G12.3)')' NO JAC: K,J,DN(K)/DV(J)*DeltaDeb ',
+            KTST,JTST, @DNAMEDVAR(KTST);
+        endif;
+    endif;
+  ENDIF;
+
+%G_COR_DEB_COMPR_PhysInfo:
+ 	do I=1,NZMOD;
+  	  if(IRS(I)==KTST .and. ICS(I)==JTST)then;   
+	    WRITE(@Wres,'(3(A,1P,E12.4))')
+        	'  Y(K)=',Y(KTST,1),'    Fsave(K)=',Fsave(KTST),
+	        '    Ydot(K)=',FSAVE(NYDIM+KTST);
+            WRITE(@Wres,'(2(A,I5),A,1P,E12.4)') ' Control IR=',KTST,
+          	'  IC=',JTST,'   AJAC=',AJAC(I);
+          endif;
+	enddo; -- this is for control of found AJAC; 
+        ICW=JTST;
+        If(ICW<=NZON*NVARS)then;
+           Izon=MOD(ICW-1,NZON)+1;
+           Ivar=(ICW-1)/NZON +1;
+           WRITE(@Wres,'(3A,I3)') 
+            ' Derivative over ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+            ' in  zon=',Izon;
+        else;
+           ICW=ICW-NZON*NVARS;
+           If(ICW<=KRAD)Then;
+              L=(ICW-1)/(NZON-NCND)+1;
+              Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
+              WRITE(@Wres,'(2(A,I3))') '  over  FJ in L=',L,'    Izon=',Izon;
+           else;
+              ICW=ICW-KRAD;
+              L=(ICW-1)/(NZON-NCND)+1;
+              Izon=NCND+MOD(ICW-1,(NZON-NCND))+1;
+              WRITE(@Wres,'(2(A,I3))') '  over  FH in L=',L,'    Izon=',Izon;
+           endif;
+        endif;  
+   If(KTST<=NZON*NVARS)then;
+      Izon=MOD(KTST-1,NZON)+1;
+      Ivar=(KTST-1)/NZON +1;
+      WRITE(@Wres,'(3A,I3)') 
+            ' for Ydot of ',CharVarName(Ivar)(1:length(CharVarName(Ivar))), 
+            ' in  zon=',Izon;
+   else;
+      KTST1=KTST-NZON*NVARS;
+      If(KTST1<=KRAD)Then;
+         L=(KTST1-1)/(NZON-NCND)+1;
+         Izon=NCND+MOD(KTST1-1,(NZON-NCND))+1;
+         WRITE(@Wres,'(2(A,I5))') '  Der. of dot(FJ) in L=',L,'    Izon=',Izon;
+      else;
+         KTST1=KTST1-KRAD;
+         L=(KTST1-1)/(NZON-NCND)+1;
+         Izon=NCND+MOD(KTST1-1,(NZON-NCND))+1;
+         WRITE(@Wres,'(2(A,I5))') '  Der. of dot(FH) in L=',L,'    Izon=',Izon;
+      endif;
+   endif;
+
+%G_COR_DEB_COMPR_PhysInfo2=G_COR_DEB_COMPR_PhysInfo:
+
+%X:
+  _Case RETCOD _Of
+      -- Control passes to _Esac for RETCOD==4
+    _1  KFLAG=-1
+    _2  KFLAG=-2
+    _3  RMAX=RMXNOR
+  _Esac;
+  HOLD=H;
+  JSTART=NQ;
+

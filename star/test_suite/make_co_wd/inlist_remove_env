@@ -1,0 +1,90 @@
+
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = 'co_core.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'co_wd.mod'
+      required_termination_code_string = 'log_Teff_upper_limit'
+
+      timescale_for_relax_composition = 1d12
+      ! these are options for the relaxation of the model to remove
+      ! the envelope on the AGB
+      timescale_for_relax_entropy = 1d-5
+      max_dt_for_relax_entropy = 1d-6
+      num_timescales_for_relax_entropy = 30
+      max_steps_to_relax_entropy = 10000
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 2000
+
+      retry_hold = 3
+      min_timestep_limit = 1d-20 ! (seconds)
+
+      x_integer_ctrl(1) = 2 ! part number
+
+      x_ctrl(1) = 1d-3 ! remove mass until this H envelope mass remains
+      he_core_boundary_h1_fraction = 0.1d0 ! ignore hydrogen tail in calculating envelope mass
+      c_core_boundary_he4_fraction = 0.1d0 ! slightly redefines he_layer_mass calculation
+
+      ! after relaxation, the model is cool, but will brighten and heat up quickly
+      log_Teff_upper_limit = 4.8
+
+
+      limit_for_rel_error_in_energy_conservation = 1d10
+      hard_limit_for_rel_error_in_energy_conservation = 1d10
+
+
+! convection
+      okay_to_reduce_gradT_excess = .true.
+      gradT_excess_lambda1 = -1 ! turn on full all the time
+      thermohaline_coeff = 1000
+      
+! solver controls
+      ignore_too_large_correction = .true.
+
+! output
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+   !pause = .true.
+         
+         show_TRho_Profile_eos_regions = .true.
+
+         HR_logT_min = 3.5 ! only used if /= -101d0
+         HR_logT_max = 5.8 ! only used if /= -101d0
+         HR_logL_min = -4.8 ! only used if /= -101d0
+         HR_logL_max = 5.2 ! only used if /= -101d0
+
+         show_HR_WD_instabilities = .true.
+
+         Profile_Panels3_xaxis_name = 'logP'
+         Profile_Panels3_xaxis_reversed = .true.
+         Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
+         Profile_Panels3_xmax = -101d0 ! only used if /= -101d0
+
+/ ! end of pgstar namelist

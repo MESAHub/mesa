@@ -1,0 +1,8 @@
+12.00, 10.93,-2,0, Asplund et al. 2005 preprint 0410214. log solar number abundances for H,He,C,N,O,Ne,Na,Mg,Al,Si,P,S,Cl,A,Ca,Ti,Cr,Mn,Fe,Ni on scale where H is 12.  The values are  log N(H), log N(He), if_weight_abundance, if_weight_default followed by log number abundance of remaining 18 elements followed by the 20 atomic weights used to calculate the abundance by weight and the corresponding epsilon form of the abundance which is proportional to the normalized number abundance, but with a different normalization factor.
+8.39, 7.78, 8.66, 7.84, 6.17, 7.53,
+6.37, 7.51, 5.36, 7.14, 5.50, 6.18,
+6.31, 4.90, 5.64, 5.39, 7.45, 6.23,
+1.007825d0, 4.0026d0, 12.0111d0, 14.0067d0, 15.9994d0,
+20.179d0, 22.98977d0, 24.305d0, 26.9815d0, 28.086d0,
+30.9738d0, 32.06d0, 35.453d0, 39.948d0, 40.08d0,
+47.9d0, 51.996d0, 54.938d0, 55.847d0, 58.71d0,

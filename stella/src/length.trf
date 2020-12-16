@@ -1,0 +1,7 @@
+Integer function LENGTH(Needle); -- LENGTH of TAIL STRIPPED string Needle
+  Character*(*) Needle;
+  LENGTH=LEN(Needle);
+  _While LENGTH>0 & Needle(LENGTH:LENGTH)==' ' _Do
+     LENGTH=LENGTH-1;
+  _Od;
+Return;end;

@@ -1,0 +1,170 @@
+       pgas    = max(pion + pele + ppos + pcoul, 1d-99)
+
+       dpgasdd  = dpiondd  + dpepdd  + dpcouldd 
+       dpgasdt  = dpiondt  + dpepdt  + dpcouldt
+       dpgasda  = dpionda  + dpepda  + dpcoulda
+       dpgasdz  = dpiondz  + dpepdz  + dpcouldz
+       dpgasddd = dpionddd + dpepddd + dpcoulddd 
+       dpgasddt = dpionddt + dpepddt + dpcoulddt 
+       dpgasdda = dpiondda + dpepdda + dpcouldda 
+       dpgasddz = dpionddz + dpepddz + dpcoulddz 
+       dpgasdtt = dpiondtt + dpepdtt + dpcouldtt 
+       dpgasdta = dpiondta + dpepdta + dpcouldta 
+       dpgasdtz = dpiondtz + dpepdtz + dpcouldtz 
+       dpgasdaa = dpiondaa + dpepdaa + dpcouldaa 
+       dpgasdaz = dpiondaz + dpepdaz + dpcouldaz 
+       dpgasdzz = dpiondzz + dpepdzz + dpcouldzz 
+
+       egas    = max(eion + eele + epos + ecoul, 1d-99)
+       
+       if (.false.) then
+       write(*,'(a6,e15.5)') 'egas', egas
+       write(*,'(a6,e15.5)') 'eion', eion
+       write(*,'(a6,e15.5)') 'eele', eele
+       write(*,'(a6,e15.5)') 'epos', epos
+       write(*,'(a6,e15.5)') 'ecoul', ecoul
+       stop 'helm'
+       end if
+
+       degasdd  = deiondd  + deepdd  + decouldd
+       degasdt  = deiondt  + deepdt  + decouldt
+       degasda  = deionda  + deepda  + decoulda
+       degasdz  = deiondz  + deepdz  + decouldz
+       degasddd = deionddd + deepddd + decoulddd 
+       degasddt = deionddt + deepddt + decoulddt 
+       degasdda = deiondda + deepdda + decouldda 
+       degasddz = deionddz + deepddz + decoulddz 
+       degasdtt = deiondtt + deepdtt + decouldtt 
+       degasdta = deiondta + deepdta + decouldta 
+       degasdtz = deiondtz + deepdtz + decouldtz 
+       degasdaa = deiondaa + deepdaa + decouldaa 
+       degasdaz = deiondaz + deepdaz + decouldaz 
+       degasdzz = deiondzz + deepdzz + decouldzz 
+
+       sgas    = max(sion + sele + spos + scoul, 1d-99)
+
+       dsgasdd  = dsiondd  + dsepdd  + dscouldd
+       dsgasdt  = dsiondt  + dsepdt  + dscouldt
+       dsgasda  = dsionda  + dsepda  + dscoulda
+       dsgasdz  = dsiondz  + dsepdz  + dscouldz
+       dsgasddd = dsionddd + dsepddd + dscoulddd 
+       dsgasddt = dsionddt + dsepddt + dscoulddt 
+       dsgasdda = dsiondda + dsepdda + dscouldda 
+       dsgasddz = dsionddz + dsepddz + dscoulddz 
+       dsgasdtt = dsiondtt + dsepdtt + dscouldtt 
+       dsgasdta = dsiondta + dsepdta + dscouldta 
+       dsgasdtz = dsiondtz + dsepdtz + dscouldtz 
+       dsgasdaa = dsiondaa + dsepdaa + dscouldaa 
+       dsgasdaz = dsiondaz + dsepdaz + dscouldaz 
+       dsgasdzz = dsiondzz + dsepdzz + dscouldzz 
+
+
+
+       if (include_radiation) then
+          !..add in radiation to get the total
+          pres    = prad + pgas
+
+          dpresdd  = dpraddd  + dpgasdd
+          dpresdt  = dpraddt  + dpgasdt
+          dpresda  = dpradda  + dpgasda
+          dpresdz  = dpraddz  + dpgasdz
+          dpresddd = dpradddd + dpgasddd
+          dpresddt = dpradddt + dpgasddt
+          dpresdda = dpraddda + dpgasdda
+          dpresddz = dpradddz + dpgasddz
+          dpresdtt = dpraddtt + dpgasdtt
+          dpresdta = dpraddta + dpgasdta
+          dpresdtz = dpraddtz + dpgasdtz
+          dpresdaa = dpraddaa + dpgasdaa
+          dpresdaz = dpraddaz + dpgasdaz
+          dpresdzz = dpraddzz + dpgasdzz
+
+          ener    = erad + egas
+
+          denerdd  = deraddd  + degasdd
+          denerdt  = deraddt  + degasdt
+          denerda  = deradda  + degasda
+          denerdz  = deraddz  + degasdz
+          denerddd = deradddd + degasddd
+          denerddt = deradddt + degasddt
+          denerdda = deraddda + degasdda
+          denerddz = deradddz + degasddz
+          denerdtt = deraddtt + degasdtt
+          denerdta = deraddta + degasdta
+          denerdtz = deraddtz + degasdtz
+          denerdaa = deraddaa + degasdaa
+          denerdaz = deraddaz + degasdaz
+          denerdzz = deraddzz + degasdzz
+
+          entr    = srad + sgas
+
+          dentrdd  = dsraddd  + dsgasdd
+          dentrdt  = dsraddt  + dsgasdt
+          dentrda  = dsradda  + dsgasda
+          dentrdz  = dsraddz  + dsgasdz
+          dentrddd = dsradddd + dsgasddd
+          dentrddt = dsradddt + dsgasddt
+          dentrdda = dsraddda + dsgasdda
+          dentrddz = dsradddz + dsgasddz
+          dentrdtt = dsraddtt + dsgasdtt
+          dentrdta = dsraddta + dsgasdta
+          dentrdtz = dsraddtz + dsgasdtz
+          dentrdaa = dsraddaa + dsgasdaa
+          dentrdaz = dsraddaz + dsgasdaz
+          dentrdzz = dsraddzz + dsgasdzz
+         
+       else ! no radiation
+       
+          pres    = pgas
+
+          dpresdd  = dpgasdd
+          dpresdt  = dpgasdt
+          dpresda  = dpgasda
+          dpresdz  = dpgasdz
+          dpresddd = dpgasddd
+          dpresddt = dpgasddt
+          dpresdda = dpgasdda
+          dpresddz = dpgasddz
+          dpresdtt = dpgasdtt
+          dpresdta = dpgasdta
+          dpresdtz = dpgasdtz
+          dpresdaa = dpgasdaa
+          dpresdaz = dpgasdaz
+          dpresdzz = dpgasdzz
+
+          ener    = egas
+
+          denerdd  = degasdd
+          denerdt  = degasdt
+          denerda  = degasda
+          denerdz  = degasdz
+          denerddd = degasddd
+          denerddt = degasddt
+          denerdda = degasdda
+          denerddz = degasddz
+          denerdtt = degasdtt
+          denerdta = degasdta
+          denerdtz = degasdtz
+          denerdaa = degasdaa
+          denerdaz = degasdaz
+          denerdzz = degasdzz
+
+          entr    = sgas
+
+          dentrdd  = dsgasdd
+          dentrdt  = dsgasdt
+          dentrda  = dsgasda
+          dentrdz  = dsgasdz
+          dentrddd = dsgasddd
+          dentrddt = dsgasddt
+          dentrdda = dsgasdda
+          dentrddz = dsgasddz
+          dentrdtt = dsgasdtt
+          dentrdta = dsgasdta
+          dentrdtz = dsgasdtz
+          dentrdaa = dsgasdaa
+          dentrdaz = dsgasdaz
+          dentrdzz = dsgasdzz
+
+       end if
+       

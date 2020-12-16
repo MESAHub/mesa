@@ -1,0 +1,9 @@
+# run this from eosFreeEOS_builder to create eosFreeEOS_data.tar.xz in the data directory
+cd data
+rm -rf eosFreeEOS_data.tar
+rm -rf eosFreeEOS_data.tar.xz
+echo 'tar -cvf eosFreeEOS_data.tar eosFreeEOS_data'
+tar -cvf eosFreeEOS_data.tar eosFreeEOS_data
+echo 'xz eosFreeEOS_data.tar'
+xz -v eosFreeEOS_data.tar
+cp eosFreeEOS_data.tar.xz ../..

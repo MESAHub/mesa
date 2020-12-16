@@ -1,0 +1,102 @@
+! inlist_wd_aic
+
+! this evolves an accreting ONeMg WD up to the point of thermal
+! runaway in the core (see Schwab et al. 2015)
+! it tests the special weak rate implementation detailed there
+! and in the third MESA instrument paper
+
+&star_job
+      show_log_description_at_start = .false.
+
+      mesa_dir = '../../..'
+
+      load_saved_model = .true.
+      saved_model_name = 'wd_aic.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'PASS: A=20 electron captures have started a thermal runaway in the core'
+
+      set_tau_factor = .true.
+      set_to_this_tau_factor = 300
+
+      set_cumulative_energy_error_at_step = 1 
+      new_cumulative_energy_error = 0d0
+
+      ! TESTING WITH STD WEAK RATES
+      !use_suzuki_weak_rates = .true. 
+      !use_special_weak_rates = .false.
+      
+      use_special_weak_rates = .true.
+      special_weak_states_file = 'aic.states'
+      special_weak_transitions_file = 'aic.transitions'
+      ion_coulomb_corrections = 'PCR2009'
+      electron_coulomb_corrections = 'Itoh2002'
+
+      change_conv_vel_flag = .true.
+      new_conv_vel_flag = .true.
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      !pgstar_flag = .true.
+      !save_pgstar_files_when_terminate = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+      use_Type2_opacities = .true.
+/ ! end of kap namelist
+
+&controls
+      
+      always_use_eps_grav_form_of_energy_eqn = .true.      
+      use_dedt_form_of_energy_eqn = .false.
+      use_time_centered_eps_grav = .true.
+      include_composition_in_eps_grav = .true.
+      use_d_eos_dxa = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1600
+         
+      delta_lgRho_cntr_limit = 1e-3
+      delta_lgRho_cntr_hard_limit = 3e-3
+
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
+
+      varcontrol_target = 1e-3
+      mesh_delta_coeff = 1.0
+
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 0d0
+
+
+      accrete_same_as_surface = .true.
+      mass_change = 1d-6
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 10
+      terminal_interval = 5
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+/ ! end of pgstar namelist

@@ -1,0 +1,17 @@
+&kappa
+         data_dir = 'kap_input_data/opal/Type2_GS98'		
+         logT_file = 'logT_points_highT_8.7'
+         CO_flag = .true.
+         logR_min = -8.00d0
+         logR_max = 1.00d0
+         logR_points = 37
+         ! metal fractions
+         Zfrac_C = 0.171835
+         Zfrac_N = 0.050335
+         Zfrac_O = 0.467356
+         Zfrac_Ne = 0.104831
+         output_dir = 'data/kap_data'
+         table_prefix = 'gs98_co'
+         header_info = 'C/O enriched -- based on Grevesse & Sauval (1998) solar abundances'
+         table_version= 38
+/

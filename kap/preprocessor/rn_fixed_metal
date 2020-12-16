@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function do_one {
+   echo "Doing fixed Z =" $2
+   ./ckap $1 $2 -1
+	 if [ $? -ne 0 ]
+	 then
+		 exit 1
+	 fi
+   echo ""
+}
+
+do_one $1 0.0000
+do_one $1 0.0001
+do_one $1 0.0003
+do_one $1 0.0010
+do_one $1 0.0020
+do_one $1 0.0040
+do_one $1 0.0100
+do_one $1 0.0200
+do_one $1 0.0300
+do_one $1 0.0400
+do_one $1 0.0600
+do_one $1 0.0800
+do_one $1 0.1000

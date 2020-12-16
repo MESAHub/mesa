@@ -1,0 +1,335 @@
+      subroutine slvrad(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
+     &          m1,m2,nm1,fac1,alphn,betan,e1_1D,e2r,e2i,lde1,z1,z2,z3,
+     &          f1,f2,f3,cont,ip1,ip2,iphes,ier,ijob,
+     &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
+     &          decsol,decsols,decsolc,decsolcs,nzmax,isparse,ia,ja,sa,sar,sai,
+     &          lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol)
+      implicit none
+      interface
+#include "mtx_decsol.dek"
+#include "mtx_decsols.dek"
+#include "mtx_decsolc.dek"
+#include"mtx_decsolcs.dek"
+      end interface
+      integer :: ia(:) ! (n+1)
+      integer :: ja(:) ! (nzmax)
+      double precision :: sa(nzmax), sar(nzmax), sai(nzmax)
+      complex*16, intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+      real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+      integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+      double precision :: fjac(ldjac,n), fmas(ldmas,nm1), fac1, alphn, betan
+      double precision, pointer :: e1_1D(:)
+      double precision :: e2r(lde1,nm1), e2i(lde1,nm1), cont(n)
+      double precision, pointer, dimension(:) :: z1, z2, z3, f1, f2, f3 ! (n)
+      integer :: ldjac, mljac, mujac, ldmas, mlmas, mumas, m1, m2, nm1, lde1, ier, ijob
+      integer :: n, mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lcd, lrd, lid
+      integer :: iphes(n)
+      integer, pointer, dimension(:) :: ip1, ip2 ! (nm1)
+      
+      
+      ! LOCALS
+      double precision :: s1, s2, s3, abno, sum1, sum2, sum3, sumh, z2i, z3i, ffja, bb
+      integer :: i, mm, j, k, jkm, im1, mpi, j1b, j2b, jm1
+      real(dp), pointer :: e1(:,:)
+      real(dp), pointer, dimension(:) :: p1, p2, p3
+      
+      e1(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
+      p1(1:n) => z1(m1+1:m1+n)
+      p2(1:n) => z2(m1+1:m1+n)
+      p3(1:n) => z3(m1+1:m1+n)
+
+
+      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,13,15), ijob
+c
+c -----------------------------------------------------------
+c
+   1  continue
+c ---  b=identity, jacobian a full matrix
+      do i=1,n
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      call decsol(1,n,lde1,e1_1D,n,n,z1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,n,lde1,e2r,e2i,n,n,z2,z3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   8  continue
+c ---  b=identity, jacobian a sparse matrix
+      do i=1,n
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      call decsols(1,n,nzmax,ia,ja,sa,z1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolcs(1,n,nzmax,ia,ja,sar,sai,z2,z3,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  11  continue
+c ---  b=identity, jacobian a full matrix, second order
+      do i=1,n
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+ 48   abno=alphn**2+betan**2
+      mm=m1/m2
+      do j=1,m2
+         sum1=0.d0
+         sum2=0.d0
+         sum3=0.d0
+         do k=mm-1,0,-1
+            jkm=j+k*m2
+            sum1=(z1(jkm)+sum1)/fac1
+            sumh=(z2(jkm)+sum2)/abno
+            sum3=(z3(jkm)+sum3)/abno
+            sum2=sumh*alphn+sum3*betan
+            sum3=sum3*alphn-sumh*betan
+            do i=1,nm1
+               im1=i+m1
+               z1(im1)=z1(im1)+fjac(i,jkm)*sum1
+               z2(im1)=z2(im1)+fjac(i,jkm)*sum2
+               z3(im1)=z3(im1)+fjac(i,jkm)*sum3
+            end do
+         end do
+      end do
+      call decsol(1,nm1,lde1,e1_1D,nm1,nm1,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,nm1,lde1,e2r,e2i,nm1,nm1,p2,p3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+ 49   continue
+      do i=m1,1,-1
+         mpi=m2+i
+         z1(i)=(z1(i)+z1(mpi))/fac1
+         z2i=z2(i)+z2(mpi)
+         z3i=z3(i)+z3(mpi)
+         z3(i)=(z3i*alphn-z2i*betan)/abno
+         z2(i)=(z2i*alphn+z3i*betan)/abno
+      end do
+      return
+c
+c -----------------------------------------------------------
+c
+   2  continue
+c ---  b=identity, jacobian a banded matrix
+      do i=1,n
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      call decsol(1,n,lde1,e1_1D,mle,mue,z1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,n,lde1,e2r,e2i,mle,mue,z2,z3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  12  continue
+c ---  b=identity, jacobian a banded matrix, second order
+      do i=1,n
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+  45  abno=alphn**2+betan**2
+      mm=m1/m2
+      do j=1,m2
+         sum1=0.d0
+         sum2=0.d0
+         sum3=0.d0
+         do k=mm-1,0,-1
+            jkm=j+k*m2
+            sum1=(z1(jkm)+sum1)/fac1
+            sumh=(z2(jkm)+sum2)/abno
+            sum3=(z3(jkm)+sum3)/abno
+            sum2=sumh*alphn+sum3*betan
+            sum3=sum3*alphn-sumh*betan
+            do i=max(1,j-mujac),min(nm1,j+mljac)
+               im1=i+m1
+               ffja=fjac(i+mujac+1-j,jkm)
+               z1(im1)=z1(im1)+ffja*sum1
+               z2(im1)=z2(im1)+ffja*sum2
+               z3(im1)=z3(im1)+ffja*sum3
+            end do
+         end do
+      end do
+      call decsol(1,nm1,lde1,e1_1D,mle,mue,p1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,nm1,lde1,e2r,e2i,mle,mue,p2,p3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      goto 49
+c
+c -----------------------------------------------------------
+c
+   3  continue
+c ---  b is a banded matrix, jacobian a full matrix
+      do i=1,n
+         s1=0.0d0
+         s2=0.0d0
+         s3=0.0d0
+         do j=max(1,i-mlmas),min(n,i+mumas)
+            bb=fmas(i-j+mbdiag,j)
+            s1=s1-bb*f1(j)
+            s2=s2-bb*f2(j)
+            s3=s3-bb*f3(j)
+         end do
+         z1(i)=z1(i)+s1*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      call decsol(1,n,lde1,e1_1D,n,n,z1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,n,lde1,e2r,e2i,n,n,z2,z3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   9  continue
+c ---  b is a banded matrix, jacobian a sparse matrix
+      do i=1,n
+         s1=0.0d0
+         s2=0.0d0
+         s3=0.0d0
+         do j=max(1,i-mlmas),min(n,i+mumas)
+            bb=fmas(i-j+mbdiag,j)
+            s1=s1-bb*f1(j)
+            s2=s2-bb*f2(j)
+            s3=s3-bb*f3(j)
+         end do
+         z1(i)=z1(i)+s1*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      !write(*,*) 'slvrad call decsols'
+      call decsols(1,n,nzmax,ia,ja,sa,z1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      !write(*,*) 'slvrad call decsolcs'
+      call decsolcs(1,n,nzmax,ia,ja,sar,sai,z2,z3,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      !write(*,*) 'slvrad back decsols'
+      return
+c
+c -----------------------------------------------------------
+c
+  13  continue
+c ---  b is a banded matrix, jacobian a full matrix, second order
+      do i=1,m1
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      do i=1,nm1
+         im1=i+m1
+         s1=0.0d0
+         s2=0.0d0
+         s3=0.0d0
+         j1b=max(1,i-mlmas)
+         j2b=min(nm1,i+mumas)
+         do j=j1b,j2b
+            jm1=j+m1
+            bb=fmas(i-j+mbdiag,j)
+            s1=s1-bb*f1(jm1)
+            s2=s2-bb*f2(jm1)
+            s3=s3-bb*f3(jm1)
+         end do
+         z1(im1)=z1(im1)+s1*fac1
+         z2(im1)=z2(im1)+s2*alphn-s3*betan
+         z3(im1)=z3(im1)+s3*alphn+s2*betan
+      end do
+      if (ijob.eq.14) goto 45
+      goto 48
+c
+c -----------------------------------------------------------
+c
+   4  continue
+c ---  b is a banded matrix, jacobian a banded matrix
+      do i=1,n
+         s1=0.0d0
+         s2=0.0d0
+         s3=0.0d0
+         do j=max(1,i-mlmas),min(n,i+mumas)
+            bb=fmas(i-j+mbdiag,j)
+            s1=s1-bb*f1(j)
+            s2=s2-bb*f2(j)
+            s3=s3-bb*f3(j)
+         end do
+         z1(i)=z1(i)+s1*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      call decsol(1,n,lde1,e1_1D,mle,mue,z1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,n,lde1,e2r,e2i,mle,mue,z2,z3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   5  continue
+c ---  b is a full matrix, jacobian a full matrix
+      do i=1,n
+         s1=0.0d0
+         s2=0.0d0
+         s3=0.0d0
+         do j=1,n
+            bb=fmas(i,j)
+            s1=s1-bb*f1(j)
+            s2=s2-bb*f2(j)
+            s3=s3-bb*f3(j)
+         end do
+         z1(i)=z1(i)+s1*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      call decsol(1,n,lde1,e1_1D,n,n,z1,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      call decsolc(1,n,lde1,e2r,e2i,n,n,z2,z3,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  15  continue
+c ---  b is a full matrix, jacobian a full matrix, second order
+      do i=1,m1
+         s2=-f2(i)
+         s3=-f3(i)
+         z1(i)=z1(i)-f1(i)*fac1
+         z2(i)=z2(i)+s2*alphn-s3*betan
+         z3(i)=z3(i)+s3*alphn+s2*betan
+      end do
+      do i=1,nm1
+         im1=i+m1
+         s1=0.0d0
+         s2=0.0d0
+         s3=0.0d0
+         do j=1,nm1
+            jm1=j+m1
+            bb=fmas(i,j)
+            s1=s1-bb*f1(jm1)
+            s2=s2-bb*f2(jm1)
+            s3=s3-bb*f3(jm1)
+         end do
+         z1(im1)=z1(im1)+s1*fac1
+         z2(im1)=z2(im1)+s2*alphn-s3*betan
+         z3(im1)=z3(im1)+s3*alphn+s2*betan
+      end do
+      goto 48
+c
+c -----------------------------------------------------------
+c
+   6  continue
+c ---  b is a full matrix, jacobian a banded matrix
+c ---  this option is not provided
+      return
+c
+c -----------------------------------------------------------
+c
+  55  continue
+       write(*,*) 'slvrad: invalid ijob', ijob
+       call mesa_error(__FILE__,__LINE__) ! slvrad
+      end subroutine slvrad

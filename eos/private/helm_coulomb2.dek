@@ -1,0 +1,425 @@
+
+!..this code fragment implments coulomb corrections
+!..see yakovlev & shalybkov 1989, uniform background corrections 
+
+!..input:
+!..den  = density g/cc
+!..temp = temperature k
+!..abar = avarage atomic weight
+!..zbar = avarge charge
+!..pion and all its derivatives = ion pressure through common block
+!..xne and all its derivatives = electron number density through common block
+
+!..output:
+!..plasg = ion coupling parameter
+!..pcoul and all its derivatives = coulomb pressure through common block
+!..ecoul and all its derivatives = coulomb energy through common block
+!..scoul and all its derivatives = coulomb entropy through common block
+
+
+
+!..yakovlev & shalybkov eqs 5, 9 and 10
+!..use the ion number density instead of the free electron number density
+!..to avoid issues with positrons being included or not (eosfxt vs helmeos)
+
+      y        = forthpi * zbar
+      s        = y * xni
+      sinv     = 1.0d0/s
+
+!..first derivatives
+      dsdd     = y * dxnidd
+      dsdt     = y * dxnidt
+      dsda     = y * dxnida
+      dsdz     = y * dxnidz + forthpi*xni
+
+!..second derivatives
+      dsddd   = y * dxniddd
+      dsddt   = y * dxniddt
+      dsdda   = y * dxnidda
+      dsddz   = y * dxniddz + forthpi*dxnidd
+      dsdtt   = y * dxnidtt
+      dsdta   = y * dxnidta
+      dsdtz   = y * dxnidtz + forthpi*dxnidt
+      dsdaa   = y * dxnidaa
+      dsdaz   = y * dxnidaz + forthpi*dxnida
+      dsdzz   = y * dxnidzz + forthpi*dxnidz
+
+
+
+!..electron-sphere radius aele
+      aele     = pow(sinv,third)
+      aeleinv  = 1.0d0/aele
+      z        = -third * aele * sinv
+      y        = -forth * z * sinv    
+
+!..first derivatives
+      daeledd  = z * dsdd
+      daeledt  = z * dsdt
+      daeleda  = z * dsda
+      daeledz  = z * dsdz
+
+!..second derivatives
+      daeleddd = y*dsdd*dsdd + z*dsddd
+      daeleddt = y*dsdt*dsdd + z*dsddt
+      daeledda = y*dsda*dsdd + z*dsdda
+      daeleddz = y*dsdz*dsdd + z*dsddz
+      daeledtt = y*dsdt*dsdt + z*dsdtt
+      daeledta = y*dsda*dsdt + z*dsdta
+      daeledtz = y*dsdz*dsdt + z*dsdtz
+      daeledaa = y*dsda*dsda + z*dsdaa
+      daeledaz = y*dsdz*dsda + z*dsdaz
+      daeledzz = y*dsdz*dsdz + z*dsdzz
+
+
+!..electron coupling parameter eplasg
+      eplasg   = esqu * ktinv * aeleinv
+      z        = -eplasg * aeleinv
+      y        = -2.0d0 * z * aeleinv
+
+!..first derivatives
+      deplasgdd = z * daeledd
+      deplasgdt = z * daeledt - eplasg*tempinv
+      deplasgda = z * daeleda
+      deplasgdz = z * daeledz
+
+!..second derivatives
+      deplasgddd = y*daeledd*daeledd + z*daeleddd 
+      deplasgddt = y*daeledt*daeledd - deplasgdd*tempinv + z*daeleddt 
+      deplasgdda = y*daeleda*daeledd + z*daeledda
+      deplasgddz = y*daeledz*daeledd + z*daeleddz
+      deplasgdtt = y*daeledt*daeledt + z*daeledtt &
+                   + (2.0d0*z*daeledt + 2.0d0*eplasg*tempinv)*tempinv
+      deplasgdta = y*daeleda*daeledt + z*daeledta &
+                   - deplasgda*tempinv
+      deplasgdtz = y*daeledz*daeledt + z*daeledtz &
+                   - deplasgdz*tempinv
+      deplasgdaa = y*daeleda*daeleda + z*daeledaa
+      deplasgdaz = y*daeledz*daeleda + z*daeledaz
+      deplasgdzz = y*daeledz*daeledz + z*daeledzz
+
+
+!..ion-sphere radius aion
+      x          = pow(zbar,third)
+      z          = x*x*x*x*x
+      ww         = fiveth * x * x
+      ion_radius = x * aele
+
+
+!..ion coupling parameter plasg
+      plasg    = z * eplasg
+      plasginv = 1.0d0/plasg
+
+!..first derivatives
+      dplasgdd  = z * deplasgdd
+      dplasgdt  = z * deplasgdt
+      dplasgda  = z * deplasgda
+      dplasgdz  = z * deplasgdz + ww*eplasg
+
+!..second derivatives
+      dplasgddd  = z * deplasgddd
+      dplasgddt  = z * deplasgddt
+      dplasgdda  = z * deplasgdda
+      dplasgddz  = z * deplasgddz + ww*deplasgdd
+      dplasgdtt  = z * deplasgdtt
+      dplasgdta  = z * deplasgdta
+      dplasgdtz  = z * deplasgdtz + ww*deplasgdt
+      dplasgdaa  = z * deplasgdaa
+      dplasgdaz  = z * deplasgdaz + ww*deplasgda
+      dplasgdzz  = z * deplasgdzz + 2.0d0*ww*deplasgdz +teninth/x*eplasg
+
+
+!..yakovlev & shalybkov 1989 equations 82, 85, 86, 87
+      if (plasg .ge. 1.0) then
+       x        = sqrt(sqrt(plasg))
+       p1       = x
+       p2       = 1.0d0/x
+       p3       = p1*plasginv
+       p4       = p2*plasginv
+       p5       = p3*plasginv
+       p6       = p4*plasginv
+
+       u0       = a1*plasg + b1*p1 + c1*p2 + d1
+       du0      = a1 + 0.25d0*b1*p3 - 0.25d0*c1*p4
+       ddu0     = -0.1875d0*b1*p5 + 0.3125d0*c1*p6
+
+
+!..energy in erg/gr
+       z        = pion * deninv
+       ecoul    = z * u0
+
+       x        = deninv*u0
+       y        = deninv*du0
+       ww       = z*du0
+       dfk       = z*ddu0
+
+!..first derivatives
+       decouldd = dpiondd*x - z*x + ww*dplasgdd
+       decouldt = dpiondt*x + ww*dplasgdt
+       decoulda = dpionda*x + ww*dplasgda
+       decouldz = dpiondz*x + ww*dplasgdz
+
+!..second derivatives
+       decoulddd = dpionddd*x + 2.0d0*dpiondd*(y*dplasgdd - deninv*x) &
+                   + z*(2.0d0*deninv*x &
+                   + (ddu0*dplasgdd - 2.0d0*y)*dplasgdd + du0*dplasgddd)
+       decoulddt = dpionddt*x + dpiondd*y*dplasgdt &
+                   - dpiondt*deninv*x  - z*y*dplasgdt &
+                   + (dpiondt*y + dfk*dplasgdt)*dplasgdd + ww*dplasgddt
+       decouldda = dpiondda*x + dpiondd*y*dplasgda &
+                   - dpionda*deninv*x - z*y*dplasgda &
+                   + (dpionda*y + dfk*dplasgda)*dplasgdd + ww*dplasgdda
+       decoulddz = dpionddz*x + dpiondd*y*dplasgdz &
+                   - dpiondz*deninv*x - z*y*dplasgdz &
+                   + (dpiondz*y + dfk*dplasgdz)*dplasgdd + ww*dplasgddz
+       decouldtt = dpiondtt*x + (2.0d0*dpiondt*y &
+                  + dfk*dplasgdt)*dplasgdt + ww*dplasgdtt
+       decouldta = dpiondta*x + dpiondt*y*dplasgda &
+                  + (dpionda*y + dfk*dplasgda)*dplasgdt + ww*dplasgdta
+       decouldtz = dpiondtz*x + dpiondt*y*dplasgdz &
+                  + (dpiondz*y + dfk*dplasgdz)*dplasgdt + ww*dplasgdtz
+       decouldaa = dpiondaa*x + (2.0d0*dpionda*y &
+                  + dfk*dplasgda)*dplasgda + ww*dplasgdaa
+       decouldaz = dpiondaz*x + dpionda*y*dplasgdz &
+                  + (dpiondz*y + dfk*dplasgdz)*dplasgda + ww*dplasgdaz
+       decouldzz = dpiondzz*x + (2.0d0*dpiondz*y &
+                  + dfk*dplasgdz)*dplasgdz + ww*dplasgdzz
+
+
+!..pressure in erg/cc
+       y        = third * den
+       pcoul    = y * ecoul
+
+!..first derivatives
+       dpcouldd = third*ecoul + y*decouldd
+       dpcouldt = y * decouldt
+       dpcoulda = y * decoulda
+       dpcouldz = y * decouldz
+
+!..second derivatives
+       dpcoulddd = 2.0d0*third*decouldd + y*decoulddd
+       dpcoulddt = third*decouldt + y*decoulddt
+       dpcouldda = third*decoulda + y*decouldda
+       dpcoulddz = third*decouldz + y*decoulddz
+       dpcouldtt = y * decouldtt
+       dpcouldta = y * decouldta
+       dpcouldtz = y * decouldtz
+       dpcouldaa = y * decouldaa
+       dpcouldaz = y * decouldaz
+       dpcouldzz = y * decouldzz
+
+
+!..entropy in erg/g/kelvin
+       u0   = 3.0d0*b1*p1 - 5.0d0*c1*p2 + d1*(log(plasg) - 1.0d0) - e1
+       du0  = 0.75d0*b1*p3 + 1.25d0*c1*p4 + d1*plasginv
+       ddu0 = -0.5625d0*b1*p5 - 1.5625d0*c1*p6 - d1*plasginv*plasginv 
+
+       z    = -avo*ytot1*kerg
+
+       scoul = z*u0
+       
+       if (.false. .and. scoul < 0) then  ! this breaks thermo consistency
+
+         !write(*,'(a30,1pe26.16)') 'scoul', scoul
+         !stop
+         
+         scoul = 1d-99
+         u0 = 0
+         du0 = 0
+         ddu0 = 0
+         
+          dscouldd = 0
+          dscouldt = 0
+          dscoulda = 0
+          dscouldz = 0
+          dscoulddd = 0
+          dscoulddt = 0
+          dscouldda = 0
+          dscoulddz = 0
+          dscouldtt = 0
+          dscouldta = 0
+          dscouldtz = 0
+          dscouldaa = 0
+          dscouldaz = 0
+          dscouldzz = 0
+         
+       else
+       
+          ww    = z*du0
+          x     = z*ddu0
+
+   !..first derivatives
+          dscouldd = ww*dplasgdd
+          dscouldt = ww*dplasgdt
+          dscoulda = ww*dplasgda - scoul*ytot1
+          dscouldz = ww*dplasgdz
+
+   !..second derivatives
+          dscoulddd = x*dplasgdd*dplasgdd + ww*dplasgddd
+          dscoulddt = x*dplasgdt*dplasgdd + ww*dplasgddt
+          dscouldda = x*dplasgda*dplasgdd + ww*dplasgdda - x*ytot1*dplasgdd
+          dscoulddz = x*dplasgdz*dplasgdd + ww*dplasgddz
+          dscouldtt = x*dplasgdt*dplasgdt + ww*dplasgdtt
+          dscouldta = x*dplasgda*dplasgdt + ww*dplasgdta - x*ytot1*dplasgdt
+!          dscouldta = x*dplasgda*dplasgdt + ww*dplasgdta - ww*ytot1*dplasgdt
+          dscouldtz = x*dplasgdz*dplasgdt + ww*dplasgdtz
+          dscouldaa = x*dplasgda*dplasgda + ww*dplasgdaa - x*ytot1*dplasgda &
+                      - ww*dplasgda*ytot1 + 2.0d0*scoul*ytot1*ytot1
+          dscouldaz = x*dplasgdz*dplasgda + ww*dplasgdaz &
+                      - ww*dplasgdz*ytot1
+          dscouldzz = x*dplasgdz*dplasgdz + ww*dplasgdzz
+
+       end if
+
+
+
+
+!..yakovlev & shalybkov 1989 equations 102, 103, 104
+      else if (plasg .lt. 1.0d0) then
+
+       if (plasg < 0d0) then
+         ierr = -1
+         if (dbg) write(*,*) 'plasg < 0d0 in helm_coulomb2'
+         return
+       end if
+       x        = sqrt(plasg)       
+       p1       = plasg*x
+       p2       = pow(plasg,b2)
+       p3       = x
+       p4       = p2*plasginv
+       p5       = p3*plasginv
+       p6       = p4*plasginv
+
+       u0   = c2*p1 - third*a2*p2
+       du0  = 1.5d0*c2*p3 - third*a2*b2*p4
+       ddu0 = 0.75d0*c2*p5 - third*a2*b2*(b2-1.0d0)*p6
+
+
+!..pressure
+       pcoul    = -pion * u0
+
+       x        = pion*du0
+       y        = pion*ddu0
+
+!..first derivatives
+       dpcouldd = -dpiondd*u0 - x*dplasgdd
+       dpcouldt = -dpiondt*u0 - x*dplasgdt
+       dpcoulda = -dpionda*u0 - x*dplasgda
+       dpcouldz = -dpiondz*u0 - x*dplasgdz
+
+!..second derivatives
+       dpcoulddd = -dpionddd*u0 - (2.0d0*dpiondd*du0 &
+                  + y*dplasgdd)*dplasgdd - x*dplasgddd
+       dpcoulddt = -dpionddt*u0 - dpiondd*du0*dplasgdt &
+                  - (dpiondt*du0 + y*dplasgdt)*dplasgdd - x*dplasgddt
+       dpcouldda = -dpiondda*u0 - dpiondd*du0*dplasgda &
+                  - (dpionda*du0 + y*dplasgda)*dplasgdd - x*dplasgdda
+       dpcoulddz = -dpionddz*u0 - dpiondd*du0*dplasgdz &
+                  - (dpiondz*du0 + y*dplasgdz)*dplasgdd - x*dplasgddz
+       dpcouldtt = -dpiondtt*u0 - (2.0d0*dpiondt*du0 &
+                  + y*dplasgdt)*dplasgdt - x*dplasgdtt
+       dpcouldta = -dpiondta*u0 - dpiondt*du0*dplasgda &
+                  - (dpionda*du0 + y*dplasgda)*dplasgdt - x*dplasgdta
+       dpcouldtz = -dpiondtz*u0 - dpiondt*du0*dplasgdz &
+                  - (dpiondz*du0 + y*dplasgdz)*dplasgdt - x*dplasgdtz
+       dpcouldaa = -dpiondaa*u0 - (2.0d0*dpionda*du0 &
+                  + y*dplasgda)*dplasgda - x*dplasgdaa
+       dpcouldaz = -dpiondaz*u0 - dpionda*du0*dplasgdz &
+                  - (dpiondz*du0 +  y*dplasgdz)*dplasgda - x*dplasgdaz
+       dpcouldzz = -dpiondzz*u0 - (2.0d0*dpiondz*du0 &
+                  + y*dplasgdz)*dplasgdz - x*dplasgdzz
+
+
+!..energy in erg/gr
+       z        = 3.0d0*deninv
+       y        = -z*deninv
+
+       ecoul    = z*pcoul
+
+       x = deninv*deninv
+
+!..first derivatives
+       decouldd = z*dpcouldd - ecoul*deninv  
+       decouldt = z*dpcouldt
+       decoulda = z*dpcoulda
+       decouldz = z*dpcouldz
+
+!..second derivatives
+       decoulddd = z*dpcoulddd + y*dpcouldd &
+                  + (2.0d0*ecoul - 3.0d0*dpcouldd)*x
+       decoulddt = z*dpcoulddt - 3.0d0*dpcouldt*x
+       decouldda = z*dpcouldda - 3.0d0*dpcoulda*x
+       decoulddz = z*dpcoulddz - 3.0d0*dpcouldz*x
+       decouldtt = z*dpcouldtt
+       decouldta = z*dpcouldta
+       decouldtz = z*dpcouldtz
+       decouldaa = z*dpcouldaa
+       decouldaz = z*dpcouldaz
+       decouldzz = z*dpcouldzz
+
+!..entropy in erg/g/kelvin
+       u0    = c2*p1 - a2/b2*(b2-1.0d0)*p2
+       du0   = 1.5d0*c2*p3 - a2*(b2-1.0d0)*p4
+       ddu0  = 0.75d0*c2*p5 - a2*(b2-1.0d0)*(b2-1.0d0)*p6
+       z     = -avo*ytot1*kerg
+       y     = -z*ytot1
+
+       scoul = z*u0
+       x     = z*du0
+       y     = z*ddu0
+
+!..first derivatives
+       dscouldd = x*dplasgdd
+       dscouldt = x*dplasgdt
+       dscoulda = x*dplasgda - scoul*ytot1
+       dscouldz = x*dplasgdz
+
+!..second derivatives
+       dscoulddd = y*dplasgdd*dplasgdd + x*dplasgddd
+       dscoulddt = y*dplasgdt*dplasgdd + x*dplasgddt
+       dscouldda = y*dplasgda*dplasgdd + x*dplasgdda - x*ytot1*dplasgdd
+       dscoulddz = y*dplasgdz*dplasgdd + x*dplasgddz
+       dscouldtt = y*dplasgdt*dplasgdt + x*dplasgdtt
+       dscouldta = y*dplasgda*dplasgdt + x*dplasgdta - x*ytot1*dplasgdt
+       dscouldtz = y*dplasgdz*dplasgdt + x*dplasgdtz
+       dscouldaa = y*dplasgda*dplasgda + x*dplasgdaa - x*ytot1*dplasgda &
+                   - x*dplasgda*ytot1 + 2.0d0*scoul*ytot1*ytot1
+       dscouldaz = y*dplasgdz*dplasgda + x*dplasgdaz - x*dplasgdz*ytot1
+       dscouldzz = y*dplasgdz*dplasgdz + x*dplasgdzz
+
+!..end of plasg if block
+      end if
+
+
+
+!..cut coulomb terms at low T and low density
+      
+      if (temp .le. coulomb_temp_cut .and. den .le. coulomb_den_cut) then
+   
+         if (temp .le. 0.1d0*coulomb_temp_cut) then
+            coulfactor = 0d0
+            dcfdt = 0d0
+         else
+            ratio = coulomb_temp_cut/temp
+            coulfactor = exp(1d0 - ratio*ratio)
+            dcfdt = coulfactor*2*ratio*ratio/temp
+         end if
+               
+         dpcouldd = coulfactor * dpcouldd
+         dpcouldt = coulfactor * dpcouldt + dcfdt * pcoul
+         dpcoulda = coulfactor * dpcoulda
+         dpcouldz = coulfactor * dpcouldz
+         pcoul    = coulfactor * pcoul
+
+         decouldd = coulfactor * decouldd
+         decouldt = coulfactor * decouldt + dcfdt * ecoul
+         decoulda = coulfactor * decoulda
+         decouldz = coulfactor * decouldz
+         ecoul    = coulfactor * ecoul
+
+         dscouldd = coulfactor * dscouldd
+         dscouldt = coulfactor * dscouldt + dcfdt * scoul
+         dscoulda = coulfactor * dscoulda
+         dscouldz = coulfactor * dscouldz
+         scoul    = coulfactor * scoul
+      
+      end if

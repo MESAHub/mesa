@@ -1,0 +1,30 @@
+
+      
+      subroutine tridiag_work_sizes(n,lrd,lid)
+         integer, intent(in) :: n
+         integer, intent(out) :: lrd,lid
+         lid = 0
+         lrd = 4*n-4
+      end subroutine tridiag_work_sizes
+      
+
+      
+      
+
+      
+      ! complex(dp) routines
+
+
+
+
+      
+      subroutine tridiag_zwork_sizes(n,lcd,lrd,lid)
+         integer, intent(in) :: n
+         integer, intent(out) :: lcd,lrd,lid
+         call tridiag_work_sizes(n,lrd,lid)
+         lcd = 5*n-4
+      end subroutine tridiag_zwork_sizes
+      
+      
+      
+

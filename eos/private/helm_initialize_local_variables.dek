@@ -1,0 +1,521 @@
+!..initialize local variables
+
+       prad     = 0.0d0
+       dpraddd  = 0.0d0
+       dpraddt  = 0.0d0
+       dpradda  = 0.0d0
+       dpraddz  = 0.0d0
+       dpradddd = 0.0d0
+       dpradddt = 0.0d0
+       dpraddda = 0.0d0
+       dpradddz = 0.0d0
+       dpraddtt = 0.0d0
+       dpraddta = 0.0d0
+       dpraddtz = 0.0d0
+       dpraddaa = 0.0d0
+       dpraddaz = 0.0d0
+       dpraddzz = 0.0d0
+
+       erad     = 0.0d0
+       deraddd  = 0.0d0
+       deraddt  = 0.0d0
+       deradda  = 0.0d0
+       deraddz  = 0.0d0
+       deradddd = 0.0d0
+       deradddt = 0.0d0
+       deraddda = 0.0d0
+       deradddz = 0.0d0
+       deraddtt = 0.0d0
+       deraddta = 0.0d0
+       deraddtz = 0.0d0
+       deraddaa = 0.0d0
+       deraddaz = 0.0d0
+       deraddzz = 0.0d0
+
+       srad     = 0.0d0
+       dsraddd  = 0.0d0
+       dsraddt  = 0.0d0
+       dsradda  = 0.0d0
+       dsraddz  = 0.0d0
+       dsradddd = 0.0d0
+       dsradddt = 0.0d0
+       dsraddda = 0.0d0
+       dsradddz = 0.0d0
+       dsraddtt = 0.0d0
+       dsraddta = 0.0d0
+       dsraddtz = 0.0d0
+       dsraddaa = 0.0d0
+       dsraddaz = 0.0d0
+       dsraddzz = 0.0d0
+
+       xni     = 0.0d0
+       dxnidd  = 0.0d0
+       dxnidt  = 0.0d0
+       dxnida  = 0.0d0
+       dxnidz  = 0.0d0
+       dxniddd = 0.0d0
+       dxniddt = 0.0d0
+       dxnidda = 0.0d0
+       dxniddz = 0.0d0
+       dxnidtt = 0.0d0
+       dxnidta = 0.0d0
+       dxnidtz = 0.0d0
+       dxnidaa = 0.0d0
+       dxnidaz = 0.0d0
+       dxnidzz = 0.0d0
+
+       pion     = 0.0d0
+       dpiondd  = 0.0d0
+       dpiondt  = 0.0d0
+       dpionda  = 0.0d0
+       dpiondz  = 0.0d0
+       dpionddd = 0.0d0
+       dpionddt = 0.0d0
+       dpiondda = 0.0d0
+       dpionddz = 0.0d0
+       dpiondtt = 0.0d0
+       dpiondta = 0.0d0
+       dpiondtz = 0.0d0
+       dpiondaa = 0.0d0
+       dpiondaz = 0.0d0
+       dpiondzz = 0.0d0
+
+       eion     = 0.0d0
+       deiondd  = 0.0d0
+       deiondt  = 0.0d0
+       deionda  = 0.0d0
+       deiondz  = 0.0d0
+       deionddd = 0.0d0
+       deionddt = 0.0d0
+       deiondda = 0.0d0
+       deionddz = 0.0d0
+       deiondtt = 0.0d0
+       deiondta = 0.0d0
+       deiondtz = 0.0d0
+       deiondaa = 0.0d0
+       deiondaz = 0.0d0
+       deiondzz = 0.0d0
+
+       sion     = 0.0d0
+       dsiondd  = 0.0d0
+       dsiondt  = 0.0d0
+       dsionda  = 0.0d0
+       dsiondz  = 0.0d0
+       dsionddd = 0.0d0
+       dsionddt = 0.0d0
+       dsiondda = 0.0d0
+       dsionddz = 0.0d0
+       dsiondtt = 0.0d0
+       dsiondta = 0.0d0
+       dsiondtz = 0.0d0
+       dsiondaa = 0.0d0
+       dsiondaz = 0.0d0
+       dsiondzz = 0.0d0
+
+       etaion   = 0.0d0
+       detaidd  = 0.0d0
+       detaidt  = 0.0d0
+       detaida  = 0.0d0
+       detaidz  = 0.0d0
+       detaiddd = 0.0d0
+       detaiddt = 0.0d0
+       detaidda = 0.0d0
+       detaiddz = 0.0d0
+       detaidtt = 0.0d0
+       detaidta = 0.0d0
+       detaidtz = 0.0d0
+       detaidaa = 0.0d0
+       detaidaz = 0.0d0
+       detaidzz = 0.0d0
+
+       xne     = 0.0d0
+       dxnedd  = 0.0d0
+       dxnedt  = 0.0d0
+       dxneda  = 0.0d0
+       dxnedz  = 0.0d0
+       dxneddd = 0.0d0
+       dxneddt = 0.0d0
+       dxnedda = 0.0d0
+       dxneddz = 0.0d0
+       dxnedtt = 0.0d0
+       dxnedta = 0.0d0
+       dxnedtz = 0.0d0
+       dxnedaa = 0.0d0
+       dxnedaz = 0.0d0
+       dxnedzz = 0.0d0
+
+
+       etaele  = 0.0d0
+       detadd  = 0.0d0
+       detadt  = 0.0d0
+       detada  = 0.0d0
+       detadz  = 0.0d0
+       detaddd = 0.0d0
+       detaddt = 0.0d0
+       detadda = 0.0d0
+       detaddz = 0.0d0
+       detadtt = 0.0d0
+       detadta = 0.0d0
+       detadtz = 0.0d0
+       detadaa = 0.0d0
+       detadaz = 0.0d0
+       detadzz = 0.0d0
+
+       etapos   = 0.0d0
+
+       xnefer     = 0.0d0
+       dxneferdd  = 0.0d0
+       dxneferdt  = 0.0d0
+       dxneferda  = 0.0d0
+       dxneferdz  = 0.0d0
+       dxneferddd = 0.0d0
+       dxneferddt = 0.0d0
+       dxneferdda = 0.0d0
+       dxneferddz = 0.0d0
+       dxneferdtt = 0.0d0
+       dxneferdta = 0.0d0
+       dxneferdtz = 0.0d0
+       dxneferdaa = 0.0d0
+       dxneferdaz = 0.0d0
+       dxneferdzz = 0.0d0
+
+       xnpfer     = 0.0d0
+       dxnpferdd  = 0.0d0
+       dxnpferdt  = 0.0d0
+       dxnpferda  = 0.0d0
+       dxnpferdz  = 0.0d0
+       dxnpferddd = 0.0d0
+       dxnpferddt = 0.0d0
+       dxnpferdda = 0.0d0
+       dxnpferddz = 0.0d0
+       dxnpferdtt = 0.0d0
+       dxnpferdta = 0.0d0
+       dxnpferdtz = 0.0d0
+       dxnpferdaa = 0.0d0
+       dxnpferdaz = 0.0d0
+       dxnpferdzz = 0.0d0
+
+       pele     = 0.0d0
+       dpeledd  = 0.0d0
+       dpeledt  = 0.0d0
+       dpeleda  = 0.0d0
+       dpeledz  = 0.0d0
+       dpeleddd = 0.0d0
+       dpeleddt = 0.0d0
+       dpeledda = 0.0d0
+       dpeleddz = 0.0d0
+       dpeledtt = 0.0d0
+       dpeledta = 0.0d0
+       dpeledtz = 0.0d0
+       dpeledaa = 0.0d0
+       dpeledaz = 0.0d0
+       dpeledzz = 0.0d0
+
+       eele     = 0.0d0
+       deeledd  = 0.0d0
+       deeledt  = 0.0d0
+       deeleda  = 0.0d0
+       deeledz  = 0.0d0
+       deeleddd = 0.0d0
+       deeleddt = 0.0d0
+       deeledda = 0.0d0
+       deeleddz = 0.0d0
+       deeledtt = 0.0d0
+       deeledta = 0.0d0
+       deeledtz = 0.0d0
+       deeledaa = 0.0d0
+       deeledaz = 0.0d0
+       deeledzz = 0.0d0
+
+       sele     = 0.0d0
+       dseledd  = 0.0d0
+       dseledt  = 0.0d0
+       dseleda  = 0.0d0
+       dseledz  = 0.0d0
+       dseleddd = 0.0d0
+       dseleddt = 0.0d0
+       dseledda = 0.0d0
+       dseleddz = 0.0d0
+       dseledtt = 0.0d0
+       dseledta = 0.0d0
+       dseledtz = 0.0d0
+       dseledaa = 0.0d0
+       dseledaz = 0.0d0
+       dseledzz = 0.0d0
+
+       ppos     = 0.0d0
+       dpposdd  = 0.0d0
+       dpposdt  = 0.0d0
+       dpposda  = 0.0d0
+       dpeledz  = 0.0d0
+       dpposddd = 0.0d0
+       dpposddt = 0.0d0
+       dpposdda = 0.0d0
+       dpposddz = 0.0d0
+       dpposdtt = 0.0d0
+       dpposdta = 0.0d0
+       dpposdtz = 0.0d0
+       dpposdaa = 0.0d0
+       dpposdaz = 0.0d0
+       dpposdzz = 0.0d0
+
+       epos     = 0.0d0
+       deposdd  = 0.0d0
+       deposdt  = 0.0d0
+       deposda  = 0.0d0
+       deeledz  = 0.0d0
+       deposddd = 0.0d0
+       deposddt = 0.0d0
+       deposdda = 0.0d0
+       deposddz = 0.0d0
+       deposdtt = 0.0d0
+       deposdta = 0.0d0
+       deposdtz = 0.0d0
+       deposdaa = 0.0d0
+       deposdaz = 0.0d0
+       deposdzz = 0.0d0
+
+       spos     = 0.0d0
+       dsposdd  = 0.0d0
+       dsposdt  = 0.0d0
+       dsposda  = 0.0d0
+       dseledz  = 0.0d0
+       dseleddd = 0.0d0
+       dseleddt = 0.0d0
+       dseledda = 0.0d0
+       dseleddz = 0.0d0
+       dseledtt = 0.0d0
+       dseledta = 0.0d0
+       dseledtz = 0.0d0
+       dseledaa = 0.0d0
+       dseledaz = 0.0d0
+       dseledzz = 0.0d0
+
+       pep     = 0.0d0
+       dpepdd  = 0.0d0
+       dpepdt  = 0.0d0
+       dpepda  = 0.0d0
+       dpepdz  = 0.0d0
+       dpepddd = 0.0d0
+       dpepddt = 0.0d0
+       dpepdda = 0.0d0
+       dpepddz = 0.0d0
+       dpepdtt = 0.0d0
+       dpepdta = 0.0d0
+       dpepdtz = 0.0d0
+       dpepdaa = 0.0d0
+       dpepdaz = 0.0d0
+       dpepdzz = 0.0d0
+
+       eep     = 0.0d0
+       deepdd  = 0.0d0
+       deepdt  = 0.0d0
+       deepda  = 0.0d0
+       deepdz  = 0.0d0
+       deepddd = 0.0d0
+       deepddt = 0.0d0
+       deepdda = 0.0d0
+       deepddz = 0.0d0
+       deepdtt = 0.0d0
+       deepdta = 0.0d0
+       deepdtz = 0.0d0
+       deepdaa = 0.0d0
+       deepdaz = 0.0d0
+       deepdzz = 0.0d0
+
+       sep     = 0.0d0
+       dsepdd  = 0.0d0
+       dsepdt  = 0.0d0
+       dsepda  = 0.0d0
+       dsepdz  = 0.0d0
+       dsepddd = 0.0d0
+       dsepddt = 0.0d0
+       dsepdda = 0.0d0
+       dsepddz = 0.0d0
+       dsepdtt = 0.0d0
+       dsepdta = 0.0d0
+       dsepdtz = 0.0d0
+       dsepdaa = 0.0d0
+       dsepdaz = 0.0d0
+       dsepdzz = 0.0d0
+
+       eip      = 0.0d0
+       deipdd   = 0.0d0
+       deipdt   = 0.0d0
+       deipda   = 0.0d0
+       deipdz   = 0.0d0
+
+       sip      = 0.0d0
+       dsipdd   = 0.0d0
+       dsipdt   = 0.0d0
+       dsipda   = 0.0d0
+       dsipdz   = 0.0d0
+
+       pcoul     = 0.0d0
+       dpcouldd  = 0.0d0
+       dpcouldt  = 0.0d0
+       dpcoulda  = 0.0d0
+       dpcouldz  = 0.0d0
+       dpcoulddd = 0.0d0
+       dpcoulddt = 0.0d0
+       dpcouldda = 0.0d0
+       dpcoulddz = 0.0d0
+       dpcouldtt = 0.0d0
+       dpcouldta = 0.0d0
+       dpcouldtz = 0.0d0
+       dpcouldaa = 0.0d0
+       dpcouldaz = 0.0d0
+       dpcouldzz = 0.0d0
+
+       ecoul     = 0.0d0
+       decouldd  = 0.0d0
+       decouldt  = 0.0d0
+       decoulda  = 0.0d0
+       decouldz  = 0.0d0
+       decoulddd = 0.0d0
+       decoulddt = 0.0d0
+       decouldda = 0.0d0
+       decoulddz = 0.0d0
+       decouldtt = 0.0d0
+       decouldta = 0.0d0
+       decouldtz = 0.0d0
+       decouldaa = 0.0d0
+       decouldaz = 0.0d0
+       decouldzz = 0.0d0
+
+       scoul     = 0.0d0
+       dscouldd  = 0.0d0
+       dscouldt  = 0.0d0
+       dscoulda  = 0.0d0
+       dscouldz  = 0.0d0
+       dscoulddd = 0.0d0
+       dscoulddt = 0.0d0
+       dscouldda = 0.0d0
+       dscoulddz = 0.0d0
+       dscouldtt = 0.0d0
+       dscouldta = 0.0d0
+       dscouldtz = 0.0d0
+       dscouldaa = 0.0d0
+       dscouldaz = 0.0d0
+       dscouldzz = 0.0d0
+       
+       plasg = 0
+
+       chit     = 0.0d0
+       dchitdd  = 0.0d0
+       dchitdt  = 0.0d0
+       dchitda  = 0.0d0
+       dchitdz  = 0.0d0
+
+       chid     = 0.0d0
+       dchiddd  = 0.0d0
+       dchiddt  = 0.0d0
+       dchidda  = 0.0d0
+       dchiddz  = 0.0d0
+
+       cv     = 0.0d0
+       dcvdd  = 0.0d0
+       dcvdt  = 0.0d0
+       dcvda  = 0.0d0
+       dcvdz  = 0.0d0
+
+       cp     = 0.0d0
+       dcpdd  = 0.0d0
+       dcpdt  = 0.0d0
+       dcpda  = 0.0d0
+       dcpdz  = 0.0d0
+
+       gam1     = 0.0d0
+       dgam1dd  = 0.0d0
+       dgam1dt  = 0.0d0
+       dgam1da  = 0.0d0
+       dgam1dz  = 0.0d0
+
+       gam2     = 0.0d0
+       dgam2dd  = 0.0d0
+       dgam2dt  = 0.0d0
+       dgam2da  = 0.0d0
+       dgam2dz  = 0.0d0
+
+       gam3     = 0.0d0
+       dgam3dd  = 0.0d0
+       dgam3dt  = 0.0d0
+       dgam3da  = 0.0d0
+       dgam3dz  = 0.0d0
+
+       nabad     = 0.0d0
+       dnabdd  = 0.0d0
+       dnabdt  = 0.0d0
+       dnabda  = 0.0d0
+       dnabdz  = 0.0d0
+
+       sound  = 0.0d0
+       dcsdd  = 0.0d0
+       dcsdt  = 0.0d0
+       dcsda  = 0.0d0
+       dcsdz  = 0.0d0
+
+       chit_gas     = 0.0d0
+       dchit_gasdd  = 0.0d0
+       dchit_gasdt  = 0.0d0
+       dchit_gasda  = 0.0d0
+       dchit_gasdz  = 0.0d0
+
+       chid_gas     = 0.0d0
+       dchid_gasdd  = 0.0d0
+       dchid_gasdt  = 0.0d0
+       dchid_gasda  = 0.0d0
+       dchid_gasdz  = 0.0d0
+
+       cv_gas     = 0.0d0
+       dcv_gasdd  = 0.0d0
+       dcv_gasdt  = 0.0d0
+       dcv_gasda  = 0.0d0
+       dcv_gasdz  = 0.0d0
+
+       cp_gas     = 0.0d0
+       dcp_gasdd  = 0.0d0
+       dcp_gasdt  = 0.0d0
+       dcp_gasda  = 0.0d0
+       dcp_gasdz  = 0.0d0
+
+       gam1_gas     = 0.0d0
+       dgam1_gasdd  = 0.0d0
+       dgam1_gasdt  = 0.0d0
+       dgam1_gasda  = 0.0d0
+       dgam1_gasdz  = 0.0d0
+
+       gam2_gas     = 0.0d0
+       dgam2_gasdd  = 0.0d0
+       dgam2_gasdt  = 0.0d0
+       dgam2_gasda  = 0.0d0
+       dgam2_gasdz  = 0.0d0
+
+       gam3_gas     = 0.0d0
+       dgam3_gasdd  = 0.0d0
+       dgam3_gasdt  = 0.0d0
+       dgam3_gasda  = 0.0d0
+       dgam3_gasdz  = 0.0d0
+
+       nabad_gas     = 0.0d0
+       dnab_gasdd  = 0.0d0
+       dnab_gasdt  = 0.0d0
+       dnab_gasda  = 0.0d0
+       dnab_gasdz  = 0.0d0
+
+       sound_gas  = 0.0d0
+       dcs_gasdd  = 0.0d0
+       dcs_gasdt  = 0.0d0
+       dcs_gasda  = 0.0d0
+       dcs_gasdz  = 0.0d0
+
+       dse = 0.0d0
+       dpe = 0.0d0
+       dsp = 0.0d0
+
+
+!..frequent combinations
+       kt      = kerg * temp
+       ktinv   = 1.0d0/kt
+       deninv  = 1.0d0/den
+       tempinv = 1.0d0/temp

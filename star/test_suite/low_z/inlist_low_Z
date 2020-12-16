@@ -1,0 +1,73 @@
+
+&star_job
+      show_log_description_at_start = .false.
+      
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+/ ! end of star_job namelist
+
+&eos
+
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.0001
+
+      use_Type2_opacities = .true.
+
+      user_num_kap_Xs = 8
+      user_num_kap_Zs = 4
+
+      user_num_kap_Xs_for_this_Z=8, 8, 8, 8
+
+      user_kap_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0
+      user_kap_Zs = 0.0d0, 0.0001d0, 0.0003d0, 0.001d0
+
+/ ! end of kap namelist
+
+&controls
+
+      use_dedt_form_of_energy_eqn = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 2000
+
+      ! starting specifications
+         initial_mass = 0.8 ! in Msun units
+         initial_Z = 0.0001
+         initial_Y = 0.25
+
+
+      ! mixing parameters
+         mixing_length_alpha = 1.6d0
+         MLT_option = 'Henyey'
+
+      ! atmosphere
+         atm_option = 'T_tau'
+         atm_T_tau_relation = 'Eddington'
+         atm_T_tau_opacity = 'varying' 
+      
+      ! when to stop  
+      xa_central_lower_limit_species(1) = 'h1'
+      xa_central_lower_limit(1) = 1d-6
+      
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 50
+      terminal_interval = 10
+      write_header_frequency = 10
+
+/ ! end of controls namelist

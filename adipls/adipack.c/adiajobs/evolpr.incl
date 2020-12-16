@@ -1,0 +1,5 @@
+c
+c  parameters for storage in evolution models
+c
+      parameter (nnmax = 5151,igvrmx=70,nrdtmx=200,nidtmx=80,
+     *  ndtgmx = 100,nbccmx = 100,iymax=12)

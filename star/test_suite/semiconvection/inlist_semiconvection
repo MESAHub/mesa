@@ -1,0 +1,107 @@
+
+! inlist_semiconvection
+
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = '1.5_zams_a09.mod'     ! from make_zams_high_mass 14618
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      change_initial_net = .true.      
+      new_net_name = 'pp_and_cno_extras.net'
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      history_columns_file = 'history_columns.list' 
+
+/ ! end of star_job namelist
+
+&eos
+
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+
+      use_Type2_opacities = .true.
+      kap_file_prefix = 'a09'
+      kap_CO_prefix = 'a09_co'
+
+/ ! end of kap namelist
+
+&controls
+
+      use_dedt_form_of_energy_eqn = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1000
+
+      initial_mass = 1.5
+      initial_z = 0.02d0
+      
+      
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 1d-1
+      semiconvection_option = 'Langer_85'
+     
+      mixing_length_alpha = 1.8d0
+      MLT_option = 'Henyey'
+
+      predictive_mix(1) = .true.
+      predictive_zone_type(1) = 'any'
+      predictive_zone_loc(1) = 'core'
+      predictive_bdy_loc(1) = 'any'
+      predictive_superad_thresh(1) = 0.005
+
+      predictive_mix(2) = .true.
+      predictive_zone_type(2) = 'any'
+      predictive_zone_loc(2) = 'surf'
+      predictive_bdy_loc(2) = 'any'
+      predictive_superad_thresh(2) = 0.001
+
+      num_cells_for_smooth_gradL_composition_term = 10
+      threshold_for_smooth_gradL_composition_term = 0.02
+      num_cells_for_smooth_brunt_B = 10
+      threshold_for_smooth_brunt_B = 0.1
+          
+      xa_central_lower_limit_species(1) = 'h1' ! isotope name as defined in chem_def
+      xa_central_lower_limit(1) = 0.4                   
+      
+      mesh_delta_coeff = 0.5
+      max_years_for_timestep = 5d6
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+
+
+
+
+&pgstar
+      Grid4_win_flag = .true.
+      Kipp_mass_max = 0.2 ! (Msun units) negative means use default
+      
+      Grid4_file_flag = .true.
+
+/ ! end of pgstar namelist

@@ -1,0 +1,59 @@
+
+      ! add isotopes and reactions for the cno extras extension
+
+      include 'add_hot_cno'
+
+      add_isos(
+            o14,
+            f19,
+            ne18,
+            ne19,
+            mg22
+           )     
+         
+      add_reactions(
+           
+            r_n13_pg_o14,
+            r_n13_ap_o16
+            r_n15_ag_f19
+                      
+            r_o14_wk_n14,
+            r_o14_ag_ne18
+            r_o14_ap_f17
+            r_o14_gp_n13,
+           
+            r_o15_ag_ne19
+           
+            r_o16_ap_f19
+           
+            r_o18_pg_f19,
+           
+            r_f17_pg_ne18,
+            r_f17_ap_ne20
+            r_f17_pa_o14
+           
+            r_f18_pg_ne19,
+            r_f18_pa_o15
+           
+            r_f19_pa_o16
+            r_f19_pg_ne20,
+            r_f19_gp_o18          
+           
+            r_ne18_wk_f18,
+            r_ne18_gp_f17
+            rne18ap_to_mg22,  ! ne18(a,p)na21(p,g)mg22
+            r_ne18_ag_mg22,   ! ne18(a,g)mg22
+            r_mg22_ga_ne18,
+           
+            r_ne19_wk_f19,    ! ne19(e+nu)f19
+            r_ne19_ga_o15
+            rne19pg_to_mg22,  ! ne19(p,g)na20(p,g)mg21(e+nu)na21(p,g)mg22
+            r_ne19_gp_f18
+
+            rne20pg_to_mg22,  ! ne20(p,g)na21(p,g)mg22
+           
+            r_ne20_gp_f19
+           
+           )     
+           
+      remove_reaction(rne20gp_to_o16)

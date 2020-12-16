@@ -1,0 +1,144 @@
+# This is the makefile for testing the mesa eos library
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+TEST_SRCS = opal_eval.f eos_support.f \
+   test_eos_blend.f90 test_eos_support.f90 test_eos.f
+
+TESTQ_SRCS = eos_support.f \
+   test_eos_blend.f90 test_eos_support.f90 test_eos_quietly.f
+
+SAMPLE_SRCS = sample_eos.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = eos
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = chem $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+TESTQ = $(TEST_DIR)/test_quietly
+SAMPLE = $(TEST_DIR)/sample
+
+TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+TESTQ_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TESTQ_SRCS)))
+SAMPLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SAMPLE_SRCS)))
+
+all : $(TEST) $(TESTQ) $(SAMPLE)
+
+$(TEST) : $(TEST_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(TESTQ) : $(TESTQ_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(SAMPLE) : $(SAMPLE_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+
+$(TEST) : OBJS = $(TEST_OBJS)
+$(TESTQ) : OBJS = $(TESTQ_OBJS)
+$(SAMPLE) : OBJS = $(SAMPLE_OBJS)
+
+$(TEST_DIR)/% :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(TEST) $(TESTQ) $(SAMPLE)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(FCbasic) $(FCopenmp) $(FCopt) 
+
+COMPILE_FIXED = $(COMPILE) $(FCfixed) 
+
+COMPILE_FIXED_LEGACY = $(filter-out -std=f2008, $(COMPILE_FIXED))
+
+COMPILE_FREE = $(COMPILE)  $(FCfee)
+
+COMPILE_FREE_LEGACY = $(filter-out -std=f2008, $(COMPILE_FREE))
+
+opal_eval.o: opal_eval.f
+ifneq ($(QUIET),)
+	@echo FC $<
+	@$(FC) $(TEST_INCLUDES) $(COMPILE_FIXED_LEGACY) -c $<
+else
+	$(FC) $(TEST_INCLUDES) $(COMPILE_FIXED_LEGACY) -c $<
+endif
+
+test_eos_blend.o: test_eos_blend.f90
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(COMPILE) $<
+else
+	$(TEST_COMPILE) $(COMPILE) $<
+endif
+
+test_eos_support.o: test_eos_support.f90
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(COMPILE) $<
+else
+	$(TEST_COMPILE) $(COMPILE) $<
+endif
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE FIXED_LEGACY $<
+	@$(TEST_COMPILE) $(COMPILE_FIXED_LEGACY) $<
+else
+	$(TEST_COMPILE) $(COMPILE_FIXED_LEGACY) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+# Search paths for prerequisites
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.dek $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

@@ -1,0 +1,5 @@
+rm -rf ../data/kap_data
+mkdir ../data/kap_data
+mkdir ../data/kap_data/cache
+cd data/kap_data
+cp *.data   ../../../data/kap_data

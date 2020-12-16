@@ -1,0 +1,117 @@
+         if (logT >= logT1 .or. logT <= logT7 .or. logRho >= logRho1) then     
+            iregion = pure_helm
+         else if (logRho - 2*logT + 12 < logQmin) then          
+            iregion = pure_helm
+         else if (logRho - 2*logT + 12 > logQmax) then          
+            iregion = pure_helm
+         else if (logT >= logT2) then         
+            c_dy = (logT - logT2) / (logT1 - logT2)
+            if (logRho > logRho2) then
+               c_dx = (logRho - logRho2) / (logRho1 - logRho2)
+               iregion = blend_corner_out
+            else
+               iregion = blend_in_y
+            end if         
+         else if (logT >= logT3) then         
+            if (logRho > logRho2) then
+               c_dx = (logRho - logRho2) / (logRho1 - logRho2)
+               iregion = blend_in_x
+            else
+               iregion = pure_opal_scvh
+            end if            
+         else if (logRho > logRho4) then         
+            if (logT > logT6) then            
+               logRho_hi = logRho3 + (logT-logT6)*(logRho1-logRho3)/(logT3-logT6)
+               logRho_lo = logRho4 + (logT-logT6)*(logRho2-logRho4)/(logT3-logT6)
+               if (logRho >= logRho_hi) then
+                  iregion = pure_helm
+               else if (logRho >= logRho_lo) then
+                  c_dx = (logRho - logRho_lo) / (logRho_hi - logRho_lo)
+                  iregion = blend_in_x               
+               else
+                  iregion = pure_opal_scvh               
+               end if            
+            else ! logT is > logT7            
+               if (logRho > logRho3) then
+                  iregion = pure_helm
+               else ! logRho is > logRho4
+                  c_dx = (logRho - logRho4) / (logRho3 - logRho4)
+                  c_dy = (logT - logT6) / (logT7 - logT6)
+                  iregion = blend_corner_out
+               end if            
+            end if         
+         else ! logRho <= logRho4         
+            if (logT >= logT4) then
+               if (logRho > logRho7) then
+                  iregion = pure_opal_scvh
+               else if (logRho > logRho8) then
+                  c_dx = (logRho - logRho7) / (logRho8 - logRho7)
+                  iregion = blend_in_x
+               else
+                  iregion = pure_helm
+               end if
+            else if (logT >= logT5) then            
+               if (logRho >= logRho5) then
+                  iregion = pure_opal_scvh
+               else 
+                  if (logRho > logRho6) then
+                     c_dx = (logRho - logRho6) / (logRho5 - logRho6)
+                     c_dy = (logT - logT5) / (logT4 - logT5)
+                     iregion = blend_corner_in
+                  else if (logRho > logRho7) then
+                     c_dy = (logT - logT4) / (logT5 - logT4)
+                     iregion = blend_in_y
+                  else if (logRho > logRho8) then
+                     c_dx = (logRho - logRho7) / (logRho8 - logRho7)
+                     c_dy = (logT - logT4) / (logT5 - logT4)
+                     iregion = blend_corner_out
+                  else
+                     iregion = pure_helm
+                  end if               
+               end if               
+            else if (logT >= logT6) then               
+               if (logRho >= logRho5) then
+                  iregion = pure_opal_scvh
+               else if (logRho > logRho6) then
+                  c_dx = (logRho - logRho5) / (logRho6 - logRho5)
+                  iregion = blend_in_x
+               else ! logRho <= logRho6
+                  iregion = pure_helm
+               end if            
+            else ! logT > logT7            
+               if (logRho >= logRho5) then
+                  c_dy = (logT - logT6) / (logT7 - logT6)
+                  iregion = blend_in_y
+               else if (logRho >= logRho6) then
+                  c_dx = (logRho - logRho5) / (logRho6 - logRho5)
+                  c_dy = (logT - logT6) / (logT7 - logT6)
+                  iregion = blend_corner_out
+               else ! logRho < logRho6
+                  iregion = pure_helm
+               end if            
+            end if         
+         end if
+         
+         if (iregion == pure_helm) then
+            alfa = 1
+            beta = 0
+         else if (iregion == pure_opal_scvh) then
+            alfa = 0
+            beta = 1
+         else if (iregion == blend_in_y) then
+            alfa = c_dy
+            beta = 1 - alfa
+         else if (iregion == blend_in_x) then
+            alfa = c_dx
+            beta = 1 - alfa
+         else if (iregion == blend_corner_out) then
+            alfa = min(1d0, sqrt(c_dx**2 + c_dy**2))
+            beta = 1 - alfa
+         else if (iregion == blend_corner_in) then
+            beta = min(1d0, sqrt(c_dx**2 + c_dy**2))
+            alfa = 1 - beta
+         else
+            ierr = -1
+            write(*,*) 'logic breakdown in setting eos region'
+            return
+         end if

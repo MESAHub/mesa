@@ -1,0 +1,65 @@
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'done_with_edep.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'shock_part1.mod'
+      required_termination_code_string = 'extras_finish_step'
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_dt = .true.
+      seconds_for_initial_dt = 1d-12
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+      warning_limit_for_max_residual = 1d99
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 15000
+         
+      x_integer_ctrl(1) = 1 ! part number
+      min_timestep_limit = 1d-15
+
+! equation controls
+      use_fixed_vsurf_outer_BC = .true.
+      fixed_vsurf = 0d0
+
+! output controls
+
+      terminal_show_age_units = 'seconds'
+
+
+/ ! end of controls namelist
+
+&pgstar
+         
+!pause = .true.
+
+Grid2_win_flag = .true.
+pgstar_interval = 1
+
+!Mixing_ymin = 5
+
+
+/ ! end of pgstar namelist

@@ -1,0 +1,71 @@
+
+      ! add isotopes and reactions for the hot cno extension
+      ! remove the replaced basic net reactions
+
+      add_isos(
+            c13,
+            n13,
+            n15,
+            o15,
+            o17,
+            o18,
+            f17,
+            f18
+           )     
+         
+      add_reactions(
+           
+            r_c12_pg_n13,
+            r_c12_ap_n15
+           
+            r_c13_pg_n14,
+           
+            r_n13_wk_c13,
+            r_n13_gp_c12,
+           
+            r_n14_pg_o15,
+            r_n14_ap_o17
+            r_n14_gp_c13,
+            r_n14_ag_f18
+           
+            r_n15_pg_o16,
+            r_n15_pa_c12
+            r_n15_ap_o18
+           
+            r_o15_wk_n15,
+            r_o15_ap_f18
+            r_o15_gp_n14
+           
+            r_o16_pg_f17,
+            r_o16_gp_n15
+           
+            r_o17_pa_n14
+            r_o17_pg_f18,
+           
+            r_o18_pa_n15
+           
+            r_f17_wk_o17,
+            r_f17_gp_o16
+           
+            r_f18_wk_o18,
+            r_f18_gp_o17
+           
+           )     
+     
+         remove_reactions(
+           
+            rc12ap_to_o16,
+            ro16gp_to_c12,
+            ro16ap_to_ne20,
+            rc12_to_n14,
+            rn14_to_c12,
+            rn14_to_o16,
+            rn14ag_lite,
+            rn15pg_aux,
+            rn15pa_aux,
+            ro16ap_aux,
+            ro16_to_n14,
+            rf19pg_aux,
+            rf19pa_aux
+           
+           )     

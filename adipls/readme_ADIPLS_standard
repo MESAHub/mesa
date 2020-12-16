@@ -1,0 +1,53 @@
+To use ADIPLS in its normal "stand-alone" mode,
+follow the instructions in the mesa/adipls/adipack.c/README
+Documentation can be found in adipack.c/notes.
+
+If you have already installed mesa including adipls, 
+then the things in adipack.c have been built and tested.
+However, you will need to add a couple of liens to your startup
+script.  These are needed for the command line operations
+included in ADIPLS.   On my machine they look like this:
+
+setenv PATH /Users/bpaxton/mesa/adipls/adipack.c/bin:$PATH
+setenv aprgdir '/Users/bpaxton/mesa/adipls/adipack.c'
+
+
+
+unpack adipls_tar_files/models.c.tar.gz 
+try the following steps to check that things are working.
+
+cd models
+scan-amdl.d amdl.l5bi.d.15
+redistrb.d redistrb.in
+adipls.c.d adipls.c.in
+freqdif.d freqdif.in
+set-obs.d 16 l5bi.d.15.new.p2
+
+The call to scan-amdl.d reads the model info in amdl.l5bi.d.15
+and prints out some info such as that it has 2482 mesh points.
+
+The call to redistrb.d reads its commands from redistrb.in;
+this step can be skipped if you don't need to remesh the model
+before doing the pulsation analysis.
+
+The call to adipls.c.d reads its commands from adipls.c.in;
+it writes out lots of info to the terminal as it searches for modes.
+
+The call to freqdif.d reads its commands from freqdif.in;
+it compares the newly created set of modes to a reference set.
+The differences should all be small (they are in the last column).
+For example, my last few rows look like this:
+
+  431  431 1000 1000    2    2    4673.915    4673.915 -4.10535E-11
+  432  432 1100 1100    0    0    3313.667    3313.667  1.20570E-13
+  433  433 1100 1100    1    1    4128.076    4128.076 -3.66343E-11
+
+
+The call to set-obs.d reads l5bi.d.15.new.p2 and write the mode info
+to obs.l5bi.d.15.new.p2.  Open it and take a look.  It should start
+with lines like these:
+
+    0      1  258.0076  4.80998E-04  Data set from                           
+    0      2  404.4800  9.91006E-05  grand summary in file                   
+    0      3  535.9389  2.42835E-05  agsm.l5bi.d.15.new.p2                   
+    0      4  680.5727  7.20557E-06  using (corrected) eigenfrequencies      

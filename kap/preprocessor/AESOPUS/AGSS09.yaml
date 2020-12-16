@@ -1,0 +1,46 @@
+#
+# file information
+#
+
+directory: ags09
+
+files:
+    - aesopus_z0.00001_ags09_varcno.tab
+    - aesopus_z0.00003_ags09_varcno.tab
+    - aesopus_z0.0001_ags09_varcno.tab
+    - aesopus_z0.0003_ags09_varcno.tab
+    - aesopus_z0.001_ags09_varcno.tab
+    - aesopus_z0.002_ags09_varcno.tab
+    - aesopus_z0.003_ags09_varcno.tab
+    - aesopus_z0.005_ags09_varcno.tab
+    - aesopus_z0.01_ags09_varcno.tab
+    - aesopus_z0.02_ags09_varcno.tab
+    - aesopus_z0.03_ags09_varcno.tab
+    - aesopus_z0.05_ags09_varcno.tab
+    - aesopus_z0.1_ags09_varcno.tab
+
+output: AESOPUS_AGSS09.h5
+
+#
+# assumed abundance pattern information
+# 
+
+Zsun: 0.01337
+C_div_Z_sun: 1.768914E-01
+N_div_Z_sun: 5.181559E-02
+O_div_Z_sun: 4.287713E-01
+
+#
+# metalicity information
+#
+
+# the Z values must be in the same order as the files
+Zs: [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.002, 0.003, 0.005, 0.01, 0.02, 0.03, 0.05, 0.1]
+
+#
+# thermodynamic information
+#
+
+logRs: [-8.000, -7.500, -7.000, -6.500, -6.000, -5.500, -5.000, -4.500, -4.000, -3.500, -3.000, -2.500, -2.000, -1.500, -1.000, -0.500, 0.000, 0.500, 1.000]
+
+logTs: [3.200, 3.220, 3.240, 3.260, 3.280, 3.300, 3.320, 3.340, 3.360, 3.380, 3.400, 3.420, 3.440, 3.460, 3.480, 3.500, 3.520, 3.540, 3.560, 3.580, 3.600, 3.620, 3.640, 3.660, 3.680, 3.700, 3.750, 3.800, 3.850, 3.900, 3.950, 4.000, 4.050, 4.100, 4.150, 4.200, 4.250, 4.300, 4.350, 4.400, 4.450, 4.500]

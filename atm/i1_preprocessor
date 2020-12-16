@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		pwd
+		echo "build FAILED"
+		echo
+		exit 1
+	fi
+}
+
+cd preprocessor/make
+make all
+check_okay
+cd ../..
+

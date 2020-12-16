@@ -1,0 +1,96 @@
+# This is the makefile for running mesa/star
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = star
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = $(LIBS_MESA_STAR_SUPPORT)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR_SUPPORT) $(LOAD_SE)
+
+ifeq ($(USE_PGSTAR), YES)
+    LOAD_OTHER += $(LOAD_PGPLOT)
+endif
+
+#################################################################
+#
+# TARGETS
+
+STAR = $(TEST_DIR)/star
+
+OBJS = $(STAR_WORK_OBJS) run.o
+
+$(STAR) : $(OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCbasic) $(FCopenmp) $(FCstatic) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCbasic) $(FCopenmp) $(FCstatic) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(STAR)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+#################################################################
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
+else
+	$(TEST_COMPILE) $(FCfree) $<
+endif
+
+%.o: %.f90
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $<
+else
+	$(TEST_COMPILE) $<
+endif
+
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR):$(MESA_DIR)/star/job
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

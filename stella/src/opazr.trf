@@ -1,0 +1,49 @@
+-- Rosseland Opacity in Zeldovich-Raizer approximation
+-- Subroutine opat;
+Subroutine Opacit;
+Implicit real*8 (a-h,o-z);
+_include zone;
+_include fundrad;
+-- Parameter(DUSTK=10.d0,CAPMIN=1.D-4,TpDust=0.02d0,Depres=6.d+1,
+--        Begdep=3.d0,Cneutr=0.020D0);
+Parameter(DUSTK=1.d1,TpDust=0.02d0,Cneutr=0.020D0);
+_include stateq;
+COMMON/capab/Capab;
+--common/capco/capco,ZCap;
+--  Wcap=Ccapp*Xe*(Xe+XYZA)**2*pl/(XYZA*Tp**2*Tpsqrt);
+--  Wcap=Ccaps*Xe*Pl*(Scap+Cneutr*XYZA)/(Tp**2*Tpsqrt);
+    Wcap=Ccaps*Pl*
+      (Scap+Cneutr*(Yat(1)+Cneutr*Yat(2)))/(Tp**2*Tpsqrt);
+    ZCap=CcapZ*(ZMean+2.D0)**2*YZMean*Pl/(Tp**2*Tpsqrt);
+    Capab=Wcap*Xe+ZCap;
+--  Cappa=(Wcap+CTOMP)*Xe+ZCap;
+    If (Tp<TpDust) Capab=Capab+DustK*(TpDust-Tp)**2;
+    Cappa=Capab+CTOMP*Xe;
+--  IF(CAPPA<CAPMIN)THEN;
+--    CAPPA=CAPMIN; CAPT=0.D0; CAPPL=0.D0;
+--  Else;
+      CapT=XeT*(Wcap+CTOMP)+(Ccaps*Xe*ScapT+
+             CcapZ*(ZMean+2.D0)*(2.D0*ZMT*YZMean+(ZMean+2.D0)*YZMT))
+                   *Pl/(Tp**2*Tpsqrt)
+            -3.5D0*(Wcap*Xe+ZCap)/Tp;
+      If( Tp<TpDust ) CapT=CapT-2.d0*DustK*(TpDust-Tp);
+  --  CapPL=XePL*(Wcap*(1.d0/Xe+2.d0/(Xe+XYZA))+CTOMP)-Wcap;
+      CapPl=XePl*(Wcap+CTOMP)+(Ccaps*Xe*ScapPl+
+             CcapZ*(ZMean+2.D0)*(2.D0*ZMPl*YZMean+(ZMean+2.D0)*YZMPl))
+                   *Pl/(Tp**2*Tpsqrt)
+            +(Wcap*Xe+ZCap); -- dCappa/dlog(D)
+--  Endif;
+/*
+-- to test only:
+--  Wcap=exp(-Psicap)*Wcap; -- correct derivatives!!!
+--  GCoul3=CGcoul*(Xe+XYZA)**3*pl/(XYZA**2*Tp**3); --(gamma Coulon)**3
+--  GCoul3=Gcoul3**(1.d0/3.d0);
+--  WCorr=(Wcap+ZCap)*(Begdep+GCoul3)/(Begdep+Depres*GCoul3);
+--  WCorr=WCorr/(1.d0+(Tp/(Begdep*(0.5d0*(1.d0+Yat(1))/XYZA)**2))**2);
+--  Capco=WCorr+CTOMP*Xe;
+    Rcnd=3.313d-5*Tp*(1.d0+(2.18d-6*Xe*Pl/(Tpsqrt))**1.6667d0);
+         -- 1/CAPcond Christy-Pamyatnykh
+    scn=1.d0/(1.d0/cappa+Rcnd);
+    */
+return;
+end;

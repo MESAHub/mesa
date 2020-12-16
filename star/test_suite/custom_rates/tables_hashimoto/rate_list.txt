@@ -1,0 +1,9 @@
+
+! this is an example of a rates list file for use with mesa/rates
+
+! the mesa/data/net_data/rates directory has sample rate files
+
+! pairs of rate name and rate file
+
+r_c14_ag_o18   'c14rate_Hashimoto_reduced.txt'
+

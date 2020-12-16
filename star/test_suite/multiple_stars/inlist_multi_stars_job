@@ -1,0 +1,19 @@
+
+&multi_stars_job
+
+   num_stars = 3
+   
+   inlist_names(1) = 'inlist1' 
+   inlist_names(2) = 'inlist2'
+   inlist_names(3) = 'inlist3'
+   
+   !restart_flag = .true.
+   restart_names(1) = 'photos1/x120'
+   restart_names(2) = 'photos2/x140'
+   restart_names(3) = 'photos3/x200'
+   
+   which_for_pgstar = 0
+   
+   stopping_age = 1.5e8
+
+/ ! end of multi_stars_job namelist

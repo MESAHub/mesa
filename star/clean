@@ -1,0 +1,2 @@
+cd test; ./cleanup
+cd ../test_suite; ./each_test_clean >& /dev/null

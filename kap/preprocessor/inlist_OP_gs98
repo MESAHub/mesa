@@ -1,0 +1,15 @@
+&kappa
+
+         data_dir = 'kap_input_data/OP'
+         OP_file = .true.
+         type1_table = 'GS98.OP17'
+         logR_min = -8.00d0
+         logR_max = 1.00d0
+         logR_points = 37
+         logT_file = 'logT_points_highT_8.7'
+         output_dir = 'data/kap_data'
+         table_prefix = 'OP_gs98'
+         header_info = 'fixed metal distribution -- based on Grevesse & Sauval (1998) solar abundances'
+         table_version= 38
+
+/

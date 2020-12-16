@@ -1,0 +1,126 @@
+# This is the makefile for the mesa utils package
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+ifeq ($(USE_OPENMP),YES)
+    UTILS_OMP = utils_openmp
+else
+    UTILS_OMP = utils_openmp_stub
+endif
+
+SRCS = \
+   utils_def.f \
+   utils_dict.f \
+   utils_idict.f \
+   utils_lib.f \
+   utils_nan.f90 \
+   utils_nan_sp.f90 \
+   utils_nan_dp.f90 \
+   utils_nan_qp.f90 \
+   utils_c_system.c \
+   utils_system.f90 \
+   $(UTILS_OMP).f \
+
+#################################################################
+#
+# TARGETS
+
+LIB = libutils.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SRCS))))
+
+$(LIB) : $(OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS)
+else	   
+	$(LIB_TOOL) $(LIB) $(OBJS)
+endif	
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include/formats.inc
+	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include/formats
+	@$(CP_IF_NEWER) *.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) libutils.$(LIB_SUFFIX) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+
+COMPILE_CMD = $(COMPILE)
+
+utils_c_system.o : $(MOD_PRIVATE_DIR)/utils_c_system.c
+ifneq ($(QUIET),)
+	@echo CC $<
+	@$(CC) $(SPECIAL_C_FLAGS) $(LIB_FLAGS) -c $(MOD_PRIVATE_DIR)/utils_c_system.c
+else
+	$(CC) $(SPECIAL_C_FLAGS) $(LIB_FLAGS) -c $(MOD_PRIVATE_DIR)/utils_c_system.c
+endif
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.c $(SRC_PATH)
+vpath %.h $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

@@ -1,0 +1,2635 @@
+
+output of solar abundances: compare with Lodders (2003) table
+========================================================================
+isotope   % abundance
+  h1        99.998060
+  h2         0.001940
+  he3        0.016597
+  he4       99.983403
+  li6        7.589000
+  li7       92.411000
+  be9      100.000000
+  b10       19.820000
+  b11       80.180000
+  c12       98.892200
+  c13        1.107800
+  n14       99.633700
+  n15        0.366300
+  o16       99.762800
+  o17        0.037200
+  o18        0.200040
+  f19      100.000000
+  ne20      92.943100
+  ne21       0.222800
+  ne22       6.834100
+  na23     100.000000
+  mg24      78.992000
+  mg25      10.003000
+  mg26      11.005000
+  al27     100.000000
+  si28      92.229680
+  si29       4.683160
+  si30       3.087160
+  p31      100.000000
+  s32       95.018000
+  s33        0.750000
+  s34        4.215000
+  s36        0.017000
+  cl35      75.771000
+  cl37      24.229000
+  ar36      84.594600
+  ar38      15.380800
+  ar40       0.024600
+  k39       93.258110
+  k40        0.011672
+  k41        6.730220
+  ca40      96.941000
+  ca42       0.647000
+  ca43       0.135000
+  ca44       2.086000
+  ca46       0.004000
+  ca48       0.187000
+  sc45     100.000000
+  ti46       8.249000
+  ti47       7.437000
+  ti48      73.720000
+  ti49       5.409000
+  ti50       5.185000
+  v50        0.249700
+  v51       99.750300
+  cr50       4.345200
+  cr52      83.789500
+  cr53       9.500600
+  cr54       2.364700
+  mn55     100.000000
+  fe54       5.845000
+  fe56      91.754000
+  fe57       2.119000
+  fe58       0.282000
+  co59     100.000000
+  ni58      68.076900
+  ni60      26.223100
+  ni61       1.139900
+  ni62       3.634500
+  ni64       0.925600
+  cu63      69.174000
+  cu65      30.826000
+  zn64      48.630000
+  zn66      27.900000
+  zn67       4.100000
+  zn68      18.750000
+  zn70       0.620000
+  ga69      60.107900
+  ga71      39.892100
+  ge70      21.234000
+  ge72      27.662000
+  ge73       7.717000
+  ge74      35.943000
+  ge76       7.444000
+  as75     100.000000
+  se74       0.889000
+  se76       9.366000
+  se77       7.635000
+  se78      23.772000
+  se80      49.607000
+  se82       8.731000
+  br79      50.686000
+  br81      49.314000
+  kr78       0.362000
+  kr80       2.330000
+  kr82      11.650000
+  kr83      11.550000
+  kr84      56.900000
+  kr86      17.210000
+  rb85      72.165400
+  rb87      27.834600
+  sr84       0.555100
+  sr86       9.816800
+  sr87       7.377100
+  sr88      82.251000
+  y89      100.000000
+  zr90      51.452000
+  zr91      11.223000
+  zr92      17.146000
+  zr94      17.380000
+  zr96       2.799000
+  nb93     100.000000
+  mo92      14.836200
+  mo94       9.246600
+  mo95      15.920100
+  mo96      16.675600
+  mo97       9.555100
+  mo98      24.132900
+  mo100      9.633500
+  ru96       5.542000
+  ru98       1.868800
+  ru99      12.757900
+  ru100     12.598500
+  ru101     17.060000
+  ru102     31.551900
+  ru104     18.621000
+  rh103    100.000000
+  pd102      1.020000
+  pd104     11.140000
+  pd105     22.330000
+  pd106     27.330000
+  pd108     26.460000
+  pd110     11.720000
+  ag107     51.839200
+  ag109     48.160800
+  cd106      1.250000
+  cd108      0.890000
+  cd110     12.490000
+  cd111     12.800000
+  cd112     24.130000
+  cd113     12.220000
+  cd114     28.730000
+  cd116      7.490000
+  in113      4.288000
+  in115     95.712000
+  sn112      0.971000
+  sn114      0.659000
+  sn115      0.339000
+  sn116     14.536000
+  sn117      7.676000
+  sn118     24.223000
+  sn119      8.585000
+  sn120     32.593000
+  sn122      4.629000
+  sn124      5.789000
+  sb121     57.213000
+  sb123     42.787000
+  te120      0.096000
+  te122      2.603000
+  te123      0.908000
+  te124      4.816000
+  te125      7.139000
+  te126     18.952000
+  te128     31.687000
+  te130     33.799000
+  i127     100.000000
+  xe124      0.129000
+  xe126      0.112000
+  xe128      2.230000
+  xe129     27.460000
+  xe130      4.380000
+  xe131     21.800000
+  xe132     26.360000
+  xe134      9.660000
+  xe136      7.870000
+  cs133    100.000000
+  ba130      0.105800
+  ba132      0.101200
+  ba134      2.417000
+  ba135      6.592000
+  ba136      7.853000
+  ba137     11.232000
+  ba138     71.699000
+  la138      0.090170
+  la139     99.909830
+  ce136      0.186000
+  ce138      0.251000
+  ce140     88.449000
+  ce142     11.114000
+  pr141    100.000000
+  nd142     27.160000
+  nd143     12.190000
+  nd144     23.830000
+  nd145      8.300000
+  nd146     17.170000
+  nd148      5.740000
+  nd150      5.620000
+  sm144      3.073400
+  sm147     14.993400
+  sm148     11.240600
+  sm149     13.818900
+  sm150      7.379600
+  sm152     26.742100
+  sm154     22.752000
+  eu151     47.810000
+  eu153     52.190000
+  gd152      0.202900
+  gd154      2.180900
+  gd155     14.799800
+  gd156     20.466400
+  gd157     15.651800
+  gd158     24.834700
+  gd160     21.863500
+  tb159    100.000000
+  dy156      0.056000
+  dy158      0.096000
+  dy160      2.340000
+  dy161     18.910000
+  dy162     25.510000
+  dy163     24.900000
+  dy164     28.190000
+  ho165    100.000000
+  er162      0.137000
+  er164      1.609000
+  er166     33.610000
+  er167     22.930000
+  er168     26.790000
+  er170     14.930000
+  tm169    100.000000
+  yb168      0.130000
+  yb170      3.040000
+  yb171     14.280000
+  yb172     21.830000
+  yb173     16.130000
+  yb174     31.830000
+  yb176     12.760000
+  lu175     97.416000
+  lu176      2.584000
+  hf174      0.162000
+  hf176      5.250200
+  hf177     18.597300
+  hf178     27.284000
+  hf179     13.622500
+  hf180     35.084000
+  ta180      0.012300
+  ta181     99.987700
+  w180       0.119800
+  w182      26.498500
+  w183      14.313600
+  w184      30.642200
+  w186      28.425900
+  re185     37.398000
+  re187     62.602000
+  os184      0.019800
+  os186      1.592200
+  os187      1.644000
+  os188     13.286500
+  os189     16.199200
+  os190     26.343800
+  os192     40.914200
+  ir191     37.272000
+  ir193     62.728000
+  pt190      0.013634
+  pt192      0.782660
+  pt194     32.967000
+  pt195     33.831560
+  pt196     25.241660
+  pt198      7.163490
+  au197    100.000000
+  hg196      0.153440
+  hg198      9.968000
+  hg199     16.873000
+  hg200     23.096000
+  hg201     13.181000
+  hg202     29.863000
+  hg204      6.865000
+  tl203     29.524000
+  tl205     70.476000
+  pb204      1.982000
+  pb206     18.735100
+  pb207     22.590000
+  pb208     58.692900
+  bi209    100.000000
+  th232    100.000000
+  u235       0.720000
+  u238      99.274500
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           1
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           2
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           3
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           4
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           5
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           6
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           7
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           8
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i           9
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          10
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          11
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          12
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          13
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          14
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          15
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          16
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          17
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          18
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          19
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          20
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          21
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          22
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          23
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          24
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          25
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          26
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          27
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          28
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          29
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          30
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          31
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          32
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          33
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          34
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          35
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          36
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          37
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          38
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          39
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          40
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          41
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          42
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          43
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          44
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          45
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          46
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          47
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          48
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          49
+ call do_test_chem
+
+
+                                           chem_W(io16)    1.5994914620075349D+01
+                                           chem_Z(io16)    8.0000000000000000D+00
+                              chem_binding_energy(io16)    1.2761930221000000D+02
+
+ chem_name(io16) o16     
+ get_nuclide_index("o16") == io16 T
+
+ chem_element_Name(e_he) he      
+ chem_get_element_id("he") == e_he T
+
+
+                            Anders & Grevesse 1989 zsol    1.8987109631891819D-02
+                           Anders & Grevesse 1989 yesol    8.5280190902027331D-01
+
+
+ cno fraction by mass of Z
+
+                                 Anders & Grevesse 1989    7.2307477368434370D-01
+
+                                Grevesse and Noels 1993    7.1045735428893797D-01
+
+                               Grevesse and Sauval 1998    6.9188768734346451D-01
+
+                                           Lodders 2003    6.6302570462115973D-01
+
+                      Asplund, Grevesse and Sauval 2005    6.6770954116998993D-01
+
+ call do_test_composition_info
+ test moments of composition and the mass correction factor
+ for a C12-Fe56 mixture (both 50% by mass)
+
+Abar       =  19.764706
+Zbar       =   9.529412
+Z2bar      = 148.941176
+Ye         =   0.482143
+sum(X*W/A) =   0.999419
+ call do_test_Qtotal
+ test Qtotal for 2 he3 => 2 h1 + he4
+
+                                                 Qtotal    1.2859572850000005D+01
+
+ done do_tests
+ done i          50

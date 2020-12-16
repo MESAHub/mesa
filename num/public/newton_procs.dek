@@ -1,0 +1,262 @@
+      
+      ! Here are the routines that you supply to the newton solver.
+      
+      
+      ! the "primary" variables are the ones the solver works with directly
+      ! we use "x" as the name of the primaries
+      ! when the solver has modified x, it calls the following routine.
+      ! typically, set_primaries will set up pointers to the variables
+      ! in a more friendly form for the following operations.
+      ! for example, if the primary variables correspond to
+      ! 3 variables, A, B, and C, at each of nz zones, 
+      ! then set_primaries might copy the new values from x
+      ! to 3 vectors of length nz each for A, B, and C.
+      subroutine set_primaries(nvar, nz, x, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: nvar, nz
+         real(dp), pointer :: x(:,:) ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine set_primaries
+      
+      
+      ! the "secondary" variables are defined at each zone
+      ! as functions of the primary variables of that zone.
+      ! for example, if you have a primary lnm, log(mass), 
+      ! then you might have a secondary variable m = exp(lnm).
+      ! it is the job of the setsecondaries routine to
+      ! calculate the values of the secondary variables.
+      ! The 'ivar' argument is an accelerator for the
+      ! process of creating a numerical jacobian matrix.
+      ! if ivar is between 1 and nvar, where nvar is the
+      ! number of variables per zone, then it is the variable 
+      ! number of the primary variable that has been modified
+      ! for the purpose of evaluating a numerical derivative.
+      ! The reevaluation of the secondaries can, and should, 
+      ! take advantage of this information.  For example, 
+      ! if the equation of state doesn't depend on the variable
+      ! that has been changed, you should skip the relatively
+      ! costly process of evaluating the eos.  The solver makes
+      ! this easy since it takes care of caching and restoring
+      ! the previous values of the secondaries -- you don't need
+      ! to do anything special, just don't call the eos and the
+      ! old values will (hopefully!) have the results that you
+      ! would have gotten if you did call it.
+      ! NOTE: because of the caching scheme, set_secondaries must 
+      ! not change any variables other than those stored in the
+      ! array 'y' of secondary variables.  In particular, if
+      ! the equations depend on some variable 'z' that is not
+      ! held in y, then z should be set by the eval_equations
+      ! routine rather than by set_secondaries.
+      subroutine set_secondaries(ivar, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: ivar
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine set_secondaries
+      
+      
+      ! the solver needs to rescale values to keep the numerics happy.
+      ! it is the job of the vtypical routine to provide "typical" values
+      ! for use in this rescaling process.  Only rule is that the
+      ! xscale values must be nonzero since we're going to be dividing by them!
+      ! in general, it is probably a good idea to set some minimum for
+      ! the xscale values (1 is a typical choice).  Often you may
+      ! do xscale(i) = max(1d0, abs(x(i))).  Another common choice
+      ! is to use the max over all the zones of abs value for primary A 
+      ! as the scale for all A values.  Rescaling can be tricky, and
+      ! that's why we call vtypical to do the hard work rather than
+      ! trying to do it in the solver.
+      subroutine set_xscale(nvar, nz, xold, xscale, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: nvar, nz
+         real(dp), pointer :: xold(:,:) ! (nvar, nz)
+         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ! for example, 
+         ! xscale = max(1d0, abs(xold))
+      end subroutine set_xscale
+      
+      
+      ! the "size" of the modification B is an indication of how good the 
+      ! solution has become -- small enough B, and we declare victory!
+      subroutine sizeB(iter, nvar, nz, x, B, xscale, max_correction, correction_norm, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, B, xscale ! (nvar, nz)
+         real(dp), intent(out) :: correction_norm ! a measure of the average correction
+         real(dp), intent(out) :: max_correction ! magnitude of the max correction
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ! for example, 
+         ! max_correction = maxval(abs(b))
+         ! correction_norm = sum(abs(b)/(nvar*nz))
+      end subroutine sizeB
+      
+      
+      ! the proposed change to x is B*xscale*correction_factor
+      ! edit correction_factor and/or B as necessary so that the new x will be valid.
+      ! set ierr nonzero if things are beyond repair.
+      subroutine Bdomain(iter, nvar, nz, B, x, xscale, correction_factor, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, xscale, B ! (nvar, nz)
+         real(dp), intent(inout) :: correction_factor
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine Bdomain
+      
+      
+      ! When xdomain is called, x has just been set to dx + xold.
+      ! Check that this new x is valid and edit it if necessary.
+      ! If change x, then also change dx so that x = dx + xold remains true.
+      ! Set ierr nonzero if things are beyond repair.
+      subroutine xdomain(iter, nvar, nz, x, dx, xold, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, dx, xold ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine xdomain
+      
+
+      ! equ(i) has the residual for equation i, i.e., the difference between
+      ! the left and right hand sides of the equation.  So the goal
+      ! of the solver is to find an approximate solution that makes the
+      ! magnitude of the residuals acceptibly small.
+      ! after the primaries and secondaries have been evaluted, 
+      ! by calls on setprimaries and setsecondaries, respectively, 
+      ! the eval_equations routine is called to calculate the residuals.
+      ! if for some reason, it is impossible to do this, because of
+      ! of bad values in the primaries or secondaries for example, 
+      ! this routine should set ierr nonzero and return.
+      ! that will force the solver to try again.
+      subroutine eval_equations(iter, nvar, nz, x, xscale, equ, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, xscale, equ ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr            
+      end subroutine eval_equations
+
+
+      ! the sizeequ routine returns a measure of the magnitude of the residuals.
+      subroutine size_equ(iter, nvar, nz, equ, residual_norm, max_residual, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer :: equ(:,:) ! (nvar, nz)
+         real(dp), intent(out) :: residual_norm, max_residual
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+         ! for example, you might just use an average magnitude
+         ! residual_norm = sum(abs(equ(1:neq))/dble(neq))
+         ! max_residual = maxval(abs(equ(1:neq)))
+      end subroutine size_equ
+
+
+      ! this routine is called with the newly computed scaled correction B.
+      ! this is simply to allow making a record of corrections for debugging purposes.
+      subroutine inspectB(iter, nvar, nz, x, B, xscale, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz
+         real(dp), pointer, dimension(:,:) :: x, B, xscale ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine inspectB
+      
+      
+      ! the solver calls enter_setmatrix when it is about to start the computation of a jacobian matrix.
+      ! if you want to have the jacobian estimated by the solver using numerical differences, then
+         ! set need_solver_to_eval_jacobian = .true. so solver knows to do the differences itself.
+         ! set the vector xder of small changes to x values for use in numerical derivatives
+            ! derivatives are estimated by (f(x+xder)-f(x))/xder.
+      ! if you are going to create the jacobian yourself, for example by analytically calculating the partials, then
+         ! set need_solver_to_eval_jacobian = .false. 
+         ! then the solver knows that it doesn't need to do the numerical differences.
+         ! store the jacobian in the matrix A
+         ! if you are using a square matrix for the jacobian,
+            ! A(q, v) = xscale(v) * partial of equation(q) wrt variable(v)
+         ! if you are using a banded matrix for the jacobian,
+            ! A(idiag+q-v, v) = xscale(v) * partial of equation(q) wrt variable(v)
+         ! note that idiag is the row holding the diagonal entries of a square form of the jacobian.
+         ! also note that v runs from 1 to n and q must be in the range max(1, v-KU) <= q <= min(n, v+KL)
+         ! where n = nvar*nz, KL = number of subdiagonals within the band of A,
+         ! and KU = number of superdiagonals.
+      subroutine enter_setmatrix( 
+     >        iter, nvar, nz, neqs, x, xold, xscale, xder, need_solver_to_eval_jacobian, 
+     >        ldA, A1, idiag, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz, neqs ! (neqs = nvar*nz)
+         real(dp), pointer, dimension(:,:) :: x, xold, xscale, xder ! (nvar, nz)
+         logical, intent(out) :: need_solver_to_eval_jacobian
+         integer, intent(in) :: ldA ! leading dimension of A
+         real(dp), pointer, dimension(:) :: A1 ! =(ldA,neqs)
+         integer, intent(inout) :: idiag 
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine enter_setmatrix
+      
+      
+      ! the solver calls exit_setmatrix when it is has completed doing the numerical differences.
+      ! the new jacobian is in A -- see enter_setmatrix for description of the layout of A
+      ! this routine is not called if enter_setmatrix returned with need_solver_to_eval_jacobian set false.
+      subroutine exit_setmatrix(iter, nvar, nz, neqs, dx, ldA, A1, idiag, xscale, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: iter, nvar, nz, neqs ! (neqs = nvar*nz)
+         real(dp), pointer :: dx(:,:) ! (nvar, nz)
+         integer, intent(in) :: ldA ! leading dimension of A
+         real(dp), pointer, dimension(:) :: A1 ! =(ldA,neqs)
+         integer, intent(inout) :: idiag ! row of A with the matrix diagonal entries
+         real(dp), pointer, dimension(:,:) :: xscale ! (nvar, nz)
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine exit_setmatrix
+      
+      
+      ! in some cases, a problem during the evaluation of the jacobian will force the code to back out of
+      ! the attempt.  if that happens, this routine will be called instead of exit_setmatrix
+      subroutine failed_in_setmatrix(j, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         integer, intent(in) :: j ! if j > 0, then is index in x of variable that caused the failure.
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+         integer, intent(out) :: ierr
+      end subroutine failed_in_setmatrix
+      
+      
+      ! about to declare victory... but may want to do another iteration
+      integer function force_another_iteration(iter, itermin, lrpar, rpar, lipar, ipar)
+         ! 1 means force another iteration
+         ! 0 means don't need to force another
+         ! -1 means failure. newton returns with non-convergence.
+         use const_def, only: dp
+         integer, intent(in) :: iter ! have finished this many iteration and have converged
+         integer, intent(in) :: itermin ! this is the requested minimum.  iter may be < itermin.
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout) :: rpar(:) ! (lrpar)
+         integer, intent(inout) :: ipar(:) ! (lipar)
+      end function force_another_iteration

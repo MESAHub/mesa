@@ -1,0 +1,49 @@
+#!/bin/bash
+
+function check_okay {
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
+}
+
+cd obj; check_okay
+
+echo
+cat 'nfreq_and_mzone.inc'
+echo
+make -f f90StellaGF.mak clean; check_okay
+make -f f90StellaGF.mak eve2; check_okay
+make -f f90StellaGF.mak ronfict; check_okay
+make -f f90StellaGF.mak stella6_mesa; check_okay
+
+echo
+cd ../eve/run; check_okay
+pwd
+./eve2.exe; check_okay
+
+echo
+echo
+echo "construct opacity tables for current model using 6 jobs in parallel"
+cd ../../vladsf; check_okay
+pwd
+./mesa.sh; check_okay
+
+echo
+echo 'run stella'
+cd ../strad/run; check_okay
+rm -f mesa.prf; check_okay
+rm -f mesa.crv; check_okay
+rm -f mesa.res; check_okay
+rm -f mesa.bm; check_okay
+rm -f mesa.swd; check_okay
+./xstella6_mesa.exe ; date; check_okay
+
+echo
+echo 'stella extras'
+cd ../../res; check_okay
+make; check_okay
+./stella_extras; check_okay
+echo
+
+

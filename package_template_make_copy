@@ -1,0 +1,31 @@
+#!/bin/bash
+
+mkdir pkg
+mkdir pkg/make
+mkdir pkg/public
+mkdir pkg/private
+mkdir pkg/test
+mkdir pkg/test/make
+mkdir pkg/test/src
+
+cd package_template
+cp build_and_test ../pkg
+cp clean ../pkg
+cp i1 ../pkg
+cp export ../pkg
+cp install ../pkg
+cp mk ../pkg
+cp make/makefile ../pkg/make
+cp private/*.f ../pkg/private
+cp public/*.f ../pkg/public
+cd test
+cp ck ../../pkg/test
+cp clean ../../pkg/test
+cp cleanup ../../pkg/test
+cp export ../../pkg/test
+cp mk ../../pkg/test
+cp rn ../../pkg/test
+cp make/makefile ../../pkg/test/make
+cp src/*.f ../../pkg/test/src
+
+echo 'done - rename "pkg" to be whatever you want.'

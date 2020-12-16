@@ -1,0 +1,38 @@
+&star_job
+      mesa_dir = '../../..'
+
+      show_log_description_at_start = .false.
+
+
+/ ! end of star_job namelist
+
+
+
+&controls
+
+      ! check for retries as part of test_suite
+      ! you can/should delete this for use outside of test_suite
+      max_number_retries = 80
+
+      max_model_number = 70
+
+      extra_terminal_output_file = 'log2' 
+      log_directory = 'LOGS2'
+
+
+      profile_interval = 50
+      history_interval = 1
+      terminal_interval = 1
+      write_header_frequency = 10
+      
+      varcontrol_target = 1d-3
+      
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+
+
+/ ! end of pgstar namelist

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+# check if can skip inlist_1.4M_ms_initial_model
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_1.4M_XC_0.5.mod 1.4M_XC_0.5.mod
+else
+   do_one inlist_1.4M_ms_initial_model_header 1.4M_XC_0.5.mod
+   cp 1.4M_XC_0.5.mod standard_1.4M_XC_0.5.mod
+fi
+
+do_one inlist_1.4M_ms_op_mono_header final.mod
+
+# test alt version of OP mono routines
+if [ -n "$MESA_RUN_OPTIONAL" ]; then
+    do_one inlist_1.4M_ms_op_mono_alt_header final.mod
+fi

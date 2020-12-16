@@ -1,0 +1,7 @@
+#!/bin/bash
+cp defaults_$1/* defaults/
+cp private_$1/* private/
+cp public_$1/* public/
+cp make/makefile_$1 make/makefile
+cp make/makefile_base_$1 make/makefile_base
+echo astero $1

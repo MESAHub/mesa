@@ -1,0 +1,92 @@
+! inlist_remove_envelope
+
+&star_job
+
+      mesa_dir = '../../..'
+     
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'has_he_core.mod'
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'bare_he_core.mod'
+      required_termination_code_string = 'max_age'
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d3
+
+
+      relax_initial_mass = .true. ! gradually change total mass
+      new_mass = 0.15
+      lg_max_abs_mdot = -7
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+
+/
+
+&kap
+      Zbase = 0.01d0
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+      
+      max_age = 1d8
+   
+      always_use_eps_grav_form_of_energy_eqn = .true.
+
+      warn_when_large_rel_run_E_err = 1d99
+      max_abs_rel_run_E_err = 1d99
+      
+      limit_for_rel_error_in_energy_conservation = 1d-5
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1000
+
+      initial_mass = 1.5
+      initial_z = 0.01d0
+
+      mesh_delta_coeff = 0.5
+
+      delta_lg_star_mass_limit = 5d-2 ! allow large change per step
+      
+      mixing_length_alpha = 1.89
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+      !max_age = 10d9
+      !max_years_for_timestep = 1d9
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+      ! top level controls
+
+         !pause = .true. 
+            ! if true, the code waits for user to enter a RETURN on the command line
+
+!Grid3_win_flag = .true.
+      
+/ ! end of pgstar namelist

@@ -1,0 +1,190 @@
+**********
+Test suite
+**********
+
+MESA includes a comprehensive test suite.
+
+Building upon test suite cases
+------------------------------
+
+Your first stop when setting up a new problem with MESA should be the
+MESA test suite. You will find a wide range of sample cases there.
+Looking at the test_suite inlists is a quick way to familiarize yourself
+with the set of options relevant to your problem. You may want to copy
+an inlist from the test suite to one of your working directories to use
+as a starting point for a project of your own.
+
+Each test suite problem lives in a subdirectory of
+
+::
+
+   $MESA_DIR/star/test_suite
+
+and you can find (slightly out-of-date, but still useful) descriptions
+of some of the test problems in the ``docs/`` sub-directory of each
+test_suite case.
+
+For example, take a look at the "high mass" test case. It starts by
+creating a pre-main-sequence model of 100 Msun with Z=0.02, and then it
+"relaxes" Z down to 1e-5 and the mass up to 110 Msun before starting the
+evolution. It will take under 200 steps (and a few minutes) to reach a
+central X of 0.5. To try it yourself,
+
+::
+
+   cd star/test_suite/high_mass
+   ./mk
+   ./rn
+
+You can do the same with any of the test_suite cases.
+
+If you want to base your work off of a test_suite case, you should make
+a copy the directory and then edit this copy.
+
+::
+
+   cp -r $MESA_DIR/star/test_suite/high_mass my_high_mass
+
+The test_suite examples require a few tweaks in order to be used
+"outside" the of the test_suite directory. First, you need to edit
+make/makefile and delete the line
+
+::
+
+   MESA_DIR = ../../../..
+
+Then, edit the inlist files and delete the line
+
+::
+
+   mesa_dir = '../../..'
+
+Then edit the ``rn`` script and delete the line
+
+::
+
+   MESA_DIR=../../..
+
+These changes ensure that you are using the copy of MESA specified by
+the ``$MESA_DIR`` environment variable.
+
+You might also need to adjust filenames of any initial models or other
+inlists, if they are specified by a relative path.  (You can simply
+change these to be an absolute path.)
+
+The test_suite inlists specify rather strict limits on the number of
+steps (by setting ``max_model_number``) and/or retries (by setting
+``max_number_retries``). You likely want to delete these limits.
+
+The MESA test_suite problems also have non-standard run_star_extras,
+including routines that check the runtime of the example. If these annoy
+you, they can be pruned by hand.
+
+Tools such as Bill Wolf's
+`mesa-cli <http://wmwolf.github.io/mesa_cli/>`__ can automate some of
+these steps.
+
+
+Star tests
+----------
+
+:ref:`c13_pocket`
+^^^^^^^^^^^^^^^^^
+
+This test evolves a 2.0 |Msun| star through one thermal pulse on the
+asymptotic giant branch (AGB) and illustrates third dredge up and the
+formation of a :math:`^{13}{\rm C}` pocket.
+
+      
+:ref:`conductive_flame`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case models a conductively-propagated deflagration wave
+("flame") in a high-density, degenerate carbon-oxygen mixture.  It
+also provides an example for use of the ``other_build_initial_model``
+and ``other_surface_PT`` hooks.
+
+
+:ref:`hb_2M`
+^^^^^^^^^^^^
+
+This test case shows a 2 |Msun| stellar model evolving
+on the horizontal branch (HB) through core helium burning.
+
+:ref:`make_co_wd`
+^^^^^^^^^^^^^^^^^
+
+This test case produces a 0.6 |Msun| white dwarf with a carbon-oxygen
+dominated core and a stratified atmosphere dominated by hydrogen at
+its surface. The final model produced by this test case also serves as
+the starting model for :ref:`wd_diffusion` and :ref:`wd_cool_0.6M`.
+
+:ref:`ppisn`
+^^^^^^^^^^^^
+
+This test case shows an example of a star undergoing a pulsational
+pair-instability supernova. The model starts from a massive helium
+star, and includes switches from hydrostatic to hydrodynamic models,
+as well as the removal of ejected layers.
+
+:ref:`R_CrB_star`
+^^^^^^^^^^^^^^^^^
+
+This test case creates and evolves a simple model of an R Corona
+Borealis star and provides an example of how to use AESOPUS opacity
+tables in MESA.
+
+:ref:`T_tau_gradr`
+^^^^^^^^^^^^^^^^^^
+
+This test checks the implementation of the control
+``use_T_tau_gradr_factor``, which modifies the radiative gradient so
+that regions of low optical depth have a temperature that follows the
+:math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
+
+:ref:`wd_acc_small_dm`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case models an accreting CO white dwarf (WD) and checks that
+the composition of the accreted material is being correctly tracked.
+
+:ref:`wd_aic`
+^^^^^^^^^^^^^
+
+This test case shows an accreting ONeMg white dwarf (WD) evolving
+towards accretion induced collapse (AIC).  It also illustrates use of
+the special weak rate implementation described in Section 8 of |MESA
+III|.
+   
+
+Binary tests
+------------
+
+
+Astero tests
+------------
+
+astero_adipls
+^^^^^^^^^^^^^
+
+Demonstrates how to call ADIPLS using the ``astero`` module.
+
+astero_gyre
+^^^^^^^^^^^
+
+Demonstrates how to call GYRE using the ``astero`` module.  Note that
+GYRE can also be called directly, without using the ``astero`` module.
+See the ``gyre_in_mesa_*`` test cases in ``star``'s test suite.
+
+:ref:`example_astero`
+^^^^^^^^^^^^^^^^^^^^^
+
+An example optimisation run of the ``astero`` module, based on the CoRoT
+target HD 49385.  This is the usual starting point if you want to
+optimise model parameters using the ``astero`` module.
+
+surface_effects
+^^^^^^^^^^^^^^^
+
+Tests the implementation of the various surface effect corrections
+available in MESA.

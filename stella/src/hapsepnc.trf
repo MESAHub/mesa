@@ -1,0 +1,136 @@
+-- log interpolation in Ron Eastman's tables
+-- only two sets of tables are in the RAM for
+-- two values of dvdr (given by time)
+-- im == the number of mixture 
+-- km == the number of mass zone must be defined prior to 
+-- every call of Happa
+Subroutine Happa;
+Implicit real*8 (A-H,O-Z);
+_INCLUDE snrad;
+ _Include abo; -- needed for print nstep
+_Include opacity;
+--Parameter(DUSTK=1.d1,TpDust=0.032d0,Cneutr=0.020D0);
+Parameter(DUSTK=1.d-03,TpDust=0.012d0,Cneutr=0.020D0);
+Integer i,j;
+Real*8 xx,yy,Fix1,Fix2,Tab00,Tab01,Tab10,Tab11;
+Dimension Fixtab(2), Fixtsc(2);
+
+----------------------------------------------------------
+Fun(z,tabz1,tabz2,fun1,fun2)=fun1 - (fun1 - fun2)*((z-tabz1)/
+                         (tabz2-tabz1));
+----------------------------------------------------------
+
+ xx=Log(Pl*Urho); -- now natural logs!
+ yy=Log(Tp*Utp);
+ xx=max(xx,RhoTab(1));
+ xx=min(xx,RhoTab(@Ntab));
+ yy=max(yy,TpTab(1));
+ yy=min(yy,TpTab(@Ntab));
+ im=(kmhap-1)/@skip+1; -- bug, correct:
+ im=min(im,mzon/@skip); -- change to e.g. Mzon which was used for Vladsf
+-- @wterm ' kmhap=',kmhap,'   im=',im;
+<*node: find i,j for the xx,yy *>;
+_Do L=1,NFREQ;
+     <*band: interpolate hptabab and hptabsc and find hbab and hbal *>;
+--     hbab=hbab+(hbal-hbab)*Ycomp; -- approximate account of Comptonization
+--     hbab=hbab+hbal*Ycomp; -- approximate account of Comptonization
+--     HAPPAL(L)=hbab+hbsc;
+     if (hbal<0.d0 .or. hbab<0.d0 .or. hbal >1.d50 .or. hbab > 1.d50
+--       .or. (nstep >4090 & nstep <=4095 & kmhap==199)
+               ) then;
+        write(40,'(2(a,i4),1p,4(a,e12.4))') 
+               ' kmhap=',kmhap,' L=',L,'  hbal=',hbal,'  hbab=',hbab,
+               '  Tp=',Tp,' pl=',pl;
+        write(40,*) ' l j i im iis ',  l, j, i, im, iis;
+        write(40,*) ' tabs: ', tab00, tab01, tab10, tab11;
+     --   stop ' Bad happa !!!';
+     endif; 
+     HAPPAL(L)=hbal; -- for ronfsep hbsc... files keep total extintion
+     If (Tp<TpDust) Happal(L)=Happal(L)+DustK*(TpDust-Tp)**2*(UR*Urho);
+     If ( SCAT ) Then;
+       HAPABS(L)=hbab;
+       If (Tp<TpDust) Hapabs(L)=Hapabs(L)+DustK*(TpDust-Tp)**2*(UR*Urho);
+     Else;
+       HAPABS(L)=HAPPAL(L);
+     Endif;
+_Od;
+
+/*
+20:format(f12.3, 2(1x,1pe12.5));
+--       if(nstep >899 & nstep <=901 & kmhap>320)then;
+       if(mod(nstep,50)==0 
+          & (mod(kmhap,100)==0 .or. kmhap>320))then;
+         write(40,*)' test happa for step=',nstep,' zone=',kmhap;
+         write(*,*)' test happa for step=',nstep,' zone=',kmhap;
+         do nf = 1, nfreq;
+            wavet=CCL/FREQMN(nf);
+            write(40,20) wavet, pl*Hapabs(nf)/UR, 
+                   pl*(Happal(nf)-Hapabs(nf))/UR;
+  -- happa==(chi/rho)*UR*Urho => chi= Pl*happa/UR
+         end do;
+       end if; 
+*/
+Return; 
+End;
+%_band:
+ _select
+  _ abs(Knadap)==4 ! abs(Knadap)==5 [ <*twos:  *>]
+  _ abs(Knadap)==6                  [ <*ones:  *>]
+  _other [@wterm 'Use another routine for Happa!'; stop 64]
+_end;
+%_band_twos:
+
+_do iis=1,2;
+  Tab00=hptabab(l,j,i,im,iis);
+  Tab01=hptabab(l,j,i+1,im,iis);
+  Tab10=hptabab(l,j+1,i,im,iis);
+  Tab11=hptabab(l,j+1,i+1,im,iis);
+--  @wterm ' l j i im iis ',  l, j, i, im, iis;
+--  @wterm ' tabs: ', tab00, tab01, tab10, tab11;
+  Fix1=Fun(xx,RhoTab(i),RhoTab(i+1),Tab00,Tab01); -- given rho
+  Fix2=Fun(xx,RhoTab(i),RhoTab(i+1),Tab10,Tab11);
+  Fixtab(iis)=Fun(yy,TpTab(j),TpTab(j+1),Fix1,Fix2); -- given Tp
+--
+  Tab00=hptabsc(l,j,i,im,iis);
+  Tab01=hptabsc(l,j,i+1,im,iis);
+  Tab10=hptabsc(l,j+1,i,im,iis);
+  Tab11=hptabsc(l,j+1,i+1,im,iis);
+  Fix1=Fun(xx,RhoTab(i),RhoTab(i+1),Tab00,Tab01);
+  Fix2=Fun(xx,RhoTab(i),RhoTab(i+1),Tab10,Tab11);
+  Fixtsc(iis)=Fun(yy,TpTab(j),TpTab(j+1),Fix1,Fix2); -- given Tp
+_od;
+  hbab=EXP( Fun(tdlog,thaplog1,thaplog2,Fixtab(1),Fixtab(2)) ); 
+                                                   -- given time
+  hbal=EXP( Fun(tdlog,thaplog1,thaplog2,Fixtsc(1),Fixtsc(2)) );
+--  @wterm ' time ', tdlog, thaplog1, thaplog2;
+%_band_ones:
+   iis=1;
+  Tab00=hptabab(l,j,i,im,iis);
+  Tab01=hptabab(l,j,i+1,im,iis);
+  Tab10=hptabab(l,j+1,i,im,iis);
+  Tab11=hptabab(l,j+1,i+1,im,iis);
+--  @wterm ' l j i im iis ',  l, j, i, im, iis;
+--  @wterm ' tabs: ', tab00, tab01, tab10, tab11;
+  Fix1=Fun(xx,RhoTab(i),RhoTab(i+1),Tab00,Tab01); -- given rho
+  Fix2=Fun(xx,RhoTab(i),RhoTab(i+1),Tab10,Tab11);
+  Fixtab(iis)=Fun(yy,TpTab(j),TpTab(j+1),Fix1,Fix2); -- given Tp
+--
+  Tab00=hptabsc(l,j,i,im,iis);
+  Tab01=hptabsc(l,j,i+1,im,iis);
+  Tab10=hptabsc(l,j+1,i,im,iis);
+  Tab11=hptabsc(l,j+1,i+1,im,iis);
+  Fix1=Fun(xx,RhoTab(i),RhoTab(i+1),Tab00,Tab01);
+  Fix2=Fun(xx,RhoTab(i),RhoTab(i+1),Tab10,Tab11);
+  Fixtsc(iis)=Fun(yy,TpTab(j),TpTab(j+1),Fix1,Fix2); -- given Tp
+  hbab=EXP(Fixtab(iis));
+  hbal=EXP(Fixtsc(iis));
+%_node:
+--write(9,*)'Rhotab', Rhotab;
+--write(9,*)'Tptab', Tptab;
+i=INT( (xx-RhoTab(1))/(RhoTab(2)-RhoTab(1)) ) +1;
+i=Max0(1,i);
+i=Min0(@Ntab-1,i);
+j=INT( (yy-TpTab(1))/(TpTab(2)-TpTab(1)) ) +1;
+j=Max0(1,j);
+j=Min0(@Ntab-1,j);
+-- write(9,*)'happ', xx,yy,i,j;

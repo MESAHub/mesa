@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Copy file(s) if newer than the destination
+
+# Define syntax
+
+SYNTAX='Syntax: cp_if_newer [-v] source_file [source_file...] dest_file|dest_dir'
+
+# Parse options
+
+CP_OPTS=''
+
+while getopts "v" opt; do
+    case $opt in
+        v)
+	    CP_OPTS="${CP_OPTS} -v"
+	    ;;
+        \?)
+	    echo $SYNTAX
+	    exit 1
+     esac
+done
+
+shift $((OPTIND -1))
+
+# Perform the copy
+
+if [[ $# -eq 1 ]]; then
+
+    echo $SYNTAX
+    exit 1
+
+elif [[ $# -eq 2 ]]; then
+
+    src=$1
+    dst=$2
+
+    if [[ ! -f $src ]]; then
+	echo $SYNTAX
+	exit 1
+    fi
+
+    if [[ -d $dst ]]; then
+        targ=$dst/${src##*/}
+    else
+        targ=$dst
+    fi
+
+    if [[ $src -nt $targ || ! -f $targ ]]; then
+        cp ${CP_OPTS} $src $targ
+    fi
+
+else
+
+    srcs=${@:1:$#-1}
+    dst=${@: -1}
+
+    if [[ ! -d $dst ]]; then
+	echo $SYNTAX
+	exit 1
+    fi
+
+    for src in $srcs; do
+
+	if [[ ! -f $src ]]; then
+	    echo $SYNTAX
+	    exit 1
+	fi
+
+    done
+
+    for src in $srcs; do
+
+        targ=$dst/${src##*/}
+
+	if [[ $src -nt $targ || ! -f $targ ]]; then
+            cp ${CP_OPTS} $src $targ
+	fi
+
+    done
+
+fi

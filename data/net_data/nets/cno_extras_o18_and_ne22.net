@@ -1,0 +1,8 @@
+      
+         include 'basic.net'
+      
+         include 'add_cno_extras'
+      
+         include 'add_o18_and_ne22'
+         
+         remove_reaction(rn14ag_to_o18)   ! n14(a,g)f18(e+nu)o18 -- covered by hot_cno

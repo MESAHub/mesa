@@ -1,0 +1,12 @@
+! this is an example of a weak rates list file for use with mesa/rates
+
+! pairs of rate name and rate file
+
+! the expected file format is HDF5 with the following datasets
+!
+! T9s            Dataset {N}         Temperature (T(K)/10^9)
+! lYeRhos        Dataset {M}         log10 of the electron fraction times the density (g*cm^-3)
+!
+! lcapture       Dataset {N, M}      log10 of electron or positron capture rate (s^-1)
+! ldecay         Dataset {N, M}      log10 of positron or electron emission rate (s^-1)
+! lneutrino      Dataset {N, M}      log10 of the neutrino energy loss rate (MeV * s^-1)

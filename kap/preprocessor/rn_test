@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# 1st arg: inlist file name
+# 2nd arg: whichz
+# 3rd arg: whichx (-1 means all)
+
+ ./ckap 'inlist_lowT_fa05_a09_aFe_p3' 0.02 0.95
+ if [ $? -ne 0 ]
+ then
+	 exit 1
+ fi
+ echo "okay"

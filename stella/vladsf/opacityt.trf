@@ -1,0 +1,367 @@
+--_outcom;
+ -- This is a front end routine for computing absorptive opacity
+ -- and scattering opacity when dvdr = velocity gradient =1/ts (in inverse seconds)
+ -- is for any ts, dimensionless expansion parameter s=kappa_continuum*rho*c*ts
+
+   subroutine opacity(rho, temp, abund, nfreqOpac, freq, freqmn,
+            dvdr, linedatafile, rdlndump, mkshortlist, longlist,
+            taumin, xsecdatadir, opac, scatop, eden);
+        use kinds,         only: dp;
+        use rad_photo_cross_section,       only: photoCross;
+
+       implicit real*8 (a-h, o-z);
+--  _include opacity.inc; -- contains dumfreq etc - conflict with freq etc in arguments
+ -- Calling parameters:
+ -- <input>
+ --     rho = gas density in g/cc.
+ --     temp = temperature.
+ --     abund(p_Nelements) = mass fractions through z=99.
+ --     nfreqOpac = number of frequency grid points.
+ --     freq(nfreqOpac+1) = frequency grid (freq(nf+1)>freq(nf)).
+ --     freqmn(nfreqOpac) = mean frequency grid (freqmn(nf+1)>freqmn(nf)).
+ --     dvdr = velocity gradient (in inverse seconds).
+ --     linedatafile = name of file holding linelist.
+ --     rdlndump = logical flag which should be set to true if linedatafile
+ --      is a binary file.
+ --     mkshortlist = logical flag, set to true if you want routine
+ --      lineexpop to compute a short list of lines.
+ --     longlist = name of file to containing long list of lines.
+ --     taumin = minimum Sobolev optical depth a line must have to
+ --      be included in the shortlist.
+ --     xsecdatadir = path to directory which contains the Hartree-Fock-Dirac
+ --      photoionization data.
+ -- <output>
+ --     opac(nfreqOpac) = array used to store computed absorptive opacity.
+ --     scatop(nfreqOpac) = array used to store computed scattering opacity.
+ --     eden = computed electron density.
+
+       integer, parameter   :: p_Nelements = 99;
+       real*8, parameter    :: p_x_i_flo = 1d-17;
+       integer, parameter   :: p_jmax = 6;
+
+       integer nfreqOpac;
+       character*(*) linedatafile, longlist, xsecdatadir;
+       logical rdlndump, mkshortlist;
+       real*8 rho, temp, abund(p_Nelements), freq(nfreqOpac+1), freqmn(nfreqOpac), taumin;
+       real*8 opac(nfreqOpac), scatop(nfreqOpac);
+       real*8 iondenz(p_jmax,p_Nelements), iondenz_part(p_jmax,p_Nelements);
+       real*8 iondenzHminus;
+       integer ionstg1(p_Nelements);
+       real*8 frac(0:31), part(0:31), nucden;
+       real tm1,tm2;
+
+       --  pointer (ptrexpnu, expnu);
+       real*8 expnu(nfreqOpac);
+       --  pointer (ptrplnkfnc, plnkfnc);
+       real*8 plnkfnc(nfreqOpac);
+       --  pointer (ptrwave, wave);
+--       real*8 wave(nfreqOpac+1);
+       --  pointer (ptrhfreq3c2, hfreq3c2);
+--       real*8 hfreq3c2(nfreqOpac);
+       --  pointer (ptrdlnfreq, dlnfreq);
+--       real*8 dlnfreq(nfreqOpac);
+       --  pointer (ptrfreqm3, freqm3);
+--       real*8 freqm3(nfreqOpac);
+       --  pointer (ptrsigma, sigma);
+       real(kind=dp), dimension(nfreqOpac) ::  sigma;
+
+       parameter(maxfreqdim=5000);
+       real*8 wave(maxfreqdim+1);
+       real*8 hfreq3c2(maxfreqdim);
+       real*8 dlnfreq(maxfreqdim);
+       real*8 freqm3(maxfreqdim);
+
+
+       --  pointer (ptrgff, gff);
+       real*8 gff(nfreqOpac*30);
+       _include zone; -- for Az,Zn definitions in fundrad;
+       _include fundrad;
+
+
+       save ptrplnkfnc, ptrexpnu, ptrwave, ptrhfreq3c2;
+       save ptrdlnfreq, ptrgff, ptrfreqm3, ptrsigma;
+       save init, lopinit;
+       save dlnfreq, wave, hfreq3c2, freqm3;
+
+       parameter(twopi = 2.d0*pi, fourpi=2.d0*pi);
+       parameter (epsT=1.d-3);
+--  Let us transform all Ron's data to our parameters for consistency of fundamental constants
+--       data pi/3.141592653589793d+00/, fourpi/12.5637061d+00/;
+--       data bc/1.380626d-16/, h/6.626205d-27/, hev/4.1357d-15/;
+       parameter(c=Cs, h=twopi*hPlanc, evtoerg=ERGEV, bc=Boltzk,
+                 elecxsec=CTOMP/Avogar, a=CARAD, stefbltz=CSIGM);
+--       data c/2.997925d+10/, elecxsec/6.6524d-25/;
+--       data evtoerg/1.6022d-12/, a/7.56464d-15/;
+--       data stefbltz/5.66956d-05/;
+       data hmass/1.67352d-24/;
+       parameter(esu=echarg, emass=AMelec);
+--       data esu/4.80298d-10/, emass/9.1091d-28/;
+-- Dodelatj!:
+       data srpi/1.772453851d+00/, bcev/8.617064d-05/;
+
+       data init/1/, ffop0/3.6914403278312d+08/,  mode/2/;
+       data rydnu/3.2880513d+15/, n_hyd_max/9/, lopinit/0/;
+ -- - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+--       if (init .eq. 1) then;
+ -- Get space for holding auxiliary frequency grid quantities and
+ -- compute them.
+       --call vtime(tm1);
+/*          call mzalloc('ptrexpnu ', ptrexpnu, nfreqOpac * 8 );
+          call mzalloc('ptrplnkfnc ', ptrplnkfnc, nfreqOpac * 8 );
+          call mzalloc('ptrwave ', ptrwave, nfreqOpac * 8 );
+          call mzalloc('ptrhfreq3c2 ', ptrhfreq3c2, nfreqOpac * 8 );
+          call mzalloc('ptrdlnfreq ', ptrdlnfreq, nfreqOpac * 8 );
+          call mzalloc('ptrfreqm3 ', ptrfreqm3, nfreqOpac * 8 );
+          call mzalloc('ptrsigma ', ptrsigma, nfreqOpac * 8 );
+          call mzalloc('ptrgff ', ptrgff, nfreqOpac * 8  * 30);
+          */
+
+ -- Compute rest of stuff needed for frequency grid.
+
+          do nf = 1, nfreqOpac;
+             wave(nf) = c * 1.d+08 / freq(nf);
+             hfreq3c2(nf) = h * freqmn(nf)**3 / c**2;
+             freqm3(nf) = freqmn(nf)**(-3);
+          end do;
+          wave(nfreqOpac+1) = c * 1.d+08 / freq(nfreqOpac+1);
+
+          do nf = 1, nfreqOpac;
+             dlnfreq(nf) = dlog(freq(nf+1) / freq(nf));
+          end do;
+
+          init = 0;
+       --call vtime(tm2);
+
+--       end if; -- init
+--       write(*,*)' opacity t init=',tm2-tm1;
+       --call vtime(tm1);
+
+
+       bct = bc * temp;
+
+ -- Compute Planck function.
+       do nf = 1, nfreqOpac;
+          expnu(nf) = dexp(-h * freqmn(nf) / bct);
+          plnkfnc(nf) = hfreq3c2(nf) * expnu(nf) / (1.d+00 - expnu(nf));
+       end do;
+
+ -- total nuclear density.
+       nucden = abund(1) * rho / hmass;
+
+       do iz = 2, p_Nelements;
+          nucden = nucden + abund(iz) * rho / (dble(2 * iz) * hmass);
+       end do;
+
+ -- Compute the electron density.
+       maxiter = 30;
+       acc = 1.d-03;
+       numelems = p_Nelements;
+       call edensol(rho, temp, abund, eden, maxiter, acc,
+            numelems);
+ 	if (eden .ne. eden) print *, ' Bardak:',abund;
+ -- ****************************************************
+--       write(0,3) rho, temp, eden / nucden;
+ 3:format(' rho: ', 1pe10.3, ' temp: ', 1pe10.3,
+            ' eden / nucden: ', 1pe10.3);
+ -- ****************************************************
+
+ -- the pressure
+       press = bct * (eden + nucden);
+
+ -- compute ionization fractions.
+
+       do iz = 1, p_Nelements;
+          if (iz .eq. 1) then;
+             totden = abund(iz) * rho / hmass;
+          else;
+             totden = abund(iz) * rho / (dble(2 * iz) * hmass);
+          end if;
+          if (abund(iz) .gt. 0.d+00) then;
+ -- Solve Saha-Boltzmann equation to compute the ionization.
+            call sahaeqn(1, .true., press, temp, eden, iz,
+               6, ionstg1(iz), frac, part);
+ --	 if(iz.lt.4)
+ --     +	 write(0,'(a,1p6g11.4)')' frac=',(frac(iqq),iqq=1,6)
+           if (iz .eq. 1) iondenzHminus=totden * frac(0);
+           do i = 1, min(6, iz+1);
+              iondenz(i,iz) = totden * frac(i);
+  	      iondenz_part(i,iz) = iondenz(i,iz) / part(i);
+           end do;
+ --	 if(iz.lt.4)
+--      	 write(*,'(a,1p6g11.4)')' iondenz=',(iondenz(iqq,iz),iqq=1,6);
+          else;
+           do i = 1, min(6, iz+1);
+              iondenz(i,iz) = 0.d0;
+  	      iondenz_part(i,iz) = 0.d0;
+           end do;
+          endif;
+--          write(*,*)' after sahaeqn: iz abund(iz) ionstg1(iz): ',iz, abund(iz), ionstg1(iz);
+       end do;
+
+ -- zero things.
+       do nf = 1, nfreqOpac;
+          scatop(nf) = eden * elecxsec;
+          opac(nf) = 0.d+00;
+       end do;
+       --call vtime(tm2);
+
+       --write(*,*)' t Saha=',tm2-tm1;
+
+
+ -- Compute the line scattering and absorptive opacity.
+
+      --call vtime(tm1);
+
+/*
+       do iiz=1,30;
+         write(*,*)' opacity: ionstg1 = ', iiz,ionstg1(iiz);
+       end do;
+       write(*,*)' Freq:s in opacity before call lineexpop: ';
+       do nf = 1, Nfreq;
+             write(*,*)' nf freq(nf : nf+1) dlnfreq: ',
+                        nf, freq(nf), freq(nf+1), dlnfreq(nf);
+       end do;
+ */
+
+       call lineexpop(linedatafile, rdlndump, nfreqOpac, nfreqOpac,
+            hfreq3c2, dlnfreq, wave, scatop, opac, dummy, plnkfnc,
+            lopinit, mkshortlist, taumin, longlist, 1, 1,
+            eden, temp, dvdr, iondenz_part, ionstg1, 1, 1);
+
+/*
+       write(*,*)' Freq:s in opacity after call lineexpop: ';
+       do nf = 1, Nfreq;
+             write(*,*)' nf freq(nf : nf+1) dlnfreq: ',
+                        nf, freq(nf), freq(nf+1), dlnfreq(nf);
+       end do;
+ */
+
+       --call vtime(tm2);
+
+       --write(*,*)' t lineexpop=',tm2-tm1;
+
+ -- Compute free-free opacity.
+       --call vtime(tm1);
+
+       call gffcalc(gff, temp, freqmn, nfreqOpac, nfreqOpac, 30);
+
+       ffgcoeff = ffop0 * eden / sqrt(temp);
+
+       do iz = 1, p_Nelements;
+          if (abund(iz) .gt. 0.d+00) then;
+             i1 = ionstg1(iz);
+ --            write(7,'(a,2i5)')' ionstg1 iz ',i1,iz
+
+             do k = 1, min(6, iz+1);
+ -- seb changed:
+                i = k + ionstg1(iz) - 1;
+                ieff = i-1;
+                z2 = dble(ieff)**2;
+                if (ieff .gt. 0) then;
+                  do nf = 1, nfreqOpac;
+                     opterm = ffgcoeff * freqm3(nf);
+                     ffop = iondenz(k,iz) * opterm * z2 *
+                            gff(nf+(ieff-1)*nfreqOpac);
+                     opac(nf) = opac(nf) + ffop *(1.d+00 -  expnu(nf));
+--               write(*,*)'OPACITY:   nf == ', nf,' opac(nf) = ',opac(nf);
+                  end do;
+ --                      <- end sum over freq, nf
+                endif;
+             end do;
+ --                <- sum over abundant ions.
+          end if;
+ --             <- if (abund(iz) .gt. 0)
+       end do;
+ --          <- sum over elements.
+       --call vtime(tm2);
+
+       --write(*,*)' t f-f=',tm2-tm1;
+
+ -- Compute bound-free opacity.
+
+     --call vtime(tm1);
+       do iz = 1, p_Nelements;
+          if (abund(iz) .gt. 0.d+00) then;
+             i1 = ionstg1(iz);
+
+             do k = 1, min(6, iz);
+                i = ionstg1(iz) + k - 1;
+                ne = iz - i + 1; -- Number of electrons
+
+                if (ne .gt. 1) then;
+                   call valence_nl(iz, i, n_princ, l_ang);
+                   if ((n_princ .lt. 4) .or. ((n_princ .eq. 4) .and.
+                        (l_ang .eq. 0))) then;
+                      call gshfdxsec(iz, ne, n_princ, l_ang, nfreqOpac, xsecdatadir,
+                           mode, freqmn, e_thresh, sigma);
+
+                      do nf = 1, nfreqOpac;
+                         opac(nf) = opac(nf) + iondenz_part(k,iz)
+                              * sigma(nf) * dble(2 * l_ang + 1) *
+                              (1.d+00 - expnu(nf)); -- expnu(nf) corrects
+                                                    -- opacity for induced emission
+                      end do;
+                   end if;
+ --                      <- if ((n_princ .lt. 4) .or. ((n_princ .eq. 4)...
+                else if (ne .eq. 1) then; -- Hydrogen-like ion
+                   if( iz == 1 ) then;
+                      <*hminusBF: add bf for Hminus*>
+                   endif;
+                   freq0 = rydnu * dble(iz**2);
+
+                   do n_princ = 1, n_hyd_max;
+                      freqn = rydnu * dble(iz**2) / dble(n_princ)**2;
+
+                      if (freqn .lt. freq(nfreqOpac)) then;
+                         expfac = 2.d+00 * dble(n_princ**2) *
+                              exp(-h * (freq0 - freqn) / bct);
+
+                         do nf = 1, nfreqOpac;
+                            phot = freqmn(nf) / freqn;
+                            if (phot .ge. 1.d+00) then;
+                               eps = sqrt(phot - 1.d+00) + 1.d-06;
+                               sig = 6.3d-18 * (exp(4.d0 * (1.d0 - atan(eps)/ eps))
+                                    / (1.d0 - exp(-twopi / eps))) /
+                                    (phot**4 * dble(iz**2));
+ --                              opac(nf) = opac(nf) + iondenz(i,iz) *
+ -- seb changed: iondenz(i,iz) to iondenz(k,iz)
+ -- !!! check also iondenz_part(i,iz) on this subj
+ --			if ( i .ne. k ) then
+ --				print *, ' in opacity.f  i,k',i,k
+ --				pause
+ --			endif
+                               opac(nf) = opac(nf) + iondenz_part(k,iz) *
+                                    expfac * sig * (1.d+00 - expnu(nf));
+                            end if;
+                         end do;
+ --                            <- nf
+                      end if;
+ --                         <- if (freqn .lt. freq(nfreqOpac))
+                   end do;
+ --                      <- n_princ
+                end if;
+ --                   <- if (ne .gt. 1)
+             end do;
+ --                <- ion stages, k.
+          end if;
+ --             <- if (abund(iz) .gt. 0)
+       end do;
+ --          <- iz.
+       --call vtime(tm2);
+
+       --write(*,*)' t b-f=',tm2-tm1;
+
+       return;
+
+       end;
+
+%_hminusBF:
+    do nf = 1, nfreqOpac;
+       Call hMinusAbsorp( temp, wave(nf)/1.d4, 4, sig );
+                       --  K,    micron,     bf,  cm**2
+--       write(*,*)' hMinusAbsorp-> sig=',sig, 'wave(nf)=',wave(nf),' frac(0)=', frac(0);
+       opac(nf) = opac(nf) + iondenzHminus * sig * (1.d+00 - expnu(nf));
+--       write(*,*)' hMinusAbsorp-> totden=',totden, 'opac(nf)=',opac(nf);
+    end do;
+

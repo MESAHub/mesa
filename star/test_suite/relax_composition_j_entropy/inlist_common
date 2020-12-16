@@ -1,0 +1,72 @@
+
+&kap
+    Zbase = 0.02
+    use_Type2_opacities = .true.
+/ ! end of kap namelist
+
+&controls
+
+    scale_max_correction = 0.1d0
+    ignore_species_in_max_correction = .true.
+
+    varcontrol_target = 1d-3
+
+  ! limit max_model_number as part of test_suite
+    max_model_number = 1000
+
+    use_ledoux_criterion = .true.
+    mixing_length_alpha = 1.5
+    alpha_semiconvection = 1d0
+    thermohaline_coeff = 1d0
+
+  ! rotational mixing coeffs
+    am_nu_ST_factor = 0.0
+    D_visc_factor = 0.0
+    am_nu_SH_factor = 0.0
+    D_ST_factor = 0.0
+    D_SH_factor = 0.0
+    D_GSF_factor = 1.0
+    D_ES_factor = 1.0
+    D_SSI_factor = 1.0
+    D_DSI_factor = 1.0
+    am_D_mix_factor = 0.0333d0
+    am_gradmu_factor = 0.1d0
+    num_cells_for_smooth_gradL_composition_term = 3
+
+    hot_wind_scheme = 'Dutch'
+    cool_wind_RGB_scheme = 'Dutch'
+    cool_wind_AGB_scheme = 'Dutch'
+    Dutch_wind_lowT_scheme = 'de Jager'
+    Dutch_scaling_factor = 1.0
+
+  ! controls for implicit wind
+    surf_avg_tau_min = 0
+    surf_avg_tau = 10
+    max_mdot_redo_cnt = 200
+    min_years_dt_for_redo_mdot = 0
+    surf_w_div_w_crit_limit = 0.99d0
+    surf_w_div_w_crit_tol = 0.06d0
+    rotational_mdot_boost_fac = 1d10
+    rotational_mdot_kh_fac = 1d10
+    mdot_revise_factor = 1.2
+    implicit_mdot_boost = 0.1
+
+    
+  ! we use step overshooting
+    overshoot_scheme(1) = 'step'
+    overshoot_zone_type(1) = 'burn_H'
+    overshoot_zone_loc(1) = 'core'
+    overshoot_bdy_loc(1) = 'top'
+    overshoot_f(1) = 0.345
+    overshoot_f0(1) = 0.01
+
+  ! stop when the center mass fraction of h1 drops below this limit
+    xa_central_lower_limit_species(1) = 'he4'
+    xa_central_lower_limit(1) = 1d-3
+
+/ ! end of controls namelist
+
+
+&pgstar
+      
+/ ! end of pgstar namelist

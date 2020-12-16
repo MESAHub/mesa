@@ -1,0 +1,40 @@
+!..common block communication
+      integer          nt,np
+      
+      parameter        (nt=63, np=99)  
+         ! nt is number of different temperatures; np is number of different pressures
+!     high res version from Lorne Nelson
+!      parameter        (nt=621, np=751)
+      
+      
+      integer          npoint(nt)
+
+!..primary thermodynamic variables
+      double precision tlog(nt),plog(np)
+      common /zinp/    tlog,plog,npoint
+
+!..for hydrogen
+      double precision compv1_h(4,nt,np),compv2_h(4,nt,np),
+     1                 denlog_h(4,nt,np),slog_h(4,nt,np),
+     2                 ulog_h(4,nt,np),dddt_tab_h(4,nt,np),
+     3                 dddp_tab_h(4,nt,np),dsdt_tab_h(4,nt,np),
+     4                 dsdp_tab_h(4,nt,np),dtdp_tab_h(4,nt,np)
+      common /sau_h/   compv1_h,compv2_h,
+     1                 denlog_h,slog_h,
+     2                 ulog_h,dddt_tab_h,
+     3                 dddp_tab_h,dsdt_tab_h,
+     4                 dsdp_tab_h,dtdp_tab_h
+
+
+!..for helium
+      double precision compv1_he(4,nt,np),compv2_he(4,nt,np),
+     1                 denlog_he(4,nt,np),slog_he(4,nt,np),
+     2                 ulog_he(4,nt,np),dddt_tab_he(4,nt,np),
+     3                 dddp_tab_he(4,nt,np),dsdt_tab_he(4,nt,np),
+     4                 dsdp_tab_he(4,nt,np),dtdp_tab_he(4,nt,np)
+      common /sau_he/  compv1_he,compv2_he,
+     1                 denlog_he,slog_he,
+     2                 ulog_he,dddt_tab_he,
+     3                 dddp_tab_he,dsdt_tab_he,
+     4                 dsdp_tab_he,dtdp_tab_he
+

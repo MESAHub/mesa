@@ -1,0 +1,21 @@
+      BlockDataazdat
+      Implicitreal*8(a-h,o-z)
+      PARAMETER(NVARS=3)
+      include '../obj/nfreq_and_mzone.inc'
+      PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)
+      Parameter(Is=5)
+      PARAMETER(NZ=3000000)
+      Parameter(Nstage=28,Natom=15)
+      PARAMETER(KOMAX=80)
+      LogicalLSYSTEM
+      Parameter(LSystem=.FALSE.)
+      IntegerZn(Natom),ZnCo(Natom+1)
+      DimensionAZ(Natom)
+      Common/AZZn/AZ,Zn,ZnCo
+      COMMON/SAMPLE/sampleZ(Natom)
+      DATAZn/1,2,6,7,8,10,11,12,13,14,16,18,20,26,28/
+      DATAZnCo/1,2,6,7,8,10,11,12,13,14,16,18,20,26,28,27/
+      DATAAZ/1.d0,4.d0,12.d0,14.d0,16.d0,20.d0,23.d0,24.d0,27.d0,28.d0,32.d0,40.d0,40.d0,56.d0,58.d0/
+      DATAsampleZ/7.0600E-01,2.7500E-01,3.0700E-03,1.1100E-03,9.6100E-03,1.7500E-03,3.3400E-05,6.6000E-04,5.8100E-05,7.1100E-04,4.18
+     *00E-04,9.2800E-05,6.2000E-05,1.3700E-03,7.3400d-05/
+      end

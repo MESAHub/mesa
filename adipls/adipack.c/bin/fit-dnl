@@ -1,0 +1,17 @@
+#!/bin/bash
+#  script to call  $aprgdir/adiajobs/fit-dnl.x
+if [ $# -eq 0 ]
+then
+	"$aprgdir"/adiajobs/fit-dnl.x
+elif [ $# -lt 4 ] 
+then
+	echo "Usage: fit-dnl -ltinput file-gt -ltorder 1-gt -ltorder 2-gt -ltref. order-gt"
+	echo "-ltinput file-gt: Use output file from set-dnl.d"
+	echo "-ltorder 1-gt, -ltorder 2-gt: range in order used in the fit"
+	echo "-ltref. order-gt: reference order used in the fit"
+	echo "Note: Additional output on files ttt.fit-dnl," \
+		    "ttt.fit-dnl1"
+	exit 1
+else 
+	echo -e "$1\n$2 $3 $4" | "$aprgdir"/adiajobs/fit-dnl.x
+fi

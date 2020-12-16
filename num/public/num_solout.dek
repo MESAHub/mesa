@@ -1,0 +1,21 @@
+      subroutine solout(nr, xold, x, n, y, rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, irtrn)
+         ! nr is the step number.
+         ! x is the current x value; xold is the previous x value.
+         ! y is the current y value.
+         ! irtrn negative means terminate integration.
+         ! rwork_y and iwork_y hold info for interp_y
+         ! note that these are not the same as the rwork and iwork arrays for the solver.
+         use const_def, only: dp
+         integer, intent(in) :: nr, n, lrpar, lipar
+         real(dp), intent(in) :: xold, x
+         real(dp), intent(inout) :: y(:) ! (n)
+         ! y can be modified if necessary to keep it in valid range of possible solutions.
+         real(dp), intent(inout), target :: rwork_y(*)
+         integer, intent(inout), target :: iwork_y(*)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         interface
+            include 'num_interp_y.dek'
+         end interface
+         integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+      end subroutine solout

@@ -1,0 +1,113 @@
+
+&star_job
+      show_log_description_at_start = .false.
+
+      mesa_dir = '../../..'
+
+    ! build our own model
+      create_initial_model = .true.
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'flame reached halfway point'
+
+    ! pick the net
+      change_net = .true.
+      !new_net_name = 'mesa_204.net'
+      new_net_name = 'approx21.net'
+
+    ! need extremely small initial timestep
+      set_initial_dt = .true.
+      seconds_for_initial_dt = 1e-15
+      initial_model_relax_num_steps = 0
+
+    ! display on-screen plots
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+/ !end of star_job namelist
+
+
+&eos
+   use_PC = .false.
+   !dbg = .true.
+   logT_lo = 8.30088
+   logT_hi = 8.30089
+/ !end of eos namelist
+
+
+
+
+&kap
+      Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+
+      warn_when_large_virial_thm_rel_err = 1d99 ! doesn't apply
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1800
+
+    ! use our own routine to build the model
+      use_other_build_initial_model = .true.
+      x_integer_ctrl(1) = 300 ! number of points
+      x_ctrl(1) = 10 ! mass (in g)
+      x_ctrl(2) = 1d10 ! initial density (cgs)
+      x_ctrl(3) = 2d8 ! initial temperature (cgs)
+
+      x_ctrl(4) = 0.0001 ! size (in q) of region to heat
+      x_ctrl(5) = 5d9 ! temperature of that region
+
+      x_ctrl(6) = 0.50 ! mass fraction c12
+      x_ctrl(7) = 0.50 ! mass fraction o16
+      x_ctrl(8) = 0.00 ! mass fraction ne20
+
+    ! set up constant pressure/temperature boundary conditions
+      use_other_surface_PT = .true.
+      use_atm_PT_at_center_of_surface_cell = .true.
+
+    ! there's no surface here; ignore change in lgL_phot & lgL_surf
+      delta_lgL_phot_limit_L_min = 1d99
+      delta_lgL_limit_L_min = 1d99
+
+    ! specify base metallicity for opacities
+    ! unimportant since radiative opacities are irrelevant
+
+    ! don't let convection operate
+      mlt_option = 'none'
+
+    ! meshing/timestep controls
+      varcontrol_target = 1d-3
+      T_function1_weight = 50
+      limit_for_rel_error_in_energy_conservation = 1d-4
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+      
+    ! allow for minuscule timesteps
+      min_timestep_limit = 1d-20
+
+    ! use the same meshing at high temperature
+      mesh_delta_coeff = 1.0
+      logT_max_for_standard_mesh_delta_coeff = 99d0
+      logT_min_for_highT_mesh_delta_coeff = 99d0
+
+    ! we know rates are truncated above 1e10 K, so turn off warnings
+      warn_rates_for_high_temp = .false.
+
+      terminal_show_age_units = 'seconds'
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

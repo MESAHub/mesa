@@ -1,0 +1,3 @@
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+./test_memory
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

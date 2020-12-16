@@ -1,0 +1,45 @@
+   
+      subroutine bcyclic_dble_decsolblk( &
+            iop,caller_id,nvar,nz,lblk,dblk,ublk,brhs,ipiv,lrd,rpar_decsol,lid,ipar_decsol,ierr)
+         use mtx_def, only: lapack
+         use bcyclic, only: bcyclic_factor, bcyclic_solve, bcyclic_deallocate
+         integer, intent(in) :: caller_id, nvar, nz, iop, lrd, lid
+         integer, pointer, intent(inout) :: ipiv(:) ! =(nvar,nz)
+         real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+         ! row(i) of mtx has lblk(:,:,i), dblk(:,:,i), ublk(:,:,i)
+         ! lblk(:,:,1) is not used; ublk(:,:,nz) is not used.
+         real(dp), pointer, intent(inout)  :: brhs(:) ! =(nvar,nz)     
+         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
+         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ierr
+         logical, parameter :: sparse = .false.
+         include 'formats.dek'
+         ierr = 0
+         if (iop == 0) then ! factor
+            call bcyclic_factor( &
+               lblk, dblk, ublk, ipiv, brhs, nvar, nz, sparse, &
+               lrd, rpar_decsol, lid, ipar_decsol, &
+               ierr)
+         else if (iop == 1) then ! solve
+            call bcyclic_solve( &
+               lblk, dblk, ublk, ipiv, brhs, nvar, nz, sparse, &
+               lrd, rpar_decsol, lid, ipar_decsol, &
+               ierr)
+         else if (iop == 2) then ! deallocate
+            call bcyclic_deallocate( &
+               lblk, dblk, ublk, ipiv, brhs, nvar, nz, sparse, &
+               lrd, rpar_decsol, lid, ipar_decsol, &
+               ierr)
+         else
+            ierr = -1
+         end if
+      end subroutine bcyclic_dble_decsolblk
+
+      
+      subroutine bcyclic_dble_work_sizes(nvar,nz,lrd,lid)
+         integer, intent(in) :: nvar,nz
+         integer, intent(out) :: lrd,lid
+         lid = 0
+         lrd = 0
+      end subroutine bcyclic_dble_work_sizes
+

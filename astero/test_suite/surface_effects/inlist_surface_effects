@@ -1,0 +1,77 @@
+&star_job  ! surface effects
+
+      show_log_description_at_start = .false.
+      
+      astero_just_call_my_extras_check_model = .true.
+
+      load_saved_model = .true.
+      saved_model_name = 's1.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      set_initial_dt = .true. ! .false.
+      years_for_initial_dt = 1d-6
+
+/ ! end of star_job namelist
+
+
+&eos
+   !use_FreeEOS = .false.   
+/ ! end of eos namelist
+
+&kap
+    kap_file_prefix = 'OP_gs98'
+    kap_lowT_prefix = 'lowT_fa05_gs98' ! for lower temperatures.
+    use_Type2_opacities = .false.
+/ ! end of kap namelist
+
+&controls
+
+      ! max_years_for_timestep = 1d7
+      ! mesh_delta_coeff = 0.3
+
+      calculate_Brunt_N2 = .true. 
+
+      ! atmosphere
+      atm_option = 'table'
+      atm_table = 'photosphere'
+
+      ! include_composition_in_eps_grav = .false.
+      ! include_composition_in_eps_grav = .true.
+
+      ! mesh adjustment
+      mesh_delta_coeff = 0.5
+      
+      use_dedt_form_of_energy_eqn = .true.
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+      
+      max_model_number = 0
+
+      ! controls for output
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 50
+      terminal_interval = 5
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+      ! top level controls
+
+         !pause = .true. 
+            ! if true, the code waits for user to enter a RETURN on the command line
+      
+
+
+/ ! end of pgstar namelist

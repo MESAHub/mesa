@@ -1,0 +1,3 @@
+#!/bin/bash
+
+../../star/test_suite/each_test_clean $1

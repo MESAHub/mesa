@@ -1,0 +1,9 @@
+&controls
+
+  ! HR
+  time_delta_coeff = 0.1
+  history_interval = 10
+
+  terminal_interval = 100
+
+/ ! end of controls namelist

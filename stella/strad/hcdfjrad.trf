@@ -1,0 +1,1174 @@
+--
+--     17 Oct 1992   only Jacobian here (GAISH, Moscow)
+--     30 Jan 1997   HapH as in hcdfnrad.trf - difjac.inc changed !
+--     30 Oct 2006   Ndebug etc. (Tokyo) 
+--
+--  _TRACE "If(KM>Nzon-2)WRITE(0,'(A,1P,E10.2)')' HL=',HL,"
+--  _TRACE "If(KM>Nzon-2)WRITE(0,'(A,I3,A,1P,E10.2)')
+  --                           ' Nzon=',Nzon,'     B01=',B01,"
+  Subroutine DIFJAC;
+  IMPLICIT REAL*8 (A-H,O-Z);
+    _include snrad;
+    _include difjac;
+    _include nstep;
+    <*var: COMMONS & VARS OF DIFJAC *>;
+    _Include black;
+    Theta(Z)=0.5D0*(SIGN(1.D0,Z)+1.D0);
+    <*Dere: fill in Jacobian *>;
+    <*J: control NZMOD or sparsing of Jacobian according to THRmat *>;
+  return;
+  end;
+%_var:O
+--        NFRUS - the number of used frequency bins.
+--        FJ=0.5*Integral(F    over DMU)
+--        FH=0.5*Integral(F*MU over DMU)
+--        FJ in radial zone "Km" & in frequency bin "L" lies in
+--               FSAVE(NVARS*NZON+(Km-Ncnd)+(NZON-Ncnd)*(L-1))
+--        FH in radial zone "Km" & in frequency bin "L" lies in
+--               FSAVE(NVARS*NZON+KRAD+(Km-Ncnd)+(NZON-Ncnd)*(L-1))
+--               where KRAD=(NZON-Ncnd)*NFRUS
+--
+   --  Nvars=3 - without convection, Nvars=4 - with convection
+   --  RVIS  - radiative viscosity
+   PARAMETER(ZERJ=3.14159265358D-75); -- PHYSICAL ZERO IN JACOBIAN
+--  Common/Lim/Klim(Mzon);
+   COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH; -- also in abo.inc
+   COMMON/JSAVE/ASAVE(NZ),IRS(NZ),ICS(NZ); -- not in any include
+--   COMMON/NSTEP/NSTEP,MAXER,IOUT,NOUT; -- now in nstep.inc
+   Dimension HapH1D(Nfreq),HapH2D(Nfreq),tau1D(Nfreq),tau2D(Nfreq),
+             tau1T(Nfreq),tau2T(Nfreq);
+
+   Dimension
+          A40(NFREQ),B40(NFREQ),A41(NFREQ),B41(NFREQ),B51(NFREQ),
+          A50(NFREQ),B50(NFREQ),C50(NFREQ),B42(NFREQ),B52(NFREQ),
+          B55(NFREQ),B44(NFREQ),A45(NFREQ),B45(NFREQ),B54(NFREQ),
+          A55(NFREQ),C55(NFREQ),B15(NFREQ),
+          C52(NFREQ),C54(NFREQ),A42(NFREQ),Z40(NFREQ),
+          B25(NFREQ),A25(NFREQ),
+      --  C24(NFREQ),
+          BC44(NFREQ),BA44(NFREQ);
+%_Dere:
+   <*R: derivatives
+        UR=d(Udot)/dR, UU=d(Udot)/dU, UTp=d(Udot)/dTp,
+        1st line of matrices A,B,C, save AJAC  *>;
+   <*T: TpR,TpU,TpTp,DTpDFJ save TpR,
+        2nd line of A,B,C, save AJAC *>
+   <*C* derivatives of UCdot , 3rd line of A,B,C, save AJAC *>
+   _IF Km>Ncnd _THEN
+     <*F: derivatives of FJdot - 4th,
+          of FHdot - 5th line of A,B,C, save AJAC
+          and correct Z20, A20, B20 & A22 if needed for Lthick *>
+   _FI;
+   KROW=2*NZON+Km;
+   IF(Z20 ^= ZERJ)THEN;
+     @AJAC=Z20;ICS(JAC)=Km-2;
+   ENDIF;
+   IF(A20 ^= ZERJ)THEN;
+     @AJAC=A20;ICS(JAC)=Km-1;
+   ENDIF;
+   @AJAC=B20;ICS(JAC)=Km;
+   IF(A22 ^= ZERJ)THEN;
+     @AJAC=A22;ICS(JAC)=Km-1+2*NZON;
+   ENDIF;
+%_Dere.R:O
+   <*A: FORM SMALL MATRICES ACcorDING THE RULE:
+        A - FOR VALUES OVER ZONE 0 (LEFT)
+        B - FOR VALUES OVER ZONE 1 (OWN )
+        C - FOR VALUES OVER ZONE 2 (RIGHT) WITH INDECES  i,j
+        i,j = 0 corresponding to radius
+        i,j = 1 corresponding to velocity
+        i,j = 2 corresponding to temperature
+        i,j = 3 corresponding to u-convective
+        i,j = 4 corresponding to FJ
+        i,j = 5 corresponding to FH     *>;
+    <*E: FORM PART OF GRAND MATRIX AJAC *>;
+%_Dere.RA:
+   B01=-HL;
+   HLRSDM=HL*RSODM;
+   B10=-HL*2.D0*((PQ1-PQ2)*RODM*R1+AM(Km)/RC1)
+       +HLRSDM*(PQPL1*(RCinv1*RS1)+PQPL2*(RCinv2*RS1)
+                -2.D0*(QU1*U0*(RS0/RC1)+QU2*U1*(R1/RS2)));
+   B11=1.D0-HLRSDM*(QU1+QU2*(RS1/RS2));
+   B12=-PT1*HLRSDM;
+   If (Km==1) Then;
+      A10=ZERJ; A11=ZERJ;
+   else;
+      A10=(2.D0*QU1*R0*U0/RS1-PQPL1*(RCinv1*RS0))*HLRSDM;
+      A11=QU1*(RS0/RS1)*HLRSDM;
+   endif;
+   _SELECT
+      _ Km==NZON
+         [C11=ZERJ;C12=ZERJ;C10=ZERJ;
+          FLUMD1=0.D0; FLUMT1=0.D0;
+       _DO L=1,NFRUS;
+          B15(L)=-HL*WEIGHT(L)*hapH1(L) *CIMP*HEDD(L);
+          FLUMD1=FLUMD1+@FJ1*WEIGHT(L)*hapL1D(L)*HEDD(L);
+          FLUMT1=FLUMT1+@FJ1*WEIGHT(L)*hapL1T(L)*HEDD(L);
+       _OD;
+        FLUMD1=CIMP*FLUMD1;
+        FLUMT1=CIMP*FLUMT1;
+        B10=B10+HL*(FLUMD1-FIMP)/delta*(RCinv1*RS1);
+        A10=A10-HL*(FLUMD1-FIMP)/delta*(RCinv1*RS0);
+        B12=B12-HL*(FLUMT1-FIMP)/(delta*Tp1)]
+      _ Km<=Ncnd
+         [C10=(2.D0*QU2*U1*(RS1/RC2)-PQPL2*(RCinv2*RS2))*HLRSDM;
+          C11=QU2*HLRSDM;
+          C12=PT2*HLRSDM ]
+      _OTHER
+         [C10=(2.D0*QU2*U1*(RS1/RC2)-PQPL2*(RCinv2*RS2))*HLRSDM;
+          C11=QU2*HLRSDM;
+          C12=PT2*HLRSDM;
+          FLUMD1=0.D0; FLUMD2=0.D0; FLUMT1=0.D0; FLUMT2=0.D0;
+       _DO L=1,NFRUS;
+          B15(L)=-HL*WEIGHT(L)*hapH1(L) *CIMP;
+         tau1D(L)=HapL1D(L)*(dm1+dm2)/rs1;
+         tau2D(L)=HapL2D(L)*(dm1+dm2)/rs1;
+         tau1T(L)=HapL1T(L)*(dm1+dm2)/rs1;
+         tau2T(L)=HapL2T(L)*(dm1+dm2)/rs1;
+          FLUMD1=FLUMD1+@FH1*WEIGHT(L)*
+                 (Tp1up4+Tp2up4)
+          /((Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+                  *exp(-tau1D(L)))
+           +(Tp1up4/hapL1D(L))*(1.d0+@hapHlim*(exp(-tau1D(L))+tau1D(L)-1.d0)
+               *exp(-tau2(L))) );
+          HapH1D(L)=(Tp1up4+Tp2up4)
+          /((Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+               *exp(-tau1D(L)))
+           +(Tp1up4/hapL1D(L))*(1.d0+@hapHlim*(exp(-tau1D(L))+tau1D(L)-1.d0) 
+                  *exp(-tau2(L))) );
+          HapH2D(L)=(Tp1up4+Tp2up4)
+          /((Tp2up4/hapL2D(L))*(1.d0+@hapHlim*(exp(-tau2D(L))+tau2D(L)-1.d0)
+               *exp(-tau1(L)))
+           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0) 
+                  *exp(-tau2D(L))) );
+          FLUMD2=FLUMD2+@FH1*WEIGHT(L)*HapH2D(L);
+          FLUMT1=FLUMT1+@FH1*WEIGHT(L)*
+                 ((Tp1*(1.D0+delta))**4+Tp2up4)
+          /((Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+            *exp(-tau1T(L)))
+           +((Tp1*(1.D0+delta))**4/hapL1T(L))
+               *(1.d0+@hapHlim*(exp(-tau1T(L))+tau1T(L)-1.d0)*exp(-tau2(L))) );
+          FLUMT2=FLUMT2+@FH1*WEIGHT(L)*
+                 (Tp1up4+(Tp2*(1.D0+delta))**4)
+          /(((Tp2*(1.D0+delta))**4/hapL2T(L))
+             *(1.d0+@hapHlim*(exp(-tau2T(L))+tau2T(L)-1.d0)*exp(-tau1(L)))
+           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
+                 *exp(-tau2T(L))) );
+       _OD;
+        FLUMD1=CIMP*FLUMD1;
+        FLUMD2=CIMP*FLUMD2;
+        FLUMT1=CIMP*FLUMT1;
+        FLUMT2=CIMP*FLUMT2;
+        B10=B10-HL*(-(FLUMD1-FIMP)/delta*(RCinv1*RS1)+
+                    (FLUMD2-FIMP)/delta*(RCinv2*RS1));
+        A10=A10+HL*(-(FLUMD1-FIMP)/delta*(RCinv1*RS0));
+        C10=C10-HL*(-(FLUMD2-FIMP)/delta*(RCinv2*RS2));
+        B12=B12-HL*(FLUMT1-FIMP)/(delta*Tp1);
+        C12=C12-HL*(FLUMT2-FIMP)/(delta*Tp2);
+        If(Km==1)then;
+          A10=ZERJ;  A11=ZERJ;
+        endif;
+        ]
+   _END;
+   <*RT: terms for R-T smoothing *>;
+    If(Km==1)then;
+       A10=ZERJ;  A11=ZERJ;
+    endif;
+%_Dere.RA_RT:O
+ If(km>Ncnd)then;
+   -- Qcold:
+   HLRODM=HL*RODM;
+   B10=B10-HLRODM*(
+         RTphi(Km)*U0/(R1-R0)**NRT*(
+           min(0.d0,UQ1) /(R1-R0)*NRT -2.d0*Theta(-UQ1)*U0*(RS0/RC1) )
+        +RTphi(Km+1)*U2/(R2-R1)**NRT*(
+          +min(0.d0,UQ2)/(R2-R1)*NRT -2.d0*Theta(-UQ2)*U1*(R1/RS2) )  );
+   A10=A10-HLRODM*(
+        -RTphi(Km)*U1/(R1-R0)**NRT*(
+           min(0.d0,UQ1) /(R1-R0)*NRT -2.d0*Theta(-UQ1)*U0*(R0/RS1) ) );
+   C10=C10-HLRODM*(
+         RTphi(Km+1)*U2/(R2-R1)**NRT*(
+          -min(0.d0,UQ2) /(R2-R1)*NRT +2.d0*Theta(-UQ2)*U1*(RS1/RC2) ) );
+   B11=B11-HLRODM*(
+          -RTphi(Km)/(R1-R0)**NRT*(  U0*Theta(-UQ1))
+          -RTphi(Km+1)/(R2-R1)**NRT*(U2*Theta(-UQ2)*(RS1/RS2)) );
+   A11=A11-HLRODM*(
+           RTphi(Km)/(R1-R0)**NRT*(-min(0.d0,UQ1)
+            +U0*Theta(-UQ1)*(RS0/RS1)) );
+   C11=C11-HLRODM*( RTphi(Km+1)/(R2-R1)**NRT*
+                    (min(0.d0,UQ2) + U2*Theta(-UQ2)) );
+ endif;
+%_Dere.RE:
+   KROW=Km;  -- r1
+   @AJAC=1.D0;ICS(JAC)=Km;
+   @AJAC=B01 ;ICS(JAC)=Km+NZON;
+   KROW=NZON+Km;  -- u1
+ If(abs(KNadap)==5)then;  
+      @AJAC=1.d0; ICS(JAC)=KROW; -- B11 for const. hom. vel.
+ else;
+-- IF(Z10 ^= ZERJ)THEN;
+--   @AJAC=Z10;ICS(JAC)=Km-2;
+-- ENDIF;
+   IF(A10 ^= ZERJ)THEN;
+     @AJAC=A10;ICS(JAC)=Km-1;
+   ENDIF;
+   @AJAC=B10;ICS(JAC)=Km;
+   IF(C10 ^= ZERJ)THEN;
+     @AJAC=C10;ICS(JAC)=Km+1;
+   ENDIF;
+   IF(A11 ^= ZERJ)THEN;
+     @AJAC=A11;ICS(JAC)=KROW-1;
+   ENDIF;
+   @AJAC=B11;ICS(JAC)=KROW;
+   IF(C11 ^= ZERJ)THEN;
+     @AJAC=C11;ICS(JAC)=KROW+1;
+   ENDIF;
+   @AJAC=B12;ICS(JAC)=2*NZON+Km;
+   IF(C12 ^= ZERJ)THEN;
+     @AJAC=C12;ICS(JAC)=2*NZON+Km+1;
+   ENDIF;
+   IF(Km>Ncnd) THEN; -- Include RADIATIVE DERIVATIVES
+     _DO L=1,NFRUS;
+        @AJAC=B15(L);
+        IF(Km^=NZON)THEN;
+           ICS(JAC)=Km+NVARS*NZON+(NZON-Ncnd)*(L-1+NFRUS)-Ncnd;
+        ELSE;
+           ICS(JAC)=Km+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+        ENDIF;
+     _OD;
+   ENDIF;
+ endif; 
+%_Dere.T:O
+   <*A: form small matrices A,B,C like %_Dere.RA plus Z for
+        values over zone -1 (left to the left) *>;
+   <*E: form part of grand matrix AJAC *>;
+%_Dere.TA:O
+-- TPRM1=0.D0; -- DTpDot/DR(-1)/R(-1)**2
+   <*A: FIND DTPDFJ, DTPDFH - DERIVATIVES OF TpDot OVER FLUXES *>;
+   RCMET0=CM0INV*CDMETI; RCMET1=CM1INV*CDMETI;
+   <*B: FIND NUMERICALLY TPPL=PL*DTpDot/DPL  *>;
+   IF(Km^=1) THEN;
+     TPU0=RS0*((TPTQ1+2.D0*Q1)*DMETIN);
+     <*C* CONVECTIVE FC0D0 = DFC0/DPL0*PL0  *>;
+     TPR0=TPPL*RCinv1*RS0+2.D0*R0*U0*((TPTQ1+2.D0*Q1)*DMETIN);
+     <*2* CONVECTIVE PART OF TPR0 *>;
+     IF(Km<=Ncnd)THEN;
+        TPT0=(4.D0*R0*(R0*Tp0)**3)*RCMET0
+              +(FLLF0*(4.D0/Tp0-CAPT0/CAP0)
+                -4.D0*FL0*Tp0**3/(Tp0up4+Tp1up4))*CDMETI;
+        TPRM1=-FLLF0*CAPPL0/CAP0*RCinv0*CDMETI;
+        <*1* CONVECTIVE PART OF TPRM1 *>;
+        TPR0=TPR0+4.D0*(Tp0*(R0*Tp0)**3
+             -Tp1*(R0*Tp1)**3)*RCMET0-TPRM1*RS0;
+        A20=-TPR0*HL; A22=-HL*TPT0;
+        IF(Km>2)THEN;
+          Z20=-HL*TPRM1*RSM1;
+        ELSE; -- Km==2
+          Z20=ZERJ;
+        ENDIF;
+     ELSE; -- Km>Ncnd
+        A20=-TPR0*HL; TPT0=0.D0; A22=ZERJ;
+        Z20=ZERJ; -- without  R-T or with Qcold  & Q hot
+     ENDIF;
+     A21=-HL*TPU0;
+   ELSE; -- Km==1
+     A21=ZERJ; A22=ZERJ; TPU0=0.D0;
+     Z20=ZERJ; A20=ZERJ;
+   ENDIF;
+   <*3* CONVECTIVE FC1D2 *>;
+   _SELECT
+     _ Km<Ncnd
+            [TPR2<*dTpDot/dR(2)/R(2)**2 *>=
+                           -FLRT1*CAPPL2/CAP2*RCinv2*CDMETI;
+             <*4* CONVECTIVE PART OF TPR2 *>;
+             TPR1=-TPPL*RCinv1*RS1
+                  -4.D0*((R1*(U1*(0.5D0*TPTQ1+Q1)
+                          +Q1*((RS0/RS1)*U0-U1)))*DMETIN
+                         +(Tp1*(R1*Tp1)**3-Tp2*(R1*Tp2)**3)*RCMET1)
+                  -TPR2*RS1;
+             <*S* CONVECTIVE PART OF TPR1 *>;
+             TPT2=(4.D0*R1*(R1*Tp2)**3)*RCMET1
+                   -(FLRT1*(4.D0/Tp2-CAPT2/CAP2)
+                     -4.D0*FL1*Tp2**3/(Tp1up4+Tp2up4))*CDMETI ]
+     _ Km==Ncnd & Km<Nzon
+            [TPR2 /*dTpDot/dR(2)/R(2)**2 */ =
+               --  -FL1*PL2*RCMET1*CAPPL2;
+                 -FLcor2/(CAP2*(DM1+DM2)+@TAULIM*RS1)*
+                  CAPPL2*(DM1+DM2)*RCinv2*CDMETI;
+             <*5* CONVECTIVE PART OF TPR2 *>;
+             DFLDRR = 4.D0*FL1/R1--+FLcor1/CAP1*CAPPL1*RCinv1*RS1
+                          -FLcor2/(CAP2*(DM1+DM2)+@TAULIM*RS1)*
+                                                  (2.D0*@TAULIM*R1);
+             TPR1=-TPPL*RCinv1*RS1
+                  -4.D0*(R1*(U1*(0.5D0*TPTQ1+Q1)
+                          +Q1*((RS0/RS1)*U0-U1)))*DMETIN
+                  -(DFLDRR-FLcor2/(CAP2*(DM1+DM2)+@TAULIM*RS1)*
+                         (CAPPL2*(DM1+DM2)*RCinv2*RS1))*CDMETI;
+             DFLDRR=DFLDRR+FLcor1/CAP1*CAPPL1*RCinv1*RS1;
+             <*T* CONVECTIVE PART OF TPR1 *>;
+--             write(*,'(a,i4,1p,5e12.4)')' km,Tp2,cap2,dm1,dm2',
+  --                                        km,Tp2,cap2,dm1,dm2;
+             --TPT2=FL1*DM2*CAPT2*RCMET1
+             TPT2=(4.D0*R1*(R1*Tp2)**3)*RCMET1 -- without SUMJ
+                  +(4.D0*FL1*Tp2**3/(Tp1up4+Tp2up4)-4.D0*FLcor2/Tp2
+                   +FLcor2/(CAP2*(DM1+DM2)+@TAULIM*RS1)*CAPT2*(DM1+DM2))
+                   *CDMETI ]
+     _OTHER  [ TPR2=0.D0; TPT2=0.D0;
+               TPR1=-TPPL*RCinv1*RS1
+                    -4.D0*(R1*(U1*(0.5D0*TPTQ1+Q1)
+                            +Q1*((RS0/RS1)*U0-U1)))*DMETIN ]
+   _END;
+   <*F: find numerically TPT1=dTpDot/dTp1 *>;
+-- TPD=Tp2*(1.D0+delta);  -- for convection
+   TPU1=-RS1*(TPTQ1+2.D0*Q1)*DMETIN;
+   B20=-TPR1*HL; B21=-HL*TPU1; B22=1.D0-HL*TPT1;
+   <*5* CONVECTIVE FC1T2, PART OF TPT2, MATRICES B23,A23 *>;
+   If(Km<=Ncnd) then;
+      C20=-(HL*TPR2)*RS2; C22=-HL*TPT2;
+   else;
+      C20=ZERJ;  -- without  R-T or for cold
+      C22=ZERJ;
+   endif;
+%_Dere.TAC:O
+     IF(FC0^=0.D0)THEN;  <*DFC0/DPL0*PL0*>
+       FC0D0=ALFCON/2.D0*((PRPL0+PP1)/(Tp1+Tp0)*
+             (Tp0-Tp1)/(PRPL0-PP1)-(GRA1+GRAPL0)/2.D0)*UC(Km-1)*
+             (CPPL0*Tp0*PL0*(1.D0+delta)+CP1*Tp1*PL1)/2.D0;
+       FC0D0=(FC0D0-FC0)/delta;
+     ELSE;
+       FC0D0=0.D0;
+     ENDIF;
+%_Dere.TA1:O
+     TPRM1=TPRM1+RS0*FC0D0*PL0/DM0*(DMETIN*CRAP);
+%_Dere.TA2:O
+     TPR0=TPR0+2.D0*R0*FC0*(DMETIN*CRAP);
+%_Dere.TA3:O
+       IF(Km<NZON & FC1^=0.D0) THEN;
+        FC1D2=<*DFC1/DPL2*PL2*>
+             ALFCON/2.D0*((PRPL2+PP1)/(Tp1+Tp2)*
+            (Tp1-Tp2)/(PP1-PRPL2)-(GRA1+GRAPL2)/2.D0)*UC(Km)*
+            (CPPL2*Tp2*PL2*(1.D0+delta)+CP1*Tp1*PL1)/2.D0;
+        FC1D2=(FC1D2-FC1)/delta;
+   ELSE;
+      FC1D2=0.D0;
+   ENDIF;
+%_Dere.TA4:O
+   TPR2=TPR2+RS1*FC1D2*PL2/DM2*(DMETIN*CRAP);
+%_Dere.TA5:O
+        IF(Km<NZON & FC1^=0.D0) THEN;
+           FC1T2=ALFCON/2.D0*((PRT2+PP1)/(TPD+Tp1)*
+                (TPD-Tp1)/(PRT2-PP1)-(GRAT2+GRA1)/2.D0)*UC(Km)*
+                (CP1*Tp1*PL1+CPT2*TPD*PL2)/2.D0;
+           FC1T2=(FC1T2-FC1)/(Tp2*delta);
+        ELSE;
+           FC1T2=0.D0;
+        ENDIF;
+       TPT2=TPT2-RS1*FC1T2*(DMETIN*CRAP);
+       IF(Km==NZON) THEN; B23=ZERJ;               <*  ????  *>
+       ELSE; B23=HL*RS1*CFC1*(DMETIN*CRAP); ENDIF;
+       IF (Km==1) THEN; A23=ZERJ;
+       ELSE; A23=-HL*RS0*CFC0*(DMETIN*CRAP);ENDIF;
+%_Dere.TAA:O
+    --  B24(L) - DTP/DFJ1,  C24(L) - DTP/DFJ2
+/*IF(Km==Ncnd) THEN;
+    _DO L=1,NFRUS;
+      C24(L)=-HL*CDMETI*(1.5D1/PI**4)*RS1**2*CM1INV*WEIGHT(L);
+    _OD;
+  ELSE */
+  IF(Km>Ncnd)THEN;
+   _DO L=1,NFRUS;
+     A25(L)=ZERJ;
+     If(LTHICK(L,Km)) Then;
+        B24(L)=ZERJ;
+        IF( Km > Ncnd+1 ) A25(L)=-HL*CKRAD*RS0*DMETIN*WEIGHT(L);
+        B25(L)=+HL*CKRAD*RS1*DMETIN*WEIGHT(L);
+     ELSE;
+        B24(L)=-HL*Theta(@FJ1)*CKRAD/ET1*HAAB1(L)*WEIGHT(L);
+        B25(L)=ZERJ;
+     ENDIF;
+   _OD;
+  ENDIF;
+%_Dere.TAB:O
+   PL=PL1*(1.D0+delta); Tp=Tp1;
+   PTDIST=PTPL1; ET11=ETPL1;
+   IF(Km>Ncnd)THEN;
+       _DO L=1,NFRUS;
+         hapL(L)=hapL1D(L); -- DIMENSIONLESS KAPPA
+         HAAB(L)=HAAB1D(L); -- DIMENSIONLESS KAPPA
+         hapH(L)=(Tp1up4+Tp2up4)/(
+          (Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+                  *exp(-tau1D(L)))
+           +(Tp1up4/hapL1D(L))*(1.d0+@hapHlim*(exp(-tau1D(L))+tau1D(L)-1.d0)
+                  *exp(-tau2(L)))
+                                   );
+                         -- hapH - DIMENSIONLESS KAPPA  FOR FH
+       _OD;
+   ENDIF;
+   <*A: CALCULATE DTPNEW *>;
+   _IF Km<=Ncnd _THEN
+       DTPNEW=DTPNEW+(FL0-FL1)*(CK1*DMETN1)   -- RADIATION
+       <*E*-(EX*XDOT)/ET *>
+   _ELSE
+       IF(Km==Ncnd+1 & Km>1)THEN;
+        --FLcore=FLcor1+((R0*Tp0)**4-RS0**2*SUMJ)*Tp1up4/
+          FLcore=FLcor1+((R0*Tp0)**4-(R0*Tp1)**4)*Tp1up4/
+          ((CAP1D*(DM0+DM1)+@TAULIM*RS0)*(Tp0up4+Tp1up4));
+          CAPcor=CAP1D;
+       ELSE;
+          FLcore=0.D0;
+       ENDIF;
+       call traneq;
+--       _CALL @DERAT;  --  DISTURB HEATRA
+       DTPNEW=DTPNEW+HEATRA/ET11
+   _FI;
+   TPPL=(DTPNEW-DTPOLD)/delta+CK2ET1*ENGPL1;
+   <*C* CONVECTIVE FLUXES FC1D, FC0D *>;
+   <*D* CONVECTIVE PART OF TPPL *>;
+   IF(Km<Ncnd) THEN;
+       TPPL=TPPL+(FLLF1-FLRT0)*CAPPL1/CAP1*CDMETI;
+   ELSEIF(Km==Ncnd)THEN;
+      -- TPPL=TPPL-FLRT0*CAPPL1/CAP1*CDMETI;
+       TPPL=TPPL+(FLcor1-FLRT0)*CAPPL1/CAP1*CDMETI;
+   ELSE; -- Km>Ncnd
+       _DO L=1,NFRUS; -- LOGARITHMIC DERIVATIVES OF FLUXES ON DENSITY
+          DFJDPL(L)=(DFJ(L)-@DFJ1)/delta;
+          DFHDPL(L)=(DFH(L)-@DFH1)/delta;
+/*
+          if(DFHDPL(L)==0.d0 .and. Km^=Nzon)then;
+            write(@term,*)' zero DFHDPL in Km,L=',Km,L;
+            write(@term,*)' DFHDPL,Tp=',DFHDPL(L),Tp;
+            write(@term,*)' PL,PL1=',PL,PL1;
+            write(@term,*)' hapH(L),hapH1(L)=',hapH(L),hapH1(L);
+          endif;
+*/
+       _OD;
+   ENDIF;
+%_Dere.TABA:O
+   TPTQ11=PTDIST+UU1*MIN(UU1,0.D0)*(AQ1*PL);
+   DMETN1=1.D0/(DM1*ET11);
+   DTPNEW=ENG1*(CK2/ET11)+ (RS0*U0-RS1*U1)*TPTQ11*DMETN1;
+   <*C* CONVECTIVE PART OF DTPNEW *>;
+%_Dere.TABAC:O
+   DTPNEW=DTPNEW+(RS0*FC0-RS1*FC1)*DMETN1; -- CONVECTION
+%_Dere.TABE:O
+   IF(NREG(Km)^=3)DTPNEW=DTPNEW-1.5D0*RGASA*YDOTN*Tp*
+                     UEI/(ET11*FSAVE(NEQS+Km)**2)
+%_Dere.TABC:O
+   IF(Km<NZON & FC1^=0.D0) THEN;
+      FC1D=ALFCON/2.D0*((PRPL1+PP2)/(Tp1+Tp2)*
+           (Tp2-Tp1)/(PP2-PRPL1)-(GRA2+GRAPL1)/2.D0)*UC(Km)*
+           (CPPL1*Tp1*PL+CP2*Tp2*PL2)/2.D0;
+      FC1D=(FC1D-FC1)/delta;
+   ELSE;
+      FC1D=0.D0;
+   ENDIF;
+   IF(Km>1 & FC0^=0.D0) THEN;
+      FC0D=ALFCON/2.D0*((PRPL1+PP0)/(Tp1+Tp0)*
+           (Tp0-Tp1)/(PP0-PRPL1)-(GRA0+GRAPL1)/2.D0)*UC(Km-1)*
+           (CPPL1*Tp1*PL+CP0*Tp0*PL0)/2.D0;
+      FC0D=(FC0D-FC0)/delta;
+   ELSE;
+      FC0D=0.D0;
+   ENDIF;
+%_Dere.TABD:O
+        TPPL=TPPL+(RS0*FC0D-RS1*FC1D)*(DMETIN*CRAP);
+%_Dere.TAF:O
+   PL=PL1; DTP=Tp1*delta; Tp=Tp1+DTP;
+   PTDIST=PTT1; ET11=ETT1;
+   IF(Km>Ncnd)THEN;
+       _DO L=1,NFRUS;
+         hapL(L)=hapL1T(L); -- DIMENSIONLESS KAPPA
+         HAAB(L)=HAAB1T(L); -- DIMENSIONLESS KAPPA
+         hapH(L)=(Tp**4+Tp2up4)/(
+          (Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+             *exp(-tau1T(L)))
+           +(Tp**4/hapL1T(L))*(1.d0+@hapHlim*(exp(-tau1T(L))+tau1T(L)-1.d0)
+             *exp(-tau2(L)))
+                                   );
+                         -- hapH - DIMENSIONLESS KAPPA  FOR FH
+       _OD;
+   ENDIF;
+   <*A: CALCULATE DTPNEW *>;
+   _IF Km<=Ncnd _THEN
+      DTPNEW=DTPNEW+(FL0-FL1)*(CK1*DMETN1)   -- RADIATION
+      <*E*-(EX*XDOT)/ET *>
+   _ELSE
+      IF(Km==Ncnd+1 & Km>1)THEN;
+          --FLcore=((R0*Tp0)**4-RS0**2*SUMJ)
+          FLcore=((R0*Tp0)**4-(R0*Tp)**4)
+          *(Tp0up4/(CAP0*(DM0+DM1))
+                   +Tp**4/((CAP1+CAPT1*DTP)*(DM0+DM1)+@TAULIM*RS0))
+                       /(Tp0up4+Tp**4);
+          CAPcor=CAP1T;
+      ELSE;
+          FLcore=0.D0;
+      ENDIF;
+      call traneq;
+--     _CALL @DERAT;  --  CALCULATE DTPNEW
+      DTPNEW=DTPNEW+HEATRA/ET11;
+   --      B42 - DFJ1/DTP1,  DERIVATIVES OF FLUXES ON TEMPERATURE
+   --      B52 - DFH1/DTP1
+      _DO L=1,NFRUS;
+        B42(L)=HL*(@DFJ1-DFJ(L))/DTP;
+        B52(L)=HL*(@DFH1-DFH(L))/DTP
+      _OD;
+   _FI;
+   TPT1=(DTPNEW-DTPOLD)/DTP+(CK2ET1)*ENGT1;
+   <*C* CONVECTIVE FLUXES FC1D, FC0D *>;
+   <*D* CONVECTIVE PART OF TPT1 *>;
+   IF(Km<Ncnd)THEN;
+      TPT1=TPT1+(
+            FLRT0*(4.D0/Tp1-CAPT1/CAP1)-4.D0*FL0*Tp1**3/(Tp0up4+Tp1up4)
+           -FLLF1*(4.D0/Tp1-CAPT1/CAP1)+4.D0*FL1*Tp1**3/(Tp1up4+Tp2up4)
+                     )*CDMETI
+           -4.D0*(R1*(R1*Tp1)**3*RCMET1+R0*(R0*Tp1)**3*RCMET0);
+   ELSEIF(Km==Ncnd)THEN;
+      DFLDTP=4.D0*R1*(R1*Tp1)**3*CM1INV
+             +(4.D0*FLcor1/Tp1-4.D0*FL1*Tp1**3/(Tp1up4+Tp2up4)-
+               FLcor1/CAP1*CAPT1);
+      TPT1=TPT1+(
+            FLRT0*(4.D0/Tp1-CAPT1/CAP1)-4.D0*FL0*Tp1**3/(Tp0up4+Tp1up4)
+           -DFLDTP)*CDMETI-4.D0*R0*(R0*Tp1)**3*RCMET0;
+   ENDIF;
+%_Dere.TAS:O
+   TPR1=TPR1-2.D0*R1*FC1*(DMETIN*CRAP);
+%_Dere.TAFA=_Dere.TABA:O
+%_Dere.TAFC=_Dere.TABC:O
+%_Dere.TAFD:O
+   TPT1=TPT1+(RS0*FC0D-RS1*FC1D)*(DMETIN*CRAP);
+%_Dere.TE:O
+  KROW=2*NZON+Km;
+   IF(Tp1 <= @Tp_CUT) THEN; -- cool envelope
+     If(Km<=Ncnd) then;
+       B21=0.D0; A21=0.D0; C20=0.D0;B22=1.D0;A22=0.D0;C22=0.D0;
+       A20=0.D0;B20=0.D0; Z20=ZERJ;
+     else; -- Km>Ncnd
+       A22=ZERJ; Z20=ZERJ; C20=ZERJ; C22=ZERJ;
+       B21=0.D0; A21=0.D0; B22=1.D0;
+       A20=0.D0;B20=0.D0;
+     endif;
+   ENDIF;
+   IF(C20 ^= ZERJ)THEN;
+     @AJAC=C20;ICS(JAC)=Km+1;
+   ENDIF;
+   IF(A21 ^= ZERJ)THEN;
+     @AJAC=A21;ICS(JAC)=NZON+Km-1;
+   ENDIF;
+   @AJAC=B21;ICS(JAC)=NZON+Km;
+   @AJAC=B22;ICS(JAC)=KROW;
+   IF(C22 ^= ZERJ)THEN;
+     @AJAC=C22;ICS(JAC)=Km+1+2*NZON;
+   ENDIF;
+  <*C* CONVECTIVE TERMS *>;
+/*IF(Km==Ncnd)THEN; -- Include DERIVATIVES OVER FJ2
+    _DO L=1,NFRUS;
+       @AJAC=C24(L);
+       ICS(JAC)=Km+1+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+    _OD;
+  ELSE */
+  IF(Km>Ncnd)THEN; -- Include DERIVATIVES OVER FJ1
+    _DO L=1,NFRUS;
+       IF( B24(L) ^= ZERJ ) THEN;
+         @AJAC=B24(L);
+         ICS(JAC)=Km+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+       ENDIF;
+       IF( B25(L) ^= ZERJ ) THEN;
+         @AJAC=B25(L);
+         ICS(JAC)=Km+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KRAD;
+       ENDIF;
+       IF( A25(L) ^= ZERJ ) THEN;
+         @AJAC=A25(L);
+         ICS(JAC)=Km+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KRAD-1;
+       ENDIF;
+    _OD;
+  ENDIF;
+%_Dere.TEC:O
+  @AJAC=B23;ICS(JAC)=Km+3*NZON;
+  @AJAC=A23;ICS(JAC)=Km-1+3*NZON;
+%_Dere.C:
+   <*A: FORM SMALL MATRICES FOR CONVECTION *>;
+   <*E: STORE AJAC ELEMENTS FOR UCONV *>;
+%_Dere.CA:
+   _IF Km<NZON _THEN
+       <*B: FIND DUCPL1 - DERIVATIVE OF DUCONV/DT ON PL1
+            AND USING DUCPL1 FIND DUCR0 *>;
+       <*P: FIND DUCPL2 - DERIVATIVE OF DUCONV/DT ON PL2
+            AND USING DUCPL2 FIND DUCR2 ,
+            AND FROM DUCPL1 & DUCPL2 FIND DUCR1 *>;
+       <*T: FIND DUCT1 , DUCT2 - DERIVATIVES OF DUCONV/DT
+        ON Tp1 AND Tp2 *>;
+   _ELSE
+       DUCR0=0.D0;DUCR1=0.D0;DUCR2=0.D0;DUCT1=0.D0;DUCT2=0.D0
+   _FI;
+   B30=-HL*DUCR1;B32=-HL*DUCT1;B33=1.D0+HL*4.D0*UC(Km)/ELMIX1;
+   C30=-HL*DUCR2;C32=-HL*DUCT2; -- they are zero for Km==NZON
+   IF(Km==1) THEN; A30=ZERJ; ELSE; A30=-HL*DUCR0; ENDIF;
+%_Dere.CAB:
+      IF(R1*(PP1-PP2)/PP1 > (R2-R1))THEN;
+         VCPL1=MAX(0.D0,ALFCON**2/4.D0*((PRPL1+PP2)/(Tp1+Tp2)*
+            (Tp2-Tp1)/(PP2-PRPL1)-
+            (GRA2+GRAPL1)/2.D0)*(CPPL1*Tp1*GRAPL1+CP2*Tp2*GRA2)/2.D0);
+         ELMPL1=ALFCON*(PRPL1+PP2)/2.D0*(R2-R1)/(PRPL1-PP2);
+      ELSE;
+         VCPL1=MAX(0.D0,ALFCON**2/4.D0*R1/PRPL1*(PRPL1-PP2)/(R2-R1)*
+            ((PRPL1+PP2)/(Tp1+Tp2)*(Tp2-Tp1)/(PP2-PRPL1)-
+            (GRA2+GRAPL1)/2.D0)*(CPPL1*Tp1*GRAPL1+CP2*Tp2*GRA2)/2.D0);
+         ELMPL1=ALFCON*R1;
+      ENDIF;
+      DUCPL1=(2.D0*(VCPL1-UC(Km)**2)/ELMPL1-DUC(Km))/delta;
+      DUCR0=DUCPL1*PL1/DM1*RS0;
+%_Dere.CAP:
+      IF(R1*(PP1-PP2)/PP1 > (R2-R1))THEN;
+         VCPL2=MAX(0.D0,ALFCON**2/4.D0*((PP1+PRPL2)/(Tp1+Tp2)*
+             (Tp2-Tp1)/(PRPL2-PP1)-
+             (GRAPL2+GRA1)/2.D0)*(CP1*Tp1*GRA1+CPPL2*Tp2*GRAPL2)/2.D0);
+         ELMPL2=ALFCON*(PP1+PRPL2)/2.D0*(R2-R1)/(PP1-PRPL2);
+         DUCPL2=(2.D0*(VCPL2-UC(Km)**2)/ELMPL2-DUC(Km))/delta;
+         DUCR2=-DUCPL2*PL2/DM2*RS2
+               -DUC(Km)/ELMIX1*ALFCON*(PP1+PP2)/(PP1-PP2);
+         DUCR1=(DUCPL2*PL2/DM2-DUCPL1*PL1/DM1)*RS1
+               +DUC(Km)/ELMIX1*ALFCON*(PP1+PP2)/(PP1-PP2);
+      ELSE;
+         VCPL2=MAX(0.D0,ALFCON**2/4.D0*R1/PP1*(PP1-PRPL2)/(R2-R1)*
+            ((PP1+PRPL2)/(Tp1+Tp2)*(Tp2-Tp1)/(PRPL2-PP1)-
+            (GRAPL2+GRA1)/2.D0)*(CP1*Tp1*GRA1+CPPL2*Tp2*GRAPL2)/2.D0);
+         ELMPL2=ALFCON*R1;
+         DUCPL2=(2.D0*(VCPL2-UC(Km)**2)/ELMPL2-DUC(Km))/delta;
+         DUCR2=-DUCPL2*PL2/DM2*RS2-VCSQ1*2.D0/((R2-R1)*ELMIX1);
+         DUCR1=(DUCPL2*PL2/DM2-DUCPL1*PL1/DM1)*RS1
+               +VCSQ1*2.D0/((R2-R1)*ELMIX1)
+               -2.D0*UC(Km)**2/(ELMIX1*R1);
+      ENDIF;
+%_Dere.CAT:
+      TPD=Tp1*(1.D0+delta);
+      IF(R1*(PP1-PP2)/PP1 > (R2-R1))THEN;
+         VCT1=MAX(0.D0,ALFCON**2/4.D0*((PRT1+PP2)/(TPD+Tp2)*
+            (Tp2-TPD)/(PP2-PRT1)-
+            (GRA2+GRAT1)/2.D0)*(CPT1*TPD*GRAT1+CP2*Tp2*GRA2)/2.D0);
+         ELMT1=ALFCON*(PRT1+PP2)/2.D0*(R2-R1)/(PRT1-PP2);
+      ELSE;
+         VCT1=MAX(0.D0,ALFCON**2/4.D0*R1/PRT1*(PRT1-PP2)/(R2-R1)*
+            ((PRT1+PP2)/(TPD+Tp2)*(Tp2-TPD)/(PP2-PRT1)-
+            (GRA2+GRAT1)/2.D0)*(CPT1*TPD*GRAT1+CP2*Tp2*GRA2)/2.D0);
+         ELMT1=ALFCON*R1;
+      ENDIF;
+      DUCT1=(2.D0*(VCT1-UC(Km)**2)/ELMT1-DUC(Km))/(delta*Tp1);
+      TPD=Tp2*(1.D0+delta);
+      IF(R1*(PP1-PP2)/PP1 > (R2-R1))THEN;
+         VCT2=MAX(0.D0,ALFCON**2/4.D0*((PRT2+PP1)/(TPD+Tp1)*
+            (TPD-Tp1)/(PRT2-PP1)-
+            (GRA1+GRAT2)/2.D0)*(CPT2*TPD*GRAT2+CP1*Tp1*GRA1)/2.D0);
+         ELMT2=ALFCON*(PRT2+PP1)/2.D0*(R2-R1)/(PP1-PRT2);
+      ELSE;
+         VCT2=MAX(0.D0,ALFCON**2/4.D0*R1/PP1*(PP1-PRT2)/(R2-R1)*
+            ((PRT2+PP1)/(TPD+Tp1)*(TPD-Tp1)/(PRT2-PP1)-
+            (GRA1+GRAT2)/2.D0)*(CPT2*TPD*GRAT2+CP1*Tp1*GRA1)/2.D0);
+         ELMT2=ALFCON*R1;
+      ENDIF;
+      DUCT2=(2.D0*(VCT2-UC(Km)**2)/ELMT2-DUC(Km))/(delta*Tp2);
+%_Dere.CE:
+  KROW=3*NZON+Km;
+  @AJAC=A30;ICS(JAC)=Km-1;
+  @AJAC=B30;ICS(JAC)=Km;
+  @AJAC=C30;ICS(JAC)=Km+1;
+  @AJAC=B32;ICS(JAC)=Km+2*NZON;
+  @AJAC=C32;ICS(JAC)=Km+1+2*NZON;
+  @AJAC=B33;ICS(JAC)=KROW;
+%_Dere.F:O
+    <*A: FORM SMALL MATRICES FOR RADIATION *>;
+    <*E: FORM PART OF GRAND MATRIX AJAC *>;
+%_Dere.FA:O
+        -- B44 - dFJ1/dFJ1,    A40 - dFJ1/dR0,
+        -- B55 - dFH1/dFH1,    B40 - dFJ1/dR1,
+        -- A45 - dFJ1/dFH0,    A50 - dFH1/dR0,
+        -- B45 - dFJ1/dFH1,    B50 - dFH1/dR1,
+        -- B54 - dFH1/dFJ1,    C50 - dFH1/dR2,
+        -- C54 - dFH1/dFJ2,    C52 - dFH1/dT2
+    _DO L=1,NFRUS;
+       <*F: RESTORE FH1, FH0 *>;
+       <*J: SMALL MATRICES FOR dFJ/dY *>;
+       <*H: SMALL MATRICES FOR dFH/dY *>;
+       <*N: ACCOUNT FOR DJNU(L) AND DHNU *>;
+    _OD;
+%_Dere.FAF:O
+     IF(Km==Ncnd+1)THEN;
+       FH0=FHcore(L);     -- UNDISTURBED FH0 (%DERA)
+     ELSE;
+       IF(ABS(@FH0)>FLOOR(NVARS+1)    & Ncnd<0   )THEN;
+         IF(@FH0<0.D0)THEN;
+           FH0=-MIN(ABS(@FH0),ABS(@FJ1)*@TOLF);
+         ELSE;
+           FH0=MIN(ABS(@FH0),ABS(@FJ0)*@TOLF);
+         ENDIF;
+       ELSE;
+         FH0=@FH0;
+       ENDIF;
+     ENDIF;
+     IF(Km<NZON) THEN;
+       IF(ABS(@FH1)>FLOOR(NVARS+1)   & Ncnd<0   )THEN;
+         IF(@FH1<0.D0)THEN;
+           FH1=-MIN(ABS(@FH1),ABS(@FJ2)*@TOLF);
+         ELSE;
+           FH1=MIN(ABS(@FH1),ABS(@FJ1)*@TOLF);
+         ENDIF;
+       ELSE;
+         FH1=@FH1;
+       ENDIF;
+     ELSE; -- FOR Km=NZON BOUNDARY CONDITION FOR FH
+        FH1=HEDD(L)*@FJ1;
+     ENDIF;
+%_Dere.FAJ:O
+   B44(L)=1.D0+ HL*(CLIGHT*HAAB1(L)*PL1
+      +(U1-U0)/(R1-R0)*(1.D0+EDDJ(Km,L))+(3.D0-EDDJ(Km,L))*UDIVR);
+   IF(Km>1)THEN;
+      If(LTHICK(L,Km)) Then;
+         A20=A20-2.D0*HL*R0*FH0*CKRAD*DMETIN*WEIGHT(L);
+         B20=B20+2.D0*HL*R1*FH1*CKRAD*DMETIN*WEIGHT(L);
+      ENDIF;
+      A40(L)=HL*(-DFJDPL(L)*RCinv1*RS0
+              +@FJ1*((U1-U0)/(R1-R0)**2*(1.D0+EDDJ(Km,L))
+              +(3.D0-EDDJ(Km,L))/(RC0+RC1)*(2.D0*R0*U0-3.D0*RS0*UDIVR))
+              +CLIGHT*(RS0*(FH1*RS1-FH0*RS0)*RCinv1**2
+              -2.D0*FH0*R0*RCinv1));
+      A41(L)=HL*@FJ1*(-1.D0/(R1-R0)*(1.D0+EDDJ(Km,L))
+             +(3.D0-EDDJ(Km,L))*RS0/(RC0+RC1));
+   ENDIF;
+   B40(L)=HL*(DFJDPL(L)*RCinv1*RS1
+              +@FJ1*(-(U1-U0)/(R1-R0)**2*(1.D0+EDDJ(Km,L))
+              +(3.D0-EDDJ(Km,L))/(RC0+RC1)*(2.D0*R1*U1-3.D0*RS1*UDIVR))
+              +CLIGHT*(-RS1*(FH1*RS1-FH0*RS0)*RCinv1**2
+              +2.D0*FH1*R1*RCinv1));
+   B41(L)=HL*@FJ1*(1.D0/(R1-R0)*(1.D0+EDDJ(Km,L))
+          +(3.D0-EDDJ(Km,L))*RS1/(RC0+RC1));
+   IF(Km^=Ncnd+1 & Km^=NZON)THEN;
+        A45(L)=-(HL*CLIGHT)*RS0*RCinv1;
+        B45(L)=(HL*CLIGHT)*RS1*RCinv1;
+   ELSEIF(Km==NZON)THEN;
+        A45(L)=-(HL*CLIGHT)*RS0*RCinv1;
+        B45(L)=ZERJ;
+        B44(L)=B44(L)+HEDD(L)*HL*CLIGHT*RS1*RCinv1;
+   ELSE;  -- Km==Ncnd+1
+        B45(L)=(HL*CLIGHT)*RS1*RCinv1;
+        IF(Km>1)THEN;
+           DF0DT=((FL0+DFLDTP*Tp0*delta)
+                 *BLACKD(L,(0.5D0*(Tp1+Tp0*(1.D0+delta))))*CAP1
+                 /(@LEFT*(0.5D0*(Tp1+Tp0*(1.D0+delta)))**4*RS0*hapL1(L))
+                -FHcore(L))/(Tp0*delta);
+           If(LTHICK(L,Km)) Then;
+             Z20=Z20+HL*CKRAD*DMETIN*WEIGHT(L)
+                 *BLACKD(L,(0.5D0*(Tp1+Tp0)))*CAP1
+                 /(@LEFT*(0.5D0*(Tp1+Tp0))**4*hapL1(L))
+                *(FLcor1/CAP0*CAPPL0*RCinv0*RSM1);
+             A20=A20-HL*CKRAD*DMETIN*WEIGHT(L)
+                 *BLACKD(L,(0.5D0*(Tp1+Tp0)))*CAP1
+                 /(@LEFT*(0.5D0*(Tp1+Tp0))**4*hapL1(L))
+                *(FLcor1/CAP0*CAPPL0*RCinv0*RS0);
+             A22=A22-HL*RS0*CKRAD*DMETIN*WEIGHT(L)*DF0DT;
+           endif;
+           A42(L)=-(HL*CLIGHT)*RS0*RCinv1*DF0DT;
+    If(FL0 ^= 0.d0) then;
+           A40(L)=A40(L)-HL*CLIGHT*RS0*RCinv1*
+                 --(2.D0*R0*(Tp0up4-SUMJ)+FL0*CAPPL0*DM0*RCinv0)*CM0INV
+                  FH0*(DFLDRR/FL0-2.D0/R0);
+           Z40(L)=HL*CLIGHT*RS0*RCinv1*
+                 -- (FHcore(L)*CAPPL0*DM0*RCinv0*CM0INV*RSM1);
+                 (FLcor1/CAP0*CAPPL0*RCinv0*RSM1)*BLCKD(L)*CAP1
+                  /(@LEFT*(0.5D0*(Tp1+Tp0))**4*RS0*hapL1(L));
+           B44(L)=B44(L)+(HL*CLIGHT)*RS0*RCinv1*
+                  (1.5D1/PI**4)*FHcore(L)/FL0*RS0**2*CM0INV*WEIGHT(L);
+    endif;    
+    --  ELSE; -- Km==1 -- CHECKED IN %_Dere.FE
+    --    A40(L)=ZERJ; A41(L)=ZERJ;
+    --    A42(L)=ZERJ; Z40(L)=ZERJ;
+        ENDIF;
+        A45(L)=ZERJ;
+   ENDIF;
+%_Dere.FAH:O
+    IF(Km^=NZON) THEN;
+       B55(L)=1.D0+4.D0*HL*U1/R1
+              +(HL*CLIGHT)*hapH1(L)*3.D0*(DM1+DM2)
+              /(RC2-RC0);
+       B54(L)=(HL*CLIGHT)*(-EDDJ(Km,L)*2.D0/(R2-R0)
+                           +(1.5D0*EDDJ(Km,L)-0.5D0)*R0/RS1);
+       C54(L)=(HL*CLIGHT)*(EDDJ(Km+1,L)*2.D0/(R2-R0)
+                           +(1.5D0*EDDJ(Km+1,L)-0.5D0)*R2/RS1);
+/*     If(@Fj1>Floor(Nvars+1) & @Fh1>Floor(Nvars+1)
+           & EDDJ(Km,L)*@Fj1>EDDJ(Km+1,L)*@FJ2 & Klim(Km)==1 ) Then;
+         B55(L)=B55(L) +(HL*CLIGHT)*Flim*2.D0/(@Fh1*(R2-R0));
+         B54(L)=B54(L)+(HL*CLIGHT)*Hflj*@FJ2*2.D0/(@Fj1*(R2-R0));
+         C54(L)=C54(L)-(HL*CLIGHT)*Hflj*2.D0/(R2-R0);
+       Endif; */
+--       If(Km>Nthick(L)+1)Then;
+         B55(L)=B55(L)+(HL*CLIGHT)*RVIS/(R1-R0);
+      /* If(Fh1>Rlim*@TolF*@Fj1 & Km<NZON-1)Then;
+           B55(L)=B55(L)+(HL*CLIGHT)*RVIS*Hlim**4
+               *(5.d0*(Hlim+Rlim/(1.d0-Rlim))+Hlim)
+                 /(2.d0*(R1-R0));
+           If(@Fj1>Floor(Nvars+1))
+             B54(L)=B54(L)-(HL*CLIGHT)*RVIS*Hlim**4
+                 *5.d0*(Hlim+Rlim/(1.d0-Rlim))**2*@TolF*(1.d0-Rlim)
+                 /(2.d0*(R1-R0));
+         Endif; */
+--       Endif;
+    ELSE;
+       B55(L)=1.D0; B54(L)=ZERJ; C54(L)=ZERJ; A55(L)=ZERJ; C55(L)=ZERJ;
+    ENDIF;
+     --     IF(Km>Nthick(L)+1 & Km<NZON-1)THEN;
+    IF(Km<NZON-1)THEN;
+       A55(L)=-(HL*CLIGHT)*RVIS*(RS0/RS1)/(2.D0*(R1-R0));
+       C55(L)=-(HL*CLIGHT)*RVIS*(RS2/RS1)/(2.D0*(R1-R0));
+    ELSEIF(Km==NZON-1)THEN;
+       A55(L)=-(HL*CLIGHT)*RVIS*(RS0/RS1)/(2.D0*(R1-R0));
+       C55(L)=ZERJ;
+       C54(L)=C54(L)
+	      -(HL*CLIGHT)*RVIS*HEDD(L)*(RS2/RS1)/(2.D0*(R1-R0));
+  --	      ELSEIF(Km<=Nthick(L)+1)THEN;
+    ELSE;
+       A55(L)=ZERJ; C55(L)=ZERJ;
+  --	  C55(L)=-(HL*CLIGHT)*RVIS*(RS2/RS1)/(2.D0*(R1-R0));
+    ENDIF;
+    IF(Km<NZON) THEN;
+         IF(Km>1)THEN;
+--           write(@wres,*)' dFHPL/dr0=',-DFHDPL(L)*RCinv1*RS0;
+--           write(@wres,*)' dFdHaph  =',
+--                 CLIGHT*(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0 
+--                           *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1;
+           A50(L)=HL*(
+         -DFHDPL(L)*RCinv1*RS0+ -- old version
+                     CLIGHT*((    --Flim+
+                 EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1)*2.D0/(R2-R0)**2
+--            +(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0 -- new version, not better
+--            *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1
+                 +hapH1(L)*9.D0*RS0
+                         *(DM1+DM2)
+                         /(RC2-RC0)**2*@FH1
+                +(1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1/RS1));
+
+          if(NSTEP>=NDebug)then;
+           if(Km>Ncnd .and. Km<Ncnd+3 .and. L==LfrDebug)then;
+             write(@wres,*)' computing A50 Km,L=',Km,L;
+	     write(@wres,*)' dFHPL/dr0=',DFHDPL(L)*RCinv1*RS0;
+	     write(@wres,'(a,1p,3e12.3)')' grad FJ=',CLIGHT*(
+	     	  (EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1)*2.D0/(R2-R0)**2);
+	     write(@wres,'(a,1p,3e12.3)')' dFdHaph=',CLIGHT*(
+	     	  +(hapH1D(L)-hapH1(L))/delta*RCinv1*RS0 -- new version
+	     	  *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1);
+	     write(@wres,'(a,1p,3e12.3)')' HapH1=',CLIGHT*( 
+	     	       +hapH1(L)*9.D0*RS0
+	     		       *(DM1+DM2)
+	     		       /(RC2-RC0)**2*@FH1);
+	     write(@wres,'(a,1p,3e12.3)')' EddjFj=',Clight*(
+	     		     (1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1/RS1);
+	     write(@wres,*)' Nthick=',Nthick(L);
+           endif;
+          endif;
+
+         ELSE;
+           A50(L)=ZERJ;
+         ENDIF;
+         B50(L)=HL*(-4.D0*@FH1*U1/RS1
+                 +CLIGHT*( DHaphR(Km,L)*3.D0*(DM1+DM2)/(RC2-RC0)*@FH1
+                       -2.D0*((1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1*R0
+                             +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2*R2)/RC1));
+/*       B50(L)=HL*(DFHDPL(L)*RCinv1*RS1-4.D0*@FH1*U1/RS1
+                 +CLIGHT*((hapL2D(L)-hapL2(L))/delta*RCinv2*RS1
+                    *(hapH1(L)/ (hapL2(L)+Haplim*hapL1(L)) )**2*Uplim
+                       *Tp2up4/(Tp1up4+Tp2up4)
+                       *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1
+                       -2.D0*((1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1*R0
+                             +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2*R2)/RC1));
+ 
+   If(Km==131 & l==6)then;
+      write(@wres,*)' DFHDPL=',DFHDPL(L)*RCinv1*RS1;
+      write(@wres,*)' U1/rs1=',-4.D0*@FH1*U1/RS1;
+      write(@wres,*)' HaphTp=',CLIGHT*((hapL2D(L)-hapL2(L))/delta*RCinv2*RS1
+                    *(hapH1(L)/ (hapL2(L)+Haplim*hapL1(L)) )**2*Uplim
+                       *Tp2up4/(Tp1up4+Tp2up4)
+                       *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1);
+      write(@wres,*)' EddjFj=',Clight*(
+                       -2.D0*((1.5D0*EDDJ(Km,L)-0.5D0)*@FJ1*R0
+                             +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2*R2)/RC1);
+      write(@wres,*)' Nthick=',Nthick(l);
+   endif;                    */
+         C50(L)=HL*CLIGHT*(-(   --Flim+
+            EDDJ(Km+1,L)*@FJ2-EDDJ(Km,L)*@FJ1)*2.D0/(R2-R0)**2
+
+          -(hapH2D(L)-hapH1(L))/delta*RCinv2*RS2
+
+            *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1
+          -hapH1(L)*9.D0*RS2*(DM1+DM2)
+          /(RC2-RC0)**2*@FH1
+          +(1.5D0*EDDJ(Km+1,L)-0.5D0)*@FJ2/RS1);
+         B51(L)=4.D0*HL*@FH1/R1;
+   ----  C52(L)=(HL*CLIGHT)*(((hapL2T(L)/hapL2(L)-1.D0)/delta-4.D0)
+       ----     *hapH1(L)/hapL2(L)+4.D0)*hapH(L)
+         C52(L)=(HL*CLIGHT)*(((hapL2T(L)-hapL2(L))/
+         (delta*(hapL2(L)+Haplim*hapL1(L)) )-4.D0)*Uplim
+                *hapH1(L)/(hapL2(L)+Haplim*hapL1(L)) +4.D0)*hapH1(L)
+                *Tp2**3/(Tp1up4+Tp2up4)
+                *3.D0*(DM1+DM2)/(RC2-RC0)*@FH1;
+--         IF(Km>Nthick(L)+1 & Km^=NZON-1)THEN;
+         IF(Km^=NZON-1)THEN;
+            If(Km>1) A50(L)=A50(L)-(HL*CLIGHT)*RVIS*(
+                   (FH0*(RS0/RS1)-2.D0*FH1  --  -Hlim**5*Fh1
+                   +@FH2*(RS2/RS1))
+                         /(2.D0*(R1-R0)**2)
+                   +FH0*R0/(RS1*(R1-R0)));
+            B50(L)=B50(L)+(HL*CLIGHT)*RVIS*(
+                   (FH0*(RS0/RS1)-2.D0*FH1  --  -Hlim**5*Fh1
+                   +@FH2*(RS2/RS1))
+                   /(2.D0*(R1-R0)**2)
+                   +(FH0*RS0+@FH2*RS2)/(RC1*(R1-R0)));
+            C50(L)=C50(L)-(HL*CLIGHT)*RVIS*(
+                   +@FH2*R2/(RS1*(R1-R0)));
+         ELSEIF(Km==NZON-1)THEN;
+            If(Km>1) A50(L)=A50(L)-(HL*CLIGHT)*RVIS*(
+                   (FH0*(RS0/RS1)-2.D0*FH1+HEDD(L)*@FJ2*(RS2/RS1))
+                         /(2.D0*(R1-R0)**2)
+                   +FH0*R0/(RS1*(R1-R0)));
+            B50(L)=B50(L)+(HL*CLIGHT)*RVIS*(
+                   (FH0*(RS0/RS1)-2.D0*FH1+HEDD(L)*@FJ2*(RS2/RS1))
+                   /(2.D0*(R1-R0)**2)
+                   +(FH0*RS0+HEDD(L)*@FJ2*RS2)/(RC1*(R1-R0)));
+            C50(L)=C50(L)-(HL*CLIGHT)*RVIS*(
+                   +HEDD(L)*@FJ2*R2/(RS1*(R1-R0)));
+         ENDIF;
+     ELSE; -- Km==NZON
+        A50(L)=ZERJ;B50(L)=ZERJ;C50(L)=ZERJ;B51(L)=ZERJ;C52(L)=ZERJ;
+     ENDIF;
+%_Dere.FAN:O
+ IF(DUR(L)>0.D0) THEN;
+   -- BA44(L)=ZERJ; -- DFJ(L)/DFJ(L-1)
+   -- We cannot put BA44=ZERJ, since then we need put
+   -- NEEDBR=.TRUE. for every change of sign of DUR(L).
+   -- The same is true also for BC44.
+   BA44(L)=0.D0;
+  _SELECT
+    _ L==1
+      [BC44(1)=-(HL*DUR(2))*FREQMN(2)**4/WEIGHT(1);
+       BA44(1)=ZERJ;
+       IF(Km>1)THEN;
+         A40(1)=A40(1)-HL*( (U1-U0)/(R1-R0)**2*
+                ( @FJ1C*FREQMN(2)**4*EDDJ(Km,2))
+             + (2.D0*R0*U0-3.D0*RS0*UDIVR)/(RC0+RC1) *
+                ( @FJ1C*FREQMN(2)**4*(1.D0-EDDJ(Km,2)) ) )/WEIGHT(1);
+         A41(1)=A41(1)-HL*(-( @FJ1C*FREQMN(2)**4*EDDJ(Km,2) )/(R1-R0)
+                + RS0/(RC0+RC1)*(@FJ1C*FREQMN(2)**4*(1.D0-EDDJ(Km,2))
+                 ) )/WEIGHT(1);
+       ENDIF;
+       B40(1)=B40(1)-HL*(-(U1-U0)/(R1-R0)**2*
+               ( @FJ1C*FREQMN(2)**4*EDDJ(Km,2))
+             + (2.D0*R1*U1-3.D0*RS1*UDIVR)/(RC0+RC1) *
+                ( @FJ1C*FREQMN(2)**4*(1.D0-EDDJ(Km,2)) ) )/WEIGHT(1);
+       B41(1)=B41(1)-HL*( ( @FJ1C*FREQMN(2)**4*EDDJ(Km,2) )/(R1-R0)
+                + RS1/(RC0+RC1)*(@FJ1C*FREQMN(2)**4*(1.D0-EDDJ(Km,2))
+                 ) )/WEIGHT(1);
+       ]
+    _ L==NFRUS
+      [B44(L)=B44(L)+(HL*DUR(L))*FREQMN(L)**4/WEIGHT(L);
+       BC44(L)=ZERJ;
+       IF(Km>1)THEN;
+         A40(L)=A40(L)-HL*( (U1-U0)/(R1-R0)**2*
+                (-@FJ1*FREQMN(L)**4*EDDJ(Km,L) )
+             + (2.D0*R0*U0-3.D0*RS0*UDIVR)/(RC0+RC1) *
+                (-@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+         A41(L)=A41(L)-HL*(-(-@FJ1*FREQMN(L)**4*EDDJ(Km,L) )/(R1-R0)
+                + RS0/(RC0+RC1) *
+                (-@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+       ENDIF;
+       B40(L)=B40(L)-HL*( -(U1-U0)/(R1-R0)**2*
+                (-@FJ1*FREQMN(L)**4*EDDJ(Km,L) )
+             + (2.D0*R1*U1-3.D0*RS1*UDIVR)/(RC0+RC1) *
+                (-@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+       B41(L)=B41(L)-HL*( (-@FJ1*FREQMN(L)**4*EDDJ(Km,L) )/(R1-R0)
+                + RS1/(RC0+RC1) *
+                (-@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+       ]
+    _OTHER
+      [B44(L)=B44(L)+(HL*DUR(L))*FREQMN(L)**4/WEIGHT(L);
+       BC44(L)=-(HL*DUR(L+1))*FREQMN(L+1)**4/WEIGHT(L);
+       IF(Km>1)THEN;
+         A40(L)=A40(L)-HL*( (U1-U0)/(R1-R0)**2*
+                ( @FJ1C*FREQMN(L+1)**4*EDDJ(Km,L+1)
+                 -@FJ1*FREQMN(L)**4*EDDJ(Km,L) )
+             + (2.D0*R0*U0-3.D0*RS0*UDIVR)/(RC0+RC1) *
+                ( @FJ1C*FREQMN(L+1)**4*(1.D0-EDDJ(Km,L+1))
+                 -@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+         A41(L)=A41(L)-HL*(-( @FJ1C*FREQMN(L+1)**4*EDDJ(Km,L+1)
+                 -@FJ1*FREQMN(L)**4*EDDJ(Km,L) )/(R1-R0)
+                + RS0/(RC0+RC1) *
+                ( @FJ1C*FREQMN(L+1)**4*(1.D0-EDDJ(Km,L+1))
+                 -@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+       ENDIF;
+       B40(L)=B40(L)-HL*( -(U1-U0)/(R1-R0)**2*
+                ( @FJ1C*FREQMN(L+1)**4*EDDJ(Km,L+1)
+                 -@FJ1*FREQMN(L)**4*EDDJ(Km,L) )
+             + (2.D0*R1*U1-3.D0*RS1*UDIVR)/(RC0+RC1) *
+                ( @FJ1C*FREQMN(L+1)**4*(1.D0-EDDJ(Km,L+1))
+                 -@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+       B41(L)=B41(L)-HL*( ( @FJ1C*FREQMN(L+1)**4*EDDJ(Km,L+1)
+                 -@FJ1*FREQMN(L)**4*EDDJ(Km,L) )/(R1-R0)
+                + RS1/(RC0+RC1) *
+                ( @FJ1C*FREQMN(L+1)**4*(1.D0-EDDJ(Km,L+1))
+                 -@FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L)) ) )/WEIGHT(L);
+                                   ]
+  _END;
+ ELSE; -- DUR(L)<0.
+   --BC44(L)=ZERJ; -- DFJ(L)/DFJ(L+1)
+   BC44(L)=0.D0;
+  _SELECT
+    _ L==1
+      [B44(1)=B44(1)-(HL*DUR(1))*FREQMN(1)**4/WEIGHT(1);
+       BA44(1)=ZERJ;
+       IF(Km>1)THEN;
+         A40(1)=A40(1)-HL*( (U1-U0)/(R1-R0)**2*
+                ( @FJ1*FREQMN(1)**4*EDDJ(Km,1))
+             + (2.D0*R0*U0-3.D0*RS0*UDIVR)/(RC0+RC1) *
+                ( @FJ1*FREQMN(2)**4*(1.D0-EDDJ(Km,2))))/WEIGHT(1);
+         A41(1)=A41(1)-HL*(-( @FJ1*FREQMN(1)**4*EDDJ(Km,1))/(R1-R0)
+                + RS0/(RC0+RC1) *
+                ( @FJ1*FREQMN(1)**4*(1.D0-EDDJ(Km,1))))/WEIGHT(1);
+       ENDIF;
+       B40(1)=B40(1)-HL*( -(U1-U0)/(R1-R0)**2*
+                ( @FJ1*FREQMN(1)**4*EDDJ(Km,1) )
+             + (2.D0*R1*U1-3.D0*RS1*UDIVR)/(RC0+RC1) *
+                ( @FJ1*FREQMN(1)**4*(1.D0-EDDJ(Km,1))))/WEIGHT(1);
+       B41(1)=B41(1)-HL*( ( @FJ1*FREQMN(1)**4*EDDJ(Km,1))/(R1-R0)
+                + RS1/(RC0+RC1) *
+                ( @FJ1*FREQMN(1)**4*(1.D0-EDDJ(Km,1))))/WEIGHT(1);
+       ]
+    _ L==NFRUS
+      [BA44(L)=(HL*DUR(L-1))*FREQMN(L-1)**4/WEIGHT(L);
+       BC44(L)=ZERJ;
+       IF(Km>1)THEN;
+         A40(L)=A40(L)-HL*( (U1-U0)/(R1-R0)**2*
+                (
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )
+             + (2.D0*R0*U0-3.D0*RS0*UDIVR)/(RC0+RC1) *
+                (
+                 -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1)) ))/WEIGHT(L);
+         A41(L)=A41(L)-HL*(-(
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )/(R1-R0)
+                + RS0/(RC0+RC1) *
+                (-@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1))))/WEIGHT(L);
+       ENDIF;
+       B40(L)=B40(L)-HL*( -(U1-U0)/(R1-R0)**2*
+                (
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )
+             + (2.D0*R1*U1-3.D0*RS1*UDIVR)/(RC0+RC1) *
+                (
+                 -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1))))/WEIGHT(L);
+       B41(L)=B41(L)-HL*( (
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )/(R1-R0)
+                + RS1/(RC0+RC1) *
+                ( -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1))))/WEIGHT(L);
+       ]
+    _OTHER
+      [B44(L)=B44(L)-(HL*DUR(L))*FREQMN(L)**4/WEIGHT(L);
+             BA44(L)=(HL*DUR(L-1))*FREQMN(L-1)**4/WEIGHT(L);
+       IF(Km>1)THEN;
+         A40(L)=A40(L)-HL*( (U1-U0)/(R1-R0)**2*
+                ( @FJ1*FREQMN(L)**4*EDDJ(Km,L)
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )
+             + (2.D0*R0*U0-3.D0*RS0*UDIVR)/(RC0+RC1) *
+                ( @FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L))
+                 -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1)) ))/WEIGHT(L);
+         A41(L)=A41(L)-HL*(-( @FJ1*FREQMN(L)**4*EDDJ(Km,L)
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )/(R1-R0)
+                + RS0/(RC0+RC1) *
+                ( @FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L))
+                 -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1))))/WEIGHT(L);
+       ENDIF;
+       B40(L)=B40(L)-HL*( -(U1-U0)/(R1-R0)**2*
+                ( @FJ1*FREQMN(L)**4*EDDJ(Km,L)
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )
+             + (2.D0*R1*U1-3.D0*RS1*UDIVR)/(RC0+RC1) *
+                ( @FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L))
+                 -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1))))/WEIGHT(L);
+       B41(L)=B41(L)-HL*( ( @FJ1*FREQMN(L)**4*EDDJ(Km,L)
+                 -@FJ1A*FREQMN(L-1)**4*EDDJ(Km,L-1) )/(R1-R0)
+                + RS1/(RC0+RC1) *
+                ( @FJ1*FREQMN(L)**4*(1.D0-EDDJ(Km,L))
+                 -@FJ1A*FREQMN(L-1)**4*(1.D0-EDDJ(Km,L-1))))/WEIGHT(L);
+                                   ]
+  _END;
+ ENDIF;
+%_Dere.FE:O
+      _DO L=1,NFRUS;
+         KROW=Km+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd;
+--        _include sing.inc;
+         IF(Km > 1)THEN;
+            @AJAC=A40(L);ICS(JAC)=Km-1;
+         ENDIF;
+         @AJAC=B40(L);ICS(JAC)=Km  ;
+         IF(Km > 1)THEN;
+            @AJAC=A41(L);ICS(JAC)=Km+NZON-1;
+         ENDIF;
+         @AJAC=B41(L);ICS(JAC)=Km+NZON;
+         @AJAC=B42(L);ICS(JAC)=Km+2*NZON;
+         IF(Km==Ncnd+1 & Km^=1) THEN;
+            @AJAC=A42(L);ICS(JAC)=Km+2*NZON-1;
+         ENDIF;
+         @AJAC=B44(L);ICS(JAC)=KROW ;
+         IF(Km==Ncnd+1 & Km^=1) THEN;
+            @AJAC=Z40(L); ICS(JAC)=Km-2;
+         ENDIF;
+         IF(A45(L) ^= ZERJ)THEN;
+            @AJAC=A45(L);ICS(JAC)=KROW-1+KRAD;
+         ENDIF;
+         IF(B45(L) ^= ZERJ)THEN;
+            @AJAC=B45(L);ICS(JAC)=KROW+KRAD;
+         ENDIF;
+         IF(BC44(L) ^= ZERJ)THEN;
+            @AJAC=BC44(L);ICS(JAC)=KROW+(NZON-Ncnd);
+         ENDIF;
+         IF(BA44(L) ^= ZERJ)THEN;
+            @AJAC=BA44(L);ICS(JAC)=KROW-(NZON-Ncnd);
+         ENDIF;
+      _OD;
+      _DO L=1,NFRUS;
+         KROW=Km+NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd+KRAD;
+         IF(A50(L) ^= ZERJ)THEN;
+               @AJAC=A50(L);ICS(JAC)=Km-1;
+         ENDIF;
+         IF(B50(L) ^= ZERJ)THEN;
+               @AJAC=B50(L);ICS(JAC)=Km  ;
+         ENDIF;
+         IF(C50(L) ^= ZERJ)THEN;
+               @AJAC=C50(L);ICS(JAC)=Km+1;
+         ENDIF;
+         IF(B51(L) ^= ZERJ)THEN;
+               @AJAC=B51(L);ICS(JAC)=Km+NZON;
+         ENDIF;
+         @AJAC=B52(L);ICS(JAC)=Km+2*NZON;
+         IF(C52(L) ^= ZERJ)THEN;
+               @AJAC=C52(L);ICS(JAC)=Km+1+2*NZON;
+         ENDIF;
+         IF(B54(L) ^= ZERJ)THEN;
+               @AJAC=B54(L);ICS(JAC)=KROW-KRAD;
+         ENDIF;
+         IF(C54(L) ^= ZERJ)THEN;
+               @AJAC=C54(L);ICS(JAC)=KROW+1-KRAD;
+         ENDIF;
+         IF(A55(L) ^= ZERJ)THEN;
+               @AJAC=A55(L);ICS(JAC)=KROW-1;
+         ENDIF;
+         @AJAC=B55(L);ICS(JAC)=KROW;
+         IF(C55(L) ^= ZERJ)THEN;
+               @AJAC=C55(L);ICS(JAC)=KROW+1;
+         ENDIF;
+      _OD;
+%J:O
+    NZMOD=JAC;   -- THE NUMBER OF GRAND MATRIX AJAC ELEMENTS
+--  JAC=0;
+--  _DO I=1,NZMOD;
+--    IF(ABS(AJAC(I+NZ))>GMAX(IRS(I)) ! IRS(I)==ICS(I)) THEN;
+--      JAC=JAC+1;AJAC(JAC)=AJAC(I+NZ);IRS(JAC)=IRS(I);ICS(JAC)=ICS(I);
+--    ENDIF
+--  _OD;
+--  NZMOD=JAC;   -- THE NUMBER OF SELECTED ELEMENTS
+    IF(NZMOD>=NZ-1)THEN;
+      WRITE(@term,*)' NZMOD>NZ';
+      WRITE(@wres,*)' NZMOD>NZ';
+      STOP ' NZMOD>NZ';
+    ENDIF;

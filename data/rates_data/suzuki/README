@@ -1,0 +1,39 @@
+MESA includes weak reaction rates from
+
+  Suzuki, Toki, and Nomoto (2016)
+  Electron-capture and $\beta$-decay rates for sd-shell nuclei in stellar environments relevant to high-density O-Ne-Mg cores
+  http://adsabs.harvard.edu/abs/2016ApJ...817..163S
+
+These are e-capture and beta-decay rates for sd-shell nuclei (A=17-28)
+obtained with USDB.  Coulomb effects are included.  Experimental
+energies and GT transition strengths available are taken into account.
+
+The following quantities are tabulated.
+
+  density:  log_{10}(\rho Y_e)  [g/cm^3]
+  temperature: log_{10}T  [K]
+  chemical potential:  mu  [MeV]
+  Coulomb effect parameters:
+    shift in Q-value:   dQ  [MeV]
+    shift in chemical potential: Vs  [MeV]
+  e-capture rate or beta-decay rate:  e-cap-rate:  log_{10}(rate)  [1/s]
+  neutrino energy-loss rate: nu-energy-loss: log_{10}(rate)  [MeV/s]
+  gamma-ray heating rate: gamma-energy: log_{10}(rate)  [MeV/s]
+
+
+We thank Prof. Toshio Suzuki for providing these tables and giving
+permission for their inclusion in MESA.
+
+These tables were downloaded from
+
+  http://w3p.phys.chs.nihon-u.ac.jp/~suzuki/data2/link.html
+
+on March 6, 2017.  The README included with these files indicate they
+were the versions uploaded on Oct. 27, 2015.  To save disk space they
+were then xz compressed.  These text-based odat files are included
+with MESA in order to make their provenance clear, but are not
+directly used.
+
+The script make_suzuki_hdf5.py reads and processes the rate tables
+into a version suitable for MESA to use.  The resulting HDF5 file,
+Suzuki_2016.h5, is read by MESA.

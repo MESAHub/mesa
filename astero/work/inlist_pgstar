@@ -1,0 +1,36 @@
+&pgstar
+  ! see star/defaults/pgstar.defaults
+
+  ! MESA uses PGPLOT for live plotting and gives the user a tremendous
+  ! amount of control of the presentation of the information.
+
+  ! show HR diagram
+  ! this plots the history of L,Teff over many timesteps
+    HR_win_flag = .true.
+
+  ! set static plot bounds
+    HR_logT_min = 3.5
+    HR_logT_max = 4.6
+    HR_logL_min = 2.0
+    HR_logL_max = 6.0
+
+  ! set window size (aspect_ratio = height/width)
+    HR_win_width = 6
+    HR_win_aspect_ratio = 1.0
+
+
+  ! show temperature/density profile
+  ! this plots the internal structure at single timestep
+    TRho_Profile_win_flag = .true.
+
+  ! add legend explaining colors
+    show_TRho_Profile_legend = .true.
+
+  ! display numerical info about the star
+    show_TRho_Profile_text_info = .true.
+
+  ! set window size (aspect_ratio = height/width)
+    TRho_Profile_win_width = 8
+    TRho_Profile_win_aspect_ratio = 0.75
+
+/ ! end of pgstar namelist

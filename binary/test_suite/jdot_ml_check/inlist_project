@@ -1,0 +1,42 @@
+&binary_job
+
+   inlist_names(1) = 'inlist1' 
+   inlist_names(2) = 'inlist2'
+
+   evolve_both_stars = .false.
+
+/ ! end of binary_job namelist
+
+&binary_controls
+         
+   fr = 0.01
+   fr_limit = 1d-3
+   fj = 0.001
+
+   m1 = 1.0d0  ! donor mass in Msun
+   m2 = 1.4d0 ! companion mass in Msun
+   initial_period_in_days = -1
+   initial_separation_in_Rsuns = 2.75 ! only used when initial_period_in_days < 0
+
+   !transfer efficiency controls
+   mass_transfer_alpha = 0.4d0
+   mass_transfer_beta = 0.4d0
+   mass_transfer_delta = 0.19d0
+   mass_transfer_gamma = 2.0d0
+   limit_retention_by_mdot_edd = .false.
+   use_radiation_corrected_transfer_rate = .false.
+
+   !orbital J controls
+   do_jdot_mb = .false.
+   do_jdot_gr = .false.
+   do_jdot_ml = .true.
+
+   max_tries_to_achieve = 100
+   implicit_scheme_tolerance = 1d-2
+   min_change_factor = 1.005
+   max_change_factor = 1.025d0
+   initial_change_factor = 1.025d0
+   change_factor_fraction = 0.8d0
+   implicit_lambda = 0.4d0
+         
+/ ! end of binary_controls namelist

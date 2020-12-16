@@ -1,0 +1,286 @@
+! log_columns.list -- determines the contents of star history logs
+! you can use a non-standard version by setting log_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+! reorder the following names as desired to reorder columns.
+! comment out the name to omit a column (fewer columns => less IO => faster running).
+! remove '!' to restore a column.
+
+! if you have a situation where you want a non-standard set of columns,
+! make a copy of this file, edit as desired, and give the new filename in your inlist
+! as log_columns_file.   if you are just adding columns, you can 'include' this file,
+! and just list the additions in your file.   note: to include the standard default
+! version, use include '' -- the 0 length string means include the default file.
+
+! blank lines and comments can be used freely.
+! if a column name appears more than once in the list, only the first occurrence is used.
+
+! if you need to have something added to the list of options, let me know....
+
+
+! the first few lines of the log file contain parameter values as of the start of the run
+! for completeness, those items are described here:
+   
+   ! initial_mass -- star mass at start of run (Msun units)
+   ! initial_z -- starting metallicity
+   ! h1_boundary_limit -- defines abundance limit for h1_boundary_mass 
+   ! he4_boundary_limit -- defines abundance limit for he4_boundary_mass
+   ! burn_min1 -- 1st limit for reported burning, in erg/g/s
+   ! burn_min2 -- 2nd limit for reported burning, in erg/g/s
+
+
+! note: you can include another list by doing
+!        include 'filename'
+!        include '' means include the default standard list file
+
+
+! the following lines of the log file contain info about 1 model per row
+   
+   ! some general info about the model
+   
+      model_number ! counting from the start of the run
+      star_age ! elapsed simulated time in years since the start of the run
+      star_age_sec ! elapsed simulated time in seconds since the start of the run
+      star_age_min ! elapsed simulated time in minutes since the start of the run
+      star_age_hr ! elapsed simulated time in hours since the start of the run
+      star_age_day ! elapsed simulated time in days since the start of the run
+      
+      log_Lnuc_ergs_s
+      
+      star_mass ! in Msun units
+      !star_mdot ! d(star_mass)/dt (in msolar per year)
+      !time_step ! timestep in years since previous model
+      !log_dt ! log10 time_step in years
+      log_dt_sec ! log10 time_step in seconds
+      num_zones ! number of zones in the model
+      
+      total_energy
+      !total_radiation ! total lost since start of run as photons or neutrinos
+      !total_energy_plus_total_radiation ! total_energy + total_radiation
+   
+   ! mixing regions
+   
+      !  mx1 refers to the largest (by mass) convective region.
+      !  mx2 is the 2nd largest.
+
+      !  conv_mx1_top and conv_mx1_bot are the region where mixing_type == convective_mixing.
+      !  mx1_top and mx1_bot are the extent of all kinds of mixing, convective and other.
+
+      !conv_mx1_top
+      !conv_mx1_bot
+      !conv_mx2_top
+      !conv_mx2_bot
+      !mx1_top
+      !mx1_bot
+      !mx2_top
+      !mx2_bot
+      
+       
+      
+   ! regions of strong nuclear burning
+   
+      ! 2 zones where eps_nuc > burn_min1 erg/g/s
+      ! for each zone have 4 numbers: start1, start2, end2, end1
+      ! start1 is mass of inner edge where first goes > burn_min1 (or -20 if none such)
+      ! start2 is mass of inner edge where first zone reaches burn_min2 erg/g/sec (or -20 if none such)
+      ! end2 is mass of outer edge where first zone drops back below burn_min2 erg/g/s
+      ! end1 is mass of outer edge where first zone ends (i.e. eps_nuc < burn_min1)
+      ! similar for the second zone
+   
+      !epsnuc_M_1 ! start1 for 1st zone
+      !epsnuc_M_2 ! start2
+      !epsnuc_M_3 ! end2
+      !epsnuc_M_4 ! end1
+      
+      !epsnuc_M_5 ! start1 for 2nd zone
+      !epsnuc_M_6 ! start2
+      !epsnuc_M_7 ! end2
+      !epsnuc_M_8 ! end1
+   
+   ! information about abundance transitions
+   
+      he_core_mass
+      c_core_mass
+      o_core_mass   
+      si_core_mass
+      fe_core_mass
+   
+
+   ! integrated power from hydrogen and helium burning
+   
+      !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
+      !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
+      !log_LH ! log10 power_h_burn
+      !log_LHe ! log10 power_he_burn
+   
+   ! conditions near surface
+      radius
+      log_R
+      v_surf ! (cm/s)
+      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      surf_escape_v ! cm/s
+      luminosity ! luminosity in Lsun units
+      !gravity 
+      log_surf_cell_pressure
+      log_surf_cell_density
+      !surface_entropy ! in units of kerg per baryon
+      
+      Lsurf_m
+      
+      log_L_center
+      log_L_center_ergs_s
+   
+      log_L ! log10 luminosity in Lsun units
+      log_L_ergs_s
+      effective_T
+      log_Teff ! log10 effective temperature
+      log_g ! log10 gravity
+      
+      !abs_mag v_bb    
+      !log_lum_band v_bb
+      !bc v_bb  
+      
+      
+      min_opacity
+      log_min_opacity
+      
+   ! conditions near center
+      
+      log_cntr_dr_cm
+      log_center_T ! temperature
+      log_center_Rho ! density
+      log_center_P ! pressure
+      !center_degeneracy ! the electron chemical potential in units of k*T
+      !center_gamma ! plasma interaction parameter at the centermost meshpoint.
+      
+      !log_center h1
+      !log_center h2
+      !log_center he3
+      !log_center he4
+      !log_center li7
+      
+
+   ! log10 total ergs/sec for reaction categories (Lsun units)
+      
+      !pp
+      !cno
+      !tri_alfa
+      !c12_alfa
+      !n14_alfa
+      !o16_alfa
+
+   ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
+      
+      !rpp
+
+
+      
+      !mixing_regions 40
+      !burning_regions 80
+
+
+
+      ! you might want to get a more complete list of mixing regions by using the following
+      
+      !mixing_regions 40
+      
+      !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
+         ! the <integer> is the number of regions to report
+         ! there will be 2*<integer> columns for this in the log file, 2 for each region.
+         ! the first column for a region gives the mixing type using the values defined in const_def
+         ! the types are no_mixing, convective_mixing, overshoot_mixing, semiconvective_mixing,
+         ! and salt_finger_mixing, numbered from 0 to 4.
+         ! entries for extra columns after the last region in the star will have an invalid mixing_type value of -1.
+         ! the second column for a region gives the m/mstar location of the top of the region
+         ! mstar is the total mass of the star, so these locations range from 0 to 1
+         ! all regions are include starting from the center, so the bottom of one region
+         ! is the top of the previous one.  since we start at the center, the bottom of the 1st region is 0.
+         
+         ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
+
+
+
+   ! misc
+      dt_div_min_dr_div_cs
+      
+      total_mass h1
+      total_mass he4
+      total_mass fe56
+      total_mass co56
+      total_mass ni56
+      total_mass cr60
+      
+      total_ni_co_56
+      
+      log_total_mass fe56
+      log_total_mass co56
+      log_total_mass ni56
+      log_total_mass cr60
+      
+      h_rich_layer_mass
+      he_core_v
+      he_core_mass
+      he_core_radius
+      
+      outer_mach1_velocity
+      outer_mach1_csound
+      outer_mach1_lgT
+      outer_mach1_lgRho
+      outer_mach1_lgP
+      outer_mach1_mass
+      outer_mach1_q
+      outer_mach1_radius
+      outer_mach1_gamma1
+      outer_mach1_entropy
+      outer_mach1_tau
+      outer_mach1_k
+      
+      shock_velocity
+      shock_csound
+      shock_lgT
+      shock_lgRho
+      shock_lgP
+      shock_mass
+      shock_q
+      shock_radius
+      shock_gamma1
+      shock_entropy
+      shock_tau
+      shock_pre_lgRho
+      shock_k
+      
+      log_tau_center
+      
+      m_center
+      r_center
+      v_center
+      r_center_km
+      v_center_kms
+      infall_div_cs
+      
+      photosphere_L ! Lsun units
+      photosphere_log_L ! Lsun units
+      photosphere_r ! Rsun units
+      photosphere_log_r ! Rsun units
+      photosphere_m ! Msun units
+      photosphere_xm ! Msun units
+      photosphere_v_km_s
+      photosphere_cell_k
+      photosphere_cell_log_density
+      photosphere_opacity
+      
+      rel_E_err
+      log_rel_E_err
+      rel_run_E_err
+      log_rel_run_E_err
+      
+      cumulative_energy_error
+      log_rel_cumulative_energy_error
+      
+      num_retries ! total during the run
+      num_iters
+      
+
+
+

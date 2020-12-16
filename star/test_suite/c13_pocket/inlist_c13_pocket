@@ -1,0 +1,58 @@
+&star_job
+
+! begin with saved model from end of core He burning
+      load_saved_model = .true.
+      saved_model_name = '2M_3DUP.mod'
+
+! save a model and profile at the end of the run
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'one thermal pulse cycle complete'
+
+      write_profile_when_terminate = .true.
+      filename_for_profile_when_terminate = 'final_profile.data'
+
+! restart counters
+      set_initial_age = .true.
+      initial_age = 0
+      set_initial_model_number = .true.
+      initial_model_number = 0
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+! display on-screen plots
+      !pgstar_flag = .true.
+
+/ !end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+! see inlist_common and inlist_TP_AGB
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 2500
+
+! relax temporal resolution to spend less time in interpulse
+
+      dH_div_H_limit_min_H = 1d-3
+      dH_div_H_limit = 0.9
+
+! stopping condition
+      ! one thermal pulse cycle
+      ! see run_star_extras
+
+! values to check
+      x_ctrl(1) = 0.075d0 ! max_c13_expected (tol 1d-2)
+      x_ctrl(2) = 0.575d0 ! mass_max_c13_expected (tol 5d-3)
+      x_ctrl(3) = 4.0d-5  ! pocket_mass_c13_expected (tol 1d-5)
+      x_ctrl(4) = 3.0d-4  ! delta_surface_c12_expected (tol 2d-4)
+
+/ ! end of controls namelist

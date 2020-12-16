@@ -1,0 +1,30 @@
+&model
+/
+
+&mode
+	l = 0
+/
+
+&mode
+	l = 1
+/
+
+&osc
+/
+
+&rot
+/
+
+&num
+	diff_scheme = 'MAGNUS_GL2'
+/
+
+&scan
+	grid_type = 'LINEAR'
+	freq_min = 1
+	freq_max = 20.0
+	n_freq = 200
+/
+
+&grid
+/

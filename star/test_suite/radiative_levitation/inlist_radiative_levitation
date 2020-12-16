@@ -1,0 +1,227 @@
+
+! NOTE: this test performs radiative levitation which requires the OP_mono data
+! See the section "OP mono opacities" in controls.defaults for
+! information on how to obtain this data and set the relevant paths
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'sdb.mod' ! from make_sdb, 14986, with envelope thickness (x_ctrl(1)) set to 1d-3.
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'max_age'
+
+      change_initial_net = .true.      
+      new_net_name = 'basic_plus_fe56_ni58.net'
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1000 ! in years
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+
+      kap_file_prefix = 'OP_gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+      use_dedt_form_of_energy_eqn = .true.
+      
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 240
+      
+      max_age = 1d6
+      
+      x_ctrl(1) = 1d0 ! 1.75d0 ! multiply fe56 mono opacity by this factor
+
+      initial_mass = 1
+      initial_z = 0.02d0
+      
+      mixing_length_alpha = 2
+      MLT_option = 'Henyey'
+
+      varcontrol_target = 1d-3
+      mesh_delta_coeff = 1.5
+      
+      min_dq = 1d-16
+      max_surface_cell_dq = 1d-14
+      
+      photo_interval = 10
+      profile_interval = 10
+      history_interval = 10
+      terminal_interval = 1
+      write_header_frequency = 10      
+      
+      dH_div_H_limit_min_H = 1d99 ! disable this
+      dHe_div_He_limit_min_He = 1d99 ! disable this
+
+      prune_bad_cz_min_Hp_height = 0.1 ! lower limit on radial extent of cz
+
+    overshoot_scheme(1) = 'exponential'
+    overshoot_zone_type(1) = 'nonburn'
+    overshoot_zone_loc(1) = 'any'
+    overshoot_bdy_loc(1) = 'any'
+    overshoot_f(1) = 0.01
+    overshoot_f0(1) = 0.005
+
+      
+           
+      ! element diffusion
+         
+         !show_diffusion_info = .true.
+         !show_diffusion_substep_info = .true.         
+         !show_diffusion_timing = .true.
+         
+         do_element_diffusion = .true.
+         diffusion_dt_limit = 1 ! no element diffusion if dt < this limit (in seconds)
+         
+         diffusion_use_iben_macdonald = .false.
+                     
+         diffusion_min_dq_at_surface = 5d-14
+            ! treat at least this much at surface as a single cell for purposes of diffusion
+            
+         diffusion_min_T_at_surface = 1d4 ! this should be large enough to ensure hydrogen ionization
+            ! treat cells cells at surface with T < this as a single cell for purposes of diffusion
+            
+         diffusion_min_dq_ratio_at_surface = 4
+            ! combine cells at surface until have total mass >= this factor times the next cell below them
+            ! this helps with surface boundary condition for diffusion by putting large cell at surface
+
+         diffusion_AD_dm_full_on = 1d-13 ! Msun units
+         diffusion_AD_dm_full_off = 2d-11 ! Msun units
+         diffusion_AD_boost_factor = 20
+
+         diffusion_Vlimit_dm_full_on = 1d-13 ! Msun units
+         diffusion_Vlimit_dm_full_off = 8d-12 ! Msun units
+         diffusion_Vlimit = 1.5 ! in units of local cell crossing velocity
+
+         diffusion_v_max = 1d-2
+
+         diffusion_dt_div_timescale = 1.0 ! 1 ! dt is at most this times the timescale
+         
+         diffusion_max_iters_per_substep = 20
+         diffusion_max_retries_per_substep = 20
+         
+         diffusion_steps_limit = 200
+            ! if diffusion solver uses more steps than this, reduce the next timestep
+         diffusion_steps_hard_limit = 400
+            ! if diffusion solver uses more steps than this, retry
+
+         diffusion_iters_limit = 500
+            ! if use a total number of iters > this, reduce the next timestep
+         diffusion_iters_hard_limit = 1000
+            ! if use a total number of iters > this, retry
+         
+         diffusion_tol_correction_max = 3d-1
+         diffusion_tol_correction_norm = 3d-3
+         diffusion_min_X_hard_limit = -5d-3
+         
+         diffusion_X_total_atol = 1d-9
+         diffusion_X_total_rtol = 1d-6
+         
+         diffusion_upwind_abs_v_limit = 1d-6 
+            ! switch to upwind for i at face k if abs(v(i,k)) > this limit
+      
+         diffusion_T_full_on = 1d3
+         diffusion_T_full_off = 1d3
+         
+         diffusion_calculates_ionization = .true.
+         diffusion_nsmooth_typical_charge = 10
+
+         diffusion_max_T_for_radaccel = 1d7
+         diffusion_screening_for_radaccel = .true.
+
+         diffusion_min_Z_for_radaccel = 26 ! Fe
+         diffusion_max_Z_for_radaccel = 28 ! Ni
+
+         ! use environment variables for these
+         !op_mono_data_path = ...
+         !op_mono_data_cache_filename = ...
+         
+         high_logT_op_mono_full_off = 6.3d0
+         high_logT_op_mono_full_on = 5.8d0
+         
+         op_mono_min_X_to_include = 1d-10 ! skip iso if mass fraction < this
+         use_op_mono_alt_get_kap = .false.
+
+         diffusion_num_classes = 9 ! number of classes of species for diffusion calculations
+         diffusion_class_representative(1) = 'h1'
+         diffusion_class_representative(2) = 'he4'
+         diffusion_class_representative(3) = 'c12'
+         diffusion_class_representative(4) = 'n14'
+         diffusion_class_representative(5) = 'o16'
+         diffusion_class_representative(6) = 'ne20'
+         diffusion_class_representative(7) = 'mg24'
+         diffusion_class_representative(8) = 'fe56'
+         diffusion_class_representative(9) = 'ni58'
+      
+         ! in ascending order.  species goes into 1st class with A_max >= species A
+         diffusion_class_A_max(1) = 2
+         diffusion_class_A_max(2) = 4
+         diffusion_class_A_max(3) = 12
+         diffusion_class_A_max(4) = 14
+         diffusion_class_A_max(5) = 16
+         diffusion_class_A_max(6) = 20
+         diffusion_class_A_max(7) = 24
+         diffusion_class_A_max(8) = 56
+         diffusion_class_A_max(9) = 58
+         
+         !diffusion_use_isolve = .true.
+         diffusion_rtol_for_isolve = 1d-4
+         diffusion_atol_for_isolve = 1d-5
+         diffusion_maxsteps_for_isolve = 1000
+         diffusion_isolve_solver = 'ros2_solver'
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+         pgstar_interval = 1
+
+         ! Profile_Panels3_win_flag = .true. 
+         Profile_Panels3_file_flag = .true. 
+         Profile_Panels3_file_interval = 100000
+         Profile_Panels3_file_width = 7
+
+         Profile_Panels3_xaxis_name = 'logxm'
+         Profile_Panels3_xaxis_reversed = .true.
+         Profile_Panels3_xmin = -14 ! only used if /= -101d0
+         Profile_Panels3_xmax = -1 ! only used if /= -101d0
+
+         Profile_Panels3_num_panels = 3
+         Profile_Panels3_yaxis_name(2) = 'opacity'
+         Profile_Panels3_other_yaxis_name(2) = 'gradr'
+
+         Profile_Panels3_title = 'Abundance-Opacity-Mixing'
+
+/ ! end of pgstar namelist
+
+
+

@@ -1,0 +1,145 @@
+! binary_history_columns.list -- determines the contents of binary history logs
+! you can use a non-standard version by setting history_name in your binary inlist
+
+! units are cgs unless otherwise noted.
+
+! reorder the following names as desired to reorder columns.
+! comment out the name to omit a column (fewer columns => less IO => faster running).
+! remove '!' to restore a column.
+
+! if you have a situation where you want a non-standard set of columns,
+! make a copy of this file, edit as desired, and give the new filename in your inlist
+! as history_name.   if you are just adding columns, you can 'include' this file,
+! and just list the additions in your file.   note: to include the standard default
+! version, use include '' -- the 0 length string means include the default file.
+
+! blank lines and comments can be used freely.
+! if a column name appears more than once in the list, only the first occurrence is used.
+
+! if you need to have something added to the list of options, let me know....
+
+
+! the first few lines of the log file contain parameter values as of the start of the run
+! for completeness, those items are described here:
+   
+   ! version_number -- MESA version number that created this file
+   ! initial_star_1_mass -- initial mass of first star (in Msun)
+   ! initial_star_2_mass -- initial mass of second star (in Msun)
+   ! initial_period -- initial period
+
+! note: you can include another list by doing
+!        include 'filename'
+!        include '' means include the default standard list file
+
+
+! the following lines of the log file contain info about 1 model per row
+   
+      model_number ! model number of donor star
+      age ! age of donor star
+
+      ! General binary information
+
+      period_days ! orbital period in days
+      !period_hr ! orbital period in hours
+      !period_minutes ! orbital period in minutes
+      !lg_separation ! log10 of orbital separation in rsun
+      binary_separation ! orbital separation in rsun
+      !eccentricity ! orbital eccentricity
+      v_orb_1 ! orbital velocity of first star (in km/s)
+      v_orb_2 ! orbital velocity of first star (in km/s)
+
+      ! Information related to radius and overflow
+      !star_1_radius ! radius of the first star in rsun
+      !star_2_radius ! radius of the second star in rsun
+      rl_1 ! roche lobe radius of first star in rsun
+      rl_2 ! roche lobe radius of second star in rsun
+      !rl_overflow_1 ! roche lobe overflow of first star in rsun
+      !rl_overflow_2 ! roche lobe overflow of second star in rsun
+      rl_relative_overflow_1 ! roche lobe overflow of first star in units of rl_donor
+      rl_relative_overflow_2 ! roche lobe overflow of second star in units of rl_donor
+   
+      ! Information related to eccentricity change
+      
+      !edot ! total eccentricity change
+      !edot_tidal ! eccentricity change due to tidal interactions
+      !edot_enhance ! eccentricity change due to eccentricity pumping
+      !extra_edot ! user defined extra eccentricity change
+
+      ! Information related to masses and mass transfer
+
+      star_1_mass ! mass of first star in msun
+      !lg_star_1_mass ! log10 mass of first star in msun
+      star_2_mass ! mass of second star in msun
+      !lg_star_2_mass ! log10 mass of second star in msun
+      !sum_of_masses ! star_1_mass + star_2_mass
+      lg_mtransfer_rate ! log10 of abs(mass transfer rate) in Msun/yr
+                     ! this considers the amount of mass lost from the donor due to RLOF
+                     ! not the actual mass that ends up accreted
+      lg_mstar_dot_1 ! log10 of first star abs(mdot) in Msun/yr
+      lg_mstar_dot_2 ! log10 of second star abs(mdot) in Msun/yr
+      lg_system_mdot_1 ! log10 of abs(mdot) of mass lost from the system from
+                        ! around star 1 due to inneficient mass transfer in Msun/yr
+      lg_system_mdot_2 ! log10 of abs(mdot) of mass lost from the system from
+                        ! around star 2 due to inneficient mass transfer in Msun/yr
+      lg_wind_mdot_1 ! log10 of first star abs(mdot) due to winds in Msun/yr
+      lg_wind_mdot_2 ! log10 of second star abs(mdot) due to winds in Msun/yr
+      !star_1_div_star_2_mass ! star_1_mass/star_2_mass
+      !delta_star_1_mass ! star_2_mass/initial_star_2_mass
+      !delta_star_2_mass ! star_2_mass/initial_star_2_mass
+      fixed_xfer_fraction ! fixed mass transfer fraction 1-alpha-beta-delta
+      eff_xfer_fraction ! effective efficiency, -dot_M_a/dot_M_d
+      !lg_mdot_edd ! log10 Eddington accretion rate for point mass accretor in units of Msun/secyer
+      !mdot_edd_eta ! Efficiency of radiation from accretion to point source
+      !lg_accretion_luminosity ! log10 Luminosity from accretion to point source (in units of Lsun)
+      !bh_spin ! Spin parameter of BH accretor 
+      !lg_mdot_system h1 ! you can use lg_mdot_system <isotope> to get the mass loss
+                         ! rate from the system corresponding to a particular isotope.
+
+      ! Information regarding angular momentum
+
+      J_orb ! orbital angular momentum in g cm^2 s^-1
+      !J_spin_1 ! spin angular momentum of first star
+      !J_spin_2 ! spin angular momentum of second star
+      !J_total ! orbital+spin angular momentum
+      Jdot ! time derivative of orbital J
+      jdot_mb ! time derivative of J due to magnetic braking
+      jdot_gr ! time derivative of J due to gravitational wave radiation
+      jdot_ml ! time derivative of J due to mass loss
+      jdot_ls ! time derivative of J due to L-S coupling
+      jdot_missing_wind ! time derivative of J due to missing stellar AM
+                        ! loss (see binary_controls.defaults)
+      extra_jdot ! time derivative of J due to user defined mechanism
+      !accretion_mode ! Specifies whether accretion is ballistic (1) or via a
+                      ! Keplerian disc (2). In case there is no angular momentum
+                      ! accretion, its equal to zero.
+      !acc_am_div_kep_am ! ratio of accreted specific angular momentum to
+                         ! that of a Keplerian orbit at R_star. Used only when doing
+                         ! rotation and do_j_accretion = .true.
+      !lg_t_sync_1 ! log10 synchronization timescale for star 1 in years
+      !lg_t_sync_2 ! log10 synchronization timescale for star 2 in years
+      !P_rot_div_P_orb_1 ! rotational over orbital period for star 1
+      !P_rot_div_P_orb_2 ! rotational over orbital period for star 2
+
+      !Miscellaneous information
+
+      !lg_F_irr ! irradiation flux on donor
+      donor_index ! 1 or 2 depending on which star is taken as the donor
+
+      point_mass_index ! index of the star taken as point mass, zero if both are modelled
+
+      !ignore_rlof_flag ! flag that indicates whether or not mass transfer from RLOF is ignored
+      !model_twins_flag ! flag that indicates whether or not star 2 is modeled as twin of 1
+
+      !CE_flag ! flag that indicates if a CE event is being modeled
+      !CE_lambda1 ! lambda value for star 1 after CE ejection. Value is set to zero unless a CE 
+      !        ! happens, and is updated when each CE phase finishes
+      !CE_lambda2 ! same for star 2
+      !CE_Ebind1 ! similar to CE_lambda1, but specifies the binding energy down to the mass
+      !          ! coordinate of layers that we're ejected. Includes adjustements to Ebind from
+      !          ! alpha_th and other options.
+      !CE_Ebind2 ! similar to CE_lambda1, but specifies the binding energy down to the mass
+      !          ! coordinate of layers that we're ejected. Includes adjustements to Ebind from
+      !          ! alpha_th and other options.
+      !CE_num1 ! number of times star 1 has initiated a CE phase
+      !CE_num2 ! number of times star 2 has initiated a CE phase
+

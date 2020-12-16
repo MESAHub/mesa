@@ -1,0 +1,3 @@
+#!/bin/bash
+#  runs programme $1 with data file $2
+"$aprgdir"/bin/get-input "$2" | "$1"

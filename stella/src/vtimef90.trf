@@ -1,0 +1,88 @@
+--  Emulates IBM - timer
+--  XTIME - time in seconds
+SUBROUTINE VTIME(XTIME);
+REAL XTIME;
+external second;
+/*
+-- for NDP fortran
+INTEGER SECNDS;
+External SECNDS;
+XTIME=SECNDS(0);
+-- for SUN f77
+real tarray(2);
+call etime(tarray);
+XTIME=tarray(1);
+--  next lines are for MSPOWER fortran
+Integer*2 Hour,minute,second,hundredth;
+  call getTim(Hour,minute,second,hundredth);
+ xtime=3600.* Hour+60.*minute+second+0.01*hundredth ;
+*/
+XTIME=SECOND(0.0);
+RETURN;
+END;
+
+-------------------------------------------
+     real  function second(t);
+        real(4) t,tcpu;
+        call cpu_time(tcpu);
+        second=tcpu;
+       end;
+
+--------------------------------
+
+Subroutine Tremain(RTime,BegTime);
+Parameter ( RunTime=86400. );    -- Batch time !!!
+-- External Vtime;
+Real Xtime,Rtime,BegTime;
+  call Vtime(Xtime);
+  Rtime=RunTime-(Xtime-BegTime);
+Return;
+End;
+
+--------------------------------
+
+Subroutine DateTime(Date,Time);
+Character*(*) Date,Time;
+Integer Hour,minute,second,hundredth;
+Integer*4 Month,Day,Year;
+INTEGER DATE_TIME(8);
+CHARACTER (LEN = 12) REAL_CLOCK (3);
+CHARACTER(10) t;
+CHARACTER(5) z;
+
+CALL DATE_AND_TIME (REAL_CLOCK(1), REAL_CLOCK(2),
+                      REAL_CLOCK (3), DATE_TIME);
+   write(*,*)' REAL_CLOCK(1)=',REAL_CLOCK(1);
+   write(*,*)' REAL_CLOCK(2)=',REAL_CLOCK(2);
+   write(*,*)' REAL_CLOCK(3)=',REAL_CLOCK(3);
+   write(*,*)' DATE_TIME=', DATE_TIME;
+   CALL DATE_AND_TIME(TIME = t, ZONE = z);
+   write(*,*)' time=',t;
+   write(*,*)' zone=',z;
+   write(Date,'(I4,''/'',I2,''/'',I2)')
+     Date_time(1), -- Year,
+     Date_time(2), -- Month,
+     Date_time(3); -- Day;
+  Hour=Date_time(5);
+  minute=Date_time(6);
+  second=Date_time(7);
+  write(Time,'(I2,'':'',I2,'':'',I2)') Hour,minute,second;
+Return;
+End;
+
+---------------------------------
+Subroutine BasTat(string);
+  Character*(*) string;
+Return;
+End;
+---------------------------------
+Subroutine DatTim(d,t);
+character*(*) d,t;
+Return;
+End;
+----------------------------------
+Function Ltime(itim);
+Ltime=0; -- dummy
+Return;
+End;
+

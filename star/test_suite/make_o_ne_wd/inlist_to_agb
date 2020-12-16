@@ -1,0 +1,68 @@
+! inlist_to_agb
+ 
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      !load_saved_model = .true.
+      !saved_model_name = 'zams.mod'
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 'agb.mod'
+      required_termination_code_string = 'log_max_temp_upper_limit'
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 10
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1600
+
+
+   always_use_dedt_form_of_energy_eqn = .true.
+   steps_before_start_stress_test = 0           ! always run under "stress" conditions
+
+      use_gold2_tolerances = .true.
+
+      log_max_temp_upper_limit = 8.6d0
+     
+      cool_wind_full_on_T = 1d6
+      hot_wind_full_on_T = 1d6 
+      hot_wind_scheme = ''
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5 ! 0d0  
+      Blocker_scaling_factor = 0.5 ! 20d0
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+      !pause = .true.
+      Profile_Panels3_xmax = 3 !  -101d0 ! only used if /= -101d0
+
+/ ! end of pgstar namelist

@@ -1,0 +1,56 @@
+_define @lbuffer 132
+        @symbol string(i:i)
+        @space  "' '" ;
+
+/*
+program tst;  
+character*@lbuffer string, wordm(10);
+integer  lwordm(10), nwordm, lm;
+
+_repeat[  -- to exit just press CTRL-D
+ print *, ' string ? '; read(*,'(A)', end=10) string;
+ call words(string, wordm,lwordm, nwordm);
+ print *, ' nwordm=', nwordm;
+ _do i=1,nwordm;
+        lm=lwordm(i);
+        print *, '!',wordm(i)(1:lm),'!',lm;
+ _od;
+]; 10: continue;
+end;
+*/
+
+
+Subroutine words(string, wordm,lwordm,nwordm);
+character*(*) string, wordm(*);
+integer lwordm(*), nwordm;
+character*@lbuffer dmword;
+integer i, lm, lstring;
+<*length: of string in lstring *>;
+i=1; nwordm=0;
+_while i <= lstring  _do
+   <*skip: spaces *>;
+   <*accumulate: next word in wordm, length in lwordm *>;
+_od;
+
+return;
+end;
+%_length:
+  lstring=len_trim(string);
+  _while lstring > 0 
+      & string(max(lstring,1):max(lstring,1))==@space _do
+        lstring=lstring-1;
+  _od;
+%_skip:
+  _while i<= lstring & @symbol == @space _do
+    i=i+1;
+  _od;
+%_accumulate:
+  lm=0;
+  _while i <= lstring & @symbol <> @space & lm < @lbuffer _do
+    lm=lm+1;
+    dmword(lm:lm)=@symbol;
+    i=i+1;
+  _od;
+  if (lm > 0) then;
+    nwordm=nwordm+1; wordm(nwordm)(1:lm)=dmword(1:lm); lwordm(nwordm)=lm;
+  endif;

@@ -1,0 +1,4 @@
+rm -rf ../data/eosDT_data/
+mkdir ../data/eosDT_data
+mkdir ../data/eosDT_data/cache
+cp data/eosDT_data/mesa*.data ../data/eosDT_data

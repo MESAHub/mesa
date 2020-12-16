@@ -1,0 +1,20 @@
+#!/bin/bash
+
+function check_okay {
+        if [ $? -ne 0 ]
+        then
+            	echo
+                pwd
+                echo "./export FAILED"
+                echo
+                exit 1
+        fi
+}
+
+
+cd make
+make install
+check_okay 
+cd ../
+
+

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function check_okay {
+        if [ $? -ne 0 ]
+        then
+                exit 1
+        fi
+}
+
+echo 'create chem_data'
+
+rm -rf ../data/chem_data
+check_okay
+
+mkdir ../data/chem_data
+check_okay
+
+cp data/* ../data/chem_data
+check_okay

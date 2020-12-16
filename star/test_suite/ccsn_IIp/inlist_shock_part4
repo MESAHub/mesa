@@ -1,0 +1,68 @@
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = 'shock_part3.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'shock_part4.mod'
+      required_termination_code_string = 'extras_finish_step'
+
+      !pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 15000
+         
+      x_integer_ctrl(1) = 4 ! part number
+
+! RTI
+
+! equation controls
+      use_momentum_outer_BC = .true.
+      ! use_compression_inner_BC = .false. 
+
+! timestep controls
+   
+! mesh controls
+      split_merge_amr_okay_to_split_nz = .false.
+
+! solver controls
+
+! output controls
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+
+
+/ ! end of controls namelist
+
+&pgstar
+         
+!pause = .true.
+
+Profile_Panels1_xmin = -101 ! 1.9
+Profile_Panels2_xmin = -101 ! 1.9
+Abundance_xmin = -101 ! 1.9
+Mixing_xmin = -101 ! 1.9
+
+!Profile_Panels1_yaxis_name(2) = 'alpha_RTI'
+!Profile_Panels1_ymax(2) = 0.99
+!Profile_Panels1_ymin(2) = 0
+!Profile_Panels1_other_yaxis_name(2) = 'log_source_RTI'
+!Profile_Panels1_other_ymax(2) = -0.1
+!Profile_Panels1_other_ymin(2) = -10
+
+
+/ ! end of pgstar namelist

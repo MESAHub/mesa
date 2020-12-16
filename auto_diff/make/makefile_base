@@ -1,0 +1,113 @@
+# This is the makefile for the mesa library of numerical routines
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCE FILES
+
+SRCS = $(subst ../private/,,$(wildcard ../private/*.f90)) auto_diff.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+    LIBS_OTHER = $(LIBS_MATRIX)
+    DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+    LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libauto_diff.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) auto_diff.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+ifeq ($(FC),ifort)
+	@$(CP_IF_NEWER) auto_diff_*.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) support_functions.mod $(MESA_DIR)/include
+endif
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPULATION RULES
+
+COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_TO_DEPLOY))
+
+COMPILE = $(COMPILE_LEGACY) $(FCfixed)
+
+COMPILE_FREE = $(COMPILE_LEGACY) $(FCfree)
+
+#COMPILE_XTRA = $(COMPILE_NO_CHECKS) $(FCfixed) -c
+COMPILE_XTRA = $(COMPILE_BASIC) $(FCopt) $(FCfixed) -c
+
+COMPILE_LEGACY_XTRA = $(filter-out -std=f2008, $(COMPILE_XTRA)) -std=legacy
+
+COMPILE_CMD = $(COMPILE)
+
+%.o : %.mod
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_FREE $<
+	@$(COMPILE_FREE) $<
+else
+	$(COMPILE_FREE) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.dek $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

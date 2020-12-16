@@ -1,0 +1,10 @@
+      subroutine fcn_blk_dble(n,caller_id,nvar,nz,x,h,y,f,lrpar,rpar,lipar,ipar,ierr)
+         use const_def, only: dp
+         integer, intent(in) :: n, caller_id, nvar, nz, lrpar, lipar
+         real(dp), intent(in) :: x, h
+         real(dp), intent(inout), pointer :: y(:) ! (n) okay to edit y if necessary (e.g., replace negative values by zeros)
+         real(dp), intent(inout), pointer :: f(:) ! (n) dy/dx
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+      end subroutine fcn_blk_dble

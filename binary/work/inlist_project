@@ -1,0 +1,22 @@
+&binary_job
+
+   inlist_names(1) = 'inlist1' 
+   inlist_names(2) = 'inlist2'
+
+   evolve_both_stars = .false.
+
+/ ! end of binary_job namelist
+
+&binary_controls
+         
+   m1 = 1.0d0  ! donor mass in Msun
+   m2 = 1.4d0 ! companion mass in Msun
+   initial_period_in_days = 2d0
+
+   !transfer efficiency controls
+   limit_retention_by_mdot_edd = .true.
+
+   max_tries_to_achieve = 20
+         
+/ ! end of binary_controls namelist
+

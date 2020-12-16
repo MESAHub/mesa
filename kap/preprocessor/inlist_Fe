@@ -1,0 +1,15 @@
+&kappa
+
+         data_dir = 'kap_input_data/OP'
+         OP_file = .true.
+         type1_table = 'Fe.OP17'
+         logR_min = -8.00d0
+         logR_max = 1.00d0
+         logR_points = 37
+         logT_file = 'logT_points_Fe'
+         output_dir = 'data/kap_data'
+         table_prefix = 'OP_Fe'
+         header_info = 'Fe'
+         table_version= 38
+
+/

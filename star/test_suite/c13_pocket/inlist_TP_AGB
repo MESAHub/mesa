@@ -1,0 +1,52 @@
+&controls
+
+! spatially resolve the C13 pockets 
+      xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
+      xa_function_weight(1) = 5
+      xa_function_param(1) = 3d-4
+      xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
+      xa_function_weight(2) = 5
+      xa_function_param(2) = 1d-2
+      xa_function_species(3) = 'c13'  ! name of nuclide as defined in chem_def
+      xa_function_weight(3) = 4
+      xa_function_param(3) = 1d-3
+      xa_function_species(4) = 'n14'  ! name of nuclide as defined in chem_def
+      xa_function_weight(4) = 3
+      xa_function_param(4) = 1d-2
+
+! temporally resolve the thermal pulse (and interpulse)
+
+      delta_lgL_He_limit = 0.01
+      lgL_He_burn_min = 2.0
+
+      dH_limit_min_H = 1d-2
+      dH_limit = 0.1
+
+      dH_div_H_limit_min_H = 1d-5
+      dH_div_H_limit = 0.5
+
+! overshooting
+! first match will be applied
+
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'nonburn'
+      overshoot_zone_loc(1) = 'shell'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.128
+      overshoot_f0(1) = 0.100
+
+      overshoot_scheme(2) = 'exponential'
+      overshoot_zone_type(2) = 'burn_He'
+      overshoot_zone_loc(2) = 'shell'
+      overshoot_bdy_loc(2) = 'bottom'
+      overshoot_f(2) = 0.008
+      overshoot_f0(2) = 0.004
+
+      overshoot_scheme(3) = 'exponential'
+      overshoot_zone_type(3) = 'any'
+      overshoot_zone_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'any'
+      overshoot_f(3) = 0.014
+      overshoot_f0(3) = 0.004
+
+/

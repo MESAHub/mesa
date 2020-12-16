@@ -1,0 +1,140 @@
+      subroutine decsol_done(n,fjac,ldjac,fmas,ldmas,mlmas,mumas,
+     &            m1,m2,nm1,fac1,e1_1D,lde1,ip1,ak,ier,ijob,calhes,iphes,
+     &            mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
+     &            decsol,decsols,decsolblk,
+     &            caller_id, nvar, nz, lblk, dblk, ublk,
+     &            sparse_jac,nzmax,isparse,ia,ja,sa,
+     &            lrd,rpar_decsol,lid,ipar_decsol)
+      implicit none
+      interface
+#include "mtx_decsol.dek"
+#include "mtx_decsols.dek"
+#include "mtx_decsolblk.dek"
+      end interface
+      integer, intent(in) :: caller_id, nvar, nz
+      real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+      integer :: ia(:) ! (n+1)
+      integer :: ja(:) ! (nzmax)
+      integer :: n, ldjac, ldmas, mlmas, mumas, m1, m2, nm1, lde1, ier, ijob
+      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lrd, lid
+      real(dp) :: sparse_jac(:) ! (nzmax)
+      real(dp) :: sa(:) ! (nzmax)
+      real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+      integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+      real(dp) :: fac1, fjac(ldjac,n), fmas(ldmas,nm1)
+      logical :: calhes
+      integer :: iphes(n)
+      integer, pointer :: ip1(:) ! (nm1)
+      real(dp), pointer :: e1_1D(:) ! =(lde1,nm1)
+      real(dp), pointer :: ak(:)
+      
+      !write(*,*) 'decsol_done ijob', ijob
+      
+
+      ier = 0
+      if (nvar > 0) then
+         call decsolblk(
+     &      2,caller_id,nvar,nz,lblk,dblk,ublk,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         return
+      end if
+      
+      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
+c
+c -----------------------------------------------------------
+c
+   1  continue
+c ---  b=identity, jacobian a full matrix
+      call decsol(2,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   8  continue
+c ---  b=identity, jacobian a sparse matrix
+      !write(*,*) 'decsol_done call decsols'
+      call decsols(2,n,nzmax,ia,ja,sa,ak,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      !write(*,*) 'back decsols'
+      return
+c
+c -----------------------------------------------------------
+c
+  11  continue
+c ---  b=identity, jacobian a full matrix, second order
+      call decsol(2,nm1,lde1,e1_1D,nm1,nm1,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   2  continue
+c ---  b=identity, jacobian a banded matrix
+      call decsol(2,n,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  12  continue
+c ---  b=identity, jacobian a banded matrix, second order
+      call decsol(2,nm1,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   3  continue
+c ---  b is a banded matrix, jacobian a full matrix
+      call decsol(2,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   9  continue
+c ---  b is a banded matrix, jacobian a sparse matrix
+      call decsols(2,n,nzmax,ia,ja,sa,ak,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  13  continue
+c ---  b is a banded matrix, jacobian a full matrix, second order
+      goto 5
+c
+c -----------------------------------------------------------
+c
+   4  continue
+c ---  b is a banded matrix, jacobian a banded matrix
+      call decsol(2,n,lde1,e1_1D,mle,mue,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  14  continue
+c ---  b is a banded matrix, jacobian a banded matrix, second order
+      goto 12
+c
+c -----------------------------------------------------------
+c
+   5  continue
+c ---  b is a full matrix, jacobian a full matrix
+      call decsol(2,n,lde1,e1_1D,n,n,ak,ip1,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  15  continue
+c ---  b is a full matrix, jacobian a full matrix, second order
+      goto 5
+c
+c -----------------------------------------------------------
+c
+   6  continue
+c ---  b is a full matrix, jacobian a banded matrix
+c ---  this option is not provided
+      return
+c
+c -----------------------------------------------------------
+c
+  55  continue
+       write(*,*) 'decsol_done: invalid ijob', ijob
+       call mesa_error(__FILE__,__LINE__) ! decsol_done
+      end subroutine decsol_done
+c
+c ***********************************************************

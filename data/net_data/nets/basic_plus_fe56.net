@@ -1,0 +1,2 @@
+         include 'basic.net'
+         add_isos(fe56)

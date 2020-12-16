@@ -1,0 +1,58 @@
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = 'make_co_wd_6M.mod' ! WD from 6Msun (ZAMS) via make_co_wd
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'wd_c_core_ignition.mod'
+      required_termination_code_string = 'star_mass_min_limit'
+
+      ! move the surface down to larger optical depth
+      set_tau_factor = .true.
+      set_to_this_tau_factor = 30
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      pgstar_flag = .false.
+      
+/ ! end of star_job namelist
+
+&eos
+/
+
+&kap
+      Zbase = 0.02d0
+      use_Type2_opacities = .true.
+/
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 200
+
+      
+      mass_change = -1e-9
+      star_mass_min_limit = 0.95  ! chosen to remove outer H/He envelope
+
+      varcontrol_target = 1e-3
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+!pause = .true.
+
+         TRho_Profile_win_flag = .true.
+         TRho_Profile_xmin = -5.0
+         TRho_Profile_xmax = 11.0
+         TRho_Profile_ymin = 4.0
+         TRho_Profile_ymax = 10.0        
+
+         show_TRho_Profile_text_info = .true.
+
+         Abundance_win_flag = .true.
+         Abundance_xaxis_name = 'logRho'
+
+/ ! end of pgstar namelist

@@ -1,0 +1,71 @@
+last edited -- Oct 12, 2010.  Bill Paxton
+
+This is a summary of the nets included for use with mesa/net.
+
+I've given the isotopes that are included in each net,
+but I haven't listed the reactions.  To check on those,
+it is best to have the code list them for you.  In mesa/star
+you can do this by setting show_net_reactions_info;
+similarly, you can get a list of the isotopes by setting
+show_net_species_info.
+
+
+for "no frills" hydrogen and helium burning
+
+   basic -- h1, he3, he4, c12, n14, o16, ne20, mg24
+      assumes T is low enough so can ignore advanced burning and hot cno issues.
+
+
+the following nets provide more complete coverage for hydrogen and helium burning
+
+   c13 -- basic + c13
+   o18_and_ne22 -- basic + o18 and ne22   
+   o18_to_mg26 -- o18_and_ne22 + mg26
+   hot_cno -- basic + c13, n13, n15, o15, o17, o18, f17, f18
+      for high temperatures where cno becomes beta limited.
+   cno_extras -- hot_cno + o14, f19, ne18, ne19, mg22
+      for high temperatures where start to breakout of hot cno.
+   cno_extras_to_ni56 -- cno_extras + s30, ni56
+      extends rp breakout up to ni56
+      see Wallace & Woosley, ApjS, 45:389-420, 1981, Appendix C
+   pp_extras -- basic + h2, li7, be7, b8
+   pp_and_cno_extras -- pp_extras + cno_extras
+   pp_cno_extras_o18_ne22 -- pp_and_cno_extras + o18_and_ne22
+
+
+these nets extend the basic net for C/O burning and alpha chains
+   
+   co_burn -- basic + si28
+   alpha_s32 -- co_burn + s32
+   alpha_ar36 -- alpha_s32 + ar36
+   alpha_ca40 -- alpha_ar36 + ca40
+   alpha_ti44 -- alpha_ca40 + ti44
+   alpha_cr48 -- alpha_ti44 + cr48
+   alpha_fe52 -- alpha_cr48 + fe52
+   alpha_ni56 -- alpha_fe52 + fe54, ni56, neut, and prot
+   approx19 -- same isotopes as alpha_ni56; similar to Frank Timmes' APPROX19
+   approx20 -- approx19 + fe56
+   approx21 -- approx20 + cr56
+   ns_he -- approx21 + (a,p)*(p,g) intermediates for alpha links + "bypass" for c12
+
+
+If you don't find what you need here, it is fairly easy to create new nets.
+Before you try that, I suggest you study o18_and_ne22.net to see how it works.
+The idea is to start from a net that is close to what you need, then add
+isotopes and reactions as needed; you may also need to remove some reactions.
+You can put your new net file in your work directory; mesa/net looks in the
+current directory before it checks data/net_data/nets.  Before using
+your new net, get a list of isotopes and reactions and carefully check them.
+
+For reference, the current set of isotopes is in mesa/data/chem_data/isotopes.data.
+The format of that file is described in a README file in the same directory.
+The current set of reactions is in mesa/net_data/reactions.list.  The reaction names
+in net files must be defined in the reactions.list file.  Those reactions are
+implemented by the mesa/rates module.  It is not too hard to add new reactions,
+but I haven't produced a useful "how to" document yet -- so if you want to add
+reactions, ask me for help.
+
+
+
+
+

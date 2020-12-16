@@ -1,0 +1,35 @@
+tables for tau = 1e-1; Dimensions - nZ, nT, ng
+ 1 110 13
+nZ x 3 lines - Filename, version number, and header line
+1m1_Zp00.tbl
+#Table Version   5
+#[Z/Z_SOLAR]= 0.00 [A/Fe]= 0.0 GN93     | VALID RANGE:  110 110 110 110 110 110 110 110 110 110 110 110 110
+Teff_array(1:nT)
+    100    200    300    400    500    600    700    800    900   1000   1100   1200   1300
+   1400   1500   1600   1700   1800   1900   2000   2100   2200   2300   2400   2500   2600
+   2700   2800   2900   3000   3100   3200   3300   3400   3500   3750   4000   4250   4500
+   4750   5000   5250   5500   5750   6000   6250   6500   6750   7000   7250   7500   7750
+   8000   8250   8500   8750   9000   9250   9500   9750  10000  10250  10500  10750  11000
+  11250  11500  11750  12000  12250  12500  12750  13000  14000  15000  16000  17000  18000
+  19000  20000  21000  22000  23000  24000  25000  26000  27000  28000  29000  30000  31000
+  32000  33000  34000  35000  36000  37000  38000  39000  40000  41000  42000  43000  44000
+  45000  46000  47000  48000  49000  50000      
+logg_array(1:ng)
+  0.00   0.50   1.00   1.50   2.00   2.50   3.00   3.50   4.00   4.50   5.00   5.50   6.00
+
+#######################################################################################################
+NOTES: This file includes header information for each of the nZ tables and defines the Teff and logg 
+arrays. First line lists number of tables (nZ), number of Teff points (nT), number of logg points (ng).
+Next nZ lines give the first line from each of those tables. Next blocks list the Teff and logg arrays.
+This file is read during initialization of the table_atm module.
+
+How this file is made: 
+     nZ is the number of distinct table files corresponding to the number of Z values
+     nT is the number of Teff points = number of lines in each file not beginning with #
+     ng is the number of columns after the first (which is Teff) = number of columns - 1
+
+     filename followed by "head -n2" for all files in order of increasing Z
+
+     Teff_array is the first column of the file, here written in 13 columns
+
+     logg_array is listed in the last line beginning with # in 13(logg = _)

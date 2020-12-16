@@ -1,0 +1,168 @@
+
+! inlist_15M_dynamo
+
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'he_burn.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'xa_central_lower_limit'      
+
+
+      !pgstar_flag = .true.
+      
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+
+&kap
+         Zbase = 2d-2
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+         use_dedt_form_of_energy_eqn = .true.
+
+         num_trace_history_values = 2
+         trace_history_value_name(1) = 'rel_E_err'
+         trace_history_value_name(2) = 'log_rel_run_E_err'
+         
+         x_logical_ctrl(1) = .true. ! test final results for this run
+
+         ! limit max_model_number as part of test_suite
+         max_model_number = 2400
+
+         initial_mass = 15
+         initial_z = 2d-2
+
+         hot_wind_scheme = 'Dutch'
+         hot_wind_full_on_T = 1d0
+         cool_wind_full_on_T = 0d0
+         Dutch_scaling_factor = 0.8
+
+         am_nu_visc_factor = 0
+         am_D_mix_factor = 0.0333333333333333d00
+         
+         D_DSI_factor = 0
+         D_SH_factor = 1
+         D_SSI_factor = 1
+         D_ES_factor = 1
+         D_GSF_factor = 1
+         D_ST_factor = 1
+
+         am_nu_ST_factor = 10
+                  
+
+         log_center_density_limit = 12 
+         log_center_temp_limit = 10.3d0 ! max T about 2d10
+         
+         xa_central_lower_limit_species(1) = 'he4'
+         xa_central_lower_limit(1) = 0.6                       
+      
+         use_Ledoux_criterion = .true.
+   
+         alpha_semiconvection = 4d-2
+         thermohaline_coeff = 2  
+
+         dX_mix_dist_limit = 1d-4 
+         
+         omega_function_weight = 20
+
+         mdot_omega_power = 0.43
+
+         clip_D_limit = 10
+         
+         xa_scale = 1d-5
+
+         mixing_length_alpha = 1.6
+
+         dX_nuc_drop_max_A_limit = 52
+         dX_nuc_drop_min_X_limit = 1d-4
+         dX_nuc_drop_limit = 5d-3
+         dX_nuc_drop_hard_limit = 1d99
+         
+         delta_lgTeff_limit = 0.005  
+         delta_lgL_limit = 0.05
+         delta_lgRho_cntr_limit = 0.02  
+
+         mesh_dlog_pp_dlogP_extra = 0.15
+         mesh_dlog_cno_dlogP_extra = 0.15
+      
+         mesh_dlog_3alf_dlogP_extra = 0.15
+         mesh_dlog_burn_c_dlogP_extra = 0.15
+         
+         mesh_dlog_burn_n_dlogP_extra = 0.15
+         mesh_dlog_burn_o_dlogP_extra = 0.15
+      
+         mesh_dlog_burn_ne_dlogP_extra = 0.15
+         
+         mesh_dlog_burn_na_dlogP_extra = 0.15
+         mesh_dlog_burn_mg_dlogP_extra = 0.15
+         
+         mesh_dlog_cc_dlogP_extra = 0.15
+         mesh_dlog_co_dlogP_extra = 0.15
+         
+         mesh_dlog_oo_dlogP_extra = 0.15
+         
+         mesh_dlog_burn_si_dlogP_extra = 0.15
+         mesh_dlog_burn_s_dlogP_extra = 0.15
+         mesh_dlog_burn_ar_dlogP_extra = 0.15
+         mesh_dlog_burn_ca_dlogP_extra = 0.15
+         mesh_dlog_burn_ti_dlogP_extra = 0.15
+         mesh_dlog_burn_cr_dlogP_extra = 0.15
+         mesh_dlog_burn_fe_dlogP_extra = 0.15
+         
+         mesh_dlog_pnhe4_dlogP_extra = 0.15
+         mesh_dlog_other_dlogP_extra = 0.15
+         mesh_dlog_photo_dlogP_extra = 1
+         
+         
+         xa_function_species(1) = 'ne20'
+   		xa_function_weight(1) = 20
+   		xa_function_param(1) = 1d-2
+         
+         xa_function_species(1) = 'si28'
+   		xa_function_weight(1) = 20
+   		xa_function_param(1) = 1d-2
+         
+         xa_function_species(1) = 's32'
+   		xa_function_weight(1) = 20
+   		xa_function_param(1) = 1d-2
+         
+         xa_function_species(1) = 'fe54'
+   		xa_function_weight(1) = 20
+   		xa_function_param(1) = 1d-2
+         
+         xa_function_species(1) = 'fe56'
+   		xa_function_weight(1) = 20
+   		xa_function_param(1) = 1d-2
+
+         min_overshoot_q = 1d-3 
+
+         T_mix_limit = 1d4
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+
+/ ! end of pgstar namelist

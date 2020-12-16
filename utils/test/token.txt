@@ -1,0 +1,13 @@
+
+      ! test token reader
+      
+      file = "token.txt"
+      file2 = 'token2.txt'
+      
+      add_isos(ih1, ihe4, ic12)
+      
+      add_reactions(
+          rc12pg,           ! c12(p,g)n13
+          rc12ap            ! c12(a,p)n15
+          )
+         

@@ -1,0 +1,36 @@
+      ! subset of the full rp.net -- has rp.net isos up to ni56.  should be good for energy generation.
+      
+      add_isos_and_reactions(
+         neut
+         h  1 3
+      	he 3 4
+         li7
+         be 7 8
+         b8
+         b11
+         c9
+         c 11 12
+         n 12 15
+         o 13 18
+         f 17 19
+         ne 18 21
+         na 20 23
+         mg 21 25
+         al 22 27
+         si 24 30
+         p 26 31
+         s 27 34
+         cl 30 35
+         ar 31 38
+         k 35 39
+         ca 36 44
+         sc 39 45
+         ti 40 47
+         v 43 49
+         cr 44 52
+         mn 47 53
+         fe 48 56
+         co 51 56
+         ni 52 56
+         )
+         

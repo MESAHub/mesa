@@ -1,0 +1,109 @@
+# This is the makefile for the mesa adipls main program/library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+LIB_SRCS = \
+    adipls.c.d.f anldet.d.f cmparr.d.f danorm.d.f decicd.d.f \
+    dmpgsm.d.f dmpmde.d.f dmpsum.d.f geninh.d.f gm1ker.n.d.f gravpo.n.d.f \
+    kiner.n.d.f mchcff.d.f order.d.f takata.d.f readml.n.d.f res_adimod.c.d.f \
+    readsm.d.f adirhs.c.d.f rotker.c.d.f \
+    trnmod.n.d.f setbcs.n.d.f setssm.n.d.f signew.n.d.f rdfrqr.d.f varfrq.n.d.f \
+    xlmult.d.f nrkint.c.d.f nrtssl.d.f stevft.n.d.f shtint.c.d.f mchsol.n.d.f \
+    sclasl.c.d.f nrkm.d.f setsum.d.f sumout.d.f \
+    sigint.n.d.f sigitr.n.d.f sigitc.c.d.f sigsol.c.d.f sigout.c.d.f sigscn.c.d.f \
+    rsnfit.n.d.f res_adipar.c.d.f setups_adi.c.d.f set_rotation.c.d.f \
+    setobs_st.c.d.f dump_obs.c.d.f \
+    delta1.d.f delta2.d.f delta3.d.f \
+    sph.d.f uhx.d.f \
+    aramax.d.f derive.d.f derivk.new.d.f leq.d.f \
+    lininh.new.d.f lininh4.d.f ofiles.c.f \
+    nrk.d.f vinta.d.f lir.d.f rnmean.d.f \
+    vintk.new.d.f store.d.f notwin.d.f notwni.f \
+    skpcom.f zero.d.f eiginh.d.f intgpt.d.f \
+    spline.d.f length.f strcompr.f lirt.d.f blstio.f \
+    srdist.c.d.f rseta4.c.d.f
+
+PROG_SRCS = main.c.d.f user_adi.c.d.f
+
+# On Windows, the blstio common block isn't linked in properly
+
+ifeq ($(BUILD_ON_WINDOWS),YES)
+   PROG_SRC = $(PROG_SRC) blstio.f
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libadipls.$(LIB_SUFFIX_STATIC)
+PROG = ../adipack.c/adipls/adipls.c.d.x
+
+LIB_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(LIB_SRCS)))
+PROG_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PROG_SRCS)))
+
+all : $(LIB) $(PROG)
+
+$(LIB) : $(LIB_OBJS)
+# Dont build shared libraries
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL_STATIC) $(LIB) $(LIB_OBJS)
+else	   
+	$(LIB_TOOL_STATIC) $(LIB) $(LIB_OBJS)
+endif	
+
+$(PROG) : $(PROG_OBJS) $(LIB)
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $(PROG)
+	@$(COMPILE_CMD) -w -o $(PROG) $(PROG_OBJS) $(LIB)
+else	   
+	$(COMPILE_CMD) -w -o $(PROG) $(PROG_OBJS) $(LIB)
+endif	
+
+clean:
+	-@rm -f *.o $(LIB) $(PROG)
+
+install:
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+#################################################################
+#
+# COMPILATION RULES
+
+ifneq (,$(findstring gfortran,$(FC)))
+COMPILE_CMD = $(FC) -std=legacy
+else
+COMPILE_CMD = $(FC)
+endif
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) -w -c $<
+else
+	$(COMPILE_CMD) -w -c $<
+endif
+
+ifeq ($(USE_SHARED), YES)
+     COMPILE_CMD += -fPIC
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = ../adipack.c/adipls:../adipack.c/gensr:../adipack.c/adiajobs/sr
+
+vpath %.f $(SRC_PATH)
+
+

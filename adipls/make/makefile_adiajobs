@@ -1,0 +1,301 @@
+# This is the makefile for the mesa adipls support programs
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+ASYMP_SCALE_SRCS = \
+    asymp-scale.d.o lir.d.o getcas.o rdamdl.n.d.o skpcom.o \
+    cpycom.o length.o ofiles.o blstio.o
+
+COMPAMOD_SRCS = \
+    compamod.n.d.o ofiles.o lir.d.o vinta.d.o \
+    length.o blstio.o
+
+DIFF_FGONG_SRCS = \
+    diff-fgong.d.o lir.d.o blstio.o
+
+DIFF_SUM_SRCS = \
+    diff-sum.d.o rdfreq.d.o wrfreq.d.o skpcom.o \
+    blstio.o
+
+FDIF_SIN_SRCS = \
+    fdif.sin.d.o ofiles.o zero.d.o lir.d.o \
+    skpcom.o length.o blstio.o
+
+FGONG_AMDL_SRCS = \
+    fgong-amdl.d.o blstio.o
+
+FILT_GSM_SRCS = \
+    filt-gsm.d.o blstio.o
+
+FIT_DNL_SRCS = \
+    fit-dnl.o lstsqr.o skpcom.o length.o blstio.o
+
+FORM_AGSM_SRCS = \
+    form-agsm.d.o blstio.o
+
+FORM_AMDL_SRCS = \
+    form-amdl.d.o blstio.o
+
+FREQDIF_SRCS = \
+    freqdif.d.o ofiles.o zero.d.o izero.o lir.d.o \
+    rdfreq.d.o rdfrqe.d.o skpcom.o length.o blstio.o
+
+LSQFREQ_SRCS = \
+    lsqfreq.d.o rdfrqm.d.o ofiles.o lsqpol.d.o \
+    leq.d.o skpcom.o craysub.d.o length.o blstio.o
+
+MER_AMDE_SRCS = \
+    mer-amde.d.o blstio.o
+
+MER_SUM_SRCS = \
+    mer-sum.d.o rdfreq.d.o wrfreq.d.o skpcom.o blstio.o
+
+PRT_AMDL_SRCS = \
+    prt-amdl.d.o blstio.o
+
+REDISTRB_SRCS = \
+    redistrb.d.o ofiles.o length.o lir.d.o vinta.d.o \
+    rnmean.d.o spline.d.o blstio.o
+
+REDISTRB_C_SRCS = \
+    redistrb.c.d.o srdist.c.d.o rseta4.c.d.o ofiles.c.o \
+    length.o lir.d.o lirt.d.o vinta.d.o derive.d.o \
+    rnmean.d.o blstio.o
+
+RES_AMDE_SRCS = \
+    res-amde.d.o blstio.o
+
+SCAN_AGSM_SRCS = \
+    scan-agsm.d.o blstio.o
+
+SCAN_AMDE_SRCS = \
+    scan-amde.d.o blstio.o
+
+SCAN_AMDL_SRCS = \
+    scan-amdl.d.o blstio.o
+
+SCAN_SSM_SRCS = \
+    scan-ssm.d.o blstio.o
+
+SEL_AMDL_SRCS = \
+    sel-amdl.d.o blstio.o
+
+SELAMDE_SRCS = \
+    selamde.d.o ofiles.o length.o inrnge.o \
+    rdfreq.d.o setssm.d.o skpcom.o blstio.o
+
+SELSUM_SRCS = \
+    selsum.d.o ofiles.o length.o inrnge.o \
+    rdfreq.d.o setssm.d.o skpcom.o blstio.o
+
+SET_ASSCAL_SRCS = \
+    set-asscal.d.o rdamdl.n.d.o ofiles.o length.o \
+    squint.d.o vinta.d.o lir.d.o blstio.o
+
+SET_DNL_SRCS = \
+    set-dnl.d.o rdfreq.d.o skpcom.o blstio.o
+
+SET_OBS_SRCS = \
+    set-obs.d.o rdfreq.d.o skpcom.o blstio.o
+
+SETEXEC_SRCS = \
+    setexec.d.o rdfreq.d.o ofiles.o length.o \
+    skpcom.o blstio.o
+
+SORTSUM_SRCS = \
+    sortsum.d.o rdfreq.d.o rdilst.o iprsgn.d.o \
+    sort.d.o skpcom.o ofiles.o length.o blstio.o
+
+#################################################################
+#
+# TARGETS
+
+PROG_DIR = ../adipack.c/adiajobs
+
+ASYMP_SCALE = $(PROG_DIR)/asymp-scale.d.x
+COMPAMOD = $(PROG_DIR)/compamod.n.d.x
+DIFF_FGONG = $(PROG_DIR)/diff-fgong.d.x
+DIFF_SUM = $(PROG_DIR)/diff-sum.d.x
+FDIF_SIN = $(PROG_DIR)/fdif.sin.d.x
+FGONG_AMDL = $(PROG_DIR)/fgong-amdl.d.x
+FILT_GSM = $(PROG_DIR)/filt-gsm.d.x
+FIT_DNL = $(PROG_DIR)/fit-dnl
+FORM_AGSM = $(PROG_DIR)/form-agsm.d.x
+FORM_AMDL = $(PROG_DIR)/form-amdl.d.x
+FREQDIF = $(PROG_DIR)/freqdif.d.x
+LSQFREQ = $(PROG_DIR)/lsqfreq.d.x
+MER_AMDE = $(PROG_DIR)/mer-amde.d.x
+MER_SUM = $(PROG_DIR)/mer-sum.d.x
+PRT_AMDL = $(PROG_DIR)/prt-amdl.d.x
+REDISTRB_C = $(PROG_DIR)/redistrb.c.d.x
+REDISTRB = $(PROG_DIR)/redistrb.d.x
+RES_AMDE = $(PROG_DIR)/res-amde.d.x
+SCAN_AGSM = $(PROG_DIR)/scan-agsm.d.x
+SCAN_AMDE = $(PROG_DIR)/scan-amde.d.x
+SCAN_AMDL = $(PROG_DIR)/scan-amdl.d.x
+SCAN_SSM = $(PROG_DIR)/scan-ssm.d.x
+SEL_AMDL = $(PROG_DIR)/sel-amdl.d.x
+SELAMDE = $(PROG_DIR)/selamde.d.x
+SELSUM = $(PROG_DIR)/selsum.d.x
+SET_ASSCAL = $(PROG_DIR)/set-asscal.d.x
+SET_DNL = $(PROG_DIR)/set-dnl.d.x
+SET_OBS = $(PROG_DIR)/set-obs.d.x
+SETEXEC = $(PROG_DIR)/setexec.d.x
+SORTSUM = $(PROG_DIR)/sortsum.d.x
+
+ASYMP_SCALE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(ASYMP_SCALE_SRCS)))
+COMPAMOD_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(COMPAMOD_SRCS)))
+DIFF_FGONG_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(DIFF_FGONG_SRCS)))
+DIFF_SUM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(DIFF_SUM_SRCS)))
+FDIF_SIN_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FDIF_SIN_SRCS)))
+FGONG_AMDL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FGONG_AMDL_SRCS)))
+FILT_GSM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FILT_GSM_SRCS)))
+FIT_DNL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FIT_DNL_SRCS)))
+FORM_AGSM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FORM_AGSM_SRCS)))
+FORM_AMDL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FORM_AMDL_SRCS)))
+FREQDIF_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(FREQDIF_SRCS)))
+LSQFREQ_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(LSQFREQ_SRCS)))
+MER_AMDE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MER_AMDE_SRCS)))
+MER_SUM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MER_SUM_SRCS)))
+PRT_AMDL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PRT_AMDL_SRCS)))
+REDISTRB_C_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(REDISTRB_C_SRCS)))
+REDISTRB_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(REDISTRB_SRCS)))
+RES_AMDE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(RES_AMDE_SRCS)))
+SCAN_AGSM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SCAN_AGSM_SRCS)))
+SCAN_AMDE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SCAN_AMDE_SRCS)))
+SCAN_AMDL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SCAN_AMDL_SRCS)))
+SCAN_SSM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SCAN_SSM_SRCS)))
+SEL_AMDL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SEL_AMDL_SRCS)))
+SELAMDE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SELAMDE_SRCS)))
+SELSUM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SELSUM_SRCS)))
+SET_ASSCAL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SET_ASSCAL_SRCS)))
+SET_DNL_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SET_DNL_SRCS)))
+SET_OBS_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SET_OBS_SRCS)))
+SETEXEC_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SETEXEC_SRCS)))
+SORTSUM_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SORTSUM_SRCS)))
+
+all : $(ASYMP_SCALE) $(COMPAMOD) $(DIFF_FGONG) $(DIFF_SUM) $(FDIF_SIN) \
+    $(FGONG_AMDL) $(FILT_GSM) $(FIT_DNL) $(FORM_AGSM) $(FORM_AMDL) $(FREQDIF) \
+    $(LSQFREQ) $(MER_AMDE) $(MER_SUM) $(PRT_AMDL) $(REDISTRB_C) $(REDISTRB) \
+    $(RES_AMDE) $(SCAN_AGSM) $(SCAN_AMDE) $(SCAN_AMDL) $(SCAN_SSM) $(SEL_AMDL) \
+    $(SELAMDE) $(SELSUM) $(SET_ASSCAL) $(SET_DNL) $(SET_OBS) $(SETEXEC) \
+    $(SORTSUM)
+
+$(ASYMP_SCALE) : $(ASYMP_SCALE_OBJS)
+$(COMPAMOD) : $(COMPAMOD_OBJS)   
+$(DIFF_FGONG) : $(DIFF_FGONG_OBJS) 
+$(DIFF_SUM) : $(DIFF_SUM_OBJS)   
+$(FDIF_SIN) : $(FDIF_SIN_OBJS)   
+$(FGONG_AMDL) : $(FGONG_AMDL_OBJS) 
+$(FILT_GSM) : $(FILT_GSM_OBJS)   
+$(FIT_DNL) : $(FIT_DNL_OBJS)    
+$(FORM_AGSM) : $(FORM_AGSM_OBJS)  
+$(FORM_AMDL) : $(FORM_AMDL_OBJS)  
+$(FREQDIF) : $(FREQDIF_OBJS)    
+$(LSQFREQ) : $(LSQFREQ_OBJS)    
+$(MER_AMDE) : $(MER_AMDE_OBJS)   
+$(MER_SUM) : $(MER_SUM_OBJS)    
+$(PRT_AMDL) : $(PRT_AMDL_OBJS)   
+$(REDISTRB_C) : $(REDISTRB_C_OBJS) 
+$(REDISTRB) : $(REDISTRB_OBJS)   
+$(RES_AMDE) : $(RES_AMDE_OBJS)   
+$(SCAN_AGSM) : $(SCAN_AGSM_OBJS)  
+$(SCAN_AMDE) : $(SCAN_AMDE_OBJS)  
+$(SCAN_AMDL) : $(SCAN_AMDL_OBJS)  
+$(SCAN_SSM) : $(SCAN_SSM_OBJS)   
+$(SEL_AMDL) : $(SEL_AMDL_OBJS)   
+$(SELAMDE) : $(SELAMDE_OBJS)    
+$(SELSUM) : $(SELSUM_OBJS)     
+$(SET_ASSCAL) : $(SET_ASSCAL_OBJS) 
+$(SET_DNL) : $(SET_DNL_OBJS)    
+$(SET_OBS) : $(SET_OBS_OBJS)    
+$(SETEXEC) : $(SETEXEC_OBJS)    
+$(SORTSUM) : $(SORTSUM_OBJS)    
+
+$(ASYMP_SCALE) : OBJS = $(ASYMP_SCALE_OBJS)
+$(COMPAMOD) : OBJS = $(COMPAMOD_OBJS)   
+$(DIFF_FGONG) : OBJS = $(DIFF_FGONG_OBJS) 
+$(DIFF_SUM) : OBJS = $(DIFF_SUM_OBJS)   
+$(FDIF_SIN) : OBJS = $(FDIF_SIN_OBJS)   
+$(FGONG_AMDL) : OBJS = $(FGONG_AMDL_OBJS) 
+$(FILT_GSM) : OBJS = $(FILT_GSM_OBJS)   
+$(FIT_DNL) : OBJS = $(FIT_DNL_OBJS)    
+$(FORM_AGSM) : OBJS = $(FORM_AGSM_OBJS)  
+$(FORM_AMDL) : OBJS = $(FORM_AMDL_OBJS)  
+$(FREQDIF) : OBJS = $(FREQDIF_OBJS)    
+$(LSQFREQ) : OBJS = $(LSQFREQ_OBJS)    
+$(MER_AMDE) : OBJS = $(MER_AMDE_OBJS)   
+$(MER_SUM) : OBJS = $(MER_SUM_OBJS)    
+$(PRT_AMDL) : OBJS = $(PRT_AMDL_OBJS)   
+$(REDISTRB_C) : OBJS = $(REDISTRB_C_OBJS) 
+$(REDISTRB) : OBJS = $(REDISTRB_OBJS)   
+$(RES_AMDE) : OBJS = $(RES_AMDE_OBJS)   
+$(SCAN_AGSM) : OBJS = $(SCAN_AGSM_OBJS)  
+$(SCAN_AMDE) : OBJS = $(SCAN_AMDE_OBJS)  
+$(SCAN_AMDL) : OBJS = $(SCAN_AMDL_OBJS)  
+$(SCAN_SSM) : OBJS = $(SCAN_SSM_OBJS)   
+$(SEL_AMDL) : OBJS = $(SEL_AMDL_OBJS)   
+$(SELAMDE) : OBJS = $(SELAMDE_OBJS)    
+$(SELSUM) : OBJS = $(SELSUM_OBJS)     
+$(SET_ASSCAL) : OBJS = $(SET_ASSCAL_OBJS) 
+$(SET_DNL) : OBJS = $(SET_DNL_OBJS)    
+$(SET_OBS) : OBJS = $(SET_OBS_OBJS)    
+$(SETEXEC) : OBJS = $(SETEXEC_OBJS)    
+$(SORTSUM) : OBJS = $(SORTSUM_OBJS)    
+
+$(PROG_DIR)/% :
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $@
+	@$(COMPILE_CMD) -w -o $@ $(OBJS)
+else
+	$(COMPILE_CMD) -w -o $@ $(OBJS)
+endif
+
+clean:
+	-@rm -f *.o $(ASYMP_SCALE) $(COMPAMOD) $(DIFF_FGONG) $(DIFF_SUM) $(FDIF_SIN) \
+	    $(FGONG_AMDL) $(FILT_GSM) $(FIT_DNL) $(FORM_AGSM) $(FORM_AMDL) $(FREQDIF) \
+	    $(LSQFREQ) $(MER_AMDE) $(MER_SUM) $(PRT_AMDL) $(REDISTRB_C) $(REDISTRB) \
+	    $(RES_AMDE) $(SCAN_AGSM) $(SCAN_AMDE) $(SCAN_AMDL) $(SCAN_SSM) $(SEL_AMDL) \
+	    $(SELAMDE) $(SELSUM) $(SET_ASSCAL) $(SET_DNL) $(SET_OBS) $(SETEXEC) \
+	    $(SORTSUM)
+
+#################################################################
+#
+# COMPILATION RULES
+
+ifneq (,$(findstring gfortran,$(FC)))
+COMPILE_CMD = $(FC) -std=legacy
+else
+COMPILE_CMD = $(FC)
+endif
+
+ifeq ($(USE_SHARED), YES)
+     COMPILE_CMD += -fPIC
+endif
+
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) -w -c $<
+else
+	$(COMPILE_CMD) -w -c $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = ../adipack.c/adiajobs:../adipack.c/gensr:../adipack.c/adiajobs/sr
+
+vpath %.f $(SRC_PATH)

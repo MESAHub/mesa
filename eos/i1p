@@ -1,0 +1,4 @@
+#!/bin/bash
+
+../utils/i1p && \
+./i1_preprocessors

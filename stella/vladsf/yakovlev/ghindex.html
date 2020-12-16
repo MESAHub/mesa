@@ -1,0 +1,76 @@
+<HEAD><TITLE>GlimpseHTTP Demo Archive/stella/vladsf/yakovlev</TITLE></HEAD>
+<BODY><H1>GlimpseHTTP Demo Archive/stella/vladsf/yakovlev</H1>
+This is a form based interface to
+<A HREF="http://glimpse.cs.arizona.edu:1994/glimpsehttp.html">
+GlimpseHTTP</A> WWW search engine.
+<A HREF="http://glimpse.cs.arizona.edu:1994/index.html">
+Glimpse</A> is an indexing/search program that uses very little
+space for the index and allows flexible queries.  
+This glimpse interface allows both browsing and searching.
+A search covers all files in this directory and all
+directories below it.  As you browse deeper, you automatically 
+limit the search to where you are.
+<P>
+For
+<A HREF="http://glimpse.cs.arizona.edu:1994/index.html">
+information about Glimpse</A>
+and where to obtain a copy (for your personal file system or for
+your server) follow this link or mail glimpse@cs.arizona.edu
+<P>
+If You don't have a browser that can supports forms, you can
+still <A HREF="/cgi-bin/aglimpse/01/stella/vladsf/yakovlev">make a search</A>.
+
+<FORM ACTION="/cgi-bin/aglimpse/01/stella/vladsf/yakovlev">
+
+What would you like to search for? <INPUT NAME="query">
+(example of a Boolean search:  'good;bad'   will find all lines 
+containing both 'good' AND 'bad')
+<P>
+<INPUT NAME="case" TYPE="checkbox">Case insensitive
+<INPUT NAME="whole" TYPE="checkbox">Allow partial match to a word
+<P>
+Number of misspellings allowed:
+<SELECT NAME="errors">
+<OPTION>0
+<OPTION>1
+<OPTION>2
+<OPTION>3
+<OPTION>4
+<OPTION>5
+<OPTION>6
+<OPTION>7
+<OPTION>8
+<OPTION>Best match
+</SELECT>
+<P>Maximum number of files returned:
+<INPUT NAME="maxfiles" VALUE="100">
+<P>Maximum number of matches per file returned:
+<INPUT NAME="maxlines" VALUE="30">
+<P>
+Press this button to submit the query: 
+<INPUT TYPE="submit" VALUE="Submit">
+<BR>
+To reset the form, press this button: <INPUT TYPE="reset" VALUE="Reset">
+
+</FORM>
+
+<P>
+Files here:
+<UL>
+<li><a href="1sfits">1sfits (25755 bytes)</a>
+<li><a href="2pfits">2pfits (19908 bytes)</a>
+<li><a href="2sfits">2sfits (23555 bytes)</a>
+<li><a href="3dfits">3dfits (4480 bytes)</a>
+<li><a href="3pfits">3pfits (9876 bytes)</a>
+<li><a href="3sfits">3sfits (12688 bytes)</a>
+<li><a href="4sfits">4sfits (1516 bytes)</a>
+<li><a href="second.fit">second.fit (6696 bytes)</a>
+</UL>
+<HR>
+<ADDRESS>
+<A HREF="mailto:oleg@sai.msu.su">
+Oleg Bartunov<BR>
+oleg@sai.msu.su</A><BR>
+</ADDRESS>
+
+</BODY>

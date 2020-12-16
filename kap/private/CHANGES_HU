@@ -1,0 +1,78 @@
+OP4STARS_1.2
+------------
+2011, Changes on OPserver (v3.3) made by Haili Hu
+------------------------
+
+OPserver has been significantly altered for the use in the stellar evolution 
+code STARS, where the chemical abundances are solved simultaneously with the 
+stellar structure. The original OPcodes are convenient for post-processing, 
+i.e. after the stellar model has been solved. However, we need to do the OP 
+computations simultaneously with the stellar structure equations. Thus, we 
+have to compute g_rad and kappa at each meshpoint in the star for a specific 
+chemical mixture, density and temperature. We have therefore rid the code of 
+the abundance multiplier "chi", chemical mixture number "nmix", and number of 
+mesh points "nstar". Furthermore, we replaced the interpolation scheme for the 
+opacity and opacity derivatives to ensure continuity and smoothness which is 
+required for pulsation studies (only in op_osc).
+
+The routine "op_radacc" [based on op_ax] can be called at each meshpoint to 
+get radiative accelerations, opacity, average ionic charges, and their derivatives.
+
+The routine "op_opacity" [based on op_mx] can be called at each meshpoint to 
+get opacity, opacity derivatives, and average ionic charges.
+
+The routine "op_osc" [based on op_mx] can be called at each meshpoint to 
+get opacity and smooth opacity derivatives.
+
+Installation:
+-------------
+Similar as the original local version of OPserver (Remote version has been removed):
+   ./configure (change fortran compiler in Makefile.incl if needed)
+   make
+   make install
+   make clean (optional to remove formatted data files to reduce disk space)
+   make opserver
+
+Then link OPlibrary to the user code at compilation time.
+
+
+Specific changes:
+-----------------
+1) Change indices of array ff(4,4,nptot,17) to ff(nptot,17,4,4). Same for arrays
+f, r, s, ta. This puts the ntot data points in consecutive memory locations, thus
+enhancing the cache performance (thanks to Evert Glebbeek).
+
+2) Reduce nptot and ipnt from 30000 to 10000, since we always use the v mesh with 10000 
+points (see Seaton2005).
+
+3) Name the unnamed common block /atomdata/. Include save statement for all common blocks.
+Otherwise, we may have problems when using OPserver in the evolution code, which already 
+has an unnamed common block. 
+
+4) Subroutine op_radacc, based on op_ax. Changes:
+ - Calculate g_rad for any number of elements in the chemical mixture.
+ - Calculate g_rad as funtion of local radiative flux rather than Teff and r/R*;
+ - Do not loop over nmix, chi, and nstar, but calculate g_rad for for 1 meshpoint. 
+ - Do not calculate diffusion coefficient zet. We compute more accurate diffusion 
+ coefficients elsewhere (based on Paquette at al 1986).
+ - Compute average ionic charges for all elements in the chemical mixture. 
+ - Include screening corrections. In the original OPcodes this is included in "op_mx" but 
+ not in "op_ax". 
+ - Compute derivatives for the use in the stellar evolution code, for obtaining numerical 
+derivatives of the difference equations to the independent variables.
+dlog(grad)/dlog(xi), dlog(grad)/dlog(T), dlog(grad)/dlog(rho), dlog(kappa)/dlog(xi),
+dlog(kappa)/dlog(T), dlog(kappa)/dlog(rho), dZ/dlog(T), dZ(dlog(rho). 
+( - Negative values of g_rad can be obtained owing to mte correction, in particular for Na
+ around log T =4.25 (see Seaton 1997). The original code assigns log gamma=-30 in this
+ case. However this leads to irregularities. We evaluate the interpolation array gaml(4,4),
+ if there is a negative value in this array, we look for the first (or next-to) neighbour
+ with nonnegative value. If they are all negative, then a warning is given and the value of
+ log gamma=-30 is maintained. )  
+ 
+ 5) Subroutine op_opacity, based on op_mx. Similar changes as for "op_radacc"
+ 
+ 6) Subroutine op_osc, is equivalent to op_opacity, except that it is meant for use in the 
+ pulsation code rather than evolution code. Therefore, we do not need average ionic charges,
+ and a different interpolation method is used for smoothness of opacity derivatives needed for
+ pulsation studies, see M.-A. Dupret's PhD thesis. This requires interpolation in an array of
+ length 6 instead of 4. 

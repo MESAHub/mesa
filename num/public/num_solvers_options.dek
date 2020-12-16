@@ -1,0 +1,52 @@
+      
+      integer function solver_option(which_solver_option, ierr)
+         use num_def
+         character (len=*), intent(in) :: which_solver_option
+         integer, intent(out) :: ierr
+         ierr = 0
+         if (which_solver_option == 'ros2_solver') then
+            solver_option = ros2_solver
+         else if (which_solver_option == 'rose2_solver') then
+            solver_option = rose2_solver
+         else if (which_solver_option == 'ros3p_solver') then
+            solver_option = ros3p_solver
+         else if (which_solver_option == 'ros3pl_solver') then
+            solver_option = ros3pl_solver
+         else if (which_solver_option == 'rodas3_solver') then
+            solver_option = rodas3_solver
+         else if (which_solver_option == 'rodas4_solver') then
+            solver_option = rodas4_solver
+         else if (which_solver_option == 'rodasp_solver') then
+            solver_option = rodasp_solver
+         else
+            ierr = -1
+            solver_option = -1
+         end if 
+      end function solver_option
+      
+      
+      subroutine solver_option_str(which_solver_option, solver_option, ierr)
+         use num_def
+         integer, intent(in) :: which_solver_option
+         character (len=*), intent(out) :: solver_option
+         integer, intent(out) :: ierr
+         ierr = 0
+         if (which_solver_option == ros2_solver) then
+            solver_option = 'ros2_solver'
+         else if (which_solver_option == rose2_solver) then
+            solver_option = 'rose2_solver'
+         else if (which_solver_option == ros3p_solver) then
+            solver_option = 'ros3p_solver'
+         else if (which_solver_option == ros3pl_solver) then
+            solver_option = 'ros3pl_solver'
+         else if (which_solver_option == rodas3_solver) then
+            solver_option = 'rodas3_solver'
+         else if (which_solver_option == rodas4_solver) then
+            solver_option = 'rodas4_solver'
+         else if (which_solver_option == rodasp_solver) then
+            solver_option = 'rodasp_solver'
+         else
+            ierr = -1
+            solver_option = ''
+         end if 
+      end subroutine solver_option_str

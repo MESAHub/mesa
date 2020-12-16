@@ -1,0 +1,31 @@
+&model
+/
+
+&mode
+  l = 1
+/
+
+&osc
+/
+
+&rot
+/
+
+&num
+  diff_scheme = 'COLLOC_GL2' 
+/
+
+&scan
+  grid_type = 'INVERSE'
+  freq_min = 0.1
+  freq_max = 1.0
+  freq_min_units = 'GRAVITY_DELTA'
+  freq_max_units = 'GRAVITY_DELTA'
+  n_freq = 50
+/
+
+&grid
+  w_osc = 10
+  w_exp = 2
+  w_ctr = 10
+/

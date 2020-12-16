@@ -1,0 +1,36 @@
+add_isos_and_reactions(
+    neut
+    h  1  2
+   he  3  4
+   li7
+   be7
+   be  9 10
+    b8
+    c 12 13
+    n 13 15
+    o 14 18
+    f 17 19
+   ne 18 22
+   na 23 24
+   mg 23 25
+   al27
+   si 27 28
+    p 30 31
+    s 31 32
+   cl 35 38
+   ar 36 41
+    k 39 42
+   ca 40 49
+   sc 43 49
+   ti 44 51
+    v 47 52
+   cr 48 55
+   mn 51 56
+   fe 52 61
+   co 55 61
+   ni 56 65
+   )
+
+! for c12+c12 reactions, must have ne20 na23, mg23
+! for c12+o16 reactions, must have mg24, al27, si27
+! for o16+o16 reactions, must have si28, p30, p31, s31

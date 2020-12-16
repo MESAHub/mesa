@@ -1,0 +1,10 @@
+# run this from eosDT_builder to create eosDT_data.tar.xz in the data directory
+rm -rf ../data/eosDT_data/cache
+cd data
+rm -rf eosDT_data.tar
+rm -rf eosDT_data.tar.xz
+echo 'tar -cvf eosDT_data.tar eosDT_data'
+tar -cvf eosDT_data.tar eosDT_data
+echo 'xz eosDT_data.tar'
+xz -v eosDT_data.tar
+cp eosDT_data.tar.xz ../..

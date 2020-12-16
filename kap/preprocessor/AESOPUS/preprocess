@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# unpack tables
+mkdir -p ags09
+tar xv -C ags09 -f aesopus_ags09.tar.xz 
+
+# many of these AESOPUS tables contain lines like
+# 3.200-250.0000-250.0000-250.0000...
+# since there is no space separation, the columns are not correctly detected
+# this replaces "-250.0000" with " -99.0000" to circumvent the issue
+
+for f in ags09/*.tab
+do
+    sed -i 's/-250.0000/ -99.0000/g' $f
+done
+
+# run python script
+./aesopus.py AGSS09.yaml

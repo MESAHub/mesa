@@ -1,0 +1,410 @@
+! simplex_solar.defaults
+
+      
+         just_do_first_values = .false.  ! if true, then no simplex search
+
+      
+! specify controls to be varied in search, with initial values and bounds
+         
+      ! set these flags to specify which parameters will vary during searches
+         vary_FeH = .false. ! FeH = [Fe/H] = log10((Z/X)/Z_div_X_solar)
+         vary_Y = .false. ! must be false if Y_depends_on_Z is true
+         vary_mass = .false. ! initial mass
+         vary_alpha = .false.
+         vary_f_ov = .false.
+
+      ! >>>> NOTE: if "vary" is false, the "first" value is used for all runs.
+         ! so you must set the first value even when you have vary = .false.
+   
+      ! use the following as the first values in searches
+         first_FeH = 0
+         first_Y = 0
+         first_mass = 0
+         first_alpha = 0
+         first_f_ov = 0
+   
+      ! lower bounds for searches
+         min_FeH = 0
+         min_Y = 0
+         min_mass = 0
+         min_alpha = 0
+         min_f_ov = 0
+   
+      ! upper bounds for searches
+         max_FeH = 0
+         max_Y = 0
+         max_mass = 0
+         max_alpha = 0
+         max_f_ov = 0
+         
+      ! user defined parameters
+      
+         vary_my_param1 = .false.
+         vary_my_param2 = .false.
+         vary_my_param3 = .false.
+      
+         first_my_param1 = 0
+         first_my_param2 = 0
+         first_my_param3 = 0
+      
+         min_my_param1 = 0
+         min_my_param2 = 0
+         min_my_param3 = 0
+      
+         max_my_param1 = 0
+         max_my_param2 = 0
+         max_my_param3 = 0
+
+         my_param1_name = 'my_param1' ! change this to whatever you want
+         my_param2_name = 'my_param2' ! change this to whatever you want
+         my_param3_name = 'my_param3' ! change this to whatever you want
+
+      ! status of Y -- parameter or function of Z
+         
+         Y_depends_on_Z = .false. 
+            ! if false, then Y is a parameter like FeH.
+               ! you should set vary_Y, first_Y, min_Y, and max_Y.
+            ! if true, then Y depends on Z as follows: Y = Y0 + dYdZ*Z
+               ! in this case, set vary_Y = .false. 
+               ! first_Y, min_Y, and max_Y are unused.
+         Y0 = 0.248d0
+         dYdZ = 1.4d0
+   
+      ! overshoot_f0 is changed along with overshoot_f
+         ! f0_ov = f0_ov_div_f_ov * f_ov
+         f0_ov_div_f_ov = -1  ! this must be set to a positive value
+         
+
+! specify terms for chi^2 
+   
+   ! chi2 is an evenly weighted combination of terms
+      ! only need to give values for target and sigma if include in chi^2
+      
+   include_Teff_in_chi2 = .false.
+   Teff_target = -1
+   Teff_sigma = -1
+
+   include_logL_in_chi2 = .false.
+   logL_target = -1
+   logL_sigma = -1
+
+   include_logg_in_chi2 = .false.
+   logg_target = -1
+   logg_sigma = -1
+      
+      ! NOTE: for plotting with pgstar loggTe window -- logg vs. Teff
+         ! you need to set the following pgstar controls
+         ! loggTe_target_logg
+         ! loggTe_target_logg_sigma
+         ! loggTe_target_Teff
+         ! loggTe_target_Teff_sigma
+      ! same if you are plotting HR window -- lg_L vs. lg_Teff
+         ! you need to set the following pgstar controls
+         ! HR_target_logL
+         ! HR_target_logL_sigma
+         ! HR_target_Teff
+         ! HR_target_Teff_sigma
+   
+   include_FeH_in_chi2 = .true. ! [Fe/H]
+   FeH_target = -1
+   FeH_sigma = -1
+   
+      ! we calculate model [Fe/H] as = log10((Z/X)/Z_div_X_solar)
+      ! using model surface average values for Z and X.
+      Z_div_X_solar = 0.02293d0
+   
+   ! following example target values are for solar calibration.  
+   ! adjust as appropriate.
+   
+   include_logR_in_chi2 = .false.
+   logR_target = -1
+   logR_sigma = -1
+
+   include_surface_Z_div_X_in_chi2 = .false.
+   surface_Z_div_X_target = -1
+   surface_Z_div_X_sigma = -1
+      ! reminder: surface_Z_div_X = surface_Z/surface_X
+      ! and FeH = log10(surface_Z_div_X/Z_div_X_solar)
+      ! where Z_div_X_solar is a parameter specified in this inlist
+
+   include_surface_He_in_chi2 = .false.
+   surface_He_target = -1
+   surface_He_sigma = -1
+   
+   include_Rcz_in_chi2 = .false. ! radius of base of convective zone
+   Rcz_target = -1
+   Rcz_sigma = -1
+
+   include_solar_cs_rms_in_chi2 = .false. ! check sound profile
+      ! compares to mesa/data/star_data/solar_csound.data
+   solar_cs_rms_target = -1
+   solar_cs_rms_sigma = -1
+   report_solar_cs_rms = .false. 
+      ! if true, then calculate and report even if not included in chi2
+
+   include_age_in_chi2 = .false.
+   age_target = -1
+   age_sigma = -1
+   
+      ! in addition to use for solar model,
+      ! this can be used to match rough age to binary partner or cluster
+   
+      ! note: when include_age_in_chi2
+      ! in your &simplex_search_controls inlist
+         ! set min_age_for_chi2 and max_age_for_chi2, and
+         ! set eval_chi2_at_target_age_only = .false. 
+      
+      ! in your &controls inlist
+         ! set max_years_for_timestep
+         ! but do not set max_age or num_adjusted_dt_steps_before_max_age.
+      ! instead use the following:
+   
+      num_smaller_steps_before_age_target = 50 ! only used if > 0
+      dt_for_smaller_steps_before_age_target = 0.0065d8 ! ~1/10 age_sigma
+         ! this should be << age_sigma
+
+   ! to include user-defined variables in chi^2 spectro
+   ! set the "my_var" variable in your extras_check_model routine set_my_vars
+   !     use simplex_data, only: my_var1, my_var2, my_var3
+   !     my_var1 = ......
+   
+   include_my_var1_in_chi2 = .false.
+   my_var1_target = 0
+   my_var1_sigma = 0
+   my_var1_name = 'my_var1' ! change this to whatever you want
+   
+   include_my_var2_in_chi2 = .false.
+   my_var2_target = 0
+   my_var2_sigma = 0
+   my_var2_name = 'my_var2' ! change this to whatever you want
+   
+   include_my_var3_in_chi2 = .false.
+   my_var3_target = 0
+   my_var3_sigma = 0
+   my_var3_name = 'my_var3' ! change this to whatever you want
+
+   trace_chi2_info = .false. ! if true, output info to terminal
+
+   
+! search controls
+      ! gain efficiency by avoiding unnecessary chi2 evaluations
+      ! and by terminating runs that look unlikely to produce good chi2.
+      ! increase accuracy by reducing timesteps when seem to be near good chi2.
+      
+      
+      ! don't consider models that aren't old enough
+      min_age_limit = 1d6
+      
+      ! don't consider models with L_nuc/L less than this limit
+      Lnuc_div_L_limit = 0.95d0 ! this rules out pre-zams models
+
+      ! don't consider models with chi2 above this limit 
+      chi2_limit = 1000 
+      
+      eval_chi2_at_target_age_only = .false.                  
+      ! set this true if you want chi2 only for a specific age and no others,
+         ! in addition,
+         ! set max_age
+         ! set max_years_for_timestep
+         ! set num_adjusted_dt_steps_before_max_age
+                  
+      ! use these if you only want to evaluate chi2 for a given range of ages
+      min_age_for_chi2 = -1 ! (years) only use if > 0
+      max_age_for_chi2 = -1 ! (years) only use if > 0
+
+      ! terminate if reach max allowed iterations or function calls
+      simplex_itermax = 1000 ! each iteration revises the simplex
+      simplex_fcn_calls_max = 10000 ! may use several function calls per iteration
+         ! each "function call" is a stellar evolution to give a chi^2
+      
+      ! terminate if simplex gets "small" enough - i.e. small search range remaining.
+      simplex_x_atol = 1d-10 ! tolerance for absolute differences
+      simplex_x_rtol = 1d-10 ! tolerance for relative differences
+
+      ! terminate if best point has a chi^2 below simplex_chi2_tol
+      simplex_chi2_tol = 1d-10 ! tolerance for chi^2
+      
+      ! adjust max timestep depending on chi2
+      
+         ! NOTE: if you set the timestep limits too large you run the risk of missing good chi^2 cases.
+         ! but if they are very small, you will spend a lot of runtime calculating lots of frequencies
+         ! for lots of models.  There is no standard set of best values for this.
+         ! The choice will depend on the stage of evolution and how fast things are changing
+         ! in the general region of the models with good chi2 values.  
+         ! There is no alternative to trying things and tuning the controls for your problem.
+         
+         chi2_limit_for_small_timesteps = 50
+         max_yrs_dt_chi2_small_limit = 3d5 ! < max_yrs_dt_when_hot
+         
+         chi2_limit_for_smaller_timesteps = 20 ! < chi2_limit_for_small_timesteps
+         max_yrs_dt_chi2_smaller_limit = 1d5 ! < max_yrs_dt_chi2_small_limit
+         
+         chi2_limit_for_smallest_timesteps = 10 ! < chi2_limit_for_smaller_timesteps
+         max_yrs_dt_chi2_smallest_limit = 5d4 ! < max_yrs_dt_chi2_smaller_limit
+   
+
+      ! we need a way to decide when to stop an evolution run when not likely
+      ! to find a good chi2 by continuing.
+      ! the following limits are used for this.
+      ! NOTE: we don't want to stop too soon, so these limits
+         ! are only tested for models that are okay for the Lnuc_div_L_limit.
+      
+         ! logg_limit = logg_target + logg_sigma*sigmas_coeff_for_logg_limit
+         ! logL_limit = logL_target + logL_sigma*sigmas_coeff_for_logL_limit
+         ! Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit
+         ! logR_limit = logR_target + logR_sigma*sigmas_coeff_for_logR_limit
+         ! surface_Z_div_X_limit = surface_Z_div_X_target + 
+            ! surface_Z_div_X_sigma*sigmas_coeff_for_surface_Z_div_X_limit
+         ! surface_He_limit = surface_He_target + &
+            ! surface_He_sigma*sigmas_coeff_for_surface_He_limit
+         ! solar_Rcz_limit = Rcz_target + Rcz_sigma*sigmas_coeff_for_solar_Rcz_limit
+         ! solar_cs_rms_limit = solar_cs_rms_target + &
+            ! solar_cs_rms_sigma*sigmas_coeff_for_solar_cs_rms_limit
+         
+         ! only use limits with sigma_coeff /= 0
+         ! if the sigma_coeff is > 0, then stop when value is > limit
+         ! if the sigma_coeff is < 0, then stop when value is < limit
+         ! so use positive sigma_coeff for values that are increasing (such as logL)
+         ! and negative ones for values that are decreasing (logg, Teff)
+         
+         sigmas_coeff_for_logg_limit = -5 ! disable by setting to 0
+         sigmas_coeff_for_logL_limit = 5 ! disable by setting to 0
+         sigmas_coeff_for_Teff_limit = -5 ! disable by setting to 0
+         sigmas_coeff_for_logR_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_surface_Z_div_X_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_surface_He_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_solar_Rcz_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_solar_cs_rms_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_my_var1_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_my_var2_limit = 0 ! disable by setting to 0
+         sigmas_coeff_for_my_var3_limit = 0 ! disable by setting to 0
+         
+      ! you can stop the run if chi^2 is rising such that unlikely to be worth continuing.
+         
+         ! here is a relative limit
+         chi2_relative_increase_limit = 2.0d0
+         limit_num_chi2_too_big = 20
+         ! if limit_num_chi2_too_big consequtive chi2s
+         ! are > chi2_relative_increase_limit times the best chi2 for the run,
+         ! then stop the run.
+         
+         ! and here is an absolute limit
+         chi2_search_limit1 = 3.d0
+         chi2_search_limit2 = 4.0
+         ! if best chi2 for the run is <= chi2_search_limit1,
+         ! then stop the run if chi2 >= chi2_search_limit2.
+         
+      ! judge current results by best previous one for this run.
+      
+         min_num_samples_for_avg = 2 ! want at least this many samples to form averages
+         max_num_samples_for_avg = 10 ! use this many of the best chi^2 samples for averages
+         
+         ! these use results for the best chi^2 model of the previous best samples
+         avg_age_sigma_limit = 10 ! stop if age > avg age + this limit times sigma of avg age
+         avg_model_number_sigma_limit = 10 ! ditto for model number
+   
+   
+   ! other options for simplex
+   
+      simplex_centroid_weight_power = 0d0
+         ! each iteration starts by doing a reflection
+         ! of the worst point through the centroid of the others.
+         ! centroid points are weighted by (1/chi^2)**power
+         ! power = 0 gives the standard unweighted centroid.
+         ! power = 1 shifts the reflection toward the better points.
+         ! in some (many? most?) cases, this shift improves convergence rate.
+      simplex_enforce_bounds = .false.
+         ! if true, then points outside the bounds will be rejected without evaluation.
+         ! if false, then bounds will only be used in creating the initial simplex
+         !                 and for adaptive random search.
+      simplex_adaptive_random_search = .false.
+         ! this flag controls what is done if the standard options of reflect or contract
+         ! fail to produce a improvement in the simplex.
+         ! if true, test uniform random samples within the bounds until find a better point.
+         ! if false, "shrink" the simplex toward the best point.
+
+      simplex_output_filename = 'simplex_results.data'
+      
+      restart_simplex_from_file = .false.
+         ! if true, then reads the output file (simplex_output_filename)
+         ! and continues from where that stopped
+         ! using the best n+1 results as the initial simplex
+         ! (where n is the number of parameters)
+         ! NOTE: this restores the best simplex, but you may still
+         ! see it rerun recent cases if they were not good enough to be
+         ! included in the simplex.  we don't restore the information
+         ! about those failed attempts, so we need to rerun them.
+      
+      simplex_seed = 1074698122 ! seed for random number generation
+
+      ! coefficients for various steps of the downhill simplex algorithm
+      simplex_alpha = 1d0    ! reflect
+      simplex_beta = 2d0     ! expand
+      simplex_gamma = 0.5d0  ! contract
+      simplex_delta = 0.5d0  ! shrink
+
+
+   ! output controls
+   
+      write_best_model_data_for_each_sample = .true.
+      num_digits = 4 ! number of digits in sample number (with leading 0's)
+      sample_results_dir = 'outputs'
+      sample_results_prefix = 'sample_'
+         ! note that you can include a directory in the prefix if desired
+      sample_results_postfix = '.data'
+      
+      model_num_digits = 4 ! number of digits in model number (with leading 0's)
+      
+      write_profile_for_best_model = .false.
+      best_model_profile_filename = ''
+      
+      save_model_for_best_model = .false.
+      best_model_save_model_filename = ''
+      
+      save_info_for_last_model = .false. ! if true, treat final model as "best"
+      last_model_save_info_filename = '' ! and save info about final model to this file.
+      
+   
+   ! miscellaneous
+
+      simplex_just_call_my_extras_check_model = .false. ! for testing
+   
+      ! trace limits
+         trace_limits = .false.
+         ! if true, write info to terminal about status relative to various limits
+         ! such as Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit
+         ! run will stop when Teff < Teff_limit.
+         ! trace will write out values of Teff and Teff_limit
+         ! same for other limits such as for logg, logL, etc.
+   
+   
+      ! save all control settings to file
+         save_controls = .false. ! dumps &simplex_search_controls controls to file
+         save_controls_filename = '' ! if empty, uses a default name
+      
+      
+      ! composition control
+         Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
+
+
+   ! include other inlists
+   
+         read_extra_simplex_search_inlist1 = .false.
+         extra_simplex_search_inlist1_name = 'undefined'
+            ! if read_extra_simplex_search_inlist1 is true, then read this namelist file
+   
+         read_extra_simplex_search_inlist2 = .false.
+         extra_simplex_search_inlist2_name = 'undefined'
+            ! if read_extra_simplex_search_inlist2 is true, then read this namelist file
+   
+         read_extra_simplex_search_inlist3 = .false.
+         extra_simplex_search_inlist3_name = 'undefined'
+            ! if read_extra_simplex_search_inlist3 is true, then read this namelist file
+   
+         read_extra_simplex_search_inlist4 = .false.
+         extra_simplex_search_inlist4_name = 'undefined'
+            ! if read_extra_simplex_search_inlist4 is true, then read this namelist file
+   
+         read_extra_simplex_search_inlist5 = .false.
+         extra_simplex_search_inlist5_name = 'undefined'
+            ! if read_extra_simplex_search_inlist5 is true, then read this namelist file

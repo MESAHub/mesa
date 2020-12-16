@@ -1,0 +1,73 @@
+&star_job
+
+      mesa_dir = '../../..'
+      show_log_description_at_start = .false.
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+
+/ ! end of star_job namelist
+
+
+&eos
+      use_FreeEOS = .false.
+/ ! end of eos namelist
+
+
+&kap
+      Zbase = 0.02
+/ ! end of kap namelist
+
+
+&controls
+      !zams_filename = 'zams_z2m2_y98.data'
+
+      ! check for retries as part of test_suite
+      ! you can/should delete this for use outside of test_suite
+      max_number_retries = 15
+
+      max_model_number = 2000
+
+      extra_terminal_output_file = 'log1' 
+      log_directory = 'LOGS1'
+
+      profile_interval = 50
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+      
+      varcontrol_target = 1d-3
+
+      use_ledoux_criterion = .true.
+      alpha_semiconvection = 1d0
+      
+      ! we use step overshooting
+      overshoot_scheme(1) = 'step'
+      overshoot_zone_type(1) = 'burn_H'
+      overshoot_zone_loc(1) = 'core'
+      overshoot_bdy_loc(1) = 'top'
+      overshoot_f(1) = 0.345
+      overshoot_f0(1) = 0.01
+      
+      ! step_overshoot_f_above_burn_h_core = 0.345
+      ! overshoot_f0_above_burn_h_core = 0.01
+      ! step_overshoot_D0_coeff = 1.0
+
+      ! stop when the center mass fraction of h1 drops below this limit
+      xa_central_lower_limit_species(1) = 'h1'
+      xa_central_lower_limit(1) = 1d-2
+
+      hot_wind_scheme = 'Dutch'
+      hot_wind_full_on_T = 1d0
+      cool_wind_full_on_T = 0d0
+      Dutch_scaling_factor = 20d0 ! use an extreme wind to verify wind accretion is properly restricted
+                                  ! to the Eddington limit
+      
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+
+/ ! end of pgstar namelist

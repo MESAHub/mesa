@@ -1,0 +1,135 @@
+
+      ! explicit Runge-Kutta ODE
+      
+      ! 5th order with embedded 4th order method for error estimates.
+      ! 6 function evaluations per step.
+      ! will automatically take substeps if necessary.
+      
+      ! J. R. Cash, A. H. Karp. "A variable order Runge-Kutta method
+      ! for initial value problems with rapidly varying right-hand sides",
+      ! ACM Transactions on Mathematical Software 16: 201-222, 1990      
+      
+      ! the mesa implementation is thread-safe, 
+      ! so you can run multiple solutions in parallel.
+      
+      subroutine cash_karp(
+     &         n, fcn, x, y, xend, 
+     &         h, max_step_size, max_steps, 
+     &         rtol, atol, itol, 
+     &         solout, iout, 
+     &         work, lwork, iwork, liwork, 
+     &         lrpar, rpar, lipar, ipar, 
+     &         lout, idid)
+         
+         use mod_cash_karp, only:do_cash_karp
+         use const_def, only: dp
+
+         integer, intent(in) :: n ! the dimension of the system
+         
+         interface ! subroutine for computing the value of f(x, y)
+            include "num_fcn.dek"
+         end interface
+         
+         real(dp), intent(inout) :: x 
+            ! input: initial x value
+            ! output: x value for which the solution has been computed.
+            !     after successful return, x = xend.
+         real(dp), intent(inout), pointer :: y(:) ! (n) 
+            ! input: initial values for y
+            ! output: values of y for final value of x.
+         real(dp), intent(in) :: xend ! desired final x value (positive or negative)
+         real(dp), intent(inout) :: h 
+            ! input: initial step size
+            ! output: size of the last accepted step
+         real(dp), intent(in) :: max_step_size ! maximal step size.
+            ! max_step_size = 0 defaults to xend-x.
+         integer, intent(in) :: max_steps ! maximal number of allowed steps.
+         
+         ! absolute and relative error tolerances
+         real(dp), intent(in) :: rtol(*) ! relative error tolerance(s)
+         real(dp), intent(in) :: atol(*) ! absolute error tolerance(s)
+         integer, intent(in) :: itol ! switch for rtol and atol
+         ! itol=0: both rtol and atol are scalars.
+            ! error_scale for y(i) is rtol*abs(y(i))+atol
+         ! itol=1: both rtol and atol are vectors.
+            ! error_scale for y(i) is rtol(i)*abs(y(i))+atol(i).
+         ! max_error = maxval(yerror/error_scale)
+         ! the solution is accepted if max_error is less than 1.
+         
+         interface ! subroutine called after each successful step
+            include "num_solout.dek"
+         end interface
+         ! switch for calling the subroutine solout or nor
+         integer, intent(in)  :: iout
+            ! iout=0: subroutine is never called
+            ! iout=1: subroutine is used for output
+            ! NOTE: cash_karp doesn't support interpolation of results.
+         
+         ! work arrays.
+         ! NOTE: call cash_karp_work_sizes to values for lwork and liwork.
+         integer, intent(in) :: liwork, lwork
+         integer, intent(inout), pointer :: iwork(:) ! (liwork)
+         real(dp), intent(inout), pointer :: work(:) ! (lwork)
+
+            ! statistics returned in iwork
+            ! iwork(1)  nfcn    number of function evaluations
+            ! iwork(2)  nstep   number of computed steps
+            ! iwork(3)  naccpt  number of accepted steps
+            ! iwork(4)  nrejct  number of rejected steps
+            
+         ! parameter arrays for the caller supplied routines
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         
+         ! io unit for warnings and errors
+         integer, intent(in)  :: lout
+            ! if lout > 0, warnings and errors are written to this io unit.
+            ! if lout <= 0, no output is produced.
+         
+         ! result code
+         integer, intent(out)  :: idid
+            ! idid =  1  computation successful, 
+            ! idid =  2  computation successful (terminated by solout)
+            ! idid = -2  reached max allowed number of steps 
+         
+         ! ****************************************************************************
+         
+         call do_cash_karp(
+     &         n, fcn, x, y, xend, h, max_step_size, max_steps, 
+     &         rtol, atol, itol, solout, iout, work, lwork, iwork, liwork, 
+     &         lrpar, rpar, lipar, ipar, lout, idid)
+     
+      end subroutine cash_karp
+
+      
+      ! this subroutine calculates liwork and lwork
+      subroutine cash_karp_work_sizes(n, liwork, lwork)
+         integer, intent(in) :: n ! number of equations
+         integer, intent(out) :: liwork, lwork
+
+         lwork = 14*n
+         liwork = 4
+
+      end subroutine cash_karp_work_sizes
+
+
+
+*   DERIVED FROM A ROUTINE WRITTEN BY: Dr Michael Thomas Flanagan
+*
+*   DATE:       February 2002
+*   UPDATES:    22 June 2003,  April 2004,
+*               15 September 2006 (to incorporate improvements suggested by Klaus Benary [Klaus.Benary@gede.de])
+*               11 April 2007,  25 April 2007,   4 July 2008
+*
+*   DOCUMENTATION:
+*   See Michael Thomas Flanagan's Java library on-line web page:
+*   http://www.ee.ucl.ac.uk/~mflanaga/java/RungeKutta.html
+*   http://www.ee.ucl.ac.uk/~mflanaga/java/
+*
+*   Copyright (c) April 2004, September 2006, April 2007
+*
+*   PERMISSION TO COPY:
+*   Permission to use, copy and modify this software and its documentation for
+*   NON-COMMERCIAL purposes is granted, without fee, provided that an acknowledgement
+*   to the author, Michael Thomas Flanagan at www.ee.ucl.ac.uk/~mflanaga, appears in all copies.

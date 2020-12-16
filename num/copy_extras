@@ -1,0 +1,5 @@
+mkdir new/test/plot_out
+mkdir new/test/test_data
+cp -r include new
+cp test/*.rb new/test
+

@@ -1,0 +1,25 @@
+
+&binary_job
+
+      read_extra_binary_job_inlist1 = .true.
+      extra_binary_job_inlist1_name = 'inlist_project'
+
+/ ! end of star_job namelist
+
+
+
+&binary_controls
+
+      read_extra_binary_controls_inlist1 = .true.
+      extra_binary_controls_inlist1_name = 'inlist_project'
+
+/ ! end of controls namelist
+
+
+
+&binary_pgstar
+
+      read_extra_binary_pgstar_inlist1 = .true.
+      extra_binary_pgstar_inlist1_name = 'inlist_project'
+
+/ ! end of pgstar namelist

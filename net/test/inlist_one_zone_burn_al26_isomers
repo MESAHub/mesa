@@ -1,0 +1,102 @@
+&one_zone
+
+      show_net_reactions_info = .true.
+      !show_Qs = .true.
+      
+      mesa_dir = '../..'   	
+
+! network
+      net_name = 'mesa_al26.net' 
+
+! initial conditions
+      num_isos_for_Xinit = 6
+      names_of_isos_for_Xinit(1) = "neut"
+      values_for_Xinit(1)        =  0.0d0
+      names_of_isos_for_Xinit(2) = "h1"
+      values_for_Xinit(2)        = 0.0d0  ! 0.5d0
+      names_of_isos_for_Xinit(3) = "he4"
+      values_for_Xinit(3)        = 0.0d0
+      names_of_isos_for_Xinit(4) = "mg25"
+      values_for_Xinit(4)        = 0.0d0  ! 0.5d0
+      names_of_isos_for_Xinit(5) = "al26-1"
+      values_for_Xinit(5)        = 0.5d0   ! 0.5d0   !   0.00d0
+      names_of_isos_for_Xinit(6) = "al26-2"
+      values_for_Xinit(6)        = 0.5d0   !  0.0d0
+
+! burning conditions
+      burn_temp      = 5.0e9 
+      burn_rho       = 1.0d0
+
+!      burn_logT      = 8.80d0  ! 8.60d0 9.6d0
+!      burn_logRho    = 1.0d0
+
+      burn_Cv        = 0.0d0
+      burn_d_Cv_dlnT = 0.0d0
+      burn_eta       = 0.0d0
+      burn_deta_dlnT = 0.0d0
+
+      burn_tend      = 1.0d2
+      eps            = 1.0d-12
+      odescal        = 1.0d-12
+      stptry         = 1.0d-18 
+      max_steps      = 100000
+
+! output
+      quiet = .false.
+
+      data_filename = 'one_zone_burn.data'
+      
+      save_final_abundances = .true.
+      final_abundances_filename = 'abundances.data'
+
+      min_for_show_peak_abundances = 0 ! 1d-6 ! output peak value if it is > this
+      max_num_for_show_peak_abundances = 5
+      show_peak_x_and_time = .false.  ! if false, then shows final abundances instead of peak
+
+
+
+! ode solver
+      which_solver = 'rodas4_solver'
+      trace = .false.
+      !burn_dbg = .true.
+
+
+! linear algebra
+      decsol_switch = 5000
+         ! if current number of species <= switch,
+            ! then use small_mtx_decsol,
+            ! else use large_mtx_decsol.
+      small_mtx_decsol = 'lapack'
+      large_mtx_decsol = 'klu'
+
+      use_pivoting = .true.
+      !use_pivoting = .false.
+
+
+! rates
+      which_rates_choice = 2 ! nacre = 1 jina reaclib = 2      
+
+! this sets 
+! create rate data for r_al26-2_to_al26-1
+! create rate data for r_al26-1_to_al26-2
+! write ../../data/rates_data/cache/r_al26-2_to_al26-1_0.bin
+! write ../../data/rates_data/cache/r_al26-1_to_al26-2_0.bin
+
+      cache_suffix = '0' ! use this only for reactions from rate_tables
+
+! multiply rates by factor at run time
+      num_special_rate_factors = 2
+      reaction_for_special_factor(1) = 'r_al26-1_to_al26-2'
+      special_rate_factor(1) = 1.0d0
+      reaction_for_special_factor(2) = 'r_al26-2_to_al26-1'
+      special_rate_factor(2) = 1.0d0
+
+! setting these directories does not work, but having a 
+! rate_tables directory with a rate_list.txt definitely works.
+! rates and cache directories
+!     rate_tables_dir = './rate_tables'
+!     rates_cache_dir = './rates_cache'
+
+      show_ye_stuff = .false.  
+
+/ 

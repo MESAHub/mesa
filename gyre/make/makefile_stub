@@ -1,0 +1,71 @@
+# This is the makefile for the mesa gyre stub library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = gyre_lib_stub.f
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = $(LIBS_MATRIX)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libgyre.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.f90 *.fpp *.mod .depend *.so *.a ../public/gyre_lib.f
+
+install:
+	@$(CP_IF_NEWER) gyre_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree)
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE $<
+	@$(COMPILE) $<
+else
+	$(COMPILE) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)

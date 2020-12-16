@@ -1,0 +1,55 @@
+         integer, intent(in) :: n ! the dimension of the system
+         interface ! subroutine for computing the value of f(x,y)
+#include "num_fcn.dek"
+#include "num_fcn_blk_dble.dek"
+         end interface
+         integer, intent(in) :: ifcn ! gives information on fcn:
+         real(dp), intent(inout) :: x 
+         real(dp), intent(inout), pointer :: y(:) ! (n) 
+         real(dp), intent(in) :: xend ! desired final x value (positive or negative)
+         real(dp), intent(inout) :: h 
+         real(dp), intent(in) :: max_step_size
+         integer, intent(in) :: max_steps
+         real(dp), intent(in) :: rtol(*) ! relative error tolerance(s)
+         real(dp), intent(in) :: atol(*) ! absolute error tolerance(s)
+         integer, intent(in) :: itol ! switch for rtol and atol
+         interface ! subroutines for computing the jacobian
+! for dense or banded matrix
+#include "num_jac.dek" 
+! for double block tridiagonal matrix
+#include "num_jac_blk_dble.dek" 
+! for sparse matrix
+#include "num_sjac.dek" 
+         end interface
+         integer, intent(in) :: ijac, nzmax, isparse, mljac_in, mujac_in
+         interface ! subroutine for computing the partials of f(x,y) wrt x
+#include "num_dfx.dek"
+         end interface
+         integer, intent(in) :: idfx ! switch for the computation of df/dx:
+         interface ! subroutine for computing the mass matrix
+#include "num_mas.dek"
+         end interface
+         integer, intent(in) :: imas, mlmas, mumas
+         interface ! subroutine called after each successful step
+#include"num_solout.dek"
+         end interface
+         integer, intent(in)  :: iout ! switch for calling the subroutine solout
+         interface
+#include "mtx_decsol.dek"
+#include "mtx_decsols.dek"
+#include "mtx_decsolblk.dek"
+         end interface
+         integer, intent(in) :: lrd, lid
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(in) :: caller_id, nvar, nz
+         real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer, intent(inout) :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+         integer, intent(in) :: lwork, liwork
+         real(dp), pointer :: work(:) ! (lwork)
+         integer, pointer :: iwork(:) ! (liwork)
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(in)  :: lout
+         integer, intent(out)  :: idid

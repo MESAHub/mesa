@@ -1,0 +1,65 @@
+&model
+/
+
+&mode
+  l = 0
+  tag = 'l=0'
+/
+
+&mode
+  l = 1
+  tag = 'l=1'
+/
+
+&mode
+  l = 2
+  tag = 'l=2'
+/
+
+&osc
+  variables_set = 'JCD'
+  outer_bound = 'JCD'
+/
+
+&rot
+/
+
+&num
+  diff_scheme = 'COLLOC_GL4' 
+/
+
+&scan
+  grid_type = 'LINEAR'
+  freq_min = 100
+  freq_max = 1000
+  freq_min_units = 'UHZ'
+  freq_max_units = 'UHZ'
+  n_freq = 200
+  tag_list = 'l=0'
+/
+
+&scan
+  grid_type = 'LINEAR'
+  freq_min = 700
+  freq_max = 1250
+  freq_min_units = 'UHZ'
+  freq_max_units = 'UHZ'
+  n_freq = 200
+  tag_list = 'l=1'
+/
+
+&scan
+  grid_type = 'LINEAR'
+  freq_min = 750
+  freq_max = 1300
+  freq_min_units = 'UHZ'
+  freq_max_units = 'UHZ'
+  n_freq = 200
+  tag_list = 'l=2'
+/
+
+&grid
+   w_osc = 10
+   w_exp = 2
+   w_ctr = 10
+/

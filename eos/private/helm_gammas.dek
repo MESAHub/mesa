@@ -1,0 +1,272 @@
+
+!..temperature and density exponents (cox & giuli 9.81 9.82) 
+!..specific heat at constant volume (cox & giuli 9.92)
+!..third adiabatic exponent (cox & giuli 9.93)
+!..first adiabatic exponent (cox & giuli 9.97) 
+!..second adiabatic exponent (cox & giuli 9.105)
+!..specific heat at constant pressure (cox & giuli 9.98) 
+!..relativistic formula for the sound speed footnote (cox & giuli 14.29)
+
+
+!..for the gas
+       presinv     = 1.0d0/pgas
+       ww          = temp*presinv
+       yy          = -ww*presinv*dpgasdt
+       chit_gas    = ww * dpgasdt
+       dchit_gasdd = yy*dpgasdd + ww*dpgasddt
+       dchit_gasdt = yy*dpgasdt + ww*dpgasdtt + dpgasdt*presinv
+       dchit_gasda = yy*dpgasda + ww*dpgasdta
+       dchit_gasdz = yy*dpgasdz + ww*dpgasdtz       
+
+       ww          = den*presinv
+       yy          = -ww*presinv*dpgasdd
+       chid_gas    = ww*dpgasdd
+       dchid_gasdd = yy*dpgasdd + ww*dpgasddd + dpgasdd*presinv
+       dchid_gasdt = yy*dpgasdt + ww*dpgasddt
+       dchid_gasda = yy*dpgasda + ww*dpgasdda
+       dchid_gasdz = yy*dpgasdz + ww*dpgasddz
+
+       cv_gas    = degasdt
+       dcv_gasdd = degasddt
+       dcv_gasdt = degasdtt
+       dcv_gasda = degasdta
+       dcv_gasdz = degasdtz
+
+       ww          = pgas*deninv
+       yy          = -ww*deninv
+       zz          = 1.0d0/cv_gas
+       z           = tempinv*zz
+       xx          = chit_gas*z
+       x           = ww * xx
+       dfk          = xx*zz
+
+       gam3_gas    = x + 1.0d0
+       dgam3_gasdd = (dpgasdd*deninv + yy)*xx  &
+                     + (dchit_gasdd*z - dfk*dcv_gasdd)*ww
+       dgam3_gasdt = (dpgasdt*deninv - ww*tempinv)*xx &
+                     + (dchit_gasdt*z - dfk*dcv_gasdt)*ww
+       dgam3_gasda = dpgasda*deninv*xx &
+                     + (dchit_gasda*z - dfk*dcv_gasda)*ww
+       dgam3_gasdz = dpgasdz*deninv*xx  &
+                     + (dchit_gasdz*z - dfk*dcv_gasdz)*ww
+
+       gam1_gas    = chit_gas*x + chid_gas
+       
+       if (gam1_gas < 0d0) then
+         ierr = -1
+         if (dbg) then
+            write(*,*) 'gam1_gas < 0d0 in helm_gammas'
+            write(*,*) 'gam1_gas', gam1_gas
+            write(*,*) 'chit_gas', chit_gas
+            write(*,*) 'chid_gas', chid_gas
+            write(*,*) '       x', x
+            write(*,*) '      ww', ww
+            write(*,*) '      xx', xx
+            write(*,*) ' tempinv', tempinv
+            write(*,*) '  cv_gas', cv_gas
+            write(*,*) '    pgas', pgas
+            write(*,*) '  deiondt', deiondt
+            write(*,*) '   deepdt', deepdt
+            write(*,*) ' decouldt', decouldt
+            write(*,*) '   dsepdt', dsepdt
+            stop
+         end if
+         return
+       end if
+       
+       dgam1_gasdd = dchit_gasdd*x + chit_gas*dgam3_gasdd + dchid_gasdd
+       dgam1_gasdt = dchit_gasdt*x + chit_gas*dgam3_gasdt + dchid_gasdt
+       dgam1_gasda = dchit_gasda*x + chit_gas*dgam3_gasda + dchid_gasda
+       dgam1_gasdz = dchit_gasdz*x + chit_gas*dgam3_gasdz + dchid_gasdz
+
+
+       z          = 1.0d0/gam1_gas
+       nabad_gas  = x*z
+       dnab_gasdd = (dgam3_gasdd - nabad_gas*dgam1_gasdd)*z
+       dnab_gasdt = (dgam3_gasdt - nabad_gas*dgam1_gasdt)*z
+       dnab_gasda = (dgam3_gasda - nabad_gas*dgam1_gasda)*z
+       dnab_gasdz = (dgam3_gasdz - nabad_gas*dgam1_gasdz)*z
+
+       ww        = (1.0d0 - nabad_gas)
+       gam2_gas  = 1.0d0/ww
+       z         = gam2_gas*gam2_gas
+       dgam2_gasdd = z*dnab_gasdd
+       dgam2_gasdt = z*dnab_gasdt
+       dgam2_gasda = z*dnab_gasda
+       dgam2_gasdz = z*dnab_gasdz
+
+       z         = 1.0d0/chid_gas
+       ww        = gam1_gas*z
+       yy        = -ww*z*cv_gas
+       zz        = cv_gas*z
+       cp_gas    = cv_gas * ww
+       dcp_gasdd = dcv_gasdd*ww + zz*dgam1_gasdd + yy*dchid_gasdd
+       dcp_gasdt = dcv_gasdt*ww + zz*dgam1_gasdt + yy*dchid_gasdt
+       dcp_gasda = dcv_gasda*ww + zz*dgam1_gasda + yy*dchid_gasda
+       dcp_gasdz = dcv_gasdz*ww + zz*dgam1_gasdz + yy*dchid_gasdz
+
+       x         = egas + clight2
+       z         = 1.0d0 + x*den*presinv
+       xx        = 1.0d0/z
+       ww        = x*den*presinv
+       dfk        = gam1_gas*xx
+       if (dfk < 0d0) then
+         ierr = -1
+         if (dbg) then
+            write(*,*) 'dfk < 0d0 (line 90) in helm_gammas'
+            write(*,*) '     dfk', dfk
+            write(*,*) 'gam1_gas', gam1_gas
+            write(*,*) '       z', z
+            write(*,*) '       x', x
+            write(*,*) '     den', den
+            write(*,*) ' presinv', presinv
+            write(*,*) '    egas', egas
+            stop
+         end if
+         return
+       end if
+       sound_gas = clight*sqrt(dfk)
+       yy        = 0.5d0*sound_gas/dfk
+       dcs_gasdd = yy*((dgam1_gasdd - dfk)*xx  &
+                    * (degasdd*den - ww*dpgasdd + x)*presinv)
+       dcs_gasdt = yy*((dgam1_gasdt - dfk)*xx  &
+                    * (degasdt*den - ww*dpgasdt)*presinv)
+       dcs_gasda = yy*((dgam1_gasda - dfk)*xx  &
+                    * (degasda*den - ww*dpgasda)*presinv)
+       dcs_gasdz = yy*((dgam1_gasdz - dfk)*xx  &
+                    * (degasdz*den - ww*dpgasdz)*presinv)
+
+
+       presinv = 1.0d0/pres
+       ww      = temp*presinv
+       yy      = -ww*presinv*dpresdt
+       chit    = ww * dpresdt
+       dchitdd = yy*dpresdd + ww*dpresddt
+       dchitdt = yy*dpresdt + ww*dpresdtt + dpresdt*presinv
+       dchitda = yy*dpresda + ww*dpresdta
+       dchitdz = yy*dpresdz + ww*dpresdtz
+
+       ww      = den*presinv
+       yy      = -ww*presinv*dpresdd
+       chid    = ww*dpresdd
+       dchiddd = yy*dpresdd + ww*dpresddd + dpresdd*presinv
+       dchiddt = yy*dpresdt + ww*dpresddt
+       dchidda = yy*dpresda + ww*dpresdda
+       dchiddz = yy*dpresdz + ww*dpresddz
+
+       cv      = denerdt
+       dcvdd   = denerddt
+       dcvdt   = denerdtt
+       dcvda   = denerdta
+       dcvdz   = denerdtz
+
+       ww      = pres*deninv
+       yy      = -ww*deninv
+       zz      = 1.0d0/cv
+       z       = tempinv*zz
+       xx      = chit*z
+       x       = ww * xx
+       dfk      = xx*zz
+
+       gam3    = x + 1.0d0
+       dgam3dd = (dpresdd*deninv + yy)*xx + (dchitdd*z - dfk*dcvdd)*ww
+       dgam3dt = (dpresdt*deninv - ww*tempinv)*xx  &
+                  + (dchitdt*z - dfk*dcvdt)*ww
+       dgam3da = dpresda*deninv*xx + (dchitda*z - dfk*dcvda)*ww
+       dgam3dz = dpresdz*deninv*xx + (dchitdz*z - dfk*dcvdz)*ww
+       
+       if (is_bad(gam3)) then
+         ierr = -1
+         if (dbg) then
+            write(*,*) 'is_bad(gam3) in helm_gammas', gam3
+            write(*,*) 'x', x
+            write(*,*) 'ww', ww
+            write(*,*) 'xx', xx
+            write(*,*) 'chit', chit
+            write(*,*) 'z', z
+            write(*,*) 'T', temp
+            write(*,*) 'logT', logtemp
+            write(*,*) 'Rho', den
+            write(*,*) 'logRho', logden
+            write(*,*) 'abar', abar
+            write(*,*) 'zbar', zbar
+            write(*,*) 'skip_elec_pos', skip_elec_pos
+            write(*,*)
+            if (skip_elec_pos) stop
+         end if
+         return
+       end if
+
+       gam1    = chit*x + chid
+       dgam1dd = dchitdd*x + chit*dgam3dd + dchiddd
+       dgam1dt = dchitdt*x + chit*dgam3dt + dchiddt
+       dgam1da = dchitda*x + chit*dgam3da + dchidda
+       dgam1dz = dchitdz*x + chit*dgam3dz + dchiddz
+
+       z       = 1.0d0/gam1
+       nabad   = x*z
+       dnabdd  = (dgam3dd - nabad*dgam1dd)*z
+       dnabdt  = (dgam3dt - nabad*dgam1dt)*z
+       dnabda  = (dgam3da - nabad*dgam1da)*z
+       dnabdz  = (dgam3dz - nabad*dgam1dz)*z
+       
+
+       ww      = (1.0d0 - nabad)
+       gam2    = 1.0d0/ww
+       z       = gam2*gam2
+       dgam2dd = z*dnabdd
+       dgam2dt = z*dnabdt
+       dgam2da = z*dnabda
+       dgam2dz = z*dnabdz
+
+       z       = 1.0d0/chid
+       ww      = gam1*z
+       yy      = -ww*z*cv
+       zz      = cv*z
+       cp      = cv * ww
+       dcpdd   = dcvdd*ww + zz*dgam1dd + yy*dchiddd
+       dcpdt   = dcvdt*ww + zz*dgam1dt + yy*dchiddt
+       dcpda   = dcvda*ww + zz*dgam1da + yy*dchidda
+       dcpdz   = dcvdz*ww + zz*dgam1dz + yy*dchiddz
+
+
+       x       = ener + clight2
+       z       = 1.0d0 + x*den*presinv
+       xx      = 1.0d0/z
+       ww      = x*den*presinv
+       dfk      = gam1*xx
+       if (dfk < 0d0) then
+         ierr = -1
+         if (dbg) then
+            write(*,*) 'dfk < 0d0 (line 191) in helm_gammas'
+            stop
+         end if
+         return
+       end if
+       sound   = clight*sqrt(dfk)
+       yy      = 0.5d0*sound/dfk
+       dcsdd   = yy*((dgam1dd - dfk)*xx  &
+                    * (denerdd*den - ww*dpresdd + x)*presinv)
+       dcsdt   = yy*((dgam1dt - dfk)*xx  &
+                    * (denerdt*den - ww*dpresdt)*presinv)
+       dcsda   = yy*((dgam1da - dfk)*xx  &
+                    * (denerda*den - ww*dpresda)*presinv)
+       dcsdz   = yy*((dgam1dz - dfk)*xx  &
+                    * (denerdz*den - ww*dpresdz)*presinv)
+
+
+
+!..ahh the good old simple days
+!       zz    = pres/den
+!       chit  = temp/pres * dpresdt
+!       chid  = dpresdd/zz
+!       cv    = denerdt
+!       x     = zz * chit/(temp * cv)
+!       gam3  = x + 1.0d0
+!       gam1  = chit*x + chid
+!       nabad = x/gam1
+!       gam2  = 1.0d0/(1.0d0 - nabad)
+!       cp    = cv * gam1/chid
+!       z     = 1.0d0 + (ener + clight*clight)/zz
+!       sound = clight * sqrt(gam1/z)
+

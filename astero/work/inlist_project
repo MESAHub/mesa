@@ -1,0 +1,47 @@
+! null inlist to accompany default astero/work
+
+! By default, this does nothing useful other than confirm that the
+! astero module has built correctly and will run.  You probably want
+! to copy inlists from another source, be that something you've set up
+! before or the `example_astero` test case.
+
+! For the sake of future readers of this file (yourself included),
+! ONLY include the controls you are actually using.  DO NOT include
+! all of the other controls that simply have their default values.
+
+&star_job
+  ! see star/defaults/star_job.defaults
+
+  ! begin with a pre-main sequence model
+    create_pre_main_sequence_model = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+
+&kap
+  ! kap options
+  ! see kap/defaults/kap.defaults
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+
+/ ! end of kap namelist
+
+
+&controls
+  ! see star/defaults/controls.defaults
+
+  ! options for energy conservation (see MESA V, Section 3)
+    use_dedt_form_of_energy_eqn = .true.
+    use_gold_tolerances = .true.
+
+    calculate_Brunt_N2 = .true. 
+
+  ! stop when the star nears ZAMS (Lnuc/L > 0.99)
+    Lnuc_div_L_zams_limit = 0.99d0
+    stop_near_zams = .true.
+
+/ ! end of controls namelist

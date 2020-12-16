@@ -1,0 +1,866 @@
+-- Clone of evesn1a for core-collapsing SNe
+-- force it to use BM1 and Rce directly from *hyd file ignoring numbers
+-- in eve
+_Define
+     @Lfn ' ' -- for Unix
+     -- @Lfn ',80' -- length of the Filein, Fileout
+_Define @TAUPH   0.64D0
+        @Depletion  Depl     -- 0 - no depletion
+        @WTERM   "WRITE(@term,*)"
+        @ReadData "READ(Nc,'(A)'); Read(Nc,*)"
+        @ClearScreen "If(Lsystem) Call CLSCRN"
+        @ClearMass "DMIN=0.D0; AMINI=0.D0; DMOUT=0.D0;
+                   _Do K=1,Mzon; DM(K)=0.D0 _od;"
+--_TRACE "WRITE(@term,'(5(A,1P,E11.3),A)')
+--       ' rho(1)', rho(1),' dm(1)=',dm(1),' Ry(1)=',Ry(1),' Rcen=',Rcen,
+--        ' rhoCen=',rhoCen,";
+--       ' rho(1)', rho(1),'   Ry(1)=',Ry(1),'   Rce=',Rcen,";
+  --       ' BM1=',BM1,'   BM1*UM=',BM1*UM,' BMK=',BMK,";
+  --       ' rho(Mzon)', rho(Mzon),'   Ry(Mzon)=',Ry(Mzon),'   Rce=',Rcen,";
+--_TRACE "WRITE(@term,'(1x,(3x,A,1P,E11.3),A)')   ' rho(Mzon) = ', rho(Mzon),";
+--_TRACE "WRITE(@term,'(1x,(3x,A,1P,E11.3),A)')   ' rho(1) = ', rho(1),";
+--_TRACE "WRITE(@term,'(1x,3(3x,A,1P,E11.3),A)')
+--        'xnifor1=',xnifor(1),
+--        'xnifor10=',xnifor(10),
+--        'xnifor100=',xnifor(100),";
+--         ' y1=',Yat(1),'   y2=',Yat(2),' y3=',Yat(3),";
+   <*B: MAIN BODY EVE  *>;
+   <*I: BLOCK DATA *>;
+%B:O
+    _label @endparm,@endrun,@next,@eomod;
+   PROGRAM EVE;
+    IMPLICIT REAL*8(A-H,O-Z);
+    _INCLUDEN snrad;
+    _INCLUDEN opacity;
+    _INCLUDEN abo;
+    _INCLUDEN sahaandd;
+    <*varmodel: variables for foreign model *>;
+    <*C* CONVECTIVE VARIABLES *>;
+    Character*80 NFILE,Dfile,Rfile, Mfile,Rhofile,ExtMod,CompMod,
+                 NiDist;
+
+--    Parameter(High=1.E+03);
+    <*G: VARIABLES & COMMONS FOR EVE MODEL *>;
+    DATA IndAbun/1,  1,   1,     1,    1,    1,
+         --  'h','he','c12','n14','o16','ne20',
+              1,   1,    1,   1,     1,    1,     1,  1,     1/;
+         --   Na  'mg24',Al  'si28', 'S', 'ar36', K  'ca40', 'fe'
+/*    DATA IndAbun/1,  1,   0,     0,    0,    0,
+         --  'h','he','c12','n14','o16','ne20',
+              0,   0,    0,   1,     0,   0,    0,  0,     0/;
+         --   Na  'mg24',Al  'si28', S, 'ar36', K  'ca40', 'fe'
+  */ -- for one Si heavy ion
+    Open(unit=1,file='eve.1',status='old');
+    --        Data  Result Model Rho
+    READ(1,'(A)');
+    read(1,*) Dfile,Rfile, Mfile, OpaFile,Rhofile, ExtMod,
+              CompMod, NiDist;
+--    print*,Dfile,Rfile,Mfile,OpaFile,Rhofile,ExtMod,CompMod,NiDist;
+    close(1);
+
+  Narg=Iargc();
+ _Case Narg+1 _Of
+      write(*,*) ' Extra arguments.'; Stop 16;
+   _0 --write(*,*) ' using model from eve.1 file';
+   _1 write(*,*) ' using model from argument';
+      call GetArg(1,model @Lfn);
+      Mfile=model(1:length(model))//'.mod';
+      Rhofile=model(1:length(model))//'.rho';
+      NiDist=model(1:length(model))//'.xni';
+--      ExtMod='../../woo/sn1aset1e4/'//model(1:length(model))//'.hyd';
+--      ExtMod='../../woo/mixedsn1aset/'//model(1:length(model))//'.hyd';
+      ExtMod='../../modmake/'//model(1:length(model))//'.hyd';
+--      CompMod='../../woo/sn1aset1e4/'//model(1:length(model))//'.abn';
+--      CompMod='../../woo/mixedsn1aset/'//model(1:length(model))//'.abn';
+      CompMod='../../modmake/'//model(1:length(model))//'.abn';
+      print*,Dfile,Rfile,Mfile,OpaFile,Rhofile,ExtMod,CompMod,NiDist;
+ _Esac;
+
+    Open(unit=7,file=Rfile);
+    Open(unit=8,file=Dfile);
+    Open(unit=10,file=Rhofile);
+    <*A:  initial data for BEGCON called via EVEBEG*>;
+    <*I: calculate Stella transformation coefficients *>;
+    Woomix=Kadapt < 0;  -- read 2nd model with composition
+    Kadapt=ABS(Kadapt);
+/*  -- not needed for Woosley model, yabun is already in woosley model
+    If ( Kadapt==4 ! Kadapt==5 ! Kadapt==6 ) Then;
+      Open(unit=12,file=Opafile,form='unformatted');
+--      read(12) Nfreq0,Msta,Nrho,Ntp,YATab;
+      read(12) Nfreq0,Msta,Nrho,Ntp,YATab,(Wavel(iir),iir=1,@Nfreq),
+               TpTab,RhoTab,STab,EpsBand,EppBand;
+      If ( Nfreq0 <> Nfreq ) Then;
+         write(@term,*)' Check  Nfreq0=', Nfreq0, '    Nfreq=',Nfreq;
+       ---   stop 16;
+      Endif;
+    Endif;
+*/
+   -- If(Lsystem) CALL SPM001(12);
+    RADP=.true.;
+    chem=1.d0;
+--    if (Woomix & kadapt==1) then;
+    if (Woomix) then;
+	<*mix: read composition of the 2nd mixed model
+                ONLY for Xnimod (used in bgcon) and SampleZ.
+                composition of Equilibrium model defined
+                in %BM from the 1st foreign model*>;
+    endif;
+    <*sampleabun: define abundance from SampleZ (.) *>;
+    <*M: FIRST MODEL (EVEBEG-->BEGCON) *>;
+/*      If (Woomix & kadapt ^= 1) Then;
+	<*mix2: change composition according 2nd mixed model *>;
+      Endif;
+ */
+     If(^Woomix & (Kadapt== 4 ! Kadapt==6 )) then;
+        <*nickel: find nickel distribution in XNifor *>;
+        -- for Woomix == True Ni found already in bgconhe!!
+     endif;
+--     If(Kadapt== 4 ! Kadapt==6 ! (Woomix & kadapt==1) ) then;
+       Open(Unit=18,file=NiDist,form='unformatted');
+       write(18) (XNifor(k),k=1,MZon);
+       --@wterm ' XNifor written, Mzon=', Mzon;
+       Close(18);
+--     endif;
+
+      <*W: WRITE EVE MODEL *>;
+     close(9);  -- !! close model
+    stop;
+203  :write(7,*)' error in open file ',Lunit;
+    @endrun:
+    Close(6);Close(8);Close(9);Close(10);
+    END;
+%B_sampleabun:
+  -- normalization
+  sum=0.d0;
+ _Do i=1,Natom;
+     sum=sum+sampleZ(i);
+--  @wterm ' eve 1 sample i',i,sampleZ(i);
+ _od;
+ _Do i=1,Natom;
+    YATab(i)=sampleZ(i)/(AZ(i)*sum);  -- normalization
+    sampleZ(i)=YATab(i)*AZ(i);
+--  @wterm ' eve 2 sample i',i,sampleZ(i);
+ _Od;
+%B_mix:
+   <*read : 2nd model to obtain chemical composition and ammod only *>;
+   <*sampleZ: for one zone number IWOO *>;
+   _DO Nmod=1,NZONE;
+       Ammod(Nmod)= Wmod(Nmod,1);    -- mass
+   _Od;
+%B_mix_sampleZ:
+   @wterm ' Natom=',Natom,' in %B_mix_sampleZ';
+  _Do ii=1,Natom;
+        If (IndAbun(ii)>0) Then;
+            SampleZ(ii)=Wmod(IWOO,IndAbun(ii)); -- relative abundance X
+        else;
+            SampleZ(ii)=0.d0;
+        endif;
+  @wterm ' eve IWOO sample ii',IWOO,ii,sampleZ(ii);
+  _Od;
+%B_nickel:
+  i=1;
+write(@term,*)' Nickel ammod=',ammod(Nzone), '   BMK*UM=',BMK*UM;
+_Do km=1,Mzon;
+  _While am(km) /(amout+(ammod(Nzone)-BMK*UM)/UM)
+             > ammod(i)/ammod(NZONE) & i < NZONE _Do
+    i=i+1;
+  _Od;
+  XNifor(km)=XNimod(i,1);
+_Od;
+%BM:
+    PARMS(1)=BMK; PARMS(2)=Rbeg; PARMS(3)=Alpha; PARMS(4)=BM1;
+    PARMS(5)=BXY; -- the fraction of X & Y at BM1
+    IF( RWIND > 0.) THEN;
+       @WTERM ' MODEL WITH WIND', RBEG, CRHO, RWIND;
+     -- J1=MZON*2/3 +2; JT=J1; -- for wind & core (Mzon=150)
+      J1=MZON/2 +2;   JT=J1; -- for wind & core (Mzon=200)
+    ELSE;
+      If(BM1>0.)then;
+        J1=Mzon+2; JT=Mzon+2; -- without wind  with the core
+      else;
+        J1=Mzon+1; JT=Mzon+1; -- without wind  & without the core
+      endif;
+    ENDIF;
+    <*I* calculate Stella transformation coefficients *>; -- earlier
+    If(Kadapt==4 ! Kadapt==6 )Then;  -- Foreign model
+      Open(unit=11,file=ExtMod,form='unformatted',status='old');
+      <*modelfile: read Pmod,Rhomod,Tpmod, Xmod,Ymod from file *>;
+/*      _Do km=1,Mzon;
+         _Do iat=4,Natom;
+                YABUN(iat,km)=0.0d0;
+      _Od_Od; */
+      close(11);
+    Endif;
+    TC=TC/UTP;TS=TS/UTP; -- ? FOR ISOTHERMA
+--  AMZ=AMZ/UM;
+    Rcen =Rcen *RSOL/UR;   -- Transform to STELLA units
+    IPARM=0;
+    _Repeat
+       IPARM=IPARM+1;
+       dcold=densce;
+       anold=antrop;
+       if(iparm>1)then;
+--        densce=densce*facden;
+          antrop=antrop*facant;
+       endif;
+--     @ClearScreen;
+--       @Wterm;@Wterm;
+--       @Wterm' -----  Model:',Iparm,'  -------';
+--       @Wterm' Densce=',DENSCE;
+--       @Wterm' Antrop=',Antrop;
+--       @Wterm' Bmk   =',parms(1);
+--       @Wterm' Rbeg  =',parms(2);
+--       @Wterm' Alpha =',parms(3);
+--       @Wterm' BM1   =',parms(4);
+--       @Wterm' BXY   =',parms(5);
+--       @Wterm' Step  =',Step;
+       If ( Lsystem ) Then;
+         @wterm 'Continue ? If yes then';
+         @Wterm 'input Change^=0, Mass(1), Radius(2), Alpha(3)...';
+         @Wterm 'Change>0 for sequence, Change<0 for ONE model';
+         read(5,*) Change;
+       Else;
+    --   Change=4;
+         Change=-1;
+       Endif;
+       If (change==0) stop;
+       Prompt=Change<0;
+       BMK=PARMS(1); RBEG=PARMS(2); Alpha=PARMS(3); BM1=PARMS(4);
+       BXY=PARMS(5);
+    -- If(BMK<7.41)Then;
+    -- If(Rbeg>4000.)Then;
+    -- If(BXY<0.12)Then;
+    -- If(Alpha>1.)Then;
+    --    Prompt=.True.;
+    --    Iprint=2;
+    -- Endif;
+       RKON=RBEG*RSOL/UR;   -- Transform to STELLA units
+       BM1=BM1/UM;
+       BMK=BMK/UM;
+       MIDDLE=MIDDLE/UM;    --
+       EKO=0.d0; -- or define elsewhere
+       EKOpr=EKO/UEPRI;
+--       _If BM1>0. _then
+--         @ClearMass;
+--         CALL EVEBEG;
+--         Write(7,*)' Rcen found with accuracy=',(Radius(1)-Rcen)/Rcen;
+--         Rcen=Radius(1);
+--       _else
+         <*DC* iterate to find Densce calling EVEBEG *>;
+         <*sn2: define AM(), DM(), Radius(), VELOC(), TMPR()
+                 and composition in Yabun(*,*)
+                 for type Ia or II Woosley, Nomoto or Tominaga model *>;
+--       _fi
+       IF(Ifail^=0)STOP 5;
+       facden=densce/dcold;
+       facant=antrop/anold;
+       If ( Lsystem ) Then;
+         open(10);
+         Write(10,*)PARMS,ANTROP,DENSCE;
+         CLOSE(10);
+       Endif;
+       Write(7,*)' ANTROP          DENSCE          DENSCE-old';
+       Write(7,*) ANTROP,DENSCE,DCold;
+       Write(7,*)'  Rbeg';
+       Write(7,*) Rbeg;
+       IF(^Prompt)PARMS(Change)=PARMS(Change)*Step;
+--       If(^Lsystem) call Tremain(MTIM);
+    _Until Prompt ! STEP<=0.; -- ! MTIM<5;
+    If ( Lsystem ) Then;
+       @Wterm' Enter positive factor to change mass zones';
+       read(5,*,end=@endrun,iostat=irc)factdm;
+    else;
+       factdm=-1.d-03;
+    endif;
+    Write(20,*) 'factdm =',factdm;
+    close(20);
+    if(factdm>0.d0)then;
+      <*G* redefine mass zoning for uniform grid on r *>;
+    endif;
+    IF (RWIND > 0. ) THEN;
+         <*WIND: define AM(), DM(), Radius(), VELOC(), TMPR()
+                 for wind region *>;
+    ENDIF;
+    _DO K=1,Mzon;
+      Ry(K)=Radius(K); -- K+1 in old versions
+  -- if (k==1)
+--      @wterm ' Ry for K', K,Ry(K);
+      Y(K,1)=Ry(K);
+      Uy(K)=VELOC(K); -- K+1 in old versions
+      Y(K+Mzon,1)=Uy(K);
+      If( Rwind > 0.d0 )then;
+         <*Tmprwind: define Tp profile in wind *>;
+      else;
+         Ty(K)=TMPR(K); -- K+1 in old versions
+      endif;
+      Y(K+2*Mzon,1)=TY(K);
+    _OD;
+    <*O: FIND TAU & TPH *>;
+ --   WRITE(@term,'(a,1p,2e12.3)')' Tph4,  Teff=',TPH4,Tph*Utp;
+    WRITE(7,'(2(A,1P,G12.5))')' ALPHA=',ALPHA,'   TEFF=',TPH*UTP;
+%BM_modelfile:
+    read(11) NZone,Nitind;
+    @wterm ' in %BM_modelfile: NZone,Nitind=',NZone,Nitind;
+    _Do k=1,NZone;
+      read(11) (WMOD(k,i),i=1,Nitind);
+    _Od;
+    read(11) IndAbun;
+    @wterm ' IndAbun:', IndAbun;
+    If(^Woomix) read(11) (XNimod(k,1),k=1,NZone);
+    Ninm=0;
+   _DO Nmod=1,NZONE;
+--       P=CRgas*(XYZA+Xe)*Pl*Tp; -- XYZA==Sum(Yat(i))
+       XYZe=2.d0*Wmod(Nmod,IndAbun(1));   -- hydrogen
+      write(@term,'(a,1p,e10.3,a,i5)')'  XH=',XYZE/2.d0,' nm=',nmod;
+      write(@term,'(a,1p,e10.3)')'  XFe=',Wmod(Nmod,IndAbun(14));
+       _Do ii=2,Natom;
+         If ( IndAbun(ii) > 0 ) Then;
+            XYZe=XYZe+Wmod(Nmod,IndAbun(ii))*
+                 (1.d0+Real(Zn(ii)))/AZ(ii);
+            YAT(ii)=Wmod(Nmod,IndAbun(ii))/AZ(ii);
+         Else;
+            YAT(ii)=0.d0;
+         Endif;
+       _Od;
+       write(@term,'(a,1p,e12.3)')'  XYZe=',XYZe;
+       Ammod(Nmod)= Wmod(Nmod,1);    -- mass
+--       If(Ammod(Nmod)>BM1 & Ninm==0) Ninm=max(1,Nmod-1);
+       If(Ammod(Nmod)>BM1 & Ninm==0) Ninm=max(1,Nmod-2);
+              -- BM1 here is still in solar units
+       write(@term,'(a,1p,e12.3,0p,2(a,i6))')
+          ' ammod=',ammod(Nmod),' nm=',nmod,'   Ninm=',Ninm;
+       Rhomod(Nmod)=Wmod(Nmod,2)*XYZe/Urho;  -- conversion to number density
+       myrhom(Nmod)=Wmod(Nmod,2)/Urho;
+       write(@term,'(a,1p,e12.3)')' Rhomod[1/cm^3]=',Rhomod(Nmod);
+       Tpmod(Nmod)= Wmod(Nmod,3);   -- temperature
+--       write(@term,*)' Tpmod=',Tpmod(Nmod),'     nm=',nmod;
+       If (Kadapt == 4) Then;
+          Pmod(Nmod)=  Wmod(Nmod,4)/10.d0**UlgP; -- pressure
+          write(@term,'(a,1p,e12.3)')' Pmod=',Pmod(Nmod);
+       ElseIf (Kadapt==6) Then;
+          Tp=Tpmod(Nmod)/UTP; Pl=Wmod(Nmod,2)/Urho;
+--          Pmod(Nmod)=CRgas*Rhomod(Nmod)*Tp*UpUrs/10.d0**UlgP;
+          call ursos; Pmod(Nmod)=P*UpUrs/10.d0**UlgP;
+       Endif;
+       If(Nmod>Ninm & Ninm^=0 & Pmod(Nmod)>=Pmod(max(Nmod-1,1)))
+           @wterm 'nonmonotonic P in foreign zone=',Nmod;
+       If(Nmod>Ninm & Ninm^=0 & Wmod(Nmod,2)>=Wmod(max(Nmod-1,1),2))
+           @wterm 'nonmonotonic Rho in foreign zone=',Nmod;
+    _Od;
+/*
+  _do ii=1,Mzon; AZINV(ii)=1.5d0;
+  _do iii=1,Natom; YAbun(iii,ii)=0.03d0; _od;_od;
+  km=147;antrop=1.d0;
+  _do ii=1,Nzone;
+     --call Pmodro(RHOmod(ii),BMAS,Km,PR,PD);
+    call PwooRo(myrhom(ii),BMAS,Km,PR,PD);
+     write(@term,*)' Pmod=',Pmod(ii),'  Pr=',Pr;
+     write(@term,*)' Pmod=',Pmod(ii),'  myrhom=',myrhom(ii);
+  _od;
+  stop;
+*/
+%BA:
+-- If (Lsystem) then; -- for IBM
+    Nc=8;
+-- else;             -- CRAY
+  --  Nc=5;
+-- endif;
+    @ReadData ANTROP,DENSCE,DCold; -- PAR ANTROP IN BEGCON
+                                   -- CENTRAL DENSITY (New & old)
+    @ReadData  RBEG,CRHO,RWIND,TpWIND,pWind;  -- Radius (SOLAR UNITS)
+    @ReadData  Rcen;  -- Core Radius (SOLAR UNITS)
+    @ReadData  TPROC  ;   -- CENTRAL TEMPERATURE
+               Tproc=Tproc/UTp; -- to Stella Units
+    @ReadData  VSTRE  ;   -- FITTING POINT
+    @ReadData  ALPHA  ;   -- TP=TPROC*PL**ALPHA
+    @ReadData  BMK,BM1,AMeveNi;   -- MASS IN SOLAR UNITS
+                          -- Inner Mass IN SOLAR UNITS
+    @ReadData  STEP   ;   -- FACTOR FOR CHANGE PARMS
+    @ReadData  expfac,  velofac ,   rhofac, xnifac    ;   -- scaling factors
+    @ReadData  Kadapt    ;   -- SWITCH OF P(rho)
+               -- 1 - rho**ALPHA, 2 - POLYTROPE, 3 - ISOTHERMA
+    @ReadData  US     ;   -- OUT/INWARD  +1/-1
+    @ReadData  TC,TS;   -- ISOTEMP. IN CENTRE
+                        -- SURFACE TEMPERATURE
+    @ReadData  AMISO,GAMT; -- MASS OF ISOCORE
+                           -- GAMMA FOR SURFACE T
+    @ReadData  AS,ZS;   -- MEAN A,Z FOR WHITE DW.
+   -- next lines must be ignored when SampleZ is used, except for @Depletion;
+    @ReadData  XH,XHe,@Depletion; -- HYDROGEN ABUNDANCE
+                           -- HELIUM   ABUNDANCE
+                           -- Metal depletion
+    XZ=(1.d0-XH-XHe);      -- METAL    ABUNDANCE
+    If(XZ<0.d0 .or. XZ>1.d0)then;
+        @wterm ' >>>>> EVEnew  Wrong XH, Xhe:  XZ=',XZ;
+        stop 24;
+    endif;
+    @ReadData  AVERG, IWOO;     -- AVERAGE METAL WEIGHT, woosley zone
+    @ReadData   AMZinn,AMZout,     -- masscut for heavy
+                AMHein,AMHeout,   -- masscut for He
+               BXY;               -- remaining H, He
+    @ReadData  IPRINT ;     -- PRINTING REGIME
+    @ReadData  ITER1,ITER2; -- MAX.ITER IN BOUNDS
+                             -- MAX.ITER IN DEFDIA
+    @ReadData  EPS1,EPSD,EPSA;-- ACCURACY AT BOUNDARY
+                               -- ACCURACY OF DENSCE
+                               -- ACCURACY OF ANTROP
+    @ReadData  ULGCAP,ULGEPS;  -- LOG CAPPA UNITS
+                               -- LOG EN.LOSS UNITS
+    @ReadData  H      ;   -- INITIAL STEP (SEC)
+    @ReadData DM1,DM2,PLATO,CENTR,DMID,MIDDLE;
+    WRITE(7,*)'DM2=',DM2;
+    EPS1=10.D0**EPS1;EPSD=10.D0**EPSD;EPSA=10.D0**EPSA;
+    i3=3;
+    _While IndAbun(i3) == 0 & i3 <= Natom _Do;
+      i3=i3+1;
+    _Od;
+--    @Wterm' AZ =',AZ;
+    Averg=AZ(i3);
+    XA=XH;YA=XHE/4.D0;XYZA=XZ/AZ(i3)+XA+YA;
+    <*hmass:    *>;
+    --CHEM.COMPOSITION;XA=0.59732592D0;YA=0.08844245D0;XYZA=0.68821282D0
+    SQ=0.D0;  -- NEEDED FOR NONZERO CENTRAL MASS IN EVEBEG
+%BA_hmass:
+    Hmass=(BMK-BM1)*(BXY*XH*(amzinn+amzout)/2.d0+XH*(1.d0-
+            (amzinn+amzout)/2.d0));
+    write(7,*)' Hmass=',Hmass;
+%BI:
+    EIT=1.D-5; --ACCURACY OF ITERATIONS
+    DST=1.D-4;
+    ULGTP=LOG10(UTP);
+    ULGPL=LOG10(URHO);
+    ULGTM=-(LOG10(4.D0*PI*CG)+ULGPL)/2.D0;--LG TIME UNIT
+    ULGP=ULGPL+2.D0*(ULGR-ULGTM);
+    ULGV=(ULGR-ULGTM); UV=10.D0**ULGV;
+    ULGE=2.D0*(ULGR-ULGTM);
+    UEPRI=4.D0*PI*10.D0**(ULGPL+3.D0*ULGR+ULGE-50.D0);
+    UTIME=10.D0**ULGTM;
+    UR=10.D0**ULGR;
+    UP=10.D0**(ULGP-ULGPU); UPI=1.D0/UP;
+    UE=10.D0**(ULGE-ULGEU); UEI=1.D0/UE;
+ -- PUT URS ORDER OF 10.**ULGR/7.E10 :
+    IURS=LOG10(10.D0**ULGR/RSOL); URS=10.D0**IURS;
+    CK1=8.D0/3.D0*CSIGM*10.D0**((3.D0*ULGTM)+4.D0*(ULGTP-ULGR)
+       -2.D0*ULGPL-ULGCAP);
+    CK2=10.D0**(ULGEPS+(3.D0*ULGTM)-2.D0*ULGR);
+    CFR=1.5D0*10.D0**(ULGPL+ULGR+ULGCAP);CFR=2.D0/CFR;
+    CRAold=1.D0; -- CK RAPID
+  --  PRINT'('' UNITS FOR DENSITY 10**'',F6.3,'' G/CM**3    DISTANCE''
+  --      ,'' 10**'',F6.3,'' CM'')',ULGPL,ULGR;
+    UM=4.D0*PI*10.D0**(ULGPL+3.D0*ULGR)/CMS; -- Solar units
+    URM=UR/RSOL;            -- AS UM
+
+%BMO:
+     rho(1)=3.D0*DM(1)/(Ry(1)**3-Rcen**3);
+     --NFRUS=NFREQ/2; -- DEFINE CORRECTLY IN GENERAL CASE!!!
+    _Do I=2,Mzon; rho(I)=3.D0*DM(I)/(Ry(I)**3-Ry(I-1)**3) _od;
+     I=Mzon; TAU(I)=0.D0;
+     _WHILE (I>1 & TAU(I) < @TAUPH) .or. I>Mzon-2  _DO
+         _Do ii=1, Natom [ Yat(ii)=YABUN(ii,I) ];
+         PL=rho(I); TP=Ty(I);
+         WRITE(7,'(a,i4,2(a,1p,e12.4))')' I=',I,'  pl=',PL,'   Tp=',Tp;
+         CALL URSOSZ; -- old sahaz for  opazr
+         WRITE(7,*)' After Ursos';
+        -- CALL HAPPA;
+         kmhap=I;
+         call opacit;
+         TAU(I-1)=TAU(I)+(Ry(I)-Ry(I-1))
+                                         -- HAPPAL(NFRUS/2)*PL;
+                                        * cappa*pl*(UR*URHO);
+         WRITE(7,'(2(a,1p,e12.4))')' TAU=',TAU(I-1),'  Ry(I)=',Ry(I);
+         I=I-1;
+     _OD; -- TAU(I)>@TAUPH
+     JPH=I;
+     --WRITE(@term,*)' I=',I,' TAU=',TAU(I),'  Ry(I)=',Ry(I);
+     RPH=Ry(I+1)+(Ry(I)-Ry(I+1))/(TAU(I)-TAU(I+1))*(@TAUPH-TAU(I+1));
+     VPH=Uy(I+1)+(Uy(I)-Uy(I+1))/(TAU(I)-TAU(I+1))*(@TAUPH-TAU(I+1));
+     wtph=(@TAUPH-0.5D0*(TAU(I+1)+TAU(I+2)))/( 0.5D0*(TAU(I)-TAU(I+2)) );
+     TPH4=(Ty(I+2)**4+(Ty(I+1)**4-Ty(I+2)**4)/( 0.5D0*(TAU(I)-TAU(I+2)) )
+         *(@TAUPH-0.5D0*(TAU(I+1)+TAU(I+2))));
+     TPH4=Ty(I+1)**4*wtph+Ty(I+2)**4*(1.d0-wtph);
+     WRITE(7,'(2(a,1p,e12.4))')' 1 wtph=',wtph,' Tph4=',Tph4;
+     if(0.5D0*(TAU(I+1)+TAU(I+2))>@TAUPH) wtph=0.d0;
+     TPH4=Ty(I+1)**4*wtph+Ty(I+2)**4*(1.d0-wtph);
+     WRITE(7,'(2(a,1p,e12.4))')' 2 wtph=',wtph,' Tph4=',Tph4;
+     TPH=Tph4**.25D0;
+--     TPH=(Ty(I+2)**4+(Ty(I+1)**4-Ty(I+2)**4)/( 0.5D0*(TAU(I)-TAU(I+2)) )
+  --       *(@TAUPH-0.5D0*(TAU(I+1)+TAU(I+2))))**.25D0;
+     -- 0.5D0*(TAU(I)+TAU(I+1)) -- TAU IN THE MIDDLE OF ZONE I+1
+
+%BM_sn2:
+--    Basis=(RWIND/RBEG)**(1.D0/(DBLE(MZON-J1+1)));
+             -- geometric progression
+     open(unit=20,file='test.sn2');
+     write(20,*) ' Rbeg ',Rbeg,' Mzon ',Mzon, ' Rce ',Rce,
+                     ' Rsol ',Rsol,' UR ',UR, 'Densce =',Densce;
+--     deltR = Rbeg/Mzon;   -- in solar units
+
+-- Change everything to read Nomoto's model below till next %
+-- comment is --
+-- end of operator is ;
+     open(unit=23,file=ExtMod(1:length(ExtMod)),status='old');
+     read(23,*) timeStart, -- seconds
+                Nzon,BM1,Rcen,rhoCen;
+    _do j = 1, Nzon;
+       read(23,*) idum,dum,Radius(j),RHOeve(j),TMPR(j),VELOC(j),
+   	          dum,dum;
+      --@wterm'j Radius(j):', j,Radius(j);
+    _od
+     close(23,status='keep');
+
+     open(unit=23,file=CompMod(1:length(CompMod)),status='old');
+    _do j = 1, Nzon;
+     read(23,*) idum,dum,dum,dum,(YABUN(k,j), k=1, Natom), XNifor(j);
+        -- here YABUN actually contains Xabun
+--     @wterm 'Nzon j idum ',Nzon, j, idum;
+/*
+-- make  C/O=1
+     Yabun(3,j)=(Yabun(3,j)+Yabun(5,j))/2.d0;
+     Yabun(5,j)=Yabun(3,j);
+ */
+/*
+-- move Ni58 into Si and S (original proportion Si/S is saved)
+     if (Yabun(10,j) > 0.d0 .and. Yabun(11,j) > 0.d0)
+                                 sitos=Yabun(10,j)/Yabun(11,j);
+     Yabun(10,j)=Yabun(10,j)+Yabun(15,j)*(sitos/(sitos+1.d0));
+     Yabun(11,j)=Yabun(11,j)+Yabun(15,j)/(1.d0+sitos);
+     Yabun(15,j)=0.d0;
+ */
+/*
+-- move Ni58 into Fe
+     Yabun(14,j)=Yabun(14,j)+Yabun(15,j);
+     Yabun(15,j)=0.d0;
+ */
+
+--sb     restfac=(1.d0-xnifac*XNifor(j))/(1.d0-XNifor(j)); -- unclear
+-- what happens at XNifor=1
+     restfac=1.d0; -- sb
+     XNifor(j) = max(xnifac*XNifor(j),1.d-6);
+	_do k = 1, Natom;
+            if(k^=Natom-1)then;
+               YABUN(k,j) = restfac*YABUN(k,j)/AZ(k);  -- transforming Xabun to Yabun
+            else; -- Fe
+               YABUN(k,j) = (restfac*YABUN(k,j)+XNifor(j))/AZ(k); -- adding Ni56 to Fe
+            endif;
+	_od;
+        <*normalize: check the sum of Yabun(k,j)*AZ(k) for all k
+                     and normalize it to 1 *>;
+    _od;
+     close(23,status='keep');
+
+--     Radius(1)=Radius(1)/UR;
+--     VELOC(1)=VELOC(1)/(UR/Utime);
+--     Tmpr(1)=TMPR(1)/UTp;
+--	expfac = 100.0; -- now in *.eve
+      veloc(1)=veloc(2)*Radius(1)/Radius(2);
+--     @wterm' expfac = ',expfac;
+    _DO K=Nzon,1,-1;
+--       Radius(K+1) = expfac*Radius(K)/UR; -- for old zoning, also  TMPR,  VELOC,  RHOEVE
+      Radius(K) = expfac*Radius(K)/UR;
+      if (k==nzon .or. k==1) @wterm' radius (1e14cm): ',k,Radius(k) ;
+--      If (K>=130) TMPR(K)=8.d4;  -- make isothermal at low Tp
+      TMPR(K) = max (TMPR(K)/UTp/expfac, 2.d3/UTp);
+      VELOC(K) = velofac*VELOC(K)/(UR/Utime);
+--      If (K<=30)   VELOC(K+1)= VELOC(K+1)*dble(K)/30.d0; -- special slowing!
+/* test rescaling
+      If (K<=50) then;
+         VELOC(K+1)= VELOC(K+1)*(1d-1+9d-1*dble(K)/5d1); -- special slowing!
+      else;
+         VELOC(K+1)= VELOC(K+1)*dble(K)/5d1; -- accelerating
+      endif;
+ */
+      RHOeve(K) = rhofac*RHOeve(K)/Urho/expfac**3;
+-- density of Nomoto in CGS/Urho --
+    _od
+     rhoCen = rhofac*rhoCen/Urho/expfac**3;
+--    write (*,'(a,1p,g11.3)')' BM1=',BM1;
+--    pause;
+
+     BM1=BM1/UM; Rcen =Rcen/UR;   -- Transform to STELLA units
+--      Radius(1)=Rcen;
+     AMini=BM1;
+  --   AM(1)=AMini+DM(1);
+    _DO K=1,Nzon;
+      if ( K^=1 ) then;
+        -- DM(K)=(Radius(K)**3-Radius(K-1)**3)*RHOeve(K-1)/3.d0; -- here rho from *.hyd is shifted from stella
+             -- and this gives correct 1.377 for W7f
+        DM(K)=(Radius(K)**3-Radius(K-1)**3)*RHOeve(K)/3.d0; -- here rho from *.hyd is NOT shifted from stella
+                 -- and gives too low mass 1.32 for W7f, but is good for many models
+      else;
+        DM(K)=(Radius(K)**3-Rcen**3)*rhoCen/3.d0;
+      endif;
+      if(DM(K)<0.d0)then;
+        write(*,'(1x,a,i4,1p,5(1x,a,e10.3))') ' K =',K,
+          ' AM(K)*UM =',AM(K)*UM,' DM(K)*UM =',DM(K)*UM,
+          ' Radius(K)*UR =',Radius(K)*UR,' Radius(K-1)*UR =',Radius(max(K-1,1))*UR,
+          ' RHOeve(K)=',RHOeve(K);
+        pause;
+      endif;
+      if ( K^=1 ) then;
+         AM(K)=AM(K-1)+DM(K);
+      else;
+         AM(K)=DM(K)+AMini; -- or + BM1 in general!
+      endif;
+      write(20,'(1x,a,i4,1p,4(1x,a,e10.3))') ' K =',K,
+        ' AM(K)*UM =',AM(K)*UM,' DM(K)*UM =',DM(K)*UM,
+        ' Radius(K)*UR =',Radius(K)*UR,' RHOeve(K)=',RHOeve(K);
+    _OD;
+    DMOUT=0.5d0*DM(MZON);
+    AMOUT=AM(MZON)+DMOUT;
+
+%BM_sn2_normalize:
+  sum=0.d0;
+ _Do i=1,Natom;
+     sum=sum+Yabun(i,j)*AZ(i)
+ _od;
+ _Do i=1,Natom;
+    Yabun(i,j)=Yabun(i,j)/sum;  -- normalization
+ _Od;
+  Xnifor(j)=Xnifor(j)/sum;
+
+
+%BM_WIND:
+    Nzon=Mzon; -- in case of wind Nzon may be larger than in foreign model
+    TAUW=0.D0;
+    Basis=(RWIND/RBEG)**(1.D0/(DBLE(MZON-J1+1)));
+             -- geometric progression
+   K=J1-1;
+      Radius(K+1)=Radius(K)*BASIS;
+--   RhoW=CRHO/(Radius(K+1)*UR)**2;
+   RhoW=CRHO/(Radius(K+1)*UR)**2*(Radius(K+1)*UR*1.d-15)**(2.d0-pWind);
+              -- in CGS units, now CRHO is normalized to R=1e15 cm
+        Rhoedg=dM(K-1)*(3.D0*URHO)/(Radius(K)**3-Radius(K-1)**3);
+--      Ry(K-1)=Radius(K), that is why we take K, K-1  for rho in zone K-1
+        Tpedge=TMPR(K);
+        Redge =Radius(K);
+        Rhocor=Rhoedg-RhoW;
+        Write(7,*)' RhoW=',RhoW,'    Rhocor=',Rhocor;
+   if(Rhocor<0.d0)then;
+       Write(@term,*)' RhoW=',RhoW,'    Rhocor=',Rhocor;
+       Write(@term,*)' enter 1 if you wish rho>RhoW';
+       read(*,*) keywind;
+      endif;
+   if(keywind^=1)then;
+      <*relaxrho: define density in the wind to relax
+                  continuously from stellar to wind distribution
+                  in zones J1-1,Mzon *>;
+   else; -- keywind==1
+      <*windrho: put density distribution for zones K<J1 to be equal
+                 to RhoW *>;
+   endif;
+    @Wterm' TAUWIND=',TAUW;
+   keywind=0;
+   Write(@term,*)' enter km>0 if you wish a shell in zone km';
+   read(*,*) keywind;
+   If(keywind>0)then;
+     <*shell:   *>;
+   endif;
+    DMOUT=DM(MZON);
+    AMOUT=AM(MZON)+DMOUT;
+    K=J1-1;
+    _WHILE TMPR(K)<TPWIND/UTP & K>1 _DO
+       TMPR(K)=TPWIND/UTP; K=K-1
+    _OD;
+
+%BM_WIND_relaxrho:
+
+    _DO K=J1-1,Mzon;
+      Radius(K+1)=Radius(K)*BASIS;
+      RhoW=CRHO/(Radius(K+1)*UR)**2*(Radius(K+1)*UR*1.d-15)**(2.d0-pWind);
+              -- in CGS units, now CRHO is normalized to R=1e15 cm
+--      If(Radius(K+1)*UR>1.d15)
+--          RhoW=RhoW*(Radius(K+1)*UR*1.d-15)**1.5d0; -- Chugai; only for 94w
+--          RhoW=RhoW*(Radius(K+1)*UR*1.d-15)**2; -- i.e. const --
+                   --  Chugai; only for 94w
+--          RhoW=RhoW*(Radius(K+1)*UR*1.d-15)**4; -- i.e. grows --
+         RhoW=RhoW+Rhocor*(Redge/Radius(K+1))**6;
+         TMPR(K+1) =
+          Tpwind/UTp+(Tpedge-Tpwind/UTp)*(Redge/Radius(K+1))**2;
+         TAUW=TAUW+0.2*(1.+XH)*RhoW*(Radius(K+1)-Radius(K))*UR;
+         DM(K)=RhoW/(3.D0*URHO)*(Radius(K+1)**3-Radius(K)**3);
+         AM(K)=AM(K-1)+DM(K);
+         If (Kadapt ==4 ! Kadapt == 5 ! Kadapt ==6) Then;
+           _Do ii=1,Natom [ YABUN(ii,k)=YATab(ii) ];
+         Else;
+           _Do ii=1,Natom [ YABUN(ii,k)=YABUN(ii,J1-2) ];
+         Endif;
+         VELOC(K+1) = 0.D0;
+--       TMPR(K+1) = Tpwind/UTP;
+    _OD;
+
+%BM_WIND_windrho:
+    -- here K==J1-1; -- the 1st zone in the wind
+       K1=K-1;
+       RhoW=CRHO/(Radius(K1+1)*UR)**2*(Radius(K1+1)*UR*1.d-15)**(2.d0-pWind);
+     _while  3.D0*URHO*DM(K1)/(Radius(K1+1)**3-Radius(K1)**3) < RhoW
+             & K1>2 _do
+         DM(K1)=RhoW/(3.D0*URHO)*(Radius(K1+1)**3-Radius(K1)**3);
+         @wterm ' dm corrected K1=',K1;
+         K1=K1-1;
+         RhoW=CRHO/(Radius(K1+1)*UR)**2*(Radius(K1+1)*UR*1.d-15)**(2.d0-pWind);
+     _od;
+
+    _DO K=K1+1,J1-2;
+         @wterm ' am corrected K=',K;
+         AM(K)=AM(K-1)+DM(K);
+    _OD;
+
+    _DO K=J1-1,Mzon;
+      Radius(K+1)=Radius(K)*BASIS;
+      RhoW=CRHO/(Radius(K+1)*UR)**2*(Radius(K+1)*UR*1.d-15)**(2.d0-pWind);
+              -- in CGS units, now CRHO is normalized to R=1e15 cm
+      RhoW=RhoW/(1.d0+(Radius(K+1)*UR/4.5d15)**12); -- Chugai's cutting
+--      Write(@term,*)' in %BM_WIND_windrho: RhoW=',RhoW;
+--      TMPR(K+1) =
+--         Tpwind/UTp+(Tpedge-Tpwind/UTp)*(Redge/Radius(K+1))**2;
+      TAUW=TAUW+0.2*(1.+XH)*RhoW*(Radius(K+1)-Radius(K))*UR;
+      DM(K)=RhoW/(3.D0*URHO)*(Radius(K+1)**3-Radius(K)**3);
+      AM(K)=AM(K-1)+DM(K);
+      If (Kadapt ==4 ! Kadapt == 5 ! Kadapt ==6) Then;
+        _Do ii=1,Natom [ YABUN(ii,k)=YATab(ii) ];
+      Else;
+        _Do ii=1,Natom [ YABUN(ii,k)=YABUN(ii,J1-2) ];
+      Endif;
+      VELOC(K+1) = 0.D0;
+--    TMPR(K+1) = Tpwind/UTP;
+    _OD;
+
+%BM_WIND_shell:
+
+   Write(@term,*)' enter tau_Tompson shell ';
+   read(*,*) taushell;
+   rhoshell = taushell
+           /(0.2*(1.+XH)*(Radius(keywind+1)-Radius(keywind))*UR);
+   DM(keywind)=rhoshell/(3.D0*URHO)*(Radius(keywind+1)**3-Radius(keywind)**3);
+   do k=keywind,Mzon;
+     AM(K)=AM(K-1)+DM(K);
+   enddo;
+   write(@term,'(a,1p,2e12.3)') ' taushell rhoshell=',taushell,rhoshell;
+   @wterm ' dm corrected Kshell=',keywind;
+   TAUW=TAUW+0.2*(1.+XH)*rhoshell*(Radius(keywind+1)-Radius(keywind))*UR;
+   @Wterm' TAUWIND corrected=',TAUW;
+
+%BM_Tmprwind:
+    If(Tmpr(K+1)<Tpwind/UTp) then;
+        Ty(K)=Tpwind/UTp;
+    else;
+        Ty(K)=TMPR(K+1);
+    endif;
+
+%BW:
+    t=timeStart*expfac/Utime;
+ @wterm ' start time ',t*Utime;
+--    pause;
+    NSTEP=0;
+    ELOST=0.D0;
+    RADBEG=Radius(Nzon)*UR/Rsol;
+    _DO Km=1,Mzon;
+         NREG(Km)=3; --INITIAL REGIMES FOR KINETIC EQUATIONS
+         YAINV(Km)=12.D0;        -- YCARBON INVERSE
+         UC(Km)=0.D0;            -- CONVECTIVE VELOCITY
+-- in old runs @Depletion was reducing X_H, now metals
+--       YABUN(2,km)=YABUN(2,km)+(@Depletion/4.d0)*(YABUN(1,km)**3/XH**2);
+        -- before Yabun changed
+--       YABUN(1,km)=YABUN(1,km)*(1.d0-@Depletion*(YABUN(1,km)/XH)**2);
+--         YABUN(2,km)=YABUN(2,km)+(@Depletion/4.d0)*YABUN(1,km);
+--         YABUN(1,km)=YABUN(1,km)*(1.d0-@Depletion);
+    _OD;
+    KTAIL=120;
+    RCE=RCEN;  -- here interference with common from SNRAD.INC
+    KRAD=0;    -- No radiative variables
+    NQ=0;
+   -- Nomoto model read: NZON=MZON;
+    Lunit=9;
+    NFILE=Mfile;
+    call StradIO('we',LUNIT,NFILE);
+    <*rhopro: output profiles for plot *>;
+%BW_rhopro:
+    Lunit=10;
+    WRITE(10,'(2A,15(11X,A2))')
+    '     zone    mass       lg r        lg(Tp)       lg(rho)',
+      '    u          Ni ', Chames;
+--    '    lg dm      Ni ', Chames;
+    WRITE(10,'(i6,1p,g15.4)')Nzon, t*Utime;
+  _Do j=1,Natom;
+     totmass(j)=0.d0;
+  _od
+
+_define @ap "'" ;
+   _Do Km=1,NZON;
+--      WRITE(10,'(i4,5f10.3,15f8.3)') Km, (AM(Km)-dm(km)/2.d0)*UM, --centered
+      WRITE(10,@ap(i4,1p,@Nitem e13.4)@ap) Km, AM(Km)*UM,
+                  log10(max(Ry(Km),1.d-100))+UlgR,
+                  log10(max(Ty(Km),1.d-100))+UlgTp, log10(max(rho(Km),1.d-100))+UlgPl,
+                  Uy(Km)*UR/Utime, log10(max(XNIfor(km),1.d-15)),
+--                  log10(dm(Km)*UM), log10(max(XNIfor(km),1.d-15)),
+                 (LOG10(max(Yabun(j,km)*AZ(j),1.d-15)),j=1,Natom);
+/*
+      WRITE(10,@ap(i4,1p,@Nitem e13.4)@ap) Km, AM(Km)*UM,
+                  log10(Ry(Km))+UlgR,
+                  log10(Ty(Km))+UlgTp, log10(rho(Km))+UlgPl,
+                  Uy(Km)*UR/Utime, log10(max(XNIfor(km),1.d-99)),
+                 (LOG10(max(Yabun(j,km)*AZ(j),1.d-99)),j=1,Natom);
+ */
+     _Do j=1,Natom;
+        totmass(j)=totmass(j)+Yabun(j,km)*AZ(j)*dm(Km)*UM
+     _od
+      totmass(Natom+1)=totmass(Natom+1)+XNIfor(km)*dm(Km)*UM;
+   _od;
+   WRITE(10,'(''#'',65x,16f13.5)')totmass(Natom+1),(totmass(j),j=1,Natom);
+%I:O
+    BLOCK DATA EVEDAT;
+    IMPLICIT REAL*8(A-H,O-Z);
+    REAL*8 M;
+    _INCLUDE zone; -- Mzon
+    COMMON/AMM/DM(Mzon+2),M(Mzon+2);
+    COMMON /DAN1/ BM1,Rcen,BMK,RKON,PK,DENSCE,ANTROP,VSTRE,IPRINT,JZON;
+    COMMON /DAN2/ EPS1,EPSD,EPSA,DELTD,DELTB,ITER1,ITER2;
+      REAL*8 MIDDLE,DMID;
+    COMMON /DAN3/ DM1,DM2,PLATO,CENTR,MIDDLE,DMID,Kadapt;
+    COMMON /DANN/ AN;
+    COMMON/BTIME/TIME,DTN,DT0,DTK1,DTK2,DTOLD,DTMAX,TOO;
+    COMMON/UNSTL/UL,UPRESS,UE,UEPS,UCAP,UTIME,UV,UFLUX,UP;
+    COMMON/UNBSTL/UR,UM,UEPRI,ULGP,ULGE,ULGV,ULGTM,
+                  ULGEST,ULGFL,ULGCAP,ULGEPS;
+    COMMON/DJI/JT,J1,JK;
+    COMMON/CKN/CK1,CK2,CKL,CKS,ARAD,SGM;
+    COMMON/INFP/NUMST,NDPR,NPRIN,NCONTR;
+    DATA UCAP/1.D0/, UEPS/1.D0/;
+--  DATA UM/1.D0/, ALF/1.D0/, UR/1.D2/, TIME/0.0D0/;
+    DATA AN/3.D0/,JZON/Mzon/,BM1/1.6D0/,Rcen/0.D0/,
+         BMK/1.D0/,RKON/1.D0/,PK/0.D0/;
+    DATA DENSCE/162.55D0/,ANTROP/0.15654D0/;
+    DATA VSTRE/0.5D0/,IPRINT/2/;
+    DATA EPS1/1.D-06/,EPSD/1.D-06/,EPSA/1.D-06/;
+    DATA ITER1/20/,ITER2/20/,DELTD/0.001D0/,DELTB/0.001D0/;
+    DATA DM1/1.D-02/,DM2/1.D-02/,PLATO/0.4D0/,CENTR/0.4D0/;
+    END;
+%B_varmodel:o
+_include formod;
+%BC:
+    REAL*8 UC(Mzon),YAINV(Mzon);
+    EQUIVALENCE ( Y(3*Mzon+1,1),UC(1)),(Y(4*Mzon+1,1),YAINV(1));
+%BG:O
+    Parameter(NDIST=Mzon/3);     -- NUMBER OF REDEFINED OUTER ZONES
+    Common/AMZ/AMZinn,AMZout,AMHein,AMHeout,BXY,XH,XHe,XZ,Averg;
+    COMMON/AM1/
+       TMPR(Mzon+2),RHOEVE(Mzon+2),Radius(Mzon+2),VELOC(Mzon+2),
+       EPSE1(Mzon+2),PRES1(Mzon+2),TAUZON(Mzon+2),ENERGY(Mzon+2);
+    COMMON/DAN1/BM1,Rcen,BMK,RKON,PK,DENSCE,ANTROP,VSTRE,IPRINT,JZON;
+    COMMON/DAN2/EPS1,EPSD,EPSA,DELTD,DELTB,ITER1,ITER2;
+    REAL*8 MIDDLE,DMID;
+    COMMON /DAN3/ DM1,DM2,PLATO,CENTR,MIDDLE,DMID,Kadapt;
+    COMMON/TINT/TC,TS,AMISO,GAMT;
+    COMMON/DJI/JT,J1,JK;
+    COMMON/INTMP/ TPF,TPROC,ALPHA;
+    COMMON /SAMPLE/sampleZ(Natom);
+    COMMON/BEG/RBEG,AMBEG,ETOTO,POB;
+    COMMON/FAIL/IFAIL;
+    Integer Change;
+    Logical Prompt;
+    Character*3 STATUS;
+    Logical Lexist;
+    Real*8 PARMS(5),FACTDM;      -- factor of zone redefining
+    real*8 myrhom(@zone);
+    real*8 totmass(Natom+1); -- Ni in Natom+1
+

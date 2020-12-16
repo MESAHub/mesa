@@ -1,0 +1,19 @@
+#script to generate the complete set of atmosphere BC tables using the input data and codes in this directory
+#
+# [program]     [path to phoenix input file]    [path to C&K 2003 input file]       [path to MESA/atm input file]  [path to output file]
+#set -x
+./table_merge atm_input_data/phx/Zm400ap0.phx atm_input_data/ck03/am40k2odfnew.tbl atm_input_data/atm/Zm400ap0.atm atm_data/Zm40.tbl
+./table_merge atm_input_data/phx/Zm250ap0.phx atm_input_data/ck03/am25k2odfnew.tbl atm_input_data/atm/Zm250ap0.atm atm_data/Zm25.tbl
+./table_merge atm_input_data/phx/Zm200ap0.phx atm_input_data/ck03/am20k2odfnew.tbl atm_input_data/atm/Zm200ap0.atm atm_data/Zm20.tbl
+./table_merge atm_input_data/phx/Zm150ap0.phx atm_input_data/ck03/am15k2odfnew.tbl atm_input_data/atm/Zm150ap0.atm atm_data/Zm15.tbl
+./table_merge atm_input_data/phx/Zm100ap0.phx atm_input_data/ck03/am10k2odfnew.tbl atm_input_data/atm/Zm100ap0.atm atm_data/Zm10.tbl
+./table_merge atm_input_data/phx/Zm050ap0.phx atm_input_data/ck03/am05k2odfnew.tbl atm_input_data/atm/Zm050ap0.atm atm_data/Zm05.tbl
+./table_merge atm_input_data/phx/Zp000ap0.phx atm_input_data/ck03/ap00k2odfnew.tbl atm_input_data/atm/Zp000ap0.atm atm_data/Zp00.tbl
+./table_merge atm_input_data/phx/Zp050ap0.phx atm_input_data/ck03/ap05k2odfnew.tbl atm_input_data/atm/Zp050ap0.atm atm_data/Zp05.tbl
+#set +x
+
+
+
+./rnng
+
+

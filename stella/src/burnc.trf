@@ -1,0 +1,4 @@
+  subroutine burnc;
+     -- plague
+  return;
+  end;

@@ -1,0 +1,33 @@
+&star_job
+
+! begin with saved model from end of core He burning
+      load_saved_model = .true.
+      saved_model_name = '2M_TACHeB.mod'
+
+! save a model at the end of the run
+      save_model_when_terminate = .true.
+      save_model_filename = '2M_3DUP.mod'
+      required_termination_code_string = 'third pulse with 3DUP has occurred'
+
+! display on-screen plots
+      pgstar_flag = .false.
+
+/ !end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+! see inlist_common and inlist_TP_AGB
+
+! stopping condition
+      ! 3rd thermal pulse with 3DUP
+      ! see run_star_extras
+
+/ ! end of controls namelist

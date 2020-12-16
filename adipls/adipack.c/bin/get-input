@@ -1,0 +1,4 @@
+#!/bin/bash
+#  get input from file in $1
+#  input lines are marked with a '#' or a '@' at the end
+egrep '# *$|@ *$' "$1" | sed -e 's/ *[#,@] *$//'

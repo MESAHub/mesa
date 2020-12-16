@@ -1,0 +1,43 @@
+&star_job
+
+
+      mesa_dir = '../../..'
+      show_log_description_at_start = .false.
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+
+/ ! end of star_job namelist
+
+
+&kap
+
+      Zbase = 0.02
+
+/ ! end of kap namelist
+
+
+&controls
+
+      max_age = 1.4e10
+      mesh_delta_coeff = 0.8
+
+      extra_terminal_output_file = 'log1' 
+      log_directory = 'LOGS1'
+
+      profile_interval = 50
+      history_interval = 1
+      terminal_interval = 10
+      write_header_frequency = 10
+      
+      varcontrol_target = 5d-4
+      
+
+/ ! end of controls namelist
+
+
+&pgstar
+         
+
+
+/ ! end of pgstar namelist

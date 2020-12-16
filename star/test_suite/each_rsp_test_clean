@@ -1,0 +1,49 @@
+#!/bin/bash
+
+function check_okay {
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
+}
+
+function do_one {
+id=$((id+1))
+if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
+    cd $1
+    check_okay
+    echo "clean" $1
+    rm -f star
+    ./clean
+    rm -f LOGS/*
+    rm -f photos/*
+ 	 if [ -f out.txt ]
+ 	 then
+       cp out.txt out_prev.txt
+ 	 fi
+    rm -f out.txt
+    if [ -r star_history/history_out ]
+    then
+        rm -f star_history/history_out/*
+    fi
+    if [ -r star_profile/profiles_out ]
+    then
+        rm -f star_profile/profiles_out/*
+    fi
+    rm -f .running
+    
+    #cp ../rsp_Delta_Scuti/map_columns.list .
+    #svn del checks.md5
+    
+    cd ..
+fi
+}
+
+DO_ALL=0
+id=0
+curr_id="$1"
+if [ ! "$1" ]; then
+   DO_ALL=1
+fi
+source do1_rsp_test_source
+wait

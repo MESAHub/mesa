@@ -1,0 +1,66 @@
+
+&other_timestep_limit
+
+
+         !### delta_lgT_limit
+
+         ! Limit for magnitude of max change in log10 temperature in any cell.
+
+      delta_lgT_limit = 1d-5 ! 0.5d0
+
+
+         !### delta_lgT_hard_limit
+
+         ! If max `delta_lgT` is greater than `delta_lgT_hard_limit`,
+         ! retry with smaller timestep.
+
+      delta_lgT_hard_limit = 1d-4 ! -1
+
+
+         !### delta_lgT_limit_min_lgT
+
+         ! `delta_lgT_limit` limits only apply where `log10_T(k) >= delta_lgT_limit_min_lgT`.
+
+      delta_lgT_limit_min_lgT = 3d0 ! 1d99
+      
+      
+
+
+         !### rotation_steps_limit
+
+         ! If rotation solver uses more steps than this, reduce the next timestep.
+
+      rotation_steps_limit = 500
+
+
+         !### rotation_steps_hard_limit
+
+         ! If rotation solver uses more steps than this, retry.
+
+      rotation_steps_hard_limit = 700
+      
+
+
+         ! limit for change in mdot in Msun/yr
+         ! + `delta_mdot_atol` tolerance for absolute changes
+         ! + `delta_mdot_rtol` tolerance for relative changes
+
+
+      delta_mdot_atol = 1d-3
+      delta_mdot_rtol = 0.5d0
+
+
+         !### delta_mdot_limit
+         !### delta_mdot_hard_limit
+
+         !     delta_mot = abs(mdot - mdot_old)/ (delta_mdot_atol*Msun/secyer + &
+         !        delta_mdot_rtol*max(abs(mdot),abs(mdot_old)))
+
+         ! ignore if < 0
+
+      delta_mdot_limit = -1
+      delta_mdot_hard_limit = -1
+      
+
+
+/ ! end of other_timestep_limit

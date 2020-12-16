@@ -1,0 +1,13 @@
+if [ ! -d kap_input_data ]
+then
+     echo
+     echo 'unpacking kap_input_data'
+     echo
+     tar xf kap_input_data.tar.xz
+fi
+
+echo
+echo 'building preprocessor'
+echo
+cd make
+make

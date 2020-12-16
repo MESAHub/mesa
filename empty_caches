@@ -1,0 +1,11 @@
+#!/bin/bash
+
+rm -f data/eos*_data/cache/*
+rm -f data/ionization_data/cache/*
+rm -f data/kap_data/cache/*
+rm -f data/rates_data/cache/*
+rm -f eos/data/eos_data/cache/*
+rm -f kap/data/kap_data/cache/*
+rm -f net/data/net_data/cache/*
+
+echo 'done'

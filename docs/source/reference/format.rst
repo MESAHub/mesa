@@ -1,0 +1,163 @@
+==============================
+Format for MESA defaults files
+==============================
+
+This document defines a format for MESA defaults files.
+Because these files are compiled, documenation must be in commments.
+After leading spaces and ! are stripped, this file should be valid
+reStructuredText (reST) so that it can rendered in the Sphinx docs.
+This file is written in the format it describes.
+
+
+Comments
+========
+
+Comment lines begin with a bang, followed by a single space,
+and then have at least one non-whitespace character.  Empty
+comments are treated like blank lines.
+
+
+Regular Comments
+________________
+
+Most comments will be paragraphs of text.
+
+In reST, a paragraph is chunks of text separated by one or
+more blank lines. indentation is significant in reST, so all
+lines of the same paragraph must be left-aligned to the same
+level of indentation.
+
+Each block of comments is treated as a paragraph, and so the
+lengths of the lines will not be preserved.  (This feature
+allow us to nicely display much of the content in a non-fixed
+width font!)  For example, the following two blocks will look
+similar when rendered for the web.
+
+This block has no line breaks.
+
+This block
+has several
+line
+breaks
+
+Formatted Comments
+__________________
+
+More complicated comments benefit greatly from additional
+formatting.
+
+You can trigger emphasis using *one asterisk* for italics or
+**two asterisks** for bold.  The use of ``backquotes`` lets
+you put fixed-width font material inline.
+
+It is frequently helpful to make a list
+
++ foo
++ bar
++ baz
+
+If you're writing code in your comments, then you probably
+want things to appear in a fixed-width font in code blocks.
+To do so, end a paragraph with the special marker :: (double colon).
+Then write your code as an indented block surrounded by blank lines.
+(Remember, a comment begins a bang & space,
+so you must have at least 2 spaces after the ! to indent.)
+
+::
+
+ foo =   1
+ bar =  10
+ baz = 100
+
+
+By default, blocks trigger fortran syntax highlighting::
+
+    subroutine foo(bar)
+      implicit none
+      integer, intent(in) :: bar
+      bar = bar + 1
+    end subroutine foo
+
+If you know where you want the line breaks to be, but don't
+want to render things as code (in a fixed-width font), you
+can force a line break by starting lines with a | (pipe).
+
+| These lines are
+| broken exactly like in
+| the source file.
+
+
+Options & Defaults
+==================
+
+
+Single Options
+______________
+
+Most MESA options stand alone and have their own
+documentation.
+
+
+number_option
+~~~~~~~~~~~~~
+
+Number options are great.  MESA is good at taking numbers
+and making more numbers for you.  Often you'll want to set
+``number_option > 0``, but sometimes you want to set
+``number_option <= 0``.
+
+::
+
+    number_option = 1
+
+
+string_option
+~~~~~~~~~~~~~
+
+String options are great.  You can tell MESA what you want
+it to do.
+
+::
+
+    string_option = 'make me a sandwich'
+
+
+boolean_option
+~~~~~~~~~~~~~~
+
+Boolean options are great.  They can take one of two values:
+
++ .true.
++ .false.
+
+::
+
+    boolean_option = .true.
+
+
+Multiple Options
+________________
+
+
+xa_average_lower_limit_species
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+xa_average_lower_limit
+~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes there are options that need to grouped together,
+because they share documentation. If options are to be
+grouped, both their headings and their default values should
+be adjacent.
+
+::
+
+    xa_average_lower_limit_species(1) = ''
+    xa_average_lower_limit(1) = 0
+
+Whitespace Style
+================
+
+An indent is 3 spaces.  No tabs are used.  Almost all
+whitespace at the beginning of lines is strictly cosmetic and
+is not used by the parser in determining the structure of the
+file.  Whitespace at the end of lines should be avoided.

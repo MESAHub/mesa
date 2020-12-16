@@ -1,0 +1,394 @@
+# This is the makefile for the mesa matrix library (a subset of lapack)
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+# WHB removed dlazq3.f because it fails to compile with ifort 2018:
+# ../lapack_src/dlazq3.f(219): error #6633: The type of the actual argument differs from the type of the dummy argument.   [IEEE]
+#      $                DN1, DN2, IEEE )
+# --------------------------------^
+# ../lapack_src/dlazq3.f(218): error #6631: A non-optional actual argument must be present when invoking a procedure with an explicit interface.   [IEEE]
+#          CALL DLASQ5( I0, N0, Z, PP, TAU, DMIN, DMIN1, DMIN2, DN,
+# --------------^
+# ../lapack_src/dlazq3.f(218): error #6631: A non-optional actual argument must be present when invoking a procedure with an explicit interface.   [EPS]
+#          CALL DLASQ5( I0, N0, Z, PP, TAU, DMIN, DMIN1, DMIN2, DN,
+# --------------^
+
+ifeq ($(WHICH_LAPACK),USE_SRCS)
+   LAPACK_SRCS = \
+      dgbcon.f \
+      dgbequ.f \
+      dgbrfs.f \
+      dgbsv.f \
+      dgbsvx.f \
+      dgbtf2.f \
+      dgbtrf.f \
+      dgbtrs.f \
+      dgecon.f \
+      dgeequ.f \
+      dgerfs.f \
+      dgesv.f \
+      dgesvx.f \
+      dgetf2.f \
+      dgetrf.f \
+      dgetrs.f \
+      dgtcon.f \
+      dgtrfs.f \
+      dgtsv.f \
+      dgtsvx.f \
+      dgttrf.f \
+      dgttrs.f \
+      dgtts2.f \
+      disnan.f \
+      dlacn2.f \
+      dlabad.f \
+      dlacpy.f \
+      dlagtm.f \
+      dlangb.f \
+      dlange.f \
+      dlangt.f \
+      dlantb.f \
+      dlantr.f \
+      dlaqgb.f \
+      dlaqge.f \
+      dlassq.f \
+      dlaswp.f \
+      dlatbs.f \
+      dlatrs.f \
+      drscl.f \
+      dgetri.f \
+      dgesvd.f \
+      dnrm2.f \
+      dlasq3.f \
+      dlasq4.f \
+      dbdsqr.f \
+      dgelqf.f \
+      dlascl.f \
+      dorgbr.f \
+      dorgqr.f \
+      dtrtri.f \
+      dgebrd.f \
+      dgeqrf.f \
+      dlaset.f \
+      dorglq.f \
+      dormbr.f \
+      dgebd2.f \
+      dgeqr2.f \
+      dlarfb.f \
+      dlartg.f \
+      dlasq1.f \
+      dlasv2.f \
+      dorgl2.f \
+      dormqr.f \
+      dtrmm.f \
+      dgelq2.f \
+      dlabrd.f \
+      dlarft.f \
+      dlas2.f \
+      dlasr.f \
+      dorg2r.f \
+      dormlq.f \
+      drot.f \
+      dtrti2.f \
+      dtrtrs.f \
+      dlarf.f \
+      dlarfg.f \
+      dlasrt.f \
+      dorm2r.f \
+      dorml2.f \
+      dlapy2.f \
+      dlasq2.f \
+      dtrmv.f \
+      dlasq5.f \
+      dlasq6.f \
+      dlazq4.f \
+      dcabs1.f \
+      dlamch.f \
+      dlaisnan.f \
+      icmax1.f \
+      ilaclr.f \
+      iladlr.f \
+      ilaslc.f \
+      ilauplo.f \
+      ilazlr.f \
+      izmax1.f \
+      ieeeck.f \
+      iladiag.f \
+      ilaenv.f \
+      ilaslr.f \
+      ilaver.f \
+      iparmq.f \
+      ilaclc.f \
+      iladlc.f \
+      ilaprec.f \
+      ilatrans.f \
+      ilazlc.f \
+      izamax.f \
+      sgesv.f \
+      sgetf2.f \
+      sgetrf.f \
+      sgetrs.f \
+      slaswp.f \
+      zgbtrf.f \
+      zgbtrs.f \
+      zgetrf.f \
+      zgetrs.f \
+      zgetf2.f \
+      zlaswp.f \
+      zlacgv.f \
+      zswap.f \
+      zgeru.f \
+      ztbsv.f \
+      zgemv.f \
+      ztrsm.f \
+      zgbtf2.f \
+      zgttrf.f \
+      zgttrs.f \
+      zgtts2.f \
+      zscal.f \
+      zcopy.f \
+      zgemm.f \
+      dgeev.f \
+      dgebal.f \
+      dgehrd.f \
+      dorghr.f \
+      dhseqr.f \
+      dtrevc.f \
+      dgebak.f \
+      dlahr2.f \
+      dgehd2.f \
+      dlaqr0.f \
+      dlahqr.f \
+      dlaln2.f \
+      dlaqr3.f \
+      dlanv2.f \
+      dladiv.f \
+      dlaqr4.f \
+      dlaqr5.f \
+      dlaqr1.f \
+      dlaqr2.f \
+      dormhr.f \
+      dtrexc.f \
+      dlaexc.f \
+      dlasy2.f \
+      dlarfx.f
+endif
+
+LAPACK_QUAD_SRCS = \
+   qgttrf.f \
+   qgttrs.f \
+   qgtts2.f \
+   qgetrf.f \
+   qgetrs.f \
+   qgemv.f \
+   qgemm.f \
+   qgetf2.f \
+   qswap.f \
+   iqamax.f \
+   qtrsm.f \
+   qtrsv.f \
+   qger.f \
+   qscal.f \
+   qlamch.f \
+   qlaswp.f
+
+ifeq ($(WHICH_BLAS),USE_SRCS)
+   BLAS_SRCS = \
+      dgemm.f \
+      dtrsm.f \
+      xerbla.f \
+      lsame.f \
+      dger.f \
+      dcopy.f \
+      dgemv.f \
+      dtbsv.f \
+      daxpy.f \
+      ddot.f \
+      dgbmv.f \
+      dasum.f \
+      dtrsv.f \
+      dscal.f \
+      dswap.f \
+      idamax.f \
+      strsm.f \
+      sgemm.f \
+      slamch.f \
+      isamax.f \
+      sswap.f \
+      sscal.f \
+      sger.f \
+      zaxpy.f \
+      zdotc.f \
+      zgerc.f \
+      zhemv.f \
+      zher2.f \
+      ztrsv.f
+endif
+
+MTX_SRCS = \
+   mtx_def.f \
+   my_lapack95_dble.f90 \
+   my_lapack95_quad.f90 \
+   mtx_support.f90 \
+   DGBSVX_wrapper.f90 \
+   pre_conditioners.f90 \
+   bcyclic.f90 \
+   mtx_lib.f90 \
+
+ifneq ($(MAKECMDGOALS),clean)
+   $(shell $(CPP) -DDBLE $(MOD_PRIVATE_DIR)/my_lapack95.F90 > my_lapack95_dble.f90)
+   $(shell $(CPP)        $(MOD_PRIVATE_DIR)/my_lapack95.F90 > my_lapack95_quad.f90)
+   # Alter the timestamps so make wont force a recompile just because we copied the files,
+   # instead we only recompile if the original .F90 file was changed
+   $(shell touch -r $(MOD_PRIVATE_DIR)/my_lapack95.F90 my_lapack95_dble.f90)
+   $(shell touch -r $(MOD_PRIVATE_DIR)/my_lapack95.F90 my_lapack95_quad.f90)
+endif
+
+#################################################################
+#
+# TARGETS
+
+MTX_LIB = libmtx.$(LIB_SUFFIX)
+LAPACK_LIB = libmesalapack.$(LIB_SUFFIX)
+BLAS_LIB = libmesablas.$(LIB_SUFFIX)
+
+ifeq ($(WHICH_LAPACK),USE_SRCS)
+   LAPACK_LIB = libmesalapack.$(LIB_SUFFIX)
+   BLAS_LIB = libmesablas.$(LIB_SUFFIX)
+endif
+
+MTX_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MTX_SRCS) $(LAPACK_QUAD_SRCS)))
+LAPACK_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(LAPACK_SRCS)))
+BLAS_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(BLAS_SRCS)))
+
+ifeq ($(WHICH_LAPACK),USE_SRCS)
+    all : $(MTX_LIB) $(LAPACK_LIB) $(BLAS_LIB)
+else
+    all : $(MTX_LIB)
+endif
+
+$(MTX_LIB) :$(MTX_OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $@
+	@$(LIB_TOOL) $@ $(MTX_OBJS)
+else
+	$(LIB_TOOL) $@ $(MTX_OBJS)
+endif 
+
+$(LAPACK_LIB) : $(LAPACK_OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $@
+	@$(LIB_TOOL) $@ $(LAPACK_OBJS)
+else
+	$(LIB_TOOL) $@ $(LAPACK_OBJS)
+endif	
+
+$(BLAS_LIB) : $(BLAS_OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $@ 
+	@$(LIB_TOOL) $@ $(BLAS_OBJS)
+else
+	$(LIB_TOOL) $@ $(BLAS_OBJS)
+endif
+
+clean:
+	-@rm -f *.o *.f90 *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) mtx_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) mtx_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/mtx_*.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/mtx_*.inc $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(MTX_LIB) $(MESA_DIR)/lib
+ifeq ($(WHICH_LAPACK),USE_SRCS)
+	@$(CP_IF_NEWER) $(BLAS_LIB) $(MESA_DIR)/lib
+endif
+ifeq ($(WHICH_BLAS),USE_SRCS)
+	@$(CP_IF_NEWER) $(LAPACK_LIB) $(MESA_DIR)/lib
+endif
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+CC += $(SPECIAL_C_FLAGS)
+
+#COMPILE = $(COMPILE_TO_TEST) $(FCfixed)
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfixed)
+#COMPILE_FREE = $(COMPILE_TO_TEST) $(FCfree)
+COMPILE_FREE = $(COMPILE_TO_DEPLOY) $(FCfree)
+
+COMPILE_XTRA = $(COMPILE_BASIC) $(FCwarn) $(FCimpno) $(FCopt) -c $(FCfixed)
+COMPILE_XTRA_NO_OPT = $(COMPILE_BASIC) $(FCnowarn) $(FCfixed) -c
+
+COMPILE_CMD = $(COMPILE)
+
+$(LAPACK_OBJS) : COMPILE_CMD = $(COMPILE_XTRA) -std=gnu -w
+
+$(LAPACK_QUAD_OBJS) : COMPILE_CMD = $(COMPILE_XTRA) -w
+
+$(filter-out dlamch.o,$(BLAS_OBJS)) : COMPILE_CMD = $(COMPILE_XTRA) -std=gnu -w
+
+# must turn off optimization for dlamch or can get infinite loop!!!
+dlamch.o : COMPILE_CMD = $(COMPILE_XTRA_NO_OPT)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_FREE $<
+	@$(COMPILE_FREE) $<
+else
+	$(COMPILE_FREE) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):../blas_src:../lapack_src:../lapack_quad
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.F90 $(SRC_PATH)
+vpath %.dek $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(MTX_SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(MTX_SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

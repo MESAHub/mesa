@@ -1,0 +1,540 @@
+-- _outcom;
+-- _trace '------';
+    -- Formal solution of radiation equation in spherical geometry
+    -- for gamma-ray deposition by
+    -- direct Integration.
+    -- will not work for ScatG=.true.
+    -- Momentarily steady case Nfrgam groups kappa_gamma=Const=Capgam
+-- Gamma thick core,
+-----------------------------------------------------------------
+ _Define
+   @NZmax      Nzon      -- maximum number of nodes
+   @NZmin      5        -- minimum number of nodes must be < Nzon/2
+   @FRACTION   1.D01     -- DZ(Mesh)/DZ(1)
+   @TAUGAM     30.D0    -- opaque gamma core (km=incnd)
+   @taucut     1.d+02    -- tau cut along the ray
+   @TAULIM     0.d0      -- or:CFR=(4/3)/(UR*Urho==(Cappa unit)**-1)
+   @ffloor     1.d-50   -- f (occ.n) floor - machine dependent     
+--
+SUBROUTINE Gdepos;
+ IMPLICIT REAL*8 (A-H,O-Z);
+ _Includen snrad;
+-- Parameter(NP=@Npe+@Npc-1);   -- Total number of tangent rays now in abo.inc
+ Parameter(tret=1.d0/3.d0);
+ Parameter(Nfrgam=1);
+ Parameter(shrink=0.9d0);
+-- Parameter(day1gam=2.d0);
+-- Parameter(Capgam=3.d-02); -- was used constant (OK for no H)
+ Parameter(Capgam=5.d-02); -- mult by Ye
+ -- NP must be less than NZ (in zonE INCLUDE)/(2*@NZmax)!!!
+ _Includen abo;
+ <*C:  Variables and commons *>;
+ --  Call VTIME(time1);
+ -- If(toldg>0.d0)then; -- FJgam known for previous call of Gdepos
+-- If(toldg>0.d0 & t>toldg*1.003d0 & t*utime>day1gam*8.64d5 )then;
+ If(toldg>0.d0 & t>toldg*1.003d0)then;
+   -- FJgam known for previous
+   -- call of Gdepos and tnewg is appreciably larger
+   _Do km=1,Nzon;
+      FJgam(km,1)=Fjgam(km,2);
+   _od;
+   toldg=tnewg;
+   Ngamma=2;
+ Else;
+--   toldg=t*shrink;
+  -- Ngamma=1;   -- compute Fjgam for previous and current time
+   toldg=t;
+   Ngamma=2;
+ endif;
+ _Do Igamma=2,Ngamma,-1;
+    If( Igamma==1 ) Then;
+      <*Homo: factor for radius, Ry(previous)=Homo*Ry(current) *>;
+    Else;
+      Homo=1.d0;
+    Endif;
+    <*gamma: deposition *>;
+ _Od;
+ tnewg=t; -- current time
+-- Call VTIME(time2);
+--  WRITE(@Wres,'('' GdePos done at step :'',I6,'' Time(S):'',1P,G12.3)')
+--       NSTEP,time2-time1;
+ RETURN;
+END;
+
+%_Homo:
+  Homo=0.d0;
+  _Do km=1,Nzon;
+      Homo=Homo+(t-toldg)*ABS(Uy(km))/Ry(km)*dm(km)/(Amout-Amini);
+  _Od;
+  Homo=1.d0+Homo;
+
+%_gamma:
+ <*Ye: find Ye(1:Nzon) *>;
+ <*incnd: find photosphere for gamma rays *>;
+ <*B:  Define Rout, Rcore and other local variables *>;
+-- If(incnd > 0)then;
+   NPE=@Npe*nint((Rout-Rcore)/Rout);
+   NPE=min(NPE,@Npe);
+   NPE=max(NPE,2);
+   NPC=@Npc+@Npe-NPE;
+--   @wterm' gdepos6 Npe  Npc:',NPE,NPC;
+-- else;
+--   NPE=@Npe+@Npc; -- used only for DPE=step in env
+--   NPC=0;
+-- endif;
+ <*D:  Define Np points for Pray grid according Rout & Rcore *>;
+ <*T:  Define RM & calculate Hapgam(Lfr) for all values of Radius *>;
+ NEEDBR=.True.;
+ _Do1 Lfr=1,Nfrgam;
+     Knth=incnd;
+    If (Knth==0) Then;
+       Rleft=0.d0;
+    else;
+       If(Knth==incnd) Then;
+         Rleft=Homo*Rcore;
+       else;
+         Rleft=Homo*Ry(Knth);
+       endif;
+    endif;
+    KLASTS=Nzon;
+   _Do2 Ip=NP,0,-1;      --NP=@NPC+@NPE-1
+      <*mu: Find Kzer, which, for given Ip, is equal to the first
+           number such that Pray(Ip)>=RM(Kzer).
+           Find Amu(.,.) - cosines for integration of moments.
+           Save in NMU(K) current Ip for all K such that
+           Pray(Ip) < RM(K) <= Pray(Ip+1)
+           so NMU(K) becomes the number of the last value of
+           Amu for integration over Amu and fix Krowst() *>;
+      Kz(Ip)=Kzer;
+   -- Write(Nchn,*)' Kzer=',Kzer,'  for Ip=',Ip;
+   _od2;-- loop Ip
+--  WRITE(Nchn,*)' Knth =',Knth;
+--  WRITE(Nchn,*)' Nmu  :',Nmu;
+    Krow=0; -- last Krow
+    Krowst(Np)=0; -- starting value of Krow for ray Ip
+--    Jac=0;
+   _Do3 Ip=NP,0,-1;    -- NP=@NPC+@NPE-1
+      Kzer=Kz(Ip);
+   _od3;-- loop Ip
+-- Write(Nchn,*)' Krow final:  ',Krow;
+   KZrowsc=Krow; -- zero for Krow for J
+   If(ScatG)then;
+     Write(@term,*)' Scat gdepos6';
+     NEQ=KZrowsc+(Nzon-Knth); -- order of system
+   else;
+--     Write(@term,*)' notScat gdepos6';
+     NEQ=krow; -- KZrowsc was undefined if ^ScatG !!!
+   endif;
+   <*shiftnu: find f_{+/-} directly and their sums and difs in 
+              FSdir with account of Doppler shift
+              according to velocity difference *>;
+   <*Hdir: calculate FJgam *>;
+   <*DEBUG:   *>;
+ _Od1;-- loop Lfr
+
+%_gamma_DEBUG:
+  IF(MOD(Nstep,900)==0)THEN;
+     WRITE(@Wres,'(''  K/   FJgam:'')');
+     WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,FJgam(K,2),K=incnd+1,Nzon);
+  ENDIF;
+
+%_gamma_B:
+   Rout=Homo*Ry(Nzon);                  -- Outer radius
+/*   If(incnd > 0)then;
+     Rcore=Homo*Ry(incnd);              -- Radius of opaque core
+   else;
+     Rcore=Homo*Ry(max(Kmnick,1));
+   endif;
+ */
+  Rcore=Homo*Ry(max(Kmnick,1)); -- later try to find Kmnick automatically on 
+         -- the first call of gdepos6 
+
+%_gamma_Ye:
+   _do k=1,nzon;
+     Ye(k)=0.d0;
+     _Do i=1, Natom;  Ye(k)=Ye(k)+Zn(i)*Yabun(i,k)_od;
+--     @wterm ' k Ye ',k,  Ye(k);
+   _od;
+%_gamma_incnd:
+  incnd=0;
+  _do k=nzon,2,-1;
+        taugam(k)=Capgam*Ye(k)*(UR*URHO)*RHO(k)*(RY(K)-RY(k-1));
+        if (taugam(k) > @TAUGAM & incnd==0) incnd=k;
+  _od;
+--  @wterm ' incnd',  incnd, ' taugam ',taugam(max(incnd,2)),
+--       ' at km=',max(incnd,2);
+
+%_gamma_D:
+   Pray(0)=0.D0;
+   Pray(NP+1)=ROUT;                   -- FOR %_gamma_J1
+   DPE=(Rout-Rcore)/DBLE(NPE+1);    -- Pray-step on envelope
+-- If(incnd > 0.d0)then;
+     DPC=Rcore/DBLE(@NPC);             -- Pray-step on Core
+     _Do i=1,@Npc;                     -- Uniform distribution
+       Pray(i)=Pray(i-1)+DPC;          -- in core
+     _od;
+     _Do i=@Npc+1,Np;                  -- Uniform distribution
+       Pray(i)=Pray(i-1)+DPE;          -- in envelope
+     _od;
+--
+/* else;
+     _Do i=1,Np;                       -- Uniform distribution
+       Pray(i)=Pray(i-1)+DPE;          -- everywhere
+     _od;
+   endif;  */
+%_gamma_T:
+   -- Calculate Hapgam for all Frequencies
+   -- and each Point and define RM
+   _Do K=incnd+1,Nzon;
+       IF(K>1) RM(K)=0.5D0*Homo*(Ry(K)+Ry(K-1));
+       _Do Lfr=1,Nfrgam;
+          HAPW(K,Lfr)=Capgam*Ye(k)*(UR*URHO);   -- Hapgam(Lfr);
+          HAPabW(K,Lfr)=Capgam*Ye(k)*(UR*URHO); -- HAPabs(Lfr);
+       _od;
+   _od;
+    RM(1)=0.5D0*Homo*Ry(1);
+    RM(0)=0.25D0*Homo*Ry(1);
+
+%_gamma_mu:o
+    Kzer=Nzon;
+    _While Pray(Ip)<RM(Kzer) & Kzer>Knth _do
+      Kzer=Kzer-1
+    _od; -- Pray(Ip)>=RM(Kzer) ! Kzer==Knth
+    Nrdial=max(Nzon-Kzer,1);  -- the number of rad. zones
+--    @wterm' Nzon, Kzer, Nrdial:', Nzon,Kzer,Nrdial;
+    _Do K=Kzer+1,Nzon;
+       Amu(Ip,K)=SQRT(1.D0-(Pray(Ip)/RM(K))**2);
+    _od;
+    Amu(Ip,Kzer)=0.d0; -- needed for expansion correction
+   K=Kzer;  -- direct way to get starting K
+   If(K<KlastS)then;
+      _Do IK=K+1,KlastS;
+        NMU(IK)=Ip;
+      _od;
+   -- WRITE(Nchn,*)'Kz MSF(Ip):',Kz(Ip),MSF(Ip),
+   --              'Kz MSF(Ip+1):',Kz(Ip+1),MSF(Ip+1);
+      KlastS=K;
+   Elseif(K>0)then;                           -- Core
+      Nmu(K)=@Npc;
+   Endif;
+--   If(Ip>0) Krowst(Ip-1)=Krowst(Ip)+2*Mesh-1;
+%_gamma_shiftnu:
+   If(KNadap==2 .or. KNadap==3)then;
+     @wterm ' freqs not geom. progr.!! ';
+     stop 52;
+   endif;
+--   @wterm ' dlognu:',dlognu;
+   zerfr=log(freqmn(1))+1.d0/dlognu(1); -- for gamma all freqs must be other!!!
+   <*outward: find quadrature solution for radiation going out *>
+   <*inward:  find quadrature solution for radiation going in *>
+   _do Ip=0,Np;
+     fcom(Ip,Lfr)=2.d0*FSdir(Ip,Nzon); -- comoving outgoing f
+   _od; 
+%_gamma_shiftnu_outward:
+   _do Kpl=Nzon,incnd+1,-1;
+     _Do Ip=Nmu(Kpl),0,-1;
+        fr0=freqmn(Lfr); -- zero shift in zone Kpl
+        chiab=HAPabW(Kpl,Lfr); -- for ScatG=F chiab=chiex (extinction),
+        chiex=HAPW(Kpl,Lfr);   -- but we need chiex also for 
+                               -- Nstep<=1 and Kpl<=Kntold 
+                               -- when FJ is not known
+        dtau(Kpl,Ip)=(Amu(Ip,Kpl)*RM(Kpl)-Amu(Ip,Kpl-1)*RM(Kpl-1))
+                          *chiex*rho(Kpl);
+         -- Amu was not defined for K=Kz(Ip), now set to 0. rm defined for (0)
+        If(ScatG & Nstep>1)then;
+           fdirsumm=(chiab);
+          --  +(chiex-chiab)*FJr(Kpl,Lfr))/HapW(Kpl,Lfr)
+          --  *(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
+        elseif(KNadap<0)then; -- Ni from foreign model
+           fdirsumm=XNifor(Kpl)*(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
+        else;
+           fdirsumm=(1.d0-exp(-dtau(Kpl,Ip)/2.d0));
+        endif; 
+        tauz=dtau(Kpl,Ip)/2.d0;
+        K=Kpl-1;
+--        if(Kpl==incnd+1 & Lfr==1) @wterm ' 1 Ip Kz K:',Ip,Kz(Ip),K;
+       _while  K>Kz(Ip) _do
+/*        duz=Amu(Ip,Kpl)*umr(Kpl)-Amu(Ip,K)*umr(K); -- diff.vel.
+            -- must be positive for expansion in any direction
+        fr0=freqmn(Lfr)*(1.d0+duz/clight);
+        fr0log=log(fr0);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+        Lfr0=min(Nfrus,max(int(xnu),1));
+--        if(Ip==0 & Kpl==incnd+1) 
+--           write(@term,'(a,2i4,1p,2e10.3)') ' Lfr Lfr0 fr fr0 ', 
+  --             Lfr, Lfr0,freqmn(Lfr),fr0;
+          wfr0=xnu-dble(Lfr0); -- weight (compare with fout!!!)
+   */  
+   
+        chiab=HAPabW(K,Lfr); -- for ScatG=F chiab=chiex (extinction),
+        chiex=HAPW(K,Lfr); 
+
+/*          chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
+          chiex=HAPW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPW(K,min(Nfrus,Lfr0+1))*wfr0;
+   */
+--        chiab=exp(log(HAPabW(K,Lfr0))*(1.d0-wfr0)
+  --            +log(HAPabW(K,min(Nfrus,Lfr0+1)))*wfr0);
+          dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))
+                          *chiex*rho(K);
+          If(ScatG & Nstep>1)then;
+            fdirsumm=fdirsumm+(chiab);
+              -- +(chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
+                --                +FJr(K,min(Nfrus,Lfr0+1))*wfr0 ))/chiex
+                  -- *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          elseif(KNadap<0)then; -- Ni from foreign model
+            fdirsumm=fdirsumm+XNifor(K)*exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          else; 
+            fdirsumm=fdirsumm+exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          endif;
+          tauz=tauz+dtau(K,Ip);
+          K=K-1;
+       _od; -- K<=Kz(Ip)
+       if(K==Kz(ip) & tauz < @taucut)then;
+         -- continue for transparent ray for negative z:
+           _while tauz<@taucut & K<Nzon _do
+              K=K+1;
+/*              duz=Amu(Ip,Kpl)*umr(Kpl)+Amu(Ip,K)*umr(K); -- diff.vel.
+                  -- now we write '+' since mu is negative there
+              fr0=freqmn(Lfr)*(1.d0+duz/clight);
+              fr0log=log(fr0);
+              xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+              Lfr0=min(Nfrus,max(int(xnu),1));
+--              if(Ip==0 & Kpl==Nzon) 
+--           write(@term,'(a,2i4,1p,2e10.3)') 
+  --               ' far end Lfr Lfr0 fr fr0 ', 
+    --             Lfr, Lfr0,freqmn(Lfr),fr0;
+                wfr0=xnu-dble(Lfr0); -- weight
+       */
+              chiab=HAPabW(K,Lfr); -- for ScatG=F chiab=chiex (extinction),
+              chiex=HAPW(K,Lfr); 
+
+/*              chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
+              chiex=HAPW(K,Lfr0)*(1.d0-wfr0)
+                   +HAPW(K,min(Nfrus,Lfr0+1))*wfr0;
+  */
+--        chiab=exp(log(HAPabW(K,Lfr0))*(1.d0-wfr0)
+  --            +log(HAPabW(K,min(Nfrus,Lfr0+1)))*wfr0);
+              dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))
+                          *chiex*rho(K);
+                If(ScatG & Nstep>1)then;
+                  tauz=tauz+dtau(K,Ip); 
+                  fdirsumm=fdirsumm+(chiab);
+                  -- +(chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
+                    --             +FJr(K,min(Nfrus,Lfr0+1))*wfr0 ))/chiex
+                      -- *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+                elseif(KNadap<0)then; -- Ni from foreign model
+                   tauz=tauz+dtau(K,Ip); 
+                   fdirsumm=fdirsumm
+                    +XNifor(K)*exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+                else;
+                   tauz=tauz+dtau(K,Ip); 
+                   fdirsumm=fdirsumm+exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+                endif;
+  --     if(Kpl==140 & Ip==29) write(@term,'()') 
+            --    ' fdirsumm=',fdirsumm, '  k,Kpl,Ip=',k,Kpl,Ip; 
+           _od;
+       endif;
+         If(Kpl>kz(ip))then;
+              --  ftst(Ip)=log10(max(fdirsumm,1.d-300));
+                 FSdir(Ip,Kpl)=fdirsumm; -- f_{-} must be added later!
+--       if(Kpl==incnd+1 & Lfr==1) 
+--            @wterm ' 4 Fsdir Ip Kpl:',FSdir(Ip,Kpl),Ip,Kpl;
+         endif;
+     _od -- Ip
+       /*     _Do Ip=0,NP;    -- Normal order Ip here!!! for plots
+        --       xipl(Ip)=Pray(Ip);
+                 xipl(Ip)=(Ip);
+                 If(Kpl<=kz(ip))then;
+                   ftst(Ip)=ftst(max(0,Ip-1));
+                   fspl(Ip)=fspl(max(0,Ip-1));
+                 endif; 
+              _od -- Ip
+                            */
+     _label @outsm ; -- to go out of sm 
+     <*sm* supermongo plot ftst(.) and fspl(.) *>;
+     @outsm: continue;
+   _od -- Kpl
+%_gamma_shiftnu_outward_sm:
+    -- beam going outward, i.e. for f_{+}
+--        if(sm_device('xterm').lt.0)then;
+        if(sm_device('X11').lt.0)then;
+          @wterm  ' cannot open device for sm';
+          stop 96;
+        endif;
+        call sm_graphics;
+--  call sm_defvar("Tex_strings","1");
+        call sm_erase;
+--        call sm_expand( 1.3);
+        <*minmax: of ftst and fspl in fmin, fmax *>;
+        call sm_limits(xipl(0),xipl(Np),fmin,fmax);
+--      call sm_lweight(2);
+        call sm_box(1,2,0,0);
+        call sm_xlabel('pray');
+        call sm_ylabel('lg f');
+        call sm_conn(xipl,ftst,Np+1);
+        call sm_ltype(3);
+        call sm_conn(xipl,fspl,Np+1);
+--       call sm_points(xipl,fspl,Np+1);
+        call sm_relocate(xipl(0)+0.1*(xipl(Np)-xipl(0)),
+                        0.5*(fmin+fmax)+0.05*(fmin-fmax));
+        call sm_label('difference solution');
+        call sm_relocate(xipl(0)+0.1*(xipl(Np)-xipl(0)),0.5*(fmin+fmax));
+        call sm_draw(xipl(0)+0.4*(xipl(Np)-xipl(0)),0.5*(fmin+fmax));
+        write(chalab,'(a,f5.1,a,i3,a,1p,e8.2,a)')'t=',t*Utime/8.64d+04,
+              'd  K=',Kpl,'  wave=',CCL/FREQMN(Lfr),' A';
+            --  'd  L=',Lfr,'  wave=',CCL/FREQMN(Lfr),' A';
+        call sm_relocate(xipl(0)+0.05*(xipl(Np)-xipl(0)),
+                        0.5*(fmin+fmax)-0.05*(fmin-fmax));
+        call sm_label(chalab);
+        call sm_gflush(); 
+        call sm_hardcopy;
+        call sm_alpha;
+        @wterm ' hit ENTER to continue';
+        call sm_redraw(0);
+        read(@term,*,end=@outsm);
+%_gamma_shiftnu_outward_sm_minmax:
+   fmin=ftst(Irmin(Np+1,ftst,1)-1); -- -1 since function Irmin assumes x(1:nn)
+   fmin=min(fmin,fspl(Irmin(Np+1,fspl,1)-1));
+   fmax=ftst(Irmax(Np+1,ftst,1)-1);
+   fmax=max(fmax,fspl(Irmax(Np+1,fspl,1)-1));
+%_gamma_shiftnu_inward:
+   _do Kpl=incnd+1,Nzon;
+     _Do Ip=Nmu(Kpl),0,-1;    -- NP=@NPC+@NPE-1
+        Ki=max(Kpl,kz(Ip)+1);
+        fr0=freqmn(Lfr); -- zero shift in zone  Ki
+        chiab=HAPabW(Ki,Lfr);
+        chiex=HAPW(Ki,Lfr);
+        dtau(Ki,Ip)=(Amu(Ip,Ki)*RM(Ki)-Amu(Ip,Ki-1)*RM(Ki-1))
+                          *chiex*rho(Ki);
+        If(ScatG & Nstep>1)then;
+           fdirsumm=(chiab);
+            -- +(chiex-chiab)*FJr(Ki,Lfr))/HapW(Ki,Lfr)
+            -- *(1.d0-exp(-dtau(Ki,Ip)/2.d0));
+        elseif(KNadap<0)then; -- Ni from foreign model
+           fdirsumm=XNifor(Ki)*(1.d0-exp(-dtau(Ki,Ip)/2.d0));
+        else;
+           fdirsumm=(1.d0-exp(-dtau(Ki,Ip)/2.d0));
+        endif;
+        tauz=dtau(Ki,Ip)/2.d0;
+        K=Ki; 
+       _while  K<Nzon _do
+          K=K+1;
+      /*    duz=Amu(Ip,K)*umr(K)-Amu(Ip,Ki)*umr(Ki); -- diff.vel.
+          -- must be positive for expansion in any direction
+          -- so here another order of subtraction
+          fr0=freqmn(Lfr)*(1.d0+duz/clight);
+          fr0log=log(fr0);
+          xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+          Lfr0=min(Nfrus,max(int(xnu),1));
+--          if(Ip==0  & K==incnd+1 & Lfr==1) @wterm 'out  Lfr Lfr0 fr fr0', 
+  --                     Lfr, Lfr0,freqmn(Lfr),fr0;
+          wfr0=xnu-dble(Lfr0); -- weight
+           */
+          chiab=HAPabW(K,Lfr); -- for ScatG=F chiab=chiex (extinction),
+          chiex=HAPW(K,Lfr); 
+/*
+          chiab=HAPabW(K,Lfr0)*(1.d0-wfr0)
+               +HAPabW(K,min(Nfrus,Lfr0+1))*wfr0;
+          chiex=HAPW(K,Lfr0)*(1.d0-wfr0)
+               +HAPW(K,min(Nfrus,Lfr0+1))*wfr0;
+  */
+ --       chiab=exp(log(HAPabW(K,Lfr0))*(1.d0-wfr0)
+   --           +log(HAPabW(K,min(Nfrus,Lfr0+1)))*wfr0);
+          dtau(K,Ip)=(Amu(Ip,K)*RM(K)-Amu(Ip,K-1)*RM(K-1))*chiex*rho(K);
+          If(ScatG & Nstep>1)then;
+              fdirsumm=fdirsumm+(chiab);
+               -- +(chiex-chiab)*( FJr(K,Lfr0)*(1.d0-wfr0)
+                 --               +FJr(K,min(Nfrus,Lfr0+1))*wfr0 ))/chiex
+                  -- *exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          elseif(KNadap<0)then; -- Ni from foreign model
+             fdirsumm=fdirsumm+
+                 exp(-tauz)*XNifor(K)*(1.d0-exp(-dtau(K,Ip)));
+          else; 
+             fdirsumm=fdirsumm+
+                 exp(-tauz)*(1.d0-exp(-dtau(K,Ip)));
+          endif;
+          tauz=tauz+dtau(K,Ip);
+       _od; -- K==Nzon
+           If(Kpl>kz(ip))then;
+        --         ftst(Ip)=log10(max(fdirsumm,1.d-300));
+                 FSdir(Ip,Kpl)=(FSdir(Ip,Kpl)+fdirsumm)/2.d0; -- FSdir
+                                -- was used only for storing
+--  if(Kpl==Nzon) @wterm ' FS ',FSdir(Ip,Kpl);
+--       if(Kpl==incnd+1 & Lfr==1) @wterm ' 5 Fs Fsdir Ip Kpl:',
+  --          Fs(Ip, Kpl),FSdir(Ip,Kpl),Ip,Kpl;
+           endif;
+     _od -- Ip
+     _Do Ip=0,NP;    -- Normal order Ip here!!! for plots
+--       xipl(Ip)=Pray(Ip);
+       xipl(Ip)=(Ip);
+       If(Kpl<=kz(ip))then;
+          ftst(Ip)=ftst(max(0,Ip-1));
+          fspl(Ip)=fspl(max(0,Ip-1));
+       endif; 
+     _od -- Ip
+_label @outsm ; -- to go out of sm 
+     <*sm* supermongo plot ftst(.) and fspl(.) *>;
+@outsm: continue;
+   _od -- Kpl
+--_od -- Lfr
+%_gamma_shiftnu_inward_sm=_gamma_shiftnu_outward_sm:
+
+
+
+%_gamma_Hdir:o
+    _Do K=1,Nzon;
+      If (K <= Knth) Then;
+        <*thick: put FJgam=1 for knadap <0 else Xnifor *>;
+      Else;
+        <*general: *>;
+      endif;
+--      @wterm ' k Fjgam ', k, FJgam(k,2);
+    _od;
+%_gamma_Hdir_thick:
+     If (Knadap<0) Then;
+        FJgam(k,2)=XNIfor(K);
+     Else;
+        FJgam(k,2)=1.D0;
+     Endif;
+%_gamma_Hdir_GENERAL:o
+        FJgam(k,2)=0.D0;
+        _DO Isw=NMU(K)-1,0,-1;
+            FJgam(k,2)=FJgam(k,2)
+             +(FSdir(Isw,K)+FSdir(Isw+1,K))*(Amu(Isw,K)-Amu(Isw+1,K));
+        _OD;
+        FJgam(k,2)=FJgam(k,2)+2.D0*FSdir(NMU(K),K)*Amu(NMU(K),K);
+        FJgam(k,2)=FJgam(k,2)*0.5D0;
+%C:O
+   <*S:  Local Variables *>;
+   Data ScatG/.False./;
+%CS:O
+   Integer sm_device; -- for sm
+   Character*40 chalab;
+--   Dimension Pray(0:Np+1);               -- Local: Sight parameters
+   Dimension RMPray(Mzon); -- Zr-nodes for given Pray according Ry
+   Dimension dtau(Mzon,0:Np); --,tauzar(0:Mzon,0:Np);
+   Real*4 xipl(0:Np),fspl(0:Np),ftst(0:Np),fmin,fmax;
+   Dimension ZR(0:Mzon);            -- Local: Mesh-points for given PR
+   Dimension RM(0:Mzon),umr(0:Mzon); -- Local: mean radius & speed
+   Dimension RHS(2*Mzon+2);         -- Right-Hand-Side
+   Dimension --FS(0:NP+1,Mzon),
+             Amu(0:NP+1,0:Mzon);
+   Dimension FSdir(0:NP+1,Mzon);
+--   Dimension Kz(0:NP+1),MsF(0:NP+1),Msh(0:NP+1),Krowst(0:NP+1);
+   Dimension Kz(0:NP+1),Krowst(0:NP+1);
+   Dimension NMU(Mzon);
+   Dimension Ye(Mzon);
+   Dimension HAPW(Mzon,Nfrgam);-- Work array for Happa for all freq-s.
+   Dimension HAPabW(Mzon,Nfrgam);-- Work array for Hapabs for all freq-s.
+   Dimension HAPM(Mzon), HAPabM(Mzon), HAPabZ(Mzon);
+   Dimension HAPZ(Mzon);    -- Work array for Happa for 1 given freq.
+   Dimension TAUGAM(Mzon);    -- Tau for gamma
+   Dimension Chim(Mzon), Chiabm(Mzon), ChiabZ(Mzon);
+   Dimension ChiZ(Mzon);    -- Work array for Chi for 1 given freq.
+   Real time1,time2;   -- for timing
+   Real tm1,tm2;       -- for timing
+   Logical ScatG;
+   Parameter(Nchn=@Wres);-- Number of channel for output

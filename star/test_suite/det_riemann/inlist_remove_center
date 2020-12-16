@@ -1,0 +1,105 @@
+
+&star_job
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      !saved_model_name = 'new_start.mod'
+      saved_model_name = 'zams.mod'
+
+      save_model_when_terminate = .true.
+      !save_model_filename = 'ready_to_shock.mod'
+       save_model_filename = 'removed_center.mod'
+      required_termination_code_string = 'max_age'
+      
+      change_initial_v_flag = .true.
+      new_v_flag = .true.
+
+      remove_initial_center_by_radius_Rsun = 0.3
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_dt = .true.
+      seconds_for_initial_dt = 1d3
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+
+
+&kap
+      Zbase = 0.02d0
+/ ! end of kap namelist
+
+&controls
+
+      steps_before_use_gold2_tolerances = 3
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 100
+
+      max_age_in_seconds = 1 ! 3d5
+      
+      x_ctrl(1) = -1
+
+      initial_mass = 20
+      initial_z = 0.02d0
+
+
+      velocity_logT_lower_bound = 8
+
+      fe_core_infall_limit = 1d9 ! cm/sec
+      
+      log_center_temp_limit = 1d99
+      
+      calculate_Brunt_N2 = .false.
+
+
+! equation controls
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_dedt_form_of_energy_eqn = .true.
+      
+      use_momentum_outer_BC = .true. 
+      use_zero_dLdm_outer_BC = .true.
+
+! mesh controls
+      !okay_to_remesh = .false.
+      okay_to_remesh = .true.
+            
+      R_function3_weight = 800
+      P_function_weight = 0
+      T_function1_weight = 0
+      xa_function_weight(1) = 0
+
+      max_center_cell_dq = 1d-4
+      max_surface_cell_dq = 1d-4
+      
+! output controls
+      max_num_profile_models = 1000
+      terminal_show_age_units = 'seconds'
+      
+      photo_interval = 10
+      profile_interval = 10
+      history_interval = 10
+      terminal_interval = 1
+      write_header_frequency = 10
+
+! timestep controls
+
+      max_timestep = 1d4
+      
+      varcontrol_target = 1d-2
+
+      delta_lgT_cntr_limit = 1d99
+      delta_lgRho_cntr_limit = 1d99
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

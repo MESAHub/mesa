@@ -1,0 +1,160 @@
+      ! doesn't require initial guess and doesn't require derivatives of function.
+      ! uses Brent's safe zero routine.  
+      real(dp) function safe_root_with_brackets(
+     >      f, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+         use mod_root, only: do_safe_root_with_brackets
+         use const_def, only: dp
+         interface
+            include 'num_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x1, x3 ! bounds for x
+            ! values of f at x1 and x3 must have opposite sign
+            ! return value for safe_root will be bracketed by x1 and x3
+         real(dp), intent(in) :: y1, y3 ! f(x1) and f(x3)
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr
+         safe_root_with_brackets = do_safe_root_with_brackets(
+     >      f, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)         
+      end function safe_root_with_brackets
+
+      ! sometimes you can suppy a good initial guess and df/dx for Newton,
+      ! so you'd like to try a few cycles of Newton before looking for brackets.
+      ! can provide brackets if you have them.
+      real(dp) function safe_root_with_guess(
+     >      f, x_guess, dx, x1, x3, y1, y3, newt_imax, imax, 
+     >      epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+         use mod_root, only:do_safe_root_with_guess
+         use const_def, only: dp
+         interface
+            include 'num_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x_guess ! initial guess for the root
+         real(dp), intent(in) :: dx, x1, x3, y1, y3 
+            ! dx is increment for searching for brackets (not used if x1 and x3 are given)
+            ! x1 and x3 bracket solution (can be arg_not_provided)
+            ! y1 and y3 are f(x1) and f(x3) (can be arg_not_provided)
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(in) :: newt_imax 
+            ! max number of initial Newton iterations before switch to standard safe_root
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr
+!         safe_root_with_guess = safe_root_with_initial_guess(
+!     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+     
+     
+         safe_root_with_guess = do_safe_root_with_guess(
+     >      f, x_guess, dx, x1, x3, y1, y3, newt_imax, imax, 
+     >      epsx, epsy, lrpar, rpar, lipar, ipar, ierr)  
+      end function safe_root_with_guess
+
+      
+      ! some safe root finders require bracketing values for the root.
+      ! if you don't have them, you can use this routine to do a (not too dumb) search.
+      subroutine look_for_brackets(x, dx, x1, x3, f, y1, y3, imax, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp
+         use mod_root, only:do_look_for_brackets
+         real(dp), intent(in) :: x, dx ! x is initial guess and dx is increment for searching
+         real(dp), intent(out) :: x1, x3 ! bounds
+         real(dp), intent(out) :: y1, y3 ! f(x1) and f(x3)
+         interface
+            include 'num_root_fcn.dek' ! f provides function values
+         end interface
+         integer, intent(in) :: imax
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr        
+         call do_look_for_brackets(x, dx, x1, x3, f, y1, y3, imax, lrpar, rpar, lipar, ipar, ierr)      
+      end subroutine look_for_brackets
+
+
+      real(dp) function safe_root(
+     >      f, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+         use mod_root, only: do_safe_root
+         use const_def, only: arg_not_provided
+         use const_def, only: dp
+         interface
+            include 'num_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x1, x3 ! bounds for x
+            ! values of f at x1 and x3 must have opposite sign
+            ! return value for safe_root will be bracketed by x1 and x3
+         real(dp), intent(in) :: y1, y3 ! f(x1) and f(x3)
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr         
+         safe_root = do_safe_root(
+     >      f, arg_not_provided, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)         
+      end function safe_root
+
+      
+      real(dp) function safe_root_with_initial_guess(
+     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+         use mod_root, only:do_safe_root
+         use const_def, only: dp, arg_not_provided
+         interface
+            include 'num_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x_guess ! initial guess for the root
+         real(dp), intent(in) :: x1, x3 ! bounds for x
+            ! values of f at x1 and x3 must have opposite sign
+            ! return value for safe_root will be bracketed by x1 and x3
+         real(dp), intent(in) :: y1, y3 ! f(x1) and f(x3)
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr
+         safe_root_with_initial_guess = do_safe_root(
+     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)         
+      end function safe_root_with_initial_guess
+      
+      real(dp) function safe_root_without_brackets(
+     >      f, x_guess, dx, newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+         use const_def, only: dp, arg_not_provided
+         interface
+            include 'num_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x_guess ! initial guess for the root
+         real(dp), intent(in) :: dx 
+            ! dx is increment for searching for brackets if necessary
+         integer, intent(in) :: lipar, lrpar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(in) :: newt_imax 
+            ! max number of initial Newton iterations before switch to standard safe_root
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr
+         real(dp) :: x1, x3, y1, y3
+         x1 = arg_not_provided
+         x3 = arg_not_provided
+         y1 = arg_not_provided
+         y3 = arg_not_provided
+         safe_root_without_brackets = safe_root_with_guess( 
+     >      f, x_guess, dx, x1, x3, y1, y3,
+     >      min(imax,newt_imax), imax, epsx, epsy,
+     >      lrpar, rpar, lipar, ipar, ierr)
+      end function safe_root_without_brackets
+

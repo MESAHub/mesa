@@ -1,0 +1,35 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+function do_one {
+	echo "using" $1
+	echo
+	check_okay
+	./rn $1
+	check_okay
+	echo "done"
+	echo
+}
+
+mkdir -p data/chem_data
+
+rm -f data/chem_data/*.data
+rm -f data/chem_data.tar.xz
+
+./mk
+check_okay
+do_one inlist
+check_okay
+
+echo "**************"
+echo "**************"
+echo "next step is"
+echo "./build_for_export"
+echo "**************"
+echo "**************"

@@ -1,0 +1,1586 @@
+.. _list-asterosearchcontrols:
+
+======================
+astero_search_controls
+======================
+
+|chi^2| weights
+---------------
+
+chi2_seismo_fraction
+~~~~~~~~~~~~~~~~~~~~
+
+The optimization methods will use and report a total |chi^2| that
+is a weighted sum of
+seismic and "spectroscopic" (really "non-seismic")
+parts. ``chi2_seismo_fraction`` is the weight given to the seismic
+part. i.e. the code internally evaluates something like ::
+
+    chi2 = chi2_seismo*chi2_seismo_fraction
+         + chi2_spectro*(1 - chi2_seismo_fraction)
+
+::
+
+      chi2_seismo_fraction = 0.667d0
+
+Non-seismic ("spectroscopic") observations
+------------------------------------------
+
+``chi2_spectro`` is a sum of terms for different non-seismic
+observables (e.g. Teff, logg, [Fe/H]).  These controls specify what
+quantities are added to this |chi^2| and, in some cases, how they
+are computed.
+
+Each standard component ``X`` is included by setting the flag
+``include_X_in_chi2_spectro`` to ``.true.`` and specifying the value
+with ``X_target`` and the uncertainty with ``X_sigma``.
+
+The standard options for ``X`` are:
+
++ ``Teff``
++ ``logg``
++ ``logL``
++ ``FeH``
++ ``logR``
++ ``surface_Z_div_X``
++ ``surface_He``
++ ``age``
++ ``Rcz``
+
+Target values and uncertainties for other observables can be
+defined by specifying controls for ``my_var1``, ``my_var2`` and
+``my_var3`` in the inlist and computing them in
+``run_star_extras.f``.
+
+The target values must be set separately for PGstar.  If you want
+the targets to appear in the ``loggTe`` window, you need to set
+the following PGstar controls: ::
+
+   loggTe_target_logg
+   loggTe_target_logg_sigma
+   loggTe_target_Teff
+   loggTe_target_Teff_sigma
+
+Similarly, if you want the targets to appear in the HR window,
+you need to set the following PGstar controls: ::
+
+   HR_target_logL
+   HR_target_logL_sigma
+   HR_target_Teff
+   HR_target_Teff_sigma
+
+normalize_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~
+
+If ``.true.``, the total |chi^2| is divided by the number of
+components used to define it. ::
+
+      normalize_chi2_spectro = .true.
+
+include_Teff_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Teff_target
+~~~~~~~~~~~
+Teff_sigma
+~~~~~~~~~~~
+``Teff`` is the effective temperature, in kelvin. ::
+
+      include_Teff_in_chi2_spectro = .true.
+      Teff_target = -1
+      Teff_sigma = -1
+
+include_logg_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+logg_target
+~~~~~~~~~~~
+logg_sigma
+~~~~~~~~~~~
+``logg`` is the logarithm (base 10) of the surface gravity, in cgs units. ::
+
+      include_logg_in_chi2_spectro = .true.
+      logg_target = -1
+      logg_sigma = -1
+
+include_logL_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+logL_target
+~~~~~~~~~~~
+logL_sigma
+~~~~~~~~~~~
+``logL`` is the logarithm (base 10) of the luminosity in solar units. ::
+
+      include_logL_in_chi2_spectro = .false.
+      logL_target = -1
+      logL_sigma = -1
+
+include_FeH_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+FeH_target
+~~~~~~~~~~~
+FeH_sigma
+~~~~~~~~~~~
+Z_div_X_solar
+~~~~~~~~~~~~~
+``FeH`` is the the model [Fe/H] computed as ``log10((Z/X)/Z_div_X_solar)``
+using model surface average values for ``Z`` and ``X``. ::
+
+      include_FeH_in_chi2_spectro = .true. ! [Fe/H]
+      FeH_target = -1
+      FeH_sigma = -1
+      Z_div_X_solar = 0.02293d0
+
+include_logR_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+logR_target
+~~~~~~~~~~~
+logR_sigma
+~~~~~~~~~~~
+``logR`` is the logarithm (base 10) of the radius, in solar units. ::
+
+      include_logR_in_chi2_spectro = .false.
+      logR_target = 0
+      logR_sigma = 1d-4
+
+include_surface_Z_div_X_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+surface_Z_div_X_target
+~~~~~~~~~~~~~~~~~~~~~~
+surface_Z_div_X_sigma
+~~~~~~~~~~~~~~~~~~~~~
+``surface_Z_div_X`` is the ratio of the surface average
+metallicity ``Z`` and hydrogen abundance ``X``. ::
+
+      include_surface_Z_div_X_in_chi2_spectro = .false.
+      surface_Z_div_X_target = 2.292d-2 ! GS98 value
+!surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
+      surface_Z_div_X_sigma = 1d-3
+
+include_surface_He_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+surface_He_target
+~~~~~~~~~~~~~~~~~
+surface_He_sigma
+~~~~~~~~~~~~~~~~
+``surface_He`` is the surface helium abundance. ::
+
+      include_surface_He_in_chi2_spectro = .false.
+      surface_He_target = 0.2485d0 ! Bahcall, Serenelli, Basu, 2005
+      surface_He_sigma = 0.0034
+
+include_age_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+age_target
+~~~~~~~~~~
+age_sigma
+~~~~~~~~~
+``age`` is the star's age in years.  When you
+``include_age_in_chi2_spectro``, set ``min_age_for_chi2`` and
+``max_age_for_chi2``, and set ``eval_chi2_at_target_age_only`` to
+``.false.``.  In ``&control``, set ``max_years_for_timestep`` but don't set
+``max_age`` or ``num_adjusted_dt_steps_before_max_age``. ::
+
+      include_age_in_chi2_spectro = .false.
+      age_target = 4.5695d9 ! (see Bahcall, Serenelli, and Basu, 2006)
+      age_sigma = 0.0065d9
+
+num_smaller_steps_before_age_target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      num_smaller_steps_before_age_target = 50 ! only used if > 0
+
+dt_for_smaller_steps_before_age_target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This should be much smaller than ``age_sigma``.
+
+      dt_for_smaller_steps_before_age_target = 0.0065d8 ! 1/10 age_sigma
+
+include_Rcz_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Rcz_target
+~~~~~~~~~~
+Rcz_sigma
+~~~~~~~~~
+``Rcz`` is the radius of the base of the convective zone, in solar radii. ::
+
+      include_Rcz_in_chi2_spectro = .false. ! radius of base of convective zone
+      Rcz_target = 0.713d0 ! Bahcall, Serenelli, Basu, 2005
+      Rcz_sigma = 1d-3
+
+include_my_var1_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my_var1_target
+~~~~~~~~~~~~~~
+my_var1_sigma
+~~~~~~~~~~~~~
+
+include_my_var2_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my_var2_target
+~~~~~~~~~~~~~~
+my_var2_sigma
+~~~~~~~~~~~~~
+
+include_my_var3_in_chi2_spectro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my_var3_target
+~~~~~~~~~~~~~~
+my_var3_sigma
+~~~~~~~~~~~~~
+
+To include user-defined variables in the non-seismic |chi^2|,
+set the ``my_var`` variables in your ``extras_check_model`` routine. i.e. ::
+
+    use astero_data, only: my_var1, my_var2, my_var3
+    my_var1 = ......
+
+then set the target values and uncertainties using these controls. ::
+
+      include_my_var1_in_chi2_spectro = .false.
+      my_var1_target = 0
+      my_var1_sigma = 0
+      my_var1_name = 'my_var1' ! change this to whatever you want
+
+      include_my_var2_in_chi2_spectro = .false.
+      my_var2_target = 0
+      my_var2_sigma = 0
+      my_var2_name = 'my_var2' ! change this to whatever you want
+
+      include_my_var3_in_chi2_spectro = .false.
+      my_var3_target = 0
+      my_var3_sigma = 0
+      my_var3_name = 'my_var3' ! change this to whatever you want
+
+Seismic observations
+--------------------
+
+chi2_seismo_delta_nu_fraction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+chi2_seismo_nu_max_fraction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+chi2_seismo_r_010_fraction
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+chi2_seismo_r_02_fraction
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``chi2_seismo`` is a weighted combination of the large separation
+:math:`\Delta\nu`, the frequency of maximum oscillation power
+:math:`\nu_\mathrm{max}`, ratios of frequencies and individual
+frequencies.  Specify the weighting of the terms in
+``chi2_seismo`` by setting these controls.  Naturally, all the
+fractions must be between zero and one.  If the relevant
+fraction is not zero, the corresponding target values and
+uncertainties must be set. ::
+
+      chi2_seismo_delta_nu_fraction = 0d0  ! if > 0 then delta_nu and delta_nu_sigma must be set (see below)
+      chi2_seismo_nu_max_fraction = 0d0    ! if > 0 then nu_max and nu_max_sigma must be set (see below)
+      chi2_seismo_r_010_fraction = 0d0     ! if > 0, then include r_010 frequency ratios
+      chi2_seismo_r_02_fraction = 0d0      ! if > 0, then include r_02 frequency ratios
+
+The fraction for the frequencies is whatever is left. i.e. ::
+
+    fraction for frequencies = 1 - (frac_r_010_ratios + frac_r_02_ratios + frac_delta_nu + frac_nu_max)
+
+so if you only want to use individual frequencies in
+``chi2_seismo``, set all four fractions to zero.
+
+normalize_chi2_seismo_frequencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+normalize_chi2_seismo_r_010
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+normalize_chi2_seismo_r_02
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The terms for the frequencies and ratios are sums of terms for
+each frequency and ratio.
+If you normalize them, they are divided by that number of terms. ::
+
+      normalize_chi2_seismo_frequencies = .true.
+      normalize_chi2_seismo_r_010 = .true.
+      normalize_chi2_seismo_r_02 = .true.
+
+trace_chi2_seismo_delta_nu_info
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trace_chi2_seismo_nu_max_info
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trace_chi2_seismo_ratios_info
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trace_chi2_seismo_frequencies_info
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trace_chi2_spectro_info
+~~~~~~~~~~~~~~~~~~~~~~~
+If ``.true.``, output information on that |chi^2| component to the terminal. ::
+
+      trace_chi2_seismo_delta_nu_info = .false.
+      trace_chi2_seismo_nu_max_info = .false.
+      trace_chi2_seismo_ratios_info = .false.
+      trace_chi2_seismo_frequencies_info = .false.
+
+      trace_chi2_spectro_info = .false. ! if true, output info to terminal
+
+
+nu_max
+~~~~~~
+nu_max_sigma
+~~~~~~~~~~~~
+``nu_max`` is the frequency of maximum oscillation power.  You must set this value if
+``chi2_seismo_nu_max_fraction`` is greater than zero. ::
+
+      nu_max = -1
+     ! nu_max is needed when
+     ! chi2_seismo_nu_max_fraction > 0 or correction_factor > 0 (see below)
+      nu_max_sigma = -1
+
+delta_nu
+~~~~~~~~
+delta_nu_sigma
+~~~~~~~~~~~~~~
+``delta_nu`` is the large frequency separation (roughly constant
+frequency difference between radial modes of increasing order) .
+You must set this value if ``chi2_seismo_delta_nu_fraction`` is
+greater than zero. ::
+
+      delta_nu = -1
+      delta_nu_sigma = -1
+
+If ``delta_nu`` in the inlist is greater than zero, the
+code uses the inlist values for both ``delta_nu`` and
+``delta_nu_sigma``.
+
+If ``delta_nu`` is less than or equal to zero in the inlist, the code estimates it
+by a linear fit to the observed radial frequencies and orders, ``l0_obs`` and ``l0_n_obs``.
+
+Along with calculating ``delta_nu``, if ``delta_nu_sigma``
+from the inlist is less than zero, then the code also sets
+it by using the radial data.  Note that by setting
+``delta_nu_sigma`` to a positive value and ``delta_nu`` to
+a negative value, you can have the code get ``delta_nu``
+from the given ``l0_obs`` and ``l0_n_obs``, while still
+using the ``delta_nu_sigma`` from the inlist.
+
+Mode frequency data
+-------------------
+
+nl0
+~~~
+l0_obs
+~~~~~~
+l0_obs_sigma
+~~~~~~~~~~~~
+
+Data for ``l==0`` modes.  ``nl0`` is the number of modes, ``l0_obs(1)`` to ``l0_obs(nl0)`` are the
+frequencies (in increasing frequency order) and ``l0_obs_sigma(1)`` to ``l0_obs_sigma(nl0)`` are
+the uncertainties. ::
+
+      nl0 = 0 ! number of observed l=0 modes
+      l0_obs(:) = 0 ! frequencies. set l0_obs(1), l0_obs(2) .... l0_obs(nl0)
+      l0_obs_sigma(:) = 0 ! l0_obs_sigma(i) is uncertainty for l0_obs(i), for i=1,nl0
+
+l0_n_obs
+~~~~~~~~
+``l0_n_obs(i)`` is the radial order of ``l0_obs(i)`` for ``i=1, nl0``.
+Need to give these if the code is to calculate ``delta_nu`` and ``delta_nu_sigma``.
+If you provide ``delta_nu``, then you don't need to set these.
+If ``l0_n_obs`` are provided, the Kjeldsen surface correction will use them. ::
+
+      l0_n_obs(:) = -1
+
+
+nl1
+~~~
+l1_obs
+~~~~~~
+l1_obs_sigma
+~~~~~~~~~~~~
+
+Data for ``l==1`` modes.  ``nl1`` is the number of modes, ``l1_obs(1)`` to ``l1_obs(nl1)`` are the
+frequencies (in increasing frequency order) and ``l1_obs_sigma(1)`` to ``l1_obs_sigma(nl1)`` are
+the uncertainties. ::
+
+      nl1 = 0 ! number of observed l=1 modes
+      l1_obs(:) = 0 ! frequencies. set l1_obs(1), l1_obs(2) .... l1_obs(nl1)
+      l1_obs_sigma(:) = 0 ! l1_obs_sigma(i) is uncertainty for l1_obs(i), for i=1,nl1
+
+
+nl2
+~~~
+l2_obs
+~~~~~~
+l2_obs_sigma
+~~~~~~~~~~~~
+
+Data for ``l==2`` modes.  ``nl2`` is the number of modes, ``l2_obs(1)`` to ``l2_obs(nl2)`` are the
+frequencies (in increasing frequency order) and ``l2_obs_sigma(1)`` to ``l2_obs_sigma(nl2)`` are
+the uncertainties. ::
+
+      nl2 = 0 ! number of observed l=2 modes
+      l2_obs(:) = 0 ! frequencies. set l2_obs(1), l2_obs(2) .... l2_obs(nl2)
+      l2_obs_sigma(:) = 0 ! l2_obs_sigma(i) is uncertainty for l2_obs(i), for i=1,nl2
+
+
+nl3
+~~~
+l3_obs
+~~~~~~
+l3_obs_sigma
+~~~~~~~~~~~~
+
+Data for ``l==3`` modes.  ``nl3`` is the number of modes, ``l3_obs(1)`` to ``l3_obs(nl3)`` are the
+frequencies (in increasing frequency order) and ``l3_obs_sigma(1)`` to ``l3_obs_sigma(nl3)`` are
+the uncertainties. ::
+
+      nl3 = 0 ! number of observed l=3 modes
+      l3_obs(:) = 0 ! frequencies. set l3_obs(1), l3_obs(2) .... l3_obs(nl3)
+      l3_obs_sigma(:) = 0 ! l3_obs_sigma(i) is uncertainty for l3_obs(i), for i=1,nl3
+
+Optimization parameters
+-----------------------
+
+eval_chi2_at_target_age_only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Set this to ``.true.`` if you only want |chi^2| for a specific age
+and no others.  In addition, set ``max_age``, ``max_years_for_timestep``
+and ``num_adjusted_dt_steps_before_max_age``. ::
+
+      eval_chi2_at_target_age_only = .false.
+
+min_age_for_chi2
+~~~~~~~~~~~~~~~~
+max_age_for_chi2
+~~~~~~~~~~~~~~~~
+Use these if you only want to evaluate chi2 for a given range of ages. ::
+
+      min_age_for_chi2 = -1 ! (years) only use if > 0
+      max_age_for_chi2 = -1 ! (years) only use if > 0
+
+search_type
+~~~~~~~~~~~
+This specifies the kind of search to perform, each of which has its
+own separate controls further on.  The options are
+
+``use_first_values``
+  This option means no search.
+  Just do a single run using ``first`` values for the parameters.
+
+``scan_grid``
+  Evaluates |chi^2| for each parameter combination within the
+  ``min`` and ``max`` ranges specified below, with the spacing
+  defined by ``delta``.
+
+  For a first rough scan, consider setting ``chi2_seismo_delta_nu_fraction = 1``,
+  which skips the relatively costly calculations of frequencies
+  and simply uses ``delta_nu`` along with the non-seismic information.
+  You can then follow up with medium resolution scans
+  in smaller regions around candidates from the rough scan
+  with ``chi2_seismo_delta_nu_fraction = 0`` to include frequencies.
+
+``simplex``
+  Search for minimal |chi^2| model using Nelder-Mead simplex algorithm: ::
+
+    Nelder, J. A. and Mead, R.
+    "A Simplex Method for Function Minimization."
+    Comput. J. 7, 308-313, 1965.
+
+  There are versions of this in Numerical Recipes under the name "amoeba",
+  in Matlab under the name "fminsearch", and in Mathematica as an option for "NMminimize".
+  Our version has lots of bells and whistles and is, of course, superior to the others. ;)
+
+``newuoa``
+  Search for minimal |chi^2| model using Powell's NEWUOA algorithm for
+  unconstrained minimization without derivatives
+  by quadratic polynomial approximation. ::
+
+      M.J.D. Powell, "Developments of NEWUOA for unconstrained minimization without derivatives",
+      Department of Applied Mathematics and Theoretical Physics, Cambridge, England, report NA05, 2007.
+
+``bobyqa``
+  Search for minimal |chi^2| model using Powell's "Bounded Optimization BY Quadratic Approximation" (BOBYQA) algorithm.
+  Any location within the bounds is available for consideration. ::
+
+      M.J.D. Powell, "The BOBYQA algorithm for bound constrained optimization without derivatives",
+      Department of Applied Mathematics and Theoretical Physics, Cambridge, England, report NA06, 2009.
+
+``from_file``
+  Calculates |chi^2| for the parameter values in a given file.
+  For each line of the file (after the first, which has column
+  names), set the parameter values to that of the file for those
+  parameters with ``vary_param = .true.``.
+
+The two methods from Powell use quadratic interpolation,
+either unconstrained (NEWUOA) or bounded (BOBYQA).
+The Nelder-Mead simplex method doesn't do interpolation;
+instead it simply compares values and moves toward lower |chi^2|
+and away from higher ones.  In general, you can expect the
+Powell methods to converge faster than the simplex if the |chi^2|
+terrain is not too "bumpy" (bumps confuse the interpolation).
+Since the simplex scheme doesn't do interpolation, bumps
+don't cause it trouble, so it may be more robust.
+If you are just getting started, go with simplex at first.
+Try the interpolation methods when you have a very good
+candidate and want to look near it for even better results. ::
+
+      search_type = 'use_first_values'
+
+scan_grid_output_filename
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Output goes to the following file when ``search_type = 'scan_grid'``. ::
+
+      scan_grid_output_filename = 'scan_grid_results.data'
+
+restart_scan_grid_from_file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If ``.true.``, reads the ``scan_grid_output`` file
+and continues from where that stopped. ::
+
+      restart_scan_grid_from_file = .false.
+
+simplex_itermax
+~~~~~~~~~~~~~~~
+Maximum number of iterations of the downhill simplex. ::
+
+      simplex_itermax = 1000 ! each iteration revises the simplex
+
+simplex_fcn_calls_max
+~~~~~~~~~~~~~~~~~~~~~
+Maximum number of function calls for the downhill simplex.
+One iteration may use several function calls.
+Each "function call" is a stellar evolution track to get a |chi^2|. ::
+
+      simplex_fcn_calls_max = 10000
+
+simplex_x_atol
+~~~~~~~~~~~~~~
+simplex_x_rtol
+~~~~~~~~~~~~~~
+Terminate the simplex if the differences between iterations
+are less than either of these tolerances. ::
+
+      simplex_x_atol = 1d-10 ! tolerance for absolute differences
+      simplex_x_rtol = 1d-10 ! tolerance for relative differences
+
+If you want the details, here's the snippet of code.
+``simplex(i,j)`` is value of ``i``-th parameter for point ``j``.
+``l`` is the index of the best point.
+There are ``n`` parameters and ``n+1`` points. ::
+
+    term_val_x = 0
+    do j=1,n+1 ! check each point
+       if (j == l) cycle ! l is the best point; so skip it
+       do i=1,n ! check each coordinate of point j vs point l
+          term1 = abs(simplex(i,j)-simplex(i,l)) / &
+             (x_atol + x_rtol*max(abs(simplex(i,j)), abs(simplex(i,l))))
+          if (term1 > term_val_x) term_val_x = term1
+       end do
+    end do
+    if (term_val_x <= 1d0) exit ! converged
+
+simplex_chi2_tol
+~~~~~~~~~~~~~~~~
+Terminate the simplex if the best point has a |chi^2| less than this. ::
+
+      simplex_chi2_tol = 1d-10 ! tolerance for chi^2
+
+simplex_centroid_weight_power
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Each iteration starts by doing a reflection
+of the worst point through the centroid of the others.
+The centroid points are weighted by ``(1/chi^2)**power``.
+``power = 0`` gives the standard unweighted centroid.
+``power > 0`` shifts the reflection towards the better points. ::
+
+      simplex_centroid_weight_power = 0d0
+
+simplex_enforce_bounds
+~~~~~~~~~~~~~~~~~~~~~~
+If ``.true.``, points outside the bounds will be rejected without evaluation.
+If ``.false.``, the bounds will only be used when creating the initial simplex
+and for adaptive random search. ::
+
+      simplex_enforce_bounds = .false.
+
+simplex_adaptive_random_search
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This flag controls what is done if the standard options of reflect or contract
+fail to produce a improvement in the simplex.
+If ``.true.``, test uniform random samples within the bounds until a better point is found.
+If ``.false.``, shrink the simplex toward the best point. ::
+
+      simplex_adaptive_random_search = .false.
+
+simplex_output_filename
+~~~~~~~~~~~~~~~~~~~~~~~
+Filename for the simplex output. ::
+
+      simplex_output_filename = 'simplex_results.data'
+
+restart_simplex_from_file
+~~~~~~~~~~~~~~~~~~~~~~~~~
+If ``.true.``, then reads the output file (``simplex_output_filename``)
+and continues from where that stopped
+using the best :math:`n+1` results as the initial simplex
+(where :math:`n` is the number of parameters).
+Note that this restores the best simplex but you may still
+see it rerun recent cases if they were not good enough to be
+included in the simplex.  We don't restore the information
+about those failed attempts, so we need to rerun them. ::
+
+      restart_simplex_from_file = .false.
+
+simplex_seed
+~~~~~~~~~~~~
+Integer seed for random number generation. ::
+
+      simplex_seed = 1074698122 ! seed for random number generation
+
+simplex_alpha
+~~~~~~~~~~~~~
+Coefficients for the reflection step of the downhill simplex algorithm. ::
+
+      simplex_alpha = 1d0    ! reflect
+
+simplex_beta
+~~~~~~~~~~~~
+Coefficients for the expansion step of the downhill simplex algorithm. ::
+
+      simplex_beta = 2d0     ! expand
+
+simplex_gamma
+~~~~~~~~~~~~~
+Coefficients for the contraction step of the downhill simplex algorithm. ::
+
+      simplex_gamma = 0.5d0  ! contract
+
+simplex_delta
+~~~~~~~~~~~~~
+Coefficients for the shrink step of the downhill simplex algorithm. ::
+
+      simplex_delta = 0.5d0  ! shrink
+
+newuoa_output_filename
+~~~~~~~~~~~~~~~~~~~~~~
+Filename for the NEWUOA output. ::
+
+      newuoa_output_filename = 'newuoa_results.data'
+
+newuoa_rhoend
+~~~~~~~~~~~~~
+This is the tolerance that determines relative accuracy of final values
+i.e., NEWUOA stops when results are changing by less than this.
+See ``mesa/num/public/num_newuoa`` for details. ::
+
+      newuoa_rhoend = 1d-6
+
+bobyqa_output_filename
+~~~~~~~~~~~~~~~~~~~~~~
+Filename for the BOBYQA output. ::
+
+      bobyqa_output_filename = 'bobyqa_results.data'
+
+bobyqa_rhoend
+~~~~~~~~~~~~~
+This is the tolerance that determines relative accuracy of final values
+i.e., BOBYQA stops when results are changing by less than this.
+See ``mesa/num/public/num_bobyqa`` for details. ::
+
+      bobyqa_rhoend = 1d-6
+
+filename_for_parameters
+~~~~~~~~~~~~~~~~~~~~~~~
+Filename containing parameter values when ``search_type = 'from_file'``. ::
+
+      filename_for_parameters = 'undefined'
+
+max_num_from_file
+~~~~~~~~~~~~~~~~~
+If greater than zero, stop ``from_file`` search after trying this
+many lines from the file.
+
+      max_num_from_file = -1 ! if > 0, then stop after doing this many lines from file.
+
+file_column_for_mass
+~~~~~~~~~~~~~~~~~~~~
+file_column_for_Y
+~~~~~~~~~~~~~~~~~
+file_column_for_FeH
+~~~~~~~~~~~~~~~~~~~
+file_column_for_alpha
+~~~~~~~~~~~~~~~~~~~~~
+file_column_for_f_ov
+~~~~~~~~~~~~~~~~~~~~
+file_column_for_my_param1
+~~~~~~~~~~~~~~~~~~~~~~~~~
+file_column_for_my_param2
+~~~~~~~~~~~~~~~~~~~~~~~~~
+file_column_for_my_param3
+~~~~~~~~~~~~~~~~~~~~~~~~~
+You need to say which columns in the file hold the various parameters.
+For example, if your file starts like the following: ::
+
+          chi2         mass        init_Y      init_FeH    alpha       init_f_ov   my_param1   my_param2   my_param3
+    654   0.81543178   1.35000000  0.27000000  0.21000000  1.76000000  0.01000000  0.00000000  0.00000000  0.00000000
+
+then set the column numbers like this: ::
+
+      file_column_for_mass = 3
+      file_column_for_Y = 4
+      file_column_for_FeH = 5
+      file_column_for_alpha = 6
+      file_column_for_f_ov = 7
+      file_column_for_my_param1 = 8
+      file_column_for_my_param2 = 9
+      file_column_for_my_param3 = 10
+
+Note that if you are not varying one of the parameters, e.g. ``f_ov``,
+then you don't need to set the ``file_column`` for that parameter.
+
+from_file_output_filename
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Filename for the ``from_file`` output. ::
+
+      from_file_output_filename = 'from_file_results.data'
+
+Y_depends_on_Z
+~~~~~~~~~~~~~~
+Y0
+~~
+dYdZ
+~~~~
+If ``Y_depends_on_Z = .false.``, ``Y`` is a parameter like any other and you should set
+``vary_Y``, ``first_Y``, ``min_Y`` and ``max_Y`` (and ``delta_Y`` for a grid).
+If ``.true.``, ``Y`` depends on ``Z`` according to ::
+
+    Y = Y0 + dYdZ*Z
+
+where ``Y0`` and ``dYdZ`` are set below. ::
+
+      Y_depends_on_Z = .false.
+      Y0 = 0.248d0
+      dYdZ = 1.4d0
+
+vary_FeH
+~~~~~~~~
+vary_Y
+~~~~~~
+vary_mass
+~~~~~~~~~
+vary_alpha
+~~~~~~~~~~
+vary_f_ov
+~~~~~~~~~
+vary_my_param1
+~~~~~~~~~~~~~~
+vary_my_param2
+~~~~~~~~~~~~~~
+vary_my_param3
+~~~~~~~~~~~~~~
+If ``vary_X = .true.``, that parameter will be varied by the search.
+If ``vary_X = .false.``, that parameter will be fixed at ``first_X``.
+To optimise user-defined parameters,
+set the ``my_param`` variables in your ``set_my_param`` routine
+and set the ``vary_``, ``first_``, ``min_``, ``max_`` and ``delta_`` controls below. ::
+
+      vary_FeH = .false.   ! FeH = [Fe/H] = log10((Z/X)/Z_div_X_solar)
+      vary_Y = .false.     ! must be false if Y_depends_on_Z is true
+      vary_mass = .false.  ! initial mass
+      vary_alpha = .false. ! mixing length parameter
+      vary_f_ov = .false.  ! overshoot parameter
+
+      vary_my_param1 = .false.
+      vary_my_param2 = .false.
+      vary_my_param3 = .false.
+
+my_param1_name
+~~~~~~~~~~~~~~
+my_param2_name
+~~~~~~~~~~~~~~
+my_param3_name
+~~~~~~~~~~~~~~
+Names for user-defined parameters that will be used in output. ::
+
+      my_param1_name = 'my_param1'
+      my_param2_name = 'my_param2'
+      my_param3_name = 'my_param3'
+
+first_FeH
+~~~~~~~~~
+first_Y
+~~~~~~~
+first_mass
+~~~~~~~~~~
+first_alpha
+~~~~~~~~~~~
+first_f_ov
+~~~~~~~~~~
+first_my_param1
+~~~~~~~~~~~~~~~
+first_my_param2
+~~~~~~~~~~~~~~~
+first_my_param3
+~~~~~~~~~~~~~~~
+Initial parameter values for parameters that vary;
+fixed values for parameters that don't. ::
+
+      first_FeH = 0
+      first_Y = 0
+      first_mass = 0
+      first_alpha = 0
+      first_f_ov = 0
+      first_my_param1 = 0
+      first_my_param2 = 0
+      first_my_param3 = 0
+
+min_FeH
+~~~~~~~
+min_Y
+~~~~~
+min_mass
+~~~~~~~~
+min_alpha
+~~~~~~~~~
+min_f_ov
+~~~~~~~~
+min_my_param1
+~~~~~~~~~~~~~
+min_my_param2
+~~~~~~~~~~~~~
+min_my_param3
+~~~~~~~~~~~~~
+Lower bounds for parameter values. ::
+
+      min_FeH = 0
+      min_Y = 0
+      min_mass = 0
+      min_alpha = 0
+      min_f_ov = 0
+      min_my_param1 = 0
+      min_my_param2 = 0
+      min_my_param3 = 0
+
+max_FeH
+~~~~~~~
+max_Y
+~~~~~
+max_mass
+~~~~~~~~
+max_alpha
+~~~~~~~~~
+max_f_ov
+~~~~~~~~
+max_my_param1
+~~~~~~~~~~~~~
+max_my_param2
+~~~~~~~~~~~~~
+max_my_param3
+~~~~~~~~~~~~~
+Upper bounds for parameter values. ::
+
+      max_FeH = 0
+      max_Y = 0
+      max_mass = 0
+      max_alpha = 0
+      max_f_ov = 0
+      max_my_param1 = 0
+      max_my_param2 = 0
+      max_my_param3 = 0
+
+delta_FeH
+~~~~~~~~~
+delta_Y
+~~~~~~~
+delta_mass
+~~~~~~~~~~
+delta_alpha
+~~~~~~~~~~~
+delta_f_ov
+~~~~~~~~~~
+delta_my_param1
+~~~~~~~~~~~~~~~
+delta_my_param2
+~~~~~~~~~~~~~~~
+delta_my_param3
+~~~~~~~~~~~~~~~
+Grid spacing for parameter values, used when ``search_type = 'scan_grid'``. ::
+
+      delta_FeH = 0
+      delta_Y = 0
+      delta_mass = 0
+      delta_alpha = 0
+      delta_f_ov = 0
+      delta_my_param1 = 0
+      delta_my_param2 = 0
+      delta_my_param3 = 0
+
+f0_ov_div_f_ov
+~~~~~~~~~~~~~~
+Overshoot ``f0`` is changed along with overshoot ``f`` according to ::
+
+    f0_ov = f0_ov_div_f_ov * f_ov
+
+so this must be set to a positive value if ``f_ov`` is not zero. ::
+
+      f0_ov_div_f_ov = -1
+
+Parameter limits
+----------------
+
+Calculating mode frequencies is a relatively costly process,
+so we don't want to do it for models that are not good candidates.
+i.e., we want to filter out the bad candidates using the following
+less expensive tests whenever possible.
+
+Note that if none of the models in a run pass these tests,
+then you will not get a total |chi^2| result for that run.
+That might not matter
+but if you are eliminating too many candidates in this way,
+the search routines might not get enough valid results to work properly.
+So watch what you are doing!  If your search or scan is getting lots of
+runs that fail to give |chi^2| results, you'll need to adjust the limits.
+
+min_age_limit
+~~~~~~~~~~~~~
+Don't consider models that aren't old enough. ::
+
+      min_age_limit = 1d6
+
+Lnuc_div_L_limit
+~~~~~~~~~~~~~~~~
+Don't consider models with L_nuc/L less than this limit.
+This rules out pre-ZAMS models. ::
+
+      Lnuc_div_L_limit = 0.95
+
+chi2_spectroscopic_limit
+~~~~~~~~~~~~~~~~~~~~~~~~
+Don't consider models with ``chi2_spectro`` above this limit. ::
+
+      chi2_spectroscopic_limit = 1000
+
+chi2_delta_nu_limit
+~~~~~~~~~~~~~~~~~~~
+Don't consider models with ``chi2_delta_nu`` above this limit. ::
+
+      chi2_delta_nu_limit = 1000
+
+chi2_radial_limit
+~~~~~~~~~~~~~~~~~
+We only calculate radial modes if the previous checks pass.
+
+Calculating non-radial modes is much more expensive than radial ones,
+so we skip the non-radial calculation if the radial results are poor.
+
+Don't consider models with ``chi2_radial`` above this limit. ::
+
+      chi2_radial_limit = 100
+
+We only calculate full chi^2 if pass all these limit checks.
+
+Timestep adjustment
+-------------------
+
+We don't want to evaluate more models than we need to but we also
+want to make sure that we resolve the optimal |chi^2|.  These
+controls adjust the maximum timestep depending on how close we
+are to the target values.
+
+If you set the timestep limits too large, you run the risk of
+missing good |chi^2| cases.  But if they are very small, you will
+spend a lot of runtime calculating lots of frequencies for lots
+of models.  There is no standard set of best values for this.
+The choice will depend on the stage of evolution and how fast
+things are changing in the general region of the models with good
+|chi^2| values.  These are just default values: there is no
+alternative to trying things and tuning the controls for your
+problem.
+
+max_yrs_dt_when_cold
+~~~~~~~~~~~~~~~~~~~~
+::
+
+      max_yrs_dt_when_cold = 1d8 ! when fail Lnuc/L, chi2_spectro, or ch2_delta_nu
+
+max_yrs_dt_when_warm
+~~~~~~~~~~~~~~~~~~~~
+::
+
+      max_yrs_dt_when_warm = 1d7 ! when pass previous but fail chi2_radial; < max_yrs_dt_when_cold
+
+max_yrs_dt_when_hot
+~~~~~~~~~~~~~~~~~~~
+::
+
+      max_yrs_dt_when_hot = 1d6 ! when pass chi2_radial; < max_yrs_dt_when_warm
+
+chi2_limit_for_small_timesteps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      chi2_limit_for_small_timesteps = 50
+
+max_yrs_dt_chi2_small_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      max_yrs_dt_chi2_small_limit = 3d5 ! < max_yrs_dt_when_hot
+
+chi2_limit_for_smaller_timesteps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      chi2_limit_for_smaller_timesteps = 20 ! < chi2_limit_for_small_timesteps
+
+max_yrs_dt_chi2_smaller_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      max_yrs_dt_chi2_smaller_limit = 1d5 ! < max_yrs_dt_chi2_small_limit
+
+chi2_limit_for_smallest_timesteps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      chi2_limit_for_smallest_timesteps = 10 ! < chi2_limit_for_smaller_timesteps
+
+max_yrs_dt_chi2_smallest_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      max_yrs_dt_chi2_smallest_limit = 5d4 ! < max_yrs_dt_chi2_smaller_limit
+
+sigmas_coeff_for_logg_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_logL_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_Teff_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_logR_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_surface_Z_div_X_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_surface_He_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_Rcz_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_delta_nu_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_my_var1_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_my_var2_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sigmas_coeff_for_my_var3_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We need a way to decide when to stop an evolution run.
+The following limits are used for this.
+We don't want to stop too soon, so these limits
+are only tested for models that are okay for the ``Lnuc_div_L_limit``.
+
+The limit on each variable ``X`` is ::
+
+    X_limit = X_target + X_sigma*sigmas_coeff_for_X_limit
+
+We only use limits where ``sigma_coeff_X`` is not zero.
+If ``sigma_coeff`` is positive, we stop when that value is greater than the limit.
+If ``sigma_coeff`` is negative, we stop when that value is less than the limit.
+Hence, use positive ``sigma_coeff`` for values that are increasing (e.g. ``logL``)
+and negative ``sigma_coeff`` for values that are decreasing
+(e.g. ``logg``, ``Teff``, ``delta_nu``). ::
+
+      sigmas_coeff_for_logg_limit = -5
+      sigmas_coeff_for_logL_limit = 5
+      sigmas_coeff_for_Teff_limit = -5
+      sigmas_coeff_for_logR_limit = 0
+      sigmas_coeff_for_surface_Z_div_X_limit = 0
+      sigmas_coeff_for_surface_He_limit = 0
+      sigmas_coeff_for_Rcz_limit = 0
+      sigmas_coeff_for_delta_nu_limit = 0
+      sigmas_coeff_for_my_var1_limit = 0
+      sigmas_coeff_for_my_var2_limit = 0
+      sigmas_coeff_for_my_var3_limit = 0
+
+|chi^2| limits
+--------------
+
+You can stop the run if |chi^2| is rising.
+
+chi2_relative_increase_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+limit_num_chi2_too_big
+~~~~~~~~~~~~~~~~~~~~~~
+If ``limit_num_chi2_too_big`` consecutive values of |chi^2|
+are greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run,
+then stop the run. ::
+
+      chi2_relative_increase_limit = 2.0
+      limit_num_chi2_too_big = 20
+
+chi2_search_limit1
+~~~~~~~~~~~~~~~~~~
+chi2_search_limit2
+~~~~~~~~~~~~~~~~~~
+If the best |chi^2| for the run is less than ``chi2_search_limit1``,
+stop the run if |chi^2| is greater than ``chi2_search_limit2``. ::
+
+      chi2_search_limit1 = 3.0
+      chi2_search_limit2 = 4.0
+
+If you are doing a search or scanning a grid, you can use previous results
+as a guide for when to stop a run
+
+min_num_samples_for_avg
+~~~~~~~~~~~~~~~~~~~~~~~
+max_num_samples_for_avg
+~~~~~~~~~~~~~~~~~~~~~~~
+avg_age_sigma_limit
+~~~~~~~~~~~~~~~~~~~
+avg_model_number_sigma_limit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We can stop the run using limits based on the average age of previous samples.
+Specifically, use at least ``min_num_samples_for_avg`` and at most
+``max_num_samples_for_avg`` to compute the average age and model number,
+then stop the run if the age is greater than the average age or model number
+plus ``avg_age_sigma_limit`` or ``avg_model_number_sigma_limit`` times the standard deviation
+of the same set of samples.
+::
+
+      min_num_samples_for_avg = 2 ! want at least this many samples to form averages
+      max_num_samples_for_avg = 10 ! use this many of the best chi^2 samples for averages
+      avg_age_sigma_limit = 10 ! stop if age > avg age + this limit times sigma of avg age
+      avg_model_number_sigma_limit = 10 ! ditto for model number
+
+Surface corrections
+-------------------
+correction_scheme
+~~~~~~~~~~~~~~~~~
+The options for the correction scheme are:
+
++ ``'kjeldsen'``, the correction of Kjeldsen et al. (2008);
++ ``'power_law'``, a free power law, used as a sanity check in Ball & Gizon (2017);
++ ``'cubic'``, the cubic/one-term correction by Ball & Gizon (2014, eqn 3);
++ ``'combined'``, the combined/two-term correction by Ball & Gizon (2014, eq 4);
++ ``'sonoi'``, the modified Lorentzian by Sonoi et al. (2015, eq 9); or
++ ``''``, no corrections.
+
+::
+
+      correction_scheme = 'kjeldsen'
+
+If you'd like to experiment with your own correction scheme,
+you can use the ``other_astero_freq_corr`` hook in ``$MESA_DIR/star``.
+
+surf_coef1_name
+~~~~~~~~~~~~~~~
+surf_coef2_name
+~~~~~~~~~~~~~~~
+Each surface correction has one or two parameters that are
+passed around in the code as ``surf_coef1`` and ``surf_coef2`` and
+reported in the output under the control parameters
+``surf_coef1_name`` and ``surf_coef2_name``.
+In the various schemes, the surface corrections added to a mode with
+frequency :math:`\nu`, normalized inertia :math:`\mathcal{I}`
+and relative inertia :math:`Q` are ::
+
+    kjeldsen         surf_coef1*(ν/νmax)**correction_b / Q
+                                       (surf_coef2 = correction_r, eq. 6 of K08)
+    power_law        surf_coef1*(ν/νmax)**surf_coef2 / Q
+    cubic            surf_coef1*(ν/νac)**3 / I             (surf_coef2 is meaningless)
+    combined         (surf_coef1*(ν/νac)**3 + surf_coef2/(ν/νac)) / I
+    sonoi            surf_coef1*νmax*[1 - 1/(1 + (ν/νmax)**surf_coef2)] / Q
+
+where ``νac`` is the acoustic cutoff frequency, computed by
+scaling the solar value of 5mHz in the same way as ``νmax``
+(i.e. ``νac = 5mHz * (g/gsun)/sqrt(Teff/Teff_sun)``). ::
+
+      surf_coef1_name = 'a_div_r'
+      surf_coef2_name = 'correction_r'
+
+The default values ``a_div_r`` and ``correction_r`` correspond to the
+behaviour in r11701 and before.
+
+correction_factor
+~~~~~~~~~~~~~~~~~
+Scale the correction by this fraction.  Set to zero to skip doing corrections. ::
+
+      correction_factor = 0
+
+correction_b
+~~~~~~~~~~~~
+Solar-calibrated power law index used in the ``kjeldsen`` surface correction.
+The ``kjeldsen`` surface correction uses the observed radial orders of the
+radial modes (``l0_n_obs``) if they are provided. ::
+
+      correction_b = 4.90d0
+
+save_next_best_at_higher_frequency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      save_next_best_at_higher_frequency = .true.
+
+save_next_best_at_lower_frequency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      save_next_best_at_lower_frequency = .true.
+
+note: to set nu_max_sun or delta_nu_sun, see star/defaults/controls.defaults
+
+output controls
+
+write_best_model_data_for_each_sample
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      write_best_model_data_for_each_sample = .true.
+
+num_digits
+~~~~~~~~~~
+Number of digits in sample number (with leading zeros). ::
+
+      num_digits = 4
+
+sample_results_prefix
+~~~~~~~~~~~~~~~~~~~~~
+Prefix for sample results filenames.
+You can include a directory in the prefix if desired. ::
+
+      sample_results_prefix = 'outputs/sample_'
+
+sample_results_postfix
+~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      sample_results_postfix = '.data'
+
+model_num_digits
+~~~~~~~~~~~~~~~~
+Number of digits in model number (with leading zeros). ::
+
+      model_num_digits = 4
+
+write_fgong_for_each_model
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      write_fgong_for_each_model = .false.
+
+fgong_prefix
+~~~~~~~~~~~~
+Prefix for FGONG filenames.
+You can include a directory in the prefix if desired. ::
+
+      fgong_prefix = 'fgong_'
+
+fgong_postfix
+~~~~~~~~~~~~~
+::
+
+      fgong_postfix = '.data'
+
+write_fgong_for_best_model
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      write_fgong_for_best_model = .false.
+
+best_model_fgong_filename
+~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      best_model_fgong_filename = ''
+
+write_gyre_for_each_model
+~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      write_gyre_for_each_model = .false.
+
+gyre_prefix
+~~~~~~~~~~~
+Prefix for GYRE filenames.
+You can include a directory in the prefix if desired. ::
+
+      gyre_prefix = 'gyre_'
+
+gyre_postfix
+~~~~~~~~~~~~
+::
+
+      gyre_postfix = '.data'
+
+max_num_gyre_points
+~~~~~~~~~~~~~~~~~~~
+::
+
+      max_num_gyre_points = -1 ! only used if > 1
+
+write_gyre_for_best_model
+~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      write_gyre_for_best_model = .false.
+
+best_model_gyre_filename
+~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      best_model_gyre_filename = ''
+
+write_profile_for_best_model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      write_profile_for_best_model = .false.
+
+best_model_profile_filename
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      best_model_profile_filename = ''
+
+save_model_for_best_model
+~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      save_model_for_best_model = .false.
+
+best_model_save_model_filename
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      best_model_save_model_filename = ''
+
+save_info_for_last_model
+~~~~~~~~~~~~~~~~~~~~~~~~
+last_model_save_info_filename
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If ``save_info_for_last_model = .true.``, treat the final model
+as the "best" and save info about final model to
+``last_model_save_info_filename``. ::
+
+      save_info_for_last_model = .false.
+      last_model_save_info_filename = '' ! and save info about final model to this file.
+
+
+Miscellaneous
+-------------
+
+save_next_best_at_higher_frequency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+save_next_best_at_lower_frequency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Save info about next best matches. ::
+
+      save_next_best_at_higher_frequency = .false.
+      save_next_best_at_lower_frequency = .false.
+
+
+trace_limits
+~~~~~~~~~~~~
+If ``.true.``, write info to terminal about status relative to various limits,
+e.g. if ``sigmas_coeff_for_Teff_limit`` is set,
+``Teff_limit = Teff_target + Teff_sigma*sigmas_coeff_for_Teff_limit`` and
+the run will stop when ``Teff < Teff_limit``.
+Trace will write out values of ``Teff`` and ``Teff_limit``.
+The same goes for other limits, e.g. ``logg``, ``logL``, ``delta_nu``, etc. ::
+
+      trace_limits = .false.
+
+save_controls
+~~~~~~~~~~~~~
+save_controls_filename
+~~~~~~~~~~~~~~~~~~~~~~
+If ``save_controls = .true.``, the controls in ``&astero_search_controls``
+are dumped to the file ``save_controls_filename``.
+If ``save_controls_filename`` is empty, a default filename is used. ::
+
+      save_controls = .false. ! dumps &astero_search_controls controls to file
+      save_controls_filename = '' ! if empty, uses a default name
+
+Y_frac_he3
+~~~~~~~~~~
+::
+
+      Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
+
+save_mode_model_number
+~~~~~~~~~~~~~~~~~~~~~~
+save_mode_filename
+~~~~~~~~~~~~~~~~~~
+el_to_save
+~~~~~~~~~~
+order_to_save
+~~~~~~~~~~~~~
+Save an eigenfunction. ::
+
+      save_mode_model_number = 0
+      save_mode_filename = ''
+      el_to_save = 0
+      order_to_save = 0
+
+add_atmosphere
+~~~~~~~~~~~~~~
+If ``.true.``, then ``star`` adds the atmosphere structure
+before passing the model to ADIPLS or GYRE.
+The atmosphere model is determined by the ``star`` control ``atm_option``, which should be
+it should either be one of the T(τ) integration options or ``Paczynski_grey``,
+the scheme inspired by B. Paczynski, 1969, Acta Astr., vol. 19, 1.
+which takes into account radiation dilution when tau < 2/3. ::
+
+      add_atmosphere = .false.
+
+keep_surface_point
+~~~~~~~~~~~~~~~~~~
+If ``.true.``, keep the ``k=1`` point of model. ::
+
+      keep_surface_point = .false.
+
+add_center_point
+~~~~~~~~~~~~~~~~
+If ``.true.``, add a point at ``r=0``. ::
+
+      add_center_point = .true.
+
+Oscillation calculation controls
+--------------------------------
+
+oscillation_code
+~~~~~~~~~~~~~~~~
+Either ``'adipls'`` or ``'gyre'`` (lower case).
+::
+
+      oscillation_code = 'adipls'
+
+trace_time_in_oscillation_code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+      trace_time_in_oscillation_code = .false.
+
+GYRE controls
+-------------
+The GYRE controls are read from the ``gyre_input_file``.
+Rich offers the following comments on setting them:
+
+> I suggest setting freq_min to 0.9*MINVAL(l0_obs),
+> and freq_max to 1.1*MAXVAL(l0_obs)
+> (similarly for the other l values).
+
+> freq_units should be 'UHZ',
+> and set grid_type to 'LINEAR'.
+
+> For n_freq, I suggest either setting it to 10*(freq_max - freq_min)/dfreq,
+> where dfreq is the estimated frequency spacing; or, set it to 10*nl0.
+> The factor 10 is arbitrary, but seems to be a good safety factor.
+
+gyre_input_file
+~~~~~~~~~~~~~~~
+::
+
+      gyre_input_file = 'gyre.in'
+
+gyre_non_ad
+~~~~~~~~~~~
+::
+
+      gyre_non_ad = .false.
+
+ADIPLS controls
+---------------
+Some ADIPLS controls are set here.  The rest are set in ``adipls.c.pruned.in``.
+
+ADIPLS looks for frequencies in a given range and with a given "density" of coverage.
+For example,
+for ``l=0``, the ADIPLS frequency search range is ``nu_lower_factor*l0_obs(1)``
+to ``nu_upper_factor*l0_obs(nl0)``
+and it uses ``iscan = iscan_factor_l0*nl0`` to determine how fine the scan is over the range.
+
+do_redistribute_mesh
+~~~~~~~~~~~~~~~~~~~~
+The number of zones for ADIPLS' remeshing is set in ``redistrb.c.pruned.in``.
+If you set this ``.false.``, then the mesh from ``star`` is used directly.
+If you set this ``.true.``, then ``astero`` calls ADIPLS's ``redistb`` before doing
+the frequency analysis. ::
+
+      do_redistribute_mesh = .true.
+
+
+iscan_factor_l0
+~~~~~~~~~~~~~~~
+iscan_factor_l1
+~~~~~~~~~~~~~~~
+iscan_factor_l2
+~~~~~~~~~~~~~~~
+iscan_factor_l3
+~~~~~~~~~~~~~~~
+ADIPLS will scan for frequencies at ``iscan_factor_l0`` times the number
+of observed ``l==0`` modes.  The same goes for ``l==1``, ``2`` and ``3``. ::
+
+      iscan_factor_l0 = 15
+      iscan_factor_l1 = 15
+      iscan_factor_l2 = 15
+      iscan_factor_l3 = 15
+
+nu_lower_factor
+~~~~~~~~~~~~~~~
+nu_upper_factor
+~~~~~~~~~~~~~~~
+The frequency scan range is set from the observed frequencies times these factors. ::
+
+      nu_lower_factor = 0.8
+      nu_upper_factor = 1.2
+
+adipls_irotkr
+~~~~~~~~~~~~~
+adipls_nprtkr
+~~~~~~~~~~~~~
+adipls_igm1kr
+~~~~~~~~~~~~~
+adipls_npgmkr
+~~~~~~~~~~~~~
+Miscellaneous ADIPLS parameters for experts. ::
+
+      adipls_irotkr = 0
+      adipls_nprtkr = 0
+      adipls_igm1kr = 0
+      adipls_npgmkr = 0
+
+Include other inlists
+---------------------
+
+read_extra_astero_search_inlist1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extra_astero_search_inlist1_name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+read_extra_astero_search_inlist2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extra_astero_search_inlist2_name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+read_extra_astero_search_inlist3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extra_astero_search_inlist3_name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+read_extra_astero_search_inlist4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extra_astero_search_inlist4_name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+read_extra_astero_search_inlist5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extra_astero_search_inlist5_name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If ``read_extra_astero_search_inlistN`` is ``.true.``, then read the namelist
+in file ``extra_astero_search_inlistN_name``.  ::
+
+      read_extra_astero_search_inlist1 = .false.
+      extra_astero_search_inlist1_name = 'undefined'
+
+      read_extra_astero_search_inlist2 = .false.
+      extra_astero_search_inlist2_name = 'undefined'
+
+      read_extra_astero_search_inlist3 = .false.
+      extra_astero_search_inlist3_name = 'undefined'
+
+      read_extra_astero_search_inlist4 = .false.
+      extra_astero_search_inlist4_name = 'undefined'
+
+      read_extra_astero_search_inlist5 = .false.
+      extra_astero_search_inlist5_name = 'undefined'

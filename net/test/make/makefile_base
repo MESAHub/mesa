@@ -1,0 +1,122 @@
+# This is the makefile for testing the mesa net library
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+COMMON_SRCS = \
+    test_net_do_one.f \
+    test_net_support.f \
+    mod_one_zone_burn.f
+
+TEST_SRCS = $(COMMON_SRCS) mod_test_net.f test_net.f
+
+TESTQ_SRCS = $(COMMON_SRCS) mod_test_net.f test_net_quietly.f
+
+SAMPLE_SRCS = sample_net.f
+
+ONE_ZONE_SRCS = $(COMMON_SRCS) one_zone_burn.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = net
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = eos rates chem $(LIBS_MESA_NUMERICS)
+#LIBS_OTHER = eos rates chem $(LIBS_MESA_NUMERICS) a21fxt
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lrates -lchem $(LOAD_MESA_NUMERICS)
+#LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lrates -lchem $(LOAD_MESA_NUMERICS) -L$(MESA_DIR)/net/aprox21_fxt -la21fxt
+
+#APROX21_FXT_FLAG = -DAPROX21
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+TESTQ = $(TEST_DIR)/test_quietly
+SAMPLE = $(TEST_DIR)/sample
+ONE_ZONE = $(TEST_DIR)/burn
+
+TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+TESTQ_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TESTQ_SRCS)))
+SAMPLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SAMPLE_SRCS)))
+ONE_ZONE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(ONE_ZONE_SRCS)))
+
+all : $(TEST) $(TESTQ) $(SAMPLE) $(ONE_ZONE)
+
+$(TEST) : $(TEST_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(TESTQ) : $(TESTQ_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(SAMPLE) : $(SAMPLE_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(ONE_ZONE) : $(ONE_ZONE_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+
+$(TEST) : OBJS = $(TEST_OBJS)
+$(TESTQ) : OBJS = $(TESTQ_OBJS)
+$(SAMPLE) : OBJS = $(SAMPLE_OBJS)
+$(ONE_ZONE) : OBJS = $(ONE_ZONE_OBJS)
+
+$(TEST_DIR)/% :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(TEST) $(TESTQ) \
+    	    $(SAMPLE) $(ONE_ZONE) 
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+TEST_COMPILE += $(APROX21_FXT_FLAG)
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(FCfree) $<
+else
+	$(TEST_COMPILE) $(FCfree) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

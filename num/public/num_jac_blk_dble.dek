@@ -1,0 +1,11 @@
+      subroutine jac_blk_dble(n,caller_id,nvar,nz,x,h,y,f,lblk,dblk,ublk,lrpar,rpar,lipar,ipar,ierr)
+         use const_def,only: dp
+         integer, intent(in) :: n,caller_id,nvar,nz,lrpar,lipar
+         real(dp), intent(in) :: x, h
+         real(dp), intent(inout), pointer :: y(:) ! (n)
+         real(dp), intent(inout), pointer :: f(:) ! (n) ! dy/dx
+         real(dp), dimension(:), pointer, intent(inout) :: lblk,dblk,ublk ! =(nvar,nvar,nz)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(out) :: ierr ! nonzero means terminate integration
+      end subroutine jac_blk_dble

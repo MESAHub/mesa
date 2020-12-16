@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+	   echo FAILED
+		exit 1
+	fi
+}
+
+echo 'create eosCMS_data'
+
+rm -rf eosCMS_data
+check_okay
+
+echo 'tar -xJf eosCMS_data.tar.xz'
+tar -xJf eosCMS_data.tar.xz
+check_okay
+
+mkdir -p ../data/eosCMS_data
+check_okay
+
+mv eosCMS_data/*.data ../data/eosCMS_data
+check_okay
+

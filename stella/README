@@ -1,0 +1,278 @@
+
+mesa includes a simplified version of STELLA. (thank you to Sergei Blinnikov and his group for making this possible)
+
+it doesn't have all the newest features that are in the current research version of the code,
+and there are lots of options that are not supported for use in the mesa version.
+but it is still a very useful tool for creating light curves and ejecta velocities.
+
+if you publish results that use stella, please reference the following papers in addition to mesa.
+   Blinnikov, S. I., Eastman, R., Bartunov, O. S., Popolitov, V. A., & Woosley, S. E. 1998, ApJ, 496, 454
+   Blinnikov, S., Lundqvist, P., Bartunov, O., Nomoto, K., & Iwamoto, K. 2000, ApJ, 532, 1132
+   Blinnikov, S. I., Röpke, F. K., Sorokina, E. I., et al. 2006, A&A, 453, 229
+
+here's some background information.  see the MESA IV instrument paper for more details and many examples using MESA + STELLA.
+
+   STELLA solves the radiative transfer equations in the intensity momentum approximation in each frequency bin. 
+   In mesa, stella is typically run using 40 frequency groups, enough to produce spectral energy distribution, but not sufficient to produce spectra. 
+   The opacity is computed based on over 153,000 spectral lines from Kurucz & Bell (1995) and Verner, Verner & Ferland (1996). 
+   The expansion opacity formalism from Eastman & Pinto (1993) is used for line opacity taking the effect of high velocity gradients into account. 
+   Opacity also includes photoionization, free–free absorption, and electron scattering. Local thermodynamic equilibrium is assumed in the plasma, 
+   which allows the use of the Boltzmann–Saha distribution for ionization and level populations. STELLA does not include a nuclear network except 
+   radioactive decay of nickel-56 to cobalt-56, and to iron-56. The code uses 16 species for calculating the overall opacity. 
+   These are H, He, C, N, O, Ne, Na, Mg, Al, Si, S, Ar, Ca, a sum of stable Fe and radioactive 56Co, stable Ni and radioactive 56Ni. Energy from 
+   nickel and cobalt radioactive decay is deposited into positrons and gamma-photons and is treated in a one-group transport approximation 
+   according to Swartz, Sutherland & Harkness (1995).
+   
+   The 1D equations for mass, momentum, and total energy are solved using a Lagrangian comoving grid. The artificial viscosity 
+   consists of the standard von Neumann artificial viscous pressure used for stabilizing solution (von Neumann & Richtmyer 1950) 
+   and a so-called cold artificial viscosity used to smear shocks (Blinnikov et al. 1998). Therefore, STELLA allows one to properly 
+   compute the propagation of the shock along the ejecta and the shock breakout event. The coupled equations of radiation hydrodynamics 
+   are solved through an implicit high-order predictor–corrector procedure based on the methods of Brayton, Gustavson & Hatchel 
+   (1972, see details in Blinnikov & Panov 1996; Stabrowski 1997).
+   
+   Blinnikov S. I., Panov I. V., 1996, Astron. Lett., 22, 39   
+   Blinnikov, S. I., Eastman, R., Bartunov, O. S., Popolitov, V. A., & Woosley, S. E. 1998, ApJ, 496, 454
+   Blinnikov, S., Lundqvist, P., Bartunov, O., Nomoto, K., & Iwamoto, K. 2000, ApJ, 532, 1132
+   Blinnikov, S. I., Röpke, F. K., Sorokina, E. I., et al. 2006, A&A, 453, 229   
+   Brayton R. K., Gustavson F. G., Hatchel G. D., 1972, Proc. IEEE   
+   Eastman, R. G., & Pinto, P. A. 1993, ApJ, 412, 731   
+   Kurucz R. L., Bell B., 1995, Atomic line list   
+   Stabrowski M. M., 1997, Simul. Modelling Pract. Theory, 5, 333   
+   Swartz D. A., Sutherland P. G., Harkness R. P., 1995, ApJ, 446, 766   
+   Verner D. A., Verner E. M., Ferland G. J., 1996, At. Data Nucl. Data Tables, 64, 1   
+   von Neumann J., Richtmyer R. D., 1950, J. Appl. Phys., 21, 232
+   
+   see also
+
+   Kozyreva, A. et al, MNRAS 459, L21-L25, 2016.  
+   Moriya, T. et al, MNRAS 466, 2085-2098, 2017.
+   Sorokina, E. et al, ApJ 829:17, 2016.
+   Tolstov, A. et al, ApJ 821:124, 2016.
+   
+   
+-----------
+
+
+Test Run
+
+
+to do the standard test run, copy stella/test/mesa.abn and mesa.hyd to stella/modmake/
+
+then just do the 'rn' script to compile and run.
+
+each run of stella starts with a recompilation since model dependent parameters are needed at compile time.
+
+after the compilations, several minutes are spent creating opacity tables specifically for the given model.
+
+once the opacity tables are created, the actual stella run starts.
+every 50 timesteps, a status line is output with time (days), surface v (kms), r (1e14 cm), and logL (ergs).
+the run stops when the time reaches the value given in stella/strad/run/mesa.dat as "TcurB" (days).
+You can edit TcurB as you wish before starting a run.  The default is 170.1 days.
+
+The surface velocities will start out low but will rise rapidly at breakout.
+Note that the times are given from the start of the run rather than from breakout.
+
+Following is some terminal output from doing 'rn' for the standard test case input (from stella/test).
+compare to your test run as a check before trying your own models.
+
+note that the opacity tables are created using 6 parallel shell forks,
+but stella itself uses a single thread, so there is no speed up for it on multicore machines.
+depending on your processor, you should expect stella to take an hour or so to finish.
+
+the results shown below will not exactly match your results since we have not converted stella
+to use crlibm and follow the required standards we use in mesa to get bit-for-bit indentical
+results across various platforms.  you can expect a close match, but even things like the
+total number of steps and the final reported day can be expected to differ by small amounts.
+
+
+cd mesa/stella
+./rn
+
+< compilations >
+
+/Users/bpaxton/mesa/stella/eve/run
+  radius (1e14cm):          400  0.69989519856667304     
+  radius (1e14cm):            1  0.11968746162950693     
+  start time    0.0000000000000000     
+
+
+construct opacity tables for current model using 6 jobs in parallel
+/Users/bpaxton/mesa/stella/vladsf
+terminal output in mesa_log.*
+opacity table 1
+opacity table 2
+opacity table 3
+opacity table 4
+opacity table 5
+opacity table 6
+Sat Nov 11 12:21:07 PST 2017
+Sat Nov 11 12:25:46 PST 2017
+all processes complete
+
+run stella
+    50  day    1.54321E-12  v kms     10.919      R e14    0.69990      logL     37.475    
+   100  day    9.92118E-04  v kms     10.919      R e14    0.69990      logL     38.194    
+   150  day    3.28193E-02  v kms     10.920      R e14    0.69992      logL     38.529    
+   200  day    6.45339E-02  v kms     10.920      R e14    0.69995      logL     38.460    
+   250  day    8.07699E-02  v kms     10.921      R e14    0.69996      logL     38.432    
+   300  day    9.63030E-02  v kms     10.921      R e14    0.69998      logL     38.398    
+   350  day    0.11335      v kms     10.922      R e14    0.69999      logL     38.362    
+   400  day    0.12924      v kms     10.922      R e14    0.70001      logL     38.324    
+         ...
+ 11650  day     126.25      v kms     5168.2      R e14     51.365      logL     41.143    
+ 11700  day     127.41      v kms     5168.2      R e14     51.840      logL     41.109    
+ 11750  day     128.24      v kms     5168.2      R e14     52.179      logL     41.080    
+ 11800  day     129.00      v kms     5168.2      R e14     52.493      logL     41.048    
+ 11850  day     129.45      v kms     5168.2      R e14     52.674      logL     41.025    
+ 11900  day     129.80      v kms     5168.2      R e14     52.820      logL     41.006    
+ 11950  day     130.12      v kms     5168.2      R e14     52.951      logL     40.985    
+ 12000  day     131.29      v kms     5168.2      R e14     53.427      logL     40.880    
+ 12050  day     135.12      v kms     5168.2      R e14     54.993      logL     40.134    
+ 12100  day     158.11      v kms     5168.2      R e14     64.397      logL     40.215    
+elaspsed time (minutes)    21.9
+STOP  Normal stop of stella
+
+The output files from this run are included in stella/test for comparison.
+
+
+-----------
+
+
+Input 
+      
+   the 2 input data files are 
+   
+      mesa.hyd - information about the structure
+         1st line: num zones, mass inner boundary, radius inner boundary, density at inner boundary
+         following lines: 
+            zone i, mass/Msun, r, density, temperature, velocity, pressure,
+               0d0, energy, entropy, opacity, tau, v_div_csound
+      mesa.abn - information about the composition
+         each line:
+            zone i, mass/Msun, dm/Msun, r, h1, he3+he4, c12, n14, o16, ne20, na23, mg24, 
+               al27, si28, s32, ar36, ca40, fe52+54+56, skip, co56+ni56
+         
+      put the hyd and abn files in stella/modmake before doing ./rn
+
+   create these in your mesa/star run by setting controls in &star_job.   
+   for example,
+
+      save_stella_data_when_terminate = .true.
+      save_stella_data_filename = 'mesa'
+      stella_show_headers = .false. ! must be false for files going to stella
+         ! but can be true to make files for reference including text names of columns
+      stella_min_surf_logRho = -100d0 ! prune surface cells in mesa model with density below this
+      stella_min_velocity = 0d0 ! use this as the minimum initial velocity for cells mesa.hyd file.
+      stella_skip_inner_dm = 0d0 ! skip this much of the mesa model for the stella files
+      stella_skip_inner_v_limit = 1d5 ! skip inner cells in mesa model with v < this velocity (cm/s)
+      stella_num_points = 400 ! total number of zones for stella files
+      stella_nz_extra = 40 ! number of zones for CSM; set to 0 to skip having CSM added
+      stella_mdot_years_for_wind = 1.2d0 ! these determine the CSM mass and size
+      stella_mdot_for_wind = 0.30d0 ! Msun/year
+      stella_v_wind = 12d0 ! km/s
+   
+      The total number of zones for stella files created by mesa/star are given by 'stella_num_points'.  
+      The number of zones out of that total to be used for CSM is given by 'stella_nz_extra'.
+      The value of stella_num_points must also be set in the file stella/obj/nfreq_and_mzone.inc.
+   
+      the mesa/star routine for creating stella files knows about the following species:
+         h1, he3, he4, c12, n14, o16, ne20, na23, mg24, al27, si28,
+         s32, ar36, ca40, ti44, cr48, cr60, fe52, fe54, fe56, co56, ni56
+      if your net includes other species, they will be ignored when creating the stella file.
+      on the other hand, any species missing from this list will simply be given 0 abundance.
+      
+      note that the optional CSM is specified in terms of a wind, but there is no
+      actual assumptions about the source of the material.  the default density profile
+      falls like 1/r^2 moving away from the surface.  if you would like to experiment
+      with other kinds of mass halos, you are welcome to do so by doing your own processing
+      to the model from mesa/star to construct mesa.hyd and mesa.abn input files for stella.
+   
+   
+   For performance reasons, you may want to let the mesa run evolve the shock near enough
+   to the surface than the stella model only uses a small fraction of the total number of zones 
+   for unshocked material and the rest for the shocked section.
+   That simply reduces the time stella will spend before shock breakout.
+   However, it is important to have enough unshocked material that stella
+   takes over the evolution before the light curve starts to climb,
+   so be careful that you don't reduce the number of unshocked zones too far.
+   
+   There are many expert parameters for the stella run, but you should just use the defaults
+   with a only few exceptions.
+      
+   Set TcurB, the stop time (in days) for the stella run, in stella/strad/run/mesa.dat
+      There are differences between the stella internal time and the observer time.
+      In most cases, this is not an issue. But for certain situations, 
+      you may find that the output data stops at an earlier time than the end of the run.
+      As easy work-around if this happens is simply to increase the TcurB value
+      
+   The list of times at the end of mesa.dat determines when stella adds to the output files.
+   You can modify these times as desired.  If you add or remove any, update the total count in line 24.
+
+
+-----------
+
+Changing the number of frequency bins or the number of zones in model from center to surface
+
+   The default number of frequency bins in mesa/stella is 40, and that should be fine for most jobs.
+   The default number of zones is 400, which should also be enough for most jobs.
+   
+   If you'd like to change either number, then edit obj/nfreq_and_mzone.inc.
+   The change will take effect the next time you recompile as part of a run.
+
+
+-----------
+
+Output
+
+
+   output files are placed in the stella/res directory.  here are the ones you will most likely use.
+   
+      mesa.lbol_lnuc - col 1 is days post max Lbol, col 2 is log Lbol, col 3 is log Lnuc
+      
+      mesa.vel_feII - information about the FeII 5169 velocities.  columns are labeled.
+         velocity at locations of various values for FeII 5169 tau Sobolev.
+         
+      mesa.swd.ph - information about conditions at the photosphere.  columns are labeled.
+         radius, velocity, mass, T, rho, opacity, H, He, O, Fe, Lbol, and
+         color magnitudes for UBVRI bands from mesa/colors based on stella values for Lbol, Teff, g, and Fe/H.
+
+      mesa.day<N>_post_Lbol_max.data
+         zone by zone profile of stella model at day <N> post max Lbol. Columns labeled. 
+         Interpolated from profiles saved in mesa.swd, mesa.hyd, and mesa.abn
+
+      mesa.tt — stella information about broad band light curves.
+         initial section of file has information about the frequency bins.
+         main section has labeled columns.
+         The broadband magnitudes are given as MU, MB, MV, MI, and MR.
+         Note that I and R are in reverse order for historical reasons.
+         gdepos is gamma-ray deposition, i.e. the power of heating of all the
+         mass on the hydro grid by gamma-rays from 56Ni-56Co decays in units 1e50 erg/s.
+         Tbb and rbb are black body estimates, and Teff is a rough estimate for effective temperature.
+         Rlast_sc is a rough estimate of last scattering radius. 
+         the times in this file come from deep within stella and have not been readjusted to be relative to breakout.
+
+         
+   the times for saving output profiles in mesa.swd are set in the final section of the file stella/strad/run/mesa.dat.
+      
+      the default setting gives 76 profiles starting at day 2 and ending at day 173.
+      you might want to adjust these to get more profiles saved around the end of the plateau for example.
+      if the default settings show that the drop from the plateau happens around 110-120 days,
+      then the default will only give information for days 110, 113, 116, and 120. Only integer values of days 
+      are valid after day 1. To get profiles more often between 110 to 120, edit the list as desired,
+      such as 110, 112, 113, 114, 115, 116, 117, 118, and 120, and edit the total number of
+      profiles given at the start of the list. in this case we've added 5 days, 
+      so change 76 to 81.
+
+   times for single output profiles as mesa.day<N>_post_Lbol_max.data are set in stella/res/stella_extras.f90 via 
+   call statements such as 
+      call save_day_post_Lbol_max(50d0,t0,zone,star_mass,mass_IB,'050')
+
+-----------
+
+
+Getting a "clean" stop during a run before the normal finish
+   Every 10 steps, stella checks to see if there is a file named 'stop' in stella/strad/run.
+   If it finds one, it acts as if it has reached the max number of allowed steps.
+   This produces the normal output, whereas interrupting the run with CTRL-c would not.
+   There is no way to restart a run that you have stopped.
+   

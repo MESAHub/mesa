@@ -1,0 +1,298 @@
+--  _trace "write(*,*)' ------',"
+   Program ronfict;
+-- This is a front end for the expansion opacity routine by Ron Eastman
+-- (UCSC-LLL, 1993-1994)
+-- Writing absorption opacity in a separate file 'opafile.ab'
+-- with NO expansion effect (here ts=100 days)
+-- separate absorption made in 1997
+-- bug with it corrected May 23 1998 in Saltsjoebaden
+-- time-dependent Ni-Co-Fe done by Elena Sorokina
+   implicit real*8 (a-h, o-z);
+   character*132 tablestr;
+     _INCLUDE snrad;
+     _include nico;
+--     _Include sahaandd;
+--     _Include sahaz;
+--  _Define @Ntab 4 ; -- for test
+--   _Define  @ns    4    -- standard @ns 5 is defined in zone.inc
+  _Define  @bs    1    -- begin and end  with dvdr number @bs
+--  _Define  @bs    @ns    -- begin with dvdr number @bs
+     _Include opacity;
+     --
+  <*var: variables and parameters *>;
+  call GetArg(1,tablestr);
+--  write(*,*) 'tablestr ' // trim(tablestr);
+  read(tablestr,*) itable;
+  write(*,*) 'itable', itable;
+  if (itable < 1 .or. itable > 6) stop 'bad value for itable: must be 1..6';
+  <*openfiles:  *>;
+  <*readmodel:  *>;
+--   print *, 'Yabun:',Natom, Az;
+  <*deffreq: define frequency grid *>;
+   tstwritten=.false.;
+  _do nw=itable,itable;
+     nu=70+nw; -- channel for Opafile.nw     
+     time=1.d+01**(daybegl+(dayendl-daybegl)/dble(@ns-1)*(nw-1));
+         -- time in days for the velocity gradient
+      -- Velocity gradient = 1 / time
+      dvdr = 1.0d0 / (time * 86400.d0);
+      dt=time-t*Utime/86400.d0;
+     @wterm' time in tables and T_eve:',time,t*Utime/86400.d0;
+     if (dt<0.d0) then;
+        @wterm' time in tables is less than T_eve:',time,t*Utime/86400.d0;
+        stop;
+     endif;
+--     @wterm' Nzon=',Nzon,' @skip=',@skip;
+     _do km=1,Nzon,@skip;
+         <*abund: define array abund using Yabun(.,km) from Model *>;
+         <*fillhapp: fill tables of log (happa) for desired Tp and rho
+                     and save in the arrays hpbanab1, hpbansc1
+                     -- hpbansc1 must keep total opacity  *>
+         write(nures,'(A,F8.2,A,I4)')' done time=',time,'  zone=',km; 
+     _od;
+     tstwritten=.true.;
+     Msta=@ns;
+     Nrho=@Ntab; NTp=@Ntab;
+     Stime=time;
+     write(nu)nw,Stime,Nfreq,Msta,Nrho,NTp,Wavel,Freq,Freqmn,
+          TpTab,RhoTab,hpbansc1;
+     close(unit=nu);
+     if(nw==@ns)then;
+        write(69) hpbanab1;
+     endif;   
+  _od;
+  <*closefiles:  *>;
+      end;
+%_openfiles: 
+    Open(unit=1,file='ronfict.1',status='old',action='read');
+    --        Model, NiDist  & Opafile file
+    READ(1,'(A)');
+    read(1,*) Model,NiDist,Rfile,Opafile;
+--    @wterm Model,NiDist,Rfile,Opafile;
+--    Open(unit=nures,file=Rfile);
+    Open(unit=9,file=Model,form='unformatted',action='read');
+    Open(unit=10,file=NiDist,form='unformatted',action='read');
+    app=char(ichar('0')+itable); -- itablef must be <=9
+    Rfile=Rfile(1:Length(Rfile)-5)//app//Rfile(Length(Rfile)-3:Length(Rfile));
+    inquire(file=Rfile,exist=fexist);
+  --  nures=nures+100+itable;
+    nures=4; -- @Wres;
+    write(*,*) 'result file ' // trim(Rfile);
+    if(fexist)then;
+       open(file=Rfile, unit=nures, status='old');
+    else;
+       open(file=Rfile, unit=nures, status='new');
+    endif;
+    inquire(file='lines'//app//'.out',exist=fexist);
+    if(fexist)then;
+       open(file='lines'//app//'.out ', unit=7, status='old');
+    else;
+       open(file='lines'//app//'.out ', unit=7, status='new');
+    endif;
+    open(15,file='testabun'//app//'.res');
+    _do nf=itable,itable;
+       nu=70+nf;
+        app=char(ichar('0')+nf); -- nf must be <=9
+        Opafile=Opafile(1:Length(Opafile)-1)//app;
+        Open(unit=nu,file=Opafile,form='unformatted');
+        write(*,*) 'Opafile ' // trim(Opafile);
+        if(nf==@ns)Open(unit=69,
+                file=Opafile(1:Length(Opafile)-1)//'ab',form='unformatted');
+    _od;
+    INQUIRE(FILE='linedata.dump',EXIST=rdlndump);
+    if(rdlndump) then;
+       linelist='linedata.dump';
+    else;
+       linelist = 'lineatom.dat '; -- new list
+--       linelist = 'linedata'; -- old list
+    endif;
+--    write(*,*)' linelist=',  linelist,'  OK?';
+--    read(*,*);
+
+    xsecdatadir = './yakovlev ';
+
+%_readmodel:
+    Lunit=9;
+    NFILE=Model;
+--    @wterm '>>',Nfile,'<<';
+    call StradIO('rm',Lunit,NFILE);
+    read(10) (XNifor(k),k=1,NZon);
+%_abund:
+     do iz = 1, 99;
+       abund(iz) = 0.d0;
+     end do;
+    _do ii=1,Natom-2; -- Fe & Ni are variable
+      abund(Zn(ii))=Yabun(ii,km)*Az(ii);
+    _od;
+     write(nures,'(a,1p,e10.3)')
+      ' Fe abund in eve model=',Yabun(Natom-1,km)*AZ(Natom-1);
+     write(nures,'(a,1p,e10.3)')
+      ' Ni stable abund in eve model=',Yabun(Natom,km)*AZ(Natom);
+     write(nures,'(a,1p,e10.3)')
+      ' Ni56 abund in eve model=',Xnifor(Km);
+ -- including of radionucl. Ni56-->Co56-->Fe56 decay
+ -- Yabun(Natom-1) is sum of abund. of all Fe isotops and radioactive Ni56
+ -- at the beginning (t is read from initial model); to derive pure Fe,
+ -- we have to subtract Xnifor (taken from *.xni) from Yabun(Natom-1)
+ -- Yabun(Natom) in the initial model contains only stable Ni58 isotop
+     abund(28)=Xnifor(Km)*exp(-dt/tNi); -- here Ni56 only;
+     abund(27)=Xnifor(Km)*(tCo/(tCo-tNi))*(exp(-dt/tCo)-exp(-dt/tNi));
+     abund(26)=Xnifor(Km)-abund(28)-abund(27); -- only Fe56 made from Ni56
+     write(nures,'(a,1p,3e10.3)')
+      ' Fe Co Ni from Ni56=', abund(26),abund(27),abund(28);
+     abund(28)=abund(28)+Yabun(Natom,km)*AZ(Natom); -- full Ni at this time 
+     abund(26)=Yabun(Natom-1,km)*AZ(Natom-1)-Xnifor(Km)+abund(26);
+                                                    -- full Fe at this time
+     write(nures,'(a,1p,3e10.3)')
+      ' Fe Co Ni abund here=', abund(26),abund(27),abund(28);
+     if (^tstwritten) then;
+--        write(15,'(i5,99f8.5)')km,abund;
+        write(15,'(i5,99e10.3)')km,abund;
+     endif;
+%_deffreq:
+-- Compute frequency grid.
+--   wlmax=5.d+04; wlmin=1.d+01;
+     wlmax=5.d+04; wlmin=1.d0; -- for peter
+--   wlmax=5.d+04; wlmin=1.d-01; -- MUST be for very strong shbrk 
+   -- it was 1 at q UCSC for s1b7a models and 0.1 for he15b3 models
+--   write(*,'(2(a,f8.2), a )')' wlmax=',wlmax, '   wlmin=',wlmin,' AA, OK?';
+--   read(*,*);
+
+   freq(1) = Cs * 1.d+08 / wlmax;
+   freq(nfreq+1) = Cs * 1.d+08 / wlmin;
+-- our old definition:
+   Basis=(WLMAX/WLMIN)**(1.D0/(DBLE(NFREQ)));
+   -- Geometric PROGRESSION
+   _Do i=2,NFREQ;
+      FREQ(i)=FREQ(I-1)*BASIS;
+   _OD;
+   _DO L=1,NFREQ;
+      FREQMN(L)=SQRT(FREQ(L)*FREQ(L+1))
+   _OD;
+    do lf = 1, nfreq;
+       wavel(lf) = Cs * 1.d+08 / freqmn(lf);
+    end do;
+-- caution: here freq, freqmn and wavel NOT in Stella units!!!
+-- must be redefined in Begrad
+--
+%_fillhapp:
+   lastTp=1; -- to save last value of tabulated Tp  
+  _do ir=1,@Ntab;
+--  _do ir=@Ntab,@Ntab; -- test
+      rho=1.d+01**(-18+ir);
+      rhotab(ir)=log(rho); -- here we use natural log, unlike petfict!
+      if(ir==1)then;
+         rho=1.d+01*rho;
+          -- save boundary nodes in the tables for ficticious values
+      elseif(ir==@Ntab)then;
+         rho=rho/1.d+01;
+      endif;
+      -- total nuclear density:
+      nucden = abund(1) * rho / Ambrun;
+      do iz = 2, 99;
+         nucden = nucden + abund(iz) * rho / (dble(2 * iz) * Ambrun);
+      end do;
+      If(lastTp==1)then;
+         ktpb=1;
+         lastTp=@Ntab;
+         kstep=1;
+      else;
+         ktpb=@Ntab;
+         lastTp=1;
+         kstep=-1;
+      endif;
+     _do itp=ktpb,lastTp,kstep;
+--     _do itp=@Ntab,@Ntab; -- test
+        temp=1.d+01**(3.4d0+0.2d0*(itp-1));
+        Tptab(itp)=log(temp);
+        if(itp==1)then;
+           temp=1.d+01**(3.4d0+0.2d0*itp);
+           -- save boundary nodes in the tables for ficticious values
+        elseif(itp==@Ntab)then;
+           temp=1.d+01**(3.4d0+0.2d0*(@Ntab-2));
+        endif;
+        call opacity(rho, temp, abund, nfreq, freq, freqmn, 
+            dvdr, linelist, rdlndump, .false. , longlist,
+            0.0, xsecdatadir, opac, scatop, eden);
+        -- write the computed opacity.
+  --      write(nures,15) rho, temp, time, eden, eden / nucden;
+ --     write(@wres,15) rho, temp, time, eden, eden / nucden;
+ 15:   format(' rho: ', 1pe10.3, ' temp: ', 1pe10.3, ' time(days): ',
+          1pg12.3,/, ' eden: ', 1pe10.3, ' eden/nucden: ', 1pe10.3,/);
+  --      write(@term,*) 'wavelength, opac, scatop';
+    --  write(@wres,*) 'wavelength, opac, scatop';
+        do lf = 1, nfreq;
+   --      write(@term,20) wavel(lf), opac(lf), scatop(lf);
+   --      write(@wres,20) wavel(lf), opac(lf), scatop(lf);
+        if(nw==@ns)
+         hpbanab1(lf,itp,ir,(km-1)/@skip+1)=
+                  alog(sngl(opac(lf)*1.d+01**UlgR/(rho/Urho)));
+               --old DP   log(opac(lf)*1.d+01**UlgR/(rho/Urho));
+         hpbansc1(lf,itp,ir,(km-1)/@skip+1)=
+                  alog(sngl((scatop(lf)+opac(lf))*1.d+01**UlgR/(rho/Urho)));
+               --old DP  log(scatop(lf)*1.d+01**UlgR/(rho/Urho));
+                     -- hpbansc1 must keep total opacity !!!
+               -- 
+         hbab=hpbanab1(lf,itp,ir,(km-1)/@skip+1);
+         hbal=hpbansc1(lf,itp,ir,(km-1)/@skip+1);
+         if (hbal >1.d50 .or. hbab > 1.d50)then;
+         write(nures,'(4(a,i4)/,1p,2(a,e12.4))')
+               ' L=',lf,' itp=',itp,' iro=',ir,' im=',(km-1)/@skip+1,
+               '  hbal=',hbal,'  hbab=',hbab;
+         write(nures,'(1p,2(a,e12.4))')
+               '  opac=',opac(lf),'  scatop=',scatop(lf);
+         stop ' Ronfict: bad happa !!!';
+        endif;
+
+        end do;
+     _od -- loop itp
+      write(nures,15) rho, temp, time, eden, eden / nucden;
+     -- write(@term,15) rho, temp, time, eden, eden / nucden;
+  _od  -- loop ir
+%_closefiles: 
+    close(nures);
+    close(9);
+    close(10);
+    close(15);
+%_var:o
+      Parameter ( NatomMax = 99 );
+      logical fexist;
+      Character*80 Nfile,model,NiDist,Rfile;
+      Character*1 app;
+      data daybegl/0.d0/, dayendl/2.d0/;
+      PARAMETER(MAXIONM1=(6  - 1));
+      PARAMETER(NSBINTVL=3*10 );
+
+      real*8 scatop(Nfreq), opac(Nfreq);
+      real*8 eden, temp, nucden;
+      real*8 abund(99);
+      character*80  linelist, longlist, xsecdatadir;
+      logical rdlndump;
+      logical tstwritten;
+
+/*
+c Solar abundance set (by mass).
+
+      data abund/0.75, 0.25, -10.31, -10.10, -8.82,
+     .     -2.41, -3.02, -2.03, -6.38, -3.12,
+     .     -4.51, -3.24, -4.29, -3.21, -5.31,
+     .     -3.45, -5.35, -3.72, -5.51, -4.19,
+     .     -7.51, -5.59, -6.54, -4.83, -4.95,
+     .     -2.95, -5.53, -4.21, -6.11, -5.74,
+     .     -7.66, -6.72, -7.98, -6.93, -7.60,
+     .     -7.13, -7.94, -7.28, -8.03, -7.74,
+     .     -8.73, -8.07, -18.12, -8.37, -9.04,
+     .     -8.51, -8.95, -8.41, -9.32, -8.01,
+     .     -9.08, -7.73, -8.48, -7.74, -8.94,
+     .     -7.84, -8.94, -8.43, -9.25, -8.60,
+     .     -17.95, -9.10, -9.49, -8.73, -9.47,
+     .     -8.87, -9.47, -9.07, -9.88, -9.12,
+     .     -9.86, -9.17, -9.70, -8.91, -9.68,
+     .     -8.54, -8.51, -8.22, -9.04, -8.20,
+     .     -9.06, -7.92, -9.19, -17.79, -17.79,
+     .     -17.77, -17.77, -17.76, -17.76, -9.63,
+     .     -17.75, -10.28, -17.74, -17.73, -17.73,
+     .     -17.73, -17.72, -17.71, -17.71/
+
+c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+*/      

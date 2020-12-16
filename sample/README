@@ -1,0 +1,13 @@
+You can put the sample directory anywhere and rename it as you wish.
+
+Then do the following:
+
+1) edit make/makefile to set MESA_DIR to the path to your mesa directory.
+
+2) edit src/sample.f to set 'data_dir' to be the path to the mesa data directory.
+
+3) run the 'mk' script to make.
+
+4) run the 'rn' script to run.
+
+5) run the 'ck' script to check that the code produces the expected results.

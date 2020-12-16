@@ -1,0 +1,38 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+	   echo FAILED
+		exit 1
+	fi
+}
+
+echo 'create eosDT_data'
+
+#echo 'tar -xJf ../eosDT_SCVH_data.tar.xz'
+#tar -xJf ../eosDT_SCVH_data.tar.xz
+#check_okay
+
+rm -rf eosDT_data
+check_okay
+
+echo 'tar -xJf eosDT_data.tar.xz'
+tar -xJf eosDT_data.tar.xz
+check_okay
+
+mkdir -p ../data/eosDT_data
+check_okay
+
+mv eosDT_data/*.data ../data/eosDT_data
+check_okay
+
+#mv data/eosDT_SCVH_data/*.data ../data/eosDT_data
+#check_okay
+
+mkdir -p ../data/eosDT_data/cache
+check_okay
+
+tar -xJf helm_table.dat.tar.xz -C ../data/eosDT_data
+check_okay
+

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cp data/chem_data/isotopes.data ../data/isotopes.data
+
+
+echo "**************"
+echo "**************"
+echo "next step is"
+echo "cd .. ; ./build_data_and_export"
+echo "**************"
+echo "**************"

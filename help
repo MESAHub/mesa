@@ -1,0 +1,38 @@
+#!/bin/sh
+
+echo
+echo "*** Copy and paste the following information into your email to mesa-users ***"
+echo
+
+echo 'MESA Version'
+cat "$MESA_DIR/data/version_number"
+echo
+
+echo 'uname -a'
+uname -a
+echo
+
+echo 'gfortran -v'
+gfortran -v
+echo
+
+echo '$MESASDK_ROOT'
+echo "$MESASDK_ROOT"
+echo
+
+echo 'MESASDK version'
+if [ -f "$MESASDK_ROOT/bin/mesasdk_version" ]
+then
+    "$MESASDK_ROOT/bin/mesasdk_version"
+else
+    echo "MESASDK not setup"
+fi
+echo
+
+echo '$PATH'
+echo "$PATH"
+echo
+
+echo '$MESA_DIR'
+echo "$MESA_DIR"
+echo

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+# check if can skip inlist_start
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_noh_start.mod noh_start.mod
+else
+   do_one inlist_start_header noh_start.mod
+   cp noh_start.mod standard_noh_start.mod
+fi
+
+do_one inlist_noh_riemann_header done_with_noh.mod
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'
+

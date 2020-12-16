@@ -1,0 +1,38 @@
+GYRE
+====
+
+This directory contains the GYRE oscillation code suite. A full
+description of GYRE, plus tools and documentation, can be found at:
+
+http://www.astro.wisc.edu/~townsend/gyre/
+
+Using GYRE within MESA
+======================
+
+GYRE is used internally by MESA's astero module to calculate stellar
+eigenfrequencies; this capability is enabled by setting
+
+USE_GYRE = yes
+
+in mesa/utils/makefile_header, and then building MESA as usual (i.e.,
+running ./install in mesa)
+
+Using GYRE Stand-alone
+======================
+
+GYRE can also be run in stand-alone mode, reading stellar models
+produced by MESA (or other evolution codes) from file. Details on how
+to do this are given at the website referenced above.
+
+** IMPORTANT NOTE **
+
+The full source code for the GYRE suite is provided in the gyre
+subdirectory; there's no need to download it again from the
+website. When following the instructions on the website, you should
+set the GYRE_DIR environment variable to point to $MESA_DIR/gyre/gyre.
+
+Support, FAQs
+=============
+
+Please direct all questions, comments, requests for support to the
+GYRE forums, linked to on the website.

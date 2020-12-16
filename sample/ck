@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		echo "FAILED"
+		echo
+		exit 1
+	fi
+}
+
+./rn > tmp.txt
+# run twice to avoid problems with cache reports
+./rn > tmp.txt
+check_okay
+diff -b tmp.txt test_output

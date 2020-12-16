@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+
+mkdir -p data
+cd data
+check_okay
+cd ..
+
+rm -rf ../data/colors_data
+check_okay
+mkdir ../data/colors_data
+check_okay
+cp data/lcb98cor.dat ../data/colors_data
+cp data/blackbody_johnson.dat ../data/colors_data
+check_okay
+echo "done"
+
+cd ..

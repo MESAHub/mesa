@@ -1,0 +1,22 @@
+#!/bin/bash
+
+function do_one {
+    COUNT=$((COUNT+1))
+    if [ -z "$IDS" ]
+    then
+        echo "${COUNT} $1"
+    else
+        for ID in "${IDS[@]}"
+        do
+            if [ "$COUNT" == "$ID" ]
+            then
+                echo "$1"
+            fi
+        done
+    fi
+}
+
+COUNT=0
+IDS=( "$@" )
+source do1_test_source
+

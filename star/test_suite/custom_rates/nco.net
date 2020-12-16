@@ -1,0 +1,8 @@
+      
+         include 'basic.net'
+         include 'add_co_burn'
+      
+      add_isos_and_reactions(
+	c14
+	o18
+	)

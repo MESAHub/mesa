@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+# check if can skip building starting model
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_zams_0.040_1.30.mod zams_0.040_1.30.mod
+else
+   do_one inlist_zams_header zams_0.040_1.30.mod
+   cp zams_0.040_1.30.mod standard_zams_0.040_1.30.mod
+fi
+
+do_one inlist_1.3M_ms_high_Z_header final.mod
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished'

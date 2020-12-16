@@ -1,0 +1,39 @@
+!
+! 206 isotope network. extra nice for pre-sn models.
+! last tuned: 01de2015 fxt
+!
+add_isos_and_reactions(
+ neut        ! neutron	   
+ h  1 2	     ! hydrogen	   
+ he 3 4	     ! helium	   
+ li 6 7	     ! lithium	   
+ be7     ! beryllium   
+ be  9 10    ! beryllium   
+ b8     ! boron	   
+ b 10 11     ! boron 
+ c 12 13     ! carbon	          
+ n 13 16     ! nitrogen	   
+ o 14 19     ! oxygen	   
+ f 17 20     ! fluorine	   
+ ne 18 23    ! neon	   
+ na 21 24    ! sodium	   
+ mg 23 27    ! magnesium   
+ al 25 28    ! aluminum	   
+ si 27 33    ! silicon	   
+ p 30 34     ! phosphorus  
+ s 31 37     ! sulfur	   
+ cl 35 38    ! chlorine	   
+ ar 35 41    ! argon	   
+ k 39 44     ! potassium   
+ ca 39 49    ! calcium	   
+ sc 43 51    ! scandium	   
+ ti 43 54    ! titanium	   
+ v 47 56     ! vanadium	   
+ cr 47 58    ! chromium	   
+ mn 51 59    ! manganese   
+ fe 51 66    ! iron	   
+ co 55 67    ! cobalt	   
+ ni 55 68    ! nickel	   
+ cu 59 66    ! copper	   
+ zn 59 66    ! zinc        
+            )

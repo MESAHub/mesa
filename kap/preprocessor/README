@@ -1,0 +1,127 @@
+The preprocessor sources files are in src and the makefile is in make.
+Do ./clean; ./mk to create the executable.
+Run the preprocessor by using one of the rn* scripts.
+Typically, you'll just want to rebuilt everything -- use the ./rebuild_all script for that.
+For testing, you can edit the rn_test script to do a single kap file.
+
+The preprocessor is controlled by inlists.   
+At the time of writing (Oct, 2013) we use the following inlists:
+
+   inlist_OP_a05+Ne
+   inlist_OP_a09
+   inlist_OP_a09_Przybilla
+   inlist_OP_gs98
+   inlist_a05+Ne
+   inlist_a09
+   inlist_gn93
+   inlist_gn93_CO
+   inlist_gs98
+   inlist_gs98_aFe_m2
+   inlist_gs98_aFe_p2
+   inlist_gs98_aFe_p3
+   inlist_gs98_aFe_p4
+   inlist_gs98_aFe_p4_CO
+   inlist_gs98_aFe_p6
+   inlist_gs98_aFe_p8
+   inlist_lowT_Freedman11
+   inlist_lowT_af94_gn93
+   inlist_lowT_fa05_a09
+   inlist_lowT_fa05_a09_aFe_p3
+   inlist_lowT_fa05_ags04
+   inlist_lowT_fa05_gn93
+   inlist_lowT_fa05_gs98
+   inlist_lowT_fa05_gs98_aFe_m2
+   inlist_lowT_fa05_gs98_aFe_p2
+   inlist_lowT_fa05_gs98_aFe_p4
+   inlist_lowT_fa05_gs98_aFe_p6
+   inlist_lowT_fa05_gs98_aFe_p8
+
+The inlists give information about the location of the input data,
+and the specifications for the output.  
+For example, here's the contents of inlist_OP_a09:
+
+      data_dir = 'kap_input_data/OP'
+      OP_file = .true.
+      type1_table = 'A09.OP17'
+      logR_min = -8.00d0
+      logR_max = 1.00d0
+      logR_points = 37
+      logT_file = 'logT_points_highT_8.0'
+      output_dir = 'data/kap_data'
+      table_prefix = 'OP_a09'
+      header_info = 'fixed metal distribution -- based on Asplund, Grevesse, Sauval, and Scott (2009) solar abundances'
+      table_version = 36
+
+Each of these inlists appears in the rebuild_add script in a line like this:
+
+   do_one inlist_OP_a09
+   
+The input data lives in a subdirectory of the kap/preprocessor/kap_input_data directory.
+The 'data_dir' entry in the inlist gives the path, and the 'type1_table' entry gives the filename.
+So the input data for OP_a09 is in the file kap_input_data/OP/A09.OP17.
+The kap_input_data is distributed in the mesa download as a tar.xz file.
+If you add to the kap_input_data files, rerun the build_kap_input_tar script.
+
+To add a new set of opacity tables, 
+put the input data files in the right subdirectory in kap_input_data,
+create a new inlist, and 
+a line for the inlist to the rebuild_all script,
+then run ./rebuild_all
+
+At the end of rebuild_all, it will tell you to run ./build_4_export
+Do that -- it will create kap_data.tar.xz
+
+At the end of build_4_export, it will tell you to do 
+   cd .. ; ./build_data_and_export
+   
+Do that -- it will unpack and install the new mesa kap tables.
+
+Now check the new data by making plots.
+Edit the file mesa/kap/test/src/plot_kap.f to tell it which opacities to plot by setting kappa prefix strings.
+Edit kap/test/src/test_kap_support to set the composition and logT, logRho bounds for the plot.
+For composition, here's an example for doing Type1 opacities:
+   xh = 0.30d0
+   Z = 0.02d0
+   XC = 0.0
+   XN = 0.0
+   XO = 0.0
+   XNe = 0.0
+   Zbase = -1
+
+and here's an example for Type2 where you need to give zbase, xc, and xo.
+   z =    2.67d-2
+   zbase = 1d-5
+   xh =    2.8d-2
+   xc =    2d-3
+   xo =    3.56d-3
+   
+Set the bounds for the plot like this:
+   logT_max = 10.2d0
+   logT_min = 1.7d0
+   logRho_max = 11d0
+   logRho_min = -11d0
+
+And set the resolution like this:
+   logT_points = 101
+   logRho_points = 101
+
+The do ./mk to rebuild the plotter and ./plotter to run it.
+That will give terminal output like this
+ kappa_file_prefix gs98
+ kappa_lowT_prefix lowT_fa05_gs98
+ write data for opacity plots to plot_data
+           1
+           2
+           3
+           4
+           5
+           6
+and it will store files in the test/plot_data directory.
+
+I make plots from that data using the tioga script kap/test/kap.rb
+You can edit the "logK_with_contours" in that to set the range for the colormap.
+        z_lower = -6.7
+        z_upper = 9
+
+
+

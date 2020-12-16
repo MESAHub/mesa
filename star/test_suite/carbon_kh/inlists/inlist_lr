@@ -1,0 +1,6 @@
+&controls
+
+  ! LR
+  time_delta_coeff = 1d0
+
+/ ! end of controls namelist

@@ -1,0 +1,80 @@
+
+&star_job
+
+  show_log_description_at_start = .false. 
+
+  load_saved_model = .true.
+  saved_model_name = 'zams.mod'
+
+  save_model_when_terminate = .true.
+  save_model_filename = 'final.mod'
+  required_termination_code_string = 'xa_central_lower_limit'
+
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+  set_initial_age = .true.
+  initial_age = 0
+
+  set_initial_cumulative_energy_error = .true.
+  new_cumulative_energy_error = 0d0
+
+/ !end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+
+&kap
+      Zbase = 0.02
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 200  
+
+      initial_z = 0.02
+      
+      calculate_Brunt_N2 = .true.
+
+     ! GYRE output controls
+
+     x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+     x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+     x_integer_ctrl(2) = 2 ! max number of modes to output per call
+     x_logical_ctrl(2) = .false. ! output eigenfunction files
+
+     x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+        ! should match gyre.in mode l
+     x_integer_ctrl(4) = 1 ! order
+     x_ctrl(1) = 0.2d-3 ! freq ~ this (Hz)
+     x_ctrl(2) = 1d99 ! growth < this (days)
+     
+
+  ! starting specifications
+    initial_mass = 1 ! in Msun units
+
+  ! stop when the center mass fraction of h1 drops below this limit
+    xa_central_lower_limit_species(1) = 'h1'
+    xa_central_lower_limit(1) = 1d-3
+
+   use_dedt_form_of_energy_eqn = .true.
+   
+    
+  ! output
+
+   num_trace_history_values = 2
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist

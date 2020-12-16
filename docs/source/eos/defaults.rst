@@ -1,0 +1,314 @@
+eos module controls
+===================
+
+The MESA/eos parameters are given default values here.
+The actual values as modified by your inlist are stored in the EoS_General_Info data structure.
+They can be accessed by code at runtime using the eos_handle to get a pointer to it.
+
+
+PC EOS controls
+---------------
+
+use_PC
+~~~~~~
+Select whether to use the PC eos.
+::
+
+   use_PC = .true.
+
+mass_fraction_limit_for_PC
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Only consider isotopes in the EOS if their mass fraction is above this value.
+::
+
+   mass_fraction_limit_for_PC = 1d-4
+
+logRho1_PC_limit
+~~~~~~~~~~~~~~~~
+logRho2_PC_limit
+~~~~~~~~~~~~~~~~
+Blend in logRho from no PC for below ``logRho1_PC_limit``
+to all PC above ``logRho2_PC_limit``.
+::
+
+   logRho1_PC_limit = 2.999d0 ! keep < logRho2_OPAL_SCVH_limit
+   logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
+
+
+logT1_PC_limit
+~~~~~~~~~~~~~~
+logT2_PC_limit
+~~~~~~~~~~~~~~
+Blend in logT from all PC for below ``logT1_PC_limit``
+to no PC above ``logT2_PC_limit``.
+Unused by default.  See subsequent controls.
+::
+
+   logT1_PC_limit = 7.6d0 ! okay for pure PC for logT < this (like logT_all_OPAL)
+   logT2_PC_limit = 7.7d0 ! don't use PC for logT > this (like logT_all_HELM)
+
+PC_use_Gamma_limit_instead_of_T
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+log_Gamma_e_all_HELM
+~~~~~~~~~~~~~~~~~~~~
+log_Gamma_e_all_PC
+~~~~~~~~~~~~~~~~~~
+
+If ``PC_use_Gamma_limit_instead_of_T`` is true, then these
+controls are active instead of ``logT1_PC_limit`` and
+``logT2_PC_limit``.  Here, :math:`\Gamma_e` is the electron
+Coulomb coupling parameter.  Blend in log_Gamma_e from no PC for
+below ``log_Gamma_e_all_HELM`` to all PC above
+``log_Gamma_e_all_PC``.
+::
+
+   PC_use_Gamma_limit_instead_of_T = .true.
+   log_Gamma_e_all_HELM = -1.8d0
+   log_Gamma_e_all_PC = -1.7d0
+
+PC_Gamma_start_crystal
+~~~~~~~~~~~~~~~~~~~~~~
+PC_Gamma_full_crystal
+~~~~~~~~~~~~~~~~~~~~~
+
+PC crystallization boundaries.
+Here, :math:`\Gamma` is the mean ion Coulomb coupling parameter.
+::
+
+   PC_Gamma_start_crystal = 170d0
+   PC_Gamma_full_crystal = 180d0
+
+
+FreeEOS controls
+----------------
+
+use_FreeEOS
+~~~~~~~~~~~
+Select whether to use FreeEOS.
+::
+
+   use_FreeEOS = .true.
+
+   logQ_max_FreeEOS_hi = 5.6d0
+   logQ_max_FreeEOS_lo = 5.5d0
+   logQ_min_FreeEOS_hi = -9.9d0
+   logQ_min_FreeEOS_lo = -10.0d0
+
+   logRho_min_FreeEOS_hi = -18.0d0
+   logRho_min_FreeEOS_lo = -18.1d0
+   logRho_max_FreeEOS_hi = 10.1d0
+   logRho_max_FreeEOS_lo = 10.0d0
+
+   logT_min_FreeEOS_hi = 3.1d0
+   logT_min_FreeEOS_lo = 3.0d0
+   logT_max_FreeEOS_hi = 7.7d0 ! for cburn_inward
+   logT_max_FreeEOS_lo = 7.6d0
+
+   logQ_cut_FreeEOS_lo_Z_max = 0.3d0
+   logQ_cut_lo_Z_FreeEOS_hi = 0.5d0
+   logQ_cut_lo_Z_FreeEOS_lo = -0.5d0
+   logQ_cut_hi_Z_FreeEOS_hi = -0.5d0 ! for wd_c_core_ignition
+   logQ_cut_hi_Z_FreeEOS_lo = -1.5d0
+
+   logRho_cut_FreeEOS_hi = -5.5d0 ! for make_zams_low_mass, make_brown_dwarf
+   logRho_cut_FreeEOS_lo = -6.5d0
+
+   logT_cut_FreeEOS_hi = 6.5d0 ! for inlist_cool in make_o_ne_wd
+   logT_cut_FreeEOS_lo = 6.4d0
+
+   suffix_for_FreeEOS_Z(:) = ''
+   suffix_for_FreeEOS_Z(13) = '_CO' ! Z = 0.8
+   suffix_for_FreeEOS_Z(14) = '_CO' ! Z = 0.9
+   suffix_for_FreeEOS_Z(15) = '_CO' ! Z = 1.0
+
+
+OPAL/SCVH controls
+------------------
+
+use_OPAL_SCVH
+~~~~~~~~~~~~~
+Select whether to use the OPAL/SCVH EOS. These two EOSes are pre-blended with each other.
+::
+
+   use_OPAL_SCVH = .true.
+
+   logT_low_all_HELM = 2.2d0 ! HELM for lgT <= this
+   logT_low_all_SCVH = 2.3d0 ! SCVH for lgT >= this
+
+   logT_all_OPAL = 7.5d0 ! OPAL for lgT <= this
+   logT_all_HELM = 7.6d0 ! HELM for lgT >= this
+
+   logRho1_OPAL_SCVH_limit = 3.50d0  ! must be <= 3.7
+   logRho2_OPAL_SCVH_limit = 3.48d0 ! must be < logRho1_OPAL_SCVH_limit
+   logRho_min_OPAL_SCVH_limit = -14.299d0
+
+   logQ_max_OPAL_SCVH = 5.3d0
+   logQ_min_OPAL_SCVH = -8.0d0
+
+   Z_all_OPAL = 0.035d0
+   Z_all_HELM = 0.040d0
+
+
+HELM controls
+-------------
+
+HELM is our backstop EOS.
+Therefore, there is no option that completely deactivates HELM.
+::
+
+   max_logRho_neutral_HELM = -1.5d0
+   logT_ion_HELM = 5.0d0
+   logT_neutral_HELM = 4.5d0
+   coulomb_temp_cut_HELM = -1d99
+   coulomb_den_cut_HELM = -1d99
+   include_radiation = .true.
+   always_skip_elec_pos = .false.
+   always_include_elec_pos = .false.
+
+
+
+Skye controls
+-------------
+
+use_Skye
+~~~~~~~~
+Select whether to use the Skye EOS. (EXPERIMENTAL)
+::
+
+   use_Skye = .false.
+
+mass_fraction_limit_for_Skye
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Only consider isotopes in the EOS if their mass fraction is above this value.
+::
+
+   mass_fraction_limit_for_Skye = 1d-4
+
+
+CMS controls
+------------
+
+use_CMS
+~~~~~~~
+Select whether to use the CMS EOS. (EXPERIMENTAL)
+::
+
+   use_CMS = .false.
+
+   max_Z_for_any_CMS = -1
+   max_Z_for_all_CMS = -1
+   logQ_max_for_any_CMS = -1
+   logQ_max_for_all_CMS = -1
+   logQ_min_for_any_CMS = -1
+   logQ_min_for_all_CMS = -1
+   logRho_max_for_all_CMS = -1
+   logRho_max_for_any_CMS = -1
+   logRho_min_for_all_CMS = -1
+   logRho_min_for_any_CMS = -1
+   logT_max_for_all_CMS = -1
+   logT_max_for_any_CMS = -1
+   logT_min_for_all_CMS = -1
+   logT_min_for_any_CMS = -1
+   logT_max_for_all_CMS_pure_He = -1
+   logT_max_for_any_CMS_pure_He = -1
+
+
+eosPT controls
+--------------
+choose which component EOSes to use with eosPT
+::
+
+   use_max_SCVH_for_PT = .false.
+   use_max_CMS_for_PT = .false.
+
+Miscellaneous controls
+----------------------
+::
+
+   eosDT_use_linear_interp_for_X = .false.
+   eosDT_use_linear_interp_to_HELM = .false.
+   eosDT_file_prefix = 'mesa'
+   eosPT_file_prefix = 'mesa'
+   okay_to_convert_ierr_to_skip = .true.
+   tiny_fuzz = 1d-6
+
+
+Debugging controls
+------------------
+::
+
+   dbg = .false.
+   logT_lo = -1d99
+   logT_hi = 1d99
+   logRho_lo = -1d99
+   logRho_hi = 1d99
+   X_lo = -1d99
+   X_hi = 1d99
+   Z_lo = -1d99
+   Z_hi = 1d99
+
+Extra inlist controls
+---------------------
+
+One can split an eos inlist into pieces using the following parameters.
+It works recursively, so the extras can read extras too.
+
+
+read_extra_eos_inlist1
+~~~~~~~~~~~~~~~~~~~~~~
+extra_eos_inlist1_name
+~~~~~~~~~~~~~~~~~~~~~~
+
+If ``read_extra_eos_inlist1`` is true, then read &eos from the file ``extra_eos_inlist1_name``.
+::
+
+      read_extra_eos_inlist1 = .false.
+      extra_eos_inlist1_name = 'undefined'
+
+
+read_extra_eos_inlist2
+~~~~~~~~~~~~~~~~~~~~~~
+extra_eos_inlist2_name
+~~~~~~~~~~~~~~~~~~~~~~
+
+If ``read_extra_eos_inlist2`` is true, then read &eos from the file ``extra_eos_inlist2_name``.
+::
+
+      read_extra_eos_inlist2 = .false.
+      extra_eos_inlist2_name = 'undefined'
+
+
+read_extra_eos_inlist3
+~~~~~~~~~~~~~~~~~~~~~~
+extra_eos_inlist3_name
+~~~~~~~~~~~~~~~~~~~~~~
+
+If ``read_extra_eos_inlist3`` is true, then read &eos from the file ``extra_eos_inlist3_name``.
+::
+
+      read_extra_eos_inlist3 = .false.
+      extra_eos_inlist3_name = 'undefined'
+
+
+read_extra_eos_inlist4
+~~~~~~~~~~~~~~~~~~~~~~
+extra_eos_inlist4_name
+~~~~~~~~~~~~~~~~~~~~~~
+
+If ``read_extra_eos_inlist4`` is true, then read &eos from the file ``extra_eos_inlist4_name``.
+::
+
+      read_extra_eos_inlist4 = .false.
+      extra_eos_inlist4_name = 'undefined'
+
+
+read_extra_eos_inlist5
+~~~~~~~~~~~~~~~~~~~~~~
+extra_eos_inlist5_name
+~~~~~~~~~~~~~~~~~~~~~~
+
+If ``read_extra_eos_inlist5`` is true, then read &eos from the file ``extra_eos_inlist5_name``.
+::
+
+      read_extra_eos_inlist5 = .false.
+      extra_eos_inlist5_name = 'undefined'

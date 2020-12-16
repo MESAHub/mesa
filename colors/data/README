@@ -1,0 +1,19 @@
+Data providence:
+
+
+lcb98cor.dat:
+Data and paper:
+https://ui.adsabs.harvard.edu/#abs/1998A&AS..130...65L/abstract
+https://ui.adsabs.harvard.edu/#abs/1998yCat..41300065L/abstract
+
+Taking the photon weighted values from:
+http://vizier.cfa.harvard.edu/viz-bin/VizieR-3?-source=J/A%2bAS/130/65/lcb98cor
+
+
+blackbody_johnson.txt:
+Generated from the blackbody.py script
+vega fits data available from:
+STScI
+Filter definitions from:
+http://adsabs.harvard.edu/abs/1990PASP..102.1181B
+

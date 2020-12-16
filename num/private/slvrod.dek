@@ -1,0 +1,400 @@
+c ***********************************************************
+c
+      subroutine slvrod(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
+     &          m1,m2,nm1,fac1,e_1D,lde,ip,dy,ak,fx,ynew,hd,ijob,not_stage1,
+     &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
+     &          decsol,decsols,decsolblk,
+     &          caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk1, uf_dblk1, uf_ublk1,
+     &          nzmax,isparse,ia,ja,sa,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      use mtx_lib
+      implicit none
+      interface
+#include "mtx_decsol.dek"
+#include "mtx_decsols.dek"
+#include "mtx_decsolblk.dek"
+      end interface
+      integer, intent(in) :: caller_id, nvar, nz
+      real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+      real(dp), pointer, dimension(:) :: uf_lblk1, uf_dblk1, uf_ublk1
+      integer :: ia(:) ! (n+1)
+      integer :: ja(:) ! (nzmax)
+      real(dp) :: sa(:) ! (nzmax)
+      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lrd, lid
+      integer :: n, ldjac, mljac, mujac, ldmas, mlmas, mumas, m1, m2, nm1, lde, ijob
+      integer :: ier
+      real(dp) :: fjac(ldjac,n), fmas(ldmas,nm1), dy(n)
+      real(dp) :: fac1, hd, fx(n), ynew(n)
+      logical :: not_stage1
+      real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+      integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+      integer, pointer :: ip(:) ! (nm1)
+      real(dp), pointer :: ak(:)
+      real(dp), pointer :: e_1D(:) ! =(lde,nm1)
+      
+      ! LOCALS
+      integer :: i, j, mm, k, jkm, im1
+      real(dp) :: sum
+      real(dp), pointer :: ptr(:), r1(:)
+      real(dp), target, dimension(nvar*nz) :: x0_ary, b_ary, r_ary, Ax0_ary
+      real(dp), pointer, dimension(:,:) :: ak2, x0, b, r, Ax0
+      real(dp), pointer, dimension(:,:,:) :: uf_lblk, uf_dblk, uf_ublk
+     
+c
+      if (hd.eq.0.d0) then
+         do  i=1,n
+           ak(i)=dy(i)
+         end do
+      else
+         do i=1,n
+            ak(i)=dy(i)+hd*fx(i)
+         end do
+      end if
+      
+!      write(*,*) 'slvrod ijob', ijob
+
+c
+      if (nvar > 0) then
+      
+         if (nvar*nz /= n) stop 'bad nvar*nz /= n'
+      
+         if (not_stage1) then
+            !do  i=1,n
+            !  write(*,*) 'in ak ynew', i, ak(i), ynew(i)
+            !end do
+            do i=1,n
+               ak(i)=ak(i)+ynew(i)
+            end do
+         end if
+
+         !do  i=1,n
+         !  write(*,*) 'in', i, ak(i)
+         !end do
+
+         ak2(1:nvar,1:nz) => ak(1:n)
+         x0(1:nvar,1:nz) => x0_ary(1:n)
+         b(1:nvar,1:nz) => b_ary(1:n)
+         r(1:nvar,1:nz) => r_ary(1:n)
+         Ax0(1:nvar,1:nz) => Ax0_ary(1:n)
+         
+         !do i=1,n
+         !   b_ary(i) = ak(i) ! save initial rhs
+         !end do
+         
+         ! solve A*ak = b
+         call decsolblk(
+     &      1,caller_id,nvar,nz,lblk,dblk,ublk,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         if (ier /= 0) return
+         
+         
+
+         !do  i=1,n
+         !  write(*,*) 'out', i, ak(i)
+         !end do
+         !write(*,*)
+         
+         return
+
+         do i=1,n
+            x0_ary(i) = ak(i) ! save initial solution in x0
+         end do
+         
+         ! find dx s.t. A*(x0+dx) = b
+         ! solve A*dx = b - A*x0
+         ! refined soln x = x0 + dx
+
+         uf_dblk(1:nvar,1:nvar,1:nz) => uf_dblk1(1:nvar*nvar*nz)
+         uf_ublk(1:nvar,1:nvar,1:nz) => uf_ublk1(1:nvar*nvar*nz)
+         uf_lblk(1:nvar,1:nvar,1:nz) => uf_lblk1(1:nvar*nvar*nz)
+         
+         call block_dble_mv(nvar,nz,uf_lblk,uf_dblk,uf_ublk,x0,Ax0) ! Ax0 = A*x0
+         
+         sum = 0
+         do i=1,n
+            r_ary(i) = b_ary(i) - Ax0_ary(i) ! residual
+            sum = sum + abs(r_ary(i))
+         end do
+
+         do  i=1,n
+           write(*,*) 'res', i, r_ary(i)
+         end do
+         write(*,*)
+         return
+         
+         ! solve A*dx = r
+         r1(1:n) => r_ary(1:n)
+         call decsolblk(
+     &      1,caller_id,nvar,nz,lblk,dblk,ublk,r1,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         if (ier /= 0) return
+
+         do i=1,n
+            ak(i) = r_ary(i) + x0_ary(i) ! update solution
+         end do
+         
+         ! check refined solution
+         write(*,*) 'initial sum', sum
+         
+         call block_dble_mv(nvar,nz,uf_lblk,uf_dblk,uf_ublk,ak2,Ax0) ! Ax0 = A*ak
+         
+         sum = 0
+         do i=1,n
+            r_ary(i) = b_ary(i) - Ax0_ary(i) ! error in solution
+            sum = sum + abs(r_ary(i))
+         end do
+         write(*,*) 'refined sum', sum
+         write(*,*)
+
+         return
+      end if
+      
+      goto (1,2,3,4,5,6,55,8,9,55,11,12,13,13,15), ijob
+c
+c -----------------------------------------------------------
+c
+   1  continue
+c ---  b=identity, jacobian a full matrix
+      if (not_stage1) then
+         do i=1,n
+            ak(i)=ak(i)+ynew(i)
+         end do
+      end if
+      
+   !write(*,*) 'rhs(1)', ak(1)
+   !write(*,*) 'rhs(2)', ak(2)
+      call decsol(1,n,lde,e_1D,n,n,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+   !write(*,*) 'ak(1)', ak(1)
+   !write(*,*) 'ak(2)', ak(2)
+   !write(*,*)
+
+      return
+c
+c -----------------------------------------------------------
+c
+   8  continue
+c ---  b=identity, jacobian a sparse matrix
+      if (not_stage1) then
+         do i=1,n
+            ak(i)=ak(i)+ynew(i)
+         end do
+      end if
+      !write(*,*) 'slvrod call decsols'
+      call decsols(1,n,nzmax,ia,ja,sa,ak,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      !write(*,*) 'back decsols'
+      return
+c
+c -----------------------------------------------------------
+c
+   9  continue
+c ---  b is a banded matrix, jacobian a sparse matrix
+      if (not_stage1) then
+      do  i=1,n
+         sum=0.d0
+         do  j=max(1,i-mlmas),min(n,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*ynew(j)
+         end do
+         ak(i)=ak(i)+sum
+      end do
+      end if
+      call decsols(1,n,nzmax,ia,ja,sa,ak,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  11  continue
+c ---  b=identity, jacobian a full matrix, second order
+      write(*,*) 'SLVROD: second order not supported'
+      call mesa_error(__FILE__,__LINE__)
+!      if (not_stage1) then
+!         do i=1,n
+!            ak(i)=ak(i)+ynew(i)
+!         end do
+!      end if
+! 48   mm=m1/m2
+!      do j=1,m2
+!         sum=0.d0
+!         do k=mm-1,0,-1
+!            jkm=j+k*m2
+!            sum=(ak(jkm)+sum)/fac1
+!            do i=1,nm1
+!               im1=i+m1
+!               ak(im1)=ak(im1)+fjac(i,jkm)*sum
+!            end do
+!         end do
+!      end do
+!      ptr(1:n) => ak(m1+1:m1+n)
+!      call decsol(1,nm1,lde,e_1D,nm1,nm1,ptr,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+!      do i=m1,1,-1
+!         ak(i)=(ak(i)+ak(m2+i))/fac1
+!      end do
+!      return
+c
+c -----------------------------------------------------------
+c
+   2  continue
+c ---  b=identity, jacobian a banded matrix
+      if (not_stage1) then
+         !do  i=1,n
+         !  write(*,*) 'in ak ynew', i, ak(i), ynew(i)
+         !end do
+         do i=1,n
+            ak(i)=ak(i)+ynew(i)
+         end do
+      end if
+
+      !do  i=1,n
+      !  write(*,*) 'in', i, ak(i)
+      !end do
+
+      call decsol(1,n,lde,e_1D,mle,mue,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)      
+
+      !do  i=1,n
+      !  write(*,*) 'out', i, ak(i)
+      !end do
+      !write(*,*)
+      return
+c
+c -----------------------------------------------------------
+c
+  12  continue
+c ---  b=identity, jacobian a banded matrix, second order
+      write(*,*) 'SLVROD: second order not supported'
+      call mesa_error(__FILE__,__LINE__)
+!      if (not_stage1) then
+!         do i=1,n
+!            ak(i)=ak(i)+ynew(i)
+!         end do
+!      end if
+!  45  mm=m1/m2
+!      do j=1,m2
+!         sum=0.d0
+!         do k=mm-1,0,-1
+!            jkm=j+k*m2
+!            sum=(ak(jkm)+sum)/fac1
+!            do i=max(1,j-mujac),min(nm1,j+mljac)
+!               im1=i+m1
+!               ak(im1)=ak(im1)+fjac(i+mujac+1-j,jkm)*sum
+!            end do
+!         end do
+!      end do
+!      ptr(1:n) => ak(m1+1:m1+n)
+!      call decsol(1,nm1,lde,e_1D,mle,mue,ptr,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+!      do i=m1,1,-1
+!         ak(i)=(ak(i)+ak(m2+i))/fac1
+!      end do
+!      return
+c
+c -----------------------------------------------------------
+c
+   3  continue
+c ---  b is a banded matrix, jacobian a full matrix
+      if (not_stage1) then
+      do  i=1,n
+         sum=0.d0
+         do  j=max(1,i-mlmas),min(n,i+mumas)
+            sum=sum+fmas(i-j+mbdiag,j)*ynew(j)
+         end do
+         ak(i)=ak(i)+sum
+      end do
+      end if
+      call decsol(1,n,lde,e_1D,n,n,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  13  continue
+c ---  b is a banded matrix, jacobian a full matrix, second order
+      write(*,*) 'SLVROD: second order not supported'
+      call mesa_error(__FILE__,__LINE__)
+!      if (not_stage1) then
+!         do i=1,m1
+!            ak(i)=ak(i)+ynew(i)
+!         end do
+!         do i=1,nm1
+!            sum=0.d0
+!            do j=max(1,i-mlmas),min(nm1,i+mumas)
+!                sum=sum+fmas(i-j+mbdiag,j)*ynew(j+m1)
+!            end do
+!            im1=i+m1
+!            ak(im1)=ak(im1)+sum
+!         end do
+!      end if
+!      if (ijob.eq.14) goto 45
+!      goto 48
+c
+c -----------------------------------------------------------
+c
+   4  continue
+c ---  b is a banded matrix, jacobian a banded matrix
+      if (not_stage1) then
+         do i=1,n
+            sum=0.d0
+            do j=max(1,i-mlmas),min(n,i+mumas)
+               sum=sum+fmas(i-j+mbdiag,j)*ynew(j)
+            end do
+            ak(i)=ak(i)+sum
+         end do
+      end if
+      call decsol(1,n,lde,e_1D,mle,mue,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   5  continue
+c ---  b is a full matrix, jacobian a full matrix
+      if (not_stage1) then
+      do i=1,n
+         sum=0.d0
+         do j=1,n
+            sum=sum+fmas(i,j)*ynew(j)
+         end do
+         ak(i)=ak(i)+sum
+      end do
+      end if
+      call decsol(1,n,lde,e_1D,n,n,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  15  continue
+c ---  b is a full matrix, jacobian a full matrix, second order
+      write(*,*) 'SLVROD: second order not supported'
+      call mesa_error(__FILE__,__LINE__)
+!      if (not_stage1) then
+!         do i=1,m1
+!            ak(i)=ak(i)+ynew(i)
+!         end do
+!         do i=1,nm1
+!            sum=0.d0
+!            do j=1,nm1
+!               sum=sum+fmas(i,j)*ynew(j+m1)
+!            end do
+!            im1=i+m1
+!            ak(im1)=ak(im1)+sum
+!         end do
+!      end if
+!      goto 48
+c
+c -----------------------------------------------------------
+c
+   6  continue
+c ---  b is a full matrix, jacobian a banded matrix
+c ---  this option is not provided
+      if (not_stage1) then
+      do 624 i=1,n
+         sum=0.d0
+         do 623 j=1,n
+  623       sum=sum+fmas(i,j)*ynew(j)
+  624    ak(i)=ak(i)+sum
+      call decsol(1,n,lde,e_1D,mle,mue,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      end if
+      return
+c
+c -----------------------------------------------------------
+c
+  55  continue
+       write(*,*) 'slvrod: invalid ijob', ijob
+       call mesa_error(__FILE__,__LINE__) ! slvrod
+      end subroutine slvrod
+c
+c     end of subroutine slvrod
+c
+c

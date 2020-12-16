@@ -1,0 +1,124 @@
+c
+c ***********************************************************
+c
+      subroutine slvseu(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
+     &          m1,m2,nm1,fac1,e,lde,ip,iphes,del,ijob,
+     &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
+     &          decsol,decsols,decsolblk,
+     &          caller_id, nvar, nz, lblk, dblk, ublk,
+     &          nzmax,isparse,ia,ja,sa,
+     &          lrd,rpar_decsol,lid,ipar_decsol,ier)
+      implicit real*8 (a-h,o-z)
+      interface
+#include "mtx_decsol.dek"
+#include"mtx_decsols.dek"
+#include "mtx_decsolblk.dek"
+      end interface
+      integer, intent(in) :: caller_id, nvar, nz
+      real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+      integer :: ia(:) ! (n+1)
+      integer :: ja(:) ! (nzmax)
+      real(dp) :: sa(:) ! (nzmax)
+      real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+      integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+      integer, intent(out) :: ier
+      real(dp), pointer :: p(:) ! =(n)
+      real(dp), pointer :: del(:) ! =(n)
+      real(dp), pointer :: e(:) ! =(lde,nm1)
+      integer, pointer :: ip(:) ! (nm1)
+      dimension fjac(ldjac,n),fmas(ldmas,nm1)
+      dimension iphes(n)
+c      common/linal/mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag
+c
+
+      ier = 0
+      if (nvar > 0) then
+         call decsolblk(
+     &      1,caller_id,nvar,nz,lblk,dblk,ublk,del,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         return
+      end if
+      
+      goto (1,2,1,2,1,55,55,8,8,55,11,12,11,12,11), ijob
+c
+c -----------------------------------------------------------
+c
+   1  continue
+c ---  b=identity, jacobian a full matrix
+      
+        ! write(*,*) 'rhs(1)', del(1)
+        ! write(*,*) 'rhs(2)', del(2)
+      call decsol(1,n,lde,e,n,n,del,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+        ! write(*,*) 'del(1)', del(1)
+        ! write(*,*) 'del(2)', del(2)
+        ! write(*,*)
+      return
+c
+c -----------------------------------------------------------
+c
+   2  continue
+c ---  b=identity, jacobian a banded matrix
+      call decsol(1,n,lde,e,mle,mue,del,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+   8  continue
+c ---  b=identity, jacobian a sparse matrix
+      call decsols(1,n,nzmax,ia,ja,sa,del,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      return
+c
+c -----------------------------------------------------------
+c
+  11  continue
+c ---  b=identity, jacobian a full matrix, second order
+      mm=m1/m2
+      do j=1,m2
+         sum=0.d0
+         do k=mm-1,0,-1
+            jkm=j+k*m2
+            sum=(del(jkm)+sum)/fac1
+            do i=1,nm1
+               im1=i+m1
+               del(im1)=del(im1)+fjac(i,jkm)*sum
+            end do
+         end do
+      end do
+      p(1:n) => del(m1+1:m1+n)
+      call decsol(1,nm1,lde,e,nm1,nm1,p,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      do i=m1,1,-1
+         del(i)=(del(i)+del(m2+i))/fac1
+      end do
+      return
+c
+c -----------------------------------------------------------
+c
+  12  continue
+c ---  b=identity, jacobian a banded matrix, second order
+      mm=m1/m2
+      do j=1,m2
+         sum=0.d0
+         do k=mm-1,0,-1
+            jkm=j+k*m2
+            sum=(del(jkm)+sum)/fac1
+            do i=max(1,j-mujac),min(nm1,j+mljac)
+               im1=i+m1
+               del(im1)=del(im1)+fjac(i+mujac+1-j,jkm)*sum
+            end do
+         end do
+      end do
+      p(1:n) => del(m1+1:m1+n)
+      call decsol(1,nm1,lde,e,mle,mue,p,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+      do i=m1,1,-1
+         del(i)=(del(i)+del(m2+i))/fac1
+      end do
+      return
+c
+c -----------------------------------------------------------
+c
+  55  continue
+       write(*,*) 'slvseu: invalid ijob', ijob
+       call mesa_error(__FILE__,__LINE__) ! slvseu
+      end subroutine slvseu
+c
+c     end of subroutine slvseu
+c

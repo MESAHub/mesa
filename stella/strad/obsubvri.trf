@@ -1,0 +1,168 @@
+-- _TRACE "@wterm' Lubv=',Lubv,' Nfrus=',Nfrus,"
+
+subroutine ubvnew;
+implicit real*8 (a-h, o-z);
+ _include snrad;
+ _include abo;
+<*var: local variables *>;
+<*data: for transmission functions *>;
+<*zeroflux: the flux from star at zero magnitude *>;
+_define @find
+  " _do i=1, @NPTSX;
+      Lubv=NFREQ;
+      _WHILE Lubv>1 & FREQMN(Lubv) > CCL/@WLX(i) _DO
+         Lubv=Lubv-1;
+      _OD; -- FREQMN(Lubv) <= CCL/@WLX(i) OR Lubv==1
+      indfreq(i,@lband)=Lubv;
+   _od; ";
+_define @flux
+  "  FLXAVG=0.d0;
+     wlstep=(@WLX(2)-@WLX(1))/CCL;
+     sumfhx=0.d0;
+     _do i=2, @NPTSX-1;
+       Lfr=indfreq(i,@lband);
+       FHobs=max(Flsave(Lfr,Lsaved),1.d-100);
+       FHobs1=max(Flsave(Lfr+1,Lsaved),1.d-100);
+        If(Lfr<NFRUS)Then;
+           FHX=EXP(LOG(ABS(FHobs1))+
+               LOG(ABS(FHobs/FHobs1))*DLOGNU(Lfr)*LOG((CCL/@WLX(i))
+                  /FREQMN(Lfr+1)));
+       else;
+         FHX=ABS(FHobs);
+       endif;
+       FHX=FHX*@TX(i)*(CCL/@WLX(i))**5;
+       stepn=(@WLX(i+1)-@WLX(i))/CCL;
+       if (abs(wlstep-stepn)/wlstep < 1.d-4  &  i^=@NPTSX-1) then;
+          sumfhx=sumfhx+FHX;
+       else;
+          FLXAVG=FLXAVG+sumfhx*wlstep+FHX*(wlstep+stepn)/2.d0;
+          wlstep=stepn;
+          sumfhx=0.d0;
+       endif;
+     _od;
+     AMAGX=-2.5D+00 * DLOG10(FLXAVG) + @FX0 + SCALE;
+   ";
+--SCALE=-2.5D0*DLOG10(CFLUX*(RY(NZON-1)*UR/(10.d0*UPC))**2);
+SCALE=-2.5D0*DLOG10(CFLUX*(UR/(10.d0*UPC))**2); -- Ry**2 in Flsav
+freqfind=.false.;
+
+If (^freqfind) then; -- only one time
+  _define @NPTSX NPTSU @WLX WLU @lband 1 ; @find;
+  _define @NPTSX NPTSB @WLX WLB @lband 2 ; @find;
+  _define @NPTSX NPTSV @WLX WLV @lband 3 ; @find;
+  _define @NPTSX NPTSR @WLX WLR @lband 4 ; @find;
+  _define @NPTSX NPTSI @WLX WLI @lband 5 ; @find;
+  freqfind=.true.;
+endif;
+
+_define @NPTSX NPTSU @WLX WLU @FX0 UF0 @TX TU @lband 1 ;@flux; MU=AMAGX;
+_define @NPTSX NPTSB @WLX WLB @FX0 BF0 @TX TB @lband 2 ;@flux; MB=AMAGX;
+_define @NPTSX NPTSV @WLX WLV @FX0 VF0 @TX TV @lband 3 ;@flux; MV=AMAGX;
+_define @NPTSX NPTSR @WLX WLR @FX0 RF0 @TX TR @lband 4 ;@flux; MR=AMAGX;
+_define @NPTSX NPTSI @WLX WLI @FX0 IF0 @TX TI @lband 5 ;@flux; MI=AMAGX;
+
+return; end;
+
+
+
+
+
+%_var:o
+      INTEGER NPTSU, NPTSB, NPTSV, NPTSR, NPTSI;
+      logical debug;
+--
+      PARAMETER(NPTSU=25);
+      PARAMETER(NPTSB=21);
+      PARAMETER(NPTSV=24);
+      PARAMETER(NPTSR=24);
+      PARAMETER(NPTSI=23);
+      PARAMETER(NPTSMAX=25);  -- maximum number of points
+
+      real*8 U0,B0,V0,UF0,BF0,VF0,RF0,IF0;
+      real*8 WLU(NPTSU),TU(NPTSU),WLB(NPTSB),TB(NPTSB),WLV(NPTSV),TV(NPTSV),
+                WLR(NPTSR),TR(NPTSR),WLI(NPTSI),TI(NPTSI);
+
+      real*8 FHX, FLXAVG, AMAGX, SCALE;
+      logical freqfind;
+      integer indfreq;
+      common /ubvwrk/indfreq(NPTSMAX,5), freqfind;
+--      Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
+
+%_data:o
+--      the response functions for UBVRI filters was taken from
+--      Bessell M.S.,PASP 102(1990)1181--1199;
+--      R & I bands are corresponding roughly to the Cousins system
+
+--      DATA freqfind/.false./; -- bad for transportability;
+
+   DATA U0/-0.7263D+00/;
+--
+      DATA WLU/3000., 3050., 3100., 3150., 3200., 3250., 3300., 3350.,
+       3400., 3450., 3500., 3550., 3600., 3650., 3700., 3750.,
+       3800., 3850., 3900., 3950., 4000., 4050., 4100., 4150., 4200./;
+--
+      DATA TU/0.000, 0.016, 0.068, 0.167, 0.287, 0.423, 0.560, 0.673,
+       0.772, 0.841, 0.905, 0.943, 0.981, 0.993, 1.000, 0.989, 0.916,
+       0.804, 0.625, 0.423, 0.238, 0.114, 0.051, 0.019, 0.000/;
+--
+      DATA B0/0.1649D+00/;
+--
+      DATA WLB/3600.,  3700.,  3800.,  3900.,
+       4000.,  4100.,  4200.,  4300.,  4400.,
+        4500.,  4600., 4700.,  4800.,  4900.,  5000.,  5100.,
+         5200.,  5300.,  5400.,  5500., 5600./;
+--
+      DATA TB/0.000, 0.030, 0.134, 0.567, 0.920, 0.978, 1.000, 0.978,
+       0.935, 0.853, 0.740, 0.640, 0.536, 0.424, 0.325, 0.235, 0.150,
+       0.095, 0.043, 0.009, 0.000/;
+--
+      DATA V0/0.0062D+00/;
+--
+      DATA WLV/4700., 4800.,  4900.,  5000.,  5100.,
+        5200.,  5300.,  5400.,  5500.,  5600.,  5700.,  5800.,  5900.,
+        6000.,  6100.,  6200.,  6300.,  6400.,
+       6500.,  6600.,  6700.,  6800.,  6900.,
+        7000./;
+--
+      DATA TV/0.000, 0.030,  0.163,  0.458,  0.780,
+       0.967,  1.000, 0.973, 0.898, 0.792, 0.684, 0.574,
+       0.461, 0.359, 0.270, 0.197, 0.135, 0.081, 0.045, 0.025, 0.017,
+       0.013, 0.009, 0.000/;
+--
+      data WLR/5500., 5600., 5700., 5800., 5900., 6000., 6100., 6200., 6300.,
+               6400., 6500., 6600., 6700., 6800., 6900., 7000., 7100., 7200.,
+               7300., 7400., 7500., 8000., 8500., 9000./;
+--
+      data TR/0.00,  0.23,  0.74,  0.91,  0.98,  1.00,  0.98,  0.96,  0.93,
+              0.90,  0.86,  0.81,  0.78,  0.72,  0.67,  0.61,  0.56,  0.51,
+              0.46,  0.40,  0.35,  0.14,  0.03,  0.00/;
+--
+      data WLI/7000., 7100., 7200., 7300., 7400., 7500., 7600., 7700., 7800.,
+               7900., 8000., 8100., 8200., 8300.,
+               8400., 8500., 8600., 8700., 8800., 8900., 9000., 9100., 9200./;
+--
+      data TI/0.000, 0.024, 0.232, 0.555, 0.785, 0.910, 0.965, 0.985, 0.990,
+              0.995, 1.000, 1.000, 0.990, 0.980,
+              0.950, 0.910, 0.860, 0.750, 0.560, 0.330, 0.150, 0.030, 0.000/;
+
+%_zeroflux:
+--The flux at zero magnitude for the infrared bands was taken from
+-- Wilson, Schwartz, Neugebauer, Harvey and Becklin, 1972, ApJ 177:523-540,
+-- who extrapolated the absolute spectrophotometry of Vega
+-- by Oke and Schild, ApJ 161(1970)1015
+-- using a model atmosphere by Schild, Peterson and Oke.
+--      UF0 = -48.6075 - U0;
+--      BF0 = -48.6075 - B0;
+--      VF0 = -48.6075 - V0;
+-- flux from a star at Earth atmosphere in erg/cm^2/s,
+-- from Allen
+--      UF0 = -13.87;
+--      BF0 = -12.97;
+--      VF0 = -13.74;
+-- The same derived from Eastman program
+-- as 2.5 \lg( c \int (\Phi(\lambda)/\lambda^2) d \lambda ) - 48.6075 + magcorr
+      UF0 = -13.90;
+      BF0 = -13.00;
+      VF0 = -13.72;
+      RF0 = -13.66;
+      IF0 = -14.42;

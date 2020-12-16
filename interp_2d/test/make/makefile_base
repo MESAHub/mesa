@@ -1,0 +1,97 @@
+# This is the makefile for testing the mesa interp_2d library
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+TEST_SRCS = \
+   test_renka790_sg.f test_renka790_db.f \
+   test_akima_sg.f test_akima_db.f \
+   interp_2d_support.f test_interp_2d.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = interp_2d
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = num interp_1d $(LIBS_MATRIX)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lnum -linterp_1d $(LOAD_MATRIX)
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+
+TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+
+all : $(TEST) 
+
+$(TEST) : $(TEST_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+
+$(TEST) : OBJS = $(TEST_OBJS)
+
+$(TEST_DIR)/% :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(TEST) 
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+TEST_COMPILE_LEGACY = $(filter-out -std=f2008, $(TEST_COMPILE))
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE_LEGACY $<
+	@$(TEST_COMPILE_LEGACY) $(FCfixed) $<
+else
+	$(TEST_COMPILE_LEGACY) $(FCfixed) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

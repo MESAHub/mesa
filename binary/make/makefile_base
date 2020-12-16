@@ -1,0 +1,146 @@
+# This is the makefile for the mesa binary library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCE FILES
+
+SRCS = \
+   binary_def.f90 \
+   binary_private_def.f90 \
+	binary_utils.f90 \
+   binary_photos.f90 \
+   binary_jdot.f90 \
+   binary_wind.f90 \
+   binary_mdot.f90 \
+   binary_tides.f90 \
+   binary_edot.f90 \
+   binary_ctrls_io.f90 \
+   binary_irradiation.f90 \
+   binary_history_specs.f90 \
+   binary_history.f90 \
+   binary_evolve.f90 \
+   binary_timestep.f90\
+   binary_ce.f90\
+	binary_job_ctrls_io.f90\
+	binary_do_one_utils.f90\
+   run_binary_support.f90 \
+   binary_lib.f90 \
+   mod_other_rlo_mdot.f90 \
+   mod_other_tsync.f90 \
+   mod_other_sync_spin_to_orbit.f90 \
+   mod_other_mdot_edd.f90 \
+   mod_other_adjust_mdots.f90 \
+   mod_other_accreted_material_j.f90 \
+   mod_other_binary_jdot.f90 \
+   mod_other_binary_wind_transfer.f90 \
+   mod_other_binary_edot.f90 \
+   mod_other_binary_ce.f90 \
+   mod_other_implicit_rlo.f90 \
+   mod_other_binary_extras.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = $(LIBS_MESA_STAR)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libbinary.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) binary_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) binary_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+	@$(CP_IF_NEWER) ../job/*.inc $(MESA_DIR)/include
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+MOD_DEFAULTS_DIR = $(MODULE_DIR)/defaults
+MOD_OTHER_DIR = $(MODULE_DIR)/other
+
+BINARY_INCLUDES = -I$(MOD_DEFAULTS_DIR)
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(BINARY_INCLUDES)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree)
+
+COMPILE_CMD = $(COMPILE)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_OTHER_DIR)
+
+vpath %.f90 $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

@@ -1,0 +1,188 @@
+This file documents free_eos_test,a programme to test the FreeEOS analytical
+partial derivatives by comparing them with the corresponding centred
+numerical differences.
+
+* To build free_eos_test execute in the top of the build tree or else in
+  utils
+
+make check
+
+* To run free_eos_test for a standard case execute
+
+./free_eos_test <free_eos_test.in >& free_eos_test.out_local
+
+  A file of abundances and weights called abund.dat must be in the current
+  directory.
+
+* Here is a line by line analysis of the free_eos_test.in standard version
+  as of 2004-10-14.
+
+  . First line:
+1,1,0.,5.,1.,1.,0.001d0,0.001d0,1.3,3,2,marg(2),arglo(2),arghi(2),deltaarg(2),denslim,tlim,kif, n.b. args depend on kif!
+
+    The string data after the numbers documents (in terse form) the meaning
+    of the numbers.  In this case we only have one density point in our
+    grid; one temperature point in our grid, log10(rho_lo) = 0., log10(T_lo)
+    = 5., log10(rho_hi) = 1. (ignored because there is only one rho point),
+    log10(T_hi) = 1. (ignored because there is only one T point), initial
+    step size used for delta ln rho for centred differences = 0.001, initial
+    step size used for delta ln T for centred differences = 0.001, log10
+    (rho_lim)=1.3, log10(T_lim)=3., and kif=2.  rho_lim and T_lim control
+    what part of the grid is ignored (in this case none) to avoid areas
+    (high rho, low T) where the EOS diverges.  Read the source for more
+    information. The kif value in this line says are input first variable is
+    log10(rho).  It should be consistent with the kif value in the line
+    analyzed below.
+
+  . Second line:
+n
+
+    This is in answer to "use pure element" question.  i.e., n (which is
+    equivalent to no) here means abund.dat will be used rather than a 100
+    per cent abundance of a single element.
+
+  . Third line: 
+3,1,-1,2,ifoption, ifmodified, ifion, kif
+
+    ifoption, ifmodified, and ifion are documented as to overview in
+    ../README and documented completely in minute detail in
+    ../src/free_eos.f.  They control the particular FreeEOS option suite
+    that will be use for the calculation.  kif is documented (as kif_in) in
+    ../src/free_eos.f.  It controls the meaning of the match_variable used
+    in FreeEOS.  In this case (kif=2) it is ln rho. Internally,
+    free_eos_test converts the input log10 rho values in the grid to ln rho
+    values suitable for input to free_eos.
+    
+* Interpretation of free_eos_test output.
+
+  A lot of the details are self-explantory so we will just hit the high
+  spots here.  
+  
+  . Input quantities for the EOS calculation.
+  
+    After giving the FreeEOS version string, and repeating the input from
+    free_eos_test.in, the abundances (X, Y, Z, and zmix vector) and weights
+    as determined from abund.dat, and the calculated eps abundance array,
+    where eps_i = x_i/w_i and x_i are abundances by weight (normalized so
+    their sum is unity), and w_i are the atomic weights of each element.
+    Thus, eps_i is proportional to abundance by number, but the
+    normalization is different.  The 20 elements considered in FreeEOS have
+    the following chemical symbols and atomic numbers: 
+
+     H, He,  C,  N,  O, Ne, Na, Mg, Al, Si,
+     1   2,  6,  7,  8, 10, 11, 12, 13, 14,
+     P,  S, Cl,  A, Ca, Ti, Cr, Mn, Fe, Ni,
+    15, 16, 17, 18, 20, 22, 24, 25, 26, 28
+
+  . Quantities calculated by the EOS at the specified match_variable (= ln
+    rho for this kif=2 case) and ln T grid point.
+
+    psi is the same as the Cox and Guili eta degeneracy parameter.
+    
+    degeneracy is the EFF ln f parameter and its match_variable (ln rho in
+    this case) and ln T derivatives.
+    
+    pressure is ln total pressure and its match_variable and ln T derivatives.
+    
+    density is calculated ln density (a converged quantity that closely
+    matches match_variable in this kif=2 case) and its match_variable and ln
+    T derivatives.
+    
+    energy, enthalpy, and entropy are those thermodynamic quantities and
+    the partial derives of the ln of those quantites with respect to
+    match_variable and ln T.
+    
+    gamma1,gamma2,gamma3 are those adiabatic gradients as defined in CG.
+
+    h2rat,h2plusrat are the fraction of hydrogen abundance consumed by
+    H2 and H2+.
+    
+    fh2,fhe2,fhe3 are the fraction of hydrogen abundance consumed by H+,
+    the fraction of helium abundance consumed by He+, and the fraction
+    of helium abundance consumed by He++.
+    
+    Lambda is the weak-coupling Coulomb parameter.
+    
+    Gamma is the strong-coupling Coulomb parameter =
+      Lambda**(2.d0/3.d0)/3.d0**(1.d0/3.d0)
+      
+    argsave is the match_variable and ln T value of this grid point.
+    
+    funcsave is a repeat of the 18 degeneracy, pressure, density, energy,
+    enthalpy, and entropy values in compact format.
+    
+  . Comparison of analytical derivative and centred difference results for
+    this grid point.
+
+    The id = 1 stanza gives results for the initial step sizes in
+    match_variable and ln T specified in free_eos_test.in, and id = 2, 3, 4,
+    ... divides those step sizes by 10, 100, 1000,... The centred numerical
+    differences are expected to first converge with step size^2 and then
+    after significance loss becomes important than diverge as inverse step
+    size.  So initially the agreement between analytical and centred
+    difference results should improve by a factor of 100 for each increase
+    in id, then after an optimal step size is reached giving the best
+    agreement with analytical results get worse by a factor of 10 for each
+    increase in id.
+    
+    Here is a typical id stanza near the optimal step size for most
+    parameters.
+
+ id =          4
+ 1  1 -3.63E-11 12
+ 1  2  2.06E-11 10
+ 1  3 -4.15E-10 27
+ 1  4  6.76E-09 10
+ 1  5 -7.94E-09 10
+ 1  6 -6.35E-11 10
+ 2  1 -2.18E-10 12
+ 2  2  1.01E-07 10
+ 2  3  1.00E+30 20
+ 2  4 -8.26E-09 11
+ 2  5  2.32E-09 11
+ 2  6 -7.19E-08 10
+ 
+The four columns give (1) the index of the variable being changed
+(match_variable = 1 and ln T = 2); (2) the index of the thermodynamic
+function being differenced in the same order as funcsave (that is,
+degeneracy = 1, pressure = 2, density = 3, energy = 4, enthalpy = 5, entropy
+= 6); the relative difference between the analytical derivative calculated
+by free_eos and the corresponding derivative calculated by centred numerical
+differences; and the expected number of significant digits in the results
+under ideal conditions considering you are taking differences of closely
+similar quantities to get the derivative calculated with centred
+differences.  
+
+The relative difference is set to 1.00E+30 by free_eos_test to signal when
+some calculation cannot be done reliably using centred numerical
+differences. For example, for the 2,3 case above, we are attempting to find
+the partial derivate of ln rho with respect to ln t holding match_variable =
+ln rho constant.  The analytical result = 0, of course, but the ratio of the
+numerical difference result to that zero analytical result cannot be
+calculated.
+
+The good results above indicate that for one of the more difficult EOS
+calculations at log rho = 0 and log T = 5 (corresponding to conditions that
+occur in the envelopes of extreme LMS models), most centred difference
+results confirm the derivation and programming of the analytical derivatives
+to generally 1 part in 10^9 or better.  And when there are some apparent
+exceptions to this result (e.g. the 2 2 result of 1.01E-07) it turns out
+there are other more optimal centred difference step sizes (e.g., id = 2
+where the 2 2 result is -5.88E-11) that give much better results for that
+case.
+
+In the case of the entropy, those analytical partial derivative results are
+derived directly from the expression for the entropy.  However, for the
+energy and enthalpy, the FreeEOS implementation does not directly calculate
+the analytical derivatives.  Instead, thermodynamic consistency arguments
+are used to calculate the analytical partial derivatives.  Thus, the good
+results above for the energy and entropy derivatives (the 4th and 5th
+functions) are additional confirmation of the thermodynamic consistency of
+the EOS solution although an even more stringent test is provided by
+comparing the analytical partial derivatives of the entropy that are
+calculated directly (as above) with the same quantities calculated with
+thermodynamic consistency arguments.  For that latter test it appears there
+are something like 12 significant digits of thermodynamic consistency in the
+FreeEOS results which is consistent with the known numerical precision of
+the results (as determined by comparing results on various floating-point
+platforms as discussed in the ../README file). 

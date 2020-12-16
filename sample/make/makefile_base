@@ -1,0 +1,106 @@
+# This is the sample makefile for using a mesa module
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+TEST_SRCS = sample.f
+
+EOS_CORR_SRCS = eos_correction.f
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_OTHER = net eos kap rates chem $(LIBS_MESA_NUMERICS)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lnet -leos -lkap -lrates -lchem $(LOAD_MESA_NUMERICS)
+
+#################################################################
+#
+# TARGETS
+
+TEST_DIR = ..
+
+TEST = $(TEST_DIR)/test
+EOS_CORR = $(TEST_DIR)/eoscorr
+
+TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+EOS_CORR_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(EOS_CORR_SRCS)))
+
+all: $(EOS_CORR) $(TEST)
+
+$(TEST) : $(TEST_OBJS) $(DEPS_OTHER)
+$(EOS_CORR) : $(EOS_CORR_OBJS) $(DEPS_OTHER)
+
+$(TEST) : OBJS = $(TEST_OBJS)
+$(EOS_CORR) : OBJS = $(EOS_CORR_OBJS)
+
+# We need to do this as the test code does not live in a test/ so the relative paths
+# in LD_FLAGS do not work. Normal folders with a test/ folder should use $(LD_FLAGS)
+ifeq ($(USE_SHARED), YES)
+	LDFLAGS = -Wl,-rpath=make:../lib
+endif
+
+$(TEST_DIR)/% :
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER) $(LDFLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_OTHER) $(LDFLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod .depend $(TEST) $(EOS_CORR)  *.smod
+
+install:
+	@:
+
+#################################################################
+#
+# COMPILATION RULES
+
+MY_FC_FLAGS = $(FCfree)
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo FC $<
+	@$(FC) $(FCbasic) $(MY_FC_FLAGS) -I$(MESA_INCLUDE_DIR) -c $<
+else
+	$(FC) $(FCbasic) $(MY_FC_FLAGS) -I$(MESA_INCLUDE_DIR) -c $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = ../src
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif
+

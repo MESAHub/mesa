@@ -1,0 +1,15 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+cd atm_data
+check_okay
+cd ..
+
+./export_data
+check_okay

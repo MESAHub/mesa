@@ -1,0 +1,52 @@
+This is based on the 2010 version of ADIPLS with some small modifications to make it work with mesa/star.
+
+When you install mesa, ADIPLS is installed as a library that can be used directly with mesa/star.
+(see the adipls/test directory for an example of this.)
+
+
+If you also want to use ADIPLS "stand-alone" without the links to mesa/star, simply follow
+the instructions in adipack.c/README
+
+
+
+
+------
+
+
+the following notes are to remind me of the changes I made to the standard ADIPLS download.
+
+
+
+download tar files adipack, models, red-giant, star
+unpack in ADIPLS directory
+replace 3 makefiles by my versions
+   adipls/makefile
+   adiajobs/makefile
+   adiajobs/sr/makefile
+copy my user_adi.c.d.f to adipls
+remove routines spcout_adi, modmod, and resdif from setups_adi.c.d.f (or just copy my version)
+
+cd adipls; make
+cd adiajobs; make
+
+edit startup file -- something like this
+setenv PATH /Users/bpaxton/ADIPLS/adipack.c/bin:$PATH
+setenv aprgdir '/Users/bpaxton/ADIPLS/adipack.c'
+
+test it following the instructions in readme
+
+cd models
+scan-amdl.d amdl.l5bi.d.15
+redistrb.d redistrb.in
+adipls.c.d adipls.c.in
+freqdif.d freqdif.in
+
+adipack.c/gensr/ofiles.c.f
+adipack.c/gensr/ofiles.f
+	     call system_clock(itime)
+        !itime = time()
+
+
+add makefile in gensr (necessary on linux?)
+
+

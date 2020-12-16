@@ -1,0 +1,154 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2012  Bill Paxton
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
+
+      ! search for minimal value of scalar function using nelder-mead simplex algorithm 
+         ! Nelder, J. A. and Mead, R.
+         ! "A Simplex Method for Function Minimization."
+         ! Comput. J. 7, 308-313, 1965.
+      ! there are versions of this in Numerical Recipes under the name "amoeba",
+      ! in Matlab under the name "fminsearch", and in Mathematica as an option for "NMminimize".
+      ! our version has lots of bells and whistles and is, of course, superior to the others. ;)  just kidding.
+
+      subroutine NM_simplex(
+     >      n, x_lower, x_upper, x_first, x_final, f_final,  
+     >      smplx, f, start_from_given_simplex_and_f,
+     >      fcn, x_atol, x_rtol, 
+     >      iter_max, fcn_calls_max,
+     >      centroid_weight_power, enforce_bounds, 
+     >      adaptive_random_search, seed,
+     >      alpha, beta, gamma, delta,
+     >      lrpar, rpar, lipar, ipar,
+     >      num_iters, num_fcn_calls, 
+     >      num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
+         use mod_simplex, only: do_simplex
+         integer, intent(in) :: n ! number of dimensions
+         real(dp), intent(in) :: x_lower(:), x_upper(:), x_first(:) ! (n)
+         real(dp), intent(inout) :: x_final(:) ! (n)
+         real(dp), intent(inout) :: smplx(:,:) ! (n,n+1)
+         real(dp), intent(inout) :: f(:) ! (n+1)
+         logical, intent(in) :: start_from_given_simplex_and_f
+            ! if this is true, use input values of simplex and f
+            ! and do not use x_init.
+         interface
+            include 'num_simplex_fcn.dek'
+         end interface
+         real(dp), intent(in) :: x_atol, x_rtol, centroid_weight_power
+         integer, intent(inout) :: seed
+         real(dp), intent(in) :: alpha, beta, gamma, delta
+         integer, intent(in) :: iter_max, fcn_calls_max
+         logical, intent(in) :: enforce_bounds, adaptive_random_search
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(out) :: f_final
+         integer, intent(out) :: 
+     >      num_iters, num_fcn_calls, ierr, 
+     >      num_fcn_calls_for_ars, num_accepted_for_ars
+         call do_simplex(
+     >      n, x_lower, x_upper, x_first, x_final, f_final,  
+     >      smplx, f, start_from_given_simplex_and_f,
+     >      fcn, x_atol, x_rtol, iter_max, fcn_calls_max,
+     >      centroid_weight_power, enforce_bounds, 
+     >      adaptive_random_search, seed,
+     >      alpha, beta, gamma, delta,
+     >      lrpar, rpar, lipar, ipar, 
+     >      num_iters, num_fcn_calls, 
+     >      num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
+      end subroutine NM_simplex
+      
+      
+      integer function simplex_op_code(info_str, ierr)
+         use mtx_def
+         use utils_lib, only: StrLowCase
+         character (len=*), intent(in) :: info_str
+         integer, intent(out) :: ierr
+         character (len=64) :: option
+         ierr = 0
+         option = StrLowCase(info_str)
+         
+         if (option == 'initial') then
+            simplex_op_code = simplex_initial
+            
+         else if (option == 'reflect') then
+            simplex_op_code = simplex_reflect
+            
+         else if (option == 'expand') then
+            simplex_op_code = simplex_expand
+            
+         else if (option == 'inside') then
+            simplex_op_code = simplex_inside
+            
+         else if (option == 'outside') then
+            simplex_op_code = simplex_outside
+            
+         else if (option == 'random') then
+            simplex_op_code = simplex_random
+            
+         else if (option == 'shrink') then
+            simplex_op_code = simplex_shrink
+            
+         else
+            ierr = -1
+            simplex_op_code = -1
+         end if 
+         
+      end function simplex_op_code
+      
+      
+      subroutine simplex_info_str(op_code, info_str, ierr)
+         use mtx_def
+         integer, intent(in) :: op_code
+         character (len=*), intent(out) :: info_str
+         integer, intent(out) :: ierr
+         ierr = 0
+         
+         if (op_code == simplex_initial) then
+            info_str = 'initial'
+            
+         else if (op_code == simplex_reflect) then
+            info_str = 'reflect'
+            
+         else if (op_code == simplex_expand) then
+            info_str = 'expand'
+            
+         else if (op_code == simplex_inside) then
+            info_str = 'inside'
+            
+         else if (op_code == simplex_outside) then
+            info_str = 'outside'
+            
+         else if (op_code == simplex_random) then
+            info_str = 'random'
+            
+         else if (op_code == simplex_shrink) then
+            info_str = 'shrink'
+            
+         else
+            ierr = -1
+            info_str = ''
+         end if 
+         
+      end subroutine simplex_info_str

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+	   echo FAILED
+		exit 1
+	fi
+}
+
+echo 'create eosFreeEOS_data'
+
+rm -rf eosFreeEOS_data
+check_okay
+
+echo 'tar -xJf eosFreeEOS_data.tar.xz'
+tar -xJf eosFreeEOS_data.tar.xz
+check_okay
+
+mkdir -p ../data/eosFreeEOS_data
+check_okay
+
+mv eosFreeEOS_data/*.data ../data/eosFreeEOS_data
+check_okay
+

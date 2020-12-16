@@ -1,0 +1,32 @@
+&model
+/
+
+&mode
+   l = 1
+/
+
+&osc
+   nonadiabatic = .TRUE.
+/
+
+&rot
+/
+
+&num
+   diff_scheme = 'MAGNUS_GL2'
+/
+
+&scan
+   grid_type = 'INVERSE'
+   freq_min = 0.05
+   freq_max = 0.1
+   freq_min_units = 'GRAVITY_DELTA'
+   freq_max_units = 'GRAVITY_DELTA'
+   n_freq = 100
+/
+
+&grid
+   w_osc = 10
+   w_exp = 2
+   w_ctr = 10
+/

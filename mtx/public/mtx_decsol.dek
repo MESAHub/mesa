@@ -1,0 +1,20 @@
+      subroutine decsol(iop,n,ndim,a,ml,mu,b,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
+         use const_def, only: dp
+         integer, intent(in) :: iop, n, ndim, lrd, lid
+            ! iop = 0 means factor
+            ! iop = 1 means solve
+            ! iop = 2 means deallocate
+         integer, intent(in) :: ml
+            ! if ml=n: full matrix.
+            ! if 0<=ml<n: ml is the lower bandwith of matrix
+               ! (>= number of non-zero diagonals below the main diagonal).
+         integer, intent(in) :: mu
+            ! upper bandwith of the matrix (need not be defined if ml=n)
+               ! (>= number of non-zero diagonals above the main diagonal).
+         integer, intent(inout), pointer :: ip(:) ! (n)
+         real(dp), intent(inout), pointer :: a(:) ! =(ndim,n)
+         real(dp), intent(inout), pointer :: b(:) ! (n)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         integer, intent(out) :: ier
+      end subroutine decsol

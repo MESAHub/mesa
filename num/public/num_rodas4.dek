@@ -1,0 +1,344 @@
+
+      ! 4th order implicit ODE integrator
+      
+      ! numerical solution of a stiff (or differential algebraic)
+      ! system of first order ordinary differential equations  my'=f(x, y).
+      ! this is an embedded rosenbrock method of order (3)4  
+      ! (with step size control).
+      ! as originally implemented by E.Hairer (see copyright below)
+      
+      ! this code is part of the book:
+         ! e. hairer and g. wanner, solving ordinary differential
+         ! equations ii. stiff and differential-algebraic problems.
+         ! springer series in computational mathematics 14, 
+         ! springer-verlag 1991, second edition 1996.
+         
+         ! pages 420-422.
+      
+      ! the mesa implementation is thread-safe, 
+      ! so you can run multiple solutions in parallel.
+      
+      subroutine rodas4(
+     >      n, fcn, ifcn, x, y, xend, 
+     >      h, max_step_size, max_steps, 
+     >      rtol, atol, itol, y_min, y_max, 
+     >      jac, ijac, sjac, nzmax, isparse, 
+     >      mljac, mujac, dfx, idfx, 
+     >      mas, imas, mlmas, mumas, 
+     >      solout, iout, 
+     >      decsol, decsols, decsolblk, 
+     >      lrd, rpar_decsol, lid, ipar_decsol,  
+     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >      fcn_blk_dble, jac_blk_dble,
+     >      work, lwork, iwork, liwork, 
+     >      lrpar, rpar, lipar, ipar, 
+     >      lout, idid)
+         
+         use mod_rosenbrock, only:do_rodas4
+         use const_def, only: dp
+         
+         integer, intent(in) :: n ! the dimension of the system
+         
+         interface ! subroutine for computing the value of f(x, y)
+            include "num_fcn.dek"
+            include "num_fcn_blk_dble.dek"
+         end interface
+         integer, intent(in) :: ifcn ! gives information on fcn:
+            ! ifcn=0: f(x, y) independent of x (autonomous)
+            ! ifcn=1: f(x, y) may depend on x (non-autonomous)
+
+         real(dp), intent(inout) :: x 
+            ! input: initial x value
+            ! output: x value for which the solution has been computed.
+         real(dp), intent(inout), pointer :: y(:) ! (n) 
+            ! input: initial values for y
+            ! output: values of y for final value of x.
+         real(dp), intent(in) :: xend ! desired final x value (positive or negative)
+         real(dp), intent(inout) :: h 
+            ! input: initial step size guess
+               ! for stiff equations with initial transient, 
+               ! h=1.d0/(norm of f'), usually 1.d-3 or 1.d-5, is good.
+               ! this choice is not very important, the step size is
+               ! quickly adapted. (if h=0.d0, the code puts h=1.d-6).
+            ! output: predicted step size of the last accepted step
+         real(dp), intent(in) :: max_step_size ! maximal step size.
+            ! max_step_size = 0 defaults to xend-x.
+         integer, intent(in) :: max_steps ! maximal number of allowed steps.
+         
+         ! absolute and relative error tolerances
+         real(dp), intent(in) :: rtol(*) ! relative error tolerance(s)
+         real(dp), intent(in) :: atol(*) ! absolute error tolerance(s)
+         integer, intent(in) :: itol ! switch for rtol and atol
+            ! itol=0: both rtol and atol are scalars.
+               ! error_scale for y(i) is rtol*abs(y(i))+atol
+            ! itol=1: both rtol and atol are vectors.
+               ! error_scale for y(i) is rtol(i)*abs(y(i))+atol(i).
+            ! error = sqrt(sum((yerror/error_scale)**2)/nv)
+            ! the solution is accepted if error is less than 1.
+         real(dp), intent(in) :: y_min 
+            ! trial solution rejected if any component of y < y_min
+         real(dp), intent(in) :: y_max 
+            ! trial solution rejected if any component of y > y_max
+
+         ! information about the jacobian matrix
+         interface ! subroutines for computing the jacobian
+            include "num_jac.dek" ! for dense or banded matrix
+            include "num_jac_blk_dble.dek" ! for double block tridiagonal matrix
+            include "num_sjac.dek" ! for sparse matrix
+         end interface
+         integer, intent(in) :: ijac ! switch for the computation of the jacobian:
+            ! ijac=0: jacobian is computed internally by finite differences.
+            ! ijac=1: jacobian is supplied by subroutine jac or sjac.
+         integer, intent(in) :: nzmax ! determines whether or not have sparse matrix
+            ! if nzmax == 0, matrix is not sparse and jac is called if ijac=1.
+            ! if nzmax > 0, then jacobian is sparse and nzmax is the
+               ! max size required for vectors to hold the nonzero entries in 
+               ! the factored form of the jacobian.  the routines decs and sols
+               ! are used to factor and solve the sparse matrix.
+            ! note: when nzmax > 0, you must have ijac=1, imas=0, and mljac=n. 
+         integer, intent(in) :: isparse ! format of the sparse matrix (if nzmax > 0)
+            ! values are defined in num_def.
+            ! choices are compressed_column_sparse or compressed_row_sparse
+         integer, intent(in) :: mljac
+            ! if mljac=n: jacobian is a full matrix.
+            ! if 0<=mljac<n: mljac is the lower bandwith of jacobian matrix
+               ! (>= number of non-zero diagonals below the main diagonal).
+         integer, intent(in) :: mujac
+            ! upper bandwith of jacobian matrix (need not be defined if mljac=n)
+               ! (>= number of non-zero diagonals above the main diagonal).
+         interface ! subroutine for computing the partials of f(x, y) wrt x
+            ! this routine is only called if idfx=1 and ifcn=1;
+            ! use null_dfx in the case idfx=0 or ifcn=0).
+            include "num_dfx.dek"
+         end interface
+         integer, intent(in) :: idfx ! switch for the computation of df/dx:
+            ! idfx=0: df/dx is computed internally by finite differences, 
+            !        subroutine "dfx" is never called.
+            ! idfx=1: df/dx is supplied by subroutine dfx.
+
+         ! information about the "mass" matrix
+            ! the 1st order ODE that the code solves is of the form M*Y' = F(X, Y)
+            ! with "mass matrix" M.  In many cases, you simply have Y' = F(X, Y), 
+            ! so M is the identity matrix (i.e., explicit form for the derivatives).
+            ! However, the code can deal with arbitrary M's, even singular ones.
+            ! The only restriction is that M must be constant -- it is evaluated
+            ! once at the start of the first step and not again.
+         interface ! subroutine for computing the mass matrix
+            include "num_mas.dek"
+         end interface
+         integer, intent(in) :: imas ! gives information on the mass-matrix:
+            ! imas=0: m is supposed to be the identity matrix, mas is never called.
+            ! imas=1: mass-matrix is supplied.
+         integer, intent(in) :: mlmas
+            ! if mlmas=n: M is a full matrix. the linear
+            !  algebra is done by full-matrix gauss-elimination.
+            ! if 0<=mlmas<n: mlmas is the lower bandwith of M
+               ! (>= number of non-zero diagonals below the main diagonal).
+         integer, intent(in) :: mumas
+            ! upper bandwith of M (need not be defined if mlmas=n)
+               ! (>= number of non-zero diagonals above the main diagonal).
+
+         interface ! subroutine called after each successful step
+            include "num_solout.dek"
+         end interface
+         ! switch for calling the subroutine solout or nor
+         integer, intent(in)  :: iout ! switch for calling the subroutine solout:
+            ! iout=0: subroutine is never called
+            ! iout=1: subroutine is available for output.
+         
+         
+         ! matrix routines
+         interface
+            include "mtx_decsol.dek"
+            include "mtx_decsols.dek"
+            include "mtx_decsolblk.dek"
+         end interface
+         integer, intent(in) :: lrd, lid
+         integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
+         real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
+         integer, intent(in) :: caller_id, nvar, nz
+         real(dp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+         ! row(i) of mtx has lblk(:,:,i), dblk(:,:,i), ublk(:,:,i)
+         ! lblk(:,:,1) is not used; ublk(:,:,nz) is not used.
+            
+         
+         ! work arrays.
+         ! NOTE: call rodas4_work_sizes to values for lwork and liwork.
+         integer, intent(in) :: lwork, liwork
+         real(dp), pointer :: work(:) ! (lwork)
+         integer, pointer :: iwork(:) ! (liwork)
+         ! for standard use, iwork and work must be set to zero before calling.
+         ! only exception is for sophisticated use of special parameters.
+      
+         ! sophisticated setting of parameters
+         ! -----------------------------------
+         !          several parameters of the code are tuned to make it work 
+         !          well. they may be defined by setting work(1), .., work(4)
+         !          as well as iwork(1), iwork(2) different from zero.
+         !          for zero input, the code chooses default values:
+
+         ! iwork(3)  switch for step size strategy
+         !          if iwork(3).eq.1  mod. predictive controller (gustafsson)
+         !          if iwork(3).eq.2  classical approach
+         !          the default value (for iwork(3)=0) is iwork(3)=1.
+
+         !   if the differential system has the special structure that
+         !        y(i)' = y(i+m2)   for  i=1, ..., m1, 
+         !   with m1 a multiple of m2, a substantial gain in computertime
+         !   can be achieved by setting the parameters iwork(9) and iwork(10).
+         !   e.g., for second order systems p'=v, v'=g(p, v), where p and v are 
+         !   vectors of dimension n/2, one has to put m1=m2=n/2.
+         !   for m1>0 some of the input parameters have different meanings:
+         !   - jac: only the elements of the non-trivial part of the
+         !          jacobian have to be stored
+         !          if (mljac.eq.n-m1) the jacobian is supposed to be full
+         !             dfy(i, j) = partial f(i+m1) / partial y(j)
+         !            for i=1, n-m1 and j=1, n.
+         !          else, the jacobian is banded ( m1 = m2 * mm )
+         !             dfy(i-j+mujac+1, j+k*m2) = partial f(i+m1) / partial y(j+k*m2)
+         !            for i=1, mljac+mujac+1 and j=1, m2 and k=0, mm.
+         !   - mljac: mljac=n-m1: if the non-trivial part of the jacobian is full
+         !            0<=mljac<n-m1: if the (mm+1) submatrices (for k=0, mm)
+         !                 partial f(i+m1) / partial y(j+k*m2),  i, j=1, m2
+         !                are banded, mljac is the maximal lower bandwidth
+         !                of these mm+1 submatrices
+         !   - mujac: maximal upper bandwidth of these mm+1 submatrices
+         !            need not be defined if mljac=n-m1
+         !   - mas: if imas=0 this matrix is assumed to be the identity and
+         !          need not be defined. supply a dummy subroutine in this case.
+         !          it is assumed that only the elements of right lower block of
+         !          dimension n-m1 differ from that of the identity matrix.
+         !          if (mlmas.eq.n-m1) this submatrix is supposed to be full
+         !             am(i, j) = m(i+m1, j+m1)     for i=1, n-m1 and j=1, n-m1.
+         !          else, the mass matrix is banded
+         !             am(i-j+mumas+1, j) = m(i+m1, j+m1)
+         !   - mlmas: mlmas=n-m1: if the non-trivial part of m is full
+         !            0<=mlmas<n-m1: lower bandwidth of the mass matrix
+         !   - mumas: upper bandwidth of the mass matrix
+         !            need not be defined if mlmas=n-m1
+
+         ! iwork(9)  the value of m1.  default m1=0.
+         ! iwork(10) the value of m2.  default m2=m1.
+         
+         ! iwork(11) = nerror.
+         !          variables 1 to nerror are used in estimating local errors.
+         !          default n.
+
+         ! work(1)   uround, the rounding unit, default 1.d-16.
+
+         ! work(3), work(4)   parameters for step size selection
+         !          the new step size is chosen subject to the restriction
+         !             work(3) <= hnew/hold <= work(4)
+         !          default values: work(3)=0.2d0, work(4)=3.d0
+
+         ! work(5)   the safety factor in step size prediction, 
+         !          default 0.9d0.
+
+            
+         ! parameter arrays for the caller supplied routines
+         integer, intent(in) :: lrpar, lipar
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+                  
+         ! io unit for warnings and errors
+         integer, intent(in)  :: lout
+            ! if lout > 0, warnings and errors are written to this io unit.
+            ! if lout <= 0, no output is produced.
+         
+         ! result code
+         integer, intent(out)  :: idid
+            ! idid =  1  computation successful, 
+            ! idid =  2  computation successful (terminated by solout)
+            ! idid = -1  input is not consistent, 
+            ! idid = -2  reached max allowed number of steps, 
+            ! idid = -3  step size becomes too small, 
+            ! idid = -4  matrix is repeatedly singular.
+            ! idid = -5  terminated by nonzero ierr.
+         
+         ! statistics
+            !   iwork(14)  nfcn    number of function evaluations (those for numerical
+            !                   evaluation of the jacobian are not counted)  
+            !   iwork(15)  njac    number of jacobian evaluations (either analytically
+            !                   or numerically)
+            !   iwork(16)  nstep   number of computed steps
+            !   iwork(17)  naccpt  number of accepted steps
+            !   iwork(18)  nrejct  number of rejected steps (after at least one step
+            !                   has been accepted)
+            !   iwork(19)  ndec    number of lu-decompositions (n-dimensional matrix)
+            !   iwork(20)  nsol    number of forward-backward substitutions
+
+         ! ****************************************************************************
+         
+         call do_rodas4(
+     >      n, fcn, ifcn, x, y, xend, 
+     >      h, max_step_size, max_steps, 
+     >      rtol, atol, itol, y_min, y_max, 
+     >      jac, ijac, sjac, nzmax, isparse, 
+     >      mljac, mujac, dfx, idfx, 
+     >      mas, imas, mlmas, mumas, 
+     >      solout, iout, 
+     >      decsol, decsols, decsolblk, 
+     >      lrd, rpar_decsol, lid, ipar_decsol,  
+     >      caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk,  
+     >      fcn_blk_dble, jac_blk_dble,
+     >      work, lwork, iwork, liwork, 
+     >      lrpar, rpar, lipar, ipar, 
+     >      lout, idid)
+     
+      end subroutine rodas4
+      
+      
+      ! this subroutine calculates liwork and lwork
+      subroutine rodas4_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
+         integer, intent(in) :: n, nzmax, mljac, mujac, mlmas, mumas, imas
+         integer, intent(out) :: liwork, lwork
+         integer :: ljac, lmas, km, km2, le1
+         
+         if (mljac == n) then
+            ljac = n
+            le1=n
+         else
+            ljac = mljac+mujac+1
+            le1=2*mljac+mujac+1
+         end if
+         
+         if (imas == 0) then
+            lmas = 0
+         else if (mlmas == n) then
+            lmas = n
+         else
+            lmas = mlmas+mumas+1
+         end if
+                  
+         liwork = n + 20 + nzmax + n + 1
+         lwork = n*(ljac+lmas+le1+15)+22 + 2*nzmax
+           
+      end subroutine rodas4_work_sizes
+
+
+! The following is the copyright for rodas4
+
+! Copyright (c) 2004, Ernst Hairer
+
+! Redistribution and use in source and binary forms, with or without 
+! modification, are permitted provided that the following conditions are 
+! met:
+
+! - Redistributions of source code must retain the above copyright 
+! notice, this list of conditions and the following disclaimer.
+
+! - Redistributions in binary form must reproduce the above copyright 
+! notice, this list of conditions and the following disclaimer in the 
+! documentation and/or other materials provided with the distribution.
+
+! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS 
+! IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+! TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+! PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR 
+! CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+! EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+! PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+! LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+! NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+! SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

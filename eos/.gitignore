@@ -1,0 +1,7 @@
+data/*/*.data
+*_data/*.data
+*_builder/eos_input_data/
+*_builder/*_data/
+eosDT_data/COPIES_OF_HIGH_Z_WITH_RADIATION
+
+ceos

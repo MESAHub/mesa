@@ -1,0 +1,64 @@
+      ! Fisker, Schatz, & Thielemann, ApJSS, 174:261-276, 2008.
+      ! "EXPLOSIVE HYDROGEN BURNING DURING TYPE I X-RAY BURSTS"
+      ! Table 1
+      
+      ! 304 species
+      
+      add_isos_and_reactions(
+         neut
+         h  1 3
+      	he 3 4
+         li7
+         be 7 8
+         b8
+         b11
+         c9
+         c 11 12
+         n 12 15
+         o 13 18
+         f 17 19
+         ne 18 21
+         na 20 23
+         mg 21 25
+         al 22 27
+         si 24 30
+         p 26 31
+         s 27 34
+         cl 30 35
+         ar 31 38
+         k 35 39
+         ca 36 44
+         sc 39 45
+         ti 40 47
+         v 43 49
+         cr 44 52
+         mn 47 53
+         fe 48 56
+         co 51 57
+         ni 52 62
+         cu 54 63
+         zn 55 66
+         ga 59 67
+         ge 60 68
+         as 64 69
+         se 65 72
+         br 68 73
+         kr 69 74
+         rb 73 77
+         sr 74 78
+         y 77 82
+         zr 78 83
+         nb 81 85
+         mo 82 86
+         tc 85 88
+         ru 86 91
+         rh 89 93
+         pd 90 94
+         ag 94 98
+         cd 95 99
+         in 98 104
+         sn 99 105
+         sb106
+         te107
+         )
+         

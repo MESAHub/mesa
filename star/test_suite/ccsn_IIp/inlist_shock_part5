@@ -1,0 +1,146 @@
+
+&star_job
+
+  load_saved_model = .true.
+  saved_model_name = 'shock_part4.mod'
+
+  save_model_when_terminate = .true.
+  save_model_filename = 'shock_part5.mod'
+  required_termination_code_string = 'extras_finish_step'
+
+  seconds_for_initial_dt = 0.1
+  limit_initial_dt = .true.
+
+  pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+  ! limit max_model_number as part of test_suite
+  max_model_number = 15000
+
+  num_trace_history_values = 7
+  trace_history_value_name(1) = 'm_center'
+  trace_history_value_name(2) = 'shock_mass'
+  trace_history_value_name(3) = 'total_energy'
+  trace_history_value_name(4) = 'shock_radius'
+  trace_history_value_name(5) = 'photosphere_r'
+  trace_history_value_name(6) = 'rel_E_err'
+  trace_history_value_name(7) = 'log_rel_run_E_err'
+
+  log_L_upper_limit = 8.8
+
+
+  use_compression_outer_BC = .true.
+
+  split_merge_amr_log_zoning = .false.
+
+  split_merge_amr_nz_baseline = 1600
+
+  split_merge_amr_okay_to_split_nz = .false.
+
+  delta_lgL_limit = 0.01
+
+  x_ctrl(16) = 0.05 ! stop when shock reaches this mass below surface
+  x_ctrl(45) = 0
+  x_ctrl(46) = 90
+  x_ctrl(47) = 0.8
+  x_ctrl(12) = 1d-15
+  x_ctrl(35) = -1d+99
+  x_ctrl(36) = -1d+99
+  x_integer_ctrl(1) = 5
+  x_integer_ctrl(3) = 3
+
+  photo_interval = 25
+
+/ ! end of controls namelist
+
+&pgstar
+  Abundance_xmin = -101
+
+  Mixing_xmin = -101
+
+  Profile_Panels1_xmin = -101
+
+  Profile_Panels1_yaxis_name(1) = 'logT'
+  Profile_Panels1_yaxis_name(2) = 'v_div_csound'
+
+  Profile_Panels1_ymin(2) = 0
+  Profile_Panels1_ymax(2) = -101
+
+  Profile_Panels1_other_yaxis_name(1) = 'entropy'
+  Profile_Panels1_other_yaxis_name(2) = 'csound'
+
+  Profile_Panels1_other_ymin(2) = -101
+  Profile_Panels1_other_ymax(2) = -101
+
+  Profile_Panels2_xmin = -101
+
+  Profile_Panels2_yaxis_name(1) = 'Abundance'
+  Profile_Panels2_yaxis_name(2) = 'luminosity'
+
+  Profile_Panels2_ymin(2) = -101
+
+  Profile_Panels2_other_yaxis_name(2) = 'log_dr_div_cs'
+
+  Profile_Panels2_other_ymin(2) = -101
+
+  History_Track1_title = 'Breakout Light Curve'
+  History_Track1_xname = 'star_age_hr'
+  History_Track1_yname = 'log_L'
+  History_Track1_xaxis_label = 'hours'
+  History_Track1_yaxis_label = 'log L/L\d\(2281)'
+  History_Track1_reverse_xaxis = .false.
+  History_Track1_reverse_yaxis = .false.
+  History_Track1_log_xaxis = .false.
+  History_Track1_log_yaxis = .false.
+
+  Text_Summary1_name(1, 1) = 'model_number'
+  Text_Summary1_name(2, 1) = 'log_star_age'
+  Text_Summary1_name(3, 1) = 'log_dt'
+  Text_Summary1_name(4, 1) = 'log_L'
+  Text_Summary1_name(5, 1) = 'log_Teff'
+  Text_Summary1_name(6, 1) = 'log_R'
+  Text_Summary1_name(7, 1) = 'log_g'
+  Text_Summary1_name(8, 1) = 'log_surf_cell_P'
+  Text_Summary1_name(1, 2) = 'star_mass'
+  Text_Summary1_name(2, 2) = 'log_abs_mdot'
+  Text_Summary1_name(3, 2) = 'he_core_mass'
+  Text_Summary1_name(4, 2) = 'c_core_mass'
+  Text_Summary1_name(5, 2) = 'cz_bot_mass'
+  Text_Summary1_name(6, 2) = 'cz_top_mass'
+  Text_Summary1_name(7, 2) = 'cz_bot_radius'
+  Text_Summary1_name(8, 2) = 'cz_top_radius'
+  Text_Summary1_name(1, 3) = 'log_cntr_T'
+  Text_Summary1_name(2, 3) = 'log_cntr_Rho'
+  Text_Summary1_name(3, 3) = 'log_center_P'
+  Text_Summary1_name(4, 3) = 'center h1'
+  Text_Summary1_name(5, 3) = 'v_div_csound_surf'
+  Text_Summary1_name(6, 3) = 'center c12'
+  Text_Summary1_name(7, 3) = 'center n14'
+  Text_Summary1_name(8, 3) = 'center o16'
+  Text_Summary1_name(1, 4) = 'log_Lnuc'
+  Text_Summary1_name(2, 4) = 'log_Lneu'
+  Text_Summary1_name(3, 4) = 'log_LH'
+  Text_Summary1_name(4, 4) = 'log_LHe'
+  Text_Summary1_name(5, 4) = 'log_LZ'
+  Text_Summary1_name(6, 4) = 'num_zones'
+  Text_Summary1_name(7, 4) = 'num_retries'
+  Text_Summary1_name(8, 4) = ''
+
+  Grid2_plot_name(1) = 'TRho_Profile'
+  Grid2_plot_name(2) = 'HR'
+  Grid2_plot_name(3) = 'TRho'
+  Grid2_plot_name(4) = 'History_Track1'
+  Grid2_plot_name(5) = 'Abundance'
+
+
+/ ! end of pgstar namelist

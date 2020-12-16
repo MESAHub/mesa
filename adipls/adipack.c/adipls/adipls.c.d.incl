@@ -1,0 +1,4 @@
+c
+c  defining maximum number of meshpoints
+c
+      parameter(nnmax = 20000)

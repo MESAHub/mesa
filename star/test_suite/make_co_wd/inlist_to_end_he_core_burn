@@ -1,0 +1,76 @@
+! inlist_to_end_he_core_burn
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'end_he_core_burn.mod'
+      required_termination_code_string = 'xa_central_lower_limit'
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 10
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      ! pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 30000
+
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 0.0001
+
+      retry_hold = 0
+      neg_mass_fraction_hold = 3
+
+      x_integer_ctrl(1) = 0 ! part number
+      
+      use_Ledoux_criterion = .false.
+
+! wind
+      cool_wind_full_on_T = 9.99d9
+      hot_wind_full_on_T = 1d10
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5d0  
+      Blocker_scaling_factor = 0.5d0  
+
+! output
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+         
+         Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
+         Profile_Panels3_xmax = 1.5 ! -101d0 ! only used if /= -101d0
+
+/ ! end of pgstar namelist

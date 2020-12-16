@@ -1,0 +1,1344 @@
+_outcom;
+
+--_TRACE "@wterm' depos(1), depos(20)',depos(1),depos(20),"
+-- _TRACE "@wterm' LubvV=',LubvV,' Nfrus=',Nfrus,"
+-- _TRACE "@wterm' Natom=',Natom,"
+-- _TRACE "@wterm' Irph=',Irph,"
+-- _TRACE "@wterm' Lb Hedd(63)=',Hedd(63),"
+-- _TRACE "@wterm' Tp, Pl: =',Tp,Pl,"
+_define @prfr 75
+        @ap  "'"
+_define
+   @V       (CCL/5.5D+03)
+   @B       (CCL/4.4D+03)
+   @U       (CCL/3.65D+03)
+   @freqtau LubvB
+   @tauPH   0.64D0
+   @taurep  0.1d0
+   @tauLIM  0.D0 -- OR:   CFR == (4/3)/(UR*URHO==(Cappa unit)**-1)
+--   @FJ2     Y(NVARS*NZON+(NZON-NCND)*(L-1)-NCND+Km+1,1) --  FJ(Km+1,L)
+--   @FJ1     Y(NVARS*NZON+(NZON-NCND)*(L-1)-NCND+Km,1)   --  FJ(Km,L)
+   @FJ2     Yout(NVARS*NZON+(NZON-NCND)*(L-1)-NCND+Km+1) --  FJ(Km+1,L)
+   @FJ1     Yout(NVARS*NZON+(NZON-NCND)*(L-1)-NCND+Km)   --  FJ(Km,L)
+   @NFJL    NVARS*NZON+(NZON-Ncnd)*(L-1)-Ncnd           -- for FJ(Km,L)
+   @NFHL    NVARS*NZON+(NZON-NCND)*(L-1)-NCND+KRAD      --  for FH(km, L)
+   @L       NVARS*NZON+(NZON-NCND)*L-1+KRAD,1           -- FOR K=NZON-1
+   @L1      NVARS*NZON+(NZON-NCND)*(L+1)-1+KRAD,1
+   @LL       NVARS*NZON+(NZON-NCND)*L-1+KRAD           -- FOR K=NZON-1
+   @LL1      NVARS*NZON+(NZON-NCND)*(L+1)-1+KRAD
+<*L: LOSSEN - LOSSES AND GAINS OF ENERGY *>;
+<*P: PRIBAL - PRINT MODEL & BALANCES *>;
+<*M: PRIMAG - PRINT MAGNITUDES *>;
+%L:o
+SUBROUTINE LOSSEN;
+IMPLICIT REAL*8(A-H,O-Z);
+-- INPUT  RHO,Ty,NREG,Ry,DM,CK1,2,- ARGUMENTS IN COMMONS
+-- OUTPUT  ELTOT,ELVOL,ELSURF,TPSURF IN COM/BAL/
+    _INCLUDEN snrad;
+    _INCLUDEN abo;
+ --_TRACE "@wterm' LubvV=',LubvV,' Nfrus=',Nfrus,"
+    ELVOL=0.D0;
+    _DO I=1,NZON;
+        PL=RHO(I); Tp=Ty(I);
+        CALL VOLEN(I);
+        If(NREG(I)==1)Then;
+            <*E: FIND YDOT & HEATING ENGNUC *>;
+        else;
+           ENGNUC=0.D0;
+        endif;
+        ENG=ENG+ENGNUC;
+        ELVOL=ELVOL+ENG*DM(I);
+    _OD;
+    ELVOL=CK2*ELVOL;
+--  @wterm ' eLvol=',eLvol;
+       Flum=0.D0;
+       _DO L=1,NFRUS;
+         Flum=Flum+Y(@L)*WEIGHT(L) -- FOR I=NZON-1
+       _OD;
+ --      @wterm 'Flum 1=',Flum;
+       Flum=(CLUMF*1.D-50)*Flum*Ry(NZON-1)**2;
+ --      @wterm 'Flum 2=',Flum;
+       ELSURF=Flum/(UEPRI/(UTIME*CRAP));
+ --      @wterm 'Flum=',Flum,'   Ls=',Elsurf;
+ -- CALL URSOS; CALL OPACIT;
+ -- ELSURF=(Ry(NZON))**2/(CAPPA*(DM(NZON)+DMOUT)+CFR*Ry(NZON)**2);
+ -- TPSURF=Ty(NZON)*(ELSURF*CFR)**.25D0;
+ -- ELSURF=CK1*ELSURF*(Ry(NZON)*Ty(NZON))**2*Ty(NZON)**2;
+ -- TEFF=TPSURF*1.189207D0*UTP;
+    ELTOT=ELVOL-ELSURF;
+    RETURN;
+    END;
+%LE:
+    YCARB=1.D0/Y((NVARS-1)*NZON+I,1);--YCINV
+    CALL BURNC;
+    ENGNUC=QNUC*YDOT*YCARB**2;
+%P:o
+--  DEBUG SUBCHK,UNIT(6);ENDDEBUG;
+    SUBROUTINE PRIBAL(IPOUT /*line print interval*/ );
+    IMPLICIT REAL*8(A-H,O-Z);
+    _INCLUDE snrad;
+    _INCLUDE abo; --NVARS-THE NUMBER OF INDEPENDENT VARIABLES
+    <*C:  PARAMETERS & COMMONS *>;
+    Logical fullp,fullgp;
+    <*VPlot: Vars for GPLOT    *>;
+    _Include black;
+    Theta(Z)=0.5D0*(SIGN(1.D0,Z)+1.D0);
+--  DQRGAS=CTOMP*(UR/Utime)**2/(Boltzk*UTp*Avogar)*UR*URHO;;
+    Fullgp=Ipout==0;  -- full print with graphics
+    Fullp =Ipout<=0;  -- full print
+    Lpout=max(abs(ipout),1);
+    <*A: BODY OF PRIBAL *>;
+    RETURN;
+--  ENTRy PRIBUR(IPOUT);  -- PRINT BURNT ZONE NUMBER IPOUT
+--  <*E* PRINT ZONES IPOUT-1, IPOUT, IPOUT+1 *>;
+--  RETURN;
+    <*U: FORMATS*>;
+    END;
+%PC:o
+--  COMMON/IONI/XH,XHEI,XHEII,XP,XCR;
+--    Dimension Xion(Nstage,Natom);
+--    Dimension tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon);
+    Dimension tauzon(Nfreq);
+    Logical LOW,HIGH;
+    COMMON/NIT/Xelow,Xion(0:Nstage,Natom),Nit,LOW,HIGH;
+    REAL*8 BL(NFREQ),FJ(NFREQ),FH(NFREQ);
+    REAL*8 FJL(NFREQ);
+    --Dimension workm(Mzon),Xlow(2),Xup(2);
+    COMMON/CONV/ELMX(Mzon),FLCON(Mzon);
+--    Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
+--    Parameter(NP=@Npe+@Npc-1);   -- Total number of tangent rays
+--    Common/rays/Pray(0:NP+1),fout(0:NP+1,Nfreq);
+    common/phofit/Tphfit,Rphfit;
+    common/corrttt/ ttt(nfreq);
+    Common/out/ tretard,tout,Yout(NYdim); -- for interpolation
+    CHARACTER*120 STR2;
+    character*@prfr symb;
+    Parameter(RADC3=RADC/3.D0);
+    Parameter(FJnois=1.d-30);
+    Parameter(tolIni=1.d-2); -- how large is tolerable initial condition disbalance
+--  Real*4  RTpsi(Mzon),RTchi(Mzon);
+--  Equivalence (RTpsi,WRK),(RTchi,WRK(1,3));
+%P_VPlot:o
+      CHARACTER THD(4)*60,THX(4)*30,THY(4)*30;
+      DIMENSION MX(6),XMN(6),YMX(6),YMN(6),ITYP(6);
+      DATA THD /' Tp  Rho  P  S       ',
+                '           Spectra   ',
+                '               FIG. 3',
+                '               FIG. 4'/;
+      DATA THX /'          Zone Number',
+                '        Freq. group Number',
+                '     Lagr. mass (Solar units)',
+                '        Radius (1.E14 cm)'/;
+      DATA THY /'              LG(Tp D P) ',
+                '              log( J) ',
+                '               LOG(RPH/RSUN)',
+                '                   -MV'/;
+      DATA NHD /  40  /, NHX /  30  /, NHY /  30  /;
+--    DATA ITYP/4*1/;
+--    DATA THDB/' '/,THXB/' '/,THYB/' '/;
+      DATA HTEXT /0.35D0/;
+%PA:
+--    @wterm ' do not forget ubvnew !!!';
+  --  pause;
+    <*H: print head_line : stiff & head of zone output *>;
+    KPRINT=Lpout;  -- step of print
+    <*Pre: prepare
+           balances, arrays and line for zone print & graphics*>;
+    <*W: write integral values *>;
+    -- WRITE(@Wres,*)' fullgp=',fullgp,'   Ipout=',Ipout;
+    _If fullgp _Then
+      <*G: draw graphic *>
+    _Fi;
+%PAH:
+    WRITE(@Wres,'(''%H:'')');
+    WRITE(@Wres,'(''   NSTEP   KFLAG  JSTART  NQUSED    NFUN    NJAC'',
+              ''       N   NFrus    Ncnd'',
+              ''   NITER   NFAIL   NZMOD'')');
+    WRITE(@Wres,'(12I8)') NSTEP,KFLAG,JSTART,NQUSED,NFUN,NJAC,N,NFrus,
+                      Ncnd,NITER,NFAIL,NZM;
+    WRITE(@Wres,'(''  OBS.TIME='',F15.5,'' D   PROPER T='',1P,E15.8,'' S'',
+              ''  STEP USED='',E11.5,
+              ''  STEP TRIED='',E11.5,'' S'')')
+           (tout-tretard)*(UTIME*CRAP)/86400.D0,
+           tout*(UTIME*CRAP),
+           HUSED*(UTIME*CRAP),H*(UTIME*CRAP);
+    If(CONV) Then;
+       WRITE(@Wres,95) ULGR,ULGR-6,LOG10(UTP),LOG10(URHO),ULGP-LOG10(UP);
+    else;
+       WRITE(@Wres,94) ULGR,ULGR-6,LOG10(UTP),LOG10(URHO),ULGP-LOG10(UP);
+    endif;
+%PA_Pre:
+
+--    @wterm ' Ty(Nzon)=',Ty(Nzon),'  rho=',rho(Nzon);
+
+    KENTR=1;
+    ETERM=0.D0; EKIN  =0.D0; EGRAV=0.D0;
+    EVIR= 0.D0; VISVIR=0.D0; ACVIR=0.D0;
+    ERADD=0.D0;
+    If(NCND>1)then;
+       RNcnd2=Ry(min(NCND+1,Mzon)); RNCND=Ry(min(NCND,Mzon-1));
+    else;
+       RNcnd2=0.D0;       RNCND=0.D0;
+    endif;
+    <*T: Find Teff,U,B,V & store HAPPAL in WORK(.,.), cappa in WRKX()
+    <*Tpcomp: find in Tpcomp the highest Tp(i) for i>ncnd
+              for use in approximate treatment of Compton *>
+--  Ycomp=(Boltzk*UTp*Tpcomp)/(Amelec*Cs**2); -- Comptonization par.
+--  WRITE(@Wres,*)' Tpcomp   Ycomp:  ',Tpcomp,Ycomp;
+    <*arrays: put  pressure into  Press() for Km<=Ncnd
+                   Cappa    into  WRKX()  for Km<=Ncnd
+                   UU       into  UUarr()
+              put  QRT      into  QRTarr()        *>;
+    CAP2=WRKX(1);
+--  CM2 =WRKX(1)*DM(1);
+    _Do Km=1,NZON;
+       If(Km<NZON)Then;
+          DM2=DM(Km+1);
+       else;
+          DM2=DMOUT;
+       endif;
+       RX=(DM(Km)+DM2)/2.D0;
+       <*F: find ENG, EGAS, ERAD, Q1, Accrad & put
+                   udot       into  Acc()
+                   luminosity into  ArrLum()         *>;
+       EKIN=EKIN+RX*Uy(Km)**2;
+       EGRAV=EGRAV-RX*AM(Km)/Ry(Km);
+    -- ETERM=ETERM+EGAS*DM(Km)*UEI;
+       ETERM=ETERM+WRK(Km,2)*DM(Km)*UEI;
+       ERADD=ERADD+ERAD*DM(Km)*UEI;
+       ACVIR=ACVIR+Ry(Km)*(Accel-Accrad)*RX;
+       IF(Km^=1 & Km^=NCND+1) EVIR=EVIR+Press(km)*UPI*(DM(Km)/Rho(km));
+       IF(Km^=1) VISVIR=VISVIR+Q1*(DM(Km)/Rho(km));
+    -- VISVIR=VISVIR+QRT1*(DM(Km)/Rho(km)); -- R-T
+       If(Km==IBURNT .or. Km<=20 .or. Km>=NCND-10) KPRINT=Lpout;
+       If (fullgp .or. fullp) Then;
+          _IF KPRINT==Lpout _THEN
+              _IF CONV _THEN <*C* PRINT LINE WITH CONVECTION *>
+              _ELSE <*P: PRINT LINE WITHOUT CONVECTION *>
+              _FI;
+              KPRINT=0;
+          _FI;
+       else;
+         <*swdet: shock wave details in separate file *>;
+       endif;
+       If(fullgp)Then;
+         <*R:  PREPARE ARRAYS FOR BARKUK *>;
+       endif;
+       KPRINT=KPRINT+1;
+    _od;
+    IBURNT=0; KENTR=0;
+    EKIN=EKIN/2.D0;
+    EVIR=3.D0*EVIR+Prce*Ry(1)**3
+         -(Pcnd2+RadC3*UPI*Tpcnd2**4 )*RNCND**3+Pcnd2*RNcnd2**3;
+       -- EVIR=3.D0*EVIR-Pout*Rout**3+Prce*Rce**3;
+    VISVIR=3.D0*VISVIR+Qrce*Ry(1)**3;
+    ETOT=ETERM+ERADD+EGRAV+EKIN;
+    If(NSTEP==0)ETOT0=ETOT;
+    BALENG=ETOT-ELOST-ETOT0;
+--    write(*,'(a,i5,1p,4g15.3)')' nstep, Etot, Elost, Etot0, Baleng=', 
+  --          nstep, Etot, Elost, Etot0, Baleng;
+    --pause;
+    BALVIR=EVIR+VISVIR+EGRAV-ACVIR;
+  --TEFF=TPSURF*1.189207D0*UTP;
+%PA_Pre.T:
+     <*A: FIND PARAMETERS OF PHOTOSPHERE ( %MA ) *>;
+     FLOUT=CFR*ELSURF/CK1*2.D0;
+     TPH=TPH*UTp;
+     TEFF=TPH;
+     CALL UBV;
+     TPH=TPH/UTp;
+     Km=JPH;
+     Km=Nzon; -- test
+     tauU(Km)=0.d0;
+     tauB(Km)=0.d0;
+     tauV(Km)=0.d0;
+     tauR(Km)=0.d0;
+     tauI(Km)=0.d0;
+     open(40,file='hapint.tst');
+     write(40,*)'nstep=', nstep,'   tday=', tout*UTIME/86400.D0; -- tday
+    _WHILE Km>0 _DO
+--    _WHILE Km>NCND _DO
+--      @wterm ' rho km ', km, rho(km),rho(km-1),rho(km-2),dm(km),dm(km-1);
+         PL=RHO(Km); Tp=Ty(Km); -- CHEM=CHEM0(Km);
+         _Do ii=1, Natom [ Yat(ii)=YABUN(ii,Km) ];
+         RADP=.FALSE.;
+--      @wterm' before URSOS';
+--      @wterm' km rho pl: ',Km,Rho(KM), Pl;
+         CALL URSOS;
+         CHEM0(Km)=CHEM;
+         kmhap=Km;
+         CALL HAPPA;
+         write(40,'(1x,i4,1p,2e10.2,0p,(20f6.2))')
+            km,pl*urho,Tp*uTp,(
+              log10(max(1.d-50,hapabs(ll)/(ur*urho))),ll=1,nfrus);
+         If(Scat)
+           write(40,'('' scat'',20x,20f6.2)')
+             (log10(max(1.d-50,(happal(ll)-hapabs(ll))/(ur*urho))),
+               ll=1,nfrus);
+         Call Opacit;
+         Press(Km)=P;
+--         WRK(Km,1)=Xion(1,1); -- HII
+         WRK(Km,1)=Xion(0,1); -- HI
+         WRK(Km,2)=Egas;
+         WRKX(Km)=Cappa;
+         _DO L=1,NFRUS;
+            WORK(Km,L)=SNGL(HAPPAL(L));
+         _OD;
+         If(Km>1)then;
+           tau(Km-1)=tau(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(@freqtau)*PL;
+           tauU(Km-1)=tauU(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(LubvU)*PL;
+           tauB(Km-1)=tauB(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(LubvB)*PL;
+           tauV(Km-1)=tauV(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(LubvV)*PL;
+           tauR(Km-1)=tauR(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(LubvR)*PL;
+           tauI(Km-1)=tauI(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(LubvI)*PL;
+         endif;
+         Km=Km-1;
+    _OD;
+     close(40);
+%PA_Pre.TA:
+   Km=NZON; tau(Km)=0.D0; tauTp=0.D0; IRph=0;
+   _REPEAT
+         PL=RHO(Km);
+--         If(Ty(km)<0) @wterm ' Ty(km)=',Ty(km),'  in km=',km;;
+--         Tp=abs(Ty(Km));
+         Tp=Ty(Km);
+--         CHEM=CHEM0(Km);
+         _Do ii=1, Natom;
+            Yat(ii)=YABUN(ii,Km);
+         _od;
+         If(Km>Ncnd)then;
+           RADP=.False.;
+         else;
+           RADP=.True.;
+         endif;
+         CALL URSOS;
+         CHEM0(Km)=CHEM;
+         kmhap=Km;
+         CALL HAPPA;
+         Call Opacit;
+         Press(Km)=P;
+         WRK(Km,1)=Xion(0,1); -- HI
+         WRK(Km,2)=Egas;
+         WRKX(Km)=Cappa;
+         _DO L=1,NFRUS;
+            WORK(Km,L)=SNGL(HAPPAL(L));
+         _OD;
+     --    Km=Km-1; -- wrong place???
+         If(Km>1)Then;
+           tau(Km-1)=tau(Km)+(Ry(Km)-Ry(Km-1))*HAPPAL(@freqtau)*PL;
+           tauTp=0.5D0*(tau(Km)+tau(min(Km+1,Nzon)));
+         Endif;
+         If(tau(Km)>=@tauPH & IRph==0) IRph=Km;
+--  @wterm ' km pl @freqtau hap ',km,pl,@freqtau,happal(@freqtau);
+         Km=Km-1; -- new place
+   _UNTIL Km==0 ! (tau(Km+1) >= @tauPH);
+--   _UNTIL Km==0 ! (tau(Km) >= @tauPH ! tauTp >= @tauPH);
+   IRph=min(IRph,Nzon-2);
+   JPH=IRph;
+   If(NCND>0)Then;
+     <*COND: find Rph, Vph & Tph interpolating in tau *>;
+   else;
+     <*TRAN: fitting Tph for transparent core, then Rph & Vph*>;
+   endif;
+%PA_Pre.TA_COND:
+     RPH=Ry(IRph+1)+(Ry(IRph)-Ry(IRph+1))/(tau(IRph)-tau(IRph+1))
+         *(@tauPH-tau(IRph+1));
+     RPH=max(RPH,Ry(1));
+     VPH=Uy(IRph+1)+(Uy(IRph)-Uy(IRph+1))/(tau(IRph)-tau(IRph+1))
+         *(@tauPH-tau(IRph+1));
+     XPH=YABUN(1,IRph+1)+(YABUN(1,IRph)-YABUN(1,IRph+1))
+               /(tau(IRph)-tau(IRph+1))*(@tauPH-tau(IRph+1));
+--   0.5D0*(tau(IRph)+tau(IRph+1)) -- tau IN THE MIDDLE OF ZONE IRph+1
+     TPH4=Ty(IRph+2)**4+
+         (Ty(IRph+1)**4-Ty(IRph+2)**4)/(0.5D0*(tau(IRph)-tau(IRph+2)))
+             *(@tauPH-0.5D0*(tau(IRph+1)+tau(IRph+2)));
+     TPH=ABS(TPH4)**.25D0;
+--   TPH=SIGN(TPH,TPH4);
+%PA_Pre.TA_TRAN:
+    TPH=Ty(1); -- CHANGE!!! FOR FTEFF
+    RPH=SQRT(ABS(ELSURF)/(TPH**4*CSIGM*UTp**4*UTIME**3/(URHO*UR**3)));
+--   @wterm' Lbalrad RPH=',rph;
+    I=1;
+     _WHILE I<NZON-1 & Ry(I+1) < RPH  _DO
+         I=I+1;
+     _OD; -- Ry(I+1)>=RPH
+        VPH=Uy(I+1)+(Uy(I)-Uy(I+1))/(Ry(I)-Ry(I+1))
+              *(RPH-Ry(I+1));
+%PA_Pre_arrays:
+ _Do km=1,Nzon;
+   WORKX(Km)=FLOAT(Km); -- for BARKUK
+   If(Km>1)Then;
+      U0=Uy(Km-1); R0=Ry(Km-1);
+   else;
+      U0=0.D0; R0=Rce;
+   endif;
+   UUarr(Km)=Uy(Km)-U0*(R0/Ry(Km))**2;
+   If(Km<=Ncnd)then;   -- P for other Km already in %PA_Pre.T
+      RadP=.true.;
+--   @wterm ' km Rho(km) dm ',km,Rho(km),dm(km),km+1,rho(km+1),dm(km+1);
+      Pl=Rho(Km); Tp=Ty(Km);
+      _Do ii=1, Natom [ Yat(ii)=YABUN(ii,Km) ];
+      Call URSOS; kmhap=Km; Call Opacit;
+      Press(Km)=P;
+      WRK(Km,1)=Xion(0,1);
+      WRK(Km,2)=Egas;
+      WRKX(Km)=Cappa;
+--    QRTarr(Km)=0.;   -- now non-zero everywehere
+-- else;
+  --  QRTarr(Km)= RTphi(Km)*(-min(0.D0,UUarr(Km)))/(Ry(Km)-R0)**NRT;
+               -- to multiply by U0 or U2 for Qcold
+               -- to multiply by abs(U1)*RS1   for Q hot
+   endif;
+   QRTarr(Km)= RTphi(Km)*(-min(0.D0,UUarr(Km)-EpsUq))/(Ry(Km)-R0)**NRT;
+--
+/* If(Km>Ncnd & Km>2 & Km<NZON)then;  -- crudely:
+   -- QRT1=QRT(Km);
+   hot   QRT1=RTphi(Km)*abs(Uy(Km))*(-min(0.D0,UU1))/(Ry(Km+1)-Ry(Km))**NRT;
+   cold  QRT1=RTphi(Km)*Uy(Km)*(-min(0.D0,UU1))/(Ry(Km+1)-Ry(Km))**NRT;
+   -- QRT1=RTphi(Km)*((Ry(Km)-Ry(Km-1))/(Ry(Km+1)-Ry(Km))-1.);
+   -- QRT1=RTpsi(Km)*( 1./(Ry(Km+1)-Ry(Km)) - 1./(Ry(Km)-Ry(Km-1)))*
+     --          (Ry(Km)-Ry(Km-1))*Theta(RTchi(Km));
+   else;
+      QRT1=0.;
+   endif;
+*/
+   If(Km==1)  Prce=P*UPI;
+   If(Km==ncnd+1 )then;
+     Pcnd2=P*UPI; Tpcnd2=Tp;
+   endif;
+ _od;
+%PA_Pre.F:
+  <*Burn*     *>;
+   If(Km>1)Then;
+      U0=Uy(Km-1);
+   else;
+      U0=0.D0;
+   endif;
+   If(Km<NZON)Then;
+     PQ2=Press(Km+1)*UPI
+            +AQ*Rho(Km+1)*UUarr(Km+1)*(-min(0.D0,UUarr(Km+1)));
+     U2=Uy(Km+1);
+     dm2=dm(Km+1);
+   else;
+     PQ2=0.;
+     U2=0.;
+     dm2=dmout;
+   endif;
+-- for enhanced Q1 it was used AQ1 instead of AQ:
+--      If(Km>NCND)Then;
+--        WXX=DRT*(AM(Km)-AM(max(NCND,1)))**2;
+--        AQ1=AQ+BQ*WXX/(1.D0+WXX);
+--      else;
+--        AQ1=AQ;
+--      endif;
+   Q1=AQ*Rho(Km)*UUarr(Km)*min(0.D0,UUarr(Km));
+   If(Km==1) Qrce=Q1;
+   PQ1=Press(Km)*UPI+Q1;
+   Pl=rho(Km); Tp=Ty(Km);
+   CALL VOLEN(Km);
+   RSODM=Ry(Km)**2/RX;
+   Accel=  -- dU/dt
+           RSODM*(PQ1-PQ2)-AM(Km)/Ry(Km)**2
+           -- dU/dt correction
+           +( QRTarr(Km)*U0-QRTarr(min(Km+1,Nzon))*U2 )/RX; -- Qcold
+         --+RSODM*( QRTarr(Km)*abs(Uy(Km))-QRTarr(min(Km+1,Nzon))*abs(U2));
+                                                                --hot
+   If(Km==Ncnd)Accel=Accel-RSODM*RadC3*UPI*Tpcnd2**4;
+   QRTarr(Km)=QRTarr(Km)*Uy(Km) ; -- crude, only for output (cold)
+-- QRTarr(Km)=QRTarr(Km)*abs(Uy(Km)) ; -- hot
+-- Q1=Q1+QRTarr(Km);
+   <*Flux:  calculate output flux in Flux(Km) *>;
+   IF(Km<=NCND)THEN;
+       Flum=CLUM*FLUX(Km);
+       Accrad=0.D0; ERAD=0.D0; TpRAD=0.D0;
+   ELSE;
+       Flum=0.D0; Accrad=0.D0; SUMJ=0.D0; SUMB=0.D0;
+       _Do L=1,NFRUS;
+         SUMJ=SUMJ+@FJ1*WEIGHT(L);
+--       If(Km==1) SUMB=SUMB+Black(L,Tp)*WEIGHT(L);
+         If(Km<NZON)Then;
+--           Flum=Flum+Y(@NFHL+Km,1)*WEIGHT(L);
+           Flum=Flum+Yout(@NFHL+Km)*WEIGHT(L);
+--         HAPHL=(WORK(Km+1,L)*DM(Km+1)+WORK(Km,L)*DM(Km))
+--                /(DM(Km)+DM(Km+1));
+           HAPHL=(Tp**4+Ty(Km+1)**4)
+             /(Ty(Km+1)**4*Uplim/(WORK(Km+1,L)+Haplim*WORK(Km,L))
+                  +Tp**4/WORK(Km,L));
+--           Accrad=Accrad+Y(@NFHL+Km,1)*WEIGHT(L)*HAPHL;
+           Accrad=Accrad+Yout(@NFHL+Km)*WEIGHT(L)*HAPHL;
+         else;
+--           Flum=Flum+Y(@NFHL+Km-KRAD,1)*WEIGHT(L)*HEDD(L);
+           Flum=Flum+Yout(@NFHL+Km-KRAD)*WEIGHT(L)*HEDD(L);
+           HAPHL=WORK(NZON,L);
+--           Accrad=Accrad+Y(@NFHL+Km-KRAD,1)*WEIGHT(L)*HAPHL*HEDD(L);
+           Accrad=Accrad+Yout(@NFHL+Km-KRAD)*WEIGHT(L)*HAPHL*HEDD(L);
+         endif;
+       _od;
+       <*Scattst* testing scattering Tp balance *>;
+       SUMJ=(1.5D1/PI**4)*SUMJ;
+       if (SUMJ<=0.d0) then;
+--           @wterm ' SUMJ',SUMJ;
+--         pause;
+--       else;
+--         TPRAD=ABS(SUMJ)**.25D0; -- fails on some compilers for zero
+       endif;
+       TPRAD=sqrt(sqrt(ABS(SUMJ)));
+       TPRAD=SIGN(TPRAD,SUMJ);
+       ERAD=RadC*SUMJ/rho(Km);
+       Flum=CLUMF*Flum*Ry(Km)**2;
+       Accrad=CIMP*Accrad;
+         <*THICK* *>
+--     _If fullgp _Then
+--       <*THICK: *>
+--     _fi;
+   ENDIF;
+   Acc(Km)=Accel+Accrad;
+   ArrLum(Km)=Flum;
+%PA_Pre.F_Flux:
+--      workm(Km)=Am(Km)*Um;
+--      CM1=CM2;
+        Tp1=Ty(Km);
+        CAP1=CAP2;
+        If(Km<NZON)Then;
+--         CM2=CAPPA*DM(Km+1); CMINV=1.D0/(CM1+CM2);
+           CAP2=WRKX(Km+1);
+           Tp2=Ty(Km+1);
+        ELSE;
+--         CM2=CM1*(DMOUT/DM(NZON));
+           Tp2=0.D0; -- Cap2 the same as previous zone
+--         CMINV=1.D0/(CM1+CM2+CFR*Ry(NZON)**2);
+        ENDIF;
+--        print *,Tp,Pl,CAP1,CAP2;
+--      _SELECT
+--        _ Km<=NCND
+--             [
+                 FLLF1=((Ry(Km)*Tp1)**4-(Ry(Km)*Tp2)**4)*Tp1**4/
+                  (CAP1*(DM(Km)+DM2)*(Tp1**4+Tp2**4));
+                 FLRT1=((Ry(Km)*Tp1)**4-(Ry(Km)*Tp2)**4)*Tp2**4/
+                  (CAP2*(DM(Km)+DM2)*(Tp1**4+Tp2**4));
+                 FL1=FLLF1+FLRT1; -- ]
+ --             [ FL1=((Ry(Km)*Tp1)**4-(Ry(Km)*Tp2)**4)*CMINV ]
+/*        _ Km==NCND [ SUMJ=0.D0;
+                 _DO L=1,NFRUS; SUMJ=SUMJ+@FJ2*WEIGHT(L)_OD;
+                 SUMJ=(1.5D1/PI**4)*SUMJ;
+                 FLCOR1=((Ry(Km)*Tp1)**4-SUMJ*Ry(Km)**4)*Tp1**4
+                        /(CAP1*(DM(Km)+DM(Km+1))*(Tp1**4+Tp2**4));
+                 FLCOR2=((Ry(Km)*Tp1)**4-SUMJ*Ry(Km)**4)*Tp2**4
+                    /((CAP2*(DM(Km)+DM(Km+1))+@tauLIM*Ry(Km)**2)
+                    *(Tp1**4+Tp2**4));
+                 FL1=FLCOR1+FLCOR2 ]
+          _ Km==NCND+1
+                [ SUMJ=0.D0;
+                  _DO L=1,NFRUS; SUMJ=SUMJ+@FJ1*WEIGHT(L)_OD;
+                  SUMJ=(1.5D1/PI**4)*SUMJ;
+                  --TPRAD=SUMJ**.25D0;
+                   FL1=0.D0 ]
+          _OTHER [ FL1=0.D0 ]
+        _END;                        */
+        FLUX(Km)=FL1; -- now only for conductivity
+%PA_Pre.F_Burn:
+    PL=RHO(Km); Tp=Ty(Km);
+   _CASE NREG(Km) _OF
+       _1 <*A: YCARB,ENGNUC *>;
+          AS=ASI/(1.D0+(ASI-ACARB)*YCARB); ZS=YELECT*AS;
+          YSI=(1.D0-ACARB*YCARB)/ASI;
+          If(YSI<1.D-12)YSI=1.D-12;
+          SCN=AS*(YCARB*LOG(12.D0*SQRT(12.D0)/YCARB)+
+              YSI*LOG(28.D0*SQRT(28.D0)/YSI));
+       _2 <* SILICON BURNING *>
+          SCN=LOG(28.D0**2*SQRT(28.D0)); AS=ASI; ZS=ZSI;
+          YCARB=0.D0; ENGNUC=0.D0;
+       _3 <* 56NI *>
+          SCN=LOG(56.D0**2*SQRT(56.D0)); AS=ANI; ZS=ZNI;
+          YCARB=0.D0; ENGNUC=0.D0;
+   _ESAC;
+%PA_Pre.F_Scattst:
+        If(Km==1)Then;
+          WRITE(@Wres,'(2(A,1P,E12.3) )') ' SUMB=',SUMB,
+          '   eng/cappa=',eng*CK2/(CKrad*cappa*Urho*UR);
+          --   Cappa=(Wcap+CTOMP)*Xe+ZCap;
+          itcap=0; tpold=Tp; cpold=cappa; dtp=1.;
+          _while itcap<100 & dtp>0.01 _do
+            tpit=Tp;
+            itcap=itcap+1;
+            Capsca=CTOMP*Xe;
+            Capabs=Cappa-Capsca;
+            Tf=Tp**4*Capabs-Tpold**4*Cpold;
+            TfT=4.*Tp**3*Capabs+Tp**4*(CapT-CTOMP*XeT);
+            dtp=abs(Tf/(TfT*Tpit));
+            Tp=Tpit*(1.-sign(min(0.2,dtp),Tf/(TfT*Tpit) ));
+            WRITE(@Wres,'(3(A,1P,E12.3))') ' Capsca=',Capsca,
+                    '   Capabs=',Capabs,'   Tp=',Tp;
+            call ursos; kmhap=Km;call opacit;
+          _od;
+          WRITE(@Wres,'(2(A,1P,E12.3),A,I3)')
+          '   Bl3=',Black(3,Tp),
+          '   Bl3old=',Black(3,Tpold),'  it=',itcap;
+          Tp=tpold;
+          cappa=cpold;
+       endif;
+%PA_Pre.F_THICK:
+    Tprad4=0.D0;
+    TRD4=0.D0;
+--  TBDD=0.D0;
+    _Do L=1,NFRUS;
+       If(LTHICK(L,Km)) Then;
+         -- BLA=MAX(BLACK(L,Tp),1.D-40);
+         -- BLD=BLACKD(L,Tp);
+         -- BNU=3.D0*BLA-BLD;
+         -- DBNU=BLD*(4.D0+FREQMN(L)/Tp-2.D0*BLD/BLA);
+         Tprad4=Tprad4+BLACK(L,Tp)*WEIGHT(L);
+         TRD4=TRD4+BLACKD(L,Tp)*WEIGHT(L);
+         -- TBDD=TBDD+DBNU*WEIGHT(L);
+       endif;
+    _od;
+    If(Tprad4 ^= 0.D0) Then;
+       Tprad4=Tprad4*(15.D0/PI**4);
+       TRD4=TRD4*(15.D0/PI**4);
+    -- TBDD=TBDD*(15.D0/PI**4);
+       PTH=RADC3*TRD4-RADC*Tprad4; -- ???
+       ETH=RADC*(Tprad4/PL);
+       EPlTh=-RADC*(Tprad4/PL);
+       ETTH=RADC*(TRD4/Tp)/PL;
+       PTTH=RADC3*TRD4;
+       WTH=Tprad4**.25D0;
+       DPE=(EPlTh+PTTh/Pl)*(Pl/PTh)-1.D0;
+--     WRITE(@Wres,'(A,1P,10E12.4)')' THICK TPRAD PTH ETH PTTH ETTH DPE: ',
+  --      WTH,PTH,ETH,PTTH,ETTH,DPE;
+       WRITE(@Wres,'(A,I4,2X,10L2,A,1P,2E12.4)') ' km Lth: ',
+          Km,(LTHICK(L,Km),L=1,10),' TprTh DPE:',WTh,DPE;
+    endif;
+%PA_Pre.F_Burn.A=LE:
+%PA_Pre_swdet:
+    PLLOG=LOG10(max(1.D-50, Rho(km)));
+    P LOG=LOG10(max(1.D-50, Press(km)));
+    QVLOG=LOG10(max(1.D-50, Q1*UP));
+--    QRTLG=LOG10(max(1.D-50, QRTarr(km)*UP)); -- in place of eng
+    <*extmass: calculate AMPR - mass in external layers via dm() *>;
+    PL=RHO(Km); Tp=Ty(Km); -- CHEM=CHEM0(Km);
+    If(Km==1 .or. Km==Nzon)then;
+        WRITE(81,181)(tout-tretard)*(UTIME*CRAP)/86400.D0, -- t in days
+          -- tout*Utime/8.64d4,
+        Km,log10(AMPR),log10(UR*Ry(Km)),Uy(Km)*1.D+6/(UTIME*CRAP),
+        log10(max(UTP*Ty(Km),1.d0)),log10(max(UTP*TpRAD,1.d0)),
+        PLLOG,PLOG,QVLOG,log10(max(eng,1.d-50)),Flum*1.d-40,WRKX(Km);
+    else;
+    WRITE(81,281) 0,
+        Km,log10(AMPR),log10(UR*Ry(Km)),Uy(Km)*1.D+6/(UTIME*CRAP),
+        log10(max(UTP*Ty(Km),1.d0)),log10(max(UTP*TpRAD,1.d0)),
+        PLLOG,PLOG,QVLOG,log10(max(eng,1.d-50)),Flum*1.d-40,WRKX(Km);
+    endif;
+-- 181:FORMAT(1X,F10.2,I5,F12.6,F14.7,F9.4,6F9.3,1P,2E11.3); -- for secs
+181:FORMAT(1X,F10.6,I5,F12.6,F14.7,F9.4,6F9.3,1P,2E11.3); -- for days
+281:FORMAT(10X, i1, I5,F12.6,F14.7,F9.4,6F9.3,1P,2E11.3);
+
+
+%PA_Pre.P:
+--  XCARB=ACARB*YCARB;
+    PLLOG=LOG10(max(1.D-50, Rho(km)));
+    P LOG=LOG10(max(1.D-50, Press(km)));
+    QVLOG=LOG10(max(1.D-50, Q1*UP));
+    QRTLG=LOG10(max(1.D-50, QRTarr(km)*UP));
+    AMPR=AM(Km)*UM;
+    If(AMPR<1.01*(AMini*UM) & Km>1)AMPR=AMPR-(AMini*UM);
+    PL=RHO(Km); Tp=Ty(Km); -- CHEM=CHEM0(Km);
+    _Do ii=1, Natom [ Yat(ii)=YABUN(ii,Km) ];
+    RADP=.FALSE.;
+    CALL URSOS;
+    CHEM0(Km)=CHEM;
+    barionn=rho(km)*Urho*Avogar;
+    If(AMPR>0.99D0*(AMOUT*UM)& Km>Nzon/3)then;
+--      AMPR=AMPR-(AMOUT*UM);
+      <*extmass: calculate AMPR - mass in external layers via dm() *>;
+      WRITE(@Wres,193) Km,-AMPR,Ry(Km),Uy(Km)*1.D+6/(UTIME*CRAP),
+        Ty(Km),           TpRAD,PLLOG,PLOG,QVLOG,QRTLG,
+        WRK(Km,1), ENG         ,Flum,WRKX(Km),Km
+        ,barionn,Xe*barionn, -- barion n cm^{-3}, n_e
+         Yat(14)*barionn,xion(1,14),xion(2,14); -- Fe, FeII, FeIII
+/*         Yat(7)*barionn,xion(1,7),xion(2,7), -- NaII, NaII xion(2,7)*barionn, -- NaII, NaIII
+         Yat(13)*barionn,xion(1,13),xion(2,13), -- CaII, CaIII
+*/
+    else;
+      WRITE(@Wres,93) Km,AMPR,Ry(Km),Uy(Km)*1.D+6/(UTIME*CRAP),
+--      Ty(Km),PLLOG,PLOG,NREG(Km),ENGNUC,XCARB,ENG,
+--      Ty(Km),PLLOG,PLOG,NREG(Km),XH,Accel,Accrad,
+--      Ty(Km),PLLOG,PLOG,NREG(Km),Xion(1,1),Xion(1,2),DPE,
+--      Ty(Km),PLLOG,Press(km)  ,Q1*UP ,Xion(1,1),Xion(1,2),TpRAD,
+--      Ty(Km),(UTp/1.d3)*TpRAD,PLLOG,PLOG,QVLOG,QRTLG,
+        Ty(Km),           TpRAD,PLLOG,PLOG,QVLOG,QRTLG,
+--      WRK(Km,1),CLUM*FLUX(Km),Flum,WRKX(Km),Km;
+        WRK(Km,1), ENG         ,Flum,WRKX(Km),Km
+        ,barionn,Xe*barionn, -- barion n cm^{-3}, n_e
+         Yat(14)*barionn,xion(1,14),xion(2,14); -- Fe, FeII, FeIII
+/*         Yat(7)*barionn,xion(1,7),xion(2,7), -- NaII, NaIIxion(2,7)*barionn, -- NaII, NaIII
+         Yat(13)*barionn,xion(1,13),xion(2,13), -- CaII, CaIII
+         Yat(14)*barionn,xion(1,14),xion(2,14); -- FeII, FeIII
+*/
+    endif;
+%PA_Pre.P_extmass:
+    AMPR=DMOUT;
+   _Do ikm=Nzon,km,-1; AMPR=AMPR+DM(ikm);_Od; AMPR=AMPR*UM;
+%PA_Pre_swdet_extmass=PA_Pre.P_extmass:
+%PU:
+--93:FORMAT(1X,I3,1P,4E13.5,0P,2F8.4,I5,1P,5E10.2,I5);
+93:FORMAT(1X,I3,F9.5,F12.7,F8.4,F10.3,F8.3,4F7.2,1P,4E10.2,I5
+, 11e10.2);
+193:FORMAT(1X,I3,1P,E9.2,0P,F12.7,F8.4,F10.3,F8.3,4F7.2,1P,4E10.2,I5
+, 11e10.2);
+94:FORMAT(' ZON',3X,'AM/SOL',6X,'R',F3.0,6X,'V',F3.0,5X,'T',F3.0,
+   4X,'Trad5 lgD',F3.0,' lgP',F3.0,
+-- 4X,'Trad3 lgD',F3.0,' lgP',F3.0,
+-- ' NREG   XHII      XHEII     DPE       LUM      CAPPA    ZON');
+-- ' NREG   XH        Accel     Accrad    LUM      CAPPA    ZON');
+-- ' NREG   XHII      XHEII     TpRAD     LUM      CAPPA    ZON');
+-- ' Qvis       XHII      XHEII     LUM      CAPPA    ZON');
+-- '  lgQv  lgQRT      XHII     LUMcnd     LUM     CAPPA   ZON');
+   '  lgQv  lgQRT      XHI      ENG        LUM     CAPPA   ZON'
+    ,'    n_bar     n_e          Fe        II        III');
+--     ,'    n_bar     n_e       Na        II        III       '
+--       ,  'Ca        II        III       Fe        II        III');
+-- ' NREG   ENGNUC    XCARB     ENG       LUM      CAPPA    ZON');
+95:FORMAT(' ZON',5X,'AM/SOL',6X,'R',F3.0,10X,'V',F3.0,10X,'T',F3.0,
+   5X,'LG D',F3.0,' LG P',F3.0,
+   ' NREG   ENGNUC    XCARB     UCONV     ENTROP   FLCONV   ZON');
+%PA_Pre.C:
+    XCARB=ACARB*YCARB;
+    If(Rho(km)>0.D0)PLLOG=LOG10(Rho(km));
+    If(Press(km)>0.D0)P LOG=LOG10(Press(km));
+    AMPR=AM(Km)*UM; If(AMPR>0.99D0*(AMOUT*UM))AMPR=AMPR-(AMOUT*UM);
+    If(AMPR<1.01*(AMini*UM) & Km>1)AMPR=AMPR-(AMini*UM);
+    PRINT 93,Km,AMPR,Ry(Km),Uy(Km)/(UTIME*CRAP),
+             Ty(Km),PLLOG,PLOG,NREG(Km),ENGNUC,XCARB,
+             Y(Km+(NVARS-2)*NZON,1)/UTIME,  <*  U-CONVECTIVE *>
+             SGAS,FLCON(Km)*(UEPRI/(UTIME*CRAP)),Km;
+%PA_Pre.R:
+    WORK(Km,1)=LOG10(Ty(Km));  WORK(Km,2)=LOG10(Rho(Km));
+    WORK(Km,3)=LOG10(Press(km));  --  WORK(Km,4)=SGAS;
+%PAG:
+     -- WRITE(@Wres,'(''%GR:'')');
+ <*Bar* Barkuk for plot T,P,Rho of the model *>;
+ <*flx: transform outgoing flux (Nzon-1) to rest observer frame *>;
+ <*JH:  PRINT FJ & FH *>;
+ <*SPECTR:  plots  for spectra *>;
+ <*tau: tau in all frequencies for selected zone *>;
+%PAG_Bar:
+     CALL BARKUK (WORKX, WORK,Mzon+2, NZON, 2    ,WORKX(1),WORKX(NZON),
+ --Nfreq20:  MIN(2.,FLOAT(Lpout)), 0.2, 0., 0.,NZON/2+1, 40, 0, 0, 6 );
+ --Nfreq10:      1                             NZON
+                 2.              , 0.2, 0., 0.,NZON/2+1, 40, 0, 0, 6 );
+%PAG_flx:
+   nnx=0; Nrec=0;
+   CLUMNU=LOG10(8.D0*UR**2*(BOLTZK*UTP)**3/(CS*HPLANC)**2);
+        <*getttt: obtain in ttt(NFREQ) corrected output flux
+                      na R**2  umnozhitj ! *>;
+    WRITE(@Wres,*)'   L        lg nu         comov        rest',
+          ' observer lg(L_nu)  erg/(s Hz)';
+   _do L=1,Nfrus;
+     write(@wres,'(i4,3f14.3)')L, log10(freqmn(L)*UFREQ),
+--               SNGL(LOG10(MAX(ABS(Y(@L)*RY(NZON-1)**2*FREQMN(L)**3),
+               SNGL(LOG10(MAX(ABS(Yout(@LL)*RY(NZON-1)**2*FREQMN(L)**3),
+                1.d-100)))+Clumnu, ttt(L);
+   _od;
+%PAG_flx_getttt:
+    Hnorm=0.d0;
+    _do Lfr=1,NFRUS+dLfrMax;
+        fr0=freqob(Lfr)*(1.d0-uy(Nzon)/clight);
+        fr0log=log(fr0);
+        xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+        Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
+        L=Lfr0;
+--        Hobsg=cH(Lfr)*exp((1.d0-wH(Lfr))*log(max(Y(@L1),1.d-100))+
+  --                       wH(Lfr)*log(max(Y(@L),1.d-100)));
+        if(Lfr0<Nfrus)then;
+           Hobsg=cH(Lfr)*exp((1.d0-wH(Lfr))*log(max(Yout(@LL1),1.d-100))+
+                         wH(Lfr)*log(max(Yout(@LL),1.d-100)));
+        else;
+           Hobsg=cH(Lfr)*Yout(@LL);
+        endif;
+        ttt(Lfr)=Hobsg*RY(NZON-1)**2;
+--comoving  L=Lfr;     Yout(@LL)*RY(NZON-1)**2;
+         Hnorm=Hnorm+ttt(Lfr)*WEIGHT(Lfr);
+    _od;
+    Obflum=CLUMF*Hnorm; -- obs.lum.
+      SUM=0.;
+     _Do L=1,NFRUS+dLfrMax;
+        ttt(L)=SNGL(LOG10(MAX(ABS(ttt(L)*freqob(L)**3),1.d-100)));
+        ttt(L)=ttt(L)+CLUMNU; -- erg/(sec*Hz)
+        SUM=SUM+10.**ttt(L)*(freq(L+1)-freq(L))
+             *(BoltzK*UTp/(2.d0*pi*Hplanc));
+     _Od;
+    WRITE(@Wres,*)' Rest observer Lum=', Obflum, SUM;
+--    pause;
+%PAG_JH:
+    WRITE(STR2,'(10I9)') (I,I=1,MIN(NFRUS,10)); -- HEADER FOR FREQ
+    WRITE(@Wres,'(''  L:'',A)') STR2;
+    WRITE(@Wres,'(''  K/  lg[ J_nu erg/(cm**2 s Hz strad)]  '')');
+    Lfin=MIN(NFRUS,10);
+    CJnu=(BOLTZK*UTP)**3/(2.d0*(pi*CS*HPLANC)**2);
+        -- Hplanck is hbar !!!
+    _Do K=NCND+1,NZON;
+      WRITE(@Wres,'(1X,I4,2X,10F9.3)') K,(
+       log10(max(CJnu*freqmn(L)**3
+--           *Y(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1),1),1.d-299)),
+           *Yout(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1)),1.d-299)),
+          L=1,Lfin);  -- FJ
+      If(NFRUS>10)
+        WRITE(@Wres,'(7X,10F9.3)')(
+        log10(max(CJnu*freqmn(L)**3
+--           *Y(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1),1),1.d-299)),
+           *Yout(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1)),1.d-299)),
+           L=11,NFRUS);  -- FJ
+    _od;
+
+
+-- H:
+
+    WRITE(STR2,'(10I9)') (I,I=1,MIN(NFRUS,10)); -- HEADER FOR FREQ
+    WRITE(@Wres,'(''  L:'',A)') STR2;
+    WRITE(@Wres,'(''  K/  lg[ H_nu erg/(cm**2 s Hz strad)]  '')');
+    _Do K=NCND+1,NZON;
+      WRITE(@Wres,'(1X,I4,2X,10F9.3)') K,(
+       log10(max(CJnu*freqmn(L)**3
+         *Yout(NVARS*NZON+KRAD+(K-NCND)+(NZON-NCND)*(L-1)),1.d-299)),
+            L=1,Lfin);  -- FH
+      If(NFRUS>10)
+        WRITE(@Wres,'(7X,10F9.3)')(
+        log10(max(CJnu*freqmn(L)**3
+         *Yout(NVARS*NZON+KRAD+(K-NCND)+(NZON-NCND)*(L-1)),1.d-299)),
+           L=11,NFRUS);  -- FH
+    _od;
+
+
+
+/*
+    WRITE(STR2,'(10I9)') (I,I=1,MIN(NFRUS,10)); -- HEADER FOR FREQ
+    WRITE(@Wres,'(''  L:'',A)') STR2;
+    WRITE(@Wres,'(''  K/    FJ  '')');
+    Lfin=MIN(NFRUS,10);
+    _Do K=NCND+1,NZON;
+      WRITE(@Wres,45) K,(
+--         Y(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1),1),LTHICK(L,K),
+         Yout(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1)),LTHICK(L,K),
+          L=1,Lfin);  -- FJ
+      If(NFRUS>10)
+        WRITE(@Wres,46)((
+--           Y(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1),1)),LTHICK(L,K),
+           Yout(NVARS*NZON+(K-NCND)+(NZON-NCND)*(L-1))),LTHICK(L,K),
+           L=11,NFRUS);  -- FJ
+    _od;
+    WRITE(@Wres,'(''  L:'',A)') STR2;
+    WRITE(@Wres,'(''    K/  FH  '')');
+    _Do K=NCND+1,NZON;
+      WRITE(@Wres,45)K,(
+--         Y(NVARS*NZON+KRAD+(K-NCND)+(NZON-NCND)*(L-1),1),LTHICK(L,K),
+         Yout(NVARS*NZON+KRAD+(K-NCND)+(NZON-NCND)*(L-1)),LTHICK(L,K),
+            L=1,Lfin);  -- FH
+      If(NFRUS>10)
+         WRITE(@Wres,46)((
+--         Y(NVARS*NZON+KRAD+(K-NCND)+(NZON-NCND)*(L-1),1)),LTHICK(L,K),
+         Yout(NVARS*NZON+KRAD+(K-NCND)+(NZON-NCND)*(L-1))),LTHICK(L,K),
+                      L=11,NFRUS);  -- FH
+    _od;
+*/
+ 45:FORMAT(1X,I4,2X,1P,10(E9.2,L2));
+ 46:FORMAT(7X,1P,10(E9.2,L2));
+
+    Lbeg=1;
+    Lfin=MIN(NFRUS,10);
+  _while Lbeg<Nfrus _do
+    WRITE(@Wres,'(//)');
+    WRITE(STR2,'(10I9)') (I,I=Lbeg,Lfin); -- HEADER FOR FREQ
+    WRITE(@Wres,'(''        L:'',A)') STR2;
+    WRITE(@Wres,'(''  ray(cm) /  lg[ I_nu erg/(cm**2 s Hz strad)]  '')');
+    _do ip=0,NP; -- rays
+      WRITE(@Wres,'(1X,1p,e9.3,2X,0p,10F9.3)') pray(ip)*UR,(
+       log10(max(CJnu*freqmn(L)**3*fout(ip,L),1.d-299)),L=Lbeg,Lfin);
+    _od;
+       Lbeg=Lfin+1;
+       Lfin=MIN(NFRUS,Lfin+10);
+  _od;
+%PAG_SPECTR:
+  _DO K =NCND+1,NZON;   -- RADIATION
+    If(NZON-NCND>5)Then;
+      _SELECT
+        _ K==NCND+1               [KK=2]
+        _ K==NCND+(NZON-NCND)/4   [KK=3]
+        _ K==NCND+(NZON-NCND)/2   [KK=4]
+        _ K==NCND+3*(NZON-NCND)/4 [KK=5]
+        _ K==NZON-1               [KK=6]
+        _ K==42 .or. K==43        [kk=7]
+        _OTHER            [ _ITERATE K;]
+      _END;
+    else;
+      KK=K-NCND+1;
+    endif;
+    _DO L=1,NFRUS;
+      BL(L)=MAX(BLACK(L,Ty(K))*FREQMN(L)**3,FJNOIS);
+      FJ(L)=Y(NVARS*NZON+K-NCND+(NZON-NCND)*(L-1),1)*FREQMN(L)**3;
+      FH(L)=Y(NVARS*NZON+KRAD+K-NCND+(NZON-NCND)*(L-1),1)*FREQMN(L)**3;
+      -- If(KK==2)WORK(L,1)=SNGL(LOG10(BL(L))); -- was used for Nfreq<Mzon
+      -- WORK(L,KK)=SNGL(LOG10(MAX(ABS(FJ(L)),FJNOIS)));
+      -- WORKX(L)=FLOAT(L);
+    _OD;
+    WRITE(@Wres,'(A,I3,A,1P,E12.3,A,(1P,8E12.3))')' K=',K,'   tau=',tau(K),
+         ' FJ(L,K)=',(FJ(ill),ill=1,NFRUS);
+  _OD;
+  <*BAR*  use  BARKUK *>;
+%PAG_SPECTR_BAR:
+     WRITE(@Wres,'('' %GH:'')');
+--   CALL BARKUK (WORKX, WORK,Mzon+2,NFREQ,6,WORKX(1), WORKX(NFREQ),
+--                0.5,0., 0.,0.,60, 20, NFREQ*2, 0, 6 );--NFREQ==5
+     If(6*NFRUS<90)Then;
+       CALL BARKUK (WORKX, WORK,Mzon+2,NFRUS,KK,WORKX(1), WORKX(NFRUS),
+                    1.0, 0., 0.,0.,6*(NFRUS+1), 30, NFRUS+1, 0, 6 );
+     else;
+       CALL BARKUK (WORKX, WORK,Mzon+2,NFRUS,min(3,KK),WORKX(1),
+                    WORKX(NFRUS),1.0,0., 0.,0.,3*NFRUS,20,NFRUS,0,6);
+       If(KK>3)
+         CALL BARKUK (WORKX,WORK(1,4),Mzon+2,NFRUS,min(3,KK-3),WORKX(1),
+                      WORKX(NFRUS),1.0,0., 0.,0.,3*NFRUS,20,NFRUS,0,6);
+     endif;
+%PAG_tau:
+  Nztau=43;
+     write(@wres,*)' L / lambda / tau in zon / tauabs / hapabs / hapsum /',
+          ' hapscat / cooling / heating ',
+          ' for Km = ',Nztau;
+    _do LL=1,Nfrus;
+        tauzon(LL)=0.d0;
+    _od;
+    _DO Km=Nzon,Nztau,-1;
+         PL=RHO(Km); Tp=Ty(Km); -- CHEM=CHEM0(Km);
+         _Do ii=1, Natom [ Yat(ii)=YABUN(ii,Km) ];
+         RADP=.FALSE.;
+         CALL URSOS;
+         kmhap=Km;
+         CALL HAPPA;
+         Call Opacit;
+        _do LL=1,Nfrus;
+            tauzon(LL)=tauzon(LL)+(Ry(Km)-Ry(Km-1))*HAPPAL(LL)*PL;
+            if (Km==Nztau) then;
+               write(@wres,'(1x,i4,1p,2e13.4,6e11.3)')ll,
+                  Cs*1.d8/(freqmn(ll)*Ufreq),
+                  (Ry(Km)-Ry(Km-1))*HAPPAL(LL)*PL,
+                  (Ry(Km)-Ry(Km-1))*HAPAbs(LL)*PL,
+                  log10(max(1.d-50,hapabs(ll)/(ur*urho))),
+                  log10(max(1.d-50,happal(ll)/(ur*urho))),
+                  log10(max(1.d-50,(happal(ll)-hapabs(ll))/(ur*urho))),
+                  HAPAbs(LL)*black(LL,Tp)*weight(LL),
+         HAPAbs(LL)*Y(NVARS*NZON+Nztau-NCND+(NZON-NCND)*(LL-1),1)*weight(LL);
+            endif;
+        _od;
+    _OD;
+     write(@wres,*)' L / lambda / tau for Km = ',Nztau;
+     write(@wres,'(1x,i5,2f15.5)')(ll,Cs*1.d8/(freqmn(ll)*Ufreq),tauzon(ll),
+                                  ll=1,NFRUS);
+%PAW:
+  WRITE(@Wres,'(''%B:'')');
+ write(@Wres,'(4x,8(8x,a2))')'10','20','30','40','50','60','70';
+  _do km=1,Nzon;
+    _do lfr=1, @prfr;
+      if(lthick(lfr,km))then;
+        symb(lfr:lfr)='*';
+      else;
+        symb(lfr:lfr)='o';
+      endif;
+    _od;
+     write(@Wres,'(i3,1x,a)')km,symb;
+  _od;
+  WRITE(@Wres,'(A,(10I6))')'NTHICK: ',NTHICK;
+  WRITE(@Wres,'(''  K/    tau:'',a)')@ap@freqtau@ap;
+  WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,tau(K),K=NZON,NCND+1,-1);
+  WRITE(@Wres,'(''  K/    tauU:'',a)');
+  WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,tauU(K),K=NZON,NCND+1,-1);
+  WRITE(@Wres,'(''  K/    tauB:'',a)');
+  WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,tauB(K),K=NZON,NCND+1,-1);
+  WRITE(@Wres,'(''  K/    tauV:'',a)');
+  WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,tauV(K),K=NZON,NCND+1,-1);
+  WRITE(@Wres,'(''  K/    tauR:'',a)');
+  WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,tauR(K),K=NZON,NCND+1,-1);
+  WRITE(@Wres,'(''  K/    tauI:'',a)');
+  WRITE(@Wres,'(8(1X,I3,''->'',1P,E9.2))')(K,tauI(K),K=NZON,NCND+1,-1);
+  WRITE(@Wres,'('' EFFECTIVE TEMPERATURE(KELVINS) & LOG10 ='',1P,2E15.5)')
+               TEFF,DLOG10(TEFF);
+  WRITE(@Wres,'('' VOLUME GAINS POWER (1E+50 ERG/S) ='',1P,E15.5)')
+               ELVOL*(UEPRI/(UTIME*CRAP));
+  WRITE(@Wres,'('' SURFACE LUMINOSITY (1E+50 ERG/S) ='',1P,E15.5)')
+               ELSURF*(UEPRI/(UTIME*CRAP));
+  WRITE(@Wres,'('' TOTAL  GAINS POWER (1E+50 ERG/S) ='',1P,E15.5)')
+               ELTOT*(UEPRI/(UTIME*CRAP));
+  WRITE(@Wres,'('' RADIAT.  ENERGY  (1E+50 ERG) ='',1P,E15.5,10X,
+            '' TOTAL    ENERGY  (1E+50 ERG) ='',E15.5)')
+               ERADD*UEPRI,ETOT*UEPRI;
+  WRITE(@Wres,'('' KINETIC  ENERGY  (1E+50 ERG) ='',1P,E15.5,10X,
+            '' GAINED   ENERGY  (1E+50 ERG) ='',E15.5)')
+               EKIN*UEPRI,ELOST*UEPRI;
+  WRITE(@Wres,'('' GRAVIT.  ENERGY  (1E+50 ERG) ='',1P,E15.5,10X,
+            '' VISCOUS  VIRIAL  (1E+50 ERG) ='',E15.5)')
+               EGRAV*UEPRI,VISVIR*UEPRI;
+  WRITE(@Wres,'('' VIRIAL   ENERGY  (1E+50 ERG) ='',1P,E15.5,10X,
+            '' VIRIAL  BALANCE  (1E+50 ERG) ='',E15.5)')
+               EVIR*UEPRI,BALVIR*UEPRI;
+  WRITE(@Wres,'('' THERMAL  ENERGY  (1E+50 ERG) ='',1P,E15.5,10X,
+            '' TOTAL   BALANCE  (1E+50 ERG) ='',E15.5)')
+               ETERM*UEPRI,BALENG*UEPRI;
+  WRITE(76,'(''ENERGY BALANCE AT OBS. TIME ='',1P,F15.5,2x,''DAYS : '',
+               E15.5)') (tout-tretard)*(UTIME*CRAP)/86400.D0/10.,
+               BALENG*UEPRI/(ETOT*UEPRI);
+  WRITE(@Wres,'('' <======== PARAMETERS OF PHOTOSPHERE ========> '')');
+  WRITE(@Wres,'(''   OB.T(D)         TEFF(10**3) RPH         VPH'',
+            ''         Xph     HUSED     MBOL      -U-       -B-'',
+            ''       -V-       -U-B-     -B-V-'')');
+  WRITE(@Wres,'(1X,1P,G12.5,'' E'',0P,F9.3,3F12.3,1P,E10.2,0P,6F10.3)')
+   (tout-tretard)*(UTIME*CRAP)/8.64D+04,TEFF*1.D-03,
+       RPH,VPH*1.D+06/(UTIME*CRAP),XPH,HUSED*UTIME*CRAP,
+       MBOL,MU,MB,MV,MU-MB,MB-MV;
+--  CALL PRIMAG;
+%M:o
+    SUBROUTINE PRIMAG;
+     IMPLICIT REAL*8(A-H,O-Z);
+     Parameter(MAXIT=15);
+     Parameter(EPSTPH=1.D-3);
+    _INCLUDEN snrad;
+    _INCLUDEN abo; --NVARS-THE NUMBER OF INDEPENDENT VARIABLES
+  -- _TRACE "WRITE(0,'(A,1P,2E12.3,A)')'YL YL1 ',Y(@L),Y(@L1),"
+  --_TRACE "@wterm' Jph=',Jph,' SumH=',SumH,' Teff=',Teff,"
+--_TRACE "@wterm' depos(1), depos(20)',depos(1),depos(20),"
+    <*C:  PARAMETERS & COMMONS *>;
+      REAL*8   Ryp(Mzon),Uyp(Mzon),Typ(Mzon),Rhop(Mzon); -- for primag
+    _includen opacity;
+    _includen black;
+    _Do K=1,Nzon;
+       Ryp(K)=Y(K,1);
+       Uyp(K)=Y(Nzon+K,1); -- NR
+ --      Uyp(K)=Y(Nzon+K,1)/sqrt(1.d0+(Y(Nzon+K,1)/clight)**2); -- Rel
+       Typ(K)=Y(2*Nzon+K,1);
+    _Od;
+    Rhop(1)=3.D0*DM(1)/(Ryp(1)**3-Rce**3);
+    _DO I=1,NZON;
+       IF(I>1)Rhop(I)=3.D0*DM(I)/(Ryp(I)**3-Ryp(I-1)**3)
+    _OD;
+
+    <*A: FIND PARAMETERS OF PHOTOSPHERE *>;
+    <*V: FIND TEFF,U,B,V *>;
+    <*G* PREPARE WRK,WRKX & CALL BARKUK TO CONTROL GAS DYNAMICS *>;
+    ObsLum=0.d0;
+    _DO L=1,NFRUS;
+         Obslum=Obslum+Y(@L)*WEIGHT(L)*(1.d0
+            +(uyp(Nzon-1)/clight)*(1.d0 + EddJ(Nzon-1,L))/HEdd(L)); -- observer
+            -- in first order u/c -- need be corrected for all orders
+    _od;
+    Obslum=max(CLUMF*Obslum*Ryp(NZON-1)**2,3.86d+31);
+    MBOL=4.75D0-2.5D0*LOG10(ABS(ObsLum)/3.86d+33);
+    if (mod(NSTEP,50)==0) write(@term,'(a,1p,2g15.5)') 'logL',log10(Obslum);
+    --write(@term,'(a,1p,2e12.3)')
+      --  ' Obslum  Elsurf in lbalsw ',Obslum, Elsurf;
+--       ELSURF=Obslum/(UEPRI/(UTIME*CRAP));
+--comov  MBOL=4.75D0-2.5D0*LOG10(ABS(ELSURF)*(UEPRI/(UTIME*CRAP))/3.86D-17);
+     time=(t-Ryp(NZON-1)/CLIGHT)*(UTIME*CRAP)/8.64D+04;
+-- Below we save outgoing flux and exact number of frequencies we used:
+    Lsaved=Lsaved+1;
+    NFRUSED(Lsaved)=NFRUS+dLfrMax; -- for flx files and plots in tt* routines
+    Hnorm=0.d0;
+   _do Lfr=1,NFRUS+dLfrMax;
+      fr0=freqob(Lfr)*(1.d0-uyp(Nzon)/clight);
+      fr0log=log(fr0);
+      xnu=(zerfr-fr0log)*dlognu(1); -- dlognu < 0 !
+--        Lfr0=min(Nfreq-1,Nfrus,max(int(xnu),1));
+      Lfr0=int(xnu);
+      if(Lfr0>=1)then;
+--        wfr0=(freqmn(Lfr0+1)-fr0)/(freqmn(Lfr0+1)-freqmn(Lfr0));
+                                     -- in linear scale
+        L=Lfr0;
+--	if(mod(Lfr,20)==0 .and. mod(Nstep,100)==0)then;
+--        if(Nstep==1000 .or. Nstep==1050 .or. Nstep==1100)then;
+--        if(Nstep==350 .or. Nstep==400 .or. Nstep==450)then;
+--          write(*,'(a,2I5)')' in lbalsw Lfr, Lfr0:',Lfr,Lfr0;
+--        pause;
+--        endif;
+        if(Lfr0<Nfrus)then;
+           Hobsg=cH(Lfr)*exp((1.d0-wH(Lfr))*log(max(Y(@L1),1.d-100))+
+                         wH(Lfr)*log(max(Y(@L),1.d-100)));
+        else;
+           Hobsg=cH(Lfr)*Y(@L);
+        endif;
+        Flsave(Lfr,Lsaved)=Hobsg*Ryp(NZON-1)**2;
+--comoving       Flsave(Lfr,Lsaved)=Y(@L)*Ryp(NZON-1)**2;
+        Hnorm=Hnorm+Flsave(Lfr,Lsaved)*WEIGHT(Lfr);
+--         if(mod(Lfr,20)==0 .and. mod(Nstep,100)==0)then;
+--        if(Nstep==1000 .or. Nstep==1050 .or. Nstep==1100)then;
+--        if(Nstep>=350 .and. Nstep<=550)then;
+--          write(*,'(a,2i5,1p,3e12.3)')
+--            ' lbalsw:  wH(Lfr),cH(Lfr):',Lfr,Lfr0,wH(Lfr),cH(Lfr);
+--          write(*,'(a,1p,3e12.3)')
+--            ' Hobsg, Y(@L), Hnorm:     ',Hobsg, Y(@L), Hnorm;
+--        endif;
+      else; -- Lfr0<1
+        Flsave(Lfr,Lsaved)=Hobs(Lfr)*Ryp(NZON-1)**2;
+      endif;
+   _od;
+     Obflum=CLUMF*Hnorm; -- obs.lum. according Flsave
+     if(mod(Nstep,100)==0)then;
+--       write(*,'(a,1p,4e12.3)')'  lbalsw: Obslum Obflum CLUMF Hnorm: ',
+--       Obslum, Obflum, CLUMF, Hnorm;
+--       pause;
+     endif;
+--    Obflum=max(CLUMF*Hnorm,1.d33); -- obs.lum. according Flsave
+    do L=1,NFRUS;
+      if( Obflum>1.d-100)then;
+       Flsave(L,Lsaved)=Flsave(L,Lsaved)*Obslum/Obflum;
+      else;
+         Flsave(L,Lsaved)=FJnois;
+      endif;
+    enddo;
+--    Flsave(Mfreq,Lsaved)=TPHfit; -- save Catchpole Tphotosphere
+    Flsave(Mfreq,Lsaved)=Rphtau; -- save Rph from tau=0.64
+    call ubvnew;
+    If( MOD( NSTEP, MAX0(1,NOUT/10) )==0)  then;
+            WRITE(@Wres,'(1X,1P,G12.5,0P,F11.3,3F12.3,1P,E10.2,0P,6F10.3)')
+            Time,TEFF*1.D-03,
+            RPH,VPH*1.D+06/(UTIME*CRAP),XPH,HUSED*UTIME*CRAP,
+            MBOL,MU,MB,MV,MU-MB,MB-MV;
+    endif;
+--   Write(11,'(8A4)') SNGL(Time),SNGL(TEFF*1.D-03),
+  --      SNGL(RPH),SNGL(VPH*1.D+06/(UTIME*CRAP)),SNGL(MBOL),
+    --    SNGL(MU),SNGL(MB),SNGL(MV);
+    Tcurv(1,Lsaved)=Time;
+    Tcurv(2,Lsaved)=TEFF*1.D-03;   -- Our Tphotosphere
+    Tcurv(3,Lsaved)=RPH;
+    Tcurv(4,Lsaved)=VPH*1.D+06/(UTIME*CRAP);
+    Tcurv(5,Lsaved)=MBOL;
+    Tcurv(6,Lsaved)=MU;
+    Tcurv(7,Lsaved)=MB;
+    Tcurv(8,Lsaved)=MV;
+    depos(Lsaved)=ELVOL*UEPRI/UTIME;
+--    depos(Lsaved)=TPHfit;  -- for experiments
+    RETURN;
+    END;
+%MC:O
+--    Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
+    common/phofit/Tphfit,Rphfit;
+--  REAL*8 BL(NFREQ),FJ(NFREQ),FH(NFREQ); -- FOR %MG:
+%MA:
+   I=NZON; tau(I)=0.D0; tauTp=0.D0;
+   IRph=0; kmrep=0;
+   _WHILE (I>1 & (tau(I) < @tauPH .or. tauTp < @tauPH) ) .or. I>Nzon-5 _DO
+       PL=rhop(I); Tp=Typ(I);
+--       write(*,'(a,i5,1p,2e12.3)')' in primag I rhop Typ:',I,rhop(I),Typ(I);
+       Do ii=1, Natom;
+         Yat(ii)=YABUN(ii,I);
+       enddo;
+       RADP=.FALSE.;
+       CALL URSOS;
+       kmhap=I;
+       CALL HAPPA;
+       tau(I-1)=tau(I)+(Ryp(I)-Ryp(I-1))*HAPPAL(@freqtau)*PL;
+       I=I-1;
+       If(tau(I)>=@taurep & kmRep==0) kmRep=max(I,kmnick);
+       If(tau(I)>=@tauPH & IRph==0) IRph=I;
+       tauTp=0.5D0*(tau(I)+tau(I+1));
+   _OD; -- tau(I)>=@tauPH & tauTp>=@tauPH or I==1
+   IRph = max(IRph, 1);
+   JPH=IRph;
+   RPHtau=Ryp(IRph+1)+(Ryp(IRph)-Ryp(IRph+1))/(tau(IRph)-tau(IRph+1))
+              *(@tauPH-tau(IRph+1));
+/* If(NCND>0)Then;
+     <*COND: FIND RPH, VPH & TPH INTERPOLATING IN tau *>;
+   ELSE;
+     <*TRAN: FITTING TPH FOR TRANSPARENT CORE, Then RPH & VPH*>;
+   ENDIF;  */
+     <*TRAN: FITTING TPH FOR TRANSPARENT CORE, Then RPH & VPH*>;
+%MA_COND:
+   /*   RPH=Ryp(IRph+1)+(Ryp(IRph)-Ryp(IRph+1))/(tau(IRph)-tau(IRph+1))
+              *(@tauPH-tau(IRph+1));
+        VPH=uyp(IRph+1)+(uyp(IRph)-uyp(IRph+1))/(tau(IRph)-tau(IRph+1))
+              *(@tauPH-tau(IRph+1));
+--   0.5D0*(tau(I)+tau(I+1)) -- tau IN THE MIDDLE OF ZONE I+1
+        TPHEQ=(Typ(I+2)**4+(Typ(I+1)**4-Typ(I+2)**4)
+            /(0.5D0*(tau(I)-tau(I+2)))
+            *(@tauPH-0.5D0*(tau(I+1)+tau(I+2))))**.25D0;
+                  */
+     TPH4=Typ(I+2)**4+
+         (Typ(I+1)**4-Typ(I+2)**4)/(0.5D0*(tau(I)-tau(I+2)))
+             *(@tauPH-0.5D0*(tau(I+1)+tau(I+2)));
+     TPHEQ=ABS(TPH4)**.25D0;
+     TPHEQ=SIGN(TPHEQ,TPH4);
+%MA_TRAN:
+    SUMH=0.D0;
+    _DO L=1,NFRUS;
+--       write(*,'(a,i5,1p,e12.4)')' primag L Hedd:', L,Hedd(L);
+       SUMH=SUMH+Y(@L)*WEIGHT(L)/(HEDD(L)*(1.D0-HEDD(L)))
+    _OD;
+    SUMH=(1.5D1/PI**4)*SUMH;
+    TPHo=ABS(SUMH)**.25D0;
+    TPHo=max(TPHo,1.d-2);
+    Tph=TPHo;
+    RPH=SQRT(ABS(ELSURF)/(TPHo**4*CSIGM*UTp**4*UTIME**3/(URHO*UR**3)));
+-- old Rph now via f_Edd at tau \sim 0.1 instead of h_Edd:
+/*    SUMH=0.D0;
+    _DO L=1,NFRUS;
+       SUMH=SUMH+Y(@NFHL+Kmrep,1)*WEIGHT(L)*
+           8.d0/(3.d0-6.d0*EDDJ(Kmrep,L)
+                   + sqrt(12.d0*EDDJ(Kmrep,L)-3.d0))
+    _OD;
+    SUMH=(1.5D1/PI**4)*SUMH;
+    TPHo=ABS(SUMH)**.25D0;
+    TPH=TPHo;
+    RPH=SQRT(ABS(ELSURF)/(TPHo**4*CSIGM*UTp**4*UTIME**3/(URHO*UR**3))); */
+--  If( MOD( NSTEP,NOUT) ==0)  then;
+    <*RPHOT* least squares method *>;
+--      Tph=Tphfit; -- comment this for real run
+--      RPH=SQRT(ABS(ELSURF)/(TPH**4*CSIGM*UTp**4*UTIME**3/(URHO*UR**3)));
+--      @wterm ' new Tphfit Rph ', Tphfit, Rph;
+--  Endif;
+    I=1;
+    _WHILE I<NZON-1 & Ryp(I+1) < RPH  _DO
+       I=I+1;
+    _OD; -- Ryp(I+1)>=RPH
+    VPH=uyp(I+1)+(uyp(I)-uyp(I+1))/(Ryp(I)-Ryp(I+1))*(RPH-Ryp(I+1));
+    XPH=YABUN(1,I+1)+(YABUN(1,I)-YABUN(1,I+1))/(Ryp(I)-Ryp(I+1))
+              *(RPH-Ryp(I+1));
+--    If( MOD( NSTEP, MAX0(1,NOUT/10) )==0)
+--           @wterm ' primag Tph Rph Iph=',I, Tph, Rph;
+/*%MG:
+  _DO I=1,NZON;
+    WRKX(I)=FLOAT(I);
+    WRK(I,1)=SNGL(LOG10(Typ(I)));
+    WRK(I,2)=SNGL(SIGN(LOG10(ABS(uyp(I))+1.D-08),uyp(I)));
+  _OD;
+/*_DO K=NCND+1,NZON;
+      _SELECT
+        _ K==NCND+1 [KK=2]
+        _ K==NCND+(NZON-NCND)/4   [KK=3]
+        _ K==NCND+(NZON-NCND)/2   [KK=4]
+        _ K==NCND+3*(NZON-NCND)/4   [KK=5]
+        _ K==NZON-1 [KK=6]
+        _OTHER  [_ITERATE K]
+      _END;
+    _DO L=1,NFRUS;
+      BL(L)=BLACK(L,Typ(K))*FREQMN(L)**3;
+      FJ(L)=Y(NVARS*NZON+K-NCND+(NZON-NCND)*(L-1),1)*FREQMN(L)**3;
+      FH(L)=Y(NVARS*NZON+KRAD+K-NCND+(NZON-NCND)*(L-1),1)*FREQMN(L)**3;
+      If(KK==2)WORK(L,KK-1)=SNGL(LOG10(ABS(BL(L))));
+      WORK(L,KK)=SNGL(LOG10(ABS(FJ(L))));
+      WORKX(L)=FLOAT(L);
+    _OD;
+  _OD;*/
+  NPHOT=JPH;TPHOT=TPH;
+  /* CALL BARKUK (WORKX, WORK,Mzon+2,NFREQ,6,WORKX(1), WORKX(NFREQ),
+                  0.5,0., 0.,0.,60, 20, NFREQ*2, 0, 6 ); */  */
+%MA_TRAN_RPHOT:
+  _Define
+   @NFHV    NVARS*NZON+(NZON-NCND)*(LubvV-1)-NCND+KRAD      --  FH(LubvV)
+     @dHT "
+--   wb=0.d0;
+--   wn=0.d0;
+--   _Do L=1,NFRUS;
+--     wn=wn+Weight(L)**2/(freq(L+1)-freq(L))*
+--              BlackD(L,Tphfit)*Y(@NFHL+Kmrep,1);
+--     wb=wb+Weight(L)**2/(freq(L+1)-freq(L))*--
+--              Black(L,Tphfit)*BlackD(L,Tphfit);
+--   _Od;
+--   fRPH=wn/wb;
+   dHT=0.d0;
+   _Do L=1,NFRUS;
+--        dHT=dHT+Weight(L)**2/(freq(L+1)-freq(L))*
+--                Black(L,Tphfit)*(Y(@NFHL+Kmrep,1) - Black(L,Tphfit)*fRPH);
+     If(Y(@NFHL+Kmrep,1)>0.d0) dHT=dHT+Y(@NFHL+Kmrep,1)*weight(L)*
+               (log(Y(@NFHL+Kmrep,1)/Y(@NFHV+Kmrep,1)) -
+                log(max(1.d-50,black(L,Tphfit)/black(LubvV,Tphfit))))*
+            (BlackD(L,Tphfit)/Black(L,Tphfit)-
+                   BlackD(LubvV,Tphfit)/Black(LubvV,Tphfit))
+   _OD;
+   ";
+  If(Tph>0.d0)then;
+     Tphfit=Tph;  -- Initial approximation TPH
+  else;
+     Tphfit=5.d3/UTp;
+  endif;
+  @dHT;
+  ian=0;
+  IFAIL=1; -- must be 0 if found
+  _Select
+    _  dHT>0.
+    [
+       _While dHT>0. _do
+         Ast=10.**(min(-12+ian,-1))*Tphfit;
+         Tphfit=Tphfit+Ast;
+         @dHT;
+  --       @wterm 'Tphfit',Tphfit,'   dHT=',dHT;
+         ian=ian+1;
+       _od  ]
+    _  dHT<0.
+    [  _While dHT<0. _do
+         Ast=10.**(min(-12+ian,-1))*Tphfit;
+         Tphfit=Tphfit-Ast;
+         @dHT;
+  --       @wterm 'Tphfit',Tphfit,'   dHT=',dHT;
+         ian=ian+1;
+       _od  ]
+    _other   [ IFAIL=0 ]  -- Tphfit found
+  _end
+  ITQ=0;
+--  Errest=abs(dHT);
+  _While abs(Ast)>EpsTPH*abs(Tphfit)
+             & ITQ < MAXIT & IFAIL^=0 _do
+--     Errest=abs(dHT);
+     Ast=0.5D0*SIGN(Ast,dHT);
+     Tphfit=Tphfit+Ast;
+     @dHT;
+ --    @wterm 'Binsearch',dHT;
+     ITQ=ITQ+1;
+  _od;
+--  RPHfit=Ryp(Kmrep)*SQRT(2.d0*wn/wb);
+%MV:
+     TEFF=TPH*UTp;
+     <*A: FIND FH FOR U,B,V BY INTERPOLATION IN FHU,FHB,FHV *>;
+     -- CFLUX=60/PI**4 * SIGMA * UTp**4
+     MU=-2.5D0*(LOG10(max(CFLUX*FHU*@U**5/CCL*
+                      (Ryp(NZON-1)*UR/3.0857D19)**2,1.d-10))+8.37D0);
+     MB=-2.5D0*(LOG10(max(CFLUX*FHB*@B**5/CCL*
+                      (Ryp(NZON-1)*UR/3.0857D19)**2,1.d-10))+8.18D0);
+     MV=-2.5D0*(LOG10(max(CFLUX*FHV*@V**5/CCL*
+                      (Ryp(NZON-1)*UR/3.0857D19)**2,1.d-10))+8.42D0);
+%MVA:
+   L=LubvU;  -- FOR U
+--   print *, L,Y(@L),Y(@L1);
+   If(L<NFRUS & abs(Y(@L1))>1.d-100)Then;
+     FHU=EXP(LOG(ABS(Y(@L1)))+
+             LOG(ABS(Y(@L)/Y(@L1)))*DLOGNU(L)*LOG(@U/FREQMN(L+1)));
+--           LOG(ABS(Y(@L)/Y(@L1)))/(FREQMN(L)-FREQMN(L+1))
+--       *(@U-FREQMN(L+1)));
+   else;
+     FHU=ABS(Y(@L));
+   endif;
+     L=LubvB;  -- FOR B
+--   print *, L, Y(@L),Y(@L1);
+   If(L<NFRUS & abs(Y(@L1))>1.d-100)Then;
+     FHB=EXP(LOG(ABS(Y(@L1)))+
+             LOG(ABS(Y(@L)/Y(@L1)))*DLOGNU(L)*LOG(@B/FREQMN(L+1)));
+--           LOG(ABS(Y(@L)/Y(@L1)))/(FREQMN(L)-FREQMN(L+1))
+--       *(@B-FREQMN(L+1)));
+   else;
+     FHB=ABS(Y(@L));
+   endif;
+     L=LubvV; -- FOR V
+--   print *, L,Y(@L),Y(@L1);
+   If(L<NFRUS & abs(Y(@L1))>1.d-100)Then;
+     FHV=EXP(LOG( max(1.d-100,ABS(Y(@L1))) )+
+             LOG( max(1.d-100,ABS(Y(@L)/Y(@L1))))
+                  *DLOGNU(L)*LOG(@V/FREQMN(L+1)));
+--           LOG(ABS(Y(@L)/Y(@L1)))/(FREQMN(L)-FREQMN(L+1))
+--       *(@V-FREQMN(L+1)));
+   else;
+     FHV=ABS(Y(@L));
+   endif;
+--   PRINT*,@U,@B,@V,UFREQ;
+--   PRINT*,FHU,FHB,FHV
+%PE:
+   KENTR=1;
+   _DO I=MAX0(1,Ipout-1),MIN0(Ipout+1,NZON);
+   <*F: FIND PHYSICAL QUANTITIES FOR OUTPUT*>;
+   <*P: PRINT LINE *>;
+   _OD; KENTR=0;
+%PEF=PA_Pre.F:
+%PEP=PA_Pre.P:

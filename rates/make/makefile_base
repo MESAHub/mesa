@@ -1,0 +1,152 @@
+# This is the makefile for the mesa nuclear reaction rates package
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCE FILES
+
+SRCS = \
+   rates_def.f90 \
+   rates_names.f90 \
+   rates_reverses.f90 \
+   weak_support.f90 \
+   weaklib_tables.f90 \
+   suzuki_tables.f90 \
+   load_weak.f90 \
+   eval_weak.f90 \
+   coulomb.f90 \
+   load_ecapture.f90 \
+   eval_psi.f90 \
+   eval_coulomb.f90 \
+   eval_ecapture.f90 \
+   reaclib_eval.f90 \
+   reaclib_support.f90 \
+   reaclib_print.f90 \
+   reaclib_input.f90 \
+   ratelib.f90 \
+   pycno.f90 \
+   raw_rates.f90 \
+   rates_initialize.f90 \
+   rates_support.f90 \
+   screen5.f90 \
+   screen_graboske.f90 \
+   screen_chugunov.f90 \
+   screen.f90 \
+   rates_lib.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = chem eos $(LIBS_MESA_NUMERICS)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) -lchem -leos $(LOAD_MESA_NUMERICS)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = librates.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) rates_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) rates_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree)
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+
+ifeq ($(USE_HDF5),YES)
+	COMPILE_CMD = $(COMPILE) -DUSE_HDF5
+else
+	COMPILE_CMD = $(COMPILE)
+endif
+
+rates_names.o : rates_names.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_BASIC $<
+	@$(COMPILE_BASIC) $(FCfree) $(FCchecks) -c -O0 $<
+else
+	$(COMPILE_BASIC) $(FCfree) $(FCchecks) -c -O0 $<
+endif
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f90 $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  ifeq ($(USE_HDF5),YES)
+    DEPEND_FLAGS = -DUSE_HDF5
+  else
+    DEPEND_FLAGS =
+  endif
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) $(DEPEND_FLAGS) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) $(DEPEND_FLAGS) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

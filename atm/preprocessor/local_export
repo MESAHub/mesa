@@ -1,0 +1,3 @@
+rm -rf ../atm_data/*
+cp -rf atm_data/* ../atm_data
+echo "done"

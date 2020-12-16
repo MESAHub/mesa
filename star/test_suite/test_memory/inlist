@@ -1,0 +1,15 @@
+&star_job
+  ! use defaults
+/
+
+&eos
+  ! use defaults
+/
+
+&kap
+  use_Type2_opacities = .false.
+/
+
+&controls
+  ! use defaults
+/

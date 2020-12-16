@@ -1,0 +1,200 @@
+-- _trace "write(*,*)' ------',"
+
+_DEFINE
+ @Form  "'FORMATTED',RECL=80"     -- for testing
+ @Lunit "Lunit,*"
+ @Form  "'UNFORMATTED'"
+ @Lunit "Lunit"
+@OpenFile
+      "INQUIRE(FILE=NFILE,EXIST=LEXIST);
+      IF(LEXIST)THEN;
+        STATUS='OLD';
+--        STATUS='APPEND';
+      ELSE;
+        STATUS='NEW';
+      ENDIF;
+      OPEN(Lunit,IOSTAT=IOST,FILE=NFILE,STATUS='unknown',FORM=@Form);"
+--      OPEN(Lunit,IOSTAT=IOST,FILE=NFILE,STATUS=STATUS,
+  --         ACCESS='SEQUENTIAL',FORM=@Form);"
+@IOLINE
+         "t,NSTEP"
+@IOSTARTint
+         "KTAIL,NZON,NQUSED,KRAD,NCND,NFRUS,NREG"
+@IOSTARTrea
+         "XA,YA,XYZA,EKO,RADBEG,Rce,ELOST,ULGCAP,ULGEPS,ULGP,ULGV,
+          ULGE,UEPRI,UTIME,UP,UPI,UE,UEI,CK1,CK2,CFR,CRAOLD,
+          UM,UV,URM,DM,AM,DMIN,AMINI,DMOUT,AMOUT,
+          YABUN,
+       --   Ry,Uy,Ty
+--          ((Y(ISAVE,JSAVE),ISAVE=1,NZON*NVARS+2*KRAD),JSAVE=1,NQ+1)"
+          (Y(ISAVE,1),ISAVE=1,NZON*NVARS+2*KRAD)"
+@IOCONTint
+          "JSTART,METH,KFLAG,EVALJA,OLDJAC,BADSTE,
+          Nclast,NFUN,NJAC,NITER,NFAIL,
+          MEO,NOLD,LNQ,IDOUB,NTHICK,LTHICK"
+@IOCONTrea
+          "HUSED,RMAX,TREND,OLDL0,RC,HOLD,EDN,E,EUP,BND,EPSOLD,TOLD,
+          TAUOLD,AMHT,EBurst,TBurst,AMNI,XMNI,
+          YENTOT,H,@HOLD_BAL,ETOT0,FREQ,FREQMN,DLOGNU,WEIGHT,HNT" ;
+
+-- _TRACE "WRITE(*,'(A,1P,E15.3,A)')' EKO=',EKO,";
+
+Subroutine StradIO(mode,Lunit,NFILE);
+ IMPLICIT REAL*8(A-H,O-Z);
+--character*(*) NFILE,mode*2,Status*3;
+ character*80 NFILE,mode*2,Status*3;
+ integer Lunit,IOST;
+ LOGICAL LEXIST,DUMMY;
+_INCLUDE snrad;
+_INCLUDE abo;
+_INCLUDE stsave;
+    _Select
+      _1  mode=='rm' ! mode=='RM' [<*readmodel: read initial static *>]; 
+      _11 mode=='cm' ! mode=='CM' [<*contmodel: read from .prf *>]; 
+      _2  mode=='rc' ! mode=='RC' [<*readcurve : *>]; 
+      _3  mode=='wm' ! mode=='WM' [<*writemodel: *>];
+      _4  mode=='wc' ! mode=='WC' [<*writecurve: *>];
+      _5  mode=='we' ! mode=='WE' [<*writeeve:   *>];
+      _6  mode=='sm' ! mode=='SM' [<*stinfomodel:   *>];
+      _7  mode=='sc' ! mode=='SC' [<*stinfocurve:   *>];
+      _8  mode=='sd' ! mode=='SD' [<*stinfodepos:   *>];
+      _9  mode=='sf' ! mode=='SF' [<*stinfoflux:   *>];
+      _Other [write(@term,'('' Unknown mode:'',A)') mode; stop 16 ];
+    _End;
+Return;
+End;
+
+%_readmodel:
+    @OpenFile;
+--    WRITE(@term,*)' StradIO opened file ',NFILE;
+    _Repeat
+       READ(@Lunit,IOSTAT=IOST,END=10)  @IOLINE,@IOSTARTint,@IOSTARTrea;
+ --      WRITE(@term,*)' StradIO READ STEP=',NSTEP;
+   _Until IOST^=0 .or. (IABS(NSTB)>=IABS(NSTA) & Nstep >= IABS(NSTA));
+                                  -- to end if abs(NSTB) < abs(NSTA)
+   10:CONTINUE;
+
+%_contmodel:
+    @OpenFile;
+--    WRITE(@term,*)' StradIO opened file ',NFILE;
+    _Repeat
+       READ(@Lunit,IOSTAT=IOST,END=11,ERR=111)  @IOLINE,@IOSTARTint,
+                @IOSTARTrea,@IOCONTint,@IOCONTrea;
+--       WRITE(@term,*)' StradIO READ STEP=',NSTEP;
+   _Until IOST^=0 .or. (IABS(NSTB)>=IABS(NSTA) & Nstep >= IABS(NSTA));
+                                  -- to end if abs(NSTB) < abs(NSTA)
+   goto 11;
+   111: @wterm 'ReadError ''CONTREAD''(first read),IOSTAT=',IOST;
+-- stop 29;
+   11:CONTINUE;
+
+%_stinfomodel:
+    @OpenFile;
+    READ(@Lunit,IOSTAT=IOST,END=30)  @IOLINE,@IOSTARTint,@IOSTARTrea,
+                                     @IOCONTint,@IOCONTrea;
+--    WRITE(@term,*)' StradIO READ STEP=',NSTEP;
+    Return;
+    30:LUNIT=-1; -- EOF reached
+
+%_readcurve:
+    @OpenFile;
+    @wterm ' crv opened';
+    _Repeat
+      READ(@Lunit,IOSTAT=IOST,END=20) Lsaved, -- normally is equal to Mbatch
+          ((Tcurv(ISAVE,JSAVE),ISAVE=1,8),JSAVE=1,Lsaved);
+    @wterm ' crv read lsaved=',lsaved;
+    _Until IOST ^= 0;
+    20:
+    NFILE=Depfile;
+    LUNIT=22;
+    @Openfile;
+    @wterm ' depos opened';
+    _Repeat
+      READ(@Lunit,IOSTAT=IOST,END=130) Lsaved,(Depos(JSAVE),JSAVE=1,Lsaved);
+--      @wterm ' depos read lsaved=',lsaved;
+    _Until IOST ^= 0;
+    130:
+    NFILE=Flxfile;
+    LUNIT=23;
+    @Openfile;
+    @wterm ' flux opened';
+    _Repeat
+      READ(@Lunit,IOSTAT=IOST,END=230) Lsaved,
+-- See at writecurve for comments
+        (Tcurv(1,JSAVE),NFRUSED(JSAVE),
+         (Flsave(l,JSAVE),l=1,Mfreq),
+         JSAVE=1,Lsaved
+        );
+      @wterm ' flux read lsaved=',lsaved;
+    _Until IOST ^= 0;
+    230:
+    Lsaved=0;
+%_stinfocurve:  !!! very strange code,
+    @OpenFile;
+    READ(@Lunit,IOSTAT=IOST,END=40) Lsaved, -- normally is equal to Mbatch
+          ((Tcurv(ISAVE,JSAVE),ISAVE=1,8),JSAVE=1,Lsaved);
+--    @wterm ' Curve read', lsaved;
+    return;
+    40:
+    --@wterm ' EOF reached in file crv', lsaved;
+    LUNIT=-1;
+%_stinfodepos:
+    @Openfile;
+      READ(@Lunit,IOSTAT=IOST,END=50) Lsaved,(Depos(JSAVE),JSAVE=1,Lsaved);
+--    @wterm ' Depos read ', Lsaved;
+    Return;
+    50:
+   -- @wterm ' EOF reached in file depos', lsaved;
+    LUNIT=-1;
+%_stinfoflux:
+    @Openfile;
+      READ(@Lunit,IOSTAT=IOST,END=60) Lsaved,
+        (Tcurv(1,JSAVE),NFRUSED(JSAVE),
+         (Flsave(l,JSAVE),l=1,Mfreq),
+         JSAVE=1,Lsaved
+        );
+--    @wterm ' Flx read ', Lsaved;
+    Return;
+    60:
+  --  @wterm ' EOF reached in file flx', lsaved;
+   LUNIT=-1; -- EOF reached and what to do ?
+%_writemodel:
+--    write(@term,*)' ent wm';
+    @OpenFile;
+    CRAOLD=CRAP;
+--    If( Jstart==0 ) Nq=0;
+    WRITE(@Lunit)  @IOLINE,@IOSTARTint,@IOSTARTrea,
+                   @IOCONTint,@IOCONTrea;
+    Begrun=.False.;
+--    write(@term,*)' leav wm';
+%_writeeve:
+    @OpenFile;
+    WRITE(@Lunit)  @IOLINE,@IOSTARTint,@IOSTARTrea;
+%_writecurve:
+--    write(@term,*)' ent wc';
+    @OpenFile;
+--    write(@term,*)' opened wc, Lsaved=',Lsaved;
+    WRITE(@Lunit)   Lsaved, -- normally is equal to Mbatch
+          ((Tcurv(ISAVE,JSAVE),ISAVE=1,8),JSAVE=1,Lsaved);
+
+    NFILE=Depfile;
+    LUNIT=22;
+    @Openfile;
+      Write(@Lunit) Lsaved,(Depos(JSAVE),JSAVE=1,Lsaved);
+--     write(@term,*)' stradio Lsaved=',Lsaved;
+
+    NFILE=Flxfile;
+    LUNIT=23;
+    @Openfile;
+      Write(@Lunit) Lsaved,
+--        ((Flsave(l,JSAVE),l=1,NFREQ),JSAVE=1,Lsaved);
+-- Quick and dirty hack to provide time for each record of saved output flux
+-- December 6, 1995
+        (Tcurv(1,JSAVE),NFRUSED(JSAVE),
+         (Flsave(l,JSAVE),l=1,Mfreq),
+         JSAVE=1,Lsaved
+        );
+    Begrun=.False.;
+    Lsaved=0;
+
+--    write(@term,*)' leav wc';

@@ -1,0 +1,137 @@
+      subroutine copy_all_to_3point_jacobian(nvar, nz, ldA, A, idiag, ne, em1, e00, ep1)
+         integer, intent(in) :: nvar, nz, ldA, ne
+         double precision, intent(out) :: A(:,:) ! (ldA,nvar*nz) ! the jacobian matrix
+         ! A(idiag+q-v,v) = partial of equation(q) wrt variable(v)
+         integer, intent(in) :: idiag
+         double precision, dimension(nvar,nvar,ne), intent(in) :: em1, e00, ep1         
+         integer :: eqn
+         A = 0         
+         do eqn = 1,nvar
+            call copy_one_to_3point_jacobian(nvar, nz, ldA, A, idiag, eqn, ne, em1, e00, ep1)
+         end do
+      end subroutine copy_all_to_3point_jacobian
+
+      
+      subroutine copy_one_to_3point_jacobian(nvar, nz, ldA, A, idiag, eqn, ne, em1, e00, ep1)
+         integer, intent(in) :: nvar, nz, ldA, ne
+         integer, intent(in) :: idiag, eqn
+         double precision, intent(out) :: A(:,:) ! (ldA,nvar*nz) ! the jacobian matrix
+         ! A(idiag+q-v,v) = partial of equation(q) wrt variable(v)
+         double precision, dimension(nvar,nvar,ne), intent(in) :: em1, e00, ep1         
+         ! em1(i,j,k) is partial of equation i of cell k wrt variable j of cell k-1
+         ! e00(i,j,k) is partial of equation i of cell k wrt variable j of cell k
+         ! ep1(i,j,k) is partial of equation i of cell k wrt variable j of cell k+1
+         integer :: var, k, dk, ii, jj
+         ! move partials to A from em1, e00, and ep1
+         do dk = -1, 1 ! 3 point stencil
+            do var = 1, nvar
+               ii = eqn - var - nvar*dk + idiag
+               jj = var + nvar*(dk-1)
+               select case(dk)
+                  case(-1) 
+                     do k=2,nz
+                        A(ii,jj+nvar*k) = em1(eqn,var,k)
+                     end do
+                  case(0) 
+                     do k=1,nz
+                        A(ii,jj+nvar*k) = e00(eqn,var,k)
+                     end do
+                  case(1) 
+                     do k=1,nz-1
+                        A(ii,jj+nvar*k) = ep1(eqn,var,k)
+                     end do
+               end select
+            end do
+         end do
+      end subroutine copy_one_to_3point_jacobian
+
+
+      subroutine write_3point_jacobian_info( &
+           ldA,n,A,idiag,nvar,nz,z_low,z_hi,var_lo,var_hi,eqn_lo,equ_hi, &
+           xscale,var_names,equ_names,data_dir)
+         integer, intent(in) :: ldA ! leading dimension of A
+         integer, intent(in) :: n ! number of equations, 2nd dimension of A
+         integer, intent(in) :: idiag ! row of A with the matrix diagonal entries
+         double precision, intent(in) :: A(ldA,n) ! the jacobian
+         integer, intent(in) :: nvar ! number of variables per zone
+         integer, intent(in) :: nz ! number of zones.  n = nvar*nz.
+         integer, intent(in) :: z_low ! first zone to include in output
+         integer, intent(in) :: z_hi ! last zone to include in output
+
+         integer, intent(in) :: var_lo
+         integer, intent(in) :: var_hi
+         integer, intent(in) :: eqn_lo
+         integer, intent(in) :: equ_hi
+
+         double precision, intent(in) :: xscale(nvar,nz) ! the scaling factors for the x variables
+         character (len=*), intent(in) :: var_names(nvar), equ_names(nvar), data_dir
+
+         integer :: ionames, iodata, ierr, i, j, k, z, q, v, vv
+         double precision, dimension(nz) :: Am1, A00, Ap1
+         character (len=100) :: fig_name, fname
+
+         ierr = 0
+         fname = trim(data_dir) // '/names.data'
+         open(newunit=ionames,file=trim(fname),action='write',status='replace',iostat=ierr)
+         if (ierr /= 0) then
+            write(*,*) 'failed to open ', trim(fname)
+            return
+         end if
+         
+         do j = eqn_lo, equ_hi ! the equation number
+            do i = var_lo, var_hi ! the variable number
+            
+               write(fig_name,'(a)') 'd' // trim(equ_names(j)) // '_d' // trim(var_names(i))
+               fname = trim(data_dir) // '/' // trim(fig_name) // '.data'
+               open(newunit=iodata,file=trim(fname),action='write',status='replace',iostat=ierr)
+               if (ierr /= 0) then
+                  write(*,*) 'failed to open ', trim(fname)
+                  return
+               end if
+
+               write(ionames,*) trim(fig_name)
+
+               !*          A(idiag+q-v,v) = Asq(q,v) for max(1,v-KU)<=q<=min(neq,v+KL)
+
+               do k = z_low, z_hi
+                  z = (k-1)*nvar
+                  q = z + j
+                  v = z + i
+                  if (k == 1) then
+                     Am1(k) = 0
+                  else
+                     vv = v-nvar
+                     Am1(k) = A(idiag+q-vv,vv)/xscale(i,k-1)
+                  end if
+                  A00(k) = A(idiag+q-v,v)/xscale(i,k)
+                  if (k == nz) then
+                     Ap1(k) = 0
+                  else
+                     vv = v+nvar
+                     Ap1(k) = A(idiag+q-vv,vv)/xscale(i,k+1)
+                  end if
+               end do
+               write(iodata,'(9999e20.8)') Am1(z_low:z_hi)
+               write(iodata,'(9999e20.8)') A00(z_low:z_hi)
+               write(iodata,'(9999e20.8)') Ap1(z_low:z_hi)
+               close(iodata)
+               
+            end do
+         end do         
+         
+         close(iodata)
+         close(ionames)
+
+         fname = trim(data_dir) // '/jacobian_rows.data'
+         open(unit=iodata,file=trim(fname),action='write',status='replace',iostat=ierr)
+         write(iodata,'(i3)') -1, 0, 1
+         close(iodata)
+
+         fname = trim(data_dir) // '/jacobian_cols.data'
+         open(unit=iodata,file=trim(fname),action='write',status='replace',iostat=ierr)
+         do k=z_low, z_hi
+            write(iodata,'(i3)') k
+         end do
+         close(iodata)
+
+      end subroutine write_3point_jacobian_info

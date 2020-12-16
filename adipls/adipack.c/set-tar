@@ -1,0 +1,40 @@
+#
+tar cvf adipack.c.tar `find . -name '*.f' -print` \
+        `find . -name '*akefile' -print` \
+        `find . -name '*incl' -print` \
+	adiajobs/in/*in bin notes idl_pro README set-tar
+
+tar cvf models.c.tar models/adipls.c.in models/agsm.l5bi.d.15.p2   \
+   models/agsm.l5bi.d.15.p2.for models/agsm.l5bi.d.15.p2.md   \
+   models/agsm.l5bi.d.15.p2.md.for models/amdl.l5bi.d.15   \
+   models/amdl.l5bi.d.15.for models/amdl.l5bi.d.15.p2   \
+   models/amdl.l5bi.d.15.p2.for models/fgong.l5bi.d.15   \
+   models/freqdif.in models/redistrb.in
+
+tar cvf models_big_endian.c.tar models_big_endian/agsm.l5bi.d.15.p2 \
+   models_big_endian/agsm.l5bi.d.15.p2.md \
+   models_big_endian/amdl.l5bi.d.15 \
+   models_big_endian/amdl.l5bi.d.15.p2
+
+tar cvf star.c.tar star/adipls.c.in star/agsm.0150.Z2.01.100.pg2.for  \
+   star/amdl.0150.Z2.01.100.for star/amdl.0150.Z2.01.100.pg2.for  \
+   star/agsm.0150.Z2.01.100.pg2 star/amdl.0150.Z2.01.100  \
+   star/amdl.0150.Z2.01.100.pg2 star/freqdif.in star/redistrb.c.in
+
+tar cvf star_big_endian.c.tar star_big_endian/agsm.0150.Z2.01.100.pg2 \
+   star_big_endian/amdl.0150.Z2.01.100 \
+   star_big_endian/amdl.0150.Z2.01.100.pg2
+
+tar cvf red-giant.c.tar red-giant/adipls.c.in  \
+   red-giant/agsm.0250.Z12.04a.1085.pr4  \
+   red-giant/agsm.0250.Z12.04a.1085.pr4.for  \
+   red-giant/amdl.0250.Z12.04a.1085  \
+   red-giant/amdl.0250.Z12.04a.1085.for  \
+   red-giant/amdl.0250.Z12.04a.1085.pr4  \
+   red-giant/amdl.0250.Z12.04a.1085.pr4.for  \
+   red-giant/freqdif.in red-giant/redistrb.c.in
+
+tar cvf red-giant_big_endian.c.tar   \
+   red-giant_big_endian/agsm.0250.Z12.04a.1085.pr4  \
+   red-giant_big_endian/amdl.0250.Z12.04a.1085  \
+   red-giant_big_endian/amdl.0250.Z12.04a.1085.pr4

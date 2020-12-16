@@ -1,0 +1,67 @@
+! inlist_c_burn
+ 
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = 'agb.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'c_burn.mod'
+      required_termination_code_string = 'star_species_mass_max_limit'
+
+      change_initial_conv_vel_flag = .true.
+      new_conv_vel_flag = .true.
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+   !dbg = .true.
+   logT_lo = 8.854576
+   logT_hi = 8.8545769
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 3000
+      
+! solver
+
+! when to stop
+      star_species_mass_max_limit = 0.4d0 ! Msun
+      star_species_mass_max_limit_iso = 'ne20'
+
+! wind
+      cool_wind_full_on_T = 1d6
+      hot_wind_full_on_T = 1d6 
+      hot_wind_scheme = ''
+      cool_wind_RGB_scheme = 'Reimers'
+      cool_wind_AGB_scheme = 'Blocker'
+      RGB_to_AGB_wind_switch = 1d-4
+      Reimers_scaling_factor = 0.5 ! 0d0  
+      Blocker_scaling_factor = 50d0
+
+      num_trace_history_values = 6
+      trace_history_value_name(1) = 'total_mass he4'
+      trace_history_value_name(2) = 'total_mass c12'
+      trace_history_value_name(3) = 'total_mass o16'
+      trace_history_value_name(4) = 'total_mass ne20'
+      trace_history_value_name(5) = 'rel_E_err'
+      trace_history_value_name(6) = 'log_rel_run_E_err'
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+      !pause = .true.
+      !Profile_Panels3_xmax = 3 !  -101d0 ! only used if /= -101d0
+
+/ ! end of pgstar namelist

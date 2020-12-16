@@ -1,0 +1,65 @@
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = 'He_star.mod'
+      
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_to_xa_for_accretion = .true.
+      set_initial_to_xa_for_accretion = .true.
+      set_nzlo = -1
+
+      ! get nzhi from an inlist auto-generated in the previous part
+      read_extra_star_job_inlist1 = .true.
+      extra_star_job_inlist1_name = 'inlist_nzhi'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'R_CrB_from_He_star.mod'
+      required_termination_code_string = 'Teff_lower_limit'
+
+      pgstar_flag = .true.
+
+/ !end of star_job namelist
+
+&controls
+
+      ! stop before we cross the opacity blend
+      Teff_lower_limit = 20000
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1000
+
+      ! relax timestep constraint; these are stellar engineering phases
+      varcontrol_target = 1e-3
+
+      ! new envelope abundances
+      ! roughly Weiss mixture R2
+      accrete_same_as_surface = .false.
+      accrete_given_mass_fractions = .true.
+      num_accretion_species = 6
+
+      ! Y = 0.903
+      accretion_species_id(1) = 'he4'
+      accretion_species_xa(1) = 0.903
+      
+      ! XC = 0.012
+      accretion_species_id(2) = 'c12'
+      accretion_species_xa(2) = 0.081
+      
+      ! XO = 0.01
+      accretion_species_id(4) = 'o16'
+      accretion_species_xa(4) = 0.010
+      
+      ! Z = 0.006
+      accretion_species_id(3) = 'n14'
+      accretion_species_xa(3) = 0.0042
+      
+      accretion_species_id(5) = 'ne20'
+      accretion_species_xa(5) = 0.0006
+      
+      accretion_species_id(6) = 'mg24'
+      accretion_species_xa(6) = 0.0012
+
+
+/ ! end of controls namelist

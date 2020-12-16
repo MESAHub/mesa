@@ -1,0 +1,4 @@
+This test suite example re-creates the 16-solar mass main-sequence
+evolution with the inclusion of predictive mixing (using the Ledoux
+criterion), as detailed in Section 2 of the MESA IV instrument paper
+(Paxton et al 2018).

@@ -1,0 +1,35 @@
+         add_isos_and_reactions(
+            neut
+            h  1 2
+            he 3 4
+            li 6 7
+            be7
+            be  9 10
+            b8
+             b 10 11
+             c 12 13            
+             n 13 16
+             o 15 19
+             f 17 20
+            ne 19 23
+            na 21 24
+            mg 23 27
+            al 25 28
+            si 27 33
+             p 30 34
+             s 31 37
+            cl 35 38
+            ar 35 41
+             k 39 44
+            ca 39 49
+            sc 43 51
+            ti 43 54
+             v 47 56
+            cr 47 58
+            mn 51 59
+            fe 51 66
+            co 55 67
+            ni 55 68
+            cu 59 66
+            zn 59 66
+            )

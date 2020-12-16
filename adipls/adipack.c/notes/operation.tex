@@ -1,0 +1,769 @@
+\magnification=\magstephalf
+\def\nwl{\hfill\break}
+\def\note #1]{{\bf #1]}}
+\def\etal{{\it et al.}}
+\def\eg{{\it e.g.}}
+\def\cf{{\it cf.}}
+\def\ie{{\it i.e.}}
+\def\etc{{\it etc.}}
+\def\viz{{\it viz.}}
+\def\dd{{\rm d}}
+\def\newpage{\vfill\eject}
+\def\muHz{\,\mu {\rm Hz}}
+\def\draft{\headline{\bf File: \jobname\hfill DRAFT\hfill\today}}
+
+\def\today{\ifcase\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \space\number\day, \number\year}
+\font\fourtbf=cmbx10 scaled \magstep2
+
+%  section macros, designed to avoid new page after section headings.
+\def\mainsect #1\par{\interlinepenalty=100\bigskip\bigskip\noindent
+\hangindent=1 true cm
+\hangafter=1
+{#1}\par%
+\penalty10000\par\bigskip\par\penalty10000\noindent}
+%\def\mainsect #1\par{\bigskip\bigskip\noindent{#1}\par%
+%\penalty10000\par\bigskip\par\penalty10000\noindent}
+
+\def\subsect #1\par{\bigskip\noindent{#1}\par%
+\penalty10000\bigskip\par\penalty10000\noindent}
+\def\intsect #1\par{\par\penalty10000\bigskip\penalty10000\noindent{#1}\par%
+\penalty10000\par\bigskip\par\penalty10000\noindent}
+\def\ref{\par\noindent
+	\hangindent=0.7 true cm
+	\hangafter=1}
+\parskip = 5pt
+\centerline{\fourtbf Notes on using the solar models and }
+\centerline{\fourtbf revised adiabatic pulsations package}
+\medskip
+\centerline{\today}
+\medskip
+\centerline{J. Christensen-Dalsgaard}
+
+\mainsect
+{\bf 1 Introduction}
+
+These notes give some information on the programs and data provided with the
+package.
+It is assumed that the package has been installed as described in
+the {\tt README} file provided, and that the reader is familiar with
+the basic concepts discussed in {\it Notes on adiabatic oscillation
+programme} (in the following {\it Notes}),
+particularly the input format and output files.
+All directory names are given relative to the root where
+the package was unpacked and installed.
+
+The basic way that all the programs are run is through {\tt csh}
+scripts provided in the directory {\tt bin};
+to get easy access to the scripts, {\tt bin}
+(with its appropriate prefix) must be included in the 
+command search path.
+These call the executables (denoted by ending in {\tt .x}).
+Parameters to the executable may be provided in one of two ways:
+\medskip
+\item{--} as arguments to the script
+\item{--} in a {\it control file} which is provided as as argument 
+to the script; this is typically used in more complex cases.
+The control file sets up parameters and input and output files
+for the program.
+\medskip\noindent
+In most cases the proper arguments to the scripts, with a brief
+description, is provided by calling the script either
+with no argument or with the argument {\tt -help},
+
+{\tt script -help}
+
+
+Sample control files are provided in the {\tt models.tar}
+distribution, to appear in the {\tt models} directory.
+The structure for these control files is similar to the
+structure of the control file to the basic pulsation code,
+as described in {\it Notes}, section 7.2.1.
+
+A note on program naming: for ease of reference I have in almost
+all cases kept the same names as in my own installation.
+In particular, I have kept the ``{\tt .d}'' in the most of the names,
+indicating that the programs are in double precision (8 byte reals).
+
+\subsect
+{\it 1.1 Notes on revision}
+
+The present set of programs replaces the set released in 1994.
+There have been numerous changes in several of the programs and
+corresponding control files; for this reason, unfortunately,
+backwards compatibility has not been ensured.
+However, none of the functionality in the old package has been lost.
+Also, the formats of the basic data products are the same,
+so that there should be no difficulty in using the new 
+package with old files of modes or models.
+It is suggested that the user completely replaces the old package with the
+new, rather than to try to combine them.
+\newpage
+
+\mainsect
+{\bf 2 Computing adiabatic modes}
+
+The program is started by the command
+
+{\tt adipls.n.d <control file>}
+
+\noindent
+The sample control file recomputes a modest set of modes, at selected 
+degrees, based on reading trial frequencies from a grand summary.
+Only eigenfrequencies are output.
+This is useful for testing that the program works correctly. 
+The computed frequencies can be compared with the frequencies
+by using the program {\tt freqdif.d} (see below).
+It will presumably be comparatively easy to modify the
+control file to consider other cases.
+A full list of control parameters is provided in {\it Notes}.
+
+If pulsations are to computed for other models than those provided,
+the model must be transformed into the appropriate format,
+as described in {\it Notes}, Sections 5 and 7.1.
+Note in particular that for a physical model (in contrast to
+a polytrope) $D_7$ must be set to $-1$ (this affects the
+way the surface boundary condition is treated).
+
+In general, the mesh resulting from, {\eg}, an evolution
+calculation is not optimal for oscillation calculations.
+The mesh can be reset with the program {\tt redistrb.d}
+described below.
+
+\mainsect
+{\bf 3 Auxiliary programs}
+
+The package contains a set of programs for manipulating the output
+of the pulsation program and the model files. 
+These are provided in the directory {\tt adiajobs} as Fortran source code,
+and are compiled and linked with the {\tt make} command
+(see the {\tt README} file).
+The following nomenclature is used, for any program {\tt program}:
+\medskip
+\item{--} {\tt program.d.f} is the Fortran source code. 
+\item{--} {\tt program.d.x} is the executable program.
+\item{--} {\tt program.d} is the {\tt csh} script
+(residing in {\tt bin}) used to call the program.
+\medskip
+Unlike the pulsation code, there are no separate notes documenting the
+use of these programs.
+Below follows a brief list of the most important of them,
+with indications of what they do and how they are called.
+In general, a fairly detailed description of the input parameters
+and operation of the program is provided in the source code.
+
+\medskip
+\item{$\bullet$}
+{\tt form-amdl.d}:
+Transforms between binary and ASCII versions of models for pulsation program.
+It is called with the command
+
+{\tt form-amdl.d <case> <input file> <output file>}
+
+\item{}
+Here {\tt <case>} determines the direction of the transformation:
+
+\itemitem{--} {\tt case = 1}: transform from binary to ASCII
+\itemitem{--} {\tt case = 2}: transform from ASCII to binary
+
+
+\medskip
+\item{$\bullet$}
+{\tt form-agsm.d}:
+Transforms between binary and ASCII versions of grand summaries.
+It is called with the command
+
+{\tt form-agsm.d <case> <input file> <output file> [diag]}
+
+\item{}
+Here {\tt <case>} determines the direction of the transformation:
+\itemitem{--} {\tt case = 1}: transform from binary to ASCII
+\itemitem{--} {\tt case = 2}: transform from ASCII to binary
+\item{} {\tt [diag]} controls the amount of output, as in
+the {\tt scan-agsm.d} command (see below).
+
+
+\medskip
+\item{$\bullet$}
+{\tt redistrb.d}:
+Resets mesh in model for pulsation program. It is called with the command
+
+{\tt redistrb.d <control file>}
+
+\item{}
+A sample control file ({\tt redistrb.in}) is provided.
+This is set up to set a mesh suitable for p-mode calculations.
+Although it is possible to set individual parameters, the following
+two choices should be appropriate for computing modes in solar models:
+\itemitem{--}
+{\tt icase = 11} for p modes.
+\itemitem{--}
+{\tt icase = 12} for g modes.
+\smallskip
+\item{}
+I use the convention of denoting p mode models
+with 600, 1200, 2400, 4800, $\ldots$ by the file trailers
+{\tt p, p1, p2, p3}, $\ldots$, with a similar notation for g modes.
+
+\medskip
+\item{$\bullet$}
+{\tt scan-amdl.d}: prints summary of pulsation model file.
+It is called with the command
+
+{\tt scan-amdl.d <pulsation model file>}
+
+\medskip
+\item{$\bullet$}
+{\tt set-asscal.d}: Adds dimensionless integral of $\dd r/c$ and
+dimensionless asymptotic scaling factor to pulsation model file.
+See Appendix A for precise definitions.
+It is called with the command
+
+{\tt set-asscal.d <input model file> <output model file> [truncation radius]}
+
+where
+
+\itemitem{--} {\tt truncation radius} (default photospheric radius)
+is upper limit of scaling integral.
+
+\medskip
+\item{$\bullet$}
+{\tt compamod.n.d}:
+Finds differences between two pulsation-model files.
+It is called with the command
+
+{\tt compamod.n.d <control file>}
+
+\item{}
+A sample control file ({\tt compamod.n.in}) is provided.
+
+\medskip
+\item{$\bullet$}
+{\tt fgong-amdl.d}:
+Converts model in ASCII GONG format (see Section~5)
+to pulsation model file.
+It is called with the command
+
+{\tt fgong-amdl.d <Input GONG file> <Output pulsation-model file>}
+
+\medskip
+\item{$\bullet$}
+{\tt diff-fgong.d}:
+Finds differences between two models in ASCII GONG format (see Section~5).
+It is called with the command
+
+{\tt diff-fgong.d <First input model> <Second input model> <Output file> [case]}
+
+\item{}
+Use {\tt diff-fgong.d -help} to get details about the different cases.
+The default is difference at fixed fractional radius $r/R$.
+
+\bigskip
+\item{$\bullet$}
+{\tt scan-agsm.d}: prints summary of grand summary file.
+It is called with the command
+
+{\tt scan-agsm.d <grand summary file>}
+
+\item{}
+or
+
+{\tt scan-agsm.d <grand summary file> 1}
+
+\item{}
+In the first case all modes are listed, in the second only the
+first mode for each degree.
+
+\medskip
+\item{$\bullet$}
+{\tt scan-ssm.d}: prints summary of short summary file.
+It is called with the command
+
+{\tt scan-ssm.d <short summary file>}
+
+\medskip
+\item{$\bullet$}
+{\tt scan-amde.d}: prints summary of eigenfunction file.
+It is called with the command
+
+{\tt scan-amde.d <eigenfunction file> <case>}
+
+\item{}
+Here {\tt case = 1} for a file containing the full set
+of eigenfunctions, {\tt case = 2} for file containing
+restricted set
+(for formats for eigenfunction files, see
+{\it Notes}, section 8.5).
+
+\medskip
+\item{$\bullet$}
+{\tt set-obs.d}: sets ASCII formatted file of mode data
+from grand or short summary, with each record having
+the form $l, n, \nu$, where $\nu$ is frequency in $\muHz$.
+(This can be thought of as frequencies in the form of
+observed data.)
+It is called with the command
+
+{\tt set-obs.d <case> <input file> <output file>}
+
+\item{}
+Here the input file can be either a grand summary or a 
+short summary.
+{\tt <case>} depends on the type of input file and, for
+input from a grand summary, determines the choice of frequency:
+\itemitem{--}
+{\tt case = 1}: grand summary, variational frequency.
+\itemitem{--}
+{\tt case = 2}: short summary.
+\itemitem{--}
+{\tt case = 4}: grand summary, from eigenfrequency in {\tt cs(20)}.
+Note that this allows setting Cowling
+approximation frequency.
+\itemitem{--}
+{\tt case = 5}: grand summary, from Richardson extrapolation frequency
+in {\tt cs(37)}, if this is set.
+\itemitem{--}
+Otherwise variational frequency is used.
+\item{}
+If {\tt case > 10}, set frequencies according to {\tt case - 10},
+but include also mode energy ({\cf} {\it Notes}, section~4.3) in the file.
+
+\medskip
+\item{$\bullet$}
+{\tt diff-sum.d}:
+Compares two mode sets, assumed to be ordered properly,
+outputting modes that appear in one set but not the other.
+The mode sets can
+be of the form of grand or short summaries,
+or observed data.
+It is called with the command
+
+{\tt diff-sum.d <case 1> <case 2> <input file 1> <input file 2> 
+$\backslash$\nwl
+\hbox{\null} \hskip 10em <excess 1> <excess 2>}
+
+\item{}
+Here {\tt case 1} and {\tt case 2}
+determine the types of mode sets (which may be different):
+\itemitem{--}
+{\tt case = 1}: grand summary.
+\itemitem{--}
+{\tt case = 2}: short summary.
+\itemitem{--}
+{\tt case = 3}: observed frequencies.
+
+Also
+\itemitem{--} {\tt <excess 1>}: Output file of modes in file 1 but not in file 2
+\itemitem{--} {\tt <excess 2>}: Output file of modes in file 2 but not in file 1
+
+Note: {\tt excess} files are output in same form as corresponding input file.
+
+
+
+\medskip
+\item{$\bullet$}
+{\tt res-amde.d}: sets restricted eigenfunction file from full file.
+It is called with the command
+
+{\tt res-amde.d <input file> <output file> <case>}
+
+\item{}
+Here {\tt case = 1} produces an output file with $y_1, y_2$,
+whereas {\tt case = 2} produces an output file with $\hat z_1, \hat z_2$
+(for formats for eigenfunction files, see
+{\it Notes}, section 8.5).
+
+\medskip
+\item{$\bullet$}
+{\tt freqdif.d}:
+Computes frequency differences between various types of
+frequency sets.
+It is called with the command
+
+{\tt freqdif.d <control file>}
+
+\item{}
+A sample control file ({\tt freqdif.in}) is provided,
+to compute differences between the original modes provided
+in a grand summary, and the modes computed with the
+control file for the adiabatic pulsation program.
+
+\item{}
+The frequency sets may be in the form of grand or short summaries,
+or observed frequencies, as specified by the appropriate input
+parameters (a rudimentary set of notes is provided in
+{\tt freqdif.in}).
+{\tt freqdif.d} automatically selects the overlapping modes between the
+two sets.
+If the first mode set is in the form of a grand summary, 
+the frequency differences can be automatically scaled by the mode
+inertia ratio $Q_{nl}$.
+
+\medskip
+\item{$\bullet$}
+{\tt selsum.d}:
+Selects a subset of a mode set, determined by
+windowing  and/or by matching modes in another set.
+Both input and selection sets can, independently,
+be of the form of grand or short summaries,
+or observed data.
+It is called with the command
+
+{\tt selsum.d <control file>}
+
+\item{}
+A sample control file ({\tt selsum.in}) is provided.
+
+\medskip
+\item{$\bullet$}
+{\tt mer-sum.d}:
+Combines two mode sets, assumed to be ordered properly.
+The mode sets can
+be of the form of grand or short summaries,
+or observed data.
+It is called with the command
+
+{\tt mer-sum.d <case> <input file 1> <input file 2> <output file>}
+
+\item{}
+Here {\tt case} determines the type of mode set:
+\itemitem{--}
+{\tt case = 1}: grand summary.
+\itemitem{--}
+{\tt case = 2}: short summary.
+\itemitem{--}
+{\tt case = 3}: observed frequencies, without errors.
+\itemitem{--}
+{\tt case = 4}: observed frequencies, with errors.
+
+\medskip
+\item{$\bullet$}
+{\tt sortsum.d}:
+Combines and reorders several mode sets,
+possibly applying windowing to them.
+The mode sets can
+be of the form of grand or short summaries,
+or observed data.
+It is called with the command
+
+{\tt sortsum.d <control file>}
+
+\item{}
+A sample control file ({\tt sortsum.in}) is provided.
+This is typically useful if several runs of the pulsation code
+is required to produce a complete mode set.
+To merge two mode sets, already ordered,
+the simpler program {\tt mer-sum.d} can be used (see above).
+
+\medskip
+\item{$\bullet$}
+{\tt setexec.d}:
+Scans for missing modes in a mode set file,
+estimating their frequencies from interpolation, and writing
+the estimated mode parameters as a short summary file on unit 3.
+This may subsequently be used as trial input for a new attempt to
+determine the modes.
+The input file may be in the form of a short summary or grand summary.
+The pogramme is called with the command
+
+{\tt setexec.d <control file>}
+
+\item{}
+A sample control file ({\tt setexec.in}) is provided.
+
+\medskip
+It is obvious that this is only a sample of the programmes
+supplied in {\tt adiajobs}.
+The user is invited to explore.
+
+\mainsect
+{\bf 4 IDL procedures}
+
+The package contains a small set of IDL procedures
+to read products of the pulsation code.
+They are in the directory {\tt idl\_pro}.
+Some documentation on their use is contained at the start of
+each procedure.
+
+The following procedures are provided:
+
+\item{$\bullet$}
+{\tt read\_amde.pro}: reads an eigenfunction from eigenfunction file.
+\item{$\bullet$}
+{\tt read\_amdes.pro}: reads several eigenfunctions from eigenfunction file.
+\item{$\bullet$}
+{\tt read\_amdl.pro}: reads pulsation model from file.
+\item{$\bullet$}
+{\tt read\_gsm.pro}: reads a single grand summary from file.
+\item{$\bullet$}
+{\tt read\_gsms.pro}: reads all grand summaries on file.
+\item{$\bullet$}
+{\tt read\_fgong.pro}: reads model in ASCII GONG format (see below).
+
+\mainsect
+{\bf 5 Models}
+
+The {\tt models.tar} distribution file contains
+calibrated models of the present Sun,
+frequencies for one of these models and input control
+files for the programmes.
+
+\subsect
+{\it 5.1 Some notes on naming conventions}
+
+I have kept my internal notation for the files,
+even though this may, in isolation, seem rather artificial.
+This involves a fixed naming convention
+for products of the computation.
+This is obviously arbitrary, but provides an immediate
+overview of the results:
+
+\item{$\bullet$}
+{\tt amdl.<model descriptor>}: Pulsation-model file on the original mesh
+used in the evolution calculation.
+The variables and file format are described in the Appendix.
+\item{$\bullet$}
+{\tt amdl.<model descriptor>.p<n>}: 
+Pulsation-model file on a mesh suitable for p-model calculations;
+{\tt p1}, {\tt p2}, {\tt p3}, $\ldots$ indicate meshes with 1200, 2400,
+4800, $\ldots$ points.
+\item{$\bullet$}
+{\tt amdl.<model descriptor>.g<n>}: 
+Pulsation-model file on a mesh suitable for g-model calculations;
+{\tt g1}, {\tt g2}, {\tt g3}, $\ldots$ indicate meshes with 1200, 2400,
+4800, $\ldots$ points.
+\item{$\bullet$}
+{\tt fgong.<model descriptor>}: extensive set of model variables,
+in the standard ASCII GONG format.
+The variables, and the format, are described in the notes
+contained in the file \nwl
+{\tt file-format.tex} in the {\tt notes} directory.
+
+\medskip
+
+\item{$\bullet$}
+{\tt agsm.<model descriptor>.p<n>}: grand summary of modes computed
+for model \nwl
+{\tt amdl.<model descriptor>.p<n>}.
+Different sets are distinguished by adding yet another trailer.
+\item{$\bullet$}
+{\tt ssm.<model descriptor>.p<n>}: short summary of modes computed
+for model \nwl
+{\tt amdl.<model descriptor>.p<n>}.
+\item{$\bullet$}
+{\tt amde.<model descriptor>.p<n>}: full eigenfunction file computed
+for model \nwl
+{\tt amdl.<model descriptor>.p<n>}.
+\item{$\bullet$}
+{\tt amde.<model descriptor>.p<n>.y}: restricted eigenfunction file,
+providing $y_1, y_2$, computed
+for model {\tt amdl.<model descriptor>.p<n>}.
+\item{$\bullet$}
+{\tt amde.<model descriptor>.p<n>.z}: restricted eigenfunction file,
+providing $\hat z_1, \hat z_2$, computed
+for model {\tt amdl.<model descriptor>.p<n>}.
+
+\medskip
+ASCII versions of binary files (see the {\tt form-amdl.d} and
+{\tt form-agsm.d} commands above) are indicated by adding ``{\tt .for}''
+to the names of the binary files.
+
+
+\subsect
+{\it 5.2 Notes on the models and frequencies}
+
+Most of the results are for Model S, used as reference in the GONG
+series of {\it Science} articles (see Christensen-Dalsgaard {\etal} 1996),
+or closely related models.
+In addition, for consistency with an earlier
+distribution, I have included a couple of models
+computed by Christensen-Dalsgaard, Proffitt \& Thompson (1993).
+Full descriptions of the physics used in the calculations
+is given in the relevant papers.
+
+The models are 
+provided in terms of pulsation variables ({\tt amdl} models)
+and ASCII GONG variables ({\tt fgong} models).
+They are identified by my internal model descriptors.
+This naming may appear a little unwieldy; however, I strongly
+recommend recording these names for later unique reference to the models.
+The following cases are provided:
+\medskip
+\item{$\bullet$} 
+{\tt l5bi.d.15}: Model S of Christensen-Dalsgaard {\etal} (1996). 
+OPAL(1992) opacity, OPAL equation of state,
+including helium and heavy-element settling. Age of present Sun 4.6 Gyr.
+\item{$\bullet$} 
+{\tt l5bi.d.24}: OPAL(1992) opacity, OPAL equation of state,
+including helium and heavy-element settling. Age of present Sun 4.52 Gyr.
+\item{$\bullet$} 
+{\tt l5bi.d.28}: OPAL(1995) opacity, OPAL equation of state,
+including helium and heavy-element settling. Age of present Sun 4.6 Gyr.
+\medskip
+\item{$\bullet$} 
+{\tt l4b.14}: Model without helium settling;
+MHD equation of state, OPAL(1992) opacities.\nwl
+(Model 1 of Christensen-Dalsgaard {\etal} 1993, Table 1).
+\item{$\bullet$} 
+{\tt l4b.d.18}: Model with helium settling;
+MHD equation of state, OPAL(1992) opacities.\nwl
+(Model 2 of Christensen-Dalsgaard {\etal} 1993, Table 1).
+
+\medskip
+In addition to the model files on the original mesh,
+for Model S I have also included the model on a p-mode mesh
+with 2400 points ({\tt amdl.l5bi.d.15.p2}).
+
+\bigskip\noindent
+Files of oscillation results:
+\medskip
+
+\item{$\bullet$} 
+{\tt agsm.l5bi.d.15.p2}: Grand summary of
+a moderate set of modes, at selected degrees
+(use {\tt scan-agsm.d} to find out which).
+This set is useful for testing the code and initial investigations
+of the effects of changes in the model.
+
+\item{$\bullet$} 
+{\tt agsm.l5bi.d.15.p2.md}: Grand summary of
+an extensive set of modes, 
+including all p modes below the acoustic cut-off frequency at
+degrees below 300.
+This is probably adequate for analysis of the GONG data
+(but, as {\it Notes} will show, there are easy ways to
+produce complete sets to even higher degree).
+
+\item{$\bullet$} 
+{\tt obs.l5bi.d.15.p2.md}: ASCII file (``observational format'') for
+an extensive set of modes, 
+including all p modes below the acoustic cut-off frequency at
+degrees below 300.
+
+\item{$\bullet$} 
+{\tt agsm.l5bi.d.15.g3}: 
+Grand summary of a fairly extensive set of g and f modes of
+degree 1~--~7.
+
+\medskip
+
+\item{$\bullet$} 
+{\tt agsm.l4b.14.p1}: 
+Grand summary of a moderate set of modes, at selected degrees.
+
+\item{$\bullet$} 
+{\tt agsm.l4b.14.p1.md}: 
+Grand summary of an extensive set of modes, 
+including all p modes below the acoustic cut-off frequency at
+degrees below 200, as well as modes at selected higher degree.
+
+\newpage
+
+\mainsect
+{\bf References}
+
+\ref
+Christensen-Dalsgaard, J., Proffitt, C. R. \& Thompson, M. J., 1993.
+[Effects of diffusion on solar models and their oscillation frequencies].
+{\it Astrophys. J.}, {\bf 403}, L75 -- L78.
+\ref
+Christensen-Dalsgaard, J., D\"appen, W., Ajukov, S. V., Anderson, E. R.,
+Antia, H. M., Basu, S., Baturin, V. A., Berthomieu, G., Chaboyer, B.,
+Chitre, S. M., Cox, A. N., Demarque, P., Donatowicz, J., Dziembowski, W. A.,
+Gabriel, M., Gough, D. O., Guenther, D. B., Guzik, J. A., Harvey, J. W.,
+Hill, F., Houdek, G., Iglesias, C. A., Kosovichev, A. G., Leibacher, J. W.,
+Morel, P., Proffitt, C. R., Provost, J., Reiter, J., Rhodes Jr., E. J.,
+Rogers, F. J., Roxburgh, I. W., Thompson, M. J., Ulrich, R. K., 1996.
+[The current state of solar modeling].
+{\it Science}, {\bf 272}, 1286 -- 1292.
+
+\vfill\eject
+\mainsect
+{\bf Appendix. The structure of the pulsation model file}
+
+For convenience, I repeat the information about the model-file
+structure here (see also {\it Notes}, Section~5).
+In addition, I here list the additional variables set up
+by calling {\tt set-asscal.d}:
+
+The model variables is defined in the array {\tt data(1:8)}
+of global parameters, {\tt x(1:nn)} defining the mesh
+and {\tt aa(1:ia, 1:nn)} giving the variables at each mesh point.
+The basic set of variables consists of
+$$
+\eqalignno{
+{\tt x(n)} & = x \equiv r / R \; , & (A.1) \cr
+{\tt aa(1,n)} & = A_1 
+\equiv q / x^3  , \qquad \hbox{\rm where } q = m / M \; , & (A.2) \cr
+{\tt aa(2,n)} & = A_2 = V_g 
+\equiv -  {1 \over \Gamma_1} {\dd \ln p  \over \dd \ln r}
+= {G m \rho   \over \Gamma_1 p r} \; ,  & (A.3) \cr
+{\tt aa(3,n)} & = A_3 \equiv \Gamma_1 \; ,  & (A.4) \cr
+{\tt aa(4,n)} & = A_4 = A 
+\equiv {1 \over \Gamma_1} {\dd \ln p \over \dd \ln r} - 
+{\dd \ln \rho   \over \dd \ln r} \; ,  & (A.5) \cr
+{\tt aa(5,n)} & = A_5 = U \equiv {4 \pi \rho r^3  \over m } \; . & (A.6) \cr
+\noalign{\noindent In addition, in some models}
+{\tt aa(6,n)} & \quad \hbox{\rm  is a variable dealing with turbulent pressure} 
+\; .\cr
+\noalign{\noindent In models extended with {\tt set-asscal.d}}
+{\tt aa(7,n)} & = A_7 \equiv \int_0^x {\dd x' \over \tilde c(x')} \; ,  & (A.7) \cr
+{\tt aa(8,n)} & = A_8 \equiv \int_x^{x_s} 
+\left[1 - \left({\tilde c(x') x \over \tilde c(x) x'}\right)^2 \right]^{-1/2}
+{\dd x' \over \tilde c(x')} \; . & (A.8) \cr
+}
+$$
+Here $\tilde c = (R / G M)^{1/2} c$ is the dimensionless sound speed.
+The quantities $A_1 - A_8$ are clearly all dimensionless.
+In addition we use the following ``global'' quantities for the model:
+$$
+\eqalign{
+{\tt data(1)} = & D_1 \equiv M \; , \cr
+{\tt data(2)} = & D_2 \equiv R \; , \cr
+{\tt data(3)} = & D_3 \equiv p_{\rm c} \; , \cr
+{\tt data(4)} = & D_4 \equiv \rho_{\rm c} \; , \cr
+{\tt data(5)} = & D_5 \equiv 
+- \left( {1 \over \Gamma_1 p }  {\dd^2 p \over \dd x^2} \right)_{\rm c} \; , \cr
+{\tt data(6)} = & D_6  \equiv 
+ - \left(  {1 \over \rho } {\dd^2 \rho  \over \dd x^2} \right)_{\rm c} \; , \cr
+{\tt data(7)} = & D_7  \equiv \mu \; , \cr
+{\tt data(8)} = & D_8: \hbox{see below} \; .\cr
+} \eqno(A.9)
+$$
+Here $R$ and $M$ are photospheric radius and mass of the model (the photosphere
+being defined as the point where the temperature equals the effective
+temperature). In a complete model 
+$p_{\rm c}$ and $\rho_{\rm c}$ are central pressure and 
+density, and $D_5$ and $D_6$ are evaluated at the centre.
+In an envelope model (that does not include the centre) $D_3$ and
+$D_4$ should be set to the values of pressure and density at the
+innermost mesh point, and $D_5$ and $D_6$ may be set to zero.
+The dimensional variables ({\ie}, $D_1 - D_4$) must be given in $cgs$ units.
+For a physical model $D_7$ is set to $-1$;
+in a model with a polytropic surface layer, $D_7$ is the polytropic
+index of the surface region.
+The notation is otherwise standard. The model may include an
+atmosphere (for solar models a simplified atmosphere
+extending out to roughly the temperature minimum is typically used). Thus
+at the surface possibly $x > 1$.
+
+These variables are convenient when the equations are formulated as
+by {\eg} Dziembowski; but it should be possible to derive any set
+of variables required for {\it adiabatic} oscillation calculations from them.
+$D_5$ and $D_6$ are needed
+for the expansion of the solution around the centre. 
+
+The quantity $D_8$ is used to flag for a different number
+of variables in the file, or otherwise a different structure.
+Currently the only non-standard options are
+\medskip
+\item{--} $D_8 = 10$: the file contains 6 variables $A_1 - A_6$,
+\item{--} $D_8 = 100$: the file contains 8 variables $A_1 - A_8$,
+\medskip\noindent
+as defined above.
+The value of $D_8$ is checked when the file is opened for read;
+hence the structure must be the same for all models in a given file.
+
+\end

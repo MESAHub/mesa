@@ -1,0 +1,170 @@
+&star_job
+
+  ! begin with a pure carbon model (logRhoc = 8.5)
+  ! this is the end state of the carbon_kh test case
+  load_saved_model = .true.
+  saved_model_name = 'initial_model/carbon_kh_end.mod'
+
+  set_initial_age = .true.
+  initial_age = 0
+
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+  set_initial_cumulative_energy_error = .true.
+  new_cumulative_energy_error = 0d0
+  set_cumulative_energy_error_at_step = 1
+
+  set_initial_dt = .true.
+  years_for_initial_dt = 1
+
+  ! no burning, so don't need a real net
+  auto_extend_net = .false.
+  change_net = .true.
+  new_net_name = 'minimal.net'
+
+  write_profile_when_terminate = .true.
+  filename_for_profile_when_terminate = 'final_profile.data'
+
+  pgstar_flag = .false.
+
+  ! change_v_flag = .true.
+  ! new_v_flag = .true.
+
+/ !end of star_job namelist
+
+
+&eos
+  use_PC = .false.
+  logT_ion_HELM = 2.0d0
+  logT_neutral_HELM = 1.5d0
+  use_FreeEOS = .false. ! FreeEOS / HELM blend is major entropy source
+/ ! end of eos namelist
+
+
+&kap
+/ ! end of kap namelist
+
+
+&controls
+
+  ! timestep limits
+  varcontrol_target = 1e-3
+  delta_lgT_cntr_limit = 0.005d0
+  delta_lgRho_cntr_limit = 0.01d0
+  delta_lgTeff_limit = -1
+  use_simple_es_for_kap = .true.
+
+  ! good result with eps_grav w/ or w/out v_flag
+  ! always_use_eps_grav_form_of_energy_eqn = .true.
+
+  ! ok result with dedt w/out v_flag; bad result w/ v_flag
+  ! always_use_dedt_form_of_energy_eqn = .true.
+  ! use_dedt_form_with_total_energy_conservation = .true.
+
+  ! when to stop
+  log_center_density_limit = 9.5
+  when_to_stop_atol = 1d-3
+  when_to_stop_rtol = 0
+
+  ! slowly accrete
+  mass_change = 1e-6
+
+  ! turn off nuclear reactions
+  eps_nuc_factor = 0
+  dxdt_nuc_factor = 0
+
+  history_interval = 1
+  write_profiles_flag = .true.
+  profile_interval = 1000000000
+  terminal_interval = 10
+
+  num_trace_history_values = 2
+  trace_history_value_name(1) = 'rel_E_err'
+  trace_history_value_name(2) = 'log_rel_run_E_err'
+
+  ! for convergence studies
+      read_extra_controls_inlist2 = .false.
+      extra_controls_inlist2_name = 'inlist_resolution'
+
+      read_extra_controls_inlist3 = .false.
+      extra_controls_inlist3_name = 'inlist_equations'
+
+/ ! end of controls namelist
+
+&pgstar
+
+  TRho_win_flag = .true.
+  TRho_logT_min = 8
+  TRho_logT_max = 9
+  TRho_logRho_min = 8
+  TRho_logRho_max = 10
+
+  trho_profile_win_flag = .true.
+
+  !### Profile_Panels1
+
+  Profile_Panels1_win_flag = .true.
+
+  Profile_Panels1_win_width = 12
+  Profile_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
+  Profile_Panels1_xleft = 0.15
+  Profile_Panels1_xright = 0.85
+  Profile_Panels1_ybot = 0.15
+  Profile_Panels1_ytop = 0.85
+  Profile_Panels1_txt_scale = 1.0
+  Profile_Panels1_title = 'carbon_acc'
+
+  Profile_Panels1_xaxis_name = 'zone'
+  Profile_Panels1_xaxis_reversed = .false.
+  Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
+  Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
+  Profile_Panels1_xmargin = 0d0
+  Profile_Panels1_show_mix_regions_on_xaxis = .false.
+
+  Profile_Panels1_show_grid = .false.
+
+  ! setup default plot
+  Profile_Panels1_num_panels = 2
+  Profile_Panels1_yaxis_name(1) = 'qty_eps_grav'
+  Profile_Panels1_yaxis_log(1) = .true.
+  Profile_Panels1_other_yaxis_name(1) = 'qty_dedt'
+  Profile_Panels1_other_yaxis_log(1) = .true.
+
+  Profile_Panels1_ymin(1) = -5
+  Profile_Panels1_ymax(1) = 15
+
+  Profile_Panels1_other_ymin(1) = -5
+  Profile_Panels1_other_ymax(1) = 15
+
+
+  Profile_Panels1_yaxis_name(2) = 'rel_diff'
+  Profile_Panels1_yaxis_log(2) = .true.
+  Profile_Panels1_other_yaxis_name(2) = 'eps_mdot'
+  Profile_Panels1_other_yaxis_log(2) = .true.
+
+  Profile_Panels1_ymin(2) = -6
+  Profile_Panels1_ymax(2) = 1.5
+
+  ! Profile_Panels1_yaxis_name(2) = 'v'
+  ! Profile_Panels1_yaxis_log(2) = .true.
+  ! Profile_Panels1_other_yaxis_name(2) = 'v_start'
+  ! Profile_Panels1_other_yaxis_log(2) = .true.
+
+
+
+  ! Enables calling a subroutine to add extra information to a plot
+  ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
+  Profile_Panels1_use_decorator = .false.
+
+  ! file output
+  Profile_Panels1_file_flag = .true.
+  Profile_Panels1_file_dir = 'png'
+  Profile_Panels1_file_prefix = 'profile_panels1_'
+  Profile_Panels1_file_interval = 1 ! output when `mod(model_number,Profile_Panels1_file_interval)==0`
+  Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
+  Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+/

@@ -1,0 +1,739 @@
+--
+--     Difmat version for equilibrium diffusion & multi energy group
+--     time-dependent transport in moment approximation with
+--     variable Eddington factors taken from Feautrier formal solution
+--     21 Feb 1990   kappa**-1 averaged Tp**4-weighted (Christy)
+--     15 Dec 1991   begin to include scattering (MPA, Garching)
+--     17 Oct 1992   only ODE here like in DIFFUN (GAISH, Moscow)
+--                   Jacobian in DIFJAC
+--     30 Jan 1997   attempt to correct HapH by exp(-dr*chi) (Tokyo Univ.)
+--     01 Feb 1997   closer to Chetverushkin
+--     06 Jun 2009   new diagnostics for radii at Badste 
+--
+--     Right-hand side for ODE  for radiative transfer
+--     and Jacobian for STIFF.
+--
+--        NFRUS - the number of used frequency bins.
+--        FJ=0.5*Integral(F    over DMU)
+--        FH=0.5*Integral(F*MU over DMU)
+--        FJ in radial zone "Km" & in frequency bin "L" lies in
+--               FSAVE(NVARS*NZON+(Km-Ncnd)+(NZON-Ncnd)*(L-1))
+--        FH in radial zone "Km" & in frequency bin "L" lies in
+--               FSAVE(NVARS*NZON+KRAD+(Km-Ncnd)+(NZON-Ncnd)*(L-1))
+--               where KRAD=(NZON-Ncnd)*NFRUS
+--
+--  _TRACE "if (nstep>400)
+  --         write(*,'(a,3i5,a,f11.5)')' Nzon,Ncnd,Nfrus=',Nzon,Ncnd,Nfrus,
+    --         '  fsave(229)=',fsave(229),"
+--
+ SUBROUTINE DIFMAT;
+ IMPLICIT REAL*8 (A-H,O-Z);
+    _Include snrad ;
+    _include nstep;
+    _Include difjac;
+    <*C: COMMONS & VARS OF DIFMAT *>;
+    <*Varvec: COMMONS & variables for vector operations *>;
+--
+    _Include black ;
+    Theta(Z)=0.5D0*(SIGN(1.D0,Z)+1.D0);
+--
+/*  _proc @DERAT;
+       _Include traneq.inc;
+      -- EQUATIONS OF TIME-DEPENDENT RADIATIVE TRANSFER &
+      -- RADIATIVE HEATING HEATRA FOR TRANSFER
+    _return;  */
+    _proc @PEthick;
+      <*THICK:  *>;
+    _return;
+    <*D: BODY OF DIFMAT *>;
+ RETURN;
+ END;
+%C:O
+   --  Nvars=3 - without convection, Nvars=4-with convection
+   --  RVIS  - radiative viscosity
+   Parameter(RADC3=RADC/3.D0);
+--  Common/Lim/Klim(Mzon);
+   COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH;
+   REAL*8 Ry(Mzon), Uy(Mzon),Ty(Mzon);
+   <*C* CONVECTIVE VARIABLES *>;
+%CC:O
+   COMMON/CONV/ELMX(Mzon),FLCON(Mzon);
+   EQUIVALENCE (FSAVE(NYDIM+1+3*Mzon),DUC),(FSAVE(Mzon*3+1),UC);
+   REAL*8 UC(Mzon),DUC(Mzon);
+%_Varvec:O
+%_THICK:O
+    Tprad4=0.D0; TRD4=0.D0; -- TBDD=0.D0;
+    _Do L=1,NFRUS;
+       If(LTHICK(L,KMth)) Then;
+         -- BLA=MAX(BLACK(L,Tp),1.D-40);
+         -- BLD=BLACKD(L,Tp);
+         -- BNU=3.D0*BLA-BLD;
+         -- DBNU=BLD*(4.D0+FREQMN(L)/Tp-2.D0*BLD/BLA);
+         -- TBDD=TBDD+DBNU*WEIGHT(L);
+         Tprad4=Tprad4+BLACK(L,Tp)*WEIGHT(L);
+         TRD4=TRD4+BLACKD(L,Tp)*WEIGHT(L);
+       endif;
+    _od;
+    If(Tprad4 ^= 0.D0) Then;
+       Tprad4=Tprad4*(15.D0/PI**4);
+       TRD4=TRD4*(15.D0/PI**4);
+   --  TBDD=TBDD*(15.D0/PI**4);
+   --  P=P+RADC3*TRD4-RADC*Tprad4;
+   --  Egas=Egas+RADC*(Tprad4/PL);
+       EPL=EPL-RADC*(Tprad4/PL);
+       ET=ET+RADC*(TRD4/Tp)/PL;
+       PTth=PTth+RADC3*TRD4;  -- PTth=Tp*PT;
+    endif;
+%D:
+    NFUN=NFUN+1; -- number of calls to DFrad
+    Kbad=0;
+    <*PhArr: prepare physical quantities in arrays:
+             Ry - radius;  Uy - velocity; Ty - temperature  *>;
+    <*EDDTM: define Eddington factors for time-dependent case
+             i.e. for EDTM==T *>
+   /* Invariant QD:
+       in the first Km zones Ry,Uy,Ty, ... from FSAVE(1:N) have given
+          DR/DT=U, DU/DT=UDot, DTP/DT=TpDot, ...
+       in FSAVE(NYDIM+1:NYDIM+N) for R & U at right, for Tp in the
+       zone centre. The values of phys. quantities are obtained in
+       the Km+1-th zone.
+       For EVALJA==T in Km zones the matrices A,B,C are found &
+       AJAC is stored for every zone */
+   <*A: put QD=T for  Km=0  accounting for the left boundary
+        condition *>;
+   _WHILE Km<NZON _DO
+    <*E: increment Km by 1, restore QD
+         for new Km<NZON according to general formulae,
+         for new Km=NZON accounting for right boundary conditions *>
+   _OD;-- Km==NZON
+%D_PhArr:
+    _Do K=1,Nzon;
+       Ry(K)=Fsave(K);
+       If(K>1)then; 
+         if(Ry(K)<=Ry(K-1) )then; -- try new smaller step
+           Badste=.true.;
+--           @wterm' Difmat Km=',K-1,'  R0=',Ry(K-1),'  u0=',Uy(K-1);
+--           @wterm' Difmat Km=',K  ,'  R1=',Ry(K),  '  u1=',Uy(K);
+           Kbad=K;
+           Return;
+         endif;
+       endif;
+       Uy(K)=Fsave(Nzon+K);
+       Ty(K)=Fsave(2*Nzon+K);
+       If(Ty(K)<=3.d1/UTp) then; -- try new smaller step
+         Badste=.true.;
+         Return;
+       endif;
+    _Od;
+   If(EVALJA)then;
+      Call DHapH;  -- dFH/dRy
+   endif;
+%DA:
+   Km=0;  -- current mesh zone
+   JAC=0; -- number of nonzero elements in AJAC
+   <*B: R1,U1,FL1 by left boundary conditions *>;
+   <*C: quantities for the right zone *>;
+   _IF EVALJA _THEN
+     <*F: derivatives of the right quantities *>;
+   _FI;
+%DAB:
+   R1=RCE; U1=0.D0; FL1=0.D0; FC1=0.D0;
+   RS1=R1**2; RC1=RS1*R1;
+   DM1=0.D0; Tp1=0.D0;
+   Tp1up4=0.D0; RCinv1=0.D0; Fllf1=0.D0; Flrt1=0.D0;
+   CM1INV=0.D0;
+%DE:
+   Km /* index of current mass zone */ =Km+1;
+   <*B: transfer from 1-->0 & 2-->1 *>;
+   _If Km^=Nzon _then
+     <*N: compute right values for conductivity.
+          For Km+1==Ncnd+1 left values for transfer
+          are found in %DERAT *>
+   _else
+     <*x: the same when boundary at right *>
+   _fi;
+   <*R: FIND DR/DT=U, DU/DT, DTP/DT AND STORE IN FSAVE(NYDIM+1),
+        IF EVALJA THEN FIND MATRICES  A,B,C AND STORE IN AJAC *>;
+%DEB:
+   <*A: transfer from 1-->0 , 2-->1 & find quantities needed only
+        in zone 1 *>;
+   _IF EVALJA _THEN
+      <*E: transfer derivatives & disturbed quantities
+           from previous zone *>
+   _FI;
+%DEBA:
+    If(Km^=1)then;
+      RSm1=RS0;
+    else;
+      RSm1=0.;
+    endif;
+    R0=R1;R1=R2;RS0=RS1;RS1=RS2;RC0=RC1;RC1=RC2;
+    U0=U1;U1=U2;DM0=DM1;DM1=DM2;FL0=FL1;
+    UU1=UU2;     -- important here for Qcold
+    UQ1=UQ2;
+    Tp0=Tp1;       Tp1=Tp2;       Q1=Q2;
+    Tp0up4=Tp1up4; Tp1up4=Tp2up4;
+    ENG0=ENG1;     ENG1=ENG2;
+--  YDOT1=YDOT2;
+    PL0=PL1;       PL1=PL2;
+    RCinv0=RCinv1; RCinv1=RCinv2;
+    _SELECT
+       _1 Km<=Ncnd       -- CONDUCTIVITY
+             [ET1=ET2; TPTQ1=TPTQ2;
+              CAP0=CAP1; CAP1=CAP2;
+              PT1=PT2; PQ1=PQ2; PQPL1=PQPL2]
+       _2 Km==Ncnd+1
+             [RADP=.FALSE.;PL=PL1; Tp=Tp1;
+               _Do i=1, Natom;  Yat(i)=YABUN(I,Km) _OD;
+               CHEM=CHEM0(Km);
+               CALL URSOS; 
+               kmhap=km; CALL HAPPA;
+               PTth=Tp*PT;
+               KMth=Km;
+               _call @PEthick;
+               PQ1=P*UPI+Q1;
+               ET1=ET*UEI;
+               TPTQ1=PTth*UPI+Q1;
+               CAP0=CAP1; CAP1=CAP2;
+               UDIVR=(RS0*U0+RS1*U1)/(RC0+RC1);
+             _Do L=1,NFRUS;
+                DUR(L)=(U1-U0)/(R1-R0)*EDDJ(Km,L)
+                       +UDIVR*(1.D0-EDDJ(Km,L));
+                hapL1(L)=hapPAL(L);
+                HAAB1(L)=hapABS(L)
+             _od]
+       _OTHER
+             [ET1=ET2;TPTQ1=TPTQ2;PT1=PT2;PQ1=PQ2;PQPL1=PQPL2;
+              UDIVR=(RS0*U0+RS1*U1)/(RC0+RC1);
+              _Do L=1,NFRUS;
+                 DUR(L)=(U1-U0)/(R1-R0)*EDDJ(Km,L)
+                         +UDIVR*(1.D0-EDDJ(Km,L));
+                 hapL1(L)=hapL2(L);
+                 HAAB1(L)=HAAB2(L)
+              _od]
+    _END;
+    <*C* CONVECTIVE VARS *>;
+%DEBAC:
+ -- make    _SELECT
+    PP0=PP1;PP1=PP2;
+    CP0=CP1;CP1=CP2;GRA0=GRA1;GRA1=GRA2;VCSQ0=VCSQ1;
+    FC0=FC1;ELMIX0=ELMIX1;CFC0=CFC1;
+%DEBE:
+    CAPT0=CAPT1;   CAPPL0=CAPPL1;
+    QU1=QU2;       CM0INV=CM1INV;  AQ1=AQ2;
+    CAPT1=CAPT2;   CAPPL1=CAPPL2;
+    FLLF0=FLLF1;   FLRT0=FLRT1;
+    ENGPL1=ENGPL2; ENGT1=ENGT2;
+--  CCPL1=CCPL2;   CCTP1=CCTP2;    AS1=AS2; YCARB1=YCARB2;
+    _SELECT
+       _1 Km<=Ncnd       -- CONDUCTIVITY
+            [ PTPL1=PTPL2;PTT1=PTT2;
+              ETPL1=ETPL2; ETT1=ETT2]
+       _2 Km==Ncnd+1
+            [ -- PPL, PT from CALL URSOS in %DEBA
+              PT1=PT*UPI;
+              PQPL1=PL*( (PPL*UPI)
+                      +UU1*MIN(UU1,0.D0)*AQ1);
+          --  _Do i=1, Natom [ Yat(i)=YABUN(I,Km) ]; -- in %DEBA
+              RADP=.FALSE.;
+              PL=PL1*(1.D0+DELTA);--  DISTURB DENSITY
+              Tp=Tp1;
+              CHEM=CHEM0(Km);
+              CALL URSOS;
+              kmhap=km;  
+              CALL OPACIT; 
+              CALL HAPPA;
+              _DO L=1,NFRUS; hapL1D(L)=hapPAL(L);
+                             HAAB1D(L)=hapABS(L)_OD;
+              PTth=Tp*PT;
+              KMth=Km;
+              _call @PEthick; -- one can save P,E, etc. then this is not needed
+              PTPL1=PTth*UPI; ETPL1=ET*UEI;
+              CAP1D=CAPPA; -- found in HAPPA, else call OPACIT
+              <*1* CONVECTIVE PRPL1, GRAPL1, CPPL1 *>;
+              PL=PL1;
+              CHEM=CHEM0(Km);
+              Tp=Tp1*(1.D0+DELTA);  --  DISTURB TEMPERATURE
+              CALL URSOS; 
+              kmhap=km; 
+              CALL OPACIT; 
+              CALL HAPPA;
+              _DO L=1,NFRUS;
+                 hapL1T(L)=hapPAL(L);
+                 HAAB1T(L)=hapABS(L);
+              _OD;
+              PTth=Tp*PT;
+              _Call @PEthick;
+              PTT1=PTth*UPI; ETT1=ET*UEI;
+              CAP1T=CAPPA; -- found in HAPPA, else call OPACIT
+              <*2* CONVECTIVE PRT1, GRAT1, CPT1 *>]
+       _OTHER
+            [ PTPL1=PTPL2;PTT1=PTT2;
+              ETPL1=ETPL2; ETT1=ETT2;
+             _DO L=1,NFRUS;
+                 hapL1T(L)=hapL2T(L);
+                 HAAB1T(L)=HAAB2T(L);
+                 hapL1D(L)=hapL2D(L);
+                 HAAB1D(L)=HAAB2D(L)
+             _OD]
+    _END;
+    <*C* CONVECTIVE VARS *>;
+%DEBEC:
+ -- to make _SELECT here:
+    CPPL0=CPPL1;CPPL1=CPPL2;
+    CPT0=CPT1;CPT1=CPT2;
+    GRAPL0=GRAPL1;GRAPL1=GRAPL2;
+    GRAT0=GRAT1;GRAT1=GRAT2;
+    PRPL0=PRPL1;PRPL1=PRPL2;
+    PRT0=PRT1;PRT1=PRT2;
+%DEN:
+   _Do i=1, Natom [ Yat(i)=YABUN(I,Km+1) ];
+   <*A: QUANTITIES IN RIGHT ZONE *>;
+   _SELECT
+    _ Km<Ncnd  [ FLLF1=((R1*Tp1)**4-(R1*Tp2)**4)*Tp1up4/  -- Km^=Ncnd
+                        (CAP1*(DM1+DM2)*(Tp1up4+Tp2up4)); -- for print
+                FLRT1=((R1*Tp1)**4-(R1*Tp2)**4)*Tp2up4/
+                        (CAP2*(DM1+DM2)*(Tp1up4+Tp2up4));
+                CM1INV=(Tp1up4/(CAP1*(DM1+DM2))+Tp2up4/(CAP2*(DM1+DM2)))
+                        /(Tp1up4+Tp2up4);
+                FL1=FLLF1+FLRT1 ]
+    _ Km==Ncnd [ --SUMJ=0.D0;
+                --_DO L=1,NFRUS; SUMJ=SUMJ+@FJ2*WEIGHT(L)_OD;
+                --SUMJ=(1.5D1/PI**4)*SUMJ;
+                --FLcor1=((R1*Tp1)**4-SUMJ*RS1**2)*Tp1up4/
+                FLcor1=((R1*Tp1)**4-(R1*Tp2)**4)*Tp1up4/
+                       (CAP1*(DM1+DM2)*(Tp1up4+Tp2up4));
+                --FLcor2=((R1*Tp1)**4-SUMJ*RS1**2)*Tp2up4/
+                FLcor2=((R1*Tp1)**4-(R1*Tp2)**4)*Tp2up4/
+                       ((CAP2*(DM1+DM2)+@TAULIM*RS1)*(Tp1up4+Tp2up4));
+                CM1INV=(Tp1up4/(CAP1*(DM1+DM2))+Tp2up4/
+                       (CAP2*(DM1+DM2)+@TAULIM*RS1))/(Tp1up4+Tp2up4);
+                FL1=FLcor1+FLcor2;
+                FLcore=FL1; CAPcor=CAP2 ]
+    _OTHER    [ FL1=0.D0 ]
+   _END;
+   <*C* CONVECTIVE FLUX *>;
+   _IF EVALJA _THEN
+      <*E: DERIVATIVES OF RIGHT QUANTITIES *>
+   _FI;
+%DENC:
+   CFC1=ALFCON/2.D0*((PP1+PP2)/(Tp1+Tp2)*(Tp2-Tp1)/(PP2-PP1) -
+        (GRA2+GRA1)/2.D0)*(CP1*Tp1*PL1+CP2*Tp2*PL2)/2.D0;
+   FC1=UC(Km)*CFC1;
+   FLCON(Km)=FC1;
+   ELMX(Km)=ELMIX1;
+%DENA:
+   <*B: FIND R2,U2,PL,Tp *>;
+   <*D: FIND PQ2,ENG2,TPTQ2,ET2 *>;
+   <*C* FIND CONVECTIVE VALUES GRA2, VCSQ1, ELMIX1 *>;
+%DENAB:
+   R2=Ry(Km+1);
+   RS2=R2**2; RC2=RS2*R2;
+   U2=Uy(Km+1); DM2=DM(Km+1); -- R AND U AT BOUNDARY NOT NEEDED
+   RCinv2=3.D0/(RC2-RC1);
+   PL2=DM2*RCinv2; Tp2=Ty(Km+1);
+   PL=PL2; Tp=Tp2;-- FOR URSOS
+   Tp2up4=Tp2**4;
+%DENAD:
+  <*URS:   *>;
+   PTth=Tp*PT;
+   kmhap=km+1; 
+   _If Km+1<=Ncnd _Then
+      CALL OPACIT;
+   _else
+      CALL OPACIT; -- must be called before HAPPA! or may be called in HAPPA
+      CALL HAPPA;
+      _Do L=1,NFRUS;
+          hapL2(L)=hapPAL(L);
+          HAAB2(L)=hapABS(L);
+      _od;
+      KMth=Km+1;
+      _Call @PEthick;
+   _fi;
+  <*QVIS:  *>;
+%DENAD_URS:
+   If (Km <= Ncnd & Ncnd^=0) then;
+     RADP=.TRUE.; -- equation of state in right zone as in own
+   else;
+     RADP=.FALSE.;
+   endif;
+   CHEM=CHEM0(Km+1);
+   CALL URSOS;
+   CALL VOLEN(Km+1);  -- LST=1 IN DRIVING ROUTINE
+   CHEM0(Km+1)=CHEM;
+%DENAD_QVIS:
+-- UU2=4.D0*(RS2*U2-RS1*U1)/(R2+R1)**2;
+   UU2=U2-U1*(RS1/RS2);
+--   UQ2=UU2; -- if EpsUq is ignored
+   UQ2=UU2-EpsUq;  -- force nonzero QRT for small UU
+      -- we continue to apply nonzero QRT_cold even
+      -- for positive UU2 since we have no infinite
+      -- accuracy.
+--   if(mod(Nstep,1000)==0)then;
+--    write(*,'(a,2i7,1p,3g12.3)')'Nstep, Km, UQ2,UU2,EpsUq=',Nstep,Km,UQ2,UU2,EpsUq;
+--    pause;
+--   endif;
+   AQ2=AQ;
+   IF(UU2<0.D0) THEN;
+      QUHALF=UU2*(AQ2*PL2);
+   ELSE;
+      QUHALF=0.D0;
+   ENDIF;
+   Q2=QUHALF*UU2;
+   PQ2=P*UPI+Q2;
+   ENG2=ENG; CAP2=CAPPA;
+   TPTQ2=PTth*UPI+Q2;
+   ET2=ET*UEI; PT2=PT*UPI;
+-- PP2=P*UPI; -- for convection
+%DENAC:
+      CP2=CP*UEI/PL2; <* URSOS GIVES CP FOR UNIT VOLUME *>
+      GRA2=DA;    <* FROM URSOS *>
+      IF(R1*(PP1-PP2)/PP1 > (R2-R1))THEN;
+         VCSQ1=MAX(0.D0,
+            ALFCON**2/4.D0*((PP1+PP2)/(Tp1+Tp2)*(Tp2-Tp1)/(PP2-PP1)-
+            (GRA2+GRA1)/2.D0)*(CP1*Tp1*GRA1+CP2*Tp2*GRA2)/2.D0);
+         ELMIX1=ALFCON*(PP1+PP2)/2.D0*(R2-R1)/(PP1-PP2);
+      ELSE;
+         VCSQ1=MAX(0.D0,
+            ALFCON**2/4.D0*R1/PP1*(PP1-PP2)/(R2-R1)*
+            ((PP1+PP2)/(Tp1+Tp2)*(Tp2-Tp1)/(PP2-PP1)-
+            (GRA2+GRA1)/2.D0)*(CP1*Tp1*GRA1+CP2*Tp2*GRA2)/2.D0);
+         ELMIX1=ALFCON*R1;
+      ENDIF;
+%DENE:
+     <*C: FIND PQPL2,PT2,ENGPL2,ENGT2 FOR NREG==2 *>
+     <*D: QU2,CP2 & GRA2 DISTURBED, ET CETERA *>;
+%DENEC:
+    PT2=PT*UPI; ENGPL2=ENGPL; ENGT2=ENGT;
+    PQPL2=PL2*( (PPL*UPI)+UU2*MIN(UU2,0.D0)* AQ2);
+--  AS2=AS;
+%DENED:
+    QU2=2.D0*QUHALF;
+    CAPT2=CAPT;CAPPL2=CAPPL;
+    PL=PL2*(1.D0+DELTA);--  DISTURB DENSITY
+    CHEM=CHEM0(Km+1);
+    Tp=Tp2;
+    CALL URSOS;
+    PTth=Tp*PT;
+   _If Km+1>Ncnd _then
+       kmhap=km+1; CALL HAPPA;
+       _DO L=1,NFRUS;
+         hapL2D(L)=hapPAL(L);
+         HAAB2D(L)=hapABS(L)
+       _OD;
+       KMth=Km+1;
+       _call @PEthick;
+   _fi;
+    PTPL2=PTth*UPI; ETPL2=ET*UEI;
+    <*1* CONVECTIVE PRPL2, GRAPL2, CPPL2 *>;
+    PL=PL2;
+    CHEM=CHEM0(Km+1);
+    Tp=Tp2*(1.D0+DELTA);  --  DISTURB TEMPERATURE
+    CALL URSOS;
+    PTth=Tp*PT;
+   _If Km+1>Ncnd _then
+       kmhap=km+1; CALL HAPPA;
+       _DO L=1,NFRUS;
+         hapL2T(L)=hapPAL(L);
+         HAAB2T(L)=hapABS(L)
+       _OD;
+       _call @PEthick;
+   _fi;
+    PTT2=PTth*UPI; ETT2=ET*UEI;
+    <*2* CONVECTIVE PRT2, GRAT2, CPT2 *>;
+    Tp=Tp2;
+%DENED1:
+    PRPL2=P*UPI;GRAPL2=DA;CPPL2=CP*UEI/PL;
+%DENED2:
+    PRT2=P*UPI;GRAT2=DA;CPT2=CP*UEI/PL;
+%DAC:
+   _Do ii=1, Natom [ Yat(ii)=YABUN(ii,1) ];
+   <*B: FIND R2,U2,PL,Tp *>;
+   <*D: FIND PQ2,ENG2,TPTQ2,ET2 *>;
+   CP2=CP*UEI/PL2; GRA2=DA; -- URSOS GIVES CP FOR UNIT VOLUME
+%DACB=DENAB:
+%DACD:
+  <*URS:  *>;
+   PTth=Tp*PT;
+   kmhap=1;
+   _If Ncnd>=1 _Then
+      CALL OPACIT;
+   _else
+      CALL OPACIT; -- must be called before HAPPA! or may be called in HAPPA
+      CALL HAPPA;
+      _Do L=1,NFRUS;
+          hapL2(L)=hapPAL(L);
+          HAAB2(L)=hapABS(L);
+      _od;
+      KMth=1;
+      _Call @PEthick;
+   _fi;
+   CHEM0(1)=CHEM;
+  <*QVIS: *>;
+%DACD_URS=DENAD_URS:
+%DACD_QVIS=DENAD_QVIS:
+%DAF:
+     _DO L=1,NFRUS; B24(L)=0.D0 _OD;
+     <*C: FIND PQPL2,PT2,ENGPL2,ENGT2 FOR NREG==2 *>;
+     <*D: QU2, ET CETERA *>;
+%DAFC=DENEC:
+%DAFD:
+    CAPPL1=0.D0; CAPT1=0.D0;
+    QU2=2.D0*QUHALF;
+    CAPT2=CAPT;CAPPL2=CAPPL;
+    PL=PL2*(1.D0+DELTA);--  DISTURB DENSITY
+    Tp=Tp2;
+    CHEM=CHEM0(Km+1);
+    CALL URSOS;
+    PTth=Tp*PT;
+   _If Km+1>Ncnd _then
+       kmhap=km+1; CALL HAPPA;
+       _DO L=1,NFRUS;
+         hapL2D(L)=hapPAL(L);
+         HAAB2D(L)=hapABS(L)
+       _OD;
+       KMth=Km+1;
+       _call @PEthick;
+   _fi;
+    PTPL2=PTth*UPI; ETPL2=ET*UEI;
+    <*1* CONVECTIVE PRPL2, GRAPL2, CPPL2 *>;
+    PL=PL2;
+    Tp=Tp2*(1.D0+DELTA);  --  DISTURB TEMPERATURE
+    CHEM=CHEM0(Km+1);
+    CALL URSOS;
+    PTth=Tp*PT;
+   _If Km+1>Ncnd _then
+       kmhap=km+1; CALL HAPPA;
+       _DO L=1,NFRUS;
+         hapL2T(L)=hapPAL(L);
+         HAAB2T(L)=hapABS(L)
+       _OD;
+       _call @PEthick;
+   _fi;
+    PTT2=PTth*UPI; ETT2=ET*UEI;
+    <*2* CONVECTIVE PRT2, GRAT2, CPT2 *>;
+    Tp=Tp2;
+%DEX:
+   DM2=DMOUT; -- mass above the outer radius
+   R2=R1+(R1-R0); -- to avoid divide check with RTphi(Nzon+1)
+   Q2=0.D0;
+   CM1INV=1.D0/(CAP1*(DM1+DM2)+RS1*CFR);
+   <*A: OUTER PRESSURE *>;
+   <*E: OUTER BOUNDARY CONDITIONS ON FL1 & FC1 *>;
+   If(EVALJA)then;
+     <*I: DERIVATIVES OF RIGHT BOUNDARY QUANTITIES *>
+   endif;
+%DEXA:
+-- PL=0.D0; Tp=Tp1*(R1**2*CM1INV*CFR)**0.25D0;
+-- CALL URSOS; PQ2=P*UPI;PP2=PQ2;ET2=ET*UEI;PT2=PT*UPI;
+-- VCSQ1=0.D0;
+   PQ2=0.D0;
+%DEXE:
+    FC1=0.D0;CFC1=0.D0;
+%DEXI:
+    -- For Pexterior=0. & FLUXexterior=0.:
+    PQPL2=0.D0;  QU2=0.D0; PT2=0.D0; CAPT2 =0.D0;
+    CAPPL2=0.D0; PL2=0.D0; Tp2=0.D0;  --CCTP2 =0.D0;
+--  AS2 =0.D0;   YCARB2=0.D0;
+    ENGPL2=0.D0; ENGT2 =0.D0;
+%DER:S
+   <*A: FIND DR/DT,DU/DT,DTP/DT,DUC/DT AND STORE IN FSAVE((NYDIM+1))*>;
+   _IF EVALJA _THEN
+       <*E: STORE JACOBIAN IN AJAC *>
+   _FI
+%DERA:
+   FSAVE(NYDIM+Km)=U1; -- dR/dt on the right boundary of current zone
+   --
+   RODM=2.D0/(DM1+DM2);
+   RSODM=RS1*RODM;
+   FSAVE(NYDIM+Nzon+Km)=  -- dU/dt
+                        RSODM*(PQ1-PQ2)-AM(Km)/RS1;
+   --
+   DMETIN=1.D0/(DM1*ET1);
+   CDMETI=CK1*DMETIN;
+   CK2ET1=CK2/ET1;
+   _IF Km<=Ncnd _THEN
+       HEATRA=(FL0-FL1)*CDMETI; -- radiative heating
+       FLUM=CLUM*FL1;
+       FLX0=FL0; FLX=FL1; FIMP=0.D0;
+   _ELSE
+       FSAVE(NYDIM+Nzon+Km)=FSAVE(NYDIM+Nzon+Km)
+                             -- dU/dt correction Qcold:
+           +RODM*( RTphi(Km)*U0*(-min(0.d0,UQ1))/(R1-R0)**NRT
+                  -RTphi(Km+1)*U2*(-min(0.d0,UQ2))/(R2-R1)**NRT );
+       Tp=Tp1;PL=PL1;      -- undisturbed entry
+       _DO L=1,NFRUS;
+         hapL(L)=hapL1(L); -- dimensionless CAPPA - not chi!
+         HAAB(L)=HAAB1(L); -- dimensionless CAPPA for absorption
+         tau1(L)=HapL1(L)*(dm1+dm2)/rs1;
+         tau2(L)=HapL2(L)*(dm1+dm2)/rs1;
+         hapH(L)=(Tp1up4+Tp2up4)/(
+          (Tp2up4/hapL2(L))*(1.d0+@hapHlim*(exp(-tau2(L))+tau2(L)-1.d0)
+                    *exp(-tau1(L)))
+           +(Tp1up4/hapL1(L))*(1.d0+@hapHlim*(exp(-tau1(L))+tau1(L)-1.d0)
+                    *exp(-tau2(L)))
+                                   );
+         hapH1(L)=hapH(L); -- undisturbed hapH
+                           -- hapH - dimensionless CAPPA for FH
+       _OD;
+       FRST=.TRUE.;
+/* DEB:
+       if(km==273)then;
+         write(@wres,'(a,i3,1p,3e20.12)')
+            ' km,R0,RS0,RC0=', km,R0,RS0,RC0,
+            ' km,R1,RS1,RC1=', km,R1,RS1,RC1,
+            ' km,R2,RS2,RC2=', km,R2,RS2,RC2;
+       endif;
+*/
+       call traneq;
+--DEB:
+--       if(km==273)write(@wres,'(a,2i3,1p,3e12.3)')
+--            ' km,L,DFH(L)=', km,1,DFH(1);
+       
+       If(Badste)return;
+ --    _CALL @DERAT;
+       FRST=.FALSE.;
+       <*F: add radiative force to Udot *>;
+       _Do L=1,NFRUS;
+          @DFJ1=DFJ(L);
+          @DFH1=DFH(L);
+       _od;
+       HEATRA=HEATRA/ET1;
+   _FI;
+   If(abs(KNadap)==5)   FSAVE(NYDIM+Nzon+Km)=0.d0;  -- dU/dt=0 for homolog expansion
+   If(Tp1 > @Tp_CUT)then;
+      DTPOLD=   -- dTp/dt
+          ENG1*(CK2ET1)+(RS0*U0-RS1*U1)*(TPTQ1*DMETIN)
+                           +HEATRA;         --  radiation
+                       <*G*-DE/DX*XDOT/ET*>;
+     <*C* CONVECTIVE PART OF DTPOLD, DUC(Km) *>;
+   else;
+      DTPOLD=0.D0;
+   endif;
+   FSAVE(NYDIM+2*Nzon+Km)=DTPOLD; -- Tdot(Km)=DTPOLD;
+   if(NSTEP>=NDebug)then;
+--   if(NSTEP==320 .or. NSTEP>=406)then;
+     <*Deb: debug this node    *>;
+   endif;
+
+%DERA_Deb:
+
+/* IF(Km>=106 & Km<=140)then;
+     WRITE(@wres,'(3(A,I5),A,L5)')'NSTEP=',NSTEP,' Km=',Km,'
+                  Ncnd=',Ncnd,'  EVJA=',EVALJA;
+     WRITE(@wres,'(1P,6(A,G10.3))')'HEATRA=',HEATRA,
+     '  HEAT COND=',(FL0-FL1)*CDMETI,
+     '  HTJ=',TOTW*CKRAD/ET1,
+     '  HTH=',TOTWPR*CKRAD/ET1;
+   endif; 
+*/
+
+--    IF(Km>Ncnd & Km<Nzon)then;
+--    IF(Km==Ncnd+1)then;
+--     if (nstep==320) then;
+        LfrDebug=56; -- freq to test
+  --   else;
+    --    LfrDebug=57; -- freq to test 
+--     endif;
+     IF(Km>Ncnd & Km<Ncnd+4)then;
+     WRITE(@wres,'(3(A,I10))') ' LfrDebug=',LfrDebug,' Nperturb=', Nperturb; 
+     WRITE(@wres,'(4(A,I10),2(A,L5))') ' NSTEP=',NSTEP,' Km=',Km,
+       ' Ncnd=',Ncnd,' Nfrus=',Nfrus,
+       '  EVJA=',EVALJA,'  LTH(40)=',LTHICK(40,Km);
+--     @wterm' Rdot=',FSAVE(NYDIM+Km);
+--     @wterm' Udot=',FSAVE(NYDIM+Nzon+Km);
+     WRITE(@wres,*)' Tdot=',FSAVE(NYDIM+2*Nzon+Km);
+--   WRITE(@wres,*)' RTphi =',RTphi(Km),RTphi(Km+1);
+--     @wterm' UU    =',UU1,UU2;
+     WRITE(@wres,'(1X,6(A,1P,E10.2))')
+     '   R1=',R1,'   U1=',U1,'  Tp=',Tp1,'  PL=',PL1,
+--     '   YDOT=',Y(NZON+Km,2)/H,
+  --   '   Udot=',FSAVE(NYDIM+Nzon+Km),
+     '  Fl0=',fl0,
+ --  '   RSODM*(PQ1-PQ2)=',RSODM*(PQ1-PQ2),'  PQ1=',PQ1,'  PQ2=',PQ2,
+ --  '   Q1=',Q1,'  TEST  Q1=',TPTQ1-PT1*Tp1,
+ --    '   FIMP=',FIMP,
+--   '   FLUM=',FLUM,'  FLX=',FLX,
+--     '   HEATF=',(FLX0-FLX)*CDMETI,'   HEATRA=',HEATRA,
+     '   FJ1=',FSAVE(NVARS*NZON-Ncnd+(NZON-Ncnd)*(Lfrdebug-1)+Km),
+     '   FH1=',FSAVE(NVARS*NZON-Ncnd+(NZON-Ncnd)*(Lfrdebug-1)+Km+Krad),
+     '   EDDJ(Km,LfrDebug)=',EDDJ(Km,LfrDebug),
+     '   EDDJ(Km+1,LfrDebug)=',EDDJ(Km+1,LfrDebug),
+     '   HEDD(LfrDebug)=',HEDD(LfrDebug);
+--     '   HAAB15=',HAAB1(5),'   HAAB16=',HAAB1(6),'  HL=',HL,
+ --  '   HAB1T5=',HAAB1T(5),'   HAB1T6=',HAAB1T(6),
+--     '   TOTJ=',TOTJ, -- '   HAAB5=',HAAB(5),'   HAAB6=',HAAB(6),
+  --   '   TOTW=',TOTW,'   TOTWPR=',TOTWPR,
+    -- '   ENG1=',ENG1,'   ET1=',ET1,
+  -- ' RSU=',(RS0*U0-RS1*U1),'   TPTQ1=',TPTQ1,
+--     '   DMETIN=',DMETIN,'   TJPR=',TOTJPR,'   H=',H;
+  --      WRITE(@wres,'(1X,6(A,1P,E10.2))')
+    --    '   HEATRA=',HEATRA, ' eng1*ck2et1=', eng1*ck2et1,
+      --  '  (RS0*U0-RS1*U1)*TPTQ1*DMETIN=',(RS0*U0-RS1*U1)*TPTQ1*DMETIN;
+      endif;
+
+%DERAF:
+       -- HEDD=FH/FJ AT THE SURFACE, COMES FROM FEAUTRIER
+       FIMP=0.D0;
+       FLUM=0.D0;
+       IF(Km<NZON) THEN;
+         _DO L=1,NFRUS;
+            FIMP=FIMP+@FH1*WEIGHT(L)*hapH1(L);
+            FLUM=FLUM+@FH1*WEIGHT(L);
+            If(L==LfrDebug & Km<Ncnd+5 ) 
+            WRITE(@wres,'(A,2I5,1X,6(A,1P,E20.12))')' km, Nperturb =',
+                  km,Nperturb,' @FH1=',@FH1;
+         _OD;
+       ELSE;
+         _DO L=1,NFRUS;
+            FIMP=FIMP+@FJ1*HEDD(L)*WEIGHT(L)*hapL1(L);
+            FLUM=FLUM+@FH1*WEIGHT(L)*HEDD(L);
+         _OD;
+       ENDIF;
+       FIMP=CIMP*FIMP;
+       FLUM=CLUMF*FLUM*RS1;
+       FLX0=FLX;
+       FLX=FLUM/CLUM;
+       FSAVE(NYDIM+Nzon+Km)=FSAVE(NYDIM+Nzon+Km)+FIMP;
+                -- Udot(Km)=Udot(Km)+FIMP
+
+%DERAC:
+   DTPOLD=DTPOLD+(RS0*FC0-RS1*FC1)*(DMETIN*CRAP);
+   DUC(Km)=2.D0*(VCSQ1-UC(Km)**2)/ELMIX1;
+
+%DERAG:
+   IF(NREG(Km)^=3)DTPOLD=DTPOLD-1.5D0*RGASA*YDOT1*Tp1*UEI/
+                                 (ET1*FSAVE(NEQS+Km)**2)
+%DERE:
+   call DIFJAC;
+
+%D_EDDTM:
+    IF(EDTM)THEN;
+      tw=min((t-tfeau)/trlx,1.d0);
+      ww=tw**2*(3.d0-2.d0*tw);
+      _do L=1,Nfrus;
+       _DO IK=Ncnd+1,NZON;  -- for EDTM==T
+          EddJ(IK,L)=(1.d0-ww)*EddO(IK,L)+ww*EddN(IK,L);
+--          if(mod(NSTEP-1,50)==0 & L==5 &
+  --              abs(EddN(IK,L)-EddO(IK,L))>1.d-2)then;
+--            @wterm ' JUMP Edd L, IK: ', L, IK;
+/*          if((mod(NSTEP-1,50)==0 .or. NSTEP>=NDebug) & L==25 )then;
+            @wterm ' NSTEP, NDebug, L, IK: ', NSTEP, NDebug, L, IK;
+            @wterm ' t tfeau trlx ', t, tfeau, trlx;
+            @wterm ' tw, ww ', tw, ww;
+            @wterm ' EddJ EddO EddN ', EddJ(IK,L),EddO(IK,L),EddN(IK,L);     
+--            pause;
+          endif;
+*/
+       _OD;
+        HEdd(L)=(1.d0-ww)*HEdO(L)+ww*HEdN(L);
+      _od;
+    ELSE;
+      _do L=1,Nfrus;
+        _DO IK=Ncnd+1,NZON;
+           EddJ(IK,L)=EddN(IK,L)
+        _OD;
+         HEdd(L)=HEdN(L);    
+      _od;
+    ENDIF;  
+

@@ -1,0 +1,125 @@
+&eos
+
+  !### put eos options here
+  ! see eos/defaults/eos.defaults
+  use_skye = .true.
+!  always_include_elec_pos = .true.
+
+/
+
+
+&plotter
+
+  !### Ignore ierr so large ranges can be plotted
+  ignore_ierr = .true.
+
+  !### pick which EOS to use
+  ! eosdT = 0 (blended)
+  ! SCVH = 1
+  ! HELM = 2
+  ! PC = 4
+  ! FreeEOS = 5
+  ! CMS = 6
+  ! Skye = 7
+  i_eos = 2
+
+
+  !### pick which eos quantity to plot
+  ! below for convenience: truth in eos_def.f90
+  ! i_lnPgas = 1
+  ! i_lnE = 2
+  ! i_lnS = 3
+  ! i_mu = 4
+  ! i_lnfree_e = 5
+  ! i_eta = 6
+  ! i_grad_ad = 7
+  ! i_chiRho = 8
+  ! i_chiT = 9
+  ! i_Cp = 10
+  ! i_Cv = 11
+  ! i_dE_dRho = 12
+  ! i_dS_dT = 13
+  ! i_dS_dRho = 14
+  ! i_gamma1 = 15
+  ! i_gamma3 = 16
+  ! i_phase = 17
+  ! i_latent_ddlnT = 18
+  ! i_latent_ddlnRho = 19
+  ! i_frac_HELM = 20
+  ! i_frac_OPAL_SCVH = 21
+  ! i_frac_FreeEOS = 22
+  ! i_frac_PC = 23
+  ! i_frac_Skye = 24
+  ! i_frac_CMS = 25
+
+  ! zero value used for special logic in the plotter
+  ! regions = 0 (also use special script regions.py)
+
+  i_var = 1
+
+  !### check derivatives?
+  ! if doing_dfridr is true, do dfridr and show the error
+  ! if doing_partial is true, show the partial value
+	  ! if doing_d_dlnd, partials wrt lnd, else wrt lnT
+  ! if doing_consistency is true, show the specified consistency metric
+  ! else, show the EOS value
+  doing_partial = .false.
+  doing_dfridr = .false.
+  doing_d_dlnd = .false.
+  doing_consistency = .false.
+
+  !### Consistency option
+  ! 1 - dpe: (rho/p) de/dlnRho + dlnP/dlnT - 1
+  ! 2 - dse: T (ds/dT)/(de/dT) - 1
+  ! 3 - dsp: -rho (ds/dlnRho) / (dp/dT) - 1
+
+  i_cons = 3
+
+  !### pick which quantities to plot against
+  ! valid options are Rho, T, X, Z
+
+  xname = 'Rho'
+  yname = 'T'
+
+  ! xname = 'X'
+  ! yname = 'Z'
+
+  !### pick number of points
+  ! values for non-xname, non-yname variables are ignored
+
+  nT = 100
+  nRho = 200
+  nX = 100
+  nZ = 150
+
+  !### pick plot limits
+
+  ! center/delta takes precedence over min/max
+  ! center is used when var is not xname/yname
+
+  X_center = 0.00
+  Z_center = 1.00
+
+  delta_X = 0.1
+  delta_Z = 0.1
+
+  X_min = 0
+  X_max = 1
+
+  Z_min = 0
+  Z_max = 0.1
+
+  logT_center = 6.4D+00
+  logRho_center = -3.76D+00
+
+  !delta_logT = 0.01d0
+  !delta_logRho = 0.01d0
+
+  logT_min = 3
+  logT_max = 10.2
+
+  logRho_min = -10
+  logRho_max = 10
+
+
+/

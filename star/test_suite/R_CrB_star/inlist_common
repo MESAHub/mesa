@@ -1,0 +1,39 @@
+&star_job
+
+/ !end of star_job namelist
+
+&eos
+
+/ !end of eos namelist
+
+&kap
+      ! use C/O enhanced opacities
+      use_Type2_opacities = .true.
+      Zbase = 0.006
+
+      kap_blend_logT_lower_bdy = 4.1
+      kap_blend_logT_upper_bdy = 4.2
+
+      kap_lowT_prefix = 'AESOPUS'
+      AESOPUS_filename = 'AESOPUS_GS98_RCrB.h5'
+      
+      show_info = .true.
+
+/ ! end of kap namelist
+
+&controls
+      
+      initial_mass = 0.875
+      initial_y = 0.994 ! H-free
+      initial_z = 0.006
+
+      use_dedt_form_of_energy_eqn = .true.
+      varcontrol_target = 1d-3
+
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 5
+      write_header_frequency = 50
+
+/ ! end of controls namelist

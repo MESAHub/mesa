@@ -1,0 +1,6 @@
+cd free_eos-2.2.1; ./clean
+cd ..
+
+cd make; make clean
+cd ..
+rm -rf .mesa_temp_cache

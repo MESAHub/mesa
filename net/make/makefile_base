@@ -1,0 +1,129 @@
+# This is the makefile for the mesa nuclear reaction networks library
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = \
+   net_def.f90 \
+   net_screen.f90 \
+   net_derivs_support.f90 \
+   net_derivs.f90 \
+   net_approx21.f90 \
+   net_approx21_plus_co56.f90 \
+   net_burn_support.f90 \
+   net_initialize.f90 \
+   net_eval.f90 \
+   net_burn.f90 \
+   net_burn_const_density.f90 \
+   net_burn_const_p.f90 \
+   net_lib.f90
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+     LIBS_OTHER = eos rates chem $(LIBS_MESA_NUMERICS)
+     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+     LOAD_OTHER = -L$(MESA_LIB_DIR) -leos -lrates -lchem $(LOAD_MESA_NUMERICS)
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libnet.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+
+clean:
+	-@rm -f *.o *.mod *.smod *genmod.f90 *.so *.a .depend
+
+install:
+	-@rm -f $(MESA_DIR)/data/net/cache/*.bin
+	@$(CP_IF_NEWER) net_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) net_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+# also in test makefile
+APROX21_FXT_FLAG =
+#APROX21_FXT_FLAG = -DAPROX21_FXT
+
+#COMPILE = $(COMPILE_NO_OPT) $(FCfree) $(APROX21_FXT_FLAG)
+
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(APROX21_FXT_FLAG)
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(APROX21_FXT_FLAG)
+
+COMPILE_CMD = $(COMPILE)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f90 $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

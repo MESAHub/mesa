@@ -1,0 +1,9 @@
+rm -rf ionization_data.tar
+rm -rf ionization_data.tar.xz
+rm -f ionization_data/cache/*
+echo 'tar -cvf ionization_data.tar ionization_data'
+tar -cvf ionization_data.tar ionization_data
+echo 'xz ionization_data.tar'
+xz ionization_data.tar
+echo "next step is"
+echo "cd .. ; ./build_data_and_export"

@@ -1,0 +1,141 @@
+# This is the makefile for the mesa library of numerical routines
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCE FILES
+
+SRCS = \
+   num_def.f \
+   mod_dop853.f mod_dopri5.f mod_cash_karp.f mod_dc_decsol.f \
+   mod_rosenbrock.f mod_brent.f90 mod_qsort.f90 mod_root.f mod_solout_root.f \
+   mod_random.f90 mod_newton.f mod_bobyqa.f mod_newuoa.f \
+   accurate_sum_auto_diff_18var_order1.f90  \
+	accurate_sum.f90 mod_simplex.f90 num_lib.f \
+
+#################################################################
+#
+# LIBRARIES
+
+ifeq ($(USE_SHARED), YES)
+    LIBS_OTHER = $(LIBS_MATRIX)
+    DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+    LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX) 
+endif
+
+#################################################################
+#
+# TARGETS
+
+LIB = libnum.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS) $(DEPS_OTHER)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+else
+	$(LIB_TOOL) $(LIB) $(OBJS) $(LOAD_OTHER)
+endif
+
+clean:
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+
+install:
+	@$(CP_IF_NEWER) num_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) num_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) accurate_sum.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) accurate_sum_auto_diff_18var_order1.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/num_fcn.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/num_jac.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/num_sjac.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/num_solout.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/num_mas.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../public/num_interp_y.dek $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPULATION RULES
+
+#COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_TO_TEST))
+COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_TO_DEPLOY)) -std=legacy
+
+COMPILE = $(COMPILE_LEGACY) $(FCfixed)
+
+COMPILE_FREE = $(COMPILE_LEGACY) $(FCfree)
+
+#COMPILE_XTRA = $(COMPILE_NO_CHECKS) $(FCfixed) -c
+COMPILE_XTRA = $(COMPILE_BASIC) $(FCopt) $(FCfixed) -c
+
+COMPILE_LEGACY_XTRA = $(filter-out -std=f2008, $(COMPILE_XTRA)) -std=legacy
+
+COMPILE_CMD = $(COMPILE)
+
+mod_bobyqa.o mod_newuoa.o mod_dop853.o mod_dopri5.o mod_dc_decsol.o mod_rosenbrock.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY_XTRA $<
+	@$(COMPILE_LEGACY_XTRA) $<
+else
+	$(COMPILE_LEGACY_XTRA) $<
+endif
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	@$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_FREE $<
+	@$(COMPILE_FREE) $<
+else
+	@$(COMPILE_FREE) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.dek $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

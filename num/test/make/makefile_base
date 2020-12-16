@@ -1,0 +1,142 @@
+# This is the makefile for testing the mesa num library
+
+MESA_DIR = ../../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+COMMON_SRCS = test_support.o test_int_support.o \
+   bari_beam.o test_beam.o \
+   bari_chemakzo.o test_chemakzo.o \
+   bari_medakzo.o test_medakzo.o \
+   bari_vdpol.o test_vdpol.o \
+   test_diffusion.o test_brent.o test_bobyqa.o test_newuoa.o \
+   test_simplex.o test_newton.o
+
+TEST_SRCS = $(COMMON_SRCS) test_num.o
+
+TEST_MPI_SRCS = $(COMMON_SRCS) test_num_mpi.o
+
+SAMPLE_SRCS = $(COMMON_SRCS) sample_ode_solver.o
+
+#################################################################
+#
+# LIBRARIES
+
+LIBS_LOCAL = num
+DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
+LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
+
+LIBS_OTHER = $(LIBS_MATRIX)
+DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX) -lauto_diff
+
+#################################################################
+#
+# TARGETS
+
+TEST = $(TEST_DIR)/tester
+TEST_MPI = $(TEST_DIR)/test_mpi
+SAMPLE = $(TEST_DIR)/sample
+
+TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+TEST_MPI_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_MPI_SRCS)))
+SAMPLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SAMPLE_SRCS)))
+
+all : $(TEST) $(SAMPLE)
+
+$(TEST) : $(TEST_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(TEST_MPI) : $(TEST_MPI_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+$(SAMPLE) : $(SAMPLE_OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
+
+$(TEST) : OBJS = $(TEST_OBJS)
+$(TEST_MPI) : OBJS = $(TEST_MPI_OBJS)
+$(SAMPLE) : OBJS = $(SAMPLE_OBJS)
+
+$(TEST_DIR)/% : 
+ifneq ($(QUIET),)
+	@echo LOADER $@
+	@$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+else
+	$(LOADER) $(FCopenmp) -o $@ $(OBJS) $(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod .depend $(TEST) $(TEST_MPI) $(SAMPLE)
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE_NC = $(FC) $(FCbasic) $(FCopenmp) $(FCstatic) $(FCopt) $(FCfixed) $(TEST_INCLUDES) -c
+
+COMPILE_LEGACY_NC = $(filter-out -std=f2008, $(COMPILE_NC)) -std=legacy
+TEST_COMPILE_LEGACY = $(filter-out -std=f2008, $(TEST_COMPILE)) -std=legacy
+
+test_brent.o test_simplex.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE_LEGACY $<
+	@$(TEST_COMPILE_LEGACY) $(FCfree) $<
+else
+	$(TEST_COMPILE_LEGACY) $(FCfree) $<
+endif
+
+test_bobyqa.o test_newuoa.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE_LEGACY $<
+	@$(TEST_COMPILE_LEGACY) $(FCfixed) $<
+else
+	$(TEST_COMPILE_LEGACY) $(FCfixed) $<
+endif
+
+bari_vdpol.o bari_vdpol3.o bari_vdpol_x.o bari_vdpol3_x.o bari_medakzo.o bari_hires.o \
+  bari_pollu.o bari_rober.o bari_beam.o bari_chemakzo.o : %.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_LEGACY_NC $<
+	@$(COMPILE_LEGACY_NC) $<
+else
+	$(COMPILE_LEGACY_NC) $<
+endif
+
+%.o: %.f
+ifneq ($(QUIET),)
+	@echo TEST_COMPILE_LEGACY $<
+	@$(TEST_COMPILE_LEGACY) $(FCfree) $<
+else
+	$(TEST_COMPILE_LEGACY) $(FCfree) $<
+endif
+
+#################################################################
+#
+# DEPENDENCIES
+
+SRC_PATH = $(TEST_SRC_DIR)
+
+vpath %.f $(SRC_PATH)
+
+vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+
+NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
+
+ifeq ($(NODEPS),)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(SRC_PATH) $(SRCS) > .depend
+  endif
+
+  -include .depend
+
+endif

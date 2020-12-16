@@ -1,0 +1,27 @@
+make plot files by running ./plotter
+to do a test of a single point, edit plotter.f to call Do_Test
+edit Do_Test in make_plots
+
+
+to specify whether radiation should be included, edit 'include_radiation.txt'
+nonzero means yes, zero means no.
+if you don't include radiation, the file prefix is changed from 'mesa' 
+to 'mesa-no-rad'
+
+
+to test making files for a single z, edit 'whichz.txt' and then do ./ceos
+
+
+to make the full set of files, do ./rn
+
+
+to test running the eos with the new data, do ./local_export
+and then edit the test code to have
+   use_shared_data_dir = .false.
+   
+when you are ready to export the new data, first do ./build_eosDT_4_export
+that will create the xz file in the eos directory
+
+then run ./build_data_and_export for eos to install the new eos data in mesa/data
+
+

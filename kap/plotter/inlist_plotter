@@ -1,0 +1,80 @@
+&eos
+
+  !### put eos options here
+  ! see eos/defaults/eos.defaults
+
+  use_skye = .true.
+
+/
+
+&kap
+
+  !### put kap options here
+  ! see kap/defaults/kap.defaults
+
+  use_Type2_opacities = .false.
+  Zbase = 0
+
+/
+
+
+&plotter
+
+  !### check derivatives?
+  ! if doing_partial is true, show the partial value
+  ! if doing_dfridr is true, do dfridr and show the error
+  ! if doing_d_dlnd, partials wrt lnd, else wrt lnT
+
+  doing_partial = .false.
+  doing_dfridr = .false.
+  doing_d_dlnd = .true.
+
+
+  !### pick which quantities to plot against
+  ! valid options are Rho, T, X, Z
+
+  xname = 'Rho'
+  yname = 'T'
+
+  ! xname = 'X'
+  ! yname = 'Z'
+
+  !### pick number of points
+  ! values for non-xname,yname variables are ignored
+
+  nT = 100
+  nRho = 100
+  nX = 100
+  nZ = 150
+
+  !### pick plot limits
+
+  ! center/delta takes precedence over min/max
+  ! center is used when var is not xname/yname
+
+  X_center = 0.76
+  Z_center = 0.00
+
+  delta_X = 0.1
+  delta_Z = 0.1
+
+  X_min = 0
+  X_max = 1
+
+  Z_min = 0
+  Z_max = 0.1
+
+  logT_center = 4.0
+  logRho_center = -8.5
+
+  delta_logT = 1.0d0
+  delta_logRho = 0.5d0
+
+  ! logT_min = 3.8
+  ! logT_max = 4.2
+  
+  ! logRho_min = -10
+  ! logRho_max = -6
+
+
+/

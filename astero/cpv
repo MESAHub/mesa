@@ -1,0 +1,15 @@
+#!/bin/bash
+if [ -d defaults_$1 ]
+then
+   echo defaults_$1 "already exists, so abort cpv"
+else
+   mkdir defaults_$1
+   cp defaults/* defaults_$1
+   mkdir private_$1
+   cp private/* private_$1
+   mkdir public_$1
+   cp public/* public_$1
+   cp make/makefile make/makefile_$1
+   cp make/makefile_base make/makefile_base_$1
+   echo astero $1
+fi

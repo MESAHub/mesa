@@ -1,0 +1,42 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+function do_one {
+	cd $1
+	check_okay
+	echo $1
+  if [ ! -r out.txt ]
+  then
+    if [ ! -r rn.txt ]
+    then
+      echo "failed: not yet run"
+    else
+      echo "failed: still running"
+    fi
+  else
+    echo $2
+    grep -i "$2" out.txt > /dev/null
+    if [ $? -ne 0 ]
+    then
+      echo "******************** $1 failed to match test string ********************"
+    else
+      #grep TIME out.txt
+      grep runtime out.txt
+      grep "final_check.mod after" out.txt
+      grep "run failed" out.txt
+    fi
+  fi
+	echo $1
+	echo ""
+	cd ..
+}
+
+echo ""
+source do1_test_source
+echo ""

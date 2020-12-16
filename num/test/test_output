@@ -1,0 +1,760 @@
+ call do_test_newton lapack
+ do_test_newton using lapack
+                                               expected    2.9347118120566711D-02
+                                                 actual    2.9347118120566711D-02
+
+ call do_test_newton block_thomas_dble
+ call test_find0_quadratic
+ test_find0_quadratic
+                                                      x    3.0000000000000000D+00
+                                                      y    0.0000000000000000D+00
+                                                      x    8.0000000000000000D+00
+                                                      y    0.0000000000000000D+00
+
+ call test_find_max_quadratic
+ test_find_max_quadratic
+                                                   xmax    1.8500000000000001D+00    1.8500000000000001D+00
+                                                   ymax    1.2408333333333335D+01    1.2408300000000001D+01
+
+ call test_qsort
+
+ qsort into increasing order
+                                            ord, a(ord)           1          71   -9.9960030163651914D-01
+                                            ord, a(ord)           2          72   -9.9928948077094315D-01
+                                            ord, a(ord)           3          70   -9.9556194486629213D-01
+                                            ord, a(ord)           4          73   -9.9463083462525603D-01
+                                            ord, a(ord)           5          69   -9.8719198101413452D-01
+                                            ord, a(ord)           6          74   -9.8564463258072621D-01
+                                            ord, a(ord)           7          68   -9.7452682709546579D-01
+                                            ord, a(ord)           8          75   -9.7236997285380966D-01
+                                            ord, a(ord)           9          67   -9.5762158813985332D-01
+                                            ord, a(ord)          10          76   -9.5486461238306741D-01
+                                            ord, a(ord)          11          66   -9.3654981743361887D-01
+                                            ord, a(ord)          12          77   -9.3320471553353757D-01
+                                            ord, a(ord)          13          65   -9.1140319649561785D-01
+                                            ord, a(ord)          14          78   -9.0748452271192825D-01
+                                            ord, a(ord)          15          64   -8.8229113617858856D-01
+                                            ord, a(ord)          16          79   -8.7781594033445909D-01
+                                            ord, a(ord)          17          63   -8.4934030063164712D-01
+                                            ord, a(ord)          18          80   -8.4432805393136701D-01
+                                            ord, a(ord)          19          62   -8.1269405619512647D-01
+                                            ord, a(ord)          20          81   -8.0716656650651963D-01
+                                            ord, a(ord)          21          61   -7.7251184762557512D-01
+                                            ord, a(ord)          22          82   -7.6649316459578154D-01
+                                            ord, a(ord)          23          60   -7.2896850436490246D-01
+                                            ord, a(ord)          24          83   -7.2248481478236881D-01
+                                            ord, a(ord)          25          59   -6.8225347987204332D-01
+                                            ord, a(ord)          26          84   -6.7533299372998745D-01
+                                            ord, a(ord)          27          58   -6.3257002732674139D-01
+                                            ord, a(ord)          28          85   -6.2524285508382238D-01
+                                            ord, a(ord)          29          57   -5.8013431529189685D-01
+                                            ord, a(ord)          30          86   -5.7243233686411754D-01
+                                            ord, a(ord)          31          56   -5.2517448718215876D-01
+                                            ord, a(ord)          32          87   -5.1713121323600719D-01
+                                            ord, a(ord)          33          55   -4.6792966863093371D-01
+                                            ord, a(ord)          34          88   -4.5958009478126449D-01
+                                            ord, a(ord)          35          54   -4.0864892707467643D-01
+                                            ord, a(ord)          36          89   -4.0002938162170842D-01
+                                            ord, a(ord)          37          53   -3.4759018808122588D-01
+                                            ord, a(ord)          38          90   -3.3873817394913064D-01
+                                            ord, a(ord)          39          52   -2.8501911313714345D-01
+                                            ord, a(ord)          40          91   -2.7597314470194922D-01
+                                            ord, a(ord)          41          51   -2.2120794377671979D-01
+                                            ord, a(ord)          42          92   -2.1200737929346927D-01
+                                            ord, a(ord)          43          50   -1.5643431708173897D-01
+                                            ord, a(ord)          44          93   -1.4711918744000049D-01
+                                            ord, a(ord)          45          49   -9.0980057705665404D-02
+                                            ord, a(ord)          46          94   -8.1590892258467482D-02
+                                            ord, a(ord)          47          48   -2.5129951678055481D-02
+                                            ord, a(ord)          48          95   -1.5707601902048295D-02
+                                            ord, a(ord)          49          47    4.0829492675731827D-02
+                                            ord, a(ord)          50          96    5.0244030921648385D-02
+                                            ord, a(ord)          51           1    6.5925594961839418D-02
+                                            ord, a(ord)          52          46    1.0661129130838831D-01
+                                            ord, a(ord)          53          97    1.1597705615262961D-01
+                                            ord, a(ord)          54           2    1.3156435315225570D-01
+                                            ord, a(ord)          55          45    1.7192923309433977D-01
+                                            ord, a(ord)          56          98    1.8120547487433097D-01
+                                            ord, a(ord)          57           3    1.9663068580272178D-01
+                                            ord, a(ord)          58          44    2.3649912511050780D-01
+                                            ord, a(ord)          59          99    2.4564548367106576D-01
+                                            ord, a(ord)          60           4    2.6084149472054624D-01
+                                            ord, a(ord)          61          43    3.0004002913604272D-01
+                                            ord, a(ord)          62         100    3.0901670943305382D-01
+                                            ord, a(ord)          63           5    3.2391740402552471D-01
+                                            ord, a(ord)          64          42    3.6227548399111614D-01
+                                            ord, a(ord)          65           6    3.8558397569112002D-01
+                                            ord, a(ord)          66          41    4.2293470839648450D-01
+                                            ord, a(ord)          67           7    4.4557290360145207D-01
+                                            ord, a(ord)          68          40    4.8175377912027506D-01
+                                            ord, a(ord)          69           8    5.0362318092885561D-01
+                                            ord, a(ord)          70          39    5.3847677928598070D-01
+                                            ord, a(ord)          71           9    5.5948223575284284D-01
+                                            ord, a(ord)          72          38    5.9285691184546818D-01
+                                            ord, a(ord)          73          10    6.1290702997948776D-01
+                                            ord, a(ord)          74          37    6.4465757337237584D-01
+                                            ord, a(ord)          75          11    6.6366511677992546D-01
+                                            ord, a(ord)          76          36    6.9365338350390904D-01
+                                            ord, a(ord)          77          12    7.1153565194713908D-01
+                                            ord, a(ord)          78          35    7.3963116555202224D-01
+                                            ord, a(ord)          79          13    7.5631035477070641D-01
+                                            ord, a(ord)          80          34    7.8239087401742913D-01
+                                            ord, a(ord)          81          14    7.9779441424881892D-01
+                                            ord, a(ord)          82          33    8.2174646497090442D-01
+                                            ord, a(ord)          83          15    8.3580733669472085D-01
+                                            ord, a(ord)          84          32    8.5752670551492083D-01
+                                            ord, a(ord)          85          16    8.7018373104970348D-01
+                                            ord, a(ord)          86          31    8.8957591880372011D-01
+                                            ord, a(ord)          87          17    9.0077402848582278D-01
+                                            ord, a(ord)          88          30    9.1775466138029971D-01
+                                            ord, a(ord)          89          18    9.2744513316740940D-01
+                                            ord, a(ord)          90          29    9.4194032988327792D-01
+                                            ord, a(ord)          91          19    9.5008100133996121D-01
+                                            ord, a(ord)          92          28    9.6202769448390413D-01
+                                            ord, a(ord)          93          20    9.6858314622685160D-01
+                                            ord, a(ord)          94          27    9.7792935673227788D-01
+                                            ord, a(ord)          95          21    9.8287106653709011D-01
+                                            ord, a(ord)          96          26    9.8957612982072241D-01
+                                            ord, a(ord)          97          22    9.9288259671973211D-01
+                                            ord, a(ord)          98          25    9.9691733960982165D-01
+                                            ord, a(ord)          99          23    9.9857417744101284D-01
+                                            ord, a(ord)         100          24    9.9992104510737900D-01
+
+ call do_test_newuoa
+    test NEWUOA with N = 2 and NPT =  5
+    test NEWUOA with N = 4 and NPT =  9
+    test NEWUOA with N = 6 and NPT = 13
+ call do_test_bobyqa
+    test BOBYQA with N = 2 and NPT =  5
+    test BOBYQA with N = 4 and NPT =  9
+    test BOBYQA with N = 6 and NPT = 13
+ call do_test_simplex
+ testing NM_simplex with FR4
+                                  found f_final < 1d-10
+
+ testing NM_simplex with ER
+                                  found f_final < 1d-10
+
+ testing NM_simplex with WD
+                                  found f_final < 1d-10
+
+ testing NM_simplex with BLE
+                                  found f_final < 1d-10
+
+ testing NM_simplex with PS
+                                  found f_final < 1d-10
+
+ testing NM_simplex with TR
+                                  found f_final < 1d-10
+
+ call do_test_brent
+ test brent
+ 
+TEST_GLOMIN_ALL
+  Test the Brent GLOMIN routine, which seeks
+  a global minimizer of a function F(X)
+  in an interval [A,B],
+  given some upper bound M for F".
+ 
+h_01(x) = 2 - x
+                                                  a,  b    7.0000000000000000D+00    9.0000000000000000D+00
+                                                 fa, fb   -5.0000000000000000D+00   -7.0000000000000000D+00
+ 
+h_01(x) = 2 - x
+                                                  a,  b    7.0000000000000000D+00    9.0000000000000000D+00
+                                                 fa, fb   -5.0000000000000000D+00   -7.0000000000000000D+00
+ 
+h_02(x) = x * x
+                                                  a,  b   -1.0000000000000000D+00    2.0000000000000000D+00
+                                                 fa, fb    1.0000000000000000D+00    4.0000000000000000D+00
+ 
+h_02(x) = x * x
+                                                  a,  b   -1.0000000000000000D+00    2.0000000000000000D+00
+                                                 fa, fb    1.0000000000000000D+00    4.0000000000000000D+00
+ 
+h_04(x) = ( x + sin(x) ) * exp(-x*x)
+                                                  a,  b   -1.0000000000000000D+01    1.0000000000000000D+01
+                                                 fa, fb   -3.5176959895140647D-43    3.5176959895140647D-43
+ 
+h_05(x) = ( x - sin(x) ) * exp(-x*x)
+                                                  a,  b   -1.0000000000000000D+01    1.0000000000000000D+01
+                                                 fa, fb   -3.9224559625276070D-43    3.9224559625276070D-43
+ 
+TEST_LOCAL_MIN_ALL
+  Test the Brent LOCAL_MIN routine, which seeks
+  a local minimizer of a function F(X)
+  in an interval [A,B].
+ 
+g_01(x) = ( x - 2 ) * ( x - 2 ) + 1
+                                                  a,  b    0.0000000000000000D+00    3.1415926535897931D+00
+                                                 fa, fb    5.0000000000000000D+00    2.3032337867301855D+00
+ 
+g_02(x) = x * x + exp( - x )
+                                                  a,  b    0.0000000000000000D+00    1.0000000000000000D+00
+                                                 fa, fb    1.0000000000000000D+00    1.3678794411714423D+00
+ 
+g_03(x) = x^4 + 2x^2 + x + 3
+                                                  a,  b   -2.0000000000000000D+00    2.0000000000000000D+00
+                                                 fa, fb    2.5000000000000000D+01    2.9000000000000000D+01
+ 
+g_04(x) = exp( x ) + 1 / ( 100 x )
+                                                  a,  b    1.0000000000000000D-04    1.0000000000000000D+00
+                                                 fa, fb    1.0100010000500016D+02    2.7282818284590449D+00
+ 
+g_05(x) = exp( x ) - 2x + 1/(100x) - 1/(1000000x^2)
+                                                  a,  b    2.0000000000000001D-04    2.0000000000000000D+00
+                                                 fa, fb    2.5999800020001334D+01    3.3940558489306496D+00
+ call test_binary_search
+
+ binary_search, increasing values
+                               val is less than vec(1):           1    0.0000000000000000D+00    1.0000000000000000D+00
+ okay
+                                            vec(result)    1.0890000000000000D+03
+                                                    val    1.0910000000000000D+03
+                                          vec(result+1)    1.1560000000000000D+03
+ okay
+                            val is greater than vec(n):    1.0001000000000000D+04    1.0000000000000000D+04
+ okay
+
+ binary_search, decreasing values
+                            val is greater than vec(n):           1    0.0000000000000000D+00   -1.0000000000000000D+00
+ okay
+                                          vec(result+1)   -1.1560000000000000D+03
+                                                    val   -1.0910000000000000D+03
+                                            vec(result)   -1.0890000000000000D+03
+ okay
+                               val is less than vec(1):   -1.0001000000000000D+04   -1.0000000000000000D+04
+ okay
+
+ call test_root routines
+                                                   root    7.4800610880593488D-01
+ test_root2
+                                                     x1   -1.2000000000000000D+00
+                                                     x3    2.0000000000000000D+00
+                                                     y1   -1.2957717642721649D+00
+                                                     y3    5.0191042281580711D-01
+                                              safe_root    5.0000000000000011D-01
+
+ test_root3
+                             first safe_root_with_guess    4.9999999999999362D-01
+                            second safe_root_with_guess    5.0000000000000377D-01
+
+
+ vdpol
+ cash_karp
+                                             calculated           1    1.7633919298826672D+00
+                                             calculated           2   -8.3553976467637270D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+
+ vdpol
+ dopri5
+                                             calculated           1    1.7635369595715233D+00
+                                             calculated           2   -8.3538846559057456D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+
+ vdpol
+ dop853
+                                             calculated           1    1.7631770874099637D+00
+                                             calculated           2   -8.3576249533857294D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ ijob 1
+ numerical jacobians
+ vdpol
+ ros2
+ lapack_decsol
+                                             calculated           1    1.7634791355271933D+00
+                                             calculated           2   -8.3542531418660826D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rose2
+ lapack_decsol
+                                             calculated           1    1.7632599246839684D+00
+                                             calculated           2   -8.3564923307025629D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ ros3p
+ lapack_decsol
+                                             calculated           1    1.7632133298065669D+00
+                                             calculated           2   -8.3570324604568780D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ ros3pl
+ lapack_decsol
+                                             calculated           1    1.7632275869083176D+00
+                                             calculated           2   -8.3567934070464034D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rodas3
+ lapack_decsol
+                                             calculated           1    1.7631181339242872D+00
+                                             calculated           2   -8.3579468000474644D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rodas4
+ lapack_decsol
+                                             calculated           1    1.7631994253177565D+00
+                                             calculated           2   -8.3571743817185018D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rodasp
+ lapack_decsol
+                                             calculated           1    1.7631598871920982D+00
+                                             calculated           2   -8.3575041058173893D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ analytical jacobians
+ vdpol
+ ros2
+ lapack_decsol
+                                             calculated           1    1.7634791355497950D+00
+                                             calculated           2   -8.3542531418980293D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rose2
+ lapack_decsol
+                                             calculated           1    1.7632599246818821D+00
+                                             calculated           2   -8.3564923306400030D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ ros3p
+ lapack_decsol
+                                             calculated           1    1.7632133406525121D+00
+                                             calculated           2   -8.3570742105126605D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ ros3pl
+ lapack_decsol
+                                             calculated           1    1.7632275873928600D+00
+                                             calculated           2   -8.3567934123576204D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rodas3
+ lapack_decsol
+                                             calculated           1    1.7631012951593710D+00
+                                             calculated           2   -8.3581383924336494D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rodas4
+ lapack_decsol
+                                             calculated           1    1.7631994160936251D+00
+                                             calculated           2   -8.3571744736359732D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ vdpol
+ rodasp
+ lapack_decsol
+                                             calculated           1    1.7631694821204535D+00
+                                             calculated           2   -8.3573978203824573D-01
+                                              reference           1    1.7632345401889102D+00
+                                              reference           2   -8.3568868191466206D-01
+
+ ijob 2
+ numerical jacobians
+ medakzo
+ ros3pl
+ lapack_decsol
+                                             calculated           1    5.0960636359988413D-06
+                                             calculated           2    1.0491969517895626D-04
+                                             calculated           3    2.1489707646812954D-04
+                                             calculated           4    3.1580643347487423D-04
+                                             calculated           5    3.6036169629700336D-04
+                                             calculated           6    2.5737915245326785D-04
+                                             calculated           7    7.0235309143589398D-07
+                                             calculated           8    8.6916762833643229D-16
+                                             calculated           9    1.7335386287485803D-29
+                                             calculated          10    1.2427699898049991D-51
+                                             calculated          11    6.3229012940309284D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ medakzo
+ rodas3
+ lapack_decsol
+                                             calculated           1    5.1044057496429490D-06
+                                             calculated           2    1.0509144164796351D-04
+                                             calculated           3    2.1524881905043931D-04
+                                             calculated           4    3.1632326063598971D-04
+                                             calculated           5    3.6095131839372402D-04
+                                             calculated           6    2.5780022667237854D-04
+                                             calculated           7    7.0353122158634774D-07
+                                             calculated           8    8.7060322847018551D-16
+                                             calculated           9    1.7364056185910257D-29
+                                             calculated          10    1.2448491654620188D-51
+                                             calculated          11    6.3335631801676687D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ medakzo
+ rodas4
+ lapack_decsol
+                                             calculated           1    5.1165507149016674D-06
+                                             calculated           2    1.0534145349278752D-04
+                                             calculated           3    2.1576064352936712D-04
+                                             calculated           4    3.1707458825414519D-04
+                                             calculated           5    3.6180674136109296D-04
+                                             calculated           6    2.5840709319935242D-04
+                                             calculated           7    7.0507018856580053D-07
+                                             calculated           8    8.7232225807457387D-16
+                                             calculated           9    1.7398622427423443D-29
+                                             calculated          10    1.2477630532887851D-51
+                                             calculated          11    6.3478817758147088D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ medakzo
+ rodasp
+ lapack_decsol
+                                             calculated           1    5.1176393813554315D-06
+                                             calculated           2    1.0536386150927286D-04
+                                             calculated           3    2.1580649591872240D-04
+                                             calculated           4    3.1714183094748476D-04
+                                             calculated           5    3.6188316387433610D-04
+                                             calculated           6    2.5846026349897114D-04
+                                             calculated           7    7.0515955569939380D-07
+                                             calculated           8    8.7231126422416963D-16
+                                             calculated           9    1.7398350048573668D-29
+                                             calculated          10    1.2480532538069965D-51
+                                             calculated          11    6.3495464365864103D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ analytical jacobians
+ medakzo
+ ros3pl
+ lapack_decsol
+                                             calculated           1    5.0960637243168364D-06
+                                             calculated           2    1.0491969699662779D-04
+                                             calculated           3    2.1489708021139975D-04
+                                             calculated           4    3.1580643899250193D-04
+                                             calculated           5    3.6036170259860106D-04
+                                             calculated           6    2.5737915693272009D-04
+                                             calculated           7    7.0235310551293316D-07
+                                             calculated           8    8.6916764386157413D-16
+                                             calculated           9    1.7335386560288217D-29
+                                             calculated          10    1.2427700080838643D-51
+                                             calculated          11    6.3229013868144632D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ medakzo
+ rodas3
+ lapack_decsol
+                                             calculated           1    5.1044057731908800D-06
+                                             calculated           2    1.0509144213141956D-04
+                                             calculated           3    2.1524882003749816D-04
+                                             calculated           4    3.1632326210547662D-04
+                                             calculated           5    3.6095132000701999D-04
+                                             calculated           6    2.5780022773707673D-04
+                                             calculated           7    7.0353122397424140D-07
+                                             calculated           8    8.7060323057979994D-16
+                                             calculated           9    1.7364056226941119D-29
+                                             calculated          10    1.2448491693493175D-51
+                                             calculated          11    6.3335632047165487D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ medakzo
+ rodas4
+ lapack_decsol
+                                             calculated           1    5.1165517724697156D-06
+                                             calculated           2    1.0534147528632975D-04
+                                             calculated           3    2.1576068823317711D-04
+                                             calculated           4    3.1707465369470626D-04
+                                             calculated           5    3.6180681540422049D-04
+                                             calculated           6    2.5840714397108060D-04
+                                             calculated           7    7.0507027550589720D-07
+                                             calculated           8    8.7232229445194039D-16
+                                             calculated           9    1.7398621942311134D-29
+                                             calculated          10    1.2477630521843672D-51
+                                             calculated          11    6.3478824864152956D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ medakzo
+ rodasp
+ lapack_decsol
+                                             calculated           1    5.1176389115045523D-06
+                                             calculated           2    1.0536385183895395D-04
+                                             calculated           3    2.1580647613142511D-04
+                                             calculated           4    3.1714180190981883D-04
+                                             calculated           5    3.6188313097703376D-04
+                                             calculated           6    2.5846024098914825D-04
+                                             calculated           7    7.0515951721591065D-07
+                                             calculated           8    8.7231125021305293D-16
+                                             calculated           9    1.7398350319561366D-29
+                                             calculated          10    1.2480532598882777D-51
+                                             calculated          11    6.3495461487831339D-89
+                                              reference           1    5.1139838409199086D-06
+                                              reference           2    1.0528861955822200D-04
+                                              reference           3    2.1565253246011760D-04
+                                              reference           4    3.1691604807591688D-04
+                                              reference           5    3.6162656911449179D-04
+                                              reference           6    2.5828073803501028D-04
+                                              reference           7    7.0481584295180085D-07
+                                              reference           8    8.7217834561544700D-16
+                                              reference           9    1.7395330197522149D-29
+                                              reference          10    1.2470577646617050D-51
+                                              reference          11    6.3446005298776937D-89
+
+ ijob 11
+ diffusion
+ ros2
+ lapack_decsol
+                                             calculated           1    2.5830743343587426D-01
+                                             calculated           2    2.7846910783782353D-01
+                                             calculated           3    3.1691152951397150D-01
+                                             calculated           4    3.7001888649932979D-01
+                                             calculated           5    4.3273503186187329D-01
+                                             calculated           6    4.9900300266146352D-01
+                                             calculated           7    5.6232850128082945D-01
+                                             calculated           8    6.1642180793993817D-01
+                                             calculated           9    6.5585017359534103D-01
+                                             calculated          10    6.7662119204022519D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+
+ diffusion
+ rose2
+ lapack_decsol
+                                             calculated           1    2.5830837293148384D-01
+                                             calculated           2    2.7847007270743795D-01
+                                             calculated           3    3.1691248430210472D-01
+                                             calculated           4    3.7001971345763318D-01
+                                             calculated           5    4.3273556246605260D-01
+                                             calculated           6    4.9900308258663528D-01
+                                             calculated           7    5.6232805157803434D-01
+                                             calculated           8    6.1642085306233585D-01
+                                             calculated           9    6.5584883141492245D-01
+                                             calculated          10    6.7661964216002646D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+
+ diffusion
+ ros3p
+ lapack_decsol
+                                             calculated           1    2.6011076243403941D-01
+                                             calculated           2    2.8011703481705774D-01
+                                             calculated           3    3.1652869023080821D-01
+                                             calculated           4    3.6952911673816952D-01
+                                             calculated           5    4.3333154973818111D-01
+                                             calculated           6    4.9916988793721945D-01
+                                             calculated           7    5.6224951819319346D-01
+                                             calculated           8    6.1804610649652802D-01
+                                             calculated           9    6.5418400517146558D-01
+                                             calculated          10    6.7183860876454593D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+
+ diffusion
+ ros3pl
+ lapack_decsol
+                                             calculated           1    2.5830823745508619D-01
+                                             calculated           2    2.7847024657773317D-01
+                                             calculated           3    3.1691307870551194D-01
+                                             calculated           4    3.7002057178548292D-01
+                                             calculated           5    4.3273635658821974D-01
+                                             calculated           6    4.9900349915417541D-01
+                                             calculated           7    5.6232794104555683D-01
+                                             calculated           8    6.1642025810020518D-01
+                                             calculated           9    6.5584790940394488D-01
+                                             calculated          10    6.7661856785075014D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+
+ diffusion
+ rodas3
+ lapack_decsol
+                                             calculated           1    2.5830826221185621D-01
+                                             calculated           2    2.7847012000489912D-01
+                                             calculated           3    3.1691274772418976D-01
+                                             calculated           4    3.7002011650646077D-01
+                                             calculated           5    4.3273594322531295D-01
+                                             calculated           6    4.9900328775082858D-01
+                                             calculated           7    5.6232801040182978D-01
+                                             calculated           8    6.1642058933372301D-01
+                                             calculated           9    6.5584842205539340D-01
+                                             calculated          10    6.7661916745217221D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+
+ diffusion
+ rodas4
+ lapack_decsol
+                                             calculated           1    2.5830848420344416D-01
+                                             calculated           2    2.7847007670787499D-01
+                                             calculated           3    3.1691234821458403D-01
+                                             calculated           4    3.7001949949708030D-01
+                                             calculated           5    4.3273538174194254D-01
+                                             calculated           6    4.9900301942118369D-01
+                                             calculated           7    5.6232811539696059D-01
+                                             calculated           8    6.1642098987964411D-01
+                                             calculated           9    6.5584897800714537D-01
+                                             calculated          10    6.7661977359680647D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+
+ diffusion
+ rodasp
+ lapack_decsol
+                                             calculated           1    2.5830851029263852D-01
+                                             calculated           2    2.7847008569614945D-01
+                                             calculated           3    3.1691233427774912D-01
+                                             calculated           4    3.7001947128730223D-01
+                                             calculated           5    4.3273535556990889D-01
+                                             calculated           6    4.9900300795881142D-01
+                                             calculated           7    5.6232812043154146D-01
+                                             calculated           8    6.1642100392048715D-01
+                                             calculated           9    6.5584899225834903D-01
+                                             calculated          10    6.7661978497372965D-01
+                                              reference           1    2.5830832258765279D-01
+                                              reference           2    2.7847002063795223D-01
+                                              reference           3    3.1691243229910382D-01
+                                              reference           4    3.7001966806159553D-01
+                                              reference           5    4.3273553313243934D-01
+                                              reference           6    4.9900307794850141D-01
+                                              reference           7    5.6232807598367041D-01
+                                              reference           8    6.1642090507187908D-01
+                                              reference           9    6.5584890447885325D-01
+                                              reference          10    6.7661972646501933D-01
+

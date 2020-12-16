@@ -1,0 +1,30 @@
+      
+         ! add isotopes and reactions for the pp extras extension
+         ! remove the replaced basic net reactions
+         
+         add_isos(h2, li7, be7, b8)
+         
+         add_reactions(
+            r_h1_h1_wk_h2
+            r_h1_h1_ec_h2
+            r_h2_pg_he3
+            r_h2_h2_to_he4
+            r_h2_he3_to_h1_he4
+            r_he3_ag_be7
+            r_be7_wk_li7
+            r_li7_pa_he4
+            r_be7_pg_b8
+            r_h2_be7_to_h1_he4_he4
+            r_he3_be7_to_h1_h1_he4_he4
+            r_b8_wk_he4_he4
+            r_b8_gp_be7
+            )     
+         
+         remove_reactions(
+            rpp_to_he3
+            rpep_to_he3
+            r34_pp2
+            r34_pp3
+            rbe7ec_li7_aux
+            rbe7pg_b8_aux
+            )     

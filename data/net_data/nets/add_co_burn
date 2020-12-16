@@ -1,0 +1,60 @@
+         ! add carbon/oxygen burning plus alpha link to si28
+
+         add_iso(si28)
+         
+         add_reactions(
+           
+            r_o16_ga_c12
+     
+            r_ne20_ga_o16
+     
+            r_mg24_ga_ne20
+
+            r_c12_to_he4_he4_he4
+            
+            r1212,                ! c12 + c12 -> ne20 + he4, includes na23+p channel
+            r1216_to_mg24,        ! c12 + o16 -> mg24 + he4 
+            r1216_to_si28,        ! c12 + o16 -> si28
+            r1616,                ! o16 + o16 -> si28 + he4
+           
+            ! o16 => c12           
+            ro16gp_to_c12,        ! o16(g,p)n15(p,a)c12     
+            ro16gp_aux,           ! o16(g,p)n15
+            rn15pa_aux,           !         n15(p,a)c12
+            rn15pg_aux,
+           
+            ! o16 => ne20           
+            r_o16_ag_ne20
+            ro16ap_to_ne20,       ! o16(a,p)f19(p,g)ne20     
+            ro16ap_aux,           ! o16(a,p)f19
+            rf19pg_aux,           !         f19(p,g)ne20
+           
+            ! ne20 => o16           
+            rne20gp_to_o16,       ! ne20(g,p)f19(p,a)o16     
+            rne20gp_aux,          ! ne20(g,p)f19
+            rf19pa_aux,           !          f19(p,a)o16
+           
+            ! ne20 => mg24           
+            r_ne20_ag_mg24
+            rne20ap_to_mg24,      ! ne20(a,p)na23(p,g)mg24     
+            rne20ap_aux,          ! ne20(a,p)na23
+            rna23pg_aux,          !          na23(p,g)mg24
+           
+            ! mg24 => ne20           
+            rmg24gp_to_ne20,      ! mg24(g,p)na23(p,a)ne20       
+            rmg24gp_aux,          ! mg24(g,p)na23
+            rna23pa_aux,          !          na23(p,a)ne20
+            
+            ! mg24 => si28           
+            r_mg24_ag_si28
+            rmg24ap_to_si28,      ! mg24(a,p)al27(p,g)si28 
+            rmg24ap_aux,          ! mg24(a,p)al27
+            ral27pg_aux,          !          al27(p,g)si28
+            
+            ! si28 => mg24           
+            rsi28gp_to_mg24,      ! si28(g,p)al27(p,a)mg24
+            rsi28gp_aux,          ! si28(g,p)al27
+            ral27pa_aux,          !          al27(p,a)mg24
+            r_si28_ga_mg24
+           
+            )     

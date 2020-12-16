@@ -1,0 +1,21 @@
+      ! pp chains; 4 CNO cycles; hot CNO; Ne-Na cycle; Mg-Al cycle
+
+         add_isos_and_reactions(
+            neut
+            h 1 2
+         	he 3 4
+            li 6 7
+            be7
+            be 9 10
+            b8
+            b 10 11
+            c 12 13            
+            n 13 15
+            o 14 18
+            f 17 19
+            ne 18 22
+            na 21 23
+            mg 22 26
+            al 25 27
+            si 27 28
+            )

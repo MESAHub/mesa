@@ -1,0 +1,9 @@
+# How to rebuild from scratch:
+
+cd $MESA_DIR/chem/preproccesor
+./clean
+./mk
+./rebuild_all
+./build_for_export
+cd ../
+./build_data_and_export

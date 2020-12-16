@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# Check whether the MESA SDK meets version requirements
+
+# Arguments
+
+target_version=$1
+
+if [[ -z $target_version ]]; then
+    echo 'check_sdk_version: missing argument'
+    exit 1
+fi
+
+# Testing function (from
+# https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash)
+
+version_check () {
+
+    if [[ $1 == $2 ]]; then
+        return 0
+    fi
+
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+        ver1[i]=0
+    done
+
+    for ((i=0; i<${#ver1[@]}; i++)); do
+
+        if [[ -z ${ver2[i]} ]]; then
+            ver2[i]=0
+        fi
+
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 1
+        fi
+
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 2
+        fi
+	
+    done
+
+    return 0
+
+}
+
+# Check for existance of mesasdk_version (and not mesasdk_version.sh that older sdk's shipped)
+
+if ! command -v mesasdk_version >/dev/null 2>&1; then
+    echo 'failed'
+    exit 0
+fi
+
+# Get the installed SDK version number
+
+sdk_version=$(mesasdk_version | awk 'BEGIN {FS="-"}; {print $NF}')
+
+# Convert old style (digits only) to new style (digits and dots)
+# by prepending 0.
+
+if [[ $sdk_version =~ ^[0-9]+$ ]]; then
+    sdk_version=0.$sdk_version
+fi
+
+# Compare the versions
+
+version_check $sdk_version $target_version
+
+case $? in
+    0)
+	echo 'passed'
+	;;
+    1)
+	echo 'passed'
+	;;
+    2)
+	echo 'failed'
+	;;
+esac
+
+exit 0

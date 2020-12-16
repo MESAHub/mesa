@@ -1,0 +1,162 @@
+
+&star_job
+      show_log_description_at_start = .false.
+
+      
+      change_initial_net = .true.      
+      new_net_name = 'co_burn_plus.net'
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.02d0
+
+      kap_file_prefix = 'gs98'
+      use_Type2_opacities = .true.
+
+/ ! end of kap namelist
+
+&controls
+      initial_mass = 10
+      initial_z = 0.02d0 
+
+! solver
+      use_dedt_form_of_energy_eqn = .true.
+      
+! opacity
+
+! mesh
+      mesh_delta_coeff = 1.5     
+
+! convection
+      mixing_length_alpha = 2
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 0.01
+      thermohaline_coeff = 2
+
+      okay_to_reduce_gradT_excess = .true.
+      gradT_excess_lambda1 = -1 ! turn on full all the time
+      
+! timesteps      
+      varcontrol_target = 1d-3
+      dX_nuc_drop_limit = 1d-2
+      delta_HR_limit = 0.05
+
+! Atm
+      atm_option = 'T_tau'
+      atm_T_tau_relation = 'Eddington'
+      atm_T_tau_opacity = 'fixed'
+
+! Overshoot
+       overshoot_scheme(1) = 'exponential'
+       overshoot_zone_type(1) = 'burn_Z'
+       overshoot_zone_loc(1) = 'shell'
+       overshoot_bdy_loc(1) = 'bottom'
+       overshoot_f(1) = 0.014
+       overshoot_f0(1) = 0.004
+
+! Output
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      photo_interval = 50
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 10
+      write_header_frequency = 10
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+
+      Grid2_win_flag = .true.
+      Grid2_win_width = 10
+      Grid2_win_aspect_ratio = 0.8 ! aspect_ratio = height/width
+      !Grid2_plot_name(2) = 'Power'
+      !Power_xmin = 0.510 ! only used if /= -101d0
+      !Power_xmax = 0.590 ! only used if /= -101d0
+         
+      !Grid2_file_flag = .true.
+      Grid2_file_dir = 'png'
+      Grid2_file_prefix = 'agb_'
+      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+      Grid2_file_width = -1 ! (inches) negative means use same value as for window
+      Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+         Grid2_num_plots = 5 ! <= 10
+
+         Grid2_plot_name(1) = 'TRho_Profile'
+         Grid2_plot_row(1) = 1 ! number from 1 at top
+         Grid2_plot_rowspan(1) = 3 ! plot spans this number of rows
+         Grid2_plot_col(1) =  1 ! number from 1 at left
+         Grid2_plot_colspan(1) = 2 ! plot spans this number of columns
+         Grid2_plot_pad_left(1) = 0.0 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(1) = 0.0 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(1) = 0.0 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(1) = 0.1 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(1) = 0.7 ! multiply txt_scale for subplot by this
+
+         Grid2_plot_name(2) = 'HR'
+         Grid2_plot_row(2) = 4 ! number from 1 at top
+         Grid2_plot_rowspan(2) = 3 ! plot spans this number of rows
+         Grid2_plot_col(2) =  1 ! number from 1 at left
+         Grid2_plot_colspan(2) = 1 ! plot spans this number of columns
+         Grid2_plot_pad_left(2) = 0.00 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(2) = 0.04 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(2) = 0.03 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(2) = 0.0 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(2) = 0.65 ! multiply txt_scale for subplot by this
+
+         Grid2_plot_name(3) = 'TRho'
+         Grid2_plot_row(3) = 4 ! number from 1 at top
+         Grid2_plot_rowspan(3) = 3 ! plot spans this number of rows
+         Grid2_plot_col(3) =  2 ! number from 1 at left
+         Grid2_plot_colspan(3) = 1 ! plot spans this number of columns
+         Grid2_plot_pad_left(3) = 0.04 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(3) = 0.00 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(3) = 0.03 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(3) = 0.0 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(3) = 0.65 ! multiply txt_scale for subplot by this
+
+         Grid2_plot_name(4) = 'Text_Summary1'
+         Grid2_plot_row(4) = 7 ! number from 1 at top
+         Grid2_plot_rowspan(4) = 2 ! plot spans this number of rows
+         Grid2_plot_col(4) = 1 ! number from 1 at left
+         Grid2_plot_colspan(4) = 4 ! plot spans this number of columns
+         Grid2_plot_pad_left(4) = -0.08 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(4) = 0.0 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(4) = 0.08 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(4) = -0.04 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(4) = 0.19 ! multiply txt_scale for subplot by this
+
+         Grid2_plot_name(5) = 'Profile_Panels3'
+         Grid2_plot_row(5) = 1 ! number from 1 at top
+         Grid2_plot_rowspan(5) = 6 ! plot spans this number of rows
+         Grid2_plot_col(5) =  3 ! number from 1 at left
+         Grid2_plot_colspan(5) = 2 ! plot spans this number of columns
+         Grid2_plot_pad_left(5) = 0.15 ! fraction of full window width for padding on left
+         Grid2_plot_pad_right(5) = 0.03 ! fraction of full window width for padding on right
+         Grid2_plot_pad_top(5) = 0.0 ! fraction of full window height for padding at top
+         Grid2_plot_pad_bot(5) = 0.0 ! fraction of full window height for padding at bottom
+         Grid2_txt_scale_factor(5) = 0.65 ! multiply txt_scale for subplot by this
+
+         Profile_Panels3_xaxis_name = 'mass'
+         Profile_Panels3_xaxis_reversed = .false.
+         
+         Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
+         Profile_Panels3_xmax = -101d0 ! only used if /= -101d0
+
+/ ! end of pgstar namelist

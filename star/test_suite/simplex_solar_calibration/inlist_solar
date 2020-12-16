@@ -1,0 +1,125 @@
+&star_job
+
+      !! crucial edits--------------------------------------------
+      !profile_columns_file = 'profile_columns_with_soundspeed.list'
+
+      !write_profile_when_terminate = .true.
+      !filename_for_profile_when_terminate = 'soundspeed_final_FREEeos_realcal_xtracols.profile'
+
+      !! --------------------------------------------------------- 
+
+      show_log_description_at_start = .false.
+
+      load_saved_model = .true.
+      saved_model_name = 'late_pre_zams_1.0M.mod'
+      
+      save_model_when_terminate = .true.
+      save_model_filename = 's1.mod' ! 's1_from_inlist_solar_mod.mod'
+
+      change_initial_net = .true. ! switch nuclear reaction network
+      new_net_name = 'pp_and_cno_extras.net'
+
+	   set_rate_c12ag = 'Kunz'
+	   set_rate_n14pg = 'jina reaclib'
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+      
+      set_cumulative_energy_error_each_step_if_age_less_than = 4d7
+         ! delay start of cumulative energy accounting until zams
+         ! age_target = 4.61d9 ! 4.57d9 after zams + 4d7 for pre-main-sequence
+      new_cumulative_energy_error = 0d0
+      
+      !pgstar_flag = .true.
+      
+
+/ ! end of star_job namelist
+
+
+&eos
+   !use_FreeEOS = .false.   
+   !dbg = .true.
+   !logT_lo = 6.779
+   !logT_hi = 6.7799
+/ ! end of eos namelist
+
+
+&kap
+
+      use_Type2_opacities = .false.
+      kap_file_prefix = 'OP_gs98'
+      kap_lowT_prefix = 'lowT_fa05_gs98' ! for lower temperatures.
+
+/ ! end of kap namelist
+
+&controls
+
+      ! mesh adjustment
+      mesh_delta_coeff = 0.5
+
+      ! custom mesh spacing function to resolve convective boundary
+      ! see run_star_extras.f90
+      use_other_mesh_functions = .true.
+      x_ctrl(1) = 500    ! weight
+      x_ctrl(2) = 0.02d0 ! width
+      x_ctrl(3) = 0d0    ! center
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 1200
+
+      max_years_for_timestep = 1d7           
+      varcontrol_target = 1d-3
+      max_timestep_factor = 2d0
+      delta_lgT_cntr_limit = 0.1  
+      delta_lgRho_cntr_limit = 0.5 
+
+
+      ! atmosphere
+      atm_option = 'table'
+      atm_table = 'photosphere'
+
+      
+      ! atomic diffusion
+      do_element_diffusion = .true. ! determines whether or not we do diffusion
+      do_diffusion_heating = .true.
+      diffusion_dt_limit = 7d11 ! no element diffusion if dt < this limit (in seconds)
+      diffusion_T_full_on = 1d3
+      diffusion_T_full_off = 1d3
+      
+      diffusion_calculates_ionization = .true.
+
+      diffusion_num_classes = 4 ! number of classes of species for diffusion calculations
+      diffusion_class_representative(1) = 'h1'
+      diffusion_class_representative(2) = 'he4'
+      diffusion_class_representative(3) = 'o16'
+      diffusion_class_representative(4) = 'fe56'
+   
+      ! in ascending order.  species goes into 1st class with A_max >= species A
+      diffusion_class_A_max(1) = 2
+      diffusion_class_A_max(2) = 4
+      diffusion_class_A_max(3) = 16
+      diffusion_class_A_max(4) = 10000
+         
+      diffusion_use_isolve = .true.
+      diffusion_rtol_for_isolve = 1d-4
+      diffusion_atol_for_isolve = 1d-5
+      diffusion_maxsteps_for_isolve = 1000
+      diffusion_isolve_solver = 'ros2_solver'
+
+      ! solver
+      use_dedt_form_of_energy_eqn = .true. 
+      mlt_Pturb_factor = 1
+      
+      ! controls for output      
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 10
+      terminal_interval = 10
+
+/ ! end of controls namelist
+
+

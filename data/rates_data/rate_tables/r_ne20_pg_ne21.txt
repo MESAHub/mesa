@@ -1,0 +1,7 @@
+# table for experimental rate
+#                         
+#    T8     rate             
+
+2               
+    0.0100 0.1000E-6
+  100.0000 0.1000E-6

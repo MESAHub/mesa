@@ -1,0 +1,9 @@
+# run this from eosCMS_builder to create eosCMS_data.tar.xz in the data directory
+cd data
+rm -rf eosCMS_data.tar
+rm -rf eosCMS_data.tar.xz
+echo 'tar -cvf eosCMS_data.tar eosCMS_data'
+tar -cvf eosCMS_data.tar eosCMS_data
+echo 'xz eosCMS_data.tar'
+xz -v eosCMS_data.tar
+cp eosCMS_data.tar.xz ../..

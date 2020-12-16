@@ -1,0 +1,20 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		echo "FAILED"
+		echo
+		exit 1
+	fi
+}
+
+rm -f out.txt rn.txt
+./clean
+check_okay
+./mk
+check_okay
+./rn > rn.txt
+check_okay
+mv rn.txt out.txt

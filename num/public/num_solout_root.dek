@@ -1,0 +1,96 @@
+      
+      ! uses alternating bisection and inverse parabolic interpolation.
+      ! does not require derivatives of the function, 
+      ! but will use them if they are available.
+      ! if you can make an initial guess, use solout_root_with_initial_guess.
+      real(dp) function solout_root(
+     >      f, x1, x3, y1, y3, imax, epsx, epsy, 
+     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
+         use mod_solout_root, only: do_solout_root
+         use const_def, only: arg_not_provided
+         use const_def, only: dp
+         interface
+            include 'num_solout_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x1, x3 ! bounds for x
+            ! values of f at x1 and x3 must have opposite sign
+            ! return value for solout_root will be bracketed by x1 and x3
+         real(dp), intent(in) :: y1, y3 ! f(x1) and f(x3)
+         integer, intent(in) :: lipar, lrpar
+         real(dp), intent(inout), target :: rwork_y(*)
+         integer, intent(inout), target :: iwork_y(*)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         interface
+            include 'num_interp_y.dek'
+         end interface
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr
+         solout_root = do_solout_root(
+     >      f, arg_not_provided, x1, x3, y1, y3, imax, epsx, epsy, 
+     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)         
+      end function solout_root
+
+      
+      real(dp) function solout_root_with_initial_guess(
+     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, 
+     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
+         use mod_solout_root, only:do_solout_root
+         use const_def, only: dp
+         interface
+            include 'num_solout_root_fcn.dek' ! f provides function values and optional derivatives
+         end interface
+         real(dp), intent(in) :: x_guess ! initial guess for the root
+         real(dp), intent(in) :: x1, x3 ! bounds for x
+            ! values of f at x1 and x3 must have opposite sign
+            ! return value for solout_root will be bracketed by x1 and x3
+         real(dp), intent(in) :: y1, y3 ! f(x1) and f(x3)
+         integer, intent(in) :: lipar, lrpar
+         real(dp), intent(inout), target :: rwork_y(*)
+         integer, intent(inout), target :: iwork_y(*)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         interface
+            include 'num_interp_y.dek'
+         end interface
+         integer, intent(in) :: imax ! max number of iterations for search
+         real(dp), intent(in) :: epsx, epsy 
+         ! stop seaching when x is determined to within epsx
+         ! or when abs(f(x)) is less than epsy
+         integer, intent(out) :: ierr
+         solout_root_with_initial_guess = do_solout_root(
+     >      f, x_guess, x1, x3, y1, y3, imax, epsx, epsy, 
+     >      rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)         
+      end function solout_root_with_initial_guess
+
+      
+      ! the solout root finders require bracketing values for the root.
+      ! if you don't have them, you can use this routine to do a (not too dumb) search.
+      subroutine look_for_solout_brackets(
+     >         x, dx, x1, x3, f, y1, y3, imax, 
+     >         rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
+         use mod_solout_root, only: do_solout_brackets
+         use const_def, only: dp
+         real(dp), intent(in) :: x, dx ! x is initial guess and dx is increment for searching
+         real(dp), intent(out) :: x1, x3 ! bounds
+         real(dp), intent(out) :: y1, y3 ! f(x1) and f(x3)
+         interface
+            include 'num_solout_root_fcn.dek' ! f provides function values
+         end interface
+         integer, intent(in) :: imax
+         integer, intent(in) :: lipar, lrpar
+         real(dp), intent(inout), target :: rwork_y(*)
+         integer, intent(inout), target :: iwork_y(*)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         interface
+            include 'num_interp_y.dek'
+         end interface
+         integer, intent(out) :: ierr        
+         call do_solout_brackets(
+     >            x, dx, x1, x3, f, y1, y3, imax, 
+     >            rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)      
+      end subroutine look_for_solout_brackets

@@ -1,0 +1,105 @@
+! generate a 1.4M star mid-way through the MS
+! originally run with MESA r10398
+! simplified version of an inlist initially provided by Joey Mombarg
+
+&star_job
+
+  create_pre_main_sequence_model = .true.
+
+  change_net = .true.
+  new_net_name = 'basic_plus_fe56_ni58.net'
+
+  ! for initial Z = 0.0142857
+  set_uniform_initial_composition = .true.
+  initial_h1 = 0.715399992
+  initial_h2 = 1.430799984e-05
+  initial_he3 = 4.48623528494e-05
+  initial_he4 = 0.270255137647
+
+  initial_zfracs = 6 ! AGSS09_zfracs
+
+  save_model_when_terminate = .true.
+  save_model_filename = '1.4M_XC_0.5.mod'
+
+  !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+
+
+/ ! end of eos namelist
+
+&kap
+      Zbase = 0.0142857
+
+      ! opacities with AGSS09 abundances
+      kap_file_prefix = 'a09'
+      kap_lowT_prefix = 'lowT_fa05_a09p'
+      kap_CO_prefix = 'a09_co'
+
+      use_Type2_opacities = .true.
+      kap_Type2_full_off_X = 1d-3
+      kap_Type2_full_on_X = 1d-6
+
+/ ! end of kap namelist
+
+&controls
+
+  initial_mass = 1.4
+  initial_z = 0.0142857
+
+  xa_central_lower_limit_species(1) = 'h1'
+  xa_central_lower_limit(1) = 0.5
+
+  use_Ledoux_criterion = .true.
+  alpha_semiconvection = 0.0d0
+  thermohaline_coeff = 0.0d0
+
+  mixing_length_alpha = 1.84d0
+  mlt_option = 'Henyey'
+  
+   ! H core overshoot calibrated to M67
+   overshoot_scheme(1) = 'exponential'
+   overshoot_zone_type(1) = 'any'
+   overshoot_zone_loc(1) = 'core'
+   overshoot_bdy_loc(1) = 'top'
+   overshoot_f(1) = 0.016
+   overshoot_f0(1) = 0.008
+
+   ! envelope overshoot calibrated to the sun
+   overshoot_scheme(2) = 'exponential'
+   overshoot_zone_type(2) = 'any'
+   overshoot_zone_loc(2) = 'shell'
+   overshoot_bdy_loc(2) = 'any'
+   overshoot_f(2) = 0.0162
+   overshoot_f0(2) = 0.0081
+
+  ! CO enhanced opacities
+
+  ! better resolution of the Henyey hook
+  delta_lg_XH_cntr_max = -1
+
+  ! limits based on total integrated power at surface for all nuclear reactions excluding photodistintegrations
+  delta_lgL_nuc_limit = 0.025
+  delta_lgL_nuc_hard_limit = 0.1
+  lgL_nuc_burn_min = 1.5
+
+  ! limit for magnitude of max change
+  delta_lgTeff_limit = 0.005
+  delta_lgTeff_hard_limit = 0.01
+  delta_lgL_limit = 0.02
+  delta_lgL_hard_limit = 0.05
+
+   photo_interval = 100
+   profile_interval = 100
+   history_interval = 5
+   terminal_interval = 50
+   write_header_frequency = 50
+
+/ ! end of controls namelist
+
+&pgstar
+
+/ ! end of pgstar namelist

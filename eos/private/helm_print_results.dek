@@ -1,0 +1,248 @@
+!..print results
+
+
+ 11      format(a20,e20.10)
+ 12      format(a20,i20)
+         
+        write(*,12) 'iat', iat
+        write(*,12) 'jat', jat
+
+        write(*,11) 'den', den
+        write(*,11) 'din', din
+        write(*,11) 'df_d', df_d
+ 
+ 
+        write(*,11) 'pres', pres
+        write(*,11) 'prad', prad
+        write(*,11) 'pion', pion
+        write(*,11) 'pele', pele
+        write(*,11) 'pcoul', pcoul
+        write(*,*)
+        
+        write(*,11) 'ener', ener
+        write(*,11) 'erad', erad
+        write(*,11) 'eion', eion
+        write(*,11) 'eele', eele
+        write(*,11) 'ecoul', ecoul
+        write(*,*)
+        
+        write(*,11) 'entr', entr 
+        write(*,11) 'srad', srad 
+        write(*,11) 'sion', sion 
+        write(*,11) 'sele', sele 
+        write(*,11) 'scoul', scoul 
+        write(*,*)
+
+        write(*,11) 'dpresdt',  dpresdt
+        write(*,11) 'dpresdd',  dpresdd
+        write(*,11) 'dpresda',  dpresda
+        write(*,11) 'dpresdz',  dpresdz
+
+        write(*,11) 'denerdt',  denerdt
+        write(*,11) 'denerdd',  denerdd
+        write(*,11) 'denerda',  denerda
+        write(*,11) 'denerdz',  denerdz
+
+        write(*,11) 'dentrdt',  dentrdt
+        write(*,11) 'dentrdd',  dentrdd
+        write(*,11) 'dentrda',  dentrda
+        write(*,11) 'dentrdz',  dentrdz
+        
+        write(*,11) 'prad',    prad
+        write(*,11) 'erad',    erad
+        write(*,11) 'srad',    srad 
+
+        write(*,11) 'pion',   pion
+        write(*,11) 'eion',   eion
+        write(*,11) 'sion',   sion 
+        write(*,11) 'xni',    xni
+
+        write(*,11) 'pele',   pele
+        write(*,11) 'ppos',   0.0d0
+        write(*,11) 'dpept',  dpepdt
+        write(*,11) 'dpepd',  dpepdd
+        write(*,11) 'dpepa',  dpepda
+        write(*,11) 'dpepz',  dpepdz
+
+        write(*,11) 'eele',   eele
+        write(*,11) 'epos',   0.0d0
+        write(*,11) 'deept',  deepdt
+        write(*,11) 'deepd',  deepdd
+        write(*,11) 'deepa',  deepda
+        write(*,11) 'deepz',  deepdz
+
+        write(*,11) 'sele',   sele 
+        write(*,11) 'spos',   0.0d0
+        write(*,11) 'dsept',  dsepdt 
+        write(*,11) 'dsepd',  dsepdd 
+        write(*,11) 'dsepa',  dsepda 
+        write(*,11) 'dsepz',  dsepdz
+
+        write(*,11) 'xnem',   xne
+        write(*,11) 'xne',    xnefer
+        write(*,11) 'xnp',    0.0d0
+        write(*,11) 'dxnet',  dxnedt 
+        write(*,11) 'dxned',  dxnedd 
+        write(*,11) 'dxnea',  dxneda 
+        write(*,11) 'dxnez',  dxnedz 
+
+        write(*,11) 'etaele', etaele
+        write(*,11) 'detat',  detadt
+        write(*,11) 'detad',  detadd
+        write(*,11) 'detaa',  detada
+        write(*,11) 'detaz',  detadz
+        write(*,11) 'etapos', 0.0d0
+
+        write(*,11) 'pcou',   pcoul
+        write(*,11) 'ecou',   ecoul
+        write(*,11) 'scou',   scoul
+        write(*,11) 'plasg',  plasg
+
+        write(*,11) 'dse',    dse
+        write(*,11) 'dpe',    dpe
+        write(*,11) 'dsp',    dsp
+
+        write(*,11) 'cv',     cv
+        write(*,11) 'cp',     cp
+        write(*,11) 'gam1',    gam1
+        write(*,11) 'gam2',    gam2
+        write(*,11) 'gam3',    gam3
+        write(*,11) 'cs',    sound
+        write(*,11) 'nabad',  nabad
+        write(*,11) 'chit',    chit
+        write(*,11) 'chid',    chid
+        
+        write(*,*)
+
+
+
+02    format(1x,t2,a,1p7e16.8)
+03    format(1x,t2,a7,1pe12.4,t22,a7,1pe12.4,  &
+               t42,a7,1pe12.4,t62,a7,1pe12.4)
+
+
+       write(6,02) 'p tot=',pres,  &
+                    dpresdd,dpresdt,dpresda,dpresdz
+       write(6,02) 'p gas=',pgas,  &
+                 dpgasdd,dpgasdt,dpgasda,dpgasdz
+       write(6,02) 'p rad=',prad,  &
+                 dpraddd,dpraddt,dpradda,dpraddz
+       write(6,02) 'p ion=',pion,  &
+                dpiondd,dpiondt,dpionda,dpiondz
+       write(6,02) 'p  e-=',pele,  &
+                dpepdd,dpepdt,dpepda,dpepdz
+       write(6,02) 'p  e+=',ppos
+       write(6,02) 'p coul=',pcoul,  &
+                dpcouldd,dpcouldt,dpcoulda,dpcouldz
+
+
+       write(6,*)  ' '
+       write(6,02) 'e tot=',ener,  &
+                    denerdd,denerdt,denerda,denerdz
+       write(6,02) 'e gas=',egas,  &
+                 degasdd,degasdt,degasda,degasdz
+       write(6,02) 'e rad=',erad,  &
+                deraddd,deraddt,deradda,deraddz
+       write(6,02) 'e ion=',eion,  &
+                deiondd,deiondt,deionda,deiondz
+       write(6,02) 'e  e-=',eele,  &
+                deepdd,deepdt,deepda,deepdz
+       write(6,02) 'e  e+=',epos
+       write(6,02) 'e coul=',ecoul,  &
+                decouldd,decouldt,decoulda,decouldz
+
+       write(6,*)  ' '
+       write(6,02) 's tot=',entr,  &
+                    dentrdd,dentrdt,dentrda,dentrdz
+       write(6,02) 's/xka=',entr/(kerg*avo),  &
+             dentrdd/(kerg*avo),dentrdt/(kerg*avo),dentrda/(kerg*avo),dentrdz/(kerg*avo)
+       write(6,02) 's gas=',sgas,  &
+                 dsgasdd,dsgasdt,dsgasda,dsgasdz
+       write(6,02) 's rad=',srad,  &
+                dsraddd,dsraddt,dsradda,dsraddz
+       write(6,02) 's ion=',sion,  &
+                dsiondd,dsiondt,dsionda,dsiondz
+       write(6,02) 's  e-=',sele,  &
+                dsepdd,dsepdt,dsepda,dsepdz
+       write(6,02) 's  e+=',spos
+       write(6,02) 's coul=',scoul,  &
+                dscouldd,dscouldt,dscoulda,dscouldz
+
+
+! specific heats, and ratio of electostatic to thermal energy
+! the 3 gammas and the sound speed for both the gas and the total
+       write(6,*)  ' '
+       write(6,02) 'cv  =',cv/(kerg*avo)*abar,  &
+                    dcvdd,dcvdt,  &
+                    dcvda,dcvdz
+       write(6,02) 'cp  =',cp,  &
+                    dcpdd,dcpdt,  &
+                    dcpda,dcpdz
+       write(6,02) 'gam1=',gam1,  &
+                    dgam1dd,dgam1dt,  &
+                    dgam1da,dgam1dz
+       write(6,02) 'gam2=',gam2,  &
+                    dgam2dd,dgam2dt,  &
+                    dgam2da,dgam2dz
+       write(6,02) 'gam3=',gam3,  &
+                    dgam3dd,dgam3dt,  &
+                    dgam3da,dgam3dz
+       write(6,02) 'cs  =',sound,  &
+                    dcsdd,dcsdt,  &
+                    dcsda,dcsdz
+
+       write(6,*)  ' '
+       write(6,02) 'cvgas=',sound_gas/(kerg*avo)*abar,  &
+                    dcv_gasdd,dcv_gasdt,  &
+                    dcv_gasda,dcv_gasdz
+       write(6,02) 'cpgas=',cp_gas,  &
+                    dcp_gasdd,dcp_gasdt,  &
+                    dcp_gasda,dcp_gasdz
+       write(6,02) 'g1gas=',gam1_gas,  &
+                    dgam1_gasdd,dgam1_gasdt,  &
+                    dgam1_gasda,dgam1_gasdz
+       write(6,02) 'g2gas=',gam2_gas,  &
+                    dgam2_gasdd,dgam2_gasdt,  &
+                    dgam2_gasda,dgam2_gasdz
+       write(6,02) 'g3gas=',gam3_gas,  &
+                    dgam3_gasdd,dgam3_gasdt,  &
+                    dgam3_gasda,dgam3_gasdz
+       write(6,02) 'csgas=',sound_gas,  &
+                    dcs_gasdd,dcs_gasdt,  &
+                    dcs_gasda,dcs_gasdz
+
+
+! the thermodynamic consistency relations, these should all be
+! at the floating point limit of zero
+       write(6,*) ' '
+       write(6,03) 'maxw1 =',dse,'maxw2 =',dpe,  &
+                   'maxw3 =',dsp
+
+! number density of ions and its derivatives
+       write(6,03) 'xni   =',xni,  'xnim  =',0d0
+       write(6,03) 'dxnidd=',dxnedd,'dxnidt=',dxnedt,  &
+                   'dxnida=',dxneda,'dxnidz=',dxnedz
+
+! ion chemical potential and its derivatives
+       write(6,03) 'etaion=',etaion
+       write(6,03) 'detaid=',detaidd,'detait=',detaidt,  &
+                   'detaia=',detaida,'detaiz=',detaidz
+
+
+! number density of electrons+positrons and its derivatives
+       write(6,03) 'xnele =',xne,'xnpos =',0d0,  &
+                   'xnem  =',xne
+       write(6,03) 'dxnedd=',dxnedd,'dxnedt=',dxnedt,  &
+                   'dxneda=',dxneda,'dxnedz=',dxnedz
+
+
+! electron chemical potential, positron chemical potential and its derivatives
+       write(6,03) 'etaele=',etaele,'etapos=',etapos
+       write(6,03) 'detadd=',detadd,'detadt=',detadt,  &
+                   'detada=',detada,'detadz=',detadz
+
+       write(6,03) 'zeff  =',zbar,  &
+                   'ionzd =',zbar/zbar, &
+                         'plasg =',plasg
+
+

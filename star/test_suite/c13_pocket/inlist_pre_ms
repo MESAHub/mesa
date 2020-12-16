@@ -1,0 +1,38 @@
+&star_job
+
+  ! begin with a pre-main sequence model
+    create_pre_main_sequence_model = .true.
+
+  ! save a model at the end of the run
+    save_model_when_terminate = .true.
+    save_model_filename = '2M_pre_ms.mod'
+    required_termination_code_string = 'log_L_lower_limit'
+
+  ! display on-screen plots
+    pgstar_flag = .false.
+
+/ !end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+  ! loosen tolerances
+    varcontrol_target = 1e-3
+
+  ! stopping condition
+    log_L_lower_limit = 2.0
+  
+  ! output
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 50
+
+/ ! end of controls namelist

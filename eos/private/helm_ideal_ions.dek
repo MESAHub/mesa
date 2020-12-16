@@ -1,0 +1,221 @@
+
+!..number density in 1/cm**3,
+        xni     = avo * ytot1 * den
+
+!..first derivatives
+        dxnidd  = avo * ytot1
+        dxnidt  = 0.0d0
+        dxnida  = -xni * ytot1
+        dxnidz  = 0.0d0 
+
+!..second derivatives
+        dxniddd = 0.0d0
+        dxniddt = 0.0d0
+        dxnidda = -dxnidd * ytot1
+        dxniddz = 0.0d0
+        dxnidtt = 0.0d0
+        dxnidta = 0.0d0
+        dxnidtz = 0.0d0
+        dxnidaa = -2.0d0 * dxnida * ytot1
+        dxnidaz = 0.0d0
+        dxnidzz = 0.0d0
+
+
+!..pressure in erg/cm**3
+        pion    = max(xni * kt, 1d-99)
+
+!..first derivatives
+        dpiondd = dxnidd * kt 
+        dpiondt = xni * kerg 
+        dpionda = -pion * ytot1 
+        dpiondz = 0.0d0
+
+!..second derivatives
+        dpionddd = dxniddd * kt
+        dpionddt = dxniddt * kt + dxnidd * kerg
+        dpiondda = dxnidda * kt
+        dpionddz = dxniddz * kt
+        dpiondtt = dxnidt * kerg
+        dpiondta = dxnida * kerg
+        dpiondtz = dxnidz * kerg
+        dpiondaa = -2.0d0 * dpionda * ytot1
+        dpiondaz = 0.0d0
+        dpiondzz = 0.0d0
+
+
+
+!..energy in erg/gr
+        y       = 1.5d0 * deninv
+        eion    = y * pion
+
+!..first derivatives
+        deiondd = 0.0d0
+        deiondt = y * dpiondt
+        deionda = y * dpionda
+        deiondz = 0.0d0
+
+!..second derivatives
+        deionddd = 0.0d0
+        deionddt = 0.0d0
+        deiondda = y * dpiondda - deionda*deninv 
+        deionddz = y * dpionddz - deiondz*deninv 
+        deiondtt = y * dpiondtt
+        deiondta = y * dpiondta
+        deiondtz = y * dpiondtz
+        deiondaa = y * dpiondaa
+        deiondaz = y * dpiondaz
+        deiondzz = 0.0d0
+
+
+!..ion degeneracy parameter (c&g 9.60)
+        y         = ktinv*ytot1
+        yy        = y * sqrt(y)
+        z         = xni * sifac * yy
+        etaion    = log(z)
+        xx        = 1.0d0/xni
+
+!..first derivatives
+        detaidd = dxnidd*xx
+        detaidt = dxnidt*xx - 1.5d0*tempinv
+        detaida = dxnida*xx - 1.5d0*ytot1
+        detaidz = dxnidz*xx 
+
+!..second derivatives
+        detaiddd = (dxniddd - dxnidd*dxnidd*xx)*xx
+        detaiddt = (dxniddt - dxnidd*dxnidt*xx)*xx
+        detaidda = (dxnidda - dxnidd*dxnida*xx)*xx
+        detaiddz = (dxniddz - dxnidd*dxnidz*xx)*xx
+        detaidtt = (dxnidtt - dxnidt*dxnidt*xx)*xx &
+                      + 1.5d0*tempinv*tempinv
+        detaidta = (dxnidta - dxnidt*dxnida*xx)*xx
+        detaidtz = (dxnidtz - dxnidt*dxnidz*xx)*xx
+        detaidaa = (dxnidaa - dxnida*dxnida*xx)*xx + 1.5d0*ytot1*ytot1
+        detaidaz = (dxnidaz - dxnida*dxnidz*xx)*xx
+        detaidzz = (dxnidaz - dxnidz*dxnidz*xx)*xx
+
+
+!..entropy in erg/gr/kelvin
+!..the last term is the usual  etaion * kerg * xni/den 
+!..sometimes called the sacker-tetrode equation
+
+        y        = kergavo * ytot1
+        z        = y * ytot1
+
+        sion    = (eion + pion*deninv)*tempinv - etaion * y
+
+!..first derivatives
+        dsiondd = (deiondd + (dpiondd - pion*deninv)*deninv)*tempinv &
+                  - detaidd * y
+        dsiondt = ((deiondt + dpiondt*deninv) &
+                  - (eion + pion*deninv)*tempinv)*tempinv  - detaidt*y
+        dsionda = (deionda + dpionda*deninv)*tempinv &
+                  - detaida*y + etaion*z
+        dsiondz = 0.0d0
+
+
+!..second derivatives
+        dsionddd = &
+                 (deionddd + (dpionddd - (2.0d0*dpiondd &
+                  - 2.0d0*pion*deninv)*deninv)*deninv)*tempinv &
+                  - detaiddd*y
+        dsionddt = 0d0
+        dsiondda = &
+                (deiondda + (dpiondda - dpionda*deninv)*deninv)*tempinv &
+                 - detaidda * y + detaidd * z
+        dsionddz = &
+                (deionddz + (dpionddz - dpiondz*deninv)*deninv)*tempinv &
+                 - detaiddz * y
+       dsiondtt =  ( (deiondtt + dpiondtt*deninv) &
+                 - (2.0d0*(deiondt + dpiondt*deninv)*tempinv) &
+                 + 2.0d0*(eion + pion*deninv)*tempinv*tempinv)*tempinv &
+                 - detaidtt * y
+        dsiondta = ((deiondta + dpiondta*deninv) &
+                  - (deionda + dpionda*deninv)*tempinv)*tempinv &
+                  - detaidta * y + detaidt * z
+        dsiondtz = ((deiondtz + dpiondtz*deninv) &
+                  - (deiondz + dpiondz*deninv)*tempinv)*tempinv &
+                  - detaidtz * y
+        dsiondaa = (deiondaa + dpiondaa*deninv)*tempinv &
+                  - detaidaa * y + detaida * z &
+                  + detaida * z  - 2.0d0*etaion*z*ytot1
+        dsiondaz = (deiondaz + dpiondaz*deninv)*tempinv &
+                  - detaidaz * y + detaidz * z
+        dsiondzz = 0.0d0
+
+! keep sion > 0
+      
+      if (sion < sion0) then ! exponential rolloff to zero
+         sionfactor = 1d0-sion/sion0
+         sionfactor = exp(-sionfactor*sionfactor)
+         if (sionfactor < 1d-20) sionfactor = 1d-20
+         sion_new = sion0*sionfactor
+         
+         dsionfactord = dsiondd / sion0
+         dsionfactort = dsiondt / sion0
+         dsionfactora = dsionda / sion0
+         dsionfactorz = dsiondz / sion0
+         
+         dsiondd_new = sionfactor * 2 * (1 - sion/sion0) * dsiondd
+         dsionddd_new = &
+               dsionfactord * 2 * (1 - sion/sion0) * dsiondd + &
+               sionfactor * 2 * (- dsiondd/sion0) * dsiondd + &
+               sionfactor * 2 * (1 - sion/sion0) * dsionddd
+         dsionddt_new = 0d0 ! &
+!               dsionfactort * 2 * (1 - sion/sion0) * dsiondd + &
+!               sionfactor * 2 * (- dsiondt/sion0) * dsiondd + &
+!               sionfactor * 2 * (1 - sion/sion0) * dsionddt
+         dsiondda_new = &
+               dsionfactora * 2 * (1 - sion/sion0) * dsiondd + &
+               sionfactor * 2 * (- dsionda/sion0) * dsiondd + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondda
+         dsionddz_new = &
+               dsionfactorz * 2 * (1 - sion/sion0) * dsiondd + &
+               sionfactor * 2 * (- dsiondz/sion0) * dsiondd + &
+               sionfactor * 2 * (1 - sion/sion0) * dsionddz
+
+         dsiondt_new = sionfactor * 2 * (1 - sion/sion0) * dsiondt
+         dsiondtt_new = &
+               dsionfactort * 2 * (1 - sion/sion0) * dsiondt + &
+               sionfactor * 2 * (- dsiondt/sion0) * dsiondt + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondtt
+         dsiondta_new = &
+               dsionfactora * 2 * (1 - sion/sion0) * dsiondt + &
+               sionfactor * 2 * (- dsionda/sion0) * dsiondt + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondta
+         dsiondtz_new = &
+               dsionfactorz * 2 * (1 - sion/sion0) * dsiondt + &
+               sionfactor * 2 * (- dsiondz/sion0) * dsiondt + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondtz
+
+         dsionda_new = sionfactor * 2 * (1 - sion/sion0) * dsionda
+         dsiondaa_new = &
+               dsionfactora * 2 * (1 - sion/sion0) * dsionda + &
+               sionfactor * 2 * (- dsionda/sion0) * dsionda + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondaa
+         dsiondaz_new = &
+               dsionfactorz * 2 * (1 - sion/sion0) * dsionda + &
+               sionfactor * 2 * (- dsiondz/sion0) * dsionda + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondaz
+
+         dsiondz_new = sionfactor * 2 * (1 - sion/sion0) * dsiondz
+         dsiondzz_new = &
+               dsionfactorz * 2 * (1 - sion/sion0) * dsiondz + &
+               sionfactor * 2 * (- dsiondz/sion0) * dsiondz + &
+               sionfactor * 2 * (1 - sion/sion0) * dsiondzz
+
+         sion = sion_new
+         dsiondd = dsiondd_new
+         dsiondt = dsiondt_new
+         dsionda = dsionda_new
+         dsiondz = dsiondz_new
+         dsionddd = dsionddd_new
+         dsionddt = dsionddt_new
+         dsiondda = dsiondda_new
+         dsionddz = dsionddz_new
+         dsiondtt = dsiondtt_new
+         dsiondta = dsiondta_new
+         dsiondtz = dsiondtz_new
+         dsiondaa = dsiondaa_new
+         dsiondaz = dsiondaz_new
+         dsiondzz = dsiondzz_new
+      end if

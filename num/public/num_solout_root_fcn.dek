@@ -1,0 +1,16 @@
+      real(dp) function f(x, dfdx, rwork_y, iwork_y, interp_y, lrpar, rpar, lipar, ipar, ierr)
+         ! returns with ierr = 0 if was able to evaluate f and df/dx at x
+         ! if df/dx not available, it is okay to set it to 0
+         use const_def, only: dp
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
+         real(dp), intent(inout), target :: rwork_y(*)
+         integer, intent(inout), target :: iwork_y(*)
+         integer, intent(inout), pointer :: ipar(:) ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         interface
+            include 'num_interp_y.dek'
+         end interface
+         integer, intent(out) :: ierr
+      end function f

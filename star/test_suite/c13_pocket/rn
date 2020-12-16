@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+# set MESA_RUN_OPTIONAL to run all parts of test
+if [ -n "$MESA_RUN_OPTIONAL" ]; then
+    do_one inlist_pre_ms_header 2M_pre_ms.mod LOGS_pre_ms
+    do_one inlist_to_TACHeB_header 2M_TACHeB.mod LOGS_TACHeB
+    do_one inlist_to_3DUP_header 2M_3DUP.mod LOGS_3DUP
+    cp 2M_3DUP.mod standard_2M_3DUP.mod
+else
+    echo "Skipping pre_ms -> 3DUP evolution using saved model"
+    cp standard_2M_3DUP.mod 2M_3DUP.mod
+fi
+
+do_one inlist_c13_pocket_header final.mod LOGS_c13_pocket
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished all inlists for c13_pocket'

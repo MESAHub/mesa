@@ -1,0 +1,10 @@
+# run this from eosSCVH_PT_builder to create eosSCVH_PT_data.tar.xz in the eos directory
+rm -rf ../data/eosSCVH_PT_data/cache
+cd data
+rm -rf eosSCVH_PT_data.tar
+rm -rf eosSCVH_PT_data.tar.xz
+echo 'tar -cvf eosSCVH_PT_data.tar eosSCVH_PT_data'
+tar -cvf eosSCVH_PT_data.tar eosSCVH_PT_data
+echo 'xz eosSCVH_PT_data.tar'
+xz eosSCVH_PT_data.tar
+cp eosSCVH_PT_data.tar.xz ../..

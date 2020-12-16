@@ -1,0 +1,90 @@
+&star_job
+
+
+! Start Case 1
+      create_pre_main_sequence_model = .true.
+      load_saved_model = .false.
+! Start Case 2
+      create_pre_main_sequence_model = .false.
+      load_saved_model = .true.
+      saved_model_name = 'start.mod'
+! Output history and profiles
+      history_columns_file = 'my_history_columns.list' 
+      profile_columns_file = 'my_profile_columns.list' 
+! Output models
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+! Modifications to model chemical composition
+      initial_zfracs = 6
+      kappa_file_prefix = 'a09'
+! Nuclear reactions
+      change_initial_net = .true.      
+      new_net_name = 'pp_and_cno_extras.net'
+! eos
+
+/ !end of star_job namelist
+
+
+&controls
+
+! energy
+      use_dedt_form_of_energy_eqn = .true.
+! mass and metallicity
+      initial_mass = 2.0
+      initial_z = 2d-2
+
+! opacity controls
+      use_Type2_opacities = .true.
+      Zbase = 2d-2
+
+! convection      
+      MLT_option = 'Henyey'
+      mixing_length_alpha = 1.8d0
+! convective boundaries
+      use_Ledoux_criterion = .true.
+      do_conv_premix = .true.
+! Predictive     
+      predictive_mix(1) = .true.
+      predictive_zone_type(1) = 'any'
+      predictive_zone_loc(1) = 'core'
+      predictive_bdy_loc(1) = 'any'
+      predictive_superad_thresh(1) = 0.005
+
+      predictive_mix(2) = .true.
+      predictive_zone_type(2) = 'any'
+      predictive_zone_loc(2) = 'surf'
+      predictive_bdy_loc(2) = 'any'
+      predictive_superad_thresh(2) = 0.001
+
+! temp
+! CPM
+      num_cells_for_smooth_gradL_composition_term = 10
+      threshold_for_smooth_gradL_composition_term = 0.02
+      num_cells_for_smooth_brunt_B = 10
+      threshold_for_smooth_brunt_B = 0.1
+      
+! timestep and grid controls
+
+      max_years_for_timestep = 1d5
+      mesh_delta_coeff = 0.5
+     
+! When to stop
+
+      xa_central_lower_limit_species(1) = 'h1' ! isotope name as defined in chem_def
+      xa_central_lower_limit(1) = 0.0001
+      
+
+
+! output controls
+
+      log_directory = 'LOGS_MS'
+      photo_interval = 100
+      photo_digits = 5
+      profile_interval = 10
+      history_interval = 1
+      terminal_interval = 10
+      write_header_frequency = 10
+      
+/ ! end of controls namelist
+
+

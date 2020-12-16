@@ -1,0 +1,305 @@
+! history_columns.list -- determines the contents of star history logs
+! you can use a non-standard version by setting history_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+! reorder the following names as desired to reorder columns.
+! comment out the name to omit a column (fewer columns => less IO => faster running).
+! remove '!' to restore a column.
+
+! if you have a situation where you want a non-standard set of columns,
+! make a copy of this file, edit as desired, and give the new filename in your inlist
+! as history_columns_file.   if you are just adding columns, you can 'include' this file,
+! and just list the additions in your file.   note: to include the standard default
+! version, use include '' -- the 0 length string means include the default file.
+
+! blank lines and comments can be used freely.
+! if a column name appears more than once in the list, only the first occurrence is used.
+
+! if you need to have something added to the list of options, let me know....
+
+
+! the first few lines of the log file contain parameter values as of the start of the run
+! for completeness, those items are described here:
+   
+   ! initial_mass -- star mass at start of run (Msun units)
+   ! initial_z -- starting metallicity
+   ! h1_boundary_limit -- defines abundance limit for h1_boundary_mass 
+   ! he4_boundary_limit -- defines abundance limit for he4_boundary_mass
+   ! burn_min1 -- 1st limit for reported burning, in erg/g/s
+   ! burn_min2 -- 2nd limit for reported burning, in erg/g/s
+
+
+! note: you can include another list by doing
+!        include 'filename'
+!        include '' means include the default standard list file
+
+
+! the following lines of the log file contain info about 1 model per row
+   
+   ! some general info about the model
+   
+      model_number ! counting from the start of the run
+      star_age ! elapsed simulated time in years since the start of the run
+      star_mass ! in Msun units
+      log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
+      log_rotational_mdot_boost
+      !star_mdot ! d(star_mass)/dt (in msolar per year)
+      !time_step ! timestep in years since previous model
+      log_dt ! log10 time_step
+      num_zones ! number of zones in the model
+      log_total_angular_momentum
+      
+   ! mixing regions
+   
+      !  mx1 refers to the largest (by mass) convective region.
+      !  mx2 is the 2nd largest.
+
+      !  conv_mx1_top and conv_mx1_bot are the region where mixing_type == convective_mixing.
+      !  mx1_top and mx1_bot are the extent of all kinds of mixing, convective and other.
+
+      conv_mx1_top
+      conv_mx1_bot
+      conv_mx2_top
+      conv_mx2_bot
+      mx1_top
+      mx1_bot
+      mx2_top
+      mx2_bot
+      
+       
+      
+   ! regions of strong nuclear burning
+   
+      ! 2 zones where eps_nuc > burn_min1 erg/g/s
+      ! for each zone have 4 numbers: start1, start2, end2, end1
+      ! start1 is mass of inner edge where first goes > burn_min1 (or -20 if none such)
+      ! start2 is mass of inner edge where first zone reaches burn_min2 erg/g/sec (or -20 if none such)
+      ! end2 is mass of outer edge where first zone drops back below burn_min2 erg/g/s
+      ! end1 is mass of outer edge where first zone ends (i.e. eps_nuc < burn_min1)
+      ! similar for the second zone
+   
+      epsnuc_M_1 ! start1 for 1st zone
+      epsnuc_M_2 ! start2
+      epsnuc_M_3 ! end2
+      epsnuc_M_4 ! end1
+      
+      epsnuc_M_5 ! start1 for 2nd zone
+      epsnuc_M_6 ! start2
+      epsnuc_M_7 ! end2
+      epsnuc_M_8 ! end1
+   
+   ! information about abundance transitions
+   
+      he_core_mass
+      c_core_mass
+      o_core_mass   
+      si_core_mass
+      fe_core_mass
+   
+   ! info about locations where optical depth is 10 or 100
+
+      !tau10_mass ! mass in solar units where optical depth = 10
+      !tau10_radius ! radius in solar units where optical depth = 10
+      !tau10_lgP ! estimate for log10(P) at tau = 10
+      !tau10_lgT ! estimate for log10(T) at tau = 10
+      !tau10_lgRho ! estimate for log10(density) at tau = 10
+      !tau10_L ! estimate for L/Lsun at tau = 10
+      
+      !tau100_mass ! location in solar units where optical depth = 100
+      !tau100_radius ! location in solar units where optical depth = 100
+      !tau100_lgP ! estimates for values at tau = 100
+      !tau100_lgT
+      !tau100_lgRho
+      !tau100_L
+
+   ! timescales
+      
+      !dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
+      kh_timescale ! kelvin-helmholtz timescale (years)
+      !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
+
+   ! integrated power from hydrogen and helium burning
+   
+      !power_h_burn ! total thermal power from PP and CNO, excluding neutrinos (in Lsun units)
+      !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
+      log_LH ! log10 power_h_burn
+      log_LHe ! log10 power_he_burn
+      log_Lnuc ! log(LH + LHe + LZ)
+      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+   
+   ! conditions near surface
+   
+      log_L ! log10 luminosity in Lsun units
+      log_Teff ! log10 effective temperature
+      effective_T
+      log_R ! log10 radius in Rsun units
+      log_g ! log10 gravity
+
+      surf_avg_j_rot
+      surf_avg_omega
+      surf_avg_omega_crit
+      surf_avg_omega_div_omega_crit
+      surf_avg_v_rot ! km/sec rotational velocity at equator
+      surf_avg_v_crit ! critical rotational velocity at equator
+      surf_avg_v_div_v_crit
+      surf_avg_Lrad_div_Ledd
+      surf_avg_logT
+      surf_avg_logRho
+      surf_avg_opacity
+      surf_r_equatorial_div_r
+      surf_r_polar_div_r
+   
+   ! conditions near center
+   
+      log_center_T ! temperature
+      log_center_Rho ! density
+      log_center_P ! pressure
+      !center_degeneracy ! the electron chemical potential in units of k*T
+      !center_gamma ! plasma interaction parameter at the centermost meshpoint.
+      center_omega
+      center_omega_div_omega_crit
+      
+      center_ye
+      center_entropy ! in kerg per baryon      
+      center_eps_nuc
+      center_non_nuc_neu
+
+      surface he4
+      surface c12
+      surface n14
+      surface o16
+
+      surface c13
+      surface o17
+      surface o18
+      surface f19
+
+
+      
+   ! mass fractions near center
+      
+      center h1
+      center he4
+      center c12
+      center n14
+      center o16
+      center ne20
+      center si28
+      center s32
+      center ar36
+      center ca40
+      center ti44
+      center ti50
+      center ti52
+      center cr48
+      center cr54
+      center cr56
+      center fe52
+      center fe54
+      center fe56
+      center fe58
+      center fe60
+      center ni56
+      center ni58
+      center ni60
+      center ni62
+      center ni64
+      center zn68
+      center ge72
+      ! etc. -- do as many of these 'center' commands as desired
+      
+      
+
+   ! log10 mass fractions for entire star
+      
+      !log_average h1
+      !log_average h2
+      !log_average he3
+      !log_average he4
+      !log_average li7
+
+   ! log10 total ergs/sec for reaction categories (Lsun units)
+      
+      !pp
+      !cno
+      !tri_alfa
+      !c12_alfa
+      !n14_alfa
+      !o16_alfa
+
+   ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
+      
+      !rpp
+
+   ! info about the max burning locations for hydrogen, helium, and metals
+      
+      ! info about location where have max rate of hydrogen burning (PP and CNO)
+      !eps_h_max ! erg/g/s
+      !eps_h_max_lgT ! log10 temperature at location of max burn
+      !eps_h_max_lgRho ! log10 density at location of max burn
+      !eps_h_max_m ! mass coordinate at location of max burn (Msun units)
+      !eps_h_max_lgP ! log10 pressure at location of max burn
+      !eps_h_max_lgR ! log10 radius at location of max burn
+      !eps_h_max_opacity ! opacity at location of max burn
+      
+      ! info about location where have max rate of helium burning
+         ! triple-alpha plus alpha capture on C12, N14, O16, and Ne20.
+      !eps_he_max ! erg/g/s
+      !eps_he_max_lgT ! log10 temperature at location of max burn
+      !eps_he_max_lgRho ! log10 density at location of max burn
+      !eps_he_max_m ! mass coordinate at location of max burn (Msun units)
+      !eps_he_max_lgP ! log10 pressure at location of max burn
+      !eps_he_max_lgR ! log10 radius at location of max burn
+      !eps_he_max_opacity ! opacity at location of max burn
+      
+      ! info about location where have max rate of burning of metals
+         ! alpha capture on heavy elements plus C+C, C+O, O+O, etc.
+      !eps_z_max ! erg/g/s
+      !eps_z_max_lgT ! log10 temperature at location of max burn
+      !eps_z_max_lgRho ! log10 density at location of max burn
+      !eps_z_max_m ! mass coordinate at location of max burn (Msun units)      
+      !eps_z_max_lgP ! log10 pressure at location of max burn
+      !eps_z_max_lgR ! log10 radius at location of max burn
+      !eps_z_max_opacity ! opacity at location of max burn
+
+   
+
+      ! you might want to get a more complete list of mixing regions by using the following
+      
+      mixing_regions 40
+      
+      !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
+         ! the <integer> is the number of regions to report
+         ! there will be 2*<integer> columns for this in the log file, 2 for each region.
+         ! the first column for a region gives the mixing type using the values defined in const_def
+         ! the types are no_mixing, convective_mixing, overshoot_mixing, semiconvective_mixing,
+         ! and salt_finger_mixing, numbered from 0 to 4.
+         ! entries for extra columns after the last region in the star will have an invalid mixing_type value of -1.
+         ! the second column for a region gives the m/mstar location of the top of the region
+         ! mstar is the total mass of the star, so these locations range from 0 to 1
+         ! all regions are include starting from the center, so the bottom of one region
+         ! is the top of the previous one.  since we start at the center, the bottom of the 1st region is 0.
+         
+         ! the columns in the log file will have names like 'mix_type_1' and 'mix_qtop_1'
+
+      burning_regions 80
+
+
+   ! misc
+
+      delta_nu ! large frequency separation for p-modes (microHz)
+         ! 1e6/(seconds for sound to cross diameter of star)
+      delta_Pg ! g-mode period spacing for l=1 (seconds)
+         
+      gradT_excess_alpha
+      gradT_excess_min_beta
+      gradT_excess_max_lambda
+      
+      v_div_csound_surf ! velocity divided by sound speed at outermost grid point
+      !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
+      !surface_accel_div_grav ! (v - v_old)/dt divided by GM/R^2 at outermost grid point
+      num_retries ! total during the run
+
+       
+

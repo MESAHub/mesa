@@ -1,0 +1,10 @@
+if [ ! -d eos_input_data ]
+then
+    echo
+    echo 'unpacking eos_input_data'
+    echo
+    tar xJf eos_input_data.tar.xz
+fi
+
+cd make
+make

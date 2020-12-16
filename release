@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# set this to the directory where you want the work to be done
+# you should have ~4GB free space here; this does it in RAM
+TMPDIR=/dev/shm
+
+function check_okay {
+    if [ $? -ne 0 ]
+    then
+        echo $1
+	return 1
+    fi
+}
+
+do_one() {
+
+    MESA_SVN=https://subversion.assembla.com/svn/mesa^mesa/trunk
+    MESA_FILENAME=mesa-r$1
+
+    svn export -r $1 ${MESA_SVN} ${MESA_FILENAME}
+    check_okay "failed to export SVN"
+
+    zip -r ${MESA_FILENAME}.zip ${MESA_FILENAME}
+    check_okay "failed to make zip file "
+
+    # you need to make sure you are part of the sourceforge project
+    # and that you have associated an ssh key with your account
+    echo "uploading to sourceforge..."
+    rsync --progress -e ssh ${MESA_FILENAME}.zip frs.sourceforge.net:/home/frs/project/mesa/releases
+    check_okay "failed to upload to sourceforge"
+    echo "upload finished"
+}
+
+
+(
+
+    VERSION=$(cat data/version_number)
+
+    cd ${TMPDIR}
+    do_one ${VERSION}
+
+    # cleanup
+    rm -f ${MESA_FILENAME}.zip
+    rm -rf ${MESA_FILENAME}
+
+)
+
+

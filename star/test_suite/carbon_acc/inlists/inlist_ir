@@ -1,0 +1,12 @@
+&controls
+
+  ! IR
+  delta_lgRho_cntr_limit = 1d-6
+  delta_lgRho_cntr_hard_limit = 3d-6
+
+  mesh_delta_coeff = 0.1
+  max_allowed_nz = 40000
+
+  history_interval = 100
+
+/ ! end of controls namelist

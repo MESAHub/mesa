@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function do_one {
+   echo "Doing Freedman, Z =" $2
+   ./ckap $1 $2 0
+	 if [ $? -ne 0 ]
+	 then
+		 exit 1
+	 fi
+   echo ""
+}
+
+do_one $1 0.01
+do_one $1 0.02
+do_one $1 0.04
+do_one $1 0.10
+do_one $1 0.20
+do_one $1 0.63
+do_one $1 1.00

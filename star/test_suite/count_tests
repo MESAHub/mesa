@@ -1,0 +1,9 @@
+#!/bin/bash
+
+function do_one {
+    COUNT=$((COUNT+1))
+}
+
+COUNT=0
+source do1_test_source
+echo $COUNT

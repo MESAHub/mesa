@@ -1,0 +1,62 @@
+      
+      ! to estimate the condition number of a square matrix
+      subroutine mtx_rcond(trans, n, ldA, A, ipiv, rcond, work, iwork, info)
+         character (len=*), intent(in) :: trans
+            ! Specifies the form of the system of equations:
+            ! = 'N':  A * X = B     (No transpose)
+            ! = 'T':  A**T * X = B  (Transpose)
+            ! = 'C':  A**H * X = B  (Transpose)
+         integer, intent(in) :: n, ldA
+         double precision, intent(inout) :: A(ldA,n) ! A is overwritten
+         integer, intent(out) :: ipiv(n), iwork(n), info
+         double precision, intent(out) :: work(4*n), rcond
+         logical :: lsame, notran
+         double precision :: Anorm, dlange
+         character (len=1) :: norm
+         info = 0
+         notran = lsame( trans, 'N' )
+         if( notran ) then
+            norm = '1'
+         else
+            norm = 'i'
+         end if
+         Anorm = dlange( norm, n, n, A, ldA, work )
+         info = 0
+         call dgetrf( n, n, A, ldA, ipiv, info )
+         if (info /= 0) return
+         call dgecon( norm, n, A, ldA, Anorm, rcond, work, iwork, info )
+      end subroutine mtx_rcond
+      
+      
+      ! to estimate the condition number of a banded matrix
+      subroutine mtx_rcond_banded(trans, m, n, KU, KL, AB, ldAB, ipiv, rcond, work, iwork, info)
+         character (len=*), intent(in) :: trans
+            ! Specifies the form of the system of equations:
+            ! = 'N':  A * X = B     (No transpose)
+            ! = 'T':  A**T * X = B  (Transpose)
+            ! = 'C':  A**H * X = B  (Transpose)
+         integer, intent(in) :: m ! number of rows in full matrix
+         integer, intent(in) :: n ! number of columns in full matrix
+         integer, intent(in) :: KL ! number of subdiagonals within the band of A
+         integer, intent(in) :: KU ! number of superdiagonals within the band of A
+         integer, intent(in) :: ldAB ! leading dimension of banded matrix AB
+         double precision, intent(inout) :: AB(ldAB,n) ! in form used by DGBTRF
+            ! AB(kl+ku+1+i-j,j) = A(i,j) for max(1,j-ku)<=i<=min(m,j+kl)
+         integer, intent(out) :: ipiv(*) ! dimension >= min(m,n)
+         integer, intent(out) :: iwork(n), info
+         double precision, intent(out) :: work(3*n), rcond         
+         logical :: lsame, notran
+         double precision :: anorm, dlangb
+         character (len=1) :: norm      
+         notran = lsame( trans, 'n' )
+         if( notran ) then
+            norm = '1'
+         else
+            norm = 'i'
+         end if
+         anorm = dlangb( norm, n, kl, ku, AB, ldAB, work )
+         info = 0
+         call dgbtrf( m, n, kl, ku, AB, ldAB, ipiv, info )
+         if (info /= 0) return
+         call dgbcon( norm, n, kl, ku, AB, ldAB, ipiv, anorm, rcond, work, iwork, info )         
+      end subroutine mtx_rcond_banded

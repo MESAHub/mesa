@@ -1,0 +1,124 @@
+   ! astero_pgstar_controls.defaults
+
+   ! ======================
+   ! astero_pgstar_controls
+   ! ======================
+
+   ! PGSTAR echelle plot
+   ! -------------------
+   ! ::
+   
+         echelle_win_flag = .false.
+
+         echelle_win_width = 6
+         echelle_win_aspect_ratio = 0.6 ! aspect_ratio = height/width
+         
+         echelle_xleft = 0.15
+         echelle_xright = 0.85
+         echelle_ybot = 0.15
+         echelle_ytop = 0.85
+         echelle_txt_scale = 1.0
+         echelle_title = 'Echelle'      
+         
+         echelle_delta_nu = 0 ! <= 0 means use seismic delta_nu from search inlist
+
+         show_echelle_next_best_at_higher_frequency = .false.
+         show_echelle_next_best_at_lower_frequency = .false.
+         echelle_model_alt_y_shift = 0 ! shift the alt y coord by this much on plot
+
+         show_echelle_annotation1 = .false.
+         show_echelle_annotation2 = .false.
+         show_echelle_annotation3 = .false.
+         
+         ! file output
+         ! ~~~~~~~~~~~
+         ! ::
+
+         echelle_file_flag = .false.
+         echelle_file_dir = 'png'
+         echelle_file_prefix = 'echelle'
+         echelle_best_model_file_prefix = '' ! if non-empty save best chi^2 model file
+          ! e.g. 'best_model_echelle'
+          ! note: this is enabled even if echelle_file_flag = .false.
+         echelle_file_interval = 5 ! output when mod(model_number,echelle_file_interval)==0
+         echelle_file_width = -1 ! negative means use same value as for window
+         echelle_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+   ! PGSTAR ratios plot
+   ! ------------------
+   ! ::
+   
+         ratios_win_flag = .false.
+
+         ratios_win_width = 6
+         ratios_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
+         
+         ratios_xleft = 0.15
+         ratios_xright = 0.85
+         ratios_ybot = 0.15
+         ratios_ytop = 0.85
+         ratios_txt_scale = 1.0
+         ratios_title = 'Ratios'      
+         
+         ratios_margin_sig_factor = 1 ! controls horizontal margin in units of max sigma
+
+         show_ratios_annotation1 = .false.
+         show_ratios_annotation2 = .false.
+         show_ratios_annotation3 = .false.
+         
+         ! file output
+         ! ~~~~~~~~~~~
+         ! ::
+         
+         ratios_file_flag = .false.
+         ratios_file_dir = 'png'
+         ratios_file_prefix = 'ratios'
+         ratios_best_model_file_prefix = '' ! if non-empty save best chi^2 model file
+           ! e.g., 'best_model_ratios'
+           ! note: this is enabled even if ratios_file_flag = .false.
+         ratios_file_interval = 5 ! output when mod(model_number,ratios_file_interval)==0
+         ratios_file_width = -1 ! negative means use same value as for window
+         ratios_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+   ! Include other inlists
+   ! ---------------------
+
+   ! read_extra_astero_pgstar_inlist1
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_astero_pgstar_inlist1_name
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! read_extra_astero_pgstar_inlist2
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_astero_pgstar_inlist2_name
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! read_extra_astero_pgstar_inlist3
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_astero_pgstar_inlist3_name
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! read_extra_astero_pgstar_inlist4
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_astero_pgstar_inlist4_name
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! read_extra_astero_pgstar_inlist5
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! extra_astero_pgstar_inlist5_name
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! If ``read_extra_astero_pgstar_inlistN`` is ``.true.``, then read the namelist
+   ! in file ``extra_astero_pgstar_inlistN_name``.  ::
+
+      read_extra_astero_pgstar_inlist1 = .false.
+      extra_astero_pgstar_inlist1_name = 'undefined'
+
+      read_extra_astero_pgstar_inlist2 = .false.
+      extra_astero_pgstar_inlist2_name = 'undefined'
+
+      read_extra_astero_pgstar_inlist3 = .false.
+      extra_astero_pgstar_inlist3_name = 'undefined'
+
+      read_extra_astero_pgstar_inlist4 = .false.
+      extra_astero_pgstar_inlist4_name = 'undefined'
+
+      read_extra_astero_pgstar_inlist5 = .false.
+      extra_astero_pgstar_inlist5_name = 'undefined'

@@ -1,0 +1,346 @@
+!..declare everything else
+
+!..totals
+      real(dp) :: pres
+      real(dp) :: dpresdd,dpresdt,dpresda,dpresdz
+      real(dp) :: dpresddd,dpresddt,dpresdda,dpresddz
+      real(dp) :: dpresdtt,dpresdta,dpresdtz
+      real(dp) :: dpresdaa,dpresdaz,dpresdzz
+      real(dp) :: ener
+      real(dp) :: denerdd,denerdt,denerda,denerdz
+      real(dp) :: denerddd,denerddt,denerdda,denerddz
+      real(dp) :: denerdtt,denerdta,denerdtz
+      real(dp) :: denerdaa,denerdaz,denerdzz
+      real(dp) :: entr
+      real(dp) :: dentrdd,dentrdt,dentrda,dentrdz
+      real(dp) :: dentrddd,dentrddt,dentrdda,dentrddz
+      real(dp) :: dentrdtt,dentrdta,dentrdtz
+      real(dp) :: dentrdaa,dentrdaz,dentrdzz
+
+
+!..for the gas
+      real(dp) :: pgas
+      real(dp) :: dpgasdd,dpgasdt,dpgasda,dpgasdz
+      real(dp) :: dpgasddd,dpgasddt,dpgasdda,dpgasddz
+      real(dp) :: dpgasdtt,dpgasdta,dpgasdtz
+      real(dp) :: dpgasdaa,dpgasdaz,dpgasdzz
+      real(dp) :: egas
+      real(dp) :: degasdd,degasdt,degasda,degasdz
+      real(dp) :: degasddd,degasddt,degasdda,degasddz
+      real(dp) :: degasdtt,degasdta,degasdtz
+      real(dp) :: degasdaa,degasdaz,degasdzz
+      real(dp) :: sgas
+      real(dp) :: dsgasdd,dsgasdt,dsgasda,dsgasdz
+      real(dp) :: dsgasddd,dsgasddt,dsgasdda,dsgasddz
+      real(dp) :: dsgasdtt,dsgasdta,dsgasdtz
+      real(dp) :: dsgasdaa,dsgasdaz,dsgasdzz
+
+
+!..radiation
+      integer  :: radmult
+      real(dp) :: prad
+      real(dp) :: dpraddd,dpraddt,dpradda,dpraddz
+      real(dp) :: dpradddd,dpradddt,dpraddda,dpradddz
+      real(dp) :: dpraddtt,dpraddta,dpraddtz
+      real(dp) :: dpraddaa,dpraddaz,dpraddzz
+      real(dp) :: erad
+      real(dp) :: deraddd,deraddt,deradda,deraddz
+      real(dp) :: deradddd,deradddt,deraddda,deradddz
+      real(dp) :: deraddtt,deraddta,deraddtz
+      real(dp) :: deraddaa,deraddaz,deraddzz
+      real(dp) :: srad
+      real(dp) :: dsraddd,dsraddt,dsradda,dsraddz
+      real(dp) :: dsradddd,dsradddt,dsraddda,dsradddz
+      real(dp) :: dsraddtt,dsraddta,dsraddtz
+      real(dp) :: dsraddaa,dsraddaz,dsraddzz
+
+
+!..ions
+      integer  :: ionmult
+      real(dp) :: eta_ion_try
+      real(dp), parameter :: sion0 = 1d3
+      real(dp) :: sionfactor, dsionfactord, dsionfactort
+      real(dp) :: dsionfactora, dsionfactorz
+      real(dp) :: sion_new
+      real(dp) :: dsiondd_new,dsiondt_new,dsionda_new,dsiondz_new
+      real(dp) :: dsionddd_new,dsionddt_new,dsiondda_new,dsionddz_new
+      real(dp) :: dsiondtt_new,dsiondta_new,dsiondtz_new
+      real(dp) :: dsiondaa_new,dsiondaz_new,dsiondzz_new
+
+!..ions
+
+!..pressure, energy, entropy
+      real(dp) pion,eion,sion
+      real(dp) :: dpiondd,dpiondt,dpionda,dpiondz
+      real(dp) :: deiondd,deiondt,deionda,deiondz
+      real(dp) :: dsiondd,dsiondt,dsionda,dsiondz
+      real(dp) :: dpionddd,dpionddt,dpiondda,dpionddz
+      real(dp) :: dpiondtt,dpiondta,dpiondtz
+      real(dp) :: dpiondaa,dpiondaz,dpiondzz
+      real(dp) :: deionddd,deionddt,deiondda,deionddz
+      real(dp) :: deiondtt,deiondta,deiondtz
+      real(dp) :: deiondaa,deiondaz,deiondzz
+      real(dp) :: dsionddd,dsionddt,dsiondda,dsionddz
+      real(dp) :: dsiondtt,dsiondta,dsiondtz
+      real(dp) :: dsiondaa,dsiondaz,dsiondzz
+
+!..number densities
+      real(dp) xni
+      real(dp) :: dxnidd,dxnidt,dxnida,dxnidz
+      real(dp) :: dxniddd,dxniddt,dxnidda,dxniddz
+      real(dp) :: dxnidtt,dxnidta,dxnidtz
+      real(dp) :: dxnidaa,dxnidaz,dxnidzz
+
+
+      real(dp) :: xnifer,dxniferdd,dxniferdt,dxniferda,dxniferdz
+      real(dp) :: dxniferddd,dxniferddt,dxniferdda,dxniferddz
+      real(dp) :: dxniferdtt,dxniferdta,dxniferdtz,dxniferdaa
+      real(dp) :: dxniferdaz,dxniferdzz
+
+
+!..chemical potential
+      real(dp) :: etaion
+      real(dp) :: detaidd,detaidt,detaida,detaidz
+      real(dp) :: detaiddd,detaiddt,detaidda,detaiddz
+      real(dp) :: detaidtt,detaidta,detaidtz
+      real(dp) :: detaidaa,detaidaz,detaidzz
+
+
+
+
+!..electron-positrons
+      integer :: elemult
+
+      real(dp) :: etaele,detadd,detadt,detada,detadz
+      real(dp) :: detaddd,detaddt,detadda,detaddz,detadtt
+      real(dp) :: detadta,detadtz,detadaa,detadaz,detadzz
+      real(dp) :: detadddd, detadddt, detaddtt, detadttt
+      real(dp) :: detaddda, detadtta, detaddta
+      real(dp) :: detadddz, detadttz, detaddtz
+
+      real(dp) :: pep,dpepdd,dpepdt,dpepda,dpepdz
+      real(dp) :: dpepddd,dpepddt,dpepdda,dpepddz
+      real(dp) :: dpepdtt,dpepdta,dpepdtz,dpepdaa
+      real(dp) :: dpepdaz,dpepdzz
+      real(dp) :: eep,deepdd,deepdt,deepda,deepdz
+      real(dp) :: deepddd,deepddt,deepdda,deepddz
+      real(dp) :: deepdtt,deepdta,deepdtz,deepdaa
+      real(dp) :: deepdaz,deepdzz
+      real(dp) :: sep,dsepdd,dsepdt,dsepda,dsepdz
+      real(dp) :: dsepddd,dsepddt,dsepdda,dsepddz
+      real(dp) :: dsepdtt,dsepdta,dsepdtz,dsepdaa
+      real(dp) :: dsepdaz,dsepdzz
+
+      real(dp) :: etapos,zeff
+
+      real(dp) :: pele,dpeledd,dpeledt,dpeleda,dpeledz
+      real(dp) :: dpeleddd,dpeleddt,dpeledda,dpeleddz
+      real(dp) :: dpeledtt,dpeledta,dpeledtz,dpeledaa
+      real(dp) :: dpeledaz,dpeledzz
+      real(dp) :: eele,deeledd,deeledt,deeleda,deeledz
+      real(dp) :: deeleddd,deeleddt,deeledda,deeleddz
+      real(dp) :: deeledtt,deeledta,deeledtz,deeledaa
+      real(dp) :: deeledaz,deeledzz
+      real(dp) :: sele,dseledd,dseledt,dseleda,dseledz
+      real(dp) :: dseleddd,dseleddt,dseledda,dseleddz
+      real(dp) :: dseledtt,dseledta,dseledtz,dseledaa
+      real(dp) :: dseledaz,dseledzz
+
+      real(dp) :: ppos,dpposdd,dpposdt,dpposda,dpposdz
+      real(dp) :: dpposddd,dpposddt,dpposdda,dpposddz
+      real(dp) :: dpposdtt,dpposdta,dpposdtz,dpposdaa
+      real(dp) :: dpposdaz,dpposdzz
+      real(dp) :: epos,deposdd,deposdt,deposda,deposdz
+      real(dp) :: deposddd,deposddt,deposdda,deposddz
+      real(dp) :: deposdtt,deposdta,deposdtz,deposdaa
+      real(dp) :: deposdaz,deposdzz
+      real(dp) :: spos,dsposdd,dsposdt,dsposda,dsposdz
+      real(dp) :: dsposddd,dsposddt,dsposdda,dsposddz
+      real(dp) :: dsposdtt,dsposdta,dsposdtz,dsposdaa
+      real(dp) :: dsposdaz,dsposdzz
+
+      real(dp) :: xne
+      real(dp) :: dxnedd,dxnedt,dxneda,dxnedz
+      real(dp) :: dxneddd,dxneddt,dxnedda,dxneddz
+      real(dp) :: dxnedtt,dxnedta,dxnedtz,dxnedaa
+      real(dp) :: dxnedaz,dxnedzz
+
+      real(dp) :: xnefer,dxneferdd,dxneferdt,dxneferda,dxneferdz
+      real(dp) :: dxneferddd,dxneferddt,dxneferdda,dxneferddz
+      real(dp) :: dxneferdtt,dxneferdta,dxneferdtz,dxneferdaa
+      real(dp) :: dxneferdaz,dxneferdzz
+      real(dp) :: xnpfer,dxnpferdd,dxnpferdt,dxnpferda,dxnpferdz
+      real(dp) :: dxnpferddd,dxnpferddt,dxnpferdda,dxnpferddz
+      real(dp) :: dxnpferdtt,dxnpferdta,dxnpferdtz,dxnpferdaa
+      real(dp) :: dxnpferdaz,dxnpferdzz
+      real(dp) :: dxneferdddd, dxneferdddt, dxneferddtt, dxneferdttt
+      real(dp) :: dxneferddda, dxneferdtta, dxneferddta
+      real(dp) :: dxneferdddz, dxneferdttz, dxneferddtz
+
+
+
+
+!..ionization contributions
+      real(dp) :: eip,deipdd,deipdt,deipda,deipdz
+      real(dp) :: sip,dsipdd,dsipdt,dsipda,dsipdz
+      real(dp) :: pip,dpipdd,dpipdt,dpipda,dpipdz
+
+!..ionization contributions; now in the file xneroot_common.dek
+      integer          ionized,potmult
+
+
+!..coulomb corrections
+      integer  :: coulmult
+      real(dp) :: coulfactor, dcfdt
+      real(dp), parameter :: coul0 = 0.85d0
+      real(dp), parameter :: coul02 = coul0*coul0
+      real(dp), parameter :: coul03 = coul02*coul0
+      real(dp), parameter :: coul_a0 = (-16 + coul0*(32 - 16*coul0 + coul02 + coul03))/coul03
+      real(dp), parameter :: coul_a1 = (48 - 84*coul0 + 32*coul02 - coul03)/coul03
+      real(dp), parameter :: coul_a2 = (-8*(6 - 9*coul0 + 2*coul02))/coul03
+      real(dp), parameter :: coul_a3 = (16 - 20*coul0)/coul03
+
+!..pressure, energy, entropy
+
+      real(dp) :: plasg
+
+      real(dp) :: pcoul
+      real(dp) :: dpcouldd,dpcouldt,dpcoulda,dpcouldz
+      real(dp) :: dpcoulddd,dpcoulddt,dpcouldda,dpcoulddz
+      real(dp) :: dpcouldtt,dpcouldta,dpcouldtz,dpcouldaa
+      real(dp) :: dpcouldaz,dpcouldzz
+
+      real(dp) :: ecoul
+      real(dp) :: decouldd,decouldt,decoulda,decouldz
+      real(dp) :: decoulddd,decoulddt,decouldda,decoulddz
+      real(dp) :: decouldtt,decouldta,decouldtz,decouldaa
+      real(dp) :: decouldaz,decouldzz
+
+      real(dp) :: scoul
+      real(dp) :: dscouldd,dscouldt,dscoulda,dscouldz
+      real(dp) :: dscoulddd,dscoulddt,dscouldda,dscoulddz
+      real(dp) :: dscouldtt,dscouldta,dscouldtz,dscouldaa
+      real(dp) :: dscouldaz,dscouldzz
+
+
+
+      real(dp) :: s,sinv,dsdd,dsdt,dsda,dsdz
+      real(dp) :: dsddd,dsddt,dsdda,dsddz,dsdtt,dsdta,dsdtz
+      real(dp) :: dsdaa,dsdaz,dsdzz
+      
+      real(dp) :: aele,aeleinv,daeledd,daeledt,daeleda,daeledz
+      real(dp) :: daeleddd,daeleddt,daeledda,daeleddz,daeledtt
+      real(dp) :: daeledta,daeledtz,daeledaa,daeledaz,daeledzz
+
+      real(dp) :: eplasg
+      real(dp) :: deplasgdd,deplasgdt,deplasgda,deplasgdz
+      real(dp) :: deplasgddd,deplasgddt,deplasgdda,deplasgddz
+      real(dp) :: deplasgdtt,deplasgdta,deplasgdtz,deplasgdaa
+      real(dp) :: deplasgdaz,deplasgdzz
+
+      real(dp) :: dplasgdd,dplasgdt,dplasgda,dplasgdz
+      real(dp) :: dplasgddd,dplasgddt,dplasgdda,dplasgddz
+      real(dp) :: dplasgdtt,dplasgdta,dplasgdtz,dplasgdaa
+      real(dp) :: dplasgdaz,dplasgdzz
+
+      real(dp) u0,du0,ddu0,p1,p2,p3,p4,p5,p6,ion_radius
+      real(dp), parameter :: a1 = -0.898004d0
+      real(dp), parameter :: b1 =  0.96786d0
+      real(dp), parameter :: c1 =  0.220703d0
+      real(dp), parameter :: d1 = -0.86097d0
+      real(dp), parameter :: e1 =  2.5269d0
+      real(dp), parameter :: a2 =  0.29561d0
+      real(dp), parameter :: b2 =  1.9885d0
+      real(dp), parameter :: c2 =  0.288675d0
+
+      real(dp) :: tmelt, tmeltinv
+      real(dp) :: dtmelt_dd,dtmelt_dt,dtmelt_da,dtmelt_dz
+      real(dp) :: dtmelt_ddd,dtmelt_ddt,dtmelt_dda,dtmelt_ddz
+      real(dp) :: dtmelt_dtt,dtmelt_dta,dtmelt_dtz,dtmelt_daa
+      real(dp) :: dtmelt_daz,dtmelt_dzz
+
+      real(dp) :: dx_dd,dx_dt,dx_da,dx_dz
+      real(dp) :: dx_ddd,dx_ddt,dx_dda,dx_ddz
+      real(dp) :: dx_dtt,dx_dta,dx_dtz,dx_daa
+      real(dp) :: dx_daz,dx_dzz
+
+      real(dp) :: tfac
+      real(dp) :: dtfac_dd,dtfac_dt,dtfac_da,dtfac_dz
+      real(dp) :: dtfac_ddd,dtfac_ddt,dtfac_dda,dtfac_ddz
+      real(dp) :: dtfac_dtt,dtfac_dta,dtfac_dtz,dtfac_daa
+      real(dp) :: dtfac_daz,dtfac_dzz
+
+      real(dp) :: pcoul_new
+      real(dp) :: dpcouldd_new,dpcouldt_new,dpcoulda_new,dpcouldz_new
+      real(dp) :: dpcoulddd_new,dpcoulddt_new,dpcouldda_new,dpcoulddz_new
+      real(dp) :: dpcouldtt_new,dpcouldta_new,dpcouldtz_new,dpcouldaa_new
+      real(dp) :: dpcouldaz_new,dpcouldzz_new
+
+      real(dp) :: ecoul_new
+      real(dp) :: decouldd_new,decouldt_new,decoulda_new,decouldz_new
+      real(dp) :: decoulddd_new,decoulddt_new,decouldda_new,decoulddz_new
+      real(dp) :: decouldtt_new,decouldta_new,decouldtz_new,decouldaa_new
+      real(dp) :: decouldaz_new,decouldzz_new
+
+      real(dp) :: scoul_new
+      real(dp) :: dscouldd_new,dscouldt_new,dscoulda_new,dscouldz_new
+      real(dp) :: dscoulddd_new,dscoulddt_new,dscouldda_new,dscoulddz_new
+      real(dp) :: dscouldtt_new,dscouldta_new,dscouldtz_new,dscouldaa_new
+      real(dp) :: dscouldaz_new,dscouldzz_new
+
+
+!..various physical quantities based on derivatives 
+      real(dp) :: chit
+      real(dp) :: dchitdd,dchitdt,dchitda,dchitdz
+      real(dp) :: chid
+      real(dp) :: dchiddd,dchiddt,dchidda,dchiddz
+      real(dp) :: cv
+      real(dp) :: dcvdd,dcvdt,dcvda,dcvdz
+      real(dp) :: cp
+      real(dp) :: dcpdd,dcpdt,dcpda,dcpdz
+      real(dp) :: gam1
+      real(dp) :: dgam1dd,dgam1dt,dgam1da,dgam1dz
+      real(dp) :: gam2
+      real(dp) :: dgam2dd,dgam2dt,dgam2da,dgam2dz
+      real(dp) :: gam3
+      real(dp) :: dgam3dd,dgam3dt,dgam3da,dgam3dz
+      real(dp) :: nabad
+      real(dp) :: dnabdd,dnabdt,dnabda,dnabdz
+      real(dp) :: sound
+      real(dp) :: dcsdd,dcsdt,dcsda,dcsdz
+
+      real(dp) :: chit_gas
+      real(dp) :: dchit_gasdd,dchit_gasdt,dchit_gasda,dchit_gasdz
+      real(dp) :: chid_gas
+      real(dp) :: dchid_gasdd,dchid_gasdt,dchid_gasda,dchid_gasdz
+      real(dp) :: cv_gas
+      real(dp) :: dcv_gasdd,dcv_gasdt,dcv_gasda,dcv_gasdz
+      real(dp) :: cp_gas
+      real(dp) :: dcp_gasdd,dcp_gasdt,dcp_gasda,dcp_gasdz
+      real(dp) :: gam1_gas
+      real(dp) :: dgam1_gasdd,dgam1_gasdt,dgam1_gasda,dgam1_gasdz
+      real(dp) :: gam2_gas
+      real(dp) :: dgam2_gasdd,dgam2_gasdt,dgam2_gasda,dgam2_gasdz
+      real(dp) :: gam3_gas
+      real(dp) :: dgam3_gasdd,dgam3_gasdt,dgam3_gasda,dgam3_gasdz
+      real(dp) :: nabad_gas
+      real(dp) :: dnab_gasdd,dnab_gasdt,dnab_gasda,dnab_gasdz
+      real(dp) :: sound_gas
+      real(dp) :: dcs_gasdd,dcs_gasdt,dcs_gasda,dcs_gasdz
+
+
+!..for the maxwell relations
+      real(dp) dse,dpe,dsp
+
+
+!..miscelaneous local variables 
+      integer  :: i,j,k,kend,niter,mode
+      real(dp) :: kt,ktinv,x,y,z,ww,xx,yy,zz,zzi,ytot1,ye
+      real(dp) :: ratio,fk,dfk
+      real(dp) :: deninv,tempinv,presinv,plasginv,zbarxx
+
+
+!..various derived constants
+      real(dp) :: third,sioncon,sifac,kergavo,asoli3
+      real(dp) :: clight2,eostol,fpmin
+      real(dp) :: forth,fiveth,teninth,esqu,forthpi

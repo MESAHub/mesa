@@ -1,0 +1,249 @@
+#!/bin/bash
+
+# if not set elsewhere, we're testing star
+if [ -z "$MESA_TEST_MOD" ];then
+    export MESA_TEST_MOD="star"
+fi
+
+function failure_msg {
+    echo "******************** $1 ********************" | tee -a out.txt
+}
+
+function success_msg {
+    echo "$1" | tee -a out.txt
+}
+
+function testhub_log {
+    echo "$1" >> testhub.yml
+}
+
+function antepenultimate_photo {
+    (
+        cd photos
+        if [ "$MESA_TEST_MOD" == "binary" ]
+        then
+            bp=$(ls -t b_* | head -3 | tail -1)
+            echo "${bp#b_}"
+        else
+            ls -t * | head -3 | tail -1
+        fi
+    )
+}
+
+function check_restart {
+
+    if [ -n "${SKIP_RESTARTS}" ]
+    then
+       echo "skip restarts"
+    # make sure we specified a restart file
+    elif [ -z "$4" ]
+    then
+        pwd
+        echo "missing name of restart file -- fix do1_test_source for $1"
+        echo
+    elif [ "$4" != skip ]
+    then
+
+        if [ "$4" == auto ]
+        then
+            photo="$(antepenultimate_photo)"
+        else
+            photo="$4"
+        fi
+
+        testhub_log "restart_photo: $photo"
+
+        # bail out if photo doesn't exist
+        if [ ! -e "photos/$photo" ]
+        then
+            if [ ! -e "photos/b_$photo" ]
+            then
+                failure_msg "$1 restart failed: $photo does not exist"
+                testhub_log "failure_type: :photo_file"
+                return 1
+            fi
+        fi
+
+        # do the restart
+        rm -f "$3"
+        command time -q -f '%M' -o mem-re.txt ./re "$photo" >> out.txt 2> err.txt
+        testhub_log "mem_re: $(<mem-re.txt)"
+        tee -a out.txt < err.txt
+        rm err.txt
+
+        # check that final model matches
+
+        if ! ./ck
+        then
+            failure_msg "$1 restart failed: checksum for $3 does not match after ./re $photo"
+            testhub_log "failure_type: :photo_checksum"
+            return 1
+        else
+            success_msg "$1 restart: checksum for $3 matches after ./re $photo"
+            testhub_log "success_type: :photo_checksum"
+            if [ ! -e "checks.md5" ] || [ -e ".ignore_checksum" ]; then
+                testhub_log "checksum: 00000000000000000000000000000000"
+            else
+                testhub_log "checksum: $(cut -b 1-32 < checks.md5)"
+            fi
+        fi
+    fi
+}
+
+
+function check_run {
+    # make sure we specified a final model
+    if [ -z "$3" ]
+    then
+        pwd
+        echo "missing name of final mod test file -- fix do1_test_source for $1"
+        echo
+    fi
+
+    # do the run
+    date "+   start %H:%M:%S"
+    command time -q -f '%M' -o mem-rn.txt ./rn > out.txt 2> err.txt
+    testhub_log "mem_rn: $(<mem-rn.txt)"
+    tee -a out.txt < err.txt
+    rm err.txt
+    date "+  finish %H:%M:%S"
+
+    # handle case that case was intentionally skipped
+    if grep -i "this test was intentionally skipped" out.txt
+    then
+        success_msg "$1 was intentionally skipped"
+        testhub_log "success_type: :skip"
+        return 1 # still return 1 so restart isn't tested
+    fi
+
+    # check that test string was printed during the run
+    if ! grep -i "$2" out.txt
+    then
+        echo "test string: $2"
+        failure_msg "$1 failed: does not match test string"
+        testhub_log "failure_type: :run_test_string"
+        return 1
+    else
+        success_msg "$1 run: test string matches after ./rn"
+        testhub_log "success_type: :run_test_string"
+    fi
+
+    # check that didn't get "failed to create" message
+    if grep -i "failed to create" out.txt
+    then
+        failure_msg "$1 failed to create expected output model"
+        testhub_log "failure_type: :final_model"
+        return 1
+    fi
+
+    if [ "$3" != skip ]
+    then
+
+        if [ -e "$3" ]
+        then
+            md5sum "$3" > checks.md5
+            cp "$3" final_check.mod
+        else
+            failure_msg "$1 failed to create file for checksum $3"
+            testhub_log "failure_type: :final_model"
+            return 1
+        fi
+
+    fi
+}
+
+function build_and_run {
+
+    if ! ./clean; then
+        return 1
+    fi
+
+    if ! ./mk &> mk.txt; then
+        failure_msg "$1 failed: does not compile"
+        testhub_log "failure_type: :compilation"
+        testhub_log "outcome: :fail"
+        return 1
+    fi
+
+    # delete final model if it already exists
+    if [ -n "$3" ]; then
+        rm -f "$3"
+    fi
+
+    # don't do check_restart if check_run failed
+    if ! check_run "$1" "$2" "$3" "$4"; then
+
+        # handle case that case was intentionally skipped
+        if grep -i "this test was intentionally skipped" out.txt
+        then
+            testhub_log "outcome: :pass"
+            return
+        else
+            testhub_log "outcome: :fail"
+            return 1
+        fi
+
+    fi
+
+    if ! check_restart "$1" "$2" "$3" "$4"; then
+        testhub_log "outcome: :fail"
+        return 1
+    fi
+
+    # if we made it this far, we passed
+    testhub_log "outcome: :pass"
+    return
+
+}
+
+
+function do_one {
+
+id=$((id+1))
+if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
+    cd "$1" || exit
+    touch .running
+
+
+    echo "---" > testhub.yml
+    testhub_log "test_case: $1"
+    testhub_log "module: :$MESA_TEST_MOD"
+    testhub_log "omp_num_threads: $OMP_NUM_THREADS"
+    if [ -z "$MESA_RUN_OPTIONAL" ]; then
+        testhub_log "run_optional: false"
+    else
+        testhub_log "run_optional: true"
+    fi
+    testhub_log "inlists:"
+    echo "build_and_run $1"
+    build_and_run "$1" "$2" "$3" "$4"
+
+    rm .running
+    cd ..
+
+    echo ""
+fi
+
+}
+
+
+date
+echo ""
+./each_test_clean "$1"
+
+echo ""
+
+DO_ALL=0
+id=0
+curr_id="$1"
+if [ ! "$1" ]; then
+   DO_ALL=1
+fi
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+echo ""
+
+source do1_test_source
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+echo ""

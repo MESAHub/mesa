@@ -1,0 +1,15 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		echo
+		echo "FAILED"
+		echo
+		exit 1
+	fi
+}
+
+./rn >& tmp.txt
+check_okay
+diff -b tmp.txt test_output.`head -1 tmp.txt | tr -d '[:space:]'`

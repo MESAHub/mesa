@@ -1,0 +1,418 @@
+kap module controls
+===================
+
+The MESA/kap parameters are given default values here.
+The actual values as modified by your inlist are stored in the Kap_General_Info data structure.
+They can be accessed by code at runtime using the kap_handle to get a pointer to it.
+
+
+Base metallicity
+----------------
+
+Zbase
+~~~~~
+
+The base metallicity for the opacity tables.  This provides the
+reference metallicity necessary to calculate element variations.
+Physically, this usually corresponds to the initial metallicity
+of the star.
+::
+
+      Zbase = -1
+
+
+Table selection
+---------------
+
+kap_file_prefix
+~~~~~~~~~~~~~~~
+Select the set of opacity tables for higher temperature, hydrogen-rich conditions.
+Also referred to as Type1 tables.
+See :ref:`blend controls` to understand precisely when these tables are used.
+
+These tables use the value of ``Zbase`` for Z, unless ``use_Zbase_for_Type1 = .false.``.
+
+The Type1 tables cover a wider range of X and have a higher resolution in
+Z for each X than Type2.  The Type1 tables are for (X,Z) pairs from the following sets:
+
++ X:  0.0, 0.1, 0.2, 0.35, 0.5, 0.7, 0.8, 0.9, 0.95, 1-Z
++ Z: 0.0, 1e-4, 3e-4, 1e-3, 2e-3, 4e-3, 1e-2, 2e-2, 3e-2, 4e-2, 6e-2, 8e-1, 1e-1
+
+
+Available options:
+
++ ``'gn93'``
++ ``'gs98'``
++ ``'a09'``
++ ``'OP_gs98'``
++ ``'OP_a09_nans_removed_by_hand'``
+
+::
+
+      kap_file_prefix = 'gs98'
+
+
+kap_CO_prefix
+~~~~~~~~~~~~~
+Select the set of opacity tables for higher temperature, hydrogen-poor/metal-rich conditions.
+Also referred to as Type2 tables.
+Critically, Type2 tables account for C and O enhancement during and after He burning.
+See :ref:`blend controls` to understand precisely when these tables are used.
+abundances previous to any CO enhancement.
+Ignored if ``use_Type2_opacities = .false.``.
+
+These tables use the value of ``Zbase`` as the base metallicity.
+
+The Type2 tables are for (X,Z) pairs from the following sets:
+
++ X: 0.0, 0.03, 0.10, 0.35, 0.70
++ Z: 0.00, 0.001, 0.004, 0.01, 0.02, 0.03, 0.05, 0.1
+
+
+Available options:
+
++ ``'gn93_co'``
++ ``'gs98_co'``
++ ``'a09_co'``
+
+::
+
+      kap_CO_prefix = 'gs98_co'
+
+
+
+
+kap_lowT_prefix
+~~~~~~~~~~~~~~~
+Select a set of opacity tables for lower temperatures.
+
+Available options:
+
++ ``'lowT_Freedman11'``
++ ``'lowT_fa05_gs98'``
++ ``'lowT_fa05_gn93'``
++ ``'lowT_fa05_a09p'``
++ ``'lowT_af94_gn93'``
++ ``'lowT_rt14_ag89'``
++ ``'kapCN'``
++ ``'AESOPUS'``
+
+``kap_CN`` uses tables from
+
+    | Lederer, M. T.; Aringer, B. (2009)
+    | Low temperature Rosseland opacities with varied abundances of carbon and nitrogen
+    | http://adsabs.harvard.edu/abs/2009A%26A...494..403L
+
+
+``'AESOPUS'`` uses tables from AESOPUS
+
+    | Marigo, P.; Aringer, B. (2009)
+    | Low-temperature gas opacity. ÆSOPUS: a versatile and quick computational tool
+    | http://adsabs.harvard.edu/abs/2009A%26A...508.1539M
+
+Specify which file using ``AESOPUS_filename``.
+The file is first looked for in the work directory. If not found, then data/kap_data is searched.
+Currently one set of opacities is provided, with the filename ``'AESOPUS_AGSS09.h5'``.
+
+To see more detail about the composition details of the tables set ``show_info = .true.``.
+
+You can generate your own tables with their web interface at
+http://stev.oapd.inaf.it/cgi-bin/aesopus .
+See kap/preprocessor/AESOPUS/README for information on preparing the tables for MESA.
+
+::
+
+      kap_lowT_prefix = 'lowT_fa05_gs98'
+      AESOPUS_filename = '' ! used only if kap_lowT_prefix = 'AESOPUS'
+
+Blend controls
+--------------
+
+use_Zbase_for_Type1
+~~~~~~~~~~~~~~~~~~~
+
+If true, then if ``use_Type2_opacities = .true.``, Type1 opacities will be computed
+using ``Zbase`` instead of ``Z`` when Z > Zbase. This helps with blending from Type1 to Type2.
+Ignored if ``use_Type2_opacities = .false.``.
+::
+
+      use_Zbase_for_Type1 = .true.
+
+
+use_Type2_opacities
+~~~~~~~~~~~~~~~~~~~
+
+Select whether to use Type2 opacity tables (see :ref:`kap_CO_prefix`).
+Even when true, in regions where hydrogen is
+above a given threshold, or the metallicity is not significantly higher than
+``Zbase``, Type1 tables are used instead, with blending regions to smoothly
+transition from one to the other (see following controls).
+
+::
+
+      use_Type2_opacities = .true.
+
+
+kap_Type2_full_off_X
+~~~~~~~~~~~~~~~~~~~~
+kap_Type2_full_on_X
+~~~~~~~~~~~~~~~~~~~
+
+Switch to Type1 if X too large.
+Type2 is full off for ``X >= kap_Type2_full_off_X``
+Type2 can be full on for ``X <= kap_Type2_full_on_X``.
+::
+
+      kap_Type2_full_off_X = 1d-3
+      kap_Type2_full_on_X = 1d-6
+
+
+kap_Type2_full_off_dZ
+~~~~~~~~~~~~~~~~~~~~~
+kap_Type2_full_on_dZ
+~~~~~~~~~~~~~~~~~~~~~
+
+Switch to Type1 if dZ too small ``(dZ = Z - Zbase)``.
+Type2 is full off for ``dZ <= kap_Type2_full_off_dZ``.
+Type2 can be full on for ``dZ >= kap_Type2_full_on_dZ``.
+::
+
+      kap_Type2_full_off_dZ = 0.001d0
+      kap_Type2_full_on_dZ = 0.01d0
+
+
+X and dZ terms are multiplied to get actual fraction of Type2.
+The fraction of Type2 is calculated for each cell depending on the X and dZ for that cell.
+So you can be using Type1 in cells where X is large or dZ is small,
+while at the same time you can be using Type2 where X is small and dZ is large.
+When ``frac_Type2`` is > 0 and < 1, then both Type1 and Type2 are evaluated and
+combined linearly as ``(1-frac_Type2)*kap_type1 + frac_Type2*kap_type2``.
+Add ``kap_frac_Type2`` to your profile columns list to see ``frac_Type2`` for each cell.
+
+
+kap_blend_logT_upper_bdy
+~~~~~~~~~~~~~~~~~~~~~~~~
+kap_blend_logT_lower_bdy
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Region to blend between higher temperature tables
+(see :ref:`kap_file_prefix` and :ref:`kap_CO_prefix`) and lower
+temperature tables (see :ref:`kap_lowT_prefix`).
+
+The upper/lower blend boundary will be clipped to the true extent
+of the opacity tables.  The upper boundary will be min of
+``kap_blend_logT_upper_bdy`` and the max logT for lowT tables.
+The lower boundary will be max of ``kap_blend_logT_lower_bdy``
+and min logT for highT tables.  The typical min logT of the
+higher temperature tables tables is 3.75.  Check your tables to
+be sure.
+
+It is probably a good idea to keep the blend away from H ionization.
+logT upper of about 3.9 or a bit less will do that.
+::
+
+      kap_blend_logT_upper_bdy = 3.88d0
+      kap_blend_logT_lower_bdy = 3.80d0
+
+
+
+
+Interpolation options
+---------------------
+
+cubic_interpolation_in_X
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+type of interpolation in X.
+true is cubic; false is linear.
+::
+
+      cubic_interpolation_in_X = .false.
+
+
+cubic_interpolation_in_Z
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+type of interpolation in Z.
+true is cubic; false is linear.
+::
+
+      cubic_interpolation_in_Z = .false.
+
+
+Custom tables
+-------------
+
+If the prefix options in :ref:`Table selection` above do not match one of the available options,
+MESA still searches for files in ``data/kap_data`` with the given prefix.
+This allows for custom tables.  However, the user must also indicate
+the X and Z values for which the tables are provided.
+
+Separate controls exist for each class of prefix.
+
+user_num_kap_Xs
+~~~~~~~~~~~~~~~
+
+Number of X values.
+::
+
+! user_num_kap_Xs = 10
+
+user_kap_Xs
+~~~~~~~~~~~
+
+X values for the tables (length ``user_num_kap_Xs``).
+Values such that X + Z > 1 will have X reduced to 1-Z.
+Choose ``user_num_kap_Xs_for_this_Z`` such that at most 1 X value for each Z will be reduced in this way.
+::
+
+! user_kap_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0, 0.95d0, 1.0d0
+
+user_num_kap_Zs
+~~~~~~~~~~~~~~~
+
+Number of Z values.
+::
+
+! user_num_kap_Zs = 13
+
+user_kap_Zs
+~~~~~~~~~~~
+
+Z values for the tables (length ``user_num_kap_Zs``).
+::
+
+! user_kap_Zs = 0.000d0, 0.0001d0, 0.0003d0, 0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, 0.04d0, 0.06d0, 0.08d0, 0.100d0
+
+user_num_kap_Xs_for_this_Z
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
+Use the first N (``<= user_num_kap_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_Zs``).
+::
+
+! user_num_kap_Xs_for_this_Z = 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 8
+
+
+user_num_kap_CO_Xs
+~~~~~~~~~~~~~~~~~~
+
+Number of X values.
+::
+
+! user_num_kap_CO_Xs = 5
+
+user_kap_CO_Xs
+~~~~~~~~~~~~~~
+
+X values for the tables (length ``user_num_kap_CO_Xs``).
+::
+
+! user_kap_CO_Xs = 0.00d0, 0.03d0, 0.10d0, 0.35d0, 0.70d0
+
+user_num_kap_CO_Zs
+~~~~~~~~~~~~~~~~~~
+
+Number of Z values.
+::
+
+! user_num_kap_CO_Zs = 8
+
+user_kap_CO_Zs
+~~~~~~~~~~~~~~
+
+Z values for the tables (length ``user_num_kap_CO_Zs``).
+::
+
+! user_kap_CO_Zs = 0.000d0, 0.001d0, 0.004d0, 0.010d0, 0.020d0, 0.030d0, 0.050d0, 0.100d0
+
+user_num_kap_CO_Xs_for_this_Z
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
+Use the first N (``<= user_num_kap_CO_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_CO_Zs``).
+::
+
+! user_num_kap_CO_Xs_for_this_Z = 5, 5, 5, 5, 5, 5, 5, 5
+
+
+user_num_kap_lowT_Xs
+~~~~~~~~~~~~~~~~~~~~
+
+Number of X values.
+::
+
+! user_num_kap_lowT_Xs = 10
+
+user_kap_lowT_Xs
+~~~~~~~~~~~~~~~~
+
+X values for the tables (length ``user_num_kap_lowT_Xs``).
+Values such that X + Z > 1 will have X reduced to 1-Z.
+Choose ``user_num_kap_lowT_Xs_for_this_Z`` such that at most 1 X value for each Z will be reduced in this way.
+::
+
+! user_kap_lowT_Xs = 0.0d0, 0.1d0, 0.2d0, 0.35d0, 0.5d0, 0.7d0, 0.8d0, 0.9d0, 0.95d0, 1.0d0
+
+user_num_kap_lowT_Zs
+~~~~~~~~~~~~~~~~~~~~
+
+Number of Z values.
+::
+
+! user_num_kap_lowT_Zs = 13
+
+user_kap_lowT_Zs
+~~~~~~~~~~~~~~~~
+
+Z values for the tables (length ``user_num_kap_lowT_Zs``).
+::
+
+! user_kap_lowT_Zs = 0.000d0, 0.0001d0, 0.0003d0, 0.001d0, 0.002d0, 0.004d0, 0.01d0, 0.02d0, 0.03d0, 0.04d0, 0.06d0, 0.08d0, 0.100d0
+
+user_num_kap_lowT_Xs_for_this_Z
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At different values of Z, the number of values of X may change. In particular, tables with ``X > 1-Z`` will not exist.
+Use the first N (``<= user_num_kap_lowT_Xs``) X values for the tables of the corresponding Z (length ``user_num_kap_lowT_Zs``).
+::
+
+! user_num_kap_lowT_Xs_for_this_Z = 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 8
+
+
+Miscellaneous controls
+----------------------
+
+include_electron_conduction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+add conduction opacities to radiative opacities
+::
+
+      include_electron_conduction = .true.
+
+show_info
+~~~~~~~~~
+if true, then output additional information as the opacities are loaded.
+this is particularly useful to see the detailed composition coverage of
+the AESOPUS opacity files.
+::
+
+      show_info = .false.
+
+
+Debugging controls
+------------------
+
+Specify a range of calls for which to receive debugging information.
+::
+
+      dbg = .false.
+      logT_lo = -1d99
+      logT_hi = 1d99
+      logRho_lo = -1d99
+      logRho_hi = 1d99
+      X_lo = -1d99
+      X_hi = 1d99
+      Z_lo = -1d99
+      Z_hi = 1d99

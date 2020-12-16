@@ -1,0 +1,1489 @@
+! ===============
+! binary_controls
+! ===============
+
+! specifications for starting model
+! =================================
+
+
+! m1
+! ~~
+
+! Initial mass of star 1 in Msun units. Not used when loading a saved model.
+! same caveats as ``initial_mass`` in star/defaults/controls.defaults apply
+
+! ::
+
+    m1 = 1.0d0
+
+
+! m2
+! ~~
+
+! Initial mass of star 2 in Msun units. Not used when loading a saved model.
+! same caveats as ``initial_mass`` in star/defaults/controls.defaults apply
+
+! ::
+
+    m2 = 0.8d0
+
+
+! initial_period_in_days
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+! Initial orbital period in days.
+
+! ::
+
+    initial_period_in_days = 0.5d0
+
+
+! initial_separation_in_Rsuns
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Initial separation measured in Rsuns. Only used when ``initial_period_in_days < 0``
+
+! ::
+
+    initial_separation_in_Rsuns = 100
+
+
+! initial_eccentricity
+! ~~~~~~~~~~~~~~~~~~~~
+
+! Initial eccentricity of the system
+
+! ::
+
+    initial_eccentricity = 0.0d0
+
+! controls for output
+! ===================
+
+
+! history_name
+! ~~~~~~~~~~~~
+
+! Name of file for binary output
+
+! ::
+
+    history_name = 'binary_history.data'
+
+
+! history_interval
+! ~~~~~~~~~~~~~~~~
+
+! append an entry to the history.data file when
+! ``mod(model_number, history_interval) = 0``.
+
+! ::
+
+    history_interval = 5
+
+
+! append_to_star_history
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+! If true, then the columns from the ``binary_history`` are also included
+! in each of the stars history files.
+! NOTE: if .false., then pgstar cannot access binary data
+
+! ::
+
+    append_to_star_history = .true.
+
+
+! log_directory
+! ~~~~~~~~~~~~~
+
+! Directory for binary output
+
+! ::
+
+    log_directory = '.'
+
+
+! history_dbl_format
+! ~~~~~~~~~~~~~~~~~~
+! history_int_format
+! ~~~~~~~~~~~~~~~~~~
+! history_txt_format
+! ~~~~~~~~~~~~~~~~~~
+
+! Format for double, int and text in binary output
+
+! ::
+
+    history_dbl_format = '(1pes32.16e3, 1x)'
+    history_int_format = '(i32, 1x)'
+    history_txt_format = '(a32, 1x)'
+
+
+! photo_interval
+! ~~~~~~~~~~~~~~
+! photo_digits
+! ~~~~~~~~~~~~
+! photo_directory
+! ~~~~~~~~~~~~~~~
+
+! These overwrite the values of ``photo_interval``, ``photo_digits`` and ``photo_directory`` for each
+! star, so that profiles are outputted simultaneously
+
+! ::
+
+    photo_interval = 50
+    photo_digits = 3
+    photo_directory = 'photos'
+
+
+! terminal_interval
+! ~~~~~~~~~~~~~~~~~
+
+! write info to terminal when ``mod(model_number, terminal_interval) = 0``.
+
+! ::
+
+    terminal_interval = 1
+
+
+! write_header_frequency
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+! output the log header info to the terminal when
+! ``mod(model_number, write_header_frequency*terminal_interval) = 0``.
+
+! ::
+
+    write_header_frequency = 10
+
+
+! extra_binary_terminal_output_file
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! if not empty, output terminal info to this file in addition to terminal.
+! this does not capture all of the terminal output -- just the common items.
+! it is intended for use in situations where you cannot directly see the terminal
+! output such as when running on a cluster. if you want to be able to monitor
+! the progress for such cases, you can set ``extra_binary_terminal_output_file = 'log'``
+! and then do tail -f log to view the terminal output as it is recorded in the file.
+
+! ::
+
+    extra_binary_terminal_output_file = ''
+
+! timestep controls
+! =================
+
+! The terminal output during evolution includes a short string for the 'dt_limit'.
+! This is to give you some indication of what is limiting the time steps.
+! Here's a dictionary mapping those terminal strings to the corresponding control parameters.
+! These only include limits from binary, to see the limits from star refer to
+! star/default/controls.defaults
+
+! ::
+
+!           terminal output       related parameter
+!          'b_companion'          timestep limited by companion
+!          'b_RL'                 fr
+!          'b_jorb'               fj
+!          'b_envelope'           fm
+!          'b_separation'         fa
+!          'b_eccentricity'       fe
+!          'b_deltam'             fdm
+
+
+! fm
+! ~~
+! fm_hard
+! ~~~~~~~
+! fa
+! ~~
+! fa_hard
+! ~~~~~~~
+! fr
+! ~~
+! fr_hard
+! ~~~~~~~
+! fj
+! ~~
+! fj_hard
+! ~~~~~~~
+! fe
+! ~~
+! fe_hard
+! ~~~~~~~
+
+! Timestep controls based on relative changes. After each step
+! an upper limit is set on the timestep based on changes on different
+! quantities. If the quantity is X and the change in one timestep dX,
+! then this limit is given by
+
+! ::
+
+!     dt_next_max = dt * fX*abs(X / dX)
+
+! each of these controls deals with the following:
+
+! + fm: envelope mass
+! + fa: binary separation
+! + fr: change in (r-rl)/rl
+! + fj: change in orbital angular momentum
+! + fe: change in orbital eccentricity
+
+! hard limits are strictly enforced, if a timestep exceeds that limit
+! then a retry is made.
+
+! ::
+
+    fm = 0.01d0
+    fm_hard = -1d0
+    fa = 0.01d0
+    fa_hard = 0.02d0
+    fr = 0.10d0
+    fr_hard = -1d0
+    fj = 0.001d0
+    fj_hard = 0.01d0
+    fe = 0.01d0
+    fe_hard = -1d0
+
+
+! fm_limit
+! ~~~~~~~~
+! fr_limit
+! ~~~~~~~~
+! fe_limit
+! ~~~~~~~~
+
+! Limits to timestep controls give by fm, fr and fe.
+! As these three quantities evolve naturally to zero,
+! following strictly the timestep limit given by fX would
+! reduce timesteps infinetely. These fX_limit avoid this problem
+! by computing the limit to the timestep as
+
+! ::
+
+!     dt_next_max = dt * fX*abs(max(abs(X),fX_limit) / dX)
+
+! If any of these ``fX_limit`` is smaller than zero it is ignored.
+
+! ::
+
+    fm_limit = 1d-3
+    fr_limit = 1d-2
+    fe_limit = 1d-1
+
+
+! fr_dt_limit
+! ~~~~~~~~~~~
+
+! Minimum timestep limit allowed for the fr control in years.
+
+! ::
+
+    fr_dt_limit = 10d0
+
+
+! fdm
+! ~~~
+
+
+! fdm_hard
+! ~~~~~~~~
+
+! Limits the timestep based on the fractional mass change of either component.
+
+! ::
+
+    fdm = 0.005d0
+    fdm_hard = 0.01d0
+
+
+! dt_softening_factor
+! ~~~~~~~~~~~~~~~~~~~
+
+! Weight factor to average ``max_timestep`` with old one (in log space) as in
+
+! ::
+
+!     dt_next_max = 10**(dt_softening_factor*log10(dt_next_max_old) + &
+!         (1-dt_softening_factor)*log10(dt_next_max))
+
+! where ``dt_next_max_old`` is the limit used in the previous step. This is meant
+! to avoid large changes in dt. Values must be < 1 and >= 0.
+
+! ::
+
+    dt_softening_factor = 0.5d0
+
+
+! varcontrol_{stage}
+! ~~~~~~~~~~~~~~~~~~
+
+! Allows binary to set ``varcontrol_target`` for each star depending on the
+! stage of evolution. Ignored if < 0. Each one controls the following stages,
+
+! + ``varcontrol_case_a`` : ``varcontrol_target`` for both stars during mass transfer
+!                     from a core hydrogen burning star.
+! + ``varcontrol_case_b`` : ``varcontrol_target`` for both stars during mass transfer
+!                     from a core hydrogen depleted star.
+! + ``varcontrol_ms`` : ``varcontrol_target`` for a star that has not depleted core H.
+! + ``varcontrol_post_ms`` : ``varcontrol_target`` for a star that has depleted core H.
+
+! ::
+
+    varcontrol_case_a = -1d0
+    varcontrol_case_b = -1d0
+    varcontrol_ms = -1d0
+    varcontrol_post_ms = -1d0
+
+
+! dt_reduction_factor_for_j
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! When a retry happens due to the hard limit in angular momentum changes, or
+! because the timestep produced a negative j, further multiply the timestep by this factor for
+! the next step. This can avoid multiple retries and waste of time.
+
+! ::
+
+    dt_reduction_factor_for_j = 0.1d0
+
+! when to stop
+! ============
+
+
+! accretor_overflow_terminate
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! terminate evolution if (r-rl)/rl is bigger than this for accretor
+
+! ::
+
+    accretor_overflow_terminate = 0.0d0
+
+
+! terminate_if_initial_overflow
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! terminate evolution if first model of run is overflowing
+
+! ::
+
+    terminate_if_initial_overflow = .true.
+
+
+! terminate_if_L2_overflow
+! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+! terminate evolution if there is overflow through the second Lagrangian point
+! Amount of overflow needed to reach L2 implemented as in Marchant et al. (2016), A&A, 588, A50
+
+! ::
+
+    terminate_if_L2_overflow = .false.
+
+! mass transfer controls
+! ======================
+
+
+! mass_transfer_*
+! ~~~~~~~~~~~~~~~
+
+! Transfer efficiency controls.
+! alpha, beta, delta and gamma parameters as described in Tauris & van den Heuvel 2006
+! section 16.4.1, transfer efficiency is given by 1-alpha-beta-delta.
+
+! These only affect mass that is lost from the donor due to mass transfer, winds from each
+! star will carry away angular momentum from the vicinity of each even when transfer efficiency
+! is unity. Each of these represent the following:
+
+! + alpha : fraction of mass lost from the vicinity of the donor as fast wind
+! + beta : fraction of mass lost from the vicinity of the accretor as fast wind
+! + delta : fraction of mass lost from circumbinary coplanar toroid
+! + gamma : radius of the circumbinary coplanar toroid is ``gamma**2 * orbital_separation``
+
+! ::
+
+    mass_transfer_alpha = 0.0d0
+    mass_transfer_beta = 0.0d0
+    mass_transfer_delta = 0.0d0
+    mass_transfer_gamma = 0.0d0
+
+
+! limit_retention_by_mdot_edd
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Limit accretion using ``mdot_edd``. The current implementation is intended for use with
+! black hole accretors, as in e.g. Podsiadlowski, Rappaport & Han (2003), MNRAS, 341, 385.
+! For other accretors ``mdot_edd`` should be set with ``use_this_for_mdot_edd``, the hook
+! ``use_other_mdot_edd``, or by appropriately setting ``use_this_for_mdot_edd_eta``.
+! Note: MESA versions equal or lower than 8118 used eta=1 and did not correct
+! the accreted mass for the energy lost by radiation.
+
+! If accreted material radiates an amount of energy equal to ``L=eta*mtransfer_rate*clight**2``,
+! then accretion is assumed to be limited to the Eddington luminosity,
+
+! ::
+
+!     Ledd = 4*pi*cgrav*Mbh*clight/kappa
+
+! which results in the Eddington mass-accretion rate
+
+! ::
+
+!     mdot_edd = 4*pi*cgrav*Mbh/(kappa*clight*eta)
+
+! the efficiency eta is determined by the properties of the last stable circular orbit,
+! and for a BH with no initial spin it can be expressed in terms of the initial BH mass Mbh0
+! and the current BH mass,
+
+! ::
+
+!     eta = 1-sqrt(1-(Mbh/(3*Mbh0))**2)
+
+! for Mbh < sqrt(6) Mbh0. For BHs with initial spins different from zero, an effective
+! Mbh0 can be computed, corresponding to the mass the black hole would have needed to
+! have with zero spin to reach the current mass and spin.
+
+! ::
+
+    limit_retention_by_mdot_edd = .false.
+
+
+! use_es_opacity_for_mdot_edd
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! If .true., then the opacity for ``mdot_edd`` is computed as 0.2*(1+X)
+! If .false., the opacity of the outermost cell of the donor is used
+
+! ::
+
+    use_es_opacity_for_mdot_edd = .true.
+
+
+! use_this_for_mdot_edd_eta
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Fixed ``mdot_edd_eta``, if negative, eta will be computed consistently as material is accreted.
+! Values should be between ~0.06-0.42, the minimum corresponding to a BH with spin parameter a=0, and the maximum to a=1.
+
+! ::
+
+    use_this_for_mdot_edd_eta = -1
+
+
+! use_radiation_corrected_transfer_rate
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! If true, then reduce the increase in mass of the BH to account for the radiated energy ``eta*mtransfer_rate_clight**2``
+! so that in a timestep
+
+! ::
+
+!     delta_Mbh = (1-eta)*mass_transfer_rate*dt
+
+! ::
+
+    use_radiation_corrected_transfer_rate = .true.
+
+
+! initial_bh_spin
+! ~~~~~~~~~~~~~~~
+
+! Initial spin parameter of the black hole "a". Must be between 0 and 1.
+! Evolution of BH spin is done with eq. (6) of King & Kolb (1999), MNRAS, 305, 654
+
+! ::
+
+    initial_bh_spin = 0
+
+
+! use_this_for_mdot_edd
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! Fixed ``mdot_edd`` in Msun/yr, ignored if negative
+
+! ::
+
+    use_this_for_mdot_edd = -1
+
+
+! mdot_scheme
+! ~~~~~~~~~~~
+
+! How to compute mass transfer. Options are:
+
+! + "Ritter" : Ritter 1988, A&A, 202, 93
+! + "Kolb" : Optically thick overflow of Kolb & Ritter 1990, A&A, 236, 385
+! + "roche_lobe" : Set mass transfer rate such that the donor remains inside
+!                its Roche lobe. Only works implicitly.
+! + "contact" : Extends the roche_lobe scheme to include contact systems as in
+!               Marchant et al. (2016), A&A, 588, A50
+
+! ::
+
+    mdot_scheme = 'Ritter'
+
+
+! explicit mass transfer computation.
+! ___________________________________
+
+! MESA can compute mass transfer rates either explicitly (at the beggining
+! of the step) or implicitly (iterating the solution until the mass transfer
+! rate matches the value computed at the end of the step). The explicit method
+! is used if ``max_tries_to_achieve <= 0``.
+
+
+! cur_mdot_frac
+! ~~~~~~~~~~~~~
+
+! Average the explicit mass transfer rate computed with the old in order
+! to smooth large changes.
+
+! ::
+
+!     mass_transfer = mass_transfer_old * cur_mdot_frac + (1-cur_mdot_frac) * mass_transfer
+
+! ::
+
+    cur_mdot_frac = 0.5d0
+
+
+! max_explicit_abs_mdot
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! Limit the explicit mass transfer rate to ``max_explicit_abs_mdot``, in Msun/secyer
+
+! ::
+
+    max_explicit_abs_mdot = 1d-7
+
+
+! implicit mass transfer computation.
+! ___________________________________
+
+
+! max_tries_to_achieve
+! ~~~~~~~~~~~~~~~~~~~~
+
+! The implicit method will modify the mass transfer rate and redo the step until
+! it either finds a solution, or the number of tries goes above ``max_tries_to_achieve``.
+! if ``max_tries_to_achieve <= 0`` the explicit method is used.
+
+! ::
+
+    max_tries_to_achieve = 20
+
+
+! solver_type
+! ~~~~~~~~~~~
+
+! Method use to solve for mass transfer. The solver first attempts to increase or
+! reduce the mass transfer rate used through the step until finding an upper and
+! lower limit to it. This controls what is done after that point. Options are:
+
+! + "cubic" : Given an upper and lower limit, plus a new try in between,
+!             the root of the equation is estimated by using a cubic matching the
+!             three points.
+! + "bisect" : Simply takes the average of the boundaries for the next try
+! + "both" : Alternates between cubic and bisect each iteration
+
+! ::
+
+    solver_type = 'both'
+
+
+! implicit_scheme_tolerance
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Tolerance for which a solution is considered valid. For the Ritter and Kolb
+! schemes if we call mdot the mass transfer rate used for the step, and mdot_end
+! the one computed at the end of it, a solution is valid if
+
+! ::
+
+!     |(mdot-mdot_end)/mdot_end| < b% implicit_scheme_tolerance
+
+! For the roche_lobe scheme, a solution will be considered valid if
+
+! ::
+
+!     -implicit_scheme_tolerance < (r-rl)/rl < 0
+
+! When using the roche_lobe scheme smaller values of order 1d-3 or smaller are
+! recommended.
+
+! ::
+
+    implicit_scheme_tolerance = 1d-2
+
+
+! implicit_scheme_tiny_factor
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! During the implicit scheme the solution is bracketed between a minimum and a
+! maximum value mdot_hi and mdot_lo. Even if the desired tolerance is not achieved,
+! the solution is accepted if the difference between abs(mdot_hi-mdot_lo) is smaller
+! than implicit_scheme_tiny_factor*min(abs(mdot_hi),abs(mdot_lo))
+
+! ::
+
+    implicit_scheme_tiny_factor = 1d-6
+
+
+! initial_change_factor
+! ~~~~~~~~~~~~~~~~~~~~~
+
+
+! change_factor_fraction
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+
+! implicit_lambda
+! ~~~~~~~~~~~~~~~
+
+! The implicit scheme works by adjusting the mass transfer rate from the previous
+! step until it finds a solution. If the mass transfer needs to increase/reduce after
+! a try, then it is multiplied/divided by ``change_factor``. ``initial_change_factor`` provides
+! the initial value for this parameter, however, since at certain points the mass
+! transfer rate will increase steeply and at others remain mostly constant from step
+! to step, MESA adjusts the value of the change factor to make it easier to find
+! solutions. Whenever the mass transfer rate changes from the previous value, MESA
+! will modify the ``change_factor`` according to:
+
+! ::
+
+!     if(mass_transfer_rate < mass_transfer_prev) then
+!        change_factor = change_factor*(1.0-implicit_lambda) &
+!           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_rate/mass_transfer_prev-1))
+!     else
+!        change_factor = change_factor*(1.0-implicit_lambda) &
+!           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_prev/mass_transfer_rate-1))
+!        change_factor = change_factor*(1.0-implicit_lambda) &
+!           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_rate/mass_transfer_prev-1))
+!     end if
+
+! Choosing ``implicit_lambda = 0`` will keep the change factor constant.
+
+! ::
+
+    initial_change_factor = 1.5d0
+    change_factor_fraction = 0.9d0
+    implicit_lambda = 0.25d0
+
+
+! max_change_factor
+! ~~~~~~~~~~~~~~~~~
+
+
+! min_change_factor
+! ~~~~~~~~~~~~~~~~~
+
+! Maximum and minimum values for the ``change_factor``
+
+! ::
+
+    max_change_factor = 1.5d0
+    min_change_factor = 1.05d0
+
+
+! num_tries_for_increase_change_factor
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+! change_factor_increase
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+! If after every ``num_tries_for_increase_change_factor`` iterations the implicit scheme does not have upper
+! and lower bounds for the mass transfer rate, multiply ``change_factor`` by ``change_factor_increase``. Ignored if
+! ``num_tries_for_increase_change_factor < 1``. Increase is limited to ``max_change_factor``.
+
+! ::
+
+    num_tries_for_increase_change_factor = 20
+    change_factor_increase = 1.1d0
+
+
+! starting_mdot
+! ~~~~~~~~~~~~~
+
+! When using the ``roche_lobe`` scheme, if the donor overflows for the first time
+! use ``starting_mdot`` (in Msun/secyer) as an initial guess for the mass transfer rate.
+
+! ::
+
+    starting_mdot = 1d-12
+
+
+! roche_min_mdot
+! ~~~~~~~~~~~~~~
+
+! When using the ``roche_lobe`` scheme, if mass transfer rate is below ``roche_min_mdot``
+! (in Msun/secyer) and the donor is not overflowing its roche lobe, assume detachment
+! and stop mass transfer.
+
+! ::
+
+    roche_min_mdot = 1d-16
+
+
+! min_mdot_for_implicit
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! For any choice except for the ``roche_lobe`` scheme mass transfer will be computed explicitly
+! until the explicit computation of mdot is > ``min_mdot_for_implicit`` (in Msun/secyer),
+! even if ``max_tries_to_achieve`` > 0. This is to avoid spending many iterations when the stars
+! are detached and the explicit calculation gives very low values of mdot.
+
+! ::
+
+    min_mdot_for_implicit = 1d-16
+
+
+! max_implicit_abs_mdot
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! Limit the implicit mass transfer rate to ``max_implicit_abs_mdot``, in Msun/secyer
+
+! ::
+
+    max_implicit_abs_mdot = 1d99
+
+
+! report_rlo_solver_progress
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Set true to see info about the iterations to compute mass transfer from RLOF
+
+! ::
+
+    report_rlo_solver_progress = .false.
+
+
+! Tidal wind enhancement
+! ______________________
+
+
+! do_enhance_wind_*
+! ~~~~~~~~~~~~~~~~~
+
+! Use the Tout & Eggleton mechanism to tidally enhance the wind mass
+! loss from one or both components according to:
+
+! ::
+
+!     Mdot_w = Mdot_w * ( 1 + B_wind * min( (R/RL)^6, 0.5^6 ) )
+
+! Tout & Eggleton 1988,MNRAS,231,823 (eq. 2)
+
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    do_enhance_wind_1 = .false.
+    do_enhance_wind_2 = .false.
+
+
+! tout_B_wind_*
+! ~~~~~~~~~~~~~
+
+! The ``B_wind`` parameter from the previous equation. Default value is
+! taken from Tout & Eggleton 1988,MNRAS,231,823
+
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    tout_B_wind_1 = 1d4
+    tout_B_wind_2 = 1d4
+
+
+! Wind mass accretion
+! ___________________
+
+
+! do_wind_mass_transfer_*
+! ~~~~~~~~~~~~~~~~~~~~~~~
+
+! transfer part of the mass lost due to stellar winds from the mass losing
+! component to its companion. Using the Bondi-Hoyle mechanism.
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    do_wind_mass_transfer_1 = .false.
+    do_wind_mass_transfer_2 = .false.
+
+
+! wind_BH_alpha_*
+! ~~~~~~~~~~~~~~~
+
+! Bondi-Hoyle accretion parameter for each star. The default is 3/2 taken
+! from Hurley et al. 2002, MNRAS, 329, 897, in agreement with
+! Boffin & Jorissen 1988, A&A, 205, 155
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    wind_BH_alpha_1 = 1.5d0
+    wind_BH_alpha_2 = 1.5d0
+
+
+! max_wind_transfer_fraction_*
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Upper limit on the wind transfer fraction for star *
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    max_wind_transfer_fraction_1 = 0.5d0
+    max_wind_transfer_fraction_2 = 0.5d0
+
+! orbital jdot controls
+! =====================
+
+
+! do_jdot_gr
+! ~~~~~~~~~~
+
+! Include gravitational wave radiation in jdot
+
+! ::
+
+    do_jdot_gr = .true.
+
+
+! do_jdot_ml
+! ~~~~~~~~~~
+
+! Include loss of angular momentum via mass loss. The parameters
+! ``mass_transfer_*`` determine the fractions of mass lost from the vincinity
+! of the donor, the accretor, or a circumbinary coplanar toroid.
+
+! ::
+
+    do_jdot_ml = .true.
+
+
+! do_jdot_ls
+! ~~~~~~~~~~
+
+! Fix jdot such that the total angular momentum of the system is conserved,
+! except for loses due to other jdot mechanisms, or angular momentum loss
+! from winds. This is meant to take care of L-S coupling due to tides.
+
+! ::
+
+    do_jdot_ls = .true.
+
+
+! do_jdot_missing_wind
+! ~~~~~~~~~~~~~~~~~~~~
+
+! Usually MESA computes stellar AM loss due to winds by taking the angular momentum from
+! the removed layers of the star. However, when mass transfer is included, wind mass
+! loss and mass accretion are added up, and only the remainder, if corresponding to
+! net mass loss, contributes to stellar AM loss. ``jdot_missing_wind`` compensates for this,
+! by removing from the orbit an amount of angular momentum equal to the mass lost
+! that does not contribute to stellar AM loss, times the specific angular momentum
+! at the surface.
+
+! ::
+
+    do_jdot_missing_wind = .false.
+
+
+! do_jdot_mb
+! ~~~~~~~~~~
+
+! Include magnetic braking as in Rappaport, Verbunt, and Joss.  apj, 275, 713-731. 1983.
+
+! ::
+
+    do_jdot_mb = .true.
+
+
+! include_accretor_mb
+! ~~~~~~~~~~~~~~~~~~~
+
+! If true, the contribution to jdot from magnetic braking of the accretor is
+! also taken into account.
+
+! ::
+
+    include_accretor_mb = .false.
+
+
+! magnetic_braking_gamma
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+! gamma exponent for magnetic braking.
+
+! ::
+
+    magnetic_braking_gamma = 3.0d0
+
+
+! keep_mb_on
+! ~~~~~~~~~~
+
+! If true keep magnetic braking even when radiative core goes away.
+
+! ::
+
+    keep_mb_on = .false.
+
+
+! jdot_mb_min_qconv_env
+! ~~~~~~~~~~~~~~~~~~~~~
+! jdot_mb_max_qconv_env
+! ~~~~~~~~~~~~~~~~~~~~~
+! jdot_mb_max_qrad_core
+! ~~~~~~~~~~~~~~~~~~~~~
+! jdot_mb_qlim_for_check_rad_core
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! jdot_mb_qlim_for_check_conv_env
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Conditions for magnetic braking to operate. Magnetic braking is
+! turned off if any of these do not apply.
+! The mass fraction of the convective envelope has to be > jdot_mb_min_qconv_env
+! The mass fraction of the convective envelope has to be < jdot_mb_max_qconv_env
+! The mass fraction of the radiative core has to be < jdot_mb_max_qrad_core
+! Here by mass fraction we refer to the mass of the respective zone divided by the
+! total mass of the star. To compute the mass in the envelope we add all convective
+! layers down to jdot_mb_qlim_for_check_conv_env, and keep adding layers downwards
+! until we reach a non-convective zone. This is because the very outermost cell is
+! likely radiative. A simular thing is done for the core with jdot_mb_qlim_for_check_rad_core.
+! For full details check binary_jdot.f90.
+
+! ::
+
+    jdot_mb_min_qconv_env = 1d-6
+    jdot_mb_max_qconv_env = 0.99d0
+    jdot_mb_max_qrad_core = 1d-2
+    jdot_mb_qlim_for_check_rad_core = 1d-3
+    jdot_mb_qlim_for_check_conv_env = 0.999d0
+
+
+! jdot_mb_scale_for_low_qconv_env
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! jdot_mb_mass_frac_for_scale
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! If jdot_mb_scale_for_low_qconv_env is .true., scale down jdot_mb if mass fraction of
+! the convective envelope is below jdot_mb_mass_frac_for_scale.
+! (Podsiadlowski et al. 2002, The Astrophysical Journal, Volume 565, Issue 2, pp. 1107-1133)
+
+! ::
+
+    jdot_mb_scale_for_low_qconv_env = .true.
+    jdot_mb_mass_frac_for_scale = 0.02d0
+
+
+! jdot_multiplier
+! ~~~~~~~~~~~~~~~
+
+! Multiply total jdot by this factor.
+! NOTE: ``jdot_ls`` is not affected by this.
+
+! ::
+
+    jdot_multiplier = 1d0
+
+! rotation and sync controls
+! ==========================
+
+
+! do_j_accretion
+! ~~~~~~~~~~~~~~
+
+! If true, compute accretion of angular momentum following A.3.3 of 
+! de Mink et al. 2013, ApJ, 764, 166. Otherwise, incoming  material is
+! assumed to have the specific angular momentum of the surface of the accretor.
+
+! ::
+
+    do_j_accretion = .false.
+
+
+! do_tidal_sync
+! ~~~~~~~~~~~~~
+
+! If true, apply tidal torque to the star
+
+! ::
+
+    do_tidal_sync = .false.
+
+
+! sync_type_*
+! ~~~~~~~~~~~
+
+! Timescale for orbital synchronisation.
+! "\_1" refers to first star, "\_2" to the second one.
+! Options are:
+
+! + "Instantaneous" : Keep the star synced to the orbit.
+! + "Orb_period" : Sync in the timescale of the orbital period.
+! + "Hut_conv" : Sync timescale following Hurley et al. 2002, MNRAS, 329, 897
+!              for convective envelopes.
+! + "Hut_rad" : Sync timescale following Hurley et al. 2002, MNRAS, 329, 897
+!              for radiative envelopes.
+! + "None" : No sync for this star.
+
+! ::
+
+    sync_type_1 = 'Hut_conv'
+    sync_type_2 = 'Hut_conv'
+
+
+! sync_mode_*
+! ~~~~~~~~~~~
+
+! Where angular momentum is deposited for synchronization.
+! "\_1" refers to first star, "\_2" to the second one.
+! Options are:
+
+! + "Uniform" : Each layer is synced independently given the sync timescale.
+
+! ::
+
+    sync_mode_1 = 'Uniform'
+    sync_mode_2 = 'Uniform'
+
+
+! Ftid_*
+! ~~~~~~
+
+! Tidal strength factor. Synchronisation and circularisation timescales are divided by this.
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    Ftid_1 = 1d0
+    Ftid_2 = 1d0
+
+
+! do_initial_orbit_sync_*
+! ~~~~~~~~~~~~~~~~~~~~~~~
+
+! Relax rotation of star to orbital period at the beggining of evolution.
+! "\_1" refers to first star, "\_2" to the second one.
+
+! ::
+
+    do_initial_orbit_sync_1 = .false.
+    do_initial_orbit_sync_2 = .false.
+
+
+! tidal_reduction
+! ~~~~~~~~~~~~~~~
+
+! ``tidal_reduction`` accounts for the reduction in the effectiveness of convective
+! damping of the equilibrium tide when the tidal forcing period is less than the
+! convective turnover period of the largest eddies. It corresponds to the exponent
+! in eq. (32) of Hurley et al. 2002, MNRAS, 329, 897
+
+! ``tidal_reduction`` = 1 follows Zahn(1966, 1989), while ``tidal_reduction`` = 2 follows
+! Goldreich & Nicholson (1977).
+
+! ::
+
+    tidal_reduction = 2.0d0
+
+! eccentricity controls
+! =====================
+
+
+! do_tidal_circ
+! ~~~~~~~~~~~~~
+
+! If true, apply tidal circularisation
+
+! ::
+
+    do_tidal_circ = .false.
+
+
+! circ_type_*
+! ~~~~~~~~~~~
+
+! Mechanism for circularisation. Options are:
+! "\_1" refers to first star, "\_2" to the second one.
+
+! + "Hut_conv" : Circ timescale following Hurley et al. 2002, MNRAS, 329, 897
+!              for convective envelopes.
+! + "Hut_rad" : Circ timescale following Hurley et al. 2002, MNRAS, 329, 897
+!              for radiative envelopes.
+! + "None" : no tidal circularisation
+
+! ::
+
+    circ_type_1 = 'Hut_conv'
+    circ_type_2 = 'Hut_conv'
+
+
+! use_eccentricity_enhancement
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Flag to turn on Soker eccentricity enhancement
+
+! ::
+
+    use_eccentricity_enhancement = .false.
+
+
+! max_abs_edot_tidal
+! ~~~~~~~~~~~~~~~~~~
+
+! Maximum absolute value for tidal edot (in 1/s). If the computed tidal edot goes
+! above this, then it is fixed at this maximum
+
+! ::
+
+    max_abs_edot_tidal = 1d-6
+
+
+! max_abs_edot_enhance
+! ~~~~~~~~~~~~~~~~~~~~
+
+! Maximum absolute value for eccentricity enhancement (in 1/s). If the computed edot goes
+! above this, then it is fixed at this maximum
+
+! ::
+
+    max_abs_edot_enhance = 1d-6
+
+
+! min_eccentricity
+! ~~~~~~~~~~~~~~~~
+
+! If after a step ``eccentricity < min_eccentricity``, then fix it at this value
+
+! ::
+
+    min_eccentricity = 0.0d0
+
+
+! max_eccentricity
+! ~~~~~~~~~~~~~~~~
+
+! If after a step ``eccentricity > max_eccentricity``, then fix it at this value
+
+! ::
+
+    max_eccentricity = 0.99d0
+
+
+! anomaly_steps
+! ~~~~~~~~~~~~~
+
+! For phase dependent processes, the orbit is divided into this number of steps
+! in the true anomaly, to integrate through a full orbit and obtain the secular
+! changes
+
+! ::
+
+    anomaly_steps = 500
+
+! irradiation controls
+! ====================
+
+
+! accretion_powered_irradiation
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Flag to turn on irradiation of the donor due to accretion onto a compact object.
+
+! ::
+
+    accretion_powered_irradiation = .false.
+
+
+! col_depth_for_eps_extra
+! ~~~~~~~~~~~~~~~~~~~~~~~
+
+! Energy from irradiation will be deposited in the outer 
+! ``4*Pi*R^2*col_depth_for_eps_extra`` grams of the star.
+
+! ::
+
+    col_depth_for_eps_extra = -1
+
+
+! use_accretor_luminosity_for_irrad
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Flag to turn on irradiation based on the luminosity of the accretor and binary
+! separation. Requires ``evolve_both_stars = .true.`` in binary_job inlist.
+
+! ::
+
+    use_accretor_luminosity_for_irrad = .false.
+
+
+! irrad_flux_at_std_distance
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+! std_distance_for_irradiation
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! If ``irrad_flux_at_std_distance > 0`` then irradiation flux is computed as
+
+! ::
+
+!     s% irradiation_flux = b% irrad_flux_at_std_distance * &
+!         (b% std_distance_for_irradiation/b% separation)**2
+
+! ::
+
+    irrad_flux_at_std_distance = -1
+    std_distance_for_irradiation = -1
+
+
+! max_F_irr
+! ~~~~~~~~~
+
+! Limit irradiation by this amount.
+
+! ::
+
+    max_F_irr = 5d12
+
+! common envelope controls (EXPERIMENTAL, DON'T USE)
+! ==================================================
+
+
+! CE_alpha
+! ~~~~~~~~
+
+! Common envelope efficiency factor
+
+! ::
+
+    CE_alpha = 1d0
+
+
+! CE_alpha_th
+! ~~~~~~~~~~~
+
+! Common envelope thermal efficiency factor
+
+! ::
+
+    CE_alpha_th = 1d0
+
+
+! CE_alpha_core
+! ~~~~~~~~~~~~~
+
+! Efficiency at which the change of energy in the core of the star contributes
+! to envelope ejection.
+
+! ::
+
+    CE_alpha_core = 0d0
+
+
+! CE_mass_loss_rate_high
+! ~~~~~~~~~~~~~~~~~~~~~~
+
+! Upper mass loss rate imposed during CE in Msun/yr
+
+! ::
+
+    CE_mass_loss_rate_high = 1d-1
+
+
+! CE_mass_loss_rate_low
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! Lower mass loss rate imposed during CE in Msun/yr
+
+! ::
+
+    CE_mass_loss_rate_low = 1d-6
+
+
+! CE_rel_rlo_for_detachment
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Consider the CE phase terminated when (r-rl)/rl < -CE_rel_rlo_for_detachment
+! Between (r-rl)/rl = 0d0 and (r-rl)/rl = -CE_rel_rlo_for_detachment the mass loss rate is
+! adjusted between CE_mass_loss_rate_high and CE_mass_loss_rate_low.
+
+! ::
+
+    CE_rel_rlo_for_detachment = 0.02d0
+
+
+! CE_years_detached_to_terminate
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! During CE, if the star spends this amount of time detached, terminate CE even if
+! CE_rel_rlo_for_detachment has not been reached.
+! If set to a large number mass loss will only stop when the star definetely wants
+! to detach. If set to a low number system will likely switch to stable mass transfer.
+
+! ::
+
+    CE_years_detached_to_terminate = 1d-1
+
+
+! CE_begin_at_max_implicit_abs_mdot
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! If true, initiate a common envelope phase when max_implicit_abs_mdot is reached
+
+! ::
+
+    CE_begin_at_max_implicit_abs_mdot = .false.
+
+
+! CE_years_detached_to_terminate
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! If the absolute difference between central and surface mass fractions of H and He
+! is below this, terminate the simulation. This is to stop the simulation once the entire
+! envelope has been removed
+
+! ::
+
+    CE_xa_diff_to_terminate = 0.01d0
+
+
+! CE_terminate_when_core_overflows
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Terminate if, for the current orbital separation, the radius at the point
+! where CE_xa_diff_to_terminate applies would overflow its Roche lobe
+
+! ::
+
+    CE_terminate_when_core_overflows = .true.
+
+
+! CE_min_period_in_days
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! Terminate the simulation if the period is below this during CE
+! used to terminate the simulation early in cases where a merger would be expected.
+
+! ::
+
+    CE_min_period_in_minutes = 5d0
+
+
+! CE_energy_factor_HII_toHI
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Recombination energy for ionized hydrogen will be multiplied by this
+! factor when computing the energy.
+
+! ::
+
+    CE_energy_factor_HII_toHI = 1d0
+
+
+! CE_energy_factor_HeII_toHeI
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Recombination energy for singly ionized helium will be multiplied by
+! this factor when computing the energy.
+
+! ::
+
+    CE_energy_factor_HeII_toHeI = 1d0
+
+
+! CE_energy_factor_HeIII_toHeII
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! Recombination energy for doubly ionized helium will be multiplied by
+! this factor when computing the energy.
+
+! ::
+
+    CE_energy_factor_HeIII_toHeII = 1d0
+
+
+! CE_energy_factor_H2
+! ~~~~~~~~~~~~~~~~~~~
+
+! Dissociation energy for molecular hydrogen will be multiplied by this
+! factor when computing the energy.
+
+! ::
+
+    CE_energy_factor_H2 = 0d0
+
+
+! CE_fixed_lambda
+! ~~~~~~~~~~~~~~~
+
+! For comparison to rapid-pop-synth, if this is larger than zero, then compute
+! the binding energy from this value of lambda rather than by integrating through
+! the envelope
+
+! ::
+
+    CE_fixed_lambda = -1d0
+
+! miscellaneous controls
+! ======================
+
+
+! keep_donor_fixed
+! ~~~~~~~~~~~~~~~~
+
+! keep star 1 as donor, even if accretor is closer to filling roche lobe
+
+! ::
+
+    keep_donor_fixed = .true.
+
+
+! mdot_limit_donor_switch
+! ~~~~~~~~~~~~~~~~~~~~~~~
+
+! Do not change donor if mass transfer is larger than this (given in Msun/secyer).
+! Avoids erratic changes when both stars are filling their roche loches.
+
+! ::
+
+    mdot_limit_donor_switch = 1d-20
+
+
+! use_other_{hook}
+! ~~~~~~~~~~~~~~~~
+
+! Logicals to deploy the use_other routines.
+
+! ::
+
+    use_other_rlo_mdot = .false.
+    use_other_check_implicit_rlo = .false.
+    use_other_implicit_function_to_solve = .false.
+    use_other_tsync = .false.
+    use_other_sync_spin_to_orbit = .false.
+    use_other_mdot_edd = .false.
+    use_other_adjust_mdots = .false.
+    use_other_accreted_material_j = .false.
+    use_other_jdot_gr = .false.
+    use_other_jdot_ml = .false.
+    use_other_jdot_ls = .false.
+    use_other_jdot_missing_wind = .false.
+    use_other_jdot_mb = .false.
+    use_other_extra_jdot = .false.
+    use_other_binary_wind_transfer = .false.
+    use_other_edot_tidal = .false.
+    use_other_edot_enhance = .false.
+    use_other_extra_edot = .false.
+    use_other_CE_init = .false.
+    use_other_CE_rlo_mdot = .false.
+    use_other_CE_binary_evolve_step = .false.
+    use_other_CE_binary_finish_step = .false.

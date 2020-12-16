@@ -1,0 +1,96 @@
+! inlist_zams - stops when reach Lnuc_div_L_zams_limit
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      load_saved_model = .true.
+      saved_model_name = 'zams.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'he_burn.mod'
+      required_termination_code_string = 'power_he_burn_upper_limit'
+
+
+      change_D_omega_flag = .true.
+      new_D_omega_flag = .true.
+               
+      change_initial_v_flag = .true.
+      new_v_flag = .true.
+               
+      change_rotation_flag = .true.
+      new_rotation_flag = .true.
+      
+      set_initial_surface_rotation_v = .true.
+      new_surface_rotation_v = 200 ! km/sec   << saved model is rotating 
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_age = .true.
+      initial_age = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&kap
+      Zbase = 0.02
+
+      kap_file_prefix = 'gs98'
+
+/ ! end of kap namelist
+
+&controls
+
+      initial_mass = 15
+      initial_z = 0.02
+
+      power_he_burn_upper_limit = 10d0
+
+         hot_wind_scheme = 'Dutch'
+         hot_wind_full_on_T = 1d0
+         cool_wind_full_on_T = 0d0
+         Dutch_scaling_factor = 0.8
+
+         am_nu_visc_factor = 0
+         am_D_mix_factor = 0.0333333333333333d00
+         
+         D_DSI_factor = 0
+         D_SH_factor = 1
+         D_SSI_factor = 1
+         D_ES_factor = 1
+         D_GSF_factor = 1
+         D_ST_factor = 1
+
+         am_nu_ST_factor = 10
+         
+         use_Ledoux_criterion = .true.
+   
+         alpha_semiconvection = 4d-2
+         thermohaline_coeff = 2  
+
+         omega_function_weight = 20
+
+         mdot_omega_power = 0.43
+
+         clip_D_limit = 10
+         
+         xa_scale = 1d-5
+
+         mixing_length_alpha = 1.6
+      
+      ! limit max_model_number as part of test_suite
+      max_model_number = 10000
+      
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 50
+   
+
+/ ! end of controls namelist
+

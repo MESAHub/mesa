@@ -1,0 +1,14 @@
+#!/bin/bash
+if [ ! -d chem_input_data ]
+then
+	echo
+	echo 'unpacking chem input data'
+	echo
+	tar Jxf chem_input_data.tar.xz
+fi
+
+echo
+echo 'builiding preprocessor'
+echo
+cd make
+make

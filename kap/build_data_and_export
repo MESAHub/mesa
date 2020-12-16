@@ -1,0 +1,52 @@
+#!/bin/bash
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+echo 'create kap_data'
+
+mkdir -p data
+cd data
+check_okay
+
+rm -rf kap_data
+
+cp ../kap_data.tar.xz .
+check_okay
+
+echo 'xz -d kap_data.tar.xz'
+xz -d kap_data.tar.xz
+check_okay
+tar -xf kap_data.tar
+check_okay
+rm kap_data.tar
+
+echo 'tar xfJ kapcn_data.txz'
+cp ../kapcn_data.txz .
+tar xfJ kapcn_data.txz
+rm kapcn_data.txz
+
+echo 'copy AESOPUS_AGSS09.h5'
+cp ../AESOPUS_AGSS09.h5 kap_data
+check_okay
+
+cd ..
+
+rm -rf ../data/kap_data
+check_okay
+
+mkdir ../data/kap_data
+check_okay
+
+mv data/kap_data/*.data ../data/kap_data
+check_okay
+
+mv data/kap_data/*.h5 ../data/kap_data
+check_okay
+
+mkdir ../data/kap_data/cache
+check_okay

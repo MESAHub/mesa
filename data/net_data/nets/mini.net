@@ -1,0 +1,7 @@
+      ! a little do-nothing net
+      
+      add_isos_and_reactions(
+         h1
+         he4
+         fe56
+         )

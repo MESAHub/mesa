@@ -1,0 +1,95 @@
+      SUBROUTINE F01BRR(N,ICN,A,NZ,LENROW,IP,IQ,IW,IW1)
+C     MARK 7 RELEASE. NAG COPYRIGHT 1978
+C     MARK 11.5(F77) REVISED. (SEPT 1985.)
+C     DERIVED FROM HARWELL LIBRARY ROUTINE MC22A
+C
+C     REPLACES A SPARSE MATRIX  A  BY THE PERMUTED MATRIX  P*A*Q ,
+C     WHERE  P  AND  Q  ARE PERMUTATION MATRICES.
+C
+C     .. Scalar Arguments ..
+      INTEGER           N, NZ
+C     .. Array Arguments ..
+      DOUBLE PRECISION  A(NZ)
+      INTEGER           ICN(NZ), IP(N), IQ(N), IW(N,2), IW1(NZ),
+     *                  LENROW(N)
+C     .. Local Scalars ..
+      DOUBLE PRECISION  AVAL
+      INTEGER           I, ICHAIN, IOLD, IPOS, J, J2, JJ, JNUM, JVAL,
+     *                  LENGTH, NEWPOS
+C     .. Intrinsic Functions ..
+      INTRINSIC         ABS
+C     .. Executable Statements ..
+      IF (NZ.LE.0) GO TO 180
+      IF (N.LE.0) GO TO 180
+C     SET START OF ROW I IN IW(I,1) AND LENROW(I) IN IW(I,2)
+      IW(1,1) = 1
+      IW(1,2) = LENROW(1)
+      DO 20 I = 2, N
+         IW(I,1) = IW(I-1,1) + LENROW(I-1)
+         IW(I,2) = LENROW(I)
+   20 CONTINUE
+C     PERMUTE LENROW ACCORDING TO IP.  SET OFF-SETS FOR NEW
+C     POSITION OF ROW IOLD IN IW(IOLD,1) AND PUT OLD ROW INDICES
+C     IN IW1 IN POSITIONS CORRESPONDING TO THE NEW POSITION OF
+C     THIS ROW IN A/ICN.
+      JJ = 1
+      DO 60 I = 1, N
+         IOLD = IP(I)
+         IOLD = ABS(IOLD)
+         LENGTH = IW(IOLD,2)
+         LENROW(I) = LENGTH
+         IF (LENGTH.EQ.0) GO TO 60
+         IW(IOLD,1) = IW(IOLD,1) - JJ
+         J2 = JJ + LENGTH - 1
+         DO 40 J = JJ, J2
+            IW1(J) = IOLD
+   40    CONTINUE
+         JJ = J2 + 1
+   60 CONTINUE
+C     SET INVERSE PERMUTATION TO IQ IN IW(.,2).
+      DO 80 I = 1, N
+         IOLD = IQ(I)
+         IOLD = ABS(IOLD)
+         IW(IOLD,2) = I
+   80 CONTINUE
+C     PERMUTE A AND ICN IN PLACE, CHANGING TO NEW COLUMN NUMBERS.
+C
+C     ***   MAIN LOOP   ***
+C     EACH PASS THROUGH THIS LOOP PLACES A CLOSED CHAIN OF COLUMN
+C     INDICES IN THEIR NEW (AND FINAL) POSITIONS ... THIS IS
+C     RECORDED BY SETTING THE IW1 ENTRY TO ZERO SO THAT ANY WHICH
+C     ARE SUBSEQUENTLY ENCOUNTERED DURING THIS MAJOR SCAN CAN BE
+C     BYPASSED.
+      DO 160 I = 1, NZ
+         IOLD = IW1(I)
+         IF (IOLD.EQ.0) GO TO 160
+         IPOS = I
+         JVAL = ICN(I)
+C        IF ROW IOLD IS IN SAME POSITIONS AFTER PERMUTATION GO TO ...
+         IF (IW(IOLD,1).EQ.0) GO TO 140
+         AVAL = A(I)
+C        **  CHAIN LOOP  **
+C        EACH PASS THROUGH THIS LOOP PLACES ONE (PERMUTED) COLUMN
+C        INDEX IN ITS FINAL POSITION  .. VIZ. IPOS.
+         DO 100 ICHAIN = 1, NZ
+C           NEWPOS IS THE ORIGINAL POSITION IN A/ICN OF THE ELEMENT
+C           TO BE PLACED IN POSITION IPOS.  IT IS ALSO THE POSITION
+C           OF THE NEXT ELEMENT INTHE CHAIN.
+            NEWPOS = IPOS + IW(IOLD,1)
+C           IS CHAIN COMPLETE ...
+            IF (NEWPOS.EQ.I) GO TO 120
+            A(IPOS) = A(NEWPOS)
+            JNUM = ICN(NEWPOS)
+            ICN(IPOS) = IW(JNUM,2)
+            IPOS = NEWPOS
+            IOLD = IW1(IPOS)
+            IW1(IPOS) = 0
+C           **  END OF CHAIN LOOP  **
+  100    CONTINUE
+  120    A(IPOS) = AVAL
+  140    ICN(IPOS) = IW(JVAL,2)
+C        ***  END OF MAIN LOOP   ***
+  160 CONTINUE
+C
+  180 RETURN
+      END

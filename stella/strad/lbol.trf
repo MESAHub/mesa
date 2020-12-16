@@ -1,0 +1,139 @@
+ subroutine Lbol(runname);
+    -- read and shift lum from runname.ph
+    IMPLICIT REAL*8(A-H,O-Z);
+    _include snrad;
+    _include abo;
+    _define @ap "'" ;
+-- _include zone.inc;
+-- _include fundrad.inc;
+--    parameter (Amod=18.5d0); -- LMC
+    parameter (Rpc=1.d7); -- 10 Mpc
+--    character*132 wordm(10),filestr;
+    character*(*) runname; -- this gives correct length
+--    character*80 runname; -- this gives wrong length 80
+    integer lwordm(10),lrun,nwordm;
+    dimension algfreq(Mfreq),ttt(Mfreq);
+/*
+    dimension algfreq(Nfreq),freq(Nfreq+1),freqmn(Nfreq),ttt(Nfreq);
+    DIMENSION WAVEL(NFREQ);-- WAVELENGTHS IN ANGSTREMS
+--  in Stella  WAVEL in Opacity.inc
+    Real*8 lwplam1,lwplam2;
+    DATA WLMAX/5.0D+04/,WLMIN/1.D+0/;
+    -- wavelength range in Angstrems for SN1987A (Peter Lundqvist)
+ */
+    Data Ushort/3250.d0/,Rlong/8900.d0/;
+    <*args:    *>;
+    <*freqs  :   *>;
+--      Lb=31;
+--      Lf=35;
+    <*findL: Lb to begin, Lf to finish (UBVRI bands: Rlong--Ushort) *>;
+    write(51,*) '   time          L_ubvri    L_bol    XEUV<325   IR>890'; -- limts defined in Ushort
+   _repeat [
+     read(50,@ap(F15.10,1X,I4,1X,E10.3,999F8.3)@ap,end=10) t_tt,NFRUS,dummy,
+               (ttt(L),L=1,NFREQ); -- Lum  erg/(sec*Hz)
+         --write(*,*)' ttt 1,2,3:',ttt(1), ttt(2), ttt(3);
+         --write(*,*)' ttt last:',ttt(Nfreq-2), ttt(Nfreq-1), ttt(Nfreq);
+         -- pause;
+        <*sumbins: and save the log10 of sum in suml    *>;
+
+     write(51,'(F15.10,5F10.3)') t_tt, log10(sumUBVRI), log10(sumbol),
+            log10(SUMXEUV), log10(SUMfarIR);
+           ]
+10: close(50);
+    close(51);
+    end;
+
+%_args:
+/*
+     call GetArg(1,filestr);
+     call words(filestr, wordm,lwordm, nwordm);
+    @wterm ' arg=', filestr;
+    @wterm ' nwordm=',nwordm;
+       */
+--   @wterm 'runname=',runname;
+--   lrun=length(runname);
+   lrun=len_trim(runname);
+--   @wterm ' lrun=',lrun;
+--   @wterm 'runname=',runname(1:lrun);
+   open(50,file=runname(1:lrun)//'.ph');
+--   write(*,*)' in lbol lrun=',lrun;
+--   write(*,*)' runname(1:lrun)=',runname(1:lrun);
+--   pause;
+   open(51,file=runname(1:lrun)//'.lbol');
+--   read(50,*) algfreq;
+   read(50,*) filestr; -- dummy string
+--   write(*,*)' dummy string:';
+--   write(*,*) filestr; -- dummy string
+--   pause;
+/*   write(*,'(200F6.2)') algfreq;
+   @wterm ' lam1 wavel1 lam2 wavel2 ', cs*10.**(8.-algfreq(1)),wlmax,
+         cs*10.**(8.-algfreq(nfreq)-0.5*(algfreq(nfreq)-algfreq(nfreq-1))),
+         wlmin;
+     */
+--   Cdist=2.d0*log10(rpc)+log10(4.d0*pi*Upc**2); -- when R is fixed
+--   Cdist=0.4d0*Amod+2.d0+log10(4.d0*pi*Upc**2); -- when Amod is fixed
+--   @wterm ' Amod & Cdist must be ',Amod,Cdist,' OK?';
+--   @wterm ' IUE zones selected for wlmin=1 AA! OK?';
+   -- pause;
+
+%_freqs:
+     UFREQ=BOLTZK*UTP/(2.d0*PI*HPLANC);
+     FREQ(1)=CS*1.D+08/(WLMAX*UFREQ);
+     FREQ(NFREQ+1)=CS*1.D+08/(WLMIN*UFREQ);
+     Basis=(WLMAX/WLMIN)**(1.D0/(DBLE(NFREQ)));
+     -- Geometric PROGRESSION
+    _Do i=2,NFREQ;
+       FREQ(i)=FREQ(I-1)*BASIS;
+    _OD;
+    _DO L=1,NFREQ;
+       FREQMN(L)=SQRT(FREQ(L)*FREQ(L+1))
+    _OD;
+     --
+
+%_sumbins:
+
+      SUMbol=0.;
+     _Do L=1,min(NFRUS,Nfreq);
+        SUMbol=SUMbol+10.**ttt(L)*(freq(L+1)-freq(L))*Ufreq;
+        --WRITE(@term,*)'L Sumbol=',L, SUMbol;
+        --WRITE(@term,*)'L tt fr',ttt(L),freq(L+1),freq(L);
+     _Od;
+--      WRITE(@term,*)' Rest observer Lum=', SUMbol;
+      --pause;
+      SUMubvri=0.;
+     _Do L=Lb,Lf;
+        SUMubvri=SUMubvri+10.**ttt(L)*(freq(L+1)-freq(L))*Ufreq;
+        --WRITE(@term,*)'L Sumu=',L, SUMubvri;
+     _Od; -- for SUMubvri we need only an integral, so we do not
+     -- use  weights of IUE
+
+      SUMXEUV=0.;
+     _Do L=Lf+1,min(NFRUS,Nfreq);
+        SUMXEUV=SUMXEUV+10.**ttt(L)*(freq(L+1)-freq(L))*Ufreq;
+     _Od;
+
+      SUMfarIR=0.;
+     _Do L=1,Lb-1;
+        SUMfarIR=SUMfarIR+10.**ttt(L)*(freq(L+1)-freq(L))*Ufreq;
+     _Od;
+
+%_findL:
+      L=1;
+      _while CS*1.D+08/(freqmn(L)*Ufreq) > Rlong _do
+         L=L+1;
+      _od;
+       Lb=L;
+ --      Write(@term,'(1p,3(a,e12.5))')
+ --      ' lammn(L)=',CS*1.D+08/(freqmn(L)*Ufreq),
+--           ' Rlong=',Rlong,
+ --      ' lam(L)=',CS*1.D+08/(freq(L)*Ufreq);
+
+      _while CS*1.D+08/(freqmn(L)*Ufreq) > Ushort _do
+         L=L+1;
+      _od;
+      Lf=L-1;
+ --      Write(@term,'(1p,3(a,e12.5))')
+--       ' lammn(Lf)=',CS*1.D+08/(freqmn(Lf)*Ufreq),
+--       ' Ushort=',Ushort,
+--       ' lam(Lf+1)=',CS*1.D+08/(freq(Lf+1)*Ufreq);
+

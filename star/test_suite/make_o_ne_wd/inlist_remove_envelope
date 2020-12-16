@@ -1,0 +1,72 @@
+! inlist_remove_envelope
+ 
+&star_job
+
+      load_saved_model = .true.
+      saved_model_name = 'settled_envelope.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'star_species_mass_min_limit'
+
+      change_initial_conv_vel_flag = .true.
+      new_conv_vel_flag = .false.
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+&kap
+
+/ ! end of kap namelist
+
+&controls
+
+      ! limit max_model_number as part of test_suite
+      max_model_number = 4000
+
+! solver
+      use_dedt_form_of_energy_eqn = .false.
+      always_use_eps_grav_form_of_energy_eqn = .true.
+
+      convergence_ignore_equL_residuals = .true.      
+      warning_limit_for_max_residual = 1d99
+      
+      limit_for_rel_error_in_energy_conservation = 1d-5
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+      
+! when to stop
+
+      star_species_mass_min_limit = 1d-6 ! Msun
+      star_species_mass_min_limit_iso = 'he4'
+      
+! wind     
+      mass_change = -1d-10
+   
+      num_trace_history_values = 5
+      trace_history_value_name(1) = 'total_mass c12'
+      trace_history_value_name(2) = 'total_mass o16'
+      trace_history_value_name(3) = 'total_mass ne20'
+      trace_history_value_name(4) = 'rel_E_err'
+      trace_history_value_name(5) = 'log_rel_run_E_err'
+
+      photo_interval = 25 ! want 2 or more photos in this phase
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+      !pause = .true.
+      !Profile_Panels3_xmax = 3 !  -101d0 ! only used if /= -101d0
+
+      Profile_Panels3_xaxis_name = 'logxm'
+      Profile_Panels3_xaxis_reversed = .true.
+      Profile_Panels3_xmin = -8
+      Profile_Panels3_xmax = 0
+
+/ ! end of pgstar namelist

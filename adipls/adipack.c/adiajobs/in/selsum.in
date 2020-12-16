@@ -1,0 +1,31 @@
+Files needed:
+Input on idsin (default 2)
+Input of selection modes on idssl (default 3)
+ outputs grand summary on d/s 11.
+ outputs short summary on d/s 12.
+ output l, order and frequency on d/s 13, 
+ in same form as observed results
+
+2 'agsm.l5bi.d.15.p2.md'   @
+3 '<selection mode set, if required>'   
+11 'agsm.l5bi.d.15.p2.sel'   @
+12 '0'   @
+13 '0'   @
+21 '0'   @
+22 '0'   @
+23 '0'   @
+-1 ''   @
+
+idsin,idssl?
+,,,   @
+icasin,icassl?
+1,1   @
+nw1,nw2,lw1,lw2,frqw1,frqw2, sigw1, sigw2,icaswn?
+,,,,,,,,10010,,,,,,,,,,,,,,,,,,,,    @
+iselct,irewin,irewsl,irange?
+0,,,3,,,,,,,,,,,,,,,,,,    @
+ranges 
+Select modes of degree 0 - 5 and 10 - 12
+0,-5,10,-12,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,,,,,,,,,,,,,,,,,  @
+idiag?
+1    @

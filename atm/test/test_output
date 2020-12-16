@@ -1,0 +1,95 @@
+
+ test_table: tau=0.1
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+            5090      3.70669387      4.57960650      1.00000000      1.00000000      1.00000000      4.57958715
+
+
+ test_table: tau=1
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+            6238      3.79505697      5.05351484      1.00000000      1.00000000      1.00000000      5.05350018
+
+
+ test_table: tau=10
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+            8591      3.93403827      5.20396780      1.00000000      1.00000000      1.00000000      5.20393050
+
+
+ test_table: tau=100
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+            9977      3.99899069      5.31982969      1.00000000      1.00000000      1.00000000      5.31977773
+
+
+ test_table: WD tau=25
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+            6066      3.78291844      7.89494662      0.80000001      0.00098114      0.04174253      7.89494661
+
+
+ test_table: DB WD tau=25
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+           51950      4.71558722      7.38472907      0.80000001      0.07719894      0.01481081      7.38440000
+
+
+ test_table: photosphere
+
+               T           log_T           log P          M/Msun          L/Lsun          R/Rsun         logPgas
+            5772      3.76132658      4.91699929      1.00000000      1.00000000      1.00000000      4.91698457
+
+
+ test_T_tau_varying: Eddington
+
+               T           log T           log P          M/Msun          L/Lsun               X               Z
+            5776      3.76162718      4.95521588      1.00000000      1.00277250      0.70000000      0.02000000
+
+
+ test_T_tau_varying: Krishna-Swamy
+
+               T           log T           log P          M/Msun          L/Lsun               X               Z
+            5776      3.76162718      4.77425784      1.00000000      1.00277250      0.70000000      0.02000000
+
+
+ test_T_tau_varying: solar Hopf
+
+               T           log T           log P          M/Msun          L/Lsun               X               Z
+            5776      3.76162718      4.83676375      1.00000000      1.00277250      0.70000000      0.02000000
+
+
+ test_T_tau_varying: Eddington
+
+               T           log T           log P          M/Msun          L/Lsun               X               Z
+           17026      4.23111392      5.20892721      1.00000000      1.00277250      0.70000000      0.02000000
+
+
+ test_T_tau_uniform: fixed
+                                 atm_get_grey logP surf    6.7470155156147209D+00
+                                 atm_get_grey logT surf    3.9498247208431012D+00
+                                  atm_get_grey tau_phot    1.0000000000000000D+02
+
+
+ test_T_tau_uniform: iterated
+                                 atm_get_grey logP surf    4.7487769059374845D+00
+                                 atm_get_grey logT surf    4.2748967954324364D+00
+                                  atm_get_grey tau_phot    1.5000000000000000D+02
+
+
+ test_irradiated
+
+                              test_grey_irradiated: kap    6.0255958591042850D-03
+                                            M/M_jupiter    1.4999999999999998D+00
+                                            R/R_jupiter    1.5743735095633800D+00
+                                                 R/Rsun    1.6178684913857289D-01
+                                                  kap_v    4.0000000000000001D-03
+                                                      P    1.0000000000000000D+06
+
+                                                    tau    4.0174290755095390D+00
+                                                   Teff    8.9999999999999932D+02
+                                                   T_eq    1.0000000000000000D+03
+                                                  T_int    9.0000000000000000D+02
+                                                      T    1.3714740677893797D+03
+                                                   logT    3.1371876002581209D+00
+
