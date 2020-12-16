@@ -1,1 +1,1 @@
-svn info https://subversion.assembla.com/svn/mesa^mesa/trunk -r 'HEAD' | grep Revision | egrep -o "[0-9]+"
+git rev-parse --short HEAD
