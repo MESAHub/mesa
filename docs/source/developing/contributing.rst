@@ -299,4 +299,5 @@ To your ``.git/config`` in the ``[remote "origin"]`` section enables fetching pu
 
   $(git log -1) == *'[ci skip]'*
 
-Tests to see we should skip a test
+Tests to see if we should skip testing the test cases. Note we still want to compile test MESA even if we
+skip the full test suite.
