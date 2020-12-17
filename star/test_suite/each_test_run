@@ -214,6 +214,11 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     else
         testhub_log "run_optional: true"
     fi
+    if [ -z "$MESA_FPE_CHECKS_ON" ]; then
+        testhub_log "fpe_checks: false"
+    else
+        testhub_log "fpe_checks: true"
+    fi
     testhub_log "inlists:"
     echo "build_and_run $1"
     build_and_run "$1" "$2" "$3" "$4"
