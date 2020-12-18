@@ -194,7 +194,7 @@
                call do1_of_2(rate_be7em_fxt, rate_be7em_jina)
 
             case(ir_c12_ap_n15) ! c12(a, p)n15
-               call do1_of_2_reverse(rate_n15pa_nacre, rate_n15pa_jina)
+               call do1_reverse(rate_n15pa_jina)
 
             case(ir_c12_pg_n13)
                call do1_of_2(rate_c12pg_nacre, rate_c12pg_jina)
@@ -209,16 +209,16 @@
                call do1_of_2_reverse(rate_o16pg_nacre, rate_o16pg_jina)
 
             case(ir_f18_gp_o17) ! f18(g, p)o17
-               call do1_of_2_reverse(rate_o17pg_nacre, rate_o17pg_jina)
+               call do1_reverse(rate_o17pg_jina)
 
             case(ir_f19_gp_o18) ! f19(g, p)o18
-               call do1_of_2_reverse(rate_o18pg_nacre, rate_o18pg_jina)
+               call do1_reverse(rate_o18pg_jina)
 
             case(ir_f19_pa_o16)  ! f19(p, a)o16
                call do1_of_2(rate_f19pa_nacre, rate_f19pa_jina)
 
             case(ir_f19_pg_ne20)
-               call do1_of_2(rate_f19pg_nacre, rate_f19pg_jina)
+               call do1(rate_f19pg_jina)
 
             case(ir_h2_be7_to_h1_he4_he4)      ! be7(d, p)2he4
                call do1(rate_be7dp_jina)
@@ -245,7 +245,7 @@
                call do1_of_2(rate_li7pa_nacre, rate_li7pa_jina)
 
             case(ir_mg24_ga_ne20) ! mg24(g, a)ne20
-               call do1_of_2_reverse(rate_ne20ag_nacre, rate_ne20ag_jina)
+               call do1_reverse(rate_ne20ag_jina)
 
             case(ir_n13_gp_c12) ! n13(g, p)c12
                call do1_of_2_reverse(rate_c12pg_nacre, rate_c12pg_jina)
@@ -254,10 +254,10 @@
                call do1_of_2(rate_n13pg_nacre, rate_n13pg_jina)
 
             case(ir_n14_ag_f18) ! n14(a, g)f18
-               call do1_of_2(rate_n14ag_nacre, rate_n14ag_jina)
+               call do1(rate_n14ag_jina)
 
             case(ir_n14_ap_o17) ! n14(a, p)o17
-               call do1_of_2_reverse(rate_o17pa_nacre, rate_o17pa_jina)
+               call do1_reverse(rate_o17pa_jina)
 
             case(ir_n14_gp_c13) ! n14(g, p)c13
                call do1_of_2_reverse(rate_c13pg_nacre, rate_c13pg_jina)
@@ -269,13 +269,13 @@
                call do1_of_2_reverse(rate_o18pa_nacre, rate_o18pa_jina)
 
             case(ir_n15_pa_c12) ! n15(p, a)c12
-               call do1_of_2(rate_n15pa_nacre, rate_n15pa_jina)
+               call do1(rate_n15pa_jina)
 
             case(ir_n15_pg_o16)
-               call do1_of_2(rate_n15pg_nacre, rate_n15pg_jina)
+               call do1(rate_n15pg_jina)
 
             case(ir_ne20_ag_mg24) ! ne20(a, g)mg24
-               call do1_of_2(rate_ne20ag_nacre, rate_ne20ag_jina)
+               call do1(rate_ne20ag_jina)
 
             case(ir_ne20_ap_na23) ! ne20(a, p)na23
                call do1(rate_ne20ap_jina)
@@ -284,10 +284,10 @@
                call do1_of_2_reverse(rate_o16ag_nacre, rate_o16ag_jina)
 
             case(ir_ne20_gp_f19) ! ne20(g, p)f19
-               call do1_of_2_reverse(rate_f19pg_nacre, rate_f19pg_jina)
+               call do1_reverse(rate_f19pg_jina)
 
             case(ir_ne22_pg_na23)
-               call do1_of_2(rate_ne22pg_nacre, rate_ne22pg_jina)
+               call do1(rate_ne22pg_jina)
 
             case(ir_o14_gp_n13) ! o14(g, p)n13
                call do1_of_2_reverse(rate_n13pg_nacre, rate_n13pg_jina)
@@ -302,25 +302,25 @@
                call do1_of_2_reverse(rate_f19pa_nacre, rate_f19pa_jina)
 
             case(ir_o16_gp_n15)  ! o16(g, p)n15
-               call do1_of_2_reverse(rate_n15pg_nacre, rate_n15pg_jina)
+               call do1_reverse(rate_n15pg_jina)
 
             case(ir_o16_pg_f17)
                call do1_of_2(rate_o16pg_nacre, rate_o16pg_jina)
 
             case(ir_o17_pa_n14) ! o17(p, a)n14
-               call do1_of_2(rate_o17pa_nacre, rate_o17pa_jina)
+               call do1( rate_o17pa_jina)
 
             case(ir_o17_pg_f18)
-               call do1_of_2(rate_o17pg_nacre, rate_o17pg_jina)
+               call do1(rate_o17pg_jina)
 
             case(ir_o18_ag_ne22) ! o18(a, g)ne22 
-               call do1_of_2(rate_o18ag_nacre, rate_o18ag_jina)
+               call do1(rate_o18ag_jina)
 
             case(ir_o18_pa_n15) ! o18(p, a)n15 and n15(a, p)o18
                call do1_of_2(rate_o18pa_nacre, rate_o18pa_jina)
 
             case(ir_o18_pg_f19)
-               call do1_of_2(rate_o18pg_nacre, rate_o18pg_jina)
+               call do1(rate_o18pg_jina)
 
             case(iral27pa_aux) ! al27(p, a)mg24 
                call do1_reverse(rate_mg24ap_jina)
@@ -353,10 +353,10 @@
                call do1_of_2(rate_c12pg_nacre, rate_c12pg_jina)
 
             case(irc12ap_aux)  ! c12(a, p)n15
-               call do1_of_2_reverse(rate_n15pa_nacre, rate_n15pa_jina)
+               call do1_reverse(rate_n15pa_jina)
 
             case(irc12ap_to_o16) ! c12(a, p)n15(p, g)o16
-               call do1_of_2_reverse(rate_n15pa_nacre, rate_n15pa_jina)
+               call do1_reverse(rate_n15pa_jina)
 
             case(irca40ap_aux) ! ca40(a, p)sc43 
                call do1(rate_ca40ap_jina)
@@ -398,7 +398,7 @@
                call do1_reverse(rate_v47pg_jina)
 
             case(irf19pg_aux) ! f19(p, g)ne20
-               call do1_of_2(rate_f19pg_nacre, rate_f19pg_jina)
+               call do1(rate_f19pg_jina)
 
             case(irfe52ap_aux) ! fe52(a, p)co55 
                call do1(rate_fe52ap_jina)
@@ -572,10 +572,10 @@
                call do1_of_3(rate_n14pg_nacre, rate_n14pg_jina, rate_n14pg_fxt)
 
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
-               call do1_of_2(rate_n14ag_nacre, rate_n14ag_jina)
+               call do1(rate_n14ag_jina)
 
             case(irn14ag_to_o18) ! n14(a, g)f18(e+nu)o18
-               call do1_of_2(rate_n14ag_nacre, rate_n14ag_jina)
+               call do1(rate_n14ag_jina)
 
             case(irn14gc12) ! n14 => c12 + neut + prot
                call do1_of_2_reverse(rate_c13pg_nacre, rate_c13pg_jina)
@@ -584,10 +584,10 @@
                call do1_of_3(rate_n14pg_nacre, rate_n14pg_jina, rate_n14pg_fxt)
 
             case(irn15pa_aux) ! n15(p, a)c12
-               call do1_of_2(rate_n15pa_nacre, rate_n15pa_jina)
+               call do1( rate_n15pa_jina)
 
             case(irn15pg_aux) ! n15(p, g)o16
-               call do1_of_2(rate_n15pg_nacre, rate_n15pg_jina)
+               call do1(rate_n15pg_jina)
 
             case(irna23pa_aux) ! na23(p, a)ne20 
                call do1(rate_na23pa_jina)
@@ -617,10 +617,10 @@
                call do1(rate_ne20ap_jina)
 
             case(irne20gp_aux) ! ne20(g, p)f19
-               call do1_of_2_reverse(rate_f19pg_nacre, rate_f19pg_jina)
+               call do1_reverse(rate_f19pg_jina)
 
             case(irne20gp_to_o16) ! ne20(g, p)f19(p, a)o16
-               call do1_of_2_reverse(rate_f19pg_nacre, rate_f19pg_jina)
+               call do1_reverse(rate_f19pg_jina)
 
             case(irne20pg_to_mg22) ! ne20(p, g)na21(p, g)mg22 
                call do1(rate_ne20pg_nacre)
@@ -677,13 +677,13 @@
                call do1_of_2_reverse(rate_f19pa_nacre, rate_f19pa_jina)
 
             case(iro16gp_aux)  ! o16(g, p)n15 
-               call do1_of_2_reverse(rate_n15pg_nacre, rate_n15pg_jina)
+               call do1_reverse(rate_n15pg_jina)
 
             case(iro16gp_to_c12)  ! o16(g, p)n15(p, a)c12
-               call do1_of_2_reverse(rate_n15pg_nacre, rate_n15pg_jina)
+               call do1_reverse(rate_n15pg_jina)
 
             case(iro17_to_o18) ! o17(p, g)f18(e+nu)o18
-               call do1_of_2(rate_o17pg_nacre, rate_o17pg_jina)
+               call do1(rate_o17pg_jina)
 
             case(irp31pa_aux) ! p31(p, a)si28 
                call do1_reverse(rate_si28ap_jina)
@@ -758,7 +758,7 @@
                call do1_of_2(rate_pep_fxt, rate_pep_jina)
 
             case(irn14ag_to_ne22) ! n14(a, g)f18(e+nu)o18(a, g)ne22
-               call do1_of_2(rate_n14ag_nacre, rate_n14ag_jina)
+               call do1(rate_n14ag_jina)
 
             case(irf19pa_aux)  ! f19(p, a)o16
                call do1_of_2(rate_f19pa_nacre, rate_f19pa_jina)
