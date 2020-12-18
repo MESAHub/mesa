@@ -90,12 +90,12 @@
          if (s% use_other_neu) then
             call s% other_neu( &
                s% id, k, s% T(k), log10_T, s% rho(k), log10_rho, &
-               s% abar(k), s% zbar(k), s% z2bar(k), &
+               s% abar(k), s% zbar(k), &
                log10_Tlim, flags, loss, sources, ierr)
          else
             call neu_get( &
                s% T(k), log10_T, s% rho(k), log10_rho, &
-               s% abar(k), s% zbar(k), s% z2bar(k), &
+               s% abar(k), s% zbar(k), &
                log10_Tlim, flags, loss, sources, ierr)
          end if
 
@@ -108,7 +108,6 @@
                write(*,1) 'log10_rho=', log10_rho
                write(*,1) 'abar', s% abar(k)
                write(*,1) 'zbar', s% zbar(k)
-               write(*,1) 'z2bar', s% z2bar(k)
                write(*,*)
                return
                stop
