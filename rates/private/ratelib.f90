@@ -886,40 +886,6 @@
     
 ! rc12ap, c12(a,p)n15
 
-
-      subroutine rate_n15pa_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 2.5d0) then
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               1.12d12, 15.253d0, 1d0/0.28d0, & ! a0, a1, a2
-               4.95d0, 143d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               1.01d8, 3.643d0, &  ! c0, c1
-               1.19d9, 7.406d0, & ! d0, d1
-               0d0, 0d0, 0d0, & ! e0, e1, e2
-               term)               
-         else
-            term     = 4.17d7 * pow((tf% T9),0.917d0) * exp(-3.292d0*(tf% T9i)) 
-         end if
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            7.06d-1, 57.622d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-      end subroutine rate_n15pa_nacre
-
       subroutine rate_n15pa_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
          real(dp), intent(in) :: temp
@@ -935,33 +901,33 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 
-      real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb, cc, dcc,  &
-                       dd, ddd, ee, dee, ff, dff, gg, dgg, hh, dhh, f1, df1, f2, df2,  &
-                       zz, q1, termE1, dtermE1, termE2, dtermE2, termRes, dtermRes
-      parameter        (q1 = 1.0d0/12.222016d0)
+         real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb, cc, dcc,  &
+                        dd, ddd, ee, dee, ff, dff, gg, dgg, hh, dhh, f1, df1, f2, df2,  &
+                        zz, q1, termE1, dtermE1, termE2, dtermE2, termRes, dtermRes
+         parameter        (q1 = 1.0d0/12.222016d0)
 
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-      aa   = 1.0d0 + 0.0489d0*(tf% t9i23)
-      bb   = (tf% t92)*aa*aa
-      cc   = exp(-32.120d0*(tf% t9i13) - (tf% t92)*q1)
-      dd   = 1.0d0 + 0.2654d0*(tf% t9i23)
-      ee   = (tf% t92)*dd*dd
-      ff   = exp(-32.120d0*(tf% t9i13))
-      gg   = 1.25d3 * (tf% t9i32) * exp(-27.499d0*(tf% t9i))
-      hh   = 1.43d-2 * (tf% t95) * exp(-15.541d0*(tf% t9i))
-      zz   = 1.0d0/bb
-      f1   = cc*zz
-      zz   = 1.0d0/ee
-      f2   = ff*zz
-      term    = 1.04d8*f1  + 1.76d8*f2 + gg + hh
-! 1.7 times cf88 value
-      term     = 1.7d0 * term
-      rev    = 5.13d10 * (tf% t932) * exp(-83.111d0*(tf% t9i))
-      fr    = term
-      rr     = rev * term
+            if (tf% t9 < lowT9_cutoff) then
+               fr = 0; rr = 0; return
+            end if 
+            
+         aa   = 1.0d0 + 0.0489d0*(tf% t9i23)
+         bb   = (tf% t92)*aa*aa
+         cc   = exp(-32.120d0*(tf% t9i13) - (tf% t92)*q1)
+         dd   = 1.0d0 + 0.2654d0*(tf% t9i23)
+         ee   = (tf% t92)*dd*dd
+         ff   = exp(-32.120d0*(tf% t9i13))
+         gg   = 1.25d3 * (tf% t9i32) * exp(-27.499d0*(tf% t9i))
+         hh   = 1.43d-2 * (tf% t95) * exp(-15.541d0*(tf% t9i))
+         zz   = 1.0d0/bb
+         f1   = cc*zz
+         zz   = 1.0d0/ee
+         f2   = ff*zz
+         term    = 1.04d8*f1  + 1.76d8*f2 + gg + hh
+   ! 1.7 times cf88 value
+         term     = 1.7d0 * term
+         rev    = 5.13d10 * (tf% t932) * exp(-83.111d0*(tf% t9i))
+         fr    = term
+         rr     = rev * term
       end subroutine rate_c12ag_fxt
 
 
@@ -1605,45 +1571,6 @@
    ! see rc13pg
         
 ! rn14ag, n14(a,g)f18          
-         
-
-      subroutine rate_n14ag_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, gs
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 2d0) then  
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               7.93d11, 36.035d0, 1d0/0.07d0, & ! a0, a1, a2
-               0d0, 0d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               1.85d-10, 2.750d0, &  ! c0, c1
-               2.62d0, 5.045d0, & ! d0, d1
-               2.93d3, 0.344d0, 10.561d0, & ! e0, e1, e2
-               gs)                  
-         else   
-            gs   = 1.52d2 * pow((tf% T9),1.567d0) * exp(-6.315d0*(tf% T9i)) 
-         end if   
-         bb   = 0.340d0 * exp(-26.885d0*(tf% T9i) - 0.012d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if      
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            5.420d10, 51.231d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-      end subroutine rate_n14ag_nacre
  
 ! n14(a,g)f18      
       subroutine rate_n14ag_jina(tf, temp, fr, rr)
@@ -1656,36 +1583,6 @@
 
 
 ! rn15pg, n15(p,g)o16           
-
-
-      subroutine rate_n15pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev
-         if (tf% T9 <= 3.5d0) then      
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               1.08d9, 15.254d0, 1d0/0.34d0, & ! a0, a1, a2
-               6.15d0, 16.4d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               9.23d3, 3.597d0, &  ! c0, c1
-               3.27d6, 11.024d0, & ! d0, d1
-               0d0, 0d0, 0d0, & ! e0, e1, e2
-            term)        
-         else
-            term     = 3.54d4 * pow((tf% T9),0.095d0) * exp(-2.306d0*(tf% T9i)) 
-         end if   
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            3.622d10, 140.73d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-      end subroutine rate_n15pg_nacre
-
 
       subroutine rate_n15pg_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
@@ -2080,61 +1977,6 @@
       
 ! ro17pa, o17(p,a)n14                    
 
-      subroutine rate_o17pa_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, cc, gs 
-         include 'formats.dek'
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 6d0) then      
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-            9.20d8, 16.715d0, 1d0/0.06d0, & ! a0, a1, a2
-            -80.31d0, 2211d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-            9.13d-4, 0.7667d0, &  ! c0, c1
-            9.68d0, 2.083d0, & ! d0, d1
-            1.85d6, 1.591d0, 4.848d0, & ! e0, e1, e2
-            gs)              
-            cc   = 8.13d6 * (tf% T9i32) * exp(-5.685d0*(tf% T9i)) 
-            gs = gs + cc
-         else
-            gs   = 8.73d6 * pow(tf% T9,0.950d0) * exp(-7.508d0*(tf% T9i)) 
-         end if   
-         bb   = 1.033d0 * exp(-10.034d0*(tf% T9i) - 0.165d0*(tf% T9))
-         term    = gs * (1 + bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            6.759d-1, 13.829d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-         
-         
-         return
-         
-         
-         call show_nacre_terms(tf,  &
-            9.20d8, 16.715d0, 1d0/0.06d0, & ! a0, a1, a2
-            -80.31d0, 2211d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-            9.13d-4, 0.7667d0, &  ! c0, c1
-            9.68d0, 2.083d0, & ! d0, d1
-            1.85d6, 1.591d0, 4.848d0)
-         write(*,1) 'gs', gs
-         write(*,1) 'bb', bb
-         write(*,1) 'term', term
-         write(*,*) 'rate_o17pa_nacre' 
-         
-      end subroutine rate_o17pa_nacre
-      
-      
       subroutine rate_o17pa_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
          real(dp), intent(in) :: temp
@@ -2145,45 +1987,6 @@
 
 
 ! ro17pg, o17(p,g)f18                           
-
-      subroutine rate_o17pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, gs
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 3d0) then  
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-            1.50d8, 16.710d0, 1d0/0.2d0, & ! a0, a1, a2
-            0d0, 0d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-            9.79d-6, 0.7659d0, &  ! c0, c1
-            4.15d0, 2.083d0, & ! d0, d1
-            7.74d4, 1.16d0, 6.342d0, & ! e0, e1, e2
-            gs)                     
-         else   
-            gs   = 1.74d3 * pow(tf% T9,0.700d0) * exp(-1.072d0*(tf% T9i)) 
-          end if   
-         bb   = 0.287d0 * exp(-10.011d0*(tf% T9i) - 0.062d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if      
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            3.663d10, 65.060d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-      end subroutine rate_o17pg_nacre
-      
       
       subroutine rate_o17pg_jina(tf, temp, fr, rr) ! jina reaclib   Chafa et al. (2007)
          type (T_Factors), pointer :: tf
@@ -2241,47 +2044,6 @@
 
 ! ro18pg, o18(p,g)f19                     
 
-      subroutine rate_o18pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, dd, gs
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 2d0) then   
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               4.59d8, 16.732d0, 1d0/0.15d0, & ! a0, a1, a2
-               -9.02d0, 506d0, -2400d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               9.91d-17, 0.232d0, &  ! c0, c1
-               3.30d-3, 1.033d0, & ! d0, d1
-               1.25d4, 0.458d0, 5.297d0, & ! e0, e1, e2
-               gs)        
-            dd   = 1.61d2 * (tf% T9i32) * exp(-1.665d0*(tf% T9i)) 
-            gs   = gs + dd
-         else   
-            gs   = 1.38d4 * pow(tf% T9,0.829d0) * exp(-5.919d0*(tf% T9i)) 
-          end if   
-         bb   = 0.475d0 * exp(-15.513d0*(tf% T9i) - 0.102d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if      
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            9.201d9, 92.769d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-      end subroutine rate_o18pg_nacre
-
-
       subroutine rate_o18pg_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
          real(dp), intent(in) :: temp
@@ -2292,48 +2054,6 @@
 
 
 ! ro18ag, o18(a,g)ne22                       
-
-      subroutine rate_o18ag_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) :: gs, term, term1, bb, cc, dd, rev    
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 6d0) then   
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               0d0, 0d0, 0d0, & ! a0, a1, a2
-               0d0, 0d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               1.95d-13, 2.0690d0, &  ! c0, c1
-               1.56d-2, 4.462d0, & ! d0, d1
-               3.44d5, -0.5d0, 22.103d0, & ! e0, e1, e2
-            gs)             
-            cc   = 1.01d0 * (tf% T9i32) * exp(-6.391d0*(tf% T9i)) 
-            dd   = 44.1d0 * (tf% T9i32) * exp(-7.389d0*(tf% T9i)) 
-            gs    = gs + cc + dd
-         else   
-            gs   = 3.31d5 * pow(tf% T9,-0.221d0) * exp(-24.990d0*(tf% T9i)) 
-         end if   
-         bb   = 1.411d0 * exp(-20.533d0*(tf% T9i) - 0.0382d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if      
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            5.847d10, 112.18d0, &  ! a0, a1
-            rev)     
-         fr    = term 
-         rr    = rev * term 
-      end subroutine rate_o18ag_nacre
-
 
       subroutine rate_o18ag_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
@@ -2403,45 +2123,6 @@
    ! see ro17pg                  
 
 ! rf19pg, f19(p,g)ne20                      
-
-      subroutine rate_f19pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, gs
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 1.5d0) then
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               6.37d7, 18.116d0, 0d0, & ! a0, a1, a2
-               0.775d0, 36.1d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               8.27d2, 3.752d0, &  ! c0, c1
-               0d0, 0d0, & ! d0, d1
-               1.28d6, -3.667d0, 9.120d0, & ! e0, e1, e2
-            gs)        
-         else   
-            gs   = 3.66d3 * pow(tf% T9,0.947d0) * exp(-2.245d0*(tf% T9i)) 
-         end if   
-         bb   = 0.990d0 * exp(-1.207d0*(tf% T9i) - 0.0886d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if      
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            3.696d10, 149.04d0, &  ! a0, a1
-            rev)      
-         fr    = term 
-         rr    = rev * term
-      end subroutine rate_f19pg_nacre
-
 
       subroutine rate_f19pg_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
@@ -2690,36 +2371,6 @@
     
 ! rne20ag, ne20(a,g)mg24                    
 
-      subroutine rate_ne20ag_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, gs
-         
-         include 'formats'
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 1d0) then         
-            gs   = 8.72d0 * pow(tf% T9,-0.532d0) * exp(-8.995d0*(tf% T9i)) 
-         else   
-            gs   = 3.74d2 * pow(tf% T9,2.229d0) * exp(-12.681d0*(tf% T9i)) 
-         end if      
-         bb   = 7.787d0 * exp(-19.821d0*(tf% T9i) - 0.114d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if      
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            6.010d10, 108.11d0, &  ! a0, a1
-            rev)     
-         fr    = term
-         rr    = rev * term
-         
-      end subroutine rate_ne20ag_nacre
-
       subroutine rate_ne20ag_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
          real(dp), intent(in) :: temp
@@ -2738,48 +2389,6 @@
    
 ! rne22pg, ne22(p,g)na23
 
-      subroutine rate_ne22pg_nacre(tf, temp, fr, rr)
-         type (T_Factors), pointer :: tf
-         real(dp), intent(in) :: temp
-         real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, bb, cc, dd, gs
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-         if (tf% T9 <= 12d0) then   
-            ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
-            !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
-            ! + c0 T9i32 exp(-c1/T9)
-            ! + d0 T9i32 exp(-d1/T9)
-            ! + e0 T9^e1 exp(-e2/T9)
-            call rnacre(tf,  &
-               0d0, 0d0, 0d0, & ! a0, a1, a2
-               0d0, 0d0, 0d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
-               1.11d-9, 0.422d0, &  ! c0, c1
-               6.83d-5, 0.810d0, & ! d0, d1
-               8.51d4, 0.725d0, 4.315d0, & ! e0, e1, e2
-            gs)        
-            cc   = 9.76d-3 * (tf% T9i32) * exp(-1.187d0*(tf% T9i)) 
-            dd   = 1.06d-1 * (tf% T9i32) * exp(-1.775d0*(tf% T9i)) 
-            gs   = gs + cc + dd
-         else   
-            gs   = 6.30d4 * pow(tf% T9, 0.816d0) * exp(-3.910d0*(tf% T9i)) 
-         end if  
-         bb   = 1.410d0 * exp(-14.651d0*(tf% T9i) - 0.020d0*(tf% T9))
-         if (bb > 1) then ! guard against rate going negative
-            bb  = 1
-         end if    
-         term    = gs * (1 - bb)
-         call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            4.668d9, 102.05d0, &  ! a0, a1
-            rev)      
-         fr    = term 
-         rr    = rev * term
-      end subroutine rate_ne22pg_nacre
-      
-      
       subroutine rate_ne22pg_jina(tf, temp, fr, rr)
          type (T_Factors), pointer :: tf
          real(dp), intent(in) :: temp
@@ -2790,60 +2399,6 @@
       
 ! ne22(n,g)ne23      
 
-      subroutine rate_ne22ag_fxt(tf, temp, fr, rr)
-
-      type (T_Factors), pointer :: tf
-      real(dp), intent(in) :: temp
-      real(dp), intent(out) :: fr, rr
-
-      real(dp) term, rev, aa, bb, cc, dd, res1,  &
-                       fT9a, fpT9a, gT9x,  &
-                       T9a, T9a13, T9a56,  &
-                       rdmass, res2, zz
-      parameter        (rdmass = 22.0d0*4.0d0/26.0d0,  &
-                        res2   = -11.604d0 * 22.0d0/26.0d0)
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-
-! ne22(a, g)mg26
-! kappeler 1994 apj 437, 396 
-
-      if ((tf% T9) .lt. 1.25d0) then
-       res1 = 1.54d-01*pow((tf% T9)*rdmass,-1.5d0)
-       aa    = 1.7d-36 * res1 * exp(res2*(tf% T9i)*0.097d0)
-       bb    = 1.5d-7 * res1 * exp(res2*(tf% T9i)*0.400d0)
-       cc    = 0.5d0 * res1 * 3.7d-2 * exp(res2*(tf% T9i)*0.633d0)
-       dd    = res1 * 3.6d+1 * exp(res2*(tf% T9i)*0.828d0)
-       term    = aa + bb + cc + dd
-! cf88
-      else
-       aa    = 1.0d0 + 0.0548d0*(tf% T9)
-       zz    = 1.0d0/aa
-       T9a   = (tf% T9) *zz
-       t9a13  = pow(t9a,oneth)
-       t9a56  = pow(t9a,fivsix)
-       aa     = 0.197d0/T9a
-       bb     = pow(aa,4.82d0)
-       fT9a   = exp(-bb)
-       aa     = T9a/0.249d0
-       bb     = pow(aa,2.31d0)
-       fpT9a  = exp(-bb)
-       aa     = 5.0d0*exp(-14.791d0*(tf% T9i))
-       gT9x   = 1.0d0 + aa
-       zz     = 1.0d0/gT9x
-       aa     = 4.16d19 * fpT9a*zz
-       bb     = 2.08d16 * fT9a*zz
-       term    = (aa+bb) * T9a56 * (tf% T9i32) * exp(-47.004d0/T9a13)
-      end if
-      fr    = term 
-      rev    = 6.15d+10 * (tf% T932) * exp(-123.151d0*(tf% T9i))
-      rr    = rev * term
-      end subroutine rate_ne22ag_fxt
-
-
       subroutine rate_ne22ag_jina(tf, temp, fr, rr)
       type (T_Factors), pointer :: tf
       real(dp), intent(in) :: temp
@@ -2852,62 +2407,6 @@
          call jina_reaclib_2_1(ihe4, ine22, img26, tf, fr, rr, 'rate_ne22ag_jina')
       end subroutine rate_ne22ag_jina
       
-      subroutine rate_na23pa_fxt(tf, temp, fr, rr)
-
-      type (T_Factors), pointer :: tf
-      real(dp), intent(in) :: temp
-      real(dp), intent(out) :: fr, rr
-
-      real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb, cc, dcc,  &
-                       dd, ddd, ee, dee, ff, dff, gg, dgg, hh, dhh, theta, q1, q2
-      parameter        (theta = 0.1d0,  &
-                        q1    = 1.0d0/0.0169d0,  &
-                        q2    = 1.0d0/0.017161d0)
-         
-         include 'formats.dek'
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-! na23(p, a)ne20
-! el eid & champagne 1995 
-      if ((tf% T9) <= 2.0d0) then
-       aa  = 1.26d+10 * (tf% T9i23) * exp(-20.758d0*(tf% T9i13) - (tf% T92)*q1)
-       bb  = 1.0d0  + 0.02d0*(tf% T913) - 13.8d0*(tf% T923) - 1.93d0*(tf% T9)  &
-             + 234.0d0*(tf% T943) + 83.6d0*(tf% T953)
-       cc   = aa * bb
-       dd   = 4.38d0*(tf% T9i32) * exp(-1.979d0*(tf% T9i))
-       ee   = 6.50d+06 * pow(tf% T9,-1.366d0) * exp(-6.490d0*(tf% T9i))
-       ff   = 1.19d+08 * pow(tf% T9,1.055d0) * exp(-11.411d0*(tf% T9i))
-       gg   = theta * 9.91d-14 * (tf% T9i32) * exp(-0.418d0*(tf% T9i))
-       term    = cc + dd + ee + ff + gg 
-
-! cf88 + one term from gorres, wiesher & rolfs 1989, apj 343, 365
-      else 
-       aa  = 8.56d+09 * (tf% T9i23) * exp(-20.766d0*(tf% T9i13) - (tf% T92)*q2)
-       bb  = 1.0d0  + 0.02d0*(tf% T913) + 8.21d0*(tf% T923) + 1.15d0*(tf% T9)  &
-             + 44.36d0*(tf% T943) + 15.84d0*(tf% T953)
-       cc   = aa * bb
-       dd   = 4.02d0*(tf% T9i32) * exp(-1.99d0*(tf% T9i))
-       ee   = 1.18d+04 * (tf% T9i54) * exp(-3.148d0*(tf% T9i))
-       ff   = 8.59d+05 * (tf% T943) * exp(-4.375d0*(tf% T9i))
-       gg   = theta * 3.06d-12 * (tf% T9i32) * exp(-0.447d0*(tf% T9i))
-       hh   = theta * 0.820d0*(tf% T9i32) * exp(-1.601d0*(tf% T9i))
-       term    = cc + dd + ee + ff + gg + hh
-      end if
-
-      fr    = term 
-      rev      = 1.25d0 * exp(-27.606d0*(tf% T9i))
-      rr    = rev * term
-      
-      if (.false. .and. tf% t9 > 1.3d-2 .and. tf% t9 < 1.8d-2) then
-         write(*,1) 'rate_na23pa_fxt', fr, rr, tf% t9
-      end if
-      
-      end subroutine rate_na23pa_fxt
-
-
       subroutine rate_na23pa_jina(tf, temp, fr, rr)
       type (T_Factors), pointer :: tf
       real(dp), intent(in) :: temp
@@ -2916,59 +2415,6 @@
          call jina_reaclib_2_2(ih1, ina23, ihe4, ine20, tf, fr, rr, 'rate_na23pa_jina')
       end subroutine rate_na23pa_jina
 
-
-      subroutine rate_na23pg_fxt(tf, temp, fr, rr)
-
-      type (T_Factors), pointer :: tf
-      real(dp), intent(in) :: temp
-      real(dp), intent(out) :: fr, rr
-
-      real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb, cc, dcc,  &
-                       dd, ddd, ee, dee, ff, dff, gg, dgg, hh, hhi, xx, dxx,  &
-                       theta, q1
-      parameter        (theta = 0.1d0,  &
-                        q1    = 1.0d0/0.088209d0)
-
-
-         if (tf% t9 < lowT9_cutoff) then
-            fr = 0; rr = 0; return
-         end if 
-          
-
-! na23(p, g)mg24
-
-! el eid & champagne 1995 
-      if ((tf% T9) <= 2.0d0) then
-       aa  = 2.47d+09 * (tf% T9i23) * exp(-20.758d0*(tf% T9i13))
-       bb  = 9.19d+01 * (tf% T9i32) * exp(-2.789d0*(tf% T9i))
-       cc  = 1.72d+04 * (tf% T9i32) * exp(-3.433d0*(tf% T9i))
-       dd  = 3.44d+04 * pow(tf% T9, 0.323d0) * exp(-5.219d0*(tf% T9i))
-       ee   = theta * 2.34d-04 * (tf% T9i32) * exp(-1.590d0*(tf% T9i))
-       term    = aa + bb + cc + dd + ee 
-
-! cf88 + gorres, wiesher & rolfs 1989, apj 343, 365
-      else 
- 
-       aa  = 2.93d+08 * (tf% T9i23) * exp(-20.766d0*(tf% T9i13) - (tf% T92)*q1)
-       bb  = 1.0d0 + 0.02d0*(tf% T913) + 1.61d0*(tf% T923) + 0.226d0*(tf% T9)  &
-             + 4.94d0*(tf% T943) + 1.76d0*(tf% T953)
-       xx  = aa * bb
-       cc   = 9.34d+01 * (tf% T9i32) * exp(-2.789d0*(tf% T9i))
-       dd   = 1.89d+04 * (tf% T9i32) * exp(-3.434d0*(tf% T9i))
-       ee   = 5.1d+04 * (tf% T915) * exp(-5.51d0*(tf% T9i))
-       ff   = theta * 0.820d0*(tf% T9i32) * exp(-1.601d0*(tf% T9i))
-       gg   = 1.5d0 * exp(-5.105d0*(tf% T9i))
-       hh   = 1.0d0 + gg
-       hhi  = 1.0d0/hh
-       term    = (xx + cc + dd + ee + ff) * hhi
-      end if
-
-      fr    = term 
-      rev      = 7.49d+10 * (tf% T932) * exp(-135.665d0*(tf% T9i))
-      rr    = rev * term
-      end subroutine rate_na23pg_fxt
-      
-      
       subroutine rate_na23pg_jina(tf, temp, fr, rr)
       type (T_Factors), pointer :: tf
       real(dp), intent(in) :: temp
