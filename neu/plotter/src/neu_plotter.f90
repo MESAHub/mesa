@@ -1,11 +1,7 @@
 program neu_plotter
 
-   use eos_def
-   use eos_lib, only: eosDT_get_new
    use neu_def
    use neu_lib
-   use chem_def
-   use chem_lib
    use const_lib
    use math_lib
    use num_lib, only : dfridr
