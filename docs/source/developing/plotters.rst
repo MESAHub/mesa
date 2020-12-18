@@ -17,3 +17,9 @@ kap plotter (kap/plotter)
 
 .. include:: ../../../kap/plotter/README.rst
 
+-------------------------
+neu plotter (neu/plotter)
+-------------------------
+
+.. include:: ../../../neu/plotter/README.rst
+
