@@ -36,11 +36,8 @@ Install Git LFS
 MESA uses Large File Storage (LFS), a git extension that allows us to
 easily store and version the large microphysics data files.
 
-Obtain and install Git LFS from `its website <https://git-lfs.github.com/>`_.  
+Obtain and install Git LFS from `its website <https://git-lfs.github.com/>`_.  You only need to do Step 1 in the Getting Started section.  Step 2 has already been done for MESA.
 
-.. note::
-
-   The Git LFS home page has additional information about configuring a repository.  This has already been done for MESA.  The only command you need to run is ``git lfs install``.
 
 Download the MESA repository
 ----------------------------
@@ -90,7 +87,7 @@ The line between what should be a feature branch / pull request and what's commi
 Making a commit
 ---------------
 
-When you want to add a new file or add changes to an existing file, do::
+When you want to add a new file or add changes to a file that is already tracked by git, do::
 
   git add <filename>
 
@@ -101,7 +98,7 @@ Once you have added your desired changes::
 
   git commit -m <message>
 
-If you want to commit all your changes to existing files, you can skip the git add and do::
+If you want to commit all your changes to files already tracked by git, you can skip the git add and do::
 
   git commit -a -m <message>
 
