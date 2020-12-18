@@ -101,9 +101,9 @@ LOAD_HDF5 = `mesasdk_hdf5_link`
 # step 7) do you want to use GYRE?
 
 # if you don't plan to use GYRE and want to skip building it, then
-#USE_GYRE = NO
+USE_GYRE = NO
 # if you want to have GYRE built along with the rest of mesa, then
-USE_GYRE = YES
+# USE_GYRE = YES
 
 
 # step 8) now do the mesa install
