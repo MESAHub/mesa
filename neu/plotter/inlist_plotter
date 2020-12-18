@@ -1,0 +1,66 @@
+&plotter
+
+  !### pick which neutrino loss mechanisms
+  ! if i_var = 0, sum all mechanisms
+  ! if i_var = 1 .. num_neu_types, so only that mechanism
+  i_var = 0
+
+
+  !### check derivatives?
+  ! if doing_partial is true, show the partial value
+  ! if doing_dfridr is true, do dfridr and show the error
+  ! if doing_d_dlnd, partials wrt lnd, else wrt lnT
+
+  doing_partial = .false.
+  doing_dfridr = .false.
+  doing_d_dlnd = .false.
+
+
+  !### pick which quantities to plot against
+  ! valid options are Rho, T, Zbar, Abar
+
+  xname = 'Rho'
+  yname = 'T'
+
+  ! xname = 'Zbar'
+  ! yname = 'Abar'
+
+  !### pick number of points
+  ! values for non-xname,yname variables are ignored
+
+  nT = 100
+  nRho = 100
+  nZbar = 100
+  nAbar = 150
+
+  !### pick plot limits
+
+  ! center/delta takes precedence over min/max
+  ! center is used when var is not xname/yname
+
+  Zbar_center = 6.0
+  Abar_center = 12.0
+
+  delta_Zbar = 0.1
+  delta_Abar = 0.1
+
+  ! Zbar_min = 6
+  ! Zbar_max = 8
+
+  ! Abar_min = 12
+  ! Abar_max = 16
+
+  ! logT_center = 8.5
+  ! logRho_center = 5.0d0
+
+  ! delta_logT = 1.5d0
+  ! delta_logRho = 5.0d0
+
+  logT_min = 7.0
+  logT_max = 10.0
+  
+  logRho_min = -11
+  logRho_max = 15
+
+
+/
