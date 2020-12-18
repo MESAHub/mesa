@@ -155,7 +155,7 @@
 
       
 
-      subroutine neutrinos(T, logT, Rho, logRho, abar, zbar, z2bar, log10_Tlim,  &
+      subroutine neutrinos(T, logT, Rho, logRho, abar, zbar, log10_Tlim,  &
                   flags, loss, sources, info)
       use utils_lib, only: is_bad
       
@@ -171,7 +171,6 @@
       real(dp), intent(in) :: logRho ! log10 of density
       real(dp), intent(in) :: abar ! mean atomic weight
       real(dp), intent(in) :: zbar ! mean charge
-      real(dp), intent(in) :: z2bar ! mean charge squared
       real(dp), intent(in) :: log10_Tlim ! start to cutoff at this temperature
       logical, intent(in) :: flags(num_neu_types) ! true if should include the type
       ! in most cases for stellar evolution, you may want to include brem, plas, pair, and phot

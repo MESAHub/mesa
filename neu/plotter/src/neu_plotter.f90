@@ -16,7 +16,7 @@ program neu_plotter
    integer :: ierr
    character (len=32) :: my_mesa_dir
 
-   real(dp), parameter :: log10_Tlim = 7.9d0 ! this is what the neu/test uses?
+   real(dp), parameter :: log10_Tlim = 7.5d0 ! this is what the neu/test uses?
    logical :: flags(num_neu_types) ! true if should include the type of loss
    real(dp) :: loss(num_neu_rvs) ! total from all sources
    real(dp) :: sources(num_neu_types, num_neu_rvs)
@@ -255,10 +255,9 @@ program neu_plotter
             kval = Abar
          end select
 
-         ! use zbar**2 as z2bar
          ! all flags on
          flags = .true.
-         call neu_get(T, log10T, Rho, log10Rho, abar, zbar, zbar*zbar, log10_Tlim, flags, &
+         call neu_get(T, log10T, Rho, log10Rho, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
 
          if (doing_partial) then
@@ -339,13 +338,13 @@ contains
          log_var = (lnd + delta_x)/ln10
          var = exp10(log_var)
          ! use zbar**2 as z2bar
-         call neu_get(T, log10T, var, log_var, abar, zbar, zbar*zbar, log10_Tlim, flags, &
+         call neu_get(T, log10T, var, log_var, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
       else
          log_var = (lnT + delta_x)/ln10
          var = exp10(log_var)
          ! use zbar**2 as z2bar
-         call neu_get(var, log_var, Rho, log10Rho, abar, zbar, zbar*zbar, log10_Tlim, flags, &
+         call neu_get(var, log_var, Rho, log10Rho, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
       end if
 
