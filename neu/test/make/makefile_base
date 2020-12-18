@@ -12,7 +12,7 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-TEST_SRCS = neu_support.f test_neu.f
+TEST_SRCS = neu_support.f90 test_neu.f90
 
 #################################################################
 #
@@ -32,7 +32,7 @@ LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_NUMERICS)
 
 TEST = $(TEST_DIR)/tester
 
-TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
+TEST_OBJS = $(patsubst %.f90,%.o,$(TEST_SRCS))
 
 all : $(TEST)
 
@@ -57,7 +57,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(FCfixed) $<
@@ -71,7 +71,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(TEST_SRC_DIR)
+vpath %.f90 $(TEST_SRC_DIR)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 
