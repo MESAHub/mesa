@@ -128,6 +128,24 @@ The first argument is the remote repository (``origin`` = GitHub).
 The second argument is the branch name.  If you want to get changes
 from a non-default branch (i.e., not ``main``), see :ref:`Branching`.
 
+If you have made changes to a branch and pull from a branch that
+others have independently modified, git must decide how to reconcile
+the divergent branches.  In order to avoid unnecessary merges (thereby
+giving a simpler, more linear commit history), it is suggested that
+you default to rebasing your changes.  Rebasing means that git will
+pull others' changes and then replay your changes on top of them.  If
+the changes conflict, you will have a chance to resolve the conflicts.
+To make this the default behavior, issue the following command while
+your current working directory is in the MESA git repository::
+
+  git config pull.rebase true
+
+You can also pass ``--rebase``, ``--no-rebase`` (combine changes with
+a merge commit), or ``--ff-only`` (refuse to pull if there are other
+changes) on the command line to override the configured default per
+invocation.
+
+
 If you want to get others' changes, but not immediately update your
 local repository to match that content::
 
