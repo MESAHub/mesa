@@ -371,3 +371,4 @@ echo
 
 # end scope and redirect output
 } 2>&1 | tee -a $BUILD_LOG
+ 
