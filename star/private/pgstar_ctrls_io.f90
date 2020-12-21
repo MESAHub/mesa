@@ -1121,6 +1121,38 @@
             TRho_title, &
             TRho_use_decorator, &
 
+            TmaxRho_win_flag, &
+            TmaxRho_file_flag, &
+            TmaxRho_file_interval, &
+            TmaxRho_step_max, &
+            TmaxRho_step_min, &
+            TmaxRho_file_dir, &
+            TmaxRho_file_prefix, &
+            show_TmaxRho_annotation1, &
+            show_TmaxRho_annotation2, &
+            show_TmaxRho_annotation3, &
+            show_TmaxRho_degeneracy_line, &
+            TmaxRho_fname, &
+            TmaxRho_logT_min, &
+            TmaxRho_logT_max, &
+            TmaxRho_logRho_min, &
+            TmaxRho_logRho_max, &
+            TmaxRho_logT_margin, &
+            TmaxRho_logRho_margin, &
+            TmaxRho_logRho_dlogRho_min, &
+            TmaxRho_logT_dlogT_min, &
+            TmaxRho_win_width, &
+            TmaxRho_win_aspect_ratio, &
+            TmaxRho_file_width, &
+            TmaxRho_file_aspect_ratio, &
+            TmaxRho_xleft, &
+            TmaxRho_xright, &
+            TmaxRho_ybot, &
+            TmaxRho_ytop, &
+            TmaxRho_txt_scale, &
+            TmaxRho_title, &
+            TmaxRho_use_decorator, &
+
             History_Track1_win_flag, &
             History_Track1_file_flag, &
             History_Track1_file_interval, &
@@ -4302,6 +4334,38 @@
          s% TRho_txt_scale = TRho_txt_scale
          s% TRho_title = TRho_title
          s% TRho_use_decorator = TRho_use_decorator
+
+         s% TmaxRho_win_flag = TmaxRho_win_flag
+         s% TmaxRho_file_flag = TmaxRho_file_flag
+         s% TmaxRho_file_interval = TmaxRho_file_interval
+         s% TmaxRho_step_max = TmaxRho_step_max
+         s% TmaxRho_step_min = TmaxRho_step_min
+         s% TmaxRho_file_dir = TmaxRho_file_dir
+         s% TmaxRho_file_prefix = TmaxRho_file_prefix
+         s% show_TmaxRho_annotation1 = show_TmaxRho_annotation1
+         s% show_TmaxRho_annotation2 = show_TmaxRho_annotation2
+         s% show_TmaxRho_annotation3 = show_TmaxRho_annotation3
+         s% show_TmaxRho_degeneracy_line = show_TmaxRho_degeneracy_line
+         s% TmaxRho_fname = TmaxRho_fname
+         s% TmaxRho_logT_min = TmaxRho_logT_min
+         s% TmaxRho_logT_max = TmaxRho_logT_max
+         s% TmaxRho_logRho_min = TmaxRho_logRho_min
+         s% TmaxRho_logRho_max = TmaxRho_logRho_max
+         s% TmaxRho_logT_margin = TmaxRho_logT_margin
+         s% TmaxRho_logRho_margin = TmaxRho_logRho_margin
+         s% TmaxRho_logRho_dlogRho_min = TmaxRho_logRho_dlogRho_min
+         s% TmaxRho_logT_dlogT_min = TmaxRho_logT_dlogT_min
+         s% TmaxRho_win_width = TmaxRho_win_width
+         s% TmaxRho_win_aspect_ratio = TmaxRho_win_aspect_ratio
+         s% TmaxRho_file_width = TmaxRho_file_width
+         s% TmaxRho_file_aspect_ratio = TmaxRho_file_aspect_ratio
+         s% TmaxRho_xleft = TmaxRho_xleft
+         s% TmaxRho_xright = TmaxRho_xright
+         s% TmaxRho_ybot = TmaxRho_ybot
+         s% TmaxRho_ytop = TmaxRho_ytop
+         s% TmaxRho_txt_scale = TmaxRho_txt_scale
+         s% TmaxRho_title = TmaxRho_title
+         s% TmaxRho_use_decorator = TmaxRho_use_decorator
 
          s% Dynamo_win_flag = Dynamo_win_flag
          s% Dynamo_file_flag = Dynamo_file_flag

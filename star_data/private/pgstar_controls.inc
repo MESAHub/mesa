@@ -522,6 +522,26 @@
 
 
 
+      logical :: TmaxRho_win_flag, TmaxRho_file_flag
+      logical :: do_TmaxRho_win, do_TmaxRho_file
+      logical :: show_TmaxRho_annotation1, show_TmaxRho_annotation2, show_TmaxRho_annotation3, &
+         show_TmaxRho_degeneracy_line
+      integer :: TmaxRho_file_interval, TmaxRho_step_max
+      integer :: id_TmaxRho_win, id_TmaxRho_file, TmaxRho_step_min
+      character (len=strlen) :: TmaxRho_file_dir, TmaxRho_file_prefix, TmaxRho_title, TmaxRho_fname
+      real :: &
+         TmaxRho_logT_min, TmaxRho_logT_max, TmaxRho_logT_margin, &
+         TmaxRho_logRho_min, TmaxRho_logRho_max, TmaxRho_logRho_margin, &
+         TmaxRho_logRho_dlogRho_min, TmaxRho_logT_dlogT_min, &
+         TmaxRho_win_width, TmaxRho_win_aspect_ratio, &
+         TmaxRho_xleft, TmaxRho_xright, &
+         TmaxRho_ybot, TmaxRho_ytop, TmaxRho_txt_scale, &
+         prev_TmaxRho_win_width, prev_TmaxRho_win_ratio, &
+         TmaxRho_file_width, TmaxRho_file_aspect_ratio, &
+         prev_TmaxRho_file_width, prev_TmaxRho_file_ratio
+
+
+
       logical :: logL_R_win_flag, logL_R_file_flag
       logical :: do_logL_R_win, do_logL_R_file
       logical :: show_logL_R_target_box, show_logL_photosphere_r
@@ -2128,5 +2148,6 @@
             summary_profile_use_decorator, &
             summary_history_use_decorator, &
             trho_use_decorator, &
+            tmaxrho_use_decorator, &
             trho_profile_use_decorator
 

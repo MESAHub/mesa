@@ -167,8 +167,8 @@
 
             if (ymax < 1e-29) ymax = 1e-29
             ymax = log10(dble(ymax))
-            if (ymax <= 10) then
-               ymax = 10.1
+            if (ymax <= 4) then
+               ymax = 4.3
                ymin = -4.1
             else
                ymax = ymax*1.1

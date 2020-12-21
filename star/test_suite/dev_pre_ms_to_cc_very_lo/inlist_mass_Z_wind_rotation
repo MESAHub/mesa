@@ -1,0 +1,17 @@
+! inlist_mass_Z_wind_rotation
+
+&star_job
+   new_Z = 1d-5 ! 0.02d0 ! 1d-3 ok, 1d-4 "explodes"
+   new_omega_div_omega_crit = 0.1d0
+/ ! end of star_job namelist
+
+&kap
+   Zbase = 1d-5 ! 0.02d0
+/ ! end of kap namelist
+
+&controls
+   !initial_mass = 9.2 ! standard test
+   initial_mass = 12 ! has also been tested      
+   initial_z = 1d-5 ! 0.02d0
+   Dutch_scaling_factor = 0.4
+/ ! end of controls namelist

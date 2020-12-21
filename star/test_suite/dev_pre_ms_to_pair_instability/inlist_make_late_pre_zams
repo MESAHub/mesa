@@ -1,0 +1,53 @@
+! inlist_make_late_pre_zams - until radiative core starts to develop
+
+&star_job
+
+      show_log_description_at_start = .false. 
+
+      create_pre_main_sequence_model = .true.
+      !pre_ms_relax_to_start_radiative_core = .true.
+      pre_ms_relax_to_start_radiative_core = .false. ! off for 150 M test
+      pre_ms_relax_num_steps = 100
+
+
+
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'late_pre_zams.mod'
+      required_termination_code_string = 'max_age'
+
+      !pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+      kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
+      kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
+      use_Type2_opacities = .true.
+/ ! end of kap namelist
+
+&controls
+      
+      ! limit max_model_number as part of test_suite
+      max_model_number = 10000
+      
+      max_age = 1d3
+      
+      varcontrol_target = 2d-3
+
+      num_trace_history_values = 4
+      trace_history_value_name(1) = 'conv_mx1_bot'
+      trace_history_value_name(2) = 'conv_mx1_top'         
+      trace_history_value_name(3) = 'rel_E_err'
+      trace_history_value_name(4) = 'log_rel_run_E_err'
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 5
+      terminal_interval = 10
+
+/ ! end of controls namelist
+

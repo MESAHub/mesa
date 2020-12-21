@@ -311,6 +311,7 @@
          use pgstar_dPg_dnu, only: do_dPg_dnu_Plot
          use pgstar_hr, only: do_HR_Plot
          use pgstar_trho, only: do_TRho_Plot
+         use pgstar_tmaxrho, only: do_TmaxRho_Plot
          use pgstar_dynamo, only: do_Dynamo_plot
          use pgstar_mixing_Ds, only: do_Mixing_plot
          use pgstar_trho_profile, only: do_TRho_Profile_plot
@@ -461,6 +462,10 @@
                call do_TRho_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
                   s% TRho_title, Grid_txt_scale_factor(i)*s% TRho_txt_scale, ierr)
+            case ('tmaxrho')
+               call do_TmaxRho_plot( &
+                  s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, &
+                  s% TmaxRho_title, Grid_txt_scale_factor(i)*s% TmaxRho_txt_scale, ierr)
             case ('mode_prop')
                call do_mode_propagation_plot( &
                   s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% Mode_Prop_title, &

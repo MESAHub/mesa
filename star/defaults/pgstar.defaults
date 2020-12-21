@@ -1447,6 +1447,75 @@
     TRho_file_width = -1
     TRho_file_aspect_ratio = -1
 
+! TmaxRho window
+! ===========
+
+      ! history of central temperature vs. density
+
+      ! ::
+
+    TmaxRho_win_flag = .false.
+
+      ! ::
+
+    TmaxRho_win_width = 6
+    TmaxRho_win_aspect_ratio = 0.75
+
+      ! ::
+
+    TmaxRho_xleft = 0.15
+    TmaxRho_xright = 0.85
+    TmaxRho_ybot = 0.15
+    TmaxRho_ytop = 0.85
+    TmaxRho_txt_scale = 1.0
+    TmaxRho_title = 'TmaxRho'
+
+      ! axis limits -- to override system default selections
+
+      ! ::
+
+    TmaxRho_logT_min = -101d0
+    TmaxRho_logT_max = -101d0
+    TmaxRho_logRho_min = -101d0
+    TmaxRho_logRho_max = -101d0
+
+      ! ::
+
+    TmaxRho_logT_margin = 0.1
+    TmaxRho_logRho_margin = 0.1
+    TmaxRho_logRho_dlogRho_min = -1
+    TmaxRho_logT_dlogT_min = -1
+
+      ! ::
+
+    TmaxRho_step_min = -1
+    TmaxRho_step_max = -1
+
+      ! ::
+
+    show_TmaxRho_degeneracy_line = .true.
+
+      ! ::
+
+    show_TmaxRho_annotation1 = .false.
+    show_TmaxRho_annotation2 = .false.
+    show_TmaxRho_annotation3 = .false.
+
+      ! ::
+
+    TmaxRho_fname = ''
+
+      ! file output
+
+      ! ::
+
+    TmaxRho_file_flag = .false.
+    TmaxRho_file_dir = 'png'
+    TmaxRho_file_prefix = 'trho_'
+    TmaxRho_file_interval = 5
+    TmaxRho_file_width = -1
+    TmaxRho_file_aspect_ratio = -1
+
 ! HR window
 ! =========
 

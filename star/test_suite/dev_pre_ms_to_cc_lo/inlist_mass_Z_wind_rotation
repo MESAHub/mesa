@@ -1,7 +1,7 @@
 ! inlist_mass_Z_wind_rotation
 
 &star_job
-   new_Z = 0.02d0
+   new_Z = 0.02d0 ! works for 1d-5
    new_omega_div_omega_crit = 0.1d0
 / ! end of star_job namelist
 
@@ -10,19 +10,8 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 11
-   
-      ! Note that as the mass is reduced, eventually the Ne20 burn begins off center,
-      ! and then the progress gets very slow.  it is hard to get the burning to the center.
-      ! Perhaps if you are willing to let it run and run and run, it will make it.
-      ! The location of the initial Ne20 ignition also depends on other parameters such as mixing.
-      ! So with some choices, a given mass will start at the center, but with other it will start
-      ! out at 0.5M.   I don't have a good story for this one.  Just beware.
-      
-      ! At the other end of the mass range, eventually the parameters that were ok for lower masses are
-      ! no longer appropriate and bad things happen.   What works for 15M is not sure to work for 50M.
-      ! Parameter settings that are good for 15M may be way off for 50M.  Think L/M during late burning.
-      
+   initial_mass = 12 ! standard test
+   !initial_mass = 30 ! has also been tested 
    initial_z = 0.02d0
    Dutch_scaling_factor = 0.4
 / ! end of controls namelist

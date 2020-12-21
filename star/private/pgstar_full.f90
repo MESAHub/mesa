@@ -130,6 +130,7 @@
          use pgstar_dPg_dnu, only: dPg_dnu_Plot
          use pgstar_hr, only: HR_Plot
          use pgstar_trho, only: TRho_Plot
+         use pgstar_tmaxrho, only: TmaxRho_Plot
          use pgstar_dynamo, only: Dynamo_plot
          use pgstar_mixing_Ds, only: Mixing_plot
          use pgstar_trho_profile, only: TRho_Profile_plot
@@ -591,6 +592,20 @@
          p% file_interval = s% TRho_file_interval
          p% file_width = s% TRho_file_width
          p% file_aspect_ratio = s% TRho_file_aspect_ratio
+
+         p => s% pgstar_win_file_ptr(i_TmaxRho)
+         p% plot => TmaxRho_Plot
+         p% id = i_TmaxRho
+         p% name = 'TmaxRho'
+         p% win_flag = s% TmaxRho_win_flag
+         p% win_width = s% TmaxRho_win_width
+         p% win_aspect_ratio = s% TmaxRho_win_aspect_ratio
+         p% file_flag = s% TmaxRho_file_flag
+         p% file_dir = s% TmaxRho_file_dir
+         p% file_prefix = s% TmaxRho_file_prefix
+         p% file_interval = s% TmaxRho_file_interval
+         p% file_width = s% TmaxRho_file_width
+         p% file_aspect_ratio = s% TmaxRho_file_aspect_ratio
 
          p => s% pgstar_win_file_ptr(i_Dynamo)
          p% plot => Dynamo_plot

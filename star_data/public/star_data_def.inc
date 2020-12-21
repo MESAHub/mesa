@@ -1,6 +1,5 @@
 
-      character(len=7) :: version_number ! mesa version from file $MESA_DIR/data/version_number
-         ! truncate to 7 characters for ease of use, instead of the full hash
+      character(len=40) :: version_number ! mesa version from file mesa/data/version_number
       
       
       integer, parameter :: star_def_version = 16
@@ -24,6 +23,21 @@
          ! repeat current step with smaller timestep
       integer, parameter :: terminate = 3
 
+      ! phases of evolution
+      integer, parameter :: phase_starting = 1
+      integer, parameter :: phase_PreMS = phase_starting + 1
+      integer, parameter :: phase_ZAMS = phase_PreMS + 1
+      integer, parameter :: phase_IAMS = phase_ZAMS + 1
+      integer, parameter :: phase_TAMS = phase_IAMS + 1
+      integer, parameter :: phase_He_Burn = phase_TAMS + 1
+      integer, parameter :: phase_ZACHeB = phase_He_Burn + 1
+      integer, parameter :: phase_TACHeB = phase_ZACHeB + 1
+      integer, parameter :: phase_TP_AGB = phase_TACHeB + 1
+      integer, parameter :: phase_C_Burn = phase_TP_AGB + 1
+      integer, parameter :: phase_Ne_Burn = phase_C_Burn + 1
+      integer, parameter :: phase_O_Burn = phase_Ne_Burn + 1
+      integer, parameter :: phase_Si_Burn = phase_O_Burn + 1
+      integer, parameter :: phase_WDCS = phase_Si_Burn + 1
       
       ! time_step limit identifiers
       integer, parameter :: Tlim_struc = 1
@@ -188,7 +202,20 @@
       integer, parameter :: t_v_surf_div_v_esc_limit = t_v_surf_div_v_kh_upper_limit + 1 
       integer, parameter :: t_v_surf_kms_limit = t_v_surf_div_v_esc_limit + 1 
       integer, parameter :: t_Lnuc_div_L_zams_limit = t_v_surf_kms_limit + 1 
-      integer, parameter :: t_xa_central_lower_limit = t_Lnuc_div_L_zams_limit + 1 
+      integer, parameter :: t_phase_PreMS = t_Lnuc_div_L_zams_limit + 1 
+      integer, parameter :: t_phase_ZAMS = t_phase_PreMS + 1 
+      integer, parameter :: t_phase_IAMS = t_phase_ZAMS + 1 
+      integer, parameter :: t_phase_TAMS = t_phase_IAMS + 1 
+      integer, parameter :: t_phase_He_Burn = t_phase_TAMS + 1 
+      integer, parameter :: t_phase_ZACHeB = t_phase_He_Burn + 1 
+      integer, parameter :: t_phase_TACHeB = t_phase_ZACHeB + 1 
+      integer, parameter :: t_phase_TP_AGB = t_phase_TACHeB + 1 
+      integer, parameter :: t_phase_C_Burn = t_phase_TP_AGB + 1 
+      integer, parameter :: t_phase_Ne_Burn = t_phase_C_Burn + 1 
+      integer, parameter :: t_phase_O_Burn = t_phase_Ne_Burn + 1 
+      integer, parameter :: t_phase_Si_Burn = t_phase_O_Burn + 1 
+      integer, parameter :: t_phase_WDCS = t_phase_Si_Burn + 1       
+      integer, parameter :: t_xa_central_lower_limit = t_phase_WDCS + 1 
       integer, parameter :: t_xa_central_upper_limit = t_xa_central_lower_limit + 1 
       integer, parameter :: t_xa_surface_lower_limit = t_xa_central_upper_limit + 1 
       integer, parameter :: t_xa_surface_upper_limit = t_xa_surface_lower_limit + 1 
@@ -379,6 +406,7 @@
       integer, parameter :: i_logL_Teff = i_R_Teff + 1
       integer, parameter :: i_HR = i_logL_Teff + 1
       integer, parameter :: i_TRho = i_HR + 1
+      integer, parameter :: i_TmaxRho = i_TRho + 1
       integer, parameter :: i_Dynamo = i_TRho + 1
       integer, parameter :: i_Mixing = i_Dynamo + 1
       integer, parameter :: i_rti = i_Mixing + 1

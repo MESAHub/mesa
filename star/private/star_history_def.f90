@@ -56,8 +56,10 @@
       integer, parameter :: h_log_star_age_sec = h_star_age_day + 1
       integer, parameter :: h_time_step_sec = h_log_star_age_sec + 1
       integer, parameter :: h_log_dt_sec = h_time_step_sec + 1
+      integer, parameter :: h_time_step_days = h_log_dt_sec + 1
+      integer, parameter :: h_log_dt_days = h_time_step_days + 1
 
-      integer, parameter :: h_m_center_gm = h_log_dt_sec + 1
+      integer, parameter :: h_m_center_gm = h_log_dt_days + 1
       integer, parameter :: h_r_center_km = h_m_center_gm + 1
       integer, parameter :: h_r_center_cm = h_r_center_km + 1
       integer, parameter :: h_m_center = h_r_center_cm + 1
@@ -980,6 +982,8 @@
          history_column_name(h_surface_accel_div_grav) = 'surface_accel_div_grav'
          history_column_name(h_log_dt) = 'log_dt'
          history_column_name(h_log_dt_sec) = 'log_dt_sec'
+         history_column_name(h_time_step_days) = 'time_step_days'
+         history_column_name(h_log_dt_days) = 'log_dt_days'
          
 
          history_column_name(h_power_h_burn) = 'power_h_burn'

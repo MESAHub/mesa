@@ -1629,8 +1629,10 @@
          check_dlgT_cntr_change = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         !write(*,2) 's% lnT(s% nz)', s% model_number, s% lnT(s% nz)
-         !write(*,2) 's% lnT_start(s% nz)', s% model_number, s% lnT_start(s% nz)
+         if (s% delta_lgT_cntr_limit_only_after_near_zams) then
+            if (s% X(s% nz) > 0.1d0 .and. &
+                s% L_nuc_burn_total/s% L_phot < s% Lnuc_div_L_zams_limit) return
+         end if
          change = (s% lnT(s% nz) - s% lnT_start(s% nz))/ln10
          check_dlgT_cntr_change = check_change(s, change, &
             s% delta_lgT_cntr_limit, s% delta_lgT_cntr_hard_limit, &

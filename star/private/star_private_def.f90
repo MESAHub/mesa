@@ -32,17 +32,6 @@
       implicit none
 
 
-      ! phases of evolution for logs
-      integer, parameter :: phase_starting = 0
-      integer, parameter :: phase_early_main_seq = 1
-      integer, parameter :: phase_mid_main_seq = 2
-      integer, parameter :: phase_wait_for_he = 3
-      integer, parameter :: phase_he_ignition_over = 4
-      integer, parameter :: phase_he_igniting = 5
-      integer, parameter :: phase_helium_burning = 6
-      integer, parameter :: phase_carbon_burning = 7
-
-
       real(dp), parameter :: del_cntr_rho = 1d0
       real(dp), parameter :: min_cntr_rho = 3d0
       real(dp), parameter :: no_he_ignition_limit = 0.75d0
@@ -177,6 +166,19 @@
          termination_code_str(t_v_surf_div_v_esc_limit) = 'v_surf_div_v_esc_limit'
          termination_code_str(t_v_surf_kms_limit) = 'v_surf_kms_limit'
          termination_code_str(t_Lnuc_div_L_zams_limit) = 'Lnuc_div_L_zams_limit'
+         termination_code_str(t_phase_PreMS) = 'phase_PreMS'
+         termination_code_str(t_phase_ZAMS) = 'phase_ZAMS'
+         termination_code_str(t_phase_IAMS) = 'phase_IAMS'
+         termination_code_str(t_phase_TAMS) = 'phase_TAMS'
+         termination_code_str(t_phase_He_Burn) = 'phase_He_Burn'
+         termination_code_str(t_phase_ZACHeB) = 'phase_ZACHeB' 
+         termination_code_str(t_phase_TACHeB) = 'phase_TACHeB'
+         termination_code_str(t_phase_TP_AGB) = 'phase_TP_AGB'
+         termination_code_str(t_phase_C_Burn) = 'phase_C_Burn'
+         termination_code_str(t_phase_Ne_Burn) = 'phase_Ne_Burn'
+         termination_code_str(t_phase_O_Burn) = 'phase_O_Burn'
+         termination_code_str(t_phase_Si_Burn) = 'phase_Si_Burn'
+         termination_code_str(t_phase_WDCS) = 'phase_WDCS'
          termination_code_str(t_xa_central_lower_limit) = 'xa_central_lower_limit'
          termination_code_str(t_xa_central_upper_limit) = 'xa_central_upper_limit'
          termination_code_str(t_xa_surface_lower_limit) = 'xa_surface_lower_limit'

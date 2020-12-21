@@ -183,9 +183,21 @@
 
          call set_surf_avg_rotation_info(s)
 
-         s% time_step = s% dt/secyer         ! timestep in years
+         ! s% time is in seconds
          s% star_age = s% time/secyer
-         if ( s% model_number <= 0 ) s% star_age = 0d0
+         s% time_years = s% time/secyer
+         s% time_days = s% time/dble(60*60*24)
+         if ( s% model_number <= 0 ) then
+            s% star_age = 0d0
+            s% time_days = 0d0
+            s% time_years = 0d0
+         end if
+         
+         ! s% dt is in seconds
+         s% time_step = s% dt/secyer         ! timestep in years
+         s% dt_years = s% dt/secyer
+         s% dt_days = s% dt/dble(60*60*24)
+         
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
          s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
@@ -363,6 +375,7 @@
 
          s% fe_core_infall = 0
          s% non_fe_core_infall = 0
+         s% non_fe_core_rebound = 0
          if (s% u_flag) then
             k_min = minloc(s% u(1:nz),dim=1)
             if (k_min > 0) then
@@ -385,6 +398,8 @@
                   if (s% m(k) < Msun*s% fe_core_mass) exit
                   if (-s% u(k) > s% non_fe_core_infall) &
                      s% non_fe_core_infall = -s% u(k)
+                  if (s% u(k) > s% non_fe_core_rebound) &
+                     s% non_fe_core_rebound = -s% u(k)
                end do
             end if
          else if (s% v_flag) then
@@ -409,6 +424,8 @@
                   if (s% m(k) < Msun*s% fe_core_mass) exit
                   if (-s% v(k) > s% non_fe_core_infall) &
                      s% non_fe_core_infall = -s% v(k)
+                  if (s% v(k) > s% non_fe_core_rebound) &
+                     s% non_fe_core_rebound = -s% v(k)
                end do
             end if
          end if
@@ -772,46 +789,6 @@
 
 
       end subroutine do_report
-
-
-      real(dp) function surface_avg_x(s,j)
-         use chem_def, only: chem_isos
-         type (star_info), pointer :: s
-         integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq
-         integer :: k
-         include 'formats'
-         sum_x = 0
-         sum_dq = 0
-         do k = 1, s% nz
-            sum_x = sum_x + s% xa(j,k)*s% dq(k)
-            sum_dq = sum_dq + s% dq(k)
-            if (sum_dq >= s% surface_avg_abundance_dq) exit
-         end do
-         surface_avg_x = sum_x/sum_dq
-      end function surface_avg_x
-
-
-      real(dp) function center_avg_x(s,j)
-         type (star_info), pointer :: s
-         integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq, dx, dq
-         integer :: k
-         sum_x = 0
-         sum_dq = 0
-         do k = s% nz, 1, -1
-            dq = s% dq(k)
-            dx = s% xa(j,k)*dq
-            if (sum_dq+dq >= s% center_avg_value_dq) then
-               sum_x = sum_x+ dx*(s% center_avg_value_dq - sum_dq)/dq
-               sum_dq = s% center_avg_value_dq
-               exit
-            end if
-            sum_x = sum_x + dx
-            sum_dq = sum_dq + dq
-         end do
-         center_avg_x = sum_x/sum_dq
-      end function center_avg_x
 
 
       subroutine get_burn_zone_info(s, ierr)

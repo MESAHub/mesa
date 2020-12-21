@@ -348,16 +348,6 @@
 
             call pgsch(txt_scale*s% Mixing_legend_txt_scale_factor)
             
-            if (s% D_smooth_flag .and. .not. s% conv_vel_flag) then         
-               do k=grid_min, grid_max
-                  yvec(k) = safe_log10(s% D_smooth(k))
-               end do
-               call pgsci(clr_D_smooth)
-               call pgslw(lw)
-               call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
-               call pgslw(lw_sav)     
-            end if          
-            
             if (rotation) then
             
                if (s% D_omega_flag) then         
@@ -495,6 +485,20 @@
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), y_min_mix(grid_min:grid_max))
             call pgslw(lw_sav)
+            
+            if (s% D_smooth_flag .and. .not. s% conv_vel_flag) then         
+               do k=grid_min, grid_max
+                  yvec(k) = safe_log10(s% D_smooth(k))
+               end do
+               call pgsci(clr_D_smooth)
+               call pgslw(lw)
+               call pgsls(Line_Type_Dot) ! so can see what's under
+               call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
+               call pgsls(Line_Type_Solid)
+               call pgslw(lw_sav)     
+            end if          
+            
+            ! now do legend lines
 
             call pgsave
             call pgsvp(legend_xmin, legend_xmax, legend_ymin, legend_ymax)

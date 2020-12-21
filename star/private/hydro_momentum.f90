@@ -417,10 +417,13 @@
             accel_18%d1Array(i_v_00) = d_accel_dv
 
             s% dvdt_drag(k) = 0
-            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
-               v_00 = wrap_v_00(s,k)
-               drag_18 = -s% drag_coefficient*v_00/s% dt
-               s% dvdt_drag(k) = drag_18%val
+            if (s% drag_coefficient > 0) then
+                if (s% q(k) > s% min_q_for_drag .or. &
+                   (s% turn_on_drag_in_H_envelope .and. k <= s% start_H_envelope_base_k)) then
+                  v_00 = wrap_v_00(s,k)
+                  drag_18 = -s% drag_coefficient*v_00/s% dt
+                  s% dvdt_drag(k) = drag_18%val
+               end if
             end if
          
          end if ! v_flag
