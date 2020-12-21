@@ -425,7 +425,7 @@
                   if (-s% v(k) > s% non_fe_core_infall) &
                      s% non_fe_core_infall = -s% v(k)
                   if (s% v(k) > s% non_fe_core_rebound) &
-                     s% non_fe_core_rebound = -s% v(k)
+                     s% non_fe_core_rebound = s% v(k)
                end do
             end if
          end if

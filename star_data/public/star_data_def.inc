@@ -192,7 +192,8 @@
       integer, parameter :: t_center_Ye_lower_limit = t_center_R_lower_limit + 1 
       integer, parameter :: t_fe_core_infall_limit = t_center_Ye_lower_limit + 1 
       integer, parameter :: t_non_fe_core_infall_limit = t_fe_core_infall_limit + 1 
-      integer, parameter :: t_v_div_csound_max_limit = t_non_fe_core_infall_limit + 1 
+      integer, parameter :: t_non_fe_core_rebound_limit = t_non_fe_core_infall_limit + 1 
+      integer, parameter :: t_v_div_csound_max_limit = t_non_fe_core_rebound_limit + 1 
       integer, parameter :: t_v_div_csound_surf_limit = t_v_div_csound_max_limit + 1 
       integer, parameter :: t_Pgas_div_P_limit = t_v_div_csound_surf_limit + 1 
       integer, parameter :: t_Lnuc_div_L_lower_limit = t_Pgas_div_P_limit + 1 

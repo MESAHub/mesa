@@ -1,0 +1,32 @@
+&model
+/
+
+&mode
+   l = 0
+/
+
+&osc
+   nonadiabatic = .TRUE.
+/
+
+&rot
+/
+
+&num
+   diff_scheme = 'MAGNUS_GL2' 
+/
+
+&scan
+   grid_type = 'LINEAR'
+   freq_min = 0.01
+   freq_max = 10.0
+   freq_min_units = 'ACOUSTIC_DELTA'
+   freq_max_units = 'ACOUSTIC_DELTA'
+   n_freq = 50
+/
+
+&grid
+   w_osc = 10
+   w_exp = 2
+   w_ctr = 10
+/

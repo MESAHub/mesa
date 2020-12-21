@@ -745,7 +745,7 @@
             write(*,1) 'nearing non_fe_core_infall limit', &
                s% non_fe_core_infall, s% non_fe_core_infall_limit
          
-         if (s% non_fe_core_rebound > s% non_fe_core_rebound_limit) &
+         if (s% non_fe_core_rebound > 0.99d0*s% non_fe_core_rebound_limit) &
             write(*,1) 'nearing non_fe_core_rebound limit', &
                s% non_fe_core_rebound, s% non_fe_core_rebound_limit
          
@@ -1100,6 +1100,10 @@
          else if (s% non_fe_core_infall > s% non_fe_core_infall_limit) then 
             call compare_to_target('non_fe_core_infall > non_fe_core_infall_limit', &
                s% non_fe_core_infall, s% non_fe_core_infall_limit, t_non_fe_core_infall_limit)
+
+         else if (s% non_fe_core_rebound > s% non_fe_core_rebound_limit) then 
+            call compare_to_target('non_fe_core_rebound > non_fe_core_rebound_limit', &
+               s% non_fe_core_rebound, s% non_fe_core_rebound_limit, t_non_fe_core_rebound_limit)
 
          else if (v_surf/csound_surf > s% v_div_csound_surf_limit) then 
             call compare_to_target('v_surf/csound_surf > v_div_csound_surf_limit', &

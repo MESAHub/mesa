@@ -156,6 +156,7 @@
          termination_code_str(t_center_Ye_lower_limit) = 'center_Ye_lower_limit'
          termination_code_str(t_fe_core_infall_limit) = 'fe_core_infall_limit'
          termination_code_str(t_non_fe_core_infall_limit) = 'non_fe_core_infall_limit'
+         termination_code_str(t_non_fe_core_rebound_limit) = 'non_fe_core_rebound_limit'
          termination_code_str(t_v_div_csound_max_limit) = 'v_div_csound_max_limit'
          termination_code_str(t_v_div_csound_surf_limit) = 'v_div_csound_surf_limit'
          termination_code_str(t_Pgas_div_P_limit) = 'Pgas_div_P_limit'
