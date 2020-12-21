@@ -40,7 +40,7 @@
 
       subroutine get_gval_info( &
             s, delta_gval_max, gvals1, nz, &
-            eps_h, eps_he, eps_z, num_gvals, gval_names, &
+            num_gvals, gval_names, &
             gval_is_xa_function, gval_is_logT_function, ierr)
          use chem_def
          use num_lib, only: find0
@@ -48,7 +48,7 @@
          use alloc
          use mesh_functions, only: set_mesh_function_data, max_allowed_gvals
          type (star_info), pointer :: s
-         real(dp), dimension(:), pointer :: eps_h, eps_he, eps_z, delta_gval_max
+         real(dp), dimension(:), pointer :: delta_gval_max
          real(dp), dimension(:), pointer :: gvals1
          integer, intent(in) :: nz, num_gvals
          integer, intent(out) :: ierr
@@ -126,7 +126,7 @@
                do k=1,nz
                   s% mesh_delta_coeff_factor(k) = delta_gval_max(k)
                end do
-               call s% other_mesh_delta_coeff_factor(s% id, eps_h, eps_he, eps_z, ierr)
+               call s% other_mesh_delta_coeff_factor(s% id, ierr)
                if (ierr /= 0) then
                   write(*,*) 'other_mesh_delta_coeff_factor returned ierr', ierr
                   return

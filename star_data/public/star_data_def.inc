@@ -833,10 +833,9 @@
          end subroutine other_overshooting_scheme_interface
       
       
-         subroutine other_mesh_delta_coeff_factor_interface(id, eps_h, eps_he, eps_z, ierr)
+         subroutine other_mesh_delta_coeff_factor_interface(id, ierr)
             use const_def, only: dp
             integer, intent(in) :: id
-            real(dp), intent(in), dimension(:) :: eps_h, eps_he, eps_z
             integer, intent(out) :: ierr
          end subroutine other_mesh_delta_coeff_factor_interface
       
