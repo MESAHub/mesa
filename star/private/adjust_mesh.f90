@@ -64,7 +64,7 @@
             mesh_max_allowed_ratio, tmp, J_tot1, J_tot2, center_logT, alfa, beta, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          real(dp), pointer, dimension(:) :: &
-            delta_gval_max, eps_h, eps_he, eps_z, specific_PE, specific_KE, &
+            delta_gval_max, specific_PE, specific_KE, &
             xq_old, xq_new, dq_new
          real(dp), pointer :: gvals(:,:), gvals1(:)
          integer, pointer :: which_gval(:) , comes_from(:), cell_type(:)
@@ -143,10 +143,6 @@
          end if
 
          do k=1,nz
-            eps_h(k) = s% eps_nuc_categories(ipp,k) + &
-                       s% eps_nuc_categories(icno,k)
-            eps_he(k) = s% eps_nuc_categories(i3alf,k)
-            eps_z(k) = s% eps_nuc(k) - (eps_h(k) + eps_he(k))
             specific_PE(k) = cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
             specific_KE(k) = cell_specific_KE(s,k,d_dv00,d_dvp1)
          end do
@@ -258,7 +254,7 @@
 
          call get_gval_info( &
                s, delta_gval_max, gvals1, nz, &
-               eps_h, eps_he, eps_z, num_gvals, gval_names, &
+               num_gvals, gval_names, &
                gval_is_xa_function, gval_is_logT_function, ierr)
          if (ierr /= 0) then
             s% termination_code = t_adjust_mesh_failed
@@ -435,7 +431,7 @@
             call write_plot_data_for_mesh_plan( &
                s, nz_old, nz, prv% xh, prv% xa, &
                prv% lnd, prv% lnT, prv% lnPgas, prv% lnE, prv% eturb, &
-               eps_h, eps_he, eps_z, prv% D_mix, prv% mixing_type, &
+               prv% D_mix, prv% mixing_type, &
                prv% dq, prv% q, xq_old, prv% q, &
                s% species, s% i_lnR, s% i_lum, s% i_v, s% i_u, comes_from, &
                num_gvals, gval_names, gvals, delta_gval_max, &
@@ -552,7 +548,7 @@
          if (dumping) then
             call write_plot_data_for_new_mesh( &
                s, nz, nz_old, prv% xh, prv% xa, &
-               eps_h, eps_he, eps_z, prv% D_mix, prv% q, &
+               prv% D_mix, prv% q, &
                s% xh, s% xa, s% dq, s% q, xq_new, s% species, s% net_iso, &
                num_gvals, gval_names, gvals, &
                which_gval, comes_from, cell_type, delta_gval_max, &
@@ -654,7 +650,7 @@
 
          subroutine nullify_work_ptrs
             nullify( &
-               eps_h, eps_he, which_gval, xq_old, xq_new, dq_new, comes_from, &
+               which_gval, xq_old, xq_new, dq_new, comes_from, &
                delta_gval_max, do_not_split, gvals, cell_type)
          end subroutine nullify_work_ptrs
 
@@ -683,15 +679,6 @@
             integer, intent(out) :: ierr
             logical, parameter :: crit = .false.
             ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               eps_h, nz, nz_alloc_extra, 'adjust_mesh', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               eps_he, nz, nz_alloc_extra, 'adjust_mesh', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               eps_z, nz, nz_alloc_extra, 'adjust_mesh', ierr)
-            if (ierr /= 0) return
             call work_array(s, alloc_flag, crit, &
                specific_PE, nz, nz_alloc_extra, 'adjust_mesh', ierr)
             if (ierr /= 0) return

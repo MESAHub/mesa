@@ -155,17 +155,17 @@
       end subroutine read_inlist_xtra_coeff_os
 
 
-      subroutine other_mesh_delta_coeff_factor(id, eps_h, eps_he, eps_z, ierr)
+      subroutine other_mesh_delta_coeff_factor(id, ierr)
          use const_def
          use math_lib
          use chem_def
          integer, intent(in) :: id
-         real(dp), intent(in), dimension(:) :: eps_h, eps_he, eps_z
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: he_cntr, full_off, full_on, alfa_os
          integer :: k, kk, nz, max_eps_loc
-         real(dp) :: xtra_coef, xtra_dist, coef, Hp, r_extra, max_eps, eps
+         real(dp) :: xtra_coef, xtra_dist, coef, Hp, r_extra, max_eps
+         real(dp) :: eps, eps_h, eps_he, eps_z
          logical :: in_convective_region
          logical, parameter :: dbg = .false.
          
@@ -204,12 +204,23 @@
          k = 2
          max_eps = -1d99
          max_eps_loc = -1
+
+         ! these variables store the component reaction rates at
+         ! max_eps_loc
+         eps_h = max_eps
+         eps_he = max_eps
+         eps_z = max_eps
+
          do while (k <= nz)
-            eps = eps_h(k) + eps_he(k) + eps_z(k)
+            eps = s% eps_nuc(k)
             if (in_convective_region) then
                if (s% mixing_type(k) == convective_mixing) then
                   if (eps > max_eps) then
                      max_eps = eps
+                     eps_h = s% eps_nuc_categories(ipp,k) + &
+                             s% eps_nuc_categories(icno,k)
+                     eps_he = s% eps_nuc_categories(i3alf,k)
+                     eps_z = eps - (eps_h + eps_he)
                      max_eps_loc = k
                   end if
                else
@@ -217,10 +228,10 @@
                   if (max_eps < 1d0) then
                      xtra_coef = xtra_coef_os_below_nonburn
                      xtra_dist = xtra_dist_os_below_nonburn
-                  else if (eps_h(max_eps_loc) > 0.5d0*max_eps) then
+                  else if (eps_h > 0.5d0*max_eps) then
                      xtra_coef = xtra_coef_os_below_burn_h
                      xtra_dist = xtra_dist_os_below_burn_h
-                  else if (eps_he(max_eps_loc) > 0.5d0*max_eps) then
+                  else if (eps_he > 0.5d0*max_eps) then
                      xtra_coef = xtra_coef_os_below_burn_he
                      xtra_dist = xtra_dist_os_below_burn_he
                   else
@@ -273,12 +284,21 @@
          k = nz-1
          max_eps = -1d99
          max_eps_loc = -1
+
+         eps_h = max_eps
+         eps_he = max_eps
+         eps_z = max_eps
+
          do while (k >= 1)
-            eps = eps_h(k) + eps_he(k) + eps_z(k)
+            eps = s% eps_nuc(k)
             if (in_convective_region) then
                if (s% mixing_type(k) == convective_mixing) then
                   if (eps > max_eps) then
                      max_eps = eps
+                     eps_h = s% eps_nuc_categories(ipp,k) + &
+                             s% eps_nuc_categories(icno,k)
+                     eps_he = s% eps_nuc_categories(i3alf,k)
+                     eps_z = eps - (eps_h + eps_he)
                      max_eps_loc = k
                   end if
                else
@@ -286,10 +306,10 @@
                   if (max_eps < 1d0) then
                      xtra_coef = xtra_coef_os_above_nonburn
                      xtra_dist = xtra_dist_os_above_nonburn
-                  else if (eps_h(max_eps_loc) > 0.5d0*max_eps) then
+                  else if (eps_h > 0.5d0*max_eps) then
                      xtra_coef = xtra_coef_os_above_burn_h
                      xtra_dist = xtra_dist_os_above_burn_h
-                  else if (eps_he(max_eps_loc) > 0.5d0*max_eps) then
+                  else if (eps_he > 0.5d0*max_eps) then
                      xtra_coef = xtra_coef_os_above_burn_he
                      xtra_dist = xtra_dist_os_above_burn_he
                   else

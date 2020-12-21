@@ -36,7 +36,7 @@
 
       subroutine write_plot_data_for_new_mesh( &
             s, nz, nz_old, xh_old, xa_old, &
-            eps_h, eps_he, eps_z, D_mix, q_old, &
+            D_mix, q_old, &
             xh, xa, dq, q, xq, species, net_iso, &
             num_gvals, gval_names, gvals, &
             which_gval, comes_from, cell_type, &
@@ -52,7 +52,7 @@
          integer, dimension(:), pointer :: net_iso
          real(dp), intent(in) :: xmstar
          real(dp), dimension(:), pointer :: &
-            q_old, dq, q, xq, eps_h, eps_he, eps_z, D_mix
+            q_old, dq, q, xq, D_mix
          real(dp), dimension(:), pointer :: delta_gval_max
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
@@ -67,7 +67,7 @@
          real(dp) :: v, u, ratio, lum, min_ratio, mstar, lgRho, lgT
          real(dp), pointer :: v_old(:), v_new(:,:), work(:)
          integer :: k, nwork, num_vals, iounit, k_min_ratio, d_comes_from_dk, &
-            jeps_h, jeps_he, jeps_z, jD_mix, jgval_factor, jgval_max1, &
+            jD_mix, jgval_factor, jgval_max1, &
             jlogR, jFL, jv, ju, j, &
             i_lum, i_lnd, i_lnT, i_v, i_u, i_lnR
          character (len=100) :: filename, name
@@ -96,9 +96,6 @@
          nwork = mp_work_size
          j = 0
          j = j+1; jgval_max1 = j
-         j = j+1; jeps_h = j
-         j = j+1; jeps_he = j
-         j = j+1; jeps_z = j
          j = j+1; jD_mix = j
          j = j+1; jlogR = j
          j = j+1; jFL = j
@@ -115,30 +112,6 @@
          end if
 
          ! interpolate from old values to new points for comparison
-
-         do k=1,nz_old
-            v_old(k) = safe_log10(eps_h(k))
-         end do
-         call interpolate_vector( &
-               nz_old, q_old, nz, q, v_old, v_new(:,jeps_h), interp_m3q, nwork, work, &
-               'write_plot_data_for_new_mesh', ierr)
-         v_new(:,jeps_h) = max(-99d0, v_new(:,jeps_h))
-
-         do k=1,nz_old
-            v_old(k) = safe_log10(eps_he(k))
-         end do
-         call interpolate_vector( &
-               nz_old, q_old, nz, q, v_old, v_new(:,jeps_he), interp_m3q, nwork, work, &
-               'write_plot_data_for_new_mesh', ierr)
-         v_new(:,jeps_he) = max(-99d0, v_new(:,jeps_he))
-
-         do k=1,nz_old
-            v_old(k) = safe_log10(eps_z(k))
-         end do
-         call interpolate_vector( &
-               nz_old, q_old, nz, q, v_old, v_new(:,jeps_z), interp_m3q, nwork, work, &
-               'write_plot_data_for_new_mesh', ierr)
-         v_new(:,jeps_z) = max(-99d0, v_new(:,jeps_z))
 
          do k=1,nz_old
             v_old(k) = safe_log10(D_mix(k))
@@ -218,7 +191,7 @@
             write(iounit, fmt='(a27, 1x)', advance='no') trim(name)
          end do
          write(iounit, fmt='(99(a27, 1x))', advance='no') &
-            'log_eps_h', 'log_eps_he', 'log_eps_z', 'log_D', &
+            'log_D', &
             'mass', 'xq', 'radius', 'logR', 'logT', 'logRho', 'logPgas', &
             'lum', 'v'
          do j=1,num_gvals
@@ -278,7 +251,7 @@
                write(iounit, fmt='(99(1pes27.16e3,1x))', advance='no') v_new(k,jgval_factor+j)
             end do
             write(iounit, fmt='(99(1pes27.16e3,1x))', advance='no') &
-               v_new(k,jeps_h), v_new(k,jeps_he), v_new(k,jeps_z), v_new(k,jD_mix), &
+               v_new(k,jD_mix), &
                s% m(k)/Msun, xq(k), exp(xh(i_lnR,k))/Rsun, &
                xh(i_lnR,k)/ln10, lgT, lgRho, lum/Lsun, v
             do j=1,num_gvals
@@ -314,7 +287,7 @@
       subroutine write_plot_data_for_mesh_plan( &
             s, nz_old, nz_new, xh_old, xa_old, &
             lnd_old, lnT_old, lnPgas_old, lnE_old, wturb_old, &
-            eps_h, eps_he, eps_z, D_mix, mixing_type, &
+            D_mix, mixing_type, &
             dq_old, q_old, xq_old, q_new, &
             species, i_lnR, i_lum, i_v, i_u, comes_from, &
             num_gvals, gval_names, gvals, delta_gval_max, &
@@ -332,7 +305,7 @@
          real(dp), dimension(:), pointer :: &
             dq_old, q_old, xq_old, q_new, &
             lnd_old, lnT_old, lnPgas_old, lnE_old, wturb_old, &
-            eps_h, eps_he, eps_z, D_mix
+            D_mix
          real(dp), dimension(:, :), pointer :: xh_old, xa_old
 
          integer, intent(in) :: num_gvals
@@ -381,7 +354,7 @@
             write(iounit, fmt='(a27, 1x)', advance='no') 'd_dk_' // trim(name)
          end do
          write(iounit, fmt='(99(a27, 1x))', advance='no') &
-            'log_eps_h', 'log_eps_he', 'log_eps_z', 'log_D', 'mixing_type', 'mass', &
+            'log_D', 'mixing_type', 'mass', &
             'xq', 'radius', 'logR', 'logRho', 'logT', 'logP', 'logPgas', &
             'logE', 'wturb', 'lum', 'v', 'u'
          write(iounit,*)
@@ -417,7 +390,6 @@
                end if
             end do
             write(iounit, fmt='(99(1pes27.16e3,1x))', advance='no') &
-               safe_log10(eps_h(k)), safe_log10(eps_he(k)), safe_log10(eps_z(k)), &
                log10(max(1d0,D_mix(k))), dble(mixing_type(k)), &
                (s% M_center + xmstar*q_old(k))/Msun, xq_old(k), exp(xh_old(i_lnR,k))/Rsun, &
                xh_old(i_lnR,k)/ln10, lnd_old(k)/ln10, lnT_old(k)/ln10, &

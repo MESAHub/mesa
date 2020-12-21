@@ -39,9 +39,8 @@
       contains
       
       
-      subroutine default_other_mesh_delta_coeff_factor(id, eps_h, eps_he, eps_z, ierr)
+      subroutine default_other_mesh_delta_coeff_factor(id, ierr)
          integer, intent(in) :: id
-         real(dp), intent(in), dimension(:) :: eps_h, eps_he, eps_z
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: k
