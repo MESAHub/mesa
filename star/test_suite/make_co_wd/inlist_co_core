@@ -35,6 +35,12 @@
 
       stop_at_phase_TP_AGB = .true.
 
+      ! Run will fail if these are triggered before TP_AGB
+      stop_at_phase_C_Burn = .true.
+      stop_at_phase_Ne_Burn = .true.
+      stop_at_phase_O_Burn = .true.
+
+
 ! output
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
