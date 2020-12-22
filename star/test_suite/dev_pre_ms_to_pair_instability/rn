@@ -14,6 +14,13 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
    cp late_pre_zams.mod standard_late_pre_zams.mod
 #fi
 
+#if [ -z "$MESA_RUN_OPTIONAL" ]; then
+#   cp standard_zams.mod zams.mod
+#else
+   do_one inlist_to_zams_header zams.mod
+   cp zams.mod standard_zams.mod
+#fi
+
 # check if can skip
 #if [ -z "$MESA_RUN_OPTIONAL" ]; then
 #   cp standard_near_end_core_he_burn.mod near_end_core_he_burn.mod

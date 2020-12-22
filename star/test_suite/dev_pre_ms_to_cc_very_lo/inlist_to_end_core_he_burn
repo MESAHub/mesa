@@ -6,7 +6,7 @@
       !star_job_namelist_name = 'star_job_to_end_core_he_burn_new.txt'
 
       load_saved_model = .true.
-      saved_model_name = 'late_pre_zams.mod'
+      saved_model_name = 'zams.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'after_core_he_burn.mod'
