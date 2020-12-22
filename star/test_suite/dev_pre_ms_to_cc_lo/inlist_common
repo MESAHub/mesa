@@ -119,23 +119,23 @@
       delta_lgL_limit = 0.1     
       delta_lgL_He_limit = 0.1
 
-      delta_lgRho_cntr_limit = 0.03 ! 0.02 ! 0.005   ! default 0.05
+      delta_lgRho_cntr_limit = 0.03
       delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1          ! default 1.0
+      delta_lgRho_limit = 0.1 
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.001  
+      delta_lgT_cntr_limit = 0.003  
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.001     
+      delta_lgT_max_limit = 0.003     
       delta_lgT_max_hard_limit = 0.01
 
       dHe_div_He_limit = -1
 
       dX_nuc_drop_limit = 2d-2
       dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
-      dX_nuc_drop_min_X_limit = 1d-3  ! 1.0d-3  default = 1.0d-4
+      dX_nuc_drop_min_X_limit = 1d-3
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
 
@@ -164,7 +164,7 @@
       delta_Ye_highT_limit = 1d-3
 
 ! mesh
-      mesh_delta_coeff = 1.6 ! 1.0
+      mesh_delta_coeff = 1.5
       mesh_delta_coeff_for_highT = 1.5      
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
@@ -190,21 +190,10 @@
 
       screening_mode = 'chugunov'
 
-      ! high center T limit to avoid negative mass fractions
       sig_min_factor_for_high_Tcenter = 0.01
-         ! inactive when >= 1d0
-         ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
-         ! then okay to reduce sig by as much as this factor
-         ! as needed to prevent causing negative abundances
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-         ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
-         ! this should be > Tcenter_max_for_sig_min_factor_full_off.
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-         ! if Tcenter <= this, factor = 1, so has no effect
-         ! this should be < Tcenter_min_for_sig_min_factor_full_on.
-      ! for T > full_off and < full_on, factor changes linearly with Tcenter
 
-      ! op_split_burn
       op_split_burn = .true.
       op_split_burn_min_T = 1d9
       burn_steps_limit = 150
