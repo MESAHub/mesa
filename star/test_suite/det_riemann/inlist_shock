@@ -86,6 +86,7 @@
 
 
 ! solver controls
+      steps_before_use_gold2_tolerances = 1
 
 ! output controls
       max_num_profile_models = 1000
