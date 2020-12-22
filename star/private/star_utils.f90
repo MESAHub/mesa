@@ -2787,11 +2787,11 @@
             center_he4 = 1d99
          end if
 
-         if (s% center_gamma > s% gamma_center_limit) then
+         if (s% photosphere_logg > 6d0) then
             s% phase_of_evolution = phase_WDCS
          else if (s% L_by_category(i_burn_si) > 1d2) then
             s% phase_of_evolution = phase_Si_Burn
-         else if (s% L_by_category(ioo) > 1d2 .and. center_he4 < 1d-4) then
+         else if ( (s% L_by_category(ioo) + s% L_by_category(ico)) > 1d2 .and. center_he4 < 1d-4) then
             s% phase_of_evolution = phase_O_Burn
          else if (s% L_by_category(i_burn_ne) > 1d2 .and. center_he4 < 1d-4) then
             s% phase_of_evolution = phase_Ne_Burn
