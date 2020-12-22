@@ -6,7 +6,8 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'co_core.mod'
-      required_termination_code_string = 'phase_TP_AGB'
+      required_termination_code_string = 'he_layer_mass_lower_limit'
+      ! required_termination_code_string = 'phase_TP_AGB'
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -33,12 +34,15 @@
       
       x_integer_ctrl(1) = 1 ! part number
 
-      stop_at_phase_TP_AGB = .true.
+      he_layer_mass_lower_limit = 0.04d0
+      c_core_boundary_he4_fraction = 0.1d0 ! slightly redefines he_layer_mass calculation
+      
+      ! stop_at_phase_TP_AGB = .true.
 
       ! Run will fail if these are triggered before TP_AGB
-      stop_at_phase_C_Burn = .true.
-      stop_at_phase_Ne_Burn = .true.
-      stop_at_phase_O_Burn = .true.
+      ! stop_at_phase_C_Burn = .true.
+      ! stop_at_phase_Ne_Burn = .true.
+      ! stop_at_phase_O_Burn = .true.
 
 
 ! output
