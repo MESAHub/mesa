@@ -9,10 +9,7 @@
       save_model_filename = 'start_core_collapse.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
-      !set_initial_age = .false.
-      set_initial_age = .true.
-      initial_age = 0
-
+      set_initial_age = .false.
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
 
@@ -28,7 +25,7 @@
 
 &controls
 
-      fe_core_infall_limit = 20d5
+      fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
       max_model_number = 15000
@@ -47,7 +44,6 @@
 
 ! mixing
       dq_D_mix_zero_at_H_He_crossover = 1d-2
-      dq_D_mix_zero_at_H_C_crossover = 1d-2
 
       overshoot_scheme(1) = 'none'
       overshoot_zone_type(1) = 'any'
@@ -55,17 +51,17 @@
       overshoot_bdy_loc(1) = 'any'
 
 ! timesteps
-      !delta_lgT_max_limit = 0.01     
-      !delta_lgT_max_hard_limit = -1
+      delta_lgT_max_limit = 0.01     
+      delta_lgT_max_hard_limit = -1
 
-      !delta_XNe_cntr_limit = -1
-      !delta_XNe_cntr_hard_limit = -1
+      delta_XNe_cntr_limit = -1
+      delta_XNe_cntr_hard_limit = -1
 
-      !delta_XO_cntr_limit = -1
-      !delta_XO_cntr_hard_limit = -1
+      delta_XO_cntr_limit = -1
+      delta_XO_cntr_hard_limit = -1
 
-      !delta_XSi_cntr_limit = -1
-      !delta_XSi_cntr_hard_limit = -1
+      delta_XSi_cntr_limit = -1
+      delta_XSi_cntr_hard_limit = -1
       
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
@@ -75,21 +71,14 @@
 ! mesh
 
 ! solver
-      drag_coefficient = 99 ! drive v to 0 in H envelope after end core He burn
-      turn_on_drag_in_H_envelope = .true.
-
-      !use_gold2_tolerances = .false.
+      use_gold2_tolerances = .false.
       
-      !gold_tol_max_residual3 = 5d-4
+      gold_tol_max_residual3 = 5d-4
 
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
 
 ! output
-      terminal_show_age_units = 'days'
-      terminal_show_timestep_units = 'secs'
-      terminal_show_log_dt = .false.
-      terminal_show_log_age = .false.
       
       num_trace_history_values = 4
       trace_history_value_name(1) = 'center fe56'

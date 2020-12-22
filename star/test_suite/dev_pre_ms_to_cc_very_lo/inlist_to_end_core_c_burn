@@ -50,27 +50,18 @@
       ! the run slows to a crawl.  you can let it go if you'd like.
       ! but with the barrier, things can progress to core collapse nicely.
       dq_D_mix_zero_at_H_He_crossover = 1d-2
-      dq_D_mix_zero_at_H_C_crossover = 1d-2
 
 ! timesteps
 
 ! mesh
 
 ! solver
-      ! MAJOR STELLAR ENGINEERING ALERT
-      ! drive v to 0 in H envelope after end core He burn
-      drag_coefficient = 99 ! drive v to 0 in H envelope after end core He burn
-      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
 
 ! output
-      terminal_show_age_units = 'years'
-      terminal_show_timestep_units = 'days'
-      terminal_show_log_dt = .false.
-      terminal_show_log_age = .false.
- 
+      
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -140,10 +131,5 @@
 !pause = .true.
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
 Profile_Panels3_xmax = -101d0 ! 
-
-TRho_Profile_xmin = 3.0
-TRho_Profile_xmax = 6.0
-TRho_Profile_ymin = 8.5
-TRho_Profile_ymax = 9.5
 
 / ! end of pgstar namelist
