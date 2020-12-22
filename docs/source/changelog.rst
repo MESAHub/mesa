@@ -61,6 +61,19 @@ The Compton scattering opacity routine has been updated to use the prescription 
 `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`_.
 
 
+There are new module-level kap hooks (see ``kap/other``) that allow
+individual components of the opacity module to be replaced with a
+user-specified routine given in run_star_extras.  Usage of these hooks
+is similar to hooks in star.  However, the relevant procedure pointer
+is part of the ``Kap_General_Info`` structure and not the
+``star_info`` structure.  Therefore, in ``extras_controls``, the
+procedure pointer statement should look like ``s% kap_rq %
+other_elect_cond_opacity => my_routine``.  The boolean option
+``use_other_elect_cond_opacity`` controlling whether to use the hook
+is part of the ``kap`` namelist rather than ``controls``.  An example
+can be found in the ``wd_cool_0.6M`` test suite case.
+
+
 neu
 ~~~
 
