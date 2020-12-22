@@ -30,8 +30,6 @@
 
       non_fe_core_rebound_limit = 7d7
       
-      fe_core_infall_limit = 1d99 ! turn this off
-      
       when_to_stop_atol = 1d99
       when_to_stop_rtol = 1d99
 
@@ -53,27 +51,20 @@
 ! mixing
 
 ! timesteps
-      delta_lgT_cntr_limit = 0.005  
-      delta_lgT_max_limit = 0.005     
-
-      delta_XHe_cntr_limit = 0.03d0
-      delta_XHe_cntr_hard_limit = 0.06d0
-
-      delta_XC_cntr_limit = 0.03d0
-      delta_XC_cntr_hard_limit = 0.06d0
-
-      delta_XNe_cntr_limit = 0.03d0
-      delta_XNe_cntr_hard_limit = 0.06d0
-
-      delta_XO_cntr_limit = 0.03d0
-      delta_XO_cntr_hard_limit = 0.06d0
-
-      delta_XSi_cntr_limit = 0.03d0
-      delta_XSi_cntr_hard_limit = 0.06d0
 
 ! mesh
 
 ! solver
+ gold2_tol_residual_norm1 = 1d-11
+ gold2_tol_max_residual1 = 1d-9
+ gold2_iter_for_resid_tol2 = 5
+ 
+ gold2_tol_residual_norm2 = 1d-10
+ gold2_tol_max_residual2 = 1d-8
+ gold2_iter_for_resid_tol3 = 12
+ 
+ gold2_tol_residual_norm3 = 1d-8
+ gold2_tol_max_residual3 = 1d-5
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -157,7 +148,7 @@ Profile_Panels3_xmax = -101d0 ! 2.5 !
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
 TRho_Profile_xmin = 3.0
-TRho_Profile_xmax = 8.0
+TRho_Profile_xmax = 7.0
 TRho_Profile_ymin = 8.5
 TRho_Profile_ymax = 9.6
 
