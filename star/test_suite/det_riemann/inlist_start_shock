@@ -29,7 +29,7 @@
       set_initial_dt = .true.
       seconds_for_initial_dt = 1d-5
 
-!      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -206,10 +206,9 @@
 
 &pgstar
 
-
 !pause = .true.
 
-         Grid7_title = '15 M\d\(2281)\u Post-Core-Collapse'
+         Grid7_title = '20 M\d\(2281)\u Core Shock'
 
 Grid7_win_flag = .true.
          Grid7_win_width = 10
@@ -279,9 +278,9 @@ Profile_Panels_show_Mach_1_location = .true.
 !Profile_Panels_xwidth_right_div_shock_value = 0.3
 
 
-         Profile_Panels1_xaxis_name =  'mass' !  'logR_cm' !
+         Profile_Panels1_xaxis_name =  'radius' ! 'mass' !  'logR_cm' !
 Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
-Profile_Panels1_xmax = 1.9 ! 1.54 ! 2 ! 12 ! only used if /= -101d0
+Profile_Panels1_xmax = 1.4 ! 2 ! 12 ! only used if /= -101d0
 !Profile_Panels1_xmin = 3.99853 ! only used if /= -101d0
 !Profile_Panels1_xmax = 11 ! 3.99855 ! only used if /= -101d0
 
@@ -312,16 +311,16 @@ Profile_Panels1_xmax = 1.9 ! 1.54 ! 2 ! 12 ! only used if /= -101d0
             Profile_Panels1_ymax(3) = -101d0 ! 3 ! only used if /= -101d0
             Profile_Panels1_ymargin(3) = 0.1
 
-         Profile_Panels1_other_yaxis_name(3) = 'ni56'
+         Profile_Panels1_other_yaxis_name(3) = 'mass'
             Profile_Panels1_other_ymin(3) = -101d0 ! -1e4 ! only used if /= -101d0
             Profile_Panels1_other_ymax(3) = -101d0 ! 2e4 ! only used if /= -101d0
             Profile_Panels1_other_ymargin(3) = 0.1
 
 
-         Profile_Panels2_xaxis_name =  'mass' !  'logR_cm' !
+         Profile_Panels2_xaxis_name =  'radius' ! 'mass' !  'logR_cm' !
          Profile_Panels2_xaxis_reversed = .false.
 Profile_Panels2_xmin = -101d0 ! only used if /= -101d0
-Profile_Panels2_xmax = 1.9 ! 1.54 ! 2 ! 12 ! only used if /= -101d0
+Profile_Panels2_xmax = 1.4 ! 2 ! 12 ! only used if /= -101d0
 !Profile_Panels2_xmin = 7 ! 3.9985 ! only used if /= -101d0
 !Profile_Panels2_xmax = 2.2 ! 3.9986 ! only used if /= -101d0
 
@@ -356,7 +355,7 @@ Profile_Panels2_xmax = 1.9 ! 1.54 ! 2 ! 12 ! only used if /= -101d0
          Text_Summary1_name(4,2) = 'o_core_mass'
          Text_Summary1_name(5,2) = 'v_center'
          Text_Summary1_name(6,2) = 'r_center'
-         Text_Summary1_name(7,2) = 'dt_div_dt_Courant'
+         Text_Summary1_name(7,2) = 'dt_div_min_dr_div_cs'
          Text_Summary1_name(8,2) = 'dt_div_dt_cell_collapse'
 
          Text_Summary1_name(3,3) = 'max_abs_v_lgRho'
@@ -367,6 +366,7 @@ Profile_Panels2_xmax = 1.9 ! 1.54 ! 2 ! 12 ! only used if /= -101d0
          Text_Summary1_name(8,3) = 'max_abs_v_radius'
 
       Grid2_win_flag = .false.
+
 
 
 / ! end of pgstar namelist

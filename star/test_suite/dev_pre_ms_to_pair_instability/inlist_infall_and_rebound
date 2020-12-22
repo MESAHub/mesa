@@ -30,6 +30,8 @@
 
       non_fe_core_rebound_limit = 7d7
       
+      fe_core_infall_limit = 1d99 ! turn this off
+      
       when_to_stop_atol = 1d99
       when_to_stop_rtol = 1d99
 
@@ -51,6 +53,23 @@
 ! mixing
 
 ! timesteps
+      delta_lgT_cntr_limit = 0.005  
+      delta_lgT_max_limit = 0.005     
+
+      delta_XHe_cntr_limit = 0.03d0
+      delta_XHe_cntr_hard_limit = 0.06d0
+
+      delta_XC_cntr_limit = 0.03d0
+      delta_XC_cntr_hard_limit = 0.06d0
+
+      delta_XNe_cntr_limit = 0.03d0
+      delta_XNe_cntr_hard_limit = 0.06d0
+
+      delta_XO_cntr_limit = 0.03d0
+      delta_XO_cntr_hard_limit = 0.06d0
+
+      delta_XSi_cntr_limit = 0.03d0
+      delta_XSi_cntr_hard_limit = 0.06d0
 
 ! mesh
 
