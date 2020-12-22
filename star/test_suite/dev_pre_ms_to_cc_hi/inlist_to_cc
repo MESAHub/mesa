@@ -28,7 +28,7 @@
 
 &controls
 
-      fe_core_infall_limit = 1d6
+      fe_core_infall_limit = 20d5
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000

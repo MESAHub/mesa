@@ -9142,11 +9142,11 @@
     gold2_tol_residual_norm1 = 1d-11
     gold2_tol_max_residual1 = 1d-9
     gold2_iter_for_resid_tol2 = 5
-    gold2_tol_residual_norm2 = 1d-8
-    gold2_tol_max_residual2 = 1d-5
-    gold2_iter_for_resid_tol3 = 999
-    gold2_tol_residual_norm3 = 0
-    gold2_tol_max_residual3 = 0
+    gold2_tol_residual_norm2 = 1d-10
+    gold2_tol_max_residual2 = 1d-8
+    gold2_iter_for_resid_tol3 = 12
+    gold2_tol_residual_norm3 = 1d-8
+    gold2_tol_max_residual3 = 1d-5
 
       ! ::
 
