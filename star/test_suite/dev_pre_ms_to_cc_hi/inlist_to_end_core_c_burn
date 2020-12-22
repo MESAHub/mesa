@@ -1,6 +1,7 @@
 
 
 &star_job
+      show_net_reactions_info = .true.
 
       load_saved_model = .true.
       saved_model_name = 'near_end_core_he_burn.mod'
