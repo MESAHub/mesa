@@ -88,6 +88,7 @@
          call read_namelist(handle, inlist, ierr)
          if (ierr /= 0) return
          call kap_setup_tables(handle, ierr)
+         call kap_setup_hooks(handle, ierr)
       end function alloc_kap_handle_using_inlist
 
       subroutine free_kap_handle(handle)
@@ -126,7 +127,25 @@
          call Setup_Kap_Tables(rq, use_cache, load_on_demand, ierr)
 
       end subroutine kap_setup_tables
-      
+
+
+      subroutine kap_setup_hooks(handle, ierr)
+         use kap_def, only : Kap_General_Info, get_kap_ptr
+         use other_elect_cond_opacity
+         use other_compton_opacity
+         integer, intent(in) :: handle
+         integer, intent(out):: ierr
+
+         type (Kap_General_Info), pointer :: rq
+
+         ierr = 0
+         call get_kap_ptr(handle,rq,ierr)
+
+         rq% other_elect_cond_opacity => null_other_elect_cond_opacity
+         rq% other_compton_opacity => null_other_compton_opacity
+
+      end subroutine kap_setup_hooks
+
 
       ! kap evaluation
       ! you can call these routines after you've setup the tables for the handle.

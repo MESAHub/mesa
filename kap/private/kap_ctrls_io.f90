@@ -74,6 +74,9 @@
 
    logical :: show_info
 
+   ! hooks
+   logical :: use_other_elect_cond_opacity, use_other_compton_opacity
+
    ! debugging
    logical :: dbg
    real(dp) :: logT_lo, logT_hi
@@ -124,6 +127,8 @@
       kap_Type2_full_off_dZ, kap_Type2_full_on_dZ, &
 
       show_info, &
+
+      use_other_elect_cond_opacity, use_other_compton_opacity, &
 
       read_extra_kap_inlist1, extra_kap_inlist1_name, &
       read_extra_kap_inlist2, extra_kap_inlist2_name, &
@@ -424,6 +429,9 @@
       rq% min_logT_for_logR_gt_1 = 3.3d0
 
       rq% show_info = show_info
+
+      rq% use_other_elect_cond_opacity = use_other_elect_cond_opacity
+      rq% use_other_compton_opacity = use_other_compton_opacity
 
    end subroutine store_controls
 

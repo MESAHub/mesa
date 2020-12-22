@@ -620,11 +620,19 @@
          if (logT > logT_Compton_blend_lo .or. logR < logR_Compton_blend_hi) then ! combine kap_rad with rad_compton
          
             if (dbg) write(*,*) 'combine kap_rad with rad_compton'
-            
-            call Compton_Opacity( &
-               Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-               eta, d_eta_dlnRho, d_eta_dlnT, &
-               kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
+
+            if (rq % use_other_compton_opacity) then
+               call rq% other_compton_opacity( &
+                  Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                  eta, d_eta_dlnRho, d_eta_dlnT, &
+                  kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
+            else
+               call Compton_Opacity( &
+                  Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                  eta, d_eta_dlnRho, d_eta_dlnT, &
+                  kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
+            end if
+
             if (ierr /= 0) return
             if (dbg) write(*,1) 'kap_compton', kap_compton
             if (dbg) write(*,1) 'dlnkap_compton_dlnRho', dlnkap_compton_dlnRho
@@ -713,10 +721,16 @@
             dlnkap_dlnT = dlnkap_rad_dlnT
             return
          end if
-         
-         call do_electron_conduction( &
-            zbar, logRho, logT, &
-            kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, ierr)
+
+         if (rq% use_other_elect_cond_opacity) then
+            call rq% other_elect_cond_opacity( &
+               zbar, logRho, logT, &
+               kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, ierr)
+         else
+            call do_electron_conduction( &
+               zbar, logRho, logT, &
+               kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, ierr)
+         end if
          if (ierr /= 0) return
 
          if (is_bad(kap_ec)) then
