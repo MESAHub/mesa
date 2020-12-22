@@ -157,7 +157,7 @@ Profile_Panels3_xmax = -101d0 ! 2.5 !
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
 TRho_Profile_xmin = 3.0
-TRho_Profile_xmax = 7.0
+TRho_Profile_xmax = 8.0
 TRho_Profile_ymin = 8.5
 TRho_Profile_ymax = 9.6
 
