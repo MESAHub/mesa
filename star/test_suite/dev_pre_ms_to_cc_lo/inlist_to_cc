@@ -28,10 +28,10 @@
 
 &controls
 
-      fe_core_infall_limit = 1d7
+      fe_core_infall_limit = 20d5
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 4000
+      max_model_number = 7000
       !max_number_retries = 37
 
 ! wind
