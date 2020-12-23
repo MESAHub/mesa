@@ -1389,17 +1389,6 @@
          dlambda = s% gradT_excess_dlambda
          dbeta = s% gradT_excess_dbeta
 
-         if (dbg) then
-            write(*,1) 'lambda1', lambda1
-            write(*,1) 'lambda2', lambda2
-            write(*,1) 'lambda', lambda
-            write(*,*)
-            write(*,1) 'beta1', beta1
-            write(*,1) 'beta2', beta2
-            write(*,1) 'beta', beta
-            write(*,*)
-         end if
-
          ! alpha is fraction of full boost to apply
          ! depends on location in (beta,lambda) plane
 
@@ -1433,6 +1422,19 @@
             end if
          else ! lambda <= lambda2 - dlambda
             alpha = 0
+         end if
+
+         if (dbg) then
+            write(*,1) 'lambda1', lambda1
+            write(*,1) 'lambda2', lambda2
+            write(*,1) 'lambda', lambda
+            write(*,*)
+            write(*,1) 'beta1', beta1
+            write(*,1) 'beta2', beta2
+            write(*,1) 'beta', beta
+            write(*,*)
+            write(*,1) 'alpha', alpha
+            write(*,*)
          end if
 
          if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing

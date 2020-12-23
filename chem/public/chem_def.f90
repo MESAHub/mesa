@@ -2391,19 +2391,19 @@
          category_name(icno) = 'cno'
          category_name(i3alf) = 'tri_alfa'
 
-         category_name(i_burn_c) = 'burn_c'
-         category_name(i_burn_n) = 'burn_n'
-         category_name(i_burn_o) = 'burn_o'
-         category_name(i_burn_ne) = 'burn_ne'
-         category_name(i_burn_na) = 'burn_na'
-         category_name(i_burn_mg) = 'burn_mg'
-         category_name(i_burn_si) = 'burn_si'
-         category_name(i_burn_s) = 'burn_s'
-         category_name(i_burn_ar) = 'burn_ar'
-         category_name(i_burn_ca) = 'burn_ca'
-         category_name(i_burn_ti) = 'burn_ti'
-         category_name(i_burn_cr) = 'burn_cr'
-         category_name(i_burn_fe) = 'burn_fe'
+         category_name(i_burn_c) = 'c_alpha'
+         category_name(i_burn_n) = 'n_alpha'
+         category_name(i_burn_o) = 'o_alpha'
+         category_name(i_burn_ne) = 'ne_alpha'
+         category_name(i_burn_na) = 'na_alpha'
+         category_name(i_burn_mg) = 'mg_alpha'
+         category_name(i_burn_si) = 'si_alpha'
+         category_name(i_burn_s) = 's_alpha'
+         category_name(i_burn_ar) = 'ar_alpha'
+         category_name(i_burn_ca) = 'ca_alpha'
+         category_name(i_burn_ti) = 'ti_alpha'
+         category_name(i_burn_cr) = 'cr_alpha'
+         category_name(i_burn_fe) = 'fe_co_ni'
 
          category_name(icc) = 'c12_c12'
          category_name(ico) = 'c12_o16'
@@ -2417,10 +2417,16 @@
 
          category_name(iother) = 'other'
          
-         do i=1,num_categories
+         i=1 ! write it this way to avoid stupid compiler warning.
+         if (len_trim(category_name(i)) == 0) then
+            write(*,*) 'missing name for category', i
+            flush(6)
+            stop 'set_category_names'
+         end if
+         do i=2,num_categories
             if (len_trim(category_name(i)) == 0) then
                write(*,*) 'missing name for category', i
-               if (i > 1) write(*,*) 'following ' // trim(category_name(i-1))
+               write(*,*) 'following ' // trim(category_name(i-1))
                flush(6)
                stop 'set_category_names'
             end if

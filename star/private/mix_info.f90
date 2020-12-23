@@ -47,7 +47,7 @@
          ! set convection variables cdc and conv_vel starting from local MLT results.
          ! overshooting can also be added.
          use rates_def, only: i_rate
-         use chem_def, only: ipp, icno, i3alf, ih1, ihe4
+         use chem_def, only: ipp, icno, i3alf, ih1, ihe4, ic12
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
@@ -56,9 +56,9 @@
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
 
-         integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_dbg, k_Tmax, i_h1, i_he4
+         integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_dbg, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: c, rho_face, f, Tmax, conv_vel, min_conv_vel_for_convective_mixing_type, &
-            D_smooth_source, frozen_region_bottom_q, frozen_region_top_q
+            D_smooth_source, region_bottom_q, region_top_q
          real(dp), pointer, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: rsp_or_eturb, dbg
@@ -361,24 +361,6 @@
          
             if (s% D_smooth_flag .and. .not. s% doing_finish_load_model) then
                f = min(s% dt*s% D_smooth_growth_rate, s% D_smooth_replacement_fraction)
-               frozen_region_bottom_q = s% D_smooth_frozen_region_bottom_q
-               frozen_region_top_q = s% D_smooth_frozen_region_top_q
-               if (s% dq_D_smooth_frozen_at_H_He_crossover > 0d0) then
-                  i_h1 = s% net_iso(ih1)
-                  i_he4 = s% net_iso(ihe4)
-                  if (i_h1 > 0 .and. i_he4 > 0) then
-                     do k=2,nz
-                        if (s% xa(i_h1,k-1) > s% xa(i_he4,k-1) .and. &
-                            s% xa(i_h1,k) <= s% xa(i_he4,k)) then ! crossover
-                           frozen_region_bottom_q = &
-                              s% q(k) - 0.5d0*s% dq_D_smooth_frozen_at_H_He_crossover
-                           frozen_region_top_q = &
-                              s% q(k) + 0.5d0*s% dq_D_smooth_frozen_at_H_He_crossover
-                           exit
-                        end if
-                     end do
-                  end if
-               end if
                do k=1,nz
                   if (is_bad(s% D_smooth(k))) then
                      write(*,2) 'old s% D_smooth(k)', k, s% D_smooth(k)
@@ -389,10 +371,7 @@
                      write(*,2) 'D_smooth_source', k, D_smooth_source
                      stop 'rotation mix'
                   end if
-                  if (.not. (s% q(k) >= frozen_region_bottom_q .and. &
-                             s% q(k) <= frozen_region_top_q)) then
-                     s% D_smooth(k) = (1d0 - f)*s% D_smooth(k) + f*D_smooth_source
-                  end if
+                  s% D_smooth(k) = (1d0 - f)*s% D_smooth(k) + f*D_smooth_source
                   if (is_bad(s% D_smooth(k))) then
                      write(*,2) 's% D_smooth(k)', k, s% D_smooth(k)
                      write(*,2) 'f', k, f
@@ -405,17 +384,13 @@
                   do k=2,nz-1
                      if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
                          s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                         s% D_smooth(k) > 0d0 .and. &
-                         .not. (s% q(k) >= frozen_region_bottom_q .and. &
-                                s% q(k) <= frozen_region_top_q)) &
+                         s% D_smooth(k) > 0d0) &
                         s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
                   end do
                   do k=nz-1,2,-1
                      if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
                          s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                         s% D_smooth(k) > 0d0 .and. &
-                         .not. (s% q(k) >= frozen_region_bottom_q .and. &
-                                s% q(k) <= frozen_region_top_q)) &
+                         s% D_smooth(k) > 0d0) &
                         s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
                   end do
                end if
@@ -425,6 +400,63 @@
                   end do
                end if
                
+            end if
+
+            region_bottom_q = s% D_mix_zero_region_bottom_q
+            region_top_q = s% D_mix_zero_region_top_q
+            
+            if (s% dq_D_mix_zero_at_H_He_crossover > 0d0) then
+               i_h1 = s% net_iso(ih1)
+               i_he4 = s% net_iso(ihe4)
+               if (i_h1 > 0 .and. i_he4 > 0) then
+                  do k=2,nz
+                     if (s% xa(i_h1,k-1) > s% xa(i_he4,k-1) .and. &
+                         s% xa(i_h1,k) <= s% xa(i_he4,k)) then ! crossover
+                        region_bottom_q = &
+                           s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
+                        region_top_q = &
+                           s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
+                        exit
+                     end if
+                  end do
+               end if
+            end if
+            
+            if (region_bottom_q < region_top_q) then
+               do k=2,nz
+                  if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
+                     s% D_mix(k) = 0d0
+                     s% mixing_type(k) = no_mixing
+                  end if
+               end do
+            end if
+            
+            region_bottom_q = 1d99
+            region_top_q = -1d99
+            if (s% dq_D_mix_zero_at_H_C_crossover > 0d0) then
+               i_h1 = s% net_iso(ih1)
+               i_c12 = s% net_iso(ic12)
+               if (i_h1 > 0 .and. i_c12 > 0) then
+                  do k=2,nz
+                     if (s% xa(i_h1,k-1) > s% xa(i_c12,k-1) .and. &
+                         s% xa(i_h1,k) <= s% xa(i_c12,k)) then ! crossover
+                        region_bottom_q = &
+                           s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
+                        region_top_q = &
+                           s% q(k) + 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
+                        exit
+                     end if
+                  end do
+               end if
+            end if
+            
+            if (region_bottom_q < region_top_q) then
+               do k=2,nz
+                  if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
+                     s% D_mix(k) = 0d0
+                     s% mixing_type(k) = no_mixing
+                  end if
+               end do
             end if
          
             ! as last thing, update conv_vel from D_mix and mixing length.

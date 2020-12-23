@@ -129,12 +129,16 @@
 
          real(dp) :: min_timestep_limit
          real(dp) :: center_Ye_lower_limit, center_R_lower_limit, &
-            fe_core_infall_limit, non_fe_core_infall_limit
+            fe_core_infall_limit, non_fe_core_infall_limit, non_fe_core_rebound_limit
          real(dp) :: v_div_csound_surf_limit, v_div_csound_max_limit
          real(dp) :: Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit
          real(dp) :: v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit
          real(dp) :: v_surf_div_v_esc_limit, Lnuc_div_L_zams_limit, v_surf_kms_limit
-         logical :: stop_near_zams
+         logical :: stop_near_zams, stop_at_phase_PreMS, & 
+            stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, &
+            stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
+            stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
+            stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS
          real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
@@ -154,7 +158,9 @@
          integer :: history_interval
          integer :: terminal_interval
          integer :: write_header_frequency
-         character (len=strlen) :: extra_terminal_output_file, terminal_show_age_units
+         character (len=strlen) :: extra_terminal_output_file, &
+            terminal_show_age_units, terminal_show_timestep_units
+         logical :: terminal_show_log_dt, terminal_show_log_age
          integer :: num_trace_history_values
          character (len=maxlen_history_column_name) :: trace_history_value_name(50)
 
@@ -1020,8 +1026,6 @@
          real(dp) :: nu_omega_max_replacement_fraction, nu_omega_growth_rate, &
             nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
-         
-         real(dp) :: D_smooth_replacement_fraction, D_smooth_growth_rate
 
          real(dp) :: jacobian_clip_limit
          real(dp) :: sum_xa_tolerance, xa_clip_limit
@@ -1240,6 +1244,7 @@
 
          real(dp) :: delta_lgT_cntr_limit
          real(dp) :: delta_lgT_cntr_hard_limit
+         logical :: delta_lgT_cntr_limit_only_after_near_zams
 
          real(dp) :: delta_lgT_max_limit
          real(dp) :: delta_lgT_max_hard_limit

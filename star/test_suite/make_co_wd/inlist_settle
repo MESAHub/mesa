@@ -26,7 +26,7 @@
 &controls
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 2500
+      max_model_number = 3000
 
       retry_hold = 3
 
@@ -35,8 +35,10 @@
       log_L_lower_limit = 0d0
 
 ! diffusion
-      ! most settings can be found in inlist_common
+      ! Most settings can be found in inlist_common.
+      ! Note that run_star_extras turns off diffusion until LHe < 1e3 Lsun.
       do_element_diffusion = .true.
+      show_diffusion_info = .true.
 
 ! convection
       okay_to_reduce_gradT_excess = .true.

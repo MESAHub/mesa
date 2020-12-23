@@ -284,7 +284,8 @@
          use solve_hydro, only: set_L_burn_by_category
          use winds, only: set_mdot
          use star_utils, only: &
-            eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals
+            eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals, &
+            set_phase_of_evolution
          use profile
 
          logical, intent(in) :: first_try
@@ -475,6 +476,7 @@
          s% total_angular_momentum = total_angular_momentum(s)
          call do_report(s, ierr)
          if (failed('do_report')) return
+         call set_phase_of_evolution(s)
 
          call system_clock(time0,clock_rate)
          s% current_system_clock_time = time0

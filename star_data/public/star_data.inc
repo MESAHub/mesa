@@ -1033,8 +1033,7 @@
       
       real(dp) :: center_non_nuc_neu 
       real(dp) :: center_entropy ! in kerg per baryon 
-      real(dp) :: fe_core_infall 
-      real(dp) :: non_fe_core_infall 
+      real(dp) :: fe_core_infall, non_fe_core_infall, non_fe_core_rebound
       real(dp) :: max_infall_speed_mass ! Msun
       real(dp) :: center_omega
       real(dp) :: center_omega_div_omega_crit 
@@ -1289,9 +1288,10 @@
       real(dp) :: max_eps_nuc_cp ! cp at location of max burn
       integer :: max_eps_nuc_k ! cell number
 
-      ! times
-      real(dp) :: star_age ! time in years
-      real(dp) :: time_step ! dt in years
+      ! times in other units (just for convenience)
+      real(dp) :: star_age, time_days, time_years ! time is in seconds
+      real(dp) :: time_step, dt_days, dt_years ! dt is in seconds
+      
       real(dp) :: dt_next
       real(dp) :: dt_start ! dt during first try for step
       
@@ -1459,7 +1459,7 @@
             RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
-         integer :: init_model_number
+         integer :: init_model_number, start_H_envelope_base_k
 
          real(dp) :: h1_czb_mass
          real(dp) :: dt_limit_ratio ! for timestep controller
@@ -2135,4 +2135,5 @@
             summary_profile_pgstar_decorator => null(), &
             summary_history_pgstar_decorator => null(), &
             trho_pgstar_decorator => null(), &
+            tmaxrho_pgstar_decorator => null(), &
             trho_profile_pgstar_decorator => null()

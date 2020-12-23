@@ -16,8 +16,6 @@
       
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
-      change_initial_D_smooth_flag = .true.
-      new_D_smooth_flag = .true.
 
       change_v_flag = .true.
       new_v_flag = .true.

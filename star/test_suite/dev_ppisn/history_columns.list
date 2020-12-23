@@ -481,32 +481,6 @@
       !log_average h1
       !log_average he4
       ! etc.
-
-   ! log10 total luminosity for reaction categories (Lsun units)
-      
-      pp
-      cno
-      tri_alfa
-      burn_c
-      burn_n
-      burn_o
-      burn_ne
-      burn_na
-      burn_mg
-      burn_si
-      burn_s
-      burn_ar
-      burn_ca
-      burn_ti
-      burn_cr
-      burn_fe
-      c12_c12
-      c12_o16
-      o16_o16
-      photo
-!      pnhe4
-!      other
-      
       
    ! center log10 burn erg/g/s for reaction categories
    

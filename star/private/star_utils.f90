@@ -2764,31 +2764,83 @@
       end function yrs_for_init_timestep
 
 
-      subroutine set_phase_of_evolution(s) ! at start of run
+      subroutine set_phase_of_evolution(s) ! from evolve after call do_report
          use rates_def, only: i_rate
-         use chem_def, only: i_burn_c
+         use chem_def
          type (star_info), pointer :: s
-         real(dp) :: power_he_burn, power_c_burn, power_neutrinos
-         integer :: nz
+         real(dp) :: power_he_burn, power_c_burn, power_neutrinos, &
+            center_h1, center_he4
+         integer :: nz, j
          include 'formats'
          nz = s% nz
-         if (.not. arrived_main_seq(s) .or. s% phase_of_evolution == phase_carbon_burning) return
-         power_he_burn = s% power_he_burn
-         power_c_burn = dot_product(s% dm(1:nz), s% eps_nuc_categories(i_burn_c,1:nz))/Lsun
-         power_neutrinos = s% power_neutrinos
-         if (s% phase_of_evolution == phase_helium_burning .and. power_c_burn > power_neutrinos) then
-            s% phase_of_evolution = phase_carbon_burning
-         else if (power_c_burn + power_he_burn > power_neutrinos) then
-            s% phase_of_evolution = phase_helium_burning
-         else if (s% center_he4 < center_he_going) then
-            s% phase_of_evolution = phase_helium_burning
-         else if (s% center_h1 < center_h_gone) then
-            s% phase_of_evolution = phase_wait_for_he
-         else if (s% center_h1 < center_h_going) then
-            s% phase_of_evolution = phase_mid_main_seq
+         
+         j = s% net_iso(ih1)
+         if (j > 0) then
+            center_h1 = center_avg_x(s,j)
          else
-            s% phase_of_evolution = phase_early_main_seq
+            center_h1 = 1d99
          end if
+         j = s% net_iso(ihe4)
+         if (j > 0) then
+            center_he4 = center_avg_x(s,j)
+         else
+            center_he4 = 1d99
+         end if
+
+         if (s% center_gamma > s% gamma_center_limit) then
+            s% phase_of_evolution = phase_WDCS
+         else if (s% L_by_category(i_burn_si) > 1d2) then
+            s% phase_of_evolution = phase_Si_Burn
+         else if (s% L_by_category(i_burn_o) > 1d2 .and. center_he4 < 1d-4) then
+            s% phase_of_evolution = phase_O_Burn
+         else if (s% L_by_category(i_burn_ne) > 1d2 .and. center_he4 < 1d-4) then
+            s% phase_of_evolution = phase_Ne_Burn
+         else if (s% L_by_category(i_burn_c) > 1d2 .and. center_he4 < 1d-4) then
+            s% phase_of_evolution = phase_C_Burn
+         else if (center_he4 < 1d-4 .and. &
+            s% he_core_mass - s% c_core_mass <= 0.1d0 .and. &
+            any(s% burn_he_conv_region(1:s% num_conv_boundaries))) then
+            s% phase_of_evolution = phase_TP_AGB
+         else if (center_he4 <= 1d-4) then
+            s% phase_of_evolution = phase_TACHeB          
+         else if (s% center_eps_burn(i3alf) > Lsun) then
+            s% phase_of_evolution = phase_ZACHeB
+         else if (s% L_by_category(i3alf) > 1d2) then
+            s% phase_of_evolution = phase_He_Burn
+         else if (center_h1 <= 1d-6) then
+            s% phase_of_evolution = phase_TAMS            
+         else if (center_h1 <= 0.3d0) then
+            s% phase_of_evolution = phase_IAMS            
+         else if (s% L_nuc_burn_total >= s% L_phot*s% Lnuc_div_L_zams_limit) then
+            s% phase_of_evolution = phase_ZAMS
+         else if (s% log_center_temperature > 5d0) then
+            s% phase_of_evolution = phase_PreMS
+         else
+            s% phase_of_evolution = phase_starting
+         end if 
+         
+         
+         
+         
+         
+         
+!         if (.not. arrived_main_seq(s) .or. s% phase_of_evolution == phase_carbon_burning) return
+!         power_he_burn = s% power_he_burn
+!         power_c_burn = dot_product(s% dm(1:nz), s% eps_nuc_categories(i_burn_c,1:nz))/Lsun
+!         power_neutrinos = s% power_neutrinos
+!         if (s% phase_of_evolution == phase_helium_burning .and. power_c_burn > power_neutrinos) then
+!            s% phase_of_evolution = phase_carbon_burning
+!         else if (power_c_burn + power_he_burn > power_neutrinos) then
+!            s% phase_of_evolution = phase_helium_burning
+!         else if (s% center_he4 < center_he_going) then
+!            s% phase_of_evolution = phase_helium_burning
+!         else if (s% center_h1 < center_h_gone) then
+!            s% phase_of_evolution = phase_wait_for_he
+!         else if (s% center_h1 < center_h_going) then
+!            s% phase_of_evolution = phase_mid_main_seq
+!         else
+!            s% phase_of_evolution = phase_early_main_seq
+!         end if
       end subroutine set_phase_of_evolution
 
 
@@ -3713,11 +3765,53 @@
          write(*,1) 'abar = ', s% abar(k)
          write(*,1) 'zbar = ', s% zbar(k)
          write(*,*)
+         write(*,1) 'tau = ', s% tau(k)
+         write(*,*)
          write(*,*) 's% eos_rq% tiny_fuzz', s% eos_rq% tiny_fuzz
          write(*,*)
          !stop 'write_eos_call_info'
          !$OMP end critical (omp_write_eos_call_info)
       end subroutine write_eos_call_info
+
+
+      real(dp) function surface_avg_x(s,j)
+         use chem_def, only: chem_isos
+         type (star_info), pointer :: s
+         integer, intent(in) :: j
+         real(dp) :: sum_x, sum_dq
+         integer :: k
+         include 'formats'
+         sum_x = 0
+         sum_dq = 0
+         do k = 1, s% nz
+            sum_x = sum_x + s% xa(j,k)*s% dq(k)
+            sum_dq = sum_dq + s% dq(k)
+            if (sum_dq >= s% surface_avg_abundance_dq) exit
+         end do
+         surface_avg_x = sum_x/sum_dq
+      end function surface_avg_x
+
+
+      real(dp) function center_avg_x(s,j)
+         type (star_info), pointer :: s
+         integer, intent(in) :: j
+         real(dp) :: sum_x, sum_dq, dx, dq
+         integer :: k
+         sum_x = 0
+         sum_dq = 0
+         do k = s% nz, 1, -1
+            dq = s% dq(k)
+            dx = s% xa(j,k)*dq
+            if (sum_dq+dq >= s% center_avg_value_dq) then
+               sum_x = sum_x+ dx*(s% center_avg_value_dq - sum_dq)/dq
+               sum_dq = s% center_avg_value_dq
+               exit
+            end if
+            sum_x = sum_x + dx
+            sum_dq = sum_dq + dq
+         end do
+         center_avg_x = sum_x/sum_dq
+      end function center_avg_x
 
 
       end module star_utils

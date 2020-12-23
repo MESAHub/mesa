@@ -469,10 +469,10 @@
             call pgsave
             ! show where gamma1 = 4/3
             call pgsci(clr_Gold)
-            call pgsls(Line_Type_Dash)
-            call pgslw(6)
-            call show_label(2.8, 9.2, 0.0, 0.5, '\(0529)\d1\u < 4/3')
-            call pgslw(8)
+            call pgsls(Line_Type_Solid)
+            call pgslw(3)
+            call show_label(3.0, 9.3, 0.0, 0.5, '\(0529)\d1\u < 4/3')
+            call pgslw(4)
             call pgline(size(gamma_4_thirds_logT), gamma_4_thirds_logRho, gamma_4_thirds_logT)
             call pgunsa
          end subroutine do_gamma1_4_3rd

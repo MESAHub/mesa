@@ -163,14 +163,28 @@
             'H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry'
             
          ! note that if the age is in days, then the timestep is automatically in seconds.
-         if (trim(s% terminal_show_age_units) == 'seconds') then
-            write(io,'(a)',advance='no') '  lg_dt_sec'
-         else if (trim(s% terminal_show_age_units) == 'days') then
-            write(io,'(a)',advance='no') '  lg_dt_sec'
-         else if (trim(s% terminal_show_age_units) == 'years') then
-            write(io,'(a)',advance='no') '   lg_dt_yr'
+         if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
+             trim(s% terminal_show_timestep_units) == 'secs') then
+            if (s% terminal_show_log_dt) then
+               write(io,'(a)',advance='no') '  lg_dt_sec'
+            else
+               write(io,'(a)',advance='no') '     dt_sec'
+            end if
+         else if (trim(s% terminal_show_timestep_units) == 'days') then
+            if (s% terminal_show_log_dt) then         
+               write(io,'(a)',advance='no') ' lg_dt_days'
+            else
+               write(io,'(a)',advance='no') '    dt_days'
+            end if
+         else if (trim(s% terminal_show_timestep_units) == 'years' .or. &
+                  trim(s% terminal_show_timestep_units) == 'yrs') then
+            if (s% terminal_show_log_dt) then         
+               write(io,'(a)',advance='no') '  lg_dt_yrs'
+            else
+               write(io,'(a)',advance='no') '     dt_yrs'
+            end if
          else
-            write(*,*) 'unrecognized option for terminal_show_age_units ' // trim(s% terminal_show_age_units)
+            write(*,*) 'unrecognized option for terminal_show_timestep_units ' // trim(s% terminal_show_timestep_units)
             return
          end if
          
@@ -184,12 +198,29 @@
                'He_core    He_cntr    O_cntr     lg_Z_surf gam_cntr  ' // iters // '  '
          end if
 
-         if (trim(s% terminal_show_age_units) == 'seconds') then
-            write(io,'(a)',advance='no') '    age_sec'
+         if (trim(s% terminal_show_age_units) == 'seconds' .or. &
+             trim(s% terminal_show_age_units) == 'secs') then
+            if (s% terminal_show_log_age) then
+               write(io,'(a)',advance='no') 'lg_age_secs'
+            else
+               write(io,'(a)',advance='no') '   age_secs'
+            end if
          else if (trim(s% terminal_show_age_units) == 'days') then
-            write(io,'(a)',advance='no') '   age_days'
-         else !if (trim(s% terminal_show_age_units) == 'years') then
-            write(io,'(a)',advance='no') '     age_yr'
+            if (s% terminal_show_log_age) then
+               write(io,'(a)',advance='no') 'lg_age_days'
+            else
+               write(io,'(a)',advance='no') '   age_days'
+            end if
+         else if (trim(s% terminal_show_age_units) == 'years' .or. &
+                  trim(s% terminal_show_age_units) == 'yrs') then
+            if (s% terminal_show_log_age) then
+               write(io,'(a)',advance='no') ' lg_age_yrs'
+            else
+               write(io,'(a)',advance='no') '    age_yrs'
+            end if
+         else
+            write(*,*) 'unrecognized option for terminal_show_age_units ' // trim(s% terminal_show_age_units)
+            return
          end if
          
          if (s% net_iso(isi28) == 0) then
@@ -246,17 +277,24 @@
          
          include 'formats'
          
-         age = s% star_age ! in years
-         time_step = s% time_step ! in years
-            
-         ! note that if the age is in days, then the timestep is automatically in seconds.
-         if (trim(s% terminal_show_age_units) == 'seconds') then
+         age = s% star_age ! in years            
+         if (trim(s% terminal_show_age_units) == 'seconds' .or. &
+             trim(s% terminal_show_age_units) == 'secs') then
             age = age*secyer
-            time_step = time_step*secyer
          else if (trim(s% terminal_show_age_units) == 'days') then
             age = age*secyer/(24*60*60)
-            time_step = time_step*secyer
          end if
+            
+         time_step = s% time_step ! in years
+         if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
+             trim(s% terminal_show_timestep_units) == 'secs') then
+            time_step = time_step*secyer
+         else if (trim(s% terminal_show_timestep_units) == 'days') then
+            time_step = time_step*secyer/(24*60*60)
+         end if
+        
+         if (s% terminal_show_log_age) age = safe_log10(age)
+         if (s% terminal_show_log_dt) time_step = safe_log10(time_step)
 
          model = s% model_number
          nz = s% nz
@@ -328,10 +366,10 @@
          
          tmp = max(0d0, min(1d0, 1 - (s% surface_h1 + s% surface_he3 + s% surface_he4)))
          if (s% initial_z >= 1d-5) then
-            fmt1 = '(10f11.6, '
+            fmt1 = '(1pe11.4, 0p, 9f11.6, '
          else
             tmp = safe_log10(tmp)
-            fmt1 = '(9f11.6, e11.2, '
+            fmt1 = '(1pe11.4, 0p, 8f11.6, e11.2, '
          end if
          if (s% gam(s% nz) >= 1d3) then
             fmt2 = 'e11.3, '
@@ -343,7 +381,7 @@
          !write(*,*) 'fmt line2 ' // trim(fmt)
          iters = s% num_solver_iterations
          write(io,fmt=fmt) &
-            safe_log10(time_step),  &
+            time_step,  &
             s% log_center_temperature, &
             s% log_surface_radius, &
             safe_log10(sum_LHe), &
@@ -534,17 +572,16 @@
          use rates_def
          use chem_def
          use chem_lib, only: chem_get_iso_id
-         use report, only: center_avg_x, surface_avg_x
-         use star_utils, only: omega_crit
+         use star_utils, only: omega_crit, center_avg_x, surface_avg_x
          integer, intent(in) :: id
          type (star_info), pointer :: s
-         integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_vel_loc, &
+         integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
          real(dp) :: log_surface_gravity, v_div_csound_max, &
             power_nuc_burn, power_h_burn, power_he_burn, power_c_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
-            max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_vel, &
+            max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
             species_mass_for_min_limit, species_mass_for_max_limit
             
          include 'formats'
@@ -585,14 +622,14 @@
          end if
          
          if(s%u_flag) then
-            max_vel_loc = maxloc(abs(s%u(1:nz)),dim=1)
-            max_vel = s%u(max_vel_loc)
+            max_abs_vel_loc = maxloc(abs(s%u(1:nz)),dim=1)
+            max_abs_vel = s%u(max_abs_vel_loc)
          else if (s%v_flag) then
-            max_vel_loc = maxloc(abs(s%v(1:nz)),dim=1)
-            max_vel = s%v(max_vel_loc)
+            max_abs_vel_loc = maxloc(abs(s%v(1:nz)),dim=1)
+            max_abs_vel = s%v(max_abs_vel_loc)
          else
-            max_vel_loc = -1
-            max_vel = 0d0
+            max_abs_vel_loc = -1
+            max_abs_vel = 0d0
          end if
          
          
@@ -682,9 +719,9 @@
             end if
          end if
          
-         if (max_vel > clight) then
+         if (max_abs_vel > clight) then
             write(*, '(/,a,/, I5,1X,2e20.10)') &
-               'retry because maximum velocity exceeds speed of light ',max_vel_loc,max_vel,max_vel/clight
+               'retry because maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
             do_check_limits = retry
             return
          end if
@@ -707,6 +744,10 @@
              s% non_fe_core_infall > 0.99d0*s% non_fe_core_infall_limit) &
             write(*,1) 'nearing non_fe_core_infall limit', &
                s% non_fe_core_infall, s% non_fe_core_infall_limit
+         
+         if (s% non_fe_core_rebound > 0.99d0*s% non_fe_core_rebound_limit) &
+            write(*,1) 'nearing non_fe_core_rebound limit', &
+               s% non_fe_core_rebound, s% non_fe_core_rebound_limit
          
          if (max_omega_div_omega_crit > 0.75d0*s% omega_div_omega_crit_limit .and. &
                s% omega_div_omega_crit_limit > 0 .and. k_omega > 0) &
@@ -1060,6 +1101,10 @@
             call compare_to_target('non_fe_core_infall > non_fe_core_infall_limit', &
                s% non_fe_core_infall, s% non_fe_core_infall_limit, t_non_fe_core_infall_limit)
 
+         else if (s% non_fe_core_rebound > s% non_fe_core_rebound_limit) then 
+            call compare_to_target('non_fe_core_rebound > non_fe_core_rebound_limit', &
+               s% non_fe_core_rebound, s% non_fe_core_rebound_limit, t_non_fe_core_rebound_limit)
+
          else if (v_surf/csound_surf > s% v_div_csound_surf_limit) then 
             call compare_to_target('v_surf/csound_surf > v_div_csound_surf_limit', &
                v_surf/csound_surf, s% v_div_csound_surf_limit, t_v_div_csound_surf_limit)
@@ -1088,14 +1133,6 @@
             call compare_to_target('v_surf_div_v_kh >= v_surf_div_v_kh_upper_limit', &
                v_surf_div_v_kh, s% v_surf_div_v_kh_upper_limit, t_v_surf_div_v_kh_upper_limit)
                
-         else if (s% stop_near_zams .and. &
-                  Lnuc_div_L >= s% Lnuc_div_L_zams_limit) then
-            do_check_limits = terminate
-            s% termination_code = t_Lnuc_div_L_zams_limit
-            s% result_reason = result_reason_normal
-            write(*, '(/,a,/, 99e20.10)') &
-               'stop because Lnuc_div_L >= Lnuc_div_L_zams_limit', Lnuc_div_L, s% Lnuc_div_L_zams_limit
-               
          else if (v_surf_div_v_esc >= s% v_surf_div_v_esc_limit) then 
             call compare_to_target('v_surf_div_v_esc >= v_surf_div_v_esc_limit', &
                v_surf_div_v_esc, s% v_surf_div_v_esc_limit, t_v_surf_div_v_esc_limit)
@@ -1112,6 +1149,92 @@
                s% cumulative_extra_heating, &
                s% stop_when_reach_this_cumulative_extra_heating, &
                t_cumulative_extra_heating_limit)
+               
+         else if (s% stop_near_zams .and. &
+                  Lnuc_div_L >= s% Lnuc_div_L_zams_limit) then
+            do_check_limits = terminate
+            s% termination_code = t_Lnuc_div_L_zams_limit
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/, 99e20.10)') &
+               'stop because Lnuc_div_L >= Lnuc_div_L_zams_limit', Lnuc_div_L, s% Lnuc_div_L_zams_limit
+               
+         else if (s% stop_at_phase_PreMS .and. s% phase_of_evolution == phase_PreMS) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_PreMS
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_PreMS'
+               
+         else if (s% stop_at_phase_ZAMS .and. s% phase_of_evolution == phase_ZAMS) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_ZAMS
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_ZAMS'
+               
+         else if (s% stop_at_phase_IAMS .and. s% phase_of_evolution == phase_IAMS) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_IAMS
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_IAMS'
+               
+         else if (s% stop_at_phase_TAMS .and. s% phase_of_evolution == phase_TAMS) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_TAMS
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_TAMS'
+               
+         else if (s% stop_at_phase_He_Burn .and. s% phase_of_evolution == phase_He_Burn) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_He_Burn
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_He_Burn'
+               
+         else if (s% stop_at_phase_ZACHeB .and. s% phase_of_evolution == phase_ZACHeB) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_ZACHeB
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_ZACHeB'
+               
+         else if (s% stop_at_phase_TACHeB .and. s% phase_of_evolution == phase_TACHeB) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_TACHeB
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_TACHeB'
+               
+         else if (s% stop_at_phase_TP_AGB .and. s% phase_of_evolution == phase_TP_AGB) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_TP_AGB
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_TP_AGB'
+               
+         else if (s% stop_at_phase_C_Burn .and. s% phase_of_evolution == phase_C_Burn) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_C_Burn
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_C_Burn'
+               
+         else if (s% stop_at_phase_Ne_Burn .and. s% phase_of_evolution == phase_Ne_Burn) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_Ne_Burn
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_Ne_Burn'
+               
+         else if (s% stop_at_phase_O_Burn .and. s% phase_of_evolution == phase_O_Burn) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_O_Burn
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_O_Burn'
+               
+         else if (s% stop_at_phase_Si_Burn .and. s% phase_of_evolution == phase_Si_Burn) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_Si_Burn
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_Si_Burn'
+               
+         else if (s% stop_at_phase_WDCS .and. s% phase_of_evolution == phase_WDCS) then
+            do_check_limits = terminate
+            s% termination_code = t_phase_WDCS
+            s% result_reason = result_reason_normal
+            write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_WDCS'
 
          end if
                   
@@ -1344,7 +1467,7 @@
          end if
 
          nz = s% nz
-         must_do_profile = .false.
+         must_do_profile = time_to_profile(s) ! also updates phase_of_evolution
          profile_priority = delta_priority
          model = s% model_number
          do_one_check_model = keep_going
@@ -1387,38 +1510,35 @@
             must_do_profile = .true.
          end if
          
-         if ((.not. s% helium_ignition) .and. (s% log_center_temperature > log_he_temp) &
-                  .and. (s% phase_of_evolution /= phase_he_igniting)) then
-            if ( power_c_burn + power_he_burn > power_neutrinos  .and. (power_neutrinos > 1d0)) then
-               must_do_profile = .true.
-               if (dbg) write(*,*) 'must_do_profile for helium_ignition'
-               s% helium_ignition = .true.
-               s% phase_of_evolution = phase_he_igniting
-               s% ignition_center_xhe = s% center_he4
-               s% he_luminosity_limit = s% log_surface_luminosity
-               s% prev_luminosity = s% log_surface_luminosity
-            end if
-         end if
-         
-         if ( (.not. s% carbon_ignition) .and. ( power_c_burn > power_neutrinos ) &
-               .and. (power_neutrinos > 1d0)) then
-            must_do_profile = .true.
-            s% carbon_ignition = .true.
-            s% phase_of_evolution = phase_carbon_burning
-         else if ( (s% phase_of_evolution .eq. phase_he_ignition_over .and. s% prev_age1 .eq. -1d0) &
-                  .or. s% star_age <= s% post_he_age ) then
-            s% prev_tcntr1 = s% log_center_temperature; s% prev_tcntr2 = s% prev_tcntr1
-            s% prev_age1 = s% star_age; s% prev_age2 = s% prev_age1
-            must_do_profile = .true.
-            if (dbg) write(*,*) 'must_do_profile for starting phase of steady helium burning'
-            s% post_he_age = s% star_age
-            if (.not. s% doing_first_model_of_run) &
-               write(*, '(/,a, i7,/)') 'starting phase of steady helium burning', &
-                  s% model_number
-         else if ( time_to_profile(s) ) then
-            must_do_profile = .true.
-            if (dbg) write(*,*) 'must_do_profile for time_to_profile'
-         end if
+!         if ((.not. s% helium_ignition) .and. (s% log_center_temperature > log_he_temp) &
+!                  .and. (s% phase_of_evolution /= phase_he_igniting)) then
+!            if ( power_c_burn + power_he_burn > power_neutrinos  .and. (power_neutrinos > 1d0)) then
+!               must_do_profile = .true.
+!               if (dbg) write(*,*) 'must_do_profile for helium_ignition'
+!               s% helium_ignition = .true.
+!               s% phase_of_evolution = phase_he_igniting
+!               s% ignition_center_xhe = s% center_he4
+!               s% he_luminosity_limit = s% log_surface_luminosity
+!               s% prev_luminosity = s% log_surface_luminosity
+!            end if
+!         end if
+!         
+!         if ( (.not. s% carbon_ignition) .and. ( power_c_burn > power_neutrinos ) &
+!               .and. (power_neutrinos > 1d0)) then
+!            must_do_profile = .true.
+!            s% carbon_ignition = .true.
+!            s% phase_of_evolution = phase_carbon_burning
+!         else if ( (s% phase_of_evolution .eq. phase_he_ignition_over .and. s% prev_age1 .eq. -1d0) &
+!                  .or. s% star_age <= s% post_he_age ) then
+!            s% prev_tcntr1 = s% log_center_temperature; s% prev_tcntr2 = s% prev_tcntr1
+!            s% prev_age1 = s% star_age; s% prev_age2 = s% prev_age1
+!            must_do_profile = .true.
+!            if (dbg) write(*,*) 'must_do_profile for starting phase of steady helium burning'
+!            s% post_he_age = s% star_age
+!            if (.not. s% doing_first_model_of_run) &
+!               write(*, '(/,a, i7,/)') 'starting phase of steady helium burning', &
+!                  s% model_number
+!         end if
          
          if (must_do_profile) profile_priority = phase_priority
          
@@ -1458,57 +1578,57 @@
          
          time_to_profile = .false.
          
-         select case ( s% phase_of_evolution )
-         case ( phase_starting )
-            if ( arrived_main_seq(s) ) then
-               if (dbg) write(*,*) 'arrived_main_seq'
-               time_to_profile = .true.
-               s% prev_tsurf = s% log_surface_temperature
-               if (s% center_h1 > center_h_going) then
-                  s% phase_of_evolution = phase_early_main_seq
-               else if ( s% center_h1 > center_h_gone ) then
-                  s% phase_of_evolution = phase_mid_main_seq
-               else if ( s% center_he4 > center_he_going ) then
-                  s% phase_of_evolution = phase_he_ignition_over
-               else
-                  s% phase_of_evolution = phase_helium_burning
-               end if
-            end if
-         case ( phase_early_main_seq )
-            if ( s% center_h1 < center_h_going ) then
-               time_to_profile = .true.
-               s% prev_tsurf = s% log_surface_temperature
-               s% phase_of_evolution = phase_mid_main_seq
-            end if
-         case ( phase_mid_main_seq )
-            if ( s% center_h1 < center_h_gone &
-                  .and. s% log_surface_temperature < s% prev_tsurf-surface_t_drop ) then
-               time_to_profile = .true.
-               s% phase_of_evolution = phase_wait_for_he
-            end if
-         case ( phase_wait_for_he )
-         case ( phase_he_igniting ) ! for non-flash ignition of helium core
-            if ( s% center_he4 <= s% ignition_center_xhe-center_he_drop &
-                  .and. s% log_surface_luminosity > s% prev_luminosity ) then
-               time_to_profile = .true.
-               s% phase_of_evolution = phase_he_ignition_over
-               s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
-               s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
-               if ( s% log_surface_luminosity > s% he_luminosity_limit ) &
-                  s% he_luminosity_limit = s% log_surface_luminosity
-            end if
-            s% prev_luminosity = s% log_surface_luminosity
-         case ( phase_he_ignition_over )
-            if ( s% center_he4 < center_he_going ) then
-               time_to_profile = .true.
-               s% phase_of_evolution = phase_helium_burning
-            end if      
-            s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
-            s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
-         case ( phase_carbon_burning )
-         case ( phase_helium_burning )
-         end select
-         
+!         select case ( s% phase_of_evolution )
+!         case ( phase_starting )
+!            if ( arrived_main_seq(s) ) then
+!               if (dbg) write(*,*) 'arrived_main_seq'
+!               time_to_profile = .true.
+!               s% prev_tsurf = s% log_surface_temperature
+!               if (s% center_h1 > center_h_going) then
+!                  !s% phase_of_evolution = phase_early_main_seq
+!               else if ( s% center_h1 > center_h_gone ) then
+!                  !s% phase_of_evolution = phase_mid_main_seq
+!               else if ( s% center_he4 > center_he_going ) then
+!                  !s% phase_of_evolution = phase_he_ignition_over
+!               else
+!                  !s% phase_of_evolution = phase_helium_burning
+!               end if
+!            end if
+!         case ( phase_early_main_seq )
+!            if ( s% center_h1 < center_h_going ) then
+!               time_to_profile = .true.
+!               s% prev_tsurf = s% log_surface_temperature
+!               !s% phase_of_evolution = phase_mid_main_seq
+!            end if
+!         case ( phase_mid_main_seq )
+!            if ( s% center_h1 < center_h_gone &
+!                  .and. s% log_surface_temperature < s% prev_tsurf-surface_t_drop ) then
+!               time_to_profile = .true.
+!               !s% phase_of_evolution = phase_wait_for_he
+!            end if
+!         case ( phase_wait_for_he )
+!         case ( phase_he_igniting ) ! for non-flash ignition of helium core
+!            if ( s% center_he4 <= s% ignition_center_xhe-center_he_drop &
+!                  .and. s% log_surface_luminosity > s% prev_luminosity ) then
+!               time_to_profile = .true.
+!               !s% phase_of_evolution = phase_he_ignition_over
+!               s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
+!               s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
+!               if ( s% log_surface_luminosity > s% he_luminosity_limit ) &
+!                  s% he_luminosity_limit = s% log_surface_luminosity
+!            end if
+!            s% prev_luminosity = s% log_surface_luminosity
+!         case ( phase_he_ignition_over )
+!            if ( s% center_he4 < center_he_going ) then
+!               time_to_profile = .true.
+!               !s% phase_of_evolution = phase_helium_burning
+!            end if      
+!            s% prev_tcntr2 = s% prev_tcntr1; s% prev_age2 = s% prev_age1
+!            s% prev_tcntr1 = s% log_center_temperature; s% prev_age1 = s% star_age
+!         case ( phase_carbon_burning )
+!         case ( phase_helium_burning )
+!         end select
+!         
       end function time_to_profile
       
       

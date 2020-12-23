@@ -129,14 +129,22 @@
 
       ! terminal_show_age_units
       ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! terminal_show_timestep_units
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! terminal_show_log_dt
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! terminal_show_log_age
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! options are 'years', 'days', or 'seconds'
+      ! options are 'years', 'yrs', 'days', 'secs', or 'seconds'
       ! this replaces the old controls terminal_show_age_in_years & terminal_show_age_in_days
-      ! note that if the age is in days, then the timestep is automatically in seconds.
 
       ! ::
 
     terminal_show_age_units = 'years'
+    terminal_show_timestep_units = 'years'
+    terminal_show_log_dt = .true.
+    terminal_show_log_age = .false.
 
 
       ! num_trace_history_values
@@ -1785,11 +1793,21 @@
       ! non_fe_core_infall_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if max infall speed at any location interior to ``he_core_mass``. in cm/s
+      ! stop if max infall speed (inward) at any location interior to ``he_core_mass``. in cm/s
 
       ! ::
 
     non_fe_core_infall_limit = 1d99
+
+
+      ! non_fe_core_rebound_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop if max rebound speed (outward) at any location interior to ``he_core_mass``. in cm/s
+
+      ! ::
+
+    non_fe_core_rebound_limit = 1d99
 
 
       ! v_div_csound_max_limit
@@ -1870,7 +1888,53 @@
       ! ::
 
     stop_near_zams = .false.
+    
+    
+      ! stop_at_phase_PreMS
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_ZAMS
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_IAMS
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_TAMS
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_He_Burn
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_ZACHeB
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_TACHeB
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_TP_AGB
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_C_Burn
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_Ne_Burn
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_O_Burn
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_Si_Burn
+      ! ~~~~~~~~~~~~~~
+      ! stop_at_phase_WDCS
+      ! ~~~~~~~~~~~~~~
 
+      ! if true, when phase of evolution reaches this point.
+
+      ! ::
+    
+    stop_at_phase_PreMS = .false.
+    stop_at_phase_ZAMS = .false.
+    stop_at_phase_IAMS = .false.
+    stop_at_phase_TAMS = .false.
+    stop_at_phase_He_Burn = .false.
+    stop_at_phase_ZACHeB = .false.
+    stop_at_phase_TACHeB = .false.
+    stop_at_phase_TP_AGB = .false.
+    stop_at_phase_C_Burn = .false.
+    stop_at_phase_Ne_Burn = .false.
+    stop_at_phase_O_Burn = .false.
+    stop_at_phase_Si_Burn = .false.
+    stop_at_phase_WDCS = .false.
+    
 
       ! Lnuc_div_L_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~
@@ -2411,22 +2475,6 @@
 
     gradT_excess_min_log_tau_full_on = -99
     gradT_excess_max_log_tau_full_off = -99
-
-
-      ! D_smooth_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! D_smooth_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! allows time-smoothing of mixing diffusion coeff at each step.
-      ! at the beginning of each step, after setting usual D_mix.
-      ! D_smooth(k) = (1d0 - f)*D_smooth_old(k) + f*D_mix(k)
-      ! where f = min(dt*D_smooth_growth_rate, D_smooth_replacement_fraction)
-
-      ! ::
-
-    D_smooth_replacement_fraction = 0.5d0
-    D_smooth_growth_rate = 1d0
 
 
       ! max_logT_for_mlt
@@ -9094,11 +9142,11 @@
     gold2_tol_residual_norm1 = 1d-11
     gold2_tol_max_residual1 = 1d-9
     gold2_iter_for_resid_tol2 = 5
-    gold2_tol_residual_norm2 = 1d-8
-    gold2_tol_max_residual2 = 1d-5
-    gold2_iter_for_resid_tol3 = 999
-    gold2_tol_residual_norm3 = 0
-    gold2_tol_max_residual3 = 0
+    gold2_tol_residual_norm2 = 1d-10
+    gold2_tol_max_residual2 = 1d-8
+    gold2_iter_for_resid_tol3 = 12
+    gold2_tol_residual_norm3 = 1d-8
+    gold2_tol_max_residual3 = 1d-5
 
       ! ::
 
@@ -10772,6 +10820,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~
       ! delta_lgT_cntr_hard_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lgT_cntr_limit_only_after_near_zams
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! limit for magnitude of change in log10 temperature at center
 
@@ -10779,6 +10829,7 @@
 
     delta_lgT_cntr_limit = 0.01d0
     delta_lgT_cntr_hard_limit = -1
+    delta_lgT_cntr_limit_only_after_near_zams = .true.
 
 
       ! delta_lgP_cntr_limit
@@ -11319,8 +11370,8 @@
 
       ! ::
 
-    limit_for_rel_error_in_energy_conservation = 1d-6
-    hard_limit_for_rel_error_in_energy_conservation = 1d-4
+    limit_for_rel_error_in_energy_conservation = 1d-4
+    hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 
       ! limit_for_rel_rate_in_energy_conservation

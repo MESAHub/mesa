@@ -246,9 +246,6 @@
       !pp
       !cno
       !tri_alfa
-      !burn_c
-      !burn_n
-      !burn_o
 
    ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
       
