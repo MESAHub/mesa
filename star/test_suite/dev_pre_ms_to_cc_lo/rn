@@ -7,43 +7,42 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp standard_late_pre_zams.mod late_pre_zams.mod
-#else
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_late_pre_zams.mod late_pre_zams.mod
+else
    do_one inlist_make_late_pre_zams_header late_pre_zams.mod
    cp late_pre_zams.mod standard_late_pre_zams.mod
-#fi
+fi
 
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp standard_zams.mod zams.mod
-#else
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_zams.mod zams.mod
+else
    do_one inlist_to_zams_header zams.mod
    cp zams.mod standard_zams.mod
-#fi
+fi
 
 # check if can skip
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp standard_after_core_he_burn.mod after_core_he_burn.mod
-#else
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_after_core_he_burn.mod after_core_he_burn.mod
+else
    do_one inlist_to_end_core_he_burn_header after_core_he_burn.mod
    cp after_core_he_burn.mod standard_after_core_he_burn.mod
-#fi
+fi
 
 # check if can skip
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp standard_after_core_c_burn.mod after_core_c_burn.mod
-#else
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_after_core_c_burn.mod after_core_c_burn.mod
+else
    do_one inlist_to_end_core_c_burn_header after_core_c_burn.mod
    cp after_core_c_burn.mod standard_after_core_c_burn.mod
-#fi
+fi
 
-# check if can skip
-#if [ -z "$MESA_RUN_OPTIONAL" ]; then
-#   cp standard_lgTmax_9.5.mod lgTmax_9.5.mod
-#else
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_lgTmax_9.5.mod lgTmax_9.5.mod
+else
    do_one inlist_to_lgTmax_9.5_header lgTmax_9.5.mod
    cp lgTmax_9.5.mod standard_lgTmax_9.5.mod
-#fi
+fi
 
 do_one inlist_to_cc_header start_core_collapse.mod
 

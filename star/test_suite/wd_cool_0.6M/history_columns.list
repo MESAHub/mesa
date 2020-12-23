@@ -251,15 +251,6 @@
       !log_average he4
       ! etc.
 
-   ! log10 total ergs/sec for reaction categories (Lsun units)
-      
-      pp
-      cno
-      tri_alfa
-      burn_c
-      burn_n
-      burn_o
-
    ! info about the max burning locations for hydrogen, helium, and metals
       
       ! info about location where have max rate of hydrogen burning (PP and CNO)
