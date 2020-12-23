@@ -116,23 +116,23 @@ then
 	fi
 
 
-	FILE_LIST=$(git lfs ls-files | grep -v '*')
+	# FILE_LIST=$(git lfs ls-files | grep -v '*')
 
-	if [[ -n $FILE_LIST ]]
-	then
-		echo
-		echo "****************************************************************"
-		echo "*        Some data files were not succesfully retrieved        *"
-		echo "*                                                              *"
-		echo "*                         Try running:                         *"
-		echo "*                   git lfs install --force                    *"
-		echo "*                           and then                           *"
-		echo "*                         git lfs pull                         *"
-		echo "*                                                              *"
-		echo "****************************************************************"
-		echo
-		exit 1
-	fi
+	# if [[ -n $FILE_LIST ]]
+	# then
+	# 	echo
+	# 	echo "****************************************************************"
+	# 	echo "*        Some data files were not succesfully retrieved        *"
+	# 	echo "*                                                              *"
+	# 	echo "*                         Try running:                         *"
+	# 	echo "*                   git lfs install --force                    *"
+	# 	echo "*                           and then                           *"
+	# 	echo "*                         git lfs pull                         *"
+	# 	echo "*                                                              *"
+	# 	echo "****************************************************************"
+	# 	echo
+	# 	exit 1
+	# fi
 fi
 
 
