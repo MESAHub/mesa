@@ -1928,8 +1928,8 @@
          call write1('delta_nu', best_delta_nu)
          call write1('nu_max', best_nu_max)
          write(io,*)        
-         call write1(trim(surf_coef1_name), best_surf_coef1)
-         call write1(trim(surf_coef2_name), best_surf_coef2)
+         write(io,'(a40,1pes20.10)') trim(surf_coef1_name), best_surf_coef1
+         write(io,'(a40,1pes20.10)') trim(surf_coef2_name), best_surf_coef2
          write(io,*)        
          call write1('initial h1', current_h1)
          call write1('initial he3', current_he3)
@@ -1944,7 +1944,7 @@
          call write1(trim(my_param1_name), current_my_param1)
          call write1(trim(my_param2_name), current_my_param2)
          call write1(trim(my_param3_name), current_my_param3)
-         write(io,'(a40,1pes26.16)') 'age', best_age
+         write(io,'(a40,1pes20.10)') 'age', best_age
          write(io,*)
          if (chi2_seismo_fraction == 1d0) then
             call write1('chi^2 seismo', best_chi2_seismo)
