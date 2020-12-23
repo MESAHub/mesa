@@ -154,15 +154,6 @@
       !log_average he4
       !log_average li7
 
-   ! log10 total ergs/sec for reaction categories (Lsun units)
-      
-      pp
-      cno
-      tri_alfa
-      burn_c
-      burn_n
-      burn_o
-
    ! log10 total ergs/sec for specific reactions (names from rates_def; Lsun units)
       
       !rpp

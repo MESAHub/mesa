@@ -27,9 +27,6 @@
       
       change_v_flag = .true.
       new_v_flag = .true.
-
-      change_initial_D_smooth_flag = .true.
-      new_D_smooth_flag = .true.
       
       set_rates_preference = .true.
       new_rates_preference = 2   ! 1 = nacre ; 2 = jina reaclib

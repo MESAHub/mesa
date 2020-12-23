@@ -68,6 +68,16 @@
          call test_suite_startup(s, restart, ierr)
          s% lxtra(1) = .false.
          s% lxtra(2) = restart
+
+         ! Only allow diffusion after burning from thermal pulse has settled down
+         if(s% x_integer_ctrl(1) == 3) then
+            if(s% power_he_burn > 1d3) then
+               s% do_element_diffusion = .false.
+            else
+               s% do_element_diffusion = .true.
+            end if
+         end if
+
       end subroutine extras_startup
       
       
@@ -108,18 +118,15 @@
             extras_check_model = terminate
             s% termination_code = t_extras_check_model
          end if
-         
-         !if (abs(s% Blocker_scaling_factor - Blocker_scaling_factor_after_TP) < 1d-8) return
-         
-         !if (s% center_he4 < 1d-4 .and. &
-         !      any(s% burn_he_conv_region(1:s% num_conv_boundaries)) .and. &
-         !      s% he_core_mass - s% c_core_mass <= s% TP_he_shell_max) then
-         !   !write(*,1) 'set Blocker_scaling_factor = Blocker_scaling_factor_after_TP', Blocker_scaling_factor_after_TP
-         !   !s% Blocker_scaling_factor = Blocker_scaling_factor_after_TP
-         !   write(*,*) '1st thermal pulse'
-         !   extras_check_model = terminate
-         !   s% termination_code = t_extras_finish_step
-         !end if
+
+         ! Only allow diffusion after burning from thermal pulse has settled down
+         if(s% x_integer_ctrl(1) == 3) then
+            if(s% power_he_burn > 1d3) then
+               s% do_element_diffusion = .false.
+            else
+               s% do_element_diffusion = .true.
+            end if
+         end if
          
       end function extras_check_model
 

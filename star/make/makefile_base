@@ -21,6 +21,7 @@ ifeq ($(USE_PGSTAR),YES)
       pgstar_kipp.f90 \
       pgstar_dpg_dnu.f90 \
       pgstar_trho.f90 \
+      pgstar_tmaxrho.f90 \
       pgstar_hr.f90 \
       pgstar_r_l.f90 \
       pgstar_r_teff.f90 \

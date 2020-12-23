@@ -68,11 +68,15 @@
     gamma_center_limit, eta_center_limit, log_center_temp_limit, log_max_temp_upper_limit, &
     log_max_temp_lower_limit , log_center_temp_lower_limit, log_center_density_limit, &
     log_center_density_lower_limit, center_entropy_limit, center_entropy_lower_limit, &
-    max_entropy_limit, max_entropy_lower_limit, min_timestep_limit, &
+    max_entropy_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
     fe_core_infall_limit, center_Ye_lower_limit, center_R_lower_limit, non_fe_core_infall_limit, &
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
     v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit, v_surf_div_v_esc_limit, v_surf_kms_limit, &
     stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, &
+    stop_at_phase_PreMS, stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, &
+    stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
+    stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
+    stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS, &
     peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit, delta_nu_lower_limit, &
     delta_nu_upper_limit, delta_Pg_lower_limit, delta_Pg_upper_limit, shock_mass_upper_limit, &
     mach1_mass_upper_limit, stop_when_reach_this_cumulative_extra_heating, surface_accel_div_grav_limit, &
@@ -100,7 +104,8 @@
     photo_interval, photo_digits, photo_directory, &
     
     ! output of logs and profiles
-    do_history_file, history_interval, write_header_frequency, terminal_interval, terminal_show_age_units, &
+    do_history_file, history_interval, write_header_frequency, terminal_interval, &
+    terminal_show_age_units, terminal_show_timestep_units, terminal_show_log_dt, terminal_show_log_age, &
     num_trace_history_values, trace_history_value_name, write_profiles_flag, profile_interval, &
     priority_profile_interval, log_directory, star_history_name, star_history_header_name, &
     star_history_dbl_format, star_history_int_format, star_history_txt_format, extra_terminal_output_file, &
@@ -131,9 +136,9 @@
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
     redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, D_smooth_replacement_fraction, D_smooth_growth_rate, &
-    semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_smooth_frozen_region_bottom_q, &
+    semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
-    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, D_smooth_frozen_region_top_q, &
+    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, D_mix_zero_region_top_q, &
     gradT_excess_max_change, gradT_excess_lambda1, gradT_excess_beta1, gradT_excess_lambda2, set_D_mix_to_D_smooth, &
     gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
     gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
@@ -150,8 +155,8 @@
     predictive_bdy_q_min, predictive_bdy_q_max, T_mix_limit, RSP_report_undercorrections, &
     do_conv_premix, conv_premix_avoid_increase, conv_premix_time_factor, &
     conv_premix_fix_pgas, conv_premix_dump_snapshots, do_premix_heating, &
-    overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_smooth_frozen_at_H_He_crossover, &
-    overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, &
+    overshoot_f, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
+    overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, dq_D_mix_zero_at_H_C_crossover, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, &
     min_dt_for_increases_in_convection_velocity, max_conv_vel_div_csound, &
@@ -350,7 +355,7 @@
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     trace_force_another_iteration, max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, &
-    dedt_eqn_r_scale, gamma_law_hydro, zero_gravity, drag_coefficient, min_q_for_drag, &
+    dedt_eqn_r_scale, gamma_law_hydro, zero_gravity, drag_coefficient, min_q_for_drag, turn_on_drag_in_H_envelope, &
     constant_L, v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_Fraley_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
@@ -458,7 +463,8 @@
     delta_lgL_nuc_limit, delta_lgL_nuc_hard_limit, lgL_nuc_burn_min, lgL_nuc_drop_factor, min_lgT_for_lgL_photo_limit, &
     delta_lgL_nuc_at_high_T_limit, delta_lgL_nuc_at_high_T_hard_limit, delta_lgL_nuc_at_high_T_limit_lgT_min, &
     delta_lgRho_cntr_limit, delta_lgRho_cntr_hard_limit, delta_lgP_cntr_limit, delta_lgP_cntr_hard_limit, &
-    delta_lgT_cntr_limit, delta_lgT_cntr_hard_limit, delta_lgT_max_limit, delta_lgT_max_hard_limit, &
+    delta_lgT_cntr_limit, delta_lgT_cntr_hard_limit, delta_lgT_cntr_limit_only_after_near_zams, &
+    delta_lgT_max_limit, delta_lgT_max_hard_limit, &
     delta_log_eps_nuc_limit, delta_log_eps_nuc_hard_limit, delta_lgT_max_limit_lgT_min, &
     delta_lgT_max_at_high_T_limit, delta_lgT_max_at_high_T_hard_limit, delta_lgT_max_at_high_T_limit_lgT_min, &
     delta_dX_div_X_cntr_min, delta_dX_div_X_cntr_max, delta_dX_div_X_cntr_limit, delta_dX_div_X_cntr_hard_limit, &
@@ -839,6 +845,7 @@
  s% center_Ye_lower_limit = center_Ye_lower_limit
  s% center_R_lower_limit = center_R_lower_limit
  s% non_fe_core_infall_limit = non_fe_core_infall_limit
+ s% non_fe_core_rebound_limit = non_fe_core_rebound_limit
  s% v_div_csound_surf_limit = v_div_csound_surf_limit
  s% v_div_csound_max_limit = v_div_csound_max_limit
  s% Lnuc_div_L_upper_limit = Lnuc_div_L_upper_limit
@@ -849,6 +856,19 @@
  s% v_surf_kms_limit = v_surf_kms_limit
 
  s% stop_near_zams = stop_near_zams
+ s% stop_at_phase_PreMS = stop_at_phase_PreMS
+ s% stop_at_phase_ZAMS = stop_at_phase_ZAMS
+ s% stop_at_phase_IAMS = stop_at_phase_IAMS
+ s% stop_at_phase_TAMS = stop_at_phase_TAMS
+ s% stop_at_phase_He_Burn = stop_at_phase_He_Burn
+ s% stop_at_phase_ZACHeB = stop_at_phase_ZACHeB
+ s% stop_at_phase_TACHeB = stop_at_phase_TACHeB
+ s% stop_at_phase_TP_AGB = stop_at_phase_TP_AGB
+ s% stop_at_phase_C_Burn = stop_at_phase_C_Burn
+ s% stop_at_phase_Ne_Burn = stop_at_phase_Ne_Burn
+ s% stop_at_phase_O_Burn = stop_at_phase_O_Burn
+ s% stop_at_phase_Si_Burn = stop_at_phase_Si_Burn
+ s% stop_at_phase_WDCS = stop_at_phase_WDCS
  s% Lnuc_div_L_zams_limit = Lnuc_div_L_zams_limit
  s% Pgas_div_P_limit = Pgas_div_P_limit
  s% Pgas_div_P_limit_max_q = Pgas_div_P_limit_max_q
@@ -949,6 +969,9 @@
  s% write_header_frequency = write_header_frequency
  s% terminal_interval = terminal_interval
  s% terminal_show_age_units = terminal_show_age_units
+ s% terminal_show_timestep_units = terminal_show_timestep_units
+ s% terminal_show_log_dt = terminal_show_log_dt
+ s% terminal_show_log_age = terminal_show_log_age
  s% extra_terminal_output_file = extra_terminal_output_file
  s% num_trace_history_values = num_trace_history_values
  s% trace_history_value_name = trace_history_value_name
@@ -1067,9 +1090,10 @@
  
  s% D_smooth_replacement_fraction = D_smooth_replacement_fraction
  s% D_smooth_growth_rate = D_smooth_growth_rate
- s% D_smooth_frozen_region_bottom_q = D_smooth_frozen_region_bottom_q
- s% D_smooth_frozen_region_top_q = D_smooth_frozen_region_top_q
- s% dq_D_smooth_frozen_at_H_He_crossover = dq_D_smooth_frozen_at_H_He_crossover
+ s% D_mix_zero_region_bottom_q = D_mix_zero_region_bottom_q
+ s% D_mix_zero_region_top_q = D_mix_zero_region_top_q
+ s% dq_D_mix_zero_at_H_He_crossover = dq_D_mix_zero_at_H_He_crossover
+ s% dq_D_mix_zero_at_H_C_crossover = dq_D_mix_zero_at_H_C_crossover
  s% set_D_mix_to_D_smooth = set_D_mix_to_D_smooth
  s% blend_D_smooth_between_cells_of_same_mixing_type = blend_D_smooth_between_cells_of_same_mixing_type
 
@@ -1898,6 +1922,7 @@
  s% constant_L = constant_L
  s% drag_coefficient = drag_coefficient
  s% min_q_for_drag = min_q_for_drag
+ s% turn_on_drag_in_H_envelope = turn_on_drag_in_H_envelope
  s% v_drag_factor = v_drag_factor
  s% v_drag = v_drag
  s% q_for_v_drag_full_off = q_for_v_drag_full_off
@@ -2320,6 +2345,7 @@
 
  s% delta_lgT_cntr_limit = delta_lgT_cntr_limit
  s% delta_lgT_cntr_hard_limit = delta_lgT_cntr_hard_limit
+ s% delta_lgT_cntr_limit_only_after_near_zams = delta_lgT_cntr_limit_only_after_near_zams
 
  s% delta_lgT_max_limit = delta_lgT_max_limit
  s% delta_lgT_max_hard_limit = delta_lgT_max_hard_limit
@@ -2549,6 +2575,7 @@
  center_Ye_lower_limit = s% center_Ye_lower_limit
  center_R_lower_limit = s% center_R_lower_limit
  non_fe_core_infall_limit = s% non_fe_core_infall_limit
+ non_fe_core_rebound_limit = s% non_fe_core_rebound_limit
  v_div_csound_surf_limit = s% v_div_csound_surf_limit
  v_div_csound_max_limit = s% v_div_csound_max_limit
  Lnuc_div_L_upper_limit = s% Lnuc_div_L_upper_limit
@@ -2559,6 +2586,19 @@
  v_surf_kms_limit = s% v_surf_kms_limit
 
  stop_near_zams = s% stop_near_zams
+ stop_at_phase_PreMS = s% stop_at_phase_PreMS
+ stop_at_phase_ZAMS = s% stop_at_phase_ZAMS
+ stop_at_phase_IAMS = s% stop_at_phase_IAMS
+ stop_at_phase_TAMS = s% stop_at_phase_TAMS
+ stop_at_phase_He_Burn = s% stop_at_phase_He_Burn
+ stop_at_phase_ZACHeB = s% stop_at_phase_ZACHeB
+ stop_at_phase_TACHeB = s% stop_at_phase_TACHeB
+ stop_at_phase_TP_AGB = s% stop_at_phase_TP_AGB
+ stop_at_phase_C_Burn = s% stop_at_phase_C_Burn
+ stop_at_phase_Ne_Burn = s% stop_at_phase_Ne_Burn
+ stop_at_phase_O_Burn = s% stop_at_phase_O_Burn
+ stop_at_phase_Si_Burn = s% stop_at_phase_Si_Burn
+ stop_at_phase_WDCS = s% stop_at_phase_WDCS
  Lnuc_div_L_zams_limit = s% Lnuc_div_L_zams_limit
  Pgas_div_P_limit = s% Pgas_div_P_limit
  Pgas_div_P_limit_max_q = s% Pgas_div_P_limit_max_q
@@ -2659,6 +2699,9 @@
  write_header_frequency = s% write_header_frequency
  terminal_interval = s% terminal_interval
  terminal_show_age_units = s% terminal_show_age_units
+ terminal_show_timestep_units = s% terminal_show_timestep_units
+ terminal_show_log_dt = s% terminal_show_log_dt
+ terminal_show_log_age = s% terminal_show_log_age
  extra_terminal_output_file = s% extra_terminal_output_file
  num_trace_history_values = s% num_trace_history_values
  trace_history_value_name = s% trace_history_value_name
@@ -2771,9 +2814,10 @@
  
  D_smooth_replacement_fraction = s% D_smooth_replacement_fraction
  D_smooth_growth_rate = s% D_smooth_growth_rate
- D_smooth_frozen_region_bottom_q = s% D_smooth_frozen_region_bottom_q
- D_smooth_frozen_region_top_q = s% D_smooth_frozen_region_top_q
- dq_D_smooth_frozen_at_H_He_crossover = s% dq_D_smooth_frozen_at_H_He_crossover
+ D_mix_zero_region_bottom_q = s% D_mix_zero_region_bottom_q
+ D_mix_zero_region_top_q = s% D_mix_zero_region_top_q
+ dq_D_mix_zero_at_H_He_crossover = s% dq_D_mix_zero_at_H_He_crossover
+ dq_D_mix_zero_at_H_C_crossover = s% dq_D_mix_zero_at_H_C_crossover
  set_D_mix_to_D_smooth = s% set_D_mix_to_D_smooth
  blend_D_smooth_between_cells_of_same_mixing_type = s% blend_D_smooth_between_cells_of_same_mixing_type
 
@@ -3600,6 +3644,7 @@
  constant_L = s% constant_L
  drag_coefficient = s% drag_coefficient
  min_q_for_drag = s% min_q_for_drag
+ turn_on_drag_in_H_envelope = s% turn_on_drag_in_H_envelope
  v_drag_factor = s% v_drag_factor
  v_drag = s% v_drag
  q_for_v_drag_full_off = s% q_for_v_drag_full_off
@@ -4018,6 +4063,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
 
  delta_lgT_cntr_limit = s% delta_lgT_cntr_limit
  delta_lgT_cntr_hard_limit = s% delta_lgT_cntr_hard_limit
+ delta_lgT_cntr_limit_only_after_near_zams = s% delta_lgT_cntr_limit_only_after_near_zams
 
  delta_lgP_cntr_limit = s% delta_lgP_cntr_limit
  delta_lgP_cntr_hard_limit = s% delta_lgP_cntr_hard_limit

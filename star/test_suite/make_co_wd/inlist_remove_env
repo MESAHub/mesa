@@ -31,7 +31,7 @@
 &controls
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 2000
+      max_model_number = 2500
 
       retry_hold = 3
       min_timestep_limit = 1d-20 ! (seconds)
@@ -57,12 +57,14 @@
       
 ! solver controls
       ignore_too_large_correction = .true.
+      convergence_ignore_equL_residuals = .true.
+      ! max_resid_jump_limit = 1d9
+      relax_max_number_retries = 3000
 
 ! output
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-
 
 
 / ! end of controls namelist

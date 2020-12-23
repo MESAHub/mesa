@@ -2,22 +2,19 @@
 
 &star_job
 
-      !save_star_job_namelist = .true.
-      !star_job_namelist_name = 'star_job_to_cc.txt'
-
       load_saved_model = .true.
-      saved_model_name = 'after_core_he_burn.mod'
+      saved_model_name = 'lgTmax_9.5.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'start_core_collapse.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
-      set_initial_age = .false.
+      !set_initial_age = .false.
+      set_initial_age = .true.
+      initial_age = 0
+
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
-      
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d-1
 
       !pgstar_flag = .true.
 
@@ -31,10 +28,7 @@
 
 &controls
 
-      !save_controls_namelist = .true.
-      !controls_namelist_name = 'controls_to_cc.txt'
-
-      fe_core_infall_limit = 1d7
+      fe_core_infall_limit = 1d6
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -51,16 +45,24 @@
 ! mixing
 
 ! timesteps
+      limit_for_rel_error_in_energy_conservation = 1d-4
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 ! mesh
 
 ! solver
+      drag_coefficient = 99 ! 999999d0 ! drive v to 0 in H envelope after end core He burn
+      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
 
 ! output
-      
+      terminal_show_age_units = 'days'
+      terminal_show_timestep_units = 'secs'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
+
       num_trace_history_values = 4
       trace_history_value_name(1) = 'center fe56'
       trace_history_value_name(2) = 'fe_core_infall'
@@ -122,6 +124,10 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 2.1 ! -101d0
+Profile_Panels3_xmax = 2.3 ! 3.5 ! -101d0 ! 
+Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
+
+TRho_Profile_xmin = 0.0
+TRho_Profile_ymin = 8.5
 
 / ! end of pgstar namelist

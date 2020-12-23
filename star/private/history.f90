@@ -1247,7 +1247,7 @@
             val = safe_log10(surface_avg_x(s,s% net_iso(i)))
          else if (c > log_center_xa_offset) then
             i = c - log_center_xa_offset
-            val = safe_log10(central_avg_x(s,s% net_iso(i)))
+            val = safe_log10(center_avg_x(s,s% net_iso(i)))
          else if (c > log_average_xa_offset) then
             i = c - log_average_xa_offset
             val = safe_log10(star_avg_x(s,s% net_iso(i)))
@@ -1268,7 +1268,7 @@
             val = surface_avg_x(s,s% net_iso(i))
          else if (c > center_xa_offset) then
             i = c - center_xa_offset
-            val = central_avg_x(s,s% net_iso(i))
+            val = center_avg_x(s,s% net_iso(i))
          else
 
             select case(c)
@@ -1276,11 +1276,11 @@
             case(h_model_number)
                is_int_val = .true.
                int_val = s% model_number
+               
             case(h_log_star_age)
                val = safe_log10(s% star_age)
             case(h_star_age)
                val = s% star_age
-
             case(h_log_star_age_sec)
                val = safe_log10(s% star_age*secyer)
             case(h_star_age_sec)
@@ -1293,6 +1293,19 @@
                val = s% star_age*secyer/60/60/24
             case(h_day)
                val = s% star_age*secyer/60/60/24
+
+            case(h_time_step)
+               val = s% time_step
+            case(h_log_dt)
+               val = safe_log10(s% time_step)
+            case(h_time_step_sec)
+               val = s% time_step*secyer
+            case(h_log_dt_sec)
+               val = safe_log10(s% time_step*secyer)
+            case(h_time_step_days)
+               val = s% time_step*secyer/60/60/24
+            case(h_log_dt_days)
+               val = safe_log10(s% time_step*secyer/60/60/24)
 
             case(h_log_star_mass)
                val = safe_log10(s% star_mass)
@@ -1344,15 +1357,6 @@
                val = s% m_grav(1)/Msun
             case(h_star_mass_grav_div_mass)
                val = s% m_grav(1)/s% m(1)
-
-            case(h_time_step)
-               val = s% time_step
-            case(h_log_dt)
-               val = safe_log10(s% time_step)
-            case(h_time_step_sec)
-               val = s% time_step*secyer
-            case(h_log_dt_sec)
-               val = safe_log10(s% time_step*secyer)
 
             case(h_e_thermal)
                val = sum(s% dm(1:nz)*s% T(1:nz)*s% cp(1:nz))
@@ -3441,46 +3445,6 @@
       end function apsidal_constant
 
 
-      real(dp) function central_avg_x(s,j)
-         type (star_info), pointer :: s
-         integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq
-         integer :: k
-         if (j == 0) then
-            central_avg_x = 0
-            return
-         end if
-         sum_x = 0
-         sum_dq = 0
-         do k = s% nz, 1, -1
-            sum_x = sum_x + s% xa(j,k)*s% dq(k)
-            sum_dq = sum_dq + s% dq(k)
-            if (sum_dq >= s% center_avg_value_dq) exit
-         end do
-         central_avg_x = sum_x/sum_dq
-      end function central_avg_x
-
-
-      real(dp) function surface_avg_x(s,j)
-         type (star_info), pointer :: s
-         integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq
-         integer :: k
-         if (j == 0) then
-            surface_avg_x = 0
-            return
-         end if
-         sum_x = 0
-         sum_dq = 0
-         do k = 1, s% nz
-            sum_x = sum_x + s% xa(j,k)*s% dq(k)
-            sum_dq = sum_dq + s% dq(k)
-            if (sum_dq >= s% surface_avg_abundance_dq) exit
-         end do
-         surface_avg_x = sum_x/sum_dq
-      end function surface_avg_x
-
-
       real(dp) function star_avg_x(s,j)
          type (star_info), pointer :: s
          integer, intent(in) :: j
@@ -3702,7 +3666,7 @@
          i = s% net_iso(id)
          select case (str(1:split-1))
             case('center')
-               val = central_avg_x(s,i)
+               val = center_avg_x(s,i)
             case('surface')
                val = surface_avg_x(s,i)
             case('average')
@@ -3714,7 +3678,7 @@
             case('log_average')
                val = safe_log10(star_avg_x(s,i))
             case('log_center')
-               val = safe_log10(central_avg_x(s,i))
+               val = safe_log10(center_avg_x(s,i))
             case('log_surface')
                val = safe_log10(surface_avg_x(s,i))
             case default
