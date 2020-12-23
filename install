@@ -116,23 +116,30 @@ then
 	fi
 
 
-	# FILE_LIST=$(git lfs ls-files | grep -v '*')
+        # check that each LFS file has a full copy on disk
+        FILE_LIST=$(git lfs ls-files -n)
+        for LFS_FILE in ${FILE_LIST}; do
+            # the checks have this form to handle uncommitted changes to LFS files
+            # if no file exists, that means the file was probably deleted and that's OK
+            # if the file exists, but is short, then it is probably the bare LFS pointer
+            #   and that indicates a problem retrieving the file
+            if [ -f "${LFS_FILE}" ] && [ $(du -b "${LFS_FILE}" | cut -f1) -lt 200 ];
+            then
+		echo
+		echo "****************************************************************"
+		echo "*        Some data files were not succesfully retrieved        *"
+		echo "*                                                              *"
+		echo "*                         Try running:                         *"
+		echo "*                   git lfs install --force                    *"
+		echo "*                           and then                           *"
+		echo "*                         git lfs pull                         *"
+		echo "*                                                              *"
+		echo "****************************************************************"
+		echo
+		exit 1
+	    fi
+        done
 
-	# if [[ -n $FILE_LIST ]]
-	# then
-	# 	echo
-	# 	echo "****************************************************************"
-	# 	echo "*        Some data files were not succesfully retrieved        *"
-	# 	echo "*                                                              *"
-	# 	echo "*                         Try running:                         *"
-	# 	echo "*                   git lfs install --force                    *"
-	# 	echo "*                           and then                           *"
-	# 	echo "*                         git lfs pull                         *"
-	# 	echo "*                                                              *"
-	# 	echo "****************************************************************"
-	# 	echo
-	# 	exit 1
-	# fi
 fi
 
 
