@@ -9,7 +9,7 @@ fi
 
 # Create file for TestHub
 # This file will be populated during math/test
-touch testhub.yml
+echo "# If this file contains only this line, install failed before math/test" > testhub.yml
 
 export BUILD_LOG="build.log"
 
