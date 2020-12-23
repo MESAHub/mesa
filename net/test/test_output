@@ -5,12 +5,12 @@
                                 log temp         7.833000000
                                  log rho         2.000000000
 
-                            log(eps_nuc)        12.924100645
+                            log(eps_nuc)        12.924100440
 
-                                 eps_nuc     0.839654548E+13
+                                 eps_nuc     0.839654151E+13
 
-                            d_lneps_dlnT         9.328758658
-                          d_lneps_dlnRho         1.009292769
+                            d_lneps_dlnT         9.328757835
+                          d_lneps_dlnRho         1.009292766
 
 
  energy generation by category
@@ -18,7 +18,7 @@
                                 category   log rate (erg/g/sec)
 
                                       pp        12.922533   0.836629E+13
-                                     cno        10.480754   0.302520E+11
+                                     cno        10.480697   0.302480E+11
 
 
 
@@ -30,19 +30,19 @@
                                 log temp         7.833000000
                                  log rho         2.000000000
 
-                            log(eps_nuc)        10.480242351
+                            log(eps_nuc)        10.480185432
 
-                                 eps_nuc     0.302163743E+11
+                                 eps_nuc     0.302124143E+11
 
-                            d_lneps_dlnT        11.356846819
-                          d_lneps_dlnRho         1.015667296
+                            d_lneps_dlnT        11.356884345
+                          d_lneps_dlnRho         1.015667220
 
 
  energy generation by category
 
                                 category   log rate (erg/g/sec)
 
-                                     cno        10.480242   0.302164E+11
+                                     cno        10.480185   0.302124E+11
                                       pp         3.038319   0.109224E+04
 
 
@@ -55,12 +55,12 @@
                                 log temp         7.833000000
                                  log rho         2.000000000
 
-                            log(eps_nuc)        12.921874802
+                            log(eps_nuc)        12.921874596
 
-                                 eps_nuc     0.835362166E+13
+                                 eps_nuc     0.835361769E+13
 
-                            d_lneps_dlnT         9.326561130
-                          d_lneps_dlnRho         1.009292887
+                            d_lneps_dlnT         9.326560302
+                          d_lneps_dlnRho         1.009292884
 
 
  energy generation by category
@@ -68,7 +68,7 @@
                                 category   log rate (erg/g/sec)
 
                                       pp        12.920299   0.832337E+13
-                                     cno        10.480754   0.302520E+11
+                                     cno        10.480697   0.302480E+11
 
 
 
@@ -80,12 +80,12 @@
                                 log temp         7.833000000
                                  log rho         2.000000000
 
-                            log(eps_nuc)         8.740188691
+                            log(eps_nuc)         8.729178865
 
-                                 eps_nuc     0.549779689E+09
+                                 eps_nuc     0.536017372E+09
 
-                            d_lneps_dlnT        11.626775653
-                          d_lneps_dlnRho         1.013863565
+                            d_lneps_dlnT        11.559205087
+                          d_lneps_dlnRho         1.013842798
 
 
  energy generation by category
@@ -109,7 +109,7 @@
 
                                  eps_nuc     0.150680031E+25
 
-                            d_lneps_dlnT        -0.251306068
+                            d_lneps_dlnT        -0.251306072
                           d_lneps_dlnRho         1.008425906
 
 
@@ -151,7 +151,7 @@
 
                                  eps_nuc     0.150680031E+25
 
-                            d_lneps_dlnT        -0.251306068
+                            d_lneps_dlnT        -0.251306072
                           d_lneps_dlnRho         1.008425906
 
 

@@ -211,12 +211,16 @@
 
       subroutine binary_private_def_init
          use num_def
+         use utils_lib, only: get_compiler_version, get_mesasdk_version
+
          integer :: i      
          logical :: okay
+         integer :: ierr
          
          include 'formats'
          
          okay = .true.
+         ierr = 0
 
          binary_dt_why_str(1:b_numTlim) = ''
          
@@ -244,87 +248,10 @@
          
          !here we store useful information about the compiler and SDK
          call get_compiler_version(compiler_name,compiler_version_name)
-         call get_mesasdk_version(mesasdk_version_name)
+         call get_mesasdk_version(mesasdk_version_name,ierr)
          call date_and_time(date=date)
          
       end subroutine binary_private_def_init         
-
-
-      subroutine get_compiler_version(compiler_name,compiler_version_name)
-        character(len=*) :: compiler_name, compiler_version_name
-        integer :: intel_compiler_build_date = 0
-    
-#ifdef __INTEL_COMPILER
-        compiler_name = "ifort"
-        intel_compiler_build_date = __INTEL_COMPILER_BUILD_DATE
-        write(compiler_version_name,'(i8)') intel_compiler_build_date
-#elif __GFORTRAN__
-        compiler_name = "gfortran"
-        compiler_version_name = __VERSION__
-#else
-        compiler_name = "unknown"
-        compiler_version_name = "unknown"
-#endif
-      end subroutine get_compiler_version
-      
-      subroutine get_mesasdk_version(version)
-        use iso_fortran_env
-        implicit none
-        character(len=*), intent(out) :: version
-        character(len=strlen) :: mesasdk_root, filename
-        integer :: unit, root_len, ver_len, ierr
-
-        version = 'unknown' !set here in case there is a problem below
-
-        call get_environment_variable(name='MESASDK_VERSION', value=version, length=ver_len, status=ierr)
-        if (ierr /= 0) then
-           return
-        endif
-        if(ver_len>0) then !this implies MESASDK_VERSION is defined
-           return
-        endif
-        
-        call get_environment_variable(name='MESASDK_ROOT', value=mesasdk_root, length=root_len, status=ierr)
-        if (ierr /= 0 .or. root_len==0) then
-           return
-        endif
-        
-        
-        filename=trim(mesasdk_root) // '/bin/mesasdk_version.sh'
-        open(newunit=unit, file=filename, status='old', action='read', iostat=ierr)
-        if (ierr /= 0)then
-           return
-        endif
-
-        read(unit,'(A)')
-        read(unit,'(A)')
-        read(unit,'(A)')
-        read(unit,'(A)')
-        read(unit,'(5X, A)') version
-
-        close(unit)
-
-        call strip(version,'"')
-
-      end subroutine get_mesasdk_version
-
-      elemental subroutine strip(string,set)
-        character(len=*), intent(inout) :: string
-        character(len=*), intent(in)    :: set
-        integer :: old, new, stride
-        old=1; new=1
-        do
-           stride=scan(string(old:),set)
-           if(stride>0)then
-              string(new:new+stride-2)=string(old:old+stride-2)
-              old=old+stride
-              new=new+stride-1
-           else
-              string(new:)=string(old:)
-              return
-           end if
-        end do
-      end subroutine strip
       
       integer function alloc_binary(ierr)
          integer, intent(out) :: ierr

@@ -36,11 +36,8 @@ Install Git LFS
 MESA uses Large File Storage (LFS), a git extension that allows us to
 easily store and version the large microphysics data files.
 
-Obtain and install Git LFS from `its website <https://git-lfs.github.com/>`_.  
+Obtain and install Git LFS from `its website <https://git-lfs.github.com/>`_.  You only need to do Step 1 in the Getting Started section.  Step 2 has already been done for MESA.
 
-.. note::
-
-   The Git LFS home page has additional information about configuring a repository.  This has already been done for MESA.  The only command you need to run is ``git lfs install``.
 
 Download the MESA repository
 ----------------------------
@@ -90,7 +87,7 @@ The line between what should be a feature branch / pull request and what's commi
 Making a commit
 ---------------
 
-When you want to add a new file or add changes to an existing file, do::
+When you want to add a new file or add changes to a file that is already tracked by git, do::
 
   git add <filename>
 
@@ -101,7 +98,7 @@ Once you have added your desired changes::
 
   git commit -m <message>
 
-If you want to commit all your changes to existing files, you can skip the git add and do::
+If you want to commit all your changes to files already tracked by git, you can skip the git add and do::
 
   git commit -a -m <message>
 
@@ -130,6 +127,24 @@ When you want to get others' changes::
 The first argument is the remote repository (``origin`` = GitHub).
 The second argument is the branch name.  If you want to get changes
 from a non-default branch (i.e., not ``main``), see :ref:`Branching`.
+
+If you have made changes to a branch and pull from a branch that
+others have independently modified, git must decide how to reconcile
+the divergent branches.  In order to avoid unnecessary merges (thereby
+giving a simpler, more linear commit history), it is suggested that
+you default to rebasing your changes.  Rebasing means that git will
+pull others' changes and then replay your changes on top of them.  If
+the changes conflict, you will have a chance to resolve the conflicts.
+To make this the default behavior, issue the following command while
+your current working directory is in the MESA git repository::
+
+  git config pull.rebase true
+
+You can also pass ``--rebase``, ``--no-rebase`` (combine changes with
+a merge commit), or ``--ff-only`` (refuse to pull if there are other
+changes) on the command line to override the configured default per
+invocation.
+
 
 If you want to get others' changes, but not immediately update your
 local repository to match that content::
