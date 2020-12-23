@@ -7,6 +7,10 @@ if [ -d ".git" ] || [ -f ".git" ]; then
     git rev-parse HEAD > data/version_number
 fi
 
+# Create file for TestHub
+# This file will be populated during math/test
+touch testhub.yml
+
 export BUILD_LOG="build.log"
 
 # Get system info
