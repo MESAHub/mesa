@@ -344,7 +344,7 @@ do_one_parallel star
 
 do_one_parallel binary
 
-do_one astero
+do_one_parallel astero
 
 
 
