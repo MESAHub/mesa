@@ -41,6 +41,8 @@
 
 
       integer function do_evolve_step_part1(id, first_try)
+         use alloc, only: fill_star_info_arrays_with_NaNs, &
+            do_fill_arrays_with_NaNs, star_info_old_arrays
          logical, intent(in) :: first_try
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -49,6 +51,13 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         if (first_try .and. s% fill_arrays_with_NaNs) then
+            !write(*,2) 'fill_star_info_arrays_with_NaNs', s% model_number
+            call fill_star_info_arrays_with_NaNs(s, ierr)
+            if (ierr /= 0) return
+            call star_info_old_arrays(s, do_fill_arrays_with_NaNs, ierr)
+            if (ierr /= 0) return
+         end if         
          do_evolve_step_part1 = do_step_part1(id, first_try)
          s% total_step_attempts = s% total_step_attempts + 1
          if (s% doing_relax) &
