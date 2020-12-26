@@ -23,9 +23,6 @@
       change_D_omega_flag = .true.
       new_D_omega_flag = .false.
 
-      change_D_smooth_flag = .true.
-      new_D_smooth_flag = .false.
-
       change_rotation_flag = .true.
       new_rotation_flag = .false.
 
