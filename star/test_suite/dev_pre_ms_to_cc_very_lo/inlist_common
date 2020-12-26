@@ -94,9 +94,6 @@
          ! use other_alpha_mlt only if star_mass >= this limit.
 
 ! mixing
-      set_D_mix_to_D_smooth = .true.
-      blend_D_smooth_between_cells_of_same_mixing_type = .true.
-
       D_omega_max_replacement_fraction = 0.5d0
       D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0

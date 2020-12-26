@@ -42,8 +42,8 @@
 
 
       integer function do_hydro_converge( &
-            s, itermin, nvar, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, dt_stage)
+            s, nvar, skip_global_corr_coeff_limit, &
+            tol_correction_norm, tol_max_correction)
          ! return keep_going, retry, or terminate
          use mtx_lib
          use mtx_def
@@ -51,9 +51,9 @@
          use star_utils, only: start_time, update_time
 
          type (star_info), pointer :: s
-         integer, intent(in) :: itermin, nvar
+         integer, intent(in) :: nvar
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), intent(in) :: tol_correction_norm, tol_max_correction, dt_stage
+         real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
          integer :: ierr, nz, k, mljac, mujac, n, nzmax, &
             hydro_lwork, hydro_liwork, num_jacobians
@@ -61,7 +61,7 @@
 
          include 'formats'
 
-         if (dt_stage <= 0d0) then
+         if (s% dt <= 0d0) then
             do_hydro_converge = keep_going
             return
          end if
@@ -97,8 +97,8 @@
          s% solver_call_number = s% solver_call_number + 1
 
          do_hydro_converge = do_hydro_solver( &
-            s, itermin, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, dt_stage, &
+            s, skip_global_corr_coeff_limit, &
+            tol_correction_norm, tol_max_correction, &
             report, nz, nvar, s% hydro_work, hydro_lwork, &
             s% hydro_iwork, hydro_liwork)
 
@@ -127,13 +127,8 @@
 
          subroutine work_sizes_for_solver(ierr)
             use star_solver, only: get_solver_work_sizes
-            use star_solver_15066, only: get_solver_work_sizes_15066
             integer, intent(out) :: ierr
-            if (.not. s% conv_vel_flag) then
-               call get_solver_work_sizes(s, nvar, nz, hydro_lwork, hydro_liwork, ierr)
-            else
-               call get_solver_work_sizes_15066(s, nvar, nz, hydro_lwork, hydro_liwork, ierr)
-            end if
+            call get_solver_work_sizes(s, nvar, nz, hydro_lwork, hydro_liwork, ierr)
          end subroutine work_sizes_for_solver
 
 
@@ -227,8 +222,8 @@
 
 
       integer function do_hydro_solver( &
-            s, itermin, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, dt_stage, &
+            s, skip_global_corr_coeff_limit, &
+            tol_correction_norm, tol_max_correction, &
             report, nz, nvar, solver_work, solver_lwork, &
             solver_iwork, solver_liwork)
          ! return keep_going, retry, or terminate
@@ -243,9 +238,9 @@
          use alloc
 
          type (star_info), pointer :: s
-         integer, intent(in) :: itermin, nz, nvar
+         integer, intent(in) :: nz, nvar
          logical, intent(in) :: skip_global_corr_coeff_limit, report
-         real(dp), intent(in) :: tol_correction_norm, tol_max_correction, dt_stage
+         real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
          real(dp), pointer :: dx(:,:), dx1(:) ! dx => dx1
          integer, intent(in) :: solver_lwork, solver_liwork
@@ -286,83 +281,6 @@
             end if
          end if
 
-         ! parameters for solver
-         solver_iwork(1:num_iwork_params) = 0
-         solver_work(1:num_work_params) = 0
-
-         if (s% doing_first_model_of_run) &
-            solver_iwork(i_try_really_hard) = 1 ! try_really_hard for 1st model
-         solver_iwork(i_itermin) = itermin
-
-         solver_iwork(i_max_iterations_for_jacobian) = 1
-
-         if (s% doing_first_model_of_run) then
-            solver_iwork(i_max_tries) = s% max_tries1
-         else if (s% retry_cnt > 20) then
-            solver_iwork(i_max_tries) = s% max_tries_after_20_retries
-         else if (s% retry_cnt > 10) then
-            solver_iwork(i_max_tries) = s% max_tries_after_10_retries
-         else if (s% retry_cnt > 5) then
-            solver_iwork(i_max_tries) = s% max_tries_after_5_retries
-         else if (s% retry_cnt > 0) then
-            solver_iwork(i_max_tries) = s% max_tries_for_retry
-         else
-            solver_iwork(i_max_tries) = s% solver_max_tries_before_reject
-         end if
-
-         solver_iwork(i_tiny_min_corr_coeff) = s% tiny_corr_coeff_limit
-         if (s% report_solver_progress) then
-            solver_iwork(i_debug) = 1
-         else
-            solver_iwork(i_debug) = 0
-         end if
-         solver_iwork(i_model_number) = s% model_number
-
-         solver_work(r_tol_abs_slope_min) = -1 ! unused
-         solver_work(r_tol_corr_resid_product) = -1 ! unused
-
-         solver_work(r_scale_correction_norm) = s% scale_correction_norm
-         solver_work(r_corr_param_factor) = s% corr_param_factor
-         solver_work(r_scale_max_correction) = s% scale_max_correction
-         solver_work(r_corr_norm_jump_limit) = s% corr_norm_jump_limit
-         solver_work(r_max_corr_jump_limit) = s% max_corr_jump_limit
-         solver_work(r_resid_norm_jump_limit) = s% resid_norm_jump_limit
-         solver_work(r_max_resid_jump_limit) = s% max_resid_jump_limit
-         solver_work(r_tiny_corr_factor) = s% tiny_corr_factor
-         solver_work(r_dt) = dt_stage
-         solver_work(r_tol_max_correction) = tol_max_correction
-         
-         if (gold_tolerances_level == 2) then
-            solver_work(r_tol_residual_norm) = s% gold2_tol_residual_norm1
-            solver_work(r_tol_max_residual) = s% gold2_tol_max_residual1
-            solver_work(r_tol_residual_norm2) = s% gold2_tol_residual_norm2
-            solver_work(r_tol_max_residual2) = s% gold2_tol_max_residual2
-            solver_work(r_tol_residual_norm3) = s% gold2_tol_residual_norm3
-            solver_work(r_tol_max_residual3) = s% gold2_tol_max_residual3
-         else if (gold_tolerances_level == 1) then
-            solver_work(r_tol_residual_norm) = s% gold_tol_residual_norm1
-            solver_work(r_tol_max_residual) = s% gold_tol_max_residual1
-            solver_work(r_tol_residual_norm2) = s% gold_tol_residual_norm2
-            solver_work(r_tol_max_residual2) = s% gold_tol_max_residual2
-            solver_work(r_tol_residual_norm3) = s% gold_tol_residual_norm3
-            solver_work(r_tol_max_residual3) = s% gold_tol_max_residual3
-         else
-            solver_work(r_tol_residual_norm) = s% tol_residual_norm1
-            solver_work(r_tol_max_residual) = s% tol_max_residual1
-            solver_work(r_tol_residual_norm2) = s% tol_residual_norm2
-            solver_work(r_tol_max_residual2) = s% tol_max_residual2
-            solver_work(r_tol_residual_norm3) = s% tol_residual_norm3
-            solver_work(r_tol_max_residual3) = s% tol_max_residual3
-         end if
-         
-         if (skip_global_corr_coeff_limit) then
-            solver_work(r_min_corr_coeff) = 1
-         else if (s% conv_vel_flag) then
-            solver_work(r_min_corr_coeff) = s% conv_vel_corr_coeff_limit
-         else
-            solver_work(r_min_corr_coeff) = s% corr_coeff_limit
-         end if
-
          call non_crit_get_work_array(s, dx1, nvar*nz, nvar*nz_alloc_extra, 'solver', ierr)
          if (ierr /= 0) return
          dx(1:nvar,1:nz) => dx1(1:nvar*nz)
@@ -389,8 +307,8 @@
 
          converged = .false.
          call hydro_solver_step( &
-            s, nz, s% nvar_hydro, nvar, dx1, dt_stage, &
-            gold_tolerances_level, tol_correction_norm, &
+            s, nz, s% nvar_hydro, nvar, dx1, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
@@ -432,7 +350,7 @@
                write(*,2) 's% solver_call_number', s% solver_call_number
                write(*,2) 'nz', nz
                write(*,2) 's% num_retries', s% num_retries
-               write(*,1) 'log dt/secyer', log10(dt_stage/secyer)
+               write(*,1) 'log dt/secyer', log10(s% dt/secyer)
                write(*, *)
             end if
             return
@@ -535,8 +453,8 @@
 
 
       subroutine hydro_solver_step( &
-            s, nz, nvar_hydro, nvar, dx1, dt, &
-            gold_tolerances_level, tol_correction_norm, &
+            s, nz, nvar_hydro, nvar, dx1, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
@@ -551,8 +469,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nvar_hydro, nvar
          real(dp), pointer :: dx1(:)
-         real(dp), intent(in) :: dt
-         real(dp), intent(in) :: tol_correction_norm
+         logical, intent(in) :: skip_global_corr_coeff_limit
+         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
          integer, intent(in) :: gold_tolerances_level
          integer, intent(in) :: solver_lwork, solver_liwork
          real(dp), intent(inout), pointer :: solver_work(:) ! (solver_lwork)
@@ -597,7 +515,6 @@
          ipar(ipar_first_call) = 1
 
          rpar => rpar_target
-         rpar(rpar_dt) = dt
 
          call check_sizes(s, ierr)
          if (ierr /= 0) then
@@ -648,36 +565,22 @@
             use rates_def, only: warn_rates_for_high_temp
             use star_utils, only: total_times
             use star_solver, only: solver
-            use star_solver_15066, only: solver_15066
             use num_lib, only: default_failed_in_setmatrix, &
                default_set_primaries, default_set_secondaries
             integer, intent(out) :: ierr
             integer :: k, j
             logical :: save_warn_rates_flag
-            include 'formats'
-            solver_work(r_mtx_time) = 0
-            solver_work(r_test_time) = 0
-            solver_iwork(i_caller_id) = s% id
+            include 'formats'            
             s% doing_solver_iterations = .true.
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.        
-            if (.not. s% conv_vel_flag) then
-               call solver( &
-                  s, nz, nvar, dx1, &
-                  gold_tolerances_level, tol_correction_norm, &
-                  x_scale1, s% equ1, &
-                  solver_work, solver_lwork, &
-                  solver_iwork, solver_liwork, &
-                  s% AF1, lrpar, rpar, lipar, ipar, failure, ierr)
-            else
-               call solver_15066( &
-                  s, nz, nvar, dx1, &
-                  gold_tolerances_level, tol_correction_norm, &
-                  x_scale1, s% equ1, &
-                  solver_work, solver_lwork, &
-                  solver_iwork, solver_liwork, &
-                  s% AF1, lrpar, rpar, lipar, ipar, failure, ierr)
-            end if    
+            call solver( &
+               s, nz, nvar, dx1, skip_global_corr_coeff_limit, &
+               gold_tolerances_level, tol_max_correction, tol_correction_norm, &
+               x_scale1, s% equ1, &
+               solver_work, solver_lwork, &
+               solver_iwork, solver_liwork, &
+               s% AF1, lrpar, rpar, lipar, ipar, failure, ierr)
             s% doing_solver_iterations = .false.
             warn_rates_for_high_temp = save_warn_rates_flag
          end subroutine newt

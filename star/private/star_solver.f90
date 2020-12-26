@@ -45,8 +45,8 @@
 
 
       subroutine solver( &
-            s, nz, nvar, dx, &
-            gold_tolerances_level, tol_correction_norm, &
+            s, nz, nvar, dx, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             xscale, equ, work, lwork, iwork, liwork, AF, &
             lrpar, rpar, lipar, ipar, convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
@@ -57,7 +57,7 @@
          integer, intent(in) :: nz ! number of zones
          integer, intent(in) :: nvar ! number of variables per zone
          real(dp), pointer, dimension(:) :: dx ! =(nvar,nz)
-
+         logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), pointer, dimension(:) :: xscale ! =(nvar,nz)
          real(dp), pointer, dimension(:) :: equ ! =(nvar,nz)
          ! equ(i) has the residual for equation i, i.e., the difference between
@@ -75,7 +75,7 @@
 
          ! convergence criteria
          integer, intent(in) :: gold_tolerances_level ! 0, 1, or 2
-         real(dp), intent(in) :: tol_correction_norm
+         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
             ! a trial solution is considered to have converged if
             ! max_correction <= tol_max_correction and
             !
@@ -101,22 +101,11 @@
          integer :: ldAF, neqns, mljac, mujac
          real(dp), pointer :: AF_copy(:) ! =(ldAF, neq)
 
-         integer(8) :: test_time0, test_time1, clock_rate
-         logical :: do_test_timing
+         integer(8) :: test_time1, clock_rate
 
          include 'formats.dek'
 
          s% nvar_solver_solver = nvar
-
-         do_test_timing = (work(r_test_time) /= 0)
-
-         if (do_test_timing) then
-            call system_clock(test_time0,clock_rate)
-         else
-            test_time0 = 0
-         endif
-
-         work(r_test_time) = 0
 
          ierr = 0
 
@@ -130,16 +119,11 @@
          if (s% fill_arrays_with_NaNs) call fill_with_NaNs(AF_copy)
 
          call do_solver( &
-            s, nz, nvar, dx, AF_copy, ldAF, &
-            neqns, gold_tolerances_level, tol_correction_norm, xscale, equ, &
-            work, lwork, iwork, liwork, &
+            s, nz, nvar, dx, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
+            xscale, equ, work, lwork, iwork, liwork, &
             lrpar, rpar, lipar, ipar, convergence_failure, ierr)
          s% solver_iter = 0
-
-         if (do_test_timing) then
-            call system_clock(test_time1,clock_rate)
-            work(r_test_time) = work(r_test_time) + dble(test_time1 - test_time0) / clock_rate
-         end if
 
 
          contains
@@ -197,21 +181,22 @@
 
 
       subroutine do_solver( &
-            s, nz, nvar, dx1, AF1, ldAF, neq, &
-            gold_tolerances_level, tol_correction_norm, xscale1, equ1, &
-            work, lwork, iwork, liwork, &
+            s, nz, nvar, dx1, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
+            xscale1, equ1, work, lwork, iwork, liwork, &
             lrpar, rpar, lipar, ipar, convergence_failure, ierr)
 
          type (star_info), pointer :: s
 
          integer, intent(in) :: nz, nvar, ldAF, neq
+         logical, intent(in) :: skip_global_corr_coeff_limit
 
          real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
          real(dp), pointer, dimension(:) :: dx1, equ1, xscale1
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
-         real(dp), intent(in) :: tol_correction_norm
+         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
 
          ! parameters for caller-supplied routines
          integer, intent(in) :: lrpar, lipar
@@ -253,16 +238,16 @@
             tol_residual_norm, tol_max_residual, &
             tol_residual_norm2, tol_max_residual2, &
             tol_residual_norm3, tol_max_residual3, &
-            tol_max_correction, tol_abs_slope_min, tol_corr_resid_product, &
+            tol_abs_slope_min, tol_corr_resid_product, &
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
          integer :: iter, max_tries, zone, tiny_corr_cnt, i, j, k, info, &
             last_jac_iter, max_iterations_for_jacobian, force_iter_value, &
             reuse_count, iter_for_resid_tol2, iter_for_resid_tol3, &
-            caller_id, max_corr_k, max_corr_j, max_resid_k, max_resid_j
-         integer(8) :: test_time0, test_time1, time0, time1, clock_rate
+            max_corr_k, max_corr_j, max_resid_k, max_resid_j
+         integer(8) :: test_time1, time0, time1, clock_rate
          character (len=strlen) :: err_msg
          logical :: first_try, dbg_msg, passed_tol_tests, &
-            do_mtx_timing, do_test_timing, doing_extra, okay
+            doing_extra, okay
          integer, parameter :: num_tol_msgs = 15
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
@@ -278,9 +263,6 @@
          equ(1:nvar,1:nz) => equ1(1:neq)
          xscale(1:nvar,1:nz) => xscale1(1:neq)
          AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
-
-         do_mtx_timing = (work(r_mtx_time) /= 0)
-         work(r_mtx_time) = 0
 
          tol_msg(1) = 'avg corr'
          tol_msg(2) = 'max corr '
@@ -303,19 +285,38 @@
          s% solver_iter = iter
 
          call set_param_defaults
-         dbg_msg = (iwork(i_debug) /= 0)
+         dbg_msg = s% report_solver_progress
          
-         tol_residual_norm = work(r_tol_residual_norm)
-         tol_max_residual = work(r_tol_max_residual)
-         tol_residual_norm2 = work(r_tol_residual_norm2)
-         tol_max_residual2 = work(r_tol_max_residual2)
-         tol_residual_norm3 = work(r_tol_residual_norm3)
-         tol_max_residual3 = work(r_tol_max_residual3)
+         if (gold_tolerances_level == 2) then
+            tol_residual_norm = s% gold2_tol_residual_norm1
+            tol_max_residual = s% gold2_tol_max_residual1
+            tol_residual_norm2 = s% gold2_tol_residual_norm2
+            tol_max_residual2 = s% gold2_tol_max_residual2
+            tol_residual_norm3 = s% gold2_tol_residual_norm3
+            tol_max_residual3 = s% gold2_tol_max_residual3
+         else if (gold_tolerances_level == 1) then
+            tol_residual_norm = s% gold_tol_residual_norm1
+            tol_max_residual = s% gold_tol_max_residual1
+            tol_residual_norm2 = s% gold_tol_residual_norm2
+            tol_max_residual2 = s% gold_tol_max_residual2
+            tol_residual_norm3 = s% gold_tol_residual_norm3
+            tol_max_residual3 = s% gold_tol_max_residual3
+         else
+            tol_residual_norm = s% tol_residual_norm1
+            tol_max_residual = s% tol_max_residual1
+            tol_residual_norm2 = s% tol_residual_norm2
+            tol_max_residual2 = s% tol_max_residual2
+            tol_residual_norm3 = s% tol_residual_norm3
+            tol_max_residual3 = s% tol_max_residual3
+         end if
 
-         tol_max_correction = work(r_tol_max_correction)
-         tol_abs_slope_min = work(r_tol_abs_slope_min)
-         tol_corr_resid_product = work(r_tol_corr_resid_product)
-         min_corr_coeff = work(r_min_corr_coeff)
+         tol_abs_slope_min = -1 ! unused
+         tol_corr_resid_product = -1 ! unused
+         if (skip_global_corr_coeff_limit) then
+            min_corr_coeff = 1
+         else
+            min_corr_coeff = s% corr_coeff_limit
+         end if
          
          if (gold_tolerances_level == 2) then
             iter_for_resid_tol2 = s% gold2_iter_for_resid_tol2
@@ -327,8 +328,6 @@
             iter_for_resid_tol2 = s% iter_for_resid_tol2
             iter_for_resid_tol3 = s% iter_for_resid_tol3
          end if
-
-         caller_id = iwork(i_caller_id)
 
          call pointers(ierr)
          if (ierr /= 0) return
@@ -382,15 +381,22 @@
          first_try = .true.
          iter = 1
          s% solver_iter = iter
-         max_tries = abs(iwork(i_max_tries))
+         if (s% doing_first_model_of_run) then
+            max_tries = s% max_tries1
+         else if (s% retry_cnt > 20) then
+            max_tries = s% max_tries_after_20_retries
+         else if (s% retry_cnt > 10) then
+            max_tries = s% max_tries_after_10_retries
+         else if (s% retry_cnt > 5) then
+            max_tries = s% max_tries_after_5_retries
+         else if (s% retry_cnt > 0) then
+            max_tries = s% max_tries_for_retry
+         else
+            max_tries = s% solver_max_tries_before_reject
+         end if
          last_jac_iter = 0
          tiny_corr_cnt = 0
-
-         if (iwork(i_max_iterations_for_jacobian) == 0) then
-            max_iterations_for_jacobian = 1000000
-         else
-            max_iterations_for_jacobian = iwork(i_max_iterations_for_jacobian)
-         end if
+         max_iterations_for_jacobian = 1
 
       iter_loop: do while (.not. passed_tol_tests)
 
@@ -472,8 +478,8 @@
             end if
 
             if (.not. s% ignore_too_large_correction) then
-               if ((correction_norm > work(r_corr_param_factor)*work(r_scale_correction_norm)) .and. &
-                     (iwork(i_try_really_hard) == 0)) then
+               if ((correction_norm > s% corr_param_factor*s% scale_correction_norm) .and. &
+                     .not. s% doing_first_model_of_run) then
                   call oops('avg corr too large')
                   exit iter_loop
                endif
@@ -483,12 +489,12 @@
             correction_factor = 1d0
             temp_correction_factor = 1d0
 
-            if (correction_norm*correction_factor > work(r_scale_correction_norm)) then
-               correction_factor = min(correction_factor,work(r_scale_correction_norm)/correction_norm)
+            if (correction_norm*correction_factor > s% scale_correction_norm) then
+               correction_factor = min(correction_factor,s% scale_correction_norm/correction_norm)
             end if
             
-            if (max_abs_correction*correction_factor > work(r_scale_max_correction)) then
-               temp_correction_factor = work(r_scale_max_correction)/max_abs_correction
+            if (max_abs_correction*correction_factor > s% scale_max_correction) then
+               temp_correction_factor = s% scale_max_correction/max_abs_correction
             end if
 
             if (iter > s% solver_itermin_until_reduce_min_corr_coeff) then
@@ -545,7 +551,7 @@
             s% solver_adjust_iter = 0
 
             ! coeff is factor by which adjust_correction rescaled the correction vector
-            if (coeff > work(r_tiny_corr_factor)*min_corr_coeff .or. min_corr_coeff >= 1d0) then
+            if (coeff > s% tiny_corr_factor*min_corr_coeff .or. min_corr_coeff >= 1d0) then
                tiny_corr_cnt = 0
             else
                tiny_corr_cnt = tiny_corr_cnt + 1
@@ -638,24 +644,24 @@
 
                   convergence_failure = .true.; exit iter_loop
                else if (.not. first_try .and. .not. s% doing_first_model_of_run) then
-                  if (correction_norm > work(r_corr_norm_jump_limit)*corr_norm_min) then
+                  if (correction_norm > s% corr_norm_jump_limit*corr_norm_min) then
                      call oops('avg correction jumped')
                      exit iter_loop
-                  else if (residual_norm > work(r_resid_norm_jump_limit)*resid_norm_min) then
+                  else if (residual_norm > s% resid_norm_jump_limit*resid_norm_min) then
                      call oops('avg residual jumped')
                      exit iter_loop
-                  else if (max_abs_correction > work(r_max_corr_jump_limit)*max_corr_min) then
+                  else if (max_abs_correction > s% max_corr_jump_limit*max_corr_min) then
                      call oops('max correction jumped')
                      exit iter_loop
-                  else if (max_residual > work(r_max_resid_jump_limit)*max_resid_min) then
+                  else if (max_residual > s% max_resid_jump_limit*max_resid_min) then
                      call oops('max residual jumped')
                      exit iter_loop
-                  else if (tiny_corr_cnt >= iwork(i_tiny_min_corr_coeff) &
+                  else if (tiny_corr_cnt >= s% tiny_corr_coeff_limit &
                         .and. min_corr_coeff < 1) then
                      call oops('tiny corrections')
                      exit iter_loop
                   end if
-               else if (iwork(i_try_really_hard) == 0) then
+               else if (.not. s% doing_first_model_of_run) then
                   if (coeff < min(min_corr_coeff,correction_factor)) then
                      call oops('coeff too small')
                      exit iter_loop
@@ -669,7 +675,7 @@
                end if
                if (.not. passed_tol_tests) then
                   call write_msg(message)
-               else if (iter < iwork(i_itermin)) then
+               else if (iter < s% solver_itermin) then
                   call write_msg('iter < itermin')
                else
                   call write_msg('okay!')
@@ -682,7 +688,7 @@
             if (passed_tol_tests .and. (iter+1 < max_tries)) then
                ! about to declare victory... but may want to do another iteration
                force_iter_value = force_another_iteration( &
-                                    iter, iwork(i_itermin), lrpar, rpar, lipar, ipar)
+                                    iter, s% solver_itermin, lrpar, rpar, lipar, ipar)
                if (force_iter_value > 0) then
                   passed_tol_tests = .false. ! force another
                   tiny_corr_cnt = 0 ! reset the counter
@@ -742,22 +748,12 @@
 
          subroutine set_param_defaults
 
-            if (iwork(i_itermin) == 0) iwork(i_itermin) = 2
-            if (iwork(i_max_tries) == 0) iwork(i_max_tries) = 50
-            if (iwork(i_tiny_min_corr_coeff) == 0) iwork(i_tiny_min_corr_coeff) = 25
 
-            if (work(r_tol_residual_norm)==0) work(r_tol_residual_norm)=1d99
-            if (work(r_tol_max_residual)==0) work(r_tol_max_residual)=1d99
-            if (work(r_tol_max_correction)==0) work(r_tol_max_correction)=1d99
-            if (work(r_scale_correction_norm) == 0) work(r_scale_correction_norm) = 2d0
-            if (work(r_corr_param_factor) == 0) work(r_corr_param_factor) = 10d0
-            if (work(r_scale_max_correction) == 0) work(r_scale_max_correction) = 1d99
-            if (work(r_corr_norm_jump_limit) == 0) work(r_corr_norm_jump_limit) = 1d99
-            if (work(r_max_corr_jump_limit) == 0) work(r_max_corr_jump_limit) = 1d99
-            if (work(r_resid_norm_jump_limit) == 0) work(r_resid_norm_jump_limit) = 1d99
-            if (work(r_max_resid_jump_limit) == 0) work(r_max_resid_jump_limit) = 1d99
-            if (work(r_min_corr_coeff) == 0) work(r_min_corr_coeff) = 1d-3
-            if (work(r_tiny_corr_factor) == 0) work(r_tiny_corr_factor) = 2d0
+
+            if (s% corr_param_factor == 0) s% corr_param_factor = 10d0
+            if (s% scale_max_correction == 0) s% scale_max_correction = 1d99
+            if (s% corr_norm_jump_limit == 0) s% corr_norm_jump_limit = 1d99
+            if (s% max_corr_jump_limit == 0) s% max_corr_jump_limit = 1d99
 
          end subroutine set_param_defaults
 
@@ -1053,8 +1049,6 @@
 
             if (s% doing_timing) then
                call start_time(s, time0, total_time)
-            else if (do_mtx_timing) then
-               call system_clock(time0, clock_rate)
             end if
             
             if (s% use_DGESVX_in_bcyclic) then
@@ -1080,9 +1074,6 @@
 
             if (s% doing_timing) then
                call update_time(s, time0, total_time, s% time_solver_matrix)
-            else if (do_mtx_timing) then
-               call system_clock(time1, clock_rate)
-               work(r_mtx_time) = work(r_mtx_time) + dble(time1 - time0) / clock_rate
             end if
 
             if (info /= 0) then
@@ -1895,7 +1886,7 @@
                2x, a, 1x, e10.3, 2x, a14, 1x, i5, e11.3, 2x, a, &
                2x, a)
             write(*,111) &
-               iwork(i_model_number), iter, &
+               s% model_number, iter, &
                'coeff', coeff,  &
                '   avg resid', residual_norm,  &
                trim(max_resid_str), max_resid_k, max_residual, &

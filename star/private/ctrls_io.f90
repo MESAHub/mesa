@@ -388,10 +388,6 @@
     gold_tol_residual_norm2, gold_tol_max_residual2, gold_iter_for_resid_tol3, &
     gold_tol_residual_norm3, gold_tol_max_residual3 , steps_before_use_gold_tolerances, &
     include_rotation_in_total_energy, convergence_ignore_equL_residuals, convergence_ignore_alpha_RTI_residuals, &
-    convergence_separate_equ_conv_vel_residuals, conv_vel_tol_max_residual, &
-    convergence_separate_equ_conv_vel_corrections, conv_vel_tol_max_correction, &
-    conv_vel_min_correction_to_ignore_residual, conv_vel_scale_max_correction, &
-    conv_vel_solver_itermin_until_reduce_min_corr_coeff, conv_vel_corr_coeff_limit, &
     iter_for_resid_tol2, iter_for_resid_tol3, &
     solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
     solver_reduced_min_corr_coeff, do_solver_damping_for_neg_xa, &
@@ -2028,14 +2024,6 @@
 
  s% convergence_ignore_equL_residuals = convergence_ignore_equL_residuals
  s% convergence_ignore_alpha_RTI_residuals = convergence_ignore_alpha_RTI_residuals
- s% convergence_separate_equ_conv_vel_residuals = convergence_separate_equ_conv_vel_residuals
- s% conv_vel_tol_max_residual = conv_vel_tol_max_residual
- s% convergence_separate_equ_conv_vel_corrections = convergence_separate_equ_conv_vel_corrections
- s% conv_vel_tol_max_correction = conv_vel_tol_max_correction
- s% conv_vel_min_correction_to_ignore_residual = conv_vel_min_correction_to_ignore_residual
- s% conv_vel_scale_max_correction = conv_vel_scale_max_correction
- s% conv_vel_solver_itermin_until_reduce_min_corr_coeff = conv_vel_solver_itermin_until_reduce_min_corr_coeff
- s% conv_vel_corr_coeff_limit = conv_vel_corr_coeff_limit
 
  s% iter_for_resid_tol2 = iter_for_resid_tol2
  s% iter_for_resid_tol3 = iter_for_resid_tol3
@@ -3747,14 +3735,6 @@
 
  convergence_ignore_equL_residuals = s% convergence_ignore_equL_residuals
  convergence_ignore_alpha_RTI_residuals = s% convergence_ignore_alpha_RTI_residuals
- convergence_separate_equ_conv_vel_residuals = s% convergence_separate_equ_conv_vel_residuals
- conv_vel_tol_max_residual = s% conv_vel_tol_max_residual
- convergence_separate_equ_conv_vel_corrections = s% convergence_separate_equ_conv_vel_corrections
- conv_vel_tol_max_correction = s% conv_vel_tol_max_correction
- conv_vel_min_correction_to_ignore_residual = s% conv_vel_min_correction_to_ignore_residual
- conv_vel_scale_max_correction = s% conv_vel_scale_max_correction
- conv_vel_solver_itermin_until_reduce_min_corr_coeff = s% conv_vel_solver_itermin_until_reduce_min_corr_coeff
- conv_vel_corr_coeff_limit = s% conv_vel_corr_coeff_limit
 
  iter_for_resid_tol2 = s% iter_for_resid_tol2
  iter_for_resid_tol3 = s% iter_for_resid_tol3

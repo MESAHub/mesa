@@ -196,7 +196,6 @@ SRCS = \
    evolve_support.f90 \
    star_bcyclic.f90 \
    star_solver.f90 \
-   star_solver_15066.f90 \
    solve_burn.f90 \
    solve_hydro.f90 \
    struct_burn_mix.f90 \

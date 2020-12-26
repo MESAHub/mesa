@@ -27,7 +27,7 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 do_one det_riemann "shock has reached target location" "final.mod" auto    
 do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
-do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
+#do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
 do_one dev_pre_ms_to_cc_hi "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_very_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip

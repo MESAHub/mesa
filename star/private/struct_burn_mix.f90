@@ -37,8 +37,7 @@
       contains
 
 
-      integer function do_struct_burn_mix( &
-            s, skip_global_corr_coeff_limit, dt)
+      integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
          use mix_info, only: set_mixing_info, get_convection_sigmas
          use solve_hydro, only: &
             set_surf_info, set_tol_correction, do_hydro_converge
@@ -49,17 +48,17 @@
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), intent(in) :: dt
 
          integer :: nz, nvar, species, ierr, j, k, k_bad
          integer(8) :: time0
          logical :: do_chem
-         real(dp) :: tol_correction_norm, tol_max_correction, total
+         real(dp) :: dt, tol_correction_norm, tol_max_correction, total
 
          include 'formats'
 
          ierr = 0
          s% non_epsnuc_energy_change_from_split_burn = 0d0
+         dt = s% dt
 
          if (s% rsp_flag) then
             do_struct_burn_mix = do_rsp_step(s,dt)    
@@ -181,8 +180,8 @@
                      
          if (s% trace_evolve) write(*,*) 'call do_hydro_converge'
          do_struct_burn_mix = do_hydro_converge( &
-            s, s% solver_itermin, nvar, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, dt)
+            s, nvar, skip_global_corr_coeff_limit, &
+            tol_correction_norm, tol_max_correction)
          if (s% trace_evolve) write(*,*) 'done do_hydro_converge'
 
          s% total_num_solver_iterations = &

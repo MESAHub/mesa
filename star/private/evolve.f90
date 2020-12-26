@@ -446,8 +446,7 @@
                 s% model_number_for_last_retry /= s% model_number) ! last alternative is for redo's
 
             s% doing_struct_burn_mix = .true.
-            do_step_part2 = do_struct_burn_mix( &
-               s, skip_global_corr_coeff_limit, dt)
+            do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
             s% doing_struct_burn_mix = .false.
             if (do_step_part2 /= keep_going) return
             ! when reach here, have taken the step successfully
