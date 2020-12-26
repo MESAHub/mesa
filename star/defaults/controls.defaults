@@ -1674,14 +1674,14 @@
     power_he_burn_upper_limit = 1d99
 
 
-      ! power_c_burn_upper_limit
+      ! power_z_burn_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when total power from reactions burning carbon (in Lsun units) is > this
+      ! stop when total power from reactions burning metals (in Lsun units) is > this
 
       ! ::
 
-    power_c_burn_upper_limit = 1d99
+    power_z_burn_upper_limit = 1d99
 
 
       ! power_nuc_burn_lower_limit
@@ -1714,14 +1714,14 @@
     power_he_burn_lower_limit = -1d99
 
 
-      ! power_c_burn_lower_limit
+      ! power_z_burn_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when total power from reactions burning carbon (in Lsun units) is < this.
+      ! stop when total power from reactions burning metals (in Lsun units) is < this.
 
       ! ::
 
-    power_c_burn_lower_limit = -1d99
+    power_z_burn_lower_limit = -1d99
 
 
       ! max_abs_rel_run_E_err

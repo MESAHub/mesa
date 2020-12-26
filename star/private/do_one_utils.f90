@@ -578,7 +578,7 @@
          integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
          real(dp) :: log_surface_gravity, v_div_csound_max, &
-            power_nuc_burn, power_h_burn, power_he_burn, power_c_burn, logQ, max_logQ, min_logQ, &
+            power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
             max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
@@ -649,7 +649,7 @@
          power_nuc_burn = s% power_nuc_burn
          power_h_burn = s% power_h_burn
          power_he_burn = s% power_he_burn
-         power_c_burn = s% power_c_burn
+         power_z_burn = s% power_z_burn
          log_Teff = safe_log10(s% Teff)
          if (s% L_phot > 0d0) then
             Lnuc_div_L = s% L_nuc_burn_total / s% L_phot
@@ -1055,9 +1055,9 @@
             call compare_to_target('power_he_burn >= power_he_burn_upper_limit', &
                power_he_burn, s% power_he_burn_upper_limit, t_power_he_burn_upper_limit)
 
-         else if (power_c_burn >= s% power_c_burn_upper_limit) then 
-            call compare_to_target('power_c_burn >= power_c_burn_upper_limit', &
-               power_c_burn, s% power_c_burn_upper_limit, t_power_c_burn_upper_limit)
+         else if (power_z_burn >= s% power_z_burn_upper_limit) then 
+            call compare_to_target('power_z_burn >= power_z_burn_upper_limit', &
+               power_z_burn, s% power_z_burn_upper_limit, t_power_z_burn_upper_limit)
 
          else if (power_nuc_burn < s% power_nuc_burn_lower_limit) then 
             call compare_to_target('power_nuc_burn < power_nuc_burn_lower_limit', &
@@ -1071,9 +1071,9 @@
             call compare_to_target('power_he_burn < power_he_burn_lower_limit', &
                power_he_burn, s% power_he_burn_lower_limit, t_power_he_burn_lower_limit)
 
-         else if (power_c_burn < s% power_c_burn_lower_limit) then 
-            call compare_to_target('power_c_burn < power_c_burn_lower_limit', &
-               power_c_burn, s% power_c_burn_lower_limit, t_power_c_burn_lower_limit)
+         else if (power_z_burn < s% power_z_burn_lower_limit) then 
+            call compare_to_target('power_z_burn < power_z_burn_lower_limit', &
+               power_z_burn, s% power_z_burn_lower_limit, t_power_z_burn_lower_limit)
 
          else if (s% center_Ye < s% center_Ye_lower_limit) then 
             call compare_to_target('center_Ye < center_Ye_lower_limit', &
@@ -1449,7 +1449,7 @@
          real(dp), parameter :: log_he_temp = 7.8d0
          real(dp), parameter :: d_tau_min = 1d-2, d_tau_max = 1d0
          real(dp), parameter :: little_step_factor = 10d0, little_step_size = 10d0
-         real(dp) :: v, surf_dv_dt, surf_grav, power_he_burn, power_c_burn, &
+         real(dp) :: v, surf_dv_dt, surf_grav, power_he_burn, power_z_burn, &
             power_neutrinos
          integer :: model, profile_priority, ierr
          integer, parameter :: tau_ramp = 50
@@ -1471,9 +1471,6 @@
          profile_priority = delta_priority
          model = s% model_number
          do_one_check_model = keep_going
-         
-         if ( model <= 1 ) &
-            s% next_cntr_rho = max(min_cntr_rho, s% log_center_density + del_cntr_rho)
          
          do_one_check_model = do_check_limits(id)
          if (do_one_check_model /= keep_going) then
@@ -1502,43 +1499,13 @@
          end if
          
          power_he_burn = s% power_he_burn
-         power_c_burn = dot_product(s% dm(1:nz), s% eps_nuc_categories(i_burn_c,1:nz))/Lsun
+         power_z_burn = s% power_z_burn
          power_neutrinos = s% power_neutrinos
          
          if ( s% star_age < s% profile_age ) then
             if (dbg) write(*,*) 'must_do_profile for age < profile_age'
             must_do_profile = .true.
          end if
-         
-!         if ((.not. s% helium_ignition) .and. (s% log_center_temperature > log_he_temp) &
-!                  .and. (s% phase_of_evolution /= phase_he_igniting)) then
-!            if ( power_c_burn + power_he_burn > power_neutrinos  .and. (power_neutrinos > 1d0)) then
-!               must_do_profile = .true.
-!               if (dbg) write(*,*) 'must_do_profile for helium_ignition'
-!               s% helium_ignition = .true.
-!               s% phase_of_evolution = phase_he_igniting
-!               s% ignition_center_xhe = s% center_he4
-!               s% he_luminosity_limit = s% log_surface_luminosity
-!               s% prev_luminosity = s% log_surface_luminosity
-!            end if
-!         end if
-!         
-!         if ( (.not. s% carbon_ignition) .and. ( power_c_burn > power_neutrinos ) &
-!               .and. (power_neutrinos > 1d0)) then
-!            must_do_profile = .true.
-!            s% carbon_ignition = .true.
-!            s% phase_of_evolution = phase_carbon_burning
-!         else if ( (s% phase_of_evolution .eq. phase_he_ignition_over .and. s% prev_age1 .eq. -1d0) &
-!                  .or. s% star_age <= s% post_he_age ) then
-!            s% prev_tcntr1 = s% log_center_temperature; s% prev_tcntr2 = s% prev_tcntr1
-!            s% prev_age1 = s% star_age; s% prev_age2 = s% prev_age1
-!            must_do_profile = .true.
-!            if (dbg) write(*,*) 'must_do_profile for starting phase of steady helium burning'
-!            s% post_he_age = s% star_age
-!            if (.not. s% doing_first_model_of_run) &
-!               write(*, '(/,a, i7,/)') 'starting phase of steady helium burning', &
-!                  s% model_number
-!         end if
          
          if (must_do_profile) profile_priority = phase_priority
          

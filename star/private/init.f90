@@ -370,11 +370,7 @@
 
          s% phase_of_evolution = phase_starting
          s% recent_log_header = -1000
-         s% post_he_age = -1d0
          s% profile_age = -1d0
-         s% prev_cntr_rho = 1d99
-         s% helium_ignition = .false.
-         s% carbon_ignition = .false.
 
          s% tau_base = 2d0/3d0
          s% tau_factor = 1
@@ -851,31 +847,10 @@
 
          s% most_recent_model_data_filename = ''
 
-         s% helium_ignition = .false.
-         s% carbon_ignition = .false.
-
          s% recent_log_header = -1000
          s% phase_of_evolution = 0
 
-         s% prev_Tcntr1 = 0
-         s% prev_age1 = 0
-         s% prev_Tcntr2 = 0
-         s% prev_age2 = 0
-         s% prev_Tsurf = 0
-
-         s% prv_log_luminosity = 0
-         s% prv_log_surface_temp = 0
-         s% prv_log_center_temp = 0
-         s% prv_log_center_density = 0
-
          s% profile_age = 0
-         s% post_he_age = 0
-         s% prev_luminosity = 0
-         s% ignition_center_xhe = 0
-         s% he_luminosity_limit = 0
-
-         s% prev_cntr_rho = 0
-         s% next_cntr_rho = 0
 
          s% num_solver_iterations = 0
          s% num_skipped_setvars = 0

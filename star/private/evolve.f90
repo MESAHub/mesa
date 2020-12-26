@@ -2209,7 +2209,6 @@
          s% time = age*secyer
          s% star_age = age
          s% profile_age = age
-         s% post_he_age = age
       end subroutine set_age
 
 

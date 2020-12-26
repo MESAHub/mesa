@@ -117,12 +117,12 @@
          real(dp) :: power_nuc_burn_upper_limit
          real(dp) :: power_h_burn_upper_limit
          real(dp) :: power_he_burn_upper_limit
-         real(dp) :: power_c_burn_upper_limit
+         real(dp) :: power_z_burn_upper_limit
 
          real(dp) :: power_nuc_burn_lower_limit
          real(dp) :: power_h_burn_lower_limit
          real(dp) :: power_he_burn_lower_limit
-         real(dp) :: power_c_burn_lower_limit
+         real(dp) :: power_z_burn_lower_limit
 
          integer :: max_number_retries, relax_max_number_retries
          real(dp) :: max_abs_rel_run_E_err

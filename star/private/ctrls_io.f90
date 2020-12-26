@@ -93,8 +93,8 @@
     log_Tsurf_upper_limit, log_Tsurf_lower_limit, log_Psurf_upper_limit, log_Psurf_lower_limit, &
     log_Dsurf_upper_limit, log_Dsurf_lower_limit, log_L_upper_limit, log_L_lower_limit, &
     log_g_upper_limit, log_g_lower_limit, power_nuc_burn_upper_limit, power_h_burn_upper_limit, &
-    power_he_burn_upper_limit, power_c_burn_upper_limit, power_nuc_burn_lower_limit, &
-    power_h_burn_lower_limit, power_he_burn_lower_limit, power_c_burn_lower_limit, phase_of_evolution_stop, &
+    power_he_burn_upper_limit, power_z_burn_upper_limit, power_nuc_burn_lower_limit, &
+    power_h_burn_lower_limit, power_he_burn_lower_limit, power_z_burn_lower_limit, phase_of_evolution_stop, &
     
     ! max timesteps
     max_timestep, max_years_for_timestep, &
@@ -949,11 +949,11 @@
  s% power_nuc_burn_upper_limit = power_nuc_burn_upper_limit
  s% power_h_burn_upper_limit = power_h_burn_upper_limit
  s% power_he_burn_upper_limit = power_he_burn_upper_limit
- s% power_c_burn_upper_limit = power_c_burn_upper_limit
+ s% power_z_burn_upper_limit = power_z_burn_upper_limit
  s% power_nuc_burn_lower_limit = power_nuc_burn_lower_limit
  s% power_h_burn_lower_limit = power_h_burn_lower_limit
  s% power_he_burn_lower_limit = power_he_burn_lower_limit
- s% power_c_burn_lower_limit = power_c_burn_lower_limit
+ s% power_z_burn_lower_limit = power_z_burn_lower_limit
 
  s% phase_of_evolution_stop = phase_of_evolution_stop
 
@@ -2676,11 +2676,11 @@
  power_nuc_burn_upper_limit = s% power_nuc_burn_upper_limit
  power_h_burn_upper_limit = s% power_h_burn_upper_limit
  power_he_burn_upper_limit = s% power_he_burn_upper_limit
- power_c_burn_upper_limit = s% power_c_burn_upper_limit
+ power_z_burn_upper_limit = s% power_z_burn_upper_limit
  power_nuc_burn_lower_limit = s% power_nuc_burn_lower_limit
  power_h_burn_lower_limit = s% power_h_burn_lower_limit
  power_he_burn_lower_limit = s% power_he_burn_lower_limit
- power_c_burn_lower_limit = s% power_c_burn_lower_limit
+ power_z_burn_lower_limit = s% power_z_burn_lower_limit
 
  phase_of_evolution_stop = s% phase_of_evolution_stop
 

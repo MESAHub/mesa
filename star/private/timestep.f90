@@ -1261,7 +1261,7 @@
             if (s% log_max_temperature < s% min_lgT_for_lgL_photo_limit) return
             new_L = abs(s% power_photo)
             max_other_L = 0d0
-            old_L = abs(s% power_photo_old)
+            old_L = abs(s% L_by_category_old(iphoto))
             lim = s% delta_lgL_photo_limit
             hard_lim = s% delta_lgL_photo_hard_limit
             lgL_min = s% lgL_photo_burn_min

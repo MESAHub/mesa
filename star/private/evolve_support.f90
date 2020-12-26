@@ -138,20 +138,17 @@
 
          s% time_old = s% time
 
-         s% L_nuc_burn_total_old = s% L_nuc_burn_total
-         s% power_nuc_burn_old = s% power_nuc_burn
-         s% power_h_burn_old = s% power_h_burn
-         s% power_he_burn_old = s% power_he_burn
-         s% power_c_burn_old = s% power_c_burn
-         s% power_photo_old = s% power_photo
-         s% power_z_burn_old = s% power_z_burn
-         s% power_nuc_neutrinos_old = s% power_nuc_neutrinos
-         s% power_nonnuc_neutrinos_old = s% power_nonnuc_neutrinos
-         s% power_neutrinos_old = s% power_neutrinos
-
          do i=1,num_categories
             s% L_by_category_old(i) = s% L_by_category(i)
          end do
+         s% L_nuc_burn_total_old = s% L_nuc_burn_total
+         s% power_nuc_burn_old = s% power_nuc_burn
+         s% power_nuc_neutrinos_old = s% power_nuc_neutrinos
+         s% power_nonnuc_neutrinos_old = s% power_nonnuc_neutrinos
+         s% power_neutrinos_old = s% power_neutrinos
+         s% power_h_burn_old = s% power_h_burn
+         s% power_he_burn_old = s% power_he_burn
+         s% power_z_burn_old = s% power_z_burn
 
          s% L_phot_old = s% L_phot
 
@@ -277,16 +274,6 @@
          s% total_angular_momentum = s% total_angular_momentum_old
          s% L_nuc_burn_total = s% L_nuc_burn_total_old
          s% L_phot = s% L_phot_old
-         
-         s% power_nuc_burn = s% power_nuc_burn_old
-         s% power_h_burn = s% power_h_burn_old
-         s% power_he_burn = s% power_he_burn_old
-         s% power_c_burn = s% power_c_burn_old
-         s% power_photo = s% power_photo_old
-         s% power_z_burn = s% power_z_burn_old
-         s% power_nuc_neutrinos = s% power_nuc_neutrinos_old
-         s% power_nonnuc_neutrinos = s% power_nonnuc_neutrinos_old
-         s% power_neutrinos = s% power_neutrinos_old
          
          s% mstar_dot = s% mstar_dot_old
          s% gradT_excess_alpha = s% gradT_excess_alpha_old

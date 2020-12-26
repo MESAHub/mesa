@@ -1536,11 +1536,6 @@
             case(h_log_LHe)
                val = safe_log10(s% power_he_burn)
                
-            case(h_power_c_burn)
-               val = s% power_c_burn
-            case(h_log_LC)
-               val = safe_log10(s% power_c_burn)
-               
             case(h_power_photo)
                val = s% power_photo
             case(h_Lnuc_photo)

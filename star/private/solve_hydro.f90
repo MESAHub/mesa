@@ -317,11 +317,6 @@
             solver_iwork(i_debug) = 0
          end if
          solver_iwork(i_model_number) = s% model_number
-         if (s% model_number > s% model_number_for_last_jacobian) then
-            solver_iwork(i_num_jacobians) = 0
-         else
-            solver_iwork(i_num_jacobians) = s% num_solver_iterations
-         end if
 
          solver_work(r_tol_abs_slope_min) = -1 ! unused
          solver_work(r_tol_corr_resid_product) = -1 ! unused

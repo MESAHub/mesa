@@ -223,17 +223,6 @@
          read(iounit, iostat=ierr) &
             s% mstar_dot, s% mstar_dot_old, &
             s% v_surf, s% v_surf_old, &
-            s% L_nuc_burn_total, s% L_nuc_burn_total_old, &
-            s% L_by_category, s% L_by_category_old, &
-            s% power_nuc_burn, s% power_nuc_burn_old, &
-            s% power_h_burn, s% power_h_burn_old, &
-            s% power_he_burn, s% power_he_burn_old, &
-            s% power_c_burn, s% power_c_burn_old, &
-            s% power_photo, s% power_photo_old, &
-            s% power_z_burn, s% power_z_burn_old, &
-            s% power_nuc_neutrinos, s% power_nuc_neutrinos_old, &
-            s% power_nonnuc_neutrinos, s% power_nonnuc_neutrinos_old, &
-            s% power_neutrinos, s% power_neutrinos_old, &
             s% gradT_excess_alpha, s% gradT_excess_alpha_old, &
             s% dt_limit_ratio, s% dt_limit_ratio_old, &
             s% L_phot, s% L_phot_old, s% T_surf, s% P_surf, &
@@ -266,17 +255,11 @@
          if (failed('most_recent_model_data_filename')) return
 
          call read_part_number(iounit)
-         if (failed('helium_ignition')) return
+         if (failed('recent_log_header')) return
 
          read(iounit, iostat=ierr) &
-            s% helium_ignition, s% carbon_ignition, &
             s% recent_log_header, s% phase_of_evolution, &
-            s% prev_Tcntr1, s% prev_age1, s% prev_Tcntr2, s% prev_age2, s% prev_Tsurf, &
-            s% prv_log_luminosity, s% prv_log_surface_temp, &
-            s% prv_log_center_temp, s% prv_log_center_density, &
-            s% profile_age, s% post_he_age, s% prev_luminosity, &
-            s% ignition_center_xhe, s% he_luminosity_limit, &
-            s% dt_next, s% dt_next_unclipped, s% prev_cntr_rho, s% next_cntr_rho, &
+            s% dt_next, s% dt_next_unclipped, &
             s% eps_nuc(1:nz), &
             s% d_epsnuc_dlnd(1:nz), &
             s% d_epsnuc_dlnT(1:nz), &
@@ -287,7 +270,7 @@
             s% d_dxdt_nuc_dT(:,1:nz), &
             s% d_dxdt_nuc_dx(:,:,1:nz), &
             s% eps_nuc_neu_total(1:nz)
-         if (failed('next_cntr_rho')) return
+         if (failed('eps_nuc_neu_total')) return
          
          if (s% dt_next <= 0d0) s% dt_next = s% dt_next_unclipped
 

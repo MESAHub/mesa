@@ -221,19 +221,16 @@
       !write_pulse_data_with_profile = .true.
       pulse_data_format = 'GYRE'
       
-      x_logical_ctrl(37) = .false. ! if true, then run GYRE
-
-      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
-      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-
-      x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      x_logical_ctrl(2) = .false. ! output eigenfunction files
-
-      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-         ! should match gyre.in mode l
-      x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      x_ctrl(2) = 0.33d+03 ! growth < this (days)
+!      x_logical_ctrl(37) = .false. ! if true, then run GYRE
+!      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+!      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+!      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+!      x_logical_ctrl(2) = .false. ! output eigenfunction files
+!      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+!         ! should match gyre.in mode l
+!      x_integer_ctrl(4) = 1 ! order
+!      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+!      x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
       center_avg_value_dq = 1d-12

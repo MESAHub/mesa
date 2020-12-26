@@ -111,9 +111,8 @@
 
       integer, parameter :: h_power_h_burn = h_burn_relr_regions + 1
       integer, parameter :: h_power_he_burn = h_power_h_burn + 1
-      integer, parameter :: h_power_c_burn = h_power_he_burn + 1
 
-      integer, parameter :: h_h_rich_layer_mass = h_power_c_burn + 1
+      integer, parameter :: h_h_rich_layer_mass = h_power_he_burn + 1
       integer, parameter :: h_he_rich_layer_mass = h_h_rich_layer_mass + 1
       integer, parameter :: h_c_rich_layer_mass = h_he_rich_layer_mass + 1
       integer, parameter :: h_o_rich_layer_mass = h_c_rich_layer_mass + 1
@@ -311,8 +310,7 @@
       integer, parameter :: h_log_dt = h_surface_accel_div_grav + 1
       integer, parameter :: h_log_LH = h_log_dt + 1
       integer, parameter :: h_log_LHe = h_log_LH + 1
-      integer, parameter :: h_log_LC = h_log_LHe + 1
-      integer, parameter :: h_power_photo = h_log_LC + 1
+      integer, parameter :: h_power_photo = h_log_LHe + 1
       integer, parameter :: h_Lnuc_photo = h_power_photo + 1
       
       integer, parameter :: h_Lsurf_m = h_Lnuc_photo + 1
@@ -949,9 +947,6 @@
          
          history_column_name(h_power_he_burn) = 'power_he_burn'
          history_column_name(h_log_LHe) = 'log_LHe'
-         
-         history_column_name(h_power_c_burn) = 'power_c_burn'
-         history_column_name(h_log_LC) = 'log_LC'
          
          history_column_name(h_power_photo) = 'power_photo'
          history_column_name(h_Lnuc_photo) = 'Lnuc_photo'

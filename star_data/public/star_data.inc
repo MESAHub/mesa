@@ -178,6 +178,8 @@
 
       ! the number of zones in the model
       integer :: nz, nz_old
+
+      integer :: phase_of_evolution
    
       ! total baryonic mass (grams)
       real(dp) :: mstar, mstar_old
@@ -950,16 +952,42 @@
       ! power emitted from nuclear reactions after subtracting neutrinos (Lsun units)
       real(dp), dimension(num_categories) :: center_eps_burn
       real(dp) :: L_nuc_burn_total, L_by_category(num_categories)
+      real(dp) :: L_nuc_burn_total_old, L_by_category_old(num_categories)
    
-      real(dp) :: power_nuc_burn ! total thermal power excluding photodisintegrations
-      real(dp) :: power_h_burn ! total thermal power from PP and CNO
-      real(dp) :: power_he_burn ! total thermal power from triple-alpha
-      real(dp) :: power_c_burn ! total thermal power from carbon burning
-      real(dp) :: power_photo ! total thermal power from photodisintegration
-      real(dp) :: power_z_burn ! total thermal power from metal burning
-      real(dp) :: power_nuc_neutrinos ! power emitted in neutrinos (nuclear)
-      real(dp) :: power_nonnuc_neutrinos ! power emitted in neutrinos (thermal)
-      real(dp) :: power_neutrinos ! power emitted in neutrinos (nuclear + thermal)
+      real(dp) :: power_nuc_burn, power_nuc_burn_old
+      real(dp) :: power_nuc_neutrinos, power_nuc_neutrinos_old
+      real(dp) :: power_nonnuc_neutrinos, power_nonnuc_neutrinos_old
+      real(dp) :: power_neutrinos, power_neutrinos_old
+      real(dp) :: power_h_burn, power_h_burn_old
+      real(dp) :: power_he_burn, power_he_burn_old
+      real(dp) :: power_z_burn, power_z_burn_old
+      
+      ! power for each category
+      real(dp) :: power_PP
+      real(dp) :: power_CNO
+      real(dp) :: power_tri_alpha
+      real(dp) :: power_c_alpha
+      real(dp) :: power_n_alpha
+      real(dp) :: power_o_alpha
+      real(dp) :: power_ne_alpha
+      real(dp) :: power_na_alpha
+      real(dp) :: power_mg_alpha
+      real(dp) :: power_si_alpha
+      real(dp) :: power_s_alpha
+      real(dp) :: power_ar_alpha
+      real(dp) :: power_ca_alpha
+      real(dp) :: power_ti_alpha
+      real(dp) :: power_cr_alpha
+      real(dp) :: power_fe_co_ni
+      real(dp) :: power_c12_c12
+      real(dp) :: power_c12_o16
+      real(dp) :: power_o16_o16
+      real(dp) :: power_photo
+      real(dp) :: power_pnhe4
+      real(dp) :: power_ni56_co56
+      real(dp) :: power_co56_fe56
+      real(dp) :: power_other
+      
       
       ! surface       
       real(dp) :: L_surf ! (Lsun) -- depends on control tau_for_L_surf
@@ -1354,10 +1382,21 @@
             !      material below k' was already in the star at the start of this step.
             ! if no mass was added, then this == 1.
 
-      ! profile data
-         real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
-
-      ! history data
+      ! profile and history data
+         integer, pointer :: profile_column_spec(:)
+         integer :: number_of_history_columns
+            ! number_of_history_columns = num_standard_history_columns + num extra history columns
+         real(dp), pointer :: history_values(:) ! (number_of_history_columns)
+         logical, pointer :: history_value_is_integer(:) ! (number_of_history_columns)
+         character (len=maxlen_history_column_name), pointer :: &
+            history_names(:) ! (number_of_history_columns)
+         type (integer_dict), pointer :: history_names_dict
+            ! maps names to index in history_values
+         integer :: model_number_of_history_values
+         logical :: need_to_set_history_names_etc
+         logical :: need_to_write_history
+         ! the following does not include "extra" columns
+         integer, pointer :: history_column_spec(:) ! (num_standard_history_columns)
       
          character (len=strlen) :: &
             model_profile_filename, model_controls_filename, model_data_filename
@@ -1365,26 +1404,24 @@
             most_recent_profile_filename, most_recent_controls_filename, &
             most_recent_model_data_filename
             
-         logical :: helium_ignition
-         logical :: carbon_ignition
-         integer :: recent_log_header
-         integer :: phase_of_evolution
-         real(dp) :: prev_Tcntr1         
-         real(dp) :: prev_age1         
-         real(dp) :: prev_Tcntr2         
-         real(dp) :: prev_age2         
-         real(dp) :: prev_Tsurf         
-         real(dp) :: prv_log_luminosity         
-         real(dp) :: prv_log_surface_temp         
-         real(dp) :: prv_log_center_temp         
-         real(dp) :: prv_log_center_density         
-         real(dp) :: profile_age         
-         real(dp) :: post_he_age         
-         real(dp) :: prev_luminosity       ! log(previous surface luminosity), only initialized when log_central_temperature > log_he_temp and (.not. s% helium_ignition)   
-         real(dp) :: ignition_center_xhe         
-         real(dp) :: he_luminosity_limit         
-         real(dp) :: prev_cntr_rho         
-         real(dp) :: next_cntr_rho
+!         logical :: helium_ignition
+!         logical :: carbon_ignition
+!         real(dp) :: prev_Tcntr1         
+!         real(dp) :: prev_age1         
+!         real(dp) :: prev_Tcntr2         
+!         real(dp) :: prev_age2         
+!         real(dp) :: prev_Tsurf         
+!         real(dp) :: prv_log_luminosity         
+!         real(dp) :: prv_log_surface_temp         
+!         real(dp) :: prv_log_center_temp         
+!         real(dp) :: prv_log_center_density         
+!         real(dp) :: profile_age         
+!         real(dp) :: post_he_age         
+!         real(dp) :: prev_luminosity       ! log(previous surface luminosity), only initialized when log_central_temperature > log_he_temp and (.not. s% helium_ignition)   
+!         real(dp) :: ignition_center_xhe         
+!         real(dp) :: he_luminosity_limit         
+!         real(dp) :: prev_cntr_rho         
+!         real(dp) :: next_cntr_rho
          
       ! pgstar info
          type (pgstar_hist_node), pointer :: pgstar_hist => null()
@@ -1401,13 +1438,17 @@
       
       ! misc other stuff        
 
+         real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
+         integer :: recent_log_header
+
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
             use_previous_conv_vel_from_file, RSP_make_static, RSP_have_set_velocities, &
             RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
          integer :: init_model_number, start_H_envelope_base_k
-
+         
+         real(dp) :: profile_age
          real(dp) :: h1_czb_mass
          real(dp) :: dt_limit_ratio ! for timestep controller
          real(dp) :: total_angular_momentum
@@ -1434,9 +1475,8 @@
          integer :: num_hydro_merges, num_hydro_splits
          integer :: bad_max_corr_cnt
          integer :: timestep_hold
-         integer :: model_number_for_last_jacobian
-         integer :: model_number_for_last_retry, &
-            model_number_for_last_retry_old
+!         integer :: model_number_for_last_jacobian
+         integer :: model_number_for_last_retry, model_number_for_last_retry_old
          integer :: mesh_call_number
          integer :: burn_and_mix_call_number
          integer :: solver_call_number
@@ -1451,8 +1491,7 @@
          logical :: just_wrote_terminal_header
          logical :: doing_first_model_of_run
          logical :: doing_first_model_after_restart
-         logical :: was_in_implicit_wind_limit, &
-            was_in_implicit_wind_limit_old
+         logical :: was_in_implicit_wind_limit, was_in_implicit_wind_limit_old
          integer :: result_reason
 
          real(dp) :: h1_czb_mass_prev ! set in finish_step.
@@ -1536,25 +1575,6 @@
          real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
             ! will be allocated or reallocated as necessary by solver.
             ! deallocate when free_star
-
-      ! profile info
-         integer, pointer :: profile_column_spec(:)
-      
-      ! history info
-         integer :: number_of_history_columns
-            ! number_of_history_columns = num_standard_history_columns + num extra history columns
-         real(dp), pointer :: history_values(:) ! (number_of_history_columns)
-         logical, pointer :: history_value_is_integer(:) ! (number_of_history_columns)
-         character (len=maxlen_history_column_name), pointer :: &
-            history_names(:) ! (number_of_history_columns)
-         type (integer_dict), pointer :: history_names_dict
-            ! maps names to index in history_values
-         integer :: model_number_of_history_values
-         logical :: need_to_set_history_names_etc
-         logical :: need_to_write_history
-         
-         ! the following does not include "extra" columns
-         integer, pointer :: history_column_spec(:) ! (num_standard_history_columns)
          
       ! sizeB info
          integer :: max_zone1, max_var1, max_zone2, max_var2
@@ -1611,19 +1631,6 @@
 
          ! variation control value for timestep controller
          real(dp) :: dt_limit_ratio_old
-
-         ! power emitted from nuclear reactions after subtracting neutrinos (Lsun units)
-         real(dp) :: L_nuc_burn_total_old
-         real(dp), dimension(num_categories) :: L_by_category_old
-         real(dp) :: power_nuc_burn_old
-         real(dp) :: power_h_burn_old
-         real(dp) :: power_he_burn_old
-         real(dp) :: power_c_burn_old
-         real(dp) :: power_photo_old
-         real(dp) :: power_z_burn_old
-         real(dp) :: power_nuc_neutrinos_old
-         real(dp) :: power_nonnuc_neutrinos_old
-         real(dp) :: power_neutrinos_old
       
          ! surface info
          real(dp) :: v_surf_old ! (cm/second)

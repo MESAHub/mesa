@@ -429,7 +429,6 @@
                convergence_failure = .true.
                exit iter_loop
             end if
-            iwork(i_num_jacobians) = iwork(i_num_jacobians) + 1
             last_jac_iter = iter
             
          reuse_mtx_loop: do reuse_count = 0, s% num_times_solver_reuse_mtx
