@@ -195,7 +195,6 @@
       logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
          new_reconstruction_flag
 
-      logical :: change_D_smooth_flag, change_initial_D_smooth_flag, new_D_smooth_flag
       logical :: change_rotation_flag, change_initial_rotation_flag, new_rotation_flag
 
       logical :: set_omega, set_initial_omega

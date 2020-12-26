@@ -58,7 +58,7 @@
 
          integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_dbg, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: c, rho_face, f, Tmax, conv_vel, min_conv_vel_for_convective_mixing_type, &
-            D_smooth_source, region_bottom_q, region_top_q
+            region_bottom_q, region_top_q
          real(dp), pointer, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: rsp_or_eturb, dbg
@@ -358,49 +358,6 @@
          end if
          
          if (.not. s% conv_vel_flag) then
-         
-            if (s% D_smooth_flag .and. .not. s% doing_finish_load_model) then
-               f = min(s% dt*s% D_smooth_growth_rate, s% D_smooth_replacement_fraction)
-               do k=1,nz
-                  if (is_bad(s% D_smooth(k))) then
-                     write(*,2) 'old s% D_smooth(k)', k, s% D_smooth(k)
-                     stop 'rotation mix'
-                  end if
-                  D_smooth_source = s% D_mix(k)
-                  if (is_bad(D_smooth_source)) then
-                     write(*,2) 'D_smooth_source', k, D_smooth_source
-                     stop 'rotation mix'
-                  end if
-                  s% D_smooth(k) = (1d0 - f)*s% D_smooth(k) + f*D_smooth_source
-                  if (is_bad(s% D_smooth(k))) then
-                     write(*,2) 's% D_smooth(k)', k, s% D_smooth(k)
-                     write(*,2) 'f', k, f
-                     write(*,2) 'D_smooth_source', k, D_smooth_source
-                     stop 'rotation mix'
-                  end if
-                  if (s% D_smooth(k) < 10d0) s% D_smooth(k) = 0d0
-               end do
-               if (s% blend_D_smooth_between_cells_of_same_mixing_type) then
-                  do k=2,nz-1
-                     if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
-                         s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                         s% D_smooth(k) > 0d0) &
-                        s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
-                  end do
-                  do k=nz-1,2,-1
-                     if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
-                         s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                         s% D_smooth(k) > 0d0) &
-                        s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
-                  end do
-               end if
-               if (s% set_D_mix_to_D_smooth) then
-                  do k=1,nz
-                     s% D_mix(k) = s% D_smooth(k)
-                  end do
-               end if
-               
-            end if
 
             region_bottom_q = s% D_mix_zero_region_bottom_q
             region_top_q = s% D_mix_zero_region_top_q

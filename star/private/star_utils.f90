@@ -342,9 +342,10 @@
       end subroutine set_dm_bar
 
 
-      subroutine normalize_dqs(nz, dq, ierr)
+      subroutine normalize_dqs(s, nz, dq, ierr)
          ! rescale dq's so that add to 1.000
          ! work in from boundaries to meet at largest dq
+         type (star_info), pointer :: s
          integer, intent(in) :: nz
          real(dp), intent(inout) :: dq(:) ! (nz)
          integer, intent(out) :: ierr
@@ -384,7 +385,8 @@
       end subroutine normalize_dqs
 
 
-      subroutine set_qs(nz, q, dq, ierr) ! set q's using normalized dq's
+      subroutine set_qs(s, nz, q, dq, ierr) ! set q's using normalized dq's
+         type (star_info), pointer :: s
          integer, intent(in) :: nz
          real(dp), intent(inout) :: dq(:) ! (nz)
          real(dp), intent(inout) :: q(:) ! (nz)
@@ -394,8 +396,12 @@
          logical :: okay
          include 'formats'
          ierr = 0
-         call normalize_dqs(nz, dq, ierr)
-         if (ierr /= 0) return
+         ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
+         ! ok for create pre ms etc., but not for read model
+         if (s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, nz, dq, ierr)
+            if (ierr /= 0) return
+         end if
          q(1) = 1d0
          okay = .true.
          do k=2,nz
@@ -2866,6 +2872,7 @@
          integer :: k, nz, i_lnR, i_lnT, i_lnd, i_eturb, &
             i_v, i_u, i_alpha_RTI, i_ln_cvpv0
          include 'formats'
+         
          nz = s% nz
          i_lnR = s% i_lnR
          i_lnT = s% i_lnT

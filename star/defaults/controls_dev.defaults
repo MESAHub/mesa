@@ -6,28 +6,6 @@
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
 
-      ! D_smooth_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! D_smooth_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! set_D_mix_to_D_smooth
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! blend_D_smooth_between_cells_of_same_mixing_type
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! allows time-smoothing of mixing diffusion coeff at each step.
-      ! at the beginning of each step, after setting usual D_mix.
-      ! D_smooth(k) = (1d0 - f)*D_smooth_old(k) + f*D_mix(k)
-      ! where f = min(dt*D_smooth_growth_rate, D_smooth_replacement_fraction)
-
-      ! ::
-
-    D_smooth_replacement_fraction = 0.5d0
-    D_smooth_growth_rate = 1d0
-    set_D_mix_to_D_smooth = .false.
-    blend_D_smooth_between_cells_of_same_mixing_type = .false.
-
-
       D_mix_zero_region_bottom_q = 1d99
       D_mix_zero_region_top_q = -1d99
       dq_D_mix_zero_at_H_He_crossover = -1d0
@@ -35,7 +13,13 @@
       
       
       
-
+      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
+      ! ok for create pre ms etc., but not for read model
+      ! create_pre_ms calls normalize_dqs even if this flag is false.
+      do_normalize_dqs_as_part_of_set_qs = .false.
+      
+      
+      
 
       ! Eturb parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -48,7 +48,6 @@
 
       logical :: have_done_starlib_init = .false.
 
-
       contains
 
 
@@ -238,9 +237,6 @@
          nullify(s% D_mix_non_rotation)
          nullify(s% D_mix_old)
 
-         nullify(s% dPdr_dRhodr_info)
-         nullify(s% dPdr_dRhodr_info_old)
-
          nullify(s% q)
          nullify(s% q_old)
 
@@ -292,9 +288,7 @@
          nullify(s% prev_mesh_D_ES)
          nullify(s% prev_mesh_D_GSF)
          nullify(s% prev_mesh_D_mix)
-         nullify(s% prev_mesh_dPdr_dRhodr_info)
          nullify(s% prev_mesh_D_omega)
-         nullify(s% prev_mesh_D_smooth)
          nullify(s% prev_mesh_am_nu_rot)
          nullify(s% prev_mesh_conv_vel)
          nullify(s% prev_mesh_dq)
@@ -580,7 +574,6 @@
          s% conv_vel_flag = .false.
          s% w_div_wc_flag = .false.
          s% D_omega_flag = .false.
-         s% D_smooth_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% Eturb_flag = .false.
@@ -1089,7 +1082,6 @@
             s% u_flag = .false.
             s% rotation_flag = .false.
             s% D_omega_flag = .false.
-            s% D_smooth_flag = .false.
             s% am_nu_rot_flag = .false.
             s% star_mass = s% initial_mass
             s% mstar = s% initial_mass*Msun

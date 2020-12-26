@@ -108,9 +108,6 @@
             call flip(s% D_mix, s% D_mix_old, ierr)
             if (ierr /= 0) return
 
-            call flip(s% dPdr_dRhodr_info, s% dPdr_dRhodr_info_old, ierr)
-            if (ierr /= 0) return
-
             call flip(s% omega, s% omega_old, ierr)
             if (ierr /= 0) return
 
@@ -121,9 +118,6 @@
             if (ierr /= 0) return
 
             call flip(s% am_nu_rot, s% am_nu_rot_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_smooth, s% D_smooth_old, ierr)
             if (ierr /= 0) return
 
             tmp => s% xh_old

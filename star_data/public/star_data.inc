@@ -47,9 +47,6 @@
       ! D_omega_flag is true if we are using D_omega for mixing
       logical :: D_omega_flag
 
-      ! D_smooth_flag is true if we are using D_smooth for mixing
-      logical :: D_smooth_flag
-
       ! am_nu_rot_flag is true if we are using smoothed am_nu_rot variables
       logical :: am_nu_rot_flag
 
@@ -207,9 +204,6 @@
         ! below a certain threshold, store the explicit value of mstar_dot
       real(dp) :: explicit_mstar_dot
       real(dp) :: adjust_J_q ! q down to which angular momentum is adjusted when using do_adjust_J
-      
-      ! mixing
-      real(dp), pointer, dimension(:) :: D_smooth, D_smooth_old
         
       ! vectors of structure variables: xh(i,k) holds hydro structure variable i for point k.
          ! note: abundances are in xa, not in xh.
@@ -589,8 +583,7 @@
          prev_mesh_j_rot, prev_mesh_omega, prev_mesh_nu_ST, &
          prev_mesh_D_ST, prev_mesh_D_DSI, prev_mesh_D_SH, &
          prev_mesh_D_SSI, prev_mesh_D_ES, prev_mesh_D_GSF, &
-         prev_mesh_D_mix, prev_mesh_dPdr_dRhodr_info, &
-         prev_mesh_D_omega, prev_mesh_D_smooth, prev_mesh_am_nu_rot, &
+         prev_mesh_D_mix, prev_mesh_D_omega, prev_mesh_am_nu_rot, &
          prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
@@ -1241,52 +1234,6 @@
          ! kelvin-helmholtz timescale (years) -- proportional to gravitational energy divided by luminosity
       real(dp) :: nuc_timescale 
          ! nuclear timescale (years) -- proportional to mass divided by luminosity
-      
-      ! info about the max burning locations for hydrogen, helium, and metals
-      
-      ! info about location where have max rate of hydrogen burning by PP and CNO
-      real(dp) :: max_eps_h ! erg/g/s
-      real(dp) :: max_eps_h_m ! baryonic mass coordinate at location of max burn (g)
-      real(dp) :: max_eps_h_lgT ! log10 temperature at location of max burn
-      real(dp) :: max_eps_h_lgRho ! log10 density at location of max burn
-      real(dp) :: max_eps_h_lgR ! log10 radius at location of max burn
-      real(dp) :: max_eps_h_lgP ! log10 pressure at location of max burn
-      real(dp) :: max_eps_h_opacity ! opacity at location of max burn
-      real(dp) :: max_eps_h_cp ! cp at location of max burn
-      integer :: max_eps_h_k ! cell number
-      
-      ! info about location where have max rate of helium burning by triple alpha
-      real(dp) :: max_eps_he ! erg/g/s
-      real(dp) :: max_eps_he_m ! baryonic mass coordinate at location of max burn (g)
-      real(dp) :: max_eps_he_lgT ! log10 temperature at location of max burn
-      real(dp) :: max_eps_he_lgRho ! log10 density at location of max burn
-      real(dp) :: max_eps_he_lgR ! log10 radius at location of max burn
-      real(dp) :: max_eps_he_lgP ! log10 pressure at location of max burn
-      real(dp) :: max_eps_he_opacity ! opacity at location of max burn
-      real(dp) :: max_eps_he_cp ! cp at location of max burn
-      integer :: max_eps_he_k ! cell number
-      
-      ! info about location where have max rate for burning other than h and he burning
-      real(dp) :: max_eps_z ! erg/g/s
-      real(dp) :: max_eps_z_m ! baryonic mass coordinate at location of max burn (g)      
-      real(dp) :: max_eps_z_lgT ! log10 temperature at location of max burn
-      real(dp) :: max_eps_z_lgRho ! log10 density at location of max burn
-      real(dp) :: max_eps_z_lgR ! log10 radius at location of max burn
-      real(dp) :: max_eps_z_lgP ! log10 pressure at location of max burn
-      real(dp) :: max_eps_z_opacity ! opacity at location of max burn
-      real(dp) :: max_eps_z_cp ! cp at location of max burn
-      integer :: max_eps_z_k ! cell number
-      
-      ! info about location where have max rate for burning of all kinds
-      real(dp) :: max_eps_nuc ! erg/g/s
-      real(dp) :: max_eps_nuc_m ! baryonic mass coordinate at location of max burn (g)      
-      real(dp) :: max_eps_nuc_lgT ! log10 temperature at location of max burn
-      real(dp) :: max_eps_nuc_lgRho ! log10 density at location of max burn
-      real(dp) :: max_eps_nuc_lgR ! log10 radius at location of max burn
-      real(dp) :: max_eps_nuc_lgP ! log10 pressure at location of max burn
-      real(dp) :: max_eps_nuc_opacity ! opacity at location of max burn
-      real(dp) :: max_eps_nuc_cp ! cp at location of max burn
-      integer :: max_eps_nuc_k ! cell number
 
       ! times in other units (just for convenience)
       real(dp) :: star_age, time_days, time_years ! time is in seconds
@@ -1569,12 +1516,6 @@
          ! equ(i,k) is residual for equation i of cell k            
          real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
          real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
-
-      ! ode time derivatives  <<< OBSOLETE.  DELETE THESE.
-         ! f(i,k) is expected instantaneous dx/dt for variable i of cell k     
-         ! f_old at t_old, f_mid at t_old + dt/2, and f_new at t_old + dt       
-         real(dp), dimension(:,:), pointer :: f, f_old ! (nvar,nz)
-         real(dp), dimension(:), pointer :: f_old1 ! (nvar*nz)
          
       ! equation weights
          ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
@@ -1705,7 +1646,6 @@
          real(dp), pointer, dimension(:) :: D_ES_old
          real(dp), pointer, dimension(:) :: D_GSF_old
          real(dp), pointer, dimension(:) :: D_mix_old
-         real(dp), pointer, dimension(:) :: dPdr_dRhodr_info_old
          
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 

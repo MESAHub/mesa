@@ -503,9 +503,9 @@
                                  s% dlnd_dt_const_q(k), &
                                  s% lnd_for_d_dt_const_q(k), s% xh(i_lnd,k)
                            if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dlnd_dt_const_q', k, &
-                                 s% dlnd_dt_const_q(k), &
-                                 s% lnd_for_d_dt_const_q(k), s% xh(i_lnd,k)
+                              write(*,2) 'update_vars: bad dlnd_dt_const_q', k, s% dlnd_dt_const_q(k)
+                              write(*,2) 's% lnd_for_d_dt_const_q(k)', k, s% lnd_for_d_dt_const_q(k)
+                              write(*,2) 's% xh(i_lnd,k)', k, s% xh(i_lnd,k)
                               stop 'update_vars'
                            end if
                            return
@@ -991,11 +991,10 @@
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
             
-            if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, nzlo, nzhi, ierr)
             if (failed('set_mlt_vars')) return
-          
             if (dbg) write(*,*) 'call check_for_redo_MLT'
+            
             call check_for_redo_MLT(s, nzlo, nzhi, ierr)
             if (failed('check_for_redo_MLT')) return
             

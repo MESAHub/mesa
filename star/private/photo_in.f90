@@ -80,8 +80,7 @@
             s% nvar_hydro, s% nvar_chem, s% nvar, s% init_model_number, &
             s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
-            s% rsp_flag, s% D_smooth_flag, &
-            s% prev_Lmax, s% species, s% num_reactions, &
+            s% rsp_flag, s% prev_Lmax, s% species, s% num_reactions, &
             s% model_number, s% model_number_old, s% star_mass, &
             s% mstar, s% mstar_old, &
             s% xmstar, s% xmstar_old, &
@@ -184,7 +183,7 @@
 
          read(iounit, iostat=ierr) &
             s% dq(1:nz), s% q(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
-            s% m(1:nz), s% dm(1:nz), s% dm_bar(1:nz), s% D_smooth(1:nz), &
+            s% m(1:nz), s% dm(1:nz), s% dm_bar(1:nz), &
             s% omega(1:nz), s% j_rot(1:nz), s% w_div_w_crit_roche(1:nz), &
             s% D_omega(1:nz), s% am_nu_rot(1:nz), &
             s% dlnd_dt(1:nz), s% dlnT_dt(1:nz), &
@@ -199,7 +198,6 @@
                if (failed('conv_vel_old')) return
             end if
             read(iounit, iostat=ierr) &
-               s% dPdr_dRhodr_info_old(1:nz_old), &
                s% nu_ST_old(1:nz_old), &
                s% D_ST_old(1:nz_old), &
                s% D_DSI_old(1:nz_old), &
@@ -212,7 +210,6 @@
                s% j_rot_old(1:nz_old), &
                s% D_omega_old(1:nz_old), &
                s% am_nu_rot_old(1:nz_old), &
-               s% D_smooth_old(1:nz_old), &
                s% dq_old(1:nz_old), &
                s% q_old(1:nz_old), &
                s% xh_old(:,1:nz_old), &

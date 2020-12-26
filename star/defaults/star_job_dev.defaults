@@ -103,3 +103,26 @@
     use_j_rot_flag_with_rotation = .false.
 
 
+
+      ! load_saved_photo
+      ! ~~~~~~~~~~~~~~~~
+      ! saved_photo_name
+      ! ~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    load_saved_photo = .false.
+    saved_photo_name = 'undefined'
+
+      ! save_photo_number
+      ! ~~~~~~~~~~~~~~~~
+      ! save_photo_filename
+      ! ~~~~~~~~~~~~~~~~
+      ! save_photo_when_terminate
+      ! ~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    save_photo_number = -1
+    save_photo_filename = ''
+    !save_photo_when_terminate = .true.

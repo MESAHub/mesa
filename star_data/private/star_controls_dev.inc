@@ -9,10 +9,7 @@
          
          real(dp) :: D_mix_zero_region_bottom_q, D_mix_zero_region_top_q, &
             dq_D_mix_zero_at_H_He_crossover, dq_D_mix_zero_at_H_C_crossover
-         
-         real(dp) :: D_smooth_replacement_fraction, D_smooth_growth_rate
-         logical :: set_D_mix_to_D_smooth, blend_D_smooth_between_cells_of_same_mixing_type
-         
+                  
 
          logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
          logical :: report_min_rcond_from_DGESXV
@@ -20,6 +17,8 @@
          
 
          logical :: mlt_make_surface_no_mixing
+         
+         logical :: do_normalize_dqs_as_part_of_set_qs
          
          
 

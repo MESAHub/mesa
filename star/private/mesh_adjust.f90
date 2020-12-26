@@ -53,7 +53,7 @@
             s, nz, nz_old, xh_old, xa_old, &
             energy_old, eta_old, lnd_old, lnPgas_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            D_smooth_old, conv_vel_old, lnT_old, eturb_old, specific_PE_old, specific_KE_old, &
+            conv_vel_old, lnT_old, eturb_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
@@ -66,7 +66,7 @@
          integer, dimension(:), pointer :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, D_smooth_old, conv_vel_old, lnT_old, eturb_old, &
+            lnd_old, lnPgas_old, conv_vel_old, lnT_old, eturb_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
@@ -288,13 +288,6 @@
                   0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
                if (failed('am_nu_rot')) return
             end if            
-         end if
-         
-         if (s% D_smooth_flag) then
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_smooth, D_smooth_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_smooth')) return
          end if
          
          call do_interp_pt_val( &
@@ -637,7 +630,7 @@
       subroutine do_prune_mesh_surface( &
             s, nz, nz_old, xh_old, xa_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            D_smooth_old, conv_vel_old, lnT_old, &
+            conv_vel_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
             xh, xa, ierr)
@@ -645,7 +638,7 @@
          integer, intent(in) :: nz, nz_old
          real(dp), dimension(:), pointer :: &
             j_rot_old, i_rot_old, omega_old, &
-            D_omega_old, am_nu_rot_old, D_smooth_old, conv_vel_old, lnT_old, &
+            D_omega_old, am_nu_rot_old, conv_vel_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
@@ -696,10 +689,6 @@
 
          if (s% am_nu_rot_flag) then
             call prune1(s% am_nu_rot, am_nu_rot_old, skip)
-         endif
-
-         if (s% D_smooth_flag) then
-            call prune1(s% D_smooth, D_smooth_old, skip)
          endif
 
          if (s% RTI_flag) then

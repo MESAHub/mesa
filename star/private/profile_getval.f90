@@ -1365,11 +1365,6 @@
             case (p_log_etamid_RTI)
                if (s% RTI_flag) val = safe_log10(s% etamid_RTI(k))
 
-
-            case (p_log_D_smooth)
-               if (s% D_smooth_flag) val = safe_log10(s% D_smooth(k))
-               
-               
             case (p_log_sig_RTI)
                if (s% RTI_flag) val = safe_log10(s% sig_RTI(k))
             case (p_log_sigmid_RTI)

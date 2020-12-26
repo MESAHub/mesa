@@ -397,7 +397,7 @@
             end if
          end if
 
-         call set_qs(nz, s% q, s% dq, ierr)
+         call set_qs(s, nz, s% q, s% dq, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'set_qs ierr in adjust mesh'
             s% result_reason = adjust_mesh_failed
@@ -454,7 +454,7 @@
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
             prv% j_rot, prv% i_rot, &
             prv% omega, prv% D_omega, prv% am_nu_rot, &
-            prv% D_smooth, prv% conv_vel, prv% lnT, prv% eturb, &
+            prv% conv_vel, prv% lnT, prv% eturb, &
             specific_PE, specific_KE, &
             prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, &
             prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
@@ -485,11 +485,9 @@
             s% prev_mesh_D_ES(k) = prv% prev_mesh_D_ES(k)
             s% prev_mesh_D_GSF(k) = prv% prev_mesh_D_GSF(k)
             s% prev_mesh_D_mix(k) = prv% prev_mesh_D_mix(k)
-            s% prev_mesh_dPdr_dRhodr_info(k) = prv% prev_mesh_dPdr_dRhodr_info(k)
             s% prev_mesh_D_omega(k) = prv% prev_mesh_D_omega(k)
             s% prev_mesh_am_nu_rot(k) = prv% prev_mesh_am_nu_rot(k)
             s% prev_mesh_conv_vel(k) = prv% prev_mesh_conv_vel(k)
-            s% prev_mesh_D_smooth(k) = prv% prev_mesh_D_smooth(k)
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
          end do
 

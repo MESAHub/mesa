@@ -44,7 +44,7 @@
       integer, parameter :: bit_for_am_nu_rot = 11
       integer, parameter :: bit_for_j_rot = 12
       integer, parameter :: bit_for_conv_vel_var = 13
-      integer, parameter :: bit_for_D_smooth  = 14
+      !integer, parameter ::   = 14 ! UNUSED
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
@@ -55,7 +55,6 @@
       integer, parameter :: increment_for_D_omega_flag = 1
       integer, parameter :: increment_for_am_nu_rot_flag = 1
       integer, parameter :: increment_for_RTI_flag = 1
-      integer, parameter :: increment_for_D_smooth_flag = 1
       integer, parameter :: increment_for_rsp_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
       integer, parameter :: increment_for_const_L = -1
@@ -66,7 +65,6 @@
                                           + increment_for_D_omega_flag &
                                           + increment_for_am_nu_rot_flag &
                                           + increment_for_RTI_flag &
-                                          + increment_for_D_smooth_flag &
                                           + increment_for_rsp_flag &
                                           + increment_for_conv_vel_flag
 
@@ -135,6 +133,7 @@
                ! need to recompute irot and jrot
                call use_xh_to_update_i_rot_and_j_rot(s)
             end if
+            
             s% total_angular_momentum = total_angular_momentum(s)
             if (s% trace_k > 0 .and. s% trace_k <= nz) then
                do k=1,nz
@@ -187,7 +186,7 @@
             end if
          end if
          
-         s% doing_finish_load_model = .true.         
+         s% doing_finish_load_model = .true.  
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in set_vars'
@@ -239,7 +238,7 @@
       subroutine read1_model( &
             s, species, nvar_hydro, nz, iounit, &
             is_RSP_model, want_RSP_model, &
-            xh, xa, q, dq, D_smooth, omega, j_rot, D_omega, am_nu_rot, &
+            xh, xa, q, dq, omega, j_rot, D_omega, am_nu_rot, &
             lnT, conv_vel, perm, ierr)
          use star_utils, only: set_qs
          use chem_def
@@ -248,7 +247,7 @@
          logical, intent(in) :: is_RSP_model, want_RSP_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
-            q, dq, D_smooth, omega, j_rot, D_omega, am_nu_rot, lnT, conv_vel
+            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT, conv_vel
          integer, intent(out) :: ierr
 
          integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_eturb_RSP, &
@@ -285,7 +284,6 @@
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_rsp_flag ! read eturb, erad, Fr
-         if (s% D_smooth_flag) n = n+increment_for_D_smooth_flag ! read D_smooth
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
          if (s% constant_L) n = n+increment_for_const_L ! do not read L
          if (is_RSP_model .and. .not. want_RSP_model) then
@@ -370,9 +368,6 @@
             if (s% RTI_flag) then
                j=j+1; xh(i_alpha_RTI,i) = vec(j)
             end if
-            if (s% D_smooth_flag) then
-               j=j+1; D_smooth(i) = vec(j)
-            end if
             if (s% conv_vel_flag .or. s% have_previous_conv_vel) then
                j=j+1
                if (s% conv_vel_flag) then
@@ -401,8 +396,6 @@
             return
          end if
          
-         if (.not. s% D_smooth_flag) D_smooth(1:nz) = 0d0
-         
          if (s% rotation_flag .and. .not. s% D_omega_flag) &
             s% D_omega(1:nz) = 0d0
          
@@ -424,7 +417,7 @@
             s% xh(i_Fr_RSP,1:nz) = 0d0 
          end if
 
-         call set_qs(nz, q, dq, ierr)
+         call set_qs(s, nz, q, dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'set_qs failed in read1_model sum(dq)', sum(dq(1:nz))
             return
@@ -582,7 +575,6 @@
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% constant_L = BTEST(file_type, bit_for_constant_L)
          s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
-         s% D_smooth_flag = BTEST(file_type, bit_for_D_smooth)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
          
@@ -672,7 +664,7 @@
          call read1_model( &
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &
-               s% xh, s% xa, s% q, s% dq, s% D_smooth, &
+               s% xh, s% xa, s% q, s% dq, &
                s% omega, s% j_rot, s% D_omega, s% am_nu_rot, s% lnT, &
                s% prev_conv_vel_from_file, perm, ierr)
          deallocate(names, perm)

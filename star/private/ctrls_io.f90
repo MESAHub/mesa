@@ -135,11 +135,11 @@
     min_convective_gap, min_thermohaline_gap, min_semiconvection_gap, min_thermohaline_dropout, &
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
-    redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, D_smooth_replacement_fraction, D_smooth_growth_rate, &
+    redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, &
     semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
     okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, D_mix_zero_region_top_q, &
-    gradT_excess_max_change, gradT_excess_lambda1, gradT_excess_beta1, gradT_excess_lambda2, set_D_mix_to_D_smooth, &
+    gradT_excess_max_change, gradT_excess_lambda1, gradT_excess_beta1, gradT_excess_lambda2, &
     gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
     gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, &
@@ -147,8 +147,8 @@
     fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
-    no_MLT_below_T_max, MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, &
-    max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, blend_D_smooth_between_cells_of_same_mixing_type, &
+    no_MLT_below_T_max, MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
+    max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
     limit_overshoot_Hp_using_size_of_convection_zone, RSP_min_tau_for_turbulent_flux, &
     predictive_mix, predictive_superad_thresh, predictive_avoid_reversal, predictive_limit_ingestion,&
     predictive_ingestion_factor, predictive_zone_type, predictive_zone_loc, predictive_bdy_loc, &
@@ -1088,14 +1088,10 @@
  s% gradT_excess_min_log_tau_full_on = gradT_excess_min_log_tau_full_on
  s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  
- s% D_smooth_replacement_fraction = D_smooth_replacement_fraction
- s% D_smooth_growth_rate = D_smooth_growth_rate
  s% D_mix_zero_region_bottom_q = D_mix_zero_region_bottom_q
  s% D_mix_zero_region_top_q = D_mix_zero_region_top_q
  s% dq_D_mix_zero_at_H_He_crossover = dq_D_mix_zero_at_H_He_crossover
  s% dq_D_mix_zero_at_H_C_crossover = dq_D_mix_zero_at_H_C_crossover
- s% set_D_mix_to_D_smooth = set_D_mix_to_D_smooth
- s% blend_D_smooth_between_cells_of_same_mixing_type = blend_D_smooth_between_cells_of_same_mixing_type
 
  s% use_superad_reduction = use_superad_reduction
  s% superad_reduction_gamma_limit = superad_reduction_gamma_limit
@@ -1106,6 +1102,7 @@
  
  s% max_logT_for_mlt = max_logT_for_mlt
  s% mlt_make_surface_no_mixing = mlt_make_surface_no_mixing
+ s% do_normalize_dqs_as_part_of_set_qs = do_normalize_dqs_as_part_of_set_qs
 
  s% thermohaline_coeff = thermohaline_coeff
  s% thermohaline_option = thermohaline_option
@@ -2812,14 +2809,10 @@
  gradT_excess_min_log_tau_full_on = s% gradT_excess_min_log_tau_full_on
  gradT_excess_max_log_tau_full_off = s% gradT_excess_max_log_tau_full_off
  
- D_smooth_replacement_fraction = s% D_smooth_replacement_fraction
- D_smooth_growth_rate = s% D_smooth_growth_rate
  D_mix_zero_region_bottom_q = s% D_mix_zero_region_bottom_q
  D_mix_zero_region_top_q = s% D_mix_zero_region_top_q
  dq_D_mix_zero_at_H_He_crossover = s% dq_D_mix_zero_at_H_He_crossover
  dq_D_mix_zero_at_H_C_crossover = s% dq_D_mix_zero_at_H_C_crossover
- set_D_mix_to_D_smooth = s% set_D_mix_to_D_smooth
- blend_D_smooth_between_cells_of_same_mixing_type = s% blend_D_smooth_between_cells_of_same_mixing_type
 
  use_superad_reduction = s% use_superad_reduction
  superad_reduction_gamma_limit = s% superad_reduction_gamma_limit
@@ -2830,6 +2823,7 @@
  
  max_logT_for_mlt = s% max_logT_for_mlt
  mlt_make_surface_no_mixing = s% mlt_make_surface_no_mixing
+ do_normalize_dqs_as_part_of_set_qs = s% do_normalize_dqs_as_part_of_set_qs
 
  gradT_excess_lambda1 = s% gradT_excess_lambda1
  gradT_excess_beta1 = s% gradT_excess_beta1

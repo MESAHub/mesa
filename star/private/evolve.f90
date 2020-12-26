@@ -1612,11 +1612,9 @@
                s% prev_mesh_D_ES(k) = s% D_ES(k)
                s% prev_mesh_D_GSF(k) = s% D_GSF(k)
                s% prev_mesh_D_mix(k) = s% D_mix(k)
-               s% prev_mesh_dPdr_dRhodr_info(k) = s% dPdr_dRhodr_info(k)
                s% prev_mesh_D_omega(k) = s% D_omega(k)
                s% prev_mesh_am_nu_rot(k) = s% am_nu_rot(k)
                s% prev_mesh_conv_vel(k) = s% conv_vel(k)
-               s% prev_mesh_D_smooth(k) = s% D_smooth(k)
 
                s% prev_mesh_dq(k) = s% dq(k)
 
@@ -1802,12 +1800,6 @@
                s% q(k) = s% q_old(k) ! start with same q's
                s% dq(k) = s% dq_old(k) ! start with same dq's
             end do
-            
-            if (s% D_smooth_flag) then
-               do k=1,nz
-                  s% D_smooth(k) = s% D_smooth_old(k)
-               end do
-            end if
 
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
@@ -2005,19 +1997,17 @@
                   s% D_ES_old(k) = s% prev_mesh_D_ES(k)
                   s% D_GSF_old(k) = s% prev_mesh_D_GSF(k)
                   s% D_mix_old(k) = s% prev_mesh_D_mix(k)
-                  s% dPdr_dRhodr_info_old(k) = s% prev_mesh_dPdr_dRhodr_info(k)
                   s% D_omega_old(k) = s% prev_mesh_D_omega(k)
                   s% am_nu_rot_old(k) = s% prev_mesh_am_nu_rot(k)
                   s% conv_vel(k) = s% prev_mesh_conv_vel(k)
-                  s% D_smooth_old(k) = s% prev_mesh_D_smooth(k)
                   s% dq_old(k) = s% prev_mesh_dq(k)
                end do
-               !call normalize_dqs(s% prev_mesh_nz, s% dq_old, ierr)
-               !if (ierr /= 0) then
-               !   prepare_to_retry = terminate
-               !   return
-               !end if
-               call set_qs(s% prev_mesh_nz, s% q_old, s% dq_old, ierr)
+               call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
+               if (ierr /= 0) then
+                  prepare_to_retry = terminate
+                  return
+               end if
+               call set_qs(s, s% prev_mesh_nz, s% q_old, s% dq_old, ierr)
                if (ierr /= 0) then
                   prepare_to_retry = terminate
                   return

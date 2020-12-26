@@ -1950,6 +1950,10 @@
          check_XH_cntr = check_change(s, XH_cntr - XH_cntr_old, &
             s% delta_XH_cntr_limit, s% delta_XH_cntr_hard_limit, &
             1, 'check_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XH_cntr /= keep_going) then
+            write(*,2) 'XH_cntr', s% model_number, XH_cntr
+            write(*,2) 'XH_cntr_old', s% model_number, XH_cntr_old
+         end if
       end function check_XH_cntr
 
 
@@ -1971,6 +1975,10 @@
          check_XHe_cntr = check_change(s, XHe_cntr - XHe_cntr_old, &
             s% delta_XHe_cntr_limit, s% delta_XHe_cntr_hard_limit, &
             1, 'check_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XHe_cntr /= keep_going) then
+            write(*,2) 'XHe_cntr', s% model_number, XHe_cntr
+            write(*,2) 'XHe_cntr_old', s% model_number, XHe_cntr_old
+         end if
       end function check_XHe_cntr
 
 
@@ -1992,6 +2000,10 @@
          check_XC_cntr = check_change(s, XC_cntr - XC_cntr_old, &
             s% delta_XC_cntr_limit, s% delta_XC_cntr_hard_limit, &
             1, 'check_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XC_cntr /= keep_going) then
+            write(*,2) 'XC_cntr', s% model_number, XC_cntr
+            write(*,2) 'XC_cntr_old', s% model_number, XC_cntr_old
+         end if
       end function check_XC_cntr
 
 
@@ -2013,6 +2025,10 @@
          check_XNe_cntr = check_change(s, XNe_cntr - XNe_cntr_old, &
             s% delta_XNe_cntr_limit, s% delta_XNe_cntr_hard_limit, &
             1, 'check_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XNe_cntr /= keep_going) then
+            write(*,2) 'XNe_cntr', s% model_number, XNe_cntr
+            write(*,2) 'XNe_cntr_old', s% model_number, XNe_cntr_old
+         end if
       end function check_XNe_cntr
 
 
@@ -2034,6 +2050,10 @@
          check_XO_cntr = check_change(s, XO_cntr - XO_cntr_old, &
             s% delta_XO_cntr_limit, s% delta_XO_cntr_hard_limit, &
             1, 'check_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XO_cntr /= keep_going) then
+            write(*,2) 'XO_cntr', s% model_number, XO_cntr
+            write(*,2) 'XO_cntr_old', s% model_number, XO_cntr_old
+         end if
       end function check_XO_cntr
 
 
@@ -2055,6 +2075,10 @@
          check_XSi_cntr = check_change(s, XSi_cntr - XSi_cntr_old, &
             s% delta_XSi_cntr_limit, s% delta_XSi_cntr_hard_limit, &
             1, 'check_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XSi_cntr /= keep_going) then
+            write(*,2) 'XSi_cntr', s% model_number, XSi_cntr
+            write(*,2) 'XSi_cntr_old', s% model_number, XSi_cntr_old
+         end if
       end function check_XSi_cntr
 
 

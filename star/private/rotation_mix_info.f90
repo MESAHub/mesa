@@ -260,6 +260,18 @@
                   s% D_ST_factor   * s% D_ST(k)
                if (is_bad(D_omega_source)) then
                   write(*,2) 'D_omega_source', k, D_omega_source
+                  write(*,2) 's% D_DSI_factor  * s% D_DSI(k)', k, s% D_DSI_factor  * s% D_DSI(k), &
+                     s% D_DSI_factor, s% D_DSI(k)
+                  write(*,2) 's% D_SH_factor   * s% D_SH(k)', k, s% D_SH_factor   * s% D_SH(k), &
+                     s% D_SH_factor, s% D_SH(k)
+                  write(*,2) 's% D_SSI_factor  * s% D_SSI(k)', k, s% D_SSI_factor  * s% D_SSI(k), &
+                     s% D_SSI_factor, s% D_SSI(k)
+                  write(*,2) 's% D_ES_factor   * s% D_ES(k)', k, s% D_ES_factor   * s% D_ES(k), &
+                     s% D_ES_factor, s% D_ES(k)
+                  write(*,2) 's% D_GSF_factor  * s% D_GSF(k)', k, s% D_GSF_factor  * s% D_GSF(k), &
+                     s% D_GSF_factor, s% D_GSF(k)
+                  write(*,2) 's% D_ST_factor   * s% D_ST(k)', k, s% D_ST_factor   * s% D_ST(k), &
+                     s% D_ST_factor, s% D_ST(k)
                   stop 'rotation mix'
                end if
                s% D_omega(k) = (1d0 - f)*s% D_omega(k) + f*D_omega_source

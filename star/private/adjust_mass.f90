@@ -233,6 +233,7 @@
          end if
 
          delta_m = compute_delta_m(s)
+         
          if (delta_m == 0) then
             return
          end if
@@ -499,19 +500,6 @@
                   call dealloc
                   return
                end if
-            end if
-         end if
-         
-         if (s% D_smooth_flag) then
-            call set_D_smooth( &
-               s, nz, k_const_mass, k_newval, &
-               rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
-               s% D_smooth, oldloc, newloc, oldval, newval, work, ierr)
-            if (ierr /= 0) then
-               s% retry_message = 'set_D_smooth failed in adjust mass'
-               if (s% report_ierr) write(*,*) s% retry_message
-               call dealloc
-               return
             end if
          end if
 
@@ -1295,7 +1283,7 @@
          end if
 
          if (s% simple_i_rot_flag .or. s% fitted_fp_ft_i_rot .or. k < k_below_just_added) then
-            call eval_i_rot(s, r00, r00, r00, w_div_wcrit_roche,&
+            call eval_i_rot(s, k, r00, r00, r00, w_div_wcrit_roche,&
                s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
          else
             r003 = r00*r00*r00
@@ -1311,7 +1299,7 @@
             end if
             ri = pow((r003 + rp13)/2,1d0/3d0)
             ro = pow((r003 + rm13)/2,1d0/3d0)
-            call eval_i_rot(s, ri, r00, ro, 0d0,&
+            call eval_i_rot(s, k, ri, r00, ro, 0d0,&
                s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
          end if
 

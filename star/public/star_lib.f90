@@ -497,6 +497,19 @@
       end subroutine star_write_model
       
       
+      subroutine star_write_photo(id, fname, ierr)
+         use evolve_support, only: output, output_to_file
+         integer, intent(in) :: id
+         character (len=*), intent(in) :: fname
+         integer, intent(out) :: ierr
+         if (len_trim(fname) == 0) then
+            call output(id, ierr)      
+         else
+            call output_to_file(fname, id, ierr)      
+         end if
+      end subroutine star_write_photo
+      
+      
       subroutine star_read_RSP_model(id, model_fname, ierr)
          use init, only: load_saved_RSP_model
          integer, intent(in) :: id
@@ -633,16 +646,12 @@
       
       ! at the end of a successful step, call this routine to take care of
       ! things such as writing log files or saving a "snapshot" for restarts.
-      integer function star_finish_step( &
-            id, do_photo, &
-            ierr)
+      integer function star_finish_step(id, ierr)
          ! returns either keep_going, redo, retry, or terminate.
          use evolve, only: finish_step
          integer, intent(in) :: id
-         logical, intent(in) :: do_photo ! if true, then save "photo" for restart
          integer, intent(out) :: ierr
-         star_finish_step = &
-            finish_step(id, do_photo, ierr)
+         star_finish_step = finish_step(id, .false., ierr)
       end function star_finish_step
 
       
@@ -885,15 +894,6 @@
          integer, intent(out) :: ierr
          call set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
       end subroutine star_set_am_nu_rot_flag
-
-      
-      subroutine star_set_D_smooth_flag(id, D_smooth_flag, ierr)
-         use alloc, only: set_D_smooth_flag
-         integer, intent(in) :: id
-         logical, intent(in) :: D_smooth_flag
-         integer, intent(out) :: ierr
-         call set_D_smooth_flag(id, D_smooth_flag, ierr)
-      end subroutine star_set_D_smooth_flag
 
       
       ! this routine is for adding or removing velocity variables.
@@ -2427,24 +2427,32 @@
       
       ! some routines for "stellar engineering"
 
-      subroutine star_normalize_dqs(nz, dq, ierr)
+      subroutine star_normalize_dqs(id, nz, dq, ierr)
          ! rescale dq's so that add to 1.000
          ! work in from boundaries to meet at largest dq
          use star_utils, only: normalize_dqs
+         integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(inout) :: dq(:) ! (nz)
          integer, intent(out) :: ierr
-         call normalize_dqs(nz, dq, ierr)
+         type (star_info), pointer :: s
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call normalize_dqs(s, nz, dq, ierr)
       end subroutine star_normalize_dqs
 
 
-      subroutine star_set_qs(nz, q, dq, ierr) ! set q's using normalized dq's
+      subroutine star_set_qs(id, nz, q, dq, ierr) ! set q's using normalized dq's
          use star_utils, only: set_qs
+         integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(inout) :: dq(:) ! (nz)
          real(dp), intent(inout) :: q(:) ! (nz)
          integer, intent(out) :: ierr
-         call set_qs(nz, q, dq, ierr)
+         type (star_info), pointer :: s
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call set_qs(s, nz, q, dq, ierr)
       end subroutine star_set_qs
       
       

@@ -218,13 +218,19 @@
 
          if (is_bad_num(gradr_factor)) then
             ierr = -1
+!$omp critical (gradr_factor_crit1)
             if (s% report_ierr) then
-               write(*,2) 'do1_mlt_eval gradr_factor', k, gradr_factor, s% ft_rot(k), s% fp_rot(k)
+               write(*,2) 'do1_mlt_eval s% gradr_factor', k, s% gradr_factor(k)
+               if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
+                  write(*,2) 's% ft_rot(k)', k, s% ft_rot(k)
+                  write(*,2) 's% fp_rot(k)', k, s% fp_rot(k)
+               end if
             end if
             if (s% stop_for_bad_nums) then
-               write(*,2) 'gradr_factor', k, gradr_factor, s% ft_rot(k), s% fp_rot(k)
+               write(*,2) 'gradr_factor', k, gradr_factor
                stop 'do1_mlt_eval'
             end if
+!$omp end critical (gradr_factor_crit1)
             return
          end if
 
@@ -588,24 +594,6 @@
          s% scale_height(k) = mlt_basics(mlt_scale_height)
          s% gradL(k) = mlt_basics(mlt_gradL)
          s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*r*r*rho_face)
-
-         if ((s% scale_height(k) <= 0d0 .and. MLT_option /= 'none') &
-                .or. is_bad_num(s% scale_height(k))) then
-            ierr = -1
-            if (.not. s% report_ierr) return
-!$OMP critical (mlt_info_crit2)
-            write(*,2) 's% scale_height(k)', k, s% scale_height(k)
-            call show_stuff(.true.)
-            write(*,*)
-            write(*,2) 's% scale_height(k)', k, s% scale_height(k)
-            write(*,2) 's% grada(k)', k, s% grada(k)
-            write(*,2) 's% gradr(k)', k, s% gradr(k)
-            write(*,2) 's% gradT(k)', k, s% gradT(k)
-            write(*,2) 's% gradL(k)', k, s% gradL(k)
-            write(*,2) 'max_conv_vel', k, max_conv_vel
-            if (s% stop_for_bad_nums) stop 'mlt info'
-!$OMP end critical (mlt_info_crit2)
-         end if
 
          call store_gradr_partials
 
@@ -1458,7 +1446,8 @@
          if (s% gradT_excess_alpha > 0.9999d0) s% gradT_excess_alpha = 1d0
 
          if (dbg) then
-            write(*,1) 'gradT excess new', alpha
+            write(*,1) 'set_gradT_excess_alpha gradT excess new alpha', alpha
+            write(*,1) 's% gradT_excess_age_fraction', s% gradT_excess_age_fraction
             write(*,1) 's% gradT_excess_alpha_old', s% gradT_excess_alpha_old
             write(*,1) 's% gradT_excess_alpha', s% gradT_excess_alpha
             write(*,*)

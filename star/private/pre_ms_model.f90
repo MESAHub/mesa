@@ -668,12 +668,14 @@
          
          mstar = m ! actual total mass
          
-         call normalize_dqs(nz, dq, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'normalize_dqs failed in pre ms model'
-            return
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, nz, dq, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in pre ms model'
+               return
+            end if
          end if
-         call set_qs(nz, q, dq, ierr)
+         call set_qs(s, nz, q, dq, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'set_qs failed in pre ms model'
             return

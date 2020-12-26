@@ -51,7 +51,7 @@
          logical :: v_flag, RTI_flag, conv_vel_flag, &
             Eturb_flag, u_flag, prev_flag, rotation_flag, &
             D_omega_flag, am_nu_rot_flag, write_conv_vel, &
-            rsp_flag, D_smooth_flag, no_L
+            rsp_flag, no_L
          integer :: time_vals(8)
 
          1 format(a32, 2x, 1pd26.16)
@@ -73,7 +73,6 @@
          RTI_flag = s% RTI_flag
          conv_vel_flag = s% conv_vel_flag
          rotation_flag = s% rotation_flag
-         D_smooth_flag = s% D_smooth_flag
          D_omega_flag = s% D_omega_flag .and. rotation_flag
          am_nu_rot_flag = s% am_nu_rot_flag .and. rotation_flag
          rsp_flag = s% rsp_flag
@@ -97,7 +96,6 @@
          if (D_omega_flag) file_type = file_type + 2**bit_for_D_omega
          if (am_nu_rot_flag) file_type = file_type + 2**bit_for_am_nu_rot
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
-         if (D_smooth_flag) file_type = file_type + 2**bit_for_D_smooth
          if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
          
          no_L = (s% rsp_flag .or. s% Eturb_flag)
@@ -123,8 +121,6 @@
             write(iounit,'(a)',advance='no') ', with saved convection velocities (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
             write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
-         if (BTEST(file_type, bit_for_D_smooth)) &
-            write(iounit,'(a)',advance='no') ', with smoothed diffusion coefficients (D_smooth)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', with luminosity (L), with turbulent energy (Et) and radiative flux (Fr) for RSP'
          if (BTEST(file_type, bit_for_Eturb)) &
@@ -235,9 +231,6 @@
             if (RTI_flag) then
                call write1(s% alpha_RTI(k),ierr); if (ierr /= 0) exit
             end if
-            if (D_smooth_flag) then
-               call write1(s% D_smooth(k),ierr); if (ierr /= 0) exit
-            end if
             if (write_conv_vel .or. conv_vel_flag) then
                call write1(s% conv_vel(k),ierr); if (ierr /= 0) exit
             end if
@@ -304,7 +297,6 @@
             if (u_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'u'
             if (RTI_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'alpha_RTI'
-            if (D_smooth_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'D_smooth'
             if (write_conv_vel .or. conv_vel_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'conv_vel'
             do i=1, species

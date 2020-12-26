@@ -612,19 +612,6 @@
          end if
                      
          if (result == keep_going) then 
-            call adjust_tau_factor(s)
-            if (s% L_nuc_burn_total/s% L_phot >= s% Lnuc_div_L_zams_limit &
-                  .and. .not. s% rotation_flag) then  
-               call do_rotation_near_zams(s,ierr)
-               if (ierr /= 0) return
-            end if           
-            if (s% rotation_flag) then      
-               call do_rotation(s,ierr)
-               if (ierr /= 0) return
-            end if 
-            ! if you have data that needs to be saved and restored for restarts, 
-            ! save it in s% extra_iwork and s% extra_work
-            ! before calling star_finish_step
             if (s% job% pgstar_flag) then
                 will_read_pgstar_inlist = .false.
                 if (s% pgstar_interval <= 0) then
@@ -649,7 +636,7 @@
          
          if (result == keep_going) then
             if (dbg) write(*,*) 'call star_finish_step'
-            result = star_finish_step(id, .false., ierr)
+            result = star_finish_step(id, ierr)
             if (failed('star_finish_step',ierr)) return
          end if
                      
@@ -657,6 +644,19 @@
             if (dbg) write(*,*) 'call update_pgstar_plots'
             call update_pgstar_plots(s, .false., ierr)
             if (failed('update_pgstar_plots',ierr)) return
+         end if
+         
+         if (result == keep_going) then 
+            call adjust_tau_factor(s)
+            if (s% L_nuc_burn_total/s% L_phot >= s% Lnuc_div_L_zams_limit &
+                  .and. .not. s% rotation_flag) then  
+               call do_rotation_near_zams(s,ierr)
+               if (ierr /= 0) return
+            end if           
+            if (s% rotation_flag) then      
+               call do_rotation(s,ierr)
+               if (ierr /= 0) return
+            end if 
          end if
 
       end subroutine after_step_loop
@@ -681,9 +681,19 @@
          s% need_to_save_profiles_now = .false.
          s% need_to_update_history_now = .true.
          if (dbg) write(*,*) 'call star_finish_step'
-         result = star_finish_step( &
-            id, s% job% save_photo_when_terminate, ierr)
-         if (failed('star_finish_step',ierr)) return
+         result = star_finish_step(id, ierr)
+         if (failed('star_finish_step',ierr)) return         
+         if (s% job% save_photo_when_terminate) then
+            if (len_trim(s% job% required_termination_code_string) > 0 .and. &
+                s% termination_code > 0) then ! check termination code
+               if (s% job% required_termination_code_string == &
+                   termination_code_str(s% termination_code)) then
+                  s% job% save_photo_number = s% model_number
+               end if
+            else
+               s% job% save_photo_number = s% model_number 
+            end if
+         end if         
          if (s% job% save_model_when_terminate) then
             if (len_trim(s% job% required_termination_code_string) > 0 .and. &
                 s% termination_code > 0) then ! check termination code
@@ -1167,7 +1177,13 @@
          if (s% model_number == s% job% save_model_number) then
             call star_write_model(id, s% job% save_model_filename, ierr)
             if (failed('star_write_model',ierr)) return
-            write(*, *) 'saved to ' // trim(s% job% save_model_filename)
+            write(*, *) 'model saved to ' // trim(s% job% save_model_filename)
+         end if
+      
+         if (s% model_number == s% job% save_photo_number) then
+            call star_write_photo(id, s% job% save_photo_filename, ierr)
+            if (failed('star_write_photo',ierr)) return
+            write(*, *) 'photo saved to ' // trim(s% job% save_photo_filename)
          end if
          
          if (s% model_number == s% job% save_pulse_data_for_model_number) then
@@ -1683,20 +1699,19 @@
       
       
       subroutine do_load1_star(id, s, restart, restart_filename, ierr)
-         use ctrls_io, only : store_controls
          integer, intent(in) :: id
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          character (len=*), intent(in) :: restart_filename
          integer, intent(out) :: ierr
-
-         integer :: id_aux, i, j, k
-         type (star_info), pointer :: s_aux
-         real(dp), pointer :: xq(:), xa(:,:)
-         real(dp) :: total_mass, partial_mass, total_radiation
       
          if (restart) then
             call star_load_restart_photo(id, restart_filename, ierr)
+            if (failed('star_load_restart_photo',ierr)) return
+         else if (s% job% load_saved_photo) then
+            write(*,'(a)') 'load saved photo ' // trim(s% job% saved_photo_name)
+            write(*,*)
+            call star_load_restart_photo(id, s% job% saved_photo_name, ierr)
             if (failed('star_load_restart_photo',ierr)) return
          else if (s% job% load_saved_model_for_RSP) then
             write(*,'(a)') 'load saved model for RSP ' // trim(s% job% saved_model_name)
@@ -1725,87 +1740,8 @@
             call star_read_model(id, s% job% saved_model_name, ierr)
             if (failed('star_read_model',ierr)) return
          else if (s% job% create_merger_model) then
-            if (s% job% create_pre_main_sequence_model) then
-               write(*,*) 'you have both load_saved_model and ' // &
-                  'create_pre_main_sequence_model set true'
-               write(*,*) 'please pick one and try again'
-               call mesa_error(__FILE__,__LINE__)
-            end if
-            if (s% job% create_initial_model) then
-               write(*,*) 'you have both load_saved_model and create_initial_model set true'
-               write(*,*) 'please pick one and try again'
-               call mesa_error(__FILE__,__LINE__)
-            end if
-            !load first star
-            call star_read_model(id, s% job% saved_model_for_merger_1, ierr)
-            if (failed('star_read_model',ierr)) return
-
-            !load second star
-            call alloc_star(id_aux, ierr)
-            if (failed('alloc_star',ierr)) return
-            call star_ptr(id_aux, s_aux, ierr)
-            if (failed('star_ptr',ierr)) return
-            call init_starting_star_data(s_aux, ierr)
-            if (failed('init_starting_star_data',ierr)) return
-            call star_set_kap_and_eos_handles(id_aux, ierr)
-            if (failed('set_star_kap_and_eos_handles',ierr)) return
-            call store_controls(s_aux, ierr)
-            if (failed('store_controls',ierr)) return
-            call do_star_job_controls_before(id_aux, s_aux, .false., ierr)
-            if (ierr /= 0) return
-            s_aux% job% set_rate_c12ag = s% job% set_rate_c12ag
-            s_aux% job% set_rate_n14pg = s% job% set_rate_n14pg
-            s_aux% job% set_rate_3a = s% job% set_rate_3a
-            s_aux% job% set_rate_1212 = s% job% set_rate_1212
-            call star_read_model(id_aux, s% job% saved_model_for_merger_2, ierr)
-            if (failed('star_read_model',ierr)) return
-
-            ! create composition and q array through an entropy sorting
-            total_mass = s% mstar + s_aux% mstar
-            partial_mass = 0
-            i = 1
-            j = 1
-            allocate(xq(s% nz + s_aux% nz), xa(s% species, s% nz + s_aux% nz))
-            do while (i <= s% nz .or. j <= s_aux% nz)
-               if (j > s_aux% nz .or. (i <= s% nz .and. &
-                  s% entropy(i) >= s_aux% entropy(j))) then
-                     partial_mass = partial_mass + s% dm(i)
-                     do k=1, s% species
-                        xa(k, i+j-1) = s% xa(k, i)
-                     end do
-                     i = i + 1
-               else if (i > s% nz .or. (j <= s_aux% nz .and. &
-                  s_aux% entropy(j) > s% entropy(i))) then
-                     partial_mass = partial_mass + s_aux% dm(j)
-                     do k=1, s% species
-                        xa(k, i+j-1) = s_aux% xa(k, j)
-                     end do
-                     j = j + 1
-               end if
-               xq(i+j-2) = partial_mass / total_mass
-               !write(*,*) "check", i+j-2, xq(i+j-2), xa(1, i+j-2), xa(2, i+j-2), xa(3, i+j-2)
-            end do
-            ! Relax composition first, then composition mass
-            ! Turn off rotation for relaxation
-            call star_set_rotation_flag(id, .false., ierr)
-            if (failed('star_set_rotation_flag',ierr)) then
-               deallocate(xq,xa)
-               return
-            end if
-            write(*,*) "Relaxing composition to merger composition"
-            call star_relax_composition( &
-               id, s% job% num_steps_to_relax_composition, s% nz + s_aux% nz, s% species, xa, xq, ierr)
-            if (failed('star_relax_composition',ierr)) then
-               deallocate(xq,xa)
-               return
-            end if
-            write(*,*) "Relaxing star mass to total merger mass"
-            call star_relax_mass_scale( &
-               id, total_mass/Msun, s% job% dlgm_per_step, &
-               s% job% change_mass_years_for_dt, ierr)
-            deallocate(xq,xa)
-            if (failed('star_relax_mass_scale',ierr)) return
-
+            call create_merger_model(s, ierr)
+            if (failed('create_merger_model',ierr)) return
          else if (s% job% create_pre_main_sequence_model) then
             if (.not. restart) write(*, *) 'create pre-main-sequence model'
             if (s% job% create_initial_model) then
@@ -1855,6 +1791,104 @@
          end if
 
       end subroutine do_load1_star
+
+
+      subroutine create_merger_model(s, ierr)
+         use ctrls_io, only : store_controls
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: id, id_aux, i, j, k
+         type (star_info), pointer :: s_aux
+         real(dp), pointer :: xq(:), xa(:,:)
+         real(dp) :: total_mass, partial_mass
+
+         include 'formats'
+         ierr = 0
+         id = s% id
+
+         if (s% job% create_pre_main_sequence_model) then
+            write(*,*) 'you have both load_saved_model and ' // &
+               'create_pre_main_sequence_model set true'
+            write(*,*) 'please pick one and try again'
+            call mesa_error(__FILE__,__LINE__)
+         end if
+         if (s% job% create_initial_model) then
+            write(*,*) 'you have both load_saved_model and create_initial_model set true'
+            write(*,*) 'please pick one and try again'
+            call mesa_error(__FILE__,__LINE__)
+         end if
+         !load first star
+         call star_read_model(id, s% job% saved_model_for_merger_1, ierr)
+         if (failed('star_read_model',ierr)) return
+
+         !load second star
+         call alloc_star(id_aux, ierr)
+         if (failed('alloc_star',ierr)) return
+         call star_ptr(id_aux, s_aux, ierr)
+         if (failed('star_ptr',ierr)) return
+         call init_starting_star_data(s_aux, ierr)
+         if (failed('init_starting_star_data',ierr)) return
+         call star_set_kap_and_eos_handles(id_aux, ierr)
+         if (failed('set_star_kap_and_eos_handles',ierr)) return
+         call store_controls(s_aux, ierr)
+         if (failed('store_controls',ierr)) return
+         call do_star_job_controls_before(id_aux, s_aux, .false., ierr)
+         if (ierr /= 0) return
+         s_aux% job% set_rate_c12ag = s% job% set_rate_c12ag
+         s_aux% job% set_rate_n14pg = s% job% set_rate_n14pg
+         s_aux% job% set_rate_3a = s% job% set_rate_3a
+         s_aux% job% set_rate_1212 = s% job% set_rate_1212
+         call star_read_model(id_aux, s% job% saved_model_for_merger_2, ierr)
+         if (failed('star_read_model',ierr)) return
+
+         ! create composition and q array through an entropy sorting
+         total_mass = s% mstar + s_aux% mstar
+         partial_mass = 0
+         i = 1
+         j = 1
+         allocate(xq(s% nz + s_aux% nz), xa(s% species, s% nz + s_aux% nz))
+         do while (i <= s% nz .or. j <= s_aux% nz)
+            if (j > s_aux% nz .or. (i <= s% nz .and. &
+               s% entropy(i) >= s_aux% entropy(j))) then
+                  partial_mass = partial_mass + s% dm(i)
+                  do k=1, s% species
+                     xa(k, i+j-1) = s% xa(k, i)
+                  end do
+                  i = i + 1
+            else if (i > s% nz .or. (j <= s_aux% nz .and. &
+               s_aux% entropy(j) > s% entropy(i))) then
+                  partial_mass = partial_mass + s_aux% dm(j)
+                  do k=1, s% species
+                     xa(k, i+j-1) = s_aux% xa(k, j)
+                  end do
+                  j = j + 1
+            end if
+            xq(i+j-2) = partial_mass / total_mass
+            !write(*,*) "check", i+j-2, xq(i+j-2), xa(1, i+j-2), xa(2, i+j-2), xa(3, i+j-2)
+         end do
+         ! Relax composition first, then composition mass
+         ! Turn off rotation for relaxation
+         call star_set_rotation_flag(id, .false., ierr)
+         if (failed('star_set_rotation_flag',ierr)) then
+            deallocate(xq,xa)
+            return
+         end if
+         write(*,*) "Relaxing composition to merger composition"
+         call star_relax_composition( &
+            id, s% job% num_steps_to_relax_composition, s% nz + s_aux% nz, s% species, xa, xq, ierr)
+         if (failed('star_relax_composition',ierr)) then
+            deallocate(xq,xa)
+            return
+         end if
+         write(*,*) "Relaxing star mass to total merger mass"
+         call star_relax_mass_scale( &
+            id, total_mass/Msun, s% job% dlgm_per_step, &
+            s% job% change_mass_years_for_dt, ierr)
+         deallocate(xq,xa)
+         if (failed('star_relax_mass_scale',ierr)) return
+         
+      end subroutine create_merger_model
       
 
       subroutine extend_net(s, ierr)
@@ -2181,12 +2215,6 @@
                (s% job% change_initial_am_nu_rot_flag .and. .not. restart)) then
             call star_set_am_nu_rot_flag(id, s% job% new_am_nu_rot_flag, ierr)
             if (failed('star_set_am_nu_rot_flag',ierr)) return
-         end if
-
-         if (s% job% change_D_smooth_flag .or. &
-               (s% job% change_initial_D_smooth_flag .and. .not. restart)) then
-            call star_set_D_smooth_flag(id, s% job% new_D_smooth_flag, ierr)
-            if (failed('star_set_D_smooth_flag',ierr)) return
          end if
 
          if (s% job% change_rotation_flag .or. &
