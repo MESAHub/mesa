@@ -582,7 +582,6 @@
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
-         s% use_previous_conv_vel_from_file = .false.
          s% mstar_dot = 0
 
          s% surf_lnT = 0

@@ -1,0 +1,373 @@
+#!/bin/bash
+
+set -o pipefail
+
+# Get version number from git
+if [ -d ".git" ] || [ -f ".git" ]; then
+    git rev-parse HEAD > data/version_number
+fi
+
+# Create file for TestHub
+# This file will be populated during math/test
+#touch testhub.yml
+
+export BUILD_LOG="build.log"
+
+# Get system info
+./help > $BUILD_LOG  2>&1
+
+# By scoping the code in brackets we only need to write the redirect once
+# at the end of the file
+{
+
+function check_okay {
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
+}
+
+function do_one_parallel {
+	cd $1
+	check_okay
+	echo
+	pwd
+	echo "building $1 package."
+	echo
+	# don't use nice with ./i1 or can miss errors
+	./i1p
+	check_okay
+	cd ..
+	echo
+	if [ -f skip_build ] || [ -f "$1/skip_build" ]
+	then
+		echo "mesa/$1 has been tested and exported."
+	elif [ -f skip_test ] || [ -f "$1/skip_test" ]
+	then
+		echo "mesa/$1 has been built and exported."
+	else
+		echo "mesa/$1 has been built, tested, and exported."
+	fi
+	echo
+	echo "************************************************"
+}
+
+function do_one {
+	cd $1
+	check_okay
+	echo
+	pwd
+	echo "building $1 package."
+	echo
+	# don't use nice with ./i1 or can miss errors
+	./i1
+	check_okay
+	cd ..
+	echo
+	if [ -f skip_build ] || [ -f "$1/skip_build" ]
+	then
+		echo "mesa/$1 has been tested and exported."
+	elif [ -f skip_test ] || [ -f "$1/skip_test" ]
+	then
+		echo "mesa/$1 has been built and exported."
+	else
+		echo "mesa/$1 has been built, tested, and exported."
+	fi
+	echo
+	echo "************************************************"
+}
+
+# Block sudo access, this check should come first as if a user blindly types "sudo ./install" then MESA_DIR wont be set
+# So lets catch this error first rather then forcing them to set MESA_DIR under sudo
+if  [ ${EUID:-$(id -u)} -eq 0 ];
+then
+    echo
+    echo "****************************************************************"
+    echo "*                                                              *"
+    echo "*        MESA should not be installed with root privaleges     *"
+    echo "*        Using sudo is a bad idea and unlikely to fix the      *"
+    echo "*                   problem you think you have.                *"
+    echo "*                                                              *"	
+    echo "*                 If you have permission issues,               *"
+    echo "*              contact the mesa-users mailing list             *"
+    echo "*                                                              *"
+    echo "*         If you wish to install mesa in a root location       *"
+    echo "*                then we assume you can edit the               *"
+    echo "*             ./install file to remove this check              *"
+    echo "*                                                              *"
+    echo "****************************************************************"
+    echo
+    exit 1
+fi
+
+# Check we are on git and if so did git lfs work?
+if [ -d ".git" ] || [ -f ".git" ]
+then
+	# First check if git lfs is installed
+	if ! command -v git-lfs >/dev/null 2>&1
+	then
+		echo
+		echo "****************************************************************"
+		echo "*                     git lfs is not installed                 *"
+		echo "*                                                              *"
+		echo "****************************************************************"
+		echo
+		#exit 1
+	fi
+
+
+fi
+
+
+
+
+if [ -z "$MESA_DIR" ]
+then
+	if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]
+	then
+		echo
+		echo "****************************************************************"
+		echo "*                                                              *"
+		echo "*                      MESA_DIR is not set                     *"
+		echo "*            Please set MESA_DIR and run ./mk again            *"
+		echo "*                                                              *"
+		echo "*                        Please also read:                     *"
+		echo "*  http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk  *"
+		echo "*                      To set up the MESASDK                   *"
+		echo "*                                                              *"
+		echo "****************************************************************"
+		echo
+		exit 1
+	fi
+fi
+
+if [[ "$MESA_DIR" == *" "* ]]; 
+then
+	echo
+	echo "****************************************************************"
+	echo "*                                                              *"
+	echo "*               MESA_DIR can not contain whitespace            *"
+	echo "*              Please move your MESA_DIR to a folder           *"
+	echo "*	                    without spaces in its name               *"
+	echo "*                                                              *"
+	echo "****************************************************************"
+	echo
+	exit 1
+fi
+
+
+# there is also a tool called ndiff which is part of the nmap security
+# scanner.  if called with the -? argument, that tool returns 2.
+# The ndiff utility we want recognizes this will return 0.
+# We send the output, which is on stderr, to dev/null
+
+ndiff -? 2> /dev/null
+if [ $? -ne 0 ]
+then
+	echo
+	echo "****************************************************************"
+	echo "*                                                              *"
+	echo "*    You need to install ndiff before you can install mesa.    *"
+	echo "*                                                              *"
+	echo "*                                                              *"
+	echo "*    But only if you are not using the SDK. If you see this    *"
+	echo "*            message and are trying to use the sdk             *"
+	echo "*         then please check your environment variables         *"
+	echo "*                        are set first.                        *"
+	echo "*                                                              *"
+	echo "*                                                              *"
+	echo "*    The ndiff tar file is in the mesa/utils directory.        *"
+	echo "*    Unpack it anywhere (tar -zxvf ndiff-2.00.tar.gz),         *"
+	echo "*    and cd to the ndiff directory.                            *"
+	echo "*    Then do the usual sequence:                               *"
+	echo "*                                                              *"
+	echo "*           ./configure                                        *"
+	echo "*           make all                                           *"
+	echo "*           sudo make install                                  *"
+	echo "*                                                              *"
+	echo "*    Note: 'make check' seems to give lots of false alarms.    *"
+	echo "*    I suggest skipping that step in the ndiff installation.   *"
+	echo "*                                                              *"
+	echo "*    BTW: there's another 'ndiff' out there in the unix world. *"
+	echo "*           http://nmap.org/ndiff/                             *"
+	echo "*    I'm sure it's a great tool, but it isn't what we need.    *"
+	echo "*                                                              *"
+	echo "****************************************************************"
+	echo
+	exit 1
+fi
+
+makedepf90 > /dev/null
+if [ $? -ne 0 ]
+then
+	echo
+	echo "*******************************************************************"
+	echo "*                                                                 *"
+	echo "*    You need to install makedepf90 before you can install mesa.  *"
+	echo "*                                                                 *"
+	echo "*                                                                 *"
+	echo "*    But only if you are not using the SDK. If you see this       *"
+	echo "*            message and are trying to use the sdk                *"
+	echo "*         then please check your environment variables            *"
+	echo "*                        are set first.                           *"
+	echo "*                                                                 *"
+	echo "*                                                                 *"
+	echo "*    The makedepf90 tar file is in the mesa/utils directory.      *"
+	echo "*    Unpack it anywhere (tar -zxvf makedepf90-2.8.8.tar.gz),      *"
+	echo "*    and cd to the makedepf90-2.8.8 directory.                    *"
+	echo "*    Then do the usual sequence:                                  *"
+	echo "*                                                                 *"
+	echo "*           ./configure                                           *"
+	echo "*           make all                                              *"
+	echo "*           sudo make install                                     *"
+	echo "*                                                                 *"
+	echo "*    Note: 'make test' doesn't seem to work. I suggest skipping   *"
+	echo "*    that step in the makedepf90 installation.                    *"
+	echo "*                                                                 *"
+	echo "******************************************************************"
+	echo
+	exit 1
+fi
+
+
+if [ ! -r lib ]
+then
+  mkdir lib
+fi
+
+if [ ! -r include ]
+then
+  mkdir include
+fi
+
+do_one_parallel const
+do_one utils
+do_one_parallel math
+do_one_parallel mtx
+do_one_parallel auto_diff
+do_one_parallel num
+
+do_one_parallel interp_1d
+do_one_parallel interp_2d
+
+if [ ! -r data ]
+then
+	echo
+	echo "******************************************************************"
+	echo "*                                                                *"
+	echo "*    Please setup the current mesa data before doing ./install   *"
+	echo "*    See the mesa README file for details.                       *"
+	echo "*                                                                *"
+	echo "******************************************************************"
+	echo
+	exit 1
+fi
+
+function do_input_data {
+	cd $1
+	check_okay
+	echo
+	pwd
+	echo "installing mesa $1 data."
+	echo
+	# don't use nice or can miss errors
+	./build_data_and_export
+	check_okay
+	echo "$1 data successfully installed."
+	echo
+	echo "************************************************"
+	cd ..
+}
+
+
+
+
+
+if [ ! -r data/chem_data ]
+then
+	do_input_data chem
+fi
+do_one_parallel chem
+
+if [ ! -r data/colors_data ]
+then
+	do_input_data colors
+fi
+do_one_parallel colors
+
+# get rid of obsolete eos_data directory
+rm -rf data/eos_data
+
+# check that the eos data directories exist
+if [ ! -r data/eosDT_data ]
+then
+	do_input_data eos
+elif [ ! -r data/eosPT_data ]
+then
+	do_input_data eos
+fi
+
+# now have installed eos data, so can install the eos module
+do_one_parallel eos
+
+if [ ! -r data/kap_data ]
+then
+	do_input_data kap
+fi
+do_one_parallel kap
+
+do_one_parallel rates
+do_one_parallel neu
+do_one_parallel net
+
+do_one star_data
+
+if [ ! -r data/ionization_data ]
+then
+	do_input_data ionization
+fi
+do_one_parallel ionization
+
+if [ ! -r data/atm_data ]
+then
+	do_input_data atm
+fi
+do_one atm
+
+do_one sample
+
+do_one_parallel gyre
+
+do_one adipls
+
+do_one_parallel star
+
+do_one_parallel binary
+
+do_one_parallel astero
+
+
+
+echo
+echo
+echo
+echo
+echo
+echo
+echo
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo
+echo 'MESA installation was successful'
+echo
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo
+echo
+echo
+echo
+
+# end scope and redirect output
+} 2>&1 | tee -a $BUILD_LOG

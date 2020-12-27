@@ -165,6 +165,7 @@
          if (s% w_div_wc_flag) then
             s% xh(s% i_w_div_wc,:s% nz) = s% w_div_w_crit_roche(:s% nz)
          end if
+         
          if (s% j_rot_flag) then
             s% xh(s% i_j_rot,:s% nz) = s% j_rot(:s% nz)
             s% j_rot_start(:s% nz) = s% j_rot(:s% nz)

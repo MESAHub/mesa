@@ -35,7 +35,8 @@
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
-      integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
+      integer, parameter :: bit_for_conv_vel = 5 ! file has the data, but not using as variable
+         ! we no longer create files with this, but keep it so can still read them.
       integer, parameter :: bit_for_Eturb = 6
       integer, parameter :: bit_for_RTI = 7
       integer, parameter :: bit_for_constant_L = 8
@@ -239,7 +240,7 @@
             s, species, nvar_hydro, nz, iounit, &
             is_RSP_model, want_RSP_model, &
             xh, xa, q, dq, omega, j_rot, D_omega, am_nu_rot, &
-            lnT, conv_vel, perm, ierr)
+            lnT, perm, ierr)
          use star_utils, only: set_qs
          use chem_def
          type (star_info), pointer :: s
@@ -247,7 +248,7 @@
          logical, intent(in) :: is_RSP_model, want_RSP_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
-            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT, conv_vel
+            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT
          integer, intent(out) :: ierr
 
          integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_eturb_RSP, &
@@ -368,13 +369,9 @@
             if (s% RTI_flag) then
                j=j+1; xh(i_alpha_RTI,i) = vec(j)
             end if
-            if (s% conv_vel_flag .or. s% have_previous_conv_vel) then
+            if (s% conv_vel_flag) then
                j=j+1
-               if (s% conv_vel_flag) then
-                  xh(i_ln_cvpv0,i) = log(vec(j)+s% conv_vel_v0)
-               else
-                  conv_vel(i) = vec(j)
-               end if
+               xh(i_ln_cvpv0,i) = log(vec(j)+s% conv_vel_v0)
             end if
             if (j+species > nvec) then
                ierr = -1
@@ -602,7 +599,6 @@
             return
          end if
 
-         s% have_previous_conv_vel = BTEST(file_type, bit_for_conv_vel)
          s% initial_z = initial_z
 
          s% mstar = initial_mass*Msun
@@ -666,14 +662,12 @@
                is_RSP_model, want_RSP_model, &
                s% xh, s% xa, s% q, s% dq, &
                s% omega, s% j_rot, s% D_omega, s% am_nu_rot, s% lnT, &
-               s% prev_conv_vel_from_file, perm, ierr)
+               perm, ierr)
          deallocate(names, perm)
          if (ierr /= 0) then
             write(*,*) 'do_read_saved_model failed in read1_model'
             return
          end if
-         
-         s% use_previous_conv_vel_from_file = s% have_previous_conv_vel
 
          do_read_prev = BTEST(file_type, bit_for_2models)
          if (ierr == 0) then

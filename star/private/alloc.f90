@@ -561,8 +561,6 @@
                
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
-               call do1(s% prev_conv_vel_from_file, c% prev_conv_vel_from_file)
-               if (failed('prev_conv_vel_from_file')) exit
                
                call do1(s% omega, c% omega)
                if (failed('omega')) exit

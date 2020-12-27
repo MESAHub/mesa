@@ -154,7 +154,7 @@
          integer :: iounit, nz1, nz2, file_type, nvar_hydro, species
          character (len=250) :: fname, line
          real(dp) :: m1, m2, initial_mass
-         real(dp), dimension(:), pointer :: conv_vel, lnT
+         real(dp), dimension(:), pointer :: lnT
          logical :: okay
 
          include 'formats'
@@ -247,7 +247,7 @@
 
          allocate(xh(nvar_hydro,nz), xa(species,nz), q(nz), dq(nz), &
             omega(nz), j_rot(nz), D_omega(nz), am_nu_rot(nz), &
-            lnT(nz), conv_vel(nz), stat=ierr)
+            lnT(nz), stat=ierr)
          if (ierr /= 0) then
             close(iounit)
             return
@@ -256,10 +256,10 @@
          call get1_mass( &
                s, iounit, m1, nz1, m2, nz2, initial_mass, &
                nvar_hydro, species, xh, xa, q, dq, &
-               omega, j_rot, D_omega, am_nu_rot, lnT, conv_vel, ierr)
+               omega, j_rot, D_omega, am_nu_rot, lnT, ierr)
 
          close(iounit)
-         deallocate(j_rot, conv_vel, lnT)
+         deallocate(j_rot, lnT)
 
          contains
 
@@ -327,7 +327,7 @@
       subroutine get1_mass( &
             s, iounit, m1, nz1, m2, nz2, initial_mass, &
             nvar_hydro, species, xh, xa, q, dq, &
-            omega, j_rot, D_omega, am_nu_rot, lnT, conv_vel, ierr)
+            omega, j_rot, D_omega, am_nu_rot, lnT, ierr)
          use read_model, only: read_properties, read1_model
          use chem_def, only: iso_name_length
          use read_model, only: get_chem_col_names
@@ -338,14 +338,14 @@
          real(dp), intent(inout) :: xh(:,:) ! (nvar_hydro,nz1)
          real(dp), intent(inout) :: xa(:,:) ! (species,nz1)
          real(dp), intent(inout), dimension(:) :: &
-            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT, conv_vel ! (nz1)
+            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT ! (nz1)
          integer, intent(out) :: ierr
 
          integer :: i, k, nz, nz_in, iprop
          real(dp) :: m_in, m_read, dprop, lnm1, lnm2
          real(dp), dimension(:, :), pointer :: xh2, xa2
          real(dp), dimension(:), pointer :: &
-            q2, dq2, omega2, j_rot2, D_omega2, am_nu_rot2, lnT2, conv_vel2
+            q2, dq2, omega2, j_rot2, D_omega2, am_nu_rot2, lnT2
          real(dp) :: alfa, struct(nvar_hydro), comp(species)
          logical :: okay
          character (len=net_name_len) :: net_name
@@ -358,7 +358,7 @@
          m_read = m1
 
          allocate( &
-            xh2(nvar_hydro, nz2), xa2(species, nz2), conv_vel2(nz2), q2(nz2), dq2(nz2), &
+            xh2(nvar_hydro, nz2), xa2(species, nz2), q2(nz2), dq2(nz2), &
             omega2(nz2), j_rot2(nz2), D_omega2(nz2), am_nu_rot2(nz2), &
             lnT2(nz2), names(species), perm(species), stat=ierr)
          if (ierr /= 0) return
@@ -401,7 +401,7 @@
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
                      xh, xa, q, dq, omega, j_rot, D_omega, am_nu_rot, &
-                     lnT, conv_vel, perm, ierr)
+                     lnT, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
                   if (m2 == m1) exit mass_loop
@@ -411,7 +411,7 @@
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
                      xh2, xa2, q2, dq2, omega2, j_rot2, D_omega2, am_nu_rot2, &
-                     lnT2, conv_vel2, perm, ierr)
+                     lnT2, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
                   nz = nz1
@@ -452,7 +452,7 @@
          subroutine dealloc
             deallocate(xh2, xa2, q2, dq2, &
                omega2, j_rot2, D_omega2, am_nu_rot2, &
-               lnT2, conv_vel2, names, perm)
+               lnT2, names, perm)
          end subroutine dealloc
 
       end subroutine get1_mass

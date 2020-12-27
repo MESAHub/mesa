@@ -142,7 +142,7 @@
          integer :: i_deturb_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
          integer :: i_dln_cvpv0_dt ! equation for convection velocities
          integer :: i_equ_w_div_wc ! equation for w_div_wc
-         integer :: i_dj_rot_dt ! equation for convection velocities
+         integer :: i_dj_rot_dt ! equation for specific angular momentum
          integer :: i_deturb_dt ! turbulent energy equation. only when Eturb_flag is true.
 
          
@@ -1442,7 +1442,7 @@
          integer :: recent_log_header
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            use_previous_conv_vel_from_file, RSP_make_static, RSP_have_set_velocities, &
+            RSP_make_static, RSP_have_set_velocities, &
             RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
@@ -1621,8 +1621,6 @@
 
          integer :: binary_id        
          logical :: include_binary_history_in_log_file
-
-         real(dp), pointer, dimension(:) :: prev_conv_vel_from_file
 
          real(dp), pointer :: eps_pre_mix(:) ! (nz)
          
