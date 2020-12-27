@@ -35,8 +35,7 @@
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
-      integer, parameter :: bit_for_conv_vel = 5 ! file has the data, but not using as variable
-         ! we no longer create files with this, but keep it so can still read them.
+      integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
       integer, parameter :: bit_for_Eturb = 6
       integer, parameter :: bit_for_RTI = 7
       integer, parameter :: bit_for_constant_L = 8
@@ -369,9 +368,13 @@
             if (s% RTI_flag) then
                j=j+1; xh(i_alpha_RTI,i) = vec(j)
             end if
-            if (s% conv_vel_flag) then
+            if (s% conv_vel_flag .or. s% have_previous_conv_vel) then
                j=j+1
-               xh(i_ln_cvpv0,i) = log(vec(j)+s% conv_vel_v0)
+               if (s% conv_vel_flag) then
+                  xh(i_ln_cvpv0,i) = log(vec(j)+s% conv_vel_v0)
+               else
+                  s% conv_vel(i) = vec(j)
+               end if
             end if
             if (j+species > nvec) then
                ierr = -1
@@ -599,6 +602,7 @@
             return
          end if
 
+         s% have_previous_conv_vel = BTEST(file_type, bit_for_conv_vel)
          s% initial_z = initial_z
 
          s% mstar = initial_mass*Msun

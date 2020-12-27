@@ -50,7 +50,7 @@
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
             Eturb_flag, u_flag, prev_flag, rotation_flag, &
-            D_omega_flag, am_nu_rot_flag, &
+            D_omega_flag, am_nu_rot_flag, write_conv_vel, &
             rsp_flag, no_L
          integer :: time_vals(8)
 
@@ -76,6 +76,7 @@
          D_omega_flag = s% D_omega_flag .and. rotation_flag
          am_nu_rot_flag = s% am_nu_rot_flag .and. rotation_flag
          rsp_flag = s% rsp_flag
+         write_conv_vel = s% have_mixing_info .and. s% have_previous_conv_vel
          species = s% species
          
          open(newunit=iounit, file=trim(filename), action='write', status='replace')
@@ -95,6 +96,7 @@
          if (D_omega_flag) file_type = file_type + 2**bit_for_D_omega
          if (am_nu_rot_flag) file_type = file_type + 2**bit_for_am_nu_rot
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
+         if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
          
          no_L = (s% rsp_flag .or. s% Eturb_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
@@ -115,6 +117,8 @@
             write(iounit,'(a)',advance='no') ', with cell center Riemann velocities (u)'
          if (BTEST(file_type, bit_for_RTI)) &
             write(iounit,'(a)',advance='no') ', with Rayleigh-Taylor instabilities (alpha_RTI)'
+         if (BTEST(file_type, bit_for_conv_vel)) &
+            write(iounit,'(a)',advance='no') ', with saved convection velocities (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
             write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
@@ -227,7 +231,7 @@
             if (RTI_flag) then
                call write1(s% alpha_RTI(k),ierr); if (ierr /= 0) exit
             end if
-            if (conv_vel_flag) then
+            if (write_conv_vel .or. conv_vel_flag) then
                call write1(s% conv_vel(k),ierr); if (ierr /= 0) exit
             end if
             do i=1, species
@@ -293,7 +297,7 @@
             if (u_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'u'
             if (RTI_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'alpha_RTI'
-            if (conv_vel_flag) &
+            if (write_conv_vel .or. conv_vel_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'conv_vel'
             do i=1, species
                write(iounit, fmt='(a26, 1x)', advance='no') chem_isos% name(chem_id(i))
