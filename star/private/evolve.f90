@@ -80,7 +80,6 @@
          use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
          use do_one_utils, only: write_terminal_header
          use hydro_vars, only: set_vars_if_needed, set_vars
-         use solve_hydro, only: set_L_burn_by_category
          use mix_info, only: set_cz_bdy_mass
          use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
             cell_specific_total_energy, reset_epsnuc_vectors
@@ -290,7 +289,7 @@
          use solve_omega_mix, only: do_solve_omega_mix
          use mix_info, only: set_cz_bdy_mass, set_mixing_info
          use hydro_rotation, only: set_rotation_info, set_i_rot
-         use solve_hydro, only: set_L_burn_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use winds, only: set_mdot
          use star_utils, only: &
             eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals, &
@@ -480,7 +479,7 @@
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_surface, -1, ierr)
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
 
-         call set_L_burn_by_category(s) ! final values for use in selecting timestep
+         call set_luminosity_by_category(s) ! final values for use in selecting timestep
          s% total_angular_momentum = total_angular_momentum(s)
          call do_report(s, ierr)
          if (failed('do_report')) return

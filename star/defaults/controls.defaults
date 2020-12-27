@@ -2377,7 +2377,7 @@
 
       ! ::
 
-    gradT_excess_age_fraction = 0.9d0
+    gradT_excess_age_fraction = 0d0  ! TESTING         0.9d0
 
 
       ! gradT_excess_max_change

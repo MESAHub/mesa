@@ -88,20 +88,13 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-      gradT_excess_age_fraction = 0.9d0
+    gradT_excess_age_fraction = 0d0  ! TESTING         0.9d0
       gradT_excess_lambda1 = 1.0
       gradT_excess_beta1 = 0.35
       gradT_excess_lambda2 = 0.5
       gradT_excess_beta2 = 0.25
       gradT_excess_dlambda = 0.1
       gradT_excess_dbeta = 0.1
-
-      ! max MLT++
-      ! these settings kill off all superadiabaticity.  also kill off this run!
-      !gradT_excess_lambda1 = 0.7d0
-      !gradT_excess_age_fraction = 0.2d0
-      !gradT_excess_f1 = 1d-12
-      !gradT_excess_f2 = 1d-11
 
 ! mixing
       !** for high mass - no overshoot

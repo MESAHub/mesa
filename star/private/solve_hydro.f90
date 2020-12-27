@@ -587,7 +587,7 @@
       end subroutine hydro_solver_step
 
 
-      subroutine set_L_burn_by_category(s)
+      subroutine set_luminosity_by_category(s) ! integral by mass from center out
          use rates_def, only: i_rate
          type (star_info), pointer :: s
          integer :: k, j
@@ -600,7 +600,7 @@
                s% luminosity_by_category(j,k) = L_burn_by_category(j)
             end do
          end do
-      end subroutine set_L_burn_by_category
+      end subroutine set_luminosity_by_category
 
 
       end module solve_hydro

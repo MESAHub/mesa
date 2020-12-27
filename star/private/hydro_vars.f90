@@ -481,7 +481,7 @@
 
             if (.not. skip_time_derivatives) then
 
-               ! time derivatives at constant q for use by eps_grav anc convective velocities
+               ! time derivatives at constant q for use by eps_grav and convective velocities
                if (s% generations < 2 .or. dt <= 0 .or. s% nz /= s% nz_old) then
 
                   if (i_lnd /= 0) s% dlnd_dt_const_q(1:nz) = 0
