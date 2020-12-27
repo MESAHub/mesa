@@ -411,6 +411,12 @@
             real(dp) :: angsmt
             integer :: k
             include 'formats'
+            
+            
+            return  ! test without this
+            
+            
+            
             if (s% dt <= 0 .or. angsmt <= 0 .or. s% generations < 3 &
                   .or. .not. s% have_previous_rotation_info) return
             if (s% use_split_merge_amr) then
