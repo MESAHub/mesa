@@ -154,8 +154,7 @@
          write(iounit) &
             s% mstar_dot, s% mstar_dot_old, &
             s% v_surf, s% v_surf_old, &
-            s% gradT_excess_alpha, s% gradT_excess_alpha_old, &
-            s% dt_limit_ratio, s% dt_limit_ratio_old, &
+            s% gradT_excess_alpha, s% dt_limit_ratio, s% dt_limit_ratio_old, &
             s% L_phot, s% L_phot_old, s% T_surf, s% P_surf, &
             s% L_surf, s% L_surf_old, &
             s% h1_czb_mass, s% h1_czb_mass_old, s% h1_czb_mass_prev, &

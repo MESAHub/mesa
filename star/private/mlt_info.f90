@@ -1406,30 +1406,12 @@
             write(*,*)
          end if
 
-         if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
-            s% gradT_excess_alpha = &
-               (1d0 - s% gradT_excess_age_fraction)*alpha + &
-               s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
-            if (s% gradT_excess_max_change > 0d0) then
-               if (s% gradT_excess_alpha > s% gradT_excess_alpha_old) then
-                  s% gradT_excess_alpha = min(s% gradT_excess_alpha, s% gradT_excess_alpha_old + &
-                     s% gradT_excess_max_change)
-               else
-                  s% gradT_excess_alpha = max(s% gradT_excess_alpha, s% gradT_excess_alpha_old - &
-                     s% gradT_excess_max_change)
-               end if
-            end if
-         else
-            s% gradT_excess_alpha = alpha
-         end if
-
+         s% gradT_excess_alpha = alpha
          if (s% gradT_excess_alpha < 1d-4) s% gradT_excess_alpha = 0d0
          if (s% gradT_excess_alpha > 0.9999d0) s% gradT_excess_alpha = 1d0
 
          if (dbg) then
             write(*,1) 'set_gradT_excess_alpha gradT excess new alpha', alpha
-            write(*,1) 's% gradT_excess_age_fraction', s% gradT_excess_age_fraction
-            write(*,1) 's% gradT_excess_alpha_old', s% gradT_excess_alpha_old
             write(*,1) 's% gradT_excess_alpha', s% gradT_excess_alpha
             write(*,*)
          end if

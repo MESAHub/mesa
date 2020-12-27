@@ -158,8 +158,6 @@
 
          s% v_surf_old = s% v_surf
 
-         s% gradT_excess_alpha_old = s% gradT_excess_alpha
-
          s% h1_czb_mass_old = s% h1_czb_mass_prev
 
          s% he_core_mass_old = s% he_core_mass
@@ -276,7 +274,7 @@
          s% L_phot = s% L_phot_old
          
          s% mstar_dot = s% mstar_dot_old
-         s% gradT_excess_alpha = s% gradT_excess_alpha_old
+
          s% L_surf = s% L_surf_old
          s% v_surf = s% v_surf_old
 

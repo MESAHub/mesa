@@ -785,9 +785,6 @@
          s% L_by_category = 0
          s% L_by_category_old = 0
 
-         s% gradT_excess_alpha = 0
-         s% gradT_excess_alpha_old = 0
-
          s% dt_limit_ratio = 0
          s% dt_limit_ratio_old = 0
 

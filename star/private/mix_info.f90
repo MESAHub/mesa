@@ -45,7 +45,7 @@
 
       subroutine set_mixing_info(s, skip_set_cz_bdy_mass, ierr)
          ! set convection variables cdc and conv_vel starting from local MLT results.
-         ! overshooting can also be added.
+         ! overshooting can also be added.    and rotation mixing.
          use rates_def, only: i_rate
          use chem_def, only: ipp, icno, i3alf, ih1, ihe4, ic12
          use star_utils, only: start_time, update_time

@@ -2369,17 +2369,6 @@
     gradT_excess_f2 = 1d-3
 
 
-      ! gradT_excess_age_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! These are for calculation of efficiency boosted gradT.
-      ! Fraction of old to mix with new to get next.
-
-      ! ::
-
-    gradT_excess_age_fraction = 0d0  ! TESTING         0.9d0
-
-
       ! gradT_excess_max_change
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
