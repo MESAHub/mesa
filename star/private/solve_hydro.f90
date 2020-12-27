@@ -331,8 +331,6 @@
             return
          end if
 
-         s% num_solver_iterations = solver_iwork(i_num_jacobians)
-
          if (converged) then ! sanity checks before accept it
             converged = check_after_converge(s, report, ierr)
             if (converged .and. s% RTI_flag) & ! special checks

@@ -123,8 +123,6 @@
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             xscale, equ, work, lwork, iwork, liwork, &
             lrpar, rpar, lipar, ipar, convergence_failure, ierr)
-         s% solver_iter = 0
-
 
          contains
 
@@ -397,7 +395,8 @@
          last_jac_iter = 0
          tiny_corr_cnt = 0
          max_iterations_for_jacobian = 1
-
+         s% num_solver_iterations = 0
+         
       iter_loop: do while (.not. passed_tol_tests)
 
             if (dbg_msg .and. first_try) write(*, *)
@@ -436,6 +435,7 @@
                exit iter_loop
             end if
             last_jac_iter = iter
+            s% num_solver_iterations = s% num_solver_iterations + 1
             
          reuse_mtx_loop: do reuse_count = 0, s% num_times_solver_reuse_mtx
          
