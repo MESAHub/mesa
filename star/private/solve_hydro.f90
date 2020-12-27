@@ -31,7 +31,7 @@
       implicit none
 
       private
-      public :: set_L_burn_by_category, &
+      public :: set_luminosity_by_category, &
          set_surf_info, set_tol_correction, do_hydro_converge
 
       integer, parameter :: stencil_neighbors = 1

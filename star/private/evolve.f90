@@ -1482,7 +1482,7 @@
          use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
          use mlt_info, only: set_gradT_excess_alpha
-         use solve_hydro, only: set_L_burn_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use star_utils, only: min_dr_div_cs, save_for_d_dt, &
             total_angular_momentum, eval_Ledd
 
@@ -1505,7 +1505,7 @@
             call set_vars_if_needed(s, s% dt, str, ierr)
             if (failed('set_vars_if_needed')) return            
             s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
-            call set_L_burn_by_category(s)
+            call set_luminosity_by_category(s)
             s% total_angular_momentum = total_angular_momentum(s)
             call do_report(s, ierr)
             if (failed('do_report ierr')) return     

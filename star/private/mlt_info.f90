@@ -133,11 +133,11 @@
          real(dp) :: m, mstar, L, r, dlnm_dlnq, v0, thc, asc, Q_face, &
             a, b, Pgas_div_P_limit, da_dlnd, da_dlnT, db_dlnd, db_dlnT, &
             max_q_for_Pgas_div_P_limit, min_q_for_Pgas_div_P_limit, &
-            mlt_basics(num_mlt_results), prev_conv_vel, max_conv_vel, dt, &
+            mlt_basics(num_mlt_results), max_conv_vel, dt, &
             alfa, beta, &
             T_face, rho_face, P_face, Cv_face, gamma1_face, &
             chiRho_face, chiT_face, Cp_face, opacity_face, grada_face, v, &
-            cv_old, gradr_factor, d_gradr_factor_dw, f, xh_face, tau_face, &
+            gradr_factor, d_gradr_factor_dw, f, xh_face, tau_face, &
             d_grada_face_dlnd00, d_grada_face_dlnT00, &
             d_grada_face_dlndm1, d_grada_face_dlnTm1, &
             gradL_composition_term, dlnT, dlnP, &
@@ -460,29 +460,11 @@
          thc = s% thermohaline_coeff
          asc = s% alpha_semiconvection
          if (s% center_h1 > s% semiconvection_upper_limit_center_h1) asc = 0
-
-         cv_old = -1
-         if (s% have_previous_conv_vel .and. .not. s% conv_vel_flag) then
-            if (s% generations >= 2) then
-               if (.not. is_bad(s% conv_vel_old(k))) &
-                  cv_old = s% conv_vel_old(k)
-            else if (s% use_previous_conv_vel_from_file) then
-               if (.not. is_bad(s% prev_conv_vel_from_file(k))) &
-                  cv_old = s% prev_conv_vel_from_file(k)
-            end if
-         end if
          
-         prev_conv_vel = -1
          dt = -1
 
          max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
-         if (prev_conv_vel >= 0) then
-            if (must_limit_conv_vel(s,k)) then
-               max_conv_vel = prev_conv_vel
-            end if
-         else if ( &
-               s% dt < s% min_dt_for_increases_in_convection_velocity) then
-            prev_conv_vel = 0d0
+         if (s% dt < s% min_dt_for_increases_in_convection_velocity) then
             max_conv_vel = 1d-2*s% dt*s% cgrav(k)
          end if
 
@@ -571,7 +553,7 @@
             mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau_face, just_gradr, &
+            max_conv_vel, dt, tau_face, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) then
@@ -737,7 +719,7 @@
                mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
                MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
                normal_mlt_gradT_factor, &
-               prev_conv_vel, max_conv_vel, dt, tau_face, just_get_gradr, &
+               max_conv_vel, dt, tau_face, just_get_gradr, &
                mixing_type, mlt_basics, mlt_partials1, ierr)
             if (ierr /= 0) return
             s% gradr(k) = mlt_basics(mlt_gradr)
@@ -823,7 +805,6 @@
             write(*,*)
             write(*,'(a)') "MLT_option = '" // trim(s% MLT_option) // "'"
             write(*,*)
-            write(*,1) 'prev_conv_vel =', prev_conv_vel
             write(*,1) 'max_conv_vel =', min(1d99,max_conv_vel)
             write(*,*)
             write(*,1) 'dt =', dt
@@ -1588,7 +1569,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
 
          type (star_info), pointer :: s
@@ -1615,7 +1596,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
+            max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
          logical, intent(in) :: alt_scale_height
          character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
@@ -1656,7 +1637,7 @@
                mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
                MLT_option, Henyey_y_param, Henyey_nu_param, &
                normal_mlt_gradT_factor, &
-               prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+               max_conv_vel, dt, tau, just_gradr, &
                mixing_type, mlt_basics, mlt_partials1, ierr)
             return
          end if
@@ -1693,7 +1674,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            max_conv_vel, dt, tau, just_gradr, &
             mixing_type, &
             mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
             mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &

@@ -997,7 +997,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
             use const_def, only: dp
             integer, intent(in) :: id ! id for star         
@@ -1024,7 +1024,7 @@
                gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
                alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
                Henyey_y_param, Henyey_nu_param, &
-               prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
+               max_conv_vel, dt, tau, remove_small_D_limit, &
                normal_mlt_gradT_factor
             logical, intent(in) :: alt_scale_height
             character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option

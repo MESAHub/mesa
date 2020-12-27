@@ -577,7 +577,7 @@ contains
             Z, X, tau, logRho, logT, logP, logPgas, lnm, m, mstar, lnr, r_surf, delr, cgrav, &
             r, L, rho, T, Pgas, Prad, P, opacity, chiRho, chiT, Cp, Cv, grada, gradr_factor, &
             sfactor, f, dm_dlntau, dlnr_dlntau, &
-            dlnP_dm, dlnP_dlntau, gradT, dlnT_dlntau, prev_conv_vel, max_conv_vel, dt, &
+            dlnP_dm, dlnP_dlntau, gradT, dlnT_dlntau, max_conv_vel, dt, &
             frac_Type2, dlnkap_dlnd, dlnkap_dlnT, res(num_eos_basic_results), &
             d_eos_dlnd(num_eos_basic_results), d_eos_dlnT(num_eos_basic_results), &
             d_eos_dabar(num_eos_basic_results), d_eos_dzbar(num_eos_basic_results), &
@@ -760,7 +760,7 @@ contains
          
          real(dp) :: &
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, csound, &
+            max_conv_vel, dt, csound, &
             alfa, beta, &
             T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
             chiRho_for_partials_00, chiT_for_partials_00, &
@@ -793,7 +793,6 @@ contains
 
          normal_mlt_gradT_factor = 1d0 ! when .not. s% conv_vel_flag
          
-         prev_conv_vel = -1
          max_conv_vel = 1d99
          dt = -1
          
@@ -842,7 +841,7 @@ contains
             s% mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             s% MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, .false., &
+            max_conv_vel, dt, tau, .false., &
             mixing_type, mlt_basics, mlt_partials1, ierr)
       
       end subroutine get_mlt_basics

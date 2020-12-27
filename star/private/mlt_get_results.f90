@@ -68,7 +68,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, mixing_type, &
+            max_conv_vel, dt, tau, just_gradr, mixing_type, &
             gradT, d_gradT_dvb, &
             gradr, d_gradr_dvb, &
             gradL, d_gradL_dvb, &
@@ -106,7 +106,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
+            max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
             
          logical, intent(in) :: alt_scale_height

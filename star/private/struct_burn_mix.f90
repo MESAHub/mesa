@@ -286,7 +286,7 @@
 
 
       subroutine save_start_values(s, ierr)
-         use solve_hydro, only: set_L_burn_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
          use hydro_eturb, only: set_eturb_start_vars
          use star_utils, only: eval_total_energy_integrals
@@ -297,7 +297,7 @@
          include 'formats'
          ierr = 0
 
-         call set_L_burn_by_category(s)
+         call set_luminosity_by_category(s)
 
          do k=1,s% nz
             do j=1,s% species

@@ -719,7 +719,7 @@
          
          real(dp) :: &
             cgrav, opacity, dlnkap_dlnd, dlnkap_dlnT, Cv, csound, &
-            prev_conv_vel, max_conv_vel, dt, gradL_composition_term, tau
+            max_conv_vel, dt, gradL_composition_term, tau
          integer :: mixing_type
          real(dp) :: mlt_basics(num_mlt_results)
          real(dp), target :: mlt_partials1_ary(num_mlt_partials*num_mlt_results)
@@ -775,7 +775,6 @@
          gradL_composition_term = 0
          Cv = Cp
          tau = 1
-         prev_conv_vel = -1
          max_conv_vel = 1d99
          dt = -1
          csound = 0 ! not used when dt <= 0
@@ -821,7 +820,7 @@
             s% mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             s% MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, .false., & 
+            max_conv_vel, dt, tau, .false., & 
             mixing_type, mlt_basics, mlt_partials1, ierr)
          if (ierr /= 0) return
          
