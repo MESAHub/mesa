@@ -1557,6 +1557,7 @@
       integer function prepare_for_new_step(s)
          use evolve_support, only: new_generation
          use chem_def
+         use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
 
          type (star_info), pointer :: s
 
@@ -1593,6 +1594,11 @@
             s% termination_code = t_min_timestep_limit
             s% result_reason = timestep_limits
             return
+         end if
+
+         if (s% set_rho_to_dm_div_dV .and. .not. (s% u_flag .or. s% RSP_flag)) then
+            call use_xh_to_set_rho_to_dm_div_dV(s,ierr)
+            if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
          end if
 
          if (.not. s% RSP_flag) then ! store mesh info for following step eps_mdot

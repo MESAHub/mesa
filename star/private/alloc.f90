@@ -1245,8 +1245,6 @@
             if (failed('mixing_type')) exit
             call do1(s% cz_bdy_dq, c% cz_bdy_dq)
             if (failed('cz_bdy_dq')) exit
-            call do1_logical(s% newly_nonconvective, c% newly_nonconvective)
-            if (failed('newly_nonconvective')) exit
 
             call do1(s% actual_gradT, c% actual_gradT)
             if (failed('actual_gradT')) exit

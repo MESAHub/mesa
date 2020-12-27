@@ -790,9 +790,6 @@
                   cycle
                end if
             end if
-            !if (s% newly_nonconvective(k)) then
-            !   cycle
-            !end if
 
             ! find the nearest mixing boundary
             bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))

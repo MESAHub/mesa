@@ -708,7 +708,6 @@
             ! where the convection zone boundary happens.
             ! i.e., q location of boundary is q(k) - cz_bdy_dq(k)
             ! this is where gradr == gradL by linear interpolation in the cell.
-         logical, pointer :: newly_nonconvective(:)          
       
          integer :: num_conv_boundaries ! boundaries of regions with mixing_type = convective_mixing
          ! boundaries are ordered from center to surface

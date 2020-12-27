@@ -51,7 +51,6 @@
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
-         use mix_smoothing, only: set_newly_non_conv
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -316,11 +315,6 @@
             call s% other_D_mix(s% id, ierr)
             if (failed('other_D_mix')) return
          end if
-
-         if (dbg) write(*,3) 'call set_newly_non_conv', &
-            k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
-         call set_newly_non_conv(s, ierr)
-         if (failed('set_newly_non_conv')) return
 
          do k=1,nz
             s% D_mix_non_rotation(k) = s% D_mix(k)

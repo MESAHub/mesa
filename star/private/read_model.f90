@@ -102,15 +102,16 @@
 
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
-         
-            if (s% set_rho_to_dm_div_dV .and. &
-                  .not. (s% u_flag .or. s% RSP_flag)) &
-               call use_xh_to_set_rho_to_dm_div_dV(s,ierr)
-            if (ierr /= 0) then
-               write(*,*) &
-                  'finish_load_model failed in use_xh_to_set_rho_to_dm_div_dV'
-               return
-            end if
+
+! TESTING WITH THIS MOVED TO START OF EACH STEP         
+!            if (s% set_rho_to_dm_div_dV .and. &
+!                  .not. (s% u_flag .or. s% RSP_flag)) &
+!               call use_xh_to_set_rho_to_dm_div_dV(s,ierr)
+!            if (ierr /= 0) then
+!               write(*,*) &
+!                  'finish_load_model failed in use_xh_to_set_rho_to_dm_div_dV'
+!               return
+!            end if
             
             call reset_epsnuc_vectors(s)
 

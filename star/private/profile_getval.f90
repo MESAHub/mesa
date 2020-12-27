@@ -1433,13 +1433,6 @@
                else
                   val = -99
                end if
-            case (p_newly_nonconvective)
-               if (s% newly_nonconvective(k)) then
-                  int_val = 1; val = 1
-               else
-                  int_val = 0; val = 0
-               end if
-               int_flag = .true.
             case (p_mixing_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
