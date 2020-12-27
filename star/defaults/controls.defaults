@@ -9537,7 +9537,7 @@
 
       ! ::
 
-    relax_hard_limits_after_retry = .true.
+    relax_hard_limits_after_retry = .false.
 
       ! limits based on iterations required by various solvers
 
