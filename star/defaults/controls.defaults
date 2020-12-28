@@ -3848,32 +3848,6 @@
     smooth_D_ST = 3
     smooth_nu_ST = 3
 
-      ! time smoothing.
-      ! Set to 0 to turn off time smoothing.
-
-      ! ::
-
-    angsmt_D_DSI = 0.0d0
-    angsmt_D_SH = 0.0d0
-    angsmt_D_SSI = 0.0d0
-    angsmt_D_ES = 0.0d0
-    angsmt_D_GSF = 0.0d0
-    angsmt_D_ST = 0.2d0
-    angsmt_nu_ST = 0.2d0
-    angsml = 1d-3
-
-
-      ! am_time_average
-      ! ~~~~~~~~~~~~~~~
-
-      ! If true, then ``D = (D_new + D_old)/2``,
-      ! where ``D_old`` is D from previous step
-      ! and ``D_new`` is D as calculated for current as if no time smoothing.
-
-      ! ::
-
-    am_time_average = .false.
-
 
       ! simple_i_rot_flag
       ! ~~~~~~~~~~~~~~~~~
@@ -4070,37 +4044,29 @@
     D_mix_rotation_min_logT_full_off = 9.5d0
 
 
-      ! D_omega_max_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! D_omega_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_across_convection_boundary (previously called D_omega_mixing_in_convection_regions)
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_D_omega_zero_in_convection_region
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
-    D_omega_max_replacement_fraction = 1d0 ! 0.5d0
-    D_omega_growth_rate = 1d0
     D_omega_mixing_rate = 1d0
     D_omega_mixing_across_convection_boundary = .false.
     max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 
-      ! nu_omega_max_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! nu_omega_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_across_convection_boundary
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_nu_omega_zero_in_convection_region
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
-    nu_omega_max_replacement_fraction = 1d0 ! 0.5d0
-    nu_omega_growth_rate = 1d0
     nu_omega_mixing_rate = 1d0
     nu_omega_mixing_across_convection_boundary = .false.
     max_q_for_nu_omega_zero_in_convection_region = 0.8d0

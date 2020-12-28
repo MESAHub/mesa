@@ -1608,16 +1608,8 @@
 
                s% prev_mesh_j_rot(k) = s% j_rot(k)
                s% prev_mesh_omega(k) = s% omega(k)
-               s% prev_mesh_nu_ST(k) = s% nu_ST(k)
-               s% prev_mesh_D_ST(k) = s% D_ST(k)
-               s% prev_mesh_D_DSI(k) = s% D_DSI(k)
-               s% prev_mesh_D_SH(k) = s% D_SH(k)
-               s% prev_mesh_D_SSI(k) = s% D_SSI(k)
-               s% prev_mesh_D_ES(k) = s% D_ES(k)
-               s% prev_mesh_D_GSF(k) = s% D_GSF(k)
                s% prev_mesh_D_mix(k) = s% D_mix(k)
                s% prev_mesh_D_omega(k) = s% D_omega(k)
-               s% prev_mesh_am_nu_rot(k) = s% am_nu_rot(k)
                s% prev_mesh_conv_vel(k) = s% conv_vel(k)
 
                s% prev_mesh_dq(k) = s% dq(k)
@@ -1821,7 +1813,6 @@
                      end if
                   end if
                   s% D_omega(k) = s% D_omega_old(k)
-                  s% am_nu_rot(k) = s% am_nu_rot_old(k)
                end do
                if (.not. okay) then
                   write(*,2) 'model_number', s% model_number
@@ -1993,16 +1984,8 @@
                   s% xa_old(:,k) = s% prev_mesh_xa(:,k)
                   s% j_rot_old(k) = s% prev_mesh_j_rot(k)
                   s% omega_old(k) = s% prev_mesh_omega(k)
-                  s% nu_ST_old(k) = s% prev_mesh_nu_ST(k)
-                  s% D_ST_old(k) = s% prev_mesh_D_ST(k)
-                  s% D_DSI_old(k) = s% prev_mesh_D_DSI(k)
-                  s% D_SH_old(k) = s% prev_mesh_D_SH(k)
-                  s% D_SSI_old(k) = s% prev_mesh_D_SSI(k)
-                  s% D_ES_old(k) = s% prev_mesh_D_ES(k)
-                  s% D_GSF_old(k) = s% prev_mesh_D_GSF(k)
                   s% D_mix_old(k) = s% prev_mesh_D_mix(k)
                   s% D_omega_old(k) = s% prev_mesh_D_omega(k)
-                  s% am_nu_rot_old(k) = s% prev_mesh_am_nu_rot(k)
                   s% conv_vel(k) = s% prev_mesh_conv_vel(k)
                   s% dq_old(k) = s% prev_mesh_dq(k)
                end do

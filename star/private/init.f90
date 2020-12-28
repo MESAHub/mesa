@@ -216,24 +216,6 @@
          nullify(s% conv_vel)
          nullify(s% conv_vel_old)
 
-         nullify(s% nu_ST)
-         nullify(s% nu_ST_old)
-
-         nullify(s% D_DSI)
-         nullify(s% D_DSI_old)
-
-         nullify(s% D_SH)
-         nullify(s% D_SH_old)
-
-         nullify(s% D_SSI)
-         nullify(s% D_SSI_old)
-
-         nullify(s% D_ES)
-         nullify(s% D_ES_old)
-
-         nullify(s% D_GSF)
-         nullify(s% D_GSF_old)
-
          nullify(s% D_mix_non_rotation)
          nullify(s% D_mix_old)
 
@@ -280,16 +262,8 @@
          nullify(s% prev_mesh_xa)
          nullify(s% prev_mesh_j_rot)
          nullify(s% prev_mesh_omega)
-         nullify(s% prev_mesh_nu_ST)
-         nullify(s% prev_mesh_D_ST)
-         nullify(s% prev_mesh_D_DSI)
-         nullify(s% prev_mesh_D_SH)
-         nullify(s% prev_mesh_D_SSI)
-         nullify(s% prev_mesh_D_ES)
-         nullify(s% prev_mesh_D_GSF)
          nullify(s% prev_mesh_D_mix)
          nullify(s% prev_mesh_D_omega)
-         nullify(s% prev_mesh_am_nu_rot)
          nullify(s% prev_mesh_conv_vel)
          nullify(s% prev_mesh_dq)
 

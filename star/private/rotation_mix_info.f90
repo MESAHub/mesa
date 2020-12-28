@@ -74,7 +74,7 @@
             v_ssi, h_ssi, Ris_1, Ris_2, &
             v_es, H_es, &
             v_gsf, H_gsf, &
-            N2, N2_mu, dgtau
+            N2, N2_mu
 
          real(dp), dimension(:), pointer :: saved1, smooth_work1, p_tmp, D_omega
          real(dp), pointer :: smooth_work(:,:), saved(:,:)
@@ -83,7 +83,7 @@
 
          integer :: nz, i, j, k, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
-            f, D_omega_source, max_replacement_factor
+            D_omega_source, max_replacement_factor
 
          include 'formats'
 
@@ -130,7 +130,6 @@
                         ierr = -1; cycle
                      end if
                      call smooth_for_rotation(s% D_DSI, s% smooth_D_DSI, p_tmp)
-                     call time_smooth(s% D_DSI_old, s% D_DSI, s% angsmt_D_DSI)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_DSI)
                      call zero_if_tiny(s,s% D_DSI)
@@ -144,7 +143,6 @@
                         ierr = -1; cycle
                      end if
                      call smooth_for_rotation(s% D_SH, s% smooth_D_SH, p_tmp)
-                     call time_smooth(s% D_SH_old, s% D_SH, s% angsmt_D_SH)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SH)
                      call zero_if_tiny(s,s% D_SH)
@@ -158,7 +156,6 @@
                         ierr = -1; cycle
                      end if
                      call smooth_for_rotation(s% D_SSI, s% smooth_D_SSI, p_tmp)
-                     call time_smooth(s% D_SSI_old, s% D_SSI, s% angsmt_D_SSI)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SSI)
                      call zero_if_tiny(s,s% D_SSI)
@@ -172,7 +169,6 @@
                         ierr = -1; cycle
                      end if
                      call smooth_for_rotation(s% D_ES, s% smooth_D_ES, p_tmp)
-                     call time_smooth(s% D_ES_old, s% D_ES, s% angsmt_D_ES)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_ES)
                      call zero_if_tiny(s,s% D_ES)
@@ -186,7 +182,6 @@
                         ierr = -1; cycle
                      end if
                      call smooth_for_rotation(s% D_GSF, s% smooth_D_GSF, p_tmp)
-                     call time_smooth(s% D_GSF_old, s% D_GSF, s% angsmt_D_GSF)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_GSF)
                      call zero_if_tiny(s,s% D_GSF)
@@ -205,8 +200,6 @@
 
                      call smooth_for_rotation(s% D_ST, s% smooth_D_ST, p_tmp)
                      call smooth_for_rotation(s% nu_ST, s% smooth_nu_ST, p_tmp)
-                     call time_smooth(s% D_ST_old, s% D_ST, s% angsmt_D_ST)
-                     call time_smooth(s% nu_ST_old, s% nu_ST, s% angsmt_nu_ST)
 
                      ! calculate B_r and B_phi
                      do k = 1, nz
@@ -238,20 +231,13 @@
          end do
 !$OMP END PARALLEL DO
          
-         !if (s% D_omega_flag .and. s% okay_to_use_D_omega_old .and. .not. s% doing_finish_load_model) then
          if (s% D_omega_flag .and. .not. s% doing_finish_load_model) then
                      
-            f = min(s% dt*s% D_omega_growth_rate, s% D_omega_max_replacement_fraction)
-         !write(*,2) 'set D_omega', s% model_number, f
             do k=1,nz
                if (s% q(k) <= s% max_q_for_D_omega_zero_in_convection_region .and. &
                    s% mixing_type(k) == convective_mixing) then
                   s% D_omega(k) = 0d0
                   cycle
-               end if
-               if (is_bad(s% D_omega(k))) then
-                  write(*,2) 'old s% D_omega(k)', k, s% D_omega(k)
-                  stop 'rotation mix'
                end if
                D_omega_source = &
                   s% D_DSI_factor  * s% D_DSI(k)  + &
@@ -276,9 +262,8 @@
                      s% D_ST_factor, s% D_ST(k)
                   stop 'rotation mix'
                end if
-               s% D_omega(k) = (1d0 - f)*s% D_omega(k) + f*D_omega_source
+               s% D_omega(k) = D_omega_source
                if (is_bad(s% D_omega(k))) then
-                  write(*,2) 'f', k, f
                   write(*,2) 's% D_omega(k)', k, s% D_omega(k)
                   write(*,2) 'D_omega_source', k, D_omega_source
                   stop 'rotation mix'
@@ -407,36 +392,6 @@
             s% D_omega(1) = 0d0
          
          end subroutine mix_D_omega
-
-
-         subroutine time_smooth(d_old, d_new, angsmt)
-            real(dp), pointer :: d_old(:), d_new(:)
-            real(dp) :: angsmt
-            integer :: k
-            include 'formats'
-            
-            
-            return  ! test without this
-            
-            
-            
-            if (s% dt <= 0 .or. angsmt <= 0 .or. s% generations < 3 &
-                  .or. .not. s% have_previous_rotation_info) return
-            if (s% use_split_merge_amr) then
-               write(*,*) "Time smoothing of diffusion coefficients not supported for use_split_merge_amr"
-               return
-            end if
-            if (s% am_time_average) then
-               do k=1,nz
-                  d_new(k) = 0.5d0*(d_new(k) + d_old(k))
-               end do
-               return
-            end if
-            do k=1,nz
-               d_new(k) = max(d_old(k)/(1d0 + angsmt), &
-                  min(d_new(k), max(d_old(k)*(1d0 + angsmt), d_old(k) + dgtau(k))))
-            end do
-         end subroutine time_smooth
 
 
          subroutine do_alloc(ierr)
@@ -613,9 +568,6 @@
                 N2_mu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
             if (ierr /= 0) return
             call work_array(s, alloc_flag, crit, &
-                dgtau, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
                 smooth_work1, nz*num_instabilities, nz_alloc_extra, 'rotation_mix_info', ierr)
             if (ierr /= 0) return
             call work_array(s, alloc_flag, crit, &
@@ -628,7 +580,7 @@
             integer, intent(out) :: ierr
 
             real(dp) :: &
-               bracket_term, ri0, alfa, beta, enum1, enu00, angsml, &
+               bracket_term, ri0, alfa, beta, enum1, enu00, &
                rho6, gamma, mu_e, rm23, ctmp, xi2, dynvisc, denom, &
                eps_nucm1, eps_nuc00, scale_height2, dlnRho_dlnP, dlnT_dlnP
             integer :: i, k, j
@@ -637,7 +589,6 @@
 
             ierr = 0
             nz = s% nz
-            angsml = s% angsml
 
             f_mu = s% am_gradmu_factor
 
@@ -892,14 +843,6 @@
 
                end do
 
-            end if
-
-            if (s% dt > 0) then
-               do k=2,nz-1
-                  dgtau(k) = angsml*(r(k)-r(k+1))*(r(k-1)*r(k))/s% dt
-               end do
-               dgtau(1) = dgtau(2)
-               dgtau(nz) = dgtau(nz-1)
             end if
 
          end subroutine setup

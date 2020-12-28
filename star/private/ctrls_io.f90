@@ -189,10 +189,8 @@
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
     ! mass gain or loss  
     mass_change, mass_change_full_on_dt, mass_change_full_off_dt, trace_dt_control_mass_change, &
-    min_wind, max_wind, use_accreted_material_j, accreted_material_j, &
-    D_omega_max_replacement_fraction, D_omega_growth_rate, D_omega_mixing_rate, &
-    D_omega_mixing_across_convection_boundary, max_q_for_D_omega_zero_in_convection_region,&
-    nu_omega_max_replacement_fraction, nu_omega_growth_rate, nu_omega_mixing_rate, &
+    min_wind, max_wind, use_accreted_material_j, accreted_material_j, D_omega_mixing_rate, &
+    D_omega_mixing_across_convection_boundary, max_q_for_D_omega_zero_in_convection_region, nu_omega_mixing_rate, &
     nu_omega_mixing_across_convection_boundary, max_q_for_nu_omega_zero_in_convection_region, &
     mdot_omega_power, max_rotational_mdot_boost, max_mdot_jump_for_rotation, &
     lim_trace_rotational_mdot_boost, rotational_mdot_boost_fac, rotational_mdot_kh_fac, surf_avg_tau, surf_avg_tau_min, &
@@ -290,10 +288,8 @@
     am_nu_SSI_factor, am_nu_ES_factor, am_nu_GSF_factor, am_nu_ST_factor, am_nu_visc_factor, &
     am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
     smooth_nu_ST, smooth_D_ST, smooth_D_SH, smooth_D_DSI, smooth_D_ES, smooth_D_SSI, smooth_D_GSF, &
-    angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, &
-    angsmt_nu_ST, angsml, am_time_average, simple_i_rot_flag, &
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
-    recalc_mixing_info_each_substep, adjust_J_fraction, &
+    simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
     implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_w_div_w_crit_limit, surf_w_div_w_crit_tol, &
     fitted_fp_ft_i_rot, w_div_wcrit_max, w_div_wcrit_max2, &
@@ -1357,13 +1353,9 @@
  s% max_wind = max_wind
  s% use_accreted_material_j = use_accreted_material_j
  s% accreted_material_j = accreted_material_j
- s% D_omega_max_replacement_fraction = D_omega_max_replacement_fraction
- s% D_omega_growth_rate = D_omega_growth_rate
  s% D_omega_mixing_rate = D_omega_mixing_rate
  s% D_omega_mixing_across_convection_boundary = D_omega_mixing_across_convection_boundary
  s% max_q_for_D_omega_zero_in_convection_region = max_q_for_D_omega_zero_in_convection_region
- s% nu_omega_max_replacement_fraction = nu_omega_max_replacement_fraction
- s% nu_omega_growth_rate = nu_omega_growth_rate
  s% nu_omega_mixing_rate = nu_omega_mixing_rate
  s% nu_omega_mixing_across_convection_boundary = nu_omega_mixing_across_convection_boundary
  s% max_q_for_nu_omega_zero_in_convection_region = max_q_for_nu_omega_zero_in_convection_region
@@ -1709,15 +1701,6 @@
  s% smooth_D_GSF = smooth_D_GSF
  s% smooth_D_ES = smooth_D_ES
 
- s% angsmt_D_DSI = angsmt_D_DSI
- s% angsmt_D_SH = angsmt_D_SH
- s% angsmt_D_SSI = angsmt_D_SSI
- s% angsmt_D_ES = angsmt_D_ES
- s% angsmt_D_GSF = angsmt_D_GSF
- s% angsmt_D_ST = angsmt_D_ST
- s% angsmt_nu_ST = angsmt_nu_ST
- s% angsml = angsml
- s% am_time_average = am_time_average
  s% simple_i_rot_flag = simple_i_rot_flag
  s% do_adjust_J_lost = do_adjust_J_lost
  s% premix_omega = premix_omega
@@ -3075,13 +3058,9 @@
  max_wind = s% max_wind
  use_accreted_material_j = s% use_accreted_material_j
  accreted_material_j = s% accreted_material_j
- D_omega_max_replacement_fraction = s% D_omega_max_replacement_fraction
- D_omega_growth_rate = s% D_omega_growth_rate
  D_omega_mixing_rate = s% D_omega_mixing_rate
  D_omega_mixing_across_convection_boundary = s% D_omega_mixing_across_convection_boundary
  max_q_for_D_omega_zero_in_convection_region = s% max_q_for_D_omega_zero_in_convection_region
- nu_omega_max_replacement_fraction = s% nu_omega_max_replacement_fraction
- nu_omega_growth_rate = s% nu_omega_growth_rate
  nu_omega_mixing_rate = s% nu_omega_mixing_rate
  nu_omega_mixing_across_convection_boundary = s% nu_omega_mixing_across_convection_boundary
  max_q_for_nu_omega_zero_in_convection_region = s% max_q_for_nu_omega_zero_in_convection_region
@@ -3421,15 +3400,6 @@
  smooth_D_GSF = s% smooth_D_GSF
  smooth_D_ES = s% smooth_D_ES
 
- angsmt_D_DSI = s% angsmt_D_DSI
- angsmt_D_SH = s% angsmt_D_SH
- angsmt_D_SSI = s% angsmt_D_SSI
- angsmt_D_ES = s% angsmt_D_ES
- angsmt_D_GSF = s% angsmt_D_GSF
- angsmt_D_ST = s% angsmt_D_ST
- angsmt_nu_ST = s% angsmt_nu_ST
- angsml = s% angsml
- am_time_average = s% am_time_average
  simple_i_rot_flag = s% simple_i_rot_flag
  do_adjust_J_lost = s% do_adjust_J_lost
  premix_omega = s% premix_omega

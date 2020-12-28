@@ -452,15 +452,10 @@
          call do_mesh_adjust( &
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
-            prv% j_rot, prv% i_rot, &
-            prv% omega, prv% D_omega, prv% am_nu_rot, &
-            prv% conv_vel, prv% lnT, prv% eturb, &
-            specific_PE, specific_KE, &
-            prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, &
-            prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
-            prv% D_SSI, prv% D_ES, prv% D_GSF, prv% D_mix, &
-            cell_type, comes_from, &
-            prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
+            prv% j_rot, prv% i_rot, prv% omega, prv% D_omega, &
+            prv% conv_vel, prv% lnT, prv% eturb, specific_PE, specific_KE, &
+            prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, prv% D_mix, &
+            cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then
             s% retry_message = 'do_mesh_adjust failed in mesh_adjust'
             if (s% report_ierr) write(*, *) s% retry_message
@@ -477,16 +472,8 @@
             s% prev_mesh_xh(:,k) = prv% prev_mesh_xh(:,k)
             s% prev_mesh_j_rot(k) = prv% prev_mesh_j_rot(k)
             s% prev_mesh_omega(k) = prv% prev_mesh_omega(k)
-            s% prev_mesh_nu_ST(k) = prv% prev_mesh_nu_ST(k)
-            s% prev_mesh_D_ST(k) = prv% prev_mesh_D_ST(k)
-            s% prev_mesh_D_DSI(k) = prv% prev_mesh_D_DSI(k)
-            s% prev_mesh_D_SH(k) = prv% prev_mesh_D_SH(k)
-            s% prev_mesh_D_SSI(k) = prv% prev_mesh_D_SSI(k)
-            s% prev_mesh_D_ES(k) = prv% prev_mesh_D_ES(k)
-            s% prev_mesh_D_GSF(k) = prv% prev_mesh_D_GSF(k)
             s% prev_mesh_D_mix(k) = prv% prev_mesh_D_mix(k)
             s% prev_mesh_D_omega(k) = prv% prev_mesh_D_omega(k)
-            s% prev_mesh_am_nu_rot(k) = prv% prev_mesh_am_nu_rot(k)
             s% prev_mesh_conv_vel(k) = prv% prev_mesh_conv_vel(k)
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
          end do

@@ -999,13 +999,10 @@
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
             smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST
 
-         real(dp) :: angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, &
-            angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, angsmt_nu_ST
-
-         real(dp) :: angsml, adjust_J_fraction, min_q_for_adjust_J_lost, &
+         real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J
          logical :: simple_i_rot_flag, do_adjust_J_lost, &
-            premix_omega, am_time_average, recalc_mixing_info_each_substep
+            premix_omega, recalc_mixing_info_each_substep
          real(dp) :: angular_momentum_error_warn, angular_momentum_error_retry
          integer :: max_mdot_redo_cnt
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
@@ -1018,12 +1015,10 @@
          real(dp) :: D_mix_rotation_max_logT_full_on, &
             D_mix_rotation_min_logT_full_off
          
-         real(dp) :: D_omega_max_replacement_fraction, D_omega_growth_rate, &
-            D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
+         real(dp) :: D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
          logical :: D_omega_mixing_across_convection_boundary
          
-         real(dp) :: nu_omega_max_replacement_fraction, nu_omega_growth_rate, &
-            nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
+         real(dp) :: nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
 
          real(dp) :: jacobian_clip_limit

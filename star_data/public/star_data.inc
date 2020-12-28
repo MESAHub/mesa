@@ -391,7 +391,7 @@
       real(dp), pointer :: j_flux(:), dj_flux_dw00(:), dj_flux_dwp1(:), dj_flux_dj00(:), dj_flux_djp1(:), &
          dj_flux_dlnr00(:), dj_flux_dlnrp1(:), dj_flux_dlnd(:)
            
-      real(dp), pointer, dimension(:) :: am_nu_rot, am_nu_rot_old
+      real(dp), pointer, dimension(:) :: am_nu_rot
       real(dp), pointer :: am_nu_non_rot(:) ! diffusion driven by other sources, e.g. convection
       
       real(dp), pointer :: am_nu_omega(:) ! for diffusion of rotation angular velocity omega
@@ -582,10 +582,7 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_nu_ST, &
-         prev_mesh_D_ST, prev_mesh_D_DSI, prev_mesh_D_SH, &
-         prev_mesh_D_SSI, prev_mesh_D_ES, prev_mesh_D_GSF, &
-         prev_mesh_D_mix, prev_mesh_D_omega, prev_mesh_am_nu_rot, &
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_D_mix, prev_mesh_D_omega, &
          prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
@@ -1642,13 +1639,6 @@
             cz_bot_mass_old, cz_top_mass_old
       
          real(dp), pointer, dimension(:) :: conv_vel_old
-         real(dp), pointer, dimension(:) :: nu_ST_old
-         real(dp), pointer, dimension(:) :: D_ST_old
-         real(dp), pointer, dimension(:) :: D_DSI_old
-         real(dp), pointer, dimension(:) :: D_SH_old
-         real(dp), pointer, dimension(:) :: D_SSI_old
-         real(dp), pointer, dimension(:) :: D_ES_old
-         real(dp), pointer, dimension(:) :: D_GSF_old
          real(dp), pointer, dimension(:) :: D_mix_old
          
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration

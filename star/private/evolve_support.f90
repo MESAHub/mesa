@@ -84,27 +84,6 @@
             
             ! keep old values for rotation variables in order to do time smoothing in D_omega
 
-            call flip(s% nu_ST, s% nu_ST_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_ST, s% D_ST_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_DSI, s% D_DSI_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_SH, s% D_SH_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_SSI, s% D_SSI_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_ES, s% D_ES_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_GSF, s% D_GSF_old, ierr)
-            if (ierr /= 0) return
-
             call flip(s% D_mix, s% D_mix_old, ierr)
             if (ierr /= 0) return
 
@@ -115,9 +94,6 @@
             if (ierr /= 0) return
 
             call flip(s% D_omega, s% D_omega_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% am_nu_rot, s% am_nu_rot_old, ierr)
             if (ierr /= 0) return
 
             tmp => s% xh_old

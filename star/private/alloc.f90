@@ -296,16 +296,8 @@
          if (ASSOCIATED(s% prev_mesh_xh)) deallocate(s% prev_mesh_xh)
          if (ASSOCIATED(s% prev_mesh_j_rot)) deallocate(s% prev_mesh_j_rot)
          if (ASSOCIATED(s% prev_mesh_omega)) deallocate(s% prev_mesh_omega)
-         if (ASSOCIATED(s% prev_mesh_nu_ST)) deallocate(s% prev_mesh_nu_ST)
-         if (ASSOCIATED(s% prev_mesh_D_ST)) deallocate(s% prev_mesh_D_ST)
-         if (ASSOCIATED(s% prev_mesh_D_DSI)) deallocate(s% prev_mesh_D_DSI)
-         if (ASSOCIATED(s% prev_mesh_D_SH)) deallocate(s% prev_mesh_D_SH)
-         if (ASSOCIATED(s% prev_mesh_D_SSI)) deallocate(s% prev_mesh_D_SSI)
-         if (ASSOCIATED(s% prev_mesh_D_ES)) deallocate(s% prev_mesh_D_ES)
-         if (ASSOCIATED(s% prev_mesh_D_GSF)) deallocate(s% prev_mesh_D_GSF)
          if (ASSOCIATED(s% prev_mesh_D_mix)) deallocate(s% prev_mesh_D_mix)
          if (ASSOCIATED(s% prev_mesh_D_omega)) deallocate(s% prev_mesh_D_omega)
-         if (ASSOCIATED(s% prev_mesh_am_nu_rot)) deallocate(s% prev_mesh_am_nu_rot)
          if (ASSOCIATED(s% prev_mesh_conv_vel)) deallocate(s% prev_mesh_conv_vel)
          if (ASSOCIATED(s% prev_mesh_dq)) deallocate(s% prev_mesh_dq)
 
@@ -398,20 +390,6 @@
                ! these arrays must not be filled with NaNs  
                ! because they are needed for time-smoothing rotation
                
-               call do1D(s, s% nu_ST_old, nz, action, ierr)
-               if (failed('nu_ST_old')) exit
-               call do1D(s, s% D_ST_old, nz, action, ierr)
-               if (failed('D_ST_old')) exit
-               call do1D(s, s% D_DSI_old, nz, action, ierr)
-               if (failed('D_DSI_old')) exit
-               call do1D(s, s% D_SH_old, nz, action, ierr)
-               if (failed('D_SH_old')) exit
-               call do1D(s, s% D_SSI_old, nz, action, ierr)
-               if (failed('D_SSI_old')) exit
-               call do1D(s, s% D_ES_old, nz, action, ierr)
-               if (failed('D_ES_old')) exit
-               call do1D(s, s% D_GSF_old, nz, action, ierr)
-               if (failed('D_GSF_old')) exit
                call do1D(s, s% D_mix_old, nz, action, ierr)
                if (failed('D_mix_old')) exit
                call do1D(s, s% j_rot_old, nz, action, ierr)
@@ -420,8 +398,6 @@
                if (failed('omega_old')) exit
                call do1D(s, s% D_omega_old, nz, action, ierr)
                if (failed('D_omega_old')) exit
-               call do1D(s, s% am_nu_rot_old, nz, action, ierr)
-               if (failed('am_nu_rot_old')) exit
             
             end if
 
@@ -1691,26 +1667,10 @@
                if (failed('prev_mesh_j_rot')) exit
                call do1(s% prev_mesh_omega, c% prev_mesh_omega)
                if (failed('prev_mesh_omega')) exit
-               call do1(s% prev_mesh_nu_ST, c% prev_mesh_nu_ST)
-               if (failed('prev_mesh_nu_ST')) exit
-               call do1(s% prev_mesh_D_ST, c% prev_mesh_D_ST)
-               if (failed('prev_mesh_D_ST')) exit
-               call do1(s% prev_mesh_D_DSI, c% prev_mesh_D_DSI)
-               if (failed('prev_mesh_D_DSI')) exit
-               call do1(s% prev_mesh_D_SH, c% prev_mesh_D_SH)
-               if (failed('prev_mesh_D_SH')) exit
-               call do1(s% prev_mesh_D_SSI, c% prev_mesh_D_SSI)
-               if (failed('prev_mesh_D_SSI')) exit
-               call do1(s% prev_mesh_D_ES, c% prev_mesh_D_ES)
-               if (failed('prev_mesh_D_ES')) exit
-               call do1(s% prev_mesh_D_GSF, c% prev_mesh_D_GSF)
-               if (failed('prev_mesh_D_GSF')) exit
                call do1(s% prev_mesh_D_mix, c% prev_mesh_D_mix)
                if (failed('prev_mesh_D_mix')) exit
                call do1(s% prev_mesh_D_omega, c% prev_mesh_D_omega)
                if (failed('prev_mesh_D_omega')) exit
-               call do1(s% prev_mesh_am_nu_rot, c% prev_mesh_am_nu_rot)
-               if (failed('prev_mesh_am_nu_rot')) exit
                call do1(s% prev_mesh_conv_vel, c% prev_mesh_conv_vel)
                if (failed('prev_mesh_am_nu_rot')) exit
                call do1(s% prev_mesh_dq, c% prev_mesh_dq)
@@ -3522,24 +3482,10 @@
          call zero_array(s% D_ES)
          call zero_array(s% D_GSF)
 
-         call zero_array(s% nu_ST_old)
-         call zero_array(s% D_ST_old)
-         call zero_array(s% D_DSI_old)
-         call zero_array(s% D_SH_old)
-         call zero_array(s% D_SSI_old)
-         call zero_array(s% D_ES_old)
-         call zero_array(s% D_GSF_old)
          call zero_array(s% D_mix_old)
 
          call zero_array(s% prev_mesh_omega)
          call zero_array(s% prev_mesh_j_rot)
-         call zero_array(s% prev_mesh_nu_ST)
-         call zero_array(s% prev_mesh_D_ST)
-         call zero_array(s% prev_mesh_D_DSI)
-         call zero_array(s% prev_mesh_D_SH)
-         call zero_array(s% prev_mesh_D_SSI)
-         call zero_array(s% prev_mesh_D_ES)
-         call zero_array(s% prev_mesh_D_GSF)
 
 
          contains

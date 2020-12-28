@@ -132,18 +132,10 @@
             if (.not. s% conv_vel_flag) &
                write(iounit)  s% conv_vel_old(1:nz_old)
             write(iounit) &
-               s% nu_ST_old(1:nz_old), &
-               s% D_ST_old(1:nz_old), &
-               s% D_DSI_old(1:nz_old), &
-               s% D_SH_old(1:nz_old), &
-               s% D_SSI_old(1:nz_old), &
-               s% D_ES_old(1:nz_old), &
-               s% D_GSF_old(1:nz_old), &
                s% D_mix_old(1:nz_old), &
                s% omega_old(1:nz_old), &
                s% j_rot_old(1:nz_old), &
                s% D_omega_old(1:nz_old), &
-               s% am_nu_rot_old(1:nz_old), &
                s% dq_old(1:nz_old), &
                s% q_old(1:nz_old), &
                s% xh_old(:,1:nz_old), &

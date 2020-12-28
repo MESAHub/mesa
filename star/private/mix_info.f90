@@ -1851,7 +1851,7 @@
             integer :: i, k, nz
             real(dp) :: &
                dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
-               d_dt, d_dt_in, d_dt_out, f, am_nu_rot_source
+               d_dt, d_dt_in, d_dt_out, am_nu_rot_source
             include 'formats'
          
             ierr = 0
@@ -1860,16 +1860,11 @@
          
             if (s% am_nu_rot_flag .and. .not. s% doing_finish_load_model) then
                      
-               f = min(dt*s% nu_omega_growth_rate, s% nu_omega_max_replacement_fraction)
                do k=1,nz
                   if (s% q(k) <= s% max_q_for_nu_omega_zero_in_convection_region .and. &
                       s% mixing_type(k) == convective_mixing) then
                      s% am_nu_rot(k) = 0d0
                      cycle
-                  end if
-                  if (is_bad(s% am_nu_rot(k))) then
-                     write(*,2) 'old s% am_nu_rot(k)', k, s% am_nu_rot(k)
-                     stop 'set am_nu_rot'
                   end if
                   am_nu_rot_source = s% am_nu_factor * ( &
                      am_nu_visc_factor*s% D_visc(k) + &
@@ -1883,10 +1878,9 @@
                      write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
                      stop 'set am_nu_rot'
                   end if
-                  s% am_nu_rot(k) = (1d0 - f)*s% am_nu_rot(k) + f*am_nu_rot_source
+                  s% am_nu_rot(k) = am_nu_rot_source
                   if (is_bad(s% am_nu_rot(k))) then
                      write(*,2) 's% am_nu_rot(k)', k, s% am_nu_rot(k)
-                     write(*,2) 'f', k, f
                      write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
                      stop 'set am_nu_rot'
                   end if
