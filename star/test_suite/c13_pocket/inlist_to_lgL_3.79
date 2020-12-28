@@ -1,13 +1,13 @@
 &star_job
 
-! begin with saved model
+! begin with saved model from end of core He burning
       load_saved_model = .true.
-      saved_model_name = 'lgL_3.79.mod'
+      saved_model_name = '2M_3DUP.mod'
 
 ! save a model and profile at the end of the run
       save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'one thermal pulse cycle complete'
+      save_model_filename = 'lgL_3.79.mod'
+      required_termination_code_string = 'log_L_upper_limit'
 
       write_profile_when_terminate = .true.
       filename_for_profile_when_terminate = 'final_profile.data'
@@ -34,6 +34,7 @@
 / ! end of kap namelist
 
 &controls
+    log_L_upper_limit = 3.79d0
 
 ! see inlist_common and inlist_TP_AGB
 

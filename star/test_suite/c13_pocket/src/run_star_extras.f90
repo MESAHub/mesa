@@ -60,6 +60,7 @@
            read(iounit) mcore_1TP, age_1TP, TP_count, in_LHe_peak
            read(iounit) mcore_2TP_with_3DUP, age_2TP_with_3DUP, TP_with_3DUP
         case(3)
+        case(4)
            read(iounit) TP_count, in_LHe_peak, initial_surface_c12
         end select
 
@@ -82,6 +83,7 @@
            write(iounit) mcore_1TP, age_1TP, TP_count, in_LHe_peak
            write(iounit) mcore_2TP_with_3DUP, age_2TP_with_3DUP, TP_with_3DUP
         case(3)
+        case(4)
            write(iounit) TP_count, in_LHe_peak, initial_surface_c12
         end select
 
@@ -153,6 +155,7 @@
                TP_with_3DUP = 0
                in_LHe_peak = .false.
             case(3)
+            case(4)
                TP_count = 0
                in_LHe_peak = .false.
                initial_surface_c12 = s% surface_c12
@@ -420,6 +423,8 @@
 
          case(3)
 
+         case(4)
+
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
@@ -445,7 +450,7 @@
          end select
 
          ! Dynamic pgstar axis limits
-         if (s% x_integer_ctrl(1) == 3) then
+         if (s% x_integer_ctrl(1) == 4) then
             c13 = s% net_iso(ic13)
             k_max_c13 = maxloc(s% xa(c13,1:s% nz),dim=1)
             if (s% xa(c13,k_max_c13) .gt. 0.01) then
@@ -506,6 +511,8 @@
             testhub_extras_names(6) = 'mass_DUP'; testhub_extras_vals(6) = (mcore_at_TP - mcore_min_after_TP) / 1d-3
 
          case(3)
+
+         case(4)
 
             ! characterize c13 pocket location and mass
             c13 = s% net_iso(ic13)
