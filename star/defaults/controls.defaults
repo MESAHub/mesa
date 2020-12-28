@@ -3845,8 +3845,8 @@
     smooth_D_SSI = 0
     smooth_D_ES = 0
     smooth_D_GSF = 0
-    smooth_D_ST = 0
-    smooth_nu_ST = 0
+    smooth_D_ST = 3
+    smooth_nu_ST = 3
 
       ! time smoothing.
       ! Set to 0 to turn off time smoothing.
@@ -4081,7 +4081,7 @@
 
       ! ::
 
-    D_omega_max_replacement_fraction = 1d0 ! TESTING      0.5d0
+    D_omega_max_replacement_fraction = 0.5d0
     D_omega_growth_rate = 1d0
     D_omega_mixing_rate = 1d0
     D_omega_mixing_across_convection_boundary = .false.
