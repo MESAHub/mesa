@@ -51,7 +51,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% fill_arrays_with_NaNs) then
+         
+         if (first_try .and. s% fill_arrays_with_NaNs) then
+            call test_old
             !write(*,2) 'fill_star_info_arrays_with_NaNs', s% model_number
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -71,6 +73,52 @@
             if (s% doing_relax) &
                s% total_relax_step_retries = s% total_relax_step_retries + 1
          end if
+         
+         contains
+         
+         subroutine test_old  ! these are currently saved in photos
+            use utils_lib, only: set_to_NaN
+            integer :: j
+            include 'formats'
+            call set_to_NaN(s% cumulative_energy_error_old)
+            call set_to_NaN(s% time_old)
+            call set_to_NaN(s% mstar_old)
+            call set_to_NaN(s% xmstar_old)
+            call set_to_NaN(s% M_center_old)
+            call set_to_NaN(s% v_center_old)
+            call set_to_NaN(s% R_center_old)
+            call set_to_NaN(s% L_center_old)
+            call set_to_NaN(s% total_radiation_old)
+            call set_to_NaN(s% min_kap_floor_old)
+            call set_to_NaN(s% total_angular_momentum_old)
+            call set_to_NaN(s% dt_old)
+            call set_to_NaN(s% revised_max_yr_dt_old)
+            call set_to_NaN(s% astero_revised_max_yr_dt_old)
+            call set_to_NaN(s% total_internal_energy_old)
+            call set_to_NaN(s% total_gravitational_energy_old)
+            call set_to_NaN(s% total_radial_kinetic_energy_old)
+            call set_to_NaN(s% total_turbulent_energy_old)
+            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+            call set_to_NaN(s% total_energy_old)
+            call set_to_NaN(s% mstar_dot_old)
+            call set_to_NaN(s% v_surf_old)
+            call set_to_NaN(s% dt_limit_ratio_old)
+            call set_to_NaN(s% L_phot_old)
+            call set_to_NaN(s% L_surf_old)
+            call set_to_NaN(s% h1_czb_mass_old)
+            call set_to_NaN(s% h1_czb_mass_prev)
+            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% c_core_mass_old)
+            call set_to_NaN(s% Teff_old)
+            call set_to_NaN(s% center_eps_nuc_old)
+            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
+            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
+            do j=1,max_num_mixing_regions
+               call set_to_NaN(s% cz_top_mass_old(j))
+               call set_to_NaN(s% cz_bot_mass_old(j))
+            end do            
+         end subroutine test_old
+         
       end function do_evolve_step_part1
       
 
@@ -2179,8 +2227,10 @@
          real(dp), intent(in) :: age
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         write(*,1) 'set_age', age
          s% time = age*secyer
          s% star_age = age
          s% profile_age = age

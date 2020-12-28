@@ -51,24 +51,6 @@
          ierr = 0
          nz = s% nz
          
-         s% nz_old = s% nz
-
-         s% mstar_old = s% mstar
-
-         s% xmstar_old = s% xmstar
-
-         s% M_center_old = s% M_center
-
-         s% v_center_old = s% v_center
-
-         s% R_center_old = s% R_center
-
-         s% L_center_old = s% L_center
-
-         s% total_radiation_old = s% total_radiation
-
-         s% total_angular_momentum_old = s% total_angular_momentum
-         
          if (.not. s% rsp_flag) then
 
             call flip(s% dq, s% dq_old, ierr)
@@ -97,7 +79,16 @@
             s% xa => tmp
          
          end if
-
+         
+         s% nz_old = s% nz
+         s% mstar_old = s% mstar
+         s% xmstar_old = s% xmstar
+         s% M_center_old = s% M_center
+         s% v_center_old = s% v_center
+         s% R_center_old = s% R_center
+         s% L_center_old = s% L_center
+         s% total_radiation_old = s% total_radiation
+         s% total_angular_momentum_old = s% total_angular_momentum
          s% time_old = s% time
 
          do i=1,num_categories
@@ -113,64 +104,36 @@
          s% power_z_burn_old = s% power_z_burn
 
          s% L_phot_old = s% L_phot
-
          s% mstar_dot_old = s% mstar_dot
-
          s% L_surf_old = s% L_surf
-
          s% v_surf_old = s% v_surf
-
          s% h1_czb_mass_old = s% h1_czb_mass_prev
-
          s% he_core_mass_old = s% he_core_mass
-
          s% c_core_mass_old = s% c_core_mass
-
          s% Teff_old = s% Teff
-
          s% center_eps_nuc_old = s% center_eps_nuc
-
          s% Lrad_div_Ledd_avg_surf_old = s% Lrad_div_Ledd_avg_surf
-
          s% w_div_w_crit_avg_surf_old = s% w_div_w_crit_avg_surf
-
          s% n_conv_regions_old = s% n_conv_regions
          s% cz_bot_mass_old(:) = s% cz_bot_mass(:)
          s% cz_top_mass_old(:) = s% cz_top_mass(:)         
-
          s% model_number_old = s% model_number
-
          s% dt_limit_ratio_old = s% dt_limit_ratio
-
          s% revised_net_name_old = s% revised_net_name
-
          s% revised_max_yr_dt_old = s% revised_max_yr_dt
-
          s% astero_revised_max_yr_dt_old = s% astero_revised_max_yr_dt
-
          s% total_internal_energy_old = s% total_internal_energy
-
          s% total_gravitational_energy_old = s% total_gravitational_energy
-
          s% total_radial_kinetic_energy_old = s% total_radial_kinetic_energy
-
          s% total_turbulent_energy_old = s% total_turbulent_energy
-
          s% total_rotational_kinetic_energy_old = s% total_rotational_kinetic_energy
-
          s% total_energy_old = s% total_energy
-
          s% cumulative_energy_error_old = s% cumulative_energy_error
          s% cumulative_extra_heating_old = s% cumulative_extra_heating
-
          s% log_P_center_old = s% log_P_center
-
          s% min_kap_floor_old = s% min_kap_floor
-
          s% was_in_implicit_wind_limit_old = s% was_in_implicit_wind_limit
-
          s% model_number_for_last_retry_old = s% model_number_for_last_retry
-
          s% dt_old = s% dt
 
          do i = 1, s% len_extra_work

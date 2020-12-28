@@ -46,7 +46,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, i, j, k, version, part_number, &
-            len_history_col_spec, nz, nz_old!, pnz, pnz_old
+            len_history_col_spec, nz, nz_old
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -82,57 +82,22 @@
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% rsp_flag, s% prev_Lmax, s% species, s% num_reactions, &
             s% model_number, s% model_number_old, s% star_mass, &
-            s% mstar, s% mstar_old, &
-            s% xmstar, s% xmstar_old, &
-            s% M_center, s% M_center_old, &
-            s% v_center, s% v_center_old, &
-            s% R_center, s% R_center_old, &
-            s% L_center, s% L_center_old, &
-            s% total_radiation, s% total_radiation_old, &
-            s% min_kap_floor, s% min_kap_floor_old, &
-            s% time, s% time_old, &
-            s% total_angular_momentum, s% total_angular_momentum_old, &
-            s% prev_create_atm_R0_div_R, s% dt, s% dt_old, &
+            s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
+            s% total_radiation, s% min_kap_floor, s% time, s% total_angular_momentum, &
+            s% prev_create_atm_R0_div_R, s% dt, &
             s% have_previous_rotation_info, s% have_previous_conv_vel, &
             s% have_previous_RTI_info, s% have_previous_D_mix, &
             s% initial_mass, s% initial_z, s% initial_y, &
             s% was_in_implicit_wind_limit, &
-            s% was_in_implicit_wind_limit_old, &
             s% model_number_for_last_retry, &
-            s% model_number_for_last_retry_old, &
             s% using_revised_net_name, &
             s% revised_net_name, &
-            s% revised_net_name_old, &
             s% using_revised_max_yr_dt, &
             s% revised_max_yr_dt, &
-            s% revised_max_yr_dt_old, &
             s% astero_using_revised_max_yr_dt, &
             s% astero_revised_max_yr_dt, &
-            s% astero_revised_max_yr_dt_old, &
-
-            s% total_internal_energy, &
-            s% total_internal_energy_old, &
-            s% total_gravitational_energy, &
-            s% total_gravitational_energy_old, &
-            s% total_radial_kinetic_energy, &
-            s% total_radial_kinetic_energy_old, &
-            s% total_turbulent_energy, &
-            s% total_turbulent_energy_old, &
-            s% total_rotational_kinetic_energy, &
-            s% total_rotational_kinetic_energy_old, &
-            s% total_energy, &
-            s% total_energy_old, &
             s% cumulative_energy_error, &
-            s% cumulative_energy_error_old, &
-            s% have_initial_energy_integrals, &
-            s% total_internal_energy_initial, &
-            s% total_gravitational_energy_initial, &
-            s% total_radial_kinetic_energy_initial, &
-            s% total_rotational_kinetic_energy_initial, &
-            s% total_turbulent_energy_initial, &
-            s% total_energy_initial, &
             s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor
-
          if (failed('initial_y')) return
          
          if (s% force_tau_factor > 0 .and. s% tau_factor /= s% force_tau_factor .and. &
@@ -206,21 +171,11 @@
          if (failed('mstar_dot')) return
 
          read(iounit, iostat=ierr) &
-            s% mstar_dot, s% mstar_dot_old, &
-            s% v_surf, s% v_surf_old, &
-            s% gradT_excess_alpha, s% dt_limit_ratio, s% dt_limit_ratio_old, &
-            s% L_phot, s% L_phot_old, s% T_surf, s% P_surf, &
-            s% L_surf, s% L_surf_old, &
-            s% h1_czb_mass, s% h1_czb_mass_old, s% h1_czb_mass_prev, &
-            s% he_core_mass, s% he_core_mass_old, &
-            s% c_core_mass, s% c_core_mass_old, &
-            s% tau_base, s% Teff, s% Teff_old, &
-            s% center_eps_nuc, s% center_eps_nuc_old, &
-            s% Lrad_div_Ledd_avg_surf, s% Lrad_div_Ledd_avg_surf_old, &
-            s% w_div_w_crit_avg_surf, s% w_div_w_crit_avg_surf_old, &
-            s% n_conv_regions, s% n_conv_regions_old, &
-            s% cz_bot_mass(:), s% cz_bot_mass_old(:), &
-            s% cz_top_mass(:), s% cz_top_mass_old(:)
+            s% mstar_dot, s% v_surf, s% gradT_excess_alpha, s% dt_limit_ratio, &
+            s% L_phot, s% T_surf, s% P_surf, s% L_surf, s% h1_czb_mass, &
+            s% he_core_mass, s% c_core_mass, s% tau_base, s% Teff, &
+            s% center_eps_nuc, s% Lrad_div_Ledd_avg_surf, s% w_div_w_crit_avg_surf, &
+            s% n_conv_regions, s% cz_bot_mass(:), s% cz_top_mass(:)
          if (failed('cz_top_mass_old')) return
 
          read(iounit, iostat=ierr) &
