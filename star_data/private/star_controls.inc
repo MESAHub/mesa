@@ -874,9 +874,6 @@
             relax_solver_iters_timestep_limit, &
             relax_iter_for_resid_tol2, relax_iter_for_resid_tol3
          
-         integer :: steps_before_start_stress_test
-         logical :: stress_test_relax
-         
          logical :: use_gold_tolerances
          integer :: &
             gold_solver_iters_timestep_limit, &

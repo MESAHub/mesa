@@ -79,19 +79,20 @@
          use winds, only: set_mdot
          use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
          use do_one_utils, only: write_terminal_header
-         use hydro_vars, only: set_vars_if_needed, set_vars
+         use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
          use mix_info, only: set_cz_bdy_mass
+         use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
-            cell_specific_total_energy, reset_epsnuc_vectors
+            cell_specific_total_energy, reset_epsnuc_vectors, set_qs, &
+            set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
-         integer :: ierr, j, k
+         integer :: ierr, j, k, nz
          integer(8) :: time0, clock_rate
-         logical :: trace
          real(dp) :: total_radiation
 
          logical, parameter :: dbg = .false.
@@ -103,19 +104,18 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
+         s% termination_code = 0
+         s% retry_message = ''
+         s% doing_solver_iterations = .false.
+         s% num_rotation_solver_steps = 0
+         s% have_mixing_info = .false.
+         s% L_for_BB_outer_BC = -1 ! mark as not set
+         s% need_to_setvars = .true. ! always start fresh
+         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
+         
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
             stop 'do_step_part1'
-         end if
-         
-         if (s% steps_before_start_stress_test >= 0 .and. &
-             s% model_number >= s% steps_before_start_stress_test .and. &
-             (s% stress_test_relax .or. .not. s% doing_relax)) then
-            !s% use_gold2_tolerances = .true.
-            !s% gold2_iter_for_resid_tol3 = 999
-            !s% gold2_tol_residual_norm2 = 1d-8
-            !s% gold2_tol_max_residual2 = 1d-5 
-               ! 1d-6 breaks cburn_inward because of poor HELM partials at logT 8.8, logRho 5.8
          end if
 
          if (s% u_flag .and. s% v_flag) then
@@ -123,19 +123,31 @@
             return
          end if
 
-         call system_clock(s% system_clock_at_start_of_step, clock_rate)
-         
-         s% termination_code = 0
-         s% retry_message = ''
-         trace = s% trace_evolve
-         s% doing_solver_iterations = .false.
-         s% num_rotation_solver_steps = 0
-         s% have_mixing_info = .false.
-         s% L_for_BB_outer_BC = -1 ! mark as not set
-         
-         s% need_to_setvars = .true. ! always start fresh
-         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
 
+         
+         ! unpack some of the input info
+         ! only use xh, xa, dq, omega, and j_rot as inputs (along with lots of scalars).
+         nz = s% nz
+         call set_qs(s,  nz, s% q, s% dq, ierr)
+         if (failed('set_qs')) return
+         call set_m_and_dm(s)
+         call set_dm_bar(s, nz, s% dm, s% dm_bar)
+         if (s% rotation_flag) then
+            call set_cgrav(s, ierr)
+            if (failed('set_cgrav')) return
+            call use_xh_to_update_i_rot(s)
+            s% total_angular_momentum = total_angular_momentum(s)
+            ! set r and rmid from xh
+            do k=1,nz
+               s% lnR(k) = s% xh(s% i_lnR,k)
+               s% r(k) = exp(s% lnR(k))
+            end do
+            call set_rmid(s, 1, nz, ierr)
+            if (failed('set_rmid')) return
+            call set_rotation_info(s, .true., ierr)
+            if (failed('set_rotation_info')) return
+         end if
+         
          if (s% doing_first_model_of_run) then
             if (s% do_history_file) then
                if (first_try) then
@@ -154,6 +166,8 @@
             s% timestep_hold = -111
             if (first_try) s% model_number_old = s% model_number
          end if
+
+         call system_clock(s% system_clock_at_start_of_step, clock_rate)
 
          if (first_try) then ! i.e., not a redo or retry
             s% have_new_generation = .false.
@@ -198,12 +212,7 @@
                s% total_energy_old, total_radiation)
          else
             call set_mdot(s, s% L_phot*Lsun, s% mstar, s% Teff, ierr)
-            if (ierr /= 0) then
-               do_step_part1 = retry
-               s% result_reason = nonzero_ierr
-               if (s% report_ierr) write(*, *) 'do_step_part1 set_mdot'
-               return
-            end if
+            if (failed('set_mdot')) return
             ! set energy info for new mesh
             call eval_total_energy_integrals(s, &
                s% total_internal_energy_old, &

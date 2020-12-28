@@ -2452,7 +2452,7 @@
             kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
             j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
             cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
-         integer :: k
+         integer :: k, ierr
          logical, parameter :: dbg = .false.
          include 'formats'
 
@@ -2470,8 +2470,13 @@
             s% logRho_avg_surf = 0
             return
          end if
-
-         call set_rotation_info(s,.true.,k)
+         
+         ierr = 0
+         call set_rotation_info(s,.true.,ierr)
+         if (ierr /= 0) then
+            write(*,*) 'got ierr from call set_rotation_info in set_surf_avg_rotation_info'
+            write(*,*) 'just ignore it'
+         end if
 
          tau = s% tau_factor*s% tau_base
          dmsum = 0d0

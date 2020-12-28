@@ -378,8 +378,7 @@
     relax_iter_for_resid_tol2, relax_tol_residual_norm1, relax_tol_max_residual1, &
     relax_iter_for_resid_tol3, relax_tol_residual_norm2, relax_tol_max_residual2, &
     relax_tol_residual_norm3, relax_tol_max_residual3, relax_maxT_for_gold_tolerances, &
-    use_gold_tolerances, gold_solver_iters_timestep_limit, & 
-    steps_before_start_stress_test, stress_test_relax, maxT_for_gold_tolerances, &
+    use_gold_tolerances, gold_solver_iters_timestep_limit, maxT_for_gold_tolerances, &
     gold_tol_residual_norm1, gold_tol_max_residual1, gold_iter_for_resid_tol2, &
     gold_tol_residual_norm2, gold_tol_max_residual2, gold_iter_for_resid_tol3, &
     gold_tol_residual_norm3, gold_tol_max_residual3 , steps_before_use_gold_tolerances, &
@@ -1998,9 +1997,6 @@
  s% gold2_tol_residual_norm3 = gold2_tol_residual_norm3
  s% gold2_tol_max_residual3 = gold2_tol_max_residual3
  s% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances
- 
- s% steps_before_start_stress_test = steps_before_start_stress_test
- s% stress_test_relax = stress_test_relax
  
  s% include_rotation_in_total_energy = include_rotation_in_total_energy
 
@@ -3695,9 +3691,6 @@
  gold2_tol_residual_norm3 = s% gold2_tol_residual_norm3
  gold2_tol_max_residual3 = s% gold2_tol_max_residual3
  steps_before_use_gold2_tolerances = s% steps_before_use_gold2_tolerances
- 
- steps_before_start_stress_test = s% steps_before_start_stress_test
- stress_test_relax = s% stress_test_relax
  
  include_rotation_in_total_energy = s% include_rotation_in_total_energy
 

@@ -11692,17 +11692,6 @@
     set_rho_to_dm_div_dV = .true.
 
 
-      ! steps_before_start_stress_test
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! stress_test_relax
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    steps_before_start_stress_test = 0
-    stress_test_relax = .false.
-
-
       ! use_other_{hook}
       ! ~~~~~~~~~~~~~~~~
 
