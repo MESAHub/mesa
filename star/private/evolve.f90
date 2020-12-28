@@ -51,7 +51,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (first_try .and. s% fill_arrays_with_NaNs) then
+         if (s% fill_arrays_with_NaNs) then
             !write(*,2) 'fill_star_info_arrays_with_NaNs', s% model_number
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -128,7 +128,7 @@
          ! unpack some of the input info
          ! only use xh, xa, dq, omega, and j_rot as inputs (along with lots of scalars).
          nz = s% nz
-         call set_qs(s,  nz, s% q, s% dq, ierr)
+         call set_qs(s, nz, s% q, s% dq, ierr)
          if (failed('set_qs')) return
          call set_m_and_dm(s)
          call set_dm_bar(s, nz, s% dm, s% dm_bar)
@@ -1614,15 +1614,9 @@
             do k=1, s% nz
                s% prev_mesh_xa(:,k) = s% xa(:,k)
                s% prev_mesh_xh(:,k) = s% xh(:,k)
-
                s% prev_mesh_j_rot(k) = s% j_rot(k)
                s% prev_mesh_omega(k) = s% omega(k)
-               s% prev_mesh_D_mix(k) = s% D_mix(k)
-               s% prev_mesh_D_omega(k) = s% D_omega(k)
-               s% prev_mesh_conv_vel(k) = s% conv_vel(k)
-
                s% prev_mesh_dq(k) = s% dq(k)
-
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
@@ -1779,12 +1773,6 @@
                s% termination_code = t_failed_prepare_for_new_try
                return
             end if
-            if (size(s% q_old,dim=1) < nz) then
-               write(*,*) 'bad dimensions for q_old', size(s% q_old,dim=1), nz
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
             if (size(s% dq_old,dim=1) < nz) then
                write(*,*) 'bad dimensions for dq_old', size(s% dq_old,dim=1), nz
                prepare_for_new_try = terminate
@@ -1802,10 +1790,10 @@
                do j=1,s% species
                   s% xa(j,k) = s% xa_old(j,k) ! start from copy of old composition
                end do
-               s% q(k) = s% q_old(k) ! start with same q's
                s% dq(k) = s% dq_old(k) ! start with same dq's
             end do
-
+            
+            call set_qs(s, nz, s% q, s% dq, ierr)
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
 
@@ -1821,7 +1809,6 @@
                         stop 'prepare_for_new_try'
                      end if
                   end if
-                  s% D_omega(k) = s% D_omega_old(k)
                end do
                if (.not. okay) then
                   write(*,2) 'model_number', s% model_number
@@ -1991,19 +1978,11 @@
                do k=1, s% prev_mesh_nz
                   s% xh_old(:,k) = s% prev_mesh_xh(:,k)
                   s% xa_old(:,k) = s% prev_mesh_xa(:,k)
-                  s% j_rot_old(k) = s% prev_mesh_j_rot(k)
-                  s% omega_old(k) = s% prev_mesh_omega(k)
-                  s% D_mix_old(k) = s% prev_mesh_D_mix(k)
-                  s% D_omega_old(k) = s% prev_mesh_D_omega(k)
-                  s% conv_vel(k) = s% prev_mesh_conv_vel(k)
                   s% dq_old(k) = s% prev_mesh_dq(k)
+                  s% omega_old(k) = s% prev_mesh_omega(k)
+                  s% j_rot_old(k) = s% prev_mesh_j_rot(k)
                end do
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
-               if (ierr /= 0) then
-                  prepare_to_retry = terminate
-                  return
-               end if
-               call set_qs(s, s% prev_mesh_nz, s% q_old, s% dq_old, ierr)
                if (ierr /= 0) then
                   prepare_to_retry = terminate
                   return

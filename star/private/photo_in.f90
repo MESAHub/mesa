@@ -193,17 +193,10 @@
          if (failed('*_old')) return
 
          if (s% generations > 1 .and. .not. s% rsp_flag) then
-            if (.not. s% conv_vel_flag) then
-               read(iounit, iostat=ierr) s% conv_vel_old(1:nz_old)
-               if (failed('conv_vel_old')) return
-            end if
             read(iounit, iostat=ierr) &
-               s% D_mix_old(1:nz_old), &
                s% omega_old(1:nz_old), &
                s% j_rot_old(1:nz_old), &
-               s% D_omega_old(1:nz_old), &
                s% dq_old(1:nz_old), &
-               s% q_old(1:nz_old), &
                s% xh_old(:,1:nz_old), &
                s% xa_old(:,1:nz_old)
             if (failed('xh_old')) return

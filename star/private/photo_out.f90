@@ -127,17 +127,13 @@
             s% dlnd_dt(1:nz), s% dlnT_dt(1:nz), &
             s% eps_grav(1:nz), s% conv_vel(1:nz), s% lnT(1:nz), &
             s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities
+            
          call write_part_number(iounit)
          if (s% generations > 1 .and. .not. s% rsp_flag) then
-            if (.not. s% conv_vel_flag) &
-               write(iounit)  s% conv_vel_old(1:nz_old)
             write(iounit) &
-               s% D_mix_old(1:nz_old), &
                s% omega_old(1:nz_old), &
                s% j_rot_old(1:nz_old), &
-               s% D_omega_old(1:nz_old), &
                s% dq_old(1:nz_old), &
-               s% q_old(1:nz_old), &
                s% xh_old(:,1:nz_old), &
                s% xa_old(:,1:nz_old)
          end if

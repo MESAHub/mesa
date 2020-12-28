@@ -213,15 +213,6 @@
          nullify(s% dq)
          nullify(s% dq_old)
 
-         nullify(s% conv_vel)
-         nullify(s% conv_vel_old)
-
-         nullify(s% D_mix_non_rotation)
-         nullify(s% D_mix_old)
-
-         nullify(s% q)
-         nullify(s% q_old)
-
          nullify(s% xa)
          nullify(s% xa_old)
 
@@ -262,9 +253,6 @@
          nullify(s% prev_mesh_xa)
          nullify(s% prev_mesh_j_rot)
          nullify(s% prev_mesh_omega)
-         nullify(s% prev_mesh_D_mix)
-         nullify(s% prev_mesh_D_omega)
-         nullify(s% prev_mesh_conv_vel)
          nullify(s% prev_mesh_dq)
 
          nullify(s% other_star_info)
@@ -1444,18 +1432,20 @@
                end do
                s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
             end do
-            do k0=1, s% nz_old
-               call interp_value(q, num_pts, conv_vel_interp, s% q_old(k0), conv_vel_temp, ierr)
-               !avoid extending regions with non-zero conv vel
-               do k=2, num_pts-1
-                  if(s% q_old(k0) < q(k) .and. s% q_old(k0) > q(k+1) &
-                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
-                     conv_vel_temp = 0d0
-                     exit
-                  end if
-               end do
-               s% xh_old(s% i_ln_cvpv0, k0) = log(conv_vel_temp+s% conv_vel_v0)
-            end do
+            write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
+            stop 'do_relax_to_star_cut'
+!            do k0=1, s% nz_old
+!               call interp_value(q, num_pts, conv_vel_interp, s% q_old(k0), conv_vel_temp, ierr)
+!               !avoid extending regions with non-zero conv vel
+!               do k=2, num_pts-1
+!                  if(s% q_old(k0) < q(k) .and. s% q_old(k0) > q(k+1) &
+!                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
+!                     conv_vel_temp = 0d0
+!                     exit
+!                  end if
+!               end do
+!               s% xh_old(s% i_ln_cvpv0, k0) = log(conv_vel_temp+s% conv_vel_v0)
+!            end do
             deallocate(conv_vel_interp, interp_work)
          end if
 

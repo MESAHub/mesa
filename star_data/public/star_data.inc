@@ -195,13 +195,13 @@
       !  q(1) = 1.0,
       !  for nz > k > 1, q(k) = q(k-1) - dq(k-1),
       !  q(nz) = dq(nz)
-      real(dp), pointer, dimension(:) :: q, q_old
+      real(dp), pointer, dimension(:) :: q
       
       ! rotation
       real(dp), pointer, dimension(:) :: j_rot, j_rot_old
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega, omega_old
-      real(dp), pointer, dimension(:) :: D_omega, D_omega_old
+      real(dp), pointer, dimension(:) :: D_omega
         ! when using the implicit wind calculation, which keeps omega_div_omega_crit
         ! below a certain threshold, store the explicit value of mstar_dot
       real(dp) :: explicit_mstar_dot
@@ -582,8 +582,7 @@
       real(dp), pointer, dimension(:,:) :: prev_mesh_xh ! (nvar_hydro,prev_mesh_nz)
       real(dp), pointer, dimension(:,:) :: prev_mesh_xa ! (species,prev_mesh_nz)
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
-         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_D_mix, prev_mesh_D_omega, &
-         prev_mesh_conv_vel, prev_mesh_cv, prev_mesh_dq
+         prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
 
@@ -1637,9 +1636,6 @@
          integer :: n_conv_regions_old
          real(dp), dimension(max_num_mixing_regions) :: &
             cz_bot_mass_old, cz_top_mass_old
-      
-         real(dp), pointer, dimension(:) :: conv_vel_old
-         real(dp), pointer, dimension(:) :: D_mix_old
          
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 

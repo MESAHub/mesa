@@ -71,29 +71,15 @@
          
          if (.not. s% rsp_flag) then
 
-            call flip(s% q, s% q_old, ierr)
-            if (ierr /= 0) return
-
             call flip(s% dq, s% dq_old, ierr)
             if (ierr /= 0) return
-         
-            if (.not. s% conv_vel_flag) then
-               call flip(s% conv_vel, s% conv_vel_old, ierr)
-               if (ierr /= 0) return
-            end if
             
             ! keep old values for rotation variables in order to do time smoothing in D_omega
-
-            call flip(s% D_mix, s% D_mix_old, ierr)
-            if (ierr /= 0) return
 
             call flip(s% omega, s% omega_old, ierr)
             if (ierr /= 0) return
 
             call flip(s% j_rot, s% j_rot_old, ierr)
-            if (ierr /= 0) return
-
-            call flip(s% D_omega, s% D_omega_old, ierr)
             if (ierr /= 0) return
 
             tmp => s% xh_old

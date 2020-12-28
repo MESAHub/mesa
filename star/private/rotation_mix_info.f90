@@ -34,7 +34,7 @@
       implicit none
 
       private
-      public :: set_rotation_mixing_info
+      public :: set_rotation_mixing_info, smooth_for_rotation
 
       real(dp), parameter :: Ri_crit = 0.25d0 ! critical Richardson number
       real(dp), parameter :: R_crit = 2500d0 ! critical Reynolds number
@@ -129,7 +129,7 @@
                      if (failed('set_D_DSI', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s% D_DSI, s% smooth_D_DSI, p_tmp)
+                     call smooth_for_rotation(s, s% D_DSI, s% smooth_D_DSI, p_tmp)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_DSI)
                      call zero_if_tiny(s,s% D_DSI)
@@ -142,7 +142,7 @@
                      if (failed('set_D_SH', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s% D_SH, s% smooth_D_SH, p_tmp)
+                     call smooth_for_rotation(s, s% D_SH, s% smooth_D_SH, p_tmp)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SH)
                      call zero_if_tiny(s,s% D_SH)
@@ -155,7 +155,7 @@
                      if (failed('set_D_SSI', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s% D_SSI, s% smooth_D_SSI, p_tmp)
+                     call smooth_for_rotation(s, s% D_SSI, s% smooth_D_SSI, p_tmp)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SSI)
                      call zero_if_tiny(s,s% D_SSI)
@@ -168,7 +168,7 @@
                      if (failed('set_D_ES', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s% D_ES, s% smooth_D_ES, p_tmp)
+                     call smooth_for_rotation(s, s% D_ES, s% smooth_D_ES, p_tmp)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_ES)
                      call zero_if_tiny(s,s% D_ES)
@@ -181,7 +181,7 @@
                      if (failed('set_D_GSF', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s% D_GSF, s% smooth_D_GSF, p_tmp)
+                     call smooth_for_rotation(s, s% D_GSF, s% smooth_D_GSF, p_tmp)
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_GSF)
                      call zero_if_tiny(s,s% D_GSF)
@@ -198,8 +198,8 @@
                         ierr = -1; cycle
                      end if
 
-                     call smooth_for_rotation(s% D_ST, s% smooth_D_ST, p_tmp)
-                     call smooth_for_rotation(s% nu_ST, s% smooth_nu_ST, p_tmp)
+                     call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, p_tmp)
+                     call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, p_tmp)
 
                      ! calculate B_r and B_phi
                      do k = 1, nz
@@ -270,9 +270,13 @@
                end if
             end do
             
+            if (s% smooth_D_omega > 0) then
+               p_tmp(1:nz) => smooth_work(1:nz,1)
+               call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, p_tmp)
+            end if
+            
             if (s% D_omega_mixing_rate > 0d0 .and. s% dt > 0) &
                call mix_D_omega 
-               
             
          end if
          
@@ -1244,17 +1248,18 @@
          end function failed
 
 
-         subroutine smooth_for_rotation(v, width, work)
-            use star_utils, only: weighed_smoothing
-            real(dp), dimension(:), pointer :: v, work
-            integer :: width
-            logical, parameter :: preserve_sign = .false.
-            if (width <= 0) return
-            call weighed_smoothing(v, s% nz, width, preserve_sign, work)
-         end subroutine smooth_for_rotation
-
-
       end subroutine set_rotation_mixing_info
+
+
+      subroutine smooth_for_rotation(s, v, width, work)
+         use star_utils, only: weighed_smoothing
+         type (star_info), pointer :: s
+         real(dp), dimension(:), pointer :: v, work
+         integer :: width
+         logical, parameter :: preserve_sign = .false.
+         if (width <= 0) return
+         call weighed_smoothing(v, s% nz, width, preserve_sign, work)
+      end subroutine smooth_for_rotation
 
 
       subroutine set_ST(s, &

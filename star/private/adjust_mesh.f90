@@ -472,9 +472,6 @@
             s% prev_mesh_xh(:,k) = prv% prev_mesh_xh(:,k)
             s% prev_mesh_j_rot(k) = prv% prev_mesh_j_rot(k)
             s% prev_mesh_omega(k) = prv% prev_mesh_omega(k)
-            s% prev_mesh_D_mix(k) = prv% prev_mesh_D_mix(k)
-            s% prev_mesh_D_omega(k) = prv% prev_mesh_D_omega(k)
-            s% prev_mesh_conv_vel(k) = prv% prev_mesh_conv_vel(k)
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
          end do
 
