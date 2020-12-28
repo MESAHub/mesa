@@ -79,11 +79,8 @@
       D_GSF_factor = 1
       D_ST_factor = 1
 
-      !D_omega_max_replacement_fraction = 0.5d0 ! 1 ! 0.1d0 !  
-      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
-      max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
       overshoot_scheme(1) = 'exponential'
       overshoot_zone_type(1) = 'any'

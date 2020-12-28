@@ -93,7 +93,6 @@
          ! use other_alpha_mlt only if star_mass >= this limit.
 
 ! mixing
-      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
