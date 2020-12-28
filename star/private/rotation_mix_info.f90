@@ -276,9 +276,8 @@
                      s% D_ST_factor, s% D_ST(k)
                   stop 'rotation mix'
                end if
-               s% D_omega(k) = (1d0 - f)*s% D_omega_old(k) + f*D_omega_source
+               s% D_omega(k) = (1d0 - f)*s% D_omega(k) + f*D_omega_source
                if (is_bad(s% D_omega(k))) then
-                  write(*,2) 's% D_omega_old(k)', k, s% D_omega_old(k)
                   write(*,2) 'f', k, f
                   write(*,2) 's% D_omega(k)', k, s% D_omega(k)
                   write(*,2) 'D_omega_source', k, D_omega_source

@@ -85,6 +85,8 @@
          xa_scale = 1d-5
 
          mixing_length_alpha = 1.6
+         
+         varcontrol_target = 1d-3
 
          dX_nuc_drop_max_A_limit = 52
          dX_nuc_drop_min_X_limit = 1d-4
