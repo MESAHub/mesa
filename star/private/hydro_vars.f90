@@ -297,7 +297,7 @@
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             skip_mlt, skip_eos, dt, ierr)
-         use star_utils, only: eval_irradiation_heat, set_qs, set_dm_bar, set_m_and_dm
+         use star_utils, only: eval_irradiation_heat, set_dm_bar, set_m_and_dm
          type (star_info), pointer :: s
          logical, intent(in) :: &
             skip_time_derivatives, skip_basic_vars, skip_micro_vars, &
@@ -471,11 +471,6 @@
 
             if (i_u == 0) s% u(1:nz) = 0d0
 
-            call set_qs(s, nz, s% q, s% dq, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'update_vars failed in set_qs'
-               return
-            end if
             call set_m_and_dm(s)
             call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
 

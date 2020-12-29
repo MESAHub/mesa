@@ -34,6 +34,7 @@
          real(dp) :: log_center_temp_lower_limit
          real(dp) :: log_center_density_limit, log_center_density_lower_limit
          real(dp) :: log_max_temp_upper_limit, log_max_temp_lower_limit
+         real(dp) :: surface_accel_div_grav_limit
          real(dp) :: center_entropy_limit, center_entropy_lower_limit
          real(dp) :: max_entropy_limit, max_entropy_lower_limit
 
@@ -873,6 +874,9 @@
             relax_solver_iters_timestep_limit, &
             relax_iter_for_resid_tol2, relax_iter_for_resid_tol3
          
+         integer :: steps_before_start_stress_test
+         logical :: stress_test_relax
+         
          logical :: use_gold_tolerances
          integer :: &
             gold_solver_iters_timestep_limit, &
@@ -992,13 +996,16 @@
          real(dp) :: D_visc_factor, D_DSI_factor, D_SH_factor, D_SSI_factor, &
             D_ES_factor, D_GSF_factor, D_ST_factor
 
-         integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, smooth_D_ES, &
-            smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
+         integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
+            smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST
 
-         real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
+         real(dp) :: angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, &
+            angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, angsmt_nu_ST
+
+         real(dp) :: angsml, adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J
          logical :: simple_i_rot_flag, do_adjust_J_lost, &
-            premix_omega, recalc_mixing_info_each_substep
+            premix_omega, am_time_average, recalc_mixing_info_each_substep
          real(dp) :: angular_momentum_error_warn, angular_momentum_error_retry
          integer :: max_mdot_redo_cnt
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
@@ -1011,10 +1018,12 @@
          real(dp) :: D_mix_rotation_max_logT_full_on, &
             D_mix_rotation_min_logT_full_off
          
-         real(dp) :: D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
+         real(dp) :: D_omega_max_replacement_fraction, D_omega_growth_rate, &
+            D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
          logical :: D_omega_mixing_across_convection_boundary
          
-         real(dp) :: nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
+         real(dp) :: nu_omega_max_replacement_fraction, nu_omega_growth_rate, &
+            nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
 
          real(dp) :: jacobian_clip_limit

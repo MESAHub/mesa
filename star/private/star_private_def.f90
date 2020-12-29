@@ -186,6 +186,7 @@
          termination_code_str(t_xa_surface_upper_limit) = 'xa_surface_upper_limit'
          termination_code_str(t_xa_average_lower_limit) = 'xa_average_lower_limit'
          termination_code_str(t_xa_average_upper_limit) = 'xa_average_upper_limit'
+         termination_code_str(t_surface_accel_div_grav_limit) = 'surface_accel_div_grav_limit'
          termination_code_str(t_adjust_mesh_failed) = 'adjust_mesh_failed'
          termination_code_str(t_dt_is_zero) = 'dt_is_zero'
          termination_code_str(t_min_timestep_limit) = 'min_timestep_limit'

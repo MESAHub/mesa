@@ -1449,7 +1449,7 @@
          real(dp), parameter :: log_he_temp = 7.8d0
          real(dp), parameter :: d_tau_min = 1d-2, d_tau_max = 1d0
          real(dp), parameter :: little_step_factor = 10d0, little_step_size = 10d0
-         real(dp) :: v, surf_grav, power_he_burn, power_z_burn, &
+         real(dp) :: v, surf_dv_dt, surf_grav, power_he_burn, power_z_burn, &
             power_neutrinos
          integer :: model, profile_priority, ierr
          integer, parameter :: tau_ramp = 50
@@ -1485,6 +1485,17 @@
             v = s% v(1)
          else
             v = s% r(1) * s% dlnR_dt(1)
+            if (s% dt > 0 .and. .not. s% zero_gravity) then
+               surf_dv_dt = (v - s% v_surf_old)/s% dt
+               surf_grav = s% grav(1)
+               if (abs(surf_dv_dt)/surf_grav > s% surface_accel_div_grav_limit &
+                     .and. s% surface_accel_div_grav_limit > 0) then
+                  write(*, '(a, e25.15)') 'exceeded surface_accel_div_grav_limit ', &
+                     s% surface_accel_div_grav_limit
+                  do_one_check_model = terminate
+                  s% termination_code = t_surface_accel_div_grav_limit
+               end if
+            end if
          end if
          
          power_he_burn = s% power_he_burn

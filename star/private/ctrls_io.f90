@@ -79,7 +79,7 @@
     stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS, &
     peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit, delta_nu_lower_limit, &
     delta_nu_upper_limit, delta_Pg_lower_limit, delta_Pg_upper_limit, shock_mass_upper_limit, &
-    mach1_mass_upper_limit, stop_when_reach_this_cumulative_extra_heating, &
+    mach1_mass_upper_limit, stop_when_reach_this_cumulative_extra_heating, surface_accel_div_grav_limit, &
     xa_central_lower_limit_species, xa_central_lower_limit, xa_central_upper_limit_species, xa_central_upper_limit, &
     xa_surface_lower_limit_species, xa_surface_lower_limit, xa_surface_upper_limit_species, xa_surface_upper_limit, &
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
@@ -189,8 +189,10 @@
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
     ! mass gain or loss  
     mass_change, mass_change_full_on_dt, mass_change_full_off_dt, trace_dt_control_mass_change, &
-    min_wind, max_wind, use_accreted_material_j, accreted_material_j, D_omega_mixing_rate, &
-    D_omega_mixing_across_convection_boundary, max_q_for_D_omega_zero_in_convection_region, nu_omega_mixing_rate, &
+    min_wind, max_wind, use_accreted_material_j, accreted_material_j, &
+    D_omega_max_replacement_fraction, D_omega_growth_rate, D_omega_mixing_rate, &
+    D_omega_mixing_across_convection_boundary, max_q_for_D_omega_zero_in_convection_region,&
+    nu_omega_max_replacement_fraction, nu_omega_growth_rate, nu_omega_mixing_rate, &
     nu_omega_mixing_across_convection_boundary, max_q_for_nu_omega_zero_in_convection_region, &
     mdot_omega_power, max_rotational_mdot_boost, max_mdot_jump_for_rotation, &
     lim_trace_rotational_mdot_boost, rotational_mdot_boost_fac, rotational_mdot_kh_fac, surf_avg_tau, surf_avg_tau_min, &
@@ -285,11 +287,13 @@
     am_sig_term_limit, am_D_mix_factor, am_gradmu_factor, am_nu_factor, &
     D_visc_factor, D_DSI_factor, D_SH_factor, D_SSI_factor, D_ES_factor, D_GSF_factor, D_ST_factor, &
     am_nu_non_rotation_factor, skip_rotation_in_convection_zones, am_nu_DSI_factor, am_nu_SH_factor,&
-    am_nu_SSI_factor, am_nu_ES_factor, am_nu_GSF_factor, am_nu_ST_factor, am_nu_visc_factor, smooth_am_nu_rot, &
+    am_nu_SSI_factor, am_nu_ES_factor, am_nu_GSF_factor, am_nu_ST_factor, am_nu_visc_factor, &
     am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
-    smooth_nu_ST, smooth_D_ST, smooth_D_SH, smooth_D_DSI, smooth_D_ES, smooth_D_SSI, smooth_D_GSF, smooth_D_omega, &
+    smooth_nu_ST, smooth_D_ST, smooth_D_SH, smooth_D_DSI, smooth_D_ES, smooth_D_SSI, smooth_D_GSF, &
+    angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, &
+    angsmt_nu_ST, angsml, am_time_average, simple_i_rot_flag, &
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
-    simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
+    recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
     implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_w_div_w_crit_limit, surf_w_div_w_crit_tol, &
     fitted_fp_ft_i_rot, w_div_wcrit_max, w_div_wcrit_max2, &
@@ -378,7 +382,8 @@
     relax_iter_for_resid_tol2, relax_tol_residual_norm1, relax_tol_max_residual1, &
     relax_iter_for_resid_tol3, relax_tol_residual_norm2, relax_tol_max_residual2, &
     relax_tol_residual_norm3, relax_tol_max_residual3, relax_maxT_for_gold_tolerances, &
-    use_gold_tolerances, gold_solver_iters_timestep_limit, maxT_for_gold_tolerances, &
+    use_gold_tolerances, gold_solver_iters_timestep_limit, & 
+    steps_before_start_stress_test, stress_test_relax, maxT_for_gold_tolerances, &
     gold_tol_residual_norm1, gold_tol_max_residual1, gold_iter_for_resid_tol2, &
     gold_tol_residual_norm2, gold_tol_max_residual2, gold_iter_for_resid_tol3, &
     gold_tol_residual_norm3, gold_tol_max_residual3 , steps_before_use_gold_tolerances, &
@@ -873,6 +878,8 @@
  s% mach1_mass_upper_limit = mach1_mass_upper_limit
  s% stop_when_reach_this_cumulative_extra_heating = stop_when_reach_this_cumulative_extra_heating
 
+ s% surface_accel_div_grav_limit = surface_accel_div_grav_limit
+
  s% xa_central_lower_limit_species = xa_central_lower_limit_species
  s% xa_central_lower_limit = xa_central_lower_limit
 
@@ -1350,9 +1357,13 @@
  s% max_wind = max_wind
  s% use_accreted_material_j = use_accreted_material_j
  s% accreted_material_j = accreted_material_j
+ s% D_omega_max_replacement_fraction = D_omega_max_replacement_fraction
+ s% D_omega_growth_rate = D_omega_growth_rate
  s% D_omega_mixing_rate = D_omega_mixing_rate
  s% D_omega_mixing_across_convection_boundary = D_omega_mixing_across_convection_boundary
  s% max_q_for_D_omega_zero_in_convection_region = max_q_for_D_omega_zero_in_convection_region
+ s% nu_omega_max_replacement_fraction = nu_omega_max_replacement_fraction
+ s% nu_omega_growth_rate = nu_omega_growth_rate
  s% nu_omega_mixing_rate = nu_omega_mixing_rate
  s% nu_omega_mixing_across_convection_boundary = nu_omega_mixing_across_convection_boundary
  s% max_q_for_nu_omega_zero_in_convection_region = max_q_for_nu_omega_zero_in_convection_region
@@ -1697,9 +1708,16 @@
  s% smooth_D_SH = smooth_D_SH
  s% smooth_D_GSF = smooth_D_GSF
  s% smooth_D_ES = smooth_D_ES
- s% smooth_D_omega = smooth_D_omega
- s% smooth_am_nu_rot = smooth_am_nu_rot
 
+ s% angsmt_D_DSI = angsmt_D_DSI
+ s% angsmt_D_SH = angsmt_D_SH
+ s% angsmt_D_SSI = angsmt_D_SSI
+ s% angsmt_D_ES = angsmt_D_ES
+ s% angsmt_D_GSF = angsmt_D_GSF
+ s% angsmt_D_ST = angsmt_D_ST
+ s% angsmt_nu_ST = angsmt_nu_ST
+ s% angsml = angsml
+ s% am_time_average = am_time_average
  s% simple_i_rot_flag = simple_i_rot_flag
  s% do_adjust_J_lost = do_adjust_J_lost
  s% premix_omega = premix_omega
@@ -1997,6 +2015,9 @@
  s% gold2_tol_residual_norm3 = gold2_tol_residual_norm3
  s% gold2_tol_max_residual3 = gold2_tol_max_residual3
  s% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances
+ 
+ s% steps_before_start_stress_test = steps_before_start_stress_test
+ s% stress_test_relax = stress_test_relax
  
  s% include_rotation_in_total_energy = include_rotation_in_total_energy
 
@@ -2575,6 +2596,8 @@
  mach1_mass_upper_limit = s% mach1_mass_upper_limit
  stop_when_reach_this_cumulative_extra_heating = s% stop_when_reach_this_cumulative_extra_heating
 
+ surface_accel_div_grav_limit = s% surface_accel_div_grav_limit
+
  xa_central_lower_limit_species = s% xa_central_lower_limit_species
  xa_central_lower_limit = s% xa_central_lower_limit
 
@@ -3052,9 +3075,13 @@
  max_wind = s% max_wind
  use_accreted_material_j = s% use_accreted_material_j
  accreted_material_j = s% accreted_material_j
+ D_omega_max_replacement_fraction = s% D_omega_max_replacement_fraction
+ D_omega_growth_rate = s% D_omega_growth_rate
  D_omega_mixing_rate = s% D_omega_mixing_rate
  D_omega_mixing_across_convection_boundary = s% D_omega_mixing_across_convection_boundary
  max_q_for_D_omega_zero_in_convection_region = s% max_q_for_D_omega_zero_in_convection_region
+ nu_omega_max_replacement_fraction = s% nu_omega_max_replacement_fraction
+ nu_omega_growth_rate = s% nu_omega_growth_rate
  nu_omega_mixing_rate = s% nu_omega_mixing_rate
  nu_omega_mixing_across_convection_boundary = s% nu_omega_mixing_across_convection_boundary
  max_q_for_nu_omega_zero_in_convection_region = s% max_q_for_nu_omega_zero_in_convection_region
@@ -3393,9 +3420,16 @@
  smooth_D_SH = s% smooth_D_SH
  smooth_D_GSF = s% smooth_D_GSF
  smooth_D_ES = s% smooth_D_ES
- smooth_D_omega = s% smooth_D_omega
- smooth_am_nu_rot = s% smooth_am_nu_rot
 
+ angsmt_D_DSI = s% angsmt_D_DSI
+ angsmt_D_SH = s% angsmt_D_SH
+ angsmt_D_SSI = s% angsmt_D_SSI
+ angsmt_D_ES = s% angsmt_D_ES
+ angsmt_D_GSF = s% angsmt_D_GSF
+ angsmt_D_ST = s% angsmt_D_ST
+ angsmt_nu_ST = s% angsmt_nu_ST
+ angsml = s% angsml
+ am_time_average = s% am_time_average
  simple_i_rot_flag = s% simple_i_rot_flag
  do_adjust_J_lost = s% do_adjust_J_lost
  premix_omega = s% premix_omega
@@ -3691,6 +3725,9 @@
  gold2_tol_residual_norm3 = s% gold2_tol_residual_norm3
  gold2_tol_max_residual3 = s% gold2_tol_max_residual3
  steps_before_use_gold2_tolerances = s% steps_before_use_gold2_tolerances
+ 
+ steps_before_start_stress_test = s% steps_before_start_stress_test
+ stress_test_relax = s% stress_test_relax
  
  include_rotation_in_total_energy = s% include_rotation_in_total_energy
 

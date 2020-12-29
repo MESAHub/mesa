@@ -51,9 +51,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
          if (first_try .and. s% fill_arrays_with_NaNs) then
-            call test_old
             !write(*,2) 'fill_star_info_arrays_with_NaNs', s% model_number
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -73,55 +71,6 @@
             if (s% doing_relax) &
                s% total_relax_step_retries = s% total_relax_step_retries + 1
          end if
-         
-         contains
-         
-         subroutine test_old  ! these are currently saved in photos
-            use utils_lib, only: set_to_NaN
-            integer :: j
-            include 'formats'
-            call set_to_NaN(s% time_old)
-            call set_to_NaN(s% dt_old)
-            call set_to_NaN(s% mstar_old)
-            call set_to_NaN(s% xmstar_old)
-            call set_to_NaN(s% M_center_old)
-            call set_to_NaN(s% R_center_old)
-            call set_to_NaN(s% L_center_old)
-            call set_to_NaN(s% v_center_old)
-            call set_to_NaN(s% cumulative_energy_error_old)
-            call set_to_NaN(s% total_energy_old)
-            call set_to_NaN(s% Teff_old)
-            call set_to_NaN(s% mstar_dot_old)
-            call set_to_NaN(s% L_phot_old)
-            call set_to_NaN(s% L_surf_old)
-            call set_to_NaN(s% dt_limit_ratio_old)
-            
-            
-!            call set_to_NaN(s% total_radiation_old)
-!            call set_to_NaN(s% min_kap_floor_old)
-!            call set_to_NaN(s% total_angular_momentum_old)
-!            call set_to_NaN(s% revised_max_yr_dt_old)
-!            call set_to_NaN(s% astero_revised_max_yr_dt_old)
-!            call set_to_NaN(s% total_internal_energy_old)
-!            call set_to_NaN(s% total_gravitational_energy_old)
-!            call set_to_NaN(s% total_radial_kinetic_energy_old)
-!            call set_to_NaN(s% total_turbulent_energy_old)
-!            call set_to_NaN(s% total_rotational_kinetic_energy_old)
-!            call set_to_NaN(s% v_surf_old)
-!            call set_to_NaN(s% h1_czb_mass_old)
-!            call set_to_NaN(s% h1_czb_mass_prev)
-!            call set_to_NaN(s% he_core_mass_old)
-!            call set_to_NaN(s% c_core_mass_old)
-!            call set_to_NaN(s% center_eps_nuc_old)
-!            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
-!            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
-!            do j=1,max_num_mixing_regions
-!               call set_to_NaN(s% cz_top_mass_old(j))
-!               call set_to_NaN(s% cz_bot_mass_old(j))
-!            end do            
-            
-         end subroutine test_old
-         
       end function do_evolve_step_part1
       
 
@@ -130,20 +79,19 @@
          use winds, only: set_mdot
          use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
          use do_one_utils, only: write_terminal_header
-         use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
+         use hydro_vars, only: set_vars_if_needed, set_vars
          use mix_info, only: set_cz_bdy_mass
-         use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
-            cell_specific_total_energy, reset_epsnuc_vectors, set_qs, &
-            set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
+            cell_specific_total_energy, reset_epsnuc_vectors
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
-         integer :: ierr, j, k, nz
+         integer :: ierr, j, k
          integer(8) :: time0, clock_rate
+         logical :: trace
          real(dp) :: total_radiation
 
          logical, parameter :: dbg = .false.
@@ -155,18 +103,19 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         s% termination_code = 0
-         s% retry_message = ''
-         s% doing_solver_iterations = .false.
-         s% num_rotation_solver_steps = 0
-         s% have_mixing_info = .false.
-         s% L_for_BB_outer_BC = -1 ! mark as not set
-         s% need_to_setvars = .true. ! always start fresh
-         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
-         
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
             stop 'do_step_part1'
+         end if
+         
+         if (s% steps_before_start_stress_test >= 0 .and. &
+             s% model_number >= s% steps_before_start_stress_test .and. &
+             (s% stress_test_relax .or. .not. s% doing_relax)) then
+            !s% use_gold2_tolerances = .true.
+            !s% gold2_iter_for_resid_tol3 = 999
+            !s% gold2_tol_residual_norm2 = 1d-8
+            !s% gold2_tol_max_residual2 = 1d-5 
+               ! 1d-6 breaks cburn_inward because of poor HELM partials at logT 8.8, logRho 5.8
          end if
 
          if (s% u_flag .and. s% v_flag) then
@@ -174,31 +123,19 @@
             return
          end if
 
+         call system_clock(s% system_clock_at_start_of_step, clock_rate)
+         
+         s% termination_code = 0
+         s% retry_message = ''
+         trace = s% trace_evolve
+         s% doing_solver_iterations = .false.
+         s% num_rotation_solver_steps = 0
+         s% have_mixing_info = .false.
+         s% L_for_BB_outer_BC = -1 ! mark as not set
+         
+         s% need_to_setvars = .true. ! always start fresh
+         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
 
-         
-         ! unpack some of the input info
-         ! only use xh, xa, dq, omega, and j_rot as inputs (along with lots of scalars).
-         nz = s% nz
-         call set_qs(s, nz, s% q, s% dq, ierr)
-         if (failed('set_qs')) return
-         call set_m_and_dm(s)
-         call set_dm_bar(s, nz, s% dm, s% dm_bar)
-         if (s% rotation_flag) then
-            call set_cgrav(s, ierr)
-            if (failed('set_cgrav')) return
-            call use_xh_to_update_i_rot(s)
-            s% total_angular_momentum = total_angular_momentum(s)
-            ! set r and rmid from xh
-            do k=1,nz
-               s% lnR(k) = s% xh(s% i_lnR,k)
-               s% r(k) = exp(s% lnR(k))
-            end do
-            call set_rmid(s, 1, nz, ierr)
-            if (failed('set_rmid')) return
-            call set_rotation_info(s, .true., ierr)
-            if (failed('set_rotation_info')) return
-         end if
-         
          if (s% doing_first_model_of_run) then
             if (s% do_history_file) then
                if (first_try) then
@@ -217,8 +154,6 @@
             s% timestep_hold = -111
             if (first_try) s% model_number_old = s% model_number
          end if
-
-         call system_clock(s% system_clock_at_start_of_step, clock_rate)
 
          if (first_try) then ! i.e., not a redo or retry
             s% have_new_generation = .false.
@@ -263,7 +198,12 @@
                s% total_energy_old, total_radiation)
          else
             call set_mdot(s, s% L_phot*Lsun, s% mstar, s% Teff, ierr)
-            if (failed('set_mdot')) return
+            if (ierr /= 0) then
+               do_step_part1 = retry
+               s% result_reason = nonzero_ierr
+               if (s% report_ierr) write(*, *) 'do_step_part1 set_mdot'
+               return
+            end if
             ! set energy info for new mesh
             call eval_total_energy_integrals(s, &
                s% total_internal_energy_old, &
@@ -1585,6 +1525,13 @@
          s% surf_rho = s% rho(1)
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
+
+         if (s% generations == 1 .or. s% zero_gravity .or. s%dt == 0d0) then
+            s% surf_accel_grav_ratio = 0
+         else
+            s% surf_accel_grav_ratio = &
+               (s% v_surf - s% v_surf_old)/(s% dt*s% grav(1))
+         end if
          
          if (.not. (s% RSP_flag .or. s% Eturb_flag)) then
             call set_gradT_excess_alpha(s, ierr)
@@ -1658,9 +1605,23 @@
             do k=1, s% nz
                s% prev_mesh_xa(:,k) = s% xa(:,k)
                s% prev_mesh_xh(:,k) = s% xh(:,k)
+
                s% prev_mesh_j_rot(k) = s% j_rot(k)
                s% prev_mesh_omega(k) = s% omega(k)
+               s% prev_mesh_nu_ST(k) = s% nu_ST(k)
+               s% prev_mesh_D_ST(k) = s% D_ST(k)
+               s% prev_mesh_D_DSI(k) = s% D_DSI(k)
+               s% prev_mesh_D_SH(k) = s% D_SH(k)
+               s% prev_mesh_D_SSI(k) = s% D_SSI(k)
+               s% prev_mesh_D_ES(k) = s% D_ES(k)
+               s% prev_mesh_D_GSF(k) = s% D_GSF(k)
+               s% prev_mesh_D_mix(k) = s% D_mix(k)
+               s% prev_mesh_D_omega(k) = s% D_omega(k)
+               s% prev_mesh_am_nu_rot(k) = s% am_nu_rot(k)
+               s% prev_mesh_conv_vel(k) = s% conv_vel(k)
+
                s% prev_mesh_dq(k) = s% dq(k)
+
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
@@ -1817,6 +1778,12 @@
                s% termination_code = t_failed_prepare_for_new_try
                return
             end if
+            if (size(s% q_old,dim=1) < nz) then
+               write(*,*) 'bad dimensions for q_old', size(s% q_old,dim=1), nz
+               prepare_for_new_try = terminate
+               s% termination_code = t_failed_prepare_for_new_try
+               return
+            end if
             if (size(s% dq_old,dim=1) < nz) then
                write(*,*) 'bad dimensions for dq_old', size(s% dq_old,dim=1), nz
                prepare_for_new_try = terminate
@@ -1834,16 +1801,10 @@
                do j=1,s% species
                   s% xa(j,k) = s% xa_old(j,k) ! start from copy of old composition
                end do
+               s% q(k) = s% q_old(k) ! start with same q's
                s% dq(k) = s% dq_old(k) ! start with same dq's
             end do
-            
-            call set_qs(s, nz, s% q, s% dq, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'prepare_for_new_try failed in set_qs'
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
+
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
 
@@ -1859,6 +1820,8 @@
                         stop 'prepare_for_new_try'
                      end if
                   end if
+                  s% D_omega(k) = s% D_omega_old(k)
+                  s% am_nu_rot(k) = s% am_nu_rot_old(k)
                end do
                if (.not. okay) then
                   write(*,2) 'model_number', s% model_number
@@ -2028,11 +1991,27 @@
                do k=1, s% prev_mesh_nz
                   s% xh_old(:,k) = s% prev_mesh_xh(:,k)
                   s% xa_old(:,k) = s% prev_mesh_xa(:,k)
-                  s% dq_old(k) = s% prev_mesh_dq(k)
-                  s% omega_old(k) = s% prev_mesh_omega(k)
                   s% j_rot_old(k) = s% prev_mesh_j_rot(k)
+                  s% omega_old(k) = s% prev_mesh_omega(k)
+                  s% nu_ST_old(k) = s% prev_mesh_nu_ST(k)
+                  s% D_ST_old(k) = s% prev_mesh_D_ST(k)
+                  s% D_DSI_old(k) = s% prev_mesh_D_DSI(k)
+                  s% D_SH_old(k) = s% prev_mesh_D_SH(k)
+                  s% D_SSI_old(k) = s% prev_mesh_D_SSI(k)
+                  s% D_ES_old(k) = s% prev_mesh_D_ES(k)
+                  s% D_GSF_old(k) = s% prev_mesh_D_GSF(k)
+                  s% D_mix_old(k) = s% prev_mesh_D_mix(k)
+                  s% D_omega_old(k) = s% prev_mesh_D_omega(k)
+                  s% am_nu_rot_old(k) = s% prev_mesh_am_nu_rot(k)
+                  s% conv_vel(k) = s% prev_mesh_conv_vel(k)
+                  s% dq_old(k) = s% prev_mesh_dq(k)
                end do
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
+               if (ierr /= 0) then
+                  prepare_to_retry = terminate
+                  return
+               end if
+               call set_qs(s, s% prev_mesh_nz, s% q_old, s% dq_old, ierr)
                if (ierr /= 0) then
                   prepare_to_retry = terminate
                   return
@@ -2229,10 +2208,8 @@
          real(dp), intent(in) :: age
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         write(*,1) 'set_age', age
          s% time = age*secyer
          s% star_age = age
          s% profile_age = age

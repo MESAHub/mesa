@@ -222,7 +222,8 @@
       integer, parameter :: t_xa_surface_upper_limit = t_xa_surface_lower_limit + 1 
       integer, parameter :: t_xa_average_lower_limit = t_xa_surface_upper_limit + 1 
       integer, parameter :: t_xa_average_upper_limit = t_xa_average_lower_limit + 1 
-      integer, parameter :: t_adjust_mesh_failed = t_xa_average_upper_limit + 1
+      integer, parameter :: t_surface_accel_div_grav_limit = t_xa_average_upper_limit + 1 
+      integer, parameter :: t_adjust_mesh_failed = t_surface_accel_div_grav_limit + 1
       integer, parameter :: t_dt_is_zero = t_adjust_mesh_failed + 1 
       integer, parameter :: t_min_timestep_limit = t_dt_is_zero + 1 
       integer, parameter :: t_failed_prepare_for_new_try = t_min_timestep_limit + 1 

@@ -2452,7 +2452,7 @@
             kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
             j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
             cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
-         integer :: k, ierr
+         integer :: k
          logical, parameter :: dbg = .false.
          include 'formats'
 
@@ -2470,13 +2470,8 @@
             s% logRho_avg_surf = 0
             return
          end if
-         
-         ierr = 0
-         call set_rotation_info(s,.true.,ierr)
-         if (ierr /= 0) then
-            write(*,*) 'got ierr from call set_rotation_info in set_surf_avg_rotation_info'
-            write(*,*) 'just ignore it'
-         end if
+
+         call set_rotation_info(s,.true.,k)
 
          tau = s% tau_factor*s% tau_base
          dmsum = 0d0
@@ -2516,6 +2511,10 @@
          end do
 
          s% Lrad_div_Ledd_avg_surf = Lrad_div_Ledd_sum/dmsum
+         if (s% generations > 2) & ! time average
+            s% Lrad_div_Ledd_avg_surf = &
+               0.5d0*(s% Lrad_div_Ledd_avg_surf + s% Lrad_div_Ledd_avg_surf_old)
+
          gamma_factor = 1d0 - min(s% Lrad_div_Ledd_avg_surf, 0.9999d0)
 
          tau = s% tau_factor*s% tau_base
@@ -2583,6 +2582,8 @@
             logRho_sum = logRho_sum + dm*s% lnd(k)/ln10
             kap_sum = kap_sum + dm*kap
             tau = tau + dtau
+            
+            
             if (tau >= s% surf_avg_tau) exit
 
          end do
@@ -3787,10 +3788,6 @@
          real(dp) :: sum_x, sum_dq
          integer :: k
          include 'formats'
-         if (j == 0) then
-            surface_avg_x = 0d0
-            return
-         end if
          sum_x = 0
          sum_dq = 0
          do k = 1, s% nz
@@ -3807,10 +3804,6 @@
          integer, intent(in) :: j
          real(dp) :: sum_x, sum_dq, dx, dq
          integer :: k
-         if (j == 0) then
-            center_avg_x = 0d0
-            return
-         end if
          sum_x = 0
          sum_dq = 0
          do k = s% nz, 1, -1

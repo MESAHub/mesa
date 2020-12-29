@@ -1072,6 +1072,20 @@
     log_center_temp_lower_limit = -1d99
 
 
+      ! surface_accel_div_grav_limit = -1
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! This is used when do not have a velocity variable.
+      ! The acceleration ratio is ``abs(accel)/grav`` at surface,
+      ! where accel is ``(rdot-rdot_old)/dt`` and grav is ``G*m/r^2``.
+      ! Stop if the ratio becomes larger than this limit.
+      ! Ignored if <= 0.
+
+      ! ::
+
+    surface_accel_div_grav_limit = -1
+
+
       ! log_max_temp_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3833,8 +3847,32 @@
     smooth_D_GSF = 0
     smooth_D_ST = 3
     smooth_nu_ST = 3
-    smooth_D_omega = 3
-    smooth_am_nu_rot = 3
+
+      ! time smoothing.
+      ! Set to 0 to turn off time smoothing.
+
+      ! ::
+
+    angsmt_D_DSI = 0.0d0
+    angsmt_D_SH = 0.0d0
+    angsmt_D_SSI = 0.0d0
+    angsmt_D_ES = 0.0d0
+    angsmt_D_GSF = 0.0d0
+    angsmt_D_ST = 0.2d0
+    angsmt_nu_ST = 0.2d0
+    angsml = 1d-3
+
+
+      ! am_time_average
+      ! ~~~~~~~~~~~~~~~
+
+      ! If true, then ``D = (D_new + D_old)/2``,
+      ! where ``D_old`` is D from previous step
+      ! and ``D_new`` is D as calculated for current as if no time smoothing.
+
+      ! ::
+
+    am_time_average = .false.
 
 
       ! simple_i_rot_flag
@@ -4032,29 +4070,37 @@
     D_mix_rotation_min_logT_full_off = 9.5d0
 
 
+      ! D_omega_max_replacement_fraction
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! D_omega_growth_rate
+      ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_across_convection_boundary (previously called D_omega_mixing_in_convection_regions)
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! max_q_for_D_omega_zero_in_convection_region
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
+    D_omega_max_replacement_fraction = 0.5d0
+    D_omega_growth_rate = 1d0
     D_omega_mixing_rate = 1d0
     D_omega_mixing_across_convection_boundary = .false.
     max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 
+      ! nu_omega_max_replacement_fraction
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! nu_omega_growth_rate
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~~
       ! nu_omega_mixing_across_convection_boundary
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! max_q_for_nu_omega_zero_in_convection_region
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
+    nu_omega_max_replacement_fraction = 0.5d0
+    nu_omega_growth_rate = 1d0
     nu_omega_mixing_rate = 1d0
     nu_omega_mixing_across_convection_boundary = .false.
     max_q_for_nu_omega_zero_in_convection_region = 0.8d0
@@ -11460,7 +11506,6 @@
       ! ::
 
     stop_for_bad_nums = .false.
-    !stop_for_bad_nums = .true.         ! TESTING
 
 
       ! show_mesh_changes
@@ -11561,7 +11606,6 @@
       ! ::
 
     fill_arrays_with_NaNs = .false.
-    !fill_arrays_with_NaNs = .true.        ! TESTING
 
 
       ! zero_when_allocate
@@ -11680,6 +11724,17 @@
       ! ::
 
     set_rho_to_dm_div_dV = .true.
+
+
+      ! steps_before_start_stress_test
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! stress_test_relax
+      ! ~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    steps_before_start_stress_test = 0
+    stress_test_relax = .false.
 
 
       ! use_other_{hook}

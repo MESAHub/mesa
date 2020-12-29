@@ -306,7 +306,8 @@
       integer, parameter :: h_v_surf_div_v_kh = h_v_surf + 1
       integer, parameter :: h_v_div_csound_max = h_v_surf_div_v_kh + 1
       integer, parameter :: h_v_div_csound_surf = h_v_div_csound_max + 1
-      integer, parameter :: h_log_dt = h_v_div_csound_surf + 1
+      integer, parameter :: h_surface_accel_div_grav = h_v_div_csound_surf + 1
+      integer, parameter :: h_log_dt = h_surface_accel_div_grav + 1
       integer, parameter :: h_log_LH = h_log_dt + 1
       integer, parameter :: h_log_LHe = h_log_LH + 1
       integer, parameter :: h_power_photo = h_log_LHe + 1
@@ -934,6 +935,7 @@
          history_column_name(h_v_surf_div_v_kh) = 'v_surf_div_v_kh'
          history_column_name(h_v_div_csound_max) = 'v_div_csound_max'
          history_column_name(h_v_div_csound_surf) = 'v_div_csound_surf'
+         history_column_name(h_surface_accel_div_grav) = 'surface_accel_div_grav'
          history_column_name(h_log_dt) = 'log_dt'
          history_column_name(h_log_dt_sec) = 'log_dt_sec'
          history_column_name(h_time_step_days) = 'time_step_days'
