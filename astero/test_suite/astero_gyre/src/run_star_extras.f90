@@ -44,7 +44,7 @@
       
       subroutine extras_controls(id, ierr)
          use astero_def, only: star_astero_procs
-         use astero_lib, only: astero_gyre_is_enabled
+
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -60,9 +60,6 @@
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
          include 'set_star_astero_procs.inc'
-         if (astero_gyre_is_enabled) return
-         ierr = -1
-         write(*,*) 'not using gyre: pretend got ok match for expected frequency.'
       end subroutine extras_controls
 
       
@@ -118,6 +115,7 @@
       
       
       subroutine extras_after_evolve(id, ierr)
+         use astero_lib, only: astero_gyre_is_enabled
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          
@@ -130,16 +128,18 @@
          if (ierr /= 0) return
          
          if (s% x_ctrl(1) > 0d0) then
+            if (astero_gyre_is_enabled) then
+               call get_gyre_frequency_info(s, .true., okay, ierr)
          
-            call get_gyre_frequency_info(s, .true., okay, ierr)
-         
-            if (ierr /= 0) stop 1
-            if (okay) then
-               write(*,'(a,2f20.2)') 'got ok match for expected frequency', actual_freq, expected_freq
+               if (ierr /= 0) stop 1
+               if (okay) then
+                  write(*,'(a,2f20.2)') 'got ok match for expected frequency', actual_freq, expected_freq
+               else
+                  write(*,'(a,2f20.2)') 'ERROR: bad match for expected frequency', actual_freq, expected_freq
+               end if
             else
-               write(*,'(a,2f20.2)') 'ERROR: bad match for expected frequency', actual_freq, expected_freq
+               write(*,*) 'not using gyre: pretend got ok match for expected frequency.'
             end if
-            
          end if
 
          call test_suite_after_evolve(s, ierr)

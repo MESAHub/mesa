@@ -1,7 +1,6 @@
 
       character(len=40) :: version_number ! mesa version from file mesa/data/version_number
       
-      
       integer, parameter :: star_def_version = 16
       
       integer, parameter :: nz_alloc_extra = 200

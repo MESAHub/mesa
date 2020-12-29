@@ -9,7 +9,7 @@ fi
 
 # Create file for TestHub
 # This file will be populated during math/test
-touch testhub.yml
+echo "# If this file contains only this line, install failed before math/test" > testhub.yml
 
 export BUILD_LOG="build.log"
 
@@ -115,24 +115,38 @@ then
 		#exit 1
 	fi
 
+        # empirically on lustre filesystems the LFS files don't immediately appear
+        # if requested, sleep for a bit before proceeding and doing the check
+        if [ -n "${MESA_GIT_LFS_SLEEP}" ]; then
+            sleep ${MESA_GIT_LFS_SLEEP}
+        fi
 
-	FILE_LIST=$(git lfs ls-files | grep -v '*')
+        # check that each LFS file has a full copy on disk
+        FILE_LIST=$(git lfs ls-files -n)
+        for LFS_FILE in ${FILE_LIST}; do
+            # the checks have this form to handle uncommitted changes to LFS files
+            # if no file exists, that means the file was probably deleted and that's OK
+            # if the file exists, but is short, then it is probably the bare LFS pointer
+            #   and that indicates a problem retrieving the file
+            if [ -f "${LFS_FILE}" ] && [ $(du -k "${LFS_FILE}" | cut -f1) -le 4 ];
+            then
+                echo
+                echo "${LFS_FILE} is smaller than expected for a file tracked by git LFS"
+                echo
+                echo "****************************************************************"
+                echo "*        Some data files were not successfully retrieved       *"
+                echo "*                                                              *"
+                echo "*                         Try running:                         *"
+                echo "*                   git lfs install --force                    *"
+                echo "*                           and then                           *"
+                echo "*                         git lfs pull                         *"
+                echo "*                                                              *"
+                echo "****************************************************************"
+                echo
+                exit 1
+            fi
+        done
 
-	if [[ -n $FILE_LIST ]]
-	then
-		echo
-		echo "****************************************************************"
-		echo "*        Some data files were not succesfully retrieved        *"
-		echo "*                                                              *"
-		echo "*                         Try running:                         *"
-		echo "*                   git lfs install --force                    *"
-		echo "*                           and then                           *"
-		echo "*                         git lfs pull                         *"
-		echo "*                                                              *"
-		echo "****************************************************************"
-		echo
-		exit 1
-	fi
 fi
 
 
