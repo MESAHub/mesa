@@ -84,13 +84,12 @@
       gradT_excess_dbeta = 0.1
 
 ! mixing
-      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
       max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 ! timesteps
-      varcontrol_target   = 1.0d-3
+      varcontrol_target   = 1d-3
       
       never_skip_hard_limits = .true
       limit_for_rel_error_in_energy_conservation = 1d-7

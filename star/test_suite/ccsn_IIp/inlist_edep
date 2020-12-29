@@ -51,7 +51,7 @@
   inject_until_reach_model_with_total_energy = 8d+50
   ! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
   max_age_in_seconds = 0.2d0
-  total_mass_for_inject_extra_ergs_sec = 0.3d0 ! 0.2d0
+  total_mass_for_inject_extra_ergs_sec = 0.2d0
   max_timestep = 1d-4
   
   start_time_for_inject_extra_ergs_sec = 0d0

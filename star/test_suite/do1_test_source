@@ -10,10 +10,10 @@ do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-#do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
+#  ask Josiah   do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
-#do_one black_hole "stop because fe_core_infall > fe_core_infall_limit" "start_core_collapse.mod" skip
+#  obsolete   do_one black_hole "stop because fe_core_infall > fe_core_infall_limit" "start_core_collapse.mod" skip
 do_one c13_pocket "all values are within tolerance" "final.mod" auto
 do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto                    
 do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto              
@@ -55,7 +55,7 @@ do_one make_he_wd "stop because star_age >= max_age" "final.mod" auto
 do_one make_metals "stop because have dropped below central lower limit for he4" "final.mod" auto        
 do_one make_env "stop because star_age >= max_age" "env.mod" skip 
 do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
-#do_one make_pre_ccsn_IIp "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+#  obsolete   do_one make_pre_ccsn_IIp "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one make_planets "stop because star_age >= max_age"  "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod" auto
 do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" auto
 do_one make_zams "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip

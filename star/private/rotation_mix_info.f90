@@ -235,7 +235,11 @@
 !$OMP END PARALLEL DO
          if (failed('set_rotation_mixing_info instabilities', ierr)) return
          
-         if (s% D_omega_flag .and. .not. s% doing_finish_load_model) then
+         if (s% D_omega_flag .and. s% doing_finish_load_model) then
+            do k=1,nz
+               s% D_omega(k) = 0d0
+            end do
+         else if (s% D_omega_flag) then
                      
             do k=1,nz
                if (s% q(k) <= s% max_q_for_D_omega_zero_in_convection_region .and. &

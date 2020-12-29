@@ -1925,7 +1925,11 @@
             nz = s% nz
             dt = s% dt
          
-            if (s% am_nu_rot_flag .and. .not. s% doing_finish_load_model) then
+            if (s% am_nu_rot_flag .and. s% doing_finish_load_model) then
+               do k=1,nz
+                  s% am_nu_rot(k) = 0d0
+               end do
+            else if (s% am_nu_rot_flag) then
                      
                do k=1,nz
                   if (s% q(k) <= s% max_q_for_nu_omega_zero_in_convection_region .and. &
