@@ -296,17 +296,6 @@
          if (ASSOCIATED(s% prev_mesh_xh)) deallocate(s% prev_mesh_xh)
          if (ASSOCIATED(s% prev_mesh_j_rot)) deallocate(s% prev_mesh_j_rot)
          if (ASSOCIATED(s% prev_mesh_omega)) deallocate(s% prev_mesh_omega)
-         if (ASSOCIATED(s% prev_mesh_nu_ST)) deallocate(s% prev_mesh_nu_ST)
-         if (ASSOCIATED(s% prev_mesh_D_ST)) deallocate(s% prev_mesh_D_ST)
-         if (ASSOCIATED(s% prev_mesh_D_DSI)) deallocate(s% prev_mesh_D_DSI)
-         if (ASSOCIATED(s% prev_mesh_D_SH)) deallocate(s% prev_mesh_D_SH)
-         if (ASSOCIATED(s% prev_mesh_D_SSI)) deallocate(s% prev_mesh_D_SSI)
-         if (ASSOCIATED(s% prev_mesh_D_ES)) deallocate(s% prev_mesh_D_ES)
-         if (ASSOCIATED(s% prev_mesh_D_GSF)) deallocate(s% prev_mesh_D_GSF)
-         if (ASSOCIATED(s% prev_mesh_D_mix)) deallocate(s% prev_mesh_D_mix)
-         if (ASSOCIATED(s% prev_mesh_D_omega)) deallocate(s% prev_mesh_D_omega)
-         if (ASSOCIATED(s% prev_mesh_am_nu_rot)) deallocate(s% prev_mesh_am_nu_rot)
-         if (ASSOCIATED(s% prev_mesh_conv_vel)) deallocate(s% prev_mesh_conv_vel)
          if (ASSOCIATED(s% prev_mesh_dq)) deallocate(s% prev_mesh_dq)
 
          if (ASSOCIATED(s% mix_bdy_q)) deallocate(s% mix_bdy_q)
@@ -364,71 +353,21 @@
          
          include 'formats'
 
-         ierr = 0
-
          nz = s% nz_old
          nvar_hydro = s% nvar_hydro
          species = s% species
-
-         do ! just so can exit in case of failure
-
-            call do1D(s, s% dq_old, nz, action, ierr)
-            if (failed('dq_old')) exit
-            call do1D(s, s% q_old, nz, action, ierr)
-            if (failed('q_old')) exit
-
-            call do2D(s, s% xa_old, species, nz, action, ierr)
-            if (failed('xa_old')) then
-               write(*,*) 'size(xa_old,dim=1)', size(s% xa_old,dim=1)
-               write(*,*) 'species', species
-               write(*,*) 'size(xa_old,dim=2)', size(s% xa_old,dim=2)
-               write(*,*) 's% nz_old', s% nz_old
-               exit
-            end if
-            call do2D(s, s% xh_old, nvar_hydro, nz, action, ierr)
-            if (failed('xh_old')) exit
-            
-            if (.not. s% conv_vel_flag) then
-               call do1D(s, s% conv_vel_old, nz, action, ierr)
-               if (failed('conv_vel_old')) exit
-            end if
-
-            if (action /= do_fill_arrays_with_NaNs) then
-            
-               ! these arrays must not be filled with NaNs  
-               ! because they are needed for time-smoothing rotation
-               
-               call do1D(s, s% nu_ST_old, nz, action, ierr)
-               if (failed('nu_ST_old')) exit
-               call do1D(s, s% D_ST_old, nz, action, ierr)
-               if (failed('D_ST_old')) exit
-               call do1D(s, s% D_DSI_old, nz, action, ierr)
-               if (failed('D_DSI_old')) exit
-               call do1D(s, s% D_SH_old, nz, action, ierr)
-               if (failed('D_SH_old')) exit
-               call do1D(s, s% D_SSI_old, nz, action, ierr)
-               if (failed('D_SSI_old')) exit
-               call do1D(s, s% D_ES_old, nz, action, ierr)
-               if (failed('D_ES_old')) exit
-               call do1D(s, s% D_GSF_old, nz, action, ierr)
-               if (failed('D_GSF_old')) exit
-               call do1D(s, s% D_mix_old, nz, action, ierr)
-               if (failed('D_mix_old')) exit
-               call do1D(s, s% j_rot_old, nz, action, ierr)
-               if (failed('j_rot_old')) exit
-               call do1D(s, s% omega_old, nz, action, ierr)
-               if (failed('omega_old')) exit
-               call do1D(s, s% D_omega_old, nz, action, ierr)
-               if (failed('D_omega_old')) exit
-               call do1D(s, s% am_nu_rot_old, nz, action, ierr)
-               if (failed('am_nu_rot_old')) exit
-            
-            end if
-
-            return
-         end do
-
          ierr = -1
+         call do2D(s, s% xh_old, nvar_hydro, nz, action, ierr)
+         if (failed('xh_old')) return
+         call do2D(s, s% xa_old, species, nz, action, ierr)
+         if (failed('xa_old')) return
+         call do1D(s, s% dq_old, nz, action, ierr)
+         if (failed('dq_old')) return
+         call do1D(s, s% omega_old, nz, action, ierr)
+         if (failed('omega_old')) return
+         call do1D(s, s% j_rot_old, nz, action, ierr)
+         if (failed('j_rot_old')) return
+         ierr = 0
 
          contains
 
@@ -540,80 +479,78 @@
          do ! just so can exit on failure
 
             if (action /= do_fill_arrays_with_NaNs) then
-            
                ! these arrays must not be filled with NaNs  
-               ! because they contain info that cannot be reconstructed
-               ! from contents of xh and xa             
-               call do1(s% dq, c% dq)
-               if (failed('dq')) exit
-               call do1(s% q, c% q)
-               if (failed('q')) exit
-               call do2(s% xa, c% xa, species, 'xa')
-               if (failed('xa')) exit
+               ! because they contain the inputs to the step          
                call do2(s% xh, c% xh, nvar_hydro, 'xh')
                if (failed('xh')) exit
-               call do1(s% m, c% m)
-               if (failed('m')) exit
-               call do1(s% dm, c% dm)
-               if (failed('dm')) exit
-               call do1(s% dm_bar, c% dm_bar)
-               if (failed('dm_bar')) exit   
-               
-               call do1(s% conv_vel, c% conv_vel)
-               if (failed('conv_vel')) exit
-               
+               call do2(s% xa, c% xa, species, 'xa')
+               if (failed('xa')) exit
+               call do1(s% dq, c% dq)
+               if (failed('dq')) exit
                call do1(s% omega, c% omega)
                if (failed('omega')) exit
                call do1(s% j_rot, c% j_rot)
-               if (failed('j_rot')) exit
-               call do1(s% am_nu_rot, c% am_nu_rot)
-               if (failed('am_nu_rot')) exit
-               call do1(s% D_omega, c% D_omega)
-               if (failed('D_omega')) exit
-               call do1(s% fp_rot, c% fp_rot)
-               if (failed('fp_rot')) exit
-               call do1(s% ft_rot, c% ft_rot)
-               if (failed('ft_rot')) exit
-               call do1(s% am_nu_non_rot, c% am_nu_non_rot)
-               if (failed('am_nu_non_rot')) exit
-               call do1(s% am_nu_omega, c% am_nu_omega)
-               if (failed('am_nu_omega')) exit
-               call do1(s% am_nu_j, c% am_nu_j)
-               if (failed('am_nu_j')) exit
-               call do1(s% am_sig_omega, c% am_sig_omega)
-               if (failed('am_sig_omega')) exit
-               call do1(s% am_sig_j, c% am_sig_j)
-               if (failed('am_sig_j')) exit
-               call do1(s% dfp_rot_dw_div_wc, c% dfp_rot_dw_div_wc)
-               if (failed('dfp_rot_dw_div_wc')) exit
-               call do1(s% dft_rot_dw_div_wc, c% dft_rot_dw_div_wc)
-               if (failed('dft_rot_dw_div_wc')) exit
-               call do1(s% i_rot, c% i_rot)
-               if (failed('i_rot')) exit
-               call do1(s% di_rot_dw_div_wc, c% di_rot_dw_div_wc)
-               if (failed('di_rot_dw_div_wc')) exit
-               call do1(s% di_rot_dlnr, c% di_rot_dlnr)
-               if (failed('di_rot_dlnr')) exit
-               call do1(s% w_div_w_crit_roche, c% w_div_w_crit_roche)
-               if (failed('w_div_w_crit_roche')) exit
-               call do1(s% j_flux, c% j_flux)
-               if (failed('j_flux')) exit
-               call do1(s% dj_flux_dw00, c% dj_flux_dw00)
-               if (failed('dj_flux_dw00')) exit
-               call do1(s% dj_flux_dwp1, c% dj_flux_dwp1)
-               if (failed('dj_flux_dwp1')) exit
-               call do1(s% dj_flux_dj00, c% dj_flux_dj00)
-               if (failed('dj_flux_dj00')) exit
-               call do1(s% dj_flux_djp1, c% dj_flux_djp1)
-               if (failed('dj_flux_djp1')) exit
-               call do1(s% dj_flux_dlnr00, c% dj_flux_dlnr00)
-               if (failed('dj_flux_dlnr00')) exit
-               call do1(s% dj_flux_dlnrp1, c% dj_flux_dlnrp1)
-               if (failed('dj_flux_dlnrp1')) exit
-               call do1(s% dj_flux_dlnd, c% dj_flux_dlnd)
-               if (failed('dj_flux_dlnd')) exit
-               
+               if (failed('j_rot')) exit               
             end if
+            
+            call do1(s% q, c% q)
+            if (failed('q')) exit
+            call do1(s% m, c% m)
+            if (failed('m')) exit
+            call do1(s% dm, c% dm)
+            if (failed('dm')) exit
+            call do1(s% dm_bar, c% dm_bar)
+            if (failed('dm_bar')) exit   
+            
+            call do1(s% conv_vel, c% conv_vel)
+            if (failed('conv_vel')) exit
+            
+            call do1(s% am_nu_rot, c% am_nu_rot)
+            if (failed('am_nu_rot')) exit
+            call do1(s% D_omega, c% D_omega)
+            if (failed('D_omega')) exit
+            call do1(s% fp_rot, c% fp_rot)
+            if (failed('fp_rot')) exit
+            call do1(s% ft_rot, c% ft_rot)
+            if (failed('ft_rot')) exit
+            call do1(s% am_nu_non_rot, c% am_nu_non_rot)
+            if (failed('am_nu_non_rot')) exit
+            call do1(s% am_nu_omega, c% am_nu_omega)
+            if (failed('am_nu_omega')) exit
+            call do1(s% am_nu_j, c% am_nu_j)
+            if (failed('am_nu_j')) exit
+            call do1(s% am_sig_omega, c% am_sig_omega)
+            if (failed('am_sig_omega')) exit
+            call do1(s% am_sig_j, c% am_sig_j)
+            if (failed('am_sig_j')) exit
+            call do1(s% dfp_rot_dw_div_wc, c% dfp_rot_dw_div_wc)
+            if (failed('dfp_rot_dw_div_wc')) exit
+            call do1(s% dft_rot_dw_div_wc, c% dft_rot_dw_div_wc)
+            if (failed('dft_rot_dw_div_wc')) exit
+            call do1(s% i_rot, c% i_rot)
+            if (failed('i_rot')) exit
+            call do1(s% di_rot_dw_div_wc, c% di_rot_dw_div_wc)
+            if (failed('di_rot_dw_div_wc')) exit
+            call do1(s% di_rot_dlnr, c% di_rot_dlnr)
+            if (failed('di_rot_dlnr')) exit
+            call do1(s% w_div_w_crit_roche, c% w_div_w_crit_roche)
+            if (failed('w_div_w_crit_roche')) exit
+            call do1(s% j_flux, c% j_flux)
+            if (failed('j_flux')) exit
+            call do1(s% dj_flux_dw00, c% dj_flux_dw00)
+            if (failed('dj_flux_dw00')) exit
+            call do1(s% dj_flux_dwp1, c% dj_flux_dwp1)
+            if (failed('dj_flux_dwp1')) exit
+            call do1(s% dj_flux_dj00, c% dj_flux_dj00)
+            if (failed('dj_flux_dj00')) exit
+            call do1(s% dj_flux_djp1, c% dj_flux_djp1)
+            if (failed('dj_flux_djp1')) exit
+            call do1(s% dj_flux_dlnr00, c% dj_flux_dlnr00)
+            if (failed('dj_flux_dlnr00')) exit
+            call do1(s% dj_flux_dlnrp1, c% dj_flux_dlnrp1)
+            if (failed('dj_flux_dlnrp1')) exit
+            call do1(s% dj_flux_dlnd, c% dj_flux_dlnd)
+            if (failed('dj_flux_dlnd')) exit
 
             call do2(s% xh_start, c% xh_start, nvar_hydro, 'xh_start')
             if (failed('xh_start')) exit
@@ -1682,40 +1619,16 @@
                if (failed('pstar extras')) exit
             end if
 
-            if (action /= do_fill_arrays_with_NaNs) then
-               call do2(s% prev_mesh_xh, c% prev_mesh_xh, nvar_hydro, 'prev_mesh_xh')
-               if (failed('prev_mesh_xh')) exit
-               call do2(s% prev_mesh_xa, c% prev_mesh_xa, species, 'prev_mesh_xa')
-               if (failed('prev_mesh_xa')) exit
-               call do1(s% prev_mesh_j_rot, c% prev_mesh_j_rot)
-               if (failed('prev_mesh_j_rot')) exit
-               call do1(s% prev_mesh_omega, c% prev_mesh_omega)
-               if (failed('prev_mesh_omega')) exit
-               call do1(s% prev_mesh_nu_ST, c% prev_mesh_nu_ST)
-               if (failed('prev_mesh_nu_ST')) exit
-               call do1(s% prev_mesh_D_ST, c% prev_mesh_D_ST)
-               if (failed('prev_mesh_D_ST')) exit
-               call do1(s% prev_mesh_D_DSI, c% prev_mesh_D_DSI)
-               if (failed('prev_mesh_D_DSI')) exit
-               call do1(s% prev_mesh_D_SH, c% prev_mesh_D_SH)
-               if (failed('prev_mesh_D_SH')) exit
-               call do1(s% prev_mesh_D_SSI, c% prev_mesh_D_SSI)
-               if (failed('prev_mesh_D_SSI')) exit
-               call do1(s% prev_mesh_D_ES, c% prev_mesh_D_ES)
-               if (failed('prev_mesh_D_ES')) exit
-               call do1(s% prev_mesh_D_GSF, c% prev_mesh_D_GSF)
-               if (failed('prev_mesh_D_GSF')) exit
-               call do1(s% prev_mesh_D_mix, c% prev_mesh_D_mix)
-               if (failed('prev_mesh_D_mix')) exit
-               call do1(s% prev_mesh_D_omega, c% prev_mesh_D_omega)
-               if (failed('prev_mesh_D_omega')) exit
-               call do1(s% prev_mesh_am_nu_rot, c% prev_mesh_am_nu_rot)
-               if (failed('prev_mesh_am_nu_rot')) exit
-               call do1(s% prev_mesh_conv_vel, c% prev_mesh_conv_vel)
-               if (failed('prev_mesh_am_nu_rot')) exit
-               call do1(s% prev_mesh_dq, c% prev_mesh_dq)
-               if (failed('prev_mesh_dq')) exit
-            end if
+            call do2(s% prev_mesh_xh, c% prev_mesh_xh, nvar_hydro, 'prev_mesh_xh')
+            if (failed('prev_mesh_xh')) exit
+            call do2(s% prev_mesh_xa, c% prev_mesh_xa, species, 'prev_mesh_xa')
+            if (failed('prev_mesh_xa')) exit
+            call do1(s% prev_mesh_j_rot, c% prev_mesh_j_rot)
+            if (failed('prev_mesh_j_rot')) exit
+            call do1(s% prev_mesh_omega, c% prev_mesh_omega)
+            if (failed('prev_mesh_omega')) exit
+            call do1(s% prev_mesh_dq, c% prev_mesh_dq)
+            if (failed('prev_mesh_dq')) exit
 
             if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
             return
@@ -3248,12 +3161,6 @@
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
-
-            ! need to allocate conv_vel_old
-            if (s% generations > 1) then
-               call do1D(s, s% conv_vel_old, s% nz_old, do_allocate, ierr)
-               if (ierr /= 0) write(*,*) "failed while allocating conv_vel_old"
-            end if
          end if
 
          call set_var_info(s, ierr)
@@ -3522,24 +3429,8 @@
          call zero_array(s% D_ES)
          call zero_array(s% D_GSF)
 
-         call zero_array(s% nu_ST_old)
-         call zero_array(s% D_ST_old)
-         call zero_array(s% D_DSI_old)
-         call zero_array(s% D_SH_old)
-         call zero_array(s% D_SSI_old)
-         call zero_array(s% D_ES_old)
-         call zero_array(s% D_GSF_old)
-         call zero_array(s% D_mix_old)
-
          call zero_array(s% prev_mesh_omega)
          call zero_array(s% prev_mesh_j_rot)
-         call zero_array(s% prev_mesh_nu_ST)
-         call zero_array(s% prev_mesh_D_ST)
-         call zero_array(s% prev_mesh_D_DSI)
-         call zero_array(s% prev_mesh_D_SH)
-         call zero_array(s% prev_mesh_D_SSI)
-         call zero_array(s% prev_mesh_D_ES)
-         call zero_array(s% prev_mesh_D_GSF)
 
 
          contains

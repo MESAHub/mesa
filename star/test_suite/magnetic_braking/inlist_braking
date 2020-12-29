@@ -93,8 +93,8 @@
          trace_history_value_name(6) = 'avg_setvars_per_step'
          trace_history_value_name(7) = 'avg_solver_setvars_per_step'
 
-         photo_interval = 10
-         profile_interval = 100
+         photo_interval = 50
+         profile_interval = 50
          history_interval = 10
          terminal_interval = 10
          write_header_frequency = 10
