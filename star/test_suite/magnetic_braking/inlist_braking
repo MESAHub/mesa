@@ -14,7 +14,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'max_model_number' ! 'xa_central_lower_limit'
+      required_termination_code_string = 'xa_central_lower_limit'
 
 
       change_v_flag = .true.

@@ -40,25 +40,18 @@
 
   terminal_show_age_units = 'seconds'
 
-  num_trace_history_values = 3
+  num_trace_history_values = 2
   trace_history_value_name(1) = 'cumulative_extra_heating'
   trace_history_value_name(2) = 'total_energy'
-  trace_history_value_name(3) = 'log_center_T'
-  trace_history_value_name(4) = 'shock_mass'
-  trace_history_value_name(5) = 'total_energy'
-  trace_history_value_name(6) = 'shock_radius'
-  trace_history_value_name(7) = 'photosphere_r'
-  trace_history_value_name(8) = 'rel_E_err'
-  trace_history_value_name(9) = 'log_rel_run_E_err'
 
   max_num_profile_models = 1000
 
-  max_model_number = 1900
+  max_model_number = 5000
 
   inject_until_reach_model_with_total_energy = 8d+50
   ! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
-  max_age_in_seconds = 0.05d0
-  total_mass_for_inject_extra_ergs_sec = 0.2d0
+  max_age_in_seconds = 0.2d0
+  total_mass_for_inject_extra_ergs_sec = 0.3d0 ! 0.2d0
   max_timestep = 1d-4
   
   start_time_for_inject_extra_ergs_sec = 0d0
@@ -80,14 +73,10 @@
   fixed_vsurf = 0
 
   okay_to_remesh = .true.
-
   use_split_merge_amr = .true.
-
   split_merge_amr_log_zoning = .true.
-
   split_merge_amr_nz_baseline = 1000
   split_merge_amr_MaxLong = 1.5
-
   split_merge_amr_max_iters = 10
 
   dxdt_nuc_factor = 0
@@ -119,6 +108,8 @@
   max_abs_rel_run_E_err = 1d99
 
   split_merge_amr_MaxShort = 2
+  
+  max_logT_for_mlt = 9.0d0
 
 
   ! TESTING -- NEED A WORKAROUND
@@ -127,7 +118,7 @@
    
 
   photo_interval = 50
-  profile_interval = 10
+  profile_interval = 50
   history_interval = 10
   terminal_interval = 10
 

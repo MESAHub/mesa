@@ -38,6 +38,8 @@
 
 &controls
 
+      log_L_upper_limit = 4.1
+
       use_dedt_form_of_energy_eqn = .true.
 
       num_trace_history_values = 2
@@ -54,8 +56,6 @@
       
       
       mixing_length_alpha = 1.73
-
-      log_L_upper_limit = 4.1
 
     overshoot_scheme(1) = 'exponential'
     overshoot_zone_type(1) = 'any'
