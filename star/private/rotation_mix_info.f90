@@ -301,18 +301,15 @@
             
          end if
          
-         if (s% D_omega_flag) then ! check
+         if (s% D_omega_flag) then
             do k=1,nz
+               if (is_bad(s% D_omega(k))) then
+                  write(*,2) 'before return s% D_omega(k)', k, s% D_omega(k)
+                  stop 'rotation mix'
+               end if
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
          end if
-         
-         do k=1,nz
-            if (is_bad(s% D_omega(k))) then
-               write(*,2) 'before return s% D_omega(k)', k, s% D_omega(k)
-               stop 'rotation mix'
-            end if
-         end do
 
          call dealloc
 

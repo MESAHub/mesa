@@ -2064,6 +2064,10 @@
          
             if (s% am_nu_rot_flag) then ! check
                do k=1,nz
+                  if (is_bad(s% am_nu_rot(k))) then
+                     write(*,2) 'before return s% am_nu_rot(k)', k, s% am_nu_rot(k)
+                     stop 'set_am_nu_rot'
+                  end if
                   if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
                end do
             end if         
