@@ -115,6 +115,11 @@ then
 		#exit 1
 	fi
 
+        # empirically on lustre filesystems the LFS files don't immediately appear
+        # if requested, sleep for a bit before proceeding and doing the check
+        if [ -n "${MESA_GIT_LFS_SLEEP}" ]; then
+            sleep ${MESA_GIT_LFS_SLEEP}
+        fi
 
         # check that each LFS file has a full copy on disk
         FILE_LIST=$(git lfs ls-files -n)
