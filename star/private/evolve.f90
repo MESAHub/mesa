@@ -1838,6 +1838,12 @@
             end do
             
             call set_qs(s, nz, s% q, s% dq, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'prepare_for_new_try failed in set_qs'
+               prepare_for_new_try = terminate
+               s% termination_code = t_failed_prepare_for_new_try
+               return
+            end if
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
 

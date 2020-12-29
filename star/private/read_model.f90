@@ -79,7 +79,7 @@
       subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, reset_epsnuc_vectors, &
-            save_for_d_dt
+            set_qs, save_for_d_dt
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
@@ -99,6 +99,11 @@
          s% brunt_B(1:nz) = 0 ! temporary brunt_B for set_vars
 
          if (.not. restart) then
+            call set_qs(s, nz, s% q, s% dq, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'finish_load_model failed in set_qs'
+               return
+            end if
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)            
             call reset_epsnuc_vectors(s)

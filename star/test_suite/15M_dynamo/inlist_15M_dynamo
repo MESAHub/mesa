@@ -153,7 +153,7 @@
 
          T_mix_limit = 1d4
 
-      photo_interval = 50
+      photo_interval = 10
       profile_interval = 100
       history_interval = 10
       terminal_interval = 10

@@ -353,29 +353,21 @@
          
          include 'formats'
 
-         ierr = 0
-
          nz = s% nz_old
          nvar_hydro = s% nvar_hydro
          species = s% species
-
-         do ! just so can exit in case of failure
-
-            call do2D(s, s% xh_old, nvar_hydro, nz, action, ierr)
-            if (failed('xh_old')) exit
-            call do2D(s, s% xa_old, species, nz, action, ierr)
-            if (failed('xa_old')) exit
-            call do1D(s, s% dq_old, nz, action, ierr)
-            if (failed('dq_old')) exit
-            call do1D(s, s% omega_old, nz, action, ierr)
-            if (failed('omega_old')) exit
-            call do1D(s, s% j_rot_old, nz, action, ierr)
-            if (failed('j_rot_old')) exit
-
-            return
-         end do
-
          ierr = -1
+         call do2D(s, s% xh_old, nvar_hydro, nz, action, ierr)
+         if (failed('xh_old')) return
+         call do2D(s, s% xa_old, species, nz, action, ierr)
+         if (failed('xa_old')) return
+         call do1D(s, s% dq_old, nz, action, ierr)
+         if (failed('dq_old')) return
+         call do1D(s, s% omega_old, nz, action, ierr)
+         if (failed('omega_old')) return
+         call do1D(s, s% j_rot_old, nz, action, ierr)
+         if (failed('j_rot_old')) return
+         ierr = 0
 
          contains
 

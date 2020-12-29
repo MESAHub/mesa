@@ -147,30 +147,33 @@
          if (failed('dq')) return
 
          read(iounit, iostat=ierr) &
-            s% dq(1:nz), s% q(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
-            s% m(1:nz), s% dm(1:nz), s% dm_bar(1:nz), &
-            s% omega(1:nz), s% j_rot(1:nz), s% w_div_w_crit_roche(1:nz), &
-            s% D_omega(1:nz), s% am_nu_rot(1:nz), &
-            s% dlnd_dt(1:nz), s% dlnT_dt(1:nz), &
-            s% eps_grav(1:nz), s% conv_vel(1:nz), s% lnT(1:nz), &
-            s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities
-         call read_part_number(iounit)
-         if (failed('*_old')) return
+            s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
+            s% omega(1:nz), s% j_rot(1:nz)
 
-         if (s% generations > 1 .and. .not. s% rsp_flag) then
-            read(iounit, iostat=ierr) &
-               s% omega_old(1:nz_old), &
-               s% j_rot_old(1:nz_old), &
-               s% dq_old(1:nz_old), &
-               s% xh_old(:,1:nz_old), &
-               s% xa_old(:,1:nz_old)
-            if (failed('xh_old')) return
-         end if
+!         read(iounit, iostat=ierr) &
+!            s% q(1:nz), s% m(1:nz), s% dm(1:nz), s% dm_bar(1:nz), &
+!            s% w_div_w_crit_roche(1:nz), &
+!            s% D_omega(1:nz), s% am_nu_rot(1:nz), &
+!            s% dlnd_dt(1:nz), s% dlnT_dt(1:nz), &
+!            s% eps_grav(1:nz), s% conv_vel(1:nz), s% lnT(1:nz)
+            
+!         call read_part_number(iounit)
+!         if (failed('*_old')) return
+!         if (s% generations > 1 .and. .not. s% rsp_flag) then
+!            read(iounit, iostat=ierr) &
+!               s% omega_old(1:nz_old), &
+!               s% j_rot_old(1:nz_old), &
+!               s% dq_old(1:nz_old), &
+!               s% xh_old(:,1:nz_old), &
+!               s% xa_old(:,1:nz_old)
+!            if (failed('xh_old')) return
+!         end if
 
          call read_part_number(iounit)
          if (failed('mstar_dot')) return
 
          read(iounit, iostat=ierr) &
+            s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities, &
             s% mstar_dot, s% v_surf, s% gradT_excess_alpha, s% dt_limit_ratio, &
             s% L_phot, s% T_surf, s% P_surf, s% L_surf, s% h1_czb_mass, &
             s% he_core_mass, s% c_core_mass, s% tau_base, s% Teff, &
@@ -198,17 +201,17 @@
 
          read(iounit, iostat=ierr) &
             s% recent_log_header, s% phase_of_evolution, &
-            s% dt_next, s% dt_next_unclipped, &
-            s% eps_nuc(1:nz), &
-            s% d_epsnuc_dlnd(1:nz), &
-            s% d_epsnuc_dlnT(1:nz), &
-            s% d_epsnuc_dx(:,1:nz), &
-            s% eps_nuc_categories(:,1:nz), &
-            s% dxdt_nuc(:,1:nz), &
-            s% d_dxdt_nuc_dRho(:,1:nz), &
-            s% d_dxdt_nuc_dT(:,1:nz), &
-            s% d_dxdt_nuc_dx(:,:,1:nz), &
-            s% eps_nuc_neu_total(1:nz)
+            s% dt_next, s% dt_next_unclipped !, &
+!            s% eps_nuc(1:nz), &
+!            s% d_epsnuc_dlnd(1:nz), &
+!            s% d_epsnuc_dlnT(1:nz), &
+!            s% d_epsnuc_dx(:,1:nz), &
+!            s% eps_nuc_categories(:,1:nz), &
+!            s% dxdt_nuc(:,1:nz), &
+!            s% d_dxdt_nuc_dRho(:,1:nz), &
+!            s% d_dxdt_nuc_dT(:,1:nz), &
+!            s% d_dxdt_nuc_dx(:,:,1:nz), &
+!            s% eps_nuc_neu_total(1:nz)
          if (failed('eps_nuc_neu_total')) return
          
          if (s% dt_next <= 0d0) s% dt_next = s% dt_next_unclipped
