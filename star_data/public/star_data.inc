@@ -1635,7 +1635,8 @@
          
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 
-!         real(dp) :: total_angular_momentum_old
+         real(dp) :: total_angular_momentum_old
+         
 !         real(dp) :: h1_czb_mass_old ! baryonic (Msun)
 !         real(dp) :: he_core_mass_old
 !         real(dp) :: c_core_mass_old

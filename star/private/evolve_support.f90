@@ -93,6 +93,7 @@
          s% cumulative_energy_error_old = s% cumulative_energy_error
          s% total_energy_old = s% total_energy
          s% total_internal_energy_old = s% total_internal_energy
+         s% total_angular_momentum_old = s% total_angular_momentum
          s% Teff_old = s% Teff
          s% mstar_dot_old = s% mstar_dot
          s% L_phot_old = s% L_phot
@@ -112,7 +113,6 @@
 
          
 !         s% total_radiation_old = s% total_radiation
-!         s% total_angular_momentum_old = s% total_angular_momentum
 !         s% h1_czb_mass_old = s% h1_czb_mass_prev
 !         s% he_core_mass_old = s% he_core_mass
 !         s% c_core_mass_old = s% c_core_mass
