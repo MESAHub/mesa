@@ -213,33 +213,6 @@
          nullify(s% dq)
          nullify(s% dq_old)
 
-         nullify(s% conv_vel)
-         nullify(s% conv_vel_old)
-
-         nullify(s% nu_ST)
-         nullify(s% nu_ST_old)
-
-         nullify(s% D_DSI)
-         nullify(s% D_DSI_old)
-
-         nullify(s% D_SH)
-         nullify(s% D_SH_old)
-
-         nullify(s% D_SSI)
-         nullify(s% D_SSI_old)
-
-         nullify(s% D_ES)
-         nullify(s% D_ES_old)
-
-         nullify(s% D_GSF)
-         nullify(s% D_GSF_old)
-
-         nullify(s% D_mix_non_rotation)
-         nullify(s% D_mix_old)
-
-         nullify(s% q)
-         nullify(s% q_old)
-
          nullify(s% xa)
          nullify(s% xa_old)
 
@@ -280,17 +253,6 @@
          nullify(s% prev_mesh_xa)
          nullify(s% prev_mesh_j_rot)
          nullify(s% prev_mesh_omega)
-         nullify(s% prev_mesh_nu_ST)
-         nullify(s% prev_mesh_D_ST)
-         nullify(s% prev_mesh_D_DSI)
-         nullify(s% prev_mesh_D_SH)
-         nullify(s% prev_mesh_D_SSI)
-         nullify(s% prev_mesh_D_ES)
-         nullify(s% prev_mesh_D_GSF)
-         nullify(s% prev_mesh_D_mix)
-         nullify(s% prev_mesh_D_omega)
-         nullify(s% prev_mesh_am_nu_rot)
-         nullify(s% prev_mesh_conv_vel)
          nullify(s% prev_mesh_dq)
 
          nullify(s% other_star_info)
@@ -382,15 +344,15 @@
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''
-         s% revised_net_name_old = ''
+!         s% revised_net_name_old = ''
 
          s% using_revised_max_yr_dt = .false.
          s% revised_max_yr_dt = 0
-         s% revised_max_yr_dt_old = 0
-
+!         s% revised_max_yr_dt_old = 0
+ 
          s% astero_using_revised_max_yr_dt = .false.
          s% astero_revised_max_yr_dt = 0
-         s% astero_revised_max_yr_dt_old = 0
+!         s% astero_revised_max_yr_dt_old = 0
 
          s% cumulative_energy_error = 0
          s% cumulative_energy_error_old = 0
@@ -422,7 +384,7 @@
          s% dt_why_retry_count(:) = 0
          
          s% min_kap_floor = 1d0
-         s% min_kap_floor_old = 1d0
+!         s% min_kap_floor_old = 1d0
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0
@@ -756,10 +718,10 @@
          s% time_old = 0
 
          s% total_radiation = 0
-         s% total_radiation_old = 0
+!         s% total_radiation_old = 0
 
          s% total_angular_momentum = 0
-         s% total_angular_momentum_old = 0
+!         s% total_angular_momentum_old = 0
 
          s% prev_create_atm_R0_div_R = 0
 
@@ -777,7 +739,7 @@
          s% mstar_dot_old = 0
 
          s% v_surf = 0
-         s% v_surf_old = 0
+!         s% v_surf_old = 0
 
          s% L_nuc_burn_total = 0
          s% L_nuc_burn_total_old = 0
@@ -795,26 +757,26 @@
          s% P_surf = 0
 
          s% h1_czb_mass = 0
-         s% h1_czb_mass_old = 0
+!         s% h1_czb_mass_old = 0
          s% h1_czb_mass_prev = 0
 
          s% he_core_mass = 0
-         s% he_core_mass_old = 0
+!         s% he_core_mass_old = 0
 
          s% c_core_mass = 0
-         s% c_core_mass_old = 0
+!         s% c_core_mass_old = 0
 
          s% Teff = -1 ! need to calculate it
          s% Teff_old = -1
 
          s% center_eps_nuc = 0
-         s% center_eps_nuc_old = 0
+!         s% center_eps_nuc_old = 0
 
          s% Lrad_div_Ledd_avg_surf = 0
-         s% Lrad_div_Ledd_avg_surf_old = 0
+!         s% Lrad_div_Ledd_avg_surf_old = 0
 
          s% w_div_w_crit_avg_surf = 0
-         s% w_div_w_crit_avg_surf_old = 0
+!         s% w_div_w_crit_avg_surf_old = 0
          
          s% total_internal_energy = 0d0
          s% total_gravitational_energy = 0d0
@@ -824,13 +786,13 @@
          s% total_energy = 0d0
 
          s% n_conv_regions = 0
-         s% n_conv_regions_old = 0
+!         s% n_conv_regions_old = 0
 
          s% cz_bot_mass(:) = 0
-         s% cz_bot_mass_old(:) = 0
+!         s% cz_bot_mass_old(:) = 0
 
          s% cz_top_mass(:) = 0
-         s% cz_top_mass_old(:) = 0
+!         s% cz_top_mass_old(:) = 0
 
          s% dt_next = 0
 
@@ -1470,18 +1432,20 @@
                end do
                s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
             end do
-            do k0=1, s% nz_old
-               call interp_value(q, num_pts, conv_vel_interp, s% q_old(k0), conv_vel_temp, ierr)
-               !avoid extending regions with non-zero conv vel
-               do k=2, num_pts-1
-                  if(s% q_old(k0) < q(k) .and. s% q_old(k0) > q(k+1) &
-                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
-                     conv_vel_temp = 0d0
-                     exit
-                  end if
-               end do
-               s% xh_old(s% i_ln_cvpv0, k0) = log(conv_vel_temp+s% conv_vel_v0)
-            end do
+            write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
+            stop 'do_relax_to_star_cut'
+!            do k0=1, s% nz_old
+!               call interp_value(q, num_pts, conv_vel_interp, s% q_old(k0), conv_vel_temp, ierr)
+!               !avoid extending regions with non-zero conv vel
+!               do k=2, num_pts-1
+!                  if(s% q_old(k0) < q(k) .and. s% q_old(k0) > q(k+1) &
+!                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
+!                     conv_vel_temp = 0d0
+!                     exit
+!                  end if
+!               end do
+!               s% xh_old(s% i_ln_cvpv0, k0) = log(conv_vel_temp+s% conv_vel_v0)
+!            end do
             deallocate(conv_vel_interp, interp_work)
          end if
 
