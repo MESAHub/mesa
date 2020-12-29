@@ -123,21 +123,23 @@ then
             # if no file exists, that means the file was probably deleted and that's OK
             # if the file exists, but is short, then it is probably the bare LFS pointer
             #   and that indicates a problem retrieving the file
-            if [ -f "${LFS_FILE}" ] && [ $(du -b "${LFS_FILE}" | cut -f1) -lt 200 ];
+            if [ -f "${LFS_FILE}" ] && [ $(du -k "${LFS_FILE}" | cut -f1) -le 4 ];
             then
-		echo
-		echo "****************************************************************"
-		echo "*        Some data files were not succesfully retrieved        *"
-		echo "*                                                              *"
-		echo "*                         Try running:                         *"
-		echo "*                   git lfs install --force                    *"
-		echo "*                           and then                           *"
-		echo "*                         git lfs pull                         *"
-		echo "*                                                              *"
-		echo "****************************************************************"
-		echo
-		exit 1
-	    fi
+                echo
+                echo "${LFS_FILE} is smaller than expected for a file tracked by git LFS"
+                echo
+                echo "****************************************************************"
+                echo "*        Some data files were not successfully retrieved       *"
+                echo "*                                                              *"
+                echo "*                         Try running:                         *"
+                echo "*                   git lfs install --force                    *"
+                echo "*                           and then                           *"
+                echo "*                         git lfs pull                         *"
+                echo "*                                                              *"
+                echo "****************************************************************"
+                echo
+                exit 1
+            fi
         done
 
 fi
