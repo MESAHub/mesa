@@ -13,16 +13,11 @@ the values assigned to ``initial_mass`` or ``initial_z`` in
 ``inlist_common``.
 
 Larger values for ``initial_mass`` can be used to produce more massive
-carbon-oxygen white dwarfs, but note that this test is not designed to
-produce a realistic initial-to-final-mass relation (IFMR). Instead,
-this test is designed to robustly produce usable white dwarf models as
-soon as evolution has yielded the desired core structure, and so this
-procedure truncates the AGB evolution just before reaching the
+carbon-oxygen white dwarfs, but note that this test produces only an
+approximate initial-to-final-mass relation (IFMR). The test is
+designed to truncate the AGB evolution at the beginning of the
 thermally-pulsing AGB (TP-AGB) stage, which can be difficult and/or
-resource-intensive to model. Skipping the TP-AGB stage means that the
-procedure in this test case will generally require a somewhat larger
-progenitor mass to produce a given white dwarf mass than what would be
-expected from a realistic IFMR.
+resource-intensive to model.
 
 The five steps in this procedure are:
 
@@ -44,10 +39,7 @@ This step evolves from ZAMS through the end of core helium burning.
 
 This step evolves to near the end of shell helium burning, producing
 the final C/O core profile in the interior. This step terminates when
-the He layer mass falls below 0.04 |Msun|, avoiding the TP-AGB phase
-that would begin when the He layer becomes smaller. After the AGB
-envelope is removed in the next step, residual burning in the He layer
-will reduce its final mass to around 0.01 |Msun|.
+a thermal pulse occurs in the helium shell.
 
 
 4. ``inlist_remove_env``
