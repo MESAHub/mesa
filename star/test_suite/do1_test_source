@@ -6,7 +6,7 @@ do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
 do_one 16M_conv_premix "termination code: xa_central_lower_limit" "tams.mod" auto
 do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" auto
 do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
-do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
+#       off for now since is slow test        do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
@@ -82,7 +82,7 @@ do_one sample_pre_ms "finished sample pre-ms" skip skip
 do_one sedov_omega_1 "All tests are okay"  "done_with_sedov.mod" auto
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
-do_one split_burn_big_net_30M "stop because have dropped below central lower limit for si28" "final.mod" skip
+#       off for now since is slow test        do_one split_burn_big_net_30M "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto
