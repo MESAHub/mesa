@@ -7,6 +7,10 @@ if [ -d ".git" ] || [ -f ".git" ]; then
     git rev-parse HEAD > data/version_number
 fi
 
+# Create file for TestHub
+# This file will be populated during math/test
+touch testhub.yml
+
 export BUILD_LOG="build.log"
 
 # Get system info
@@ -99,6 +103,19 @@ fi
 # Check we are on git and if so did git lfs work?
 if [ -d ".git" ] || [ -f ".git" ]
 then
+	# First check if git lfs is installed
+	if ! command -v git-lfs >/dev/null 2>&1
+	then
+		echo
+		echo "****************************************************************"
+		echo "*                     git lfs is not installed                 *"
+		echo "*                                                              *"
+		echo "****************************************************************"
+		echo
+		#exit 1
+	fi
+
+
 	FILE_LIST=$(git lfs ls-files | grep -v '*')
 
 	if [[ -n $FILE_LIST ]]

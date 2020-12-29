@@ -18,6 +18,9 @@
 
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
+      
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-1
 
       !pgstar_flag = .true.
 
@@ -52,15 +55,13 @@
       thermohaline_coeff = 0
 
 ! mixing
-      dq_D_mix_zero_at_H_He_crossover = 1d-2
-      dq_D_mix_zero_at_H_C_crossover = 1d-2
 
 ! timesteps
 
 ! mesh
 
 ! solver
-      drag_coefficient = 99 ! drive v to 0 in H envelope after end core He burn
+      drag_coefficient = 99 ! 999999d0 ! drive v to 0 in H envelope after end core He burn
       turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls

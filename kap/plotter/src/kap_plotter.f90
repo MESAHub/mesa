@@ -330,7 +330,7 @@ program kap_plotter
    deallocate(net_iso, chem_id)
 
    if (ierr /= 0) then
-      write(*,*) 'bad result from eos_get'
+      write(*,*) 'bad result from kap_get'
       stop 1
    end if
 

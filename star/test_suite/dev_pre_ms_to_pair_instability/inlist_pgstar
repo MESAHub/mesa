@@ -206,7 +206,7 @@ Profile_Panels1_other_yaxis_name(5) = 'pgas_div_p'
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'
 Profile_Panels1_xmin = -101d0
-Profile_Panels1_xmax = 6.1
+Profile_Panels1_xmax = 8.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'

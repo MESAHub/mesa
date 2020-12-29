@@ -47,6 +47,12 @@
       thermohaline_coeff = 0
 
 ! mixing
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'burn_He'
+      overshoot_zone_loc(1) = 'shell'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.01
+      overshoot_f0(1) = 0.005
 
 ! timesteps
 

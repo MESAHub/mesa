@@ -28,7 +28,7 @@
 
 &controls
 
-      fe_core_infall_limit = 20d5
+      fe_core_infall_limit = 1d6
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -43,15 +43,15 @@
 ! mlt
 
 ! mixing
-      dq_D_mix_zero_at_H_He_crossover = 1d-2
-      dq_D_mix_zero_at_H_C_crossover = 1d-2
 
 ! timesteps
+      limit_for_rel_error_in_energy_conservation = 1d-4
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 ! mesh
 
 ! solver
-      drag_coefficient = 99 ! drive v to 0 in H envelope after end core He burn
+      drag_coefficient = 99 ! 999999d0 ! drive v to 0 in H envelope after end core He burn
       turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls

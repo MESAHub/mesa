@@ -10,7 +10,6 @@
       required_termination_code_string = 'log_L_lower_limit'
 
       !pgstar_flag = .true.
-      pause_before_terminate = .true.
 
 / ! end of star_job namelist
 
