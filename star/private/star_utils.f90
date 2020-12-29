@@ -2516,10 +2516,6 @@
          end do
 
          s% Lrad_div_Ledd_avg_surf = Lrad_div_Ledd_sum/dmsum
-         if (s% generations > 2) & ! time average
-            s% Lrad_div_Ledd_avg_surf = &
-               0.5d0*(s% Lrad_div_Ledd_avg_surf + s% Lrad_div_Ledd_avg_surf_old)
-
          gamma_factor = 1d0 - min(s% Lrad_div_Ledd_avg_surf, 0.9999d0)
 
          tau = s% tau_factor*s% tau_base
@@ -2587,8 +2583,6 @@
             logRho_sum = logRho_sum + dm*s% lnd(k)/ln10
             kap_sum = kap_sum + dm*kap
             tau = tau + dtau
-            
-            
             if (tau >= s% surf_avg_tau) exit
 
          end do
@@ -3793,6 +3787,10 @@
          real(dp) :: sum_x, sum_dq
          integer :: k
          include 'formats'
+         if (j == 0) then
+            surface_avg_x = 0d0
+            return
+         end if
          sum_x = 0
          sum_dq = 0
          do k = 1, s% nz
@@ -3809,6 +3807,10 @@
          integer, intent(in) :: j
          real(dp) :: sum_x, sum_dq, dx, dq
          integer :: k
+         if (j == 0) then
+            center_avg_x = 0d0
+            return
+         end if
          sum_x = 0
          sum_dq = 0
          do k = s% nz, 1, -1

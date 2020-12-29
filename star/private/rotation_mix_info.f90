@@ -103,6 +103,9 @@
          s% omega_shear(1:nz) = 0
 
          if (all(s% omega(1:nz) == 0d0)) then
+            do k=1,nz
+               s% D_omega(k) = 0d0
+            end do
             return
          end if
 
@@ -230,6 +233,7 @@
 
          end do
 !$OMP END PARALLEL DO
+         if (failed('set_rotation_mixing_info instabilities', ierr)) return
          
          if (s% D_omega_flag .and. .not. s% doing_finish_load_model) then
                      
@@ -273,10 +277,23 @@
             if (s% smooth_D_omega > 0) then
                p_tmp(1:nz) => smooth_work(1:nz,1)
                call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, p_tmp)
+               do k=1,nz
+                  if (is_bad(s% D_omega(k))) then
+                     write(*,2) 'after smooth_for_rotation s% D_omega(k)', k, s% D_omega(k)
+                     stop 'rotation mix'
+                  end if
+               end do
             end if
             
-            if (s% D_omega_mixing_rate > 0d0 .and. s% dt > 0) &
+            if (s% D_omega_mixing_rate > 0d0 .and. s% dt > 0) then
                call mix_D_omega 
+               do k=1,nz
+                  if (is_bad(s% D_omega(k))) then
+                     write(*,2) 'after mix_D_omega s% D_omega(k)', k, s% D_omega(k)
+                     stop 'rotation mix'
+                  end if
+               end do
+            end if
             
          end if
          
@@ -285,6 +302,13 @@
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
          end if
+         
+         do k=1,nz
+            if (is_bad(s% D_omega(k))) then
+               write(*,2) 'before return s% D_omega(k)', k, s% D_omega(k)
+               stop 'rotation mix'
+            end if
+         end do
 
          call dealloc
 

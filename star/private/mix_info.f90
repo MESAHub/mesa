@@ -162,6 +162,8 @@
             end do
          end if
          
+         call check('after get mlt_D')
+         
          if (dbg) write(*,3) 'after copy mlt results', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
          
@@ -205,6 +207,8 @@
               if (failed('remove_embedded_semiconvection')) return
 
          end if
+         
+         call check('after get remove_mixing_glitches')
 
          if (dbg) write(*,3) 'call do_mix_envelope', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -235,6 +239,8 @@
             call add_predictive_mixing(s, ierr)
             if (failed('add_predictive_mixing')) return
          end if
+         
+         call check('after add_predictive_mixing')
 
          ! NB: re-call locate_convection_boundries to take into
          ! account changes from add_predictive_mixing
@@ -257,6 +263,8 @@
             call add_overshooting(s, ierr)
             if (failed('add_overshooting')) return
          end if
+         
+         call check('after add_overshooting')
 
          if (dbg) write(*,3) 'call add_RTI_turbulence', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -319,6 +327,8 @@
          do k=1,nz
             s% D_mix_non_rotation(k) = s% D_mix(k)
          end do
+         
+         call check('before rotation_flag')
 
          if (s% rotation_flag) then
 
@@ -332,6 +342,8 @@
             if (dbg) write(*,*) 'call update_rotation_mixing_info'
             call update_rotation_mixing_info(s,ierr)
             if (failed('update_rotation_mixing_info')) return
+         
+         call check('after update_rotation_mixing_info')
 
             do k = 2, nz
                if (s% D_mix(k) < 1d-10) s% D_mix(k) = 0d0
@@ -429,7 +441,7 @@
             s% conv_vel(1) = 0d0
          end if
 
-         call check
+         call check('final')
          if (failed('set_mixing_info')) return
 
          if (dbg) write(*,3) 'done mixing', k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -485,19 +497,15 @@
             if (ierr /= 0) return
          end subroutine do_work_arrays
 
-         subroutine check
+         subroutine check(str)
+            character(len=*) :: str
             integer :: k
             include 'formats'
             do k = 1, s% nz
-               !if (s% conv_vel(k) < 0d0 .or. &
-               !      (s% mixing_type(k) == 0 .and. s% conv_vel(k) > 0d0)) then
-               !   write(*,3) 'mixing_type conv_vel', k, s% mixing_type(k), s% conv_vel(k)
-               !   stop 'set mixing info'
-               !end if
                if (is_bad_num(s% D_mix(k))) then
                   ierr = -1
                   if (s% report_ierr) then
-                     write(*,3) 'mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
+                     write(*,3) trim(str) // ' mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
                      if (s% rotation_flag) then
                         if (is_bad_num(s% D_mix_non_rotation(k))) &
                            write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
@@ -1688,6 +1696,9 @@
                write(*,*) 'update_rotation_mixing_info failed in call to set_rotation_mixing_info'
             return
          end if
+         
+         call check('after set_rotation_mixing_info')
+         if (s% D_omega_flag) call check_D_omega('check_D_omega after set_rotation_mixing_info')
 
          ! include rotation part for mixing abundances
          full_on = s% D_mix_rotation_max_logT_full_on
@@ -1716,6 +1727,8 @@
             end if
             s% D_mix(k) = s% D_mix_non_rotation(k) + s% D_mix_rotation(k)
          end do
+         
+         call check('after include rotation part for mixing abundances')
 
          if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
             do k=2,nz
@@ -1844,6 +1857,59 @@
          end if
          
          contains
+
+         subroutine check(str)
+            character(len=*) :: str
+            integer :: k
+            include 'formats'
+            do k = 2, s% nz
+               if (is_bad_num(s% D_mix(k))) then
+                  ierr = -1
+                  if (s% report_ierr) then
+                     write(*,3) trim(str) // ' mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
+                     if (s% rotation_flag) then
+                        if (is_bad_num(s% D_mix_non_rotation(k))) &
+                           write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
+                        if (is_bad_num(s% D_visc(k))) write(*,2) 's% D_visc(k)', k, s% D_visc(k)
+                        if (is_bad_num(s% D_DSI(k))) write(*,2) 's% D_DSI(k)', k, s% D_DSI(k)
+                        if (is_bad_num(s% D_SH(k))) write(*,2) 's% D_SH(k)', k, s% D_SH(k)
+                        if (is_bad_num(s% D_SSI(k))) write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
+                        if (is_bad_num(s% D_ES(k))) write(*,2) 's% D_ES(k)', k, s% D_ES(k)
+                        if (is_bad_num(s% D_GSF(k))) write(*,2) 's% D_GSF(k)', k, s% D_GSF(k)
+                        if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
+                     end if
+                  end if
+                  if (s% stop_for_bad_nums) stop 'set mixing info'
+               end if
+            end do
+         end subroutine check
+
+         subroutine check_D_omega(str)
+            character(len=*) :: str
+            integer :: k
+            include 'formats'
+            do k = 2, s% nz
+               if (is_bad_num(s% D_omega(k))) then
+                  ierr = -1
+                  if (s% report_ierr) then
+                     write(*,3) trim(str) // ' mixing_type, D_omega', k, s% mixing_type(k), s% D_omega(k)
+                     write(*,*) 's% doing_finish_load_model', s% doing_finish_load_model
+                     if (s% rotation_flag) then
+                        if (is_bad_num(s% D_mix_non_rotation(k))) &
+                           write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
+                        if (is_bad_num(s% D_visc(k))) write(*,2) 's% D_visc(k)', k, s% D_visc(k)
+                        if (is_bad_num(s% D_DSI(k))) write(*,2) 's% D_DSI(k)', k, s% D_DSI(k)
+                        if (is_bad_num(s% D_SH(k))) write(*,2) 's% D_SH(k)', k, s% D_SH(k)
+                        if (is_bad_num(s% D_SSI(k))) write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
+                        if (is_bad_num(s% D_ES(k))) write(*,2) 's% D_ES(k)', k, s% D_ES(k)
+                        if (is_bad_num(s% D_GSF(k))) write(*,2) 's% D_GSF(k)', k, s% D_GSF(k)
+                        if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
+                     end if
+                  end if
+                  if (s% stop_for_bad_nums) stop 'set mixing info'
+               end if
+            end do
+         end subroutine check_D_omega
          
          subroutine set_am_nu_rot(ierr)
             use alloc

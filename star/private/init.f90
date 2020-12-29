@@ -344,15 +344,15 @@
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''
-         s% revised_net_name_old = ''
+!         s% revised_net_name_old = ''
 
          s% using_revised_max_yr_dt = .false.
          s% revised_max_yr_dt = 0
-         s% revised_max_yr_dt_old = 0
-
+!         s% revised_max_yr_dt_old = 0
+ 
          s% astero_using_revised_max_yr_dt = .false.
          s% astero_revised_max_yr_dt = 0
-         s% astero_revised_max_yr_dt_old = 0
+!         s% astero_revised_max_yr_dt_old = 0
 
          s% cumulative_energy_error = 0
          s% cumulative_energy_error_old = 0
@@ -384,7 +384,7 @@
          s% dt_why_retry_count(:) = 0
          
          s% min_kap_floor = 1d0
-         s% min_kap_floor_old = 1d0
+!         s% min_kap_floor_old = 1d0
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0
@@ -718,10 +718,10 @@
          s% time_old = 0
 
          s% total_radiation = 0
-         s% total_radiation_old = 0
+!         s% total_radiation_old = 0
 
          s% total_angular_momentum = 0
-         s% total_angular_momentum_old = 0
+!         s% total_angular_momentum_old = 0
 
          s% prev_create_atm_R0_div_R = 0
 
@@ -739,7 +739,7 @@
          s% mstar_dot_old = 0
 
          s% v_surf = 0
-         s% v_surf_old = 0
+!         s% v_surf_old = 0
 
          s% L_nuc_burn_total = 0
          s% L_nuc_burn_total_old = 0
@@ -757,26 +757,26 @@
          s% P_surf = 0
 
          s% h1_czb_mass = 0
-         s% h1_czb_mass_old = 0
+!         s% h1_czb_mass_old = 0
          s% h1_czb_mass_prev = 0
 
          s% he_core_mass = 0
-         s% he_core_mass_old = 0
+!         s% he_core_mass_old = 0
 
          s% c_core_mass = 0
-         s% c_core_mass_old = 0
+!         s% c_core_mass_old = 0
 
          s% Teff = -1 ! need to calculate it
          s% Teff_old = -1
 
          s% center_eps_nuc = 0
-         s% center_eps_nuc_old = 0
+!         s% center_eps_nuc_old = 0
 
          s% Lrad_div_Ledd_avg_surf = 0
-         s% Lrad_div_Ledd_avg_surf_old = 0
+!         s% Lrad_div_Ledd_avg_surf_old = 0
 
          s% w_div_w_crit_avg_surf = 0
-         s% w_div_w_crit_avg_surf_old = 0
+!         s% w_div_w_crit_avg_surf_old = 0
          
          s% total_internal_energy = 0d0
          s% total_gravitational_energy = 0d0
@@ -786,13 +786,13 @@
          s% total_energy = 0d0
 
          s% n_conv_regions = 0
-         s% n_conv_regions_old = 0
+!         s% n_conv_regions_old = 0
 
          s% cz_bot_mass(:) = 0
-         s% cz_bot_mass_old(:) = 0
+!         s% cz_bot_mass_old(:) = 0
 
          s% cz_top_mass(:) = 0
-         s% cz_top_mass_old(:) = 0
+!         s% cz_top_mass_old(:) = 0
 
          s% dt_next = 0
 

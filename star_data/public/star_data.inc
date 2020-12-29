@@ -129,7 +129,6 @@
       ! chem variables, if any, follow the structure variables
          integer :: i_chem1 ! index of the first chem variable (0 means no chem variables)
             ! if i_chem1 /= 0, then i_chem1 == nvar_hydro + 1
-         integer :: i_dchem1 ! index of the first delta chem variable (0 means no delta chem variables)
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r
@@ -144,12 +143,10 @@
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
          integer :: i_deturb_dt ! turbulent energy equation. only when Eturb_flag is true.
-
          
       ! chem equations follow the structure equations
          integer :: equchem1 ! index of the first chem equation (0 means no chem equations)
             ! if equchem1 /= 0, then equchem1 == nvar_hydro + 1
-         integer :: equdchem1 ! index of the first delta chem equation (0 means no delta chem equations)
 
       ! tau surface
          real(dp) :: tau_base, tau_factor
@@ -949,13 +946,13 @@
       real(dp) :: L_nuc_burn_total, L_by_category(num_categories)
       real(dp) :: L_nuc_burn_total_old, L_by_category_old(num_categories)
    
-      real(dp) :: power_nuc_burn, power_nuc_burn_old
-      real(dp) :: power_nuc_neutrinos, power_nuc_neutrinos_old
-      real(dp) :: power_nonnuc_neutrinos, power_nonnuc_neutrinos_old
-      real(dp) :: power_neutrinos, power_neutrinos_old
-      real(dp) :: power_h_burn, power_h_burn_old
-      real(dp) :: power_he_burn, power_he_burn_old
-      real(dp) :: power_z_burn, power_z_burn_old
+      real(dp) :: power_nuc_burn , power_nuc_burn_old
+      real(dp) :: power_nuc_neutrinos , power_nuc_neutrinos_old
+      real(dp) :: power_nonnuc_neutrinos , power_nonnuc_neutrinos_old
+      real(dp) :: power_neutrinos , power_neutrinos_old
+      real(dp) :: power_h_burn , power_h_burn_old
+      real(dp) :: power_he_burn , power_he_burn_old
+      real(dp) :: power_z_burn , power_z_burn_old
       
       ! power for each category
       real(dp) :: power_PP
@@ -1471,7 +1468,7 @@
          integer :: bad_max_corr_cnt
          integer :: timestep_hold
 !         integer :: model_number_for_last_jacobian
-         integer :: model_number_for_last_retry, model_number_for_last_retry_old
+         integer :: model_number_for_last_retry !, model_number_for_last_retry_old
          integer :: mesh_call_number
          integer :: burn_and_mix_call_number
          integer :: solver_call_number
@@ -1486,7 +1483,7 @@
          logical :: just_wrote_terminal_header
          logical :: doing_first_model_of_run
          logical :: doing_first_model_after_restart
-         logical :: was_in_implicit_wind_limit, was_in_implicit_wind_limit_old
+         logical :: was_in_implicit_wind_limit !, was_in_implicit_wind_limit_old
          integer :: result_reason
 
          real(dp) :: h1_czb_mass_prev ! set in finish_step.
@@ -1588,7 +1585,6 @@
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          integer :: burn_nstep_max, burn_nfcn_total
          real(dp) :: dVARdot_dVAR
-         real(dp) :: surf_accel_grav_ratio
          logical :: have_mixing_info
          logical :: doing_solver_iterations
          logical :: doing_flash_wind, doing_rlo_wind, doing_nova_wind
@@ -1608,11 +1604,11 @@
          
          logical :: using_revised_max_yr_dt
          real(dp) :: revised_max_yr_dt
-         real(dp) :: revised_max_yr_dt_old
+!         real(dp) :: revised_max_yr_dt_old
          
          logical :: astero_using_revised_max_yr_dt
          real(dp) :: astero_revised_max_yr_dt
-         real(dp) :: astero_revised_max_yr_dt_old
+!         real(dp) :: astero_revised_max_yr_dt_old
 
          integer :: binary_id        
          logical :: include_binary_history_in_log_file
@@ -1626,25 +1622,25 @@
          real(dp) :: dt_limit_ratio_old
       
          ! surface info
-         real(dp) :: v_surf_old ! (cm/second)
          real(dp) :: L_surf_old ! surface luminosity (Lsun units)
          real(dp) :: L_phot_old ! photosphere luminosity (Lsun units)
-         real(dp) :: Lrad_div_Ledd_avg_surf_old
-         real(dp) :: w_div_w_crit_avg_surf_old
+!         real(dp) :: Lrad_div_Ledd_avg_surf_old
+!         real(dp) :: w_div_w_crit_avg_surf_old
+!         real(dp) :: v_surf_old ! (cm/second)
          
          ! convection regions
-         integer :: n_conv_regions_old
-         real(dp), dimension(max_num_mixing_regions) :: &
-            cz_bot_mass_old, cz_top_mass_old
+!         integer :: n_conv_regions_old
+!         real(dp), dimension(max_num_mixing_regions) :: &
+!            cz_bot_mass_old, cz_top_mass_old
          
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 
-         real(dp) :: total_angular_momentum_old
-         real(dp) :: h1_czb_mass_old ! baryonic (Msun)
-         real(dp) :: he_core_mass_old
-         real(dp) :: c_core_mass_old
+!         real(dp) :: total_angular_momentum_old
+!         real(dp) :: h1_czb_mass_old ! baryonic (Msun)
+!         real(dp) :: he_core_mass_old
+!         real(dp) :: c_core_mass_old
+!         real(dp) :: center_eps_nuc_old
          real(dp) :: Teff_old
-         real(dp) :: center_eps_nuc_old
 
          ! For eps_mdot  (source term only used when mdot /= 0)
          real(dp), pointer, dimension(:) :: eps_mdot
@@ -1659,12 +1655,12 @@
             
          real(dp) :: &
             
-            total_internal_energy_old, &
             total_gravitational_energy_old, &
             total_radial_kinetic_energy_old, &
             total_turbulent_energy_old, &
             total_rotational_kinetic_energy_old, &
             total_energy_old, &
+            total_internal_energy_old, &
          
             total_internal_energy_before_adjust_mass, &
             total_gravitational_energy_before_adjust_mass, &
@@ -1722,16 +1718,16 @@
             total_extra_heating, &
             error_in_energy_conservation, &
             cumulative_energy_error, &
+            cumulative_energy_error_old, &
             cumulative_extra_heating, &
+            cumulative_extra_heating_old, &
             log_P_center, &
             min_kap_floor
          
-         real(dp) :: &
-            min_kap_floor_old, &
-            log_P_center_old, &
-            cumulative_energy_error_old, &
-            cumulative_extra_heating_old, &
-            total_radiation_old
+!         real(dp) :: &
+!            min_kap_floor_old, &
+!            log_P_center_old, &
+!            total_radiation_old
             
          real(dp) :: mesh_adjust_IE_conservation
          real(dp) :: mesh_adjust_PE_conservation
@@ -1750,7 +1746,7 @@
          
          logical :: using_revised_net_name
          character (len=net_name_len) :: revised_net_name
-         character (len=net_name_len) :: revised_net_name_old
+!         character (len=net_name_len) :: revised_net_name_old
                   
          integer :: num_extra_profile_cols
          character (len=80), pointer :: extra_profile_col_names(:)

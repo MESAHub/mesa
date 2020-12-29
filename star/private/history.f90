@@ -1882,10 +1882,6 @@
                   val = 0d0 ! s% r(1)*s% dlnR_dt(1)
                end if
 
-            case(h_surface_accel_div_grav)
-               if (s% dt > 0 .and. s% generations > 1) then
-                  val = (v_surf - s% v_surf_old)/(s% dt*s% grav(1))
-               end if
             case(h_log_L_div_Ledd)
                Ledd = eval_Ledd(s, ierr)
                if (ierr /= 0 .or. Ledd == 0d0) then

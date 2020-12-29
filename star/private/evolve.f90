@@ -80,43 +80,46 @@
             use utils_lib, only: set_to_NaN
             integer :: j
             include 'formats'
-            call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% time_old)
+            call set_to_NaN(s% dt_old)
             call set_to_NaN(s% mstar_old)
             call set_to_NaN(s% xmstar_old)
             call set_to_NaN(s% M_center_old)
-            call set_to_NaN(s% v_center_old)
             call set_to_NaN(s% R_center_old)
             call set_to_NaN(s% L_center_old)
-            call set_to_NaN(s% total_radiation_old)
-            call set_to_NaN(s% min_kap_floor_old)
-            call set_to_NaN(s% total_angular_momentum_old)
-            call set_to_NaN(s% dt_old)
-            call set_to_NaN(s% revised_max_yr_dt_old)
-            call set_to_NaN(s% astero_revised_max_yr_dt_old)
-            call set_to_NaN(s% total_internal_energy_old)
-            call set_to_NaN(s% total_gravitational_energy_old)
-            call set_to_NaN(s% total_radial_kinetic_energy_old)
-            call set_to_NaN(s% total_turbulent_energy_old)
-            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+            call set_to_NaN(s% v_center_old)
+            call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% total_energy_old)
+            call set_to_NaN(s% Teff_old)
             call set_to_NaN(s% mstar_dot_old)
-            call set_to_NaN(s% v_surf_old)
-            call set_to_NaN(s% dt_limit_ratio_old)
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf_old)
-            call set_to_NaN(s% h1_czb_mass_old)
-            call set_to_NaN(s% h1_czb_mass_prev)
-            call set_to_NaN(s% he_core_mass_old)
-            call set_to_NaN(s% c_core_mass_old)
-            call set_to_NaN(s% Teff_old)
-            call set_to_NaN(s% center_eps_nuc_old)
-            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
-            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
-            do j=1,max_num_mixing_regions
-               call set_to_NaN(s% cz_top_mass_old(j))
-               call set_to_NaN(s% cz_bot_mass_old(j))
-            end do            
+            call set_to_NaN(s% dt_limit_ratio_old)
+            
+            
+!            call set_to_NaN(s% total_radiation_old)
+!            call set_to_NaN(s% min_kap_floor_old)
+!            call set_to_NaN(s% total_angular_momentum_old)
+!            call set_to_NaN(s% revised_max_yr_dt_old)
+!            call set_to_NaN(s% astero_revised_max_yr_dt_old)
+!            call set_to_NaN(s% total_internal_energy_old)
+!            call set_to_NaN(s% total_gravitational_energy_old)
+!            call set_to_NaN(s% total_radial_kinetic_energy_old)
+!            call set_to_NaN(s% total_turbulent_energy_old)
+!            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+!            call set_to_NaN(s% v_surf_old)
+!            call set_to_NaN(s% h1_czb_mass_old)
+!            call set_to_NaN(s% h1_czb_mass_prev)
+!            call set_to_NaN(s% he_core_mass_old)
+!            call set_to_NaN(s% c_core_mass_old)
+!            call set_to_NaN(s% center_eps_nuc_old)
+!            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
+!            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
+!            do j=1,max_num_mixing_regions
+!               call set_to_NaN(s% cz_top_mass_old(j))
+!               call set_to_NaN(s% cz_bot_mass_old(j))
+!            end do            
+            
          end subroutine test_old
          
       end function do_evolve_step_part1
@@ -1582,13 +1585,6 @@
          s% surf_rho = s% rho(1)
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
-
-         if (s% generations == 1 .or. s% zero_gravity .or. s%dt == 0d0) then
-            s% surf_accel_grav_ratio = 0
-         else
-            s% surf_accel_grav_ratio = &
-               (s% v_surf - s% v_surf_old)/(s% dt*s% grav(1))
-         end if
          
          if (.not. (s% RSP_flag .or. s% Eturb_flag)) then
             call set_gradT_excess_alpha(s, ierr)

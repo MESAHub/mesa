@@ -1072,20 +1072,6 @@
     log_center_temp_lower_limit = -1d99
 
 
-      ! surface_accel_div_grav_limit = -1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! This is used when do not have a velocity variable.
-      ! The acceleration ratio is ``abs(accel)/grav`` at surface,
-      ! where accel is ``(rdot-rdot_old)/dt`` and grav is ``G*m/r^2``.
-      ! Stop if the ratio becomes larger than this limit.
-      ! Ignored if <= 0.
-
-      ! ::
-
-    surface_accel_div_grav_limit = -1
-
-
       ! log_max_temp_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 

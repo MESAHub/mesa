@@ -79,7 +79,7 @@
     stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS, &
     peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit, delta_nu_lower_limit, &
     delta_nu_upper_limit, delta_Pg_lower_limit, delta_Pg_upper_limit, shock_mass_upper_limit, &
-    mach1_mass_upper_limit, stop_when_reach_this_cumulative_extra_heating, surface_accel_div_grav_limit, &
+    mach1_mass_upper_limit, stop_when_reach_this_cumulative_extra_heating, &
     xa_central_lower_limit_species, xa_central_lower_limit, xa_central_upper_limit_species, xa_central_upper_limit, &
     xa_surface_lower_limit_species, xa_surface_lower_limit, xa_surface_upper_limit_species, xa_surface_upper_limit, &
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
@@ -872,8 +872,6 @@
  s% shock_mass_upper_limit = shock_mass_upper_limit
  s% mach1_mass_upper_limit = mach1_mass_upper_limit
  s% stop_when_reach_this_cumulative_extra_heating = stop_when_reach_this_cumulative_extra_heating
-
- s% surface_accel_div_grav_limit = surface_accel_div_grav_limit
 
  s% xa_central_lower_limit_species = xa_central_lower_limit_species
  s% xa_central_lower_limit = xa_central_lower_limit
@@ -2576,8 +2574,6 @@
  shock_mass_upper_limit = s% shock_mass_upper_limit
  mach1_mass_upper_limit = s% mach1_mass_upper_limit
  stop_when_reach_this_cumulative_extra_heating = s% stop_when_reach_this_cumulative_extra_heating
-
- surface_accel_div_grav_limit = s% surface_accel_div_grav_limit
 
  xa_central_lower_limit_species = s% xa_central_lower_limit_species
  xa_central_lower_limit = s% xa_central_lower_limit

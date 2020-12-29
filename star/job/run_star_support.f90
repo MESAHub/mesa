@@ -1183,7 +1183,8 @@
          if (s% model_number == s% job% save_photo_number) then
             call star_write_photo(id, s% job% save_photo_filename, ierr)
             if (failed('star_write_photo',ierr)) return
-            write(*, *) 'photo saved to ' // trim(s% job% save_photo_filename)
+            if (len_trim(s% job% save_photo_filename) > 0) &
+               write(*, *) 'photo saved to ' // trim(s% job% save_photo_filename)
          end if
          
          if (s% model_number == s% job% save_pulse_data_for_model_number) then
