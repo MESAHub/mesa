@@ -997,7 +997,7 @@
             D_ES_factor, D_GSF_factor, D_ST_factor
 
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
-            smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST
+            smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
 
          real(dp) :: angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, &
             angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, angsmt_nu_ST

@@ -291,7 +291,7 @@
     am_nu_omega_rot_factor, am_nu_omega_non_rot_factor, am_nu_j_rot_factor, am_nu_j_non_rot_factor, &
     smooth_nu_ST, smooth_D_ST, smooth_D_SH, smooth_D_DSI, smooth_D_ES, smooth_D_SSI, smooth_D_GSF, &
     angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, &
-    angsmt_nu_ST, angsml, am_time_average, simple_i_rot_flag, &
+    angsmt_nu_ST, angsml, am_time_average, simple_i_rot_flag, smooth_am_nu_rot, smooth_D_omega, &
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
     recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
@@ -1708,6 +1708,8 @@
  s% smooth_D_SH = smooth_D_SH
  s% smooth_D_GSF = smooth_D_GSF
  s% smooth_D_ES = smooth_D_ES
+ s% smooth_D_omega = smooth_D_omega
+ s% smooth_am_nu_rot = smooth_am_nu_rot
 
  s% angsmt_D_DSI = angsmt_D_DSI
  s% angsmt_D_SH = angsmt_D_SH
@@ -3420,6 +3422,8 @@
  smooth_D_SH = s% smooth_D_SH
  smooth_D_GSF = s% smooth_D_GSF
  smooth_D_ES = s% smooth_D_ES
+ smooth_D_omega = s% smooth_D_omega
+ smooth_am_nu_rot = s% smooth_am_nu_rot
 
  angsmt_D_DSI = s% angsmt_D_DSI
  angsmt_D_SH = s% angsmt_D_SH

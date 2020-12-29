@@ -3847,6 +3847,8 @@
     smooth_D_GSF = 0
     smooth_D_ST = 3
     smooth_nu_ST = 3
+    smooth_D_omega = 3
+    smooth_am_nu_rot = 3
 
       ! time smoothing.
       ! Set to 0 to turn off time smoothing.
