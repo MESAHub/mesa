@@ -70,7 +70,7 @@ briefly summarize these, including appropriate citations.
   Radiative opacities are primarily from OPAL \citep{Iglesias1993,
   Iglesias1996}, with low-temperature data from \citet{Ferguson2005}
   and the high-temperature, Compton-scattering dominated regime by
-  \citet{Buchler1976}.  Electron conduction opacities are from
+  \citet{Poutanen2017}.  Electron conduction opacities are from
   \citet{Cassisi2007}.
   
   Nuclear reaction rates are from JINA REACLIB \citep{Cyburt2010} plus
