@@ -2144,8 +2144,6 @@
 
          nz = s% nz
          trace = s% trace_evolve
-
-         s% h1_czb_mass_prev = s% h1_czb_mass
          prev_num_iounits_in_use = number_iounits_allocated()
 
          finish_step = keep_going

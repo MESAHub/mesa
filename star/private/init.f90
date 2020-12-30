@@ -311,7 +311,6 @@
          s% time_nonburn_net = 0
          s% time_mlt = 0
          s% time_set_hydro_vars = 0
-
          s% time_total = 0
 
          s% timing_num_get_eos_calls = 0
@@ -757,8 +756,6 @@
          s% P_surf = 0
 
          s% h1_czb_mass = 0
-!         s% h1_czb_mass_old = 0
-         s% h1_czb_mass_prev = 0
 
          s% he_core_mass = 0
 !         s% he_core_mass_old = 0
