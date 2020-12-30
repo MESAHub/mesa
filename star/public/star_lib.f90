@@ -2250,12 +2250,14 @@
       subroutine star_get_kap( &
             id, k, zbar, xa, logRho, logT, &
             lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
+            eta, deta_dlnRho, deta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2, ierr)
          use kap_support, only: get_kap, fraction_of_op_mono
          integer, intent(in) :: id
          integer, intent(in) :: k
          real(dp), intent(in) :: zbar, logRho, logT, &
-            lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT
+            lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
+            eta, deta_dlnRho, deta_dlnT
          real(dp), intent(in), pointer :: xa(:)
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2
          integer, intent(out) :: ierr
@@ -2266,6 +2268,7 @@
          call get_kap( &
             s, k, zbar, xa, logRho, logT, &
             lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
+            eta, deta_dlnRho, deta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2, ierr)
        end subroutine star_get_kap
        

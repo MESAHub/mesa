@@ -33,8 +33,6 @@
       private
       public :: build_pre_ms_model
 
-      integer, parameter :: nmet = 5
-         
       logical, parameter :: dbg = .false.
 
       contains
@@ -54,14 +52,14 @@
          real(dp) :: &
             initial_z, x, y, z, xa(species), mstar, mstar1, lgM, rstar, rho_c, &
             abar, zbar, z53bar, mass_correction, z2bar, ye, sumx, &
-            lgL, eps_grav, metals(nmet), lnd, dlnd, lnd1, lnd3, y1, y3, epsx, epsy, &
+            lgL, eps_grav, lnd, dlnd, lnd1, lnd3, y1, y3, epsx, epsy, &
             T_c, guess_rho_c, d_log10_P
          integer :: i, j, k, nz, pre_ms_lrpar
          real(dp), pointer :: xh(:,:), q(:), dq(:)
          integer, parameter :: pre_ms_lipar = 1, imax = 100, rpar_init = 8
          integer, target :: ipar_ary(pre_ms_lipar)
          integer, pointer :: ipar(:)
-         real(dp), target :: rpar_ary(rpar_init+nmet+species) ! (pre_ms_lrpar)
+         real(dp), target :: rpar_ary(rpar_init+species) ! (pre_ms_lrpar)
          real(dp), pointer :: rpar(:)
          real(dp) :: mu_eff ! effective mean molecular weight for gas particles
          real(dp) :: initial_y, initial_h1, initial_h2, initial_he3, initial_he4, &
@@ -74,7 +72,7 @@
          ipar => ipar_ary
          rpar => rpar_ary
          
-         pre_ms_lrpar = rpar_init+nmet+species
+         pre_ms_lrpar = rpar_init+species
          
          if (nvar_hydro > 4) then
             write(*,*) 'sorry, build_pre_ms_model only supports the basic 4 vars.'
@@ -158,8 +156,6 @@
          mu_eff = 4 / (3 + 5*x) 
             ! estimate mu_eff assuming complete ionization and Z << 1
             
-         call set_metals ! for opacities
- 
          guess_rho_c = s% pre_ms_guess_rho_c
          if (guess_rho_c <= 0) then ! use n=3/2 polytrope
             rstar = Rsun*7.41d6*(mu_eff/0.6d0)*(mstar/Msun)/T_c ! Ushomirsky et al, 6
@@ -209,7 +205,6 @@
          rpar(i+1) = d_log10_P; i = i+1
          
          rpar(i+1:i+species) = xa(1:species); i = i+species
-         rpar(i+1:i+nmet) = metals(1:nmet); i = i+nmet
          
          if (i /= pre_ms_lrpar) then
             write(*,*) 'i /= pre_ms_lrpar', i, pre_ms_lrpar
@@ -297,16 +292,6 @@
          
          contains
          
-         subroutine set_metals ! for opacities
-            real(dp) :: xc, xn, xo, xne, xheavy
-            xc = xa(s% net_iso(ic12))
-            xn = xa(s% net_iso(in14))
-            xo = xa(s% net_iso(io16))
-            xne = xa(s% net_iso(ine20))
-            xheavy = initial_z - (xc + xn + xo + xne)
-            metals(:) = (/ xc, xn, xo, xne, xheavy /)
-         end subroutine set_metals
-         
          subroutine dealloc
             deallocate(xh, q, dq)
          end subroutine dealloc
@@ -324,7 +309,7 @@
                  
          type (star_info), pointer :: s
          real(dp) :: rho_c, T_c, eps_grav, x, z, abar, zbar, d_log10_P
-         real(dp), pointer :: xa(:), metals(:)
+         real(dp), pointer :: xa(:)
          integer :: i, nz, species
          real(dp) :: mstar, mstar1
          
@@ -361,7 +346,6 @@
          zbar = rpar(i+1); i = i+1
          d_log10_P = rpar(i+1); i = i+1
          xa => rpar(i+1:i+species); i = i+species
-         metals => rpar(i+1:i+nmet); i = i+nmet
          if (i > lrpar) then
             write(*,*) 'i > lrpar', i, lrpar
             write(*,*) 'pre_ms f'
@@ -428,6 +412,7 @@
             d_eos_dabar(num_eos_basic_results), d_eos_dzbar(num_eos_basic_results), &
             dres_dxa(num_eos_basic_results,s% species), &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             cgrav, r, rmid, rho, logRho, T, lnT, L, P, P0, dm, m0, L0, r0, lnT0, T0, &
             rho0, rho_mid, Pmid, chiRho0, chiRho_mid, chiT0, chiT_mid, Cp0, Cp_mid, &
             grada0, grada_mid, mmid, Tmid, Lmid, &
@@ -514,6 +499,7 @@
                s, zbar, x, y, xa, rho, m, mstar, r, T, lnT, L, P, &
                chiRho, chiT, Cp, grada, &
                lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+               eta, d_eta_dlnRho, d_eta_dlnT, &
                gradT, ierr )
             if (ierr /= 0) return
          
@@ -600,6 +586,7 @@
                         s, zbar, x, y, xa, rho_mid, mmid, mstar, rmid, Tmid, log(Tmid), Lmid, Pmid, &
                         chiRho_mid, chiT_mid, Cp_mid, grada_mid, &
                         lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                        eta, d_eta_dlnRho, d_eta_dlnT, &
                         gradT, ierr )
                      if (ierr /= 0) return
                      T = T0 + Tmid*gradT*(P-P0)/Pmid
@@ -690,6 +677,9 @@
             lnfree_e = res(i_lnfree_e)
             d_lnfree_e_dlnRho = d_eos_dlnd(i_lnfree_e)
             d_lnfree_e_dlnT = d_eos_dlnT(i_lnfree_e)
+            eta = res(i_eta)
+            d_eta_dlnRho = d_eos_dlnd(i_eta)
+            d_eta_dlnT = d_eos_dlnT(i_eta)
          end subroutine unpack_eos_results
          
 
@@ -700,24 +690,27 @@
             s, zbar, x, y, xa, rho, m, mstar, r, T, lnT, L, P, &
             chiRho, chiT, Cp, grada, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             gradT, ierr )
          use chem_def, only: ih1
          use mlt_info, only: do1_mlt_eval
+         use kap_def, only : num_kap_fracs
          use kap_lib, only : kap_get
 
          type (star_info), pointer :: s
          real(dp), intent(in) :: &
             zbar, x, y, xa(:), rho, m, mstar, r, T, lnT, L, P, &
             chiRho, chiT, Cp, grada, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(out) :: gradT
          integer, intent(out) :: ierr
 
-         real(dp) :: Z, XC, XN, XO, XNe, frac_Type2
          
          real(dp) :: &
             cgrav, opacity, dlnkap_dlnd, dlnkap_dlnT, Cv, csound, &
             prev_conv_vel, max_conv_vel, dt, gradL_composition_term, tau
+         real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
          integer :: mixing_type
          real(dp) :: mlt_basics(num_mlt_results)
          real(dp), target :: mlt_partials1_ary(num_mlt_partials*num_mlt_results)
@@ -752,17 +745,12 @@
             dlnkap_dlnT = 0
          else
 
-            ! this can be improved
-            Z = 1-X-Y
-            XC = 0
-            XN = 0
-            XO = 0
-            XNe = 0
-
             call kap_get( &
-                 s% kap_handle, zbar, X, Z, XC, XN, XO, XNe, log10(Rho), lnT/ln10, &
+                 s% kap_handle, s% species, s% chem_id, s% net_iso, xa, &
+                 log10(Rho), lnT/ln10, &
                  lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                 frac_Type2, opacity, dlnkap_dlnd, dlnkap_dlnT, ierr)
+                 eta, d_eta_dlnRho, d_eta_dlnT, &
+                 kap_fracs, opacity, dlnkap_dlnd, dlnkap_dlnT, dlnkap_dxa, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in kap_get in eval_gradT'
                return
