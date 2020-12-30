@@ -777,140 +777,81 @@
 
       subroutine Compton_Opacity( &
             Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            eta_in, d_eta_in_dlnRho, d_eta_in_dlnT, &
+            eta_in, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use eos_lib
          use eos_def
          use const_def
+         use auto_diff
 
-         ! same as Thompson at low T and low RHO.
-         ! high T and high degeneracy both lengthen mean free path and thus decrease opacity.
-         ! formula for approximating this effect from Buchler & Yueh, 1976, Apj, 210:440-446.
-
-         ! this approximation breaks down for high degeneracy (eta > 4), but
-         ! by then conduction should be dominant anyway, so things should be okay.
+         ! evaluates the poutanen 2017, apj 835, 119 fitting formula for the compton opacity.
+         ! coefficients from table 1 between 2 and 300 kev
 
          real(dp), intent(in) :: Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-         real(dp), intent(in) :: eta_in, d_eta_in_dlnRho, d_eta_in_dlnT
+         real(dp), intent(in) :: eta_in, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr
          
-         real(dp) :: T, rho, edensity, efermi, eta, psi, psi2, Gbar_inverse, kT_mc2, free_e, tmp, &
-            d_free_e_dlnRho, d_free_e_dlnT, d_edensity_dlnRho, d_edensity_dlnT, &
-            edensity_one_third, d_efermi_dlnRho, d_efermi_dlnT, d_kT_mc2_dlnT, &
-            d_eta_dlnRho, d_eta_dlnT, &
-            d_psi_dlnRho, d_psi_dlnT, d_psi2_dlnRho, d_psi2_dlnT, &
-            d_Gbar_inverse_dlnRho, d_Gbar_inverse_dlnT
-         real(dp), parameter :: rho_limit = 5d7
-         real(dp), parameter :: T_limit = 2d10
-         real(dp), parameter :: pow_3o8pi = 0.242430689510993d0 ! pow(3/(8*pi),2d0/3d0)
-         
-         logical :: hit_rho_limit, hit_T_limit
+         type(auto_diff_real_2var_order1) :: T, rho, free_e, eta, kap_auto
+         type(auto_diff_real_2var_order1) :: zeta, f1, f2, f3, alpha, tbr, theta, tkev, mfp
+
+         real(dp) :: free_e_val
+
+         ! poutanen table 1
+         real(dp), parameter :: &
+            t0     =  43.3d0, &
+            alpha0 =  0.885d0, &
+            c01    =  0.682d0, &
+            c02    = -0.0454d0, &
+            c11    =  0.240d0, &
+            c12    =  0.0043d0, &
+            c21    =  0.050d0, &
+            c22    = -0.0067d0, &
+            c31    = -0.037d0, &
+            c32    =  0.0031d0
          
          include 'formats.dek'
          
-         
-         
-         
-         
-         ! NOTE: to get correct numerical estimates need to call eos to get new free_e when change lnd/lnT
-         
-         
-         
-         
-         
          ierr = 0
-         free_e = exp(lnfree_e)
-         d_free_e_dlnRho = free_e*d_lnfree_e_dlnRho
-         d_free_e_dlnT = free_e*d_lnfree_e_dlnT
+
+         ! set up auto diff
+         ! var1: Rho
+         ! var2: T
          
+         Rho = Rho_in
+         Rho% d1val1 = 1d0
+         Rho% d1val2 = 0d0
+
          T = T_in
-         hit_T_limit = (T > T_limit)
-         if (hit_T_limit) T = T_limit
-         rho = rho_in
-         hit_rho_limit = (rho > rho_limit)
-         if (hit_rho_limit) rho = rho_limit
+         T% d1val1 = 0d0
+         T% d1val2 = 1d0
 
-         edensity = free_e*rho/amu
-         if (edensity <= 0) then
-            ierr = -1; return
-         end if
-         d_edensity_dlnRho = d_free_e_dlnRho*rho/amu + edensity
-         d_edensity_dlnT = d_free_e_dlnT*rho/amu
-         
-         tmp = planck_h*planck_h/(2d0*me)*pow_3o8pi
-         edensity_one_third = pow(edensity,1d0/3d0)
-         efermi = tmp*edensity_one_third*edensity_one_third
-         d_efermi_dlnRho = (2d0/3d0)*tmp*d_edensity_dlnRho/edensity_one_third
-         d_efermi_dlnT = (2d0/3d0)*tmp*d_edensity_dlnT/edensity_one_third
-         
-         kT_mc2 = T * (kerg / (me * clight*clight))
-         d_kT_mc2_dlnT = kT_mc2
+         free_e_val = exp(lnfree_e)
+         free_e = free_e_val
+         free_e % d1val1 = free_e_val*d_lnfree_e_dlnRho/Rho_in
+         free_e % d1val2 = free_e_val*d_lnfree_e_dlnT/T_in
 
-         eta = (efermi - me*clight*clight)/(kerg*T)
-         d_eta_dlnRho = d_efermi_dlnRho/(kerg*T)
-         d_eta_dlnT = d_efermi_dlnT/(kerg*T) - eta
+         eta = eta_in
+         eta % d1val1 = d_eta_dlnRho/Rho_in
+         eta % d1val2 = d_eta_dlnT/T_in
 
-         if (eta > 4d0) then
-            eta = 4d0
-            d_eta_dlnRho = 0d0
-            d_eta_dlnT = 0d0
-         else if (eta < -10d0) then  
-            eta = -10
-            d_eta_dlnRho = 0d0
-            d_eta_dlnT = 0d0
-         end if
+         theta = T * kerg / (me * clight * clight)
+         tkev  = T * kev * 1.0d-3
+         zeta  = exp(c01 * eta + c02 * eta*eta)
+         f1    = 1.0d0 + c11 * zeta + c12 * zeta * zeta
+         f2    = 1.0d0 + c21 * zeta + c22 * zeta * zeta
+         f3    = 1.0d0 + c31 * zeta + c32 * zeta * zeta
+         alpha = alpha0 * f3
+         tbr   = t0 * f2
+         mfp   = f1 * (1.0d0 + pow(tkev/tbr,alpha))
 
-         psi = exp(eta*(0.8168d0 - eta*0.05522d0)) ! coefficients from B&Y
-         d_psi_dlnRho = psi*(0.8168d0 - 2*0.05522d0*eta)*d_eta_dlnRho
-         d_psi_dlnT = psi*(0.8168d0 - 2*0.05522d0*eta)*d_eta_dlnT
-         
-         psi2 = psi*psi
-         d_psi2_dlnRho = 2d0*psi*d_psi_dlnRho
-         d_psi2_dlnT = 2d0*psi*d_psi_dlnT
+         ! equation 31
+         kap_auto = sige*(free_e/amu)/mfp
 
-         ! formula for Gbar_inverse from B&Y (incorrectly given as Gbar in their paper!)
-         Gbar_inverse = &
-            1.129d0+0.2965d0*psi-0.005594d0*psi2 &
-            +(11.47d0+0.3570d0*psi+0.1078d0*psi2)*kT_mc2 &
-            +(0.1678d0*psi-3.249d0-0.04706d0*psi2)*kT_mc2*kT_mc2
-            
-         d_Gbar_inverse_dlnRho = &
-            0.2965d0*d_psi_dlnRho-0.005594d0*d_psi2_dlnRho &
-            +(0.3570d0*d_psi_dlnRho+0.1078d0*d_psi2_dlnRho)*kT_mc2 &
-            +(0.1678d0*d_psi_dlnRho-0.04706d0*d_psi2_dlnRho)*kT_mc2*kT_mc2
-            
-         d_Gbar_inverse_dlnT = &
-            0.2965d0*d_psi_dlnT-0.005594d0*d_psi2_dlnT &
-            +(0.3570d0*d_psi_dlnT+0.1078d0*d_psi2_dlnT)*kT_mc2 &
-            +(0.1678d0*d_psi_dlnT-0.04706d0*d_psi2_dlnT)*kT_mc2*kT_mc2 &
-            +(11.47d0+0.3570d0*psi+0.1078d0*psi2)*d_kT_mc2_dlnT &
-            +(0.1678d0*psi-3.249d0-0.04706d0*psi2)*2d0*kT_mc2*d_kT_mc2_dlnT
-         
-         kap = sige*edensity/(rho*Gbar_inverse)
-         
-         if (kap <= 0.0d0) then
-            write(*,*) 'lnfree_e', lnfree_e
-            write(*,*) 'Rho', Rho
-            write(*,*) 'T', T
-            write(*,*) 'edensity', edensity
-            write(*,*) 'efermi', efermi
-            write(*,*) 'sige', sige
-            write(*,*) 'Gbar_inverse', Gbar_inverse
-            write(*,*) 'eta',eta
-            write(*,*) 'psi', psi
-            write(*,*) 'bad compton kap', kap
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         dlnkap_dlnRho = &
-            d_edensity_dlnRho/edensity - d_Gbar_inverse_dlnRho/Gbar_inverse - 1d0
-            
-         dlnkap_dlnT = &
-            d_edensity_dlnT/edensity - d_Gbar_inverse_dlnT/Gbar_inverse
-            
-         if (hit_rho_limit) dlnkap_dlnRho = 0d0
-         if (hit_T_limit) dlnkap_dlnT = 0d0
+         ! unpack auto_diff
+         kap = kap_auto% val
+         dlnkap_dlnRho = Rho% val * kap_auto% d1val1 / kap
+         dlnkap_dlnT = T% val * kap_auto% d1val2 / kap
          
       end subroutine Compton_Opacity
 
