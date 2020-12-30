@@ -52,7 +52,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (first_try .and. s% fill_arrays_with_NaNs) then
+         if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
             call test_old
             !write(*,2) 'fill_star_info_arrays_with_NaNs', s% model_number
             call fill_star_info_arrays_with_NaNs(s, ierr)

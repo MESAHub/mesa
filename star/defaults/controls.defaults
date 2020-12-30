@@ -11507,8 +11507,8 @@
 
       ! ::
 
-    !stop_for_bad_nums = .false.
-    stop_for_bad_nums = .true.         ! TESTING
+    stop_for_bad_nums = .false.
+    !stop_for_bad_nums = .true.         ! TESTING
 
 
       ! show_mesh_changes
@@ -11608,8 +11608,8 @@
 
       ! ::
 
-    !fill_arrays_with_NaNs = .false.
-    fill_arrays_with_NaNs = .true.        ! TESTING
+    fill_arrays_with_NaNs = .false.
+    !fill_arrays_with_NaNs = .true.        ! TESTING
 
 
       ! zero_when_allocate
