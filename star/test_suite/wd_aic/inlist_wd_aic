@@ -78,15 +78,17 @@
       mesh_delta_coeff = 1.0
 
       use_Ledoux_criterion = .true.
+      num_cells_for_smooth_brunt_B = 0
+      num_cells_for_smooth_gradL_composition_term = 0
       alpha_semiconvection = 0d0
-
+      mlt_option = 'none'
 
       accrete_same_as_surface = .true.
       mass_change = 1d-6
 
 
-      use_gold2_tolerances = .false.
-      use_gold_tolerances = .false.
+      use_gold2_tolerances = .true.
+      use_gold_tolerances = .true.
       varcontrol_target = 1d-3
       warning_limit_for_max_residual = 1d99
 
