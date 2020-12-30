@@ -154,7 +154,7 @@
                   return
                end if
                do k=1,nz
-                  if ( (s% xa(fe56,k) + s% xa(ni58,k)) > 0.5 ) then
+                  if ( (s% xa(fe56,k) + s% xa(ni58,k)) > 0.8 ) then
                      write(*,2) 'a region dominated by fe56/ni58 has formed', k, s% xa(fe56,k), s% xa(ni58,k)
                      return
                   end if
