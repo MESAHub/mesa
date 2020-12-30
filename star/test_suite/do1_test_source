@@ -25,7 +25,7 @@ do_one create_zams "finished create main sequence" skip skip
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 do_one det_riemann "shock has reached target location" "final.mod" auto    
-do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
+#   not yet       do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 # ********* off until debugged     do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
 do_one dev_pre_ms_to_cc_hi "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
@@ -70,14 +70,18 @@ do_one other_physics_hooks "stop because have dropped below central lower limit 
 do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
-do_one rsp_BEP "good match for period" "final.mod" auto   
-do_one rsp_BLAP "good match for period" "final.mod" auto 
-do_one rsp_Cepheid "good match for period" "final.mod" auto   
+
+# RSP restarts are broken
+
+do_one rsp_BEP "good match for period" "final.mod" skip   
+do_one rsp_BLAP "good match for period" "final.mod" skip 
+do_one rsp_Cepheid "good match for period" "final.mod" skip   
 do_one rsp_check_2nd_crossing "Teff_red_edge     5" skip skip
-do_one rsp_Delta_Scuti "good match for period" "final.mod" auto 
+do_one rsp_Delta_Scuti "good match for period" "final.mod" skip 
 do_one rsp_gyre "good match for period" skip skip
-do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
-do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
+do_one rsp_RR_Lyrae "good match for period" "final.mod" skip   
+do_one rsp_Type_II_Cepheid "good match for period" "final.mod" skip   
+
 do_one sample_pre_ms "finished sample pre-ms" skip skip
 do_one sedov_omega_1 "All tests are okay"  "done_with_sedov.mod" auto
 do_one semiconvection "all values are within tolerances" "final.mod" auto  

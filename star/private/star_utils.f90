@@ -849,14 +849,8 @@
                r = pow(r3,1d0/3d0)
                m = s% m(k) - s% dm(k)*(tau_phot - tau00)/dtau
                if (s% u_flag) then
-                  v = s% u_face(k) + &
-                     (s% u_face(k+1) - s% u_face(k))*(tau_phot - tau00)/dtau
-                  if (is_bad(v)) then
-                     write(*,2) 'v', k, v
-                     write(*,2) 's% u_face(k)', k, s% u_face(k)
-                     write(*,2) 's% u_face(k+1)', k, s% u_face(k+1)
-                     stop 'get_phot_info'
-                  end if
+                  v = s% v_center
+                  ! skip it since get_phot_info can be called before u_face has been set
                else if (s% v_flag) then
                   v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
                end if

@@ -995,7 +995,6 @@
             else
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
-            
             call set_mlt_vars(s, nzlo, nzhi, ierr)
             if (failed('set_mlt_vars')) return
             if (dbg) write(*,*) 'call check_for_redo_MLT'
@@ -1006,6 +1005,7 @@
          end if
          
          if (s% need_to_reset_eturb) then
+            stop 'need_to_reset_eturb is not ready for use'
             if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, 1, s% nz, ierr)
             if (failed('set_mlt_vars')) return
