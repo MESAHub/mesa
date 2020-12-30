@@ -982,6 +982,10 @@
             call set_net(s, s% net_name, ierr)
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
+            if (s% rsp_flag) then
+               write(*,*) 'Sorry: RSP does not currently support restarts.'
+               stop 'model_builder'
+            end if
             call init_def(s) ! RSP
             call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
             if (s% max_years_for_timestep > 0) &
