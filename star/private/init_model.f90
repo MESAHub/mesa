@@ -71,6 +71,7 @@
 
       subroutine get_zams_model(s, zams_filename, ierr)
          use alloc, only: allocate_star_info_arrays
+         use utils_lib, only: is_bad
          use relax, only: do_relax_mass
          type (star_info), pointer :: s
          character (len=*) :: zams_filename
@@ -87,6 +88,10 @@
          include 'formats'
 
          ierr = 0
+         if (is_bad(s% initial_mass)) then
+            write(*,1) 's% initial_mass', s% initial_mass
+            stop 'get_zams_model'
+         end if
 
          init_mass = s% initial_mass
          s% mstar = s% initial_mass*Msun

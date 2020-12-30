@@ -493,10 +493,12 @@
 
          if (ierr /= 0 .or. initial_mass < 0 .or. nz < 0 &
                .or. initial_z < 0 .or. species < 0 .or. &
+               is_bad(s% xmstar) .or. &
                is_bad(initial_mass + initial_z)) then
             ierr = -1
             write(*, *) 'do_read_model: missing required properties'
             write(*,*) 'initial_mass', initial_mass
+            write(*,*) 'xmstar', s% xmstar
             write(*,*) 'initial_z', initial_z
             write(*,*) 'nz', nz
             write(*,*) 'species', species

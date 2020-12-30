@@ -727,10 +727,7 @@
          s% dt = 0
          s% dt_old = 0
 
-         s% have_previous_rotation_info = .false.
-         s% have_previous_RTI_info = .false.
          s% have_previous_conv_vel = .false.
-         s% have_previous_D_mix = .false.
 
          s% net_name = ''
 
@@ -1346,10 +1343,7 @@
          ! avoid making photos
          photo_interval = s% photo_interval
          s% photo_interval = 10000000
-         s% have_previous_rotation_info = .false.
-         s% have_previous_RTI_info = .false.
          s% have_previous_conv_vel = .false.
-         s% have_previous_D_mix = .false.
          s% have_j_rot = .false.
          ! WARNING, might need to add stuff here to actually get the ZAMS model to load.
          ! otherwise can get an error of the form "error in reading model data  j+species > nvec"

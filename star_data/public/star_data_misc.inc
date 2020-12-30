@@ -63,5 +63,19 @@
       real(dp) :: tau_factor
       
       integer :: phase_of_evolution
+      
+      
+      logical :: using_revised_max_yr_dt
+      real(dp) :: revised_max_yr_dt
+      real(dp) :: revised_max_yr_dt_old
+      
+      logical :: astero_using_revised_max_yr_dt
+      real(dp) :: astero_revised_max_yr_dt
+      real(dp) :: astero_revised_max_yr_dt_old
+
+      integer :: binary_id        
+      logical :: include_binary_history_in_log_file
+         
+      logical :: have_j_rot
    
       

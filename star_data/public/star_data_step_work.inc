@@ -184,7 +184,7 @@
       real(dp), pointer :: j_flux(:), dj_flux_dw00(:), dj_flux_dwp1(:), dj_flux_dj00(:), dj_flux_djp1(:), &
          dj_flux_dlnr00(:), dj_flux_dlnrp1(:), dj_flux_dlnd(:)
            
-      real(dp), pointer, dimension(:) :: am_nu_rot, am_nu_rot_old
+      real(dp), pointer :: am_nu_rot(:)
       real(dp), pointer :: am_nu_non_rot(:) ! diffusion driven by other sources, e.g. convection
       
       real(dp), pointer :: am_nu_omega(:) ! for diffusion of rotation angular velocity omega
@@ -1067,7 +1067,7 @@
       real(dp) :: star_age, time_days, time_years ! time is in seconds
       real(dp) :: time_step, dt_days, dt_years ! dt is in seconds
       
-      real(dp) :: dt_next
+      real(dp) :: dt
       real(dp) :: dt_start ! dt during first try for step
       
       ! a few things from start of step that will need later
@@ -1196,32 +1196,50 @@
             RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
-         integer :: init_model_number, start_H_envelope_base_k
          
+         real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: profile_age
          real(dp) :: h1_czb_mass
-         real(dp) :: dt_limit_ratio ! for timestep controller
+         real(dp) :: dt_limit_ratio
          real(dp) :: total_angular_momentum
-         real(dp) :: total_abs_angular_momentum ! integral of |j_rot|, used for equation scaling
-         real(dp) :: angular_momentum_removed ! total removed by mass loss in the current step
-         real(dp) :: angular_momentum_added ! total added by mass gain in the current step
-         real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
-         real(dp) :: residual_norm, max_residual
-
-         real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
+         real(dp) :: total_abs_angular_momentum
+         real(dp) :: angular_momentum_removed
+         real(dp) :: angular_momentum_added
+         real(dp) :: residual_norm
+         real(dp) :: max_residual
+         real(dp) :: force_tau_factor
+         real(dp) :: force_Tsurf_factor
+         real(dp) :: force_opacity_factor
+         real(dp) :: max_fixup_for_mix         
+         real(dp) :: initial_timestep    
+         real(dp) :: initial_L_center
+         real(dp) :: initial_R_center
+         real(dp) :: initial_v_center
+         real(dp) :: tau_center  
+         real(dp) :: super_eddington_wind_mdot
+         real(dp) :: vsurf_wind_mdot
          
-         integer :: total_step_attempts, total_relax_step_attempts
-         integer :: total_step_retries, total_relax_step_retries
-         integer :: total_step_redos, total_relax_step_redos
-         integer :: total_steps_finished, total_relax_steps_finished
-         
+         integer :: init_model_number
+         integer :: start_H_envelope_base_k
+         integer :: total_step_attempts
+         integer :: total_relax_step_attempts
+         integer :: total_step_retries
+         integer :: total_relax_step_retries
+         integer :: total_step_redos
+         integer :: total_relax_step_redos
+         integer :: total_steps_finished
+         integer :: total_relax_steps_finished
          integer :: num_solver_iterations ! for this step
-         integer :: num_skipped_setvars, num_setvars, num_solver_setvars
+         integer :: num_skipped_setvars
+         integer :: num_setvars
+         integer :: num_solver_setvars
          integer :: num_retries
-         integer :: num_hydro_merges, num_hydro_splits
+         integer :: num_hydro_merges
+         integer :: num_hydro_splits
          integer :: bad_max_corr_cnt
          integer :: timestep_hold
-         integer :: model_number_for_last_retry, model_number_for_last_retry_old
+         integer :: model_number_for_last_retry
+         integer :: model_number_for_last_retry_old
          integer :: mesh_call_number
          integer :: burn_and_mix_call_number
          integer :: solver_call_number
@@ -1229,15 +1247,12 @@
          integer :: num_diffusion_solver_iters
          integer :: num_diffusion_solver_steps
          integer :: num_rotation_solver_steps
-         real(dp) :: max_fixup_for_mix         
-         real(dp) :: initial_timestep    
-         real(dp) :: initial_L_center, initial_R_center, initial_v_center, tau_center  
-         real(dp) :: super_eddington_wind_mdot, vsurf_wind_mdot
+         integer :: result_reason
+
          logical :: just_wrote_terminal_header
          logical :: doing_first_model_of_run
          logical :: doing_first_model_after_restart
          logical :: was_in_implicit_wind_limit, was_in_implicit_wind_limit_old
-         integer :: result_reason
       
          integer :: Tlim_dXnuc_species
          integer :: Tlim_dXnuc_cell
@@ -1323,7 +1338,6 @@
          type(ulstore_qp), pointer :: bcyclic_odd_storage_qp(:)
       
       ! misc
-         integer :: nvar_solver_solver
          integer :: termination_code
          character (len=strlen) :: retry_message
          logical :: doing_check_partials
@@ -1336,11 +1350,6 @@
          logical :: doing_solver_iterations
          logical :: doing_flash_wind, doing_rlo_wind, doing_nova_wind
          real(dp) :: prev_create_atm_R0_div_R
-         logical :: have_previous_rotation_info
-         logical :: have_j_rot
-         logical :: have_previous_RTI_info
-         logical :: have_previous_conv_vel
-         logical :: have_previous_D_mix
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
          integer :: k_CpTMdot_lt_L
@@ -1348,17 +1357,6 @@
          real(dp) :: dX_nuc_drop_max_drop
          real(dp) :: solver_test_partials_val, solver_test_partials_dval_dx
          integer :: solver_test_partials_var, solver_test_partials_dx_sink
-         
-         logical :: using_revised_max_yr_dt
-         real(dp) :: revised_max_yr_dt
-         real(dp) :: revised_max_yr_dt_old
-         
-         logical :: astero_using_revised_max_yr_dt
-         real(dp) :: astero_revised_max_yr_dt
-         real(dp) :: astero_revised_max_yr_dt_old
-
-         integer :: binary_id        
-         logical :: include_binary_history_in_log_file
 
          real(dp), pointer :: eps_pre_mix(:) ! (nz)
          
@@ -1551,6 +1549,7 @@
          
          real(dp) :: tau_base
          
+      logical :: have_previous_conv_vel
          
          
          

@@ -105,8 +105,6 @@
 
          include 'formats.dek'
 
-         s% nvar_solver_solver = nvar
-
          ierr = 0
 
          neqns = nvar*nz

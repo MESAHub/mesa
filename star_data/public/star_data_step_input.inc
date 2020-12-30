@@ -6,7 +6,7 @@
       integer :: model_number
       
       real(dp) :: time ! elapsed time (seconds)
-      real(dp) :: dt ! timestep (seconds)
+      real(dp) :: dt_next ! timestep (seconds)
    
       ! total baryonic mass (grams)
       real(dp) :: mstar

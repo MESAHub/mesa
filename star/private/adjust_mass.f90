@@ -45,7 +45,7 @@
       real(dp) function compute_delta_m(s) result(delta_m)
          use star_utils, only: save_for_d_dt
          type (star_info), pointer :: s
-
+         include 'formats'
          delta_m = s% dt*s% mstar_dot
 
          if (s% super_eddington_wind_mdot /= 0 .and. s% super_eddington_wind_mdot > -s% mstar_dot) then
@@ -65,6 +65,21 @@
          end if
 
          delta_m = s% dt*s% mstar_dot
+         
+         if (is_bad(s% dt)) then
+            write(*,1) 's% dt', s% dt
+            stop 'compute_delta_m'
+         end if
+         
+         if (is_bad(s% mstar_dot)) then
+            write(*,1) 's% mstar_dot', s% mstar_dot
+            stop 'compute_delta_m'
+         end if
+         
+         if (is_bad(delta_m)) then
+            write(*,1) 'delta_m', delta_m
+            stop 'compute_delta_m'
+         end if
 
       end function compute_delta_m
 
@@ -247,6 +262,11 @@
 
          new_mstar = old_mstar + delta_m
          new_xmstar = old_xmstar + delta_m
+         
+         if (is_bad(new_xmstar)) then
+            write(*,1) 'new_xmstar', new_xmstar
+            stop 'do_adjust_mass'
+         end if
 
          if (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
                .and. new_mstar > Msun*s% max_star_mass_for_gain) then
@@ -691,6 +711,24 @@
          ierr = 0
          dbg = .false.
          flag = .false.
+         
+         if (is_bad(old_xmstar)) then
+            write(*,1) 'old_xmstar', old_xmstar
+            stop 'revise_q_and_dq'
+         end if
+
+         if (is_bad(new_xmstar)) then
+            write(*,1) 'new_xmstar', new_xmstar
+            stop 'revise_q_and_dq'
+         end if
+
+         if (is_bad(delta_m)) then
+            write(*,1) 'delta_m', delta_m
+            stop 'revise_q_and_dq'
+         end if
+
+
+         
 
          okay_to_move_kB_inward = .false.
 
@@ -710,7 +748,15 @@
             sumdq = sumdq + s% dq(k)
          end do
          frac = 1.0d0/sumdq
+         if (is_bad(frac)) then
+            write(*,1) 'frac for initial renorm', frac
+            stop 'revise_q_and_dq'
+         end if
          do k = 1, nz
+            if (is_bad(s% dq(k))) then
+               write(*,2) 'bad dq input', s% dq(k)
+               stop 'revise_q_and_dq'
+            end if
             s% dq(k) = s% dq(k) * frac
          end do
 
@@ -728,11 +774,20 @@
             lnTmax = 0
             lnT_A = 0
          end if
-
+         
+         if (is_bad(s% max_q_for_k_below_const_q)) then
+            write(*,*) 's% max_q_for_k_below_const_q', s% max_q_for_k_below_const_q
+            stop 'revise_q_and_dq'
+         end if
+         if (is_bad(s% min_q_for_k_below_const_q)) then
+            write(*,*) 's% min_q_for_k_below_const_q', s% min_q_for_k_below_const_q
+            stop 'revise_q_and_dq'
+         end if
+         
          kA = min_kA
          do k = min_kA, nz-1
             kA = k
-            if ( (1-xq(k)) > s% max_q_for_k_below_const_q ) cycle
+            if ( (1-xq(k)) > s% max_q_for_k_below_const_q) cycle
             if ( 1.0d0-xq(k) <= s% min_q_for_k_below_const_q) exit
             if (i_lnT /= 0) then
                if (s% xh(i_lnT,k) >= lnT_A) exit
@@ -744,6 +799,15 @@
             lnT_B = min(lnTmax, lnTlim_B)
          else
             lnT_B = 0
+         end if
+         
+         if (is_bad(s% max_q_for_k_const_mass)) then
+            write(*,*) 's% max_q_for_k_const_mass', s% max_q_for_k_const_mass
+            stop 'revise_q_and_dq'
+         end if
+         if (is_bad(s% min_q_for_k_const_mass)) then
+            write(*,*) 's% min_q_for_k_const_mass', s% min_q_for_k_const_mass
+            stop 'revise_q_and_dq'
          end if
 
          kB = kA+1
@@ -799,6 +863,10 @@
          s% dq(kA:kB-1) = s% dq(kA:kB-1)*qfrac
          frac_qp = mold_o_mnew_qp
          frac = frac_qp
+         if (is_bad(frac)) then
+            write(*,1) 'frac for kA:kB-1', frac
+            stop 'revise_q_and_dq'
+         end if
          s% dq(kB:nz) = s% dq(kB:nz)*frac
          
          adjust_mass_outer_frac = 1d0
@@ -827,6 +895,10 @@
          q2 = sumdq
          frac_qp = q1/q2
          frac = frac_qp
+         if (is_bad(frac)) then
+            write(*,1) 'frac for renorm', frac
+            stop 'revise_q_and_dq'
+         end if
          do k = 1, nz
             s% dq(k) = s% dq(k) * frac
          end do
