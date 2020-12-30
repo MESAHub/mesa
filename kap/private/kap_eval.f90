@@ -598,17 +598,6 @@
          
          ierr = 0
          
-         if (dbg) then
-            write(*,1) 'logT', logT
-            write(*,1) 'logRho', logRho
-            write(*,1) 'lnfree_e', lnfree_e
-            write(*,1) 'd_lnfree_e_dlnRho', d_lnfree_e_dlnRho
-            write(*,1) 'd_lnfree_e_dlnT', d_lnfree_e_dlnT
-            call test_Compton_Opacity( &
-               Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, ierr)
-            stop 'test_Compton_Opacity'
-         end if
-
          logT_Compton_blend_hi = rq% logT_Compton_blend_hi
          logT_Compton_blend_lo = logT_Compton_blend_hi - 0.50d0
 
@@ -779,143 +768,10 @@
       
       end subroutine combine_rad_with_compton_and_conduction
 
-      subroutine test_Compton_Opacity( &
-            Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, ierr)
-         real(dp), intent(in) :: Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-         integer, intent(out) :: ierr
-         
-         logical :: doing_d_dlnd
-         real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT, &
-            dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT, &
-            lnd, lnT, dx_0, dvardx_0, err, dvardx, xdum
-         include 'formats'
-         ierr = 0
-         
-         call Compton_Opacity_test( &
-            Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, &
-            dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT, ierr)
-         if (ierr /= 0) stop 'failed in test_Compton_Opacity'
-         
-         !doing_d_dlnd = .true.
-         doing_d_dlnd = .false.
-      
-         lnd = log(Rho)
-         lnT = log(T)
-
-         if (doing_d_dlnd) then
-            dx_0 = lnd*1d-4
-            dvardx_0 = d_dbg_var_dlnd ! analytic value of partial
-         else
-            dx_0 = lnT*1d-4
-            dvardx_0 = d_dbg_var_dlnT ! analytic value of partial
-         end if
-         err = 0d0
-         dvardx = dfridr(dx_0,err)
-         xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),1d-3)         
-         if (doing_d_dlnd) then
-            write(*,1) 'compton d_dlnRho analytic, numeric, diff, rel diff', &
-                  dvardx_0, dvardx, err, xdum
-         else ! doing d_dlnT
-            write(*,1) 'compton d_dlnT analytic, numeric, diff, rel diff', &
-                  dvardx_0, dvardx, err, xdum
-         end if
-         write(*,*)
-         
-      
-         contains
-         
-         
-         real(dp) function dfridr_func(delta_x) result(val)
-            real(dp), intent(in) :: delta_x
-            integer :: ierr
-            real(dp) :: log_var
-            include 'formats'
-            ierr = 0
-            if (doing_d_dlnd) then
-               log_var = (lnd + delta_x)/ln10
-               call Compton_Opacity_test( &
-                  exp10(log_var), T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                  kap, dlnkap_dlnRho, dlnkap_dlnT, &
-                  dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT, ierr)
-            else
-               log_var = (lnT + delta_x)/ln10
-               call Compton_Opacity_test( &
-                  Rho, exp10(log_var), lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                  kap, dlnkap_dlnRho, dlnkap_dlnT, &
-                  dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT, ierr)
-            end if
-            val = dbg_var
-         end function dfridr_func
-
-         real(dp) function dfridr(hx,err) ! from Frank
-            real(dp), intent(in) :: hx
-            real(dp), intent(out) :: err
-            !  this routine returns the first derivative of a function func(x)
-            !  at the point x, by ridders method of polynomial extrapolation.
-            !  value hx is the initial step size;
-            !  it should be an increment for which func changes substantially.
-            !  an estimate of the error in the first derivative is returned in err.
-            integer, parameter :: ntab = 20
-            integer :: i,j
-            real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum
-            real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
-            include 'formats'
-            dfridr = 0d0
-            hh = hx
-            ! 2nd order central difference
-            a(1,1) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
-            write(*,2) 'dfdx hh', 1, a(1,1), hh
-            err = big
-            ! succesive columns in the neville tableu will go to smaller stepsizes
-            ! and higher orders of extrapolation
-            do i=2,ntab
-               hh = hh/con
-               a(1,i) = (dfridr_func(hh) - dfridr_func(-hh))/(2d0*hh)
-               !write(*,2) 'dfdx hh', i, a(1,i), hh
-               ! compute extrapolations of various orders; the error stratagy is to compare
-               ! each new extrapolation to one order lower but both at the same stepsize
-               ! and at the previous stepsize
-               fac = con2
-               do j=2,i
-                  a(j,i) = (a(j-1,i)*fac - a(j-1,i-1))/(fac-1d0)
-                  fac = con2*fac
-                  errt = max(abs(a(j,i)-a(j-1,i)),abs(a(j,i)-a(j-1,i-1)))
-                  if (errt <= err) then
-                     err = errt
-                     dfridr = a(j,i)
-                     write(*,3) 'dfridr err', i, j, dfridr, err
-                  end if
-               end do
-               ! if higher order is worse by a significant factor safe, then bail
-               if (abs(a(i,i) - a(i-1,i-1)) >= safe*err) then
-                  write(*,1) 'higher order is worse', err, a(i,i), a(i-1,i-1)
-                  return
-               end if
-            end do
-         end function dfridr
-         
-      end subroutine test_Compton_Opacity
-      
 
       subroutine Compton_Opacity( &
             Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-         real(dp), intent(in) :: Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-         real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
-         integer, intent(out) :: ierr
-         real(dp) :: dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT
-         call Compton_Opacity_test( &
-            Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, &
-            dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT, ierr)
-      end subroutine Compton_Opacity
-      
-
-      subroutine Compton_Opacity_test( &
-            Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, &
-            dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT, ierr)
          use eos_lib
          use eos_def
          use const_def
@@ -928,8 +784,7 @@
          ! by then conduction should be dominant anyway, so things should be okay.
 
          real(dp), intent(in) :: Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-         real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT, &
-            dbg_var, d_dbg_var_dlnd, d_dbg_var_dlnT
+         real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr
          
          real(dp) :: T, rho, edensity, efermi, eta, psi, psi2, Gbar_inverse, kT_mc2, free_e, tmp, &
@@ -981,10 +836,6 @@
          d_efermi_dlnRho = (2d0/3d0)*tmp*d_edensity_dlnRho/edensity_one_third
          d_efermi_dlnT = (2d0/3d0)*tmp*d_edensity_dlnT/edensity_one_third
          
-         dbg_var = efermi
-         d_dbg_var_dlnd = d_efermi_dlnRho
-         d_dbg_var_dlnT = d_efermi_dlnT
-         
          kT_mc2 = T * (kerg / (me * clight*clight))
          d_kT_mc2_dlnT = kT_mc2
 
@@ -1028,10 +879,6 @@
             +(11.47d0+0.3570d0*psi+0.1078d0*psi2)*d_kT_mc2_dlnT &
             +(0.1678d0*psi-3.249d0-0.04706d0*psi2)*2d0*kT_mc2*d_kT_mc2_dlnT
          
-         !dbg_var = Gbar_inverse
-         !d_dbg_var_dlnd = d_Gbar_inverse_dlnRho
-         !d_dbg_var_dlnT = d_Gbar_inverse_dlnT
-         
          kap = sige*edensity/(rho*Gbar_inverse)
          
          if (kap <= 0.0d0) then
@@ -1057,11 +904,7 @@
          if (hit_rho_limit) dlnkap_dlnRho = 0d0
          if (hit_T_limit) dlnkap_dlnT = 0d0
          
-         !dbg_var = log(kap)
-         !d_dbg_var_dlnd = dlnkap_dlnRho
-         !d_dbg_var_dlnT = dlnkap_dlnT
-
-      end subroutine Compton_Opacity_test
+      end subroutine Compton_Opacity
 
 
       end module kap_eval
