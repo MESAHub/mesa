@@ -75,14 +75,19 @@
       integer, parameter :: s32 = 31
       
       real(dp) :: Mstar, Xc, Xn, Xo, Xne, xc_base, xn_base, xo_base, xne_base, &
-         zbar, frac_Type2, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+         lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+         eta, d_eta_dlnRho, d_eta_dlnT
       real(dp) :: Z_init, Z
       real(dp) :: lnRho(maxpts), lnT(maxpts), logRho(maxpts), logT(maxpts), X(maxspec,maxpts)
       real(dp) :: lnR(maxpts), L, dq(maxpts)
       real(dp) :: kappa(maxpts), dlnkap_dlnRho(maxpts), dlnkap_dlnT(maxpts)
+      real(dp) :: kappa_fracs(num_kap_fracs), dlnkap_dxa(maxspec)
       real(dp) :: kappaCO(maxpts), dlnkapCO_dlnRho(maxpts), dlnkapCO_dlnT(maxpts)
+      real(dp) :: kappaCO_fracs(num_kap_fracs), dlnkapCO_dxa(maxspec)
       character (len=32) :: my_mesa_dir
-      
+
+      integer, dimension(:), pointer :: chem_id, net_iso
+
       use_cache = .false.
       show_info = .false.
       model_file = 'sample_kap_agb.model'
@@ -151,36 +156,42 @@
       rq1% Zbase = Z_init
       rq2% Zbase = Z_init
       
-      XC_base = GN93_element_zfrac(e_C)*Z_init
-      XN_base = GN93_element_zfrac(e_N)*Z_init
-      XO_base = GN93_element_zfrac(e_O)*Z_init
-      XNe_base = GN93_element_zfrac(e_Ne)*Z_init
-
       logRho(:) = lnRho(:)/ln10 !convert ln's to log10's
       logT(:)   = lnT(:)  /ln10   
-      zbar = 1.5d0              ! needed for electron conduction at high rho
+
+      ! these should come from an eos call
       lnfree_e = 0d0            ! needed for Compton at high T
       d_lnfree_e_dlnRho = 0d0
       d_lnfree_e_dlnT = 0d0
+      eta = 0d0            ! needed for Compton at high T
+      d_eta_dlnRho = 0d0
+      d_eta_dlnT = 0d0
 
-!$omp parallel do private(i,ierr,XC,XN,XO,XNe,Z) schedule(dynamic)
+      allocate(chem_id(NSpec), net_iso(num_chem_isos))
+      chem_id(:) = (/ ih1, ih2, ihe3, ihe4, ili7, ibe7, ib8, ic12, &
+         ic13, in13, in14, in15, io16, io17, io18, if19, ine20, ine21, &
+         ine22, ina22, ina23, img24, img25, img26, ial26, ial27, &
+         isi28, isi29, isi30, ip31, is32 /)
+      net_iso(:) = 0
+      do i = 1, Nspec
+         net_iso(chem_id(i)) = i
+      end do
+
+!$omp parallel do private(i,ierr) schedule(dynamic)
       do i=1,Npts            
-         XC = X(c12,i) + X(c13,i)
-         XN = X(n14,i) + X(n15,i)
-         XO = X(o16,i) + X(o17,i) + X(o18,i)
-         XNe = X(ne20,i) + X(ne21,i) + X(ne22,i)
-         Z = 1d0 - (X(h1,i)+X(he3,i)+X(he4,i))
 
          call kap_get( &
-            handle1, zbar, X(h1,i), Z, XC, XN, XO, XNe, logRho(i), logT(i), &
+            handle1, Nspec, chem_id, net_iso, X(1:Nspec,i), logRho(i), logT(i), &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            frac_Type2, kappa(i), dlnkap_dlnRho(i), dlnkap_dlnT(i), ierr)
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            kappa_fracs, kappa(i), dlnkap_dlnRho(i), dlnkap_dlnT(i), dlnkap_dxa, ierr)
          if(ierr/=0) write(*,*) 'kap_get (Type 1) failed at i=', i
 
          call kap_get( &
-            handle2, zbar, X(h1,i), Z, XC, XN, XO, XNe, logRho(i), logT(i), &
+            handle2, Nspec, chem_id, net_iso, X(1:Nspec,i), logRho(i), logT(i), &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            frac_Type2, kappaCO(i), dlnkapCO_dlnRho(i), dlnkapCO_dlnT(i), ierr)
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            kappaCO_fracs, kappaCO(i), dlnkapCO_dlnRho(i), dlnkapCO_dlnT(i), dlnkapCO_dxa, ierr)
          if(ierr/=0) write(*,*) 'kap_get (Type 2) failed at i=', i
 
       enddo
@@ -202,6 +213,7 @@
        close(iounit)
 
       !all finished? then deallocate the handle and unload the opacity tables
+      deallocate(chem_id, net_iso)
       call free_kap_handle(handle1)
       call free_kap_handle(handle2)
       call kap_shutdown

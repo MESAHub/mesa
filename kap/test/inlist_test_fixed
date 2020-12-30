@@ -1,3 +1,7 @@
+&eos
+  ! use defaults
+/
+
 &kap
 
   use_Type2_opacities = .false.
