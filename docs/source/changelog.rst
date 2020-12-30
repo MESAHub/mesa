@@ -57,6 +57,10 @@ the blended opacity.
          integer, intent(out) :: ierr ! 0 means AOK.
 
 
+The Compton scattering opacity routine has been updated to use the prescription of
+`Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`_.
+
+
 neu
 ~~~
 
