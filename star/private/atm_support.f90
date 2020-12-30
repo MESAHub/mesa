@@ -29,7 +29,7 @@ module atm_support
 
   use star_private_def
   use const_def
-  use utils_lib, only: mesa_error
+  use utils_lib, only: mesa_error, is_bad
 
   ! No implicit typing
 
@@ -78,6 +78,11 @@ contains
     real(dp) :: tau
     real(dp) :: r_surf
     real(dp) :: L_surf
+    
+    if (is_bad(tau_surf)) then
+       write(*,*) 'tau_surf', tau_surf
+       stop 'bad tau_surf arg for get_atm_PT'
+    end if
 
     ! Evaluate surface temperature and pressure by dispatching to the
     ! appropriate internal routine

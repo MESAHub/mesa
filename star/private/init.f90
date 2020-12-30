@@ -728,6 +728,8 @@
          s% dt_old = 0
 
          s% have_previous_conv_vel = .false.
+         s% have_previous_rotation_info = .false.
+         s% have_previous_RTI_info = .false.
 
          s% net_name = ''
 

@@ -103,7 +103,7 @@
             call set_to_NaN(s% L_surf_old)
             call set_to_NaN(s% dt_limit_ratio_old)
             
-            ! do some more     (after 611bac9)       
+            if (.true.) then ! do some more     (after 611bac9)       
             call set_to_NaN(s% total_radiation_old)
             call set_to_NaN(s% min_kap_floor_old)
             call set_to_NaN(s% total_angular_momentum_old)
@@ -265,7 +265,6 @@
             s% num_skipped_setvars = -999
             s% num_setvars = -999
             s% num_solver_setvars = -999
-            s% num_retries = -999
             s% num_hydro_merges = -999
             s% num_hydro_splits = -999
             s% bad_max_corr_cnt = -999
@@ -294,6 +293,139 @@
                call set_to_NaN(s% L_by_category(j))
                call set_to_NaN(s% L_by_category_old(j))
             end do
+            
+            end if
+            
+            if (.true.) then ! after 65e0e76
+
+            s% termination_code = -999
+            s% boost_mlt_alfa = -999
+            s% burn_nstep_max = -999
+            s% burn_nfcn_total = -999
+            s% k_CpTMdot_lt_L = -999
+            s% dX_nuc_drop_max_k = -999
+            s% dX_nuc_drop_max_j = -999
+            s% solver_test_partials_var = -999
+            s% solver_test_partials_dx_sink = -999
+            
+            call set_to_NaN(s% dVARdot_dVAR)
+            call set_to_NaN(s% surf_accel_grav_ratio)
+            call set_to_NaN(s% prev_create_atm_R0_div_R)
+            call set_to_NaN(s% dt_next_unclipped)
+            call set_to_NaN(s% L_for_BB_outer_BC)
+            call set_to_NaN(s% dX_nuc_drop_max_drop)
+            call set_to_NaN(s% solver_test_partials_val)
+            call set_to_NaN(s% solver_test_partials_dval_dx)
+
+            ! variation control value for timestep controller
+            call set_to_NaN(s% dt_limit_ratio_old)
+      
+            ! surface info
+            call set_to_NaN(s% v_surf_old) ! (cm/second)
+            call set_to_NaN(s% L_surf_old) ! surface luminosity (Lsun units)
+            call set_to_NaN(s% L_phot_old) ! photosphere luminosity (Lsun units)
+            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
+            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
+            
+            s% n_conv_regions_old = -999
+            
+            call set_to_NaN(s% total_angular_momentum_old)
+            call set_to_NaN(s% h1_czb_mass_old) ! baryonic (Msun)
+            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% c_core_mass_old)
+            call set_to_NaN(s% Teff_old)
+            call set_to_NaN(s% center_eps_nuc_old)
+            
+            call set_to_NaN(s% total_internal_energy_old)
+            call set_to_NaN(s% total_gravitational_energy_old)
+            call set_to_NaN(s% total_radial_kinetic_energy_old)
+            call set_to_NaN(s% total_turbulent_energy_old)
+            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+            call set_to_NaN(s% total_energy_old)   
+            call set_to_NaN(s% total_internal_energy_before_adjust_mass)
+            call set_to_NaN(s% total_gravitational_energy_before_adjust_mass)
+            call set_to_NaN(s% total_radial_kinetic_energy_before_adjust_mass)
+            call set_to_NaN(s% total_turbulent_energy_before_adjust_mass)
+            call set_to_NaN(s% total_rotational_kinetic_energy_before_adjust_mass)
+            call set_to_NaN(s% total_energy_before_adjust_mass)          
+            call set_to_NaN(s% total_internal_energy_after_adjust_mass)
+            call set_to_NaN(s% total_gravitational_energy_after_adjust_mass)
+            call set_to_NaN(s% total_radial_kinetic_energy_after_adjust_mass)
+            call set_to_NaN(s% total_turbulent_energy_after_adjust_mass)
+            call set_to_NaN(s% total_rotational_kinetic_energy_after_adjust_mass)
+            call set_to_NaN(s% total_energy_after_adjust_mass)                
+            call set_to_NaN(s% total_internal_energy_start)
+            call set_to_NaN(s% total_gravitational_energy_start)
+            call set_to_NaN(s% total_radial_kinetic_energy_start)
+            call set_to_NaN(s% total_turbulent_energy_start)
+            call set_to_NaN(s% total_rotational_kinetic_energy_start)
+            call set_to_NaN(s% total_energy_start)           
+            call set_to_NaN(s% total_internal_energy_end)
+            call set_to_NaN(s% total_gravitational_energy_end)
+            call set_to_NaN(s% total_radial_kinetic_energy_end)
+            call set_to_NaN(s% total_turbulent_energy_end)
+            call set_to_NaN(s% total_rotational_kinetic_energy_end)
+            call set_to_NaN(s% total_energy_end)                  
+            call set_to_NaN(s% total_internal_energy)
+            call set_to_NaN(s% total_gravitational_energy)
+            call set_to_NaN(s% total_radial_kinetic_energy)
+            call set_to_NaN(s% total_turbulent_energy)
+            call set_to_NaN(s% total_rotational_kinetic_energy)
+            call set_to_NaN(s% total_energy)           
+            call set_to_NaN(s% surface_cell_specific_total_energy_old)
+            call set_to_NaN(s% total_energy_change_from_mdot) 
+            call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)               
+            call set_to_NaN(s% total_energy_sources_and_sinks)
+            call set_to_NaN(s% virial_thm_P_avg)
+            call set_to_NaN(s% total_eps_grav)
+            call set_to_NaN(s% total_eps_mdot)
+            call set_to_NaN(s% total_radiation)
+            call set_to_NaN(s% work_outward_at_surface)
+            call set_to_NaN(s% work_inward_at_center)
+            call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
+            call set_to_NaN(s% total_nuclear_heating)
+            call set_to_NaN(s% total_non_nuc_neu_cooling)
+            call set_to_NaN(s% total_irradiation_heating)
+            call set_to_NaN(s% total_WD_sedimentation_heating)
+            call set_to_NaN(s% total_energy_from_diffusion)
+            call set_to_NaN(s% total_extra_heating)
+            call set_to_NaN(s% error_in_energy_conservation)
+            call set_to_NaN(s% log_P_center)
+            call set_to_NaN(s% min_kap_floor)      
+            call set_to_NaN(s% min_kap_floor_old)
+            call set_to_NaN(s% log_P_center_old)
+            call set_to_NaN(s% cumulative_energy_error_old)
+            call set_to_NaN(s% cumulative_extra_heating_old)
+            call set_to_NaN(s% total_radiation_old)        
+            call set_to_NaN(s% mesh_adjust_IE_conservation)
+            call set_to_NaN(s% mesh_adjust_PE_conservation)
+            call set_to_NaN(s% mesh_adjust_KE_conservation)
+            
+            call set_to_NaN(s% total_internal_energy_initial)
+            call set_to_NaN(s% total_gravitational_energy_initial)
+            call set_to_NaN(s% total_radial_kinetic_energy_initial)
+            call set_to_NaN(s% total_turbulent_energy_initial)
+            call set_to_NaN(s% total_rotational_kinetic_energy_initial)
+            call set_to_NaN(s% total_energy_initial)
+            call set_to_NaN(s% time_evolve_step)
+            call set_to_NaN(s% time_remesh)
+            call set_to_NaN(s% time_adjust_mass)
+            call set_to_NaN(s% time_conv_premix)
+            call set_to_NaN(s% time_element_diffusion)
+            call set_to_NaN(s% time_struct_burn_mix)
+            call set_to_NaN(s% time_solver_matrix)
+            call set_to_NaN(s% time_solve_mix)
+            call set_to_NaN(s% time_solve_burn)
+            call set_to_NaN(s% time_solve_omega_mix)
+            call set_to_NaN(s% time_eos)
+            call set_to_NaN(s% time_neu_kap)
+            call set_to_NaN(s% time_nonburn_net)
+            call set_to_NaN(s% time_mlt)
+            call set_to_NaN(s% time_set_hydro_vars)
+            call set_to_NaN(s% time_set_mixing_info)
+            call set_to_NaN(s% time_total)
+            
+            end if
             
          end subroutine test_set_undefined
          

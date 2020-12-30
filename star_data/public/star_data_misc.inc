@@ -57,10 +57,11 @@
       integer :: total_num_solver_iterations, total_num_solver_relax_iterations
       integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made
       integer :: total_num_solver_calls_converged, total_num_solver_relax_calls_converged
+      integer :: num_retries
 
       integer :: recent_log_header ! model_number when last output header info to terminal
       
-      real(dp) :: tau_factor
+      real(dp) :: tau_factor, tau_base
       
       integer :: phase_of_evolution
       
@@ -77,5 +78,10 @@
       logical :: include_binary_history_in_log_file
          
       logical :: have_j_rot
+      
+      ! NEED TO GET RID OF THESE
+      logical :: have_previous_rotation_info
+      logical :: have_previous_RTI_info
+      logical :: have_previous_conv_vel
    
       

@@ -194,24 +194,21 @@
             return
          end if
          
-!         if (s% rotation_flag) then
-!            call restore(s% nu_ST, nu_st)
-!            call restore(s% D_ST, d_st)
-!            call restore(s% D_DSI, d_dsi)
-!            call restore(s% D_SH, d_sh)
-!            call restore(s% D_SSI, d_ssi)
-!            call restore(s% D_ES, d_es)
-!            call restore(s% D_GSF, d_gsf)
-!            s% have_previous_rotation_info = .true.
-!         end if
-! 
-!         if (s% RTI_flag) then
-!            call restore(s% dPdr_dRhodr_info, RTI_info)
-!            s% have_previous_RTI_info = .true.
-!         end if
-! 
-!         call restore(s% D_mix, d_mx)
-!         s% have_previous_D_mix = .true.
+         if (s% rotation_flag) then
+            call restore(s% nu_ST, nu_st)
+            call restore(s% D_ST, d_st)
+            call restore(s% D_DSI, d_dsi)
+            call restore(s% D_SH, d_sh)
+            call restore(s% D_SSI, d_ssi)
+            call restore(s% D_ES, d_es)
+            call restore(s% D_GSF, d_gsf)
+            s% have_previous_rotation_info = .true.
+         end if
+ 
+         if (s% RTI_flag) then
+            call restore(s% dPdr_dRhodr_info, RTI_info)
+            s% have_previous_RTI_info = .true.
+         end if
          
          if (s% op_split_burn) then
             do k = 1, nz
@@ -1236,6 +1233,12 @@
          ! Evaluate the surface optical depth
 
          tau_surf = s% tau_factor*s% tau_base ! tau at outer edge of cell 1
+         if (is_bad(tau_surf)) then
+            write(*,1) 's% tau_factor', s% tau_factor
+            write(*,1) 's% tau_base', s% tau_base
+            write(*,1) 'tau_surf', tau_surf
+            stop 'bad tau_surf in get_surf_PT'
+         end if
 
          ! Evaluate surface temperature and pressure
              

@@ -1233,7 +1233,6 @@
          integer :: num_skipped_setvars
          integer :: num_setvars
          integer :: num_solver_setvars
-         integer :: num_retries
          integer :: num_hydro_merges
          integer :: num_hydro_splits
          integer :: bad_max_corr_cnt
@@ -1338,30 +1337,39 @@
          type(ulstore_qp), pointer :: bcyclic_odd_storage_qp(:)
       
       ! misc
-         integer :: termination_code
+         
          character (len=strlen) :: retry_message
-         logical :: doing_check_partials
+
+         real(dp), pointer :: eps_pre_mix(:) ! (nz)
+         real(dp), pointer, dimension(:) :: burn_avg_epsnuc
+         integer, pointer, dimension(:) :: burn_num_iters
+
+         integer :: termination_code
          integer :: boost_mlt_alfa
-         real(dp) :: save1, save2, save3, save4, save5, save6, save7
-         integer :: burn_nstep_max, burn_nfcn_total
-         real(dp) :: dVARdot_dVAR
-         real(dp) :: surf_accel_grav_ratio
+         integer :: burn_nstep_max
+         integer :: burn_nfcn_total
+         integer :: k_CpTMdot_lt_L
+         integer :: dX_nuc_drop_max_k
+         integer :: dX_nuc_drop_max_j
+         integer :: solver_test_partials_var
+         integer :: solver_test_partials_dx_sink
+         
+         logical :: doing_check_partials
          logical :: have_mixing_info
          logical :: doing_solver_iterations
-         logical :: doing_flash_wind, doing_rlo_wind, doing_nova_wind
+         logical :: doing_flash_wind
+         logical :: doing_rlo_wind
+         logical :: doing_nova_wind
+         
+         real(dp) :: save1, save2, save3, save4, save5, save6, save7
+         
+         real(dp) :: dVARdot_dVAR
+         real(dp) :: surf_accel_grav_ratio
          real(dp) :: prev_create_atm_R0_div_R
          real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
-         integer :: k_CpTMdot_lt_L
-         integer :: dX_nuc_drop_max_k, dX_nuc_drop_max_j
          real(dp) :: dX_nuc_drop_max_drop
          real(dp) :: solver_test_partials_val, solver_test_partials_dval_dx
-         integer :: solver_test_partials_var, solver_test_partials_dx_sink
-
-         real(dp), pointer :: eps_pre_mix(:) ! (nz)
-         
-         real(dp), pointer, dimension(:) :: burn_avg_epsnuc
-         integer, pointer, dimension(:) :: burn_num_iters
 
          ! variation control value for timestep controller
          real(dp) :: dt_limit_ratio_old
@@ -1378,16 +1386,6 @@
          real(dp), dimension(max_num_mixing_regions) :: &
             cz_bot_mass_old, cz_top_mass_old
       
-         real(dp), pointer, dimension(:) :: conv_vel_old
-         real(dp), pointer, dimension(:) :: nu_ST_old
-         real(dp), pointer, dimension(:) :: D_ST_old
-         real(dp), pointer, dimension(:) :: D_DSI_old
-         real(dp), pointer, dimension(:) :: D_SH_old
-         real(dp), pointer, dimension(:) :: D_SSI_old
-         real(dp), pointer, dimension(:) :: D_ES_old
-         real(dp), pointer, dimension(:) :: D_GSF_old
-         real(dp), pointer, dimension(:) :: D_mix_old
-         
          real(dp), pointer, dimension(:) :: max_abs_xa_corr ! from most recent solver iteration
 
          real(dp) :: total_angular_momentum_old
@@ -1409,7 +1407,6 @@
             dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, PdVdt
             
          real(dp) :: &
-            
             total_internal_energy_old, &
             total_gravitational_energy_old, &
             total_radial_kinetic_energy_old, &
@@ -1545,11 +1542,6 @@
             time_total
             ! change total_times function in star_utils if change this list
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
-         
-         
-         real(dp) :: tau_base
-         
-      logical :: have_previous_conv_vel
          
          
          
