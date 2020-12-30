@@ -315,7 +315,7 @@ program kap_plotter
             err = 0d0
             dvardx = dfridr(dx_0,dfridr_func,err)
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),min_derivative_error)
-            res1 = safe_log10(xdum)
+            res1 = safe_log10(abs(xdum))
          end if
 
 
