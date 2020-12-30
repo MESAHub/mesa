@@ -78,8 +78,8 @@
             if (is_bad(s% L_by_category(j))) then
                do k=1,nz
                   if (is_bad(s% eps_nuc_categories(j,k))) then
-                     write(*,2) trim(category_name(j)), k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
-                     stop 'set_power_info'
+                     write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
+                     if (s% stop_for_bad_nums) stop 'set_power_info'
                   end if
                end do
             end if

@@ -1563,7 +1563,7 @@
          if (.not. s% RSP_flag) then
             call save_for_d_dt(s)
             call set_vars_if_needed(s, s% dt, str, ierr)
-            if (failed('set_vars_if_needed')) return            
+            if (failed('set_vars_if_needed')) return     
             s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
             call set_luminosity_by_category(s)
             s% total_angular_momentum = total_angular_momentum(s)

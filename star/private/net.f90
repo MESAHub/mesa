@@ -27,6 +27,7 @@
 
       use star_private_def
       use const_def
+      use utils_lib, only: is_bad
 
       implicit none
 
@@ -153,7 +154,9 @@
 
          ierr = 0
 
-         if (check_op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+         if (check_op_split_burn .and. &
+             s% doing_struct_burn_mix .and. &
+             s% T_start(k) >= s% op_split_burn_min_T) then ! leave this to do_burn
             return
          end if
 
@@ -246,6 +249,13 @@
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
                screening_mode, s% theta_e(k), s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+         end if
+
+         if (is_bad(s% eps_nuc(k))) then
+            ierr = -1
+            if (s% report_ierr) write(*,*) 'net_get returned bad eps_nuc', ierr
+            if (s% stop_for_bad_nums) stop 'do1_net'
+            return
          end if
 
          if (-k == s% nz) then
