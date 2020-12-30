@@ -98,16 +98,14 @@
          nz = s% nz
          s% brunt_B(1:nz) = 0 ! temporary brunt_B for set_vars
 
-         if (.not. restart) then
-            call set_qs(s, nz, s% q, s% dq, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'finish_load_model failed in set_qs'
-               return
-            end if
-            call set_m_and_dm(s)
-            call set_dm_bar(s, nz, s% dm, s% dm_bar)            
-            call reset_epsnuc_vectors(s)
+         call set_qs(s, nz, s% q, s% dq, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model failed in set_qs'
+            return
          end if
+         call set_m_and_dm(s)
+         call set_dm_bar(s, nz, s% dm, s% dm_bar)            
+         call reset_epsnuc_vectors(s)
 
          if (s% rotation_flag) then
             ! older MESA versions stored only omega in saved models. However, when
@@ -115,16 +113,24 @@
             ! the angular momentum in order to initialize the model. This flag is here
             ! to account for the loading of old saved models.
             if (s% have_j_rot) then
-               if (restart) then
+               !if (restart) then
                   ! only need to compute irot, w_div_w_crit_roche is stored in photos
-                  call set_i_rot_from_omega_and_j_rot(s)
-               else
+               !   call set_i_rot_from_omega_and_j_rot(s)
+               !else
                   ! need to set w_div_w_crit_roche as well
                   call use_xh_to_update_i_rot(s)
-               end if
+               !end if
             else
                ! need to recompute irot and jrot
                call use_xh_to_update_i_rot_and_j_rot(s)
+            end if
+
+            ! this ensures fp, ft, r_equatorial and r_polar are set by the end
+            call set_rotation_info(s, .true., ierr)
+            if (ierr /= 0) then
+               write(*,*) &
+                  'finish_load_model failed in set_rotation_info'
+               return
             end if
             
             s% total_angular_momentum = total_angular_momentum(s)
@@ -213,16 +219,6 @@
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in do_report'
             return
-         end if
-
-         if (s% rotation_flag) then
-            ! this ensures fp, ft, r_equatorial and r_polar are set by the end
-            call set_rotation_info(s, .true., ierr)
-            if (ierr /= 0) then
-               write(*,*) &
-                  'finish_load_model failed in set_rotation_info'
-               return
-            end if
          end if
 
       end subroutine finish_load_model
