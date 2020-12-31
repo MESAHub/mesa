@@ -1,3 +1,7 @@
+&eos
+  ! use defaults
+/
+
 &kap
 
   kap_co_prefix = 'gn93_co'

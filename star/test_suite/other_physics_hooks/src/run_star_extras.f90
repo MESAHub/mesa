@@ -716,24 +716,19 @@
 
 
       subroutine my_kap_get( &
-            id, k, handle, zbar, X, Z, XC, XN, XO, XNe, &
-            log10_rho, log10_T, species, chem_id, net_iso, xa, &
+            id, k, handle, species, chem_id, net_iso, xa, &
+            log10_rho, log10_T, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            frac_Type2, kap, dln_kap_dlnRho, dln_kap_dlnT, ierr)
-         
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
+
+         use kap_def, only: num_kap_fracs
          use kap_lib
  
          ! INPUT
          integer, intent(in) :: id ! star id if available; 0 otherwise
          integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
          integer, intent(in) :: handle ! from alloc_kap_handle
-         real(dp), intent(in) :: zbar ! average ion charge
-         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition    
-         real(dp), intent(in) :: log10_rho ! density
-         real(dp), intent(in) :: log10_T ! temperature
-         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-            ! free_e := total combined number per nucleon of free electrons and positrons
-
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
@@ -743,18 +738,26 @@
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
          real(dp), intent(in) :: xa(:) ! mass fractions
-         
+         real(dp), intent(in) :: log10_rho ! density
+         real(dp), intent(in) :: log10_T ! temperature
+         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+            ! free_e := total combined number per nucleon of free electrons and positrons
+         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
+            ! eta := electron degeneracy parameter
+
          ! OUTPUT
-         real(dp), intent(out) :: frac_Type2
+         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
          real(dp), intent(out) :: kap ! opacity
          real(dp), intent(out) :: dln_kap_dlnRho ! partial derivative at constant T
          real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
+         real(dp), intent(out) :: dln_kap_dxa(:) ! partial derivative w.r.t. to species
          integer, intent(out) :: ierr ! 0 means AOK.
                   
          call kap_get( &
-            handle, zbar, X, Z, XC, XN, XO, XNe, log10_rho, log10_T, &
+            handle, species, chem_id, net_iso, xa, log10_rho, log10_T, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            frac_Type2, kap, dln_kap_dlnRho, dln_kap_dlnT, ierr)
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
 
       end subroutine my_kap_get
 

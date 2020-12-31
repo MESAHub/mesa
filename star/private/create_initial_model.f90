@@ -437,36 +437,35 @@
 
 
       subroutine get_kap_from_rhoT(cs,logrho,logT,kap)
+         use kap_def, only: num_kap_fracs
          use kap_lib
          type (create_star_info), pointer :: cs
          real(dp) :: logrho,logT,kap
          real(dp) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+         real(dp) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp) :: dlnkap_dlnRho, dlnkap_dlnT
+         real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(species)
          integer :: ierr
 
-         real(dp) :: Z, XC, XN, XO, XNe, frac_Type2
-         
          ierr=0
 
-         ! this can be improved
-         Z = 1d0 - X - Y
-         XC = 0d0
-         XN = 0d0
-         XO = 0d0
-         XNe = 0d0
-
-
+         ! this ignores lnfree and eta
+         lnfree_e=0; d_lnfree_e_dlnRho=0; d_lnfree_e_dlnT=0
+         eta=0; d_eta_dlnRho=0; d_eta_dlnT=0
+         
          call kap_get( &
-              kap_handle, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
+              kap_handle, species, chem_id, net_iso, xa, &
+              logRho, logT, &
               lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-              frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+              eta, d_eta_dlnRho, d_eta_dlnT, &
+              kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in kap_get get_kap_from_rhoT'
             return
          end if
 
          if(ierr/=0) then
-            write(*,*) 'kap_get_Type1 failed'
+            write(*,*) 'kap_get failed'
             stop
          endif
 

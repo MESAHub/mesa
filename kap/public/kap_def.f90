@@ -31,6 +31,12 @@ module kap_def
   
   logical, parameter :: show_allocations = .false.  ! for debugging memory usage
 
+  ! for kap output
+  integer, parameter :: num_kap_fracs = 4
+  integer, parameter :: i_frac_lowT = 1
+  integer, parameter :: i_frac_highT = i_frac_lowT + 1
+  integer, parameter :: i_frac_Type2 = i_frac_highT + 1
+  integer, parameter :: i_frac_Compton = i_frac_Type2 + 1
 
   ! info about op_mono elements
   integer, parameter :: num_op_mono_elements = 17
