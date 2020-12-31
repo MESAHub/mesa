@@ -1207,9 +1207,6 @@
          real(dp) :: angular_momentum_added
          real(dp) :: residual_norm
          real(dp) :: max_residual
-         real(dp) :: force_tau_factor
-         real(dp) :: force_Tsurf_factor
-         real(dp) :: force_opacity_factor
          real(dp) :: max_fixup_for_mix         
          real(dp) :: initial_timestep    
          real(dp) :: initial_L_center

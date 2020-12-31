@@ -62,6 +62,9 @@
       integer :: recent_log_header ! model_number when last output header info to terminal
       
       real(dp) :: tau_factor, tau_base
+      real(dp) :: force_tau_factor
+      real(dp) :: force_Tsurf_factor
+      real(dp) :: force_opacity_factor
       
       integer :: phase_of_evolution
       

@@ -103,6 +103,8 @@
             call set_to_NaN(s% L_surf_old)
             call set_to_NaN(s% dt_limit_ratio_old)
             
+            ! ok if return here
+            
             if (.true.) then ! do some more     (after 611bac9)       
             call set_to_NaN(s% total_radiation_old)
             call set_to_NaN(s% min_kap_floor_old)
@@ -229,9 +231,6 @@
             call set_to_NaN(s% angular_momentum_added)
             call set_to_NaN(s% residual_norm)
             call set_to_NaN(s% max_residual)
-            call set_to_NaN(s% force_tau_factor)
-            call set_to_NaN(s% force_Tsurf_factor)
-            call set_to_NaN(s% force_opacity_factor)
             call set_to_NaN(s% max_fixup_for_mix)
             call set_to_NaN(s% initial_timestep)   
             call set_to_NaN(s% initial_L_center)

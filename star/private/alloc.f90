@@ -452,8 +452,8 @@
 
          ierr = 0
          null_str = '' ! avoid bogus compiler warnings 'array subscript 1 is above array bounds'
-
-         nz = max(s% prev_mesh_nz, s% nz)
+         
+         
          species = s% species
          num_reactions = s% num_reactions
          nvar = s% nvar
@@ -463,8 +463,10 @@
          c => s
          action = action_in
          if (action == do_check_size) then
+            nz = s% nz
             sz_new = nz
          else
+            nz = max(s% prev_mesh_nz, s% nz)
             sz_new = nz + nz_alloc_extra
          end if
 
@@ -484,7 +486,15 @@
                call do2(s% xh, c% xh, nvar_hydro, 'xh')
                if (failed('xh')) exit
                call do2(s% xa, c% xa, species, 'xa')
-               if (failed('xa')) exit
+               if (failed('xa')) then
+                  write(*,2) 'species', species
+                  write(*,2) 'size(s% xa,dim=1)', size(s% xa,dim=1)
+                  write(*,2) 's% nz', s% nz
+                  write(*,2) 's% prev_mesh_nz', s% prev_mesh_nz
+                  write(*,2) 'size(s% xa,dim=2)', size(s% xa,dim=2)
+                  stop 'star_info_arrays'
+                  exit
+               end if
                call do1(s% dq, c% dq)
                if (failed('dq')) exit
                call do1(s% omega, c% omega)
