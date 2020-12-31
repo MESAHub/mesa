@@ -10,8 +10,51 @@ Backwards-incompatible changes
 
 
 
+
 Module-level changes
 --------------------
+
+kap
+~~~
+
+The call signatures of ``kap_get`` and the hook ``other_kap_get`` have
+changed.  The set of arguments is now conceptually equivalent between
+the two subroutines.  The inputs include the density, temperature, and
+full composition vector.  The free electron/positron number and the
+electron degeneracy parameter (and their derivatives) are also
+required.  The outputs include the opacity and its derivatives as well
+as information about the fractions of various opacity sources used in
+the blended opacity.
+
+::
+
+      subroutine kap_get( &
+         handle, species, chem_id, net_iso, xa, &
+         logRho, logT, &
+         lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+         eta, d_eta_dlnRho, d_eta_dlnT , &
+         kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
+
+         ! INPUT
+         integer, intent(in) :: handle ! from alloc_kap_handle
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, pointer :: net_iso(:) ! maps chem id to species number
+         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: logRho ! density
+         real(dp), intent(in) :: logT ! temperature
+         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+            ! free_e := total combined number per nucleon of free electrons and positrons
+         real(dp), intent(in)  :: eta, d_eta_dlnRho, d_eta_dlnT
+            ! eta := electron degeneracy parameter from eos
+
+         ! OUTPUT
+         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
+         real(dp), intent(out) :: kap ! opacity
+         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         real(dp), intent(out) :: dlnkap_dxa(:) ! partial derivative w.r.t. species
+         integer, intent(out) :: ierr ! 0 means AOK.
 
 
 neu
