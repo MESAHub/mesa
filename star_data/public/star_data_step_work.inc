@@ -1234,10 +1234,7 @@
          integer :: timestep_hold
          integer :: model_number_for_last_retry
          integer :: model_number_for_last_retry_old
-         integer :: mesh_call_number
-         integer :: burn_and_mix_call_number
-         integer :: solver_call_number
-         integer :: diffusion_call_number
+         
          integer :: num_diffusion_solver_iters
          integer :: num_diffusion_solver_steps
          integer :: num_rotation_solver_steps
@@ -1480,14 +1477,12 @@
          
          character (len=strlen) :: most_recent_photo_name
          
-         logical :: have_initial_energy_integrals
          real(dp) :: &
             total_internal_energy_initial, &
             total_gravitational_energy_initial, &
             total_radial_kinetic_energy_initial, &
             total_turbulent_energy_initial, &
-            total_rotational_kinetic_energy_initial, &
-            total_energy_initial          
+            total_rotational_kinetic_energy_initial
          
          logical :: using_revised_net_name
          character (len=net_name_len) :: revised_net_name

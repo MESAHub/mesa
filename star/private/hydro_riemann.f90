@@ -1175,6 +1175,12 @@
          end if
          sources = sources + diffusion_eps
          s% dedt_RTI(k) = diffusion_eps
+         if (is_bad(diffusion_eps)) then
+!$omp critical (hydro_reimann_crit3)
+            write(*,2) 'diffusion_eps', k, diffusion_eps
+            stop 'do1_Riemann_energy_eqn'
+!$omp end critical (hydro_reimann_crit3)
+         end if
       
          if (s% nonlocal_NiCo_decay_heat .or. &
                s% gamma_law_hydro > 0 .or. doing_op_split_burn) then
@@ -1200,6 +1206,15 @@
          if (s% do_conv_premix .and. s% do_premix_heating) &
             s% eps_heat(k) = s% eps_heat(k) + s% eps_pre_mix(k)
          sources = sources + s% eps_heat(k)
+         if (is_bad(sources)) then
+!$omp critical (hydro_reimann_crit4)
+            write(*,2) 'eps_nuc', k, eps_nuc
+            write(*,2) 'non_nuc_neu', k, non_nuc_neu
+            write(*,2) 's% extra_heat(k)', k, s% extra_heat(k)
+            write(*,2) 's% irradiation_heat(k)', k, s% irradiation_heat(k)
+            stop 'do1_Riemann_energy_eqn'
+!$omp end critical (hydro_reimann_crit4)
+         end if
          
          E_src_sink = E_src_sink + s% eps_heat(k)
          dEt_dt = 0d0

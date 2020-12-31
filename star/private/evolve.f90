@@ -272,9 +272,6 @@
             s% timestep_hold = -999
             s% model_number_for_last_retry = -999
             s% model_number_for_last_retry_old = -999
-            s% mesh_call_number = -999
-            s% burn_and_mix_call_number = -999
-            s% solver_call_number = -999
             s% diffusion_call_number = -999
             s% num_diffusion_solver_iters = -999
             s% num_diffusion_solver_steps = -999
@@ -414,7 +411,6 @@
             call set_to_NaN(s% total_radial_kinetic_energy_initial)
             call set_to_NaN(s% total_turbulent_energy_initial)
             call set_to_NaN(s% total_rotational_kinetic_energy_initial)
-            call set_to_NaN(s% total_energy_initial)
             call set_to_NaN(s% time_evolve_step)
             call set_to_NaN(s% time_remesh)
             call set_to_NaN(s% time_adjust_mass)
@@ -1739,6 +1735,7 @@
 
       subroutine check_for_extra_heat(s, ierr)
          use hydro_vars, only: set_vars
+         use utils_lib, only: is_bad
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
@@ -1836,6 +1833,13 @@
          end if
          if (left_to_inject < extra*dt*s% xmstar*(qmax - qmin)) then
             extra = left_to_inject/(dt*s% xmstar*(qmax - qmin))
+         end if
+         if (is_bad(extra)) then
+            write(*,2) 'extra', s% model_number, extra
+            write(*,2) 'left_to_inject', s% model_number, left_to_inject
+            write(*,2) 's% total_energy_initial', s% model_number, s% total_energy_initial
+            write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
+            stop 'check_for_extra_heat'
          end if
          do k=nz,1,-1
             q00 = s% q(k)

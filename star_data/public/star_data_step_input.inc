@@ -187,6 +187,13 @@
       integer :: total_num_solver_calls_converged, total_num_solver_relax_calls_converged
       integer :: num_retries
 
+      logical :: have_initial_energy_integrals
+      real(dp) :: total_energy_initial          
+         
+      integer :: mesh_call_number
+      integer :: solver_call_number
+      integer :: diffusion_call_number
+
       integer :: recent_log_header ! model_number when last output header info to terminal
       
       integer :: phase_of_evolution
