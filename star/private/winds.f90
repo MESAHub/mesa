@@ -521,7 +521,7 @@
             end if
 
             wind_mdot_prev = -s% mstar_dot_old
-            if (s% generations > 2 .and. wind_mdot > 0 .and. wind_mdot_prev > 0) &
+            if (wind_mdot > 0 .and. wind_mdot_prev > 0) &
                wind_mdot = min(wind_mdot, s% max_mdot_jump_for_rotation*wind_mdot_prev)
 
             ! recheck max_wind

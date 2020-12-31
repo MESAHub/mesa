@@ -3,6 +3,8 @@
       ! can be "undefined" when start to take a step
       ! not saved in models or in photos.
       
+      real(dp) :: mstar_dot ! (gm/second)
+      
       real(dp), pointer, dimension(:) :: D_omega
       
       ! when using the implicit wind calculation, which keeps omega_div_omega_crit
@@ -1065,7 +1067,6 @@
       real(dp) :: star_age, time_days, time_years ! time is in seconds
       real(dp) :: time_step, dt_days, dt_years ! dt is in seconds
       
-      real(dp) :: dt
       real(dp) :: dt_start ! dt during first try for step
       
       ! a few things from start of step that will need later

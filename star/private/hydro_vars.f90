@@ -194,6 +194,17 @@
             return
          end if
          
+!         if (s% rotation_flag) then
+!            call restore(s% nu_ST, nu_st)
+!            call restore(s% D_ST, d_st)
+!            call restore(s% D_DSI, d_dsi)
+!            call restore(s% D_SH, d_sh)
+!            call restore(s% D_SSI, d_ssi)
+!            call restore(s% D_ES, d_es)
+!            call restore(s% D_GSF, d_gsf)
+!            s% have_previous_rotation_info = .true.
+!         end if
+         
          if (s% op_split_burn) then
             do k = 1, nz
                if (s% T_start(k) >= s% op_split_burn_min_T) &
@@ -1086,7 +1097,6 @@
          nz = s% nz
          species = s% species
          s% L_phot = s% L(1)/Lsun
-         s% L_surf = s% L(1)/Lsun
          if (.not. s% using_Fraley_time_centering) then
             s% d_vc_dv = 1d0
          else

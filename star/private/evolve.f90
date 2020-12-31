@@ -87,6 +87,7 @@
             use utils_lib, only: set_to_NaN
             integer :: j
             include 'formats'
+
             call set_to_NaN(s% time_old)
             call set_to_NaN(s% dt_old)
             call set_to_NaN(s% mstar_old)
@@ -128,6 +129,7 @@
                call set_to_NaN(s% cz_bot_mass_old(j))
             end do      
 
+            call set_to_NaN(s% mstar_dot)
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% adjust_J_q)
             call set_to_NaN(s% rotational_mdot_boost)
@@ -203,7 +205,6 @@
             call set_to_NaN(s% time_days)
             call set_to_NaN(s% time_years)
             call set_to_NaN(s% time_step)
-            call set_to_NaN(s% dt)
             call set_to_NaN(s% dt_days)
             call set_to_NaN(s% dt_years)
             call set_to_NaN(s% dt_start)
@@ -223,6 +224,9 @@
             call set_to_NaN(s% h1_czb_mass)
             call set_to_NaN(s% profile_age)
             call set_to_NaN(s% h1_czb_mass)
+            
+            !call set_to_NaN(s% dt_limit_ratio)
+            
             call set_to_NaN(s% total_angular_momentum)
             call set_to_NaN(s% total_abs_angular_momentum)
             call set_to_NaN(s% angular_momentum_removed)
@@ -285,7 +289,6 @@
             s% k_below_just_added = -999
             s% start_H_envelope_base_k = -999
             s% init_model_number = -999
-            
             do j=1,num_categories
                call set_to_NaN(s% L_by_category(j))
                call set_to_NaN(s% L_by_category_old(j))
@@ -293,7 +296,6 @@
             
             end if
             
-            return
             if (.true.) then ! after 65e0e76
 
             s% termination_code = -999
@@ -317,7 +319,7 @@
 
             ! variation control value for timestep controller
             call set_to_NaN(s% dt_limit_ratio_old)
-      
+
             ! surface info
             call set_to_NaN(s% v_surf_old) ! (cm/second)
             call set_to_NaN(s% L_surf_old) ! surface luminosity (Lsun units)
@@ -399,6 +401,14 @@
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% mesh_adjust_KE_conservation)
             
+
+            
+            
+            ! ok to here
+      
+            !return
+            
+            
             call set_to_NaN(s% total_internal_energy_initial)
             call set_to_NaN(s% total_gravitational_energy_initial)
             call set_to_NaN(s% total_radial_kinetic_energy_initial)
@@ -468,6 +478,7 @@
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
+         s% generations = 1
          
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -502,8 +513,6 @@
             if (failed('set_rmid')) return
             call set_rotation_info(s, .true., ierr)
             if (failed('set_rotation_info')) return
-         else
-            s% total_angular_momentum = 0d0
          end if
          
          if (s% doing_first_model_of_run) then
@@ -895,7 +904,7 @@
             was_in_implicit_wind_limit = s% was_in_implicit_wind_limit
             if(abs(s% mstar_dot_old) > 0) then
                if (was_in_implicit_wind_limit .and. &
-                   s% generations >= 2 .and. &
+                   s% generations == 2 .and. &
                    abs((s% mstar_dot-s% mstar_dot_old)/s% mstar_dot_old)+1 > &
                    s% mdot_revise_factor) then
                    write(*,*) "Skipping first step in implicit mdot"
@@ -1973,15 +1982,18 @@
             s% prev_mesh_nz = s% nz
          end if
          
-         call set_start_of_step_info(s, 'before do_mesh', ierr)
-         if (failed('set_start_of_step_info ierr')) return
-         
          if (s% okay_to_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
+               call set_start_of_step_info(s, 'before do_mesh', ierr)
+               if (failed('set_start_of_step_info ierr')) return
                prepare_for_new_step = do_mesh(s) ! sets s% need_to_setvars = .true. if changes anything
                if (prepare_for_new_step /= keep_going) return
             end if
          end if
+         
+         call new_generation(s, ierr)
+         if (failed('new_generation ierr')) return
+         s% generations = 2
 
          if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
             s% dt_next = max(0d0, s% max_age*secyer - s% time)
@@ -2010,10 +2022,6 @@
             write(*,1) 's% dt', s% dt
             stop 'prepare_for_new_step'
          end if
-         
-         call new_generation(s, ierr)
-         if (failed('new_generation ierr')) return
-         s% generations = min(max_generations, s% generations+1)
 
          s% retry_cnt = 0
          s% redo_cnt = 0

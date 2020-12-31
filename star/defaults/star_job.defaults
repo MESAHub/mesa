@@ -1832,6 +1832,27 @@
     change_initial_D_omega_flag = .false.
 
 
+      ! new_am_nu_rot_flag
+      ! ~~~~~~~~~~~~~~~~~~
+      ! change_am_nu_rot_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! change_initial_am_nu_rot_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_D_omega_for_am_nu_rot
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``am_nu_rot_flag`` is true, use time and space smoothed ``am_nu_rot`` like ``D_omega``
+      ! else if ``D_omega_flag`` and ``use_D_omega_for_am_nu_rot``, use ``D_omega`` for ``am_nu_rot``
+      ! else use ``am_nu_rot`` from current model with no smoothing
+
+      ! ::
+
+    new_am_nu_rot_flag = .false.
+    change_am_nu_rot_flag = .false.
+    change_initial_am_nu_rot_flag = .false.
+    use_D_omega_for_am_nu_rot = .true.
+
+
       ! relax_core
       ! ~~~~~~~~~~
       ! relax_initial_core

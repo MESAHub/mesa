@@ -2200,12 +2200,6 @@
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
          end if
-         if (is_bad(dlgL)) then
-            write(*,2) 'dlgL', s% model_number, dlgL
-            write(*,2) 's% L_surf', s% model_number, s% L_surf
-            write(*,2) 's% L_surf_old', s% model_number, s% L_surf_old
-            stop 'check_delta_lgL'
-         end if
          check_delta_lgL = check_change(s, dlgL, &
             s% delta_lgL_limit, s% delta_lgL_hard_limit, &
             1, 'check_delta_lgL', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -2703,8 +2697,7 @@
          dt_limit_ratio_target = 1d0
 
          if (s% use_dt_low_pass_controller .and. &
-               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0 .and. &
-               s% generations > 2) then ! use 2 values to do "low pass" controller
+               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0) then ! use 2 values to do "low pass" controller
             ratio = limiter(dt_limit_ratio_target/dt_limit_ratio)
             ratio_prev = limiter(dt_limit_ratio_target/s% dt_limit_ratio_old)
             limtr = limiter( &

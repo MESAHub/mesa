@@ -82,34 +82,34 @@
          
          s% model_number_old = s% model_number
          s% nz_old = s% nz
-         s% time_old = s% time; call check(s% time, 's% time')
-         s% dt_old = s% dt; call check(s% dt, 's% dt')
-         s% mstar_old = s% mstar; call check(s% mstar, 's% mstar')
-         s% xmstar_old = s% xmstar; call check(s% xmstar, 's% xmstar')
-         s% M_center_old = s% M_center; call check(s% M_center, 's% M_center')
-         s% R_center_old = s% R_center; call check(s% R_center, 's% R_center')
-         s% L_center_old = s% L_center; call check(s% L_center, 's% L_center')
-         s% v_center_old = s% v_center; call check(s% v_center, 's% v_center')
-         s% cumulative_energy_error_old = s% cumulative_energy_error; call check(s% cumulative_energy_error, 's% cumulative_energy_error')
-         s% total_energy_old = s% total_energy; call check(s% total_energy, 's% total_energy')
-         s% total_internal_energy_old = s% total_internal_energy; call check(s% total_internal_energy, 's% total_internal_energy')
-         s% total_angular_momentum_old = s% total_angular_momentum; call check(s% total_angular_momentum, 's% total_angular_momentum')
-         s% Teff_old = s% Teff; call check(s% Teff, 's% Teff')
-         s% mstar_dot_old = s% mstar_dot; call check(s% mstar_dot, 's% mstar_dot')
-         s% L_phot_old = s% L_phot; call check(s% L_phot, 's% L_phot')
-         s% L_surf_old = s% L_surf; call check(s% L_surf, 's% L_surf')
-         s% dt_limit_ratio_old = s% dt_limit_ratio; call check(s% dt_limit_ratio, 's% dt_limit_ratio')
-         s% L_nuc_burn_total_old = s% L_nuc_burn_total; call check(s% L_nuc_burn_total, 's% L_nuc_burn_total')
-         s% power_nuc_burn_old = s% power_nuc_burn; call check(s% power_nuc_burn, 's% power_nuc_burn')
-         s% power_nuc_neutrinos_old = s% power_nuc_neutrinos; call check(s% power_nuc_neutrinos, 's% power_nuc_neutrinos')
-         s% power_nonnuc_neutrinos_old = s% power_nonnuc_neutrinos; call check(s% power_nonnuc_neutrinos, 's% power_nonnuc_neutrinos')
-         s% power_neutrinos_old = s% power_neutrinos; call check(s% power_neutrinos, 's% power_neutrinos')
-         s% power_h_burn_old = s% power_h_burn; call check(s% power_h_burn, 's% power_h_burn')
-         s% power_he_burn_old = s% power_he_burn; call check(s% power_he_burn, 's% power_he_burn')
-         s% power_z_burn_old = s% power_z_burn; call check(s% power_z_burn, 's% power_z_burn')
+         s% time_old = s% time
+         s% dt_old = s% dt
+         s% mstar_old = s% mstar
+         s% xmstar_old = s% xmstar
+         s% M_center_old = s% M_center
+         s% R_center_old = s% R_center
+         s% L_center_old = s% L_center
+         s% v_center_old = s% v_center
+         s% cumulative_energy_error_old = s% cumulative_energy_error
+         s% total_energy_old = s% total_energy
+         s% total_internal_energy_old = s% total_internal_energy
+         s% total_angular_momentum_old = s% total_angular_momentum
+         s% Teff_old = s% Teff
+         s% mstar_dot_old = s% mstar_dot
+         s% L_phot_old = s% L_phot
+         s% L_surf_old = s% L_surf
+         s% dt_limit_ratio_old = s% dt_limit_ratio
+         s% L_nuc_burn_total_old = s% L_nuc_burn_total
          do i=1,num_categories
-            s% L_by_category_old(i) = s% L_by_category(i); call check(s% L_by_category(i), 's% L_by_category')
+            s% L_by_category_old(i) = s% L_by_category(i)
          end do
+         s% power_nuc_burn_old = s% power_nuc_burn
+         s% power_nuc_neutrinos_old = s% power_nuc_neutrinos
+         s% power_nonnuc_neutrinos_old = s% power_nonnuc_neutrinos
+         s% power_neutrinos_old = s% power_neutrinos
+         s% power_h_burn_old = s% power_h_burn
+         s% power_he_burn_old = s% power_he_burn
+         s% power_z_burn_old = s% power_z_burn
 
          
 !         s% total_radiation_old = s% total_radiation
@@ -153,16 +153,6 @@
          if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
 
          contains
-         
-         subroutine check(val, str)
-            real(dp), intent(in) :: val
-            character (len=*) :: str
-            include 'formats'
-            if (is_bad(val)) then
-               write(*,2) 'new_generation ' // trim(str), s% model_number, val
-               stop 'check in new_generation'
-            end if
-         end subroutine check
 
          subroutine flip(ptr, ptr_old, ierr)
             real(dp), pointer, dimension(:) :: ptr, ptr_old
