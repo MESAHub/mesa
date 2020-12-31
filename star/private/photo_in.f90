@@ -84,8 +84,7 @@
             s% model_number, s% model_number_old, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
             s% total_radiation, s% min_kap_floor, s% time, s% total_angular_momentum, &
-            s% prev_create_atm_R0_div_R, s% dt, &
-            s% have_previous_rotation_info, s% have_previous_conv_vel, s% have_previous_RTI_info, &
+            s% prev_create_atm_R0_div_R, s% dt, s% have_previous_conv_vel, &
             s% initial_mass, s% initial_z, s% initial_y, &
             s% was_in_implicit_wind_limit, &
             s% model_number_for_last_retry, &

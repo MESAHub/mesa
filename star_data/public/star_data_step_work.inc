@@ -3,8 +3,6 @@
       ! can be "undefined" when start to take a step
       ! not saved in models or in photos.
       
-      real(dp) :: mstar_dot ! (gm/second)
-      
       real(dp), pointer, dimension(:) :: D_omega
       
       ! when using the implicit wind calculation, which keeps omega_div_omega_crit
@@ -1200,7 +1198,6 @@
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: profile_age
          real(dp) :: h1_czb_mass
-         real(dp) :: dt_limit_ratio
          real(dp) :: total_angular_momentum
          real(dp) :: total_abs_angular_momentum
          real(dp) :: angular_momentum_removed

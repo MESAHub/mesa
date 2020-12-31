@@ -2200,6 +2200,12 @@
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
          end if
+         if (is_bad(dlgL)) then
+            write(*,2) 'dlgL', s% model_number, dlgL
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            write(*,2) 's% L_surf_old', s% model_number, s% L_surf_old
+            stop 'check_delta_lgL'
+         end if
          check_delta_lgL = check_change(s, dlgL, &
             s% delta_lgL_limit, s% delta_lgL_hard_limit, &
             1, 'check_delta_lgL', skip_hard_limit, dt_limit_ratio, relative_excess)

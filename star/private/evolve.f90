@@ -128,7 +128,6 @@
                call set_to_NaN(s% cz_bot_mass_old(j))
             end do      
 
-            call set_to_NaN(s% mstar_dot)
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% adjust_J_q)
             call set_to_NaN(s% rotational_mdot_boost)
@@ -224,7 +223,6 @@
             call set_to_NaN(s% h1_czb_mass)
             call set_to_NaN(s% profile_age)
             call set_to_NaN(s% h1_czb_mass)
-            call set_to_NaN(s% dt_limit_ratio)
             call set_to_NaN(s% total_angular_momentum)
             call set_to_NaN(s% total_abs_angular_momentum)
             call set_to_NaN(s% angular_momentum_removed)
@@ -295,6 +293,7 @@
             
             end if
             
+            return
             if (.true.) then ! after 65e0e76
 
             s% termination_code = -999
@@ -503,6 +502,8 @@
             if (failed('set_rmid')) return
             call set_rotation_info(s, .true., ierr)
             if (failed('set_rotation_info')) return
+         else
+            s% total_angular_momentum = 0d0
          end if
          
          if (s% doing_first_model_of_run) then
@@ -1972,18 +1973,15 @@
             s% prev_mesh_nz = s% nz
          end if
          
+         call set_start_of_step_info(s, 'before do_mesh', ierr)
+         if (failed('set_start_of_step_info ierr')) return
+         
          if (s% okay_to_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
-               call set_start_of_step_info(s, 'before do_mesh', ierr)
-               if (failed('set_start_of_step_info ierr')) return
                prepare_for_new_step = do_mesh(s) ! sets s% need_to_setvars = .true. if changes anything
                if (prepare_for_new_step /= keep_going) return
             end if
          end if
-         
-         call new_generation(s, ierr)
-         if (failed('new_generation ierr')) return
-         s% generations = min(max_generations, s% generations+1)
 
          if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
             s% dt_next = max(0d0, s% max_age*secyer - s% time)
@@ -2012,6 +2010,10 @@
             write(*,1) 's% dt', s% dt
             stop 'prepare_for_new_step'
          end if
+         
+         call new_generation(s, ierr)
+         if (failed('new_generation ierr')) return
+         s% generations = min(max_generations, s% generations+1)
 
          s% retry_cnt = 0
          s% redo_cnt = 0

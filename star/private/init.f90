@@ -727,26 +727,21 @@
          s% dt = 0
          s% dt_old = 0
 
-         s% have_previous_rotation_info = .false.
-         s% have_previous_RTI_info = .false.
          s% have_previous_conv_vel = .false.
 
          s% net_name = ''
 
          s% mstar_dot = 0
-         s% mstar_dot_old = 0
+!         s% mstar_dot_old = 0
 
          s% v_surf = 0
 !         s% v_surf_old = 0
 
          s% L_nuc_burn_total = 0
-         s% L_nuc_burn_total_old = 0
 
          s% L_by_category = 0
-         s% L_by_category_old = 0
 
          s% dt_limit_ratio = 0
-         s% dt_limit_ratio_old = 0
 
          s% L_phot = 0
          s% L_phot_old = 0

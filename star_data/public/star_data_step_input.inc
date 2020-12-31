@@ -2,8 +2,6 @@
 
    ! input for taking a step.
    ! modified during the step so that at end holds the new model.
-       
-      integer :: model_number
       
       real(dp) :: time ! elapsed time (seconds)
       real(dp) :: dt_next ! timestep (seconds)
@@ -12,6 +10,7 @@
       real(dp) :: mstar
       real(dp) :: xmstar ! baryonic mass external to M_center
          ! thus mstar = M_center + xmstar
+      real(dp) :: mstar_dot ! (gm/second)
 
       ! the number of zones in the model
       integer :: nz
@@ -36,7 +35,13 @@
       real(dp), pointer, dimension(:) :: j_rot ! (nz)
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega ! (nz)
-      
+       
+      integer :: model_number, num_retries
+      integer :: total_num_solver_iterations, total_num_solver_relax_iterations
+      integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made
+      integer :: total_num_solver_calls_converged, total_num_solver_relax_calls_converged
+      integer :: phase_of_evolution
+      real(dp) :: cumulative_energy_error, cumulative_extra_heating      
       
       ! center boundary
       
@@ -145,7 +150,59 @@
          
         
       logical :: D_omega_flag ! D_omega_flag is true if we are using D_omega for mixing        
-      logical :: am_nu_rot_flag! am_nu_rot_flag is true if we are using smoothed am_nu_rot variables
+
+      ! history
+         integer, pointer :: profile_column_spec(:)
+         integer :: number_of_history_columns
+            ! number_of_history_columns = num_standard_history_columns + num extra history columns
+         real(dp), pointer :: history_values(:) ! (number_of_history_columns)
+         logical, pointer :: history_value_is_integer(:) ! (number_of_history_columns)
+         character (len=maxlen_history_column_name), pointer :: &
+            history_names(:) ! (number_of_history_columns)
+         type (integer_dict), pointer :: history_names_dict
+            ! maps names to index in history_values
+         integer :: model_number_of_history_values
+         logical :: need_to_set_history_names_etc
+         ! the following does not include "extra" columns
+         integer, pointer :: history_column_spec(:) ! (num_standard_history_columns)
+      
+      ! profile
+         character (len=strlen) :: &
+            model_profile_filename, model_controls_filename, model_data_filename
+         character (len=strlen) :: &
+            most_recent_profile_filename, most_recent_controls_filename, &
+            most_recent_model_data_filename
+         
+      ! pgstar
+         type (pgstar_hist_node), pointer :: pgstar_hist => null()
+      
+      ! random number generator (marsaglia and zaman). period is 2**43 with
+      ! 900 million different sequences. the state of the generator (for restarts)
+         integer :: rand_i97, rand_j97
+         real(dp) :: rand_u(rand_u_len), rand_c, rand_cd, rand_cm
+      
+      ! for timestep low pass filter
+         real(dp) :: dt_limit_ratio
+      
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 
+
+      ! Q: A lot of names are "log" something -- natural or base 10 log?
+      ! A: I use "ln" for natural log and "log" for base 10.
 
 
+      ! Q: How is the "center" of a zone defined? is it the center by mass, or radius?
+      ! A: Extensive variables (R, L, M, velocity) are defined at cell boundaries.
+      !    Intensive variables (T, rho, composition) are cell averages. 
+      !    We use the cell average as an estimate of the point value at the cell center by mass.
+      !   The themo variables are cell averages since they are calculated as functions of the cell averages.
+      !   Note however that gradr and gradT are not thermo variables.
+      !   They are defined at cell boundaries and depend on both neighbors.
+      !   If you are comparing to results from a model that doesn't have staggered variables
+      !   (i.e., one that defines the intensive and extensive vars at the same place), then
+      !   you will need to adjust.   For example, to compare our sound speed profile to
+      !   published results, we interpolate the cell centered csound values to find values
+      !   at cell boundaries.
+      
            
