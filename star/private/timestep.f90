@@ -2170,6 +2170,7 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
          real(dp) :: dlgL_phot, relative_excess
+         include 'formats'
          check_delta_lgL_phot = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
@@ -2178,6 +2179,11 @@
             dlgL_phot = 0
          else
             dlgL_phot = log10(s% L_phot/s% L_phot_old)
+         end if
+         if (is_bad(dlgL_phot)) then
+            write(*,2) 's% L_phot', s% model_number, s% L_phot
+            write(*,2) 's% L_phot_old', s% model_number, s% L_phot_old
+            stop 'check_delta_lgL'
          end if
          check_delta_lgL_phot = check_change(s, dlgL_phot, &
             s% delta_lgL_phot_limit, s% delta_lgL_phot_hard_limit, &
@@ -2199,6 +2205,11 @@
             dlgL = 0
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
+         end if
+         if (is_bad(dlgL)) then
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            write(*,2) 's% L_surf_old', s% model_number, s% L_surf_old
+            stop 'check_delta_lgL'
          end if
          check_delta_lgL = check_change(s, dlgL, &
             s% delta_lgL_limit, s% delta_lgL_hard_limit, &

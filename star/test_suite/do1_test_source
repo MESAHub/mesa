@@ -10,7 +10,7 @@ do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-#  ask Josiah   do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
+#  Josiah says skip this one   do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 #  obsolete   do_one black_hole "stop because fe_core_infall > fe_core_infall_limit" "start_core_collapse.mod" skip

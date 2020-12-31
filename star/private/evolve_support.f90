@@ -97,6 +97,12 @@
          s% Teff_old = s% Teff
          s% mstar_dot_old = s% mstar_dot
          s% L_phot_old = s% L_phot
+         if (is_bad(s% L_phot_old)) then
+            write(*,2) 's% L_phot_old', s% model_number, s% L_phot_old
+            stop 'new_generation'
+         end if
+         
+         
          s% L_surf_old = s% L_surf
          s% dt_limit_ratio_old = s% dt_limit_ratio
          s% L_nuc_burn_total_old = s% L_nuc_burn_total

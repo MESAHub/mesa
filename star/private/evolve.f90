@@ -1927,6 +1927,8 @@
          use evolve_support, only: new_generation
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
+         use report, only: set_phot_info
+         use hydro_vars, only: set_vars_if_needed
 
          type (star_info), pointer :: s
 
@@ -1990,6 +1992,10 @@
                if (prepare_for_new_step /= keep_going) return
             end if
          end if
+         
+         call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
+         if (failed('set_vars_if_needed ierr')) return
+         call set_phot_info(s)
          
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
