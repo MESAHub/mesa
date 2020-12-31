@@ -38,6 +38,7 @@
       subroutine Get_kap_Results( &
            rq, zbar, X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+           eta, d_eta_dlnRho, d_eta_dlnT, &
            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use const_def
          use utils_lib, only: is_bad
@@ -46,6 +47,7 @@
          real(dp), intent(in) :: X, XC, XN, XO, XNe, Z, zbar
          real(dp), intent(in) :: logRho_in, logT_in
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(out) :: frac_Type2
          real(dp), intent(out) :: kap ! opacity
          real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
@@ -98,6 +100,7 @@
          call combine_rad_with_compton_and_conduction( &
             rq, Rho, logRho, T, logT, zbar, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          
@@ -571,6 +574,7 @@
       subroutine combine_rad_with_compton_and_conduction( &
             rq, Rho, logRho, T, logT, zbar, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
@@ -578,6 +582,7 @@
          type (Kap_General_Info), pointer :: rq
          real(dp), intent(in) :: Rho, logRho, T, logT, zbar
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(inout) :: kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr ! 0 means AOK.
@@ -618,6 +623,7 @@
             
             call Compton_Opacity( &
                Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+               eta, d_eta_dlnRho, d_eta_dlnT, &
                kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
             if (ierr /= 0) return
             if (dbg) write(*,1) 'kap_compton', kap_compton
@@ -771,6 +777,7 @@
 
       subroutine Compton_Opacity( &
             Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta_in, d_eta_in_dlnRho, d_eta_in_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use eos_lib
          use eos_def
@@ -784,6 +791,7 @@
          ! by then conduction should be dominant anyway, so things should be okay.
 
          real(dp), intent(in) :: Rho_in, T_in, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+         real(dp), intent(in) :: eta_in, d_eta_in_dlnRho, d_eta_in_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr
          

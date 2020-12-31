@@ -1,3 +1,7 @@
+&eos
+  ! use defaults
+/
+
 &kap
 
   kap_file_prefix = 'a09'

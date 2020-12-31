@@ -622,7 +622,9 @@
          integer, intent(out) :: ierr
          
          real(dp) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             frac_Type2, opacity, dlnkap_dlnd, dlnkap_dlnT, opacity_factor
+         real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
          
          include 'formats'
          ierr = 0
@@ -637,18 +639,27 @@
          lnfree_e = res(i_lnfree_e)
          d_lnfree_e_dlnRho = d_dlnd(i_lnfree_e)
          d_lnfree_e_dlnT = d_dlnT(i_lnfree_e)
+
+         eta = res(i_eta)
+         d_eta_dlnRho = d_dlnd(i_eta)
+         d_eta_dlnT = d_dlnT(i_eta)
+
          if (s% use_other_kap) then
             call s% other_kap_get( &
-               s% id, k, kap_handle, zbar, X, Z, XC, XN, XO, XNe, &
-               logRho, logT, species, chem_id, net_iso, xa, &
+               s% id, k, kap_handle, species, chem_id, net_iso, xa, &
+               logRho, logT, &
                lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-               frac_Type2, opacity, dlnkap_dlnd, dlnkap_dlnT, ierr)
+               eta, d_eta_dlnRho, d_eta_dlnT, &
+               kap_fracs, opacity, dlnkap_dlnd, dlnkap_dlnT, dlnkap_dxa, ierr)
          else
             call kap_get( &
-               kap_handle, zbar, X, Z, XC, XN, XO, XNe, &
-               logRho, logT, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-               frac_Type2, opacity, dlnkap_dlnd, dlnkap_dlnT, ierr)
+               kap_handle, species, chem_id, net_iso, xa, &
+               logRho, logT, &
+               lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+               eta, d_eta_dlnRho, d_eta_dlnT, &
+               kap_fracs, opacity, dlnkap_dlnd, dlnkap_dlnT, dlnkap_dxa, ierr)
          end if
+         frac_Type2 = kap_fracs(i_frac_Type2)
          if (ierr /= 0) then
 !$OMP critical
             write(*,*) 'failed in eval1_mesa_eos_and_kap get kap'
