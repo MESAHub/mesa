@@ -83,7 +83,7 @@
          
          contains
          
-         subroutine test_set_undefined  ! these are currently saved in photos
+         subroutine test_set_undefined  ! these were previously saved in photos
             use utils_lib, only: set_to_NaN
             integer :: j
             include 'formats'
@@ -103,10 +103,6 @@
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf_old)
             call set_to_NaN(s% dt_limit_ratio_old)
-            
-            ! ok if return here
-            
-            if (.true.) then ! do some more     (after 611bac9)       
             call set_to_NaN(s% total_radiation_old)
             call set_to_NaN(s% total_angular_momentum_old)
             call set_to_NaN(s% revised_max_yr_dt_old)
@@ -116,7 +112,6 @@
             call set_to_NaN(s% total_radial_kinetic_energy_old)
             call set_to_NaN(s% total_turbulent_energy_old)
             call set_to_NaN(s% total_rotational_kinetic_energy_old)
-            call set_to_NaN(s% v_surf_old)
             call set_to_NaN(s% h1_czb_mass_old)
             call set_to_NaN(s% he_core_mass_old)
             call set_to_NaN(s% c_core_mass_old)
@@ -222,10 +217,7 @@
             call set_to_NaN(s% adjust_mass_inner_frac_sub1)
             call set_to_NaN(s% h1_czb_mass)
             call set_to_NaN(s% profile_age)
-            call set_to_NaN(s% h1_czb_mass)
-            
-            !call set_to_NaN(s% dt_limit_ratio)
-            
+            call set_to_NaN(s% h1_czb_mass)            
             call set_to_NaN(s% total_angular_momentum)
             call set_to_NaN(s% total_abs_angular_momentum)
             call set_to_NaN(s% angular_momentum_removed)
@@ -289,10 +281,6 @@
                call set_to_NaN(s% L_by_category(j))
                call set_to_NaN(s% L_by_category_old(j))
             end do
-            
-            end if
-            
-            if (.true.) then ! after 65e0e76
 
             s% termination_code = -999
             s% boost_mlt_alfa = -999
@@ -321,7 +309,6 @@
             call set_to_NaN(s% L_surf_old) ! surface luminosity (Lsun units)
             call set_to_NaN(s% L_phot_old) ! photosphere luminosity (Lsun units)
             call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
-            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
             
             s% n_conv_regions_old = -999
             
@@ -394,14 +381,6 @@
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% mesh_adjust_KE_conservation)
             
-
-            
-            
-            ! ok to here
-      
-            !return
-            
-            
             call set_to_NaN(s% total_internal_energy_initial)
             call set_to_NaN(s% total_gravitational_energy_initial)
             call set_to_NaN(s% total_radial_kinetic_energy_initial)
@@ -424,8 +403,6 @@
             call set_to_NaN(s% time_set_hydro_vars)
             call set_to_NaN(s% time_set_mixing_info)
             call set_to_NaN(s% time_total)
-            
-            end if
             
          end subroutine test_set_undefined
          
@@ -468,7 +445,6 @@
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
          s% L_for_BB_outer_BC = -1 ! mark as not set
-         s% Teff = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1

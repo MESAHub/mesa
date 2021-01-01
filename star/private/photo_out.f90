@@ -43,7 +43,7 @@
          integer, intent(in) :: iounit
          integer, intent(out) :: ierr
 
-         integer :: part_number, nz, nz_old, len_history_col_spec
+         integer :: part_number, nz, len_history_col_spec
          integer :: k
 
          include 'formats'
@@ -51,26 +51,23 @@
          ierr = 0
          nz = s% nz
 
-         nz_old = s% nz_old
          part_number = 0 ! part_numbers are just a consistency check on the data file
 
          write(iounit) star_def_version
          
          call write_part_number(iounit)
          write(iounit) &
-            s% initial_z, &    ! <<<<<<<<<<<<<<<<<<<<<<<<< need this since read_model can change what is in the inlist
+            s% initial_z, & ! need this since read_model can change what is in the inlist
             s% generations, s% total_num_solver_iterations, &
-            s% nz, s% nz_old, &
-            s% nvar_hydro, s% nvar_chem, s% nvar, &
+            s% nz, s% nvar_hydro, s% nvar_chem, s% nvar, &
             s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% rsp_flag, s% prev_Lmax, s% species, s% num_reactions, &
-            s% model_number, s% model_number_old, s% star_mass, &
+            s% model_number, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
-            s% total_radiation, s% time, s% total_angular_momentum, &
-            s% prev_create_atm_R0_div_R, s% dt, s% have_previous_conv_vel, &
+            s% time, s% total_angular_momentum, &
+            s% dt, s% have_previous_conv_vel, &
             s% was_in_implicit_wind_limit, &
-            s% model_number_for_last_retry, &
             s% using_revised_net_name, &
             s% revised_net_name, &
             s% using_revised_max_yr_dt, &
@@ -91,8 +88,7 @@
          call write_part_number(iounit)
          write(iounit) &
             s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities, &
-            s% mstar_dot, s% v_surf, s% dt_limit_ratio, &
-            s% tau_base, s% w_div_w_crit_avg_surf
+            s% dt_limit_ratio, s% tau_base
 
          write(iounit) &
             s% i_lnd, s% i_lnT, s% i_lnR, s% i_lum, s% i_eturb_RSP, s% i_erad_RSP, s% i_Fr_RSP, &
@@ -114,27 +110,20 @@
 
          call write_part_number(iounit) 
          write(iounit) &
-            s% num_solver_iterations, s% num_skipped_setvars, s% num_retries, s% num_setvars, &
-            
+            s% num_solver_iterations, s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
             s% total_num_solver_iterations, &
             s% total_num_solver_relax_iterations, &
-            s% total_num_solver_calls_made, &
-            
+            s% total_num_solver_calls_made, &            
             s% total_num_solver_relax_calls_made, &
             s% total_num_solver_calls_converged, &
             s% total_num_solver_relax_calls_converged, &
-
             s% total_step_attempts, s% total_relax_step_attempts, &
             s% total_step_retries, s% total_relax_step_retries, &
             s% total_step_redos, s% total_relax_step_redos, &
             s% total_steps_finished, s% total_relax_steps_finished, &
-
-            s% num_hydro_merges, s% num_hydro_splits, &
-            s% tau_center, &
-            s% timestep_hold, s% model_number_for_last_retry, s% bad_max_corr_cnt, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
-            s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
-            s% initial_timestep, s% result_reason, s% need_to_update_history_now, &
+            s% Teff, s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
+            s% need_to_update_history_now, &
             s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% need_to_save_profiles_now, s% save_profiles_model_priority, &
             s% most_recent_photo_name, &
@@ -144,11 +133,11 @@
          write(iounit) s% len_extra_iwork, s% len_extra_work
          if (s% len_extra_iwork > 0) then
             write(iounit) s% extra_iwork(1:s% len_extra_iwork)
-            write(iounit) s% extra_iwork_old(1:s% len_extra_iwork)
+            !write(iounit) s% extra_iwork_old(1:s% len_extra_iwork)
          end if
          if (s% len_extra_work > 0) then
             write(iounit) s% extra_work(1:s% len_extra_work)
-            write(iounit) s% extra_work_old(1:s% len_extra_work)
+            !write(iounit) s% extra_work_old(1:s% len_extra_work)
          end if
 
          write(iounit) s% ixtra

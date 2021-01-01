@@ -433,7 +433,7 @@
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
-            tau_factor, fixed_L_for_BB_outer_BC, &
+            tau_factor, Teff, fixed_L_for_BB_outer_BC, &
             Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string, message
          character (len=net_name_len) :: net_name
@@ -477,6 +477,7 @@
          s% star_age = 0
          s% xmstar = -1
          
+         Teff = s% Teff
          fixed_L_for_BB_outer_BC = s% fixed_L_for_BB_outer_BC
          tau_factor = s% tau_factor
          Tsurf_factor = s% Tsurf_factor
@@ -486,7 +487,7 @@
          call read_properties(iounit, &
             net_name, species, nz, year_month_day_when_created, &
             initial_mass, initial_z, initial_y, mixing_length_alpha, &
-            s% model_number, s% star_age, tau_factor, &
+            s% model_number, s% star_age, tau_factor, s% Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             s% xmstar, s% R_center, s% L_center, s% v_center, &
             s% cumulative_energy_error, s% num_retries, ierr)
@@ -765,12 +766,12 @@
             num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, fixed_L_for_BB_outer_BC, &
-            tau_factor, Tsurf_factor, opacity_factor, &
+            Teff, tau_factor, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          call do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
-            model_number, star_age, tau_factor, &
+            model_number, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
@@ -786,13 +787,13 @@
             num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, cumulative_energy_error, &
-            tau_factor, Tsurf_factor, &
+            Teff, tau_factor, Tsurf_factor, &
             fixed_L_for_BB_outer_BC, opacity_factor, &
             xmstar, R_center, L_center, v_center
          call do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
-            model_number, star_age, tau_factor, &
+            model_number, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
@@ -802,7 +803,7 @@
       subroutine do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
-            model_number, star_age, tau_factor, &
+            model_number, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
@@ -812,7 +813,7 @@
          integer, intent(inout) :: species, n_shells, &
             year_month_day_when_created, num_retries, model_number
          real(dp), intent(inout) :: m_div_msun, initial_z, &
-            mixing_length_alpha, star_age, tau_factor, &
+            mixing_length_alpha, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          integer, intent(out) :: ierr
@@ -837,7 +838,7 @@
          call read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
-            model_number, star_age, tau_factor, &
+            model_number, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
@@ -848,7 +849,7 @@
       subroutine read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
-            model_number, star_age, tau_factor, &
+            model_number, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
@@ -857,7 +858,7 @@
          integer, intent(inout) :: species, n_shells, &
             year_month_day_when_created, model_number, num_retries
          real(dp), intent(inout) :: m_div_msun, initial_z, initial_y, &
-            mixing_length_alpha, star_age, tau_factor, &
+            mixing_length_alpha, star_age, tau_factor, Teff, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          integer, intent(out) :: ierr
@@ -878,6 +879,7 @@
             if (match_keyword('initial_y', line, initial_y)) cycle
             if (match_keyword('mixing_length_alpha', line, mixing_length_alpha)) cycle
             if (match_keyword('tau_factor', line, tau_factor)) cycle
+            if (match_keyword('Teff', line, Teff)) cycle
             if (match_keyword('fixed_L_for_BB_outer_BC', line, fixed_L_for_BB_outer_BC)) cycle
             if (match_keyword('Tsurf_factor', line, Tsurf_factor)) cycle
             if (match_keyword('opacity_factor', line, opacity_factor)) cycle

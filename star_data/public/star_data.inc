@@ -11,6 +11,3 @@ include "star_data_step_work.inc"
    
 include "star_data_procedures.inc"
    ! procedure pointers for hooks and such
-   
-include "star_data_misc.inc"
-   ! saved in photos, not in models

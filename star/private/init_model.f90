@@ -281,7 +281,7 @@
             year_month_day_when_created = -1
             call read_properties(iounit, &
                s% net_name, iprop, iprop, year_month_day_when_created, &
-               dprop, initial_z, initial_y, dprop, iprop, dprop, &
+               dprop, initial_z, initial_y, dprop, iprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, iprop, ierr)
             if (ierr /= 0) return
             if (year_month_day_when_created < min_when_created) then
@@ -372,7 +372,7 @@
 
             m_in = -1; nz_in = -1; net_name = ''
             call read_properties(iounit, &
-               net_name, iprop, nz_in, iprop, m_in, dprop, dprop, dprop, iprop, &
+               net_name, iprop, nz_in, iprop, m_in, dprop, dprop, dprop, iprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, iprop, ierr)
             if (ierr /= 0 .or. m_in < 0 .or. nz_in < 0) then
                write(*,*) 'missing required properties'

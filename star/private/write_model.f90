@@ -176,6 +176,7 @@
          if (s% use_fixed_L_for_BB_outer_BC) then
             write(iounit, 1) 'fixed_L_for_BB_outer_BC', s% fixed_L_for_BB_outer_BC
          end if
+         write(iounit, 1) 'Teff', s% Teff
          write(iounit, 1) 'total_energy', s% total_energy
          write(iounit, 1) 'cumulative_energy_error', s% cumulative_energy_error
          if (abs(s% total_energy) > 1d0) &

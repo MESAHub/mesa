@@ -835,7 +835,7 @@
       real(dp) :: photosphere_column_density ! g/cm^2
       real(dp) :: photosphere_logg
       real(dp) :: photosphere_acoustic_r ! sound travel time from center to photosphere (seconds)
-      real(dp) :: photosphere_T, Teff
+      real(dp) :: photosphere_T
       integer :: photosphere_cell_k
 
       ! center region -- averages over center_avg_value_dq

@@ -46,7 +46,7 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, i, j, k, version, part_number, &
-            len_history_col_spec, nz, nz_old, kk
+            len_history_col_spec, nz, kk
          logical, parameter :: dbg = .false.
          real(dp) :: xx
 
@@ -76,19 +76,17 @@
          if (failed('generations')) return
 
          read(iounit, iostat=ierr) &
-            s% initial_z, &    ! <<<<<<<<<<<<<<<<<<<<<<<<< need this since read_model can change what is in the inlist
+            s% initial_z, & ! need this since read_model can change what is in the inlist
             s% generations, s% total_num_solver_iterations, &
-            s% nz, s% nz_old, &
-            s% nvar_hydro, s% nvar_chem, s% nvar, &
+            s% nz, s% nvar_hydro, s% nvar_chem, s% nvar, &
             s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% rsp_flag, s% prev_Lmax, s% species, s% num_reactions, &
-            s% model_number, s% model_number_old, s% star_mass, &
+            s% model_number, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
-            s% total_radiation, s% time, s% total_angular_momentum, &
-            s% prev_create_atm_R0_div_R, s% dt, s% have_previous_conv_vel, &
+            s% time, s% total_angular_momentum, &
+            s% dt, s% have_previous_conv_vel, &
             s% was_in_implicit_wind_limit, &
-            s% model_number_for_last_retry, &
             s% using_revised_net_name, &
             s% revised_net_name, &
             s% using_revised_max_yr_dt, &
@@ -128,10 +126,9 @@
             s% max_years_for_timestep = s% astero_revised_max_yr_dt
 
          nz = s% nz
-         nz_old = s% nz_old
 
          read(iounit, iostat=ierr) s% net_name
-         if (failed('nz_old')) return
+         if (failed('net_name')) return
 
          call set_var_info(s, ierr)
          if (failed('set_var_info')) return
@@ -151,12 +148,11 @@
             s% omega(1:nz), s% j_rot(1:nz)
 
          call read_part_number(iounit)
-         if (failed('mstar_dot')) return
+         if (failed('rsp_num_periods')) return
 
          read(iounit, iostat=ierr) &
             s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities, &
-            s% mstar_dot, s% v_surf, s% dt_limit_ratio, &
-            s% tau_base, s% w_div_w_crit_avg_surf
+            s% dt_limit_ratio, s% tau_base
          if (failed('cz_top_mass_old')) return
 
          read(iounit, iostat=ierr) &
@@ -189,26 +185,16 @@
 
          read(iounit, iostat=ierr) &
             s% num_solver_iterations, s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
-                   
-            s% total_num_solver_iterations, &
-            s% total_num_solver_relax_iterations, &
-            s% total_num_solver_calls_made, &
-            
-            s% total_num_solver_relax_calls_made, &
-            s% total_num_solver_calls_converged, &
-            s% total_num_solver_relax_calls_converged, &
-
+            s% total_num_solver_iterations, s% total_num_solver_relax_iterations, &
+            s% total_num_solver_calls_made, s% total_num_solver_relax_calls_made, &
+            s% total_num_solver_calls_converged, s% total_num_solver_relax_calls_converged, &
             s% total_step_attempts, s% total_relax_step_attempts, &
             s% total_step_retries, s% total_relax_step_retries, &
             s% total_step_redos, s% total_relax_step_redos, &
             s% total_steps_finished, s% total_relax_steps_finished, &
-
-            s% num_hydro_merges, s% num_hydro_splits, &
-            s% tau_center, &
-            s% timestep_hold, s% model_number_for_last_retry, s% bad_max_corr_cnt, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
-            s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
-            s% initial_timestep, s% result_reason, s% need_to_update_history_now, &
+            s% Teff, s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
+            s% need_to_update_history_now, &
             s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% need_to_save_profiles_now, s% save_profiles_model_priority, &
             s% most_recent_photo_name, &
@@ -229,8 +215,8 @@
             if (failed('allocate extra_iwork')) return
             read(iounit, iostat=ierr) s% extra_iwork(1:s% len_extra_iwork)
             if (failed('read extra_iwork')) return
-            read(iounit, iostat=ierr) s% extra_iwork_old(1:s% len_extra_iwork)
-            if (failed('allocate extra_iwork_old')) return
+            !read(iounit, iostat=ierr) s% extra_iwork_old(1:s% len_extra_iwork)
+            !if (failed('allocate extra_iwork_old')) return
          else
             nullify(s% extra_iwork, s% extra_iwork_old)
          end if
@@ -243,8 +229,8 @@
             if (failed('allocate extra_work')) return
             read(iounit, iostat=ierr) s% extra_work(1:s% len_extra_work)
             if (failed('read extra_work')) return
-            read(iounit, iostat=ierr) s% extra_work_old(1:s% len_extra_work)
-            if (failed('read extra_work_old')) return
+            !read(iounit, iostat=ierr) s% extra_work_old(1:s% len_extra_work)
+            !if (failed('read extra_work_old')) return
          else
             nullify(s% extra_work, s% extra_work_old)
          end if
