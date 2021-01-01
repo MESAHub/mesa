@@ -1461,11 +1461,9 @@
             total_energy_from_diffusion, &
             total_extra_heating, &
             error_in_energy_conservation, &
-            log_P_center, &
-            min_kap_floor
+            log_P_center
          
          real(dp) :: &
-            min_kap_floor_old, &
             log_P_center_old, &
             cumulative_energy_error_old, &
             cumulative_extra_heating_old, &
@@ -1534,5 +1532,7 @@
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
          
          
+         real(dp) :: revised_max_yr_dt_old
+         real(dp) :: astero_revised_max_yr_dt_old
          
            

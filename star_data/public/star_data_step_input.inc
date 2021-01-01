@@ -114,12 +114,10 @@
       ! chem variables, if any, follow the structure variables
          integer :: i_chem1 ! index of the first chem variable (0 means no chem variables)
             ! if i_chem1 /= 0, then i_chem1 == nvar_hydro + 1
-         integer :: i_dchem1 ! index of the first delta chem variable (0 means no delta chem variables)
          
       ! chem equations follow the structure equations
          integer :: equchem1 ! index of the first chem equation (0 means no chem equations)
             ! if equchem1 /= 0, then equchem1 == nvar_hydro + 1
-         integer :: equdchem1 ! index of the first delta chem equation (0 means no delta chem equations)
         
 
       integer :: nvar_hydro ! the number of structure variables per zone      

@@ -381,9 +381,6 @@
          s% why_Tlim = Tlim_struc
          s% dt_why_count(:) = 0
          s% dt_why_retry_count(:) = 0
-         
-         s% min_kap_floor = 1d0
-!         s% min_kap_floor_old = 1d0
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0

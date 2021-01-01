@@ -108,7 +108,6 @@
             
             if (.true.) then ! do some more     (after 611bac9)       
             call set_to_NaN(s% total_radiation_old)
-            call set_to_NaN(s% min_kap_floor_old)
             call set_to_NaN(s% total_angular_momentum_old)
             call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% astero_revised_max_yr_dt_old)
@@ -388,8 +387,6 @@
             call set_to_NaN(s% total_extra_heating)
             call set_to_NaN(s% error_in_energy_conservation)
             call set_to_NaN(s% log_P_center)
-            call set_to_NaN(s% min_kap_floor)      
-            call set_to_NaN(s% min_kap_floor_old)
             call set_to_NaN(s% log_P_center_old)
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% cumulative_extra_heating_old)

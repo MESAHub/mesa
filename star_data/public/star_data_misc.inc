@@ -31,11 +31,9 @@
       
       logical :: using_revised_max_yr_dt
       real(dp) :: revised_max_yr_dt
-      real(dp) :: revised_max_yr_dt_old
       
       logical :: astero_using_revised_max_yr_dt
       real(dp) :: astero_revised_max_yr_dt
-      real(dp) :: astero_revised_max_yr_dt_old
 
       integer :: binary_id        
       logical :: include_binary_history_in_log_file
@@ -44,4 +42,6 @@
       
       logical :: have_previous_conv_vel ! only needed when set conv_vel_flag true
    
-      
+      ! experimental "dev" items
+         integer :: i_dchem1 ! index of the first delta chem variable (0 means no delta chem variables)
+         integer :: equdchem1 ! index of the first delta chem equation (0 means no delta chem equations)

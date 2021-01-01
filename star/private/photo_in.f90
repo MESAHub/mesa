@@ -77,15 +77,14 @@
          read(iounit, iostat=ierr) &
             s% generations, s% total_num_solver_iterations, &
             s% nz, s% nz_old, &
-            s% nvar_hydro, s% nvar_chem, s% nvar, s% init_model_number, &
+            s% nvar_hydro, s% nvar_chem, s% nvar, &
             s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% rsp_flag, s% prev_Lmax, s% species, s% num_reactions, &
             s% model_number, s% model_number_old, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
-            s% total_radiation, s% min_kap_floor, s% time, s% total_angular_momentum, &
+            s% total_radiation, s% time, s% total_angular_momentum, &
             s% prev_create_atm_R0_div_R, s% dt, s% have_previous_conv_vel, &
-            s% initial_mass, s% initial_z, s% initial_y, &
             s% was_in_implicit_wind_limit, &
             s% model_number_for_last_retry, &
             s% using_revised_net_name, &
@@ -149,35 +148,13 @@
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
             s% omega(1:nz), s% j_rot(1:nz)
 
-!         read(iounit, iostat=ierr) &
-!            s% q(1:nz), s% m(1:nz), s% dm(1:nz), s% dm_bar(1:nz), &
-!            s% w_div_w_crit_roche(1:nz), &
-!            s% D_omega(1:nz), s% am_nu_rot(1:nz), &
-!            s% dlnd_dt(1:nz), s% dlnT_dt(1:nz), &
-!            s% eps_grav(1:nz), s% conv_vel(1:nz), s% lnT(1:nz)
-            
-!         call read_part_number(iounit)
-!         if (failed('*_old')) return
-!         if (s% generations > 1 .and. .not. s% rsp_flag) then
-!            read(iounit, iostat=ierr) &
-!               s% omega_old(1:nz_old), &
-!               s% j_rot_old(1:nz_old), &
-!               s% dq_old(1:nz_old), &
-!               s% xh_old(:,1:nz_old), &
-!               s% xa_old(:,1:nz_old)
-!            if (failed('xh_old')) return
-!         end if
-
          call read_part_number(iounit)
          if (failed('mstar_dot')) return
 
          read(iounit, iostat=ierr) &
             s% rsp_num_periods, s% rsp_dt, s% rsp_period, s% RSP_have_set_velocities, &
-            s% mstar_dot, s% v_surf, s% gradT_excess_alpha, s% dt_limit_ratio, &
-            s% L_phot, s% T_surf, s% P_surf, s% L_surf, s% h1_czb_mass, &
-            s% he_core_mass, s% c_core_mass, s% tau_base, s% Teff, &
-            s% center_eps_nuc, s% Lrad_div_Ledd_avg_surf, s% w_div_w_crit_avg_surf, &
-            s% n_conv_regions, s% cz_bot_mass(:), s% cz_top_mass(:)
+            s% mstar_dot, s% v_surf, s% dt_limit_ratio, &
+            s% tau_base, s% w_div_w_crit_avg_surf
          if (failed('cz_top_mass_old')) return
 
          read(iounit, iostat=ierr) &
@@ -200,17 +177,7 @@
 
          read(iounit, iostat=ierr) &
             s% recent_log_header, s% phase_of_evolution, &
-            s% dt_next, s% dt_next_unclipped !, &
-!            s% eps_nuc(1:nz), &
-!            s% d_epsnuc_dlnd(1:nz), &
-!            s% d_epsnuc_dlnT(1:nz), &
-!            s% d_epsnuc_dx(:,1:nz), &
-!            s% eps_nuc_categories(:,1:nz), &
-!            s% dxdt_nuc(:,1:nz), &
-!            s% d_dxdt_nuc_dRho(:,1:nz), &
-!            s% d_dxdt_nuc_dT(:,1:nz), &
-!            s% d_dxdt_nuc_dx(:,:,1:nz), &
-!            s% eps_nuc_neu_total(1:nz)
+            s% dt_next, s% dt_next_unclipped
          if (failed('eps_nuc_neu_total')) return
          
          if (s% dt_next <= 0d0) s% dt_next = s% dt_next_unclipped
@@ -235,20 +202,14 @@
             s% total_steps_finished, s% total_relax_steps_finished, &
 
             s% num_hydro_merges, s% num_hydro_splits, &
-            s% initial_L_center, s% initial_R_center, s% initial_v_center, s% tau_center, &
+            s% tau_center, &
             s% timestep_hold, s% model_number_for_last_retry, s% bad_max_corr_cnt, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
-            s% Tlim_dXnuc_species, s% Tlim_dXnuc_cell, &
-            s% Tlim_dXnuc_drop_species, s% Tlim_dXnuc_drop_cell, &
-            s% Tlim_dX_species, s% Tlim_dX_cell, &
-            s% Tlim_dt_div_min_dr_div_cs_cell, &
-            s% Tlim_dX_div_X_species, s% Tlim_dX_div_X_cell, &
-            s% Tlim_dlgL_nuc_category, s% Tlim_dlgL_nuc_cell, &
             s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
             s% initial_timestep, s% result_reason, s% need_to_update_history_now, &
             s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% need_to_save_profiles_now, s% save_profiles_model_priority, &
-            s% doing_flash_wind, s% doing_rlo_wind, s% doing_nova_wind, s% most_recent_photo_name, &
+            s% most_recent_photo_name, &
             s% rand_i97, s% rand_j97, s% rand_u(1:rand_u_len), s% rand_c, s% rand_cd, s% rand_cm
          if (failed('most_recent_photo_name')) return
 
@@ -292,13 +253,6 @@
          if (failed('xtra')) return
          read(iounit, iostat=ierr) s% lxtra
          if (failed('lxtra')) return
-         
-         read(iounit, iostat=ierr) s% ixtra_old
-         if (failed('ixtra_old')) return
-         read(iounit, iostat=ierr) s% xtra_old
-         if (failed('xtra_old')) return
-         read(iounit, iostat=ierr) s% lxtra_old
-         if (failed('lxtra_old')) return
 
          read(iounit, iostat=ierr) len_history_col_spec
          if (failed('len_history_col_spec')) return
