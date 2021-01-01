@@ -211,14 +211,9 @@
          end if
 
          nullify(s% dq)
-         nullify(s% dq_old)
-
          nullify(s% xa)
-         nullify(s% xa_old)
-
          nullify(s% xh)
-         nullify(s% xh_old)
-
+         
          nullify( &
             s% op_mono_umesh1, s% op_mono_semesh1, s% op_mono_ff1, &
             s% op_mono_rs1)
@@ -343,21 +338,16 @@
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''
-!         s% revised_net_name_old = ''
 
          s% using_revised_max_yr_dt = .false.
          s% revised_max_yr_dt = 0
-!         s% revised_max_yr_dt_old = 0
  
          s% astero_using_revised_max_yr_dt = .false.
          s% astero_revised_max_yr_dt = 0
-!         s% astero_revised_max_yr_dt_old = 0
 
          s% cumulative_energy_error = 0
-         s% cumulative_energy_error_old = 0
 
          s% cumulative_extra_heating = 0
-         s% cumulative_extra_heating_old = 0
 
          s% have_initial_energy_integrals = .false.
 
@@ -480,7 +470,6 @@
          s% model_number = 0
          s% time = 0
          s% dt = 0
-         s% dt_old = 0
          
          s% total_num_solver_iterations = 0
          s% total_num_solver_relax_iterations = 0
@@ -518,8 +507,6 @@
          s% net_name = ''
          s% species = 0
          s% num_reactions = 0
-
-         s% nz_old = 0
 
          s% v_flag = .false.
          s% u_flag = .false.
@@ -679,7 +666,6 @@
          s% generations = 0
 
          s% nz = 0
-         s% nz_old = 0
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
@@ -690,85 +676,40 @@
          s% num_reactions = 0
 
          s% model_number = 0
-         s% model_number_old = 0
-
          s% mstar = 0
-         s% mstar_old = 0
-
          s% xmstar = 0
-         s% xmstar_old = 0
-
          s% M_center = 0
-         s% M_center_old = 0
-
          s% v_center = 0
-         s% v_center_old = 0
-
          s% R_center = 0
-         s% R_center_old = 0
-
          s% L_center = 0
-         s% L_center_old = 0
-
          s% time = 0
-         s% time_old = 0
-
          s% total_radiation = 0
-!         s% total_radiation_old = 0
-
          s% total_angular_momentum = 0
-!         s% total_angular_momentum_old = 0
-
          s% prev_create_atm_R0_div_R = 0
 
          s% dt = 0
-         s% dt_old = 0
 
          s% have_previous_conv_vel = .false.
 
          s% net_name = ''
 
          s% mstar_dot = 0
-         s% mstar_dot_old = 0
-
          s% v_surf = 0
-!         s% v_surf_old = 0
-
          s% L_nuc_burn_total = 0
-         s% L_nuc_burn_total_old = 0
-
          s% L_by_category = 0
-         s% L_by_category_old = 0
-
          s% dt_limit_ratio = 0
-         s% dt_limit_ratio_old = 0
-
          s% L_phot = 0
-         s% L_phot_old = 0
-
          s% T_surf = 0
          s% P_surf = 0
 
          s% h1_czb_mass = 0
 
          s% he_core_mass = 0
-!         s% he_core_mass_old = 0
-
          s% c_core_mass = 0
-!         s% c_core_mass_old = 0
-
          s% Teff = -1 ! need to calculate it
-         s% Teff_old = -1
-
          s% center_eps_nuc = 0
-!         s% center_eps_nuc_old = 0
-
          s% Lrad_div_Ledd_avg_surf = 0
-!         s% Lrad_div_Ledd_avg_surf_old = 0
-
-         s% w_div_w_crit_avg_surf = 0
-!         s% w_div_w_crit_avg_surf_old = 0
-         
+         s% w_div_w_crit_avg_surf = 0         
          s% total_internal_energy = 0d0
          s% total_gravitational_energy = 0d0
          s% total_radial_kinetic_energy = 0d0
@@ -777,14 +718,8 @@
          s% total_energy = 0d0
 
          s% n_conv_regions = 0
-!         s% n_conv_regions_old = 0
-
          s% cz_bot_mass(:) = 0
-!         s% cz_bot_mass_old(:) = 0
-
          s% cz_top_mass(:) = 0
-!         s% cz_top_mass_old(:) = 0
-
          s% dt_next = 0
 
          s% model_profile_filename = ''
@@ -1426,18 +1361,6 @@
             end do
             write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
             stop 'do_relax_to_star_cut'
-!            do k0=1, s% nz_old
-!               call interp_value(q, num_pts, conv_vel_interp, s% q_old(k0), conv_vel_temp, ierr)
-!               !avoid extending regions with non-zero conv vel
-!               do k=2, num_pts-1
-!                  if(s% q_old(k0) < q(k) .and. s% q_old(k0) > q(k+1) &
-!                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
-!                     conv_vel_temp = 0d0
-!                     exit
-!                  end if
-!               end do
-!               s% xh_old(s% i_ln_cvpv0, k0) = log(conv_vel_temp+s% conv_vel_v0)
-!            end do
             deallocate(conv_vel_interp, interp_work)
          end if
 

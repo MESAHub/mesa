@@ -1,7 +1,7 @@
 ! star_data_work.inc
-      ! "working storage" derived from inputs while taking a step
-      ! can be "undefined" when start to take a step
-      ! not saved in models or in photos.
+   ! working storage for data derived from inputs while taking a step.
+   ! can be undefined when start to take a step (e.g. by calling fill_arrays_with_NaNs).
+   ! not saved in models or in photos.
       
       real(dp) :: mstar_dot ! (gm/second)
       

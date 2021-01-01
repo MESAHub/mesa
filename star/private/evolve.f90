@@ -83,7 +83,9 @@
          
          contains
          
-         subroutine test_set_undefined  ! these were previously saved in photos
+         subroutine test_set_undefined  
+            ! should include everything in star_data_step_work.inc
+            ! may be missing some.  if so, please add them.
             use utils_lib, only: set_to_NaN
             integer :: j
             include 'formats'
@@ -459,27 +461,24 @@
             return
          end if
 
-
-         
-         ! unpack some of the input info
-         ! only use xh, xa, dq, omega, and j_rot as inputs (along with lots of scalars).
+         ! unpack some of the input information
          nz = s% nz
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (failed('set_qs')) return
          call set_m_and_dm(s)
          call set_dm_bar(s, nz, s% dm, s% dm_bar)
+         call set_cgrav(s, ierr)
+         if (failed('set_cgrav')) return
+         do k=1,nz
+            s% lnR(k) = s% xh(s% i_lnR,k)
+            s% r(k) = exp(s% lnR(k))
+         end do
+         call set_rmid(s, 1, nz, ierr)
+         if (failed('set_rmid')) return
+
          if (s% rotation_flag) then
-            call set_cgrav(s, ierr)
-            if (failed('set_cgrav')) return
             call use_xh_to_update_i_rot(s)
             s% total_angular_momentum = total_angular_momentum(s)
-            ! set r and rmid from xh
-            do k=1,nz
-               s% lnR(k) = s% xh(s% i_lnR,k)
-               s% r(k) = exp(s% lnR(k))
-            end do
-            call set_rmid(s, 1, nz, ierr)
-            if (failed('set_rmid')) return
             call set_rotation_info(s, .true., ierr)
             if (failed('set_rotation_info')) return
          end if
@@ -547,13 +546,6 @@
                s% total_turbulent_energy_old, &
                s% total_energy_old, total_radiation)
          else
-         
-            ! need to get Teff
-            if (is_bad(s% Teff)) then
-               write(*,2) 'Teff in prepare_for_new_try', s% model_number, s% Teff
-               stop 'prepare_for_new_try'
-            end if 
-            
             call set_mdot(s, s% L_phot*Lsun, s% mstar, s% Teff, ierr)
             if (failed('set_mdot')) return
             ! set energy info for new mesh
@@ -1308,7 +1300,8 @@
             else
                s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
             end if
-
+            
+            ! notes from Adam:
             ! When there are mass changes the total energy of the model changes.
             ! We can split this change into three parts:
             ! 1. Mass flows into or out of the model with some specific energy.
@@ -1416,7 +1409,7 @@
                total_radiation = dt*(L_surf - s% L_center)
             end if
 
-            !phase1_total_energy_from_mdot = &
+            !note: phase1_total_energy_from_mdot = &
             !     s% mdot_acoustic_surface &
             !   + s% total_energy_change_from_mdot &
             !   + s% mdot_adiabatic_surface &

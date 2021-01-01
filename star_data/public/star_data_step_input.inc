@@ -1,34 +1,42 @@
 ! star_data_step_input.inc
-
    ! input for taking a step.
    ! modified during the step so that at end holds the new model.
+   ! can be saved in models and photos.
+      
+      real(dp) :: time ! elapsed time (seconds)
+      real(dp) :: dt, dt_next ! timesteps (seconds)
        
       integer :: model_number
-
       integer :: nvar_hydro ! the number of structure variables per zone      
       integer :: species ! species = number of isotopes in the current net
       integer :: nvar_chem ! the number of chemical abundance variables per zone
-      ! = 0 for operator splitting with separate evolution of abundances
-      ! = species to solve for all abundances along with structure
+         ! = 0 for operator splitting with separate evolution of abundances
+         ! = species to solve for all abundances solved coupled with structure
       integer :: nvar ! = nvar_hydro + nvar_chem
+      integer :: nz ! the number of zones in the model
       
-      real(dp) :: time ! elapsed time (seconds)
-      real(dp) :: dt, dt_next ! timestep (seconds)
+      ! inner boundary
+      real(dp) :: M_center ! total baryonic mass (g) interior to innermost cell (usually 0)
+      real(dp) :: v_center ! velocity (cm/s) of inner edge of innermost cell (usually 0)
+      real(dp) :: R_center ! radius (cm) of inner edge of innermost cell (usually 0)
+         ! R_center is automatically updated at each timestep if velocity_center is nonzero.
+      real(dp) :: L_center ! luminosity (erg/s) at inner edge of innermost cell (usually 0)
    
       ! total baryonic mass (grams)
       real(dp) :: mstar
       real(dp) :: xmstar ! baryonic mass external to M_center
          ! thus mstar = M_center + xmstar
 
-      ! the number of zones in the model
-      integer :: nz
-
       ! dq(k) is the fraction of xmstar between points k and k+1
       real(dp), pointer, dimension(:) :: dq ! (nz)
+      
+      ! rotation
+      real(dp), pointer, dimension(:) :: j_rot ! (nz)
+        ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
+      real(dp), pointer, dimension(:) :: omega ! (nz)
         
       ! vectors of structure variables: xh(i,k) holds hydro structure variable i for point k.
-         ! note: abundances are in xa, not in xh.
-         ! also note that mass and rotation are not included in xh
+         ! note: abundances are in xa, not in xh.  dq, j_rot, and omega are not in xh.
       real(dp), pointer, dimension(:,:) :: xh ! (nvar,nz)
    
       ! composition variables: xa(j,k) holds mass fraction of species j for location k
@@ -36,22 +44,6 @@
       ! chem_id(j) gives the iso identifier from chem_def
       ! net_iso(chem_id(j)) = j
       real(dp), pointer, dimension(:,:) :: xa ! (species,nz)
-      
-      ! rotation
-      real(dp), pointer, dimension(:) :: j_rot ! (nz)
-        ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
-      real(dp), pointer, dimension(:) :: omega ! (nz)
-      
-      logical :: have_j_rot
-      logical :: D_omega_flag ! D_omega_flag is true if we are using D_omega for mixing        
-      logical :: am_nu_rot_flag ! am_nu_rot_flag is true if we are using smoothed am_nu_rot variables
-      
-      ! inner boundary
-         real(dp) :: M_center ! total baryonic mass (g) interior to innermost cell (usually 0)
-         real(dp) :: v_center ! velocity (cm/s) of inner edge of innermost cell (usually 0)
-         real(dp) :: R_center ! radius (cm) of inner edge of innermost cell (usually 0)
-            ! R_center is automatically updated at each timestep if velocity_center is nonzero.
-         real(dp) :: L_center ! luminosity (erg/s) at inner edge of innermost cell (usually 0)
 
       ! flags indicating extra variables and equations in addition to the minimal set
          logical :: v_flag ! true for velocity variables at cell boundaries     
@@ -135,52 +127,38 @@
          integer :: rand_i97, rand_j97
          real(dp) :: rand_u(rand_u_len), rand_c, rand_cd, rand_cm
       
-      ! misc information
+      ! misc input information
 
-         real(dp) :: Teff ! not sure why this is needed.   need to find out.
-
-         real(dp) :: dt_limit_ratio ! for timestep low-pass limiter
-      
+         real(dp) :: Teff, dt_limit_ratio
          real(dp) :: cumulative_energy_error, cumulative_extra_heating
+         real(dp) :: total_energy_initial, tau_factor, tau_base
+         real(dp) :: force_tau_factor, force_Tsurf_factor, force_opacity_factor
+         real(dp) :: revised_max_yr_dt, astero_revised_max_yr_dt
+                
+         logical :: include_binary_history_in_log_file
+         logical :: using_revised_max_yr_dt, astero_using_revised_max_yr_dt
+         logical :: have_initial_energy_integrals, have_j_rot
+         logical :: D_omega_flag ! D_omega_flag is true if we are using D_omega for mixing        
+         logical :: am_nu_rot_flag ! smooth am_nu_rot like D_omega
+         
          integer :: total_num_solver_iterations, total_num_solver_relax_iterations
          integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made
          integer :: total_num_solver_calls_converged, total_num_solver_relax_calls_converged
-         integer :: num_retries
-         integer :: phase_of_evolution
+         integer :: num_retries, phase_of_evolution
          integer :: recent_log_header ! model_number when last output header info to terminal
-      
-         logical :: have_initial_energy_integrals
-         real(dp) :: total_energy_initial          
-         
-         integer :: mesh_call_number
-         integer :: solver_call_number
-         integer :: diffusion_call_number
-      
-         real(dp) :: tau_factor, tau_base
-         real(dp) :: force_tau_factor
-         real(dp) :: force_Tsurf_factor
-         real(dp) :: force_opacity_factor
-      
-         logical :: using_revised_max_yr_dt
-         real(dp) :: revised_max_yr_dt
-      
-         logical :: astero_using_revised_max_yr_dt
-         real(dp) :: astero_revised_max_yr_dt
-
+         integer :: mesh_call_number, solver_call_number, diffusion_call_number
          integer :: binary_id        
-         logical :: include_binary_history_in_log_file
    
    
    
-      ! experimental
+      ! experimental work in progress.  not for public use yet.
       
          logical :: conv_vel_flag ! true for conv_vel as a solver variable     
          logical :: w_div_wc_flag ! true for w_div_wc as a solver variable     
          logical :: j_rot_flag ! true for j_rot as a solver variable     
          logical :: Eturb_flag ! true for turbulent energy as a solver variable    
 
-         integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at the outer face of cell.
-                               ! v0 is an arbitrary user defined value.
+         integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at face of cell. v0 is an arbitrary user defined value.
          integer :: i_w_div_wc ! ratio of omega to critical value without the Eddington factor
          integer :: i_j_rot ! specific angular momentum associated to cell face
          integer :: i_eturb ! cell specific turbulent energy. only when Eturb_flag is true.
@@ -192,7 +170,4 @@
 
          logical :: have_previous_conv_vel ! only needed when set conv_vel_flag true
 
-
-         integer :: i_dchem1 ! index of the first delta chem variable (0 means no delta chem variables)
-         integer :: equdchem1 ! index of the first delta chem equation (0 means no delta chem equations)
 
