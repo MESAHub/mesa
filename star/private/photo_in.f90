@@ -46,8 +46,9 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, i, j, k, version, part_number, &
-            len_history_col_spec, nz, nz_old
+            len_history_col_spec, nz, nz_old, kk
          logical, parameter :: dbg = .false.
+         real(dp) :: xx
 
          include 'formats'
 
@@ -75,6 +76,7 @@
          if (failed('generations')) return
 
          read(iounit, iostat=ierr) &
+            s% initial_z, &    ! <<<<<<<<<<<<<<<<<<<<<<<<< need this since read_model can change what is in the inlist
             s% generations, s% total_num_solver_iterations, &
             s% nz, s% nz_old, &
             s% nvar_hydro, s% nvar_chem, s% nvar, &

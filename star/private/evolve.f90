@@ -329,7 +329,6 @@
             call set_to_NaN(s% h1_czb_mass_old) ! baryonic (Msun)
             call set_to_NaN(s% he_core_mass_old)
             call set_to_NaN(s% c_core_mass_old)
-            call set_to_NaN(s% Teff_old)
             call set_to_NaN(s% center_eps_nuc_old)
             
             call set_to_NaN(s% total_internal_energy_old)
@@ -469,6 +468,7 @@
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
          s% L_for_BB_outer_BC = -1 ! mark as not set
+         s% Teff = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1
@@ -571,6 +571,13 @@
                s% total_turbulent_energy_old, &
                s% total_energy_old, total_radiation)
          else
+         
+            ! need to get Teff
+            if (is_bad(s% Teff)) then
+               write(*,2) 'Teff in prepare_for_new_try', s% model_number, s% Teff
+               stop 'prepare_for_new_try'
+            end if 
+            
             call set_mdot(s, s% L_phot*Lsun, s% mstar, s% Teff, ierr)
             if (failed('set_mdot')) return
             ! set energy info for new mesh

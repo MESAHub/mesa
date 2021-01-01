@@ -784,7 +784,7 @@
 
          ierr = 0
          
-         ! Set rurface values
+         ! Set surface values
 
          L_surf = s% L(1)
          r_surf = s% r(1)
@@ -836,7 +836,7 @@
          end if
 
          s% Teff = Teff
-
+         
          ! Calculate and store photosphere (tau=2/3) values; these
          ! aren't actually used to set up surface values
 

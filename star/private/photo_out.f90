@@ -58,6 +58,7 @@
          
          call write_part_number(iounit)
          write(iounit) &
+            s% initial_z, &    ! <<<<<<<<<<<<<<<<<<<<<<<<< need this since read_model can change what is in the inlist
             s% generations, s% total_num_solver_iterations, &
             s% nz, s% nz_old, &
             s% nvar_hydro, s% nvar_chem, s% nvar, &
@@ -86,23 +87,6 @@
          write(iounit) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
             s% omega(1:nz), s% j_rot(1:nz)
-
-!         write(iounit) &
-!            s% q(1:nz), s% m(1:nz), s% dm(1:nz), s% dm_bar(1:nz), &
-!            s% w_div_w_crit_roche(1:nz), &
-!            s% D_omega(1:nz), s% am_nu_rot(1:nz), &
-!            s% dlnd_dt(1:nz), s% dlnT_dt(1:nz), &
-!            s% eps_grav(1:nz), s% conv_vel(1:nz), s% lnT(1:nz)
-            
-!         call write_part_number(iounit)
-!         if (s% generations > 1 .and. .not. s% rsp_flag) then
-!            write(iounit) &
-!               s% omega_old(1:nz_old), &
-!               s% j_rot_old(1:nz_old), &
-!               s% dq_old(1:nz_old), &
-!               s% xh_old(:,1:nz_old), &
-!               s% xa_old(:,1:nz_old)
-!         end if
 
          call write_part_number(iounit)
          write(iounit) &
