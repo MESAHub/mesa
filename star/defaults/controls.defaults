@@ -3850,32 +3850,6 @@
     smooth_D_omega = 3
     smooth_am_nu_rot = 3
 
-      ! time smoothing.
-      ! Set to 0 to turn off time smoothing.
-
-      ! ::
-
-    angsmt_D_DSI = 0.0d0
-    angsmt_D_SH = 0.0d0
-    angsmt_D_SSI = 0.0d0
-    angsmt_D_ES = 0.0d0
-    angsmt_D_GSF = 0.0d0
-    angsmt_D_ST = 0.2d0
-    angsmt_nu_ST = 0.2d0
-    angsml = 1d-3
-
-
-      ! am_time_average
-      ! ~~~~~~~~~~~~~~~
-
-      ! If true, then ``D = (D_new + D_old)/2``,
-      ! where ``D_old`` is D from previous step
-      ! and ``D_new`` is D as calculated for current as if no time smoothing.
-
-      ! ::
-
-    am_time_average = .false.
-
 
       ! simple_i_rot_flag
       ! ~~~~~~~~~~~~~~~~~

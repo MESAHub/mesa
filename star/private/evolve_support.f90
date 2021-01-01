@@ -131,7 +131,7 @@
 
          call s% other_new_generation(s% id, ierr)
          
-         if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
+         s% need_to_setvars = .true.
 
          contains
 

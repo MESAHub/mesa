@@ -10,7 +10,8 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 9.2 ! standard test
+   initial_mass = 10
+   !initial_mass = 9.2 ! standard test
    !initial_mass = 12 ! has also been tested      
    initial_z = 0.02d0
    Dutch_scaling_factor = 0.4

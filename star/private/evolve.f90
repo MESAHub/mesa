@@ -59,9 +59,8 @@
             stop 'do_evolve_step_part1'
          end if
          
-         if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+         if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
             call test_set_undefined
-            !write(*,2) 'fill_star_info_arrays_with_NaNs', s% model_number
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
             call star_info_old_arrays(s, do_fill_arrays_with_NaNs, ierr)
@@ -89,6 +88,61 @@
             use utils_lib, only: set_to_NaN
             integer :: j
             include 'formats'
+
+            s% nz_old = -999
+            s% model_number_old = -999
+            s% prev_mesh_nz = -999   
+            s% num_conv_boundaries = -999
+            s% num_mix_boundaries = -999
+            s% num_mix_regions = -999   
+            s% num_mixing_regions = -999
+            s% n_conv_regions = -999
+            s% atm_structure_num_pts = -999
+            s% generations = -999
+            s% init_model_number = -999
+            s% start_H_envelope_base_k = -999
+            s% total_step_attempts = -999
+            s% total_relax_step_attempts = -999
+            s% total_step_retries = -999
+            s% total_relax_step_retries = -999
+            s% total_step_redos = -999
+            s% total_relax_step_redos = -999
+            s% total_steps_finished = -999
+            s% total_relax_steps_finished = -999
+            s% num_solver_iterations = -999
+            s% num_skipped_setvars = -999
+            s% num_setvars = -999
+            s% num_solver_setvars = -999
+            s% num_hydro_merges = -999
+            s% num_hydro_splits = -999
+            s% bad_max_corr_cnt = -999
+            s% timestep_hold = -999
+            s% model_number_for_last_retry = -999
+            s% model_number_for_last_retry_old = -999
+            s% diffusion_call_number = -999
+            s% num_diffusion_solver_iters = -999
+            s% num_diffusion_solver_steps = -999
+            s% num_rotation_solver_steps = -999
+            s% result_reason = -999
+            s% why_Tlim = -999
+            s% burner_storage_sz_per_thread = -999
+            s% burner_num_threads = -999
+            s% k_below_const_q = -999
+            s% k_const_mass = -999
+            s% k_for_test_CpT_absMdot_div_L = -999
+            s% k_below_just_added = -999
+            s% start_H_envelope_base_k = -999
+            s% init_model_number = -999
+            s% termination_code = -999
+            s% boost_mlt_alfa = -999
+            s% burn_nstep_max = -999
+            s% burn_nfcn_total = -999
+            s% k_CpTMdot_lt_L = -999
+            s% dX_nuc_drop_max_k = -999
+            s% dX_nuc_drop_max_j = -999
+            s% solver_test_partials_var = -999
+            s% solver_test_partials_dx_sink = -999
+            s% n_conv_regions_old = -999
 
             call set_to_NaN(s% time_old)
             call set_to_NaN(s% dt_old)
@@ -234,65 +288,10 @@
             call set_to_NaN(s% tau_center)  
             call set_to_NaN(s% super_eddington_wind_mdot)
             call set_to_NaN(s% vsurf_wind_mdot)
-
-            s% nz_old = -999
-            s% model_number_old = -999
-            s% prev_mesh_nz = -999   
-            s% num_conv_boundaries = -999
-            s% num_mix_boundaries = -999
-            s% num_mix_regions = -999   
-            s% num_mixing_regions = -999
-            s% n_conv_regions = -999
-            s% atm_structure_num_pts = -999
-            s% generations = -999
-            s% init_model_number = -999
-            s% start_H_envelope_base_k = -999
-            s% total_step_attempts = -999
-            s% total_relax_step_attempts = -999
-            s% total_step_retries = -999
-            s% total_relax_step_retries = -999
-            s% total_step_redos = -999
-            s% total_relax_step_redos = -999
-            s% total_steps_finished = -999
-            s% total_relax_steps_finished = -999
-            s% num_solver_iterations = -999
-            s% num_skipped_setvars = -999
-            s% num_setvars = -999
-            s% num_solver_setvars = -999
-            s% num_hydro_merges = -999
-            s% num_hydro_splits = -999
-            s% bad_max_corr_cnt = -999
-            s% timestep_hold = -999
-            s% model_number_for_last_retry = -999
-            s% model_number_for_last_retry_old = -999
-            s% diffusion_call_number = -999
-            s% num_diffusion_solver_iters = -999
-            s% num_diffusion_solver_steps = -999
-            s% num_rotation_solver_steps = -999
-            s% result_reason = -999
-            s% why_Tlim = -999
-            s% burner_storage_sz_per_thread = -999
-            s% burner_num_threads = -999
-            s% k_below_const_q = -999
-            s% k_const_mass = -999
-            s% k_for_test_CpT_absMdot_div_L = -999
-            s% k_below_just_added = -999
-            s% start_H_envelope_base_k = -999
-            s% init_model_number = -999
             do j=1,num_categories
                call set_to_NaN(s% L_by_category(j))
                call set_to_NaN(s% L_by_category_old(j))
             end do
-
-            s% termination_code = -999
-            s% boost_mlt_alfa = -999
-            s% burn_nstep_max = -999
-            s% burn_nfcn_total = -999
-            s% k_CpTMdot_lt_L = -999
-            s% dX_nuc_drop_max_k = -999
-            s% dX_nuc_drop_max_j = -999
-            s% solver_test_partials_var = -999
-            s% solver_test_partials_dx_sink = -999
             
             call set_to_NaN(s% dVARdot_dVAR)
             call set_to_NaN(s% surf_accel_grav_ratio)
@@ -311,8 +310,6 @@
             call set_to_NaN(s% L_surf_old) ! surface luminosity (Lsun units)
             call set_to_NaN(s% L_phot_old) ! photosphere luminosity (Lsun units)
             call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
-            
-            s% n_conv_regions_old = -999
             
             call set_to_NaN(s% total_angular_momentum_old)
             call set_to_NaN(s% h1_czb_mass_old) ! baryonic (Msun)
@@ -467,18 +464,18 @@
          if (failed('set_qs')) return
          call set_m_and_dm(s)
          call set_dm_bar(s, nz, s% dm, s% dm_bar)
-         call set_cgrav(s, ierr)
-         if (failed('set_cgrav')) return
-         do k=1,nz
-            s% lnR(k) = s% xh(s% i_lnR,k)
-            s% r(k) = exp(s% lnR(k))
-         end do
-         call set_rmid(s, 1, nz, ierr)
-         if (failed('set_rmid')) return
-
          if (s% rotation_flag) then
+            call set_cgrav(s, ierr)
+            if (failed('set_cgrav')) return
             call use_xh_to_update_i_rot(s)
             s% total_angular_momentum = total_angular_momentum(s)
+            ! set r and rmid from xh
+            do k=1,nz
+               s% lnR(k) = s% xh(s% i_lnR,k)
+               s% r(k) = exp(s% lnR(k))
+            end do
+            call set_rmid(s, 1, nz, ierr)
+            if (failed('set_rmid')) return
             call set_rotation_info(s, .true., ierr)
             if (failed('set_rotation_info')) return
          end if

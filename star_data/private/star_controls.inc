@@ -999,13 +999,10 @@
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
             smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
 
-         real(dp) :: angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, &
-            angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, angsmt_nu_ST
-
-         real(dp) :: angsml, adjust_J_fraction, min_q_for_adjust_J_lost, &
+         real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J
          logical :: simple_i_rot_flag, do_adjust_J_lost, &
-            premix_omega, am_time_average, recalc_mixing_info_each_substep
+            premix_omega, recalc_mixing_info_each_substep
          real(dp) :: angular_momentum_error_warn, angular_momentum_error_retry
          integer :: max_mdot_redo_cnt
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
