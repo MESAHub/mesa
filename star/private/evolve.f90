@@ -249,7 +249,6 @@
             call set_to_NaN(s% dt_days)
             call set_to_NaN(s% dt_years)
             call set_to_NaN(s% dt_start)
-            call set_to_NaN(s% prev_Lmax)
             call set_to_NaN(s% prev_Ledd)
             call set_to_NaN(s% starting_T_center)
             call set_to_NaN(s% min_dr_div_cs_start)
@@ -286,7 +285,6 @@
             call set_to_NaN(s% dVARdot_dVAR)
             call set_to_NaN(s% surf_accel_grav_ratio)
             call set_to_NaN(s% prev_create_atm_R0_div_R)
-            call set_to_NaN(s% dt_next_unclipped)
             call set_to_NaN(s% L_for_BB_outer_BC)
             call set_to_NaN(s% dX_nuc_drop_max_drop)
             call set_to_NaN(s% solver_test_partials_val)
@@ -1855,7 +1853,6 @@
 
          ! save a few things from start of step that will need later
          s% min_dr_div_cs_start = min_dr_div_cs(s,k)
-         s% prev_Lmax = maxval(abs(s% L(1:nz)))
          if (s% rotation_flag) then
             s% surf_r_equatorial = s% r_equatorial(1)
          else
@@ -2184,7 +2181,6 @@
          if (s% RSP_flag) then
             pick_next_timestep = keep_going
             s% dt_next = s% RSP_dt
-            s% dt_next_unclipped = s% dt_next
             s% why_Tlim = Tlim_max_timestep
             return
          end if         
@@ -2206,8 +2202,6 @@
             return
          end if
 
-         s% dt_next_unclipped = s% dt_next
-               ! write out the unclipped timestep in saved models
          if (s% time < 0 .and. s% time + s% dt_next > 0) then
             s% dt_next = -s% time
          else if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then

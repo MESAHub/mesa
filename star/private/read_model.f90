@@ -392,12 +392,6 @@
             s% am_nu_rot(1:nz) = 0d0
 
          if (s% constant_L) xh(i_lum,1:nz) = s% L_center
-
-         if (i_lum /= 0) then
-            s% prev_Lmax = maxval(abs(xh(i_lum,1:nz)))
-         else
-            s% prev_Lmax = s% L_center
-         end if
          
          if (want_RSP_model .and. .not. is_RSP_model) then
             ! proper values for these will be set in rsp_setup_part2

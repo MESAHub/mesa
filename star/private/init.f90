@@ -549,7 +549,6 @@
 
          s% dt = -1
          s% dt_next = -1
-         s% dt_next_unclipped = -1
 
          s% i_lnd = 0
          s% i_lnT = 0
@@ -677,7 +676,6 @@
          s% nvar_chem = 0
          s% nvar = 0
 
-         s% prev_Lmax = 0
          s% species = 0
          s% num_reactions = 0
 
@@ -914,10 +912,6 @@
             call set_net(s, s% net_name, ierr)
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
-            if (s% rsp_flag) then
-               write(*,*) 'Sorry: RSP does not currently support restarts.'
-               stop 'model_builder'
-            end if
             call init_def(s) ! RSP
             call finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
             if (s% max_years_for_timestep > 0) &

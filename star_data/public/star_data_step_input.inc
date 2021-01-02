@@ -140,6 +140,8 @@
          logical :: have_initial_energy_integrals, have_j_rot
          logical :: D_omega_flag ! D_omega_flag is true if we are using D_omega for mixing        
          logical :: am_nu_rot_flag ! smooth am_nu_rot like D_omega
+         logical :: was_in_implicit_wind_limit
+         logical :: rsp_have_set_velocities
          
          integer :: total_num_solver_iterations, total_num_solver_relax_iterations
          integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made

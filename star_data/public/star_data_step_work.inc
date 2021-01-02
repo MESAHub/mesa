@@ -1069,7 +1069,7 @@
       real(dp) :: dt_start ! dt during first try for step
       
       ! a few things from start of step that will need later
-      real(dp) :: prev_Lmax, prev_Ledd, starting_T_center, min_dr_div_cs_start, &
+      real(dp) :: prev_Ledd, starting_T_center, min_dr_div_cs_start, &
          surf_r_equatorial, surf_opacity, surf_csound, surf_rho
    
       ! for solvers
@@ -1190,8 +1190,7 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_make_static, RSP_have_set_velocities, &
-            RSP_just_did_remesh, RSP_just_set_velocities, &
+            RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
          
@@ -1242,7 +1241,7 @@
          logical :: just_wrote_terminal_header
          logical :: doing_first_model_of_run
          logical :: doing_first_model_after_restart
-         logical :: was_in_implicit_wind_limit, was_in_implicit_wind_limit_old
+         logical :: was_in_implicit_wind_limit_old
       
          integer :: Tlim_dXnuc_species
          integer :: Tlim_dXnuc_cell
@@ -1357,7 +1356,6 @@
          real(dp) :: dVARdot_dVAR
          real(dp) :: surf_accel_grav_ratio
          real(dp) :: prev_create_atm_R0_div_R
-         real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
          real(dp) :: dX_nuc_drop_max_drop
          real(dp) :: solver_test_partials_val, solver_test_partials_dval_dx

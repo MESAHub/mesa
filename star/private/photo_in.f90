@@ -73,19 +73,18 @@
          end if
 
          call read_part_number(iounit)
-         if (failed('generations')) return
+         if (failed('initial_z')) return
 
          read(iounit, iostat=ierr) &
             s% initial_z, & ! need this since read_model can change what is in the inlist
-            s% generations, s% total_num_solver_iterations, &
+            s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar, &
-            s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, &
+            s% v_flag, s% u_flag, s% rotation_flag, s% Eturb_flag, s% RSP_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
-            s% rsp_flag, s% prev_Lmax, s% species, s% num_reactions, &
+            s% species, s% num_reactions, &
             s% model_number, s% star_mass, &
             s% mstar, s% xmstar, s% M_center, s% v_center, s% R_center, s% L_center, &
-            s% time, s% total_angular_momentum, &
-            s% dt, s% have_previous_conv_vel, &
+            s% time, s% dt, s% have_previous_conv_vel, &
             s% was_in_implicit_wind_limit, &
             s% using_revised_net_name, &
             s% revised_net_name, &
@@ -93,7 +92,7 @@
             s% revised_max_yr_dt, &
             s% astero_using_revised_max_yr_dt, &
             s% astero_revised_max_yr_dt, &
-            s% cumulative_energy_error, &
+            s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor
          if (failed('initial_y')) return
@@ -165,7 +164,7 @@
          if (failed('i_dalpha_RTI_dt')) return
 
          read(iounit, iostat=ierr) &
-            s% model_profile_filename, s% model_controls_filename, s% model_data_filename, &
+            s% model_controls_filename, s% model_data_filename, &
             s% most_recent_profile_filename, s% most_recent_controls_filename, &
             s% most_recent_model_data_filename
          if (failed('most_recent_model_data_filename')) return
@@ -174,17 +173,14 @@
          if (failed('recent_log_header')) return
 
          read(iounit, iostat=ierr) &
-            s% recent_log_header, s% phase_of_evolution, &
-            s% dt_next, s% dt_next_unclipped
+            s% recent_log_header, s% phase_of_evolution, s% dt_next
          if (failed('eps_nuc_neu_total')) return
-         
-         if (s% dt_next <= 0d0) s% dt_next = s% dt_next_unclipped
 
          call read_part_number(iounit)
          if (failed('read_part_number')) return
 
          read(iounit, iostat=ierr) &
-            s% num_solver_iterations, s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
+            s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
             s% total_num_solver_iterations, s% total_num_solver_relax_iterations, &
             s% total_num_solver_calls_made, s% total_num_solver_relax_calls_made, &
             s% total_num_solver_calls_converged, s% total_num_solver_relax_calls_converged, &
@@ -193,11 +189,8 @@
             s% total_step_redos, s% total_relax_step_redos, &
             s% total_steps_finished, s% total_relax_steps_finished, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
-            s% Teff, s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
-            s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
-            s% need_to_update_history_now, &
+            s% Teff, s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
-            s% need_to_save_profiles_now, s% save_profiles_model_priority, &
             s% most_recent_photo_name, &
             s% rand_i97, s% rand_j97, s% rand_u(1:rand_u_len), s% rand_c, s% rand_cd, s% rand_cm
          if (failed('most_recent_photo_name')) return
