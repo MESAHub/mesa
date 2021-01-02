@@ -153,7 +153,6 @@
 
          include 'formats'
 
-         s% model_number = s% model_number_old
          s% nz = s% nz_old
          s% mstar = s% mstar_old
          s% xmstar = s% xmstar_old
