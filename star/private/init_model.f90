@@ -290,7 +290,8 @@
 
             call read_properties(iounit, &
                s% net_name, iprop, iprop, year_month_day_when_created, &
-               dprop, initial_z, initial_y, dprop, iprop, dprop, dprop, &
+               dprop, initial_z, initial_y, &
+               dprop, iprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, iprop, ierr)
@@ -389,7 +390,8 @@
 
             m_in = -1; nz_in = -1; net_name = ''
             call read_properties(iounit, &
-               net_name, iprop, nz_in, iprop, m_in, dprop, dprop, dprop, iprop, dprop, &
+               net_name, iprop, nz_in, iprop, m_in, &
+               dprop, dprop, dprop, iprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, iprop, ierr)

@@ -95,6 +95,7 @@
          s% total_internal_energy_old = s% total_internal_energy
          s% total_angular_momentum_old = s% total_angular_momentum
          s% Teff_old = s% Teff
+         s% gradT_excess_alpha_old = s% gradT_excess_alpha
          s% power_nuc_burn_old = s% power_nuc_burn
          s% power_h_burn_old = s% power_h_burn
          s% power_he_burn_old = s% power_he_burn
@@ -165,6 +166,7 @@
          s% total_internal_energy = s% total_internal_energy_old
          s% total_angular_momentum = s% total_angular_momentum_old
          s% Teff = s% Teff_old
+         s% gradT_excess_alpha = s% gradT_excess_alpha_old
          s% power_nuc_burn = s% power_nuc_burn_old
          s% power_h_burn = s% power_h_burn_old
          s% power_he_burn = s% power_he_burn_old

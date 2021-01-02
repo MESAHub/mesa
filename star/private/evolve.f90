@@ -155,6 +155,7 @@
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% total_energy_old)
             call set_to_NaN(s% Teff_old)
+            call set_to_NaN(s% gradT_excess_alpha_old)
             call set_to_NaN(s% mstar_dot_old)
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf_old)

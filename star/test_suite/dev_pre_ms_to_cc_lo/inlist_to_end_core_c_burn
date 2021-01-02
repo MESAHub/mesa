@@ -50,10 +50,6 @@
 ! mesh
 
 ! solver
-      ! MAJOR STELLAR ENGINEERING ALERT
-      ! drive v to 0 in H envelope after end core He burn
-      drag_coefficient = 99
-      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.

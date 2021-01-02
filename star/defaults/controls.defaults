@@ -2344,8 +2344,7 @@
 
       ! Inefficient convection => large gradT excess and steep T gradient to enhance radiative transport.
       ! Reduce gradT excess by making gradT closer to adiabatic gradient.
-      ! If true, code is allowed to adjust gradT to boost efficiency of energy transport
-      ! See ``gradT_excess_f1``, ``gradT_excess_f2``, and ``gradT_excess_age_fraction`` below.
+      ! If okay_to_reduce_gradT_excess is true, code is allowed to adjust gradT to boost efficiency of energy transport.
 
       ! This is the treatment of convection, referred to as MLT++
       ! in Section 7.2 of Paxton et al. (2013), that reduces the
@@ -2367,6 +2366,17 @@
 
     gradT_excess_f1 = 1d-4
     gradT_excess_f2 = 1d-3
+
+
+      ! gradT_excess_age_fraction
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! These are for calculation of efficiency boosted gradT.
+      ! Fraction of old to mix with new to get next.
+
+      ! ::
+
+    gradT_excess_age_fraction = 0.9d0
 
 
       ! gradT_excess_max_change
@@ -2596,7 +2606,7 @@
 
       ! ::
 
-    min_overshoot_q = 1d-3
+    min_overshoot_q = 0d0
 
       ! NOTE: In addition to giving these 'f' parameters non-zero values, you should also
       ! check the settings for ``mass_for_overshoot_full_on`` and ``mass_for_overshoot_full_off``.

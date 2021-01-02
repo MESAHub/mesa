@@ -119,7 +119,7 @@
             s% total_step_retries, s% total_relax_step_retries, &
             s% total_step_redos, s% total_relax_step_redos, &
             s% total_steps_finished, s% total_relax_steps_finished, &
-            s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
+            s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, s% gradT_excess_alpha, &
             s% Teff, s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% most_recent_photo_name, &

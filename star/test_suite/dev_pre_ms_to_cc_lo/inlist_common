@@ -86,16 +86,13 @@
       use_other_alpha_mlt = .true. ! implemented in run_star_extras
       x_ctrl(21) = 3.0 ! alpha_H
       x_ctrl(22) = 1.5 ! alpha_other
-      x_ctrl(23) = 0.5 ! H_limit 
-         ! use alpha_H if cell X >= H_limit; else use alpha_other
-      x_ctrl(24) = 9d0 ! mass limit (Msun)
-         ! use other_alpha_mlt only if star_mass >= this limit.
+      x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
+      x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
 
 ! mixing
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
-      ! overshooting is turned on in inlist_to_end_core_he_burn, off otherwise.
       overshoot_scheme(1) = 'none'
       overshoot_zone_type(1) = 'any'
       overshoot_zone_loc(1) = 'any'
