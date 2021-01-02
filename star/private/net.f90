@@ -84,7 +84,7 @@
 
          net_lwork = net_work_size(s% net_handle, ierr)
          
-         check_op_split_burn = s% op_split_burn ! .and. s% doing_struct_burn_mix
+         check_op_split_burn = s% op_split_burn
          
          if (nzlo == nzhi) then
             call do1_net(s, nzlo, s% species, &

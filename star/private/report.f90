@@ -78,6 +78,7 @@
          use chem_def, only: category_name
          type (star_info), pointer :: s
          integer :: j, k, nz
+         real(dp) :: eps_nuc
          include 'formats'
          nz = s% nz
          
@@ -130,7 +131,16 @@
          else            
             ! better if set power_nuc_burn using eps_nuc instead of categories
             ! categories can be subject to numerical jitters at very high temperatures
-            s% power_nuc_burn = dot_product(s% eps_nuc(1:nz), s% dm(1:nz))/Lsun
+            s% power_nuc_burn = 0d0
+            do k=1,nz
+               if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+                  eps_nuc = s% burn_avg_epsnuc(k)
+               else
+                  eps_nuc = s% eps_nuc(k)
+               end if
+               s% power_nuc_burn = s% power_nuc_burn + eps_nuc*s% dm(k)
+            end do
+            s% power_nuc_burn = s% power_nuc_burn/Lsun
             s% power_nuc_neutrinos = dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
             s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
             s% power_he_burn = s% L_by_category(i3alf)

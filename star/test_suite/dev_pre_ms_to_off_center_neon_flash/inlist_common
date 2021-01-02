@@ -96,7 +96,6 @@
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
-      ! overshooting is turned on in inlist_to_end_core_he_burn, off otherwise.
       overshoot_scheme(1) = 'none'
       overshoot_zone_type(1) = 'any'
       overshoot_zone_loc(1) = 'any'

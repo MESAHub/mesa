@@ -749,18 +749,18 @@
          ! similar for second and third zones
       real(dp) :: burn_zone_mass(4,3)
          
-      ! power emitted from nuclear reactions after subtracting neutrinos (Lsun units)
-      real(dp), dimension(num_categories) :: center_eps_burn
+      ! power emitted from nuclear reactions after subtracting neutrinos (Lsun units)         
+      real(dp) :: center_eps_burn(num_categories)
       real(dp) :: L_nuc_burn_total, L_by_category(num_categories)
-      real(dp) :: L_nuc_burn_total_old, L_by_category_old(num_categories)
+      real(dp) :: power_nuc_neutrinos
+      real(dp) :: power_nonnuc_neutrinos
+      real(dp) :: power_neutrinos
    
-      real(dp) :: power_nuc_burn, power_nuc_burn_old
-      real(dp) :: power_nuc_neutrinos, power_nuc_neutrinos_old
-      real(dp) :: power_nonnuc_neutrinos, power_nonnuc_neutrinos_old
-      real(dp) :: power_neutrinos, power_neutrinos_old
-      real(dp) :: power_h_burn, power_h_burn_old
-      real(dp) :: power_he_burn, power_he_burn_old
-      real(dp) :: power_z_burn, power_z_burn_old
+      real(dp) :: power_nuc_burn_old
+      real(dp) :: power_h_burn_old
+      real(dp) :: power_he_burn_old
+      real(dp) :: power_z_burn_old
+      real(dp) :: power_photo_old
       
       ! power for each category
       real(dp) :: power_PP
@@ -782,7 +782,6 @@
       real(dp) :: power_c12_c12
       real(dp) :: power_c12_o16
       real(dp) :: power_o16_o16
-      real(dp) :: power_photo
       real(dp) :: power_pnhe4
       real(dp) :: power_ni56_co56
       real(dp) :: power_co56_fe56

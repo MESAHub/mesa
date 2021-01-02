@@ -363,6 +363,12 @@
 
          s% boost_mlt_alfa = 0
 
+         s% power_nuc_burn = -1
+         s% power_h_burn = -1
+         s% power_he_burn = -1
+         s% power_z_burn = -1
+         s% power_photo = -1
+
          s% k_const_mass = 1
          s% k_below_just_added = 1
          s% k_below_const_q = 1

@@ -95,27 +95,15 @@
          s% total_internal_energy_old = s% total_internal_energy
          s% total_angular_momentum_old = s% total_angular_momentum
          s% Teff_old = s% Teff
-         s% mstar_dot_old = s% mstar_dot
-         s% L_phot_old = s% L_phot
-         if (is_bad(s% L_phot_old)) then
-            write(*,2) 's% L_phot_old', s% model_number, s% L_phot_old
-            stop 'new_generation'
-         end if
-         
-         
-         s% L_surf_old = s% L_surf
-         s% dt_limit_ratio_old = s% dt_limit_ratio
-         s% L_nuc_burn_total_old = s% L_nuc_burn_total
-         do i=1,num_categories
-            s% L_by_category_old(i) = s% L_by_category(i)
-         end do
          s% power_nuc_burn_old = s% power_nuc_burn
-         s% power_nuc_neutrinos_old = s% power_nuc_neutrinos
-         s% power_nonnuc_neutrinos_old = s% power_nonnuc_neutrinos
-         s% power_neutrinos_old = s% power_neutrinos
          s% power_h_burn_old = s% power_h_burn
          s% power_he_burn_old = s% power_he_burn
          s% power_z_burn_old = s% power_z_burn
+         s% power_photo_old = s% power_photo         
+         s% mstar_dot_old = s% mstar_dot
+         s% L_phot_old = s% L_phot
+         s% L_surf_old = s% L_surf
+         s% dt_limit_ratio_old = s% dt_limit_ratio
 
          do i = 1, s% len_extra_work
             s% extra_work_old(i) = s% extra_work(i)

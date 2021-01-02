@@ -28,7 +28,7 @@ do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.
 #   needs help from Pablo      do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
 do_one dev_pre_ms_to_cc_hi "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-# ********* off until resolve off-center burn issues     do_one dev_pre_ms_to_cc_very_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+do_one dev_pre_ms_to_off_center_neon_flash "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_pair_instability "stop because non_fe_core_rebound > non_fe_core_rebound_limit" "final.mod" skip
 #   delete this?    do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip

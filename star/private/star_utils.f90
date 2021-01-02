@@ -2818,30 +2818,7 @@
             s% phase_of_evolution = phase_starting
          end if 
          
-         
-         
-         
-         
-         
-!         if (.not. arrived_main_seq(s) .or. s% phase_of_evolution == phase_carbon_burning) return
-!         power_he_burn = s% power_he_burn
-!         power_c_burn = dot_product(s% dm(1:nz), s% eps_nuc_categories(i_burn_c,1:nz))/Lsun
-!         power_neutrinos = s% power_neutrinos
-!         if (s% phase_of_evolution == phase_helium_burning .and. power_c_burn > power_neutrinos) then
-!            s% phase_of_evolution = phase_carbon_burning
-!         else if (power_c_burn + power_he_burn > power_neutrinos) then
-!            s% phase_of_evolution = phase_helium_burning
-!         else if (s% center_he4 < center_he_going) then
-!            s% phase_of_evolution = phase_helium_burning
-!         else if (s% center_h1 < center_h_gone) then
-!            s% phase_of_evolution = phase_wait_for_he
-!         else if (s% center_h1 < center_h_going) then
-!            s% phase_of_evolution = phase_mid_main_seq
-!         else
-!            s% phase_of_evolution = phase_early_main_seq
-!         end if
       end subroutine set_phase_of_evolution
-
 
 
       logical function arrived_main_seq(s)

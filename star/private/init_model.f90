@@ -101,7 +101,11 @@
          call get1_zams_model( &
             s, zams_filename, nz, xh, xa, q, dq, &
             omega, D_omega, am_nu_rot, in_range, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            write(*,1) 'failed in get1_zams_model'
+            stop 'get_zams_model'
+         end if
+
 
          s% nz = nz
          call allocate_star_info_arrays(s, ierr)
@@ -193,6 +197,8 @@
          call read_zams_header ! sets net_name
          if (ierr /= 0) then
             close(iounit)
+            write(*,*) 'failed in read_zams_header'
+            stop 'get1_zams_model'
             return
          end if
 
@@ -262,7 +268,10 @@
                s, iounit, m1, nz1, m2, nz2, initial_mass, &
                nvar_hydro, species, xh, xa, q, dq, &
                omega, j_rot, D_omega, am_nu_rot, lnT, ierr)
-
+         if (ierr /= 0) then
+            write(*,*) 'failed in get1_mass'
+            stop 'get_zams_model'
+         end if
          close(iounit)
          deallocate(j_rot, lnT)
 
@@ -276,14 +285,22 @@
             read(iounit, *, iostat=ierr) ! skip blank line before property list
             include 'formats'
             if (ierr /= 0) return
-            iprop = -1
-            dprop = -1
             year_month_day_when_created = -1
+
+
             call read_properties(iounit, &
                s% net_name, iprop, iprop, year_month_day_when_created, &
                dprop, initial_z, initial_y, dprop, iprop, dprop, dprop, &
-               dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, iprop, ierr)
-            if (ierr /= 0) return
+               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, iprop, ierr)
+            if (ierr /= 0) then
+               write(*,2) 'year_month_day_when_created', year_month_day_when_created
+               write(*,*) 'net_name' // trim(s% net_name)
+               stop 'read_zams_header'
+               return
+            end if
+
             if (year_month_day_when_created < min_when_created) then
                ierr = -1
                write(*, *)
@@ -373,7 +390,9 @@
             m_in = -1; nz_in = -1; net_name = ''
             call read_properties(iounit, &
                net_name, iprop, nz_in, iprop, m_in, dprop, dprop, dprop, iprop, dprop, &
-               dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, dprop, iprop, ierr)
+               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, dprop, iprop, ierr)
             if (ierr /= 0 .or. m_in < 0 .or. nz_in < 0) then
                write(*,*) 'missing required properties'
                write(*,*) 'ierr', ierr

@@ -51,6 +51,13 @@
       ! but with the barrier, things can progress to core collapse nicely.
       dq_D_mix_zero_at_H_He_crossover = 1d-2
 
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'burn_Z'
+      overshoot_zone_loc(1) = 'shell'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.015
+      overshoot_f0(1) = 0.005
+
 ! timesteps
 
 ! mesh

@@ -194,6 +194,7 @@
             s% total_steps_finished, s% total_relax_steps_finished, &
             s% mesh_call_number, s% solver_call_number, s% diffusion_call_number, &
             s% Teff, s% why_Tlim, s% dt_why_retry_count, s% dt_why_count, &
+            s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             s% need_to_update_history_now, &
             s% dt_why_count(1:numTlim), s% dt_why_retry_count(1:numTlim), &
             s% need_to_save_profiles_now, s% save_profiles_model_priority, &

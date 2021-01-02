@@ -1258,7 +1258,7 @@
             if (s% log_max_temperature < s% min_lgT_for_lgL_photo_limit) return
             new_L = abs(s% power_photo)
             max_other_L = 0d0
-            old_L = abs(s% L_by_category_old(iphoto))
+            old_L = abs(s% power_photo_old)
             lim = s% delta_lgL_photo_limit
             hard_lim = s% delta_lgL_photo_hard_limit
             lgL_min = s% lgL_photo_burn_min
@@ -1311,6 +1311,8 @@
             stop 'bad iso arg for check_lgL'
          end if
          
+         if (old_L < 0d0) return
+         
          lim = lim*s% time_delta_coeff
          hard_lim = hard_lim*s% time_delta_coeff
 
@@ -1341,7 +1343,7 @@
          if (dbg) write(*,1) 'hard_lim', hard_lim
          if (hard_lim > 0 .and. abs_change > hard_lim .and. (.not. skip_hard_limit)) then
             if (s% report_all_dt_limits) write(*, '(a30, f20.10, 99e20.10)') trim(msg), &
-               lgL - lgL_old, hard_lim, lgL, lgL_old, s% L_nuc_burn_total, s% L_nuc_burn_total_old
+               lgL - lgL_old, hard_lim, lgL, lgL_old, s% L_nuc_burn_total
             check_lgL = retry
             s% retry_message = 'lgL hard limit'
             return

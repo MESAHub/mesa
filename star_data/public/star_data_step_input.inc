@@ -147,8 +147,16 @@
          integer :: num_retries, phase_of_evolution
          integer :: recent_log_header ! model_number when last output header info to terminal
          integer :: mesh_call_number, solver_call_number, diffusion_call_number
-         integer :: binary_id        
-   
+         integer :: binary_id       
+         
+         ! power emitted from nuclear reactions after subtracting neutrinos (Lsun units)
+         ! these are used for timesteps, but are difficult to evaluate when doing op_split_burn until start solver.
+         ! to get accurate "old" values, allow them as optional inputs.  don't use if < 0.
+         real(dp) :: power_nuc_burn
+         real(dp) :: power_h_burn
+         real(dp) :: power_he_burn
+         real(dp) :: power_z_burn
+         real(dp) :: power_photo
    
    
       ! experimental work in progress.  not for public use yet.

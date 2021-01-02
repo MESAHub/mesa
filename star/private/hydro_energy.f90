@@ -231,7 +231,7 @@
             if (s% eps_nuc_factor == 0d0 .or. &
                 s% nonlocal_NiCo_decay_heat .or. s% gamma_law_hydro > 0) then
                eps_nuc_18 = 0 ! get eps_nuc from extra_heat instead
-            else if (doing_op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+            else if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
                eps_nuc_18 = 0d0
                eps_nuc_18%val = s% burn_avg_epsnuc(k)
             else
