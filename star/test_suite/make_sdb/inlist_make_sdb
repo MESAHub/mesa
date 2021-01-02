@@ -13,7 +13,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'sdb.mod'
-      required_termination_code_string = 'max_model_number' ! 'xa_central_upper_limit'
+      required_termination_code_string = 'xa_central_upper_limit'
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -56,8 +56,7 @@
 &controls
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 210 ! 4200
-      fill_arrays_with_NaNs = .false.
+      max_model_number = 4200
 
       ! The following controls turn off winds after the H envelope is reduced to a specified mass.
       x_ctrl(1) = 5d-3 ! desired H envelope mass
