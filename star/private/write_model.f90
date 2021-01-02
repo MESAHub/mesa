@@ -246,6 +246,7 @@
             write(iounit, 1, advance='no') 'timestep (seconds)'
             call write1_eol(s% dt,ierr)
             write(iounit, 1, advance='no') 'dt_next (seconds)'
+            call write1_eol(s% dt_next_unclipped,ierr)
             write(iounit, '(a)')
          end if
          close(iounit)

@@ -2181,6 +2181,7 @@
          if (s% RSP_flag) then
             pick_next_timestep = keep_going
             s% dt_next = s% RSP_dt
+            s% dt_next_unclipped = s% dt_next
             s% why_Tlim = Tlim_max_timestep
             return
          end if         
@@ -2202,6 +2203,8 @@
             return
          end if
 
+         s% dt_next_unclipped = s% dt_next
+               ! write out the unclipped timestep in saved models
          if (s% time < 0 .and. s% time + s% dt_next > 0) then
             s% dt_next = -s% time
          else if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then

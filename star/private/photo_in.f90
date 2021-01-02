@@ -173,8 +173,9 @@
          if (failed('recent_log_header')) return
 
          read(iounit, iostat=ierr) &
-            s% recent_log_header, s% phase_of_evolution, s% dt_next
+            s% recent_log_header, s% phase_of_evolution, s% dt_next, s% dt_next_unclipped
          if (failed('eps_nuc_neu_total')) return
+         if (s% dt_next <= 0d0) s% dt_next = s% dt_next_unclipped
 
          call read_part_number(iounit)
          if (failed('read_part_number')) return

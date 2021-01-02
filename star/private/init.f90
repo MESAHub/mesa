@@ -549,6 +549,7 @@
 
          s% dt = -1
          s% dt_next = -1
+         s% dt_next_unclipped = -1
 
          s% i_lnd = 0
          s% i_lnT = 0

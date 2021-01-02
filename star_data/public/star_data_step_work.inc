@@ -1356,6 +1356,7 @@
          real(dp) :: dVARdot_dVAR
          real(dp) :: surf_accel_grav_ratio
          real(dp) :: prev_create_atm_R0_div_R
+         real(dp) :: dt_next_unclipped
          real(dp) :: L_for_BB_outer_BC
          real(dp) :: dX_nuc_drop_max_drop
          real(dp) :: solver_test_partials_val, solver_test_partials_dval_dx

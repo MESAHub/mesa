@@ -104,7 +104,7 @@
 
          call write_part_number(iounit)
          write(iounit) &
-            s% recent_log_header, s% phase_of_evolution, s% dt_next
+            s% recent_log_header, s% phase_of_evolution, s% dt_next, s% dt_next_unclipped
 
          call write_part_number(iounit) 
          write(iounit) &

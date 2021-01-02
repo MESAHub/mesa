@@ -646,7 +646,6 @@
          end do 
          if (count/=0) call mesa_error(__FILE__,__LINE__)
 
-
          nvar = s% nvar
          call read1_model( &
                s, s% species, s% nvar_hydro, nz, iounit, &
