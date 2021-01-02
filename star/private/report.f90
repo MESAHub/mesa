@@ -81,7 +81,7 @@
          real(dp) :: eps_nuc
          include 'formats'
          nz = s% nz
-         
+
          do j=1,num_categories
             s% L_by_category(j) = &
                dot_product(s% dm(1:nz), s% eps_nuc_categories(j,1:nz))/Lsun
@@ -140,7 +140,7 @@
                end if
                s% power_nuc_burn = s% power_nuc_burn + eps_nuc*s% dm(k)
             end do
-            s% power_nuc_burn = s% power_nuc_burn/Lsun
+            s% power_nuc_burn = s% power_nuc_burn/Lsun            
             s% power_nuc_neutrinos = dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
             s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
             s% power_he_burn = s% L_by_category(i3alf)
@@ -280,7 +280,6 @@
          s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
-         call set_power_info(s)
          luminosity = s% L(1)
          s% total_radiation = s% total_radiation + &
             s% dt*(luminosity + s% power_neutrinos)

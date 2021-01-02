@@ -1415,8 +1415,21 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
+         include 'formats'
          check_lgL_nuc_change = check_lgL( &
             s, ineut, 'check_lgL_nuc_change', skip_hard_limit, dt, dt_limit_ratio)
+         if (check_lgL_nuc_change /= keep_going) then
+            write(*,2) 's% power_nuc_burn', s% model_number, s% power_nuc_burn
+            write(*,2) 's% power_nuc_burn_old', s% model_number, s% power_nuc_burn_old
+            write(*,2) 'change', s% model_number, s% power_nuc_burn - s% power_nuc_burn_old
+            if (s% log_max_temperature > s% delta_lgL_nuc_at_high_T_limit_lgT_min) then
+               write(*,2) 's% delta_lgL_nuc_at_high_T_limit', s% model_number, s% delta_lgL_nuc_at_high_T_limit
+               write(*,2) 's% delta_lgL_nuc_at_high_T_limit', s% model_number, s% delta_lgL_nuc_at_high_T_limit
+            else
+               write(*,2) 's% delta_lgL_nuc_limit', s% model_number, s% delta_lgL_nuc_limit
+               write(*,2) 's% delta_lgL_nuc_hard_limit', s% model_number, s% delta_lgL_nuc_hard_limit
+            end if
+         end if
       end function check_lgL_nuc_change
 
 

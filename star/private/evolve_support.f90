@@ -153,6 +153,7 @@
 
          include 'formats'
 
+         s% model_number = s% model_number_old
          s% nz = s% nz_old
          s% mstar = s% mstar_old
          s% xmstar = s% xmstar_old
@@ -161,6 +162,19 @@
          s% L_center = s% L_center_old
          s% v_center = s% v_center_old
          s% cumulative_energy_error = s% cumulative_energy_error_old
+         s% total_energy = s% total_energy_old
+         s% total_internal_energy = s% total_internal_energy_old
+         s% total_angular_momentum = s% total_angular_momentum_old
+         s% Teff = s% Teff_old
+         s% power_nuc_burn = s% power_nuc_burn_old
+         s% power_h_burn = s% power_h_burn_old
+         s% power_he_burn = s% power_he_burn_old
+         s% power_z_burn = s% power_z_burn_old
+         s% power_photo = s% power_photo_old
+         s% mstar_dot = s% mstar_dot_old
+         s% L_phot = s% L_phot_old
+         s% L_surf = s% L_surf_old
+         s% dt_limit_ratio = s% dt_limit_ratio_old
 
          do i = 1, s% len_extra_work
             s% extra_work(i) = s% extra_work_old(i)

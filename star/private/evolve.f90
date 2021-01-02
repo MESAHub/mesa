@@ -607,7 +607,7 @@
       integer function do_step_part2(id, first_try)
          use num_def
          use chem_def
-         use report, only: do_report
+         use report, only: do_report, set_power_info
          use adjust_mass, only: do_adjust_mass
          use element_diffusion, only: do_element_diffusion, finish_element_diffusion
          use conv_premix, only: do_conv_premix
@@ -811,6 +811,8 @@
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
 
          call set_luminosity_by_category(s) ! final values for use in selecting timestep
+         call set_power_info(s)
+
          s% total_angular_momentum = total_angular_momentum(s)
          call do_report(s, ierr)
          if (failed('do_report')) return
