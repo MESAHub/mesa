@@ -88,12 +88,7 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-      gradT_excess_lambda1 = 1.0
-      gradT_excess_beta1 = 0.35
-      gradT_excess_lambda2 = 0.5
-      gradT_excess_beta2 = 0.25
-      gradT_excess_dlambda = 0.1
-      gradT_excess_dbeta = 0.1
+      gradT_excess_lambda1 = -1 ! force gradT_excess_alpha = 1, full on all the time.
 
 ! mixing
       !** for high mass - no overshoot
@@ -101,7 +96,7 @@
       D_omega_mixing_across_convection_boundary = .false.
 
 ! timesteps
-      varcontrol_target   = 1d-3
+      varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true
       limit_for_rel_error_in_energy_conservation = 1d-7

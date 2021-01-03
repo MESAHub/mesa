@@ -1392,9 +1392,7 @@
          else ! lambda <= lambda2 - dlambda
             alpha = 0
          end if
-
-
-         if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
+         if (lambda1 >= 0) then ! time smoothing
             s% gradT_excess_alpha = &
                (1d0 - s% gradT_excess_age_fraction)*alpha + &
                s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
