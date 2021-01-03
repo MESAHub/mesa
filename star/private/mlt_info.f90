@@ -1304,6 +1304,14 @@
             if (dbg) write(*,1) 'okay_to_reduce_gradT_excess'
             return
          end if
+         
+         
+         ! TESTING
+         s% gradT_excess_alpha = 1d0
+         return
+         
+         
+         
          nz = s% nz
 
          h1 = s% net_iso(ih1)
