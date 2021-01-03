@@ -427,7 +427,7 @@
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
-            tau_factor, Teff, gradT_excess_alpha, fixed_L_for_BB_outer_BC, &
+            tau_factor, Teff, fixed_L_for_BB_outer_BC, &
             Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string, message
          character (len=net_name_len) :: net_name
@@ -472,7 +472,6 @@
          s% xmstar = -1
          
          Teff = s% Teff
-         gradT_excess_alpha = s% gradT_excess_alpha
          fixed_L_for_BB_outer_BC = s% fixed_L_for_BB_outer_BC
          tau_factor = s% tau_factor
          Tsurf_factor = s% Tsurf_factor
@@ -482,7 +481,7 @@
          call read_properties(iounit, &
             net_name, species, nz, year_month_day_when_created, &
             initial_mass, initial_z, initial_y, mixing_length_alpha, &
-            s% model_number, s% star_age, tau_factor, s% Teff, s% gradT_excess_alpha, &
+            s% model_number, s% star_age, tau_factor, s% Teff, &
             s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             s% xmstar, s% R_center, s% L_center, s% v_center, &
@@ -761,13 +760,13 @@
             num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, fixed_L_for_BB_outer_BC, &
-            Teff, gradT_excess_alpha, tau_factor, Tsurf_factor, opacity_factor, &
+            Teff, tau_factor, Tsurf_factor, opacity_factor, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          call do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
-            model_number, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
@@ -778,7 +777,7 @@
       subroutine do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
-            model_number, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
@@ -789,7 +788,7 @@
          integer, intent(inout) :: species, n_shells, &
             year_month_day_when_created, num_retries, model_number
          real(dp), intent(inout) :: m_div_msun, initial_z, &
-            mixing_length_alpha, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
@@ -815,7 +814,7 @@
          call read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
-            model_number, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
@@ -831,14 +830,14 @@
          integer :: species, n_shells, &
             year_month_day_when_created, model_number, num_retries
          real(dp) :: m_div_msun, initial_z, initial_y, &
-            mixing_length_alpha, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          call read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
-            model_number, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
@@ -855,14 +854,14 @@
             num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
             mixing_length_alpha, cumulative_energy_error, &
-            Teff, gradT_excess_alpha, tau_factor, Tsurf_factor, &
+            Teff, tau_factor, Tsurf_factor, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, opacity_factor, &
             xmstar, R_center, L_center, v_center
          call do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
-            model_number, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
@@ -873,7 +872,7 @@
       subroutine read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
-            model_number, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
@@ -883,7 +882,7 @@
          integer, intent(inout) :: species, n_shells, &
             year_month_day_when_created, model_number, num_retries
          real(dp), intent(inout) :: m_div_msun, initial_z, initial_y, &
-            mixing_length_alpha, star_age, tau_factor, Teff, gradT_excess_alpha, &
+            mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
@@ -906,7 +905,6 @@
             if (match_keyword('mixing_length_alpha', line, mixing_length_alpha)) cycle
             if (match_keyword('tau_factor', line, tau_factor)) cycle
             if (match_keyword('Teff', line, Teff)) cycle
-            if (match_keyword('gradT_excess_alpha', line, gradT_excess_alpha)) cycle
             if (match_keyword('power_nuc_burn', line, power_nuc_burn)) cycle
             if (match_keyword('power_h_burn', line, power_h_burn)) cycle
             if (match_keyword('power_he_burn', line, power_he_burn)) cycle

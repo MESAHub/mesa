@@ -88,8 +88,7 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-      gradT_excess_lambda1 = -1 ! force gradT_excess_alpha = 1, full on all the time.
-
+  
 ! mixing
       !** for high mass - no overshoot
       D_omega_mixing_rate = 1d0

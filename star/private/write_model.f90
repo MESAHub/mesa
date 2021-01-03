@@ -177,7 +177,6 @@
             write(iounit, 1) 'fixed_L_for_BB_outer_BC', s% fixed_L_for_BB_outer_BC
          end if
          write(iounit, 1) 'Teff', s% Teff
-         write(iounit, 1) 'gradT_excess_alpha', s% gradT_excess_alpha
          write(iounit, 1) 'power_nuc_burn', s% power_nuc_burn
          write(iounit, 1) 'power_h_burn', s% power_h_burn
          write(iounit, 1) 'power_he_burn', s% power_he_burn

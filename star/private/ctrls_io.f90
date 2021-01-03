@@ -138,9 +138,7 @@
     redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, &
     semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
     num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
-    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, gradT_excess_age_fraction, D_mix_zero_region_top_q, &
-    gradT_excess_max_change, gradT_excess_lambda1, gradT_excess_beta1, gradT_excess_lambda2, &
-    gradT_excess_beta2, gradT_excess_dlambda, gradT_excess_dbeta, gradT_excess_max_center_h1, &
+    okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, D_mix_zero_region_top_q, gradT_excess_max_center_h1, &
     gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
@@ -1063,14 +1061,6 @@
  s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
  s% gradT_excess_f1 = gradT_excess_f1
  s% gradT_excess_f2 = gradT_excess_f2
- s% gradT_excess_age_fraction = gradT_excess_age_fraction
- s% gradT_excess_max_change = gradT_excess_max_change
- s% gradT_excess_lambda1 = gradT_excess_lambda1
- s% gradT_excess_beta1 = gradT_excess_beta1
- s% gradT_excess_lambda2 = gradT_excess_lambda2
- s% gradT_excess_beta2 = gradT_excess_beta2
- s% gradT_excess_dlambda = gradT_excess_dlambda
- s% gradT_excess_dbeta = gradT_excess_dbeta
  s% gradT_excess_max_center_h1 = gradT_excess_max_center_h1
  s% gradT_excess_min_center_he4 = gradT_excess_min_center_he4
  s% gradT_excess_max_logT = gradT_excess_max_logT
@@ -2766,8 +2756,6 @@
  okay_to_reduce_gradT_excess = s% okay_to_reduce_gradT_excess
  gradT_excess_f1 = s% gradT_excess_f1
  gradT_excess_f2 = s% gradT_excess_f2
- gradT_excess_age_fraction = s% gradT_excess_age_fraction
- gradT_excess_max_change = s% gradT_excess_max_change
  gradT_excess_max_center_h1 = s% gradT_excess_max_center_h1
  gradT_excess_min_center_he4 = s% gradT_excess_min_center_he4
  gradT_excess_max_logT = s% gradT_excess_max_logT
@@ -2789,13 +2777,6 @@
  max_logT_for_mlt = s% max_logT_for_mlt
  mlt_make_surface_no_mixing = s% mlt_make_surface_no_mixing
  do_normalize_dqs_as_part_of_set_qs = s% do_normalize_dqs_as_part_of_set_qs
-
- gradT_excess_lambda1 = s% gradT_excess_lambda1
- gradT_excess_beta1 = s% gradT_excess_beta1
- gradT_excess_lambda2 = s% gradT_excess_lambda2
- gradT_excess_beta2 = s% gradT_excess_beta2
- gradT_excess_dlambda = s% gradT_excess_dlambda
- gradT_excess_dbeta = s% gradT_excess_dbeta
 
  thermohaline_coeff = s% thermohaline_coeff
  thermohaline_option = s% thermohaline_option

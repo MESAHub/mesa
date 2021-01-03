@@ -42,7 +42,7 @@
 
 ! convection
       okay_to_reduce_gradT_excess = .true.
-      gradT_excess_lambda1 = -1 ! turn on full all the time
+
       thermohaline_coeff = 1000
       
 ! solver controls

@@ -13,5 +13,5 @@
    initial_mass = 12 ! standard test
    !initial_mass = 30 ! has also been tested 
    initial_z = 0.02d0
-   Dutch_scaling_factor = 0.4
+   Dutch_scaling_factor = 0.4 ! wind is off after core He burn
 / ! end of controls namelist

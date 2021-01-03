@@ -708,7 +708,6 @@
          s% P_surf = 0
          
          s% gradT_excess_alpha = 0
-         s% gradT_excess_alpha_old = 0
 
          s% h1_czb_mass = 0
 

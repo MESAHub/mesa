@@ -1383,7 +1383,6 @@
          real(dp) :: he_core_mass_old
          real(dp) :: c_core_mass_old
          real(dp) :: Teff_old
-         real(dp) :: gradT_excess_alpha_old
          real(dp) :: center_eps_nuc_old
 
          ! For eps_mdot  (source term only used when mdot /= 0)
