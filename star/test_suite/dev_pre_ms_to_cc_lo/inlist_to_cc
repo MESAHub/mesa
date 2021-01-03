@@ -32,10 +32,9 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 7000
-      !max_number_retries = 37
+      !max_number_retries = 51 ! 49
 
 ! wind
-      Dutch_scaling_factor = 0d0 ! wind off after core He burn
 
 ! atmosphere
 
@@ -49,6 +48,11 @@
 ! mixing
 
 ! timesteps
+      delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
+      
+      ! tighter limits for Si_cntr
+      delta_XSi_cntr_limit = 0.002d0
+      delta_XSi_cntr_hard_limit = 0.01d0
 
 ! mesh
 

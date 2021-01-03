@@ -2,6 +2,9 @@
 
 &star_job
 
+      !save_star_job_namelist = .true.
+      !star_job_namelist_name = 'star_job_to_lgT_9.5_new.txt'
+
       load_saved_model = .true.
       saved_model_name = 'after_core_c_burn.mod'
 
@@ -16,7 +19,10 @@
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
       
-      !pgstar_flag = .false.
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-1
+
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -28,6 +34,9 @@
 
 &controls
 
+      !save_controls_namelist = .true.
+      !controls_namelist_name = 'controls_to_lgT_9.5_new.txt'
+
       log_max_temp_upper_limit = 9.50d0
 
       ! limit max_model_number as part of test_suite
@@ -35,6 +44,7 @@
       !max_number_retries = 37
 
 ! wind
+      Dutch_scaling_factor = 0d0 ! wind off after core He burn
 
 ! atmosphere
 
@@ -52,6 +62,8 @@
 ! mesh
 
 ! solver
+      drag_coefficient = 99 ! 999999d0 ! drive v to 0 in H envelope after end core He burn
+      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -61,7 +73,7 @@
       terminal_show_timestep_units = 'days'
       terminal_show_log_dt = .false.
       terminal_show_log_age = .false.
-      
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'

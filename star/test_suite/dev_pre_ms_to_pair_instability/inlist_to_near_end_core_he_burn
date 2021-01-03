@@ -155,13 +155,11 @@
 !pause = .true.
 
 Grid1_plot_name(3) = 'HR'
-Profile_Panels3_xmin = -101d0
-Profile_Panels3_xmax = -101d0
 Profile_Panels3_other_yaxis_name(4) = 'entropy'
 
-!Profile_Panels3_xaxis_name = 'zone'
-!Profile_Panels3_xmin = 48
-!Profile_Panels3_xmax = 58
-!Profile_Panels3_xaxis_reversed = .true.
+TRho_Profile_xmin = -8.0
+TRho_Profile_xmax = 8.0
+TRho_Profile_ymin = 5
+TRho_Profile_ymax = 10
 
 / ! end of pgstar namelist

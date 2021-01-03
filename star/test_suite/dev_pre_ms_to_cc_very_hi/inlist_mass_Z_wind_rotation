@@ -2,7 +2,7 @@
 
 &star_job
    new_Z = 1d-4
-   new_omega_div_omega_crit = 0.1d0
+   new_omega_div_omega_crit = 0d0
 / ! end of star_job namelist
 
 &kap
@@ -10,7 +10,7 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 100
+   initial_mass = 120
    initial_z = 1d-4
-   Dutch_scaling_factor = 0.1d0 ! wind off after core He burning
+   Dutch_scaling_factor = 0d0
 / ! end of controls namelist

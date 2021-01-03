@@ -28,7 +28,7 @@
 
 &controls
 
-      non_fe_core_rebound_limit = 7d7
+      non_fe_core_rebound_limit = 2d7
       
       when_to_stop_atol = 1d99
       when_to_stop_rtol = 1d99
@@ -38,6 +38,7 @@
       !max_number_retries = 37
 
 ! wind
+      Dutch_scaling_factor = 0d0 ! wind off after core He burn
 
 ! atmosphere
 
@@ -51,6 +52,23 @@
 ! mixing
 
 ! timesteps
+       ! relax these limit for infall.   let lgT_cntr set the pace.
+      delta_lgT_max_hard_limit = 0.1
+
+      dX_nuc_drop_limit = 1d-1 ! relax this limit for infall  
+      dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
+      dX_nuc_drop_min_X_limit = 1d-3  ! 1.0d-3  default = 1.0d-4
+      dX_nuc_drop_max_A_limit = 52   
+      dX_nuc_drop_hard_limit = 1d99
+
+      delta_XNe_cntr_limit = 0.05d0
+      delta_XNe_cntr_hard_limit = 0.1d0
+
+      delta_XO_cntr_limit = 0.05d0
+      delta_XO_cntr_hard_limit = 0.1d0
+
+      delta_XSi_cntr_limit = 0.05d0
+      delta_XSi_cntr_hard_limit = 0.1d0
 
 ! mesh
 
@@ -110,7 +128,7 @@
             ! 'gradT', 'mlt_vc' to test mlt
             ! 'opacity' to test kap
 
-      solver_test_partials_write_eos_call_info = .true.
+      !solver_test_partials_write_eos_call_info = .true.
       
       !solver_test_partials_k_low = -1
       !solver_test_partials_k_high = -1
@@ -144,12 +162,12 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 2.5 ! 
+Profile_Panels3_xmax =  65 ! -101d0 ! 2.5 ! 
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
 TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 7.0
 TRho_Profile_ymin = 8.5
-TRho_Profile_ymax = 9.6
+TRho_Profile_ymax = 9.8
 
 / ! end of pgstar namelist
