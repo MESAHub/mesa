@@ -18,9 +18,9 @@ NEU_PLOTTER_SRCS = neu_plotter.f90
 #
 # LIBRARIES
 
-LIBS_OTHER = net eos neu rates chem $(LIBS_MESA_NUMERICS)
+LIBS_OTHER = neu $(LIBS_MESA_NUMERICS)
 DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-LOAD_OTHER = -L$(MESA_LIB_DIR) -lnet -leos -lneu -lrates -lchem $(LOAD_MESA_NUMERICS)
+LOAD_OTHER = -L$(MESA_LIB_DIR) -lneu $(LOAD_MESA_NUMERICS)
 
 #################################################################
 #
