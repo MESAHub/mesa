@@ -16,7 +16,7 @@
       new_v_flag = .true.
 
 !** for high mass
-      relax_to_this_tau_factor = 900
+      relax_to_this_tau_factor = 1.5d6
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
 !** for high mass

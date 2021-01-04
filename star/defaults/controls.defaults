@@ -1959,11 +1959,22 @@
       ! gamma1_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! stop if min gamma1 < this limit
+      ! stop if min gamma1 < this limit in a cell with ``q <= gamma1_limit_max_q``
 
       ! ::
 
     gamma1_limit = -1
+
+
+      ! gamma1_limit_max_q
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop if gamma1 < this limit at any location with ``q <= gamma1_limit_max_q``
+      ! values near unity skip the outer envelope
+
+      ! ::
+
+    gamma1_limit_max_q = 0.95d0
 
 
       ! Pgas_div_P_limit

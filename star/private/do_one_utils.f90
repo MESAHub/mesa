@@ -697,6 +697,7 @@
          
          min_gamma1 = 1d99
          do k = s% nz, 1, -1
+            if (s% q(k) > s% gamma1_limit_max_q) exit
             if (s% gamma1(k) < min_gamma1) min_gamma1 = s% gamma1(k)
          end do
          

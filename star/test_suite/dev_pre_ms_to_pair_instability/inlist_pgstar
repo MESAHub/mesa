@@ -22,8 +22,8 @@ Grid1_win_aspect_ratio = 0.666
 ! file output
 !Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
-Grid1_file_prefix = 'infall_'
-Grid1_file_interval = 1     ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_file_prefix = 'black_hole_'
+Grid1_file_interval = 25     ! output when mod(model_number,Grid1_file_interval)==0
 Grid1_file_width = -1        ! (inches) negative means use same value as for window
 Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
@@ -141,8 +141,8 @@ Profile_Panels3_yaxis_name(2) = 'Power'
 Profile_Panels3_yaxis_name(3) = 'Mixing'
 Mixing_legend_txt_scale_factor = 0.9
 
-Profile_Panels3_yaxis_name(4) = 'gamma1'
-Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s' ! 
+Profile_Panels3_yaxis_name(4) = 'logRho'
+Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
 
 Profile_Panels3_yaxis_name(5) = 'logT'
 Profile_Panels3_other_yaxis_name(5) = 'burn_num_iters'

@@ -139,7 +139,8 @@
             stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
             stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
             stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS
-         real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q, gamma1_limit
+         real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q
+         real(dp) :: gamma1_limit, gamma1_limit_max_q
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
          real(dp) :: delta_Pg_lower_limit, delta_Pg_upper_limit

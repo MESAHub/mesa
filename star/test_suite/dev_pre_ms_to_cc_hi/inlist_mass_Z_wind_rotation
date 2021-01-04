@@ -16,5 +16,5 @@
    !initial_mass = 30 ! has also been tested 
    initial_z = 0.02d0
    !initial_z = 1d-5
-   Dutch_scaling_factor = 0.1d0 ! wind off after core He burning
+   Dutch_scaling_factor = 0d0
 / ! end of controls namelist

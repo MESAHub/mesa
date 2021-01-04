@@ -12,5 +12,5 @@
 &controls
    initial_mass = 90
    initial_z = 1d-3
-   Dutch_scaling_factor = 0.1d0
+   Dutch_scaling_factor = 0d0
 / ! end of controls namelist
