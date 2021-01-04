@@ -3,7 +3,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgT_9.55.mod'
+      saved_model_name = 'lgTmax_9.55.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -34,7 +34,7 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'si28'
-      xa_central_lower_limit(1) = 0.25d0
+      xa_central_lower_limit(1) = 0.6d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -108,7 +108,7 @@
       !mesh_dump_call_number = 5189
       !okay_to_remesh = .false.
       
-      !trace_evolve = .true.
+      trace_evolve = .true.
 
       !stop_for_bad_nums = .true.
       

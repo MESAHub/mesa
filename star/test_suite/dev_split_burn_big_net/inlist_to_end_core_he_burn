@@ -2,11 +2,11 @@
 
 &star_job
 
-      !save_star_job_namelist = .true.
-      !star_job_namelist_name = 'star_job_to_end_core_he_burn.txt'
+      save_star_job_namelist = .true.
+      star_job_namelist_name = 'star_job_to_end_core_he_burn_new.txt'
 
       load_saved_model = .true.
-      saved_model_name = 'late_pre_zams.mod'
+      saved_model_name = 'zams.mod'
       
       save_model_when_terminate = .true.
       save_model_filename = 'after_core_he_burn.mod'
@@ -41,8 +41,8 @@
 
 &controls
 
-      !save_controls_namelist = .true.
-      !controls_namelist_name = 'controls_to_end_core_he_burn.txt'
+      save_controls_namelist = .true.
+      controls_namelist_name = 'controls_to_end_core_he_burn_new.txt'
 
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 1d-3
@@ -63,6 +63,28 @@
       thermohaline_coeff = 2
 
 ! mixing
+      ! overshooting is turned on in inlist_to_end_core_he_burn, off otherwise.
+      overshoot_scheme(1) = 'exponential'
+      overshoot_zone_type(1) = 'burn_Z'
+      overshoot_zone_loc(1) = 'shell'
+      overshoot_bdy_loc(1) = 'bottom'
+      overshoot_f(1) = 0.01
+      overshoot_f0(1) = 0.005
+
+      overshoot_scheme(2) = 'none'
+      overshoot_zone_type(2) = 'burn_Z'
+      overshoot_zone_loc(2) = 'any'
+      overshoot_bdy_loc(2) = 'top'
+      
+      overshoot_scheme(3) = 'exponential'
+      overshoot_zone_type(3) = 'any'
+      overshoot_zone_loc(3) = 'any'
+      overshoot_bdy_loc(3) = 'any'
+      overshoot_f(3) = 0.01
+      overshoot_f0(3) = 0.005
+
+      min_overshoot_q = 0d0
+      overshoot_D_min = 100.0
 
 ! timesteps
 
@@ -146,5 +168,6 @@
 Grid1_plot_name(3) = 'HR'
 Profile_Panels3_xmin = -101d0
 Profile_Panels3_xmax = -101d0
+Profile_Panels3_other_yaxis_name(4) = 'entropy'
 
 / ! end of pgstar namelist

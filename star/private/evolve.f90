@@ -53,6 +53,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         if (s% trace_evolve) write(*,'(/,a)') 'start evolve step'
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
@@ -598,6 +600,7 @@
             if (s% doing_relax) &
                s% total_relax_steps_finished = s% total_relax_steps_finished + 1
          end if
+         if (s% trace_evolve) write(*,'(/,a)') 'done evolve step'
       end function do_evolve_step_part2
 
 

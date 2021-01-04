@@ -352,7 +352,6 @@
             return
          end if
          
-         if (s% trace_evolve) write(*,*) 'solver startup call eval_equations'
          call eval_equations( &
             iter, nvar, nz, dx, xscale, equ, lrpar, rpar, lipar, ipar, ierr)         
          if (ierr /= 0) then
@@ -361,7 +360,6 @@
             convergence_failure = .true.
             return
          end if
-         if (s% trace_evolve) write(*,*) 'solver done eval_equations'
          
          call sizequ(s, &
             iter, nvar, nz, equ, &

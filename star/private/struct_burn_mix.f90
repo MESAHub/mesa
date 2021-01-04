@@ -179,11 +179,11 @@
             return
          end if
                      
-         if (s% trace_evolve) write(*,*) 'call do_hydro_converge'
+         if (s% trace_evolve) write(*,*) 'call solver'
          do_struct_burn_mix = do_hydro_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction)
-         if (s% trace_evolve) write(*,*) 'done do_hydro_converge'
+         if (s% trace_evolve) write(*,*) 'done solver'
 
          s% total_num_solver_iterations = &
             s% total_num_solver_iterations + s% num_solver_iterations
