@@ -40,44 +40,22 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          logical :: store_model
+         integer :: l
          store_model = .true.
          ierr = 0
-         if (nl0 > 0) then
-            call get_one_el_info(s, 0, &
-               nu_lower_factor*l0_obs(1), &
-               nu_upper_factor*l0_obs(nl0), &
-               iscan_factor_l0*nl0, 1, nl0, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) return
-            store_model = .false.
-         end if         
-         if (nl1 > 0) then
-            call get_one_el_info(s, 1, &
-               nu_lower_factor*l1_obs(1), &
-               nu_upper_factor*l1_obs(nl1), &
-               iscan_factor_l1*nl1, 1, nl1, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) return
-            store_model = .false.
-         end if        
-         if (nl2 > 0) then
-            call get_one_el_info(s, 2, &
-               nu_lower_factor*l2_obs(1), &
-               nu_upper_factor*l2_obs(nl2), &
-               iscan_factor_l2*nl2, 1, nl2, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) return
-            store_model = .false.
-         end if         
-         if (nl3 > 0) then
-            call get_one_el_info(s, 3, &
-               nu_lower_factor*l3_obs(1), &
-               nu_upper_factor*l3_obs(nl3), &
-               iscan_factor_l3*nl3, 1, nl3, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) return
-            store_model = .false.
-         end if
+
+         do l = 0, 3
+            if (nl(l) > 0) then
+               call get_one_el_info(s, l, &
+                  nu_lower_factor*freq_target(l,1), &
+                  nu_upper_factor*freq_target(l,nl(l)), &
+                  iscan_factor(l)*nl(l), 1, nl(l), store_model, &
+                  oscillation_code, ierr)
+               if (ierr /= 0) return
+               store_model = .false.
+            end if
+         end do
+
       end subroutine get_all_el_info
       
 
@@ -86,7 +64,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: id
          
-         integer :: max_el_for_chi2, ierr, i, j, n
+         integer :: max_el_for_chi2, ierr, i, j, l, n
          logical :: store_model, checking_age
          real(dp) :: age_limit, model_limit, err, target_l0, X, Y, Z, &
             frac, surface_X, surface_Z, chi2_freq_and_ratios_fraction, &
@@ -269,10 +247,10 @@
          have_nonradial = .false.
          model_ratios_n = 0
          
-         l0_freq(1:nl0) = 0
-         l1_freq(1:nl1) = 0
-         l2_freq(1:nl2) = 0
-         l3_freq(1:nl3) = 0
+         model_freq(0,1:nl(0)) = 0
+         model_freq(1,1:nl(1)) = 0
+         model_freq(2,1:nl(2)) = 0
+         model_freq(3,1:nl(3)) = 0
          
          if (delta_nu_sigma > 0) then
             chi2_delta_nu = pow2((delta_nu - delta_nu_model)/delta_nu_sigma)
@@ -364,7 +342,7 @@
          end if
          
          store_model = .true.
-         if (nl0 > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
+         if (nl(0) > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
             if (.not. get_radial(oscillation_code)) then
                !write(*,'(a65,i6)') 'failed to find all required l=0 modes', s% model_number
                if (trace_chi2_seismo_frequencies_info) then
@@ -383,84 +361,34 @@
             store_model = .false.
             have_radial = .true.
          end if
-                  
-         !write(*,2) 'nl1', nl1
-         if (nl1 > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
-            call get_one_el_info(s, 1, &
-               nu_lower_factor*l1_obs(1), &
-               nu_upper_factor*l1_obs(nl1), &
-               iscan_factor_l1*nl1, 1, nl1, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) then
-               if (trace_chi2_seismo_frequencies_info) write(*,*)
-               write(*,'(a65,i6)') 'failed to find all required l=1 modes', s% model_number
-               if (trace_chi2_seismo_frequencies_info) then
-                  write(*,2) 'results for l=1'
-                  i = 0
-                  do j = 1, num_results
-                     if (el(j) /= 1) cycle
-                     i = i+1
-                     write(*,2) 'freq', i, cyclic_freq(j)
-                  end do
-                  write(*,*)
+
+         do l = 1, 3
+            !write(*,3) 'l, nl(l)', l, nl(l)
+            if (nl(l) > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
+               call get_one_el_info(s, l, &
+                  nu_lower_factor*freq_target(l,1), &
+                  nu_upper_factor*freq_target(l,nl(l)), &
+                  iscan_factor(l)*nl(l), 1, nl(l), store_model, &
+                  oscillation_code, ierr)
+               if (ierr /= 0) then
+                  if (trace_chi2_seismo_frequencies_info) write(*,*)
+                  write(*,'(a65,i4,i6)') 'failed to find all required modes', l, s% model_number
+                  if (trace_chi2_seismo_frequencies_info) then
+                     write(*,2) 'results for l =', l
+                     i = 0
+                     do j = 1, num_results
+                        if (el(j) /= l) cycle
+                        i = i+1
+                        write(*,2) 'freq', i, cyclic_freq(j)
+                     end do
+                     write(*,*)
+                  end if
+                  call check_too_many_bad
+                  return
                end if
-               call check_too_many_bad
-               return
+               store_model = .false.
             end if
-            store_model = .false.
-         end if
-         
-         !write(*,2) 'nl2', nl2
-         if (nl2 > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
-            call get_one_el_info(s, 2, &
-               nu_lower_factor*l2_obs(1), &
-               nu_upper_factor*l2_obs(nl2), &
-               iscan_factor_l2*nl2, 1, nl2, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) then
-               if (trace_chi2_seismo_frequencies_info) write(*,*)
-               write(*,'(a65,i6)') 'failed to find all required l=2 modes', s% model_number
-               if (trace_chi2_seismo_frequencies_info) then
-                  write(*,2) 'results for l=2'
-                  i = 0
-                  do j = 1, num_results
-                     if (el(j) /= 2) cycle
-                     i = i+1
-                     write(*,2) 'freq', i, cyclic_freq(j)
-                  end do
-                  write(*,*)
-               end if
-               call check_too_many_bad
-               return
-            end if
-            store_model = .false.
-         end if
-         
-         !write(*,2) 'nl3', nl3
-         if (nl3 > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
-            call get_one_el_info(s, 3, &
-               nu_lower_factor*l3_obs(1), &
-               nu_upper_factor*l3_obs(nl3), &
-               iscan_factor_l3*nl3, 1, nl3, store_model, &
-               oscillation_code, ierr)
-            if (ierr /= 0) then
-               if (trace_chi2_seismo_frequencies_info) write(*,*)
-               write(*,'(a65,i6)') 'failed to find all required l=3 modes', s% model_number
-               if (trace_chi2_seismo_frequencies_info) then
-                  write(*,2) 'results for l=3'
-                  i = 0
-                  do j = 1, num_results
-                     if (el(j) /= 3) cycle
-                     i = i+1
-                     write(*,2) 'freq', i, cyclic_freq(j)
-                  end do
-                  write(*,*)
-               end if
-               call check_too_many_bad
-               return
-            end if
-            store_model = .false.
-         end if
+         end do
          
          have_nonradial = .true.
          
@@ -470,11 +398,11 @@
                write(*,'(a65,i6)') 'failed in get_freq_corr', s% model_number
                return
             end if
-            if (nl3 > 0) then
+            if (nl(3) > 0) then
                max_el_for_chi2 = 3
-            else if (nl2 > 0) then
+            else if (nl(2) > 0) then
                max_el_for_chi2 = 2
-            else if (nl1 > 0) then
+            else if (nl(1) > 0) then
                max_el_for_chi2 = 1
             else
                max_el_for_chi2 = 0
@@ -487,7 +415,7 @@
          if (chi2_seismo_r_010_fraction > 0 .and. max_el_for_chi2 >= 1) then
 
             call get_frequency_ratios( &
-               .false., nl0, l0_freq_corr, nl1, l1_freq_corr, &
+               .false., nl(0), model_freq_corr(0,:), nl(1), model_freq_corr(1,:), &
                model_ratios_n, model_ratios_l0_first, model_ratios_l1_first, &
                model_ratios_r01, model_ratios_r10)
             
@@ -512,7 +440,7 @@
                
          if (chi2_seismo_r_02_fraction > 0 .and. max_el_for_chi2 >= 2) then
             call get_r02_frequency_ratios( &
-               .false., nl0, l0_freq_corr, nl1, l1_freq_corr, nl2, l2_freq_corr, model_ratios_r02)
+               .false., nl(0), model_freq_corr(0,:), nl(1), model_freq_corr(1,:), nl(2), model_freq_corr(2,:), model_ratios_r02)
          end if
          
          chi2 = get_chi2(s, max_el_for_chi2, .true., ierr)
@@ -628,11 +556,11 @@
             include 'formats'
             ierr = 0
             get_radial = .false.
-            l0_freq(:) = 0.
+            model_freq(0,:) = 0d0
             call get_one_el_info(s, 0, &
-               nu_lower_factor*l0_obs(1), &
-               nu_upper_factor*l0_obs(nl0), &
-               iscan_factor_l0*nl0, 1, nl0, store_model, &
+               nu_lower_factor*freq_target(0,1), &
+               nu_upper_factor*freq_target(0,nl(0)), &
+               iscan_factor(0)*nl(0), 1, nl(0), store_model, &
                code, ierr)
             if (ierr /= 0) then
                !write(*,'(a65,i6)') 'failed in oscillation code', s% model_number
@@ -642,7 +570,7 @@
             if (.not. have_all_l0_freqs()) then
                write(*,'(a65,i6)') 'failed to find all required l=0 frequencies', &
                   s% model_number
-               l0_freq_corr(:) = l0_freq(:) ! for plotting
+               model_freq_corr(0,:) = model_freq(0,:) ! for plotting
                return
             end if
             call get_freq_corr(s, .true., ierr)
@@ -656,7 +584,7 @@
                return
             end if
             !write(*,1) trim(code) // ' chi2_radial', chi2_radial
-            if (chi2_radial > chi2_radial_limit .and. nl1 + nl2 + nl3 > 0) then
+            if (chi2_radial > chi2_radial_limit .and. nl(1) + nl(2) + nl(3) > 0) then
                write(*,'(a50,i6,99f16.2)') &
                   'chi2_radial > chi2_radial_limit', &
                   s% model_number, chi2_radial, chi2_radial_limit
@@ -671,11 +599,11 @@
             real(dp) :: prev
             cnt = 0
             have_all_l0_freqs = .true.
-            if (nl0 <= 0) return
-            prev = l0_freq(1)
-            do i=2,nl0
-               if (l0_obs(i) < 0) cycle
-               if (l0_freq(i) == prev) then
+            if (nl(0) <= 0) return
+            prev = model_freq(0,1)
+            do i=2,nl(0)
+               if (freq_target(0,i) < 0) cycle
+               if (model_freq(0,i) == prev) then
                   have_all_l0_freqs = .false.
                   if (cnt == 0) write(*,'(i30,4x,a)',advance='no') &
                      s% model_number, 'missing l=0 freq number:'
@@ -976,7 +904,7 @@
       
       subroutine store_best_info(s)
          type (star_info), pointer :: s
-         integer :: i
+         integer :: i, l
       
          best_chi2 = chi2
          best_chi2_seismo = chi2_seismo
@@ -1006,33 +934,14 @@
          best_nu_max = nu_max_model
          best_surf_coef1 = surf_coef1
          best_surf_coef2 = surf_coef2
-         
-         do i=1, nl0
-            best_l0_order(i) = l0_order(i)
-            best_l0_freq(i) = l0_freq(i)
-            best_l0_freq_corr(i) = l0_freq_corr(i)
-            best_l0_inertia(i) = l0_inertia(i)
-         end do
 
-         do i=1, nl1
-            best_l1_order(i) = l1_order(i)
-            best_l1_freq(i) = l1_freq(i)
-            best_l1_freq_corr(i) = l1_freq_corr(i)
-            best_l1_inertia(i) = l1_inertia(i)
-         end do
-      
-         do i=1, nl2
-            best_l2_order(i) = l2_order(i)
-            best_l2_freq(i) = l2_freq(i)
-            best_l2_freq_corr(i) = l2_freq_corr(i)
-            best_l2_inertia(i) = l2_inertia(i)
-         end do
-      
-         do i=1, nl3
-            best_l3_order(i) = l3_order(i)
-            best_l3_freq(i) = l3_freq(i)
-            best_l3_freq_corr(i) = l3_freq_corr(i)
-            best_l3_inertia(i) = l3_inertia(i)
+         do l = 0, 3
+            do i = 1, nl(l)
+               best_order(l,i) = model_order(l,i)
+               best_freq(l,i) = model_freq(l,i)
+               best_freq_corr(l,i) = model_freq_corr(l,i)
+               best_inertia(l,i) = model_inertia(l,i)
+            end do
          end do
          
          best_ratios_r01(:) = 0d0
@@ -1044,7 +953,7 @@
             best_ratios_r10(i) = model_ratios_r10(i)
          end do
          
-         do i=1,nl0
+         do i=1,nl(0)
             best_ratios_r02(i) = model_ratios_r02(i)
          end do
       
@@ -1053,7 +962,7 @@
 
       subroutine set_current_from_best(s)
          type (star_info), pointer :: s
-         integer :: i
+         integer :: i, l
       
          chi2 = best_chi2
          chi2_seismo = best_chi2_seismo
@@ -1063,33 +972,14 @@
          nu_max_model = best_nu_max
          surf_coef1 = best_surf_coef1
          surf_coef2 = best_surf_coef2
-         
-         do i=1, nl0
-            l0_order(i) = best_l0_order(i)
-            l0_freq(i) = best_l0_freq(i)
-            l0_freq_corr(i) = best_l0_freq_corr(i)
-            l0_inertia(i) = best_l0_inertia(i)
-         end do
 
-         do i=1, nl1
-            l1_order(i) = best_l1_order(i)
-            l1_freq(i) = best_l1_freq(i)
-            l1_freq_corr(i) = best_l1_freq_corr(i)
-            l1_inertia(i) = best_l1_inertia(i)
-         end do
-      
-         do i=1, nl2
-            l2_order(i) = best_l2_order(i)
-            l2_freq(i) = best_l2_freq(i)
-            l2_freq_corr(i) = best_l2_freq_corr(i)
-            l2_inertia(i) = best_l2_inertia(i)
-         end do
-      
-         do i=1, nl3
-            l3_order(i) = best_l3_order(i)
-            l3_freq(i) = best_l3_freq(i)
-            l3_freq_corr(i) = best_l3_freq_corr(i)
-            l3_inertia(i) = best_l3_inertia(i)
+         do l = 0, 3
+            do i = 1, nl(l)
+               model_order(l,i) = best_order(l,i)
+               model_freq(l,i) = best_freq(l,i)
+               model_freq_corr(l,i) = best_freq_corr(l,i)
+               model_inertia(l,i) = best_inertia(l,i)
+            end do
          end do
          
          do i=1,ratios_n
@@ -1097,7 +987,7 @@
             model_ratios_r10(i) = best_ratios_r10(i)
          end do
          
-         do i=1,nl0
+         do i=1,nl(0)
             model_ratios_r02(i) = best_ratios_r02(i)
          end do
       

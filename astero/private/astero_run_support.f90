@@ -1578,26 +1578,25 @@
          sample_nu_max(i) = best_nu_max
          sample_model_number(i) = best_model_number
 
-         sample_l0_order(:,i) = best_l0_order(:)
-         sample_l1_order(:,i) = best_l1_order(:)
-         sample_l2_order(:,i) = best_l2_order(:)
-         sample_l3_order(:,i) = best_l3_order(:)
+         sample_order(0,:,i) = best_order(0,:)
+         sample_freq(0,:,i) = best_freq(0,:)
+         sample_freq_corr(0,:,i) = best_freq_corr(0,:)
+         sample_inertia(0,:,i) = best_inertia(0,:)
       
-         sample_l0_freq(:,i) = best_l0_freq(:)
-         sample_l0_freq_corr(:,i) = best_l0_freq_corr(:)
-         sample_l0_inertia(:,i) = best_l0_inertia(:)
+         sample_order(1,:,i) = best_order(1,:)
+         sample_freq(1,:,i) = best_freq(1,:)
+         sample_freq_corr(1,:,i) = best_freq_corr(1,:)
+         sample_inertia(1,:,i) = best_inertia(1,:)
       
-         sample_l1_freq(:,i) = best_l1_freq(:)
-         sample_l1_freq_corr(:,i) = best_l1_freq_corr(:)
-         sample_l1_inertia(:,i) = best_l1_inertia(:)
+         sample_order(2,:,i) = best_order(2,:)
+         sample_freq(2,:,i) = best_freq(2,:)
+         sample_freq_corr(2,:,i) = best_freq_corr(2,:)
+         sample_inertia(2,:,i) = best_inertia(2,:)
       
-         sample_l2_freq(:,i) = best_l2_freq(:)
-         sample_l2_freq_corr(:,i) = best_l2_freq_corr(:)
-         sample_l2_inertia(:,i) = best_l2_inertia(:)
-      
-         sample_l3_freq(:,i) = best_l3_freq(:)
-         sample_l3_freq_corr(:,i) = best_l3_freq_corr(:)
-         sample_l3_inertia(:,i) = best_l3_inertia(:)
+         sample_order(3,:,i) = best_order(3,:)
+         sample_freq(3,:,i) = best_freq(3,:)
+         sample_freq_corr(3,:,i) = best_freq_corr(3,:)
+         sample_inertia(3,:,i) = best_inertia(3,:)
          
          sample_ratios_r01(:,i) = best_ratios_r01(:)
          sample_ratios_r10(:,i) = best_ratios_r10(:)
@@ -1697,22 +1696,10 @@
          best_surf_coef1 = 0
          best_surf_coef2 = 0
          best_model_number = 0
-         best_l0_order = 0
-         best_l1_order = 0
-         best_l2_order = 0
-         best_l3_order = 0
-         best_l0_freq = 0
-         best_l0_freq_corr = 0
-         best_l0_inertia = 0
-         best_l1_freq = 0
-         best_l1_freq_corr = 0
-         best_l1_inertia = 0
-         best_l2_freq = 0
-         best_l2_freq_corr = 0
-         best_l2_inertia = 0
-         best_l3_freq = 0
-         best_l3_freq_corr = 0
-         best_l3_inertia = 0
+         best_order = 0
+         best_freq = 0
+         best_freq_corr = 0
+         best_inertia = 0
          best_ratios_r01 = 0
          best_ratios_r10 = 0
          best_ratios_r02 = 0
