@@ -3,11 +3,11 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgTmax_9.55.mod'
+      saved_model_name = 'lgTmax_9.5.mod' ! from pre_ms_to_cc_lo using given inlist_mass_Z_wind_rotation
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+      required_termination_code_string = 'log_max_temp_upper_limit'
 
       change_initial_net = .true.
       new_net_name = 'mesa_201.net'
@@ -33,8 +33,7 @@
 
 &controls
 
-      xa_central_lower_limit_species(1) = 'si28'
-      xa_central_lower_limit(1) = 0.6d0
+      log_max_temp_upper_limit = 9.52d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -47,13 +46,17 @@
 ! rotation
 
 ! mlt
+      alpha_semiconvection = 0
+      thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      ! relax for testing big net.
-      delta_XSi_cntr_limit = 0.05d0
-      delta_XSi_cntr_hard_limit = 0.10d0
+      delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
+      
+      ! tighter limits for Si_cntr
+      delta_XSi_cntr_limit = 0.002d0
+      delta_XSi_cntr_hard_limit = 0.01d0
 
 ! mesh
 
@@ -72,7 +75,8 @@
       terminal_interval = 1
 
 ! FOR DEBUGGING
-
+      ! turn on some things to provide entertainment while wait.
+      
       report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
