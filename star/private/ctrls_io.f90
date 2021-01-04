@@ -72,7 +72,7 @@
     fe_core_infall_limit, center_Ye_lower_limit, center_R_lower_limit, non_fe_core_infall_limit, &
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
     v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit, v_surf_div_v_esc_limit, v_surf_kms_limit, &
-    stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, &
+    stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, gamma1_limit, &
     stop_at_phase_PreMS, stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, &
     stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
     stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
@@ -859,6 +859,7 @@
  s% stop_at_phase_Si_Burn = stop_at_phase_Si_Burn
  s% stop_at_phase_WDCS = stop_at_phase_WDCS
  s% Lnuc_div_L_zams_limit = Lnuc_div_L_zams_limit
+ s% gamma1_limit = gamma1_limit
  s% Pgas_div_P_limit = Pgas_div_P_limit
  s% Pgas_div_P_limit_max_q = Pgas_div_P_limit_max_q
  s% peak_burn_vconv_div_cs_limit = peak_burn_vconv_div_cs_limit
@@ -2556,6 +2557,7 @@
  Lnuc_div_L_zams_limit = s% Lnuc_div_L_zams_limit
  Pgas_div_P_limit = s% Pgas_div_P_limit
  Pgas_div_P_limit_max_q = s% Pgas_div_P_limit_max_q
+ gamma1_limit = s% gamma1_limit
  peak_burn_vconv_div_cs_limit = s% peak_burn_vconv_div_cs_limit
  omega_div_omega_crit_limit = s% omega_div_omega_crit_limit
  delta_nu_lower_limit = s% delta_nu_lower_limit
