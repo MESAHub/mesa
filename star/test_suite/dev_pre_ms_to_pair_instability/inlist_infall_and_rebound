@@ -3,7 +3,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'after_core_c_burn.mod'
+      saved_model_name = 'lgTmax_9.3.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -15,6 +15,11 @@
 
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
+      
+      change_initial_u_flag = .true.
+      change_initial_v_flag = .true.
+      new_v_flag = .false.
+      new_u_flag = .true.   
 
       !pgstar_flag = .false.
 

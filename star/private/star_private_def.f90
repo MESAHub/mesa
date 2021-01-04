@@ -159,6 +159,7 @@
          termination_code_str(t_non_fe_core_rebound_limit) = 'non_fe_core_rebound_limit'
          termination_code_str(t_v_div_csound_max_limit) = 'v_div_csound_max_limit'
          termination_code_str(t_v_div_csound_surf_limit) = 'v_div_csound_surf_limit'
+         termination_code_str(t_gamma1_limit) = 'gamma1_limit'
          termination_code_str(t_Pgas_div_P_limit) = 'Pgas_div_P_limit'
          termination_code_str(t_Lnuc_div_L_lower_limit) = 'Lnuc_div_L_lower_limit'
          termination_code_str(t_Lnuc_div_L_upper_limit) = 'Lnuc_div_L_upper_limit'

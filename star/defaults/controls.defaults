@@ -1956,6 +1956,16 @@
     Lnuc_div_L_lower_limit = -1d99
 
 
+      ! gamma1_limit
+      ! ~~~~~~~~~~~~~~~~
+
+      ! stop if min gamma1 < this limit
+
+      ! ::
+
+    gamma1_limit = -1
+
+
       ! Pgas_div_P_limit
       ! ~~~~~~~~~~~~~~~~
 

@@ -582,7 +582,7 @@
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
             max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
-            species_mass_for_min_limit, species_mass_for_max_limit
+            species_mass_for_min_limit, species_mass_for_max_limit, min_gamma1
             
          include 'formats'
          
@@ -693,6 +693,11 @@
          do k = s% nz, 1, -1
             if (s% q(k) > s% Pgas_div_P_limit_max_q) exit
             if (s% pgas(k)/s% p(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% p(k)
+         end do
+         
+         min_gamma1 = 1d99
+         do k = s% nz, 1, -1
+            if (s% gamma1(k) < min_gamma1) min_gamma1 = s% gamma1(k)
          end do
          
          max_omega_div_omega_crit = 0; k_omega = 0
@@ -1112,6 +1117,10 @@
          else if (v_div_csound_max > s% v_div_csound_max_limit) then 
             call compare_to_target('v_div_csound_max > v_div_csound_max_limit', &
                v_div_csound_max, s% v_div_csound_max_limit, t_v_div_csound_max_limit)
+
+         else if (min_gamma1 < s% gamma1_limit) then 
+            call compare_to_target('min_gamma1 < gamma1_limit', &
+               min_gamma1, s% gamma1_limit, t_gamma1_limit)            
 
          else if (min_pgas_div_p < s% Pgas_div_P_limit) then 
             call compare_to_target('min_pgas_div_p < Pgas_div_P_limit', &
