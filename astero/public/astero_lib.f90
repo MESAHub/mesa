@@ -30,7 +30,12 @@
       
       use const_def, only: dp
       use gyre_support, only: GYRE_IS_ENABLED
-      
+
+      use astero_support, only: &
+            astero_get_cubic_all_freq_corr => get_cubic_all_freq_corr, &
+            astero_get_combined_all_freq_corr => get_combined_all_freq_corr, &
+            astero_get_power_law_all_freq_corr => get_power_law_all_freq_corr, &
+            astero_get_sonoi_all_freq_corr => get_sonoi_all_freq_corr
       implicit none
       
       logical, parameter :: astero_gyre_is_enabled = GYRE_IS_ENABLED
@@ -140,105 +145,7 @@
             a_div_r, b, nu_max, correction_factor, check_obs, &
             nl0, l0_obs, l0_freq, l0_freq_corr, l0_inertia)
       end subroutine astero_get_kjeldsen_radial_freq_corr
-
-      
-      subroutine astero_get_cubic_all_freq_corr(a3, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-        use astero_support, only: get_cubic_all_freq_corr
-        integer, intent(in) :: nl0, nl1, nl2, nl3
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(inout), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
-        real(dp), intent(out) :: a3
-        logical :: radial_only
-        call get_cubic_all_freq_corr(a3, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-      end subroutine astero_get_cubic_all_freq_corr
-
-
-      subroutine astero_get_combined_all_freq_corr(a3, a1, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-        use astero_support, only: get_combined_all_freq_corr
-        integer, intent(in) :: nl0, nl1, nl2, nl3
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(inout), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
-        real(dp), intent(out) :: a3, a1
-        logical :: radial_only
-        call get_combined_all_freq_corr(a3, a1, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-      end subroutine astero_get_combined_all_freq_corr
       
       
-      subroutine astero_get_power_law_all_freq_corr(a, b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-        use astero_support, only: get_power_law_all_freq_corr
-        integer, intent(in) :: nl0, nl1, nl2, nl3
-        real(dp), intent(in) :: freq_ref
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(out), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
-        real(dp), intent(out) :: a, b
-        logical :: radial_only
-        call get_power_law_all_freq_corr(a, b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-      end subroutine astero_get_power_law_all_freq_corr
-
-
-      subroutine astero_get_sonoi_all_freq_corr(a, b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-        use astero_support, only: get_sonoi_all_freq_corr
-        integer, intent(in) :: nl0, nl1, nl2, nl3
-        real(dp), intent(in) :: freq_ref
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(out), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
-        real(dp), intent(out) :: a, b
-        logical :: radial_only
-        call get_sonoi_all_freq_corr(a, b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
-      end subroutine astero_get_sonoi_all_freq_corr
-
-
       end module astero_lib
 
