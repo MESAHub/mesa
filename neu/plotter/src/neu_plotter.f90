@@ -327,19 +327,15 @@ contains
 
       lnT = log10T*ln10
       lnd = log10Rho*ln10
-
-      ! must call eos to get new lnfree_e info
       
       if (doing_d_dlnd) then
          log_var = (lnd + delta_x)/ln10
          var = exp10(log_var)
-         ! use zbar**2 as z2bar
          call neu_get(T, log10T, var, log_var, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
       else
          log_var = (lnT + delta_x)/ln10
          var = exp10(log_var)
-         ! use zbar**2 as z2bar
          call neu_get(var, log_var, Rho, log10Rho, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
       end if
