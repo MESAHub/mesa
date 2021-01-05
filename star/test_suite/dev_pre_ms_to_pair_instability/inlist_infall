@@ -105,11 +105,11 @@
       terminal_show_log_dt = .false.
       terminal_show_log_age = .false.
 
-      num_trace_history_values = 4
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-      trace_history_value_name(3) = 'fe_core_infall'
-      trace_history_value_name(4) = 'non_fe_core_infall'
+      num_trace_history_values = 2
+      !trace_history_value_name(1) = 'rel_E_err'
+      !trace_history_value_name(2) = 'log_rel_run_E_err'
+      trace_history_value_name(1) = 'fe_core_infall'
+      trace_history_value_name(2) = 'non_fe_core_infall'
 
       photo_interval = 10
       !profile_interval = 1
@@ -183,6 +183,6 @@ Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 10
 TRho_Profile_ymin = 8.5
-TRho_Profile_ymax = 10
+TRho_Profile_ymax = 10.5
 
 / ! end of pgstar namelist
