@@ -16,7 +16,7 @@
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 

@@ -68,6 +68,10 @@
       D_GSF_factor = 1
       D_ST_factor = 1
 
+! mixing
+      D_omega_mixing_rate = 1d0
+      D_omega_mixing_across_convection_boundary = .false.
+
 ! mlt
       mixing_length_alpha = 1.5
       MLT_option = 'Henyey'
@@ -84,15 +88,6 @@
 
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-
-      gradT_excess_lambda1 = 1.0
-      gradT_excess_beta1 = 0.35
-
-      gradT_excess_lambda2 = 0.5
-      gradT_excess_beta2 = 0.25
-
-      gradT_excess_dlambda = 0.1
-      gradT_excess_dbeta = 0.1
       
       use_other_alpha_mlt = .false. ! implemented in run_star_extras
       x_ctrl(21) = 3.0 ! alpha for H envelope
@@ -101,12 +96,6 @@
          ! use alpha_H if cell X >= H_limit; else use alpha_other
       x_ctrl(24) = 9d0 ! mass limit (Msun)
          ! use other_alpfa_mlt only if star_mass >= this limit.
-
-! mixing
-      D_omega_growth_rate = 1d0
-      D_omega_mixing_rate = 1d0
-      D_omega_mixing_across_convection_boundary = .false.
-      max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 ! timesteps      
       varcontrol_target = 1d-3

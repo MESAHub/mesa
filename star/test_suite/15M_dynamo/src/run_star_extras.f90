@@ -93,9 +93,9 @@
          call check('log total_angular_momentum', safe_log10(s% total_angular_momentum), 50d0, 52.5d0)
          call check('log center_omega', safe_log10(s% center_omega), -5.0d0, -3.0d0)
          call check('log he_core_omega', safe_log10(s% he_core_omega), -5.0d0, -3.0d0)
-         call check('he_core_mass', s% he_core_mass, 4.0d0, 5.1d0)
+         call check('he_core_mass', s% he_core_mass, 3.7d0, 4.5d0)
          call check('surface j_rot', safe_log10(s% j_rot(1)),  17d0, 19d0)
-         call check('surface v_rot', s% omega(1)*s% r(1)*1d-5, 0.4d0, 0.7d0)
+         call check('surface v_rot', s% omega(1)*s% r(1)*1d-5, 0.2d0, 0.6d0)
          
          k_cntr = 0
          k_surf = 0
@@ -110,8 +110,8 @@
          call check('logRho', avg_val(s% lnd)/ln10, 1d0, 3.0d0)
          call check('log j_rot', safe_log10(avg_val(s% j_rot)), 15.8d0, 16.8d0)
          call check('D_ES', safe_log10(avg_val(s% D_ES)), 3.5d0, 6.5d0) 
-         call check('D_ST', safe_log10(avg_val(s% D_ST)), 4.0d0, 8.0d0)
-         call check('nu_ST', safe_log10(avg_val(s% nu_ST)), 8.1d0, 10.9d0)
+         call check('D_ST', safe_log10(avg_val(s% D_ST)), 1.0d0, 3.0d0)
+         call check('nu_ST', safe_log10(avg_val(s% nu_ST)), 9.1d0, 11.9d0)
          write(*,*)
          if (okay) write(*,'(a)') 'all values are within tolerances'
          write(*,*)
