@@ -765,6 +765,12 @@
             write(*,'(a)') 'pause_before_terminate: hit RETURN to continue'
             read(*,*)
          end if
+
+         call s% extras_after_evolve(id, ierr)
+         if (failed('after_evolve_extras',ierr)) return
+
+         call star_after_evolve(id, ierr)
+         if (failed('star_after_evolve',ierr)) return
          
          if (s% result_reason == result_reason_normal) then
          
@@ -773,12 +779,6 @@
                   s, s% job% save_pgstar_files_when_terminate, &
                   ierr)
             if (failed('update_pgstar_plots',ierr)) return
-
-            call s% extras_after_evolve(id, ierr)
-            if (failed('after_evolve_extras',ierr)) return
-
-            call star_after_evolve(id, ierr)
-            if (failed('star_after_evolve',ierr)) return
 
             call show_terminal_header(id, ierr)
             if (failed('show_terminal_header',ierr)) return
