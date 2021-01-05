@@ -27,8 +27,9 @@ program kap_plotter
    character (len=32) :: my_mesa_dir
 
    real(dp) :: Y, z2bar, z53bar, ye, mass_correction, sumx
-   real(dp) :: abar, zbar, XC, XN, XO, XNe
+   real(dp) :: abar, zbar
    real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2
+   real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(species)
 
    real(dp) :: res1
 
@@ -289,9 +290,12 @@ program kap_plotter
          end if
          
          call kap_get( &
-              kap_handle, zbar, X, Z, XC, XN, XO, XNe, log10Rho, log10T, &
+              kap_handle, species, chem_id, net_iso, xa, log10Rho, log10T, &
               res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
-              frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+              res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
+              kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
+
+         frac_Type2 = kap_fracs(i_frac_Type2)
 
          if (doing_partial) then
             if (doing_d_dlnd) then
@@ -315,7 +319,7 @@ program kap_plotter
             err = 0d0
             dvardx = dfridr(dx_0,dfridr_func,err)
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),min_derivative_error)
-            res1 = safe_log10(xdum)
+            res1 = safe_log10(abs(xdum))
          end if
 
 
@@ -455,11 +459,6 @@ contains
       xa(fe56) = 0.0
       xa(he4) = 1d0 - xa(h1) - xa(c12) - xa(o16) - xa(fe56)
 
-      XC = xa(c12)
-      XN = xa(n14)
-      XO = xa(o16)
-      XNe = xa(ne20)
-
       call basic_composition_info( &
          species, chem_id, xa, X, Y, Z, &
          abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
@@ -486,9 +485,10 @@ contains
             var, log_var, T, log10T, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          call kap_get( &
-            kap_handle, zbar, X, Z, XC, XN, XO, XNe, log_var, log10T, &
+            kap_handle, species, chem_id, net_iso, xa, log_var, log10T, &
             res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
-            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+            res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
+            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
       else
          log_var = (lnT + delta_x)/ln10
          var = exp10(log_var)
@@ -497,9 +497,10 @@ contains
             Rho, log10Rho, var, log_var, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          call kap_get( &
-            kap_handle, zbar, X, Z, XC, XN, XO, XNe, log10Rho, log_var, &
+            kap_handle, species, chem_id, net_iso, xa, log10Rho, log_var, &
             res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
-            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+            res(i_eta), d_dlnd(i_eta), d_dlnT(i_eta), &
+            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
       end if
 
       val = log(kap)

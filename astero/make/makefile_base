@@ -11,7 +11,7 @@ include $(MESA_DIR)/utils/makefile_header
 #################################################################
 #
 # SOURCES
-	
+
 # define the PGSTAR files for astero
 ifeq ($(USE_PGSTAR),YES)
 PGSTAR_SRCS = pgstar_astero_plots.f90
@@ -24,7 +24,7 @@ GYRE_SRCS = gyre_support.f90
 else
 GYRE_SRCS = gyre_support_stub.f90
 endif
-	
+
 
 SRCS = \
 	astero_def.f90 \
@@ -136,4 +136,9 @@ ifeq ($(NODEPS),)
 
   -include .depend
 
+endif
+
+ifeq ($(USE_GYRE),NO)
+gyre_support.mod : gyre_support_stub.o
+	@true
 endif

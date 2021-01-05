@@ -401,6 +401,28 @@
       show_info = .false.
 
 
+! Other hooks
+! -----------
+
+   ! Control whether to use other hooks.  See ``kap/other``.
+
+   ! use_other_elect_cond_opacity
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Replace electron conduction opacity routine
+   ! ::
+
+      use_other_elect_cond_opacity = .false.
+
+   ! use_other_compton_opacity
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   ! Replace Compton opacity routine
+   ! ::
+
+      use_other_compton_opacity = .false.
+
+
 ! Debugging controls
 ! ------------------
 

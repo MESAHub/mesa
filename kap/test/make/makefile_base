@@ -12,11 +12,11 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-TEST_SRCS = test_kap_support.f test_kap.f
+TEST_SRCS = test_kap_support.f90 test_kap.f90
 
-TESTQ_SRCS = test_kap_support.f test_kap_quietly.f
+TESTQ_SRCS = test_kap_support.f90 test_kap_quietly.f90
 
-SAMPLE_SRCS = sample_kap.f
+SAMPLE_SRCS = sample_kap.f90
 
 #################################################################
 #
@@ -69,7 +69,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(FCfree) $<
@@ -83,7 +83,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

@@ -125,7 +125,7 @@ Compton Scattering
 
 At sufficiently high temperature :math:`(T \gtrsim 10^8\,\rm K)`, the
 opacity will be dominated by Compton scattering.  MESA calculates the
-opacity of Compton scattering using the equations of |BY76|.  Near the
+opacity of Compton scattering using the prescription of |P17|.  Near the
 high-:math:`T` and low-:math:`R` edges of the high temperature opacity
 tables, MESA smoothly blends the tabulated opacity values with the
 Compton scattering values.  The location of these blends is not
@@ -150,7 +150,7 @@ spans :math:`-6 \le \log(\rho/\rm g\,cm^{-3}) \le 11.50` and :math:`3
 \le \log(T/\rm K) \le 10`.
 
 
-.. |BY76| replace:: `Buchler & Yueh (1976) <https://ui.adsabs.harvard.edu/abs/1976ApJ...210..440B/abstract>`__
+.. |P17| replace:: `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`__
 
 .. |Fergusson| replace:: `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`__
 

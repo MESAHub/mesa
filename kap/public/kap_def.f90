@@ -27,10 +27,49 @@ module kap_def
   use const_def, only: dp
 
   implicit none
-  
+
+  ! interfaces for procedure pointers
+  abstract interface
+
+     subroutine other_elect_cond_opacity_interface( &
+        zbar, logRho, logT, &
+        kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+        use const_def, only: dp
+        real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
+        real(dp), intent(in) :: logRho ! the density
+        real(dp), intent(in) :: logT ! the temperature
+        real(dp), intent(out) :: kap ! electron conduction opacity
+        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+        integer, intent(out) :: ierr ! 0 means AOK.
+     end subroutine other_elect_cond_opacity_interface
+
+     subroutine other_compton_opacity_interface( &
+        Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+        eta, d_eta_dlnRho, d_eta_dlnT, &
+        kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+        use const_def, only: dp
+        real(dp), intent(in) :: Rho, T
+        real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
+        ! free_e := total combined number per nucleon of free electrons and positrons
+        real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
+        ! eta := electron degeneracy parameter from eos
+        real(dp), intent(out) :: kap ! electron conduction opacity
+        real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
+        integer, intent(out) :: ierr ! 0 means AOK.
+     end subroutine other_compton_opacity_interface
+
+  end interface
+
   
   logical, parameter :: show_allocations = .false.  ! for debugging memory usage
 
+  ! for kap output
+  integer, parameter :: num_kap_fracs = 4
+  integer, parameter :: i_frac_lowT = 1
+  integer, parameter :: i_frac_highT = i_frac_lowT + 1
+  integer, parameter :: i_frac_Type2 = i_frac_highT + 1
+  integer, parameter :: i_frac_Compton = i_frac_Type2 + 1
 
   ! info about op_mono elements
   integer, parameter :: num_op_mono_elements = 17
@@ -197,6 +236,16 @@ module kap_def
       ! bookkeeping
       integer :: handle
       logical :: in_use
+
+      ! other hooks
+
+      logical :: use_other_elect_cond_opacity
+      procedure (other_elect_cond_opacity_interface), pointer, nopass :: &
+         other_elect_cond_opacity => null()
+
+      logical :: use_other_compton_opacity
+      procedure (other_compton_opacity_interface), pointer, nopass :: &
+         other_compton_opacity => null()
 
   end type Kap_General_Info
 

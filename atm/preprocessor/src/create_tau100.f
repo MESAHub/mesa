@@ -612,8 +612,9 @@ contains
          kap, dlnkap_dlnRho, dlnkap_dlnT, &
          ierr)
 
+      use kap_def, only: num_kap_fracs
       use kap_lib, only: kap_get
-      use eos_def, only: i_lnfree_e
+      use eos_def, only: i_lnfree_e, i_eta
 
       real(dp), intent(in)  :: lnRho
       real(dp), intent(in)  :: lnT
@@ -625,12 +626,13 @@ contains
       real(dp), intent(out) :: dlnkap_dlnT
       integer, intent(out)  :: ierr
 
-      real(dp) :: frac_Type2
+      real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(num_isos)
 
       call kap_get( &
-           kap_handle, zbar, X, Z, XC, XN, XO, 0d0, &
+           kap_handle, num_isos, chem_id, net_iso, xa, &
            lnRho/ln10, lnT/ln10, res(i_lnfree_e), dres_dlnRho(i_lnfree_e), dres_dlnT(i_lnfree_e), &
-           frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+           res(i_eta), dres_dlnRho(i_eta), dres_dlnT(i_eta), &
+           kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
 
     end subroutine kap_proc
 

@@ -1355,7 +1355,7 @@ contains
        kap, dlnkap_dlnRho, dlnkap_dlnT, &
        ierr)
 
-    use eos_def, only: i_lnfree_e
+    use eos_def, only: i_lnfree_e, i_eta
     use kap_support, only: get_kap
 
     type(star_info), pointer :: s
@@ -1374,6 +1374,7 @@ contains
     call get_kap( &
          s, 0, s% zbar(1), s% xa(:,1), lnRho/ln10, lnT/ln10, &
          res(i_lnfree_e), dres_dlnRho(i_lnfree_e), dres_dlnT(i_lnfree_e), &
+         res(i_eta), dres_dlnRho(i_eta), dres_dlnT(i_eta), &
          kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2, &
          ierr)
     if (ierr /= 0) then

@@ -33,6 +33,6 @@ check_okay
 mkdir -p ../data/eosDT_data/cache
 check_okay
 
-tar -xJf helm_table.dat.tar.xz -C ../data/eosDT_data
+xz --decompress --keep --stdout helm_table.dat.xz > ../data/eosDT_data/helm_table.dat
 check_okay
 

@@ -88,6 +88,7 @@
          call read_namelist(handle, inlist, ierr)
          if (ierr /= 0) return
          call kap_setup_tables(handle, ierr)
+         call kap_setup_hooks(handle, ierr)
       end function alloc_kap_handle_using_inlist
 
       subroutine free_kap_handle(handle)
@@ -126,7 +127,25 @@
          call Setup_Kap_Tables(rq, use_cache, load_on_demand, ierr)
 
       end subroutine kap_setup_tables
-      
+
+
+      subroutine kap_setup_hooks(handle, ierr)
+         use kap_def, only : Kap_General_Info, get_kap_ptr
+         use other_elect_cond_opacity
+         use other_compton_opacity
+         integer, intent(in) :: handle
+         integer, intent(out):: ierr
+
+         type (Kap_General_Info), pointer :: rq
+
+         ierr = 0
+         call get_kap_ptr(handle,rq,ierr)
+
+         rq% other_elect_cond_opacity => null_other_elect_cond_opacity
+         rq% other_compton_opacity => null_other_compton_opacity
+
+      end subroutine kap_setup_hooks
+
 
       ! kap evaluation
       ! you can call these routines after you've setup the tables for the handle.
@@ -136,30 +155,44 @@
       
       
       subroutine kap_get( &
-            handle, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-        use kap_def, only : kap_is_initialized, Kap_General_Info
-        use kap_eval, only : Get_kap_Results
+         handle, species, chem_id, net_iso, xa, &
+         logRho, logT, &
+         lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+         eta, d_eta_dlnRho, d_eta_dlnT , &
+         kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, dlnkap_dxa, ierr)
+         use chem_def, only: chem_isos
+         use chem_lib, only: basic_composition_info
+         use kap_def, only : kap_is_initialized, Kap_General_Info, num_kap_fracs, i_frac_Type2
+         use kap_eval, only : Get_kap_Results
          ! INPUT
          integer, intent(in) :: handle ! from alloc_kap_handle
-         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition    
+         integer, intent(in) :: species
+         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, pointer :: net_iso(:) ! maps chem id to species number
+         real(dp), intent(in) :: xa(:) ! mass fractions
          real(dp), intent(in) :: logRho ! density
          real(dp), intent(in) :: logT ! temperature
-         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-            ! free_e := total combined number per nucleon of free electrons and positrons
-         
+         ! free_e := total combined number per nucleon of free electrons and positrons
+         real(dp), intent(in)  :: eta, d_eta_dlnRho, d_eta_dlnT
+         ! eta := electron degeneracy parameter from eos
+
          ! OUTPUT
-         real(dp), intent(out) :: frac_Type2
+         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
          real(dp), intent(out) :: kap ! opacity
          real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
+         real(dp), intent(out) :: dlnkap_dxa(:) ! partial derivative w.r.t. species
          integer, intent(out) :: ierr ! 0 means AOK.
 
          type (Kap_General_Info), pointer :: rq
 
-         
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: XC, XN, XO, XNe
+         integer :: i, iz
+
+         real(dp) :: frac_Type2
+
          ierr = 0
          if (.not. kap_is_initialized) then
             ierr=-1
@@ -169,14 +202,39 @@
          call kap_ptr(handle,rq,ierr)
          if (ierr /= 0) return
 
+         call basic_composition_info( &
+            species, chem_id, xa, X, Y, Z, &
+            abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
+
+         xc = 0; xn = 0; xo = 0; xne = 0
+         do i=1, species
+            iz = chem_isos% Z(chem_id(i))
+            select case(iz)
+            case (6)
+               xc = xc + xa(i)
+            case (7)
+               xn = xn + xa(i)
+            case (8)
+               xo = xo + xa(i)
+            case (10)
+               xne = xne + xa(i)
+            end select
+         end do
+
          call Get_kap_Results( &
-              rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
-              lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-              frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
- 
+            rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
+            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
+            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+
+         kap_fracs = 0
+         kap_fracs(i_frac_Type2) = frac_Type2
+
+         dlnkap_dxa = 0
+
       end subroutine kap_get
-      
-      
+
+
       subroutine kap_get_elect_cond_opacity( &
             zbar, logRho, logT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -201,13 +259,16 @@
       
       
       subroutine kap_get_compton_opacity( &
-            Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+         eta, d_eta_dlnRho, d_eta_dlnT, &
+         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_eval, only: Compton_Opacity
          use kap_def, only : kap_is_initialized
          real(dp), intent(in) :: Rho, T
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
+         real(dp), intent(in)  :: eta, d_eta_dlnT, d_eta_dlnRho
+            ! eta := electron degeneracy parameter from eos
          real(dp), intent(out) :: kap ! electron conduction opacity
          real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr ! 0 means AOK.
@@ -217,6 +278,7 @@
          endif
          ierr = 0
          call Compton_Opacity(Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
       end subroutine kap_get_compton_opacity
 
@@ -259,7 +321,8 @@
          real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
          integer, intent(out) :: ierr ! 0 means AOK.
-         
+
+         real(dp) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp) :: g1, kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp) :: Rho, T
          type (Kap_General_Info), pointer :: rq
@@ -293,6 +356,7 @@
          call combine_rad_with_compton_and_conduction( &
             rq, rho, logRho, T, logT, zbar, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          

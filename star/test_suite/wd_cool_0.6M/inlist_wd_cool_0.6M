@@ -43,6 +43,10 @@
       kap_file_prefix = 'gs98'
       use_Type2_opacities = .true.
 
+      ! use Blouin et al. (2020) corrections
+      ! see run_star_extras
+      use_other_elect_cond_opacity = .false.
+
 / ! end of kap namelist
 
 &controls

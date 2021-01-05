@@ -646,6 +646,7 @@ contains
          call get_kap( &
             s, 1, s% zbar(1), xa, logRho, logT, &
             s% lnfree_e(1), s% d_eos_dlnd(i_lnfree_e,1), s% d_eos_dlnT(i_lnfree_e,1), &
+            s% eta(1), s% d_eos_dlnd(i_eta,1), s% d_eos_dlnT(i_eta,1), &
             opacity, dlnkap_dlnd, dlnkap_dlnT, frac_Type2, ierr)
          if (ierr /= 0) then
             if (dbg) then

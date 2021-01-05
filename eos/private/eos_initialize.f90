@@ -44,8 +44,10 @@
          integer, intent(OUT) :: ierr ! 0 means AOK.
          !integer, parameter :: imax = 261, jmax = 101  
             ! dimensions of small version of helm table
-         integer, parameter :: imax = 1081, jmax = 401  
-            ! dimensions of large version of helm table; 40 points per decade
+         !integer, parameter :: imax = 1081, jmax = 401
+            ! dimensions of medium version of helm table; 40 points per decade
+         integer, parameter :: imax = 2701, jmax = 1001
+            ! dimensions of large version of helm table; 100 points per decade
          ! helm table lives in eosDT_data
          character (len=256) :: eosDT_data_dir, eosPT_data_dir
          ierr = 0

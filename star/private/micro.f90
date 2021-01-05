@@ -546,7 +546,7 @@ contains
     use kap_def
     use kap_lib
     use kap_support, only: fraction_of_op_mono, get_kap
-    use eos_def, only : i_lnfree_e
+    use eos_def, only : i_lnfree_e, i_eta
     use eos_lib, only: Radiation_Pressure
     use star_utils, only: get_XYZ
 
@@ -560,6 +560,7 @@ contains
          log10_rho, log10_T, dlnkap_dlnd, dlnkap_dlnT, &
          opacity_max, opacity_max0, opacity_max1, zbar, &
          lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+         eta, d_eta_dlnRho, d_eta_dlnT, &
          log_r, log_r_in, log_r_out, log_r_frac, frac, min_cno_for_kap_limit, &
          P, Prad, Pgas, Ledd_factor, Ledd_kap, Ledd_log, &
          a, b, da_dlnd, da_dlnT, db_dlnd, db_dlnT, opacity_factor
@@ -584,7 +585,11 @@ contains
     lnfree_e = s% lnfree_e(k)
     d_lnfree_e_dlnRho = s% d_eos_dlnd(i_lnfree_e,k)
     d_lnfree_e_dlnT = s% d_eos_dlnT(i_lnfree_e,k)
-    
+
+    eta = s% eta(k)
+    d_eta_dlnRho = s% d_eos_dlnd(i_eta,k)
+    d_eta_dlnT = s% d_eos_dlnT(i_eta,k)
+
     if (s% use_starting_composition_for_kap) then
        xa(1:s% species) => s% xa_start(1:s% species,k)
        zbar = s% zbar_start(k)
@@ -596,6 +601,7 @@ contains
     call get_kap( &
          s, k, zbar, xa, log10_rho, log10_T, &
          lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+         eta, d_eta_dlnRho, d_eta_dlnT, &
          s% opacity(k), dlnkap_dlnd, dlnkap_dlnT, s% kap_frac_Type2(k), ierr)
 
     if (is_bad_num(s% opacity(k)) .or. ierr /= 0) then
