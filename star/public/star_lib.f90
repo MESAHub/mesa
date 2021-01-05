@@ -2251,7 +2251,8 @@
             id, k, zbar, xa, logRho, logT, &
             lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
             eta, deta_dlnRho, deta_dlnT, &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2, ierr)
+            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use kap_def, only: num_kap_fracs
          use kap_support, only: get_kap, fraction_of_op_mono
          integer, intent(in) :: id
          integer, intent(in) :: k
@@ -2259,7 +2260,8 @@
             lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
             eta, deta_dlnRho, deta_dlnT
          real(dp), intent(in), pointer :: xa(:)
-         real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2
+         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
+         real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
@@ -2269,7 +2271,7 @@
             s, k, zbar, xa, logRho, logT, &
             lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
             eta, deta_dlnRho, deta_dlnT, &
-            kap, dlnkap_dlnRho, dlnkap_dlnT, frac_Type2, ierr)
+            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
        end subroutine star_get_kap
        
        subroutine star_do_eos_for_cell(id, k, ierr)

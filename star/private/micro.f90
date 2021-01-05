@@ -564,6 +564,7 @@ contains
          log_r, log_r_in, log_r_out, log_r_frac, frac, min_cno_for_kap_limit, &
          P, Prad, Pgas, Ledd_factor, Ledd_kap, Ledd_log, &
          a, b, da_dlnd, da_dlnT, db_dlnd, db_dlnT, opacity_factor
+    real(dp), dimension(num_kap_fracs) :: kap_fracs
     character (len=100) :: message
     real(dp), pointer :: xa(:)
     logical :: test_partials
@@ -602,7 +603,13 @@ contains
          s, k, zbar, xa, log10_rho, log10_T, &
          lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
          eta, d_eta_dlnRho, d_eta_dlnT, &
-         s% opacity(k), dlnkap_dlnd, dlnkap_dlnT, s% kap_frac_Type2(k), ierr)
+         kap_fracs, s% opacity(k), dlnkap_dlnd, dlnkap_dlnT, ierr)
+
+    ! unpack fractions
+    s% kap_frac_lowT(k) = kap_fracs(i_frac_lowT)
+    s% kap_frac_highT(k) = kap_fracs(i_frac_highT)
+    s% kap_frac_Type2(k) = kap_fracs(i_frac_Type2)
+    s% kap_frac_Compton(k) = kap_fracs(i_frac_Compton)
 
     if (is_bad_num(s% opacity(k)) .or. ierr /= 0) then
        if (s% report_ierr) then
