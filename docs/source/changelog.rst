@@ -80,6 +80,14 @@ neu
 The call signature of other_neu has changed. You no longer need to pass in z2bar
 
 
+Other changes
+-------------
+
+* Analogous to ``kap_frac_Type2``, information about the fractional
+  contribution of the lowT tables, highT tables, and Compton opacities
+  to the final result from the opacity module are now included in
+  star_info arrays and profile columns with the names
+  ``kap_frac_lowT``, ``kap_frac_highT``, ``kap_frac_Compton``.
 
 Changes in r15140
 =================

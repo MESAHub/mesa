@@ -931,8 +931,14 @@
             if (failed('d_opacity_dlnd')) exit
             call do1(s% d_opacity_dlnT, c% d_opacity_dlnT)
             if (failed('d_opacity_dlnT')) exit
+            call do1(s% kap_frac_lowT, c% kap_frac_lowT)
+            if (failed('kap_frac_lowT')) exit
+            call do1(s% kap_frac_highT, c% kap_frac_highT)
+            if (failed('kap_frac_highT')) exit
             call do1(s% kap_frac_Type2, c% kap_frac_Type2)
             if (failed('kap_frac_Type2')) exit
+            call do1(s% kap_frac_Compton, c% kap_frac_Compton)
+            if (failed('kap_frac_Compton')) exit
             call do1(s% kap_frac_op_mono, c% kap_frac_op_mono)
             if (failed('kap_frac_op_mono')) exit
 

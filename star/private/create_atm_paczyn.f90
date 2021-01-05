@@ -557,6 +557,7 @@ contains
          use utils_lib, only: realloc_double2
          use eos_def
          use eos_support, only: solve_eos_given_PgasT_auto
+         use kap_def, only: num_kap_fracs
          use kap_support, only: get_kap
 
          integer, intent(in) :: n, lr, li
@@ -578,7 +579,7 @@ contains
             r, L, rho, T, Pgas, Prad, P, opacity, chiRho, chiT, Cp, Cv, grada, gradr_factor, &
             sfactor, f, dm_dlntau, dlnr_dlntau, &
             dlnP_dm, dlnP_dlntau, gradT, dlnT_dlntau, prev_conv_vel, max_conv_vel, dt, &
-            frac_Type2, dlnkap_dlnd, dlnkap_dlnT, res(num_eos_basic_results), &
+            kap_fracs(num_kap_fracs), dlnkap_dlnd, dlnkap_dlnT, res(num_eos_basic_results), &
             d_eos_dlnd(num_eos_basic_results), d_eos_dlnT(num_eos_basic_results), &
             d_eos_dabar(num_eos_basic_results), d_eos_dzbar(num_eos_basic_results), &
             mlt_basics(num_mlt_results)
@@ -647,7 +648,7 @@ contains
             s, 1, s% zbar(1), xa, logRho, logT, &
             s% lnfree_e(1), s% d_eos_dlnd(i_lnfree_e,1), s% d_eos_dlnT(i_lnfree_e,1), &
             s% eta(1), s% d_eos_dlnd(i_eta,1), s% d_eos_dlnT(i_eta,1), &
-            opacity, dlnkap_dlnd, dlnkap_dlnT, frac_Type2, ierr)
+            kap_fracs, opacity, dlnkap_dlnd, dlnkap_dlnT, ierr)
          if (ierr /= 0) then
             if (dbg) then
                write(*,*) 'failed in get_kap'
