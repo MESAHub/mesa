@@ -219,13 +219,13 @@ contains
        s, k, zbar, xa, logRho, logT, &
        lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
        eta, d_eta_dlnRho, d_eta_dlnT, &
-       kap, dlnkap_dlnd, dlnkap_dlnT, frac_Type2, ierr)
+       kap_fracs, kap, dlnkap_dlnd, dlnkap_dlnT, ierr)
 
     use utils_lib
     use num_lib
     use kap_def, only: kap_test_partials, &
        kap_test_partials_val, kap_test_partials_dval_dx, &
-       num_kap_fracs, i_frac_Type2
+       num_kap_fracs
     use kap_lib, only: &
          load_op_mono_data, get_op_mono_params, &
          get_op_mono_args, kap_get_op_mono, kap_get
@@ -239,10 +239,11 @@ contains
     real(dp), intent(in) :: lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT
     real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
     real(dp), intent(in) :: xa(:)
-    real(dp), intent(out) :: kap, dlnkap_dlnd, dlnkap_dlnT, frac_Type2
+    real(dp), intent(out) :: kap_fracs(num_kap_fracs)
+    real(dp), intent(out) :: kap, dlnkap_dlnd, dlnkap_dlnT
     integer, intent(out) :: ierr
 
-    real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
+    real(dp) :: dlnkap_dxa(s% species)
 
     integer :: i, iz, nptot, ipe, nrad, thread_num, sz, offset
     type(auto_diff_real_2var_order1) :: beta, lnkap, lnkap_op
@@ -264,7 +265,6 @@ contains
     if (s% doing_timing) s% timing_num_get_kap_calls = s% timing_num_get_kap_calls + 1
 
     kap = -1d99
-    frac_Type2 = 0
     if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = 0
 
     net_iso => s% net_iso
@@ -396,14 +396,12 @@ contains
        if (s% use_other_kap) then
           call s% other_kap_get_op_mono( &
                s% kap_handle, zbar, logRho, logT, &
-               lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                s% use_op_mono_alt_get_kap, &
                nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
                kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
        else
           call kap_get_op_mono( &
                s% kap_handle, zbar, logRho, logT, &
-               lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                s% use_op_mono_alt_get_kap, &
                nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
                kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, ierr)
@@ -456,8 +454,6 @@ contains
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_fracs, kap, dlnkap_dlnd, dlnkap_dlnT, dlnkap_dxa, ierr)
     end if
-
-    frac_Type2 = kap_fracs(i_frac_Type2)
 
     if (ierr /= 0) then
        return

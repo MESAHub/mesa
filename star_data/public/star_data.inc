@@ -435,7 +435,10 @@
          ! this is partial of opacity wrt natural log of density at constant T
       real(dp), pointer :: d_opacity_dlnT(:)
          ! this is partial of opacity wrt natural log of T at constant density
+      real(dp), pointer :: kap_frac_lowT(:) ! fraction of opacity from lowT tables
+      real(dp), pointer :: kap_frac_highT(:) ! fraction of opacity from highT tables
       real(dp), pointer :: kap_frac_Type2(:) ! fraction of opacity from Type2 tables
+      real(dp), pointer :: kap_frac_Compton(:) ! fraction of opacity from Compton_Opacity
       real(dp), pointer :: kap_frac_op_mono(:) ! fraction of opacity from OP mono
       real, pointer, dimension(:) :: & ! working storage
          op_mono_umesh1, op_mono_semesh1, op_mono_ff1, op_mono_rs1

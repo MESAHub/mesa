@@ -191,8 +191,6 @@
          real(dp) :: XC, XN, XO, XNe
          integer :: i, iz
 
-         real(dp) :: frac_Type2
-
          ierr = 0
          if (.not. kap_is_initialized) then
             ierr=-1
@@ -225,10 +223,7 @@
             rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
-            frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-
-         kap_fracs = 0
-         kap_fracs(i_frac_Type2) = frac_Type2
+            kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
          dlnkap_dxa = 0
 
@@ -290,19 +285,17 @@
       
       subroutine kap_get_op_mono( &
             handle, zbar, logRho, logT, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             ! args for op_mono
             use_op_mono_alt_get_kap, &
             nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
             ! output
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
-         use kap_eval, only: combine_rad_with_compton_and_conduction
+         use kap_eval, only: combine_rad_with_conduction
          integer, intent(in) :: handle ! from alloc_kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: logRho ! the density
          real(dp), intent(in) :: logT ! the temperature
-         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
          ! args for op_mono_get_kap
          logical, intent(in) :: use_op_mono_alt_get_kap
          integer, intent(in) :: nel
@@ -322,7 +315,6 @@
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
          integer, intent(out) :: ierr ! 0 means AOK.
 
-         real(dp) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp) :: g1, kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp) :: Rho, T
          type (Kap_General_Info), pointer :: rq
@@ -352,11 +344,9 @@
          if (ierr /= 0) return
          
          kap_rad = exp10(g1)
-         
-         call combine_rad_with_compton_and_conduction( &
+
+         call combine_rad_with_conduction( &
             rq, rho, logRho, T, logT, zbar, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          
