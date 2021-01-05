@@ -29,14 +29,13 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'c12'
-      xa_central_lower_limit(1) = 1d-5
+      xa_central_lower_limit(1) = 1d-3
 
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
       !max_number_retries = 37
 
 ! wind
-      Dutch_scaling_factor = 0d0 ! wind off after core He burn
 
 ! atmosphere
 
@@ -139,10 +138,11 @@
 
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
 Profile_Panels3_xmax = -101d0 ! 
+Profile_Panels3_yaxis_name(4) = 'gamma1'
 
-TRho_Profile_xmin = 3.0
+TRho_Profile_xmin = 3.5
 TRho_Profile_xmax = 7.5
-TRho_Profile_ymin = 8.3
+TRho_Profile_ymin = 8.5
 TRho_Profile_ymax = 9.2
 
 / ! end of pgstar namelist

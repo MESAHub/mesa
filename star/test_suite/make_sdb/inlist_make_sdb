@@ -15,6 +15,9 @@
       save_model_filename = 'sdb.mod'
       required_termination_code_string = 'xa_central_upper_limit'
 
+      save_photo_when_terminate = .true.
+      save_photo_filename = 'sdb.photo'
+
       set_initial_model_number = .true.
       initial_model_number = 0
 
