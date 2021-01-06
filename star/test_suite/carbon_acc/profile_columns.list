@@ -297,28 +297,6 @@
    !log_concentration h1
    !log_concentration he4
       
-   ! average charge from ionization module
-   !avg_charge_H
-   !avg_charge_He
-   !avg_charge_C
-   !avg_charge_N
-   !avg_charge_O
-   !avg_charge_Ne
-   !avg_charge_Mg
-   !avg_charge_Si
-   !avg_charge_Fe
-      
-   ! average neutral fraction from ionization module
-   !neutral_fraction_H
-   !neutral_fraction_He
-   !neutral_fraction_C
-   !neutral_fraction_N
-   !neutral_fraction_O
-   !neutral_fraction_Ne
-   !neutral_fraction_Mg
-   !neutral_fraction_Si
-   !neutral_fraction_Fe
-
 
    ! typical charge for given species
    !typical_charge he4

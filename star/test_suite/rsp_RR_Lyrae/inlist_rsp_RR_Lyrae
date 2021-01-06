@@ -111,6 +111,5 @@
       Profile_Panels1_xmax = -101D0
 
       Profile_Panels1_dymin(4) = 0.02
-      Profile_Panels1_yaxis_name(2) = 'avg_charge_He'         
 
 / ! end of pgstar namelist
