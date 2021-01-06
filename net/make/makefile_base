@@ -18,7 +18,6 @@ SRCS = \
    net_derivs_support.f90 \
    net_derivs.f90 \
    net_approx21.f90 \
-   net_approx21_plus_co56.f90 \
    net_burn_support.f90 \
    net_initialize.f90 \
    net_eval.f90 \
