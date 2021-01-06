@@ -30,11 +30,11 @@
 
       implicit none
 
-      double precision :: X, Z, Y, abar, zbar, z2bar, z53bar, ye
+      real(dp) :: X, Z, Y, abar, zbar, z2bar, z53bar, ye
       integer, parameter :: species = 7
       integer, parameter :: h1=1, he4=2, c12=3, n14=4, o16=5, ne20=6, mg24=7
       integer, pointer, dimension(:) :: net_iso, chem_id
-      double precision :: xa(species)
+      real(dp) :: xa(species)
 
 
       call Sample
@@ -44,9 +44,9 @@
       subroutine Sample
          
          integer :: handle
-         double precision :: Rho, T, Pgas, log10Rho
-         double precision :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
-         double precision, dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+         real(dp) :: Rho, T, Pgas, log10Rho
+         real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, d_dlnRho_const_T, d_dlnT_const_Rho
+         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
          integer :: ierr
          character (len=32) :: my_mesa_dir
 
@@ -82,16 +82,16 @@
          write(*,*) 'call eosDT_get'
          
          ! get a set of results for given temperature and density
-         call eosDT_get(
-     >         handle, Z, X, abar, zbar, 
-     >         species, chem_id, net_iso, xa,
-     >         Rho, log10(Rho), T, log10(T), 
-     >         res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+         call eosDT_get( &
+               handle, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               Rho, log10(Rho), T, log10(T), &
+               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
          
         
  1       format(a20,3x,e20.12)
 
-         ! the indices for the results are defined in eos_def.f
+         ! the indices for the results are defined in eos_def.f90
          write(*,*)
          write(*,1) 'temperature', T
          write(*,1) 'density', Rho
@@ -106,14 +106,14 @@
          write(*,*)
 
          Pgas = exp(res(i_lnPgas))
-         call eosPT_get( 
-     >         handle, Z, X, abar, zbar,  
-     >         species, chem_id, net_iso, xa,
-     >         Pgas, log10(Pgas), T, log10(T), 
-     >         Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, 
-     >         res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+         call eosPT_get( &
+               handle, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               Pgas, log10(Pgas), T, log10(T), &
+               Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
+               res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
       
-         ! the indices for the results are defined in eos_def.f
+         ! the indices for the results are defined in eos_def.f90
          write(*,*)
          write(*,1) 'temperature', T
          write(*,1) 'density', Rho
@@ -178,13 +178,13 @@
       subroutine Init_Composition
          use chem_lib
 
-         double precision, parameter :: Zfrac_C = 0.173312d0
-         double precision, parameter :: Zfrac_N = 0.053177d0
-         double precision, parameter :: Zfrac_O = 0.482398d0
-         double precision, parameter :: Zfrac_Ne = 0.098675d0
+         real(dp), parameter :: Zfrac_C = 0.173312d0
+         real(dp), parameter :: Zfrac_N = 0.053177d0
+         real(dp), parameter :: Zfrac_O = 0.482398d0
+         real(dp), parameter :: Zfrac_Ne = 0.098675d0
          
-         double precision :: xz, frac, dabar_dx(species), dzbar_dx(species), sumx,
-     >         mass_correction, dmc_dx(species)
+         real(dp) :: xz, frac, dabar_dx(species), dzbar_dx(species), sumx, &
+               mass_correction, dmc_dx(species)
          
          net_iso(:) = 0
          
@@ -206,9 +206,9 @@
          xa(ne20) = Z * Zfrac_Ne
          xa(species) = 1 - sum(xa(1:species-1))
          
-         call composition_info(
-     >         species, chem_id, xa, X, Y, xz, abar, zbar, z2bar, z53bar, ye, mass_correction,
-     >         sumx, dabar_dx, dzbar_dx, dmc_dx)
+         call composition_info( &
+               species, chem_id, xa, X, Y, xz, abar, zbar, z2bar, z53bar, ye, mass_correction, &
+               sumx, dabar_dx, dzbar_dx, dmc_dx)
          ! ! for now, we use the approx versions
          ! abar = approx_abar
          ! zbar = approx_zbar
