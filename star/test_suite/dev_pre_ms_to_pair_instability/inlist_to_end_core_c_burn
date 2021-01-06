@@ -49,13 +49,10 @@
 ! mixing
 
 ! timesteps
-      !max_years_for_timestep = 0.5  ! TESTING PULSES
 
 ! mesh
 
 ! solver
-      drag_coefficient = 999999d0 ! drive v to 0 in H envelope after end core He burn
-      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
