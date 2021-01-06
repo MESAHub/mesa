@@ -12,13 +12,13 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-TEST_SRCS = opal_eval.f eos_support.f \
-   test_eos_blend.f90 test_eos_support.f90 test_eos.f
+TEST_SRCS = eos_support.f90 \
+   test_eos_blend.f90 test_eos_support.f90 test_eos.f90
 
-TESTQ_SRCS = eos_support.f \
-   test_eos_blend.f90 test_eos_support.f90 test_eos_quietly.f
+TESTQ_SRCS = eos_support.f90 \
+   test_eos_blend.f90 test_eos_support.f90 test_eos_quietly.f90
 
-SAMPLE_SRCS = sample_eos.f
+SAMPLE_SRCS = sample_eos.f90
 
 #################################################################
 #
@@ -40,9 +40,9 @@ TEST = $(TEST_DIR)/tester
 TESTQ = $(TEST_DIR)/test_quietly
 SAMPLE = $(TEST_DIR)/sample
 
-TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
-TESTQ_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TESTQ_SRCS)))
-SAMPLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SAMPLE_SRCS)))
+TEST_OBJS = $(patsubst %.f90,%.o,$(TEST_SRCS))
+TESTQ_OBJS = $(patsubst %.f90,%.o,$(TESTQ_SRCS))
+SAMPLE_OBJS = $(patsubst %.f90,%.o,$(SAMPLE_SRCS))
 
 all : $(TEST) $(TESTQ) $(SAMPLE)
 
@@ -73,44 +73,12 @@ nodeps : $(.DEFAULT_GOAL)
 
 COMPILE = $(FCbasic) $(FCopenmp) $(FCopt) 
 
-COMPILE_FIXED = $(COMPILE) $(FCfixed) 
-
-COMPILE_FIXED_LEGACY = $(filter-out -std=f2008, $(COMPILE_FIXED))
-
-COMPILE_FREE = $(COMPILE)  $(FCfee)
-
-COMPILE_FREE_LEGACY = $(filter-out -std=f2008, $(COMPILE_FREE))
-
-opal_eval.o: opal_eval.f
-ifneq ($(QUIET),)
-	@echo FC $<
-	@$(FC) $(TEST_INCLUDES) $(COMPILE_FIXED_LEGACY) -c $<
-else
-	$(FC) $(TEST_INCLUDES) $(COMPILE_FIXED_LEGACY) -c $<
-endif
-
-test_eos_blend.o: test_eos_blend.f90
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(COMPILE) $<
 else
 	$(TEST_COMPILE) $(COMPILE) $<
-endif
-
-test_eos_support.o: test_eos_support.f90
-ifneq ($(QUIET),)
-	@echo TEST_COMPILE $<
-	@$(TEST_COMPILE) $(COMPILE) $<
-else
-	$(TEST_COMPILE) $(COMPILE) $<
-endif
-
-%.o: %.f
-ifneq ($(QUIET),)
-	@echo TEST_COMPILE FIXED_LEGACY $<
-	@$(TEST_COMPILE) $(COMPILE_FIXED_LEGACY) $<
-else
-	$(TEST_COMPILE) $(COMPILE_FIXED_LEGACY) $<
 endif
 
 #################################################################
@@ -121,9 +89,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)
-vpath %.dek $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

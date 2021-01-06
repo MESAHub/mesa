@@ -212,8 +212,11 @@
       integer, parameter :: p_tau_eff_div_tau = p_tau_eff + 1
       integer, parameter :: p_xtau = p_tau_eff_div_tau + 1
       integer, parameter :: p_tau = p_xtau + 1
-      integer, parameter :: p_kap_frac_Type2 = p_tau + 1
-      integer, parameter :: p_kap_frac_op_mono = p_kap_frac_Type2 + 1
+      integer, parameter :: p_kap_frac_lowT = p_tau + 1
+      integer, parameter :: p_kap_frac_highT = p_kap_frac_lowT + 1
+      integer, parameter :: p_kap_frac_Type2 = p_kap_frac_highT + 1
+      integer, parameter :: p_kap_frac_Compton = p_kap_frac_Type2 + 1
+      integer, parameter :: p_kap_frac_op_mono = p_kap_frac_Compton + 1
       integer, parameter :: p_extra_opacity_factor = p_kap_frac_op_mono + 1
       integer, parameter :: p_log_kap_times_factor = p_extra_opacity_factor + 1
       integer, parameter :: p_log_opacity = p_log_kap_times_factor + 1
@@ -998,7 +1001,10 @@
          profile_column_name(p_extra_opacity_factor) = 'extra_opacity_factor'
          profile_column_name(p_log_kap_times_factor) = 'log_kap_times_factor'
          profile_column_name(p_log_opacity) = 'log_opacity'
+         profile_column_name(p_kap_frac_lowT) = 'kap_frac_lowT'
+         profile_column_name(p_kap_frac_highT) = 'kap_frac_highT'
          profile_column_name(p_kap_frac_Type2) = 'kap_frac_Type2'
+         profile_column_name(p_kap_frac_Compton) = 'kap_frac_Compton'
          profile_column_name(p_kap_frac_op_mono) = 'kap_frac_op_mono'
          profile_column_name(p_energy) = 'energy'
          profile_column_name(p_logM) = 'logM'

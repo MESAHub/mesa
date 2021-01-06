@@ -106,6 +106,9 @@
 
       real(dp), parameter :: sige = 6.6524587321d-25 ! Thomson cross section (cm^2)
 
+      real(dp), parameter :: weinberg_theta  = 0.22290d0 ! sin**2(theta_weinberg)
+      real(dp), parameter :: num_neu_fam = 3.0d0 ! number of neutrino flavors = 3.02 plus/minus 0.005 (1998)
+
 ! the following quantities are not exact
 
       real(dp), parameter :: standard_cgrav = 6.67430d-8 ! gravitational constant (g^-1 cm^3 s^-2)

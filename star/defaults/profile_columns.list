@@ -335,7 +335,10 @@
       !  (was previously called dkap_dlnrho_at_face)
    !dkap_dlnT_face ! partial derivative of opacity wrt. ln T (at rho=const) at outer edge of cell
       !  (was previously called dkap_dlnT_at_face)
+   !kap_frac_lowT ! fraction of opacity from lowT tables
+   !kap_frac_highT ! fraction of opacity from highT tables
    !kap_frac_Type2 ! fraction of opacity from Type2 tables
+   !kap_frac_Compton ! fraction of opacity from Compton_Opacity
    !kap_frac_op_mono ! fraction of opacity from OP mono
 
 !# Luminosity 

@@ -36,29 +36,37 @@
       
       
       subroutine Get_kap_Results( &
-           rq, zbar, X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
+           rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
            eta, d_eta_dlnRho, d_eta_dlnT, &
-           frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+           kap_fracs, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use const_def
          use utils_lib, only: is_bad
+         use auto_diff
 
          type (Kap_General_Info), pointer :: rq
          real(dp), intent(in) :: X, XC, XN, XO, XNe, Z, zbar
-         real(dp), intent(in) :: logRho_in, logT_in
+         real(dp), intent(in) :: logRho, logT
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
          real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
-         real(dp), intent(out) :: frac_Type2
+         real(dp), intent(out) :: kap_fracs(num_kap_fracs)
          real(dp), intent(out) :: kap ! opacity
          real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
          integer, intent(out) :: ierr ! 0 means AOK.
-         
-         real(dp) :: logR, logT, T, logRho, Rho, logKap
-         real(dp) :: logT_Compton_blend_hi, logR_Compton_blend_lo, &
-            kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
-            beta, kap_beta, dlnkap_beta_dlnRho, dlnkap_beta_dlnT, &
-            alfa, kap_alfa, dlnkap_alfa_dlnRho, dlnkap_alfa_dlnT
+
+         real(dp) :: kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
+         real(dp) :: kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT
+
+         real(dp) :: logT_Compton_blend_lo, logT_Compton_blend_hi
+         real(dp) :: logR_Compton_blend_lo, logR_Compton_blend_hi
+
+         real(dp) :: Rho, T
+         type(auto_diff_real_2var_order1) :: logT_auto, logRho_auto, logR_auto
+         type(auto_diff_real_2var_order1) :: logkap_rad, logkap_compton
+         type(auto_diff_real_2var_order1) :: blend_logT, blend_logR, blend
+
+         real(dp) :: frac_Type2, frac_highT, frac_lowT
          
          logical :: dbg
 
@@ -71,36 +79,139 @@
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
             Z >= rq% Z_lo .and. Z <= rq% Z_hi
 
-         logRho = logRho_in; Rho = exp10(logRho)
-         logT = logT_in; T = exp10(logT)
-         logR = logRho - 3*logT + 18
+         ! auto diff
+         ! var1: logRho
+         ! var2: logT
+
+         Rho = exp10(logRho)
+         logRho_auto% val = logRho
+         logRho_auto% d1val1 = 1d0
+         logRho_auto% d1val2 = 0d0
+
+         T = exp10(logT)
+         logT_auto% val = logT
+         logT_auto% d1val1 = 0d0
+         logT_auto% d1val2 = 1d0
+
+         logR_auto = logRho_auto - 3d0*logT_auto + 18d0
+
          if (dbg) write(*,1) 'logRho', logRho
          if (dbg) write(*,1) 'logT', logT
-         if (dbg) write(*,1) 'logR', logR
-         
+         if (dbg) write(*,1) 'logR', logR_auto% val
+
+         ! initialize fracs
+         kap_fracs = 0
          frac_Type2 = 0d0
+         frac_lowT = 0d0
+         frac_highT = 0d0
 
-
+         ! blend to Compton at high T
          logT_Compton_blend_hi = rq% logT_Compton_blend_hi
+         logT_Compton_blend_lo = logT_Compton_blend_hi - 0.50d0
+
+         ! blend in logT
+         if (logT_auto >= logT_Compton_blend_hi) then
+            blend_logT = 1d0
+         else if (logT_auto > logT_Compton_blend_lo .and. logT_auto <= logT_Compton_blend_hi) then
+            blend_logT = (logT_auto - logT_Compton_blend_lo) / (logT_Compton_blend_hi - logT_Compton_blend_lo)
+         else
+            blend_logT = 0d0
+         end if
+         ! quintic smoothing
+         blend_logT = -blend_logT*blend_logT*blend_logT*(-10d0 + blend_logT*(15d0 - 6d0*blend_logT))
+
+
+         ! blend to Compton at low R
          logR_Compton_blend_lo = rq% logR_Compton_blend_lo
-         if (logT >= logT_Compton_blend_hi .or. logR <= logR_Compton_blend_lo) then ! just use compton
+         logR_Compton_blend_hi = logR_Compton_blend_lo + 0.50d0
+
+         ! blend in logR
+         if (logR_auto <= logR_Compton_blend_lo) then
+            blend_logR = 1d0
+         else if (logR_auto > logR_Compton_blend_lo .and. logR_auto <= logR_Compton_blend_hi) then
+            blend_logR = (logR_Compton_blend_hi - logR_auto) / (logR_Compton_blend_hi - logR_Compton_blend_lo)
+         else
+            blend_logR = 0d0
+         endif
+         ! quintic smoothing
+         blend_logR = -blend_logR*blend_logR*blend_logR*(-10d0 + blend_logR*(15d0 - 6d0*blend_logR))
+
+
+         ! smoothly combine blends
+         blend = 1d0 - (1d0-blend_logT)*(1d0-blend_logR)
+         kap_fracs(i_frac_Compton) = blend% val
+
+
+         if (blend .gt. 0) then ! at least some compton
+
+            if (rq % use_other_compton_opacity) then
+               call rq% other_compton_opacity(Rho, T, &
+                  lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                  eta, d_eta_dlnRho, d_eta_dlnT, &
+                  kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
+            else
+               call Compton_Opacity(Rho, T, &
+                  lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
+                  eta, d_eta_dlnRho, d_eta_dlnT, &
+                  kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
+            end if
+
+         else ! no Compton
+
+            kap_compton = 1d-30
+            dlnkap_compton_dlnRho = 0d0
+            dlnkap_compton_dlnT = 0d0
+
+         end if
+
+         ! pack into auto_diff type
+         logkap_compton = log10(kap_compton)
+         logkap_compton% d1val1 = dlnkap_compton_dlnRho
+         logkap_compton% d1val2 = dlnkap_compton_dlnT
+
+
+         if (blend .lt. 1) then ! at least some tables
+
+            call Get_kap_Results_blend_T( &
+                 rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
+                 frac_lowT, frac_highT, frac_Type2, &
+                 kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
+
+            ! revise reported fractions based on Compton blend
+            frac_lowT = (1d0 - blend% val) * frac_lowT
+            frac_highT = (1d0 - blend% val) * frac_highT
+            ! the value of frac_Type2 doesn't need revised if it represents
+            ! the fraction of highT opacities provided by the Type2 tables
+            ! frac_Type2 = (1d0 - blend% val) * frac_Type2
+
+         else ! no tables
 
             kap_rad = 1d-30
             dlnkap_rad_dlnRho = 0d0
             dlnkap_rad_dlnT = 0d0
 
-         else
-
-            call Get_kap_Results_blend_T( &
-                 rq, X, Z, XC, XN, XO, XNe, logRho, logT, &
-                 frac_Type2, kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, ierr)
-                 
          end if
-         
-         call combine_rad_with_compton_and_conduction( &
+
+         ! pack into auto_diff type
+         logkap_rad = log10(kap_rad)
+         logkap_rad% d1val1 = dlnkap_rad_dlnRho
+         logkap_rad% d1val2 = dlnkap_rad_dlnT
+
+         ! pack kap_fracs from tables
+         kap_fracs(i_frac_lowT) = frac_lowT
+         kap_fracs(i_frac_highT) = frac_highT
+         kap_fracs(i_frac_Type2) = frac_Type2
+
+         ! do blend
+         logkap_rad = blend * logkap_compton + (1d0 - blend) * logkap_rad
+
+         ! unpack auto_diff
+         kap_rad = exp10(logkap_rad% val)
+         dlnkap_rad_dlnRho = logkap_rad% d1val1
+         dlnkap_rad_dlnT = logkap_rad% d1val2
+
+         call combine_rad_with_conduction( &
             rq, Rho, logRho, T, logT, zbar, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          
@@ -109,7 +220,7 @@
       
       subroutine Get_kap_Results_blend_T( &
            rq, X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
-           frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+           frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
         use kap_def
         use utils_lib, only: is_bad
@@ -121,7 +232,7 @@
         real(dp), intent(in) :: logT_in ! temperature
 
         ! OUTPUT
-        real(dp), intent(out) :: frac_Type2
+        real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
         real(dp), intent(out) :: kap ! opacity
         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
@@ -161,6 +272,9 @@
            clipped_Rho = .true.
         end if
 
+        frac_lowT = 0d0
+        frac_highT = 0d0
+        frac_Type2 = 0d0
 
         if (rq% use_Type2_opacities .and. &
             associated(kap_co_z_tables(rq% kap_CO_option)% ar)) then
@@ -178,6 +292,7 @@
                 X, Z, XC, XN, XO, XNe, logRho, logT, &
                 frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
            if (clipped_Rho) dlnkap_dlnRho = 0d0
+           frac_lowT = 1d0
            return
         end if
 
@@ -201,6 +316,7 @@
                 X, Z, XC, XN, XO, XNe, logRho, logT, &
                 frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
            if (clipped_Rho) dlnkap_dlnRho = 0d0
+           frac_highT = 1d0
            return
         end if
 
@@ -239,6 +355,8 @@
              d_alfa_dlnT*logKap1*ln10 + d_beta_dlnT*logKap2*ln10
         kap = exp10(logKap)
 
+        frac_lowT = beta
+        frac_highT = alfa
 
         if (dbg) then
            write(*,1) 'alfa', alfa
@@ -571,149 +689,24 @@
       end subroutine Get_kap_highT_Results
 
 
-      subroutine combine_rad_with_compton_and_conduction( &
+      subroutine combine_rad_with_conduction( &
             rq, Rho, logRho, T, logT, zbar, &
-            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
          use condint, only: do_electron_conduction
          type (Kap_General_Info), pointer :: rq
          real(dp), intent(in) :: Rho, logRho, T, logT, zbar
-         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
-         real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(inout) :: kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr ! 0 means AOK.
       
-         real(dp) :: &
-            kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT, &
-            kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, kap_highT, &
-            dkap_compton_dlnRho, dkap_compton_dlnT, &
-            alfa, d_alfa_dlnT, d_alfa_dlnRho, beta, d_beta_dlnT, d_beta_dlnRho,&
-            alfa0, d_alfa0_dlnT, d_alfa0_dlnRho, logKap, logKap_rad, logKap_compton
-         
-         real(dp) :: logT_Compton_blend_lo, logT_Compton_blend_hi
-         real(dp) :: logR, logR_Compton_blend_lo, logR_Compton_blend_hi
-         
+         real(dp) :: kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT
          logical, parameter :: dbg = .false.
          
          include 'formats'
          
          ierr = 0
-         
-         logT_Compton_blend_hi = rq% logT_Compton_blend_hi
-         logT_Compton_blend_lo = logT_Compton_blend_hi - 0.50d0
-
-         !also blend to Compton at low R
-         logR = logRho - 3d0*logT + 18d0
-         logR_Compton_blend_lo = rq% logR_Compton_blend_lo
-         logR_Compton_blend_hi = logR_Compton_blend_lo + 0.50d0
-
-         if (logT_Compton_blend_hi < 7.5d0) then
-            write(*,1) 'Get_kap_Results: logT_Compton_blend_hi', logT_Compton_blend_hi
-            write(*,1) 'bogus??? expect 7.99 for OP and 8.69 for OPAL'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         if (logT > logT_Compton_blend_lo .or. logR < logR_Compton_blend_hi) then ! combine kap_rad with rad_compton
-         
-            if (dbg) write(*,*) 'combine kap_rad with rad_compton'
-
-            if (rq % use_other_compton_opacity) then
-               call rq% other_compton_opacity( &
-                  Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                  eta, d_eta_dlnRho, d_eta_dlnT, &
-                  kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
-            else
-               call Compton_Opacity( &
-                  Rho, T, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-                  eta, d_eta_dlnRho, d_eta_dlnT, &
-                  kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT, ierr)
-            end if
-
-            if (ierr /= 0) return
-            if (dbg) write(*,1) 'kap_compton', kap_compton
-            if (dbg) write(*,1) 'dlnkap_compton_dlnRho', dlnkap_compton_dlnRho
-            if (dbg) write(*,1) 'dlnkap_compton_dlnT', dlnkap_compton_dlnT
-            if (dbg) write(*,*) 'logT >= logT_Compton_blend_hi', logT >= logT_Compton_blend_hi, &
-               logT, logT_Compton_blend_hi
-            if (logT >= logT_Compton_blend_hi .or. logR <= logR_Compton_blend_lo) then
-               kap_rad = kap_compton
-               dlnkap_rad_dlnRho = dlnkap_compton_dlnRho
-               dlnkap_rad_dlnT = dlnkap_compton_dlnT
-            else
-               !blend in temperature
-               if (logT > logT_Compton_blend_lo .and. logT <= logT_Compton_blend_hi) then
-                  alfa0 = (logT - logT_Compton_blend_lo) &
-                     / (logT_Compton_blend_hi - logT_Compton_blend_lo)
-                  d_alfa0_dlnT = 1d0/(logT_Compton_blend_hi - logT_Compton_blend_lo)/ln10
-                  
-                  ! must smooth the transitions near alfa = 0.0 and 1.0  
-                  ! use quintic smoothing function for this with 1st and 2nd derivs = 0 at ends
-                  alfa = -alfa0*alfa0*alfa0*(-10d0 + alfa0*(15d0 - 6d0*alfa0))
-                  d_alfa_dlnT = 30d0*(alfa0 - 1d0)*(alfa0 - 1d0)*alfa0*alfa0*d_alfa0_dlnT
-
-                  beta = 1d0 - alfa
-                  d_beta_dlnT = -d_alfa_dlnT
-                  
-                  if (dbg) then
-                     write(*,1) 'alfa', alfa
-                     write(*,1) 'beta', beta
-                  end if
-
-                  logKap_rad = log10(kap_rad)
-                  logKap_compton = log10(kap_compton)
-                  
-                  logKap = alfa*logKap_compton + beta*logKap_rad
-                  dlnkap_rad_dlnRho = &
-                     alfa*dlnkap_compton_dlnRho + beta*dlnkap_rad_dlnRho
-                  dlnkap_rad_dlnT = &
-                     alfa*dlnkap_compton_dlnT + beta*dlnkap_rad_dlnT + &
-                     d_alfa_dlnT*logKap_compton*ln10 + d_beta_dlnT*logKap_rad*ln10
-                  kap_rad = exp10(logKap)
-               end if
-               !blend in R
-               if (logR > logR_Compton_blend_lo .and. logR <= logR_Compton_blend_hi) then
-                  alfa0 = (logR - logR_Compton_blend_lo) &
-                     / (logR_Compton_blend_hi - logR_Compton_blend_lo)
-                  d_alfa0_dlnT = -3d0/(logR_Compton_blend_hi - logR_Compton_blend_lo)/ln10
-                  d_alfa0_dlnRho = 1d0/(logR_Compton_blend_hi - logR_Compton_blend_lo)/ln10
-                  
-                  ! must smooth the transitions near alfa = 0.0 and 1.0  
-                  ! use quintic smoothing function for this with 1st and 2nd derivs = 0 at ends
-                  alfa = -alfa0*alfa0*alfa0*(-10d0 + alfa0*(15d0 - 6d0*alfa0))
-                  d_alfa_dlnT = 30d0*(alfa0 - 1d0)*(alfa0 - 1d0)*alfa0*alfa0*d_alfa0_dlnT
-                  d_alfa_dlnRho = 30d0*(alfa0 - 1d0)*(alfa0 - 1d0)*alfa0*alfa0*d_alfa0_dlnRho
-
-                  beta = 1d0 - alfa
-                  d_beta_dlnT = -d_alfa_dlnT
-                  d_beta_dlnRho = -d_alfa_dlnRho
-                  
-                  if (dbg) then
-                     write(*,1) 'alfa', alfa
-                     write(*,1) 'beta', beta
-                  end if
-
-                  logKap_rad = log10(kap_rad)
-                  logKap_compton = log10(kap_compton)
-                  
-                  logKap = beta*logKap_compton + alfa*logKap_rad
-                  dlnkap_rad_dlnRho = &
-                     beta*dlnkap_compton_dlnRho + alfa*dlnkap_rad_dlnRho + &
-                     d_beta_dlnRho*logKap_compton*ln10 + d_alfa_dlnRho*logKap_rad*ln10
-                  dlnkap_rad_dlnT = &
-                     beta*dlnkap_compton_dlnT + alfa*dlnkap_rad_dlnT + &
-                     d_beta_dlnT*logKap_compton*ln10 + d_alfa_dlnT*logKap_rad*ln10
-                  kap_rad = exp10(logKap)
-               end if
-            end if
-            if (dbg) write(*,1) 'kap_rad', kap_rad
-            if (dbg) write(*,1) 'dlnkap_rad_dlnRho', dlnkap_rad_dlnRho
-            if (dbg) write(*,1) 'dlnkap_rad_dlnT', dlnkap_rad_dlnT
-            if (dbg) write(*,*)
-         end if
          
          if (.not. rq% include_electron_conduction) then
             kap = kap_rad
@@ -735,7 +728,7 @@
 
          if (is_bad(kap_ec)) then
             write(*,*) 'kap_ec', kap_ec
-            stop 'Get_kap_Results'
+            stop 'combine_rad_with_conduction'
          end if
          if (dbg) write(*,1) 'kap_ec', kap_ec
          if (dbg) write(*,1) 'dlnkap_ec_dlnRho', dlnkap_ec_dlnRho
@@ -764,7 +757,7 @@
             write(*,1) 'dkap_rad_dlnRho', kap_rad * dlnkap_rad_dlnRho
             write(*,1) 'kap_rad', kap_rad
             write(*,1) 'kap_ec', kap_ec
-            stop 'Get_kap_Results'
+            stop 'combine_rad_with_conduction'
          end if
          
          dlnkap_dlnT = (kap/kap_rad) * dlnkap_rad_dlnT + (kap/kap_ec) * dlnkap_ec_dlnT
@@ -778,15 +771,15 @@
             write(*,1) 'dkap_rad_dlnT', kap_rad * dlnkap_rad_dlnT
             write(*,1) 'kap_rad', kap_rad
             write(*,1) 'kap_ec', kap_ec
-            stop 'Get_kap_Results'
+            stop 'combine_rad_with_conduction'
          end if
 
          if (dbg) write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
          if (dbg) write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
-         if (dbg) stop 'combine_rad_with_compton_and_conduction'
+         if (dbg) stop 'combine_rad_with_conduction'
       
       
-      end subroutine combine_rad_with_compton_and_conduction
+      end subroutine combine_rad_with_conduction
 
 
       subroutine Compton_Opacity( &

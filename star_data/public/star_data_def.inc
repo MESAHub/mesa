@@ -834,10 +834,9 @@
          end subroutine other_overshooting_scheme_interface
       
       
-         subroutine other_mesh_delta_coeff_factor_interface(id, eps_h, eps_he, eps_z, ierr)
+         subroutine other_mesh_delta_coeff_factor_interface(id, ierr)
             use const_def, only: dp
             integer, intent(in) :: id
-            real(dp), intent(in), dimension(:) :: eps_h, eps_he, eps_z
             integer, intent(out) :: ierr
          end subroutine other_mesh_delta_coeff_factor_interface
       
@@ -1621,7 +1620,6 @@
       
          subroutine other_kap_get_op_mono_interface( &
                handle, zbar, log10_rho, log10_T, &
-               lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
                ! args for op_mono
                use_op_mono_alt_get_kap, &
                nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
@@ -1632,7 +1630,6 @@
             real(dp), intent(in) :: zbar
             real(dp), intent(in) :: log10_rho ! the density
             real(dp), intent(in) :: log10_T ! the temperature
-            real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! args for op_mono_get_kap
             logical, intent(in) :: use_op_mono_alt_get_kap
             integer, intent(in) :: nel
