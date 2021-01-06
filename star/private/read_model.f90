@@ -38,7 +38,7 @@
       integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
       integer, parameter :: bit_for_Eturb = 6
       integer, parameter :: bit_for_RTI = 7
-      integer, parameter :: bit_for_constant_L = 8
+      !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
       integer, parameter :: bit_for_D_omega = 10
       integer, parameter :: bit_for_am_nu_rot = 11
@@ -274,7 +274,6 @@
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_rsp_flag ! read eturb, erad, Fr
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
-         if (s% constant_L) n = n+increment_for_const_L ! do not read L
          if (is_RSP_model .and. .not. want_RSP_model) then
             if (.not. s% Eturb_flag) then
                write(*,*) '(is_RSP_model .and. .not. want_RSP_model) requires Eturb_flag true'
@@ -331,7 +330,7 @@
             if (i_eturb /= 0) then
                j=j+1; xh(i_eturb,i) = max(min_eturb,vec(j))
             end if            
-            if (.not. (s% constant_L .or. no_L)) then
+            if (.not. no_L) then
                j=j+1; xh(i_lum,i) = vec(j)
             end if            
             j=j+1; dq(i) = vec(j)
@@ -390,8 +389,6 @@
          
          if (s% rotation_flag .and. .not. s% am_nu_rot_flag) &
             s% am_nu_rot(1:nz) = 0d0
-
-         if (s% constant_L) xh(i_lum,1:nz) = s% L_center
          
          if (want_RSP_model .and. .not. is_RSP_model) then
             ! proper values for these will be set in rsp_setup_part2
@@ -560,7 +557,6 @@
          s% D_omega_flag = BTEST(file_type, bit_for_D_omega)
          s% am_nu_rot_flag = BTEST(file_type, bit_for_am_nu_rot)
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
-         s% constant_L = BTEST(file_type, bit_for_constant_L)
          s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)

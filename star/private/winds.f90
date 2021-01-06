@@ -287,8 +287,7 @@
             end if
          end if
 
-         if (wind_mdot >= 0 .and. s% super_eddington_scaling_factor <= 0 &
-               .and. .not. s% zero_gravity) then
+         if (wind_mdot >= 0 .and. s% super_eddington_scaling_factor <= 0) then
             ! check for super eddington boost to wind
             L_div_Ledd = L1 / s% prev_Ledd
             full_off = s% wind_boost_full_off_L_div_Ledd

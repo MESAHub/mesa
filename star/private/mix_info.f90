@@ -2585,16 +2585,7 @@
          ierr = 0
          nz = s% nz
 
-         if (.not. s% RTI_flag) then
-            if (s% gamma_law_hydro > 0d0) then
-               do k = 1, nz
-                  s% mixing_type(k) = no_mixing
-                  s% D_mix(k) = 0d0
-                  s% conv_vel(k) = 0d0
-               end do
-            end if
-            return
-         end if
+         if (.not. s% RTI_flag) return
 
          coeff = s% composition_RTI_diffusion_factor
          if (coeff <= 0) return

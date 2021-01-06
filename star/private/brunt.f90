@@ -57,14 +57,6 @@
          ierr = 0
          nz = s% nz
 
-         if (s% gamma_law_hydro > 0d0 .or. &
-             ((.not. s% calculate_Brunt_N2) .and. &
-              (.not. s% use_Ledoux_criterion))) then
-            call set_nan(s% unsmoothed_brunt_B(1:nz))
-            call set_nan(s% brunt_B(1:nz))
-            return
-         end if
-
          if (s% use_other_brunt) then
             call s% other_brunt(s% id, ierr)
             if (ierr /= 0) then
@@ -119,7 +111,6 @@
          ierr = 0
          nz = s% nz
 
-         if (s% gamma_law_hydro > 0d0) return
          if (.not. s% calculate_Brunt_N2) then
             call set_nan(s% brunt_N2(1:nz))
             call set_nan(s% brunt_N2_composition_term(1:nz))

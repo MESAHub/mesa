@@ -1357,7 +1357,7 @@
       subroutine set_k_CpTMdot_lt_L(s)
          type (star_info), pointer :: s
          integer :: k, nz
-         if (s% mstar_dot <= 0d0 .or. s% gamma_law_hydro > 0d0) then
+         if (s% mstar_dot <= 0d0) then
             s% k_CpTMdot_lt_L = 1
             return
          end if
@@ -1476,7 +1476,6 @@
          real(dp) :: Hp, alt_Hp, alfa, beta, rho_face, P_face
          integer :: k
          include 'formats'
-         !if (s% gamma_law_hydro > 0d0) return
          do k=1,s% nz
             if (s% cgrav(k) == 0) then
                s% scale_height(k) = 0
@@ -2069,8 +2068,7 @@
          cell_total = s% energy(k)
          if (s% v_flag .or. s% u_flag) &
             cell_total = cell_total + cell_specific_KE(s,k,d_dv00,d_dvp1)
-         if (.not. s% zero_gravity) &
-            cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
+         cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
          if (s% Eturb_flag) cell_total = cell_total + s% Eturb(k)
@@ -2147,11 +2145,9 @@
                cell_total = cell_total + cell1
                total_radial_kinetic_energy = total_radial_kinetic_energy + cell1
             end if
-            if (.not. s% zero_gravity) then
-               cell1 = dm*cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
-               cell_total = cell_total + cell1
-               total_gravitational_energy = total_gravitational_energy + cell1
-            end if
+            cell1 = dm*cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
+            cell_total = cell_total + cell1
+            total_gravitational_energy = total_gravitational_energy + cell1
             if (s% rotation_flag) then
                cell1 = dm*cell_specific_rotational_energy(s,k)
                total_rotational_kinetic_energy = total_rotational_kinetic_energy + cell1
@@ -2200,10 +2196,8 @@
                cell1 = dm*cell_specific_KE(s,k,d_dv00,d_dvp1)
                cell_total = cell_total + cell1
             end if
-            if (.not. s% zero_gravity) then
-               cell1 = dm*cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
-               cell_total = cell_total + cell1
-            end if
+            cell1 = dm*cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
+            cell_total = cell_total + cell1
             if (s% rotation_flag) then
                cell1 = dm*cell_specific_rotational_energy(s,k)
                if (s% include_rotation_in_total_energy) &

@@ -349,8 +349,8 @@
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     trace_force_another_iteration, max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, &
-    dedt_eqn_r_scale, gamma_law_hydro, zero_gravity, drag_coefficient, min_q_for_drag, turn_on_drag_in_H_envelope, &
-    constant_L, v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
+    dedt_eqn_r_scale, drag_coefficient, min_q_for_drag, turn_on_drag_in_H_envelope, &
+    v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_Fraley_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
@@ -1884,9 +1884,6 @@
  s% include_L_in_Fraley_time_centering = include_L_in_Fraley_time_centering
  s% steps_before_use_Fraley_time_centering = steps_before_use_Fraley_time_centering
  
- s% gamma_law_hydro = gamma_law_hydro
- s% zero_gravity = zero_gravity
- s% constant_L = constant_L
  s% drag_coefficient = drag_coefficient
  s% min_q_for_drag = min_q_for_drag
  s% turn_on_drag_in_H_envelope = turn_on_drag_in_H_envelope
@@ -3572,9 +3569,6 @@
  include_P_in_Fraley_time_centering = s% include_P_in_Fraley_time_centering
  include_L_in_Fraley_time_centering = s% include_L_in_Fraley_time_centering
  
- gamma_law_hydro = s% gamma_law_hydro
- zero_gravity = s% zero_gravity
- constant_L = s% constant_L
  drag_coefficient = s% drag_coefficient
  min_q_for_drag = s% min_q_for_drag
  turn_on_drag_in_H_envelope = s% turn_on_drag_in_H_envelope

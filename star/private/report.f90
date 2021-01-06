@@ -445,13 +445,6 @@
          call get_mass_info(s, s% dm, ierr)
          if (failed('get_mass_info')) return
          
-         if (s% zero_gravity) then
-            s% nu_max = 0
-            s% acoustic_cutoff = 0
-            s% delta_Pg = 0
-            return
-         end if
-         
          s% nu_max = s% nu_max_sun*s% star_mass/ &
             (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
          s% acoustic_cutoff = &
@@ -460,14 +453,12 @@
          if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
          call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
          
-         if (.not. s% constant_L) then
-            call get_tau(s, ierr)
-            if (failed('get_tau')) return
-            call check_tau(10d0, s% tau10_radius, s% tau10_mass, &
-                  s% tau10_lgP, s% tau10_lgT, s% tau10_lgRho, s% tau10_L)
-            call check_tau(100d0, s% tau100_radius, s% tau100_mass, &
-                  s% tau100_lgP, s% tau100_lgT, s% tau100_lgRho, s% tau100_L)
-         end if
+         call get_tau(s, ierr)
+         if (failed('get_tau')) return
+         call check_tau(10d0, s% tau10_radius, s% tau10_mass, &
+               s% tau10_lgP, s% tau10_lgT, s% tau10_lgRho, s% tau10_L)
+         call check_tau(100d0, s% tau100_radius, s% tau100_mass, &
+               s% tau100_lgP, s% tau100_lgT, s% tau100_lgRho, s% tau100_L)
 
          if (s% rsp_flag) return
 

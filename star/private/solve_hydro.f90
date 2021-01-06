@@ -431,7 +431,7 @@
                      s% lnR_start(k) - s% lnR_start(k+1), s% lnR_start(k), s% lnR_start(k+1)
                converged = .false.; exit
                stop 'check_after_converge'
-            else if (s% gamma_law_hydro <= 0d0) then
+            else
                if (s% lnT(k) > ln10*12) then
                   if (report) write(*,2) 'after hydro, logT > 12 in cell k', k, s% lnT(k)
                   converged = .false.!; exit

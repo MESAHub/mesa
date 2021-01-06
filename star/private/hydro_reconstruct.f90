@@ -260,20 +260,18 @@
          d_csR_dlndR = s% P(iR)*(s% d_eos_dlnd(i_gamma1,iR) + &
             s% gamma1(iR)*(s% chiRho_for_partials(iR) - 1d0))/(2d0*rhoR*csR)
          
-         if (.not. s% zero_gravity) then 
-            ! change PR and PL for gravity
-            call get_G(s, k, G, dG_dlnR, dG_dw)
-            dPdm_grav = -G*s% m_grav(k)/(r*r*A)  ! cm^-1 s^-2
-            d_dPdm_grav_dlnR = -4d0*dPdm_grav - dG_dlnR*s% m_grav(k)/(r*r*A)            
-            delta_m = 0.5d0*s% dm(iL) ! positive delta_m from left center to edge
-            PL = PL + delta_m*dPdm_grav
-            d_PL_dlnR = delta_m*d_dPdm_grav_dlnR            
-            d_PL_dw = delta_m*dPdm_grav/G*dG_dw     
-            delta_m = -0.5d0*s% dm(iR) ! negative delta_m from right center to edge
-            PR = PR + delta_m*dPdm_grav
-            d_PR_dlnR = delta_m*d_dPdm_grav_dlnR
-            d_PR_dw = delta_m*dPdm_grav/G*dG_dw
-         end if
+         ! change PR and PL for gravity
+         call get_G(s, k, G, dG_dlnR, dG_dw)
+         dPdm_grav = -G*s% m_grav(k)/(r*r*A)  ! cm^-1 s^-2
+         d_dPdm_grav_dlnR = -4d0*dPdm_grav - dG_dlnR*s% m_grav(k)/(r*r*A)            
+         delta_m = 0.5d0*s% dm(iL) ! positive delta_m from left center to edge
+         PL = PL + delta_m*dPdm_grav
+         d_PL_dlnR = delta_m*d_dPdm_grav_dlnR            
+         d_PL_dw = delta_m*dPdm_grav/G*dG_dw     
+         delta_m = -0.5d0*s% dm(iR) ! negative delta_m from right center to edge
+         PR = PR + delta_m*dPdm_grav
+         d_PR_dlnR = delta_m*d_dPdm_grav_dlnR
+         d_PR_dw = delta_m*dPdm_grav/G*dG_dw
             
          ! acoustic wavespeeds (eqn 2.38)
          Sl1 = uL - csL

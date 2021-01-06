@@ -778,8 +778,7 @@
          L_surf = s% L(1)
          r_surf = s% r(1)
 
-         if ((s% RSP_flag .and. .not. s% RSP_use_atm_grey_with_kap_for_Psurf) &
-             .or. s% constant_L) then
+         if (s% RSP_flag .and. .not. s% RSP_use_atm_grey_with_kap_for_Psurf) then
 
             call get_phot_info( &
                  s, r_phot, m_phot, v_phot, L_phot, T_phot, &
@@ -894,10 +893,8 @@
 
          if (.not. skip_other_cgrav) call set_cgrav(s, ierr)
          
-         if (.not. s% constant_L) then
-            call get_tau(s, ierr)
-            if (failed('get_tau')) return
-         end if
+         call get_tau(s, ierr)
+         if (failed('get_tau')) return
 
          if (.not. skip_m_grav_and_grav) then
             ! don't change m_grav or grav during solver iteratons
@@ -1153,8 +1150,6 @@
                   write(*,*) 'other_cgrav returned ierr', ierr
                return
             end if
-         else if (s% zero_gravity) then
-            s% cgrav(1:s% nz) = 0d0
          else
             s% cgrav(1:s% nz) = standard_cgrav
          end if

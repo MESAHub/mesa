@@ -87,9 +87,7 @@
          d_eflux_dlnTm1 = 0 
          d_eflux_dw = 0 
 
-         if (s% constant_L) then
-            L = 0d0
-         else if (k > s% nz) then
+         if (k > s% nz) then
             L = s% L_center
          else
             L = s% L(k)
@@ -187,12 +185,8 @@
          d_eflux_dlnTm1 = 0 
          d_eflux_dw = 0 
 
-         if (s% constant_L) then
-            L = 0d0
-         else
-            L = s% L(1)
-            d_eflux_dL = 1d0
-         end if
+         L = s% L(1)
+         d_eflux_dL = 1d0
          
          nz = s% nz
          
@@ -653,36 +647,28 @@
          d_geom_source_dlnd = geometry_source*s% chiRho_for_partials(k)
          d_geom_source_dlnT = geometry_source*s% chiT_for_partials(k)
          
-         if (s% zero_gravity) then
-            gravity_source = 0
-            d_grav_source_dlnRL = 0
-            d_grav_source_dlnRR = 0
-            d_grav_source_dwL = 0
-            d_grav_source_dwR = 0
+         ! left 1/2 of dm gets gravity force at left face
+         ! right 1/2 of dm gets gravity force at right face.
+         ! this form is to match the gravity force equilibrium reconstruction.
+         call get_G(s, k, G00, dG00_dlnR, dG00_dw)
+         gsR = -G00*mR*0.5d0*dm/(rR*rR)
+         dgsR_dlnRR = -2d0*gsR + gsR*dG00_dlnR/G00
+         dgsR_dwR = gsR*dG00_dw/G00
+         if (k == nz) then
+            gsL = 0d0
+            dgsL_dlnRL = 0
+            dgsL_dwL = 0
          else
-            ! left 1/2 of dm gets gravity force at left face
-            ! right 1/2 of dm gets gravity force at right face.
-            ! this form is to match the gravity force equilibrium reconstruction.
-            call get_G(s, k, G00, dG00_dlnR, dG00_dw)
-            gsR = -G00*mR*0.5d0*dm/(rR*rR)
-            dgsR_dlnRR = -2d0*gsR + gsR*dG00_dlnR/G00
-            dgsR_dwR = gsR*dG00_dw/G00
-            if (k == nz) then
-               gsL = 0d0
-               dgsL_dlnRL = 0
-               dgsL_dwL = 0
-            else
-               call get_G(s, k+1, Gp1, dGp1_dlnR, dGp1_dw)
-               gsL = -Gp1*mL*0.5d0*dm/(rL*rL)
-               dgsL_dlnRL = -2d0*gsL + gsL*dGp1_dlnR/Gp1
-               dgsL_dwL = gsL*dGp1_dw/Gp1
-            end if
-            gravity_source = gsL + gsR ! total gravitational force on cell
-            d_grav_source_dlnRL = dgsL_dlnRL
-            d_grav_source_dlnRR = dgsR_dlnRR
-            d_grav_source_dwL = dgsL_dwL
-            d_grav_source_dwR = dgsR_dwR
+            call get_G(s, k+1, Gp1, dGp1_dlnR, dGp1_dw)
+            gsL = -Gp1*mL*0.5d0*dm/(rL*rL)
+            dgsL_dlnRL = -2d0*gsL + gsL*dGp1_dlnR/Gp1
+            dgsL_dwL = gsL*dGp1_dw/Gp1
          end if
+         gravity_source = gsL + gsR ! total gravitational force on cell
+         d_grav_source_dlnRL = dgsL_dlnRL
+         d_grav_source_dlnRR = dgsR_dlnRR
+         d_grav_source_dwL = dgsL_dwL
+         d_grav_source_dwR = dgsR_dwR
 
          sources = geometry_source + gravity_source
 
@@ -1182,18 +1168,13 @@
 !$omp end critical (hydro_reimann_crit3)
          end if
       
-         if (s% nonlocal_NiCo_decay_heat .or. &
-               s% gamma_law_hydro > 0 .or. doing_op_split_burn) then
+         if (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn) then
             eps_nuc = 0 ! get eps_nuc from extra_heat instead
          else
             eps_nuc = s% eps_nuc(k)
          end if
 
-         if (s% gamma_law_hydro > 0) then
-            non_nuc_neu = 0d0
-         else
-            non_nuc_neu = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-         end if
+         non_nuc_neu = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
          
          s% eps_heat(k) = &
             eps_nuc - non_nuc_neu + s% extra_heat(k) + s% irradiation_heat(k)
@@ -1311,19 +1292,17 @@
          d_dedt_dlnTp1 = d_dedt_dlnTp1 + s% d_extra_heat_dlnTp1(k)
                      
          ! add partials of eps_heat
-         if (s% gamma_law_hydro == 0) then
-            d_dedt_dlnT00 = d_dedt_dlnT00 - 0.5d0*s% d_nonnucneu_dlnT(k)
-            d_dedt_dlnd00 = d_dedt_dlnd00 - 0.5d0*s% d_nonnucneu_dlnd(k)
-            ! partials of eps_nuc
-            if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
-               d_dedt_dlnT00 = d_dedt_dlnT00 + s% d_epsnuc_dlnT(k)
-               d_dedt_dlnd00 = d_dedt_dlnd00 + s% d_epsnuc_dlnd(k)
-               if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
-                  do j=1,s% nvar_chem
-                     call e00(s, xscale, i_dlnE_dt, s% i_chem1+j-1, k, nvar, &
-                              scal*s% d_epsnuc_dx(j,k)*f)
-                  end do
-               end if
+         d_dedt_dlnT00 = d_dedt_dlnT00 - 0.5d0*s% d_nonnucneu_dlnT(k)
+         d_dedt_dlnd00 = d_dedt_dlnd00 - 0.5d0*s% d_nonnucneu_dlnd(k)
+         ! partials of eps_nuc
+         if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
+            d_dedt_dlnT00 = d_dedt_dlnT00 + s% d_epsnuc_dlnT(k)
+            d_dedt_dlnd00 = d_dedt_dlnd00 + s% d_epsnuc_dlnd(k)
+            if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
+               do j=1,s% nvar_chem
+                  call e00(s, xscale, i_dlnE_dt, s% i_chem1+j-1, k, nvar, &
+                           scal*s% d_epsnuc_dx(j,k)*f)
+               end do
             end if
          end if
          

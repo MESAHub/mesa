@@ -1640,20 +1640,6 @@
 
          i_equL = s% i_equL
          if (i_equL == 0) return
-         
-         if (s% constant_L) then
-            if (k < s% nz) then
-               equ(i_equL, k) = s% L(k) - s% L(k+1)
-               if (.not. skip_partials) &
-                  call ep1(s, xscale, i_equL, s% i_lum, k, nvar, -1d0)
-            else
-               equ(i_equL, k) = s% L(k) - s% L_center
-            end if
-            s% equL_residual(k) = equ(i_equL,k)
-            if (.not. skip_partials) &
-               call e00(s, xscale, i_equL, s% i_lum, k, nvar, 1d0)
-            return
-         end if
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
             call do1_alt_dlnT_dm_eqn(s, k, xscale, equ, skip_partials, nvar, ierr)
@@ -1854,48 +1840,6 @@
 
          s% dlnP_dm_expected(1) = s% dlnP_dm_expected(2) ! not used except for output
          s% dlnT_dm_expected(1) = s% dlnT_dm_expected(2) ! not used except for output
-
-         if (s% constant_L) then 
-            call set_zero_dL_dm_BC(ierr)
-            if (ierr /= 0) then
-               if (s% report_ierr) then
-                  write(*,*) 'PT_eqns_surf: ierr from set_zero_dL_dm_BC'
-               end if
-               return
-            end if
-            ! default to use_zero_Pgas_outer_BC, but offer other options
-            if (s% use_fixed_vsurf_outer_BC) then
-               call set_fixed_vsurf_outer_BC(ierr)
-               if (s% u_flag .and. s% use_Psurf_for_surface_eflux) then
-                  call do1_Riemann_energy_eqn( &
-                     s, 1, 0d0, 0d0, 0d0, 0d0, 0d0, &
-                     xscale, equ, skip_partials, s% do_mix .or. s% do_burn, nvar, ierr)
-                  if (ierr /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_Riemann_energy_eqn', 1
-                     if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Riemann_energy_eqn'
-                  end if
-               end if
-            else ! if (s% use_zero_Pgas_outer_BC)
-               P_rad = Radiation_Pressure(s% T_start(1))
-               call set_momentum_BC(P_rad, 0d0, 0d0, 0d0, 0d0, ierr)
-               if (s% u_flag .and. s% use_Psurf_for_surface_eflux) then
-                  call do1_Riemann_energy_eqn( &
-                     s, 1, P_rad, 0d0, 0d0, 0d0, 0d0, &
-                     xscale, equ, skip_partials, s% do_mix .or. s% do_burn, nvar, ierr)
-                  if (ierr /= 0) then
-                     if (s% report_ierr) write(*,2) 'ierr in do1_Riemann_energy_eqn', 1
-                     if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Riemann_energy_eqn'
-                  end if
-               end if
-            endif
-            if (ierr /= 0) then
-               if (s% report_ierr) then
-                  write(*,*) 'PT_eqns_surf: ierr from set_momentum_BC'
-               end if
-               return
-            end if
-            return
-         end if
          
          call set_Teff_info_for_eqns(s, skip_partials, r, L, Teff, &
             lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
@@ -2077,7 +2021,7 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            if (s% constant_L .or. s% L(1) <= 0d0) then
+            if (s% L(1) <= 0d0) then
                equ(i_equL,1) = s% L(1) - s% L(2)
                s% equL_residual(1) = equ(i_equL,1)
                if (.not. skip_partials) then

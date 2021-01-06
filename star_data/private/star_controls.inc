@@ -811,13 +811,10 @@
             steps_before_use_Fraley_time_centering
          
          real(dp) :: &
-            gamma_law_hydro, &
             v_drag_factor, &
             v_drag, &
             q_for_v_drag_full_off, &
             q_for_v_drag_full_on
-            
-         logical :: zero_gravity, constant_L
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &

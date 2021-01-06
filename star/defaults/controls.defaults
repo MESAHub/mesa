@@ -3184,7 +3184,6 @@
 
       ! for special tests
       ! can set ALFA = 0 for pure radiative with no turbulence or convection.
-      ! can set gamma_law_hydro > 0 and it will be used by rsp for eos.
       ! can set zero_gravity = .true.
       ! can set opacity to be constant times density.
 
@@ -8227,39 +8226,6 @@
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
 
       ! for hydro comparison tests (e.g., Sedov)
-
-
-      ! gamma_law_hydro
-      ! ~~~~~~~~~~~~~~~
-
-      ! off as long as value is <= 0
-
-      ! ::
-
-    gamma_law_hydro = 0d0
-
-
-      ! zero_gravity
-      ! ~~~~~~~~~~~~
-
-      ! if true, then set G to zero
-
-      ! ::
-
-    zero_gravity = .false.
-
-
-      ! constant_L
-      ! ~~~~~~~~~~
-
-      ! if true, then L(k) = L_center for all k.  disable dlnTdm equation.
-      ! by default, this implies the boundary conditions ``use_zero_dLdm_outer_BC``
-      ! and ``use_zero_Pgas_outer_BC``.  The only other currently available boundary
-      ! condition compatible with this option is ``use_fixed_vsurf_outer_BC``.
-
-      ! ::
-
-    constant_L = .false.
 
 
       ! v_drag_factor

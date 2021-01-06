@@ -1329,8 +1329,7 @@
                ! keep track of rotational kinetic energy
             end if
             
-            if (s% eps_nuc_factor == 0d0 .or. &
-                s% nonlocal_NiCo_decay_heat .or. s% gamma_law_hydro > 0) then
+            if (s% eps_nuc_factor == 0d0 .or. s% nonlocal_NiCo_decay_heat) then
                s% total_nuclear_heating = 0d0
             else if (s% op_split_burn) then
                s% total_nuclear_heating = 0d0
@@ -1347,7 +1346,7 @@
                s% total_nuclear_heating = dt*dot_product(s% dm(1:nz), s% eps_nuc(1:nz))
             end if
             
-            if (s% RSP_flag .or. s% gamma_law_hydro > 0) then
+            if (s% RSP_flag) then
                s% total_non_nuc_neu_cooling = 0d0
                s% total_irradiation_heating = 0d0
             else

@@ -2189,8 +2189,7 @@
          check_delta_lgL_phot = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% L_phot < s% delta_lgL_phot_limit_L_min .or. &
-               s% L_phot_old <= 0d0 .or. s% constant_L) then
+         if (s% L_phot < s% delta_lgL_phot_limit_L_min .or. s% L_phot_old <= 0d0) then
             dlgL_phot = 0
          else
             dlgL_phot = log10(s% L_phot/s% L_phot_old)
@@ -2215,8 +2214,7 @@
          check_delta_lgL = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% L_surf < s% delta_lgL_limit_L_min .or. &
-               s% L_surf_old <= 0d0 .or. s% constant_L) then
+         if (s% L_surf < s% delta_lgL_limit_L_min .or. s% L_surf_old <= 0d0) then
             dlgL = 0
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
