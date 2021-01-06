@@ -60,7 +60,6 @@ do_one make_zams "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" s
 do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
 do_one make_zams_ultra_high_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
 do_one multiple_stars "all stars have reached stopping age" skip skip
-do_one noh_riemann "velocities look reasonable near r=0.1" "done_with_noh.mod" skip
 do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto   
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
