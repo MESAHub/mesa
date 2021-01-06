@@ -21,7 +21,7 @@ gmon.out
 callgrind.out*
 massif.out*
 valgrind.out*
-
+vgcore.*
 
 ## Diffs/Patches
 *.orig
