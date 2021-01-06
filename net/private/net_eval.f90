@@ -52,8 +52,7 @@
             lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, ierr)
          use net_initialize, only: &
             set_rate_ptrs, setup_net_info, set_ptrs_for_approx21
-         use net_approx21, only: approx21_nrat
-         use net_approx21_plus_co56, only: approx21_plus_co56_nrat
+         use net_approx21, only: num_reactions_func => num_reactions
          use net_screen
          use net_derivs
          use net_def, only: &
@@ -200,11 +199,7 @@
          end if
 
          if (g% doing_approx21) then
-            if (g% add_co56_to_approx21) then
-               approx21_num_rates = approx21_plus_co56_nrat
-            else
-               approx21_num_rates = approx21_nrat
-            end if
+            approx21_num_rates = num_reactions_func(g%add_co56_to_approx21)
          else
             approx21_num_rates = -1
          end if
@@ -306,11 +301,7 @@
          eps_neu_total = 0
          
          if (g% doing_approx21) then
-            if (g% add_co56_to_approx21) then
-               call eval_net_approx21_plus_co56(ierr)
-            else
-               call eval_net_approx21(ierr)
-            end if
+            call eval_net_approx21_procs()
             if (ierr /= 0) return                
 
             if (net_test_partials) then            
@@ -389,30 +380,105 @@
          
          contains
 
-         subroutine eval_net_approx21(ierr)
-            use net_approx21, only: &
-               approx21_special_reactions, approx21_dydt, approx21_d_epsneu_dy, &
-               approx21_eval_PPII_fraction, approx21_eps_info, &
-               approx21_dfdy, approx21_dfdT_dfdRho
-            integer, intent(out) :: ierr
-#include "net_eval_approx21_proc.inc"
-         end subroutine eval_net_approx21
+         subroutine eval_net_approx21_procs()
+            use net_approx21
 
-         subroutine eval_net_approx21_plus_co56(ierr)
-            use net_approx21_plus_co56, only: &
-               approx21_special_reactions, approx21_dydt, approx21_d_epsneu_dy, &
-               approx21_eval_PPII_fraction, approx21_eps_info, &
-               approx21_dfdy, approx21_dfdT_dfdRho
-            integer, intent(out) :: ierr
-#include "net_eval_approx21_proc.inc"
-         end subroutine eval_net_approx21_plus_co56
+            ierr = 0
+            
+            call approx21_special_reactions( &
+               btemp, bden, abar, zbar, n% y, &
+               g% which_rates(ir_he4_he4_he4_to_c12) == use_rate_3a_FL87, &
+               Qconv*reaction_Qs(ir_he4_he4_he4_to_c12), &
+               rate_screened, rate_screened_dT, rate_screened_dRho, &
+               dratdumdy1, dratdumdy2, g% add_co56_to_approx21, ierr)
+            if (ierr /= 0) return            
+            
+            call approx21_dydt( &
+               n% y, rate_screened, rate_screened, &
+               dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
+               g% fe56ec_n_neut, btemp,g% add_co56_to_approx21,  ierr)
+            if (ierr /= 0) return
+               
+            fII = approx21_eval_PPII_fraction(n% y, rate_screened)
+            
+            call get_approx21_eps_info( &
+                  dydt1, rate_screened, .true., eps_total, eps_neu_total, &
+                  g% add_co56_to_approx21,  ierr)
+                  
+            if (ierr /= 0) return               
+            eps_nuc = eps_total - eps_neu_total
+            
+            do i=1,num_isos
+               dxdt(i) = chem_isos% Z_plus_N(chem_id(i))*dydt1(i)
+            end do
+
+            if (just_dxdt) return
+
+            call approx21_dfdy( &
+               n% y, dfdy, &
+               g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, g% fe56ec_n_neut, &
+               rate_screened, rate_screened_dT, rate_screened_dRho, &
+               dratdumdy1, dratdumdy2, btemp,g% add_co56_to_approx21,  ierr)
+            if (ierr /= 0) return
+
+            call approx21_dfdT_dfdRho( & 
+               
+               ! NOTE: currently this gives d_eps_total_dy -- should fix to account for neutrinos too
+               
+               n% y, mion, dfdy, rate_screened, rate_screened_dT, rate_screened_dRho, &
+               g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
+               g% fe56ec_n_neut, btemp, dfdT, dfdRho, d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
+            if (ierr /= 0) return
+
+            call get_approx21_eps_info( &
+               dfdT, rate_screened_dT, .false., deps_total_dT, deps_neu_dT, &
+               g% add_co56_to_approx21,  ierr)
+
+            if (ierr /= 0) return
+            d_eps_nuc_dT = deps_total_dT - deps_neu_dT
+                              
+            call get_approx21_eps_info( &
+               dfdRho, rate_screened_dRho, .false., deps_total_dRho, deps_neu_dRho, &
+               g% add_co56_to_approx21,  ierr)
+
+            if (ierr /= 0) return             
+            d_eps_nuc_dRho = deps_total_dRho - deps_neu_dRho
+            
+            call approx21_d_epsneu_dy( &
+               n% y, rate_screened, &
+               reaction_neuQs(irpp_to_he3), &   
+               reaction_neuQs(ir34_pp2), &  
+               reaction_neuQs(ir34_pp3), &  
+               reaction_neuQs(irc12_to_n14), &  
+               reaction_neuQs(irn14_to_c12), &  
+               reaction_neuQs(iro16_to_n14), &  
+               d_epsneu_dy, &
+               g% add_co56_to_approx21,  ierr)
+            if (ierr /= 0) return
+
+            do i=1,num_isos
+               ci = chem_id(i)
+               Z_plus_N = dble(chem_isos% Z_plus_N(ci))
+               d_eps_nuc_dx(i) = (d_epsnuc_dy(i) - d_epsneu_dy(i))/Z_plus_N 
+               d_dxdt_dRho(i) = Z_plus_N*dfdRho(i)
+               d_dxdt_dT(i) = Z_plus_N*dfdT(i)
+               do j=1, num_isos
+                  d_dxdt_dx(i,j) = &
+                     dfdy(i,j)*Z_plus_N/chem_isos% Z_plus_N(chem_id(j))
+               end do
+            end do
+
+
+         end subroutine eval_net_approx21_procs
+
 
          subroutine get_approx21_eps_info( &
-               dydt1, rate_screened, do_eps_nuc_categories, eps_total, eps_neu_total, ierr)
+               dydt1, rate_screened, do_eps_nuc_categories, eps_total, eps_neu_total, plus_co56, ierr)
             use net_approx21, only: approx21_eps_info
             real(dp), intent(in), dimension(:) :: dydt1, rate_screened
             logical, intent(in) :: do_eps_nuc_categories
             real(dp), intent(out) :: eps_total, eps_neu_total
+            logical, intent(in) :: plus_co56
             integer, intent(out) :: ierr
             real(dp) :: Qtotal_rfe56ec, Qneu_rfe56ec
             
@@ -467,7 +533,7 @@
                reaction_Qs(irhe4_rebuild), &
                eps_total, eps_neu_total, &
                do_eps_nuc_categories, n% eps_nuc_categories, &
-               .false., ierr)
+               .false., plus_co56, ierr)
 
          end subroutine get_approx21_eps_info
          
@@ -510,71 +576,7 @@
             Qtotal = reaction_Qs(ir)
             Qneu = reaction_neuQs(ir)
          end subroutine get_Qs_rfe56ec
-            
-         subroutine get_approx21_plus_co56_eps_info( &
-               dydt1, rate_screened, do_eps_nuc_categories, eps_total, eps_neu_total, ierr)
-            use net_approx21_plus_co56, only: approx21_eps_info
-            real(dp), intent(in), dimension(:) :: dydt1, rate_screened
-            logical, intent(in) :: do_eps_nuc_categories
-            real(dp), intent(out) :: eps_total, eps_neu_total
-            integer, intent(out) :: ierr
-            real(dp) :: Qtotal_rfe56ec, Qneu_rfe56ec
-            
-            ! Indexes into reaction_Qs and reaction_neuQs should be in terms of the
-            ! normal rate ids not the approx21 rate ids (in net_approx21.f90)
-            
-            call get_Qs_rfe56ec(Qtotal_rfe56ec, Qneu_rfe56ec)
-
-            call approx21_eps_info( &
-               n, n% y, mion, dydt1, rate_screened, fII, &               
-               reaction_Qs(irpp_to_he3), reaction_neuQs(irpp_to_he3), & 
-               reaction_Qs(ir_he3_he3_to_h1_h1_he4), &
-               reaction_Qs(ir34_pp2), reaction_neuQs(ir34_pp2), & 
-               reaction_Qs(ir34_pp3), reaction_neuQs(ir34_pp3), & 
-               reaction_Qs(irc12_to_n14), reaction_neuQs(irc12_to_n14), & 
-               reaction_Qs(irn14_to_c12), reaction_neuQs(irn14_to_c12), & 
-               reaction_Qs(iro16_to_n14), reaction_neuQs(iro16_to_n14), & 
-               reaction_Qs(irn14_to_o16), &
-               
-               reaction_Qs(irprot_to_neut), reaction_neuQs(irprot_to_neut), & 
-               reaction_Qs(irneut_to_prot), reaction_neuQs(irneut_to_prot), & 
-               reaction_Qs(irni56ec_to_co56), reaction_neuQs(irni56ec_to_co56), & 
-               reaction_Qs(irco56ec_to_fe56), reaction_neuQs(irco56ec_to_fe56), & 
-               Qtotal_rfe56ec, Qneu_rfe56ec, &
-               
-               reaction_Qs(irn14ag_lite), &
-               reaction_Qs(ir_he4_he4_he4_to_c12), &
-               reaction_Qs(ir_c12_ag_o16), reaction_Qs(ir_o16_ag_ne20), &
-               reaction_Qs(ir1212), &
-               reaction_Qs(ir1216_to_mg24), reaction_Qs(ir1216_to_si28), &
-               reaction_Qs(ir1616a), reaction_Qs(ir1616g), &
-               reaction_Qs(ir_ne20_ag_mg24), &
-               reaction_Qs(ir_mg24_ag_si28), &
-               reaction_Qs(ir_si28_ag_s32), &
-               reaction_Qs(ir_s32_ag_ar36), &
-               reaction_Qs(ir_ar36_ag_ca40), &
-               reaction_Qs(ir_ca40_ag_ti44), &
-               reaction_Qs(ir_ti44_ag_cr48), &
-               reaction_Qs(ir_cr48_ag_fe52), &
-               reaction_Qs(ir_fe52_ag_ni56), &               
-               reaction_Qs(ir_fe52_ng_fe53), &       
-               reaction_Qs(ir_fe53_ng_fe54), &       
-               reaction_Qs(ir_fe54_ng_fe55), &       
-               reaction_Qs(ir_fe55_ng_fe56), &                              
-               reaction_Qs(irfe52neut_to_fe54), &               
-               reaction_Qs(irfe52aprot_to_fe54), &               
-               reaction_Qs(irfe54ng_to_fe56), &               
-               reaction_Qs(irfe54aprot_to_fe56), &               
-               reaction_Qs(irfe52aprot_to_ni56), &               
-               reaction_Qs(irfe54prot_to_ni56), &               
-               reaction_Qs(irhe4_breakup), &
-               reaction_Qs(irhe4_rebuild), &
-               eps_total, eps_neu_total, &
-               do_eps_nuc_categories, n% eps_nuc_categories, &
-               .false., ierr)
-
-         end subroutine get_approx21_plus_co56_eps_info
-         
+                     
          subroutine store_partials
             integer :: i, j
             include 'formats'
@@ -595,8 +597,7 @@
          subroutine get_rates_with_screening(ierr)
             use rates_def, only: reaction_inputs
             use rates_lib, only: eval_using_rate_tables
-            use net_approx21, only: approx21_nrat
-            use net_approx21_plus_co56, only: approx21_plus_co56_nrat
+            use net_approx21, only: num_reactions_func => num_reactions
             
             integer, intent(out) :: ierr
             
@@ -632,11 +633,7 @@
             end if
 
             if (g% doing_approx21) then
-               if (g% add_co56_to_approx21) then
-                  call approx21_plus_co56_rates(ierr)
-               else
-                  call approx21_rates(ierr)
-               end if
+               call approx21_rates(g% add_co56_to_approx21,ierr)
                if (ierr /= 0) return            
             end if
             
@@ -652,11 +649,7 @@
                if (dbg) write(*,*) 'done screen_net with init=.false.'
                if (ierr /= 0) return
                if (g% doing_approx21) then
-                  if (g% add_co56_to_approx21) then
-                     num = approx21_plus_co56_nrat
-                  else
-                     num = approx21_nrat
-                  end if
+                  num = num_reactions_func(g%add_co56_to_approx21)
                   do i=num_reactions+1,num
                      rate_screened(i) = rate_raw(i)
                      rate_screened_dT(i) = rate_raw_dT(i)
@@ -677,9 +670,10 @@
             
          end subroutine get_rates_with_screening 
 
-         subroutine approx21_rates(ierr)
+         subroutine approx21_rates(plus_co56, ierr)
             use net_approx21, only: &
                approx21_pa_pg_fractions, approx21_weak_rates
+            logical, intent(in) :: plus_co56
             integer, intent(out) :: ierr
             ierr = 0
             call approx21_pa_pg_fractions( &
@@ -688,24 +682,10 @@
             call approx21_weak_rates( &
                n% y, rate_raw, rate_raw_dT, rate_raw_dRho, &
                btemp, bden, ye, eta, zbar, &
-               weak_rate_factor, reuse_rate_screened, ierr)
+               weak_rate_factor, reuse_rate_screened, plus_co56, ierr)
             if (ierr /= 0) return            
          end subroutine approx21_rates
 
-         subroutine approx21_plus_co56_rates(ierr)
-            use net_approx21_plus_co56, only: &
-               approx21_pa_pg_fractions, approx21_weak_rates
-            integer, intent(out) :: ierr
-            ierr = 0
-            call approx21_pa_pg_fractions( &
-               rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
-            if (ierr /= 0) return            
-            call approx21_weak_rates( &
-               n% y, rate_raw, rate_raw_dT, rate_raw_dRho, &
-               btemp, bden, ye, eta, zbar, &
-               weak_rate_factor, reuse_rate_screened, ierr)
-            if (ierr /= 0) return            
-         end subroutine approx21_plus_co56_rates
 
          subroutine get_weaklib_rates(ierr)
             use rates_def, only : Coulomb_Info

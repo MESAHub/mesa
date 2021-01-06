@@ -28,6 +28,9 @@
       use net_screen
       use chem_def
       use math_lib
+
+      use net_approx21, only : num_reactions_func => num_reactions, &
+                               num_mesa_reactions_func => num_mesa_reactions
       
       implicit none
 
@@ -46,17 +49,11 @@
       contains
 
       integer function work_size(g)
-         use net_approx21, only: approx21_nrat
-         use net_approx21_plus_co56, only: approx21_plus_co56_nrat
          type (Net_General_Info), pointer  :: g         
          integer :: num_isos, num_reactions, num_wk_reactions
          num_reactions = g% num_reactions
          if (g% doing_approx21) then
-            if (g% add_co56_to_approx21) then
-               num_reactions = approx21_plus_co56_nrat
-            else
-               num_reactions = approx21_nrat
-            end if
+            num_reactions  = num_reactions_func(g% add_co56_to_approx21)
          end if
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
@@ -75,8 +72,7 @@
       subroutine set_ptrs_for_approx21( &
             add_co56, i, work, dfdy, dratdumdy1, dratdumdy2, &
             d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho)
-         use net_approx21, only: approx21_nrat
-         use net_approx21_plus_co56, only: approx21_plus_co56_nrat
+
          logical, intent(in) :: add_co56
          integer, intent(inout) :: i
          real(dp), pointer :: work(:) ! (lwork)
@@ -87,11 +83,10 @@
             
          integer :: num_isos, num_reactions
 
+         num_reactions = num_reactions_func(add_co56)
          if (add_co56) then
-            num_reactions = approx21_plus_co56_nrat
             num_isos = 22
          else
-            num_reactions = approx21_nrat
             num_isos = 21
          end if
          
@@ -125,8 +120,6 @@
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
             i, ierr)
-         use net_approx21, only: approx21_nrat
-         use net_approx21_plus_co56, only: approx21_plus_co56_nrat
          type (Net_General_Info), pointer  :: g
          integer, intent(in) :: lwork
          integer, intent(inout) :: i
@@ -137,11 +130,7 @@
          integer :: sz
          ierr = 0
          if (g% doing_approx21) then
-            if (g% add_co56_to_approx21) then
-               sz = approx21_plus_co56_nrat
-            else
-               sz = approx21_nrat
-            end if
+            sz = num_reactions_func(g% add_co56_to_approx21)
          else
             sz = g% num_reactions
          end if
@@ -168,8 +157,6 @@
             i, ierr)
          use rates_def, only: classic_screening
          use chem_def
-         use net_approx21, only: approx21_nrat
-         use net_approx21_plus_co56, only: approx21_plus_co56_nrat
          type (Net_General_Info), pointer  :: g
          type (Net_Info), pointer :: n
          integer, intent(in) :: lwork
@@ -195,11 +182,7 @@
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
          if (g% doing_approx21) then
-            if (g% add_co56_to_approx21) then
-               num_reactions = approx21_plus_co56_nrat
-            else
-               num_reactions = approx21_nrat
-            end if
+            num_reactions = num_reactions_func(g% add_co56_to_approx21)
          else
             num_reactions = g% num_reactions
          end if
@@ -1421,11 +1404,7 @@
          
          if (g% doing_approx21) then
             if (dbg) write(*,*) 'call mark_approx21'
-            if (g% add_co56_to_approx21) then
-               call do_mark_approx21_plus_co56(handle, ierr)
-            else
-               call do_mark_approx21(handle, ierr)
-            end if
+            call do_mark_approx21(handle, ierr)
             if (ierr /= 0) return
          end if
          
@@ -1463,11 +1442,7 @@
          
          if (g% doing_approx21) then
             if (dbg) write(*,*) 'call set_approx21'
-            if (g% add_co56_to_approx21) then
-               call do_set_approx21_plus_co56(handle, ierr)
-            else
-               call do_set_approx21(handle, ierr)
-            end if
+            call do_set_approx21(handle, ierr)
             if (ierr /= 0) return
          end if
 
@@ -1481,13 +1456,7 @@
             integer, intent(out) :: ierr
             call mark_approx21(handle, ierr)
          end subroutine do_mark_approx21
-         
-         subroutine do_mark_approx21_plus_co56(handle, ierr)
-            use net_approx21_plus_co56, only: mark_approx21
-            integer, intent(in) :: handle
-            integer, intent(out) :: ierr
-            call mark_approx21(handle, ierr)
-         end subroutine do_mark_approx21_plus_co56
+      
          
          subroutine do_set_approx21(handle, ierr)
             use net_approx21, only: set_approx21
@@ -1495,13 +1464,6 @@
             integer, intent(out) :: ierr
             call set_approx21(handle, ierr)
          end subroutine do_set_approx21
-         
-         subroutine do_set_approx21_plus_co56(handle, ierr)
-            use net_approx21_plus_co56, only: set_approx21
-            integer, intent(in) :: handle
-            integer, intent(out) :: ierr
-            call set_approx21(handle, ierr)
-         end subroutine do_set_approx21_plus_co56
          
       
       end subroutine finish_net_def
