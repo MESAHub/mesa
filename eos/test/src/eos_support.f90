@@ -15,15 +15,15 @@
 
 
       
-      double precision :: X, Z, Zinit, Y, dXC, dXO, XC, XO, abar, zbar, z2bar, z53bar, ye
+      real(dp) :: X, Z, Zinit, Y, dXC, dXO, XC, XO, abar, zbar, z2bar, z53bar, ye
       integer, parameter :: species = 7
       integer, parameter :: h1=1, he4=2, c12=3, n14=4, o16=5, ne20=6, mg24=7
       integer, target :: chem_id_array(species)
       integer, pointer, dimension(:) :: chem_id, net_iso
-      double precision :: xa(species)
+      real(dp) :: xa(species)
       
       
-      double precision, dimension(:,:), pointer :: d_dxa ! (num_eos_basic_results,species)
+      real(dp), dimension(:,:), pointer :: d_dxa ! (num_eos_basic_results,species)
 
       integer :: handle
       type (EoS_General_Info), pointer :: rq
@@ -39,15 +39,15 @@
 
       subroutine Init_Composition(X_in, Zinit_in, XC_in, XO_in)
          use chem_lib
-         double precision, intent(IN) :: X_in, Zinit_in, XC_in, XO_in
+         real(dp), intent(IN) :: X_in, Zinit_in, XC_in, XO_in
 
-         double precision, parameter :: Zfrac_C = 0.173312d0
-         double precision, parameter :: Zfrac_N = 0.053177d0
-         double precision, parameter :: Zfrac_O = 0.482398d0
-         double precision, parameter :: Zfrac_Ne = 0.098675d0
+         real(dp), parameter :: Zfrac_C = 0.173312d0
+         real(dp), parameter :: Zfrac_N = 0.053177d0
+         real(dp), parameter :: Zfrac_O = 0.482398d0
+         real(dp), parameter :: Zfrac_Ne = 0.098675d0
          
-         double precision :: Z, frac, dabar_dx(species), dzbar_dx(species), sumx,
-     >         mass_correction, dmc_dx(species)
+         real(dp) :: Z, frac, dabar_dx(species), dzbar_dx(species), sumx, &
+               mass_correction, dmc_dx(species)
          
          chem_id => chem_id_array
          
@@ -90,9 +90,9 @@
          xa(ne20) = Zinit * Zfrac_Ne
          xa(species) = 1 - sum(xa(1:species-1))
          
-         call composition_info(
-     >         species, chem_id, xa, X, Y, Z, abar, zbar, z2bar, z53bar, 
-     >         ye, mass_correction, sumx, dabar_dx, dzbar_dx, dmc_dx)
+         call composition_info( &
+               species, chem_id, xa, X, Y, Z, abar, zbar, z2bar, z53bar, &
+               ye, mass_correction, sumx, dabar_dx, dzbar_dx, dmc_dx)
 
       end subroutine Init_Composition
 
@@ -104,7 +104,7 @@
 
          character (len=256) :: my_mesa_dir
          integer :: info
-         double precision :: logT_all_HELM, logT_all_OPAL
+         real(dp) :: logT_all_HELM, logT_all_OPAL
          logical :: use_cache
          
          info = 0
