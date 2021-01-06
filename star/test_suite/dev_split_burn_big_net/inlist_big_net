@@ -7,7 +7,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'log_max_temp_upper_limit'
+      required_termination_code_string = 'xa_central_lower_limit'
 
       change_initial_net = .true.
       !new_net_name = 'mesa_201.net'
@@ -33,8 +33,9 @@
 / ! end of kap namelist
 
 &controls
-
-      log_max_temp_upper_limit = 9.52d0
+      
+      xa_central_lower_limit_species(1) = 'si28'
+      xa_central_lower_limit(1) = 0.55d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
