@@ -762,7 +762,7 @@ contains
          
          real(dp) :: &
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, normal_mlt_gradT_factor, &
-            max_conv_vel, dt, csound, &
+            dt, csound, &
             alfa, beta, &
             T_00, T_m1, rho_00, rho_m1, P_00, P_m1, &
             chiRho_for_partials_00, chiT_for_partials_00, &
@@ -795,7 +795,6 @@ contains
 
          normal_mlt_gradT_factor = 1d0 ! when .not. s% conv_vel_flag
          
-         max_conv_vel = 1d99
          dt = -1
          
          csound = 0 ! not used when dt <= 0
@@ -843,7 +842,7 @@ contains
             s% mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             s% MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, .false., &
+            dt, tau, .false., &
             mixing_type, mlt_basics, mlt_partials1, ierr)
       
       end subroutine get_mlt_basics

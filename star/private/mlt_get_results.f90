@@ -68,7 +68,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, just_gradr, mixing_type, &
+            dt, tau, just_gradr, mixing_type, &
             gradT, d_gradT_dvb, &
             gradr, d_gradr_dvb, &
             gradL, d_gradL_dvb, &
@@ -106,7 +106,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            max_conv_vel, dt, tau, remove_small_D_limit, &
+            dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
             
          logical, intent(in) :: alt_scale_height
@@ -386,8 +386,7 @@
          end if
          
          if (opacity < 1d-10 .or. P < 1d-20 .or. T < 1d-10 .or. Rho < 1d-20 &
-               .or. m < 1d-10 .or. r < 1d-10 .or. cgrav < 1d-10 .or. &
-               max_conv_vel == 0d0) then
+               .or. m < 1d-10 .or. r < 1d-10 .or. cgrav < 1d-10) then
             if (.false.) then
                write(*,2) 'special set no mixing', kz
                write(*,*) 'opacity < 1d-10', opacity < 1d-10
@@ -397,7 +396,6 @@
                write(*,*) 'm < 1d-10', m < 1d-10
                write(*,*) 'r < 1d-10', r < 1d-10
                write(*,*) 'cgrav < 1d-10', cgrav < 1d-10
-               write(*,*) 'max_conv_vel == 0d0', max_conv_vel == 0d0       
                write(*,*) "MLT_option == 'none' ", MLT_option == 'none'      
                call mesa_error(__FILE__,__LINE__)
             end if
@@ -1221,14 +1219,9 @@
             x = Q*P / (8*rho)
             sqrt_x = sqrt(x)
             conv_vel = mixing_length_alpha*sqrt_x*Gamma / A
-            if (conv_vel > max_conv_vel) then
-               conv_vel = max_conv_vel
-               d_conv_vel_dvb = 0
-            else
-               d_conv_vel_dvb = 0.5d0*conv_vel* &
-                 (-2*dA_dvb/A + 2*d_Gamma_dvb/Gamma + &
-                 dP_dvb/P + dQ_dvb/Q - drho_dvb/rho)
-            end if
+            d_conv_vel_dvb = 0.5d0*conv_vel* &
+              (-2*dA_dvb/A + 2*d_Gamma_dvb/Gamma + &
+              dP_dvb/P + dQ_dvb/Q - drho_dvb/rho)
             
             if (debug) write(*,1) 'conv_vel', conv_vel
             if (conv_vel < 0) then

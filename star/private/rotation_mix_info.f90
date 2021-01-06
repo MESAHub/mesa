@@ -1541,7 +1541,7 @@
          real(dp), dimension(:), pointer :: dc
          integer :: k
          real(dp) :: tiny
-         tiny = s% clip_D_limit
+         tiny = 1d-6
          do k=1,s% nz
             if (dc(k) < tiny) dc(k) = 0
          end do

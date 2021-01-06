@@ -3156,7 +3156,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, just_gradr, &
+            dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          use mlt_get_results, only: Get_results
          use star_def
@@ -3184,7 +3184,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            max_conv_vel, dt, tau, remove_small_D_limit, &
+            dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
          logical, intent(in) :: alt_scale_height
          character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
@@ -3229,7 +3229,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            max_conv_vel, dt, tau, just_gradr, &
+            dt, tau, just_gradr, &
             mixing_type, &
             mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
             mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &

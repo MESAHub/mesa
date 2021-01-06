@@ -227,17 +227,8 @@
 
       ! mixing regions
 
-         logical :: remove_mixing_glitches, okay_to_remove_mixing_singleton, &
-            redo_conv_for_dr_lt_mixing_length
-         real(dp) :: min_convective_gap
-         real(dp) :: min_thermohaline_gap
-         real(dp) :: min_semiconvection_gap
-         real(dp) :: min_thermohaline_dropout
-         real(dp) :: max_dropout_gradL_sub_grada
-         logical :: remove_embedded_semiconvection
+         logical :: redo_conv_for_dr_lt_mixing_length
          logical  :: recalc_mix_info_after_evolve
-         real(dp) :: prune_bad_cz_min_Hp_height
-         real(dp) :: prune_bad_cz_min_log_eps_nuc
 
 
       ! mixing parameters
@@ -250,7 +241,6 @@
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
          real(dp) :: threshold_for_smooth_gradL_composition_term
-         real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
          real(dp) :: Henyey_MLT_y_param, Henyey_MLT_nu_param, mlt_Pturb_factor, &
             min_logT_for_make_gradr_sticky_in_solver_iters
@@ -345,11 +335,7 @@
             RSP_alpha_d_standard, RSP_gamma_r_standard, &
             RSP_alpha_P_factor, RSP_alpha_s_factor, RSP_alpha_c_factor, &
             RSP_alpha_d_factor, RSP_gamma_r_factor, &
-            RSP_min_tau, RSP_min_q, max_conv_vel_div_csound, &
-            min_dt_for_increases_in_convection_velocity, &
-            max_v_for_convection, max_q_for_convection_with_hydro_on, &
-            max_v_div_cs_for_convection, &
-            max_abs_du_div_cs_for_convection, &
+            RSP_min_tau, RSP_min_q, max_abs_du_div_cs_for_convection, &
             RTI_smooth_fraction, RTI_smooth_mass, &
             alpha_RTI_diffusion_factor, &
             dudt_RTI_diffusion_factor, &
@@ -965,9 +951,9 @@
          logical :: set_min_am_nu_non_rot
          real(dp) :: min_am_nu_non_rot, min_center_Ye_for_min_am_nu_non_rot
 
-         logical :: set_min_D_mix, set_min_D_mix_below_Tmax, set_min_D_mix_in_H_He
-         real(dp) :: min_D_mix, min_D_mix_below_Tmax, min_center_Ye_for_min_D_mix, &
-            min_D_mix_in_H_He, mass_lower_limit_for_min_D_mix, &
+         logical :: set_min_D_mix
+         real(dp) :: min_D_mix, &
+            mass_lower_limit_for_min_D_mix, &
             mass_upper_limit_for_min_D_mix
 
          real(dp) :: smooth_outer_xa_big, smooth_outer_xa_small

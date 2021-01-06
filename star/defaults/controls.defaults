@@ -3240,57 +3240,6 @@
     mix_factor = 1
 
 
-      ! min_dt_for_increases_in_convection_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! convective velocities are not increased if dt < this value (in seconds)
-
-      ! ::
-
-    min_dt_for_increases_in_convection_velocity = -1d0
-
-
-      ! max_conv_vel_div_csound
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! convective velocities are limited to local sound speed times this factor
-
-      ! ::
-
-    max_conv_vel_div_csound = 1d99
-
-
-      ! max_v_for_convection
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! disable convection for locations with v > than this limit. In km/s.
-
-      ! ::
-
-    max_v_for_convection = 1d99
-
-
-      ! max_q_for_convection_with_hydro_on
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! disable convection for locations with q > than this limit when
-      ! either v_flag or u_flag are true.
-
-      ! ::
-
-    max_q_for_convection_with_hydro_on = 1d99
-
-
-      ! max_v_div_cs_for_convection
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! disable convection for locations with abs(v)/cs > this limit
-
-      ! ::
-
-    max_v_div_cs_for_convection = 1d99
-
-
       ! max_abs_du_div_cs_for_convection
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3299,31 +3248,6 @@
       ! ::
 
     max_abs_du_div_cs_for_convection = 0.03d0
-
-
-      ! prune_bad_cz_min_Hp_height
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Lower limit on radial extent of cz (<= 0 to disable).
-      ! Remove tiny convection zones unless have strong nuclear burning
-      ! i.e., remove if ``size < prune_bad_cz_min_Hp_height`` .and.
-      ! ``max_log_eps < prune_bad_cz_min_log_eps_nuc``.
-
-      ! ::
-
-    prune_bad_cz_min_Hp_height = 0
-
-
-      ! prune_bad_cz_min_log_eps_nuc
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Lower limit on max log eps nuc in cz.
-      ! In units of average pressure scale height at top and bottom of region.
-      ! This allows emergence of very small cz at site of he core flash, for example.
-
-      ! ::
-
-    prune_bad_cz_min_log_eps_nuc = -99
 
 
       ! redo_conv_for_dr_lt_mixing_length
@@ -3335,105 +3259,6 @@
       ! ::
 
     redo_conv_for_dr_lt_mixing_length = .false.
-
-
-      ! smooth_convective_bdy has been deleted.
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_mixing_glitches
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, then okay to remove gaps and singletons.
-
-      ! ::
-
-    remove_mixing_glitches = .true.
-
-
-   ! glitches
-   ! ________
-
-      ! The following controls are for different kinds of "glitches" that can be removed.
-
-
-      ! okay_to_remove_mixing_singleton
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, remove singletons.
-
-      ! ::
-
-    okay_to_remove_mixing_singleton = .true.
-
-
-      ! clip_D_limit
-      ! ~~~~~~~~~~~~
-
-      ! Zero mixing diffusion coeffs that are smaller than this.
-
-      ! ::
-
-    clip_D_limit = 0
-
-
-      ! min_convective_gap
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Close gap between convective regions if smaller than this (< 0 means skip this).
-      ! Gap measured radially in units of pressure scale height.
-
-      ! ::
-
-    min_convective_gap = -1
-
-
-      ! min_thermohaline_gap
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! Close gap between thermohaline mixing regions if smaller than this (< 0 means skip this).
-      ! Gap measured radially in units of pressure scale height.
-
-      ! ::
-
-    min_thermohaline_gap = -1
-
-
-      ! min_thermohaline_dropout
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! max_dropout_gradL_sub_grada
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If find radiative region embedded in thermohaline,
-      ! and ``max(gradL - grada)`` in region is everywhere ``< max_dropout_gradL_sub_grada``
-      ! and region height is ``< min_thermohaline_dropout``
-      ! then convert the region to thermohaline.
-      ! ``min_thermohaline_dropout <= 0`` disables.
-
-      ! ::
-
-    min_thermohaline_dropout = -1
-    max_dropout_gradL_sub_grada = 1d-3
-
-
-      ! min_semiconvection_gap
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Close gap between semiconvective mixing regions if smaller than this (< 0 means skip this).
-      ! Gap measured radially in units of pressure scale height.
-
-      ! ::
-
-    min_semiconvection_gap = -1
-
-
-      ! remove_embedded_semiconvection
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If have a semiconvection region bounded on each side by convection,
-      ! convert it to be convective too.
-
-      ! ::
-
-    remove_embedded_semiconvection = .false.
 
 
       ! recalc_mix_info_after_evolve
@@ -3468,63 +3293,24 @@
     min_D_mix = 1d3
 
 
-      ! set_min_D_mix_in_H_He
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! min_D_mix_in_H_He
-      ! ~~~~~~~~~~~~~~~~~
+   ! smooth_outer_xa_big
+   ! ~~~~~~~~~~~~~~~~~~~
+   ! smooth_outer_xa_small
+   ! ~~~~~~~~~~~~~~~~~~~~~
 
-      ! ``D_mix`` will be at least this large in regions
-      ! where max mass fractions of H and He add to more that 0.5
-      ! if ``set_min_D_mix_in_H_He`` is true.
+   ! Soften composition jumps in outer layers.
+   ! If ``smooth_outer_xa_big`` and ``smooth_outer_xa_small`` are bigger than 0, then
+   ! starting from the outermost grid point, homogeneously mix a region of size
+   ! ``smooth_outer_xa_small`` (in solar masses), and proceed inwards, linearly reducing
+   ! the size of the homogeneously mixed region in such a way that it becomes zero.
+   ! After going ``smooth_outer_xa_big`` solar masses in. In this way, the outer ``smooth_outer_xa_big``
+   ! solar masses are "cleaned" of composition jumps.
 
-      ! ::
+   ! ::
 
-    set_min_D_mix_in_H_He = .false.
-    min_D_mix_in_H_He = 1d3
+ smooth_outer_xa_big = -1d0
+ smooth_outer_xa_small = -1d0
 
-
-      ! set_min_D_mix_below_Tmax
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! min_D_mix_below_Tmax
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! ``D_mix`` will be at least this large for cells below location of max temperature
-      ! if ``set_min_D_mix_below_Tmax`` is true.
-
-      ! ::
-
-    set_min_D_mix_below_Tmax = .false.
-    min_D_mix_below_Tmax = 1d3
-
-
-      ! min_center_Ye_for_min_D_mix
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``min_D_mix`` is only used when ``center_ye >= this``
-      ! i.e., when ``center_ye`` drops below this, ``min_D_mix = 0``.
-
-      ! ::
-
-    min_center_Ye_for_min_D_mix = 0.47d0
-
-
-      ! smooth_outer_xa_big
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! smooth_outer_xa_small
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! Soften composition jumps in outer layers.
-      ! If ``smooth_outer_xa_big`` and ``smooth_outer_xa_small`` are bigger than 0, then
-      ! starting from the outermost grid point, homogeneously mix a region of size
-      ! ``smooth_outer_xa_small`` (in solar masses), and proceed inwards, linearly reducing
-      ! the size of the homogeneously mixed region in such a way that it becomes zero.
-      ! After going ``smooth_outer_xa_big`` solar masses in. In this way, the outer ``smooth_outer_xa_big``
-      ! solar masses are "cleaned" of composition jumps.
-
-      ! ::
-
-    smooth_outer_xa_big = -1d0
-    smooth_outer_xa_small = -1d0
 
 ! rotation controls
 ! =================
