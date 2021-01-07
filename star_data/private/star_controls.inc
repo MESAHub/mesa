@@ -433,8 +433,6 @@
          real(dp) :: mdot_omega_power, max_rotational_mdot_boost, lim_trace_rotational_mdot_boost, &
             rotational_mdot_boost_fac, rotational_mdot_kh_fac, surf_avg_tau, surf_avg_tau_min, &
             max_mdot_jump_for_rotation
-
-         real(dp) :: remove_H_wind_mdot, remove_H_wind_H_mass_limit
          
          integer :: max_tries_for_implicit_wind
          real(dp) :: iwind_tolerance, iwind_lambda
@@ -443,8 +441,6 @@
             wind_boost_full_off_L_div_Ledd, wind_boost_full_on_L_div_Ledd, &
             super_eddington_wind_max_boost
          logical :: trace_super_eddington_wind_boost
-         
-         real(dp) :: vsurf_scaling_factor, vsurf_wind_factor
 
          character (len=strlen) :: hot_wind_scheme
          character (len=strlen) :: cool_wind_RGB_scheme
@@ -468,13 +464,6 @@
          real(dp) :: rlo_wind_roche_lobe_radius, rlo_wind_base_mdot
          real(dp) :: roche_lobe_xfer_full_on, roche_lobe_xfer_full_off
          real(dp) :: rlo_wind_scale_height
-
-         real(dp) :: nova_scaling_factor, nova_wind_b
-         real(dp) :: nova_wind_max_Teff, nova_wind_min_L
-         real(dp) :: nova_min_Teff_for_accretion, nova_roche_lobe_radius, nova_RLO_mdot
-
-         real(dp) :: flash_wind_mdot, flash_wind_starts
-         real(dp) :: flash_wind_declines, flash_wind_full_off
 
          real(dp) :: max_logT_for_k_below_const_q, max_logT_for_k_const_mass
          real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
@@ -1200,26 +1189,6 @@
          real(dp) :: delta_lgL_nuc_cat_hard_limit
          real(dp) :: lgL_nuc_cat_burn_min
          real(dp) :: lgL_nuc_mix_dist_limit
-
-         logical :: check_delta_lgL_pp ! pp chains
-         logical :: check_delta_lgL_cno ! cno cycles
-         logical :: check_delta_lgL_3alf ! triple alpha
-         logical :: check_delta_lgL_burn_c
-         logical :: check_delta_lgL_burn_n
-         logical :: check_delta_lgL_burn_o
-         logical :: check_delta_lgL_burn_ne
-         logical :: check_delta_lgL_burn_na
-         logical :: check_delta_lgL_burn_mg
-         logical :: check_delta_lgL_burn_si
-         logical :: check_delta_lgL_burn_s
-         logical :: check_delta_lgL_burn_ar
-         logical :: check_delta_lgL_burn_ca
-         logical :: check_delta_lgL_burn_ti
-         logical :: check_delta_lgL_burn_cr
-         logical :: check_delta_lgL_burn_fe
-         logical :: check_delta_lgL_cc ! c12 + c12
-         logical :: check_delta_lgL_co ! c12 + o16
-         logical :: check_delta_lgL_oo ! o16 + o16
 
          real(dp) :: delta_lgL_H_limit
          real(dp) :: delta_lgL_H_hard_limit, lgL_H_burn_relative_limit

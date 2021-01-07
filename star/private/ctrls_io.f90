@@ -192,15 +192,11 @@
     nu_omega_mixing_across_convection_boundary, max_q_for_nu_omega_zero_in_convection_region, &
     mdot_omega_power, max_rotational_mdot_boost, max_mdot_jump_for_rotation, &
     lim_trace_rotational_mdot_boost, rotational_mdot_boost_fac, rotational_mdot_kh_fac, surf_avg_tau, surf_avg_tau_min, &
-    max_tries_for_implicit_wind, iwind_tolerance, iwind_lambda, vsurf_scaling_factor, vsurf_wind_factor, &
-    remove_H_wind_mdot, remove_H_wind_H_mass_limit, super_eddington_scaling_factor, &
+    max_tries_for_implicit_wind, iwind_tolerance, iwind_lambda, super_eddington_scaling_factor, &
     super_eddington_wind_Ledd_factor, wind_boost_full_off_L_div_Ledd, wind_boost_full_on_L_div_Ledd, &
     super_eddington_wind_max_boost, trace_super_eddington_wind_boost, &
-    flash_wind_mdot, flash_wind_starts, flash_wind_declines, flash_wind_full_off, &
     rlo_scaling_factor, rlo_wind_min_L, rlo_wind_max_Teff, rlo_wind_roche_lobe_radius, &
     roche_lobe_xfer_full_on, roche_lobe_xfer_full_off, rlo_wind_base_mdot, rlo_wind_scale_height, &
-    nova_scaling_factor, nova_wind_b, nova_wind_max_Teff, nova_wind_min_L, nova_min_Teff_for_accretion,&
-    nova_roche_lobe_radius, nova_RLO_mdot, &
     hot_wind_scheme, cool_wind_RGB_scheme, cool_wind_AGB_scheme, RGB_to_AGB_wind_switch, &
     Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, van_Loon_scaling_factor, &
     Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
@@ -439,12 +435,7 @@
     delta_lgL_phot_limit, delta_lgL_phot_hard_limit, delta_lgL_phot_limit_L_min, &
     delta_Ye_highT_limit, delta_Ye_highT_hard_limit, minT_for_highT_Ye_limit, &
     delta_lgL_nuc_cat_limit, delta_lgL_nuc_cat_hard_limit, lgL_nuc_cat_burn_min, lgL_nuc_mix_dist_limit, &
-    check_delta_lgL_pp, check_delta_lgL_cno, check_delta_lgL_3alf, &
-    check_delta_lgL_burn_c, check_delta_lgL_burn_n, check_delta_lgL_burn_o, check_delta_lgL_burn_ne, &
-    check_delta_lgL_burn_na, check_delta_lgL_burn_mg, check_delta_lgL_burn_si, check_delta_lgL_burn_s, &
-    check_delta_lgL_burn_ar, check_delta_lgL_burn_ca, check_delta_lgL_burn_ti, &
-    check_delta_lgL_burn_cr, check_delta_lgL_burn_fe, delta_lgT_max_limit_only_after_near_zams, &
-    check_delta_lgL_cc, check_delta_lgL_co, check_delta_lgL_oo, max_lgT_for_lgL_nuc_limit, &
+    delta_lgT_max_limit_only_after_near_zams, &
     delta_lgL_H_limit, delta_lgL_H_hard_limit, lgL_H_burn_min, lgL_H_drop_factor, lgL_H_burn_relative_limit, &
     delta_lgL_He_limit, delta_lgL_He_hard_limit, lgL_He_burn_min, lgL_He_drop_factor, lgL_He_burn_relative_limit, &
     delta_lgL_z_limit, delta_lgL_z_hard_limit, lgL_z_burn_min, lgL_z_drop_factor, lgL_z_burn_relative_limit, &
@@ -453,7 +444,7 @@
     delta_lgL_nuc_at_high_T_limit, delta_lgL_nuc_at_high_T_hard_limit, delta_lgL_nuc_at_high_T_limit_lgT_min, &
     delta_lgRho_cntr_limit, delta_lgRho_cntr_hard_limit, delta_lgP_cntr_limit, delta_lgP_cntr_hard_limit, &
     delta_lgT_cntr_limit, delta_lgT_cntr_hard_limit, delta_lgT_cntr_limit_only_after_near_zams, &
-    delta_lgT_max_limit, delta_lgT_max_hard_limit, &
+    delta_lgT_max_limit, delta_lgT_max_hard_limit, max_lgT_for_lgL_nuc_limit, &
     delta_log_eps_nuc_limit, delta_log_eps_nuc_hard_limit, delta_lgT_max_limit_lgT_min, &
     delta_lgT_max_at_high_T_limit, delta_lgT_max_at_high_T_hard_limit, delta_lgT_max_at_high_T_limit_lgT_min, &
     delta_dX_div_X_cntr_min, delta_dX_div_X_cntr_max, delta_dX_div_X_cntr_limit, delta_dX_div_X_cntr_hard_limit, &
@@ -1351,8 +1342,6 @@
  s% surf_avg_tau = surf_avg_tau
  s% surf_avg_tau_min = surf_avg_tau_min
 
- s% remove_H_wind_mdot = remove_H_wind_mdot
- s% remove_H_wind_H_mass_limit = remove_H_wind_H_mass_limit
  s% super_eddington_scaling_factor = super_eddington_scaling_factor
  s% super_eddington_wind_Ledd_factor = super_eddington_wind_Ledd_factor
  s% wind_boost_full_off_L_div_Ledd = wind_boost_full_off_L_div_Ledd
@@ -1360,17 +1349,9 @@
  s% super_eddington_wind_max_boost = super_eddington_wind_max_boost
  s% trace_super_eddington_wind_boost = trace_super_eddington_wind_boost
  
- s% vsurf_scaling_factor = vsurf_scaling_factor
- s% vsurf_wind_factor = vsurf_wind_factor
- 
  s% max_tries_for_implicit_wind = max_tries_for_implicit_wind
  s% iwind_tolerance = iwind_tolerance
  s% iwind_lambda = iwind_lambda
-
- s% flash_wind_mdot = flash_wind_mdot
- s% flash_wind_starts = flash_wind_starts
- s% flash_wind_declines = flash_wind_declines
- s% flash_wind_full_off = flash_wind_full_off
 
  s% cool_wind_full_on_T = cool_wind_full_on_T
  s% hot_wind_full_on_T = hot_wind_full_on_T
@@ -1383,14 +1364,6 @@
  s% roche_lobe_xfer_full_off = roche_lobe_xfer_full_off
  s% rlo_wind_base_mdot = rlo_wind_base_mdot
  s% rlo_wind_scale_height = rlo_wind_scale_height
-
- s% nova_scaling_factor = nova_scaling_factor
- s% nova_wind_b = nova_wind_b
- s% nova_wind_max_Teff = nova_wind_max_Teff
- s% nova_wind_min_L = nova_wind_min_L
- s% nova_min_Teff_for_accretion = nova_min_Teff_for_accretion
- s% nova_roche_lobe_radius = nova_roche_lobe_radius
- s% nova_RLO_mdot = nova_RLO_mdot
 
  s% hot_wind_scheme = hot_wind_scheme
  s% cool_wind_RGB_scheme = cool_wind_RGB_scheme
@@ -2226,28 +2199,6 @@
  s% lgL_nuc_cat_burn_min = lgL_nuc_cat_burn_min
  s% lgL_nuc_mix_dist_limit = lgL_nuc_mix_dist_limit
 
- s% check_delta_lgL_pp = check_delta_lgL_pp
- s% check_delta_lgL_cno = check_delta_lgL_cno
- s% check_delta_lgL_3alf = check_delta_lgL_3alf
-
- s% check_delta_lgL_burn_c = check_delta_lgL_burn_c
- s% check_delta_lgL_burn_n = check_delta_lgL_burn_n
- s% check_delta_lgL_burn_o = check_delta_lgL_burn_o
- s% check_delta_lgL_burn_ne = check_delta_lgL_burn_ne
- s% check_delta_lgL_burn_na = check_delta_lgL_burn_na
- s% check_delta_lgL_burn_mg = check_delta_lgL_burn_mg
- s% check_delta_lgL_burn_si = check_delta_lgL_burn_si
- s% check_delta_lgL_burn_s = check_delta_lgL_burn_s
- s% check_delta_lgL_burn_ar = check_delta_lgL_burn_ar
- s% check_delta_lgL_burn_ca = check_delta_lgL_burn_ca
- s% check_delta_lgL_burn_ti = check_delta_lgL_burn_ti
- s% check_delta_lgL_burn_cr = check_delta_lgL_burn_cr
- s% check_delta_lgL_burn_fe = check_delta_lgL_burn_fe
-
- s% check_delta_lgL_cc = check_delta_lgL_cc
- s% check_delta_lgL_co = check_delta_lgL_co
- s% check_delta_lgL_oo = check_delta_lgL_oo
-
  s% delta_lgL_H_limit = delta_lgL_H_limit
  s% delta_lgL_H_hard_limit = delta_lgL_H_hard_limit
  s% lgL_H_burn_min = lgL_H_burn_min
@@ -3038,8 +2989,6 @@
  surf_avg_tau = s% surf_avg_tau
  surf_avg_tau_min = s% surf_avg_tau_min
 
- remove_H_wind_mdot = s% remove_H_wind_mdot
- remove_H_wind_H_mass_limit = s% remove_H_wind_H_mass_limit
  super_eddington_scaling_factor = s% super_eddington_scaling_factor
  super_eddington_wind_Ledd_factor = s% super_eddington_wind_Ledd_factor
  wind_boost_full_off_L_div_Ledd = s% wind_boost_full_off_L_div_Ledd
@@ -3047,17 +2996,9 @@
  super_eddington_wind_max_boost = s% super_eddington_wind_max_boost
  trace_super_eddington_wind_boost = s% trace_super_eddington_wind_boost
  
- vsurf_scaling_factor = s% vsurf_scaling_factor
- vsurf_wind_factor = s% vsurf_wind_factor
- 
  max_tries_for_implicit_wind = s% max_tries_for_implicit_wind
  iwind_tolerance = s% iwind_tolerance
  iwind_lambda = s% iwind_lambda
-
- flash_wind_mdot = s% flash_wind_mdot
- flash_wind_starts = s% flash_wind_starts
- flash_wind_declines = s% flash_wind_declines
- flash_wind_full_off = s% flash_wind_full_off
 
  rlo_scaling_factor = s% rlo_scaling_factor
  rlo_wind_min_L = s% rlo_wind_min_L
@@ -3067,14 +3008,6 @@
  roche_lobe_xfer_full_off = s% roche_lobe_xfer_full_off
  rlo_wind_base_mdot = s% rlo_wind_base_mdot
  rlo_wind_scale_height = s% rlo_wind_scale_height
-
- nova_scaling_factor = s% nova_scaling_factor
- nova_wind_b = s% nova_wind_b
- nova_wind_max_Teff = s% nova_wind_max_Teff
- nova_wind_min_L = s% nova_wind_min_L
- nova_min_Teff_for_accretion = s% nova_min_Teff_for_accretion
- nova_roche_lobe_radius = s% nova_roche_lobe_radius
- nova_RLO_mdot = s% nova_RLO_mdot
 
  cool_wind_RGB_scheme = s% cool_wind_RGB_scheme
  cool_wind_AGB_scheme = s% cool_wind_AGB_scheme
@@ -3902,28 +3835,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  delta_lgL_nuc_cat_hard_limit = s% delta_lgL_nuc_cat_hard_limit
  lgL_nuc_cat_burn_min = s% lgL_nuc_cat_burn_min
  lgL_nuc_mix_dist_limit = s% lgL_nuc_mix_dist_limit
-
- check_delta_lgL_pp = s% check_delta_lgL_pp
- check_delta_lgL_cno = s% check_delta_lgL_cno
- check_delta_lgL_3alf = s% check_delta_lgL_3alf
-
- check_delta_lgL_burn_c = s% check_delta_lgL_burn_c
- check_delta_lgL_burn_n = s% check_delta_lgL_burn_n
- check_delta_lgL_burn_o = s% check_delta_lgL_burn_o
- check_delta_lgL_burn_ne = s% check_delta_lgL_burn_ne
- check_delta_lgL_burn_na = s% check_delta_lgL_burn_na
- check_delta_lgL_burn_mg = s% check_delta_lgL_burn_mg
- check_delta_lgL_burn_si = s% check_delta_lgL_burn_si
- check_delta_lgL_burn_s = s% check_delta_lgL_burn_s
- check_delta_lgL_burn_ar = s% check_delta_lgL_burn_ar
- check_delta_lgL_burn_ca = s% check_delta_lgL_burn_ca
- check_delta_lgL_burn_ti = s% check_delta_lgL_burn_ti
- check_delta_lgL_burn_cr = s% check_delta_lgL_burn_cr
- check_delta_lgL_burn_fe = s% check_delta_lgL_burn_fe
-
- check_delta_lgL_cc = s% check_delta_lgL_cc
- check_delta_lgL_co = s% check_delta_lgL_co
- check_delta_lgL_oo = s% check_delta_lgL_oo
 
  delta_lgL_H_limit = s% delta_lgL_H_limit
  delta_lgL_H_hard_limit = s% delta_lgL_H_hard_limit

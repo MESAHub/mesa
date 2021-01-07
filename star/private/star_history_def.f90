@@ -338,7 +338,8 @@
       integer, parameter :: h_max_L_rad_div_Ledd_div_phi_Joss = h_lum_div_Ledd + 1
       integer, parameter :: h_max_L_rad_div_Ledd = h_max_L_rad_div_Ledd_div_phi_Joss + 1
 
-      integer, parameter :: h_logT_max = h_max_L_rad_div_Ledd + 1
+      integer, parameter :: h_gamma1_min = h_max_L_rad_div_Ledd + 1
+      integer, parameter :: h_logT_max = h_gamma1_min + 1
       integer, parameter :: h_logQ_max = h_logT_max + 1
       integer, parameter :: h_logQ_min = h_logQ_max + 1
 
@@ -1083,6 +1084,7 @@
          history_column_name(h_gradT_excess_min_beta) = 'gradT_excess_min_beta'
          history_column_name(h_gradT_excess_max_lambda) = 'gradT_excess_max_lambda'
 
+         history_column_name(h_gamma1_min) = 'gamma1_min'
          history_column_name(h_logT_max) = 'logT_max'
          history_column_name(h_logQ_max) = 'logQ_max'
          history_column_name(h_logQ_min) = 'logQ_min'

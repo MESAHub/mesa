@@ -278,7 +278,6 @@
             call set_to_NaN(s% initial_v_center)
             call set_to_NaN(s% tau_center)  
             call set_to_NaN(s% super_eddington_wind_mdot)
-            call set_to_NaN(s% vsurf_wind_mdot)
             do j=1,num_categories
                call set_to_NaN(s% L_by_category(j))
             end do

@@ -336,7 +336,7 @@ Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
 Text_Summary1_name(3,1) = 'star_age'
-Text_Summary1_name(3,2) = 'log_L'
+Text_Summary1_name(3,2) = 'min_gamma1'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'C_core'

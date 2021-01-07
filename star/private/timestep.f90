@@ -1468,27 +1468,25 @@
                if (abs(s% q(k) - mix_bdy_q(bdy)) < s% lgL_nuc_mix_dist_limit) cycle
             end if
 
-            if (s% check_delta_lgL_pp) call do1_category(ipp,k)
-            if (s% check_delta_lgL_cno) call do1_category(icno,k)
-            if (s% check_delta_lgL_3alf) call do1_category(i3alf,k)
-
-            if (s% check_delta_lgL_burn_c) call do1_category(i_burn_c,k)
-            if (s% check_delta_lgL_burn_n) call do1_category(i_burn_n,k)
-            if (s% check_delta_lgL_burn_o) call do1_category(i_burn_o,k)
-            if (s% check_delta_lgL_burn_ne) call do1_category(i_burn_ne,k)
-            if (s% check_delta_lgL_burn_na) call do1_category(i_burn_na,k)
-            if (s% check_delta_lgL_burn_mg) call do1_category(i_burn_mg,k)
-            if (s% check_delta_lgL_burn_si) call do1_category(i_burn_si,k)
-            if (s% check_delta_lgL_burn_s) call do1_category(i_burn_s,k)
-            if (s% check_delta_lgL_burn_ar) call do1_category(i_burn_ar,k)
-            if (s% check_delta_lgL_burn_ca) call do1_category(i_burn_ca,k)
-            if (s% check_delta_lgL_burn_ti) call do1_category(i_burn_ti,k)
-            if (s% check_delta_lgL_burn_cr) call do1_category(i_burn_cr,k)
-            if (s% check_delta_lgL_burn_fe) call do1_category(i_burn_fe,k)
-
-            if (s% check_delta_lgL_cc) call do1_category(icc,k)
-            if (s% check_delta_lgL_co) call do1_category(ico,k)
-            if (s% check_delta_lgL_oo) call do1_category(ioo,k)
+            call do1_category(ipp,k)
+            call do1_category(icno,k)
+            call do1_category(i3alf,k)
+            call do1_category(i_burn_c,k)
+            call do1_category(i_burn_n,k)
+            call do1_category(i_burn_o,k)
+            call do1_category(i_burn_ne,k)
+            call do1_category(i_burn_na,k)
+            call do1_category(i_burn_mg,k)
+            call do1_category(i_burn_si,k)
+            call do1_category(i_burn_s,k)
+            call do1_category(i_burn_ar,k)
+            call do1_category(i_burn_ca,k)
+            call do1_category(i_burn_ti,k)
+            call do1_category(i_burn_cr,k)
+            call do1_category(i_burn_fe,k)
+            call do1_category(icc,k)
+            call do1_category(ico,k)
+            call do1_category(ioo,k)
 
          end do
 

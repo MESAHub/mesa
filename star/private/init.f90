@@ -322,7 +322,6 @@
 
          s% doing_flash_wind = .false.
          s% doing_rlo_wind = .false.
-         s% doing_nova_wind = .false.
 
          s% phase_of_evolution = phase_starting
          s% recent_log_header = -1000
@@ -772,7 +771,6 @@
 
          s% doing_flash_wind = .false.
          s% doing_rlo_wind = .false.
-         s% doing_nova_wind = .false.
          s% most_recent_photo_name = ''
 
          s% len_extra_iwork = 0
