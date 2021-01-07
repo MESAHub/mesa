@@ -18,7 +18,7 @@
       save_model_filename = 'R_CrB_from_He_star.mod'
       required_termination_code_string = 'Teff_lower_limit'
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / !end of star_job namelist
 

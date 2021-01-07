@@ -1597,19 +1597,6 @@
          integer, intent(out) :: ierr
          call do_relax_num_steps(id, num_steps, max_timestep, ierr)      
       end subroutine star_relax_num_steps
-      
-
-      subroutine star_relax_to_star_cut(&
-            id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)
-         use init, only: do_relax_to_star_cut
-
-         integer, intent(in) :: id, k_remove
-         logical, intent(in) :: do_jrot, do_entropy
-         logical, intent(in) :: turn_off_energy_sources_and_sinks ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
-         integer, intent(out) :: ierr
-
-         call do_relax_to_star_cut(id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)      
-      end subroutine star_relax_to_star_cut
             
 
       ! evolve until star_check_limits returns terminate.
@@ -2640,6 +2627,19 @@
          integer, intent(out) :: ierr
          call do_zero_inner_v_by_mass_gm(id, m, ierr)      
       end subroutine star_zero_inner_v_by_mass_gm
+      
+
+      subroutine star_relax_to_star_cut(&
+            id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)
+         use remove_shells, only: do_relax_to_star_cut
+
+         integer, intent(in) :: id, k_remove
+         logical, intent(in) :: do_jrot, do_entropy
+         logical, intent(in) :: turn_off_energy_sources_and_sinks ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
+         integer, intent(out) :: ierr
+
+         call do_relax_to_star_cut(id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)      
+      end subroutine star_relax_to_star_cut
       
       
       subroutine star_remove_surface_by_v_surf_km_s(id, v_surf_km_s, ierr)

@@ -156,11 +156,11 @@
       delta_lgT_max_limit = 0.001     
       delta_lgT_max_hard_limit = 0.01
 
-      delta_lgL_photo_limit = 0.01d0
-      delta_lgL_photo_hard_limit = 0.02d0
-      min_lgT_for_lgL_photo_limit = 9.0d0
-      lgL_photo_burn_min = 10d0
-      lgL_photo_drop_factor = 10
+      delta_lgL_power_photo_limit = 0.01d0
+      delta_lgL_power_photo_hard_limit = 0.02d0
+      min_lgT_for_lgL_power_photo_limit = 9.0d0
+      lgL_power_photo_burn_min = 10d0
+      lgL_power_photo_drop_factor = 10
 
       delta_lgL_nuc_limit = 0.01d0
       delta_lgL_nuc_hard_limit = 0.02d0

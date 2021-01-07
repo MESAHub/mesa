@@ -205,7 +205,18 @@
                end do
                do k = kbot, 1, -1
                   if (s% m(k) > bottom_mass + H_env_limit*Msun) then
-                     call star_relax_to_star_cut(s% id, k, .false., .true., .true., ierr)
+                  
+                     write(*,2) 'call star_remove_surface_at_cell_k', k, s% m(k)/Msun
+                     call star_remove_surface_at_cell_k(s% id, k, ierr)
+                     if (ierr /= 0) then
+                        write(*,*) 'failed in star_remove_surface_at_cell_k', k
+                        extras_finish_step = terminate
+                        return
+                     end if
+                     
+                     !call star_relax_to_star_cut(s% id, k, .false., .true., .true., ierr)
+                     
+                     
                      s% lxtra(1) = .true.
                      exit
                   end if
