@@ -1,7 +1,7 @@
 ! inlist_mass_Z_wind_rotation
 
 &star_job
-   new_Z = 0.02d0 ! works for 1d-5
+   new_Z = 0.02d0 ! has also been tested for 1d-5
    new_omega_div_omega_crit = 0.1d0
 / ! end of star_job namelist
 
@@ -11,7 +11,7 @@
 
 &controls
    initial_mass = 12 ! standard test
-   !initial_mass = 30 ! has also been tested 
+   !initial_mass = 25 ! has also been tested 
    initial_z = 0.02d0
    Dutch_scaling_factor = 0.4
 / ! end of controls namelist

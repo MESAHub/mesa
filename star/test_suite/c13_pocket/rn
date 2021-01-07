@@ -18,6 +18,14 @@ else
     cp standard_2M_3DUP.mod 2M_3DUP.mod
 fi
 
+if [ -n "$MESA_RUN_OPTIONAL" ]; then
+    do_one inlist_to_lgL_3.79_header lgL_3.79.mod LOGS_to_lgL_3.79
+    cp lgL_3.79.mod standard_lgL_3.79.mod
+else
+    echo "Skipping 3DUP evolution to lgL=3.79 using saved model"
+    cp standard_lgL_3.79.mod lgL_3.79.mod
+fi
+
 do_one inlist_c13_pocket_header final.mod LOGS_c13_pocket
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

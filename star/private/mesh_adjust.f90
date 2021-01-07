@@ -52,13 +52,10 @@
       subroutine do_mesh_adjust( &
             s, nz, nz_old, xh_old, xa_old, &
             energy_old, eta_old, lnd_old, lnPgas_old, &
-            j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            D_smooth_old, conv_vel_old, lnT_old, eturb_old, specific_PE_old, specific_KE_old, &
-            old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
-            nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
-            D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
-            cell_type, comes_from, &
-            dq_old, xq_old, xh, xa, dq, xq, ierr)
+            j_rot_old, i_rot_old, omega_old, D_omega_old, &
+            conv_vel_old, lnT_old, eturb_old, specific_PE_old, specific_KE_old, &
+            old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
+            cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
          use interp_1d_def
          use interp_1d_lib
          type (star_info), pointer :: s
@@ -66,12 +63,10 @@
          integer, dimension(:), pointer :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, D_smooth_old, conv_vel_old, lnT_old, eturb_old, &
+            lnd_old, lnPgas_old, conv_vel_old, lnT_old, eturb_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
-            j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
-            D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
+            j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
          real(dp), dimension(:), pointer :: &
@@ -248,53 +243,12 @@
                xq_old, xq, dq_old, dq, xh, j_rot_old, &
                xout_old, xout_new, dqbar_old, dqbar, ierr)
             if (failed('adjust_omega')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% nu_ST, nu_ST_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('nu_ST')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_ST, D_ST_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_ST')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_DSI, D_DSI_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_DSI')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_SH, D_SH_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_SH')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_SSI, D_SSI_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_SSI')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_ES, D_ES_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_ES')) return
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_GSF, D_GSF_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_GSF')) return
             if (s% D_omega_flag) then
                call do_interp_pt_val( &
                   s, nz, nz_old, nzlo, nzhi, s% D_omega, D_omega_old, &
                   0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
                if (failed('D_omega')) return
             end if
-            if (s% am_nu_rot_flag) then
-               call do_interp_pt_val( &
-                  s, nz, nz_old, nzlo, nzhi, s% am_nu_rot, am_nu_rot_old, &
-                  0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-               if (failed('am_nu_rot')) return
-            end if            
-         end if
-         
-         if (s% D_smooth_flag) then
-            call do_interp_pt_val( &
-               s, nz, nz_old, nzlo, nzhi, s% D_smooth, D_smooth_old, &
-               0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
-            if (failed('D_smooth')) return
          end if
          
          call do_interp_pt_val( &
@@ -637,7 +591,7 @@
       subroutine do_prune_mesh_surface( &
             s, nz, nz_old, xh_old, xa_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, am_nu_rot_old, &
-            D_smooth_old, conv_vel_old, lnT_old, &
+            conv_vel_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old, &
             xh, xa, ierr)
@@ -645,7 +599,7 @@
          integer, intent(in) :: nz, nz_old
          real(dp), dimension(:), pointer :: &
             j_rot_old, i_rot_old, omega_old, &
-            D_omega_old, am_nu_rot_old, D_smooth_old, conv_vel_old, lnT_old, &
+            D_omega_old, am_nu_rot_old, conv_vel_old, lnT_old, &
             dPdr_dRhodr_info_old, nu_ST_old, D_ST_old, D_DSI_old, D_SH_old, &
             D_SSI_old, D_ES_old, D_GSF_old, D_mix_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
@@ -692,14 +646,6 @@
 
          if (s% D_omega_flag) then
             call prune1(s% D_omega, D_omega_old, skip)
-         endif
-
-         if (s% am_nu_rot_flag) then
-            call prune1(s% am_nu_rot, am_nu_rot_old, skip)
-         endif
-
-         if (s% D_smooth_flag) then
-            call prune1(s% D_smooth, D_smooth_old, skip)
          endif
 
          if (s% RTI_flag) then

@@ -37,8 +37,7 @@
       contains
 
 
-      integer function do_struct_burn_mix( &
-            s, skip_global_corr_coeff_limit, dt)
+      integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
          use mix_info, only: set_mixing_info, get_convection_sigmas
          use solve_hydro, only: &
             set_surf_info, set_tol_correction, do_hydro_converge
@@ -49,17 +48,17 @@
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), intent(in) :: dt
 
          integer :: nz, nvar, species, ierr, j, k, k_bad
          integer(8) :: time0
          logical :: do_chem
-         real(dp) :: tol_correction_norm, tol_max_correction, total
+         real(dp) :: dt, tol_correction_norm, tol_max_correction, total
 
          include 'formats'
 
          ierr = 0
          s% non_epsnuc_energy_change_from_split_burn = 0d0
+         dt = s% dt
 
          if (s% rsp_flag) then
             do_struct_burn_mix = do_rsp_step(s,dt)    
@@ -166,6 +165,7 @@
          if (s% w_div_wc_flag) then
             s% xh(s% i_w_div_wc,:s% nz) = s% w_div_w_crit_roche(:s% nz)
          end if
+         
          if (s% j_rot_flag) then
             s% xh(s% i_j_rot,:s% nz) = s% j_rot(:s% nz)
             s% j_rot_start(:s% nz) = s% j_rot(:s% nz)
@@ -179,11 +179,11 @@
             return
          end if
                      
-         if (s% trace_evolve) write(*,*) 'call do_hydro_converge'
+         if (s% trace_evolve) write(*,*) 'call solver'
          do_struct_burn_mix = do_hydro_converge( &
-            s, s% solver_itermin, nvar, skip_global_corr_coeff_limit, &
-            tol_correction_norm, tol_max_correction, dt)
-         if (s% trace_evolve) write(*,*) 'done do_hydro_converge'
+            s, nvar, skip_global_corr_coeff_limit, &
+            tol_correction_norm, tol_max_correction)
+         if (s% trace_evolve) write(*,*) 'done solver'
 
          s% total_num_solver_iterations = &
             s% total_num_solver_iterations + s% num_solver_iterations
@@ -287,7 +287,7 @@
 
 
       subroutine save_start_values(s, ierr)
-         use solve_hydro, only: set_L_burn_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
          use hydro_eturb, only: set_eturb_start_vars
          use star_utils, only: eval_total_energy_integrals
@@ -298,7 +298,7 @@
          include 'formats'
          ierr = 0
 
-         call set_L_burn_by_category(s)
+         call set_luminosity_by_category(s)
 
          do k=1,s% nz
             do j=1,s% species

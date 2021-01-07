@@ -253,7 +253,7 @@
          ! returns either keep_going, retry, or terminate.
          integer function extras_check_model(id)
             integer, intent(in) :: id
-            integer :: ierr
+            integer :: ierr, kmax
             type (star_info), pointer :: s
             ierr = 0
             call star_ptr(id, s, ierr)
@@ -276,7 +276,8 @@
             ! termination_code_str(t_xtra1) = 'my termination condition'
 
             ! stop once flame is halfway through domain
-            if (s% r(s% max_eps_nuc_k) .gt. 0.5d0 * s%r (1)) then
+            kmax = maxloc(s% eps_nuc(1:s% nz), dim=1)
+            if (s%r (kmax) .gt. 0.5d0 * s%r (1)) then
                extras_check_model = terminate
                s% termination_code = t_xtra1
                termination_code_str(t_xtra1) = 'flame reached halfway point'
@@ -306,24 +307,26 @@
             integer, intent(out) :: ierr
             type (star_info), pointer :: s
 
-            integer :: k, k_burn
+            integer :: k, k_burn, kmax
             real(dp) :: rtop, rbot, max_eps_nuc_k
 
             ierr = 0
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
 
+            kmax = maxloc(s% eps_nuc(1:s% nz), dim=1)
+
             !note: do NOT add the extras names to history_columns.list
             ! the history_columns.list is only for the built-in log column options.
             ! it must not include the new column names you are adding here.
 
             names(1) = 'r_flame'
-            vals(1) = s% r(s% max_eps_nuc_k)
+            vals(1) = s% r(kmax)
 
             
             names(2) = 'l_flame'
             rtop = 0d0
-            do k = s% max_eps_nuc_k, 1, -1
+            do k = kmax, 1, -1
                 if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
                      rtop = s% r(k)
                      exit
@@ -331,7 +334,7 @@
             end do
 
             rbot = 0d0
-            do k = s% max_eps_nuc_k, s% nz
+            do k = kmax, s% nz
                 if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
                      rbot = s% r(k)
                      exit

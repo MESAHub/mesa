@@ -1,4 +1,3 @@
-
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
 do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
@@ -10,10 +9,10 @@ do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-#do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
+#  Josiah says skip this one for now   do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
-#do_one black_hole "stop because fe_core_infall > fe_core_infall_limit" "start_core_collapse.mod" skip
+#  black_hole is obsolete. use dev_pre_ms_to_cc_hi instead.   do_one black_hole "stop because fe_core_infall > fe_core_infall_limit" "start_core_collapse.mod" skip
 do_one c13_pocket "all values are within tolerance" "final.mod" auto
 do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto                    
 do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto              
@@ -24,14 +23,13 @@ do_one create_zahb "stop because center he4 < HB_limit" skip skip
 do_one create_zams "finished create main sequence" skip skip
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
-do_one det_riemann "shock has reached target location" "final.mod" auto    
-do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
+#   not yet       do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
-do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
+#  dev_ppisn needs help from Pablo      do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
 do_one dev_pre_ms_to_cc_hi "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-#do_one dev_pre_ms_to_cc_very_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_pair_instability "stop because non_fe_core_rebound > non_fe_core_rebound_limit" "final.mod" skip
+do_one dev_pre_ms_to_neon_flash "stop because ne20 total mass <= star_species_mass_min_limit" "final.mod" skip
+do_one dev_pre_ms_to_pair_instability "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
@@ -55,14 +53,13 @@ do_one make_he_wd "stop because star_age >= max_age" "final.mod" auto
 do_one make_metals "stop because have dropped below central lower limit for he4" "final.mod" auto        
 do_one make_env "stop because star_age >= max_age" "env.mod" skip 
 do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
-#do_one make_pre_ccsn_IIp "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+#  make_pre_ccsn_IIp is obsolete. use dev_pre_ms_to_cc_lo instead.   do_one make_pre_ccsn_IIp "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one make_planets "stop because star_age >= max_age"  "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod" auto
 do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" auto
-do_one make_zams "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" auto
-do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" auto
-do_one make_zams_ultra_high_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" auto
+do_one make_zams "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
+do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
+do_one make_zams_ultra_high_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
 do_one multiple_stars "all stars have reached stopping age" skip skip
-do_one noh_riemann "velocities look reasonable near r=0.1" "done_with_noh.mod" skip
 do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto   
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
@@ -79,10 +76,9 @@ do_one rsp_gyre "good match for period" skip skip
 do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
 do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
 do_one sample_pre_ms "finished sample pre-ms" skip skip
-do_one sedov_omega_1 "All tests are okay"  "done_with_sedov.mod" auto
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
-do_one split_burn_big_net_30M "stop because have dropped below central lower limit for si28" "final.mod" skip
+#  split_burn_big_net_30M is obsolete. use dev_split_burn_big_net instead.   do_one split_burn_big_net_30M "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto

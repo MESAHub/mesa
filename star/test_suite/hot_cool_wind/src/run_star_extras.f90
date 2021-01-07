@@ -81,7 +81,7 @@
          Mass = s% mstar / Msun
 
          if (s% log_surface_luminosity >= s% log_L_upper_limit .and. &
-             Mass > 6.75d0 .and. Mass < 6.77d0) then
+             Mass > 6.73d0 .and. Mass < 6.77d0) then
             write(*,'(a)') 'all values are within tolerance'
          else
             write(*,'(a)') 'test failed!'

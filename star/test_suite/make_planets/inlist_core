@@ -65,6 +65,9 @@
 	! knobs
 	!use_lnE_for_eps_grav = .false.
 	T_mix_limit = 0
+   
+   use_gold2_tolerances = .false.
+   use_gold_tolerances = .false.
 
 	! output to files and terminal
 	photo_interval = 50

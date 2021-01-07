@@ -34,7 +34,7 @@
 
 &controls
 
-      x_integer_ctrl(1) = 3 ! part number
+      x_integer_ctrl(1) = 4 ! part number
 
       read_extra_controls_inlist1 = .true.
       extra_controls_inlist1_name = 'inlist_common'

@@ -85,7 +85,6 @@
    !nonnucneu_phot ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
    !nonnucneu_pair ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
    eps_grav ! heat from gravitational contraction (negative for expansion)
-   newly_nonconvective
    mlt_mixing_length ! mixing length for mlt (cm)
    log_D_mix ! log10 diffusion coefficient in units of cm^2/second (Eulerian)
    log_conv_vel ! log10 convection velocity (cm/sec)

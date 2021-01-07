@@ -68,7 +68,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, mixing_type, &
+            max_conv_vel, dt, tau, just_gradr, mixing_type, &
             gradT, d_gradT_dvb, &
             gradr, d_gradr_dvb, &
             gradL, d_gradL_dvb, &
@@ -106,7 +106,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
+            max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
             
          logical, intent(in) :: alt_scale_height
@@ -187,6 +187,7 @@
          ierr = 0
          gradT_temp = 0
          debug = .false.
+         if (debug) write(*,*) 'enter Get_results', kz
          
          dL_dvb(:) = 0d0
          dL_dvb(mlt_dL) = 1d0
@@ -261,15 +262,7 @@
          if (ss% w_div_wc_flag) then
             d_gradr_dvb(mlt_w_div_wc_var) = d_gradr_factor_dw*P*opacity*L / (16*pi*clight*m*cgrav*Pr)
          end if
-         
-         if (test_partials) then
-            ss% solver_test_partials_val = opacity
-            ss% solver_test_partials_var = ss% i_lnd
-            ss% solver_test_partials_dval_dx = d_opacity_dvb(mlt_dlnd00)
-            write(*,*) 'mlt get_results   opacity', ss% solver_test_partials_var
-         end if
-         
-         
+         if (debug) write(*,1) 'gradr', gradr
          
          if (is_bad(gradr)) then
             ierr = -1
@@ -297,6 +290,7 @@
          grav = cgrav*m / (r*r)
          d_grav_dvb = 0d0
          d_grav_dvb(mlt_dlnR) = -2*grav
+         if (debug) write(*,1) 'grav', grav
          
          if (grav < 0) then
             write(*,1) 'grav', grav
@@ -318,6 +312,7 @@
             end if
          end if
          H_P = scale_height
+         if (debug) write(*,1) 'H_P', H_P
 
          if (scale_height <= 0d0 .or. is_bad(scale_height)) then
             ierr = -1
@@ -560,7 +555,8 @@
 
          mixing_type = convective_mixing
          
-         if (debug .or. D < 0) then
+         !if (debug .or. D < 0) then
+         if (D < 0) then
             write(*,*) 'get_gradT: convective_mixing'
             write(*,1) 'D', D
             write(*,1) 'conv_vel', conv_vel
@@ -1289,11 +1285,26 @@
 
             if (test_partials) then
                ss% solver_test_partials_val = gradT
-               ss% solver_test_partials_var = ss% i_lnd
-               ss% solver_test_partials_dval_dx = d_gradT_dvb(mlt_dlnd00)
-               write(*,*) 'mlt get_results', ss% solver_test_partials_var
+               ss% solver_test_partials_var = ss% i_lnT
+               ss% solver_test_partials_dval_dx = d_gradT_dvb(mlt_dlnT00)
+                  !Zeta*d_grada_dvb(mlt_dlnT00) + grada*d_Zeta_dvb(mlt_dlnT00)
+               write(*,*) 'set_convective_mixing', &
+                  ss% solver_test_partials_var, gradT
+               write(*,1) 'P/Pr', P/Pr
+               write(*,1) 'opacity', opacity
+               write(*,1) 'L/Lsun', L/Lsun
+               write(*,1) 'm/Msun', m/Msun
+               write(*,1) 'P*opacity*L', P*opacity*L
+               write(*,1) '16*pi*clight*m*cgrav*Pr', 16*pi*clight*m*cgrav*Pr
+               
+               
+               
+               write(*,1) 'gradr', gradr
+               write(*,1) 'grada', grada
+               write(*,1) 'Zeta', Zeta
             end if
             
+                     !gradr = P*opacity*L / (16*pi*clight*m*cgrav*Pr)
             
             
             if (is_bad(gradT)) then

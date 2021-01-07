@@ -31,7 +31,7 @@
 
       ! GYRE output controls
 
-      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      x_integer_ctrl(1) = 4 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
       x_integer_ctrl(2) = 2 ! max number of modes to output per call

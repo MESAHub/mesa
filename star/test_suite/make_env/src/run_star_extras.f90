@@ -262,7 +262,10 @@
             s% dq(k) = s% dq(k-1)*dq_factor
          end do
 
-         call star_set_qs(nz, s% q, s% dq, ierr)
+         call star_normalize_dqs(s% id, nz, s% dq, ierr)
+         if (ierr /= 0) stop 'failed in star_normalize_dqs'  
+
+         call star_set_qs(s% id, nz, s% q, s% dq, ierr)
          if (ierr /= 0) stop 'failed in star_set_qs'  
          
          call star_set_m_and_dm(s% id, ierr)

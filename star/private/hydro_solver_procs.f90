@@ -270,13 +270,13 @@
                      if (is_bad(sumequ)) then
                         if (dbg) then
                            write(*,3) trim(s% nameofequ(j)) // ' sumequ', j, k, sumequ
-                           stop 'sizeq'
+                           stop 'sizeq 1'
                         end if
                         ierr = -1
                         if (s% report_ierr) &
                            write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
                               j, k, equ(j,k)*s% residual_weight(j,k)
-                        if (s% stop_for_bad_nums) stop 'sizeq'
+                        if (s% stop_for_bad_nums) stop 'sizeq 2'
                         return
                      end if
                      if (absq > equ_max) then

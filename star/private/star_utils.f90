@@ -342,9 +342,10 @@
       end subroutine set_dm_bar
 
 
-      subroutine normalize_dqs(nz, dq, ierr)
+      subroutine normalize_dqs(s, nz, dq, ierr)
          ! rescale dq's so that add to 1.000
          ! work in from boundaries to meet at largest dq
+         type (star_info), pointer :: s
          integer, intent(in) :: nz
          real(dp), intent(inout) :: dq(:) ! (nz)
          integer, intent(out) :: ierr
@@ -384,7 +385,8 @@
       end subroutine normalize_dqs
 
 
-      subroutine set_qs(nz, q, dq, ierr) ! set q's using normalized dq's
+      subroutine set_qs(s, nz, q, dq, ierr) ! set q's using normalized dq's
+         type (star_info), pointer :: s
          integer, intent(in) :: nz
          real(dp), intent(inout) :: dq(:) ! (nz)
          real(dp), intent(inout) :: q(:) ! (nz)
@@ -394,8 +396,12 @@
          logical :: okay
          include 'formats'
          ierr = 0
-         call normalize_dqs(nz, dq, ierr)
-         if (ierr /= 0) return
+         ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
+         ! ok for create pre ms etc., but not for read model
+         if (s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, nz, dq, ierr)
+            if (ierr /= 0) return
+         end if
          q(1) = 1d0
          okay = .true.
          do k=2,nz
@@ -843,14 +849,8 @@
                r = pow(r3,1d0/3d0)
                m = s% m(k) - s% dm(k)*(tau_phot - tau00)/dtau
                if (s% u_flag) then
-                  v = s% u_face(k) + &
-                     (s% u_face(k+1) - s% u_face(k))*(tau_phot - tau00)/dtau
-                  if (is_bad(v)) then
-                     write(*,2) 'v', k, v
-                     write(*,2) 's% u_face(k)', k, s% u_face(k)
-                     write(*,2) 's% u_face(k+1)', k, s% u_face(k+1)
-                     stop 'get_phot_info'
-                  end if
+                  v = s% v_center
+                  ! skip it since get_phot_info can be called before u_face has been set
                else if (s% v_flag) then
                   v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
                end if
@@ -2446,7 +2446,7 @@
             kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
             j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
             cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
-         integer :: k
+         integer :: k, ierr
          logical, parameter :: dbg = .false.
          include 'formats'
 
@@ -2464,8 +2464,13 @@
             s% logRho_avg_surf = 0
             return
          end if
-
-         call set_rotation_info(s,.true.,k)
+         
+         ierr = 0
+         call set_rotation_info(s,.true.,ierr)
+         if (ierr /= 0) then
+            write(*,*) 'got ierr from call set_rotation_info in set_surf_avg_rotation_info'
+            write(*,*) 'just ignore it'
+         end if
 
          tau = s% tau_factor*s% tau_base
          dmsum = 0d0
@@ -2505,10 +2510,6 @@
          end do
 
          s% Lrad_div_Ledd_avg_surf = Lrad_div_Ledd_sum/dmsum
-         if (s% generations > 2) & ! time average
-            s% Lrad_div_Ledd_avg_surf = &
-               0.5d0*(s% Lrad_div_Ledd_avg_surf + s% Lrad_div_Ledd_avg_surf_old)
-
          gamma_factor = 1d0 - min(s% Lrad_div_Ledd_avg_surf, 0.9999d0)
 
          tau = s% tau_factor*s% tau_base
@@ -2576,8 +2577,6 @@
             logRho_sum = logRho_sum + dm*s% lnd(k)/ln10
             kap_sum = kap_sum + dm*kap
             tau = tau + dtau
-            
-            
             if (tau >= s% surf_avg_tau) exit
 
          end do
@@ -2819,30 +2818,7 @@
             s% phase_of_evolution = phase_starting
          end if 
          
-         
-         
-         
-         
-         
-!         if (.not. arrived_main_seq(s) .or. s% phase_of_evolution == phase_carbon_burning) return
-!         power_he_burn = s% power_he_burn
-!         power_c_burn = dot_product(s% dm(1:nz), s% eps_nuc_categories(i_burn_c,1:nz))/Lsun
-!         power_neutrinos = s% power_neutrinos
-!         if (s% phase_of_evolution == phase_helium_burning .and. power_c_burn > power_neutrinos) then
-!            s% phase_of_evolution = phase_carbon_burning
-!         else if (power_c_burn + power_he_burn > power_neutrinos) then
-!            s% phase_of_evolution = phase_helium_burning
-!         else if (s% center_he4 < center_he_going) then
-!            s% phase_of_evolution = phase_helium_burning
-!         else if (s% center_h1 < center_h_gone) then
-!            s% phase_of_evolution = phase_wait_for_he
-!         else if (s% center_h1 < center_h_going) then
-!            s% phase_of_evolution = phase_mid_main_seq
-!         else
-!            s% phase_of_evolution = phase_early_main_seq
-!         end if
       end subroutine set_phase_of_evolution
-
 
 
       logical function arrived_main_seq(s)
@@ -2866,6 +2842,7 @@
          integer :: k, nz, i_lnR, i_lnT, i_lnd, i_eturb, &
             i_v, i_u, i_alpha_RTI, i_ln_cvpv0
          include 'formats'
+         
          nz = s% nz
          i_lnR = s% i_lnR
          i_lnT = s% i_lnT
@@ -3781,6 +3758,10 @@
          real(dp) :: sum_x, sum_dq
          integer :: k
          include 'formats'
+         if (j == 0) then
+            surface_avg_x = 0d0
+            return
+         end if
          sum_x = 0
          sum_dq = 0
          do k = 1, s% nz
@@ -3797,6 +3778,10 @@
          integer, intent(in) :: j
          real(dp) :: sum_x, sum_dq, dx, dq
          integer :: k
+         if (j == 0) then
+            center_avg_x = 0d0
+            return
+         end if
          sum_x = 0
          sum_dq = 0
          do k = s% nz, 1, -1

@@ -790,9 +790,6 @@
                   cycle
                end if
             end if
-            if (s% newly_nonconvective(k)) then
-               cycle
-            end if
 
             ! find the nearest mixing boundary
             bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
@@ -1314,6 +1311,8 @@
             stop 'bad iso arg for check_lgL'
          end if
          
+         if (old_L < 0d0) return
+         
          lim = lim*s% time_delta_coeff
          hard_lim = hard_lim*s% time_delta_coeff
 
@@ -1344,7 +1343,7 @@
          if (dbg) write(*,1) 'hard_lim', hard_lim
          if (hard_lim > 0 .and. abs_change > hard_lim .and. (.not. skip_hard_limit)) then
             if (s% report_all_dt_limits) write(*, '(a30, f20.10, 99e20.10)') trim(msg), &
-               lgL - lgL_old, hard_lim, lgL, lgL_old, s% L_nuc_burn_total, s% L_nuc_burn_total_old
+               lgL - lgL_old, hard_lim, lgL, lgL_old, s% L_nuc_burn_total
             check_lgL = retry
             s% retry_message = 'lgL hard limit'
             return
@@ -1416,8 +1415,21 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
+         include 'formats'
          check_lgL_nuc_change = check_lgL( &
             s, ineut, 'check_lgL_nuc_change', skip_hard_limit, dt, dt_limit_ratio)
+         if (check_lgL_nuc_change /= keep_going) then
+            write(*,2) 's% power_nuc_burn', s% model_number, s% power_nuc_burn
+            write(*,2) 's% power_nuc_burn_old', s% model_number, s% power_nuc_burn_old
+            write(*,2) 'change', s% model_number, s% power_nuc_burn - s% power_nuc_burn_old
+            if (s% log_max_temperature > s% delta_lgL_nuc_at_high_T_limit_lgT_min) then
+               write(*,2) 's% delta_lgL_nuc_at_high_T_limit', s% model_number, s% delta_lgL_nuc_at_high_T_limit
+               write(*,2) 's% delta_lgL_nuc_at_high_T_limit', s% model_number, s% delta_lgL_nuc_at_high_T_limit
+            else
+               write(*,2) 's% delta_lgL_nuc_limit', s% model_number, s% delta_lgL_nuc_limit
+               write(*,2) 's% delta_lgL_nuc_hard_limit', s% model_number, s% delta_lgL_nuc_hard_limit
+            end if
+         end if
       end function check_lgL_nuc_change
 
 
@@ -1950,6 +1962,10 @@
          check_XH_cntr = check_change(s, XH_cntr - XH_cntr_old, &
             s% delta_XH_cntr_limit, s% delta_XH_cntr_hard_limit, &
             1, 'check_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XH_cntr /= keep_going) then
+            write(*,2) 'XH_cntr', s% model_number, XH_cntr
+            write(*,2) 'XH_cntr_old', s% model_number, XH_cntr_old
+         end if
       end function check_XH_cntr
 
 
@@ -1971,6 +1987,10 @@
          check_XHe_cntr = check_change(s, XHe_cntr - XHe_cntr_old, &
             s% delta_XHe_cntr_limit, s% delta_XHe_cntr_hard_limit, &
             1, 'check_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XHe_cntr /= keep_going) then
+            write(*,2) 'XHe_cntr', s% model_number, XHe_cntr
+            write(*,2) 'XHe_cntr_old', s% model_number, XHe_cntr_old
+         end if
       end function check_XHe_cntr
 
 
@@ -1992,6 +2012,10 @@
          check_XC_cntr = check_change(s, XC_cntr - XC_cntr_old, &
             s% delta_XC_cntr_limit, s% delta_XC_cntr_hard_limit, &
             1, 'check_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XC_cntr /= keep_going) then
+            write(*,2) 'XC_cntr', s% model_number, XC_cntr
+            write(*,2) 'XC_cntr_old', s% model_number, XC_cntr_old
+         end if
       end function check_XC_cntr
 
 
@@ -2013,6 +2037,10 @@
          check_XNe_cntr = check_change(s, XNe_cntr - XNe_cntr_old, &
             s% delta_XNe_cntr_limit, s% delta_XNe_cntr_hard_limit, &
             1, 'check_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XNe_cntr /= keep_going) then
+            write(*,2) 'XNe_cntr', s% model_number, XNe_cntr
+            write(*,2) 'XNe_cntr_old', s% model_number, XNe_cntr_old
+         end if
       end function check_XNe_cntr
 
 
@@ -2034,6 +2062,10 @@
          check_XO_cntr = check_change(s, XO_cntr - XO_cntr_old, &
             s% delta_XO_cntr_limit, s% delta_XO_cntr_hard_limit, &
             1, 'check_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XO_cntr /= keep_going) then
+            write(*,2) 'XO_cntr', s% model_number, XO_cntr
+            write(*,2) 'XO_cntr_old', s% model_number, XO_cntr_old
+         end if
       end function check_XO_cntr
 
 
@@ -2055,6 +2087,10 @@
          check_XSi_cntr = check_change(s, XSi_cntr - XSi_cntr_old, &
             s% delta_XSi_cntr_limit, s% delta_XSi_cntr_hard_limit, &
             1, 'check_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_XSi_cntr /= keep_going) then
+            write(*,2) 'XSi_cntr', s% model_number, XSi_cntr
+            write(*,2) 'XSi_cntr_old', s% model_number, XSi_cntr_old
+         end if
       end function check_XSi_cntr
 
 
@@ -2149,6 +2185,7 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(inout) :: dt_limit_ratio
          real(dp) :: dlgL_phot, relative_excess
+         include 'formats'
          check_delta_lgL_phot = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
@@ -2157,6 +2194,11 @@
             dlgL_phot = 0
          else
             dlgL_phot = log10(s% L_phot/s% L_phot_old)
+         end if
+         if (is_bad(dlgL_phot)) then
+            write(*,2) 's% L_phot', s% model_number, s% L_phot
+            write(*,2) 's% L_phot_old', s% model_number, s% L_phot_old
+            stop 'check_delta_lgL'
          end if
          check_delta_lgL_phot = check_change(s, dlgL_phot, &
             s% delta_lgL_phot_limit, s% delta_lgL_phot_hard_limit, &
@@ -2178,6 +2220,11 @@
             dlgL = 0
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
+         end if
+         if (is_bad(dlgL)) then
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            write(*,2) 's% L_surf_old', s% model_number, s% L_surf_old
+            stop 'check_delta_lgL'
          end if
          check_delta_lgL = check_change(s, dlgL, &
             s% delta_lgL_limit, s% delta_lgL_hard_limit, &
@@ -2676,8 +2723,7 @@
          dt_limit_ratio_target = 1d0
 
          if (s% use_dt_low_pass_controller .and. &
-               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0 .and. &
-               s% generations > 2) then ! use 2 values to do "low pass" controller
+               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0) then ! use 2 values to do "low pass" controller
             ratio = limiter(dt_limit_ratio_target/dt_limit_ratio)
             ratio_prev = limiter(dt_limit_ratio_target/s% dt_limit_ratio_old)
             limtr = limiter( &

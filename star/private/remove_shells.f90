@@ -564,7 +564,7 @@
       subroutine do_remove_center(id, k, ierr)
          use read_model, only: finish_load_model
          use alloc, only: prune_star_info_arrays
-         use star_utils, only: set_qs
+         use star_utils, only: normalize_dqs, set_qs
          integer, intent(in) :: id, k
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -603,7 +603,14 @@
          do kk=1,k-1
             s% dq(kk) = s% dm(kk)/new_xmstar
          end do
-         call set_qs(s% nz, s% q, s% dq, ierr)
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, s% nz, s% dq, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in do_remove_center'
+               return
+            end if
+         end if
+         call set_qs(s, s% nz, s% q, s% dq, ierr)
          if (ierr /= 0) return
          s% generations = 1 ! memory leak, but hopefully not necessary to fix
             ! assuming remove center is a rare operation
@@ -992,7 +999,7 @@
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% j_rot, prv% i_rot, &
             prv% omega, prv% D_omega, prv% am_nu_rot, &
-            prv% D_smooth, prv% conv_vel, prv% lnT, &
+            prv% conv_vel, prv% lnT, &
             prv% dPdr_dRhodr_info, prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
             prv% D_SSI, prv% D_ES, prv% D_GSF, prv% D_mix, &
             s% xh, s% xa, ierr)

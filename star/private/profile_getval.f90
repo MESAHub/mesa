@@ -1371,11 +1371,6 @@
             case (p_log_etamid_RTI)
                if (s% RTI_flag) val = safe_log10(s% etamid_RTI(k))
 
-
-            case (p_log_D_smooth)
-               if (s% D_smooth_flag) val = safe_log10(s% D_smooth(k))
-               
-               
             case (p_log_sig_RTI)
                if (s% RTI_flag) val = safe_log10(s% sig_RTI(k))
             case (p_log_sigmid_RTI)
@@ -1444,13 +1439,6 @@
                else
                   val = -99
                end if
-            case (p_newly_nonconvective)
-               if (s% newly_nonconvective(k)) then
-                  int_val = 1; val = 1
-               else
-                  int_val = 0; val = 0
-               end if
-               int_flag = .true.
             case (p_mixing_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)

@@ -9,3 +9,13 @@
       
       logical :: change_j_rot_flag, change_initial_j_rot_flag, new_j_rot_flag
 
+
+
+
+      logical :: load_saved_photo
+      character (len=strlen) :: saved_photo_name
+      
+      integer :: save_photo_number
+      character (len=strlen) :: save_photo_filename
+      !save_photo_when_terminate = .true.
+      

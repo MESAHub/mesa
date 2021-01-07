@@ -6,28 +6,6 @@
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
 
-      ! D_smooth_replacement_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! D_smooth_growth_rate
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! set_D_mix_to_D_smooth
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! blend_D_smooth_between_cells_of_same_mixing_type
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! allows time-smoothing of mixing diffusion coeff at each step.
-      ! at the beginning of each step, after setting usual D_mix.
-      ! D_smooth(k) = (1d0 - f)*D_smooth_old(k) + f*D_mix(k)
-      ! where f = min(dt*D_smooth_growth_rate, D_smooth_replacement_fraction)
-
-      ! ::
-
-    D_smooth_replacement_fraction = 0.5d0
-    D_smooth_growth_rate = 1d0
-    set_D_mix_to_D_smooth = .false.
-    blend_D_smooth_between_cells_of_same_mixing_type = .false.
-
-
       D_mix_zero_region_bottom_q = 1d99
       D_mix_zero_region_top_q = -1d99
       dq_D_mix_zero_at_H_He_crossover = -1d0
@@ -35,7 +13,13 @@
       
       
       
-
+      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
+      ! ok for create pre ms etc., but not for read model
+      ! create_pre_ms calls normalize_dqs even if this flag is false.
+      do_normalize_dqs_as_part_of_set_qs = .false.
+      
+      
+      
 
       ! Eturb parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,61 +201,4 @@
       ! ::
 
     conv_vel_use_mlt_vc_start = .true.
-
-
-
-      ! convergence_separate_equ_conv_vel_residuals
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! conv_vel_residual_tol
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! if convergence_separate_equ_conv_vel_residuals is .true., when
-      ! using convective velocity variables the residuals of the
-      ! convective velocity equation are treated separately. In this
-      ! case only the max residual is checked against
-      ! conv_vel_max_residual_tol. The low precision is due to double
-      ! precision float limitations, which do not allow arbitrary precision.
-      ! However, despite the relaxed tolerance on the equations, the actual
-      ! value of the convective velocity can be solved down to machine precision.
-
-      ! ::
-
-    convergence_separate_equ_conv_vel_residuals = .true.
-    conv_vel_tol_max_residual = 5d-2
-
-
-      ! convergence_separate_equ_conv_vel_corrections
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! conv_vel_correction_tol
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Similar to convergence_separate_equ_conv_vel_residuals, separates
-      ! correction for conv_vel and only applies the conv_vel_max_correction_tol
-      ! criteria for a solution. It also allows to define a different scaling for the
-      ! correction that takes into account just the changes in the convective velocity
-      ! variable, conv_vel_scale_max_correction. Note that the correction represents
-      ! changes on the variable ln(conv_vel + s% conv_vel_v0) rather than the actual
-      ! convective velocity.
-
-      ! ::
-
-    convergence_separate_equ_conv_vel_corrections = .true.
-    conv_vel_tol_max_correction = 1d-3
-    conv_vel_min_correction_to_ignore_residual = 1d-8
-    conv_vel_scale_max_correction = 5d0
-
-
-      ! conv_vel_solver_itermin_until_reduce_min_corr_coeff
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! conv_vel_corr_coeff_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! When using conv_vel, use this value instead of
-      ! solver_itermin_until_reduce_min_corr_coeff
-      ! and corr_coeff_limit
-
-      ! ::
-
-    conv_vel_solver_itermin_until_reduce_min_corr_coeff = 15
-    conv_vel_corr_coeff_limit = 0.05d0
 

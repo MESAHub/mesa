@@ -183,14 +183,15 @@
 
       ! inner radius of shell ri
       ! outer radius of shell ra
-      subroutine eval_i_rot(s,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
+      subroutine eval_i_rot(s,k,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
          type (star_info), pointer :: s
+         integer, intent(in) :: k ! just for debugging
          real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
          real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
          real(dp) :: re, w, w2, w3, w4, w5, w6, lg_one_sub_w4, B, A
          real(dp) :: rai,ra2,ri2,rm2
          real(dp) :: dre_dw_div_wc, dB_dw_div_wc, dA_dw_div_wc
-
+         include 'formats'
          if (s% use_other_eval_i_rot) then
             call s% other_eval_i_rot(s% id,ri,r00,ra,w_div_w_crit_roche, i_rot, di_rot_dlnr, di_rot_dw_div_wc)
          else if (s% fitted_fp_ft_i_rot) then
@@ -244,10 +245,10 @@
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             end if
             if (k==1) then
-               call eval_i_rot(s, s% rmid(1), s% r(1), s% r(1), s% w_div_w_crit_roche(1), &
+               call eval_i_rot(s, k, s% rmid(1), s% r(1), s% r(1), s% w_div_w_crit_roche(1), &
                   s% i_rot(1), s% di_rot_dlnr(1), s% di_rot_dw_div_wc(1))
             else
-               call eval_i_rot(s, s% rmid(k), s% r(k), s% rmid(k-1), s% w_div_w_crit_roche(k), &
+               call eval_i_rot(s, k, s% rmid(k), s% r(k), s% rmid(k-1), s% w_div_w_crit_roche(k), &
                   s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
             end if
          end do
@@ -319,7 +320,7 @@
          r00 = exp(s% xh(s% i_lnR,k))
 
          if (s% fitted_fp_ft_i_rot .or. s% simple_i_rot_flag) then
-            call eval_i_rot(s, r00, r00, r00, s% w_div_w_crit_roche(k), &
+            call eval_i_rot(s, k, r00, r00, r00, s% w_div_w_crit_roche(k), &
                s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
             return
          end if
@@ -345,7 +346,7 @@
             r_out = pow(0.5*(r003 + rm13),1d0/3d0)
          end if
 
-         call eval_i_rot(s,r_in,r00,r_out,0d0,&
+         call eval_i_rot(s,k,r_in,r00,r_out,0d0,&
             s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
 
       end subroutine update1_i_rot_from_xh

@@ -124,7 +124,6 @@ SRCS = \
    overshoot_utils.f90 \
    overshoot_exp.f90 \
    overshoot_step.f90 \
-   mix_smoothing.f90 \
    mlt_get_results.f90 \
    mlt_info.f90 \
    rotation_mix_info.f90 \
@@ -196,7 +195,6 @@ SRCS = \
    evolve_support.f90 \
    star_bcyclic.f90 \
    star_solver.f90 \
-   star_solver_15066.f90 \
    solve_burn.f90 \
    solve_hydro.f90 \
    struct_burn_mix.f90 \

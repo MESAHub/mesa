@@ -3555,7 +3555,7 @@
 
       integer function relax_to_radiative_core_check_model(s, id, lipar, ipar, lrpar, rpar)
          use do_one_utils, only:do_bare_bones_check_model
-         use report, only: do_report
+         use report, only: set_power_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -3567,20 +3567,13 @@
          relax_to_radiative_core_check_model = do_bare_bones_check_model(id)
          if (relax_to_radiative_core_check_model /= keep_going) return
          ierr = 0
-         call do_report(s, ierr)
-         if (ierr /= 0) then
-            write(*,2) 'relax_to_radiative_core_check_model failed in do_report', s% model_number
-            relax_to_radiative_core_check_model = terminate
-            return
-         end if
-
+         call set_power_info(s)
          if (s% L_nuc_burn_total/s% L_phot > s% job% pre_ms_check_radiative_core_Lnuc_div_L_limit) then
             write(*,*) 'reached pre_ms_check_radiative_core_Lnuc_div_L_limit in relax to begin radiative core'
             relax_to_radiative_core_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
          end if
-
          min_conv_mx1_bot = rpar(2)
          if (s% conv_mx1_bot < min_conv_mx1_bot) then
             min_conv_mx1_bot = s% conv_mx1_bot
@@ -3597,7 +3590,6 @@
          else if (mod(s% model_number, s% terminal_interval) == 0) then
             write(*,2) 'waiting for fully convective core to develop', s% model_number, s% conv_mx1_bot
          end if
-         
       end function relax_to_radiative_core_check_model
 
 
@@ -4036,6 +4028,8 @@
 
          procedure(integer), pointer :: tmp_ptr1 => null(), tmp_ptr3 => null()
          procedure(), pointer :: tmp_ptr2 => null(), tmp_ptr4 => null()
+         
+         include 'formats'
 
          ierr = 0
          call get_star_ptr(id, s, ierr)
@@ -4144,8 +4138,9 @@
 
             end do step_loop
 
-            if (s% job% pgstar_flag) then
+            if (.false. .and. s% job% pgstar_flag) then
                ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
+               write(*,2) 'after step_loop: call update_pgstar_data', s% model_number
                call update_pgstar_data(s, ierr)
                if (failed()) return
                call do_read_pgstar_controls(s, s% inlist_fname, ierr) 
@@ -4167,7 +4162,7 @@
             s% how_many_extra_history_columns => no_extra_history_columns
             s% data_for_extra_history_columns => none_for_extra_history_columns
 
-            result = finish_step(id, .false.,ierr)
+            result = finish_step(id, .false., ierr)
             s% how_many_extra_history_columns => tmp_ptr1
             s% data_for_extra_history_columns => tmp_ptr2
             s% how_many_extra_profile_columns => tmp_ptr3
@@ -4185,6 +4180,7 @@
 
          if (s% job% pgstar_flag) then
          ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile
+         write(*,2) 'after evolve_loop: call update_pgstar_data', s% model_number
             call update_pgstar_data(s, ierr)
             if (ierr /= 0) return
             call do_read_pgstar_controls(s, s% inlist_fname, ierr)

@@ -3,14 +3,15 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgT_9.55.mod'
+      saved_model_name = 'lgTmax_9.5.mod' ! from pre_ms_to_cc_lo using given inlist_mass_Z_wind_rotation
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       required_termination_code_string = 'xa_central_lower_limit'
 
       change_initial_net = .true.
-      new_net_name = 'mesa_201.net'
+      !new_net_name = 'mesa_201.net'
+      new_net_name = 'mesa_80.net' ! good enough for testing
 
       set_initial_age = .true.
       initial_age = 0
@@ -21,7 +22,7 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      !pgstar_flag = .true.
+      pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -32,9 +33,9 @@
 / ! end of kap namelist
 
 &controls
-
+      
       xa_central_lower_limit_species(1) = 'si28'
-      xa_central_lower_limit(1) = 0.25d0
+      xa_central_lower_limit(1) = 0.55d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -47,32 +48,34 @@
 ! rotation
 
 ! mlt
+      alpha_semiconvection = 0
+      thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      ! relax for testing big net.
-      delta_XSi_cntr_limit = 0.05d0
-      delta_XSi_cntr_hard_limit = 0.10d0
+      delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
 
 ! mesh
 
 ! solver
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
+      
+      use_gold2_tolerances = .false.
 
 ! output
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      photo_interval = 10
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
 
 ! FOR DEBUGGING
-
+      
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
@@ -108,7 +111,7 @@
       !mesh_dump_call_number = 5189
       !okay_to_remesh = .false.
       
-      !trace_evolve = .true.
+      trace_evolve = .true.
 
       !stop_for_bad_nums = .true.
       

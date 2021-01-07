@@ -1572,20 +1572,6 @@
     new_reconstruction_flag = .false.
 
 
-      ! new_D_smooth_flag
-      ! ~~~~~~~~~~~~~~~~~
-      ! change_D_smooth_flag
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! change_initial_D_smooth_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    new_D_smooth_flag = .false.
-    change_D_smooth_flag = .false.
-    change_initial_D_smooth_flag = .false.
-
-
    ! rotation controls
    ! _________________
 
