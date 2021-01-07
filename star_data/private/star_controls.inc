@@ -1006,12 +1006,10 @@
          real(dp) :: D_mix_rotation_max_logT_full_on, &
             D_mix_rotation_min_logT_full_off
          
-         real(dp) :: D_omega_max_replacement_fraction, D_omega_growth_rate, &
-            D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
+         real(dp) :: D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
          logical :: D_omega_mixing_across_convection_boundary
          
-         real(dp) :: nu_omega_max_replacement_fraction, nu_omega_growth_rate, &
-            nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
+         real(dp) :: nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
 
          real(dp) :: jacobian_clip_limit

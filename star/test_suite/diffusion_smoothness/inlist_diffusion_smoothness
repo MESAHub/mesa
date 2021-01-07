@@ -72,7 +72,7 @@
 
 !      set_min_D_mix = .true.
       min_D_mix = 1d2 ! D_mix will be at least this large
-!      min_center_Ye_for_min_D_mix = 0.47 ! min_D_mix is only used when center Ye >= this
+      min_center_Ye_for_min_D_mix = 0.47 ! min_D_mix is only used when center Ye >= this
          ! i.e., when center Ye drops below this, min_D_mix is 0
       
       

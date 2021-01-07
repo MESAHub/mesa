@@ -89,36 +89,36 @@
 
       clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this 
               
-!      prune_bad_cz_min_Hp_height = 0 ! lower limit on radial extent of cz
-!      remove_mixing_glitches = .true. ! if true, then okay to remove gaps and singletons
-!      
-!               ! the following controls are for different kinds of "glitches" that can be removed
-!            
-!
-!               okay_to_remove_mixing_singleton = .true.
-!         
-!               min_convective_gap = -1 ! 0.1 
-!                  ! close gap between convective regions if smaller than this (< 0 means skip this)
-!                  ! gap measured radially in units of pressure scale height
-!         
-!               min_thermohaline_gap = 0
-!                  ! close gap between thermohaline mixing regions if smaller than this (< 0 means skip this)
-!                  ! gap measured radially in units of pressure scale height
-!               
-!               min_thermohaline_dropout = 0
-!               max_dropout_gradL_sub_grada = 1d-3
-!                  ! if find radiative region embedded in thermohaline,
-!                  ! and max(gradL - grada) in region is everywhere < max_dropout_gradL_sub_grada
-!                  ! and region height is < min_thermohaline_dropout
-!                  ! then convert the region to thermohaline
-!         
-!               min_semiconvection_gap = 0 
-!                  ! close gap between semiconvective mixing regions if smaller than this (< 0 means skip this)
-!                  ! gap measured radially in units of pressure scale height
-!         
-!               remove_embedded_semiconvection = .false.
-!                  ! if have a semiconvection region bounded on each side by convection,
-!                  ! convert it to be convective too.
+      prune_bad_cz_min_Hp_height = 0 ! lower limit on radial extent of cz
+      remove_mixing_glitches = .true. ! if true, then okay to remove gaps and singletons
+      
+               ! the following controls are for different kinds of "glitches" that can be removed
+            
+
+               okay_to_remove_mixing_singleton = .true.
+         
+               min_convective_gap = -1 ! 0.1 
+                  ! close gap between convective regions if smaller than this (< 0 means skip this)
+                  ! gap measured radially in units of pressure scale height
+         
+               min_thermohaline_gap = 0
+                  ! close gap between thermohaline mixing regions if smaller than this (< 0 means skip this)
+                  ! gap measured radially in units of pressure scale height
+               
+               min_thermohaline_dropout = 0
+               max_dropout_gradL_sub_grada = 1d-3
+                  ! if find radiative region embedded in thermohaline,
+                  ! and max(gradL - grada) in region is everywhere < max_dropout_gradL_sub_grada
+                  ! and region height is < min_thermohaline_dropout
+                  ! then convert the region to thermohaline
+         
+               min_semiconvection_gap = 0 
+                  ! close gap between semiconvective mixing regions if smaller than this (< 0 means skip this)
+                  ! gap measured radially in units of pressure scale height
+         
+               remove_embedded_semiconvection = .false.
+                  ! if have a semiconvection region bounded on each side by convection,
+                  ! convert it to be convective too.
          
       photo_interval = 50 
       profile_interval = 50

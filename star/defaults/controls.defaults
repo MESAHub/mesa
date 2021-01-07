@@ -3526,6 +3526,7 @@
     smooth_outer_xa_big = -1d0
     smooth_outer_xa_small = -1d0
 
+
 ! rotation controls
 ! =================
 
@@ -4023,8 +4024,6 @@
 
       ! ::
 
-    D_omega_max_replacement_fraction = 0.5d0
-    D_omega_growth_rate = 1d0
     D_omega_mixing_rate = 1d0
     D_omega_mixing_across_convection_boundary = .false.
     max_q_for_D_omega_zero_in_convection_region = 0.8d0
@@ -4041,11 +4040,10 @@
 
       ! ::
 
-    nu_omega_max_replacement_fraction = 0.5d0
-    nu_omega_growth_rate = 1d0
     nu_omega_mixing_rate = 1d0
     nu_omega_mixing_across_convection_boundary = .false.
     max_q_for_nu_omega_zero_in_convection_region = 0.8d0
+
 
 ! atmosphere boundary conditions
 ! ==============================
@@ -9402,7 +9400,7 @@
 
       ! ::
 
-    varcontrol_target = 1d-4
+    varcontrol_target = 1d-3
 
 
       ! min_allowed_varcontrol_target
@@ -9436,7 +9434,7 @@
 
       ! ::
 
-    never_skip_hard_limits = .false.
+    never_skip_hard_limits = .true.
 
 
       ! relax_hard_limits_after_retry
