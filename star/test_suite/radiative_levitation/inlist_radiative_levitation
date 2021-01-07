@@ -81,7 +81,7 @@
       dH_div_H_limit_min_H = 1d99 ! disable this
       dHe_div_He_limit_min_He = 1d99 ! disable this
 
-      prune_bad_cz_min_Hp_height = 0.1 ! lower limit on radial extent of cz
+      !prune_bad_cz_min_Hp_height = 0.1 ! lower limit on radial extent of cz
 
     overshoot_scheme(1) = 'exponential'
     overshoot_zone_type(1) = 'nonburn'
