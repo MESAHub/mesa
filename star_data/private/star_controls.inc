@@ -241,6 +241,7 @@
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
          real(dp) :: threshold_for_smooth_gradL_composition_term
+         real(dp) :: clip_D_limit
          logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
          real(dp) :: Henyey_MLT_y_param, Henyey_MLT_nu_param, mlt_Pturb_factor, &
             min_logT_for_make_gradr_sticky_in_solver_iters

@@ -292,7 +292,7 @@
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
     set_min_am_nu_non_rot, min_am_nu_non_rot, min_center_Ye_for_min_am_nu_non_rot, &
     set_min_D_mix, mass_lower_limit_for_min_D_mix, mass_upper_limit_for_min_D_mix, &
-    min_D_mix, smooth_outer_xa_big, smooth_outer_xa_small, nonlocal_NiCo_kap_gamma, nonlocal_NiCo_decay_heat, &
+    min_D_mix, clip_D_limit, smooth_outer_xa_big, smooth_outer_xa_small, nonlocal_NiCo_kap_gamma, nonlocal_NiCo_decay_heat, &
     dtau_gamma_NiCo_decay_heat, max_logT_for_net, reaction_neuQs_factor, &
     
     ! element diffusion parameters
@@ -1707,6 +1707,7 @@
  s% mass_lower_limit_for_min_D_mix = mass_lower_limit_for_min_D_mix
  s% mass_upper_limit_for_min_D_mix = mass_upper_limit_for_min_D_mix
  s% min_D_mix = min_D_mix
+ s% clip_D_limit = clip_D_limit
  s% reaction_neuQs_factor = reaction_neuQs_factor
  s% nonlocal_NiCo_kap_gamma = nonlocal_NiCo_kap_gamma
  s% nonlocal_NiCo_decay_heat = nonlocal_NiCo_decay_heat
@@ -3372,6 +3373,7 @@
  mass_lower_limit_for_min_D_mix = s% mass_lower_limit_for_min_D_mix
  mass_upper_limit_for_min_D_mix = s% mass_upper_limit_for_min_D_mix
  min_D_mix = s% min_D_mix
+ clip_D_limit = s% clip_D_limit
  reaction_neuQs_factor = s% reaction_neuQs_factor
  nonlocal_NiCo_kap_gamma = s% nonlocal_NiCo_kap_gamma
  nonlocal_NiCo_decay_heat = s% nonlocal_NiCo_decay_heat

@@ -166,6 +166,11 @@
          
          if (dbg) write(*,3) 'after copy mlt results', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            
+         if (dbg) write(*,3) 'call remove_tiny_mixing', &
+            k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+         call remove_tiny_mixing(s, ierr)
+         if (failed('remove_tiny_mixing')) return
 
          if (dbg) write(*,3) 'call do_mix_envelope', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -812,6 +817,36 @@
          call switch_to_no_mixing(s,k)
          call switch_to_radiative(s,k)
       end subroutine set_use_gradr
+
+
+      subroutine remove_tiny_mixing(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k, nz
+         logical, parameter :: dbg = .false.
+         real(dp) :: tiny
+
+         include 'formats'
+
+         if (dbg) write(*,*) 'remove_tiny_mixing'
+
+         ierr = 0
+         nz = s% nz
+
+         tiny = s% clip_D_limit
+         do k=1,nz
+            if (s% D_mix(k) < tiny) then
+               s% cdc(k) = 0
+               s% D_mix(k) = 0
+               if (.not. s% conv_vel_flag) then
+                  s% conv_vel(k) = 0
+               end if
+               s% mixing_type(k) = no_mixing
+            end if
+         end do
+
+      end subroutine remove_tiny_mixing
 
 
       subroutine locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)

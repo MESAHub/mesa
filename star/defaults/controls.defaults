@@ -3293,6 +3293,16 @@
     min_D_mix = 1d3
 
 
+      ! clip_D_limit
+      ! ~~~~~~~~~~~~
+
+      ! Zero mixing diffusion coeffs that are smaller than this.
+
+      ! ::
+
+    clip_D_limit = 0
+
+
    ! smooth_outer_xa_big
    ! ~~~~~~~~~~~~~~~~~~~
    ! smooth_outer_xa_small

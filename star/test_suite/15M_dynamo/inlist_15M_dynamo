@@ -80,7 +80,7 @@
 
          mdot_omega_power = 0.43
 
-         !clip_D_limit = 10
+         clip_D_limit = 10
          
          xa_scale = 1d-5
 

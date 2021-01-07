@@ -87,12 +87,13 @@
 
       mixing_length_alpha = 1.8
 
+      clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this 
+              
 !      prune_bad_cz_min_Hp_height = 0 ! lower limit on radial extent of cz
 !      remove_mixing_glitches = .true. ! if true, then okay to remove gaps and singletons
 !      
 !               ! the following controls are for different kinds of "glitches" that can be removed
 !            
-!               clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this         
 !
 !               okay_to_remove_mixing_singleton = .true.
 !         

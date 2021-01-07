@@ -88,7 +88,7 @@
 
          T_mix_limit = 1d4
 
-         !clip_D_limit = 10 ! zero mixing diffusion coeffs that are smaller than this
+         clip_D_limit = 10 ! zero mixing diffusion coeffs that are smaller than this
          
          xa_scale = 1d-5
 
