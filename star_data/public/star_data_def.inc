@@ -182,12 +182,12 @@
       integer, parameter :: t_power_nuc_burn_upper_limit = t_log_g_upper_limit + 1 
       integer, parameter :: t_power_h_burn_upper_limit = t_power_nuc_burn_upper_limit + 1 
       integer, parameter :: t_power_he_burn_upper_limit = t_power_h_burn_upper_limit + 1 
-      integer, parameter :: t_power_c_burn_upper_limit = t_power_he_burn_upper_limit + 1 
-      integer, parameter :: t_power_nuc_burn_lower_limit = t_power_c_burn_upper_limit + 1 
+      integer, parameter :: t_power_z_burn_upper_limit = t_power_he_burn_upper_limit + 1 
+      integer, parameter :: t_power_nuc_burn_lower_limit = t_power_z_burn_upper_limit + 1 
       integer, parameter :: t_power_h_burn_lower_limit = t_power_nuc_burn_lower_limit + 1 
       integer, parameter :: t_power_he_burn_lower_limit = t_power_h_burn_lower_limit + 1 
-      integer, parameter :: t_power_c_burn_lower_limit = t_power_he_burn_lower_limit + 1 
-      integer, parameter :: t_phase_of_evolution_stop = t_power_c_burn_lower_limit + 1 
+      integer, parameter :: t_power_z_burn_lower_limit = t_power_he_burn_lower_limit + 1 
+      integer, parameter :: t_phase_of_evolution_stop = t_power_z_burn_lower_limit + 1 
       integer, parameter :: t_center_R_lower_limit = t_phase_of_evolution_stop + 1 
       integer, parameter :: t_center_Ye_lower_limit = t_center_R_lower_limit + 1 
       integer, parameter :: t_fe_core_infall_limit = t_center_Ye_lower_limit + 1 
@@ -195,7 +195,8 @@
       integer, parameter :: t_non_fe_core_rebound_limit = t_non_fe_core_infall_limit + 1 
       integer, parameter :: t_v_div_csound_max_limit = t_non_fe_core_rebound_limit + 1 
       integer, parameter :: t_v_div_csound_surf_limit = t_v_div_csound_max_limit + 1 
-      integer, parameter :: t_Pgas_div_P_limit = t_v_div_csound_surf_limit + 1 
+      integer, parameter :: t_gamma1_limit = t_v_div_csound_surf_limit + 1 
+      integer, parameter :: t_Pgas_div_P_limit = t_gamma1_limit + 1 
       integer, parameter :: t_Lnuc_div_L_lower_limit = t_Pgas_div_P_limit + 1 
       integer, parameter :: t_Lnuc_div_L_upper_limit = t_Lnuc_div_L_lower_limit + 1 
       integer, parameter :: t_v_surf_div_v_kh_lower_limit = t_Lnuc_div_L_upper_limit + 1 
@@ -996,7 +997,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
             use const_def, only: dp
             integer, intent(in) :: id ! id for star         
@@ -1023,7 +1024,7 @@
                gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
                alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
                Henyey_y_param, Henyey_nu_param, &
-               prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
+               max_conv_vel, dt, tau, remove_small_D_limit, &
                normal_mlt_gradT_factor
             logical, intent(in) :: alt_scale_height
             character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option

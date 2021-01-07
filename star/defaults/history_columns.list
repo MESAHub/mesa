@@ -722,57 +722,8 @@
          ! Menv = Msun*(star_mass - max_T_mass),
          ! Rcore = Rsun*max_T_radius
       !max_T_shell_binding_energy ! integral from max_T out
-
-
-   !## info about location where have max rate of hydrogen burning (PP and CNO)
-      !max_eps_h ! erg/g/s
-      !max_eps_h_lgT ! log10 temperature at location of max burn
-      !max_eps_h_lgRho ! log10 density at location of max burn
-      !max_eps_h_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_h_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_h_lgP ! log10 pressure at location of max burn
-      !max_eps_h_lgR ! log10 radius at location of max burn
-      !max_eps_h_opacity ! opacity at location of max burn
-
-   !## info about location where have max rate of helium burning
-         ! triple-alpha plus alpha capture on C12, N14, O16, and Ne20.
-      !max_eps_he ! erg/g/s
-      !max_eps_he_lgT ! log10 temperature at location of max_eps_he
-      !max_eps_he_lgRho ! log10 density at location of max burn
-      !max_eps_he_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_he_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_he_lgP ! log10 pressure at location of max burn
-      !max_eps_he_lgR ! log10 radius at location of max burn
-      !max_eps_he_opacity ! opacity at location of max burn
-
-   !## info about location where have max rate of burning of metals
-         ! alpha capture on heavy elements plus C+C, C+O, O+O, etc.
-      !max_eps_z ! erg/g/s
-      !max_eps_z_lgT ! log10 temperature at location of max burn
-      !max_eps_z_lgRho ! log10 density at location of max burn
-      !max_eps_z_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_z_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_z_lgP ! log10 pressure at location of max burn
-      !max_eps_z_lgR ! log10 radius at location of max burn
-      !max_eps_z_opacity ! opacity at location of max burn
-
-   !## info about location where have max rate of burning of all types
-      !max_eps_nuc ! erg/g/s
-      !max_eps_nuc_lgT ! log10 temperature at location of max burn
-      !max_eps_nuc_lgRho ! log10 density at location of max burn
-      !max_eps_nuc_m ! mass coordinate at location of max burn (Msun units)
-      !max_eps_nuc_xm ! mass exterior to location of max burn (Msun units)
-      !max_eps_nuc_lgP ! log10 pressure at location of max burn
-      !max_eps_nuc_lgR ! log10 radius at location of max burn
-      !max_eps_nuc_opacity ! opacity at location of max burn
-      !max_eps_nuc_cp ! Cp at location of max burn
-      !max_eps_nuc_t_heat ! Cp*T/eps_nuc at location of max burn
-      !max_eps_nuc_csound
-      !max_eps_nuc_pi_r_div_cs
-      !max_eps_nuc_H ! pressure scale height
-      !max_eps_nuc_H_div_cs
-      !max_eps_nuc_log_xa he4 ! any species
-
+      
+      
    !## info at location of max abs velocity
       ! note: can use control "min_tau_for_max_abs_v_location" to exclude surface
       !max_abs_v_velocity

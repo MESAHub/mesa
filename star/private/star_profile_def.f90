@@ -536,8 +536,7 @@
       integer, parameter :: p_log_sig_raw_mix = p_burn_num_iters + 1
       integer, parameter :: p_log_sig_mix = p_log_sig_raw_mix + 1
       integer, parameter :: p_log_conv_vel = p_log_sig_mix + 1
-      integer, parameter :: p_newly_nonconvective = p_log_conv_vel + 1
-      integer, parameter :: p_conv_vel_div_L_vel = p_newly_nonconvective + 1
+      integer, parameter :: p_conv_vel_div_L_vel = p_log_conv_vel + 1
       integer, parameter :: p_conv_vel_div_csound = p_conv_vel_div_L_vel + 1
       integer, parameter :: p_log_tau_conv_yrs = p_conv_vel_div_csound + 1
       integer, parameter :: p_mixing_type = p_log_tau_conv_yrs + 1
@@ -1320,7 +1319,6 @@
          profile_column_name(p_log_conv_vel) = 'log_conv_vel'
          profile_column_name(p_conv_vel_div_csound) = 'conv_vel_div_csound'
          profile_column_name(p_conv_vel_div_L_vel) = 'conv_vel_div_L_vel'
-         profile_column_name(p_newly_nonconvective) = 'newly_nonconvective'
          profile_column_name(p_conv_mixing_type) = 'conv_mixing_type'
          profile_column_name(p_log_tau_conv_yrs) = 'log_tau_conv_yrs'
          profile_column_name(p_mixing_type) = 'mixing_type'

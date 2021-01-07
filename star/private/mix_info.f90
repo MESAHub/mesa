@@ -45,20 +45,19 @@
 
       subroutine set_mixing_info(s, skip_set_cz_bdy_mass, ierr)
          ! set convection variables cdc and conv_vel starting from local MLT results.
-         ! overshooting can also be added.
+         ! overshooting can also be added.    and rotation mixing.
          use rates_def, only: i_rate
          use chem_def, only: ipp, icno, i3alf, ih1, ihe4, ic12
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
-         use mix_smoothing, only: set_newly_non_conv
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
 
          integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_dbg, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: c, rho_face, f, Tmax, conv_vel, min_conv_vel_for_convective_mixing_type, &
-            D_smooth_source, region_bottom_q, region_top_q
+            region_bottom_q, region_top_q
          real(dp), pointer, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: rsp_or_eturb, dbg
@@ -163,6 +162,8 @@
             end do
          end if
          
+         call check('after get mlt_D')
+         
          if (dbg) write(*,3) 'after copy mlt results', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
          
@@ -206,6 +207,8 @@
               if (failed('remove_embedded_semiconvection')) return
 
          end if
+         
+         call check('after get remove_mixing_glitches')
 
          if (dbg) write(*,3) 'call do_mix_envelope', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -236,6 +239,8 @@
             call add_predictive_mixing(s, ierr)
             if (failed('add_predictive_mixing')) return
          end if
+         
+         call check('after add_predictive_mixing')
 
          ! NB: re-call locate_convection_boundries to take into
          ! account changes from add_predictive_mixing
@@ -258,6 +263,8 @@
             call add_overshooting(s, ierr)
             if (failed('add_overshooting')) return
          end if
+         
+         call check('after add_overshooting')
 
          if (dbg) write(*,3) 'call add_RTI_turbulence', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -317,14 +324,11 @@
             if (failed('other_D_mix')) return
          end if
 
-         if (dbg) write(*,3) 'call set_newly_non_conv', &
-            k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
-         call set_newly_non_conv(s, ierr)
-         if (failed('set_newly_non_conv')) return
-
          do k=1,nz
             s% D_mix_non_rotation(k) = s% D_mix(k)
          end do
+         
+         call check('before rotation_flag')
 
          if (s% rotation_flag) then
 
@@ -338,6 +342,8 @@
             if (dbg) write(*,*) 'call update_rotation_mixing_info'
             call update_rotation_mixing_info(s,ierr)
             if (failed('update_rotation_mixing_info')) return
+         
+         call check('after update_rotation_mixing_info')
 
             do k = 2, nz
                if (s% D_mix(k) < 1d-10) s% D_mix(k) = 0d0
@@ -358,49 +364,6 @@
          end if
          
          if (.not. s% conv_vel_flag) then
-         
-            if (s% D_smooth_flag .and. .not. s% doing_finish_load_model) then
-               f = min(s% dt*s% D_smooth_growth_rate, s% D_smooth_replacement_fraction)
-               do k=1,nz
-                  if (is_bad(s% D_smooth(k))) then
-                     write(*,2) 'old s% D_smooth(k)', k, s% D_smooth(k)
-                     stop 'rotation mix'
-                  end if
-                  D_smooth_source = s% D_mix(k)
-                  if (is_bad(D_smooth_source)) then
-                     write(*,2) 'D_smooth_source', k, D_smooth_source
-                     stop 'rotation mix'
-                  end if
-                  s% D_smooth(k) = (1d0 - f)*s% D_smooth(k) + f*D_smooth_source
-                  if (is_bad(s% D_smooth(k))) then
-                     write(*,2) 's% D_smooth(k)', k, s% D_smooth(k)
-                     write(*,2) 'f', k, f
-                     write(*,2) 'D_smooth_source', k, D_smooth_source
-                     stop 'rotation mix'
-                  end if
-                  if (s% D_smooth(k) < 10d0) s% D_smooth(k) = 0d0
-               end do
-               if (s% blend_D_smooth_between_cells_of_same_mixing_type) then
-                  do k=2,nz-1
-                     if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
-                         s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                         s% D_smooth(k) > 0d0) &
-                        s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
-                  end do
-                  do k=nz-1,2,-1
-                     if (s% mixing_type(k-1) == s% mixing_type(k) .and. &
-                         s% mixing_type(k) == s% mixing_type(k+1) .and. &
-                         s% D_smooth(k) > 0d0) &
-                        s% D_smooth(k) = (s% D_smooth(k-1) + s% D_smooth(k) + s% D_smooth(k+1))/3d0
-                  end do
-               end if
-               if (s% set_D_mix_to_D_smooth) then
-                  do k=1,nz
-                     s% D_mix(k) = s% D_smooth(k)
-                  end do
-               end if
-               
-            end if
 
             region_bottom_q = s% D_mix_zero_region_bottom_q
             region_top_q = s% D_mix_zero_region_top_q
@@ -478,7 +441,7 @@
             s% conv_vel(1) = 0d0
          end if
 
-         call check
+         call check('final')
          if (failed('set_mixing_info')) return
 
          if (dbg) write(*,3) 'done mixing', k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -534,19 +497,15 @@
             if (ierr /= 0) return
          end subroutine do_work_arrays
 
-         subroutine check
+         subroutine check(str)
+            character(len=*) :: str
             integer :: k
             include 'formats'
             do k = 1, s% nz
-               !if (s% conv_vel(k) < 0d0 .or. &
-               !      (s% mixing_type(k) == 0 .and. s% conv_vel(k) > 0d0)) then
-               !   write(*,3) 'mixing_type conv_vel', k, s% mixing_type(k), s% conv_vel(k)
-               !   stop 'set mixing info'
-               !end if
                if (is_bad_num(s% D_mix(k))) then
                   ierr = -1
                   if (s% report_ierr) then
-                     write(*,3) 'mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
+                     write(*,3) trim(str) // ' mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
                      if (s% rotation_flag) then
                         if (is_bad_num(s% D_mix_non_rotation(k))) &
                            write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
@@ -1737,6 +1696,9 @@
                write(*,*) 'update_rotation_mixing_info failed in call to set_rotation_mixing_info'
             return
          end if
+         
+         call check('after set_rotation_mixing_info')
+         if (s% D_omega_flag) call check_D_omega('check_D_omega after set_rotation_mixing_info')
 
          ! include rotation part for mixing abundances
          full_on = s% D_mix_rotation_max_logT_full_on
@@ -1765,6 +1727,8 @@
             end if
             s% D_mix(k) = s% D_mix_non_rotation(k) + s% D_mix_rotation(k)
          end do
+         
+         call check('after include rotation part for mixing abundances')
 
          if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
             do k=2,nz
@@ -1893,32 +1857,85 @@
          end if
          
          contains
+
+         subroutine check(str)
+            character(len=*) :: str
+            integer :: k
+            include 'formats'
+            do k = 2, s% nz
+               if (is_bad_num(s% D_mix(k))) then
+                  ierr = -1
+                  if (s% report_ierr) then
+                     write(*,3) trim(str) // ' mixing_type, D_mix', k, s% mixing_type(k), s% D_mix(k)
+                     if (s% rotation_flag) then
+                        if (is_bad_num(s% D_mix_non_rotation(k))) &
+                           write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
+                        if (is_bad_num(s% D_visc(k))) write(*,2) 's% D_visc(k)', k, s% D_visc(k)
+                        if (is_bad_num(s% D_DSI(k))) write(*,2) 's% D_DSI(k)', k, s% D_DSI(k)
+                        if (is_bad_num(s% D_SH(k))) write(*,2) 's% D_SH(k)', k, s% D_SH(k)
+                        if (is_bad_num(s% D_SSI(k))) write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
+                        if (is_bad_num(s% D_ES(k))) write(*,2) 's% D_ES(k)', k, s% D_ES(k)
+                        if (is_bad_num(s% D_GSF(k))) write(*,2) 's% D_GSF(k)', k, s% D_GSF(k)
+                        if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
+                     end if
+                  end if
+                  if (s% stop_for_bad_nums) stop 'set mixing info'
+               end if
+            end do
+         end subroutine check
+
+         subroutine check_D_omega(str)
+            character(len=*) :: str
+            integer :: k
+            include 'formats'
+            do k = 2, s% nz
+               if (is_bad_num(s% D_omega(k))) then
+                  ierr = -1
+                  if (s% report_ierr) then
+                     write(*,3) trim(str) // ' mixing_type, D_omega', k, s% mixing_type(k), s% D_omega(k)
+                     write(*,*) 's% doing_finish_load_model', s% doing_finish_load_model
+                     if (s% rotation_flag) then
+                        if (is_bad_num(s% D_mix_non_rotation(k))) &
+                           write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
+                        if (is_bad_num(s% D_visc(k))) write(*,2) 's% D_visc(k)', k, s% D_visc(k)
+                        if (is_bad_num(s% D_DSI(k))) write(*,2) 's% D_DSI(k)', k, s% D_DSI(k)
+                        if (is_bad_num(s% D_SH(k))) write(*,2) 's% D_SH(k)', k, s% D_SH(k)
+                        if (is_bad_num(s% D_SSI(k))) write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
+                        if (is_bad_num(s% D_ES(k))) write(*,2) 's% D_ES(k)', k, s% D_ES(k)
+                        if (is_bad_num(s% D_GSF(k))) write(*,2) 's% D_GSF(k)', k, s% D_GSF(k)
+                        if (is_bad_num(s% D_ST(k))) write(*,2) 's% D_ST(k)', k, s% D_ST(k)
+                     end if
+                  end if
+                  if (s% stop_for_bad_nums) stop 'set mixing info'
+               end if
+            end do
+         end subroutine check_D_omega
          
          subroutine set_am_nu_rot(ierr)
             use alloc
+            use rotation_mix_info, only: smooth_for_rotation
             integer, intent(out) :: ierr
             integer :: i, k, nz
             real(dp) :: &
                dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
-               d_dt, d_dt_in, d_dt_out, f, am_nu_rot_source
+               d_dt, d_dt_in, d_dt_out, am_nu_rot_source
             include 'formats'
          
             ierr = 0
             nz = s% nz
             dt = s% dt
          
-            if (s% am_nu_rot_flag .and. .not. s% doing_finish_load_model) then
+            if (s% am_nu_rot_flag .and. s% doing_finish_load_model) then
+               do k=1,nz
+                  s% am_nu_rot(k) = 0d0
+               end do
+            else if (s% am_nu_rot_flag) then
                      
-               f = min(dt*s% nu_omega_growth_rate, s% nu_omega_max_replacement_fraction)
                do k=1,nz
                   if (s% q(k) <= s% max_q_for_nu_omega_zero_in_convection_region .and. &
                       s% mixing_type(k) == convective_mixing) then
                      s% am_nu_rot(k) = 0d0
                      cycle
-                  end if
-                  if (is_bad(s% am_nu_rot(k))) then
-                     write(*,2) 'old s% am_nu_rot(k)', k, s% am_nu_rot(k)
-                     stop 'set am_nu_rot'
                   end if
                   am_nu_rot_source = s% am_nu_factor * ( &
                      am_nu_visc_factor*s% D_visc(k) + &
@@ -1932,104 +1949,112 @@
                      write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
                      stop 'set am_nu_rot'
                   end if
-                  s% am_nu_rot(k) = (1d0 - f)*s% am_nu_rot(k) + f*am_nu_rot_source
+                  s% am_nu_rot(k) = am_nu_rot_source
                   if (is_bad(s% am_nu_rot(k))) then
                      write(*,2) 's% am_nu_rot(k)', k, s% am_nu_rot(k)
-                     write(*,2) 'f', k, f
                      write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
                      stop 'set am_nu_rot'
                   end if
                end do
-            
-               if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
+               
+               if (s% smooth_am_nu_rot > 0 .or. &
+                    (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0)) then
                   
                   call do_alloc(ierr)
                   if (ierr /= 0) return
+
+                  if (s% smooth_am_nu_rot > 0) then
+                     call smooth_for_rotation(s, s% am_nu_rot, s% smooth_am_nu_rot, sig)
+                  end if
             
-                  rate = min(s% nu_omega_mixing_rate, 1d0/dt)
-                  do k=2,nz-1
-                     if (s% am_nu_rot(k) == 0 .or. s% am_nu_rot(k+1) == 0) then
-                        sig(k) = 0
-                     else if ((.not. s% nu_omega_mixing_across_convection_boundary) .and. &
-                        s% mixing_type(k) /= convective_mixing .and. &
-                            (s% mixing_type(k-1) == convective_mixing .or. &
-                             s% mixing_type(k+1) == convective_mixing)) then
-                         sig(k) = 0
-                     else
-                        sig(k) = rate*dt
-                     end if       
-                  end do
-                  sig(1) = 0
-                  sig(nz) = 0
+                  if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
             
-                  do k=1,nz
-                     if (k < nz) then
-                        d_dt_in = sig(k)*(s% am_nu_rot(k+1) - s% am_nu_rot(k))
-                     else
-                        d_dt_in = -sig(k)*s% am_nu_rot(k)
-                     end if
-                     if (k > 1) then
-                        d_dt_out = sig(k-1)*(s% am_nu_rot(k) - s% am_nu_rot(k-1))
-                        d_ddt_dm1 = sig(k-1)
-                        d_ddt_d00 = -(sig(k-1) + sig(k))
-                     else
-                        d_dt_out = 0
-                        d_ddt_dm1 = 0
-                        d_ddt_d00 = -sig(k)
-                     end if
-                     d_dt = d_dt_in - d_dt_out
-                     d_ddt_dp1 = sig(k)
-                     rhs(k) = d_dt
-                     d(k) = 1d0 - d_ddt_d00
-                     if (k < nz) then
-                        du(k) = -d_ddt_dp1
-                     else
-                        du(k) = 0
-                     end if
-                     if (k > 1) dl(k-1) = -d_ddt_dm1               
-                  end do
-                  dl(nz) = 0
+                     rate = min(s% nu_omega_mixing_rate, 1d0/dt)
+                     do k=2,nz-1
+                        if (s% am_nu_rot(k) == 0 .or. s% am_nu_rot(k+1) == 0) then
+                           sig(k) = 0
+                        else if ((.not. s% nu_omega_mixing_across_convection_boundary) .and. &
+                           s% mixing_type(k) /= convective_mixing .and. &
+                               (s% mixing_type(k-1) == convective_mixing .or. &
+                                s% mixing_type(k+1) == convective_mixing)) then
+                            sig(k) = 0
+                        else
+                           sig(k) = rate*dt
+                        end if       
+                     end do
+                     sig(1) = 0
+                     sig(nz) = 0
             
-                  ! solve tridiagonal
-                  bp(1) = d(1)
-                  vp(1) = rhs(1)
-                  do i = 2,nz
-                     if (bp(i-1) == 0) then
-                        write(*,*) 'failed in set_am_nu_rot', s% model_number
-                        stop 'mix_am_nu_rot'
-                        ierr = -1
-                        return
-                     end if
-                     m = dl(i-1)/bp(i-1)
-                     bp(i) = d(i) - m*du(i-1)
-                     vp(i) = rhs(i) - m*vp(i-1)
-                  end do
-                  xp(nz) = vp(nz)/bp(nz)
-                  x(nz) = xp(nz)
-                  do i = nz-1, 1, -1
-                     xp(i) = (vp(i) - du(i)*xp(i+1))/bp(i)
-                     x(i) = xp(i)
-                  end do
+                     do k=1,nz
+                        if (k < nz) then
+                           d_dt_in = sig(k)*(s% am_nu_rot(k+1) - s% am_nu_rot(k))
+                        else
+                           d_dt_in = -sig(k)*s% am_nu_rot(k)
+                        end if
+                        if (k > 1) then
+                           d_dt_out = sig(k-1)*(s% am_nu_rot(k) - s% am_nu_rot(k-1))
+                           d_ddt_dm1 = sig(k-1)
+                           d_ddt_d00 = -(sig(k-1) + sig(k))
+                        else
+                           d_dt_out = 0
+                           d_ddt_dm1 = 0
+                           d_ddt_d00 = -sig(k)
+                        end if
+                        d_dt = d_dt_in - d_dt_out
+                        d_ddt_dp1 = sig(k)
+                        rhs(k) = d_dt
+                        d(k) = 1d0 - d_ddt_d00
+                        if (k < nz) then
+                           du(k) = -d_ddt_dp1
+                        else
+                           du(k) = 0
+                        end if
+                        if (k > 1) dl(k-1) = -d_ddt_dm1               
+                     end do
+                     dl(nz) = 0
             
-                  do k=2,nz
-                     if (is_bad(x(k))) then
-                        return
-                        write(*,3) 's% am_nu_rot(k) prev, x', k, &
-                           s% model_number, s% am_nu_rot(k), x(k), bp(i)
-                        stop 'mix_am_nu_rot'
-                     end if
-                  end do
+                     ! solve tridiagonal
+                     bp(1) = d(1)
+                     vp(1) = rhs(1)
+                     do i = 2,nz
+                        if (bp(i-1) == 0) then
+                           write(*,*) 'failed in set_am_nu_rot', s% model_number
+                           stop 'mix_am_nu_rot'
+                           ierr = -1
+                           return
+                        end if
+                        m = dl(i-1)/bp(i-1)
+                        bp(i) = d(i) - m*du(i-1)
+                        vp(i) = rhs(i) - m*vp(i-1)
+                     end do
+                     xp(nz) = vp(nz)/bp(nz)
+                     x(nz) = xp(nz)
+                     do i = nz-1, 1, -1
+                        xp(i) = (vp(i) - du(i)*xp(i+1))/bp(i)
+                        x(i) = xp(i)
+                     end do
             
-                  ! update am_nu_rot
-                  do k=2,nz
-                     s% am_nu_rot(k) = s% am_nu_rot(k) + x(k)
-                     if (is_bad(s% am_nu_rot(k))) then
-                        write(*,3) 's% am_nu_rot(k)', k, s% model_number, s% am_nu_rot(k)
-                        stop 'mix_am_nu_rot'
-                     end if
-                     if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
-                  end do
-                  s% am_nu_rot(1) = 0d0
+                     do k=2,nz
+                        if (is_bad(x(k))) then
+                           return
+                           write(*,3) 's% am_nu_rot(k) prev, x', k, &
+                              s% model_number, s% am_nu_rot(k), x(k), bp(i)
+                           stop 'mix_am_nu_rot'
+                        end if
+                     end do
+            
+                     ! update am_nu_rot
+                     do k=2,nz
+                        s% am_nu_rot(k) = s% am_nu_rot(k) + x(k)
+                        if (is_bad(s% am_nu_rot(k))) then
+                           write(*,3) 's% am_nu_rot(k)', k, s% model_number, s% am_nu_rot(k)
+                           stop 'mix_am_nu_rot'
+                        end if
+                        if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
+                     end do
+                     s% am_nu_rot(1) = 0d0
+                  
+                  end if
                   
                   call dealloc
 
@@ -2039,6 +2064,10 @@
          
             if (s% am_nu_rot_flag) then ! check
                do k=1,nz
+                  if (is_bad(s% am_nu_rot(k))) then
+                     write(*,2) 'before return s% am_nu_rot(k)', k, s% am_nu_rot(k)
+                     stop 'set_am_nu_rot'
+                  end if
                   if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
                end do
             end if         

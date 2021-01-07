@@ -1536,11 +1536,6 @@
             case(h_log_LHe)
                val = safe_log10(s% power_he_burn)
                
-            case(h_power_c_burn)
-               val = s% power_c_burn
-            case(h_log_LC)
-               val = safe_log10(s% power_c_burn)
-               
             case(h_power_photo)
                val = s% power_photo
             case(h_Lnuc_photo)
@@ -1887,10 +1882,6 @@
                   val = 0d0 ! s% r(1)*s% dlnR_dt(1)
                end if
 
-            case(h_surface_accel_div_grav)
-               if (s% dt > 0 .and. s% generations > 1) then
-                  val = (v_surf - s% v_surf_old)/(s% dt*s% grav(1))
-               end if
             case(h_log_L_div_Ledd)
                Ledd = eval_Ledd(s, ierr)
                if (ierr /= 0 .or. Ledd == 0d0) then
@@ -2473,90 +2464,6 @@
                val = s% max_T_entropy
             case(h_max_T_eps_nuc)
                val = s% max_T_eps_nuc
-
-            case(h_max_eps_h)
-               val = s% max_eps_h
-            case(h_max_eps_h_lgT)
-               val = s% max_eps_h_lgT
-            case(h_max_eps_h_lgRho)
-               val = s% max_eps_h_lgRho
-            case(h_max_eps_h_m)
-               val = s% max_eps_h_m/Msun
-            case(h_max_eps_h_xm)
-               val = (s% mstar - s% max_eps_h_m)/Msun
-            case(h_max_eps_h_lgR)
-               val = s% max_eps_h_lgR
-            case(h_max_eps_h_lgP)
-               val = s% max_eps_h_lgP
-            case(h_max_eps_h_opacity)
-               val = s% max_eps_h_opacity
-
-            case(h_max_eps_he)
-               val = s% max_eps_he
-            case(h_max_eps_he_lgT)
-               val = s% max_eps_he_lgT
-            case(h_max_eps_he_lgRho)
-               val = s% max_eps_he_lgRho
-            case(h_max_eps_he_m)
-               val = s% max_eps_he_m/Msun
-            case(h_max_eps_he_xm)
-               val = (s% mstar - s% max_eps_he_m)/Msun
-            case(h_max_eps_he_lgR)
-               val = s% max_eps_he_lgR
-            case(h_max_eps_he_lgP)
-               val = s% max_eps_he_lgP
-            case(h_max_eps_he_opacity)
-               val = s% max_eps_he_opacity
-
-            case(h_max_eps_z)
-               val = s% max_eps_z
-            case(h_max_eps_z_lgT)
-               val = s% max_eps_z_lgT
-            case(h_max_eps_z_lgRho)
-               val = s% max_eps_z_lgRho
-            case(h_max_eps_z_m)
-               val = s% max_eps_z_m/Msun
-            case(h_max_eps_z_xm)
-               val = (s% mstar - s% max_eps_z_m)/Msun
-            case(h_max_eps_z_lgR)
-               val = s% max_eps_z_lgR
-            case(h_max_eps_z_lgP)
-               val = s% max_eps_z_lgP
-            case(h_max_eps_z_opacity)
-               val = s% max_eps_z_opacity
-
-            case(h_max_eps_nuc)
-               val = s% max_eps_nuc
-            case(h_max_eps_nuc_lgT)
-               val = s% max_eps_nuc_lgT
-            case(h_max_eps_nuc_lgRho)
-               val = s% max_eps_nuc_lgRho
-            case(h_max_eps_nuc_m)
-               val = s% max_eps_nuc_m/Msun
-            case(h_max_eps_nuc_xm)
-               val = (s% mstar - s% max_eps_nuc_m)/Msun
-            case(h_max_eps_nuc_lgR)
-               val = s% max_eps_nuc_lgR
-            case(h_max_eps_nuc_lgP)
-               val = s% max_eps_nuc_lgP
-            case(h_max_eps_nuc_opacity)
-               val = s% max_eps_nuc_opacity
-            case(h_max_eps_nuc_cp)
-               val = s% max_eps_nuc_cp
-            case(h_max_eps_nuc_t_heat)
-               if (s% max_eps_nuc >= 0) then
-                  val = s% max_eps_nuc_cp* &
-                        exp10(s% max_eps_nuc_lgT)/s% max_eps_nuc
-               end if
-
-            case(h_max_eps_nuc_csound)
-               val = s% csound(s% max_eps_nuc_k)
-            case(h_max_eps_nuc_pi_r_div_cs)
-               val = pi*s% r(s% max_eps_nuc_k)/s% csound(s% max_eps_nuc_k)
-            case(h_max_eps_nuc_H)
-               val = s% scale_height(s% max_eps_nuc_k)
-            case(h_max_eps_nuc_H_div_cs)
-               val = s% scale_height(s% max_eps_nuc_k)/s% csound(s% max_eps_nuc_k)
 
             case(h_surface_optical_depth)
                val = s% tau_base*s% tau_factor

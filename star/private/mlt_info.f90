@@ -133,11 +133,11 @@
          real(dp) :: m, mstar, L, r, dlnm_dlnq, v0, thc, asc, Q_face, &
             a, b, Pgas_div_P_limit, da_dlnd, da_dlnT, db_dlnd, db_dlnT, &
             max_q_for_Pgas_div_P_limit, min_q_for_Pgas_div_P_limit, &
-            mlt_basics(num_mlt_results), prev_conv_vel, max_conv_vel, dt, &
+            mlt_basics(num_mlt_results), max_conv_vel, dt, &
             alfa, beta, &
             T_face, rho_face, P_face, Cv_face, gamma1_face, &
             chiRho_face, chiT_face, Cp_face, opacity_face, grada_face, v, &
-            cv_old, gradr_factor, d_gradr_factor_dw, f, xh_face, tau_face, &
+            gradr_factor, d_gradr_factor_dw, f, xh_face, tau_face, &
             d_grada_face_dlnd00, d_grada_face_dlnT00, &
             d_grada_face_dlndm1, d_grada_face_dlnTm1, &
             gradL_composition_term, dlnT, dlnP, &
@@ -218,13 +218,19 @@
 
          if (is_bad_num(gradr_factor)) then
             ierr = -1
+!$omp critical (gradr_factor_crit1)
             if (s% report_ierr) then
-               write(*,2) 'do1_mlt_eval gradr_factor', k, gradr_factor, s% ft_rot(k), s% fp_rot(k)
+               write(*,2) 'do1_mlt_eval s% gradr_factor', k, s% gradr_factor(k)
+               if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
+                  write(*,2) 's% ft_rot(k)', k, s% ft_rot(k)
+                  write(*,2) 's% fp_rot(k)', k, s% fp_rot(k)
+               end if
             end if
             if (s% stop_for_bad_nums) then
-               write(*,2) 'gradr_factor', k, gradr_factor, s% ft_rot(k), s% fp_rot(k)
+               write(*,2) 'gradr_factor', k, gradr_factor
                stop 'do1_mlt_eval'
             end if
+!$omp end critical (gradr_factor_crit1)
             return
          end if
 
@@ -454,29 +460,11 @@
          thc = s% thermohaline_coeff
          asc = s% alpha_semiconvection
          if (s% center_h1 > s% semiconvection_upper_limit_center_h1) asc = 0
-
-         cv_old = -1
-         if (s% have_previous_conv_vel .and. .not. s% conv_vel_flag) then
-            if (s% generations >= 2) then
-               if (.not. is_bad(s% conv_vel_old(k))) &
-                  cv_old = s% conv_vel_old(k)
-            else if (s% use_previous_conv_vel_from_file) then
-               if (.not. is_bad(s% prev_conv_vel_from_file(k))) &
-                  cv_old = s% prev_conv_vel_from_file(k)
-            end if
-         end if
          
-         prev_conv_vel = -1
          dt = -1
 
          max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
-         if (prev_conv_vel >= 0) then
-            if (must_limit_conv_vel(s,k)) then
-               max_conv_vel = prev_conv_vel
-            end if
-         else if ( &
-               s% dt < s% min_dt_for_increases_in_convection_velocity) then
-            prev_conv_vel = 0d0
+         if (s% dt < s% min_dt_for_increases_in_convection_velocity) then
             max_conv_vel = 1d-2*s% dt*s% cgrav(k)
          end if
 
@@ -565,7 +553,7 @@
             mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
             MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau_face, just_gradr, &
+            max_conv_vel, dt, tau_face, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) then
@@ -588,24 +576,6 @@
          s% scale_height(k) = mlt_basics(mlt_scale_height)
          s% gradL(k) = mlt_basics(mlt_gradL)
          s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*r*r*rho_face)
-
-         if ((s% scale_height(k) <= 0d0 .and. MLT_option /= 'none') &
-                .or. is_bad_num(s% scale_height(k))) then
-            ierr = -1
-            if (.not. s% report_ierr) return
-!$OMP critical (mlt_info_crit2)
-            write(*,2) 's% scale_height(k)', k, s% scale_height(k)
-            call show_stuff(.true.)
-            write(*,*)
-            write(*,2) 's% scale_height(k)', k, s% scale_height(k)
-            write(*,2) 's% grada(k)', k, s% grada(k)
-            write(*,2) 's% gradr(k)', k, s% gradr(k)
-            write(*,2) 's% gradT(k)', k, s% gradT(k)
-            write(*,2) 's% gradL(k)', k, s% gradL(k)
-            write(*,2) 'max_conv_vel', k, max_conv_vel
-            if (s% stop_for_bad_nums) stop 'mlt info'
-!$OMP end critical (mlt_info_crit2)
-         end if
 
          call store_gradr_partials
 
@@ -749,7 +719,7 @@
                mixing_length_alpha, s% alt_scale_height_flag, s% remove_small_D_limit, &
                MLT_option, s% Henyey_MLT_y_param, s% Henyey_MLT_nu_param, &
                normal_mlt_gradT_factor, &
-               prev_conv_vel, max_conv_vel, dt, tau_face, just_get_gradr, &
+               max_conv_vel, dt, tau_face, just_get_gradr, &
                mixing_type, mlt_basics, mlt_partials1, ierr)
             if (ierr /= 0) return
             s% gradr(k) = mlt_basics(mlt_gradr)
@@ -835,7 +805,6 @@
             write(*,*)
             write(*,'(a)') "MLT_option = '" // trim(s% MLT_option) // "'"
             write(*,*)
-            write(*,1) 'prev_conv_vel =', prev_conv_vel
             write(*,1) 'max_conv_vel =', min(1d99,max_conv_vel)
             write(*,*)
             write(*,1) 'dt =', dt
@@ -1335,6 +1304,7 @@
             if (dbg) write(*,1) 'okay_to_reduce_gradT_excess'
             return
          end if
+
          nz = s% nz
 
          h1 = s% net_iso(ih1)
@@ -1355,114 +1325,7 @@
             end if
          end if
 
-         beta = 1d0 ! beta = min over k of Pgas(k)/P(k)
-         k_beta = 0
-         do k=1,nz
-            tmp = s% Pgas(k)/s% P(k)
-            if (tmp < beta) then
-               k_beta = k
-               beta = tmp
-            end if
-         end do
-
-         beta = beta*(1d0 + s% xa(1,nz))
-
-         s% gradT_excess_min_beta = beta
-         if (dbg) write(*,2) 'gradT_excess_min_beta', k_beta, beta
-
-         lambda = 0d0 ! lambda = max over k of Lrad(k)/Ledd(k)
-         do k=2,k_beta
-            tmp = get_Lrad_div_Ledd(s,k)
-            if (tmp > lambda) then
-               k_lambda = k
-               lambda = tmp
-            end if
-         end do
-         lambda = min(1d0,lambda)
-         s% gradT_excess_max_lambda = lambda
-         if (dbg) write(*,2) 'gradT_excess_max_lambda', k_lambda, lambda
-
-         lambda1 = s% gradT_excess_lambda1
-         beta1 = s% gradT_excess_beta1
-         lambda2 = s% gradT_excess_lambda2
-         beta2 = s% gradT_excess_beta2
-         dlambda = s% gradT_excess_dlambda
-         dbeta = s% gradT_excess_dbeta
-
-         ! alpha is fraction of full boost to apply
-         ! depends on location in (beta,lambda) plane
-
-         if (lambda1 < 0) then
-            alpha = 1
-         else if (lambda >= lambda1) then
-            if (beta <= beta1) then
-               alpha = 1
-            else if (beta < beta1 + dbeta) then
-               alpha = (beta1 + dbeta - beta)/dbeta
-            else ! beta >= beta1 + dbeta
-               alpha = 0
-            end if
-         else if (lambda >= lambda2) then
-            beta_limit = beta2 + &
-               (lambda - lambda2)*(beta1 - beta2)/(lambda1 - lambda2)
-            if (beta <= beta_limit) then
-               alpha = 1
-            else if (beta < beta_limit + dbeta) then
-               alpha = (beta_limit + dbeta - beta)/dbeta
-            else
-               alpha = 0
-            end if
-         else if (lambda > lambda2 - dlambda) then
-            if (beta <= beta2) then
-               alpha = 1
-            else if (beta < beta2 + dbeta) then
-               alpha = (lambda - (lambda2 - dlambda))/dlambda
-            else ! beta >= beta2 + dbeta
-               alpha = 0
-            end if
-         else ! lambda <= lambda2 - dlambda
-            alpha = 0
-         end if
-
-         if (dbg) then
-            write(*,1) 'lambda1', lambda1
-            write(*,1) 'lambda2', lambda2
-            write(*,1) 'lambda', lambda
-            write(*,*)
-            write(*,1) 'beta1', beta1
-            write(*,1) 'beta2', beta2
-            write(*,1) 'beta', beta
-            write(*,*)
-            write(*,1) 'alpha', alpha
-            write(*,*)
-         end if
-
-         if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
-            s% gradT_excess_alpha = &
-               (1d0 - s% gradT_excess_age_fraction)*alpha + &
-               s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
-            if (s% gradT_excess_max_change > 0d0) then
-               if (s% gradT_excess_alpha > s% gradT_excess_alpha_old) then
-                  s% gradT_excess_alpha = min(s% gradT_excess_alpha, s% gradT_excess_alpha_old + &
-                     s% gradT_excess_max_change)
-               else
-                  s% gradT_excess_alpha = max(s% gradT_excess_alpha, s% gradT_excess_alpha_old - &
-                     s% gradT_excess_max_change)
-               end if
-            end if
-         else
-            s% gradT_excess_alpha = alpha
-         end if
-
-         if (s% gradT_excess_alpha < 1d-4) s% gradT_excess_alpha = 0d0
-         if (s% gradT_excess_alpha > 0.9999d0) s% gradT_excess_alpha = 1d0
-
-         if (dbg) then
-            write(*,1) 'gradT excess new', alpha
-            write(*,1) 's% gradT_excess_alpha_old', s% gradT_excess_alpha_old
-            write(*,1) 's% gradT_excess_alpha', s% gradT_excess_alpha
-            write(*,*)
-         end if
+         s% gradT_excess_alpha = 1d0
 
       end subroutine set_gradT_excess_alpha
 
@@ -1599,7 +1462,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            max_conv_vel, dt, tau, just_gradr, &
             mixing_type, mlt_basics, mlt_partials1, ierr)
 
          type (star_info), pointer :: s
@@ -1626,7 +1489,7 @@
             gradr_factor, d_gradr_factor_dw, gradL_composition_term, &
             alpha_semiconvection, thermohaline_coeff, mixing_length_alpha, &
             Henyey_y_param, Henyey_nu_param, &
-            prev_conv_vel, max_conv_vel, dt, tau, remove_small_D_limit, &
+            max_conv_vel, dt, tau, remove_small_D_limit, &
             normal_mlt_gradT_factor
          logical, intent(in) :: alt_scale_height
          character (len=*), intent(in) :: thermohaline_option, MLT_option, semiconvection_option
@@ -1667,7 +1530,7 @@
                mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
                MLT_option, Henyey_y_param, Henyey_nu_param, &
                normal_mlt_gradT_factor, &
-               prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+               max_conv_vel, dt, tau, just_gradr, &
                mixing_type, mlt_basics, mlt_partials1, ierr)
             return
          end if
@@ -1704,7 +1567,7 @@
             mixing_length_alpha, alt_scale_height, remove_small_D_limit, &
             MLT_option, Henyey_y_param, Henyey_nu_param, &
             normal_mlt_gradT_factor, &
-            prev_conv_vel, max_conv_vel, dt, tau, just_gradr, &
+            max_conv_vel, dt, tau, just_gradr, &
             mixing_type, &
             mlt_basics(mlt_gradT), mlt_partials(:,mlt_gradT), &
             mlt_basics(mlt_gradr), mlt_partials(:,mlt_gradr), &

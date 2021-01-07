@@ -32,7 +32,7 @@
       xa_central_lower_limit(1) = 1d-3
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 6000
+      max_model_number = 10000
       !max_number_retries = 37
 
 ! wind
@@ -47,18 +47,15 @@
       thermohaline_coeff = 0
 
 ! mixing
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'burn_He'
-      overshoot_zone_loc(1) = 'shell'
-      overshoot_bdy_loc(1) = 'bottom'
-      overshoot_f(1) = 0.01
-      overshoot_f0(1) = 0.005
 
 ! timesteps
+      !max_years_for_timestep = 0.5  ! TESTING PULSES
 
 ! mesh
 
 ! solver
+      drag_coefficient = 999999d0 ! drive v to 0 in H envelope after end core He burn
+      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -73,11 +70,6 @@
       x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
-      terminal_show_age_units = 'years'
-      terminal_show_timestep_units = 'days'
-      terminal_show_log_dt = .false.
-      terminal_show_log_age = .false.
-
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -143,15 +135,14 @@
 
 
 &pgstar
-!pause = .true.
-Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 2.5 ! 
-Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
+Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
+Profile_Panels3_xmax = -101d0 ! 
+Profile_Panels3_yaxis_name(4) = 'gamma1'
 
-TRho_Profile_xmin = 3.0
-TRho_Profile_xmax = 6.0
+TRho_Profile_xmin = 3.5
+TRho_Profile_xmax = 7.5
 TRho_Profile_ymin = 8.5
-TRho_Profile_ymax = 9.5
+TRho_Profile_ymax = 9.2
 
 / ! end of pgstar namelist

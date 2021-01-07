@@ -55,6 +55,10 @@
          pgstar_flag, &
          save_pgstar_files_when_terminate, &
          save_photo_when_terminate, &
+         load_saved_photo, &
+         saved_photo_name, &
+         save_photo_filename, &
+         save_photo_number, &
          write_profile_when_terminate, &
          show_retry_counts_when_terminate, &
          show_timestep_limit_counts_when_terminate, &
@@ -319,10 +323,6 @@
          new_am_nu_rot_flag, &
          
          use_D_omega_for_am_nu_rot, &
-         
-         change_D_smooth_flag, &
-         change_initial_D_smooth_flag, &
-         new_D_smooth_flag, &
          
          change_u_flag, &
          change_initial_u_flag, &
@@ -693,6 +693,10 @@
          s% job% pgstar_flag = pgstar_flag
          s% job% save_pgstar_files_when_terminate = save_pgstar_files_when_terminate
          s% job% save_photo_when_terminate = save_photo_when_terminate
+         s% job% load_saved_photo = load_saved_photo
+         s% job% saved_photo_name = saved_photo_name
+         s% job% save_photo_filename = save_photo_filename
+         s% job% save_photo_number = save_photo_number
          s% job% write_profile_when_terminate = write_profile_when_terminate
          s% job% show_retry_counts_when_terminate = show_retry_counts_when_terminate
          s% job% show_timestep_limit_counts_when_terminate = show_timestep_limit_counts_when_terminate
@@ -956,10 +960,6 @@
          s% job% change_initial_am_nu_rot_flag = change_initial_am_nu_rot_flag
          s% job% new_am_nu_rot_flag = new_am_nu_rot_flag
          s% job% use_D_omega_for_am_nu_rot = use_D_omega_for_am_nu_rot
-
-         s% job% change_D_smooth_flag = change_D_smooth_flag
-         s% job% change_initial_D_smooth_flag = change_initial_D_smooth_flag
-         s% job% new_D_smooth_flag = new_D_smooth_flag
 
          s% job% change_u_flag = change_u_flag
          s% job% change_initial_u_flag = change_initial_u_flag
@@ -1258,6 +1258,10 @@
          pgstar_flag = s% job% pgstar_flag
          save_pgstar_files_when_terminate = s% job% save_pgstar_files_when_terminate
          save_photo_when_terminate = s% job% save_photo_when_terminate
+         load_saved_photo = s% job% load_saved_photo
+         saved_photo_name = s% job% saved_photo_name
+         save_photo_filename = s% job% save_photo_filename
+         save_photo_number = s% job% save_photo_number
          write_profile_when_terminate = s% job% write_profile_when_terminate
          show_retry_counts_when_terminate = s% job% show_retry_counts_when_terminate
          show_timestep_limit_counts_when_terminate = s% job% show_timestep_limit_counts_when_terminate
@@ -1521,10 +1525,6 @@
          change_initial_am_nu_rot_flag = s% job% change_initial_am_nu_rot_flag
          new_am_nu_rot_flag = s% job% new_am_nu_rot_flag
          use_D_omega_for_am_nu_rot = s% job% use_D_omega_for_am_nu_rot
-
-         change_D_smooth_flag = s% job% change_D_smooth_flag
-         change_initial_D_smooth_flag = s% job% change_initial_D_smooth_flag
-         new_D_smooth_flag = s% job% new_D_smooth_flag
 
          change_u_flag = s% job% change_u_flag
          change_initial_u_flag = s% job% change_initial_u_flag

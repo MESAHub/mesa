@@ -32,7 +32,6 @@
       include "test_suite_extras_def.inc"
 
 
-      include 'convective_bdy/convective_bdy_def.inc'
       include 'overshoot_dbl_exp/overshoot_dbl_exp_def.inc'
       include 'timestep_limit/timestep_limit_def.inc'
       include 'other_winds/other_winds_def.inc'
@@ -53,8 +52,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         include 'convective_bdy/convective_bdy_extras_controls.inc'
-         if (ierr /= 0) return
          include 'overshoot_dbl_exp/overshoot_dbl_exp_extras_controls.inc'
          if (ierr /= 0) return
          include 'timestep_limit/timestep_limit_extras_controls.inc'
@@ -88,7 +85,6 @@
       end subroutine extras_controls
 
 
-      include 'convective_bdy/convective_bdy.inc'
       include 'overshoot_dbl_exp/overshoot_dbl_exp.inc'
       include 'timestep_limit/timestep_limit.inc'
       include 'other_winds/other_winds.inc'

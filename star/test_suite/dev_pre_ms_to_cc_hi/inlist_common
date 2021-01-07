@@ -16,7 +16,7 @@
       new_v_flag = .true.
 
 !** for high mass
-      relax_to_this_tau_factor = 900
+      relax_to_this_tau_factor = 1.5d6
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
 !** for high mass
@@ -88,32 +88,14 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-      gradT_excess_age_fraction = 0.9d0
-      gradT_excess_lambda1 = 1.0
-      gradT_excess_beta1 = 0.35
-      gradT_excess_lambda2 = 0.5
-      gradT_excess_beta2 = 0.25
-      gradT_excess_dlambda = 0.1
-      gradT_excess_dbeta = 0.1
-
-      ! max MLT++
-      ! these settings kill off all superadiabaticity.  also kill off this run!
-      !gradT_excess_lambda1 = 0.7d0
-      !gradT_excess_age_fraction = 0.2d0
-      !gradT_excess_f1 = 1d-12
-      !gradT_excess_f2 = 1d-11
-
+  
 ! mixing
       !** for high mass - no overshoot
-      
-      D_omega_max_replacement_fraction = 0.5d0
-      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
-      max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 ! timesteps
-      varcontrol_target   = 1d-3
+      varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true
       limit_for_rel_error_in_energy_conservation = 1d-7

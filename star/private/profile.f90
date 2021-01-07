@@ -954,11 +954,6 @@
          end if
 
          s% profile_age = s% star_age
-         s% prv_log_luminosity = s% log_surface_luminosity
-         s% prv_log_surface_temp = s% log_surface_temperature
-         s% prv_log_center_temp = s% log_center_temperature
-         s% prv_log_center_density = s% log_center_density
-         s% next_cntr_rho = s% next_cntr_rho + del_cntr_rho
 
          call dealloc
 

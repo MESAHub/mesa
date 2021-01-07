@@ -1,7 +1,5 @@
 
 &controls
-      
-      !gradT_excess_lambda1 = -1 ! force MLT++
 
       use_other_alpha_mlt = .true.
       x_ctrl(21) = 1.5 ! alpha for H envelope

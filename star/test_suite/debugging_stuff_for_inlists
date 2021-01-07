@@ -41,6 +41,7 @@
 
       !report_why_dt_limits = .true.
       !report_all_dt_limits = .true.
+      !report_solver_dt_info = .true.
       
       !show_mesh_changes = .true.
       !mesh_dump_call_number = 5189

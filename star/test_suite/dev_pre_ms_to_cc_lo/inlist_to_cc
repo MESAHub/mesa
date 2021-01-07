@@ -28,11 +28,11 @@
 
 &controls
 
-      fe_core_infall_limit = 20d5
+      fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
       max_model_number = 7000
-      !max_number_retries = 37
+      !max_number_retries = 51 ! 49
 
 ! wind
 
@@ -48,12 +48,15 @@
 ! mixing
 
 ! timesteps
+      delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
+      
+      ! tighter limits for Si_cntr
+      delta_XSi_cntr_limit = 0.002d0
+      delta_XSi_cntr_hard_limit = 0.01d0
 
 ! mesh
 
 ! solver
-      drag_coefficient = 99 ! drive v to 0 in H envelope after end core He burn
-      turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.

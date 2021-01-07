@@ -1,8 +1,8 @@
 &star_job
 
-! begin with saved model from end of core He burning
+! begin with saved model
       load_saved_model = .true.
-      saved_model_name = '2M_3DUP.mod'
+      saved_model_name = 'lgL_3.79.mod'
 
 ! save a model and profile at the end of the run
       save_model_when_terminate = .true.

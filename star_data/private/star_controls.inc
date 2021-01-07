@@ -117,12 +117,12 @@
          real(dp) :: power_nuc_burn_upper_limit
          real(dp) :: power_h_burn_upper_limit
          real(dp) :: power_he_burn_upper_limit
-         real(dp) :: power_c_burn_upper_limit
+         real(dp) :: power_z_burn_upper_limit
 
          real(dp) :: power_nuc_burn_lower_limit
          real(dp) :: power_h_burn_lower_limit
          real(dp) :: power_he_burn_lower_limit
-         real(dp) :: power_c_burn_lower_limit
+         real(dp) :: power_z_burn_lower_limit
 
          integer :: max_number_retries, relax_max_number_retries
          real(dp) :: max_abs_rel_run_E_err
@@ -140,6 +140,7 @@
             stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
             stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS
          real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q
+         real(dp) :: gamma1_limit, gamma1_limit_max_q
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
          real(dp) :: delta_Pg_lower_limit, delta_Pg_upper_limit
@@ -262,14 +263,6 @@
          real(dp) :: &
             gradT_excess_f1, &
             gradT_excess_f2, &
-            gradT_excess_age_fraction, &
-            gradT_excess_max_change, &
-            gradT_excess_lambda1, &
-            gradT_excess_beta1, &
-            gradT_excess_lambda2, &
-            gradT_excess_beta2, &
-            gradT_excess_dlambda, &
-            gradT_excess_dbeta, &
             gradT_excess_max_center_h1, &
             gradT_excess_min_center_he4, &
             gradT_excess_max_logT, &
@@ -998,15 +991,12 @@
             D_ES_factor, D_GSF_factor, D_ST_factor
 
          integer :: smooth_D_DSI, smooth_D_SH, smooth_D_SSI, &
-            smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST
+            smooth_D_ES, smooth_D_GSF, smooth_D_ST, smooth_nu_ST, smooth_D_omega, smooth_am_nu_rot
 
-         real(dp) :: angsmt_D_DSI, angsmt_D_SH, angsmt_D_SSI, &
-            angsmt_D_ES, angsmt_D_GSF, angsmt_D_ST, angsmt_nu_ST
-
-         real(dp) :: angsml, adjust_J_fraction, min_q_for_adjust_J_lost, &
+         real(dp) :: adjust_J_fraction, min_q_for_adjust_J_lost, &
             min_J_div_delta_J
          logical :: simple_i_rot_flag, do_adjust_J_lost, &
-            premix_omega, am_time_average, recalc_mixing_info_each_substep
+            premix_omega, recalc_mixing_info_each_substep
          real(dp) :: angular_momentum_error_warn, angular_momentum_error_retry
          integer :: max_mdot_redo_cnt
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &

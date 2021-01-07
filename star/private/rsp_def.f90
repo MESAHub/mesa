@@ -520,7 +520,7 @@
       
       
       subroutine set_star_vars(s, ierr)
-         use star_utils, only: set_qs, set_m_and_dm, set_dm_bar
+         use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: sum_dm
@@ -540,7 +540,14 @@
             write(*,2) 's% nz', s% nz
             stop 'bad nz'
          end if
-         call set_qs(s% nz, s% q, s% dq, ierr)
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, s% nz, s% dq, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in rsp_def set_star_vars'
+               return
+            end if
+         end if
+         call set_qs(s, s% nz, s% q, s% dq, ierr)
          if (ierr /= 0) stop 'failed in set_qs'         
          s% m(1) = s% mstar
          do k=2,s% nz
@@ -714,7 +721,7 @@
       
       subroutine cleanup_for_LINA( &
             s, M, DM, DM_BAR, R, Vol, T, Et, P, ierr)
-         use star_utils, only: set_qs, set_m_and_dm, set_dm_bar
+         use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          real(dp), intent(inout), dimension(:) :: &
             M, DM, DM_BAR, R, Vol, T, Et, P
@@ -740,7 +747,14 @@
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
          
          ! fix
-         call set_qs(NZN, s% q, s% dq, ierr)
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, NZN, s% dq, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in rsp_def cleanup_for_LINA'
+               return
+            end if
+         end if
+         call set_qs(s, NZN, s% q, s% dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in set_qs'
             stop 'build_rsp_model'
