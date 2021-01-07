@@ -131,10 +131,13 @@
     ! for reported surface/center abundances
     surface_avg_abundance_dq, center_avg_value_dq, &
     
-    recalc_mix_info_after_evolve, &
+    ! mixing parameters
+    min_convective_gap, min_thermohaline_gap, min_semiconvection_gap, min_thermohaline_dropout, &
+    max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
+    okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
     redo_conv_for_dr_lt_mixing_length, alpha_semiconvection, &
     semiconvection_upper_limit_center_h1, semiconvection_option, use_Ledoux_criterion, D_mix_zero_region_bottom_q, &
-    num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, &
+    num_cells_for_smooth_gradL_composition_term, threshold_for_smooth_gradL_composition_term, clip_D_limit, &
     okay_to_reduce_gradT_excess, gradT_excess_f1, gradT_excess_f2, D_mix_zero_region_top_q, gradT_excess_max_center_h1, &
     gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, &
@@ -154,8 +157,9 @@
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, dq_D_mix_zero_at_H_C_crossover, &
     overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, &
-    alpha_RTI_src_max_q, &
-    max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
+    min_dt_for_increases_in_convection_velocity, max_conv_vel_div_csound, &
+    max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
+    max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
     calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
     threshold_for_smooth_brunt_B, use_brunt_gradmuX_form, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
@@ -291,8 +295,10 @@
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
     set_min_am_nu_non_rot, min_am_nu_non_rot, min_center_Ye_for_min_am_nu_non_rot, &
+    set_min_D_mix_below_Tmax, min_D_mix_below_Tmax, set_min_D_mix_in_H_He, min_D_mix_in_H_He, &
     set_min_D_mix, mass_lower_limit_for_min_D_mix, mass_upper_limit_for_min_D_mix, &
-    min_D_mix, clip_D_limit, smooth_outer_xa_big, smooth_outer_xa_small, nonlocal_NiCo_kap_gamma, nonlocal_NiCo_decay_heat, &
+    min_D_mix, min_center_Ye_for_min_D_mix, &
+    smooth_outer_xa_big, smooth_outer_xa_small, nonlocal_NiCo_kap_gamma, nonlocal_NiCo_decay_heat, &
     dtau_gamma_NiCo_decay_heat, max_logT_for_net, reaction_neuQs_factor, &
     
     ! element diffusion parameters
@@ -1031,7 +1037,18 @@
  s% surface_avg_abundance_dq = surface_avg_abundance_dq
  s% center_avg_value_dq = center_avg_value_dq
 
+ ! mixing parameters
+ s% min_convective_gap = min_convective_gap
+ s% min_thermohaline_gap = min_thermohaline_gap
+ s% min_semiconvection_gap = min_semiconvection_gap
+ s% min_thermohaline_dropout = min_thermohaline_dropout
+ s% max_dropout_gradL_sub_grada = max_dropout_gradL_sub_grada
+ s% remove_embedded_semiconvection = remove_embedded_semiconvection
  s% recalc_mix_info_after_evolve = recalc_mix_info_after_evolve
+ s% remove_mixing_glitches = remove_mixing_glitches
+ s% okay_to_remove_mixing_singleton = okay_to_remove_mixing_singleton
+ s% prune_bad_cz_min_Hp_height = prune_bad_cz_min_Hp_height
+ s% prune_bad_cz_min_log_eps_nuc = prune_bad_cz_min_log_eps_nuc
  s% redo_conv_for_dr_lt_mixing_length = redo_conv_for_dr_lt_mixing_length
 
  s% alpha_semiconvection = alpha_semiconvection
@@ -1040,6 +1057,7 @@
  s% use_Ledoux_criterion = use_Ledoux_criterion
  s% num_cells_for_smooth_gradL_composition_term = num_cells_for_smooth_gradL_composition_term
  s% threshold_for_smooth_gradL_composition_term = threshold_for_smooth_gradL_composition_term
+ s% clip_D_limit = clip_D_limit
  s% fix_eps_grav_transition_to_grid = fix_eps_grav_transition_to_grid
 
  s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
@@ -1121,6 +1139,11 @@
  s%overshoot_D_min = overshoot_D_min
  s%overshoot_brunt_B_max = overshoot_brunt_B_max
 
+ s% min_dt_for_increases_in_convection_velocity = min_dt_for_increases_in_convection_velocity
+ s% max_conv_vel_div_csound = max_conv_vel_div_csound
+ s% max_v_for_convection = max_v_for_convection
+ s% max_q_for_convection_with_hydro_on = max_q_for_convection_with_hydro_on
+ s% max_v_div_cs_for_convection = max_v_div_cs_for_convection
  s% max_abs_du_div_cs_for_convection = max_abs_du_div_cs_for_convection
 
  s% calculate_Brunt_N2 = calculate_Brunt_N2
@@ -1707,7 +1730,11 @@
  s% mass_lower_limit_for_min_D_mix = mass_lower_limit_for_min_D_mix
  s% mass_upper_limit_for_min_D_mix = mass_upper_limit_for_min_D_mix
  s% min_D_mix = min_D_mix
- s% clip_D_limit = clip_D_limit
+ s% set_min_D_mix_below_Tmax = set_min_D_mix_below_Tmax
+ s% min_D_mix_below_Tmax = min_D_mix_below_Tmax
+ s% set_min_D_mix_in_H_He = set_min_D_mix_in_H_He
+ s% min_D_mix_in_H_He = min_D_mix_in_H_He
+ s% min_center_Ye_for_min_D_mix = min_center_Ye_for_min_D_mix
  s% reaction_neuQs_factor = reaction_neuQs_factor
  s% nonlocal_NiCo_kap_gamma = nonlocal_NiCo_kap_gamma
  s% nonlocal_NiCo_decay_heat = nonlocal_NiCo_decay_heat
@@ -2704,7 +2731,18 @@
  surface_avg_abundance_dq = s% surface_avg_abundance_dq
  center_avg_value_dq = s% center_avg_value_dq
 
+ ! mixing parameters
+ min_convective_gap = s% min_convective_gap
+ min_thermohaline_gap = s% min_thermohaline_gap
+ min_semiconvection_gap = s% min_semiconvection_gap
+ min_thermohaline_dropout = s% min_thermohaline_dropout
+ max_dropout_gradL_sub_grada = s% max_dropout_gradL_sub_grada
+ remove_embedded_semiconvection = s% remove_embedded_semiconvection
  recalc_mix_info_after_evolve = s% recalc_mix_info_after_evolve
+ remove_mixing_glitches = s% remove_mixing_glitches
+ okay_to_remove_mixing_singleton = s% okay_to_remove_mixing_singleton
+ prune_bad_cz_min_Hp_height = s% prune_bad_cz_min_Hp_height
+ prune_bad_cz_min_log_eps_nuc = s% prune_bad_cz_min_log_eps_nuc
  redo_conv_for_dr_lt_mixing_length = s% redo_conv_for_dr_lt_mixing_length
 
  alpha_semiconvection = s% alpha_semiconvection
@@ -2713,6 +2751,7 @@
  use_Ledoux_criterion = s% use_Ledoux_criterion
  num_cells_for_smooth_gradL_composition_term = s% num_cells_for_smooth_gradL_composition_term
  threshold_for_smooth_gradL_composition_term = s% threshold_for_smooth_gradL_composition_term
+ clip_D_limit = s% clip_D_limit
  fix_eps_grav_transition_to_grid = s% fix_eps_grav_transition_to_grid
 
  okay_to_reduce_gradT_excess = s% okay_to_reduce_gradT_excess
@@ -2794,6 +2833,11 @@
  overshoot_D_min = s%overshoot_D_min
  overshoot_brunt_B_max = s%overshoot_brunt_B_max
 
+ min_dt_for_increases_in_convection_velocity = s% min_dt_for_increases_in_convection_velocity
+ max_conv_vel_div_csound = s% max_conv_vel_div_csound
+ max_v_for_convection = s% max_v_for_convection
+ max_q_for_convection_with_hydro_on = s% max_q_for_convection_with_hydro_on
+ max_v_div_cs_for_convection = s% max_v_div_cs_for_convection
  max_abs_du_div_cs_for_convection = s% max_abs_du_div_cs_for_convection
 
  calculate_Brunt_N2 = s% calculate_Brunt_N2
@@ -3373,7 +3417,11 @@
  mass_lower_limit_for_min_D_mix = s% mass_lower_limit_for_min_D_mix
  mass_upper_limit_for_min_D_mix = s% mass_upper_limit_for_min_D_mix
  min_D_mix = s% min_D_mix
- clip_D_limit = s% clip_D_limit
+ set_min_D_mix_below_Tmax = s% set_min_D_mix_below_Tmax
+ min_D_mix_below_Tmax = s% min_D_mix_below_Tmax
+ set_min_D_mix_in_H_He = s% set_min_D_mix_in_H_He
+ min_D_mix_in_H_He = s% min_D_mix_in_H_He
+ min_center_Ye_for_min_D_mix = s% min_center_Ye_for_min_D_mix
  reaction_neuQs_factor = s% reaction_neuQs_factor
  nonlocal_NiCo_kap_gamma = s% nonlocal_NiCo_kap_gamma
  nonlocal_NiCo_decay_heat = s% nonlocal_NiCo_decay_heat

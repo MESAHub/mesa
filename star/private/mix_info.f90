@@ -166,11 +166,49 @@
          
          if (dbg) write(*,3) 'after copy mlt results', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
-            
-         if (dbg) write(*,3) 'call remove_tiny_mixing', &
-            k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
-         call remove_tiny_mixing(s, ierr)
-         if (failed('remove_tiny_mixing')) return
+         
+         if (s% remove_mixing_glitches) then
+
+            if (dbg) write(*, *) 'remove_mixing_glitches'
+
+            if (dbg) write(*,3) 'call remove_tiny_mixing', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call remove_tiny_mixing(s, ierr)
+            if (failed('remove_tiny_mixing')) return
+
+            if (dbg) write(*,3) 'call remove_mixing_singletons', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call remove_mixing_singletons(s, ierr)
+            if (failed('remove_mixing_singletons')) return
+
+            if (dbg) write(*,3) 'call close_convection_gaps', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call close_convection_gaps(s, ierr)
+            if (failed('close_convection_gaps')) return
+
+            if (dbg) write(*,3) 'call close_thermohaline_gaps', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call close_thermohaline_gaps(s, ierr)
+            if (failed('close_thermohaline_gaps')) return
+
+            if (dbg) write(*,3) 'call remove_thermohaline_dropouts', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call remove_thermohaline_dropouts(s, ierr)
+            if (failed('remove_thermohaline_dropouts')) return
+
+            if (dbg) write(*,3) 'call close_semiconvection_gaps', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call close_semiconvection_gaps(s, ierr)
+            if (failed('close_semiconvection_gaps')) return
+
+            if (dbg) write(*,3) 'call remove_embedded_semiconvection', &
+               k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
+            call remove_embedded_semiconvection(s, ierr)
+              if (failed('remove_embedded_semiconvection')) return
+
+         end if
+         
+         call check('after get remove_mixing_glitches')
 
          if (dbg) write(*,3) 'call do_mix_envelope', &
             k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
@@ -245,12 +283,37 @@
             if (failed('set_cz_bdy_mass')) return
          end if
 
-         if (s% set_min_D_mix) then
+         if (s% set_min_D_mix .and. s% ye(nz) >= s% min_center_Ye_for_min_D_mix) then
             do k=1,nz
                if (s% D_mix(k) >= s% min_D_mix) cycle
                if (s% m(k) > s% mass_upper_limit_for_min_D_mix*Msun) cycle
                if (s% m(k) < s% mass_lower_limit_for_min_D_mix*Msun) cycle
                s% D_mix(k) = s% min_D_mix
+               s% mixing_type(k) = minimum_mixing
+            end do
+         end if
+
+         if (s% set_min_D_mix_below_Tmax) then
+            Tmax = -1
+            k_Tmax = -1
+            do k=1,nz
+               if (s% T(k) > Tmax) then
+                  Tmax = s% T(k)
+                  k_Tmax = k
+               end if
+            end do
+            do k=k_Tmax+1,nz
+               if (s% D_mix(k) >= s% min_D_mix_below_Tmax) cycle
+               s% D_mix(k) = s% min_D_mix_below_Tmax
+               s% mixing_type(k) = minimum_mixing
+            end do
+         end if
+
+         if (s% set_min_D_mix_in_H_He) then
+            do k=1,nz
+               if (s% X(k) + s% Y(k) < 0.5d0) exit
+               if (s% D_mix(k) >= s% min_D_mix_in_H_He) cycle
+               s% D_mix(k) = s% min_D_mix_in_H_He
                s% mixing_type(k) = minimum_mixing
             end do
          end if
@@ -713,6 +776,25 @@
             dr = top_r - bot_r
             Hp = (bot_Hp + top_Hp)/2
 
+            if (dr/Hp < s% prune_bad_cz_min_Hp_height .and. s% prune_bad_cz_min_Hp_height > 0) then
+               max_eps = maxval(eps_h(k:k_bot) + eps_he(k:k_bot) + eps_z(k:k_bot))
+               if (end_dbg) write(*,3) 'max_eps', k, k_bot, max_eps, &
+                  exp10(s% prune_bad_cz_min_log_eps_nuc)
+               if (max_eps < exp10(s% prune_bad_cz_min_log_eps_nuc) &
+                     .and. all(s% mixing_type(k+1:k_bot-1) /= thermohaline_mixing)) then
+                  do kk = k, k_bot ! this includes the radiative points at boundaries
+                     call set_use_gradr(s,kk)
+                     s% cdc(kk) = 0
+                     s% D_mix(kk) = 0
+                     if (.not. s% conv_vel_flag) s% conv_vel(kk) = 0
+                     s% mixing_type(kk) = no_mixing
+                  end do
+                  if (s% num_conv_boundaries > 0) &
+                     s% num_conv_boundaries = s% num_conv_boundaries-1
+                  return
+               end if
+            end if
+
             if (s% num_conv_boundaries == max_conv_bdy) then
                call realloc(ierr)
                if (ierr /= 0) return
@@ -817,36 +899,6 @@
          call switch_to_no_mixing(s,k)
          call switch_to_radiative(s,k)
       end subroutine set_use_gradr
-
-
-      subroutine remove_tiny_mixing(s, ierr)
-         type (star_info), pointer :: s
-         integer, intent(out) :: ierr
-
-         integer :: k, nz
-         logical, parameter :: dbg = .false.
-         real(dp) :: tiny
-
-         include 'formats'
-
-         if (dbg) write(*,*) 'remove_tiny_mixing'
-
-         ierr = 0
-         nz = s% nz
-
-         tiny = s% clip_D_limit
-         do k=1,nz
-            if (s% D_mix(k) < tiny) then
-               s% cdc(k) = 0
-               s% D_mix(k) = 0
-               if (.not. s% conv_vel_flag) then
-                  s% conv_vel(k) = 0
-               end if
-               s% mixing_type(k) = no_mixing
-            end if
-         end do
-
-      end subroutine remove_tiny_mixing
 
 
       subroutine locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)
@@ -1017,6 +1069,381 @@
 
 
       end subroutine locate_mixing_boundaries
+
+
+      subroutine remove_tiny_mixing(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k, nz
+         logical, parameter :: dbg = .false.
+         real(dp) :: tiny
+
+         include 'formats'
+
+         if (dbg) write(*,*) 'remove_tiny_mixing'
+
+         ierr = 0
+         nz = s% nz
+
+         tiny = s% clip_D_limit
+         do k=1,nz
+            if (s% D_mix(k) < tiny) then
+               s% cdc(k) = 0
+               s% D_mix(k) = 0
+               if (.not. s% conv_vel_flag) then
+                  s% conv_vel(k) = 0
+               end if
+               s% mixing_type(k) = no_mixing
+            end if
+         end do
+
+      end subroutine remove_tiny_mixing
+
+
+      ! remove single point mixing or non-mixing regions
+      ! NOTE: does not remove thermohaline singletons
+      subroutine remove_mixing_singletons(s, ierr)
+         !use star_utils, only: scale_height
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k, nz
+         logical, parameter :: dbg = .false.
+         real(dp) :: lambda
+
+         include 'formats'
+
+         if (dbg) write(*,*) 'remove_mixing_singletons'
+
+         ierr = 0
+         nz = s% nz
+
+         do k=2,nz-1
+            if (s% cdc(k) == 0) then
+               if (s% cdc(k-1) /= 0 .and. s% cdc(k+1) /= 0) then
+                  s% cdc(k) = (s% cdc(k-1) + s% cdc(k+1))/2
+                  s% D_mix(k) = s% cdc(k)/pow2(4*pi*s% r(k)*s% r(k)*s% rho(k))
+                  lambda = s% alpha_mlt(k)* &
+                     (s% scale_height(k-1) + s% scale_height(k+1))/2
+                  if (.not. s% conv_vel_flag) then
+                     s% conv_vel(k) = 3*s% D_mix(k)/lambda
+                  end if
+                  s% mixing_type(k) = max(s% mixing_type(k-1), s% mixing_type(k+1))
+               if (dbg) write(*,3) 'remove radiative singleton', k, nz
+               end if
+            else if (s% okay_to_remove_mixing_singleton) then
+               if (s% cdc(k-1) == 0 .and. s% cdc(k+1) == 0) then
+                  call set_use_gradr(s,k)
+                  s% cdc(k) = 0
+                  s% D_mix(k) = 0
+                  if (.not. s% conv_vel_flag) then
+                     s% conv_vel(k) = 0
+                  end if
+                  s% mixing_type(k) = no_mixing
+                  if (dbg) write(*,3) 'remove mixing singleton', k, nz
+               end if
+            end if
+         end do
+
+         if (s% cdc(1) == 0) then
+            if (s% cdc(2) /= 0) then
+               s% cdc(1) = s% cdc(2)
+               s% D_mix(1) = s% D_mix(2)
+               if (.not. s% conv_vel_flag) then
+                  s% conv_vel(1) = s% conv_vel(2)
+               end if
+               s% mixing_type(1) = s% mixing_type(2)
+               if (dbg) write(*,3) 'remove radiative singleton', 1, nz
+            end if
+         else
+            if (s% cdc(2) == 0) then
+               call set_use_gradr(s,1)
+               s% cdc(1) = 0
+               s% D_mix(1) = 0
+               if (.not. s% conv_vel_flag) then
+                  s% conv_vel(1) = 0
+               end if
+               s% mixing_type(1) = no_mixing
+               if (dbg) write(*,2) 'remove mixing singleton', 1
+            end if
+         end if
+
+         if (s% cdc(nz) == 0) then
+            if (s% cdc(nz-1) /= 0) then
+               s% cdc(nz) = s% cdc(nz-1)
+               s% D_mix(nz) = s% D_mix(nz-1)
+               if (.not. s% conv_vel_flag) s% conv_vel(nz) = s% conv_vel(nz-1)
+               s% mixing_type(nz) = s% mixing_type(nz-1)
+               if (dbg) write(*,2) 'remove radiative singleton: s% cdc(nz-1)', nz, s% cdc(nz-1)
+            end if
+         else
+            if (s% cdc(nz-1) == 0) then
+               call set_use_gradr(s,nz)
+               s% cdc(nz) = 0
+               s% D_mix(nz) = 0
+               if(.not. s% conv_vel_flag) s% conv_vel(nz) = 0
+               s% mixing_type(nz) = no_mixing
+               if (dbg) write(*,2) 'remove mixing singleton: s% cdc(nz)', nz, s% cdc(nz)
+            end if
+         end if
+
+      end subroutine remove_mixing_singletons
+
+
+      subroutine close_convection_gaps(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         call close_gaps(s, convective_mixing, s% min_convective_gap, ierr)
+      end subroutine close_convection_gaps
+
+
+      subroutine close_thermohaline_gaps(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         call close_gaps(s, thermohaline_mixing, s% min_thermohaline_gap, ierr)
+      end subroutine close_thermohaline_gaps
+
+
+      subroutine close_semiconvection_gaps(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         call close_gaps(s, semiconvective_mixing, s% min_semiconvection_gap, ierr)
+      end subroutine close_semiconvection_gaps
+
+
+      subroutine close_gaps(s, mix_type, min_gap, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: mix_type
+         real(dp), intent(in) :: min_gap
+         integer, intent(out) :: ierr
+
+         integer :: k, kk, nz
+         logical :: in_region, dbg
+         real(dp) :: rtop, rbot, Hp
+         integer :: ktop, kbot ! k's for gap
+         include 'formats'
+
+         dbg = .false.
+         !dbg = (mix_type == convective_mixing)
+         if (dbg) write(*,*) 'close_gaps convective_mixing'
+         if (dbg) write(*,3) 'mixing_type', 1152, s% mixing_type(1152)
+         ierr = 0
+         if (min_gap < 0) return
+         nz = s% nz
+         in_region = (s% mixing_type(nz) == mix_type)
+         rbot = 0
+         kbot = nz
+         do k=nz-1, 2, -1
+            if (in_region) then
+               if (s% mixing_type(k) /= mix_type) then ! end of region
+                  kbot = k+1
+                  rbot = s% r(kbot)
+                  in_region = .false.
+                  if (dbg) write(*,2) 'end of region', kbot, rbot
+               end if
+            else
+               if (s% mixing_type(k) == mix_type) then ! start of region
+                  ktop = k
+                  rtop = s% r(ktop)
+                  Hp = s% P(ktop)/(s% rho(ktop)*s% grav(ktop))
+                  if (dbg) write(*,2) 'start of region', ktop, rtop
+                  if (dbg) write(*,1) 'rtop - rbot < Hp*min_gap', (rtop - rbot) - Hp*min_gap, &
+                     rtop - rbot, Hp*min_gap, Hp, min_gap, (rtop-rbot)/Hp
+                  if (rtop - rbot < Hp*min_gap) then
+                     if (kbot < nz) then
+                        s% cdc(ktop+1:kbot-1) = (s% cdc(ktop) + s% cdc(kbot))/2
+                        s% D_mix(ktop+1:kbot-1) = &
+                           (s% D_mix(ktop) + s% D_mix(kbot))/2
+                        if(.not. s% conv_vel_flag) s% conv_vel(ktop+1:kbot-1) = (s% conv_vel(ktop) + s% conv_vel(kbot))/2
+                        s% mixing_type(ktop+1:kbot-1) = mix_type
+                        if (dbg) write(*,3) 'close mixing gap', &
+                              ktop+1, kbot-1, (rtop - rbot)/Hp, rtop - rbot, Hp
+                     else
+                        s% cdc(ktop+1:kbot) = s% cdc(ktop)
+                        s% D_mix(ktop+1:kbot) = s% D_mix(ktop)
+                        if(.not. s% conv_vel_flag) s% conv_vel(ktop+1:kbot) = s% conv_vel(ktop)
+                        s% mixing_type(ktop+1:kbot) = mix_type
+                        if (dbg) write(*,3) 'close mixing gap', &
+                           ktop+1, kbot, (rtop - rbot)/Hp, rtop - rbot, Hp
+                     end if
+                  end if
+                  in_region = .true.
+               end if
+            end if
+         end do
+         if (dbg) write(*,3) 'mixing_type', 1152, s% mixing_type(1152)
+         if (dbg) write(*,*) 'done close_gaps'
+         !if (dbg) stop 'done close_gaps'
+
+      end subroutine close_gaps
+
+
+      ! if find radiative region embedded in thermohaline,
+      ! and max(gradL - grada) in region is < 1d-3
+      ! and region height is < min_thermohaline_dropout
+      ! then convert the region to thermohaline
+      subroutine remove_thermohaline_dropouts(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k, nz, j
+         logical :: in_region
+         real(dp) :: rtop, rbot, Hp, q_upper, q_lower, alfa, beta
+         integer :: ktop, kbot ! k's for gap
+         logical :: all_small
+         logical, parameter :: dbg = .false.
+         include 'formats'
+         ierr = 0
+         nz = s% nz
+         rbot = s% r(nz)
+         kbot = nz-1
+         in_region = (s% mixing_type(kbot) == no_mixing)
+         all_small = .false.
+         do k=nz-2, 2, -1
+            if (in_region) then
+               if (s% mixing_type(k) == no_mixing) then ! check if okay
+                  if (s% gradL(k) - s% grada_face(k) > s% max_dropout_gradL_sub_grada) &
+                     all_small = .false.
+               else ! end of radiative region
+                  ktop = k+1
+                  rtop = s% r(ktop)
+                  Hp = s% P(ktop)/(s% rho(ktop)*s% grav(ktop))
+                  q_upper = s% q(ktop-1)
+                  q_lower = s% q(kbot+1)
+                  if (rtop - rbot < Hp*s% min_thermohaline_dropout .and. &
+                      s% mixing_type(ktop-1) == thermohaline_mixing .and. &
+                      s% mixing_type(kbot+1) == thermohaline_mixing .and. &
+                      q_upper - q_lower > 1d-20 .and. all_small) then
+                     do j = ktop, kbot ! interpolate in q
+                        alfa = (s% q(j) - q_lower)/(q_upper - q_lower)
+                        beta = 1 - alfa
+                        s% cdc(j) = alfa*s% cdc(ktop-1) + beta*s% cdc(kbot+1)
+                        s% D_mix(j) = alfa*s% D_mix(ktop-1) + beta*s% D_mix(kbot+1)
+                        if (.not. s% conv_vel_flag) then
+                           s% conv_vel(j) = alfa*s% conv_vel(ktop-1) + beta*s% conv_vel(kbot+1)
+                        end if
+                        s% mixing_type(j) = thermohaline_mixing
+                     end do
+                  end if
+                  in_region = .false.
+               end if
+            else
+               if (s% mixing_type(k) == no_mixing) then ! start of region
+                  kbot = k
+                  rbot = s% r(kbot)
+                  in_region = .true.
+                  all_small = &
+                     (s% gradL(k) - s% grada_face(k) <= s% max_dropout_gradL_sub_grada)
+               end if
+            end if
+         end do
+
+      end subroutine remove_thermohaline_dropouts
+
+
+      subroutine remove_embedded_semiconvection(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k, nz
+         logical :: in_region
+         integer :: kbot, ktop
+
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         ierr = 0
+         if (.not. s% remove_embedded_semiconvection) return
+
+         nz = s% nz
+
+         in_region = check(nz)
+         kbot = nz
+         do k=nz-1, 2, -1
+            if (in_region) then
+               if (.not. check(k)) then ! end of region
+                  ktop = k+1
+                  in_region = .false.
+                  call clean_region
+               end if
+            else ! not in region
+               if (check(k)) then ! start of region
+                  kbot = k
+                  in_region = .true.
+               end if
+            end if
+         end do
+
+         if (in_region) then
+            ktop = 1
+            call clean_region
+         end if
+
+
+         contains
+
+
+         subroutine clean_region
+            integer :: kbot1, ktop1, kk
+            include 'formats'
+            if (dbg) write(*,3) 'clean_region semiconvective', kbot, ktop
+            ! move top to below top convective region
+            do while (s% mixing_type(ktop) == convective_mixing)
+               ktop = ktop + 1
+               if (ktop >= kbot) return
+            end do
+            if (dbg) write(*,2) 'new ktop 1', ktop
+            ! move top to below top semiconvective region
+            do while (s% mixing_type(ktop) == semiconvective_mixing)
+               ktop = ktop + 1
+               if (ktop >= kbot) return
+            end do
+            if (dbg) write(*,2) 'new ktop 2', ktop
+            ! move bot to above bottom convective region
+            do while (s% mixing_type(kbot) == convective_mixing)
+               kbot = kbot - 1
+               if (ktop >= kbot) return
+            end do
+            if (dbg) write(*,2) 'new kbot 1', kbot
+            ! move bot to above bottom semiconvective region
+            do while (s% mixing_type(kbot) == semiconvective_mixing)
+               kbot = kbot - 1
+               if (ktop >= kbot) return
+            end do
+            if (dbg) write(*,2) 'new kbot 2', kbot
+            ! convert any semiconvective region between kbot and ktop
+            kbot1 = kbot
+            do while (kbot1 > ktop)
+               ! move kbot1 to bottom of next semiconvective region
+               do while (s% mixing_type(kbot1) == convective_mixing)
+                  kbot1 = kbot1 - 1
+                  if (kbot1 <= ktop) return
+               end do
+               ktop1 = kbot1
+               ! move ktop1 to top of semiconvective region
+               do while (s% mixing_type(ktop1) == semiconvective_mixing)
+                  ktop1 = ktop1 - 1
+                  if (ktop1 <= ktop) return
+               end do
+               s% D_mix(ktop1+1:kbot1) = s% D_mix(ktop1)
+               s% mixing_type(ktop1+1:kbot1) = convective_mixing
+               if (.not. s% conv_vel_flag) s% conv_vel(ktop1+1:kbot1) = s% conv_vel(ktop1)
+               if (dbg) write(*,3) 'merge semiconvective island', kbot1, ktop1+1
+               kbot1 = ktop1
+            end do
+         end subroutine clean_region
+
+
+         logical function check(k)
+            integer, intent(in) :: k
+            check = &
+               (s% mixing_type(k) == semiconvective_mixing) .or. &
+               (s% mixing_type(k) == convective_mixing)
+         end function check
+
+      end subroutine remove_embedded_semiconvection
 
 
       subroutine do_mix_envelope(s)

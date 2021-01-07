@@ -774,7 +774,7 @@
          max_dX_div_X_bdy_dist_dm = 0
          cz_dist_limit = s% dX_mix_dist_limit*Msun
 
-         if (s% set_min_D_mix) then
+         if (s% set_min_D_mix .and. s% ye(s% nz) >= s% min_center_Ye_for_min_D_mix) then
             D_mix_cutoff = s% min_D_mix
          else
             D_mix_cutoff = 0

@@ -75,7 +75,7 @@
    make_gradr_sticky_in_solver_iters = .true.
 
    use_gold2_tolerances = .false.
-   use_gold_tolerances = .false.
+   use_gold_tolerances = .true.
 
    xa_scale = 1d-5
    solver_itermin = 2
