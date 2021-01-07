@@ -166,6 +166,9 @@ Other changes
   star_info arrays and profile columns with the names
   ``kap_frac_lowT``, ``kap_frac_highT``, ``kap_frac_Compton``.
 
+* ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``,
+  ``eps_he`` or ``eps_z`` as arguments.
+
 Changes in r15140
 =================
 
