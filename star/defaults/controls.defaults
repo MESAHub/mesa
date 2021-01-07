@@ -4069,11 +4069,6 @@
       ! See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       ! ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       ! ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
-      ! + ``'Paczynski_grey'`` :
-      ! create an atmosphere for given base conditions.
-      ! inspired by B. Paczynski, 1969, Acta Astr., vol. 19, 1.
-      ! takes into account dilution when tau < 2/3,
-      ! and calls mlt to get gradT allowing for convection in atmosphere.
       ! + ``'fixed_Teff'`` :
       ! set Tsurf from Eddington T(tau) relation
       !     for current surface tau and Teff = ``atm_fixed_Teff``.
@@ -4371,17 +4366,6 @@
     atm_irradiated_P_surf = 1d6
 
 
-      ! Pacyznski_atm_R_surf_errtol
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Parameters for ``Paczynski_grey``.
-
-      ! ::
-
-    trace_atm_Paczynski_grey = .false.
-    Paczynski_atm_R_surf_errtol = 3d-4
-
-
       ! surface_extra_Pgas
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -4467,16 +4451,6 @@
     use_zero_dLdm_outer_BC = .false.
 
 
-      ! use_T_Paczynski_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``T_surf^4`` is set to ``L/(8*pi*boltz_sig*R^2)``
-
-      ! ::
-
-    use_T_Paczynski_outer_BC = .false.
-
-
       ! use_T_black_body_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4505,7 +4479,7 @@
       ! fixed_L_for_BB_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! for ``use_T_black_body_outer_BC`` and ``use_T_Paczynski_outer_BC``
+      ! for ``use_T_black_body_outer_BC``
 
       ! ::
 
@@ -4566,10 +4540,9 @@
 
       ! Parameters controlling atmosphere structure building. MESA can
       ! evaluate the spatial structure of the atmosphere for the
-      ! following ``atm_option`` choices:
+      ! following ``atm_option`` choice:
 
       ! + ``'T_tau'``
-      ! + ``'paczynski_grey``'
 
       ! The atmosphere structure data are appended to the interior model
       ! when ``add_atmosphere_to_pulsation = .true.``. They do not affect

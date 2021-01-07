@@ -94,7 +94,7 @@
     log_Dsurf_upper_limit, log_Dsurf_lower_limit, log_L_upper_limit, log_L_lower_limit, &
     log_g_upper_limit, log_g_lower_limit, power_nuc_burn_upper_limit, power_h_burn_upper_limit, &
     power_he_burn_upper_limit, power_z_burn_upper_limit, power_nuc_burn_lower_limit, &
-    power_h_burn_lower_limit, power_he_burn_lower_limit, power_z_burn_lower_limit, phase_of_evolution_stop, &
+    power_h_burn_lower_limit, power_he_burn_lower_limit, power_z_burn_lower_limit, &
     
     ! max timesteps
     max_timestep, max_years_for_timestep, &
@@ -492,11 +492,9 @@
     atm_irradiated_kap_v, atm_irradiated_kap_v_div_kap_th, atm_irradiated_P_surf, &
     atm_irradiated_max_iters, &
 
-    Paczynski_atm_R_surf_errtol, trace_atm_Paczynski_grey, &
-
     surface_extra_Pgas, use_atm_PT_at_center_of_surface_cell, &
     use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, use_T_black_body_outer_BC, &
-    use_T_Paczynski_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
+    fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
     use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, use_Psurf_for_surface_eflux, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
@@ -513,7 +511,7 @@
     inject_until_reach_model_with_total_energy, &
     
     ! mass gain or loss
-    no_wind_if_no_rotation, clip_small_mdots, max_logT_for_k_below_const_q, &
+    no_wind_if_no_rotation, max_logT_for_k_below_const_q, &
     max_q_for_k_below_const_q, min_q_for_k_below_const_q, max_logT_for_k_const_mass, &
     min_q_for_k_const_mass, max_q_for_k_const_mass, &
     
@@ -944,8 +942,6 @@
  s% power_he_burn_lower_limit = power_he_burn_lower_limit
  s% power_z_burn_lower_limit = power_z_burn_lower_limit
 
- s% phase_of_evolution_stop = phase_of_evolution_stop
-
  ! output of "snapshots" for restarts
  s% photo_interval = photo_interval
  s% photo_digits = photo_digits
@@ -1292,16 +1288,12 @@
  s% atm_irradiated_P_surf = atm_irradiated_P_surf
  s% atm_irradiated_max_iters = atm_irradiated_max_iters
 
- s% Paczynski_atm_R_surf_errtol = Paczynski_atm_R_surf_errtol
- s% trace_atm_Paczynski_grey = trace_atm_Paczynski_grey
-
  s% surface_extra_Pgas = surface_extra_Pgas
  s% use_atm_PT_at_center_of_surface_cell = use_atm_PT_at_center_of_surface_cell
  s% use_compression_outer_BC = use_compression_outer_BC
  s% use_momentum_outer_BC = use_momentum_outer_BC
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
  s% use_T_black_body_outer_BC = use_T_black_body_outer_BC
- s% use_T_Paczynski_outer_BC = use_T_Paczynski_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
  s% use_fixed_L_for_BB_outer_BC = use_fixed_L_for_BB_outer_BC
@@ -1416,7 +1408,7 @@
  s% wind_H_envelope_limit = wind_H_envelope_limit
  s% wind_H_He_envelope_limit = wind_H_He_envelope_limit
  s% wind_He_layer_limit = wind_He_layer_limit
- s% clip_small_mdots = clip_small_mdots
+
  s% max_logT_for_k_below_const_q = max_logT_for_k_below_const_q
  s% max_q_for_k_below_const_q = max_q_for_k_below_const_q
  s% min_q_for_k_below_const_q = min_q_for_k_below_const_q
@@ -2638,8 +2630,6 @@
  power_he_burn_lower_limit = s% power_he_burn_lower_limit
  power_z_burn_lower_limit = s% power_z_burn_lower_limit
 
- phase_of_evolution_stop = s% phase_of_evolution_stop
-
 
  ! output of "snapshots" for restarts
  photo_interval = s% photo_interval
@@ -2985,16 +2975,12 @@
  atm_irradiated_P_surf = s% atm_irradiated_P_surf
  atm_irradiated_max_iters = s% atm_irradiated_max_iters
 
- Paczynski_atm_R_surf_errtol = s% Paczynski_atm_R_surf_errtol
- trace_atm_Paczynski_grey = s% trace_atm_Paczynski_grey
-
  surface_extra_Pgas = s% surface_extra_Pgas
  use_atm_PT_at_center_of_surface_cell = s% use_atm_PT_at_center_of_surface_cell
  use_compression_outer_BC = s% use_compression_outer_BC
  use_momentum_outer_BC = s% use_momentum_outer_BC
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
  use_T_black_body_outer_BC = s% use_T_black_body_outer_BC
- use_T_Paczynski_outer_BC = s% use_T_Paczynski_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
  use_fixed_L_for_BB_outer_BC = s% use_fixed_L_for_BB_outer_BC
@@ -3105,7 +3091,6 @@
  wind_H_envelope_limit = s% wind_H_envelope_limit
  wind_H_He_envelope_limit = s% wind_H_He_envelope_limit
  wind_He_layer_limit = s% wind_He_layer_limit
- clip_small_mdots = s% clip_small_mdots
 
  max_logT_for_k_below_const_q = s% max_logT_for_k_below_const_q
  max_q_for_k_below_const_q = s% max_q_for_k_below_const_q

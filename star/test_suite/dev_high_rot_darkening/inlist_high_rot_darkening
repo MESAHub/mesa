@@ -74,6 +74,8 @@
     ! this is mainly to resolve properly when the star goes off the main sequence
     delta_HR_limit = 0.005d0
     delta_XH_cntr_limit = 0.005d0
+    
+    varcontrol_target = 1d-4
 
     use_dedt_form_of_energy_eqn = .true.
      

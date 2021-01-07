@@ -1167,7 +1167,6 @@
          use atm_def, only: star_debugging_atm_flag, &
             atm_test_partials_val, atm_test_partials_dval_dx
          use chem_def
-         use create_atm_paczyn, only: get_Paczynski_atm_surf_PT
          use eos_lib, only: Radiation_Pressure
 
          type (star_info), pointer :: s
@@ -1198,7 +1197,7 @@
          do_not_need_atm_Tsurf = &
             s% i_lum == 0 .or. &
             ((s% use_fixed_L_for_BB_outer_BC .or. s% tau_for_L_BB > 0d0) .and. &
-             (s% use_T_black_body_outer_BC .or. s% use_T_Paczynski_outer_BC))
+             (s% use_T_black_body_outer_BC))
 
          ! Set up stellar surface parameters
 

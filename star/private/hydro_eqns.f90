@@ -1953,8 +1953,6 @@
             call set_zero_dL_dm_BC(ierr)
          else if (s% use_T_black_body_outer_BC) then
             call set_T_black_body_BC(ierr)
-         else if (s% use_T_Paczynski_outer_BC) then
-            call set_T_Paczynski_BC(ierr)
          else
             call set_Tsurf_BC(ierr)
          end if
@@ -2042,12 +2040,6 @@
             integer, intent(out) :: ierr
             call set_BB_BC(4d0,ierr)
          end subroutine set_T_black_body_BC
-
-
-         subroutine set_T_Paczynski_BC(ierr)
-            integer, intent(out) :: ierr
-            call set_BB_BC(8d0,ierr)
-         end subroutine set_T_Paczynski_BC
 
 
          subroutine set_BB_BC(factor,ierr)

@@ -91,6 +91,8 @@
          clip_D_limit = 10 ! zero mixing diffusion coeffs that are smaller than this
          
          xa_scale = 1d-5
+         
+         varcontrol_target = 1d-4
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)

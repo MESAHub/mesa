@@ -392,9 +392,6 @@
          real(dp) :: atm_irradiated_P_surf
          integer :: atm_irradiated_max_iters
 
-         logical :: trace_atm_Paczynski_grey
-         real(dp) :: Paczynski_atm_R_surf_errtol
-
          real(dp) :: surface_extra_Pgas
          real(dp) :: Tsurf_factor
          real(dp) :: fixed_vsurf
@@ -408,7 +405,6 @@
          logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          logical :: use_fixed_L_for_BB_outer_BC
-         logical :: use_T_Paczynski_outer_BC
          logical :: use_Psurf_for_surface_eflux
 
       ! create atmosphere
@@ -465,6 +461,24 @@
          character (len=strlen) :: Dutch_wind_lowT_scheme
 
          real(dp) :: wind_H_envelope_limit, wind_H_He_envelope_limit, wind_He_layer_limit
+
+         logical :: no_wind_if_no_rotation
+
+         real(dp) :: rlo_scaling_factor, rlo_wind_min_L, rlo_wind_max_Teff
+         real(dp) :: rlo_wind_roche_lobe_radius, rlo_wind_base_mdot
+         real(dp) :: roche_lobe_xfer_full_on, roche_lobe_xfer_full_off
+         real(dp) :: rlo_wind_scale_height
+
+         real(dp) :: nova_scaling_factor, nova_wind_b
+         real(dp) :: nova_wind_max_Teff, nova_wind_min_L
+         real(dp) :: nova_min_Teff_for_accretion, nova_roche_lobe_radius, nova_RLO_mdot
+
+         real(dp) :: flash_wind_mdot, flash_wind_starts
+         real(dp) :: flash_wind_declines, flash_wind_full_off
+
+         real(dp) :: max_logT_for_k_below_const_q, max_logT_for_k_const_mass
+         real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
+         real(dp) :: min_q_for_k_const_mass, max_q_for_k_const_mass
 
          ! composition of accreted material
          logical :: accrete_same_as_surface
@@ -1050,6 +1064,9 @@
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
+            
+         logical :: stop_for_bad_nums
+         integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
          
       ! timestep parameters
       
@@ -1402,39 +1419,3 @@
          integer :: x_integer_ctrl(num_x_ctrls)
          logical :: x_logical_ctrl(num_x_ctrls)
          character (len=strlen) :: x_character_ctrl(num_x_ctrls)
-
-
-      ! the following control parameters are not intended for general use
-
-
-      ! mass gain or loss
-
-         logical :: clip_small_mdots ! set them to zero.
-
-         logical :: no_wind_if_no_rotation
-
-         real(dp) :: max_logT_for_k_below_const_q, max_logT_for_k_const_mass
-         real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
-         real(dp) :: min_q_for_k_const_mass, max_q_for_k_const_mass
-
-         real(dp) :: rlo_scaling_factor, rlo_wind_min_L, rlo_wind_max_Teff
-         real(dp) :: rlo_wind_roche_lobe_radius, rlo_wind_base_mdot
-         real(dp) :: roche_lobe_xfer_full_on, roche_lobe_xfer_full_off
-         real(dp) :: rlo_wind_scale_height
-
-         real(dp) :: nova_scaling_factor, nova_wind_b
-         real(dp) :: nova_wind_max_Teff, nova_wind_min_L
-         real(dp) :: nova_min_Teff_for_accretion, nova_roche_lobe_radius, nova_RLO_mdot
-
-         real(dp) :: flash_wind_mdot, flash_wind_starts
-         real(dp) :: flash_wind_declines, flash_wind_full_off
-
-
-      ! info for debugging
-         logical :: stop_for_bad_nums
-
-         integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
-
-         integer :: phase_of_evolution_stop
-
-

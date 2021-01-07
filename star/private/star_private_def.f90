@@ -151,7 +151,6 @@
          termination_code_str(t_power_h_burn_lower_limit) = 'power_h_burn_lower_limit'
          termination_code_str(t_power_he_burn_lower_limit) = 'power_he_burn_lower_limit'
          termination_code_str(t_power_z_burn_lower_limit) = 'power_z_burn_lower_limit'
-         termination_code_str(t_phase_of_evolution_stop) = 'phase_of_evolution_stop'
          termination_code_str(t_center_R_lower_limit) = 'center_R_lower_limit'
          termination_code_str(t_center_Ye_lower_limit) = 'center_Ye_lower_limit'
          termination_code_str(t_fe_core_infall_limit) = 'fe_core_infall_limit'

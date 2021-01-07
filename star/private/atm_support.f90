@@ -55,8 +55,6 @@ contains
        lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
        ierr)
-       
-    use create_atm_paczyn, only: get_Paczynski_atm_surf_PT
 
     type (star_info), pointer :: s
     real(dp), intent(in)      :: tau_surf
@@ -113,17 +111,6 @@ contains
        call get_irradiated( &
             s, s% atm_irradiated_opacity, skip_partials, &
             Teff, &
-            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-            lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-            ierr)
-
-    case ('Paczynski_grey')
-
-       R_surf = s% r(1)
-       L_surf = s% L(1)
-
-       call get_Paczynski_atm_surf_PT( &
-            s, R_surf, L_surf, skip_partials, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -234,10 +221,6 @@ contains
        end if
 
     case ('irradiated_grey')
-
-       tau_base = 2._dp/3._dp
-
-    case ('Paczynski_grey')
 
        tau_base = 2._dp/3._dp
 
@@ -1101,10 +1084,6 @@ contains
             s% atm_T_tau_relation, s% atm_T_tau_opacity, &
             s% atm_structure_num_pts, s% atm_structure, &
             ierr)
-
-    case ('Paczynski_grey')
-
-       stop 'paczynski_grey not yet implemented'
 
     case default
 

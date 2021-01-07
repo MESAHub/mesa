@@ -187,8 +187,7 @@
       integer, parameter :: t_power_h_burn_lower_limit = t_power_nuc_burn_lower_limit + 1 
       integer, parameter :: t_power_he_burn_lower_limit = t_power_h_burn_lower_limit + 1 
       integer, parameter :: t_power_z_burn_lower_limit = t_power_he_burn_lower_limit + 1 
-      integer, parameter :: t_phase_of_evolution_stop = t_power_z_burn_lower_limit + 1 
-      integer, parameter :: t_center_R_lower_limit = t_phase_of_evolution_stop + 1 
+      integer, parameter :: t_center_R_lower_limit = t_power_z_burn_lower_limit + 1 
       integer, parameter :: t_center_Ye_lower_limit = t_center_R_lower_limit + 1 
       integer, parameter :: t_fe_core_infall_limit = t_center_Ye_lower_limit + 1 
       integer, parameter :: t_non_fe_core_infall_limit = t_fe_core_infall_limit + 1 
