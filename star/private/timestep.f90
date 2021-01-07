@@ -344,18 +344,6 @@
                s, skip_hard_limit, dt_limit_ratio(Tlim_error_in_energy_conservation))
             if (return_now(Tlim_error_in_energy_conservation)) return
 
-            do_timestep_limits = check_rel_rate_in_energy( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_error_rate_energy_conservation))
-            if (return_now(Tlim_error_rate_energy_conservation)) return
-
-            do_timestep_limits = check_avg_v_residual( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_avg_v_residual))
-            if (return_now(Tlim_avg_v_residual)) return
-
-            do_timestep_limits = check_max_abs_v_residual( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_max_abs_v_residual))
-            if (return_now(Tlim_max_abs_v_residual)) return
-
             do_timestep_limits = check_dX_nuc_drop( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dX_nuc_drop))
             if (return_now(Tlim_dX_nuc_drop)) return
@@ -2173,7 +2161,7 @@
          check_adjust_J_q = check_change(s, 1-s% adjust_J_q, &
             1-s% adjust_J_q_limit, &
             1-s% adjust_J_q_hard_limit, &
-            1, 'check_rel_error_in_energy', &
+            1, 'check_adjust_J_q', &
             .false., dt_limit_ratio, relative_excess)
       end function check_adjust_J_q
 
@@ -2252,58 +2240,6 @@
             s% delta_HR_limit, s% delta_HR_hard_limit, &
             1, 'check_delta_HR', skip_hard_limit, dt_limit_ratio, relative_excess)
       end function check_delta_HR
-
-
-      integer function check_avg_v_residual(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: val, relative_excess
-         include 'formats'
-         check_avg_v_residual = keep_going
-         if (.not. s% v_flag) return
-         val = abs(dot_product(s% dq(1:s% nz),s% v_residual(1:s% nz)))
-         check_avg_v_residual = check_change(s, val, &
-            s% limit_for_avg_v_residual, &
-            s% hard_limit_for_avg_v_residual, &
-            1, 'check_avg_v_residual', &
-            .false., dt_limit_ratio, relative_excess)
-      end function check_avg_v_residual
-
-
-      integer function check_max_abs_v_residual(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: val, relative_excess
-         include 'formats'
-         check_max_abs_v_residual = keep_going
-         if (.not. s% v_flag) return
-         val = maxval(abs(s% v_residual(1:s% nz)))
-         check_max_abs_v_residual = check_change(s, val, &
-            s% limit_for_max_abs_v_residual, &
-            s% hard_limit_for_max_abs_v_residual, &
-            1, 'check_max_abs_v_residual', &
-            .false., dt_limit_ratio, relative_excess)
-      end function check_max_abs_v_residual
-
-
-      integer function check_rel_rate_in_energy(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: rel_rate, relative_excess
-         include 'formats'
-         check_rel_rate_in_energy = keep_going
-         dt_limit_ratio = 0d0
-         if (s% doing_relax) return
-         rel_rate = abs(s% error_in_energy_conservation/s% total_energy_end)/s% dt
-         check_rel_rate_in_energy = check_change(s, rel_rate, &
-            s% limit_for_rel_rate_in_energy_conservation, &
-            s% hard_limit_for_rel_rate_in_energy_conservation, &
-            1, 'check_rel_rate_in_energy', &
-            .false., dt_limit_ratio, relative_excess)
-      end function check_rel_rate_in_energy
 
 
       integer function check_rel_error_in_energy(s, skip_hard_limit, dt_limit_ratio)

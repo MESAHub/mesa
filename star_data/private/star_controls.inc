@@ -1101,7 +1101,6 @@
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &
             min_q_for_dt_div_min_dr_div_cs_limit, &
             max_q_for_dt_div_min_dr_div_cs_limit
-            
          integer :: min_k_for_dt_div_min_dr_div_cs_limit
 
          real(dp) :: dX_mix_dist_limit
@@ -1301,35 +1300,20 @@
 
          real(dp) :: delta_lg_star_mass_limit
          real(dp) :: delta_lg_star_mass_hard_limit
-
-         logical :: trace_force_another_iteration
-
-         real(dp) :: &
-            limit_for_avg_v_residual, &
-            hard_limit_for_avg_v_residual
-         real(dp) :: &
-            limit_for_max_abs_v_residual, &
-            hard_limit_for_max_abs_v_residual
-         real(dp) :: &
-            limit_for_abs_rel_E_err, &
-            hard_limit_for_abs_rel_E_err
-
          real(dp) :: &
             limit_for_rel_error_in_energy_conservation, &
             hard_limit_for_rel_error_in_energy_conservation
-         real(dp) :: &
-            limit_for_rel_rate_in_energy_conservation, &
-            hard_limit_for_rel_rate_in_energy_conservation
-         integer :: min_k_for_max_dlnd_residual, min_k_for_max_dvdt_residual
+
+         logical :: trace_force_another_iteration
+
+         real(dp) :: limit_for_max_abs_v_residual, hard_limit_for_max_abs_v_residual
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
 
          logical :: report_all_dt_limits, report_dX_nuc_drop_dt_limits
          logical :: report_why_dt_limits, report_solver_dt_info
 
-         logical :: trace_evolve, trace_solar_neutrinos
-         integer :: min_times_redo_cdc, max_times_redo_cdc
-         integer :: redo_cdc_iters_okay
+         logical :: trace_evolve
 
       ! misc
 

@@ -11049,67 +11049,6 @@
     hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 
-      ! limit_for_rel_rate_in_energy_conservation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_rel_rate_in_energy_conservation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     rel_rate_in_energy_conservation = abs(error_in_energy_conservation/total_energy)/dt
-      ! with dt in seconds.
-
-      ! ::
-
-    limit_for_rel_rate_in_energy_conservation = 1d99
-    hard_limit_for_rel_rate_in_energy_conservation = 1d99
-
-
-      ! limit_for_avg_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_avg_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     avg_v_residual = abs(dot_product(s% dq(1:s% nz),s% v_residual(1:s% nz)))
-
-      ! ::
-
-    limit_for_avg_v_residual = 1d99
-    hard_limit_for_avg_v_residual = 1d99
-
-
-      ! limit_for_max_abs_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_max_abs_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     max_abs_v_residual = maxval(abs(s% v_residual(1:s% nz)))
-
-      ! ::
-
-    limit_for_max_abs_v_residual = 1d99
-    hard_limit_for_max_abs_v_residual = 1d99
-
-
-      ! limit_for_abs_rel_E_err
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_abs_rel_E_err
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     abs_rel_E_err = maxval(abs(s% rel_E_err(1:s% nz)))
-
-      ! ::
-
-    limit_for_abs_rel_E_err = 1d99
-    hard_limit_for_abs_rel_E_err = 1d99
-
-
       ! report_why_dt_limits
       ! ~~~~~~~~~~~~~~~~~~~~
 

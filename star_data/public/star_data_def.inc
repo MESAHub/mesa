@@ -104,12 +104,7 @@
       integer, parameter :: Tlim_del_mdot = Tlim_dlgL_photo + 1
       integer, parameter :: Tlim_adjust_J_q = Tlim_del_mdot + 1
       integer, parameter :: Tlim_delta_Ye_highT = Tlim_adjust_J_q + 1
-      integer, parameter :: Tlim_error_rate_energy_conservation = Tlim_delta_Ye_highT + 1
-      integer, parameter :: Tlim_max_abs_lgE_residual = Tlim_error_rate_energy_conservation + 1
-      integer, parameter :: Tlim_avg_lgE_residual = Tlim_max_abs_lgE_residual + 1
-      integer, parameter :: Tlim_max_abs_v_residual = Tlim_avg_lgE_residual + 1
-      integer, parameter :: Tlim_avg_v_residual = Tlim_max_abs_v_residual + 1
-      integer, parameter :: Tlim_error_in_energy_conservation = Tlim_avg_v_residual + 1
+      integer, parameter :: Tlim_error_in_energy_conservation = Tlim_delta_Ye_highT + 1
       integer, parameter :: Tlim_retry = Tlim_error_in_energy_conservation + 1
       integer, parameter :: Tlim_binary = Tlim_retry + 1
       integer, parameter :: Tlim_error_other = Tlim_binary + 1

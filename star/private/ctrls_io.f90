@@ -465,9 +465,7 @@
     never_skip_hard_limits, relax_hard_limits_after_retry, report_all_dt_limits, &
     report_why_dt_limits, report_solver_dt_info, report_dX_nuc_drop_dt_limits, &
     limit_for_rel_error_in_energy_conservation, hard_limit_for_rel_error_in_energy_conservation, &
-    limit_for_rel_rate_in_energy_conservation, hard_limit_for_rel_rate_in_energy_conservation, &
-    limit_for_avg_v_residual, hard_limit_for_avg_v_residual, limit_for_max_abs_v_residual, &
-    hard_limit_for_max_abs_v_residual, limit_for_abs_rel_E_err, hard_limit_for_abs_rel_E_err, &
+    limit_for_max_abs_v_residual, hard_limit_for_max_abs_v_residual, &
 
     ! atmosphere -- surface boundary conditions
 
@@ -523,7 +521,7 @@
     use_other_diffusion_coefficients, use_other_pgstar_plots, use_other_eval_fp_ft, use_other_eval_i_rot, use_other_torque, &
     use_other_torque_implicit, use_other_wind, use_other_accreting_state, use_other_after_struct_burn_mix, use_other_mesh_delta_coeff_factor, &
     use_other_before_struct_burn_mix, use_other_astero_freq_corr, use_other_timestep_limit, &
-    x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, trace_solar_neutrinos, &
+    x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, &
     
     ! extra files
     read_extra_controls_inlist1, extra_controls_inlist1_name, read_extra_controls_inlist2, &
@@ -2338,15 +2336,8 @@
  s% limit_for_rel_error_in_energy_conservation = limit_for_rel_error_in_energy_conservation
  s% hard_limit_for_rel_error_in_energy_conservation = hard_limit_for_rel_error_in_energy_conservation
 
- s% limit_for_rel_rate_in_energy_conservation = limit_for_rel_rate_in_energy_conservation
- s% hard_limit_for_rel_rate_in_energy_conservation = hard_limit_for_rel_rate_in_energy_conservation
-
- s% limit_for_avg_v_residual = limit_for_avg_v_residual
- s% hard_limit_for_avg_v_residual = hard_limit_for_avg_v_residual
  s% limit_for_max_abs_v_residual = limit_for_max_abs_v_residual
  s% hard_limit_for_max_abs_v_residual = hard_limit_for_max_abs_v_residual
- s% limit_for_abs_rel_E_err = limit_for_abs_rel_E_err
- s% hard_limit_for_abs_rel_E_err = hard_limit_for_abs_rel_E_err
 
  s% min_chem_eqn_scale = min_chem_eqn_scale
 
@@ -2398,8 +2389,6 @@
  s% use_other_before_struct_burn_mix = use_other_before_struct_burn_mix
  s% use_other_astero_freq_corr = use_other_astero_freq_corr
  s% use_other_timestep_limit = use_other_timestep_limit
-
- s% trace_solar_neutrinos = trace_solar_neutrinos
 
  s% x_ctrl = x_ctrl
  s% x_integer_ctrl = x_integer_ctrl
@@ -3975,15 +3964,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  limit_for_rel_error_in_energy_conservation = s% limit_for_rel_error_in_energy_conservation
  hard_limit_for_rel_error_in_energy_conservation = s% hard_limit_for_rel_error_in_energy_conservation
 
- limit_for_rel_rate_in_energy_conservation = s% limit_for_rel_rate_in_energy_conservation
- hard_limit_for_rel_rate_in_energy_conservation = s% hard_limit_for_rel_rate_in_energy_conservation
-
- limit_for_avg_v_residual = s% limit_for_avg_v_residual
- hard_limit_for_avg_v_residual = s% hard_limit_for_avg_v_residual
  limit_for_max_abs_v_residual = s% limit_for_max_abs_v_residual
  hard_limit_for_max_abs_v_residual = s% hard_limit_for_max_abs_v_residual
- limit_for_abs_rel_E_err = s% limit_for_abs_rel_E_err
- hard_limit_for_abs_rel_E_err = s% hard_limit_for_abs_rel_E_err
 
  min_chem_eqn_scale = s% min_chem_eqn_scale
 
@@ -4036,8 +4018,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_other_before_struct_burn_mix = s% use_other_before_struct_burn_mix
  use_other_astero_freq_corr = s% use_other_astero_freq_corr
  use_other_timestep_limit = s% use_other_timestep_limit
-
- trace_solar_neutrinos = s% trace_solar_neutrinos
 
  x_ctrl = s% x_ctrl
  x_integer_ctrl = s% x_integer_ctrl
