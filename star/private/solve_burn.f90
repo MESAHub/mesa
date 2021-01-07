@@ -310,7 +310,7 @@
                get_eos_info_for_burn_at_const_density, &
                s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
-               screening_mode, s% theta_e(k),  &
+               screening_mode, &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
                burn_lwork, burn_work, net_lwork, net_work, s% xa(1:species,k), &
@@ -339,7 +339,7 @@
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
                s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
-               screening_mode, s% theta_e(k),  &
+               screening_mode,  &
                stptry, max_steps, eps, odescal, &
                okay_to_reuse_rate_screened, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &

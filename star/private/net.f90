@@ -232,7 +232,7 @@
                std_reaction_Qs, reaction_neuQs, reuse_given_rates, .false., &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
-               screening_mode, s% theta_e(k), s% eps_nuc_categories(:,k), &
+               screening_mode, s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
          else
             call net_get( &
@@ -244,7 +244,7 @@
                std_reaction_Qs, reaction_neuQs, reuse_given_rates, .false., &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
-               screening_mode, s% theta_e(k), s% eps_nuc_categories(:,k), &
+               screening_mode, s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
          end if
 
@@ -547,7 +547,6 @@
          write(*,1) 'z2bar =', s% z2bar(k)
          write(*,1) 'ye =', s% ye(k)
          write(*,*) 'screening_mode = ' // trim(s% screening_mode)
-         write(*,1) 'theta_e =', s% theta_e(k)
          write(*,*)
 
       end subroutine show_stuff

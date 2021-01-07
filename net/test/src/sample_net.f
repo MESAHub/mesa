@@ -208,7 +208,7 @@
          real(dp) :: xa(species), T, logT, Rho, logRho, eta, d_eta_dlnT, d_eta_dlnRho, &
             d_eps_nuc_dx(species), dabar_dx(species), dzbar_dx(species), dmc_dx(species), &
             weak_rate_factor, xh, xhe, z, abar, zbar, z2bar, z53bar, ye, mass_correction, xsum, &
-            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, theta_e_for_graboske_et_al, &
+            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, &
             eps_nuc_categories(num_categories), eps_neu_total, &
             dxdt(species), d_dxdt_dRho(species), d_dxdt_dT(species), &
             d_dxdt_dx(species,species)
@@ -244,7 +244,6 @@
          rate_factors(:) = 1
          weak_rate_factor = 1
 
-         theta_e_for_graboske_et_al =  1 ! for nondegenerate
          screening_mode = extended_screening
          
          reuse_rate_raw = .false.
@@ -259,7 +258,7 @@
             std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, & 
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, & 
-            screening_mode, theta_e_for_graboske_et_al, &     
+            screening_mode, &     
             eps_nuc_categories, eps_neu_total, & 
             lwork, work, ierr)
          if (ierr /= 0) then

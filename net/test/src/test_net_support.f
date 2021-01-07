@@ -465,7 +465,7 @@
                   std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  screening_mode, theta_e, &
+                  screening_mode,  &
                   eps_nuc_categories, eps_neu_total, &
                   lwork, work, info)
          if (info /= 0) then
@@ -1103,7 +1103,6 @@
                                                  logT =    9.6532818288064650D+00
                                                logRho =    7.9479966082179185D+00
                                                   eta =    2.7403163311838425D+00
-                                              theta_e =    0.0000000000000000D+00
                                    
                                    
                screening_mode = extended_screening
@@ -1151,7 +1150,6 @@
                                                    logT =    9.8200000000000003D+00
                                                  logRho =    8.2586740078478176D+00
                                                  eta = 0d0
-                                              theta_e =    0.0000000000000000D+00
                                    
                                    
                screening_mode = extended_screening
@@ -1201,7 +1199,6 @@
                                                  logT =    4.6233007922659333D+00
                                                logRho =   -1.0746410107891649D+01
                                                   eta =   -2.2590260158215202D+01
-                                              theta_e =    0.0000000000000000D+00
                                    
                                    
                screening_mode = extended_screening
@@ -1242,8 +1239,6 @@
                                                   eta =    1.2629003275927920D+01
 
                               write(*,*) 'sum xin', sum(xin(:))
-
-                               theta_e =    0
                                    
                                    
                screening_mode = extended_screening
@@ -1271,7 +1266,6 @@
                                   logT =    8.6864273893515023D+00
                                 logRho =    2.0591020210828619D+00
                                    eta =   -1.4317150417353590D+01
-                               theta_e =    1
                                    
                                    
                screening_mode = extended_screening
@@ -1392,7 +1386,6 @@
                                                 z2bar =    5.7180065624152712D+02
                                                    ye =    4.8534829345982072D-01
                         screening_mode = extended_screening
-                                              theta_e =    0.0000000000000000D+00
 
          else
             
@@ -1438,7 +1431,7 @@
                abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
                rate_factors, weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
-               screening_mode, theta_e_for_graboske_et_al,  &
+               screening_mode, &
                lwork, work, ierr)
             stop 'net_get_rates_only'
          end if
@@ -1451,7 +1444,7 @@
                std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-               screening_mode, theta_e,      &
+               screening_mode,  &
                eps_nuc_categories, eps_neu_total,  &
                lwork, work, actual_Qs, actual_neuQs, from_weaklib, info)
          if (info /= 0) then
@@ -1679,7 +1672,6 @@
          write(*,*)
          write(*,*) 'net_name ', trim(net_file)
          write(*,*) 'species', species
-         write(*,1) 'theta_e =', theta_e
          write(*,1) 'abar =', abar
          write(*,1) 'zbar =', zbar
          write(*,1) 'z2bar =', z2bar
@@ -1764,7 +1756,7 @@
                   std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  screening_mode, theta_e,      &
+                  screening_mode,    &
                   eps_nuc_categories, eps_neu_total,  &
                   lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
 
@@ -1786,7 +1778,7 @@
                   std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  screening_mode, theta_e,      &
+                  screening_mode,   &
                   eps_nuc_categories, eps_neu_total,  &
                   lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
 
@@ -1803,7 +1795,7 @@
                   std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  screening_mode, theta_e,      &
+                  screening_mode,  &
                   eps_nuc_categories, eps_neu_total,  &
                   lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
                   

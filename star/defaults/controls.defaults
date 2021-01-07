@@ -6696,9 +6696,6 @@
       ! ~~~~~~~~~~~~~~
 
       ! + empty string means no screening
-      ! + ``'classic'`` :
-      ! DeWitt, Graboske, Cooper, "Screening Factors for Nuclear Reactions.
-      !    I. General Theory", ApJ, 181:439-456, 1973.
       ! Graboske, DeWitt, Grossman, Cooper, "Screening Factors for Nuclear Reactions.
       !    II. Intermediate Screening and Astrophysical Applications", ApJ, 181:457-474, 1973.
       ! + ``' extended'`` :

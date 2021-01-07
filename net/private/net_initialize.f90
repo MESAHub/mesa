@@ -161,12 +161,11 @@
       
       subroutine setup_net_info( &
             g, n, eps_nuc_categories,  &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode,  &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
             reuse_rate_raw, reuse_rate_screened, &
             i, ierr)
-         use rates_def, only: classic_screening
          use chem_def
          use net_approx21, only: approx21_nrat
          use net_approx21_plus_co56, only: approx21_plus_co56_nrat
@@ -175,7 +174,6 @@
          integer, intent(in) :: lwork
          real(dp), intent(inout), target :: eps_nuc_categories(:) ! (num_categories)
          integer, intent(in) :: screening_mode
-         real(dp), intent(in) :: theta_e_for_graboske_et_al
          real(dp), intent(inout), dimension(:), target :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
@@ -205,11 +203,7 @@
          end if
          
          n% screening_mode = screening_mode
-         n% theta_e_for_graboske_et_al = theta_e_for_graboske_et_al
-         
-         if (screening_mode == classic_screening .and. associated(n% graboske_cache))  &
-               n% graboske_cache(1,:,:) = 0
-         
+ 
          n% eps_nuc_categories => eps_nuc_categories
          
          if (.not. reuse_rate_screened) then
@@ -287,7 +281,6 @@
          logical, parameter :: reuse_rate_raw = .false.
          logical, parameter :: reuse_rate_screened = .false.
          integer, parameter :: screening_mode = extended_screening
-         real(dp), parameter :: theta_e_for_graboske_et_al = 1
          
          include 'formats.dek'
          
@@ -327,7 +320,7 @@
          
          call setup_net_info( &
             g, n, eps_nuc_categories,  &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
             reuse_rate_raw, reuse_rate_screened, &

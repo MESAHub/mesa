@@ -593,7 +593,7 @@
             reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             lwork, work, ierr)
          use chem_def, only: num_categories
@@ -655,25 +655,7 @@
 
          real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
 
-         integer, intent(in) :: screening_mode
-         ! if true, use the screening scheme defined in the following papers:
-            ! DeWitt, Graboske, Cooper, "Screening Factors for Nuclear Reactions. 
-            !    I. General Theory", ApJ, 181:439-456, 1973.
-            ! Graboske, DeWitt, Grossman, Cooper, "Screening Factors for Nuclear Reactions. 
-            !    II. Intermediate Screening and Astrophysical Applications", ApJ, 181:457-474, 1973.
-         ! if false, use the screening scheme from Frank Timmes which is based on the following:
-            !..graboske, dewit, grossman and cooper apj 181 457 1973, for weak screening. 
-            !..alastuey and jancovici apj 226 1034 1978, for strong screening. 
-            !..itoh et al apj 234 1079 1979, plasma parameters for strong screening. 
-            !..see also, 
-            !..wallace & woosley 1982, apj, 258, 696, appendix a.
-            !..calder et al, 2007, apj, 656, 313.    
-         real(dp), intent(in)  :: theta_e_for_graboske_et_al
-            ! if screening_mode is true,
-            ! then theta_e is used to quantify the freezing-out of degenerate electrons
-            ! (see paper I by DeWitt, Graboske, Cooper, equation number 5).
-            ! theta_e goes to 1 for non-degenerate electrons and to 0 for large degeneracy.
-            ! the mesa/eos routine eos_theta_e computes this as a function of T and eta.
+         integer, intent(in) :: screening_mode 
             
          integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
          real(dp), pointer :: work(:) ! (lwork)
@@ -711,7 +693,7 @@
                reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-               screening_mode, theta_e_for_graboske_et_al,  &
+               screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
                lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
                ierr)
@@ -756,7 +738,7 @@
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             lwork, work, ierr)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
@@ -799,24 +781,6 @@
          ! rate_raw and rate_screened are described in the declaration of the Net_Info derived type
 
          integer, intent(in) :: screening_mode
-         ! if true, use the screening scheme defined in the following papers:
-            ! DeWitt, Graboske, Cooper, "Screening Factors for Nuclear Reactions. 
-            !    I. General Theory", ApJ, 181:439-456, 1973.
-            ! Graboske, DeWitt, Grossman, Cooper, "Screening Factors for Nuclear Reactions. 
-            !    II. Intermediate Screening and Astrophysical Applications", ApJ, 181:457-474, 1973.
-         ! if false, use the screening scheme from Frank Timmes which is based on the following:
-            !..graboske, dewit, grossman and cooper apj 181 457 1973, for weak screening. 
-            !..alastuey and jancovici apj 226 1034 1978, for strong screening. 
-            !..itoh et al apj 234 1079 1979, plasma parameters for strong screening. 
-            !..see also, 
-            !..wallace & woosley 1982, apj, 258, 696, appendix a.
-            !..calder et al, 2007, apj, 656, 313.    
-         real(dp), intent(in)  :: theta_e_for_graboske_et_al
-            ! if screening_mode is true,
-            ! then theta_e is used to quantify the freezing-out of degenerate electrons
-            ! (see paper I by DeWitt, Graboske, Cooper, equation number 5).
-            ! theta_e goes to 1 for non-degenerate electrons and to 0 for large degeneracy.
-            ! the mesa/eos routine eos_theta_e computes this as a function of T and eta.
             
          integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
          real(dp), pointer :: work(:) ! (lwork)
@@ -872,7 +836,7 @@
                reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-               screening_mode, theta_e_for_graboske_et_al,  &
+               screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
                lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
                ierr)
@@ -895,7 +859,7 @@
             reaction_Qs, reaction_neuQs, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             lwork, work, ierr)
          use chem_def, only: num_categories
@@ -954,12 +918,6 @@
          ! rate_raw and rate_screened are described in the declaration of the Net_Info derived type
 
          integer, intent(in) :: screening_mode ! Selects which screening mode to use, see rates_def for definition 
-         real(dp), intent(in)  :: theta_e_for_graboske_et_al
-            ! if screening_mode is true,
-            ! then theta_e is used to quantify the freezing-out of degenerate electrons
-            ! (see paper I by DeWitt, Graboske, Cooper, equation number 5).
-            ! theta_e goes to 1 for non-degenerate electrons and to 0 for large degeneracy.
-            ! the mesa/eos routine eos_theta_e computes this as a function of T and eta.
             
          integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
          real(dp), pointer :: work(:) ! (lwork)
@@ -999,7 +957,7 @@
             reaction_Qs, reaction_neuQs, .false., .false., &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
             ierr)
@@ -1014,7 +972,7 @@
             reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             lwork, work, actual_Qs, actual_neuQs, from_weaklib, &
             ierr)
@@ -1051,7 +1009,6 @@
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
          integer, intent(in) :: screening_mode
-         real(dp), intent(in)  :: theta_e_for_graboske_et_al
          integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
          real(dp), pointer :: work(:) ! (lwork)
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null  (num_reactions)
@@ -1084,7 +1041,7 @@
             reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
             ierr)
@@ -1117,7 +1074,7 @@
             num_times_for_interpolation, times, log10Ts_f1, log10Rhos_f1, etas_f1, &
             dxdt_source_term, rate_factors, &
             weak_rate_factor, reaction_Qs, reaction_neuQs, &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode, &
             stptry, max_steps, eps, odescal, &
             okay_to_reuse_rate_screened, &
             use_pivoting, trace, dbg, burner_finish_substep, &
@@ -1147,7 +1104,6 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode ! see screen_def
-         real(dp), intent(in) :: theta_e_for_graboske_et_al
          real(dp), intent(in) :: stptry ! try this for 1st step.  0 means try in 1 step.
          integer, intent(in) :: max_steps ! maximal number of allowed steps.
          real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
@@ -1180,7 +1136,7 @@
             handle, num_isos, num_reactions, t_start, t_end, starting_x, &
             num_times_for_interpolation, times, log10Ts_f1, log10Rhos_f1, etas_f1, &
             dxdt_source_term, rate_factors, weak_rate_factor, &
-            reaction_Qs, reaction_neuQs, screening_mode, theta_e_for_graboske_et_al,  &
+            reaction_Qs, reaction_neuQs, screening_mode, &
             stptry, max_steps, eps, odescal, &
             okay_to_reuse_rate_screened, &
             use_pivoting, trace, dbg, burner_finish_substep, &
@@ -1234,7 +1190,7 @@
             starting_x, starting_log10T, log10Rho, &
             get_eos_info_for_burn_at_const_density, &
             rate_factors, weak_rate_factor, reaction_Qs, reaction_neuQs, &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
             burn_lwork, burn_work_array, net_lwork, net_work_array, &
@@ -1257,7 +1213,6 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode ! see screen_def
-         real(dp), intent(in) :: theta_e_for_graboske_et_al
          real(dp), intent(in) :: stptry ! try this for 1st step.  0 means try in 1 step.
          integer, intent(in) :: max_steps ! maximal number of allowed steps.
          real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
@@ -1284,7 +1239,7 @@
             starting_x, starting_log10T, log10Rho, &
             get_eos_info_for_burn_at_const_density, &
             rate_factors, weak_rate_factor, reaction_Qs, reaction_neuQs, &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
             burn_lwork, burn_work_array, net_lwork, net_work_array, &
