@@ -502,44 +502,6 @@
             case (p_logR)
                val = safe_log10(s% r(k)/Rsun)
 
-            case (p_avg_charge_H)
-               val = get_ion_info(ion_iZ_H,k,chem_isos% Z(ih1))
-            case (p_avg_charge_He)
-               val = get_ion_info(ion_iZ_He,k,chem_isos% Z(ihe4))
-            case (p_avg_charge_C)
-               val = get_ion_info(ion_iZ_C,k,chem_isos% Z(ic12))
-            case (p_avg_charge_N)
-               val = get_ion_info(ion_iZ_N,k,chem_isos% Z(in14))
-            case (p_avg_charge_O)
-               val = get_ion_info(ion_iZ_O,k,chem_isos% Z(io16))
-            case (p_avg_charge_Ne)
-               val = get_ion_info(ion_iZ_Ne,k,chem_isos% Z(ine20))
-            case (p_avg_charge_Mg)
-               val = get_ion_info(ion_iZ_Mg,k,chem_isos% Z(img24))
-            case (p_avg_charge_Si)
-               val = get_ion_info(ion_iZ_Si,k,chem_isos% Z(isi28))
-            case (p_avg_charge_Fe)
-               val = get_ion_info(ion_iZ_Fe,k,chem_isos% Z(ife56))
-
-            case (p_neutral_fraction_H)
-               val = get_ion_info(ion_ifneut_H,k,chem_isos% Z(ih1))
-            case (p_neutral_fraction_He)
-               val = get_ion_info(ion_ifneut_He,k,chem_isos% Z(ihe4))
-            case (p_neutral_fraction_C)
-               val = get_ion_info(ion_ifneut_C,k,chem_isos% Z(ic12))
-            case (p_neutral_fraction_N)
-               val = get_ion_info(ion_ifneut_N,k,chem_isos% Z(in14))
-            case (p_neutral_fraction_O)
-               val = get_ion_info(ion_ifneut_O,k,chem_isos% Z(io16))
-            case (p_neutral_fraction_Ne)
-               val = get_ion_info(ion_ifneut_Ne,k,chem_isos% Z(ine20))
-            case (p_neutral_fraction_Mg)
-               val = get_ion_info(ion_ifneut_Mg,k,chem_isos% Z(img24))
-            case (p_neutral_fraction_Si)
-               val = get_ion_info(ion_ifneut_Si,k,chem_isos% Z(isi28))
-            case (p_neutral_fraction_Fe)
-               val = get_ion_info(ion_ifneut_Fe,k,chem_isos% Z(ife56))
-
             case (p_q)
                val = s% q(k)
             case (p_log_q)
@@ -2529,24 +2491,6 @@
                end if
             endif
          end function if_rot
-
-         real(dp) function get_ion_info(id,k,Z)
-            use ionization_lib, only: eval_ionization
-            integer, intent(in) :: id, k, Z
-            integer :: ierr
-            ierr = 0
-            if (ionization_k /= k) then
-               call eval_ionization( &
-                  s% Z(k), s% X(k), s% Rho(k), s% lnd(k)/ln10, &
-                  s% T(k), s% lnT(k)/ln10, ionization_res, ierr)
-               ionization_k = k
-            end if
-            if (ierr /= 0) then
-               get_ion_info = Z
-            else
-               get_ion_info = ionization_res(id)
-            end if
-         end function get_ion_info
 
       end subroutine getval_for_profile
 

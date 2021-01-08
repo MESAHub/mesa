@@ -49,7 +49,9 @@
          call do_init_ionization(ionization_cache_dir, use_cache, ierr) 
       end subroutine ionization_init
 
-
+      ! EXPERIMENTAL
+      ! This routine is currently undocumented, not recommended for publishable work.
+      ! Element diffusion uses eval_typical_charge, not eval_ionization.
       subroutine eval_ionization(Z, X, Rho, log10Rho, T, log10T, res, ierr)
          use ionization_def, only: num_ion_vals
          use ion_tables_eval, only: Get_ion_Results
@@ -101,6 +103,7 @@
             cid, abar, abar*free_e, T, log10_T, rho, log10_rho)    
       end function eval_typical_charge
 
+      ! EXPERIMENTAL
       real(dp) function eval_charge_of_Fe56_in_He4(log10_ne, log10_T, ierr)
          use mod_ionization, only: charge_of_Fe56_in_He4
          real(dp), intent(in) :: log10_ne ! ne=avo*rho*free_e

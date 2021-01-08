@@ -93,27 +93,7 @@
       integer, parameter :: p_log_dq = p_q + 1
       integer, parameter :: p_dq = p_log_dq + 1
 
-      integer, parameter :: p_avg_charge_H = p_dq + 1
-      integer, parameter :: p_avg_charge_He = p_avg_charge_H + 1
-      integer, parameter :: p_avg_charge_C = p_avg_charge_He + 1
-      integer, parameter :: p_avg_charge_N = p_avg_charge_C + 1
-      integer, parameter :: p_avg_charge_O = p_avg_charge_N + 1
-      integer, parameter :: p_avg_charge_Ne = p_avg_charge_O + 1
-      integer, parameter :: p_avg_charge_Mg = p_avg_charge_Ne + 1
-      integer, parameter :: p_avg_charge_Si = p_avg_charge_Mg + 1
-      integer, parameter :: p_avg_charge_Fe = p_avg_charge_Si + 1
-
-      integer, parameter :: p_neutral_fraction_H = p_avg_charge_Fe + 1
-      integer, parameter :: p_neutral_fraction_He = p_neutral_fraction_H + 1
-      integer, parameter :: p_neutral_fraction_C = p_neutral_fraction_He + 1
-      integer, parameter :: p_neutral_fraction_N = p_neutral_fraction_C + 1
-      integer, parameter :: p_neutral_fraction_O = p_neutral_fraction_N + 1
-      integer, parameter :: p_neutral_fraction_Ne = p_neutral_fraction_O + 1
-      integer, parameter :: p_neutral_fraction_Mg = p_neutral_fraction_Ne + 1
-      integer, parameter :: p_neutral_fraction_Si = p_neutral_fraction_Mg + 1
-      integer, parameter :: p_neutral_fraction_Fe = p_neutral_fraction_Si + 1
-
-      integer, parameter :: p_pgas_div_p = p_neutral_fraction_Fe + 1
+      integer, parameter :: p_pgas_div_p =  p_dq + 1
       integer, parameter :: p_pgas_div_ptotal = p_pgas_div_p + 1
 
       integer, parameter :: p_prad_div_pgas = p_pgas_div_ptotal + 1
@@ -906,25 +886,6 @@
          profile_column_name(p_m_grav) = 'm_grav'
          profile_column_name(p_mass_correction_factor) = 'mass_correction_factor'
          profile_column_name(p_m_grav_div_m_baryonic) = 'm_grav_div_m_baryonic'
-
-         profile_column_name(p_avg_charge_H) = 'avg_charge_H'
-         profile_column_name(p_avg_charge_He) = 'avg_charge_He'
-         profile_column_name(p_avg_charge_C) = 'avg_charge_C'
-         profile_column_name(p_avg_charge_N) = 'avg_charge_N'
-         profile_column_name(p_avg_charge_O) = 'avg_charge_O'
-         profile_column_name(p_avg_charge_Ne) = 'avg_charge_Ne'
-         profile_column_name(p_avg_charge_Mg) = 'avg_charge_Mg'
-         profile_column_name(p_avg_charge_Si) = 'avg_charge_Si'
-         profile_column_name(p_avg_charge_Fe) = 'avg_charge_Fe'
-         profile_column_name(p_neutral_fraction_H) = 'neutral_fraction_H'
-         profile_column_name(p_neutral_fraction_He) = 'neutral_fraction_He'
-         profile_column_name(p_neutral_fraction_C) = 'neutral_fraction_C'
-         profile_column_name(p_neutral_fraction_N) = 'neutral_fraction_N'
-         profile_column_name(p_neutral_fraction_O) = 'neutral_fraction_O'
-         profile_column_name(p_neutral_fraction_Ne) = 'neutral_fraction_Ne'
-         profile_column_name(p_neutral_fraction_Mg) = 'neutral_fraction_Mg'
-         profile_column_name(p_neutral_fraction_Si) = 'neutral_fraction_Si'
-         profile_column_name(p_neutral_fraction_Fe) = 'neutral_fraction_Fe'
 
          profile_column_name(p_log_x) = 'log_x'
          profile_column_name(p_x) = 'x'

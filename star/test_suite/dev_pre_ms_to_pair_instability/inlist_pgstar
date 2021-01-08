@@ -183,10 +183,10 @@ Profile_Panels1_num_panels = 5
 Profile_Panels1_yaxis_name(1) = 'logRho'
 Profile_Panels1_other_yaxis_name(1) = 'logT'
 
-Profile_Panels1_yaxis_name(2) = 'avg_charge_He'
+Profile_Panels1_yaxis_name(2) = ''
 Profile_Panels1_ymin(2) = 0
 Profile_Panels1_ymax(2) = 2.2
-Profile_Panels1_other_yaxis_name(2) = 'avg_charge_H'
+Profile_Panels1_other_yaxis_name(2) = ''
 Profile_Panels1_other_ymin(2) = 0
 Profile_Panels1_other_ymax(2) = 1.1
 

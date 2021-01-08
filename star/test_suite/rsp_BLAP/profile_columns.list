@@ -56,9 +56,6 @@
    opacity ! opacity measured at center of zone
    log_opacity ! log10(opacity)
    
-   avg_charge_H
-   avg_charge_He
-
    mass ! m/Msun. mass coordinate of outer boundary of cell.
    log_mass
    !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
