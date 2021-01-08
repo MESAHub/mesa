@@ -1068,7 +1068,8 @@
 
          real(dp) :: min_timestep_factor
          real(dp) :: max_timestep_factor
-         real(dp) :: max_timestep_factor_at_high_T, min_logT_for_max_timestep_factor_at_high_T
+         real(dp) :: max_timestep_factor_at_high_T, &
+            min_logT_for_max_timestep_factor_at_high_T
          real(dp) :: timestep_factor_for_retries
          integer :: retry_hold
          integer :: neg_mass_fraction_hold
@@ -1169,9 +1170,6 @@
          real(dp) :: delta_lgR_limit
          real(dp) :: delta_lgR_hard_limit, delta_lgR_limit_min_lgR
 
-         real(dp) :: delta_lgL_phot_limit
-         real(dp) :: delta_lgL_phot_hard_limit, delta_lgL_phot_limit_L_min
-
          real(dp) :: delta_Ye_highT_limit
          real(dp) :: delta_Ye_highT_hard_limit
          real(dp) :: minT_for_highT_Ye_limit
@@ -1183,6 +1181,12 @@
          real(dp) :: delta_lgL_nuc_at_high_T_limit_lgT_min
          real(dp) :: max_lgT_for_lgL_nuc_limit
          real(dp) :: lgL_nuc_burn_min, lgL_nuc_drop_factor
+         
+         real(dp) :: delta_lgL_power_photo_limit = -1
+         real(dp) :: delta_lgL_power_photo_hard_limit = -1
+         real(dp) :: min_lgT_for_lgL_power_photo_limit = 9d0
+         real(dp) :: lgL_power_photo_burn_min = 10d0
+         real(dp) :: lgL_power_photo_drop_factor = 10
 
          real(dp) :: delta_lgL_nuc_cat_limit
          real(dp) :: delta_lgL_nuc_cat_hard_limit
@@ -1200,11 +1204,6 @@
          real(dp) :: delta_lgL_z_limit
          real(dp) :: delta_lgL_z_hard_limit, lgL_z_burn_relative_limit
          real(dp) :: lgL_z_burn_min, lgL_z_drop_factor
-
-         real(dp) :: delta_lgL_photo_limit
-         real(dp) :: delta_lgL_photo_hard_limit
-         real(dp) :: lgL_photo_burn_min, lgL_photo_drop_factor
-         real(dp) :: min_lgT_for_lgL_photo_limit
 
          real(dp) :: delta_lgP_cntr_limit
          real(dp) :: delta_lgP_cntr_hard_limit
@@ -1279,12 +1278,6 @@
          real(dp) :: delta_lgTeff_limit
          real(dp) :: delta_lgTeff_hard_limit
 
-         real(dp) :: delta_vsurf_kms_limit
-         real(dp) :: delta_vsurf_kms_hard_limit
-
-         real(dp) :: delta_lgR_phot_limit
-         real(dp) :: delta_lgR_phot_hard_limit
-
          real(dp) :: delta_lgL_limit, delta_lgL_limit_L_min
          real(dp) :: delta_lgL_hard_limit
 
@@ -1303,10 +1296,6 @@
          real(dp) :: &
             limit_for_rel_error_in_energy_conservation, &
             hard_limit_for_rel_error_in_energy_conservation
-
-         logical :: trace_force_another_iteration
-
-         real(dp) :: limit_for_max_abs_v_residual, hard_limit_for_max_abs_v_residual
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
 

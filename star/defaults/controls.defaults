@@ -7839,16 +7839,6 @@
     max_abs_rel_change_surf_lnS = 5d-4
 
 
-      ! trace_force_another_iteration
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, report when force another iteration in solver solver.
-
-      ! ::
-
-    trace_force_another_iteration = .false.
-
-
       ! extra_power_source
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -8958,7 +8948,7 @@
       !          'Lnuc_cat'             delta_lgL_nuc_cat_limit
       !          'Lnuc_H'               delta_lgL_H_limit
       !          'Lnuc_He'              delta_lgL_He_limit
-      !          'Lnuc_photo'           delta_lgL_photo_limit
+      !          'Lnuc_photo'           delta_lgL_power_photo_limit
       !          'Lnuc_z'               delta_lgL_z_limit
       !          'bad_X_sum'            (solver found bad mass sum)
       !          'dH'                   dH_limit
@@ -8984,7 +8974,6 @@
       !          'highT del Ye'         delta_Ye_highT_limit
       !          'hold'                 (recent retry, so no increase in dt)
       !          'lgL'                  delta_lgL_limit
-      !          'lgL_phot'             delta_lgL_phot_limit
       !          'lgP'                  delta_lgP_limit
       !          'lgP_cntr'             delta_lgP_cntr_limit
       !          'lgR'                  delta_lgR_limit
@@ -10245,7 +10234,7 @@
       ! contributions of forward and reverse rates such as
       ! photodisintegration and rebuilding of he4
       ! so if doing advanced burning, may want to turn off lgL_nuc limits above some max logT
-      ! and turn on lgL_photo limits at a somewhat smaller max logT.
+      ! and turn on lgL_power_photo limits at a somewhat smaller max logT.
 
       ! ::
 
@@ -10274,46 +10263,32 @@
       ! values for ``lgL_photo`` are based on ``L_by_category(iphoto)``
 
 
-      ! delta_lgL_photo_limit
+      ! delta_lgL_power_photo_limit
       ! ~~~~~~~~~~~~~~~~~~~~~
-      ! delta_lgL_photo_hard_limit
+      ! delta_lgL_power_photo_hard_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! min_lgT_for_lgL_photo_limit
+      ! min_lgT_for_lgL_power_photo_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! lgL_photo_burn_min
+      ! lgL_power_photo_burn_min
       ! ~~~~~~~~~~~~~~~~~~
-      ! lgL_photo_drop_factor
+      ! lgL_power_photo_drop_factor
       ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Limit for magnitude of change in ``lgL_photo``.
-      ! If max delta is greater than ``delta_lgL_photo_hard_limit``,
+      ! If max delta is greater than ``delta_lgL_power_photo_hard_limit``,
       ! retry with smaller timestep.
-      ! ignore delta_lgL_photo_limit when max logT < ``min_lgT_for_lgL_photo_limit``.
-      ! Ignore changes in ``lgL_photo`` if value is less than ``lgL_photo_burn_min``.
-      ! When ``L_photo`` is dropping, multiply limits by ``lgL_photo_drop_factor``.
+      ! ignore delta_lgL_power_photo_limit when max logT < ``min_lgT_for_lgL_power_photo_limit``.
+      ! Ignore changes in ``lgL_photo`` if value is less than ``lgL_power_photo_burn_min``.
+      ! When ``L_photo`` is dropping, multiply limits by ``lgL_power_photo_drop_factor``.
 
       ! ::
 
-    delta_lgL_photo_limit = -1
-    delta_lgL_photo_hard_limit = -1
-    min_lgT_for_lgL_photo_limit = 9d0
-    lgL_photo_burn_min = 10d0
-    lgL_photo_drop_factor = 10
+    delta_lgL_power_photo_limit = -1
+    delta_lgL_power_photo_hard_limit = -1
+    min_lgT_for_lgL_power_photo_limit = 9d0
+    lgL_power_photo_burn_min = 10d0
+    lgL_power_photo_drop_factor = 10
     
-      ! limit based on changes in velocity at surface
-
-
-      ! delta_vsurf_kms_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! delta_vsurf_kms_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Limit for magnitude of change in velocity at surface
-
-      ! ::
-
-    delta_vsurf_kms_limit = 1d99
-    delta_vsurf_kms_hard_limit = 1d99
 
       ! limits based on changes at photosphere
 
@@ -10346,23 +10321,6 @@
     delta_lgL_limit_L_min = -100
     delta_lgL_limit = 0.1d0
     delta_lgL_hard_limit = -1
-
-
-      ! delta_lgL_phot_limit_L_min
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! delta_lgL_phot_limit
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! delta_lgL_phot_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Limit for magnitude of change in log10(``L_phot``/Lsun).
-      ! Only apply this limit when ``L_phot`` >= ``delta_lgL_phot_limit_L_min`` (in Lsun units).
-
-      ! ::
-
-    delta_lgL_phot_limit_L_min = -100
-    delta_lgL_phot_limit = 0.1d0
-    delta_lgL_phot_hard_limit = -1
 
 
       ! dt_div_min_dr_div_cs_limit

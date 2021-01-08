@@ -22,7 +22,7 @@
       set_initial_dt = .true.
       years_for_initial_dt = 1d2 ! in years
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist

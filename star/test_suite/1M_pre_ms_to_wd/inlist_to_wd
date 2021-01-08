@@ -10,8 +10,7 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'log_L_lower_limit'
 
-
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 

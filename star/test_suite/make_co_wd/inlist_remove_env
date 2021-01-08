@@ -15,6 +15,10 @@
       max_dt_for_relax_entropy = 1d-6
       num_timescales_for_relax_entropy = 30
       max_steps_to_relax_entropy = 10000
+      
+      remove_surface_do_jrot = .false.
+      remove_surface_do_entropy = .true.
+      remove_surface_turn_off_energy_sources_and_sinks = .true.
 
       !pgstar_flag = .true.
 

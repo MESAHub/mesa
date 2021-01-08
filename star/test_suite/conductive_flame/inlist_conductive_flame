@@ -22,7 +22,7 @@
       initial_model_relax_num_steps = 0
 
     ! display on-screen plots
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / !end of star_job namelist
@@ -71,8 +71,7 @@
       use_other_surface_PT = .true.
       use_atm_PT_at_center_of_surface_cell = .true.
 
-    ! there's no surface here; ignore change in lgL_phot & lgL_surf
-      delta_lgL_phot_limit_L_min = 1d99
+    ! there's no surface here; ignore change in lgL_surf
       delta_lgL_limit_L_min = 1d99
 
     ! specify base metallicity for opacities

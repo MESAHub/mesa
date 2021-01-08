@@ -191,7 +191,6 @@
          zero_initial_inner_v_by_mass_Msun, &
          zero_inner_v_by_mass_Msun, &
 
-         repeat_remove_surface_for_each_step, &
          remove_surface_at_cell_k, &
          remove_surface_by_optical_depth, &
          remove_surface_by_density, &
@@ -204,6 +203,10 @@
          remove_surface_by_v_surf_km_s, &
          remove_surface_by_v_surf_div_cs, &
          remove_surface_by_v_surf_div_v_escape, &
+
+         remove_surface_do_jrot, &
+         remove_surface_do_entropy, &
+         remove_surface_turn_off_energy_sources_and_sinks, &
          
          remove_initial_surface_at_cell_k, &
          remove_initial_surface_by_optical_depth, &
@@ -850,7 +853,6 @@
          s% job% remove_initial_surface_by_v_surf_div_cs = remove_initial_surface_by_v_surf_div_cs
          s% job% remove_initial_surface_by_v_surf_div_v_escape = remove_initial_surface_by_v_surf_div_v_escape
 
-         s% job% repeat_remove_surface_for_each_step = repeat_remove_surface_for_each_step
          s% job% remove_surface_at_cell_k = remove_surface_at_cell_k
          s% job% remove_surface_by_optical_depth = remove_surface_by_optical_depth
          s% job% remove_surface_by_density = remove_surface_by_density
@@ -863,6 +865,10 @@
          s% job% remove_surface_by_v_surf_km_s = remove_surface_by_v_surf_km_s
          s% job% remove_surface_by_v_surf_div_cs = remove_surface_by_v_surf_div_cs
          s% job% remove_surface_by_v_surf_div_v_escape = remove_surface_by_v_surf_div_v_escape
+         
+         s% job% remove_surface_do_jrot = remove_surface_do_jrot
+         s% job% remove_surface_do_entropy = remove_surface_do_entropy
+         s% job% remove_surface_turn_off_energy_sources_and_sinks = remove_surface_turn_off_energy_sources_and_sinks
 
          s% job% report_mass_not_fe56 = report_mass_not_fe56
          s% job% relax_dxdt_nuc_factor = relax_dxdt_nuc_factor
@@ -1399,7 +1405,6 @@
          zero_initial_inner_v_by_mass_Msun = s% job% zero_initial_inner_v_by_mass_Msun
          zero_inner_v_by_mass_Msun = s% job% zero_inner_v_by_mass_Msun
 
-         repeat_remove_surface_for_each_step = s% job% repeat_remove_surface_for_each_step
          remove_surface_at_cell_k = s% job% remove_surface_at_cell_k
          remove_surface_by_optical_depth = s% job% remove_surface_by_optical_depth
          remove_surface_by_density = s% job% remove_surface_by_density
@@ -1412,6 +1417,10 @@
          remove_surface_by_v_surf_km_s = s% job% remove_surface_by_v_surf_km_s
          remove_surface_by_v_surf_div_cs = s% job% remove_surface_by_v_surf_div_cs
          remove_surface_by_v_surf_div_v_escape = s% job% remove_surface_by_v_surf_div_v_escape
+         
+         remove_surface_do_jrot = s% job% remove_surface_do_jrot
+         remove_surface_do_entropy = s% job% remove_surface_do_entropy
+         remove_surface_turn_off_energy_sources_and_sinks = s% job% remove_surface_turn_off_energy_sources_and_sinks
          
          remove_initial_surface_at_cell_k = s% job% remove_initial_surface_at_cell_k
          remove_initial_surface_by_optical_depth = &

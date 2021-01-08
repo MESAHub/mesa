@@ -214,9 +214,9 @@
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_z))
             if (return_now(Tlim_dlgL_z)) return
 
-            do_timestep_limits = check_lgL_photo_change( &
-               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_photo))
-            if (return_now(Tlim_dlgL_photo)) return
+            do_timestep_limits = check_lgL_power_photo_change( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_power_photo))
+            if (return_now(Tlim_dlgL_power_photo)) return
 
             do_timestep_limits = check_lgL_nuc_change( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgL_nuc))
@@ -225,10 +225,6 @@
             do_timestep_limits = check_dlgTeff_change( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgTeff))
             if (return_now(Tlim_dlgTeff)) return
-
-            do_timestep_limits = check_dvsurf_kms_change( &
-               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dvsurf_kms))
-            if (return_now(Tlim_dvsurf_kms)) return
 
             do_timestep_limits = check_dlgRho_cntr_change( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dlgRho_cntr))
@@ -327,10 +323,6 @@
             do_timestep_limits = check_delta_lgL( &
                s, skip_hard_limit, dt_limit_ratio(Tlim_lgL))
             if (return_now(Tlim_lgL)) return
-
-            do_timestep_limits = check_delta_lgL_phot( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_lgL_phot))
-            if (return_now(Tlim_lgL_phot)) return
 
             do_timestep_limits = check_dt_div_min_dr_div_cs( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dt_div_min_dr_div_cs))
@@ -1242,15 +1234,15 @@
          check_lgL = keep_going
          
          iso = iso_in
-         if (iso == iprot) then ! check_lgL_photo_change
-            if (s% log_max_temperature < s% min_lgT_for_lgL_photo_limit) return
+         if (iso == iprot) then ! check_lgL_power_photo_change
+            if (s% log_max_temperature < s% min_lgT_for_lgL_power_photo_limit) return
             new_L = abs(s% power_photo)
             max_other_L = 0d0
             old_L = abs(s% power_photo_old)
-            lim = s% delta_lgL_photo_limit
-            hard_lim = s% delta_lgL_photo_hard_limit
-            lgL_min = s% lgL_photo_burn_min
-            drop_factor = s% lgL_photo_drop_factor
+            lim = s% delta_lgL_power_photo_limit
+            hard_lim = s% delta_lgL_power_photo_hard_limit
+            lgL_min = s% lgL_power_photo_burn_min
+            drop_factor = s% lgL_power_photo_drop_factor
             relative_limit = 0d0
          else if (iso == ineut) then ! check_lgL_nuc_change
             if (s% log_max_temperature > s% max_lgT_for_lgL_nuc_limit) return
@@ -1386,15 +1378,15 @@
       end function check_lgL_z_change
 
 
-      integer function check_lgL_photo_change(s, skip_hard_limit, dt, dt_limit_ratio)
+      integer function check_lgL_power_photo_change(s, skip_hard_limit, dt, dt_limit_ratio)
          use chem_def, only: iprot
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
-         check_lgL_photo_change = check_lgL( &
-            s, iprot, 'check_lgL_photo_change', skip_hard_limit, dt, dt_limit_ratio)
-      end function check_lgL_photo_change
+         check_lgL_power_photo_change = check_lgL( &
+            s, iprot, 'check_lgL_power_photo_change', skip_hard_limit, dt, dt_limit_ratio)
+      end function check_lgL_power_photo_change
 
 
       integer function check_lgL_nuc_change(s, skip_hard_limit, dt, dt_limit_ratio)
@@ -1521,23 +1513,6 @@
             s% delta_lgTeff_limit, s% delta_lgTeff_hard_limit, &
             1, 'check_dlgTeff_change', skip_hard_limit, dt_limit_ratio, relative_excess)
       end function check_dlgTeff_change
-
-
-      integer function check_dvsurf_kms_change(s, skip_hard_limit, dt, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(in) :: dt
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: change, relative_excess
-         include 'formats'
-         check_dvsurf_kms_change = keep_going
-         dt_limit_ratio = 0d0
-         if (s% doing_relax .or. .not. s% v_flag) return
-         change = (s% v(1) - s% v_start(1))/1d5
-         check_dvsurf_kms_change = check_change(s, change, &
-            s% delta_vsurf_kms_limit, s% delta_vsurf_kms_hard_limit, &
-            1, 'check_dvsurf_kms_change', skip_hard_limit, dt_limit_ratio, relative_excess)
-      end function check_dvsurf_kms_change
 
 
       integer function check_dYe_highT_change( &
@@ -2164,31 +2139,6 @@
             1, 'check_adjust_J_q', &
             .false., dt_limit_ratio, relative_excess)
       end function check_adjust_J_q
-
-
-      integer function check_delta_lgL_phot(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: dlgL_phot, relative_excess
-         include 'formats'
-         check_delta_lgL_phot = keep_going
-         dt_limit_ratio = 0d0
-         if (s% doing_relax) return
-         if (s% L_phot < s% delta_lgL_phot_limit_L_min .or. s% L_phot_old <= 0d0) then
-            dlgL_phot = 0
-         else
-            dlgL_phot = log10(s% L_phot/s% L_phot_old)
-         end if
-         if (is_bad(dlgL_phot)) then
-            write(*,2) 's% L_phot', s% model_number, s% L_phot
-            write(*,2) 's% L_phot_old', s% model_number, s% L_phot_old
-            stop 'check_delta_lgL'
-         end if
-         check_delta_lgL_phot = check_change(s, dlgL_phot, &
-            s% delta_lgL_phot_limit, s% delta_lgL_phot_hard_limit, &
-            1, 'check_delta_lgL_phot', skip_hard_limit, dt_limit_ratio, relative_excess)
-      end function check_delta_lgL_phot
 
 
       integer function check_delta_lgL(s, skip_hard_limit, dt_limit_ratio)
