@@ -18,8 +18,11 @@ module auto_diff_real_2var_order2_module
       make_binop, &
       operator(-), &
       exp, &
+      expm1, &
       exp10, &
+      powm1, &
       log, &
+      log1p, &
       safe_log, &
       log10, &
       safe_log10, &
@@ -140,13 +143,25 @@ module auto_diff_real_2var_order2_module
       module procedure exp_self
    end interface exp
    
+   interface expm1
+      module procedure expm1_self
+   end interface expm1
+   
    interface exp10
       module procedure exp10_self
    end interface exp10
    
+   interface powm1
+      module procedure powm1_self
+   end interface powm1
+   
    interface log
       module procedure log_self
    end interface log
+   
+   interface log1p
+      module procedure log1p_self
+   end interface log1p
    
    interface safe_log
       module procedure safe_log_self
@@ -657,6 +672,19 @@ module auto_diff_real_2var_order2_module
       unary%d2val2 = q0*(x%d2val2 + pow2(x%d1val2))
    end function exp_self
    
+   function expm1_self(x) result(unary)
+      type(auto_diff_real_2var_order2), intent(in) :: x
+      type(auto_diff_real_2var_order2) :: unary
+      real(dp) :: q0
+      q0 = exp(x%val)
+      unary%val = expm1(x%val)
+      unary%d1val1 = q0*x%d1val1
+      unary%d1val2 = q0*x%d1val2
+      unary%d2val1 = q0*(x%d2val1 + pow2(x%d1val1))
+      unary%d1val1_d1val2 = q0*(x%d1val1*x%d1val2 + x%d1val1_d1val2)
+      unary%d2val2 = q0*(x%d2val2 + pow2(x%d1val2))
+   end function expm1_self
+   
    function exp10_self(x) result(unary)
       type(auto_diff_real_2var_order2), intent(in) :: x
       type(auto_diff_real_2var_order2) :: unary
@@ -674,6 +702,21 @@ module auto_diff_real_2var_order2_module
       unary%d2val2 = q2*(q1*pow2(x%d1val2) + x%d2val2)
    end function exp10_self
    
+   function powm1_self(x) result(unary)
+      type(auto_diff_real_2var_order2), intent(in) :: x
+      type(auto_diff_real_2var_order2) :: unary
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = powm1(pow2(x%val))
+      q1 = powm1(pow3(x%val))
+      unary%val = powm1(x%val)
+      unary%d1val1 = -q0*x%d1val1
+      unary%d1val2 = -q0*x%d1val2
+      unary%d2val1 = q1*(-x%d2val1*x%val + 2*pow2(x%d1val1))
+      unary%d1val1_d1val2 = q1*(2*x%d1val1*x%d1val2 - x%d1val1_d1val2*x%val)
+      unary%d2val2 = q1*(-x%d2val2*x%val + 2*pow2(x%d1val2))
+   end function powm1_self
+   
    function log_self(x) result(unary)
       type(auto_diff_real_2var_order2), intent(in) :: x
       type(auto_diff_real_2var_order2) :: unary
@@ -688,6 +731,23 @@ module auto_diff_real_2var_order2_module
       unary%d1val1_d1val2 = q1*(-x%d1val1*x%d1val2 + x%d1val1_d1val2*x%val)
       unary%d2val2 = q1*(x%d2val2*x%val - pow2(x%d1val2))
    end function log_self
+   
+   function log1p_self(x) result(unary)
+      type(auto_diff_real_2var_order2), intent(in) :: x
+      type(auto_diff_real_2var_order2) :: unary
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = x%val + 1
+      q1 = powm1(q0)
+      q2 = powm1(pow2(q0))
+      unary%val = log1p(x%val)
+      unary%d1val1 = q1*x%d1val1
+      unary%d1val2 = q1*x%d1val2
+      unary%d2val1 = q2*(q0*x%d2val1 - pow2(x%d1val1))
+      unary%d1val1_d1val2 = q2*(q0*x%d1val1_d1val2 - x%d1val1*x%d1val2)
+      unary%d2val2 = q2*(q0*x%d2val2 - pow2(x%d1val2))
+   end function log1p_self
    
    function safe_log_self(x) result(unary)
       type(auto_diff_real_2var_order2), intent(in) :: x

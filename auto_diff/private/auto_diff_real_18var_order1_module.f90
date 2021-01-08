@@ -18,8 +18,11 @@ module auto_diff_real_18var_order1_module
       make_binop, &
       operator(-), &
       exp, &
+      expm1, &
       exp10, &
+      powm1, &
       log, &
+      log1p, &
       safe_log, &
       log10, &
       safe_log10, &
@@ -134,13 +137,25 @@ module auto_diff_real_18var_order1_module
       module procedure exp_self
    end interface exp
    
+   interface expm1
+      module procedure expm1_self
+   end interface expm1
+   
    interface exp10
       module procedure exp10_self
    end interface exp10
    
+   interface powm1
+      module procedure powm1_self
+   end interface powm1
+   
    interface log
       module procedure log_self
    end interface log
+   
+   interface log1p
+      module procedure log1p_self
+   end interface log1p
    
    interface safe_log
       module procedure safe_log_self
@@ -607,6 +622,13 @@ module auto_diff_real_18var_order1_module
       unary%d1Array(1:18) = q0*x%d1Array(1:18)
    end function exp_self
    
+   function expm1_self(x) result(unary)
+      type(auto_diff_real_18var_order1), intent(in) :: x
+      type(auto_diff_real_18var_order1) :: unary
+      unary%val = expm1(x%val)
+      unary%d1Array(1:18) = x%d1Array(1:18)*exp(x%val)
+   end function expm1_self
+   
    function exp10_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
@@ -616,12 +638,26 @@ module auto_diff_real_18var_order1_module
       unary%d1Array(1:18) = q0*x%d1Array(1:18)*ln10
    end function exp10_self
    
+   function powm1_self(x) result(unary)
+      type(auto_diff_real_18var_order1), intent(in) :: x
+      type(auto_diff_real_18var_order1) :: unary
+      unary%val = powm1(x%val)
+      unary%d1Array(1:18) = -x%d1Array(1:18)*powm1(pow2(x%val))
+   end function powm1_self
+   
    function log_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = log(x%val)
       unary%d1Array(1:18) = x%d1Array(1:18)*powm1(x%val)
    end function log_self
+   
+   function log1p_self(x) result(unary)
+      type(auto_diff_real_18var_order1), intent(in) :: x
+      type(auto_diff_real_18var_order1) :: unary
+      unary%val = log1p(x%val)
+      unary%d1Array(1:18) = x%d1Array(1:18)*powm1(x%val + 1)
+   end function log1p_self
    
    function safe_log_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
