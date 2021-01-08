@@ -143,9 +143,6 @@
    !eps_nuc ! ergs/g/sec from nuclear reactions (neutrinos subtracted)
    !non_nuc_neu ! non-nuclear-reaction neutrino losses
    
-   avg_charge_H
-   avg_charge_He
-   
    !nonnucneu_plas ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
    !nonnucneu_brem ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
    !nonnucneu_phot ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
