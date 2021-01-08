@@ -95,7 +95,7 @@
             starting_x, starting_log10T, log10Rho, &
             get_eos_info_for_burn_at_const_density, &
             rate_factors, weak_rate_factor, reaction_Qs, reaction_neuQs, &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode, &
             stptry_in, max_steps, eps, odescal, &
             use_pivoting, trace, burn_dbg, burner_finish_substep, &
             burn_lwork, burn_work_array, net_lwork, net_work_array, &
@@ -123,7 +123,6 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode ! see screen_def
-         real(dp), intent(in) :: theta_e_for_graboske_et_al
          real(dp), intent(in) :: stptry_in ! try this for 1st step.  0 means try in 1 step.
          integer, intent(in) :: max_steps ! maximal number of allowed steps.
          real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
@@ -148,7 +147,7 @@
          type (Net_General_Info), pointer :: g
          integer :: ijac, lrd, lid, lout, i, j, ir, idid, sz
          logical :: okay
-         real(dp) :: temp, rho, lgT, lgRho, r, prev_lgRho, prev_lgT, theta
+         real(dp) :: temp, rho, lgT, lgRho, r, prev_lgRho, prev_lgT
          
          integer :: stpmax, imax_dydx, nstp
          real(dp) :: &
@@ -201,7 +200,6 @@
 
          d_eta_dlnRho = 0d0
          
-         theta = theta_e_for_graboske_et_al
          lgT = starting_log10T
          lnT = lgT*ln10
          temp = exp10(lgT)
@@ -268,7 +266,7 @@
          if (dbg) write(*,2) 'call setup_net_info', iwork
          call setup_net_info( &
             g, n, eps_nuc_categories,  &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, burn_lwork, burn_work_array, &
             .false., .false., iwork, ierr)
@@ -487,7 +485,7 @@
                .false., .false., &
                eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-               screening_mode, theta,  &
+               screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
                net_lwork, net_work_array, &
                actual_Qs, actual_neuQs, from_weaklib, .false., ierr)

@@ -679,12 +679,10 @@
                zhat, zhat2, lzav, aznut, zs13inv, &
                ierr)
          use screen5, only: screen5_init_AZ_info
-         use screen_graboske, only: graboske_init_z_info
          real(dp), intent(in) :: a1, z1, a2, z2
          real(dp), intent(out) :: zg1, zg2, zg3, zg4
          real(dp), intent(out) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
          integer, intent(out) :: ierr
-         call graboske_init_z_info(zg1, zg2, zg3, zg4, z1, z2, ierr)
          if (ierr /= 0) return
          call screen5_init_AZ_info( &
                zs13, zhat, zhat2, lzav, aznut, zs13inv, a1, z1, a2, z2, ierr)
@@ -699,11 +697,9 @@
          ierr = 0
          option = StrLowCase(which_screening_option)         
          if (option == 'no_screening' .or. len_trim(option) == 0) then
-            screening_option = no_screening           
+            screening_option = no_screening                   
          else if (option == 'extended') then
-            screening_option = extended_screening            
-         else if (option == 'classic') then
-            screening_option = classic_screening           
+            screening_option = extended_screening           
          else if (option == 'salpeter') then
             screening_option = salpeter_screening    
          else if (option == 'chugunov') then
@@ -721,9 +717,7 @@
          integer, intent(out) :: ierr
          ierr = 0         
          if (which_screening_option == no_screening) then
-            screening_option = 'no_screening'            
-         else if (which_screening_option == classic_screening) then
-            screening_option = 'classic'            
+            screening_option = 'no_screening'                    
          else if (which_screening_option == extended_screening) then
             screening_option = 'extended'            
          else if (which_screening_option == salpeter_screening) then
@@ -856,8 +850,7 @@
       ! sets info that depends only on temp, den, and overall composition         
       subroutine screen_set_context( &
             sc, temp, den, logT, logRho, zbar, abar, z2bar,  &
-            screening_mode, graboske_cache,  &
-            theta_e, num_isos, y, iso_z158)
+            screening_mode, num_isos, y, iso_z158)
          use rates_def
          use screen, only: do_screen_set_context
          type (Screen_Info), pointer :: sc
@@ -866,15 +859,11 @@
                temp, den, logT, logRho, zbar, abar, z2bar, y(:), iso_z158(:)
             ! y(:) = x(:)/chem_A(chem_id(:))
             ! iso_z(:) = chem_Z(chem_id(:))**1.58
-         integer, intent(in) :: screening_mode ! if false, use fxt screening scheme.
-         real(dp), pointer :: graboske_cache(:,:,:)
-         real(dp) :: theta_e ! for screening_mode == classic_screening
-            ! theta_e is used in the Graboske et al screening method.
-            ! for non-degenerate electrons, theta_e goes to 1.
-            ! for significantly degenerate electrons, it goes to 0.
+         integer, intent(in) :: screening_mode 
          call do_screen_set_context( &
             sc, temp, den, logT, logRho, zbar, abar, z2bar, &
-            screening_mode, graboske_cache, theta_e, num_isos, y, iso_z158)
+            screening_mode, num_isos, y, iso_z158)
+
       end subroutine screen_set_context
 
 
@@ -883,32 +872,24 @@
       subroutine screen_pair( &
                sc, a1, z1, a2, z2, screening_mode, &
                zg1, zg2, zg3, zg4, zs13, zhat, zhat2, lzav, aznut, zs13inv, &
-               theta_e_for_graboske_et_al, graboske_cache, scor, scordt, scordd, ierr)
+               scor, scordt, scordd, ierr)
          use rates_def
-         use screen_graboske, only: graboske_et_al_screening
          use screen5, only: fxt_screen5
          use screening_chugunov, only: eval_screen_chugunov
          
          type (Screen_Info), pointer :: sc ! previously setup 
          real(dp), intent(in) :: a1, z1, a2, z2
          integer, intent(in) :: screening_mode ! see screen_def.
-         real(dp) :: theta_e_for_graboske_et_al ! not used for fxt screening.
          ! cached info
          real(dp), intent(in) :: zg1, zg2, zg3, zg4
          real(dp), intent(in) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
-         real(dp), pointer :: graboske_cache(:,:,:) ! (3,max_z_to_cache,max_z_to_cache)
          ! outputs
          real(dp), intent(out) :: scor ! screening factor
          real(dp), intent(out) :: scordt ! partial wrt temperature
          real(dp), intent(out) :: scordd ! partial wrt density
          integer, intent(out) :: ierr
          
-         if (screening_mode == classic_screening) then
-            call graboske_et_al_screening( &
-               sc, zg1, zg2, zg3, zg4,  &
-               theta_e_for_graboske_et_al, graboske_cache, &
-               a1, z1, a2, z2, scor, scordt, scordd, ierr)
-         else if (screening_mode == extended_screening) then
+         if (screening_mode == extended_screening) then
             call fxt_screen5( &
                sc, zs13, zhat, zhat2, lzav, aznut, zs13inv,  &
                a1, z1, a2, z2, scor, scordt, scordd, ierr)
@@ -988,7 +969,7 @@
       ! sets info that depends only on temp, den, and overall composition         
       subroutine coulomb_set_context( &
             cc, temp, den, logT, logRho, zbar, abar, z2bar,  &
-            theta_e, num_isos, y, iso_z52)
+             num_isos, y, iso_z52)
          use rates_def, only: Coulomb_Info
          use coulomb, only: do_coulomb_set_context
          type (Coulomb_Info), pointer :: cc
@@ -997,12 +978,9 @@
                temp, den, logT, logRho, zbar, abar, z2bar, y(:), iso_z52(:)
             ! y(:) = x(:)/chem_A(chem_id(:))
             ! iso_z52(:) = chem_Z(chem_id(:))**5/2
-         real(dp) :: theta_e
-            ! for non-degenerate electrons, theta_e goes to 1.
-            ! for significantly degenerate electrons, it goes to 0.
          call do_coulomb_set_context( &
             cc, temp, den, logT, logRho, zbar, abar, z2bar, &
-            theta_e, num_isos, y, iso_z52)
+            num_isos, y, iso_z52)
       end subroutine coulomb_set_context
 
 

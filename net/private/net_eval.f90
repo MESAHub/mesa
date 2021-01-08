@@ -47,7 +47,7 @@
             reuse_rate_raw, reuse_rate_screened, &
             eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode, &
             eps_nuc_categories, eps_neu_total, &
             lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, ierr)
          use net_initialize, only: &
@@ -89,7 +89,6 @@
          real(dp), intent(inout) :: eps_nuc_categories(:)
          real(dp), intent(out) :: eps_neu_total
          integer, intent(in) :: screening_mode
-         real(dp), intent(in)  :: theta_e_for_graboske_et_al
          integer, intent(in) :: lwork
          real(dp), pointer :: work(:) ! (lwork)
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null
@@ -188,7 +187,7 @@
          if (dbg) write(*,*) 'call setup_net_info'
          call setup_net_info( &
             g, n, eps_nuc_categories,  &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
             reuse_rate_raw, reuse_rate_screened, &
@@ -644,7 +643,7 @@
                   g, num_isos, n% y, btemp, bden, logtemp, logrho, .false.,  &
                   rate_raw, rate_raw_dT, rate_raw_dRho, &
                   rate_screened, rate_screened_dT, rate_screened_dRho, &
-                  n% screening_mode, n% theta_e_for_graboske_et_al, n% graboske_cache, &
+                  n% screening_mode, &
                   screen_h1, screen_he4, zbar, abar, z2bar, ye, ierr)
                if (dbg) write(*,*) 'done screen_net with init=.false.'
                if (ierr /= 0) return
@@ -710,7 +709,7 @@
 
             call coulomb_set_context( &
                cc, temp, rho, logtemp, logrho, zbar, abar, z2bar,  &
-               n% theta_e_for_graboske_et_al, num_isos, n% y, g% z52)
+               num_isos, n% y, g% z52)
             
             call eval_weak_reaction_info( &
                num_wk_reactions, &

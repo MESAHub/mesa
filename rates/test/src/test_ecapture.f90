@@ -239,7 +239,7 @@ contains
     allocate(cc)
 
     call coulomb_set_context(cc, T, Rho, log10T, log10Rho, &
-         zbar, abar, z2bar, 0d0, species, ya, za52)
+         zbar, abar, z2bar, species, ya, za52)
 
     mu1 = do_mui_coulomb(cc, z1)
     mu2 = do_mui_coulomb(cc, z2)
@@ -327,7 +327,7 @@ contains
          res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
 
     call coulomb_set_context(cc, T, Rho, log10T, log10Rho, &
-         zbar, abar, z2bar, 0d0, species, ya, za)
+         zbar, abar, z2bar, species, ya, za)
 
     eta = res(i_eta)
     d_eta_dlnT = d_dlnT(i_eta)

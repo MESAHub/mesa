@@ -65,7 +65,6 @@
       integer :: num_isos_for_Xinit
       logical :: uniform_Xinit
 
-      real(dp) :: theta_e_for_graboske_et_al
       integer :: screening_mode
       integer, pointer :: which_rates(:)
 
@@ -498,7 +497,6 @@
             write(*,1) 'max_step_size', max_step_size
             write(*,2) 'max_steps', max_steps
             write(*,2) 'screening_mode', screening_mode
-            write(*,1) 'theta_e_for_graboske_et_al', theta_e_for_graboske_et_al
             write(*,*)
          end if
          
@@ -548,7 +546,7 @@
                get_eos_info_for_burn_at_const_density, &
                rate_factors, weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
-               screening_mode, theta_e_for_graboske_et_al,  &
+               screening_mode,  &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
                burn_lwork, burn_work_array, net_lwork, net_work_array, &
@@ -631,7 +629,7 @@
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
                rate_factors, weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
-               screening_mode, theta_e_for_graboske_et_al, & 
+               screening_mode,  & 
                stptry, max_steps, eps, odescal, &
                okay_to_reuse_rate_screened, & 
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
@@ -1181,7 +1179,7 @@
                   std_reaction_Qs, std_reaction_neuQs, .false., .false., &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
-                  screening_mode, theta_e_for_graboske_et_al, &
+                  screening_mode, &
                   eps_nuc_categories, eps_neu_total, &
                   lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
             if (ierr /= 0) then
@@ -1501,7 +1499,7 @@
          min_for_show_peak_abundances, max_num_for_show_peak_abundances, &
          data_output_min_t, data_filename, &
          which_solver, screening_mode, which_rates_choice, &
-         theta_e_for_graboske_et_al, data_heading_line, show_net_reactions_info, &
+         data_heading_line, show_net_reactions_info, &
          rattab_logT_lower_bound, rattab_logT_upper_bound, max_steps, max_step_size, &
          decsol_switch, small_mtx_decsol, large_mtx_decsol, &
          burn_at_constant_P, burn_at_constant_density, &
@@ -1594,7 +1592,6 @@
          0.95d0, 0.005d0, 0.035d0, 0.010d0 /)
       
       screening_mode = extended_screening
-      theta_e_for_graboske_et_al = 1
       which_rates_choice = rates_NACRE_if_available
 
       num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors

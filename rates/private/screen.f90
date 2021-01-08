@@ -34,15 +34,14 @@
       
       subroutine do_screen_set_context( &
             sc, temp, den, logT, logRho, zbar, abar, z2bar, &
-            screening_mode, graboske_cache, theta_e, num_isos, y, iso_z158)
+            screening_mode, num_isos, y, iso_z158)
          type (Screen_Info), pointer :: sc
          integer, intent(in) :: num_isos
          real(dp), intent(in) ::  &
-            temp, den, logT, logRho, zbar, abar, z2bar, theta_e,  &
+            temp, den, logT, logRho, zbar, abar, z2bar,  &
             y(:), &
             iso_z158(:) ! Z**1.58
          integer, intent(in) :: screening_mode
-         real(dp), pointer :: graboske_cache(:,:,:)
       
          real(dp), parameter :: x13   = 1.0d0/3.0d0 
          real(dp), parameter :: x14   = 1.0d0/4.0d0
@@ -68,7 +67,6 @@
          sc% zbar  = zbar
          sc% abar  = abar
          sc% z2bar = z2bar
-         sc% theta_e = theta_e
 
          ! get the info that depends only on temp, den, and overall composition         
 
@@ -84,18 +82,7 @@
          end do
          sc% z1pt58bar = abar * qq
          sc% zbar13 = pow(zbar,1d0/3d0)
-
-         if (associated(graboske_cache)) graboske_cache(1,:,:) = 0
-         
-         if (screening_mode == classic_screening) then
-            sc% zbar0pt28 = pow(zbar,0.28d0) ! zbar**(2-2*b), b = 0.86, Graboske. intermediate.
-            sc% Lambda0 = 1.88d8*sqrt(den/(abar*temp*temp*temp)) ! (Graboske eqn 19; mu_I = abar)
-            sc% Lambda0_23 = pow(sc% Lambda0,2d0/3d0)
-            sc% Lambda0b = pow(sc% Lambda0,0.860d0)
-            sc% ztilda = sqrt(z2bar + zbar*theta_e)  ! (Dewitt eqn 4)
-            sc% ztilda0pt58 = pow(sc% ztilda,0.58d0) ! ztilda**(3*b-2), b = 0.86
-         end if
-   
+           
          sc% pp       = sqrt(sc% rr * sc% tempi * (z2bar + zbar)) 
          qq            = 0.5d0/(sc% pp) *(z2bar + zbar) 
          sc% dppdt    = qq*sc% rr*sc% dtempi
