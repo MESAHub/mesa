@@ -27,12 +27,18 @@ module auto_diff_real_2var_order3_module
       sin, &
       cos, &
       tan, &
+      sinpi, &
+      cospi, &
+      tanpi, &
       sinh, &
       cosh, &
       tanh, &
       asin, &
       acos, &
       atan, &
+      asinpi, &
+      acospi, &
+      atanpi, &
       asinh, &
       acosh, &
       atanh, &
@@ -174,6 +180,18 @@ module auto_diff_real_2var_order3_module
       module procedure tan_self
    end interface tan
    
+   interface sinpi
+      module procedure sinpi_self
+   end interface sinpi
+   
+   interface cospi
+      module procedure cospi_self
+   end interface cospi
+   
+   interface tanpi
+      module procedure tanpi_self
+   end interface tanpi
+   
    interface sinh
       module procedure sinh_self
    end interface sinh
@@ -197,6 +215,18 @@ module auto_diff_real_2var_order3_module
    interface atan
       module procedure atan_self
    end interface atan
+   
+   interface asinpi
+      module procedure asinpi_self
+   end interface asinpi
+   
+   interface acospi
+      module procedure acospi_self
+   end interface acospi
+   
+   interface atanpi
+      module procedure atanpi_self
+   end interface atanpi
    
    interface asinh
       module procedure asinh_self
@@ -1055,6 +1085,139 @@ module auto_diff_real_2var_order3_module
       unary%d3val2 = q1*(q10*q15 + q12*q15 + 6*q14*x%d1val2 + x%d3val2)
    end function tan_self
    
+   function sinpi_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = pi*x%val
+      q1 = sin(q0)
+      q2 = cos(q0)
+      q3 = pi*q2
+      q4 = pow2(x%d1val1)
+      q5 = pi*q1
+      q6 = q5*x%d1val2
+      q7 = pow2(x%d1val2)
+      q8 = q5*x%d1val1
+      q9 = q2*pow2(pi)
+      q10 = 2*x%d1val1_d1val2
+      q11 = q1*x%d2val2
+      unary%val = q1
+      unary%d1val1 = q3*x%d1val1
+      unary%d1val2 = q3*x%d1val2
+      unary%d2val1 = pi*(q2*x%d2val1 - q4*q5)
+      unary%d1val1_d1val2 = pi*(q2*x%d1val1_d1val2 - q6*x%d1val1)
+      unary%d2val2 = pi*(q2*x%d2val2 - q5*q7)
+      unary%d3val1 = pi*(q2*x%d3val1 - 3*q8*x%d2val1 - q9*pow3(x%d1val1))
+      unary%d2val1_d1val2 = pi*(-q10*q8 + q2*x%d2val1_d1val2 - q4*q9*x%d1val2 - q6*x%d2val1)
+      unary%d1val1_d2val2 = -pi*(pi*x%d1val1*(q11 + q3*q7) + q10*q6 - q2*x%d1val1_d2val2)
+      unary%d3val2 = pi*(-3*pi*q11*x%d1val2 + q2*x%d3val2 - q9*pow3(x%d1val2))
+   end function sinpi_self
+   
+   function cospi_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = pi*x%val
+      q1 = cos(q0)
+      q2 = sin(q0)
+      q3 = pi*q2
+      q4 = pow2(x%d1val1)
+      q5 = pi*q1
+      q6 = q5*x%d1val2
+      q7 = pow2(x%d1val2)
+      q8 = q5*x%d1val1
+      q9 = q2*pow2(pi)
+      q10 = 2*x%d1val1_d1val2
+      q11 = q1*x%d2val2
+      unary%val = q1
+      unary%d1val1 = -q3*x%d1val1
+      unary%d1val2 = -q3*x%d1val2
+      unary%d2val1 = -pi*(q2*x%d2val1 + q4*q5)
+      unary%d1val1_d1val2 = -pi*(q2*x%d1val1_d1val2 + q6*x%d1val1)
+      unary%d2val2 = -pi*(q2*x%d2val2 + q5*q7)
+      unary%d3val1 = pi*(-q2*x%d3val1 - 3*q8*x%d2val1 + q9*pow3(x%d1val1))
+      unary%d2val1_d1val2 = pi*(-q10*q8 - q2*x%d2val1_d1val2 + q4*q9*x%d1val2 - q6*x%d2val1)
+      unary%d1val1_d2val2 = -pi*(-pi*x%d1val1*(-q11 + q3*q7) + q10*q6 + q2*x%d1val1_d2val2)
+      unary%d3val2 = pi*(-3*pi*q11*x%d1val2 - q2*x%d3val2 + q9*pow3(x%d1val2))
+   end function cospi_self
+   
+   function tanpi_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      real(dp) :: q19
+      real(dp) :: q18
+      real(dp) :: q17
+      real(dp) :: q16
+      real(dp) :: q15
+      real(dp) :: q14
+      real(dp) :: q13
+      real(dp) :: q12
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = pi*x%val
+      q1 = tan(q0)
+      q2 = powm1(pow2(cos(q0)))
+      q3 = pi*q2
+      q4 = pow2(x%d1val1)
+      q5 = 2*pi
+      q6 = q1*q5
+      q7 = q4*q6 + x%d2val1
+      q8 = q6*x%d1val2
+      q9 = pow2(x%d1val2)
+      q10 = pi*q1
+      q11 = q10*x%d1val1
+      q12 = pow2(pi)
+      q13 = q12*pow3(x%d1val1)
+      q14 = 2*q2
+      q15 = pow2(q1)
+      q16 = 4*q15
+      q17 = 4*x%d1val1_d1val2
+      q18 = q1*x%d2val2
+      q19 = q12*pow3(x%d1val2)
+      unary%val = q1
+      unary%d1val1 = q3*x%d1val1
+      unary%d1val2 = q3*x%d1val2
+      unary%d2val1 = q3*q7
+      unary%d1val1_d1val2 = q3*(q8*x%d1val1 + x%d1val1_d1val2)
+      unary%d2val2 = q3*(q6*q9 + x%d2val2)
+      unary%d3val1 = q3*(6*q11*x%d2val1 + q13*q14 + q13*q16 + x%d3val1)
+      unary%d2val1_d1val2 = q3*(q11*q17 + q12*q14*q4*x%d1val2 + q7*q8 + x%d2val1_d1val2)
+      unary%d1val1_d2val2 = q3*(q10*q17*x%d1val2 + q5*x%d1val1*(q15*q5*q9 + q18 + q3*q9) + x%d1val1_d2val2)
+      unary%d3val2 = q3*(6*pi*q18*x%d1val2 + q14*q19 + q16*q19 + x%d3val2)
+   end function tanpi_self
+   
    function sinh_self(x) result(unary)
       type(auto_diff_real_2var_order3), intent(in) :: x
       type(auto_diff_real_2var_order3) :: unary
@@ -1316,6 +1479,165 @@ module auto_diff_real_2var_order3_module
       unary%d1val1_d2val2 = q12*(-4*q10*x%d1val2*x%val - q14*(q1*(q11 + q17) - q11*q16) + q3*x%d1val1_d2val2)
       unary%d3val2 = q12*(-2*q1*x%d1val2*(q11 + 3*q17) + q13*pow3(x%d1val2) + q3*x%d3val2)
    end function atan_self
+   
+   function asinpi_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      real(dp) :: q18
+      real(dp) :: q17
+      real(dp) :: q16
+      real(dp) :: q15
+      real(dp) :: q14
+      real(dp) :: q13
+      real(dp) :: q12
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = powm1(pi)
+      q1 = pow2(x%val)
+      q2 = 1 - q1
+      q3 = q0*powm1(sqrt(q2))
+      q4 = pow2(x%d1val1)
+      q5 = q1 - 1
+      q6 = q0*powm1(pow3(sqrt(q2)))
+      q7 = x%d1val2*x%val
+      q8 = pow2(x%d1val2)
+      q9 = 3*q1
+      q10 = pow2(q5)
+      q11 = q0*powm1(pow5(sqrt(q2)))
+      q12 = pow4(x%val)
+      q13 = 2*q1
+      q14 = q4*x%d1val2
+      q15 = 2*x%d1val1_d1val2
+      q16 = q15*x%d1val1
+      q17 = pow3(x%val)
+      q18 = x%d2val2*x%val
+      unary%val = q0*asin(x%val)
+      unary%d1val1 = q3*x%d1val1
+      unary%d1val2 = q3*x%d1val2
+      unary%d2val1 = q6*(q4*x%val - q5*x%d2val1)
+      unary%d1val1_d1val2 = q6*(q2*x%d1val1_d1val2 + q7*x%d1val1)
+      unary%d2val2 = q6*(-q5*x%d2val2 + q8*x%val)
+      unary%d3val1 = q11*(q10*x%d3val1 - q5*x%d1val1*(q4 + 3*x%d2val1*x%val) + q9*pow3(x%d1val1))
+      unary%d2val1_d1val2 = q3*(q12*x%d2val1_d1val2 + q13*q14 - q13*x%d2val1_d1val2 + q14 - q16*q17 + q16*x%val - q17*x%d1val2*x%d2val1 + q7*x%d2val1 + x%d2val1_d1val2)*powm1(q12 - q13 + 1)
+      unary%d1val1_d2val2 = q11*(q10*x%d1val1_d2val2 - q15*q5*q7 - x%d1val1*(q5*(q18 + q8) - q8*q9))
+      unary%d3val2 = q11*(q10*x%d3val2 - q5*x%d1val2*(3*q18 + q8) + q9*pow3(x%d1val2))
+   end function asinpi_self
+   
+   function acospi_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      real(dp) :: q18
+      real(dp) :: q17
+      real(dp) :: q16
+      real(dp) :: q15
+      real(dp) :: q14
+      real(dp) :: q13
+      real(dp) :: q12
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = powm1(pi)
+      q1 = pow2(x%val)
+      q2 = 1 - q1
+      q3 = q0*powm1(sqrt(q2))
+      q4 = pow2(x%d1val1)
+      q5 = q4*x%val
+      q6 = q1 - 1
+      q7 = q6*x%d2val1
+      q8 = q0*powm1(pow3(sqrt(q2)))
+      q9 = x%d1val1*x%d1val2
+      q10 = q6*x%d1val1_d1val2
+      q11 = pow2(x%d1val2)
+      q12 = pow3(q6)
+      q13 = 3*q1
+      q14 = q1*(3 - q13)
+      q15 = pow2(q6)
+      q16 = q0*powm1(pow7(sqrt(q2)))
+      q17 = 2*x%val
+      q18 = x%d2val2*x%val
+      unary%val = q0*acos(x%val)
+      unary%d1val1 = -q3*x%d1val1
+      unary%d1val2 = -q3*x%d1val2
+      unary%d2val1 = q8*(-q5 + q7)
+      unary%d1val1_d1val2 = -q8*(-q10 + q9*x%val)
+      unary%d2val2 = q8*(-q11*x%val + q6*x%d2val2)
+      unary%d3val1 = q16*(q12*x%d3val1 - q14*pow3(x%d1val1) - q15*x%d1val1*(q4 + 3*x%d2val1*x%val))
+      unary%d2val1_d1val2 = q16*(q2*(-2*q1*q4*x%d1val2 - q15*x%d2val1_d1val2 + q6*x%d1val1*(q17*x%d1val1_d1val2 + q9)) + q6*x%d1val2*x%val*(q5 - q7))
+      unary%d1val1_d2val2 = q0*(q10*q17*x%d1val2 - q15*x%d1val1_d2val2 + x%d1val1*(-q11*q13 + q6*(q11 + q18)))*powm1(pow5(sqrt(q2)))
+      unary%d3val2 = q16*(q12*x%d3val2 - q14*pow3(x%d1val2) - q15*x%d1val2*(q11 + 3*q18))
+   end function acospi_self
+   
+   function atanpi_self(x) result(unary)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      type(auto_diff_real_2var_order3) :: unary
+      real(dp) :: q18
+      real(dp) :: q17
+      real(dp) :: q16
+      real(dp) :: q15
+      real(dp) :: q14
+      real(dp) :: q13
+      real(dp) :: q12
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = powm1(pi)
+      q1 = pow2(x%val)
+      q2 = q1 + 1
+      q3 = q0*powm1(q2)
+      q4 = pow2(x%d1val1)
+      q5 = 2*x%val
+      q6 = q4*q5
+      q7 = q2*x%d2val1
+      q8 = pow2(q2)
+      q9 = q0*powm1(q8)
+      q10 = x%d1val1*x%d1val2
+      q11 = q2*x%d1val1_d1val2
+      q12 = pow2(x%d1val2)
+      q13 = 8*q1
+      q14 = 2*x%d1val1
+      q15 = q14*q2
+      q16 = q0*powm1(pow3(q2))
+      q17 = 4*q1
+      q18 = x%d2val2*x%val
+      unary%val = q0*atan(x%val)
+      unary%d1val1 = q3*x%d1val1
+      unary%d1val2 = q3*x%d1val2
+      unary%d2val1 = q9*(-q6 + q7)
+      unary%d1val1_d1val2 = q9*(-q10*q5 + q11)
+      unary%d2val2 = q9*(-q12*q5 + q2*x%d2val2)
+      unary%d3val1 = q16*(q13*pow3(x%d1val1) - q15*(q4 + 3*x%d2val1*x%val) + q8*x%d3val1)
+      unary%d2val1_d1val2 = q16*(-q15*(q10 + q5*x%d1val1_d1val2) + q17*q4*x%d1val2 + q5*x%d1val2*(q6 - q7) + q8*x%d2val1_d1val2)
+      unary%d1val1_d2val2 = q16*(-4*q11*x%d1val2*x%val - q14*(-q12*q17 + q2*(q12 + q18)) + q8*x%d1val1_d2val2)
+      unary%d3val2 = q16*(q13*pow3(x%d1val2) - 2*q2*x%d1val2*(q12 + 3*q18) + q8*x%d3val2)
+   end function atanpi_self
    
    function asinh_self(x) result(unary)
       type(auto_diff_real_2var_order3), intent(in) :: x
