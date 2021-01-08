@@ -4,10 +4,12 @@ from sympy import *
 unary_operators = [
 	(lambda x: -1*x, 'unary_minus'),
 	(lambda x: exp(x), 'exp'),
+	(lambda x: 10**x, 'exp10'),
 	(lambda x: log(x), 'log'),
 	(lambda x: log(x), 'safe_log'),
 	(lambda x: log(x,10), 'log10'),
 	(lambda x: log(x,10), 'safe_log10'),
+	(lambda x: log(x,2), 'log2'),
 	(lambda x: sin(x), 'sin'),
 	(lambda x: cos(x), 'cos'),
 	(lambda x: tan(x), 'tan'),
@@ -27,6 +29,7 @@ unary_operators = [
 	(lambda x: x**5, 'pow5'),
 	(lambda x: x**6, 'pow6'),
 	(lambda x: x**7, 'pow7'),
+	(lambda x: x**8, 'pow8'),
 	(lambda x: abs(x), 'abs')
 ]
 
