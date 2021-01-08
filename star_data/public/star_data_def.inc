@@ -104,12 +104,7 @@
       integer, parameter :: Tlim_del_mdot = Tlim_dlgL_photo + 1
       integer, parameter :: Tlim_adjust_J_q = Tlim_del_mdot + 1
       integer, parameter :: Tlim_delta_Ye_highT = Tlim_adjust_J_q + 1
-      integer, parameter :: Tlim_error_rate_energy_conservation = Tlim_delta_Ye_highT + 1
-      integer, parameter :: Tlim_max_abs_lgE_residual = Tlim_error_rate_energy_conservation + 1
-      integer, parameter :: Tlim_avg_lgE_residual = Tlim_max_abs_lgE_residual + 1
-      integer, parameter :: Tlim_max_abs_v_residual = Tlim_avg_lgE_residual + 1
-      integer, parameter :: Tlim_avg_v_residual = Tlim_max_abs_v_residual + 1
-      integer, parameter :: Tlim_error_in_energy_conservation = Tlim_avg_v_residual + 1
+      integer, parameter :: Tlim_error_in_energy_conservation = Tlim_delta_Ye_highT + 1
       integer, parameter :: Tlim_retry = Tlim_error_in_energy_conservation + 1
       integer, parameter :: Tlim_binary = Tlim_retry + 1
       integer, parameter :: Tlim_error_other = Tlim_binary + 1
@@ -187,8 +182,7 @@
       integer, parameter :: t_power_h_burn_lower_limit = t_power_nuc_burn_lower_limit + 1 
       integer, parameter :: t_power_he_burn_lower_limit = t_power_h_burn_lower_limit + 1 
       integer, parameter :: t_power_z_burn_lower_limit = t_power_he_burn_lower_limit + 1 
-      integer, parameter :: t_phase_of_evolution_stop = t_power_z_burn_lower_limit + 1 
-      integer, parameter :: t_center_R_lower_limit = t_phase_of_evolution_stop + 1 
+      integer, parameter :: t_center_R_lower_limit = t_power_z_burn_lower_limit + 1 
       integer, parameter :: t_center_Ye_lower_limit = t_center_R_lower_limit + 1 
       integer, parameter :: t_fe_core_infall_limit = t_center_Ye_lower_limit + 1 
       integer, parameter :: t_non_fe_core_infall_limit = t_fe_core_infall_limit + 1 

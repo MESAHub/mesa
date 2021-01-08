@@ -392,9 +392,6 @@
          real(dp) :: atm_irradiated_P_surf
          integer :: atm_irradiated_max_iters
 
-         logical :: trace_atm_Paczynski_grey
-         real(dp) :: Paczynski_atm_R_surf_errtol
-
          real(dp) :: surface_extra_Pgas
          real(dp) :: Tsurf_factor
          real(dp) :: fixed_vsurf
@@ -408,7 +405,6 @@
          logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          logical :: use_fixed_L_for_BB_outer_BC
-         logical :: use_T_Paczynski_outer_BC
          logical :: use_Psurf_for_surface_eflux
 
       ! create atmosphere
@@ -437,8 +433,6 @@
          real(dp) :: mdot_omega_power, max_rotational_mdot_boost, lim_trace_rotational_mdot_boost, &
             rotational_mdot_boost_fac, rotational_mdot_kh_fac, surf_avg_tau, surf_avg_tau_min, &
             max_mdot_jump_for_rotation
-
-         real(dp) :: remove_H_wind_mdot, remove_H_wind_H_mass_limit
          
          integer :: max_tries_for_implicit_wind
          real(dp) :: iwind_tolerance, iwind_lambda
@@ -447,8 +441,6 @@
             wind_boost_full_off_L_div_Ledd, wind_boost_full_on_L_div_Ledd, &
             super_eddington_wind_max_boost
          logical :: trace_super_eddington_wind_boost
-         
-         real(dp) :: vsurf_scaling_factor, vsurf_wind_factor
 
          character (len=strlen) :: hot_wind_scheme
          character (len=strlen) :: cool_wind_RGB_scheme
@@ -465,6 +457,17 @@
          character (len=strlen) :: Dutch_wind_lowT_scheme
 
          real(dp) :: wind_H_envelope_limit, wind_H_He_envelope_limit, wind_He_layer_limit
+
+         logical :: no_wind_if_no_rotation
+
+         real(dp) :: rlo_scaling_factor, rlo_wind_min_L, rlo_wind_max_Teff
+         real(dp) :: rlo_wind_roche_lobe_radius, rlo_wind_base_mdot
+         real(dp) :: roche_lobe_xfer_full_on, roche_lobe_xfer_full_off
+         real(dp) :: rlo_wind_scale_height
+
+         real(dp) :: max_logT_for_k_below_const_q, max_logT_for_k_const_mass
+         real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
+         real(dp) :: min_q_for_k_const_mass, max_q_for_k_const_mass
 
          ! composition of accreted material
          logical :: accrete_same_as_surface
@@ -811,13 +814,10 @@
             steps_before_use_Fraley_time_centering
          
          real(dp) :: &
-            gamma_law_hydro, &
             v_drag_factor, &
             v_drag, &
             q_for_v_drag_full_off, &
             q_for_v_drag_full_on
-            
-         logical :: zero_gravity, constant_L
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -1009,12 +1009,10 @@
          real(dp) :: D_mix_rotation_max_logT_full_on, &
             D_mix_rotation_min_logT_full_off
          
-         real(dp) :: D_omega_max_replacement_fraction, D_omega_growth_rate, &
-            D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
+         real(dp) :: D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
          logical :: D_omega_mixing_across_convection_boundary
          
-         real(dp) :: nu_omega_max_replacement_fraction, nu_omega_growth_rate, &
-            nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
+         real(dp) :: nu_omega_mixing_rate, max_q_for_nu_omega_zero_in_convection_region
          logical :: nu_omega_mixing_across_convection_boundary
 
          real(dp) :: jacobian_clip_limit
@@ -1055,6 +1053,9 @@
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
+            
+         logical :: stop_for_bad_nums
+         integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
          
       ! timestep parameters
       
@@ -1100,7 +1101,6 @@
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &
             min_q_for_dt_div_min_dr_div_cs_limit, &
             max_q_for_dt_div_min_dr_div_cs_limit
-            
          integer :: min_k_for_dt_div_min_dr_div_cs_limit
 
          real(dp) :: dX_mix_dist_limit
@@ -1188,26 +1188,6 @@
          real(dp) :: delta_lgL_nuc_cat_hard_limit
          real(dp) :: lgL_nuc_cat_burn_min
          real(dp) :: lgL_nuc_mix_dist_limit
-
-         logical :: check_delta_lgL_pp ! pp chains
-         logical :: check_delta_lgL_cno ! cno cycles
-         logical :: check_delta_lgL_3alf ! triple alpha
-         logical :: check_delta_lgL_burn_c
-         logical :: check_delta_lgL_burn_n
-         logical :: check_delta_lgL_burn_o
-         logical :: check_delta_lgL_burn_ne
-         logical :: check_delta_lgL_burn_na
-         logical :: check_delta_lgL_burn_mg
-         logical :: check_delta_lgL_burn_si
-         logical :: check_delta_lgL_burn_s
-         logical :: check_delta_lgL_burn_ar
-         logical :: check_delta_lgL_burn_ca
-         logical :: check_delta_lgL_burn_ti
-         logical :: check_delta_lgL_burn_cr
-         logical :: check_delta_lgL_burn_fe
-         logical :: check_delta_lgL_cc ! c12 + c12
-         logical :: check_delta_lgL_co ! c12 + o16
-         logical :: check_delta_lgL_oo ! o16 + o16
 
          real(dp) :: delta_lgL_H_limit
          real(dp) :: delta_lgL_H_hard_limit, lgL_H_burn_relative_limit
@@ -1320,35 +1300,20 @@
 
          real(dp) :: delta_lg_star_mass_limit
          real(dp) :: delta_lg_star_mass_hard_limit
-
-         logical :: trace_force_another_iteration
-
-         real(dp) :: &
-            limit_for_avg_v_residual, &
-            hard_limit_for_avg_v_residual
-         real(dp) :: &
-            limit_for_max_abs_v_residual, &
-            hard_limit_for_max_abs_v_residual
-         real(dp) :: &
-            limit_for_abs_rel_E_err, &
-            hard_limit_for_abs_rel_E_err
-
          real(dp) :: &
             limit_for_rel_error_in_energy_conservation, &
             hard_limit_for_rel_error_in_energy_conservation
-         real(dp) :: &
-            limit_for_rel_rate_in_energy_conservation, &
-            hard_limit_for_rel_rate_in_energy_conservation
-         integer :: min_k_for_max_dlnd_residual, min_k_for_max_dvdt_residual
+
+         logical :: trace_force_another_iteration
+
+         real(dp) :: limit_for_max_abs_v_residual, hard_limit_for_max_abs_v_residual
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
 
          logical :: report_all_dt_limits, report_dX_nuc_drop_dt_limits
          logical :: report_why_dt_limits, report_solver_dt_info
 
-         logical :: trace_evolve, trace_solar_neutrinos
-         integer :: min_times_redo_cdc, max_times_redo_cdc
-         integer :: redo_cdc_iters_okay
+         logical :: trace_evolve
 
       ! misc
 
@@ -1407,39 +1372,3 @@
          integer :: x_integer_ctrl(num_x_ctrls)
          logical :: x_logical_ctrl(num_x_ctrls)
          character (len=strlen) :: x_character_ctrl(num_x_ctrls)
-
-
-      ! the following control parameters are not intended for general use
-
-
-      ! mass gain or loss
-
-         logical :: clip_small_mdots ! set them to zero.
-
-         logical :: no_wind_if_no_rotation
-
-         real(dp) :: max_logT_for_k_below_const_q, max_logT_for_k_const_mass
-         real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
-         real(dp) :: min_q_for_k_const_mass, max_q_for_k_const_mass
-
-         real(dp) :: rlo_scaling_factor, rlo_wind_min_L, rlo_wind_max_Teff
-         real(dp) :: rlo_wind_roche_lobe_radius, rlo_wind_base_mdot
-         real(dp) :: roche_lobe_xfer_full_on, roche_lobe_xfer_full_off
-         real(dp) :: rlo_wind_scale_height
-
-         real(dp) :: nova_scaling_factor, nova_wind_b
-         real(dp) :: nova_wind_max_Teff, nova_wind_min_L
-         real(dp) :: nova_min_Teff_for_accretion, nova_roche_lobe_radius, nova_RLO_mdot
-
-         real(dp) :: flash_wind_mdot, flash_wind_starts
-         real(dp) :: flash_wind_declines, flash_wind_full_off
-
-
-      ! info for debugging
-         logical :: stop_for_bad_nums
-
-         integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
-
-         integer :: phase_of_evolution_stop
-
-

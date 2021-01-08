@@ -68,8 +68,7 @@
          nz = s% nz
          species = s% species
 
-         if ((s% eps_nuc_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) .or. &
-               s% gamma_law_hydro > 0d0) then
+         if (s% eps_nuc_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) then
             do k = 1, nz
                s% eps_nuc(k) = 0d0
             end do

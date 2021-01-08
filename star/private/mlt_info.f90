@@ -166,11 +166,6 @@
          include 'formats'
 
          ierr = 0
-         if (s% gamma_law_hydro > 0d0) then  
-            call set_no_MLT_results
-            return
-         end if
-
          nz = s% nz
          
          if (k < 1 .or. k > nz) then
@@ -874,11 +869,7 @@
             s% mlt_vc(k) = 0d0
             s% mlt_Gamma(k) = 0d0
             s% grada_face(k) = 0d0
-            if (s% zero_gravity) then
-               s% scale_height(k) = 0
-            else
-               s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
-            end if
+            s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
             s% gradT(k) = 0d0

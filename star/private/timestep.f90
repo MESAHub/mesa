@@ -344,18 +344,6 @@
                s, skip_hard_limit, dt_limit_ratio(Tlim_error_in_energy_conservation))
             if (return_now(Tlim_error_in_energy_conservation)) return
 
-            do_timestep_limits = check_rel_rate_in_energy( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_error_rate_energy_conservation))
-            if (return_now(Tlim_error_rate_energy_conservation)) return
-
-            do_timestep_limits = check_avg_v_residual( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_avg_v_residual))
-            if (return_now(Tlim_avg_v_residual)) return
-
-            do_timestep_limits = check_max_abs_v_residual( &
-               s, skip_hard_limit, dt_limit_ratio(Tlim_max_abs_v_residual))
-            if (return_now(Tlim_max_abs_v_residual)) return
-
             do_timestep_limits = check_dX_nuc_drop( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dX_nuc_drop))
             if (return_now(Tlim_dX_nuc_drop)) return
@@ -1468,27 +1456,25 @@
                if (abs(s% q(k) - mix_bdy_q(bdy)) < s% lgL_nuc_mix_dist_limit) cycle
             end if
 
-            if (s% check_delta_lgL_pp) call do1_category(ipp,k)
-            if (s% check_delta_lgL_cno) call do1_category(icno,k)
-            if (s% check_delta_lgL_3alf) call do1_category(i3alf,k)
-
-            if (s% check_delta_lgL_burn_c) call do1_category(i_burn_c,k)
-            if (s% check_delta_lgL_burn_n) call do1_category(i_burn_n,k)
-            if (s% check_delta_lgL_burn_o) call do1_category(i_burn_o,k)
-            if (s% check_delta_lgL_burn_ne) call do1_category(i_burn_ne,k)
-            if (s% check_delta_lgL_burn_na) call do1_category(i_burn_na,k)
-            if (s% check_delta_lgL_burn_mg) call do1_category(i_burn_mg,k)
-            if (s% check_delta_lgL_burn_si) call do1_category(i_burn_si,k)
-            if (s% check_delta_lgL_burn_s) call do1_category(i_burn_s,k)
-            if (s% check_delta_lgL_burn_ar) call do1_category(i_burn_ar,k)
-            if (s% check_delta_lgL_burn_ca) call do1_category(i_burn_ca,k)
-            if (s% check_delta_lgL_burn_ti) call do1_category(i_burn_ti,k)
-            if (s% check_delta_lgL_burn_cr) call do1_category(i_burn_cr,k)
-            if (s% check_delta_lgL_burn_fe) call do1_category(i_burn_fe,k)
-
-            if (s% check_delta_lgL_cc) call do1_category(icc,k)
-            if (s% check_delta_lgL_co) call do1_category(ico,k)
-            if (s% check_delta_lgL_oo) call do1_category(ioo,k)
+            call do1_category(ipp,k)
+            call do1_category(icno,k)
+            call do1_category(i3alf,k)
+            call do1_category(i_burn_c,k)
+            call do1_category(i_burn_n,k)
+            call do1_category(i_burn_o,k)
+            call do1_category(i_burn_ne,k)
+            call do1_category(i_burn_na,k)
+            call do1_category(i_burn_mg,k)
+            call do1_category(i_burn_si,k)
+            call do1_category(i_burn_s,k)
+            call do1_category(i_burn_ar,k)
+            call do1_category(i_burn_ca,k)
+            call do1_category(i_burn_ti,k)
+            call do1_category(i_burn_cr,k)
+            call do1_category(i_burn_fe,k)
+            call do1_category(icc,k)
+            call do1_category(ico,k)
+            call do1_category(ioo,k)
 
          end do
 
@@ -2175,7 +2161,7 @@
          check_adjust_J_q = check_change(s, 1-s% adjust_J_q, &
             1-s% adjust_J_q_limit, &
             1-s% adjust_J_q_hard_limit, &
-            1, 'check_rel_error_in_energy', &
+            1, 'check_adjust_J_q', &
             .false., dt_limit_ratio, relative_excess)
       end function check_adjust_J_q
 
@@ -2189,8 +2175,7 @@
          check_delta_lgL_phot = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% L_phot < s% delta_lgL_phot_limit_L_min .or. &
-               s% L_phot_old <= 0d0 .or. s% constant_L) then
+         if (s% L_phot < s% delta_lgL_phot_limit_L_min .or. s% L_phot_old <= 0d0) then
             dlgL_phot = 0
          else
             dlgL_phot = log10(s% L_phot/s% L_phot_old)
@@ -2215,8 +2200,7 @@
          check_delta_lgL = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% L_surf < s% delta_lgL_limit_L_min .or. &
-               s% L_surf_old <= 0d0 .or. s% constant_L) then
+         if (s% L_surf < s% delta_lgL_limit_L_min .or. s% L_surf_old <= 0d0) then
             dlgL = 0
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
@@ -2256,58 +2240,6 @@
             s% delta_HR_limit, s% delta_HR_hard_limit, &
             1, 'check_delta_HR', skip_hard_limit, dt_limit_ratio, relative_excess)
       end function check_delta_HR
-
-
-      integer function check_avg_v_residual(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: val, relative_excess
-         include 'formats'
-         check_avg_v_residual = keep_going
-         if (.not. s% v_flag) return
-         val = abs(dot_product(s% dq(1:s% nz),s% v_residual(1:s% nz)))
-         check_avg_v_residual = check_change(s, val, &
-            s% limit_for_avg_v_residual, &
-            s% hard_limit_for_avg_v_residual, &
-            1, 'check_avg_v_residual', &
-            .false., dt_limit_ratio, relative_excess)
-      end function check_avg_v_residual
-
-
-      integer function check_max_abs_v_residual(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: val, relative_excess
-         include 'formats'
-         check_max_abs_v_residual = keep_going
-         if (.not. s% v_flag) return
-         val = maxval(abs(s% v_residual(1:s% nz)))
-         check_max_abs_v_residual = check_change(s, val, &
-            s% limit_for_max_abs_v_residual, &
-            s% hard_limit_for_max_abs_v_residual, &
-            1, 'check_max_abs_v_residual', &
-            .false., dt_limit_ratio, relative_excess)
-      end function check_max_abs_v_residual
-
-
-      integer function check_rel_rate_in_energy(s, skip_hard_limit, dt_limit_ratio)
-         type (star_info), pointer :: s
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(inout) :: dt_limit_ratio
-         real(dp) :: rel_rate, relative_excess
-         include 'formats'
-         check_rel_rate_in_energy = keep_going
-         dt_limit_ratio = 0d0
-         if (s% doing_relax) return
-         rel_rate = abs(s% error_in_energy_conservation/s% total_energy_end)/s% dt
-         check_rel_rate_in_energy = check_change(s, rel_rate, &
-            s% limit_for_rel_rate_in_energy_conservation, &
-            s% hard_limit_for_rel_rate_in_energy_conservation, &
-            1, 'check_rel_rate_in_energy', &
-            .false., dt_limit_ratio, relative_excess)
-      end function check_rel_rate_in_energy
 
 
       integer function check_rel_error_in_energy(s, skip_hard_limit, dt_limit_ratio)

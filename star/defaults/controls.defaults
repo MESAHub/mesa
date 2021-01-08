@@ -3184,7 +3184,6 @@
 
       ! for special tests
       ! can set ALFA = 0 for pure radiative with no turbulence or convection.
-      ! can set gamma_law_hydro > 0 and it will be used by rsp for eos.
       ! can set zero_gravity = .true.
       ! can set opacity to be constant times density.
 
@@ -3526,6 +3525,7 @@
 
     smooth_outer_xa_big = -1d0
     smooth_outer_xa_small = -1d0
+
 
 ! rotation controls
 ! =================
@@ -4024,8 +4024,6 @@
 
       ! ::
 
-    D_omega_max_replacement_fraction = 0.5d0
-    D_omega_growth_rate = 1d0
     D_omega_mixing_rate = 1d0
     D_omega_mixing_across_convection_boundary = .false.
     max_q_for_D_omega_zero_in_convection_region = 0.8d0
@@ -4042,11 +4040,10 @@
 
       ! ::
 
-    nu_omega_max_replacement_fraction = 0.5d0
-    nu_omega_growth_rate = 1d0
     nu_omega_mixing_rate = 1d0
     nu_omega_mixing_across_convection_boundary = .false.
     max_q_for_nu_omega_zero_in_convection_region = 0.8d0
+
 
 ! atmosphere boundary conditions
 ! ==============================
@@ -4072,11 +4069,6 @@
       ! See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       ! ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       ! ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
-      ! + ``'Paczynski_grey'`` :
-      ! create an atmosphere for given base conditions.
-      ! inspired by B. Paczynski, 1969, Acta Astr., vol. 19, 1.
-      ! takes into account dilution when tau < 2/3,
-      ! and calls mlt to get gradT allowing for convection in atmosphere.
       ! + ``'fixed_Teff'`` :
       ! set Tsurf from Eddington T(tau) relation
       !     for current surface tau and Teff = ``atm_fixed_Teff``.
@@ -4374,17 +4366,6 @@
     atm_irradiated_P_surf = 1d6
 
 
-      ! Pacyznski_atm_R_surf_errtol
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Parameters for ``Paczynski_grey``.
-
-      ! ::
-
-    trace_atm_Paczynski_grey = .false.
-    Paczynski_atm_R_surf_errtol = 3d-4
-
-
       ! surface_extra_Pgas
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -4470,16 +4451,6 @@
     use_zero_dLdm_outer_BC = .false.
 
 
-      ! use_T_Paczynski_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``T_surf^4`` is set to ``L/(8*pi*boltz_sig*R^2)``
-
-      ! ::
-
-    use_T_Paczynski_outer_BC = .false.
-
-
       ! use_T_black_body_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4508,7 +4479,7 @@
       ! fixed_L_for_BB_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! for ``use_T_black_body_outer_BC`` and ``use_T_Paczynski_outer_BC``
+      ! for ``use_T_black_body_outer_BC``
 
       ! ::
 
@@ -4569,10 +4540,9 @@
 
       ! Parameters controlling atmosphere structure building. MESA can
       ! evaluate the spatial structure of the atmosphere for the
-      ! following ``atm_option`` choices:
+      ! following ``atm_option`` choice:
 
       ! + ``'T_tau'``
-      ! + ``'paczynski_grey``'
 
       ! The atmosphere structure data are appended to the interior model
       ! when ``add_atmosphere_to_pulsation = .true.``. They do not affect
@@ -5090,53 +5060,6 @@
     iwind_lambda = 1d0
 
 
-   ! remove H wind
-   ! _____________
-
-
-      ! remove_H_wind_mdot
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! This wind removes surface material until reaching a target total H mass for the star.
-      ! Max rate of removal in Msun/year ; only applies if this is > 0.
-
-      ! ::
-
-    remove_H_wind_mdot = 0d0
-
-
-      ! remove_H_wind_H_mass_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! This wind removes surface material until reaching a target total H mass for the star.
-      ! Turn off this wind when total H mass < this limit (Msun units).
-
-      ! ::
-
-    remove_H_wind_H_mass_limit = 0
-
-
-      ! vsurf_scaling_factor
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! vsurf_wind_factor
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! start wind when surface velocity reaches ``vsurf_wind_factor`` times sound speed.
-      ! ``vsurf_scaling_factor`` scales the strength of the wind.
-
-      ! Wind triggered by surface velocity > surface sound speed.
-      ! v_effective = surface velocity/vsurf_wind_factor
-      ! if (v_effective > surface sound speed)
-      ! vescape = sqrt(cgrav(1)*M/R)
-      ! vsurf_wind_mdot = vsurf_scaling_factor*(v_effective - csound)/vescape
-      ! resulting lg_Mdot = log10(vsurf_wind_mdot/(Msun/secyer))
-
-      ! ::
-
-    vsurf_scaling_factor = 0
-    vsurf_wind_factor = 1
-
-
       ! super_eddington_scaling_factor
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -5390,120 +5313,6 @@
       ! ::
 
     roche_lobe_xfer_full_off = 1.0d0
-
-
-      ! nova_scaling_factor
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! Amplitude of wind.
-      ! "nova" wind is scheme used in Kato and Hachisu, ApJ 437:802-826, 1994. (eqn 23).
-      ! This only applies when ``nova_scaling_factor`` > 0.
-
-      ! ::
-
-    nova_scaling_factor = 0
-
-
-      ! nova_wind_b
-      ! ~~~~~~~~~~~
-
-      ! Wind parameter
-
-      ! ::
-
-    nova_wind_b = 0
-
-
-      ! nova_wind_max_Teff
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Only on when Teff < this limit.
-
-      ! ::
-
-    nova_wind_max_Teff = 0
-
-
-      ! nova_wind_min_L
-      ! ~~~~~~~~~~~~~~~
-
-      ! only on when L > this limit. (Lsun)
-
-      ! ::
-
-    nova_wind_min_L = 0
-
-
-      ! nova_min_Teff_for_accretion
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! When ``nova_scaling_factor /= 0`` and ``Teff < this`` and ``L > nova_wind_min_L``, no accretion.
-
-      ! ::
-
-    nova_min_Teff_for_accretion = 0
-
-
-      ! nova_roche_lobe_radius
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! units in Rsun
-
-      ! ::
-
-    nova_roche_lobe_radius = 0
-
-
-      ! nova_RLO_mdot
-      ! ~~~~~~~~~~~~~
-
-      ! roche lobe overflow mdot, Msun/year
-
-      ! ::
-
-    nova_RLO_mdot = 0
-
-
-      ! flash_wind_mdot
-      ! ~~~~~~~~~~~~~~~
-
-      ! Rate of mass ejection in Msun/year.
-      ! "flash" wind is scheme used in Kato, Saio, and Hachisu, ApJ 340:509-517, 1989.
-      ! This only applies when ``flash_wind_mdot`` > 0.
-
-      ! ::
-
-    flash_wind_mdot = -1
-
-
-      ! flash_wind_starts
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! Wind starts when R >= this limit (Rsun units).
-
-      ! ::
-
-    flash_wind_starts = -1
-
-
-      ! flash_wind_declines
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! Wind starts to decline when R <= this limit (Rsun units).
-
-      ! ::
-
-    flash_wind_declines = -1
-
-
-      ! flash_wind_full_off
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! Wind full off when R <= this limit (Rsun units).
-
-      ! ::
-
-    flash_wind_full_off = -1
 
 
    ! controls for adjust_mass
@@ -8224,39 +8033,6 @@
       ! for hydro comparison tests (e.g., Sedov)
 
 
-      ! gamma_law_hydro
-      ! ~~~~~~~~~~~~~~~
-
-      ! off as long as value is <= 0
-
-      ! ::
-
-    gamma_law_hydro = 0d0
-
-
-      ! zero_gravity
-      ! ~~~~~~~~~~~~
-
-      ! if true, then set G to zero
-
-      ! ::
-
-    zero_gravity = .false.
-
-
-      ! constant_L
-      ! ~~~~~~~~~~
-
-      ! if true, then L(k) = L_center for all k.  disable dlnTdm equation.
-      ! by default, this implies the boundary conditions ``use_zero_dLdm_outer_BC``
-      ! and ``use_zero_Pgas_outer_BC``.  The only other currently available boundary
-      ! condition compatible with this option is ``use_fixed_vsurf_outer_BC``.
-
-      ! ::
-
-    constant_L = .false.
-
-
       ! v_drag_factor
       ! ~~~~~~~~~~~~~
       ! v_drag
@@ -9431,7 +9207,7 @@
 
       ! ::
 
-    varcontrol_target = 1d-4
+    varcontrol_target = 1d-3
 
 
       ! min_allowed_varcontrol_target
@@ -9465,7 +9241,7 @@
 
       ! ::
 
-    never_skip_hard_limits = .false.
+    never_skip_hard_limits = .true.
 
 
       ! relax_hard_limits_after_retry
@@ -10262,39 +10038,6 @@
       ! ::
 
     lgL_nuc_mix_dist_limit = 1d-6
-
-
-      ! check_deltalgL_{burning_category}
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Flags determining which reaction categories are considered.
-
-      ! ::
-
-    check_delta_lgL_pp = .true.
-    check_delta_lgL_cno = .true.
-    check_delta_lgL_3alf = .true.
-    check_delta_lgL_burn_c = .true.
-    check_delta_lgL_burn_n = .true.
-    check_delta_lgL_burn_o = .true.
-    check_delta_lgL_burn_ne = .true.
-    check_delta_lgL_burn_na = .true.
-    check_delta_lgL_burn_mg = .true.
-    check_delta_lgL_burn_si = .true.
-    check_delta_lgL_burn_s = .true.
-    check_delta_lgL_burn_ar = .true.
-    check_delta_lgL_burn_ca = .true.
-    check_delta_lgL_burn_ti = .true.
-    check_delta_lgL_burn_cr = .true.
-    check_delta_lgL_burn_fe = .true.
-
-      ! c12 + c12, c12 + o16, and o16 + o16
-
-      ! ::
-
-    check_delta_lgL_cc = .true.
-    check_delta_lgL_co = .true.
-    check_delta_lgL_oo = .true.
 
       ! ``L_H_burn`` = integrated power at surface from PP and CNO (in Lsun units)
 
@@ -11299,67 +11042,6 @@
 
     limit_for_rel_error_in_energy_conservation = 1d-4
     hard_limit_for_rel_error_in_energy_conservation = 1d-3
-
-
-      ! limit_for_rel_rate_in_energy_conservation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_rel_rate_in_energy_conservation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     rel_rate_in_energy_conservation = abs(error_in_energy_conservation/total_energy)/dt
-      ! with dt in seconds.
-
-      ! ::
-
-    limit_for_rel_rate_in_energy_conservation = 1d99
-    hard_limit_for_rel_rate_in_energy_conservation = 1d99
-
-
-      ! limit_for_avg_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_avg_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     avg_v_residual = abs(dot_product(s% dq(1:s% nz),s% v_residual(1:s% nz)))
-
-      ! ::
-
-    limit_for_avg_v_residual = 1d99
-    hard_limit_for_avg_v_residual = 1d99
-
-
-      ! limit_for_max_abs_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_max_abs_v_residual
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     max_abs_v_residual = maxval(abs(s% v_residual(1:s% nz)))
-
-      ! ::
-
-    limit_for_max_abs_v_residual = 1d99
-    hard_limit_for_max_abs_v_residual = 1d99
-
-
-      ! limit_for_abs_rel_E_err
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-      ! hard_limit_for_abs_rel_E_err
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-      !     abs_rel_E_err = maxval(abs(s% rel_E_err(1:s% nz)))
-
-      ! ::
-
-    limit_for_abs_rel_E_err = 1d99
-    hard_limit_for_abs_rel_E_err = 1d99
 
 
       ! report_why_dt_limits

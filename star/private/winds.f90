@@ -107,58 +107,6 @@
                log10(s% super_eddington_wind_mdot/(Msun/secyer))
          end if
 
-         call eval_vsurf_wind(s, L1, M1, R1, ierr)
-         if (ierr /= 0) then
-            if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: eval_vsurf_wind ierr'
-            return
-         end if
-
-         if (s% vsurf_wind_mdot > wind_mdot) then
-            wind_mdot = s% vsurf_wind_mdot
-            if (dbg) write(*,1) 'vsurf wind lg_Mdot', &
-               log10(s% vsurf_wind_mdot/(Msun/secyer))
-         end if
-
-         if (dbg) write(*,1) 's% remove_H_wind_mdot', s% remove_H_wind_mdot
-         if (s% remove_H_wind_mdot > 0 .and. h1 > 0) then
-            total_H = dot_product(s% xa(h1,1:nz), s% dm(1:nz))/Msun
-            write(*,1) 'total_H', total_H
-            if (dbg) write(*,1) 's% remove_H_wind_H_mass_limit', s% remove_H_wind_H_mass_limit
-            if (total_H > s% remove_H_wind_H_mass_limit) then
-               if (s% remove_H_wind_mdot*Msun/secyer > wind_mdot) then
-                  wind_mdot = s% remove_H_wind_mdot*Msun/secyer
-                  if (dbg) write(*,1) 'use remove H wind lg_Mdot', &
-                     log10(s% remove_H_wind_mdot/(Msun/secyer))
-               end if
-            end if
-         end if
-
-         if (s% flash_wind_mdot > 0) then
-            if (s% doing_flash_wind) then
-               if (R1/Rsun <= s% flash_wind_full_off) then
-                  s% doing_flash_wind = .false.
-                  write(*,*) 's% doing_flash_wind = .false.'
-               end if
-            else if (R1/Rsun >= s% flash_wind_starts) then
-               s% doing_flash_wind = .true.
-               write(*,*) 's% doing_flash_wind = .true.'
-            end if
-            if (s% doing_flash_wind .and. s% flash_wind_mdot*Msun/secyer > wind_mdot) then
-               if (R1/Rsun < s% flash_wind_declines) then
-                  s% flash_wind_mdot = s% flash_wind_mdot * &
-                     (s% flash_wind_declines - R1/Rsun) / &
-                        (s% flash_wind_declines - s% flash_wind_full_off)
-               else if (R1/Rsun > s% flash_wind_starts) then
-                  s% flash_wind_mdot = &
-                     s% flash_wind_mdot*pow(2d0,(R1/Rsun)/s% flash_wind_starts - 1d0)
-               end if
-               if (s% flash_wind_mdot*Msun/secyer > wind_mdot) then
-                  wind_mdot = s% flash_wind_mdot*Msun/secyer
-                  write(*,1) 'flash wind r', R1/Rsun
-               end if
-            end if
-         end if
-
          mdot = eval_rlo_wind(s, L1/Lsun, R1/Rsun, T1, xfer_ratio, ierr) ! Msun/year
          mdot = mdot*Msun/secyer
          if (ierr /= 0) then
@@ -170,23 +118,6 @@
          if (s% doing_rlo_wind .and. mdot > wind_mdot) then
             if (dbg) write(*,1) 's% doing_rlo_wind mdot', log10(mdot/(Msun/secyer))
             wind_mdot = mdot
-         end if
-
-         !if (s% nova_scaling_factor /= 0 .and. L1/Lsun > s% nova_wind_min_L .and. &
-         !      T1 < s% nova_min_Teff_for_accretion .and. s% mass_change > 0) then
-         !   mdot = 0
-         !else
-            mdot = eval_nova_wind(s, L1/Lsun, R1/Rsun, T1, ierr)
-            if (ierr /= 0) then
-               if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: eval_nova_wind ierr'
-               return
-            end if
-         !end if
-         
-         s% doing_nova_wind = (mdot /= 0)
-         if (s% doing_nova_wind .and. mdot*Msun/secyer > wind_mdot) then
-            if (dbg) write(*,1) 's% doing_nova_wind mdot', mdot
-            wind_mdot = mdot*Msun/secyer
          end if
 
          if (h1 > 0) then
@@ -287,8 +218,7 @@
             end if
          end if
 
-         if (wind_mdot >= 0 .and. s% super_eddington_scaling_factor <= 0 &
-               .and. .not. s% zero_gravity) then
+         if (wind_mdot >= 0 .and. s% super_eddington_scaling_factor <= 0) then
             ! check for super eddington boost to wind
             L_div_Ledd = L1 / s% prev_Ledd
             full_off = s% wind_boost_full_off_L_div_Ledd
@@ -699,60 +629,6 @@
                s% model_number, log10(s% super_eddington_wind_mdot/(Msun/secyer)), L/Ledd
 
       end subroutine eval_super_eddington_wind
-
-
-      subroutine eval_vsurf_wind(s, L, M, R, ierr)
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: L, M, R
-         integer, intent(out) :: ierr
-         real(dp) :: vsurf, csound, v_effective, vesc
-         include 'formats'
-         ierr = 0
-         s% vsurf_wind_mdot = 0
-         if (s% vsurf_scaling_factor <= 0) return         
-         if (s% u_flag) then
-            vsurf = s% u(1)
-         else if (s% v_flag) then
-            vsurf = s% v(1)
-         else
-            return
-         end if         
-         csound = s% csound(1)
-         v_effective = vsurf/s% vsurf_wind_factor
-         if (v_effective <= csound) return
-         vesc = sqrt(s% cgrav(1)*M/R)
-         s% vsurf_wind_mdot = s% vsurf_scaling_factor*(v_effective - csound)/vesc
-         if (mod(s% model_number, s% terminal_interval) == 0) &
-            write(*,'(a60,i12,1p2e12.4)') 'vsurf: lg_Mdot, v_effective/csound', &
-               s% model_number, log10(s% vsurf_wind_mdot/(Msun/secyer)), v_effective/csound
-      end subroutine eval_vsurf_wind
-
-
-      real(dp) function eval_nova_wind(s, L_surf, R, Teff, ierr) ! value in Msun/year
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: L_surf, R, Teff ! Lsun, Rsun, K
-         integer, intent(out) :: ierr
-         real(dp) :: roche_lobe_radius ! Rsun
-         real(dp) :: mdot
-         include 'formats'
-         ierr = 0
-         eval_nova_wind = 0
-         if (s% nova_scaling_factor <= 0) return
-         if (L_surf < s% nova_wind_min_L) return
-         if (Teff > s% nova_wind_max_Teff) return
-
-         roche_lobe_radius = s% nova_roche_lobe_radius
-         if (R >= roche_lobe_radius) then
-            mdot = s% nova_RLO_mdot*Msun/secyer ! in gm per second
-            write(*,1) 'nova RLO log mdot', log10(s% nova_scaling_factor*mdot/(Msun/secyer))
-         else ! eqn 23 of Kato and Hachisu, ApJ 437:802-826, 1994
-            mdot = exp10(-1.49d0*log10(Teff/1d5) + s% nova_wind_b) ! in gm per second
-            write(*,1) 'nova wind log mdot', log10(s% nova_scaling_factor*mdot/(Msun/secyer))
-         end if
-
-         eval_nova_wind = s% nova_scaling_factor*mdot/(Msun/secyer)
-
-      end function eval_nova_wind
 
 
       real(dp) function eval_rlo_wind(s, L_surf, R, Teff, xfer_ratio, ierr) ! value in Msun/year

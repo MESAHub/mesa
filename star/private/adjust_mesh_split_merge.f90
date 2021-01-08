@@ -103,12 +103,8 @@
          MaxTooSmall = s% split_merge_amr_MaxShort
          MaxTooBig = s% split_merge_amr_MaxLong
          k = nz_old
-         if (.not. s% constant_L) then
-            tau_center = s% tau(k) + &
-               s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
-         else
-            tau_center = 0
-         end if
+         tau_center = s% tau(k) + &
+            s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
             if (iTooSmall > 0 .and. TooSmall > MaxTooSmall) then
@@ -254,7 +250,6 @@
          inner_outer_q = 0d0
          
          if (logtau_zoning) then
-            if (s% constant_L) stop 'cannot use logtau_zoning with constant_L'
             k = nz
             xmin = log(tau_center)
             xmax = log(s% tau(1))
@@ -586,7 +581,6 @@
          integer :: k
          real(dp) :: PE, rL, rC, dm, mC
          totPE = 0d0
-         if (s% zero_gravity) return
          do k=1,s% nz
             if (k == s% nz) then
                rL = s% R_center
@@ -729,24 +723,19 @@
             tauL = s% tau(ip)
          end if
          
-         if (s% constant_L) then
-            tauR = 0
-            tauL = 0
+         tauR = s% tau(i)
+         if (i == nz) then
+            tauL = tau_center
          else
-            tauR = s% tau(i)
-            if (i == nz) then
-               tauL = tau_center
-            else
-               tauL = s% tau(ip)
-            end if
-            if (is_bad(tauL+tauR)) then
-               !$omp critical (adjust_mesh_split_merge_crit1)
-               write(*,2) 'tauL', ip, tauL
-               write(*,2) 'tauR', i, tauR
-               write(*,2) 'nz', nz
-               stop 'do_split'
-               !$omp end critical (adjust_mesh_split_merge_crit1)         
-            end if
+            tauL = s% tau(ip)
+         end if
+         if (is_bad(tauL+tauR)) then
+            !$omp critical (adjust_mesh_split_merge_crit1)
+            write(*,2) 'tauL', ip, tauL
+            write(*,2) 'tauR', i, tauR
+            write(*,2) 'nz', nz
+            stop 'do_split'
+            !$omp end critical (adjust_mesh_split_merge_crit1)         
          end if
                  
          dr = rR - rL
@@ -1152,31 +1141,17 @@
          s% lnd(i) = log(rho)
          s% xh(s% i_lnd,i) = s% lnd(i)
          logRho = s% lnd(i)/ln10
-         if (s% gamma_law_hydro > 0d0) then
-            call basic_composition_info( &
-               s% species, s% chem_id, s% xa(1:species,i), s% X(i), s% Y(i), s% Z(i), &
-               s% abar(i), s% zbar(i), s% z2bar(i), s% z53bar(i), s% ye(i), &
-               s% mass_correction(i), xsum)
-            call eos_gamma_DE_get_PT( &
-               s% abar(i), rho, s% energy(i), s% gamma_law_hydro, &
-               s% P(i), s% T(i), ierr)
-            if (ierr /= 0) return ! stop 'do_merge failed in eos_gamma_DE_get_PT'
-            s% lnT(i) = log(s% T(i))
-            s% xh(s% i_lnT,i) = s% lnT(i)
-         else
-            do q=1,species
-               new_xa(q) = s% xa(q,i)
-            end do
-            call set_lnT_for_energy(s, i, &
-               s% net_iso(ih1), s% net_iso(ihe3), s% net_iso(ihe4), &
-               species, new_xa, rho, logRho, s% energy(i), s% lnT(i), &
-               new_lnT, revised_energy, ierr)
-            if (ierr /= 0) return
-            s% xh(s% i_lnT,i) = new_lnT
-            s% lnT(i) = new_lnT
-            s% T(i) = exp(new_lnT)
-         end if
-         !call do_kap_for_cell(s,i,ierr)
+         do q=1,species
+            new_xa(q) = s% xa(q,i)
+         end do
+         call set_lnT_for_energy(s, i, &
+            s% net_iso(ih1), s% net_iso(ihe3), s% net_iso(ihe4), &
+            species, new_xa, rho, logRho, s% energy(i), s% lnT(i), &
+            new_lnT, revised_energy, ierr)
+         if (ierr /= 0) return
+         s% xh(s% i_lnT,i) = new_lnT
+         s% lnT(i) = new_lnT
+         s% T(i) = exp(new_lnT)
       end subroutine update_xh_eos_and_kap
 
 

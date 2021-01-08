@@ -233,7 +233,7 @@
             s% abar(k) = abar
             s% zbar(k) = zbar
             s% z53bar(k) = z53bar
-            call get_eos( &      ! this takes care of gamma_law_hydro > 0
+            call get_eos( &
                s, k, xa, &
                Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, &

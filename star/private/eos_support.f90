@@ -112,25 +112,6 @@ contains
             s% species, s% chem_id, s% net_iso, xa, &
             Rho, logRho, T, logT, &
             res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
-    else if (s% gamma_law_hydro > 0d0) then
-       call eos_gamma_DT_get( &
-            s% eos_handle, abar, rho, logRho, T, logT, s% gamma_law_hydro, &
-            res, dres_dlnRho, dres_dlnT, &
-            Pgas, Prad, energy, entropy, ierr)
-       if (ierr /= 0) then
-          s% retry_message = 'eos_gamma_DT_get failed in get_eos'
-          if (s% report_ierr) then
-             !$OMP critical (get_eos_critical)
-             write(*,2) 'eos_gamma_DT_get failed in get_eos', k
-             write(*,1) 'abar', abar
-             write(*,1) 'rho', rho
-             write(*,1) 'log10Rho', logRho
-             write(*,1) 'T', T
-             write(*,1) 'log10T', logT
-             write(*,1) 's% gamma_law_hydro', s% gamma_law_hydro
-             !$OMP end critical (get_eos_critical)
-          end if
-       end if
     else if (s% use_eosDT_ideal_gas) then
        call eosDT_ideal_gas_get( &
             s% eos_handle, eos_z, eos_x, abar, zbar, &
@@ -250,10 +231,6 @@ contains
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logT, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
             eos_calls, ierr)
-    else if (s% gamma_law_hydro > 0d0) then
-       write(*,*) 'cannot call solve_eos_given_DE with gamma_law_hydro > 0'
-       ierr = -1
-       return
     else if (s% use_eosDT_ideal_gas) then
        write(*,*) 'cannot call solve_eos_given_DE with use_eosDT_ideal_gas set'
        ierr = -1
@@ -319,10 +296,6 @@ contains
        write(*,*) 'cannot call solve_eos_given_DEgas with use_other_eos'
        ierr = -1
        return
-    else if (s% gamma_law_hydro > 0d0) then
-       write(*,*) 'cannot call solve_eos_given_DEgas with gamma_law_hydro > 0'
-       ierr = -1
-       return
     else if (s% use_eosDT_ideal_gas) then
        write(*,*) 'cannot call solve_eos_given_DEgas with use_eosDT_ideal_gas set'
        ierr = -1
@@ -385,10 +358,6 @@ contains
 
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_DP with use_other_eos set'
-       ierr = -1
-       return
-    else if (s% gamma_law_hydro > 0d0) then
-       write(*,*) 'cannot call solve_eos_given_DP with gamma_law_hydro > 0'
        ierr = -1
        return
     else if (s% use_eosDT_ideal_gas) then
@@ -459,10 +428,6 @@ contains
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logT, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
             eos_calls, ierr)
-    else if (s% gamma_law_hydro > 0d0) then
-       write(*,*) 'cannot call solve_eos_given_DS with gamma_law_hydro > 0'
-       ierr = -1
-       return
     else if (s% use_eosDT_ideal_gas) then
        write(*,*) 'cannot call solve_eos_given_DS with use_eosDT_ideal_gas set'
        ierr = -1
@@ -526,10 +491,6 @@ contains
 
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_PT with use_other_eos set'
-       ierr = -1
-       return
-    else if (s% gamma_law_hydro > 0d0) then
-       write(*,*) 'cannot call solve_eos_given_PT with gamma_law_hydro > 0'
        ierr = -1
        return
     else if (s% use_eosDT_ideal_gas) then
@@ -602,10 +563,6 @@ contains
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logRho, res, dres_dlnRho, dres_dlnT, &
             dres_dabar, dres_dzbar, eos_calls, ierr)
-    else if (s% gamma_law_hydro > 0d0) then
-       write(*,*) 'cannot call solve_eos_given_PgasT with gamma_law_hydro > 0'
-       ierr = -1
-       return
     else if (s% use_eosDT_ideal_gas) then
        write(*,*) 'cannot call solve_eos_given_PgasT with use_eosDT_ideal_gas set'
        ierr = -1

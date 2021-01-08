@@ -228,8 +228,7 @@
             include 'formats'
             ierr = 0
          
-            if (s% eps_nuc_factor == 0d0 .or. &
-                s% nonlocal_NiCo_decay_heat .or. s% gamma_law_hydro > 0) then
+            if (s% eps_nuc_factor == 0d0 .or. s% nonlocal_NiCo_decay_heat) then
                eps_nuc_18 = 0 ! get eps_nuc from extra_heat instead
             else if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
                eps_nuc_18 = 0d0
@@ -242,12 +241,10 @@
             end if
             
             non_nuc_neu_18 = 0d0
-            if (s% gamma_law_hydro == 0) then 
-               ! for reasons lost in the past, we always time center non_nuc_neu
-               non_nuc_neu_18%val = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-               non_nuc_neu_18%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
-               non_nuc_neu_18%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
-            end if
+            ! for reasons lost in the past, we always time center non_nuc_neu
+            non_nuc_neu_18%val = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
+            non_nuc_neu_18%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
+            non_nuc_neu_18%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
             
             call wrap(extra_heat_18, s% extra_heat(k), &
                s% d_extra_heat_dlndm1(k), s% d_extra_heat_dlnd00(k), s% d_extra_heat_dlndp1(k), &
@@ -453,14 +450,12 @@
             
             ! do partials wrt composition
 
-            if (s% gamma_law_hydro == 0) then
-               if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
-                  if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
-                     do j=1,s% species
-                        call e00(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
-                                 scal*s% d_epsnuc_dx(j,k))
-                     end do
-                  end if
+            if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
+               if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
+                  do j=1,s% species
+                     call e00(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
+                              scal*s% d_epsnuc_dx(j,k))
+                  end do
                end if
             end if
 
