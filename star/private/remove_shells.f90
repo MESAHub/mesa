@@ -916,8 +916,8 @@
       end subroutine do_remove_surface
 
 
-      ! Relax to a trimmed stellar model with all surface cells removed
-      ! down to k_remove (the cell k_remove will be the outermost in the new model).
+      ! Relax to a trimmed stellar model with surface cells removed down to k_remove
+      ! (the cell k_remove will be the outermost in the new model).
       subroutine do_relax_to_star_cut( &
             id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)
 
@@ -932,7 +932,8 @@
 
          integer, intent(in) :: id, k_remove
          logical, intent(in) :: do_jrot, do_entropy
-         logical, intent(in) :: turn_off_energy_sources_and_sinks ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
+         logical, intent(in) :: turn_off_energy_sources_and_sinks 
+            ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
          logical :: conv_vel_flag, v_flag, u_flag, rotation_flag

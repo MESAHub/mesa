@@ -2054,6 +2054,8 @@
                val = s% fe_core_infall*1d-5 ! convert to km/sec
             case(h_non_fe_core_infall)
                val = s% non_fe_core_infall*1d-5 ! convert to km/sec
+            case(h_non_fe_core_rebound)
+               val = s% non_fe_core_rebound*1d-5 ! convert to km/sec
             case(h_center_omega)
                val = if_rot(s% center_omega)
             case(h_center_omega_div_omega_crit)
