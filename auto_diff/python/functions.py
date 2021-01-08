@@ -1,4 +1,5 @@
 from sympy import *
+from sympy.codegen.cfunctions import *
 
 pi = symbols('pi')
 
@@ -6,8 +7,11 @@ pi = symbols('pi')
 unary_operators = [
 	(lambda x: -1*x, 'unary_minus'),
 	(lambda x: exp(x), 'exp'),
+	(lambda x: expm1(x), 'expm1'),
 	(lambda x: 10**x, 'exp10'),
+	(lambda x: 1/x, 'powm1'),
 	(lambda x: log(x), 'log'),
+	(lambda x: log1p(x), 'log1p'),
 	(lambda x: log(x), 'safe_log'),
 	(lambda x: log(x,10), 'log10'),
 	(lambda x: log(x,10), 'safe_log10'),
