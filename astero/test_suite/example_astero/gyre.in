@@ -59,7 +59,7 @@
 /
 
 &grid
-  alpha_osc = 10
-  alpha_exp = 2
-  alpha_ctr = 10
+  w_osc = 10
+  w_exp = 2
+  w_ctr = 10
 /
