@@ -4171,6 +4171,10 @@
       ! + ``'Krishna_Swamy'`` :
       ! use the grey T(tau) relation described by K.S. Krishna-Swamy, ApJ 145,
       ! 174–194 (1966).
+      ! + ``'Trampedach_solar'`` :
+      ! use the analytic fit by Ball (2021, RNAAS 5, 7) to the Hopf
+      ! function for the solar simulation by Trampedach et al. (2014,
+      ! MNRAS 442, 805–820)
 
       ! ::
 
