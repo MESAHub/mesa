@@ -35,12 +35,12 @@ module coulomb
 contains
 
   subroutine do_coulomb_set_context( &
-       cc, temp, den, logT, logRho, zbar, abar, z2bar, theta_e, &
+       cc, temp, den, logT, logRho, zbar, abar, z2bar,  &
        num_isos, y, iso_z52)
     type (Coulomb_Info), pointer :: cc
     integer, intent(in) :: num_isos
     real(dp), intent(in) ::  &
-         temp, den, logT, logRho, zbar, abar, z2bar, theta_e, &
+         temp, den, logT, logRho, zbar, abar, z2bar, &
          y(:), iso_z52(:) ! Z to the power of 5/2
 
     real(dp), parameter :: x13   = 1.0d0/3.0d0 
@@ -57,7 +57,6 @@ contains
     cc% zbar  = zbar
     cc% abar  = abar
     cc% z2bar = z2bar
-    cc% theta_e = theta_e
 
     ! get the info that depends only on temp, den, and overall composition         
 

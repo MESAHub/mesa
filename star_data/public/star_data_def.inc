@@ -928,7 +928,7 @@
                reaction_Qs, reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-               screening_mode, theta_e_for_graboske_et_al,  &
+               screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
                lwork, work, ierr)      
             use const_def, only: dp
@@ -964,7 +964,6 @@
             real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
             real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
             integer, intent(in) :: screening_mode
-            real(dp), intent(in)  :: theta_e_for_graboske_et_al
             integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
             real(dp), pointer :: work(:) ! (lwork)
             integer, intent(out) :: ierr ! 0 means okay

@@ -307,8 +307,8 @@
             use chem_lib, only: basic_composition_info
             use net_eval, only: eval_net
             use eos_def
-            use eos_lib, only: Radiation_Pressure, eosPT_get, eos_theta_e
-            use rates_def, only: classic_screening, rates_reaction_id_max
+            use eos_lib, only: Radiation_Pressure, eosPT_get
+            use rates_def, only: rates_reaction_id_max
 
             integer, intent(in) :: nvar, ld_dfdv, lrpar, lipar
             real(dp), intent(in) :: time, h
@@ -338,7 +338,7 @@
             integer(8) :: time0, time1, clock_rate
             real(dp), pointer :: work(:) ! (lwork)
 
-            real(dp) :: xh, Y, z, Cp, theta_e, d_theta_e_deta, rate_limit
+            real(dp) :: xh, Y, z, Cp, rate_limit
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
             real(dp) :: dlnRho_dlnT_const_P, d_epsnuc_dlnT_const_P, d_Cp_dlnT
             real(dp) :: res(num_eos_basic_results)
@@ -435,10 +435,7 @@
             eta = res(i_eta)
             d_eta_dlnRho = d_dlnRho_const_T(i_eta)
             d_eta_dlnT = d_dlnT_const_Rho(i_eta)
-            theta_e = 0
             screening_mode = ipar(i_screening_mode)
-            if (screening_mode == classic_screening) &
-                  theta_e = eos_theta_e(eta, d_theta_e_deta)
             rpar(r_burn_const_P_rho) = Rho
             rpar(r_burn_const_P_temperature) = T
             rpar(r_burn_const_P_lnS) = res(i_lnS)
@@ -492,7 +489,7 @@
                   reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
-                  screening_mode, theta_e, &
+                  screening_mode, &
                   eps_nuc_categories, eps_neu_total, &
                   lwork, work, actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
 

@@ -33,7 +33,6 @@
          
       logical, parameter :: extended_set = .false.
       logical, parameter :: sorted = .true.
-      real(dp), parameter :: theta_e_for_graboske_et_al = 1 ! for nondegenerate
 
       logical :: qt
       character (len=64) :: net_file
@@ -42,7 +41,6 @@
       real(dp) :: z, abar, zbar, z2bar, z53bar, ye, &
          eta, d_eta_dlnT, d_eta_dlnRho, eps_neu_total
       integer :: screening_mode
-      real(dp) :: theta_e = theta_e_for_graboske_et_al
       real(dp) :: test_logT, test_logRho     
       logical :: reuse_rate_raw, reuse_rate_screened = .false.
       integer, pointer :: reaction_id(:)
@@ -127,7 +125,7 @@
                   std_reaction_Qs, std_reaction_neuQs, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  screening_mode, theta_e,     &
+                  screening_mode,      &
                   eps_nuc_categories, eps_neu_total, &
                   lwork, work, info)
          else
@@ -138,7 +136,7 @@
                   std_reaction_Qs, std_reaction_neuQs, reuse_rate_raw, reuse_rate_screened, &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  screening_mode, theta_e,     &
+                  screening_mode,    &
                   eps_nuc_categories, eps_neu_total, &
                   lwork, work, info)
          end if
