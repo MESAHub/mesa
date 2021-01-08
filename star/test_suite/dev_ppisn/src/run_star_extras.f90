@@ -1281,8 +1281,6 @@
             s% atm_fixed_Tsurf = s% xtra(x_Tsurf_for_atm)
             s% tau_factor = s% xtra(x_tau_factor)
             s% force_tau_factor = s% xtra(x_tau_factor)
-            s% delta_lgL_phot_limit = -1d0
-            s% delta_lgL_phot_limit_L_min = 1d99
             s% delta_lgL_limit_L_min = 1d99
          else
             s% use_atm_PT_at_center_of_surface_cell = .false.
@@ -1291,8 +1289,6 @@
             s% atm_T_tau_opacity = 'fixed'
             s% tau_factor = 1d0
             s% force_tau_factor = 1d0
-            s% delta_lgL_phot_limit = 0.25d0
-            s% delta_lgL_phot_limit_L_min = -100
             s% delta_lgL_limit_L_min = -100
          end if
 
@@ -1305,8 +1301,8 @@
          if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit2) then
             s% delta_lgL_nuc_limit = -1d0
             s% delta_lgL_nuc_hard_limit = -1d0
-            s% delta_lgL_photo_limit = -1d0
-            s% delta_lgL_photo_hard_limit = -1d0
+            s% delta_lgL_power_photo_limit = -1d0
+            s% delta_lgL_power_photo_hard_limit = -1d0
          else
             if (s% ixtra(ix_steps_since_relax) == 0 &
                   .or. safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
@@ -1317,11 +1313,11 @@
                s% delta_lgL_nuc_hard_limit = 2d0*delta_lgLnuc_limit
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
-               s% delta_lgL_photo_limit = delta_lgLnuc_limit
-               s% delta_lgL_photo_hard_limit = 2d0*delta_lgLnuc_limit
+               s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
+               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
             else
-               s% delta_lgL_photo_limit = -1d0
-               s% delta_lgL_photo_hard_limit = -1d0
+               s% delta_lgL_power_photo_limit = -1d0
+               s% delta_lgL_power_photo_hard_limit = -1d0
             end if
          end if
 

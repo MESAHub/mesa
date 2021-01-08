@@ -63,8 +63,7 @@
       integer, parameter :: Tlim_dlgL_He = Tlim_dlgL_H + 1
       integer, parameter :: Tlim_dlgL_z = Tlim_dlgL_He + 1
       integer, parameter :: Tlim_dlgL_nuc = Tlim_dlgL_z + 1
-      integer, parameter :: Tlim_dvsurf_kms = Tlim_dlgL_nuc + 1
-      integer, parameter :: Tlim_dlgTeff = Tlim_dvsurf_kms + 1
+      integer, parameter :: Tlim_dlgTeff = Tlim_dlgL_nuc + 1
       integer, parameter :: Tlim_dlgRho_cntr = Tlim_dlgTeff + 1
       integer, parameter :: Tlim_dlgP_cntr = Tlim_dlgRho_cntr + 1
       integer, parameter :: Tlim_dlgT_cntr = Tlim_dlgP_cntr + 1
@@ -73,8 +72,7 @@
       integer, parameter :: Tlim_lg_XH_cntr = Tlim_dlgT_max_at_high_T + 1
       integer, parameter :: Tlim_dmstar = Tlim_lg_XH_cntr + 1
       integer, parameter :: Tlim_dt_div_min_dr_div_cs = Tlim_dmstar + 1
-      integer, parameter :: Tlim_lgL_phot = Tlim_dt_div_min_dr_div_cs + 1
-      integer, parameter :: Tlim_lgL = Tlim_lgL_phot + 1
+      integer, parameter :: Tlim_lgL = Tlim_dt_div_min_dr_div_cs + 1
       integer, parameter :: Tlim_max_timestep = Tlim_lgL + 1
       integer, parameter :: Tlim_timestep_hold = Tlim_max_timestep + 1
       integer, parameter :: Tlim_dX_div_X_cntr = Tlim_timestep_hold + 1
@@ -92,7 +90,8 @@
       integer, parameter :: Tlim_dX_nuc_drop = Tlim_XSi_cntr + 1
       integer, parameter :: Tlim_neg_X = Tlim_dX_nuc_drop + 1
       integer, parameter :: Tlim_bad_Xsum = Tlim_neg_X + 1
-      integer, parameter :: Tlim_delta_HR = Tlim_bad_Xsum + 1
+      integer, parameter :: Tlim_dlgL_power_photo = Tlim_bad_Xsum + 1
+      integer, parameter :: Tlim_delta_HR = Tlim_dlgL_power_photo + 1
       integer, parameter :: Tlim_dHe3 = Tlim_delta_HR + 1
       integer, parameter :: Tlim_dHe3_div_He3 = Tlim_dHe3 + 1
       integer, parameter :: Tlim_max_mix_fixup = Tlim_dHe3_div_He3 + 1
@@ -100,8 +99,7 @@
       integer, parameter :: Tlim_num_diff_solver_iters = Tlim_dlog_eps_nuc + 1
       integer, parameter :: Tlim_burn_max_num_substeps = Tlim_num_diff_solver_iters + 1
       integer, parameter :: Tlim_burn_max_num_iters = Tlim_burn_max_num_substeps + 1
-      integer, parameter :: Tlim_dlgL_photo = Tlim_burn_max_num_iters + 1
-      integer, parameter :: Tlim_del_mdot = Tlim_dlgL_photo + 1
+      integer, parameter :: Tlim_del_mdot = Tlim_burn_max_num_iters + 1
       integer, parameter :: Tlim_adjust_J_q = Tlim_del_mdot + 1
       integer, parameter :: Tlim_delta_Ye_highT = Tlim_adjust_J_q + 1
       integer, parameter :: Tlim_error_in_energy_conservation = Tlim_delta_Ye_highT + 1

@@ -343,7 +343,7 @@
     include_composition_in_eps_grav, max_eta_for_dedt_form_of_energy_eqn, no_dedt_form_during_relax, &
     use_dedt_form_with_total_energy_conservation, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
-    trace_force_another_iteration, max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
+    max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, &
     dedt_eqn_r_scale, drag_coefficient, min_q_for_drag, turn_on_drag_in_H_envelope, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
@@ -432,15 +432,14 @@
     delta_lgT_limit, delta_lgT_hard_limit, delta_lgT_limit_min_lgT, &
     delta_lgE_limit, delta_lgE_hard_limit, delta_lgE_limit_min_lgE, &
     delta_lgR_limit, delta_lgR_hard_limit, delta_lgR_limit_min_lgR, &
-    delta_lgL_phot_limit, delta_lgL_phot_hard_limit, delta_lgL_phot_limit_L_min, &
     delta_Ye_highT_limit, delta_Ye_highT_hard_limit, minT_for_highT_Ye_limit, &
     delta_lgL_nuc_cat_limit, delta_lgL_nuc_cat_hard_limit, lgL_nuc_cat_burn_min, lgL_nuc_mix_dist_limit, &
     delta_lgT_max_limit_only_after_near_zams, &
     delta_lgL_H_limit, delta_lgL_H_hard_limit, lgL_H_burn_min, lgL_H_drop_factor, lgL_H_burn_relative_limit, &
     delta_lgL_He_limit, delta_lgL_He_hard_limit, lgL_He_burn_min, lgL_He_drop_factor, lgL_He_burn_relative_limit, &
     delta_lgL_z_limit, delta_lgL_z_hard_limit, lgL_z_burn_min, lgL_z_drop_factor, lgL_z_burn_relative_limit, &
-    delta_lgL_photo_limit, delta_lgL_photo_hard_limit, lgL_photo_burn_min, lgL_photo_drop_factor, &
-    delta_lgL_nuc_limit, delta_lgL_nuc_hard_limit, lgL_nuc_burn_min, lgL_nuc_drop_factor, min_lgT_for_lgL_photo_limit, &
+    delta_lgL_power_photo_limit, delta_lgL_power_photo_hard_limit, lgL_power_photo_burn_min, lgL_power_photo_drop_factor, &
+    delta_lgL_nuc_limit, delta_lgL_nuc_hard_limit, lgL_nuc_burn_min, lgL_nuc_drop_factor, min_lgT_for_lgL_power_photo_limit, &
     delta_lgL_nuc_at_high_T_limit, delta_lgL_nuc_at_high_T_hard_limit, delta_lgL_nuc_at_high_T_limit_lgT_min, &
     delta_lgRho_cntr_limit, delta_lgRho_cntr_hard_limit, delta_lgP_cntr_limit, delta_lgP_cntr_hard_limit, &
     delta_lgT_cntr_limit, delta_lgT_cntr_hard_limit, delta_lgT_cntr_limit_only_after_near_zams, &
@@ -459,13 +458,12 @@
     delta_XO_cntr_limit, delta_XO_cntr_hard_limit, delta_XSi_cntr_limit, delta_XSi_cntr_hard_limit, &
     delta_lgTeff_limit, delta_lgTeff_hard_limit, delta_lgL_limit, delta_lgL_limit_L_min, delta_lgL_hard_limit, &
     delta_HR_ds_L, delta_HR_ds_Teff, delta_HR_limit, delta_HR_hard_limit, &
-    delta_lg_star_mass_limit, delta_lg_star_mass_hard_limit, delta_vsurf_kms_limit, delta_vsurf_kms_hard_limit, &
+    delta_lg_star_mass_limit, delta_lg_star_mass_hard_limit, &
     delta_mdot_atol, delta_mdot_rtol, delta_mdot_limit, delta_mdot_hard_limit, &
     adjust_J_q_limit, adjust_J_q_hard_limit, &
     never_skip_hard_limits, relax_hard_limits_after_retry, report_all_dt_limits, &
     report_why_dt_limits, report_solver_dt_info, report_dX_nuc_drop_dt_limits, &
     limit_for_rel_error_in_energy_conservation, hard_limit_for_rel_error_in_energy_conservation, &
-    limit_for_max_abs_v_residual, hard_limit_for_max_abs_v_residual, &
 
     ! atmosphere -- surface boundary conditions
 
@@ -1836,7 +1834,6 @@
  s% eps_mdot_factor = eps_mdot_factor
  s% include_composition_in_eps_grav = include_composition_in_eps_grav
  s% max_abs_rel_change_surf_lnS = max_abs_rel_change_surf_lnS
- s% trace_force_another_iteration = trace_force_another_iteration
  s% max_num_surf_revisions = max_num_surf_revisions
  s% Gamma_lnS_eps_grav_full_off = Gamma_lnS_eps_grav_full_off
  s% Gamma_lnS_eps_grav_full_on = Gamma_lnS_eps_grav_full_on
@@ -2184,10 +2181,6 @@
  s% delta_lgR_hard_limit = delta_lgR_hard_limit
  s% delta_lgR_limit_min_lgR = delta_lgR_limit_min_lgR
 
- s% delta_lgL_phot_limit = delta_lgL_phot_limit
- s% delta_lgL_phot_hard_limit = delta_lgL_phot_hard_limit
- s% delta_lgL_phot_limit_L_min = delta_lgL_phot_limit_L_min
-
  s% delta_Ye_highT_limit = delta_Ye_highT_limit
  s% delta_Ye_highT_hard_limit = delta_Ye_highT_hard_limit
  s% minT_for_highT_Ye_limit = minT_for_highT_Ye_limit
@@ -2215,11 +2208,11 @@
  s% lgL_z_drop_factor = lgL_z_drop_factor
  s% lgL_z_burn_relative_limit = lgL_z_burn_relative_limit
 
- s% delta_lgL_photo_limit = delta_lgL_photo_limit
- s% delta_lgL_photo_hard_limit = delta_lgL_photo_hard_limit
- s% lgL_photo_burn_min = lgL_photo_burn_min
- s% lgL_photo_drop_factor = lgL_photo_drop_factor
- s% min_lgT_for_lgL_photo_limit = min_lgT_for_lgL_photo_limit
+ s% delta_lgL_power_photo_limit = delta_lgL_power_photo_limit
+ s% delta_lgL_power_photo_hard_limit = delta_lgL_power_photo_hard_limit
+ s% lgL_power_photo_burn_min = lgL_power_photo_burn_min
+ s% lgL_power_photo_drop_factor = lgL_power_photo_drop_factor
+ s% min_lgT_for_lgL_power_photo_limit = min_lgT_for_lgL_power_photo_limit
 
  s% delta_lgL_nuc_limit = delta_lgL_nuc_limit
  s% delta_lgL_nuc_hard_limit = delta_lgL_nuc_hard_limit
@@ -2300,9 +2293,6 @@
  s% delta_XO_cntr_hard_limit = delta_XO_cntr_hard_limit
  s% delta_XSi_cntr_limit = delta_XSi_cntr_limit
  s% delta_XSi_cntr_hard_limit = delta_XSi_cntr_hard_limit
- 
- s% delta_vsurf_kms_limit = delta_vsurf_kms_limit
- s% delta_vsurf_kms_hard_limit = delta_vsurf_kms_hard_limit
 
  s% delta_lgTeff_limit = delta_lgTeff_limit
  s% delta_lgTeff_hard_limit = delta_lgTeff_hard_limit
@@ -2335,9 +2325,6 @@
 
  s% limit_for_rel_error_in_energy_conservation = limit_for_rel_error_in_energy_conservation
  s% hard_limit_for_rel_error_in_energy_conservation = hard_limit_for_rel_error_in_energy_conservation
-
- s% limit_for_max_abs_v_residual = limit_for_max_abs_v_residual
- s% hard_limit_for_max_abs_v_residual = hard_limit_for_max_abs_v_residual
 
  s% min_chem_eqn_scale = min_chem_eqn_scale
 
@@ -3465,7 +3452,6 @@
  eps_mdot_factor = s% eps_mdot_factor
  include_composition_in_eps_grav = s% include_composition_in_eps_grav
  max_abs_rel_change_surf_lnS = s% max_abs_rel_change_surf_lnS
- trace_force_another_iteration = s% trace_force_another_iteration
  max_num_surf_revisions = s% max_num_surf_revisions
  Gamma_lnS_eps_grav_full_off = s% Gamma_lnS_eps_grav_full_off
  Gamma_lnS_eps_grav_full_on = s% Gamma_lnS_eps_grav_full_on
@@ -3808,10 +3794,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  delta_lgE_hard_limit = s% delta_lgE_hard_limit
  delta_lgE_limit_min_lgE = s% delta_lgE_limit_min_lgE
 
- delta_lgL_phot_limit = s% delta_lgL_phot_limit
- delta_lgL_phot_hard_limit = s% delta_lgL_phot_hard_limit
- delta_lgL_phot_limit_L_min = s% delta_lgL_phot_limit_L_min
-
  delta_lgR_limit = s% delta_lgR_limit
  delta_lgR_hard_limit = s% delta_lgR_hard_limit
  delta_lgR_limit_min_lgR = s% delta_lgR_limit_min_lgR
@@ -3843,11 +3825,11 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  lgL_z_drop_factor = s% lgL_z_drop_factor
  lgL_z_burn_relative_limit = s% lgL_z_burn_relative_limit
 
- delta_lgL_photo_limit = s% delta_lgL_photo_limit
- delta_lgL_photo_hard_limit = s% delta_lgL_photo_hard_limit
- lgL_photo_burn_min = s% lgL_photo_burn_min
- lgL_photo_drop_factor = s% lgL_photo_drop_factor
- min_lgT_for_lgL_photo_limit = s% min_lgT_for_lgL_photo_limit
+ delta_lgL_power_photo_limit = s% delta_lgL_power_photo_limit
+ delta_lgL_power_photo_hard_limit = s% delta_lgL_power_photo_hard_limit
+ lgL_power_photo_burn_min = s% lgL_power_photo_burn_min
+ lgL_power_photo_drop_factor = s% lgL_power_photo_drop_factor
+ min_lgT_for_lgL_power_photo_limit = s% min_lgT_for_lgL_power_photo_limit
 
  delta_lgL_nuc_limit = s% delta_lgL_nuc_limit
  delta_lgL_nuc_hard_limit = s% delta_lgL_nuc_hard_limit
@@ -3928,9 +3910,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  delta_XO_cntr_hard_limit = s% delta_XO_cntr_hard_limit
  delta_XSi_cntr_limit = s% delta_XSi_cntr_limit
  delta_XSi_cntr_hard_limit = s% delta_XSi_cntr_hard_limit
- 
- delta_vsurf_kms_limit = s% delta_vsurf_kms_limit
- delta_vsurf_kms_hard_limit = s% delta_vsurf_kms_hard_limit
 
  delta_lgTeff_limit = s% delta_lgTeff_limit
  delta_lgTeff_hard_limit = s% delta_lgTeff_hard_limit
@@ -3963,9 +3942,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
 
  limit_for_rel_error_in_energy_conservation = s% limit_for_rel_error_in_energy_conservation
  hard_limit_for_rel_error_in_energy_conservation = s% hard_limit_for_rel_error_in_energy_conservation
-
- limit_for_max_abs_v_residual = s% limit_for_max_abs_v_residual
- hard_limit_for_max_abs_v_residual = s% hard_limit_for_max_abs_v_residual
 
  min_chem_eqn_scale = s% min_chem_eqn_scale
 

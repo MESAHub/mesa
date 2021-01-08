@@ -919,10 +919,6 @@
                s% num_surf_revisions < s% max_num_surf_revisions .and. &
                abs(s% lnS(1) - s% surf_lnS) > &
                   s% max_abs_rel_change_surf_lnS*max(s% lnS(1),s% surf_lnS)) then
-            if (s% trace_force_another_iteration) &
-               write(*,2) 'force extra iter to fix predicted final surface lnS', iter, &
-                  abs(s% lnS(1) - s% surf_lnS)/max(s% lnS(1),s% surf_lnS), &
-                  s% max_abs_rel_change_surf_lnS
             s% surf_lnT = s% lnT(1)
             s% surf_lnR = s% lnR(1)
             if (s% i_lnd /= 0) s% surf_lnd = s% lnd(1)

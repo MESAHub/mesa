@@ -35,7 +35,7 @@
 !        include '' means include the default standard list file
 
 ! items corresponding to names on terminal output lines
-
+      gamma1_min
       lg_Lnuc
       H_rich
       N_cntr

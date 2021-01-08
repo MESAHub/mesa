@@ -7,7 +7,7 @@
 
       profile_starting_model = .true.
 
-      pgstar_flag = .true.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
