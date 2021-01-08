@@ -417,16 +417,29 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: k
-         real(dp) :: v
+         real(dp) :: v_infall, v
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_by_infall_kms: get_star_ptr ierr', ierr
             return
          end if
-         v = -abs(infall_kms)*1d5
+         v_infall = -abs(infall_kms)*1d5
+         !write(*,1) 'v_infall', v_infall
          do k=1,s% nz
-            if (s% v(k) <= v) then
+            if (s% v_flag) then
+               v = s% v(k)
+            else if (s% u_flag) then
+               v = s% u(k)
+            else
+               write(*,*) 'must have v or u for do_remove_center_by_infall_kms'
+               ierr = -1
+               return
+            end if
+            !write(*,2) 'v', k, v, v_infall
+            if (v <= v_infall) then
                call do_remove_inner_fraction_q(id, s% q(k), ierr)
+               write(*,1) 'new inner boundary mass', s% m_center/Msun
                return
             end if
          end do
