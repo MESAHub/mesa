@@ -1,5 +1,7 @@
 from sympy import *
 
+pi = symbols('pi')
+
 # Supported unary functions
 unary_operators = [
 	(lambda x: -1*x, 'unary_minus'),
@@ -13,12 +15,18 @@ unary_operators = [
 	(lambda x: sin(x), 'sin'),
 	(lambda x: cos(x), 'cos'),
 	(lambda x: tan(x), 'tan'),
+	(lambda x: sin(pi*x), 'sinpi'),
+	(lambda x: cos(pi*x), 'cospi'),
+	(lambda x: tan(pi*x), 'tanpi'),
 	(lambda x: sinh(x), 'sinh'),
 	(lambda x: cosh(x), 'cosh'),
 	(lambda x: tanh(x), 'tanh'),
 	(lambda x: asin(x), 'asin'),
 	(lambda x: acos(x), 'acos'),
 	(lambda x: atan(x), 'atan'),
+	(lambda x: asin(x)/pi, 'asinpi'),
+	(lambda x: acos(x)/pi, 'acospi'),
+	(lambda x: atan(x)/pi, 'atanpi'),
 	(lambda x: asinh(x), 'asinh'),
 	(lambda x: acosh(x), 'acosh'),
 	(lambda x: atanh(x), 'atanh'),
