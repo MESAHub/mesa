@@ -433,7 +433,6 @@
                   s% dxh_lnT(k) = dx(i_lnT,k)
                   if (abs(s% lnT(k) - s% lnT_start(k)) > &
                           ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
-                       s% gamma_law_hydro == 0d0 .and. &
                        s% min_logT_for_hydro_mtx_max_allowed < &
                         ln10*min(s% lnT(k),s% lnT_start(k))) then
                      if (report) &
@@ -446,7 +445,6 @@
                      return
                   end if
                   if (s% lnT(k) > ln10*s% hydro_mtx_max_allowed_logT .and. &
-                       s% gamma_law_hydro == 0d0 .and. &
                        s% min_logT_for_hydro_mtx_max_allowed < &
                         ln10*min(s% lnT(k),s% lnT_start(k))) then
                      if (report) &
@@ -457,8 +455,7 @@
                      ierr = -1
                      return
                   end if
-                  if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT .and. &
-                       s% gamma_law_hydro == 0d0) then
+                  if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT) then
                      if (report) &
                         write(*,4) 'hydro_mtx: logT too small', &
                            s% model_number, k, iter, &
@@ -632,8 +629,7 @@
                   if (do_lnd) then
                      s% lnd(k) = x(i_lnd)
                      s% dxh_lnd(k) = dx(i_lnd,k)
-                     if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho .and. &
-                         s% gamma_law_hydro == 0d0) then
+                     if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                         s% retry_message = 'logRho < hydro_mtx_min_allowed_logRho'
                         if (report) &
                            write(*,4) 'hydro_mtx: logRho too small', &
@@ -643,7 +639,6 @@
                         return
                      end if
                      if (s% lnd(k) > ln10*s% hydro_mtx_max_allowed_logRho .and. &
-                          s% gamma_law_hydro == 0d0 .and. &
                           s% min_logT_for_hydro_mtx_max_allowed < &
                            ln10*min(s% lnT(k),s% lnT_start(k))) then
                         s% retry_message = 'logRho > hydro_mtx_max_allowed_logRho'

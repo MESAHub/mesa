@@ -1166,7 +1166,8 @@
          logical, intent(out) :: is_int_val
          integer, intent(out) :: ierr
          integer :: k, i, min_k
-         real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep
+         real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, &
+            min_gamma1
          real(dp), pointer :: v(:)
          logical :: v_flag
 
@@ -1378,6 +1379,13 @@
 
             case(h_logT_max)
                val = s% log_max_temperature
+            case(h_gamma1_min)
+               min_gamma1 = 1d99
+               do k = s% nz, 1, -1
+                  if (s% q(k) > s% gamma1_limit_max_q) exit
+                  if (s% gamma1(k) < min_gamma1) min_gamma1 = s% gamma1(k)
+               end do
+               val = min_gamma1
 
             case(h_logQ_max)
                val = maxval(s% lnd(1:nz)/ln10 - 2*s% lnT(1:nz)/ln10 + 12)

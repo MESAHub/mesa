@@ -153,11 +153,7 @@
          P4=4.d0*PI
          P43=P4/3.d0
          
-         if (s% zero_gravity) then
-            G=0d0
-         else
-            G=standard_cgrav
-         end if
+         G=standard_cgrav
          SIG=boltz_sigma
          SUNL=Lsun
          SUNM=Msun

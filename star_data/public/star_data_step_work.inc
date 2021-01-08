@@ -1213,7 +1213,6 @@
          real(dp) :: initial_v_center
          real(dp) :: tau_center  
          real(dp) :: super_eddington_wind_mdot
-         real(dp) :: vsurf_wind_mdot
          
          integer :: init_model_number
          integer :: start_H_envelope_base_k
@@ -1352,7 +1351,6 @@
          logical :: doing_solver_iterations
          logical :: doing_flash_wind
          logical :: doing_rlo_wind
-         logical :: doing_nova_wind
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          

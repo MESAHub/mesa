@@ -33,7 +33,7 @@
 
 &controls
       
-      fe_core_infall_limit = 1d8
+      fe_core_infall_limit = 5d7
       
       when_to_stop_atol = 1d99
       when_to_stop_rtol = 1d99

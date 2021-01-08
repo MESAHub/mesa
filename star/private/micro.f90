@@ -112,29 +112,21 @@ contains
 
     if (.not. (skip_kap .and. skip_neu)) then
 
-       if (s% constant_L) then ! need opacities
-          if (.not. skip_kap) then
-             do k = 1, s% nz
-                s% opacity(k) = 1d0
-             end do
-          end if
-       else
-          if (.not. skip_kap) then
-             call prepare_kap(s, ierr)
-             if (ierr /= 0) return
-             if (s% use_other_opacity_factor) then
-                call s% other_opacity_factor(s% id, ierr)
-                if (ierr /= 0) return
-             else
-                s% extra_opacity_factor(1:s% nz) = s% opacity_factor
-             end if
-          endif
+       if (.not. skip_kap) then
+          call prepare_kap(s, ierr)
+          if (ierr /= 0) return
           if (s% use_other_opacity_factor) then
              call s% other_opacity_factor(s% id, ierr)
              if (ierr /= 0) return
           else
              s% extra_opacity_factor(1:s% nz) = s% opacity_factor
           end if
+       endif
+       if (s% use_other_opacity_factor) then
+          call s% other_opacity_factor(s% id, ierr)
+          if (ierr /= 0) return
+       else
+          s% extra_opacity_factor(1:s% nz) = s% opacity_factor
        end if
 
        if (s% doing_timing) call start_time(s, time0, total)
@@ -433,7 +425,7 @@ contains
 
     T = s% T(k)
     rho = s% rho(k)
-    if ((T > 1d15 .or. rho > 1d15) .and. s% gamma_law_hydro == 0d0) then
+    if (T > 1d15 .or. rho > 1d15) then
        ierr = -1
        if (s% report_ierr) then
           write(*,4) 'bad T or rho for eos', k, s% solver_iter, s% model_number
@@ -443,7 +435,7 @@ contains
        return
     end if
     s% Prad(k) = crad * T*T*T*T / 3
-    if (s% gamma_law_hydro > 0d0 .or. s% use_eosDT_ideal_gas) then
+    if (s% use_eosDT_ideal_gas) then
        s% P(k) = s% Pgas(k)
     else
        s% P(k) = s% Prad(k) + s% Pgas(k)
@@ -572,13 +564,6 @@ contains
     include 'formats'
 
     ierr = 0
-
-    if (s% constant_L) then
-       s% opacity(k) = 0.2d0
-       s% d_opacity_dlnd(k) = 0
-       s% d_opacity_dlnT(k) = 0
-       return
-    end if
 
     log10_rho = s% lnd(k)/ln10
     log10_T = s% lnT(k)/ln10

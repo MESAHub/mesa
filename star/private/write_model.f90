@@ -84,7 +84,6 @@
          if (Eturb_flag) file_type = file_type + 2**bit_for_Eturb
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
-         if (s% constant_L) file_type = file_type + 2**bit_for_constant_L
          if (prev_flag) file_type = file_type + 2**bit_for_2models
          if (v_flag) file_type = file_type + 2**bit_for_velocity
          if (u_flag) file_type = file_type + 2**bit_for_u
@@ -122,9 +121,7 @@
             write(iounit,'(a)',advance='no') ', with wturb=sqrt(turbulent energy)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
-         if (s% constant_L) then
-            write(iounit,'(a)',advance='no') ', luminosity=L_center'
-         else if (.not. no_L) then
+         if (.not. no_L) then
             write(iounit,'(a)',advance='no') ', L=luminosity'
          end if
          if (s% M_center /= 0) then
@@ -159,7 +156,7 @@
             write(iounit, 11) 'v_center', s% v_center, &
                '! velocity of outer edge of core (cm/s)'
          end if
-         if (s% L_center /= 0 .or. s% constant_L) then
+         if (s% L_center /= 0) then
             write(iounit, 11) 'L_center', s% L_center, &
                '! luminosity of core (erg/s). L/Lsun, avg core eps (erg/g/s):', &
                   s% L_center/Lsun, s% L_center/max(1d0,s% M_center)
@@ -209,7 +206,7 @@
             if (Eturb_flag) then
                call write1(s% Eturb(k),ierr); if (ierr /= 0) exit
             end if            
-            if (.not. (s% constant_L .or. no_L)) then
+            if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             end if            
             call write1(s% dq(k),ierr); if (ierr /= 0) exit
@@ -280,7 +277,7 @@
             else if (Eturb_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'Eturb'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
-            else if (.not. (s% constant_L .or. no_L)) then
+            else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             end if
             write(iounit, fmt='(a26, 1x)', advance='no') 'dq'

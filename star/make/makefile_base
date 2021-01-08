@@ -131,7 +131,6 @@ SRCS = \
    kap_support.f90 \
    eos_support.f90 \
    atm_support.f90 \
-   create_atm_paczyn.f90 \
    net.f90 \
    neu.f90 \
    micro.f90 \
