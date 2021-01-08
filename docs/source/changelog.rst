@@ -80,6 +80,13 @@ neu
 The call signature of other_neu has changed. You no longer need to pass in z2bar
 
 
+net
+~~~
+
+The screening mode ``classic_screening`` has been removed. Anyeone using other_net_get needs
+to remove ``theta_e_for_graboske_et_al`` from its argument list.
+
+
 Other changes
 -------------
 

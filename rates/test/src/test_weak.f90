@@ -103,7 +103,6 @@ module test_weak
          ! eta =   -5.3287260155378711
          ! d_eta_dlnT=   -1.5713400060794886
          ! d_eta_dlnRho =    1.0016532307086357
-         ! theta_e =    0.0000000000000000
 
       else
          logT = 7.5d0

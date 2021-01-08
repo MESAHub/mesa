@@ -722,11 +722,6 @@
       ! screening
       
       integer, parameter :: no_screening = 0
-      integer, parameter :: classic_screening = 1
-         ! DeWitt, Graboske, Cooper, "Screening Factors for Nuclear Reactions. 
-         !    I. General Theory", ApJ, 181:439-456, 1973.
-         ! Graboske, DeWitt, Grossman, Cooper, "Screening Factors for Nuclear Reactions. 
-         !    II. Intermediate Screening and Astrophysical Applications", ApJ, 181:457-474, 1973.
       integer, parameter :: extended_screening = 2
          ! based on code from Frank Timmes
          ! extends the Graboske method using results from Alastuey and Jancovici (1978),
@@ -743,7 +738,6 @@
          real(dp) :: den
          real(dp) :: logT
          real(dp) :: logRho
-         real(dp) :: theta_e
          real(dp) :: zbar
          real(dp) :: abar
          real(dp) :: z2bar
@@ -892,7 +886,6 @@
          real(dp) :: den
          real(dp) :: logT
          real(dp) :: logRho
-         real(dp) :: theta_e
          real(dp) :: zbar
          real(dp) :: abar
          real(dp) :: z2bar

@@ -49,7 +49,7 @@
             n% g, num_chem_isos, y, 1d0, 1d0, 0d0, 0d0, .true., &
             n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
             n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-            n% screening_mode, n% theta_e_for_graboske_et_al, n% graboske_cache, &
+            n% screening_mode,  &
             screen_h1, screen_he4, 0d0, 0d0, 0d0, 1d0, ierr)
       end subroutine make_screening_tables
       
@@ -58,7 +58,7 @@
             g, num_isos, y, temp, den, logT, logRho, init,  &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
-            screening_mode, theta_e, graboske_cache, &
+            screening_mode, &
             screen_h1, screen_he4, zbar, abar, z2bar, ye, ierr)
 
          use rates_def, only: Screen_Info, reaction_name
@@ -67,12 +67,11 @@
          type (Net_General_Info), pointer  :: g
          integer, intent(in) :: num_isos, screening_mode
          real(dp), intent(in) :: y(:), temp, den, logT, logRho, &
-            zbar, abar, z2bar, ye, theta_e
+            zbar, abar, z2bar, ye
          real(dp), intent(inout), dimension(:) :: &
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
          real(dp), intent(inout), dimension(:,:) :: screen_h1, screen_he4
-         real(dp), pointer :: graboske_cache(:,:,:)
          logical, intent(in) :: init
          integer, intent(out) :: ierr
 
@@ -90,8 +89,7 @@
          if (.not. init) then
             call screen_set_context( &
                sc, temp, den, logT, logRho, zbar, abar, z2bar,  &
-               screening_mode, graboske_cache, &
-               theta_e, num_isos, y, g% z158)
+               screening_mode, num_isos, y, g% z158)
          end if
 
          num_reactions = g% num_reactions
@@ -232,7 +230,7 @@
                   sc, a1, z1, a2, z2, screening_mode, &
                   g% zg1(jscr), g% zg2(jscr), g% zg3(jscr), g% zg4(jscr), g% zs13(jscr),  &
                   g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), g% aznut(jscr), g% zs13inv(jscr), &
-                  theta_e, graboske_cache, scor, scordt, scordd, ierr) 
+                  scor, scordt, scordd, ierr) 
                if (ierr /= 0) write(*,*) 'screen_pair failed in screening_pair ' // &
                      trim(reaction_name(ir)) 
                
