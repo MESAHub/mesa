@@ -36,7 +36,6 @@ SRCS = \
    rates_initialize.f90 \
    rates_support.f90 \
    screen5.f90 \
-   screen_graboske.f90 \
    screen_chugunov.f90 \
    screen.f90 \
    rates_lib.f90

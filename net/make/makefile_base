@@ -18,7 +18,6 @@ SRCS = \
    net_derivs_support.f90 \
    net_derivs.f90 \
    net_approx21.f90 \
-   net_approx21_plus_co56.f90 \
    net_burn_support.f90 \
    net_initialize.f90 \
    net_eval.f90 \
@@ -69,14 +68,10 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-# also in test makefile
-APROX21_FXT_FLAG =
-#APROX21_FXT_FLAG = -DAPROX21_FXT
+#COMPILE = $(COMPILE_NO_OPT) $(FCfree) 
 
-#COMPILE = $(COMPILE_NO_OPT) $(FCfree) $(APROX21_FXT_FLAG)
-
-#COMPILE = $(COMPILE_TO_TEST) $(FCfree) $(APROX21_FXT_FLAG)
-COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) $(APROX21_FXT_FLAG)
+#COMPILE = $(COMPILE_TO_TEST) $(FCfree) 
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) 
 
 COMPILE_CMD = $(COMPILE)
 

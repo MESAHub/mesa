@@ -268,7 +268,7 @@
                   if (result == terminate) exit evolve_loop
                   first_try = .false.
                end do step_loop
-               result = star_finish_step(id, .false.,ierr)
+               result = star_finish_step(id, ierr)
                if (result /= keep_going) exit evolve_loop         
             end do evolve_loop
 

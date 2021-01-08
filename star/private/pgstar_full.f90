@@ -1297,8 +1297,7 @@
 
          if (s% clear_history) call pgstar_clear(s)
 
-         call update_pgstar_data(s, &
-            ierr)
+         call update_pgstar_data(s, ierr)
          if (failed('update_pgstar_data')) return
          
          call onScreen_Plots(s, must_write_files, ierr)

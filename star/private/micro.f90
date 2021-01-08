@@ -328,7 +328,7 @@ contains
     if (ierr /= 0) then
        if (s% report_ierr) then
           write(*,*) 'do_eos_for_cell: get_eos ierr', ierr
-          stop 'do_eos_for_cell'
+          !stop 'do_eos_for_cell'
        end if
        return
     end if

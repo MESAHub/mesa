@@ -361,20 +361,21 @@
    ! Mode frequency data
    ! -------------------
 
-   ! nl0
+   ! nl
    ! ~~~
-   ! l0_obs
-   ! ~~~~~~
-   ! l0_obs_sigma
+   ! freq_target
+   ! ~~~~~~~~~~~
+   ! freq_sigma
    ! ~~~~~~~~~~~~
 
-   ! Data for ``l==0`` modes.  ``nl0`` is the number of modes, ``l0_obs(1)`` to ``l0_obs(nl0)`` are the
-   ! frequencies (in increasing frequency order) and ``l0_obs_sigma(1)`` to ``l0_obs_sigma(nl0)`` are
+   ! Data for oscillation modes.  ``nl(el)`` is the number of modes of degree ``el``,
+   ! ``freq_target(el,1)`` to ``freq_target(el,nl(el))`` are the
+   ! frequencies (in increasing frequency order) and ``freq_sigma(el,1)`` to ``freq_sigma(el,nl(el))`` are
    ! the uncertainties. ::
 
-      nl0 = 0 ! number of observed l=0 modes
-      l0_obs(:) = 0 ! frequencies. set l0_obs(1), l0_obs(2) .... l0_obs(nl0)
-      l0_obs_sigma(:) = 0 ! l0_obs_sigma(i) is uncertainty for l0_obs(i), for i=1,nl0
+      nl(0:3) = 0 ! number of observed modes
+      freq_target(0:3,:) = 0 ! frequencies. set e.g. freq_target(0,1) ... freq_target(0,nl(0)) for radial modes
+      freq_sigma(0:3,:) = 0 ! freq_sigma(el,i) is uncertainty for freq_target(el,i)
 
    ! l0_n_obs
    ! ~~~~~~~~
@@ -384,54 +385,6 @@
    ! If ``l0_n_obs`` are provided, the Kjeldsen surface correction will use them. ::
 
       l0_n_obs(:) = -1
-
-
-   ! nl1
-   ! ~~~
-   ! l1_obs
-   ! ~~~~~~
-   ! l1_obs_sigma
-   ! ~~~~~~~~~~~~
-
-   ! Data for ``l==1`` modes.  ``nl1`` is the number of modes, ``l1_obs(1)`` to ``l1_obs(nl1)`` are the
-   ! frequencies (in increasing frequency order) and ``l1_obs_sigma(1)`` to ``l1_obs_sigma(nl1)`` are
-   ! the uncertainties. ::
-
-      nl1 = 0 ! number of observed l=1 modes
-      l1_obs(:) = 0 ! frequencies. set l1_obs(1), l1_obs(2) .... l1_obs(nl1)
-      l1_obs_sigma(:) = 0 ! l1_obs_sigma(i) is uncertainty for l1_obs(i), for i=1,nl1
-
-
-   ! nl2
-   ! ~~~
-   ! l2_obs
-   ! ~~~~~~
-   ! l2_obs_sigma
-   ! ~~~~~~~~~~~~
-
-   ! Data for ``l==2`` modes.  ``nl2`` is the number of modes, ``l2_obs(1)`` to ``l2_obs(nl2)`` are the
-   ! frequencies (in increasing frequency order) and ``l2_obs_sigma(1)`` to ``l2_obs_sigma(nl2)`` are
-   ! the uncertainties. ::
-
-      nl2 = 0 ! number of observed l=2 modes
-      l2_obs(:) = 0 ! frequencies. set l2_obs(1), l2_obs(2) .... l2_obs(nl2)
-      l2_obs_sigma(:) = 0 ! l2_obs_sigma(i) is uncertainty for l2_obs(i), for i=1,nl2
-
-
-   ! nl3
-   ! ~~~
-   ! l3_obs
-   ! ~~~~~~
-   ! l3_obs_sigma
-   ! ~~~~~~~~~~~~
-
-   ! Data for ``l==3`` modes.  ``nl3`` is the number of modes, ``l3_obs(1)`` to ``l3_obs(nl3)`` are the
-   ! frequencies (in increasing frequency order) and ``l3_obs_sigma(1)`` to ``l3_obs_sigma(nl3)`` are
-   ! the uncertainties. ::
-
-      nl3 = 0 ! number of observed l=3 modes
-      l3_obs(:) = 0 ! frequencies. set l3_obs(1), l3_obs(2) .... l3_obs(nl3)
-      l3_obs_sigma(:) = 0 ! l3_obs_sigma(i) is uncertainty for l3_obs(i), for i=1,nl3
 
    ! Optimization parameters
    ! -----------------------
@@ -1504,21 +1457,15 @@
       do_redistribute_mesh = .true.
 
 
-   ! iscan_factor_l0
+   ! iscan_factor
    ! ~~~~~~~~~~~~~~~
-   ! iscan_factor_l1
-   ! ~~~~~~~~~~~~~~~
-   ! iscan_factor_l2
-   ! ~~~~~~~~~~~~~~~
-   ! iscan_factor_l3
-   ! ~~~~~~~~~~~~~~~
-   ! ADIPLS will scan for frequencies at ``iscan_factor_l0`` times the number
-   ! of observed ``l==0`` modes.  The same goes for ``l==1``, ``2`` and ``3``. ::
+   ! ADIPLS will scan for frequencies at ``iscan_factor(l)`` times the number
+   ! of observed ``l`` modes. ::
 
-      iscan_factor_l0 = 15
-      iscan_factor_l1 = 15
-      iscan_factor_l2 = 15
-      iscan_factor_l3 = 15
+      iscan_factor(0) = 15
+      iscan_factor(1) = 15
+      iscan_factor(2) = 15
+      iscan_factor(3) = 15
 
    ! nu_lower_factor
    ! ~~~~~~~~~~~~~~~

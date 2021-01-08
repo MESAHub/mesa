@@ -44,7 +44,7 @@
          ! multiple calls are ok to search.
          use rsp_build, only: do_rsp_build
          use hydro_vars, only: set_vars, set_Teff
-         use report, only: do_report
+         !use report, only: do_report
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k
@@ -67,8 +67,8 @@
          s% doing_finish_load_model = .false.
          call set_Teff(s, ierr)
          if (ierr /= 0) return
-         call do_report(s, ierr)
-         if (ierr /= 0) return
+         !call do_report(s, ierr)
+         !if (ierr /= 0) return
       end subroutine do1_rsp_build
 
 
@@ -144,7 +144,8 @@
       
 
       subroutine finish_build_rsp_model(s,ierr)
-         use star_utils, only: set_qs, set_m_and_dm, set_dm_bar
+         use star_utils, only: &
+            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: i, k, j
@@ -173,7 +174,14 @@
             s% xh(s% i_v,k) = s% v(k)
          end do
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
-         call set_qs(NZN, s% q, s% dq, ierr)
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
+            call normalize_dqs(s, NZN, s% dq, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in finish_build_rsp_model'
+               return
+            end if
+         end if
+         call set_qs(s, NZN, s% q, s% dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in set_qs'
             stop 'build_rsp_model'

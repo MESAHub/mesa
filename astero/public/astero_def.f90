@@ -145,26 +145,12 @@
       real(dp) :: Z_div_X_solar
 
       integer, parameter :: & ! increase these if necessary
-         max_nl0 = 1000, &
-         max_nl1 = 1000, &
-         max_nl2 = 1000, &
-         max_nl3 = 1000
+         max_nl = 1000
 
-      ! observed l=0 modes to match to model
-      integer :: nl0
-      real(dp) :: l0_obs(max_nl0), l0_obs_sigma(max_nl0)
-      
-      ! observed l=1 modes to match to model
-      integer :: nl1
-      real(dp) :: l1_obs(max_nl1), l1_obs_sigma(max_nl1)
-      
-      ! observed l=2 modes to match to model
-      integer :: nl2
-      real(dp) :: l2_obs(max_nl2), l2_obs_sigma(max_nl2)
-      
-      ! observed l=3 modes to match to model
-      integer :: nl3
-      real(dp) :: l3_obs(max_nl3), l3_obs_sigma(max_nl3)
+      ! observed modes to match to model
+      integer  :: nl(0:3)
+      real(dp) :: freq_target(0:3,max_nl)
+      real(dp) :: freq_sigma(0:3,max_nl)
             
       character (len=100) :: search_type
       
@@ -253,11 +239,11 @@
          surf_coef1_name, surf_coef2_name
       
       real(dp) :: correction_b, correction_factor
-      integer :: l0_n_obs(max_nl0)
+      integer :: l0_n_obs(max_nl)
       
       ! frequency ratios for observations
       integer :: ratios_n, ratios_l0_first, ratios_l1_first
-      real(dp), dimension(max_nl0) :: &
+      real(dp), dimension(max_nl) :: &
          ratios_r01, sigmas_r01, &
          ratios_r10, sigmas_r10, &
          ratios_r02, sigmas_r02
@@ -322,8 +308,7 @@
       logical :: do_redistribute_mesh
       ! note: number of zones for redistribute is set in the redistrb.c input file
                
-      integer :: & ! iscan for adipls = this factor times expected number of modes
-         iscan_factor_l0, iscan_factor_l1, iscan_factor_l2, iscan_factor_l3
+      integer :: iscan_factor(0:3) ! iscan for adipls = this factor times expected number of modes
       real(dp) :: nu_lower_factor, nu_upper_factor
          ! frequency range for adipls is set from observed frequencies times these            
       integer :: & ! misc adipls parameters
@@ -403,14 +388,9 @@
          my_var3_target, my_var3_sigma, my_var3_name, &
          
          Z_div_X_solar, &
-         nl0, &
-         l0_obs, l0_obs_sigma, &
-         nl1, &
-         l1_obs, l1_obs_sigma, &
-         nl2, &
-         l2_obs, l2_obs_sigma, &
-         nl3, &
-         l3_obs, l3_obs_sigma, &
+         nl, &
+         freq_target, &
+         freq_sigma, &
          
          search_type, &
          
@@ -520,7 +500,7 @@
          add_center_point, &
          do_redistribute_mesh, &
          trace_time_in_oscillation_code, &
-         iscan_factor_l0, iscan_factor_l1, iscan_factor_l2, iscan_factor_l3, &
+         iscan_factor, &
          adipls_irotkr, adipls_nprtkr, adipls_igm1kr, adipls_npgmkr, &
          nu_lower_factor, nu_upper_factor, &
          read_extra_astero_search_inlist1, &
@@ -618,42 +598,31 @@
       
       
       ! working storage for models and search results
-      real(dp) :: l0_freq(max_nl0), l0_freq_corr(max_nl0), &
-         l0_inertia(max_nl0)
-      real(dp) :: l1_freq(max_nl1), l1_freq_corr(max_nl1), &
-         l1_inertia(max_nl1)
-      real(dp) :: l2_freq(max_nl2), l2_freq_corr(max_nl2), &
-         l2_inertia(max_nl2)
-      real(dp) :: l3_freq(max_nl3), l3_freq_corr(max_nl3), &
-         l3_inertia(max_nl3)
-      integer :: l0_order(max_nl0), l1_order(max_nl1), &
-         l2_order(max_nl2), l3_order(max_nl3)
-         
+      real(dp) :: model_freq(0:3,max_nl)
+      real(dp) :: model_freq_corr(0:3,max_nl)
+      real(dp) :: model_inertia(0:3,max_nl)
+      integer  :: model_order(0:3,max_nl)
+
+      ! there are no alt frequencies for l=0 but we need the data so
+      ! we can pass arrays containing data for all l
+
       ! next best fit at higher frequency
-      real(dp) :: l1_freq_alt_up(max_nl1), l1_freq_corr_alt_up(max_nl1), &
-         l1_inertia_alt_up(max_nl1)
-      real(dp) :: l2_freq_alt_up(max_nl2), l2_freq_corr_alt_up(max_nl2), &
-         l2_inertia_alt_up(max_nl2)
-      real(dp) :: l3_freq_alt_up(max_nl3), l3_freq_corr_alt_up(max_nl3), &
-         l3_inertia_alt_up(max_nl3)
-      integer :: l1_order_alt_up(max_nl1), l2_order_alt_up(max_nl2), &
-         l3_order_alt_up(max_nl3)
+      real(dp) :: model_freq_alt_up(0:3,max_nl)
+      real(dp) :: model_freq_corr_alt_up(0:3,max_nl)
+      real(dp) :: model_inertia_alt_up(0:3,max_nl)
+      integer  :: model_order_alt_up(0:3,max_nl)
          
       ! next best fit at lower frequency
-      real(dp) :: l1_freq_alt_down(max_nl1), l1_freq_corr_alt_down(max_nl1), &
-         l1_inertia_alt_down(max_nl1)
-      real(dp) :: l2_freq_alt_down(max_nl2), l2_freq_corr_alt_down(max_nl2), &
-         l2_inertia_alt_down(max_nl2)
-      real(dp) :: l3_freq_alt_down(max_nl3), l3_freq_corr_alt_down(max_nl3), &
-         l3_inertia_alt_down(max_nl3)
-      integer :: l1_order_alt_down(max_nl1), l2_order_alt_down(max_nl2), &
-         l3_order_alt_down(max_nl3)
+      real(dp) :: model_freq_alt_down(0:3,max_nl)
+      real(dp) :: model_freq_corr_alt_down(0:3,max_nl)
+      real(dp) :: model_inertia_alt_down(0:3,max_nl)
+      integer  :: model_order_alt_down(0:3,max_nl)
 
-      integer, dimension(max_nl0) :: i2_for_r02
-      
+      integer, dimension(max_nl) :: i2_for_r02
+
       ! frequency ratios for model
       integer :: model_ratios_n, model_ratios_l0_first, model_ratios_l1_first
-      real(dp), dimension(max_nl0) :: &
+      real(dp), dimension(max_nl) :: &
          model_ratios_r01, &
          model_ratios_r10, &
          model_ratios_r02
@@ -720,29 +689,12 @@
       integer :: &
          best_model_number
          
-      integer :: &
-         best_l0_order(max_nl0), &
-         best_l1_order(max_nl1), &
-         best_l2_order(max_nl2), &
-         best_l3_order(max_nl3)
-      real(dp), dimension (max_nl0) :: &
-         best_l0_freq, &
-         best_l0_freq_corr, &
-         best_l0_inertia
-      real(dp), dimension (max_nl1) :: &
-         best_l1_freq, &
-         best_l1_freq_corr, &
-         best_l1_inertia
-      real(dp), dimension (max_nl2) :: &
-         best_l2_freq, &
-         best_l2_freq_corr, &
-         best_l2_inertia
-      real(dp), dimension (max_nl3) :: &
-         best_l3_freq, &
-         best_l3_freq_corr, &
-         best_l3_inertia
-      
-      real(dp), dimension(max_nl0) :: &
+      integer  :: best_order(0:3,max_nl)
+      real(dp) :: best_freq(0:3,max_nl)
+      real(dp) :: best_freq_corr(0:3,max_nl)
+      real(dp) :: best_inertia(0:3,max_nl)
+
+      real(dp), dimension(max_nl) :: &
          best_ratios_r01, &
          best_ratios_r10, &
          best_ratios_r02
@@ -789,25 +741,10 @@
          sample_model_number, &
          sample_op_code
          
-      integer, pointer, dimension(:,:) :: &
-         sample_l0_order, &
-         sample_l1_order, &
-         sample_l2_order, &
-         sample_l3_order
-         
-      real(dp), pointer, dimension(:,:) :: &
-         sample_l0_freq, &
-         sample_l0_freq_corr, &
-         sample_l0_inertia, &
-         sample_l1_freq, &
-         sample_l1_freq_corr, &
-         sample_l1_inertia, &
-         sample_l2_freq, &
-         sample_l2_freq_corr, &
-         sample_l2_inertia, &
-         sample_l3_freq, &
-         sample_l3_freq_corr, &
-         sample_l3_inertia
+      integer,  pointer, dimension(:,:,:) :: sample_order
+      real(dp), pointer, dimension(:,:,:) :: sample_freq
+      real(dp), pointer, dimension(:,:,:) :: sample_freq_corr
+      real(dp), pointer, dimension(:,:,:) :: sample_inertia
 
       real(dp), pointer, dimension(:,:) :: &
          sample_ratios_r01, &
@@ -995,22 +932,10 @@
             sample_op_code, &
             sample_model_number, &
             sample_index_by_chi2, &
-            sample_l0_order, &
-            sample_l1_order, &
-            sample_l2_order, &
-            sample_l3_order, &
-            sample_l0_freq, &
-            sample_l0_freq_corr, &
-            sample_l0_inertia, &
-            sample_l1_freq, &
-            sample_l1_freq_corr, &
-            sample_l1_inertia, &
-            sample_l2_freq, &
-            sample_l2_freq_corr, &
-            sample_l2_inertia, &
-            sample_l3_freq, &
-            sample_l3_freq_corr, &
-            sample_l3_inertia, &
+            sample_order, &
+            sample_freq, &
+            sample_freq_corr, &
+            sample_inertia, &
             sample_ratios_r01, &
             sample_ratios_r10, &
             sample_ratios_r02)
@@ -1062,34 +987,80 @@
             
          call realloc_integer(sample_op_code,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_integer(sample_model_number,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_integer2(sample_l0_order,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_integer2(sample_l1_order,max_nl1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_integer2(sample_l2_order,max_nl2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_integer2(sample_l3_order,max_nl2,max_num_samples,ierr); if (ierr /= 0) return
-            
-         call realloc_double2(sample_l0_freq,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l0_freq_corr,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l0_inertia,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
-         
-         call realloc_double2(sample_l1_freq,max_nl1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l1_freq_corr,max_nl1,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l1_inertia,max_nl1,max_num_samples,ierr); if (ierr /= 0) return
-         
-         call realloc_double2(sample_l2_freq,max_nl2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l2_freq_corr,max_nl2,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l2_inertia,max_nl2,max_num_samples,ierr); if (ierr /= 0) return
-         
-         call realloc_double2(sample_l3_freq,max_nl3,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l3_freq_corr,max_nl3,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_l3_inertia,max_nl3,max_num_samples,ierr); if (ierr /= 0) return
 
-         call realloc_double2(sample_ratios_r01,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_ratios_r10,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
-         call realloc_double2(sample_ratios_r02,max_nl0,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_integer2_modes(sample_order,max_nl,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2_modes(sample_freq,max_nl,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2_modes(sample_freq_corr,max_nl,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2_modes(sample_inertia,max_nl,max_num_samples,ierr); if (ierr /= 0) return
+
+         call realloc_double2(sample_ratios_r01,max_nl,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2(sample_ratios_r10,max_nl,max_num_samples,ierr); if (ierr /= 0) return
+         call realloc_double2(sample_ratios_r02,max_nl,max_num_samples,ierr); if (ierr /= 0) return
 
       end subroutine alloc_sample_ptrs
+
    
-   
+      ! for the frequency arrays sample_{order,freq,freq_corr,inertia}, the first index
+      ! is 0:3, so here are some specific realloc routines for that case
+      ! basically copied from utils/public/utils_lib.f
+      subroutine realloc_double2_modes(ptr,new_size1,new_size2,ierr)
+         real(dp), pointer :: ptr(:,:,:)
+         integer, intent(in) :: new_size1,new_size2
+         integer, intent(out) :: ierr
+         real(dp), pointer :: new_ptr(:,:,:)
+         integer :: l, i1,i2, i, j
+         ierr = 0
+         allocate(new_ptr(0:3,new_size1,new_size2),stat=ierr)
+         if (ierr /= 0) return
+         if (associated(ptr)) then
+            i1 = min(new_size1,size(ptr,dim=1))
+            i2 = min(new_size2,size(ptr,dim=2))
+            ! ifort uses stack for array copy temp storage
+            ! for large copies, this can produce seg faults
+            ! doing the explicit loops seems to be safe
+            !new_ptr(0:3,1:i1,1:i2) = ptr(0:3,1:i1,1:i2)
+            do l=0,3
+               do i=1,i1
+                  do j=1,i2
+                     new_ptr(l,i,j) = ptr(l,i,j)
+                  end do
+               end do
+            end do
+            deallocate(ptr)
+         end if
+         ptr => new_ptr
+      end subroutine realloc_double2_modes
+
+
+      subroutine realloc_integer2_modes(ptr,new_size1,new_size2,ierr)
+         integer, pointer :: ptr(:,:,:)
+         integer, intent(in) :: new_size1,new_size2
+         integer, intent(out) :: ierr
+         integer, pointer :: new_ptr(:,:,:)
+         integer :: l, i1, i2, i, j
+         ierr = 0
+         allocate(new_ptr(0:3,new_size1,new_size2),stat=ierr)
+         if (ierr /= 0) return
+         if (associated(ptr)) then
+            i1 = min(new_size1,size(ptr,dim=1))
+            i2 = min(new_size2,size(ptr,dim=2))
+            ! ifort uses stack for array copy temp storage
+            ! for large copies, this can produce seg faults
+            ! doing the explicit loops seems to be safe
+            !new_ptr(0:3,1:i1,1:i2) = ptr(0:3,1:i1,1:i2)
+            do l=0,3
+               do i=1,i1
+                  do j=1,i2
+                     new_ptr(l,i,j) = ptr(l,i,j)
+                  end do
+               end do
+            end do
+            deallocate(ptr)
+         end if
+         ptr => new_ptr
+      end subroutine realloc_integer2_modes
+
+
       subroutine read_astero_search_controls(filename, ierr)
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
@@ -1429,7 +1400,7 @@
          
          if (chi2_seismo_fraction > 0) then
          
-            do j=1,nl0
+            do j=1,nl(0)
                if (j < 10) then
                   write(str,'(i1)') j
                else if (j < 100) then
@@ -1446,7 +1417,7 @@
                   'l0_inertia_' // trim(str)
             end do
             
-            do j=1,nl1
+            do j=1,nl(1)
                if (j < 10) then
                   write(str,'(i1)') j
                else if (j < 100) then
@@ -1463,7 +1434,7 @@
                   'l1_inertia_' // trim(str)
             end do
             
-            do j=1,nl2
+            do j=1,nl(2)
                if (j < 10) then
                   write(str,'(i1)') j
                else if (j < 100) then
@@ -1480,7 +1451,7 @@
                   'l2_inertia_' // trim(str)
             end do
             
-            do j=1,nl3
+            do j=1,nl(3)
                if (j < 10) then
                   write(str,'(i1)') j
                else if (j < 100) then
@@ -1515,7 +1486,7 @@
             end do
 
             if (chi2_seismo_r_02_fraction > 0) then
-               do j=1,nl0
+               do j=1,nl(0)
                   if (j < 10) then
                      write(str,'(i1)') j
                   else if (j < 100) then
@@ -1541,7 +1512,7 @@
          use num_lib, only: simplex_info_str
          integer, intent(in) :: i, iounit
             
-         integer :: j, k, op_code, ierr
+         integer :: j, k, l, op_code, ierr
          character (len=256) :: info_str
          
          ierr = 0
@@ -1591,10 +1562,10 @@
             sample_surf_coef2(i), &
             sample_chi2_seismo(i), &
             sample_chi2_spectro(i), &
-            nl0, &
-            nl1, &
-            nl2, &
-            nl3, &
+            nl(0), &
+            nl(1), &
+            nl(2), &
+            nl(3), &
             ratios_n, &
             ratios_l0_first, &
             ratios_l1_first
@@ -1602,29 +1573,13 @@
          if (iounit == 6) return
          
          if (chi2_seismo_fraction > 0) then
-            
-            do k=1,nl0
-               write(iounit,'(i26,99(1pes26.16))',advance='no') &
-                  sample_l0_order(k,i), l0_obs(k), l0_obs_sigma(k), &
-                  sample_l0_freq(k,i), sample_l0_freq_corr(k,i), sample_l0_inertia(k,i)
-            end do
-            
-            do k=1,nl1
-               write(iounit,'(i26,99(1pes26.16))',advance='no') &
-                  sample_l1_order(k,i), l1_obs(k), l1_obs_sigma(k), &
-                  sample_l1_freq(k,i), sample_l1_freq_corr(k,i), sample_l1_inertia(k,i)
-            end do
-            
-            do k=1,nl2
-               write(iounit,'(i26,99(1pes26.16))',advance='no') &
-                  sample_l2_order(k,i), l2_obs(k), l2_obs_sigma(k), &
-                  sample_l2_freq(k,i), sample_l2_freq_corr(k,i), sample_l2_inertia(k,i)
-            end do
-            
-            do k=1,nl3
-               write(iounit,'(i26,99(1pes26.16))',advance='no') &
-                  sample_l3_order(k,i), l3_obs(k), l3_obs_sigma(k), &
-                  sample_l3_freq(k,i), sample_l3_freq_corr(k,i), sample_l3_inertia(k,i)
+
+            do l = 0, 3
+               do k = 1, nl(l)
+                  write(iounit,'(i26,99(1pes26.16))',advance='no') &
+                     sample_order(l,k,i), freq_target(l,k), freq_sigma(l,k), &
+                     sample_freq(l,k,i), sample_freq_corr(l,k,i), sample_inertia(l,k,i)
+               end do
             end do
 
             do k=1,ratios_n
@@ -1634,7 +1589,7 @@
             end do
 
             if (chi2_seismo_r_02_fraction > 0) then
-               do k=1,nl0
+               do k=1,nl(0)
                   write(iounit,'(99(1pes26.16))',advance='no') &
                      ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
                end do
@@ -1679,59 +1634,31 @@
          integer, intent(in) :: io
          
          real(dp) :: chi2term
-         integer :: i
+         integer :: i, l
+
+         ! elaborate shenanigans to preserve header format
+         character(len=8), dimension(5) :: header
           
-         write(io,'(/,2a6,99a20)') &
-            'l=0', 'n', 'chi2term', 'l0_freq', 'l0_corr', 'l0_obs', 'l0_sigma', 'log E'
-         do i = 1, nl0
-            if (l0_obs(i) < 0) cycle
-            chi2term = pow2((best_l0_freq_corr(i) - l0_obs(i))/l0_obs_sigma(i))
-            write(io,'(6x,i6,e20.10,99f20.10)') &
-               best_l0_order(i), chi2term, best_l0_freq(i), best_l0_freq_corr(i), &
-               l0_obs(i), l0_obs_sigma(i), safe_log10(best_l0_inertia(i))
+         do l = 0, 3
+            if (nl(l) > 0) then
+               write(header(1), '(a2,i1)') 'l=', l
+               write(header(2), '(a1,i1,a5)') 'l', l, '_freq'
+               write(header(3), '(a1,i1,a5)') 'l', l, '_corr'
+               write(header(4), '(a1,i1,a4)') 'l', l, '_obs'
+               write(header(5), '(a1,i1,a6)') 'l', l, '_sigma'
+               write(io,'(/,2a6,99a20)') &
+                  trim(header(1)), 'n', 'chi2term', trim(header(2)), trim(header(3)), &
+                  trim(header(4)), trim(header(5)), 'log E'
+
+               do i = 1, nl(l)
+                  if (freq_target(l,i) < 0) cycle
+                  chi2term = pow2((best_freq_corr(l,i) - freq_target(l,i))/freq_sigma(l,i))
+                  write(io,'(6x,i6,e20.10,99f20.10)') &
+                     best_order(l,i), chi2term, best_freq(l,i), best_freq_corr(l,i), &
+                     freq_target(l,i), freq_sigma(l,i), safe_log10(best_inertia(l,i))
+               end do
+            end if
          end do
-      
-         if (nl1 > 0) then
-            write(io,*)
-            write(io,'(2a6,99a20)') &
-               'l=1', 'n', 'chi2term', 'l1_freq', 'l1_corr', 'l1_obs', 'l1_sigma', 'log E'
-            do i = 1, nl1
-               if (l1_obs(i) < 0) cycle
-               chi2term = pow2((best_l1_freq_corr(i) - l1_obs(i))/l1_obs_sigma(i))
-               if (is_bad(chi2term)) cycle
-               write(io,'(6x,i6,e20.10,99f20.10)') &
-                  best_l1_order(i), chi2term, best_l1_freq(i), best_l1_freq_corr(i), &
-                  l1_obs(i), l1_obs_sigma(i), safe_log10(best_l1_inertia(i))
-            end do
-         end if
-      
-         if (nl2 > 0) then
-            write(io,*)
-            write(io,'(2a6,99a20)') &
-               'l=2', 'n', 'chi2term', 'l2_freq', 'l2_corr', 'l2_obs', 'l2_sigma', 'log E'
-            do i = 1, nl2
-               if (l2_obs(i) < 0) cycle
-               chi2term = pow2((best_l2_freq_corr(i) - l2_obs(i))/l2_obs_sigma(i))
-               if (is_bad(chi2term)) cycle
-               write(io,'(6x,i6,e20.10,99f20.10)') &
-                  best_l2_order(i), chi2term, best_l2_freq(i), best_l2_freq_corr(i), &
-                  l2_obs(i), l2_obs_sigma(i), safe_log10(best_l2_inertia(i))
-            end do
-         end if
-         
-         if (nl3 > 0) then
-            write(io,*)
-            write(io,'(2a6,99a20)') &
-               'l=3', 'n', 'chi2term', 'l3_freq', 'l3_corr', 'l3_obs', 'l3_sigma', 'log E'
-            do i = 1, nl3
-               if (l3_obs(i) < 0) cycle
-               chi2term = pow2((best_l3_freq_corr(i) - l3_obs(i))/l3_obs_sigma(i))
-               if (is_bad(chi2term)) cycle
-               write(io,'(6x,i6,e20.10,99f20.10)') &
-                  best_l3_order(i), chi2term, best_l3_freq(i), best_l3_freq_corr(i), &
-                  l3_obs(i), l3_obs_sigma(i), safe_log10(best_l3_inertia(i))
-            end do
-         end if
       
       end subroutine show_best_el_info
       
@@ -1750,9 +1677,9 @@
          do i=1,ratios_n
             chi2term = &
                pow2((model_ratios_r01(i) - ratios_r01(i))/sigmas_r01(i))
-            write(io,'(6x,i6,e20.10,99f20.10)') l0_order(i + l0_first), &
+            write(io,'(6x,i6,e20.10,99f20.10)') model_order(0,i + l0_first), &
                chi2term, model_ratios_r01(i), ratios_r01(i), sigmas_r01(i), &
-               l0_obs(i + l0_first)
+               freq_target(0,i + l0_first)
          end do
           
          write(io,'(/,2a6,99a16)') &
@@ -1760,9 +1687,9 @@
          do i=1,ratios_n
             chi2term = &
                pow2((model_ratios_r10(i) - ratios_r10(i))/sigmas_r10(i))
-            write(io,'(6x,i6,e20.10,99f20.10)') l1_order(i + l1_first), &
+            write(io,'(6x,i6,e20.10,99f20.10)') model_order(1,i + l1_first), &
                chi2term, model_ratios_r10(i), ratios_r10(i), sigmas_r10(i), &
-               l1_obs(i + l1_first)
+               freq_target(1,i + l1_first)
          end do
                
       end subroutine show_best_r010_ratios_info
@@ -1776,13 +1703,13 @@
          
          write(io,'(/,2a6,99a16)') &
             'r02', 'l=0 n', 'chi2term', 'r02', 'r02_obs', 'r02_sigma', 'l0_obs'
-         do i=1,nl0
+         do i=1,nl(0)
             if (sigmas_r02(i) == 0d0) cycle
             chi2term = &
                pow2((model_ratios_r02(i) - ratios_r02(i))/sigmas_r02(i))
-            write(io,'(6x,i6,e20.10,99f20.10)') l0_order(i), &
+            write(io,'(6x,i6,e20.10,99f20.10)') model_order(0,i), &
                chi2term, model_ratios_r02(i), ratios_r02(i), sigmas_r02(i), &
-               l0_obs(i)
+               freq_target(0,i)
          end do
                
       end subroutine show_best_r02_ratios_info
@@ -2055,7 +1982,7 @@
          integer, intent(in) :: j, iounit
          integer, intent(out) :: ierr
             
-         integer :: i, k
+         integer :: i, k, l
          character (len=256) :: info_str
          real(dp) :: logR
          
@@ -2104,10 +2031,10 @@
             sample_surf_coef2(i), &
             sample_chi2_seismo(i), &
             sample_chi2_spectro(i), &
-            nl0, &
-            nl1, &
-            nl2, &
-            nl3, &
+            nl(0), &
+            nl(1), &
+            nl(2), &
+            nl(3), &
             ratios_n, &
             ratios_l0_first, &
             ratios_l1_first
@@ -2116,33 +2043,14 @@
          sample_radius(i) = exp10(logR)
 
          if (chi2_seismo_fraction > 0) then
-            
-            do k=1,nl0
-               read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
-                  sample_l0_order(k,i), l0_obs(k), l0_obs_sigma(k), &
-                  sample_l0_freq(k,i), sample_l0_freq_corr(k,i), sample_l0_inertia(k,i)
-               if (failed('l=0')) return
-            end do
-            
-            do k=1,nl1
-               read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
-                  sample_l1_order(k,i), l1_obs(k), l1_obs_sigma(k), &
-                  sample_l1_freq(k,i), sample_l1_freq_corr(k,i), sample_l1_inertia(k,i)
-               if (failed('l=1')) return
-            end do
-            
-            do k=1,nl2
-               read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
-                  sample_l2_order(k,i), l2_obs(k), l2_obs_sigma(k), &
-                  sample_l2_freq(k,i), sample_l2_freq_corr(k,i), sample_l2_inertia(k,i)
-               if (failed('l=2')) return
-            end do
-            
-            do k=1,nl3
-               read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
-                  sample_l3_order(k,i), l3_obs(k), l3_obs_sigma(k), &
-                  sample_l3_freq(k,i), sample_l3_freq_corr(k,i), sample_l3_inertia(k,i)
-               if (failed('l=3')) return
+
+            do l = 0, 3
+               do k = 1, nl(0)
+                  read(iounit,'(i26,99(1pes26.16))',advance='no',iostat=ierr) &
+                     sample_order(l,k,i), freq_target(l,k), freq_sigma(l,k), &
+                     sample_freq(l,k,i), sample_freq_corr(l,k,i), sample_inertia(l,k,i)
+                  if (failed('freqs')) return
+               end do
             end do
 
             do k=1,ratios_n
@@ -2152,7 +2060,7 @@
                if (failed('ratios_r010')) return
             end do
 
-            do k=1,nl0
+            do k=1,nl(0)
                read(iounit,'(99(1pes26.16))',advance='no',iostat=ierr) &
                   ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
                if (failed('ratios_r02')) return

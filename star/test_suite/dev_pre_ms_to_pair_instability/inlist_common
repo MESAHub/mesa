@@ -24,7 +24,7 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -88,49 +88,35 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-      gradT_excess_age_fraction = 0.9d0
-      gradT_excess_lambda1 = 1.0
-      gradT_excess_beta1 = 0.35
-      gradT_excess_lambda2 = 0.5
-      gradT_excess_beta2 = 0.25
-      gradT_excess_dlambda = 0.1
-      gradT_excess_dbeta = 0.1
-
+  
 ! mixing
       !** for high mass - no overshoot
-      
-      D_omega_max_replacement_fraction = 0.5d0
-      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
-      max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 ! timesteps
-      varcontrol_target   = 1d-3
+      varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true
+      limit_for_rel_error_in_energy_conservation = 1d-7
+      hard_limit_for_rel_error_in_energy_conservation = 1d-6      
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
       delta_lgTeff_limit =  0.01
-      delta_lgTeff_hard_limit = 0.05
-
-      delta_lgL_limit = 0.1
-      delta_lgL_hard_limit = 0.3
-           
+      delta_lgL_limit = 0.1     
       delta_lgL_He_limit = 0.1
-      delta_lgL_He_hard_limit = 0.3
 
-      delta_lgRho_cntr_limit = 0.03
-      delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1
+      delta_lgRho_cntr_limit = 0.03 ! 0.02 ! 0.005   ! default 0.05
+      delta_lgRho_cntr_hard_limit = -1
+      delta_lgRho_limit = 0.1          ! default 1.0
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.003  
+      delta_lgT_cntr_limit = 0.002  
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.003     
+      delta_lgT_max_limit = 0.002     
       delta_lgT_max_hard_limit = 0.01
 
       dHe_div_He_limit = -1
@@ -238,10 +224,8 @@
       x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
-      terminal_show_log_dt = .false.
-
       center_avg_value_dq = 1d-12
-      he_core_boundary_h1_fraction = 0.1
+      he_core_boundary_h1_fraction = 0.5
       c_core_boundary_he4_fraction = 0.5
       o_core_boundary_c12_fraction = 0.5
       si_core_boundary_o16_fraction = 0.5

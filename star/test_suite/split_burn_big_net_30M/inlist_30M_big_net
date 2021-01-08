@@ -32,7 +32,7 @@
 &controls
 
    xa_central_lower_limit_species(1) = 'si28'
-   xa_central_lower_limit(1) = 0.5d0
+   xa_central_lower_limit(1) = 0.55d0
    
 
       when_to_stop_rtol = 1d99

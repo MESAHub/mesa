@@ -1,5 +1,8 @@
 ! inlist_zams_ultra_high_mass - stops when reach Lnuc_div_L_zams_limit
 
+! note: for more than about 200M, lg_LH can get very large during the process of adding mass.
+! in this case, the code simply declares that it is at zams immediately.
+
 &star_job
 
       show_log_description_at_start = .false. 
@@ -12,8 +15,8 @@
       required_termination_code_string = 'Lnuc_div_L_zams_limit'
 
       relax_initial_mass_scale = .true.
-      dlgm_per_step = 1d-3
-      new_mass = 300
+      dlgm_per_step = 2d-3
+      new_mass = 250  ! NOTE: change initial_mass in &controls to match
       change_mass_years_for_dt = 1d-2
 
       
@@ -39,7 +42,7 @@
 
 &controls
 
-      initial_mass = 300
+      initial_mass = 250  ! NOTE: change new_mass in &star_job to match
       initial_z = 1d-4
       
       stop_near_zams = .true.
@@ -54,8 +57,8 @@
 
       photo_interval = 100
       profile_interval = 100
-      history_interval = 5
-      terminal_interval = 50
+      history_interval = 50
+      terminal_interval = 10
 
 / ! end of controls namelist
 

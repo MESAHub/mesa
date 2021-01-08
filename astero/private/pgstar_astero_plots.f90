@@ -65,7 +65,7 @@
          p% file_width = echelle_file_width
          p% file_aspect_ratio = echelle_file_aspect_ratio
          
-         if (nl1 > 0) then
+         if (nl(1) > 0) then
             i = i+1
             plot_id = i_Other + i - 1
             p => s% pgstar_win_file_ptr(plot_id)
@@ -161,29 +161,29 @@
          xpt_max = -1e9
          ymin = 1e9
          ymax = 0         
-         if (nl0 > 0) then
-            ymin = min(ymin,minval(l0_obs(1:nl0)))
-            ymax = max(ymax,maxval(l0_obs(1:nl0)))
-            xpt_min = min(xpt_min,minval(mod(l0_obs(1:nl0),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(l0_obs(1:nl0),plot_delta_nu)))
+         if (nl(0) > 0) then
+            ymin = min(ymin,minval(freq_target(0,1:nl(0))))
+            ymax = max(ymax,maxval(freq_target(0,1:nl(0))))
+            xpt_min = min(xpt_min,minval(mod(freq_target(0,1:nl(0)),plot_delta_nu)))
+            xpt_max = max(xpt_max,maxval(mod(freq_target(0,1:nl(0)),plot_delta_nu)))
          end if
-         if (nl1 > 0) then
-            ymin = min(ymin,minval(l1_obs(1:nl1)))
-            ymax = max(ymax,maxval(l1_obs(1:nl1)))
-            xpt_min = min(xpt_min,minval(mod(l1_obs(1:nl1),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(l1_obs(1:nl1),plot_delta_nu)))
+         if (nl(1) > 0) then
+            ymin = min(ymin,minval(freq_target(1,1:nl(1))))
+            ymax = max(ymax,maxval(freq_target(1,1:nl(1))))
+            xpt_min = min(xpt_min,minval(mod(freq_target(1,1:nl(1)),plot_delta_nu)))
+            xpt_max = max(xpt_max,maxval(mod(freq_target(1,1:nl(1)),plot_delta_nu)))
          end if
-         if (nl2 > 0) then
-            ymin = min(ymin,minval(l2_obs(1:nl2)))
-            ymax = max(ymax,maxval(l2_obs(1:nl2)))
-            xpt_min = min(xpt_min,minval(mod(l2_obs(1:nl2),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(l2_obs(1:nl2),plot_delta_nu)))
+         if (nl(2) > 0) then
+            ymin = min(ymin,minval(freq_target(2,1:nl(2))))
+            ymax = max(ymax,maxval(freq_target(2,1:nl(2))))
+            xpt_min = min(xpt_min,minval(mod(freq_target(2,1:nl(2)),plot_delta_nu)))
+            xpt_max = max(xpt_max,maxval(mod(freq_target(2,1:nl(2)),plot_delta_nu)))
          end if
-         if (nl3 > 0) then
-            ymin = min(ymin,minval(l3_obs(1:nl3)))
-            ymax = max(ymax,maxval(l3_obs(1:nl3)))
-            xpt_min = min(xpt_min,minval(mod(l3_obs(1:nl3),plot_delta_nu)))
-            xpt_max = max(xpt_max,maxval(mod(l3_obs(1:nl3),plot_delta_nu)))
+         if (nl(3) > 0) then
+            ymin = min(ymin,minval(freq_target(3,1:nl(3))))
+            ymax = max(ymax,maxval(freq_target(3,1:nl(3))))
+            xpt_min = min(xpt_min,minval(mod(freq_target(3,1:nl(3)),plot_delta_nu)))
+            xpt_max = max(xpt_max,maxval(mod(freq_target(3,1:nl(3)),plot_delta_nu)))
          end if
          dy = ymax - ymin
          dy = max(dy, 1.0)
@@ -216,7 +216,7 @@
          ! label
          y_obs = ymin + dy*0.12
          y_txt = ymin + dy*0.17
-         if (nl3 > 0) then
+         if (nl(3) > 0) then
             dx = (xmax-xmin)/4d0
          else
             dx = (xmax-xmin)/3d0
@@ -262,7 +262,7 @@
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=2')
          
-         if (nl3 > 0) then
+         if (nl(3) > 0) then
             x_obs = x_obs+dx
             call pgsci(l3_color)
             call pgsch(1.6*txt_scale)
@@ -274,50 +274,50 @@
          
          marker_scale = 2.4*txt_scale
          call pgsch(marker_scale)
-         if (nl0 > 0) then
-            do i=1,nl0
-               call show_obs(l0_obs(i), l0_color, l0_shape)
+         if (nl(0) > 0) then
+            do i=1,nl(0)
+               call show_obs(freq_target(0,i), l0_color, l0_shape)
                !if (have_radial) call show_model( &
-               if (l0_freq_corr(i) > 0) call show_model( &
-                  l0_obs(i), l0_freq_corr(i), 0d0, 0d0, &
+               if (model_freq_corr(0,i) > 0) call show_model( &
+                  freq_target(0,i), model_freq_corr(0,i), 0d0, 0d0, &
                   0d0, 0d0, 0d0, l0_color)
             end do
          end if
          
-         if (nl1 > 0) then
-            do i=1,nl1
-               call show_obs(l1_obs(i), l1_color, l1_shape)
+         if (nl(1) > 0) then
+            do i=1,nl(1)
+               call show_obs(freq_target(1,i), l1_color, l1_shape)
                if (have_nonradial) then
                   call show_model( &
-                     l1_obs(i), l1_freq_corr(i), l1_freq_corr_alt_up(i), &
-                     l1_freq_corr_alt_down(i), &
-                     l1_inertia(i), l1_inertia_alt_up(i), l1_inertia_alt_down(i), &
+                     freq_target(1,i), model_freq_corr(1,i), model_freq_corr_alt_up(1,i), &
+                     model_freq_corr_alt_down(1,i), &
+                     model_inertia(1,i), model_inertia_alt_up(1,i), model_inertia_alt_down(1,i), &
                      l1_color)
                end if
             end do
          end if
          
-         if (nl2 > 0) then
-            do i=1,nl2
-               call show_obs(l2_obs(i), l2_color, l2_shape)
+         if (nl(2) > 0) then
+            do i=1,nl(2)
+               call show_obs(freq_target(2,i), l2_color, l2_shape)
                if (have_nonradial) then
                   call show_model( &
-                     l2_obs(i), l2_freq_corr(i), l2_freq_corr_alt_up(i), &
-                     l2_freq_corr_alt_down(i), &
-                     l2_inertia(i), l2_inertia_alt_up(i), l2_inertia_alt_down(i), &
+                     freq_target(2,i), model_freq_corr(2,i), model_freq_corr_alt_up(2,i), &
+                     model_freq_corr_alt_down(2,i), &
+                     model_inertia(2,i), model_inertia_alt_up(2,i), model_inertia_alt_down(2,i), &
                      l2_color)
                end if
             end do
          end if
          
-         if (nl3 > 0) then
-            do i=1,nl3
-               call show_obs(l3_obs(i), l3_color, l3_shape)
+         if (nl(3) > 0) then
+            do i=1,nl(3)
+               call show_obs(freq_target(3,i), l3_color, l3_shape)
                if (have_nonradial) then
                   call show_model( &
-                     l3_obs(i), l3_freq_corr(i), l3_freq_corr_alt_up(i), &
-                     l3_freq_corr_alt_down(i), &
-                     l3_inertia(i), l3_inertia_alt_up(i), l3_inertia_alt_down(i), &
+                     freq_target(3,i), model_freq_corr(3,i), model_freq_corr_alt_up(3,i), &
+                     model_freq_corr_alt_down(3,i), &
+                     model_inertia(3,i), model_inertia_alt_up(3,i), model_inertia_alt_down(3,i), &
                      l3_color)
                end if
             end do
@@ -470,7 +470,7 @@
             return
          end if
          
-         if (nl1 <= 0 .or. ratios_n <= 0) then
+         if (nl(1) <= 0 .or. ratios_n <= 0) then
             return
          end if
          
@@ -488,7 +488,7 @@
             if (ratios_r10(i) > xmax) xmax = ratios_r10(i)
             if (ratios_r10(i) < xmin) xmin = ratios_r10(i)
          end do
-         do i=1,nl0
+         do i=1,nl(0)
             if (sigmas_r02(i) == 0) cycle
             if (ratios_r02(i) > xmax) xmax = ratios_r02(i)
             if (ratios_r02(i) < xmin) xmin = ratios_r02(i)
@@ -502,12 +502,12 @@
          xmin = xmin - dx*0.1
          xmax = xmax + dx*0.1
          
-         ymin = l0_obs(1 + l0_first)
-         ymax = l1_obs(n + l1_first)
-         do i=2,nl0
+         ymin = freq_target(0,1 + l0_first)
+         ymax = freq_target(1,n + l1_first)
+         do i=2,nl(0)
             if (sigmas_r02(i) == 0d0) cycle
-            if (l0_obs(i) > ymax) ymax = l0_obs(i)
-            if (l0_obs(i) < ymin) ymin = l0_obs(i)
+            if (freq_target(0,i) > ymax) ymax = freq_target(0,i)
+            if (freq_target(0,i) < ymin) ymin = freq_target(0,i)
          end do
          dy = ymax - ymin
          dy = max(dy, 1.0)
@@ -583,7 +583,7 @@
             call show_r10(i)
          end do
          
-         do i=1,nl0
+         do i=1,nl(0)
             call show_r02(i)
          end do
          
@@ -600,14 +600,14 @@
             integer, intent(in) :: i
             real :: x_obs, y_obs, sig_obs, x_model, y_model
             include 'formats'
-            y_obs = l0_obs(i + l0_first)
+            y_obs = freq_target(0,i + l0_first)
             x_obs = ratios_r01(i)
             sig_obs = sigmas_r01(i)
             call pgsci(r01_color)
             call pgmove(x_obs-sig_obs, y_obs)
             call pgdraw(x_obs+sig_obs, y_obs)
             if (show_model) then
-               y_model = l0_freq_corr(i + l0_first)
+               y_model = model_freq_corr(0,i + l0_first)
                x_model = model_ratios_r01(i)
                call pgmove(x_obs, y_obs)
                call pgdraw(x_model, y_model)
@@ -620,14 +620,14 @@
             integer, intent(in) :: i
             real :: x_obs, y_obs, sig_obs, x_model, y_model
             include 'formats'
-            y_obs = l1_obs(i + l1_first)
+            y_obs = freq_target(1,i + l1_first)
             x_obs = ratios_r10(i)
             sig_obs = sigmas_r10(i)
             call pgsci(r10_color)
             call pgmove(x_obs-sig_obs, y_obs)
             call pgdraw(x_obs+sig_obs, y_obs)
             if (show_model) then
-               y_model = l1_freq_corr(i + l1_first)
+               y_model = model_freq_corr(1,i + l1_first)
                x_model = model_ratios_r10(i)
                call pgmove(x_obs, y_obs)
                call pgdraw(x_model, y_model)
@@ -640,7 +640,7 @@
             integer, intent(in) :: i
             real :: x_obs, y_obs, sig_obs, x_model, y_model
             include 'formats'
-            y_obs = l0_obs(i + l0_first)
+            y_obs = freq_target(0,i + l0_first)
             x_obs = ratios_r02(i)
             sig_obs = sigmas_r02(i)
             if (sig_obs == 0d0) return
@@ -648,7 +648,7 @@
             call pgmove(x_obs-sig_obs, y_obs)
             call pgdraw(x_obs+sig_obs, y_obs)
             if (show_model) then
-               y_model = l0_freq_corr(i + l0_first)
+               y_model = model_freq_corr(0,i + l0_first)
                x_model = model_ratios_r02(i)
                call pgmove(x_obs, y_obs)
                call pgdraw(x_model, y_model)

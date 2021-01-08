@@ -45,12 +45,11 @@ module test_screen
       integer :: chem_id(num_isos), i1, i2, jscr, ierr
       integer, pointer :: net_iso(:)
       real(dp) :: xin(num_isos), y(num_isos), iso_z(num_isos), xz, abar, zbar, z2bar, z53bar, ye, sumx, &
-            dabar_dx(num_isos), dzbar_dx(num_isos), temp, den, logT, logRho, theta_e_for_graboske_et_al, &
+            dabar_dx(num_isos), dzbar_dx(num_isos), temp, den, logT, logRho, &
             sc1a, sc1adt, sc1add, xh, xhe, dmc_dx(num_isos), iso_z158(num_isos)
       type (Screen_Info), pointer :: sc
       real(dp) :: zg1, zg2, zg3, zg4
       real(dp) :: zs13, zhat, zhat2, lzav, aznut, zs13inv, mass_correction!approx_abar, approx_zbar
-      real(dp), pointer :: graboske_cache(:,:,:) ! (3,max_z_to_cache,max_z_to_cache)
       integer :: screening_mode, i
       character(len=256) :: scr_option_str
       integer :: h1, he3, he4, c12, n14, o16, ne20, mg24
@@ -98,8 +97,6 @@ module test_screen
                         logT =    7.7110722845770692D+00
                      logRho =    4.5306372623742392D+00
 
-         theta_e_for_graboske_et_al = 1
-
          xin(net_iso(ih1)) =    9.1649493293186402D-22
          xin(net_iso(ihe3)) =    1.8583723770506327D-24
          xin(net_iso(ihe4)) =    9.8958688392029037D-01
@@ -126,7 +123,6 @@ module test_screen
                   
                                  logT =    7d0
                               logRho =    1d0
-         theta_e_for_graboske_et_al = 1
          
          end if
       
@@ -140,13 +136,10 @@ module test_screen
          iso_z158(i) = pow(real(chem_isos% Z(chem_id(i)),kind=dp),1.58d0)
       end do
       y(:) = xin(:)/chem_isos% Z_plus_N(chem_id(:))
-      
-      allocate(sc, graboske_cache(3,max_z_to_cache,max_z_to_cache))
+   
+      allocate(sc)
       
       call do1(salpeter_screening, ierr)
-      if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
-      call do1(classic_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
       
       call do1(extended_screening, ierr)
@@ -158,7 +151,7 @@ module test_screen
       call do1(no_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
       
-      deallocate(sc, graboske_cache, net_iso)
+      deallocate(sc, net_iso)
 
       write(*,*) 'done'
       
@@ -184,21 +177,20 @@ module test_screen
             zhat, zhat2, lzav, aznut, zs13inv, &
             ierr)
          if (ierr /= 0) return
-         
+
+
          ! set the context for the reactions
          call screen_set_context( &
             sc, temp, den, logT, logRho, zbar, abar, z2bar,  &
-            sc_mode, graboske_cache,  &
-            theta_e_for_graboske_et_al, num_isos, y, iso_z158)
-         
-         graboske_cache = 0
+            sc_mode, num_isos, y, iso_z158)
+
          call screen_pair( &
             sc,  &
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)),  &
             sc_mode, &
             zg1, zg2, zg3, zg4, zs13, zhat, zhat2, lzav, aznut, zs13inv, &
-            theta_e_for_graboske_et_al, graboske_cache, sc1a, sc1adt, sc1add, ierr)
+            sc1a, sc1adt, sc1add, ierr)
          if (ierr /= 0) return
 
          write(*,1) 'logT = ', logT

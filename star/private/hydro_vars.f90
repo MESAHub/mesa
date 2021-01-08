@@ -194,25 +194,6 @@
             return
          end if
          
-         if (s% rotation_flag) then
-            call restore(s% nu_ST, nu_st)
-            call restore(s% D_ST, d_st)
-            call restore(s% D_DSI, d_dsi)
-            call restore(s% D_SH, d_sh)
-            call restore(s% D_SSI, d_ssi)
-            call restore(s% D_ES, d_es)
-            call restore(s% D_GSF, d_gsf)
-            s% have_previous_rotation_info = .true.
-         end if
-
-         if (s% RTI_flag) then
-            call restore(s% dPdr_dRhodr_info, RTI_info)
-            s% have_previous_RTI_info = .true.
-         end if
-
-         call restore(s% D_mix, d_mx)
-         s% have_previous_D_mix = .true.
-         
          if (s% op_split_burn) then
             do k = 1, nz
                if (s% T_start(k) >= s% op_split_burn_min_T) &
@@ -297,7 +278,7 @@
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             skip_mlt, skip_eos, dt, ierr)
-         use star_utils, only: eval_irradiation_heat, set_dm_bar, set_m_and_dm
+         use star_utils, only: eval_irradiation_heat, set_qs, set_dm_bar, set_m_and_dm
          type (star_info), pointer :: s
          logical, intent(in) :: &
             skip_time_derivatives, skip_basic_vars, skip_micro_vars, &
@@ -471,6 +452,11 @@
 
             if (i_u == 0) s% u(1:nz) = 0d0
 
+            call set_qs(s, nz, s% q, s% dq, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'update_vars failed in set_qs'
+               return
+            end if
             call set_m_and_dm(s)
             call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
 
@@ -481,7 +467,7 @@
 
             if (.not. skip_time_derivatives) then
 
-               ! time derivatives at constant q for use by eps_grav anc convective velocities
+               ! time derivatives at constant q for use by eps_grav and convective velocities
                if (s% generations < 2 .or. dt <= 0 .or. s% nz /= s% nz_old) then
 
                   if (i_lnd /= 0) s% dlnd_dt_const_q(1:nz) = 0
@@ -503,9 +489,9 @@
                                  s% dlnd_dt_const_q(k), &
                                  s% lnd_for_d_dt_const_q(k), s% xh(i_lnd,k)
                            if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dlnd_dt_const_q', k, &
-                                 s% dlnd_dt_const_q(k), &
-                                 s% lnd_for_d_dt_const_q(k), s% xh(i_lnd,k)
+                              write(*,2) 'update_vars: bad dlnd_dt_const_q', k, s% dlnd_dt_const_q(k)
+                              write(*,2) 's% lnd_for_d_dt_const_q(k)', k, s% lnd_for_d_dt_const_q(k)
+                              write(*,2) 's% xh(i_lnd,k)', k, s% xh(i_lnd,k)
                               stop 'update_vars'
                            end if
                            return
@@ -787,7 +773,7 @@
 
          ierr = 0
          
-         ! Set rurface values
+         ! Set surface values
 
          L_surf = s% L(1)
          r_surf = s% r(1)
@@ -839,7 +825,7 @@
          end if
 
          s% Teff = Teff
-
+         
          ! Calculate and store photosphere (tau=2/3) values; these
          ! aren't actually used to set up surface values
 
@@ -990,18 +976,17 @@
             else
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
-            
-            if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, nzlo, nzhi, ierr)
             if (failed('set_mlt_vars')) return
-          
             if (dbg) write(*,*) 'call check_for_redo_MLT'
+            
             call check_for_redo_MLT(s, nzlo, nzhi, ierr)
             if (failed('check_for_redo_MLT')) return
             
          end if
          
          if (s% need_to_reset_eturb) then
+            stop 'need_to_reset_eturb is not ready for use'
             if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, 1, s% nz, ierr)
             if (failed('set_mlt_vars')) return
@@ -1232,6 +1217,12 @@
          ! Evaluate the surface optical depth
 
          tau_surf = s% tau_factor*s% tau_base ! tau at outer edge of cell 1
+         if (is_bad(tau_surf)) then
+            write(*,1) 's% tau_factor', s% tau_factor
+            write(*,1) 's% tau_base', s% tau_base
+            write(*,1) 'tau_surf', tau_surf
+            stop 'bad tau_surf in get_surf_PT'
+         end if
 
          ! Evaluate surface temperature and pressure
              

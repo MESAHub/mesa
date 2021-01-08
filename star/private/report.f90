@@ -37,12 +37,177 @@
       implicit none
 
       contains
+      
+      
+      subroutine set_phot_info(s)
+         use atm_lib, only: atm_black_body_T
+         type (star_info), pointer :: s
+         real(dp) :: luminosity
+         include 'formats'
+         call get_phot_info(s, &
+            s% photosphere_r, s% photosphere_m, s% photosphere_v, &
+            s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
+            s% photosphere_opacity, s% photosphere_logg, &
+            s% photosphere_column_density, s% photosphere_cell_k)
+         s% photosphere_black_body_T = &
+            atm_black_body_T(s% photosphere_L, s% photosphere_r)
+         s% photosphere_r = s% photosphere_r/Rsun
+         s% photosphere_m = s% photosphere_m/Msun
+         s% photosphere_L = s% photosphere_L/Lsun
+         s% L_phot = s% photosphere_L
+         luminosity = s% L(1)
+         if (is_bad(luminosity)) then
+            write(*,2) 's% L(1)', s% model_number, s% L(1)
+            write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
+            stop 'set_phot_info'
+            luminosity = 0d0
+         end if
+         if (s% Teff < 0 .or. is_bad(s% Teff)) s% Teff = s% photosphere_black_body_T
+         s% L_surf = luminosity/Lsun
+         s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
+            ! log10(stellar luminosity in solar units)
+         s% log_L_surf = s% log_surface_luminosity
+         if (is_bad(s% L_surf)) then
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            stop 'set_phot_info'
+         end if
+      end subroutine set_phot_info
+
+
+      subroutine set_power_info(s)
+         use chem_def, only: category_name
+         type (star_info), pointer :: s
+         integer :: j, k, nz
+         real(dp) :: eps_nuc
+         include 'formats'
+         nz = s% nz
+
+         do j=1,num_categories
+            s% L_by_category(j) = &
+               dot_product(s% dm(1:nz), s% eps_nuc_categories(j,1:nz))/Lsun
+            s% center_eps_burn(j) = center_value_eps_burn(j)
+            if (is_bad(s% L_by_category(j))) then
+               do k=1,nz
+                  if (is_bad(s% eps_nuc_categories(j,k))) then
+                     write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
+                     if (s% stop_for_bad_nums) stop 'set_power_info'
+                  end if
+               end do
+            end if
+         end do  
+                
+         if (s% eps_nuc_factor == 0d0) then
+            s% power_nuc_burn = 0d0
+            s% power_nuc_neutrinos = 0d0
+            s% power_nonnuc_neutrinos = 0d0
+            s% power_neutrinos = 0d0
+            s% power_h_burn = 0d0
+            s% power_he_burn = 0d0
+            s% power_z_burn = 0d0
+            s% power_PP = 0d0
+            s% power_CNO = 0d0
+            s% power_tri_alpha = 0d0
+            s% power_c_alpha = 0d0
+            s% power_n_alpha = 0d0
+            s% power_o_alpha = 0d0
+            s% power_ne_alpha = 0d0
+            s% power_na_alpha = 0d0
+            s% power_mg_alpha = 0d0
+            s% power_si_alpha = 0d0
+            s% power_s_alpha = 0d0
+            s% power_ar_alpha = 0d0
+            s% power_ca_alpha = 0d0
+            s% power_ti_alpha = 0d0
+            s% power_cr_alpha = 0d0
+            s% power_fe_co_ni = 0d0
+            s% power_c12_c12 = 0d0
+            s% power_c12_o16 = 0d0
+            s% power_o16_o16 = 0d0
+            s% power_photo = 0d0
+            s% power_pnhe4 = 0d0
+            s% power_ni56_co56 = 0d0
+            s% power_co56_fe56 = 0d0
+            s% power_other = 0d0
+         else            
+            ! better if set power_nuc_burn using eps_nuc instead of categories
+            ! categories can be subject to numerical jitters at very high temperatures
+            s% power_nuc_burn = 0d0
+            do k=1,nz
+               if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+                  eps_nuc = s% burn_avg_epsnuc(k)
+               else
+                  eps_nuc = s% eps_nuc(k)
+               end if
+               s% power_nuc_burn = s% power_nuc_burn + eps_nuc*s% dm(k)
+            end do
+            s% power_nuc_burn = s% power_nuc_burn/Lsun            
+            s% power_nuc_neutrinos = dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
+            s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
+            s% power_he_burn = s% L_by_category(i3alf)
+            s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
+            s% power_PP = s% L_by_category(ipp)
+            s% power_CNO = s% L_by_category(icno)
+            s% power_tri_alpha = s% L_by_category(i3alf)
+            s% power_c_alpha = s% L_by_category(i_burn_c)
+            s% power_n_alpha = s% L_by_category(i_burn_n)
+            s% power_o_alpha = s% L_by_category(i_burn_o)
+            s% power_ne_alpha = s% L_by_category(i_burn_ne)
+            s% power_na_alpha = s% L_by_category(i_burn_na)
+            s% power_mg_alpha = s% L_by_category(i_burn_mg)
+            s% power_si_alpha = s% L_by_category(i_burn_si)
+            s% power_s_alpha = s% L_by_category(i_burn_s)
+            s% power_ar_alpha = s% L_by_category(i_burn_ar)
+            s% power_ca_alpha = s% L_by_category(i_burn_ca)
+            s% power_ti_alpha = s% L_by_category(i_burn_ti)
+            s% power_cr_alpha = s% L_by_category(i_burn_cr)
+            s% power_fe_co_ni = s% L_by_category(i_burn_fe)
+            s% power_c12_c12 = s% L_by_category(icc)
+            s% power_c12_o16 = s% L_by_category(ico)
+            s% power_o16_o16 = s% L_by_category(ioo)
+            s% power_photo = s% L_by_category(iphoto)
+            s% power_pnhe4 = s% L_by_category(ipnhe4)
+            s% power_ni56_co56 = s% L_by_category(i_ni56_co56)
+            s% power_co56_fe56 = s% L_by_category(i_co56_fe56)
+            s% power_other = s% L_by_category(iother)
+         end if
+         
+         if (s% non_nuc_neu_factor == 0d0) then
+            s% power_nonnuc_neutrinos = 0d0
+         else
+            s% power_nonnuc_neutrinos = &
+                 dot_product(s% dm(1:nz),s% non_nuc_neu(1:nz))/Lsun
+         end if
+         s% power_neutrinos = s% power_nuc_neutrinos + s% power_nonnuc_neutrinos
+         s% L_nuc_burn_total = s% power_nuc_burn
+         
+         contains
+
+         real(dp) function center_value_eps_burn(j)
+            integer, intent(in) :: j
+            real(dp) :: sum_x, sum_dq, dx, dq
+            integer :: k
+            sum_x = 0
+            sum_dq = 0
+            do k = s% nz, 1, -1
+               dq = s% dq(k)
+               dx = s% eps_nuc_categories(j,k)*dq
+               if (sum_dq+dq >= s% center_avg_value_dq) then
+                  sum_x = sum_x + dx*(s% center_avg_value_dq - sum_dq)/dq
+                  sum_dq = s% center_avg_value_dq
+                  exit
+               end if
+               sum_x = sum_x + dx
+               sum_dq = sum_dq + dq
+            end do
+            center_value_eps_burn = sum_x/sum_dq
+         end function center_value_eps_burn
+
+      end subroutine set_power_info
 
 
       subroutine do_report(s, ierr)
          use rates_def, only: &
             i_rate, i_rate_dRho, i_rate_dT, std_reaction_Qs, std_reaction_neuQs
-         use atm_lib, only: atm_black_body_T
          use star_utils, only: get_phot_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -51,7 +216,7 @@
             h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
          real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, &
             twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
-            prev_he, cur_c, prev_c, luminosity, v, mstar, pdg, pdg_prev, &
+            prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
             prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum
          logical, parameter :: new_only = .false.
          integer, pointer :: net_iso(:)
@@ -76,26 +241,7 @@
          
          s% log_P_center = s% lnP(nz)/ln10
          
-         call get_phot_info(s, &
-            s% photosphere_r, s% photosphere_m, s% photosphere_v, &
-            s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
-            s% photosphere_opacity, s% photosphere_logg, &
-            s% photosphere_column_density, s% photosphere_cell_k)
-         
-         s% photosphere_black_body_T = &
-            atm_black_body_T(s% photosphere_L, s% photosphere_r)
-         s% photosphere_r = s% photosphere_r/Rsun
-         s% photosphere_m = s% photosphere_m/Msun
-         s% photosphere_L = s% photosphere_L/Lsun
-         s% L_phot = s% photosphere_L
-         
-         luminosity = s% L(1)
-         if (is_bad(luminosity)) luminosity = 0d0
-         if (s% Teff < 0 .or. is_bad(s% Teff)) s% Teff = s% photosphere_black_body_T
-         s% L_surf = luminosity/Lsun
-         s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
-            ! log10(stellar luminosity in solar units)
-         s% log_L_surf = s% log_surface_luminosity
+         call set_phot_info(s)
 
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)
@@ -133,45 +279,10 @@
          s% log_surface_pressure = s% lnP(1)/ln10 ! log10(pressure at surface)
          s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
-
-         do j=1,num_categories
-            s% L_by_category(j) = &
-               dot_product(s% dm(1:nz), s% eps_nuc_categories(j,1:nz))/Lsun
-            s% center_eps_burn(j) = center_value_eps_burn(j)
-         end do
          
-         if (s% eps_nuc_factor == 0d0) then
-            s% power_nuc_burn = 0d0
-            s% power_h_burn = 0d0
-            s% power_he_burn = 0d0
-            s% power_c_burn = 0d0
-            s% power_photo = 0d0
-            s% power_z_burn = 0d0
-            s% power_nuc_neutrinos = 0d0
-         else            
-            ! better if set power_nuc_burn using eps_nuc instead of categories
-            ! categories can be subject to numerical jitters at very high temperatures
-            s% power_nuc_burn = dot_product(s% eps_nuc(1:nz), s% dm(1:nz))/Lsun
-            s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
-            s% power_he_burn = s% L_by_category(i3alf)
-            s% power_c_burn = s% L_by_category(i_burn_c)
-            s% power_photo = s% L_by_category(iphoto)
-            s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
-            s% power_nuc_neutrinos = &
-                 dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
-         end if
-         if (s% non_nuc_neu_factor == 0d0) then
-            s% power_nonnuc_neutrinos = 0d0
-         else
-            s% power_nonnuc_neutrinos = &
-                 dot_product(s% dm(1:nz),s% non_nuc_neu(1:nz))/Lsun
-         end if
-         s% power_neutrinos = s% power_nuc_neutrinos + s% power_nonnuc_neutrinos
-
+         luminosity = s% L(1)
          s% total_radiation = s% total_radiation + &
             s% dt*(luminosity + s% power_neutrinos)
-
-         s% L_nuc_burn_total = s% power_nuc_burn
 
          if (s% u_flag) then
             s% v_surf = s% u(1)
@@ -359,9 +470,6 @@
          end if
 
          if (s% rsp_flag) return
-         
-         call get_power_info(s, s% dm, ierr)
-         if (failed('get_power_info')) return
 
          call get_mixing_regions(s, ierr)
          if (failed('get_mixing_regions')) return
@@ -606,27 +714,6 @@
             volume_at_q = (4*pi/3)*v_new(1)
 
          end function volume_at_q
-
-
-         real(dp) function center_value_eps_burn(j)
-            integer, intent(in) :: j
-            real(dp) :: sum_x, sum_dq, dx, dq
-            integer :: k
-            sum_x = 0
-            sum_dq = 0
-            do k = s% nz, 1, -1
-               dq = s% dq(k)
-               dx = s% eps_nuc_categories(j,k)*dq
-               if (sum_dq+dq >= s% center_avg_value_dq) then
-                  sum_x = sum_x + dx*(s% center_avg_value_dq - sum_dq)/dq
-                  sum_dq = s% center_avg_value_dq
-                  exit
-               end if
-               sum_x = sum_x + dx
-               sum_dq = sum_dq + dq
-            end do
-            center_value_eps_burn = sum_x/sum_dq
-         end function center_value_eps_burn
 
 
          real(dp) function center_omega_div_omega_crit()
@@ -1746,389 +1833,6 @@
          end do
          s% num_mixing_regions = n
       end subroutine get_mixing_regions
-
-
-      subroutine get_power_info(s, cell_masses, ierr)
-         use rates_def, only: i_rate, std_reaction_Qs, std_reaction_neuQs
-         use chem_def, only: ipp, icno, i3alf
-         type (star_info), pointer :: s
-         real(dp), pointer, intent(in) :: cell_masses(:)
-         integer, intent(out) :: ierr
-
-         integer :: i, j, k, nz
-         real(dp), pointer :: eps_h(:), eps_he(:), eps_z(:)
-
-         include 'formats'
-
-         ierr = 0
-         nz = s% nz
-
-         call do_alloc(ierr)
-         if (ierr /= 0) return
-
-         do k=1,nz
-            eps_h(k) = s% eps_nuc_categories(ipp,k) + s% eps_nuc_categories(icno,k)
-            eps_he(k) = s% eps_nuc_categories(i3alf,k)
-            eps_z(k) = s% eps_nuc(k) - (eps_h(k) + eps_he(k))
-         end do
-
-         call set_max_burn_info(s, nz, eps_h, &
-            s% max_eps_h, s% max_eps_h_lgT, s% max_eps_h_lgRho, s% max_eps_h_m, &
-            s% max_eps_h_lgR, s% max_eps_h_lgP, s% max_eps_h_opacity, s% max_eps_h_cp,  &
-            s% max_eps_h_k, .false., ierr)
-         if (failed('set_max_burn_info h')) return
-
-         call set_max_burn_info(s, nz, eps_he, &
-            s% max_eps_he, s% max_eps_he_lgT, s% max_eps_he_lgRho, s% max_eps_he_m, &
-            s% max_eps_he_lgR, s% max_eps_he_lgP, s% max_eps_he_opacity, s% max_eps_he_cp, &
-            s% max_eps_he_k, .false., ierr)
-         if (failed('set_max_burn_info he')) return
-
-         call set_max_burn_info(s, nz, eps_z, &
-            s% max_eps_z, s% max_eps_z_lgT, s% max_eps_z_lgRho, s% max_eps_z_m, &
-            s% max_eps_z_lgR, s% max_eps_z_lgP, s% max_eps_z_opacity, s% max_eps_z_cp, &
-            s% max_eps_z_k, .false., ierr)
-         if (failed('set_max_burn_info z')) return
-
-         call check_for_bad_num(s% max_eps_z, 's% max_eps_z')
-         call check_for_bad_num(s% max_eps_z_lgT, 's% max_eps_z_lgT')
-         call check_for_bad_num(s% max_eps_z_lgRho, 's% max_eps_z_lgRho')
-         call check_for_bad_num(s% max_eps_z_m, 's% max_eps_z_m')
-         call check_for_bad_num(s% max_eps_z_lgP, 's% max_eps_z_lgP')
-         call check_for_bad_num(s% max_eps_z_lgR, 's% max_eps_z_lgR')
-         call check_for_bad_num(s% max_eps_z_opacity, 's% max_eps_z_opacity')
-         if (ierr /= 0) return
-
-         call set_max_burn_info(s, nz, s% eps_nuc, &
-            s% max_eps_nuc, s% max_eps_nuc_lgT, s% max_eps_nuc_lgRho, s% max_eps_nuc_m, &
-            s% max_eps_nuc_lgR, s% max_eps_nuc_lgP, s% max_eps_nuc_opacity, s% max_eps_nuc_cp, &
-            s% max_eps_nuc_k, .false., ierr)
-         if (failed('set_max_burn_info eps_nuc')) return
-
-         call dealloc
-
-
-         contains
-
-
-         logical function failed(str)
-            character (len=*), intent(in) :: str
-            failed = (ierr /= 0)
-            if (failed) then
-               write(*, *) trim(str) // ' ierr', ierr
-               call dealloc
-            end if
-         end function failed
-
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               eps_h, nz, nz_alloc_extra, 'report', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               eps_he, nz, nz_alloc_extra, 'report', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               eps_z, nz, nz_alloc_extra, 'report', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
-
-         subroutine check_for_bad_num(v, str)
-            real(dp), intent(in) :: v
-            character (len=*), intent(in) :: str
-            if (is_bad(v)) then
-               write(*,*) 'get_power_info ' // trim(str) , v
-               ierr = -1
-               if (s% stop_for_bad_nums) stop 'get_power_info'
-            end if
-         end subroutine check_for_bad_num
-
-
-      end subroutine get_power_info
-
-
-      subroutine set_max_burn_info( &
-            s, nz, eps, eps_max, max_lgT, max_lgRho, max_m, max_lgR, max_lgP, &
-            max_opacity, max_cp, max_k, show, ierr)
-         use interp_1d_def
-         use interp_1d_lib
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz
-         real(dp), intent(in) :: eps(:) ! (nz)
-         real(dp), intent(out) :: &
-            eps_max, max_lgT, max_lgRho, max_m, max_lgR, max_lgP, max_opacity, max_cp
-         logical, intent(in) :: show
-         integer, intent(out) :: max_k, ierr
-
-         integer, parameter :: n_old = 5, n_new = 1, nwork = pm_work_size
-         real(dp) :: x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new), &
-               delta, delta_2, mx_2, delta_3, mx_3
-         integer :: k, i
-         logical :: dbg
-         real(dp), target :: work_ary(n_old*nwork), f1_ary(4*n_old)
-         real(dp), pointer :: work(:), f1(:), f(:,:)
-         work => work_ary
-
-         include 'formats'
-
-         dbg = show
-
-         f1 => f1_ary
-         f(1:4,1:n_old) => f1(1:4*n_old)
-
-         ierr = 0
-         k = maxloc(eps(1:nz), dim=1)
-         max_k = k
-         if (k < 3 .or. k > nz-2) then
-            k = nz ! move to center
-            call skip_interpolation
-            return
-         end if
-
-         ! place x's at cell midpoints
-         x_old(1) = s% dq(k-2)/2
-         x_old(2) = s% dq(k-2) + s% dq(k-1)/2
-         x_old(3) = s% dq(k-2) + s% dq(k-1) + s% dq(k)/2
-         x_old(4) = s% dq(k-2) + s% dq(k-1) + s% dq(k) + s% dq(k+1)/2
-         x_old(5) = s% dq(k-2) + s% dq(k-1) + s% dq(k) + s% dq(k+1) + s% dq(k+2)/2
-         f(1,1:5) = eps(k-2:k+2)
-         call interp_pm(x_old, n_old, f1, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interp_pm for eps'
-            return
-         end if
-
-         if (dbg) write(*,*) 'for 2'
-         call find_delta_and_max(2,delta_2,mx_2,ierr)
-         if (ierr /= 0) then
-            if (dbg) then
-               write(*,2) 'mx_2', k, mx_2
-               do i=k-2,k+2
-                  write(*,2) 'eps', i, eps(i), s% dq(i)
-               end do
-               write(*,*)
-               do i=1,5
-                  write(*,2) 'x_old', i, x_old(i)
-               end do
-               write(*,*)
-               stop 'debug: set_max_burn_info'
-            end if
-            write(*,*) 'set_max_burn_info: failed in find_delta_and_max 2'
-            return
-         end if
-         if (dbg) then
-            write(*,1) 'fraction', delta_2/(x_old(3)-x_old(2))
-            write(*,1) 'mx_2', mx_2
-            write(*,*)
-         end if
-
-         if (dbg) write(*,*) 'for 3'
-         call find_delta_and_max(3,delta_3,mx_3,ierr)
-         if (ierr /= 0) then
-            if (dbg) then
-               write(*,2) 'mx_3', k, mx_3
-               do i=k-2,k+2
-                  write(*,2) 'eps', i, eps(i), s% dq(i)
-               end do
-               do i=1,5
-                  write(*,2) 'x_old', i, x_old(i)
-               end do
-               stop 'debug: set_max_burn_info'
-            end if
-            write(*,*) 'set_max_burn_info: failed in find_delta_and_max 3'
-            return
-         end if
-         if (dbg) then
-            write(*,1) 'fraction', delta_3/(x_old(4)-x_old(3))
-            write(*,1) 'mx_3', mx_3
-            write(*,*)
-         end if
-
-         if (mx_2 > mx_3 .and. delta_2 < x_old(3)-x_old(2)) then
-            delta = delta_2; eps_max = mx_2; x_new(1) = x_old(2) + delta
-            max_m = s% M_center + s% xmstar*(s% q(k-2) - (x_old(2)+delta))
-            if (dbg) write(*,*) 'use 2', delta/(x_old(3)-x_old(2))
-         else
-            delta = delta_3; eps_max = mx_3; x_new(1) = x_old(3) + delta
-            max_m = s% M_center + s% xmstar*(s% q(k-2) - (x_old(3)+delta))
-            if (dbg) write(*,*) 'use 3', delta/(x_old(4)-x_old(3))
-         end if
-
-         ! interpolate max_lgT, max_lgRho, max_lgP, max_opacity, max_cp
-         call interpolate_vector( &
-            n_old, x_old, n_new, x_new, s% lnT(k-2:k+2), v_new, interp_pm, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interpolate_vector for lnT'
-            return
-         end if
-         max_lgT = v_new(1)/ln10
-
-         call interpolate_vector( &
-            n_old, x_old, n_new, x_new, s% cp(k-2:k+2), v_new, interp_pm, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interpolate_vector for cp'
-            return
-         end if
-         max_cp = v_new(1)
-
-         call interpolate_vector( &
-            n_old, x_old, n_new, x_new, s% lnd(k-2:k+2), v_new, interp_pm, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interpolate_vector for lnd'
-            return
-         end if
-         max_lgRho = v_new(1)/ln10
-
-         call interpolate_vector( &
-            n_old, x_old, n_new, x_new, s% lnP(k-2:k+2), v_new, interp_pm, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interpolate_vector for lnP'
-            return
-         end if
-         max_lgP = v_new(1)/ln10
-
-         call interpolate_vector( &
-            n_old, x_old, n_new, x_new, s% opacity(k-2:k+2), v_new, interp_pm, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interpolate_vector for opacity'
-            return
-         end if
-         max_opacity = v_new(1)
-
-         ! change to interpolating values at cell boundaries
-         x_new(1) = (max_m - s% M_center)/s% xmstar ! q at max
-         x_old(1:5) = s% q(k-2:k+2)
-         ! interpolate max_lgR
-         call interpolate_vector( &
-            n_old, x_old, n_new, x_new, s% lnR(k-2:k+2), v_new, interp_pm, nwork, work, &
-            'report set_max_burn_info', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_max_burn_info: failed in interpolate_vector for lgR'
-            return
-         end if
-         max_lgR = v_new(1)/ln10
-
-         if (dbg) then
-            write(*,*) 'k', k
-            write(*,1) 'x_old(1:5)', x_old(1:5)
-            write(*,1) 'mass(k-2:k+2)', s% M_center + s% xmstar*(s% q(k-2:k+2) + s% q(k-1:k+3))/2
-            write(*,1) 'max_m', max_m
-            write(*,1) 's% M_center', s% M_center
-            write(*,1) 's% xmstar', s% xmstar
-            write(*,1) 'q(k-2:k+2)', s% q(k-2:k+2)
-            write(*,1) 'dq(k-2:k+2)', s% dq(k-2:k+2)
-            write(*,1) 'm(k-2:k+2)', s% m(k-2:k+2)
-            write(*,*)
-            write(*,1) 'eps(k-2:k+2)', eps(k-2:k+2)
-            write(*,1) 'eps_max', eps_max
-            write(*,*)
-            write(*,1) 'cp(k-2:k+2)', s% cp(k-2:k+2)/ln10
-            write(*,1) 'max_cp', max_cp
-            write(*,*)
-            write(*,1) 'lgT(k-2:k+2)', s% lnT(k-2:k+2)/ln10
-            write(*,1) 'max_lgT', max_lgT
-            write(*,*)
-            write(*,1) 'lgd(k-2:k+2)', s% lnd(k-2:k+2)/ln10
-            write(*,1) 'max_lgRho', max_lgRho
-            write(*,*)
-            write(*,1) 'lgR(k-2:k+2)', s% lnR(k-2:k+2)/ln10
-            write(*,1) 'max_lgR', max_lgR
-            write(*,*)
-            if (is_bad(max_lgR)) stop
-         end if
-
-         contains
-
-         subroutine find_delta_and_max(i,delta,mx,ierr)
-            integer, intent(in) :: i
-            real(dp), intent(out) :: delta, mx
-            integer, intent(out) :: ierr
-            real(dp) :: s2, s, delta1, delta2, v1, v2
-            include 'formats'
-            ierr = 0
-            if (abs(f(4,i)) < 1d-99) then ! treat as quadratic
-               call quad(i,delta,mx)
-               if (is_bad(mx)) ierr = -1
-               return
-            end if
-            s2 = f(3,i)*f(3,i) - 3*f(2,i)*f(4,i)
-            if (s2 < 0 .or. f(4,i) == 0 .or. f(3,i) == 0) then
-               call quad(i,delta,mx)
-               if (is_bad(mx)) ierr = -1
-               return
-            end if
-            s = sqrt(s2)
-            delta1 = (-f(3,i) + s)/(3*f(4,i))
-            delta2 = -(f(3,i) + s)/(3*f(4,i))
-            v1 = f(1,i) + delta1*(f(2,i) + delta1*(f(3,i) + delta1*f(4,i)))
-            v2 = f(1,i) + delta2*(f(2,i) + delta2*(f(3,i) + delta2*f(4,i)))
-            if (v1 > v2) then
-               delta = delta1; mx = v1
-            else
-               delta = delta2; mx = v2
-            end if
-            if (is_bad(mx)) then
-               call quad(i,delta,mx)
-               if (is_bad(mx)) then
-                  ierr = -1
-                  if (dbg) write(*,1) 'find_delta_and_max mx', mx
-               end if
-            end if
-         end subroutine find_delta_and_max
-
-         subroutine quad(i,delta,mx)
-            integer, intent(in) :: i
-            real(dp), intent(out) :: delta, mx
-            if (f(3,i) == 0) then
-               delta = 0; mx = f(1,i); return
-            end if
-            delta = -f(2,i)/(2*f(3,i))
-            if (delta < 0 .or. delta + x_old(i) > x_old(i+1)) then ! no extremum
-               if (f(1,i) > f(1,i+1)) then
-                  delta = 0; mx = f(1,i)
-               else
-                  delta = x_old(i+1)-x_old(i); mx = f(1,i+1)
-               end if
-            else
-               mx = f(1,i) + delta*(f(2,i) + delta*f(3,i))
-            end if
-         end subroutine quad
-
-         subroutine skip_interpolation
-            eps_max = eps(k)
-            max_lgT = s% lnT(k)/ln10
-            max_lgRho = s% lnd(k)/ln10
-            max_lgP = s% lnp(k)/ln10
-            max_opacity = s% opacity(k)
-            max_lgR = s% lnR(k)/ln10
-            max_cp = s% cp(k)
-            if (k < nz) then
-               max_m = s% M_center + s% xmstar*(s% q(k) + s% q(k+1))/2/Msun ! midpoint of cell k
-            else
-               max_m = s% M_center
-            end if
-         end subroutine skip_interpolation
-
-      end subroutine set_max_burn_info
 
 
       end module report

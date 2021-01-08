@@ -41,14 +41,33 @@
 
 
       integer function do_evolve_step_part1(id, first_try)
+         use alloc, only: fill_star_info_arrays_with_NaNs, &
+            do_fill_arrays_with_NaNs, star_info_old_arrays
          logical, intent(in) :: first_try
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr
+         include 'formats'
+         
          do_evolve_step_part1 = terminate
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         if (s% trace_evolve) write(*,'(/,a)') 'start evolve step'
+         
+         if (is_bad(s% dt)) then
+            write(*,1) 's% dt', s% dt
+            stop 'do_evolve_step_part1'
+         end if
+         
+         if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            call test_set_undefined
+            call fill_star_info_arrays_with_NaNs(s, ierr)
+            if (ierr /= 0) return
+            call star_info_old_arrays(s, do_fill_arrays_with_NaNs, ierr)
+            if (ierr /= 0) return
+         end if         
          do_evolve_step_part1 = do_step_part1(id, first_try)
          s% total_step_attempts = s% total_step_attempts + 1
          if (s% doing_relax) &
@@ -62,6 +81,319 @@
             if (s% doing_relax) &
                s% total_relax_step_retries = s% total_relax_step_retries + 1
          end if
+         
+         contains
+         
+         subroutine test_set_undefined  
+            ! should include everything in star_data_step_work.inc
+            ! may be missing some.  if so, please add them.
+            use utils_lib, only: set_to_NaN
+            integer :: j
+            include 'formats'
+
+            s% nz_old = -999
+            s% model_number_old = -999
+            s% prev_mesh_nz = -999   
+            s% num_conv_boundaries = -999
+            s% num_mix_boundaries = -999
+            s% num_mix_regions = -999   
+            s% num_mixing_regions = -999
+            s% n_conv_regions = -999
+            s% atm_structure_num_pts = -999
+            s% generations = -999
+            s% init_model_number = -999
+            s% start_H_envelope_base_k = -999
+            s% total_step_attempts = -999
+            s% total_relax_step_attempts = -999
+            s% total_step_retries = -999
+            s% total_relax_step_retries = -999
+            s% total_step_redos = -999
+            s% total_relax_step_redos = -999
+            s% total_steps_finished = -999
+            s% total_relax_steps_finished = -999
+            s% num_solver_iterations = -999
+            s% num_skipped_setvars = -999
+            s% num_setvars = -999
+            s% num_solver_setvars = -999
+            s% num_hydro_merges = -999
+            s% num_hydro_splits = -999
+            s% bad_max_corr_cnt = -999
+            s% timestep_hold = -999
+            s% model_number_for_last_retry = -999
+            s% model_number_for_last_retry_old = -999
+            s% diffusion_call_number = -999
+            s% num_diffusion_solver_iters = -999
+            s% num_diffusion_solver_steps = -999
+            s% num_rotation_solver_steps = -999
+            s% result_reason = -999
+            s% why_Tlim = -999
+            s% burner_storage_sz_per_thread = -999
+            s% burner_num_threads = -999
+            s% k_below_const_q = -999
+            s% k_const_mass = -999
+            s% k_for_test_CpT_absMdot_div_L = -999
+            s% k_below_just_added = -999
+            s% start_H_envelope_base_k = -999
+            s% init_model_number = -999
+            s% termination_code = -999
+            s% boost_mlt_alfa = -999
+            s% burn_nstep_max = -999
+            s% burn_nfcn_total = -999
+            s% k_CpTMdot_lt_L = -999
+            s% dX_nuc_drop_max_k = -999
+            s% dX_nuc_drop_max_j = -999
+            s% solver_test_partials_var = -999
+            s% solver_test_partials_dx_sink = -999
+            s% n_conv_regions_old = -999
+
+            call set_to_NaN(s% time_old)
+            call set_to_NaN(s% dt_old)
+            call set_to_NaN(s% mstar_old)
+            call set_to_NaN(s% xmstar_old)
+            call set_to_NaN(s% M_center_old)
+            call set_to_NaN(s% R_center_old)
+            call set_to_NaN(s% L_center_old)
+            call set_to_NaN(s% v_center_old)
+            call set_to_NaN(s% cumulative_energy_error_old)
+            call set_to_NaN(s% total_energy_old)
+            call set_to_NaN(s% Teff_old)
+            call set_to_NaN(s% mstar_dot_old)
+            call set_to_NaN(s% L_phot_old)
+            call set_to_NaN(s% L_surf_old)
+            call set_to_NaN(s% dt_limit_ratio_old)
+            call set_to_NaN(s% total_radiation_old)
+            call set_to_NaN(s% total_angular_momentum_old)
+            call set_to_NaN(s% revised_max_yr_dt_old)
+            call set_to_NaN(s% astero_revised_max_yr_dt_old)
+            call set_to_NaN(s% total_internal_energy_old)
+            call set_to_NaN(s% total_gravitational_energy_old)
+            call set_to_NaN(s% total_radial_kinetic_energy_old)
+            call set_to_NaN(s% total_turbulent_energy_old)
+            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+            call set_to_NaN(s% h1_czb_mass_old)
+            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% c_core_mass_old)
+            call set_to_NaN(s% center_eps_nuc_old)
+            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
+            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
+            do j=1,max_num_mixing_regions
+               call set_to_NaN(s% cz_top_mass_old(j))
+               call set_to_NaN(s% cz_bot_mass_old(j))
+            end do      
+
+            call set_to_NaN(s% mstar_dot)
+            call set_to_NaN(s% explicit_mstar_dot)
+            call set_to_NaN(s% adjust_J_q)
+            call set_to_NaN(s% rotational_mdot_boost)
+            call set_to_NaN(s% d_vc_dv)
+            call set_to_NaN(s% mdot_acoustic_surface)
+            call set_to_NaN(s% mdot_adiabatic_surface)
+            call set_to_NaN(s% gradT_excess_min_beta)
+            call set_to_NaN(s% gradT_excess_max_lambda)
+            call set_to_NaN(s% delta_Pg)
+            call set_to_NaN(s% nu_max)
+            call set_to_NaN(s% acoustic_cutoff)
+            call set_to_NaN(s% delta_nu)
+            call set_to_NaN(s% conv_mx1_top)
+            call set_to_NaN(s% conv_mx1_bot)
+            call set_to_NaN(s% conv_mx2_top)
+            call set_to_NaN(s% conv_mx2_bot)
+            call set_to_NaN(s% mx1_top)
+            call set_to_NaN(s% mx1_bot)
+            call set_to_NaN(s% mx2_top)
+            call set_to_NaN(s% mx2_bot)
+            call set_to_NaN(s% conv_mx1_top_r)
+            call set_to_NaN(s% conv_mx1_bot_r)
+            call set_to_NaN(s% conv_mx2_top_r)
+            call set_to_NaN(s% conv_mx2_bot_r)
+            call set_to_NaN(s% mx1_top_r)
+            call set_to_NaN(s% mx1_bot_r)
+            call set_to_NaN(s% mx2_top_r)
+            call set_to_NaN(s% mx2_bot_r)
+            call set_to_NaN(s% L_nuc_burn_total)
+            call set_to_NaN(s% power_nuc_burn_old)
+            call set_to_NaN(s% power_nuc_neutrinos)
+            call set_to_NaN(s% power_nonnuc_neutrinos)
+            call set_to_NaN(s% power_neutrinos)
+            call set_to_NaN(s% power_h_burn_old)
+            call set_to_NaN(s% power_he_burn_old)
+            call set_to_NaN(s% power_z_burn_old)
+            call set_to_NaN(s% power_PP)
+            call set_to_NaN(s% power_CNO)
+            call set_to_NaN(s% power_tri_alpha)
+            call set_to_NaN(s% power_c_alpha)
+            call set_to_NaN(s% power_n_alpha)
+            call set_to_NaN(s% power_o_alpha)
+            call set_to_NaN(s% power_ne_alpha)
+            call set_to_NaN(s% power_na_alpha)
+            call set_to_NaN(s% power_mg_alpha)
+            call set_to_NaN(s% power_si_alpha)
+            call set_to_NaN(s% power_s_alpha)
+            call set_to_NaN(s% power_ar_alpha)
+            call set_to_NaN(s% power_ca_alpha)
+            call set_to_NaN(s% power_ti_alpha)
+            call set_to_NaN(s% power_cr_alpha)
+            call set_to_NaN(s% power_fe_co_ni)
+            call set_to_NaN(s% power_c12_c12)
+            call set_to_NaN(s% power_c12_o16)
+            call set_to_NaN(s% power_o16_o16)
+            call set_to_NaN(s% power_pnhe4)
+            call set_to_NaN(s% power_ni56_co56)
+            call set_to_NaN(s% power_co56_fe56)
+            call set_to_NaN(s% power_other)
+            call set_to_NaN(s% L_surf)
+            call set_to_NaN(s% log_L_surf)
+            call set_to_NaN(s% star_age)
+            call set_to_NaN(s% time_days)
+            call set_to_NaN(s% time_years)
+            call set_to_NaN(s% time_step)
+            call set_to_NaN(s% dt_days)
+            call set_to_NaN(s% dt_years)
+            call set_to_NaN(s% dt_start)
+            call set_to_NaN(s% prev_Ledd)
+            call set_to_NaN(s% starting_T_center)
+            call set_to_NaN(s% min_dr_div_cs_start)
+            call set_to_NaN(s% surf_r_equatorial)
+            call set_to_NaN(s% surf_opacity)
+            call set_to_NaN(s% surf_csound)
+            call set_to_NaN(s% surf_rho)
+            call set_to_NaN(s% shock_mass_start)
+            call set_to_NaN(s% photosphere_opacity_start)
+            call set_to_NaN(s% adjust_mass_outer_frac_sub1)
+            call set_to_NaN(s% adjust_mass_mid_frac_sub1)
+            call set_to_NaN(s% adjust_mass_inner_frac_sub1)
+            call set_to_NaN(s% h1_czb_mass)
+            call set_to_NaN(s% profile_age)
+            call set_to_NaN(s% h1_czb_mass)            
+            call set_to_NaN(s% total_angular_momentum)
+            call set_to_NaN(s% total_abs_angular_momentum)
+            call set_to_NaN(s% angular_momentum_removed)
+            call set_to_NaN(s% angular_momentum_added)
+            call set_to_NaN(s% residual_norm)
+            call set_to_NaN(s% max_residual)
+            call set_to_NaN(s% max_fixup_for_mix)
+            call set_to_NaN(s% initial_timestep)   
+            call set_to_NaN(s% initial_L_center)
+            call set_to_NaN(s% initial_R_center)
+            call set_to_NaN(s% initial_v_center)
+            call set_to_NaN(s% tau_center)  
+            call set_to_NaN(s% super_eddington_wind_mdot)
+            call set_to_NaN(s% vsurf_wind_mdot)
+            do j=1,num_categories
+               call set_to_NaN(s% L_by_category(j))
+            end do
+            
+            call set_to_NaN(s% dVARdot_dVAR)
+            call set_to_NaN(s% surf_accel_grav_ratio)
+            call set_to_NaN(s% prev_create_atm_R0_div_R)
+            call set_to_NaN(s% L_for_BB_outer_BC)
+            call set_to_NaN(s% dX_nuc_drop_max_drop)
+            call set_to_NaN(s% solver_test_partials_val)
+            call set_to_NaN(s% solver_test_partials_dval_dx)
+
+            ! variation control value for timestep controller
+            call set_to_NaN(s% dt_limit_ratio_old)
+
+            ! surface info
+            call set_to_NaN(s% v_surf_old) ! (cm/second)
+            call set_to_NaN(s% L_surf_old) ! surface luminosity (Lsun units)
+            call set_to_NaN(s% L_phot_old) ! photosphere luminosity (Lsun units)
+            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
+            
+            call set_to_NaN(s% total_angular_momentum_old)
+            call set_to_NaN(s% h1_czb_mass_old) ! baryonic (Msun)
+            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% c_core_mass_old)
+            call set_to_NaN(s% center_eps_nuc_old)
+            
+            call set_to_NaN(s% total_internal_energy_old)
+            call set_to_NaN(s% total_gravitational_energy_old)
+            call set_to_NaN(s% total_radial_kinetic_energy_old)
+            call set_to_NaN(s% total_turbulent_energy_old)
+            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+            call set_to_NaN(s% total_energy_old)   
+            call set_to_NaN(s% total_internal_energy_before_adjust_mass)
+            call set_to_NaN(s% total_gravitational_energy_before_adjust_mass)
+            call set_to_NaN(s% total_radial_kinetic_energy_before_adjust_mass)
+            call set_to_NaN(s% total_turbulent_energy_before_adjust_mass)
+            call set_to_NaN(s% total_rotational_kinetic_energy_before_adjust_mass)
+            call set_to_NaN(s% total_energy_before_adjust_mass)          
+            call set_to_NaN(s% total_internal_energy_after_adjust_mass)
+            call set_to_NaN(s% total_gravitational_energy_after_adjust_mass)
+            call set_to_NaN(s% total_radial_kinetic_energy_after_adjust_mass)
+            call set_to_NaN(s% total_turbulent_energy_after_adjust_mass)
+            call set_to_NaN(s% total_rotational_kinetic_energy_after_adjust_mass)
+            call set_to_NaN(s% total_energy_after_adjust_mass)                
+            call set_to_NaN(s% total_internal_energy_start)
+            call set_to_NaN(s% total_gravitational_energy_start)
+            call set_to_NaN(s% total_radial_kinetic_energy_start)
+            call set_to_NaN(s% total_turbulent_energy_start)
+            call set_to_NaN(s% total_rotational_kinetic_energy_start)
+            call set_to_NaN(s% total_energy_start)           
+            call set_to_NaN(s% total_internal_energy_end)
+            call set_to_NaN(s% total_gravitational_energy_end)
+            call set_to_NaN(s% total_radial_kinetic_energy_end)
+            call set_to_NaN(s% total_turbulent_energy_end)
+            call set_to_NaN(s% total_rotational_kinetic_energy_end)
+            call set_to_NaN(s% total_energy_end)                  
+            call set_to_NaN(s% total_internal_energy)
+            call set_to_NaN(s% total_gravitational_energy)
+            call set_to_NaN(s% total_radial_kinetic_energy)
+            call set_to_NaN(s% total_turbulent_energy)
+            call set_to_NaN(s% total_rotational_kinetic_energy)
+            call set_to_NaN(s% total_energy)           
+            call set_to_NaN(s% surface_cell_specific_total_energy_old)
+            call set_to_NaN(s% total_energy_change_from_mdot) 
+            call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)               
+            call set_to_NaN(s% total_energy_sources_and_sinks)
+            call set_to_NaN(s% virial_thm_P_avg)
+            call set_to_NaN(s% total_eps_grav)
+            call set_to_NaN(s% total_eps_mdot)
+            call set_to_NaN(s% total_radiation)
+            call set_to_NaN(s% work_outward_at_surface)
+            call set_to_NaN(s% work_inward_at_center)
+            call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
+            call set_to_NaN(s% total_nuclear_heating)
+            call set_to_NaN(s% total_non_nuc_neu_cooling)
+            call set_to_NaN(s% total_irradiation_heating)
+            call set_to_NaN(s% total_WD_sedimentation_heating)
+            call set_to_NaN(s% total_energy_from_diffusion)
+            call set_to_NaN(s% total_extra_heating)
+            call set_to_NaN(s% error_in_energy_conservation)
+            call set_to_NaN(s% log_P_center)
+            call set_to_NaN(s% log_P_center_old)
+            call set_to_NaN(s% cumulative_energy_error_old)
+            call set_to_NaN(s% cumulative_extra_heating_old)
+            call set_to_NaN(s% total_radiation_old)        
+            call set_to_NaN(s% mesh_adjust_IE_conservation)
+            call set_to_NaN(s% mesh_adjust_PE_conservation)
+            call set_to_NaN(s% mesh_adjust_KE_conservation)
+            
+            call set_to_NaN(s% total_internal_energy_initial)
+            call set_to_NaN(s% total_gravitational_energy_initial)
+            call set_to_NaN(s% total_radial_kinetic_energy_initial)
+            call set_to_NaN(s% total_turbulent_energy_initial)
+            call set_to_NaN(s% total_rotational_kinetic_energy_initial)
+            call set_to_NaN(s% time_evolve_step)
+            call set_to_NaN(s% time_remesh)
+            call set_to_NaN(s% time_adjust_mass)
+            call set_to_NaN(s% time_conv_premix)
+            call set_to_NaN(s% time_element_diffusion)
+            call set_to_NaN(s% time_struct_burn_mix)
+            call set_to_NaN(s% time_solver_matrix)
+            call set_to_NaN(s% time_solve_mix)
+            call set_to_NaN(s% time_solve_burn)
+            call set_to_NaN(s% time_solve_omega_mix)
+            call set_to_NaN(s% time_eos)
+            call set_to_NaN(s% time_neu_kap)
+            call set_to_NaN(s% time_nonburn_net)
+            call set_to_NaN(s% time_mlt)
+            call set_to_NaN(s% time_set_hydro_vars)
+            call set_to_NaN(s% time_set_mixing_info)
+            call set_to_NaN(s% time_total)
+            
+         end subroutine test_set_undefined
+         
       end function do_evolve_step_part1
       
 
@@ -70,20 +402,20 @@
          use winds, only: set_mdot
          use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
          use do_one_utils, only: write_terminal_header
-         use hydro_vars, only: set_vars_if_needed, set_vars
-         use solve_hydro, only: set_L_burn_by_category
+         use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
          use mix_info, only: set_cz_bdy_mass
+         use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
-            cell_specific_total_energy, reset_epsnuc_vectors
+            cell_specific_total_energy, reset_epsnuc_vectors, set_qs, &
+            set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
-         integer :: ierr, j, k
+         integer :: ierr, j, k, nz
          integer(8) :: time0, clock_rate
-         logical :: trace
          real(dp) :: total_radiation
 
          logical, parameter :: dbg = .false.
@@ -95,19 +427,19 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
+         s% termination_code = 0
+         s% retry_message = ''
+         s% doing_solver_iterations = .false.
+         s% num_rotation_solver_steps = 0
+         s% have_mixing_info = .false.
+         s% L_for_BB_outer_BC = -1 ! mark as not set
+         s% need_to_setvars = .true. ! always start fresh
+         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
+         s% generations = 1
+         
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
             stop 'do_step_part1'
-         end if
-         
-         if (s% steps_before_start_stress_test >= 0 .and. &
-             s% model_number >= s% steps_before_start_stress_test .and. &
-             (s% stress_test_relax .or. .not. s% doing_relax)) then
-            !s% use_gold2_tolerances = .true.
-            !s% gold2_iter_for_resid_tol3 = 999
-            !s% gold2_tol_residual_norm2 = 1d-8
-            !s% gold2_tol_max_residual2 = 1d-5 
-               ! 1d-6 breaks cburn_inward because of poor HELM partials at logT 8.8, logRho 5.8
          end if
 
          if (s% u_flag .and. s% v_flag) then
@@ -115,19 +447,28 @@
             return
          end if
 
-         call system_clock(s% system_clock_at_start_of_step, clock_rate)
+         ! unpack some of the input information
+         nz = s% nz
+         call set_qs(s, nz, s% q, s% dq, ierr)
+         if (failed('set_qs')) return
+         call set_m_and_dm(s)
+         call set_dm_bar(s, nz, s% dm, s% dm_bar)
+         if (s% rotation_flag) then
+            call set_cgrav(s, ierr)
+            if (failed('set_cgrav')) return
+            call use_xh_to_update_i_rot(s)
+            s% total_angular_momentum = total_angular_momentum(s)
+            ! set r and rmid from xh
+            do k=1,nz
+               s% lnR(k) = s% xh(s% i_lnR,k)
+               s% r(k) = exp(s% lnR(k))
+            end do
+            call set_rmid(s, 1, nz, ierr)
+            if (failed('set_rmid')) return
+            call set_rotation_info(s, .true., ierr)
+            if (failed('set_rotation_info')) return
+         end if
          
-         s% termination_code = 0
-         s% retry_message = ''
-         trace = s% trace_evolve
-         s% doing_solver_iterations = .false.
-         s% num_rotation_solver_steps = 0
-         s% have_mixing_info = .false.
-         s% L_for_BB_outer_BC = -1 ! mark as not set
-         
-         s% need_to_setvars = .true. ! always start fresh
-         s% okay_to_set_mixing_info = .true. ! set false by element diffusion
-
          if (s% doing_first_model_of_run) then
             if (s% do_history_file) then
                if (first_try) then
@@ -146,6 +487,8 @@
             s% timestep_hold = -111
             if (first_try) s% model_number_old = s% model_number
          end if
+
+         call system_clock(s% system_clock_at_start_of_step, clock_rate)
 
          if (first_try) then ! i.e., not a redo or retry
             s% have_new_generation = .false.
@@ -190,12 +533,7 @@
                s% total_energy_old, total_radiation)
          else
             call set_mdot(s, s% L_phot*Lsun, s% mstar, s% Teff, ierr)
-            if (ierr /= 0) then
-               do_step_part1 = retry
-               s% result_reason = nonzero_ierr
-               if (s% report_ierr) write(*, *) 'do_step_part1 set_mdot'
-               return
-            end if
+            if (failed('set_mdot')) return
             ! set energy info for new mesh
             call eval_total_energy_integrals(s, &
                s% total_internal_energy_old, &
@@ -262,13 +600,14 @@
             if (s% doing_relax) &
                s% total_relax_steps_finished = s% total_relax_steps_finished + 1
          end if
+         if (s% trace_evolve) write(*,'(/,a)') 'done evolve step'
       end function do_evolve_step_part2
 
 
       integer function do_step_part2(id, first_try)
          use num_def
          use chem_def
-         use report, only: do_report
+         use report, only: do_report, set_power_info
          use adjust_mass, only: do_adjust_mass
          use element_diffusion, only: do_element_diffusion, finish_element_diffusion
          use conv_premix, only: do_conv_premix
@@ -281,7 +620,7 @@
          use solve_omega_mix, only: do_solve_omega_mix
          use mix_info, only: set_cz_bdy_mass, set_mixing_info
          use hydro_rotation, only: set_rotation_info, set_i_rot
-         use solve_hydro, only: set_L_burn_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use winds, only: set_mdot
          use star_utils, only: &
             eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals, &
@@ -437,8 +776,7 @@
                 s% model_number_for_last_retry /= s% model_number) ! last alternative is for redo's
 
             s% doing_struct_burn_mix = .true.
-            do_step_part2 = do_struct_burn_mix( &
-               s, skip_global_corr_coeff_limit, dt)
+            do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
             s% doing_struct_burn_mix = .false.
             if (do_step_part2 /= keep_going) return
             ! when reach here, have taken the step successfully
@@ -472,7 +810,9 @@
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_surface, -1, ierr)
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
 
-         call set_L_burn_by_category(s) ! final values for use in selecting timestep
+         call set_luminosity_by_category(s) ! final values for use in selecting timestep
+         call set_power_info(s)
+
          s% total_angular_momentum = total_angular_momentum(s)
          call do_report(s, ierr)
          if (failed('do_report')) return
@@ -521,7 +861,7 @@
             was_in_implicit_wind_limit = s% was_in_implicit_wind_limit
             if(abs(s% mstar_dot_old) > 0) then
                if (was_in_implicit_wind_limit .and. &
-                   s% generations >= 2 .and. &
+                   s% generations == 2 .and. &
                    abs((s% mstar_dot-s% mstar_dot_old)/s% mstar_dot_old)+1 > &
                    s% mdot_revise_factor) then
                    write(*,*) "Skipping first step in implicit mdot"
@@ -949,7 +1289,8 @@
             else
                s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
             end if
-
+            
+            ! notes from Adam:
             ! When there are mass changes the total energy of the model changes.
             ! We can split this change into three parts:
             ! 1. Mass flows into or out of the model with some specific energy.
@@ -1057,7 +1398,7 @@
                total_radiation = dt*(L_surf - s% L_center)
             end if
 
-            !phase1_total_energy_from_mdot = &
+            !note: phase1_total_energy_from_mdot = &
             !     s% mdot_acoustic_surface &
             !   + s% total_energy_change_from_mdot &
             !   + s% mdot_adiabatic_surface &
@@ -1356,6 +1697,7 @@
 
       subroutine check_for_extra_heat(s, ierr)
          use hydro_vars, only: set_vars
+         use utils_lib, only: is_bad
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
@@ -1454,6 +1796,13 @@
          if (left_to_inject < extra*dt*s% xmstar*(qmax - qmin)) then
             extra = left_to_inject/(dt*s% xmstar*(qmax - qmin))
          end if
+         if (is_bad(extra)) then
+            write(*,2) 'extra', s% model_number, extra
+            write(*,2) 'left_to_inject', s% model_number, left_to_inject
+            write(*,2) 's% total_energy_initial', s% model_number, s% total_energy_initial
+            write(*,2) 's% total_energy_start', s% model_number, s% total_energy_start
+            stop 'check_for_extra_heat'
+         end if
          do k=nz,1,-1
             q00 = s% q(k)
             if (qp1 >= qmin .and. q00 <= qmax) then ! all inside of region
@@ -1475,7 +1824,7 @@
          use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
          use mlt_info, only: set_gradT_excess_alpha
-         use solve_hydro, only: set_L_burn_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use star_utils, only: min_dr_div_cs, save_for_d_dt, &
             total_angular_momentum, eval_Ledd
 
@@ -1496,9 +1845,9 @@
          if (.not. s% RSP_flag) then
             call save_for_d_dt(s)
             call set_vars_if_needed(s, s% dt, str, ierr)
-            if (failed('set_vars_if_needed')) return            
+            if (failed('set_vars_if_needed')) return     
             s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
-            call set_L_burn_by_category(s)
+            call set_luminosity_by_category(s)
             s% total_angular_momentum = total_angular_momentum(s)
             call do_report(s, ierr)
             if (failed('do_report ierr')) return     
@@ -1506,7 +1855,6 @@
 
          ! save a few things from start of step that will need later
          s% min_dr_div_cs_start = min_dr_div_cs(s,k)
-         s% prev_Lmax = maxval(abs(s% L(1:nz)))
          if (s% rotation_flag) then
             s% surf_r_equatorial = s% r_equatorial(1)
          else
@@ -1518,13 +1866,6 @@
          s% surf_rho = s% rho(1)
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
-
-         if (s% generations == 1 .or. s% zero_gravity .or. s%dt == 0d0) then
-            s% surf_accel_grav_ratio = 0
-         else
-            s% surf_accel_grav_ratio = &
-               (s% v_surf - s% v_surf_old)/(s% dt*s% grav(1))
-         end if
          
          if (.not. (s% RSP_flag .or. s% Eturb_flag)) then
             call set_gradT_excess_alpha(s, ierr)
@@ -1550,6 +1891,9 @@
       integer function prepare_for_new_step(s)
          use evolve_support, only: new_generation
          use chem_def
+         use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
+         use report, only: set_phot_info
+         use hydro_vars, only: set_vars_if_needed
 
          type (star_info), pointer :: s
 
@@ -1588,29 +1932,18 @@
             return
          end if
 
+         if (s% set_rho_to_dm_div_dV .and. .not. (s% u_flag .or. s% RSP_flag)) then
+            call use_xh_to_set_rho_to_dm_div_dV(s,ierr)
+            if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
+         end if
+
          if (.not. s% RSP_flag) then ! store mesh info for following step eps_mdot
             do k=1, s% nz
                s% prev_mesh_xa(:,k) = s% xa(:,k)
                s% prev_mesh_xh(:,k) = s% xh(:,k)
-
                s% prev_mesh_j_rot(k) = s% j_rot(k)
                s% prev_mesh_omega(k) = s% omega(k)
-               s% prev_mesh_nu_ST(k) = s% nu_ST(k)
-               s% prev_mesh_D_ST(k) = s% D_ST(k)
-               s% prev_mesh_D_DSI(k) = s% D_DSI(k)
-               s% prev_mesh_D_SH(k) = s% D_SH(k)
-               s% prev_mesh_D_SSI(k) = s% D_SSI(k)
-               s% prev_mesh_D_ES(k) = s% D_ES(k)
-               s% prev_mesh_D_GSF(k) = s% D_GSF(k)
-               s% prev_mesh_D_mix(k) = s% D_mix(k)
-               s% prev_mesh_dPdr_dRhodr_info(k) = s% dPdr_dRhodr_info(k)
-               s% prev_mesh_D_omega(k) = s% D_omega(k)
-               s% prev_mesh_am_nu_rot(k) = s% am_nu_rot(k)
-               s% prev_mesh_conv_vel(k) = s% conv_vel(k)
-               s% prev_mesh_D_smooth(k) = s% D_smooth(k)
-
                s% prev_mesh_dq(k) = s% dq(k)
-
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
@@ -1625,9 +1958,13 @@
             end if
          end if
          
+         call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
+         if (failed('set_vars_if_needed ierr')) return
+         call set_phot_info(s)
+         
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
-         s% generations = min(max_generations, s% generations+1)
+         s% generations = 2
 
          if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
             s% dt_next = max(0d0, s% max_age*secyer - s% time)
@@ -1651,6 +1988,11 @@
             write(*,2) 'force increase in timestep', s% model_number, s% dt
          end if
          s% dt_start = s% dt
+         
+         if (is_bad(s% dt)) then
+            write(*,1) 's% dt', s% dt
+            stop 'prepare_for_new_step'
+         end if
 
          s% retry_cnt = 0
          s% redo_cnt = 0
@@ -1767,12 +2109,6 @@
                s% termination_code = t_failed_prepare_for_new_try
                return
             end if
-            if (size(s% q_old,dim=1) < nz) then
-               write(*,*) 'bad dimensions for q_old', size(s% q_old,dim=1), nz
-               prepare_for_new_try = terminate
-               s% termination_code = t_failed_prepare_for_new_try
-               return
-            end if
             if (size(s% dq_old,dim=1) < nz) then
                write(*,*) 'bad dimensions for dq_old', size(s% dq_old,dim=1), nz
                prepare_for_new_try = terminate
@@ -1790,16 +2126,16 @@
                do j=1,s% species
                   s% xa(j,k) = s% xa_old(j,k) ! start from copy of old composition
                end do
-               s% q(k) = s% q_old(k) ! start with same q's
                s% dq(k) = s% dq_old(k) ! start with same dq's
             end do
             
-            if (s% D_smooth_flag) then
-               do k=1,nz
-                  s% D_smooth(k) = s% D_smooth_old(k)
-               end do
+            call set_qs(s, nz, s% q, s% dq, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'prepare_for_new_try failed in set_qs'
+               prepare_for_new_try = terminate
+               s% termination_code = t_failed_prepare_for_new_try
+               return
             end if
-
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
 
@@ -1815,8 +2151,6 @@
                         stop 'prepare_for_new_try'
                      end if
                   end if
-                  s% D_omega(k) = s% D_omega_old(k)
-                  s% am_nu_rot(k) = s% am_nu_rot_old(k)
                end do
                if (.not. okay) then
                   write(*,2) 'model_number', s% model_number
@@ -1986,29 +2320,11 @@
                do k=1, s% prev_mesh_nz
                   s% xh_old(:,k) = s% prev_mesh_xh(:,k)
                   s% xa_old(:,k) = s% prev_mesh_xa(:,k)
-                  s% j_rot_old(k) = s% prev_mesh_j_rot(k)
-                  s% omega_old(k) = s% prev_mesh_omega(k)
-                  s% nu_ST_old(k) = s% prev_mesh_nu_ST(k)
-                  s% D_ST_old(k) = s% prev_mesh_D_ST(k)
-                  s% D_DSI_old(k) = s% prev_mesh_D_DSI(k)
-                  s% D_SH_old(k) = s% prev_mesh_D_SH(k)
-                  s% D_SSI_old(k) = s% prev_mesh_D_SSI(k)
-                  s% D_ES_old(k) = s% prev_mesh_D_ES(k)
-                  s% D_GSF_old(k) = s% prev_mesh_D_GSF(k)
-                  s% D_mix_old(k) = s% prev_mesh_D_mix(k)
-                  s% dPdr_dRhodr_info_old(k) = s% prev_mesh_dPdr_dRhodr_info(k)
-                  s% D_omega_old(k) = s% prev_mesh_D_omega(k)
-                  s% am_nu_rot_old(k) = s% prev_mesh_am_nu_rot(k)
-                  s% conv_vel(k) = s% prev_mesh_conv_vel(k)
-                  s% D_smooth_old(k) = s% prev_mesh_D_smooth(k)
                   s% dq_old(k) = s% prev_mesh_dq(k)
+                  s% omega_old(k) = s% prev_mesh_omega(k)
+                  s% j_rot_old(k) = s% prev_mesh_j_rot(k)
                end do
-               !call normalize_dqs(s% prev_mesh_nz, s% dq_old, ierr)
-               !if (ierr /= 0) then
-               !   prepare_to_retry = terminate
-               !   return
-               !end if
-               call set_qs(s% prev_mesh_nz, s% q_old, s% dq_old, ierr)
+               call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
                if (ierr /= 0) then
                   prepare_to_retry = terminate
                   return
@@ -2120,8 +2436,6 @@
 
          nz = s% nz
          trace = s% trace_evolve
-
-         s% h1_czb_mass_prev = s% h1_czb_mass
          prev_num_iounits_in_use = number_iounits_allocated()
 
          finish_step = keep_going
@@ -2205,12 +2519,13 @@
          real(dp), intent(in) :: age
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         write(*,1) 'set_age', age
          s% time = age*secyer
          s% star_age = age
          s% profile_age = age
-         s% post_he_age = age
       end subroutine set_age
 
 

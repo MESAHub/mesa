@@ -177,72 +177,72 @@
          
 
       ! observed l=0 modes to match to model
-         nl0 = 9
-         l0_obs(1) = 799.70d0
-         l0_obs(2) = 855.30d0
-         l0_obs(3) = 909.92d0
-         l0_obs(4) = 965.16d0
-         l0_obs(5) = 1021.81d0
-         l0_obs(6) = 1078.97d0
-         l0_obs(7) = 1135.32d0
-         l0_obs(8) = 1192.12d0
-         l0_obs(9) = 1250.12d0
-         l0_obs_sigma(1) = 0.27d0
-         l0_obs_sigma(2) = 0.73d0
-         l0_obs_sigma(3) = 0.26d0
-         l0_obs_sigma(4) = 0.36d0
-         l0_obs_sigma(5) = 0.28d0
-         l0_obs_sigma(6) = 0.33d0
-         l0_obs_sigma(7) = 0.34d0
-         l0_obs_sigma(8) = 0.45d0
-         l0_obs_sigma(9) = 0.89d0
+         nl(0) = 9
+         freq_target(0,1) = 799.70d0
+         freq_target(0,2) = 855.30d0
+         freq_target(0,3) = 909.92d0
+         freq_target(0,4) = 965.16d0
+         freq_target(0,5) = 1021.81d0
+         freq_target(0,6) = 1078.97d0
+         freq_target(0,7) = 1135.32d0
+         freq_target(0,8) = 1192.12d0
+         freq_target(0,9) = 1250.12d0
+         freq_sigma(0,1) = 0.27d0
+         freq_sigma(0,2) = 0.73d0
+         freq_sigma(0,3) = 0.26d0
+         freq_sigma(0,4) = 0.36d0
+         freq_sigma(0,5) = 0.28d0
+         freq_sigma(0,6) = 0.33d0
+         freq_sigma(0,7) = 0.34d0
+         freq_sigma(0,8) = 0.45d0
+         freq_sigma(0,9) = 0.89d0
    
       ! observed l=1 modes to match to model
-         nl1 = 10
-         l1_obs(1) = 748.60d0
-         l1_obs(2) = 777.91d0
-         l1_obs(3) = 828.21d0
-         l1_obs(4) = 881.29d0
-         l1_obs(5) = 935.90d0
-         l1_obs(6) = 991.09d0
-         l1_obs(7) = 1047.79d0
-         l1_obs(8) = 1104.68d0
-         l1_obs(9) = 1161.27d0
-         l1_obs(10) = 1216.95d0
-         l1_obs_sigma(1) = 0.23d0
-         l1_obs_sigma(2) = 0.24d0
-         l1_obs_sigma(3) = 0.42d0
-         l1_obs_sigma(4) = 0.29d0
-         l1_obs_sigma(5) = 0.23d0
-         l1_obs_sigma(6) = 0.22d0
-         l1_obs_sigma(7) = 0.24d0
-         l1_obs_sigma(8) = 0.22d0
-         l1_obs_sigma(9) = 0.33d0
-         l1_obs_sigma(10) = 0.53d0
+         nl(1) = 10
+         freq_target(1,1) = 748.60d0
+         freq_target(1,2) = 777.91d0
+         freq_target(1,3) = 828.21d0
+         freq_target(1,4) = 881.29d0
+         freq_target(1,5) = 935.90d0
+         freq_target(1,6) = 991.09d0
+         freq_target(1,7) = 1047.79d0
+         freq_target(1,8) = 1104.68d0
+         freq_target(1,9) = 1161.27d0
+         freq_target(1,10) = 1216.95d0
+         freq_sigma(1,1) = 0.23d0
+         freq_sigma(1,2) = 0.24d0
+         freq_sigma(1,3) = 0.42d0
+         freq_sigma(1,4) = 0.29d0
+         freq_sigma(1,5) = 0.23d0
+         freq_sigma(1,6) = 0.22d0
+         freq_sigma(1,7) = 0.24d0
+         freq_sigma(1,8) = 0.22d0
+         freq_sigma(1,9) = 0.33d0
+         freq_sigma(1,10) = 0.53d0
    
       ! observed l=2 modes to match to model
-         nl2 = 8
-         l2_obs(1) = 794.55d0
-         l2_obs(2) = 905.31d0
-         l2_obs(3) = 961.47d0
-         l2_obs(4) = 1017.56d0
-         l2_obs(5) = 1075.01d0
-         l2_obs(6) = 1130.79d0
-         l2_obs(7) = 1187.55d0
-         l2_obs(8) = 1246.78d0
-         l2_obs_sigma(1) = 0.52d0
-         l2_obs_sigma(2) = 0.35d0
-         l2_obs_sigma(3) = 0.49d0
-         l2_obs_sigma(4) = 0.27d0
-         l2_obs_sigma(5) = 0.27d0
-         l2_obs_sigma(6) = 0.61d0
-         l2_obs_sigma(7) = 0.32d0
-         l2_obs_sigma(8) = 0.84d0
+         nl(2) = 8
+         freq_target(2,1) = 794.55d0
+         freq_target(2,2) = 905.31d0
+         freq_target(2,3) = 961.47d0
+         freq_target(2,4) = 1017.56d0
+         freq_target(2,5) = 1075.01d0
+         freq_target(2,6) = 1130.79d0
+         freq_target(2,7) = 1187.55d0
+         freq_target(2,8) = 1246.78d0
+         freq_sigma(2,1) = 0.52d0
+         freq_sigma(2,2) = 0.35d0
+         freq_sigma(2,3) = 0.49d0
+         freq_sigma(2,4) = 0.27d0
+         freq_sigma(2,5) = 0.27d0
+         freq_sigma(2,6) = 0.61d0
+         freq_sigma(2,7) = 0.32d0
+         freq_sigma(2,8) = 0.84d0
    
       ! observed l=3 modes for matching to model
-         nl3 = 0 ! number of observed l=3 modes
-         l3_obs(:) = 0 ! frequencies. set l3_obs(1), l3_obs(2) .... l3_obs(nl3)   
-         l3_obs_sigma(:) = 0 ! l3_obs_sigma(i) is uncertainty for l3_obs(i), for i=1,nl3
+         nl(3) = 0
+         freq_target(3,:) = 0
+         freq_sigma(3,:) = 0
    
    
    ! search controls
@@ -778,7 +778,7 @@
             ! and set grid_type to 'LINEAR'.
 
             ! For n_freq, I suggest either setting it to 10*(freq_max - freq_min)/dfreq,
-            ! where dfreq is the estimated frequency spacing; or, set it to 10*nl0.
+            ! where dfreq is the estimated frequency spacing; or, set it to 10*nl(0).
             ! The factor 10 is arbitrary, but seems to be a good safety factor.
 
       ! adipls controls
@@ -792,18 +792,18 @@
             
             
          ! iscan for adipls = the following factor times the given number of observed modes
-         iscan_factor_l0 = 15
-         iscan_factor_l1 = 15
-         iscan_factor_l2 = 15
-         iscan_factor_l3 = 15
+         iscan_factor(0) = 15
+         iscan_factor(1) = 15
+         iscan_factor(2) = 15
+         iscan_factor(3) = 15
          ! frequency range is set from observed frequencies times these factors
          nu_lower_factor = 0.8
          nu_upper_factor = 1.2
          
          ! adipls looks for frequencies in a given range and with a given "density" of coverage
          ! for example, 
-         ! for l=0, the adipls freq search range is nu_lower_factor*l0_obs(1) to nu_upper_factor*l0_obs(nl0)
-	         ! and it uses iscan = iscan_factor_l0*nl0 to determine how fine the scan is over the range.
+         ! for l=0, the adipls freq search range is nu_lower_factor*freq_target(0,1) to nu_upper_factor*freq_target(0,nl(0))
+	         ! and it uses iscan = iscan_factor_l0*nl(0) to determine how fine the scan is over the range.
          ! similar for l=1 and l=2
          
          ! misc adipls parameters for experts

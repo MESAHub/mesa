@@ -111,9 +111,8 @@
 
       integer, parameter :: h_power_h_burn = h_burn_relr_regions + 1
       integer, parameter :: h_power_he_burn = h_power_h_burn + 1
-      integer, parameter :: h_power_c_burn = h_power_he_burn + 1
 
-      integer, parameter :: h_h_rich_layer_mass = h_power_c_burn + 1
+      integer, parameter :: h_h_rich_layer_mass = h_power_he_burn + 1
       integer, parameter :: h_he_rich_layer_mass = h_h_rich_layer_mass + 1
       integer, parameter :: h_c_rich_layer_mass = h_he_rich_layer_mass + 1
       integer, parameter :: h_o_rich_layer_mass = h_c_rich_layer_mass + 1
@@ -307,12 +306,10 @@
       integer, parameter :: h_v_surf_div_v_kh = h_v_surf + 1
       integer, parameter :: h_v_div_csound_max = h_v_surf_div_v_kh + 1
       integer, parameter :: h_v_div_csound_surf = h_v_div_csound_max + 1
-      integer, parameter :: h_surface_accel_div_grav = h_v_div_csound_surf + 1
-      integer, parameter :: h_log_dt = h_surface_accel_div_grav + 1
+      integer, parameter :: h_log_dt = h_v_div_csound_surf + 1
       integer, parameter :: h_log_LH = h_log_dt + 1
       integer, parameter :: h_log_LHe = h_log_LH + 1
-      integer, parameter :: h_log_LC = h_log_LHe + 1
-      integer, parameter :: h_power_photo = h_log_LC + 1
+      integer, parameter :: h_power_photo = h_log_LHe + 1
       integer, parameter :: h_Lnuc_photo = h_power_photo + 1
       
       integer, parameter :: h_Lsurf_m = h_Lnuc_photo + 1
@@ -490,49 +487,7 @@
       integer, parameter :: h_max_T_L = h_max_T_lgRho + 1
       integer, parameter :: h_max_T_eps_nuc = h_max_T_L + 1
 
-      integer, parameter :: h_max_eps_h = h_max_T_eps_nuc + 1
-      integer, parameter :: h_max_eps_h_lgT = h_max_eps_h + 1
-      integer, parameter :: h_max_eps_h_lgRho = h_max_eps_h_lgT + 1
-      integer, parameter :: h_max_eps_h_m = h_max_eps_h_lgRho + 1
-      integer, parameter :: h_max_eps_h_xm = h_max_eps_h_m + 1
-      integer, parameter :: h_max_eps_h_lgR = h_max_eps_h_xm + 1
-      integer, parameter :: h_max_eps_h_lgP = h_max_eps_h_lgR + 1
-      integer, parameter :: h_max_eps_h_opacity = h_max_eps_h_lgP + 1
-
-      integer, parameter :: h_max_eps_he = h_max_eps_h_opacity + 1
-      integer, parameter :: h_max_eps_he_lgT = h_max_eps_he + 1
-      integer, parameter :: h_max_eps_he_lgRho = h_max_eps_he_lgT + 1
-      integer, parameter :: h_max_eps_he_m = h_max_eps_he_lgRho + 1
-      integer, parameter :: h_max_eps_he_xm = h_max_eps_he_m + 1
-      integer, parameter :: h_max_eps_he_lgR = h_max_eps_he_xm + 1
-      integer, parameter :: h_max_eps_he_lgP = h_max_eps_he_lgR + 1
-      integer, parameter :: h_max_eps_he_opacity = h_max_eps_he_lgP + 1
-
-      integer, parameter :: h_max_eps_z = h_max_eps_he_opacity + 1
-      integer, parameter :: h_max_eps_z_lgT = h_max_eps_z + 1
-      integer, parameter :: h_max_eps_z_lgRho = h_max_eps_z_lgT + 1
-      integer, parameter :: h_max_eps_z_m = h_max_eps_z_lgRho + 1
-      integer, parameter :: h_max_eps_z_xm = h_max_eps_z_m + 1
-      integer, parameter :: h_max_eps_z_lgR = h_max_eps_z_xm + 1
-      integer, parameter :: h_max_eps_z_lgP = h_max_eps_z_lgR + 1
-      integer, parameter :: h_max_eps_z_opacity = h_max_eps_z_lgP + 1
-
-      integer, parameter :: h_max_eps_nuc = h_max_eps_z_opacity + 1
-      integer, parameter :: h_max_eps_nuc_lgT = h_max_eps_nuc + 1
-      integer, parameter :: h_max_eps_nuc_lgRho = h_max_eps_nuc_lgT + 1
-      integer, parameter :: h_max_eps_nuc_m = h_max_eps_nuc_lgRho + 1
-      integer, parameter :: h_max_eps_nuc_xm = h_max_eps_nuc_m + 1
-      integer, parameter :: h_max_eps_nuc_lgR = h_max_eps_nuc_xm + 1
-      integer, parameter :: h_max_eps_nuc_lgP = h_max_eps_nuc_lgR + 1
-      integer, parameter :: h_max_eps_nuc_opacity = h_max_eps_nuc_lgP + 1
-      integer, parameter :: h_max_eps_nuc_cp = h_max_eps_nuc_opacity + 1
-      integer, parameter :: h_max_eps_nuc_csound = h_max_eps_nuc_cp + 1
-      integer, parameter :: h_max_eps_nuc_pi_r_div_cs = h_max_eps_nuc_csound + 1
-      integer, parameter :: h_max_eps_nuc_H = h_max_eps_nuc_pi_r_div_cs + 1
-      integer, parameter :: h_max_eps_nuc_H_div_cs = h_max_eps_nuc_H + 1
-      integer, parameter :: h_max_eps_nuc_t_heat = h_max_eps_nuc_H_div_cs + 1
-
-      integer, parameter :: h_max_conv_vel_div_csound = h_max_eps_nuc_t_heat + 1
+      integer, parameter :: h_max_conv_vel_div_csound = h_max_T_eps_nuc + 1
       integer, parameter :: h_max_gradT_div_grada = h_max_conv_vel_div_csound + 1
       integer, parameter :: h_max_gradT_sub_grada = h_max_gradT_div_grada + 1
       integer, parameter :: h_min_log_mlt_Gamma = h_max_gradT_sub_grada + 1
@@ -979,7 +934,6 @@
          history_column_name(h_v_surf_div_v_kh) = 'v_surf_div_v_kh'
          history_column_name(h_v_div_csound_max) = 'v_div_csound_max'
          history_column_name(h_v_div_csound_surf) = 'v_div_csound_surf'
-         history_column_name(h_surface_accel_div_grav) = 'surface_accel_div_grav'
          history_column_name(h_log_dt) = 'log_dt'
          history_column_name(h_log_dt_sec) = 'log_dt_sec'
          history_column_name(h_time_step_days) = 'time_step_days'
@@ -991,9 +945,6 @@
          
          history_column_name(h_power_he_burn) = 'power_he_burn'
          history_column_name(h_log_LHe) = 'log_LHe'
-         
-         history_column_name(h_power_c_burn) = 'power_c_burn'
-         history_column_name(h_log_LC) = 'log_LC'
          
          history_column_name(h_power_photo) = 'power_photo'
          history_column_name(h_Lnuc_photo) = 'Lnuc_photo'
@@ -1413,65 +1364,6 @@
          history_column_name(h_max_T_lgRho) = 'max_T_lgRho'
          history_column_name(h_max_T_L) = 'max_T_L'
          history_column_name(h_max_T_eps_nuc) = 'max_T_eps_nuc'
-
-         history_column_name(h_max_eps_h) = 'max_eps_h' ! erg/g/s
-         history_column_name(h_max_eps_h_lgT) = &
-            'max_eps_h_lgT' ! log10 temperature at location of max burn
-         history_column_name(h_max_eps_h_lgRho) = &
-            'max_eps_h_lgRho' ! log10 density at location of max burn
-         history_column_name(h_max_eps_h_m) = &
-            'max_eps_h_m' ! mass coordinate at location of max burn (Msun units)
-         history_column_name(h_max_eps_h_xm) = &
-            'max_eps_h_xm' ! mass exterior to loc of max burn (Msun units)
-         history_column_name(h_max_eps_h_lgR) = 'max_eps_h_lgR'
-         history_column_name(h_max_eps_h_lgP) = 'max_eps_h_lgP'
-         history_column_name(h_max_eps_h_opacity) = 'max_eps_h_opacity'
-
-         history_column_name(h_max_eps_he) = 'max_eps_he' ! erg/g/s
-         history_column_name(h_max_eps_he_lgT) = &
-            'max_eps_he_lgT' ! log10 temperature at location of max burn
-         history_column_name(h_max_eps_he_lgRho) = &
-            'max_eps_he_lgRho' ! log10 density at location of max burn
-         history_column_name(h_max_eps_he_m) = &
-            'max_eps_he_m' ! mass coordinate at location of max burn (Msun units)
-         history_column_name(h_max_eps_he_xm) = &
-            'max_eps_he_xm' ! mass exterior to loc of max burn (Msun units)
-         history_column_name(h_max_eps_he_lgR) = 'max_eps_he_lgR'
-         history_column_name(h_max_eps_he_lgP) = 'max_eps_he_lgP'
-         history_column_name(h_max_eps_he_opacity) = 'max_eps_he_opacity'
-
-         history_column_name(h_max_eps_z) = 'max_eps_z' ! erg/g/s
-         history_column_name(h_max_eps_z_lgT) = &
-            'max_eps_z_lgT' ! log10 temperature at location of max burn
-         history_column_name(h_max_eps_z_lgRho) = &
-            'max_eps_z_lgRho' ! log10 density at location of max burn
-         history_column_name(h_max_eps_z_m) = &
-            'max_eps_z_m' ! mass coordinate at location of max burn (Msun units)
-         history_column_name(h_max_eps_z_xm) = &
-            'max_eps_z_xm' ! mass exterior to loc of max burn (Msun units)
-         history_column_name(h_max_eps_z_lgR) = 'max_eps_z_lgR'
-         history_column_name(h_max_eps_z_lgP) = 'max_eps_z_lgP'
-         history_column_name(h_max_eps_z_opacity) = 'max_eps_z_opacity'
-
-         history_column_name(h_max_eps_nuc) = 'max_eps_nuc' ! erg/g/s
-         history_column_name(h_max_eps_nuc_lgT) = &
-            'max_eps_nuc_lgT' ! log10 temperature at location of max burn
-         history_column_name(h_max_eps_nuc_lgRho) = &
-            'max_eps_nuc_lgRho' ! log10 density at location of max burn
-         history_column_name(h_max_eps_nuc_m) = &
-            'max_eps_nuc_m' ! mass coordinate at location of max burn (Msun units)
-         history_column_name(h_max_eps_nuc_xm) = &
-            'max_eps_nuc_xm' ! mass exterior to loc of max burn (Msun units)
-         history_column_name(h_max_eps_nuc_lgR) = 'max_eps_nuc_lgR'
-         history_column_name(h_max_eps_nuc_lgP) = 'max_eps_nuc_lgP'
-         history_column_name(h_max_eps_nuc_opacity) = 'max_eps_nuc_opacity'
-         history_column_name(h_max_eps_nuc_cp) = 'max_eps_nuc_cp'
-         history_column_name(h_max_eps_nuc_t_heat) = 'max_eps_nuc_t_heat'
-
-         history_column_name(h_max_eps_nuc_csound) = 'max_eps_nuc_csound'
-         history_column_name(h_max_eps_nuc_pi_r_div_cs) = 'max_eps_nuc_pi_r_div_cs'
-         history_column_name(h_max_eps_nuc_H) = 'max_eps_nuc_H'
-         history_column_name(h_max_eps_nuc_H_div_cs) = 'max_eps_nuc_H_div_cs'
 
          history_column_name(h_log_surf_optical_depth) = 'log_surf_optical_depth'
          history_column_name(h_surface_optical_depth) = 'surface_optical_depth'

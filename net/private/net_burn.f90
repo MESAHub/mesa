@@ -97,7 +97,7 @@
             ntimes, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
-            screening_mode, theta_e_for_graboske_et_al,  &
+            screening_mode,  &
             stptry_in, max_steps, eps, odescal, &
             okay_to_reuse_rate_screened, &
             use_pivoting, trace, burn_dbg, burner_finish_substep, &
@@ -135,7 +135,6 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode ! see screen_def
-         real(dp), intent(in) :: theta_e_for_graboske_et_al
          real(dp), intent(in) :: stptry_in
          integer, intent(in) :: max_steps ! maximal number of allowed steps.
          real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
@@ -161,7 +160,7 @@
          type (Net_General_Info), pointer :: g
          integer :: ijac, lrd, lid, lout, i, j, ir, idid, sz
          logical :: okay, reuse_rate_raw, have_set_rate_screened
-         real(dp) :: temp, rho, eta, lgT, lgRho, r, prev_lgRho, prev_lgT, theta
+         real(dp) :: temp, rho, eta, lgT, lgRho, r, prev_lgRho, prev_lgT
          
          integer :: stpmax, imax_dydx, nstp
          real(dp) :: &
@@ -206,7 +205,6 @@
          reuse_rate_raw = .false. ! must evaluate 1st time
          have_set_rate_screened = .false.
          
-         theta = theta_e_for_graboske_et_al
          lgT = log10Ts_f1(1)
          temp = exp10(lgT)
          lgRho = log10Rhos_f1(1)
@@ -271,7 +269,7 @@
          if (dbg) write(*,2) 'call setup_net_info', iwork
          call setup_net_info( &
             g, n, eps_nuc_categories,  &
-            screening_mode, theta_e_for_graboske_et_al, &
+            screening_mode, &
             rate_screened, rate_screened_dT, rate_screened_dRho, &
             rate_raw, rate_raw_dT, rate_raw_dRho, burn_lwork, burn_work_array, &
             .false., .false., iwork, ierr)
@@ -506,7 +504,7 @@
                reuse_rate_raw, reuse_rate_screened, &
                eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-               screening_mode, theta,  &
+               screening_mode, &
                eps_nuc_categories, eps_neu_total, &
                net_lwork, net_work_array, &
                actual_Qs, actual_neuQs, from_weaklib, .false., ierr)

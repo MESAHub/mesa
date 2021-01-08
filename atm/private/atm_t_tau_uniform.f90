@@ -664,6 +664,7 @@ contains
        write(*,1) 'P0', P0
        write(*,1) 'Pextra', Pextra
        write(*,1) 'P', P
+       stop 'atm_t_tau_uniform'
        return
     end if
 

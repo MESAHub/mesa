@@ -38,33 +38,19 @@
       
       subroutine check_search_controls(ierr)
          integer, intent(out) :: ierr
-         integer :: i
+         integer :: i, l
          include 'formats'
-         ierr = 0         
-         do i=2,nl0
-            if (l0_obs(i) <= l0_obs(i-1)) then
-               write(*,3) 'l0_obs values out of order', i-1, i, l0_obs(i-1), l0_obs(i)
-               ierr = -1
-            end if
-         end do         
-         do i=2,nl1
-            if (l1_obs(i) <= l1_obs(i-1)) then
-               write(*,3) 'l1_obs values out of order', i-1, i, l1_obs(i-1), l1_obs(i)
-               ierr = -1
-            end if
-         end do         
-         do i=2,nl2
-            if (l2_obs(i) <= l2_obs(i-1)) then
-               write(*,3) 'l2_obs values out of order', i-1, i, l2_obs(i-1), l2_obs(i)
-               ierr = -1
-            end if
-         end do         
-         do i=2,nl3
-            if (l3_obs(i) <= l3_obs(i-1)) then
-               write(*,3) 'l3_obs values out of order', i-1, i, l3_obs(i-1), l3_obs(i)
-               ierr = -1
-            end if
-         end do         
+         ierr = 0
+
+         do l = 0, 3
+            do i = 2, nl(l)
+               if (freq_target(l,i) <= freq_target(l,i-1)) then
+                  write(*,4) 'freq_target values out of order', l, i-1, i, freq_target(l,i-1), freq_target(l,i)
+                  ierr = -1
+               end if
+            end do
+         end do
+
          if (ierr /= 0) &
             write(*,1) 'please put frequency values in ascending order'      
       end subroutine check_search_controls
@@ -163,25 +149,33 @@
          call qsort(index, num_results, cyclic_freq)
 
          if (l == 0) then
-            call set_to_closest(l0_obs, &
-               l0_freq, empty, empty, &
-               l0_inertia, empty, empty, &
-               l0_order, int_empty, int_empty, ierr)
+            call set_to_closest(freq_target(0,:), &
+               model_freq(0,:), empty, empty, &
+               model_inertia(0,:), empty, empty, &
+               model_order(0,:), int_empty, int_empty, ierr)
+
+            model_freq_alt_up(0,:) = model_freq(0,:)
+            model_inertia_alt_up(0,:) = model_inertia(0,:)
+            model_order_alt_up(0,:) = model_order(0,:)
+
+            model_freq_alt_down(0,:) = model_freq(0,:)
+            model_inertia_alt_down(0,:) = model_inertia(0,:)
+            model_order_alt_down(0,:) = model_order(0,:)
          else if (l == 1) then
-            call set_to_closest(l1_obs, &
-               l1_freq, l1_freq_alt_up, l1_freq_alt_down, &
-               l1_inertia, l1_inertia_alt_up, l1_inertia_alt_down, &
-               l1_order, l1_order_alt_up, l1_order_alt_down, ierr)
+            call set_to_closest(freq_target(1,:), &
+               model_freq(1,:), model_freq_alt_up(1,:), model_freq_alt_down(1,:), &
+               model_inertia(1,:), model_inertia_alt_up(1,:), model_inertia_alt_down(1,:), &
+               model_order(1,:), model_order_alt_up(1,:), model_order_alt_down(1,:), ierr)
          else if (l == 2) then
-            call set_to_closest(l2_obs, &
-               l2_freq, l2_freq_alt_up, l2_freq_alt_down, &
-               l2_inertia, l2_inertia_alt_up, l2_inertia_alt_down, &
-               l2_order, l2_order_alt_up, l2_order_alt_down, ierr)
+            call set_to_closest(freq_target(2,:), &
+               model_freq(2,:), model_freq_alt_up(2,:), model_freq_alt_down(2,:), &
+               model_inertia(2,:), model_inertia_alt_up(2,:), model_inertia_alt_down(2,:), &
+               model_order(2,:), model_order_alt_up(2,:), model_order_alt_down(2,:), ierr)
          else if (l == 3) then
-            call set_to_closest(l3_obs, &
-               l3_freq, l3_freq_alt_up, l3_freq_alt_down, &
-               l3_inertia, l3_inertia_alt_up, l3_inertia_alt_down, &
-               l3_order, l3_order_alt_up, l3_order_alt_down, ierr)
+            call set_to_closest(freq_target(3,:), &
+               model_freq(3,:), model_freq_alt_up(3,:), model_freq_alt_down(3,:), &
+               model_inertia(3,:), model_inertia_alt_up(3,:), model_inertia_alt_down(3,:), &
+               model_order(3,:), model_order_alt_up(3,:), model_order_alt_down(3,:), ierr)
          else
             stop 'bad value for l in get_one_el_info'
          end if
@@ -191,16 +185,16 @@
             return
          end if
          
-         if (l == 0 .and. correction_factor > 0 .and. nl0 > 0 .and. &
+         if (l == 0 .and. correction_factor > 0 .and. nl(0) > 0 .and. &
                delta_nu > 0 .and. nu_max > 0 .and. avg_nu_obs > 0) then 
             ! calculate surface correction info
             
             cnt = 0
             sum_1 = 0
-            do i=1,nl0
-               if (l0_obs(i) < 0) cycle
+            do i=1,nl(0)
+               if (freq_target(0,i) < 0) cycle
                cnt = cnt + 1
-               sum_1 = sum_1 + l0_freq(i)
+               sum_1 = sum_1 + model_freq(0,i)
             end do
             if (cnt == 0) return
             avg_nu_model = sum_1/cnt
@@ -208,12 +202,12 @@
             sum_1 = 0
             sum_2 = 0
             sum_3 = 0
-            do i=1,nl0
-               if (l0_obs(i) < 0) cycle
+            do i=1,nl(0)
+               if (freq_target(0,i) < 0) cycle
                sum_1 = sum_1 + &
-                  (l0_freq(i) - avg_nu_model)*(l0_n_obs(i) - avg_radial_n)
+                  (model_freq(0,i) - avg_nu_model)*(l0_n_obs(i) - avg_radial_n)
                sum_2 = sum_2 + pow2(l0_n_obs(i) - avg_radial_n)
-               sum_3 = sum_3 + pow(l0_obs(i)/nu_max,b)
+               sum_3 = sum_3 + pow(freq_target(0,i)/nu_max,b)
             end do
             if (sum_2 == 0 .or. sum_3 == 0) return
             delta_nu_model = sum_1/sum_2
@@ -221,7 +215,7 @@
                (b-1)/(b*avg_nu_model/avg_nu_obs - delta_nu_model/delta_nu)
             if (correction_r <= 0) return
             correction_a = & ! K08 eqn 10
-               min(0d0, avg_nu_obs - correction_r*avg_nu_model)*nl0/sum_3
+               min(0d0, avg_nu_obs - correction_r*avg_nu_model)*nl(0)/sum_3
             a_div_r = correction_a/correction_r
             
          end if
@@ -348,7 +342,7 @@
          
          if (nl1 <= 0) return
       
-         call get_max_sequence(nl0, l0, l0_first, l0_seq_n)
+         call get_max_sequence(nl(0), l0, l0_first, l0_seq_n)
          l0_last = l0_first + l0_seq_n - 1
          if (dbg) write(*,4) 'l0_first l0_last l0_seq_n', l0_first, l0_last, l0_seq_n
 
@@ -409,15 +403,15 @@
             r10(i) = d10/(l0(i0+1) - l0(i0))
             if (.not. init) cycle
             ! set ratio sigmas
-            sd01 = sqrt(pow2(l0_obs_sigma(i0-1)) + pow2(4*l1_obs_sigma(i1-1)) + &
-               pow2(6*l0_obs_sigma(i0)) + pow2(4*l1_obs_sigma(i1)) + pow2(l0_obs_sigma(i0+1)))/8d0
+            sd01 = sqrt(pow2(freq_sigma(0,i0-1)) + pow2(4*freq_sigma(1,i1-1)) + &
+               pow2(6*freq_sigma(0,i0)) + pow2(4*freq_sigma(1,i1)) + pow2(freq_sigma(0,i0+1)))/8d0
             dnu = l1(i1) - l1(i1-1)
-            sdnu = sqrt(pow2(l1_obs_sigma(i1)) + pow2(l1_obs_sigma(i1-1)))
+            sdnu = sqrt(pow2(freq_sigma(1,i1)) + pow2(freq_sigma(1,i1-1)))
             sigmas_r01(i) = sqrt(pow2(sd01/dnu) + pow2(sdnu*d01/(dnu*dnu)))
-            sd10 = sqrt(pow2(l1_obs_sigma(i1-1)) + pow2(4*l0_obs_sigma(i0)) + &
-               pow2(6*l1_obs_sigma(i1)) + pow2(4*l0_obs_sigma(i0+1)) + pow2(l1_obs_sigma(i1+1)))/8d0
+            sd10 = sqrt(pow2(freq_sigma(1,i1-1)) + pow2(4*freq_sigma(0,i0)) + &
+               pow2(6*freq_sigma(1,i1)) + pow2(4*freq_sigma(0,i0+1)) + pow2(freq_sigma(1,i1+1)))/8d0
             dnu = l0(i0+1) - l0(i0)
-            sdnu = sqrt(pow2(l0_obs_sigma(i0+1)) + pow2(l0_obs_sigma(i0)))
+            sdnu = sqrt(pow2(freq_sigma(0,i0+1)) + pow2(freq_sigma(0,i0)))
             sigmas_r10(i) = sqrt(pow2(sd10/dnu) + pow2(sdnu*d10/(dnu*dnu)) )
             if (trace_chi2_seismo_ratios_info) then
                write(*,'(a30,i4,99f16.6)') 'r01 r10 sigmas_r01 sigmas_r10', &
@@ -483,8 +477,8 @@
             r02(i) = d02/dnu
             if (.not. init) cycle
             ! set ratio sigmas
-            sd02 = sqrt(pow2(l0_obs_sigma(i0)) + pow2(l2_obs_sigma(i2)))
-            sdnu = sqrt(pow2(l1_obs_sigma(i1)) + pow2(l1_obs_sigma(i1-1)))
+            sd02 = sqrt(pow2(freq_sigma(0,i0)) + pow2(freq_sigma(2,i2)))
+            sdnu = sqrt(pow2(freq_sigma(1,i1)) + pow2(freq_sigma(1,i1-1)))
             sigmas_r02(i) = sqrt(pow2(sd02/dnu) + pow2(sdnu*d02/(dnu*dnu)))
             if (trace_chi2_seismo_ratios_info) then
                write(*,'(a30,i4,99f16.6)') 'r02 sigmas_r02', &
@@ -534,7 +528,7 @@
          real(dp) :: alfa, beta
          ratio = 0
          i_lo = 0
-         do i=1,nl0
+         do i=1,nl(0)
             if (sigmas_r02(i) == 0) cycle
             i_lo = i
             exit
@@ -545,7 +539,7 @@
             return
          end if
          i_hi = i_lo
-         do i=i_lo+1,nl0
+         do i=i_lo+1,nl(0)
             if (sigmas_r02(i) == 0) cycle
             i_hi = i
             if (freq > model_freqs(i)) cycle
@@ -557,12 +551,6 @@
          end do
          ratio = model_ratios(i_hi)
       end function interpolate_ratio_r02
-      
-      
-      
-      
-      
-      
 
 
       subroutine get_max_sequence(nl, l_obs, max_seq_i, max_seq_n)
@@ -606,7 +594,7 @@
          integer, intent(out) :: ierr
          
          integer :: i, cnt, norders
-         integer, dimension(max_nl0) :: orders
+         integer, dimension(max_nl) :: orders
          real(dp) :: sum_1, sum_2, sum_3, range, nmax
          real(dp) :: x, y, isig2, sum_xy, sum_x, sum_y, sum_x2, sum_isig2, d
          
@@ -618,7 +606,7 @@
          
          !call test_get_frequency_ratios
          
-         if (nl0 <= 0) return
+         if (nl(0) <= 0) return
          
          sigmas_r02 = 0d0
          ratios_r02 = 0d0
@@ -626,25 +614,27 @@
          if (chi2_seismo_r_010_fraction > 0 .or. &
              chi2_seismo_r_02_fraction > 0) then
             call get_frequency_ratios( &
-               .true., nl0, l0_obs, nl1, l1_obs, &
+               .true., nl(0), freq_target(0,:), nl(1), freq_target(1,:), &
                ratios_n, ratios_l0_first, ratios_l1_first, &
                ratios_r01, ratios_r10)
          end if
          if (chi2_seismo_r_02_fraction > 0) then
-            call get_r02_frequency_ratios( &
-               .true., nl0, l0_obs, nl1, l1_obs, nl2, l2_obs, ratios_r02)
+            call get_r02_frequency_ratios(.true., &
+               nl(0), freq_target(0,:), &
+               nl(1), freq_target(1,:), &
+               nl(2), freq_target(2,:), ratios_r02)
          end if
          
-         if (delta_nu <= 0 .and. nl0 > 1 .and. l0_n_obs(1) > 0) then
+         if (delta_nu <= 0 .and. nl(0) > 1 .and. l0_n_obs(1) > 0) then
             sum_xy = 0
             sum_x = 0
             sum_y = 0
             sum_x2 = 0
             sum_isig2 = 0
-            do i=1,nl0
-               isig2 = 1d0/pow2(l0_obs_sigma(i))
+            do i=1,nl(0)
+               isig2 = 1d0/pow2(freq_sigma(0,i))
                x = dble(l0_n_obs(i))
-               y = l0_obs(i)
+               y = freq_target(0,i)
                sum_xy = sum_xy + x*y*isig2
                sum_x = sum_x + x*isig2
                sum_y = sum_y + y*isig2
@@ -665,16 +655,16 @@
                ierr = -1
                return
             end if
-            ! set l0_n_obs(i) to order of l0_obs(i)
-            range = l0_obs(nl0) - l0_obs(1)
+            ! set l0_n_obs(i) to order of freq_target(0,i)
+            range = freq_target(0,nl(0)) - freq_target(0,1)
             norders = int(range/delta_nu + 0.5d0) + 1
             nmax = (nu_max/delta_nu)*(delta_nu_sun/nu_max_sun)*22.6 - 1.6         
             l0_n_obs(1) = int(nmax - (norders-1)/2)
-            if (dbg) write(*,3) 'l0_n_obs(i)', 1, l0_n_obs(1), l0_obs(1)
+            if (dbg) write(*,3) 'l0_n_obs(i)', 1, l0_n_obs(1), freq_target(0,1)
             do i=2,norders
                l0_n_obs(i) = l0_n_obs(1) + &
-                  int((l0_obs(i) - l0_obs(1))/delta_nu + 0.5)
-               if (dbg) write(*,3) 'l0_n_obs(i)', i, l0_n_obs(i), l0_obs(i)
+                  int((freq_target(0,i) - freq_target(0,1))/delta_nu + 0.5)
+               if (dbg) write(*,3) 'l0_n_obs(i)', i, l0_n_obs(i), freq_target(0,i)
             end do
             if (dbg) then
                write(*,1) 'range', range
@@ -691,10 +681,10 @@
          cnt = 0
          sum_1 = 0
          sum_2 = 0
-         do i=1,nl0
-            if (l0_obs(i) < 0) cycle
+         do i=1,nl(0)
+            if (freq_target(0,i) < 0) cycle
             cnt = cnt + 1
-            sum_1 = sum_1 + l0_obs(i)
+            sum_1 = sum_1 + freq_target(0,i)
             sum_2 = sum_2 + l0_n_obs(i)
          end do
          avg_nu_obs = sum_1/cnt
@@ -718,20 +708,20 @@
          integer :: i
          real(dp) :: alfa, beta
          inertia = 0
-         if (nl0 == 0) return
-         if (freq <= l0_freq(1)) then
-            inertia = l0_inertia(1)
+         if (nl(0) == 0) return
+         if (freq <= model_freq(0,1)) then
+            inertia = model_inertia(0,1)
             return
          end if
-         if (freq >= l0_freq(nl0)) then
-            inertia = l0_inertia(nl0)
+         if (freq >= model_freq(0,nl(0))) then
+            inertia = model_inertia(0,nl(0))
             return
          end if
-         do i=2,nl0
-            if (freq < l0_freq(i)) then
-               alfa = (freq - l0_freq(i-1))/(l0_freq(i) - l0_freq(i-1))
+         do i=2,nl(0)
+            if (freq < model_freq(0,i)) then
+               alfa = (freq - model_freq(0,i-1))/(model_freq(0,i) - model_freq(0,i-1))
                beta = 1d0 - alfa
-               inertia = alfa*l0_inertia(i) + beta*l0_inertia(i-1)
+               inertia = alfa*model_inertia(0,i) + beta*model_inertia(0,i-1)
                return
             end if
          end do
@@ -779,10 +769,10 @@
                if (l1_obs(i) < 0) cycle
             end if
             l1_freq_corr(i) = l1_freq(i)
-            if (b > 0 .and. correction_factor > 0 .and. l1_freq_corr(i) > 0 .and. nl0 > 0) then
+            if (b > 0 .and. correction_factor > 0 .and. l1_freq_corr(i) > 0 .and. nl(0) > 0) then
                interp_l0_inertia = interpolate_l0_inertia(l1_freq(i))
                !write(*,2) 'l1_freq_corr: l0_inertia interp prev', i, interp_l0_inertia, &
-               !   (l0_inertia(min(nl0,i)) + l0_inertia(min(nl0,i+1)))/2
+               !   (l0_inertia(min(nl(0),i)) + l0_inertia(min(nl(0),i+1)))/2
                Qnl = l1_inertia(i)/interp_l0_inertia
                l1_freq_corr(i) = l1_freq_corr(i) + &
                   correction_factor*(a_div_r/Qnl)*pow(l1_freq(i)/nu_max,b)
@@ -802,183 +792,123 @@
 
       
       subroutine get_kjeldsen_freq_corr
+         integer :: l
+
          call get_kjeldsen_radial_freq_corr( &
             a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl0, l0_obs, l0_freq, l0_freq_corr, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl1, l1_obs, l1_freq, l1_freq_corr, l1_inertia, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl2, l2_obs, l2_freq, l2_freq_corr, l2_inertia, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl3, l3_obs, l3_freq, l3_freq_corr, l3_inertia, l0_inertia)
+            nl(0), freq_target(0,:), model_freq(0,:), model_freq_corr(0,:), model_inertia(0,:))
+
+         do l = 1, 3
+            call get_kjeldsen_nonradial_freq_corr( &
+               a_div_r, correction_b, nu_max, correction_factor, .true., &
+               nl(l), freq_target(l,:), model_freq(l,:), model_freq_corr(l,:), model_inertia(l,:), model_inertia(0,:))
+         end do
+
       end subroutine get_kjeldsen_freq_corr
 
       
       subroutine get_kjeldsen_freq_corr_alt_up
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl1, l1_obs, l1_freq_alt_up, l1_freq_corr_alt_up, l1_inertia_alt_up, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl2, l2_obs, l2_freq_alt_up, l2_freq_corr_alt_up, l2_inertia_alt_up, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl3, l3_obs, l3_freq_alt_up, l3_freq_corr_alt_up, l3_inertia_alt_up, l0_inertia)
+         integer :: l
+
+         do l = 1, 3
+            call get_kjeldsen_nonradial_freq_corr( &
+               a_div_r, correction_b, nu_max, correction_factor, .true., &
+               nl(l), freq_target(l,:), model_freq_alt_up(l,:), model_freq_corr_alt_up(l,:), &
+               model_inertia_alt_up(l,:), model_inertia(0,:))
+         end do
+
       end subroutine get_kjeldsen_freq_corr_alt_up
 
       
       subroutine get_kjeldsen_freq_corr_alt_down 
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl1, l1_obs, l1_freq_alt_down, l1_freq_corr_alt_down, l1_inertia_alt_down, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl2, l2_obs, l2_freq_alt_down, l2_freq_corr_alt_down, l2_inertia_alt_down, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, correction_factor, .true., &
-            nl3, l3_obs, l3_freq_alt_down, l3_freq_corr_alt_down, l3_inertia_alt_down, l0_inertia)
+         integer :: l
+
+         do l = 1, 3
+            call get_kjeldsen_nonradial_freq_corr( &
+               a_div_r, correction_b, nu_max, correction_factor, .true., &
+               nl(l), freq_target(l,:), model_freq_alt_down(l,:), model_freq_corr_alt_down(l,:), &
+               model_inertia_alt_down(l,:), model_inertia(0,:))
+         end do
+
       end subroutine get_kjeldsen_freq_corr_alt_down
       
       
-      subroutine get_no_freq_corr   ! use correction_factor = 0d0 for this
-         call get_kjeldsen_radial_freq_corr( &
-            a_div_r, correction_b, nu_max, 0d0, .true., &
-            nl0, l0_obs, l0_freq, l0_freq_corr, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, 0d0, .true., &
-            nl1, l1_obs, l1_freq, l1_freq_corr, l1_inertia, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, 0d0, .true., &
-            nl2, l2_obs, l2_freq, l2_freq_corr, l2_inertia, l0_inertia)
-         call get_kjeldsen_nonradial_freq_corr( &
-            a_div_r, correction_b, nu_max, 0d0, .true., &
-            nl3, l3_obs, l3_freq, l3_freq_corr, l3_inertia, l0_inertia)
+      subroutine get_no_freq_corr
+         integer :: i, l
+
+         do l = 0, 3
+            do i = 1, nl(l)
+               model_freq_corr(l,i) = model_freq(l,i)
+            end do
+         end do
       end subroutine get_no_freq_corr
       
       
       subroutine get_no_freq_corr_alt_up
-         integer :: i
-         do i=1,nl1
-            l1_freq_corr_alt_up(i) = l1_freq_alt_up(i)
-         end do
-         do i=1,nl2
-            l2_freq_corr_alt_up(i) = l2_freq_alt_up(i)
-         end do
-         do i=1,nl3
-            l3_freq_corr_alt_up(i) = l3_freq_alt_up(i)
+         integer :: i, l
+
+         do l = 0, 3
+            do i = 1, nl(l)
+               model_freq_corr_alt_up(l,i) = model_freq_alt_up(l,i)
+            end do
          end do
       end subroutine get_no_freq_corr_alt_up
       
       
       subroutine get_no_freq_corr_alt_down
-         integer :: i
-         do i=1,nl1
-            l1_freq_corr_alt_down(i) = l1_freq_alt_down(i)
-         end do
-         do i=1,nl2
-            l2_freq_corr_alt_down(i) = l2_freq_alt_down(i)
-         end do
-         do i=1,nl3
-            l3_freq_corr_alt_down(i) = l3_freq_alt_down(i)
+         integer :: i, l
+
+         do l = 0, 3
+            do i = 1, nl(l)
+               model_freq_corr_alt_down(l,i) = model_freq_alt_down(l,i)
+            end do
          end do
       end subroutine get_no_freq_corr_alt_down
 
 
-      subroutine get_cubic_radial_freq_corr(a3, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia)
-        integer, intent(in) :: nl0
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia
-        real(dp), intent(inout), dimension(:) :: l0_freq_corr
-        real(dp), intent(out) :: a3
-
-        real(dp) :: X, y, XtX, Xty
-        integer :: i
-
-        XtX = 0d0
-        Xty = 0d0
-
-        do i = 1, nl0
-           X = l0_freq(i)**3/l0_inertia(i)/l0_obs_sigma(i)
-           y = (l0_obs(i) - l0_freq(i))/l0_obs_sigma(i)
-
-           XtX = XtX + X*X
-           Xty = Xty + X*y
-        end do
-
-        a3 = Xty/XtX
-
-        l0_freq_corr(1:nl0) = l0_freq(1:nl0) + correction_factor*a3*l0_freq(1:nl0)**3/l0_inertia(1:nl0)
-
-      end subroutine get_cubic_radial_freq_corr
-
-
       subroutine get_cubic_all_freq_corr(a3, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, obs, sigma, freq, freq_corr, inertia)
            
-        integer, intent(in) :: nl0, nl1, nl2, nl3
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(inout), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
+        integer, intent(in) :: nl(0:)
+        real(dp), intent(in), dimension(0:,:) :: &
+             obs, sigma, freq, inertia
+        real(dp), intent(inout), dimension(0:,:) :: freq_corr
         real(dp), intent(out) :: a3
 
         logical :: radial_only
         real(dp) :: X, y, XtX, Xty
-        integer :: i
+        integer :: i, l
 
         XtX = 0d0
         Xty = 0d0
 
-        do i = 1, nl0
-           X = l0_freq(i)**3/l0_inertia(i)/l0_obs_sigma(i)
-           y = (l0_obs(i) - l0_freq(i))/l0_obs_sigma(i)
+        do i = 1, nl(0)
+           X = freq(0,i)**3/inertia(0,i)/sigma(0,i)
+           y = (obs(0,i) - freq(0,i))/sigma(0,i)
 
            XtX = XtX + X*X
            Xty = Xty + X*y
         end do
 
         if (.not. radial_only) then
-           do i = 1, nl1
-              X = l1_freq(i)**3/l1_inertia(i)/l1_obs_sigma(i)
-              y = (l1_obs(i) - l1_freq(i))/l1_obs_sigma(i)
+           do l = 1, 3
+              do i = 1, nl(l)
+                 X = freq(l,i)**3/inertia(l,i)/sigma(l,i)
+                 y = (obs(l,i) - freq(l,i))/sigma(l,i)
 
-              XtX = XtX + X*X
-              Xty = Xty + X*y
-           end do
-
-           do i = 1, nl2
-              X = l2_freq(i)**3/l2_inertia(i)/l2_obs_sigma(i)
-              y = (l2_obs(i) - l2_freq(i))/l2_obs_sigma(i)
-
-              XtX = XtX + X*X
-              Xty = Xty + X*y
-           end do
-
-           do i = 1, nl3
-              X = l3_freq(i)**3/l3_inertia(i)/l3_obs_sigma(i)
-              y = (l3_obs(i) - l3_freq(i))/l3_obs_sigma(i)
-
-              XtX = XtX + X*X
-              Xty = Xty + X*y
+                 XtX = XtX + X*X
+                 Xty = Xty + X*y
+              end do
            end do
         end if
 
         a3 = Xty/XtX
 
-        l0_freq_corr(1:nl0) = l0_freq(1:nl0) + correction_factor*a3*l0_freq(1:nl0)**3/l0_inertia(1:nl0)
-        l1_freq_corr(1:nl1) = l1_freq(1:nl1) + correction_factor*a3*l1_freq(1:nl1)**3/l1_inertia(1:nl1)
-        l2_freq_corr(1:nl2) = l2_freq(1:nl2) + correction_factor*a3*l2_freq(1:nl2)**3/l2_inertia(1:nl2)
-        l3_freq_corr(1:nl3) = l3_freq(1:nl3) + correction_factor*a3*l3_freq(1:nl3)**3/l3_inertia(1:nl3)
+        do l = 0, 3
+           do i = 1, nl(l)
+              freq_corr(l,i) = freq(l,i) + correction_factor*a3*freq(l,i)**3/inertia(l,i)
+           end do
+        end do
 
       end subroutine get_cubic_all_freq_corr
 
@@ -986,108 +916,45 @@
       subroutine get_cubic_freq_corr(radial_only)
          logical, intent(in) :: radial_only
          call get_cubic_all_freq_corr(a3, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, freq_target, freq_sigma, model_freq, model_freq_corr, model_inertia)
       end subroutine get_cubic_freq_corr
       
       
       subroutine get_cubic_freq_corr_alt_up(radial_only)
          logical, intent(in) :: radial_only
          call get_cubic_all_freq_corr(a3, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_up, l1_freq_corr_alt_up, l1_inertia_alt_up, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_up, l2_freq_corr_alt_up, l2_inertia_alt_up, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_up, l3_freq_corr_alt_up, l3_inertia_alt_up)
+            nl, freq_target, freq_sigma, model_freq_alt_up, model_freq_corr, model_inertia_alt_up)
       end subroutine get_cubic_freq_corr_alt_up
       
       
       subroutine get_cubic_freq_corr_alt_down(radial_only)
          logical, intent(in) :: radial_only
          call get_cubic_all_freq_corr(a3, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_down, l1_freq_corr_alt_down, l1_inertia_alt_down, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_down, l2_freq_corr_alt_down, l2_inertia_alt_down, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_down, l3_freq_corr_alt_down, l3_inertia_alt_down)
+            nl, freq_target, freq_sigma, model_freq_alt_down, model_freq_corr_alt_down, model_inertia_alt_down)
       end subroutine get_cubic_freq_corr_alt_down
-
-      
-      subroutine get_combined_radial_freq_corr(a3, a1, &
-           nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia)
-
-        integer, intent(in) :: nl0
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia
-        real(dp), intent(inout), dimension(:) :: l0_freq_corr
-        real(dp), intent(out) :: a3, a1
-
-        integer :: i
-        real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
-        real(dp) :: detXtX
-
-        XtX = 0d0
-        Xty = 0d0
-
-        do i = 1, nl0
-           X(1) = l0_freq(i)**(-1)/l0_inertia(i)/l0_obs_sigma(i)
-           X(2) = l0_freq(i)**3/l0_inertia(i)/l0_obs_sigma(i)
-           y = (l0_obs(i) - l0_freq(i))/l0_obs_sigma(i)
-
-           XtX(1,1) = XtX(1,1) + X(1)*X(1)
-           XtX(1,2) = XtX(1,2) + X(1)*X(2)
-           XtX(2,2) = XtX(2,2) + X(2)*X(2)
-           Xty(1) = Xty(1) + X(1)*y
-           Xty(2) = Xty(2) + X(2)*y
-        end do
-
-        XtX(2,1) = XtX(1,2)
-
-        XtXi(1,1) = XtX(2,2)
-        XtXi(2,2) = XtX(1,1)
-        XtXi(1,2) = -XtX(1,2)
-        XtXi(2,1) = -XtX(2,1)
-
-        detXtX = XtX(1,1)*XtX(2,2) - XtX(1,2)*XtX(2,1)
-        XtXi = XtXi/detXtX
-
-        a1 = XtXi(1,1)*Xty(1) + XtXi(1,2)*Xty(2)
-        a3 = XtXi(2,1)*Xty(1) + XtXi(2,2)*Xty(2)
-
-        l0_freq_corr(1:nl0) = l0_freq(1:nl0) + &
-             correction_factor*(a1*l0_freq(1:nl0)**(-1)+a3*l0_freq(1:nl0)**3)/l0_inertia(1:nl0)
-
-      end subroutine get_combined_radial_freq_corr
 
 
       subroutine get_combined_all_freq_corr(a3, a1, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, obs, sigma, freq, freq_corr, inertia)
 
-        integer, intent(in) :: nl0, nl1, nl2, nl3
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(inout), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
+        integer, intent(in) :: nl(0:)
+        real(dp), intent(in), dimension(0:,:) :: &
+             obs, sigma, freq, inertia
+        real(dp), intent(inout), dimension(0:,:) :: freq_corr
         real(dp), intent(out) :: a3, a1
         logical :: radial_only
         
-        integer :: i
+        integer :: i, l
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX
 
         XtX = 0d0
         Xty = 0d0
 
-        do i = 1, nl0
-           X(1) = l0_freq(i)**(-1)/l0_inertia(i)/l0_obs_sigma(i)
-           X(2) = l0_freq(i)**3/l0_inertia(i)/l0_obs_sigma(i)
-           y = (l0_obs(i) - l0_freq(i))/l0_obs_sigma(i)
+        do i = 1, nl(0)
+           X(1) = freq(0,i)**(-1)/inertia(0,i)/sigma(0,i)
+           X(2) = freq(0,i)**3/inertia(0,i)/sigma(0,i)
+           y = (obs(0,i) - freq(0,i))/sigma(0,i)
 
            XtX(1,1) = XtX(1,1) + X(1)*X(1)
            XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1097,40 +964,18 @@
         end do
 
         if (.not. radial_only) then
-           do i = 1, nl1
-              X(1) = l1_freq(i)**(-1)/l1_inertia(i)/l1_obs_sigma(i)
-              X(2) = l1_freq(i)**3/l1_inertia(i)/l1_obs_sigma(i)
-              y = (l1_obs(i) - l1_freq(i))/l1_obs_sigma(i)
+           do l = 1, 3
+              do i = 1, nl(l)
+                 X(1) = freq(l,i)**(-1)/inertia(l,i)/sigma(l,i)
+                 X(2) = freq(l,i)**3/inertia(l,i)/sigma(l,i)
+                 y = (obs(l,i) - freq(l,i))/sigma(l,i)
 
-              XtX(1,1) = XtX(1,1) + X(1)*X(1)
-              XtX(1,2) = XtX(1,2) + X(1)*X(2)
-              XtX(2,2) = XtX(2,2) + X(2)*X(2)
-              Xty(1) = Xty(1) + X(1)*y
-              Xty(2) = Xty(2) + X(2)*y
-           end do
-
-           do i = 1, nl2
-              X(1) = l2_freq(i)**(-1)/l2_inertia(i)/l2_obs_sigma(i)
-              X(2) = l2_freq(i)**3/l2_inertia(i)/l2_obs_sigma(i)
-              y = (l2_obs(i) - l2_freq(i))/l2_obs_sigma(i)
-
-              XtX(1,1) = XtX(1,1) + X(1)*X(1)
-              XtX(1,2) = XtX(1,2) + X(1)*X(2)
-              XtX(2,2) = XtX(2,2) + X(2)*X(2)
-              Xty(1) = Xty(1) + X(1)*y
-              Xty(2) = Xty(2) + X(2)*y
-           end do
-
-           do i = 1, nl3
-              X(1) = l3_freq(i)**(-1)/l3_inertia(i)/l3_obs_sigma(i)
-              X(2) = l3_freq(i)**3/l3_inertia(i)/l3_obs_sigma(i)
-              y = (l3_obs(i) - l3_freq(i))/l3_obs_sigma(i)
-
-              XtX(1,1) = XtX(1,1) + X(1)*X(1)
-              XtX(1,2) = XtX(1,2) + X(1)*X(2)
-              XtX(2,2) = XtX(2,2) + X(2)*X(2)
-              Xty(1) = Xty(1) + X(1)*y
-              Xty(2) = Xty(2) + X(2)*y
+                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
+                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
+                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
+                 Xty(1) = Xty(1) + X(1)*y
+                 Xty(2) = Xty(2) + X(2)*y
+              end do
            end do
         end if
 
@@ -1147,44 +992,34 @@
         a1 = XtXi(1,1)*Xty(1) + XtXi(1,2)*Xty(2)
         a3 = XtXi(2,1)*Xty(1) + XtXi(2,2)*Xty(2)
 
-        l0_freq_corr(1:nl0) = l0_freq(1:nl0) + &
-             correction_factor*(a1*l0_freq(1:nl0)**(-1)+a3*l0_freq(1:nl0)**3)/l0_inertia(1:nl0)
-        l1_freq_corr(1:nl1) = l1_freq(1:nl1) + &
-             correction_factor*(a1*l1_freq(1:nl1)**(-1)+a3*l1_freq(1:nl1)**3)/l1_inertia(1:nl1)
-        l2_freq_corr(1:nl2) = l2_freq(1:nl2) + &
-             correction_factor*(a1*l2_freq(1:nl2)**(-1)+a3*l2_freq(1:nl2)**3)/l2_inertia(1:nl2)
-        l3_freq_corr(1:nl3) = l3_freq(1:nl3) + &
-             correction_factor*(a1*l3_freq(1:nl3)**(-1)+a3*l3_freq(1:nl3)**3)/l3_inertia(1:nl3)
+        do l = 0, 3
+           do i = 1, nl(l)
+              freq_corr(l,i) = freq(l,i) + &
+                    correction_factor*(a1*freq(l,i)**(-1)+a3*freq(l,i)**3)/inertia(l,i)
+           end do
+        end do
+
       end subroutine get_combined_all_freq_corr
 
 
       subroutine get_combined_freq_corr(radial_only)
          logical, intent(in) :: radial_only
          call get_combined_all_freq_corr(a3, a1, radial_only, &
-              nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-              nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-              nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-              nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, freq_target, freq_sigma, model_freq, model_freq_corr, model_inertia)
       end subroutine get_combined_freq_corr
       
       
       subroutine get_combined_freq_corr_alt_up(radial_only)
          logical, intent(in) :: radial_only
          call get_combined_all_freq_corr(a3, a1, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_up, l1_freq_corr_alt_up, l1_inertia_alt_up, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_up, l2_freq_corr_alt_up, l2_inertia_alt_up, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_up, l3_freq_corr_alt_up, l3_inertia_alt_up)
+            nl, freq_target, freq_sigma, model_freq_alt_up, model_freq_corr_alt_up, model_inertia_alt_up)
       end subroutine get_combined_freq_corr_alt_up
       
       
       subroutine get_combined_freq_corr_alt_down(radial_only)
          logical, intent(in) :: radial_only
          call get_combined_all_freq_corr(a3, a1, radial_only, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_down, l1_freq_corr_alt_down, l1_inertia_alt_down, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_down, l2_freq_corr_alt_down, l2_inertia_alt_down, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_down, l3_freq_corr_alt_down, l3_inertia_alt_down)
+            nl, freq_target, freq_sigma, model_freq_alt_down, model_freq_corr_alt_down, model_inertia_alt_down)
       end subroutine get_combined_freq_corr_alt_down
       
       
@@ -1210,27 +1045,20 @@
       
       
       subroutine get_power_law_all_freq_corr(a, b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, obs, sigma, freq, freq_corr, inertia)
 
-        integer, intent(in) :: nl0, nl1, nl2, nl3
+        integer, intent(in) :: nl(0:)
         real(dp), intent(in) :: freq_ref
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(out), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
+        real(dp), intent(in), dimension(0:,:) :: &
+             obs, sigma, freq, inertia
+        real(dp), intent(out), dimension(0:,:) :: freq_corr
         real(dp), intent(out) :: a, b
 
         logical :: radial_only
-        integer :: i, iter
+        integer :: i, l, iter
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX, da, db
-        real(dp) :: Q1(nl1), Q2(nl2), Q3(nl3)
+        real(dp) :: Q(0:3,max_nl)
 
         ! Power_Law's solar values happen to be the same as MESA's but the
         ! commented expression is there in case it changes
@@ -1244,10 +1072,12 @@
            XtX = 0d0
            Xty = 0d0
 
-           do i = 1, nl0
-              X(1) = -dpower_law_da(l0_freq(i), freq_ref, a, b)/l0_obs_sigma(i)
-              X(2) = -dpower_law_db(l0_freq(i), freq_ref, a, b)/l0_obs_sigma(i)
-              y = (l0_obs(i) - l0_freq(i) - power_law(l0_freq(i), freq_ref, a, b))/l0_obs_sigma(i)
+           do i = 1, nl(0)
+              Q(0,i) = 1
+
+              X(1) = -dpower_law_da(freq(0,i), freq_ref, a, b)/sigma(0,i)
+              X(2) = -dpower_law_db(freq(0,i), freq_ref, a, b)/sigma(0,i)
+              y = (obs(0,i) - freq(0,i) - power_law(freq(0,i), freq_ref, a, b))/sigma(0,i)
               
               XtX(1,1) = XtX(1,1) + X(1)*X(1)
               XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1257,46 +1087,20 @@
            end do
 
            if (.not. radial_only) then
-              do i = 1, nl1
-                 Q1(i) = l1_inertia(i)/interpolate_l0_inertia(l1_freq(i))
+              do l = 1, 3
+                 do i = 1, nl(l)
+                    Q(l,i) = inertia(l,i)/interpolate_l0_inertia(freq(l,i))
 
-                 X(1) = -dpower_law_da(l1_freq(i), freq_ref, a, b)/l1_obs_sigma(i)
-                 X(2) = -dpower_law_db(l1_freq(i), freq_ref, a, b)/l1_obs_sigma(i)
-                 y = ((l1_obs(i) - l1_freq(i))*Q1(i) - power_law(l1_freq(i), freq_ref, a, b))/l1_obs_sigma(i)
+                    X(1) = -dpower_law_da(freq(l,i), freq_ref, a, b)/sigma(l,i)
+                    X(2) = -dpower_law_db(freq(l,i), freq_ref, a, b)/sigma(l,i)
+                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - power_law(freq(l,i), freq_ref, a, b))/sigma(l,i)
                  
-                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
-                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
-                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
-                 Xty(1) = Xty(1) + X(1)*y
-                 Xty(2) = Xty(2) + X(2)*y
-              end do
-
-              do i = 1, nl2
-                 Q2(i) = l2_inertia(i)/interpolate_l0_inertia(l2_freq(i))
-
-                 X(1) = -dpower_law_da(l2_freq(i), freq_ref, a, b)/l2_obs_sigma(i)
-                 X(2) = -dpower_law_db(l2_freq(i), freq_ref, a, b)/l2_obs_sigma(i)
-                 y = ((l2_obs(i) - l2_freq(i))*Q2(i) - power_law(l2_freq(i), freq_ref, a, b))/l2_obs_sigma(i)
-                 
-                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
-                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
-                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
-                 Xty(1) = Xty(1) + X(1)*y
-                 Xty(2) = Xty(2) + X(2)*y
-              end do
-
-              do i = 1, nl3
-                 Q3(i) = l3_inertia(i)/interpolate_l0_inertia(l3_freq(i))
-
-                 X(1) = -dpower_law_da(l3_freq(i), freq_ref, a, b)/l3_obs_sigma(i)
-                 X(2) = -dpower_law_db(l3_freq(i), freq_ref, a, b)/l3_obs_sigma(i)
-                 y = ((l3_obs(i) - l3_freq(i))*Q3(i) - power_law(l3_freq(i), freq_ref, a, b))/l3_obs_sigma(i)
-                 
-                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
-                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
-                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
-                 Xty(1) = Xty(1) + X(1)*y
-                 Xty(2) = Xty(2) + X(2)*y
+                    XtX(1,1) = XtX(1,1) + X(1)*X(1)
+                    XtX(1,2) = XtX(1,2) + X(1)*X(2)
+                    XtX(2,2) = XtX(2,2) + X(2)*X(2)
+                    Xty(1) = Xty(1) + X(1)*y
+                    Xty(2) = Xty(2) + X(2)*y
+                 end do
               end do
            end if
 
@@ -1323,23 +1127,16 @@
 
         ! if ((da /= da) .or. (db /= db)) then
         !    write(*,*) 'NaN in Power_Law surface correction', iter
-        !    write(*,*) l0_freq(1:nl0)
-        !    if (nl1 > 0) write(*,*) l1_freq(1:nl1)
-        !    if (nl2 > 0) write(*,*) l2_freq(1:nl2)
-        !    if (nl3 > 0) write(*,*) l3_freq(1:nl3)
+        !    write(*,*) freq(0,1:nl(0))
+        !    if (nl(1) > 0) write(*,*) freq(1,1:nl(1))
+        !    if (nl(2) > 0) write(*,*) freq(2,1:nl(2))
+        !    if (nl(3) > 0) write(*,*) freq(3,1:nl(3))
         ! end if
 
-        do i=1,nl0
-           l0_freq_corr(i) = l0_freq(i) + correction_factor*power_law(l0_freq(i), freq_ref, a, b)
-        end do
-        do i=1,nl1
-           l1_freq_corr(i) = l1_freq(i) + correction_factor*power_law(l1_freq(i), freq_ref, a, b)/Q1(i)
-        end do
-        do i=1,nl2
-           l2_freq_corr(i) = l2_freq(i) + correction_factor*power_law(l2_freq(i), freq_ref, a, b)/Q2(i)
-        end do
-        do i=1,nl3
-           l3_freq_corr(i) = l3_freq(i) + correction_factor*power_law(l3_freq(i), freq_ref, a, b)/Q3(i)
+        do l = 0, 3
+           do i = 1, nl(l)
+              freq_corr(l,i) = freq(l,i) + correction_factor*power_law(freq(l,i), freq_ref, a, b)/Q(l,i)
+           end do
         end do
 
       end subroutine get_power_law_all_freq_corr
@@ -1349,10 +1146,7 @@
          logical, intent(in) :: radial_only
          real(dp), intent(in) :: freq_ref
          call get_power_law_all_freq_corr(power_law_a, power_law_b, radial_only, freq_ref, &
-              nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-              nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-              nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-              nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, freq_target, freq_sigma, model_freq, model_freq_corr, model_inertia)
       end subroutine get_power_law_freq_corr
       
       
@@ -1360,10 +1154,7 @@
          logical, intent(in) :: radial_only
          real(dp), intent(in) :: freq_ref
          call get_power_law_all_freq_corr(power_law_a, power_law_b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_up, l1_freq_corr_alt_up, l1_inertia_alt_up, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_up, l2_freq_corr_alt_up, l2_inertia_alt_up, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_up, l3_freq_corr_alt_up, l3_inertia_alt_up)
+            nl, freq_target, freq_sigma, model_freq_alt_up, model_freq_corr_alt_up, model_inertia_alt_up)
       end subroutine get_power_law_freq_corr_alt_up
       
       
@@ -1371,10 +1162,7 @@
          logical, intent(in) :: radial_only
          real(dp), intent(in) :: freq_ref
          call get_power_law_all_freq_corr(power_law_a, power_law_b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_down, l1_freq_corr_alt_down, l1_inertia_alt_down, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_down, l2_freq_corr_alt_down, l2_inertia_alt_down, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_down, l3_freq_corr_alt_down, l3_inertia_alt_down)
+            nl, freq_target, freq_sigma, model_freq_alt_down, model_freq_corr_alt_down, model_inertia_alt_down)
       end subroutine get_power_law_freq_corr_alt_down
       
       
@@ -1400,27 +1188,20 @@
 
 
       subroutine get_sonoi_all_freq_corr(a, b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, obs, sigma, freq, freq_corr, inertia)
 
-        integer, intent(in) :: nl0, nl1, nl2, nl3
+        integer, intent(in) :: nl(0:)
         real(dp), intent(in) :: freq_ref
-        real(dp), intent(in), dimension(:) :: &
-             l0_obs, l0_obs_sigma, l0_freq, l0_inertia, &
-             l1_obs, l1_obs_sigma, l1_freq, l1_inertia, &
-             l2_obs, l2_obs_sigma, l2_freq, l2_inertia, &
-             l3_obs, l3_obs_sigma, l3_freq, l3_inertia
-        real(dp), intent(out), dimension(:) :: &
-             l0_freq_corr, l1_freq_corr, l2_freq_corr, l3_freq_corr
+        real(dp), intent(in), dimension(0:,:) :: &
+             obs, sigma, freq, inertia
+        real(dp), intent(out), dimension(0:,:) :: freq_corr
         real(dp), intent(out) :: a, b
 
         logical :: radial_only
-        integer :: i, iter
+        integer :: i, l, iter
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX, da, db
-        real(dp) :: Q1(nl1), Q2(nl2), Q3(nl3)
+        real(dp) :: Q(0:3,max_nl)
 
         ! Sonoi's solar values happen to be the same as MESA's but the
         ! commented expression is there in case it changes
@@ -1433,10 +1214,12 @@
            XtX = 0d0
            Xty = 0d0
 
-           do i = 1, nl0
-              X(1) = -dsonoi_da(l0_freq(i), freq_ref, a, b)/l0_obs_sigma(i)
-              X(2) = -dsonoi_db(l0_freq(i), freq_ref, a, b)/l0_obs_sigma(i)
-              y = (l0_obs(i) - l0_freq(i) - sonoi(l0_freq(i), freq_ref, a, b))/l0_obs_sigma(i)
+           do i = 1, nl(0)
+              Q(0,i) = 1
+
+              X(1) = -dsonoi_da(freq(0,i), freq_ref, a, b)/sigma(0,i)
+              X(2) = -dsonoi_db(freq(0,i), freq_ref, a, b)/sigma(0,i)
+              y = (obs(0,i) - freq(0,i) - sonoi(freq(0,i), freq_ref, a, b))/sigma(0,i)
               
               XtX(1,1) = XtX(1,1) + X(1)*X(1)
               XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1446,46 +1229,20 @@
            end do
 
            if (.not. radial_only) then
-              do i = 1, nl1
-                 Q1(i) = l1_inertia(i)/interpolate_l0_inertia(l1_freq(i))
+              do l = 1, 3
+                 do i = 1, nl(l)
+                    Q(l,i) = inertia(l,i)/interpolate_l0_inertia(freq(l,i))
 
-                 X(1) = -dsonoi_da(l1_freq(i), freq_ref, a, b)/l1_obs_sigma(i)
-                 X(2) = -dsonoi_db(l1_freq(i), freq_ref, a, b)/l1_obs_sigma(i)
-                 y = ((l1_obs(i) - l1_freq(i))*Q1(i) - sonoi(l1_freq(i), freq_ref, a, b))/l1_obs_sigma(i)
+                    X(1) = -dsonoi_da(freq(l,i), freq_ref, a, b)/sigma(l,i)
+                    X(2) = -dsonoi_db(freq(l,i), freq_ref, a, b)/sigma(l,i)
+                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - sonoi(freq(l,i), freq_ref, a, b))/sigma(l,i)
                  
-                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
-                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
-                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
-                 Xty(1) = Xty(1) + X(1)*y
-                 Xty(2) = Xty(2) + X(2)*y
-              end do
-
-              do i = 1, nl2
-                 Q2(i) = l2_inertia(i)/interpolate_l0_inertia(l2_freq(i))
-
-                 X(1) = -dsonoi_da(l2_freq(i), freq_ref, a, b)/l2_obs_sigma(i)
-                 X(2) = -dsonoi_db(l2_freq(i), freq_ref, a, b)/l2_obs_sigma(i)
-                 y = ((l2_obs(i) - l2_freq(i))*Q2(i) - sonoi(l2_freq(i), freq_ref, a, b))/l2_obs_sigma(i)
-                 
-                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
-                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
-                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
-                 Xty(1) = Xty(1) + X(1)*y
-                 Xty(2) = Xty(2) + X(2)*y
-              end do
-
-              do i = 1, nl3
-                 Q3(i) = l3_inertia(i)/interpolate_l0_inertia(l3_freq(i))
-
-                 X(1) = -dsonoi_da(l3_freq(i), freq_ref, a, b)/l3_obs_sigma(i)
-                 X(2) = -dsonoi_db(l3_freq(i), freq_ref, a, b)/l3_obs_sigma(i)
-                 y = ((l3_obs(i) - l3_freq(i))*Q3(i) - sonoi(l3_freq(i), freq_ref, a, b))/l3_obs_sigma(i)
-                 
-                 XtX(1,1) = XtX(1,1) + X(1)*X(1)
-                 XtX(1,2) = XtX(1,2) + X(1)*X(2)
-                 XtX(2,2) = XtX(2,2) + X(2)*X(2)
-                 Xty(1) = Xty(1) + X(1)*y
-                 Xty(2) = Xty(2) + X(2)*y
+                    XtX(1,1) = XtX(1,1) + X(1)*X(1)
+                    XtX(1,2) = XtX(1,2) + X(1)*X(2)
+                    XtX(2,2) = XtX(2,2) + X(2)*X(2)
+                    Xty(1) = Xty(1) + X(1)*y
+                    Xty(2) = Xty(2) + X(2)*y
+                 end do
               end do
            end if
 
@@ -1512,25 +1269,18 @@
 
         ! if ((da /= da) .or. (db /= db)) then
         !    write(*,*) 'NaN in Sonoi surface correction', iter
-        !    write(*,*) l0_freq(1:nl0)
-        !    if (nl1 > 0) write(*,*) l1_freq(1:nl1)
-        !    if (nl2 > 0) write(*,*) l2_freq(1:nl2)
-        !    if (nl3 > 0) write(*,*) l3_freq(1:nl3)
+        !    write(*,*) freq(0,1:nl(0))
+        !    if (nl(1) > 0) write(*,*) freq(1:nl(1))
+        !    if (nl(2) > 0) write(*,*) freq(1:nl(2))
+        !    if (nl(3) > 0) write(*,*) freq(1:nl(3))
         ! end if
 
         if (b < 0d0) a = 0d0
 
-        do i=1,nl0
-           l0_freq_corr(i) = l0_freq(i) + correction_factor*sonoi(l0_freq(i), freq_ref, a, b)
-        end do
-        do i=1,nl1
-           l1_freq_corr(i) = l1_freq(i) + correction_factor*sonoi(l1_freq(i), freq_ref, a, b)/Q1(i)
-        end do
-        do i=1,nl2
-           l2_freq_corr(i) = l2_freq(i) + correction_factor*sonoi(l2_freq(i), freq_ref, a, b)/Q2(i)
-        end do
-        do i=1,nl3
-           l3_freq_corr(i) = l3_freq(i) + correction_factor*sonoi(l3_freq(i), freq_ref, a, b)/Q3(i)
+        do l = 0, 3
+           do i = 1, nl(l)
+              freq_corr(l,i) = freq(l,i) + correction_factor*sonoi(freq(l,i), freq_ref, a, b)/Q(l,i)
+           end do
         end do
 
       end subroutine get_sonoi_all_freq_corr
@@ -1540,10 +1290,7 @@
          logical, intent(in) :: radial_only
          real(dp), intent(in) :: freq_ref
          call get_sonoi_all_freq_corr(sonoi_a, sonoi_b, radial_only, freq_ref, &
-              nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-              nl1, l1_obs, l1_obs_sigma, l1_freq, l1_freq_corr, l1_inertia, &
-              nl2, l2_obs, l2_obs_sigma, l2_freq, l2_freq_corr, l2_inertia, &
-              nl3, l3_obs, l3_obs_sigma, l3_freq, l3_freq_corr, l3_inertia)
+            nl, freq_target, freq_sigma, model_freq, model_freq_corr, model_inertia)
       end subroutine get_sonoi_freq_corr
       
       
@@ -1551,10 +1298,7 @@
          logical, intent(in) :: radial_only
          real(dp), intent(in) :: freq_ref
          call get_sonoi_all_freq_corr(sonoi_a, sonoi_b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_up, l1_freq_corr_alt_up, l1_inertia_alt_up, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_up, l2_freq_corr_alt_up, l2_inertia_alt_up, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_up, l3_freq_corr_alt_up, l3_inertia_alt_up)
+            nl, freq_target, freq_sigma, model_freq_alt_up, model_freq_corr_alt_up, model_inertia_alt_up)
       end subroutine get_sonoi_freq_corr_alt_up
       
       
@@ -1562,10 +1306,7 @@
          logical, intent(in) :: radial_only
          real(dp), intent(in) :: freq_ref
          call get_sonoi_all_freq_corr(sonoi_a, sonoi_b, radial_only, freq_ref, &
-            nl0, l0_obs, l0_obs_sigma, l0_freq, l0_freq_corr, l0_inertia, &
-            nl1, l1_obs, l1_obs_sigma, l1_freq_alt_down, l1_freq_corr_alt_down, l1_inertia_alt_down, &
-            nl2, l2_obs, l2_obs_sigma, l2_freq_alt_down, l2_freq_corr_alt_down, l2_inertia_alt_down, &
-            nl3, l3_obs, l3_obs_sigma, l3_freq_alt_down, l3_freq_corr_alt_down, l3_inertia_alt_down)
+            nl, freq_target, freq_sigma, model_freq_alt_down, model_freq_corr_alt_down, model_inertia_alt_down)
       end subroutine get_sonoi_freq_corr_alt_down
       
       
@@ -1650,7 +1391,7 @@
          logical, intent(in) :: trace_okay
          integer, intent(out) :: ierr
 
-         integer :: i, n, chi2N1, chi2N2
+         integer :: i, l, n, chi2N1, chi2N2
          real(dp) :: chi2term, Teff, logL, chi2sum1, chi2sum2, frac, &
             model_r01, model_r10, model_r02
          
@@ -1670,59 +1411,35 @@
                write(*,'(4a6,99a20)') &
                   'model', 'i', 'l', 'n', 'chi2term', 'freq', 'corr', &
                   'obs', 'sigma', 'log E'
-            do i = 1, nl0
-               if (l0_obs(i) < 0) cycle
+
+            do i = 1, nl(0)
+               if (freq_target(0,i) < 0) cycle
                chi2term = &
-                  pow2((l0_freq_corr(i) - l0_obs(i))/l0_obs_sigma(i))
+                  pow2((model_freq_corr(0,i) - freq_target(0,i))/freq_sigma(0,i))
                if (trace_okay .and. trace_chi2_seismo_frequencies_info) &
                   write(*,'(4i6,99(1pe20.10))') &
-                     s% model_number, i, 0, l0_order(i), chi2term, l0_freq(i), &
-                     l0_freq_corr(i), l0_obs(i), l0_obs_sigma(i), safe_log10(l0_inertia(i))
+                     s% model_number, i, 0, model_order(0,i), chi2term, model_freq(0,i), &
+                     model_freq_corr(0,i), freq_target(0,i), freq_sigma(0,i), safe_log10(model_inertia(0,i))
                chi2sum1 = chi2sum1 + chi2term
                chi2N1 = chi2N1 + 1
             end do
-         
-            if (max_el >= 1) then
-               do i = 1, nl1
-                  if (l1_obs(i) < 0) cycle
-                  chi2term = &
-                     pow2((l1_freq_corr(i) - l1_obs(i))/l1_obs_sigma(i))       
-                  if (trace_okay .and. trace_chi2_seismo_frequencies_info) &
-                     write(*,'(4i6,99(1pe20.10))') &
-                        s% model_number, i, 1, l1_order(i), chi2term, l1_freq(i), &
-                        l1_freq_corr(i), l1_obs(i), l1_obs_sigma(i), safe_log10(l1_inertia(i))
-                  chi2sum1 = chi2sum1 + chi2term
-                  chi2N1 = chi2N1 + 1
-               end do
-            end if
-         
-            if (max_el >= 2) then
-               do i = 1, nl2
-                  if (l2_obs(i) < 0) cycle
-                  chi2term = &
-                     pow2((l2_freq_corr(i) - l2_obs(i))/l2_obs_sigma(i))            
-                  if (trace_okay .and. trace_chi2_seismo_frequencies_info) &
-                     write(*,'(4i6,99(1pe20.10))') &
-                        s% model_number, i, 2, l2_order(i), chi2term, l2_freq(i), &
-                        l2_freq_corr(i), l2_obs(i), l2_obs_sigma(i), safe_log10(l2_inertia(i))
-                  chi2sum1 = chi2sum1 + chi2term
-                  chi2N1 = chi2N1 + 1
-               end do
-            end if
-         
-            if (max_el >= 3) then
-               do i = 1, nl3
-                  if (l3_obs(i) < 0) cycle
-                  chi2term = &
-                     pow2((l3_freq_corr(i) - l3_obs(i))/l3_obs_sigma(i))            
-                  if (trace_okay .and. trace_chi2_seismo_frequencies_info) &
-                     write(*,'(4i6,99(1pe20.10))') &
-                        s% model_number, i, 3, l3_order(i), chi2term, l3_freq(i), &
-                        l3_freq_corr(i), l3_obs(i), l3_obs_sigma(i), safe_log10(l3_inertia(i))
-                  chi2sum1 = chi2sum1 + chi2term
-                  chi2N1 = chi2N1 + 1
-               end do
-            end if
+
+            do l = 1, 3
+               if (max_el >= l) then
+                  do i = 1, nl(l)
+                     if (freq_target(l,i) < 0) cycle
+                     chi2term = &
+                           pow2((model_freq_corr(l,i) - freq_target(l,i))/freq_sigma(l,i))
+                     if (trace_okay .and. trace_chi2_seismo_frequencies_info) &
+                           write(*,'(4i6,99(1pe20.10))') &
+                           s% model_number, i, l, model_order(l,i), chi2term, model_freq(l,i), &
+                           model_freq_corr(l,i), freq_target(l,i), freq_sigma(l,i), safe_log10(model_inertia(l,i))
+                     chi2sum1 = chi2sum1 + chi2term
+                     chi2N1 = chi2N1 + 1
+                  end do
+               end if
+            end do
+
             num_chi2_seismo_terms = chi2N1
             if (normalize_chi2_seismo_frequencies) then
                chi2_frequencies = chi2sum1/max(1,chi2N1)
@@ -1743,13 +1460,13 @@
             chi2sum1 = 0
             do i=1,ratios_n
                model_r01 = interpolate_ratio_r010( &
-                  l0_obs(i + ratios_l0_first), ratios_l0_first, l0_freq, model_ratios_r01)
+                  freq_target(0,i + ratios_l0_first), ratios_l0_first, model_freq(0,:), model_ratios_r01)
                if (trace_okay .and. trace_chi2_seismo_ratios_info) &
                   write(*,2) 'r01 obs, model, interp, model - interp', &
                      i, ratios_r01(i), model_ratios_r01(i + ratios_l0_first), model_r01, &
                      model_ratios_r01(i + ratios_l0_first) - model_r01
                model_r10 = interpolate_ratio_r010( &
-                  l1_obs(i + ratios_l1_first), ratios_l1_first, l1_freq, model_ratios_r10)
+                  freq_target(1,i + ratios_l1_first), ratios_l1_first, model_freq(1,:), model_ratios_r10)
                if (trace_okay .and. trace_chi2_seismo_ratios_info) &
                   write(*,2) 'r10 obs, model, interp, model - interp', &
                      i, ratios_r10(i), model_ratios_r10(i + ratios_l1_first), model_r10, &
@@ -1777,14 +1494,14 @@
             
             chi2sum1 = 0
             n = 0
-            do i=2,nl0
+            do i=2,nl(0)
                if (sigmas_r02(i) == 0d0) cycle
                model_r02 = interpolate_ratio_r02( &
-                  l0_obs(i + ratios_l0_first), l0_freq, model_ratios_r02)
+                  freq_target(0,i + ratios_l0_first), model_freq(0,:), model_ratios_r02)
                if (trace_okay .and. trace_chi2_seismo_ratios_info) &
                   write(*,2) 'r02 obs, model, interp, model - interp', &
                      i, ratios_r02(i), model_ratios_r02(i), model_r02, &
-                     model_ratios_r02(i) - model_r10
+                     model_ratios_r02(i) - model_r02
                chi2sum1 = chi2sum1 + &
                   pow2((model_r02 - ratios_r02(i))/sigmas_r02(i))
                n = n+1

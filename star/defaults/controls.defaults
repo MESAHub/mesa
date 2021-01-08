@@ -1674,14 +1674,14 @@
     power_he_burn_upper_limit = 1d99
 
 
-      ! power_c_burn_upper_limit
+      ! power_z_burn_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when total power from reactions burning carbon (in Lsun units) is > this
+      ! stop when total power from reactions burning metals (in Lsun units) is > this
 
       ! ::
 
-    power_c_burn_upper_limit = 1d99
+    power_z_burn_upper_limit = 1d99
 
 
       ! power_nuc_burn_lower_limit
@@ -1714,14 +1714,14 @@
     power_he_burn_lower_limit = -1d99
 
 
-      ! power_c_burn_lower_limit
+      ! power_z_burn_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when total power from reactions burning carbon (in Lsun units) is < this.
+      ! stop when total power from reactions burning metals (in Lsun units) is < this.
 
       ! ::
 
-    power_c_burn_lower_limit = -1d99
+    power_z_burn_lower_limit = -1d99
 
 
       ! max_abs_rel_run_E_err
@@ -1954,6 +1954,27 @@
       ! ::
 
     Lnuc_div_L_lower_limit = -1d99
+
+
+      ! gamma1_limit
+      ! ~~~~~~~~~~~~~~~~
+
+      ! stop if min gamma1 < this limit in a cell with ``q <= gamma1_limit_max_q``
+
+      ! ::
+
+    gamma1_limit = -1
+
+
+      ! gamma1_limit_max_q
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop if gamma1 < this limit at any location with ``q <= gamma1_limit_max_q``
+      ! values near unity skip the outer envelope
+
+      ! ::
+
+    gamma1_limit_max_q = 0.95d0
 
 
       ! Pgas_div_P_limit
@@ -2344,8 +2365,7 @@
 
       ! Inefficient convection => large gradT excess and steep T gradient to enhance radiative transport.
       ! Reduce gradT excess by making gradT closer to adiabatic gradient.
-      ! If true, code is allowed to adjust gradT to boost efficiency of energy transport
-      ! See ``gradT_excess_f1``, ``gradT_excess_f2``, and ``gradT_excess_age_fraction`` below.
+      ! If okay_to_reduce_gradT_excess is true, code is allowed to adjust gradT to boost efficiency of energy transport.
 
       ! This is the treatment of convection, referred to as MLT++
       ! in Section 7.2 of Paxton et al. (2013), that reduces the
@@ -2367,70 +2387,6 @@
 
     gradT_excess_f1 = 1d-4
     gradT_excess_f2 = 1d-3
-
-
-      ! gradT_excess_age_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! These are for calculation of efficiency boosted gradT.
-      ! Fraction of old to mix with new to get next.
-
-      ! ::
-
-    gradT_excess_age_fraction = 0.9d0
-
-
-      ! gradT_excess_max_change
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! These are for calculation of efficiency boosted gradT.
-      ! Maximum change allowed in one timestep for ``gradT_excess_alpha``.
-      ! Ignored if negative.
-
-      ! ::
-
-    gradT_excess_max_change = -1d0
-
-
-      ! gradT_excess_lambda1
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! gradT_excess_beta1
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! In some situations you might want to force alfa = 1.
-      ! You can do that by setting ``gradT_excess_lambda1 < 0``.
-      ! The following are for the normal calculation of ``gradT_excess_alfa``
-
-      ! ::
-
-    gradT_excess_lambda1 = 1.0d0
-    gradT_excess_beta1 = 0.35d0
-
-
-      ! gradT_excess_lambda2
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! gradT_excess_beta2
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! The following are for the normal calculation of ``gradT_excess_alfa``.
-
-      ! ::
-
-    gradT_excess_lambda2 = 0.5d0
-    gradT_excess_beta2 = 0.25d0
-
-
-      ! gradT_excess_dlambda
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! gradT_excess_dbeta
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! The following are for the normal calculation of ``gradT_excess_alfa``.
-
-      ! ::
-
-    gradT_excess_dlambda = 0.1d0
-    gradT_excess_dbeta = 0.1d0
 
 
       ! gradT_excess_max_center_h1
@@ -2607,7 +2563,7 @@
 
       ! ::
 
-    min_overshoot_q = 1d-3
+    min_overshoot_q = 0d0
 
       ! NOTE: In addition to giving these 'f' parameters non-zero values, you should also
       ! check the settings for ``mass_for_overshoot_full_on`` and ``mass_for_overshoot_full_off``.
@@ -3856,34 +3812,10 @@
     smooth_D_SSI = 0
     smooth_D_ES = 0
     smooth_D_GSF = 0
-    smooth_D_ST = 0
-    smooth_nu_ST = 0
-
-      ! time smoothing.
-      ! Set to 0 to turn off time smoothing.
-
-      ! ::
-
-    angsmt_D_DSI = 0.0d0
-    angsmt_D_SH = 0.0d0
-    angsmt_D_SSI = 0.0d0
-    angsmt_D_ES = 0.0d0
-    angsmt_D_GSF = 0.0d0
-    angsmt_D_ST = 0.2d0
-    angsmt_nu_ST = 0.2d0
-    angsml = 1d-3
-
-
-      ! am_time_average
-      ! ~~~~~~~~~~~~~~~
-
-      ! If true, then ``D = (D_new + D_old)/2``,
-      ! where ``D_old`` is D from previous step
-      ! and ``D_new`` is D as calculated for current as if no time smoothing.
-
-      ! ::
-
-    am_time_average = .false.
+    smooth_D_ST = 3
+    smooth_nu_ST = 3
+    smooth_D_omega = 3
+    smooth_am_nu_rot = 3
 
 
       ! simple_i_rot_flag
@@ -6696,13 +6628,8 @@
       ! ~~~~~~~~~~~~~~
 
       ! + empty string means no screening
-      ! + ``'classic'`` :
-      ! DeWitt, Graboske, Cooper, "Screening Factors for Nuclear Reactions.
-      !    I. General Theory", ApJ, 181:439-456, 1973.
-      ! Graboske, DeWitt, Grossman, Cooper, "Screening Factors for Nuclear Reactions.
-      !    II. Intermediate Screening and Astrophysical Applications", ApJ, 181:457-474, 1973.
       ! + ``' extended'`` :
-      ! extends the Graboske method using results from Alastuey and Jancovici (1978),
+      ! extends the Graboske (1973) method using results from Alastuey and Jancovici (1978),
       ! along with plasma parameters from Itoh et al (1979) for strong screening.
       ! + ``'salpeter'`` :
       ! weak screening only.  following Salpeter (1954),
@@ -9144,7 +9071,7 @@
     gold2_iter_for_resid_tol2 = 5
     gold2_tol_residual_norm2 = 1d-10
     gold2_tol_max_residual2 = 1d-8
-    gold2_iter_for_resid_tol3 = 12
+    gold2_iter_for_resid_tol3 = 10
     gold2_tol_residual_norm3 = 1d-8
     gold2_tol_max_residual3 = 1d-5
 
@@ -9548,7 +9475,7 @@
 
       ! ::
 
-    relax_hard_limits_after_retry = .true.
+    relax_hard_limits_after_retry = .false.
 
       ! limits based on iterations required by various solvers
 

@@ -27,6 +27,7 @@
 
       use star_private_def
       use const_def
+      use utils_lib, only: is_bad
 
       implicit none
 
@@ -83,7 +84,7 @@
 
          net_lwork = net_work_size(s% net_handle, ierr)
          
-         check_op_split_burn = s% op_split_burn ! .and. s% doing_struct_burn_mix
+         check_op_split_burn = s% op_split_burn
          
          if (nzlo == nzhi) then
             call do1_net(s, nzlo, s% species, &
@@ -153,7 +154,9 @@
 
          ierr = 0
 
-         if (check_op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+         if (check_op_split_burn .and. &
+             s% doing_struct_burn_mix .and. &
+             s% T_start(k) >= s% op_split_burn_min_T) then ! leave this to do_burn
             return
          end if
 
@@ -232,7 +235,7 @@
                std_reaction_Qs, reaction_neuQs, reuse_given_rates, .false., &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
-               screening_mode, s% theta_e(k), s% eps_nuc_categories(:,k), &
+               screening_mode, s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
          else
             call net_get( &
@@ -244,8 +247,15 @@
                std_reaction_Qs, reaction_neuQs, reuse_given_rates, .false., &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
-               screening_mode, s% theta_e(k), s% eps_nuc_categories(:,k), &
+               screening_mode, s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), net_lwork, net_work, ierr)
+         end if
+
+         if (is_bad(s% eps_nuc(k))) then
+            ierr = -1
+            if (s% report_ierr) write(*,*) 'net_get returned bad eps_nuc', ierr
+            if (s% stop_for_bad_nums) stop 'do1_net'
+            return
          end if
 
          if (-k == s% nz) then
@@ -547,7 +557,6 @@
          write(*,1) 'z2bar =', s% z2bar(k)
          write(*,1) 'ye =', s% ye(k)
          write(*,*) 'screening_mode = ' // trim(s% screening_mode)
-         write(*,1) 'theta_e =', s% theta_e(k)
          write(*,*)
 
       end subroutine show_stuff

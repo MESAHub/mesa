@@ -7,8 +7,20 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-do_one inlist_create_input_header create_input.mod
-do_one inlist_start_relax_composition_j_entropy_header relaxed.mod
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_create_input.mod create_input.mod
+else
+   do_one inlist_create_input_header create_input.mod
+   cp create_input.mod standard_create_input.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_relaxed.mod relaxed.mod
+else
+   do_one inlist_start_relax_composition_j_entropy_header relaxed.mod
+   cp relaxed.mod standard_relaxed.mod
+fi
+
 do_one inlist_relax_composition_j_entropy_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

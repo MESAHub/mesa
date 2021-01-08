@@ -53,7 +53,7 @@
 
 ! timestep tolerances
 
-      varcontrol_target = 1d-4
+      varcontrol_target = 1d-3
 
       delta_lgRho_cntr_limit = 0.05
       delta_lgRho_cntr_hard_limit = 0.1
@@ -82,8 +82,8 @@
       Blocker_scaling_factor = 0.05d0
 
 ! output
-      photo_interval = 500
-      profile_interval = 100
+      photo_interval = 50
+      profile_interval = 50
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10

@@ -48,7 +48,6 @@
 
       logical :: have_done_starlib_init = .false.
 
-
       contains
 
 
@@ -212,44 +211,9 @@
          end if
 
          nullify(s% dq)
-         nullify(s% dq_old)
-
-         nullify(s% conv_vel)
-         nullify(s% conv_vel_old)
-
-         nullify(s% nu_ST)
-         nullify(s% nu_ST_old)
-
-         nullify(s% D_DSI)
-         nullify(s% D_DSI_old)
-
-         nullify(s% D_SH)
-         nullify(s% D_SH_old)
-
-         nullify(s% D_SSI)
-         nullify(s% D_SSI_old)
-
-         nullify(s% D_ES)
-         nullify(s% D_ES_old)
-
-         nullify(s% D_GSF)
-         nullify(s% D_GSF_old)
-
-         nullify(s% D_mix_non_rotation)
-         nullify(s% D_mix_old)
-
-         nullify(s% dPdr_dRhodr_info)
-         nullify(s% dPdr_dRhodr_info_old)
-
-         nullify(s% q)
-         nullify(s% q_old)
-
          nullify(s% xa)
-         nullify(s% xa_old)
-
          nullify(s% xh)
-         nullify(s% xh_old)
-
+         
          nullify( &
             s% op_mono_umesh1, s% op_mono_semesh1, s% op_mono_ff1, &
             s% op_mono_rs1)
@@ -284,19 +248,6 @@
          nullify(s% prev_mesh_xa)
          nullify(s% prev_mesh_j_rot)
          nullify(s% prev_mesh_omega)
-         nullify(s% prev_mesh_nu_ST)
-         nullify(s% prev_mesh_D_ST)
-         nullify(s% prev_mesh_D_DSI)
-         nullify(s% prev_mesh_D_SH)
-         nullify(s% prev_mesh_D_SSI)
-         nullify(s% prev_mesh_D_ES)
-         nullify(s% prev_mesh_D_GSF)
-         nullify(s% prev_mesh_D_mix)
-         nullify(s% prev_mesh_dPdr_dRhodr_info)
-         nullify(s% prev_mesh_D_omega)
-         nullify(s% prev_mesh_D_smooth)
-         nullify(s% prev_mesh_am_nu_rot)
-         nullify(s% prev_mesh_conv_vel)
          nullify(s% prev_mesh_dq)
 
          nullify(s% other_star_info)
@@ -355,7 +306,6 @@
          s% time_nonburn_net = 0
          s% time_mlt = 0
          s% time_set_hydro_vars = 0
-
          s% time_total = 0
 
          s% timing_num_get_eos_calls = 0
@@ -376,11 +326,7 @@
 
          s% phase_of_evolution = phase_starting
          s% recent_log_header = -1000
-         s% post_he_age = -1d0
          s% profile_age = -1d0
-         s% prev_cntr_rho = 1d99
-         s% helium_ignition = .false.
-         s% carbon_ignition = .false.
 
          s% tau_base = 2d0/3d0
          s% tau_factor = 1
@@ -392,21 +338,16 @@
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''
-         s% revised_net_name_old = ''
 
          s% using_revised_max_yr_dt = .false.
          s% revised_max_yr_dt = 0
-         s% revised_max_yr_dt_old = 0
-
+ 
          s% astero_using_revised_max_yr_dt = .false.
          s% astero_revised_max_yr_dt = 0
-         s% astero_revised_max_yr_dt_old = 0
 
          s% cumulative_energy_error = 0
-         s% cumulative_energy_error_old = 0
 
          s% cumulative_extra_heating = 0
-         s% cumulative_extra_heating_old = 0
 
          s% have_initial_energy_integrals = .false.
 
@@ -422,6 +363,12 @@
 
          s% boost_mlt_alfa = 0
 
+         s% power_nuc_burn = -1
+         s% power_h_burn = -1
+         s% power_he_burn = -1
+         s% power_z_burn = -1
+         s% power_photo = -1
+
          s% k_const_mass = 1
          s% k_below_just_added = 1
          s% k_below_const_q = 1
@@ -430,9 +377,6 @@
          s% why_Tlim = Tlim_struc
          s% dt_why_count(:) = 0
          s% dt_why_retry_count(:) = 0
-         
-         s% min_kap_floor = 1d0
-         s% min_kap_floor_old = 1d0
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0
@@ -532,7 +476,6 @@
          s% model_number = 0
          s% time = 0
          s% dt = 0
-         s% dt_old = 0
          
          s% total_num_solver_iterations = 0
          s% total_num_solver_relax_iterations = 0
@@ -571,8 +514,6 @@
          s% species = 0
          s% num_reactions = 0
 
-         s% nz_old = 0
-
          s% v_flag = .false.
          s% u_flag = .false.
          s% rotation_flag = .false.
@@ -580,7 +521,6 @@
          s% conv_vel_flag = .false.
          s% w_div_wc_flag = .false.
          s% D_omega_flag = .false.
-         s% D_smooth_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% Eturb_flag = .false.
@@ -593,7 +533,6 @@
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
-         s% use_previous_conv_vel_from_file = .false.
          s% mstar_dot = 0
 
          s% surf_lnT = 0
@@ -733,104 +672,51 @@
          s% generations = 0
 
          s% nz = 0
-         s% nz_old = 0
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
          s% nvar = 0
 
-         s% prev_Lmax = 0
          s% species = 0
          s% num_reactions = 0
 
          s% model_number = 0
-         s% model_number_old = 0
-
          s% mstar = 0
-         s% mstar_old = 0
-
          s% xmstar = 0
-         s% xmstar_old = 0
-
          s% M_center = 0
-         s% M_center_old = 0
-
          s% v_center = 0
-         s% v_center_old = 0
-
          s% R_center = 0
-         s% R_center_old = 0
-
          s% L_center = 0
-         s% L_center_old = 0
-
          s% time = 0
-         s% time_old = 0
-
          s% total_radiation = 0
-         s% total_radiation_old = 0
-
          s% total_angular_momentum = 0
-         s% total_angular_momentum_old = 0
-
          s% prev_create_atm_R0_div_R = 0
 
          s% dt = 0
-         s% dt_old = 0
 
-         s% have_previous_rotation_info = .false.
-         s% have_previous_RTI_info = .false.
          s% have_previous_conv_vel = .false.
-         s% have_previous_D_mix = .false.
 
          s% net_name = ''
 
          s% mstar_dot = 0
-         s% mstar_dot_old = 0
-
          s% v_surf = 0
-         s% v_surf_old = 0
-
          s% L_nuc_burn_total = 0
-         s% L_nuc_burn_total_old = 0
-
          s% L_by_category = 0
-         s% L_by_category_old = 0
-
-         s% gradT_excess_alpha = 0
-         s% gradT_excess_alpha_old = 0
-
          s% dt_limit_ratio = 0
-         s% dt_limit_ratio_old = 0
-
          s% L_phot = 0
-         s% L_phot_old = 0
-
          s% T_surf = 0
          s% P_surf = 0
+         
+         s% gradT_excess_alpha = 0
 
          s% h1_czb_mass = 0
-         s% h1_czb_mass_old = 0
-         s% h1_czb_mass_prev = 0
 
          s% he_core_mass = 0
-         s% he_core_mass_old = 0
-
          s% c_core_mass = 0
-         s% c_core_mass_old = 0
-
          s% Teff = -1 ! need to calculate it
-         s% Teff_old = -1
-
          s% center_eps_nuc = 0
-         s% center_eps_nuc_old = 0
-
          s% Lrad_div_Ledd_avg_surf = 0
-         s% Lrad_div_Ledd_avg_surf_old = 0
-
-         s% w_div_w_crit_avg_surf = 0
-         s% w_div_w_crit_avg_surf_old = 0
-         
+         s% w_div_w_crit_avg_surf = 0         
          s% total_internal_energy = 0d0
          s% total_gravitational_energy = 0d0
          s% total_radial_kinetic_energy = 0d0
@@ -839,14 +725,8 @@
          s% total_energy = 0d0
 
          s% n_conv_regions = 0
-         s% n_conv_regions_old = 0
-
          s% cz_bot_mass(:) = 0
-         s% cz_bot_mass_old(:) = 0
-
          s% cz_top_mass(:) = 0
-         s% cz_top_mass_old(:) = 0
-
          s% dt_next = 0
 
          s% model_profile_filename = ''
@@ -858,31 +738,10 @@
 
          s% most_recent_model_data_filename = ''
 
-         s% helium_ignition = .false.
-         s% carbon_ignition = .false.
-
          s% recent_log_header = -1000
          s% phase_of_evolution = 0
 
-         s% prev_Tcntr1 = 0
-         s% prev_age1 = 0
-         s% prev_Tcntr2 = 0
-         s% prev_age2 = 0
-         s% prev_Tsurf = 0
-
-         s% prv_log_luminosity = 0
-         s% prv_log_surface_temp = 0
-         s% prv_log_center_temp = 0
-         s% prv_log_center_density = 0
-
          s% profile_age = 0
-         s% post_he_age = 0
-         s% prev_luminosity = 0
-         s% ignition_center_xhe = 0
-         s% he_luminosity_limit = 0
-
-         s% prev_cntr_rho = 0
-         s% next_cntr_rho = 0
 
          s% num_solver_iterations = 0
          s% num_skipped_setvars = 0
@@ -1089,7 +948,6 @@
             s% u_flag = .false.
             s% rotation_flag = .false.
             s% D_omega_flag = .false.
-            s% D_smooth_flag = .false.
             s% am_nu_rot_flag = .false.
             s% star_mass = s% initial_mass
             s% mstar = s% initial_mass*Msun
@@ -1420,10 +1278,7 @@
          ! avoid making photos
          photo_interval = s% photo_interval
          s% photo_interval = 10000000
-         s% have_previous_rotation_info = .false.
-         s% have_previous_RTI_info = .false.
          s% have_previous_conv_vel = .false.
-         s% have_previous_D_mix = .false.
          s% have_j_rot = .false.
          ! WARNING, might need to add stuff here to actually get the ZAMS model to load.
          ! otherwise can get an error of the form "error in reading model data  j+species > nvec"
@@ -1507,18 +1362,8 @@
                end do
                s% xh(s% i_ln_cvpv0, k0) = log(s% conv_vel(k0)+s% conv_vel_v0)
             end do
-            do k0=1, s% nz_old
-               call interp_value(q, num_pts, conv_vel_interp, s% q_old(k0), conv_vel_temp, ierr)
-               !avoid extending regions with non-zero conv vel
-               do k=2, num_pts-1
-                  if(s% q_old(k0) < q(k) .and. s% q_old(k0) > q(k+1) &
-                     .and. (conv_vel_interp(4*k-3)<1d-5 .or. conv_vel_interp(4*(k+1)-3)<1d-5)) then
-                     conv_vel_temp = 0d0
-                     exit
-                  end if
-               end do
-               s% xh_old(s% i_ln_cvpv0, k0) = log(conv_vel_temp+s% conv_vel_v0)
-            end do
+            write(*,*) 'need to rewrite some things here in do_relax_to_star_cut'
+            stop 'do_relax_to_star_cut'
             deallocate(conv_vel_interp, interp_work)
          end if
 

@@ -14,6 +14,76 @@ Backwards-incompatible changes
 Module-level changes
 --------------------
 
+astero
+~~~~~~
+
+Many of the one-dimensional arrays of mode data (e.g. ``l0_obs``) have
+been consolidated into two-dimensional arrays (e.g. ``freq_target``)
+in which the first index is the angular degree ``l``.  The following
+controls in ``&astero_search_controls`` have changed:
+
++-----------------------+-----------------------+
++ Old                   + New                   +
++=======================+=======================+
++                       +                       +
++ ``nl0``               + ``nl(0)``             +
++                       +                       +
++ ``nl1``               + ``nl(1)``             +
++                       +                       +
++ ``nl2``               + ``nl(2)``             +
++                       +                       +
++ ``nl3``               + ``nl(3)``             +
++                       +                       +
++-----------------------+-----------------------+
++                       +                       +
++ ``l0_obs(:)``         + ``freq_target(0,:)``  +
++                       +                       +
++ ``l1_obs(:)``         + ``freq_target(1,:)``  +
++                       +                       +
++ ``l2_obs(:)``         + ``freq_target(2,:)``  +
++                       +                       +
++ ``l3_obs(:)``         + ``freq_target(3,:)``  +
++                       +                       +
++-----------------------+-----------------------+
++                       +                       +
++ ``l0_obs_sigma(:)``   + ``freq_sigma(0,:)``   +
++                       +                       +
++ ``l1_obs_sigma(:)``   + ``freq_sigma(1,:)``   +
++                       +                       +
++ ``l2_obs_sigma(:)``   + ``freq_sigma(2,:)``   +
++                       +                       +
++ ``l3_obs_sigma(:)``   + ``freq_sigma(3,:)``   +
++                       +                       +
++-----------------------+-----------------------+
++                       +                       +
++ ``iscan_factor_l0``   + ``iscan_factor(0)``   +
++                       +                       +
++ ``iscan_factor_l1``   + ``iscan_factor(1)``   +
++                       +                       +
++ ``iscan_factor_l2``   + ``iscan_factor(2)``   +
++                       +                       +
++ ``iscan_factor_l3``   + ``iscan_factor(3)``   +
++                       +                       +
++-----------------------+-----------------------+
+
+The call signatures to the surface correction subroutines have also
+changed, generally from
+
+::
+
+    subroutine get_some_freq_corr(...,
+          nl0, l0_obs, l0_sigma, l0_freq, l0_freq_corr, l0_inertia,
+          nl1, l1_obs, l1_sigma, l1_freq, l1_freq_corr, l1_inertia,
+          nl2, l2_obs, l2_sigma, l2_freq, l2_freq_corr, l2_inertia,
+          nl3, l3_obs, l3_sigma, l3_freq, l3_freq_corr, l3_inertia)
+
+to
+
+::
+
+    subroutine get_some_freq_corr(...,
+          nl, obs, sigma, freq, freq_corr, inertia)
+
 kap
 ~~~
 
@@ -80,6 +150,13 @@ neu
 The call signature of other_neu has changed. You no longer need to pass in z2bar
 
 
+net
+~~~
+
+The screening mode ``classic_screening`` has been removed. Anyeone using other_net_get needs
+to remove ``theta_e_for_graboske_et_al`` from its argument list.
+
+
 Other changes
 -------------
 
@@ -88,6 +165,9 @@ Other changes
   to the final result from the opacity module are now included in
   star_info arrays and profile columns with the names
   ``kap_frac_lowT``, ``kap_frac_highT``, ``kap_frac_Compton``.
+
+* ``other_mesh_delta_coeff_factor`` no longer takes ``eps_h``,
+  ``eps_he`` or ``eps_z`` as arguments.
 
 Changes in r15140
 =================

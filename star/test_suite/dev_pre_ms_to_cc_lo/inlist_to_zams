@@ -50,6 +50,9 @@
       Lnuc_div_L_zams_limit = 0.4 ! for very high mass
       
       
+! wind
+      ! delay wind until reach zams
+      Dutch_scaling_factor = 0
 
 ! atmosphere
 
@@ -61,7 +64,6 @@
       thermohaline_coeff = 2
 
 ! mixing
-!** for high mass - no overshoot
 
 ! timesteps
       delta_XHe_cntr_hard_limit = 0.02d0

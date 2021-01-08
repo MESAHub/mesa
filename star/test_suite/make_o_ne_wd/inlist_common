@@ -46,7 +46,6 @@
       thermohaline_coeff = 2
 
       okay_to_reduce_gradT_excess = .true.
-      gradT_excess_lambda1 = -1 ! turn on full all the time
 
 ! mixing
        overshoot_scheme(1) = 'exponential'

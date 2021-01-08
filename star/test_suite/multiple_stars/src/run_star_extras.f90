@@ -239,18 +239,15 @@
                if (failed('read_pgstar_inlist')) return
                result = s% extras_finish_step(id)
                if (result /= keep_going) exit evolve_loop
-               result = star_finish_step(id, .false.,ierr)
+               result = star_finish_step(id, ierr)
                if (failed('star_finish_step')) return
                if (result /= keep_going) exit evolve_loop
                if (s% job% pgstar_flag .and. (i == which_for_pgstar) .or. (which_for_pgstar < 0)) &
-                  call update_pgstar_plots( &
-                     s, .false., ierr)
+                  call update_pgstar_plots(s, .false., ierr)
                if (failed('update_pgstar_plots')) return
             else if (result == terminate) then
                if (result_reason == result_reason_normal) then
-                  result = star_finish_step( &
-                     id, s% job% save_photo_when_terminate, &
-                     ierr)
+                  result = star_finish_step(id, ierr)
                   if (failed('star_finish_step')) return
                   call do_saves( &
                      id, ierr)

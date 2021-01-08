@@ -49,9 +49,8 @@
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
-            Eturb_flag, u_flag, prev_flag, rotation_flag, &
-            D_omega_flag, am_nu_rot_flag, write_conv_vel, &
-            rsp_flag, D_smooth_flag, no_L
+            Eturb_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
+            rsp_flag, no_L
          integer :: time_vals(8)
 
          1 format(a32, 2x, 1pd26.16)
@@ -73,9 +72,6 @@
          RTI_flag = s% RTI_flag
          conv_vel_flag = s% conv_vel_flag
          rotation_flag = s% rotation_flag
-         D_smooth_flag = s% D_smooth_flag
-         D_omega_flag = s% D_omega_flag .and. rotation_flag
-         am_nu_rot_flag = s% am_nu_rot_flag .and. rotation_flag
          rsp_flag = s% rsp_flag
          write_conv_vel = s% have_mixing_info .and. s% have_previous_conv_vel
          species = s% species
@@ -94,10 +90,7 @@
          if (u_flag) file_type = file_type + 2**bit_for_u
          if (rotation_flag) file_type = file_type + 2**bit_for_rotation
          if (rotation_flag) file_type = file_type + 2**bit_for_j_rot
-         if (D_omega_flag) file_type = file_type + 2**bit_for_D_omega
-         if (am_nu_rot_flag) file_type = file_type + 2**bit_for_am_nu_rot
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
-         if (D_smooth_flag) file_type = file_type + 2**bit_for_D_smooth
          if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
          
          no_L = (s% rsp_flag .or. s% Eturb_flag)
@@ -123,8 +116,6 @@
             write(iounit,'(a)',advance='no') ', with saved convection velocities (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
             write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
-         if (BTEST(file_type, bit_for_D_smooth)) &
-            write(iounit,'(a)',advance='no') ', with smoothed diffusion coefficients (D_smooth)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', with luminosity (L), with turbulent energy (Et) and radiative flux (Fr) for RSP'
          if (BTEST(file_type, bit_for_Eturb)) &
@@ -185,6 +176,12 @@
          if (s% use_fixed_L_for_BB_outer_BC) then
             write(iounit, 1) 'fixed_L_for_BB_outer_BC', s% fixed_L_for_BB_outer_BC
          end if
+         write(iounit, 1) 'Teff', s% Teff
+         write(iounit, 1) 'power_nuc_burn', s% power_nuc_burn
+         write(iounit, 1) 'power_h_burn', s% power_h_burn
+         write(iounit, 1) 'power_he_burn', s% power_he_burn
+         write(iounit, 1) 'power_z_burn', s% power_z_burn
+         write(iounit, 1) 'power_photo', s% power_photo
          write(iounit, 1) 'total_energy', s% total_energy
          write(iounit, 1) 'cumulative_energy_error', s% cumulative_energy_error
          if (abs(s% total_energy) > 1d0) &
@@ -223,20 +220,11 @@
                call write1(s% omega(k),ierr); if (ierr /= 0) exit
                call write1(s% j_rot(k),ierr); if (ierr /= 0) exit
             end if
-            if (D_omega_flag) then
-               call write1(s% D_omega(k),ierr); if (ierr /= 0) exit
-            end if
-            if (am_nu_rot_flag) then
-               call write1(s% am_nu_rot(k),ierr); if (ierr /= 0) exit
-            end if
             if (u_flag) then
                call write1(s% u(k),ierr); if (ierr /= 0) exit
             end if
             if (RTI_flag) then
                call write1(s% alpha_RTI(k),ierr); if (ierr /= 0) exit
-            end if
-            if (D_smooth_flag) then
-               call write1(s% D_smooth(k),ierr); if (ierr /= 0) exit
             end if
             if (write_conv_vel .or. conv_vel_flag) then
                call write1(s% conv_vel(k),ierr); if (ierr /= 0) exit
@@ -299,12 +287,9 @@
             if (v_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'v'
             if (rotation_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'omega'
             if (rotation_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'j_rot'
-            if (D_omega_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'D_omega'
-            if (am_nu_rot_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'am_nu_rot'
             if (u_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'u'
             if (RTI_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'alpha_RTI'
-            if (D_smooth_flag) write(iounit, fmt='(a26, 1x)', advance='no') 'D_smooth'
             if (write_conv_vel .or. conv_vel_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'conv_vel'
             do i=1, species
