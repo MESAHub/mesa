@@ -7224,11 +7224,9 @@
       ! use_d_eos_dxa
       ! ~~~~~~~~~~~~~
 
-      ! for debugging
-
       ! ::
 
-    use_d_eos_dxa = .false.
+    use_d_eos_dxa = .true.
 
 ! opacity controls
 ! ================
