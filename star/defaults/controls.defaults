@@ -6224,29 +6224,6 @@
     okay_to_remesh = .true.
 
 
-      ! restore_mesh_on_retry
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, then after a retry the remeshing is undone for the step,
-      ! and the following try is performed with the same mesh used in the
-      ! previous step.
-
-      ! ::
-
-    restore_mesh_on_retry = .true.   ! TESTING
-
-
-      ! num_steps_to_hold_mesh_after_retry
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! When restore_mesh_on_retry=true, then after a retry remeshing is not done
-      ! for this number of steps.
-
-      ! ::
-
-    num_steps_to_hold_mesh_after_retry = 0
-
-
       ! remesh_dt_limit
       ! ~~~~~~~~~~~~~~~
 

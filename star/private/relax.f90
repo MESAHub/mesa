@@ -4023,7 +4023,7 @@
             tol_residual_norm3, tol_max_residual3, &
             max_timestep_factor, mass_change, varcontrol_target, dt_next, &
             time_old, maxT_for_gold_tolerances
-         logical :: do_history_file, write_profiles_flag, first_try, use_other_wind, &
+         logical :: do_history_file, write_profiles_flag, use_other_wind, &
             use_gold_tolerances, use_gold2_tolerances
 
          procedure(integer), pointer :: tmp_ptr1 => null(), tmp_ptr3 => null()
@@ -4112,15 +4112,13 @@
 
          evolve_loop: do ! evolve one step per loop
 
-            first_try = .true.
-
             step_loop: do ! may need to repeat this loop for retry
             
-               result = do_evolve_step_part1(id, first_try)
+               result = do_evolve_step_part1(id)
                if (result == keep_going) &
                   result = adjust_model(s, id, lipar, ipar, lrpar, rpar)
                if (result == keep_going) &
-                  result = do_evolve_step_part2(id, first_try)
+                  result = do_evolve_step_part2(id)
 
                if (result == keep_going) result = check_model(s, id, lipar, ipar, lrpar, rpar)
                if (result == keep_going) result = pick_next_timestep(id)
@@ -4134,7 +4132,6 @@
                if (result == redo) result = prepare_to_redo(id)
                if (result == retry) result = prepare_to_retry(id)
                if (result == terminate) exit evolve_loop
-               first_try = .false.
 
             end do step_loop
 

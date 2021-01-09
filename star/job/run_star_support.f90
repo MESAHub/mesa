@@ -74,7 +74,7 @@
          end interface
          
          integer :: result, model_number, source, nsteps, j, ci, nz
-         logical :: continue_evolve_loop, first_try
+         logical :: continue_evolve_loop
          type (star_info), pointer :: s
          character (len=strlen) :: inlist_fname
             
@@ -116,8 +116,6 @@
 
             result = s% extras_start_step(id)  
             if (result /= keep_going) exit evolve_loop             
-
-            first_try = .true.
          
             step_loop: do ! may need to repeat this loop
             
@@ -127,7 +125,7 @@
                   exit
                end if
             
-               result = star_evolve_step(id, first_try)
+               result = star_evolve_step(id)
                if (result == keep_going) result = star_check_model(id)
                if (result == keep_going) result = s% extras_check_model(id)
                if (result == keep_going) result = star_pick_next_timestep(id)            
@@ -151,7 +149,6 @@
                   continue_evolve_loop = .false.
                   exit step_loop
                end if
-               first_try = .false.
                
             end do step_loop
             
