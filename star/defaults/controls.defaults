@@ -6233,7 +6233,7 @@
 
       ! ::
 
-    restore_mesh_on_retry = .false.
+    restore_mesh_on_retry = .true.
 
 
       ! num_steps_to_hold_mesh_after_retry
