@@ -178,7 +178,7 @@ Profile_Panels1_title = ''
 
 Profile_Panels1_txt_scale = 0.7
 
-Profile_Panels1_num_panelsProfile_Panels1_num_panels = 4
+Profile_Panels1_num_panels = 4
 
 Profile_Panels1_yaxis_name(1) = 'logRho'
 Profile_Panels1_other_yaxis_name(1) = 'logT'

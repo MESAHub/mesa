@@ -2031,6 +2031,7 @@
          s% need_to_setvars = .true.
          if (s% doing_timing) call start_time(s, time0, total)        
          if (s% use_split_merge_amr) then
+            write(*,*) 'call remesh_split_merge'
             do_mesh = remesh_split_merge(s) ! sets s% need_to_setvars = .true. if changes anything
             if (do_mesh /= keep_going .and. s% report_ierr) &
                write(*, *) 'do_mesh: remesh_split_merge failed'
