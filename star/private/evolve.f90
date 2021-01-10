@@ -2026,7 +2026,8 @@
          include 'formats'
          do_mesh = keep_going
          if (.not. s% okay_to_remesh) return
-         if (s% model_number_for_last_retry > s% model_number - s% num_steps_to_hold_mesh_after_retry) return
+         if (s% restore_mesh_on_retry &
+            .and. s% model_number_for_last_retry > s% model_number - s% num_steps_to_hold_mesh_after_retry) return
          s% need_to_setvars = .true.
          if (s% doing_timing) call start_time(s, time0, total)        
          if (s% use_split_merge_amr) then
@@ -2312,7 +2313,7 @@
          
          s% need_to_setvars = .true.
 
-         if (.not. s% RSP_flag) then
+         if (s% restore_mesh_on_retry .and. .not. s% RSP_flag) then
             if (.not. s% prev_mesh_species_or_nvar_hydro_changed) then
                do k=1, s% prev_mesh_nz
                   s% xh_old(:,k) = s% prev_mesh_xh(:,k)
