@@ -6229,11 +6229,11 @@
 
       ! If true, then after a retry the remeshing is undone for the step,
       ! and the following try is performed with the same mesh used in the
-      ! previous step.
+      ! previous step.   This can help with the retry by reducing the changes.
 
       ! ::
 
-    restore_mesh_on_retry = .false.
+    restore_mesh_on_retry = .true.
 
 
       ! num_steps_to_hold_mesh_after_retry
