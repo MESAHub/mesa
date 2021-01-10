@@ -40,9 +40,10 @@
       contains
 
 
-      integer function do_evolve_step_part1(id)
+      integer function do_evolve_step_part1(id, first_try)
          use alloc, only: fill_star_info_arrays_with_NaNs, &
             do_fill_arrays_with_NaNs, star_info_old_arrays
+         logical, intent(in) :: first_try
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr
@@ -60,14 +61,14 @@
             stop 'do_evolve_step_part1'
          end if
          
-         if (s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+         if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
             call star_info_old_arrays(s, do_fill_arrays_with_NaNs, ierr)
             if (ierr /= 0) return
          end if         
-         do_evolve_step_part1 = do_step_part1(id)
+         do_evolve_step_part1 = do_step_part1(id, first_try)
          s% total_step_attempts = s% total_step_attempts + 1
          if (s% doing_relax) &
             s% total_relax_step_attempts = s% total_relax_step_attempts + 1
@@ -395,7 +396,7 @@
       end function do_evolve_step_part1
       
 
-      integer function do_step_part1(id)
+      integer function do_step_part1(id, first_try)
          use hydro_vars, only: set_vars
          use winds, only: set_mdot
          use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
@@ -408,6 +409,7 @@
             set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
+         logical, intent(in) :: first_try
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
@@ -467,7 +469,13 @@
          end if
          
          if (s% doing_first_model_of_run) then
-            if (s% do_history_file) call write_terminal_header(s)
+            if (s% do_history_file) then
+               if (first_try) then
+                  call write_terminal_header(s)
+               else
+                  write(*,1) '1st model retry log10(dt/yr)', log10(s% dt/secyer)
+               end if
+            end if
             call system_clock(time0,clock_rate)
             s% starting_system_clock_time = time0
             s% system_clock_rate = clock_rate
@@ -476,12 +484,12 @@
             s% initial_R_center = s% R_center
             s% initial_v_center = s% v_center
             s% timestep_hold = -111
-            s% model_number_old = s% model_number
+            if (first_try) s% model_number_old = s% model_number
          end if
 
          call system_clock(s% system_clock_at_start_of_step, clock_rate)
 
-         !if (first_try) then ! i.e., not a redo or retry
+         if (first_try) then ! i.e., not a redo or retry
             s% have_new_generation = .false.
             do_step_part1 = prepare_for_new_step(s)
             if (do_step_part1 /= keep_going) then
@@ -494,7 +502,7 @@
             if (s% steps_before_use_Fraley_time_centering >= 0 .and. &
                 s% model_number > s% steps_before_use_Fraley_time_centering) &
                s% using_Fraley_time_centering = .true.
-         !end if
+         end if
          
          call reset_epsnuc_vectors(s)
          
@@ -568,7 +576,8 @@
       end function do_step_part1
 
 
-      integer function do_evolve_step_part2(id)
+      integer function do_evolve_step_part2(id, first_try)
+         logical, intent(in) :: first_try
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr
@@ -576,7 +585,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         do_evolve_step_part2 = do_step_part2(id)
+         do_evolve_step_part2 = do_step_part2(id, first_try)
          if (do_evolve_step_part2 == redo) then
             s% total_step_redos = s% total_step_redos + 1
             if (s% doing_relax) &
@@ -594,7 +603,7 @@
       end function do_evolve_step_part2
 
 
-      integer function do_step_part2(id)
+      integer function do_step_part2(id, first_try)
          use num_def
          use chem_def
          use report, only: do_report, set_power_info
@@ -617,6 +626,7 @@
             set_phase_of_evolution
          use profile
 
+         logical, intent(in) :: first_try
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
@@ -761,8 +771,8 @@
                if (failed('set_cz_bdy_mass')) return
             end if
             
-            skip_global_corr_coeff_limit = &
-                s% model_number_for_last_retry /= s% model_number
+            skip_global_corr_coeff_limit = (first_try .or. &
+                s% model_number_for_last_retry /= s% model_number) ! last alternative is for redo's
 
             s% doing_struct_burn_mix = .true.
             do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
@@ -2016,6 +2026,7 @@
          include 'formats'
          do_mesh = keep_going
          if (.not. s% okay_to_remesh) return
+         if (s% model_number_for_last_retry > s% model_number - s% num_steps_to_hold_mesh_after_retry) return
          s% need_to_setvars = .true.
          if (s% doing_timing) call start_time(s, time0, total)        
          if (s% use_split_merge_amr) then

@@ -545,6 +545,8 @@
          real(dp) :: max_rel_delta_IE_for_mesh_total_energy_balance
          integer :: max_allowed_nz
 
+         integer :: num_steps_to_hold_mesh_after_retry
+
          real(dp) :: mesh_max_allowed_ratio, remesh_max_allowed_logT
 
          real(dp) :: max_delta_x_for_merge

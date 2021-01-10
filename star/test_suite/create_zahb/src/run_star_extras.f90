@@ -174,6 +174,7 @@
          integer, intent(out) :: ierr
          
          integer :: i, j, result
+         logical :: first_try
          character (len=256) :: history_name, profiles_index_name, &
             profile_data_prefix, zahb_inlist, last_model
 
@@ -256,14 +257,16 @@
             if (failed('star_set_profile_columns',ierr)) return
 
             evolve_loop: do ! evolve one step per loop
+               first_try = .true.
                step_loop: do ! repeat for retry
-                  result = star_evolve_step(id)
+                  result = star_evolve_step(id, first_try)
                   if (result == keep_going) result = s% extras_check_model(id)
                   if (result == keep_going) result = star_pick_next_timestep(id)            
                   if (result == keep_going) exit step_loop
                   if (result == redo) result = star_prepare_to_redo(id)
                   if (result == retry) result = star_prepare_to_retry(id)
                   if (result == terminate) exit evolve_loop
+                  first_try = .false.
                end do step_loop
                result = star_finish_step(id, ierr)
                if (result /= keep_going) exit evolve_loop         

@@ -557,11 +557,14 @@
       ! this routine takes one step in the evolution.
       ! when it returns successfully (i.e, with value = keep_going), the data
       ! describing the new model can be found in the variables defined in star_def.
-      integer function star_evolve_step(id)
+      integer function star_evolve_step(id, first_try)
          ! returns either keep_going, redo, retry, or terminate
          use star_def, only: terminate, keep_going
          use star_utils, only: start_time, update_time
          integer, intent(in) :: id
+         logical, intent(in) :: first_try 
+            ! true on the first try to take this step
+            ! false if this is a repeat for a retry
          type (star_info), pointer :: s
          integer :: ierr
          integer(8) :: time0, clock_rate
@@ -571,36 +574,39 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (s% doing_timing) call start_time(s, time0, total)
-         star_evolve_step = star_evolve_step_part1(id)
-         if (star_evolve_step == keep_going) star_evolve_step = star_evolve_step_part2(id)
+         star_evolve_step = star_evolve_step_part1(id, first_try)
+         if (star_evolve_step == keep_going) &
+            star_evolve_step = star_evolve_step_part2(id, first_try)
          if (s% doing_timing) call update_time(s, time0, total, s% time_evolve_step)         
       end function star_evolve_step
 
       ! individual functions to evolve each of the parts of star_evolve_step
-      integer function star_evolve_step_part1(id)
+      integer function star_evolve_step_part1(id, first_try)
          use star_def, only: keep_going, redo, retry, terminate
          use evolve, only: do_evolve_step_part1
          integer, intent(in) :: id
+         logical, intent(in) :: first_try 
          type (star_info), pointer :: s
          integer :: ierr
          star_evolve_step_part1 = terminate
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         star_evolve_step_part1 = do_evolve_step_part1(id)
+         star_evolve_step_part1 = do_evolve_step_part1(id, first_try)
       end function star_evolve_step_part1
 
-      integer function star_evolve_step_part2(id)
+      integer function star_evolve_step_part2(id, first_try)
          use star_def, only: keep_going, redo, retry, terminate
          use evolve, only: do_evolve_step_part2
          integer, intent(in) :: id
+         logical, intent(in) :: first_try 
          type (star_info), pointer :: s
          integer :: ierr
          star_evolve_step_part2 = terminate
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         star_evolve_step_part2 = do_evolve_step_part2(id)
+         star_evolve_step_part2 = do_evolve_step_part2(id, first_try)
       end function star_evolve_step_part2
       
       

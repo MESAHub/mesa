@@ -227,7 +227,7 @@
     
     ! mesh adjustment
     remesh_log_L_nuc_burn_min, show_mesh_changes, okay_to_remesh, &
-    max_rel_delta_IE_for_mesh_total_energy_balance, &
+    num_steps_to_hold_mesh_after_retry, max_rel_delta_IE_for_mesh_total_energy_balance, &
     trace_mesh_adjust_error_in_conservation, max_allowed_nz, mesh_max_allowed_ratio, &
     remesh_max_allowed_logT, max_delta_x_for_merge, mesh_dump_call_number, &
     mesh_adjust_use_quadratic, mesh_ok_to_merge, mesh_max_k_old_for_split, mesh_min_k_old_for_split, &
@@ -1449,6 +1449,7 @@
  s% remesh_log_L_nuc_burn_min = remesh_log_L_nuc_burn_min
  s% show_mesh_changes = show_mesh_changes
  s% okay_to_remesh = okay_to_remesh
+ s% num_steps_to_hold_mesh_after_retry = num_steps_to_hold_mesh_after_retry
  s% trace_mesh_adjust_error_in_conservation = trace_mesh_adjust_error_in_conservation
  s% max_rel_delta_IE_for_mesh_total_energy_balance = max_rel_delta_IE_for_mesh_total_energy_balance
  s% max_allowed_nz = max_allowed_nz
@@ -3068,6 +3069,7 @@
  remesh_log_L_nuc_burn_min = s% remesh_log_L_nuc_burn_min
  show_mesh_changes = s% show_mesh_changes
  okay_to_remesh = s% okay_to_remesh
+ num_steps_to_hold_mesh_after_retry = s% num_steps_to_hold_mesh_after_retry
  trace_mesh_adjust_error_in_conservation = s% trace_mesh_adjust_error_in_conservation
  max_rel_delta_IE_for_mesh_total_energy_balance = s% max_rel_delta_IE_for_mesh_total_energy_balance
  max_allowed_nz = s% max_allowed_nz

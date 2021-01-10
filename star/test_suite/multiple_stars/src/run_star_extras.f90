@@ -58,7 +58,7 @@
          integer :: id, ierr, i, i_prev, result, result_reason, model_number
          type (star_info), pointer :: s
          character (len=64) :: inlist_fname
-         logical :: continue_evolve_loop
+         logical :: first_try, continue_evolve_loop
          real(dp) :: sum_times
          real(dp) :: dt
          
@@ -185,6 +185,8 @@
             if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
             if (s% job% report_cell_for_xm > 0) call do_report_cell_for_xm(s)
             
+            first_try = .true.
+            
             model_number = get_model_number(id, ierr)
             if (failed('get_model_number')) return
 
@@ -196,7 +198,7 @@
                   exit step_loop
                end if
 
-               result = star_evolve_step(id)
+               result = star_evolve_step(id, first_try)
                if (result == keep_going) result = check_model(s, id)
                if (result == keep_going) result = star_pick_next_timestep(id)            
                if (result == keep_going) exit step_loop
@@ -223,6 +225,7 @@
                   continue_evolve_loop = .false.
                   exit step_loop
                end if
+               first_try = .false.
                
             end do step_loop
                         
