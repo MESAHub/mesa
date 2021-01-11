@@ -128,3 +128,9 @@ at the same time. However, all unnamed critical blocks act like one block and th
 Therefore you should always named your OMP critical blocks to ensure the best performance.  
 
 Do not name your OMP critical block with a name that has already been used for a variable, procedure, module or any other object.
+
+
+Environment variables
+---------------------
+
+If making a new environment variable then the variable should be prefixed with ``MESA_`` to ensure we don’t collide with other variables.

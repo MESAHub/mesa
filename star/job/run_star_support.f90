@@ -270,6 +270,10 @@
          if(dbg) write(*,*) 'call add_fpe_checks'
          call add_fpe_checks(id, s, ierr)
          if (failed('add_fpe_checks',ierr)) return
+
+         if(dbg) write(*,*) 'call pgstar_env_check'
+         call pgstar_env_check(id, s, ierr)
+         if (failed('pgstar_env_check',ierr)) return        
          
 
          ! testing module-level (atm/eos/kap/net) partials requires single-threaded execution
@@ -3666,6 +3670,31 @@
          end if
 
       end subroutine add_fpe_checks
+
+      subroutine pgstar_env_check(id, s, ierr)
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         character(len=3) :: flag_check
+         integer :: status
+
+         include 'formats.inc'
+
+         ierr = 0
+
+         call GET_ENVIRONMENT_VARIABLE('MESA_FORCE_PGSTAR_FLAG', flag_check, STATUS=status)
+         if (status /= 0) return
+
+         if (trim(flag_check)=="ON" .or. trim(flag_check)=="on") then
+            write(*,*) "pgstar_flag forced on"
+            s% job% pgstar_flag = .true.
+         else if (trim(flag_check)=="OFF" .or. trim(flag_check)=="off") then
+            write(*,*) "pgstar_flag forced off"
+            s% job% pgstar_flag = .false.            
+         end if
+
+      end subroutine pgstar_env_check
 
       end module run_star_support
       
