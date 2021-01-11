@@ -145,7 +145,8 @@
          do iter = 1, 100
             call emergency_merge(s, iTooSmall)
             if (iTooSmall == 0) exit
-            if (s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_merge', iTooSmall, s% dq(iTooSmall)
             call do_merge(s, iTooSmall, species, new_xa, ierr)
@@ -159,7 +160,8 @@
          do iter = 1, 100
             call emergency_split(s, iTooBig)
             if (iTooBig == 0) exit
-            if (s% amr_split_merge_has_undergone_remesh(iTooBig)) exit
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  s% amr_split_merge_has_undergone_remesh(iTooBig)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_split', iTooBig, s% dq(iTooBig)
             call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
@@ -284,7 +286,8 @@
             else
                xR = s% r(k)
             end if
-            if (s% split_merge_amr_avoid_repeated_remesh .and. s% amr_split_merge_has_undergone_remesh(k)) cycle
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  (s% split_merge_amr_avoid_repeated_remesh .and. s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
             
@@ -417,9 +420,11 @@
          
          if (merge_center) i = i-1
          ip = i+1
-         if (s% amr_split_merge_has_undergone_remesh(i) .or. s% amr_split_merge_has_undergone_remesh(ip)) then
+         if (s% split_merge_amr_avoid_repeated_remesh .and. &
+               (s% amr_split_merge_has_undergone_remesh(i) .or. s% amr_split_merge_has_undergone_remesh(ip))) then
             s% amr_split_merge_has_undergone_remesh(i) = .true.
             s% amr_split_merge_has_undergone_remesh(ip) = .true.
+            
             return
          end if
 

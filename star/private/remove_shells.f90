@@ -769,7 +769,7 @@
          real(dp), intent(in) :: v_surf_div_v_escape
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
+         integer :: k, k_vesc
          real(dp) :: vesc, vesc_m1
          real(dp), dimension(:), pointer :: v
          include 'formats'
@@ -785,17 +785,16 @@
          else
             return
          end if
-         vesc = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
-         if (v(1) < vesc*v_surf_div_v_escape) return
-         do k=2,3 ! s% nz
-            vesc_m1 = vesc
+         k_vesc = 0
+         do k=2, s% nz
+            if (s% q(k) > s% job% max_q_for_remove_surface_by_v_surf_div_v_escape) cycle
+            if (s% q(k) < s% job% min_q_for_remove_surface_by_v_surf_div_v_escape) exit
             vesc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-            if (v(k) < vesc*v_surf_div_v_escape) exit
-            write(*,2) 'v/vesc', k-1, v(k-1)/vesc_m1
+            if (v(k) >= vesc*v_surf_div_v_escape) k_vesc = k
          end do
-         write(*,2) 'do_remove_surface_by_v_surf_div_v_escape', k-1, v(k-1)/vesc_m1
-         call do_remove_surface(id, k-1, ierr)
-         return
+         if (k_vesc == 0) return
+         write(*,2) 'do_remove_surface_by_v_surf_div_v_escape q', k_vesc, s% q(k_vesc)
+         call do_remove_surface(id, k_vesc, ierr)
       end subroutine do_remove_surface_by_v_surf_div_v_escape
 
 
@@ -911,21 +910,161 @@
 
 
       subroutine do_remove_surface(id, surface_k, ierr)
+         use read_model, only: finish_load_model
+         use mesh_adjust, only: do_prune_mesh_surface
+         use alloc, only: resize_star_info_arrays
+         use star_utils, only: tau_eff
          integer, intent(in) :: id, surface_k
          integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% R_center /= 0d0) then
-            write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
-            ierr = -1
-            stop 'do_remove_surface'
+         type (star_info), pointer :: s, c, prv
+         type (star_info), target :: copy_info
+         real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P, T_black_body
+         integer :: k, k_old, nz, nz_old, skip
+
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         if (surface_k == 1) then
+            ierr = 0
+            return
          end if
-         call do_relax_to_star_cut( &
-            id, surface_k, s% job% remove_surface_do_jrot, &
-            s% job% remove_surface_do_entropy, &
-            s% job% remove_surface_turn_off_energy_sources_and_sinks, ierr)
+
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) &
+               write(*,*) 'do_remove_surface: get_star_ptr ierr'
+            return
+         end if
+
+         if (s% job% remove_surface_by_relax_to_star_cut) then
+            if (s% R_center /= 0d0) then
+               write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
+               ierr = -1
+               stop 'do_remove_surface'
+            end if         
+            call do_relax_to_star_cut( &
+               id, surface_k, s% job% remove_surface_do_jrot, &
+               s% job% remove_surface_do_entropy, &
+               s% job% remove_surface_turn_off_energy_sources_and_sinks, ierr)
+            return
+         end if
+
+         nz_old = s% nz
+         skip = surface_k - 1
+
+         if (dbg) write(*,2) 'do remove surface skip', skip
+         if (skip < 1 .or. skip >= nz_old) return
+
+         tau_surf_new = tau_eff(s,1+skip)
+         tau_factor_new = s% tau_factor*tau_surf_new/s% tau(1)
+
+         if (dbg) write(*,1) 'tau_surf_old', s% tau(1)
+         if (dbg) write(*,1) 'tau_factor_old', s% tau_factor
+         if (dbg) write(*,1) 'tau_surf_new', tau_surf_new
+         if (dbg) write(*,1) 'tau_factor_new', tau_factor_new
+
+         rmid = s% rmid(1+skip)
+         Lmid = (s% L(1+skip) + s% L(2+skip))/2
+         T = s% T(1+skip)
+         P = s% P(1+skip)
+
+         if (.not. associated(s% other_star_info)) then
+            allocate(s% other_star_info)
+            prv => s% other_star_info
+            c => null()
+            if (dbg) write(*,1) 'c is null'
+         else
+            prv => s% other_star_info
+            c => copy_info
+            c = prv
+         end if
+
+         prv = s ! this makes copies of pointers and scalars
+
+         nz = nz_old - skip
+         s% nz = nz
+         if (dbg) write(*,2) 'nz_old', nz_old
+         if (dbg) write(*,2) 'nz', nz
+
+         if (dbg) write(*,1) 'call resize_star_info_arrays'
+         call resize_star_info_arrays(s, c, ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) &
+               write(*,*) 'resize_star_info_arrays failed in do_remove_surface'
+            return
+         end if
+
+         if (dbg) write(*,2) 'prv% dm(1)/Msun', 1, prv% dm(1)/Msun
+         if (dbg) write(*,2) 'prv% m(1)/msun', 1, prv% m(1)/Msun
+         if (dbg) write(*,2) 'prv% dm(nz_old)/Msun', nz_old, prv% dm(nz_old)/Msun
+         if (dbg) write(*,2) 'prv% m(nz_old)/msun', nz_old, prv% m(nz_old)/Msun
+
+         s% mstar = prv% m(1 + skip)
+         s% xmstar = s% mstar - prv% M_center
+         s% q(1) = 1d0
+         do k = 1, nz
+            k_old = k + skip
+            s% dq(k) = prv% dm(k_old)/s% xmstar
+            if (k > 1) s% q(k) = s% q(k-1) - s% dq(k-1)
+         end do
+         s% dq(nz) = s% q(nz)
+         do k = 1, nz
+            s% dm(k) = s% dq(k)*s% xmstar
+            s% m(k) = s% q(k)*s% xmstar + s% M_center
+         end do
+         if (dbg) write(*,2) 's% dq(1)', 1, s% dq(1)
+         if (dbg) write(*,2) 's% dm(1)/Msun', 1, s% dm(1)/Msun
+         if (dbg) write(*,2) 's% m(1)/msun', 1, s% m(1)/Msun
+         if (dbg) write(*,2) 's% dm(nz)/Msun', nz, s% dm(nz)/Msun
+         if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
+
+         if (dbg) write(*,1) 'call do_prune_mesh_surface'
+         call do_prune_mesh_surface( &
+            s, nz, nz_old, prv% xh, prv% xa, &
+            prv% j_rot, prv% i_rot, &
+            prv% omega, prv% D_omega, prv% am_nu_rot, &
+            prv% conv_vel, prv% lnT, &
+            prv% dPdr_dRhodr_info, prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
+            prv% D_SSI, prv% D_ES, prv% D_GSF, prv% D_mix, &
+            s% xh, s% xa, ierr)
+         if (ierr /= 0) then
+            return
+         end if
+         if (dbg) write(*,2) 's% dq(1)', 1, s% dq(1)
+         if (dbg) write(*,2) 's% dm(1)/Msun', 1, s% dm(1)/Msun
+         if (dbg) write(*,2) 's% m(1)/msun', 1, s% m(1)/Msun
+         if (dbg) write(*,2) 's% dm(nz)/Msun', nz, s% dm(nz)/Msun
+         if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
+
+         if (Lmid > 0d0) then
+            T_black_body = pow(Lmid/(4*pi*rmid*rmid*boltz_sigma), 0.25d0)
+            s% Tsurf_factor = T/T_black_body
+         else
+            s% Tsurf_factor = 1d0
+         end if
+         s% force_Tsurf_factor = s% Tsurf_factor
+
+         if (s% use_momentum_outer_bc) then
+            s% tau_factor = tau_factor_new
+            s% force_tau_factor = s% tau_factor
+         end if
+
+         s% need_to_setvars = .true.
+
+         if (dbg) write(*,1) 'call finish_load_model'
+         call finish_load_model(s, .false., .false., .false., ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) &
+               write(*,*) 'finish_load_model failed in do_remove_surface'
+            return
+         end if
+
+         if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
+            s% tau_factor, s% Tsurf_factor
+            
+         if (dbg) stop 'do_remove_surface'
+            
       end subroutine do_remove_surface
 
 

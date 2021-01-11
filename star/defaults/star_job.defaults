@@ -2281,6 +2281,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_v_surf_div_v_escape
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_q_for_remove_surface_by_v_surf_div_v_escape
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_remove_surface_by_v_surf_div_v_escape
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! allows the outer envelope to be removed. ignored if <= 0
 
@@ -2298,8 +2302,12 @@
     remove_surface_by_v_surf_km_s = 0
     remove_surface_by_v_surf_div_cs = 0
     remove_surface_by_v_surf_div_v_escape = 0
+    min_q_for_remove_surface_by_v_surf_div_v_escape = 0
+    max_q_for_remove_surface_by_v_surf_div_v_escape = 0
     
     
+      ! remove_surface_by_relax_to_star_cut
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_do_jrot
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_do_entropy
@@ -2309,6 +2317,7 @@
 
       ! ::
       
+    remove_surface_by_relax_to_star_cut = .false.
     remove_surface_do_jrot = .false.
     remove_surface_do_entropy = .true.
     remove_surface_turn_off_energy_sources_and_sinks = .true.
