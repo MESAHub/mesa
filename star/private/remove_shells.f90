@@ -416,7 +416,7 @@
          real(dp), intent(in) :: infall_kms
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
+         integer :: k, k_infall
          real(dp) :: v_infall, v
          include 'formats'
          call get_star_ptr(id, s, ierr)
@@ -425,8 +425,8 @@
             return
          end if
          v_infall = -abs(infall_kms)*1d5
-         !write(*,1) 'v_infall', v_infall
-         do k=1,s% nz
+         k_infall = 0
+         do k=s% nz,1,-1
             if (s% v_flag) then
                v = s% v(k)
             else if (s% u_flag) then
@@ -436,14 +436,12 @@
                ierr = -1
                return
             end if
-            !write(*,2) 'v', k, v, v_infall
-            if (v <= v_infall) then
-               call do_remove_inner_fraction_q(id, s% q(k), ierr)
-               write(*,1) 'new inner boundary mass', s% m_center/Msun
-               return
-            end if
+            if (v > v_infall) exit ! not falling fast enough
+            k_infall = k
          end do
-         ierr = -1
+         if (k_infall == 0) return ! no infall
+         call do_remove_inner_fraction_q(id, s% q(k_infall), ierr)
+         write(*,1) 'new inner boundary mass', s% m_center/Msun
       end subroutine do_remove_center_by_infall_kms
 
 

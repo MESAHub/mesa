@@ -6,7 +6,7 @@
       saved_model_name = 'gamma1_limit.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+      save_model_filename = 'infall.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
       !set_initial_age = .false.
@@ -33,7 +33,8 @@
 
 &controls
       
-      fe_core_infall_limit = 5d7
+      fe_core_infall_limit = 500d5
+      non_fe_core_infall_limit = 1d99
       
       when_to_stop_atol = 1d99
       when_to_stop_rtol = 1d99
