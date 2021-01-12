@@ -46,46 +46,46 @@ WHICH_BLAS = USE_SRCS
 LOAD_BLAS = -lmesablas
 MKL_INCLUDE = 
 
-# step 4) do you want to use PGPLOT with mesa/star?                                                                                     
-# you can have onscreen plots updated at each step,                                                                                     
-# and you can save files for making movies.  very cool!                                                                                 
+# step 4) do you want to use PGPLOT with mesa/star?
+# you can have onscreen plots updated at each step,
+# and you can save files for making movies.  very cool!
 
-# NOTE: you need to have a PGPLOT built using the same fortran and c compiler as you                                                    
-# are using for mesa.                                                                                                                   
+# NOTE: you need to have a PGPLOT built using the same fortran and c compiler as you
+# are using for mesa.
 
-# if you don't already have a compatible pgplot,                                                                                         
-# follow the instructions in pgplot/README                                                                                               
+# if you don't already have a compatible pgplot,
+# follow the instructions in pgplot/README
 
-# to access pgplot from mesa/star,                                                                                                       
-# set USE_PGSTAR = YES and set LOAD_PGPLOT to load the libraries.                                                                       
-# in mesa/star, set the control parameter pgstar_flag = .true. in &star_job                                                             
-# when you run star it will open a window using X and draw plots using PGSTAR                                                           
-# the plots will be updated each time a log entry is made.                                                                               
-# see star/test/src/pgstar_defaults.dek for details.                                                                                     
+# to access pgplot from mesa/star,
+# set USE_PGSTAR = YES and set LOAD_PGPLOT to load the libraries.
+# in mesa/star, set the control parameter pgstar_flag = .true. in &star_job
+# when you run star it will open a window using X and draw plots using PGSTAR
+# the plots will be updated each time a log entry is made.
+# see star/test/src/pgstar_defaults.dek for details.
 
-# NOTE: if you have libpng, then include '-lpng' in the LOAD_PGPLOT line.                                                               
-# the *.png files are excellent for making movies.                                                                                       
-# but if you don't have libpng and can't get it, no problem; it isn't required.                                                         
-# just remove '-lpng' from the LOAD_PGPLOT line.                                                                                         
+# NOTE: if you have libpng, then include '-lpng' in the LOAD_PGPLOT line.
+# the *.png files are excellent for making movies.
+# but if you don't have libpng and can't get it, no problem; it isn't required.
+# just remove '-lpng' from the LOAD_PGPLOT line.
 
-# Similarly, if you don't have X windows and don't want to make onscreen plots,                                                         
-# then you can load PGPLOT without it.  Just delete the X stuff from LOAD_PGPLOT.                                                       
+# Similarly, if you don't have X windows and don't want to make onscreen plots,
+# then you can load PGPLOT without it.  Just delete the X stuff from LOAD_PGPLOT.
 
-# for users of Red Hat OS: Georgios Magkotsios reports success with these settings:                                                     
-#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot -L/usr/lib64 -lX11 -lsvml -lpng                                                                 
-#FCstatic = -shared-intel #-Bstatic -static-intel                                                                                       
+# for users of Red Hat OS: Georgios Magkotsios reports success with these settings:
+#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot -L/usr/lib64 -lX11 -lsvml -lpng
+#FCstatic = -shared-intel #-Bstatic -static-intel
 
-# for Ubuntu, Philip Pinto found these libraries to be necessary:                                                                       
-#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot  -lX11 -lxcb -lXau -lXdmcp -lXext -lpng -lz                                                    
+# for Ubuntu, Philip Pinto found these libraries to be necessary:
+#LOAD_PGPLOT = -L${PGPLOT_DIR} -lpgplot  -lX11 -lxcb -lXau -lXdmcp -lXext -lpng -lz
 
-# for Fedora 12 (x86_64), Mike Zingale reported that the following worked                                                               
-# 1. at the terminal:                                                                                                                   
-#  yum install pgplot pgplot-devel                                                                                                       
-# 2. in the mesa/util/makefile_header                                                                                                   
-# USE_PGSTAR = YES                                                                                                                       
-# LOAD_PGPLOT = -lpgplot -L/usr/lib64 -lX11 -lpng                                                                                       
-# 3. it is also important that the following environment variable be set:                                                               
-# export PGPLOT_DIR=/usr/share/pgplot/  
+# for Fedora 12 (x86_64), Mike Zingale reported that the following worked
+# 1. at the terminal:
+#  yum install pgplot pgplot-devel
+# 2. in the mesa/util/makefile_header
+# USE_PGSTAR = YES
+# LOAD_PGPLOT = -lpgplot -L/usr/lib64 -lX11 -lpng
+# 3. it is also important that the following environment variable be set:
+# export PGPLOT_DIR=/usr/share/pgplot/
 
 
 # NOTE: a change in USE_PGSTAR doesn't take effect until you next recompile mesa/star
@@ -210,7 +210,7 @@ FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=100 $(SPECIAL_FC_FLAG
 FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
 # -Warray-temporaries
  
-FCimpno = -fimplicit-none  
+FCimpno = -fimplicit-none
 FCchecks = -fbounds-check
 FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination
 #FCwarn = -Wunused-value -Werror -W -Wno-compare-reals -Wno-unused-parameter
