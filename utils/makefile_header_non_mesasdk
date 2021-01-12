@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # NOTE: MESA is no longer supported on 32-bit systems.  This isn't by design;
 # we simply haven't been able to get it to work!  So if you really-really want 
 # to use an antique 32-bit system for mesa, you'll have to try to make it work yourself.
@@ -388,7 +386,7 @@ LOAD_MESA_STAR_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_STAR))
 ifeq ($(USE_PGSTAR),YES)
    LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
 else
-   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
+   LOAD_MESA_STAR_EXT = $(LOAD_STAR_MODS_EXT)
 endif
 LOAD_MESA_STAR = $(LOAD_MESA_STAR_INT) $(LOAD_MESA_STAR_EXT)
 
@@ -404,7 +402,7 @@ STAR_WORK_OBJS = \
    run_star_extras.o run_star.o 
 
 BINARY_WORK_OBJS = \
-   $(STAR_WORK_OBJS) run_binary_extras.o run_binary.o
+   run_star_extras.o run_binary_extras.o run_binary.o
    
 #Test if we are on windows
 BUILD_ON_WINDOWS=NO
@@ -421,7 +419,7 @@ CP_IF_NEWER = $(MESA_DIR)/utils/cp_if_newer
 # makedepf90 invocation (depends on whether we have the SDK2-patched version that
 # supports the -X flag)
 ifneq ($(shell makedepf90 -V | grep sdk2),)
-    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env crmath hdf5
+    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env ieee_arithmetic crmath hdf5
     MAKEDEPF90 = makedepf90 -m %m.mod -X $(addprefix -u,$(MAKEDEPF90_IGNORE_MODS))
 else
     MAKEDEPF90 = makedepf90 -m %m.mod
