@@ -48,6 +48,8 @@ contains
     integer, intent(in)       :: k
     complex(WP)               :: xi_r
 
+    xi_r = 0._WP
+
   end function xi_r
 
   !****
@@ -57,6 +59,8 @@ contains
     class(wave_t), intent(in) :: this
     integer, intent(in)       :: k
     complex(WP)               :: xi_h
+
+    xi_h = 0._WP
 
   end function xi_h
 
@@ -68,6 +72,8 @@ contains
     integer, intent(in)       :: k
     real(WP)                  :: dW_dx
 
+    dW_dx = 0._WP
+
   end function dW_dx
 
   !****
@@ -78,6 +84,8 @@ contains
     character(*), intent(in)           :: freq_units
     character(*), optional, intent(in) :: freq_frame
     complex(WP)                        :: freq
+
+    freq = 0._WP
 
   end function freq
 
