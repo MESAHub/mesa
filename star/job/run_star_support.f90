@@ -3675,24 +3675,24 @@
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-
-         character(len=3) :: flag_check
+         character(len=5) :: flag
          integer :: status
 
          include 'formats.inc'
 
          ierr = 0
 
-         call GET_ENVIRONMENT_VARIABLE('MESA_FORCE_PGSTAR_FLAG', flag_check, STATUS=status)
+         call get_environment_variable('MESA_FORCE_PGSTAR_FLAG', flag, STATUS=status)
          if (status /= 0) return
 
-         if (trim(flag_check)=="ON" .or. trim(flag_check)=="on") then
-            write(*,*) "pgstar_flag forced on"
+         select case (trim(flag))
+         case ("TRUE", "true")
+            write(*,*) "PGSTAR forced on"
             s% job% pgstar_flag = .true.
-         else if (trim(flag_check)=="OFF" .or. trim(flag_check)=="off") then
-            write(*,*) "pgstar_flag forced off"
-            s% job% pgstar_flag = .false.            
-         end if
+         case ("FALSE", "false")
+            write(*,*) "PGSTAR forced off"
+            s% job% pgstar_flag = .false.     
+         end select
 
       end subroutine pgstar_env_check
 
