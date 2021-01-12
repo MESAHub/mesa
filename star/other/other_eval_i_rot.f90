@@ -42,6 +42,10 @@
          real(dp), intent(in) :: ri,r00,ra,w_div_w_crit_roche
          real(dp), intent(out) :: i_rot, di_rot_dlnr, di_rot_dw_div_wc
 
+         i_rot = 0
+         di_rot_dlnr = 0
+         di_rot_dw_div_wc = 0
+
          write(*,*) 'no implementation for other_eval_i_rot'
          stop
 
