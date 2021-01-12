@@ -1060,17 +1060,18 @@
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnRho
-         real(dp) :: lim, dlnRho
+         real(dp) :: lim, dlnRho, max_abs_dlnRho
          integer :: k
          include 'formats'
          lim = ln10*s% delta_lgRho_limit_min_lgRho
          i = 0
-         max_dlnRho = 0
+         max_abs_dlnRho = 0
          do k=1,s% nz
             if (s% lnd(k) < lim) cycle
-            dlnRho = abs(s% lnd(k) - s% lnd_start(k))
-            if (dlnRho > max_dlnRho) then
+            dlnRho = s% lnd(k) - s% lnd_start(k)
+            if (abs(dlnRho) > max_abs_dlnRho) then
                max_dlnRho = dlnRho
+               max_abs_dlnRho = abs(dlnRho)
                i = k
             end if
          end do
@@ -1089,7 +1090,7 @@
          check_dlgRho_change = keep_going
          call get_dlgRho_info(s, i, max_dlnd)
          if (i == 0) return
-         check_dlgRho_change = check_change(s, max_dlnd/ln10, &
+         check_dlgRho_change = check_change(s, abs(max_dlnd)/ln10, &
             s% delta_lgRho_limit, s% delta_lgRho_hard_limit, &
             i, 'check_dlgRho_change', skip_hard_limit, dt_limit_ratio, relative_excess)
       end function check_dlgRho_change
@@ -1100,17 +1101,18 @@
          type (star_info), pointer :: s
          integer, intent(out) :: i
          real(dp), intent(out) :: max_dlnT
-         real(dp) :: lim, dlnT
+         real(dp) :: lim, dlnT, abs_max_dlnT
          integer :: k
          include 'formats'
          lim = ln10*s% delta_lgT_limit_min_lgT
          i = 0
-         max_dlnT = 0
+         abs_max_dlnT = 0
          do k=1,s% nz
             if (s% lnT(k) < lim) cycle
-            dlnT = abs(s% lnT(k) - s% lnT_start(k))
-            if (dlnT > max_dlnT) then
+            dlnT = s% lnT(k) - s% lnT_start(k)
+            if (abs(dlnT) > abs_max_dlnT) then
                max_dlnT = dlnT
+               abs_max_dlnT = abs(dlnT)
                i = k
             end if
          end do
@@ -1129,7 +1131,7 @@
          check_dlgT_change = keep_going
          call get_dlgT_info(s, i, max_dlnT)
          if (i == 0) return
-         check_dlgT_change = check_change(s, max_dlnT/ln10, &
+         check_dlgT_change = check_change(s, abs(max_dlnT)/ln10, &
             s% delta_lgT_limit, s% delta_lgT_hard_limit, &
             i, 'check_dlgT_change', skip_hard_limit, dt_limit_ratio, relative_excess)
       end function check_dlgT_change

@@ -318,7 +318,7 @@
             if (s% dm(k) <= 0d0 .or. is_bad(s% m(k) + s% dm(k))) then
                write(*,2) 'dm m dq q M_center', k, &
                   s% dm(k), s% m(k), s% dq(k), s% q(k), s% M_center
-               stop 'set_m_and_dm'
+               if (s% stop_for_bad_nums) stop 'set_m_and_dm'
             end if
          end do
       end subroutine set_m_and_dm
@@ -3426,6 +3426,7 @@
          call get1_avQ(s, k, avQ, &
             d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
          if (ierr /= 0) return
+         s% avQ(k) = avQ
          if (s% avQ_start(k) < -1d90) s% avQ_start(k) = avQ
       end subroutine get_avQ
       

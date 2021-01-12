@@ -66,38 +66,15 @@
       !min_k_for_dt_div_min_dr_div_cs_limit = 10
       !min_q_for_dt_div_min_dr_div_cs_limit = 0.1d0
       !max_q_for_dt_div_min_dr_div_cs_limit = 1d0
-      
 
-       ! relax these limit for infall.   let lgT_cntr set the pace.
+
+      ! relax limits for infall.   let lgT_cntr, lgRho_cntr set the pace.
 
       dX_nuc_drop_limit = 1d-1 ! relax this limit for infall  
       dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
       dX_nuc_drop_min_X_limit = 1d-3  ! 1.0d-3  default = 1.0d-4
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
-
-      delta_XHe_cntr_limit = 1d99
-      delta_XHe_cntr_hard_limit = 1d99
-
-      delta_XNe_cntr_limit = 0.05d0
-      delta_XNe_cntr_hard_limit = 0.1d0
-
-      delta_XO_cntr_limit = 0.05d0
-      delta_XO_cntr_hard_limit = 0.1d0
-
-      delta_XSi_cntr_limit = 0.05d0
-      delta_XSi_cntr_hard_limit = 0.1d0
-       
-      delta_lgT_max_hard_limit = 0.1
-
-
-
-
-
-
-
-
-       ! relax these limit for infall.   let lgT_cntr set the pace.
 
       delta_XHe_cntr_limit = 1d99
       delta_XHe_cntr_hard_limit = 1d99
@@ -110,6 +87,34 @@
 
       delta_XSi_cntr_limit = 1d99
       delta_XSi_cntr_hard_limit = 1d99
+
+
+
+
+      delta_lgRho_cntr_limit = 0.005
+      delta_lgRho_cntr_hard_limit = 0.01
+      
+      delta_lgT_cntr_limit_only_after_near_zams = .true.
+      delta_lgT_cntr_limit = 0.002  
+      delta_lgT_cntr_hard_limit = 0.01
+
+      delta_lgT_max_limit_only_after_near_zams = .true.
+      delta_lgT_max_limit = 0.002     
+      delta_lgT_max_hard_limit = 0.01
+
+
+      delta_lgRho_limit = 0.1
+      delta_lgRho_hard_limit = 0.3
+      delta_lgRho_limit_min_lgRho = -9d0
+
+      delta_lgT_limit = 0.1
+      delta_lgT_hard_limit = 0.3
+      delta_lgT_limit_min_lgT = 4d0
+
+
+
+
+
 
 
 
@@ -138,7 +143,11 @@
  
     use_avQ_art_visc = .true.
     avQ_cq = 4.0d0
-    avQ_zsh = 0.1d0
+    avQ_zsh = 0.001d0
+    
+    use_compression_outer_BC = .true.     ! very important
+    
+    
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -196,7 +205,7 @@
       !solver_test_net_partials = .true.
       !solver_test_atm_partials = .true.
 
-      !report_why_dt_limits = .true.
+      report_why_dt_limits = .true.
       !report_all_dt_limits = .true.
       
       !show_mesh_changes = .true.
@@ -229,7 +238,7 @@ Profile_Panels3_yaxis_name(4) = 'gamma1'
     Profile_Panels3_ymax(4) = -101d0
 
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
-Profile_Panels3_yaxis_name(5) = 'log_dr_div_cs' ! 'logRho'
+Profile_Panels3_yaxis_name(5) = 'logRho' ! 'avQ'
  
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
 Profile_Panels3_yaxis_name(6) = 'logR_cm'
