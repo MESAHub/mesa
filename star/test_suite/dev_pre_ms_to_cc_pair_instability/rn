@@ -42,14 +42,8 @@ else
    cp gamma1_limit.mod standard_gamma1_limit.mod
 fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_infall.mod infall.mod
-else
-   do_one inlist_infall_header infall.mod
-   cp infall.mod standard_infall.mod
-fi
-
-do_one inlist_outburst_header final.mod
+do_one inlist_infall_header infall.mod
+#do_one inlist_outburst_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

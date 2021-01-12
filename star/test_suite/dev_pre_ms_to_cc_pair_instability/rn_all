@@ -18,8 +18,8 @@ cp after_core_c_burn.mod standard_after_core_c_burn.mod
 do_one inlist_to_gamma1_limit_header gamma1_limit.mod
 cp gamma1_limit.mod standard_gamma1_limit.mod
 do_one inlist_infall_header infall.mod
-cp infall.mod standard_infall.mod
-do_one inlist_outburst_header final.mod
+#cp infall.mod standard_infall.mod
+#do_one inlist_outburst_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

@@ -183,21 +183,10 @@
 
       screening_mode = 'chugunov'
 
-      ! high center T limit to avoid negative mass fractions
       sig_min_factor_for_high_Tcenter = 0.01
-         ! inactive when >= 1d0
-         ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
-         ! then okay to reduce sig by as much as this factor
-         ! as needed to prevent causing negative abundances
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-         ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
-         ! this should be > Tcenter_max_for_sig_min_factor_full_off.
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-         ! if Tcenter <= this, factor = 1, so has no effect
-         ! this should be < Tcenter_min_for_sig_min_factor_full_on.
-      ! for T > full_off and < full_on, factor changes linearly with Tcenter
 
-      ! op_split_burn
       op_split_burn = .true.
       op_split_burn_min_T = 1d9
       burn_steps_limit = 150
