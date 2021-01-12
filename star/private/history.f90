@@ -3521,7 +3521,7 @@
          csound_surf = eval_csound(s,1,ierr)
 
          if (s% u_flag) then
-            v_surf = s% u_face(1)
+            v_surf = s% u(1)
          else if (s% v_flag) then
             v_surf = s% v(1)
          else

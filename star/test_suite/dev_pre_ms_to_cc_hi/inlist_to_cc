@@ -64,7 +64,7 @@
       terminal_show_log_age = .false.
 
       num_trace_history_values = 4
-      trace_history_value_name(1) = 'center fe56'
+      trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
