@@ -2221,7 +2221,10 @@
          check_dt_div_min_dr_div_cs = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
+         if (s% dt_div_min_dr_div_cs_limit <= 0d0) return
          dt_x = min_dr_div_cs(s, s% Tlim_dt_div_min_dr_div_cs_cell)
+         !write(*,2) 'log min_dr_div_cs, q, m', s% Tlim_dt_div_min_dr_div_cs_cell, &
+         !   safe_log10(dt_x), s% q(s% Tlim_dt_div_min_dr_div_cs_cell), s% m(s% Tlim_dt_div_min_dr_div_cs_cell)/Msun
          ratio = dt/dt_x
          check_dt_div_min_dr_div_cs = check_change(s, ratio, &
             s% dt_div_min_dr_div_cs_limit, s% dt_div_min_dr_div_cs_hard_limit, &

@@ -1320,11 +1320,15 @@
          nz = s% nz
          min_k = nz
          min_dr_div_cs = 1d99
+         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
+         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
+         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
          if (s% v_flag) then
-            r00 = s% R_center
-            do k=nz,1,-1
-               rp1 = r00
+            do k = k_min, nz-1
+               if (s% q(k) > max_q) cycle
+               if (s% q(k) < min_q) exit
                r00 = s% r(k)
+               rp1 = s% r(k+1)
                dr_div_cs = (r00 - rp1)/s% csound(k)
                if (dr_div_cs < min_dr_div_cs) then
                   min_dr_div_cs = dr_div_cs
@@ -1336,9 +1340,6 @@
          if (.not. s% u_flag) return
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
-         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
-         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
-         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
          do k = k_min, nz-1
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit

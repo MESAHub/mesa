@@ -62,7 +62,11 @@
       !warn_when_large_rel_run_E_err = 1d99
 
       
-      dt_div_min_dr_div_cs_limit = 0.9d0
+      !dt_div_min_dr_div_cs_limit = 0.9d0
+      !min_k_for_dt_div_min_dr_div_cs_limit = 10
+      !min_q_for_dt_div_min_dr_div_cs_limit = 0.1d0
+      !max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+      
 
        ! relax these limit for infall.   let lgT_cntr set the pace.
 
@@ -85,6 +89,30 @@
       delta_XSi_cntr_hard_limit = 0.1d0
        
       delta_lgT_max_hard_limit = 0.1
+
+
+
+
+
+
+
+
+       ! relax these limit for infall.   let lgT_cntr set the pace.
+
+      delta_XHe_cntr_limit = 1d99
+      delta_XHe_cntr_hard_limit = 1d99
+
+      delta_XNe_cntr_limit = 1d99
+      delta_XNe_cntr_hard_limit = 1d99
+
+      delta_XO_cntr_limit = 1d99
+      delta_XO_cntr_hard_limit = 1d99
+
+      delta_XSi_cntr_limit = 1d99
+      delta_XSi_cntr_hard_limit = 1d99
+
+
+
 
 ! mesh
       okay_to_remesh = .true
@@ -201,8 +229,8 @@ Profile_Panels3_yaxis_name(4) = 'gamma1'
     Profile_Panels3_ymax(4) = -101d0
 
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
-Profile_Panels3_yaxis_name(5) = 'logRho'
-
+Profile_Panels3_yaxis_name(5) = 'log_dr_div_cs' ! 'logRho'
+ 
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
 Profile_Panels3_yaxis_name(6) = 'logR_cm'
 
