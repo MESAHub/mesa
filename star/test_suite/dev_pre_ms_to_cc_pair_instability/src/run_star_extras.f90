@@ -31,6 +31,8 @@
       implicit none
       
       include "test_suite_extras_def.inc"
+      
+      real(dp) :: Psurf, Tsurf, Lsurf
 
 ! here are the x controls used below
 
@@ -64,6 +66,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          s% extras_startup => extras_startup
+         s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
          s% extras_after_evolve => extras_after_evolve
@@ -118,6 +121,22 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          
+         if (.not. restart) then
+            Psurf = s% P(1)
+            Tsurf = s% T(1)
+            Lsurf = s% L(1)
+            call alloc_extra_info(s)
+            if (s% x_logical_ctrl(1) .and. s% fixed_L_for_BB_outer_BC > 0d0) then
+               Lsurf = s% fixed_L_for_BB_outer_BC
+               call switch_BCs(s)
+            end if
+         else ! it is a restart
+            call unpack_extra_info(s)
+            if (s% x_logical_ctrl(1)) call switch_BCs(s)
+         end if
+         if (s% x_ctrl(16) > 0d0) &
+            s% x_ctrl(2) = s% star_mass - s% x_ctrl(16)
+         
          if (.not. s% x_logical_ctrl(37)) return
          
          ! Initialize GYRE
@@ -137,6 +156,15 @@
          call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
          
       end subroutine extras_startup
+      
+      
+      subroutine switch_BCs(s)
+         type (star_info), pointer :: s
+         s% use_compression_outer_BC = .true.
+         s% use_T_black_body_outer_BC = .true.
+         s% use_fixed_L_for_BB_outer_BC = .true.
+         s% fixed_L_for_BB_outer_BC = Lsurf
+      end subroutine switch_BCs
       
       
       subroutine extras_after_evolve(id, ierr)
@@ -234,13 +262,188 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+         call store_extra_info(s)
+         if (s% x_logical_ctrl(1)) call switch_BCs(s)
          if (.not. s% x_logical_ctrl(37)) return
          extras_finish_step = gyre_in_mesa_extras_finish_step(id)
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step
       end function extras_finish_step
       
+
+      integer function extras_start_step(id)
+         integer, intent(in) :: id
+         integer :: ierr
+         type (star_info), pointer :: s
+         integer :: k, k0, k1
+         real(dp) :: v_esc
+         real(dp),pointer, dimension(:) :: vel
+         include 'formats'
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         extras_start_step = keep_going        
+         if (.not. s% x_logical_ctrl(2)) return 
+         if (s% u_flag) then
+            vel => s% u
+         else if (s% v_flag) then
+            vel => s% v
+         else
+            write(*,*) 'extras_start_step: Must have either v_flag or u_flag enabled'
+            stop
+         end if
+         k0 = s% nz+1
+         do k = 1, s% nz
+            if (s% q(k) < s% x_ctrl(19)) then
+               !write(*,2) 'nothing in outer layer with v >= v_esc', k, s% q(k)
+               exit ! only check outer layer
+            end if
+            v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
+            if (vel(k) > v_esc) then
+               k0 = k
+               exit
+            end if
+         end do
+         if (k0 >= s% nz) return
+         ! k0 is outermost location below surface with u > escape velocity.
+         ! remove inward from k0 where u large enough compared to escape velocity.
+         k1 = k0
+         do k = k0+1, s% nz
+            v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
+            if (vel(k) < s% x_ctrl(17)*v_esc) then ! stop removing here
+               k1 = k-1
+               exit
+            end if
+         end do
+         if (s% q(k1) > s% x_ctrl(18)) then
+            !write(*,2) 'v > vesc, but too little to bother with', k1, s% q(k1)
+            return ! too little to bother with
+         end if
+         k1 = max(k1, s% x_integer_ctrl(20))
+         do while (s% L(k1) <= 0)
+            k1 = k1 + 1
+         end do
+         call star_remove_surface_at_cell_k(s% id, k1, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'extras_start_step failed in star_remove_surface_at_cell_k'
+            write(*,2) 'at q', k1, s% q(k1)
+            extras_start_step = terminate
+            return
+         end if
+         if (s% x_logical_ctrl(1)) then
+            Psurf = s% P(1)
+            Tsurf = s% T(1)
+            Lsurf = s% L(1)
+            call switch_BCs(s)
+         end if
+         extras_start_step = keep_going
+      end function extras_start_step
       
+
+      
+      ! routines for saving and restoring extra data so can do restarts
+         
+         ! put these defs at the top and delete from the following routines
+         !integer, parameter :: extra_info_alloc = 1
+         !integer, parameter :: extra_info_get = 2
+         !integer, parameter :: extra_info_put = 3
+      
+      
+      subroutine alloc_extra_info(s)
+         integer, parameter :: extra_info_alloc = 1
+         type (star_info), pointer :: s
+         call move_extra_info(s,extra_info_alloc)
+      end subroutine alloc_extra_info
+      
+      
+      subroutine unpack_extra_info(s)
+         integer, parameter :: extra_info_get = 2
+         type (star_info), pointer :: s
+         call move_extra_info(s,extra_info_get)
+      end subroutine unpack_extra_info
+      
+      
+      subroutine store_extra_info(s)
+         integer, parameter :: extra_info_put = 3
+         type (star_info), pointer :: s
+         call move_extra_info(s,extra_info_put)
+      end subroutine store_extra_info
+      
+      
+      subroutine move_extra_info(s,op)
+         integer, parameter :: extra_info_alloc = 1
+         integer, parameter :: extra_info_get = 2
+         integer, parameter :: extra_info_put = 3
+         type (star_info), pointer :: s
+         integer, intent(in) :: op
+         
+         integer :: i, j, num_ints, num_dbls, ierr
+         
+         i = 0
+         ! call move_int or move_flg
+         !call move_int(vsurf_gt_cs_count)   
+         !call move_flg(in_period_with_vsurf_gt_cs)
+         num_ints = i
+         
+         i = 0
+         call move_dbl(Psurf)   
+         call move_dbl(Tsurf)   
+         call move_dbl(Lsurf)   
+         num_dbls = i
+         
+         if (op /= extra_info_alloc) return
+         if (num_ints == 0 .and. num_dbls == 0) return
+         
+         ierr = 0
+         call star_alloc_extras(s% id, num_ints, num_dbls, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'failed in star_alloc_extras'
+            write(*,*) 'alloc_extras num_ints', num_ints
+            write(*,*) 'alloc_extras num_dbls', num_dbls
+            stop 1
+         end if
+         
+         contains
+         
+         subroutine move_dbl(dbl)
+            double precision :: dbl
+            i = i+1
+            select case (op)
+            case (extra_info_get)
+               dbl = s% extra_work(i)
+            case (extra_info_put)
+               s% extra_work(i) = dbl
+            end select
+         end subroutine move_dbl
+         
+         subroutine move_int(int)
+            integer :: int
+            i = i+1
+            select case (op)
+            case (extra_info_get)
+               int = s% extra_iwork(i)
+            case (extra_info_put)
+               s% extra_iwork(i) = int
+            end select
+         end subroutine move_int
+         
+         subroutine move_flg(flg)
+            logical :: flg
+            i = i+1
+            select case (op)
+            case (extra_info_get)
+               flg = (s% extra_iwork(i) /= 0)
+            case (extra_info_put)
+               if (flg) then
+                  s% extra_iwork(i) = 1
+               else
+                  s% extra_iwork(i) = 0
+               end if
+            end select
+         end subroutine move_flg
+      
+      end subroutine move_extra_info
+
 
       end module run_star_extras
       

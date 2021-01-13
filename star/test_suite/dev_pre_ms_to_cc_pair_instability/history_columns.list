@@ -130,6 +130,8 @@
       o_core_mass   
       si_core_mass
       fe_core_mass
+      
+      center_ye
    
    ! info about locations where optical depth is 10 or 100
 

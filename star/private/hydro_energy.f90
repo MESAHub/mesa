@@ -671,7 +671,7 @@
                mlt_Pturb_18%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
                P_face_18 = P_face_18 + mlt_Pturb_18
             end if            
-         else         
+         else ! k == 1
             P_face_18 = PL_18 + avQL_18 + PtL_18            
             if (.not. skip_P) then
                do j=1,s% species

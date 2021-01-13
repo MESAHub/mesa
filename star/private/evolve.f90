@@ -1434,6 +1434,12 @@
             s% cumulative_energy_error = s% cumulative_energy_error_old + &
                s% error_in_energy_conservation
 
+            s% total_internal_energy = s% total_internal_energy_end
+            s% total_gravitational_energy = s% total_gravitational_energy_end
+            s% total_radial_kinetic_energy = s% total_radial_kinetic_energy_end
+            s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
+            s% total_turbulent_energy = s% total_turbulent_energy_end
+            s% total_energy = s% total_energy_end
          
             if (s% model_number == s% energy_conservation_dump_model_number &
                   .and. .not. s% doing_relax) then
@@ -1572,13 +1578,13 @@
                   diff_total_turbulent_energy = &
                      s% total_turbulent_energy_end - s% total_turbulent_energy_start
                      
-                  write(*,2) 'post split rel err sum_cell_de', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_de', s% model_number, &
                      (sum_cell_de - diff_total_internal_energy)/s% total_energy, &
                      sum_cell_de, diff_total_internal_energy
-                  write(*,2) 'post split rel err sum_cell_dpe', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_dpe', s% model_number, &
                      (sum_cell_dpe - diff_total_gravitational_energy)/s% total_energy, &
                      sum_cell_dpe, diff_total_gravitational_energy
-                  write(*,2) 'post split rel err sum_cell_dke', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_dke', s% model_number, &
                      (sum_cell_dke - diff_total_kinetic_energy)/s% total_energy, &
                      sum_cell_dke, diff_total_kinetic_energy
                   !write(*,2) 'rel err ', s% model_number, &
@@ -1655,13 +1661,6 @@
                stop 'okay_energy_conservation'
                return
             end if
-
-            s% total_internal_energy = s% total_internal_energy_end
-            s% total_gravitational_energy = s% total_gravitational_energy_end
-            s% total_radial_kinetic_energy = s% total_radial_kinetic_energy_end
-            s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
-            s% total_turbulent_energy = s% total_turbulent_energy_end
-            s% total_energy = s% total_energy_end
 
             okay_energy_conservation = .true.
 
