@@ -204,8 +204,6 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     cd "$1" || exit
     touch .running
 
-    export MESA_FORCE_PGSTAR_FLAG=false
-
     echo "---" > testhub.yml
     testhub_log "test_case: $1"
     testhub_log "module: :$MESA_TEST_MOD"
@@ -226,8 +224,6 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
 
     rm .running
     cd ..
-    unset MESA_FORCE_PGSTAR_FLAG
-    
 
     echo ""
 fi
