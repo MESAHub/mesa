@@ -4509,17 +4509,6 @@
     Tsurf_factor = 1
 
 
-      ! use_Psurf_for_surface_eflux
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! used when u_flag is true. If true, then includes the work term against Psurf
-      ! in the outermost cell. If not, the surface energy flux is equal to L(1)
-
-      ! ::
-
-    use_Psurf_for_surface_eflux = .true.
-
-
       ! irradiation_flux
       ! ~~~~~~~~~~~~~~~~
       ! column_depth_for_irradiation
@@ -8019,28 +8008,6 @@
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
 
       ! for hydro comparison tests (e.g., Sedov)
-
-
-      ! v_drag_factor
-      ! ~~~~~~~~~~~~~
-      ! v_drag
-      ! ~~~~~~
-      ! q_for_v_drag_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! q_for_v_drag_full_on
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! Implemented only for u_flag right now. Adds a pseudo drag term of the form
-      ! -v_drag_factor*(v-v_drag)^2/r, can be used damp velocities in outer layers
-      ! of a star. Effect is full on for q>q_for_v_drag_full_on and full off for
-      ! q < q_for_v_drag_full_off.
-
-      ! ::
-
-    v_drag_factor = 0d0
-    v_drag = 0d0
-    q_for_v_drag_full_off = 0.95d0
-    q_for_v_drag_full_on = 0.96d0
 
 
       ! Rayleigh-Taylor Instability

@@ -344,9 +344,7 @@
     use_dedt_form_with_total_energy_conservation, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
-    use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, &
-    dedt_eqn_r_scale, drag_coefficient, min_q_for_drag, turn_on_drag_in_H_envelope, &
-    v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
+    use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_Fraley_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
@@ -482,7 +480,7 @@
     surface_extra_Pgas, use_atm_PT_at_center_of_surface_cell, &
     use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, use_T_black_body_outer_BC, &
     fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
-    use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, use_Psurf_for_surface_eflux, &
+    use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
@@ -1288,7 +1286,6 @@
  s% fixed_L_for_BB_outer_BC = fixed_L_for_BB_outer_BC
  s% use_zero_dLdm_outer_BC = use_zero_dLdm_outer_BC
  s% Tsurf_factor = Tsurf_factor
- s% use_Psurf_for_surface_eflux = use_Psurf_for_surface_eflux
 
  s% atm_build_tau_outer = atm_build_tau_outer
  s% atm_build_dlogtau = atm_build_dlogtau
@@ -1843,14 +1840,6 @@
  s% include_P_in_Fraley_time_centering = include_P_in_Fraley_time_centering
  s% include_L_in_Fraley_time_centering = include_L_in_Fraley_time_centering
  s% steps_before_use_Fraley_time_centering = steps_before_use_Fraley_time_centering
- 
- s% drag_coefficient = drag_coefficient
- s% min_q_for_drag = min_q_for_drag
- s% turn_on_drag_in_H_envelope = turn_on_drag_in_H_envelope
- s% v_drag_factor = v_drag_factor
- s% v_drag = v_drag
- s% q_for_v_drag_full_off = q_for_v_drag_full_off
- s% q_for_v_drag_full_on = q_for_v_drag_full_on
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -2917,7 +2906,6 @@
  tau_for_L_BB = s% tau_for_L_BB
  use_zero_dLdm_outer_BC = s% use_zero_dLdm_outer_BC
  Tsurf_factor = s% Tsurf_factor
- use_Psurf_for_surface_eflux = s% use_Psurf_for_surface_eflux
 
  atm_build_tau_outer = s% atm_build_tau_outer
  atm_build_dlogtau = s% atm_build_dlogtau
@@ -3463,14 +3451,6 @@
  steps_before_use_Fraley_time_centering = s% steps_before_use_Fraley_time_centering
  include_P_in_Fraley_time_centering = s% include_P_in_Fraley_time_centering
  include_L_in_Fraley_time_centering = s% include_L_in_Fraley_time_centering
- 
- drag_coefficient = s% drag_coefficient
- min_q_for_drag = s% min_q_for_drag
- turn_on_drag_in_H_envelope = s% turn_on_drag_in_H_envelope
- v_drag_factor = s% v_drag_factor
- v_drag = s% v_drag
- q_for_v_drag_full_off = s% q_for_v_drag_full_off
- q_for_v_drag_full_on = s% q_for_v_drag_full_on
 
  RTI_A = s% RTI_A
  RTI_B = s% RTI_B

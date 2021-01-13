@@ -73,24 +73,6 @@
     mlt_make_surface_no_mixing = .false.
 
 
-      ! drag_coefficient
-      ! ~~~~~~~~~~~~~~~~
-      ! min_q_for_drag
-      ! ~~~~~~~~~~~~~~
-      ! turn_on_drag_in_H_envelope
-      ! ~~~~~~~~~~~~~~
-
-      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
-      ! only for v(k) when q(k) > min_q_for_drag.
-      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
-
-      ! ::
-
-    drag_coefficient = 0d0
-    min_q_for_drag = 0d0
-    turn_on_drag_in_H_envelope = .false.
-
-
       ! use_superad_reduction
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! superad_reduction_Gamma_limit

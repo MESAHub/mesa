@@ -19,13 +19,6 @@
          logical :: mlt_make_surface_no_mixing
          
          logical :: do_normalize_dqs_as_part_of_set_qs
-         
-         
-
-         real(dp) :: &
-            drag_coefficient, &
-            min_q_for_drag
-         logical :: turn_on_drag_in_H_envelope
             
             
          

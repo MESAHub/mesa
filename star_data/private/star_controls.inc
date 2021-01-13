@@ -405,7 +405,6 @@
          logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          logical :: use_fixed_L_for_BB_outer_BC
-         logical :: use_Psurf_for_surface_eflux
 
       ! create atmosphere
 
@@ -812,12 +811,6 @@
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
             steps_before_use_Fraley_time_centering
-         
-         real(dp) :: &
-            v_drag_factor, &
-            v_drag, &
-            q_for_v_drag_full_off, &
-            q_for_v_drag_full_on
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &

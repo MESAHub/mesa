@@ -366,13 +366,11 @@
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_18var_order1) :: &
-            extra_18, accel_18, v_00, drag_18, Uq_18
+            extra_18, accel_18, v_00, Uq_18
          real(dp) :: accel, d_accel_dv, fraction_on
          logical :: test_partials, local_v_flag
 
          include 'formats'
-         ! use_other_momentum, use_other_momentum_implicit
-         ! dv_dt, drag, Uq
 
          ierr = 0
          
@@ -392,7 +390,6 @@
          end if
          
          accel_18 = 0d0
-         drag_18 = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
@@ -415,16 +412,6 @@
             end if
             accel_18%val = accel
             accel_18%d1Array(i_v_00) = d_accel_dv
-
-            s% dvdt_drag(k) = 0
-            if (s% drag_coefficient > 0) then
-                if (s% q(k) > s% min_q_for_drag .or. &
-                   (s% turn_on_drag_in_H_envelope .and. k <= s% start_H_envelope_base_k)) then
-                  v_00 = wrap_v_00(s,k)
-                  drag_18 = -s% drag_coefficient*v_00/s% dt
-                  s% dvdt_drag(k) = drag_18%val
-               end if
-            end if
          
          end if ! v_flag
 
@@ -434,7 +421,7 @@
             if (ierr /= 0) return
          end if
          
-         other_18 = extra_18 - accel_18 + drag_18 + Uq_18
+         other_18 = extra_18 - accel_18 + Uq_18
          other = other_18%val
          
          if (.false.) then
@@ -444,10 +431,6 @@
             end if
             if (is_bad(accel_18%d1Array(i_lnd_m1))) then
                write(*,2) 'lnd_m1 accel_18', k, accel_18%d1Array(i_lnd_m1)
-               stop 'expected_non_HSE_term'
-            end if
-            if (is_bad(drag_18%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 drag_18', k, drag_18%d1Array(i_lnd_m1)
                stop 'expected_non_HSE_term'
             end if
             if (is_bad(Uq_18%d1Array(i_lnd_m1))) then

@@ -30,6 +30,7 @@
       use const_def
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
+      use auto_diff_support
       use star_utils, only: em1, e00, ep1
 
       implicit none
@@ -223,8 +224,7 @@
             use hydro_Eturb, only: calc_Eq_18
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
-               eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, &
-               v_00, v_p1, drag_force, drag_energy_18
+               eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, RTI_diffusion_18
             include 'formats'
             ierr = 0
          
@@ -273,32 +273,57 @@
                if (ierr /= 0) return
             end if   
             
-            ! sign confusion???  drag_energy always >= 0?
-            drag_energy_18 = 0d0   
-            if (.false.) then    ! this term makes energy conservation bad.   what's wrong???
-                           
-            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
-               v_00 = wrap_v_00(s,k)
-               drag_force = s% drag_coefficient*v_00/s% dt
-               drag_energy_18 = 0.5d0*v_00*drag_force
-               ! drag energy for outer half-cell.   the 0.5d0 is for dm/2
-            end if            
-            if (s% q(k+1) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
-               v_p1 = wrap_v_p1(s,k)
-               drag_force = s% drag_coefficient*v_p1/s% dt
-               drag_energy_18 = drag_energy_18 + 0.5d0*v_p1*drag_force
-               ! drag energy for inner half-cell.   the 0.5d0 is for dm/2
-            end if       
-               
-            end if  
+            call setup_RTI_diffusion(RTI_diffusion_18)
 
-            sources_18 = eps_nuc_18 - non_nuc_neu_18 + extra_heat_18 + Eq_18 + drag_energy_18
+            sources_18 = eps_nuc_18 - non_nuc_neu_18 + extra_heat_18 + Eq_18 + RTI_diffusion_18
 
             sources_18%val = sources_18%val + s% irradiation_heat(k)
             
             if (s% mstar_dot /= 0d0) sources_18%val = sources_18%val + s% eps_mdot(k)
 
          end subroutine setup_sources_and_others
+         
+         subroutine setup_RTI_diffusion(diffusion_eps_18)
+            type(auto_diff_real_18var_order1), intent(out) :: diffusion_eps_18
+            real(dp) :: diffusion_factor, emin_start, sigp1, sig00
+            logical :: do_diffusion
+            type(auto_diff_real_18var_order1) :: &
+               e_m1, e_00, e_p1, diffusion_eps_in, diffusion_eps_out
+            include 'formats'
+            diffusion_factor = s% dedt_RTI_diffusion_factor
+            do_diffusion = s% RTI_flag .and. diffusion_factor > 0d0
+            if (.not. do_diffusion) then
+               diffusion_eps_18 = 0d0
+            else
+               if (k < s% nz) then
+                  if (s% alpha_RTI(k) > 1d-10 .and. k > 1) then
+                     emin_start = min( &
+                        s% energy_start(k+1), s% energy_start(k), s% energy_start(k-1))
+                     if (emin_start < 5d0*s% RTI_energy_floor) then
+                        diffusion_factor = diffusion_factor* &
+                           (1d0 + (5d0*s% RTI_energy_floor - emin_start)/emin_start)
+                     end if
+                  end if
+                  sigp1 = diffusion_factor*s% sig_RTI(k+1)
+                  e_p1 = wrap_e_p1(s,k)
+               else
+                  sigp1 = 0
+                  e_p1 = 0d0
+               end if
+               if (k > 1) then
+                  sig00 = diffusion_factor*s% sig_RTI(k)
+                  e_m1 = wrap_e_m1(s,k)
+               else
+                  sig00 = 0
+                  e_m1 = 0
+               end if
+               e_00 = wrap_e_00(s,k)
+               diffusion_eps_in = sigp1*(e_p1 - e_00)/dm
+               diffusion_eps_out = sig00*(e_00 - e_m1)/dm
+               diffusion_eps_18 = diffusion_eps_in - diffusion_eps_out
+            end if
+            s% dedt_RTI(k) = diffusion_eps_18%val
+         end subroutine setup_RTI_diffusion
          
          subroutine setup_dEturb_dt(ierr)
             integer, intent(out) :: ierr
@@ -315,6 +340,11 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
+            
+            if (s% u_flag) then ! for now, assume u_flag means no eps_grav 
+               eps_grav_form = .false.
+               return
+            end if
 
             eps_grav_form = .not. s% use_dedt_form_of_energy_eqn
          
@@ -358,6 +388,7 @@
          end subroutine setup_eps_grav
 
          subroutine setup_de_dt_and_friends(ierr)
+            use star_utils, only: get_dke_dt_dpe_dt
             integer, intent(out) :: ierr
             real(dp) :: P_dV
             real(dp) :: dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
@@ -576,7 +607,7 @@
          include 'formats'
          ierr = 0
 
-         if (k > s% nz .or. (s% dt <= 0d0 .and. .not. s% v_flag)) then
+         if (k > s% nz .or. (s% dt <= 0d0 .and. .not. (s% v_flag .or. s% u_flag))) then
             work_18 = 0d0
             if (k == s% nz+1) then
                work = 4*pi*s% r_center*s% r_center*s% P_start(s% nz)*s% v_center
@@ -587,121 +618,131 @@
             d_work_dxam1 = 0d0
             return    
          end if
-
-         theta = 1d0
-         P_theta = 1d0
-         if (s% using_Fraley_time_centering) then
-            theta = 0.5d0
-            if (s% include_P_in_Fraley_time_centering) P_theta = 0.5d0
-         end if
          
          A_18 = 0d0
          A_18%val = 4d0*pi*s% R2(k)
          A_18%d1Array(i_lnR_00) = 4d0*pi*s% d_R2_dlnR(k)
          A = A_18%val
 
-         PR_18 = 0d0
-         avQR_18 = 0d0
-         PtR_18 = 0d0         
-         if (k > 1) then 
+         if (s% u_flag) then ! keep it simple for now.
+         
+            call wrap_P_face(s, P_face_18, k) 
+            call wrap_u_face(s, u_face_18, k) 
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
+         
+         else
+
+            theta = 1d0
+            P_theta = 1d0
+            if (s% using_Fraley_time_centering) then
+               theta = 0.5d0
+               if (s% include_P_in_Fraley_time_centering) P_theta = 0.5d0
+            end if
+
+            PR_18 = 0d0
+            avQR_18 = 0d0
+            PtR_18 = 0d0         
+            if (k > 1) then 
+               if (s% use_avQ_art_visc) then
+                  call get_avQ_18(s, k-1, avQR_18, ierr)
+                  if (ierr /= 0) return
+                  avQR_18 = shift_m1(avQR_18)
+                  avQR_18 = 0.5d0*(avQR_18 + s% avQ_start(k-1))
+               end if            
+               if (s% Eturb_flag) then
+                  call calc_Pt_18_tw(s, k-1, PtR_18, ierr)
+                  if (ierr /= 0) return
+                  PtR_18 = shift_m1(PtR_18)
+               end if            
+               if (.not. skip_P) then
+                  PR_18 = wrap_p_m1(s, k)
+                  if (s% using_Fraley_time_centering .and. &
+                           s% include_P_in_Fraley_time_centering) &
+                     PR_18 = 0.5d0*(PR_18 + s% P_start(k))
+               end if            
+               if (s% use_other_pressure) PR_18%val = PR_18%val + s% extra_pressure(k-1)            
+            end if
+      
+            avQL_18 = 0d0
             if (s% use_avQ_art_visc) then
-               call get_avQ_18(s, k-1, avQR_18, ierr)
+               call get_avQ_18(s, k, avQL_18, ierr)
                if (ierr /= 0) return
-               avQR_18 = shift_m1(avQR_18)
-               avQR_18 = 0.5d0*(avQR_18 + s% avQ_start(k-1))
-            end if            
+               avQL_18 = 0.5d0*(avQL_18 + s% avQ_start(k))
+            end if
+         
+            PtL_18 = 0d0
             if (s% Eturb_flag) then
-               call calc_Pt_18_tw(s, k-1, PtR_18, ierr)
+               call calc_Pt_18_tw(s, k, PtL_18, ierr)
                if (ierr /= 0) return
-               PtR_18 = shift_m1(PtR_18)
-            end if            
-            if (.not. skip_P) then
-               PR_18 = wrap_p_m1(s, k)
+            end if
+         
+            if (skip_P) then
+               PL_18 = 0d0
+            else
+               PL_18 = wrap_p_00(s, k)
                if (s% using_Fraley_time_centering .and. &
                         s% include_P_in_Fraley_time_centering) &
-                  PR_18 = 0.5d0*(PR_18 + s% P_start(k))
-            end if            
-            if (s% use_other_pressure) PR_18%val = PR_18%val + s% extra_pressure(k-1)            
-         end if
-      
-         avQL_18 = 0d0
-         if (s% use_avQ_art_visc) then
-            call get_avQ_18(s, k, avQL_18, ierr)
-            if (ierr /= 0) return
-            avQL_18 = 0.5d0*(avQL_18 + s% avQ_start(k))
-         end if
+                  PL_18 = 0.5d0*(PL_18 + s% P_start(k))
+            end if
+            if (s% use_other_pressure) PL_18%val = PL_18%val + s% extra_pressure(k)
          
-         PtL_18 = 0d0
-         if (s% Eturb_flag) then
-            call calc_Pt_18_tw(s, k, PtL_18, ierr)
-            if (ierr /= 0) return
-         end if
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
          
-         if (skip_P) then
-            PL_18 = 0d0
-         else
-            PL_18 = wrap_p_00(s, k)
-            if (s% using_Fraley_time_centering .and. &
-                     s% include_P_in_Fraley_time_centering) &
-               PL_18 = 0.5d0*(PL_18 + s% P_start(k))
+            if (k > 1) then         
+               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+               beta = 1d0 - alfa
+               P_face_18 = alfa*(PL_18 + avQL_18 + PtL_18) + beta*(PR_18 + avQR_18 + PtR_18)            
+               if (.not. skip_P) then
+                  do j=1,s% species
+                     d_Pface_dxa00(j) = d_Pface_dxa00(j) + &
+                        alfa*s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
+                  end do
+                  do j=1,s% species
+                     d_Pface_dxam1(j) = d_Pface_dxam1(j) + &
+                        beta*s% dlnP_dxa_for_partials(j,k-1)*P_theta*s% P(k-1)
+                  end do
+               end if         
+               if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
+                  mlt_Pturb_18 = 0d0
+                  mlt_Pturb_18%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
+                  mlt_Pturb_18%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
+                  mlt_Pturb_18%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
+                  P_face_18 = P_face_18 + mlt_Pturb_18
+               end if            
+            else ! k == 1
+               P_face_18 = PL_18 + avQL_18 + PtL_18            
+               if (.not. skip_P) then
+                  do j=1,s% species
+                     d_Pface_dxa00(j) = d_Pface_dxa00(j) + &
+                        s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
+                  end do
+               end if            
+            end if
+
+            u_face_18 = 0d0
+            if (s% v_flag) then
+               u_face_18%val = s% vc(k)
+               u_face_18%d1Array(i_v_00) = s% d_vc_dv
+            else
+               u_face_18%val = theta*(s% r(k) - s% r_start(k))/s% dt
+               u_face_18%d1Array(i_lnR_00) = theta*s% r(k)/s% dt
+            end if
+            
          end if
-         if (s% use_other_pressure) PL_18%val = PL_18%val + s% extra_pressure(k)
-         
-         d_Pface_dxa00 = 0d0
-         d_Pface_dxam1 = 0d0
-         
-         if (k > 1) then         
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            beta = 1d0 - alfa
-            P_face_18 = alfa*(PL_18 + avQL_18 + PtL_18) + beta*(PR_18 + avQR_18 + PtR_18)            
-            if (.not. skip_P) then
-               do j=1,s% species
-                  d_Pface_dxa00(j) = d_Pface_dxa00(j) + &
-                     alfa*s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
-               end do
-               do j=1,s% species
-                  d_Pface_dxam1(j) = d_Pface_dxam1(j) + &
-                     beta*s% dlnP_dxa_for_partials(j,k-1)*P_theta*s% P(k-1)
-               end do
-            end if         
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
-               mlt_Pturb_18 = 0d0
-               mlt_Pturb_18%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
-               mlt_Pturb_18%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
-               mlt_Pturb_18%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
-               P_face_18 = P_face_18 + mlt_Pturb_18
-            end if            
-         else ! k == 1
-            P_face_18 = PL_18 + avQL_18 + PtL_18            
-            if (.not. skip_P) then
-               do j=1,s% species
-                  d_Pface_dxa00(j) = d_Pface_dxa00(j) + &
-                     s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
-               end do
-            end if            
-         end if
-         P_face = P_face_18%val
-         
-         u_face_18 = 0d0
-         if (s% v_flag) then
-            u_face_18%val = s% vc(k)
-            u_face_18%d1Array(i_v_00) = s% d_vc_dv
-         else
-            u_face_18%val = theta*(s% r(k) - s% r_start(k))/s% dt
-            u_face_18%d1Array(i_lnR_00) = theta*s% r(k)/s% dt
-         end if
-         u_face = u_face_18%val
          
          work_18 = A_18*P_face_18*u_face_18
-         
+         P_face = P_face_18%val
+         u_face = u_face_18%val
          work = work_18%val
+         if (k == 1) s% work_outward_at_surface = work
+         
          do j=1,s% species
             d_work_dxa00(j) = A*d_Pface_dxa00(j)*u_face
             d_work_dxam1(j) = A*d_Pface_dxam1(j)*u_face
          end do
-         
-         if (k == 1) s% work_outward_at_surface = work
-         
+
          if (is_bad(work)) then
 !$omp critical (hydro_equ_l_crit2)
             write(*,2) 'work', k, work
@@ -720,40 +761,6 @@
          end if
          
       end subroutine eval1_work
-
-      
-      subroutine get_dke_dt_dpe_dt(s, k, dt, &
-            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
-            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)
-         use star_utils, only: cell_start_specific_PE_qp, cell_specific_PE_qp, &
-            cell_start_specific_KE_qp, cell_specific_KE_qp
-         type (star_info), pointer :: s      
-         integer, intent(in) :: k 
-         real(dp), intent(in) :: dt
-         real(dp), intent(out) :: &
-            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
-            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1
-         integer, intent(out) :: ierr
-         real(dp) :: PE_start, PE_new, KE_start, KE_new, q1
-         real(dp) :: dpe_dlnR00, dpe_dlnRp1, dke_dv00, dke_dvp1
-         integer :: nz
-         include 'formats'
-         ierr = 0
-         ! rate of change in specific PE (erg/g/s)
-         PE_start = cell_start_specific_PE_qp(s,k)
-         PE_new = cell_specific_PE_qp(s,k,dpe_dlnR00,dpe_dlnRp1)
-         q1 = PE_new - PE_start
-         dpe_dt = q1/dt ! erg/g/s
-         d_dpedt_dlnR00 = dpe_dlnR00/dt
-         d_dpedt_dlnRp1 = dpe_dlnRp1/dt    
-         ! rate of change in specific KE (erg/g/s)
-         KE_start = cell_start_specific_KE_qp(s,k)
-         KE_new = cell_specific_KE_qp(s,k,dke_dv00,dke_dvp1)
-         q1 = KE_new - KE_start
-         dke_dt = q1/dt ! erg/g/s
-         d_dkedt_dv00 = dke_dv00/dt
-         d_dkedt_dvp1 = dke_dvp1/dt   
-      end subroutine get_dke_dt_dpe_dt
 
 
       subroutine get_P_dV(s, k, P_dV, d_PdV_dlnd, d_PdV_dlnT, ierr)

@@ -2035,6 +2035,38 @@
          end if
          cell_specific_rotational_energy = 0.5d0*(e_p1 + e_00)
       end function cell_specific_rotational_energy
+
+      
+      subroutine get_dke_dt_dpe_dt(s, k, dt, &
+            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)
+         type (star_info), pointer :: s      
+         integer, intent(in) :: k 
+         real(dp), intent(in) :: dt
+         real(dp), intent(out) :: &
+            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1
+         integer, intent(out) :: ierr
+         real(dp) :: PE_start, PE_new, KE_start, KE_new, q1
+         real(dp) :: dpe_dlnR00, dpe_dlnRp1, dke_dv00, dke_dvp1
+         integer :: nz
+         include 'formats'
+         ierr = 0
+         ! rate of change in specific PE (erg/g/s)
+         PE_start = cell_start_specific_PE_qp(s,k)
+         PE_new = cell_specific_PE_qp(s,k,dpe_dlnR00,dpe_dlnRp1)
+         q1 = PE_new - PE_start
+         dpe_dt = q1/dt ! erg/g/s
+         d_dpedt_dlnR00 = dpe_dlnR00/dt
+         d_dpedt_dlnRp1 = dpe_dlnRp1/dt    
+         ! rate of change in specific KE (erg/g/s)
+         KE_start = cell_start_specific_KE_qp(s,k)
+         KE_new = cell_specific_KE_qp(s,k,dke_dv00,dke_dvp1)
+         q1 = KE_new - KE_start
+         dke_dt = q1/dt ! erg/g/s
+         d_dkedt_dv00 = dke_dv00/dt
+         d_dkedt_dvp1 = dke_dvp1/dt   
+      end subroutine get_dke_dt_dpe_dt
       
       
       real(dp) function eval_deltaM_total_from_profile( &
