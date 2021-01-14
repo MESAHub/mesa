@@ -204,7 +204,6 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     cd "$1" || exit
     touch .running
 
-
     echo "---" > testhub.yml
     testhub_log "test_case: $1"
     testhub_log "module: :$MESA_TEST_MOD"

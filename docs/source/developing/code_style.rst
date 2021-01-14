@@ -146,3 +146,8 @@ Unformatted statements are likely to cause unit tests to fail.  They also make i
 different compilers.
 
 Some helpful formats are provided in ``include/formats``.
+
+Environment variables
+---------------------
+
+If making a new environment variable then the variable should be prefixed with ``MESA_`` to ensure we don’t collide with other variables.
