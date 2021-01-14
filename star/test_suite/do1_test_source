@@ -27,7 +27,7 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto                 
 
-#   not yet       do_one dev_pre_ms_to_cc_pair_instability "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+do_one dev_pre_ms_to_cc_pair_instability "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 #   not yet       do_one dev_pre_ms_to_cc_ppisn "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_hi "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_lo "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip

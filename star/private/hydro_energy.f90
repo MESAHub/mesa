@@ -115,10 +115,13 @@
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
          s% PdVdt(k) = 0d0
          
+         
+         ! NOTE: for now, u_flag forces same as use_dedt_form_with_total_energy_conservation
+         
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
             esum_18 = - dL_dm_18 + sources_18 + others_18 - dEturb_dt_18 - dwork_dm_18 + eps_grav_18
-         else if (s% use_dedt_form_with_total_energy_conservation) then
+         else if (s% use_dedt_form_with_total_energy_conservation .or. s% u_flag) then
             esum_18 = - dL_dm_18 + sources_18 + others_18 - dEturb_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          else
             esum_18 = - dL_dm_18 + sources_18 + others_18 - dEturb_dt_18 - dwork_dm_18 - P_dV_dt_18 - de_dt_18
@@ -144,7 +147,7 @@
          call unpack_res18(resid_18)
 
          if (test_partials) then  
-            s% solver_test_partials_var = s% i_lnT
+            s% solver_test_partials_var = s% i_u
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)  
             write(*,*) 'get1_energy_eqn', s% solver_test_partials_var
             if (eps_grav_form) write(*,*) 'eps_grav_form', eps_grav_form
@@ -574,9 +577,9 @@
          test_partials = .false.
             
          if (test_partials) then
-            s% solver_test_partials_val = work_00
-            s% solver_test_partials_var = s% i_lnd
-            s% solver_test_partials_dval_dx = 0d0
+            s% solver_test_partials_val = dwork
+            s% solver_test_partials_var = s% i_u
+            s% solver_test_partials_dval_dx = dwork_18%d1Array(i_v_00)
             write(*,*) 'eval_dwork', s% solver_test_partials_var
          end if
 
@@ -754,9 +757,9 @@
          test_partials = .false.
             
          if (test_partials) then
-            s% solver_test_partials_val = u_face
-            s% solver_test_partials_var = s% i_lnR
-            s% solver_test_partials_dval_dx = 0d0
+            s% solver_test_partials_val = work
+            s% solver_test_partials_var = s% i_u
+            s% solver_test_partials_dval_dx = work_18%d1Array(i_v_00)
             write(*,*) 'eval1_work', s% solver_test_partials_var
          end if
          

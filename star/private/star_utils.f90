@@ -1456,6 +1456,7 @@
          call unpack1(s% i_lnT, dlnT_m1, dlnT_00, dlnT_p1)
          call unpack1(s% i_lnR, dlnR_m1, dlnR_00, dlnR_p1)
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
+         if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
          if (s% i_eturb /= 0) call unpack1(s% i_eturb, deturb_m1, deturb_00, deturb_p1)
          

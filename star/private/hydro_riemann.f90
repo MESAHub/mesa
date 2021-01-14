@@ -49,8 +49,8 @@
 
       private
       public :: &
-         do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
-         do1_Riemann_dlnRdt_eqn
+         do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, do1_Riemann_dlnRdt_eqn
+         ! Riemann_energy_eqn is now part of the standard energy equation
 
       contains
 
@@ -542,7 +542,7 @@
          residual = (dudt_expected - dudt_actual)*scal
 
          if (test_partials) then
-            s% solver_test_partials_val = flux_in - flux_out
+            s% solver_test_partials_val = residual
          end if
          
          if (is_bad(residual)) then
@@ -652,8 +652,8 @@
          !ep1_lnd = 0; ep1_lnT = 0
          
          if (test_partials) then
-            s% solver_test_partials_var = s% i_w_div_wc
-            s% solver_test_partials_dval_dx = d_grav_source_dwR/dm
+            s% solver_test_partials_var = s% i_lnR
+            s% solver_test_partials_dval_dx = e00_lnR
             !write(*,2) 'Uq', k, Uq
             !write(*,2) 'dudt_expected', k, dudt_expected
             !write(*,2) 'dudt_actual', k, dudt_actual
