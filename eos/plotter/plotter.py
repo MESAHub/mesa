@@ -10,8 +10,8 @@ def parse(fname):
     nY, nX = np.loadtxt(fname, max_rows=1, skiprows=3, unpack=True, dtype=int)
     data = np.loadtxt(fname, skiprows=4)
     data = np.reshape(data, ((nX, nY, -1)))
-    Yran = data[0,:,0]
-    Xran = data[:,0,1]
+    Yran = np.array(data[0,:,0])
+    Xran = np.array(data[:,0,1])
     data = np.swapaxes(data, 0, 1)
     return data, Yran, Xran
 
