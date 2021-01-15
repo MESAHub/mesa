@@ -46,7 +46,15 @@
       !max_number_retries = 58
 
 ! wind
-
+      ! same as in ppisn 9967
+      Dutch_scaling_factor = 0.4
+      cool_wind_RGB_scheme = 'Dutch'
+      cool_wind_AGB_scheme = 'Dutch'
+      hot_wind_scheme = 'Dutch'
+      Dutch_wind_lowT_scheme = 'van Loon'
+      cool_wind_full_on_T = 0.8d4
+      hot_wind_full_on_T = 1.2d4
+   
 ! atmosphere
 
 ! rotation

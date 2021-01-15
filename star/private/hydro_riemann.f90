@@ -652,8 +652,8 @@
          !ep1_lnd = 0; ep1_lnT = 0
          
          if (test_partials) then
-            s% solver_test_partials_var = s% i_lnR
-            s% solver_test_partials_dval_dx = e00_lnR
+            s% solver_test_partials_var = s% i_lnd
+            s% solver_test_partials_dval_dx = ep1_lnd
             !write(*,2) 'Uq', k, Uq
             !write(*,2) 'dudt_expected', k, dudt_expected
             !write(*,2) 'dudt_actual', k, dudt_actual

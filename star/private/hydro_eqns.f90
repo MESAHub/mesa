@@ -2275,8 +2275,8 @@
             
             if (skip_partials) return
             if (test_partials) then
-               s% solver_test_partials_var = s% i_lnT
-               s% solver_test_partials_dval_dx = P*dlnPsurf_dlnT
+               s% solver_test_partials_var = s% i_lum
+               s% solver_test_partials_dval_dx = P*dlnPsurf_dL
                write(*,*) 'set_momentum_BC', s% solver_test_partials_var, s% Eturb_flag
             end if
 

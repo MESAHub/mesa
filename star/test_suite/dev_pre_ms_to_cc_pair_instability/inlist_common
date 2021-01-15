@@ -24,6 +24,9 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
+      save_star_job_namelist = .true.
+      star_job_namelist_name = 'controls_star_job.txt'
+
       !pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -213,6 +216,9 @@
       x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
+      save_controls_namelist = .true.
+      controls_namelist_name = 'controls.txt'
+
       center_avg_value_dq = 1d-12
       he_core_boundary_h1_fraction = 0.5
       c_core_boundary_he4_fraction = 0.5
