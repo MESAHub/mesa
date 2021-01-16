@@ -110,7 +110,7 @@
          call check('logRho', avg_val(s% lnd)/ln10, 1d0, 3.0d0)
          call check('log j_rot', safe_log10(avg_val(s% j_rot)), 15.8d0, 16.8d0)
          call check('D_ES', safe_log10(avg_val(s% D_ES)), 3.5d0, 6.5d0) 
-         call check('D_ST', safe_log10(avg_val(s% D_ST)), 1.0d0, 3.0d0)
+         call check('D_ST', safe_log10(avg_val(s% D_ST)), 1.0d0, 10.0d0)
          call check('nu_ST', safe_log10(avg_val(s% nu_ST)), 9.1d0, 11.9d0)
          write(*,*)
          if (okay) write(*,'(a)') 'all values are within tolerances'

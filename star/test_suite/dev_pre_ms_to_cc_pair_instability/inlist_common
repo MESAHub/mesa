@@ -27,7 +27,7 @@
       save_star_job_namelist = .true.
       star_job_namelist_name = 'controls_star_job.txt'
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -155,8 +155,8 @@
       delta_Ye_highT_limit = 1d-3
 
 ! mesh
-      mesh_delta_coeff = 1.6
-      mesh_delta_coeff_for_highT = 1.5      
+      mesh_delta_coeff = 0.8
+      mesh_delta_coeff_for_highT = 0.6      
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
       min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
