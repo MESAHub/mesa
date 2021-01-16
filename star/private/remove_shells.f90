@@ -214,6 +214,7 @@
          integer :: k, k0, k1, nz
          real(dp) :: ie, ke, pe, rR, rL, rC, m_cntr, &
             sum_total_energy, speed_limit
+         real(dp), pointer :: v(:)
          
          include 'formats'
          
@@ -223,9 +224,11 @@
             return
          end if
          
-         if (.not. s% u_flag) then
-            write(*,*) 'only remove fallback with u_flag'
-            ierr = -1
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
             return
          end if
          
@@ -239,7 +242,7 @@
             sum_total_energy = 0d0
             do k = nz,1,-1
                ie = s% energy(k)*s% dm(k)
-               ke = 0.5d0*s% u(k)*s% u(k)*s% dm(k)
+               ke = 0.5d0*v(k)*v(k)*s% dm(k)
                if (k == s% nz) then   
                   rL = s% R_center
                else
@@ -273,7 +276,7 @@
             end if
             do k=k0-1,1,-1
                ie = s% energy(k)*s% dm(k)
-               ke = 0.5d0*s% u(k)*s% u(k)*s% dm(k)
+               ke = 0.5d0*v(k)*v(k)*s% dm(k)
                rL = s% r(k+1)
                rR = s% r(k)
                rC = 0.5d0*(rR + rL)
@@ -287,12 +290,10 @@
             end do
          else
             speed_limit = s% job% remove_fallback_speed_limit
-            !write(*,3) '-u/limit', s% model_number, nz, -s% u(nz)/(speed_limit*s% csound(nz))
-            if (-s% u(nz) <= speed_limit*s% csound(nz)) return
+            if (-v(nz) <= speed_limit*s% csound(nz)) return
             do k = nz-1,1,-1
                k0 = k+1
-               !write(*,3) '-u/limit', s% model_number, k, -s% u(k)/(speed_limit*s% csound(k))
-               if (-s% u(k) < speed_limit*s% csound(k)) exit
+               if (-v(k) < speed_limit*s% csound(k)) exit
             end do
          end if
          

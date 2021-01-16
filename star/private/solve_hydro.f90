@@ -365,7 +365,7 @@
          logical, intent(in) :: report
          integer, intent(out) :: ierr
          integer :: k, nz
-         real(dp) :: old_energy, old_IE, new_IE, old_KE, new_KE, new_u, &
+         real(dp) :: old_energy, old_IE, new_IE, old_KE, new_KE, new_u, new_v, &
             revised_energy, new_lnT
          include 'formats'
          ierr = 0
@@ -392,15 +392,27 @@
                s% T(k) = exp(new_lnT)
             end if
             new_IE = s% energy(k)*s% dm(k)
-            old_KE = 0.5d0*s% dm(k)*s% u(k)*s% u(k)
-            new_KE = max(0d0, old_KE + old_IE - new_IE)
-            new_u = sqrt(new_KE/(0.5d0*s% dm(k)))
-            if (s% u(k) > 0d0) then
-               s% u(k) = new_u
-            else
-               s% u(k) = -new_u
+            if (s% u_flag) then
+               old_KE = 0.5d0*s% dm(k)*s% u(k)*s% u(k)
+               new_KE = max(0d0, old_KE + old_IE - new_IE)
+               new_u = sqrt(new_KE/(0.5d0*s% dm(k)))
+               if (s% u(k) > 0d0) then
+                  s% u(k) = new_u
+               else
+                  s% u(k) = -new_u
+               end if
+               s% xh(s% i_u, k) = s% u(k)
+            else if (s% v_flag) then ! only rough approximation possible here
+               old_KE = 0.5d0*s% dm_bar(k)*s% v(k)*s% v(k)
+               new_KE = max(0d0, old_KE + old_IE - new_IE)
+               new_v = sqrt(max(0d0,new_KE)/(0.5d0*s% dm_bar(k)))
+               if (s% v(k) > 0d0) then
+                  s% v(k) = new_v
+               else
+                  s% v(k) = -new_v
+               end if
+               s% xh(s% i_v, k) = s% v(k)
             end if
-            s% xh(s% i_u, k) = s% u(k)
          end do
       end function RTI_check_after_converge
 
