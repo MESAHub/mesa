@@ -31,6 +31,9 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
    
+      !pgstar_flag = .true.
+
+
 / ! end of star_job namelist
 
 &eos
@@ -111,7 +114,7 @@
          
       Grid2_win_flag = .true.
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+      Grid2_title = '0.55 M\d\(2281)\u  Z=0.0001  Type II Cepheid'
       
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
