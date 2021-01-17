@@ -117,7 +117,7 @@
          History_Panels1_ymax(2) = -101d0 ! only used if /= -101d0        
          History_Panels1_dymin(2) = -1 
          
-         History_Panels1_other_yaxis_name(2) = 'v_surf'
+         History_Panels1_other_yaxis_name(2) = 'v_surf_km_s'
          History_Panels1_other_yaxis_reversed(2) = .false.
          History_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
          History_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0        
