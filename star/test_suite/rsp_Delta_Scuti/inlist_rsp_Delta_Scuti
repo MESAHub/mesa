@@ -30,11 +30,14 @@
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
    
 / ! end of star_job namelist
 
 &kap
-   Zbase    =   0.02d0
+
+      Zbase    =   0.02d0
 
       kap_file_prefix = 'a09'
       kap_lowT_prefix = 'lowT_fa05_a09p'
@@ -116,7 +119,7 @@
          
       Grid2_win_flag = .true.
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+      Grid2_title = '2.0 M\d\(2281)\u  Z=0.02  delta Scuti'
       
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
