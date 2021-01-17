@@ -333,7 +333,7 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 55.1 ! -101d0
+Profile_Panels3_xmax = -1 ! 55.1 ! -101d0
 
 Profile_Panels3_num_panels = 6
 

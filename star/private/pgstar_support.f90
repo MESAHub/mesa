@@ -1117,8 +1117,8 @@
 
          ! use given if it isn't = 101
          use_given_xmin = abs(given_xmin+101.0) > 1e-6
-         if (xaxis_by == 'mass' .and. given_xmin < 0 .and. .not. use_given_xmin) then
-            xmin = maxval(xvec(1:nz)) - given_xmin
+         if (xaxis_by == 'mass' .and. given_xmin < 0 .and. use_given_xmin) then
+            xmin = maxval(xvec(1:nz)) + given_xmin
          else if (use_given_xmin) then
             xmin = given_xmin
          else if (xaxis_by == 'logxm' .or. xaxis_by == 'logxq') then
@@ -1128,9 +1128,9 @@
          end if
 
          use_given_xmax = abs(given_xmax+101.0) > 1e-6
-         if (xaxis_by == 'mass' .and. given_xmax < 0 .and. .not. use_given_xmin) then
-            xmax = maxval(xvec(1:nz)) - given_xmax
-         elseif (use_given_xmax) then
+         if (xaxis_by == 'mass' .and. given_xmax < 0 .and. use_given_xmax) then
+            xmax = maxval(xvec(1:nz)) + given_xmax
+         else if (use_given_xmax) then
             xmax = given_xmax
          else
             xmax = maxval(xvec(1:nz))
