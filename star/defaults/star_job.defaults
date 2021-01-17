@@ -2216,6 +2216,8 @@
 
       ! remove_initial_surface_at_cell_k
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_initial_surface_at_he_core_boundary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_optical_depth
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_density
@@ -2244,6 +2246,7 @@
       ! ::
 
     remove_initial_surface_at_cell_k = 0
+    remove_initial_surface_at_he_core_boundary = 0
     remove_initial_surface_by_optical_depth = 0
     remove_initial_surface_by_density = 0
     remove_initial_surface_by_pressure = 0
@@ -2258,6 +2261,8 @@
 
 
       ! remove_surface_at_cell_k
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_surface_at_he_core_boundary
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_optical_depth
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2291,6 +2296,7 @@
       ! ::
 
     remove_surface_at_cell_k = 0
+    remove_surface_at_he_core_boundary = 0
     remove_surface_by_optical_depth = 0
     remove_surface_by_density = 0
     remove_surface_by_pressure = 0

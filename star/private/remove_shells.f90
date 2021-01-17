@@ -675,6 +675,28 @@
       end subroutine do_remove_surface_at_cell_k
 
 
+      subroutine do_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)
+         integer, intent(in) :: id
+         real(dp), intent(in) :: h1_fraction
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'do_remove_surface_at_he_core_boundary: get_star_ptr ierr', ierr
+            return
+         end if
+         if (s% X(1) <= h1_fraction) return
+         do k=2,s% nz
+            if (s% X(k) <= h1_fraction) then
+               call do_remove_surface(id, k-1, ierr)
+               return
+            end if
+         end do
+         ierr = -1
+      end subroutine do_remove_surface_at_he_core_boundary
+
+
       subroutine do_remove_surface_by_optical_depth(id, optical_depth, ierr)
          integer, intent(in) :: id
          real(dp), intent(in) :: optical_depth

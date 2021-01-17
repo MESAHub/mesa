@@ -118,6 +118,7 @@
          max_q_for_remove_surface_by_v_surf_div_v_escape
 
       integer :: remove_surface_at_cell_k, remove_initial_surface_at_cell_k
+      real(dp) :: remove_surface_at_he_core_boundary, remove_initial_surface_at_he_core_boundary
       real(dp) :: remove_surface_by_optical_depth, remove_initial_surface_by_optical_depth
       real(dp) :: remove_surface_by_density, remove_initial_surface_by_density
       real(dp) :: remove_surface_by_pressure, remove_initial_surface_by_pressure

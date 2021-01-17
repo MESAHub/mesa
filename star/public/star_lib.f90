@@ -2677,6 +2677,15 @@
       end subroutine star_remove_surface_at_cell_k
       
       
+      subroutine star_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)
+         use remove_shells, only: do_remove_surface_at_he_core_boundary
+         integer, intent(in) :: id
+         real(dp), intent(in) :: h1_fraction
+         integer, intent(out) :: ierr
+         call do_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)      
+      end subroutine star_remove_surface_at_he_core_boundary
+      
+      
       subroutine star_remove_surface_by_optical_depth(id, optical_depth, ierr)
          use remove_shells, only: do_remove_surface_by_optical_depth
          integer, intent(in) :: id
@@ -2684,8 +2693,7 @@
          integer, intent(out) :: ierr
          call do_remove_surface_by_optical_depth(id, optical_depth, ierr)      
       end subroutine star_remove_surface_by_optical_depth
-      
-      
+
       
       subroutine star_remove_surface_by_density(id, density, ierr)
          use remove_shells, only: do_remove_surface_by_density

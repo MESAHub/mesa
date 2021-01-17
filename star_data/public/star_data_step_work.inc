@@ -1331,6 +1331,7 @@
       ! misc
          
          character (len=strlen) :: retry_message
+         integer :: retry_message_k
 
          real(dp), pointer :: eps_pre_mix(:) ! (nz)
          real(dp), pointer, dimension(:) :: burn_avg_epsnuc

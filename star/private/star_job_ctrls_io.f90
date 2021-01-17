@@ -192,6 +192,7 @@
          zero_inner_v_by_mass_Msun, &
 
          remove_surface_at_cell_k, &
+         remove_surface_at_he_core_boundary, &
          remove_surface_by_optical_depth, &
          remove_surface_by_density, &
          remove_surface_by_pressure, &
@@ -212,6 +213,7 @@
          remove_surface_by_relax_to_star_cut, &
          
          remove_initial_surface_at_cell_k, &
+         remove_initial_surface_at_he_core_boundary, &
          remove_initial_surface_by_optical_depth, &
          remove_initial_surface_by_density, &
          remove_initial_surface_by_pressure, &
@@ -840,6 +842,8 @@
          s% job% zero_inner_v_by_mass_Msun = zero_inner_v_by_mass_Msun
 
          s% job% remove_initial_surface_at_cell_k = remove_initial_surface_at_cell_k
+         s% job% remove_initial_surface_at_he_core_boundary = &
+            remove_initial_surface_at_he_core_boundary
          s% job% remove_initial_surface_by_optical_depth = &
             remove_initial_surface_by_optical_depth
          s% job% remove_initial_surface_by_density = &
@@ -857,6 +861,7 @@
          s% job% remove_initial_surface_by_v_surf_div_v_escape = remove_initial_surface_by_v_surf_div_v_escape
 
          s% job% remove_surface_at_cell_k = remove_surface_at_cell_k
+         s% job% remove_surface_at_he_core_boundary = remove_surface_at_he_core_boundary
          s% job% remove_surface_by_optical_depth = remove_surface_by_optical_depth
          s% job% remove_surface_by_density = remove_surface_by_density
          s% job% remove_surface_by_pressure = remove_surface_by_pressure
@@ -1412,6 +1417,7 @@
          zero_inner_v_by_mass_Msun = s% job% zero_inner_v_by_mass_Msun
 
          remove_surface_at_cell_k = s% job% remove_surface_at_cell_k
+         remove_surface_at_he_core_boundary = s% job% remove_surface_at_he_core_boundary
          remove_surface_by_optical_depth = s% job% remove_surface_by_optical_depth
          remove_surface_by_density = s% job% remove_surface_by_density
          remove_surface_by_pressure = s% job% remove_surface_by_pressure
@@ -1432,6 +1438,8 @@
          remove_surface_by_relax_to_star_cut = s% job% remove_surface_by_relax_to_star_cut
          
          remove_initial_surface_at_cell_k = s% job% remove_initial_surface_at_cell_k
+         remove_initial_surface_at_he_core_boundary = &
+            s% job% remove_initial_surface_at_he_core_boundary
          remove_initial_surface_by_optical_depth = &
             s% job% remove_initial_surface_by_optical_depth
          remove_initial_surface_by_density = &

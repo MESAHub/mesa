@@ -2345,11 +2345,16 @@
          retry_factor = s% timestep_factor_for_retries
          s% dt = s% dt*retry_factor
          if (len_trim(s% retry_message) > 0) then
-            write(*,'(a, i8)') ' retry: ' // trim(s% retry_message), s% model_number
+            if (s% retry_message_k > 0) then
+               write(*,'(a, 2i8)') ' retry: ' // trim(s% retry_message), s% retry_message_k, s% model_number
+            else
+               write(*,'(a, i8)') ' retry: ' // trim(s% retry_message), s% model_number
+            end if
          else
             write(*,'(a, i8)') ' retry', s% model_number
             !if (.true.) stop 'failed to set retry_message'
          end if
+         s% retry_message_k = 0
          if (s% report_ierr) &
             write(*,'(a50,2i6,3f16.6)') 'retry log10(dt/yr), log10(dt), retry_factor', &
                s% retry_cnt, s% model_number, log10(s% dt*retry_factor/secyer), &
