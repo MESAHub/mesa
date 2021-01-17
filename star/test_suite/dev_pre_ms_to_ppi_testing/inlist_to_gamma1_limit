@@ -147,8 +147,10 @@ History_Panels1_other_yaxis_name(2) = 'star_age_day'
 
 Profile_Panels1_same_yaxis_range(3) = .false. ! .true.      << for comparison with 9967
 
-TRho_Profile_xmin = -5 ! -2.0
-TRho_Profile_ymin = 6 ! 7.5
+TRho_Profile_xmin = 2.0
+TRho_Profile_xmax = 7.5
+TRho_Profile_ymin = 8.3
+TRho_Profile_ymax = 9.5
 
 Text_Summary1_name(1,1) = 'model_number'
 Text_Summary1_name(1,2) = 'log_dt'

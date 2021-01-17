@@ -50,6 +50,15 @@
       fe_core_infall_limit = 3d7
       log_center_temp_limit = 1d99
 
+!      x_logical_ctrl(1) = .true. ! switch BCs           << not working if turn on for retry.  perhaps ok if on at start.
+      
+      ! controls for removing surface layer
+      ! see run_star_extras for details
+      x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
+      x_ctrl(18) = 1d0 ! only remove if remaining q(k) < this
+      x_ctrl(19) = 0.99d0 ! only check v/v_esc for q(k) >= this
+      x_integer_ctrl(20) = 10 ! remove at least this many cells
+
 ! wind
 
 ! atmosphere
@@ -158,7 +167,6 @@
 
 
 ! mesh
-
       okay_to_remesh = .true
       use_split_merge_amr = .true.
       split_merge_amr_log_zoning = .true.
@@ -173,30 +181,12 @@
       gold_tol_max_residual3 = 1d-4
 
       always_use_dedt_form_of_energy_eqn = .true.       
-
-
-
-
-      
-      !use_dPrad_dm_form_of_T_gradient_eqn = .true.
-      !use_dedt_form_of_energy_eqn = .true.
       
       use_momentum_outer_BC = .true.
-      
-      !eps_nuc_factor = 0d0
-      !dxdt_nuc_factor = 0d0
-
-      !velocity_logT_lower_bound = 7 
-      !max_dt_yrs_for_velocity_logT_lower_bound = 0.1
 
       solver_iters_timestep_limit = 20
       
-
-
-
       min_timestep_limit = 1d-12
-
-
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
@@ -223,6 +213,19 @@
       burn_steps_hard_limit = 250
       op_split_burn_eps = 1d-5
       op_split_burn_odescal = 1d-5
+      
+      
+      
+      
+      ! pablo uses these for ppisn
+
+      restore_mesh_on_retry = .true.
+      num_steps_to_hold_mesh_after_retry = 5
+      
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      
+      
+      
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -330,28 +333,35 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = -101d0
+Profile_Panels3_xmax = 55.1 ! -101d0
 
 Profile_Panels3_num_panels = 6
 
-Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
 Profile_Panels3_yaxis_name(4) = 'gamma1'
     Profile_Panels3_ymin(4) = 1.28d0
     Profile_Panels3_ymax(4) = -101d0
+Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
+    Profile_Panels3_other_dymin(4) = 0.15
 
-Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
 Profile_Panels3_yaxis_name(5) = 'logRho' ! 'avQ'
+Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
+    Profile_Panels3_other_dymin(5) = 12
  
-Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
 Profile_Panels3_yaxis_name(6) = 'logR_cm'
+Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
+    Profile_Panels3_other_dymin(6) = 0.15
+
+
 
 History_Panels1_yaxis_name(1) = 'star_mass'
 History_Panels1_other_yaxis_name(2) = 'star_age_day'
 
 Profile_Panels1_same_yaxis_range(3) = .false. ! .true.      << for comparison with 9967
 
-TRho_Profile_xmin = -5 ! -2.0
-TRho_Profile_ymin = 6 ! 7.5
+TRho_Profile_xmin = 2.0
+!TRho_Profile_xmax = 7.5
+TRho_Profile_ymin = 8.3
+!TRho_Profile_ymax = 9.2
 
 Text_Summary1_name(1,1) = 'model_number'
 Text_Summary1_name(1,2) = 'log_dt'
