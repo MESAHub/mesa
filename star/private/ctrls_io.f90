@@ -459,8 +459,8 @@
     delta_lg_star_mass_limit, delta_lg_star_mass_hard_limit, &
     delta_mdot_atol, delta_mdot_rtol, delta_mdot_limit, delta_mdot_hard_limit, &
     adjust_J_q_limit, adjust_J_q_hard_limit, &
-    never_skip_hard_limits, relax_hard_limits_after_retry, report_all_dt_limits, &
-    report_why_dt_limits, report_solver_dt_info, report_dX_nuc_drop_dt_limits, &
+    never_skip_hard_limits, relax_hard_limits_after_retry, &
+    report_dt_hard_limit_retries, report_solver_dt_info, &
     limit_for_rel_error_in_energy_conservation, hard_limit_for_rel_error_in_energy_conservation, &
 
     ! atmosphere -- surface boundary conditions
@@ -2309,10 +2309,8 @@
  s% adjust_J_q_hard_limit = adjust_J_q_hard_limit
  s% never_skip_hard_limits = never_skip_hard_limits
  s% relax_hard_limits_after_retry = relax_hard_limits_after_retry
- s% report_all_dt_limits = report_all_dt_limits
- s% report_why_dt_limits = report_why_dt_limits
+ s% report_dt_hard_limit_retries = report_dt_hard_limit_retries
  s% report_solver_dt_info = report_solver_dt_info
- s% report_dX_nuc_drop_dt_limits = report_dX_nuc_drop_dt_limits
 
  s% limit_for_rel_error_in_energy_conservation = limit_for_rel_error_in_energy_conservation
  s% hard_limit_for_rel_error_in_energy_conservation = hard_limit_for_rel_error_in_energy_conservation
@@ -3919,10 +3917,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  adjust_J_q_hard_limit = s% adjust_J_q_hard_limit
  never_skip_hard_limits = s% never_skip_hard_limits
  relax_hard_limits_after_retry = s% relax_hard_limits_after_retry
- report_all_dt_limits = s% report_all_dt_limits
- report_why_dt_limits = s% report_why_dt_limits
+ report_dt_hard_limit_retries = s% report_dt_hard_limit_retries
  report_solver_dt_info = s% report_solver_dt_info
- report_dX_nuc_drop_dt_limits = s% report_dX_nuc_drop_dt_limits
 
  limit_for_rel_error_in_energy_conservation = s% limit_for_rel_error_in_energy_conservation
  hard_limit_for_rel_error_in_energy_conservation = s% hard_limit_for_rel_error_in_energy_conservation

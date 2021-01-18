@@ -3,7 +3,8 @@
       show_log_description_at_start = .false.
    
       load_saved_model = .true.
-      saved_model_name = 'lgTmax.mod'
+      !saved_model_name = 'lgTmax.mod'
+      saved_model_name = 'gamma1_limit.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'converted.mod'
@@ -22,7 +23,7 @@
 &controls
    
       ! limit max_model_number as part of test_suite
-      max_model_number = 150
+      max_model_number = 200
 
       !fe_core_infall_limit = 3d7
       !log_center_temp_limit = 1d99

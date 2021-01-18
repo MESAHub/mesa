@@ -23,8 +23,8 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
 
-      fe_core_infall_limit = 1d99
-      non_fe_core_infall_limit = 1d99 ! 1d8
+      fe_core_infall_limit = 400d5
+      non_fe_core_infall_limit = 1d99
       log_center_temp_limit = 1d99
 
       when_to_stop_rtol = 1d99
@@ -51,10 +51,13 @@
 ! timesteps
 
 ! mesh
+      !okay_to_remesh = .false.
 
 ! solver
       use_gold2_tolerances = .false.
       use_gold_tolerances = .true.
+
+      gold_iter_for_resid_tol3 = 7
       gold_tol_max_residual3 = 1d-4
 
       always_use_dedt_form_of_energy_eqn = .true.       

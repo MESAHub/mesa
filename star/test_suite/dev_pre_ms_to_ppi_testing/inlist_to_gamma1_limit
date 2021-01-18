@@ -30,7 +30,7 @@
 
 &controls
 
-      gamma1_limit = 1.33d0
+      gamma1_limit = 1.31d0
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
 

@@ -1,9 +1,9 @@
 
 &star_job
-      change_initial_u_flag = .true.
-      change_initial_v_flag = .true.
-      new_v_flag = .false.
-      new_u_flag = .true.
+!      change_initial_u_flag = .true.
+!      change_initial_v_flag = .true.
+!      new_v_flag = .false.
+!      new_u_flag = .true.
 
       set_initial_age = .true.
       set_initial_model_number = .true.
@@ -35,8 +35,8 @@
 ! mixing
       
 ! timesteps      
-      dt_div_min_dr_div_cs_limit = 0.7d0
-      dt_div_min_dr_div_cs_hard_limit = 1.0d0
+!      dt_div_min_dr_div_cs_limit = 0.7d0
+!      dt_div_min_dr_div_cs_hard_limit = 1.0d0
 
 ! mesh
       use_split_merge_amr = .true.

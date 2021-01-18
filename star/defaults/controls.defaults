@@ -10967,24 +10967,14 @@
     hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 
-      ! report_why_dt_limits
+      ! report_dt_hard_limit_retries
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! If true, produce terminal output about choice of timestep.
 
       ! ::
 
-    report_why_dt_limits = .false.
-
-
-      ! report_all_dt_limits
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, produce terminal output about all influences for choice of timestep.
-
-      ! ::
-
-    report_all_dt_limits = .false.
+    report_dt_hard_limit_retries = .false.
 
 
       ! report_solver_dt_info
@@ -10995,16 +10985,6 @@
       ! ::
 
     report_solver_dt_info = .false.
-
-
-      ! report_dX_nuc_drop_dt_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, report timestep limits from drop in abundance from nuclear reactions.
-
-      ! ::
-
-    report_dX_nuc_drop_dt_limits = .false.
 
 ! debugging controls
 ! ==================

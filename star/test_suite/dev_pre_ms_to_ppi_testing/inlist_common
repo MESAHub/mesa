@@ -151,6 +151,8 @@
 
       delta_Ye_highT_limit = 1d-3
 
+      gold_solver_iters_timestep_limit = 20
+      gold2_solver_iters_timestep_limit = 20
       solver_iters_timestep_limit = 20
 
 ! mesh

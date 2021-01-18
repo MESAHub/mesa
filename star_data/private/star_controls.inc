@@ -1291,10 +1291,7 @@
             hard_limit_for_rel_error_in_energy_conservation
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
-
-         logical :: report_all_dt_limits, report_dX_nuc_drop_dt_limits
-         logical :: report_why_dt_limits, report_solver_dt_info
-
+         logical :: report_dt_hard_limit_retries, report_solver_dt_info
          logical :: trace_evolve
 
       ! misc
