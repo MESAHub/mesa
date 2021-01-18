@@ -68,6 +68,9 @@
       model_number ! counting from the start of the run
       star_age ! elapsed simulated time in years since the start of the run
       star_age_day
+      star_age_hr
+      star_age_min
+      star_age_sec
       star_mass ! in Msun units
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
       log_rotational_mdot_boost
@@ -76,6 +79,10 @@
       log_dt ! log10 time_step
       num_zones ! number of zones in the model
       log_total_angular_momentum
+      total_energy_foe
+      total_energy
+      log_total_energy
+      
       
       log_max_residual
       log_residual_norm
@@ -201,6 +208,9 @@
       center_omega
       center_omega_div_omega_crit
       center_ye
+
+      center_T
+      center_Rho
       center_entropy ! in kerg per baryon      
       
 

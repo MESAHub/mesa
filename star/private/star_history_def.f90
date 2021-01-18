@@ -229,7 +229,8 @@
       integer, parameter :: h_total_turbulent_energy = h_total_gravitational_energy + 1
       integer, parameter :: h_total_radial_kinetic_energy = h_total_turbulent_energy + 1
       integer, parameter :: h_total_rotational_kinetic_energy = h_total_radial_kinetic_energy + 1
-      integer, parameter :: h_total_energy = h_total_rotational_kinetic_energy + 1
+      integer, parameter :: h_total_energy_foe = h_total_rotational_kinetic_energy + 1
+      integer, parameter :: h_total_energy = h_total_energy_foe + 1
 
       integer, parameter :: h_log_total_internal_energy = h_total_energy + 1
       integer, parameter :: h_log_total_gravitational_energy = h_log_total_internal_energy + 1
@@ -996,6 +997,7 @@
          history_column_name(h_total_radial_kinetic_energy) = 'total_radial_kinetic_energy'
          history_column_name(h_total_rotational_kinetic_energy) = 'total_rotational_kinetic_energy'
          history_column_name(h_total_turbulent_energy) = 'total_turbulent_energy'
+         history_column_name(h_total_energy_foe) = 'total_energy_foe'
          history_column_name(h_total_energy) = 'total_energy'
 
          history_column_name(h_log_total_internal_energy) = 'log_total_internal_energy'

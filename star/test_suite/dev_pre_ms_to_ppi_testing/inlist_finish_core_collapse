@@ -1,45 +1,21 @@
 
 &star_job
-      show_log_description_at_start = .false.
    
       load_saved_model = .true.
-      !saved_model_name = 'start_core_collapse.mod'
-      saved_model_name = 'gamma1_limit.mod'
+      saved_model_name = 'converted.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
-
-      change_initial_u_flag = .true.
-      change_initial_v_flag = .true.
-      new_v_flag = .false.
-      new_u_flag = .true.
-
-      set_initial_age = .false.
-      set_initial_model_number = .false.
-
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-2
-
-      change_D_omega_flag = .true.
-      new_D_omega_flag = .false.
-
-      change_rotation_flag = .true.
-      new_rotation_flag = .false.
 
       pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-      use_PC = .false.
 / ! end of eos namelist
 
 &kap
-      kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
-      kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
-      kap_lowT_prefix = 'lowT_fa05_a09p'
-      use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
@@ -47,13 +23,16 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
 
-      fe_core_infall_limit = 3d7
+      fe_core_infall_limit = 1d99
+      non_fe_core_infall_limit = 1d99 ! 1d8
       log_center_temp_limit = 1d99
 
-!      x_logical_ctrl(1) = .true. ! switch BCs           << not working if turn on for retry.  perhaps ok if on at start.
-      
-      ! controls for removing surface layer
-      ! see run_star_extras for details
+      when_to_stop_rtol = 1d99
+      when_to_stop_atol = 1d99
+
+      ! controls for removing surface layer.  see run_star_extras for details
+      !x_logical_ctrl(1) = .true. ! switch BCs
+      x_logical_ctrl(2) = .true. ! check v vs v escape
       x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
       x_ctrl(18) = 1d0 ! only remove if remaining q(k) < this
       x_ctrl(19) = 0.99d0 ! only check v/v_esc for q(k) >= this
@@ -62,118 +41,16 @@
 ! wind
 
 ! atmosphere
-      Pextra_factor = 4 
-      ! need this extra pressure to stabilize the atmosphere during core He burning
- 
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
 
 ! rotation
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d00
-      D_DSI_factor = 0
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
 
 ! mlt
-      mixing_length_alpha = 1.5
-      MLT_option = 'Henyey'
-
-      use_Ledoux_criterion = .true.
-      semiconvection_option = 'Langer_85 mixing; gradT = gradr'
-      thermohaline_option = 'Kippenhahn'
-      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
-
-      mlt_make_surface_no_mixing = .true.
-
-      okay_to_reduce_gradT_excess = .true.
-      gradT_excess_f1 = 1d-4
-      gradT_excess_f2 = 1d-2
 
 ! mixing
-      D_omega_mixing_rate = 1d0
-      D_omega_mixing_across_convection_boundary = .false.
       
 ! timesteps
-      varcontrol_target = 1d-3
-      
-      never_skip_hard_limits = .true
-      limit_for_rel_error_in_energy_conservation = 1d-4
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
-
-      min_xa_hard_limit = -1d-5
-      min_xa_hard_limit_for_highT = -3d-5
-
-      delta_lgTeff_limit =  0.01
-      delta_lgL_limit = 0.1     
-      delta_lgL_He_limit = 0.1
-
-      delta_lgRho_cntr_limit = 0.03 ! 0.02 ! 0.005   ! default 0.05
-      delta_lgRho_cntr_hard_limit = -1
-      delta_lgRho_limit = 0.1          ! default 1.0
-      
-      delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.002  
-      delta_lgT_cntr_hard_limit = 0.01
-
-      delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.002     
-      delta_lgT_max_hard_limit = 0.01
-
-      dHe_div_He_limit = -1
-
-      dX_nuc_drop_limit = 2d-2
-      dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
-      dX_nuc_drop_min_X_limit = 1d-3  ! 1.0d-3  default = 1.0d-4
-      dX_nuc_drop_max_A_limit = 52   
-      dX_nuc_drop_hard_limit = 1d99
-
-      delta_lg_XH_cntr_limit = -1
-      delta_lg_XHe_cntr_limit = -1
-      delta_lg_XC_cntr_limit = -1
-      delta_lg_XNe_cntr_limit = -1
-      delta_lg_XO_cntr_limit = -1
-      delta_lg_XSi_cntr_limit = -1
-
-      delta_XHe_cntr_limit = -1 ! 0.01d0
-      delta_XHe_cntr_hard_limit = -1 ! 0.02d0
-
-      delta_XC_cntr_limit = -1 ! 0.01d0
-      delta_XC_cntr_hard_limit = -1 ! 0.02d0
-
-      delta_XNe_cntr_limit = -1 ! 0.01d0
-      delta_XNe_cntr_hard_limit = -1 ! 0.02d0
-
-      delta_XO_cntr_limit = -1 ! 0.01d0
-      delta_XO_cntr_hard_limit = -1 ! 0.02d0
-
-      delta_XSi_cntr_limit = -1 ! 0.01d0
-      delta_XSi_cntr_hard_limit = -1 ! 0.02d0
-
-
-      delta_Ye_highT_limit = 1d-3
-
-
-
-
-
-
-
 
 ! mesh
-      okay_to_remesh = .true
-      use_split_merge_amr = .true.
-      split_merge_amr_log_zoning = .true.
-      split_merge_amr_nz_baseline = 2000
-      split_merge_amr_MaxLong = 2d0
-      split_merge_amr_MaxShort = 2d0
-      split_merge_amr_max_iters = 10
 
 ! solver
       use_gold2_tolerances = .false.
@@ -181,25 +58,22 @@
       gold_tol_max_residual3 = 1d-4
 
       always_use_dedt_form_of_energy_eqn = .true.       
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_d_eos_dxa = .true.
       
       use_momentum_outer_BC = .true.
-
-      solver_iters_timestep_limit = 20
       
       min_timestep_limit = 1d-12
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
-      use_d_eos_dxa = .true.
+      
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
       min_timestep_limit = 1d-12 ! (seconds)
 
       warn_rates_for_high_temp = .true.
       max_safe_logT_for_rates = 10.5d0
-
-      when_to_stop_rtol = 1d-3
-      when_to_stop_atol = 1d-3
 
       screening_mode = 'chugunov'
 
@@ -213,16 +87,10 @@
       burn_steps_hard_limit = 250
       op_split_burn_eps = 1d-5
       op_split_burn_odescal = 1d-5
-      
-      
-      
-      
-      ! pablo uses these for ppisn
 
-      restore_mesh_on_retry = .true.
-      num_steps_to_hold_mesh_after_retry = 5
+      !restore_mesh_on_retry = .true.
+      !num_steps_to_hold_mesh_after_retry = 5
       
-      use_dPrad_dm_form_of_T_gradient_eqn = .true.
       
       
       
@@ -231,21 +99,6 @@
       !write_pulse_data_with_profile = .true.
 
 ! output
-
-
-
-      center_avg_value_dq = 1d-2
-
-      he_core_boundary_h1_fraction = 0.1 ! 0.5
-      c_core_boundary_he4_fraction = 0.5
-      o_core_boundary_c12_fraction = 0.5
-      si_core_boundary_o16_fraction = 0.5
-      fe_core_boundary_si28_fraction = 0.5
-
-      terminal_show_age_units = 'days'
-      terminal_show_timestep_units = 'secs'
-      terminal_show_log_dt = .false.
-      terminal_show_log_age = .false.
 
       num_trace_history_values = 4
       trace_history_value_name(1) = 'non_fe_core_infall'
@@ -350,6 +203,63 @@ Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
 Profile_Panels3_yaxis_name(6) = 'logR_cm'
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
+
+Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
+!Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
+!Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
+
+    History_Panels2_title = ''
+
+    History_Panels2_xaxis_name = 'star_age_sec'
+    History_Panels2_max_width = -1
+
+    History_Panels2_txt_scale = 0.75
+    History_Panels2_xmin = -101d0
+    History_Panels2_xmax = -101d0
+    History_Panels2_dxmin = -1
+    History_Panels2_xaxis_reversed = .false.
+    History_Panels2_xaxis_log = .false.
+    History_Panels2_xmargin = 0.0
+
+      ! ::
+
+    History_Panels2_num_panels = 2
+
+      ! ::
+
+    History_Panels2_yaxis_name(1) = 'center_T'
+    History_Panels2_yaxis_reversed(1) = .false.
+    History_Panels2_ymin(1) = -101d0
+    History_Panels2_ymax(1) = -101d0
+    History_Panels2_dymin(1) = 0.1
+
+      ! ::
+
+    History_Panels2_other_yaxis_name(1) = 'total_energy_foe'
+    History_Panels2_other_yaxis_reversed(1) = .true.
+    History_Panels2_other_ymin(1) = -101d0
+    History_Panels2_other_ymax(1) = -101d0
+    History_Panels2_other_dymin(1) = 0.1
+
+      ! ::
+
+    History_Panels2_yaxis_name(2) = 'center_Rho'
+    History_Panels2_yaxis_reversed(2) = .false.
+    History_Panels2_ymin(2) = -101d0
+    History_Panels2_ymax(2) = -101d0
+    History_Panels2_dymin(2) = 0.1
+
+      ! ::
+
+    History_Panels2_other_yaxis_name(2) = 'center_entropy'
+    History_Panels2_other_yaxis_reversed(2) = .false.
+    History_Panels2_other_ymin(2) = -101d0
+    History_Panels2_other_ymax(2) = -101d0
+    History_Panels2_other_dymin(2) = 0.1
+
+
+
+
 
 
 

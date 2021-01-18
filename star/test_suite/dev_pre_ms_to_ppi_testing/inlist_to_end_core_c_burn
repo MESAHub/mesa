@@ -3,14 +3,12 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'near_end_core_he_burn.mod'
+      saved_model_name = 'removed_envelope.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'after_core_c_burn.mod'
       required_termination_code_string = 'xa_central_lower_limit'
       
-      remove_initial_surface_at_he_core_boundary = 0.1d0
-
       ! for plotting history vs age
       set_initial_age = .true.
       initial_age = 0

@@ -327,7 +327,7 @@ Text_Summary1_name(2,5) = 'He_core'
 
 Text_Summary1_name(3,1) = 'fe_core_infall'
 Text_Summary1_name(3,2) = 'log_max_T'
-Text_Summary1_name(3,3) = 'eta_cntr'
+Text_Summary1_name(3,3) = 'log_Teff'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'C_core'
 

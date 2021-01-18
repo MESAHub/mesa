@@ -130,7 +130,8 @@
       
       subroutine switch_BCs(s)
          type (star_info), pointer :: s
-         s% use_compression_outer_BC = .true.
+         !s% use_compression_outer_BC = .true.
+         !s% use_momentum_outer_BC = .true.
          s% use_T_black_body_outer_BC = .true.
          s% use_fixed_L_for_BB_outer_BC = .true.
          s% fixed_L_for_BB_outer_BC = Lsurf
@@ -271,7 +272,7 @@
             end if
          end do
          if (s% q(k1) > s% x_ctrl(18)) then
-            !write(*,2) 'v > vesc, but too little to bother with', k1, s% q(k1)
+            write(*,2) 'v > vesc, but too little to bother with', k1, s% q(k1)
             return ! too little to bother with
          end if
          k1 = max(k1, s% x_integer_ctrl(20))

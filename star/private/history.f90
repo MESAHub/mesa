@@ -1721,6 +1721,8 @@
                val = s% total_turbulent_energy_end
            case(h_total_energy)
                val = s% total_energy_end
+           case(h_total_energy_foe)
+               val = s% total_energy_end*1d-51
                
            case(h_log_total_internal_energy)
                val = safe_log10(s% total_internal_energy_end)
