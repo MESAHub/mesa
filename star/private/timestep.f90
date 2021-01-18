@@ -2091,6 +2091,7 @@
          if (ierr /= 0) return
          if (dt_timescale < 1d-30) return
          ratio = dt/dt_timescale
+         !write(*,2) 'dt dt_cell_collapse ratio', min_collapse_k, dt, dt_timescale, ratio
          check_dt_div_dt_cell_collapse = check_change(s, ratio, &
             s% dt_div_dt_cell_collapse_limit, s% dt_div_dt_cell_collapse_hard_limit, &
             min_collapse_k, 'check_dt_div_dt_cell_collapse', skip_hard_limit, dt_limit_ratio, relative_excess)
