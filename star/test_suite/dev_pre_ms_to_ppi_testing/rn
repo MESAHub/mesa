@@ -22,8 +22,11 @@ cp removed_envelope.mod standard_removed_envelope.mod
 do_one inlist_to_end_core_c_burn_header after_core_c_burn.mod
 cp after_core_c_burn.mod standard_after_core_c_burn.mod
    
-do_one inlist_to_gamma1_limit_header gamma1_limit.mod
-cp gamma1_limit.mod standard_gamma1_limit.mod
+#do_one inlist_to_gamma1_limit_header gamma1_limit.mod
+#cp gamma1_limit.mod standard_gamma1_limit.mod
+
+do_one inlist_to_lgTmax_header lgTmax.mod
+cp lgTmax.mod standard_lgTmax.mod
 
 do_one inlist_convert_header converted.mod
 cp converted.mod standard_converted.mod
