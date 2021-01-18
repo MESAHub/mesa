@@ -10305,6 +10305,25 @@
     dt_div_min_dr_div_cs_hard_limit = -1
 
 
+      ! dt_div_dt_cell_collapse_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! dt_div_dt_cell_collapse_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! limit for dt compared to cell_collapse timescale (negative means no limit)
+
+      ! ::
+
+      !     dt_cell_collapse = min over shells k that have v(k+1) > v(k) of
+      !     (r(k)-r(k+1))/(v(k+1)-v(k)), the time for the cell to collapse
+      !     to zero thickness at current velocities.  only for v_flag true.
+
+      ! ::
+
+    dt_div_dt_cell_collapse_limit = -1
+    dt_div_dt_cell_collapse_hard_limit = -1
+
+
       ! min_k_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_q_for_dt_div_min_dr_div_cs_limit

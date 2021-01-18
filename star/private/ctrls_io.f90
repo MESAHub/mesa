@@ -411,6 +411,7 @@
     varcontrol_target, min_allowed_varcontrol_target, varcontrol_dt_limit_ratio_hard_max, xa_scale, &
     solver_iters_timestep_limit, burn_steps_limit, burn_steps_hard_limit, &
     diffusion_steps_limit, diffusion_steps_hard_limit, diffusion_iters_limit, diffusion_iters_hard_limit, &
+    dt_div_dt_cell_collapse_limit, dt_div_dt_cell_collapse_hard_limit, &
     dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, &
@@ -2095,6 +2096,8 @@
  s% diffusion_iters_limit = diffusion_iters_limit
  s% diffusion_iters_hard_limit = diffusion_iters_hard_limit
 
+ s% dt_div_dt_cell_collapse_limit = dt_div_dt_cell_collapse_limit
+ s% dt_div_dt_cell_collapse_hard_limit = dt_div_dt_cell_collapse_hard_limit
  s% dt_div_min_dr_div_cs_limit = dt_div_min_dr_div_cs_limit
  s% dt_div_min_dr_div_cs_hard_limit = dt_div_min_dr_div_cs_hard_limit
  
@@ -3704,6 +3707,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  diffusion_iters_limit = s% diffusion_iters_limit
  diffusion_iters_hard_limit = s% diffusion_iters_hard_limit
 
+ dt_div_dt_cell_collapse_limit = s% dt_div_dt_cell_collapse_limit
+ dt_div_dt_cell_collapse_hard_limit = s% dt_div_dt_cell_collapse_hard_limit
  dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
  dt_div_min_dr_div_cs_hard_limit = s% dt_div_min_dr_div_cs_hard_limit
  

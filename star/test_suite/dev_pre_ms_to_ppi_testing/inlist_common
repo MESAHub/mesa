@@ -95,6 +95,8 @@
       D_omega_mixing_across_convection_boundary = .false.
 
 ! timesteps
+      report_dt_hard_limit_retries = .true.
+      
       varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true

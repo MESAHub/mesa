@@ -189,7 +189,7 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = -1 ! 55.1 ! -101d0
+Profile_Panels3_xmax = -101d0
 
 Profile_Panels3_num_panels = 6
 
@@ -199,11 +199,11 @@ Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
     Profile_Panels3_other_dymin(4) = 0.15
 
-Profile_Panels3_yaxis_name(5) = 'logRho' ! 'avQ'
+Profile_Panels3_yaxis_name(5) = 'logP' ! 'logRho'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(5) = 12
  
-Profile_Panels3_yaxis_name(6) = 'logR_cm'
+Profile_Panels3_yaxis_name(6) = 'avQ' ! 'logT'
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
 

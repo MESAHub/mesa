@@ -1090,6 +1090,8 @@
          integer :: diffusion_iters_hard_limit
 
          real(dp) :: &
+            dt_div_dt_cell_collapse_limit, &
+            dt_div_dt_cell_collapse_hard_limit, &
             dt_div_min_dr_div_cs_limit, &
             dt_div_min_dr_div_cs_hard_limit, &
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &

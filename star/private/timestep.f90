@@ -325,6 +325,10 @@
                s, skip_hard_limit, dt_limit_ratio(Tlim_lgL))
             if (return_now(Tlim_lgL)) return
 
+            do_timestep_limits = check_dt_div_dt_cell_collapse( &
+               s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dt_div_dt_cell_collapse))
+            if (return_now(Tlim_dt_div_dt_cell_collapse)) return
+
             do_timestep_limits = check_dt_div_min_dr_div_cs( &
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_dt_div_min_dr_div_cs))
             if (return_now(Tlim_dt_div_min_dr_div_cs)) return
@@ -2069,6 +2073,31 @@
             write(*,1) 'rel_error', s% error_in_energy_conservation/s% total_energy_end
          end if
       end function check_rel_error_in_energy
+
+
+      integer function check_dt_div_dt_cell_collapse(s, skip_hard_limit, dt, dt_limit_ratio)
+         use star_utils, only: eval_min_cell_collapse_time
+         type (star_info), pointer :: s
+         logical, intent(in) :: skip_hard_limit
+         real(dp), intent(in) :: dt
+         real(dp), intent(inout) :: dt_limit_ratio
+         real(dp) :: ratio, dt_timescale, relative_excess
+         integer :: min_collapse_k, ierr
+         include 'formats'
+         check_dt_div_dt_cell_collapse = keep_going
+         if (s% doing_relax) return
+         dt_timescale = eval_min_cell_collapse_time( &
+            s, 2, s% nz, min_collapse_k, ierr)
+         if (ierr /= 0) return
+         if (dt_timescale < 1d-30) return
+         ratio = dt/dt_timescale
+         check_dt_div_dt_cell_collapse = check_change(s, ratio, &
+            s% dt_div_dt_cell_collapse_limit, s% dt_div_dt_cell_collapse_hard_limit, &
+            min_collapse_k, 'check_dt_div_dt_cell_collapse', skip_hard_limit, dt_limit_ratio, relative_excess)
+         if (check_dt_div_dt_cell_collapse /= keep_going .and. s% report_dt_hard_limit_retries) then
+            write(*,2) 'min dt_cell_collapse', min_collapse_k, dt_timescale
+         end if
+      end function check_dt_div_dt_cell_collapse
 
 
       integer function check_dt_div_min_dr_div_cs(s, skip_hard_limit, dt, dt_limit_ratio)
