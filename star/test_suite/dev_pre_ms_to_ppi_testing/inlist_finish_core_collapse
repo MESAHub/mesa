@@ -36,7 +36,7 @@
       ! controls for removing surface layer.  see run_star_extras for details
       x_logical_ctrl(1) = .true. ! switch BCs
       x_logical_ctrl(2) = .true. ! check v vs v escape
-      x_ctrl(15) = 2d4 ! if vsurf (kms) > this, switch to fixed_vsurf BC with the current vsurf
+      x_ctrl(15) = 100 ! 2d4 ! if vsurf (kms) > this, switch to fixed_vsurf BC with the current vsurf
       x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
       x_ctrl(18) = 1d0 ! only remove if remaining q(k) < this
       x_ctrl(19) = 0.99d0 ! only check v/v_esc for q(k) >= this

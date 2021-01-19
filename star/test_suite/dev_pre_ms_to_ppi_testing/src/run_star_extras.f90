@@ -31,8 +31,8 @@
       
       include "test_suite_extras_def.inc"
       
-      real(dp) :: Psurf, Tsurf, Lsurf
-      logical :: have_switched_BCs
+      real(dp) :: Psurf, Tsurf, Lsurf, vsurf
+      logical :: have_switched_to_fixed_vsurf
 
       contains
 
@@ -107,7 +107,8 @@
             Psurf = s% P(1)
             Tsurf = s% T(1)
             Lsurf = s% L(1)
-            have_switched_BCs = .false.
+            vsurf = s% v(1)
+            have_switched_to_fixed_vsurf = .false.
             call alloc_extra_info(s)
             if (s% x_logical_ctrl(1)) then
                if (s% fixed_L_for_BB_outer_BC < 0d0) then
@@ -129,7 +130,18 @@
       
       subroutine switch_BCs(s)
          type (star_info), pointer :: s
-         if (.not. have_switched_BCs) return
+         if (have_switched_to_fixed_vsurf) then
+            s% use_momentum_outer_BC = .false.
+            s% use_fixed_vsurf_outer_BC = .true.
+            s% fixed_vsurf = vsurf
+         else
+            s% use_momentum_outer_BC = .true.
+            s% use_fixed_vsurf_outer_BC = .false.
+         end if
+         
+         return
+         
+         
          s% use_T_black_body_outer_BC = .true.
          s% use_fixed_L_for_BB_outer_BC = .true.
          s% fixed_L_for_BB_outer_BC = Lsurf
@@ -259,18 +271,31 @@
             end if
          end do
          if (k0 >= s% nz) then ! didn't find vel > v_vesc
-            v_limit = 1d5*s% x_ctrl(15)
-            if (vel(k) > v_limit) then
-               if (.not. s% use_fixed_vsurf_outer_BC) then
-                  write(*,*)
-                  write(*,*)
-                  write(*,2) 'switch to use_fixed_vsurf_outer_BC = .true.', s% model_number, vel(k)*1d-5
-                  write(*,*)
-                  write(*,*)
-                  s% use_fixed_vsurf_outer_BC = .true.
-                  s% use_momentum_outer_BC = .false.
-                  s% fixed_vsurf = vel(k)
-               end if
+            if (.not. s% use_fixed_vsurf_outer_BC) then
+               v_limit = 1d5*s% x_ctrl(15)
+               do k=1,5
+                  !write(*,3) 'vel(k)/v_limit', k, s% model_number, vel(k)/v_limit, vel(k), v_limit
+                  if (vel(k) > v_limit) then
+                     if (k > 1) then
+                        call star_remove_surface_at_cell_k(s% id, k1, ierr)
+                        if (ierr /= 0) then
+                           write(*,*) 'extras_start_step failed in star_remove_surface_at_cell_k'
+                           write(*,2) 'at q', k1, s% q(k1)
+                           extras_start_step = terminate
+                           return
+                        end if
+                     end if
+                     write(*,*)
+                     write(*,*)
+                     write(*,2) 'switch to use_fixed_vsurf_outer_BC = .true.', s% model_number, v_limit*1d-5
+                     write(*,*)
+                     write(*,*)
+                     vsurf = v_limit
+                     have_switched_to_fixed_vsurf = .true.
+                     call switch_BCs(s)
+                     exit
+                  end if
+               end do
             end if
             return
          end if
@@ -303,10 +328,13 @@
             Psurf = s% P(1)
             Tsurf = s% T(1)
             Lsurf = s% L(1)
+            vsurf = s% v(1)
+            have_switched_to_fixed_vsurf = .false.
             call switch_BCs(s)
          end if
          extras_start_step = keep_going
       end function extras_start_step
+   
 
 
       ! returns either keep_going or terminate.
@@ -367,13 +395,14 @@
          i = 0
          ! call move_int or move_flg
          !call move_int(vsurf_gt_cs_count)   
-         call move_flg(have_switched_BCs)
+         call move_flg(have_switched_to_fixed_vsurf)
          num_ints = i
          
          i = 0
          call move_dbl(Psurf)   
          call move_dbl(Tsurf)   
          call move_dbl(Lsurf)   
+         call move_dbl(vsurf)   
          num_dbls = i
          
          if (op /= extra_info_alloc) return

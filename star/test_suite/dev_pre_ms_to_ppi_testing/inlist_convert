@@ -10,7 +10,7 @@
       save_model_filename = 'converted.mod'
       required_termination_code_string = 'max_model_number'
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -24,11 +24,7 @@
    
       ! limit max_model_number as part of test_suite
       max_model_number = 200
-
-      !fe_core_infall_limit = 3d7
-      !log_center_temp_limit = 1d99
-      
-      !max_timestep = 1d-2
+      max_number_retries = 0
 
 
 ! wind
@@ -43,7 +39,7 @@
       
 ! timesteps
       max_timestep_factor = 1.05d0
-      max_timestep = 1d0
+      max_timestep = 1d3 ! 1d0
 
 ! mesh
 
