@@ -1197,8 +1197,12 @@
              (s% use_T_black_body_outer_BC))
 
          ! Set up stellar surface parameters
-
-         L_surf = s% L(1)
+         
+         if (s% use_T_black_body_outer_BC .and. s% use_fixed_L_for_BB_outer_BC) then
+            L_surf = s% fixed_L_for_BB_outer_BC
+         else
+            L_surf = s% L(1)
+         end if
          R_surf = s% r(1)
          
          ! Initialize partials
@@ -1232,6 +1236,10 @@
                dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
             endif
+             
+         !else if (do_not_need_atm_Tsurf) then
+             
+         !else if (do_not_need_atm_Psurf) then
 
          else
 
@@ -1342,7 +1350,7 @@
                end if
 
                call get_atm_PT( &
-                    s, tau_surf, skip_partials, &
+                    s, tau_surf, L_surf, R_surf, s% m(1), s% cgrav(1), skip_partials, &
                     Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                     lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                     ierr)

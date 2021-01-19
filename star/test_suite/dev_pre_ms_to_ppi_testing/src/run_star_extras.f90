@@ -107,6 +107,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         
          call test_suite_startup(s, restart, ierr)
          
          if (.not. restart) then
@@ -114,8 +115,12 @@
             Tsurf = s% T(1)
             Lsurf = s% L(1)
             call alloc_extra_info(s)
-            if (s% x_logical_ctrl(1) .and. s% fixed_L_for_BB_outer_BC > 0d0) then
-               Lsurf = s% fixed_L_for_BB_outer_BC
+            if (s% x_logical_ctrl(1)) then
+               if (s% fixed_L_for_BB_outer_BC < 0d0) then
+                  s% fixed_L_for_BB_outer_BC = Lsurf
+               else
+                  Lsurf = s% fixed_L_for_BB_outer_BC
+               end if
                call switch_BCs(s)
             end if
          else ! it is a restart

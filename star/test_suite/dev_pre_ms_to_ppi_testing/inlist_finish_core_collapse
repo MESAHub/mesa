@@ -34,7 +34,7 @@
       when_to_stop_atol = 1d99
 
       ! controls for removing surface layer.  see run_star_extras for details
-      !x_logical_ctrl(1) = .true. ! switch BCs
+      x_logical_ctrl(1) = .true. ! switch BCs
       x_logical_ctrl(2) = .true. ! check v vs v escape
       x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
       x_ctrl(18) = 1d0 ! only remove if remaining q(k) < this
@@ -52,8 +52,8 @@
 ! mixing
       
 ! timesteps
-      dt_div_dt_cell_collapse_limit = 0.01 ! limit for dt/dt_cell_collapse
-      dt_div_dt_cell_collapse_hard_limit = 0.1
+      dt_div_dt_cell_collapse_limit = 0.05 ! limit for dt/dt_cell_collapse
+      dt_div_dt_cell_collapse_hard_limit = 0.2
 
 ! mesh
       !okay_to_remesh = .false.
@@ -70,6 +70,9 @@
       use_d_eos_dxa = .true.
       
       use_momentum_outer_BC = .true.
+      use_T_black_body_outer_BC = .true.
+      use_fixed_L_for_BB_outer_BC = .true.
+      fixed_L_for_BB_outer_BC = -1 ! set in run_star_extras extras_startup
       
       min_timestep_limit = 1d-12
 
@@ -121,8 +124,8 @@
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0

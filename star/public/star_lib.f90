@@ -710,12 +710,13 @@
          call write_controls(s, filename, ierr)
       end subroutine star_write_controls
 
-      subroutine star_build_atm(s, ierr)
+      subroutine star_build_atm(s, L, R, M, cgrav, ierr)
          ! sets s% atm_structure_num_pts and s% atm_structure
         use atm_support
          type (star_info), pointer :: s
+         real(dp), intent(in) :: L, R, M, cgrav
          integer, intent(out) :: ierr
-         call build_atm(s, ierr)
+         call build_atm(s, L, R, M, cgrav, ierr)
        end subroutine star_build_atm
 
       
@@ -2286,13 +2287,13 @@
        end subroutine star_do_kap_for_cell
        
        subroutine star_get_atm_PT( &
-             id, tau_surf, skip_partials, Teff, &
+             id, tau_surf, L, R, M, cgrav, skip_partials, Teff, &
              lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
              lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
              ierr)
          use atm_support, only: get_atm_PT
          integer, intent(in) :: id
-         real(dp), intent(in) :: tau_surf
+         real(dp), intent(in) :: tau_surf, L, R, M, cgrav
          logical, intent(in) :: skip_partials
          real(dp), intent(out) :: &
             Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
@@ -2303,7 +2304,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call get_atm_PT( &
-             s, tau_surf, skip_partials, &
+             s, tau_surf, L, R, M, cgrav, skip_partials, &
              Teff, &
              lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
              lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
