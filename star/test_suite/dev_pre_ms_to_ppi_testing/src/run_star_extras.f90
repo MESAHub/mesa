@@ -32,15 +32,8 @@
       include "test_suite_extras_def.inc"
       
       real(dp) :: Psurf, Tsurf, Lsurf
+      logical :: have_switched_BCs
 
-! here are the x controls used below
-
-!alpha_mlt_routine
-         !alpha_H = s% x_ctrl(21)
-         !alpha_other = s% x_ctrl(22)
-         !H_limit = s% x_ctrl(23)
-
-      
       contains
 
       include "test_suite_extras.inc"
@@ -114,6 +107,7 @@
             Psurf = s% P(1)
             Tsurf = s% T(1)
             Lsurf = s% L(1)
+            have_switched_BCs = .false.
             call alloc_extra_info(s)
             if (s% x_logical_ctrl(1)) then
                if (s% fixed_L_for_BB_outer_BC < 0d0) then
@@ -135,8 +129,7 @@
       
       subroutine switch_BCs(s)
          type (star_info), pointer :: s
-         !s% use_compression_outer_BC = .true.
-         !s% use_momentum_outer_BC = .true.
+         if (.not. have_switched_BCs) return
          s% use_T_black_body_outer_BC = .true.
          s% use_fixed_L_for_BB_outer_BC = .true.
          s% fixed_L_for_BB_outer_BC = Lsurf
@@ -237,7 +230,7 @@
          integer :: ierr
          type (star_info), pointer :: s
          integer :: k, k0, k1
-         real(dp) :: v_esc
+         real(dp) :: v_esc, v_limit
          real(dp),pointer, dimension(:) :: vel
          include 'formats'
          ierr = 0
@@ -265,7 +258,22 @@
                exit
             end if
          end do
-         if (k0 >= s% nz) return
+         if (k0 >= s% nz) then ! didn't find vel > v_vesc
+            v_limit = 1d5*s% x_ctrl(15)
+            if (vel(k) > v_limit) then
+               if (.not. s% use_fixed_vsurf_outer_BC) then
+                  write(*,*)
+                  write(*,*)
+                  write(*,2) 'switch to use_fixed_vsurf_outer_BC = .true.', s% model_number, vel(k)*1d-5
+                  write(*,*)
+                  write(*,*)
+                  s% use_fixed_vsurf_outer_BC = .true.
+                  s% use_momentum_outer_BC = .false.
+                  s% fixed_vsurf = vel(k)
+               end if
+            end if
+            return
+         end if
          ! k0 is outermost location below surface with u > escape velocity.
          ! remove inward from k0 where u large enough compared to escape velocity.
          k1 = k0
@@ -359,7 +367,7 @@
          i = 0
          ! call move_int or move_flg
          !call move_int(vsurf_gt_cs_count)   
-         !call move_flg(in_period_with_vsurf_gt_cs)
+         call move_flg(have_switched_BCs)
          num_ints = i
          
          i = 0

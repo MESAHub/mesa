@@ -399,9 +399,7 @@
          use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
-         use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
-            cell_specific_total_energy, reset_epsnuc_vectors, set_qs, &
-            set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
+         use star_utils
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
@@ -442,6 +440,7 @@
          end if
 
          ! unpack some of the input information
+         call reset_starting_vectors(s)
          nz = s% nz
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (failed('set_qs')) return
