@@ -226,8 +226,7 @@
     relax_dlnZ, relax_dY, &
     
     ! mesh adjustment
-    remesh_log_L_nuc_burn_min, show_mesh_changes, okay_to_remesh, &
-    restore_mesh_on_retry, num_steps_to_hold_mesh_after_retry, &
+    show_mesh_changes, okay_to_remesh, restore_mesh_on_retry, num_steps_to_hold_mesh_after_retry, &
     max_rel_delta_IE_for_mesh_total_energy_balance, &
     trace_mesh_adjust_error_in_conservation, max_allowed_nz, mesh_max_allowed_ratio, &
     remesh_max_allowed_logT, max_delta_x_for_merge, mesh_dump_call_number, &
@@ -1445,7 +1444,6 @@
  s% relax_dY = relax_dY
 
  ! mesh adjustment
- s% remesh_log_L_nuc_burn_min = remesh_log_L_nuc_burn_min
  s% show_mesh_changes = show_mesh_changes
  s% okay_to_remesh = okay_to_remesh
  s% restore_mesh_on_retry = restore_mesh_on_retry
@@ -3059,7 +3057,6 @@
  relax_dY = s% relax_dY
 
  ! mesh adjustment
- remesh_log_L_nuc_burn_min = s% remesh_log_L_nuc_burn_min
  show_mesh_changes = s% show_mesh_changes
  okay_to_remesh = s% okay_to_remesh
  restore_mesh_on_retry = s% restore_mesh_on_retry

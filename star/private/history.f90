@@ -2948,22 +2948,6 @@
                   val = safe_log10(sum(s% dq(1:s% k_for_test_CpT_absMdot_div_L-1)))
                end if
 
-            case (h_k_CpTMdot_lt_L)
-               int_val = s% k_CpTMdot_lt_L
-               is_int_val = .true.
-            case (h_q_CpTMdot_lt_L)
-               if (s% k_CpTMdot_lt_L == nz) then
-                  val = 0d0
-               else
-                  val = s% q(s% k_CpTMdot_lt_L)
-               end if
-            case (h_logxq_CpTMdot_lt_L)
-               if (s% k_CpTMdot_lt_L == nz) then
-                  val = 0d0
-               else
-                  val = safe_log10(sum(s% dq(1:s% k_CpTMdot_lt_L-1)))
-               end if
-
             case (h_rotation_solver_steps)
                int_val = s% num_rotation_solver_steps
                is_int_val = .true.
@@ -2980,13 +2964,6 @@
             case (h_diffusion_solver_iters)
                int_val = s% num_diffusion_solver_iters
                is_int_val = .true.
-
-            case (h_total_radiation)
-               val = s% total_radiation
-
-            case (h_total_energy_plus_total_radiation)
-               val = get_total_energy_integral(s,nz)
-               val = val + s% total_radiation
 
            case(h_tot_IE_div_IE_plus_KE)
                val = s% total_internal_energy_end / &

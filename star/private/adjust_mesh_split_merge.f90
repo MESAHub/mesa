@@ -704,7 +704,7 @@
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
          integer, intent(out) :: ierr
-         integer :: i, ip, j, jp, k, q, nz, nz_old, &
+         integer :: i, ip, j, jp, q, nz, nz_old, &
             iR, iC, iL, imin, imax, op_err
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, rho_RR, rho_iR, &
@@ -862,7 +862,7 @@
                grad_v2 = get1_grad(v2_L, v2_C, v2_R, dLeft, dCntr, dRght)
             end if
          else if (s% v_flag) then
-            if (k == s% nz) then
+            if (iL == s% nz) then
                v_L = s% v_center
             else
                v_L = s% v(ip)

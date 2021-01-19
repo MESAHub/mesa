@@ -537,7 +537,6 @@
          real(dp) :: logT_max_for_standard_mesh_delta_coeff
          real(dp) :: logT_min_for_highT_mesh_delta_coeff
          real(dp) :: remesh_dt_limit
-         real(dp) :: remesh_log_L_nuc_burn_min
          real(dp) :: mesh_Pgas_div_P_exponent
 
          logical :: okay_to_remesh, trace_mesh_adjust_error_in_conservation

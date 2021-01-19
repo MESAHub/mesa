@@ -6246,17 +6246,6 @@
     remesh_dt_limit = -1
 
 
-      ! remesh_log_L_nuc_burn_min
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! No mesh adjustments when ``log10(L_nuc_burn_total)`` is less than this.
-      ! By default, this turns off mesh changes during the early pre-MS.
-
-      ! ::
-
-    remesh_log_L_nuc_burn_min = -50
-
-
       ! use_split_merge_amr
       ! ~~~~~~~~~~~~~~~~~~~
 

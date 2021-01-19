@@ -489,10 +489,6 @@
          integer, intent(out) :: ierr
 
          integer, parameter :: lipar=hydro_lipar, lrpar=hydro_lrpar
-         integer, target :: ipar_target(lipar)
-         real(dp), target :: rpar_target(lrpar)
-         integer, pointer :: ipar(:)
-         real(dp), pointer :: rpar(:)
 
          integer :: mljac, mujac, i, k, j, matrix_type, neq
          logical :: failure
@@ -519,12 +515,6 @@
 
          mljac = 2*nvar-1
          mujac = mljac
-
-         ipar => ipar_target
-         ipar(ipar_id) = s% id
-         ipar(ipar_first_call) = 1
-
-         rpar => rpar_target
 
          call check_sizes(s, ierr)
          if (ierr /= 0) then
@@ -590,7 +580,7 @@
                x_scale1, s% equ1, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &
-               s% AF1, lrpar, rpar, lipar, ipar, failure, ierr)
+               s% AF1, failure, ierr)
             s% doing_solver_iterations = .false.
             warn_rates_for_high_temp = save_warn_rates_flag
          end subroutine newt

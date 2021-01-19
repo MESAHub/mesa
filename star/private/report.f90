@@ -281,8 +281,6 @@
          s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
          luminosity = s% L(1)
-         s% total_radiation = s% total_radiation + &
-            s% dt*(luminosity + s% power_neutrinos)
 
          if (s% u_flag) then
             s% v_surf = s% u(1)
@@ -311,7 +309,6 @@
          
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
-         s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)

@@ -752,11 +752,7 @@
       integer, parameter :: h_q_for_test_CpT_absMdot_div_L = h_k_for_test_CpT_absMdot_div_L + 1
       integer, parameter :: h_logxq_for_test_CpT_absMdot_div_L = h_q_for_test_CpT_absMdot_div_L + 1
 
-      integer, parameter :: h_k_CpTMdot_lt_L = h_logxq_for_test_CpT_absMdot_div_L + 1
-      integer, parameter :: h_q_CpTMdot_lt_L = h_k_CpTMdot_lt_L + 1
-      integer, parameter :: h_logxq_CpTMdot_lt_L = h_q_CpTMdot_lt_L + 1
-
-      integer, parameter :: h_tot_E = h_logxq_CpTMdot_lt_L + 1
+      integer, parameter :: h_tot_E = h_logxq_for_test_CpT_absMdot_div_L + 1
       integer, parameter :: h_log_tot_E = h_tot_E + 1
       integer, parameter :: h_tot_KE = h_log_tot_E + 1
       integer, parameter :: h_log_tot_KE = h_tot_KE + 1
@@ -778,9 +774,7 @@
       integer, parameter :: h_rotation_solver_steps = h_burn_solver_maxsteps + 1
       integer, parameter :: h_diffusion_solver_steps = h_rotation_solver_steps + 1
       integer, parameter :: h_diffusion_solver_iters = h_diffusion_solver_steps + 1
-      integer, parameter :: h_total_radiation = h_diffusion_solver_iters + 1
-      integer, parameter :: h_total_energy_plus_total_radiation = h_total_radiation + 1
-      integer, parameter :: h_grav_dark_L_polar = h_total_energy_plus_total_radiation + 1
+      integer, parameter :: h_grav_dark_L_polar = h_diffusion_solver_iters + 1
       integer, parameter :: h_grav_dark_Teff_polar = h_grav_dark_L_polar + 1
       integer, parameter :: h_grav_dark_L_equatorial = h_grav_dark_Teff_polar + 1
       integer, parameter :: h_grav_dark_Teff_equatorial = h_grav_dark_L_equatorial + 1
@@ -1573,17 +1567,10 @@
          history_column_name(h_q_for_test_CpT_absMdot_div_L) = 'q_for_test_CpT_absMdot_div_L'
          history_column_name(h_logxq_for_test_CpT_absMdot_div_L) = 'logxq_for_test_CpT_absMdot_div_L'
 
-         history_column_name(h_k_CpTMdot_lt_L) = 'k_CpTMdot_lt_L'
-         history_column_name(h_q_CpTMdot_lt_L) = 'q_CpTMdot_lt_L'
-         history_column_name(h_logxq_CpTMdot_lt_L) = 'logxq_CpTMdot_lt_L'
-
          history_column_name(h_burn_solver_maxsteps) = 'burn_solver_maxsteps'
          history_column_name(h_rotation_solver_steps) = 'rotation_solver_steps'
          history_column_name(h_diffusion_solver_steps) = 'diffusion_solver_steps'
          history_column_name(h_diffusion_solver_iters) = 'diffusion_solver_iters'
-         history_column_name(h_total_radiation) = 'total_radiation'
-         history_column_name(h_total_energy_plus_total_radiation) = &
-            'total_energy_plus_total_radiation'
 
          history_column_name(h_tot_E) = 'tot_E'
          history_column_name(h_log_tot_E) = 'log_tot_E'

@@ -62,6 +62,7 @@
          end if
          
          if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            write(*,*) 'fill_arrays_with_NaNs at start of step'
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -139,7 +140,6 @@
             s% boost_mlt_alfa = -999
             s% burn_nstep_max = -999
             s% burn_nfcn_total = -999
-            s% k_CpTMdot_lt_L = -999
             s% dX_nuc_drop_max_k = -999
             s% dX_nuc_drop_max_j = -999
             s% solver_test_partials_var = -999
@@ -161,7 +161,6 @@
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf_old)
             call set_to_NaN(s% dt_limit_ratio_old)
-            call set_to_NaN(s% total_radiation_old)
             call set_to_NaN(s% total_angular_momentum_old)
             call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% astero_revised_max_yr_dt_old)
@@ -181,7 +180,6 @@
                call set_to_NaN(s% cz_bot_mass_old(j))
             end do      
 
-            call set_to_NaN(s% mstar_dot)
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% adjust_J_q)
             call set_to_NaN(s% rotational_mdot_boost)
@@ -263,7 +261,6 @@
             call set_to_NaN(s% adjust_mass_mid_frac_sub1)
             call set_to_NaN(s% adjust_mass_inner_frac_sub1)
             call set_to_NaN(s% h1_czb_mass)
-            call set_to_NaN(s% profile_age)
             call set_to_NaN(s% h1_czb_mass)            
             call set_to_NaN(s% total_angular_momentum)
             call set_to_NaN(s% total_abs_angular_momentum)
@@ -348,7 +345,6 @@
             call set_to_NaN(s% virial_thm_P_avg)
             call set_to_NaN(s% total_eps_grav)
             call set_to_NaN(s% total_eps_mdot)
-            call set_to_NaN(s% total_radiation)
             call set_to_NaN(s% work_outward_at_surface)
             call set_to_NaN(s% work_inward_at_center)
             call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
@@ -363,7 +359,6 @@
             call set_to_NaN(s% log_P_center_old)
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% cumulative_extra_heating_old)
-            call set_to_NaN(s% total_radiation_old)        
             call set_to_NaN(s% mesh_adjust_IE_conservation)
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% mesh_adjust_KE_conservation)
@@ -676,6 +671,7 @@
             
             dt = s% dt
             s% time = s% time_old + dt
+            s% star_age = s% time/secyer
             s% okay_to_set_mixing_info = .true.
 
             if (s% v_center /= 0d0) then ! adjust R_center               
@@ -699,6 +695,7 @@
 
                call do_adjust_mass(s, s% species, ierr)
                if (failed('do_adjust_mass')) return
+               s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
                if (failed('set_vars_if_needed after do_adjust_mass')) return
 
@@ -2527,7 +2524,6 @@
          write(*,1) 'set_age', age
          s% time = age*secyer
          s% star_age = age
-         s% profile_age = age
       end subroutine set_age
 
 

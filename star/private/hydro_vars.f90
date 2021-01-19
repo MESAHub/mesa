@@ -848,7 +848,7 @@
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
          use mlt_info, only: set_mlt_vars, check_for_redo_MLT, set_grads
-         use star_utils, only: set_k_CpTMdot_lt_L, start_time, update_time, &
+         use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
@@ -904,9 +904,6 @@
 
          if (dbg) write(*,*) 'call set_scale_height'
          call set_scale_height(s)
-
-         if (dbg) write(*,*) 'call set_k_CpTMdot_lt_L'
-         call set_k_CpTMdot_lt_L(s)
 
          if (s% rotation_flag .and. (.not. skip_rotation .or. s% w_div_wc_flag)) then
             if (dbg) write(*,*) 'call set_rotation_info'

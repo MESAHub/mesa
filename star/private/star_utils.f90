@@ -1352,26 +1352,7 @@
             end if
          end do
       end function min_dr_div_cs
-
-
-      ! largest k s.t. for all k' < k, cell k' has Cp(k')*T(k')*mstar_dot < L(k).
-      subroutine set_k_CpTMdot_lt_L(s)
-         type (star_info), pointer :: s
-         integer :: k, nz
-         if (s% mstar_dot <= 0d0) then
-            s% k_CpTMdot_lt_L = 1
-            return
-         end if
-         nz = s% nz
-         do k = 2, nz
-            if (s% Cp(k)*s% T(k)*s% mstar_dot >= max(1d-99,s% L(k))) then
-               s% k_CpTMdot_lt_L = k-1
-               return
-            end if
-         end do
-         s% k_CpTMdot_lt_L = nz
-      end subroutine set_k_CpTMdot_lt_L
-
+      
 
       subroutine reset_epsnuc_vectors(s)
          type (star_info), pointer :: s

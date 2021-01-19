@@ -1198,7 +1198,6 @@
             need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
-         real(dp) :: profile_age
          real(dp) :: h1_czb_mass
          real(dp) :: total_angular_momentum
          real(dp) :: total_abs_angular_momentum
@@ -1341,7 +1340,6 @@
          integer :: boost_mlt_alfa
          integer :: burn_nstep_max
          integer :: burn_nfcn_total
-         integer :: k_CpTMdot_lt_L
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j
          integer :: solver_test_partials_var
@@ -1450,7 +1448,6 @@
             virial_thm_P_avg, &
             total_eps_grav, &
             total_eps_mdot, &
-            total_radiation, &
             work_outward_at_surface, &
             work_inward_at_center, &
             non_epsnuc_energy_change_from_split_burn, &
@@ -1466,8 +1463,7 @@
          real(dp) :: &
             log_P_center_old, &
             cumulative_energy_error_old, &
-            cumulative_extra_heating_old, &
-            total_radiation_old
+            cumulative_extra_heating_old
             
          real(dp) :: mesh_adjust_IE_conservation
          real(dp) :: mesh_adjust_PE_conservation
