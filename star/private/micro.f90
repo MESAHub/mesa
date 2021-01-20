@@ -384,7 +384,6 @@ contains
 
     use eos_def
     use chem_def
-    use eos_lib, only: eos_theta_e
     use star_utils, only: eval_csound, write_eos_call_info
 
     type (star_info), pointer :: s
@@ -394,7 +393,7 @@ contains
     integer, intent(out) :: ierr
     integer :: i, j
 
-    real(dp) :: d_theta_e_deta, T, rho, &
+    real(dp) :: T, rho, &
          dlnd_dV, Pgas, Prad, &
          P, PV, PT, E, EV, ET, CP, dCp_dV, dCp_dT, &
          chiT, dchiT_dlnd, dchiT_dlnT, &
@@ -480,11 +479,6 @@ contains
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
     s% d_QQ_dlnd(k) = s% QQ(k)*(d_dlnd(i_chiT)/s% chiT(k) - d_dlnd(i_chiRho)/s% chiRho(k) - 1d0)
     s% d_QQ_dlnT(k) = s% QQ(k)*(d_dlnT(i_chiT)/s% chiT(k) - d_dlnT(i_chiRho)/s% chiRho(k) - 1d0)
-    if (s% screening_mode == 'classic') then
-       s% theta_e(k) = eos_theta_e(res(i_eta), d_theta_e_deta)
-    else
-       s% theta_e(k) = 0d0
-    end if
     s% csound(k) = eval_csound(s,k,ierr)
 
     ! check some key values

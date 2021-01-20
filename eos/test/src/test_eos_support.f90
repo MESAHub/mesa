@@ -2244,25 +2244,6 @@
       end subroutine Do_One_TRho
 
       
-      subroutine test_theta_e
-         integer :: i
-         real(dp), parameter :: eta_min = -10d0
-         real(dp), parameter :: eta_max = 75d0
-         real(dp), parameter :: d_eta = 5d0
-         real(dp) :: eta, theta_e, d_theta_e_deta
- 3       format(f14.2,2x,2(1pe16.6,2x))
-         write(*,*) 'test_theta_e'
-         eta = eta_min
-         write(*,'(a14,99a18)') 'eta', 'theta_e'
-         do while (eta <= eta_max)
-            theta_e = eos_theta_e(eta, d_theta_e_deta)
-            write(*,3) eta, theta_e
-            eta = eta + d_eta
-         end do
-         write(*,*)
-      end subroutine test_theta_e
-      
-      
       subroutine test_dirac_integrals
          real(dp) :: dk, T, eta, theta, fdph, fdmh, fdeta, fdtheta, theta_e
  1       format(a40,1pe26.16)
