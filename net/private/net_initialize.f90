@@ -277,7 +277,6 @@
          
          n% reaction_Qs => std_reaction_Qs
          n% reaction_neuQs => std_reaction_neuQs
-         nullify(n% graboske_cache)
                   
          num_reactions = g% num_reactions
          num_isos = g% num_isos
