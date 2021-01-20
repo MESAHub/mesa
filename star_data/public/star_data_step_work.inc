@@ -93,7 +93,6 @@
          ! (d_ln(p)/d_ln(rho)) at constant entropy.
       real(dp), pointer :: gamma3(:)      ! gamma3 := 1 + dlnT_dlnRho at constant S, 
       real(dp), pointer :: eta(:)        ! electron degeneracy parameter
-      real(dp), pointer :: theta_e(:)    ! electron degeneracy factor for graboske screening
       real(dp), pointer :: gam(:)        ! plasma interaction parameter
       real(dp), pointer :: mu(:)         
          ! mean molecular weight per particle (ions + free electrons)

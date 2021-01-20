@@ -706,17 +706,6 @@
       ! misc
       
 
-      real(dp) function eos_theta_e(eta, d_theta_e_deta)
-         ! theta_e is used in the Graboske et al screening method.
-         ! for non-degenerate electrons, theta_e goes to 1.
-         ! for significantly degenerate electrons, it goes to 0.
-         use eosDT_eval, only:eval_theta_e
-         real(dp), intent(in) :: eta ! degeneracy parameter
-         real(dp), intent(out) :: d_theta_e_deta
-         eos_theta_e = eval_theta_e(eta, d_theta_e_deta)
-      end function eos_theta_e
-
-
       subroutine eos_fermi_dirac_integral(dk, eta, theta, fd, fdeta, fdtheta)
          !..from Frank Timmes' site, http://www.cococubed.com/code_pages/fermi_dirac.shtml
          !..this routine computes the fermi-dirac integrals of 

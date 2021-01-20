@@ -347,21 +347,6 @@
       end subroutine do_convert_helm_results
 
       
-      real(dp) function eval_theta_e(eta, d_theta_e_deta)
-         use interp_1d_lib, only : interp_values_and_slopes
-         real(dp), intent(in) :: eta
-         real(dp), intent(out) :: d_theta_e_deta
-         integer, parameter :: nvar = 1
-         integer :: ierr
-         real(dp) :: x(nvar), vals(nvar), slopes(nvar)
-         x(1) = eta
-         call interp_values_and_slopes( &
-                  x_theta_e, theta_e_nx, f_theta_e1, nvar, x, vals, slopes, ierr)
-         eval_theta_e = vals(1)
-         d_theta_e_deta = slopes(1)
-      end function eval_theta_e 
-      
-
       subroutine Get_HELM_Results( &
                X, abar, zbar, arho, alogrho, atemp, alogtemp, &
                coulomb_temp_cut, coulomb_den_cut, &

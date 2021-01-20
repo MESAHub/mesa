@@ -712,8 +712,6 @@
             if (failed('gamma3')) exit
             call do1(s% eta, c% eta)
             if (failed('eta')) exit
-            call do1(s% theta_e, c% theta_e)
-            if (failed('theta_e')) exit
             call do1(s% gam, c% gam)
             if (failed('gam')) exit
             call do1(s% mu, c% mu)
