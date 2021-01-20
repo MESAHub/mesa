@@ -405,7 +405,6 @@
          logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          logical :: use_fixed_L_for_BB_outer_BC
-         logical :: use_Psurf_for_surface_eflux
 
       ! create atmosphere
 
@@ -538,7 +537,6 @@
          real(dp) :: logT_max_for_standard_mesh_delta_coeff
          real(dp) :: logT_min_for_highT_mesh_delta_coeff
          real(dp) :: remesh_dt_limit
-         real(dp) :: remesh_log_L_nuc_burn_min
          real(dp) :: mesh_Pgas_div_P_exponent
 
          logical :: okay_to_remesh, trace_mesh_adjust_error_in_conservation
@@ -812,12 +810,6 @@
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
             steps_before_use_Fraley_time_centering
-         
-         real(dp) :: &
-            v_drag_factor, &
-            v_drag, &
-            q_for_v_drag_full_off, &
-            q_for_v_drag_full_on
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -1097,6 +1089,8 @@
          integer :: diffusion_iters_hard_limit
 
          real(dp) :: &
+            dt_div_dt_cell_collapse_limit, &
+            dt_div_dt_cell_collapse_hard_limit, &
             dt_div_min_dr_div_cs_limit, &
             dt_div_min_dr_div_cs_hard_limit, &
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &
@@ -1298,10 +1292,7 @@
             hard_limit_for_rel_error_in_energy_conservation
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
-
-         logical :: report_all_dt_limits, report_dX_nuc_drop_dt_limits
-         logical :: report_why_dt_limits, report_solver_dt_info
-
+         logical :: report_dt_hard_limit_retries, report_solver_dt_info
          logical :: trace_evolve
 
       ! misc

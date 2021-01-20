@@ -71,6 +71,9 @@
          if (s% eps_nuc_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) then
             do k = 1, nz
                s% eps_nuc(k) = 0d0
+               s% burn_num_iters(k) = 0
+               s% burn_avg_epsnuc(k) = 0d0
+               s% max_burn_correction(k) = 0d0
             end do
             return
          end if

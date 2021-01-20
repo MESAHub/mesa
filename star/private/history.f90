@@ -1721,6 +1721,8 @@
                val = s% total_turbulent_energy_end
            case(h_total_energy)
                val = s% total_energy_end
+           case(h_total_energy_foe)
+               val = s% total_energy_end*1d-51
                
            case(h_log_total_internal_energy)
                val = safe_log10(s% total_internal_energy_end)
@@ -2054,6 +2056,8 @@
                val = s% fe_core_infall*1d-5 ! convert to km/sec
             case(h_non_fe_core_infall)
                val = s% non_fe_core_infall*1d-5 ! convert to km/sec
+            case(h_non_fe_core_rebound)
+               val = s% non_fe_core_rebound*1d-5 ! convert to km/sec
             case(h_center_omega)
                val = if_rot(s% center_omega)
             case(h_center_omega_div_omega_crit)
@@ -2944,22 +2948,6 @@
                   val = safe_log10(sum(s% dq(1:s% k_for_test_CpT_absMdot_div_L-1)))
                end if
 
-            case (h_k_CpTMdot_lt_L)
-               int_val = s% k_CpTMdot_lt_L
-               is_int_val = .true.
-            case (h_q_CpTMdot_lt_L)
-               if (s% k_CpTMdot_lt_L == nz) then
-                  val = 0d0
-               else
-                  val = s% q(s% k_CpTMdot_lt_L)
-               end if
-            case (h_logxq_CpTMdot_lt_L)
-               if (s% k_CpTMdot_lt_L == nz) then
-                  val = 0d0
-               else
-                  val = safe_log10(sum(s% dq(1:s% k_CpTMdot_lt_L-1)))
-               end if
-
             case (h_rotation_solver_steps)
                int_val = s% num_rotation_solver_steps
                is_int_val = .true.
@@ -2976,13 +2964,6 @@
             case (h_diffusion_solver_iters)
                int_val = s% num_diffusion_solver_iters
                is_int_val = .true.
-
-            case (h_total_radiation)
-               val = s% total_radiation
-
-            case (h_total_energy_plus_total_radiation)
-               val = get_total_energy_integral(s,nz)
-               val = val + s% total_radiation
 
            case(h_tot_IE_div_IE_plus_KE)
                val = s% total_internal_energy_end / &
@@ -3519,7 +3500,7 @@
          csound_surf = eval_csound(s,1,ierr)
 
          if (s% u_flag) then
-            v_surf = s% u_face(1)
+            v_surf = s% u(1)
          else if (s% v_flag) then
             v_surf = s% v(1)
          else

@@ -281,8 +281,6 @@
          s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
          luminosity = s% L(1)
-         s% total_radiation = s% total_radiation + &
-            s% dt*(luminosity + s% power_neutrinos)
 
          if (s% u_flag) then
             s% v_surf = s% u(1)
@@ -311,7 +309,6 @@
          
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
-         s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
@@ -489,16 +486,23 @@
                      s% fe_core_infall = -s% u(k)
                end do
             end if
-            non_fe_core_mass = max( &
-               s% he_core_mass, s% c_core_mass, s% o_core_mass, s% si_core_mass)
+            non_fe_core_mass = s% he_core_mass
+            !write(*,2) 's% he_core_mass', s% model_number, s% he_core_mass
+            !write(*,2) 's% c_core_mass', s% model_number, s% c_core_mass
+            !write(*,2) 's% o_core_mass', s% model_number, s% o_core_mass
+            !write(*,2) 's% si_core_mass', s% model_number, s% si_core_mass
+            !write(*,2) 'non_fe_core_mass', s% model_number, non_fe_core_mass
+            !write(*,2) 's% non_fe_core_rebound', s% model_number, s% non_fe_core_rebound
             if (non_fe_core_mass > 0) then
                do k = 1, nz
                   if (s% m(k) > Msun*non_fe_core_mass) cycle
                   if (s% m(k) < Msun*s% fe_core_mass) exit
                   if (-s% u(k) > s% non_fe_core_infall) &
                      s% non_fe_core_infall = -s% u(k)
-                  if (s% u(k) > s% non_fe_core_rebound) &
-                     s% non_fe_core_rebound = -s% u(k)
+                  if (s% u(k) > s% non_fe_core_rebound) then
+                     s% non_fe_core_rebound = s% u(k)
+                     !write(*,2) 's% non_fe_core_rebound', k, s% non_fe_core_rebound, s% m(k)/Msun
+                  end if
                end do
             end if
          else if (s% v_flag) then

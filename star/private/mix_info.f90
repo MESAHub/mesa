@@ -2129,7 +2129,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: &
-            C, alpha_face, f, &
+            C, alpha_face, f, v, &
             am1, a00, ap1, min_dm, alfa0, alfa, cs, r, shock_mass_start, &
             log_max_boost, m_full_boost, m_no_boost, max_boost, &
             dm_for_center_eta_nondecreasing, min_eta
@@ -2152,7 +2152,12 @@
          
          shock_mass_start = 1d99
          do k = 1, nz
-            if (s% u(k) > s% csound(k)) then
+            if (s% u_flag) then
+               v = s% u(k)
+            else
+               v = s% v(k)
+            end if
+            if (v > s% csound(k)) then
                if (k > 1) shock_mass_start = s% m(k) ! skip this after breakout
                exit
             end if

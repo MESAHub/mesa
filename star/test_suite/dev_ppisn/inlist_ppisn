@@ -240,7 +240,7 @@
 
    warn_rates_for_high_temp = .false.
 
-   ! Here begins the inferno of additional paramaters to control turning hydro on/off and
+   ! Here begins the inferno of additional parameters to control turning hydro on/off and
    ! relaxing the star to a lower mass
    ! 'Abandon hope all ye who enter here'
    ! also given are the variable names to which each is assigned in run_star_extras

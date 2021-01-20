@@ -29,6 +29,7 @@
       use const_def
       use star_utils, only: em1, e00, ep1
       use utils_lib
+      use auto_diff
       
       implicit none
 
@@ -48,188 +49,11 @@
 
       private
       public :: &
-         do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
-         do1_Riemann_energy_eqn, do1_Riemann_dlnRdt_eqn
+         do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, do1_Riemann_dlnRdt_eqn
+         ! Riemann_energy_eqn is now part of the standard energy equation
 
       contains
-      
-      ! ergs/s from cell(k) to cell(k-1)
-      subroutine eval1_energy_flux(s, k, &
-            eflux, d_eflux_dL, d_eflux_dlnR, &
-            d_eflux_du00, d_eflux_dum1, &
-            d_eflux_dlnd00, d_eflux_dlndm1, d_eflux_dlnT00, d_eflux_dlnTm1, d_eflux_dw, &
-            ierr)
-         type (star_info), pointer :: s 
-         integer, intent(in) :: k
-         real(qp), intent(out) :: eflux
-         real(dp), intent(out) :: &
-            d_eflux_dL, d_eflux_dlnR, &
-            d_eflux_du00, d_eflux_dum1, &
-            d_eflux_dlnd00, d_eflux_dlndm1, d_eflux_dlnT00, d_eflux_dlnTm1, d_eflux_dw
-         integer, intent(out) :: ierr
-         real(qp) :: r, A, dA_dlnR, P_face, u_face, L, &
-            eta, dr, vol, gam, ieL, ieR, rhoR, rhoL, vR, vL
-         integer :: nz
-         logical :: test_partials
-         include 'formats'
-         ierr = 0
 
-         !test_partials = (k == s% solver_test_partials_k) 
-         test_partials = .false.
-         
-         d_eflux_dL = 0 
-         d_eflux_dlnR = 0 
-         d_eflux_du00 = 0 
-         d_eflux_dum1 = 0 
-         d_eflux_dlnd00 = 0 
-         d_eflux_dlndm1 = 0 
-         d_eflux_dlnT00 = 0 
-         d_eflux_dlnTm1 = 0 
-         d_eflux_dw = 0 
-
-         if (k > s% nz) then
-            L = s% L_center
-         else
-            L = s% L(k)
-            d_eflux_dL = 1d0
-         end if
-         
-         nz = s% nz
-
-         if (k > nz) then
-            eflux = L
-            return    
-         end if
-         
-         r = s% r(k)
-         A = 4d0*pi*r*r
-         dA_dlnR = 2d0*A
-         u_face = s% u_face(k)
-         P_face = s% P_face(k)
-
-         eflux = A*P_face*u_face + L
-         
-         if (is_bad(dble(eflux))) then
-            ierr = -1
-            if (.not. s% report_ierr) return
-            write(*,2) 'A', k, A
-            write(*,2) 'P_face', k, P_face
-            write(*,2) 'u_face', k, u_face
-            write(*,2) 'L', k, L
-            write(*,2) 'eflux', k, eflux
-            stop 'eval1_energy_flux'
-         end if
-         
-         d_eflux_dlnR = &
-            dA_dlnR*P_face*u_face + &
-            A*s% d_Pface_dlnR(k)*u_face + &
-            A*P_face*s% d_uface_dlnR(k)
-         d_eflux_dL = d_eflux_dL + A*s% d_Pface_dL(k)*u_face
-         d_eflux_dlnd00 = &
-            A*(s% d_Pface_dlnd00(k)*u_face + P_face*s% d_uface_dlnd00(k))
-         d_eflux_dlndm1 = &
-           A*(s% d_Pface_dlndm1(k)*u_face + P_face*s% d_uface_dlndm1(k))
-         d_eflux_du00 = &
-            A*(s% d_Pface_du00(k)*u_face + P_face*s% d_uface_du00(k))
-         d_eflux_dum1 = &
-            A*(s% d_Pface_dum1(k)*u_face + P_face*s% d_uface_dum1(k))
-         d_eflux_dlnT00 = &
-            A*(s% d_Pface_dlnT00(k)*u_face + P_face*s% d_uface_dlnT00(k))
-         d_eflux_dlnTm1 = &
-            A*(s% d_Pface_dlnTm1(k)*u_face + P_face*s% d_uface_dlnTm1(k))
-         d_eflux_dw = &
-            A*s% d_Pface_dw(k)*u_face + &
-            A*P_face*s% d_uface_dw(k)
-         
-         if (test_partials) then
-            s% solver_test_partials_val = u_face
-            s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = s% d_uface_dlnT00(k)
-         end if
-         
-      end subroutine eval1_energy_flux
-      
-      
-      subroutine eval_surf_energy_flux(s, Psurf, &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            eflux, d_eflux_dL, d_eflux_dlnR, &
-            d_eflux_du00, d_eflux_dum1, &
-            d_eflux_dlnd00, d_eflux_dlndm1, d_eflux_dlnT00, d_eflux_dlnTm1, d_eflux_dw, &
-            ierr)
-         type (star_info), pointer :: s 
-         real(dp), intent(in) :: &
-            Psurf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         real(qp), intent(out) :: eflux
-         real(dp), intent(out) :: &
-            d_eflux_dL, d_eflux_dlnR, &
-            d_eflux_du00, d_eflux_dum1, &
-            d_eflux_dlnd00, d_eflux_dlndm1, d_eflux_dlnT00, d_eflux_dlnTm1, d_eflux_dw
-         integer, intent(out) :: ierr
-         real(qp) :: r, A, dA_dlnR, P_face, u_face, L, &
-            eta, dr, vol, gam, ieL, ieR, rhoR, rhoL, vR, vL
-         integer :: nz
-         logical :: test_partials
-         include 'formats'
-         ierr = 0
-
-         !test_partials = (k == s% solver_test_partials_k) 
-         test_partials = .false.
-         
-         d_eflux_dL = 0 
-         d_eflux_dlnR = 0 
-         d_eflux_du00 = 0 
-         d_eflux_dum1 = 0 
-         d_eflux_dlnd00 = 0 
-         d_eflux_dlndm1 = 0 
-         d_eflux_dlnT00 = 0 
-         d_eflux_dlnTm1 = 0 
-         d_eflux_dw = 0 
-
-         L = s% L(1)
-         d_eflux_dL = 1d0
-         
-         nz = s% nz
-         
-         r = s% r(1)
-         A = 4d0*pi*r*r
-         dA_dlnR = 2d0*A
-         u_face = s% u_face(1)
-
-         eflux = A*Psurf*u_face + L
-         
-         if (is_bad(dble(eflux))) then
-            ierr = -1
-            if (.not. s% report_ierr) return
-            write(*,2) 'Psurf', Psurf
-            write(*,2) 'u_face', u_face
-            write(*,2) 'L', L
-            write(*,2) 'eflux', eflux
-            stop 'eval_surf_energy_flux'
-         end if
-         
-         d_eflux_dlnR = &
-            dA_dlnR*Psurf*u_face + &
-            A*Psurf*dlnPsurf_dlnR*u_face + &
-            A*Psurf*s% d_uface_dlnR(1)
-         d_eflux_dL = d_eflux_dL + A*Psurf*dlnPsurf_dL*u_face
-         d_eflux_dlnd00 = &
-            A*(Psurf*dlnPsurf_dlnd*u_face + Psurf*s% d_uface_dlnd00(1))
-         d_eflux_dlndm1 = A*Psurf*s% d_uface_dlndm1(1)
-         d_eflux_du00 = A*Psurf*s% d_uface_du00(1)
-         d_eflux_dum1 = A*Psurf*s% d_uface_dum1(1)
-         d_eflux_dlnT00 = &
-            A*(Psurf*dlnPsurf_dlnT*u_face + Psurf*s% d_uface_dlnT00(1))
-         d_eflux_dlnTm1 = A*Psurf*s% d_uface_dlnTm1(1)
-         d_eflux_dw = &
-            A*Psurf*s% d_uface_dw(1)
-         
-         if (test_partials) then
-            s% solver_test_partials_val = u_face
-            s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = s% d_uface_dlnT00(1)
-         end if
-         
-      end subroutine eval_surf_energy_flux
       
       ! (g cm/s)/s from cell(k) to cell(k-1)
       subroutine eval1_momentum_flux(s, k, &
@@ -551,8 +375,7 @@
             alfa, beta, ie_plus_ke, scal, dt, d_dlnd, d_dlnT, &
             d_diff_source_dum1, d_diff_source_du00, d_diff_source_dup1, &
             full_on, full_off, logRho, rmid, &
-            dudt_actual, d_dudt_actual_du, dudt_factor, alpha, &
-            v_drag, drag_factor, drag_fraction
+            dudt_actual, d_dudt_actual_du, dudt_factor, alpha
          logical :: dbg, do_diffusion, test_partials
 
          include 'formats'
@@ -704,26 +527,6 @@
          
          dudt_ex_qp = (flux_in - flux_out + sources)/dm
          dudt_expected = dudt_ex_qp
-
-         drag_factor = s% v_drag_factor
-         v_drag = s% v_drag
-         if (s% q(k) < s% q_for_v_drag_full_off) then
-            drag_fraction = 0d0
-         else if (s% q(k) > s% q_for_v_drag_full_on) then
-            drag_fraction = 1d0
-         else
-            drag_fraction = (s% q(k) - s% q_for_v_drag_full_off)&
-                               /(s% q_for_v_drag_full_on - s% q_for_v_drag_full_off)
-         end if
-         drag_factor = drag_factor*drag_fraction
-
-         if (drag_factor > 0d0) then
-            if (s% u(k) > v_drag) then
-               dudt_expected = dudt_expected - drag_factor*pow2(s% u(k) - v_drag)/s% r(k)
-            else if (s% u(k) < -v_drag) then
-               dudt_expected = dudt_expected + drag_factor*pow2(s% u(k) + v_drag)/s% r(k)
-            end if
-         end if
          
          dudt_factor = 1d0
          
@@ -739,7 +542,7 @@
          residual = (dudt_expected - dudt_actual)*scal
 
          if (test_partials) then
-            s% solver_test_partials_val = flux_in - flux_out
+            s% solver_test_partials_val = residual
          end if
          
          if (is_bad(residual)) then
@@ -780,14 +583,6 @@
          
          d_dudt_dw00 = dudt_factor*(0 - d_momflux00_dw00 + ds_dw00)/dm
          d_dudt_dwp1 = dudt_factor*(d_momfluxp1_dwp1 - 0 + ds_dwp1)/dm  
-
-         if (drag_factor > 0d0) then
-            if (s% u(k) > v_drag) then
-               d_dudt_dlnR00 = d_dudt_dlnR00 + drag_factor*pow2(s% u(k) - v_drag)/s% r(k)
-            else if (s% u(k) < -v_drag) then
-               d_dudt_dlnR00 = d_dudt_dlnR00 - drag_factor*pow2(s% u(k) + v_drag)/s% r(k)
-            end if
-         end if
                
          d_dudt_dum1 = &
             dudt_factor*(0 - d_momflux00_dum1 + 0 + d_diff_source_dum1)/dm
@@ -795,14 +590,6 @@
             dudt_factor*(d_momfluxp1_du00 - d_momflux00_du00 + 0 + d_diff_source_du00)/dm
          d_dudt_dup1 = &
             dudt_factor*(d_momfluxp1_dup1 - 0 + 0 + d_diff_source_dup1)/dm  
-
-         if (drag_factor > 0d0) then
-            if (s% u(k) > v_drag) then
-               d_dudt_du00 = d_dudt_du00 - 2d0*drag_factor*(s% u(k) - v_drag)/s% r(k)
-            else if (s% u(k) < -v_drag) then
-               d_dudt_du00 = d_dudt_du00 + 2d0*drag_factor*(s% u(k) + v_drag)/s% r(k)
-            end if
-         end if
                    
          d_dudt_dlndm1 = dudt_factor*(0 - d_momflux00_dlndm1 + ds_dlndm1)/dm
          d_dudt_dlnd00 = &
@@ -865,8 +652,8 @@
          !ep1_lnd = 0; ep1_lnT = 0
          
          if (test_partials) then
-            s% solver_test_partials_var = s% i_w_div_wc
-            s% solver_test_partials_dval_dx = d_grav_source_dwR/dm
+            s% solver_test_partials_var = s% i_lnd
+            s% solver_test_partials_dval_dx = ep1_lnd
             !write(*,2) 'Uq', k, Uq
             !write(*,2) 'dudt_expected', k, dudt_expected
             !write(*,2) 'dudt_actual', k, dudt_actual
@@ -876,7 +663,6 @@
             !write(*,2) 'flux_in - flux_out', k, flux_in - flux_out
             !write(*,2) 'flux_in', k, flux_in
             !write(*,2) 'flux_out', k, flux_out
-            !write(*,2) 'drag_factor', k, drag_factor
             !write(*,2) 'dudt_factor', k, dudt_factor
             !write(*,2) 'scal', k, scal
             !write(*,2) 's% u(k)', k, s% u(k)
@@ -977,413 +763,6 @@
          end if
          
       end subroutine store1_dudt_residual_and_partials
-      
-      
-      subroutine do1_Riemann_energy_eqn( &
-            s, k, P_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            xscale, equ, skip_partials, do_chem, nvar, ierr)
-         use eos_def, only: i_grad_ad
-         use star_utils, only: cell_start_specific_PE, cell_specific_PE
-         type (star_info), pointer :: s         
-         integer, intent(in) :: k, nvar
-         real(dp), intent(in) :: P_surf ! only used if k==1
-         real(dp), intent(in) :: &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
-         logical, intent(in) :: skip_partials, do_chem
-         integer, intent(out) :: ierr
-
-         real(qp) :: &
-            eflux00, efluxp1, dt, dm, flux_out, flux_in, u_new, u_old, &
-            dKE_dt, mC, rC_new, rC_start, G, dPE_dt, sources, dedt_expected_qp, &
-            energy_qp, e0_qp, f_qp, de_div_e0_expected, de_div_e0_actual, &
-            dEt_dt, sig00, sigp1, diffusion_eps, e_m1, e_p1
-         real(dp) :: &
-            d_eflux_dL00, d_eflux00_dlnR00, &
-            d_eflux00_du00, d_eflux00_dum1, &
-            d_eflux00_dlnd00, d_eflux00_dlndm1, &
-            d_eflux00_dlnT00, d_eflux00_dlnTm1, &
-            d_eflux_dLp1, d_efluxp1_dlnRp1, &
-            d_efluxp1_dup1, d_efluxp1_du00, &
-            d_efluxp1_dlndp1, d_efluxp1_dlnd00, &
-            d_efluxp1_dlnTp1, d_efluxp1_dlnT00, &
-            d_eflux00_dPR_00, d_eflux00_dPL_m1, &
-            d_eflux00_duR_00, d_eflux00_duL_m1, &
-            d_eflux00_drhoR_00, d_eflux00_drhoL_m1, &
-            d_eflux00_dcsR_00, d_eflux00_dcsL_m1, &
-            d_efluxp1_dPR_p1, d_efluxp1_dPL_00, &
-            d_efluxp1_duR_p1, d_efluxp1_duL_00, &
-            d_efluxp1_drhoR_p1, d_efluxp1_drhoL_00, &
-            d_efluxp1_dcsR_p1, d_efluxp1_dcsL_00, &
-            d_eflux00_dw00, d_efluxp1_dwp1, &
-            e00_PR, ep1_PR, e00_PL, em1_PL, &
-            e00_uR, ep1_uR, e00_uL, em1_uL, &
-            e00_rhoR, ep1_rhoR, e00_rhoL, em1_rhoL, &
-            e00_csR, ep1_csR, e00_csL, em1_csL, &         
-            alpha, energy, e0, f, rR, rL, dedt_expected, d_dKEdt_du, E_src_sink, &
-            d_rC_new_dlnR00, d_rC_new_dlnRp1, emin_start, vt0, dPE_dlnR00, dPE_dlnRp1, &
-            d_dPEdt_dlnR00, d_dPEdt_dlnRp1, eps_nuc, non_nuc_neu, PE_start, PE_new, &
-            e_div_e0, d_dedt_dL00, d_dedt_dLp1, d_dedt_dlnR00, d_dedt_dlnRp1, d_dedt_dw00, d_dedt_dwp1, &
-            d_dedt_dum1, d_dedt_du00, d_dedt_dup1, Et0, Et, &
-            d_dedt_dlndm1, d_dedt_dlnd00, d_dedt_dlndp1, d_dEtdt_dEt, &
-            d_dedt_dlnTm1, d_dedt_dlnT00, d_dedt_dlnTp1, &
-            d_dedt_dlnd_c_E, d_dedt_dE_c_Rho, d_dedt_dEt, &
-            d_de_div_e0_dlnd_c_E, d_de_div_e0_dlnE_c_Rho, &
-            num_dequ, num_dlnd, num_deflux00, num_defluxp1, &
-            num_dP_face, num_du_face, dlgE, dequ, dlgT, dlgRho, &
-            d_Etotal_dt, d_dlnd, d_dlnT, &
-            d_diff_eps_dlnE_m1, d_diff_eps_dlnE_00, d_diff_eps_dlnE_p1, &
-            diffusion_factor, diffusion_eps_in, diffusion_eps_out, scal, term
-         integer :: nz, j, i, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_u, i_w_div_wc
-         logical :: do_diffusion, test_partials, doing_op_split_burn
-         
-         include 'formats'
-
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-         
-         ierr = 0
-         i_dlnE_dt = s% i_dlnE_dt
-         nz = s% nz
-         E_src_sink = 0
-
-         doing_op_split_burn = s% op_split_burn .and. &
-            s% T_start(k) >= s% op_split_burn_min_T
-         
-         dt = 1d0/s% dVARdot_dVAR
-         
-         dm = s% dm(k)
-         energy = s% energy(k)
-         energy_qp = energy
-         e0 = s% energy_start(k)
-         e0_qp = e0
-         e_div_e0 = energy/e0
-         f_qp = dt/e0_qp ! factor to convert dedt to de_div_e0
-         f = f_qp
-
-         if (k==1) then
-            call eval_surf_energy_flux(s, P_surf, &
-               dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-               eflux00, d_eflux_dL00, d_eflux00_dlnR00, &
-               d_eflux00_du00, d_eflux00_dum1, &
-               d_eflux00_dlnd00, d_eflux00_dlndm1, &
-               d_eflux00_dlnT00, d_eflux00_dlnTm1, &
-               d_eflux00_dw00, ierr)   
-            if (ierr /= 0) return
-         else
-            call eval1_energy_flux(s, k, &
-               eflux00, d_eflux_dL00, d_eflux00_dlnR00, &
-               d_eflux00_du00, d_eflux00_dum1, &
-               d_eflux00_dlnd00, d_eflux00_dlndm1, &
-               d_eflux00_dlnT00, d_eflux00_dlnTm1, &
-               d_eflux00_dw00, ierr)   
-            if (ierr /= 0) return
-         end if
-
-         call eval1_energy_flux(s, k+1, &
-            efluxp1, d_eflux_dLp1, d_efluxp1_dlnRp1, &
-            d_efluxp1_dup1, d_efluxp1_du00, &
-            d_efluxp1_dlndp1, d_efluxp1_dlnd00, &
-            d_efluxp1_dlnTp1, d_efluxp1_dlnT00, &
-            d_efluxp1_dwp1, ierr)   
-         if (ierr /= 0) return
-         
-         flux_out = eflux00
-         flux_in = efluxp1
-         
-         dKE_dt = 0d0
-         dPE_dt = 0d0
-         sources = 0d0
-         do_diffusion = .false.
-         
-         rR = s% r(k)
-         if (k == nz) then
-            rL = s% R_center
-         else
-            rL = s% r(k+1)
-         end if
-         
-         ! rate of change in specific KE (erg/g/s)
-         u_new = s% u(k)
-         u_old = s% u_start(k)
-         dKE_dt = 0.5d0*(u_new*u_new - u_old*u_old)/dt ! erg/g/s
-         d_dKEdt_du = u_new/dt
-         
-         ! rate of change in specific PE (erg/g/s)
-         PE_start = cell_start_specific_PE(s,k)
-         PE_new = cell_specific_PE(s,k,dPE_dlnR00,dPE_dlnRp1)
-         dPE_dt = (PE_new - PE_start)/dt ! erg/g/s
-         d_dPEdt_dlnR00 = dPE_dlnR00/dt
-         d_dPEdt_dlnRp1 = dPE_dlnRp1/dt
-         
-         diffusion_factor = s% dedt_RTI_diffusion_factor
-         do_diffusion = s% RTI_flag .and. diffusion_factor > 0d0
-         if (do_diffusion) then ! add diffusion source term to dedt         
-            if (k < s% nz) then
-               if (s% alpha_RTI(k) > 1d-10 .and. k > 1) then
-                  emin_start = min( &
-                     s% energy_start(k+1), s% energy_start(k), s% energy_start(k-1))
-                  if (emin_start < 5d0*s% RTI_energy_floor) then
-                     diffusion_factor = diffusion_factor* &
-                        (1d0 + (5d0*s% RTI_energy_floor - emin_start)/emin_start)
-                     !write(*,2) 'boosted energy diff factor', k+1, diffusion_factor
-                  end if
-               end if
-               sigp1 = diffusion_factor*s% sig_RTI(k+1)
-               e_p1 = s% energy(k+1)
-            else
-               sigp1 = 0
-               e_p1 = 0
-            end if
-            if (k > 1) then
-               sig00 = diffusion_factor*s% sig_RTI(k)
-               e_m1 = s% energy(k-1)
-            else
-               sig00 = 0
-               e_m1 = 0
-            end if
-            diffusion_eps_in = sigp1*(e_p1 - energy_qp)/dm
-            diffusion_eps_out = sig00*(energy_qp - e_m1)/dm
-            diffusion_eps = diffusion_eps_in - diffusion_eps_out
-            d_diff_eps_dlnE_m1 = sig00*e_m1/dm
-            d_diff_eps_dlnE_00 = -(sig00 + sigp1)*energy_qp/dm
-            d_diff_eps_dlnE_p1 = sigp1*e_p1/dm
-         else
-            diffusion_eps_in = 0d0
-            diffusion_eps_out = 0d0
-            diffusion_eps = 0d0
-            d_diff_eps_dlnE_m1 = 0d0
-            d_diff_eps_dlnE_00 = 0d0
-            d_diff_eps_dlnE_p1 = 0d0
-            e_p1 = 0
-            e_m1 = 0
-         end if
-         sources = sources + diffusion_eps
-         s% dedt_RTI(k) = diffusion_eps
-         if (is_bad(diffusion_eps)) then
-!$omp critical (hydro_reimann_crit3)
-            write(*,2) 'diffusion_eps', k, diffusion_eps
-            stop 'do1_Riemann_energy_eqn'
-!$omp end critical (hydro_reimann_crit3)
-         end if
-      
-         if (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn) then
-            eps_nuc = 0 ! get eps_nuc from extra_heat instead
-         else
-            eps_nuc = s% eps_nuc(k)
-         end if
-
-         non_nuc_neu = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-         
-         s% eps_heat(k) = &
-            eps_nuc - non_nuc_neu + s% extra_heat(k) + s% irradiation_heat(k)
-         if (s% mstar_dot /= 0d0) &
-            s% eps_heat(k) = s% eps_heat(k) + s% eps_mdot(k)
-         if (s% do_element_diffusion .and. s% do_WD_sedimentation_heating) &
-            s% eps_heat(k) = s% eps_heat(k) + s% eps_WD_sedimentation(k)
-         if (s% do_element_diffusion .and. s% do_diffusion_heating) &
-            s% eps_heat(k) = s% eps_heat(k) + s% eps_diffusion(k)
-         if (s% do_conv_premix .and. s% do_premix_heating) &
-            s% eps_heat(k) = s% eps_heat(k) + s% eps_pre_mix(k)
-         sources = sources + s% eps_heat(k)
-         if (is_bad(sources)) then
-!$omp critical (hydro_reimann_crit4)
-            write(*,2) 'eps_nuc', k, eps_nuc
-            write(*,2) 'non_nuc_neu', k, non_nuc_neu
-            write(*,2) 's% extra_heat(k)', k, s% extra_heat(k)
-            write(*,2) 's% irradiation_heat(k)', k, s% irradiation_heat(k)
-            stop 'do1_Riemann_energy_eqn'
-!$omp end critical (hydro_reimann_crit4)
-         end if
-         
-         E_src_sink = E_src_sink + s% eps_heat(k)
-         dEt_dt = 0d0
-         d_dEtdt_dEt = 0d0
-         
-         d_Etotal_dt = (flux_in - flux_out)/dm + sources
-         ! Etotal = IE + KE + PE + Et,
-         ! so energy = IE = Etotal - KE - PE - Et,
-         ! d_internal_enegy = d_Etotal - dKE - dPE - dEt_dt
-         dedt_expected_qp = d_Etotal_dt - dKE_dt - dPE_dt - dEt_dt
-         dedt_expected = dedt_expected_qp ! erg/g/s     
-
-         de_div_e0_expected = dedt_expected*f
-         de_div_e0_actual = (energy_qp - e0_qp)/e0_qp
-         
-         if (k > 1) then
-            scal = 1d0
-         else
-            scal = 1d-6
-         end if
-         
-         equ(i_dlnE_dt, k) = scal*(de_div_e0_expected - de_div_e0_actual)
-         s% E_residual(k) = equ(i_dlnE_dt, k)
-         s% ergs_error(k) = dm*e0*(de_div_e0_actual - de_div_e0_expected) 
-            ! this gives the right sign for reported errors
-         
-         if (is_bad(equ(i_dlnE_dt, k))) then
-            ierr = -1
-            if (.not. s% report_ierr) return
-!$omp critical (hydro_reimann_crit1)
-            write(*,2) 'equ(i_dlnE_dt, k)', k, equ(i_dlnE_dt, k)
-            write(*,2) 'de_div_e0_expected', k, de_div_e0_expected
-            write(*,2) 'de_div_e0_actual', k, de_div_e0_actual
-            write(*,2) 'dedt_expected_qp', k, dedt_expected_qp
-            write(*,2) 's% dVARdot_dVAR', k, s% dVARdot_dVAR
-            write(*,2) 'dt', k, dt
-            write(*,2) 'e0', k, e0
-            write(*,2) 'f_qp', k, f_qp
-            write(*,2) 'd_Etotal_dt', k, d_Etotal_dt
-            write(*,2) 'dKE_dt', k, dKE_dt
-            write(*,2) 'dPE_dt', k, dPE_dt
-            write(*,2) 'dEt_dt', k, dEt_dt
-            write(*,2) 'flux_in', k, flux_in
-            write(*,2) 'flux_out', k, flux_out
-            write(*,2) 'dm', k, dm
-            write(*,2) 'sources', k, sources
-            write(*,*)
-            stop 'do1_Riemann_energy_eqn'
-!$omp end critical (hydro_reimann_crit1)
-         end if
-
-         if (test_partials) then
-            s% solver_test_partials_val = dedt_expected ! equ(i_dlnE_dt, k)
-         end if
-         
-         if (skip_partials) return
-
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
-         i_lum = s% i_lum
-         i_u = s% i_u
-         i_w_div_wc = s% i_w_div_wc ! used when including rotation with implicit correction factors
-
-         ! partial of -de_div_e0_actual
-         call e00(s, xscale, i_dlnE_dt, i_lnd, k, nvar, -scal*s% dE_drho_for_partials(k)*s% rho(k)/e0)
-         call e00(s, xscale, i_dlnE_dt, i_lnT, k, nvar, -scal*s% Cv_for_partials(k)*s% T(k)/e0)
-         
-         ! add partials of (flux_in - flux_out)/dm    
-         d_dedt_dL00 = (0 - d_eflux_dL00)/dm
-         d_dedt_dLp1 = (d_eflux_dLp1 - 0)/dm
-         d_dedt_dlnR00 = (0 - d_eflux00_dlnR00)/dm
-         d_dedt_dlnRp1 = (d_efluxp1_dlnRp1 - 0)/dm
-         d_dedt_dum1 = (0 - d_eflux00_dum1)/dm
-         d_dedt_du00 = (d_efluxp1_du00 - d_eflux00_du00)/dm
-         d_dedt_dup1 = (d_efluxp1_dup1 - 0)/dm
-         d_dedt_dlndm1 = (0 - d_eflux00_dlndm1)/dm
-         d_dedt_dlnd00 = (d_efluxp1_dlnd00 - d_eflux00_dlnd00)/dm
-         d_dedt_dlndp1 = (d_efluxp1_dlndp1 - 0)/dm
-         d_dedt_dlnTm1 = (0 - d_eflux00_dlnTm1)/dm
-         d_dedt_dlnT00 = (d_efluxp1_dlnT00 - d_eflux00_dlnT00)/dm
-         d_dedt_dlnTp1 = (d_efluxp1_dlnTp1 - 0)/dm         
-         d_dedt_dw00 = (0 - d_eflux00_dw00)/dm
-         d_dedt_dwp1 = (d_efluxp1_dwp1 - 0)/dm
-         
-         ! add partials of extra heat
-         d_dedt_dlnR00 = d_dedt_dlnR00 + s% d_extra_heat_dlnR00(k)
-         d_dedt_dlnRp1 = d_dedt_dlnRp1 + s% d_extra_heat_dlnRp1(k)
-         d_dedt_dlndm1 = d_dedt_dlndm1 + s% d_extra_heat_dlndm1(k)
-         d_dedt_dlnd00 = d_dedt_dlnd00 + s% d_extra_heat_dlnd00(k)
-         d_dedt_dlndp1 = d_dedt_dlndp1 + s% d_extra_heat_dlndp1(k)
-         d_dedt_dlnTm1 = d_dedt_dlnTm1 + s% d_extra_heat_dlnTm1(k)
-         d_dedt_dlnT00 = d_dedt_dlnT00 + s% d_extra_heat_dlnT00(k)
-         d_dedt_dlnTp1 = d_dedt_dlnTp1 + s% d_extra_heat_dlnTp1(k)
-                     
-         ! add partials of eps_heat
-         d_dedt_dlnT00 = d_dedt_dlnT00 - 0.5d0*s% d_nonnucneu_dlnT(k)
-         d_dedt_dlnd00 = d_dedt_dlnd00 - 0.5d0*s% d_nonnucneu_dlnd(k)
-         ! partials of eps_nuc
-         if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
-            d_dedt_dlnT00 = d_dedt_dlnT00 + s% d_epsnuc_dlnT(k)
-            d_dedt_dlnd00 = d_dedt_dlnd00 + s% d_epsnuc_dlnd(k)
-            if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
-               do j=1,s% nvar_chem
-                  call e00(s, xscale, i_dlnE_dt, s% i_chem1+j-1, k, nvar, &
-                           scal*s% d_epsnuc_dx(j,k)*f)
-               end do
-            end if
-         end if
-         
-         ! add partials of -dKE_dt
-         d_dedt_du00 = d_dedt_du00 - d_dKEdt_du
-         
-         ! add partials of -dPE_dt
-         d_dedt_dlnR00 = d_dedt_dlnR00 - d_dPEdt_dlnR00
-         d_dedt_dlnRp1 = d_dedt_dlnRp1 - d_dPEdt_dlnRp1
-
-         if (do_diffusion) then ! add partials of diffusion term
-            d_dedt_dlnd00 = d_dedt_dlnd00 + d_diff_eps_dlnE_00/energy*s% dE_drho_for_partials(k)*s% rho(k)
-            d_dedt_dlnT00 = d_dedt_dlnT00 + d_diff_eps_dlnE_00/energy*s% Cv_for_partials(k)*s% T(k)
-            if (k > 1) then
-               d_dedt_dlndm1 = d_dedt_dlndm1 + &
-                  d_diff_eps_dlnE_m1/dble(e_m1)*s% dE_drho_for_partials(k-1)*s% rho(k-1)
-               d_dedt_dlnTm1 = d_dedt_dlnTm1 + &
-                  d_diff_eps_dlnE_m1/dble(e_m1)*s% Cv_for_partials(k-1)*s% T(k-1)
-            end if
-            if (k < nz) then
-               d_dedt_dlndp1 = d_dedt_dlndp1 + &
-                  d_diff_eps_dlnE_p1/dble(e_p1)*s% dE_drho_for_partials(k+1)*s% rho(k+1)
-               d_dedt_dlnTp1 = d_dedt_dlnTp1 + &
-                  d_diff_eps_dlnE_p1/dble(e_p1)*s% Cv_for_partials(k+1)*s% T(k+1)
-            end if
-         end if
-
-         call e00(s, xscale, i_dlnE_dt, i_u, k, nvar, scal*d_dedt_du00*f)
-         call e00(s, xscale, i_dlnE_dt, i_lnR, k, nvar, scal*d_dedt_dlnR00*f)
-         if (i_lum /= 0) &
-            call e00(s, xscale, i_dlnE_dt, i_lum, k, nvar, scal*d_dedt_dL00*f)
-         call e00(s, xscale, i_dlnE_dt, i_lnd, k, nvar, scal*d_dedt_dlnd00*f)
-         call e00(s, xscale, i_dlnE_dt, i_lnT, k, nvar, scal*d_dedt_dlnT00*f)
-         if (s% w_div_wc_flag) &
-            call e00(s, xscale, i_dlnE_dt, i_w_div_wc, k, nvar, scal*d_dedt_dw00*f)
-
-         if (k > 1) then ! do k-1 partials   
-            call em1(s, xscale, i_dlnE_dt, i_u, k, nvar, scal*d_dedt_dum1*f)            
-            call em1(s, xscale, i_dlnE_dt, i_lnd, k, nvar, scal*d_dedt_dlndm1*f)              
-            call em1(s, xscale, i_dlnE_dt, i_lnT, k, nvar, scal*d_dedt_dlnTm1*f) 
-         end if
-
-         if (k < nz) then ! do k+1 partials
-            call ep1(s, xscale, i_dlnE_dt, i_u, k, nvar, scal*d_dedt_dup1*f)           
-            call ep1(s, xscale, i_dlnE_dt, i_lnR, k, nvar, scal*d_dedt_dlnRp1*f)
-            if (i_lum /= 0) &
-               call ep1(s, xscale, i_dlnE_dt, i_lum, k, nvar, scal*d_dedt_dLp1*f)           
-            call ep1(s, xscale, i_dlnE_dt, i_lnd, k, nvar, scal*d_dedt_dlndp1*f)              
-            call ep1(s, xscale, i_dlnE_dt, i_lnT, k, nvar, scal*d_dedt_dlnTp1*f) 
-            if (s% w_div_wc_flag) &
-               call ep1(s, xscale, i_dlnE_dt, i_w_div_wc, k, nvar, scal*d_dedt_dwp1*f)
-         end if
-
-
-
-        ! d_dedt_dL00 
-        ! d_dedt_dlnR00 
-        ! d_dedt_du00 
-        ! d_dedt_dlnd00 
-        ! d_dedt_dlnT00 
-         
-        ! d_dedt_dum1 
-        ! d_dedt_dlndm1 
-        ! d_dedt_dlnTm1 
-
-        ! d_dedt_dLp1 
-        ! d_dedt_dlnRp1 
-        ! d_dedt_dup1 
-        ! d_dedt_dlndp1 
-        ! d_dedt_dlnTp1 
-
-         if (test_partials) then   
-            s% solver_test_partials_var = i_lnT
-            s% solver_test_partials_dval_dx = d_dedt_dlnT00
-            write(*,2) 'logRho', k, s% lnd(k)/ln10
-            write(*,2) 'logT', k, s% lnT(k)/ln10
-            write(*,2) 'X', k, s% X(k)
-            write(*,2) 'Z', k, s% Z(k)
-         end if
-
-      end subroutine do1_Riemann_energy_eqn
          
          
       subroutine do1_Riemann_dlnRdt_eqn( &

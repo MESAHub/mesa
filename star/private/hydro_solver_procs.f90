@@ -87,20 +87,16 @@
       end subroutine set_xscale_info
 
 
-      subroutine eval_equations( &
-            iter, nvar, nz, dx, xscale, equ_in, lrpar, rpar, lipar, ipar, ierr)
+      subroutine eval_equations(s, iter, nvar, nz, dx, xscale, equ_in, ierr)
          use hydro_eqns, only: eval_equ
          use mix_info, only: set_dxdt_mix
          use star_utils, only: update_time, total_times
+         type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
          real(dp), pointer, dimension(:,:) :: dx, xscale, equ_in ! (nvar, nz)
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
 
          integer :: cnt, i, j, k
-         type (star_info), pointer :: s
          integer :: id
          real(dp) :: dt, theta_dt
          real(dp), pointer :: equ(:,:)
@@ -111,17 +107,13 @@
 
          ierr = 0
 
-         id = ipar(ipar_id)
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
          equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
 
          if (dbg) write(*, *) 'eval_equations'
 
-         dt = rpar(rpar_dt)
+         dt = s% dt
 
-         if (ipar(ipar_first_call) /= 0) then
-            ipar(ipar_first_call) = 0
+         if (s% solver_iter == 0) then
             if (dbg) write(*, *) 'skip set_solver_vars on call before 1st iter'
          else
             if (dbg) write(*, *) 'call set_solver_vars'
@@ -197,15 +189,11 @@
 
       subroutine sizequ(s, &
             iter, nvar, nz, equ, &
-            equ_norm, equ_max, k_max, j_max, &
-            lrpar, rpar, lipar, ipar, ierr)
+            equ_norm, equ_max, k_max, j_max, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
          real(dp), pointer :: equ(:,:) ! (nvar, nz)
          real(dp), intent(out) :: equ_norm, equ_max
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: k_max, j_max, ierr
 
          integer :: j, k, num_terms, n, i_chem1, nvar_hydro, nvar_chem, &
@@ -340,16 +328,12 @@
 
       subroutine sizeB(s, &
             iter, nvar, nz, B, xscale, &
-            max_correction, correction_norm, max_zone, max_var, &
-            lrpar, rpar, lipar, ipar, ierr)
+            max_correction, correction_norm, max_zone, max_var, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
          real(dp), pointer, dimension(:,:) :: B, xscale ! (nvar, nz)
          real(dp), intent(out) :: correction_norm ! a measure of the average correction
          real(dp), intent(out) :: max_correction ! magnitude of the max correction
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: max_zone, max_var, ierr
 
          integer :: k, i, num_terms, j, n, nvar_hydro, &
@@ -599,7 +583,7 @@
                s% model_number, iter, trim(s% nameofvar(max_var)), k, &
                correction_norm, B(j,k)*s% correction_weight(j,k), xscale(j,k), &
                dx, new - prev, new, prev, &
-               s% m(k)/Msun, log10(rpar(rpar_dt)/secyer), &
+               s% m(k)/Msun, log10(s% dt/secyer), &
                s% lnE(k)/ln10, s% lnT(k)/ln10, &
                s% lnd(k)/ln10
          end subroutine show_stuff
@@ -624,18 +608,16 @@
       ! the proposed change to dx is B*xscale*correction_factor
       ! edit correction_factor and/or B as necessary so that the new dx will be valid.
       ! set ierr nonzero if things are beyond repair.
-      subroutine Bdomain( &
-            iter, nvar, nz, B, dx, xscale, correction_factor, lrpar, rpar, lipar, ipar, ierr)
+      subroutine Bdomain(s, &
+            iter, nvar, nz, B, dx, xscale, correction_factor, ierr)
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
          use rsp_def, only: EFL0
+         type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
          real(dp), pointer, dimension(:,:) :: dx, xscale, B ! (nvar, nz)
          real(dp), intent(inout) :: correction_factor
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
          integer :: id, i, j, k, species, bad_j, bad_k, &
             i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_eturb
@@ -645,12 +627,8 @@
             dconv_vel, old_conv_vel, new_conv_vel, dEt, old_Et, new_Et, &
             dalpha_RTI, new_alpha_RTI, old_alpha_RTI, log_conv_vel_v0, &
             dlum_surf, old_lum_surf, new_lum_surf
-         type (star_info), pointer :: s
          include 'formats'
          ierr = 0
-         id = ipar(ipar_id)
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
          min_alpha = 1d0
 
          if (s% Eturb_flag) then ! clip change in eturb to maintain non-negativity.
@@ -833,30 +811,18 @@
       end subroutine Bdomain
 
 
-      subroutine inspectB(iter, nvar, nz, dx, B, xscale, lrpar, rpar, lipar, ipar, ierr)
+      subroutine inspectB(s, iter, nvar, nz, dx, B, xscale, ierr)
          integer, intent(in) :: iter, nvar, nz
+         type (star_info), pointer :: s
          real(dp), pointer, dimension(:,:) :: dx, B, xscale ! (nvar, nz)
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
 
-         type (star_info), pointer :: s
          integer :: id
          integer, parameter :: inspectB_iter_stop = -1
          include 'formats'
 
-         id = ipar(ipar_id)
-
          if (dbg) write(*, *) 'inspectB', iter
          ierr = 0
-
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-
-         !if (.not. s% solver_inspectB_flag) 
-         return
-
          if (iter == inspectB_iter_stop) then
             call dumpB
             stop 'debug: inspectB'
@@ -887,16 +853,13 @@
       ! 1 means force another iteration
       ! 0 means don't need to force another
       ! -1 means failure. solver returns with non-convergence.
-      integer function force_another_iteration(iter, itermin, lrpar, rpar, lipar, ipar)
+      integer function force_another_iteration(s, iter, itermin)
          use hydro_mtx, only: ipar_id
+         type (star_info), pointer :: s
          integer, intent(in) :: iter ! have finished this many iterations and have converged
          integer, intent(in) :: itermin ! this is the requested minimum.  iter may be < itermin.
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
 
-         type (star_info), pointer :: s
-         integer :: id, ierr, k, res
+         integer :: k, res
 
          include 'formats'
 
@@ -905,15 +868,6 @@
             return
          end if
          force_another_iteration = 0
-
-         id = ipar(ipar_id)
-         ierr = 0
-
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) then ! DISASTER
-            force_another_iteration = -1
-            return
-         end if
 
          if (s% k_below_just_added > 1 .and. &
                s% num_surf_revisions < s% max_num_surf_revisions .and. &

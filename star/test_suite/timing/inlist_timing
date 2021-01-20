@@ -80,16 +80,6 @@
       RGB_to_AGB_wind_switch = 1d-4
       Reimers_scaling_factor = 0.5d0  
       Blocker_scaling_factor = 0.1d0  
-
-      !report_hydro_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-
-      report_why_dt_limits = .false.
-      report_all_dt_limits = .false.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 8242
-      !okay_to_remesh = .false.
       
       photo_interval = 50
       profile_interval = 50

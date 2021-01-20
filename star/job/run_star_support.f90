@@ -2083,6 +2083,11 @@
             s% init_model_number = s% model_number
          end if
 
+         if (s% job% set_initial_number_retries .and. .not. restart) then
+            write(*,2) 'set_initial_number_retries', s% job% initial_number_retries
+            s% num_retries = s% job% initial_number_retries
+         end if
+
          if (s% job% steps_to_take_before_terminate > 0) then
             s% max_model_number = s% model_number + s% job% steps_to_take_before_terminate
             write(*,2) 'steps_to_take_before_terminate', &
@@ -3393,6 +3398,14 @@
          
          ierr = 0
 
+         if (s% job% remove_initial_surface_at_he_core_boundary > 0 .and. .not. restart) then
+            write(*, 1) 'remove_initial_surface_at_he_core_boundary', &
+               s% job% remove_initial_surface_at_he_core_boundary
+            call star_remove_surface_at_he_core_boundary( &
+               id, s% job% remove_initial_surface_at_he_core_boundary, ierr)
+            if (failed('star_remove_surface_at_he_core_boundary',ierr)) return
+         end if
+
          if (s% job% remove_initial_surface_by_optical_depth > 0 .and. .not. restart) then
             write(*, 1) 'remove_initial_surface_by_optical_depth', &
                s% job% remove_initial_surface_by_optical_depth
@@ -3508,6 +3521,13 @@
          include 'formats.inc'
          
          ierr = 0
+
+         if (s% job% remove_surface_at_he_core_boundary > 0) then
+            !write(*, 1) 'remove_surface_at_he_core_boundary', s% job% remove_surface_at_he_core_boundary
+            call star_remove_surface_at_he_core_boundary( &
+               id, s% job% remove_surface_at_he_core_boundary, ierr)
+            if (failed('star_remove_surface_at_he_core_boundary',ierr)) return
+         end if
 
          if (s% job% remove_surface_by_optical_depth > 0) then
             !write(*, 1) 'remove_surface_by_optical_depth', s% job% remove_surface_by_optical_depth

@@ -7,7 +7,7 @@
       save_model_filename = 'shock_part2.mod'
       required_termination_code_string = 'extras_finish_step'
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -46,15 +46,15 @@
 
       terminal_show_age_units = 'seconds'
 
-      photo_interval = 1
+      !photo_interval = 1
       !profile_interval = 10
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
