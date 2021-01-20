@@ -490,7 +490,7 @@
          real(dp) :: rho, logRho, dlnd_dV, logE, logE_want, logE_tol, logT, &
             logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
          
          include 'formats'
@@ -522,9 +522,9 @@
             logE_tol = 1d-11
             
             call solve_eos_given_DE( &
-               s, k, Z, X, abar, zbar, xa, &
+               s, k, xa, &
                logRho, logE_want, logT_guess, logT_tol, logE_tol, &
-               logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
+               logT, res, d_dlnd, d_dlnT, d_dxa, &
                ierr)
             if (ierr == 0) then
                s% lnT(k) = logT*ln10
@@ -866,7 +866,8 @@
             other_value, other_tol, logRho_bnd1, other_at_bnd1, &
             logRho_bnd2, other_at_bnd2, logRho_guess, logRho_result, logRho_tol
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
          integer :: max_iter, which_other, eos_calls, iter
             
          include 'formats'
@@ -885,13 +886,13 @@
          s% xh(s% i_lnT,kk) = s% lnT(kk)
          
          call eosDT_get_Rho( &
-            eos_handle, Z, X, abar, zbar, &
+            eos_handle, &
             species, chem_id, net_iso, xa, &
             s% lnT(kk)/ln10, which_other, other_value, &
             logRho_tol, other_tol, max_iter, logRho_guess, &
             logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
             logRho_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
+            d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
                
          s% lnd(kk) = logRho_result*ln10
@@ -983,7 +984,8 @@
             other_value, other_tol, logT_bnd1, other_at_bnd1, &
             logT_bnd2, other_at_bnd2, logT_guess, logT_result, logT_tol
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
          integer :: max_iter, which_other, eos_calls, iter
             
          include 'formats'
@@ -1000,13 +1002,13 @@
          logT_guess = log10(s% T(kk))
          
          call eosDT_get_T( &
-            eos_handle, Z, X, abar, zbar, &
+            eos_handle, &
             species, chem_id, net_iso, xa, &
             s% lnd(kk)/ln10, which_other, other_value, &
             logT_tol, other_tol, max_iter, logT_guess, &
             logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
             logT_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
+            d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
                
          s% lnT(kk) = logT_result*ln10
@@ -1026,7 +1028,8 @@
             other_value, logT_bnd1, other_at_bnd1, &
             logT_bnd2, other_at_bnd2, logT_guess, logT_result
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            res, d_dlnd, d_dlnT
+         real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
          integer :: max_iter, which_other, eos_calls, iter
          ierr = 0         
          max_iter = 100
@@ -1041,13 +1044,13 @@
          logT_guess = log10(s% T(kk))
          
          call eosDT_get_T( &
-            eos_handle, Z, X, abar, zbar, &
+            eos_handle, &
             species, chem_id, net_iso, xa, &
             s% lnd(kk)/ln10, which_other, other_value, &
             logT_tol, other_tol, max_iter, logT_guess, &
             logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
             logT_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
+            d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
                
          s% lnT(kk) = logT_result*ln10

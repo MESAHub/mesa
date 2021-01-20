@@ -509,7 +509,7 @@
          other_at_bnd1 = arg_not_provided
          other_at_bnd2 = arg_not_provided
 
-         call eosDT_get_Rho( &
+         call eosDT_get_Rho_legacy( &
             eos_handle, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             logT, which_other, other, &

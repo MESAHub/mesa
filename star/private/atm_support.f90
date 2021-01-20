@@ -1260,8 +1260,6 @@ contains
     real(dp) :: logRho, logRho_guess
     real(dp) :: dlnRho_dlnPgas
     real(dp) :: dlnRho_dlnT
-    real(dp) :: dres_dabar(num_eos_basic_results)
-    real(dp) :: dres_dzbar(num_eos_basic_results)
     real(dp) :: dres_dxa(num_eos_basic_results,s% species)
 
     T = exp(lnT)
@@ -1281,9 +1279,9 @@ contains
     logRho_guess = log10(rho)
 
     call solve_eos_given_PgasT( &
-         s, 0, s% Z(1), s% X(1), s% abar(1), s% zbar(1), s% xa(:,1), &
+         s, 0, s% xa(:,1), &
          lnT/ln10, log10(Pgas), logRho_guess, LOGRHO_TOL, LOGPGAS_TOL, &
-         logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+         logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
          ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to solve_eos_given_PgasT failed in eos_proc'

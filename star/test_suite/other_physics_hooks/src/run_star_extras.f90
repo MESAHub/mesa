@@ -229,13 +229,13 @@
       ! eosDT search routines.
       
       subroutine my_eosDT_get_T( &
-               id, k, handle, Z, X, abar, zbar, &
+               id, k, handle, &
                species, chem_id, net_iso, xa, &
                logRho, which_other, other_value, &
                logT_tol, other_tol, max_iter, logT_guess, & 
                logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               d_dabar_c_TRho, d_dzbar_c_TRho, &
+               d_dxa_c_TRho, &
                eos_calls, ierr)
      
          ! finds log10 T given values for density and 'other', and initial guess for temperature.
@@ -251,11 +251,6 @@
          integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar, zbar
-         
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
@@ -284,20 +279,19 @@
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dabar_c_TRho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dzbar_c_TRho(:) ! (num_eos_basic_results) 
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
          
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
          
          call eosDT_get_T( &
-            handle, Z, X, abar, zbar, &
+            handle, &
             species, chem_id, net_iso, xa, &
             logRho, which_other, other_value, &
             logT_tol, other_tol, max_iter, logT_guess, & 
             logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
             logT_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-            d_dabar_c_TRho, d_dzbar_c_TRho, &
+            d_dxa_c_TRho, &
             eos_calls, ierr)
          
 
@@ -305,13 +299,13 @@
       
 
       subroutine my_eosDT_get_Rho( &
-               id, k, handle, Z, X, abar, zbar, &
+               id, k, handle, &
                species, chem_id, net_iso, xa, &
                logT, which_other, other_value, &
                logRho_tol, other_tol, max_iter, logRho_guess,  &
                logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
                logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-               d_dabar_c_TRho, d_dzbar_c_TRho, eos_calls, ierr)
+               d_dxa_c_TRho, eos_calls, ierr)
      
          ! finds log10 Rho given values for temperature and 'other', and initial guess for density.
          ! does up to max_iter attempts until logRho changes by less than tol.
@@ -326,11 +320,6 @@
          integer, intent(in) :: id ! star id if available; 0 otherwise
          integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
          integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar, zbar
          
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
@@ -363,20 +352,19 @@
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dabar_c_TRho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dzbar_c_TRho(:) ! (num_eos_basic_results) 
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
 
          integer, intent(out) :: eos_calls
          integer, intent(out) :: ierr ! 0 means AOK.
          
          call eosDT_get_Rho( &
-            handle, Z, X, abar, zbar, &
+            handle, &
             species, chem_id, net_iso, xa, &
             logT, which_other, other_value, &
             logRho_tol, other_tol, max_iter, logRho_guess,  &
             logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
             logRho_result, res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-            d_dabar_c_TRho, d_dzbar_c_TRho, eos_calls, ierr)
+            d_dxa_c_TRho, eos_calls, ierr)
          
 
       end subroutine my_eosDT_get_Rho
