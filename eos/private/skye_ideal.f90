@@ -181,9 +181,6 @@ module skye_ideal
       din = din_in
 
 
-!..assume complete ionization 
-        xne    = xni * zbar
-
 !..density derivs
         dindd   = ye
         dinda   = -din*ytot1
@@ -242,46 +239,6 @@ module skye_ideal
         fi(34) = ht% fddtt(iat+1,jat)
         fi(35) = ht% fddtt(iat,jat+1)
         fi(36) = ht% fddtt(iat+1,jat+1)
-        
-        if (.false.) then
-          fi(           1 ) =    6.7955181191688634d+019
-          fi(           2 ) =    6.4153793083172643d+019
-          fi(           3 ) =    7.1949978394642317d+019
-          fi(           4 ) =    6.7925125811238838d+019
-          fi(           5 ) =   -95723.493066505616d0     
-          fi(           6 ) =   -101151.76591915185d0      
-          fi(           7 ) =   -96069.380284212413d0      
-          fi(           8 ) =   -101518.14833891283d0      
-          fi(           9 ) =   -20.125669209403792d0      
-          fi(          10 ) =   -20.125673679884493d0      
-          fi(          11 ) =   -19.002315451465396d0      
-          fi(          12 ) =   -19.002319323130294d0      
-          fi(          13 ) =    4.4843029837101228d+019
-          fi(          14 ) =    4.2334538740420534d+019
-          fi(          15 ) =    4.7500183193874416d+019
-          fi(          16 ) =    4.4843053588171121d+019
-          fi(          17 ) =   -1.5020933965138571d+024
-          fi(          18 ) =   -1.3387419506508374d+024
-          fi(          19 ) =   -1.5910986550797369d+024
-          fi(          20 ) =   -1.4180679764777474d+024
-          fi(          21 ) =    4484362052739.8555d0      
-          fi(          22 ) =    4233511265507.4458d0      
-          fi(          23 ) =    4484360639522.0361d0      
-          fi(          24 ) =    4233509890335.1753d0      
-          fi(          25 ) =   -1.5021032993489110d+017
-          fi(          26 ) =   -1.3387510342435318d+017
-          fi(          27 ) =   -1.5021030742082810d+017
-          fi(          28 ) =   -1.3387508286723318d+017
-          fi(          29 ) =   -2.5622106979824100     
-          fi(          30 ) =   -2.4932220854878300     
-          fi(          31 ) =   -2.2190032624589202     
-          fi(          32 ) =   -2.1592602908194998     
-          fi(          33 ) =    0.0000000000000000     
-          fi(          34 ) =    0.0000000000000000     
-          fi(          35 ) =    0.0000000000000000     
-          fi(          36 ) =    0.0000000000000000     
-      end if
- 
 
 !..various differences
         xt  = max( (temp - ht% t(jat)) * ht% dti_sav(jat), 0.0d0)
@@ -407,28 +364,6 @@ module skye_ideal
         df_ddd = h5(iat,jat,fi, &
                 si0t, si1t, si2t, si0mt, si1mt, si2mt, &
                 dddsi0d, dddsi1d, dddsi2d, dddsi0md, dddsi1md, dddsi2md)
-
-      !write(*,'(a,x,99e22.14)') 'h', free, df_t, df_d, df_dd, df_dt, df_tt, df_ddd, df_ddt, df_dtt, 0d0
-
-
-         if (.false.) then ! debug
-            write(*,'(a,1p99e22.14)') 'den, temp, xt mxt, xd, mxd', den, temp, xt, mxt, xd, mxd
-            
-            write(*,'(99a22)') 'Fgas', 'dFgas_dT', 'dFgas_dRho', 'd2Fgas_dRho2', 'd2Fgas_dRho_dT',  &
-                'd2Fgas_dT2', 'd3Fgas_dRho2_dT', 'd3Fgas_dRho_dT2', 'd4Fgas_dRho2_dT2'
-            do k=0,3
-               write(*,'(a4,1p99e22.14)') '  fi',  &
-                fi(1+k), fi(5+k), fi(13+k), fi(17+k), fi(21+k), fi(9+k),  &
-                fi(25+k), fi(29+k), fi(33+k)
-            end do
-            write(*,'(a4,1p99e22.14)') '  h5',  &
-                free, df_t, df_d, df_dd, df_dt, df_tt, df_ddd, df_ddt, df_dtt, 0d0
-            write(*,'(99a15)') 'dsi0t', 'dsi1t', 'dsi2t', 'dsi0mt', 'dsi1mt', 'dsi2mt',  &
-               'si0d', 'si1d', 'si2d', 'si0md', 'si1md', 'si2md'
-           call show_h5(fi, iat,jat, &
-                dsi0t,  dsi1t,  dsi2t,  dsi0mt,  dsi1mt,  dsi2mt, &
-                si0d,   si1d,   si2d,   si0md,   si1md,   si2md)
-         end if
 
 !..now get the pressure derivative with density, chemical potential, and 
 !..electron positron number densities
