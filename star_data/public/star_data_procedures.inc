@@ -126,15 +126,6 @@
          procedure (other_eosDT_get_Rho_interface), pointer, nopass :: &
             other_eosDT_get_Rho => null()
 
-         procedure (other_eosPT_get_interface), pointer, nopass :: &
-            other_eosPT_get => null()
-         procedure (other_eosPT_get_T_interface), pointer, nopass :: &
-            other_eosPT_get_T => null()
-         procedure (other_eosPT_get_Pgas_interface), pointer, nopass :: &
-            other_eosPT_get_Pgas => null()
-         procedure (other_eosPT_get_Pgas_for_Rho_interface), pointer, nopass :: &
-            other_eosPT_get_Pgas_for_Rho => null()
-
          procedure (other_eosDE_get_interface), pointer, nopass :: &
             other_eosDE_get => null()
 
