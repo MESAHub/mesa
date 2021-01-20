@@ -126,22 +126,12 @@
             end if
 
             ! this ensures fp, ft, r_equatorial and r_polar are set by the end
-            call set_rotation_info(s, .true., ierr)
-            if (ierr /= 0) then
-               write(*,*) &
-                  'finish_load_model failed in set_rotation_info'
-               return
-            end if
-            
-            s% total_angular_momentum = total_angular_momentum(s)
-            if (s% trace_k > 0 .and. s% trace_k <= nz) then
-               do k=1,nz
-                  write(*,3) 'lnr', s% model_number, k, s% xh(s% i_lnR, k)
-                  write(*,3) 'i_rot', s% model_number, k, s% i_rot(k)
-                  write(*,3) 'j_rot', s% model_number, k, s% j_rot(k)
-                  write(*,3) 'omega', s% model_number, k, s% omega(k)
-               end do
-            end if
+            !call set_rotation_info(s, .true., ierr)
+            !if (ierr /= 0) then
+            !   write(*,*) &
+            !      'finish_load_model failed in set_rotation_info'
+            !   return
+            !end if
 
          end if
          
@@ -192,7 +182,19 @@
             return
          end if
          s% doing_finish_load_model = .false.
-         
+
+         if (s% rotation_flag) then
+            s% total_angular_momentum = total_angular_momentum(s)
+            if (s% trace_k > 0 .and. s% trace_k <= nz) then
+               do k=1,nz
+                  write(*,3) 'lnr', s% model_number, k, s% xh(s% i_lnR, k)
+                  write(*,3) 'i_rot', s% model_number, k, s% i_rot(k)
+                  write(*,3) 'j_rot', s% model_number, k, s% j_rot(k)
+                  write(*,3) 'omega', s% model_number, k, s% omega(k)
+               end do
+            end if
+         end if
+
          if (s% rsp_flag) then
             call rsp_setup_part2(s, restart, want_rsp_model, is_rsp_model, ierr)
             if (ierr /= 0) then

@@ -71,7 +71,8 @@
       integer, parameter :: Tlim_dlgT_max_at_high_T = Tlim_dlgT_max + 1
       integer, parameter :: Tlim_lg_XH_cntr = Tlim_dlgT_max_at_high_T + 1
       integer, parameter :: Tlim_dmstar = Tlim_lg_XH_cntr + 1
-      integer, parameter :: Tlim_dt_div_min_dr_div_cs = Tlim_dmstar + 1
+      integer, parameter :: Tlim_dt_div_dt_cell_collapse = Tlim_dmstar + 1
+      integer, parameter :: Tlim_dt_div_min_dr_div_cs = Tlim_dt_div_dt_cell_collapse + 1
       integer, parameter :: Tlim_lgL = Tlim_dt_div_min_dr_div_cs + 1
       integer, parameter :: Tlim_max_timestep = Tlim_lgL + 1
       integer, parameter :: Tlim_timestep_hold = Tlim_max_timestep + 1

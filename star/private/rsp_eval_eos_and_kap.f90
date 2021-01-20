@@ -829,7 +829,7 @@
          ierr = 0
 
          call get_atm_PT_legacy_grey_and_kap( &
-              s, tau, .TRUE., & 
+              s, tau, L, R, M, s% cgrav(1), .TRUE., & 
               Teff, kap, &
               lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
               lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &

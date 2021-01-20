@@ -29,7 +29,6 @@
 
 ! equation controls
       use_momentum_outer_BC = .true.
-      ! use_compression_inner_BC = .false. 
 
 ! timestep controls
    

@@ -318,7 +318,7 @@
             if (s% dm(k) <= 0d0 .or. is_bad(s% m(k) + s% dm(k))) then
                write(*,2) 'dm m dq q M_center', k, &
                   s% dm(k), s% m(k), s% dq(k), s% q(k), s% M_center
-               stop 'set_m_and_dm'
+               if (s% stop_for_bad_nums) stop 'set_m_and_dm'
             end if
          end do
       end subroutine set_m_and_dm
@@ -1320,11 +1320,15 @@
          nz = s% nz
          min_k = nz
          min_dr_div_cs = 1d99
+         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
+         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
+         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
          if (s% v_flag) then
-            r00 = s% R_center
-            do k=nz,1,-1
-               rp1 = r00
+            do k = k_min, nz-1
+               if (s% q(k) > max_q) cycle
+               if (s% q(k) < min_q) exit
                r00 = s% r(k)
+               rp1 = s% r(k+1)
                dr_div_cs = (r00 - rp1)/s% csound(k)
                if (dr_div_cs < min_dr_div_cs) then
                   min_dr_div_cs = dr_div_cs
@@ -1336,9 +1340,6 @@
          if (.not. s% u_flag) return
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
-         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
-         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
-         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
          do k = k_min, nz-1
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
@@ -1351,26 +1352,7 @@
             end if
          end do
       end function min_dr_div_cs
-
-
-      ! largest k s.t. for all k' < k, cell k' has Cp(k')*T(k')*mstar_dot < L(k).
-      subroutine set_k_CpTMdot_lt_L(s)
-         type (star_info), pointer :: s
-         integer :: k, nz
-         if (s% mstar_dot <= 0d0) then
-            s% k_CpTMdot_lt_L = 1
-            return
-         end if
-         nz = s% nz
-         do k = 2, nz
-            if (s% Cp(k)*s% T(k)*s% mstar_dot >= max(1d-99,s% L(k))) then
-               s% k_CpTMdot_lt_L = k-1
-               return
-            end if
-         end do
-         s% k_CpTMdot_lt_L = nz
-      end subroutine set_k_CpTMdot_lt_L
-
+      
 
       subroutine reset_epsnuc_vectors(s)
          type (star_info), pointer :: s
@@ -1455,6 +1437,7 @@
          call unpack1(s% i_lnT, dlnT_m1, dlnT_00, dlnT_p1)
          call unpack1(s% i_lnR, dlnR_m1, dlnR_00, dlnR_p1)
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
+         if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
          if (s% i_eturb /= 0) call unpack1(s% i_eturb, deturb_m1, deturb_00, deturb_p1)
          
@@ -2034,6 +2017,38 @@
          end if
          cell_specific_rotational_energy = 0.5d0*(e_p1 + e_00)
       end function cell_specific_rotational_energy
+
+      
+      subroutine get_dke_dt_dpe_dt(s, k, dt, &
+            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)
+         type (star_info), pointer :: s      
+         integer, intent(in) :: k 
+         real(dp), intent(in) :: dt
+         real(dp), intent(out) :: &
+            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1
+         integer, intent(out) :: ierr
+         real(dp) :: PE_start, PE_new, KE_start, KE_new, q1
+         real(dp) :: dpe_dlnR00, dpe_dlnRp1, dke_dv00, dke_dvp1
+         integer :: nz
+         include 'formats'
+         ierr = 0
+         ! rate of change in specific PE (erg/g/s)
+         PE_start = cell_start_specific_PE_qp(s,k)
+         PE_new = cell_specific_PE_qp(s,k,dpe_dlnR00,dpe_dlnRp1)
+         q1 = PE_new - PE_start
+         dpe_dt = q1/dt ! erg/g/s
+         d_dpedt_dlnR00 = dpe_dlnR00/dt
+         d_dpedt_dlnRp1 = dpe_dlnRp1/dt    
+         ! rate of change in specific KE (erg/g/s)
+         KE_start = cell_start_specific_KE_qp(s,k)
+         KE_new = cell_specific_KE_qp(s,k,dke_dv00,dke_dvp1)
+         q1 = KE_new - KE_start
+         dke_dt = q1/dt ! erg/g/s
+         d_dkedt_dv00 = dke_dv00/dt
+         d_dkedt_dvp1 = dke_dvp1/dt   
+      end subroutine get_dke_dt_dpe_dt
       
       
       real(dp) function eval_deltaM_total_from_profile( &
@@ -3425,6 +3440,7 @@
          call get1_avQ(s, k, avQ, &
             d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
          if (ierr /= 0) return
+         s% avQ(k) = avQ
          if (s% avQ_start(k) < -1d90) s% avQ_start(k) = avQ
       end subroutine get_avQ
       

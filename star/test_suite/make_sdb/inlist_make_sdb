@@ -117,8 +117,8 @@
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      stop_for_bad_nums = .true.
-      fill_arrays_with_NaNs = .true.
+      !stop_for_bad_nums = .true.
+      !fill_arrays_with_NaNs = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1

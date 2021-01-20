@@ -94,9 +94,6 @@
 
       report_solver_progress = .false. ! set true to see info about solver iterations
       report_ierr = .false. ! if true, produce terminal output when have some internal error
-
-      report_why_dt_limits = .false.
-      report_all_dt_limits = .false.
       
       !show_mesh_changes = .true.
       !mesh_dump_call_number = 8242
