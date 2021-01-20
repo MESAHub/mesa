@@ -1677,7 +1677,7 @@
             s, k, h1, he3, he4, species, xa, tol, &
             Rho, logRho, energy, lnT_guess, lnT, result_energy, ierr)
          use eos_support, only: solve_eos_given_DE
-         use eos_def, only: num_eos_basic_results, i_lnE
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnE
          use chem_lib, only: basic_composition_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, h1, he3, he4, species
@@ -1688,25 +1688,22 @@
          real(dp) :: &
             X, Y, Z, T, logT, res(num_eos_basic_results), &
             d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
-            d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
-            abar, zbar, z53bar, z2bar, ye, mass_correction, sumx, logT_tol, logE_tol
+            d_dxa(num_eos_d_dxa_results, s% species), &
+            logT_tol, logE_tol
          integer :: j
 
          include 'formats'
 
          ierr = 0
 
-         call basic_composition_info(species, s% chem_id, xa(:), X, Y, Z, &
-               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-
          logT_tol = tol ! 1d-11
          logE_tol = tol ! 1d-11
          call solve_eos_given_DE( &
-            s, k, Z, X, abar, zbar, xa(:), &
+            s, k, xa(:), &
             logRho, log10(energy), lnT_guess/ln10, &
             logT_tol, logE_tol, &
             logT, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, &
+            d_dxa, &
             ierr)
          lnT = logT*ln10
          
@@ -1734,10 +1731,6 @@
             write(*,1) 'logRho =', logRho
             write(*,1) 'logT_guess =', lnT_guess/ln10
             write(*,1) 'energy =', energy
-            write(*,1) 'Z =', Z
-            write(*,1) 'X =', X
-            write(*,1) 'abar =', abar
-            write(*,1) 'zbar =', zbar
             write(*,*)
             write(*,*)
          end subroutine show
