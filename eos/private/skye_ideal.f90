@@ -662,15 +662,9 @@ module skye_ideal
         x       = din * din
         pele    = x * df_d
 
-if (logtemp < 9d0) then
         ww = x*df_dd + 2.0d0*din*df_d
         zz = x*df_ddd + 4.0d0*din*df_dd + 2.0d0*df_d
         y = x * df_ddt + 2.0d0*din*df_dt
-else
-        ww = dpepdd_in
-        zz = dpepddd_in
-        y = dpepddt_in
-end if
 
 !..first derivatives
         dpepdt  = x * df_dt
