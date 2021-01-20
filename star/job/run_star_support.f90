@@ -2994,6 +2994,7 @@
             real(dp) :: T_guess_gas, T_guess_rad, logT_guess
             ! these are used for all eos calls
             real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp), dimension(num_eos_d_dxa_results, s% species) :: d_dxa
             include 'formats.inc'
             
             write(*,*)
@@ -3036,10 +3037,10 @@
                   ! get entropy
                   if (s% job% get_entropy_for_relax_from_eos == 'eosDT') then
                      call eosDT_get( &
-                        s% eos_handle, 1 - s% X(k) - s% Y(k), s% X(k), s% abar(k), s% zbar(k), &
+                        s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &
                         var1, log10(var1), var2, log10(var2), &
-                        res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+                        res, d_dlnd, d_dlnT, d_dxa, ierr)
                      if (ierr /= 0) then
                         write(*,*) "failed in eosDT_get"
                         return

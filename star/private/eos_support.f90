@@ -64,9 +64,7 @@ contains
        res, dres_dlnRho, dres_dlnT, &
        dres_dxa, ierr)
 
-    use chem_lib, only: basic_composition_info
-    use eos_lib, only: eosDT_get, eosDT_get_new, eos_gamma_DT_get, &
-         eosDT_ideal_gas_get, eosDT_HELMEOS_get
+    use eos_lib, only: eosDT_get
     use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, num_helm_results, i_lnE
 
     type (star_info), pointer :: s
@@ -77,10 +75,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp) :: z, y, xh, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
-    real(dp) :: eos_z, eos_x, Pgas, Prad, energy, entropy
     real(dp), dimension(num_eos_basic_results) :: dres_dabar, dres_dzbar
-    real(dp) :: helm_res(num_helm_results)
     integer :: j
     logical :: off_table
 
@@ -91,74 +86,17 @@ contains
     if (s% doing_timing) &
        s% timing_num_get_eos_calls = s% timing_num_get_eos_calls + 1
 
-    call basic_composition_info( &
-         s% species, s% chem_id, xa, xh, y, z, &
-         abar, zbar, z2bar, z53bar, &
-         ye, mass_correction, sumx)
-
-    if (s% use_fixed_XZ_for_eos) then
-       eos_x = s% fixed_X_for_eos
-       eos_z = s% fixed_Z_for_eos
-    else
-       eos_x = xh
-       eos_z = z
-    end if
-    
-    dres_dxa = 0d0
-
     if (s% use_other_eos) then
        call s% other_eosDT_get( &
-            s% id, k, s% eos_handle, eos_z, eos_x, abar, zbar, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
-    else if (s% use_eosDT_ideal_gas) then
-       call eosDT_ideal_gas_get( &
-            s% eos_handle, eos_z, eos_x, abar, zbar, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
-    else if (s% use_eosDT_HELMEOS) then
-       call eosDT_HELMEOS_get( &
-            s% eos_handle, eos_z, eos_x, abar, zbar, &
-            s% species, s% chem_id, s% net_iso, xa, &
-            Rho, logRho, T, logT, &
-            s% eos_rq% include_radiation, &
-            s% eos_rq% always_skip_elec_pos, &
-            s% eos_rq% always_include_elec_pos, &
-            s% eos_rq% logT_ion_HELM, s% eos_rq% logT_neutral_HELM, &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, helm_res, off_table, ierr)
-    else if (s% use_d_eos_dxa) then
-       call eosDT_get_new( &
+            s% id, k, &
             s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
             Rho, logRho, T, logT, &
             res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
-            
-       if (is_bad(dres_dxa(i_lnE,1))) then
-          !$OMP critical (get_eos_critical)
-          write(*,*) 'get_eos ierr', ierr
-          do j=1,s% species
-             write(*,2) 'dres_dxa(i_lnE,j) ' // trim(s% nameofequ(j+s% nvar_hydro)), j, dres_dxa(i_lnE,j)
-          end do
-          write(*,2) 'k', k
-          write(*,1) 'z', z
-          write(*,1) 'xh', xh
-          write(*,1) 'abar', abar
-          write(*,1) 'zbar', zbar
-          write(*,1) 'log10Rho', logRho
-          write(*,1) 'log10T', logT
-          if (s% stop_for_bad_nums .and. &
-               is_bad(dres_dxa(1,1))) stop 'do_eos_for_cell'
-          !$OMP end critical (get_eos_critical)
-       end if
-       
     else
        call eosDT_get( &
-            s% eos_handle, eos_z, eos_x, abar, zbar, &
-            s% species, s% chem_id, s% net_iso, xa, &
+            s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
             Rho, logRho, T, logT, &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, ierr)
-       
+            res, dres_dlnRho, dres_dlnT, dres_dxa, ierr)
     end if
 
     if (ierr /= 0) then
@@ -167,10 +105,9 @@ contains
           !$OMP critical (get_eos_critical)
           write(*,*) 'get_eos ierr', ierr
           write(*,2) 'k', k
-          write(*,1) 'z', z
-          write(*,1) 'xh', xh
-          write(*,1) 'abar', abar
-          write(*,1) 'zbar', zbar
+          do j=1,s% species
+             write(*,2) 'xa(j) ' // trim(s% nameofequ(j+s% nvar_hydro)), j, xa(j)
+          end do
           write(*,1) 'log10Rho', logRho
           write(*,1) 'log10T', logT
           if (s% stop_for_bad_nums .and. &
@@ -231,14 +168,6 @@ contains
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logT, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
             eos_calls, ierr)
-    else if (s% use_eosDT_ideal_gas) then
-       write(*,*) 'cannot call solve_eos_given_DE with use_eosDT_ideal_gas set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_HELMEOS) then
-       write(*,*) 'cannot call solve_eos_given_DE with use_eosDT_HELMEOS set'
-       ierr = -1
-       return
     else
        call eosDT_get_T( &
             s% eos_handle, eos_z, eos_x, abar, zbar, &
@@ -296,14 +225,6 @@ contains
        write(*,*) 'cannot call solve_eos_given_DEgas with use_other_eos'
        ierr = -1
        return
-    else if (s% use_eosDT_ideal_gas) then
-       write(*,*) 'cannot call solve_eos_given_DEgas with use_eosDT_ideal_gas set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_HELMEOS) then
-       write(*,*) 'cannot call solve_eos_given_DEgas with use_eosDT_HELMEOS set'
-       ierr = -1
-       return
     else
       call eosDT_get_T_given_egas( &
          s% eos_handle, eos_z, eos_x, abar, zbar, &
@@ -358,14 +279,6 @@ contains
 
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_DP with use_other_eos set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_ideal_gas) then
-       write(*,*) 'cannot call solve_eos_given_DP with use_eosDT_ideal_gas set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_HELMEOS) then
-       write(*,*) 'cannot call solve_eos_given_DP with use_eosDT_HELMEOS set'
        ierr = -1
        return
     else
@@ -428,14 +341,6 @@ contains
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logT, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
             eos_calls, ierr)
-    else if (s% use_eosDT_ideal_gas) then
-       write(*,*) 'cannot call solve_eos_given_DS with use_eosDT_ideal_gas set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_HELMEOS) then
-       write(*,*) 'cannot call solve_eos_given_DS with use_eosDT_HELMEOS set'
-       ierr = -1
-       return
     else
        call eosDT_get_T( &
             s% eos_handle, eos_z, eos_x, abar, zbar, &
@@ -491,14 +396,6 @@ contains
 
     if (s% use_other_eos) then
        write(*,*) 'cannot call solve_eos_given_PT with use_other_eos set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_ideal_gas) then
-       write(*,*) 'cannot call solve_eos_given_PT with use_eosDT_ideal_gas set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_HELMEOS) then
-       write(*,*) 'cannot call solve_eos_given_PT with use_eosDT_HELMEOS set'
        ierr = -1
        return
     else
@@ -563,14 +460,6 @@ contains
             arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
             logRho, res, dres_dlnRho, dres_dlnT, &
             dres_dabar, dres_dzbar, eos_calls, ierr)
-    else if (s% use_eosDT_ideal_gas) then
-       write(*,*) 'cannot call solve_eos_given_PgasT with use_eosDT_ideal_gas set'
-       ierr = -1
-       return
-    else if (s% use_eosDT_HELMEOS) then
-       write(*,*) 'cannot call solve_eos_given_PgasT with use_eosDT_HELMEOS set'
-       ierr = -1
-       return
     else if (is_bad(logPgas)) then
        write(*,*) 'bad logPgas for solve_eos_given_PgasT', logPgas
        ierr = -1

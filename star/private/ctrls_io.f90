@@ -322,7 +322,7 @@
     
     ! eos controls
     use_fixed_XZ_for_eos, fixed_X_for_eos, fixed_Z_for_eos, use_d_eos_dxa, &
-    use_eosDT_ideal_gas, use_eosDT_HELMEOS, report_eos_settings_at_start_of_run, &
+    report_eos_settings_at_start_of_run, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -1771,8 +1771,6 @@
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% use_eosDT_ideal_gas = use_eosDT_ideal_gas
- s% use_eosDT_HELMEOS = use_eosDT_HELMEOS
  s% use_fixed_XZ_for_eos = use_fixed_XZ_for_eos
  s% report_eos_settings_at_start_of_run = report_eos_settings_at_start_of_run
  s% fixed_X_for_eos = fixed_X_for_eos
@@ -3387,8 +3385,6 @@
  fixed_X_for_eos = s% fixed_X_for_eos
  fixed_Z_for_eos = s% fixed_Z_for_eos
  report_eos_settings_at_start_of_run = s% report_eos_settings_at_start_of_run
- use_eosDT_ideal_gas = s% use_eosDT_ideal_gas
- use_eosDT_HELMEOS = s% use_eosDT_HELMEOS
  use_d_eos_dxa = s% use_d_eos_dxa
  
  ! opacity controls

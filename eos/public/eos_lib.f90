@@ -129,7 +129,7 @@
       ! so you can do multiple evaluations in parallel using the same handle.      
       
 
-      subroutine eosDT_get( &
+      subroutine eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, log10Rho, T, log10T, &
@@ -204,10 +204,10 @@
          d_dzbar_const_TRho = 0
          d_dabar_const_TRho = 0
          
-      end subroutine eosDT_get
+      end subroutine eosDT_get_legacy
       
 
-      subroutine eosDT_get_new( &
+      subroutine eosDT_get( &
                handle, species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, d_dxa, ierr)
@@ -247,7 +247,7 @@
             Pgas, Prad, energy, entropy, ierr)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
-      end subroutine eosDT_get_new
+      end subroutine eosDT_get
       
       
       subroutine eosDT_test_component( &
@@ -324,93 +324,6 @@
       end subroutine eosDT_test_component
 
 
-      subroutine eosDT_HELMEOS_get( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho, log10Rho, T, log10T, &
-               include_radiation, always_skip_elec_pos, always_include_elec_pos, &
-               logT_ion, logT_neutral, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-               !Pgas, Prad, energy, entropy, helm_res, ierr)
-               d_dabar_const_TRho, d_dzbar_const_TRho, helm_res, off_table, ierr)
-
-         use eos_def
-         use eosDT_eval, only: get_eosDT_HELMEOS_Results
-
-         ! INPUT
-         
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar
-            ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-            ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-            ! index from 1 to num_chem_isos (defined in chem_def)
-            ! value is 0 if the iso is not in the current net
-            ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-            ! provide both if you have them.  else pass one and set the other to arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
-            
-         real(dp), intent(in) :: T, log10T ! the temperature
-            ! provide both if you have them.  else pass one and set the other to arg_not_provided
-            
-         real(dp), intent(in) :: logT_ion, logT_neutral
-         
-         logical, intent(in) :: include_radiation, always_skip_elec_pos, always_include_elec_pos
-         
-         ! OUTPUT
-         
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         ! partial derivatives of the basic results wrt lnd and lnT
-         
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
-         ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
-         ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-         ! d_dabar(i) = d(res(i))/dabar|TRho,zbar
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
-         ! d_dzbar(i) = d(res(i))/dzbar|TRho,abar
-
-         real(dp), intent(inout) :: helm_res(:) ! (num_helm_results)
-         
-         logical, intent(out) :: off_table
-         integer, intent(out) :: ierr ! 0 means AOK.
-         
-         type (EoS_General_Info), pointer :: rq
-         real(dp) :: Pgas, Prad, energy, entropy
-         
-         call get_eos_ptr(handle,rq,ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for eos -- did you call alloc_eos_handle?'
-            return
-         end if
-         call get_eosDT_HELMEOS_Results( &
-            rq, Z, X, abar, zbar, Rho, log10Rho, T, log10T, &
-            include_radiation, always_skip_elec_pos, always_include_elec_pos, &
-            logT_ion, logT_neutral, &
-            res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-            d_dabar_const_TRho, d_dzbar_const_TRho, &
-            helm_res, off_table, ierr)      
-         !Pgas = exp(res(i_lnPgas))
-         !Prad = crad*T*T*T*T/3d0
-         !energy = exp(res(i_lnE))
-         !entropy = exp(res(i_lnS))
-               
-      end subroutine eosDT_HELMEOS_get
-
-      
       subroutine helmeos2_eval( &
             T, logT, Rho, logRho, X, abar, zbar, &
             coulomb_temp_cut, coulomb_den_cut, helm_res, &
@@ -432,94 +345,6 @@
             always_skip_elec_pos, always_include_elec_pos, &
             logT_ion, logT_neutral, off_table, ierr)
       end subroutine helmeos2_eval
-      
-      
-      subroutine eosDT_ideal_gas_get( &
-               handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho, log10Rho, T, log10T, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-               !Pgas, Prad, energy, entropy, ierr)
-               d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
-
-         use eos_def
-         use eosDT_eval, only: get_eosDT_HELMEOS_Results
-
-         ! INPUT
-         
-         integer, intent(in) :: handle
-
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar
-            ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-            ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-            ! index from 1 to num_chem_isos (defined in chem_def)
-            ! value is 0 if the iso is not in the current net
-            ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         
-         real(dp), intent(in) :: Rho, log10Rho ! the density
-            ! provide both if you have them.  else pass one and set the other to arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
-            
-         real(dp), intent(in) :: T, log10T ! the temperature
-            ! provide both if you have them.  else pass one and set the other to arg_not_provided
-         
-         ! OUTPUT
-         
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         ! partial derivatives of the basic results wrt lnd and lnT
-         
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
-         ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
-         ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
-
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-         ! d_dabar(i) = d(res(i))/dabar|TRho,zbar
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
-         ! d_dzbar(i) = d(res(i))/dzbar|TRho,abar
-         
-         !real(dp), intent(out) :: Pgas, Prad, energy, entropy
-         
-         integer, intent(out) :: ierr ! 0 means AOK.
-         
-         logical, parameter :: &
-            include_radiation = .false., &
-            always_skip_elec_pos = .true., &
-            always_include_elec_pos = .false.
-         real(dp) :: helm_res(num_helm_results)
-         type (EoS_General_Info), pointer :: rq
-         real(dp) :: Pgas, Prad, energy, entropy
-         real(dp), parameter :: logT_ion = -1, logT_neutral = -1
-         logical :: off_table
-         
-         call get_eos_ptr(handle,rq,ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for eos -- did you call alloc_eos_handle?'
-            return
-         end if
-         call get_eosDT_HELMEOS_Results( &
-            rq, Z, X, abar, zbar, Rho, log10Rho, T, log10T, &
-            include_radiation, always_skip_elec_pos, always_include_elec_pos, &
-            logT_ion, logT_neutral, &
-            res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-            d_dabar_const_TRho, d_dzbar_const_TRho, &
-            helm_res, off_table, ierr)      
-         !Pgas = exp(res(i_lnPgas))
-         !Prad = crad*T*T*T*T/3d0
-         !energy = exp(res(i_lnE))
-         !entropy = exp(res(i_lnS))
-               
-      end subroutine eosDT_ideal_gas_get
       
       
       ! the following routine uses gas pressure and temperature as input variables
