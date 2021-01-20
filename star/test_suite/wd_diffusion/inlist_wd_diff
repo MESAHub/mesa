@@ -13,7 +13,7 @@
       required_termination_code_string = 'Teff_lower_limit'
 
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist

@@ -229,7 +229,8 @@
       integer, parameter :: h_total_turbulent_energy = h_total_gravitational_energy + 1
       integer, parameter :: h_total_radial_kinetic_energy = h_total_turbulent_energy + 1
       integer, parameter :: h_total_rotational_kinetic_energy = h_total_radial_kinetic_energy + 1
-      integer, parameter :: h_total_energy = h_total_rotational_kinetic_energy + 1
+      integer, parameter :: h_total_energy_foe = h_total_rotational_kinetic_energy + 1
+      integer, parameter :: h_total_energy = h_total_energy_foe + 1
 
       integer, parameter :: h_log_total_internal_energy = h_total_energy + 1
       integer, parameter :: h_log_total_gravitational_energy = h_log_total_internal_energy + 1
@@ -524,7 +525,8 @@
       integer, parameter :: h_compactness = h_log_Ledd + 1
       integer, parameter :: h_compactness_parameter = h_compactness + 1
       integer, parameter :: h_max_infall_speed = h_compactness_parameter + 1
-      integer, parameter :: h_non_fe_core_infall = h_max_infall_speed + 1
+      integer, parameter :: h_non_fe_core_rebound = h_max_infall_speed + 1
+      integer, parameter :: h_non_fe_core_infall = h_non_fe_core_rebound + 1
       integer, parameter :: h_fe_core_infall = h_non_fe_core_infall + 1
 
       integer, parameter :: h_cz_bot_mass = h_fe_core_infall + 1
@@ -750,11 +752,7 @@
       integer, parameter :: h_q_for_test_CpT_absMdot_div_L = h_k_for_test_CpT_absMdot_div_L + 1
       integer, parameter :: h_logxq_for_test_CpT_absMdot_div_L = h_q_for_test_CpT_absMdot_div_L + 1
 
-      integer, parameter :: h_k_CpTMdot_lt_L = h_logxq_for_test_CpT_absMdot_div_L + 1
-      integer, parameter :: h_q_CpTMdot_lt_L = h_k_CpTMdot_lt_L + 1
-      integer, parameter :: h_logxq_CpTMdot_lt_L = h_q_CpTMdot_lt_L + 1
-
-      integer, parameter :: h_tot_E = h_logxq_CpTMdot_lt_L + 1
+      integer, parameter :: h_tot_E = h_logxq_for_test_CpT_absMdot_div_L + 1
       integer, parameter :: h_log_tot_E = h_tot_E + 1
       integer, parameter :: h_tot_KE = h_log_tot_E + 1
       integer, parameter :: h_log_tot_KE = h_tot_KE + 1
@@ -776,9 +774,7 @@
       integer, parameter :: h_rotation_solver_steps = h_burn_solver_maxsteps + 1
       integer, parameter :: h_diffusion_solver_steps = h_rotation_solver_steps + 1
       integer, parameter :: h_diffusion_solver_iters = h_diffusion_solver_steps + 1
-      integer, parameter :: h_total_radiation = h_diffusion_solver_iters + 1
-      integer, parameter :: h_total_energy_plus_total_radiation = h_total_radiation + 1
-      integer, parameter :: h_grav_dark_L_polar = h_total_energy_plus_total_radiation + 1
+      integer, parameter :: h_grav_dark_L_polar = h_diffusion_solver_iters + 1
       integer, parameter :: h_grav_dark_Teff_polar = h_grav_dark_L_polar + 1
       integer, parameter :: h_grav_dark_L_equatorial = h_grav_dark_Teff_polar + 1
       integer, parameter :: h_grav_dark_Teff_equatorial = h_grav_dark_L_equatorial + 1
@@ -927,6 +923,7 @@
          history_column_name(h_max_infall_speed) = 'max_infall_speed'
          history_column_name(h_fe_core_infall) = 'fe_core_infall'
          history_column_name(h_non_fe_core_infall) = 'non_fe_core_infall'
+         history_column_name(h_non_fe_core_rebound) = 'non_fe_core_rebound'
          history_column_name(h_compactness) = 'compactness'
          history_column_name(h_compactness_parameter) = 'compactness_parameter'
          history_column_name(h_v_surf_div_escape_v) = 'v_surf_div_escape_v'
@@ -994,6 +991,7 @@
          history_column_name(h_total_radial_kinetic_energy) = 'total_radial_kinetic_energy'
          history_column_name(h_total_rotational_kinetic_energy) = 'total_rotational_kinetic_energy'
          history_column_name(h_total_turbulent_energy) = 'total_turbulent_energy'
+         history_column_name(h_total_energy_foe) = 'total_energy_foe'
          history_column_name(h_total_energy) = 'total_energy'
 
          history_column_name(h_log_total_internal_energy) = 'log_total_internal_energy'
@@ -1569,17 +1567,10 @@
          history_column_name(h_q_for_test_CpT_absMdot_div_L) = 'q_for_test_CpT_absMdot_div_L'
          history_column_name(h_logxq_for_test_CpT_absMdot_div_L) = 'logxq_for_test_CpT_absMdot_div_L'
 
-         history_column_name(h_k_CpTMdot_lt_L) = 'k_CpTMdot_lt_L'
-         history_column_name(h_q_CpTMdot_lt_L) = 'q_CpTMdot_lt_L'
-         history_column_name(h_logxq_CpTMdot_lt_L) = 'logxq_CpTMdot_lt_L'
-
          history_column_name(h_burn_solver_maxsteps) = 'burn_solver_maxsteps'
          history_column_name(h_rotation_solver_steps) = 'rotation_solver_steps'
          history_column_name(h_diffusion_solver_steps) = 'diffusion_solver_steps'
          history_column_name(h_diffusion_solver_iters) = 'diffusion_solver_iters'
-         history_column_name(h_total_radiation) = 'total_radiation'
-         history_column_name(h_total_energy_plus_total_radiation) = &
-            'total_energy_plus_total_radiation'
 
          history_column_name(h_tot_E) = 'tot_E'
          history_column_name(h_log_tot_E) = 'log_tot_E'

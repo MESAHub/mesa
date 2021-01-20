@@ -45,7 +45,7 @@ module neu_support
 
                   call neu_get( T, logT, Rho, logRho,abar,zbar,7.5d0,flags,loss,sources,info)
 
-                  write(*,*) logT,logRho,abar,zbar,loss,sources
+                  write(*,'(99(1pe26.16))') logT,logRho,abar,zbar,loss,sources
                end do
             end do
          end do

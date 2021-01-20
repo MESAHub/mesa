@@ -1501,11 +1501,6 @@
          power_z_burn = s% power_z_burn
          power_neutrinos = s% power_neutrinos
          
-         if ( s% star_age < s% profile_age ) then
-            if (dbg) write(*,*) 'must_do_profile for age < profile_age'
-            must_do_profile = .true.
-         end if
-         
          if (must_do_profile) profile_priority = phase_priority
          
          logged = get_history_info(s, must_do_profile)

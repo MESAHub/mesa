@@ -74,7 +74,7 @@
             s% History_Panels1_num_panels, &
             s% History_Panels1_other_ymin, &
             s% History_Panels1_other_ymax, &
-            s% History_Panels1_yaxis_reversed, &
+            s% History_Panels1_other_yaxis_reversed, &
             s% History_Panels1_other_yaxis_log, &
             s% History_Panels1_same_yaxis_range, &
             s% History_Panels1_other_dymin, &
@@ -100,9 +100,14 @@
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         include 'formats'
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         write (*,2) 'History_Panels2_plot total_energy_end', s% model_number, s% total_energy_end
+         
+         
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
@@ -135,7 +140,7 @@
             s% History_Panels2_num_panels, &
             s% History_Panels2_other_ymin, &
             s% History_Panels2_other_ymax, &
-            s% History_Panels2_yaxis_reversed, &
+            s% History_Panels2_other_yaxis_reversed, &
             s% History_Panels2_other_yaxis_log, &
             s% History_Panels2_same_yaxis_range, &
             s% History_Panels2_other_dymin, &
@@ -196,7 +201,7 @@
             s% History_Panels3_num_panels, &
             s% History_Panels3_other_ymin, &
             s% History_Panels3_other_ymax, &
-            s% History_Panels3_yaxis_reversed, &
+            s% History_Panels3_other_yaxis_reversed, &
             s% History_Panels3_other_yaxis_log, &
             s% History_Panels3_same_yaxis_range, &
             s% History_Panels3_other_dymin, &
@@ -257,7 +262,7 @@
             s% History_Panels4_num_panels, &
             s% History_Panels4_other_ymin, &
             s% History_Panels4_other_ymax, &
-            s% History_Panels4_yaxis_reversed, &
+            s% History_Panels4_other_yaxis_reversed, &
             s% History_Panels4_other_yaxis_log, &
             s% History_Panels4_same_yaxis_range, &
             s% History_Panels4_other_dymin, &
@@ -318,7 +323,7 @@
             s% History_Panels5_num_panels, &
             s% History_Panels5_other_ymin, &
             s% History_Panels5_other_ymax, &
-            s% History_Panels5_yaxis_reversed, &
+            s% History_Panels5_other_yaxis_reversed, &
             s% History_Panels5_other_yaxis_log, &
             s% History_Panels5_same_yaxis_range, &
             s% History_Panels5_other_dymin, &
@@ -379,7 +384,7 @@
             s% History_Panels6_num_panels, &
             s% History_Panels6_other_ymin, &
             s% History_Panels6_other_ymax, &
-            s% History_Panels6_yaxis_reversed, &
+            s% History_Panels6_other_yaxis_reversed, &
             s% History_Panels6_other_yaxis_log, &
             s% History_Panels6_same_yaxis_range, &
             s% History_Panels6_other_dymin, &
@@ -440,7 +445,7 @@
             s% History_Panels7_num_panels, &
             s% History_Panels7_other_ymin, &
             s% History_Panels7_other_ymax, &
-            s% History_Panels7_yaxis_reversed, &
+            s% History_Panels7_other_yaxis_reversed, &
             s% History_Panels7_other_yaxis_log, &
             s% History_Panels7_same_yaxis_range, &
             s% History_Panels7_other_dymin, &
@@ -501,7 +506,7 @@
             s% History_Panels8_num_panels, &
             s% History_Panels8_other_ymin, &
             s% History_Panels8_other_ymax, &
-            s% History_Panels8_yaxis_reversed, &
+            s% History_Panels8_other_yaxis_reversed, &
             s% History_Panels8_other_yaxis_log, &
             s% History_Panels8_same_yaxis_range, &
             s% History_Panels8_other_dymin, &

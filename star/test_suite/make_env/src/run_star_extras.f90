@@ -372,7 +372,7 @@
             skip_partials = .true.
             s% opacity_start(1) = 1d-2 ! kap_guess
             call star_get_atm_PT( &
-                s% id, tau_surf, skip_partials, &
+                s% id, tau_surf, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                 s% Teff, &
                 lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &

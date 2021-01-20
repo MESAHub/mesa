@@ -272,6 +272,7 @@
          dt_why_str(Tlim_dlog_eps_nuc) = 'log_eps_nuc'
          dt_why_str(Tlim_lg_XH_cntr) = 'lg_XH_cntr'
          dt_why_str(Tlim_dmstar) = 'delta_mstar'
+         dt_why_str(Tlim_dt_div_dt_cell_collapse) = 'dt_collapse'
          dt_why_str(Tlim_dt_div_min_dr_div_cs) = 'min_dr_div_cs'
          dt_why_str(Tlim_lgL) = 'lgL'
          dt_why_str(Tlim_max_timestep) = 'max_dt'

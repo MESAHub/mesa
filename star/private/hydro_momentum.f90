@@ -117,7 +117,8 @@
          
          type(auto_diff_real_18var_order1) :: resid1_18, resid_18, &
             other_18, dm_div_A_18, grav_18, area_18, dXP_18, d_mlt_Pturb_18, &
-            iXPavg_18, other_dm_div_A_18, grav_dm_div_A_18
+            iXPavg_18, other_dm_div_A_18, grav_dm_div_A_18, &
+            RTI_terms_18, RTI_terms_dm_div_A_18
          type(accurate_auto_diff_real_18var_order1) :: residual_sum_18
 
          include 'formats'
@@ -127,20 +128,33 @@
          
          ierr = 0
          call init
-         
-         ! equation is accel = grav + extra_grav - area*dXP/dm
-         ! accel = dv/dt
-         ! grav = -G*m/r^2 with possible factors for rotation and GR
-         ! extra_grav is from the other_momentum hook
-         ! dXP includes a variety of pressures
+
+!   dv/dt = - G*m/r^2 - (dXP_18 + d_mlt_Pturb_18)*area/dm + extra_grav + Uq + RTI_diffusion + RTI_kick
+! 
+!   grav_18 = expected_HSE_grav_term = -G*m/r^2 with possible modifications for rotation
+!   other_18 = expected_non_HSE_term = extra_grav - dv/dt + Uq
+!   extra_grav is from the other_momentum hook
+!   dXP_18 = pressure difference across face from center to center of adjacent cells (excluding mlt_Pturb effects)
+!        XP = P_18 + avQ_18 + Pt_18 + extra_pressure, with time centering
+!   iXPavg_18 = 1/(avg XP).  for normalizing equation
+!   d_mlt_Pturb_18 = difference in MLT convective pressure across face
+!   RTI_terms_18 = RTI_diffusion + RTI_kick
+!   dm_div_A_18 = dm/area
+! 
+!   0  = extra_grav - dv/dt + Uq - G*m/r^2 - RTI_diffusion - RTI_kick - (dXP_18 + d_mlt_Pturb_18)*area/dm
+!   0  = other + grav - RTI_terms - (dXP_18 + d_mlt_Pturb_18)*area/dm
+!   0  = (other + grav - RTI_terms)*dm/area - dXP_18 - d_mlt_Pturb_18
+!   0  = other_dm_div_A_18 + grav_dm_div_A_18 - dXP_18 - d_mlt_Pturb_18 + RTI_terms_dm_div_A_18
 
          call setup_HSE(d_grav_dw, dm_div_A, ierr); if (ierr /= 0) return ! grav_18 and dm_div_A_18
-         call setup_non_HSE(ierr); if (ierr /= 0) return ! other_18
+         call setup_non_HSE(ierr); if (ierr /= 0) return ! other = s% extra_grav(k) - s% dv_dt(k)
          call setup_dXP(ierr); if (ierr /= 0) return ! dXP_18, iXPavg_18
          call setup_d_mlt_Pturb(ierr); if (ierr /= 0) return ! d_mlt_Pturb_18
+         call setup_RTI_terms(ierr); if (ierr /= 0) return ! RTI_terms_18
          
          other_dm_div_A_18 = other_18*dm_div_A_18
          grav_dm_div_A_18 = grav_18*dm_div_A_18
+         RTI_terms_dm_div_A_18 = RTI_terms_18*dm_div_A_18
          
          if (.false.) then
             if (is_bad(other_dm_div_A_18%d1Array(i_lnd_m1))) then
@@ -162,7 +176,7 @@
          end if
          
          ! sum terms in residual_sum_18 using accurate_auto_diff_real_18var_order1
-         residual_sum_18 = other_dm_div_A_18 + grav_dm_div_A_18 - dXP_18 - d_mlt_Pturb_18
+         residual_sum_18 = other_dm_div_A_18 + grav_dm_div_A_18 - dXP_18 - d_mlt_Pturb_18 + RTI_terms_dm_div_A_18
          
          resid1_18 = residual_sum_18 ! convert back to auto_diff_real_18var_order1
          resid_18 = resid1_18*iXPavg_18 ! scaling
@@ -266,6 +280,41 @@
             d_mlt_Pturb_18%d1Array(i_lnd_m1) = d_dmltPturb_dlndm1
             d_mlt_Pturb_18%d1Array(i_lnd_00) = d_dmltPturb_dlnd00
          end subroutine setup_d_mlt_Pturb         
+                  
+         subroutine setup_RTI_terms(ierr)
+            use auto_diff_support
+            integer, intent(out) :: ierr
+            type(auto_diff_real_18var_order1) :: v_p1, v_00, v_m1, dvdt_diffusion, &
+               f, rho_00, rho_m1, dvdt_kick
+            real(dp) :: sigm1, sig00
+            RTI_terms_18 = 0d0
+            if (.not. s% RTI_flag) return
+            if (k >= s% nz .or. k <= 1) return
+            ! diffusion of specific momentum (i.e. v)
+            if (s% dudt_RTI_diffusion_factor > 0d0) then ! add diffusion source term to dvdt
+               ! sigmid_RTI(k) is mixing flow at center k in (gm sec^1)
+               sigm1 = s% dudt_RTI_diffusion_factor*s% sigmid_RTI(k-1)
+               sig00 = s% dudt_RTI_diffusion_factor*s% sigmid_RTI(k)
+               v_p1 = wrap_v_p1(s, k)
+               v_00 = wrap_v_00(s, k)
+               v_m1 = wrap_v_m1(s, k)
+               dvdt_diffusion = sig00*(v_p1 - v_00) - sigm1*(v_00 - v_m1) ! (g/s)*(cm/s)
+               dvdt_diffusion = dvdt_diffusion/s% dm_bar(k) ! divide by g to get units of cm/s^2
+            else
+               dvdt_diffusion = 0d0
+            end if
+            ! kick to adjust densities
+            if (s% eta_RTI(k) > 0d0 .and. &
+               s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
+               f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/dm_div_A_18
+               rho_00 = wrap_d_00(s, k)
+               rho_m1 = wrap_d_m1(s, k)
+               dvdt_kick = f*(rho_00 - rho_m1)/s% dt ! change v according to direction of lower density
+            else
+               dvdt_kick = 0d0
+            end if            
+            RTI_terms_18 = dvdt_diffusion + dvdt_kick            
+         end subroutine setup_RTI_terms
          
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials
@@ -366,13 +415,11 @@
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_18var_order1) :: &
-            extra_18, accel_18, v_00, drag_18, Uq_18
+            extra_18, accel_18, v_00, Uq_18
          real(dp) :: accel, d_accel_dv, fraction_on
          logical :: test_partials, local_v_flag
 
          include 'formats'
-         ! use_other_momentum, use_other_momentum_implicit
-         ! dv_dt, drag, Uq
 
          ierr = 0
          
@@ -392,7 +439,6 @@
          end if
          
          accel_18 = 0d0
-         drag_18 = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
@@ -415,16 +461,6 @@
             end if
             accel_18%val = accel
             accel_18%d1Array(i_v_00) = d_accel_dv
-
-            s% dvdt_drag(k) = 0
-            if (s% drag_coefficient > 0) then
-                if (s% q(k) > s% min_q_for_drag .or. &
-                   (s% turn_on_drag_in_H_envelope .and. k <= s% start_H_envelope_base_k)) then
-                  v_00 = wrap_v_00(s,k)
-                  drag_18 = -s% drag_coefficient*v_00/s% dt
-                  s% dvdt_drag(k) = drag_18%val
-               end if
-            end if
          
          end if ! v_flag
 
@@ -434,7 +470,7 @@
             if (ierr /= 0) return
          end if
          
-         other_18 = extra_18 - accel_18 + drag_18 + Uq_18
+         other_18 = extra_18 - accel_18 + Uq_18
          other = other_18%val
          
          if (.false.) then
@@ -444,10 +480,6 @@
             end if
             if (is_bad(accel_18%d1Array(i_lnd_m1))) then
                write(*,2) 'lnd_m1 accel_18', k, accel_18%d1Array(i_lnd_m1)
-               stop 'expected_non_HSE_term'
-            end if
-            if (is_bad(drag_18%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 drag_18', k, drag_18%d1Array(i_lnd_m1)
                stop 'expected_non_HSE_term'
             end if
             if (is_bad(Uq_18%d1Array(i_lnd_m1))) then

@@ -48,7 +48,7 @@
             s, nz, nvar, dx, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             xscale, equ, work, lwork, iwork, liwork, AF, &
-            lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+            convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
          use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
 
@@ -89,11 +89,6 @@
             ! where "slope" is slope of the line for line search in the solver,
             ! and is analogous to the slope of df/ddx in a 1D solver root finder.
 
-         ! parameters for caller-supplied routines
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
-
          ! output
          logical, intent(out) :: convergence_failure
          integer, intent(out) :: ierr ! 0 means okay.
@@ -120,7 +115,7 @@
             s, nz, nvar, dx, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             xscale, equ, work, lwork, iwork, liwork, &
-            lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+            convergence_failure, ierr)
 
          contains
 
@@ -180,7 +175,7 @@
             s, nz, nvar, dx1, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             xscale1, equ1, work, lwork, iwork, liwork, &
-            lrpar, rpar, lipar, ipar, convergence_failure, ierr)
+            convergence_failure, ierr)
 
          type (star_info), pointer :: s
 
@@ -193,11 +188,6 @@
          ! controls
          integer, intent(in) :: gold_tolerances_level
          real(dp), intent(in) :: tol_max_correction, tol_correction_norm
-
-         ! parameters for caller-supplied routines
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
 
          ! work arrays
          integer, intent(in) :: lwork, liwork
@@ -352,8 +342,7 @@
             return
          end if
          
-         call eval_equations( &
-            iter, nvar, nz, dx, xscale, equ, lrpar, rpar, lipar, ipar, ierr)         
+         call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)         
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -363,8 +352,7 @@
          
          call sizequ(s, &
             iter, nvar, nz, equ, &
-            residual_norm, max_residual, max_resid_k, max_resid_j, &
-            lrpar, rpar, lipar, ipar, ierr)
+            residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: sizequ returned ierr', ierr
@@ -423,8 +411,7 @@
                   tol_residual_norm, tol_max_residual
             end if
 
-            call setmatrix( &
-               neq, dx, xscale, dxsave, ddxsave, lrpar, rpar, lipar, ipar, ierr)
+            call setmatrix(neq, dx, xscale, dxsave, ddxsave, ierr)
             if (ierr /= 0) then
                call write_msg('setmatrix returned ierr /= 0')
                convergence_failure = .true.
@@ -442,7 +429,7 @@
             end if
 
             ! inform caller about the correction
-            call inspectB(iter, nvar, nz, dx, soln, xscale, lrpar, rpar, lipar, ipar, ierr)
+            call inspectB(s, iter, nvar, nz, dx, soln, xscale, ierr)
             if (ierr /= 0) then
                call oops('inspectB returned ierr')
                exit iter_loop
@@ -450,8 +437,7 @@
 
             ! compute size of scaled correction B
             call sizeB(s, iter, nvar, nz, soln, xscale, &
-                     max_correction, correction_norm, max_corr_k, max_corr_j, &
-                     lrpar, rpar, lipar, ipar, ierr)
+                  max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             if (ierr /= 0) then
                call oops('correction rejected by sizeB')
                exit iter_loop
@@ -507,9 +493,8 @@
             correction_factor = min(correction_factor, temp_correction_factor)
 
             ! fix B if out of definition domain
-            call Bdomain( &
-               iter, nvar, nz, soln, dx, xscale, correction_factor, &
-               lrpar, rpar, lipar, ipar, ierr)
+            call Bdomain(s, &
+               iter, nvar, nz, soln, dx, xscale, correction_factor, ierr)
             if (ierr /= 0) then ! correction cannot be fixed
                call oops('correction rejected by Bdomain')
                exit iter_loop
@@ -538,8 +523,7 @@
             
             f = 0d0
             call adjust_correction( &
-               min_corr_coeff, correction_factor, grad_f1, f, slope, coeff, &
-               err_msg, lrpar, rpar, lipar, ipar, ierr)
+               min_corr_coeff, correction_factor, grad_f1, f, slope, coeff, err_msg, ierr)
             if (ierr /= 0) then
                call oops(err_msg)
                exit iter_loop
@@ -557,8 +541,7 @@
 
             call sizequ(s, &
                iter, nvar, nz, equ, &
-               residual_norm, max_residual, max_resid_k, max_resid_j, &
-               lrpar, rpar, lipar, ipar, ierr)
+               residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             if (ierr /= 0) then
                call oops('sizequ returned ierr')
                exit iter_loop
@@ -683,8 +666,7 @@
 
             if (passed_tol_tests .and. (iter+1 < max_tries)) then
                ! about to declare victory... but may want to do another iteration
-               force_iter_value = force_another_iteration( &
-                                    iter, s% solver_itermin, lrpar, rpar, lipar, ipar)
+               force_iter_value = force_another_iteration(s, iter, s% solver_itermin)
                if (force_iter_value > 0) then
                   passed_tol_tests = .false. ! force another
                   tiny_corr_cnt = 0 ! reset the counter
@@ -767,7 +749,7 @@
 
          subroutine adjust_correction( &
                min_corr_coeff_in, max_corr_coeff, grad_f, f, slope, coeff,  &
-               err_msg, lrpar, rpar, lipar, ipar, ierr)
+               err_msg, ierr)
             real(dp), intent(in) :: min_corr_coeff_in
             real(dp), intent(in) :: max_corr_coeff
             real(dp), intent(in) :: grad_f(:) ! (neq) ! gradient df/ddx at xold
@@ -780,9 +762,6 @@
             ! if all goes well, the new x will give an improvement in f
 
             character (len=*), intent(out) :: err_msg
-            integer, intent(in) :: lrpar, lipar
-            real(dp), intent(inout) :: rpar(:) ! (lrpar)
-            integer, intent(inout) :: ipar(:) ! (lipar)
             integer, intent(out) :: ierr
 
             integer :: i, j, k, iter, k_max_corr, i_max_corr
@@ -847,7 +826,7 @@
                s% solver_adjust_iter = iter
 
                call apply_coeff(nvar, nz, dx, dxsave, soln, xscale, coeff, skip_eval_f)
-               call eval_equations(iter, nvar, nz, dx, xscale, equ, lrpar, rpar, lipar, ipar, ierr)
+               call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -1100,36 +1079,29 @@
          end subroutine solve_mtx
 
 
-         logical function do_enter_setmatrix( &
-                  neq, dx, xscale, lrpar, rpar, lipar, ipar, ierr)
+         logical function do_enter_setmatrix(neq, dx, xscale, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             implicit none
             integer, intent(in) :: neq
             real(dp), pointer, dimension(:,:) :: dx, ddx, xscale
-            integer, intent(in) :: lrpar, lipar
-            real(dp), intent(inout) :: rpar(:) ! (lrpar)
-            integer, intent(inout) :: ipar(:) ! (lipar)
             integer, intent(out) :: ierr
             logical :: need_solver_to_eval_jacobian
             integer :: i, j, k
             include 'formats.dek'
             need_solver_to_eval_jacobian = .true.
-            call enter_setmatrix(iter,  &
+            call enter_setmatrix(s, iter,  &
                   nvar, nz, neq, dx, xscale, xder, need_solver_to_eval_jacobian, &
-                  size(A,dim=1), A1, lrpar, rpar, lipar, ipar, ierr)
+                  size(A,dim=1), A1, ierr)
             do_enter_setmatrix = need_solver_to_eval_jacobian
          end function do_enter_setmatrix
 
 
          subroutine setmatrix( &
-               neq, dx, xscale, dxsave, ddxsave, lrpar, rpar, lipar, ipar, ierr)
+               neq, dx, xscale, dxsave, ddxsave, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             use star_utils, only: e00, em1, ep1
             integer, intent(in) :: neq
             real(dp), pointer, dimension(:,:) :: dx, xscale, dxsave, ddxsave
-            integer, intent(in) :: lrpar, lipar
-            real(dp), intent(inout) :: rpar(:) ! (lrpar)
-            integer, intent(inout) :: ipar(:) ! (lipar)
             integer, intent(out) :: ierr
 
             integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
@@ -1146,8 +1118,7 @@
                s% solver_test_partials_k > 0 .and. &
                s% solver_call_number == s% solver_test_partials_call_number .and. &
                s% solver_test_partials_iter_number == iter
-            need_solver_to_eval_jacobian = do_enter_setmatrix( &
-                  neq, dx, xscale, lrpar, rpar, lipar, ipar, ierr)
+            need_solver_to_eval_jacobian = do_enter_setmatrix(neq, dx, xscale, ierr)
             if (ierr /= 0) return
 
             if (.not. testing_partial) return
@@ -1157,8 +1128,7 @@
                call eval_partials(s, nvar, xscale, ierr)
                if (ierr /= 0) return
             else
-               call eval_equations( &
-                  iter, nvar, nz, dx, xscale, equ, lrpar, rpar, lipar, ipar, ierr)
+               call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)
                if (ierr /= 0) then
                   write(*,3) '1st call eval_equations failed'
                   stop 'setmatrix'
@@ -1670,8 +1640,7 @@
                end if
                dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations( &
-               iter, nvar, nz, dx, xscale, equ, lrpar, rpar, lipar, ipar, ierr)            
+            call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)            
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
@@ -1840,8 +1809,7 @@
             if (max_resid_j < 0) then
                call sizequ(s, &
                   iter, nvar, nz, equ, &
-                  residual_norm, max_residual, max_resid_k, max_resid_j, &
-                  lrpar, rpar, lipar, ipar, ierr)
+                  residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             end if
             
             if (max_resid_j > 0) then
@@ -1852,8 +1820,7 @@
             
             if (max_corr_j < 0) then
                call sizeB(s, iter, nvar, nz, B, xscale, &
-                  max_correction, correction_norm, max_corr_k, max_corr_j, &
-                  lrpar, rpar, lipar, ipar, ierr)
+                  max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             end if
             
             if (max_corr_j > 0) then

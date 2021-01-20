@@ -953,8 +953,6 @@
             call dealloc; return
          end if
 
-         s% profile_age = s% star_age
-
          call dealloc
 
 

@@ -4171,6 +4171,10 @@
       ! + ``'Krishna_Swamy'`` :
       ! use the grey T(tau) relation described by K.S. Krishna-Swamy, ApJ 145,
       ! 174–194 (1966).
+      ! + ``'Trampedach_solar'`` :
+      ! use the analytic fit by Ball (2021, RNAAS 5, 7) to the Hopf
+      ! function for the solar simulation by Trampedach et al. (2014,
+      ! MNRAS 442, 805–820)
 
       ! ::
 
@@ -4507,17 +4511,6 @@
       ! ::
 
     Tsurf_factor = 1
-
-
-      ! use_Psurf_for_surface_eflux
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! used when u_flag is true. If true, then includes the work term against Psurf
-      ! in the outermost cell. If not, the surface energy flux is equal to L(1)
-
-      ! ::
-
-    use_Psurf_for_surface_eflux = .true.
 
 
       ! irradiation_flux
@@ -6229,7 +6222,7 @@
 
       ! If true, then after a retry the remeshing is undone for the step,
       ! and the following try is performed with the same mesh used in the
-      ! previous step.
+      ! previous step.   This can help with the retry by reducing the changes.
 
       ! ::
 
@@ -6255,17 +6248,6 @@
       ! ::
 
     remesh_dt_limit = -1
-
-
-      ! remesh_log_L_nuc_burn_min
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! No mesh adjustments when ``log10(L_nuc_burn_total)`` is less than this.
-      ! By default, this turns off mesh changes during the early pre-MS.
-
-      ! ::
-
-    remesh_log_L_nuc_burn_min = -50
 
 
       ! use_split_merge_amr
@@ -7224,11 +7206,9 @@
       ! use_d_eos_dxa
       ! ~~~~~~~~~~~~~
 
-      ! for debugging
-
       ! ::
 
-    use_d_eos_dxa = .false.
+    use_d_eos_dxa = .true.
 
 ! opacity controls
 ! ================
@@ -8021,28 +8001,6 @@
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
 
       ! for hydro comparison tests (e.g., Sedov)
-
-
-      ! v_drag_factor
-      ! ~~~~~~~~~~~~~
-      ! v_drag
-      ! ~~~~~~
-      ! q_for_v_drag_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! q_for_v_drag_full_on
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! Implemented only for u_flag right now. Adds a pseudo drag term of the form
-      ! -v_drag_factor*(v-v_drag)^2/r, can be used damp velocities in outer layers
-      ! of a star. Effect is full on for q>q_for_v_drag_full_on and full off for
-      ! q < q_for_v_drag_full_off.
-
-      ! ::
-
-    v_drag_factor = 0d0
-    v_drag = 0d0
-    q_for_v_drag_full_off = 0.95d0
-    q_for_v_drag_full_on = 0.96d0
 
 
       ! Rayleigh-Taylor Instability
@@ -10340,6 +10298,25 @@
     dt_div_min_dr_div_cs_hard_limit = -1
 
 
+      ! dt_div_dt_cell_collapse_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! dt_div_dt_cell_collapse_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! limit for dt compared to cell_collapse timescale (negative means no limit)
+
+      ! ::
+
+      !     dt_cell_collapse = min over shells k that have v(k+1) > v(k) of
+      !     (r(k)-r(k+1))/(v(k+1)-v(k)), the time for the cell to collapse
+      !     to zero thickness at current velocities.  only for v_flag true.
+
+      ! ::
+
+    dt_div_dt_cell_collapse_limit = -1
+    dt_div_dt_cell_collapse_hard_limit = -1
+
+
       ! min_k_for_dt_div_min_dr_div_cs_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_q_for_dt_div_min_dr_div_cs_limit
@@ -11002,24 +10979,14 @@
     hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 
-      ! report_why_dt_limits
+      ! report_dt_hard_limit_retries
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! If true, produce terminal output about choice of timestep.
 
       ! ::
 
-    report_why_dt_limits = .false.
-
-
-      ! report_all_dt_limits
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, produce terminal output about all influences for choice of timestep.
-
-      ! ::
-
-    report_all_dt_limits = .false.
+    report_dt_hard_limit_retries = .false.
 
 
       ! report_solver_dt_info
@@ -11030,16 +10997,6 @@
       ! ::
 
     report_solver_dt_info = .false.
-
-
-      ! report_dX_nuc_drop_dt_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If true, report timestep limits from drop in abundance from nuclear reactions.
-
-      ! ::
-
-    report_dX_nuc_drop_dt_limits = .false.
 
 ! debugging controls
 ! ==================

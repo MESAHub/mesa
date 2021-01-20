@@ -105,9 +105,7 @@
          use mesh_functions
          use hydro_reconstruct, only: do_uface_and_Pface
          use hydro_riemann, only: &
-            do1_Riemann_momentum_eqn, &
-            do1_Riemann_energy_eqn, &
-            do1_Riemann_dlnRdt_eqn
+            do1_Riemann_momentum_eqn, do1_Riemann_dlnRdt_eqn
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
          use hydro_momentum, only: do1_momentum_eqn
@@ -336,27 +334,12 @@
                if (do_struct_thermo) then
                   if (do_dlnE_dt) then
                      call zero_eps_grav_and_partials(s, k)
-                     if (s% u_flag) then
-                        if (k > 1 .or. .not. s% use_Psurf_for_surface_eflux) then ! k==1 done  as BC if use_Psurf_for_surface_eflux
-                           call do1_Riemann_energy_eqn( &
-                              s, k, 0d0, 0d0, 0d0, 0d0, 0d0, &
-                              xscale, equ, skip_partials, do_chem, nvar, op_err)
-                        end if
-
-                        if (op_err /= 0) then
-                           if (s% report_ierr) write(*,2) 'ierr in do1_Riemann_energy_eqn', k
-                           if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Riemann_energy_eqn'
-                           ierr = op_err
-                        end if
-                     else
-                        call do1_energy_eqn( &
-                           s, k, xscale, equ, skip_partials, &
-                           do_chem, nvar, op_err)
-                        if (op_err /= 0) then
-                           if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', k
-                           if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_energy_eqn'
-                           ierr = op_err
-                        end if
+                     call do1_energy_eqn( &
+                        s, k, xscale, equ, skip_partials, do_chem, nvar, op_err)
+                     if (op_err /= 0) then
+                        if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', k
+                        if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_energy_eqn'
+                        ierr = op_err
                      end if
                   end if
                   if (do_deturb_dt) then
@@ -1789,7 +1772,6 @@
             do_du_dt, do_dv_dt, do_equL, ierr)
 
          use hydro_vars, only: set_Teff_info_for_eqns
-         use hydro_riemann, only: do1_Riemann_energy_eqn
          use chem_def
          use atm_def
          use eos_lib, only: Radiation_Pressure
@@ -1955,17 +1937,6 @@
             call set_T_black_body_BC(ierr)
          else
             call set_Tsurf_BC(ierr)
-         end if
-
-         if (s% u_flag .and. s% use_Psurf_for_surface_eflux) then
-            call do1_Riemann_energy_eqn( &
-               s, 1, P_surf, dlnPsurf_dL, dlnPsurf_dlnR, &
-               dlnPsurf_dlnkap*dlnkap_dlnd, dlnPsurf_dlnkap*dlnkap_dlnT, &
-               xscale, equ, skip_partials, s% do_mix .or. s% do_burn, nvar, ierr)
-            if (ierr /= 0) then
-               if (s% report_ierr) write(*,2) 'ierr in do1_Riemann_energy_eqn', 1
-               if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Riemann_energy_eqn'
-            end if
          end if
 
          if (test_partials) then
@@ -2304,8 +2275,8 @@
             
             if (skip_partials) return
             if (test_partials) then
-               s% solver_test_partials_var = s% i_lnT
-               s% solver_test_partials_dval_dx = P*dlnPsurf_dlnT
+               s% solver_test_partials_var = s% i_lum
+               s% solver_test_partials_dval_dx = P*dlnPsurf_dL
                write(*,*) 'set_momentum_BC', s% solver_test_partials_var, s% Eturb_flag
             end if
 

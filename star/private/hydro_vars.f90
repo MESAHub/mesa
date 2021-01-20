@@ -848,7 +848,7 @@
          use atm_support, only: get_T_tau_id
          use micro, only: set_micro_vars
          use mlt_info, only: set_mlt_vars, check_for_redo_MLT, set_grads
-         use star_utils, only: set_k_CpTMdot_lt_L, start_time, update_time, &
+         use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
@@ -904,9 +904,6 @@
 
          if (dbg) write(*,*) 'call set_scale_height'
          call set_scale_height(s)
-
-         if (dbg) write(*,*) 'call set_k_CpTMdot_lt_L'
-         call set_k_CpTMdot_lt_L(s)
 
          if (s% rotation_flag .and. (.not. skip_rotation .or. s% w_div_wc_flag)) then
             if (dbg) write(*,*) 'call set_rotation_info'
@@ -1200,8 +1197,12 @@
              (s% use_T_black_body_outer_BC))
 
          ! Set up stellar surface parameters
-
-         L_surf = s% L(1)
+         
+         if (s% use_T_black_body_outer_BC .and. s% use_fixed_L_for_BB_outer_BC) then
+            L_surf = s% fixed_L_for_BB_outer_BC
+         else
+            L_surf = s% L(1)
+         end if
          R_surf = s% r(1)
          
          ! Initialize partials
@@ -1235,6 +1236,10 @@
                dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
             endif
+             
+         !else if (do_not_need_atm_Tsurf) then
+             
+         !else if (do_not_need_atm_Psurf) then
 
          else
 
@@ -1345,7 +1350,7 @@
                end if
 
                call get_atm_PT( &
-                    s, tau_surf, skip_partials, &
+                    s, tau_surf, L_surf, R_surf, s% m(1), s% cgrav(1), skip_partials, &
                     Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                     lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                     ierr)
