@@ -7145,26 +7145,6 @@
 ! ============
 
 
-      ! use_eosDT_ideal_gas
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! if true, then eos is ideal gas eos as implemented by HELMEOS
-
-      ! ::
-
-    use_eosDT_ideal_gas = .false.
-
-
-      ! use_eosDT_HELMEOS
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! if true, then eos is as implemented by HELMEOS alone; no blending.
-
-      ! ::
-
-    use_eosDT_HELMEOS = .false.
-
-
       ! report_eos_settings_at_start_of_run
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1050,11 +1050,10 @@
 
 
          subroutine other_eosDT_get_interface( &
-                 id, k, handle, Z, X, abar, zbar, & 
+                 id, k, handle, & 
                  species, chem_id, net_iso, xa, &
                  Rho, log10Rho, T, log10T, & 
-                 res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                 d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
+                 res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, ierr)
             use const_def, only: dp
 
             ! INPUT
@@ -1063,13 +1062,6 @@
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: handle ! eos handle
 
-            real(dp), intent(in) :: Z ! the metals mass fraction
-            real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-            real(dp), intent(in) :: abar
-               ! mean atomic number (nucleons per nucleus; grams per mole)
-            real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
             integer, intent(in) :: species
             integer, pointer :: chem_id(:) ! maps species to chem id
                ! index from 1 to species
@@ -1095,8 +1087,8 @@
             ! d_dlnRho_c_T(i) = d(res(i))/dlnd|T
             real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
             ! d_dlnT(i) = d(res(i))/dlnT|Rho
-            real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-            real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+            real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results,species)
+            ! d_dxa(i,j) = d(res(i))/dxa(j)|T,Rho
          
             integer, intent(out) :: ierr ! 0 means AOK.
          

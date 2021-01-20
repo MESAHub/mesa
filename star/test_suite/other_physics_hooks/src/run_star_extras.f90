@@ -188,19 +188,15 @@
          extras_finish_step = keep_going
       end function extras_finish_step
       
-      
 
+      ! eosDT routine.
 
-
-
-
-      
       subroutine my_eosDT_get( &
-              id, k, handle, Z, X, abar, zbar, & 
+              id, k, handle, &
               species, chem_id, net_iso, xa, &
               Rho, log10Rho, T, log10T, & 
               res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-              d_dabar_c_TRho, d_dzbar_c_TRho, ierr)
+              d_dxa_c_TRho, ierr)
 
          use chem_def, only: num_chem_isos
          use eos_def
@@ -211,9 +207,6 @@
          integer, intent(in) :: id ! star id if available; 0 otherwise
          integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
          integer, intent(in) :: handle ! eos handle
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-         real(dp), intent(in) :: abar, zbar
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
@@ -223,17 +216,16 @@
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (num_eos_basic_results) 
          real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dabar_c_TRho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dzbar_c_TRho(:) ! (num_eos_basic_results) 
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (num_eos_d_dxa_results, species)
          
          integer, intent(out) :: ierr ! 0 means AOK.
          
          call eosDT_get( &
-              handle, Z, X, abar, zbar, & 
+              handle, &
               species, chem_id, net_iso, xa, &
               Rho, log10Rho, T, log10T, & 
               res, d_dlnRho_c_T, d_dlnT_c_Rho, &
-              d_dabar_c_TRho, d_dzbar_c_TRho, ierr)
+              d_dxa_c_TRho, ierr)
          
       end subroutine my_eosDT_get
       

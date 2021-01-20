@@ -407,7 +407,7 @@
          eos_handle = alloc_eos_handle_using_inlist(inlist, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
-         call eosDT_get_new( &
+         call eosDT_get( &
                eos_handle, species, chem_id, net_iso, xa, &
                exp10(logRho), logRho, exp10(logT), logT, &
                res, deos_dlnd, deos_dlnT, deos_dxa, ierr)

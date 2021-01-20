@@ -249,12 +249,11 @@
                CSND = s% csound(k)
             end if
          else ! k <= 0 or k > nz
-            call eosDT_get( &
-               eos_handle, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               Rho, logRho, T, logT,  &
+            call get_eos( &
+               s, 0, xa, &
+               Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, &
-               d_dabar, d_dzbar, ierr)
+               d_dxa, ierr)
             if (ierr == 0) then
                Prad = crad*T**4/3d0
                Pgas = exp(res(i_lnPgas))
@@ -277,7 +276,7 @@
             if (s% stop_for_bad_nums .and. is_bad(logRho+logT)) stop 'do_eos_for_cell'
             !$OMP end critical
             !return
-            stop 'RSP failed in eosDT_get'
+            stop 'RSP failed in get_eos'
          end if
          
          if (skip_kap) then

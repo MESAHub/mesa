@@ -82,7 +82,7 @@
          write(*,*) 'call eosDT_get'
          
          ! get a set of results for given temperature and density
-         call eosDT_get( &
+         call eosDT_get_legacy( &
                handle, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, log10(Rho), T, log10(T), &

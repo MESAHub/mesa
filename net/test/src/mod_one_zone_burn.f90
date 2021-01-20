@@ -1151,7 +1151,7 @@
                T = exp10(logT)
                Rho = exp10(logRho)
          
-               call eosDT_get( &
+               call eosDT_get_legacy( &
                   eos_handle, Z, xh, abar, zbar, &
                   species, chem_id, net_iso, x, &
                   Rho, logRho, T, logT, &

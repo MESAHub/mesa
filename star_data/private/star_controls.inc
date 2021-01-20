@@ -761,7 +761,6 @@
 
       ! eos controls
          logical :: &
-            use_eosDT_ideal_gas, use_eosDT_HELMEOS, &
             report_eos_settings_at_start_of_run, &
             use_fixed_XZ_for_eos
          real(dp) :: fixed_X_for_eos, fixed_Z_for_eos
