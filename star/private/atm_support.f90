@@ -418,7 +418,8 @@ contains
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY
+         ATM_T_TAU_KRISHNA_SWAMY, &
+         ATM_T_TAU_TRAMPEDACH_SOLAR
     
     character(*), intent(in) :: T_tau_relation
     integer, intent(out)     :: T_tau_id
@@ -435,6 +436,8 @@ contains
        T_tau_id = ATM_T_TAU_SOLAR_HOPF
     case ('Krishna_Swamy')
        T_tau_id = ATM_T_TAU_KRISHNA_SWAMY
+    case ('Trampedach_solar')
+       T_tau_id = ATM_T_TAU_TRAMPEDACH_SOLAR
     case default
        write(*,*) 'Unknown value for atm_T_tau_relation: ' // trim(T_tau_relation)
        stop 'Please amend your inlist file to correct this problem'

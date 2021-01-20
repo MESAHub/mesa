@@ -128,3 +128,26 @@ at the same time. However, all unnamed critical blocks act like one block and th
 Therefore you should always named your OMP critical blocks to ensure the best performance.  
 
 Do not name your OMP critical block with a name that has already been used for a variable, procedure, module or any other object.
+
+
+Formatting
+----------
+
+Use explicit formats for any ``write`` statements.  Different compilers use different default formats, which can lead to spurious
+failures when strings are compared. e.g. when printing some floating point number ``x``, instead of ::
+
+  write(*,*) x
+
+use ::
+
+  write(*, '(1pd26.16)') x
+
+Unformatted statements are likely to cause unit tests to fail.  They also make it difficult to compare output from runs with
+different compilers.
+
+Some helpful formats are provided in ``include/formats``.
+
+Environment variables
+---------------------
+
+If making a new environment variable then the variable should be prefixed with ``MESA_`` to ensure we don’t collide with other variables.

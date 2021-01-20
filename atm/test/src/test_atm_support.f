@@ -58,6 +58,7 @@ contains
     call test_T_tau_varying(ATM_T_TAU_EDDINGTON, 'Eddington', -1._dp)
     call test_T_tau_varying(ATM_T_TAU_KRISHNA_SWAMY, 'Krishna-Swamy', -1._dp)
     call test_T_tau_varying(ATM_T_TAU_SOLAR_HOPF, 'solar Hopf', -1._dp)
+    call test_T_tau_varying(ATM_T_TAU_TRAMPEDACH_SOLAR, 'Trampedach solar', -1._dp)
     call test_T_tau_varying(ATM_T_TAU_EDDINGTON, 'Eddington', 100._dp)
 
     call test_T_tau_uniform('fixed', 100._dp)
