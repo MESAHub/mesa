@@ -101,7 +101,6 @@
             rate_screened, rate_screened_dT, rate_screened_dRho
          real(dp), target, dimension(num_rvs, num_isos) :: screen_h1, screen_he4
          integer, parameter :: max_z_for_cache = 14
-         real(dp), target :: graboske_cache(3, max_z_for_cache, max_z_for_cache)
          real(qp), target :: dydt_a(num_rvs*num_isos)
          real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
          real(dp), target :: mion_a(num_isos)
@@ -164,7 +163,6 @@
             screen_he4(:,:) = 0
          end if
          
-         n% graboske_cache => graboske_cache
          n% reaction_Qs => reaction_Qs
          n% reaction_neuQs => reaction_neuQs
          n% eps_neu_total = 0
