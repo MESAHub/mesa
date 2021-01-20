@@ -1544,6 +1544,7 @@
             if (X < s% delta_dX_div_X_cntr_min) cycle
             if (X <= 0d0) cycle
             dX = X - s% xa_old(j,nz)
+            if (s% delta_dX_div_X_drop_only .and. dX > 0) cycle
             abs_dX_div_X = abs(dX/X)
             if (abs_dX_div_X > max_abs_dX_div_X) then
                max_abs_dX_div_X = abs_dX_div_X
@@ -1578,6 +1579,7 @@
          if (lg_XH_cntr > s% delta_lg_XH_cntr_max) return
          if (lg_XH_cntr < s% delta_lg_XH_cntr_min) return
          lg_XH_cntr_old = safe_log10(s% xa_old(h1,nz))
+         if (s% delta_lg_XH_drop_only .and. lg_XH_cntr >= lg_XH_cntr_old) return
          check_lg_XH_cntr = check_change(s, lg_XH_cntr - lg_XH_cntr_old, &
             s% delta_lg_XH_cntr_limit, s% delta_lg_XH_cntr_hard_limit, &
             nz, 'check_lg_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1610,6 +1612,7 @@
          if (lg_XHe_cntr > s% delta_lg_XHe_cntr_max) return
          if (lg_XHe_cntr < s% delta_lg_XHe_cntr_min) return
          lg_XHe_cntr_old = safe_log10(s% xa_old(he4,nz))
+         if (s% delta_lg_XHe_drop_only .and. lg_XHe_cntr >= lg_XHe_cntr_old) return
          check_lg_XHe_cntr = check_change(s, lg_XHe_cntr - lg_XHe_cntr_old, &
             s% delta_lg_XHe_cntr_limit, s% delta_lg_XHe_cntr_hard_limit, &
             nz, 'check_lg_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1645,6 +1648,7 @@
          if (lg_XC_cntr > s% delta_lg_XC_cntr_max) return
          if (lg_XC_cntr < s% delta_lg_XC_cntr_min) return
          lg_XC_cntr_old = safe_log10(s% xa_old(c12,nz))
+         if (s% delta_lg_XC_drop_only .and. lg_XC_cntr >= lg_XC_cntr_old) return
          check_lg_XC_cntr = check_change(s, lg_XC_cntr - lg_XC_cntr_old, &
             s% delta_lg_XC_cntr_limit, s% delta_lg_XC_cntr_hard_limit, &
             nz, 'check_lg_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1681,6 +1685,7 @@
          if (lg_XNe_cntr > s% delta_lg_XNe_cntr_max) return
          if (lg_XNe_cntr < s% delta_lg_XNe_cntr_min) return
          lg_XNe_cntr_old = safe_log10(s% xa_old(o16,nz))
+         if (s% delta_lg_XNe_drop_only .and. lg_XNe_cntr >= lg_XNe_cntr_old) return
          check_lg_XNe_cntr = check_change(s, lg_XNe_cntr - lg_XNe_cntr_old, &
             s% delta_lg_XNe_cntr_limit, s% delta_lg_XNe_cntr_hard_limit, &
             nz, 'check_lg_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1717,6 +1722,7 @@
          if (lg_XO_cntr > s% delta_lg_XO_cntr_max) return
          if (lg_XO_cntr < s% delta_lg_XO_cntr_min) return
          lg_XO_cntr_old = safe_log10(s% xa_old(o16,nz))
+         if (s% delta_lg_XO_drop_only .and. lg_XO_cntr >= lg_XO_cntr_old) return
          check_lg_XO_cntr = check_change(s, lg_XO_cntr - lg_XO_cntr_old, &
             s% delta_lg_XO_cntr_limit, s% delta_lg_XO_cntr_hard_limit, &
             nz, 'check_lg_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1753,6 +1759,7 @@
          if (lg_XSi_cntr > s% delta_lg_XSi_cntr_max) return
          if (lg_XSi_cntr < s% delta_lg_XSi_cntr_min) return
          lg_XSi_cntr_old = safe_log10(s% xa_old(o16,nz))
+         if (s% delta_lg_XSi_drop_only .and. lg_XSi_cntr >= lg_XSi_cntr_old) return
          check_lg_XSi_cntr = check_change(s, lg_XSi_cntr - lg_XSi_cntr_old, &
             s% delta_lg_XSi_cntr_limit, s% delta_lg_XSi_cntr_hard_limit, &
             nz, 'check_lg_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1778,6 +1785,7 @@
          nz = s% nz
          XH_cntr = s% xa(h1,nz)
          XH_cntr_old = s% xa_old(h1,nz)
+         if (s% delta_XH_drop_only .and. XH_cntr >= XH_cntr_old) return
          check_XH_cntr = check_change(s, XH_cntr - XH_cntr_old, &
             s% delta_XH_cntr_limit, s% delta_XH_cntr_hard_limit, &
             nz, 'check_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1803,6 +1811,7 @@
          nz = s% nz
          XHe_cntr = s% xa(he4,nz)
          XHe_cntr_old = s% xa_old(he4,nz)
+         if (s% delta_XHe_drop_only .and. XHe_cntr >= XHe_cntr_old) return
          check_XHe_cntr = check_change(s, XHe_cntr - XHe_cntr_old, &
             s% delta_XHe_cntr_limit, s% delta_XHe_cntr_hard_limit, &
             nz, 'check_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1828,6 +1837,7 @@
          nz = s% nz
          XC_cntr = s% xa(c12,nz)
          XC_cntr_old = s% xa_old(c12,nz)
+         if (s% delta_XC_drop_only .and. XC_cntr >= XC_cntr_old) return
          check_XC_cntr = check_change(s, XC_cntr - XC_cntr_old, &
             s% delta_XC_cntr_limit, s% delta_XC_cntr_hard_limit, &
             nz, 'check_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1853,6 +1863,7 @@
          nz = s% nz
          XNe_cntr = s% xa(ne20,nz)
          XNe_cntr_old = s% xa_old(ne20,nz)
+         if (s% delta_XNe_drop_only .and. XNe_cntr >= XNe_cntr_old) return
          check_XNe_cntr = check_change(s, XNe_cntr - XNe_cntr_old, &
             s% delta_XNe_cntr_limit, s% delta_XNe_cntr_hard_limit, &
             nz, 'check_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1878,6 +1889,7 @@
          nz = s% nz
          XO_cntr = s% xa(o16,nz)
          XO_cntr_old = s% xa_old(o16,nz)
+         if (s% delta_XO_drop_only .and. XO_cntr >= XO_cntr_old) return
          check_XO_cntr = check_change(s, XO_cntr - XO_cntr_old, &
             s% delta_XO_cntr_limit, s% delta_XO_cntr_hard_limit, &
             nz, 'check_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
@@ -1903,6 +1915,7 @@
          nz = s% nz
          XSi_cntr = s% xa(si28,nz)
          XSi_cntr_old = s% xa_old(si28,nz)
+         if (s% delta_XSi_drop_only .and. XSi_cntr >= XSi_cntr_old) return
          check_XSi_cntr = check_change(s, XSi_cntr - XSi_cntr_old, &
             s% delta_XSi_cntr_limit, s% delta_XSi_cntr_hard_limit, &
             nz, 'check_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)

@@ -24,7 +24,7 @@
    
       ! limit max_model_number as part of test_suite
       max_model_number = 200
-      max_number_retries = 0
+      !max_number_retries = 0
 
 
 ! wind
@@ -39,7 +39,7 @@
       
 ! timesteps
       max_timestep_factor = 1.05d0
-      max_timestep = 1d3 ! 1d0
+      max_timestep = 1d2 ! 1d0
 
 ! mesh
 

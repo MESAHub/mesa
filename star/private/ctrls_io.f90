@@ -445,6 +445,9 @@
     delta_log_eps_nuc_limit, delta_log_eps_nuc_hard_limit, delta_lgT_max_limit_lgT_min, &
     delta_lgT_max_at_high_T_limit, delta_lgT_max_at_high_T_hard_limit, delta_lgT_max_at_high_T_limit_lgT_min, &
     delta_dX_div_X_cntr_min, delta_dX_div_X_cntr_max, delta_dX_div_X_cntr_limit, delta_dX_div_X_cntr_hard_limit, &
+    delta_dX_div_X_drop_only, delta_lg_XH_drop_only, &
+    delta_lg_XHe_drop_only, delta_lg_XC_drop_only, delta_lg_XNe_drop_only, delta_lg_XO_drop_only, delta_lg_XSi_drop_only, &
+    delta_XH_drop_only, delta_XHe_drop_only, delta_XC_drop_only, delta_XNe_drop_only, delta_XO_drop_only, delta_XSi_drop_only, &    
     delta_lg_XH_cntr_min, delta_lg_XH_cntr_max, delta_lg_XH_cntr_limit, delta_lg_XH_cntr_hard_limit, &
     delta_lg_XHe_cntr_min, delta_lg_XHe_cntr_max, delta_lg_XHe_cntr_limit, delta_lg_XHe_cntr_hard_limit, &
     delta_lg_XC_cntr_min, delta_lg_XC_cntr_max, delta_lg_XC_cntr_limit, delta_lg_XC_cntr_hard_limit, &
@@ -2243,6 +2246,20 @@
  s% delta_dX_div_X_cntr_limit = delta_dX_div_X_cntr_limit
  s% delta_dX_div_X_cntr_hard_limit = delta_dX_div_X_cntr_hard_limit
 
+ s% delta_dX_div_X_drop_only = delta_dX_div_X_drop_only
+ s% delta_lg_XH_drop_only = delta_lg_XH_drop_only
+ s% delta_lg_XHe_drop_only = delta_lg_XHe_drop_only
+ s% delta_lg_XC_drop_only = delta_lg_XC_drop_only
+ s% delta_lg_XNe_drop_only = delta_lg_XNe_drop_only
+ s% delta_lg_XO_drop_only = delta_lg_XO_drop_only
+ s% delta_lg_XSi_drop_only = delta_lg_XSi_drop_only
+ s% delta_XH_drop_only = delta_XH_drop_only
+ s% delta_XHe_drop_only = delta_XHe_drop_only
+ s% delta_XC_drop_only = delta_XC_drop_only
+ s% delta_XNe_drop_only = delta_XNe_drop_only
+ s% delta_XO_drop_only = delta_XO_drop_only
+ s% delta_XSi_drop_only = delta_XSi_drop_only
+
  s% delta_lg_XH_cntr_min = delta_lg_XH_cntr_min
  s% delta_lg_XH_cntr_max = delta_lg_XH_cntr_max
  s% delta_lg_XH_cntr_limit = delta_lg_XH_cntr_limit
@@ -3851,6 +3868,20 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  delta_dX_div_X_cntr_max = s% delta_dX_div_X_cntr_max
  delta_dX_div_X_cntr_limit = s% delta_dX_div_X_cntr_limit
  delta_dX_div_X_cntr_hard_limit = s% delta_dX_div_X_cntr_hard_limit
+
+ delta_dX_div_X_drop_only = s% delta_dX_div_X_drop_only
+ delta_lg_XH_drop_only = s% delta_lg_XH_drop_only
+ delta_lg_XHe_drop_only = s% delta_lg_XHe_drop_only
+ delta_lg_XC_drop_only = s% delta_lg_XC_drop_only
+ delta_lg_XNe_drop_only = s% delta_lg_XNe_drop_only
+ delta_lg_XO_drop_only = s% delta_lg_XO_drop_only
+ delta_lg_XSi_drop_only = s% delta_lg_XSi_drop_only
+ delta_XH_drop_only = s% delta_XH_drop_only
+ delta_XHe_drop_only = s% delta_XHe_drop_only
+ delta_XC_drop_only = s% delta_XC_drop_only
+ delta_XNe_drop_only = s% delta_XNe_drop_only
+ delta_XO_drop_only = s% delta_XO_drop_only
+ delta_XSi_drop_only = s% delta_XSi_drop_only
 
  delta_lg_XH_cntr_min = s% delta_lg_XH_cntr_min
  delta_lg_XH_cntr_max = s% delta_lg_XH_cntr_max

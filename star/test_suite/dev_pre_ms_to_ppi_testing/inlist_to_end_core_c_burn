@@ -8,6 +8,15 @@
       save_model_when_terminate = .true.
       save_model_filename = 'after_core_c_burn.mod'
       required_termination_code_string = 'xa_central_lower_limit'
+
+
+      replace_initial_element = .true.
+      chem_name1 = 'h1'
+      chem_name2 = 'he4'
+      !replace_element_nzlo = -1
+      !replace_element_nzhi = -1
+
+
       
       ! for plotting history vs age
       set_initial_age = .true.

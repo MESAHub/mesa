@@ -1220,6 +1220,20 @@
 
          real(dp) :: delta_log_eps_nuc_limit
          real(dp) :: delta_log_eps_nuc_hard_limit
+         
+         logical :: delta_dX_div_X_drop_only
+         logical :: delta_lg_XH_drop_only
+         logical :: delta_lg_XHe_drop_only
+         logical :: delta_lg_XC_drop_only
+         logical :: delta_lg_XNe_drop_only
+         logical :: delta_lg_XO_drop_only
+         logical :: delta_lg_XSi_drop_only
+         logical :: delta_XH_drop_only
+         logical :: delta_XHe_drop_only
+         logical :: delta_XC_drop_only
+         logical :: delta_XNe_drop_only
+         logical :: delta_XO_drop_only
+         logical :: delta_XSi_drop_only
 
          real(dp) :: delta_dX_div_X_cntr_limit
          real(dp) :: delta_dX_div_X_cntr_hard_limit

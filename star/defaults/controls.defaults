@@ -10904,6 +10904,53 @@
     delta_XSi_cntr_hard_limit = 0.05d0
 
 
+      ! delta_dX_div_X_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XH_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XHe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XC_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XNe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XO_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XSi_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XH_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XHe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XC_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XNe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XO_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XSi_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+         
+
+      ! If true, then only limit drops in abundance. 
+
+      ! ::
+
+   delta_dX_div_X_drop_only = .false.
+   delta_lg_XH_drop_only = .false.
+   delta_lg_XHe_drop_only = .false.
+   delta_lg_XC_drop_only = .false.
+   delta_lg_XNe_drop_only = .false.
+   delta_lg_XO_drop_only = .false.
+   delta_lg_XSi_drop_only = .false.
+   delta_XH_drop_only = .false.
+   delta_XHe_drop_only = .false.
+   delta_XC_drop_only = .false.
+   delta_XNe_drop_only = .false.
+   delta_XO_drop_only = .false.
+   delta_XSi_drop_only = .false.
+
+
    ! limits based on changes in mass of the star
    ! ___________________________________________
 

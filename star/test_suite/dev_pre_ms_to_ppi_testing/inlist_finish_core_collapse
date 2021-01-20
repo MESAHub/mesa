@@ -22,9 +22,8 @@
 &controls
    
       ! limit max_model_number as part of test_suite
-      max_model_number = 10000
-      
-      max_number_retries = 30
+      max_model_number = 10000      
+      !max_number_retries = 30
 
       fe_core_infall_limit = 300d5
       non_fe_core_infall_limit = 1d99
@@ -36,7 +35,7 @@
       ! controls for removing surface layer.  see run_star_extras for details
       x_logical_ctrl(1) = .true. ! switch BCs
       x_logical_ctrl(2) = .true. ! check v vs v escape
-      x_ctrl(15) = 100 ! 2d4 ! if vsurf (kms) > this, switch to fixed_vsurf BC with the current vsurf
+      x_ctrl(15) = 100 ! if vsurf (kms) > this, switch to fixed_vsurf BC with the current vsurf
       x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
       x_ctrl(18) = 1d0 ! only remove if remaining q(k) < this
       x_ctrl(19) = 0.99d0 ! only check v/v_esc for q(k) >= this
@@ -69,6 +68,10 @@
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
       use_d_eos_dxa = .true.
+
+      use_avQ_art_visc = .true.
+      avQ_cq = 4.0d0
+      avQ_zsh = 0.1d0
       
       use_momentum_outer_BC = .true.
       
