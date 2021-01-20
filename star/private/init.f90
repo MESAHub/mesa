@@ -628,11 +628,6 @@
          s% other_eosDT_get_T => null_other_eosDT_get_T
          s% other_eosDT_get_Rho => null_other_eosDT_get_Rho
 
-         s% other_eosPT_get => null_other_eosPT_get
-         s% other_eosPT_get_T => null_other_eosPT_get_T
-         s% other_eosPT_get_Pgas => null_other_eosPT_get_Pgas
-         s% other_eosPT_get_Pgas_for_Rho => null_other_eosPT_get_Pgas_for_Rho
-
          s% other_eosDE_get => null_other_eosDE_get
 
          s% other_kap_get => null_other_kap_get
