@@ -435,11 +435,7 @@ contains
        return
     end if
     s% Prad(k) = crad * T*T*T*T / 3
-    if (s% use_eosDT_ideal_gas) then
-       s% P(k) = s% Pgas(k)
-    else
-       s% P(k) = s% Prad(k) + s% Pgas(k)
-    end if
+    s% P(k) = s% Prad(k) + s% Pgas(k)
     s% lnP(k) = log(s% P(k))
     s% lnS(k) = res(i_lnS)
     s% lnE(k) = res(i_lnE)

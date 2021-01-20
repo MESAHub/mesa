@@ -48,11 +48,10 @@
       
       
       subroutine null_other_eosDT_get( &
-              id, k, handle, Z, X, abar, zbar, & 
+              id, k, handle, &
               species, chem_id, net_iso, xa, &
               Rho, log10Rho, T, log10T, & 
-              res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-              d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
+              res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, ierr)
 
          ! INPUT
          use chem_def, only: num_chem_isos
@@ -61,13 +60,6 @@
          integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
          integer, intent(in) :: handle ! eos handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar
-            ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
@@ -90,19 +82,18 @@
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          ! partial derivatives of the basic results wrt lnd and lnT
          real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)  
-         ! d_dlnRho_c_T(i) = d(res(i))/dlnd|T
+         ! d_dlnRho(i) = d(res(i))/dlnd|T
          real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
          ! d_dlnT(i) = d(res(i))/dlnT|Rho
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results,species)
+         ! d_dxa(i,j) = d(res(i))/dxa(j)|T,Rho
          
          integer, intent(out) :: ierr ! 0 means AOK.
          
          res = 0
          d_dlnRho_const_T = 0
          d_dlnT_const_Rho = 0
-         d_dabar_const_TRho = 0
-         d_dzbar_const_TRho = 0
+         d_dxa_const_TRho = 0
 
          write(*,*) 'no implementation for other_eosDT_get'
          ierr = -1
