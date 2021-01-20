@@ -2464,10 +2464,10 @@
 
       ! ::
 
-    overshoot_scheme(:) = ''
-    overshoot_zone_type(:) = ''
-    overshoot_zone_loc(:) = ''
-    overshoot_bdy_loc(:) = ''
+    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``other``
+    overshoot_zone_type(:) = '' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
+    overshoot_zone_loc(:) = '' ! ``core``, ``shell``, ``any``
+    overshoot_bdy_loc(:) = '' ! ``bottom``, ``top``, ``any``
 
       ! Amount of overshooting from edge of convective zone
       ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
@@ -8886,7 +8886,7 @@
       !          'Lnuc_cat'             delta_lgL_nuc_cat_limit
       !          'Lnuc_H'               delta_lgL_H_limit
       !          'Lnuc_He'              delta_lgL_He_limit
-      !          'Lnuc_photo'           delta_lgL_power_photo_limit
+      !          'lgL_power_phot'       delta_lgL_power_photo_limit 
       !          'Lnuc_z'               delta_lgL_z_limit
       !          'bad_X_sum'            (solver found bad mass sum)
       !          'dH'                   dH_limit
@@ -8944,6 +8944,9 @@
       !          'solver iters'         solver_iters_timestep_limit
       !          'rel_E_err'            limit_for_rel_error_in_energy_conservation
       !          'varcontrol'           varcontrol_target
+      !          'max increase'         max_timestep_factor or max_timestep_factor_at_high_T
+      !          'max decrease'         min_timestep_factor
+      !          'retry'                (just did a retry)
       !          'b_****'               see binary/defaults/binary_controls.defaults
 
 
