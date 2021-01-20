@@ -111,13 +111,6 @@
             return
          end if
 
-         if (s% L_nuc_burn_total > 0 .and. s% M_center == 0 .and. &
-               s% chem_id(maxloc(s% xa(:,s% nz),dim=1)) == ih1 .and. &
-               safe_log10(s% L_nuc_burn_total) < s% remesh_log_L_nuc_burn_min) then
-            if (dbg_remesh) write(*,*) 'remesh_log_L_nuc_burn_min'
-            return
-         end if
-
          species = s% species
          nz_old = s% nz
          nz = nz_old

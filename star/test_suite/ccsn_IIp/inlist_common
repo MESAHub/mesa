@@ -6,8 +6,8 @@
  
    show_log_description_at_start = .false.
 
-   change_v_flag = .true.
-   new_v_flag = .true.
+!   change_v_flag = .true.
+!   new_v_flag = .true.
 
    set_initial_age = .true.
    initial_age = 0

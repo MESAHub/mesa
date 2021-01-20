@@ -11,16 +11,19 @@ do_one inlist_infall_header finished_infall.mod LOGS_part_infall
 do_one inlist_end_infall_header ready_for_edep.mod LOGS_part_end_infall
 do_one inlist_edep_header done_with_edep.mod LOGS_part_edep
 do_one inlist_shock_part1_header shock_part1.mod LOGS_part1
-do_one inlist_shock_part2_header shock_part2.mod LOGS_part2
 
-# check if can skip shock_part3
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_shock_part2.mod shock_part2.mod
+else
+   do_one inlist_shock_part2_header shock_part2.mod LOGS_part2
+fi
+
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_shock_part3.mod shock_part3.mod
 else
    do_one inlist_shock_part3_header shock_part3.mod LOGS_part3
 fi
 
-# check if can skip shock_part4
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_shock_part4.mod shock_part4.mod
 else

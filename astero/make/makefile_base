@@ -72,6 +72,9 @@ install:
 	@$(CP_IF_NEWER) astero_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 	@$(CP_IF_NEWER) ../public/*.inc $(MESA_DIR)/include
+ifeq ($(FC),ifort)
+	@$(CP_IF_NEWER) astero_support.mod $(MESA_DIR)/include
+endif
 
 nodeps : $(.DEFAULT_GOAL)
 
@@ -140,5 +143,10 @@ endif
 
 ifeq ($(USE_GYRE),NO)
 gyre_support.mod : gyre_support_stub.o
+	@true
+endif
+
+ifeq ($(USE_PGSTAR),NO)
+pgstar_astero_plots.mod : pgstar_astero_plots_stub.o
 	@true
 endif

@@ -52,7 +52,7 @@
          remesh_split_merge = keep_going
          if (.not. s% okay_to_remesh) return
 
-         if (.not. s% u_flag) stop 'remesh_split_merge requires u_flag = true'
+         !if (.not. s% u_flag) stop 'remesh_split_merge requires u_flag = true'
 
          if (s% rotation_flag) then
             old_J = total_angular_momentum(s)
@@ -120,7 +120,7 @@
                num_merge = num_merge + 1
                if (s% trace_split_merge_amr) then
                   call report_energies(s,'after merge')
-                  write(*,*)
+                  !write(*,*)
                end if
                cycle
             end if
@@ -136,7 +136,7 @@
                num_split = num_split + 1
                if (s% trace_split_merge_amr) then
                   call report_energies(s,'after split')
-                  write(*,*)
+                  !write(*,*)
                end if
                cycle
             end if
@@ -145,7 +145,8 @@
          do iter = 1, 100
             call emergency_merge(s, iTooSmall)
             if (iTooSmall == 0) exit
-            if (s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_merge', iTooSmall, s% dq(iTooSmall)
             call do_merge(s, iTooSmall, species, new_xa, ierr)
@@ -153,13 +154,14 @@
             num_merge = num_merge + 1
             if (s% trace_split_merge_amr) then
                call report_energies(s,'after emergency_merge')
-               write(*,*)
+               !write(*,*)
             end if
          end do
          do iter = 1, 100
             call emergency_split(s, iTooBig)
             if (iTooBig == 0) exit
-            if (s% amr_split_merge_has_undergone_remesh(iTooBig)) exit
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  s% amr_split_merge_has_undergone_remesh(iTooBig)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_split', iTooBig, s% dq(iTooBig)
             call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
@@ -167,7 +169,7 @@
             num_split = num_split + 1
             if (s% trace_split_merge_amr) then
                call report_energies(s,'after emergency_split')
-               write(*,*)
+               !write(*,*)
             end if
          end do
          s% mesh_call_number = s% mesh_call_number + 1
@@ -238,6 +240,7 @@
             outer_dx_baseline, inner_dx_baseline, inner_outer_q
          logical :: log_zoning, logtau_zoning, du_div_cs_limit_flag
          integer :: nz, nz_baseline, k, kmin
+         real(dp), pointer :: v(:), r_for_v(:)
 
          include 'formats'
          
@@ -248,6 +251,15 @@
          dq_min = s% split_merge_amr_dq_min
          dq_max = s% split_merge_amr_dq_max
          inner_outer_q = 0d0
+         if (s% u_flag) then
+            v => s% u
+            r_for_v => s% rmid
+         else if (s% v_flag) then
+            v => s% v
+            r_for_v => s% r
+         else
+            nullify(v,r_for_v)
+         end if
          
          if (logtau_zoning) then
             k = nz
@@ -284,7 +296,8 @@
             else
                xR = s% r(k)
             end if
-            if (s% split_merge_amr_avoid_repeated_remesh .and. s% amr_split_merge_has_undergone_remesh(k)) cycle
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  (s% split_merge_amr_avoid_repeated_remesh .and. s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
             
@@ -308,29 +321,30 @@
             end if
 
             du_div_cs_limit_flag = .false.
+
             if (.not. s% merge_amr_du_div_cs_limit_only_for_compression) then
                du_div_cs_limit_flag = .true.
-            else
+            else if (associated(v)) then
                if (k < nz) then
-                  if (s% u(k+1)*pow2(s% rmid(k+1)) > s% u(k)*pow2(s% rmid(k))) then
+                  if (v(k+1)*pow2(r_for_v(k+1)) > v(k)*pow2(r_for_v(k))) then
                      du_div_cs_limit_flag = .true.
                   end if
                end if
                if (.not. du_div_cs_limit_flag .and. k > 1) then
-                  if (s% u(k)*pow2(s% rmid(k)) > s% u(k-1)*pow2(s% rmid(k-1))) then
+                  if (v(k)*pow2(r_for_v(k)) > v(k-1)*pow2(r_for_v(k-1))) then
                      du_div_cs_limit_flag = .true.
                   end if
                end if
             end if
 
-            if (du_div_cs_limit_flag) then
+            if (du_div_cs_limit_flag .and. associated(v)) then
                if (k == 1) then 
-                  abs_du_div_cs = abs(s% u(k) - s% u(k+1))/s% csound(k)
+                  abs_du_div_cs = abs(v(k) - v(k+1))/s% csound(k)
                else if (k == nz) then
-                  abs_du_div_cs = abs(s% u(nz-1) - s% u(nz))/s% csound(nz)
+                  abs_du_div_cs = abs(v(nz-1) - v(nz))/s% csound(nz)
                else
-                  abs_du_div_cs = max(abs(s% u(k) - s% u(k+1)), &
-                            abs(s% u(k) - s% u(k-1)))/s% csound(k)
+                  abs_du_div_cs = max(abs(v(k) - v(k+1)), &
+                            abs(v(k) - v(k-1)))/s% csound(k)
                end if
             else
                abs_du_div_cs = 0d0
@@ -417,9 +431,11 @@
          
          if (merge_center) i = i-1
          ip = i+1
-         if (s% amr_split_merge_has_undergone_remesh(i) .or. s% amr_split_merge_has_undergone_remesh(ip)) then
+         if (s% split_merge_amr_avoid_repeated_remesh .and. &
+               (s% amr_split_merge_has_undergone_remesh(i) .or. s% amr_split_merge_has_undergone_remesh(ip))) then
             s% amr_split_merge_has_undergone_remesh(i) = .true.
             s% amr_split_merge_has_undergone_remesh(ip) = .true.
+            
             return
          end if
 
@@ -487,9 +503,14 @@
          end do
 
          KE = KE_i + KE_ip
-         v = sqrt(KE/(0.5d0*dm))
-         if (s% u(i) < 0d0) v = -v
-         s% u(i) = v
+         if (s% u_flag) then
+            v = sqrt(KE/(0.5d0*dm))
+            if (s% u(i) < 0d0) v = -v
+            s% u(i) = v
+         else if (s% v_flag) then
+            ! there's no good solution for this.
+            ! so just leave s% v(i) unchanged.
+         end if
 
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
@@ -517,7 +538,11 @@
             s% m(im) = s% m(i0)
             s% dq(im) = s% dq(i0)
             s% q(im) = s% q(i0)
-            s% u(im) = s% u(i0)
+            if (s% u_flag) then
+               s% u(im) = s% u(i0)
+            else if (s% v_flag) then
+               s% v(im) = s% v(i0)
+            end if
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
@@ -536,9 +561,15 @@
 
          nz = nz - 1
          s% nz = nz
-
-         s% xh(s% i_u,i) = s% u(i)
+         
+         if (s% u_flag) then
+            s% xh(s% i_u,i) = s% u(i)
+         else if (s% v_flag) then
+            s% xh(s% i_v,i) = s% v(i)
+         end if
+         
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
+         
          if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
@@ -600,11 +631,20 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: Etot, KE, PE, IE
-         real(dp) :: dm, mC, v, P, rL, rC
+         real(dp) :: dm, mC, v0, v1, P, rL, rC
          include 'formats'
          dm = s% dm(k)
-         v = s% u(k)
-         KE = 0.5d0*dm*v*v
+         if (s% u_flag) then
+            KE = 0.5d0*dm*s% u(k)**2
+         else if (s% v_flag) then
+            v0 = s% v(k)
+            if (k < s% nz) then
+               v1 = s% v(k+1)
+            else
+               v1 = s% v_center
+            end if
+            KE = 0.25d0*dm*(v0**2 + v1**2)
+         end if
          P = s% P(k)
          IE = s% energy(k)*dm
          if (s% cgrav(k) == 0) then
@@ -664,7 +704,7 @@
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
          integer, intent(out) :: ierr
-         integer :: i, ip, j, jp, k, q, nz, nz_old, &
+         integer :: i, ip, j, jp, q, nz, nz_old, &
             iR, iC, iL, imin, imax, op_err
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, rho_RR, rho_iR, &
@@ -748,8 +788,10 @@
 
          dm = s% dm(i)
          rho = dm/dV
+         
          v = s% u(i)
          v2 = v*v
+         
          energy = s% energy(i)
             
          ! estimate values of energy and velocity^2 at cell boundaries
@@ -769,18 +811,12 @@
             iL = nz_old
          end if
          
-         v_R = s% u(iR)
-         v2_R = v_R*v_R
          energy_R = s% energy(iR)
          rho_R = s% dm(iR)/get_dV(s,iR)
          
-         v_C = s% u(iC)
-         v2_C = v_C*v_C
          energy_C = s% energy(iC)
          rho_C = s% dm(iC)/get_dV(s,iC)
          
-         v_L = s% u(iL)
-         v2_L = v_L*v_L
          energy_L = s% energy(iL)
          rho_L = s% dm(iL)/get_dV(s,iL)
             
@@ -809,15 +845,32 @@
          end if
 
          grad_energy = get1_grad(energy_L, energy_C, energy_R, dLeft, dCntr, dRght)
-         
-         if ((v_L - v_C)*(v_C - v_R) <= 0) then ! not strictly monotonic velocities
-            grad_v2 = 0d0
-         else
-            grad_v2 = get1_grad(v2_L, v2_C, v2_R, dLeft, dCntr, dRght)
-         end if
             
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
+         
+         if (s% u_flag) then
+            v_R = s% u(iR)
+            v2_R = v_R*v_R
+            v_C = s% u(iC)
+            v2_C = v_C*v_C         
+            v_L = s% u(iL)
+            v2_L = v_L*v_L
+            if ((v_L - v_C)*(v_C - v_R) <= 0) then ! not strictly monotonic velocities
+               grad_v2 = 0d0
+            else
+               grad_v2 = get1_grad(v2_L, v2_C, v2_R, dLeft, dCntr, dRght)
+            end if
+         else if (s% v_flag) then
+            if (iL == s% nz) then
+               v_L = s% v_center
+            else
+               v_L = s% v(ip)
+            end if
+            v2_L = v_L*v_L
+            v_R = s% v(i)
+            v2_R = v_R*v_R
+         end if
 
          do q = 1, species
             grad_xa(q) = get1_grad( &
@@ -847,7 +900,11 @@
                s% m(jp) = s% m(j)
                s% dq(jp) = s% dq(j)
                s% q(jp) = s% q(j)
-               s% u(jp) = s% u(j)
+               if (s% u_flag) then
+                  s% u(jp) = s% u(j)
+               else if (s% v_flag) then
+                  s% v(jp) = s% v(j)
+               end if
                s% energy(jp) = s% energy(j)
                s% dPdr_dRhodr_info(jp) = s% dPdr_dRhodr_info(j)
                s% cgrav(jp) = s% cgrav(j)
@@ -947,22 +1004,25 @@
             energy_R = energy
             energy_L = energy
          end if
-
-         v2_R = v2 + grad_v2*dr/4
-         v2_L = (dm*v2 - dmR*v2_R)/dmL
-         if (v2_R < 0d0 .or. v2_L < 0d0) then
-            v2_R = v2
-            v2_L = v2
-         end if
          
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
 
-         s% u(i) = sqrt(v2_R)
-         s% u(ip) = sqrt(v2_L)
-         if (v < 0d0) then
-            s% u(i) = -s% u(i)
-            s% u(ip) = -s% u(ip)
+         if (s% u_flag) then
+            v2_R = v2 + grad_v2*dr/4
+            v2_L = (dm*v2 - dmR*v2_R)/dmL
+            if (v2_R < 0d0 .or. v2_L < 0d0) then
+               v2_R = v2
+               v2_L = v2
+            end if
+            s% u(i) = sqrt(v2_R)
+            s% u(ip) = sqrt(v2_L)
+            if (v < 0d0) then
+               s% u(i) = -s% u(i)
+               s% u(ip) = -s% u(ip)
+            end if
+         else if (s% v_flag) then ! just make a rough approximation. 
+            s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
          end if
          
          if (s% RTI_flag) then ! set new alpha
@@ -1026,8 +1086,8 @@
                s% xa(q,ip) = s% xa(q,ip)/sumxp
             end do
          end if
-
-         s% u_face(ip) = 0.5d0*(s% u(i) + s% u(ip))
+         
+         if (s% u_flag) s% u_face(ip) = 0.5d0*(s% u(i) + s% u(ip))
 
          ! r, q, m, u_face unchanged for face i
          dVR = dV - dVL
@@ -1095,8 +1155,13 @@
          end if
 
          s% xh(s% i_lnR,ip) = log(s% r(ip))
-         s% xh(s% i_u,i) = s% u(i)
-         s% xh(s% i_u,ip) = s% u(ip)
+         if (s% u_flag) then
+            s% xh(s% i_u,i) = s% u(i)
+            s% xh(s% i_u,ip) = s% u(ip)
+         else if (s% v_flag) then
+            s% xh(s% i_v,i) = s% v(i)
+            s% xh(s% i_v,ip) = s% v(ip)
+         end if
          if (s% RTI_flag) then
             s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
             s% xh(s% i_alpha_RTI,ip) = s% alpha_RTI(ip)
@@ -1201,13 +1266,22 @@
       real(dp) function total_KE(s)
          type (star_info), pointer :: s
          integer :: k
-         real(dp) :: v
+         real(dp) :: v0, v1
          include 'formats'
          total_KE = 0
-         do k=1,s% nz
-            v = s% u(k)
-            total_KE = total_KE + 0.5d0*s% dm(k)*v*v
-         end do
+         if (s% u_flag) then
+            do k=1,s% nz
+               total_KE = total_KE + 0.5d0*s% dm(k)*s% u(k)**2
+            end do
+         else if (s% v_flag) then
+            do k=1,s% nz-1
+               total_KE = total_KE + &
+                  0.25d0*s% dm(k)*(s% v(k)**2 + s% v(k+1)**2)
+            end do
+            k = s% nz
+            total_KE = total_KE + &
+               0.25d0*s% dm(k)*(s% v(k)**2 + s% v_center**2)
+         end if
       end function total_KE
 
 
@@ -1244,6 +1318,10 @@
          character (len=*), intent(in) :: str
          real(dp) :: KE, IE, PE, Etot
          include 'formats'
+         
+         return
+         
+         
          KE = total_KE(s)
          IE = total_IE(s)
          PE = total_PE(s)

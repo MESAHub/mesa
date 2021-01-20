@@ -324,7 +324,6 @@
 
          s% phase_of_evolution = phase_starting
          s% recent_log_header = -1000
-         s% profile_age = -1d0
 
          s% tau_base = 2d0/3d0
          s% tau_factor = 1
@@ -344,7 +343,6 @@
          s% astero_revised_max_yr_dt = 0
 
          s% cumulative_energy_error = 0
-
          s% cumulative_extra_heating = 0
 
          s% have_initial_energy_integrals = .false.
@@ -358,7 +356,9 @@
          s% model_number = 0
          s% RSP_have_set_velocities = .false.
          s% RSP_just_set_velocities = .false.
-
+         
+         s% dt = 0d0
+         s% mstar_dot = 0d0
          s% boost_mlt_alfa = 0
 
          s% power_nuc_burn = -1
@@ -370,7 +370,6 @@
          s% k_const_mass = 1
          s% k_below_just_added = 1
          s% k_below_const_q = 1
-         s% k_CpTMdot_lt_L = 1
 
          s% why_Tlim = Tlim_struc
          s% dt_why_count(:) = 0
@@ -686,7 +685,6 @@
          s% R_center = 0
          s% L_center = 0
          s% time = 0
-         s% total_radiation = 0
          s% total_angular_momentum = 0
          s% prev_create_atm_R0_div_R = 0
 
@@ -738,8 +736,6 @@
 
          s% recent_log_header = -1000
          s% phase_of_evolution = 0
-
-         s% profile_age = 0
 
          s% num_solver_iterations = 0
          s% num_skipped_setvars = 0

@@ -23,7 +23,7 @@
       save_model_filename = 'final.mod'
       !required_termination_code_string = 'max_age'
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist

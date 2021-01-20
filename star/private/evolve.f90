@@ -62,6 +62,7 @@
          end if
          
          if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            write(*,*) 'fill_arrays_with_NaNs at start of step'
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -139,7 +140,6 @@
             s% boost_mlt_alfa = -999
             s% burn_nstep_max = -999
             s% burn_nfcn_total = -999
-            s% k_CpTMdot_lt_L = -999
             s% dX_nuc_drop_max_k = -999
             s% dX_nuc_drop_max_j = -999
             s% solver_test_partials_var = -999
@@ -161,7 +161,6 @@
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf_old)
             call set_to_NaN(s% dt_limit_ratio_old)
-            call set_to_NaN(s% total_radiation_old)
             call set_to_NaN(s% total_angular_momentum_old)
             call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% astero_revised_max_yr_dt_old)
@@ -181,7 +180,6 @@
                call set_to_NaN(s% cz_bot_mass_old(j))
             end do      
 
-            call set_to_NaN(s% mstar_dot)
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% adjust_J_q)
             call set_to_NaN(s% rotational_mdot_boost)
@@ -263,7 +261,6 @@
             call set_to_NaN(s% adjust_mass_mid_frac_sub1)
             call set_to_NaN(s% adjust_mass_inner_frac_sub1)
             call set_to_NaN(s% h1_czb_mass)
-            call set_to_NaN(s% profile_age)
             call set_to_NaN(s% h1_czb_mass)            
             call set_to_NaN(s% total_angular_momentum)
             call set_to_NaN(s% total_abs_angular_momentum)
@@ -348,7 +345,6 @@
             call set_to_NaN(s% virial_thm_P_avg)
             call set_to_NaN(s% total_eps_grav)
             call set_to_NaN(s% total_eps_mdot)
-            call set_to_NaN(s% total_radiation)
             call set_to_NaN(s% work_outward_at_surface)
             call set_to_NaN(s% work_inward_at_center)
             call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
@@ -363,7 +359,6 @@
             call set_to_NaN(s% log_P_center_old)
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% cumulative_extra_heating_old)
-            call set_to_NaN(s% total_radiation_old)        
             call set_to_NaN(s% mesh_adjust_IE_conservation)
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% mesh_adjust_KE_conservation)
@@ -404,9 +399,7 @@
          use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
-         use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
-            cell_specific_total_energy, reset_epsnuc_vectors, set_qs, &
-            set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
+         use star_utils
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
@@ -447,6 +440,7 @@
          end if
 
          ! unpack some of the input information
+         call reset_starting_vectors(s)
          nz = s% nz
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (failed('set_qs')) return
@@ -676,6 +670,7 @@
             
             dt = s% dt
             s% time = s% time_old + dt
+            s% star_age = s% time/secyer
             s% okay_to_set_mixing_info = .true.
 
             if (s% v_center /= 0d0) then ! adjust R_center               
@@ -699,6 +694,7 @@
 
                call do_adjust_mass(s, s% species, ierr)
                if (failed('do_adjust_mass')) return
+               s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
                if (failed('set_vars_if_needed after do_adjust_mass')) return
 
@@ -1434,6 +1430,12 @@
             s% cumulative_energy_error = s% cumulative_energy_error_old + &
                s% error_in_energy_conservation
 
+            s% total_internal_energy = s% total_internal_energy_end
+            s% total_gravitational_energy = s% total_gravitational_energy_end
+            s% total_radial_kinetic_energy = s% total_radial_kinetic_energy_end
+            s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
+            s% total_turbulent_energy = s% total_turbulent_energy_end
+            s% total_energy = s% total_energy_end
          
             if (s% model_number == s% energy_conservation_dump_model_number &
                   .and. .not. s% doing_relax) then
@@ -1572,13 +1574,13 @@
                   diff_total_turbulent_energy = &
                      s% total_turbulent_energy_end - s% total_turbulent_energy_start
                      
-                  write(*,2) 'post split rel err sum_cell_de', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_de', s% model_number, &
                      (sum_cell_de - diff_total_internal_energy)/s% total_energy, &
                      sum_cell_de, diff_total_internal_energy
-                  write(*,2) 'post split rel err sum_cell_dpe', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_dpe', s% model_number, &
                      (sum_cell_dpe - diff_total_gravitational_energy)/s% total_energy, &
                      sum_cell_dpe, diff_total_gravitational_energy
-                  write(*,2) 'post split rel err sum_cell_dke', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_dke', s% model_number, &
                      (sum_cell_dke - diff_total_kinetic_energy)/s% total_energy, &
                      sum_cell_dke, diff_total_kinetic_energy
                   !write(*,2) 'rel err ', s% model_number, &
@@ -1655,13 +1657,6 @@
                stop 'okay_energy_conservation'
                return
             end if
-
-            s% total_internal_energy = s% total_internal_energy_end
-            s% total_gravitational_energy = s% total_gravitational_energy_end
-            s% total_radial_kinetic_energy = s% total_radial_kinetic_energy_end
-            s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
-            s% total_turbulent_energy = s% total_turbulent_energy_end
-            s% total_energy = s% total_energy_end
 
             okay_energy_conservation = .true.
 
@@ -2346,11 +2341,16 @@
          retry_factor = s% timestep_factor_for_retries
          s% dt = s% dt*retry_factor
          if (len_trim(s% retry_message) > 0) then
-            write(*,'(a, i8)') ' retry: ' // trim(s% retry_message), s% model_number
+            if (s% retry_message_k > 0) then
+               write(*,'(a, 2i8)') ' retry: ' // trim(s% retry_message), s% retry_message_k, s% model_number
+            else
+               write(*,'(a, i8)') ' retry: ' // trim(s% retry_message), s% model_number
+            end if
          else
             write(*,'(a, i8)') ' retry', s% model_number
             !if (.true.) stop 'failed to set retry_message'
          end if
+         s% retry_message_k = 0
          if (s% report_ierr) &
             write(*,'(a50,2i6,3f16.6)') 'retry log10(dt/yr), log10(dt), retry_factor', &
                s% retry_cnt, s% model_number, log10(s% dt*retry_factor/secyer), &
@@ -2523,7 +2523,6 @@
          write(*,1) 'set_age', age
          s% time = age*secyer
          s% star_age = age
-         s% profile_age = age
       end subroutine set_age
 
 

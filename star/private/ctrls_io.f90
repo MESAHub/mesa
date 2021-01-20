@@ -226,8 +226,7 @@
     relax_dlnZ, relax_dY, &
     
     ! mesh adjustment
-    remesh_log_L_nuc_burn_min, show_mesh_changes, okay_to_remesh, &
-    restore_mesh_on_retry, num_steps_to_hold_mesh_after_retry, &
+    show_mesh_changes, okay_to_remesh, restore_mesh_on_retry, num_steps_to_hold_mesh_after_retry, &
     max_rel_delta_IE_for_mesh_total_energy_balance, &
     trace_mesh_adjust_error_in_conservation, max_allowed_nz, mesh_max_allowed_ratio, &
     remesh_max_allowed_logT, max_delta_x_for_merge, mesh_dump_call_number, &
@@ -344,9 +343,7 @@
     use_dedt_form_with_total_energy_conservation, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
-    use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, &
-    dedt_eqn_r_scale, drag_coefficient, min_q_for_drag, turn_on_drag_in_H_envelope, &
-    v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
+    use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_Fraley_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
@@ -392,7 +389,7 @@
     corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, &
     corr_coeff_limit, tiny_corr_factor, solver_test_partials_call_number, solver_test_partials_iter_number, &
     max_tries1, solver_max_tries_before_reject, max_tries_for_retry, max_tries_after_5_retries, solver_test_partials_sink_name, &
-    max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_avQ_art_visc, &
+    max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_avQ_art_visc, avQ_cq, avQ_zsh, &
     min_xa_hard_limit, min_xa_hard_limit_for_highT, logT_max_for_min_xa_hard_limit, logT_min_for_min_xa_hard_limit_for_highT, &
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
     xa_clip_limit, report_solver_progress, solver_test_partials_k_high, &
@@ -413,6 +410,7 @@
     varcontrol_target, min_allowed_varcontrol_target, varcontrol_dt_limit_ratio_hard_max, xa_scale, &
     solver_iters_timestep_limit, burn_steps_limit, burn_steps_hard_limit, &
     diffusion_steps_limit, diffusion_steps_hard_limit, diffusion_iters_limit, diffusion_iters_hard_limit, &
+    dt_div_dt_cell_collapse_limit, dt_div_dt_cell_collapse_hard_limit, &
     dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, &
@@ -461,8 +459,8 @@
     delta_lg_star_mass_limit, delta_lg_star_mass_hard_limit, &
     delta_mdot_atol, delta_mdot_rtol, delta_mdot_limit, delta_mdot_hard_limit, &
     adjust_J_q_limit, adjust_J_q_hard_limit, &
-    never_skip_hard_limits, relax_hard_limits_after_retry, report_all_dt_limits, &
-    report_why_dt_limits, report_solver_dt_info, report_dX_nuc_drop_dt_limits, &
+    never_skip_hard_limits, relax_hard_limits_after_retry, &
+    report_dt_hard_limit_retries, report_solver_dt_info, &
     limit_for_rel_error_in_energy_conservation, hard_limit_for_rel_error_in_energy_conservation, &
 
     ! atmosphere -- surface boundary conditions
@@ -482,7 +480,7 @@
     surface_extra_Pgas, use_atm_PT_at_center_of_surface_cell, &
     use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, use_T_black_body_outer_BC, &
     fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
-    use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, use_Psurf_for_surface_eflux, &
+    use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
@@ -1288,7 +1286,6 @@
  s% fixed_L_for_BB_outer_BC = fixed_L_for_BB_outer_BC
  s% use_zero_dLdm_outer_BC = use_zero_dLdm_outer_BC
  s% Tsurf_factor = Tsurf_factor
- s% use_Psurf_for_surface_eflux = use_Psurf_for_surface_eflux
 
  s% atm_build_tau_outer = atm_build_tau_outer
  s% atm_build_dlogtau = atm_build_dlogtau
@@ -1447,7 +1444,6 @@
  s% relax_dY = relax_dY
 
  ! mesh adjustment
- s% remesh_log_L_nuc_burn_min = remesh_log_L_nuc_burn_min
  s% show_mesh_changes = show_mesh_changes
  s% okay_to_remesh = okay_to_remesh
  s% restore_mesh_on_retry = restore_mesh_on_retry
@@ -1843,14 +1839,6 @@
  s% include_P_in_Fraley_time_centering = include_P_in_Fraley_time_centering
  s% include_L_in_Fraley_time_centering = include_L_in_Fraley_time_centering
  s% steps_before_use_Fraley_time_centering = steps_before_use_Fraley_time_centering
- 
- s% drag_coefficient = drag_coefficient
- s% min_q_for_drag = min_q_for_drag
- s% turn_on_drag_in_H_envelope = turn_on_drag_in_H_envelope
- s% v_drag_factor = v_drag_factor
- s% v_drag = v_drag
- s% q_for_v_drag_full_off = q_for_v_drag_full_off
- s% q_for_v_drag_full_on = q_for_v_drag_full_on
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -2012,6 +2000,8 @@
  s% redo_limit = redo_limit
 
  s% use_avQ_art_visc = use_avQ_art_visc
+ s% avQ_cq = avQ_cq
+ s% avQ_zsh = avQ_zsh
 
  s% min_xa_hard_limit = min_xa_hard_limit
  s% min_xa_hard_limit_for_highT = min_xa_hard_limit_for_highT
@@ -2104,6 +2094,8 @@
  s% diffusion_iters_limit = diffusion_iters_limit
  s% diffusion_iters_hard_limit = diffusion_iters_hard_limit
 
+ s% dt_div_dt_cell_collapse_limit = dt_div_dt_cell_collapse_limit
+ s% dt_div_dt_cell_collapse_hard_limit = dt_div_dt_cell_collapse_hard_limit
  s% dt_div_min_dr_div_cs_limit = dt_div_min_dr_div_cs_limit
  s% dt_div_min_dr_div_cs_hard_limit = dt_div_min_dr_div_cs_hard_limit
  
@@ -2318,10 +2310,8 @@
  s% adjust_J_q_hard_limit = adjust_J_q_hard_limit
  s% never_skip_hard_limits = never_skip_hard_limits
  s% relax_hard_limits_after_retry = relax_hard_limits_after_retry
- s% report_all_dt_limits = report_all_dt_limits
- s% report_why_dt_limits = report_why_dt_limits
+ s% report_dt_hard_limit_retries = report_dt_hard_limit_retries
  s% report_solver_dt_info = report_solver_dt_info
- s% report_dX_nuc_drop_dt_limits = report_dX_nuc_drop_dt_limits
 
  s% limit_for_rel_error_in_energy_conservation = limit_for_rel_error_in_energy_conservation
  s% hard_limit_for_rel_error_in_energy_conservation = hard_limit_for_rel_error_in_energy_conservation
@@ -2915,7 +2905,6 @@
  tau_for_L_BB = s% tau_for_L_BB
  use_zero_dLdm_outer_BC = s% use_zero_dLdm_outer_BC
  Tsurf_factor = s% Tsurf_factor
- use_Psurf_for_surface_eflux = s% use_Psurf_for_surface_eflux
 
  atm_build_tau_outer = s% atm_build_tau_outer
  atm_build_dlogtau = s% atm_build_dlogtau
@@ -3068,7 +3057,6 @@
  relax_dY = s% relax_dY
 
  ! mesh adjustment
- remesh_log_L_nuc_burn_min = s% remesh_log_L_nuc_burn_min
  show_mesh_changes = s% show_mesh_changes
  okay_to_remesh = s% okay_to_remesh
  restore_mesh_on_retry = s% restore_mesh_on_retry
@@ -3461,14 +3449,6 @@
  steps_before_use_Fraley_time_centering = s% steps_before_use_Fraley_time_centering
  include_P_in_Fraley_time_centering = s% include_P_in_Fraley_time_centering
  include_L_in_Fraley_time_centering = s% include_L_in_Fraley_time_centering
- 
- drag_coefficient = s% drag_coefficient
- min_q_for_drag = s% min_q_for_drag
- turn_on_drag_in_H_envelope = s% turn_on_drag_in_H_envelope
- v_drag_factor = s% v_drag_factor
- v_drag = s% v_drag
- q_for_v_drag_full_off = s% q_for_v_drag_full_off
- q_for_v_drag_full_on = s% q_for_v_drag_full_on
 
  RTI_A = s% RTI_A
  RTI_B = s% RTI_B
@@ -3630,6 +3610,8 @@
  redo_limit = s% redo_limit
 
  use_avQ_art_visc = s% use_avQ_art_visc
+ avQ_cq = s% avQ_cq
+ avQ_zsh = s% avQ_zsh
 
  min_xa_hard_limit = s% min_xa_hard_limit
  min_xa_hard_limit_for_highT = s% min_xa_hard_limit_for_highT
@@ -3722,6 +3704,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  diffusion_iters_limit = s% diffusion_iters_limit
  diffusion_iters_hard_limit = s% diffusion_iters_hard_limit
 
+ dt_div_dt_cell_collapse_limit = s% dt_div_dt_cell_collapse_limit
+ dt_div_dt_cell_collapse_hard_limit = s% dt_div_dt_cell_collapse_hard_limit
  dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
  dt_div_min_dr_div_cs_hard_limit = s% dt_div_min_dr_div_cs_hard_limit
  
@@ -3935,10 +3919,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  adjust_J_q_hard_limit = s% adjust_J_q_hard_limit
  never_skip_hard_limits = s% never_skip_hard_limits
  relax_hard_limits_after_retry = s% relax_hard_limits_after_retry
- report_all_dt_limits = s% report_all_dt_limits
- report_why_dt_limits = s% report_why_dt_limits
+ report_dt_hard_limit_retries = s% report_dt_hard_limit_retries
  report_solver_dt_info = s% report_solver_dt_info
- report_dX_nuc_drop_dt_limits = s% report_dX_nuc_drop_dt_limits
 
  limit_for_rel_error_in_energy_conservation = s% limit_for_rel_error_in_energy_conservation
  hard_limit_for_rel_error_in_energy_conservation = s% hard_limit_for_rel_error_in_energy_conservation

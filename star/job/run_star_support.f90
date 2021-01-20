@@ -270,6 +270,10 @@
          if(dbg) write(*,*) 'call add_fpe_checks'
          call add_fpe_checks(id, s, ierr)
          if (failed('add_fpe_checks',ierr)) return
+
+         if(dbg) write(*,*) 'call pgstar_env_check'
+         call pgstar_env_check(id, s, ierr)
+         if (failed('pgstar_env_check',ierr)) return        
          
 
          ! testing module-level (atm/eos/kap/net) partials requires single-threaded execution
@@ -2079,6 +2083,11 @@
             s% init_model_number = s% model_number
          end if
 
+         if (s% job% set_initial_number_retries .and. .not. restart) then
+            write(*,2) 'set_initial_number_retries', s% job% initial_number_retries
+            s% num_retries = s% job% initial_number_retries
+         end if
+
          if (s% job% steps_to_take_before_terminate > 0) then
             s% max_model_number = s% model_number + s% job% steps_to_take_before_terminate
             write(*,2) 'steps_to_take_before_terminate', &
@@ -3389,6 +3398,14 @@
          
          ierr = 0
 
+         if (s% job% remove_initial_surface_at_he_core_boundary > 0 .and. .not. restart) then
+            write(*, 1) 'remove_initial_surface_at_he_core_boundary', &
+               s% job% remove_initial_surface_at_he_core_boundary
+            call star_remove_surface_at_he_core_boundary( &
+               id, s% job% remove_initial_surface_at_he_core_boundary, ierr)
+            if (failed('star_remove_surface_at_he_core_boundary',ierr)) return
+         end if
+
          if (s% job% remove_initial_surface_by_optical_depth > 0 .and. .not. restart) then
             write(*, 1) 'remove_initial_surface_by_optical_depth', &
                s% job% remove_initial_surface_by_optical_depth
@@ -3504,6 +3521,13 @@
          include 'formats.inc'
          
          ierr = 0
+
+         if (s% job% remove_surface_at_he_core_boundary > 0) then
+            !write(*, 1) 'remove_surface_at_he_core_boundary', s% job% remove_surface_at_he_core_boundary
+            call star_remove_surface_at_he_core_boundary( &
+               id, s% job% remove_surface_at_he_core_boundary, ierr)
+            if (failed('star_remove_surface_at_he_core_boundary',ierr)) return
+         end if
 
          if (s% job% remove_surface_by_optical_depth > 0) then
             !write(*, 1) 'remove_surface_by_optical_depth', s% job% remove_surface_by_optical_depth
@@ -3666,6 +3690,31 @@
          end if
 
       end subroutine add_fpe_checks
+
+      subroutine pgstar_env_check(id, s, ierr)
+         integer, intent(in) :: id
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+         character(len=5) :: flag
+         integer :: status
+
+         include 'formats.inc'
+
+         ierr = 0
+
+         call get_environment_variable('MESA_FORCE_PGSTAR_FLAG', flag, STATUS=status)
+         if (status /= 0) return
+
+         select case (trim(flag))
+         case ("TRUE", "true")
+            write(*,*) "PGSTAR forced on"
+            s% job% pgstar_flag = .true.
+         case ("FALSE", "false")
+            write(*,*) "PGSTAR forced off"
+            s% job% pgstar_flag = .false.     
+         end select
+
+      end subroutine pgstar_env_check
 
       end module run_star_support
       

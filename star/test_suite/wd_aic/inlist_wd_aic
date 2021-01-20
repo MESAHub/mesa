@@ -39,8 +39,8 @@
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      !pgstar_flag = .true.
-      !save_pgstar_files_when_terminate = .true.
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
 

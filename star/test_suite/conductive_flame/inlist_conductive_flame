@@ -22,7 +22,7 @@
       initial_model_relax_num_steps = 0
 
     ! display on-screen plots
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / !end of star_job namelist

@@ -1010,23 +1010,20 @@
       end subroutine edit_dlnR_dt_above_k_below_just_added
 
 
-      subroutine enter_setmatrix( &
+      subroutine enter_setmatrix(s, &
             iter, nvar, nz, neqns, dx, &
             xscale, xder, need_solver_to_eval_jacobian, &
-            ldA, A1, lrpar, rpar, lipar, ipar, ierr)
+            ldA, A1, ierr)
          use mtx_def, only: lapack
          use rsp_def, only: ABB, LD_ABB, NV, MAX_NZN
+         type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz, neqns ! (neqns = nvar*nz)
          real(dp), pointer, dimension(:,:) :: dx, xscale, xder ! (nvar, nz)
          logical, intent(out) :: need_solver_to_eval_jacobian
          integer, intent(in) :: ldA ! leading dimension of A
          real(dp), pointer, dimension(:) :: A1
-         integer, intent(in) :: lrpar, lipar
-         real(dp), intent(inout) :: rpar(:) ! (lrpar)
-         integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
 
-         type (star_info), pointer :: s
          real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
          integer :: i, j, k, cnt, i_lnR, nnz, nzlo, nzhi
          real(dp) :: dt, lnR00, lnRm1, lnRp1, dlnR_prev, ddx, ddx_limit, &
@@ -1037,16 +1034,9 @@
 
          include 'formats'
 
-         id = ipar(ipar_id)
          dbg_enter_setmatrix = dbg
 
          ierr = 0
-
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            ierr = -1
-            return
-         end if
 
          if (dbg_enter_setmatrix) write(*, '(/,/,/,/,/,/,a)') 'enter_setmatrix'
 
@@ -1058,7 +1048,7 @@
                   s% num_solver_iterations
          end if
 
-         dt = rpar(rpar_dt)
+         dt = s% dt
 
          do_chem = (s% do_burn .or. s% do_mix)
 

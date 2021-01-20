@@ -260,8 +260,8 @@
             real :: ymx, dx, dyline, ypos, xpts(2), ypts(2)
             integer :: iclr, num_max
             num_max = min(num_categories, s% Power_legend_max_cnt)
-            if (cnt >= num_max) return
             power_line_legend = cnt
+            if (cnt >= num_max) return
             ymx = maxval(s% eps_nuc_categories(icat,grid_min:grid_max))
             if (ymx < exp10_ymin) return
             iclr = cnt - num_colors*(cnt/num_colors) + 1

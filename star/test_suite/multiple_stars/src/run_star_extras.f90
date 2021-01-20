@@ -184,7 +184,7 @@
          
             if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
             if (s% job% report_cell_for_xm > 0) call do_report_cell_for_xm(s)
-         
+            
             first_try = .true.
             
             model_number = get_model_number(id, ierr)
