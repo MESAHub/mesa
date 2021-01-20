@@ -318,12 +318,6 @@
          eosPT_XZ_loaded, eosSCVH_PT_XZ_loaded, eosCMS_PT_XZ_loaded
       
 
-      ! interpolation info for theta_e
-      integer :: theta_e_nx
-      real(dp), pointer :: f_theta_e1(:), f_theta_e(:,:)
-      real(dp), pointer :: x_theta_e(:)
-
-
       ! interpolation info for eosPC support tables FITION9
       type FITION_Info
          real(dp), pointer :: f1(:), f(:,:)
@@ -563,10 +557,6 @@
          call free_EosPT_XZ_Info(eosCMS_PT_XZ_data, eosCMS_PT_XZ_loaded)
 
          ! Misc. stuff
-
-         if (ASSOCIATED(f_theta_e1)) deallocate(f_theta_e1)
-         nullify(f_theta_e)
-         if (ASSOCIATED(x_theta_e)) deallocate(x_theta_e)
 
          if (FITION9_loaded) then
             do iz = 1, FITION_vals
