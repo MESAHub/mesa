@@ -95,12 +95,9 @@
       integer, parameter :: Tlim_delta_HR = Tlim_dlgL_power_photo + 1
       integer, parameter :: Tlim_dHe3 = Tlim_delta_HR + 1
       integer, parameter :: Tlim_dHe3_div_He3 = Tlim_dHe3 + 1
-      integer, parameter :: Tlim_max_mix_fixup = Tlim_dHe3_div_He3 + 1
-      integer, parameter :: Tlim_dlog_eps_nuc = Tlim_max_mix_fixup + 1
+      integer, parameter :: Tlim_dlog_eps_nuc = Tlim_dHe3_div_He3 + 1
       integer, parameter :: Tlim_num_diff_solver_iters = Tlim_dlog_eps_nuc + 1
-      integer, parameter :: Tlim_burn_max_num_substeps = Tlim_num_diff_solver_iters + 1
-      integer, parameter :: Tlim_burn_max_num_iters = Tlim_burn_max_num_substeps + 1
-      integer, parameter :: Tlim_del_mdot = Tlim_burn_max_num_iters + 1
+      integer, parameter :: Tlim_del_mdot = Tlim_num_diff_solver_iters + 1
       integer, parameter :: Tlim_adjust_J_q = Tlim_del_mdot + 1
       integer, parameter :: Tlim_delta_Ye_highT = Tlim_adjust_J_q + 1
       integer, parameter :: Tlim_error_in_energy_conservation = Tlim_delta_Ye_highT + 1
