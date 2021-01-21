@@ -29,6 +29,10 @@
 
 / ! end of star_job namelist
 
+&eos
+
+
+/ ! end of eos namelist
 
 
 &kap
@@ -46,7 +50,7 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      initial_mass = 8.5d0
+      initial_mass = 7.5d0
       initial_z = 0.02d0
       
       xa_central_lower_limit_species(1) = 'he4'
