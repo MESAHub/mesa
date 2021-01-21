@@ -1656,7 +1656,6 @@
       end function total_times
 
 
-
       subroutine smooth(dc, sz)
          real(dp), intent(inout) :: dc(:)
          integer, intent(in) :: sz

@@ -2814,33 +2814,34 @@
 
             case(h_max_gradT_div_grada)
                val = 0
-               do k = 1, nz
+               do k = 2, nz
+                  if (s% grada_face(k) == 0) cycle
                   if (s% gradT(k)/s% grada_face(k) > val) &
                      val = s% gradT(k)/s% grada_face(k)
                end do
             case(h_max_gradT_sub_grada)
                val = 0
-               do k = 1, nz
+               do k = 2, nz
                   if (s% gradT(k) - s% grada_face(k) > val) &
                      val = s% gradT(k) - s% grada_face(k)
                end do
             case(h_min_log_mlt_Gamma)
                val = 1d99
-               do k = 1, nz
+               do k = 2, nz
                   if (s% mlt_Gamma(k) > 0 .and. s% mlt_Gamma(k) < val) val = s% mlt_Gamma(k)
                end do
                val = safe_log10(val)
 
             case(h_max_conv_vel_div_csound)
                val = 0
-               do k = 1, nz
-                  if (s% q(k) > s% max_conv_vel_div_csound_maxq) cycle
+               do k = 2, nz
+                  if (s% q(k) > s% max_conv_vel_div_csound_maxq .or. s% csound(k) == 0) cycle 
                   if (s% conv_vel(k)/s% csound(k) > val) val = s% conv_vel(k)/s% csound(k)
                end do
 
             case(h_min_t_eddy)
                val = 1d99
-               do k = 1, nz
+               do k = 2, nz
                   if (s% conv_vel(k) <= 0) cycle
                   if (s% scale_height(k)/s% conv_vel(k) < val) &
                      val = s% scale_height(k)/s% conv_vel(k)

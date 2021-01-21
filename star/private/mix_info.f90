@@ -342,8 +342,6 @@
             if (dbg) write(*,*) 'call update_rotation_mixing_info'
             call update_rotation_mixing_info(s,ierr)
             if (failed('update_rotation_mixing_info')) return
-         
-         call check('after update_rotation_mixing_info')
 
             do k = 2, nz
                if (s% D_mix(k) < 1d-10) s% D_mix(k) = 0d0
@@ -362,6 +360,8 @@
             end if
 
          end if
+         
+         call check('after update_rotation_mixing_info')
          
          if (.not. s% conv_vel_flag) then
 

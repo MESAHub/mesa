@@ -55,8 +55,6 @@
 
             call flip(s% dq, s% dq_old, ierr)
             if (ierr /= 0) return
-            
-            ! keep old values for rotation variables in order to do time smoothing in D_omega
 
             call flip(s% omega, s% omega_old, ierr)
             if (ierr /= 0) return

@@ -1,9 +1,9 @@
 
 &star_job
-!      change_initial_u_flag = .true.
-!      change_initial_v_flag = .true.
-!      new_v_flag = .false.
-!      new_u_flag = .true.
+      change_initial_u_flag = .true.
+      change_initial_v_flag = .true.
+      new_v_flag = .false.
+      new_u_flag = .true.
 
       set_initial_age = .true.
       set_initial_model_number = .true.
@@ -54,10 +54,6 @@
       use_d_eos_dxa = .true.
       
       use_momentum_outer_BC = .true.
-
-!      use_avQ_art_visc = .true.
-!      avQ_cq = 1d-3 ! 4.0d0
-!      avQ_zsh = 0  !  .001 ! 0.1d0
       
       min_timestep_limit = 1d-12
 

@@ -69,7 +69,6 @@
       star_age ! elapsed simulated time in years since the start of the run
       star_mass ! in Msun units
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
-      log_rotational_mdot_boost
       !star_mdot ! d(star_mass)/dt (in msolar per year)
       !time_step ! timestep in years since previous model
       log_dt ! log10 time_step

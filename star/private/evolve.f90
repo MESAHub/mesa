@@ -368,23 +368,6 @@
             call set_to_NaN(s% total_radial_kinetic_energy_initial)
             call set_to_NaN(s% total_turbulent_energy_initial)
             call set_to_NaN(s% total_rotational_kinetic_energy_initial)
-            call set_to_NaN(s% time_evolve_step)
-            call set_to_NaN(s% time_remesh)
-            call set_to_NaN(s% time_adjust_mass)
-            call set_to_NaN(s% time_conv_premix)
-            call set_to_NaN(s% time_element_diffusion)
-            call set_to_NaN(s% time_struct_burn_mix)
-            call set_to_NaN(s% time_solver_matrix)
-            call set_to_NaN(s% time_solve_mix)
-            call set_to_NaN(s% time_solve_burn)
-            call set_to_NaN(s% time_solve_omega_mix)
-            call set_to_NaN(s% time_eos)
-            call set_to_NaN(s% time_neu_kap)
-            call set_to_NaN(s% time_nonburn_net)
-            call set_to_NaN(s% time_mlt)
-            call set_to_NaN(s% time_set_hydro_vars)
-            call set_to_NaN(s% time_set_mixing_info)
-            call set_to_NaN(s% time_total)
             
          end subroutine test_set_undefined
          
@@ -424,6 +407,7 @@
          s% doing_solver_iterations = .false.
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
+         s% rotational_mdot_boost = 0d0
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
@@ -439,7 +423,6 @@
             return
          end if
 
-         ! unpack some of the input information
          call reset_starting_vectors(s)
          nz = s% nz
          call set_qs(s, nz, s% q, s% dq, ierr)
@@ -748,7 +731,6 @@
                call set_vars_if_needed(s, dt, 'after do_solve_omega_mix', ierr)
                if (failed('after do_solve_omega_mix')) return
             end if
-         
             
             if (s% use_other_pressure) then
                call s% other_pressure(s% id, ierr)
@@ -812,7 +794,7 @@
          call do_report(s, ierr)
          if (failed('do_report')) return
          call set_phase_of_evolution(s)
-
+            
          call system_clock(time0,clock_rate)
          s% current_system_clock_time = time0
          s% total_elapsed_time = &

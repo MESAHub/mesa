@@ -29,6 +29,7 @@
       use star_private_def
       use const_def
       use chem_def, only: ih1, ihe4, ic12, ic13, in14, io16
+      use utils_lib, only: is_bad
 
       implicit none
 
@@ -297,6 +298,10 @@
                   using_wind_scheme_mdot .or. &
                      s% v_div_v_crit_avg_surf > 0.8d0)) then
             call rotation_enhancement(ierr)
+            if (is_bad(s% rotational_mdot_boost)) then
+               write(*,2) 'is_bad(s% rotational_mdot_boost)', s% model_number
+               if (s% stop_for_bad_nums) stop 'winds: rotation_enhancement'
+            end if
             if (ierr /= 0) then
                if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: rotation_enhancement ierr'
                return
