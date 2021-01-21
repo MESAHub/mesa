@@ -101,6 +101,6 @@
 !pause = .true.
 
 Grid2_win_flag = .true.
-pgstar_interval = 5
+pgstar_interval = 10
 
 / ! end of pgstar namelist

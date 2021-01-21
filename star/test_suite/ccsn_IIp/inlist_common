@@ -1,13 +1,16 @@
 ! inlist_common
 
 &star_job
+
    read_extra_star_job_inlist1 = .true.
    extra_star_job_inlist1_name = 'inlist_mass_Z'
  
    show_log_description_at_start = .false.
 
-!   change_v_flag = .true.
-!   new_v_flag = .true.
+   change_initial_u_flag = .true.
+   change_initial_v_flag = .true.
+   new_v_flag = .false.
+   new_u_flag = .true.
 
    set_initial_age = .true.
    initial_age = 0
@@ -18,74 +21,26 @@
 / ! end of star_job namelist
 
 &eos
+   use_PC = .false.
 / ! end of eos namelist
 
 &kap
    read_extra_kap_inlist1 = .true.
    extra_kap_inlist1_name = 'inlist_mass_Z'
-
-   kap_file_prefix = 'gs98'
-   use_Type2_opacities = .false.
 / ! end of kap namelist
 
 &controls
+
    read_extra_controls_inlist1 = .true.
    extra_controls_inlist1_name = 'inlist_mass_Z'
 
-   ! high center T limit to avoid negative mass fractions
-   sig_min_factor_for_high_Tcenter = 0.01
-    ! inactive when >= 1d0
-      ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
-      ! then okay to reduce sig by as much as this factor
-      ! as needed to prevent causing negative abundances
-   Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-      ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
-      ! this should be > Tcenter_max_for_sig_min_factor_full_off.
-   Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-      ! if Tcenter <= this, factor = 1, so has no effect
-      ! this should be < Tcenter_min_for_sig_min_factor_full_on.
-   ! for T > full_off and < full_on, factor changes linearly with Tcenter
-
-   velocity_logT_lower_bound = 8 
-   max_dt_yrs_for_velocity_logT_lower_bound = 0.1
-
-   mesh_delta_coeff = 1.5
-   mesh_delta_coeff_for_highT = 2.5
-   logT_max_for_standard_mesh_delta_coeff = 9.0 
-   logT_min_for_highT_mesh_delta_coeff = 9.5 
-   
-   varcontrol_target = 1d-3
-   
-   dX_nuc_drop_limit = 5d-2
-   dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
-   
-   delta_Ye_highT_limit = 1d-3
-
-   okay_to_reduce_gradT_excess = .true. 
-   gradT_excess_f1 = 1d-4
-   gradT_excess_f2 = 1d-2
-
-   hot_wind_scheme = '' ! 'Dutch'
-   hot_wind_full_on_T = 1d0
-   cool_wind_full_on_T = 0d0
-   Dutch_scaling_factor = 0.8
-
-   include_composition_in_eps_grav = .true.
-
-   make_gradr_sticky_in_solver_iters = .true.
-
-   use_gold2_tolerances = .false.
-   use_gold_tolerances = .true.
-
-   xa_scale = 1d-5
-   solver_itermin = 2
-
-   mixing_length_alpha = 1.5
+! mlt
+   mixing_length_alpha = 1.9
    MLT_option = 'Henyey'
 
    use_Ledoux_criterion = .true.
    alpha_semiconvection = 0.01
-   thermohaline_coeff = 2
+   thermohaline_coeff = 0
    thermohaline_option = 'Kippenhahn'
 
    use_other_alpha_mlt = .true. ! implemented in run_star_extras
@@ -96,9 +51,18 @@
    x_ctrl(24) = 9d0 ! mass limit (Msun)
       ! use other_alpfa_mlt only if star_mass >= this limit.
 
+   okay_to_reduce_gradT_excess = .false. 
+
+! mixing
    min_overshoot_q = 0d0
 
-   screening_mode = 'extended'
+! timesteps
+   varcontrol_target = 1d-3
+   
+   dX_nuc_drop_limit = 5d-2
+   dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
+   
+   delta_Ye_highT_limit = 1d-3
    
    min_timestep_limit = 1d-12 ! (seconds)
 
@@ -113,6 +77,53 @@
    delta_lgRho_cntr_limit = 0.02  
 
    T_mix_limit = 0
+
+! mesh
+
+! solver
+
+   use_gold2_tolerances = .false.
+   use_gold_tolerances = .true.
+
+   use_dedt_form_of_energy_eqn = .true.
+   use_dPrad_dm_form_of_T_gradient_eqn = .true.
+   
+   convergence_ignore_equL_residuals = .true.
+   include_composition_in_eps_grav = .true.
+   make_gradr_sticky_in_solver_iters = .true.
+
+   eps_nuc_factor = 0
+   non_nuc_neu_factor = 0
+   
+   calculate_Brunt_N2 = .false.
+
+   sig_min_factor_for_high_Tcenter = 0.01
+   Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+   Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+
+   velocity_logT_lower_bound = 8 
+   max_dt_yrs_for_velocity_logT_lower_bound = 0.1
+
+   xa_scale = 1d-5
+
+   fe_core_infall_limit = 1d99 ! cm/sec
+
+   screening_mode = 'extended'
+   
+   warn_rates_for_high_temp = .false.
+
+! output
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+   he_core_boundary_h1_fraction = 0.5
+   c_core_boundary_he4_fraction = 0.5
+   o_core_boundary_c12_fraction = 0.5
+   si_core_boundary_o16_fraction = 0.5
+   fe_core_boundary_si28_fraction = 0.5
+
 
 / ! end of controls namelist
 

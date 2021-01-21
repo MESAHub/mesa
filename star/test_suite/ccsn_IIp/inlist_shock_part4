@@ -7,7 +7,7 @@
       save_model_filename = 'shock_part4.mod'
       required_termination_code_string = 'extras_finish_step'
 
-      !pgstar_flag = .false.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -50,6 +50,8 @@
 &pgstar
          
 !pause = .true.
+Grid2_win_flag = .true.
+pgstar_interval = 10
 
 Profile_Panels1_xmin = -101 ! 1.9
 Profile_Panels2_xmin = -101 ! 1.9

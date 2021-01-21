@@ -32,16 +32,16 @@
   Profile_Panels2_xaxis_reversed = .false.
 
   Profile_Panels2_num_panels = 2
-  Profile_Panels2_yaxis_name(1) = 'v_div_csound'
-  Profile_Panels2_yaxis_name(2) = 'entropy'
-
+  Profile_Panels2_yaxis_name(1) = 'vel_km_per_s'
+  Profile_Panels2_other_yaxis_name(1) = 'v_div_csound'
   Profile_Panels2_ymin(1) = -101
-  Profile_Panels2_ymin(2) = -101
-
-  Profile_Panels2_other_yaxis_name(1) = 'vel_km_per_s'
-  Profile_Panels2_other_yaxis_name(2) = 'total_energy'
-
+  Profile_Panels2_dymin(1) = 0.015
   Profile_Panels2_other_ymin(1) = -101
+  Profile_Panels2_other_dymin(1) = 0.0015
+
+  Profile_Panels2_yaxis_name(2) = 'entropy'
+  Profile_Panels2_ymin(2) = -101
+  Profile_Panels2_other_yaxis_name(2) = 'avQ' ! 'total_energy'
   Profile_Panels2_other_ymin(2) = -101
 
   Text_Summary1_txt_scale = 5.5
@@ -154,22 +154,22 @@
 
 Profile_Panels1_xaxis_name = 'zone'
 Profile_Panels1_xaxis_reversed = .true.
-Profile_Panels1_xmin = 500
+Profile_Panels1_xmin = 0 ! 500
 Profile_Panels1_xmax = -101d0
 
 Profile_Panels2_xaxis_name = 'zone'
 Profile_Panels2_xaxis_reversed = .true.
-Profile_Panels2_xmin = 500
+Profile_Panels2_xmin = 0 ! 500
 Profile_Panels2_xmax = -101d0
 
 Mixing_xaxis_name = 'zone'
 Mixing_xaxis_reversed = .true.
-Mixing_xmin = 500
+Mixing_xmin = 0 ! 500
 Mixing_xmax = -101d0
 
 Abundance_xaxis_name = 'zone'
 Abundance_xaxis_reversed = .true.
-Abundance_xmin = 500
+Abundance_xmin = 0 ! 500
 Abundance_xmax = -101d0
 
 

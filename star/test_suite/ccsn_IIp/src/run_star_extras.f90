@@ -600,8 +600,6 @@
          if (restart) then
             call unpack_extra_info(s)
          else
-         
-            !call test_numerical_diffusion(s)
             
             initial_nico = 0
             min_m_photosphere = 1d99
@@ -613,6 +611,18 @@
             initial_time = s% time
             initial_he_core_mass = s% he_core_mass
             call alloc_extra_info(s)
+         
+            if (s% x_integer_ctrl(1) == 0) then
+               if (s% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
+                  if (s% v_flag) then
+                     do k=1,s% nz
+                        s% xh(s% i_v,k) = 0d0
+                        s% v(k) = 0d0
+                     end do
+                  end if
+               end if
+               return
+            end if
 
             if (s% x_integer_ctrl(1) == 5 .and. &
                 s% x_ctrl(17) > 0) call add_csm ! part 5, add csm
@@ -650,7 +660,12 @@
             if (start_m == 0d0) then ! use max v
                k_max_v = maxloc(s% u(1:s% nz),dim=1)
                start_m = s% m(k_max_v)/Msun
-               write(*,2) 'no shock; use max_v for start_m', k_max_v, start_m
+               if (start_m < 2d0*s% M_center/Msun) then
+                  write(*,2) 'no shock; use max_v for start_m', k_max_v, start_m
+               else
+                  start_m = s% M_center/Msun
+                  write(*,2) 'no shock; use M_center for start_m', s% nz, start_m
+               end if
             else
                write(*,2) 'use shock for start_m', s% shock_k, s% shock_mass
             end if

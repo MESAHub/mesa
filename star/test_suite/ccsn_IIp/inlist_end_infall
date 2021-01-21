@@ -13,13 +13,11 @@
       set_initial_L_center = .true.
       new_L_center = 0d0
 
+      change_initial_RTI_flag = .true.
+      new_RTI_flag = .false.
+
       change_initial_net = .true.      
       new_net_name = 'approx21_cr60_plus_co56.net'
-
-      change_initial_u_flag = .true.
-      change_initial_v_flag = .true.
-      new_v_flag = .false.
-      new_u_flag = .true.
 
       set_initial_age = .true.
       initial_age = 0d0
@@ -41,67 +39,39 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.006d0
-      use_Type2_opacities = .false.
 / ! end of kap namelist
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 200
-      
-      max_number_retries = 50
-         
-      max_timestep = 1d-2
-      min_timestep_limit = 1d-20 
+! when to stop
       
       max_age_in_seconds = 1d-5
 
-      eps_nuc_factor = 0d0
-      !dxdt_nuc_factor = 0d0
+      ! limit max_model_number as part of test_suite
+      max_model_number = 200
+      max_number_retries = 50
 
-      fe_core_infall_limit = 1d99 ! cm/sec
-      calculate_Brunt_N2 = .false.
+! wind
 
-      warn_when_large_rel_run_E_err = 1d99
-      warning_limit_for_max_residual = 1d99
-            
-! equation controls
-      use_dPrad_dm_form_of_T_gradient_eqn = .true.
-      use_dedt_form_of_energy_eqn = .true.
-      
-      !use_momentum_outer_BC = .true.
-      use_fixed_vsurf_outer_BC = .true.
-      fixed_vsurf = 0d0
+! atmosphere
 
-! mixing controls
-      mixing_length_alpha = 1.9
-      MLT_option = 'Henyey'
-      thermohaline_coeff = 0
-      okay_to_reduce_gradT_excess = .false.
+! rotation
 
-! mesh controls
-      okay_to_remesh = .true
-      use_split_merge_amr = .true.
-      split_merge_amr_log_zoning = .true.
-      split_merge_amr_nz_baseline = 1000
-      split_merge_amr_MaxLong = 1.5d0
-      split_merge_amr_MaxShort = 2d0
-      split_merge_amr_max_iters = 10
-      !trace_split_merge_amr = .true.
+! element diffusion
 
-! timestep controls
+! mlt
 
-  limit_for_rel_error_in_energy_conservation = 1d99
-  hard_limit_for_rel_error_in_energy_conservation = 1d99
+! mixing
+
+! timesteps
+      max_timestep = 1d-2
+      min_timestep_limit = 1d-20 
 
       delta_lgL_He_limit = 0.5
       delta_lgT_cntr_limit = 0.2
       delta_lgRho_cntr_limit = 0.5
 
       dX_nuc_drop_limit_at_high_T = 1d-2
-
-      varcontrol_target = 1d-3
 
       delta_XH_cntr_limit = 1d99
       delta_XHe_cntr_limit = 1d99
@@ -115,25 +85,37 @@
       delta_XO_cntr_hard_limit = -1d0
       delta_XNe_cntr_hard_limit = -1d0
       delta_XSi_cntr_hard_limit = -1d0
-
-
-! solver controls
       
-      convergence_ignore_equL_residuals = .true.
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
 
+! mesh
+      okay_to_remesh = .true
+      use_split_merge_amr = .true.
+      split_merge_amr_log_zoning = .true.
+      split_merge_amr_nz_baseline = 1000
+      split_merge_amr_MaxLong = 1.5d0
+      split_merge_amr_MaxShort = 2d0
+      split_merge_amr_max_iters = 10
+      !trace_split_merge_amr = .true.
 
-! output controls
+! solver
 
-      warn_rates_for_high_temp = .false.
+      warn_when_large_rel_run_E_err = 1d99
       warning_limit_for_max_residual = 1d99
+      
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_dedt_form_of_energy_eqn = .true.
+      convergence_ignore_equL_residuals = .true.
+      warning_limit_for_max_residual = 1d99
+      
+      use_fixed_vsurf_outer_BC = .true.
+      fixed_vsurf = 0d0
+  
+      dxdt_nuc_factor = 0
 
-      he_core_boundary_h1_fraction = 0.5
-      c_core_boundary_he4_fraction = 0.5
-      o_core_boundary_c12_fraction = 0.5
-      si_core_boundary_o16_fraction = 0.5
-      fe_core_boundary_si28_fraction = 0.5
+! output
 
-      max_num_profile_models = 1000
       terminal_show_age_units = 'seconds'
 
       num_trace_history_values = 8
@@ -151,6 +133,7 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
+
       
       !photo_interval = 1
       !profile_interval = 1

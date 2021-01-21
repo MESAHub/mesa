@@ -17,12 +17,6 @@
   change_initial_RTI_flag = .true.
   new_RTI_flag = .false.
 
-  change_initial_v_flag = .true.
-  new_v_flag = .false.
-
-  change_initial_u_flag = .true.
-  new_u_flag = .true.
-
   !pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -35,8 +29,72 @@
 
 &controls
 
-  initial_mass = 20
-  initial_z = 0.02
+! energy injection
+  ! inject_until_reach_model_with_total_energy is set by inlist_mass_Z
+  
+  ! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
+  max_age_in_seconds = 0.2d0
+  total_mass_for_inject_extra_ergs_sec = 0.2d0
+  max_timestep = 1d-4
+
+! when to stop
+  max_model_number = 5000
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+  MLT_option = 'Henyey'
+  max_logT_for_mlt = 9.0d0
+
+! mixing
+  mix_factor = 0
+
+! timesteps
+  limit_for_rel_error_in_energy_conservation = 1d99
+  hard_limit_for_rel_error_in_energy_conservation = 1d99
+
+  varcontrol_target = 0.01
+
+  dX_nuc_drop_limit_at_high_T = 0.01
+  delta_lgL_He_limit = 0.5
+  delta_lgT_cntr_limit = 0.2
+  delta_lgRho_cntr_limit = 0.5
+
+! mesh
+  okay_to_remesh = .true.
+  use_split_merge_amr = .true.
+  split_merge_amr_log_zoning = .true.
+  split_merge_amr_nz_baseline = 2000
+  split_merge_amr_MaxShort = 2
+  split_merge_amr_MaxLong = 2 ! 1.5
+  split_merge_amr_max_iters = 10
+
+! solver
+  
+  start_time_for_inject_extra_ergs_sec = 0d0
+  base_of_inject_extra_ergs_sec = -1d0
+
+
+  ! TESTING -- NEED A WORKAROUND
+  use_gold2_tolerances = .false.
+  use_gold_tolerances = .false.
+
+  use_fixed_vsurf_outer_BC = .true.
+  fixed_vsurf = 0
+  
+  dxdt_nuc_factor = 0
+
+  warn_when_large_rel_run_E_err = 1d99
+  warning_limit_for_max_residual = 1d99
+  max_abs_rel_run_E_err = 1d99
+
+! output
 
   terminal_show_age_units = 'seconds'
 
@@ -44,78 +102,6 @@
   trace_history_value_name(1) = 'cumulative_extra_heating'
   trace_history_value_name(2) = 'total_energy'
 
-  max_num_profile_models = 1000
-
-  max_model_number = 5000
-
-  inject_until_reach_model_with_total_energy = 8d+50
-  ! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
-  max_age_in_seconds = 0.2d0
-  total_mass_for_inject_extra_ergs_sec = 0.2d0
-  max_timestep = 1d-4
-  
-  start_time_for_inject_extra_ergs_sec = 0d0
-  base_of_inject_extra_ergs_sec = -1d0
-
-  fe_core_infall_limit = 1d+99
-
-  mixing_length_alpha = 1.9
-
-  thermohaline_coeff = 0
-
-  MLT_option = 'Henyey'
-
-  okay_to_reduce_gradT_excess = .false.
-
-  mix_factor = 0
-
-  use_fixed_vsurf_outer_BC = .true.
-  fixed_vsurf = 0
-
-  okay_to_remesh = .true.
-  use_split_merge_amr = .true.
-  split_merge_amr_log_zoning = .true.
-  split_merge_amr_nz_baseline = 1000
-  split_merge_amr_MaxLong = 1.5
-  split_merge_amr_max_iters = 10
-
-  dxdt_nuc_factor = 0
-
-  use_dedt_form_of_energy_eqn = .true.
-
-  non_nuc_neu_factor = 0
-  eps_nuc_factor = 0
-
-  use_dPrad_dm_form_of_T_gradient_eqn = .true.
-
-  convergence_ignore_equL_residuals = .true.
-
-  limit_for_rel_error_in_energy_conservation = 1d99
-  hard_limit_for_rel_error_in_energy_conservation = 1d99
-
-  varcontrol_target = 0.01
-
-  dX_nuc_drop_limit_at_high_T = 0.01
-
-  delta_lgL_He_limit = 0.5
-
-  delta_lgT_cntr_limit = 0.2
-
-  delta_lgRho_cntr_limit = 0.5
-
-  warn_when_large_rel_run_E_err = 1d99
-  warning_limit_for_max_residual = 1d99
-  max_abs_rel_run_E_err = 1d99
-
-  split_merge_amr_MaxShort = 2
-  
-  max_logT_for_mlt = 9.0d0
-
-
-  ! TESTING -- NEED A WORKAROUND
-  use_gold2_tolerances = .false.
-  use_gold_tolerances = .false.
-   
 
   photo_interval = 50
   profile_interval = 50
@@ -201,6 +187,6 @@
 !pause = .true.
 
 Grid2_win_flag = .true.
-pgstar_interval = 1
+pgstar_interval = 10
 
 / ! end of pgstar namelist
