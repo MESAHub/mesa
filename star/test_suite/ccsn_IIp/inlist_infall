@@ -22,7 +22,9 @@
    change_initial_RTI_flag = .true.
    new_RTI_flag = .false.
 
-   remove_initial_center_by_entropy = 4
+   remove_initial_center_at_inner_max_abs_v = .true.
+   !remove_initial_center_by_entropy = 4 ! required for 12M
+   !remove_initial_center_by_si28 = 0.05 ! required for 20M
    remove_center_set_zero_v_center = .false. ! infall continues
 
    !pgstar_flag = .true.
@@ -41,8 +43,8 @@
 
    center_R_lower_limit = 4d7
 
-   when_to_stop_rtol = 0.0001
-   when_to_stop_atol = 10000
+   when_to_stop_rtol = 1d99 ! 0.0001
+   when_to_stop_atol = 1d99 ! 10000
 
    max_model_number = 500
 

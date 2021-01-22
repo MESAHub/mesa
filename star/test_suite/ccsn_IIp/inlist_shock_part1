@@ -1,5 +1,8 @@
 &star_job
       show_log_description_at_start = .false.
+      
+      change_initial_net = .true.      
+      new_net_name = 'ccsn_IIp_cold.net'
 
       load_saved_model = .true.
       saved_model_name = 'done_with_edep.mod'

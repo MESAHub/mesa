@@ -45,7 +45,7 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
 
-      fe_core_infall_limit = 1d8
+      fe_core_infall_limit = 3d7
       log_center_temp_limit = 1d99
       
 ! equation controls

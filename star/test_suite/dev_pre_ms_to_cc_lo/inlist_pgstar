@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 1
+pgstar_interval = 2
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0

@@ -26,7 +26,7 @@
       change_rotation_flag = .true.
       new_rotation_flag = .false.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -180,7 +180,7 @@
       terminal_show_age_units = 'days'
 
       num_trace_history_values = 4
-      trace_history_value_name(1) = 'center fe56'
+      trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
@@ -268,15 +268,14 @@
 &pgstar
 
 !pause = .true.
+Profile_Panels3_xmin = 0 ! -101d0
+Profile_Panels3_xmax =  -101d0 ! 2.5 ! 
+Profile_Panels3_yaxis_name(4) = 'gamma1'
+Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
-pgstar_interval = 1
-
-! x-axis limits and properties
-Profile_Panels3_xaxis_name = 'mass'
-Profile_Panels3_xmin = 0.0
-Profile_Panels3_xmax = 2.0
-Profile_Panels3_xaxis_reversed = .false.
-
-Text_Summary1_name(3,1) = 'fe_core_infall'
+TRho_Profile_xmin = 3.0
+TRho_Profile_xmax = 10
+TRho_Profile_ymin = 8.5
+TRho_Profile_ymax = 10.5
 
 / ! end of pgstar namelist

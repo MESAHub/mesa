@@ -8,7 +8,7 @@
       required_termination_code_string = 'extras_finish_step'
       
       change_initial_net = .true.      
-      new_net_name = 'ccsn_IIp_cold.net'
+      new_net_name = 'ccsn_IIp_stella.net'
 
       !pgstar_flag = .true.
 

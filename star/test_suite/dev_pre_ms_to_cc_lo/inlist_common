@@ -23,6 +23,8 @@
 / ! end of star_job namelist
 
 &eos
+      use_Skye = .true.
+      use_PC = .false.
 / ! end of eos namelist
 
 &kap
@@ -210,7 +212,7 @@
       terminal_show_log_dt = .false.
 
       center_avg_value_dq = 1d-12
-      he_core_boundary_h1_fraction = 0.5
+      he_core_boundary_h1_fraction = 0.1
       c_core_boundary_he4_fraction = 0.5
       o_core_boundary_c12_fraction = 0.5
       si_core_boundary_o16_fraction = 0.5

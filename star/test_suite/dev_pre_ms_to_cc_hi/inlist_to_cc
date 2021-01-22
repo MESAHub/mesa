@@ -148,13 +148,17 @@
 
 
 &pgstar
+!Grid1_file_flag = .true.
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 2.3 ! 3.5 ! -101d0 ! 
+Profile_Panels3_xmax =  -101d0 ! 2.5 ! 
+Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
-TRho_Profile_xmin = 0.0
+TRho_Profile_xmin = 3.0
+TRho_Profile_xmax = 10
 TRho_Profile_ymin = 8.5
+TRho_Profile_ymax = 10.5
 
 / ! end of pgstar namelist

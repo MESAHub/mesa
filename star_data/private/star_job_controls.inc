@@ -93,6 +93,7 @@
       real(dp) :: dlgL_per_step, relax_L_center_dt
 
       integer :: remove_center_at_cell_k, remove_initial_center_at_cell_k
+      logical :: remove_center_at_max_infall_speed, remove_initial_center_at_cmax_infall_speed
       real(dp) :: remove_center_by_temperature, remove_initial_center_by_temperature
       real(dp) :: remove_center_by_mass_fraction_q, remove_initial_center_by_mass_fraction_q
       real(dp) :: remove_center_by_delta_mass_gm, remove_initial_center_by_delta_mass_gm
