@@ -11,7 +11,8 @@
 
 &controls
    initial_mass = 12 ! standard test
-   !initial_mass = 25 ! has also been tested 
+   !initial_mass = 20 ! ccsn_IIp test
+   !initial_mass = 25 ! ccsn_IIp test 
    initial_z = 0.02d0
    Dutch_scaling_factor = 0.4
 / ! end of controls namelist

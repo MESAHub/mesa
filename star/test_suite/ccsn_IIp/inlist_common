@@ -17,6 +17,8 @@
 
    set_initial_model_number = .true.
    initial_model_number = 0
+   
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 

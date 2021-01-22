@@ -20,9 +20,9 @@
    inject_until_reach_model_with_total_energy = 8d50  ! for 12M
 
    !initial_mass = 20
-   !inject_until_reach_model_with_total_energy = 8d50  ! 1.2d51  ! for 20M
+   !inject_until_reach_model_with_total_energy = 1.2d51  ! for 20M
 
    !initial_mass = 25
-   !inject_until_reach_model_with_total_energy = 1.2d51  ! for 25M
+   !inject_until_reach_model_with_total_energy = 1.5d51  ! for 25M
 
 / ! end of controls namelist

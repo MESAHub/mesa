@@ -237,15 +237,17 @@
          integer, intent(out) :: ierr
 
          real(dp) :: &
-            old_total_neut, old_total_h, old_total_he, &
-            old_total_c, old_total_n, old_total_o, old_other, &
+            old_total_neut, old_total_h, old_total_he, old_total_c, old_total_n, &
+            old_total_o, old_total_ne, old_total_mg, old_total_si, old_other, &
             total_neut, total_h, total_he, total_c, total_n, total_o, &
-            other, lgT, zfrac, xsol, lgT_lo, lgT_hi
+            total_ne, total_mg, total_si, other, &
+            lgT, zfrac, xsol, lgT_lo, lgT_hi
          integer :: i, j, cid, Z
          character(len=solnamelen) :: sol_name
 
          logical :: dbg, did_total_neut, did_total_h, did_total_he, &
-            did_total_c, did_total_n, did_total_o, did_total_other
+            did_total_c, did_total_n, did_total_o, did_total_ne, &
+            did_total_mg, did_total_si, did_total_other
 
          include 'formats'
 
@@ -272,6 +274,9 @@
          old_total_c = 0
          old_total_n = 0
          old_total_o = 0
+         old_total_ne = 0
+         old_total_mg = 0
+         old_total_si = 0
          old_other = 0
          do j=1, old_num_isos
             Z = chem_isos% Z(old_chem_id(j))
@@ -287,6 +292,12 @@
                old_total_n = old_total_n + xa_startv(j,k)
             else if (Z == 8) then
                old_total_o = old_total_o + xa_startv(j,k)
+            else if (Z == 10) then
+               old_total_ne = old_total_ne + xa_startv(j,k)
+            else if (Z == 12) then
+               old_total_mg = old_total_mg + xa_startv(j,k)
+            else if (Z == 14) then
+               old_total_si = old_total_si + xa_startv(j,k)
             else
                old_other = old_other + xa_startv(j,k)
             end if
@@ -334,6 +345,9 @@
          total_c = 0
          total_n = 0
          total_o = 0
+         total_ne = 0
+         total_mg = 0
+         total_si = 0
          other = 0
          do j=1, species
             select case(int(chem_isos% Z(chem_id(j))))
@@ -349,6 +363,12 @@
                   total_n = total_n + xa_new(j,k)
                case (8)
                   total_o = total_o + xa_new(j,k)
+               case (10)
+                  total_ne = total_ne + xa_new(j,k)
+               case (12)
+                  total_mg = total_mg + xa_new(j,k)
+               case (14)
+                  total_si = total_si + xa_new(j,k)
                case default
                   other = other + xa_new(j,k)
             end select
@@ -366,6 +386,9 @@
          did_total_c = .false.
          did_total_n = .false.
          did_total_o = .false.
+         did_total_ne = .false.
+         did_total_mg = .false.
+         did_total_si = .false.
          did_total_other = .false.
          do j=1, species
             select case(int(chem_isos% Z(chem_id(j))))
@@ -399,6 +422,25 @@
                      xa_new(j,k) = xa_new(j,k)*old_total_o/total_o
                      did_total_o = .true.
                   end if
+
+               case (10)
+                  if (total_ne > 0) then
+                     xa_new(j,k) = xa_new(j,k)*old_total_ne/total_ne
+                     did_total_o = .true.
+                  end if
+
+               case (12)
+                  if (total_mg > 0) then
+                     xa_new(j,k) = xa_new(j,k)*old_total_mg/total_mg
+                     did_total_mg = .true.
+                  end if
+
+               case (14)
+                  if (total_si > 0) then
+                     xa_new(j,k) = xa_new(j,k)*old_total_si/total_si
+                     did_total_si = .true.
+                  end if
+
                case default
                   if (other > 0) then
                      xa_new(j,k) = xa_new(j,k)*old_other/other

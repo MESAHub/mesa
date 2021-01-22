@@ -18,7 +18,7 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 

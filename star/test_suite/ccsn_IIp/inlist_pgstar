@@ -41,7 +41,7 @@
 
   Profile_Panels2_yaxis_name(2) = 'entropy'
   Profile_Panels2_ymin(2) = -101
-  Profile_Panels2_other_yaxis_name(2) = 'avQ' ! 'total_energy'
+  Profile_Panels2_other_yaxis_name(2) = 'total_energy'
   Profile_Panels2_other_ymin(2) = -101
 
   Text_Summary1_txt_scale = 5.5

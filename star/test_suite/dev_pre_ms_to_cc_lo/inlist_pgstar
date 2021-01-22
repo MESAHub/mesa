@@ -479,7 +479,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     TmaxRho_logT_max = -101d0
     TmaxRho_logRho_min = -101d0
     TmaxRho_logRho_max = -101d0
-    show_TmaxRho_degeneracy_line = .true.
+    show_TmaxRho_degeneracy_line = .true. 
 
 
 
@@ -605,7 +605,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_yaxis_reversed(2) = .false.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
-    History_Panels1_dymin(2) = 0.1
+    History_Panels1_dymin(2) = 0.0
 
       ! ::
 
