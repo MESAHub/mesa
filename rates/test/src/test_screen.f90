@@ -173,7 +173,7 @@ module test_screen
          call screen_init_AZ_info( &
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)), &
-            zg1, zg2, zg3, zg4, zs13, &
+            zs13, &
             zhat, zhat2, lzav, aznut, zs13inv, &
             ierr)
          if (ierr /= 0) return
@@ -189,7 +189,7 @@ module test_screen
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)),  &
             sc_mode, &
-            zg1, zg2, zg3, zg4, zs13, zhat, zhat2, lzav, aznut, zs13inv, &
+            zs13, zhat, zhat2, lzav, aznut, zs13inv, &
             sc1a, sc1adt, sc1add, ierr)
          if (ierr /= 0) return
 

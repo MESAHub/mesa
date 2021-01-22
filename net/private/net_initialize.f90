@@ -2049,10 +2049,6 @@
             g% reaction_reaclib_kind(num_reactions), &
             g% reverse_id_for_kind_ne_other(num_reactions), &
             g% reaction_id(num_reactions), &
-            g% zg1(num_reactions), &
-            g% zg2(num_reactions), &
-            g% zg3(num_reactions), &
-            g% zg4(num_reactions), &
             g% zs13(num_reactions), &
             g% zhat(num_reactions), &
             g% zhat2(num_reactions), &
