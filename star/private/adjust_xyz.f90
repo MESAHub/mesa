@@ -422,19 +422,16 @@
                      xa_new(j,k) = xa_new(j,k)*old_total_o/total_o
                      did_total_o = .true.
                   end if
-
                case (10)
                   if (total_ne > 0) then
                      xa_new(j,k) = xa_new(j,k)*old_total_ne/total_ne
-                     did_total_o = .true.
+                     did_total_ne = .true.
                   end if
-
                case (12)
                   if (total_mg > 0) then
                      xa_new(j,k) = xa_new(j,k)*old_total_mg/total_mg
                      did_total_mg = .true.
                   end if
-
                case (14)
                   if (total_si > 0) then
                      xa_new(j,k) = xa_new(j,k)*old_total_si/total_si
@@ -463,6 +460,12 @@
             xa_new(j,k) = xa_new(j,k) + old_total_n
          if (old_total_o > 0 .and. .not. did_total_o) &
             xa_new(j,k) = xa_new(j,k) + old_total_o
+         if (old_total_ne > 0 .and. .not. did_total_ne) &
+            xa_new(j,k) = xa_new(j,k) + old_total_ne
+         if (old_total_mg > 0 .and. .not. did_total_mg) &
+            xa_new(j,k) = xa_new(j,k) + old_total_mg
+         if (old_total_si > 0 .and. .not. did_total_si) &
+            xa_new(j,k) = xa_new(j,k) + old_total_si
          if (old_other > 0 .and. .not. did_total_other) &
             xa_new(j,k) = xa_new(j,k) + old_other
 
