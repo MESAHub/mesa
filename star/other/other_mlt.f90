@@ -150,43 +150,7 @@
          
          ! see star_data/public/star_data_def.inc for lists of mlt_basics and mlt_partials
          
-         
-         mlt_partials(1:num_mlt_partials,1:num_mlt_results) => &
-            mlt_partials1(1:num_mlt_partials*num_mlt_results)
 
-         ! factor = multiplier for gradr
-         factor = 0.8d0 ! calculate according to local conditions
-         
-         ! blend from standard gradT to gradT = factor*gradr depending on ratio Prad_face/P_face
-         ! alfa_blend = fraction factor*gradr, beta_blend = fraction standard gradT
-         min_ratio = 0.2
-         max_ratio = 0.8
-         ! use start of step values for T and P so that the value of alfa_blend is constant during iterations
-         ! that saves us from dealing with partials of alfa_blend
-         if (k > 1) then
-            T_start_face = alfa*s% T_start(k) + beta*s% T_start(k-1)
-            P_start_face = alfa*s% P_start(k) + beta*s% P_start(k-1)
-         else
-            T_start_face = s% T_start(k)
-            P_start_face = s% P_start(k)
-         end if
-         Prad_start_face = Radiation_Pressure(T_start_face)
-         if (Prad_start_face/P_start_face <= min_ratio) then
-            alfa_blend = 0d0
-         else if (Prad_start_face/P_start_face >= max_ratio) then
-            alfa_blend = 1d0
-         else
-            alfa_blend = (Prad_start_face/P_start_face - min_ratio)/(max_ratio - min_ratio)
-         end if
-         beta_blend = 1d0 - alfa_blend
-                  
-         ! combine factor*gradr with the standard gradT in mlt_basics and mlt_partials  
-         mlt_basics(mlt_gradT) = alfa_blend*factor*mlt_basics(mlt_gradr) + beta_blend*mlt_basics(mlt_gradT)
-         do j=1,num_mlt_partials
-            mlt_partials(j,mlt_gradT) = alfa_blend*factor*mlt_partials(j,mlt_gradr) + beta_blend*mlt_partials(j,mlt_gradT)
-         end do
-         
-         ! the caller will unpack all of this to set things like s% gradT(k) and s% d_gradT_dlnT00(k)
          
       end subroutine null_other_mlt
 
