@@ -114,12 +114,6 @@
    
          ! the following is private info for the implementation
          
-         ! tables for graboske screening
-         real(dp), pointer :: zg1(:) ! (num_reactions)
-         real(dp), pointer :: zg2(:) ! (num_reactions)
-         real(dp), pointer :: zg3(:) ! (num_reactions)
-         real(dp), pointer :: zg4(:) ! (num_reactions)
-         
          ! tables for screen5
          real(dp), pointer :: zs13(:) ! (num_reactions) ! zs13 = (z1+z2)**(1./3.)
          real(dp), pointer :: zhat(:) ! (num_reactions)
@@ -431,22 +425,6 @@
             if (associated(g% reaction_max_Z_plus_N_for_max_Z)) then
                deallocate(g% reaction_max_Z_plus_N_for_max_Z)
                   nullify(g% reaction_max_Z_plus_N_for_max_Z)
-            end if
-            if (associated(g% zg1)) then
-               deallocate(g% zg1)
-                  nullify(g% zg1)
-            end if
-            if (associated(g% zg2)) then
-               deallocate(g% zg2)
-                  nullify(g% zg2)
-            end if
-            if (associated(g% zg3)) then
-               deallocate(g% zg3)
-                  nullify(g% zg3)
-            end if
-            if (associated(g% zg4)) then
-               deallocate(g% zg4)
-                  nullify(g% zg4)
             end if
             if (associated(g% zs13)) then
                deallocate(g% zs13)

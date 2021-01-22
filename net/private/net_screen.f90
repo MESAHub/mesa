@@ -182,8 +182,8 @@
             if (init) then
                call screen_init_AZ_info( &
                   a1, z1, a2, z2, &
-                  g% zg1(jscr), g% zg2(jscr), g% zg3(jscr), g% zg4(jscr), g% zs13(jscr),  &
-                  g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), g% aznut(jscr), g% zs13inv(jscr), &
+                  g% zs13(jscr), g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), &
+                  g% aznut(jscr), g% zs13inv(jscr), &
                   ierr)
                if (ierr /= 0) write(*,*) 'screen_init_AZ_info failed in screening_pair ' // &
                      trim(reaction_name(ir))    
@@ -228,8 +228,8 @@
                end if 
                call screen_pair( &
                   sc, a1, z1, a2, z2, screening_mode, &
-                  g% zg1(jscr), g% zg2(jscr), g% zg3(jscr), g% zg4(jscr), g% zs13(jscr),  &
-                  g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), g% aznut(jscr), g% zs13inv(jscr), &
+                  g% zs13(jscr), g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), &
+                  g% aznut(jscr), g% zs13inv(jscr), &
                   scor, scordt, scordd, ierr) 
                if (ierr /= 0) write(*,*) 'screen_pair failed in screening_pair ' // &
                      trim(reaction_name(ir)) 

@@ -675,12 +675,10 @@
       
       subroutine screen_init_AZ_info( &
                a1, z1, a2, z2, &
-               zg1, zg2, zg3, zg4, zs13, &
-               zhat, zhat2, lzav, aznut, zs13inv, &
+               zs13, zhat, zhat2, lzav, aznut, zs13inv, &
                ierr)
          use screen5, only: screen5_init_AZ_info
          real(dp), intent(in) :: a1, z1, a2, z2
-         real(dp), intent(out) :: zg1, zg2, zg3, zg4
          real(dp), intent(out) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
          integer, intent(out) :: ierr
          if (ierr /= 0) return
@@ -871,7 +869,7 @@
       ! make calls in exactly the same order as for screen_init_AZ_info   
       subroutine screen_pair( &
                sc, a1, z1, a2, z2, screening_mode, &
-               zg1, zg2, zg3, zg4, zs13, zhat, zhat2, lzav, aznut, zs13inv, &
+               zs13, zhat, zhat2, lzav, aznut, zs13inv, &
                scor, scordt, scordd, ierr)
          use rates_def
          use screen5, only: fxt_screen5
@@ -881,7 +879,6 @@
          real(dp), intent(in) :: a1, z1, a2, z2
          integer, intent(in) :: screening_mode ! see screen_def.
          ! cached info
-         real(dp), intent(in) :: zg1, zg2, zg3, zg4
          real(dp), intent(in) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
          ! outputs
          real(dp), intent(out) :: scor ! screening factor
