@@ -241,19 +241,19 @@
          !    nl(0), test_freq(0,:), model_freq(0,:), model_freq_corr(0,:), model_inertia(0,:))
          ! okay = check_okay('a_div_r', a_div_r, target_a_div_r, perfect_tol) .and. okay
 
-         test_freq(0,1:nl(0)) = model_freq(0,1:nl(0)) + target_a3*model_freq(0,1:nl(0))**3/model_inertia(0,1:nl(0))
-         test_freq(1,1:nl(1)) = model_freq(1,1:nl(1)) + target_a3*model_freq(1,1:nl(1))**3/model_inertia(1,1:nl(1))
-         test_freq(2,1:nl(2)) = model_freq(2,1:nl(2)) + target_a3*model_freq(2,1:nl(2))**3/model_inertia(2,1:nl(2))
-         test_freq(3,1:nl(3)) = model_freq(3,1:nl(3)) + target_a3*model_freq(3,1:nl(3))**3/model_inertia(3,1:nl(3))
+         test_freq(0,1:nl(0)) = model_freq(0,1:nl(0)) + target_a3*pow3(model_freq(0,1:nl(0)))/model_inertia(0,1:nl(0))
+         test_freq(1,1:nl(1)) = model_freq(1,1:nl(1)) + target_a3*pow3(model_freq(1,1:nl(1)))/model_inertia(1,1:nl(1))
+         test_freq(2,1:nl(2)) = model_freq(2,1:nl(2)) + target_a3*pow3(model_freq(2,1:nl(2)))/model_inertia(2,1:nl(2))
+         test_freq(3,1:nl(3)) = model_freq(3,1:nl(3)) + target_a3*pow3(model_freq(3,1:nl(3)))/model_inertia(3,1:nl(3))
 
          call astero_get_cubic_all_freq_corr(x0, .false., &
             nl, test_freq, freq_sigma, model_freq, model_freq_corr, model_inertia)
          okay = check_okay('a3', x0, target_a3, perfect_tol) .and. okay
 
-         test_freq(0,1:nl(0)) = model_freq(0,1:nl(0)) + (target_b1/model_freq(0,1:nl(0))+target_b3*model_freq(0,1:nl(0))**3)/model_inertia(0,1:nl(0))
-         test_freq(1,1:nl(1)) = model_freq(1,1:nl(1)) + (target_b1/model_freq(1,1:nl(1))+target_b3*model_freq(1,1:nl(1))**3)/model_inertia(1,1:nl(1))
-         test_freq(2,1:nl(2)) = model_freq(2,1:nl(2)) + (target_b1/model_freq(2,1:nl(2))+target_b3*model_freq(2,1:nl(2))**3)/model_inertia(2,1:nl(2))
-         test_freq(3,1:nl(3)) = model_freq(3,1:nl(3)) + (target_b1/model_freq(3,1:nl(3))+target_b3*model_freq(3,1:nl(3))**3)/model_inertia(3,1:nl(3))
+         test_freq(0,1:nl(0)) = model_freq(0,1:nl(0)) + (target_b1*powm1(model_freq(0,1:nl(0)))+target_b3*pow3(model_freq(0,1:nl(0))))/model_inertia(0,1:nl(0))
+         test_freq(1,1:nl(1)) = model_freq(1,1:nl(1)) + (target_b1*powm1(model_freq(1,1:nl(1)))+target_b3*pow3(model_freq(1,1:nl(1))))/model_inertia(1,1:nl(1))
+         test_freq(2,1:nl(2)) = model_freq(2,1:nl(2)) + (target_b1*powm1(model_freq(2,1:nl(2)))+target_b3*pow3(model_freq(2,1:nl(2))))/model_inertia(2,1:nl(2))
+         test_freq(3,1:nl(3)) = model_freq(3,1:nl(3)) + (target_b1*powm1(model_freq(3,1:nl(3)))+target_b3*pow3(model_freq(3,1:nl(3))))/model_inertia(3,1:nl(3))
 
          call astero_get_combined_all_freq_corr(x0, x1, .false., &
             nl, test_freq, freq_sigma, model_freq, model_freq_corr, model_inertia)
