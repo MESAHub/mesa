@@ -427,7 +427,7 @@
              X2=AY(J)/(AY(I)+AY(J))
              X1=dim(1.d0,X2)
              if (X2.lt.TINY) cycle
-             X=X2/RZ+(1.d0-1.d0/RZ)*X2**RZ
+             X=X2/RZ+(1.d0-1.d0/RZ)*pow(X2, RZ)
              GAMI=pow(AZion(I),5d0/3d0)*GAME ! Gamma_i corrected 14.05.13
              DeltaG=.012d0*(1.d0-1.d0/pow2(RZ))*(X1+X2*pow(RZ,5d0/3d0))
              DeltaG=DeltaG*X/X2*dim(1.d0,X)/X1

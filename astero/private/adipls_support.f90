@@ -88,7 +88,7 @@
          include 'formats'
          
          ierr = 0
-         sig_fac = (2*pi)**2*R**3/(G*M)
+         sig_fac = (2*pi)**2*pow3(R)/(G*M)
          nsel = 0
          dels = 1
          els1 = dble(l)
@@ -880,15 +880,15 @@
          
          do n=2,nn
             aa(1,n)=x(n)
-            aa(2,n)=q(n)/x(n)**3
+            aa(2,n)=q(n)/pow3(x(n))
             aa(3,n)=cgrav*glob(1)*q(n)*var(5,n)/(var(10,n)*var(4,n)*var(1,n))
             aa(4,n)=var(10,n)
             aa(5,n)=var(15,n)
-            aa(6,n)=pi4*var(5,n)*var(1,n)**3/(glob(1)*q(n))
+            aa(6,n)=pi4*var(5,n)*pow3(var(1,n))/(glob(1)*q(n))
          end do
          
          aa(1,1)=0
-         aa(2,1)=pi4/3.d0*var(5,1)*glob(2)**3/glob(1)
+         aa(2,1)=pi4/3.d0*var(5,1)*pow3(glob(2))/glob(1)
          aa(3,1)=0
          aa(4,1)=var(10,1)
          aa(5,1)=0
