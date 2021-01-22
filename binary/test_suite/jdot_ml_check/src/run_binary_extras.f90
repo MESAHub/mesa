@@ -105,6 +105,7 @@
          character (len=maxlen_binary_history_column_name) :: names(n)
          real(dp) :: vals(n), a0, q, q0, alpha, beta, delta, gamma, epsilon
          integer, intent(out) :: ierr
+         include 'formats'
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in binary_ptr'
@@ -123,14 +124,13 @@
          delta = b% mass_transfer_delta
          gamma = b% mass_transfer_gamma
          epsilon = 1 - alpha - beta - delta
-         vals(1) = a0*( &
-             (q/q0)**(2*(alpha+gamma*delta-1)) * &
-             ((q+1)/(q0+1))**((-alpha-beta+delta)/(1-epsilon)) * &
-             ((epsilon*q+1)/(epsilon*q0+1))**(3 + &
-             2*(alpha*epsilon**2+beta+gamma*delta*(1-epsilon)**2)/(epsilon*(1-epsilon))) &
-             )
+         vals(1) = a0* &
+             pow(q/q0, 2*(alpha+gamma*delta-1)) * &
+             pow((q+1)/(q0+1), (-alpha-beta+delta)/(1-epsilon)) * &
+             pow((epsilon*q+1)/(epsilon*q0+1), 3 + &
+             2*(alpha*epsilon**2+beta+gamma*delta*(1-epsilon)**2)/(epsilon*(1-epsilon)))
          b% xtra(ix_separation_error) = (vals(1) - b% separation/Rsun)/ vals(1)
-         write(*,*) "error in separation", b% xtra(ix_separation_error)
+         write(*,1) "error in separation", b% xtra(ix_separation_error)
       end subroutine data_for_extra_binary_history_columns
       
       integer function extras_binary_startup(binary_id,restart,ierr)

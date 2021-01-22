@@ -16,6 +16,8 @@
 
 / ! end of kap namelist
 
+&eos
+/
 
 &controls
 
