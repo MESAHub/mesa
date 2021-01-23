@@ -128,27 +128,22 @@
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
 
+      delta_XHe_cntr_limit = 0.01d0
+      delta_XHe_cntr_hard_limit = 0.03d0
       delta_lg_XH_cntr_limit = -1
       delta_lg_XHe_cntr_limit = -1
       delta_lg_XC_cntr_limit = -1
       delta_lg_XNe_cntr_limit = -1
       delta_lg_XO_cntr_limit = -1
       delta_lg_XSi_cntr_limit = -1
-
-      delta_XHe_cntr_limit = 0.01d0
-      delta_XHe_cntr_hard_limit = 0.03d0
-
-      delta_XC_cntr_limit = 0.01d0
-      delta_XC_cntr_hard_limit = 0.03d0
-
-      delta_XNe_cntr_limit = 0.01d0
-      delta_XNe_cntr_hard_limit = 0.03d0
-
-      delta_XO_cntr_limit = 0.01d0
-      delta_XO_cntr_hard_limit = 0.03d0
-
-      delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = 0.03d0
+      delta_XC_cntr_limit = -1
+      delta_XC_cntr_hard_limit = -1
+      delta_XNe_cntr_limit = -1
+      delta_XNe_cntr_hard_limit = -1
+      delta_XO_cntr_limit = -1
+      delta_XO_cntr_hard_limit = -1
+      delta_XSi_cntr_limit = -1
+      delta_XSi_cntr_hard_limit = -1
 
       delta_Ye_highT_limit = 1d-3
 

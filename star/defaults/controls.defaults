@@ -8918,7 +8918,7 @@
       !          'dL/L'                 dL_div_L_limit
       !          'dX'                   dX_limit
       !          'dX/X'                 dX_div_X_limit
-      !          'dX_burn'              dX_nuc_drop_limit
+      !          'dX_nuc_drop'          dX_nuc_drop_limit
       !          'delta mdot'           delta_mdot_limit
       !          'delta total J'        delta_lg_total_J_limit
       !          'delta_HR'             delta_HR_limit

@@ -41,7 +41,6 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
@@ -49,10 +48,9 @@
 
 ! timesteps
       delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
-      
-      ! tighter limits for Si_cntr
-      delta_XSi_cntr_limit = 0.002d0
-      delta_XSi_cntr_hard_limit = 0.01d0
+
+      delta_XSi_cntr_limit = 0.01d0
+      delta_XSi_cntr_hard_limit = 0.03d0
 
 ! mesh
 

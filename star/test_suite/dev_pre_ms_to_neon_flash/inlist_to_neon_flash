@@ -43,7 +43,6 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 

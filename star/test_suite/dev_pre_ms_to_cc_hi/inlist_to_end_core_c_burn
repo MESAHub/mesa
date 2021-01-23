@@ -42,7 +42,6 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
@@ -74,10 +73,10 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 2
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 

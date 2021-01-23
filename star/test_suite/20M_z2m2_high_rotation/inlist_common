@@ -98,6 +98,11 @@
       D_GSF_factor = 1
       D_ST_factor = 1
 
+      smooth_D_ST = 5
+      smooth_nu_ST = 5
+      smooth_D_omega = 5
+      smooth_am_nu_rot = 5
+
 ! mixing
 
       mixing_length_alpha = 1.5
@@ -243,10 +248,11 @@
 
 ! output
 
-      num_trace_history_values = 3
+      num_trace_history_values = 4
       trace_history_value_name(1) = 'burn_solver_maxsteps'
       trace_history_value_name(2) = 'rel_E_err'
       trace_history_value_name(3) = 'log_rel_run_E_err'
+      trace_history_value_name(4) = 'surf_avg_v_div_v_crit'
 
       center_avg_value_dq = 1d-12
       he_core_boundary_h1_fraction = 0.5

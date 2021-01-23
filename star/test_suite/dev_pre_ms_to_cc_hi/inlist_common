@@ -15,11 +15,9 @@
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
-!** for high mass
       relax_to_this_tau_factor = 1.5d6
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
-!** for high mass
 
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
@@ -54,9 +52,7 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 4 
-      ! need this extra pressure to stabilize the atmosphere during core He burning
- 
+      Pextra_factor = 4  
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
@@ -78,7 +74,6 @@
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       thermohaline_option = 'Kippenhahn'
-      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
@@ -89,7 +84,6 @@
       gradT_excess_f2 = 1d-2
   
 ! mixing
-      !** for high mass - no overshoot
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
@@ -106,9 +100,9 @@
       delta_lgL_limit = 0.1     
       delta_lgL_He_limit = 0.1
 
-      delta_lgRho_cntr_limit = 0.03 ! 0.02 ! 0.005   ! default 0.05
+      delta_lgRho_cntr_limit = 0.03
       delta_lgRho_cntr_hard_limit = -1
-      delta_lgRho_limit = 0.1          ! default 1.0
+      delta_lgRho_limit = 0.1
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
       delta_lgT_cntr_limit = 0.002  
@@ -120,33 +114,28 @@
 
       dHe_div_He_limit = -1
 
-      dX_nuc_drop_limit = 2d-2
-      dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
-      dX_nuc_drop_min_X_limit = 1d-3  ! 1.0d-3  default = 1.0d-4
+      dX_nuc_drop_limit = 5d-1 ! 2d-2
+      dX_nuc_drop_limit_at_high_T = -1
+      dX_nuc_drop_min_X_limit = 1d-3
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
 
+      delta_XHe_cntr_limit = 0.01d0
+      delta_XHe_cntr_hard_limit = 0.03d0
       delta_lg_XH_cntr_limit = -1
       delta_lg_XHe_cntr_limit = -1
       delta_lg_XC_cntr_limit = -1
       delta_lg_XNe_cntr_limit = -1
       delta_lg_XO_cntr_limit = -1
       delta_lg_XSi_cntr_limit = -1
-
-      delta_XHe_cntr_limit = 0.01d0
-      delta_XHe_cntr_hard_limit = 0.02d0
-
-      delta_XC_cntr_limit = 0.01d0
-      delta_XC_cntr_hard_limit = 0.02d0
-
-      delta_XNe_cntr_limit = 0.01d0
-      delta_XNe_cntr_hard_limit = 0.02d0
-
-      delta_XO_cntr_limit = 0.01d0
-      delta_XO_cntr_hard_limit = 0.02d0
-
-      delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = 0.02d0
+      delta_XC_cntr_limit = -1
+      delta_XC_cntr_hard_limit = -1
+      delta_XNe_cntr_limit = -1
+      delta_XNe_cntr_hard_limit = -1
+      delta_XO_cntr_limit = -1
+      delta_XO_cntr_hard_limit = -1
+      delta_XSi_cntr_limit = -1
+      delta_XSi_cntr_hard_limit = -1
 
       delta_Ye_highT_limit = 1d-3
 
@@ -155,17 +144,15 @@
       mesh_delta_coeff_for_highT = 1.5      
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
-      min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
+      min_dq_for_xa = 1d-4 
 
 ! solver
       use_gold2_tolerances = .true.
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 1d-4
 
-!** for high mass
       always_use_dedt_form_of_energy_eqn = .true.       
       max_tries_for_implicit_wind = 0      
-!** for high mass
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
@@ -182,21 +169,10 @@
 
       screening_mode = 'chugunov'
 
-      ! high center T limit to avoid negative mass fractions
       sig_min_factor_for_high_Tcenter = 0.01
-         ! inactive when >= 1d0
-         ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
-         ! then okay to reduce sig by as much as this factor
-         ! as needed to prevent causing negative abundances
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-         ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
-         ! this should be > Tcenter_max_for_sig_min_factor_full_off.
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-         ! if Tcenter <= this, factor = 1, so has no effect
-         ! this should be < Tcenter_min_for_sig_min_factor_full_on.
-      ! for T > full_off and < full_on, factor changes linearly with Tcenter
 
-      ! op_split_burn
       op_split_burn = .true.
       op_split_burn_min_T = 1d9
       burn_steps_limit = 150

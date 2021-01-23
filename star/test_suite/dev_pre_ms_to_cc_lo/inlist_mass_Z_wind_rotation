@@ -10,8 +10,8 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 12
-   !initial_mass = 20 
+   !initial_mass = 12
+   initial_mass = 20 
    initial_z = 0.02d0
    Dutch_scaling_factor = 0.4
 / ! end of controls namelist

@@ -44,7 +44,7 @@ fi
 
 do_one inlist_to_cc_header start_core_collapse.mod
 
-do_one inlist_finish_core_collapse_header final.mod
+do_one inlist_prepare_for_ccsn_IIp_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

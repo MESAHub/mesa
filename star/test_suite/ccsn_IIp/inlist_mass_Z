@@ -1,7 +1,7 @@
 ! inlist_mass_Z 
 
 &star_job
-   saved_model_name = 'pre_ccsn_IIp_12M_zams_2498f1.mod'
+   saved_model_name = 'pre_ccsn_IIp_20M_zams.mod'
    new_Z = 0.02d0
 / ! end of star_job namelist
 
@@ -14,10 +14,10 @@
 &controls
    initial_z = 0.02d0
    
-   initial_mass = 12
-   inject_until_reach_model_with_total_energy = 8d50
+   !initial_mass = 12
+   !inject_until_reach_model_with_total_energy = 8d50
 
-   !initial_mass = 20
-   !inject_until_reach_model_with_total_energy = 1.3d51
+   initial_mass = 20
+   inject_until_reach_model_with_total_energy = 1.3d51
 
 / ! end of controls namelist

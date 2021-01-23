@@ -12,6 +12,9 @@
 
    set_initial_model_number = .true.
    initial_model_number = 0
+   
+   set_initial_number_retries = .true.
+   initial_number_retries = 0
 
    set_initial_dt = .true.
    seconds_for_initial_dt = 0.0001

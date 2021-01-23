@@ -511,7 +511,7 @@
          k_max = minloc(v(1:s% nz),dim=1)
          q_max = s% q(k_max)
          abs_v_max = abs(v(k_max))
-         write(*,2) 'v abs_v_max q_max', k_max, v(k_max), abs_v_max, q_max
+         !write(*,2) 'v abs_v_max q_max', k_max, v(k_max), abs_v_max, q_max
          call do_remove_center(id, k_max, ierr)
       end subroutine do_remove_center_at_inner_max_abs_v
 
@@ -604,11 +604,7 @@
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
          if (s% u_flag) then
             kk = minloc(s% u(1:s% nz),dim=1)
-               write(*,2) 'min s% u(k)', kk, s% u(kk), s% m(kk)/Msun
-
-
             s% v_center = s% u(k)
-               write(*,2) 'center s% u(k)', k, s% u(k)
             if (is_bad(s% v_center)) then
                write(*,2) 'center s% u(k)', k, s% u(k)
                stop 'do_remove_center'

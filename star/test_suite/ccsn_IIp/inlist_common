@@ -17,6 +17,8 @@
 
    set_initial_model_number = .true.
    initial_model_number = 0
+
+   set_initial_number_retries = .false.
    
    pgstar_flag = .true.
 

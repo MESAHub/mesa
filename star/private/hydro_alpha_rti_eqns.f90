@@ -64,11 +64,15 @@
             r00, rp1, ravg_start, dP, drho, rho, rmid, cs, ds_da, &
             dadt_source, dequ_dE_const_Rho, dequ_dlnd, &
             dequ_dlnd_const_E, dequ_dlnPgas_const_T, dequ_dlnT, &
-            dequ_dlnT_const_Pgas, dlnT_dlnd_const_E, dVARdot_dVAR, fac
+            dequ_dlnT_const_Pgas, dlnT_dlnd_const_E, dVARdot_dVAR, fac, &
+            d_dalpha_00, d_dalpha_m1, d_dalpha_p1
+         logical :: test_partials
 
          include 'formats'
 
          ierr = 0
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
 
          dVARdot_dVAR = s% dVARdot_dVAR
          i = s% i_alpha_RTI
@@ -155,9 +159,13 @@
          instability2 = -dPdr_drhodr ! > 0 means Rayleigh-Taylor unstable         
          if (instability2 <= 0d0 .or. &
                s% q(k) > s% alpha_RTI_src_max_q .or. &
-               s% q(k) < s% alpha_RTI_src_min_q) then
+               s% q(k) < s% alpha_RTI_src_min_q .or. &
+               s% rho(k) < 1d99) then
+               !s% rho(k) < s% alpha_RTI_src_min_rho) then
             source_plus = 0d0
             instability2 = 0d0
+            instability = 0d0
+            A_plus_B_div_rho = 0d0
          else
             RTI_B = s% RTI_B
             instability = sqrt(instability2)
@@ -178,7 +186,10 @@
          dadt_expected = dadt_mix + dadt_source
          dadt_actual = s% dalpha_RTI_dt(k)
 
-         if (associated(xscale)) then
+         if (dadt_expected == 0d0) then
+            equ(i,k) = dadt_expected
+            eqn_scale = 1d0
+         else if (associated(xscale)) then
             eqn_scale = xscale(i,k)*dVARdot_dVAR
             equ(i,k) = (dadt_expected - dadt_actual)/eqn_scale
          else
@@ -186,25 +197,64 @@
             eqn_scale = 1d0
          end if
 
-         if (skip_partials) return
-
-         ! partial of -dadt_actual/eqn_scale
-         call e00(s, xscale, i, i, k, nvar, -dVARdot_dVAR/eqn_scale)
-
-         if (dadt_mix /= 0d0) then ! partials of dadt_mix/eqn_scale
-            call e00(s, xscale, i, i, k, nvar, d_dadt_mix_da00/eqn_scale)
-            if (k > 1) then
-               call em1(s, xscale, i, i, k, nvar, d_dadt_mix_dam1/eqn_scale)
-            end if
-            if (k < nz) then
-               call ep1(s, xscale, i, i, k, nvar, d_dadt_mix_dap1/eqn_scale)
-            end if
+         if (test_partials) then
+            write(*,*) 'associated(xscale)', associated(xscale)
+            write(*,2) 'a00', k, a00
+            write(*,2) 'dadt_mix', k, dadt_mix
+            write(*,2) 'dadt_source', k, dadt_source
+            write(*,2) 'source_plus', k, source_plus
+            write(*,2) 'source_minus', k, source_minus
+            write(*,2) 'A_plus_B_div_rho', k, A_plus_B_div_rho
+            write(*,2) 'instability', k, instability
+            write(*,2) 's% q(k)', k, s% q(k)
+            write(*,2) 's% P(k)', k, s% P(k)
+            write(*,2) 's% rho(k)', k, s% rho(k)
+            write(*,2) 's% alpha_RTI_src_max_q', k, s% alpha_RTI_src_max_q
+            write(*,2) 'dadt_expected', k, dadt_expected
+            write(*,2) 'dadt_actual', k, dadt_actual
+            write(*,2) 'eqn_scale', k, eqn_scale
+            write(*,2) 's% dt', k, s% dt
+            write(*,2) 'equ(i,k)', k, equ(i,k)
+            s% solver_test_partials_val = equ(i,k)
          end if
 
-         if (dadt_source == 0d0) return
-         ! partials of dadt_source/eqn_scale
+         if (skip_partials) return
+         
+         d_dalpha_00 = 0
+         d_dalpha_m1 = 0
+         d_dalpha_p1 = 0
+         
+         if (dadt_expected == 0d0) then
+            d_dalpha_00 = 1d0
+         else
+            ! partial of -dadt_actual/eqn_scale
+            d_dalpha_00 = -dVARdot_dVAR/eqn_scale
 
-         call e00(s, xscale, i, i, k, nvar, ds_da/eqn_scale)
+            if (dadt_mix /= 0d0) then ! partials of dadt_mix/eqn_scale
+               d_dalpha_00 = d_dalpha_00 + d_dadt_mix_da00/eqn_scale
+               if (k > 1) then
+                  d_dalpha_m1 = d_dadt_mix_dam1/eqn_scale
+                  call em1(s, xscale, i, i, k, nvar, d_dalpha_m1)
+               end if
+               if (k < nz) then
+                  d_dalpha_p1 = d_dadt_mix_dap1/eqn_scale
+                  call ep1(s, xscale, i, i, k, nvar, d_dalpha_p1)
+               end if
+            end if
+
+            ! partials of dadt_source/eqn_scale
+            if (dadt_source /= 0d0) d_dalpha_00 = d_dalpha_00 + ds_da/eqn_scale
+         
+         end if
+
+         
+         call e00(s, xscale, i, i, k, nvar, d_dalpha_00)
+
+         if (test_partials) then   
+            s% solver_test_partials_var = i
+            s% solver_test_partials_dval_dx = d_dalpha_00
+            write(*,*) 'do1_alpha', s% solver_test_partials_var
+         end if
 
       end subroutine do1_alpha
 
