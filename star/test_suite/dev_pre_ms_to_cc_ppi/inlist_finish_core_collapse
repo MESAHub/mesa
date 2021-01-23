@@ -1,0 +1,334 @@
+
+&star_job
+   
+      load_saved_model = .true.
+      saved_model_name = 'converted.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'fe_core_infall_limit'
+
+      !pgstar_flag = .false.
+
+/ ! end of star_job namelist
+
+&eos
+   use_Skye = .true.
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+   
+      ! limit max_model_number as part of test_suite
+      max_model_number = 10000      
+      !max_number_retries = 30
+
+      fe_core_infall_limit = 300d5
+      non_fe_core_infall_limit = 1d99
+      log_center_temp_limit = 1d99
+
+      when_to_stop_rtol = 1d99
+      when_to_stop_atol = 1d99
+
+      ! controls for removing surface layer.  see run_star_extras for details
+      x_logical_ctrl(1) = .true. ! switch BCs
+      x_logical_ctrl(2) = .true. ! check v vs v escape
+      x_ctrl(15) = 100 ! if vsurf (kms) > this, switch to fixed_vsurf BC with the current vsurf
+      x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
+      x_ctrl(18) = 1d0 ! only remove if remaining q(k) < this
+      x_ctrl(19) = 0.99d0 ! only check v/v_esc for q(k) >= this
+      x_integer_ctrl(20) = 10 ! remove at least this many cells
+
+! surface ejection
+
+      x_logical_ctrl(2) = .true. ! check for v > v_esc
+      x_ctrl(17) = 1.0 ! v/v_esc where stop removing. it will be new surface.
+      x_ctrl(18) = 0.99999 ! q limit for removing
+      x_ctrl(19) = 0.99999 ! q limit for checking v > v_esc
+
+      x_ctrl(15) = 1d99 ! if don't find v > v_esc, check for v > this (kms)
+                   ! remove to here and switch to fixed_vsurf_outer_BC
+
+
+
+
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! mlt
+
+! mixing
+      
+! timesteps
+      dt_div_dt_cell_collapse_limit = 0.05 ! limit for dt/dt_cell_collapse
+      dt_div_dt_cell_collapse_hard_limit = 0.2
+
+! mesh
+      !okay_to_remesh = .false.
+
+! solver
+      use_gold2_tolerances = .false.
+      use_gold_tolerances = .true.
+
+      gold_iter_for_resid_tol3 = 7
+      gold_tol_max_residual3 = 1d-4
+
+      always_use_dedt_form_of_energy_eqn = .true.       
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_d_eos_dxa = .true.
+      
+      use_momentum_outer_BC = .true.
+      
+      min_timestep_limit = 1d-12
+
+      convergence_ignore_equL_residuals = .true. 
+      make_gradr_sticky_in_solver_iters = .true.
+      
+      xa_scale = 1d-5
+      iter_for_resid_tol2 = 10
+      min_timestep_limit = 1d-12 ! (seconds)
+
+      warn_rates_for_high_temp = .true.
+      max_safe_logT_for_rates = 10.5d0
+
+      screening_mode = 'chugunov'
+
+      sig_min_factor_for_high_Tcenter = 0.01
+      Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+      Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+
+      op_split_burn = .true.
+      op_split_burn_min_T = 1d9
+      burn_steps_limit = 150
+      burn_steps_hard_limit = 250
+      op_split_burn_eps = 1d-5
+      op_split_burn_odescal = 1d-5
+
+      !restore_mesh_on_retry = .true.
+      !num_steps_to_hold_mesh_after_retry = 5
+      
+      
+      
+      
+      
+! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+
+! output
+
+      num_trace_history_values = 4
+      trace_history_value_name(1) = 'non_fe_core_infall'
+      trace_history_value_name(2) = 'fe_core_infall'
+      trace_history_value_name(3) = 'rel_E_err'
+      trace_history_value_name(4) = 'log_rel_run_E_err'
+
+      photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      terminal_interval = 1
+
+! FOR DEBUGGING
+
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
+
+      !solver_save_photo_call_number = 0
+         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+
+      !solver_test_partials_call_number = 464
+      !solver_test_partials_k = 27
+      !solver_test_partials_iter_number = 2
+      !solver_test_partials_dx_0 = 1d-2
+      !solver_test_partials_var_name = 'lnT' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
+      !solver_test_partials_equ_name = 'grad_ad' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
+      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+      !solver_test_partials_show_dx_var_name = 'h1'
+
+         ! equ name can also be one of these
+            ! 'lnE', 'lnP', 'grad_ad' to test eos
+            ! 'eps_nuc' to test net
+            ! 'non_nuc_neu' to test neu
+            ! 'gradT', 'mlt_vc' to test mlt
+            ! 'opacity' to test kap
+
+      !solver_test_partials_write_eos_call_info = .true.
+      
+      !solver_test_partials_k_low = -1
+      !solver_test_partials_k_high = -1
+      
+      !solver_test_eos_partials = .true.
+      !solver_test_kap_partials = .true.
+      !solver_test_net_partials = .true.
+      !solver_test_atm_partials = .true.
+
+      !report_why_dt_limits = .true.
+      !report_all_dt_limits = .true.
+      !report_solver_dt_info = .true.
+      
+      !show_mesh_changes = .true.
+      !mesh_dump_call_number = 5189
+      !okay_to_remesh = .false.
+      
+      !energy_conservation_dump_model_number = -1
+      
+      !trace_evolve = .true.
+      
+      !use_DGESVX_in_bcyclic = .true.
+      !use_equilibration_in_DGESVX = .true.
+      !report_min_rcond_from_DGESXV = .true.
+
+
+      ! solver debugging
+      !solver_check_everything = .true.
+      
+      !solver_epsder_struct = 1d-6
+      !solver_epsder_chem = 1d-6
+
+      !fill_arrays_with_NaNs = .true.
+      
+      !report_solver_dt_info = .true.
+      !report_dX_nuc_drop_dt_limits = .true.
+      !report_bad_negative_xa = .true.
+      
+      !trace_k = 0
+
+/ ! end of controls namelist
+
+&pgstar
+
+
+
+!pause = .true.
+Profile_Panels3_xmin = 0 ! -101d0
+Profile_Panels3_xmax = -101d0
+
+Profile_Panels3_num_panels = 6
+
+Profile_Panels3_yaxis_name(4) = 'gamma1'
+    Profile_Panels3_ymin(4) = 1.28d0
+    Profile_Panels3_ymax(4) = -101d0
+Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
+    Profile_Panels3_other_dymin(4) = 0.15
+
+Profile_Panels3_yaxis_name(5) = 'logP' ! 'logRho'
+Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
+    Profile_Panels3_other_dymin(5) = 12
+ 
+Profile_Panels3_yaxis_name(6) = 'logRho'
+Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
+    Profile_Panels3_other_dymin(6) = 0.15
+
+Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
+!Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
+!Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
+
+    History_Panels2_title = ''
+
+    History_Panels2_xaxis_name = 'star_age_sec'
+    History_Panels2_max_width = -1
+
+    History_Panels2_txt_scale = 0.75
+    History_Panels2_xmin = -101d0
+    History_Panels2_xmax = -101d0
+    History_Panels2_dxmin = -1
+    History_Panels2_xaxis_reversed = .false.
+    History_Panels2_xaxis_log = .false.
+    History_Panels2_xmargin = 0.0
+
+      ! ::
+
+    History_Panels2_num_panels = 2
+
+      ! ::
+
+    History_Panels2_yaxis_name(1) = 'center_T'
+    History_Panels2_yaxis_reversed(1) = .false.
+    History_Panels2_ymin(1) = -101d0
+    History_Panels2_ymax(1) = -101d0
+    History_Panels2_dymin(1) = 0.1
+
+      ! ::
+
+    History_Panels2_other_yaxis_name(1) = 'total_energy_foe'
+    History_Panels2_other_yaxis_reversed(1) = .true.
+    History_Panels2_other_ymin(1) = -101d0
+    History_Panels2_other_ymax(1) = -101d0
+    History_Panels2_other_dymin(1) = 0.1
+
+      ! ::
+
+    History_Panels2_yaxis_name(2) = 'center_Rho'
+    History_Panels2_yaxis_reversed(2) = .false.
+    History_Panels2_ymin(2) = -101d0
+    History_Panels2_ymax(2) = -101d0
+    History_Panels2_dymin(2) = 0.1
+
+      ! ::
+
+    History_Panels2_other_yaxis_name(2) = 'center_entropy'
+    History_Panels2_other_yaxis_reversed(2) = .false.
+    History_Panels2_other_ymin(2) = -101d0
+    History_Panels2_other_ymax(2) = -101d0
+    History_Panels2_other_dymin(2) = 0.1
+
+
+
+
+
+
+
+History_Panels1_yaxis_name(1) = 'star_mass'
+History_Panels1_other_yaxis_name(2) = 'star_age_day'
+
+Profile_Panels1_same_yaxis_range(3) = .false. ! .true.      << for comparison with 9967
+
+TRho_Profile_xmin = 2.0
+!TRho_Profile_xmax = 7.5
+TRho_Profile_ymin = 8.3
+!TRho_Profile_ymax = 9.2
+
+Text_Summary1_name(1,1) = 'model_number'
+Text_Summary1_name(1,2) = 'log_dt'
+Text_Summary1_name(1,3) = 'Mass'
+Text_Summary1_name(1,4) = 'center_ye'    
+Text_Summary1_name(1,5) = 'H_rich'
+
+Text_Summary1_name(2,1) = 'gamma1_min'  
+Text_Summary1_name(2,2) = 'star_age_day'
+Text_Summary1_name(2,3) = 'log_L'
+Text_Summary1_name(2,4) = 'He_cntr'
+Text_Summary1_name(2,5) = 'He_core'
+
+Text_Summary1_name(3,1) = 'v_surf_div_escape_v'
+Text_Summary1_name(3,2) = 'log_cntr_Rho'
+Text_Summary1_name(3,3) = 'log_Teff'
+Text_Summary1_name(3,4) = 'C_cntr'
+Text_Summary1_name(3,5) = 'C_core'
+
+Text_Summary1_name(4,1) = 'non_fe_core_infall'
+Text_Summary1_name(4,2) = 'log_LH'
+Text_Summary1_name(4,3) = 'lg_Lnuc'
+Text_Summary1_name(4,4) = 'O_cntr'
+Text_Summary1_name(4,5) = 'Fe_core'
+
+Text_Summary1_name(5,1) = 'log_cntr_T'
+Text_Summary1_name(5,2) = 'log_LHe'
+Text_Summary1_name(5,3) = 'lg_Lneu'
+Text_Summary1_name(5,4) = 'Ne_cntr'
+Text_Summary1_name(5,5) = 'zones'
+
+Text_Summary1_name(6,1) = 'log_max_T'
+Text_Summary1_name(6,2) = 'log_LZ'
+Text_Summary1_name(6,3) = 'lg_Lphoto'
+Text_Summary1_name(6,4) = 'Si_cntr'
+Text_Summary1_name(6,5) = 'retries'
+
+/ ! end of pgstar namelist
