@@ -3,7 +3,8 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'near_end_core_he_burn.mod'
+      !saved_model_name = 'near_end_core_he_burn.mod'
+      saved_model_name = 'removed_envelope.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'after_core_c_burn.mod'
@@ -16,7 +17,7 @@
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 

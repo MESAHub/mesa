@@ -39,7 +39,7 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'he4'
-      xa_central_lower_limit(1) = 0.05d0 ! stop before oscillations begin    1d-3
+      xa_central_lower_limit(1) = 0.05d0 ! stop before oscillations begin 
 
       ! limit max_model_number as part of test_suite
       max_model_number = 3000

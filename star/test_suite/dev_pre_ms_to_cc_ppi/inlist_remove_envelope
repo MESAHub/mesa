@@ -9,7 +9,7 @@
       save_model_filename = 'removed_envelope.mod'
       required_termination_code_string = 'max_model_number'
       
-      remove_initial_surface_at_he_core_boundary = 0.2d0 ! fails with 0.1d0
+      remove_initial_surface_at_he_core_boundary = 0.01d0 ! H abundance where cut
 
       set_initial_age = .true.
       initial_age = 0

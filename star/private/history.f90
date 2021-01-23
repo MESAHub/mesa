@@ -1891,6 +1891,8 @@
                else
                   val = 0d0 ! s% r(1)*s% dlnR_dt(1)
                end if
+            case(h_bound_mass)
+               val = bound_mass(s)/Msun
 
             case(h_log_L_div_Ledd)
                Ledd = eval_Ledd(s, ierr)

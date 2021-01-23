@@ -26,6 +26,7 @@
       use star_def
       use const_def
       use math_lib
+      use gyre_lib
       
       implicit none
       
@@ -33,6 +34,17 @@
       
       real(dp) :: Psurf, Tsurf, Lsurf, vsurf
       logical :: have_switched_to_fixed_vsurf
+
+!gyre
+      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      !x_logical_ctrl(2) = .false. ! output eigenfunction files
+      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      !x_integer_ctrl(4) = 1 ! order
+      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
       contains
 
@@ -125,6 +137,24 @@
          if (s% x_ctrl(16) > 0d0) &
             s% x_ctrl(2) = s% star_mass - s% x_ctrl(16)
          
+         if (.not. s% x_logical_ctrl(37)) return
+         
+         ! Initialize GYRE
+
+         call gyre_init('gyre.in')
+
+         ! Set constants
+
+         call gyre_set_constant('G_GRAVITY', standard_cgrav)
+         call gyre_set_constant('C_LIGHT', clight)
+         call gyre_set_constant('A_RADIATION', crad)
+
+         call gyre_set_constant('M_SUN', Msun)
+         call gyre_set_constant('R_SUN', Rsun)
+         call gyre_set_constant('L_SUN', Lsun)
+
+         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+         
       end subroutine extras_startup
       
       
@@ -171,6 +201,8 @@
             end if
          end do
          call test_suite_after_evolve(s, ierr)
+         if (.not. s% x_logical_ctrl(37)) return
+         call gyre_final()
       end subroutine extras_after_evolve
       
 
@@ -266,6 +298,7 @@
             v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
             if (vel(k) > v_esc) then
                k0 = k
+               write(*,2) 'found vel > v_esc', k, vel(k)/v_esc, vel(k), v_esc
                exit
             end if
          end do
@@ -305,17 +338,20 @@
             v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
             if (vel(k) < s% x_ctrl(17)*v_esc) then ! stop removing here
                k1 = k-1
+               write(*,2) 'vel < x_ctrl(17)*v_esc', k, vel(k), &
+                  s% x_ctrl(17)*v_esc, s% x_ctrl(17), v_esc
                exit
             end if
          end do
          if (s% q(k1) > s% x_ctrl(18)) then
-            write(*,2) 'v > vesc, but too little to bother with', k1, s% q(k1)
+            write(*,2) 'some v > vesc, but too little mass to bother removing', k1, s% q(k1)
             return ! too little to bother with
          end if
          k1 = max(k1, s% x_integer_ctrl(20))
          do while (s% L(k1) <= 0)
             k1 = k1 + 1
          end do
+         write(*,2) 'enough mass with v > vesc, remove surface', k1, s% m(k1)/Msun, s% q(k1)
          call star_remove_surface_at_cell_k(s% id, k1, ierr)
          if (ierr /= 0) then
             write(*,*) 'extras_start_step failed in star_remove_surface_at_cell_k'
@@ -323,6 +359,7 @@
             extras_start_step = terminate
             return
          end if
+         write(*,2) 'done remove surface', 1, s% m(1)/Msun
          if (s% x_logical_ctrl(1)) then
             Psurf = s% P(1)
             Tsurf = s% T(1)
@@ -334,7 +371,7 @@
          extras_start_step = keep_going
       end function extras_start_step
    
-
+      include 'gyre_in_mesa_extras_finish_step.inc'
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -350,6 +387,10 @@
          extras_finish_step = keep_going
          call store_extra_info(s)
          if (s% x_logical_ctrl(1)) call switch_BCs(s)
+         if (.not. s% x_logical_ctrl(37)) return
+         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+         if (extras_finish_step == terminate) &
+             s% termination_code = t_extras_finish_step
       end function extras_finish_step
 
       
