@@ -56,6 +56,12 @@
 
          ierr = 0
          nz = s% nz
+         
+         if (.not. s% calculate_Brunt_B) then
+            call set_nan(s% brunt_B(1:nz))
+            call set_nan(s% unsmoothed_brunt_B(1:nz))
+            return
+         end if
 
          if (s% use_other_brunt) then
             call s% other_brunt(s% id, ierr)
@@ -111,7 +117,7 @@
          ierr = 0
          nz = s% nz
 
-         if (.not. s% calculate_Brunt_N2) then
+         if (.not. (s% calculate_Brunt_B .and. s% calculate_Brunt_N2)) then
             call set_nan(s% brunt_N2(1:nz))
             call set_nan(s% brunt_N2_composition_term(1:nz))
             return
@@ -220,7 +226,7 @@
 
 
       subroutine do_brunt_B_MHM_form(s, ierr)
-         ! Brassard from Mike Montgomery
+         ! Brassard from Mike Montgomery (MHM)
          use star_utils, only: get_face_values
          use interp_1d_def
 
@@ -238,6 +244,8 @@
 
          nz = s% nz
          species = s% species
+         
+         nullify(T_face, rho_face, chiT_face)
 
          call do_alloc(ierr)
          if (ierr /= 0) then
@@ -247,13 +255,25 @@
          end if
 
          call get_face_values(s, s% chiT, chiT_face, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
+         write(*,*) 'associated chiT_face', associated(chiT_face)
 
          call get_face_values(s, s% T, T_face, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
+         write(*,*) 'associated T_face', associated(T_face)
 
          call get_face_values(s, s% rho, rho_face, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
+         write(*,*) 'associated rho_face', associated(rho_face)
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,nz
@@ -289,6 +309,11 @@
             integer, intent(out) :: ierr
             logical, parameter :: crit = .false.
             ierr = 0
+            if (.not. alloc_flag) then
+               write(*,*) 'free T_face', associated(T_face)
+               write(*,*) 'free rho_face', associated(rho_face)
+               write(*,*) 'free chiT_face', associated(chiT_face)
+            end if
             call work_array(s, alloc_flag, crit, &
                T_face, nz, nz_alloc_extra, 'brunt', ierr)
             if (ierr /= 0) return
@@ -298,6 +323,11 @@
             call work_array(s, alloc_flag, crit, &
                chiT_face, nz, nz_alloc_extra, 'brunt', ierr)
             if (ierr /= 0) return
+            if (alloc_flag) then
+               write(*,*) 'alloc T_face', associated(T_face)
+               write(*,*) 'alloc rho_face', associated(rho_face)
+               write(*,*) 'alloc chiT_face', associated(chiT_face)
+            end if
          end subroutine do_work_arrays
 
       end subroutine do_brunt_B_MHM_form

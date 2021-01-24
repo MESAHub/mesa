@@ -467,7 +467,6 @@
             call dealloc
          end function failed
 
-
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr
             call do_work_arrays(.true.,ierr)
@@ -484,16 +483,17 @@
             logical, parameter :: crit = .false.
             ierr = 0
             call work_array(s, alloc_flag, crit, &
-               eps_h, nz, nz_alloc_extra, 'mix_info', ierr)
+               eps_h, nz, nz_alloc_extra, 'mix_info eps_h', ierr)
             if (ierr /= 0) return
             call work_array(s, alloc_flag, crit, &
-               eps_he, nz, nz_alloc_extra, 'mix_info', ierr)
+               eps_he, nz, nz_alloc_extra, 'mix_info eps_he', ierr)
+            if (ierr /= 0) return
+            if (.not. associated(eps_z)) stop 'eps_z nil set_mixing_info'
+            call work_array(s, alloc_flag, crit, &
+               eps_z, nz, nz_alloc_extra, 'mix_info eps_z', ierr)
             if (ierr /= 0) return
             call work_array(s, alloc_flag, crit, &
-               eps_z, nz, nz_alloc_extra, 'mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               cdc_factor, nz, nz_alloc_extra, 'mix_info', ierr)
+               cdc_factor, nz, nz_alloc_extra, 'mix_info cdc_factor', ierr)
             if (ierr /= 0) return
          end subroutine do_work_arrays
 
@@ -501,6 +501,18 @@
             character(len=*) :: str
             integer :: k
             include 'formats'
+            if (.not. associated(eps_h)) then
+               write(*,*) trim(str)
+               stop 'eps_h nil set_mixing_info'
+            end if
+            if (.not. associated(eps_he)) then
+               write(*,*) trim(str)
+               stop 'eps_he nil set_mixing_info'
+            end if
+            if (.not. associated(eps_z)) then
+               write(*,*) trim(str)
+               stop 'eps_z nil set_mixing_info'
+            end if
             do k = 1, s% nz
                if (is_bad_num(s% D_mix(k))) then
                   ierr = -1

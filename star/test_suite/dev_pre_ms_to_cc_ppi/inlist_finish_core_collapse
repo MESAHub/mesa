@@ -33,13 +33,10 @@
       when_to_stop_atol = 1d99
 
 ! trim envelope when radius gets too large
-      !x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
-      
-      ! will get  retry: get_T_tau -- L <= 0    if set trigger too small
-
-      x_ctrl(19) = 5000 ! trigger for R too large
+      x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
+      x_ctrl(19) = 1000 ! trigger for R too large
       x_ctrl(20) = 5.0 ! cut back to place where v < v_esc*x_ctrl(20)
-      x_ctrl(21) = 2500 ! or cut back to place where r/rsun < x_ctrl(21)
+      x_ctrl(21) = 1000 ! or cut back to place where r/rsun < x_ctrl(21)
 
 
 ! wind
@@ -61,18 +58,18 @@
       delta_lgL_He_limit = 0.5
 
       delta_lgT_max_limit = 0.03    
-      delta_lgT_max_hard_limit = 0.06
+      delta_lgT_max_hard_limit = 0.1
 
       delta_lgT_cntr_limit = 0.03    
-      delta_lgT_cntr_hard_limit = 0.06
+      delta_lgT_cntr_hard_limit = 0.1
 
       delta_XHe_cntr_limit = 0.03
-      delta_XHe_cntr_hard_limit = 0.06
+      delta_XHe_cntr_hard_limit = 0.1
 
       delta_XSi_cntr_limit = 0.01d0
       delta_XSi_cntr_hard_limit = 0.03d0
 
-      dt_div_min_dr_div_cs_limit = 2 ! 0.7d0
+      !dt_div_min_dr_div_cs_limit = 2 ! 0.7d0
 
 ! mesh
 
@@ -89,6 +86,8 @@
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
       use_d_eos_dxa = .true.
+      
+      !calculate_Brunt_B = .false.
       
       use_momentum_outer_BC = .true.
       
@@ -144,6 +143,8 @@
       trace_history_value_name(3) = 'bound_mass'
       trace_history_value_name(4) = 'rel_E_err'
       trace_history_value_name(5) = 'log_rel_run_E_err'
+      
+      !report_min_dr_div_cs = .true.
 
       photo_interval = 10
       !profile_interval = 1

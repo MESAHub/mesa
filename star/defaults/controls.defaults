@@ -7479,13 +7479,16 @@
    ! ______________
 
 
+      ! calculate_Brunt_B
+      ! ~~~~~~~~~~~~~~~~~~
       ! calculate_Brunt_N2
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! Only calculate ``Brunt_N2`` if this is true.
+      ! Only calculate if this is true.
 
       ! ::
 
+    calculate_Brunt_B = .true.
     calculate_Brunt_N2 = .true.
 
 

@@ -211,7 +211,7 @@ contains
 
              ! Check if the overshoot will be stabilized by the stratification
 
-             if (s%overshoot_brunt_B_max > 0._dp) then
+             if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
                 
                 if (.not. s% calculate_Brunt_N2) &
                    stop 'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.'

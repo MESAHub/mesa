@@ -39,9 +39,9 @@
 ! mesh
       use_split_merge_amr = .true.
       split_merge_amr_log_zoning = .true.
-      split_merge_amr_nz_baseline = 3300
-      split_merge_amr_MaxLong = 3d0
-      split_merge_amr_MaxShort = 1.5d0
+      split_merge_amr_nz_baseline = 2000
+      split_merge_amr_MaxLong = 1.7d0
+      split_merge_amr_MaxShort = 1.7d0
       split_merge_amr_max_iters = 10
 
 ! solver

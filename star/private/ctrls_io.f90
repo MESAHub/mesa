@@ -160,7 +160,7 @@
     min_dt_for_increases_in_convection_velocity, max_conv_vel_div_csound, &
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
-    calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
+    calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
     threshold_for_smooth_brunt_B, use_brunt_gradmuX_form, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
     RSP_max_num_periods, RSP_min_max_R_for_periods, &
@@ -1130,6 +1130,7 @@
  s% max_v_div_cs_for_convection = max_v_div_cs_for_convection
  s% max_abs_du_div_cs_for_convection = max_abs_du_div_cs_for_convection
 
+ s% calculate_Brunt_B = calculate_Brunt_B
  s% calculate_Brunt_N2 = calculate_Brunt_N2
  s% brunt_N2_coefficient = brunt_N2_coefficient
  s% num_cells_for_smooth_brunt_B = num_cells_for_smooth_brunt_B
@@ -2765,6 +2766,7 @@
  max_v_div_cs_for_convection = s% max_v_div_cs_for_convection
  max_abs_du_div_cs_for_convection = s% max_abs_du_div_cs_for_convection
 
+ calculate_Brunt_B = s% calculate_Brunt_B
  calculate_Brunt_N2 = s% calculate_Brunt_N2
  brunt_N2_coefficient = s% brunt_N2_coefficient
  threshold_for_smooth_brunt_B = s% threshold_for_smooth_brunt_B

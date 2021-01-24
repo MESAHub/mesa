@@ -362,7 +362,7 @@
          integer :: RTI_smooth_iterations
 
       ! brunt
-         logical :: calculate_Brunt_N2, use_brunt_gradmuX_form
+         logical :: calculate_Brunt_B, calculate_Brunt_N2, use_brunt_gradmuX_form
          real(dp) :: min_magnitude_brunt_B, brunt_N2_coefficient
          integer :: num_cells_for_smooth_brunt_B
          real(dp) :: threshold_for_smooth_brunt_B
