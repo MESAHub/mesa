@@ -368,7 +368,7 @@
          end if
 
          s% why_Tlim = i_limit
-         if (i_limit > 0) s% dt_why_retry_count(i_limit) = s% dt_why_retry_count(i_limit) + 1
+         if (i_limit > 0) s% dt_why_count(i_limit) = s% dt_why_count(i_limit) + 1
 
          contains
 
@@ -2134,7 +2134,8 @@
             s% dt_div_min_dr_div_cs_limit, s% dt_div_min_dr_div_cs_hard_limit, &
             s% Tlim_dt_div_min_dr_div_cs_cell, 'check_dt_div_min_dr_div_cs', &
             skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dt_div_min_dr_div_cs /= keep_going .and. s% report_dt_hard_limit_retries) then
+         if ((check_dt_div_min_dr_div_cs /= keep_going .and. s% report_dt_hard_limit_retries) .or. &
+             (ratio > 1d0 .and. s% report_min_dr_div_cs)) then
             write(*,2) 'min_dr_div_cs', s% Tlim_dt_div_min_dr_div_cs_cell, dt_x
          end if
       end function check_dt_div_min_dr_div_cs

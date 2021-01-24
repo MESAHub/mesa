@@ -1307,7 +1307,7 @@
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
          logical :: report_dt_hard_limit_retries, report_solver_dt_info
-         logical :: trace_evolve
+         logical :: trace_evolve, report_min_dr_div_cs
 
       ! misc
 

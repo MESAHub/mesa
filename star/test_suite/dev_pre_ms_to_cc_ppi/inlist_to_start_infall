@@ -31,6 +31,8 @@
 
 &controls
 
+      !non_fe_core_infall_limit = 20d5
+
       xa_central_lower_limit_species(1) = 'o16'
       xa_central_lower_limit(1) = 1d-2
 

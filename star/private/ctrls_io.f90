@@ -463,7 +463,7 @@
     delta_mdot_atol, delta_mdot_rtol, delta_mdot_limit, delta_mdot_hard_limit, &
     adjust_J_q_limit, adjust_J_q_hard_limit, &
     never_skip_hard_limits, relax_hard_limits_after_retry, &
-    report_dt_hard_limit_retries, report_solver_dt_info, &
+    report_dt_hard_limit_retries, report_min_dr_div_cs, report_solver_dt_info, &
     limit_for_rel_error_in_energy_conservation, hard_limit_for_rel_error_in_energy_conservation, &
 
     ! atmosphere -- surface boundary conditions
@@ -2328,6 +2328,7 @@
  s% never_skip_hard_limits = never_skip_hard_limits
  s% relax_hard_limits_after_retry = relax_hard_limits_after_retry
  s% report_dt_hard_limit_retries = report_dt_hard_limit_retries
+ s% report_min_dr_div_cs = report_min_dr_div_cs
  s% report_solver_dt_info = report_solver_dt_info
 
  s% limit_for_rel_error_in_energy_conservation = limit_for_rel_error_in_energy_conservation
@@ -3951,6 +3952,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  never_skip_hard_limits = s% never_skip_hard_limits
  relax_hard_limits_after_retry = s% relax_hard_limits_after_retry
  report_dt_hard_limit_retries = s% report_dt_hard_limit_retries
+ report_min_dr_div_cs = s% report_min_dr_div_cs
  report_solver_dt_info = s% report_solver_dt_info
 
  limit_for_rel_error_in_energy_conservation = s% limit_for_rel_error_in_energy_conservation

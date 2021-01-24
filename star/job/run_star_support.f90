@@ -729,13 +729,12 @@
                   write(*,2) trim(dt_why_str(i)) // ' retries', s% dt_why_retry_count(i)
                end if
             end do
-            write(*,2) 'misc other retries', s% num_retries - sum(s% dt_why_retry_count(1:numTlim))
             write(*,*)
          end if
          if (s% job% show_timestep_limit_counts_when_terminate) then
             do i=1,numTlim
                if (s% dt_why_count(i) > 0) then
-                  write(*,2) trim(dt_why_str(i)) // ' dt limits', s% dt_why_count(i)
+                  write(*,2) trim(dt_why_str(i)) // ' dt limit', s% dt_why_count(i)
                end if
             end do
             write(*,*)

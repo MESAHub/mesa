@@ -11026,6 +11026,16 @@
     hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
 
+      ! report_min_dr_div_cs
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, produce terminal output about minimum of cell dr/cs
+
+      ! ::
+
+    report_min_dr_div_cs = .false.
+
+
       ! report_dt_hard_limit_retries
       ! ~~~~~~~~~~~~~~~~~~~~
 

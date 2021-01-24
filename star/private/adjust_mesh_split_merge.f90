@@ -297,7 +297,8 @@
                xR = s% r(k)
             end if
             if (s% split_merge_amr_avoid_repeated_remesh .and. &
-                  (s% split_merge_amr_avoid_repeated_remesh .and. s% amr_split_merge_has_undergone_remesh(k))) cycle
+                  (s% split_merge_amr_avoid_repeated_remesh .and. &
+                     s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
             

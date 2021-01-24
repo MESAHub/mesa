@@ -78,8 +78,12 @@
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
       log_rotational_mdot_boost
       !star_mdot ! d(star_mass)/dt (in msolar per year)
-      !time_step ! timestep in years since previous model
+      time_step ! timestep in years since previous model
+      time_step_sec
+      time_step_days
       log_dt ! log10 time_step
+      log_dt_sec
+      log_dt_days
       num_zones ! number of zones in the model
       log_total_angular_momentum
       total_energy_foe
@@ -89,7 +93,7 @@
       
       log_max_residual
       log_residual_norm
-      num_solver_iterations ! iterations at this step
+      num_solver_iterations ! iterations this step
       rel_E_err
       log_rel_E_err
       log_rel_run_E_err

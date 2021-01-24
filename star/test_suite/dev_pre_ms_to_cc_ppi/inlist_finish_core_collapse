@@ -32,11 +32,14 @@
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
 
-! trim envelope when too large radius
-      x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
-      x_ctrl(19) = 1000 ! trigger for R too large
+! trim envelope when radius gets too large
+      !x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
+      
+      ! will get  retry: get_T_tau -- L <= 0    if set trigger too small
+
+      x_ctrl(19) = 5000 ! trigger for R too large
       x_ctrl(20) = 5.0 ! cut back to place where v < v_esc*x_ctrl(20)
-      x_ctrl(21) = 1000 ! or cut back to place where r/rsun < x_ctrl(21)
+      x_ctrl(21) = 2500 ! or cut back to place where r/rsun < x_ctrl(21)
 
 
 ! wind
@@ -58,13 +61,18 @@
       delta_lgL_He_limit = 0.5
 
       delta_lgT_max_limit = 0.03    
-      delta_lgT_max_hard_limit = 0.1
+      delta_lgT_max_hard_limit = 0.06
 
       delta_lgT_cntr_limit = 0.03    
-      delta_lgT_cntr_hard_limit = 0.1
+      delta_lgT_cntr_hard_limit = 0.06
 
       delta_XHe_cntr_limit = 0.03
-      delta_XHe_cntr_hard_limit = 0.1
+      delta_XHe_cntr_hard_limit = 0.06
+
+      delta_XSi_cntr_limit = 0.01d0
+      delta_XSi_cntr_hard_limit = 0.03d0
+
+      dt_div_min_dr_div_cs_limit = 2 ! 0.7d0
 
 ! mesh
 
@@ -116,7 +124,7 @@
       
       !x_logical_ctrl(37) = .true. ! if true, then run GYRE
 
-      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+      x_integer_ctrl(1) = 50 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
       x_integer_ctrl(2) = 2 ! max number of modes to output per call
@@ -177,10 +185,6 @@
       !solver_test_kap_partials = .true.
       !solver_test_net_partials = .true.
       !solver_test_atm_partials = .true.
-
-      !report_why_dt_limits = .true.
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
       
       !show_mesh_changes = .true.
       !mesh_dump_call_number = 5189
@@ -216,8 +220,26 @@
 
 
 !pause = .true.
-Profile_Panels3_xmin = 0 ! -101d0
+
+Grid1_num_plots = 5
+
+Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
+Grid1_plot_col(5) = 1          ! number from 1 at left
+Grid1_plot_colspan(5) = 2       ! plot spans this number of columns
+Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
+Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
+
+
+
+Profile_Panels3_xaxis_name = 'mass'
+Profile_Panels3_xmin = 0.0
 Profile_Panels3_xmax = -101d0
+Profile_Panels3_xaxis_reversed = .false.
+
+Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xmin = -101d0
+Profile_Panels3_xmax = -101d0
+Profile_Panels3_xaxis_reversed = .true.
 
 Profile_Panels3_num_panels = 6
 
@@ -227,88 +249,97 @@ Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
     Profile_Panels3_other_dymin(4) = 0.15
 
-Profile_Panels3_yaxis_name(5) = 'logP' ! 'logRho'
+Profile_Panels3_yaxis_name(5) = 'logRho'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(5) = 12
  
-Profile_Panels3_yaxis_name(6) = 'logRho'
+Profile_Panels3_yaxis_name(6) = 'logR'
+    Profile_Panels3_ymin(6) = -101 ! -3d0
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
 
-Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
-Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
-Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
 
-    History_Panels2_title = ''
+ History_Panels2_title = ''
 
-    History_Panels2_xaxis_name = 'star_age_day'
-    History_Panels2_max_width = -1
+ History_Panels2_xaxis_name = 'star_age_day'
+ History_Panels2_max_width = -1
 
-    History_Panels2_txt_scale = 0.75
-    History_Panels2_xmin = -101d0
-    History_Panels2_xmax = -101d0
-    History_Panels2_dxmin = -1
-    History_Panels2_xaxis_reversed = .false.
-    History_Panels2_xaxis_log = .false.
-    History_Panels2_xmargin = 0.0
+ History_Panels2_txt_scale = 0.75
+ History_Panels2_xmin = -101d0
+ History_Panels2_xmax = -101d0
+ History_Panels2_dxmin = -1
+ History_Panels2_xaxis_reversed = .false.
+ History_Panels2_xaxis_log = .false.
+ History_Panels2_xmargin = 0.0
 
-      ! ::
+ History_Panels2_num_panels = 3
 
-    History_Panels2_num_panels = 3
+ History_Panels2_yaxis_name(1) = 'log_cntr_T'
+ History_Panels2_yaxis_reversed(1) = .false.
+ History_Panels2_ymin(1) = -101d0
+ History_Panels2_ymax(1) = -101d0
+ History_Panels2_dymin(1) = 0.1
 
-      ! ::
+ History_Panels2_other_yaxis_name(1) = 'gamma1_min'
+ History_Panels2_other_ymin(1) = -101d0
+ History_Panels2_other_ymax(1) = -101d0
+ History_Panels2_other_dymin(1) = 0.01
 
-    History_Panels2_yaxis_name(1) = 'log_cntr_T'
-    History_Panels2_yaxis_reversed(1) = .false.
-    History_Panels2_ymin(1) = -101d0
-    History_Panels2_ymax(1) = -101d0
-    History_Panels2_dymin(1) = 0.1
+ History_Panels2_yaxis_name(2) = 'log_cntr_Rho'
+ History_Panels2_yaxis_reversed(2) = .false.
+ History_Panels2_ymin(2) = -101d0
+ History_Panels2_ymax(2) = -101d0
+ History_Panels2_dymin(2) = 0.1
 
-      ! ::
+ History_Panels2_other_yaxis_name(2) = 'log_dt'
+ History_Panels2_other_yaxis_reversed(2) = .false.
+ History_Panels2_other_ymin(2) = -101d0
+ History_Panels2_other_ymax(2) = -101d0
+ History_Panels2_other_dymin(2) = 0.1
 
-    History_Panels2_other_yaxis_name(1) = 'fe_core_infall'
-    History_Panels2_other_ymin(1) = -101d0
-    History_Panels2_other_ymax(1) = -101d0
-    History_Panels2_other_dymin(1) = 1
+History_Panels2_yaxis_name(3) = 'bound_mass'
+History_Panels2_yaxis_reversed(3) = .false.
+History_Panels2_ymin(3) = -101d0
+History_Panels2_ymax(3) = -101d0
+History_Panels2_dymin(3) = 0.1
 
-      ! ::
+History_Panels2_other_yaxis_name(3) = 'non_fe_core_infall'
+History_Panels2_other_yaxis_reversed(3) = .false.
+History_Panels2_other_ymin(3) = -101d0
+History_Panels2_other_ymax(3) = -101d0
+History_Panels2_other_dymin(3) = 0.01
 
-    History_Panels2_yaxis_name(2) = 'log_cntr_Rho'
-    History_Panels2_yaxis_reversed(2) = .false.
-    History_Panels2_ymin(2) = -101d0
-    History_Panels2_ymax(2) = -101d0
-    History_Panels2_dymin(2) = 0.1
+ History_Panels2_yaxis_name(4) = 'v_surf_km_s'
+ History_Panels2_yaxis_reversed(4) = .false.
+ History_Panels2_ymin(4) = -101d0
+ History_Panels2_ymax(4) = -101d0
+ History_Panels2_dymin(4) = 0.1
 
-      ! ::
+ History_Panels2_other_yaxis_name(4) = 'log_R'
+ History_Panels2_other_yaxis_reversed(4) = .false.
+ History_Panels2_other_ymin(4) = -2d0
+ History_Panels2_other_ymax(4) = -101d0
 
-    History_Panels2_other_yaxis_name(2) = 'non_fe_core_infall'
-    History_Panels2_other_yaxis_reversed(2) = .false.
-    History_Panels2_other_ymin(2) = -101d0
-    History_Panels2_other_ymax(2) = -101d0
-    History_Panels2_other_dymin(2) = 0.1
+ History_Panels2_yaxis_name(5) = 'retries'
+ History_Panels2_yaxis_reversed(5) = .false.
+ History_Panels2_ymin(5) = -101d0
+ History_Panels2_ymax(5) = -101d0
+ History_Panels2_dymin(5) = 0.1
 
-      ! ::
-
-    History_Panels2_yaxis_name(3) = 'bound_mass'
-    History_Panels2_yaxis_reversed(3) = .false.
-    History_Panels2_ymin(3) = -101d0
-    History_Panels2_ymax(3) = -101d0
-    History_Panels2_dymin(3) = 0.1
-
-      ! ::
-
-    History_Panels2_other_yaxis_name(3) = 'gamma1_min'
-    History_Panels2_other_yaxis_reversed(3) = .false.
-    History_Panels2_other_ymin(3) = -101d0
-    History_Panels2_other_ymax(3) = -101d0
-    History_Panels2_other_dymin(3) = 0.01
-
+ History_Panels2_other_yaxis_name(5) = 'log_dt'
+ History_Panels2_other_yaxis_reversed(5) = .false.
+ History_Panels2_other_ymin(5) = -101d0
+ History_Panels2_other_ymax(5) = -101d0
+ History_Panels2_other_dymin(5) = 0.1
 
 
 
 
 History_Panels1_num_panels = 3
-History_Panels1_other_yaxis_name(2) = 'star_age_day'
+History_Panels1_other_yaxis_name(2) = 'v_surf_km_s'
+
+
+
 
 Profile_Panels1_same_yaxis_range(3) = .true.
 
@@ -318,7 +349,7 @@ TRho_Profile_ymin = 8.3
 !TRho_Profile_ymax = 9.2
 
 Text_Summary1_name(1,1) = 'model_number'
-Text_Summary1_name(1,2) = 'log_dt'
+Text_Summary1_name(1,2) = 'time_step_sec'
 Text_Summary1_name(1,3) = 'Mass'
 Text_Summary1_name(1,4) = 'log_L'    
 Text_Summary1_name(1,5) = 'log_Teff'

@@ -277,8 +277,8 @@
 
       ! ::
 
-    show_retry_counts_when_terminate = .false.
-    show_timestep_limit_counts_when_terminate = .false.
+    show_retry_counts_when_terminate = .true.
+    show_timestep_limit_counts_when_terminate = .true.
 
 
       ! write_profile_when_terminate
