@@ -25,30 +25,18 @@
       max_model_number = 10000      
       !max_number_retries = 30
 
-      fe_core_infall_limit = 300d5
+      fe_core_infall_limit = 2d7 
       non_fe_core_infall_limit = 1d99
       log_center_temp_limit = 1d99
 
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
 
-      ! controls for removing surface layer.  see run_star_extras for details
-      x_logical_ctrl(1) = .true. ! switch BCs
-
-      x_integer_ctrl(20) = 3 ! remove at least this many cells
-
-! surface ejection
-
-      x_logical_ctrl(2) = .false. ! .true. ! check for v > v_esc
-      x_ctrl(17) = 1.0 ! v/v_esc where stop removing. it will be new surface.
-      x_ctrl(18) = 0.99999 ! q limit for removing
-      x_ctrl(19) = 0.99999 ! q limit for checking v > v_esc
-
-      x_ctrl(15) = 1d99 ! if don't find v > v_esc, check for v > this (kms)
-                   ! remove to here and switch to fixed_vsurf_outer_BC
-
-
-
+! trim envelope when too large radius
+      x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
+      x_ctrl(19) = 1000 ! trigger for R too large
+      x_ctrl(20) = 5.0 ! cut back to place where v < v_esc*x_ctrl(20)
+      x_ctrl(21) = 1000 ! or cut back to place where r/rsun < x_ctrl(21)
 
 
 ! wind
@@ -62,18 +50,30 @@
 ! mixing
       
 ! timesteps
-      dt_div_dt_cell_collapse_limit = 0.05 ! limit for dt/dt_cell_collapse
-      dt_div_dt_cell_collapse_hard_limit = 0.2
-
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
+      delta_lgTeff_limit =  0.2
+      delta_lgL_limit = 0.5     
+      delta_lgL_He_limit = 0.5
+
+      delta_lgT_max_limit = 0.03    
+      delta_lgT_max_hard_limit = 0.1
+
+      delta_lgT_cntr_limit = 0.03    
+      delta_lgT_cntr_hard_limit = 0.1
+
+      delta_XHe_cntr_limit = 0.03
+      delta_XHe_cntr_hard_limit = 0.1
+
 ! mesh
-      !okay_to_remesh = .false.
 
 ! solver
       use_gold2_tolerances = .false.
       use_gold_tolerances = .true.
+
+      max_abs_rel_run_E_err = 1d99
+      warn_when_large_rel_run_E_err = 1d99
 
       gold_iter_for_resid_tol3 = 7
       gold_tol_max_residual3 = 1d-4
@@ -111,7 +111,7 @@
 
 ! GYRE output controls
 
-      write_pulse_data_with_profile = .true.
+      !write_pulse_data_with_profile = .true.
       pulse_data_format = 'GYRE'
       
       !x_logical_ctrl(37) = .true. ! if true, then run GYRE
@@ -130,11 +130,12 @@
 
 ! output
 
-      num_trace_history_values = 4
+      num_trace_history_values = 5
       trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
-      trace_history_value_name(3) = 'rel_E_err'
-      trace_history_value_name(4) = 'log_rel_run_E_err'
+      trace_history_value_name(3) = 'bound_mass'
+      trace_history_value_name(4) = 'rel_E_err'
+      trace_history_value_name(5) = 'log_rel_run_E_err'
 
       photo_interval = 10
       !profile_interval = 1
@@ -215,7 +216,7 @@
 
 
 !pause = .true.
-Profile_Panels3_xmin = -1 ! 0 ! -101d0
+Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax = -101d0
 
 Profile_Panels3_num_panels = 6
@@ -235,8 +236,8 @@ Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
 
 Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
-!Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
-!Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
+Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
+Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
 
     History_Panels2_title = ''
 
@@ -265,11 +266,10 @@ Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
 
       ! ::
 
-    History_Panels2_other_yaxis_name(1) = 'total_energy_foe'
-    History_Panels2_other_yaxis_reversed(1) = .true.
+    History_Panels2_other_yaxis_name(1) = 'fe_core_infall'
     History_Panels2_other_ymin(1) = -101d0
     History_Panels2_other_ymax(1) = -101d0
-    History_Panels2_other_dymin(1) = 0.1
+    History_Panels2_other_dymin(1) = 1
 
       ! ::
 
@@ -289,7 +289,7 @@ Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
 
       ! ::
 
-    History_Panels2_yaxis_name(3) = 'log_R'
+    History_Panels2_yaxis_name(3) = 'bound_mass'
     History_Panels2_yaxis_reversed(3) = .false.
     History_Panels2_ymin(3) = -101d0
     History_Panels2_ymax(3) = -101d0
@@ -307,12 +307,10 @@ Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
 
 
 
-
-
-History_Panels1_yaxis_name(1) = 'star_mass'
+History_Panels1_num_panels = 3
 History_Panels1_other_yaxis_name(2) = 'star_age_day'
 
-Profile_Panels1_same_yaxis_range(3) = .false. ! .true.      << for comparison with 9967
+Profile_Panels1_same_yaxis_range(3) = .true.
 
 TRho_Profile_xmin = 2.0
 !TRho_Profile_xmax = 7.5
@@ -322,18 +320,18 @@ TRho_Profile_ymin = 8.3
 Text_Summary1_name(1,1) = 'model_number'
 Text_Summary1_name(1,2) = 'log_dt'
 Text_Summary1_name(1,3) = 'Mass'
-Text_Summary1_name(1,4) = 'center_ye'    
-Text_Summary1_name(1,5) = 'H_rich'
+Text_Summary1_name(1,4) = 'log_L'    
+Text_Summary1_name(1,5) = 'log_Teff'
 
 Text_Summary1_name(2,1) = 'gamma1_min'  
 Text_Summary1_name(2,2) = 'star_age_day'
-Text_Summary1_name(2,3) = 'log_L'
+Text_Summary1_name(2,3) = 'bound_mass'
 Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
-Text_Summary1_name(3,1) = 'v_surf_div_escape_v'
+Text_Summary1_name(3,1) = 'fe_core_infall'
 Text_Summary1_name(3,2) = 'log_cntr_Rho'
-Text_Summary1_name(3,3) = 'log_Teff'
+Text_Summary1_name(3,3) = 'log_R'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'C_core'
 
@@ -343,13 +341,13 @@ Text_Summary1_name(4,3) = 'lg_Lnuc'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'Fe_core'
 
-Text_Summary1_name(5,1) = 'log_cntr_T'
+Text_Summary1_name(5,1) = 'log_max_T'
 Text_Summary1_name(5,2) = 'log_LHe'
 Text_Summary1_name(5,3) = 'lg_Lneu'
 Text_Summary1_name(5,4) = 'Ne_cntr'
 Text_Summary1_name(5,5) = 'zones'
 
-Text_Summary1_name(6,1) = 'log_max_T'
+Text_Summary1_name(6,1) = 'log_cntr_T'
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'

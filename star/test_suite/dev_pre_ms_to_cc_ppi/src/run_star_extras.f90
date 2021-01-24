@@ -32,9 +32,6 @@
       
       include "test_suite_extras_def.inc"
       
-      real(dp) :: Psurf, Tsurf, Lsurf, vsurf
-      logical :: have_switched_to_fixed_vsurf
-
 !gyre
       !x_logical_ctrl(37) = .false. ! if true, then run GYRE
       !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
@@ -116,26 +113,10 @@
          call test_suite_startup(s, restart, ierr)
          
          if (.not. restart) then
-            Psurf = s% P(1)
-            Tsurf = s% T(1)
-            Lsurf = s% L(1)
-            vsurf = s% v(1)
-            have_switched_to_fixed_vsurf = .false.
             call alloc_extra_info(s)
-            if (s% x_logical_ctrl(1)) then
-               if (s% fixed_L_for_BB_outer_BC < 0d0) then
-                  s% fixed_L_for_BB_outer_BC = Lsurf
-               else
-                  Lsurf = s% fixed_L_for_BB_outer_BC
-               end if
-               call switch_BCs(s)
-            end if
          else ! it is a restart
             call unpack_extra_info(s)
-            if (s% x_logical_ctrl(1)) call switch_BCs(s)
          end if
-         if (s% x_ctrl(16) > 0d0) &
-            s% x_ctrl(2) = s% star_mass - s% x_ctrl(16)
          
          if (.not. s% x_logical_ctrl(37)) return
          
@@ -158,26 +139,6 @@
       end subroutine extras_startup
       
       
-      subroutine switch_BCs(s)
-         type (star_info), pointer :: s
-         if (have_switched_to_fixed_vsurf) then
-            s% use_momentum_outer_BC = .false.
-            s% use_fixed_vsurf_outer_BC = .true.
-            s% fixed_vsurf = vsurf
-         else
-            s% use_momentum_outer_BC = .true.
-            s% use_fixed_vsurf_outer_BC = .false.
-         end if
-         
-         return
-         
-         
-         s% use_T_black_body_outer_BC = .true.
-         s% use_fixed_L_for_BB_outer_BC = .true.
-         s% fixed_L_for_BB_outer_BC = Lsurf
-      end subroutine switch_BCs
-      
-      
       subroutine extras_after_evolve(id, ierr)
          use num_lib, only: find0
          integer, intent(in) :: id
@@ -189,18 +150,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         nz = s% nz
-         write(*,*)
-         do k=nz-1,1,-1
-            if (s% ye(k) >= 0.495d0) then
-               m = find0( &
-                  s% m(k+1), s% ye(k+1) - 0.495d0, &
-                  s% m(k), s% ye(k) - 0.495d0)
-               if (m > 0d0) write(*,2) 'ye = 0.495', k, m/Msun
-               exit
-            end if
-         end do
          call test_suite_after_evolve(s, ierr)
+         if (ierr /= 0) return
          if (.not. s% x_logical_ctrl(37)) return
          call gyre_final()
       end subroutine extras_after_evolve
@@ -272,15 +223,18 @@
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         integer :: k, k0, k1
-         real(dp) :: v_esc, v_limit
+         integer :: k, k0
+         real(dp) :: v_limit
          real(dp),pointer, dimension(:) :: vel
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_start_step = keep_going        
-         if (.not. s% x_logical_ctrl(2)) return 
+         if (.not. s% x_logical_ctrl(20)) return 
+         if (s% r(1)/Rsun <= s% x_ctrl(19)) return
+         ! else R too large.  cut back to where v/v_esc < x_ctrl(18)
+         write(*,2) 'r(1)/Rsun too large', s% model_number, s% r(1)/Rsun, s% x_ctrl(19)
          if (s% u_flag) then
             vel => s% u
          else if (s% v_flag) then
@@ -289,85 +243,29 @@
             write(*,*) 'extras_start_step: Must have either v_flag or u_flag enabled'
             stop
          end if
-         k0 = s% nz+1
+         k0 = 0
          do k = 1, s% nz
-            if (s% q(k) < s% x_ctrl(19)) then
-               !write(*,2) 'nothing in outer layer with v >= v_esc', k, s% q(k)
-               exit ! only check outer layer
-            end if
-            v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-            if (vel(k) > v_esc) then
-               k0 = k
-               write(*,2) 'found vel > v_esc', k, vel(k)/v_esc, vel(k), v_esc
-               exit
-            end if
+            v_limit = s% x_ctrl(20)*sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
+            if (vel(k) >= v_limit) cycle
+            k0 = k
+            exit
          end do
-         if (k0 >= s% nz) then ! didn't find vel > v_vesc
-            if (.not. s% use_fixed_vsurf_outer_BC) then
-               v_limit = 1d5*s% x_ctrl(15)
-               do k=1,5
-                  !write(*,3) 'vel(k)/v_limit', k, s% model_number, vel(k)/v_limit, vel(k), v_limit
-                  if (vel(k) > v_limit) then
-                     if (k > 1) then
-                        call star_remove_surface_at_cell_k(s% id, k1, ierr)
-                        if (ierr /= 0) then
-                           write(*,*) 'extras_start_step failed in star_remove_surface_at_cell_k'
-                           write(*,2) 'at q', k1, s% q(k1)
-                           extras_start_step = terminate
-                           return
-                        end if
-                     end if
-                     write(*,*)
-                     write(*,*)
-                     write(*,2) 'switch to use_fixed_vsurf_outer_BC = .true.', s% model_number, v_limit*1d-5
-                     write(*,*)
-                     write(*,*)
-                     vsurf = v_limit
-                     have_switched_to_fixed_vsurf = .true.
-                     call switch_BCs(s)
-                     exit
-                  end if
-               end do
-            end if
-            return
-         end if
-         ! k0 is outermost location below surface with u > escape velocity.
-         ! remove inward from k0 where u large enough compared to escape velocity.
-         k1 = k0
-         do k = k0+1, s% nz
-            v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-            if (vel(k) < s% x_ctrl(17)*v_esc) then ! stop removing here
-               k1 = k-1
-               write(*,2) 'vel < x_ctrl(17)*v_esc', k, vel(k), &
-                  s% x_ctrl(17)*v_esc, s% x_ctrl(17), v_esc
-               exit
-            end if
-         end do
-         if (s% q(k1) > s% x_ctrl(18)) then
-            write(*,2) 'some v > vesc, but too little mass to bother removing', k1, s% q(k1)
-            return ! too little to bother with
-         end if
-         k1 = max(k1, s% x_integer_ctrl(20))
-         do while (s% L(k1) <= 0)
-            k1 = k1 + 1
-         end do
-         write(*,2) 'enough mass with v > vesc, remove surface', k1, s% m(k1)/Msun, s% q(k1)
-         call star_remove_surface_at_cell_k(s% id, k1, ierr)
+         if (k0 == 0) return ! didn't find vel < v_vesc
+         !write(*,2) 'remove surface', k0, s% m(k0)/Msun, s% q(k0)
+         call star_remove_surface_at_cell_k(s% id, k0, ierr)
          if (ierr /= 0) then
             write(*,*) 'extras_start_step failed in star_remove_surface_at_cell_k'
-            write(*,2) 'at q', k1, s% q(k1)
+            write(*,2) 'at q', k0, s% q(k0)
             extras_start_step = terminate
             return
          end if
-         write(*,2) 'done remove surface', 1, s% m(1)/Msun
-         if (s% x_logical_ctrl(1)) then
-            Psurf = s% P(1)
-            Tsurf = s% T(1)
-            Lsurf = s% L(1)
-            vsurf = s% v(1)
-            have_switched_to_fixed_vsurf = .false.
-            call switch_BCs(s)
+         if (s% u_flag) then
+            vel => s% u
+         else if (s% v_flag) then
+            vel => s% v
          end if
+         write(*,1) 'new r(1)/Rsun, m(1)/Msun v_surf/v_esc', &
+            s% r(1)/Rsun, s% m(1)/Msun, vel(1)/sqrt(2d0*s% cgrav(1)*s% m(1)/s% r(1))
          extras_start_step = keep_going
       end function extras_start_step
    
@@ -386,7 +284,6 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
          call store_extra_info(s)
-         if (s% x_logical_ctrl(1)) call switch_BCs(s)
          if (.not. s% x_logical_ctrl(37)) return
          extras_finish_step = gyre_in_mesa_extras_finish_step(id)
          if (extras_finish_step == terminate) &
@@ -435,14 +332,11 @@
          i = 0
          ! call move_int or move_flg
          !call move_int(vsurf_gt_cs_count)   
-         call move_flg(have_switched_to_fixed_vsurf)
+         !call move_flg(have_switched_to_fixed_vsurf)
          num_ints = i
          
          i = 0
-         call move_dbl(Psurf)   
-         call move_dbl(Tsurf)   
-         call move_dbl(Lsurf)   
-         call move_dbl(vsurf)   
+         !call move_dbl(Psurf)   
          num_dbls = i
          
          if (op /= extra_info_alloc) return
@@ -497,8 +391,6 @@
          end subroutine move_flg
       
       end subroutine move_extra_info
-
-
 
 
       end module run_star_extras

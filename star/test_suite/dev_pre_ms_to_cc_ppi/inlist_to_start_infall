@@ -7,10 +7,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'start_infall.mod'
-      required_termination_code_string = 'non_fe_core_infall_limit'
-
-!      change_initial_RTI_flag = .true.         ! skip if have removed H env
-!      new_RTI_flag = .true.
+      required_termination_code_string = 'xa_central_lower_limit'
 
       !set_initial_age = .false.
       set_initial_age = .true.
@@ -34,9 +31,11 @@
 
 &controls
 
-      non_fe_core_infall_limit = 20d5
-    when_to_stop_rtol = 1d99
-    when_to_stop_atol = 1d99
+      xa_central_lower_limit_species(1) = 'o16'
+      xa_central_lower_limit(1) = 1d-2
+
+      when_to_stop_rtol = 1d99
+      when_to_stop_atol = 1d99
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000

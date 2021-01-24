@@ -47,7 +47,7 @@
 ! mixing
 
 ! timesteps
-      !max_years_for_timestep = 0.5  ! TESTING PULSES
+      !max_years_for_timestep = 0.1
 
 ! mesh
 
