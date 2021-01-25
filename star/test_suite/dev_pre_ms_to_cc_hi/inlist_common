@@ -16,7 +16,7 @@
       new_v_flag = .true.
 
 !** for high mass
-      relax_to_this_tau_factor = 900
+      relax_to_this_tau_factor = 1.5d6
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
 !** for high mass
@@ -29,6 +29,8 @@
 / ! end of star_job namelist
 
 &eos
+      use_Skye = .true.
+      use_PC = .false.
 / ! end of eos namelist
 
 &kap
@@ -85,32 +87,14 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-      gradT_excess_age_fraction = 0.9d0
-      gradT_excess_lambda1 = 1.0
-      gradT_excess_beta1 = 0.35
-      gradT_excess_lambda2 = 0.5
-      gradT_excess_beta2 = 0.25
-      gradT_excess_dlambda = 0.1
-      gradT_excess_dbeta = 0.1
-
-      ! max MLT++
-      ! these settings kill off all superadiabaticity.  also kill off this run!
-      !gradT_excess_lambda1 = 0.7d0
-      !gradT_excess_age_fraction = 0.2d0
-      !gradT_excess_f1 = 1d-12
-      !gradT_excess_f2 = 1d-11
-
+  
 ! mixing
       !** for high mass - no overshoot
-      
-      D_omega_max_replacement_fraction = 0.5d0
-      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
-      max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 ! timesteps
-      varcontrol_target   = 1d-3
+      varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true
       limit_for_rel_error_in_energy_conservation = 1d-7
@@ -122,9 +106,9 @@
       delta_lgL_limit = 0.1     
       delta_lgL_He_limit = 0.1
 
-      delta_lgRho_cntr_limit = 0.03
+      delta_lgRho_cntr_limit = 0.03 ! 0.02 ! 0.005   ! default 0.05
       delta_lgRho_cntr_hard_limit = -1
-      delta_lgRho_limit = 0.1
+      delta_lgRho_limit = 0.1          ! default 1.0
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
       delta_lgT_cntr_limit = 0.002  
@@ -138,7 +122,7 @@
 
       dX_nuc_drop_limit = 2d-2
       dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
-      dX_nuc_drop_min_X_limit = 1d-3
+      dX_nuc_drop_min_X_limit = 1d-3  ! 1.0d-3  default = 1.0d-4
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
 
@@ -198,10 +182,21 @@
 
       screening_mode = 'chugunov'
 
+      ! high center T limit to avoid negative mass fractions
       sig_min_factor_for_high_Tcenter = 0.01
+         ! inactive when >= 1d0
+         ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
+         ! then okay to reduce sig by as much as this factor
+         ! as needed to prevent causing negative abundances
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+         ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
+         ! this should be > Tcenter_max_for_sig_min_factor_full_off.
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+         ! if Tcenter <= this, factor = 1, so has no effect
+         ! this should be < Tcenter_min_for_sig_min_factor_full_on.
+      ! for T > full_off and < full_on, factor changes linearly with Tcenter
 
+      ! op_split_burn
       op_split_burn = .true.
       op_split_burn_min_T = 1d9
       burn_steps_limit = 150
@@ -229,7 +224,7 @@
 
 ! output
       center_avg_value_dq = 1d-12
-      he_core_boundary_h1_fraction = 0.5
+      he_core_boundary_h1_fraction = 0.1
       c_core_boundary_he4_fraction = 0.5
       o_core_boundary_c12_fraction = 0.5
       si_core_boundary_o16_fraction = 0.5

@@ -28,7 +28,7 @@
 
 &controls
 
-      fe_core_infall_limit = 2.5d7 ! 1d6
+      fe_core_infall_limit = 1d6
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -48,17 +48,12 @@
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-      delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = 0.03d0
+      !delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
 
 ! mesh
 
 ! solver
-      !use_Fraley_time_centering = .true.
-      !steps_before_use_Fraley_time_centering = -1
-      !include_P_in_Fraley_time_centering = .true.
-      !include_L_in_Fraley_time_centering = .true.
-
+      
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
 
@@ -74,10 +69,10 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
       
       !make_gradr_sticky_in_solver_iters = .false.
 
