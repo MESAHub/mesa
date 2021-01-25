@@ -7,8 +7,8 @@
       save_model_filename = 'shock_part3.mod'
       required_termination_code_string = 'extras_finish_step'
       
-      change_initial_net = .true.      
-      new_net_name = 'ccsn_IIp_stella.net'
+      !change_conv_vel_flag = .true.
+      !new_conv_vel_flag = .false.
 
       !pgstar_flag = .true.
 
@@ -54,6 +54,6 @@
 !pause = .true.
 
 Grid2_win_flag = .true.
-pgstar_interval = 10
+pgstar_interval = 5
 
 / ! end of pgstar namelist

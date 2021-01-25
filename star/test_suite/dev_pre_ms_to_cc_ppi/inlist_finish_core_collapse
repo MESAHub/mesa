@@ -25,7 +25,7 @@
       max_model_number = 10000      
       !max_number_retries = 30
 
-      fe_core_infall_limit = 2d7 
+      fe_core_infall_limit = 150d5
       non_fe_core_infall_limit = 1d99
       log_center_temp_limit = 1d99
 
@@ -33,7 +33,7 @@
       when_to_stop_atol = 1d99
 
 ! trim envelope when radius gets too large
-      x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
+      !x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
       x_ctrl(19) = 1000 ! trigger for R too large
       x_ctrl(20) = 5.0 ! cut back to place where v < v_esc*x_ctrl(20)
       x_ctrl(21) = 1000 ! or cut back to place where r/rsun < x_ctrl(21)
@@ -46,6 +46,7 @@
 ! rotation
 
 ! mlt
+      max_logT_for_mlt = 9.3d0
 
 ! mixing
       
@@ -89,7 +90,8 @@
       
       !calculate_Brunt_B = .false.
       
-      use_momentum_outer_BC = .true.
+      !use_momentum_outer_BC = .true.
+      use_compression_outer_BC = .true.
       
       min_timestep_limit = 1d-12
 
@@ -123,7 +125,7 @@
       
       !x_logical_ctrl(37) = .true. ! if true, then run GYRE
 
-      x_integer_ctrl(1) = 50 ! output GYRE info at this step interval
+      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
       x_integer_ctrl(2) = 2 ! max number of modes to output per call
@@ -307,7 +309,7 @@ History_Panels2_dymin(3) = 0.1
 History_Panels2_other_yaxis_name(3) = 'non_fe_core_infall'
 History_Panels2_other_yaxis_reversed(3) = .false.
 History_Panels2_other_ymin(3) = -101d0
-History_Panels2_other_ymax(3) = -101d0
+History_Panels2_other_ymax(3) = 1100d0
 History_Panels2_other_dymin(3) = 0.01
 
  History_Panels2_yaxis_name(4) = 'v_surf_km_s'

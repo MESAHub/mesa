@@ -44,28 +44,14 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 6000
       !max_number_retries = 58
-      
-      
-      !stop_near_zams = .true.
-      Lnuc_div_L_zams_limit = 0.4 ! for very high mass
-      
-      
-      
-! wind
-      ! delay wind until reach zams
-      Dutch_scaling_factor = 0
 
 ! atmosphere
 
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
-      alpha_semiconvection = 0.01
-      thermohaline_coeff = 2
 
 ! mixing
-!** for high mass - no overshoot
 
 ! timesteps
       delta_XHe_cntr_hard_limit = 0.02d0

@@ -237,7 +237,7 @@
          dt_why_str(Tlim_struc) = 'varcontrol'
          dt_why_str(Tlim_max_timestep_factor) = 'max increase'
          dt_why_str(Tlim_min_timestep_factor) = 'max decrease'
-         dt_why_str(Tlim_solver) = 'solver iters'
+         dt_why_str(Tlim_solver) = 'solver'
          dt_why_str(Tlim_num_burn_steps) = 'burn steps'
          dt_why_str(Tlim_num_diff_solver_steps) = 'diff steps'
          dt_why_str(Tlim_num_diff_solver_iters) = 'diff iters'

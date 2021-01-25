@@ -2,6 +2,9 @@
 
 &star_job
 
+      !save_star_job_namelist = .true.
+      !star_job_namelist_name = 'star_job_to_lgT_9.5_new.txt'
+
       load_saved_model = .true.
       saved_model_name = 'after_core_c_burn.mod'
 
@@ -16,7 +19,7 @@
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
 
-      !pgstar_flag = .false.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -27,6 +30,9 @@
 / ! end of kap namelist
 
 &controls
+
+      !save_controls_namelist = .true.
+      !controls_namelist_name = 'controls_to_lgT_9.5_new.txt'
 
       log_max_temp_upper_limit = 9.50d0
 
@@ -41,6 +47,7 @@
 ! rotation
 
 ! mlt
+      ! semiconvection and thermohaline are on until end of core He burn, off after.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
@@ -51,6 +58,8 @@
 ! mesh
 
 ! solver
+      turn_on_drag_in_H_envelope = .true.
+      drag_coefficient = 99
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -65,10 +74,10 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
@@ -120,10 +129,10 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 5 ! 
+Profile_Panels3_xmax = 2.5 ! -101d0
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
-TRho_Profile_xmin = -2.0
-TRho_Profile_ymin = 7.5
+TRho_Profile_xmin = 0.0
+TRho_Profile_ymin = 8.5
 
 / ! end of pgstar namelist

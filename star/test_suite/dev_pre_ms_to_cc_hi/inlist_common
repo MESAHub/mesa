@@ -15,9 +15,11 @@
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
-      relax_to_this_tau_factor = 1.5d6
+!** for high mass
+      relax_to_this_tau_factor = 900
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
+!** for high mass
 
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
@@ -27,8 +29,6 @@
 / ! end of star_job namelist
 
 &eos
-      use_Skye = .true.
-      use_PC = .false.
 / ! end of eos namelist
 
 &kap
@@ -52,7 +52,9 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 4  
+      Pextra_factor = 4 
+      ! need this extra pressure to stabilize the atmosphere during core He burning
+ 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
@@ -74,6 +76,7 @@
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       thermohaline_option = 'Kippenhahn'
+      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
@@ -82,13 +85,32 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-  
+      gradT_excess_age_fraction = 0.9d0
+      gradT_excess_lambda1 = 1.0
+      gradT_excess_beta1 = 0.35
+      gradT_excess_lambda2 = 0.5
+      gradT_excess_beta2 = 0.25
+      gradT_excess_dlambda = 0.1
+      gradT_excess_dbeta = 0.1
+
+      ! max MLT++
+      ! these settings kill off all superadiabaticity.  also kill off this run!
+      !gradT_excess_lambda1 = 0.7d0
+      !gradT_excess_age_fraction = 0.2d0
+      !gradT_excess_f1 = 1d-12
+      !gradT_excess_f2 = 1d-11
+
 ! mixing
+      !** for high mass - no overshoot
+      
+      D_omega_max_replacement_fraction = 0.5d0
+      D_omega_growth_rate = 1d0
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
+      max_q_for_D_omega_zero_in_convection_region = 0.8d0
 
 ! timesteps
-      varcontrol_target = 1d-3
+      varcontrol_target   = 1d-3
       
       never_skip_hard_limits = .true
       limit_for_rel_error_in_energy_conservation = 1d-7
@@ -114,28 +136,33 @@
 
       dHe_div_He_limit = -1
 
-      dX_nuc_drop_limit = 5d-1 ! 2d-2
-      dX_nuc_drop_limit_at_high_T = -1
+      dX_nuc_drop_limit = 2d-2
+      dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
       dX_nuc_drop_min_X_limit = 1d-3
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
 
-      delta_XHe_cntr_limit = 0.01d0
-      delta_XHe_cntr_hard_limit = 0.03d0
       delta_lg_XH_cntr_limit = -1
       delta_lg_XHe_cntr_limit = -1
       delta_lg_XC_cntr_limit = -1
       delta_lg_XNe_cntr_limit = -1
       delta_lg_XO_cntr_limit = -1
       delta_lg_XSi_cntr_limit = -1
-      delta_XC_cntr_limit = -1
-      delta_XC_cntr_hard_limit = -1
-      delta_XNe_cntr_limit = -1
-      delta_XNe_cntr_hard_limit = -1
-      delta_XO_cntr_limit = -1
-      delta_XO_cntr_hard_limit = -1
-      delta_XSi_cntr_limit = -1
-      delta_XSi_cntr_hard_limit = -1
+
+      delta_XHe_cntr_limit = 0.01d0
+      delta_XHe_cntr_hard_limit = 0.02d0
+
+      delta_XC_cntr_limit = 0.01d0
+      delta_XC_cntr_hard_limit = 0.02d0
+
+      delta_XNe_cntr_limit = 0.01d0
+      delta_XNe_cntr_hard_limit = 0.02d0
+
+      delta_XO_cntr_limit = 0.01d0
+      delta_XO_cntr_hard_limit = 0.02d0
+
+      delta_XSi_cntr_limit = 0.01d0
+      delta_XSi_cntr_hard_limit = 0.02d0
 
       delta_Ye_highT_limit = 1d-3
 
@@ -144,15 +171,17 @@
       mesh_delta_coeff_for_highT = 1.5      
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
-      min_dq_for_xa = 1d-4 
+      min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
 
 ! solver
       use_gold2_tolerances = .true.
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 1d-4
 
+!** for high mass
       always_use_dedt_form_of_energy_eqn = .true.       
       max_tries_for_implicit_wind = 0      
+!** for high mass
 
       convergence_ignore_equL_residuals = .true. 
       make_gradr_sticky_in_solver_iters = .true.
@@ -200,7 +229,7 @@
 
 ! output
       center_avg_value_dq = 1d-12
-      he_core_boundary_h1_fraction = 0.1
+      he_core_boundary_h1_fraction = 0.5
       c_core_boundary_he4_fraction = 0.5
       o_core_boundary_c12_fraction = 0.5
       si_core_boundary_o16_fraction = 0.5

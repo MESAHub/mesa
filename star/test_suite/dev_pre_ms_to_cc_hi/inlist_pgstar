@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 2
+pgstar_interval = 1
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0
@@ -177,13 +177,18 @@ Profile_Panels3_show_mix_regions_on_xaxis = .true.
 Profile_Panels1_title = ''
 
 Profile_Panels1_txt_scale = 0.7
-Profile_Panels1_num_panels = 4
+
+Profile_Panels1_num_panels = 5
 
 Profile_Panels1_yaxis_name(1) = 'logRho'
 Profile_Panels1_other_yaxis_name(1) = 'logT'
 
-Profile_Panels1_yaxis_name(2) = 'entropy'
-Profile_Panels1_other_yaxis_name(2) = 'pgas_div_p'
+Profile_Panels1_yaxis_name(2) = 'avg_charge_He'
+Profile_Panels1_ymin(2) = 0
+Profile_Panels1_ymax(2) = 2.2
+Profile_Panels1_other_yaxis_name(2) = 'avg_charge_H'
+Profile_Panels1_other_ymin(2) = 0
+Profile_Panels1_other_ymax(2) = 1.1
 
 Profile_Panels1_yaxis_name(3) = 'gradT'
 Profile_Panels1_other_yaxis_name(3) = 'grada'
@@ -192,10 +197,16 @@ Profile_Panels1_same_yaxis_range(3) = .true.
 Profile_Panels1_yaxis_name(4) = 'log_opacity'
 Profile_Panels1_other_yaxis_name(4) = 'gradr'
 
+Profile_Panels1_yaxis_name(5) = 'entropy' ! 'gradT_excess_effect'
+Profile_Panels1_other_yaxis_name(5) = 'pgas_div_p'
+
+
+
+
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'
 Profile_Panels1_xmin = -101d0
-Profile_Panels1_xmax = 8.1
+Profile_Panels1_xmax = 6.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'
@@ -312,26 +323,25 @@ Text_Summary1_num_rows = 6 ! <= 20
 Text_Summary1_num_cols = 5 ! <= 20
 Text_Summary1_name(:,:) = ''
 
-
 Text_Summary1_name(1,1) = 'model_number'
-Text_Summary1_name(1,2) = 'log_dt'
+Text_Summary1_name(1,2) = 'Teff'
 Text_Summary1_name(1,3) = 'Mass'
 Text_Summary1_name(1,4) = 'H_cntr'
 Text_Summary1_name(1,5) = 'H_rich'
 
-Text_Summary1_name(2,1) = 'non_fe_core_infall'  
-Text_Summary1_name(2,2) = 'star_age'
+Text_Summary1_name(2,1) = 'log_dt'  
+Text_Summary1_name(2,2) = 'log_R'
 Text_Summary1_name(2,3) = 'lg_Mdot'
 Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
-Text_Summary1_name(3,1) = 'fe_core_infall'
-Text_Summary1_name(3,2) = 'log_max_T'
+Text_Summary1_name(3,1) = 'star_age'
+Text_Summary1_name(3,2) = 'log_L'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'C_core'
 
-Text_Summary1_name(4,1) = 'gamma1_min'
+Text_Summary1_name(4,1) = 'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'
 Text_Summary1_name(4,3) = 'lg_Lnuc'
 Text_Summary1_name(4,4) = 'O_cntr'
