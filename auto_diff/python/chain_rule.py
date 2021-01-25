@@ -134,7 +134,7 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 			if 'colon' in str(sub_expr): # Intermediate is an array type.
 				is_array[sym] = True
 			else:
-				for s in sub_expr.args:
+				for s in sub_expr.free_symbols:
 					if s in is_array:
 						if is_array[s]:
 							is_array[sym] = True # Intermediate is defined in terms of an array type and so is an array type.
@@ -253,15 +253,11 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, f
 
 	for i in range(len(common_sub_expressions[0])):
 		for sym, sub_expr in common_sub_expressions[0]:
-			if str(sym) == 'q34':
-				print(sym,sub_expr)
 			if 'colon' in str(sub_expr): # Intermediate is an array type.
 				is_array[sym] = True
 			else:
 				for s in sub_expr.free_symbols:
 					if s in is_array:
-						if str(sym) == 'q34':
-							print(sym, s, is_array[s])
 						if is_array[s]:
 							is_array[sym] = True # Intermediate is defined in terms of an array type and so is an array type.
 
