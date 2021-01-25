@@ -51,9 +51,7 @@ clean:
 	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
 
 install:
-	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include
-	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include/formats.inc
-	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include/formats
+	@$(CP_IF_NEWER) ../formats $(MESA_DIR)/include
 	@$(CP_IF_NEWER) *.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) libutils.$(LIB_SUFFIX) $(MESA_DIR)/lib
 

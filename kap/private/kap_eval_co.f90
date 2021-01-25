@@ -623,7 +623,7 @@
          real(dp) :: logK_1_3, dlogK_1_3_dlogRho, dlogK_1_3_dlogT
          logical, parameter :: read_later = .false., dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -1135,7 +1135,7 @@
          logical :: clipped_logT
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          if (dbg) write(*,1) 'enter Get_CO_Kap_for_logRho_logT', logRho, logT_in
          

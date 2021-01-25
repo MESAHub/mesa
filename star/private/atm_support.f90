@@ -273,7 +273,7 @@ contains
 
     integer  :: T_tau_id
 
-    include 'formats.dek'
+    include 'formats'
 
     ! Sanity check on L
 
@@ -375,7 +375,7 @@ contains
       real(dp), intent(out) :: dres_dlnRho(:)
       real(dp), intent(out) :: dres_dlnT(:)
       integer, intent(out)  :: ierr
-      include 'formats.dek'
+      include 'formats'
       
       call eos_proc( &
            s, lnP, lnT, &
@@ -400,7 +400,7 @@ contains
       real(dp), intent(out) :: dlnkap_dlnRho
       real(dp), intent(out) :: dlnkap_dlnT
       integer, intent(out)  :: ierr
-      include 'formats.dek'
+      include 'formats'
       
       call kap_proc( &
            s, lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
@@ -511,7 +511,7 @@ contains
     real(dp) :: kap_a
     real(dp) :: tau_b
 
-    include 'formats.dek'
+    include 'formats'
 
     ! Check that tau_factor is correct
 
@@ -798,7 +798,7 @@ contains
     real(dp) :: kap
     real(dp) :: tau_surf
 
-    include 'formats.dek'
+    include 'formats'
 
     kap_guess = s% opacity_start(1)
 

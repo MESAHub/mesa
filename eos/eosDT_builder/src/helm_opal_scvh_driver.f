@@ -216,7 +216,7 @@ c ***********************************************************************
 
       double precision :: helm_res(num_helm_results), dlnPgas_dlnY, Pgas, Prad
       
-      include 'formats.dek'
+      include 'formats'
 
 		ierr = 0
 		have_called_helm = .false.
@@ -397,7 +397,7 @@ c ***********************************************************************
 		contains
 
       subroutine check_results
-         include 'formats.dek'
+         include 'formats'
          if (is_bad_num(logPgas_opalscvh) .or. 
      >       is_bad_num(logE_opalscvh) .or. 
      >       is_bad_num(logS_opalscvh) .or. 
@@ -449,7 +449,7 @@ c ***********************************************************************
 		   double precision, parameter :: logT_neutral = 4.5d0
          logical :: off_table
 		   
-		   include 'formats.dek'
+		   include 'formats'
 		   
 			if (have_called_helm) return
 			have_called_helm = .true.

@@ -131,7 +131,7 @@
             Cp_mesa, Cv_mesa, dE_dRho_mesa, dS_dT_mesa, dS_dRho_mesa, &
             mu_mesa, log_free_e_mesa, gamma1_mesa, gamma3_mesa, grad_ad_mesa, eta_mesa
             
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -368,7 +368,7 @@
             double precision :: v_scvh, v_mesa
             double precision :: rel_diff
             double precision, parameter :: lim = 0.2d0
-            include 'formats.dek'
+            include 'formats'
             rel_diff = (v_scvh - v_mesa)/max(abs(v_scvh),abs(v_mesa),1d0)
             if (abs(rel_diff) < lim) return
             write(*,*) 'rel diff too large for ' // trim(str)
@@ -436,7 +436,7 @@
             xnhp, xnhepp, mu_M_scvh, Ne_scvh, logNe_scvh
          integer, parameter :: include_radiation = 1
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          call interpolate_scvh( &
@@ -492,7 +492,7 @@
             d_eos_dlnT(num_eos_basic_results)
          integer:: which_other, max_iter, eos_calls
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          

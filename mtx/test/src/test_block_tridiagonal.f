@@ -94,7 +94,7 @@
          logical :: use_given_weights
          character (len=255) :: fname, which_decsol_str
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -224,7 +224,7 @@
             real(fltp) :: avg_err, max_err, err, atol, rtol
             integer :: i_max, j_max, i, j, k
          
-            include 'formats.dek'         
+            include 'formats'
                      
             iop = 0 ! factor A
 #ifdef DBLE
@@ -314,7 +314,7 @@
          subroutine set_brhs(lblk, dblk, ublk)
             real(fltp), pointer, dimension(:,:,:) :: lblk, dblk, ublk
             integer :: k, j
-            include 'formats.dek'
+            include 'formats'
             ! set brhs = A*xcorrect
 #ifdef DBLE
             call block_dble_mv(nvar, nz, lblk, dblk, ublk, xcorrect, brhs)
@@ -335,7 +335,7 @@
          subroutine check_x
             real(fltp) :: max_err, err, atol, rtol, avg_err
             integer :: i_max, j_max,i, j, rep        
-            include 'formats.dek'
+            include 'formats'
             atol = 1d-4
             rtol = 1d-4   
             call check1_x(avg_err, max_err, atol, rtol, i_max, j_max)
@@ -354,7 +354,7 @@
             integer :: i, j
             real(fltp) :: err_sum
             real(fltp) :: err
-            include 'formats.dek'      
+            include 'formats'
             max_err = 0; i_max = 0; j_max = 0; err_sum = 0
             do j = 1, nz
                do i = 1, nvar

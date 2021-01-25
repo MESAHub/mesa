@@ -57,7 +57,7 @@
             integer, parameter :: nt_for_CK = 76, max_ng_for_CK = 11
             integer :: ng_for_CK_Teff(nt_for_CK)
             
-            include 'formats.dek'
+            include 'formats'
             
             ! set the Teff values
             i = 0

@@ -82,7 +82,7 @@
          character (len=6) :: str
          character (len=256) :: fname
 
-         include 'formats.dek'
+         include 'formats'
 
          work1 => work_ary
 
@@ -189,7 +189,7 @@
          real, target :: work_ary(n_old*pm_work_size)
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
          
          work1 => work_ary
 

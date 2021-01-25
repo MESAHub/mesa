@@ -222,7 +222,7 @@
          
          logical :: dbg = .false.
          
-         include 'formats.inc'
+         include 'formats'
          ierr = 0
          xmargin = 0
 
@@ -268,7 +268,7 @@
                default_ymax_right, default_ymin_right
             character (len=128) :: str
          
-            include 'formats.inc'
+            include 'formats'
             ierr = 0
             
             call pgsave

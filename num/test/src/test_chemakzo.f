@@ -97,7 +97,7 @@
          integer, intent(out) :: irtrn
          real(dp) :: xout, val
          integer :: i, ierr
-         include 'formats.dek'
+         include 'formats'
          irtrn = 0
          !write(*,2) 'x', nr, x
          xout = 100

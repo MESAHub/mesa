@@ -98,7 +98,7 @@
 
          integer(8) :: test_time1, clock_rate
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -243,7 +243,7 @@
          real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
-         include 'formats.dek'
+         include 'formats'
 
          dx(1:nvar,1:nz) => dx1(1:neq)
          equ(1:nvar,1:nz) => equ1(1:neq)
@@ -710,7 +710,7 @@
 
 
          subroutine get_message
-            include 'formats.dek'
+            include 'formats'
             i = 0
             if (correction_norm > tol_correction_norm*coeff) i = i+1
             if (max_abs_correction > tol_max_correction*coeff) i = i+2
@@ -776,7 +776,7 @@
 
             real(dp), parameter :: alam_factor = 0.2d0
 
-            include 'formats.dek'
+            include 'formats'
 
             ierr = 0
             coeff = 0
@@ -1012,7 +1012,7 @@
             integer ::  i, k
             real(dp) :: ferr, berr, total_time
 
-            include 'formats.dek'
+            include 'formats'
 
             solve_equ=.true.
             !$omp simd
@@ -1061,7 +1061,7 @@
 
          subroutine factor_mtx
             use star_bcyclic, only: bcyclic_factor
-            include 'formats.dek'
+            include 'formats'
             call bcyclic_factor( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, row_scale_factors1, col_scale_factors1, &
@@ -1071,7 +1071,7 @@
 
          subroutine solve_mtx
             use star_bcyclic, only: bcyclic_solve
-            include 'formats.dek'
+            include 'formats'
             call bcyclic_solve( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
@@ -1087,7 +1087,7 @@
             integer, intent(out) :: ierr
             logical :: need_solver_to_eval_jacobian
             integer :: i, j, k
-            include 'formats.dek'
+            include 'formats'
             need_solver_to_eval_jacobian = .true.
             call enter_setmatrix(s, iter,  &
                   nvar, nz, neq, dx, xscale, xder, need_solver_to_eval_jacobian, &
@@ -1110,7 +1110,7 @@
                dx_0, dvardx, dvardx_0, xdum, err
             logical :: need_solver_to_eval_jacobian, testing_partial
 
-            include 'formats.dek'
+            include 'formats'
 
             ierr = 0
             testing_partial = & ! check inlist parameters
@@ -1965,7 +1965,7 @@
             real(dp), intent(in), dimension(:,:) :: equ
             integer :: k, i
             real(dp) :: q
-            include 'formats.dek'
+            include 'formats'
             eval_f = 0
             do k = 1, nz
                do i = 1, nvar
@@ -1987,7 +1987,7 @@
 
          integer :: neq
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          neq = nvar*nz
