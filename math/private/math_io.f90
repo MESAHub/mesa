@@ -116,7 +116,7 @@ contains
     character(len=l), intent(out) :: str
 
     write(str, 100, ROUND='COMPATIBLE') x
-100 format(E26.17)
+100 format(1PD26.16)
 
   end subroutine double_to_str
   
