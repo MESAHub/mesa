@@ -129,7 +129,7 @@
 
         logical :: condition ! for debugging output
 
-        include 'formats.dek'
+        include 'formats'
 
         ! enforce minimum rate threshold
         r = r_in
@@ -280,7 +280,7 @@
          integer, pointer :: chem_id(:)
          chem_id => n% g% chem_id
 
-         include 'formats.dek'
+         include 'formats'
 
          if (symbolic) then
             n% d_dydt_dy(i1, i2) = 1
@@ -369,7 +369,7 @@
          integer, pointer :: chem_id(:)
          chem_id => n% g% chem_id
 
-         include 'formats.dek'
+         include 'formats'
 
          if (symbolic) then
             n% d_dydt_dy(i1, i2) = 1

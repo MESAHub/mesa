@@ -103,7 +103,7 @@
          type (binary_info), pointer :: b
          character (len=strlen) :: inlist_fname
 
-         include 'formats.inc'
+         include 'formats'
 
          ierr = 0
          call system_clock(time0,clock_rate)

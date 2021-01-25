@@ -46,7 +46,7 @@
          integer, pointer :: chem_id(:) 
             ! will be allocated by extract_nuclides_from_chem_isos
          logical :: use_weaklib
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          call integer_dict_create_hash(reaction_names_dict, ierr)
@@ -86,7 +86,7 @@
          logical, parameter :: weak = .false.
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -163,7 +163,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          i = indx
@@ -254,7 +254,7 @@
          logical, intent(out) :: already_defined
          integer, intent(out) :: ierr         
          logical, parameter :: dbg = .false.         
-         include 'formats.dek'
+         include 'formats'
          ierr = 0        
          ir = get_rates_reaction_id(reaction_handle)
          if (ir > 0) then
@@ -291,7 +291,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -538,7 +538,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          if (dbg) write(*,*) 'init_raw_rates_records'
          
@@ -668,7 +668,7 @@
          real(dp) :: Q
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -1209,7 +1209,7 @@
          integer, intent(in) :: ir
          
          integer :: num_in, num_out, reactants(100), k, n, i, ii, j
-         include 'formats.dek'
+         include 'formats'
          i = 0
          do k = 1, 2*max_num_reaction_inputs-1, 2
             n = reaction_inputs(k,ir)

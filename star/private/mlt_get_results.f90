@@ -179,7 +179,7 @@
             d_Gamma_factor_dvb(nvbs), d_grad_scale_dvb(nvbs), d_Gamma_inv_threshold_dvb(nvbs), &
             d_Gamma_term_dvb(nvbs)
 
-         include 'formats.dek'
+         include 'formats'
 
          !test_partials = (kz == ss% solver_test_partials_k)
          test_partials = .false.
@@ -942,7 +942,7 @@
          
          subroutine set_convective_mixing
             ! need to set gradT, d_gradT_dvb, conv_vel, d_conv_vel_dvb
-            include 'formats.dek'
+            include 'formats'
             real(dp) ff1, ff2, ff3, ff4, ff5, aa, bb, y0, xres, a1, a2, sqrt_x
             real(dp) :: A_0, A_1, A_2, A_numerator, A_denom, inv_sqrt_x
             real(dp), dimension(nvbs) :: &
@@ -1324,7 +1324,7 @@
                d_a5_dvb, d_a6_dvb, d_a_dvb, d_b1_dvb, d_b2_dvb, d_b3_dvb, d_b4_dvb, &
                d_b5_dvb, d_b6_dvb, d_b7_dvb, d_b_dvb, d_div_dvb
             
-            include 'formats.dek'
+            include 'formats'
             if (dbg) write(*,*) 'check for semiconvection'
             call set_no_mixing ! sets gradT = gradr
             D_semi = alpha_semiconvection*radiative_conductivity/(6*Cp*rho) &
@@ -1480,7 +1480,7 @@
             ! only changes D, d_D_dvb, gradT, d_gradT_dvb
             ! does NOT change any others such as mlt_vc
             
-            include 'formats.dek'
+            include 'formats'
             real(dp) ff1, ff2, ff3, ff4, sqrt_x, tmp
             real(dp) :: cv_var, A_0, A_1, A_2, A_numerator, A_denom, &
                inv_sqrt_x, save_gradT

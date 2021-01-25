@@ -45,7 +45,7 @@
       real(dp) :: W_A, W_B, W_C, W_D, a, b, g_A, g_B, g_C, g_D, Q
       character (len=32) :: my_mesa_dir
       
-      include 'formats.dek'
+      include 'formats'
             
       ierr = 0
       
@@ -102,7 +102,7 @@
       
       logical, parameter :: dbg = .false.
       
-      include 'formats.dek'
+      include 'formats'
       
       write(*,*)
       write(*,*) 'do_test_rates', which
@@ -169,7 +169,7 @@
       integer :: i, ir, which_rate
       logical, parameter :: dbg = .false.
       
-      include 'formats.dek'
+      include 'formats'
       
       write(*,*)
       write(*,*) 'test1'
@@ -219,7 +219,7 @@
       contains
       
       subroutine run1
-         include 'formats.dek'
+         include 'formats'
          call get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) trim(reaction_Name(ir)), raw_rate
@@ -237,7 +237,7 @@
       real(dp) :: eps_nuc ! eps_nuc in ergs/g/sec
       real(dp) :: deps_nuc_dT ! partial wrt temperature
       real(dp) :: deps_nuc_dRho ! partial wrt density
-      include 'formats.dek'
+      include 'formats'
       T = 1d7
       Rho = 1d10
       Y = 1
@@ -256,7 +256,7 @@
       integer :: i, ir, which_rate
       logical, parameter :: dbg = .false.
       
-      include 'formats.dek'
+      include 'formats'
       
       
       write(*,*)
@@ -282,7 +282,7 @@
       contains
       
       subroutine run1
-         include 'formats.dek'
+         include 'formats'
          call get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) trim(reaction_Name(ir)), raw_rate
@@ -301,7 +301,7 @@
       real(dp) :: deps_nuc_dT ! partial wrt temperature
       real(dp) :: deps_nuc_dRho ! partial wrt density
       real(dp) :: dT, dRho
-      include 'formats.dek'
+      include 'formats'
       T = 7.9432823472428218d+07
       dT = T*1d-8
       Rho = 3.1622776601683793d+09

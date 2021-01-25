@@ -1279,7 +1279,7 @@
       integer function get_num_reaction_inputs(ir)
          integer, intent(in) :: ir
          integer :: j
-         include 'formats.dek'
+         include 'formats'
          if (max_num_reaction_inputs == 3) then
             if (reaction_inputs(5,ir) /= 0) then
                get_num_reaction_inputs = 3

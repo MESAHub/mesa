@@ -141,7 +141,7 @@
             real(dp) :: initial_z,initial_y,initial_h1,initial_h2
             real(dp) :: initial_he3,initial_he4,xsol_he3,xsol_he4,la,lac
 
-            include 'formats.inc'
+            include 'formats'
             ierr = 0
 
             call pgsave

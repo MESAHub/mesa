@@ -159,7 +159,7 @@
                include "mtx_decsolblk.dek"
             end interface
             integer :: j
-            include 'formats.dek'
+            include 'formats'
             call isolve( &
                which_solver, n, fcn, t(i), y, t(i+1), & 
                h, max_step_size, max_steps, & 

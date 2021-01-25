@@ -570,7 +570,7 @@
             integer, intent(out) :: ierr
             integer :: k, j
             logical :: save_warn_rates_flag
-            include 'formats'            
+            include 'formats'
             s% doing_solver_iterations = .true.
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.        

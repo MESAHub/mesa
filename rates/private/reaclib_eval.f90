@@ -58,7 +58,7 @@
             ln_lambdas, lambdas, dlambdas_dlnT, &
             ln_rlambdas, rlambdas, drlambdas_dlnT
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -102,7 +102,7 @@
          real(dp), dimension(7) :: T9fac, dT9fac_dT9, dT9fac_dlnT
          integer :: i, j
          
-         include 'formats.dek'
+         include 'formats'
 
          T9inv = 1d0/T9
          
@@ -165,7 +165,7 @@
          real(dp), dimension(num_lambdas) :: A, Qratio, dQratio_dlnT
          real(dp) :: tfac, dtfac_dlnT, lnT9, T9i, dT9i_dlnT, ln1, fac1, dfac1_dlnT, dln1_dlnT,blurp
          
-         include 'formats.dek'
+         include 'formats'
    
          ! find index of partition function and logarithmically interpolate
          indx = get_partition_fcn_indx(T9)
@@ -248,7 +248,7 @@
          integer, intent(out) :: lo, hi
          integer, intent(out) :: ierr
          integer :: ir
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          lo = 0
          hi = 0

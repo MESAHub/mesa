@@ -321,7 +321,7 @@
          double precision :: XI(NIP), YI(NIP), ZI(NIP)
          integer :: info, NXD, NYD
          
-         include 'formats.dek'
+         include 'formats'
          
          info = 0
          NXD = np
@@ -759,7 +759,7 @@
                        si0t,si1t,si2t,si0mt,si1mt,si2mt,si0p,si1p,si2p,si0mp,si1mp,si2mp, &
                        z,fi_h(36),fi_he(36),w0t,w1t,w2t,w0mt,w1mt,w2mt,w0p,w1p,w2p,w0mp,w1mp,w2mp
 
-      include 'formats.dek'
+      include 'formats'
       
       info = 0
       

@@ -111,7 +111,7 @@
             j_change, sep_change, rel_gap_change, e_change, set_dt, &
             rel_change
 
-         include 'formats.inc'
+         include 'formats'
 
          dtm = 1d99
          dtj = 1d99

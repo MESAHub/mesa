@@ -186,7 +186,7 @@
             rate_screened, rate_screened_dT, rate_screened_dRho
          integer :: iwork, cid
          
-         include 'formats.dek'
+         include 'formats'
          
          !dbg = .true.
          dbg = burn_dbg
@@ -413,7 +413,7 @@
       
             real(dp), parameter :: coulomb_temp_cut = 1d6, coulomb_den_cut = 1d3
          
-            include 'formats.dek'
+            include 'formats'
          
             ierr = 0
 

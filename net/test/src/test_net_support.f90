@@ -820,7 +820,7 @@
             rate_raw, rate_raw_dT, rate_raw_dRho, &
             rate_screened, rate_screened_dT, rate_screened_dRho
          
-         include 'formats.dek'
+         include 'formats'
          
          write(*,*) 'Do_One_Test ' // trim(net_file)
          

@@ -157,7 +157,7 @@
             logK2, kap2, dlogK2_dlogRho, dlogK2_dlogT
          real(dp), pointer :: f1(:)
             
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          shift = 4*num_logRhos*num_logTs

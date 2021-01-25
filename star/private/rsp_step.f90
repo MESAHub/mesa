@@ -346,7 +346,7 @@
          subroutine check_partial
             integer :: i_var
             real(dp) :: dvardx_0, dx_0, dvardx, xdum, err
-            include 'formats'            
+            include 'formats'
             i_var = s% solver_test_partials_var 
             dvardx_0 = s% solver_test_partials_dval_dx ! analytic partial
             if (i_var <= 0) then
