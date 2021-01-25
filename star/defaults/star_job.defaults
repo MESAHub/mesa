@@ -2310,23 +2310,6 @@
     remove_surface_by_v_surf_div_v_escape = 0
     min_q_for_remove_surface_by_v_surf_div_v_escape = 0
     max_q_for_remove_surface_by_v_surf_div_v_escape = 0
-    
-    
-      ! remove_surface_by_relax_to_star_cut
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_do_jrot
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_do_entropy
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_turn_off_energy_sources_and_sinks
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-      
-    remove_surface_by_relax_to_star_cut = .false.
-    remove_surface_do_jrot = .false.
-    remove_surface_do_entropy = .true.
-    remove_surface_turn_off_energy_sources_and_sinks = .true.
 
 
       ! report_mass_not_fe56

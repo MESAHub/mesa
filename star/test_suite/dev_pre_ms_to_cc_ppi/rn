@@ -22,6 +22,13 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_removed_envelope.mod removed_envelope.mod
+else
+   do_one inlist_remove_envelope_header removed_envelope.mod
+   cp removed_envelope.mod standard_removed_envelope.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_near_end_core_he_burn.mod near_end_core_he_burn.mod
 else
    do_one inlist_to_near_end_core_he_burn_header near_end_core_he_burn.mod

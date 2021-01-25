@@ -131,10 +131,6 @@
       real(dp) :: remove_surface_by_v_surf_km_s, remove_initial_surface_by_v_surf_km_s
       real(dp) :: remove_surface_by_v_surf_div_v_escape, remove_initial_surface_by_v_surf_div_v_escape
       real(dp) :: remove_surface_by_v_surf_div_cs, remove_initial_surface_by_v_surf_div_cs
-      
-      logical :: remove_surface_do_entropy, remove_surface_do_jrot, &
-         remove_surface_turn_off_energy_sources_and_sinks, &
-         remove_surface_by_relax_to_star_cut
 
       real(dp) :: zero_initial_inner_v_by_mass_Msun, &
          zero_inner_v_by_mass_Msun

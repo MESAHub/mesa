@@ -24,6 +24,23 @@
     change_initial_Eturb_flag = .false.
     change_Eturb_flag_at_model_number = -111
     new_Eturb_flag = .false.
+    
+    
+      ! remove_surface_by_relax_to_star_cut
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_surface_do_jrot
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_surface_do_entropy
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remove_surface_turn_off_energy_sources_and_sinks
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+      
+    remove_surface_by_relax_to_star_cut = .false.
+    remove_surface_do_jrot = .false.
+    remove_surface_do_entropy = .true.
+    remove_surface_turn_off_energy_sources_and_sinks = .true.
 
 
       ! change_conv_vel_flag
