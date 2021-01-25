@@ -82,7 +82,7 @@
          integer :: ierr
          real(dp) :: chem_factors(ionmax)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -321,7 +321,7 @@
          
          logical :: CO_enhanced
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 

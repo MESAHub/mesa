@@ -20,7 +20,7 @@
          real(dp) :: Z, X, logPgas, logT, logRho, logP, T, Prad, Pgas, P
          real(dp) :: logT_min, logT_max, dlogT
          integer :: iounit
-         include 'formats.dek'
+         include 'formats'
          call Setup_eos
          Z =  0.02d0
          X =  0.0d0
@@ -52,7 +52,7 @@
          real(dp) :: Z, X, logPgas, logT, logRho, logP, T, Prad, Pgas, P
          real(dp) :: logT_min, logT_max, dlogT
          integer :: iounit
-         include 'formats.dek'
+         include 'formats'
          call Setup_eos
          Z =  0.02d0
          X =  0.0d0
@@ -128,7 +128,7 @@
          character (len=eos_name_length) :: names(num_eos_basic_results)
          
          
-         include 'formats.dek'
+         include 'formats'
  
          ierr = 0
 
@@ -337,7 +337,7 @@
          integer, pointer, dimension(:) :: chem_id1, net_iso1
          real(dp) :: xa1(species)
                   
-         include 'formats.dek'
+         include 'formats'
  
          ierr = 0
 
@@ -1101,7 +1101,7 @@
                res2, d_dlnd2, d_dlnT2, d_dabar2, d_dzbar2
          integer :: info, i
       
-         include 'formats.dek'
+         include 'formats'
 
          info = 0
 
@@ -1169,7 +1169,7 @@
          logical, parameter :: quietly = .true.
          integer :: ierr
          
-         include 'formats.dek'
+         include 'formats'
 
          call Setup_eos
 
@@ -1206,7 +1206,7 @@
          contains
          
          subroutine do1
-            include 'formats.dek'
+            include 'formats'
             rq% logT_all_HELM = logT_all_HELM
             rq% logT_all_OPAL = logT_all_OPAL
             write(*,1) 'logT_all_HELM', logT_all_HELM

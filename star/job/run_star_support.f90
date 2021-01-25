@@ -976,7 +976,7 @@
       subroutine relax_tau_factor(s)
          type (star_info), pointer :: s         
          real(dp) :: next
-         include 'formats.inc'
+         include 'formats'
          write(*,*) 'relax_to_this_tau_factor < s% tau_factor', &
             s% job% relax_to_this_tau_factor < s% tau_factor
          write(*,1) 'relax_to_this_tau_factor', s% job% relax_to_this_tau_factor
@@ -1001,7 +1001,7 @@
       subroutine relax_Tsurf_factor(s)
          type (star_info), pointer :: s         
          real(dp) :: next
-         include 'formats.inc'
+         include 'formats'
          write(*,*) 'relax_to_this_Tsurf_factor < s% Tsurf_factor', &
             s% job% relax_to_this_Tsurf_factor < s% Tsurf_factor
          write(*,1) 'relax_to_this_Tsurf_factor', s% job% relax_to_this_Tsurf_factor
@@ -1080,7 +1080,7 @@
          integer :: item_order(max_num_items)
          integer :: ierr, omp_num_threads, item_num, num_items, i, j
          real(dp) :: total, misc, tmp
-         include 'formats.inc'
+         include 'formats'
          ierr = 0
          omp_num_threads = utils_OMP_GET_MAX_THREADS()
          s% time_total = s% job% check_before_step_timing + &
@@ -1428,7 +1428,7 @@
          type (star_info), pointer :: s
          integer :: k, fe56
          real(dp) :: sumdq
-         include 'formats.inc'
+         include 'formats'
          fe56 = s% net_iso(ife56)
          if (fe56 == 0) return
          sumdq = 0
@@ -1455,7 +1455,7 @@
          type (star_info), pointer :: s
          integer :: k
          real(dp) :: sumdq, dq
-         include 'formats.inc'
+         include 'formats'
          dq = s% job% report_cell_for_xm/s% xmstar
          if (dq > 1) then
             write(*,2) 'report_cell_for_xm > xmstar', s% nz
@@ -1590,7 +1590,7 @@
          integer :: j, i, ir
          integer, pointer :: net_reaction_ptr(:) 
          
-         include 'formats.inc'
+         include 'formats'
          
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -1628,7 +1628,7 @@
          integer, intent(out) :: ierr
          logical, parameter :: kap_use_cache = .true.
          logical :: save_flag
-         include 'formats.inc'
+         include 'formats'
       
          ierr = 0
 
@@ -1905,7 +1905,7 @@
          
          real(dp) :: cntr_h, cntr_he
          
-         include 'formats.inc'
+         include 'formats'
          
          ierr = 0
          
@@ -2003,7 +2003,7 @@
          real(dp) :: log_m, log_lifetime, max_dt, max_timestep, minq, maxq
          integer :: i, j, k, nzlo, nzhi, chem_id, chem_id1, chem_id2
          logical :: change_v, change_u
-         include 'formats.inc'
+         include 'formats'
          
          if (len_trim(s% job% history_columns_file) > 0) &
             write(*,*) 'read ' // trim(s% job% history_columns_file)
@@ -2883,7 +2883,7 @@
             integer, intent(out) :: ierr
             real(dp), pointer :: xq(:), xa(:,:)
             integer :: num_pts, num_species, i, iounit
-            include 'formats.inc'
+            include 'formats'
             
             write(*,*)
             write(*,1) 'relax_initial_composition'
@@ -2937,7 +2937,7 @@
             integer, intent(out) :: ierr
             real(dp), pointer :: xq(:), angular_momentum(:)
             integer :: num_pts, i, iounit
-            include 'formats.inc'
+            include 'formats'
             
             write(*,*)
             write(*,1) 'relax_initial_angular_momentum'
@@ -2995,7 +2995,7 @@
             ! these are used for all eos calls
             real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
             real(dp), dimension(num_eos_d_dxa_results, s% species) :: d_dxa
-            include 'formats.inc'
+            include 'formats'
             
             write(*,*)
             write(*,1) 'relax_initial_entropy'
@@ -3103,7 +3103,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         include 'formats.inc'
+         include 'formats'
          
          if (s% job% remove_center_by_temperature > 0) then
             write(*, 1) 'remove_center_by_temperature', s% job% remove_center_by_temperature
@@ -3395,7 +3395,7 @@
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
 
-         include 'formats.inc'
+         include 'formats'
          
          ierr = 0
 
@@ -3519,7 +3519,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         include 'formats.inc'
+         include 'formats'
          
          ierr = 0
 
@@ -3678,7 +3678,7 @@
          character(len=1) fpe_check
          integer :: status
 
-         include 'formats.inc'
+         include 'formats'
 
          ierr = 0
 
@@ -3699,7 +3699,7 @@
          character(len=5) :: flag
          integer :: status
 
-         include 'formats.inc'
+         include 'formats'
 
          ierr = 0
 

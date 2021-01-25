@@ -42,7 +42,7 @@
          
          real(dp), parameter :: expected = 2.9347118120566711D-02 ! using lapack
          
-         include 'formats.dek'
+         include 'formats'
 
          which_decsol = which_decsol_in
          call decsol_option_str(which_decsol, decsol_option_name, ierr)
@@ -134,7 +134,7 @@
          real(dp) :: tol_correction_norm, tol_max_correction, tol_residual_norm
          logical :: nonconv
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -430,7 +430,7 @@
          integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
          real(dp) :: epsder
-         include 'formats.dek'
+         include 'formats'
          if (dbg) write(*, '(/, a)') 'enter_setmatrix'
          if (ipar(1) /= 0) then ! do numerical jacobian
             epsder = 1d-6 ! relative variation to compute numerical derivatives

@@ -110,7 +110,7 @@
 
          integer :: j
          
-         include 'formats.dek'
+         include 'formats'
          
          ! NOTE: logPs and logTs must be in monotonic increasing order
 
@@ -440,7 +440,7 @@
          integer :: j,jT,kP
          
          
-         include 'formats.dek'
+         include 'formats'
 
          info = 0
          
@@ -592,7 +592,7 @@
             double precision :: bcymax(NlogPs)       ! bc data vs. x at y=ymax
             integer :: ict(6)                    ! code specifying output desired
             double precision :: fval(6)          ! output data
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             if (si% needs_initialization) then
@@ -734,7 +734,7 @@
      1                 logP_guess,epslogP,epslogRho,x1,x3,y1,y3,dfdlogP,
      1                 z,fi_h(36),fi_he(36),w0t,w1t,w2t,w0mt,w1mt,w2mt,w0p,w1p,w2p,w0mp,w1mp,w2mp
 
-      include 'formats.dek'
+      include 'formats'
 		info = 0
 		ipar => ipar_array
 		rpar => rpar_array
@@ -1122,7 +1122,7 @@
      >      xnhe,dxnhe_dlogT,dxnhe_dlogP,
      >      xnhep,dxnhep_dlogT,dxnhep_dlogP,xmassh1,xmasshe4
          logical :: only_densities,search_for_SCVH
-         include 'formats.dek'
+         include 'formats'
          if (logP < logP_min .or. logP > logP_max) then
             ierr = -1
             if (dbg) write(*,*)
@@ -1204,7 +1204,7 @@
      >      b3,db3_dT,db3_dP,
      >      b,db_dT,db_dP
 
-         include 'formats.dek'
+         include 'formats'
          
          if (xnh_in > 1d0) then
             xnh = 1d0

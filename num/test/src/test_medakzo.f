@@ -292,7 +292,7 @@
          real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
                   
          rpar => rpar_ary
          ipar => ipar_ary

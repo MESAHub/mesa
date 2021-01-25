@@ -164,7 +164,7 @@ c ***********************************************************************
       double precision, parameter :: logRho5 = -5.80d0
       double precision, parameter :: logRho6 = -6.8d0 !-6.3d0
       
-      include 'formats.dek'
+      include 'formats'
       
       logAvo = log10(avo)
       mecc = me*clight*clight
@@ -549,7 +549,7 @@ c ***********************************************************************
      >      Pgas_1, Pgas_2, P_1, P_2, Pgas, P, s_1, s_2, s, dP_dT, dP_dRho,
      >      e_1, e_2, e, dE_dT, dP_dT_1, dP_dT_2, dP_dRho_1, dP_dRho_2, x   
          
-         include 'formats.dek'
+         include 'formats'
          
          Pgas_1 = 10**logPgas_1
          Pgas_2 = 10**logPgas_2

@@ -290,7 +290,7 @@
          integer, intent(out) :: ierr
          integer :: i, id
          type (Net_General_Info), pointer  :: g
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return         

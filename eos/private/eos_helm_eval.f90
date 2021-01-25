@@ -136,7 +136,7 @@
          logical :: always_skip_elec_pos, always_include_elec_pos, &
             include_radiation
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          off_table = .false.
@@ -203,7 +203,7 @@
          real(dp) :: mu, P, Pgas, energy, entropy, free_e, dse, dpe, dsp
          integer :: j, k, ci
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -371,7 +371,7 @@
          
          logical, parameter :: clip_to_table_boundaries = .true.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          off_table = .false.

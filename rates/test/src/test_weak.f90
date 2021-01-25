@@ -57,7 +57,7 @@ module test_weak
       real(dp) :: dvardx, dvardx_0, dx_0, err, var_0, xdum
       logical :: doing_d_dlnd
       
-      include 'formats.dek'
+      include 'formats'
 
       ierr = 0
                

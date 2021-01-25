@@ -932,7 +932,7 @@
          type (star_info), pointer :: s
          integer :: k, j, i
 
-         include 'formats.dek'
+         include 'formats'
 
          do k=1,s% nz
             write(*,2) 'dq', k, s% dq(k)

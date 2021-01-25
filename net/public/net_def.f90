@@ -544,7 +544,7 @@
          integer, intent(out) :: ierr
          type (Net_General_Info), pointer :: g
          integer :: j
-         include 'formats.dek'
+         include 'formats'
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) then
             write(*,*) 'invalid handle for net_set_which_rates'

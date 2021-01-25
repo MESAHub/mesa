@@ -50,7 +50,7 @@
             A, B, dA_dlnT, dA_dlnRho, dB_dlnT, dB_dlnRho, dlogGe_dlogT, dlogGe_dlogRho, &
             logT_lo, logT_hi, logRho_lo, logRho_hi
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -172,7 +172,7 @@
          real(dp), dimension(species) :: AY, AZion, ACMI
          integer :: i, j
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          AZion(1:species) = chem_isos% Z(chem_id(1:species))
@@ -218,7 +218,7 @@
             real(dp) :: Zmean,CMImean,Z2mean
             real(dp), parameter :: UN_T6=0.3157746d0
 
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             

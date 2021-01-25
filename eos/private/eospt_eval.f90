@@ -189,7 +189,7 @@
          
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -298,7 +298,7 @@
             real(dp) :: logW_margin, logT_margin, &
                logW1, logW2, logW3, logW4, logT1, logT2, logT3, logT4, c_dx, c_dy
             
-            include 'formats.dek'
+            include 'formats'
             
             c_dx = 0
             c_dy = 0
@@ -411,7 +411,7 @@
          real(dp), intent(in) :: atemp, alogtemp
          real(dp), intent(out) :: Pgas, logPgas, T, logT
          integer, intent(out) :: ierr
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          T = atemp; logT = alogtemp
          if (atemp == arg_not_provided .and. alogtemp == arg_not_provided) then
@@ -460,7 +460,7 @@
          integer :: iz, j, ci
          logical, parameter :: OPAL_SCVH_dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          tiny = rq% tiny_fuzz
 
          ierr = 0
@@ -556,7 +556,7 @@
          integer :: ix, ix_lo, ix_hi, j, num_Xs
          logical, parameter :: dbg_for_X = .false.
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -729,7 +729,7 @@
          
          character (len=256) :: message
          
-         include 'formats.dek'
+         include 'formats'
 
          logPgas = logPgas_in
          logT = logT_in
@@ -857,7 +857,7 @@
          
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
       
          ierr = 0
          iW = int((logW - ep% logW_min) / ep% del_logW + 1d-4) + 1
@@ -907,7 +907,7 @@
          
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
       
          ierr = 0
          iT = int((logT - ep% logT_min) / ep% del_logT + 1d-4) + 1
@@ -970,7 +970,7 @@
          integer :: k, ip1, jp1
          real(dp), pointer :: fin(:,:,:,:)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -1110,7 +1110,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -1181,7 +1181,7 @@
          subroutine do_partials ! dlnRho_dlnPgas_c_T and dlnRho_dlnT_c_Pgas
             real(dp) :: Prad, P, dP_dRho, dPgas_dRho, &
                   dP_dT, dPrad_dT, dPgas_dT, dRho_dPgas, dRho_dT
-            include 'formats.dek'
+            include 'formats'
             
             Prad = crad*T*T*T*T/3
             P = Pgas + Prad
@@ -1447,7 +1447,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -1645,7 +1645,7 @@
          logical, parameter :: basic_flag = .false.
          type (EoS_General_Info), pointer :: rq
 
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          get_f_df = 0

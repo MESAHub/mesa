@@ -218,7 +218,7 @@
          type (Net_Info), target :: netinfo_target
          type (Net_Info), pointer :: netinfo
          
-         include "formats.dek"
+         include "formats"
          
          ierr = 0
          work => work_ary

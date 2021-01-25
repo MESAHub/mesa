@@ -321,7 +321,7 @@
             type(auto_diff_real_18var_order1) :: res18
             real(dp) :: resid1
             integer :: j
-            include 'formats'            
+            include 'formats'
             call unpack_res18_partials(s, k, nvar, xscale, i_dv_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% rotation_flag .and. s% w_div_wc_flag .and. s% use_gravity_rotation_correction) then

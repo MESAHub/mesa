@@ -79,7 +79,7 @@
          integer :: ierr, i, j, num_logWs, num_logTs, call_number
          character (len=256) :: dir, fname, prefix
             
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 

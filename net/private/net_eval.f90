@@ -126,7 +126,7 @@
          logical, parameter :: dbg = .false.
          !logical, parameter :: dbg = .true.
          
-         include 'formats.dek'
+         include 'formats'
 
          if (dbg) write(*,*) 'enter eval_net'
          
@@ -602,7 +602,7 @@
             real(dp) :: f
             logical :: okay
             
-            include 'formats.dek'
+            include 'formats'
 
             do i=1,num_reactions
                if (g% reaction_id(i) <= 0) then
@@ -694,7 +694,7 @@
 
             integer, intent(out) :: ierr
             integer :: i, j, id, ir
-            include 'formats.dek'
+            include 'formats'
 
             ! before getting the weaklib rates, the Coulomb_Info
             ! structure must be populated.  the ecapture routines need
@@ -772,7 +772,7 @@
          real(dp) :: sum
          integer :: i, ci
          character (len=256) :: message
-         include 'formats.dek'
+         include 'formats'
          sum = 0
          do i = 1, g% num_isos
             sum = sum + x(i)

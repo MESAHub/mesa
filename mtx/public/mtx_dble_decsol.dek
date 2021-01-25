@@ -17,7 +17,7 @@
          integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ier
          integer :: i, j, iounit
-         include 'formats.dek'
+         include 'formats'
          ier = 0
          if (iop == 0) then ! factor
             if (ml == n) then

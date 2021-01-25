@@ -109,7 +109,7 @@ contains
     real(dp) :: dT_dlnT
     real(dp) :: dT_dlnTeff
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -267,7 +267,7 @@ contains
     integer                 :: ng
     integer                 :: j
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 

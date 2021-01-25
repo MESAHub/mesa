@@ -108,7 +108,7 @@
          
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -158,7 +158,7 @@
          real(dp), intent(in) :: aE, alogE, aRho, alogRho
          real(dp), intent(out) :: energy, logE, Rho, logRho
          integer, intent(out) :: ierr
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          energy = aE; logE = alogE
          if (aE == arg_not_provided .and. alogE == arg_not_provided) then
@@ -218,7 +218,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -390,7 +390,7 @@
          integer :: k, ip1, jp1
          real(dp), pointer :: fin(:,:,:,:)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          

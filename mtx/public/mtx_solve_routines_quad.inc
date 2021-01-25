@@ -162,7 +162,7 @@
          real(qp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
          integer :: j, i
          real(qp), parameter :: zero=0
-         include 'formats.dek'
+         include 'formats'
          ! transa = 'n'
          ! transb = 'n'
          ! alpha = -1

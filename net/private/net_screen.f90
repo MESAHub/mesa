@@ -81,7 +81,7 @@
          real(dp) :: Tfactor, dTfactordt
          logical :: all_okay
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          sc => scrn_info
@@ -267,7 +267,7 @@
          subroutine set_rate_screening(i, sc1a, sc1adt, sc1add)
             integer, intent(in) :: i
             real(dp), intent(in) :: sc1a, sc1adt, sc1add
-            include 'formats.dek'
+            include 'formats'
             if (i == 0) return         
             rate_screened(i) = rate_raw(i)*sc1a
             rate_screened_dT(i) = rate_raw_dT(i)*sc1a + rate_raw(i)*sc1adt
@@ -284,7 +284,7 @@
             integer, intent(in) :: ir
             integer, intent(out) :: ierr
             real(dp) :: sc1a, sc1adt, sc1add, a1, z1, a2, z2
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             a1 = chem_isos% Z_plus_N(i1)
             z1 = dble(chem_isos% Z(i1))
@@ -316,7 +316,7 @@
             real(dp) :: sc2, sc2dt, sc2dd
             real(dp) :: scor, scordt, scordd
             real(dp) :: a1, z1, a2, z2, a3, z3
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             i1 = i1_in; i2 = i2_in; i3 = i3_in
             a1 = chem_isos% Z_plus_N(i1)
@@ -380,7 +380,7 @@
             integer, pointer :: rtab(:)
             real(dp) :: rateII, rateIII, rsum, fII, fIII
 
-            include 'formats.dek'
+            include 'formats'
           
             rtab => g% net_reaction
             ierr = 0
