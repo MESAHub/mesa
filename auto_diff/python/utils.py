@@ -48,7 +48,7 @@ def substitute_rational(expr):
 	# This avoids Fortran integer division from ruining our expressions through rounding.
 
 	# Search for Rational
-	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Rational)]
+	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Rational) and p != 1 and p != -1]
 
 	# Build substitutions
 	new_ex = [symbols(str(float(p)) + '_dp') for p in to_sub]
