@@ -31,8 +31,8 @@ def fortran_substitutions(deriv):
 	# Replace calls to half-integer powers with calls to sqrt**n
 	deriv = substitute_pow(deriv)
 
-	# Next replace non-integer rational numbers with floating-point approximations
-	# to avoid Fortran integer division.
+	# Next replace rational numbers with floating-point approximations
+	# to avoid Fortran integer division and issues in pow calls.
 	deriv = substitute_rational(deriv)
 
 	# Put in _dp's for the remaining floats.
@@ -49,9 +49,6 @@ def substitute_rational(expr):
 
 	# Search for Rational
 	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Rational)]
-
-	# Search for non-Integer Rational
-	to_sub = [p for p in to_sub if p.q != Integer(1)]
 
 	# Build substitutions
 	new_ex = [symbols(str(float(p)) + '_dp') for p in to_sub]
@@ -70,6 +67,9 @@ def substitute_dp(expr):
 
 	# Search for Float
 	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Float)]
+
+	for p in preorder_traversal(expr):
+		print(p)
 
 	# Build substitutions
 	new_ex = [symbols(str(float(p)) + '_dp') for p in to_sub]
