@@ -24,15 +24,15 @@ module skye_coulomb_solid
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F free energy per kT per ion
    function ocp_solid_anharmonic_free_energy(GAMI,TPT) result(F)
-      type(auto_diff_real_2var_order3), intent(in) :: GAMI,TPT
-      type(auto_diff_real_2var_order3) :: F
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: GAMI,TPT
+      type(auto_diff_real_2var_order3_dArray) :: F
 
       real(dp), parameter :: A1 = 10.9d0
       real(dp), parameter :: A2 = 247d0
       real(dp), parameter :: A3 = 1.765d5
       real(dp), parameter :: B1 = 0.12d0 ! coefficient of \eta^2/\Gamma at T=0
 
-      type(auto_diff_real_2var_order3) :: TPT2
+      type(auto_diff_real_2var_order3_dArray) :: TPT2
 
       TPT2=TPT*TPT
 
@@ -56,14 +56,14 @@ module skye_coulomb_solid
    !! @param F free energy per kT per ion
    function ocp_solid_harmonic_free_energy(GAMI,TPT_in) result(F)
       ! Inputs
-      type(auto_diff_real_2var_order3), intent(in) :: GAMI,TPT_in
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: GAMI,TPT_in
 
       ! Intermediates
-      type(auto_diff_real_2var_order3) :: TPT, UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
-      type(auto_diff_real_2var_order3) :: Fth, U0
+      type(auto_diff_real_2var_order3_dArray) :: TPT, UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
+      type(auto_diff_real_2var_order3_dArray) :: Fth, U0
       
       ! Output
-      type(auto_diff_real_2var_order3) :: F
+      type(auto_diff_real_2var_order3_dArray) :: F
 
       real(dp), parameter :: CM = .895929256d0 ! Madelung
       real(dp), parameter :: EPS=1d-5
@@ -181,7 +181,7 @@ module skye_coulomb_solid
       ! Inputs
       integer, intent(in) :: n
       real(dp), intent(in) :: AZion(:), AY(:)
-      type(auto_diff_real_2var_order3), intent(in) :: GAME
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: GAME
 
       ! Intermediates
       integer :: i,j, num_unique_charges
@@ -189,10 +189,10 @@ module skye_coulomb_solid
       logical :: found
       integer :: found_index
       real(dp) :: RZ, aj, dG
-      type(auto_diff_real_2var_order3) :: GAMI
+      type(auto_diff_real_2var_order3_dArray) :: GAMI
 
       ! Output
-      type(auto_diff_real_2var_order3) :: F
+      type(auto_diff_real_2var_order3_dArray) :: F
 
       ! Parameters
       real(dp), parameter :: C = 0.012d0

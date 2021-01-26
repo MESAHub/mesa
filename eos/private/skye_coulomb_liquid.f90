@@ -18,9 +18,9 @@ module skye_coulomb_liquid
    !! @param g ion degeneracy parameter
    !! @param F non-ideal free energy
    function classical_ocp_liquid_free_energy(g) result(F)
-      type(auto_diff_real_2var_order3), intent(in) :: g
-      type(auto_diff_real_2var_order3) :: FA, FB
-      type(auto_diff_real_2var_order3) :: F
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: g
+      type(auto_diff_real_2var_order3_dArray) :: FA, FB
+      type(auto_diff_real_2var_order3_dArray) :: F
 
       real(dp), parameter :: SQ32=sqrt(3d0) / 2d0
 
@@ -48,9 +48,9 @@ module skye_coulomb_liquid
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F non-ideal free energy
    function quantum_ocp_liquid_free_energy_correction(TPT) result(F)
-         type(auto_diff_real_2var_order3), intent(in) :: TPT
-         type(auto_diff_real_2var_order3) :: eta
-         type(auto_diff_real_2var_order3) :: F
+         type(auto_diff_real_2var_order3_dArray), intent(in) :: TPT
+         type(auto_diff_real_2var_order3_dArray) :: eta
+         type(auto_diff_real_2var_order3_dArray) :: F
 
          real(dp), parameter :: Q1 = 5.994d0
          real(dp), parameter :: Q2 = 70.3d0
@@ -75,13 +75,13 @@ module skye_coulomb_liquid
    !! @param Z321 Mean of Z*(1+Z)^(3/2) for ions.
    !! @param FMIX mixing free energy correction per ion per kT.
    function liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321) result(FMIX)
-      type(auto_diff_real_2var_order3), intent(in) :: RS,GAME
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: RS,GAME
       real(dp), intent(in) :: Zmean,Z2mean,Z52,Z53,Z321
 
-      type(auto_diff_real_2var_order3) :: GAMImean, Dif0, DifR, DifFDH, D
-      type(auto_diff_real_2var_order3) :: P3, D0, GP, FMIX0, Q, R, GQ
+      type(auto_diff_real_2var_order3_dArray) :: GAMImean, Dif0, DifR, DifFDH, D
+      type(auto_diff_real_2var_order3_dArray) :: P3, D0, GP, FMIX0, Q, R, GQ
       
-      type(auto_diff_real_2var_order3) :: FMIX
+      type(auto_diff_real_2var_order3_dArray) :: FMIX
 
       real(dp), parameter :: TINY = 1d-9
       

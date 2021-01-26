@@ -15,23 +15,23 @@ module skye_ideal
 
    contains
 
-   type(auto_diff_real_2var_order3) function compute_F_rad(temp, den) result(Frad)
-      type(auto_diff_real_2var_order3), intent(in) :: temp, den
+   type(auto_diff_real_2var_order3_dArray) function compute_F_rad(temp, den) result(Frad)
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: temp, den
 
       ! F = - P / rho
       Frad = -crad * pow4(temp) / (3d0 * den)
 
    end function compute_F_rad
 
-   type(auto_diff_real_2var_order3) function compute_F_ideal_ion(temp, den, abar, species, weights, ya) result(F_ideal_ion)
-      type(auto_diff_real_2var_order3), intent(in) :: temp, den
+   type(auto_diff_real_2var_order3_dArray) function compute_F_ideal_ion(temp, den, abar, species, weights, ya) result(F_ideal_ion)
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: temp, den
       integer, intent(in) :: species
       real(dp), intent(in) :: weights(species), ya(species), abar
 
       integer :: j
-      type(auto_diff_real_2var_order3) :: n, nj, nQ, nQj
-      type(auto_diff_real_2var_order3) :: y, yy, z
-      type(auto_diff_real_2var_order3) :: kt, xni, etaion
+      type(auto_diff_real_2var_order3_dArray) :: n, nj, nQ, nQj
+      type(auto_diff_real_2var_order3_dArray) :: y, yy, z
+      type(auto_diff_real_2var_order3_dArray) :: kt, xni, etaion
 
       ! Helper quantity
       kt = kerg * temp
@@ -48,10 +48,10 @@ module skye_ideal
 
    end function compute_F_ideal_ion
 
-   type(auto_diff_real_2var_order3) function compute_xne(den, ytot1, zbar) result(xne)
-      type(auto_diff_real_2var_order3), intent(in) :: den
+   type(auto_diff_real_2var_order3_dArray) function compute_xne(den, ytot1, zbar) result(xne)
+      type(auto_diff_real_2var_order3_dArray), intent(in) :: den
       real(dp), intent(in) :: ytot1, zbar
-      type(auto_diff_real_2var_order3) :: xni
+      type(auto_diff_real_2var_order3_dArray) :: xni
 
       ! xne is the electron density due to matter, and so is proportional to density and independent of temperature
       ! for a fully ionized system.
@@ -166,7 +166,7 @@ module skye_ideal
                        df_ttt, df_dtt, df_ddt, df_ddd
       real(dp) :: etaele,detadd,detadt
       real(dp) :: detaddd,detaddt,detadtt
-      type(auto_diff_real_2var_order3), intent(out) :: adr_etaele, adr_xnefer, s, e, p
+      type(auto_diff_real_2var_order3_dArray), intent(out) :: adr_etaele, adr_xnefer, s, e, p
       real(dp) :: sele, dsepdt, dsepdd, dsepddt, dsepdtt, dsepddd, &
                  eele, deepdt, deepdd, deepddt, deepdtt, deepddd, &
                  pele, dpepdt, dpepdd, dpepddt, dpepdtt, dpepddd
