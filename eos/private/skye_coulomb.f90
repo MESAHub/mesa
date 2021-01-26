@@ -40,13 +40,13 @@ module skye_coulomb
    subroutine nonideal_corrections(NMIX,AY,AZion,ACMI, min_gamma_for_solid, max_gamma_for_liquid,&
                                   RHO,temp, xnefer, abar,dF, latent_ddlnT, latent_ddlnRho,phase)
       integer, intent(in) :: NMIX
-      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), min_gamma_for_solid, max_gamma_for_liquid
-      type(auto_diff_real_2var_order3_array), intent(in) :: RHO, temp, xnefer
+      real(dp), intent(in) :: AZion(:), ACMI(:), min_gamma_for_solid, max_gamma_for_liquid
+      type(auto_diff_real_2var_order3_array), intent(in) :: RHO, temp, xnefer, abar, AY(:)
       type(auto_diff_real_2var_order3_array), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
 
       integer :: IX
       integer :: LIQSOL
-      real(dp) :: Zion, Zmean, Z2mean, Z52, Z53, Z321, norm
+      type(auto_diff_real_2var_order3_array) :: Zion, Zmean, Z2mean, Z52, Z53, Z321, norm
       type(auto_diff_real_2var_order3_array) :: GAME, RS, DENS, Smix, F_phase_independent
       type(auto_diff_real_2var_order3_array) :: kT, dF_sol, dF_liq, latent_S, min_S
 
@@ -168,7 +168,8 @@ module skye_coulomb
    type(auto_diff_real_2var_order3_array) function linear_mixing_entropy(Nmix, AZion, AY) result(Smix)
       ! Inputs
       integer, intent(in) :: Nmix
-      real(dp), intent(in) :: AZion(:), AY(:)
+      real(dp), intent(in) :: AZion(:)
+      type(auto_diff_real_2var_order3_array), intent(in) :: AY(:)
 
       ! Intermediates and constants
       integer :: i
@@ -203,8 +204,9 @@ module skye_coulomb
       ! Inputs
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
-      real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, min_gamma_for_solid, max_gamma_for_liquid
+      real(dp), intent(in) :: AZion(:), ACMI(:), min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3_array), intent(in) :: temp, GAME, RS
+      type(auto_diff_real_2var_order3_array), intent(in) :: abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321
 
       ! Intermediates and constants
       integer :: i,j

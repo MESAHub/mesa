@@ -189,7 +189,7 @@ module skye
       !!..this routine assumes a call to subroutine read_helm_table has
       !!..been performed prior to calling this routine.
       subroutine skye_eos( &
-            temp_in, den_in, Xfrac, abar, zbar,  &
+            temp_in, den_in, Xfrac, abar_in, zbar,  &
             Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
             mass_fraction_limit, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
@@ -209,16 +209,17 @@ module skye
          integer, pointer :: chem_id(:)
          real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit, Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid
-         real(dp), intent(in) :: Xfrac, abar, zbar
+         real(dp), intent(in) :: Xfrac, abar_in, zbar
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
          
          integer :: relevant_species, lookup(species)
          type(auto_diff_real_2var_order3_array) :: temp, logtemp, den, logden, din
-         real(dp) :: AZION(species), ACMI(species), select_xa(species), ya(species)
+         real(dp) :: AZION(species), ACMI(species)
          type (Helm_Table), pointer :: ht
-         real(dp) :: ytot1, ye, norm
+         real(dp) :: ytot1, ye, ya_real(species)
+         type(auto_diff_real_2var_order3_array) :: abar, ya(species), norm, select_xa(species)
          type(auto_diff_real_2var_order3_array) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
          type(auto_diff_real_2var_order3_array) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
          type(auto_diff_real_2var_order3_array) :: pele, eele, eep, sele
@@ -235,8 +236,10 @@ module skye
          den%d1val2 = 1d0
          logden = log10(den)
 
+         abar = abar_in
+
          ! HELM table lookup uses din rather than den
-         ytot1 = 1.0d0 / abar
+         ytot1 = 1.0d0 / abar_in
          ye = ytot1 * zbar
          din = ye*den
 
@@ -278,9 +281,12 @@ module skye
          do j=1,relevant_species
             ya(j) = ya(j) / norm
          end do
+         do j=1,relevant_species
+            ya_real(j) = ya(j)%val
+         end do
 
          ! Ideal ion free energy, only depends on abar
-         F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
+         F_ideal_ion = compute_F_ideal_ion(temp, den, abar_in, relevant_species, ACMI, ya_real)
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
@@ -288,11 +294,6 @@ module skye
                                sele, eele, pele, etaele, xnefer, ierr)
 
          xnefer = compute_xne(den, ytot1, zbar)
-
-         ! Normalize mass fractions
-         do j=1,relevant_species
-            select_xa(j) = select_xa(j) / norm
-         end do
 
          ! Compute non-ideal corrections
          call nonideal_corrections(relevant_species, ya(1:relevant_species), &
@@ -302,7 +303,7 @@ module skye
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
 
-         call  pack_for_export(F_ideal_ion, F_coul, F_rad, temp, den, xnefer, etaele, abar, zbar, &
+         call  pack_for_export(F_ideal_ion, F_coul, F_rad, temp, den, xnefer, etaele, abar_in, zbar, &
                                  pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
                                  res, d_dlnd, d_dlnT)
 

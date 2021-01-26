@@ -135,13 +135,13 @@ module skye_coulomb_solid
    !!
    !! @param x2 Abundance of the higher-charge species
    !! @param Rz Charge ratio of species (> 1 by definition).
-   real(dp) function deltaG_Ogata93(x2, Rz) result(dG)
+   type(auto_diff_real_2var_order3_array) function deltaG_Ogata93(x2, Rz) result(dG)
       ! Inputs
-      real(dp), intent(in) :: x2
+      type(auto_diff_real_2var_order3_array), intent(in) :: x2
       real(dp), intent(in) :: Rz
 
       ! Intermediates
-      real(dp) :: CR
+      type(auto_diff_real_2var_order3_array) :: CR
 
       CR = 0.05d0 * pow2(Rz - 1d0) / ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
       dG = CR / (1 + (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
@@ -155,13 +155,13 @@ module skye_coulomb_solid
    !!
    !! @param x Abundance of the higher-charge species
    !! @param Rz Charge ratio of species (> 1 by definition).
-   real(dp) function deltaG_PC13(x2, Rz) result(dG)
+   type(auto_diff_real_2var_order3_array) function deltaG_PC13(x2, Rz) result(dG)
       ! Inputs
-      real(dp), intent(in) :: x2
+      type(auto_diff_real_2var_order3_array), intent(in) :: x2
       real(dp), intent(in) :: Rz
 
       ! Intermediates
-      real(dp) :: x
+      type(auto_diff_real_2var_order3_array) :: x
 
       x = x2 / Rz + (1d0 - 1d0 / Rz) * pow(x2, Rz)
       dG = 0.012d0 * ((x*(1d0-x)) / (x2*(1d0-x2))) * (1d0 - 1d0/pow2(Rz)) * (1d0 - x2 + x2 * pow(Rz,5d0/3d0))
@@ -180,16 +180,16 @@ module skye_coulomb_solid
    function solid_mixing_rule_correction(n, AY, AZion, GAME) result(F)      
       ! Inputs
       integer, intent(in) :: n
-      real(dp), intent(in) :: AZion(:), AY(:)
-      type(auto_diff_real_2var_order3_array), intent(in) :: GAME
+      real(dp), intent(in) :: AZion(:)
+      type(auto_diff_real_2var_order3_array), intent(in) :: AY(:), GAME
 
       ! Intermediates
       integer :: i,j, num_unique_charges
-      real(dp) :: unique_charges(n), charge_abundances(n)
+      real(dp) :: unique_charges(n)
       logical :: found
       integer :: found_index
-      real(dp) :: RZ, aj, dG
-      type(auto_diff_real_2var_order3_array) :: GAMI
+      real(dp) :: RZ
+      type(auto_diff_real_2var_order3_array) :: GAMI, charge_abundances(n), aj, dG
 
       ! Output
       type(auto_diff_real_2var_order3_array) :: F

@@ -76,7 +76,7 @@ module skye_coulomb_liquid
    !! @param FMIX mixing free energy correction per ion per kT.
    function liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321) result(FMIX)
       type(auto_diff_real_2var_order3_array), intent(in) :: RS,GAME
-      real(dp), intent(in) :: Zmean,Z2mean,Z52,Z53,Z321
+      type(auto_diff_real_2var_order3_array), intent(in) :: Zmean,Z2mean,Z52,Z53,Z321
 
       type(auto_diff_real_2var_order3_array) :: GAMImean, Dif0, DifR, DifFDH, D
       type(auto_diff_real_2var_order3_array) :: P3, D0, GP, FMIX0, Q, R, GQ
