@@ -224,6 +224,9 @@ module skye
          type(auto_diff_real_2var_order3_array) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
          type(auto_diff_real_2var_order3_array) :: pele, eele, eep, sele
 
+         integer, parameter :: n_diff = 5
+         integer :: diff_species(n_diff)
+
          ht => eos_ht
 
          ierr = 0
