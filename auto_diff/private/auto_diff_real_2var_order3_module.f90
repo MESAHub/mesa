@@ -810,7 +810,7 @@ module auto_diff_real_2var_order3_module
       real(dp) :: q1
       real(dp) :: q0
       q0 = pow(10.0_dp, x%val)
-      q1 = log(10.0_dp)
+      q1 = ln10
       q2 = q0*q1
       q3 = pow2(x%d1val1)
       q4 = q1*x%d1val1
@@ -991,7 +991,7 @@ module auto_diff_real_2var_order3_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
-      q0 = powm1(log(10.0_dp))
+      q0 = powm1(ln10)
       q1 = q0*powm1(x%val)
       q2 = x%d2val1*x%val
       q3 = pow2(x%d1val1)
@@ -1028,7 +1028,7 @@ module auto_diff_real_2var_order3_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
-      q0 = powm1(safe_log(10.0_dp))
+      q0 = powm1(ln10)
       q1 = q0*powm1(x%val)
       q2 = x%d2val1*x%val
       q3 = pow2(x%d1val1)
