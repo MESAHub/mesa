@@ -19,8 +19,6 @@ use_list.append(tab + 'use support_functions')
 
 for f in config_files:
 	print(f)
-	if '_array' not in f:
-		continue
 	with open(f, 'r') as fi:
 		data = load(fi, Loader=Loader)
 

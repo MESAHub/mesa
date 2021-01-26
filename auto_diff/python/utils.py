@@ -68,9 +68,6 @@ def substitute_dp(expr):
 	# Search for Float
 	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Float)]
 
-	for p in preorder_traversal(expr):
-		print(p)
-
 	# Build substitutions
 	new_ex = [symbols(str(float(p)) + '_dp') for p in to_sub]
 
