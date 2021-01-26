@@ -31,8 +31,8 @@ def fortran_substitutions(deriv):
 	# Replace calls to half-integer powers with calls to sqrt**n
 	deriv = substitute_pow(deriv)
 
-	# Next replace non-integer rational numbers with floating-point approximations
-	# to avoid Fortran integer division.
+	# Next replace rational numbers with floating-point approximations
+	# to avoid Fortran integer division and issues in pow calls.
 	deriv = substitute_rational(deriv)
 
 	# Put in _dp's for the remaining floats.
@@ -48,10 +48,7 @@ def substitute_rational(expr):
 	# This avoids Fortran integer division from ruining our expressions through rounding.
 
 	# Search for Rational
-	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Rational)]
-
-	# Search for non-Integer Rational
-	to_sub = [p for p in to_sub if p.q != Integer(1)]
+	to_sub = [p for p in preorder_traversal(expr) if isinstance(p, Rational) and p != 1 and p != -1]
 
 	# Build substitutions
 	new_ex = [symbols(str(float(p)) + '_dp') for p in to_sub]
@@ -170,8 +167,8 @@ def py_to_fort(expr):
 	expr = expr.replace('sign(', 'sgn(')
 
 	# Next we take advantage of MESA/const having pre-computing log10
-	expr = expr.replace('safe_log(10)', 'ln10')
-	expr = expr.replace('log(10)', 'ln10')
+	expr = expr.replace('safe_log(10.0_dp)', 'ln10')
+	expr = expr.replace('log(10.0_dp)', 'ln10')
 
 	# Next we replace 'colon' with ':' because sympy doesn't like colons in the middle of variable names.
 	expr = expr.replace('colon', ':')

@@ -633,7 +633,7 @@ module auto_diff_real_18var_order1_module
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       real(dp) :: q0
-      q0 = pow(10, x%val)
+      q0 = pow(10.0_dp, x%val)
       unary%val = q0
       unary%d1Array(1:18) = q0*x%d1Array(1:18)*ln10
    end function exp10_self
@@ -688,7 +688,7 @@ module auto_diff_real_18var_order1_module
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       real(dp) :: q0
-      q0 = powm1(log(2))
+      q0 = powm1(log(2.0_dp))
       unary%val = q0*log(x%val)
       unary%d1Array(1:18) = q0*x%d1Array(1:18)*powm1(x%val)
    end function log2_self
@@ -844,49 +844,49 @@ module auto_diff_real_18var_order1_module
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow2(x%val)
-      unary%d1Array(1:18) = 2*x%d1Array(1:18)*x%val
+      unary%d1Array(1:18) = 2.0_dp*x%d1Array(1:18)*x%val
    end function pow2_self
    
    function pow3_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow3(x%val)
-      unary%d1Array(1:18) = 3*x%d1Array(1:18)*pow2(x%val)
+      unary%d1Array(1:18) = 3.0_dp*x%d1Array(1:18)*pow2(x%val)
    end function pow3_self
    
    function pow4_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow4(x%val)
-      unary%d1Array(1:18) = 4*x%d1Array(1:18)*pow3(x%val)
+      unary%d1Array(1:18) = 4.0_dp*x%d1Array(1:18)*pow3(x%val)
    end function pow4_self
    
    function pow5_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow5(x%val)
-      unary%d1Array(1:18) = 5*x%d1Array(1:18)*pow4(x%val)
+      unary%d1Array(1:18) = 5.0_dp*x%d1Array(1:18)*pow4(x%val)
    end function pow5_self
    
    function pow6_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow6(x%val)
-      unary%d1Array(1:18) = 6*x%d1Array(1:18)*pow5(x%val)
+      unary%d1Array(1:18) = 6.0_dp*x%d1Array(1:18)*pow5(x%val)
    end function pow6_self
    
    function pow7_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow7(x%val)
-      unary%d1Array(1:18) = 7*x%d1Array(1:18)*pow6(x%val)
+      unary%d1Array(1:18) = 7.0_dp*x%d1Array(1:18)*pow6(x%val)
    end function pow7_self
    
    function pow8_self(x) result(unary)
       type(auto_diff_real_18var_order1), intent(in) :: x
       type(auto_diff_real_18var_order1) :: unary
       unary%val = pow8(x%val)
-      unary%d1Array(1:18) = 8*x%d1Array(1:18)*pow7(x%val)
+      unary%d1Array(1:18) = 8.0_dp*x%d1Array(1:18)*pow7(x%val)
    end function pow8_self
    
    function abs_self(x) result(unary)
