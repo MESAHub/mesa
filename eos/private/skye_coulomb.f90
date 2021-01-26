@@ -41,14 +41,14 @@ module skye_coulomb
                                   RHO,temp, xnefer, abar,dF, latent_ddlnT, latent_ddlnRho,phase)
       integer, intent(in) :: NMIX
       real(dp), intent(in) :: AZion(:), ACMI(:), min_gamma_for_solid, max_gamma_for_liquid
-      type(auto_diff_real_2var_order3_array), intent(in) :: RHO, temp, xnefer, abar, AY(:)
-      type(auto_diff_real_2var_order3_array), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: RHO, temp, xnefer, abar, AY(:)
+      type(auto_diff_real_2var_order3_1var_order2), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
 
       integer :: IX
       integer :: LIQSOL
-      type(auto_diff_real_2var_order3_array) :: Zion, Zmean, Z2mean, Z52, Z53, Z321, norm
-      type(auto_diff_real_2var_order3_array) :: GAME, RS, DENS, Smix, F_phase_independent
-      type(auto_diff_real_2var_order3_array) :: kT, dF_sol, dF_liq, latent_S, min_S
+      type(auto_diff_real_2var_order3_1var_order2) :: Zion, Zmean, Z2mean, Z52, Z53, Z321, norm
+      type(auto_diff_real_2var_order3_1var_order2) :: GAME, RS, DENS, Smix, F_phase_independent
+      type(auto_diff_real_2var_order3_1var_order2) :: kT, dF_sol, dF_liq, latent_S, min_S
 
       ! Compute various mean charge quantities
       Zmean=0d0
@@ -121,10 +121,10 @@ module skye_coulomb
    !! @param latent_ddlnT Equals T^2 dS/dT for the latent heat. Equivalently, d(latent heat)/dlnT.
    !! @param latent_ddlnRho Equals T Rho dS/dRho for the latent heat. Equivalently, d(latent heat)/dlnRho.
    subroutine decide_phase(dF_liq, dF_sol, kT, temp, rho, dF, phase, latent_ddlnT, latent_ddlnRho)
-      type(auto_diff_real_2var_order3_array), intent(in) :: dF_liq, dF_sol, kT, temp, rho
-      type(auto_diff_real_2var_order3_array), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: dF_liq, dF_sol, kT, temp, rho
+      type(auto_diff_real_2var_order3_1var_order2), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
 
-      type(auto_diff_real_2var_order3_array) :: blur, dF_blur, latent_S
+      type(auto_diff_real_2var_order3_1var_order2) :: blur, dF_blur, latent_S
       real(dp), parameter :: blur_width = 1d2
 
       ! Pick the phase with the minimum free energy
@@ -165,11 +165,11 @@ module skye_coulomb
    !! @param Azion An array of the charges of those species.
    !! @param AY An array of the number fractions of those species.
    !! @param Smix The linear mixing entropy per ion per kB.
-   type(auto_diff_real_2var_order3_array) function linear_mixing_entropy(Nmix, AZion, AY) result(Smix)
+   type(auto_diff_real_2var_order3_1var_order2) function linear_mixing_entropy(Nmix, AZion, AY) result(Smix)
       ! Inputs
       integer, intent(in) :: Nmix
       real(dp), intent(in) :: AZion(:)
-      type(auto_diff_real_2var_order3_array), intent(in) :: AY(:)
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: AY(:)
 
       ! Intermediates and constants
       integer :: i
@@ -205,16 +205,16 @@ module skye_coulomb
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
       real(dp), intent(in) :: AZion(:), ACMI(:), min_gamma_for_solid, max_gamma_for_liquid
-      type(auto_diff_real_2var_order3_array), intent(in) :: temp, GAME, RS
-      type(auto_diff_real_2var_order3_array), intent(in) :: abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, GAME, RS
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321
 
       ! Intermediates and constants
       integer :: i,j
-      type(auto_diff_real_2var_order3_array) :: FMIX, f
+      type(auto_diff_real_2var_order3_1var_order2) :: FMIX, f
       real(dp), parameter :: TINY=1.d-7
 
       ! Output
-      type(auto_diff_real_2var_order3_array) :: dF
+      type(auto_diff_real_2var_order3_1var_order2) :: dF
 
       dF = 0d0
 
@@ -252,17 +252,17 @@ module skye_coulomb
    function extrapolate_free_energy(LIQSOL, temp, RS, Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid) result(F)
       ! Inputs
       integer, intent(in) :: LIQSOL
-      type(auto_diff_real_2var_order3_array), intent(in) :: temp, RS
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, RS
       real(dp), intent(in) :: Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid
 
       ! Intermediates
       real(dp) :: COTPT, gamma_boundary
-      type(auto_diff_real_2var_order3_array) :: temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT
+      type(auto_diff_real_2var_order3_1var_order2) :: temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT
 
       real(dp), parameter :: AUM = amu / me
 
       ! Output
-      type(auto_diff_real_2var_order3_array) :: F
+      type(auto_diff_real_2var_order3_1var_order2) :: F
 
       GAMI = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
       COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
@@ -349,10 +349,10 @@ module skye_coulomb
    function ocp_free_energy(LIQSOL,GAMI,TPT) result(F)
       ! Inputs
       integer, intent(in) :: LIQSOL
-      type(auto_diff_real_2var_order3_array), intent(in) :: GAMI, TPT
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: GAMI, TPT
 
       ! Output
-      type(auto_diff_real_2var_order3_array) :: F
+      type(auto_diff_real_2var_order3_1var_order2) :: F
 
 
       ! i-e corrections (FSCR) ruin the phase transition at densities ~1d3 and below.
@@ -378,21 +378,21 @@ module skye_coulomb
    !! @param FXC Electron exchange-correlation non-ideal free energy correction per electron per kT
    function EXCOR7(RS,GAME) result(FXC)
       ! Inputs
-      type(auto_diff_real_2var_order3_array), intent(in) :: RS, GAME
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: RS, GAME
 
       ! Intermediates
-      type(auto_diff_real_2var_order3_array) :: THETA, SQTH, THETA2, THETA3, THETA4, EXP1TH
-      type(auto_diff_real_2var_order3_array) :: CHT1, SHT1, CHT2, SHT2
-      type(auto_diff_real_2var_order3_array) :: T1, T2
-      type(auto_diff_real_2var_order3_array) :: A0, A1, A, B0, B1, B
-      type(auto_diff_real_2var_order3_array) :: C, CDH, CDHH, C3, C3DH, C3DHH
-      type(auto_diff_real_2var_order3_array) :: D0, D1, D, E0, E1, E
-      type(auto_diff_real_2var_order3_array) :: DISCR, SQGE
-      type(auto_diff_real_2var_order3_array) :: B2, B3, R3, S1, S2, S3, B4, C4
-      type(auto_diff_real_2var_order3_array) :: S4A, S4B, S4C, S4
+      type(auto_diff_real_2var_order3_1var_order2) :: THETA, SQTH, THETA2, THETA3, THETA4, EXP1TH
+      type(auto_diff_real_2var_order3_1var_order2) :: CHT1, SHT1, CHT2, SHT2
+      type(auto_diff_real_2var_order3_1var_order2) :: T1, T2
+      type(auto_diff_real_2var_order3_1var_order2) :: A0, A1, A, B0, B1, B
+      type(auto_diff_real_2var_order3_1var_order2) :: C, CDH, CDHH, C3, C3DH, C3DHH
+      type(auto_diff_real_2var_order3_1var_order2) :: D0, D1, D, E0, E1, E
+      type(auto_diff_real_2var_order3_1var_order2) :: DISCR, SQGE
+      type(auto_diff_real_2var_order3_1var_order2) :: B2, B3, R3, S1, S2, S3, B4, C4
+      type(auto_diff_real_2var_order3_1var_order2) :: S4A, S4B, S4C, S4
 
       ! Output
-      type(auto_diff_real_2var_order3_array) :: FXC
+      type(auto_diff_real_2var_order3_1var_order2) :: FXC
 
       THETA=0.543d0*RS/GAME ! non-relativistic degeneracy parameter
       SQTH=sqrt(THETA)

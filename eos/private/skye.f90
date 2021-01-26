@@ -215,14 +215,14 @@ module skye
          real(dp), intent(out), dimension(nv, species) :: d_dxa
          
          integer :: relevant_species, lookup(species)
-         type(auto_diff_real_2var_order3_array) :: temp, logtemp, den, logden, din
+         type(auto_diff_real_2var_order3_1var_order2) :: temp, logtemp, den, logden, din
          real(dp) :: AZION(species), ACMI(species)
          type (Helm_Table), pointer :: ht
          real(dp) :: ytot1, ye, ya_real(species)
-         type(auto_diff_real_2var_order3_array) :: abar, ya(species), norm, select_xa(species)
-         type(auto_diff_real_2var_order3_array) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
-         type(auto_diff_real_2var_order3_array) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
-         type(auto_diff_real_2var_order3_array) :: pele, eele, eep, sele
+         type(auto_diff_real_2var_order3_1var_order2) :: abar, ya(species), norm, select_xa(species)
+         type(auto_diff_real_2var_order3_1var_order2) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
+         type(auto_diff_real_2var_order3_1var_order2) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
+         type(auto_diff_real_2var_order3_1var_order2) :: pele, eele, eep, sele
 
          integer, parameter :: n_diff = 5
          integer :: diff_species(n_diff)

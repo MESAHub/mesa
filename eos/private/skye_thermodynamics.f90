@@ -20,9 +20,9 @@ module skye_thermodynamics
    !! @param e Internal energy (erg/g)
    !! @param p Pressure (erg/cm^3)
    subroutine thermodynamics_from_free_energy(F, temp, den, s, e, p)
-      type(auto_diff_real_2var_order3_array), intent(in) :: F
-      type(auto_diff_real_2var_order3_array), intent(in) :: temp, den
-      type(auto_diff_real_2var_order3_array), intent(out) :: s, e, p
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: F
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, den
+      type(auto_diff_real_2var_order3_1var_order2), intent(out) :: s, e, p
 
       ! Entropy
       ! s = - F/dT
@@ -57,8 +57,8 @@ module skye_thermodynamics
    !! @param cs Sound speed (cm/s)
    subroutine compute_derived_quantities(temp, dens, s, e, p, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs)
       use const_def, only: clight
-      type(auto_diff_real_2var_order3_array), intent(in) :: temp, dens, s, e, p
-      type(auto_diff_real_2var_order3_array), intent(out) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, dens, s, e, p
+      type(auto_diff_real_2var_order3_1var_order2), intent(out) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
 
       ! Susceptibilities
       chit = differentiate_1(p) * temp / p
@@ -106,14 +106,14 @@ module skye_thermodynamics
                                           pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
                                           res, d_dlnRho, d_dlnT)
       use eos_def
-      type(auto_diff_real_2var_order3_array), intent(in) :: F_ideal_ion, F_coul, F_rad, temp, dens, xnefer, etaele
-      type(auto_diff_real_2var_order3_array), intent(in) :: pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: F_ideal_ion, F_coul, F_rad, temp, dens, xnefer, etaele
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho
       real(dp), intent(in) :: abar, zbar
 
       ! Intermediates
-      type(auto_diff_real_2var_order3_array) :: srad, erad, prad, sgas, egas, pgas, p, e, s
-      type(auto_diff_real_2var_order3_array) :: F_ion_gas, lnS, lnE, lnPgas, mu, lnfree_e
-      type(auto_diff_real_2var_order3_array) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
+      type(auto_diff_real_2var_order3_1var_order2) :: srad, erad, prad, sgas, egas, pgas, p, e, s
+      type(auto_diff_real_2var_order3_1var_order2) :: F_ion_gas, lnS, lnE, lnPgas, mu, lnfree_e
+      type(auto_diff_real_2var_order3_1var_order2) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
 
       ! Outputs
       real(dp), intent(inout) :: res(nv)

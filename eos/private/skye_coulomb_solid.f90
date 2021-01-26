@@ -24,15 +24,15 @@ module skye_coulomb_solid
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F free energy per kT per ion
    function ocp_solid_anharmonic_free_energy(GAMI,TPT) result(F)
-      type(auto_diff_real_2var_order3_array), intent(in) :: GAMI,TPT
-      type(auto_diff_real_2var_order3_array) :: F
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: GAMI,TPT
+      type(auto_diff_real_2var_order3_1var_order2) :: F
 
       real(dp), parameter :: A1 = 10.9d0
       real(dp), parameter :: A2 = 247d0
       real(dp), parameter :: A3 = 1.765d5
       real(dp), parameter :: B1 = 0.12d0 ! coefficient of \eta^2/\Gamma at T=0
 
-      type(auto_diff_real_2var_order3_array) :: TPT2
+      type(auto_diff_real_2var_order3_1var_order2) :: TPT2
 
       TPT2=TPT*TPT
 
@@ -56,14 +56,14 @@ module skye_coulomb_solid
    !! @param F free energy per kT per ion
    function ocp_solid_harmonic_free_energy(GAMI,TPT_in) result(F)
       ! Inputs
-      type(auto_diff_real_2var_order3_array), intent(in) :: GAMI,TPT_in
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: GAMI,TPT_in
 
       ! Intermediates
-      type(auto_diff_real_2var_order3_array) :: TPT, UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
-      type(auto_diff_real_2var_order3_array) :: Fth, U0
+      type(auto_diff_real_2var_order3_1var_order2) :: TPT, UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
+      type(auto_diff_real_2var_order3_1var_order2) :: Fth, U0
       
       ! Output
-      type(auto_diff_real_2var_order3_array) :: F
+      type(auto_diff_real_2var_order3_1var_order2) :: F
 
       real(dp), parameter :: CM = .895929256d0 ! Madelung
       real(dp), parameter :: EPS=1d-5
@@ -135,13 +135,13 @@ module skye_coulomb_solid
    !!
    !! @param x2 Abundance of the higher-charge species
    !! @param Rz Charge ratio of species (> 1 by definition).
-   type(auto_diff_real_2var_order3_array) function deltaG_Ogata93(x2, Rz) result(dG)
+   type(auto_diff_real_2var_order3_1var_order2) function deltaG_Ogata93(x2, Rz) result(dG)
       ! Inputs
-      type(auto_diff_real_2var_order3_array), intent(in) :: x2
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x2
       real(dp), intent(in) :: Rz
 
       ! Intermediates
-      type(auto_diff_real_2var_order3_array) :: CR
+      type(auto_diff_real_2var_order3_1var_order2) :: CR
 
       CR = 0.05d0 * pow2(Rz - 1d0) / ((1d0 + 0.64d0 * (Rz - 1d0)) * (1d0 + 0.5d0 * pow2(Rz - 1d0)))
       dG = CR / (1 + (sqrt(x2) * (sqrt(x2) - 0.3d0) * (sqrt(x2) - 0.7d0) * (sqrt(x2) - 1d0)) * 27d0 * (Rz - 1d0) / (1d0 + 0.1d0 * (Rz - 1d0)))
@@ -155,13 +155,13 @@ module skye_coulomb_solid
    !!
    !! @param x Abundance of the higher-charge species
    !! @param Rz Charge ratio of species (> 1 by definition).
-   type(auto_diff_real_2var_order3_array) function deltaG_PC13(x2, Rz) result(dG)
+   type(auto_diff_real_2var_order3_1var_order2) function deltaG_PC13(x2, Rz) result(dG)
       ! Inputs
-      type(auto_diff_real_2var_order3_array), intent(in) :: x2
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x2
       real(dp), intent(in) :: Rz
 
       ! Intermediates
-      type(auto_diff_real_2var_order3_array) :: x
+      type(auto_diff_real_2var_order3_1var_order2) :: x
 
       x = x2 / Rz + (1d0 - 1d0 / Rz) * pow(x2, Rz)
       dG = 0.012d0 * ((x*(1d0-x)) / (x2*(1d0-x2))) * (1d0 - 1d0/pow2(Rz)) * (1d0 - x2 + x2 * pow(Rz,5d0/3d0))
@@ -181,7 +181,7 @@ module skye_coulomb_solid
       ! Inputs
       integer, intent(in) :: n
       real(dp), intent(in) :: AZion(:)
-      type(auto_diff_real_2var_order3_array), intent(in) :: AY(:), GAME
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: AY(:), GAME
 
       ! Intermediates
       integer :: i,j, num_unique_charges
@@ -189,10 +189,10 @@ module skye_coulomb_solid
       logical :: found
       integer :: found_index
       real(dp) :: RZ
-      type(auto_diff_real_2var_order3_array) :: GAMI, charge_abundances(n), aj, dG
+      type(auto_diff_real_2var_order3_1var_order2) :: GAMI, charge_abundances(n), aj, dG
 
       ! Output
-      type(auto_diff_real_2var_order3_array) :: F
+      type(auto_diff_real_2var_order3_1var_order2) :: F
 
       ! Parameters
       real(dp), parameter :: C = 0.012d0
