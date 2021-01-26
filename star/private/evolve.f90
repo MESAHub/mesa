@@ -160,7 +160,6 @@
             call set_to_NaN(s% mstar_dot_old)
             call set_to_NaN(s% L_phot_old)
             call set_to_NaN(s% L_surf_old)
-            call set_to_NaN(s% dt_limit_ratio_old)
             call set_to_NaN(s% total_angular_momentum_old)
             call set_to_NaN(s% revised_max_yr_dt_old)
             call set_to_NaN(s% astero_revised_max_yr_dt_old)

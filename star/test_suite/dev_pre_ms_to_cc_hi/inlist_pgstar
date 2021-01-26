@@ -601,23 +601,23 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = 'log_R'
+    History_Panels1_yaxis_name(2) = 'v_div_cs'
     History_Panels1_yaxis_reversed(2) = .false.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
-    History_Panels1_dymin(2) = 0.1
+    History_Panels1_dymin(2) = 7d-5
 
       ! ::
 
-    History_Panels1_other_yaxis_name(2) = 'v_div_cs' ! 'v_surf_km_s'
+    History_Panels1_other_yaxis_name(2) = 'log_max_T' ! 'v_surf_km_s'
     History_Panels1_other_yaxis_reversed(2) = .false.
     History_Panels1_other_ymin(2) = -101d0
     History_Panels1_other_ymax(2) = -101d0
-    History_Panels1_other_dymin(2) = 7d-5
+    History_Panels1_other_dymin(2) = 0.1
 
       ! ::
 
-    History_Panels1_yaxis_name(3) = 'log_cntr_Rho'
+    History_Panels1_yaxis_name(3) = 'log_R'
     History_Panels1_yaxis_reversed(3) = .false.
     History_Panels1_ymin(3) = -101d0
     History_Panels1_ymax(3) = -101d0
@@ -625,7 +625,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_other_yaxis_name(3) = 'log_max_T'
+    History_Panels1_other_yaxis_name(3) = 'log_cntr_Rho'
     History_Panels1_other_yaxis_reversed(3) = .false.
     History_Panels1_other_ymin(3) = -101d0
     History_Panels1_other_ymax(3) = -101d0

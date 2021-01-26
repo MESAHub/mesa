@@ -6,7 +6,7 @@
       saved_model_name = 'after_core_c_burn.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'lgTmax_9.5.mod'
+      save_model_filename = 'lgTmax.mod'
       required_termination_code_string = 'log_max_temp_upper_limit'
 
       !set_initial_age = .false.
@@ -31,7 +31,7 @@
 
 &controls
 
-      log_max_temp_upper_limit = 9.50d0
+      log_max_temp_upper_limit = 9.550d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -44,13 +44,16 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
+      max_logT_for_mlt = 9.5d0
+
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
+
+      dX_nuc_drop_limit = -1
 
 ! mesh
 

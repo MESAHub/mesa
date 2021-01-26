@@ -3,10 +3,10 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgTmax_9.5.mod'
+      saved_model_name = 'lgTmax.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'start_core_collapse.mod'
+      save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
       !set_initial_age = .false.
@@ -15,6 +15,11 @@
 
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
+
+      change_initial_u_flag = .true.
+      change_initial_v_flag = .true.
+      new_v_flag = .false.
+      new_u_flag = .true.
 
       !pgstar_flag = .false.
 
@@ -28,7 +33,7 @@
 
 &controls
 
-      fe_core_infall_limit = 1d6
+      fe_core_infall_limit = 250d5
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -41,6 +46,7 @@
 ! rotation
 
 ! mlt
+      max_logT_for_mlt = 9.3d0
 
 ! mixing
 
@@ -53,12 +59,13 @@
 ! mesh
 
 ! solver
+      !use_compression_outer_BC = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
 
 ! output
-      terminal_show_age_units = 'days'
+      terminal_show_age_units = 'secs'
       terminal_show_timestep_units = 'secs'
       terminal_show_log_dt = .false.
       terminal_show_log_age = .false.
@@ -151,8 +158,19 @@
 !Grid1_file_flag = .true.
 
 !pause = .true.
+
+Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax =  -101d0 ! 2.5 ! 
+Profile_Panels3_xmax =  5 ! 
+Profile_Panels3_xaxis_reversed = .false.
+
+Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xmin = -101d0
+Profile_Panels3_xmax = -101d0
+Profile_Panels3_xaxis_reversed = .true.
+
+
+
 Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
@@ -160,5 +178,8 @@ TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 10
 TRho_Profile_ymin = 8.5
 TRho_Profile_ymax = 10.5
+
+Text_Summary1_name(1,2) = 'time_step_sec'
+Text_Summary1_name(2,2) = 'star_age_sec'
 
 / ! end of pgstar namelist

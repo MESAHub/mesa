@@ -29,6 +29,13 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_removed_envelope.mod removed_envelope.mod
+else
+   do_one inlist_remove_envelope_header removed_envelope.mod
+   cp removed_envelope.mod standard_removed_envelope.mod
+fi
+
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_after_core_c_burn.mod after_core_c_burn.mod
 else
    do_one inlist_to_end_core_c_burn_header after_core_c_burn.mod
@@ -36,15 +43,13 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_lgTmax_9.5.mod lgTmax_9.5.mod
+   cp standard_lgTmax.mod lgTmax.mod
 else
-   do_one inlist_to_lgTmax_9.5_header lgTmax_9.5.mod
-   cp lgTmax_9.5.mod standard_lgTmax_9.5.mod
+   do_one inlist_to_lgTmax_header lgTmax.mod
+   cp lgTmax.mod standard_lgTmax.mod
 fi
 
-do_one inlist_to_cc_header start_core_collapse.mod
-
-do_one inlist_finish_core_collapse_header final.mod
+do_one inlist_to_cc_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

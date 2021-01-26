@@ -315,11 +315,9 @@
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_del_mdot))
             if (return_now(Tlim_del_mdot)) return
 
-            if (s% rotation_flag .and. s% do_adjust_J_lost .and. s% mstar_dot < 0d0) then
-               do_timestep_limits = check_adjust_J_q( &
-                  s, skip_hard_limit, dt_limit_ratio(Tlim_adjust_J_q))
-               if (return_now(Tlim_adjust_J_q)) return
-            end if
+            do_timestep_limits = check_adjust_J_q( &
+               s, skip_hard_limit, dt_limit_ratio(Tlim_adjust_J_q))
+            if (return_now(Tlim_adjust_J_q)) return
 
             do_timestep_limits = check_delta_lgL( &
                s, skip_hard_limit, dt_limit_ratio(Tlim_lgL))
@@ -1993,6 +1991,7 @@
          check_adjust_J_q = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
+         if (.not. (s% rotation_flag .and. s% do_adjust_J_lost .and. s% mstar_dot < 0d0)) return
          ! we care about s% adjust_J_q remaining above a given limit
          ! so we use 1-S% adjust_J_q
          check_adjust_J_q = check_change(s, 1-s% adjust_J_q, &

@@ -277,7 +277,7 @@
          dt_why_str(Tlim_lgL) = 'lgL'
          dt_why_str(Tlim_max_timestep) = 'max_dt'
          dt_why_str(Tlim_timestep_hold) = 'hold'
-         dt_why_str(Tlim_dX_nuc_drop) = 'dX_nuc_drop'
+         dt_why_str(Tlim_dX_nuc_drop) = 'dX_nuc'
          dt_why_str(Tlim_dX_div_X_cntr) = 'dX_div_X_cntr'
          dt_why_str(Tlim_lg_XHe_cntr) = 'lg_XHe_cntr'
          dt_why_str(Tlim_lg_XC_cntr) = 'lg_XC_cntr'

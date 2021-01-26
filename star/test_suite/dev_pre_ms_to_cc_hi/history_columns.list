@@ -35,7 +35,7 @@
 !        include '' means include the default standard list file
 
 ! items corresponding to names on terminal output lines
-
+      gamma1_min
       lg_Lnuc
       H_rich
       N_cntr
@@ -58,6 +58,9 @@
       C_cntr
       retries
 
+      non_fe_core_infall
+      fe_core_infall
+      bound_mass
 
 
 
@@ -67,18 +70,30 @@
    
       model_number ! counting from the start of the run
       star_age ! elapsed simulated time in years since the start of the run
+      star_age_day
+      star_age_hr
+      star_age_min
+      star_age_sec
       star_mass ! in Msun units
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
       log_rotational_mdot_boost
       !star_mdot ! d(star_mass)/dt (in msolar per year)
-      !time_step ! timestep in years since previous model
+      time_step ! timestep in years since previous model
+      time_step_sec
+      time_step_days
       log_dt ! log10 time_step
+      log_dt_sec
+      log_dt_days
       num_zones ! number of zones in the model
       log_total_angular_momentum
+      total_energy_foe
+      total_energy
+      log_total_energy
+      
       
       log_max_residual
       log_residual_norm
-      num_solver_iterations ! iterations at this step
+      num_solver_iterations ! iterations this step
       rel_E_err
       log_rel_E_err
       log_rel_run_E_err
@@ -129,6 +144,8 @@
       o_core_mass   
       si_core_mass
       fe_core_mass
+      
+      center_ye
    
    ! info about locations where optical depth is 10 or 100
 
@@ -198,6 +215,9 @@
       center_omega
       center_omega_div_omega_crit
       center_ye
+
+      center_T
+      center_Rho
       center_entropy ! in kerg per baryon      
       
 
