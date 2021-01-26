@@ -167,8 +167,8 @@ def py_to_fort(expr):
 	expr = expr.replace('sign(', 'sgn(')
 
 	# Next we take advantage of MESA/const having pre-computing log10
-	expr = expr.replace('safe_log(10)', 'ln10')
-	expr = expr.replace('log(10)', 'ln10')
+	expr = expr.replace('safe_log(10.0_dp)', 'ln10')
+	expr = expr.replace('log(10.0_dp)', 'ln10')
 
 	# Next we replace 'colon' with ':' because sympy doesn't like colons in the middle of variable names.
 	expr = expr.replace('colon', ':')
