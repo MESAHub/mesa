@@ -100,6 +100,7 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 	left_hand_names = []
 	derivatives = []
 	for p in partials:
+		print(p)
 		# Beginning of Fortran line, for writing out the answer
 		unary_symbol_str = auto_diff_type.partial_str_in_instance('unary', p).replace(':','colon')
 		
@@ -221,6 +222,7 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, f
 	left_hand_names = []
 	derivatives = []
 	for p in partials:
+		print(p)
 		# Beginning of Fortran line, for writing out the answer
 		binary_symbol_str = auto_diff_type.partial_str_in_instance('binary', p).replace(':','colon')
 		

@@ -40,6 +40,7 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 
 	# Comparison
 	for op, opname in comparison_operators:
+		print('generating operator',opname)
 		interfaces.append('interface operator(' + op + ')')
 		begin.append(tab + 'operator(' + op + '), &')
 
@@ -93,6 +94,7 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 
 	# Specific Operators
 	for op, opname in unary_operators:
+		print('generating operator',opname)
 
 		function = auto_diff_type.specific_unary_operator_function(opname, op)
 		functions.append(str(function))
@@ -110,6 +112,7 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators, compa
 		interfaces.append('')
 
 	for op, opname in binary_operators:
+		print('generating operator',opname)
 		# (auto_diff, auto_diff)
 		function = auto_diff_type.specific_binary_operator_function_self(opname, op)
 		functions.append(str(function))
