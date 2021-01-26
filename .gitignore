@@ -81,3 +81,4 @@ testhub.yml
 .DS_Store
 .mesa_temp_cache/
 TAGS
+*.pyc
