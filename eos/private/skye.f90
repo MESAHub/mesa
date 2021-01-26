@@ -215,13 +215,13 @@ module skye
          real(dp), intent(out), dimension(nv, species) :: d_dxa
          
          integer :: relevant_species, lookup(species)
-         type(auto_diff_real_2var_order3_dArray) :: temp, logtemp, den, logden, din
+         type(auto_diff_real_2var_order3_array) :: temp, logtemp, den, logden, din
          real(dp) :: AZION(species), ACMI(species), select_xa(species), ya(species)
          type (Helm_Table), pointer :: ht
          real(dp) :: ytot1, ye, norm
-         type(auto_diff_real_2var_order3_dArray) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
-         type(auto_diff_real_2var_order3_dArray) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
-         type(auto_diff_real_2var_order3_dArray) :: pele, eele, eep, sele
+         type(auto_diff_real_2var_order3_array) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
+         type(auto_diff_real_2var_order3_array) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
+         type(auto_diff_real_2var_order3_array) :: pele, eele, eep, sele
 
          ht => eos_ht
 
