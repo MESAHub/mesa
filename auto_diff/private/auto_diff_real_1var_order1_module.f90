@@ -640,7 +640,7 @@ module auto_diff_real_1var_order1_module
       real(dp) :: q0
       q0 = pow(10.0_dp, x%val)
       unary%val = q0
-      unary%d1val1 = q0*x%d1val1*log(10.0_dp)
+      unary%d1val1 = q0*x%d1val1*ln10
    end function exp10_self
    
    function powm1_self(x) result(unary)
@@ -675,7 +675,7 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       real(dp) :: q0
-      q0 = powm1(log(10.0_dp))
+      q0 = powm1(ln10)
       unary%val = q0*log(x%val)
       unary%d1val1 = q0*x%d1val1*powm1(x%val)
    end function log10_self
@@ -684,7 +684,7 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       real(dp) :: q0
-      q0 = powm1(safe_log(10.0_dp))
+      q0 = powm1(ln10)
       unary%val = q0*safe_log(x%val)
       unary%d1val1 = q0*x%d1val1*powm1(x%val)
    end function safe_log10_self
