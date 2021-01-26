@@ -54,18 +54,18 @@
      
       
       
-		contains
+      contains
 
-		
-		subroutine setup_scvh(data_dir)
-		   character (len=*),intent(IN) :: data_dir
-		   call alloc_for_scvh
-		   call read_data_for_scvh(data_dir)
-		end subroutine setup_scvh
-		
-		
-		subroutine alloc_for_scvh
-		   
+
+      subroutine setup_scvh(data_dir)
+         character (len=*),intent(IN) :: data_dir
+         call alloc_for_scvh
+         call read_data_for_scvh(data_dir)
+      end subroutine setup_scvh
+
+
+      subroutine alloc_for_scvh
+
          integer :: info
          info = 0
 
@@ -102,11 +102,11 @@
             info_he% name = name_he
          end subroutine alloc
 
-		end subroutine alloc_for_scvh
-		
-		
-		subroutine read_data_for_scvh(data_dir)
-		   character (len=*),intent(IN) :: data_dir
+      end subroutine alloc_for_scvh
+
+
+      subroutine read_data_for_scvh(data_dir)
+         character (len=*),intent(IN) :: data_dir
 
          integer :: j
          
@@ -114,25 +114,25 @@
          
          ! NOTE: logPs and logTs must be in monotonic increasing order
 
-		   do j=1,NlogPs
-		      logPs(j) = logP_min + (j-1)*dlogP ! store logP values in logPs
-		   end do
-		   if (abs(logPs(NlogPs)-logP_max) > 1d-4) call do_stop('read_data_for_scvh expects max logP of 19.0')
-		   do j=1,NlogTs
-		      logTs(j) = logT_min + (j-1)*dlogT ! store logT values in logTs
-		   end do
-		   if (abs(logTs(NlogTs)-logT_max) > 1d-4) call do_stop('read_data_for_scvh expects max logT of 7.06')
+         do j=1,NlogPs
+            logPs(j) = logP_min + (j-1)*dlogP ! store logP values in logPs
+         end do
+         if (abs(logPs(NlogPs)-logP_max) > 1d-4) call do_stop('read_data_for_scvh expects max logP of 19.0')
+         do j=1,NlogTs
+            logTs(j) = logT_min + (j-1)*dlogT ! store logT values in logTs
+         end do
+         if (abs(logTs(NlogTs)-logT_max) > 1d-4) call do_stop('read_data_for_scvh expects max logT of 7.06')
          
-		   call read_file_for_scvh(data_dir,'scvh/h_tab.asc.data',num_h_pts,NlogPs,NlogTs,
+         call read_file_for_scvh(data_dir,'scvh/h_tab.asc.data',num_h_pts,NlogPs,NlogTs,
      >         compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
-		   call read_file_for_scvh(data_dir,'scvh/he_tab.asc.data',num_he_pts,NlogPs,NlogTs,
+         call read_file_for_scvh(data_dir,'scvh/he_tab.asc.data',num_he_pts,NlogPs,NlogTs,
      >         compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
          
          
          if (.false.) then
-		      call write_file_for_scvh(data_dir,'scvh/h_tab.new.data',num_h_pts,NlogPs,NlogTs,
+            call write_file_for_scvh(data_dir,'scvh/h_tab.new.data',num_h_pts,NlogPs,NlogTs,
      >         compv1_h_si,compv2_h_si,denlog_h_si,slog_h_si,ulog_h_si)
-		      call write_file_for_scvh(data_dir,'scvh/he_tab.new.data',num_he_pts,NlogPs,NlogTs,
+            call write_file_for_scvh(data_dir,'scvh/he_tab.new.data',num_he_pts,NlogPs,NlogTs,
      >         compv1_he_si,compv2_he_si,denlog_he_si,slog_he_si,ulog_he_si)
          
          end if
@@ -273,19 +273,19 @@
          end subroutine extra_smoothing
                   
      
-		end subroutine read_data_for_scvh
-		
-		
-		subroutine read_file_for_scvh(data_dir,filename,n,np,nt,
+      end subroutine read_data_for_scvh
+
+
+      subroutine read_file_for_scvh(data_dir,filename,n,np,nt,
      >      compv1,compv2,denlog,slog,ulog)
          character (len=*) :: data_dir,filename
          integer,intent(in) :: n,np,nt
          type (scvh_info) ::compv1,compv2,denlog,slog,ulog
          integer :: i,j,jj,nps,k,kk
          double precision :: tlg,plg,c1,c2,c3,c4,c5
-		   character (len=256) :: full_name
-		   write(full_name,'(3a)') trim(data_dir),'/',trim(filename)
-   		write(*,*) 'read ' // trim(full_name)
+         character (len=256) :: full_name
+         write(full_name,'(3a)') trim(data_dir),'/',trim(filename)
+         write(*,*) 'read ' // trim(full_name)
          open(unit=1,file=trim(full_name),action='read')
          do i=1,nt
             kk = 0
@@ -331,14 +331,14 @@
             k_for_MAX_logP(i) = kk
          enddo
          close(unit=1)
-   		write(*,*) 'close ' // trim(filename)
-		
-		end subroutine read_file_for_scvh
+         write(*,*) 'close ' // trim(filename)
+
+      end subroutine read_file_for_scvh
 
 
-		
-		
-		subroutine write_file_for_scvh(data_dir,filename,n,np,nt,
+
+
+      subroutine write_file_for_scvh(data_dir,filename,n,np,nt,
      >      compv1,compv2,denlog,slog,ulog)
          character (len=*) :: data_dir,filename
          integer,intent(in) :: n,np,nt
@@ -346,9 +346,9 @@
          integer :: i,j,jj,nps,k,kk
          double precision :: tlg,plg,c1,c2,c3,c4,c5
          logical :: lowT
-		   character (len=256) :: full_name
-		   write(full_name,'(3a)') trim(data_dir),'/',trim(filename)
-   		write(*,*) 'write ' // trim(full_name)
+         character (len=256) :: full_name
+         write(full_name,'(3a)') trim(data_dir),'/',trim(filename)
+         write(*,*) 'write ' // trim(full_name)
          open(unit=1,file=trim(full_name),action='write')
          do i=1,nt
             lowT = (logTs(i) < 4.05d0)
@@ -373,14 +373,14 @@
             enddo
          enddo
          close(unit=1)
-   		write(*,*) 'close ' // trim(filename)
-		
-		end subroutine write_file_for_scvh
-		
-		
-		integer function locate_logT(logT)
-		   double precision,intent(in) :: logT
-		   integer :: jT,j
+         write(*,*) 'close ' // trim(filename)
+
+      end subroutine write_file_for_scvh
+
+
+      integer function locate_logT(logT)
+         double precision,intent(in) :: logT
+         integer :: jT,j
          jT = NlogTs-1
          do j=2,NlogTs-1
             if (logT < logTs(j)) then
@@ -388,10 +388,10 @@
             end if
          end do
          locate_logT = jT
-		end function locate_logT
-		
-		
-		subroutine interp_densities(logT,logP,pres,den_h,den_he,info)
+      end function locate_logT
+
+
+      subroutine interp_densities(logT,logP,pres,den_h,den_he,info)
          double precision,intent(in) :: logT,logP,pres
          double precision,intent(out) :: den_h,den_he
          integer,intent(out) :: info
@@ -650,8 +650,8 @@
      >               Cp,Cv,dE_dRho,dS_dT,dS_dRho,
      >               mu,gamma1,gamma3,grad_ad,logNe,
      >               info)
-		
-		use num_lib,only: safe_root_without_brackets
+
+      use num_lib,only: safe_root_without_brackets
       implicit none
       save
 
@@ -664,7 +664,7 @@
      >               logPgas,logE,logS,chiRho,chiT,
      >               Cp,Cv,dE_dRho,dS_dT,dS_dRho,
      >               mu,gamma1,gamma3,grad_ad,logNe
-		integer,intent(out) :: info ! returned = 0 if AOK
+      integer,intent(out) :: info ! returned = 0 if AOK
      
       double precision dpressdd,dpressdt,ener,dedd,
      >      xnh,dxnh_dlogT,dxnh_dlogP,
@@ -677,7 +677,7 @@
       double precision xmasshe4,dedt
 
 !..local variables
-		
+
       double precision prad,erad,srad
 
       double precision logP,inv_Rho,inv_T,inv_P,small_value,Rho_min
@@ -735,10 +735,10 @@
      1                 z,fi_h(36),fi_he(36),w0t,w1t,w2t,w0mt,w1mt,w2mt,w0p,w1p,w2p,w0mp,w1mp,w2mp
 
       include 'formats'
-		info = 0
-		ipar => ipar_array
-		rpar => rpar_array
-				
+      info = 0
+      ipar => ipar_array
+      rpar => rpar_array
+
       z=0; w0t=0; w1t=0; w2t=0; w0mt=0; w1mt=0; w2mt=0
       w0p=0; w1p=0; w2p=0; w0mp=0; w1mp=0; w2mp=0; i=0; j=0
 
@@ -1032,16 +1032,16 @@
       
 
 
-   	xnhp = max(0d0,min(1d0,1 - (xnh2 + xnh)))
-   	xnhepp = max(0d0,min(1d0,1 - (xnhep + xnhe)))
+      xnhp = max(0d0,min(1d0,1 - (xnh2 + xnh)))
+      xnhepp = max(0d0,min(1d0,1 - (xnhep + xnhe)))
       mu = xmassh1 * (xnhp / 2 + xnh + 2 * xnh2) + 4 * (1 - xmassh1) * (xnhepp / 3 + xnhep / 2 + xnhe)
       
-		Ne = Rho * avo * (xmassh1 * xnhp + (1 - xmassh1) * (xnhep + 2 * xnhepp) / 4 )
-		if (Ne < 1d-99) Ne = 1d-99
-		logNe = log10(Ne)
-		if (logNe - logRho < 17d0) logNe = logRho + 17d0
-			! put a lower limit on the electron abundance to avoid spurious 
-			! bicubic interpolations at very low T
+      Ne = Rho * avo * (xmassh1 * xnhp + (1 - xmassh1) * (xnhep + 2 * xnhepp) / 4 )
+      if (Ne < 1d-99) Ne = 1d-99
+      logNe = log10(Ne)
+      if (logNe - logRho < 17d0) logNe = logRho + 17d0
+         ! put a lower limit on the electron abundance to avoid spurious
+         ! bicubic interpolations at very low T
 
       if (.false. .and. gamma1 <= 0) then
          write(*,1) 'scvh_core gamma1',gamma1
@@ -1291,8 +1291,8 @@
          end if
 
          delt = num/denom
-   		if (delt <= tiny) then
-   		   delt = tiny
+         if (delt <= tiny) then
+            delt = tiny
             ddelt_dP = 0
             ddelt_dT = 0
          else
