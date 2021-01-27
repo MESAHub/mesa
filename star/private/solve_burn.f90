@@ -397,7 +397,7 @@
             integer, intent(out) :: ierr            
             real(dp) :: res(num_helm_results)
             real(dp), parameter :: coulomb_temp_cut = 1d6, coulomb_den_cut = 1d3
-            include 'formats'            
+            include 'formats'
             ierr = 0
             
             Cv = Cv0

@@ -88,10 +88,13 @@ situation. The MAC will reevaluate the membership of these groups on a
 recurring basis. Removal from MD, MTC, and MAC can be for inactivity,
 harm to the Project, or simply opting out.
 
-Onboarding to MD is done by the MAC in consultation with the MTC and the
-MD. Nominations and suggestions from any MDs are welcome. Currently, the
-MD are Bill P., Warrick, Evan, Lars, Matteo, Aaron, Rob, Adam, Meridith,
-Pablo, Josiah, Radek, Anne, Rich, Bill W, and Frank.
+Onboarding to MD is done by the MAC in consultation with the MTC and
+the MD.  When a candidate developer is identified, there will be a
+comment period where any MD can privately provide feedback to the MAC
+about the addition to the MESA team.  Nominations and suggestions from
+any MDs are welcome. Currently, the MD are Bill P., Warrick, Evan,
+Earl, Lars, Matteo, Aaron, Rob, Adam, Meridith, Pablo, Josiah, Radek,
+Anne, Rich, Bill W, and Frank.
 
 As MESA's "first author", Bill is an ex-officio member of both MAC and
 MTC.

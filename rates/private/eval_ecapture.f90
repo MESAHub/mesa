@@ -96,7 +96,7 @@ contains
     integer :: rxn_type, ii
     integer, parameter :: rxn_ecapture = 1, rxn_betadecay = -1
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 

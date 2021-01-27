@@ -62,7 +62,7 @@
          type(reaction_data), intent(inout) :: rates
          integer :: i, i1, i2, i3, i4
          
-         include 'formats.dek'
+         include 'formats'
 
          ! check for allocation
          if (.not.associated(rates% weight)) then
@@ -188,7 +188,7 @@
          real(dp) :: fac, massfac, sum1, sum2, tmp
       
          
-         include 'formats.dek'
+         include 'formats'
          
          ! Get these consistently from the isotopes.data file
          mp=winvn%W(chem_get_iso_id('prot'))
@@ -408,7 +408,7 @@
          integer :: in1, in2, out1, out2, num, pspecies(num_in + num_out)
          logical :: do_long_form, ec_flag, wk_flag
          
-         include 'formats.dek'
+         include 'formats'
          
          num = num_in + num_out
          pspecies(1:num) = pspecies_in(1:num)
@@ -502,7 +502,7 @@
             integer :: n
             integer :: species(n)
             integer :: i, j, Zi, Ni, Zj, Nj, isomer_j, isomer_i, cid
-            include 'formats.dek'
+            include 'formats'
             do i=1,n-1
                cid = species(i)
                if (cid <= 0) cycle
@@ -613,7 +613,7 @@
          end function one_two
          
          logical function two_one()
-            include 'formats.dek'
+            include 'formats'
             two_one = .true.
             if (in1 == 0 .or. in2 == 0 .or. out1 == 0 .or. in1 == in2) return
             two_one = .false.

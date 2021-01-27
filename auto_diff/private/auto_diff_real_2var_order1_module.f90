@@ -655,7 +655,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q1
       real(dp) :: q0
-      q0 = pow(10, x%val)
+      q0 = pow(10.0_dp, x%val)
       q1 = q0*ln10
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
@@ -731,7 +731,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q1
       real(dp) :: q0
-      q0 = powm1(log(2))
+      q0 = powm1(log(2.0_dp))
       q1 = q0*powm1(x%val)
       unary%val = q0*log(x%val)
       unary%d1val1 = q1*x%d1val1
@@ -948,7 +948,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 2*x%val
+      q0 = 2.0_dp*x%val
       unary%val = pow2(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
@@ -958,7 +958,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 3*pow2(x%val)
+      q0 = 3.0_dp*pow2(x%val)
       unary%val = pow3(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
@@ -968,7 +968,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 4*pow3(x%val)
+      q0 = 4.0_dp*pow3(x%val)
       unary%val = pow4(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
@@ -978,7 +978,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 5*pow4(x%val)
+      q0 = 5.0_dp*pow4(x%val)
       unary%val = pow5(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
@@ -988,7 +988,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 6*pow5(x%val)
+      q0 = 6.0_dp*pow5(x%val)
       unary%val = pow6(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
@@ -998,7 +998,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 7*pow6(x%val)
+      q0 = 7.0_dp*pow6(x%val)
       unary%val = pow7(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
@@ -1008,7 +1008,7 @@ module auto_diff_real_2var_order1_module
       type(auto_diff_real_2var_order1), intent(in) :: x
       type(auto_diff_real_2var_order1) :: unary
       real(dp) :: q0
-      q0 = 8*pow7(x%val)
+      q0 = 8.0_dp*pow7(x%val)
       unary%val = pow8(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2

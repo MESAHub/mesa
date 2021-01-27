@@ -70,7 +70,7 @@
          
          logical :: dbg
 
-         include 'formats.dek'
+         include 'formats'
 
          dbg = rq% dbg
          if (dbg) dbg = & ! check limits
@@ -817,7 +817,7 @@
             c31    = -0.037d0, &
             c32    =  0.0031d0
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 

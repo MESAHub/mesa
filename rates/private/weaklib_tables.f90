@@ -317,7 +317,7 @@ contains
     subroutine find_location ! set ix, jy; x is T9; y is lYeRho
       integer i, j
       real(dp) :: del
-      include 'formats.dek'                       
+      include 'formats'
       ! x0 <= T9 <= x1
       ix = table % num_T9-1 ! since weak_num_T9 is small, just do a linear search
       do i = 2, table % num_T9-1
@@ -345,7 +345,7 @@ contains
       integer i, j
       real(dp) :: del
 
-      include 'formats.dek'
+      include 'formats'
 
       call find_location
 
@@ -415,7 +415,7 @@ contains
            cxi*(cyi*fin(4,ix,jy) +cy*fin(4,ix,jy+1))+ &
            cx*(cyi*fin(4,ix+1,jy)+cy*fin(4,ix+1,jy+1)))
 
-      include 'formats.dek'
+      include 'formats'
       if (dbg) then
          write(*,1) 'fin(1,ix,jy)', fin(1,ix,jy)
          write(*,1) 'fin(1,ix,jy+1)', fin(1,ix,jy+1)
@@ -459,7 +459,7 @@ contains
     end subroutine do_bicubic_interpolations
 
     subroutine setup_for_linear_interp
-      include 'formats.dek'
+      include 'formats'
 
       call find_location
 

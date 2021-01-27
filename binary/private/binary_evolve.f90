@@ -45,7 +45,7 @@
          integer :: finish_step_result
          integer :: i, ierr
          real(dp) :: r_isco, Z1, Z2
-         include 'formats.inc'
+         include 'formats'
 
          b% evolve_both_stars = b% job% evolve_both_stars
          b% warn_binary_extra = b% job% warn_binary_extra
@@ -213,7 +213,7 @@
          type (binary_info), pointer :: b
          logical :: switch_donor
          real(dp) :: mdot_hi_temp
-         include 'formats.inc'
+         include 'formats'
 
          switch_donor = .false.
 
@@ -265,7 +265,7 @@
          type(binary_info), pointer :: b
          integer :: i
          
-         include 'formats.inc'
+         include 'formats'
 
          ! store the final mdots used for each star
          ! for a point mass accretor this is already set in the subroutine adjust_mdots of binary_mdot
@@ -398,7 +398,7 @@
          real(dp) :: new_mdot, q
 
 
-         include 'formats.inc'
+         include 'formats'
 
          binary_check_model = retry
          ierr = 0

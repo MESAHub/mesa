@@ -109,7 +109,7 @@
          real(dp) :: res(num_ion_vals)
          integer :: ierr, i
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          Z = 0.0188d0
@@ -149,7 +149,7 @@
             typical_charge, actual
          integer :: cid, ierr
          
-         include 'formats.dek'
+         include 'formats'
 
          abar = 1.4641872501488922D+00
          free_e = 7.7809739936525557D-01
@@ -363,7 +363,7 @@
          real(dp) :: z
          integer :: k
          
-         include 'formats.dek'
+         include 'formats'
                      
          ierr = 0
           

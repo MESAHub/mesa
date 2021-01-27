@@ -374,7 +374,7 @@
          integer :: num_logTs, num_logRs
          real :: logR_min, logR_max, logT_min, logT_max, tiny
 
-         include 'formats.dek'
+         include 'formats'
 
          num_logTs = ferg_num_logTs
          num_logRs = ferg_num_logRs

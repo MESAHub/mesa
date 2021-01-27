@@ -53,7 +53,7 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'         
+         include 'formats'
          call get1_Eturb_L_eqn( &
             s, k, xscale, equ, L_start_max, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
@@ -121,7 +121,7 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'         
+         include 'formats'
          call get1_turbulent_energy_eqn( &
             s, k, xscale, equ, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)

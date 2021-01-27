@@ -50,7 +50,7 @@
          character (len=256) :: dir
          integer, parameter :: io_unit0 = 40
          
-         include 'formats.dek'
+         include 'formats'
          
          write(*,*) 'do1_test for eosPT'
 
@@ -156,7 +156,7 @@
          character (len=256) :: dir
          integer, parameter :: io_unit0 = 40
          
-         include 'formats.dek'
+         include 'formats'
          
          which_eos = scvh_eos
          

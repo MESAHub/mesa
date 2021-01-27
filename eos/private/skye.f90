@@ -137,7 +137,7 @@ module skye
          
          real(dp) :: logT_ion, logT_neutral
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 

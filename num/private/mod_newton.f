@@ -161,7 +161,7 @@
          integer(8) :: test_time0, test_time1, clock_rate
          logical :: do_test_timing
          
-         include 'formats.dek'
+         include 'formats'
 
          do_test_timing = (work(r_test_time) /= 0)
          work(r_test_time) = 0
@@ -374,7 +374,7 @@
          real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
          
-         include 'formats.dek'
+         include 'formats'
          
          x(1:nvar,1:nz) => x1(1:neq)
          xold(1:nvar,1:nz) => xold1(1:neq)
@@ -786,7 +786,7 @@
          
          
          subroutine get_message
-            include 'formats.dek'
+            include 'formats'
             i = 0
             if (correction_norm > tol_correction_norm*coeff) i = i+1
             if (max_correction > tol_max_correction*coeff) i = i+2
@@ -881,7 +881,7 @@
 
             real(dp), parameter :: alam_factor = 0.2d0
             
-            include 'formats.dek'
+            include 'formats'
          
             ierr = 0                  
             coeff = 0
@@ -1059,7 +1059,7 @@
             integer ::  nrhs, ldafb, ldb, ldx, lda, i, j, n, sprs_nz
             real(dp) :: ferr, berr
             
-            include 'formats.dek'
+            include 'formats'
 
             solve_equ=.true.
             do k=1,nz
@@ -1096,7 +1096,7 @@
             integer, intent(in) :: n, ldafb
             integer, intent(out) :: sprs_nz
             integer :: i, j, k, info_dealloc
-            include 'formats.dek'
+            include 'formats'
             sprs_nz = 0
             if (matrix_type == block_tridiag_dble_matrix_type) then
                if (.not. overlay_AF) then
@@ -1178,7 +1178,7 @@
             integer, intent(out) :: ierr
             logical :: need_solver_to_eval_jacobian
             integer :: i, j, k
-            include 'formats.dek'
+            include 'formats'
             need_solver_to_eval_jacobian = .true.
             call enter_setmatrix(iiter, 
      >                  nvar, nz, neq, x, xold, xscale, xder, need_solver_to_eval_jacobian, 
@@ -1202,7 +1202,7 @@
             real(dp) :: dscale, partial
             logical :: need_solver_to_eval_jacobian
             
-            include 'formats.dek'
+            include 'formats'
 
             ierr = 0
             
@@ -1595,7 +1595,7 @@
             real(dp), intent(in), dimension(:,:) :: equ
             integer :: k, i
             real*8 :: q
-            include 'formats.dek'
+            include 'formats'
             eval_f = 0
             do k = 1, nz
                do i = 1, nvar
@@ -1620,7 +1620,7 @@
          
          integer :: i, ndiag, ldAF, neq
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          neq = nvar*nz

@@ -59,7 +59,7 @@
          integer :: k, ip1, jp1
          real(dp), pointer :: fin(:,:,:,:)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          

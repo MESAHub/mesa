@@ -51,7 +51,7 @@
          logical, intent(in) :: skip_partials, do_chem
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'         
+         include 'formats'
          call get1_energy_eqn( &
             s, k, xscale, equ, skip_partials, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
@@ -774,7 +774,7 @@
          integer, intent(out) :: ierr
          real(dp) :: rho, dlnd, theta, P, d_P_dlnd00, d_P_dlnT00, dV, d_dV_dlnd
          logical :: test_partials
-         include 'formats'         
+         include 'formats'
          ierr = 0         
          
          if (s% using_Fraley_time_centering .and. &

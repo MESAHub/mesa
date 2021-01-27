@@ -2090,7 +2090,7 @@
          integer, intent(out) :: ierr
          integer :: k, op_err, old_k, new_k
          real(dp) :: old_j_tot, new_j_tot
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
 
 !$OMP PARALLEL DO PRIVATE(k, op_err) SCHEDULE(dynamic,2)
@@ -2122,7 +2122,7 @@
 
          integer, parameter :: k_dbg = -1
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          xq_outer = xout_new(k)
@@ -2285,7 +2285,7 @@
          integer :: k, j, op_err, old_k, new_k, i_v
          real(dp) :: old_ke_tot, new_ke_tot, xmstar, err
 
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          i_v = s% i_v
          xmstar = s% xmstar
@@ -2355,7 +2355,7 @@
 
          integer, parameter :: k_dbg = -1
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -2542,7 +2542,7 @@
          integer :: k, j, op_err, old_k, new_k, i_u
          real(dp) :: old_ke_tot, new_ke_tot, xmstar, err
 
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          i_u = s% i_u
          xmstar = s% xmstar
@@ -2604,7 +2604,7 @@
 
          integer, parameter :: k_dbg = -1
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
