@@ -115,7 +115,7 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 		if xval is not None:
 			d = d.subs(x_syms[0], 0)
 
-		d = simplify(d)
+	#	d = simplify(d)
 
 		expressions.append(d)
 		left_hand_names.append(unary_symbol_str)
@@ -239,6 +239,8 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, f
 			d = d.subs(x_syms[0], xval)
 		if yval is not None:
 			d = d.subs(y_syms[0], yval)
+
+		#d = simplify(d, force=True)
 
 		expressions.append(d)
 		left_hand_names.append(binary_symbol_str)
