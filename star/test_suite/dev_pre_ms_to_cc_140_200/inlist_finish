@@ -34,6 +34,8 @@
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
 
+      gamma1_limit_max_q = 0.75d0
+
 ! trim envelope when radius gets too large
       !x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
       x_ctrl(19) = 1000 ! trigger for R too large
