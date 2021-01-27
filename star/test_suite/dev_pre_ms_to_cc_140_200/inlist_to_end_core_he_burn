@@ -6,7 +6,7 @@
       saved_model_name = 'zams.mod'
       
       save_model_when_terminate = .true.
-      save_model_filename = 'near_end_core_he_burn.mod'
+      save_model_filename = 'after_core_he_burn.mod'
       required_termination_code_string = 'xa_central_lower_limit'
 
       set_initial_age = .true.
@@ -39,7 +39,7 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'he4'
-      xa_central_lower_limit(1) = 0.05d0 ! stop before oscillations begin    1d-3
+      xa_central_lower_limit(1) = 0.05d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 3000
@@ -52,12 +52,10 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
       alpha_semiconvection = 0.01
       thermohaline_coeff = 2
 
 ! mixing
-!** for high mass - no overshoot
 
 ! timesteps
       delta_XHe_cntr_hard_limit = 0.02d0
