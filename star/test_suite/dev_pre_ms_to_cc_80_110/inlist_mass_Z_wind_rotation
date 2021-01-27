@@ -10,7 +10,7 @@
 / ! end of kap namelist
 
 &controls
-   initial_mass = 110 ! 80 ok, 70 too small.
+   initial_mass = 80
    initial_z = 1d-3
    Dutch_scaling_factor = 0d0
 / ! end of controls namelist

@@ -44,7 +44,7 @@
 ! rotation
 
 ! mlt
-      max_logT_for_mlt = 9.5d0
+      max_logT_for_mlt = 9.3d0
 
       alpha_semiconvection = 0
       thermohaline_coeff = 0

@@ -16,10 +16,14 @@
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
 
-      change_initial_u_flag = .true.
-      change_initial_v_flag = .true.
-      new_v_flag = .false.
-      new_u_flag = .true.
+      ! only do u_flag for more massive stars
+      ! that develop significant non_fe_core_infall
+      ! impacting the fe_core_infall collapse.
+      
+      !change_initial_u_flag = .true.
+      !change_initial_v_flag = .true.
+      !new_v_flag = .false.
+      !new_u_flag = .true.
 
       !pgstar_flag = .false.
 
@@ -46,7 +50,6 @@
 ! rotation
 
 ! mlt
-      max_logT_for_mlt = 9.3d0
 
 ! mixing
 
@@ -54,12 +57,9 @@
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-      !delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
-
 ! mesh
 
 ! solver
-      !use_compression_outer_BC = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
