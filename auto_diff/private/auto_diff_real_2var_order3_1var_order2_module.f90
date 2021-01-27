@@ -13003,38 +13003,72 @@ module auto_diff_real_2var_order3_1var_order2_module
    function abs_self(x) result(unary)
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x
       type(auto_diff_real_2var_order3_1var_order2) :: unary
+      real(dp) :: q17
+      real(dp) :: q16
+      real(dp) :: q15
+      real(dp) :: q14
+      real(dp) :: q13
+      real(dp) :: q12
+      real(dp) :: q11
+      real(dp) :: q10
+      real(dp) :: q9
+      real(dp) :: q8
+      real(dp) :: q7
+      real(dp) :: q6
+      real(dp) :: q5
+      real(dp) :: q4
+      real(dp) :: q3
+      real(dp) :: q2
+      real(dp) :: q1
       real(dp) :: q0
       q0 = sgn(x%val)
+      q1 = Subs(0.0_dp, _xi_1, x%val)
+      q2 = q1*x%d1val2
+      q3 = Subs(0.0_dp, _xi_1, x%val)
+      q4 = q3*x%d1val3
+      q5 = 2.0_dp*x%d1val1_d1val2
+      q6 = 16.0_dp*q1
+      q7 = pow2(x%d1val2)
+      q8 = q1*x%d1val2_d1val3
+      q9 = 2.0_dp*q4
+      q10 = q3*x%d2val3
+      q11 = q3*pow2(x%d1val3)
+      q12 = q10 + q11
+      q13 = 2.0_dp*q2
+      q14 = 0.25_dp*q1
+      q15 = q1*x%d1val2_d2val3
+      q16 = 2.0_dp*q8
+      q17 = 2.0_dp*x%d1val2
       unary%val = Abs(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
       unary%d1val3 = q0*x%d1val3
       unary%d2val1 = q0*x%d2val1
-      unary%d1val1_d1val2 = q0*x%d1val1_d1val2
-      unary%d1val1_d1val3 = q0*x%d1val1_d1val3
+      unary%d1val1_d1val2 = q0*x%d1val1_d1val2 + q2*x%d1val1
+      unary%d1val1_d1val3 = q0*x%d1val1_d1val3 + q4*x%d1val1
       unary%d2val2 = q0*x%d2val2
-      unary%d1val2_d1val3 = q0*x%d1val2_d1val3
+      unary%d1val2_d1val3 = q0*x%d1val2_d1val3 + q4*x%d1val2
       unary%d2val3 = q0*x%d2val3
       unary%d3val1 = q0*x%d3val1
-      unary%d2val1_d1val2 = q0*x%d2val1_d1val2
-      unary%d2val1_d1val3 = q0*x%d2val1_d1val3
-      unary%d1val1_d2val2 = q0*x%d1val1_d2val2
-      unary%d1val1_d1val2_d1val3 = q0*x%d1val1_d1val2_d1val3
-      unary%d1val1_d2val3 = q0*x%d1val1_d2val3
+      unary%d2val1_d1val2 = q0*x%d2val1_d1val2 + q2*x%d2val1
+      unary%d2val1_d1val3 = q0*x%d2val1_d1val3 + q4*x%d2val1
+      unary%d1val1_d2val2 = 0.0625_dp*x%d1val1*(q6*q7 + q6*x%d2val2) + q0*x%d1val1_d2val2 + q2*q5
+      unary%d1val1_d1val2_d1val3 = q0*x%d1val1_d1val2_d1val3 + q2*x%d1val1_d1val3 + q4*x%d1val1_d1val2 + q8*x%d1val1
+      unary%d1val1_d2val3 = q0*x%d1val1_d2val3 + q12*x%d1val1 + q9*x%d1val1_d1val3
       unary%d3val2 = q0*x%d3val2
-      unary%d2val2_d1val3 = q0*x%d2val2_d1val3
-      unary%d1val2_d2val3 = q0*x%d1val2_d2val3
-      unary%d3val1_d1val3 = q0*x%d3val1_d1val3
-      unary%d2val1_d1val2_d1val3 = q0*x%d2val1_d1val2_d1val3
-      unary%d2val1_d2val3 = q0*x%d2val1_d2val3
-      unary%d1val1_d2val2_d1val3 = q0*x%d1val1_d2val2_d1val3
-      unary%d1val1_d1val2_d2val3 = q0*x%d1val1_d1val2_d2val3
-      unary%d3val2_d1val3 = q0*x%d3val2_d1val3
-      unary%d2val2_d2val3 = q0*x%d2val2_d2val3
-      unary%d3val1_d2val3 = q0*x%d3val1_d2val3
-      unary%d2val1_d1val2_d2val3 = q0*x%d2val1_d1val2_d2val3
-      unary%d1val1_d2val2_d2val3 = q0*x%d1val1_d2val2_d2val3
-      unary%d3val2_d2val3 = q0*x%d3val2_d2val3
+      unary%d2val2_d1val3 = q0*x%d2val2_d1val3 + q4*x%d2val2
+      unary%d1val2_d2val3 = q0*x%d1val2_d2val3 + q12*x%d1val2 + q9*x%d1val2_d1val3
+      unary%d3val1_d1val3 = q0*x%d3val1_d1val3 + q4*x%d3val1
+      unary%d2val1_d1val2_d1val3 = q0*x%d2val1_d1val2_d1val3 + q2*x%d2val1_d1val3 + q4*x%d2val1_d1val2 + q8*x%d2val1
+      unary%d2val1_d2val3 = q0*x%d2val1_d2val3 + q12*x%d2val1 + q9*x%d2val1_d1val3
+      unary%d1val1_d2val2_d1val3 = 4.0_dp*x%d1val1*(0.5_dp*q2*x%d1val2_d1val3 + q14*x%d2val2_d1val3) + 4.0_dp*x%d1val1_d1val3*(q14*q7 + q14*x%d2val2) + q0*x%d1val1_d2val2_d1val3 + q13*x%d1val1_d1val2_d1val3 + q4*x%d1val1_d2val2 + q5*q8
+      unary%d1val1_d1val2_d2val3 = q0*x%d1val1_d1val2_d2val3 + q10*x%d1val1_d1val2 + q11*x%d1val1_d1val2 + q15*x%d1val1 + q16*x%d1val1_d1val3 + q2*x%d1val1_d2val3 + q9*x%d1val1_d1val2_d1val3
+      unary%d3val2_d1val3 = q0*x%d3val2_d1val3 + q4*x%d3val2
+      unary%d2val2_d2val3 = q0*x%d2val2_d2val3 + q12*x%d2val2 + q9*x%d2val2_d1val3
+      unary%d3val1_d2val3 = q0*x%d3val1_d2val3 + q12*x%d3val1 + q9*x%d3val1_d1val3
+      unary%d2val1_d1val2_d2val3 = q0*x%d2val1_d1val2_d2val3 + q10*x%d2val1_d1val2 + q11*x%d2val1_d1val2 + q15*x%d2val1 + q16*x%d2val1_d1val3 + q2*x%d2val1_d2val3 + q9*x%d2val1_d1val2_d1val3
+      unary%d1val1_d2val2_d2val3 = 2.0_dp*q1*x%d1val1_d1val3*(q17*x%d1val2_d1val3 + x%d2val2_d1val3) + 4.0_dp*q8*x%d1val1_d1val2_d1val3 + q0*x%d1val1_d2val2_d2val3 + q1*x%d1val1*(2.0_dp*pow2(x%d1val2_d1val3) + q17*x%d1val2_d2val3 + x%d2val2_d2val3) + q10*x%d1val1_d2val2 + q11*x%d1val1_d2val2 + q13*x%d1val1_d1val2_d2val3 + q14*x%d1val1_d2val3*(4.0_dp*q7 + 4.0_dp*x%d2val2) + q15*q5 + q9*x%d1val1_d2val2_d1val3
+      unary%d3val2_d2val3 = q0*x%d3val2_d2val3 + q12*x%d3val2 + q9*x%d3val2_d1val3
    end function abs_self
    
    function add_self(x, y) result(binary)
@@ -18015,6 +18049,48 @@ module auto_diff_real_2var_order3_1var_order2_module
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: y
       type(auto_diff_real_2var_order3_1var_order2) :: binary
+      real(dp) :: q60
+      real(dp) :: q59
+      real(dp) :: q58
+      real(dp) :: q57
+      real(dp) :: q56
+      real(dp) :: q55
+      real(dp) :: q54
+      real(dp) :: q53
+      real(dp) :: q52
+      real(dp) :: q51
+      real(dp) :: q50
+      real(dp) :: q49
+      real(dp) :: q48
+      real(dp) :: q47
+      real(dp) :: q46
+      real(dp) :: q45
+      real(dp) :: q44
+      real(dp) :: q43
+      real(dp) :: q42
+      real(dp) :: q41
+      real(dp) :: q40
+      real(dp) :: q39
+      real(dp) :: q38
+      real(dp) :: q37
+      real(dp) :: q36
+      real(dp) :: q35
+      real(dp) :: q34
+      real(dp) :: q33
+      real(dp) :: q32
+      real(dp) :: q31
+      real(dp) :: q30
+      real(dp) :: q29
+      real(dp) :: q28
+      real(dp) :: q27
+      real(dp) :: q26
+      real(dp) :: q25
+      real(dp) :: q24
+      real(dp) :: q23
+      real(dp) :: q22
+      real(dp) :: q21
+      real(dp) :: q20
+      real(dp) :: q19
       real(dp) :: q18
       real(dp) :: q17
       real(dp) :: q16
@@ -18037,58 +18113,124 @@ module auto_diff_real_2var_order3_1var_order2_module
       q0 = x%val - y%val
       q1 = sgn(q0)
       q2 = 0.5_dp*q1
-      q3 = -0.5_dp*y%d2val1 + 0.5_dp*x%d2val1
-      q4 = -0.5_dp*y%d1val1_d1val2 + 0.5_dp*x%d1val1_d1val2
-      q5 = -0.5_dp*y%d1val1_d1val3 + 0.5_dp*x%d1val1_d1val3
-      q6 = -0.5_dp*y%d2val2 + 0.5_dp*x%d2val2
-      q7 = -0.5_dp*y%d1val2_d1val3 + 0.5_dp*x%d1val2_d1val3
-      q8 = -0.5_dp*y%d3val1 + 0.5_dp*x%d3val1
-      q9 = -0.5_dp*y%d2val1_d1val2 + 0.5_dp*x%d2val1_d1val2
-      q10 = -0.5_dp*y%d2val1_d1val3 + 0.5_dp*x%d2val1_d1val3
-      q11 = -0.5_dp*y%d1val1_d2val2 + 0.5_dp*x%d1val1_d2val2
-      q12 = -0.5_dp*y%d1val1_d1val2_d1val3 + 0.5_dp*x%d1val1_d1val2_d1val3
-      q13 = -0.5_dp*y%d3val2 + 0.5_dp*x%d3val2
-      q14 = -0.5_dp*y%d2val2_d1val3 + 0.5_dp*x%d2val2_d1val3
-      q15 = -0.5_dp*y%d3val1_d1val3 + 0.5_dp*x%d3val1_d1val3
-      q16 = -0.5_dp*y%d2val1_d1val2_d1val3 + 0.5_dp*x%d2val1_d1val2_d1val3
-      q17 = -0.5_dp*y%d1val1_d2val2_d1val3 + 0.5_dp*x%d1val1_d2val2_d1val3
-      q18 = -0.5_dp*y%d3val2_d1val3 + 0.5_dp*x%d3val2_d1val3
+      q3 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1
+      q4 = x%d1val2 - y%d1val2
+      q5 = -0.5_dp*y%d1val2 + 0.5_dp*x%d1val2
+      q6 = x%d1val3 - y%d1val3
+      q7 = -0.5_dp*y%d2val1 + 0.5_dp*x%d2val1
+      q8 = -0.5_dp*y%d1val1_d1val2 + 0.5_dp*x%d1val1_d1val2
+      q9 = Subs(0.0_dp, _xi_1, q0)
+      q10 = q4*q9
+      q11 = -0.5_dp*y%d1val1_d1val3 + 0.5_dp*x%d1val1_d1val3
+      q12 = Subs(0.0_dp, _xi_1, q0)
+      q13 = q12*q6
+      q14 = -0.5_dp*y%d2val2 + 0.5_dp*x%d2val2
+      q15 = -0.5_dp*y%d1val2_d1val3 + 0.5_dp*x%d1val2_d1val3
+      q16 = x%d2val3 - y%d2val3
+      q17 = -0.5_dp*y%d3val1 + 0.5_dp*x%d3val1
+      q18 = -0.5_dp*y%d2val1_d1val2 + 0.5_dp*x%d2val1_d1val2
+      q19 = -0.5_dp*y%d2val1_d1val3 + 0.5_dp*x%d2val1_d1val3
+      q20 = -0.5_dp*y%d1val1_d2val2 + 0.5_dp*x%d1val1_d2val2
+      q21 = -4.0_dp*y%d1val2 + 4.0_dp*x%d1val2
+      q22 = q8*q9
+      q23 = -2.0_dp*y%d2val2 + 2.0_dp*x%d2val2
+      q24 = q3*q9
+      q25 = 0.0625_dp*pow2(q21)
+      q26 = -0.5_dp*y%d1val1_d1val2_d1val3 + 0.5_dp*x%d1val1_d1val2_d1val3
+      q27 = x%d1val2_d1val3 - y%d1val2_d1val3
+      q28 = q27*q9
+      q29 = x%d1val1_d2val3 - y%d1val1_d2val3
+      q30 = x%d1val1_d1val3 - y%d1val1_d1val3
+      q31 = q12*q3
+      q32 = pow2(q6)
+      q33 = -0.5_dp*y%d3val2 + 0.5_dp*x%d3val2
+      q34 = -0.5_dp*y%d2val2_d1val3 + 0.5_dp*x%d2val2_d1val3
+      q35 = x%d1val2_d2val3 - y%d1val2_d2val3
+      q36 = q12*q5
+      q37 = -0.5_dp*y%d3val1_d1val3 + 0.5_dp*x%d3val1_d1val3
+      q38 = -0.5_dp*y%d2val1_d1val2_d1val3 + 0.5_dp*x%d2val1_d1val2_d1val3
+      q39 = x%d2val1_d2val3 - y%d2val1_d2val3
+      q40 = x%d2val1_d1val3 - y%d2val1_d1val3
+      q41 = q12*q7
+      q42 = -0.5_dp*y%d1val1_d2val2_d1val3 + 0.5_dp*x%d1val1_d2val2_d1val3
+      q43 = q11*q9
+      q44 = x%d2val2_d1val3 - y%d2val2_d1val3
+      q45 = -2.0_dp*y%d1val2 + 2.0_dp*x%d1val2
+      q46 = q45*q9
+      q47 = x%d1val1_d1val2_d2val3 - y%d1val1_d1val2_d2val3
+      q48 = x%d1val1_d1val2_d1val3 - y%d1val1_d1val2_d1val3
+      q49 = q28*q30
+      q50 = q24*q35
+      q51 = q12*q8
+      q52 = 0.25_dp*q46
+      q53 = -0.5_dp*y%d3val2_d1val3 + 0.5_dp*x%d3val2_d1val3
+      q54 = x%d2val2_d2val3 - y%d2val2_d2val3
+      q55 = q12*q14
+      q56 = q12*q17
+      q57 = q12*q18
+      q58 = q12*q20
+      q59 = q29*q9
+      q60 = q12*q33
       binary%val = -0.5_dp*y%val + 0.5_dp*x%val + 0.5_dp*Abs(q0)
-      binary%d1val1 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1 + q2*(x%d1val1 - y%d1val1)
-      binary%d1val2 = -0.5_dp*y%d1val2 + 0.5_dp*x%d1val2 + q2*(x%d1val2 - y%d1val2)
-      binary%d1val3 = -0.5_dp*y%d1val3 + 0.5_dp*x%d1val3 + q2*(x%d1val3 - y%d1val3)
-      binary%d2val1 = q1*q3 + q3
-      binary%d1val1_d1val2 = q1*q4 + q4
-      binary%d1val1_d1val3 = q1*q5 + q5
-      binary%d2val2 = q1*q6 + q6
-      binary%d1val2_d1val3 = q1*q7 + q7
-      binary%d2val3 = -0.5_dp*y%d2val3 + 0.5_dp*x%d2val3 + q2*(x%d2val3 - y%d2val3)
-      binary%d3val1 = q1*q8 + q8
-      binary%d2val1_d1val2 = q1*q9 + q9
-      binary%d2val1_d1val3 = q1*q10 + q10
-      binary%d1val1_d2val2 = q1*q11 + q11
-      binary%d1val1_d1val2_d1val3 = q1*q12 + q12
-      binary%d1val1_d2val3 = -0.5_dp*y%d1val1_d2val3 + 0.5_dp*x%d1val1_d2val3 + q2*(x%d1val1_d2val3 - y%d1val1_d2val3)
-      binary%d3val2 = q1*q13 + q13
-      binary%d2val2_d1val3 = q1*q14 + q14
-      binary%d1val2_d2val3 = -0.5_dp*y%d1val2_d2val3 + 0.5_dp*x%d1val2_d2val3 + q2*(x%d1val2_d2val3 - y%d1val2_d2val3)
-      binary%d3val1_d1val3 = q1*q15 + q15
-      binary%d2val1_d1val2_d1val3 = q1*q16 + q16
-      binary%d2val1_d2val3 = -0.5_dp*y%d2val1_d2val3 + 0.5_dp*x%d2val1_d2val3 + q2*(x%d2val1_d2val3 - y%d2val1_d2val3)
-      binary%d1val1_d2val2_d1val3 = q1*q17 + q17
-      binary%d1val1_d1val2_d2val3 = -0.5_dp*y%d1val1_d1val2_d2val3 + 0.5_dp*x%d1val1_d1val2_d2val3 + q2*(x%d1val1_d1val2_d2val3 - y%d1val1_d1val2_d2val3)
-      binary%d3val2_d1val3 = q1*q18 + q18
-      binary%d2val2_d2val3 = -0.5_dp*y%d2val2_d2val3 + 0.5_dp*x%d2val2_d2val3 + q2*(x%d2val2_d2val3 - y%d2val2_d2val3)
-      binary%d3val1_d2val3 = -0.5_dp*y%d3val1_d2val3 + 0.5_dp*x%d3val1_d2val3 + q2*(x%d3val1_d2val3 - y%d3val1_d2val3)
-      binary%d2val1_d1val2_d2val3 = -0.5_dp*y%d2val1_d1val2_d2val3 + 0.5_dp*x%d2val1_d1val2_d2val3 + q2*(x%d2val1_d1val2_d2val3 - y%d2val1_d1val2_d2val3)
-      binary%d1val1_d2val2_d2val3 = -0.5_dp*y%d1val1_d2val2_d2val3 + 0.5_dp*x%d1val1_d2val2_d2val3 + q2*(x%d1val1_d2val2_d2val3 - y%d1val1_d2val2_d2val3)
-      binary%d3val2_d2val3 = -0.5_dp*y%d3val2_d2val3 + 0.5_dp*x%d3val2_d2val3 + q2*(x%d3val2_d2val3 - y%d3val2_d2val3)
+      binary%d1val1 = q2*(x%d1val1 - y%d1val1) + q3
+      binary%d1val2 = q2*q4 + q5
+      binary%d1val3 = -0.5_dp*y%d1val3 + 0.5_dp*x%d1val3 + q2*q6
+      binary%d2val1 = q1*q7 + q7
+      binary%d1val1_d1val2 = q1*q8 + q10*q3 + q8
+      binary%d1val1_d1val3 = q1*q11 + q11 + q13*q3
+      binary%d2val2 = q1*q14 + q14
+      binary%d1val2_d1val3 = q1*q15 + q13*q5 + q15
+      binary%d2val3 = -0.5_dp*y%d2val3 + 0.5_dp*x%d2val3 + q16*q2
+      binary%d3val1 = q1*q17 + q17
+      binary%d2val1_d1val2 = q1*q18 + q10*q7 + q18
+      binary%d2val1_d1val3 = q1*q19 + q13*q7 + q19
+      binary%d1val1_d2val2 = 0.5_dp*q21*q22 + 0.5_dp*q23*q24 + q1*q20 + q20 + q24*q25
+      binary%d1val1_d1val2_d1val3 = q1*q26 + q10*q11 + q13*q8 + q26 + q28*q3
+      binary%d1val1_d2val3 = -0.5_dp*y%d1val1_d2val3 + 0.5_dp*x%d1val1_d2val3 + q13*q30 + q16*q31 + q2*q29 + q31*q32
+      binary%d3val2 = q1*q33 + q33
+      binary%d2val2_d1val3 = q1*q34 + q13*q14 + q34
+      binary%d1val2_d2val3 = -0.5_dp*y%d1val2_d2val3 + 0.5_dp*x%d1val2_d2val3 + q13*q27 + q16*q36 + q2*q35 + q32*q36
+      binary%d3val1_d1val3 = q1*q37 + q13*q17 + q37
+      binary%d2val1_d1val2_d1val3 = q1*q38 + q10*q19 + q13*q18 + q28*q7 + q38
+      binary%d2val1_d2val3 = -0.5_dp*y%d2val1_d2val3 + 0.5_dp*x%d2val1_d2val3 + q13*q40 + q16*q41 + q2*q39 + q32*q41
+      binary%d1val1_d2val2_d1val3 = 0.0625_dp*q21*q24*(-8.0_dp*y%d1val2_d1val3 + 8.0_dp*x%d1val2_d1val3) + q1*q42 + q13*q20 + q22*(-2.0_dp*y%d1val2_d1val3 + 2.0_dp*x%d1val2_d1val3) + q24*q44 + q25*q43 + q26*q46 + q42 + q43*(x%d2val2 - y%d2val2)
+      binary%d1val1_d1val2_d2val3 = -0.5_dp*y%d1val1_d1val2_d2val3 + 0.5_dp*x%d1val1_d1val2_d2val3 + q13*q48 + q16*q51 + q2*q47 + q29*q52 + q32*q51 + q49 + q50
+      binary%d3val2_d1val3 = q1*q53 + q13*q33 + q53
+      binary%d2val2_d2val3 = -0.5_dp*y%d2val2_d2val3 + 0.5_dp*x%d2val2_d2val3 + q13*q44 + q16*q55 + q2*q54 + q32*q55
+      binary%d3val1_d2val3 = -0.5_dp*y%d3val1_d2val3 + 0.5_dp*x%d3val1_d2val3 + q13*(x%d3val1_d1val3 - y%d3val1_d1val3) + q16*q56 + q2*(x%d3val1_d2val3 - y%d3val1_d2val3) + q32*q56
+      binary%d2val1_d1val2_d2val3 = -0.5_dp*y%d2val1_d1val2_d2val3 + 0.5_dp*x%d2val1_d1val2_d2val3 + q13*(x%d2val1_d1val2_d1val3 - y%d2val1_d1val2_d1val3) + q16*q57 + q2*(x%d2val1_d1val2_d2val3 - y%d2val1_d1val2_d2val3) + q28*q40 + q32*q57 + q35*q7*q9 + q39*q52
+      binary%d1val1_d2val2_d2val3 = -0.5_dp*y%d1val1_d2val2_d2val3 + 0.125_dp*q59*pow2(q45) + 0.25_dp*q23*q59 + 0.5_dp*q46*q47 + 0.5_dp*x%d1val1_d2val2_d2val3 + 2.0_dp*q22*q35 + 2.0_dp*q24*pow2(q27) + 2.0_dp*q28*q48 + q13*(x%d1val1_d2val2_d1val3 - y%d1val1_d2val2_d1val3) + q16*q58 + q2*(x%d1val1_d2val2_d2val3 - y%d1val1_d2val2_d2val3) + q24*q54 + q30*q44*q9 + q32*q58 + q45*q49 + q45*q50
+      binary%d3val2_d2val3 = -0.5_dp*y%d3val2_d2val3 + 0.5_dp*x%d3val2_d2val3 + q13*(x%d3val2_d1val3 - y%d3val2_d1val3) + q16*q60 + q2*(x%d3val2_d2val3 - y%d3val2_d2val3) + q32*q60
    end function dim_self
    
    function dim_self_real(x, y) result(unary)
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x
       real(dp), intent(in) :: y
       type(auto_diff_real_2var_order3_1var_order2) :: unary
+      real(dp) :: q54
+      real(dp) :: q53
+      real(dp) :: q52
+      real(dp) :: q51
+      real(dp) :: q50
+      real(dp) :: q49
+      real(dp) :: q48
+      real(dp) :: q47
+      real(dp) :: q46
+      real(dp) :: q45
+      real(dp) :: q44
+      real(dp) :: q43
+      real(dp) :: q42
+      real(dp) :: q41
+      real(dp) :: q40
+      real(dp) :: q39
+      real(dp) :: q38
+      real(dp) :: q37
+      real(dp) :: q36
+      real(dp) :: q35
+      real(dp) :: q34
+      real(dp) :: q33
+      real(dp) :: q32
+      real(dp) :: q31
       real(dp) :: q30
       real(dp) :: q29
       real(dp) :: q28
@@ -18127,66 +18269,114 @@ module auto_diff_real_2var_order3_1var_order2_module
       q4 = 0.5_dp*x%d1val3
       q5 = 0.5_dp*x%d2val1
       q6 = 0.5_dp*x%d1val1_d1val2
-      q7 = 0.5_dp*x%d1val1_d1val3
-      q8 = 0.5_dp*x%d2val2
-      q9 = 0.5_dp*x%d1val2_d1val3
-      q10 = 0.5_dp*x%d2val3
-      q11 = 0.5_dp*x%d3val1
-      q12 = 0.5_dp*x%d2val1_d1val2
-      q13 = 0.5_dp*x%d2val1_d1val3
-      q14 = 0.5_dp*x%d1val1_d2val2
-      q15 = 0.5_dp*x%d1val1_d1val2_d1val3
-      q16 = 0.5_dp*x%d1val1_d2val3
-      q17 = 0.5_dp*x%d3val2
-      q18 = 0.5_dp*x%d2val2_d1val3
-      q19 = 0.5_dp*x%d1val2_d2val3
-      q20 = 0.5_dp*x%d3val1_d1val3
-      q21 = 0.5_dp*x%d2val1_d1val2_d1val3
-      q22 = 0.5_dp*x%d2val1_d2val3
-      q23 = 0.5_dp*x%d1val1_d2val2_d1val3
-      q24 = 0.5_dp*x%d1val1_d1val2_d2val3
-      q25 = 0.5_dp*x%d3val2_d1val3
-      q26 = 0.5_dp*x%d2val2_d2val3
-      q27 = 0.5_dp*x%d3val1_d2val3
-      q28 = 0.5_dp*x%d2val1_d1val2_d2val3
-      q29 = 0.5_dp*x%d1val1_d2val2_d2val3
-      q30 = 0.5_dp*x%d3val2_d2val3
+      q7 = Subs(0.0_dp, _xi_1, q0)
+      q8 = q1*q7
+      q9 = 0.5_dp*x%d1val1_d1val3
+      q10 = Subs(0.0_dp, _xi_1, q0)
+      q11 = q10*x%d1val3
+      q12 = 0.5_dp*x%d2val2
+      q13 = 0.5_dp*x%d1val2_d1val3
+      q14 = 0.5_dp*x%d2val3
+      q15 = 0.5_dp*x%d3val1
+      q16 = 0.5_dp*x%d2val1_d1val2
+      q17 = q3*q7
+      q18 = 0.5_dp*x%d2val1_d1val3
+      q19 = q10*q4
+      q20 = 0.5_dp*x%d1val1_d2val2
+      q21 = 1.0_dp*x%d1val1_d1val2
+      q22 = q7*x%d1val2
+      q23 = pow2(x%d1val2)
+      q24 = 0.5_dp*x%d1val1_d1val2_d1val3
+      q25 = q7*x%d1val2_d1val3
+      q26 = q7*x%d1val1_d1val3
+      q27 = 0.5_dp*x%d1val1_d2val3
+      q28 = q1*q10
+      q29 = pow2(x%d1val3)
+      q30 = 0.5_dp*x%d3val2
+      q31 = 0.5_dp*x%d2val2_d1val3
+      q32 = 0.5_dp*x%d1val2_d2val3
+      q33 = q10*q3
+      q34 = 0.5_dp*x%d3val1_d1val3
+      q35 = 0.5_dp*x%d2val1_d1val2_d1val3
+      q36 = 0.5_dp*x%d2val1_d2val3
+      q37 = q10*q5
+      q38 = 0.5_dp*x%d1val1_d2val2_d1val3
+      q39 = 1.0_dp*q22
+      q40 = q7*q9
+      q41 = 1.0_dp*x%d1val1
+      q42 = 0.5_dp*x%d1val1_d1val2_d2val3
+      q43 = q25*x%d1val1_d1val3
+      q44 = q10*q6
+      q45 = 0.5_dp*x%d3val2_d1val3
+      q46 = 0.5_dp*x%d2val2_d2val3
+      q47 = q10*q12
+      q48 = 0.5_dp*x%d3val1_d2val3
+      q49 = q10*q14
+      q50 = q10*q29
+      q51 = 0.5_dp*x%d2val1_d1val2_d2val3
+      q52 = q7*x%d1val2_d2val3
+      q53 = 0.5_dp*x%d1val1_d2val2_d2val3
+      q54 = 0.5_dp*x%d3val2_d2val3
       unary%val = -0.5_dp*y + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       unary%d1val1 = q1*q2 + q1
       unary%d1val2 = q2*q3 + q3
       unary%d1val3 = q2*q4 + q4
       unary%d2val1 = q2*q5 + q5
-      unary%d1val1_d1val2 = q2*q6 + q6
-      unary%d1val1_d1val3 = q2*q7 + q7
-      unary%d2val2 = q2*q8 + q8
-      unary%d1val2_d1val3 = q2*q9 + q9
-      unary%d2val3 = q10*q2 + q10
-      unary%d3val1 = q11*q2 + q11
-      unary%d2val1_d1val2 = q12*q2 + q12
-      unary%d2val1_d1val3 = q13*q2 + q13
-      unary%d1val1_d2val2 = q14*q2 + q14
-      unary%d1val1_d1val2_d1val3 = q15*q2 + q15
-      unary%d1val1_d2val3 = q16*q2 + q16
-      unary%d3val2 = q17*q2 + q17
-      unary%d2val2_d1val3 = q18*q2 + q18
-      unary%d1val2_d2val3 = q19*q2 + q19
-      unary%d3val1_d1val3 = q2*q20 + q20
-      unary%d2val1_d1val2_d1val3 = q2*q21 + q21
-      unary%d2val1_d2val3 = q2*q22 + q22
-      unary%d1val1_d2val2_d1val3 = q2*q23 + q23
-      unary%d1val1_d1val2_d2val3 = q2*q24 + q24
-      unary%d3val2_d1val3 = q2*q25 + q25
-      unary%d2val2_d2val3 = q2*q26 + q26
-      unary%d3val1_d2val3 = q2*q27 + q27
-      unary%d2val1_d1val2_d2val3 = q2*q28 + q28
-      unary%d1val1_d2val2_d2val3 = q2*q29 + q29
-      unary%d3val2_d2val3 = q2*q30 + q30
+      unary%d1val1_d1val2 = q2*q6 + q6 + q8*x%d1val2
+      unary%d1val1_d1val3 = q1*q11 + q2*q9 + q9
+      unary%d2val2 = q12*q2 + q12
+      unary%d1val2_d1val3 = q11*q3 + q13*q2 + q13
+      unary%d2val3 = q14*q2 + q14
+      unary%d3val1 = q15*q2 + q15
+      unary%d2val1_d1val2 = q16*q2 + q16 + q17*x%d2val1
+      unary%d2val1_d1val3 = q18*q2 + q18 + q19*x%d2val1
+      unary%d1val1_d2val2 = q2*q20 + q20 + q21*q22 + q23*q8 + q8*x%d2val2
+      unary%d1val1_d1val2_d1val3 = q1*q25 + q19*x%d1val1_d1val2 + q2*q24 + q24 + q26*q3
+      unary%d1val1_d2val3 = q11*x%d1val1_d1val3 + q2*q27 + q27 + q28*q29 + q28*x%d2val3
+      unary%d3val2 = q2*q30 + q30
+      unary%d2val2_d1val3 = q19*x%d2val2 + q2*q31 + q31
+      unary%d1val2_d2val3 = q11*x%d1val2_d1val3 + q2*q32 + q29*q33 + q32 + q33*x%d2val3
+      unary%d3val1_d1val3 = q19*x%d3val1 + q2*q34 + q34
+      unary%d2val1_d1val2_d1val3 = q17*x%d2val1_d1val3 + q19*x%d2val1_d1val2 + q2*q35 + q25*q5 + q35
+      unary%d2val1_d2val3 = q11*x%d2val1_d1val3 + q2*q36 + q29*q37 + q36 + q37*x%d2val3
+      unary%d1val1_d2val2_d1val3 = q19*x%d1val1_d2val2 + q2*q38 + q21*q25 + q23*q40 + q25*q41*x%d1val2 + q38 + q39*x%d1val1_d1val2_d1val3 + q40*x%d2val2 + q8*x%d2val2_d1val3
+      unary%d1val1_d1val2_d2val3 = q11*x%d1val1_d1val2_d1val3 + q17*x%d1val1_d2val3 + q2*q42 + q29*q44 + q42 + q43 + q44*x%d2val3 + q8*x%d1val2_d2val3
+      unary%d3val2_d1val3 = q19*x%d3val2 + q2*q45 + q45
+      unary%d2val2_d2val3 = q11*x%d2val2_d1val3 + q2*q46 + q29*q47 + q46 + q47*x%d2val3
+      unary%d3val1_d2val3 = q11*x%d3val1_d1val3 + q15*q50 + q2*q48 + q48 + q49*x%d3val1
+      unary%d2val1_d1val2_d2val3 = q11*x%d2val1_d1val2_d1val3 + q16*q50 + q17*x%d2val1_d2val3 + q2*q51 + q25*x%d2val1_d1val3 + q49*x%d2val1_d1val2 + q5*q52 + q51
+      unary%d1val1_d2val2_d2val3 = 2.0_dp*q25*x%d1val1_d1val2_d1val3 + 2.0_dp*q43*x%d1val2 + q11*x%d1val1_d2val2_d1val3 + q12*q7*x%d1val1_d2val3 + q2*q53 + q20*q50 + q21*q52 + q23*q27*q7 + q26*x%d2val2_d1val3 + q39*x%d1val1*x%d1val2_d2val3 + q39*x%d1val1_d1val2_d2val3 + q41*q7*pow2(x%d1val2_d1val3) + q49*x%d1val1_d2val2 + q53 + q8*x%d2val2_d2val3
+      unary%d3val2_d2val3 = q11*x%d3val2_d1val3 + q2*q54 + q30*q50 + q49*x%d3val2 + q54
    end function dim_self_real
    
    function dim_real_self(z, x) result(unary)
       real(dp), intent(in) :: z
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x
       type(auto_diff_real_2var_order3_1var_order2) :: unary
+      real(dp) :: q54
+      real(dp) :: q53
+      real(dp) :: q52
+      real(dp) :: q51
+      real(dp) :: q50
+      real(dp) :: q49
+      real(dp) :: q48
+      real(dp) :: q47
+      real(dp) :: q46
+      real(dp) :: q45
+      real(dp) :: q44
+      real(dp) :: q43
+      real(dp) :: q42
+      real(dp) :: q41
+      real(dp) :: q40
+      real(dp) :: q39
+      real(dp) :: q38
+      real(dp) :: q37
+      real(dp) :: q36
+      real(dp) :: q35
+      real(dp) :: q34
+      real(dp) :: q33
+      real(dp) :: q32
+      real(dp) :: q31
       real(dp) :: q30
       real(dp) :: q29
       real(dp) :: q28
@@ -18225,60 +18415,84 @@ module auto_diff_real_2var_order3_1var_order2_module
       q4 = 0.5_dp*x%d1val3
       q5 = 0.5_dp*x%d2val1
       q6 = 0.5_dp*x%d1val1_d1val2
-      q7 = 0.5_dp*x%d1val1_d1val3
-      q8 = 0.5_dp*x%d2val2
-      q9 = 0.5_dp*x%d1val2_d1val3
-      q10 = 0.5_dp*x%d2val3
-      q11 = 0.5_dp*x%d3val1
-      q12 = 0.5_dp*x%d2val1_d1val2
-      q13 = 0.5_dp*x%d2val1_d1val3
-      q14 = 0.5_dp*x%d1val1_d2val2
-      q15 = 0.5_dp*x%d1val1_d1val2_d1val3
-      q16 = 0.5_dp*x%d1val1_d2val3
-      q17 = 0.5_dp*x%d3val2
-      q18 = 0.5_dp*x%d2val2_d1val3
-      q19 = 0.5_dp*x%d1val2_d2val3
-      q20 = 0.5_dp*x%d3val1_d1val3
-      q21 = 0.5_dp*x%d2val1_d1val2_d1val3
-      q22 = 0.5_dp*x%d2val1_d2val3
-      q23 = 0.5_dp*x%d1val1_d2val2_d1val3
-      q24 = 0.5_dp*x%d1val1_d1val2_d2val3
-      q25 = 0.5_dp*x%d3val2_d1val3
-      q26 = 0.5_dp*x%d2val2_d2val3
-      q27 = 0.5_dp*x%d3val1_d2val3
-      q28 = 0.5_dp*x%d2val1_d1val2_d2val3
-      q29 = 0.5_dp*x%d1val1_d2val2_d2val3
-      q30 = 0.5_dp*x%d3val2_d2val3
+      q7 = Subs(0.0_dp, _xi_1, q0)
+      q8 = q1*q7
+      q9 = 0.5_dp*x%d1val1_d1val3
+      q10 = Subs(0.0_dp, _xi_1, q0)
+      q11 = q10*x%d1val3
+      q12 = 0.5_dp*x%d2val2
+      q13 = 0.5_dp*x%d1val2_d1val3
+      q14 = 0.5_dp*x%d2val3
+      q15 = 0.5_dp*x%d3val1
+      q16 = 0.5_dp*x%d2val1_d1val2
+      q17 = q3*q7
+      q18 = 0.5_dp*x%d2val1_d1val3
+      q19 = q10*q4
+      q20 = 0.5_dp*x%d1val1_d2val2
+      q21 = 1.0_dp*x%d1val1_d1val2
+      q22 = q7*x%d1val2
+      q23 = pow2(x%d1val2)
+      q24 = 0.5_dp*x%d1val1_d1val2_d1val3
+      q25 = q7*x%d1val2_d1val3
+      q26 = q7*x%d1val1_d1val3
+      q27 = 0.5_dp*x%d1val1_d2val3
+      q28 = q1*q10
+      q29 = pow2(x%d1val3)
+      q30 = 0.5_dp*x%d3val2
+      q31 = 0.5_dp*x%d2val2_d1val3
+      q32 = 0.5_dp*x%d1val2_d2val3
+      q33 = q10*q3
+      q34 = 0.5_dp*x%d3val1_d1val3
+      q35 = 0.5_dp*x%d2val1_d1val2_d1val3
+      q36 = 0.5_dp*x%d2val1_d2val3
+      q37 = q10*q5
+      q38 = 0.5_dp*x%d1val1_d2val2_d1val3
+      q39 = 1.0_dp*q22
+      q40 = q7*q9
+      q41 = 1.0_dp*x%d1val1
+      q42 = 0.5_dp*x%d1val1_d1val2_d2val3
+      q43 = q25*x%d1val1_d1val3
+      q44 = q10*q6
+      q45 = 0.5_dp*x%d3val2_d1val3
+      q46 = 0.5_dp*x%d2val2_d2val3
+      q47 = q10*q12
+      q48 = 0.5_dp*x%d3val1_d2val3
+      q49 = q10*q14
+      q50 = q10*q29
+      q51 = 0.5_dp*x%d2val1_d1val2_d2val3
+      q52 = q7*x%d1val2_d2val3
+      q53 = 0.5_dp*x%d1val1_d2val2_d2val3
+      q54 = 0.5_dp*x%d3val2_d2val3
       unary%val = -0.5_dp*x%val + 0.5_dp*z + 0.5_dp*Abs(q0)
       unary%d1val1 = q1*q2 - q1
       unary%d1val2 = q2*q3 - q3
       unary%d1val3 = q2*q4 - q4
       unary%d2val1 = q2*q5 - q5
-      unary%d1val1_d1val2 = q2*q6 - q6
-      unary%d1val1_d1val3 = q2*q7 - q7
-      unary%d2val2 = q2*q8 - q8
-      unary%d1val2_d1val3 = q2*q9 - q9
-      unary%d2val3 = q10*q2 - q10
-      unary%d3val1 = q11*q2 - q11
-      unary%d2val1_d1val2 = q12*q2 - q12
-      unary%d2val1_d1val3 = q13*q2 - q13
-      unary%d1val1_d2val2 = q14*q2 - q14
-      unary%d1val1_d1val2_d1val3 = q15*q2 - q15
-      unary%d1val1_d2val3 = q16*q2 - q16
-      unary%d3val2 = q17*q2 - q17
-      unary%d2val2_d1val3 = q18*q2 - q18
-      unary%d1val2_d2val3 = q19*q2 - q19
-      unary%d3val1_d1val3 = q2*q20 - q20
-      unary%d2val1_d1val2_d1val3 = q2*q21 - q21
-      unary%d2val1_d2val3 = q2*q22 - q22
-      unary%d1val1_d2val2_d1val3 = q2*q23 - q23
-      unary%d1val1_d1val2_d2val3 = q2*q24 - q24
-      unary%d3val2_d1val3 = q2*q25 - q25
-      unary%d2val2_d2val3 = q2*q26 - q26
-      unary%d3val1_d2val3 = q2*q27 - q27
-      unary%d2val1_d1val2_d2val3 = q2*q28 - q28
-      unary%d1val1_d2val2_d2val3 = q2*q29 - q29
-      unary%d3val2_d2val3 = q2*q30 - q30
+      unary%d1val1_d1val2 = q2*q6 - q6 + q8*x%d1val2
+      unary%d1val1_d1val3 = q1*q11 + q2*q9 - q9
+      unary%d2val2 = q12*q2 - q12
+      unary%d1val2_d1val3 = q11*q3 + q13*q2 - q13
+      unary%d2val3 = q14*q2 - q14
+      unary%d3val1 = q15*q2 - q15
+      unary%d2val1_d1val2 = q16*q2 - q16 + q17*x%d2val1
+      unary%d2val1_d1val3 = q18*q2 - q18 + q19*x%d2val1
+      unary%d1val1_d2val2 = q2*q20 - q20 + q21*q22 + q23*q8 + q8*x%d2val2
+      unary%d1val1_d1val2_d1val3 = q1*q25 + q19*x%d1val1_d1val2 + q2*q24 - q24 + q26*q3
+      unary%d1val1_d2val3 = q11*x%d1val1_d1val3 + q2*q27 - q27 + q28*q29 + q28*x%d2val3
+      unary%d3val2 = q2*q30 - q30
+      unary%d2val2_d1val3 = q19*x%d2val2 + q2*q31 - q31
+      unary%d1val2_d2val3 = q11*x%d1val2_d1val3 + q2*q32 + q29*q33 - q32 + q33*x%d2val3
+      unary%d3val1_d1val3 = q19*x%d3val1 + q2*q34 - q34
+      unary%d2val1_d1val2_d1val3 = q17*x%d2val1_d1val3 + q19*x%d2val1_d1val2 + q2*q35 + q25*q5 - q35
+      unary%d2val1_d2val3 = q11*x%d2val1_d1val3 + q2*q36 + q29*q37 - q36 + q37*x%d2val3
+      unary%d1val1_d2val2_d1val3 = q19*x%d1val1_d2val2 + q2*q38 + q21*q25 + q23*q40 + q25*q41*x%d1val2 - q38 + q39*x%d1val1_d1val2_d1val3 + q40*x%d2val2 + q8*x%d2val2_d1val3
+      unary%d1val1_d1val2_d2val3 = q11*x%d1val1_d1val2_d1val3 + q17*x%d1val1_d2val3 + q2*q42 + q29*q44 - q42 + q43 + q44*x%d2val3 + q8*x%d1val2_d2val3
+      unary%d3val2_d1val3 = q19*x%d3val2 + q2*q45 - q45
+      unary%d2val2_d2val3 = q11*x%d2val2_d1val3 + q2*q46 + q29*q47 - q46 + q47*x%d2val3
+      unary%d3val1_d2val3 = q11*x%d3val1_d1val3 + q15*q50 + q2*q48 - q48 + q49*x%d3val1
+      unary%d2val1_d1val2_d2val3 = q11*x%d2val1_d1val2_d1val3 + q16*q50 + q17*x%d2val1_d2val3 + q2*q51 + q25*x%d2val1_d1val3 + q49*x%d2val1_d1val2 + q5*q52 - q51
+      unary%d1val1_d2val2_d2val3 = 2.0_dp*q25*x%d1val1_d1val2_d1val3 + 2.0_dp*q43*x%d1val2 + q11*x%d1val1_d2val2_d1val3 + q12*q7*x%d1val1_d2val3 + q2*q53 + q20*q50 + q21*q52 + q23*q27*q7 + q26*x%d2val2_d1val3 + q39*x%d1val1*x%d1val2_d2val3 + q39*x%d1val1_d1val2_d2val3 + q41*q7*pow2(x%d1val2_d1val3) + q49*x%d1val1_d2val2 - q53 + q8*x%d2val2_d2val3
+      unary%d3val2_d2val3 = q11*x%d3val2_d1val3 + q2*q54 + q30*q50 + q49*x%d3val2 - q54
    end function dim_real_self
    
    function dim_self_int(x, y) result(unary)
@@ -18286,6 +18500,30 @@ module auto_diff_real_2var_order3_1var_order2_module
       integer, intent(in) :: y
       type(auto_diff_real_2var_order3_1var_order2) :: unary
       real(dp) :: y_dp
+      real(dp) :: q54
+      real(dp) :: q53
+      real(dp) :: q52
+      real(dp) :: q51
+      real(dp) :: q50
+      real(dp) :: q49
+      real(dp) :: q48
+      real(dp) :: q47
+      real(dp) :: q46
+      real(dp) :: q45
+      real(dp) :: q44
+      real(dp) :: q43
+      real(dp) :: q42
+      real(dp) :: q41
+      real(dp) :: q40
+      real(dp) :: q39
+      real(dp) :: q38
+      real(dp) :: q37
+      real(dp) :: q36
+      real(dp) :: q35
+      real(dp) :: q34
+      real(dp) :: q33
+      real(dp) :: q32
+      real(dp) :: q31
       real(dp) :: q30
       real(dp) :: q29
       real(dp) :: q28
@@ -18325,60 +18563,84 @@ module auto_diff_real_2var_order3_1var_order2_module
       q4 = 0.5_dp*x%d1val3
       q5 = 0.5_dp*x%d2val1
       q6 = 0.5_dp*x%d1val1_d1val2
-      q7 = 0.5_dp*x%d1val1_d1val3
-      q8 = 0.5_dp*x%d2val2
-      q9 = 0.5_dp*x%d1val2_d1val3
-      q10 = 0.5_dp*x%d2val3
-      q11 = 0.5_dp*x%d3val1
-      q12 = 0.5_dp*x%d2val1_d1val2
-      q13 = 0.5_dp*x%d2val1_d1val3
-      q14 = 0.5_dp*x%d1val1_d2val2
-      q15 = 0.5_dp*x%d1val1_d1val2_d1val3
-      q16 = 0.5_dp*x%d1val1_d2val3
-      q17 = 0.5_dp*x%d3val2
-      q18 = 0.5_dp*x%d2val2_d1val3
-      q19 = 0.5_dp*x%d1val2_d2val3
-      q20 = 0.5_dp*x%d3val1_d1val3
-      q21 = 0.5_dp*x%d2val1_d1val2_d1val3
-      q22 = 0.5_dp*x%d2val1_d2val3
-      q23 = 0.5_dp*x%d1val1_d2val2_d1val3
-      q24 = 0.5_dp*x%d1val1_d1val2_d2val3
-      q25 = 0.5_dp*x%d3val2_d1val3
-      q26 = 0.5_dp*x%d2val2_d2val3
-      q27 = 0.5_dp*x%d3val1_d2val3
-      q28 = 0.5_dp*x%d2val1_d1val2_d2val3
-      q29 = 0.5_dp*x%d1val1_d2val2_d2val3
-      q30 = 0.5_dp*x%d3val2_d2val3
+      q7 = Subs(0.0_dp, _xi_1, q0)
+      q8 = q1*q7
+      q9 = 0.5_dp*x%d1val1_d1val3
+      q10 = Subs(0.0_dp, _xi_1, q0)
+      q11 = q10*x%d1val3
+      q12 = 0.5_dp*x%d2val2
+      q13 = 0.5_dp*x%d1val2_d1val3
+      q14 = 0.5_dp*x%d2val3
+      q15 = 0.5_dp*x%d3val1
+      q16 = 0.5_dp*x%d2val1_d1val2
+      q17 = q3*q7
+      q18 = 0.5_dp*x%d2val1_d1val3
+      q19 = q10*q4
+      q20 = 0.5_dp*x%d1val1_d2val2
+      q21 = 1.0_dp*x%d1val1_d1val2
+      q22 = q7*x%d1val2
+      q23 = pow2(x%d1val2)
+      q24 = 0.5_dp*x%d1val1_d1val2_d1val3
+      q25 = q7*x%d1val2_d1val3
+      q26 = q7*x%d1val1_d1val3
+      q27 = 0.5_dp*x%d1val1_d2val3
+      q28 = q1*q10
+      q29 = pow2(x%d1val3)
+      q30 = 0.5_dp*x%d3val2
+      q31 = 0.5_dp*x%d2val2_d1val3
+      q32 = 0.5_dp*x%d1val2_d2val3
+      q33 = q10*q3
+      q34 = 0.5_dp*x%d3val1_d1val3
+      q35 = 0.5_dp*x%d2val1_d1val2_d1val3
+      q36 = 0.5_dp*x%d2val1_d2val3
+      q37 = q10*q5
+      q38 = 0.5_dp*x%d1val1_d2val2_d1val3
+      q39 = 1.0_dp*q22
+      q40 = q7*q9
+      q41 = 1.0_dp*x%d1val1
+      q42 = 0.5_dp*x%d1val1_d1val2_d2val3
+      q43 = q25*x%d1val1_d1val3
+      q44 = q10*q6
+      q45 = 0.5_dp*x%d3val2_d1val3
+      q46 = 0.5_dp*x%d2val2_d2val3
+      q47 = q10*q12
+      q48 = 0.5_dp*x%d3val1_d2val3
+      q49 = q10*q14
+      q50 = q10*q29
+      q51 = 0.5_dp*x%d2val1_d1val2_d2val3
+      q52 = q7*x%d1val2_d2val3
+      q53 = 0.5_dp*x%d1val1_d2val2_d2val3
+      q54 = 0.5_dp*x%d3val2_d2val3
       unary%val = -0.5_dp*y_dp + 0.5_dp*x%val + 0.5_dp*Abs(q0)
       unary%d1val1 = q1*q2 + q1
       unary%d1val2 = q2*q3 + q3
       unary%d1val3 = q2*q4 + q4
       unary%d2val1 = q2*q5 + q5
-      unary%d1val1_d1val2 = q2*q6 + q6
-      unary%d1val1_d1val3 = q2*q7 + q7
-      unary%d2val2 = q2*q8 + q8
-      unary%d1val2_d1val3 = q2*q9 + q9
-      unary%d2val3 = q10*q2 + q10
-      unary%d3val1 = q11*q2 + q11
-      unary%d2val1_d1val2 = q12*q2 + q12
-      unary%d2val1_d1val3 = q13*q2 + q13
-      unary%d1val1_d2val2 = q14*q2 + q14
-      unary%d1val1_d1val2_d1val3 = q15*q2 + q15
-      unary%d1val1_d2val3 = q16*q2 + q16
-      unary%d3val2 = q17*q2 + q17
-      unary%d2val2_d1val3 = q18*q2 + q18
-      unary%d1val2_d2val3 = q19*q2 + q19
-      unary%d3val1_d1val3 = q2*q20 + q20
-      unary%d2val1_d1val2_d1val3 = q2*q21 + q21
-      unary%d2val1_d2val3 = q2*q22 + q22
-      unary%d1val1_d2val2_d1val3 = q2*q23 + q23
-      unary%d1val1_d1val2_d2val3 = q2*q24 + q24
-      unary%d3val2_d1val3 = q2*q25 + q25
-      unary%d2val2_d2val3 = q2*q26 + q26
-      unary%d3val1_d2val3 = q2*q27 + q27
-      unary%d2val1_d1val2_d2val3 = q2*q28 + q28
-      unary%d1val1_d2val2_d2val3 = q2*q29 + q29
-      unary%d3val2_d2val3 = q2*q30 + q30
+      unary%d1val1_d1val2 = q2*q6 + q6 + q8*x%d1val2
+      unary%d1val1_d1val3 = q1*q11 + q2*q9 + q9
+      unary%d2val2 = q12*q2 + q12
+      unary%d1val2_d1val3 = q11*q3 + q13*q2 + q13
+      unary%d2val3 = q14*q2 + q14
+      unary%d3val1 = q15*q2 + q15
+      unary%d2val1_d1val2 = q16*q2 + q16 + q17*x%d2val1
+      unary%d2val1_d1val3 = q18*q2 + q18 + q19*x%d2val1
+      unary%d1val1_d2val2 = q2*q20 + q20 + q21*q22 + q23*q8 + q8*x%d2val2
+      unary%d1val1_d1val2_d1val3 = q1*q25 + q19*x%d1val1_d1val2 + q2*q24 + q24 + q26*q3
+      unary%d1val1_d2val3 = q11*x%d1val1_d1val3 + q2*q27 + q27 + q28*q29 + q28*x%d2val3
+      unary%d3val2 = q2*q30 + q30
+      unary%d2val2_d1val3 = q19*x%d2val2 + q2*q31 + q31
+      unary%d1val2_d2val3 = q11*x%d1val2_d1val3 + q2*q32 + q29*q33 + q32 + q33*x%d2val3
+      unary%d3val1_d1val3 = q19*x%d3val1 + q2*q34 + q34
+      unary%d2val1_d1val2_d1val3 = q17*x%d2val1_d1val3 + q19*x%d2val1_d1val2 + q2*q35 + q25*q5 + q35
+      unary%d2val1_d2val3 = q11*x%d2val1_d1val3 + q2*q36 + q29*q37 + q36 + q37*x%d2val3
+      unary%d1val1_d2val2_d1val3 = q19*x%d1val1_d2val2 + q2*q38 + q21*q25 + q23*q40 + q25*q41*x%d1val2 + q38 + q39*x%d1val1_d1val2_d1val3 + q40*x%d2val2 + q8*x%d2val2_d1val3
+      unary%d1val1_d1val2_d2val3 = q11*x%d1val1_d1val2_d1val3 + q17*x%d1val1_d2val3 + q2*q42 + q29*q44 + q42 + q43 + q44*x%d2val3 + q8*x%d1val2_d2val3
+      unary%d3val2_d1val3 = q19*x%d3val2 + q2*q45 + q45
+      unary%d2val2_d2val3 = q11*x%d2val2_d1val3 + q2*q46 + q29*q47 + q46 + q47*x%d2val3
+      unary%d3val1_d2val3 = q11*x%d3val1_d1val3 + q15*q50 + q2*q48 + q48 + q49*x%d3val1
+      unary%d2val1_d1val2_d2val3 = q11*x%d2val1_d1val2_d1val3 + q16*q50 + q17*x%d2val1_d2val3 + q2*q51 + q25*x%d2val1_d1val3 + q49*x%d2val1_d1val2 + q5*q52 + q51
+      unary%d1val1_d2val2_d2val3 = 2.0_dp*q25*x%d1val1_d1val2_d1val3 + 2.0_dp*q43*x%d1val2 + q11*x%d1val1_d2val2_d1val3 + q12*q7*x%d1val1_d2val3 + q2*q53 + q20*q50 + q21*q52 + q23*q27*q7 + q26*x%d2val2_d1val3 + q39*x%d1val1*x%d1val2_d2val3 + q39*x%d1val1_d1val2_d2val3 + q41*q7*pow2(x%d1val2_d1val3) + q49*x%d1val1_d2val2 + q53 + q8*x%d2val2_d2val3
+      unary%d3val2_d2val3 = q11*x%d3val2_d1val3 + q2*q54 + q30*q50 + q49*x%d3val2 + q54
    end function dim_self_int
    
    function dim_int_self(z, x) result(unary)
@@ -18386,6 +18648,30 @@ module auto_diff_real_2var_order3_1var_order2_module
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: x
       type(auto_diff_real_2var_order3_1var_order2) :: unary
       real(dp) :: y_dp
+      real(dp) :: q54
+      real(dp) :: q53
+      real(dp) :: q52
+      real(dp) :: q51
+      real(dp) :: q50
+      real(dp) :: q49
+      real(dp) :: q48
+      real(dp) :: q47
+      real(dp) :: q46
+      real(dp) :: q45
+      real(dp) :: q44
+      real(dp) :: q43
+      real(dp) :: q42
+      real(dp) :: q41
+      real(dp) :: q40
+      real(dp) :: q39
+      real(dp) :: q38
+      real(dp) :: q37
+      real(dp) :: q36
+      real(dp) :: q35
+      real(dp) :: q34
+      real(dp) :: q33
+      real(dp) :: q32
+      real(dp) :: q31
       real(dp) :: q30
       real(dp) :: q29
       real(dp) :: q28
@@ -18425,60 +18711,84 @@ module auto_diff_real_2var_order3_1var_order2_module
       q4 = 0.5_dp*x%d1val3
       q5 = 0.5_dp*x%d2val1
       q6 = 0.5_dp*x%d1val1_d1val2
-      q7 = 0.5_dp*x%d1val1_d1val3
-      q8 = 0.5_dp*x%d2val2
-      q9 = 0.5_dp*x%d1val2_d1val3
-      q10 = 0.5_dp*x%d2val3
-      q11 = 0.5_dp*x%d3val1
-      q12 = 0.5_dp*x%d2val1_d1val2
-      q13 = 0.5_dp*x%d2val1_d1val3
-      q14 = 0.5_dp*x%d1val1_d2val2
-      q15 = 0.5_dp*x%d1val1_d1val2_d1val3
-      q16 = 0.5_dp*x%d1val1_d2val3
-      q17 = 0.5_dp*x%d3val2
-      q18 = 0.5_dp*x%d2val2_d1val3
-      q19 = 0.5_dp*x%d1val2_d2val3
-      q20 = 0.5_dp*x%d3val1_d1val3
-      q21 = 0.5_dp*x%d2val1_d1val2_d1val3
-      q22 = 0.5_dp*x%d2val1_d2val3
-      q23 = 0.5_dp*x%d1val1_d2val2_d1val3
-      q24 = 0.5_dp*x%d1val1_d1val2_d2val3
-      q25 = 0.5_dp*x%d3val2_d1val3
-      q26 = 0.5_dp*x%d2val2_d2val3
-      q27 = 0.5_dp*x%d3val1_d2val3
-      q28 = 0.5_dp*x%d2val1_d1val2_d2val3
-      q29 = 0.5_dp*x%d1val1_d2val2_d2val3
-      q30 = 0.5_dp*x%d3val2_d2val3
+      q7 = Subs(0.0_dp, _xi_1, q0)
+      q8 = q1*q7
+      q9 = 0.5_dp*x%d1val1_d1val3
+      q10 = Subs(0.0_dp, _xi_1, q0)
+      q11 = q10*x%d1val3
+      q12 = 0.5_dp*x%d2val2
+      q13 = 0.5_dp*x%d1val2_d1val3
+      q14 = 0.5_dp*x%d2val3
+      q15 = 0.5_dp*x%d3val1
+      q16 = 0.5_dp*x%d2val1_d1val2
+      q17 = q3*q7
+      q18 = 0.5_dp*x%d2val1_d1val3
+      q19 = q10*q4
+      q20 = 0.5_dp*x%d1val1_d2val2
+      q21 = 1.0_dp*x%d1val1_d1val2
+      q22 = q7*x%d1val2
+      q23 = pow2(x%d1val2)
+      q24 = 0.5_dp*x%d1val1_d1val2_d1val3
+      q25 = q7*x%d1val2_d1val3
+      q26 = q7*x%d1val1_d1val3
+      q27 = 0.5_dp*x%d1val1_d2val3
+      q28 = q1*q10
+      q29 = pow2(x%d1val3)
+      q30 = 0.5_dp*x%d3val2
+      q31 = 0.5_dp*x%d2val2_d1val3
+      q32 = 0.5_dp*x%d1val2_d2val3
+      q33 = q10*q3
+      q34 = 0.5_dp*x%d3val1_d1val3
+      q35 = 0.5_dp*x%d2val1_d1val2_d1val3
+      q36 = 0.5_dp*x%d2val1_d2val3
+      q37 = q10*q5
+      q38 = 0.5_dp*x%d1val1_d2val2_d1val3
+      q39 = 1.0_dp*q22
+      q40 = q7*q9
+      q41 = 1.0_dp*x%d1val1
+      q42 = 0.5_dp*x%d1val1_d1val2_d2val3
+      q43 = q25*x%d1val1_d1val3
+      q44 = q10*q6
+      q45 = 0.5_dp*x%d3val2_d1val3
+      q46 = 0.5_dp*x%d2val2_d2val3
+      q47 = q10*q12
+      q48 = 0.5_dp*x%d3val1_d2val3
+      q49 = q10*q14
+      q50 = q10*q29
+      q51 = 0.5_dp*x%d2val1_d1val2_d2val3
+      q52 = q7*x%d1val2_d2val3
+      q53 = 0.5_dp*x%d1val1_d2val2_d2val3
+      q54 = 0.5_dp*x%d3val2_d2val3
       unary%val = -0.5_dp*x%val + 0.5_dp*y_dp + 0.5_dp*Abs(q0)
       unary%d1val1 = q1*q2 - q1
       unary%d1val2 = q2*q3 - q3
       unary%d1val3 = q2*q4 - q4
       unary%d2val1 = q2*q5 - q5
-      unary%d1val1_d1val2 = q2*q6 - q6
-      unary%d1val1_d1val3 = q2*q7 - q7
-      unary%d2val2 = q2*q8 - q8
-      unary%d1val2_d1val3 = q2*q9 - q9
-      unary%d2val3 = q10*q2 - q10
-      unary%d3val1 = q11*q2 - q11
-      unary%d2val1_d1val2 = q12*q2 - q12
-      unary%d2val1_d1val3 = q13*q2 - q13
-      unary%d1val1_d2val2 = q14*q2 - q14
-      unary%d1val1_d1val2_d1val3 = q15*q2 - q15
-      unary%d1val1_d2val3 = q16*q2 - q16
-      unary%d3val2 = q17*q2 - q17
-      unary%d2val2_d1val3 = q18*q2 - q18
-      unary%d1val2_d2val3 = q19*q2 - q19
-      unary%d3val1_d1val3 = q2*q20 - q20
-      unary%d2val1_d1val2_d1val3 = q2*q21 - q21
-      unary%d2val1_d2val3 = q2*q22 - q22
-      unary%d1val1_d2val2_d1val3 = q2*q23 - q23
-      unary%d1val1_d1val2_d2val3 = q2*q24 - q24
-      unary%d3val2_d1val3 = q2*q25 - q25
-      unary%d2val2_d2val3 = q2*q26 - q26
-      unary%d3val1_d2val3 = q2*q27 - q27
-      unary%d2val1_d1val2_d2val3 = q2*q28 - q28
-      unary%d1val1_d2val2_d2val3 = q2*q29 - q29
-      unary%d3val2_d2val3 = q2*q30 - q30
+      unary%d1val1_d1val2 = q2*q6 - q6 + q8*x%d1val2
+      unary%d1val1_d1val3 = q1*q11 + q2*q9 - q9
+      unary%d2val2 = q12*q2 - q12
+      unary%d1val2_d1val3 = q11*q3 + q13*q2 - q13
+      unary%d2val3 = q14*q2 - q14
+      unary%d3val1 = q15*q2 - q15
+      unary%d2val1_d1val2 = q16*q2 - q16 + q17*x%d2val1
+      unary%d2val1_d1val3 = q18*q2 - q18 + q19*x%d2val1
+      unary%d1val1_d2val2 = q2*q20 - q20 + q21*q22 + q23*q8 + q8*x%d2val2
+      unary%d1val1_d1val2_d1val3 = q1*q25 + q19*x%d1val1_d1val2 + q2*q24 - q24 + q26*q3
+      unary%d1val1_d2val3 = q11*x%d1val1_d1val3 + q2*q27 - q27 + q28*q29 + q28*x%d2val3
+      unary%d3val2 = q2*q30 - q30
+      unary%d2val2_d1val3 = q19*x%d2val2 + q2*q31 - q31
+      unary%d1val2_d2val3 = q11*x%d1val2_d1val3 + q2*q32 + q29*q33 - q32 + q33*x%d2val3
+      unary%d3val1_d1val3 = q19*x%d3val1 + q2*q34 - q34
+      unary%d2val1_d1val2_d1val3 = q17*x%d2val1_d1val3 + q19*x%d2val1_d1val2 + q2*q35 + q25*q5 - q35
+      unary%d2val1_d2val3 = q11*x%d2val1_d1val3 + q2*q36 + q29*q37 - q36 + q37*x%d2val3
+      unary%d1val1_d2val2_d1val3 = q19*x%d1val1_d2val2 + q2*q38 + q21*q25 + q23*q40 + q25*q41*x%d1val2 - q38 + q39*x%d1val1_d1val2_d1val3 + q40*x%d2val2 + q8*x%d2val2_d1val3
+      unary%d1val1_d1val2_d2val3 = q11*x%d1val1_d1val2_d1val3 + q17*x%d1val1_d2val3 + q2*q42 + q29*q44 - q42 + q43 + q44*x%d2val3 + q8*x%d1val2_d2val3
+      unary%d3val2_d1val3 = q19*x%d3val2 + q2*q45 - q45
+      unary%d2val2_d2val3 = q11*x%d2val2_d1val3 + q2*q46 + q29*q47 - q46 + q47*x%d2val3
+      unary%d3val1_d2val3 = q11*x%d3val1_d1val3 + q15*q50 + q2*q48 - q48 + q49*x%d3val1
+      unary%d2val1_d1val2_d2val3 = q11*x%d2val1_d1val2_d1val3 + q16*q50 + q17*x%d2val1_d2val3 + q2*q51 + q25*x%d2val1_d1val3 + q49*x%d2val1_d1val2 + q5*q52 - q51
+      unary%d1val1_d2val2_d2val3 = 2.0_dp*q25*x%d1val1_d1val2_d1val3 + 2.0_dp*q43*x%d1val2 + q11*x%d1val1_d2val2_d1val3 + q12*q7*x%d1val1_d2val3 + q2*q53 + q20*q50 + q21*q52 + q23*q27*q7 + q26*x%d2val2_d1val3 + q39*x%d1val1*x%d1val2_d2val3 + q39*x%d1val1_d1val2_d2val3 + q41*q7*pow2(x%d1val2_d1val3) + q49*x%d1val1_d2val2 - q53 + q8*x%d2val2_d2val3
+      unary%d3val2_d2val3 = q11*x%d3val2_d1val3 + q2*q54 + q30*q50 + q49*x%d3val2 - q54
    end function dim_int_self
    
    function differentiate_auto_diff_real_2var_order3_1var_order2_1(this) result(derivative)
