@@ -1,0 +1,14 @@
+inlist_common_converted
+      dt_div_min_dr_div_cs_limit = 0.7d0
+
+inlist_finish_core_collapse
+   delta_XSi_cntr_limit = 0.01d0
+   delta_XSi_cntr_hard_limit = 0.03d0
+   
+   x_logical_ctrl(37) = .true. ! if true, then run GYRE
+   x_integer_ctrl(1) = 50 ! output GYRE info at this step interval
+   
+inlist_to_start_infall
+   xa_central_lower_limit_species(1) = 'o16'
+   xa_central_lower_limit(1) = 1d-3
+   

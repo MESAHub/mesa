@@ -1287,6 +1287,24 @@
 
     star_mass_max_limit = 0
 
+      ! bound_mass_min_limit
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when star mass in Msun units is < this.  <= 0 means no limit.
+
+      ! ::
+
+    bound_mass_max_limit = 0
+
+      ! bound_mass_max_limit
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when star mass in Msun units is > this.  <= 0 means no limit.
+
+      ! ::
+
+    bound_mass_max_limit = 0
+
 
       ! star_species_mass_min_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1561,6 +1579,26 @@
       ! ::
 
     log_Tsurf_lower_limit = -1d99
+
+
+      ! log_Rsurf_upper_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop when log10 of R/Rsun in outermost cell is greater than this limit.
+
+      ! ::
+
+    log_Rsurf_upper_limit = 1d99
+
+
+      ! log_Rsurf_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop when log10 of R/Rsun in outermost cell is less than this limit.
+
+      ! ::
+
+    log_Rsurf_lower_limit = -1d99
 
 
       ! log_L_upper_limit

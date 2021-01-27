@@ -572,12 +572,12 @@
          use rates_def
          use chem_def
          use chem_lib, only: chem_get_iso_id
-         use star_utils, only: omega_crit, center_avg_x, surface_avg_x
+         use star_utils
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
-         real(dp) :: log_surface_gravity, v_div_csound_max, &
+         real(dp) :: log_surface_gravity, v_div_csound_max, bound_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
@@ -620,6 +620,8 @@
             v_surf = abs(s% r(1) * s% dlnR_dt(1))
             v_div_csound_max = 0d0
          end if
+         
+         bound_mass = get_bound_mass(s)/Msun
          
          if(s%u_flag) then
             max_abs_vel_loc = maxloc(abs(s%u(1:nz)),dim=1)
@@ -875,6 +877,14 @@
             call compare_to_target('star_mass >= star_mass_max_limit', &
                s% star_mass, s% star_mass_max_limit, t_star_mass_max_limit)
             
+         else if (s% bound_mass_min_limit > 0 .and. bound_mass <= s% bound_mass_min_limit) then 
+            call compare_to_target('bound_mass <= bound_mass_min_limit', &
+               bound_mass, s% bound_mass_min_limit, t_bound_mass_min_limit)
+            
+         else if (s% bound_mass_max_limit > 0 .and. bound_mass >= s% bound_mass_max_limit) then 
+            call compare_to_target('bound_mass >= bound_mass_max_limit', &
+               bound_mass, s% bound_mass_max_limit, t_bound_mass_max_limit)
+            
          else if (species_mass_for_min_limit >= 0 .and. &
                species_mass_for_min_limit <= s% star_species_mass_min_limit) then 
             call compare_to_target( &
@@ -1016,6 +1026,14 @@
          else if (s% log_surface_temperature >= s% log_Tsurf_upper_limit) then 
             call compare_to_target('log_surface_temperature >= log_Tsurf_upper_limit', &
                s% log_surface_temperature, s% log_Tsurf_upper_limit, t_log_Tsurf_upper_limit)
+
+         else if (s% log_surface_radius <= s% log_Rsurf_lower_limit) then 
+            call compare_to_target('log_surface_radius <= log_Rsurf_lower_limit', &
+               s% log_surface_radius, s% log_Rsurf_lower_limit, t_log_Rsurf_lower_limit)
+               
+         else if (s% log_surface_radius >= s% log_Rsurf_upper_limit) then 
+            call compare_to_target('log_surface_radius >= log_Rsurf_upper_limit', &
+               s% log_surface_radius, s% log_Rsurf_upper_limit, t_log_Rsurf_upper_limit)
 
          else if (s% log_surface_pressure <= s% log_Psurf_lower_limit) then 
             call compare_to_target('log_surface_pressure <= log_Psurf_lower_limit', &

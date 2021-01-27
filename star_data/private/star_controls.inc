@@ -65,6 +65,7 @@
          real(dp) :: HB_limit
 
          real(dp) :: star_mass_min_limit, star_mass_max_limit
+         real(dp) :: bound_mass_min_limit, bound_mass_max_limit
          
          real(dp) :: star_species_mass_min_limit, star_species_mass_max_limit
          character (len=iso_name_length) :: &
@@ -101,6 +102,9 @@
 
          real(dp) :: log_Tsurf_upper_limit
          real(dp) :: log_Tsurf_lower_limit
+
+         real(dp) :: log_Rsurf_upper_limit
+         real(dp) :: log_Rsurf_lower_limit
 
          real(dp) :: log_L_upper_limit
          real(dp) :: log_L_lower_limit

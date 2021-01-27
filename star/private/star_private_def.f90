@@ -100,6 +100,8 @@
          termination_code_str(t_HB_limit) = 'HB_limit'
          termination_code_str(t_star_mass_min_limit) = 'star_mass_min_limit'
          termination_code_str(t_star_mass_max_limit) = 'star_mass_max_limit'
+         termination_code_str(t_bound_mass_min_limit) = 'bound_mass_min_limit'
+         termination_code_str(t_bound_mass_max_limit) = 'bound_mass_max_limit'
          
          termination_code_str(t_star_species_mass_min_limit) = 'star_species_mass_min_limit'
          termination_code_str(t_star_species_mass_max_limit) = 'star_species_mass_max_limit'
@@ -135,6 +137,8 @@
          termination_code_str(t_log_Teff_upper_limit) = 'log_Teff_upper_limit'
          termination_code_str(t_log_Tsurf_lower_limit) = 'log_Tsurf_lower_limit'
          termination_code_str(t_log_Tsurf_upper_limit) = 'log_Tsurf_upper_limit'
+         termination_code_str(t_log_Rsurf_lower_limit) = 'log_Rsurf_lower_limit'
+         termination_code_str(t_log_Rsurf_upper_limit) = 'log_Rsurf_upper_limit'
          termination_code_str(t_log_Psurf_lower_limit) = 'log_Psurf_lower_limit'
          termination_code_str(t_log_Psurf_upper_limit) = 'log_Psurf_upper_limit'
          termination_code_str(t_log_Dsurf_lower_limit) = 'log_Dsurf_lower_limit'

@@ -1,0 +1,165 @@
+
+&star_job
+      change_initial_u_flag = .true.
+      change_initial_v_flag = .true.
+      new_v_flag = .false.
+      new_u_flag = .true.
+
+      set_initial_age = .true.
+      set_initial_model_number = .true.
+
+      change_D_omega_flag = .true.
+      new_D_omega_flag = .false.
+
+      change_rotation_flag = .true.
+      new_rotation_flag = .false.
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! mlt
+
+! mixing
+      
+! timesteps      
+
+! mesh
+      use_split_merge_amr = .true.
+      split_merge_amr_log_zoning = .true.
+      split_merge_amr_nz_baseline = 2500 ! 2000
+      split_merge_amr_MaxLong = 1.7d0
+      split_merge_amr_MaxShort = 1.7d0
+      split_merge_amr_max_iters = 10
+
+! solver
+      use_gold2_tolerances = .false.
+      use_gold_tolerances = .true.
+      gold_tol_max_residual3 = 1d-4
+
+      always_use_dedt_form_of_energy_eqn = .true.       
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_d_eos_dxa = .true.
+      
+      use_momentum_outer_BC = .true.
+      
+      min_timestep_limit = 1d-12
+
+      convergence_ignore_equL_residuals = .true. 
+      make_gradr_sticky_in_solver_iters = .true.
+      
+      xa_scale = 1d-5
+      iter_for_resid_tol2 = 10
+      min_timestep_limit = 1d-12 ! (seconds)
+
+      warn_rates_for_high_temp = .true.
+      max_safe_logT_for_rates = 10.5d0
+
+      screening_mode = 'chugunov'
+
+      sig_min_factor_for_high_Tcenter = 0.01
+      Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+      Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+
+      op_split_burn = .true.
+      op_split_burn_min_T = 1d9
+      burn_steps_limit = 150
+      burn_steps_hard_limit = 250
+      op_split_burn_eps = 1d-5
+      op_split_burn_odescal = 1d-5
+
+! output
+
+      center_avg_value_dq = 1d-2
+
+      he_core_boundary_h1_fraction = 0.1
+      c_core_boundary_he4_fraction = 0.5
+      o_core_boundary_c12_fraction = 0.5
+      si_core_boundary_o16_fraction = 0.5
+      fe_core_boundary_si28_fraction = 0.5
+
+      terminal_show_age_units = 'days'
+      terminal_show_timestep_units = 'secs'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
+
+      num_trace_history_values = 4
+      trace_history_value_name(1) = 'non_fe_core_infall'
+      trace_history_value_name(2) = 'fe_core_infall'
+      trace_history_value_name(3) = 'rel_E_err'
+      trace_history_value_name(4) = 'log_rel_run_E_err'
+
+
+/ ! end of controls namelist
+
+&pgstar
+
+!pause = .true.
+Profile_Panels3_xmin = 0 ! -101d0
+Profile_Panels3_xmax = -101d0
+
+Profile_Panels3_num_panels = 6
+
+Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
+Profile_Panels3_yaxis_name(4) = 'gamma1'
+    Profile_Panels3_ymin(4) = 1.28d0
+    Profile_Panels3_ymax(4) = -101d0
+
+Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
+Profile_Panels3_yaxis_name(5) = 'logRho'
+ 
+Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
+Profile_Panels3_yaxis_name(6) = 'logR_cm'
+
+TRho_Profile_xmin = -5 ! -2.0
+TRho_Profile_ymin = 6 ! 7.5
+
+Text_Summary1_name(1,1) = 'model_number'
+Text_Summary1_name(1,2) = 'log_dt'
+Text_Summary1_name(1,3) = 'Mass'
+Text_Summary1_name(1,4) = 'center_ye'    
+Text_Summary1_name(1,5) = 'H_rich'
+
+Text_Summary1_name(2,1) = 'gamma1_min'  
+Text_Summary1_name(2,2) = 'star_age_day'
+Text_Summary1_name(2,3) = 'log_L'
+Text_Summary1_name(2,4) = 'He_cntr'
+Text_Summary1_name(2,5) = 'He_core'
+
+Text_Summary1_name(3,1) = 'non_fe_core_infall'
+Text_Summary1_name(3,2) = 'log_cntr_Rho'
+Text_Summary1_name(3,3) = 'log_Teff'
+Text_Summary1_name(3,4) = 'C_cntr'
+Text_Summary1_name(3,5) = 'C_core'
+
+Text_Summary1_name(4,1) = 'v_surf_div_escape_v'
+Text_Summary1_name(4,2) = 'log_LH'
+Text_Summary1_name(4,3) = 'lg_Lnuc'
+Text_Summary1_name(4,4) = 'O_cntr'
+Text_Summary1_name(4,5) = 'Fe_core'
+
+Text_Summary1_name(5,1) = 'log_max_T'
+Text_Summary1_name(5,2) = 'log_LHe'
+Text_Summary1_name(5,3) = 'lg_Lneu'
+Text_Summary1_name(5,4) = 'Ne_cntr'
+Text_Summary1_name(5,5) = 'zones'
+
+Text_Summary1_name(6,1) = 'log_cntr_T'
+Text_Summary1_name(6,2) = 'log_LZ'
+Text_Summary1_name(6,3) = 'lg_Lphoto'
+Text_Summary1_name(6,4) = 'Si_cntr'
+Text_Summary1_name(6,5) = 'retries'
+
+/ ! end of pgstar namelist

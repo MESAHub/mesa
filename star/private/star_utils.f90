@@ -1656,7 +1656,7 @@
       end function total_times
 
       
-      real(dp) function bound_mass(s)
+      real(dp) function get_bound_mass(s)
          type (star_info), pointer :: s
          integer :: k
          real(dp), pointer :: v(:)
@@ -1666,16 +1666,16 @@
          else if (s% v_flag) then
             v => s% v
          else
-            bound_mass = s% m(1)
+            get_bound_mass = s% m(1)
             return
          end if
          do k=1,s% nz
             vesc2 = 2d0*s% cgrav(k)*s% m(k)/s% r(k)
             if (v(k) > 0d0 .and. v(k)**2 > vesc2) cycle
-            bound_mass = s% m(k)
+            get_bound_mass = s% m(k)
             exit
          end do
-      end function bound_mass
+      end function get_bound_mass
 
 
       subroutine smooth(dc, sz)
