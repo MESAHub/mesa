@@ -36,10 +36,10 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_lgTmax_9.5.mod lgTmax_9.5.mod
+   cp standard_lgTmax.mod lgTmax.mod
 else
-   do_one inlist_to_lgTmax_9.5_header lgTmax_9.5.mod
-   cp lgTmax_9.5.mod standard_lgTmax_9.5.mod
+   do_one inlist_to_lgTmax_header lgTmax.mod
+   cp lgTmax.mod standard_lgTmax.mod
 fi
 
 do_one inlist_to_cc_header start_core_collapse.mod

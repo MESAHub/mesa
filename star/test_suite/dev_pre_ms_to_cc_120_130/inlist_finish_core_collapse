@@ -253,7 +253,7 @@ Profile_Panels3_yaxis_name(5) = 'logRho'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(5) = 12
  
-Profile_Panels3_yaxis_name(6) = 'mass' ! 'logR'
+Profile_Panels3_yaxis_name(6) = 'logT' ! 'mass' ! 'logR'
     Profile_Panels3_ymin(6) = -101 ! -3d0
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15

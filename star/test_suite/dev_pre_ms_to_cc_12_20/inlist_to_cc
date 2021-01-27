@@ -3,7 +3,7 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgTmax_9.5.mod'
+      saved_model_name = 'lgTmax.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'start_core_collapse.mod'
