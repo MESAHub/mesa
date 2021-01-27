@@ -30,7 +30,7 @@ specified conditions.  If :math:`f = 0`, the result of the next level
 is evaluated and returned.  If :math:`f = 1`, the result of the EOS
 component corresponding to the current level is returned.  Otherwise,
 both results are evaluated, blended, and returned.  Smooth blends are
-assured the smoothness of the functions that define the component
+assured via the smoothness of the functions that define the component
 fractions.
 
 This approach means that that EOS components have an order of
@@ -142,7 +142,7 @@ FreeEOS
 The FreeEOS |FreeEOS| tables are based on the FreeEOS code, version 2.2.1, 
 and utilize the EOS1 option suite.  FreeEOS is described as an "efficient 
 free-energy minimization technique that is suitable for physical conditions 
-in stellar interiors."  It provides results for arbitrary chemical compostion 
+in stellar interiors."  It provides results for arbitrary chemical composition
 that are thermodynamically consistent to machine precision.  The tables assume 
 a scaled-solar chemical composition and are parameterized by :math:`X` and 
 :math:`Z,` with tables provided up to :math:`Z=1.` FreeEOS covers a similar 
@@ -170,7 +170,7 @@ PC
 
 The PC EOS |PC| is a fully-ionized electron-ion plasma EOS.  It
 includes a detailed treatment of Coulomb interactions and so is
-prefered once the Coulomb coupling paramter becomes significant.  It
+preferred once the Coulomb coupling parameter becomes significant.  It
 includes the phase transition associated with ion crystallization.
 The composition is accounted for by including all isotopes with mass
 fractions above a specified minimum.
