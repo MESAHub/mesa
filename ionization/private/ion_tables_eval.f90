@@ -87,7 +87,7 @@
          
          logical :: debug
          
-         include 'formats.dek'         
+         include 'formats'
          
          ierr = 0
          debug = dbg
@@ -364,7 +364,7 @@
          
          real(dp) :: logRho, logT, logQ
          
-         include 'formats.dek'
+         include 'formats'
 
          logRho = logRho_in
          logT = logT_in
@@ -477,7 +477,7 @@
          integer :: k, ip1, jp1
          real(dp) :: f(4,nx,ny)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          hx=x1-x0

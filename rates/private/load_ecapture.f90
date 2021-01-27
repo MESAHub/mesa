@@ -60,7 +60,7 @@ contains
 
     logical, parameter :: dbg = .false.
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -202,7 +202,7 @@ contains
 
     logical, parameter :: dbg = .false.
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 

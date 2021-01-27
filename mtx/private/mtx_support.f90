@@ -158,7 +158,7 @@
          
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          if (dbg) write(*,*) 'enter do_band_to_row_sparse'
          
@@ -273,7 +273,7 @@
          real(dp) :: val
          
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          nz = nz_start(num) - 1
@@ -690,7 +690,7 @@
          real(qp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
          real(qp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)         
          integer :: nvar, nz, k        
-         include 'formats.dek'
+         include 'formats'
          nvar = size(b,dim=1)
          nz = size(b,dim=2)         
 !$OMP PARALLEL DO PRIVATE(k)
@@ -768,7 +768,7 @@
          real(dp), intent(inout) :: x(:) ! (m)
          integer :: i, j
          real(dp), dimension(m) :: y
-         include 'formats.dek'
+         include 'formats'
          ! y = U*b
          do i=1,m
             y(i) = 0
@@ -797,7 +797,7 @@
          real(dp), intent(inout) :: C(:,:) ! (m,m)
          integer :: i, j, k
          real(dp), dimension(m,m) :: Y
-         include 'formats.dek'
+         include 'formats'
          ! Y = U*B
          do i=1,m
             do j=1,m

@@ -76,7 +76,7 @@
          real(dp), target :: dfdy1(ld_dfdy*n)
          real(dp), pointer :: dfdy(:,:)
          integer :: i, k 
-         include 'formats'        
+         include 'formats'
          ierr = 0
          dfdy(1:ld_dfdy,1:n) => dfdy1(1:ld_dfdy*n)
          call vdpol_jacob(n,x,h,y,f,dfdy,ld_dfdy,lrpar,rpar,lipar,ipar,ierr)

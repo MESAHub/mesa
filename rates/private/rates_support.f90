@@ -55,7 +55,7 @@
          real(dp), pointer :: rattab_f(:,:,:)
          real(dp) :: logtemp
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -150,7 +150,7 @@
             real(dp) :: denom, am1, a00, ap1, ap2, cm1, c00, cp1, cp2,  &
                   rate, dr_dT, dx, dt, old_rate, old_dr_dT
             
-            include 'formats.dek'
+            include 'formats'
                
             k = iat+1 ! starting guess for search
             do while (logtemp < logttab(k) .and. k > 1)
@@ -203,7 +203,7 @@
 
          logical :: all_okay, a_okay, all_in_cache
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -582,7 +582,7 @@
          type (T_Factors), target ::  tfs
          type (T_Factors), pointer :: tf
 
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -614,7 +614,7 @@
          
          real(dp) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          call get_reaclib_rate_and_dlnT( &
@@ -665,7 +665,7 @@
          
          real(dp) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          call get_reaclib_rate_and_dlnT( &

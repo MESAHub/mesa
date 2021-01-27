@@ -56,7 +56,7 @@
          real(dp), intent(inout) :: rates(:)
          integer, intent(out) :: ierr
          integer :: i, ir, op_err
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
 
 !x$OMP PARALLEL DO PRIVATE(i,ir,op_err)
@@ -86,7 +86,7 @@
 
          real(dp) :: rr
 
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -823,7 +823,7 @@
          subroutine do_default(ierr) 
             integer, intent(out) :: ierr ! set ierr to -1 if cannot find rate                      
             real(dp) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT             
-            include 'formats.dek'           
+            include 'formats'
             ierr = 0                     
             ! look for rate in reaclib
             call get_reaclib_rate_and_dlnT( &
@@ -922,7 +922,7 @@
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
          real(dp) :: fr1, rr1, alfa, beta
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          if (which_rate == 2 .and. temp < JR_T_full_on) then
             call eval_raw_rate(ir, rate_fcn1, tf, temp, fr1, rr1, ierr)
@@ -964,7 +964,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          call rate_fcn1(tf, temp, fr, rr)
          if (fr < 0 .or. rr < 0) then
@@ -990,7 +990,7 @@
          integer, parameter :: nv = 1
          real(dp) :: x(nv), vals(nv)
          type (rate_table_info), pointer :: ri
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
 
          ri => raw_rates_records(ir)
@@ -1031,7 +1031,7 @@
                                     inv_lambda, dinv_lambda_dlnT
          integer :: lo, hi, num_lambdas
          real(dp) :: fr_table
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
 
          call eval_table(rir, tf, temp, fr_table, rr, ierr)
@@ -1237,7 +1237,7 @@
          subroutine do_jina_reaclib_reverse(reverse_handle)
             character (len=*) :: reverse_handle
             integer :: ierr, lo, hi, r_id
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             r_id = reverse_reaction_id(ir)
             if (r_id == 0) then ! don't know

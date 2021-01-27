@@ -303,7 +303,7 @@ contains
     subroutine find_location ! set ix, jy; x is logT; y is lYeRho
       integer i, j
       real(dp) :: del
-      include 'formats.dek'
+      include 'formats'
       ! x0 <= logT <= x1
       ix = table % num_T-1 ! since weak_num_logT is small, just do a linear search
       do i = 2, table % num_T-1
@@ -328,7 +328,7 @@ contains
     end subroutine find_location
 
     subroutine setup_for_linear_interp
-      include 'formats.dek'
+      include 'formats'
 
       call find_location
 

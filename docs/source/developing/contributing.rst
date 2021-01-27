@@ -219,7 +219,13 @@ If you want to push that branch to GitHub to share it with others, do::
 
   git push --set-upstream origin mynewbranch
 
-This will create a new branch on GitHub named ``mynewbranch`` and associate it with the local branch on your machine of the same name.  
+This will create a new branch on GitHub named ``mynewbranch`` and associate it with the local branch on your machine of the same name.
+
+.. note::
+
+  Give the branch a short, descriptive name.  To help others quickly
+  see who a branch belongs to, you can prepend your initials (e.g.,
+  ``jws/kap-compton`` or ``rf/rates-nullify``).
 
 Once you have set the upstream branch, you may omit the branch name when you push additional changes to this branch::
 

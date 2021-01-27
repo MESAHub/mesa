@@ -71,7 +71,7 @@
 
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          vec => vec_ary
@@ -179,7 +179,7 @@
 
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -490,7 +490,7 @@
 
         logical, parameter :: dbg = .false.
 
-        include 'formats.dek'
+        include 'formats'
 
         ierr = 0
 

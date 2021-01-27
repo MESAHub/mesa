@@ -1232,7 +1232,7 @@
             f, jtot_bdy, goal_total, bdy_j, bdy_total, inner_total, outer_total, &
             msum, isum, jsum, omega_uniform
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -1396,7 +1396,7 @@
 
          integer, parameter :: k_dbg = -1
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 

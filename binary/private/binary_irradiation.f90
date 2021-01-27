@@ -41,7 +41,7 @@
          real(dp) :: Lx
          integer :: ierr
          type (star_info), pointer :: s
-         include 'formats.inc'
+         include 'formats'
          ierr = 0
          s => b% s_donor
          if (b% col_depth_for_eps_extra <= 0) return

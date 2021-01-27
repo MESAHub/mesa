@@ -40,7 +40,7 @@
       integer :: i
       logical :: dbg
       
-      include 'formats.dek'
+      include 'formats'
 
       dbg = dbg_in
 !      dbg = (abs(Z_in - 0.01d0) < 1d-6 .and. abs(xh_in - 0.7d0) < 1d-6 .and. 

@@ -2655,7 +2655,7 @@
             integer, intent(in) :: handle
             integer, intent(out) :: ierr
             type (Net_General_Info), pointer :: g
-            include 'formats.dek'
+            include 'formats'
             call get_net_ptr(handle, g, ierr)
             if (ierr /= 0) then
                write(*,*) 'invalid handle for do_mark_approx21_on_coprocessor'
@@ -2675,7 +2675,7 @@
             integer, intent(in) :: handle
             integer, intent(out) :: ierr
             type (Net_General_Info), pointer :: g
-            include 'formats.dek'
+            include 'formats'
             call get_net_ptr(handle, g, ierr)
             if (ierr /= 0) then
                write(*,*) 'invalid handle for do_mark_approx21_on_coprocessor'

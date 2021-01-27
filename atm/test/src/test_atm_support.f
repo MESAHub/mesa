@@ -75,7 +75,7 @@ contains
     integer, intent(in)      :: table_id
     character(*), intent(in) :: label
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -144,7 +144,7 @@ contains
     real(dp) :: errtol
     integer  :: max_steps
 
-    include 'formats.dek'
+    include 'formats'
 
     ierr = 0
 
@@ -222,7 +222,7 @@ contains
     real(dp) :: tau_base
     real(dp) :: errtol
 
-    include 'formats.dek'
+    include 'formats'
 
     if (test_verbosely) then
        write(*,*)
@@ -307,7 +307,7 @@ contains
 
     real(dp) :: errtol
 
-    include 'formats.dek'
+    include 'formats'
 
     if (test_verbosely) then
        write(*,*)

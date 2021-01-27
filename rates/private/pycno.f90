@@ -80,7 +80,7 @@
          real(dp) :: A1, dA1dT, B1_numerator, dB1_numerator_dT
          real(dp) :: A2, dA2dT, B2_numerator, dB2_numerator_dT
 
-         include 'formats.dek'
+         include 'formats'
          
          R6=RHO*1d-6
          dR6dRho = 1d-6

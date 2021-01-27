@@ -126,7 +126,7 @@
          real(dp), dimension(num_ion_vals) :: res
          integer :: k
          
-         include 'formats.dek'
+         include 'formats'
                      
          ierr = 0
          call Get_ion_Results(Z, X, Rho, lgRho, T, lgT, res, ierr)

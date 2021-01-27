@@ -35,7 +35,7 @@
       integer, target :: ipar_decsol(lid)
       integer :: ierr, lid_check, lrd_check, iop
       
-      include 'formats.dek'
+      include 'formats'
       
 !******************************************
       ierr = 0
