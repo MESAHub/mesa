@@ -1,6 +1,6 @@
 
 &star_job
-   
+
       required_termination_code_string = 'log_Rsurf_upper_limit'
 
       !pgstar_flag = .false.
@@ -8,7 +8,7 @@
 / ! end of star_job namelist
 
 &controls
-
+      
       log_Rsurf_upper_limit = 4d0
       
       fe_core_infall_limit = 1d99
@@ -16,7 +16,3 @@
       gamma1_limit_max_q = 0.75d0
 
 / ! end of controls namelist
-
-&pgstar
-
-/ ! end of pgstar namelist

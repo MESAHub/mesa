@@ -3,7 +3,6 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'removed_envelope.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'after_core_c_burn.mod'
@@ -25,7 +24,6 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'c12'
-      xa_central_lower_limit(1) = 1d-3
 
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
@@ -53,6 +51,11 @@
       !write_pulse_data_with_profile = .true.
 
 ! output
+      terminal_show_age_units = 'years'
+      terminal_show_timestep_units = 'days'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'

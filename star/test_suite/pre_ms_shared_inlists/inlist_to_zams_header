@@ -7,6 +7,8 @@
       extra_star_job_inlist2_name = 'inlist_mass_Z_wind_rotation'
       read_extra_star_job_inlist3 = .true.
       extra_star_job_inlist3_name = '../pre_ms_shared_inlists/inlist_to_zams'
+      !read_extra_star_job_inlist4 = .true.
+      !extra_star_job_inlist4_name = 'inlist_to_zams'
 / ! end of star_job namelist
 
 &eos
@@ -32,6 +34,8 @@
       extra_controls_inlist2_name = 'inlist_mass_Z_wind_rotation'
       read_extra_controls_inlist3 = .true.
       extra_controls_inlist3_name = '../pre_ms_shared_inlists/inlist_to_zams'
+      !read_extra_controls_inlist4 = .true.
+      !extra_controls_inlist4_name = 'inlist_to_zams'
 / ! end of controls namelist
 
 &pgstar

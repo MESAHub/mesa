@@ -7,13 +7,13 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-   do_one inlist_make_late_pre_zams_header late_pre_zams.mod
+   do_one ../pre_ms_shared_inlists/inlist_make_late_pre_zams_header late_pre_zams.mod
    cp late_pre_zams.mod standard_late_pre_zams.mod
-   do_one inlist_to_zams_header zams.mod
+   do_one ../pre_ms_shared_inlists/inlist_to_zams_header zams.mod
    cp zams.mod standard_zams.mod
-   do_one inlist_to_end_core_he_burn_header after_core_he_burn.mod
+   do_one ../pre_ms_shared_inlists/inlist_to_end_core_he_burn_header after_core_he_burn.mod
    cp after_core_he_burn.mod standard_after_core_he_burn.mod
-   do_one inlist_to_end_core_c_burn_header after_core_c_burn.mod
+   do_one ../pre_ms_shared_inlists/inlist_to_end_core_c_burn_header after_core_c_burn.mod
    cp after_core_c_burn.mod standard_after_core_c_burn.mod
 
 do_one inlist_to_neon_flash_header final.mod

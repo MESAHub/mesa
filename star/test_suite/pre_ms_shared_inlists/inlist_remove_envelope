@@ -9,8 +9,6 @@
       save_model_filename = 'removed_envelope.mod'
       required_termination_code_string = 'max_model_number'
 
-      !remove_initial_surface_at_he_core_boundary set in header
-
       set_initial_age = .true.
       initial_age = 0
 
@@ -18,6 +16,10 @@
       set_initial_number_retries = .true.
 
       pgstar_flag = .false.
+      
+      ! read the local specifics
+      read_extra_star_job_inlist1 = .true.
+      extra_star_job_inlist1_name = 'inlist_remove_envelope'
 
 / ! end of star_job namelist
 
