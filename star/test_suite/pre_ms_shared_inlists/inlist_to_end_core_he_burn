@@ -3,10 +3,10 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'late_pre_zams.mod'
+      saved_model_name = 'zams.mod'
       
       save_model_when_terminate = .true.
-      save_model_filename = 'zams.mod'
+      save_model_filename = 'after_core_he_burn.mod'
       required_termination_code_string = 'xa_central_lower_limit'
 
       set_initial_age = .true.
@@ -25,7 +25,7 @@
       change_rotation_flag = .false.  ! rotation off until near zams
       num_steps_to_relax_rotation = 50
 
-      pgstar_flag = .false.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -38,18 +38,14 @@
 
 &controls
 
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 0.68d0
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 0.05d0
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 6000
+      max_model_number = 3000
       !max_number_retries = 58
-      
-      Lnuc_div_L_zams_limit = 0.4 ! for very high mass
-      
+
 ! wind
-      ! delay wind until reach zams
-      Dutch_scaling_factor = 0
 
 ! atmosphere
 
@@ -71,7 +67,6 @@
 ! mesh
 
 ! solver
-      solver_iters_timestep_limit = 20
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -93,15 +88,9 @@
 &pgstar
 
 !pause = .true.
-
 Grid1_plot_name(3) = 'HR'
 Profile_Panels3_xmin = -101d0
 Profile_Panels3_xmax = -101d0
 Profile_Panels3_other_yaxis_name(4) = 'entropy'
-
-!Profile_Panels3_xaxis_name = 'zone'
-!Profile_Panels3_xmin = 48
-!Profile_Panels3_xmax = 58
-!Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist
