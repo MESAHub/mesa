@@ -106,9 +106,8 @@ module skye_thermodynamics
                                           pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
                                           res, d_dlnRho, d_dlnT)
       use eos_def
-      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: F_ideal_ion, F_coul, F_rad, temp, dens, xnefer, etaele
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: F_ideal_ion, F_coul, F_rad, temp, dens, xnefer, etaele, abar, zbar
       type(auto_diff_real_2var_order3_1var_order2), intent(in) :: pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho
-      real(dp), intent(in) :: abar, zbar
 
       ! Intermediates
       type(auto_diff_real_2var_order3_1var_order2) :: srad, erad, prad, sgas, egas, pgas, p, e, s

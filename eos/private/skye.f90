@@ -141,8 +141,7 @@ module skye
 
          ierr = 0
 
-         call skye_eos( &
-            T, Rho, X, abar, zbar, &
+         call skye_eos(T, Rho, X, &
             rq%Skye_min_gamma_for_solid, rq%Skye_max_gamma_for_liquid, &
             rq%mass_fraction_limit_for_Skye, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
@@ -189,7 +188,7 @@ module skye
       !!..this routine assumes a call to subroutine read_helm_table has
       !!..been performed prior to calling this routine.
       subroutine skye_eos( &
-            temp_in, den_in, Xfrac, abar_in, zbar,  &
+            temp_in, den_in, Xfrac, &
             Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
             mass_fraction_limit, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
@@ -209,17 +208,16 @@ module skye
          integer, pointer :: chem_id(:)
          real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit, Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid
-         real(dp), intent(in) :: Xfrac, abar_in, zbar
+         real(dp), intent(in) :: Xfrac, zbar
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
          
          integer :: relevant_species, lookup(species)
+         type(auto_diff_real_2var_order3_1var_order2) :: packed_W(species), packed_A(species), packed_Z(species), packed_ya(species), zbar, abar
          type(auto_diff_real_2var_order3_1var_order2) :: temp, logtemp, den, logden, din
-         real(dp) :: AZION(species), ACMI(species)
          type (Helm_Table), pointer :: ht
-         real(dp) :: ytot1, ye, ya_real(species)
-         type(auto_diff_real_2var_order3_1var_order2) :: abar, ya(species), norm, select_xa(species)
+         real(dp) :: ytot1, ye
          type(auto_diff_real_2var_order3_1var_order2) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
          type(auto_diff_real_2var_order3_1var_order2) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
          type(auto_diff_real_2var_order3_1var_order2) :: pele, eele, eep, sele
@@ -239,12 +237,8 @@ module skye
          den%d1val2 = 1d0
          logden = log10(den)
 
-         abar = abar_in
-
-         ! HELM table lookup uses din rather than den
-         ytot1 = 1.0d0 / abar_in
-         ye = ytot1 * zbar
-         din = ye*den
+         call pack_species(chem_id, species, xa, mass_fraction_limit, i_ddx, &
+                              relevant_species, lookup, packed_ya, packed_Z, packed_W, packed_A, zbar, abar)
 
          F_rad = 0d0
          F_ion_gas = 0d0
@@ -257,14 +251,64 @@ module skye
          ! Radiation free energy, independent of composition
          F_rad = compute_F_rad(temp, den)
 
+         ! Ideal ion free energy, only depends on abar
+         F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, packed_W(1:relevant_species), packed_ya(1:relevant_species))
+
+         ! Ideal electron-positron thermodynamics (s, e, p)
+         ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
+         ! HELM table lookup uses din rather than den
+         ytot1 = 1.0d0 / abar
+         ye = ytot1 * zbar
+         din = ye*den
+         call compute_ideal_ele(temp%val, den%val, din%val, logtemp%val, logden%val, zbar%val, ytot1%val, ye%val, ht, &
+                               sele, eele, pele, etaele, xnefer, ierr)
+         xnefer = compute_xne(den, ytot1, zbar)
+
+         ! Compute non-ideal corrections
+         call nonideal_corrections(relevant_species, packed_ya(1:relevant_species),
+                                     packed_Z(1:relevant_species), packed_W(1:relevant_species), &
+                                     Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
+                                     den, temp, xnefer, abar, &
+                                     F_coul, latent_ddlnT, latent_ddlnRho, phase)
+
+
+         call  pack_for_export(F_ideal_ion, F_coul, F_rad, temp, den, xnefer, etaele, abar, zbar, &
+                                 pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
+                                 res, d_dlnd, d_dlnT)
+
+      end subroutine skye_eos
+
+      subroutine pack_species(chem_id, species, xa, mass_fraction_limit, i_ddx, &
+                              relevant_species, lookup, packed_ya, packed_Z, packed_W, packed_A, zbar, abar)
+         use chem_def, only: chem_isos
+
+         ! Inputs
+         integer, pointer :: chem_id(:)
+         integer, intent(in) :: species
+         real(dp), intent(in) :: xa(species), W(species)
+         real(dp), intent(in) :: mass_fraction_limit ! The limit below which we don't pack a species (i.e. we ignore it).
+         integer, intent(in) :: i_ddx ! The index of the species to treat as val3 for auto_diff purposes
+
+         ! Intermediates
+         integer :: j, indep
+         real(dp) :: norm, select_xa(species)
+
+         ! Outputs
+         integer, intent(out) :: relevant_species ! The number of species we packed away
+         integer, intent(out) :: lookup(species) ! Array of integers such that lookup(index in original xa) = (index in packed).
+         real(dp), intent(out) :: packed_Z(species, packed_W(species), packed_A(species)
+         type(auto_diff_real_2var_order3_1var_order2), intent(out) :: packed_ya(species), zbar, abar
+
          ! Count and pack relevant species for Coulomb corrections. Relevant means mass fraction above limit.
+         ! Pack away Z (charge) and W (atomic weight) and store lookup table.
          relevant_species = 0
          norm = 0d0
          do j=1,species
             if (xa(j) > mass_fraction_limit) then
                relevant_species = relevant_species + 1
-               AZION(relevant_species) = chem_isos% Z(chem_id(j))
-               ACMI(relevant_species) = chem_isos% W(chem_id(j))
+               packed_Z(relevant_species) = chem_isos% Z(chem_id(j))
+               packed_W(relevant_species) = chem_isos% W(chem_id(j))
+               packed_A(relevant_species) = chem_isos% Z_plus_N(chem_id(j))
                select_xa(relevant_species) = xa(j)
                lookup(j) = relevant_species
                norm = norm + xa(j)
@@ -276,42 +320,42 @@ module skye
             select_xa(j) = select_xa(j) / norm
          end do
 
-         ! Compute number fractions
+         ! Compute number fractions and normalize.
          norm = 0d0
          do j=1,relevant_species
-            ya(j) = select_xa(j) / ACMI(j)
-            norm = norm + ya(j)
+            packed_ya(j) = select_xa(j) / packed_W(j)
+            norm = norm + packed_ya(j)
          end do
          do j=1,relevant_species
-            ya(j) = ya(j) / norm
+            packed_ya(j) = packed_ya(j) / norm
          end do
+
+         ! Find the independent species
          do j=1,relevant_species
-            ya_real(j) = ya(j)%val
+            if (lookup(j) == i_ddx) then
+               indep = j
+               exit
+            end if
          end do
 
-         ! Ideal ion free energy, only depends on abar
-         F_ideal_ion = compute_F_ideal_ion(temp, den, abar_in, relevant_species, ACMI, ya_real)
+         ! Imbue with derivatives
+         packed_ya(indep)%d1val3 = 1d0
 
-         ! Ideal electron-positron thermodynamics (s, e, p)
-         ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
-         call compute_ideal_ele(temp%val, den%val, din%val, logtemp%val, logden%val, zbar, ytot1, ye, ht, &
-                               sele, eele, pele, etaele, xnefer, ierr)
+         ! Enforce the sum rule that composition adds to unity.
+         do j=1,relevant_species
+            if (j /= indep) then
+               packed_ya(j)%d1val3 = -1d0 * packed_ya(j)%val / (1d0 - packed_ya(indep)%val)
+            end if
+         end do
 
-         xnefer = compute_xne(den, ytot1, zbar)
+         abar = 0d0 
+         zbar = 0d0
+         do j=1,relevant_species
+            abar = abar + packed_ya(j) * packed_A(j)
+            zbar = zbar + packed_ya(j) * packed_Z(j)
+         end do
 
-         ! Compute non-ideal corrections
-         call nonideal_corrections(relevant_species, ya(1:relevant_species), &
-                                     AZION(1:relevant_species), ACMI(1:relevant_species), &
-                                     Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
-                                     den, temp, xnefer, abar, &
-                                     F_coul, latent_ddlnT, latent_ddlnRho, phase)
-
-
-         call  pack_for_export(F_ideal_ion, F_coul, F_rad, temp, den, xnefer, etaele, abar_in, zbar, &
-                                 pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
-                                 res, d_dlnd, d_dlnT)
-
-      end subroutine skye_eos
+      end subroutine pack_species
 
 
 end module skye

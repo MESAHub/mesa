@@ -24,9 +24,9 @@ module skye_ideal
    end function compute_F_rad
 
    type(auto_diff_real_2var_order3_1var_order2) function compute_F_ideal_ion(temp, den, abar, species, weights, ya) result(F_ideal_ion)
-      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, den
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, den, abar, ya(species)
       integer, intent(in) :: species
-      real(dp), intent(in) :: weights(species), ya(species), abar
+      real(dp), intent(in) :: weights(species)
 
       integer :: j
       type(auto_diff_real_2var_order3_1var_order2) :: n, nj, nQ, nQj
@@ -49,8 +49,7 @@ module skye_ideal
    end function compute_F_ideal_ion
 
    type(auto_diff_real_2var_order3_1var_order2) function compute_xne(den, ytot1, zbar) result(xne)
-      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: den
-      real(dp), intent(in) :: ytot1, zbar
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: den, ytot1, zbar
       type(auto_diff_real_2var_order3_1var_order2) :: xni
 
       ! xne is the electron density due to matter, and so is proportional to density and independent of temperature
