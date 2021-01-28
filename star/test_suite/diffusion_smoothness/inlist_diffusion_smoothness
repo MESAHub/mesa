@@ -77,7 +77,6 @@
       
       
       num_cells_for_smooth_brunt_B = 0
-      !use_brunt_gradmuX_form = .true.
       
       !show_diffusion_info = .true. ! terminal output for diffusion
          !show_diffusion_substep_info = .true.         
