@@ -1,0 +1,4 @@
+
+&star_job
+   remove_initial_surface_at_he_core_boundary = 0.1d0 ! H abundance where cut
+/ ! end of star_job namelist
