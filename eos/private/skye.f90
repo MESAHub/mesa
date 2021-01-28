@@ -363,7 +363,7 @@ module skye
 
          abar = 0d0 
          do j=1,species
-            abar = abar + packed_ya(j) * A(j)
+            abar = abar + ya(j) * A(j)
          end do
 
 
