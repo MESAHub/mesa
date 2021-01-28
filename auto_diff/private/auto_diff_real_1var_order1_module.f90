@@ -768,7 +768,11 @@ module auto_diff_real_1var_order1_module
       real(dp) :: q0
       q0 = tanh(x%val)
       unary%val = q0
+<<<<<<< HEAD
       unary%d1val1 = x%d1val1*(1 - pow2(q0))
+=======
+      unary%d1val1 = -x%d1val1*(pow2(q0) - 1)
+>>>>>>> origin/main
    end function tanh_self
    
    function asin_self(x) result(unary)
@@ -813,10 +817,8 @@ module auto_diff_real_1var_order1_module
    function atanpi_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
-      real(dp) :: q0
-      q0 = powm1(pi)
-      unary%val = q0*atan(x%val)
-      unary%d1val1 = q0*x%d1val1*powm1(pow2(x%val) + 1)
+      unary%val = powm1(pi)*atan(x%val)
+      unary%d1val1 = x%d1val1*powm1(pi*pow2(x%val) + pi)
    end function atanpi_self
    
    function asinh_self(x) result(unary)
@@ -1041,10 +1043,8 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1), intent(in) :: y
       type(auto_diff_real_1var_order1) :: binary
-      real(dp) :: q0
-      q0 = powm1(y%val)
-      binary%val = q0*x%val
-      binary%d1val1 = q0*x%d1val1 - x%val*y%d1val1*powm1(pow2(y%val))
+      binary%val = x%val*powm1(y%val)
+      binary%d1val1 = (x%d1val1*y%val - x%val*y%d1val1)*powm1(pow2(y%val))
    end function div_self
    
    function div_self_real(x, y) result(unary)
@@ -1091,10 +1091,8 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1), intent(in) :: y
       type(auto_diff_real_1var_order1) :: binary
-      real(dp) :: q0
-      q0 = pow(x%val, y%val)
-      binary%val = q0
-      binary%d1val1 = q0*(x%d1val1*y%val*powm1(x%val) + y%d1val1*log(x%val))
+      binary%val = pow(x%val, y%val)
+      binary%d1val1 = (x%d1val1*y%val + x%val*y%d1val1*log(x%val))*pow(x%val, y%val - 1)
    end function pow_self
    
    function pow_self_real(x, y) result(unary)

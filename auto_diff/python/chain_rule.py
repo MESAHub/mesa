@@ -118,7 +118,7 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 			d = d.subs(x_syms[0], 0)
 
 		d_before = d
-		#d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
+		d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
 		cost_before = weighted_count_ops(d_before, verbose=False)
 		cost_after = weighted_count_ops(d, verbose=False)
 		if cost_before != cost_after:
@@ -254,7 +254,7 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, f
 			d = d.subs(y_syms[0], yval)
 
 		d_before = d
-		#d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
+		d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
 		cost_before = weighted_count_ops(d_before, verbose=False)
 		cost_after = weighted_count_ops(d, verbose=False)
 		if cost_before != cost_after:
