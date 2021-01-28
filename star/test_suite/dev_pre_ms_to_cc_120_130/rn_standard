@@ -56,7 +56,7 @@ else
    cp converted.mod standard_converted.mod
 fi
 
-do_one inlist_finish_core_collapse_header final.mod
+do_one inlist_finish_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

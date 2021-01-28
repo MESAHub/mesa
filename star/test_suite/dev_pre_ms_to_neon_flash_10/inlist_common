@@ -18,7 +18,7 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -207,7 +207,7 @@
       terminal_show_log_dt = .false.
 
       center_avg_value_dq = 1d-12
-      he_core_boundary_h1_fraction = 0.5
+      he_core_boundary_h1_fraction = 0.1
       c_core_boundary_he4_fraction = 0.5
       o_core_boundary_c12_fraction = 0.5
       si_core_boundary_o16_fraction = 0.5

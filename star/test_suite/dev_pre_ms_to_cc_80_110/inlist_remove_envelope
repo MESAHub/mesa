@@ -40,32 +40,19 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      !max_years_for_timestep = 0.1
 
 ! mesh
 
 ! solver
-      !drag_coefficient = 999999d0 ! drive v to 0 in H envelope after end core He burn
-      !turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
-      !x_logical_ctrl(37) = .true. ! if true, then run GYRE
-      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-      x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      x_logical_ctrl(2) = .false. ! output eigenfunction files
-      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-      x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
       num_trace_history_values = 2

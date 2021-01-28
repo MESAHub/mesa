@@ -65,7 +65,6 @@
 / ! end of controls namelist
 
 
-
 &pgstar
 
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0

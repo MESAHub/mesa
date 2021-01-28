@@ -62,9 +62,7 @@
       !history_interval = 1
       !terminal_interval = 1
 
-
 / ! end of controls namelist
-
 
 
 &pgstar

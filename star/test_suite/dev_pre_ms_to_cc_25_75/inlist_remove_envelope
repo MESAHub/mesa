@@ -1,4 +1,5 @@
 
+
 &star_job
 
       load_saved_model = .true.
@@ -10,6 +11,9 @@
 
 ! uncomment the following to remove H env
       !remove_initial_surface_at_he_core_boundary = 0.1d0 ! H abundance where cut
+
+      set_initial_age = .true.
+      initial_age = 0
 
       set_initial_model_number = .true.
       set_initial_number_retries = .true.
@@ -37,20 +41,16 @@
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      !max_years_for_timestep = 0.1
 
 ! mesh
 
 ! solver
-      !drag_coefficient = 999999d0 ! drive v to 0 in H envelope after end core He burn
-      !turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.

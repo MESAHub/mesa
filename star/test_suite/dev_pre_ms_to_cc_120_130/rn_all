@@ -28,7 +28,7 @@ cp start_infall.mod standard_start_infall.mod
 do_one inlist_convert_header converted.mod
 cp converted.mod standard_converted.mod
 
-do_one inlist_finish_core_collapse_header final.mod
+do_one inlist_finish_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
