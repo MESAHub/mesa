@@ -18,9 +18,9 @@ module skye_coulomb_liquid
    !! @param g ion degeneracy parameter
    !! @param F non-ideal free energy
    function classical_ocp_liquid_free_energy(g) result(F)
-      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: g
-      type(auto_diff_real_2var_order3_1var_order2) :: FA, FB
-      type(auto_diff_real_2var_order3_1var_order2) :: F
+      type(auto_diff_real_2var_order3), intent(in) :: g
+      type(auto_diff_real_2var_order3) :: FA, FB
+      type(auto_diff_real_2var_order3) :: F
 
       real(dp), parameter :: SQ32=sqrt(3d0) / 2d0
 
@@ -48,9 +48,9 @@ module skye_coulomb_liquid
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F non-ideal free energy
    function quantum_ocp_liquid_free_energy_correction(TPT) result(F)
-         type(auto_diff_real_2var_order3_1var_order2), intent(in) :: TPT
-         type(auto_diff_real_2var_order3_1var_order2) :: eta
-         type(auto_diff_real_2var_order3_1var_order2) :: F
+         type(auto_diff_real_2var_order3), intent(in) :: TPT
+         type(auto_diff_real_2var_order3) :: eta
+         type(auto_diff_real_2var_order3) :: F
 
          real(dp), parameter :: Q1 = 5.994d0
          real(dp), parameter :: Q2 = 70.3d0

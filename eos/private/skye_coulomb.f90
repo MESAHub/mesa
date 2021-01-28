@@ -244,26 +244,38 @@ module skye_coulomb
    !! The free energy is then just linear in temperature (F = F(boundary) - S(boundary) * (T - T(boundary))),
    !!
    !! @param LIQSOL Integer specifying the phase: 0 for liquid, 1 for solid
-   !! @param temp Temperature (K)
-   !! @param RS Electron density parameter
+   !! @param temp_in Temperature (K)
+   !! @param RS_in Electron density parameter
    !! @param Zion Charge of the species of interest in electron charges.
    !! @param CMI Mass of the species of interest in AMU. 
    !! @param F non-ideal free energy per ion per kT
-   function extrapolate_free_energy(LIQSOL, temp, RS, Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid) result(F)
+   function extrapolate_free_energy(LIQSOL, temp_in, RS_in, Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid) result(F_out)
       ! Inputs
       integer, intent(in) :: LIQSOL
-      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp, RS
+      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: temp_in, RS_in
       real(dp), intent(in) :: Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid
 
       ! Intermediates
       real(dp) :: COTPT, gamma_boundary
-      type(auto_diff_real_2var_order3_1var_order2) :: temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT
+      type(auto_diff_real_2var_order3) :: temp, RS, temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT, F
 
       real(dp), parameter :: AUM = amu / me
 
       ! Output
-      type(auto_diff_real_2var_order3_1var_order2) :: F
+      type(auto_diff_real_2var_order3_1var_order2) :: F_out
 
+      ! Copy over temp from full composition autodiff type to just (T,rho) type.
+      temp = temp_in%val
+      temp%d1val1 = 1d0
+
+      ! Copy over RS from full composition autodiff type to just (T,rho) type.
+      ! RS is only a function of density, so we only need to copy over the rho derivatives.
+      RS = RS_in%val
+      RS%d1val2 = RS_in%d1val2
+      RS%d2val2 = RS_in%d2val2
+      RS%d3val2 = RS_in%d3val2
+
+      ! Compute derived quantities
       GAMI = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
       COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
       TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
@@ -335,6 +347,17 @@ module skye_coulomb
          F = F + (1d0 - temp_boundary / temp) * dF_dlnT
       end if
 
+      F_out = F%val
+      F_out%d1val1 = F%d1val1
+      F_out%d1val2 = F%d1val2
+      F_out%d1val1_d1val2 = F%d1val1_d1val2
+      F_out%d2val1 = F%d2val1
+      F_out%d2val2 = F%d2val2
+      F_out%d3val1 = F%d3val1
+      F_out%d3val2 = F%d3val2
+      F_out%d2val1_d1val2 = F%d2val1_d1val2
+      F_out%d1val1_d2val2 = F%d1val1_d2val2
+
    end function extrapolate_free_energy
 
    !> Calculates the free energy of a one-component
@@ -349,10 +372,10 @@ module skye_coulomb
    function ocp_free_energy(LIQSOL,GAMI,TPT) result(F)
       ! Inputs
       integer, intent(in) :: LIQSOL
-      type(auto_diff_real_2var_order3_1var_order2), intent(in) :: GAMI, TPT
+      type(auto_diff_real_2var_order3), intent(in) :: GAMI, TPT
 
       ! Output
-      type(auto_diff_real_2var_order3_1var_order2) :: F
+      type(auto_diff_real_2var_order3) :: F
 
 
       ! i-e corrections (FSCR) ruin the phase transition at densities ~1d3 and below.
