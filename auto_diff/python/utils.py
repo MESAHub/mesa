@@ -48,7 +48,6 @@ def substitute_rational(expr):
 	# (wildcard matching).
 	expr = expr.xreplace(dict({old:new for old,new in zip(*(to_sub,new_ex))}))
 
-
 	return expr
 
 def substitute_dp(expr):
