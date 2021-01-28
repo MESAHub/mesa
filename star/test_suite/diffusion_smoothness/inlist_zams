@@ -55,7 +55,6 @@
       
       
       num_cells_for_smooth_brunt_B = 0
-      !use_brunt_gradmuX_form = .true.
       
       photo_interval = 50
       profile_interval = 100

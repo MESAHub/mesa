@@ -7502,18 +7502,6 @@
     threshold_for_smooth_brunt_B = 0d0
 
 
-      ! use_brunt_gradmuX_form
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! For comparison to older codes.
-      ! Assumes ideal gas plus radiation for ``brunt_B``.
-      ! Uses hydrogen mass fraction to estimate dlnmu = dX/(X + 0.6).
-
-      ! ::
-
-    use_brunt_gradmuX_form = .false.
-
-
       ! min_magnitude_brunt_B
       ! ~~~~~~~~~~~~~~~~~~~~~
 
