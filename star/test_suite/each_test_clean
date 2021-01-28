@@ -1,18 +1,10 @@
 #!/bin/bash
 
-function check_okay {
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
-}
-
 function do_one {
 id=$((id+1))
 if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
-    cd $1
-    check_okay
-    echo "clean" $1
+    cd "$1" || return
+    echo "clean $1"
 
     ./clean
     rm -f LOGS/*

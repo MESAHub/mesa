@@ -201,7 +201,7 @@ function do_one {
 
 id=$((id+1))
 if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
-    cd "$1" || exit
+    cd "$1" || return
     touch .running
 
     echo "---" > testhub.yml
