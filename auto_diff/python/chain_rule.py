@@ -117,16 +117,6 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 		if xval is not None:
 			d = d.subs(x_syms[0], 0)
 
-		d_before = d
-		d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
-		cost_before = weighted_count_ops(d_before, verbose=False)
-		cost_after = weighted_count_ops(d, verbose=False)
-		if cost_before != cost_after:
-			cost_before = weighted_count_ops(d_before, verbose=True)
-			cost_after = weighted_count_ops(d, verbose=True)
-			print('Cost before:', cost_before)
-			print('Cost after: ', cost_after)
-			print('')
 
 
 		expressions.append(d)
@@ -252,17 +242,6 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, f
 			d = d.subs(x_syms[0], xval)
 		if yval is not None:
 			d = d.subs(y_syms[0], yval)
-
-		d_before = d
-		d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
-		cost_before = weighted_count_ops(d_before, verbose=False)
-		cost_after = weighted_count_ops(d, verbose=False)
-		if cost_before != cost_after:
-			cost_before = weighted_count_ops(d_before, verbose=True)
-			cost_after = weighted_count_ops(d, verbose=True)
-			print('Cost before:', cost_before)
-			print('Cost after: ', cost_after)
-			print('')
 
 
 		expressions.append(d)
