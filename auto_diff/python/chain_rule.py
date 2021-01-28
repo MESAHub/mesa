@@ -1,4 +1,4 @@
-from sympy import symbols, factorial, diff, DiracDelta, simplify, sign, Derivative
+from sympy import symbols, factorial, diff, DiracDelta, simplify, sign, Derivative, Subs
 from utils import wrap_element, fortran_substitutions, ddelta, zero_function, sgn
 from sympy.simplify.cse_main import cse
 from sympy.utilities.iterables import numbered_symbols
@@ -103,7 +103,8 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 	for p in partials:
 		# Beginning of Fortran line, for writing out the answer
 		unary_symbol_str = auto_diff_type.partial_str_in_instance('unary', p).replace(':','colon')
-		
+		print('-----------------',p)
+
 		# Construct partial derivative specified by orders
 		# of the power series, evaluated at (val1, val2, ...) = 0.
 		d = z
@@ -111,12 +112,24 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=
 			d = diff(d, indep, order)
 			d = d.replace(DiracDelta, zero_function) # Diract Delta is only non-zero in a set of measure zero, so we set it to zero.
 			d = d.replace(sign, sgn) # simplify can do weird things with sign, turning it into the piecewise operator. We want to avoid that so we redirect to a custom sgn function.
+			d = d.replace(Subs, zero_function) # Eliminates derivatives of the Dirac Delta and Sign, which are non-zero only at sets of measure zero.
 			d = d.replace(Derivative, zero_function) # Eliminates derivatives of the Dirac Delta and Sign, which are non-zero only at sets of measure zero.
 			d = d.subs(indep, 0)
 
 		if xval is not None:
 			d = d.subs(x_syms[0], 0)
 
+
+		d_before = d
+		#d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
+		cost_before = weighted_count_ops(d_before, verbose=False)
+		cost_after = weighted_count_ops(d, verbose=False)
+		if cost_before != cost_after:
+			cost_before = weighted_count_ops(d_before, verbose=True)
+			cost_after = weighted_count_ops(d, verbose=True)
+			print('Cost before:', cost_before)
+			print('Cost after: ', cost_after)
+			print('')
 
 
 		expressions.append(d)
@@ -226,22 +239,36 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, f
 	for p in partials:
 		# Beginning of Fortran line, for writing out the answer
 		binary_symbol_str = auto_diff_type.partial_str_in_instance('binary', p).replace(':','colon')
-		
+		print('-----------------',p)
+
 		# Construct partial derivative specified by orders
 		# of the power series, evaluated at (val1, val2, ...) = 0.
 		d = z
 
 		for order, indep in zip(*(p.orders, indep_syms)):
 			d = diff(d, indep, order)
-			d = d.replace(DiracDelta, zero_function) # Dirac Delta is only non-zero in a set of measure zero, so we set it to zero.
+			d = d.replace(DiracDelta, zero_function) # Diract Delta is only non-zero in a set of measure zero, so we set it to zero.
 			d = d.replace(sign, sgn) # simplify can do weird things with sign, turning it into the piecewise operator. We want to avoid that so we redirect to a custom sgn function.
+			d = d.replace(Subs, zero_function) # Eliminates derivatives of the Dirac Delta and Sign, which are non-zero only at sets of measure zero.
 			d = d.replace(Derivative, zero_function) # Eliminates derivatives of the Dirac Delta and Sign, which are non-zero only at sets of measure zero.
 			d = d.subs(indep, 0)
+
 
 		if xval is not None:
 			d = d.subs(x_syms[0], xval)
 		if yval is not None:
 			d = d.subs(y_syms[0], yval)
+
+		d_before = d
+		#d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
+		cost_before = weighted_count_ops(d_before, verbose=False)
+		cost_after = weighted_count_ops(d, verbose=False)
+		if cost_before != cost_after:
+			cost_before = weighted_count_ops(d_before, verbose=True)
+			cost_after = weighted_count_ops(d, verbose=True)
+			print('Cost before:', cost_before)
+			print('Cost after: ', cost_after)
+			print('')
 
 
 		expressions.append(d)

@@ -1318,7 +1318,7 @@ module auto_diff_real_2var_order2_module
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
       unary%d2val1 = q0*x%d2val1
-      unary%d1val1_d1val2 = q0*x%d1val1_d1val2 + x%d1val1*x%d1val2*Subs(0.0_dp, _xi_1, x%val)
+      unary%d1val1_d1val2 = q0*x%d1val1_d1val2
       unary%d2val2 = q0*x%d2val2
    end function abs_self
    
@@ -1894,8 +1894,6 @@ module auto_diff_real_2var_order2_module
       type(auto_diff_real_2var_order2), intent(in) :: x
       type(auto_diff_real_2var_order2), intent(in) :: y
       type(auto_diff_real_2var_order2) :: binary
-      real(dp) :: q5
-      real(dp) :: q4
       real(dp) :: q3
       real(dp) :: q2
       real(dp) :: q1
@@ -1903,14 +1901,12 @@ module auto_diff_real_2var_order2_module
       q0 = x%val - y%val
       q1 = sgn(q0)
       q2 = 0.5_dp*q1
-      q3 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1
-      q4 = x%d1val2 - y%d1val2
-      q5 = -0.5_dp*y%d1val1_d1val2 + 0.5_dp*x%d1val1_d1val2
+      q3 = -0.5_dp*y%d1val1_d1val2 + 0.5_dp*x%d1val1_d1val2
       binary%val = -0.5_dp*y%val + 0.5_dp*x%val + 0.5_dp*Abs(q0)
-      binary%d1val1 = q2*(x%d1val1 - y%d1val1) + q3
-      binary%d1val2 = -0.5_dp*y%d1val2 + 0.5_dp*x%d1val2 + q2*q4
+      binary%d1val1 = -0.5_dp*y%d1val1 + 0.5_dp*x%d1val1 + q2*(x%d1val1 - y%d1val1)
+      binary%d1val2 = -0.5_dp*y%d1val2 + 0.5_dp*x%d1val2 + q2*(x%d1val2 - y%d1val2)
       binary%d2val1 = -0.5_dp*y%d2val1 + 0.5_dp*x%d2val1 + q2*(x%d2val1 - y%d2val1)
-      binary%d1val1_d1val2 = q1*q5 + q3*q4*Subs(0.0_dp, _xi_1, q0) + q5
+      binary%d1val1_d1val2 = q1*q3 + q3
       binary%d2val2 = -0.5_dp*y%d2val2 + 0.5_dp*x%d2val2 + q2*(x%d2val2 - y%d2val2)
    end function dim_self
    
@@ -1936,7 +1932,7 @@ module auto_diff_real_2var_order2_module
       unary%d1val1 = q1*q2 + q1
       unary%d1val2 = q2*q3 + q3
       unary%d2val1 = q2*q4 + q4
-      unary%d1val1_d1val2 = q1*x%d1val2*Subs(0.0_dp, _xi_1, q0) + q2*q5 + q5
+      unary%d1val1_d1val2 = q2*q5 + q5
       unary%d2val2 = q2*q6 + q6
    end function dim_self_real
    
@@ -1962,7 +1958,7 @@ module auto_diff_real_2var_order2_module
       unary%d1val1 = q1*q2 - q1
       unary%d1val2 = q2*q3 - q3
       unary%d2val1 = q2*q4 - q4
-      unary%d1val1_d1val2 = q1*x%d1val2*Subs(0.0_dp, _xi_1, q0) + q2*q5 - q5
+      unary%d1val1_d1val2 = q2*q5 - q5
       unary%d2val2 = q2*q6 - q6
    end function dim_real_self
    
@@ -1990,7 +1986,7 @@ module auto_diff_real_2var_order2_module
       unary%d1val1 = q1*q2 + q1
       unary%d1val2 = q2*q3 + q3
       unary%d2val1 = q2*q4 + q4
-      unary%d1val1_d1val2 = q1*x%d1val2*Subs(0.0_dp, _xi_1, q0) + q2*q5 + q5
+      unary%d1val1_d1val2 = q2*q5 + q5
       unary%d2val2 = q2*q6 + q6
    end function dim_self_int
    
@@ -2018,7 +2014,7 @@ module auto_diff_real_2var_order2_module
       unary%d1val1 = q1*q2 - q1
       unary%d1val2 = q2*q3 - q3
       unary%d2val1 = q2*q4 - q4
-      unary%d1val1_d1val2 = q1*x%d1val2*Subs(0.0_dp, _xi_1, q0) + q2*q5 - q5
+      unary%d1val1_d1val2 = q2*q5 - q5
       unary%d2val2 = q2*q6 - q6
    end function dim_int_self
    
