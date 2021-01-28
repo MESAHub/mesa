@@ -42,6 +42,7 @@
    !dbg = .true.
    logT_lo = 7.5455
    logT_hi = 7.54559
+   mass_fraction_limit_for_PC = 1d-5
 / !end of eos namelist
 
 &kap
