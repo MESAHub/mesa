@@ -266,6 +266,7 @@ module skye
                AZION(relevant_species) = chem_isos% Z(chem_id(j))
                ACMI(relevant_species) = chem_isos% W(chem_id(j))
                select_xa(relevant_species) = xa(j)
+               lookup(j) = relevant_species
                norm = norm + xa(j)
             end if
          end do
