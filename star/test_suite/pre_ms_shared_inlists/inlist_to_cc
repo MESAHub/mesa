@@ -1,6 +1,7 @@
 
 
 &star_job
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       saved_model_name = 'lgTmax.mod'

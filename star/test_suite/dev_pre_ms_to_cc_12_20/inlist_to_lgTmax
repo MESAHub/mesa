@@ -1,19 +1,23 @@
 
 
 &star_job
+    save_star_job_namelist = .true.
+    star_job_namelist_name = 'inlist_lgTmax_star_job.txt'
       
       !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
 &controls
+    save_controls_namelist = .true.
+    controls_namelist_name = 'inlist_lgTmax_controls.txt'
 
 ! timesteps
 
-!>       delta_lgT_max_limit = 0.02     
-!>       delta_lgT_max_hard_limit = 0.2
-!> 
-!>       dX_nuc_drop_limit = -1
+       delta_lgT_max_limit = 0.02     
+       delta_lgT_max_hard_limit = 0.2
+ 
+       dX_nuc_drop_limit = -1
 
 / ! end of controls namelist
 
