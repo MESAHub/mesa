@@ -980,13 +980,13 @@
          real(dp) :: vol00, volp1, cell_vol
          integer :: k, nz
          include 'formats'
-         vol00 = (4*pi/3)*s% R_center*s% R_center*s% R_center
+         vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
          nz = s% nz
          do k=nz, 1, -1
             volp1 = vol00
             cell_vol = s% dm(k)/s% rho(k)
             vol00 = volp1 + cell_vol
-            s% lnR(k) = log(vol00/(4*pi/3))/3
+            s% lnR(k) = log(vol00/four_thirds_pi)/3
             dx(s% i_lnR,k) = s% lnR(k) - xh_start(s% i_lnR,k)
             if (k >= s% k_below_just_added) &
                s% dlnR_dt(k) = &

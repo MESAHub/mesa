@@ -1170,7 +1170,7 @@
             if (k > nzlo) then
                T_face(k) = alfa_face(k)*T(k) + (1d0-alfa_face(k))*T(k-1)
                rho_face(k) = alfa_face(k)*rho(k) + (1d0-alfa_face(k))*rho(k-1)
-               four_pi_r2_rho_face(k) = 4*pi*r_face(k)*r_face(k)*rho_face(k)
+               four_pi_r2_rho_face(k) = pi4*r_face(k)*r_face(k)*rho_face(k)
                dlnP_dr_face(k) = four_pi_r2_rho_face(k)*dlnP_dm_face(k)
                dlnT_dr_face(k) = four_pi_r2_rho_face(k)*dlnT_dm_face(k)
                dlnRho_dr_face(k) = four_pi_r2_rho_face(k)*dlnRho_dm_face(k)
@@ -1378,7 +1378,7 @@
 
          logT = log10(T)
          logRho = log10(rho)
-         flux = L/(4*pi*r*r)
+         flux = L/(pi4*r*r)
 
          if (dbg) write(*,*) 'call op_mono_get_radacc'
          call op_mono_get_radacc( &

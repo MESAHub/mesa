@@ -1582,7 +1582,7 @@
                write(*,2) 's% Fr(1)', s% model_number, s% Fr(1)
                write(*,2) 's% Lc(1)', s% model_number, s% Lc(1)
                write(*,2) 's% Lt(1)', s% model_number, s% Lt(1)
-               write(*,2) 'sum L', s% model_number, s% Fr(1)*4d0*pi*s% r(1)*s% r(1)+s% Lc(1)+s% Lt(1)
+               write(*,2) 'sum L', s% model_number, s% Fr(1)*pi4*s% r(1)*s% r(1)+s% Lc(1)+s% Lt(1)
                okay_energy_conservation = .false.
                stop 'okay_energy_conservation'
                return
@@ -1700,7 +1700,7 @@
                tau_gamma_sum = 0
                do k=k1,1,-1 ! move eps_nuc outward from k1 to extra_heat at k
                   tau_gamma_sum = tau_gamma_sum + &
-                     kap_gamma*s% dm(k)/(4*pi*s% rmid(k)*s% rmid(k))
+                     kap_gamma*s% dm(k)/(pi4*s% rmid(k)*s% rmid(k))
                   if (tau_gamma_sum >= s% dtau_gamma_NiCo_decay_heat) then
                      s% extra_heat(k) = s% extra_heat(k) + &
                         s% eps_nuc(k1)*s% dm(k1)/s% dm(k)

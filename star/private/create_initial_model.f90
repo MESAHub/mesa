@@ -318,8 +318,8 @@
          ! compute first point off center
          r1 = 1.d-2 * R_try * min(0.1d0,eps)
 
-         m1=4.d0*pi/3.d0 * rhoc * r1*r1*r1
-         P=Pc-2.d0*pi/3.d0 * G*rhoc*rhoc*r1*r1
+         m1 = four_thirds_pi * rhoc * r1*r1*r1
+         P = Pc - two_thirds*pi * G*rhoc*rhoc*r1*r1
          intdmT1=m1*Tc
          y=(/r1,m1,intdmT1/)
          call get_TRho_from_PS(cs,P,S,T,rho)
@@ -396,7 +396,7 @@
          cs% mass = cs% mg(nz)
          cs% radius = cs% rg(nz)
          cs% Teff = cs% Tg(nz)
-         cs% luminosity = 4.d0*pi*pow2(cs% radius)*boltz_sigma*pow4(cs% Teff)
+         cs% luminosity = pi4*pow2(cs% radius)*boltz_sigma*pow4(cs% Teff)
          do k=1,nz
             cs% Lg(k)=cs% luminosity*cs% intdmTg(k)/cs% intdmTg(nz)
          end do
@@ -427,7 +427,7 @@
          call get_TRho_from_PS(cs,P,S,T,rho)
          !write(*,"(a24,10(2x,es15.8))") "S*mp/kb,lgPc,lgTc,rhoc=",S*mp/boltzm,log10(P),log10(T),rho
          dydP(1)=-r*r/(G*m*rho)
-         dydP(2)=-4.d0*pi*r*r*r*r/(G*m)
+         dydP(2)=-pi4*r*r*r*r/(G*m)
          dydP(3)=dydP(2)*T
 
       end subroutine

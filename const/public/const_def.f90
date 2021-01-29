@@ -62,6 +62,7 @@
       real(dp), parameter :: four_thirds = 4d0/3d0
       real(dp), parameter :: five_thirds = 5d0/3d0
       real(dp), parameter :: one_sixth = 1d0/6d0
+      real(dp), parameter :: four_thirds_pi = four_thirds*pi
       real(dp), parameter :: ln4pi3 = 1.4324119583011810d0 ! = log(4*pi/3)
       real(dp), parameter :: two_13 = 1.2599210498948730d0 ! = pow(2d0,1d0/3d0)
       real(dp), parameter :: four_13 = 1.5874010519681994d0 ! = pow(4d0,1d0/3d0)

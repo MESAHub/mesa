@@ -61,11 +61,11 @@
          logRho_hi = rq% logRho1_PC_limit ! okay for pure PC for logRho > this
          
          if (rq% PC_use_Gamma_limit_instead_of_T) then
-            !gamma_e = (qe**2)*((4.0d0/3.0d0)*pi*avo*Rho*zbar/abar)**one_third/(kerg*T)
+            !gamma_e = (qe**2)*(four_thirds_pi*avo*Rho*zbar/abar)**one_third/(kerg*T)
             !logGe = logGe0 + logRho/3 - logT
-            ! where Ge0 = (qe**2)*((4.0d0/3.0d0)*pi*avo*zbar/abar)**one_third/kerg
+            ! where Ge0 = (qe**2)*(four_thirds_pi*avo*zbar/abar)**one_third/kerg
             logGe0 = log10( & 
-                 qe*qe*pow((4.0d0/3.0d0)*pi*avo*zbar/abar,(1d0/3d0))/kerg)
+                 qe*qe*pow(four_thirds_pi*avo*zbar/abar, one_third)/kerg)
             logGe = logGe0 + logRho/3 - logT
             logGe_lo = rq% log_Gamma_e_all_HELM ! HELM for logGe <= this
             logGe_hi = rq% log_Gamma_e_all_PC ! PC for logGe >= this

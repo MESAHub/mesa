@@ -157,7 +157,7 @@
          dntotdd = 1d0/(amu*abar)
    
          ! ion and electron sphere radii (itoh 1979 eq 1-3)
-         !a_e = pow((3.d0 /(4.d0 * pi * zbar * ntot)),x13)
+         !a_e = pow((3.d0 /(pi4 * zbar * ntot)),x13)
          a_e = sc% a_e
 
          a_1 = a_e * z13(int(z1)) !pow(z1,x13)
@@ -178,7 +178,7 @@
    
          ! plasma frequency and temperature (chugunov 2007 eq 2)
    
-         wp = sqrt((4.d0 * pi * z1z2 * qe * qe * ntot/mav))
+         wp = sqrt((pi4 * z1z2 * qe * qe * ntot/mav))
          dwpdd = x12 * wp/rho
          
          tp = hbar*wp/kerg
@@ -218,10 +218,10 @@
          end if
          
          ! zeta (chugunov 2007 eq 3)
-         U = (4.d0 * tp * tp)/(3.d0 * pi * pi * tk * tk)
+         U = four_thirds*(tp * tp)/(pi2 * tk * tk)
          zeta = pow(U,x13)
          dzetadt = -x23 * (zeta/tk) * dtkdt 
-         dzetadd =  x13 * (zeta/U) * (4.d0/(3.d0*pi*pi)) * 2.d0 * denom
+         dzetadd =  x13 * (zeta/U) * (four_thirds/pi2) * 2.d0 * denom
 
          ! coulomb coupling parameter gamma (itoh 1979 eq 4)
          gam = z1z2 * qe * qe/(a_av * tk * kerg)

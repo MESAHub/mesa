@@ -1067,7 +1067,7 @@
          if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
 
          if (Lmid > 0d0) then
-            T_black_body = pow(Lmid/(4*pi*rmid*rmid*boltz_sigma), 0.25d0)
+            T_black_body = pow(Lmid/(pi4*rmid*rmid*boltz_sigma), 0.25d0)
             s% Tsurf_factor = T/T_black_body
          else
             s% Tsurf_factor = 1d0
