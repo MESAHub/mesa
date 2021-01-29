@@ -367,7 +367,7 @@ contains
 
        endif
 
-       rho_face = dm/(4d0*pi*r*r*r*dlnr)
+       rho_face = dm/(pi4*r*r*r*dlnr)
 
     endif
 

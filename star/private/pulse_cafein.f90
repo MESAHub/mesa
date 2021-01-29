@@ -379,14 +379,14 @@ contains
         V = rho*g*r/P
         V_g = V/Gamma_1
         As = N2*r/g
-        U = 4d0*pi*rho*r**3/m
+        U = pi4*rho*r**3/m
 
         l_rad(j) = l
 
         c_1 = (r/R_star)**3*(M_star/m)
         c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
         c_3 = 0d0
-        c_4 = 4d0*pi*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
+        c_4 = pi4*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
 
       end associate
 
@@ -501,14 +501,14 @@ contains
         V = rho*g*r/P
         V_g = V/Gamma_1
         As = N2*r/g
-        U = 4d0*pi*rho*r**3/m
+        U = pi4*rho*r**3/m
 
         l_rad(j) = 16d0*pi*r*crad*clight*T**4*nabla*V/(3d0*kap*rho)
 
         c_1 = (r/R_star)**3*(M_star/m)
         c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
-        c_3 = 4d0*pi*r**3*rho*eps/l_rad(j)
-        c_4 = 4d0*pi*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
+        c_3 = pi4*r**3*rho*eps/l_rad(j)
+        c_4 = pi4*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
         
       end associate
 
@@ -625,7 +625,7 @@ contains
 
         cgrav = eval_center(s%r, s%cgrav, 1, s%nz)
 
-        c_1 = 3d0*(M_star/R_star**3)/(4d0*pi*rho)
+        c_1 = 3d0*(M_star/R_star**3)/(pi4*rho)
         c_2 = 0d0
         c_3 = 9d0*eps*kap*P/(16*pi*crad*clight*T**4*nabla*cgrav)
         c_4 = 9d0*T*c_P*kap*P/(16*pi*crad*clight*T**4*nabla*cgrav)*SQRT(s%cgrav(s%nz)*M_star/R_star**3)

@@ -159,14 +159,14 @@
          call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
 
 
-         vol00 = (4*pi/3)*s% R_center*s% R_center*s% R_center
+         vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
          do j=nz,1,-1
 
             volp1 = vol00
             cell_vol = s% dm(j)/s% rho(j)
             vol00 = volp1 + cell_vol
 
-            r_new = exp(log(vol00/(4*pi/3))/3)
+            r_new = exp(log(vol00/four_thirds_pi)*one_third)
 
             s%r(j) = r_new
             s%R2(j) = pow2(r_new)
@@ -1369,8 +1369,8 @@
             else
                rm13 = exp(3*s% lnR_for_d_dt_const_m(k-1))
             end if
-            ri = pow((r003 + rp13)/2,1d0/3d0)
-            ro = pow((r003 + rm13)/2,1d0/3d0)
+            ri = pow((r003 + rp13)/2,one_third)
+            ro = pow((r003 + rm13)/2,one_third)
             call eval_i_rot(s, k, ri, r00, ro, 0d0,&
                s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
          end if

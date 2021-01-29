@@ -1034,7 +1034,7 @@
                   else
                      frac = s% cz_bdy_dq(k-1)/s% dq(k-1)
                      val = (1d0 - frac)*pow3(s% r(k-1)) + frac*pow3(s% r(k))
-                     val = pow(val,1d0/3d0)/s% r(1)
+                     val = pow(val,one_third)/s% r(1)
                   end if
                end if
             else if (c > mixing_offset) then
@@ -1972,7 +1972,7 @@
 
             case(h_v_wind_Km_per_s)
                val = 1d-5*s% opacity(1)*max(0d0,-s% mstar_dot)/ &
-                        (4*pi*s% photosphere_r*Rsun*s% tau_base)
+                        (pi4*s% photosphere_r*Rsun*s% tau_base)
 
             case (h_kh_mdot_limit)
                if(s% rotation_flag) then
@@ -2312,7 +2312,7 @@
                val = s% max_abs_v_eps_nuc
             case(h_max_abs_v_E0) ! 4/3 pi R^3 crad T^4
                val = s% max_abs_v_radius*Rsun
-               val = 4*pi/3*val*val*val*crad*exp10(4*s% max_abs_v_lgT)
+               val = four_thirds_pi*val*val*val*crad*exp10(4*s% max_abs_v_lgT)
                
             case(h_total_ni_co_56)
                if (s% net_iso(ico56) > 0 .and. s% net_iso(ini56) > 0) &
@@ -2552,7 +2552,7 @@
             case(h_cz_log_column_depth)
                if (s% largest_conv_mixing_region /= 0) then
                   k = s% mixing_region_bottom(s% largest_conv_mixing_region)
-                  val = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(4*pi*s% r(k)*s% r(k)))
+                  val = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
                end if
             case(h_cz_log_radial_depth)
                if (s% largest_conv_mixing_region /= 0) then
@@ -2678,7 +2678,7 @@
             case(h_cz_top_log_column_depth)
                if (s% largest_conv_mixing_region /= 0) then
                   k = s% mixing_region_top(s% largest_conv_mixing_region)
-                  val = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(4*pi*s% r(k)*s% r(k)))
+                  val = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
                end if
             case(h_cz_top_log_radial_depth)
                if (s% largest_conv_mixing_region /= 0) then
@@ -3277,7 +3277,7 @@
 
         y = j - 2 ! value at r = 0
         do k = s% nz, 1, -1
-           fprmid3 = 4d0 * pi * pow(s% rmid(k), 3)
+           fprmid3 = pi4 * pow(s% rmid(k), 3)
            rho_bar = 3d0 * s% m(k) / fprmid3
            if (k == s% nz) then
               dr_div_r = s% r(k) / s% rmid(k) ! r(nz+1) would be zero

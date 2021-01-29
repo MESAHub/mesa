@@ -188,7 +188,7 @@
                   cv_face = star_interp_val_to_pt(s% cv,k,nz,s% dq,"binary_tides")
                   T_face = star_interp_val_to_pt(s% T,k,nz,s% dq,"binary_tides")
                   csound_face = star_interp_val_to_pt(s% csound,k,nz,s% dq,"binary_tides")
-                  tkh = 4*pi*s% r(k)*s% r(k)*rho_face*cv_face*T_face/s% L(k) ! (4.4)
+                  tkh = pi4*s% r(k)*s% r(k)*rho_face*cv_face*T_face/s% L(k) ! (4.4)
                   tdyn = 1/csound_face
                   tdyn_div_tkh(k) = tdyn/tkh
                end do

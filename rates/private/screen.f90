@@ -105,7 +105,7 @@
          
          ! ion and electron sphere radii (itoh 1979 eq 1-3)
          sc% ntot  = den / (amu*abar)
-         sc% a_e = pow((3.d0 /(4.d0 * pi * zbar * sc% ntot)),x13)
+         sc% a_e = pow((3.d0 /(pi4 * zbar * sc% ntot)),x13)
       
       end subroutine do_screen_set_context
 

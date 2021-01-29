@@ -204,9 +204,9 @@
                      do k = 1, nz
                         q = s% omega_shear(k)
                         s% dynamo_B_r(k) = & ! eqn 11, Heger et al. 2005
-                           pow(pow2(4D0*pi*rho(k)*s% nu_ST(k)*q/r(k))*abs(omega(k))*s% nu_ST(k),0.25D0)
+                           pow(pow2(pi4*rho(k)*s% nu_ST(k)*q/r(k))*abs(omega(k))*s% nu_ST(k),0.25D0)
                         s% dynamo_B_phi(k) = & ! eqn 12, Heger et al. 2005
-                           pow(pow2(4D0*pi*rho(k)*omega(k)*q*r(k))*abs(omega(k))*s% nu_ST(k),0.25d0)
+                           pow(pow2(pi4*rho(k)*omega(k)*q*r(k))*abs(omega(k))*s% nu_ST(k),0.25d0)
                      end do
 
                      if (s% skip_rotation_in_convection_zones) &
@@ -790,7 +790,7 @@
             ! dynamic viscosity
             do i=1,nz
                rho6 = rho(i)*1d-6
-               gamma = 0.2275d0*zbar(i)*zbar(i)*pow(rho6/abar(i),1d0/3d0)*1.d8/T(i)
+               gamma = 0.2275d0*zbar(i)*zbar(i)*pow(rho6/abar(i),one_third)*1.d8/T(i)
                   ! gamma => eq (5) of Itoh et al 1987 ApJ 317,733
                ! electron viscosity according to Nandkumar & Pethick 1984 MNRAS
                mu_e = abar(i)/zbar(i)
@@ -804,7 +804,7 @@
                ctmp = -0.016321227d0+1.0198850d0*pow(gamma,-1.9217970d0) + &
                        0.024113535d0*pow(gamma,0.49999098d0)
                ! dynamic shear viscosity
-               dynvisc = 5.53d3*zbar(i)*pow(rho6,5d0/6d0)*ctmp/pow(abar(i),1d0/3d0)
+               dynvisc = 5.53d3*zbar(i)*pow(rho6,5d0/6d0)*ctmp/pow(abar(i),one_third)
                ! add contibution of radiation
                dynvisc = dynvisc + 4.D0*crad*pow4(T(i))/(15.D0*clight*opacity(i)*rho(i))
                ! add contibution of electrons
@@ -820,7 +820,7 @@
                   ! so bullet proof by including lower bounds
                   bracket_term = &
                      2*r(i)*r(i)*(eps_nuc(i)/max(1d-3*Lsun,abs(L(i))) - 1/max(1d-3*Msun,m(i))) - &
-                     3/(4*pi*rho(i)*max(1d-3*Rsun,r(i)))
+                     3/(pi4*rho(i)*max(1d-3*Rsun,r(i)))
                   if (abs(gradT_sub_grada(i)) < 1d-50) then
                      ve0(i) = 1d99
                      ve_mu(i) = 1d99
@@ -1327,7 +1327,7 @@
 
             xkap = 16d0*boltz_sigma*T(k)*T(k)*T(k)/ &
                      (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
-            xgamma = 0.2275d0*zbar(k)*zbar(k)*pow(rho(k)*1.d-6/abar(k),1d0/3d0)*1.d8/T(k)
+            xgamma = 0.2275d0*zbar(k)*zbar(k)*pow(rho(k)*1.d-6/abar(k),one_third)*1.d8/T(k)
             xlg = log10(xgamma)
             if (xlg < -1.5d0) then
                xsig1 = sige1(zbar(k),T(k),xgamma)
@@ -1363,7 +1363,7 @@
             xmagdn = rho(k)
             xmagtn = T(k)
             xmagrn = r(k)
-            xmag4pd = sqrt(4*pi*xmagdn)
+            xmag4pd = sqrt(pi4*xmagdn)
 
             dlnomega_dlnr = &
                (omega(k-1) - omega(k+1))/(r(k-1) - r(k+1))*(r(k)/omega(k))
@@ -1483,9 +1483,9 @@
             !..... that l_mix = H_p.
             if ((xmagnt .LE. 0.D0) .AND. (xmagnmu .GT. 0.D0) .AND. (xmagn .GT. 0.D0)) &
                xmagnu = &
-                  sqrt(xmagnu*scale_height(k)*(1.d0/3.d0)* &
+                  sqrt(xmagnu*scale_height(k)*(one_third)* &
                   pow(grav(k)*delta(k)*scale_height(k)*MAX(0.D0,L(k))/ &
-                         (64.D0*pi*xmagdn*Cp(k)*xmagtn*xmagrn*xmagrn),1.d0/3.d0))
+                         (64.D0*pi*xmagdn*Cp(k)*xmagtn*xmagrn*xmagrn),one_third))
 
             s% D_ST(k) = min(xmagdif,xmagnu)*xmagfdif
             s% nu_ST(k) = xmagnu*xmagfnu
@@ -1558,7 +1558,7 @@
          xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
          etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
          etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
-         sige1 = clight*clight/(4d0*pi*etan)                    ! sigma = c^2/(4pi*eta)
+         sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
       end function sige1
 
 
