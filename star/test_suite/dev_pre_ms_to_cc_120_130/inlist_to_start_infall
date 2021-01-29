@@ -1,8 +1,6 @@
 
 
 &star_job
-    save_star_job_namelist = .true.
-    star_job_namelist_name = 'start_infall_star_job.txt'
 
       load_saved_model = .true.
       saved_model_name = 'after_core_c_burn.mod'
@@ -29,8 +27,6 @@
 / ! end of kap namelist
 
 &controls
-    save_controls_namelist = .true.
-    controls_namelist_name = 'start_infall_controls.txt'
 
       xa_central_lower_limit_species(1) = 'o16'
       xa_central_lower_limit(1) = 1d-2

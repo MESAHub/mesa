@@ -1,12 +1,68 @@
 
 &star_job
+      show_log_description_at_start = .false.
    
+      load_saved_model = .true.
       saved_model_name = 'start_infall.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'converted.mod'
+      required_termination_code_string = 'max_model_number'
 
       !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
 
 &controls
+   
+      ! limit max_model_number as part of test_suite
+      max_model_number = 200
+      !max_number_retries = 0
+
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! mlt
+
+! mixing
+      
+! timesteps
+      max_timestep_factor = 1.01d0
+      max_timestep = 1d2
+
+! mesh
+
+! solver
+      
+! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+
+! output
+
+      !photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+
 / ! end of controls namelist
+
+&pgstar
+
+
+
+!pause = .true.
+Profile_Panels3_xmin = 0 ! -101d0
+Profile_Panels3_xmax = -101d0
+
+
+/ ! end of pgstar namelist
