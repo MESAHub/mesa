@@ -54,6 +54,4 @@
       extra_pgstar_inlist2_name = '../pre_ms_shared_inlists/inlist_common_converted'
       read_extra_pgstar_inlist3 = .true.
       extra_pgstar_inlist3_name = '../pre_ms_shared_inlists/inlist_convert'
-      read_extra_pgstar_inlist4 = .true.
-      extra_pgstar_inlist4_name = 'inlist_convert'
 / ! end of pgstar namelist

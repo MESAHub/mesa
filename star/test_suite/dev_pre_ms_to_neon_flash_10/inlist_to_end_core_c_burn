@@ -4,17 +4,24 @@
 
       saved_model_name = 'after_core_he_burn.mod'
 
+      required_termination_code_string = 'star_species_mass_max_limit'
+
       !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
 &controls
 
-      xa_central_lower_limit(1) = 0.01
+      star_species_mass_max_limit = 0.55d0
+      star_species_mass_max_limit_iso = 'ne20'
+
+      xa_central_lower_limit_species(1) = ''
 
 / ! end of controls namelist
 
 
 &pgstar
+
+Text_Summary1_name(1,2) = 'total_mass ne20'
 
 / ! end of pgstar namelist
