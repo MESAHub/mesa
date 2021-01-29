@@ -500,7 +500,7 @@
             d_v_div_r = v_00/r_00
          end if
          Chi = (16d0/3d0)*pi*alpha*alpha_m*w_rho2*r6_cell*h_00*d_v_div_r/dm_00         
-         epsilon_q = 4d0*pi*Chi*d_v_div_r/dm_00
+         epsilon_q = pi4*Chi*d_v_div_r/dm_00
 
          s% Eq(k) = epsilon_q%val
 
@@ -906,7 +906,7 @@
             d_v_div_r_m1 = v_m1/r_m1 - v_00/r_00
             Chi_m1 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_m1*r6_cell_m1*h_m1*d_v_div_r_m1/dm_m1         
          
-            Uq = 4d0*pi*(Chi_m1 - Chi_00)/(s% dm_bar(k)*r_00)
+            Uq = pi4*(Chi_m1 - Chi_00)/(s% dm_bar(k)*r_00)
          
          if (.false.) then
             
@@ -1138,7 +1138,7 @@
          QQ_div_Cp_face = 0.5d0*(QQ_m1/Cp_m1 + QQ_00/Cp_00)
          Y1 = QQ_div_Cp_face*(P_m1 - P_00) - (lnT_m1 - lnT_00)
          avg_Vol = 0.5d0*(1d0/d_00 + 1d0/d_m1)
-         area = 4d0*pi*r_00**2
+         area = pi4*r_00**2
          Y2 = area*Hp_face/(avg_Vol*dm_bar)
          Y_face = Y1*Y2
          
@@ -1475,7 +1475,7 @@
          do k=2, nz
             dm_bar = s% dm_bar(k)
             r_00 = wrap_r_00(s,k)
-            area = 4d0*pi*r_00**2
+            area = pi4*r_00**2
             T_m1 = wrap_T_m1(s,k)
             T_00 = wrap_T_00(s,k)
             kap_m1 = wrap_kap_m1(s,k)

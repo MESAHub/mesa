@@ -31,7 +31,7 @@
          use astero_def, only: store_new_oscillation_results, &
             el, order, em, cyclic_freq, inertia, num_results
          use adipls_support, only: adipls_mode_info
-         use const_def, only: dp, pi
+         use const_def, only: dp, pi4
          use utils_lib, only: mesa_error
 
          implicit none
@@ -56,7 +56,7 @@
          new_el = int(obs_st(1,nobs_st) + 0.5_dp)
          new_order = int(obs_st(2,nobs_st) + 0.5_dp)
          new_em = csummm(38)
-         new_inertia = obs_st(4,nobs_st)*4._dp*pi
+         new_inertia = obs_st(4,nobs_st)*pi4
          new_cyclic_freq = obs_st(3,nobs_st)
          
          call store_new_oscillation_results( &

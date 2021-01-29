@@ -461,10 +461,10 @@
          else
             ! eg., eq. (9) of Podsiadlowski, Rappaport & Han 2003, MNRAS, 341, 385
             if (.not. b% use_es_opacity_for_mdot_edd) then
-               mdot_edd = 4d0*pi*standard_cgrav*b% m(b% a_i) &
+               mdot_edd = pi4*standard_cgrav*b% m(b% a_i) &
                   /(clight*b% s_donor% opacity(1)*mdot_edd_eta)
             else
-               mdot_edd = 4d0*pi*standard_cgrav*b% m(b% a_i)&
+               mdot_edd = pi4*standard_cgrav*b% m(b% a_i)&
                   /(clight*0.2d0*(1d0+b% s_donor% surface_h1)*mdot_edd_eta)
             end if
          end if

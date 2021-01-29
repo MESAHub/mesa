@@ -95,7 +95,7 @@
             return    
          end if
          r = s% r(k)
-         A = 4d0*pi*r*r
+         A = pi4*r*r
          Pface = s% P_face(k)
          momflux = A*Pface
          
@@ -142,7 +142,7 @@
          ierr = 0
          k = 1
          r = s% r(k)
-         A = 4d0*pi*r*r
+         A = pi4*r*r
          momflux = A*P_surf
          d_momflux_dlnR = momflux*(2 + dlnPsurf_dlnR)
          d_momflux_dL = momflux*dlnPsurf_dL
@@ -459,11 +459,11 @@
          if (k == nz) then 
             ! no flux in from left, so only have geometry source on right
             ! this matters for cases with R_center > 0.
-            geometry_source = 4*pi*P*rR*rR
+            geometry_source = pi4*P*rR*rR
             d_geom_source_dlnRR = 8*pi*P*rR*rR
             d_geom_source_dlnRL = 0
          else
-            geometry_source = 4*pi*P*(rR*rR - rL*rL)
+            geometry_source = pi4*P*(rR*rR - rL*rL)
             d_geom_source_dlnRR = 8*pi*P*rR*rR
             d_geom_source_dlnRL = -8*pi*P*rL*rL
          end if

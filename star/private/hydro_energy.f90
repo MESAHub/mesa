@@ -613,7 +613,7 @@
          if (k > s% nz .or. (s% dt <= 0d0 .and. .not. (s% v_flag .or. s% u_flag))) then
             work_18 = 0d0
             if (k == s% nz+1) then
-               work = 4*pi*s% r_center*s% r_center*s% P_start(s% nz)*s% v_center
+               work = pi4*s% r_center*s% r_center*s% P_start(s% nz)*s% v_center
                s% work_inward_at_center = work
             end if
             work_18%val = work
@@ -623,8 +623,8 @@
          end if
          
          A_18 = 0d0
-         A_18%val = 4d0*pi*s% R2(k)
-         A_18%d1Array(i_lnR_00) = 4d0*pi*s% d_R2_dlnR(k)
+         A_18%val = pi4*s% R2(k)
+         A_18%d1Array(i_lnR_00) = pi4*s% d_R2_dlnR(k)
          A = A_18%val
 
          if (s% u_flag) then ! keep it simple for now.

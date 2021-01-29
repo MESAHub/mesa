@@ -676,7 +676,7 @@
             end if
 
             if (q <= s% q(nz)) then
-               volume_at_q = (q/s% q(nz))*(4*pi/3)*s% r(nz)*s% r(nz)*s% r(nz)
+               volume_at_q = (q/s% q(nz))*four_thirds_pi*s% r(nz)*s% r(nz)*s% r(nz)
                return
             end if
             k00 = 1
@@ -686,7 +686,7 @@
                end if
             end do
             if (k00 == 1) then
-               volume_at_q = (4*pi/3)*q*s% r(1)*s% r(1)*s% r(1)
+               volume_at_q = four_thirds_pi*q*s% r(1)*s% r(1)*s% r(1)
                write(*,1) 'volume_at_q', volume_at_q
                return
             end if
@@ -720,7 +720,7 @@
                return
             end if
 
-            volume_at_q = (4*pi/3)*v_new(1)
+            volume_at_q = four_thirds_pi*v_new(1)
 
          end function volume_at_q
 
@@ -1093,7 +1093,7 @@
             s% max_T_lgP_thin_shell = -1d99
          else
             s% max_T_lgP_thin_shell = &
-               log10(s% cgrav(k)*s% m(k)*(s% m(1)-s% m(k))/(4*pi*pow4(s% r(k))))
+               log10(s% cgrav(k)*s% m(k)*(s% m(1)-s% m(k))/(pi4*pow4(s% r(k))))
             if (s% v_flag) then
                do kk = 1, k
                   s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
@@ -1704,7 +1704,7 @@
          bdy_Y = interp3(s% Y(k-1), s% Y(k), s% Y(k+1))
 
          bdy_r = pow( &
-            interp2(s% r(k)*s% r(k)*s% r(k), s% r(k+1)*s% r(k+1)*s% r(k+1)),1d0/3d0)/Rsun
+            interp2(s% r(k)*s% r(k)*s% r(k), s% r(k+1)*s% r(k+1)*s% r(k+1)),one_third)/Rsun
          bdy_L = interp2(s% L(k), s% L(k+1))/Lsun
          bdy_g = interp2(s% grav(k), s% grav(k+1))
          bdy_scale_height = interp2(s% scale_height(k), s% scale_height(k+1))
