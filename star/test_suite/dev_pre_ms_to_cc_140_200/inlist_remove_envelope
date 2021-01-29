@@ -1,7 +1,11 @@
 
 &star_job
+    save_star_job_namelist = .true.
+    star_job_namelist_name = 'remove_envelope_star_job.txt'
    remove_initial_surface_at_he_core_boundary = 0.1d0 ! H abundance where cut
 / ! end of star_job namelist
 
 &controls
+    save_controls_namelist = .true.
+    controls_namelist_name = 'remove_envelope_controls.txt'
 / ! end of controls namelist

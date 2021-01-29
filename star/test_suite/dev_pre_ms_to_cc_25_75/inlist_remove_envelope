@@ -1,0 +1,8 @@
+
+&star_job
+      ! uncomment the following to remove H env
+      !remove_initial_surface_at_he_core_boundary = 0.1d0 ! H abundance where cut
+/ ! end of star_job namelist
+
+&controls
+/ ! end of controls namelist
