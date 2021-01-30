@@ -3,9 +3,6 @@
 ! so local inlist_common files show differences from what is used for that case.
 
 &star_job
-      read_extra_star_job_inlist1 = .true.
-      extra_star_job_inlist1_name = 'inlist_common'
-
       show_log_description_at_start = .false.
 
       change_initial_net = .true.
@@ -32,18 +29,12 @@
 
 / ! end of star_job namelist
 
-&eos
-      read_extra_eos_inlist1 = .true.
-      extra_eos_inlist1_name = 'inlist_common'
-      
+&eos      
       use_Skye = .true.
       use_PC = .false.
 / ! end of eos namelist
 
-&kap
-      read_extra_kap_inlist1 = .true.
-      extra_kap_inlist1_name = 'inlist_common'
-      
+&kap      
       kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
@@ -52,8 +43,6 @@
 / ! end of kap namelist
 
 &controls
-      read_extra_controls_inlist1 = .true.
-      extra_controls_inlist1_name = 'inlist_common'
 
 ! wind
       cool_wind_full_on_T = 0.8d4
