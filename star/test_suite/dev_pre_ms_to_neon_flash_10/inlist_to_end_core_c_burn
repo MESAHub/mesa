@@ -74,11 +74,11 @@
 &pgstar
 
 Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 
+Profile_Panels3_xmax = 4 ! -101d0 ! 
 
-TRho_Profile_xmin = 2.5
-TRho_Profile_xmax = 7.5
-TRho_Profile_ymin = 8.4
+TRho_Profile_xmin = 4
+TRho_Profile_xmax = 7.0
+TRho_Profile_ymin = 8.1
 TRho_Profile_ymax = 9.2
 
 Text_Summary1_name(1,2) = 'total_mass ne20'

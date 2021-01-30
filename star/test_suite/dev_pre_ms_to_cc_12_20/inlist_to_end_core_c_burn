@@ -7,7 +7,7 @@
       saved_model_name = 'after_core_he_burn.mod'
 
       save_model_when_terminate = .true.
-      save_model_name = 'after_core_c_burn.mod'
+      save_model_filename = 'after_core_c_burn.mod'
       required_termination_code_string = 'xa_central_lower_limit'
 
       set_initial_model_number = .false.

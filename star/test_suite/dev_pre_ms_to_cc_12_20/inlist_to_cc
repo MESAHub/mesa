@@ -4,7 +4,7 @@
       show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      save_model_filename = 'start_core_collapse.mod'
+      saved_model_name = 'lgTmax.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
