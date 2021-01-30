@@ -1,7 +1,7 @@
-do_one dev_pre_ms_to_neon_flash_10 "stop because ne20 total mass <= star_species_mass_min_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_25_75 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_80_200 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+do_one dev_pre_ms_to_neon_flash_10 "stop because ne20 total mass <= star_species_mass_min_limit" "final.mod" skip
 
 return
 
