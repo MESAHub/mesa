@@ -1,7 +1,4 @@
 
-! the contents of this are set to match the needs of pre_ms_to_cc_12_20
-! so local inlist_common files show differences from what is used for that case.
-
 &star_job
       show_log_description_at_start = .false.
 
@@ -29,12 +26,12 @@
 
 / ! end of star_job namelist
 
-&eos      
+&eos
       use_Skye = .true.
       use_PC = .false.
 / ! end of eos namelist
 
-&kap      
+&kap
       kap_file_prefix = 'a09'    ! 'gs98' 'a09'  'OP_a09' 'OP_gs98'
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
@@ -55,9 +52,7 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 4 
-      ! need this extra pressure to stabilize the atmosphere during core He burning
-
+      Pextra_factor = 4  
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
@@ -79,7 +74,6 @@
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       thermohaline_option = 'Kippenhahn'
-      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 
@@ -88,25 +82,17 @@
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
-
+  
 ! mixing
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
 
-      overshoot_scheme(1) = 'none'
-      overshoot_zone_type(1) = 'any'
-      overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
-
 ! timesteps
-      varcontrol_target   = 1d-3
-      min_timestep_factor = 0.8d0
-      max_timestep_factor = 1.05d0
-      timestep_factor_for_retries = 0.75
-      limit_for_rel_error_in_energy_conservation = 1d-7
-      hard_limit_for_rel_error_in_energy_conservation = 1d-6      
+      varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true
+      limit_for_rel_error_in_energy_conservation = 1d-7
+      hard_limit_for_rel_error_in_energy_conservation = 1d-6      
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
@@ -115,8 +101,8 @@
       delta_lgL_He_limit = 0.1
 
       delta_lgRho_cntr_limit = 0.03
-      delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1 
+      delta_lgRho_cntr_hard_limit = -1
+      delta_lgRho_limit = 0.1
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
       delta_lgT_cntr_limit = 0.002  
@@ -128,8 +114,8 @@
 
       dHe_div_He_limit = -1
 
-      dX_nuc_drop_limit = 2d-2
-      dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
+      dX_nuc_drop_limit = 5d-1 ! 2d-2
+      dX_nuc_drop_limit_at_high_T = -1
       dX_nuc_drop_min_X_limit = 1d-3
       dX_nuc_drop_max_A_limit = 52   
       dX_nuc_drop_hard_limit = 1d99
@@ -150,7 +136,7 @@
       delta_XO_cntr_hard_limit = -1
       delta_XSi_cntr_limit = -1
       delta_XSi_cntr_hard_limit = -1
-      
+
       delta_Ye_highT_limit = 1d-3
 
 ! mesh
@@ -158,7 +144,7 @@
       mesh_delta_coeff_for_highT = 1.5      
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
-      min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes
+      min_dq_for_xa = 1d-4 
 
 ! solver
       use_gold2_tolerances = .true.
@@ -213,8 +199,6 @@
       x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
-      terminal_show_log_dt = .false.
-
       photo_interval = 50
       profile_interval = 50
       history_interval = 10

@@ -7,7 +7,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'start_infall.mod'
-      required_termination_code_string = 'non_fe_core_infall_limit'
+      required_termination_code_string = 'xa_central_lower_limit'
 
       !set_initial_age = .false.
       set_initial_age = .true.
@@ -28,7 +28,8 @@
 
 &controls
 
-      non_fe_core_infall_limit = 100d5
+      xa_central_lower_limit_species(1) = 'o16'
+      xa_central_lower_limit(1) = 1d-2
 
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
@@ -50,11 +51,6 @@
 ! mixing
 
 ! timesteps
-      delta_lgT_cntr_limit = 0.05 
-      delta_lgT_cntr_hard_limit = 0.1
-
-      delta_lgT_max_limit = 0.05    
-      delta_lgT_max_hard_limit = 0.1
 
 ! mesh
 
@@ -75,10 +71,10 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 / ! end of controls namelist
 
@@ -92,10 +88,8 @@ Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax =  -101d0 ! 2.5 ! 
 Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
-Profile_Panels3_other_dymin(4) = 1
-
+!Profile_Panels3_yaxis_name(5) = 'avQ'
 Profile_Panels3_other_yaxis_name(5) = 'v_div_cs'
-Profile_Panels3_other_dymin(4) = 0.1
 
 TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 10

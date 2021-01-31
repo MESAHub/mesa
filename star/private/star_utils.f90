@@ -1656,6 +1656,28 @@
       end function total_times
 
       
+      real(dp) function get_ejecta_total_energy(s)
+         type (star_info), pointer :: s
+         real(dp) :: bound_mass, total_energy
+         integer :: k, kh1
+         bound_mass = get_bound_mass(s)
+         total_energy = 0d0
+         kh1 = 1
+         do k=1,s% nz
+            if (s% m(k) <= bound_mass) exit
+            kh1 = k
+         end do
+         if (kh1 == 1) return
+         get_ejecta_total_energy = eval_cell_section_total_energy(s, 1, kh1)
+      end function get_ejecta_total_energy
+
+      
+      real(dp) function get_ejecta_mass(s)
+         type (star_info), pointer :: s
+         get_ejecta_mass = s% m(1) - get_bound_mass(s)
+      end function get_ejecta_mass
+
+      
       real(dp) function get_bound_mass(s)
          type (star_info), pointer :: s
          integer :: k

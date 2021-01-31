@@ -38,7 +38,7 @@
       
 ! timesteps
       max_timestep_factor = 1.01d0
-      max_timestep = 1d0
+      max_timestep = 1d0 !    try smaller timesteps    1d2
 
 ! mesh
 
@@ -49,10 +49,10 @@
 
 ! output
 
-      photo_interval = 10
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
 / ! end of controls namelist
 
@@ -64,9 +64,5 @@
 Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax = -101d0
 
-Profile_Panels3_xaxis_name = 'zone'
-Profile_Panels3_xmin = -101d0 ! 0.0
-Profile_Panels3_xmax = -101d0 ! 2.2
-Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist

@@ -46,8 +46,39 @@
 
 ! solver
       use_gold2_tolerances = .false.
+      use_gold_tolerances = .true.
+      gold_tol_max_residual3 = 1d-4
+
+      always_use_dedt_form_of_energy_eqn = .true.       
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_d_eos_dxa = .true.
       
       use_momentum_outer_BC = .true.
+      
+      min_timestep_limit = 1d-12
+
+      convergence_ignore_equL_residuals = .true. 
+      make_gradr_sticky_in_solver_iters = .true.
+      
+      xa_scale = 1d-5
+      iter_for_resid_tol2 = 10
+      min_timestep_limit = 1d-12 ! (seconds)
+
+      warn_rates_for_high_temp = .true.
+      max_safe_logT_for_rates = 10.5d0
+
+      screening_mode = 'chugunov'
+
+      sig_min_factor_for_high_Tcenter = 0.01
+      Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+      Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+
+      op_split_burn = .true.
+      op_split_burn_min_T = 1d9
+      burn_steps_limit = 150
+      burn_steps_hard_limit = 250
+      op_split_burn_eps = 1d-5
+      op_split_burn_odescal = 1d-5
 
 ! output
 
@@ -103,7 +134,7 @@ Text_Summary1_name(3,1) = 'v_surf_div_escape_v'
 Text_Summary1_name(3,2) = 'log_cntr_Rho'
 Text_Summary1_name(3,3) = 'log_Teff'
 Text_Summary1_name(3,4) = 'C_cntr'
-Text_Summary1_name(3,5) = 'O_core'
+Text_Summary1_name(3,5) = 'CO_core'
 
 Text_Summary1_name(4,1) = 'non_fe_core_infall'
 Text_Summary1_name(4,2) = 'log_LH'

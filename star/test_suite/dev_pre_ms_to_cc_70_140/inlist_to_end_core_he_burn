@@ -2,8 +2,6 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
-
       load_saved_model = .true.
       saved_model_name = 'zams.mod'
       
@@ -26,6 +24,8 @@
       near_zams_relax_omega_div_omega_crit = .true.
       change_rotation_flag = .false.  ! rotation off until near zams
       num_steps_to_relax_rotation = 50
+
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 

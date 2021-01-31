@@ -36,7 +36,7 @@ Grid1_plot_col(:) =  1          ! number from 1 at left
 Grid1_plot_colspan(:) = 1       ! plot spans this number of columns
 Grid1_plot_pad_left(:) = 0.0    ! fraction of full window width for padding on left
 Grid1_plot_pad_right(:) = 0.0   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for padding at top
+Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for paddin g at top
 Grid1_plot_pad_bot(:) = 0.0     ! fraction of full window height for padding at bottom
 Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
 
@@ -329,7 +329,7 @@ Text_Summary1_name(3,1) = 'star_age'
 Text_Summary1_name(3,2) = 'log_L'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
-Text_Summary1_name(3,5) = 'C_core'
+Text_Summary1_name(3,5) = 'CO_core'
 
 Text_Summary1_name(4,1) = 'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'

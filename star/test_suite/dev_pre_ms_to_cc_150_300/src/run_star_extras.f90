@@ -32,9 +32,6 @@
       
       include "test_suite_extras_def.inc"
       
-      logical :: using_fixed_outer_BCs
-      real(dp) :: vsurf, Lsurf
-      
 !gyre
       !x_logical_ctrl(37) = .false. ! if true, then run GYRE
       !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
@@ -86,11 +83,6 @@
          alpha_other = s% x_ctrl(22)
          H_limit = s% x_ctrl(23)
          h1 = s% net_iso(ih1)
-         !write(*,1) 'alpha_H', alpha_H
-         !write(*,1) 'alpha_other', alpha_other
-         !write(*,1) 'H_limit', H_limit
-         !write(*,2) 'h1', h1
-         !write(*,2) 's% nz', s% nz
          if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
          do k=1,s% nz
             if (s% xa(h1,k) >= H_limit) then
@@ -98,7 +90,6 @@
             else
                s% alpha_mlt(k) = alpha_other
             end if
-            !write(*,2) 'alpha_mlt', k, s% alpha_mlt(k), 
          end do
          !stop
       end subroutine alpha_mlt_routine
@@ -116,11 +107,9 @@
          call test_suite_startup(s, restart, ierr)
          
          if (.not. restart) then
-            using_fixed_outer_BCs = .false.
             call alloc_extra_info(s)
          else ! it is a restart
             call unpack_extra_info(s)
-            if (using_fixed_outer_BCs) call set_outer_BCs(s)
          end if
          
          if (.not. s% x_logical_ctrl(37)) return
@@ -227,90 +216,8 @@
       integer function extras_start_step(id)
          integer, intent(in) :: id
          integer :: ierr
-         type (star_info), pointer :: s
-         integer :: k, k0, k_cut
-         real(dp) :: v_limit
-         real(dp),pointer, dimension(:) :: vel
-         include 'formats'
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
          extras_start_step = keep_going        
-         if (.not. s% x_logical_ctrl(20)) return 
-         if (s% r(1)/Rsun <= s% x_ctrl(19)) return
-         ! else R too large.  cut back to where v/v_esc < x_ctrl(18)
-         write(*,2) 'r(1)/Rsun too large', s% model_number, s% r(1)/Rsun, s% x_ctrl(19)
-         if (s% u_flag) then
-            vel => s% u
-         else if (s% v_flag) then
-            vel => s% v
-         else
-            write(*,*) 'extras_start_step: Must have either v_flag or u_flag enabled'
-            stop
-         end if
-         k0 = 0
-         do k = 1, s% nz
-            v_limit = s% x_ctrl(20)*sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
-            if (vel(k) >= v_limit) cycle
-            k0 = k
-            exit
-         end do
-         if (k0 <= 1) then
-            write(*,2) 'failed to find v/v_esc > limit', s% model_number, s% x_ctrl(20)
-            return
-         end if
-         
-         if (.true.) then 
-            k_cut = k0
-         else ! find place where L(k0) ~ L(1)
-            k_cut = 0
-            do k = k0, 2, -1
-               if (abs(s% L(k) - s% L(1)) < 0.1d0*s% L(1)) then
-                  k_cut = k
-                  exit
-               end if
-               write(*,2) '1 - L/Lsurf, L, Lsurf', k, 1d0 - s% L(k)/s% L(1), s% L(k)/Lsun, s% L(1)/Lsun
-            end do
-            if (k_cut <= 1) then
-               write(*,2) 'failed to find L ~ Lsurf where v/v_esc > limit', s% model_number, s% x_ctrl(20)
-               return
-            end if
-         end if
-         
-         vsurf = vel(k_cut)
-         Lsurf = s% L(k_cut)         
-         !write(*,2) 'remove surface', k_cut, s% m(k_cut)/Msun, s% q(k_cut)
-         call star_remove_surface_at_cell_k(s% id, k_cut, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'extras_start_step failed in star_remove_surface_at_cell_k'
-            write(*,2) 'at q', k_cut, s% q(k_cut)
-            extras_start_step = terminate
-            return
-         end if
-         if (s% u_flag) then
-            vel => s% u
-         else if (s% v_flag) then
-            vel => s% v
-         end if
-         write(*,1) 'new surface R M L v v/v_esc', &
-            s% r(1)/Rsun, s% m(1)/Msun, Lsurf/Lsun, vel(1)*1d-5, &
-            vel(1)/sqrt(2d0*s% cgrav(1)*s% m(1)/s% r(1))
-            
-         !using_fixed_outer_BCs = .true.
-         !call set_outer_BCs(s)
-         
-         extras_start_step = keep_going
       end function extras_start_step
-      
-      
-      subroutine set_outer_BCs(s)
-         type (star_info), pointer :: s
-         s% use_fixed_vsurf_outer_BC = .true.
-         s% fixed_vsurf = vsurf
-         s% use_T_black_body_outer_BC = .true.
-         s% use_fixed_L_for_BB_outer_BC = .true.
-         s% fixed_L_for_BB_outer_BC = Lsurf
-      end subroutine set_outer_BCs
    
       include 'gyre_in_mesa_extras_finish_step.inc'
 
@@ -375,12 +282,12 @@
          i = 0
          ! call move_int or move_flg
          !call move_int(vsurf_gt_cs_count)   
-         call move_flg(using_fixed_outer_BCs)
+         !call move_flg(using_fixed_outer_BCs)
          num_ints = i
          
          i = 0
-         call move_dbl(vsurf)   
-         call move_dbl(Lsurf)   
+         !call move_dbl(vsurf)   
+         !call move_dbl(Lsurf)   
          num_dbls = i
          
          if (op /= extra_info_alloc) return
