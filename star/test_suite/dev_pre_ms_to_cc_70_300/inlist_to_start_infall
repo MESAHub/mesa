@@ -8,6 +8,7 @@
       save_model_when_terminate = .true.
       save_model_filename = 'start_infall.mod'
       required_termination_code_string = 'xa_central_lower_limit'
+      !required_termination_code_string = 'non_fe_core_infall_limit' ! for 200M
 
       !set_initial_age = .false.
       set_initial_age = .true.
@@ -30,6 +31,9 @@
 
       xa_central_lower_limit_species(1) = 'o16'
       xa_central_lower_limit(1) = 1d-2
+
+      !non_fe_core_infall_limit = 100d5 ! for 200M
+      
 
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99

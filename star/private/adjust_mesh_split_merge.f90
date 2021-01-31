@@ -107,40 +107,24 @@
             s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
-            if (iTooSmall > 0 .and. TooSmall > MaxTooSmall) then
-               ! ratio of desired/actual is too large
-               if (s% trace_split_merge_amr) then
-                  write(*,4) 'do_merge TooSmall', &
-                     iTooSmall, s% nz, s% model_number, &
-                     TooSmall, MaxTooSmall, s% dq(iTooSmall)
-                  call report_energies(s,'before merge TooSmall')
+            if (mod(iter,2) == 0) then
+               if (iTooSmall > 0 .and. TooSmall > MaxTooSmall) then
+                  call split1
+               else if (iTooBig > 0 .and. TooBig > MaxTooBig) then
+                  call merge1
+               else
+                  exit
                end if
-               call do_merge(s, iTooSmall, species, new_xa, ierr)
-               if (ierr /= 0) return
-               num_merge = num_merge + 1
-               if (s% trace_split_merge_amr) then
-                  call report_energies(s,'after merge')
-                  !write(*,*)
+            else
+               if (iTooBig > 0 .and. TooBig > MaxTooBig) then
+                  call merge1
+               else if (iTooSmall > 0 .and. TooSmall > MaxTooSmall) then
+                  call split1
+               else
+                  exit
                end if
-               cycle
             end if
-            if (iTooBig > 0 .and. TooBig > MaxTooBig) then
-               ! ratio of actual/desired is too large
-               if (s% trace_split_merge_amr) then
-                  write(*,4) 'do_split TooBig', iTooBig, &
-                     s% nz, s% model_number, TooBig, MaxTooBig, s% dq(iTooBig)
-                  call report_energies(s,'before split')
-               end if
-               call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
-               if (ierr /= 0) return
-               num_split = num_split + 1
-               if (s% trace_split_merge_amr) then
-                  call report_energies(s,'after split')
-                  !write(*,*)
-               end if
-               cycle
-            end if
-            exit
+            if (ierr /= 0) return
          end do
          do iter = 1, 100
             call emergency_merge(s, iTooSmall)
@@ -197,6 +181,42 @@
             end do
          end if
          if (s% model_number == -6918) stop 'amr'
+         
+         contains
+         
+         subroutine split1 ! ratio of desired/actual is too large
+            include 'formats'
+            if (s% trace_split_merge_amr) then
+               write(*,4) 'do_merge TooSmall', &
+                  iTooSmall, s% nz, s% model_number, &
+                  TooSmall, MaxTooSmall, s% dq(iTooSmall)
+               call report_energies(s,'before merge TooSmall')
+            end if
+            call do_merge(s, iTooSmall, species, new_xa, ierr)
+            if (ierr /= 0) return
+            num_merge = num_merge + 1
+            if (s% trace_split_merge_amr) then
+               call report_energies(s,'after merge')
+               !write(*,*)
+            end if
+         end subroutine split1
+         
+         subroutine merge1  ! ratio of actual/desired is too large
+            include 'formats'
+            if (s% trace_split_merge_amr) then
+               write(*,4) 'do_split TooBig', iTooBig, &
+                  s% nz, s% model_number, TooBig, MaxTooBig, s% dq(iTooBig)
+               call report_energies(s,'before split')
+            end if
+            call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
+            if (ierr /= 0) return
+            num_split = num_split + 1
+            if (s% trace_split_merge_amr) then
+               call report_energies(s,'after split')
+               !write(*,*)
+            end if
+         end subroutine merge1
+         
       end subroutine amr
 
 
