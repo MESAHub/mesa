@@ -77,10 +77,15 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 2.5 ! -101d0
+Profile_Panels3_xmax = 2.0 ! -101d0
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
 TRho_Profile_xmin = -2.0
 TRho_Profile_ymin = 7.5
+
+TRho_Profile_xmin = 3.0
+TRho_Profile_xmax = 9.0
+TRho_Profile_ymin = 8.3
+TRho_Profile_ymax = 9.6
 
 / ! end of pgstar namelist

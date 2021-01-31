@@ -7,7 +7,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'start_infall.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+      required_termination_code_string = 'non_fe_core_infall_limit'
 
       !set_initial_age = .false.
       set_initial_age = .true.
@@ -28,8 +28,7 @@
 
 &controls
 
-      xa_central_lower_limit_species(1) = 'o16'
-      xa_central_lower_limit(1) = 1d-2
+      non_fe_core_infall_limit = 100d5
 
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
@@ -51,6 +50,11 @@
 ! mixing
 
 ! timesteps
+      delta_lgT_cntr_limit = 0.05 
+      delta_lgT_cntr_hard_limit = 0.1
+
+      delta_lgT_max_limit = 0.05    
+      delta_lgT_max_hard_limit = 0.1
 
 ! mesh
 
@@ -71,10 +75,10 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 / ! end of controls namelist
 

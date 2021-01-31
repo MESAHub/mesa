@@ -2,7 +2,7 @@
 
 &star_job
    new_Z = 0.02d0
-   new_omega_div_omega_crit = 0.1d0
+   new_omega_div_omega_crit = 0.0d0
 / ! end of star_job namelist
 
 &kap
@@ -12,5 +12,5 @@
 &controls
    initial_mass = 15 
    initial_z = 0.02d0
-   Dutch_scaling_factor = 0.4
+   Dutch_scaling_factor = 0.0
 / ! end of controls namelist

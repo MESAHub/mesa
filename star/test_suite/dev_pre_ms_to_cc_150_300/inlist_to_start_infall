@@ -28,7 +28,7 @@
 
 &controls
 
-      non_fe_core_infall_limit = 100d5 ! for 200M
+      non_fe_core_infall_limit = 100d5
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
@@ -70,10 +70,10 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 / ! end of controls namelist
 

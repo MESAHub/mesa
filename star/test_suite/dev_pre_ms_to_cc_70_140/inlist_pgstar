@@ -137,6 +137,7 @@ Mixing_legend_txt_scale_factor = 0.9
 
 Profile_Panels3_yaxis_name(4) = 'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
+Profile_Panels3_other_dymin(4) = 0.2
 
 Profile_Panels3_yaxis_name(5) = 'logT'
 Profile_Panels3_other_yaxis_name(5) = 'burn_num_iters'
