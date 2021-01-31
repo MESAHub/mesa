@@ -11,8 +11,7 @@
       required_termination_code_string = 'max_model_number'
 
       ! may need to experiment some to find a value that works for different M and Z.
-      remove_initial_surface_at_he_core_boundary = 0.01d0 ! ok for 175M, Z=1.6d-3
-      !remove_initial_surface_at_he_core_boundary = 0.1d0 ! ok for 200M, Z=1.6d-3
+      remove_initial_surface_at_he_core_boundary = 0.1d0
 
       set_initial_age = .true.
       initial_age = 0

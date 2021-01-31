@@ -24,8 +24,7 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'c12'
-      xa_central_lower_limit(1) = 1d-3
-      xa_central_lower_limit(1) = 0.05 ! for 200M
+      xa_central_lower_limit(1) = 0.05
 
       ! limit max_model_number as part of test_suite
       max_model_number = 10000

@@ -90,6 +90,8 @@
       total_energy
       log_total_energy
       
+      total_mass ni56
+      
       
       log_max_residual
       log_residual_norm
