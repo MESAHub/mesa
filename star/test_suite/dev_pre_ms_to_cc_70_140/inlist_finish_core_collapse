@@ -196,7 +196,7 @@ Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
 
  History_Panels2_title = ''
 
- History_Panels2_xaxis_name = 'star_age_sec'
+ History_Panels2_xaxis_name = 'star_age_day'
  History_Panels2_max_width = -1
 
  History_Panels2_txt_scale = 0.75
@@ -288,7 +288,7 @@ Text_Summary1_name(3,1) = 'log_cntr_T'
 Text_Summary1_name(3,2) = 'log_cntr_Rho'
 Text_Summary1_name(3,3) = 'log_R'
 Text_Summary1_name(3,4) = 'C_cntr'
-Text_Summary1_name(3,5) = 'C_core'
+Text_Summary1_name(3,5) = 'O_core'
 
 Text_Summary1_name(4,1) = 'fe_core_infall' 
 Text_Summary1_name(4,2) = 'gamma1_min'

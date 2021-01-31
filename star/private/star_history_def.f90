@@ -114,11 +114,9 @@
 
       integer, parameter :: h_h_rich_layer_mass = h_power_he_burn + 1
       integer, parameter :: h_he_rich_layer_mass = h_h_rich_layer_mass + 1
-      integer, parameter :: h_c_rich_layer_mass = h_he_rich_layer_mass + 1
-      integer, parameter :: h_o_rich_layer_mass = h_c_rich_layer_mass + 1
-      integer, parameter :: h_si_rich_layer_mass = h_o_rich_layer_mass + 1
+      integer, parameter :: h_co_rich_layer_mass = h_he_rich_layer_mass + 1
 
-      integer, parameter :: h_he_core_mass = h_si_rich_layer_mass + 1
+      integer, parameter :: h_he_core_mass = h_co_rich_layer_mass + 1
       integer, parameter :: h_he_core_radius = h_he_core_mass + 1
       integer, parameter :: h_he_core_lgT = h_he_core_radius + 1
       integer, parameter :: h_he_core_lgRho = h_he_core_lgT + 1
@@ -128,37 +126,17 @@
       integer, parameter :: h_he_core_omega_div_omega_crit = h_he_core_omega + 1
       integer, parameter :: h_he_core_k = h_he_core_omega_div_omega_crit + 1
 
-      integer, parameter :: h_c_core_mass = h_he_core_k + 1
-      integer, parameter :: h_c_core_radius = h_c_core_mass + 1
-      integer, parameter :: h_c_core_lgT = h_c_core_radius + 1
-      integer, parameter :: h_c_core_lgRho = h_c_core_lgT + 1
-      integer, parameter :: h_c_core_L = h_c_core_lgRho + 1
-      integer, parameter :: h_c_core_v = h_c_core_L + 1
-      integer, parameter :: h_c_core_omega = h_c_core_v + 1
-      integer, parameter :: h_c_core_omega_div_omega_crit = h_c_core_omega + 1
-      integer, parameter :: h_c_core_k = h_c_core_omega_div_omega_crit + 1
+      integer, parameter :: h_co_core_mass = h_he_core_k + 1
+      integer, parameter :: h_co_core_radius = h_co_core_mass + 1
+      integer, parameter :: h_co_core_lgT = h_co_core_radius + 1
+      integer, parameter :: h_co_core_lgRho = h_co_core_lgT + 1
+      integer, parameter :: h_co_core_L = h_co_core_lgRho + 1
+      integer, parameter :: h_co_core_v = h_co_core_L + 1
+      integer, parameter :: h_co_core_omega = h_co_core_v + 1
+      integer, parameter :: h_co_core_omega_div_omega_crit = h_co_core_omega + 1
+      integer, parameter :: h_co_core_k = h_co_core_omega_div_omega_crit + 1
 
-      integer, parameter :: h_o_core_mass = h_c_core_k + 1
-      integer, parameter :: h_o_core_radius = h_o_core_mass + 1
-      integer, parameter :: h_o_core_lgT = h_o_core_radius + 1
-      integer, parameter :: h_o_core_lgRho = h_o_core_lgT + 1
-      integer, parameter :: h_o_core_L = h_o_core_lgRho + 1
-      integer, parameter :: h_o_core_v = h_o_core_L + 1
-      integer, parameter :: h_o_core_omega = h_o_core_v + 1
-      integer, parameter :: h_o_core_omega_div_omega_crit = h_o_core_omega + 1
-      integer, parameter :: h_o_core_k = h_o_core_omega_div_omega_crit + 1
-
-      integer, parameter :: h_si_core_mass = h_o_core_k + 1
-      integer, parameter :: h_si_core_radius = h_si_core_mass + 1
-      integer, parameter :: h_si_core_lgT = h_si_core_radius + 1
-      integer, parameter :: h_si_core_lgRho = h_si_core_lgT + 1
-      integer, parameter :: h_si_core_L = h_si_core_lgRho + 1
-      integer, parameter :: h_si_core_v = h_si_core_L + 1
-      integer, parameter :: h_si_core_omega = h_si_core_v + 1
-      integer, parameter :: h_si_core_omega_div_omega_crit = h_si_core_omega + 1
-      integer, parameter :: h_si_core_k = h_si_core_omega_div_omega_crit + 1
-
-      integer, parameter :: h_fe_core_mass = h_si_core_k + 1
+      integer, parameter :: h_fe_core_mass = h_co_core_k + 1
       integer, parameter :: h_fe_core_radius = h_fe_core_mass + 1
       integer, parameter :: h_fe_core_lgT = h_fe_core_radius + 1
       integer, parameter :: h_fe_core_lgRho = h_fe_core_lgT + 1
@@ -788,10 +766,8 @@
       integer, parameter :: h_He_core = h_lg_Lneu + 1
       integer, parameter :: h_O_cntr = h_He_core + 1
       integer, parameter :: h_lg_Lphoto = h_O_cntr + 1
-      integer, parameter :: h_C_core = h_lg_Lphoto + 1
-      integer, parameter :: h_O_core = h_C_core + 1
-      integer, parameter :: h_Si_core = h_O_core + 1
-      integer, parameter :: h_Fe_core = h_Si_core + 1
+      integer, parameter :: h_CO_core = h_lg_Lphoto + 1
+      integer, parameter :: h_Fe_core = h_CO_core + 1
       integer, parameter :: h_Ne_cntr = h_Fe_core + 1
       integer, parameter :: h_Mass = h_Ne_cntr + 1
       integer, parameter :: h_H_cntr = h_Mass + 1
@@ -1170,9 +1146,7 @@
 
          history_column_name(h_h_rich_layer_mass) = 'h_rich_layer_mass'
          history_column_name(h_he_rich_layer_mass) = 'he_rich_layer_mass'
-         history_column_name(h_c_rich_layer_mass) = 'c_rich_layer_mass'
-         history_column_name(h_o_rich_layer_mass) = 'o_rich_layer_mass'
-         history_column_name(h_si_rich_layer_mass) = 'si_rich_layer_mass'
+         history_column_name(h_co_rich_layer_mass) = 'co_rich_layer_mass'
 
          history_column_name(h_he_core_mass) = 'he_core_mass'
          history_column_name(h_he_core_radius) = 'he_core_radius'
@@ -1184,35 +1158,15 @@
          history_column_name(h_he_core_omega_div_omega_crit) = 'he_core_omega_div_omega_crit'
          history_column_name(h_he_core_k) = 'he_core_k'
 
-         history_column_name(h_c_core_mass) = 'c_core_mass'
-         history_column_name(h_c_core_radius) = 'c_core_radius'
-         history_column_name(h_c_core_lgT) = 'c_core_lgT'
-         history_column_name(h_c_core_lgRho) = 'c_core_lgRho'
-         history_column_name(h_c_core_L) = 'c_core_L'
-         history_column_name(h_c_core_v) = 'c_core_v'
-         history_column_name(h_c_core_omega) = 'c_core_omega'
-         history_column_name(h_c_core_omega_div_omega_crit) = 'c_core_omega_div_omega_crit'
-         history_column_name(h_c_core_k) = 'c_core_k'
-
-         history_column_name(h_o_core_mass) = 'o_core_mass'
-         history_column_name(h_o_core_radius) = 'o_core_radius'
-         history_column_name(h_o_core_lgT) = 'o_core_lgT'
-         history_column_name(h_o_core_lgRho) = 'o_core_lgRho'
-         history_column_name(h_o_core_L) = 'o_core_L'
-         history_column_name(h_o_core_v) = 'o_core_v'
-         history_column_name(h_o_core_omega) = 'o_core_omega'
-         history_column_name(h_o_core_omega_div_omega_crit) = 'o_core_omega_div_omega_crit'
-         history_column_name(h_o_core_k) = 'o_core_k'
-
-         history_column_name(h_si_core_mass) = 'si_core_mass'
-         history_column_name(h_si_core_radius) = 'si_core_radius'
-         history_column_name(h_si_core_lgT) = 'si_core_lgT'
-         history_column_name(h_si_core_lgRho) = 'si_core_lgRho'
-         history_column_name(h_si_core_L) = 'si_core_L'
-         history_column_name(h_si_core_v) = 'si_core_v'
-         history_column_name(h_si_core_omega) = 'si_core_omega'
-         history_column_name(h_si_core_omega_div_omega_crit) = 'si_core_omega_div_omega_crit'
-         history_column_name(h_si_core_k) = 'si_core_k'
+         history_column_name(h_co_core_mass) = 'co_core_mass'
+         history_column_name(h_co_core_radius) = 'co_core_radius'
+         history_column_name(h_co_core_lgT) = 'co_core_lgT'
+         history_column_name(h_co_core_lgRho) = 'co_core_lgRho'
+         history_column_name(h_co_core_L) = 'co_core_L'
+         history_column_name(h_co_core_v) = 'co_core_v'
+         history_column_name(h_co_core_omega) = 'co_core_omega'
+         history_column_name(h_co_core_omega_div_omega_crit) = 'co_core_omega_div_omega_crit'
+         history_column_name(h_co_core_k) = 'co_core_k'
 
          history_column_name(h_fe_core_mass) = 'fe_core_mass'
          history_column_name(h_fe_core_radius) = 'fe_core_radius'
@@ -1606,9 +1560,7 @@
          history_column_name(h_He_core) = 'He_core'
          history_column_name(h_O_cntr) = 'O_cntr'
          history_column_name(h_lg_Lphoto) = 'lg_Lphoto'
-         history_column_name(h_C_core) = 'C_core'
-         history_column_name(h_O_core) = 'O_core'
-         history_column_name(h_Si_core) = 'Si_core'
+         history_column_name(h_CO_core) = 'CO_core'
          history_column_name(h_Fe_core) = 'Fe_core'
          history_column_name(h_Ne_cntr) = 'Ne_cntr'
          history_column_name(h_Mass) = 'Mass'

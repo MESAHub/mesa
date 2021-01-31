@@ -57,8 +57,7 @@
     initial_mass, initial_z, initial_y, initial_he3, &
     
     ! definition of core boundaries
-    he_core_boundary_h1_fraction, c_core_boundary_he4_fraction, o_core_boundary_c12_fraction, &
-    si_core_boundary_o16_fraction, fe_core_boundary_si28_fraction, &
+    he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, fe_core_boundary_si28_fraction, &
     neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
     
     ! when to stop
@@ -73,7 +72,7 @@
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
     v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit, v_surf_div_v_esc_limit, v_surf_kms_limit, &
     stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, gamma1_limit, gamma1_limit_max_q, &
-    stop_at_phase_PreMS, stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, &
+    stop_at_phase_PreMS, stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, gamma1_limit_max_v_div_vesc, &
     stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
     stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
     stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS, &
@@ -85,7 +84,7 @@
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
     star_species_mass_min_limit, star_species_mass_min_limit_iso, star_species_mass_max_limit, star_species_mass_max_limit_iso, &
     xmstar_min_limit, xmstar_max_limit, envelope_mass_limit, envelope_fraction_left_limit, &
-    he_core_mass_limit, c_core_mass_limit, o_core_mass_limit, si_core_mass_limit, &
+    he_core_mass_limit, co_core_mass_limit, &
     fe_core_mass_limit, neutron_rich_core_mass_limit, HB_limit, star_mass_min_limit, star_mass_max_limit, &
     he_layer_mass_lower_limit, abs_diff_lg_LH_lg_Ls_limit, Teff_upper_limit, Teff_lower_limit, &
     photosphere_m_upper_limit, photosphere_m_lower_limit, photosphere_m_sub_M_center_limit, &
@@ -783,9 +782,7 @@
 
  ! definition of core boundaries
  s% he_core_boundary_h1_fraction = he_core_boundary_h1_fraction
- s% c_core_boundary_he4_fraction = c_core_boundary_he4_fraction
- s% o_core_boundary_c12_fraction = o_core_boundary_c12_fraction
- s% si_core_boundary_o16_fraction = si_core_boundary_o16_fraction
+ s% co_core_boundary_he4_fraction = co_core_boundary_he4_fraction
  s% fe_core_boundary_si28_fraction = fe_core_boundary_si28_fraction
  s% neutron_rich_core_boundary_Ye_max = neutron_rich_core_boundary_Ye_max
  s% min_boundary_fraction = min_boundary_fraction
@@ -848,6 +845,7 @@
  s% Lnuc_div_L_zams_limit = Lnuc_div_L_zams_limit
  s% gamma1_limit = gamma1_limit
  s% gamma1_limit_max_q = gamma1_limit_max_q
+ s% gamma1_limit_max_v_div_vesc = gamma1_limit_max_v_div_vesc
  s% Pgas_div_P_limit = Pgas_div_P_limit
  s% Pgas_div_P_limit_max_q = Pgas_div_P_limit_max_q
  s% peak_burn_vconv_div_cs_limit = peak_burn_vconv_div_cs_limit
@@ -896,9 +894,7 @@
  s% envelope_fraction_left_limit = envelope_fraction_left_limit
 
  s% he_core_mass_limit = he_core_mass_limit
- s% c_core_mass_limit = c_core_mass_limit
- s% o_core_mass_limit = o_core_mass_limit
- s% si_core_mass_limit = si_core_mass_limit
+ s% co_core_mass_limit = co_core_mass_limit
  s% fe_core_mass_limit = fe_core_mass_limit
  s% neutron_rich_core_mass_limit = neutron_rich_core_mass_limit
 
@@ -2423,9 +2419,7 @@
 
  ! definition of core boundaries
  he_core_boundary_h1_fraction = s% he_core_boundary_h1_fraction
- c_core_boundary_he4_fraction = s% c_core_boundary_he4_fraction
- o_core_boundary_c12_fraction = s% o_core_boundary_c12_fraction
- si_core_boundary_o16_fraction = s% si_core_boundary_o16_fraction
+ co_core_boundary_he4_fraction = s% co_core_boundary_he4_fraction
  fe_core_boundary_si28_fraction = s% fe_core_boundary_si28_fraction
  neutron_rich_core_boundary_Ye_max = s% neutron_rich_core_boundary_Ye_max
  min_boundary_fraction = s% min_boundary_fraction
@@ -2490,6 +2484,7 @@
  Pgas_div_P_limit_max_q = s% Pgas_div_P_limit_max_q
  gamma1_limit = s% gamma1_limit
  gamma1_limit_max_q = s% gamma1_limit_max_q
+ gamma1_limit_max_v_div_vesc = s% gamma1_limit_max_v_div_vesc
  peak_burn_vconv_div_cs_limit = s% peak_burn_vconv_div_cs_limit
  omega_div_omega_crit_limit = s% omega_div_omega_crit_limit
  delta_nu_lower_limit = s% delta_nu_lower_limit
@@ -2536,9 +2531,7 @@
  envelope_fraction_left_limit = s% envelope_fraction_left_limit
 
  he_core_mass_limit = s% he_core_mass_limit
- c_core_mass_limit = s% c_core_mass_limit
- o_core_mass_limit = s% o_core_mass_limit
- si_core_mass_limit = s% si_core_mass_limit
+ co_core_mass_limit = s% co_core_mass_limit
  fe_core_mass_limit = s% fe_core_mass_limit
  neutron_rich_core_mass_limit = s% neutron_rich_core_mass_limit
 

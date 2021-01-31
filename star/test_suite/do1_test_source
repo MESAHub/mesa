@@ -1,10 +1,4 @@
 
-do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_25_65 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_70_140 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_150_300 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-return
-
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
 do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto

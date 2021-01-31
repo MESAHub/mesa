@@ -11,9 +11,7 @@
       ! definition of core boundaries
          real(dp) :: &
             he_core_boundary_h1_fraction, &
-            c_core_boundary_he4_fraction, &
-            o_core_boundary_c12_fraction, &
-            si_core_boundary_o16_fraction, &
+            co_core_boundary_he4_fraction, &
             fe_core_boundary_si28_fraction, &
             neutron_rich_core_boundary_Ye_max, &
             min_boundary_fraction
@@ -25,8 +23,7 @@
          real(dp) :: when_to_stop_rtol
 
          real(dp) :: max_age, max_age_in_seconds, &
-            dt_years_for_steps_before_max_age, &
-            reduction_factor_for_max_timestep
+            dt_years_for_steps_before_max_age, reduction_factor_for_max_timestep
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit
          real(dp) :: eta_center_limit
@@ -77,9 +74,7 @@
          real(dp) :: envelope_fraction_left_limit
 
          real(dp) :: he_core_mass_limit
-         real(dp) :: c_core_mass_limit
-         real(dp) :: o_core_mass_limit
-         real(dp) :: si_core_mass_limit
+         real(dp) :: co_core_mass_limit
          real(dp) :: fe_core_mass_limit
          real(dp) :: neutron_rich_core_mass_limit
 
@@ -144,7 +139,7 @@
             stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
             stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS
          real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q
-         real(dp) :: gamma1_limit, gamma1_limit_max_q
+         real(dp) :: gamma1_limit, gamma1_limit_max_q, gamma1_limit_max_v_div_vesc
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
          real(dp) :: delta_Pg_lower_limit, delta_Pg_upper_limit

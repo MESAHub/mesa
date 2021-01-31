@@ -226,11 +226,11 @@
          if (s% net_iso(isi28) == 0) then
             write(io,'(a)') &
                '    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   ' // &
-               'C_core     C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit'
+               'CO_core    C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit'
          else
             write(io,'(a)') &
                '    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   ' // &
-               'C_core     C_cntr     Ne_cntr    Si_cntr  v_div_cs       dt_limit'
+               'CO_core    C_cntr     Ne_cntr    Si_cntr  v_div_cs       dt_limit'
          end if
          write(io,'(a)') &
             '_______________________________________________________________________' // &
@@ -356,7 +356,7 @@
             safe_log10(sum_LH), & ! fmt3
             safe_log10(sum_Lnuc), &
             s% star_mass, &            
-            s% star_mass - max(s% he_core_mass, s% c_core_mass, s% o_core_mass), &
+            s% star_mass - max(s% he_core_mass, s% co_core_mass), &
             s% center_h1, & ! fmt4
             s% center_n14, &
             s% surface_he3 + s% surface_he4, &
@@ -431,7 +431,7 @@
                safe_log10(sum_Lz), &
                safe_log10(abs(s% power_photo)), &
                s% lnd(1)/ln10, &
-               s% c_core_mass, &
+               s% co_core_mass, &
                s% center_c12, &
                s% center_ne20, &
                tmp, &
@@ -448,7 +448,7 @@
                safe_log10(sum_Lz), &
                safe_log10(abs(s% power_photo)), &
                s% lnd(1)/ln10, &
-               s% c_core_mass, &
+               s% co_core_mass, &
                s% center_c12, &
                s% center_ne20, &
                tmp, &
@@ -582,7 +582,7 @@
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
             max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
-            species_mass_for_min_limit, species_mass_for_max_limit, min_gamma1
+            species_mass_for_min_limit, species_mass_for_max_limit
             
          include 'formats'
          
@@ -695,12 +695,6 @@
          do k = s% nz, 1, -1
             if (s% q(k) > s% Pgas_div_P_limit_max_q) exit
             if (s% pgas(k)/s% p(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% p(k)
-         end do
-         
-         min_gamma1 = 1d99
-         do k = s% nz, 1, -1
-            if (s% q(k) > s% gamma1_limit_max_q) exit
-            if (s% gamma1(k) < min_gamma1) min_gamma1 = s% gamma1(k)
          end do
          
          max_omega_div_omega_crit = 0; k_omega = 0
@@ -918,17 +912,9 @@
             call compare_to_target('he_core_mass >= he_core_mass_limit', &
                s% he_core_mass, s% he_core_mass_limit, t_he_core_mass_limit)
             
-         else if (s% c_core_mass >= s% c_core_mass_limit) then 
-            call compare_to_target('c_core_mass >= c_core_mass_limit', &
-               s% c_core_mass, s% c_core_mass_limit, t_c_core_mass_limit)
-
-         else if (s% o_core_mass >= s% o_core_mass_limit) then 
-            call compare_to_target('o_core_mass >= o_core_mass_limit', &
-               s% o_core_mass, s% o_core_mass_limit, t_o_core_mass_limit)
-            
-         else if (s% si_core_mass >= s% si_core_mass_limit) then 
-            call compare_to_target('si_core_mass >= si_core_mass_limit', &
-               s% si_core_mass, s% si_core_mass_limit, t_si_core_mass_limit)
+         else if (s% co_core_mass >= s% co_core_mass_limit) then 
+            call compare_to_target('co_core_mass >= co_core_mass_limit', &
+               s% co_core_mass, s% co_core_mass_limit, t_co_core_mass_limit)
             
          else if (s% fe_core_mass >= s% fe_core_mass_limit) then 
             call compare_to_target('fe_core_mass >= fe_core_mass_limit', &
@@ -939,12 +925,12 @@
                s% neutron_rich_core_mass, s% neutron_rich_core_mass_limit, t_neutron_rich_core_mass_limit)
             
          else if ( &
-               s% he_core_mass >= s% c_core_mass .and. &
-               s% c_core_mass > 0 .and. &
+               s% he_core_mass >= s% co_core_mass .and. &
+               s% co_core_mass > 0 .and. &
                s% center_he4 < 1d-4 .and. &
-               s% he_core_mass - s% c_core_mass < s% he_layer_mass_lower_limit) then 
+               s% he_core_mass - s% co_core_mass < s% he_layer_mass_lower_limit) then 
             call compare_to_target('he layer mass < he_layer_mass_lower_limit', &
-               s% he_core_mass - s% c_core_mass, s% he_layer_mass_lower_limit, &
+               s% he_core_mass - s% co_core_mass, s% he_layer_mass_lower_limit, &
                t_he_layer_mass_lower_limit)
             
          else if (abs(safe_log10(power_h_burn) - s% log_surface_luminosity) <= &
@@ -1137,9 +1123,9 @@
             call compare_to_target('v_div_csound_max > v_div_csound_max_limit', &
                v_div_csound_max, s% v_div_csound_max_limit, t_v_div_csound_max_limit)
 
-         else if (min_gamma1 < s% gamma1_limit) then 
+         else if (s% min_gamma1 < s% gamma1_limit) then 
             call compare_to_target('min_gamma1 < gamma1_limit', &
-               min_gamma1, s% gamma1_limit, t_gamma1_limit)            
+               s% min_gamma1, s% gamma1_limit, t_gamma1_limit)            
 
          else if (min_pgas_div_p < s% Pgas_div_P_limit) then 
             call compare_to_target('min_pgas_div_p < Pgas_div_P_limit', &

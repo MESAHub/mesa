@@ -112,9 +112,7 @@
          termination_code_str(t_envelope_fraction_left_limit) = 'envelope_fraction_left_limit'
 
          termination_code_str(t_he_core_mass_limit) = 'he_core_mass_limit'
-         termination_code_str(t_c_core_mass_limit) = 'c_core_mass_limit'
-         termination_code_str(t_o_core_mass_limit) = 'o_core_mass_limit'
-         termination_code_str(t_si_core_mass_limit) = 'si_core_mass_limit'
+         termination_code_str(t_co_core_mass_limit) = 'co_core_mass_limit'
          termination_code_str(t_fe_core_mass_limit) = 'fe_core_mass_limit'
          termination_code_str(t_neutron_rich_core_mass_limit) = 'neutron_rich_core_mass_limit'
 

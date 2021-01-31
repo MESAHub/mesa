@@ -2827,7 +2827,7 @@
          else if (s% L_by_category(icc) > 1d2 .and. center_he4 < 1d-4) then
             s% phase_of_evolution = phase_C_Burn
          else if (center_he4 < 1d-4 .and. &
-            s% he_core_mass - s% c_core_mass <= 0.1d0 .and. &
+            s% he_core_mass - s% co_core_mass <= 0.1d0 .and. &
             any(s% burn_he_conv_region(1:s% num_conv_boundaries))) then
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then

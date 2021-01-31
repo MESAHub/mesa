@@ -194,7 +194,7 @@ Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
 
  History_Panels2_title = ''
 
- History_Panels2_xaxis_name = 'star_age_sec'
+ History_Panels2_xaxis_name = 'star_age_day'
  History_Panels2_max_width = -1
 
  History_Panels2_txt_scale = 0.75

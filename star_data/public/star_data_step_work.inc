@@ -902,35 +902,15 @@
       real(dp) :: he_core_omega_div_omega_crit
       integer :: he_core_k ! boundary is in this cell
       
-      real(dp) :: c_core_mass ! baryonic (Msun)
-      real(dp) :: c_core_radius ! Rsun
-      real(dp) :: c_core_lgT
-      real(dp) :: c_core_lgRho
-      real(dp) :: c_core_L ! Lsun
-      real(dp) :: c_core_v
-      real(dp) :: c_core_omega ! (s^-1)
-      real(dp) :: c_core_omega_div_omega_crit
-      integer :: c_core_k ! boundary is in this cell
-      
-      real(dp) :: o_core_mass ! baryonic (Msun)
-      real(dp) :: o_core_radius ! Rsun
-      real(dp) :: o_core_lgT
-      real(dp) :: o_core_lgRho
-      real(dp) :: o_core_L ! Lsun
-      real(dp) :: o_core_v
-      real(dp) :: o_core_omega ! (s^-1)
-      real(dp) :: o_core_omega_div_omega_crit
-      integer :: o_core_k ! boundary is in this cell
-      
-      real(dp) :: si_core_mass ! baryonic (Msun)
-      real(dp) :: si_core_radius ! Rsun
-      real(dp) :: si_core_lgT
-      real(dp) :: si_core_lgRho
-      real(dp) :: si_core_L ! Lsun
-      real(dp) :: si_core_v
-      real(dp) :: si_core_omega ! (s^-1)
-      real(dp) :: si_core_omega_div_omega_crit
-      integer :: si_core_k ! boundary is in this cell
+      real(dp) :: co_core_mass ! baryonic (Msun)
+      real(dp) :: co_core_radius ! Rsun
+      real(dp) :: co_core_lgT
+      real(dp) :: co_core_lgRho
+      real(dp) :: co_core_L ! Lsun
+      real(dp) :: co_core_v
+      real(dp) :: co_core_omega ! (s^-1)
+      real(dp) :: co_core_omega_div_omega_crit
+      integer :: co_core_k ! boundary is in this cell
 
       real(dp) :: fe_core_mass ! baryonic (Msun)
       real(dp) :: fe_core_radius ! Rsun
@@ -1056,6 +1036,8 @@
       real(dp) :: tau100_lgT
       real(dp) :: tau100_lgRho
       real(dp) :: tau100_L
+
+      real(dp) :: min_gamma1
 
       ! timescales
       real(dp) :: dynamic_timescale 
@@ -1381,7 +1363,7 @@
          real(dp) :: total_angular_momentum_old
          real(dp) :: h1_czb_mass_old ! baryonic (Msun)
          real(dp) :: he_core_mass_old
-         real(dp) :: c_core_mass_old
+         real(dp) :: co_core_mass_old
          real(dp) :: Teff_old
          real(dp) :: center_eps_nuc_old
 

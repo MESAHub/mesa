@@ -216,13 +216,6 @@
 ! output
       terminal_show_log_dt = .false.
 
-      center_avg_value_dq = 1d-12
-      he_core_boundary_h1_fraction = 0.1
-      c_core_boundary_he4_fraction = 0.5
-      o_core_boundary_c12_fraction = 0.5
-      si_core_boundary_o16_fraction = 0.5
-      fe_core_boundary_si28_fraction = 0.5
-
       photo_interval = 50
       profile_interval = 50
       history_interval = 10

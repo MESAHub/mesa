@@ -275,10 +275,8 @@
 
          if (wind_mdot >= 0) then
              H_env_mass = s% star_mass - s% he_core_mass
-             H_He_env_mass = s% star_mass - s% c_core_mass
-             He_layer_mass = s% he_core_mass - s% c_core_mass
-             !write(*,2) 'He_layer_mass', s% model_number, He_layer_mass, &
-             !   s% he_core_mass, s% c_core_mass
+             H_He_env_mass = s% star_mass - s% co_core_mass
+             He_layer_mass = s% he_core_mass - s% co_core_mass
              if (s% wind_H_envelope_limit > 0 .and. &
                    H_env_mass < s% wind_H_envelope_limit) then
                 wind_mdot = 0
