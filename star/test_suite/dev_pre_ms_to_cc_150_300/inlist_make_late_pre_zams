@@ -11,7 +11,7 @@
       save_model_filename = 'late_pre_zams.mod'
       required_termination_code_string = 'max_age'
 
-      pgstar_flag = .false.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 

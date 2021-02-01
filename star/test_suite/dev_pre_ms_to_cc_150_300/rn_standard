@@ -43,20 +43,20 @@ else
 fi
 
 if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_start_infall.mod start_infall.mod
-else
-   do_one inlist_to_start_infall_header start_infall.mod
-   cp start_infall.mod standard_start_infall.mod
-fi
-
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
    cp standard_converted.mod converted.mod
 else
    do_one inlist_convert_header converted.mod
    cp converted.mod standard_converted.mod
 fi
 
-do_one inlist_finish_core_collapse_header final.mod
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_prepared.mod prepared.mod
+else
+   do_one inlist_prepare_header prepared.mod
+   cp prepared.mod standard_prepared.mod
+fi
+
+do_one inlist_finish_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

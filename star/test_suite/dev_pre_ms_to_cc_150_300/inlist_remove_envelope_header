@@ -6,7 +6,7 @@
       read_extra_star_job_inlist2 = .true.
       extra_star_job_inlist2_name = 'inlist_mass_Z_wind_rotation'
       read_extra_star_job_inlist3 = .true.
-      extra_star_job_inlist3_name = 'inlist_remove_envelope'      
+      extra_star_job_inlist3_name = 'inlist_remove_envelope'
 / ! end of star_job namelist
 
 &eos
