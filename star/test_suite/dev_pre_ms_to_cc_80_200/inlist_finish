@@ -6,7 +6,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'log_Rsurf_upper_limit' ! 200M
+      !required_termination_code_string = 'log_Rsurf_upper_limit' ! 200M
       required_termination_code_string = 'fe_core_infall_limit'
 
       !pgstar_flag = .false.
@@ -26,8 +26,8 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 4d0 ! 200M
-      fe_core_infall_limit = 2d7         ! 140M
+      !log_Rsurf_upper_limit = 4d0 ! 200M
+      fe_core_infall_limit = 1d7 
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99

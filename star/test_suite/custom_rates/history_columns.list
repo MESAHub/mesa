@@ -147,9 +147,7 @@
    ! information about abundance transitions
    
       he_core_mass
-      c_core_mass
-      o_core_mass   
-      si_core_mass
+      co_core_mass
       fe_core_mass
 
       envelope_mass ! = star_mass - h1_boundary_mass

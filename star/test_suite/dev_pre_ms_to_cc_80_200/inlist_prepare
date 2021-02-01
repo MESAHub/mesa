@@ -6,8 +6,8 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'prepared.mod'
-      required_termination_code_string = 'log_max_temp_upper_limit'       ! 100M
-      !required_termination_code_string = 'non_fe_core_infall_limit'        ! 140M
+      required_termination_code_string = 'log_max_temp_upper_limit'       ! for lower masses
+      !required_termination_code_string = 'non_fe_core_infall_limit'        ! for higher masses
 
       !pgstar_flag = .false.
 
@@ -26,8 +26,8 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      log_max_temp_upper_limit = 9.52d0      ! 100M
-      !non_fe_core_infall_limit = 1d7         ! 140M
+      log_max_temp_upper_limit = 9.52d0      ! for lower masses
+      !non_fe_core_infall_limit = 1d7         ! for higher masses
 
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99

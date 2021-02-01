@@ -1,13 +1,14 @@
 
 
 &star_job
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
-      saved_model_name = 'after_core_c_burn.mod'
+      saved_model_name = 'lgTmax.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'start_infall.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+      save_model_filename = 'final.mod'
+      required_termination_code_string = 'fe_core_infall_limit'
 
       !set_initial_age = .false.
       set_initial_age = .true.
@@ -15,8 +16,6 @@
 
       set_initial_model_number = .false.
       set_initial_number_retries = .false.
-
-      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -28,11 +27,7 @@
 
 &controls
 
-      xa_central_lower_limit_species(1) = 'o16'
-      xa_central_lower_limit(1) = 1d-2
-
-      when_to_stop_rtol = 1d99
-      when_to_stop_atol = 1d99
+      fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
@@ -51,6 +46,11 @@
 ! mixing
 
 ! timesteps
+      limit_for_rel_error_in_energy_conservation = 1d-4
+      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+      delta_XSi_cntr_limit = 0.008
+      delta_XSi_cntr_hard_limit = 0.025
 
 ! mesh
 
@@ -60,8 +60,8 @@
       !write_pulse_data_with_profile = .true.
 
 ! output
-      terminal_show_age_units = 'days'
-      terminal_show_timestep_units = 'days'
+      terminal_show_age_units = 'secs'
+      terminal_show_timestep_units = 'secs'
       terminal_show_log_dt = .false.
       terminal_show_log_age = .false.
 
@@ -71,10 +71,10 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 / ! end of controls namelist
 
@@ -84,16 +84,28 @@
 !Grid1_file_flag = .true.
 
 !pause = .true.
+
+Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax =  -101d0 ! 2.5 ! 
+Profile_Panels3_xmax =  5 ! 
+Profile_Panels3_xaxis_reversed = .false.
+
+Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xmin = -101d0
+Profile_Panels3_xmax = -101d0
+Profile_Panels3_xaxis_reversed = .true.
+
+
+
 Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
-!Profile_Panels3_yaxis_name(5) = 'avQ'
-Profile_Panels3_other_yaxis_name(5) = 'v_div_cs'
 
 TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 10
 TRho_Profile_ymin = 8.5
-TRho_Profile_ymax = 10.5
+TRho_Profile_ymax = 10.1
+
+Text_Summary1_name(1,2) = 'time_step_sec'
+Text_Summary1_name(2,2) = 'star_age_sec'
 
 / ! end of pgstar namelist
