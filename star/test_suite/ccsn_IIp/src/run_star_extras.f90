@@ -742,43 +742,6 @@
             
          end if ! not restart
          
-         if (s% x_integer_ctrl(1) == -1) then   ! report starting model info
-            write(*,'(a)') trim(s% job% saved_model_name)
-            write(*,'(99a8)') &
-               'mass', &
-               'radius', &
-               'Teff', &
-               'log_L', &
-               'h_env', &
-               'he_core', &
-               'o_core', &
-               'si_core', &
-               'fe_core', &
-               'log_g', &
-               'tot h1', &
-               'tot he4'
-            tot_h1 = (s% xmstar/Msun)*dot_product( &
-               s% xa(s% net_iso(ih1),1:s% nz), &
-               s% dq(1:s% nz))/sum(s% dq(1:s% nz))
-            tot_he4 = (s% xmstar/Msun)*dot_product( &
-               s% xa(s% net_iso(ihe4),1:s% nz), &
-               s% dq(1:s% nz))/sum(s% dq(1:s% nz))
-            write(*,'(f8.3,f8.1,i8,99f8.3)') &
-               s% star_mass, & !'mass', &
-               s% R(1)/Rsun, & !'radius', &
-               int(s% Teff), & !'Teff', &
-               safe_log10(s% L_surf), & !'log_L', &
-               s% star_mass - s% he_core_mass, & ! 'h_env', &
-               s% he_core_mass, & !'he_core', &
-               s% o_core_mass, & !'o_core', &
-               s% si_core_mass, & !'si_core', &
-               s% fe_core_mass, & !'fe_core', &
-               safe_log10(s% grav(1)), & !'log_g', &
-               tot_h1, & !'tot h1', &
-               tot_he4 !'tot he4'
-            stop 'test'
-         end if
-         
          write(*,1) 's% x_ctrl(16)', s% x_ctrl(16)
          write(*,1) 's% star_mass', s% star_mass
          write(*,1) 'start_m', start_m
@@ -798,7 +761,7 @@
             s% x_ctrl(2) = stop_m
             write(*,1) 'stop when shock reaches', stop_m
             write(*,1) 's% he_core_mass', s% he_core_mass
-            write(*,1) 's% o_core_mass', s% o_core_mass
+            write(*,1) 's% co_core_mass', s% co_core_mass
             write(*,1) 's% M_center/Msun', s% M_center/Msun
             write(*,1) 's% star_mass', s% star_mass
             write(*,*)

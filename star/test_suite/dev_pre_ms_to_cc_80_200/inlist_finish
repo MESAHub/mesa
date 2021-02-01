@@ -6,8 +6,8 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      !required_termination_code_string = 'log_Rsurf_upper_limit' ! 200M
-      required_termination_code_string = 'fe_core_infall_limit'
+      !required_termination_code_string = 'fe_core_infall_limit'  ! for lower masses
+      !required_termination_code_string = 'log_Rsurf_upper_limit' ! for higher masses
 
       !pgstar_flag = .false.
 
@@ -26,8 +26,11 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      !log_Rsurf_upper_limit = 4d0 ! 200M
-      fe_core_infall_limit = 1d7 
+      log_Rsurf_upper_limit = 4d0 ! for higher masses
+      fe_core_infall_limit = 1d7 ! for lower masses
+      
+      x_logical_ctrl(7) = .true. ! for inlist_finish
+          ! checks for a required_termination_code
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
@@ -140,12 +143,20 @@
 
 ! output
 
-      num_trace_history_values = 5
+      num_trace_history_values = 8
       trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
       trace_history_value_name(3) = 'bound_mass'
       trace_history_value_name(4) = 'rel_E_err'
       trace_history_value_name(5) = 'log_rel_run_E_err'
+      trace_history_value_name(6) = 'he_core_radius'
+      trace_history_value_name(7) = 'co_core_radius'
+      trace_history_value_name(8) = 'fe_core_radius'
+      
+       
+       
+       
+       
       
       !report_min_dr_div_cs = .true.
 

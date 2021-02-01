@@ -51,10 +51,15 @@
       Si_cntr
       lg_Mdot
       He_cntr
+      
       zones
       lg_Dsurf
       C_cntr
       retries
+      
+      he_core_radius
+      co_core_radius
+      fe_core_radius
 
       non_fe_core_infall
       fe_core_infall

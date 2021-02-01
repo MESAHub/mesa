@@ -42,6 +42,8 @@
       !x_integer_ctrl(4) = 1 ! order
       !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
       !x_ctrl(2) = 0.33d+03 ! growth < this (days)
+      
+      !x_logical_ctrl(7) = .true. for inlist_finish
 
       contains
 
@@ -146,8 +148,34 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
          if (ierr /= 0) return
+         
+         if (s% x_logical_ctrl(6)) & ! inlist_prepare
+            call check_termination_code(t_log_max_temp_upper_limit, t_non_fe_core_infall_limit)
+         
+         if (s% x_logical_ctrl(7)) & ! inlist_finish
+            call check_termination_code(t_fe_core_infall_limit, t_log_Rsurf_upper_limit)
+         
          if (.not. s% x_logical_ctrl(37)) return
          call gyre_final()
+         
+         contains
+         
+         subroutine check_termination_code(tc1, tc2)
+            integer, intent(in) :: tc1, tc2
+            if (s% termination_code /= tc1 .and. s% termination_code /= tc2) then
+               if (s% termination_code > 0 .and. s% termination_code <= num_termination_codes) then
+                  write(*,*) 'Failed to get a valid termination reason ' // &
+                     trim(termination_code_str(s% termination_code))
+               else
+                  write(*,*) 'Failed to get a valid termination reason'
+               end if
+               ierr = -1
+            else
+               write(*,*) 'Has a valid termination reason ' // &
+                  trim(termination_code_str(s% termination_code))
+            end if
+         end subroutine check_termination_code
+         
       end subroutine extras_after_evolve
       
 
