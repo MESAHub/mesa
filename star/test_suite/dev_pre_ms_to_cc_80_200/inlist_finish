@@ -26,7 +26,7 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 4d0 ! for higher masses
+      log_Rsurf_upper_limit = 4.5d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
       
       x_logical_ctrl(7) = .true. ! for inlist_finish
@@ -143,7 +143,7 @@
 
 ! output
 
-      num_trace_history_values = 8
+      num_trace_history_values = 4 ! 9
       trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
       trace_history_value_name(3) = 'bound_mass'
@@ -152,13 +152,7 @@
       trace_history_value_name(6) = 'he_core_radius'
       trace_history_value_name(7) = 'co_core_radius'
       trace_history_value_name(8) = 'fe_core_radius'
-      
-       
-       
-       
-       
-      
-      !report_min_dr_div_cs = .true.
+      trace_history_value_name(9) = 'total_energy_foe'
 
       photo_interval = 10
       !profile_interval = 1
@@ -205,7 +199,7 @@
       !mesh_dump_call_number = 5189
       !okay_to_remesh = .false.
       
-      !energy_conservation_dump_model_number = -1
+      !energy_conservation_dump_model_number = 546
       
       !trace_evolve = .true.
       
@@ -232,6 +226,10 @@
 
 &pgstar
 
+!Grid1_file_flag = .true.
+Grid1_file_dir = 'png'
+Grid1_file_prefix = 'cc_'
+Grid1_file_interval = 1     ! output when mod(model_number,Grid1_file_interval)==0
 
 
 !pause = .true.
@@ -268,7 +266,7 @@ Profile_Panels3_yaxis_name(5) = 'logRho'
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(5) = 12
  
-Profile_Panels3_yaxis_name(6) = 'logT' ! 'mass' ! 'logR'
+Profile_Panels3_yaxis_name(6) =  'logT' ! 'mass' ! 'logR_cm' !
     Profile_Panels3_ymin(6) = -101 ! -3d0
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
@@ -276,7 +274,7 @@ Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
 
  History_Panels2_title = ''
 
- History_Panels2_xaxis_name = 'star_age_sec'
+ History_Panels2_xaxis_name = 'star_age_day'
  History_Panels2_max_width = -1
 
  History_Panels2_txt_scale = 0.75

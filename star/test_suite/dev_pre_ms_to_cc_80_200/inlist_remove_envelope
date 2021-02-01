@@ -10,6 +10,7 @@
       required_termination_code_string = 'max_model_number'
 
       remove_initial_surface_at_he_core_boundary = 0.01d0 ! H abundance where cut
+      remove_initial_surface_at_he_core_boundary = 0.1d0 ! 0.05d0 ! 150M
 
 ! this fails as of Jan 25      
 !      remove_surface_by_relax_to_star_cut = .true.

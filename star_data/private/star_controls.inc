@@ -644,15 +644,17 @@
          
          logical :: use_split_merge_amr, trace_split_merge_amr, &
             equal_split_density_amr, split_merge_amr_skip_inner_cell, &
+            split_merge_amr_hybrid_zoning, &
             split_merge_amr_log_zoning, &
             split_merge_amr_logtau_zoning, &
             split_merge_amr_okay_to_split_nz, &
             split_merge_amr_okay_to_split_1, &
             merge_amr_inhibit_at_jumps
-         integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters
+         integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters, &
+            split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_cntr_dq_min
+            split_merge_amr_r_core_cm
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells

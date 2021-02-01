@@ -1237,10 +1237,10 @@
             virial = 3*sum(s% dm(1:nz)*s% P(1:nz)/s% rho(1:nz))
             s% virial_thm_P_avg = virial
 
-            if (s% u_flag) then ! .or. s% use_dedt_form_of_energy_eqn) then
+            s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
+            if (s% u_flag .and. s% total_eps_grav /= 0d0) then ! .or. s% use_dedt_form_of_energy_eqn) then
+               write(*,2) 'u_flag energy accounting ignores total_eps_grav', s% model_number, s% total_eps_grav
                s% total_eps_grav = 0
-            else
-               s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
             end if
             
             ! notes from Adam:
@@ -1331,12 +1331,6 @@
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
             s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz))
-            
-            if (s% u_flag) then ! ignore total_work for Riemann hydro
-               s% work_outward_at_surface = 0d0
-               s% work_inward_at_center = 0d0
-            else ! these are set in energy equation
-            end if
 
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
@@ -1414,8 +1408,7 @@
                write(*,*)
                
                if (s% use_dedt_form_with_total_energy_conservation .and. &
-                   s% always_use_dedt_form_of_energy_eqn .and. &
-                   .not. s% u_flag) then
+                   s% always_use_dedt_form_of_energy_eqn) then
                   
                   write(*,*)
                   write(*,*) 'for debugging phase1_sources_and_sinks'
