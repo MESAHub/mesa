@@ -137,6 +137,7 @@ Mixing_legend_txt_scale_factor = 0.9
 
 Profile_Panels3_yaxis_name(4) = 'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
+Profile_Panels3_other_dymin(4) = 0.75
 
 Profile_Panels3_yaxis_name(5) = 'logT'
 Profile_Panels3_other_yaxis_name(5) = 'burn_num_iters'
@@ -607,7 +608,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_yaxis_reversed(2) = .false.
     History_Panels1_other_ymin(2) = -101d0
     History_Panels1_other_ymax(2) = -101d0
-    History_Panels1_other_dymin(2) = 7d-5
+    History_Panels1_other_dymin(2) = 0.14
 
       ! ::
 

@@ -257,7 +257,8 @@
          real(dp) :: &
             oversize_ratio, undersize_ratio, abs_du_div_cs, outer_fraction, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
-            outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm
+            outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
+            target_dr_core, target_dlnR_envelope
          logical :: hydrid_zoning, log_zoning, logtau_zoning, du_div_cs_limit_flag
          integer :: nz, nz_baseline, k, kmin, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
@@ -268,9 +269,9 @@
          hydrid_zoning = s% split_merge_amr_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
-         nz_baseline = s% split_merge_amr_nz_baseline         
          nz_r_core = s% split_merge_amr_nz_r_core
          r_core_cm = s% split_merge_amr_r_core_cm
+         nz_baseline = s% split_merge_amr_nz_baseline         
          dq_min = s% split_merge_amr_dq_min
          dq_max = s% split_merge_amr_dq_max
          inner_outer_q = 0d0
@@ -285,7 +286,8 @@
          end if
          
          if (hydrid_zoning) then
-            stop 'hydrid_zoning not ready'
+            target_dr_core = (r_core_cm - s% R_center)/nz_r_core
+            target_dlnR_envelope = (s% lnR(1) - log(max(1d0,r_core_cm)))/(nz - nz_r_core)
          else if (logtau_zoning) then
             k = nz
             xmin = log(tau_center)
@@ -314,13 +316,32 @@
          
             xL = xR
             dx_baseline = inner_dx_baseline
-            if (logtau_zoning) then
+            if (hydrid_zoning) then
+               if (s% r(k) < r_core_cm) then
+                  xR = s% r(k)
+                  if (k == nz) then
+                     xL = s% R_center
+                  else
+                     xL = s% r(k+1)
+                  end if
+                  dx_baseline = target_dr_core
+               else
+                  xR = log(s% r(k))
+                  if (k == nz) then
+                     xL = log(max(1d0,s% R_center))
+                  else
+                     xL = log(s% r(k+1))
+                  end if
+                  dx_baseline = target_dlnR_envelope
+               end if
+            else if (logtau_zoning) then
                xR = log(s% tau(k))
             else if (log_zoning) then
                xR = log(s% r(k)) ! s% lnR(k) may not be set since making many changes
             else
                xR = s% r(k)
             end if
+            
             if (s% split_merge_amr_avoid_repeated_remesh .and. &
                   (s% split_merge_amr_avoid_repeated_remesh .and. &
                      s% amr_split_merge_has_undergone_remesh(k))) cycle
@@ -336,9 +357,8 @@
                end if
             end if
 
-            if (s% merge_amr_ignore_surface_cells .and. k<=s% merge_amr_k_for_ignore_surface_cells) then
-               cycle
-            end if
+            if (s% merge_amr_ignore_surface_cells .and. &
+                  k<=s% merge_amr_k_for_ignore_surface_cells) cycle
 
             if(abs(dx_actual)>0d0) then
                undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))

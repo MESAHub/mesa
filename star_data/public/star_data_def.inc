@@ -141,7 +141,8 @@
       integer, parameter :: t_envelope_fraction_left_limit = t_envelope_mass_limit + 1 
       integer, parameter :: t_he_core_mass_limit = t_envelope_fraction_left_limit + 1 
       integer, parameter :: t_co_core_mass_limit = t_he_core_mass_limit + 1 
-      integer, parameter :: t_fe_core_mass_limit = t_co_core_mass_limit + 1 
+      integer, parameter :: t_one_core_mass_limit = t_co_core_mass_limit + 1 
+      integer, parameter :: t_fe_core_mass_limit = t_one_core_mass_limit + 1 
       integer, parameter :: t_neutron_rich_core_mass_limit = t_fe_core_mass_limit + 1 
       integer, parameter :: t_he_layer_mass_lower_limit = t_neutron_rich_core_mass_limit + 1 
       integer, parameter :: t_abs_diff_lg_LH_lg_Ls_limit = t_he_layer_mass_lower_limit + 1 

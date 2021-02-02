@@ -113,6 +113,7 @@
 
          termination_code_str(t_he_core_mass_limit) = 'he_core_mass_limit'
          termination_code_str(t_co_core_mass_limit) = 'co_core_mass_limit'
+         termination_code_str(t_one_core_mass_limit) = 'one_core_mass_limit'
          termination_code_str(t_fe_core_mass_limit) = 'fe_core_mass_limit'
          termination_code_str(t_neutron_rich_core_mass_limit) = 'neutron_rich_core_mass_limit'
 

@@ -12,6 +12,7 @@
          real(dp) :: &
             he_core_boundary_h1_fraction, &
             co_core_boundary_he4_fraction, &
+            one_core_boundary_he4_c12_fraction, &
             fe_core_boundary_si28_fraction, &
             neutron_rich_core_boundary_Ye_max, &
             min_boundary_fraction
@@ -75,6 +76,7 @@
 
          real(dp) :: he_core_mass_limit
          real(dp) :: co_core_mass_limit
+         real(dp) :: one_core_mass_limit
          real(dp) :: fe_core_mass_limit
          real(dp) :: neutron_rich_core_mass_limit
 

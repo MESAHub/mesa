@@ -910,6 +910,16 @@
       real(dp) :: co_core_omega ! (s^-1)
       real(dp) :: co_core_omega_div_omega_crit
       integer :: co_core_k ! boundary is in this cell
+      
+      real(dp) :: one_core_mass ! baryonic (Msun)
+      real(dp) :: one_core_radius ! Rsun
+      real(dp) :: one_core_lgT
+      real(dp) :: one_core_lgRho
+      real(dp) :: one_core_L ! Lsun
+      real(dp) :: one_core_v
+      real(dp) :: one_core_omega ! (s^-1)
+      real(dp) :: one_core_omega_div_omega_crit
+      integer :: one_core_k ! boundary is in this cell
 
       real(dp) :: fe_core_mass ! baryonic (Msun)
       real(dp) :: fe_core_radius ! Rsun

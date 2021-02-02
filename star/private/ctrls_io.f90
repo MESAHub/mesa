@@ -57,8 +57,8 @@
     initial_mass, initial_z, initial_y, initial_he3, &
     
     ! definition of core boundaries
-    he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, fe_core_boundary_si28_fraction, &
-    neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
+    he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, one_core_boundary_he4_c12_fraction, &
+    fe_core_boundary_si28_fraction, neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
     
     ! when to stop
     max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, &
@@ -84,7 +84,7 @@
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
     star_species_mass_min_limit, star_species_mass_min_limit_iso, star_species_mass_max_limit, star_species_mass_max_limit_iso, &
     xmstar_min_limit, xmstar_max_limit, envelope_mass_limit, envelope_fraction_left_limit, &
-    he_core_mass_limit, co_core_mass_limit, &
+    he_core_mass_limit, co_core_mass_limit, one_core_mass_limit, &
     fe_core_mass_limit, neutron_rich_core_mass_limit, HB_limit, star_mass_min_limit, star_mass_max_limit, &
     he_layer_mass_lower_limit, abs_diff_lg_LH_lg_Ls_limit, Teff_upper_limit, Teff_lower_limit, &
     photosphere_m_upper_limit, photosphere_m_lower_limit, photosphere_m_sub_M_center_limit, &
@@ -783,6 +783,7 @@
  ! definition of core boundaries
  s% he_core_boundary_h1_fraction = he_core_boundary_h1_fraction
  s% co_core_boundary_he4_fraction = co_core_boundary_he4_fraction
+ s% one_core_boundary_he4_c12_fraction = one_core_boundary_he4_c12_fraction
  s% fe_core_boundary_si28_fraction = fe_core_boundary_si28_fraction
  s% neutron_rich_core_boundary_Ye_max = neutron_rich_core_boundary_Ye_max
  s% min_boundary_fraction = min_boundary_fraction
@@ -895,6 +896,7 @@
 
  s% he_core_mass_limit = he_core_mass_limit
  s% co_core_mass_limit = co_core_mass_limit
+ s% one_core_mass_limit = one_core_mass_limit
  s% fe_core_mass_limit = fe_core_mass_limit
  s% neutron_rich_core_mass_limit = neutron_rich_core_mass_limit
 
@@ -2420,6 +2422,7 @@
  ! definition of core boundaries
  he_core_boundary_h1_fraction = s% he_core_boundary_h1_fraction
  co_core_boundary_he4_fraction = s% co_core_boundary_he4_fraction
+ one_core_boundary_he4_c12_fraction = s% one_core_boundary_he4_c12_fraction
  fe_core_boundary_si28_fraction = s% fe_core_boundary_si28_fraction
  neutron_rich_core_boundary_Ye_max = s% neutron_rich_core_boundary_Ye_max
  min_boundary_fraction = s% min_boundary_fraction
@@ -2532,6 +2535,7 @@
 
  he_core_mass_limit = s% he_core_mass_limit
  co_core_mass_limit = s% co_core_mass_limit
+ one_core_mass_limit = s% one_core_mass_limit
  fe_core_mass_limit = s% fe_core_mass_limit
  neutron_rich_core_mass_limit = s% neutron_rich_core_mass_limit
 

@@ -916,6 +916,10 @@
             call compare_to_target('co_core_mass >= co_core_mass_limit', &
                s% co_core_mass, s% co_core_mass_limit, t_co_core_mass_limit)
             
+         else if (s% one_core_mass >= s% one_core_mass_limit) then 
+            call compare_to_target('one_core_mass >= one_core_mass_limit', &
+               s% one_core_mass, s% one_core_mass_limit, t_one_core_mass_limit)
+            
          else if (s% fe_core_mass >= s% fe_core_mass_limit) then 
             call compare_to_target('fe_core_mass >= fe_core_mass_limit', &
                s% fe_core_mass, s% fe_core_mass_limit, t_fe_core_mass_limit)

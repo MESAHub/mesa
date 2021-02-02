@@ -42,16 +42,24 @@
 
 ! mesh
       use_split_merge_amr = .true.
-      split_merge_amr_log_zoning = .true.
+      
+      !split_merge_amr_log_zoning = .true.
+      
+      split_merge_amr_hybrid_zoning = .true.
+      split_merge_amr_nz_r_core = 300
+      split_merge_amr_r_core_cm = 1d8
+      
       split_merge_amr_nz_baseline = 2500 ! 2000
       split_merge_amr_MaxLong = 1.7d0
       split_merge_amr_MaxShort = 1.7d0
       split_merge_amr_max_iters = 10
+      
+      
 
 ! solver
-      !use_gold2_tolerances = .false.
+      use_gold2_tolerances = .false.
       use_gold_tolerances = .true.
-      !gold_tol_max_residual3 = 1d-4
+      gold_tol_max_residual3 = 1d-3
 
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.

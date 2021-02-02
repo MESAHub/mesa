@@ -164,14 +164,14 @@
             integer, intent(in) :: tc1, tc2
             if (s% termination_code /= tc1 .and. s% termination_code /= tc2) then
                if (s% termination_code > 0 .and. s% termination_code <= num_termination_codes) then
-                  write(*,*) 'Failed to get a valid termination reason ' // &
+                  write(*,*) 'Failed to get a valid termination reason. got this instead: ' // &
                      trim(termination_code_str(s% termination_code))
                else
                   write(*,*) 'Failed to get a valid termination reason'
                end if
                ierr = -1
             else
-               write(*,*) 'Has a valid termination reason ' // &
+               write(*,*) 'Has a valid termination reason: ' // &
                   trim(termination_code_str(s% termination_code))
             end if
          end subroutine check_termination_code

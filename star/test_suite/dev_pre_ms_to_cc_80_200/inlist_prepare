@@ -175,7 +175,7 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 0.01 ! -101d0
+Profile_Panels3_xmax = -101d0
 
 TRho_Profile_xmin = 2.3
 TRho_Profile_xmax = 8.2
