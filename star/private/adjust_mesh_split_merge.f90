@@ -257,17 +257,20 @@
          real(dp) :: &
             oversize_ratio, undersize_ratio, abs_du_div_cs, outer_fraction, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
-            outer_dx_baseline, inner_dx_baseline, inner_outer_q
-         logical :: log_zoning, logtau_zoning, du_div_cs_limit_flag
-         integer :: nz, nz_baseline, k, kmin
+            outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm
+         logical :: hydrid_zoning, log_zoning, logtau_zoning, du_div_cs_limit_flag
+         integer :: nz, nz_baseline, k, kmin, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
 
          include 'formats'
          
          nz = s% nz
+         hydrid_zoning = s% split_merge_amr_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
          nz_baseline = s% split_merge_amr_nz_baseline         
+         nz_r_core = s% split_merge_amr_nz_r_core
+         r_core_cm = s% split_merge_amr_r_core_cm
          dq_min = s% split_merge_amr_dq_min
          dq_max = s% split_merge_amr_dq_max
          inner_outer_q = 0d0
@@ -281,7 +284,9 @@
             nullify(v,r_for_v)
          end if
          
-         if (logtau_zoning) then
+         if (hydrid_zoning) then
+            stop 'hydrid_zoning not ready'
+         else if (logtau_zoning) then
             k = nz
             xmin = log(tau_center)
             xmax = log(s% tau(1))
@@ -312,12 +317,13 @@
             if (logtau_zoning) then
                xR = log(s% tau(k))
             else if (log_zoning) then
-               xR = log(s% r(k)) ! s% lnR(k) not set
+               xR = log(s% r(k)) ! s% lnR(k) may not be set since making many changes
             else
                xR = s% r(k)
             end if
             if (s% split_merge_amr_avoid_repeated_remesh .and. &
-                  (s% split_merge_amr_avoid_repeated_remesh .and. s% amr_split_merge_has_undergone_remesh(k))) cycle
+                  (s% split_merge_amr_avoid_repeated_remesh .and. &
+                     s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
             

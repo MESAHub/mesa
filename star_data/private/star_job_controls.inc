@@ -71,6 +71,8 @@
       logical :: relax_mass_scale, relax_initial_mass_scale
       real(dp) :: dlgm_per_step, relax_M_center_dt, change_mass_years_for_dt
       logical :: relax_M_center, relax_initial_M_center
+     
+      logical :: relax_mass_to_remove_H_env, relax_initial_mass_to_remove_H_env
 
       logical :: relax_core, relax_initial_core
       real(dp) :: new_core_mass, dlg_core_mass_per_step, &

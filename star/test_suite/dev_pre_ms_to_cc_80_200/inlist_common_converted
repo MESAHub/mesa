@@ -32,6 +32,9 @@
 ! rotation
 
 ! mlt
+      alpha_semiconvection = 0
+      thermohaline_coeff = 0
+      max_logT_for_mlt = 9.0d0
 
 ! mixing
       
@@ -46,9 +49,9 @@
       split_merge_amr_max_iters = 10
 
 ! solver
-      use_gold2_tolerances = .false.
+      !use_gold2_tolerances = .false.
       use_gold_tolerances = .true.
-      gold_tol_max_residual3 = 1d-4
+      !gold_tol_max_residual3 = 1d-4
 
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
@@ -105,14 +108,17 @@ Profile_Panels3_xmax = -101d0
 Profile_Panels3_num_panels = 6
 
 Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
+Profile_Panels3_other_dymin(4) = 0.1
 Profile_Panels3_yaxis_name(4) = 'gamma1'
     Profile_Panels3_ymin(4) = 1.28d0
     Profile_Panels3_ymax(4) = -101d0
 
 Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
+Profile_Panels3_other_dymin(5) = 1
 Profile_Panels3_yaxis_name(5) = 'logRho'
  
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
+Profile_Panels3_other_dymin(6) = 0.1
 Profile_Panels3_yaxis_name(6) = 'logR_cm'
 
 TRho_Profile_xmin = -5 ! -2.0

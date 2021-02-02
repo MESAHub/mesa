@@ -38,7 +38,7 @@
       
 ! timesteps
       max_timestep_factor = 1.01d0
-      max_timestep = 1d0
+      max_timestep = 1d-2
 
 ! mesh
 

@@ -51,16 +51,10 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
-      max_logT_for_mlt = 9.3d0
 
 ! mixing
       
 ! timesteps
-      limit_for_rel_error_in_energy_conservation = 1d-4
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
-
       delta_lgTeff_limit =  0.2
       delta_lgL_limit = 0.5     
       delta_lgL_He_limit = 0.5
@@ -73,54 +67,16 @@
 
       delta_XHe_cntr_limit = 0.03
       delta_XHe_cntr_hard_limit = 0.1
-
+ 
       delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = 0.03d0
-
-      !dt_div_min_dr_div_cs_limit = 2 ! 0.7d0
+      delta_XSi_cntr_hard_limit = -1 ! 0.03d0  ! this kills the 120M case 
 
 ! mesh
 
 ! solver
-      use_gold2_tolerances = .false.
-      use_gold_tolerances = .true.
 
-      max_abs_rel_run_E_err = 1d99
-      warn_when_large_rel_run_E_err = 1d99
-
-      gold_iter_for_resid_tol3 = 7
-      gold_tol_max_residual3 = 1d-4
-
-      always_use_dedt_form_of_energy_eqn = .true.       
-      use_dPrad_dm_form_of_T_gradient_eqn = .true.
-      use_d_eos_dxa = .true.
-      
+      ! this change of surface BC can cause lots of initial retries to reduce timestep
       use_compression_outer_BC = .true.
-      
-      min_timestep_limit = 1d-12
-
-      convergence_ignore_equL_residuals = .true. 
-      make_gradr_sticky_in_solver_iters = .true.
-      
-      xa_scale = 1d-5
-      iter_for_resid_tol2 = 10
-      min_timestep_limit = 1d-12 ! (seconds)
-
-      warn_rates_for_high_temp = .true.
-      max_safe_logT_for_rates = 10.5d0
-
-      screening_mode = 'chugunov'
-
-      sig_min_factor_for_high_Tcenter = 0.01
-      Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-      Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-
-      op_split_burn = .true.
-      op_split_burn_min_T = 1d9
-      burn_steps_limit = 150
-      burn_steps_hard_limit = 250
-      op_split_burn_eps = 1d-5
-      op_split_burn_odescal = 1d-5
 
 ! GYRE output controls
 

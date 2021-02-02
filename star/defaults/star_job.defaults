@@ -1003,6 +1003,20 @@
     lg_max_abs_mdot = -100
 
 
+      ! relax_mass_to_remove_H_env
+      ! ~~~~~~~~~~
+      ! relax_initial_mass_to_remove_H_env
+      ! ~~~~~~~~
+
+      ! Gradually reduce total mass by a wind to remove the H envelope.
+      ! Equivalent to relax_mass with new_mass = He_core_mass.
+
+      ! ::
+
+    relax_mass_to_remove_H_env = .false.
+    relax_initial_mass_to_remove_H_env = .false.
+
+
       ! relax_mass_scale
       ! ~~~~~~~~~~~~~~~~
       ! relax_initial_mass_scale

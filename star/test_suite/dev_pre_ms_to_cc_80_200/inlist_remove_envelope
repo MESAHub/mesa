@@ -7,7 +7,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'removed_envelope.mod'
-      required_termination_code_string = 'max_model_number'
+      required_termination_code_string = 'star_species_mass_min_limit'
 
       !remove_initial_surface_at_he_core_boundary = 0.45d0
 
@@ -28,12 +28,15 @@
 / ! end of kap namelist
 
 &controls
+      star_species_mass_min_limit = 1d-3
+      star_species_mass_min_limit_iso = 'h1'
       
       ! just run for a relatively small number of steps to adjust to removing envelope
-      max_model_number = 1 ! 100
+      max_model_number = 4000
       !max_number_retries = 37
 
 ! wind
+      mass_change = -1d-1
 
 ! atmosphere
 
