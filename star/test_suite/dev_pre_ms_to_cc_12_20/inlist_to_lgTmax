@@ -42,9 +42,6 @@
 ! mixing
 
 ! timesteps
-      delta_lgT_max_limit = 0.02     
-      delta_lgT_max_hard_limit = 0.2
-
       dX_nuc_drop_limit = -1
 
 ! mesh

@@ -72,7 +72,7 @@
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
       thermohaline_option = 'Kippenhahn'
-      ! semiconvection and thermohaline are turned on in inlist_to_end_core_he_burn, off otherwise.
+
       alpha_semiconvection = 0
       thermohaline_coeff = 0
 

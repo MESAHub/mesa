@@ -7,9 +7,10 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'removed_envelope.mod'
-      required_termination_code_string = 'star_species_mass_min_limit'
+      required_termination_code_string = 'max_model_number'
 
-      !remove_initial_surface_at_he_core_boundary = 0.45d0
+      relax_initial_mass_to_remove_H_env = .true.
+      lg_max_abs_mdot = -3
 
       set_initial_age = .true.
       initial_age = 0
@@ -28,35 +29,26 @@
 / ! end of kap namelist
 
 &controls
-      star_species_mass_min_limit = 1d-3
-      star_species_mass_min_limit_iso = 'h1'
       
       ! just run for a relatively small number of steps to adjust to removing envelope
-      max_model_number = 4000
+      max_model_number = 100
       !max_number_retries = 37
 
 ! wind
-      mass_change = -1d-1
 
 ! atmosphere
 
 ! rotation
 
 ! mlt
-      ! semiconvection and thermohaline are on until end of core He burn, off after.
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      !max_years_for_timestep = 0.1
 
 ! mesh
 
 ! solver
-      !drag_coefficient = 999999d0 ! drive v to 0 in H envelope after end core He burn
-      !turn_on_drag_in_H_envelope = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.

@@ -40,8 +40,6 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
 
 ! mixing
 
