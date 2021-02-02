@@ -10,7 +10,7 @@
       required_termination_code_string = 'max_model_number'
 
       relax_initial_mass_to_remove_H_env = .true.
-      lg_max_abs_mdot = -3
+      lg_max_abs_mdot = -1
 
       set_initial_age = .true.
       initial_age = 0
@@ -31,7 +31,7 @@
 &controls
       
       ! just run for a relatively small number of steps to adjust to removing envelope
-      max_model_number = 100
+      max_model_number = 10
       !max_number_retries = 37
 
 ! wind
@@ -49,6 +49,8 @@
 ! mesh
 
 ! solver
+      use_gold2_tolerances = .false.
+      use_gold_tolerances = .false.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
