@@ -1,0 +1,135 @@
+# This is the makefile for the mesa star_data package
+
+MESA_DIR = ../..
+
+#################################################################
+#
+# PREAMBLE
+
+include $(MESA_DIR)/utils/makefile_header
+
+#################################################################
+#
+# SOURCES
+
+SRCS = \
+   star_data_def.f90 \
+   star_data_lib.f90
+
+#################################################################
+#
+# TARGETS
+
+LIB = libstar_data.$(LIB_SUFFIX)
+
+OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+
+$(LIB) : $(OBJS)
+ifneq ($(QUIET),)
+	@echo LIB_TOOL $(LIB)
+	@$(LIB_TOOL) $(LIB) $(OBJS)
+else	   
+	$(LIB_TOOL) $(LIB) $(OBJS)
+endif
+
+clean:
+	-@rm -f *.o *.mod *.smod *genmod.f90 *.so *.a .depend .order
+
+install:
+	@$(CP_IF_NEWER) star_data_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_data_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) ../private/*.inc $(MESA_DIR)/include
+	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+
+nodeps : $(.DEFAULT_GOAL)
+
+#################################################################
+#
+# COMPILATION RULES
+
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
+
+COMPILE_CMD = $(COMPILE)
+
+%.o : %.mod
+
+%.o : %.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.o : %.f90
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@$(COMPILE_CMD) $<
+else
+	$(COMPILE_CMD) $<
+endif
+
+%.mod : %.o
+	@true
+
+#################################################################
+#
+# DEPENDENCIES
+
+# Paths to search for source & include files
+
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
+vpath %.inc $(SRC_PATH)
+
+vpath %.mod $(MESA_DIR)/include
+
+# Automatic dependency generation using makedepf90. If full
+# dependencies are required, set FULLDEPS to the value 'yes';
+# otherwise, order-only dependencies will be generated. Note that
+# the default value given below can be overridden from the command
+# line and/or the shell environment; this provides a simple way
+# to turn off full dependencies without editing this file
+
+FULLDEPS ?= yes
+
+# Turning off FULLDEPS makes Bill happy because eliminates unnecessary extra compiles
+# but beware; here are comments from Rich:
+#
+# Generally speaking, we *DON'T* want to make the order-only checking the default, 
+# because then a modification to a module which changes its public interface 
+# would not trigger a rebuild of all the modules which depend on it. 
+# Bad things would result.
+#
+# However, for when one is playing around with internals, in a way that doesn't 
+# affect public interfaces, it can be a time-saving measure to use order-only checking.
+
+# reminders for Bill: the name of the file must be the same as the name of the module
+       # and no upper case letters in filenames.
+       # use COMPILE_LEGACY for old files that do not comply with f2008 standards.
+       # use .f for fixed format, .f90 for free
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+
+  DEPEND_DIRS = .:$(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+
+  .depend :
+  ifneq ($(QUIET),)
+	@echo MAKEDEPF90
+	@$(MAKEDEPF90) -I$(DEPEND_DIRS) $(SRCS) > .depend
+  else
+	$(MAKEDEPF90) -I$(DEPEND_DIRS) $(SRCS) > .depend
+  endif	
+
+  .order : .depend
+	@sed -e 's/:/:|/g' .depend > .order
+
+  ifeq ($(FULLDEPS),yes)
+    -include .depend
+  else
+    -include .order
+  endif
+
+endif

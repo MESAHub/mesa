@@ -175,8 +175,7 @@
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 0.001 ! -101d0
-Profile_Panels3_other_yaxis_name(5) = 'zone'
+Profile_Panels3_xmax = -101d0
 
 TRho_Profile_xmin = 2.3
 TRho_Profile_xmax = 8.2
