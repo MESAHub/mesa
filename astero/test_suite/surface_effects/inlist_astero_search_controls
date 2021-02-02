@@ -656,10 +656,12 @@
       ! you can stop the run if chi^2 is rising.
          
          ! here is a relative limit
-         chi2_relative_increase_limit = 2.0
          limit_num_chi2_too_big = 3
+         chi2_relative_increase_limit = 2.0
          ! if limit_num_chi2_too_big consequtive chi2s
          ! are > chi2_relative_increase_limit times the best chi2 for the run,
+         ! or a chi2 component exceeds its corresponding limit,
+         ! or chi2 can't be evaluated,
          ! then stop the run.
          
          ! and this is an absolute limit
