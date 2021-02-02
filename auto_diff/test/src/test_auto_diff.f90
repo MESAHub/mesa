@@ -73,13 +73,13 @@ program test_auto_diff
       do i=1,15
          x%d1Array(i) = 1d0 * i
       end do
-      y = x**2
+      y = pow2(x)
       do i=1,15
          call should_print0('', 6d0 * i, y%d1Array(i))
       end do
 
       write(*,*) 'Test x = x**2'
-      x = x**2
+      x = pow2(x)
       do i=1,15
          call should_print0('', 6d0 * i, x%d1Array(i))
       end do
