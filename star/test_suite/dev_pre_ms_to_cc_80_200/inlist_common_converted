@@ -25,6 +25,7 @@
 &controls
 
 ! wind
+      Dutch_scaling_factor = 0d0
 
 ! atmosphere
 
