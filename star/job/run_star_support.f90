@@ -729,13 +729,12 @@
                   write(*,2) trim(dt_why_str(i)) // ' retries', s% dt_why_retry_count(i)
                end if
             end do
-            write(*,2) 'misc other retries', s% num_retries - sum(s% dt_why_retry_count(1:numTlim))
             write(*,*)
          end if
          if (s% job% show_timestep_limit_counts_when_terminate) then
             do i=1,numTlim
                if (s% dt_why_count(i) > 0) then
-                  write(*,2) trim(dt_why_str(i)) // ' dt limits', s% dt_why_count(i)
+                  write(*,2) trim(dt_why_str(i)) // ' dt limit', s% dt_why_count(i)
                end if
             end do
             write(*,*)
@@ -2520,6 +2519,12 @@
             if (failed('star_relax_mass',ierr)) return
          end if
 
+         if (s% job% relax_mass_to_remove_H_env) then
+            write(*, 1) 'relaxrelax_mass_to_remove_H_env_mass'
+            call star_relax_mass_to_remove_H_env(id, s% job% lg_max_abs_mdot, ierr)
+            if (failed('star_relax_mass_to_remove_H_env',ierr)) return
+         end if
+
          if (s% job% relax_dxdt_nuc_factor .or. &
                (s% job% relax_initial_dxdt_nuc_factor .and. .not. restart)) then
             write(*, 1) 'relax_dxdt_nuc_factor', s% job% new_dxdt_nuc_factor
@@ -2563,6 +2568,12 @@
             write(*, 1) 'relax_initial_mass to new_mass', s% job% new_mass
             call star_relax_mass(id, s% job% new_mass, s% job% lg_max_abs_mdot, ierr)
             if (failed('relax_initial_mass',ierr)) return
+         end if
+
+         if (s% job% relax_initial_mass_to_remove_H_env .and. .not. restart) then
+            write(*, 1) 'relax_initial_mass_to_remove_H_env'
+            call star_relax_mass_to_remove_H_env(id, s% job% lg_max_abs_mdot, ierr)
+            if (failed('relax_initial_mass_to_remove_H_env',ierr)) return
          end if
 
          if (s% job% relax_mass_scale .or. &

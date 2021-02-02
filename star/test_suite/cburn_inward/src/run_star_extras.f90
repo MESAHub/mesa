@@ -191,8 +191,8 @@
          real(dp) :: netEng,ne_burn,o_burn
          
          has_ignited = .false.
-         if(s% c_core_mass > 0d0) then
-            if(s%m(k)/Msun < s%c_core_mass)THEN
+         if(s% co_core_mass > 0d0) then
+            if(s%m(k)/Msun < s%co_core_mass)THEN
                netEng = star_get_profile_output(s,'net_nuclear_energy',k)
          
                if(netEng >= 0.0)THEN

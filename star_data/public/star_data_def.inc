@@ -129,8 +129,10 @@
       integer, parameter :: t_HB_limit = t_log_max_temp_lower_limit + 1 
       integer, parameter :: t_star_mass_min_limit = t_HB_limit + 1 
       integer, parameter :: t_star_mass_max_limit = t_star_mass_min_limit + 1 
+      integer, parameter :: t_bound_mass_min_limit = t_star_mass_max_limit + 1 
+      integer, parameter :: t_bound_mass_max_limit = t_bound_mass_min_limit + 1 
       
-      integer, parameter :: t_star_species_mass_min_limit = t_star_mass_max_limit + 1 
+      integer, parameter :: t_star_species_mass_min_limit = t_bound_mass_max_limit + 1 
       integer, parameter :: t_star_species_mass_max_limit = t_star_species_mass_min_limit + 1 
       
       integer, parameter :: t_xmstar_min_limit = t_star_species_mass_max_limit + 1 
@@ -138,10 +140,8 @@
       integer, parameter :: t_envelope_mass_limit = t_xmstar_max_limit + 1 
       integer, parameter :: t_envelope_fraction_left_limit = t_envelope_mass_limit + 1 
       integer, parameter :: t_he_core_mass_limit = t_envelope_fraction_left_limit + 1 
-      integer, parameter :: t_c_core_mass_limit = t_he_core_mass_limit + 1 
-      integer, parameter :: t_o_core_mass_limit = t_c_core_mass_limit + 1 
-      integer, parameter :: t_si_core_mass_limit = t_o_core_mass_limit + 1 
-      integer, parameter :: t_fe_core_mass_limit = t_si_core_mass_limit + 1 
+      integer, parameter :: t_co_core_mass_limit = t_he_core_mass_limit + 1 
+      integer, parameter :: t_fe_core_mass_limit = t_co_core_mass_limit + 1 
       integer, parameter :: t_neutron_rich_core_mass_limit = t_fe_core_mass_limit + 1 
       integer, parameter :: t_he_layer_mass_lower_limit = t_neutron_rich_core_mass_limit + 1 
       integer, parameter :: t_abs_diff_lg_LH_lg_Ls_limit = t_he_layer_mass_lower_limit + 1 
@@ -162,7 +162,9 @@
       integer, parameter :: t_log_Teff_upper_limit = t_log_Teff_lower_limit + 1 
       integer, parameter :: t_log_Tsurf_lower_limit = t_log_Teff_upper_limit + 1 
       integer, parameter :: t_log_Tsurf_upper_limit = t_log_Tsurf_lower_limit + 1 
-      integer, parameter :: t_log_Psurf_lower_limit = t_log_Tsurf_upper_limit + 1 
+      integer, parameter :: t_log_Rsurf_lower_limit = t_log_Tsurf_upper_limit + 1 
+      integer, parameter :: t_log_Rsurf_upper_limit = t_log_Rsurf_lower_limit + 1 
+      integer, parameter :: t_log_Psurf_lower_limit = t_log_Rsurf_upper_limit + 1 
       integer, parameter :: t_log_Psurf_upper_limit = t_log_Psurf_lower_limit + 1 
       integer, parameter :: t_log_Dsurf_lower_limit = t_log_Psurf_upper_limit + 1 
       integer, parameter :: t_log_Dsurf_upper_limit = t_log_Dsurf_lower_limit + 1 

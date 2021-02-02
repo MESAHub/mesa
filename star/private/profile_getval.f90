@@ -1337,7 +1337,7 @@
                if (s% RTI_flag) val = safe_log10(s% sigmid_RTI(k))
 
             case (p_log_D_omega)
-               if (s% D_omega_flag) val = safe_log10(s% D_omega(k))
+               if (s% rotation_flag) val = safe_log10(s% D_omega(k))
                
             case (p_log_D_mix_non_rotation)
                val = safe_log10(s% D_mix_non_rotation(k))

@@ -1140,7 +1140,7 @@
          call smooth(s% grad_density,nz)
          call smooth(s% grad_temperature,nz)
 
-         if (s% use_Ledoux_criterion) then
+         if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
             do k=1,nz
                s% gradL_composition_term(k) = s% unsmoothed_brunt_B(k)
             end do

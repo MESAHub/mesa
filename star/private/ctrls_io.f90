@@ -57,8 +57,7 @@
     initial_mass, initial_z, initial_y, initial_he3, &
     
     ! definition of core boundaries
-    he_core_boundary_h1_fraction, c_core_boundary_he4_fraction, o_core_boundary_c12_fraction, &
-    si_core_boundary_o16_fraction, fe_core_boundary_si28_fraction, &
+    he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, fe_core_boundary_si28_fraction, &
     neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
     
     ! when to stop
@@ -73,7 +72,7 @@
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
     v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit, v_surf_div_v_esc_limit, v_surf_kms_limit, &
     stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, gamma1_limit, gamma1_limit_max_q, &
-    stop_at_phase_PreMS, stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, &
+    stop_at_phase_PreMS, stop_at_phase_ZAMS, stop_at_phase_IAMS, stop_at_phase_TAMS, gamma1_limit_max_v_div_vesc, &
     stop_at_phase_He_Burn, stop_at_phase_ZACHeB, stop_at_phase_TACHeB, &
     stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
     stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS, &
@@ -85,12 +84,13 @@
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
     star_species_mass_min_limit, star_species_mass_min_limit_iso, star_species_mass_max_limit, star_species_mass_max_limit_iso, &
     xmstar_min_limit, xmstar_max_limit, envelope_mass_limit, envelope_fraction_left_limit, &
-    he_core_mass_limit, c_core_mass_limit, o_core_mass_limit, si_core_mass_limit, &
+    he_core_mass_limit, co_core_mass_limit, &
     fe_core_mass_limit, neutron_rich_core_mass_limit, HB_limit, star_mass_min_limit, star_mass_max_limit, &
     he_layer_mass_lower_limit, abs_diff_lg_LH_lg_Ls_limit, Teff_upper_limit, Teff_lower_limit, &
     photosphere_m_upper_limit, photosphere_m_lower_limit, photosphere_m_sub_M_center_limit, &
     photosphere_r_upper_limit, photosphere_r_lower_limit, log_Teff_upper_limit, log_Teff_lower_limit, &
-    log_Tsurf_upper_limit, log_Tsurf_lower_limit, log_Psurf_upper_limit, log_Psurf_lower_limit, &
+    log_Tsurf_upper_limit, log_Tsurf_lower_limit, log_Rsurf_upper_limit, log_Rsurf_lower_limit, &
+    log_Psurf_upper_limit, log_Psurf_lower_limit, bound_mass_min_limit, bound_mass_max_limit, &
     log_Dsurf_upper_limit, log_Dsurf_lower_limit, log_L_upper_limit, log_L_lower_limit, &
     log_g_upper_limit, log_g_lower_limit, power_nuc_burn_upper_limit, power_h_burn_upper_limit, &
     power_he_burn_upper_limit, power_z_burn_upper_limit, power_nuc_burn_lower_limit, &
@@ -160,7 +160,7 @@
     min_dt_for_increases_in_convection_velocity, max_conv_vel_div_csound, &
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
-    calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
+    calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
     threshold_for_smooth_brunt_B, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
     RSP_max_num_periods, RSP_min_max_R_for_periods, &
@@ -259,12 +259,12 @@
     gradT_function_weight, log_tau_function_weight, log_kap_function_weight, omega_function_weight, &
     gam_function_weight, gam_function_param1, gam_function_param2, &
     xa_function_species, xa_function_weight, xa_function_param, xa_mesh_delta_coeff, &
-    use_split_merge_amr, split_merge_amr_nz_baseline, split_merge_amr_log_zoning, &
-    split_merge_amr_logtau_zoning, split_merge_amr_okay_to_split_nz, &
+    use_split_merge_amr, split_merge_amr_nz_baseline, split_merge_amr_log_zoning, split_merge_amr_hybrid_zoning, &
+    split_merge_amr_logtau_zoning, split_merge_amr_okay_to_split_nz, split_merge_amr_nz_r_core, &
     split_merge_amr_okay_to_split_1, merge_amr_inhibit_at_jumps, split_merge_amr_MaxLong,&
     split_merge_amr_MaxShort, merge_amr_max_abs_du_div_cs, &
     merge_amr_ignore_surface_cells, merge_amr_k_for_ignore_surface_cells, &
-    merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, &
+    merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
     split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, trace_split_merge_amr, equal_split_density_amr, &
 
     ! nuclear reaction parameters
@@ -445,6 +445,9 @@
     delta_log_eps_nuc_limit, delta_log_eps_nuc_hard_limit, delta_lgT_max_limit_lgT_min, &
     delta_lgT_max_at_high_T_limit, delta_lgT_max_at_high_T_hard_limit, delta_lgT_max_at_high_T_limit_lgT_min, &
     delta_dX_div_X_cntr_min, delta_dX_div_X_cntr_max, delta_dX_div_X_cntr_limit, delta_dX_div_X_cntr_hard_limit, &
+    delta_dX_div_X_drop_only, delta_lg_XH_drop_only, &
+    delta_lg_XHe_drop_only, delta_lg_XC_drop_only, delta_lg_XNe_drop_only, delta_lg_XO_drop_only, delta_lg_XSi_drop_only, &
+    delta_XH_drop_only, delta_XHe_drop_only, delta_XC_drop_only, delta_XNe_drop_only, delta_XO_drop_only, delta_XSi_drop_only, &    
     delta_lg_XH_cntr_min, delta_lg_XH_cntr_max, delta_lg_XH_cntr_limit, delta_lg_XH_cntr_hard_limit, &
     delta_lg_XHe_cntr_min, delta_lg_XHe_cntr_max, delta_lg_XHe_cntr_limit, delta_lg_XHe_cntr_hard_limit, &
     delta_lg_XC_cntr_min, delta_lg_XC_cntr_max, delta_lg_XC_cntr_limit, delta_lg_XC_cntr_hard_limit, &
@@ -460,7 +463,7 @@
     delta_mdot_atol, delta_mdot_rtol, delta_mdot_limit, delta_mdot_hard_limit, &
     adjust_J_q_limit, adjust_J_q_hard_limit, &
     never_skip_hard_limits, relax_hard_limits_after_retry, &
-    report_dt_hard_limit_retries, report_solver_dt_info, &
+    report_dt_hard_limit_retries, report_min_dr_div_cs, report_solver_dt_info, &
     limit_for_rel_error_in_energy_conservation, hard_limit_for_rel_error_in_energy_conservation, &
 
     ! atmosphere -- surface boundary conditions
@@ -779,9 +782,7 @@
 
  ! definition of core boundaries
  s% he_core_boundary_h1_fraction = he_core_boundary_h1_fraction
- s% c_core_boundary_he4_fraction = c_core_boundary_he4_fraction
- s% o_core_boundary_c12_fraction = o_core_boundary_c12_fraction
- s% si_core_boundary_o16_fraction = si_core_boundary_o16_fraction
+ s% co_core_boundary_he4_fraction = co_core_boundary_he4_fraction
  s% fe_core_boundary_si28_fraction = fe_core_boundary_si28_fraction
  s% neutron_rich_core_boundary_Ye_max = neutron_rich_core_boundary_Ye_max
  s% min_boundary_fraction = min_boundary_fraction
@@ -844,6 +845,7 @@
  s% Lnuc_div_L_zams_limit = Lnuc_div_L_zams_limit
  s% gamma1_limit = gamma1_limit
  s% gamma1_limit_max_q = gamma1_limit_max_q
+ s% gamma1_limit_max_v_div_vesc = gamma1_limit_max_v_div_vesc
  s% Pgas_div_P_limit = Pgas_div_P_limit
  s% Pgas_div_P_limit_max_q = Pgas_div_P_limit_max_q
  s% peak_burn_vconv_div_cs_limit = peak_burn_vconv_div_cs_limit
@@ -878,6 +880,8 @@
 
  s% star_mass_max_limit = star_mass_max_limit
  s% star_mass_min_limit = star_mass_min_limit
+ s% bound_mass_max_limit = bound_mass_max_limit
+ s% bound_mass_min_limit = bound_mass_min_limit
  
  s% star_species_mass_min_limit = star_species_mass_min_limit
  s% star_species_mass_min_limit_iso = star_species_mass_min_limit_iso
@@ -890,9 +894,7 @@
  s% envelope_fraction_left_limit = envelope_fraction_left_limit
 
  s% he_core_mass_limit = he_core_mass_limit
- s% c_core_mass_limit = c_core_mass_limit
- s% o_core_mass_limit = o_core_mass_limit
- s% si_core_mass_limit = si_core_mass_limit
+ s% co_core_mass_limit = co_core_mass_limit
  s% fe_core_mass_limit = fe_core_mass_limit
  s% neutron_rich_core_mass_limit = neutron_rich_core_mass_limit
 
@@ -909,6 +911,8 @@
  s% log_Teff_lower_limit = log_Teff_lower_limit
  s% log_Tsurf_upper_limit = log_Tsurf_upper_limit
  s% log_Tsurf_lower_limit = log_Tsurf_lower_limit
+ s% log_Rsurf_upper_limit = log_Rsurf_upper_limit
+ s% log_Rsurf_lower_limit = log_Rsurf_lower_limit
  s% log_Psurf_upper_limit = log_Psurf_upper_limit
  s% log_Psurf_lower_limit = log_Psurf_lower_limit
  s% log_Dsurf_upper_limit = log_Dsurf_upper_limit
@@ -1127,6 +1131,7 @@
  s% max_v_div_cs_for_convection = max_v_div_cs_for_convection
  s% max_abs_du_div_cs_for_convection = max_abs_du_div_cs_for_convection
 
+ s% calculate_Brunt_B = calculate_Brunt_B
  s% calculate_Brunt_N2 = calculate_Brunt_N2
  s% brunt_N2_coefficient = brunt_N2_coefficient
  s% num_cells_for_smooth_brunt_B = num_cells_for_smooth_brunt_B
@@ -1564,7 +1569,9 @@
  
  s% use_split_merge_amr = use_split_merge_amr
  s% split_merge_amr_nz_baseline = split_merge_amr_nz_baseline
+ s% split_merge_amr_nz_r_core = split_merge_amr_nz_r_core
  s% split_merge_amr_log_zoning = split_merge_amr_log_zoning
+ s% split_merge_amr_hybrid_zoning = split_merge_amr_hybrid_zoning
  s% split_merge_amr_logtau_zoning = split_merge_amr_logtau_zoning
  s% split_merge_amr_okay_to_split_nz = split_merge_amr_okay_to_split_nz
  s% split_merge_amr_okay_to_split_1 = split_merge_amr_okay_to_split_1
@@ -1578,6 +1585,7 @@
  s% merge_amr_k_for_ignore_surface_cells = merge_amr_k_for_ignore_surface_cells
  s% split_merge_amr_dq_min = split_merge_amr_dq_min
  s% split_merge_amr_dq_max = split_merge_amr_dq_max
+ s% split_merge_amr_r_core_cm = split_merge_amr_r_core_cm
  s% split_merge_amr_max_iters = split_merge_amr_max_iters
  s% trace_split_merge_amr = trace_split_merge_amr
  s% equal_split_density_amr = equal_split_density_amr
@@ -2240,6 +2248,20 @@
  s% delta_dX_div_X_cntr_limit = delta_dX_div_X_cntr_limit
  s% delta_dX_div_X_cntr_hard_limit = delta_dX_div_X_cntr_hard_limit
 
+ s% delta_dX_div_X_drop_only = delta_dX_div_X_drop_only
+ s% delta_lg_XH_drop_only = delta_lg_XH_drop_only
+ s% delta_lg_XHe_drop_only = delta_lg_XHe_drop_only
+ s% delta_lg_XC_drop_only = delta_lg_XC_drop_only
+ s% delta_lg_XNe_drop_only = delta_lg_XNe_drop_only
+ s% delta_lg_XO_drop_only = delta_lg_XO_drop_only
+ s% delta_lg_XSi_drop_only = delta_lg_XSi_drop_only
+ s% delta_XH_drop_only = delta_XH_drop_only
+ s% delta_XHe_drop_only = delta_XHe_drop_only
+ s% delta_XC_drop_only = delta_XC_drop_only
+ s% delta_XNe_drop_only = delta_XNe_drop_only
+ s% delta_XO_drop_only = delta_XO_drop_only
+ s% delta_XSi_drop_only = delta_XSi_drop_only
+
  s% delta_lg_XH_cntr_min = delta_lg_XH_cntr_min
  s% delta_lg_XH_cntr_max = delta_lg_XH_cntr_max
  s% delta_lg_XH_cntr_limit = delta_lg_XH_cntr_limit
@@ -2308,6 +2330,7 @@
  s% never_skip_hard_limits = never_skip_hard_limits
  s% relax_hard_limits_after_retry = relax_hard_limits_after_retry
  s% report_dt_hard_limit_retries = report_dt_hard_limit_retries
+ s% report_min_dr_div_cs = report_min_dr_div_cs
  s% report_solver_dt_info = report_solver_dt_info
 
  s% limit_for_rel_error_in_energy_conservation = limit_for_rel_error_in_energy_conservation
@@ -2396,9 +2419,7 @@
 
  ! definition of core boundaries
  he_core_boundary_h1_fraction = s% he_core_boundary_h1_fraction
- c_core_boundary_he4_fraction = s% c_core_boundary_he4_fraction
- o_core_boundary_c12_fraction = s% o_core_boundary_c12_fraction
- si_core_boundary_o16_fraction = s% si_core_boundary_o16_fraction
+ co_core_boundary_he4_fraction = s% co_core_boundary_he4_fraction
  fe_core_boundary_si28_fraction = s% fe_core_boundary_si28_fraction
  neutron_rich_core_boundary_Ye_max = s% neutron_rich_core_boundary_Ye_max
  min_boundary_fraction = s% min_boundary_fraction
@@ -2463,6 +2484,7 @@
  Pgas_div_P_limit_max_q = s% Pgas_div_P_limit_max_q
  gamma1_limit = s% gamma1_limit
  gamma1_limit_max_q = s% gamma1_limit_max_q
+ gamma1_limit_max_v_div_vesc = s% gamma1_limit_max_v_div_vesc
  peak_burn_vconv_div_cs_limit = s% peak_burn_vconv_div_cs_limit
  omega_div_omega_crit_limit = s% omega_div_omega_crit_limit
  delta_nu_lower_limit = s% delta_nu_lower_limit
@@ -2495,6 +2517,8 @@
 
  star_mass_max_limit = s% star_mass_max_limit
  star_mass_min_limit = s% star_mass_min_limit
+ bound_mass_max_limit = s% bound_mass_max_limit
+ bound_mass_min_limit = s% bound_mass_min_limit
  
  star_species_mass_min_limit = s% star_species_mass_min_limit
  star_species_mass_min_limit_iso = s% star_species_mass_min_limit_iso
@@ -2507,9 +2531,7 @@
  envelope_fraction_left_limit = s% envelope_fraction_left_limit
 
  he_core_mass_limit = s% he_core_mass_limit
- c_core_mass_limit = s% c_core_mass_limit
- o_core_mass_limit = s% o_core_mass_limit
- si_core_mass_limit = s% si_core_mass_limit
+ co_core_mass_limit = s% co_core_mass_limit
  fe_core_mass_limit = s% fe_core_mass_limit
  neutron_rich_core_mass_limit = s% neutron_rich_core_mass_limit
 
@@ -2526,6 +2548,8 @@
  log_Teff_lower_limit = s% log_Teff_lower_limit
  log_Tsurf_upper_limit = s% log_Tsurf_upper_limit
  log_Tsurf_lower_limit = s% log_Tsurf_lower_limit
+ log_Rsurf_upper_limit = s% log_Rsurf_upper_limit
+ log_Rsurf_lower_limit = s% log_Rsurf_lower_limit
  log_Psurf_upper_limit = s% log_Psurf_upper_limit
  log_Psurf_lower_limit = s% log_Psurf_lower_limit
  log_Dsurf_upper_limit = s% log_Dsurf_upper_limit
@@ -2744,6 +2768,7 @@
  max_v_div_cs_for_convection = s% max_v_div_cs_for_convection
  max_abs_du_div_cs_for_convection = s% max_abs_du_div_cs_for_convection
 
+ calculate_Brunt_B = s% calculate_Brunt_B
  calculate_Brunt_N2 = s% calculate_Brunt_N2
  brunt_N2_coefficient = s% brunt_N2_coefficient
  threshold_for_smooth_brunt_B = s% threshold_for_smooth_brunt_B
@@ -3174,7 +3199,9 @@
  
  use_split_merge_amr = s% use_split_merge_amr
  split_merge_amr_nz_baseline = s% split_merge_amr_nz_baseline
+ split_merge_amr_nz_r_core = s% split_merge_amr_nz_r_core
  split_merge_amr_log_zoning = s% split_merge_amr_log_zoning
+ split_merge_amr_hybrid_zoning = s% split_merge_amr_hybrid_zoning
  split_merge_amr_logtau_zoning = s% split_merge_amr_logtau_zoning
  split_merge_amr_okay_to_split_nz = s% split_merge_amr_okay_to_split_nz
  split_merge_amr_okay_to_split_1 = s% split_merge_amr_okay_to_split_1
@@ -3188,6 +3215,7 @@
  merge_amr_k_for_ignore_surface_cells = s% merge_amr_k_for_ignore_surface_cells
  split_merge_amr_dq_min = s% split_merge_amr_dq_min
  split_merge_amr_dq_max = s% split_merge_amr_dq_max
+ split_merge_amr_r_core_cm = s% split_merge_amr_r_core_cm
  split_merge_amr_max_iters = s% split_merge_amr_max_iters
  trace_split_merge_amr = s% trace_split_merge_amr
  equal_split_density_amr = s% equal_split_density_amr
@@ -3846,6 +3874,20 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  delta_dX_div_X_cntr_limit = s% delta_dX_div_X_cntr_limit
  delta_dX_div_X_cntr_hard_limit = s% delta_dX_div_X_cntr_hard_limit
 
+ delta_dX_div_X_drop_only = s% delta_dX_div_X_drop_only
+ delta_lg_XH_drop_only = s% delta_lg_XH_drop_only
+ delta_lg_XHe_drop_only = s% delta_lg_XHe_drop_only
+ delta_lg_XC_drop_only = s% delta_lg_XC_drop_only
+ delta_lg_XNe_drop_only = s% delta_lg_XNe_drop_only
+ delta_lg_XO_drop_only = s% delta_lg_XO_drop_only
+ delta_lg_XSi_drop_only = s% delta_lg_XSi_drop_only
+ delta_XH_drop_only = s% delta_XH_drop_only
+ delta_XHe_drop_only = s% delta_XHe_drop_only
+ delta_XC_drop_only = s% delta_XC_drop_only
+ delta_XNe_drop_only = s% delta_XNe_drop_only
+ delta_XO_drop_only = s% delta_XO_drop_only
+ delta_XSi_drop_only = s% delta_XSi_drop_only
+
  delta_lg_XH_cntr_min = s% delta_lg_XH_cntr_min
  delta_lg_XH_cntr_max = s% delta_lg_XH_cntr_max
  delta_lg_XH_cntr_limit = s% delta_lg_XH_cntr_limit
@@ -3914,6 +3956,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  never_skip_hard_limits = s% never_skip_hard_limits
  relax_hard_limits_after_retry = s% relax_hard_limits_after_retry
  report_dt_hard_limit_retries = s% report_dt_hard_limit_retries
+ report_min_dr_div_cs = s% report_min_dr_div_cs
  report_solver_dt_info = s% report_solver_dt_info
 
  limit_for_rel_error_in_energy_conservation = s% limit_for_rel_error_in_energy_conservation

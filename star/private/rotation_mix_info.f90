@@ -101,13 +101,9 @@
          s% dynamo_B_r(1:nz) = 0
          s% dynamo_B_phi(1:nz) = 0
          s% omega_shear(1:nz) = 0
+         s% D_omega(1:nz) = 0
 
-         if (all(s% omega(1:nz) == 0d0)) then
-            do k=1,nz
-               s% D_omega(k) = 0d0
-            end do
-            return
-         end if
+         if (all(s% omega(1:nz) == 0d0)) return
 
          call setup(ierr)
          if (failed('setup for set_rotation_mixing_info', ierr)) return

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+MESA_DIR=../../..
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+do_one inlist_infall_header finished_infall.mod LOGS_part_infall
+do_one inlist_end_infall_header ready_for_edep.mod LOGS_part_end_infall
+do_one inlist_edep_header done_with_edep.mod LOGS_part_edep
+do_one inlist_shock_part1_header shock_part1.mod LOGS_part1
+do_one inlist_shock_part2_header shock_part2.mod LOGS_part2
+
+   do_one inlist_shock_part3_header shock_part3.mod LOGS_part3
+   cp shock_part3.mod standard_shock_part3.mod
+
+   do_one inlist_shock_part4_header shock_part4.mod LOGS_part4
+   cp shock_part4.mod standard_shock_part4.mod
+
+do_one inlist_shock_part5_header shock_part5.mod LOGS_part5
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

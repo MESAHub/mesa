@@ -29,6 +29,7 @@
       use star_private_def
       use const_def
       use chem_def, only: ih1, ihe4, ic12, ic13, in14, io16
+      use utils_lib, only: is_bad
 
       implicit none
 
@@ -274,10 +275,8 @@
 
          if (wind_mdot >= 0) then
              H_env_mass = s% star_mass - s% he_core_mass
-             H_He_env_mass = s% star_mass - s% c_core_mass
-             He_layer_mass = s% he_core_mass - s% c_core_mass
-             !write(*,2) 'He_layer_mass', s% model_number, He_layer_mass, &
-             !   s% he_core_mass, s% c_core_mass
+             H_He_env_mass = s% star_mass - s% co_core_mass
+             He_layer_mass = s% he_core_mass - s% co_core_mass
              if (s% wind_H_envelope_limit > 0 .and. &
                    H_env_mass < s% wind_H_envelope_limit) then
                 wind_mdot = 0
@@ -297,6 +296,10 @@
                   using_wind_scheme_mdot .or. &
                      s% v_div_v_crit_avg_surf > 0.8d0)) then
             call rotation_enhancement(ierr)
+            if (is_bad(s% rotational_mdot_boost)) then
+               write(*,2) 'is_bad(s% rotational_mdot_boost)', s% model_number
+               if (s% stop_for_bad_nums) stop 'winds: rotation_enhancement'
+            end if
             if (ierr /= 0) then
                if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: rotation_enhancement ierr'
                return

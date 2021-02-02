@@ -1655,6 +1655,49 @@
             s% time_set_mixing_info
       end function total_times
 
+      
+      real(dp) function get_ejecta_total_energy(s)
+         type (star_info), pointer :: s
+         real(dp) :: bound_mass, total_energy
+         integer :: k, kh1
+         bound_mass = get_bound_mass(s)
+         total_energy = 0d0
+         kh1 = 1
+         do k=1,s% nz
+            if (s% m(k) <= bound_mass) exit
+            kh1 = k
+         end do
+         if (kh1 == 1) return
+         get_ejecta_total_energy = eval_cell_section_total_energy(s, 1, kh1)
+      end function get_ejecta_total_energy
+
+      
+      real(dp) function get_ejecta_mass(s)
+         type (star_info), pointer :: s
+         get_ejecta_mass = s% m(1) - get_bound_mass(s)
+      end function get_ejecta_mass
+
+      
+      real(dp) function get_bound_mass(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp), pointer :: v(:)
+         real(dp) :: vesc2
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
+            get_bound_mass = s% m(1)
+            return
+         end if
+         do k=1,s% nz
+            vesc2 = 2d0*s% cgrav(k)*s% m(k)/s% r(k)
+            if (v(k) > 0d0 .and. v(k)**2 > vesc2) cycle
+            get_bound_mass = s% m(k)
+            exit
+         end do
+      end function get_bound_mass
 
 
       subroutine smooth(dc, sz)
@@ -2806,7 +2849,7 @@
          else if (s% L_by_category(icc) > 1d2 .and. center_he4 < 1d-4) then
             s% phase_of_evolution = phase_C_Burn
          else if (center_he4 < 1d-4 .and. &
-            s% he_core_mass - s% c_core_mass <= 0.1d0 .and. &
+            s% he_core_mass - s% co_core_mass <= 0.1d0 .and. &
             any(s% burn_he_conv_region(1:s% num_conv_boundaries))) then
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then
