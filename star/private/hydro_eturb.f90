@@ -261,14 +261,14 @@
             v_00 = wrap_v_00(s, k)
             v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
             ! Compute areas on faces (used by L_turb)
-            area_00 = 4d0 * pi * r_00**2
-            area_p1 = 4d0 * pi * r_p1**2
+            area_00 = 4d0 * pi * pow2(r_00)
+            area_p1 = 4d0 * pi * pow2(r_p1)
             ! Compute gravity on faces (used by L_turb)
             m_00 = s% m(k)
             cgrav_00 = s% cgrav(k)
-            g_00 = m_00 * cgrav_00 / r_00**2
+            g_00 = m_00 * cgrav_00 / pow2(r_00)
             if (r_p1 > 0d0) then
-               g_p1 = (m_00 - dm_00) * cgrav_00 / r_p1**2
+               g_p1 = (m_00 - dm_00) * cgrav_00 /  pow2(r_p1)
             else
                g_p1 = 0d0
             end if            
@@ -464,7 +464,7 @@
          alpha = s% Eturb_alfa
          alpha_m = s% Eturb_alfam
 
-         dr_00 = dm_00 / (4d0 * pi * d_00 * (r_00**2 + r_00*r_p1 + r_p1**2))
+         dr_00 = dm_00 / (4d0 * pi * d_00 * (pow2(r_00) + r_00*r_p1 + pow2(r_p1)))
          d_v_div_r_dr_00 = (v_p1 / r_p1 - v_00 / r_00) / dr_00
          epsilon_q = (4d0 / 3d0) * alpha * alpha_m * h_00 * w_00 * pow2(d_v_div_r_dr_00)
 
@@ -492,7 +492,7 @@
          alpha = s% Eturb_alfa
          alpha_m = s% Eturb_alfam
 
-         w_rho2 = sqrt(eturb_00)*d_00**2
+         w_rho2 = sqrt(eturb_00)*pow2(d_00)
          r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
          if (k < s% nz) then
             d_v_div_r = v_00/r_00 - v_p1/r_p1
@@ -524,7 +524,7 @@
          ierr = 0
          gammar = s% Eturb_alfar
          alpha = s% Eturb_alfa
-         Dr = (4d0 * boltz_sigma * gammar**2 / alpha**2) * (T_00**3 / (d_00**2 + cp_00 * kap_00 * h_00))
+         Dr = (4d0 * boltz_sigma * pow2(gammar) / pow2(alpha)) * (pow3(T_00) / (pow2(d_00) + cp_00 * kap_00 * h_00))
 
          s% DAMPR(k) = Dr%val
 
@@ -547,8 +547,8 @@
          else
             gammar = s% Eturb_alfar
             eturb_00 = wrap_eturb_00(s,k)
-            Dr = (4d0 * boltz_sigma * gammar**2 / alpha**2) * T_00**3 * eturb_00 / &
-                  (d_00**2 * Cp_00 * kap_00 * h_00**2)
+            Dr = (4d0 * boltz_sigma * pow2(gammar) / pow2(alpha)) * pow3(T_00) * eturb_00 / &
+                  (pow2(d_00) * Cp_00 * kap_00 * pow2(h_00))
          end if
          s% DAMPR(k) = Dr%val
       end function compute_Dr
@@ -568,7 +568,7 @@
          ierr = 0
          alpha = s% Eturb_alfa
          D = 0d0
-         if (alpha /= 0d0) D = w_00**1.5d0 / (alpha * h_00)
+         if (alpha /= 0d0) D = pow(w_00,1.5d0) / (alpha * h_00)
          s% DAMP(k) = D%val
 
       end function compute_D_adam
@@ -655,8 +655,8 @@
          ierr = 0
          alpha = s% Eturb_alfa
          
-         dr_bar_00 = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / (4d0 * pi * r_00**2)
-         dr_bar_p1 = 0.5d0 * (dm_00 / d_00 + dm_p1 / d_p1) / (4d0 * pi * r_p1**2)
+         dr_bar_00 = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / (4d0 * pi * pow2(r_00))
+         dr_bar_p1 = 0.5d0 * (dm_00 / d_00 + dm_p1 / d_p1) / (4d0 * pi * pow2(r_p1))
 
          ds_dr_00 = (s_00 - s_m1) / dr_bar_00
          ds_dr_p1 = (s_p1 - s_00) / dr_bar_p1
@@ -738,7 +738,7 @@
                
             QQ_div_Cp = 0.5d0*(QQ_div_Cp_face_00 + QQ_div_Cp_face_p1)
 
-            Y_cell = 0.5d0*(Y1_00*r_00**2 + Y1_p1*r_p1**2)
+            Y_cell = 0.5d0*(Y1_00*pow2(r_00) + Y1_p1*pow2(r_p1))
 
             Source = alpha * Y_cell * d_00 * T_00 * P_00 * Cp_00 * QQ_div_Cp * sqrt(eturb_00) / s% dm(k)
 
@@ -817,8 +817,8 @@
          alpha = s% Eturb_alfa
          alpha_m = s% Eturb_alfam
 
-         dr_00 = dm_00 / (4d0 * pi * d_00 * (r_00**2 + r_00*r_p1 + r_p1**2))
-         dr_m1 = dm_m1 / (4d0 * pi * d_m1 * (r_m1**2 + r_m1*r_00 + r_00**2))
+         dr_00 = dm_00 / (4d0 * pi * d_00 * (pow2(r_00) + r_00*r_p1 + pow2(r_p1)))
+         dr_m1 = dm_m1 / (4d0 * pi * d_m1 * (pow2(r_m1) + r_m1*r_00 + pow2(r_00)))
 
          d_v_div_r_dr_00 = (v_p1 / r_p1 - v_00 / r_00) / dr_00
          d_v_div_r_dr_m1 = (v_00 / r_00 - v_00 / r_00) / dr_m1
@@ -826,24 +826,24 @@
          cgrav_mid_00 = 0.5d0 * (cgrav_p1 + cgrav_00)
          rmid_00 = 0.5d0 * (r_00 + r_p1)
          mmid_00 = 0.5d0 * (m_00 + m_p1)
-         g_00 = cgrav_mid_00 * mmid_00 / rmid_00**2 ! gravity in cell k
+         g_00 = cgrav_mid_00 * mmid_00 / pow2(rmid_00) ! gravity in cell k
 
          cgrav_mid_m1 = 0.5d0 * (cgrav_00 + cgrav_m1)
          rmid_m1 = 0.5d0 * (r_m1 + r_00)
          mmid_m1 = 0.5d0 * (m_m1 + m_00)
-         g_m1 = cgrav_mid_m1 * mmid_m1 / rmid_m1**2 ! gravity in cell k-1
+         g_m1 = cgrav_mid_m1 * mmid_m1 / pow2(rmid_m1) ! gravity in cell k-1
 
          h_00 = P_00 / (d_00 * g_00) ! Scale height in cell k
          h_m1 = P_m1 / (d_m1 * g_m1) ! Scale height in cell k-1
 
-         flux_00 = (4d0 / 3d0) * alpha * alpha_m * d_00 * h_00 * w_00 * rmid_00**3 * d_v_div_r_dr_00 ! Flux through cell k
-         flux_m1 = (4d0 / 3d0) * alpha * alpha_m * d_m1 * h_m1 * w_m1 * rmid_m1**3 * d_v_div_r_dr_m1 ! Flux through cell k-1
+         flux_00 = (4d0 / 3d0) * alpha * alpha_m * d_00 * h_00 * w_00 * pow3(rmid_00) * d_v_div_r_dr_00 ! Flux through cell k
+         flux_m1 = (4d0 / 3d0) * alpha * alpha_m * d_m1 * h_m1 * w_m1 * pow3(rmid_m1) * d_v_div_r_dr_m1 ! Flux through cell k-1
 
          rho_inv_avg = 0.5d0 * (1d0 / d_m1 + 1d0 / d_00)
 
-         area = 4d0 * pi * r_00**2
+         area = 4d0 * pi * pow2(r_00)
          dr_bar = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / area
-         Uq = rho_inv_avg * (flux_m1 - flux_00) / (dr_bar * r_00**3)
+         Uq = rho_inv_avg * (flux_m1 - flux_00) / (dr_bar * pow3(r_00))
 
          s% Uq(k) = Uq%val
 
@@ -885,23 +885,23 @@
             cgrav_mid_00 = 0.5d0 * (cgrav_p1 + cgrav_00)
             rmid_00 = 0.5d0 * (r_00 + r_p1)
             mmid_00 = 0.5d0 * (m_00 + m_p1)
-            g_00 = cgrav_mid_00 * mmid_00 / rmid_00**2 ! gravity in cell k
+            g_00 = cgrav_mid_00 * mmid_00 / pow2(rmid_00) ! gravity in cell k
 
             cgrav_mid_m1 = 0.5d0 * (cgrav_00 + cgrav_m1)
             rmid_m1 = 0.5d0 * (r_m1 + r_00)
             mmid_m1 = 0.5d0 * (m_m1 + m_00)
-            g_m1 = cgrav_mid_m1 * mmid_m1 / rmid_m1**2 ! gravity in cell k-1
+            g_m1 = cgrav_mid_m1 * mmid_m1 / pow2(rmid_m1) ! gravity in cell k-1
 
             h_00 = P_00 / (d_00 * g_00) ! Scale height in cell k
             h_m1 = P_m1 / (d_m1 * g_m1) ! Scale height in cell k-1
          
             r6_00 = pow6(r_00)
-            w_rho2_00 = w_00*d_00**2
+            w_rho2_00 = w_00*pow2(d_00)
             r6_cell_00 = 0.5d0*(r6_00 + pow6(r_p1))
             d_v_div_r_00 = v_00/r_00 - v_p1/r_p1
             Chi_00 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_00*r6_cell_00*h_00*d_v_div_r_00/dm_00         
 
-            w_rho2_m1 = w_m1*d_m1**2
+            w_rho2_m1 = w_m1*pow2(d_m1)
             r6_cell_m1 = 0.5d0*(pow6(r_m1) + r6_00)
             d_v_div_r_m1 = v_m1/r_m1 - v_00/r_00
             Chi_m1 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_m1*r6_cell_m1*h_m1*d_v_div_r_m1/dm_m1         
@@ -1005,7 +1005,7 @@
             d_P_rad = crad/3d0*(T4m1 - T400)
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
-            Lr = -d_P_rad/dm_bar*clight*area**2/kap_face
+            Lr = -d_P_rad/dm_bar*clight*pow2(area)/kap_face
             
          end if
          
@@ -1134,11 +1134,11 @@
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
          
          P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-         Hp_face = P_div_rho_face*r_00**2/(cgrav*m)
+         Hp_face = P_div_rho_face*pow2(r_00)/(cgrav*m)
          QQ_div_Cp_face = 0.5d0*(QQ_m1/Cp_m1 + QQ_00/Cp_00)
          Y1 = QQ_div_Cp_face*(P_m1 - P_00) - (lnT_m1 - lnT_00)
          avg_Vol = 0.5d0*(1d0/d_00 + 1d0/d_m1)
-         area = 4d0*pi*r_00**2
+         area = 4d0*pi*pow2(r_00)
          Y2 = area*Hp_face/(avg_Vol*dm_bar)
          Y_face = Y1*Y2
          
@@ -1183,7 +1183,7 @@
          rho_h_face = 0.5d0 * (P_m1 + P_00) / g
 
          dr_bar = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / area
-         wturb_d_eturb_dr = -(2d0/3d0) * (w_00**1.5d0 - w_m1**1.5d0) / dr_bar ! Minus because r(k) < r(k-1)
+         wturb_d_eturb_dr = -(2d0/3d0) * (pow(w_00,1.5d0) - pow(w_m1,1.5d0)) / dr_bar ! Minus because r(k) < r(k-1)
          Ft = -alpha * alpha_t * rho_h_face * wturb_d_eturb_dr
 
          Lt_18 = area * Ft
@@ -1219,9 +1219,9 @@
          else
             r_00 = wrap_r_00(s,k)
             P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-            Hp_face = P_div_rho_face*r_00**2/(s% cgrav(k)*s% m(k))
-            rho2_face = 0.5d0*(d_00**2 + d_m1**2)
-            Lt_18 = -2d0/3d0*alpha*alpha_t*area**2*Hp_face*rho2_face*&
+            Hp_face = P_div_rho_face*pow2(r_00)/(s% cgrav(k)*s% m(k))
+            rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
+            Lt_18 = -2d0/3d0*alpha*alpha_t*pow2(area)*Hp_face*rho2_face*&
                (pow(eturb_m1,1.5d0) - pow(eturb_00,1.5d0))/s% dm_bar(k)            
          end if
 
@@ -1261,7 +1261,7 @@
          kap_m1 = wrap_kap_m1(s, k)
          kap_00 = wrap_kap_00(s, k)
 
-         area = 4d0 * pi * r_00**2
+         area = 4d0 * pi * pow2(r_00)
 
          ! Radiative luminosity               
          Lr = compute_Lr(s, k, dm_bar, area, T_m1, T_00, kap_m1, kap_00, ierr)
@@ -1275,7 +1275,7 @@
             m = s% m(k)
             cgrav = s% cgrav(k)
 
-            g = m * cgrav / r_00**2
+            g = m * cgrav / pow2(r_00)
 
             r_p1 = wrap_r_p1(s, k)
 
@@ -1475,7 +1475,7 @@
          do k=2, nz
             dm_bar = s% dm_bar(k)
             r_00 = wrap_r_00(s,k)
-            area = 4d0*pi*r_00**2
+            area = 4d0*pi*pow2(r_00)
             T_m1 = wrap_T_m1(s,k)
             T_00 = wrap_T_00(s,k)
             kap_m1 = wrap_kap_m1(s,k)
@@ -1494,7 +1494,7 @@
                w_00 = w_face(k)
             end if
             if (w_00 < 0d0) w_00 = 0d0
-            s% xh(i_eturb,k) = max(min_eturb, w_00**2)
+            s% xh(i_eturb,k) = max(min_eturb, pow2(w_00))
             s% Eturb(k) = s% xh(i_eturb,k)
             call compute_L(s, k, L, Lr, Lc, Lt, ierr)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
