@@ -207,6 +207,7 @@ module skye_coulomb_solid
             if (unique_charges(j) == AZion(i)) then
                found = .true.
                found_index = j
+               exit
             end if
          end do
 
@@ -215,7 +216,7 @@ module skye_coulomb_solid
             unique_charges(num_unique_charges) = AZion(i)
             charge_abundances(num_unique_charges) = AY(i)
          else
-            charge_abundances(j) = charge_abundances(j) + AY(i)
+            charge_abundances(found_index) = charge_abundances(found_index) + AY(i)
          end if
       end do
 

@@ -353,7 +353,7 @@
          type (star_info), pointer :: s
          integer :: k, k0
          real(dp) :: lnP_limit
-         include 'formats'        
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_limit_center_logP: get_star_ptr ierr', ierr

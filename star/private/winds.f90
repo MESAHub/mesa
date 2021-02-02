@@ -487,7 +487,7 @@
                else if (T1 < Teff_jump - dT) then
                   alfa = 0
                else
-                  alfa = (T1 - (Teff_jump - dT)) / (2*dT)
+                  alfa = 0.5d0*(T1 - (Teff_jump - dT)) / dT
                end if
             end if
 
@@ -497,7 +497,7 @@
                logMdot = &
                   - 6.697d0 &
                   + 2.194d0*log10(L1/Lsun/1d5) &
-                  - 1.313d0*log10(M1/Msun/30) &
+                  - 1.313d0*log10(M1/Msun/30d0) &
                   - 1.226d0*log10(vinf_div_vesc/2d0) &
                   + 0.933d0*log10(T1/4d4) &
                   - 10.92d0*pow2(log10(T1/4d4)) &
@@ -513,7 +513,7 @@
                logMdot = &
                   - 6.688d0 &
                   + 2.210d0*log10(L1/Lsun/1d5) &
-                  - 1.339d0*log10(M1/Msun/30) &
+                  - 1.339d0*log10(M1/Msun/30d0) &
                   - 1.601d0*log10(vinf_div_vesc/2d0) &
                   + 1.07d0*log10(T1/2d4) &
                   + 0.85d0*log10(Z/Zsolar)

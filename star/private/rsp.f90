@@ -80,7 +80,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i, j, k
-         include 'formats'         
+         include 'formats'
          NSTART = 1
          s% nz = s% RSP_nz         
          if (s% job% change_initial_net) then

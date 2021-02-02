@@ -57,7 +57,7 @@
          real(dp) :: alfa, beta, d_alfa_dlnT, alfa_hi_Z, beta_hi_Z, d_alfa_hi_Z_dlnT
          integer :: i, ir, cid
 
-         include 'formats.dek'
+         include 'formats'
          
          call do_eval_weaklib_reaction_info( &
             n, ids, T9, YeRho, &
@@ -168,7 +168,7 @@
 
          class(weak_rate_table), pointer :: table
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -328,7 +328,7 @@
          contains
          
          subroutine show_stuff
-            include 'formats.dek'
+            include 'formats'
             write(*,1) 'T9', T9
             write(*,1) 'lYeRho', lYeRho
             write(*,1) 'eta', eta

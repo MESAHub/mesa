@@ -73,7 +73,6 @@
    !logS ! log10(specific entropy)
    gamma1 ! dlnP_dlnRho at constant S
    !gamma3 ! gamma3 - 1 = dlnT_dlnRho at constant S
-   !theta_e ! electron degeneracy factor for graboske screening
    !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
    free_e ! free_e is mean number of free electrons per nucleon
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon

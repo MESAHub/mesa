@@ -742,13 +742,7 @@
          real(dp) :: abar
          real(dp) :: z2bar
          real(dp) :: zbar13
-         real(dp) :: zbar0pt28
          real(dp) :: z1pt58bar
-         real(dp) :: ztilda ! sqrt(z2bar + zbar*theta_e)  ! (Dewitt eqn 4)
-         real(dp) :: ztilda0pt58
-         real(dp) :: Lambda0 ! = 1.88d8*sqrt(rho/(abar*T**3)) ! (Graboske eqn 19; mu_I = abar)
-         real(dp) :: Lambda0b ! Lambda0**0.86
-         real(dp) :: Lambda0_23 ! Lambda0**(2d0/3d0)
          real(dp) :: ytot
          real(dp) :: rr
          real(dp) :: tempi
@@ -773,15 +767,6 @@
       
       
       real(dp) :: reaclib_min_T9 ! for T9 < this, return 0 for reaclib strong rates
-      
-
-      ! integers to 1/3 (for graboske screening)
-      integer, parameter :: num_one_thirds = 60
-      real(dp) :: one_third_power(num_one_thirds)
-      ! integers to 1.86 (for graboske screening)
-      integer, parameter :: num_pow_186 = 60
-      real(dp) :: pow_186(num_pow_186)
-
 
       type (integer_dict), pointer :: reaction_names_dict
       
@@ -1188,12 +1173,6 @@
          integer, intent(out) :: ierr
          integer :: i         
          ierr = 0
-         do i=1,num_one_thirds
-            one_third_power(i) = pow(dble(i),1d0/3d0)
-         end do
-         do i=1,num_pow_186
-            pow_186(i) = pow(dble(i),1.86d0)
-         end do
          call set_rattab_range(5.30102999566398d0, 10.301029995664d0)
          
          reaclib_min_T9 = 1d-2 
@@ -1300,7 +1279,7 @@
       integer function get_num_reaction_inputs(ir)
          integer, intent(in) :: ir
          integer :: j
-         include 'formats.dek'
+         include 'formats'
          if (max_num_reaction_inputs == 3) then
             if (reaction_inputs(5,ir) /= 0) then
                get_num_reaction_inputs = 3

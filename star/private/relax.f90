@@ -4370,7 +4370,7 @@
       subroutine error_check(name,ierr)
          character(len=*), intent(in) :: name
          integer, intent(in) :: ierr
-         include 'formats.inc'
+         include 'formats'
 
          if (ierr /= 0) then
             write(*,*) 'failed in ', name

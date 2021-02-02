@@ -59,12 +59,12 @@ module skye_coulomb
       do IX=1,NMIX
          Zmean=Zmean+AY(IX)*AZion(IX)
          Z2mean=Z2mean+AY(IX)*AZion(IX)*AZion(IX)
-         Z53=Z53+AY(IX)*AZION(IX)**(5d0/3d0)
+         Z53=Z53+AY(IX)*pow(AZION(IX), five_thirds)
          Z52=Z52+AY(IX)*pow5(sqrt(AZion(IX)))
          Z321=Z321+AY(IX)*AZion(IX)*pow3(sqrt(AZion(IX)+1.d0))
       enddo
 
-      DENS = xnefer * rbohr**3 ! DENS = (electrons per cubic bohr)
+      DENS = xnefer * pow3(rbohr) ! DENS = (electrons per cubic bohr)
       RS = pow(3d0 / (4d0 * PI * DENS),1d0/3d0) ! r_s - electron density parameter
       GAME = qe * qe / (rbohr * boltzm * temp * RS) ! electron Coulomb parameter Gamma_e
 

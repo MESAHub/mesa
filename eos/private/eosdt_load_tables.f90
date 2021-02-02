@@ -141,7 +141,7 @@
             integer :: iounit1, iounit2        
             real(dp) :: X, Z    
             type (DT_xz_Info), pointer :: xz
-            include 'formats.dek'            
+            include 'formats'
             iounit1 = alloc_iounit(ierr); if (ierr /= 0) return
             iounit2 = alloc_iounit(ierr); if (ierr /= 0) return            
             if (which_eosdt == eosdt_max_FreeEOS) then
@@ -239,7 +239,7 @@
          real(dp), pointer :: vec(:)
          integer :: n
          
-         include 'formats.dek'
+         include 'formats'
 
          info = 0    
          vec => vec_ary
@@ -479,7 +479,7 @@
          integer :: v, vlist(3), var, i, j, num_logQs, num_logTs, ii, jj
          character (len=256) :: message
          
-         include 'formats.dek'
+         include 'formats'
 
          info = 0
 
@@ -577,7 +577,7 @@
          integer :: num_logQs_in, num_logTs_in, version_in, i, j
          real(dp), parameter :: tiny = 1d-10
          
-         include 'formats.dek'
+         include 'formats'
          
          ios = 0
          open(unit=io_unit,file=trim(cache_filename),action='read', &

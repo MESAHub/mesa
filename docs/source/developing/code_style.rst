@@ -11,7 +11,7 @@ Indentation/whitespace rules are codified in an `EditorConfig`_ file located in 
 Exponents
 ---------
 
-When raising a number to a power of something use the ``pow()`` routines provided by the mathlib:
+When raising a number to a floating-point power, use the ``pow()`` routine provided by ``math_lib``:
 
 .. code-block:: fortran
 
@@ -23,8 +23,9 @@ instead of
 
     x**1.5d0
 
-There are short cut routines for raising a number to a integer powers ``pow2``, ``pow3``, etc.
-
+Use ``powN(x)`` to raise ``x`` to an integer power ``N``.
+You should *always* use these for integer powers greater than 2.
+``**2`` has so far not been a problem and is tolerated.
 
 Errors
 ------

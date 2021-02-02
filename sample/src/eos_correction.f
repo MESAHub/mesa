@@ -112,7 +112,7 @@
                log10T = lg_Ts(j)
                T = exp10(log10T)
    
-               call eosDT_get( &
+               call eosDT_get_legacy( &
                      handle, &
                      X, Z, abar, zbar, species, chem_id, net_iso, xa, &
                      Rho, log10Rho, T, log10T, res, d_dlnd, d_dlnT, &

@@ -232,8 +232,7 @@
       integer, parameter :: p_gamma1 = p_logS_per_baryon + 1
       integer, parameter :: p_gamma3 = p_gamma1 + 1
       integer, parameter :: p_eta = p_gamma3 + 1
-      integer, parameter :: p_theta_e = p_eta + 1
-      integer, parameter :: p_gam = p_theta_e + 1
+      integer, parameter :: p_gam = p_eta + 1
       integer, parameter :: p_mu = p_gam + 1
 
       integer, parameter :: p_eos_frac_OPAL_SCVH = p_mu + 1
@@ -998,7 +997,6 @@
          profile_column_name(p_gamma1) = 'gamma1'
          profile_column_name(p_gamma3) = 'gamma3'
          profile_column_name(p_eta) = 'eta'
-         profile_column_name(p_theta_e) = 'theta_e'
          profile_column_name(p_gam) = 'gam'
          profile_column_name(p_mu) = 'mu'
 

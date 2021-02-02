@@ -271,7 +271,7 @@
          type (star_info), pointer :: s
          real(dp) :: msum, lgrho_limit, lnd_limit
          integer :: k, i_lnd
-         include 'formats'         
+         include 'formats'
          w = 0
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -575,7 +575,7 @@
             max_iter, eos_calls
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         include 'formats'         
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return

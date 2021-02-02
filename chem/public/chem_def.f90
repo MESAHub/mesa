@@ -1084,7 +1084,7 @@
          ! Grevesse and Noels 1993
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'         
+         include 'formats'
 
          GN93_element_zfrac(:) = -20.0d0
          
@@ -1190,7 +1190,7 @@
          ! Grevesse and Sauval 1998, Table 1
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'         
+         include 'formats'
 
          GS98_element_zfrac(:) = -20.0d0
 
@@ -1295,7 +1295,7 @@
          ! Lodders 2003, ApJ, Table 1 recommended abundance
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'         
+         include 'formats'
 
          L03_element_zfrac(:) = -20.0d0
          
@@ -1401,7 +1401,7 @@
          ! Asplund, Grevesse and Sauval 2005      
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'         
+         include 'formats'
 
          AGS05_element_zfrac(:) = -20.0d0
                   
@@ -1508,7 +1508,7 @@
          ! Annu. Rev. Astron. Astrophys. 2009. 47:481–522
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'         
+         include 'formats'
          
          AGSS09_element_zfrac(:) = -20.0d0
          
@@ -1617,7 +1617,7 @@
          ! The modified elements are: he, c, n, o, ne, mg, al, si, s, ar, fe
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'
+         include 'formats'
          
          A09_Prz_zfrac(:)  = -20.0d0
 
@@ -1723,7 +1723,7 @@
          ! Lodders 09
          integer :: i
          real(dp) :: z_sum  
-         include 'formats.dek'
+         include 'formats'
          
          L09_element_zfrac(:) = 0
          

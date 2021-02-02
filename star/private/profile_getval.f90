@@ -906,8 +906,6 @@
                val = s% gamma3(k)
             case (p_eta)
                val = s% eta(k)
-            case (p_theta_e)
-               val = s% theta_e(k)
             case (p_gam)
                val = s% gam(k)
             case (p_mu)

@@ -61,7 +61,7 @@
 
          logical :: dbg
          
-         include 'formats.dek'
+         include 'formats'
          
          dbg = .false.
          if (dbg) write(*,1) 'Get1_kap_fixed_metal_Results logT', logT
@@ -347,7 +347,7 @@
       
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          x_tables => z_tables(iz)% x_tables
@@ -642,7 +642,7 @@
       
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          if (x_tables(ix)% not_loaded_yet) then ! avoid doing critical section if possible

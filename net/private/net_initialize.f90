@@ -173,7 +173,7 @@
          character (len=256) :: err_msg    
          real(dp) :: qneu
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          n% g => g
@@ -265,7 +265,7 @@
          logical, parameter :: reuse_rate_screened = .false.
          integer, parameter :: screening_mode = extended_screening
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
 
@@ -277,7 +277,6 @@
          
          n% reaction_Qs => std_reaction_Qs
          n% reaction_neuQs => std_reaction_neuQs
-         nullify(n% graboske_cache)
                   
          num_reactions = g% num_reactions
          num_isos = g% num_isos
@@ -861,7 +860,7 @@
             integer :: i, j, k, ir, r_ir
             logical :: matches
             
-            include 'formats.dek'
+            include 'formats'
 
             ierr = 0
             special_loop: do j = 1, num_special_case_reactions
@@ -1128,7 +1127,7 @@
             use rates_lib, only: rates_reaction_id, add_reaction_for_handle
             character (len=*), intent(in) :: string
             integer, intent(out) :: ir, ierr
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             add_reaction_for_this_handle = .false.
             ir = rates_reaction_id(string)
@@ -1156,7 +1155,7 @@
             character (len=*), intent(in) :: string
             integer, intent(out) :: ir, ierr
             integer :: indx
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             add_this_reaclib_forward_reaction = .false.
             ir = rates_reaction_id(string)
@@ -1221,7 +1220,7 @@
             character (len=100) :: string, reverse
             integer :: indx, i
             logical, parameter :: dbg = .false.
-            include 'formats.dek'
+            include 'formats'
             ierr = 0
             ir = 0
             
@@ -1334,7 +1333,7 @@
          use chem_def
          character (len=*), intent(in) :: str
          integer :: ir
-         include 'formats.dek'
+         include 'formats'
          write(*,*) trim(str)
          do ir = 1, rates_reaction_id_max
             if (reaction_screening_info(3,ir) <= 0) cycle
@@ -1359,7 +1358,7 @@
          logical, parameter :: dbg = .false.
          !logical, parameter :: dbg = .true.
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          
@@ -2038,7 +2037,7 @@
             rtab, index, ids, reaction_kind, &
             reaction_reaclib_kind, reaction_id, reverse_id_for_kind_ne_other
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          rtab => g% net_reaction
@@ -2050,10 +2049,6 @@
             g% reaction_reaclib_kind(num_reactions), &
             g% reverse_id_for_kind_ne_other(num_reactions), &
             g% reaction_id(num_reactions), &
-            g% zg1(num_reactions), &
-            g% zg2(num_reactions), &
-            g% zg3(num_reactions), &
-            g% zg4(num_reactions), &
             g% zs13(num_reactions), &
             g% zhat(num_reactions), &
             g% zhat2(num_reactions), &
@@ -2265,7 +2260,7 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
 
       subroutine init_special_case_reaction_info
          integer :: i
-         include 'formats.dek'
+         include 'formats'
          
          i = 0
          

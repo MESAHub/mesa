@@ -161,7 +161,7 @@
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
     calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
-    threshold_for_smooth_brunt_B, use_brunt_gradmuX_form, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
+    threshold_for_smooth_brunt_B, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
     min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
     RSP_max_num_periods, RSP_min_max_R_for_periods, &
     RSP_min_PERIOD_div_PERIODLIN, RSP_report_limit_dt, RSP_mode_for_setting_PERIODLIN, RSP_initial_dt_factor, &
@@ -322,7 +322,7 @@
     
     ! eos controls
     use_fixed_XZ_for_eos, fixed_X_for_eos, fixed_Z_for_eos, use_d_eos_dxa, &
-    use_eosDT_ideal_gas, use_eosDT_HELMEOS, report_eos_settings_at_start_of_run, &
+    report_eos_settings_at_start_of_run, &
 
     ! opacity controls
     use_simple_es_for_kap, use_starting_composition_for_kap, &
@@ -1136,7 +1136,6 @@
  s% brunt_N2_coefficient = brunt_N2_coefficient
  s% num_cells_for_smooth_brunt_B = num_cells_for_smooth_brunt_B
  s% threshold_for_smooth_brunt_B = threshold_for_smooth_brunt_B
- s% use_brunt_gradmuX_form = use_brunt_gradmuX_form
  s% min_magnitude_brunt_B = min_magnitude_brunt_B
 
  s% min_overshoot_q = min_overshoot_q
@@ -1779,8 +1778,6 @@
  s% diffusion_isolve_solver = diffusion_isolve_solver
 
  ! eos controls
- s% use_eosDT_ideal_gas = use_eosDT_ideal_gas
- s% use_eosDT_HELMEOS = use_eosDT_HELMEOS
  s% use_fixed_XZ_for_eos = use_fixed_XZ_for_eos
  s% report_eos_settings_at_start_of_run = report_eos_settings_at_start_of_run
  s% fixed_X_for_eos = fixed_X_for_eos
@@ -2775,7 +2772,6 @@
  calculate_Brunt_N2 = s% calculate_Brunt_N2
  brunt_N2_coefficient = s% brunt_N2_coefficient
  threshold_for_smooth_brunt_B = s% threshold_for_smooth_brunt_B
- use_brunt_gradmuX_form = s% use_brunt_gradmuX_form
  min_magnitude_brunt_B = s% min_magnitude_brunt_B
 
  min_overshoot_q = s% min_overshoot_q
@@ -3415,8 +3411,6 @@
  fixed_X_for_eos = s% fixed_X_for_eos
  fixed_Z_for_eos = s% fixed_Z_for_eos
  report_eos_settings_at_start_of_run = s% report_eos_settings_at_start_of_run
- use_eosDT_ideal_gas = s% use_eosDT_ideal_gas
- use_eosDT_HELMEOS = s% use_eosDT_HELMEOS
  use_d_eos_dxa = s% use_d_eos_dxa
  
  ! opacity controls

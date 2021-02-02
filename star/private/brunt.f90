@@ -69,12 +69,6 @@
                 s% retry_message = 'failed in other_brunt'
                 if (s% report_ierr) write(*, *) s% retry_message
             end if
-         else if (s% use_brunt_gradmuX_form) then
-            call do_brunt_B_gradmuX_form(s,ierr)
-            if (ierr /= 0) then
-                s% retry_message = 'failed in do_brunt_B_gradmuX_form'
-                if (s% report_ierr) write(*, *) s% retry_message
-            end if
          else
             call do_brunt_B_MHM_form(s,ierr)
             if (ierr /= 0) then
@@ -417,114 +411,6 @@
          end if
 
       end subroutine get_brunt_B
-
-
-      ! dlnRho_form
-
-      !   A = (1/gamma1)*(dlnP/dlnR) - (dlnRho/dlnR)
-      !   N2 = A*g/r
-      !
-      !   N2 = g^2 * (rho/P)*(chiT/chiRho) * (B - (gradT_sub_grada))
-      !
-      !   B = gradT_sub_grada + N2/(g^2 * (rho/P)*(chiT/chiRho))
-
-      ! treat gamma1, lnP, and lnd as values at rmid
-      ! interpolate to r at edge to get gamma1_edge, lnP_edge, lnd_edge
-      ! using lnR as x, interpolate to get slopes dlnP/dlnR and dlnd/dlnR at edges
-      ! combine those results to get A.  then N2 from A.
-      ! interpolate in m to get (rho/P)*(chiT/chiRho) at edge.
-      ! use that with N2 to get B for use with Ledoux
-
-      subroutine do_brunt_B_dlnRho_form(s,rho_P_chiT_chiRho_face,ierr)
-
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: rho_P_chiT_chiRho_face(:)
-         integer, intent(out) :: ierr
-
-         real(dp) :: alfa, beta, gamma1_face, P_face, dr, dlnd_dr, &
-            dlnP_dr, brunt_N2
-         integer :: nz, k, species
-         logical, parameter :: dbg = .false.
-
-         include 'formats'
-
-         ierr = 0
-         nz = s% nz
-         species = s% species
-
-         !   A = (1/gamma1)*(dlnP/dlnR) - (dlnRho/dlnR)
-         !   N2 = A*g/r = g*((dlnP/dr)/gamma1 - (dlnRho/dr))
-         !   N2 = g^2 * (rho/P)*(chiT/chiRho) * (B - (gradT_sub_grada))
-         !   B = gradT_sub_grada + N2/(g^2 * (rho/P)*(chiT/chiRho))
-
-         do k=2,nz
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            beta = 1 - alfa
-            gamma1_face = alfa*s% gamma1(k) + beta*s% gamma1(k-1)
-            P_face = alfa*s% P(k) + beta*s% P(k-1)
-            dr = s% rmid(k-1) - s% rmid(k)
-            dlnd_dr = (s% lnd(k-1) - s% lnd(k))/dr
-            dlnP_dr = (s% P(k-1) - s% P(k))/(P_face*dr)
-            brunt_N2 = s% grav(k)*(dlnP_dr/gamma1_face - dlnd_dr)
-            !s% profile_extra(k,1) = brunt_N2
-            s% brunt_B(k) = s% gradT_sub_grada(k) + &
-               brunt_N2/(s% grav(k)*s% grav(k)*rho_P_chiT_chiRho_face(k))
-         end do
-         s% brunt_B(1) = s% brunt_B(2)
-         !s% profile_extra(1,1) = 0
-         !s% profile_extra_name(1) = 'brunt_N2_dlnRho_form'
-
-      end subroutine do_brunt_B_dlnRho_form
-
-
-      subroutine do_brunt_B_gradmuX_form(s,ierr)
-         use chem_def, only: ih1
-         type (star_info), pointer :: s
-         integer, intent(out) :: ierr
-
-         integer :: nz, h1, k
-         real(dp) :: A, B, beta_face, beta_factor, dlnmu_X, dlnP, x_face
-
-         include 'formats'
-
-         ierr = 0
-         nz = s% nz
-         h1 = s% net_iso(ih1)
-         if (h1 <= 0) then
-            s% brunt_B(1:nz) = 0
-            return
-         end if
-
-         do k = 2, nz
-            A = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            B = 1 - A
-            beta_face = A*s% Pgas(k)/s% P(k) + B*s% Pgas(k-1)/s% P(k-1)
-            beta_factor = beta_face/(4d0 - 3d0*beta_face)
-            x_face = A*s% xa(h1,k) + B*s% xa(h1,k-1)
-            dlnmu_X = -(s% xa(h1,k-1) - s% xa(h1,k))/(x_face + 0.6d0)
-            dlnP = s% lnP(k-1) - s% lnP(k)
-            if (dlnP > -1d-50) then
-               !dlnP = -1d-50
-               s% brunt_B(k) = 0
-               cycle
-            end if
-            s% brunt_B(k) = beta_factor*dlnmu_X/dlnP
-            if (s% brunt_B(k) < -1d10 .and. k == 1496) then
-               write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
-               write(*,2) 'beta_factor', k, beta_factor
-               write(*,2) 'dlnmu_X', k, dlnmu_X
-               write(*,2) 'dlnP', k, dlnP
-               write(*,2) 's% xa(h1,k-1)', k-1, s% xa(h1,k-1)
-               write(*,2) 's% xa(h1,k)', k, s% xa(h1,k)
-               write(*,2) 's% lnP(k-1)', k-1, s% lnP(k-1)
-               write(*,2) 's% lnP(k)', k, s% lnP(k)
-               write(*,2) 's% lnP(k-1) - s% lnP(k)', k, s% lnP(k-1) - s% lnP(k)
-               stop
-            end if
-         end do
-         s% brunt_B(1) = s% brunt_B(2)
-
-      end subroutine do_brunt_B_gradmuX_form
 
 
       end module brunt
