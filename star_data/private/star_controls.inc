@@ -11,9 +11,7 @@
       ! definition of core boundaries
          real(dp) :: &
             he_core_boundary_h1_fraction, &
-            c_core_boundary_he4_fraction, &
-            o_core_boundary_c12_fraction, &
-            si_core_boundary_o16_fraction, &
+            co_core_boundary_he4_fraction, &
             fe_core_boundary_si28_fraction, &
             neutron_rich_core_boundary_Ye_max, &
             min_boundary_fraction
@@ -25,8 +23,7 @@
          real(dp) :: when_to_stop_rtol
 
          real(dp) :: max_age, max_age_in_seconds, &
-            dt_years_for_steps_before_max_age, &
-            reduction_factor_for_max_timestep
+            dt_years_for_steps_before_max_age, reduction_factor_for_max_timestep
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit
          real(dp) :: eta_center_limit
@@ -65,6 +62,7 @@
          real(dp) :: HB_limit
 
          real(dp) :: star_mass_min_limit, star_mass_max_limit
+         real(dp) :: bound_mass_min_limit, bound_mass_max_limit
          
          real(dp) :: star_species_mass_min_limit, star_species_mass_max_limit
          character (len=iso_name_length) :: &
@@ -76,9 +74,7 @@
          real(dp) :: envelope_fraction_left_limit
 
          real(dp) :: he_core_mass_limit
-         real(dp) :: c_core_mass_limit
-         real(dp) :: o_core_mass_limit
-         real(dp) :: si_core_mass_limit
+         real(dp) :: co_core_mass_limit
          real(dp) :: fe_core_mass_limit
          real(dp) :: neutron_rich_core_mass_limit
 
@@ -101,6 +97,9 @@
 
          real(dp) :: log_Tsurf_upper_limit
          real(dp) :: log_Tsurf_lower_limit
+
+         real(dp) :: log_Rsurf_upper_limit
+         real(dp) :: log_Rsurf_lower_limit
 
          real(dp) :: log_L_upper_limit
          real(dp) :: log_L_lower_limit
@@ -140,7 +139,7 @@
             stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
             stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS
          real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q
-         real(dp) :: gamma1_limit, gamma1_limit_max_q
+         real(dp) :: gamma1_limit, gamma1_limit_max_q, gamma1_limit_max_v_div_vesc
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
          real(dp) :: delta_Pg_lower_limit, delta_Pg_upper_limit
@@ -362,7 +361,7 @@
          integer :: RTI_smooth_iterations
 
       ! brunt
-         logical :: calculate_Brunt_N2
+         logical :: calculate_Brunt_B, calculate_Brunt_N2
          real(dp) :: min_magnitude_brunt_B, brunt_N2_coefficient
          integer :: num_cells_for_smooth_brunt_B
          real(dp) :: threshold_for_smooth_brunt_B
@@ -645,15 +644,17 @@
          
          logical :: use_split_merge_amr, trace_split_merge_amr, &
             equal_split_density_amr, split_merge_amr_skip_inner_cell, &
+            split_merge_amr_hybrid_zoning, &
             split_merge_amr_log_zoning, &
             split_merge_amr_logtau_zoning, &
             split_merge_amr_okay_to_split_nz, &
             split_merge_amr_okay_to_split_1, &
             merge_amr_inhibit_at_jumps
-         integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters
+         integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters, &
+            split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_cntr_dq_min
+            split_merge_amr_r_core_cm
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells
@@ -1219,6 +1220,20 @@
 
          real(dp) :: delta_log_eps_nuc_limit
          real(dp) :: delta_log_eps_nuc_hard_limit
+         
+         logical :: delta_dX_div_X_drop_only
+         logical :: delta_lg_XH_drop_only
+         logical :: delta_lg_XHe_drop_only
+         logical :: delta_lg_XC_drop_only
+         logical :: delta_lg_XNe_drop_only
+         logical :: delta_lg_XO_drop_only
+         logical :: delta_lg_XSi_drop_only
+         logical :: delta_XH_drop_only
+         logical :: delta_XHe_drop_only
+         logical :: delta_XC_drop_only
+         logical :: delta_XNe_drop_only
+         logical :: delta_XO_drop_only
+         logical :: delta_XSi_drop_only
 
          real(dp) :: delta_dX_div_X_cntr_limit
          real(dp) :: delta_dX_div_X_cntr_hard_limit
@@ -1292,7 +1307,7 @@
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
          logical :: report_dt_hard_limit_retries, report_solver_dt_info
-         logical :: trace_evolve
+         logical :: trace_evolve, report_min_dr_div_cs
 
       ! misc
 

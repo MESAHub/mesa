@@ -827,62 +827,38 @@
       ! he_core_boundary_h1_fraction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If >= 0, boundary is outermost location where h1 mass fraction is <= this value,
+      ! If fraction >= 0, boundary is outermost location where h1 mass fraction is <= this value,
       ! and he4 mass fraction >= ``min_boundary_fraction`` (see below).
-      ! If < 0, boundary is outermost location where he4 is the most abundant species.
+      ! If fraction < 0, boundary is outermost location where he4 is the most abundant species.
 
       ! ::
 
-    he_core_boundary_h1_fraction = 0.01d0
+    he_core_boundary_h1_fraction = 0.1d0
 
 
-      ! c_core_boundary_he4_fraction
+      ! co_core_boundary_he4_fraction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If >= 0, boundary is outermost location where he4 mass fraction is <= this value,
-      ! and c12 mass fraction >= ``min_boundary_fraction`` (see below).
-      ! If < 0, boundary is outermost location where c12 is the most abundant species.
+      ! If fraction >= 0, boundary is outermost location where he4 mass fraction is <= this value,
+      ! and c12+o16 mass fraction >= ``min_boundary_fraction`` (see below).
+      ! If fraction < 0, boundary is outermost location where c12+o16 is more abundant than any other species.
 
       ! ::
 
-    c_core_boundary_he4_fraction = 0.01d0
-
-
-      ! o_core_boundary_c12_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If >= 0, boundary is outermost location where c12 mass fraction is <= this value,
-      ! and o16 mass fraction >= ``min_boundary_fraction`` (see below).
-      ! If < 0, boundary is outermost location where o16 is the most abundant species.
-
-      ! ::
-
-    o_core_boundary_c12_fraction = 0.01d0
-
-
-      ! si_core_boundary_o16_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If >= 0, boundary is outermost location where o16 mass fraction is <= this value,
-      ! and si28 mass fraction >= ``min_boundary_fraction`` (see below).
-      ! If < 0, boundary is outermost location where si28 is the most abundant species.
-
-      ! ::
-
-    si_core_boundary_o16_fraction = 0.01d0
+    co_core_boundary_he4_fraction = 0.1d0
 
 
       ! fe_core_boundary_si28_fraction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! For this case, "iron" includes any species with A > 46.
-      ! If >= 0, boundary is outermost location where si28 mass fraction is <= this value,
+      ! If fraction >= 0, boundary is outermost location where si28 mass fraction is <= this value,
       ! and "iron" mass fraction >= ``min_boundary_fraction`` (see below).
-      ! If < 0, boundary is outermost location where "iron" is the most abundant species.
+      ! If fraction < 0, boundary is outermost location where "iron" is the most abundant species.
 
       ! ::
 
-    fe_core_boundary_si28_fraction = 0.01d0
+    fe_core_boundary_si28_fraction = 0.1d0
 
 
       ! neutron_rich_core_boundary_Ye_max
@@ -1287,6 +1263,24 @@
 
     star_mass_max_limit = 0
 
+      ! bound_mass_min_limit
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when star mass in Msun units is < this.  <= 0 means no limit.
+
+      ! ::
+
+    bound_mass_max_limit = 0
+
+      ! bound_mass_max_limit
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Stop when star mass in Msun units is > this.  <= 0 means no limit.
+
+      ! ::
+
+    bound_mass_max_limit = 0
+
 
       ! star_species_mass_min_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1380,34 +1374,14 @@
     he_core_mass_limit = 1d99
 
 
-      ! c_core_mass_limit
+      ! co_core_mass_limit
       ! ~~~~~~~~~~~~~~~~~
 
-      ! stop when carbon core reaches this mass, in Msun units
+      ! stop when CO core reaches this mass, in Msun units
 
       ! ::
 
-    c_core_mass_limit = 1d99
-
-
-      ! o_core_mass_limit
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! stop when oxygen core reaches this mass, in Msun units
-
-      ! ::
-
-    o_core_mass_limit = 1d99
-
-
-      ! si_core_mass_limit
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! stop when silicon core reaches this mass, in Msun units
-
-      ! ::
-
-    si_core_mass_limit = 1d99
+    co_core_mass_limit = 1d99
 
 
       ! fe_core_mass_limit
@@ -1561,6 +1535,26 @@
       ! ::
 
     log_Tsurf_lower_limit = -1d99
+
+
+      ! log_Rsurf_upper_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop when log10 of R/Rsun in outermost cell is greater than this limit.
+
+      ! ::
+
+    log_Rsurf_upper_limit = 1d99
+
+
+      ! log_Rsurf_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop when log10 of R/Rsun in outermost cell is less than this limit.
+
+      ! ::
+
+    log_Rsurf_lower_limit = -1d99
 
 
       ! log_L_upper_limit
@@ -1975,6 +1969,16 @@
       ! ::
 
     gamma1_limit_max_q = 0.95d0
+
+
+      ! gamma1_limit_max_v_div_vesc
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! stop if gamma1 < this limit at any location with ``v_div_vesc <= gamma1_limit_max_v_div_vesc``
+
+      ! ::
+
+    gamma1_limit_max_v_div_vesc = 0.95d0
 
 
       ! Pgas_div_P_limit
@@ -5206,8 +5210,8 @@
       ! wind_H_He_envelope_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Winds automatically shut off when star_mass - c_core_mass is less than this limit.
-      ! The value of ``c_core_boundary_he4_fraction`` defines c_core_mass.
+      ! Winds automatically shut off when star_mass - co_core_mass is less than this limit.
+      ! The value of ``co_core_boundary_he4_fraction`` defines co_core_mass.
       ! Mass in Msun units.
 
       ! ::
@@ -5218,7 +5222,7 @@
       ! wind_He_layer_limit
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Winds automatically shut off when he_core_mass - c_core_mass is less than this limit.
+      ! Winds automatically shut off when he_core_mass - co_core_mass is less than this limit.
       ! Mass in Msun units.
 
       ! ::
@@ -6262,23 +6266,30 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_log_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_hybrid_zoning
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if split_merge_amr_logtau_zoning, target is even grid spacing in logtau
       ! else if split_merge_amr_log_zoning, target is even grid spacing in logr
+      ! else if split_merge_amr_hybrid_zoning, target is even r spacing for core, even logr outside
       ! else target is even grid spacing in r
 
       ! ::
 
     split_merge_amr_logtau_zoning = .false.
     split_merge_amr_log_zoning = .true.
+    split_merge_amr_hybrid_zoning = .false.
 
 
       ! split_merge_amr_nz_baseline
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_nz_r_core
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
     split_merge_amr_nz_baseline = 1000
+    split_merge_amr_nz_r_core = 200
 
 
       ! split_merge_amr_MaxLong
@@ -6362,6 +6373,14 @@
 
     split_merge_amr_dq_min = 1d-14
     split_merge_amr_dq_max = 1d0
+
+
+      ! split_merge_amr_r_core_cm
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    split_merge_amr_r_core_cm = 1d8
 
 
       ! split_merge_amr_max_iters
@@ -7459,13 +7478,16 @@
    ! ______________
 
 
+      ! calculate_Brunt_B
+      ! ~~~~~~~~~~~~~~~~~~
       ! calculate_Brunt_N2
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! Only calculate ``Brunt_N2`` if this is true.
+      ! Only calculate if this is true.
 
       ! ::
 
+    calculate_Brunt_B = .true.
     calculate_Brunt_N2 = .true.
 
 
@@ -8886,7 +8908,7 @@
       !          'dL/L'                 dL_div_L_limit
       !          'dX'                   dX_limit
       !          'dX/X'                 dX_div_X_limit
-      !          'dX_burn'              dX_nuc_drop_limit
+      !          'dX_nuc_drop'          dX_nuc_drop_limit
       !          'delta mdot'           delta_mdot_limit
       !          'delta total J'        delta_lg_total_J_limit
       !          'delta_HR'             delta_HR_limit
@@ -10875,6 +10897,53 @@
     delta_XSi_cntr_hard_limit = 0.05d0
 
 
+      ! delta_dX_div_X_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XH_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XHe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XC_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XNe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XO_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lg_XSi_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XH_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XHe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XC_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XNe_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XO_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_XSi_drop_only
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+         
+
+      ! If true, then only limit drops in abundance. 
+
+      ! ::
+
+   delta_dX_div_X_drop_only = .false.
+   delta_lg_XH_drop_only = .false.
+   delta_lg_XHe_drop_only = .false.
+   delta_lg_XC_drop_only = .false.
+   delta_lg_XNe_drop_only = .false.
+   delta_lg_XO_drop_only = .false.
+   delta_lg_XSi_drop_only = .false.
+   delta_XH_drop_only = .false.
+   delta_XHe_drop_only = .false.
+   delta_XC_drop_only = .false.
+   delta_XNe_drop_only = .false.
+   delta_XO_drop_only = .false.
+   delta_XSi_drop_only = .false.
+
+
    ! limits based on changes in mass of the star
    ! ___________________________________________
 
@@ -10948,6 +11017,16 @@
 
     limit_for_rel_error_in_energy_conservation = 1d-4
     hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+
+      ! report_min_dr_div_cs
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, produce terminal output about minimum of cell dr/cs
+
+      ! ::
+
+    report_min_dr_div_cs = .false.
 
 
       ! report_dt_hard_limit_retries

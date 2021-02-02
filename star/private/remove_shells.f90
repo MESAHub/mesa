@@ -492,22 +492,27 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: q_max, abs_v_max
-         integer :: k
+         integer :: k_max
+         real(dp), pointer :: v(:)
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_at_inner_max_abs_v: get_star_ptr ierr', ierr
             return
          end if
-         q_max = 0
-         abs_v_max = 0
-         do k=s% nz-1, 1, -1
-            if (abs(s% v(k)) > abs_v_max) then
-               q_max = s% q(k)
-               abs_v_max = abs(s% v(k))
-               exit
-            end if
-         end do
-         call do_remove_inner_fraction_q(id, q_max, ierr)
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
+            stop 'no u or v for do_remove_center_at_inner_max_abs_v?'
+            return
+         end if
+         k_max = minloc(v(1:s% nz),dim=1)
+         q_max = s% q(k_max)
+         abs_v_max = abs(v(k_max))
+         !write(*,2) 'v abs_v_max q_max', k_max, v(k_max), abs_v_max, q_max
+         call do_remove_center(id, k_max, ierr)
       end subroutine do_remove_center_at_inner_max_abs_v
 
 
@@ -594,17 +599,20 @@
          new_xmstar = s% m(1) - s% M_center
          s% xmstar = new_xmstar
          s% R_center = s% r(k)
+         
+         
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
          if (s% u_flag) then
+            kk = minloc(s% u(1:s% nz),dim=1)
             s% v_center = s% u(k)
             if (is_bad(s% v_center)) then
-               write(*,2) 's% u(k)', k, s% u(k)
+               write(*,2) 'center s% u(k)', k, s% u(k)
                stop 'do_remove_center'
             end if
          else if (s% v_flag) then
             s% v_center = s% v(k)
             if (is_bad(s% v_center)) then
-               write(*,2) 's% v(k)', k, s% v(k)
+               write(*,2) 'center s% v(k)', k, s% v(k)
                stop 'do_remove_center'
             end if
          else

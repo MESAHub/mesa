@@ -583,7 +583,7 @@
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &
-                  'C core', s% c_core_mass)
+                  'CO core', s% co_core_mass)
 
          cnt = 0; ypos = ypos + dypos
          cnt = write_info_line_flt(cnt, ypos, xpos0, dxpos, dxval, &

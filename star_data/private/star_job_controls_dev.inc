@@ -8,8 +8,10 @@
       logical :: change_w_div_wc_flag, change_initial_w_div_wc_flag, new_w_div_wc_flag
       
       logical :: change_j_rot_flag, change_initial_j_rot_flag, new_j_rot_flag
-
-
+      
+      logical :: remove_surface_do_entropy, remove_surface_do_jrot, &
+         remove_surface_turn_off_energy_sources_and_sinks, &
+         remove_surface_by_relax_to_star_cut
 
 
       logical :: load_saved_photo

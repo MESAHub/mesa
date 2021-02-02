@@ -1299,6 +1299,23 @@
       end subroutine star_relax_mass
       
       
+      subroutine star_relax_mass_to_remove_H_env(id, lg_max_abs_mdot, ierr) ! also resets initial_mass
+         use relax, only: do_relax_mass
+         use report, only: get_mass_info
+         integer, intent(in) :: id
+         real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
+            ! e.g., -8.0 for mdot of -10^-8 Msun/year
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call get_mass_info(s, s% dm, ierr)
+         if (ierr /= 0) return
+         call do_relax_mass(id, s% he_core_mass, lg_max_abs_mdot, ierr)      
+      end subroutine star_relax_mass_to_remove_H_env
+      
+      
       subroutine star_relax_mass_scale( &
             id, new_mass, dlgm_per_step, change_mass_years_for_dt, ierr) ! also resets initial_mass
          ! rescales star mass without changing composition as function of m/mstar

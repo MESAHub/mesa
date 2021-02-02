@@ -600,8 +600,6 @@
          if (restart) then
             call unpack_extra_info(s)
          else
-         
-            !call test_numerical_diffusion(s)
             
             initial_nico = 0
             min_m_photosphere = 1d99
@@ -613,6 +611,18 @@
             initial_time = s% time
             initial_he_core_mass = s% he_core_mass
             call alloc_extra_info(s)
+         
+            if (s% x_integer_ctrl(1) == 0) then
+               if (s% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
+                  if (s% v_flag) then
+                     do k=1,s% nz
+                        s% xh(s% i_v,k) = 0d0
+                        s% v(k) = 0d0
+                     end do
+                  end if
+               end if
+               return
+            end if
 
             if (s% x_integer_ctrl(1) == 5 .and. &
                 s% x_ctrl(17) > 0) call add_csm ! part 5, add csm
@@ -650,7 +660,12 @@
             if (start_m == 0d0) then ! use max v
                k_max_v = maxloc(s% u(1:s% nz),dim=1)
                start_m = s% m(k_max_v)/Msun
-               write(*,2) 'no shock; use max_v for start_m', k_max_v, start_m
+               if (start_m < 2d0*s% M_center/Msun) then
+                  write(*,2) 'no shock; use max_v for start_m', k_max_v, start_m
+               else
+                  start_m = s% M_center/Msun
+                  write(*,2) 'no shock; use M_center for start_m', s% nz, start_m
+               end if
             else
                write(*,2) 'use shock for start_m', s% shock_k, s% shock_mass
             end if
@@ -727,43 +742,6 @@
             
          end if ! not restart
          
-         if (s% x_integer_ctrl(1) == -1) then   ! report starting model info
-            write(*,'(a)') trim(s% job% saved_model_name)
-            write(*,'(99a8)') &
-               'mass', &
-               'radius', &
-               'Teff', &
-               'log_L', &
-               'h_env', &
-               'he_core', &
-               'o_core', &
-               'si_core', &
-               'fe_core', &
-               'log_g', &
-               'tot h1', &
-               'tot he4'
-            tot_h1 = (s% xmstar/Msun)*dot_product( &
-               s% xa(s% net_iso(ih1),1:s% nz), &
-               s% dq(1:s% nz))/sum(s% dq(1:s% nz))
-            tot_he4 = (s% xmstar/Msun)*dot_product( &
-               s% xa(s% net_iso(ihe4),1:s% nz), &
-               s% dq(1:s% nz))/sum(s% dq(1:s% nz))
-            write(*,'(f8.3,f8.1,i8,99f8.3)') &
-               s% star_mass, & !'mass', &
-               s% R(1)/Rsun, & !'radius', &
-               int(s% Teff), & !'Teff', &
-               safe_log10(s% L_surf), & !'log_L', &
-               s% star_mass - s% he_core_mass, & ! 'h_env', &
-               s% he_core_mass, & !'he_core', &
-               s% o_core_mass, & !'o_core', &
-               s% si_core_mass, & !'si_core', &
-               s% fe_core_mass, & !'fe_core', &
-               safe_log10(s% grav(1)), & !'log_g', &
-               tot_h1, & !'tot h1', &
-               tot_he4 !'tot he4'
-            stop 'test'
-         end if
-         
          write(*,1) 's% x_ctrl(16)', s% x_ctrl(16)
          write(*,1) 's% star_mass', s% star_mass
          write(*,1) 'start_m', start_m
@@ -783,7 +761,7 @@
             s% x_ctrl(2) = stop_m
             write(*,1) 'stop when shock reaches', stop_m
             write(*,1) 's% he_core_mass', s% he_core_mass
-            write(*,1) 's% o_core_mass', s% o_core_mass
+            write(*,1) 's% co_core_mass', s% co_core_mass
             write(*,1) 's% M_center/Msun', s% M_center/Msun
             write(*,1) 's% star_mass', s% star_mass
             write(*,*)
