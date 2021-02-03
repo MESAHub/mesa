@@ -286,7 +286,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
          s% History_Panels2_xaxis_name = 'model_number'
          if (.not. s% x_logical_ctrl(7)) return
          ! check age and set History_Panels2_xaxis_name
