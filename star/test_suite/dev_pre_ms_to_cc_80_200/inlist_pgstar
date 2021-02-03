@@ -335,7 +335,6 @@ Text_Summary1_name(6,5) = 'retries'
 
  History_Panels2_title = ''
 
- History_Panels2_xaxis_name = 'model_number'
  History_Panels2_max_width = -1
 
  History_Panels2_txt_scale = 0.75

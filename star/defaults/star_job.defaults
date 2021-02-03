@@ -2322,8 +2322,8 @@
     remove_surface_by_v_surf_km_s = 0
     remove_surface_by_v_surf_div_cs = 0
     remove_surface_by_v_surf_div_v_escape = 0
-    min_q_for_remove_surface_by_v_surf_div_v_escape = 0
-    max_q_for_remove_surface_by_v_surf_div_v_escape = 0
+    min_q_for_remove_surface_by_v_surf_div_v_escape = 0d0
+    max_q_for_remove_surface_by_v_surf_div_v_escape = 1d0
 
 
       ! report_mass_not_fe56

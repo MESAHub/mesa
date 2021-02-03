@@ -458,6 +458,7 @@
          use other_overshooting_scheme, only: null_other_overshooting_scheme
          use other_photo_write, only: default_other_photo_write
          use other_photo_read, only: default_other_photo_read
+         use other_set_pgstar_controls, only: default_other_set_pgstar_controls
          use other_eos
          use other_kap
          use pgstar_decorator
@@ -644,6 +645,8 @@
 
          s% other_photo_write => default_other_photo_write
          s% other_photo_read => default_other_photo_read
+
+         s% other_set_pgstar_controls => default_other_set_pgstar_controls
 
          s% other_new_generation => null_other_new_generation
          s% other_set_current_to_old => null_other_set_current_to_old

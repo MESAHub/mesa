@@ -1453,6 +1453,11 @@
          end subroutine other_set_current_to_old_interface
       
       
+         subroutine other_set_pgstar_controls_interface(id)
+            integer, intent(in) :: id
+         end subroutine other_set_pgstar_controls_interface
+      
+      
          subroutine other_astero_freq_corr_interface(id, ierr)
             integer, intent(in) :: id
             integer, intent(out) :: ierr

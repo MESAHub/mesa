@@ -1363,6 +1363,7 @@
          logical :: use_other_edit_pulse_data
          logical :: use_other_astero_freq_corr
          logical :: use_other_timestep_limit
+         logical :: use_other_set_pgstar_controls
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

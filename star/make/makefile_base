@@ -110,6 +110,7 @@ SRCS = \
    other_solver_monitor.f90 \
    other_photo_write.f90 \
    other_photo_read.f90 \
+   other_set_pgstar_controls.f90 \
    other_astero_freq_corr.f90 \
    other_eval_fp_ft.f90 \
    other_eval_i_rot.f90 \

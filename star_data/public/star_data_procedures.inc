@@ -156,6 +156,9 @@
          procedure (other_set_current_to_old_interface), pointer, nopass :: &
             other_set_current_to_old => null()
 
+         procedure (other_set_pgstar_controls_interface), pointer, nopass :: &
+            other_set_pgstar_controls => null()
+
          procedure (other_astero_freq_corr_interface), pointer, nopass :: &
             other_astero_freq_corr => null()
 

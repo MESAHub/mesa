@@ -111,6 +111,8 @@
             write(*,*) 'PGSTAR failed in reading ' // trim(inlist_fname)
             return
          end if
+         if (s% use_other_set_pgstar_controls) &
+            call s% other_set_pgstar_controls(s% id)
          call set_win_file_data(s, ierr)
       end subroutine do_read_pgstar_controls
 

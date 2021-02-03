@@ -53,6 +53,7 @@
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
          s% other_alpha_mlt => alpha_mlt_routine       
+         s% other_set_pgstar_controls => set_pgstar_controls       
       end subroutine extras_controls
 
 
@@ -210,7 +211,7 @@
 
 
       integer function extras_start_step(id)
-         use star_lib, only: star_remove_surface_by_radius_cm, &
+         use star_lib, only: star_remove_surface_by_v_surf_div_v_escape, &
             star_set_v_flag, star_set_u_flag
          integer, intent(in) :: id
          integer :: ierr
@@ -221,19 +222,16 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
-
          if (.not. s% x_logical_ctrl(7)) return
-         
          ! check logR
          lgRsurf = log10(exp(s% xh(s% i_lnR,1))/Rsun)
          !write(*,2) 'lgRsurf', s% model_number, lgRsurf
          if (lgRsurf > s% x_ctrl(19)) then
             write(*,*) 'surface logR > limit ', lgRsurf, s% x_ctrl(19)
-            write(*,*) 'prune surface to logR = ', s% x_ctrl(20)
-            call star_remove_surface_by_radius_cm(id, Rsun*exp10(s% x_ctrl(20)), ierr)
-            if (failed('star_remove_surface_by_radius_cm',ierr)) return
+            write(*,*) 'prune surface to v/v_esc = ', s% x_ctrl(20)
+            call star_remove_surface_by_v_surf_div_v_escape(id, s% x_ctrl(20), ierr)
+            if (failed('star_remove_surface_by_v_surf_div_v_escape',ierr)) return
          end if
-         
          ! check u_flag vs v_flag choice
          lgTmax = maxval(s% xh(s% i_lnT,1:s% nz))/ln10
          !write(*,2) 'lgTmax', s% model_number, lgTmax
@@ -267,8 +265,6 @@
             end if
          end if
          
-         
-         
          contains
       
          logical function failed(str,ierr)
@@ -281,6 +277,27 @@
          end function failed
          
       end function extras_start_step
+
+
+      subroutine set_pgstar_controls(id)
+         integer, intent(in) :: id
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         extras_check_model = keep_going         
+         s% History_Panels2_xaxis_name = 'model_number'
+         if (.not. s% x_logical_ctrl(7)) return
+         ! check age and set History_Panels2_xaxis_name
+         if (s% star_age > 1d0) then
+            s% History_Panels2_xaxis_name = 'star_age'
+         else if (s% star_age*secyer > 24*60*60) then
+            s% History_Panels2_xaxis_name = 'star_age_day'
+         else
+            s% History_Panels2_xaxis_name = 'star_age_sec'
+         end if
+      end subroutine set_pgstar_controls
    
 
       ! returns either keep_going or terminate.
@@ -295,7 +312,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         call store_extra_info(s)
+         call store_extra_info(s)         
       end function extras_finish_step
 
       
