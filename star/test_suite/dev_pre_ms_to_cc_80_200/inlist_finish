@@ -8,6 +8,7 @@
       save_model_filename = 'final.mod'
       !required_termination_code_string = 'fe_core_infall_limit'  ! for lower masses
       !required_termination_code_string = 'log_Rsurf_upper_limit' ! for higher masses
+      !required_termination_code_string = 'bound_mass_min_limit' ! for completely unbound cases
 
       !pgstar_flag = .false.
 
@@ -28,18 +29,27 @@
       
       log_Rsurf_upper_limit = 4.5d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
-      
-      x_logical_ctrl(7) = .true. ! for inlist_finish
-          ! checks for a required_termination_code
+      bound_mass_min_limit = 10d0 ! for completely unbound cases
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
 
-      gamma1_limit_max_q = 0.75d0
-
+! tell run_star_extras that this is inlist_finish
+      x_logical_ctrl(7) = .true.
+      
 ! prune envelope when radius gets too large
       x_ctrl(19) = 1d99 ! 4.13d0 ! limit for log(R/Rsun)
       x_ctrl(20) = 2.0d0 ! cut back to this log(R/Rsun)
+      
+! switch between u_flag and v_flag depending on lgTmax
+      x_ctrl(21) = 9.0d0 ! from u_flag to v_flag when drop below this
+      x_ctrl(22) = 9.4d0 ! from v_flag to u_flag when go above this
+      use_avQ_art_visc = .false. ! will be set true for v_flag, false for u_flag
+      avQ_cq = 4.0d0
+      avQ_zsh = 0.1d0
+      
+      x_ctrl(23) = 1.0 ! u_flag dt_div_min_dr_div_cs_limit
+      x_ctrl(24) = 1.5 ! u_flag dt_div_min_dr_div_cs_hard_limit      
 
 ! wind
 
@@ -66,39 +76,17 @@
       delta_XHe_cntr_hard_limit = 0.1
  
       delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = -1 ! 0.03d0  ! this kills the 120M case 
+      delta_XSi_cntr_hard_limit = -1 ! 0.03d0  ! this kills the 120M case  ??
 
 ! mesh
 
 ! solver 
-!      use_avQ_art_visc = .true.
-!      avQ_cq = 4.0d0
-!      avQ_zsh = 0.1d0
-      
-
       ! this change of surface BC can cause lots of initial retries to reduce timestep
       use_compression_outer_BC = .true.
 
-! GYRE output controls
-
-      !write_pulse_data_with_profile = .true.
-      pulse_data_format = 'GYRE'
-      
-      !x_logical_ctrl(37) = .true. ! if true, then run GYRE
-
-      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
-      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-
-      x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      x_logical_ctrl(2) = .false. ! output eigenfunction files
-
-      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-         ! should match gyre.in mode l
-      x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      x_ctrl(2) = 0.33d+03 ! growth < this (days)
-
 ! output
+
+      gamma1_limit_max_q = 0.75d0 ! only check below this limit
 
       num_trace_history_values = 7
       trace_history_value_name(1) = 'non_fe_core_infall'
@@ -189,16 +177,6 @@ Grid1_file_interval = 1     ! output when mod(model_number,Grid1_file_interval)=
 
 !pause = .true.
 
-Grid1_num_plots = 5
-
-Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
-Grid1_plot_col(5) = 1          ! number from 1 at left
-Grid1_plot_colspan(5) = 2       ! plot spans this number of columns
-Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
-Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
-
-
-
 Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0.0
 Profile_Panels3_xmax = -101d0
@@ -227,118 +205,15 @@ Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
 
 
- History_Panels2_title = ''
+Text_Summary1_name(2,3) = 'bound_mass'
 
- History_Panels2_xaxis_name = 'star_age_day'
- History_Panels2_max_width = -1
+ History_Panels2_xaxis_name = 'star_age_sec'
 
- History_Panels2_txt_scale = 0.75
- History_Panels2_xmin = -101d0
- History_Panels2_xmax = -101d0
- History_Panels2_dxmin = -1
- History_Panels2_xaxis_reversed = .false.
- History_Panels2_xaxis_log = .false.
- History_Panels2_xmargin = 0.0
-
- History_Panels2_num_panels = 3
-
- History_Panels2_yaxis_name(1) = 'log_cntr_T'
- History_Panels2_yaxis_reversed(1) = .false.
- History_Panels2_ymin(1) = -101d0
- History_Panels2_ymax(1) = -101d0
- History_Panels2_dymin(1) = 0.1
-
- History_Panels2_other_yaxis_name(1) = 'total_energy_foe'
- History_Panels2_other_ymin(1) = -101d0
- History_Panels2_other_ymax(1) = -101d0
- History_Panels2_other_dymin(1) = 0.1
-
- History_Panels2_yaxis_name(2) = 'log_cntr_Rho'
- History_Panels2_yaxis_reversed(2) = .false.
- History_Panels2_ymin(2) = -101d0
- History_Panels2_ymax(2) = -101d0
- History_Panels2_dymin(2) = 0.1
-
- History_Panels2_other_yaxis_name(2) = 'gamma1_min'
- History_Panels2_other_yaxis_reversed(2) = .false.
- History_Panels2_other_ymin(2) = -101d0
- History_Panels2_other_ymax(2) = -101d0
- History_Panels2_other_dymin(2) = 0.01
-
-History_Panels2_yaxis_name(3) = 'bound_mass'
-History_Panels2_yaxis_reversed(3) = .false.
-History_Panels2_ymin(3) = -101d0
-History_Panels2_ymax(3) = -101d0
-History_Panels2_dymin(3) = 0.1
-
-History_Panels2_other_yaxis_name(3) = 'non_fe_core_infall'
-History_Panels2_other_yaxis_reversed(3) = .false.
-History_Panels2_other_ymin(3) = -101d0
-History_Panels2_other_ymax(3) = -101d0
-History_Panels2_other_dymin(3) = 0.01
-
-! not doing these currently
- History_Panels2_yaxis_name(4) = 'log_dt'
- History_Panels2_yaxis_reversed(4) = .false.
- History_Panels2_ymin(4) = -101d0
- History_Panels2_ymax(4) = -101d0
- History_Panels2_dymin(4) = 0.1
-
- History_Panels2_other_yaxis_name(4) = 'log_R'
- History_Panels2_other_yaxis_reversed(4) = .false.
- History_Panels2_other_ymin(4) = -2d0
- History_Panels2_other_ymax(4) = -101d0
-
-
-
-
-History_Panels1_num_panels = 3
-History_Panels1_other_yaxis_name(2) = 'v_surf_km_s'
-
-
-
-
-Profile_Panels1_same_yaxis_range(3) = .true.
 
 TRho_Profile_xmin = 2.0
 !TRho_Profile_xmax = 7.5
 TRho_Profile_ymin = 8.3
 !TRho_Profile_ymax = 9.2
 
-Text_Summary1_name(1,1) = 'model_number'
-Text_Summary1_name(1,2) = 'time_step_sec'
-Text_Summary1_name(1,3) = 'Mass'
-Text_Summary1_name(1,4) = 'log_L'    
-Text_Summary1_name(1,5) = 'log_Teff'
-
-Text_Summary1_name(2,1) = 'log_max_T'  
-Text_Summary1_name(2,2) = 'star_age_day'
-Text_Summary1_name(2,3) = 'bound_mass'
-Text_Summary1_name(2,4) = 'He_cntr'
-Text_Summary1_name(2,5) = 'He_core'
-
-Text_Summary1_name(3,1) = 'log_cntr_T'  
-Text_Summary1_name(3,2) = 'log_cntr_Rho'
-Text_Summary1_name(3,3) = 'log_R'
-Text_Summary1_name(3,4) = 'C_cntr'
-Text_Summary1_name(3,5) = 'CO_core'
-
-Text_Summary1_name(4,1) = 'fe_core_infall' 
-Text_Summary1_name(4,2) = 'gamma1_min'
-Text_Summary1_name(4,3) = 'lg_Lnuc'
-Text_Summary1_name(4,4) = 'O_cntr'
-Text_Summary1_name(4,5) = 'Fe_core'
-
-Text_Summary1_name(5,1) = 'non_fe_core_infall' 
-Text_Summary1_name(5,2) = 'log_LHe'
-Text_Summary1_name(5,3) = 'lg_Lneu'
-Text_Summary1_name(5,4) = 'Ne_cntr'
-Text_Summary1_name(5,5) = 'zones'
-
-Text_Summary1_name(6,1) = 'total_energy_foe' 
-Text_Summary1_name(6,2) = 'log_LZ'
-Text_Summary1_name(6,3) = 'lg_Lphoto'
-Text_Summary1_name(6,4) = 'Si_cntr'
-Text_Summary1_name(6,5) = 'retries'
 
 / ! end of pgstar namelist

@@ -26,24 +26,10 @@
       use star_def
       use const_def
       use math_lib
-      use gyre_lib
       
       implicit none
       
       include "test_suite_extras_def.inc"
-      
-!gyre
-      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
-      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      !x_logical_ctrl(2) = .false. ! output eigenfunction files
-      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-      !x_integer_ctrl(4) = 1 ! order
-      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
-      
-      !x_logical_ctrl(7) = .true. for inlist_finish
 
       contains
 
@@ -112,26 +98,7 @@
             call alloc_extra_info(s)
          else ! it is a restart
             call unpack_extra_info(s)
-         end if
-         
-         if (.not. s% x_logical_ctrl(37)) return
-         
-         ! Initialize GYRE
-
-         call gyre_init('gyre.in')
-
-         ! Set constants
-
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
-
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
-
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-         
+         end if 
       end subroutine extras_startup
       
       
@@ -150,19 +117,20 @@
          if (ierr /= 0) return
          
          if (s% x_logical_ctrl(6)) & ! inlist_prepare
-            call check_termination_code(t_log_max_temp_upper_limit, t_non_fe_core_infall_limit)
+            call check_termination_code( &
+               t_log_max_temp_upper_limit, t_non_fe_core_infall_limit, -1)
          
          if (s% x_logical_ctrl(7)) & ! inlist_finish
-            call check_termination_code(t_fe_core_infall_limit, t_log_Rsurf_upper_limit)
-         
-         if (.not. s% x_logical_ctrl(37)) return
-         call gyre_final()
+            call check_termination_code( &
+               t_fe_core_infall_limit, t_log_Rsurf_upper_limit, t_bound_mass_min_limit)
          
          contains
          
-         subroutine check_termination_code(tc1, tc2)
-            integer, intent(in) :: tc1, tc2
-            if (s% termination_code /= tc1 .and. s% termination_code /= tc2) then
+         subroutine check_termination_code(tc1, tc2, tc3)
+            integer, intent(in) :: tc1, tc2, tc3
+            if (s% termination_code /= tc1 .and. &
+                s% termination_code /= tc2 .and. &
+                s% termination_code /= tc3) then
                if (s% termination_code > 0 .and. s% termination_code <= num_termination_codes) then
                   write(*,*) 'Failed to get a valid termination reason. got this instead: ' // &
                      trim(termination_code_str(s% termination_code))
@@ -242,32 +210,78 @@
 
 
       integer function extras_start_step(id)
-         use star_lib, only: star_remove_surface_by_radius_cm
+         use star_lib, only: star_remove_surface_by_radius_cm, &
+            star_set_v_flag, star_set_u_flag
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
+         real(dp) :: lgTmax, lgRsurf
+         include 'formats'
          extras_start_step = keep_going    
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) then
-            extras_start_step = terminate
-            write(*,*) 'extras_start_step failed in call to star_ptr'
-            return
-         end if
+         if (failed('star_ptr',ierr)) return
+
          if (.not. s% x_logical_ctrl(7)) return
-         if (log10(s% r(1)/Rsun) <= s% x_ctrl(19)) return
-         write(*,*) 'surface logR > limit ', log10(s% r(1)/Rsun), s% x_ctrl(19)
-         write(*,*) 'cut surface at logR = ', s% x_ctrl(20)
-         call star_remove_surface_by_radius_cm(id, Rsun*exp10(s% x_ctrl(20)), ierr)
-         if (ierr /= 0) then
-            extras_start_step = terminate
-            write(*,*) 'extras_start_step failed in call to star_remove_surface_by_radius_cm'
-            return
+         
+         ! check logR
+         lgRsurf = log10(exp(s% xh(s% i_lnR,1))/Rsun)
+         !write(*,2) 'lgRsurf', s% model_number, lgRsurf
+         if (lgRsurf > s% x_ctrl(19)) then
+            write(*,*) 'surface logR > limit ', lgRsurf, s% x_ctrl(19)
+            write(*,*) 'prune surface to logR = ', s% x_ctrl(20)
+            call star_remove_surface_by_radius_cm(id, Rsun*exp10(s% x_ctrl(20)), ierr)
+            if (failed('star_remove_surface_by_radius_cm',ierr)) return
          end if
+         
+         ! check u_flag vs v_flag choice
+         lgTmax = maxval(s% xh(s% i_lnT,1:s% nz))/ln10
+         !write(*,2) 'lgTmax', s% model_number, lgTmax
+         if (s% u_flag) then
+            s% dt_div_min_dr_div_cs_limit = s% x_ctrl(23)
+            s% dt_div_min_dr_div_cs_hard_limit = s% x_ctrl(24)
+            !write(*,2) 'lower limit', s% model_number, s% x_ctrl(21)
+            if (lgTmax < s% x_ctrl(21)) then ! switch to v_flag
+               ! do add new before remove old so can set initial values
+               write(*,*) 'new_v_flag', .true.
+               call star_set_v_flag(s% id, .true., ierr)
+               if (failed('star_set_v_flag',ierr)) return
+               write(*,*) 'new_u_flag', .false.
+               call star_set_u_flag(s% id, .false., ierr)
+               if (failed('star_set_u_flag',ierr)) return
+               s% use_avQ_art_visc = .true.
+            end if
+         else if (s% v_flag) then
+            s% dt_div_min_dr_div_cs_limit = 1d99
+            s% dt_div_min_dr_div_cs_hard_limit = 1d99
+            !write(*,2) 'upper limit', s% model_number, s% x_ctrl(22)
+            if (lgTmax > s% x_ctrl(22)) then ! switch to u_flag
+               ! do add new before remove old so can set initial values
+               write(*,*) 'new_u_flag', .true.
+               call star_set_u_flag(id, .true., ierr)
+               if (failed('star_set_u_flag',ierr)) return
+               write(*,*) 'new_v_flag', .false.
+               call star_set_v_flag(s% id, .false., ierr)
+               if (failed('star_set_v_flag',ierr)) return
+               s% use_avQ_art_visc = .false.
+            end if
+         end if
+         
+         
+         
+         contains
+      
+         logical function failed(str,ierr)
+            character (len=*), intent(in) :: str
+            integer, intent(in) :: ierr
+            failed = (ierr /= 0)
+            if (.not. failed) return
+            write(*,*) 'extras_start_step failed in ' // trim(str)
+            extras_start_step = terminate
+         end function failed
+         
       end function extras_start_step
    
-      include 'gyre_in_mesa_extras_finish_step.inc'
-
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -282,10 +296,6 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
          call store_extra_info(s)
-         if (.not. s% x_logical_ctrl(37)) return
-         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-         if (extras_finish_step == terminate) &
-             s% termination_code = t_extras_finish_step
       end function extras_finish_step
 
       

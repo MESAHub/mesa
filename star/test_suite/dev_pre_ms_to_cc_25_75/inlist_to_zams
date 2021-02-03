@@ -73,9 +73,6 @@
 
 ! solver
       solver_iters_timestep_limit = 20
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
 
 ! output
       num_trace_history_values = 2

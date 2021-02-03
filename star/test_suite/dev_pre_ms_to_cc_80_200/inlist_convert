@@ -43,9 +43,6 @@
 ! mesh
 
 ! solver
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
 
 ! output
 
@@ -130,6 +127,7 @@
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax = -101d0
+Profile_Panels3_yaxis_name(5) = 'logR_cm'
 
 Profile_Panels3_xaxis_name = 'zone'
 Profile_Panels3_xmin = -101d0 ! 

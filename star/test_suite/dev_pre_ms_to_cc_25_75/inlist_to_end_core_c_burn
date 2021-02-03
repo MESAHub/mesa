@@ -47,9 +47,6 @@
 ! mesh
 
 ! solver
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
 
 ! output
       terminal_show_age_units = 'years'

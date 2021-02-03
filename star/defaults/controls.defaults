@@ -1282,7 +1282,7 @@
 
       ! ::
 
-    bound_mass_max_limit = 0
+    bound_mass_min_limit = 0
 
       ! bound_mass_max_limit
       ! ~~~~~~~~~~~~~~~~~~~

@@ -41,13 +41,10 @@
 ! timesteps      
 
 ! mesh
-      use_split_merge_amr = .true.
-      
-      !split_merge_amr_log_zoning = .true.
-      
+      use_split_merge_amr = .true.      
       split_merge_amr_hybrid_zoning = .true.
-      split_merge_amr_nz_r_core = 200
-      split_merge_amr_r_core_cm = 1d8
+      split_merge_amr_nz_r_core = 300
+      split_merge_amr_r_core_cm = 1d9
       
       split_merge_amr_nz_baseline = 2500 ! 2000
       split_merge_amr_MaxLong = 1.7d0
@@ -110,62 +107,5 @@
 
 &pgstar
 !pause = .true.
-Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = -101d0
-
-Profile_Panels3_num_panels = 6
-
-Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
-Profile_Panels3_other_dymin(4) = 0.1
-Profile_Panels3_yaxis_name(4) = 'gamma1'
-    Profile_Panels3_ymin(4) = 1.28d0
-    Profile_Panels3_ymax(4) = -101d0
-
-Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
-Profile_Panels3_other_dymin(5) = 1
-Profile_Panels3_yaxis_name(5) = 'logRho'
- 
-Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
-Profile_Panels3_other_dymin(6) = 0.1
-Profile_Panels3_yaxis_name(6) = 'logR_cm'
-
-TRho_Profile_xmin = -5 ! -2.0
-TRho_Profile_ymin = 6 ! 7.5
-
-Text_Summary1_name(1,1) = 'model_number'
-Text_Summary1_name(1,2) = 'log_dt'
-Text_Summary1_name(1,3) = 'Mass'
-Text_Summary1_name(1,4) = 'center_ye'    
-Text_Summary1_name(1,5) = 'H_rich'
-
-Text_Summary1_name(2,1) = 'gamma1_min'  
-Text_Summary1_name(2,2) = 'star_age_day'
-Text_Summary1_name(2,3) = 'log_L'
-Text_Summary1_name(2,4) = 'He_cntr'
-Text_Summary1_name(2,5) = 'He_core'
-
-Text_Summary1_name(3,1) = 'v_surf_div_escape_v'
-Text_Summary1_name(3,2) = 'log_cntr_Rho'
-Text_Summary1_name(3,3) = 'log_Teff'
-Text_Summary1_name(3,4) = 'C_cntr'
-Text_Summary1_name(3,5) = 'CO_core'
-
-Text_Summary1_name(4,1) = 'non_fe_core_infall'
-Text_Summary1_name(4,2) = 'log_LH'
-Text_Summary1_name(4,3) = 'lg_Lnuc'
-Text_Summary1_name(4,4) = 'O_cntr'
-Text_Summary1_name(4,5) = 'Fe_core'
-
-Text_Summary1_name(5,1) = 'log_cntr_T'
-Text_Summary1_name(5,2) = 'log_LHe'
-Text_Summary1_name(5,3) = 'lg_Lneu'
-Text_Summary1_name(5,4) = 'Ne_cntr'
-Text_Summary1_name(5,5) = 'zones'
-
-Text_Summary1_name(6,1) = 'log_max_T'
-Text_Summary1_name(6,2) = 'log_LZ'
-Text_Summary1_name(6,3) = 'lg_Lphoto'
-Text_Summary1_name(6,4) = 'Si_cntr'
-Text_Summary1_name(6,5) = 'retries'
 
 / ! end of pgstar namelist

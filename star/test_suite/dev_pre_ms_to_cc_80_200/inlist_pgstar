@@ -45,7 +45,7 @@ Grid1_title = ''
 
 Grid1_num_cols = 3 ! divide plotting region into this many equal width cols
 Grid1_num_rows = 5 ! divide plotting region into this many equal height rows
-Grid1_num_plots = 6 ! <= 10
+Grid1_num_plots = 5
 
 
 Grid1_plot_name(1) = 'Text_Summary1'
@@ -90,39 +90,30 @@ Grid1_plot_rowspan(4) = 4       ! plot spans this number of rows
 Grid1_plot_col(4) =  3          ! Number from 1 at left
 Grid1_plot_colspan(4) = 1       ! plot spans this number of columns
 
-Grid1_plot_pad_left(4) = 0.04    ! fraction of full window width for padding on left
+Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
 Grid1_plot_pad_right(4) = 0.06   ! fraction of full window width for padding on right
 Grid1_plot_pad_top(4) = -0.04    ! fraction of full window height for padding at top
 Grid1_plot_pad_bot(4) = 0     ! fraction of full window height for padding at bottom
 Grid1_txt_scale_factor(4) = 0.6 ! multiply txt_scale for subplot by this
 
-Grid1_plot_name(5) = 'Profile_Panels1'
+Grid1_plot_name(5) = 'History_Panels2' ! replaces Profile_Panels1
 Grid1_plot_row(5) = 3           ! number from 1 at top
 Grid1_plot_rowspan(5) = 3       ! plot spans this number of rows
 Grid1_plot_col(5) = 1          ! number from 1 at left
-Grid1_plot_colspan(5) = 1       ! plot spans this number of columns
+Grid1_plot_colspan(5) = 2       ! plot spans this number of columns
 
-Grid1_plot_pad_left(5) = 0.00    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(5) = 0.10   ! fraction of full window width for padding on right
+Grid1_plot_pad_left(4) = 0.02    ! fraction of full window width for padding on left
+Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
 Grid1_plot_pad_top(5) = 0.05     ! fraction of full window height for padding at top
 Grid1_plot_pad_bot(5) = 0     ! fraction of full window height for padding at bottom
 Grid1_txt_scale_factor(5) = 0.6 ! multiply txt_scale for subplot by this
 
-Grid1_plot_name(6) = 'History_Panels1'
-Grid1_plot_row(6) = 3           ! number from 1 at top
-Grid1_plot_rowspan(6) = 3       ! plot spans this number of rows
-Grid1_plot_col(6) =  2          ! number from 1 at left
-Grid1_plot_colspan(6) = 1       ! plot spans this number of columns
-
-Grid1_plot_pad_left(6) = 0.00    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(6) = 0.06   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(6) = 0.05     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(6) = 0.0     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(6) = 0.6 ! multiply txt_scale for subplot by this
-
 !------------------------------------------------------------------------------------
 
 Profile_Panels3_win_flag = .false.
+
+Profile_Panels3_txt_scale = 0.7
+Profile_Panels3_show_mix_regions_on_xaxis = .true.
 
 Profile_Panels3_title = ''
 
@@ -148,16 +139,11 @@ Profile_Panels3_xmin = 0.0
 Profile_Panels3_xmax = -101d0 ! 2.2
 Profile_Panels3_xaxis_reversed = .false.
 
+Profile_Panels3_xaxis_name = 'zone'
+Profile_Panels3_xmin = 0
+Profile_Panels3_xmax = -101d0
+Profile_Panels3_xaxis_reversed = .true.
 
-Profile_Panels3_txt_scale = 0.7
-
-!Profile_Panels3_xaxis_name = 'zone'
-!Profile_Panels3_xmin = 800
-!Profile_Panels3_xmax = 1100
-!Profile_Panels3_xaxis_reversed = .true.
-
-!Profile_Panels3_show_grid = .true.
-Profile_Panels3_show_mix_regions_on_xaxis = .true.
 
 !------------------------------------------------------------------------------------
 
@@ -307,42 +293,95 @@ Text_Summary1_num_rows = 6 ! <= 20
 Text_Summary1_num_cols = 5 ! <= 20
 Text_Summary1_name(:,:) = ''
 
-
 Text_Summary1_name(1,1) = 'model_number'
-Text_Summary1_name(1,2) = 'log_dt'
+Text_Summary1_name(1,2) = 'time_step_sec'
 Text_Summary1_name(1,3) = 'Mass'
-Text_Summary1_name(1,4) = 'H_cntr'
-Text_Summary1_name(1,5) = 'H_rich'
+Text_Summary1_name(1,4) = 'log_L'    
+Text_Summary1_name(1,5) = 'log_Teff'
 
-Text_Summary1_name(2,1) = 'non_fe_core_infall'  
-Text_Summary1_name(2,2) = 'star_age'
+Text_Summary1_name(2,1) = 'log_max_T'  
+Text_Summary1_name(2,2) = 'star_age_day'
 Text_Summary1_name(2,3) = 'lg_Mdot'
 Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
-Text_Summary1_name(3,1) = 'fe_core_infall'
-Text_Summary1_name(3,2) = 'log_max_T'
-Text_Summary1_name(3,3) = 'eta_cntr'
+Text_Summary1_name(3,1) = 'log_cntr_T'  
+Text_Summary1_name(3,2) = 'log_cntr_Rho'
+Text_Summary1_name(3,3) = 'log_R'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'CO_core'
 
-Text_Summary1_name(4,1) = 'gamma1_min'
-Text_Summary1_name(4,2) = 'log_LH'
+Text_Summary1_name(4,1) = 'fe_core_infall' 
+Text_Summary1_name(4,2) = 'gamma1_min'
 Text_Summary1_name(4,3) = 'lg_Lnuc'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'Fe_core'
 
-Text_Summary1_name(5,1) = 'log_cntr_T'
+Text_Summary1_name(5,1) = 'non_fe_core_infall' 
 Text_Summary1_name(5,2) = 'log_LHe'
 Text_Summary1_name(5,3) = 'lg_Lneu'
 Text_Summary1_name(5,4) = 'Ne_cntr'
 Text_Summary1_name(5,5) = 'zones'
 
-Text_Summary1_name(6,1) = 'log_cntr_Rho'
+Text_Summary1_name(6,1) = '' 
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'
 Text_Summary1_name(6,5) = 'retries'
+
+
+!------------------------------------------------------------------------------------
+
+
+ History_Panels2_title = ''
+
+ History_Panels2_xaxis_name = 'model_number'
+ History_Panels2_max_width = -1
+
+ History_Panels2_txt_scale = 0.75
+ History_Panels2_xmin = -101d0
+ History_Panels2_xmax = -101d0
+ History_Panels2_dxmin = -1
+ History_Panels2_xaxis_reversed = .false.
+ History_Panels2_xaxis_log = .false.
+ History_Panels2_xmargin = 0.0
+
+ History_Panels2_num_panels = 3
+
+ History_Panels2_yaxis_name(1) = 'log_cntr_T'
+ History_Panels2_yaxis_reversed(1) = .false.
+ History_Panels2_ymin(1) = -101d0
+ History_Panels2_ymax(1) = -101d0
+ History_Panels2_dymin(1) = 0.1
+
+ History_Panels2_other_yaxis_name(1) = 'log_dt'
+ History_Panels2_other_ymin(1) = -101d0
+ History_Panels2_other_ymax(1) = -101d0
+ History_Panels2_other_dymin(1) = 0.1
+
+ History_Panels2_yaxis_name(2) = 'log_cntr_Rho'
+ History_Panels2_yaxis_reversed(2) = .false.
+ History_Panels2_ymin(2) = -101d0
+ History_Panels2_ymax(2) = -101d0
+ History_Panels2_dymin(2) = 0.1
+
+ History_Panels2_other_yaxis_name(2) = 'gamma1_min'
+ History_Panels2_other_yaxis_reversed(2) = .false.
+ History_Panels2_other_ymin(2) = -101d0
+ History_Panels2_other_ymax(2) = -101d0
+ History_Panels2_other_dymin(2) = 0.01
+
+History_Panels2_yaxis_name(3) = 'bound_mass'
+History_Panels2_yaxis_reversed(3) = .false.
+History_Panels2_ymin(3) = -101d0
+History_Panels2_ymax(3) = -101d0
+History_Panels2_dymin(3) = 0.1
+
+History_Panels2_other_yaxis_name(3) = 'non_fe_core_infall'
+History_Panels2_other_yaxis_reversed(3) = .false.
+History_Panels2_other_ymin(3) = -101d0
+History_Panels2_other_ymax(3) = -101d0
+History_Panels2_other_dymin(3) = 0.8
 
 
 !------------------------------------------------------------------------------------
@@ -576,7 +615,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_num_panels = 4
+    History_Panels1_num_panels = 3
 
       ! ::
 
@@ -604,7 +643,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_other_yaxis_name(2) = 'v_div_cs' ! 'v_surf_km_s'
+    History_Panels1_other_yaxis_name(2) = 'v_surf_km_s'
     History_Panels1_other_yaxis_reversed(2) = .false.
     History_Panels1_other_ymin(2) = -101d0
     History_Panels1_other_ymax(2) = -101d0
@@ -625,21 +664,6 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_ymin(3) = -101d0
     History_Panels1_other_ymax(3) = -101d0
     History_Panels1_other_dymin(3) = 0.01
-      ! ::
-
-    History_Panels1_yaxis_name(4) = 'log_L'
-    History_Panels1_yaxis_reversed(4) = .false.
-    History_Panels1_ymin(4) = -101d0
-    History_Panels1_ymax(4) = -101d0
-    History_Panels1_dymin(4) = 0.01
-
-      ! ::
-
-    History_Panels1_other_yaxis_name(4) = 'log_Teff'
-    History_Panels1_other_yaxis_reversed(4) = .false.
-    History_Panels1_other_ymin(4) = -101d0
-    History_Panels1_other_ymax(4) = -101d0
-    History_Panels1_other_dymin(4) = 0.01
 
 
 !-----------------------------------------------------------------------
