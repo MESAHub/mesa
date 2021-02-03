@@ -98,12 +98,12 @@
          call allocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in allocate_star_info_arrays'
-            stop 'build_rsp_model'
+            return
          end if
          call set_RSP_flag(s% id, .true., ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in set_RSP_flag'
-            stop 'build_rsp_model'
+            return
          end if
          call init_for_rsp_eos_and_kap(s)  
          s% rsp_period = 0d0
@@ -115,13 +115,13 @@
             call s% other_rsp_build_model(s% id,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in other_rsp_build_model'
-               stop 'build_rsp_model'
+               return
             end if
          else
             call do_rsp_build(s,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in do_rsp_build'
-               stop 'build_rsp_model'
+               return
             end if            
          end if
          if (.not. s% use_RSP_new_start_scheme) &
@@ -137,7 +137,7 @@
          s% dt = s% rsp_dt
          if (is_bad(s% dt)) then
             write(*,1) 'dt', s% dt
-            stop 'build_rsp_model'
+            return
          end if
          call finish_build_rsp_model(s, ierr)                     
       end subroutine build_rsp_model
