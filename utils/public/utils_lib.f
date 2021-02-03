@@ -1097,14 +1097,15 @@ contains
 
 
    subroutine mesa_error(file, line,msg)
+      use iso_fortran_env, only: error_unit
       character(len=*), intent(in) :: file
       character(len=*), optional,intent(in) :: msg
       integer, intent(in) :: line
       character (len=strlen) :: bt_disable
       if(present(msg)) then
-         write(*,"(A, A, A, I4, A, A)") "File: ", file, ", Line: ",line,", Message: ",msg
+         write(error_unit,"(A, A, A, I4, A, A)") "File: ", file, ", Line: ",line,", Message: ",msg
       else
-         write(*,"(A, A, A, I4)") "File: ", file, ", Line: ", line
+         write(error_unit,"(A, A, A, I4)") "File: ", file, ", Line: ", line
       end if
       call get_environment_variable("MESA_ERROR_BACKTRACE_DISABLE", bt_disable)
       if (len_trim(bt_disable) > 0) then
