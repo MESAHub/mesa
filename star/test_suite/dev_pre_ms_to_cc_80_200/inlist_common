@@ -15,7 +15,7 @@
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
-      relax_to_this_tau_factor = 1.5d6
+      relax_to_this_tau_factor = 1.5d7
       dlogtau_factor = 0.1d0
       relax_initial_tau_factor = .true.
 

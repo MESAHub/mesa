@@ -1,6 +1,6 @@
 
 &star_job
-   
+
       load_saved_model = .true.
       saved_model_name = 'prepared.mod'
 
@@ -37,12 +37,9 @@
 
       gamma1_limit_max_q = 0.75d0
 
-! trim envelope when radius gets too large
-      !x_logical_ctrl(20) = .true. ! check for r/rsun > x_ctrl(19)
-      x_ctrl(19) = 1000 ! trigger for R too large
-      x_ctrl(20) = 5.0 ! cut back to place where v < v_esc*x_ctrl(20)
-      x_ctrl(21) = 1000 ! or cut back to place where r/rsun < x_ctrl(21)
-
+! prune envelope when radius gets too large
+      x_ctrl(19) = 1d99 ! 4.13d0 ! limit for log(R/Rsun)
+      x_ctrl(20) = 2.0d0 ! cut back to this log(R/Rsun)
 
 ! wind
 
@@ -73,7 +70,11 @@
 
 ! mesh
 
-! solver
+! solver 
+!      use_avQ_art_visc = .true.
+!      avQ_cq = 4.0d0
+!      avQ_zsh = 0.1d0
+      
 
       ! this change of surface BC can cause lots of initial retries to reduce timestep
       use_compression_outer_BC = .true.

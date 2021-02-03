@@ -242,12 +242,32 @@
 
 
       integer function extras_start_step(id)
+         use star_lib, only: star_remove_surface_by_radius_cm
          integer, intent(in) :: id
          integer :: ierr
-         extras_start_step = keep_going        
+         type (star_info), pointer :: s
+         extras_start_step = keep_going    
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            extras_start_step = terminate
+            write(*,*) 'extras_start_step failed in call to star_ptr'
+            return
+         end if
+         if (.not. s% x_logical_ctrl(7)) return
+         if (log10(s% r(1)/Rsun) <= s% x_ctrl(19)) return
+         write(*,*) 'surface logR > limit ', log10(s% r(1)/Rsun), s% x_ctrl(19)
+         write(*,*) 'cut surface at logR = ', s% x_ctrl(20)
+         call star_remove_surface_by_radius_cm(id, Rsun*exp10(s% x_ctrl(20)), ierr)
+         if (ierr /= 0) then
+            extras_start_step = terminate
+            write(*,*) 'extras_start_step failed in call to star_remove_surface_by_radius_cm'
+            return
+         end if
       end function extras_start_step
    
       include 'gyre_in_mesa_extras_finish_step.inc'
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)

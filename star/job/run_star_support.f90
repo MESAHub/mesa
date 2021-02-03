@@ -2520,7 +2520,7 @@
          end if
 
          if (s% job% relax_mass_to_remove_H_env) then
-            write(*, 1) 'relaxrelax_mass_to_remove_H_env_mass'
+            write(*, 1) 'relax_mass_to_remove_H_env_mass'
             call star_relax_mass_to_remove_H_env(id, s% job% lg_max_abs_mdot, ierr)
             if (failed('star_relax_mass_to_remove_H_env',ierr)) return
          end if

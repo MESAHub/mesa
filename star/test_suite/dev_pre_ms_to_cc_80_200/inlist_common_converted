@@ -46,7 +46,7 @@
       !split_merge_amr_log_zoning = .true.
       
       split_merge_amr_hybrid_zoning = .true.
-      split_merge_amr_nz_r_core = 300
+      split_merge_amr_nz_r_core = 200
       split_merge_amr_r_core_cm = 1d8
       
       split_merge_amr_nz_baseline = 2500 ! 2000
