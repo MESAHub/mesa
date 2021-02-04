@@ -122,7 +122,7 @@ then
         fi
 
         # check that each LFS file has a full copy on disk
-        FILE_LIST=$(git lfs ls-files -n)
+        FILE_LIST=$(git-lfs ls-files | awk '{print $NF}')
         for LFS_FILE in ${FILE_LIST}; do
             # the checks have this form to handle uncommitted changes to LFS files
             # if no file exists, that means the file was probably deleted and that's OK
