@@ -1,8 +1,13 @@
 
 &star_job
+      !save_star_job_namelist = .true.
+      !star_job_namelist_name = 'controls_star_job_finish.txt'
 
       load_saved_model = .true.
       saved_model_name = 'prepared.mod'
+      
+      !load_saved_photo = .false.
+      !saved_photo_name = 'prepared.photo'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -12,6 +17,8 @@
 
       max_q_for_remove_surface_by_v_surf_div_v_escape = 1d0
       min_q_for_remove_surface_by_v_surf_div_v_escape = 0d0
+      
+      !set_initial_model_number = .false.
 
       !pgstar_flag = .false.
 
@@ -25,6 +32,8 @@
 / ! end of kap namelist
 
 &controls
+      !save_controls_namelist = .true.
+      !controls_namelist_name = 'controls_finish.txt'
    
       ! limit max_model_number as part of test_suite
       max_model_number = 10000      
@@ -36,6 +45,8 @@
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
+
+      gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
       
       use_other_set_pgstar_controls = .true.
 
@@ -43,20 +54,33 @@
       x_logical_ctrl(7) = .true.
       
 ! prune envelope when radius gets too large
-      x_ctrl(19) = 6.0d0 ! limit for log(R/Rsun)
+      x_ctrl(19) = 3.5d0 ! limit for log(R/Rsun)
       x_ctrl(20) = 10.0d0 ! cut back to this v/v_esc
       
 ! switch between u_flag and v_flag depending on lgTmax
-      x_ctrl(21) = 9.0d0 ! from u_flag to v_flag when drop below this
+      x_ctrl(21) = 8.5d0 ! from u_flag to v_flag when drop below this
       x_ctrl(22) = 9.4d0 ! from v_flag to u_flag when go above this
-      use_avQ_art_visc = .false. ! will be set true for v_flag, false for u_flag
+      use_avQ_art_visc = .false. ! will automatically be set true for v_flag, false for u_flag
       avQ_cq = 4.0d0
-      avQ_zsh = 0.1d0
+      avQ_zsh = 0.0001d0
       
-      x_ctrl(23) = 1.0 ! u_flag dt_div_min_dr_div_cs_limit
-      x_ctrl(24) = 1.5 ! u_flag dt_div_min_dr_div_cs_hard_limit      
+      x_ctrl(23) = 3.0 ! u_flag dt_div_min_dr_div_cs_limit
+      x_ctrl(24) = 9.0 ! 1.5 ! u_flag dt_div_min_dr_div_cs_hard_limit      
+      min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 1d0
+      min_q_for_dt_div_min_dr_div_cs_limit = 0d0
+      max_q_for_dt_div_min_dr_div_cs_limit = 1d0
 
 ! wind
+    ! "rlo" wind scheme provides a simple radius-determined-wind with exponential increase.
+    rlo_scaling_factor = 1
+    rlo_wind_min_L = 1d-6 ! Only on when L > this limit. (Lsun)
+    rlo_wind_max_Teff = 1d99 ! Only on when Teff < this limit.
+    rlo_wind_roche_lobe_radius = 100 ! Only on when R > this (Rsun).
+    rlo_wind_base_mdot = 1d-3 ! Base rate of mass loss when R = roche lobe radius (Msun/year).
+    rlo_wind_scale_height = -1 ! Determines exponential growth rate of mass loss (Rsun).
+    
+    max_T_center_for_any_mass_loss = 9d9
+    max_T_center_for_full_mass_loss = 7d9
 
 ! atmosphere
 
@@ -71,27 +95,24 @@
       delta_lgL_limit = 0.5     
       delta_lgL_He_limit = 0.5
 
-      delta_lgT_max_limit = 0.03    
-      delta_lgT_max_hard_limit = 0.1
+      delta_lgT_max_limit = 0.01    
+      delta_lgT_max_hard_limit = 0.05
 
-      delta_lgT_cntr_limit = 0.03    
-      delta_lgT_cntr_hard_limit = 0.1
+      delta_lgT_cntr_limit = 0.01    
+      delta_lgT_cntr_hard_limit = 0.05
 
       delta_XHe_cntr_limit = 0.03
       delta_XHe_cntr_hard_limit = 0.1
  
       delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = -1 ! 0.03d0  ! this kills the 120M case  ??
+      delta_XSi_cntr_hard_limit = -1
 
 ! mesh
 
 ! solver 
-      ! this change of surface BC can cause lots of initial retries to reduce timestep
       use_compression_outer_BC = .true.
 
 ! output
-
-      gamma1_limit_max_q = 0.75d0 ! only check below this limit
 
       num_trace_history_values = 6
       trace_history_value_name(1) = 'non_fe_core_infall'
@@ -191,9 +212,13 @@ Profile_Panels3_xmin = -101d0
 Profile_Panels3_xmax = -101d0
 Profile_Panels3_xaxis_reversed = .true.
 
+!Profile_Panels3_xaxis_name = 'logxq'
+!Profile_Panels3_xmin = -6d0
+!Profile_Panels3_xmax = 0d0
+
 Profile_Panels3_num_panels = 6
 
-Profile_Panels3_yaxis_name(4) = 'gamma1'
+Profile_Panels3_yaxis_name(4) = 'gamma1' ! 'avQ' ! 
     Profile_Panels3_ymin(4) = 1.26d0
     Profile_Panels3_ymax(4) = -101d0
 Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
@@ -208,8 +233,9 @@ Profile_Panels3_yaxis_name(6) =  'logT' ! 'mass' ! 'logR_cm' !
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
 
-
 Text_Summary1_name(2,3) = 'bound_mass'
+Text_Summary1_name(2,4) = 'log_R'
+Text_Summary1_name(3,3) = 'log_abs_mdot'
 
 
 TRho_Profile_xmin = 2.0

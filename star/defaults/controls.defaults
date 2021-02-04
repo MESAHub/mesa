@@ -6316,21 +6316,17 @@
 
       ! split_merge_amr_MaxLong
       ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_MaxShort
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! split cell if ratio of actual/desired size is > this; ignore if <= 0
+      ! split cell if ratio of actual/desired size is > split_merge_amr_MaxLong; ignore if <= 0
+      ! merge cell if ratio of desired/actual size is < split_merge_amr_MaxShort; ignore if <= 0
+      ! be careful to avoid inconsistent limits such as when a required split triggers a required merge.
+      ! to be safe, make sure product of limits > 2.
 
       ! ::
 
     split_merge_amr_MaxLong = 1.5d0
-
-
-      ! split_merge_amr_MaxLong
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! merge cell if ratio of desired/actual size is > this; ignore if <= 0
-
-      ! ::
-
     split_merge_amr_MaxShort = 1.5d0
 
 

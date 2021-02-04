@@ -1,5 +1,7 @@
 
 &star_job
+      !save_star_job_namelist = .true.
+      !star_job_namelist_name = 'controls_star_job_prepare.txt'
    
       load_saved_model = .true.
       saved_model_name = 'converted.mod'
@@ -21,13 +23,15 @@
 / ! end of kap namelist
 
 &controls
+      !save_controls_namelist = .true.
+      !controls_namelist_name = 'controls_prepare.txt'
    
       ! limit max_model_number as part of test_suite
       max_model_number = 10000      
       !max_number_retries = 30
       
       log_max_temp_upper_limit = 9.52d0      ! for lower masses
-      non_fe_core_infall_limit = 50d5        ! for higher masses
+      non_fe_core_infall_limit = 3d7        ! for higher masses
       
       x_logical_ctrl(6) = .true. ! for inlist_prepare
           ! checks for a required_termination_code
@@ -69,6 +73,7 @@
 ! mesh
 
 ! solver
+      use_compression_outer_BC = .true.
 
 ! output
 

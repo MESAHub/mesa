@@ -186,7 +186,6 @@
                s% cumulative_energy_error/s% total_energy, &
                'log_rel_run_E_err', &
                safe_log10(abs(s% cumulative_energy_error/s% total_energy))
-         write(iounit, 1) 'time', s% time
          write(iounit, 2) 'num_retries', s% num_retries
          write(iounit, '(a)') ! blank line for end of property list      
 

@@ -1912,7 +1912,7 @@
                + dlnT_bc_dT0*dT0_dlnd
          dlnT_bc_dL = dlnT_bc_dlnTsurf*dlnTsurf_dL + dlnT_bc_dT0*dT0_dL
          dlnT_bc_dlnR = dlnT_bc_dlnTsurf*dlnTsurf_dlnR + dlnT_bc_dT0*dT0_dlnR
-
+         
          if (s% use_compression_outer_BC) then
             call set_compression_BC(ierr)
          else if (s% use_zero_Pgas_outer_BC) then

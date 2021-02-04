@@ -287,7 +287,8 @@
          
          if (hydrid_zoning) then
             target_dr_core = (r_core_cm - s% R_center)/nz_r_core
-            target_dlnR_envelope = (s% lnR(1) - log(max(1d0,r_core_cm)))/(nz - nz_r_core)
+            target_dlnR_envelope = &
+               (s% lnR(1) - log(max(1d0,r_core_cm)))/(nz_baseline - nz_r_core)
          else if (logtau_zoning) then
             k = nz
             xmin = log(tau_center)

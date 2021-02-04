@@ -41,6 +41,8 @@
       max_timestep = 1d-2
 
 ! mesh
+      split_merge_amr_MaxLong = 1.4d0
+      split_merge_amr_MaxShort = 1.4d0
 
 ! solver
 
@@ -133,6 +135,8 @@ Profile_Panels3_xaxis_name = 'zone'
 Profile_Panels3_xmin = -101d0 ! 
 Profile_Panels3_xmax = -101d0
 Profile_Panels3_xaxis_reversed = .true.
+
+Text_Summary1_name(2,2) = 'star_age_sec'
 
 
 / ! end of pgstar namelist

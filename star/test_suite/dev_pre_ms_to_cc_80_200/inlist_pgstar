@@ -347,36 +347,36 @@ Text_Summary1_name(6,5) = 'retries'
 
  History_Panels2_num_panels = 3
 
- History_Panels2_yaxis_name(1) = 'log_cntr_T'
+ History_Panels2_yaxis_name(1) = 'log_dt'
  History_Panels2_yaxis_reversed(1) = .false.
  History_Panels2_ymin(1) = -101d0
  History_Panels2_ymax(1) = -101d0
  History_Panels2_dymin(1) = 0.1
 
- History_Panels2_other_yaxis_name(1) = 'log_dt'
+ History_Panels2_other_yaxis_name(1) = 'log_cntr_T'
  History_Panels2_other_ymin(1) = -101d0
  History_Panels2_other_ymax(1) = -101d0
  History_Panels2_other_dymin(1) = 0.1
 
- History_Panels2_yaxis_name(2) = 'log_cntr_Rho'
+ History_Panels2_yaxis_name(2) = 'gamma1_min'
  History_Panels2_yaxis_reversed(2) = .false.
  History_Panels2_ymin(2) = -101d0
  History_Panels2_ymax(2) = -101d0
- History_Panels2_dymin(2) = 0.1
+ History_Panels2_dymin(2) = 0.01
 
- History_Panels2_other_yaxis_name(2) = 'gamma1_min'
+ History_Panels2_other_yaxis_name(2) = 'log_cntr_Rho'
  History_Panels2_other_yaxis_reversed(2) = .false.
  History_Panels2_other_ymin(2) = -101d0
  History_Panels2_other_ymax(2) = -101d0
- History_Panels2_other_dymin(2) = 0.01
+ History_Panels2_other_dymin(2) = 0.1
 
-History_Panels2_yaxis_name(3) = 'bound_mass'
+History_Panels2_yaxis_name(3) = 'non_fe_core_infall'
 History_Panels2_yaxis_reversed(3) = .false.
 History_Panels2_ymin(3) = -101d0
 History_Panels2_ymax(3) = -101d0
 History_Panels2_dymin(3) = 0.1
 
-History_Panels2_other_yaxis_name(3) = 'non_fe_core_infall'
+History_Panels2_other_yaxis_name(3) = 'bound_mass'
 History_Panels2_other_yaxis_reversed(3) = .false.
 History_Panels2_other_ymin(3) = -101d0
 History_Panels2_other_ymax(3) = -101d0

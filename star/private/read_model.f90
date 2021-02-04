@@ -501,7 +501,6 @@
          end if
          
          s% init_model_number = s% model_number
-
          s% time = s% star_age*secyer
 
          if (abs(tau_factor - s% tau_factor) > tau_factor*1d-9 .and. &

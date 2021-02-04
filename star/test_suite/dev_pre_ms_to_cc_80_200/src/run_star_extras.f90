@@ -52,36 +52,8 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
-         s% other_alpha_mlt => alpha_mlt_routine       
          s% other_set_pgstar_controls => set_pgstar_controls       
       end subroutine extras_controls
-
-
-      subroutine alpha_mlt_routine(id, ierr)
-         use chem_def, only: ih1
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k, h1
-         real(dp) :: alpha_H, alpha_other, H_limit
-         include 'formats'
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         alpha_H = s% x_ctrl(21)
-         alpha_other = s% x_ctrl(22)
-         H_limit = s% x_ctrl(23)
-         h1 = s% net_iso(ih1)
-         if (alpha_H <= 0 .or. alpha_other <= 0 .or. h1 <= 0) return
-         do k=1,s% nz
-            if (s% xa(h1,k) >= H_limit) then
-               s% alpha_mlt(k) = alpha_H
-            else
-               s% alpha_mlt(k) = alpha_other
-            end if
-         end do
-         !stop
-      end subroutine alpha_mlt_routine
       
       
       subroutine extras_startup(id, restart, ierr)
@@ -91,15 +63,21 @@
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         call test_suite_startup(s, restart, ierr)
-         
+         if (ierr /= 0) return         
+         call test_suite_startup(s, restart, ierr)         
          if (.not. restart) then
             call alloc_extra_info(s)
          else ! it is a restart
             call unpack_extra_info(s)
          end if 
+         if (s% x_logical_ctrl(7) .and. & ! inlist_finish
+             len_trim(s% x_character_ctrl(1)) > 0) then
+            call star_read_controls(id, s% x_character_ctrl(1), ierr)
+            if (ierr /= 0) then
+               write(*,*) 'failed reading ' // trim(s% x_character_ctrl(1))
+               return
+            end if         
+         end if
       end subroutine extras_startup
       
       
@@ -211,8 +189,6 @@
 
 
       integer function extras_start_step(id)
-         use star_lib, only: star_remove_surface_by_v_surf_div_v_escape, &
-            star_set_v_flag, star_set_u_flag
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
@@ -227,10 +203,16 @@
          lgRsurf = log10(exp(s% xh(s% i_lnR,1))/Rsun)
          !write(*,2) 'lgRsurf', s% model_number, lgRsurf
          if (lgRsurf > s% x_ctrl(19)) then
-            write(*,*) 'surface logR > limit ', lgRsurf, s% x_ctrl(19)
-            write(*,*) 'prune surface to v/v_esc = ', s% x_ctrl(20)
-            call star_remove_surface_by_v_surf_div_v_escape(id, s% x_ctrl(20), ierr)
-            if (failed('star_remove_surface_by_v_surf_div_v_escape',ierr)) return
+            s% mass_change = -2d0
+            write(*,*) 'surface logR > limit: turn on wind'
+         
+         
+            !write(*,*) 'surface logR > limit ', lgRsurf, s% x_ctrl(19)
+            !write(*,*) 'prune surface to v/v_esc = ', s% x_ctrl(20)
+            !call star_remove_surface_by_v_surf_div_v_escape(id, s% x_ctrl(20), ierr)
+            !if (failed('star_remove_surface_by_v_surf_div_v_escape',ierr)) return
+         else
+            s% mass_change = 0d0
          end if
          ! check u_flag vs v_flag choice
          lgTmax = maxval(s% xh(s% i_lnT,1:s% nz))/ln10
@@ -293,6 +275,10 @@
             s% History_Panels2_xaxis_name = 'star_age'
          else if (s% star_age*secyer > 24*60*60) then
             s% History_Panels2_xaxis_name = 'star_age_day'
+         else if (s% star_age*secyer > 60*60) then
+            s% History_Panels2_xaxis_name = 'star_age_hr'
+         else if (s% star_age*secyer > 60) then
+            s% History_Panels2_xaxis_name = 'star_age_min'
          else
             s% History_Panels2_xaxis_name = 'star_age_sec'
          end if
