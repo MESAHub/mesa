@@ -14,9 +14,6 @@
       !required_termination_code_string = 'fe_core_infall_limit'  ! for lower masses
       !required_termination_code_string = 'log_Rsurf_upper_limit' ! for higher masses
       !required_termination_code_string = 'bound_mass_min_limit' ! for completely unbound cases
-
-      max_q_for_remove_surface_by_v_surf_div_v_escape = 1d0
-      min_q_for_remove_surface_by_v_surf_div_v_escape = 0d0
       
       !set_initial_model_number = .false.
 
@@ -39,14 +36,12 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 7d0 ! for higher masses
+      log_Rsurf_upper_limit = 4d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
       bound_mass_min_limit = 10d0 ! for completely unbound cases
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
-
-      gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
       
       use_other_set_pgstar_controls = .true.
 
@@ -71,16 +66,6 @@
       max_q_for_dt_div_min_dr_div_cs_limit = 1d0
 
 ! wind
-    ! "rlo" wind scheme provides a simple radius-determined-wind with exponential increase.
-    rlo_scaling_factor = 1
-    rlo_wind_min_L = 1d-6 ! Only on when L > this limit. (Lsun)
-    rlo_wind_max_Teff = 1d99 ! Only on when Teff < this limit.
-    rlo_wind_roche_lobe_radius = 100 ! Only on when R > this (Rsun).
-    rlo_wind_base_mdot = 1d-3 ! Base rate of mass loss when R = roche lobe radius (Msun/year).
-    rlo_wind_scale_height = -1 ! Determines exponential growth rate of mass loss (Rsun).
-    
-    max_T_center_for_any_mass_loss = 9d9
-    max_T_center_for_full_mass_loss = 7d9
 
 ! atmosphere
 
@@ -113,6 +98,7 @@
       use_compression_outer_BC = .true.
 
 ! output
+      gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 
       num_trace_history_values = 6
       trace_history_value_name(1) = 'non_fe_core_infall'

@@ -633,7 +633,8 @@
       integer, parameter :: p_log_L_div_CpTMdot = p_log_mdot_v + 1
       integer, parameter :: p_cs_at_cell_bdy = p_log_L_div_CpTMdot + 1
 
-      integer, parameter :: p_total_energy_integral_outward = p_cs_at_cell_bdy + 1
+      integer, parameter :: p_binding = p_cs_at_cell_bdy + 1
+      integer, parameter :: p_total_energy_integral_outward = p_binding + 1
       integer, parameter :: p_total_energy_integral = p_total_energy_integral_outward + 1
       integer, parameter :: p_total_energy_sign = p_total_energy_integral + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
@@ -1374,6 +1375,7 @@
 
          profile_column_name(p_total_energy) = 'total_energy'
          profile_column_name(p_total_energy_sign) = 'total_energy_sign'
+         profile_column_name(p_binding) = 'binding'
          profile_column_name(p_total_energy_integral_outward) = 'total_energy_integral_outward'
          profile_column_name(p_total_energy_integral) = 'total_energy_integral'
 

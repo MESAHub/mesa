@@ -1681,21 +1681,11 @@
       real(dp) function get_bound_mass(s)
          type (star_info), pointer :: s
          integer :: k
-         real(dp), pointer :: v(:)
-         real(dp) :: vesc2
-         if (s% u_flag) then
-            v => s% u
-         else if (s% v_flag) then
-            v => s% v
-         else
-            get_bound_mass = s% m(1)
-            return
-         end if
          do k=1,s% nz
-            vesc2 = 2d0*s% cgrav(k)*s% m(k)/s% r(k)
-            if (v(k) > 0d0 .and. v(k)**2 > vesc2) cycle
-            get_bound_mass = s% m(k)
-            exit
+            if (s% total_energy_integral_center(k) < 0d0) then
+               get_bound_mass = s% m(k)
+               exit
+            end if
          end do
       end function get_bound_mass
 
