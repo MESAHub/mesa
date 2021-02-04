@@ -153,7 +153,7 @@ module skye_coulomb
       latent_S = -(differentiate_1(dF_blur)) ! S = -dF/dT
 
       ! T dS/dlnT = T^2 dS/dT 
-      latent_ddlnT = differentiate_1(latent_S) *  temp**2
+      latent_ddlnT = differentiate_1(latent_S) *  pow2(temp)
 
       ! T dS/dlnRho = T Rho dS/dRho
       latent_ddlnRho = temp * rho * differentiate_2(latent_S)      

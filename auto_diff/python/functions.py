@@ -78,4 +78,4 @@ comparison_operators = [
 ]
 
 # Names of functions that map onto intrinsic operators
-intrinsics = {'add':'+', 'sub':'-', 'mul':'*', 'div':'/', 'pow':'**', 'unary_minus':'-'}
+intrinsics = {'add':'+', 'sub':'-', 'mul':'*', 'div':'/', 'unary_minus':'-'}

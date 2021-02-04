@@ -57,11 +57,10 @@ module auto_diff_real_18var_order1_module
       operator(+), &
       operator(*), &
       operator(/), &
-      operator(**), &
+      pow, &
       max, &
       min, &
-      dim, &
-      pow
+      dim
    type :: auto_diff_real_18var_order1
       real(dp) :: val
       real(dp) :: d1Array(18)
@@ -313,13 +312,13 @@ module auto_diff_real_18var_order1_module
       module procedure div_int_self
    end interface operator(/)
    
-   interface operator(**)
+   interface pow
       module procedure pow_self
       module procedure pow_self_real
       module procedure pow_real_self
       module procedure pow_self_int
       module procedure pow_int_self
-   end interface operator(**)
+   end interface pow
    
    interface max
       module procedure max_self
@@ -344,14 +343,6 @@ module auto_diff_real_18var_order1_module
       module procedure dim_self_int
       module procedure dim_int_self
    end interface dim
-   
-   interface pow
-      module procedure pow_self
-      module procedure pow_self_real
-      module procedure pow_real_self
-      module procedure pow_self_int
-      module procedure pow_int_self
-   end interface pow
    
    contains
 

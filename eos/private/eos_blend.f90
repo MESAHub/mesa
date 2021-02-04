@@ -129,7 +129,7 @@ module eos_blend
          diff_line(1) = line_end(1) - line_start(1)
          diff_line(2) = line_end(2) - line_start(2)
 
-         length_squared = diff_line(1)**2 + diff_line(2)**2
+         length_squared = pow2(diff_line(1)) + pow2(diff_line(2))
 
          ! First, find the nearest_point_on_line. We parameterize this by
          ! (nearest) = (start) + lambda (end - start)
@@ -138,15 +138,15 @@ module eos_blend
          lambda = (diff_start(1) * diff_line(1) + diff_start(2) * diff_line(2)) / length_squared
 
          if (lambda < 0d0) then ! Nearest point is line_start
-            d = sqrt(diff_start(1)**2 + diff_start(2)**2)
+            d = sqrt(pow2(diff_start(1)) + pow2(diff_start(2)))
          else if (lambda > 1d0) then ! Nearest point is line_end
-            d = sqrt(diff_end(1)**2 + diff_end(2)**2)
+            d = sqrt(pow2(diff_end(1)) + pow2(diff_end(2)))
          else ! Nearest point is interior to the line segment
             nearest_point_on_line(1) = line_start(1) + lambda * diff_line(1)
             nearest_point_on_line(2) = line_start(2) + lambda * diff_line(2)
             nearest_point_on_line(1) = nearest_point_on_line(1) - p(1)
             nearest_point_on_line(2) = nearest_point_on_line(2) - p(2)
-            d = sqrt(nearest_point_on_line(1)**2 + nearest_point_on_line(2)**2 + eps**2)
+            d = sqrt(pow2(nearest_point_on_line(1)) + pow2(nearest_point_on_line(2)) + pow2(eps))
          end if
 
       end function min_distance_from_point_to_line_segment
