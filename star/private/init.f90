@@ -703,7 +703,7 @@
          s% h1_czb_mass = 0
 
          s% he_core_mass = 0
-         s% c_core_mass = 0
+         s% co_core_mass = 0
          s% Teff = -1 ! need to calculate it
          s% center_eps_nuc = 0
          s% Lrad_div_Ledd_avg_surf = 0

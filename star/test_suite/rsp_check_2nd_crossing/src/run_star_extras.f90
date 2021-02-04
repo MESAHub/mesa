@@ -114,7 +114,7 @@ module run_star_extras
          open(unit=io_in, file=trim(s% x_character_ctrl(1)), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open history data file ' // trim(s% x_character_ctrl(1))
-            stop 1
+            return
          end if        
          
          do i=1,skip_cols
@@ -138,7 +138,7 @@ module run_star_extras
          open(unit=io_out, file=TRIM(s% x_character_ctrl(2)), status='REPLACE', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open output data file ' // trim(s% x_character_ctrl(2))
-            stop 1
+            return
          end if
 
          mass = s% RSP_mass
@@ -212,7 +212,8 @@ module run_star_extras
             lum(n) = s% RSP_L
             if ((.not. have_first) .and. growth(n) > 0d0) then
                write(*,*) 'failed to find red edge'
-               stop 1
+               ierr = -1
+               return
             end if
             have_first = .true.
             model(n) = model_cnt
@@ -230,7 +231,8 @@ module run_star_extras
             write(*,2) 'n', n
             write(*,2) 'num_beyond_blue_edge', num_beyond_blue_edge
             write(*,1) 'growth(1)', growth(1)
-            stop 'failed to find bounding negative growth locations'
+            ierr = -1
+            return
          end if
          
          Teff_red_edge = -1
@@ -317,14 +319,20 @@ module run_star_extras
          end if
          write(*,*)
          write(io_out,*)
-         if (Teff_blue_edge < 0d0) stop 'failed to find blue edge'         
+         if (Teff_blue_edge < 0d0) then
+            write(*,*) 'failed to find blue edge'         
+            return
+         end if
          
          f(1:4,1:n) => f1(1:4*n)
          do i=1,n
             f(1,i) = lum(i)
          end do
          call interp_pm(temp, n, f1, pm_work_size, work1, 'rsp', ierr)
-         if (ierr /= 0) stop 'failed in interp_pm Ts'
+         if (ierr /= 0) then
+            write(*,*) 'failed in interp_pm Ts'
+            return
+         end if
          
          offset = 0d0
          write(*,'(a10,2a20)') 'offset', 'Teff', 'L'
@@ -349,7 +357,7 @@ module run_star_extras
 
          !deallocate(f1, work1, x_new, v_new)
          
-         stop 'done rsp_check_2nd_crossing'
+         ierr = -1 ! to force termination of run
          
          contains
          

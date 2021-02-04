@@ -150,7 +150,7 @@
          if (s% R_center /= 0) then
             write(iounit, 11) 'R_center', s% R_center, &
                '! radius of core (cm).  R/Rsun, avg core density (g/cm^3):', &
-                  s% R_center/Rsun, s% M_center/(4*pi/3*pow3(s% R_center))
+                  s% R_center/Rsun, s% M_center/(four_thirds_pi*pow3(s% R_center))
          end if
          if (s% v_center /= 0) then
             write(iounit, 11) 'v_center', s% v_center, &

@@ -71,6 +71,8 @@
       logical :: relax_mass_scale, relax_initial_mass_scale
       real(dp) :: dlgm_per_step, relax_M_center_dt, change_mass_years_for_dt
       logical :: relax_M_center, relax_initial_M_center
+     
+      logical :: relax_mass_to_remove_H_env, relax_initial_mass_to_remove_H_env
 
       logical :: relax_core, relax_initial_core
       real(dp) :: new_core_mass, dlg_core_mass_per_step, &
@@ -93,6 +95,7 @@
       real(dp) :: dlgL_per_step, relax_L_center_dt
 
       integer :: remove_center_at_cell_k, remove_initial_center_at_cell_k
+      logical :: remove_center_at_max_infall_speed, remove_initial_center_at_cmax_infall_speed
       real(dp) :: remove_center_by_temperature, remove_initial_center_by_temperature
       real(dp) :: remove_center_by_mass_fraction_q, remove_initial_center_by_mass_fraction_q
       real(dp) :: remove_center_by_delta_mass_gm, remove_initial_center_by_delta_mass_gm
@@ -130,10 +133,6 @@
       real(dp) :: remove_surface_by_v_surf_km_s, remove_initial_surface_by_v_surf_km_s
       real(dp) :: remove_surface_by_v_surf_div_v_escape, remove_initial_surface_by_v_surf_div_v_escape
       real(dp) :: remove_surface_by_v_surf_div_cs, remove_initial_surface_by_v_surf_div_cs
-      
-      logical :: remove_surface_do_entropy, remove_surface_do_jrot, &
-         remove_surface_turn_off_energy_sources_and_sinks, &
-         remove_surface_by_relax_to_star_cut
 
       real(dp) :: zero_initial_inner_v_by_mass_Msun, &
          zero_inner_v_by_mass_Msun

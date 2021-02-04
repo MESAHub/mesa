@@ -277,8 +277,8 @@
 
       ! ::
 
-    show_retry_counts_when_terminate = .false.
-    show_timestep_limit_counts_when_terminate = .false.
+    show_retry_counts_when_terminate = .true.
+    show_timestep_limit_counts_when_terminate = .true.
 
 
       ! write_profile_when_terminate
@@ -1001,6 +1001,20 @@
     relax_initial_mass = .false.
     new_mass = -1
     lg_max_abs_mdot = -100
+
+
+      ! relax_mass_to_remove_H_env
+      ! ~~~~~~~~~~
+      ! relax_initial_mass_to_remove_H_env
+      ! ~~~~~~~~
+
+      ! Gradually reduce total mass by a wind to remove the H envelope.
+      ! Equivalent to relax_mass with new_mass = He_core_mass.
+
+      ! ::
+
+    relax_mass_to_remove_H_env = .false.
+    relax_initial_mass_to_remove_H_env = .false.
 
 
       ! relax_mass_scale
@@ -2310,23 +2324,6 @@
     remove_surface_by_v_surf_div_v_escape = 0
     min_q_for_remove_surface_by_v_surf_div_v_escape = 0
     max_q_for_remove_surface_by_v_surf_div_v_escape = 0
-    
-    
-      ! remove_surface_by_relax_to_star_cut
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_do_jrot
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_do_entropy
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_turn_off_energy_sources_and_sinks
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-      
-    remove_surface_by_relax_to_star_cut = .false.
-    remove_surface_do_jrot = .false.
-    remove_surface_do_entropy = .true.
-    remove_surface_turn_off_energy_sources_and_sinks = .true.
 
 
       ! report_mass_not_fe56

@@ -223,7 +223,7 @@
          dcsR_dcsL_m1 = 0
       
          r = s% r(k)
-         A = 4d0*pi*r*r
+         A = pi4*r*r
       
          iL = k
          iR = k-1

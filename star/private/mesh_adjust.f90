@@ -1137,9 +1137,9 @@
          interp_n = interp_hi - interp_lo + 1
 
          do k=1,nz_old
-            Vol_old_plus1(k) = (pi4/3)*old_r(k)*old_r(k)*old_r(k)
+            Vol_old_plus1(k) = four_thirds_pi*old_r(k)*old_r(k)*old_r(k)
          end do
-         Vol_center = (pi4/3)*s% R_center*s% R_center*s% R_center
+         Vol_center = four_thirds_pi*s% R_center*s% R_center*s% R_center
          Vol_old_plus1(nz_old+1) = Vol_center
 
          ! testing -- check for Vol_old_plus1 strictly decreasing
@@ -1279,7 +1279,7 @@
             do k=1,n
                new_r(k) = old_r(k)
                density_new(k) = old_rho(k)
-               Vol_new(k) = 4d0/3d0*pi*new_r(k)*new_r(k)*new_r(k)
+               Vol_new(k) = four_thirds_pi*new_r(k)*new_r(k)*new_r(k)
             end do
          end if
 
@@ -1288,11 +1288,11 @@
             do k=0,n
                new_r(nz-k) = old_r(nz_old-k)
                density_new(nz-k) = old_rho(nz_old-k)
-               Vol_new(nz-k) = 4d0/3d0*pi*new_r(nz-k)*new_r(nz-k)*new_r(nz-k)
+               Vol_new(nz-k) = four_thirds_pi*new_r(nz-k)*new_r(nz-k)*new_r(nz-k)
             end do
          else ! nzhi == nz
             density_new(nz) = xmstar*dq(nz)/(Vol_new(nz) - Vol_center)
-            new_r(nz) = pow(Vol_new(nz)/(pi4/3), 1d0/3d0)
+            new_r(nz) = pow(Vol_new(nz)/four_thirds_pi, one_third)
 
             if (dbg) then
                write(*,2) 'old_rho(nz_old)', nz_old, old_rho(nz_old)
@@ -1329,7 +1329,7 @@
             if (cell_type(k) == unchanged_type) then
                new_r(k) = old_r(comes_from(k))
             else
-               new_r(k) = pow(Vol_new(k)/(pi4/3), 1d0/3d0)
+               new_r(k) = pow(Vol_new(k)/four_thirds_pi, one_third)
             end if
          end subroutine set1_new_r
 

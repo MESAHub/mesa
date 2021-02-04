@@ -500,7 +500,7 @@
             d_v_div_r = v_00/r_00
          end if
          Chi = (16d0/3d0)*pi*alpha*alpha_m*w_rho2*r6_cell*h_00*d_v_div_r/dm_00         
-         epsilon_q = 4d0*pi*Chi*d_v_div_r/dm_00
+         epsilon_q = pi4*Chi*d_v_div_r/dm_00
 
          s% Eq(k) = epsilon_q%val
 
@@ -906,7 +906,7 @@
             d_v_div_r_m1 = v_m1/r_m1 - v_00/r_00
             Chi_m1 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_m1*r6_cell_m1*h_m1*d_v_div_r_m1/dm_m1         
          
-            Uq = 4d0*pi*(Chi_m1 - Chi_00)/(s% dm_bar(k)*r_00)
+            Uq = pi4*(Chi_m1 - Chi_00)/(s% dm_bar(k)*r_00)
          
          if (.false.) then
             

@@ -56,6 +56,12 @@
 
          ierr = 0
          nz = s% nz
+         
+         if (.not. s% calculate_Brunt_B) then
+            call set_nan(s% brunt_B(1:nz))
+            call set_nan(s% unsmoothed_brunt_B(1:nz))
+            return
+         end if
 
          if (s% use_other_brunt) then
             call s% other_brunt(s% id, ierr)
@@ -105,7 +111,7 @@
          ierr = 0
          nz = s% nz
 
-         if (.not. s% calculate_Brunt_N2) then
+         if (.not. (s% calculate_Brunt_B .and. s% calculate_Brunt_N2)) then
             call set_nan(s% brunt_N2(1:nz))
             call set_nan(s% brunt_N2_composition_term(1:nz))
             return
@@ -214,7 +220,7 @@
 
 
       subroutine do_brunt_B_MHM_form(s, ierr)
-         ! Brassard from Mike Montgomery
+         ! Brassard from Mike Montgomery (MHM)
          use star_utils, only: get_face_values
          use interp_1d_def
 
@@ -232,6 +238,8 @@
 
          nz = s% nz
          species = s% species
+         
+         nullify(T_face, rho_face, chiT_face)
 
          call do_alloc(ierr)
          if (ierr /= 0) then
@@ -241,13 +249,22 @@
          end if
 
          call get_face_values(s, s% chiT, chiT_face, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
 
          call get_face_values(s, s% T, T_face, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
 
          call get_face_values(s, s% rho, rho_face, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,nz
@@ -368,7 +385,7 @@
          if (delta_lnP > -1d-50) then
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*s% P(k) + (1-alfa)*s% P(k-1)
-            dlnP_dm = -s% cgrav(k)*s% m(k)/(4*pi*pow4(s% r(k))*Ppoint)
+            dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))*Ppoint)
             delta_lnP = dlnP_dm*s% dm_bar(k)
          end if
 
