@@ -24,8 +24,10 @@ instead of
     x**1.5d0
 
 Use ``powN(x)`` to raise ``x`` to an integer power ``N``.
-You should *always* use these for integer powers greater than 2.
-``**2`` has so far not been a problem and is tolerated.
+For ``real`` types you should *always* use these for integer powers greater than 2.
+``**2`` has so far not been a problem and is tolerated though not recommended.
+For ``auto_diff`` types you *must* use ``powN`` for integer powers *including* 2.
+Doing otherwise will result in a compiler error.
 
 
 Errors
