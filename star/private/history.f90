@@ -1889,9 +1889,7 @@
             case(h_bound_mass)
                val = get_bound_mass(s)/Msun
             case(h_ejecta_mass)
-               val = get_ejecta_mass(s)/Msun
-            case(h_ejecta_total_energy)
-               val = get_ejecta_total_energy(s)
+               val = (s% m(1) - get_bound_mass(s))/Msun
 
             case(h_log_L_div_Ledd)
                Ledd = eval_Ledd(s, ierr)

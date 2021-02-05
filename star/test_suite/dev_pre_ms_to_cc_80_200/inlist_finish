@@ -22,7 +22,6 @@
 / ! end of star_job namelist
 
 &eos
-   use_Skye = .true.
 / ! end of eos namelist
 
 &kap
@@ -36,7 +35,7 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 4d0 ! for higher masses
+      log_Rsurf_upper_limit = 4.5d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
       bound_mass_min_limit = 10d0 ! for completely unbound cases
       
@@ -47,23 +46,6 @@
 
 ! tell run_star_extras that this is inlist_finish
       x_logical_ctrl(7) = .true.
-      
-! prune envelope when radius gets too large
-      x_ctrl(19) = 3.5d0 ! limit for log(R/Rsun)
-      x_ctrl(20) = 10.0d0 ! cut back to this v/v_esc
-      
-! switch between u_flag and v_flag depending on lgTmax
-      x_ctrl(21) = 8.5d0 ! from u_flag to v_flag when drop below this
-      x_ctrl(22) = 9.4d0 ! from v_flag to u_flag when go above this
-      use_avQ_art_visc = .false. ! will automatically be set true for v_flag, false for u_flag
-      avQ_cq = 4.0d0
-      avQ_zsh = 0.0001d0
-      
-      x_ctrl(23) = 3.0 ! u_flag dt_div_min_dr_div_cs_limit
-      x_ctrl(24) = 9.0 ! 1.5 ! u_flag dt_div_min_dr_div_cs_hard_limit      
-      min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 1d0
-      min_q_for_dt_div_min_dr_div_cs_limit = 0d0
-      max_q_for_dt_div_min_dr_div_cs_limit = 1d0
 
 ! wind
 
@@ -91,6 +73,11 @@
  
       delta_XSi_cntr_limit = 0.01d0
       delta_XSi_cntr_hard_limit = -1
+      
+      !dt_div_min_dr_div_cs_limit = 30.0
+      !dt_div_min_dr_div_cs_hard_limit = 60.0
+      !min_q_for_dt_div_min_dr_div_cs_limit = 0d0
+      !max_q_for_dt_div_min_dr_div_cs_limit = 0.9d0
 
 ! mesh
 
@@ -219,9 +206,8 @@ Profile_Panels3_yaxis_name(6) =  'logT' ! 'mass' ! 'logR_cm' !
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
 
-Text_Summary1_name(2,3) = 'bound_mass'
 Text_Summary1_name(2,4) = 'log_R'
-Text_Summary1_name(3,3) = 'log_abs_mdot'
+Text_Summary1_name(3,3) = 'bound_mass'
 
 
 TRho_Profile_xmin = 2.0

@@ -190,74 +190,7 @@
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
-         integer :: ierr
-         type (star_info), pointer :: s
-         real(dp) :: lgTmax, lgRsurf
-         include 'formats'
          extras_start_step = keep_going    
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (failed('star_ptr',ierr)) return
-         if (.not. s% x_logical_ctrl(7)) return
-         ! check logR
-         lgRsurf = log10(exp(s% xh(s% i_lnR,1))/Rsun)
-         !write(*,2) 'lgRsurf', s% model_number, lgRsurf
-         if (lgRsurf > s% x_ctrl(19)) then
-            s% mass_change = -2d0
-            write(*,*) 'surface logR > limit: turn on wind'
-         
-         
-            !write(*,*) 'surface logR > limit ', lgRsurf, s% x_ctrl(19)
-            !write(*,*) 'prune surface to v/v_esc = ', s% x_ctrl(20)
-            !call star_remove_surface_by_v_surf_div_v_escape(id, s% x_ctrl(20), ierr)
-            !if (failed('star_remove_surface_by_v_surf_div_v_escape',ierr)) return
-         else
-            s% mass_change = 0d0
-         end if
-         ! check u_flag vs v_flag choice
-         lgTmax = maxval(s% xh(s% i_lnT,1:s% nz))/ln10
-         !write(*,2) 'lgTmax', s% model_number, lgTmax
-         if (s% u_flag) then
-            s% dt_div_min_dr_div_cs_limit = s% x_ctrl(23)
-            s% dt_div_min_dr_div_cs_hard_limit = s% x_ctrl(24)
-            !write(*,2) 'lower limit', s% model_number, s% x_ctrl(21)
-            if (lgTmax < s% x_ctrl(21)) then ! switch to v_flag
-               ! do add new before remove old so can set initial values
-               write(*,*) 'new_v_flag', .true.
-               call star_set_v_flag(s% id, .true., ierr)
-               if (failed('star_set_v_flag',ierr)) return
-               write(*,*) 'new_u_flag', .false.
-               call star_set_u_flag(s% id, .false., ierr)
-               if (failed('star_set_u_flag',ierr)) return
-               s% use_avQ_art_visc = .true.
-            end if
-         else if (s% v_flag) then
-            s% dt_div_min_dr_div_cs_limit = 1d99
-            s% dt_div_min_dr_div_cs_hard_limit = 1d99
-            !write(*,2) 'upper limit', s% model_number, s% x_ctrl(22)
-            if (lgTmax > s% x_ctrl(22)) then ! switch to u_flag
-               ! do add new before remove old so can set initial values
-               write(*,*) 'new_u_flag', .true.
-               call star_set_u_flag(id, .true., ierr)
-               if (failed('star_set_u_flag',ierr)) return
-               write(*,*) 'new_v_flag', .false.
-               call star_set_v_flag(s% id, .false., ierr)
-               if (failed('star_set_v_flag',ierr)) return
-               s% use_avQ_art_visc = .false.
-            end if
-         end if
-         
-         contains
-      
-         logical function failed(str,ierr)
-            character (len=*), intent(in) :: str
-            integer, intent(in) :: ierr
-            failed = (ierr /= 0)
-            if (.not. failed) return
-            write(*,*) 'extras_start_step failed in ' // trim(str)
-            extras_start_step = terminate
-         end function failed
-         
       end function extras_start_step
 
 

@@ -374,7 +374,7 @@ History_Panels2_yaxis_name(3) = 'non_fe_core_infall'
 History_Panels2_yaxis_reversed(3) = .false.
 History_Panels2_ymin(3) = -101d0
 History_Panels2_ymax(3) = -101d0
-History_Panels2_dymin(3) = 0.1
+History_Panels2_dymin(3) = 5
 
 History_Panels2_other_yaxis_name(3) = 'bound_mass'
 History_Panels2_other_yaxis_reversed(3) = .false.
