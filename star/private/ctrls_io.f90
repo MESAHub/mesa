@@ -90,7 +90,7 @@
     photosphere_m_upper_limit, photosphere_m_lower_limit, photosphere_m_sub_M_center_limit, &
     photosphere_r_upper_limit, photosphere_r_lower_limit, log_Teff_upper_limit, log_Teff_lower_limit, &
     log_Tsurf_upper_limit, log_Tsurf_lower_limit, log_Rsurf_upper_limit, log_Rsurf_lower_limit, &
-    log_Psurf_upper_limit, log_Psurf_lower_limit, bound_mass_min_limit, bound_mass_max_limit, &
+    log_Psurf_upper_limit, log_Psurf_lower_limit, remnant_mass_min_limit, ejecta_mass_max_limit, &
     log_Dsurf_upper_limit, log_Dsurf_lower_limit, log_L_upper_limit, log_L_lower_limit, &
     log_g_upper_limit, log_g_lower_limit, power_nuc_burn_upper_limit, power_h_burn_upper_limit, &
     power_he_burn_upper_limit, power_z_burn_upper_limit, power_nuc_burn_lower_limit, &
@@ -881,8 +881,8 @@
 
  s% star_mass_max_limit = star_mass_max_limit
  s% star_mass_min_limit = star_mass_min_limit
- s% bound_mass_max_limit = bound_mass_max_limit
- s% bound_mass_min_limit = bound_mass_min_limit
+ s% ejecta_mass_max_limit = ejecta_mass_max_limit
+ s% remnant_mass_min_limit = remnant_mass_min_limit
  
  s% star_species_mass_min_limit = star_species_mass_min_limit
  s% star_species_mass_min_limit_iso = star_species_mass_min_limit_iso
@@ -2521,8 +2521,8 @@
 
  star_mass_max_limit = s% star_mass_max_limit
  star_mass_min_limit = s% star_mass_min_limit
- bound_mass_max_limit = s% bound_mass_max_limit
- bound_mass_min_limit = s% bound_mass_min_limit
+ ejecta_mass_max_limit = s% ejecta_mass_max_limit
+ remnant_mass_min_limit = s% remnant_mass_min_limit
  
  star_species_mass_min_limit = s% star_species_mass_min_limit
  star_species_mass_min_limit_iso = s% star_species_mass_min_limit_iso

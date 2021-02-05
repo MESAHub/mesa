@@ -1656,39 +1656,43 @@
       end function total_times
 
       
-      real(dp) function get_bound_mass(s)
-         use num_lib, only: find0
+      real(dp) function get_remnant_mass(s)
          type (star_info), pointer :: s
          integer :: k
-         get_bound_mass = s% m(1)
          do k=1,s% nz
             if (s% total_energy_integral_center(k) < 0d0) then
-               get_bound_mass = s% m(k)
+               get_remnant_mass = s% m(k)
                return
             end if
          end do
-         get_bound_mass = 0d0
-      end function get_bound_mass
+         get_remnant_mass = 0d0
+      end function get_remnant_mass
       
       
       real(dp) function get_ejecta_mass(s)
+         use num_lib, only: find0
          type (star_info), pointer :: s
          integer :: k
          real(dp), pointer :: v(:)
-         real(dp) :: vesc2
+         real(dp) :: vesc2, vesc2_prev, dm
+         get_ejecta_mass = 0d0
          if (s% u_flag) then
             v => s% u
          else if (s% v_flag) then
             v => s% v
          else
-            get_ejecta_mass = s% m(1)
             return
          end if
+         vesc2_prev = 0d0
          do k=1,s% nz
             vesc2 = 2d0*s% cgrav(k)*s% m(k)/s% r(k)
-            if (v(k) > 0d0 .and. v(k)**2 > vesc2) cycle
-            get_ejecta_mass = s% m(k)
-            exit
+            if (v(k) < 0d0 .or. v(k)**2 < vesc2) then
+               if (k == 1) return
+               dm = find0(0d0, vesc2_prev, s% dm(k-1), vesc2)
+               get_ejecta_mass = s% m(1) - (s% m(k-1) + dm)
+               return
+            end if
+            vesc2_prev = vesc2
          end do
       end function get_ejecta_mass
 

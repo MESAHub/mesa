@@ -100,8 +100,8 @@
          termination_code_str(t_HB_limit) = 'HB_limit'
          termination_code_str(t_star_mass_min_limit) = 'star_mass_min_limit'
          termination_code_str(t_star_mass_max_limit) = 'star_mass_max_limit'
-         termination_code_str(t_bound_mass_min_limit) = 'bound_mass_min_limit'
-         termination_code_str(t_bound_mass_max_limit) = 'bound_mass_max_limit'
+         termination_code_str(t_remnant_mass_min_limit) = 'remnant_mass_min_limit'
+         termination_code_str(t_ejecta_mass_max_limit) = 'ejecta_mass_max_limit'
          
          termination_code_str(t_star_species_mass_min_limit) = 'star_species_mass_min_limit'
          termination_code_str(t_star_species_mass_max_limit) = 'star_species_mass_max_limit'

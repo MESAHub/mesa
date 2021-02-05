@@ -257,7 +257,7 @@
          nz = nz1
 
          allocate(xh(nvar_hydro,nz), xa(species,nz), q(nz), dq(nz), &
-            omega(nz), j_rot(nz), D_omega(nz), am_nu_rot(nz), &
+            omega(nz), j_rot(nz), am_nu_rot(nz), &
             lnT(nz), stat=ierr)
          if (ierr /= 0) then
             close(iounit)
@@ -267,7 +267,7 @@
          call get1_mass( &
                s, iounit, m1, nz1, m2, nz2, initial_mass, &
                nvar_hydro, species, xh, xa, q, dq, &
-               omega, j_rot, D_omega, am_nu_rot, lnT, ierr)
+               omega, j_rot, am_nu_rot, lnT, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in get1_mass'
             stop 'get_zams_model'
@@ -350,7 +350,7 @@
       subroutine get1_mass( &
             s, iounit, m1, nz1, m2, nz2, initial_mass, &
             nvar_hydro, species, xh, xa, q, dq, &
-            omega, j_rot, D_omega, am_nu_rot, lnT, ierr)
+            omega, j_rot, am_nu_rot, lnT, ierr)
          use read_model, only: read_properties, read1_model
          use chem_def, only: iso_name_length
          use read_model, only: get_chem_col_names
@@ -361,7 +361,7 @@
          real(dp), intent(inout) :: xh(:,:) ! (nvar_hydro,nz1)
          real(dp), intent(inout) :: xa(:,:) ! (species,nz1)
          real(dp), intent(inout), dimension(:) :: &
-            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT ! (nz1)
+            q, dq, omega, j_rot, am_nu_rot, lnT ! (nz1)
          integer, intent(out) :: ierr
 
          integer :: i, k, nz, nz_in, iprop
@@ -426,7 +426,7 @@
                if (m_read == m1) then
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
-                     xh, xa, q, dq, omega, j_rot, D_omega, am_nu_rot, &
+                     xh, xa, q, dq, omega, j_rot, am_nu_rot, &
                      lnT, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
@@ -436,7 +436,7 @@
                else
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
-                     xh2, xa2, q2, dq2, omega2, j_rot2, D_omega2, am_nu_rot2, &
+                     xh2, xa2, q2, dq2, omega2, j_rot2, am_nu_rot2, &
                      lnT2, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.

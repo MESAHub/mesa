@@ -229,7 +229,7 @@
       subroutine read1_model( &
             s, species, nvar_hydro, nz, iounit, &
             is_RSP_model, want_RSP_model, &
-            xh, xa, q, dq, omega, j_rot, D_omega, am_nu_rot, &
+            xh, xa, q, dq, omega, j_rot, am_nu_rot, &
             lnT, perm, ierr)
          use star_utils, only: set_qs
          use chem_def
@@ -238,7 +238,7 @@
          logical, intent(in) :: is_RSP_model, want_RSP_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
-            q, dq, omega, j_rot, D_omega, am_nu_rot, lnT
+            q, dq, omega, j_rot, am_nu_rot, lnT
          integer, intent(out) :: ierr
 
          integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_eturb_RSP, &
@@ -347,10 +347,10 @@
                j=j+1; j_rot(i) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1; !D_omega(i) = vec(j)
+               j=j+1; !D_omega(i) = vec(j) ! no longer used
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1; !am_nu_rot(i) = vec(j)
+               j=j+1; !am_nu_rot(i) = vec(j) ! no longer used
             end if
             if (i_u /= 0) then
                j=j+1; xh(i_u,i) = vec(j)
@@ -648,7 +648,7 @@
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &
                s% xh, s% xa, s% q, s% dq, &
-               s% omega, s% j_rot, s% D_omega, s% am_nu_rot, s% lnT, &
+               s% omega, s% j_rot, s% am_nu_rot, s% lnT, &
                perm, ierr)
          deallocate(names, perm)
          if (ierr /= 0) then

@@ -1886,8 +1886,8 @@
                else
                   val = 0d0 ! s% r(1)*s% dlnR_dt(1)
                end if
-            case(h_bound_mass)
-               val = get_bound_mass(s)/Msun
+            case(h_remnant_mass)
+               val = get_remnant_mass(s)/Msun
             case(h_ejecta_mass)
                val = get_ejecta_mass(s)/Msun
 

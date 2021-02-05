@@ -1275,23 +1275,19 @@
 
     star_mass_max_limit = 0
 
-      ! bound_mass_min_limit
+      ! remnant_mass_min_limit
+      ! ~~~~~~~~~~~~~~~~~~~
+      ! ejecta_mass_max_limit
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Stop when star mass in Msun units is < this.  <= 0 means no limit.
+      ! Stop when remnant mass in Msun units is < this.  <= 0 means no limit.
+      ! remnant_mass = star_mass - ejecta_mass
+      ! ejecta_mass is outermost mass that all has v(k) >= v_escape(k)
 
       ! ::
 
-    bound_mass_min_limit = 0
-
-      ! bound_mass_max_limit
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! Stop when star mass in Msun units is > this.  <= 0 means no limit.
-
-      ! ::
-
-    bound_mass_max_limit = 0
+    remnant_mass_min_limit = 0
+    ejecta_mass_max_limit = 1d99
 
 
       ! star_species_mass_min_limit

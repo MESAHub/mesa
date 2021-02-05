@@ -129,12 +129,10 @@
       integer, parameter :: t_HB_limit = t_log_max_temp_lower_limit + 1 
       integer, parameter :: t_star_mass_min_limit = t_HB_limit + 1 
       integer, parameter :: t_star_mass_max_limit = t_star_mass_min_limit + 1 
-      integer, parameter :: t_bound_mass_min_limit = t_star_mass_max_limit + 1 
-      integer, parameter :: t_bound_mass_max_limit = t_bound_mass_min_limit + 1 
-      
-      integer, parameter :: t_star_species_mass_min_limit = t_bound_mass_max_limit + 1 
-      integer, parameter :: t_star_species_mass_max_limit = t_star_species_mass_min_limit + 1 
-      
+      integer, parameter :: t_remnant_mass_min_limit = t_star_mass_max_limit + 1 
+      integer, parameter :: t_ejecta_mass_max_limit = t_remnant_mass_min_limit + 1 
+      integer, parameter :: t_star_species_mass_min_limit = t_ejecta_mass_max_limit + 1 
+      integer, parameter :: t_star_species_mass_max_limit = t_star_species_mass_min_limit + 1       
       integer, parameter :: t_xmstar_min_limit = t_star_species_mass_max_limit + 1 
       integer, parameter :: t_xmstar_max_limit = t_xmstar_min_limit + 1 
       integer, parameter :: t_envelope_mass_limit = t_xmstar_max_limit + 1 

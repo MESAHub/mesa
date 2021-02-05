@@ -63,7 +63,7 @@
          real(dp) :: HB_limit
 
          real(dp) :: star_mass_min_limit, star_mass_max_limit
-         real(dp) :: bound_mass_min_limit, bound_mass_max_limit
+         real(dp) :: remnant_mass_min_limit, ejecta_mass_max_limit
          
          real(dp) :: star_species_mass_min_limit, star_species_mass_max_limit
          character (len=iso_name_length) :: &
