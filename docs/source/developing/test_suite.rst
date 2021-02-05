@@ -214,8 +214,30 @@ In particular, in the star/binary ``after_evolve`` hook, the call to
 ``test_suite_after_evolve`` (and its callees) append the relevant info
 to the ``testhub.yml`` file.
 
-The aforementioned routines control output that should be present for
-every MESA test case.  Some test cases may want to output additional
+This output is generated each time MESA terminates (except after a restart).  Therefore, the per-inlist quantities that can be reported by TestHub are those accessible within a single part of a MESA run.  By default, we report
+
+   + ``runtime_minutes``
+   + ``steps``
+   + ``retries``
+   + ``redos``
+   + ``solver_calls_made``
+   + ``solver_calls_failed``
+   + ``solver_iterations``
+
+In a multi-part test case, the per-part values can be summed to give the properties of the complete run.
+
+TestHub also reports quantities that can reflect information preserved by MESA across parts.  These are transmitted via their inclusion in the model file.  That means the values reported by cases that use saved models to skip optional parts will be influenced by the performance at the time the saved model was generated.  Additionally, some parts may include inlist options that reset or modify these quantities.  TestHub reports the values at the end of each part, but the precise meaning of these quantities cannot be understood without reference to the details of the test case.
+
+   + ``model_number``
+   + ``star_age``
+   + ``num_retries``
+   + ``log_rel_run_E_err``
+
+.. note ::
+
+  These values can be useful when diagnosing test case issues because they directly correspond to quantities in the terminal output.
+
+Some test cases may want to output additional
 information.  To do so, set elements in the provided arrays
 ``testhub_extras_names`` and ``testhub_extras_values``.  The values in
 these arrays (at the time the after evolve hook is called) will be
