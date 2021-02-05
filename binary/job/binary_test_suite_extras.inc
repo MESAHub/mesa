@@ -30,8 +30,25 @@ subroutine test_suite_testhub_end(b, ierr)
    ! timing
    write(iounit,'(6X, A, F6.2)') 'runtime_minutes: ', test_suite_runtime
 
+   ! calculate log_rel_run_E_err
+   val1 = -99
+   if (b% s1% total_energy_end /= 0d0) &
+        val1 = safe_log10(abs(b% s1% cumulative_energy_error/b% s1% total_energy_end))
 
-   ! performance counters
+   val2 = -99
+   if (b% evolve_both_stars) then
+      if (b% s2% total_energy_end /= 0d0) &
+           val2 = safe_log10(abs(b% s2% cumulative_energy_error/b% s2% total_energy_end))
+   end if
+
+   ! model information
+   ! these quantities can be cumulative as they are stored in saved models
+   write(iounit,'(6X, A, I12)') 'model_number: ', b% s1% model_number
+   write(iounit,'(6X, A, ES26.16)') 'star_age: ', b% s1% star_age
+   write(iounit,'(6X, A, I12)') 'num_retries: ', b% s1% num_retries
+   write(iounit,'(6X, A, F26.16)') 'log_rel_run_E_err: ', max(val1, val2)
+
+   ! per-part performance counters
    if (b% evolve_both_stars) then
       steps = max(b% s1% total_steps_finished, b% s2% total_steps_finished) ! should be equal
       retries = b% s1% total_step_retries + b% s2% total_step_retries ! total from both stars; does not count mdot
@@ -49,25 +66,12 @@ subroutine test_suite_testhub_end(b, ierr)
       solver_iterations = b% s1% total_num_solver_iterations
    end if
 
-   write(iounit,'(6X, A, I6)') 'steps: ', steps
-   write(iounit,'(6X, A, I6)') 'retries: ', retries
-   write(iounit,'(6X, A, I6)') 'redos: ', redos
-   write(iounit,'(6X, A, I6)') 'solver_calls_made: ', solver_calls_made
-   write(iounit,'(6X, A, I6)') 'solver_calls_failed: ', solver_calls_failed
-   write(iounit,'(6X, A, I6)') 'solver_iterations: ', solver_iterations
-
-   ! log_rel_run_E_err
-   val1 = -99
-   if (b% s1% total_energy_end /= 0d0) &
-        val1 = safe_log10(abs(b% s1% cumulative_energy_error/b% s1% total_energy_end))
-
-   val2 = -99
-   if (b% evolve_both_stars) then
-      if (b% s2% total_energy_end /= 0d0) &
-           val2 = safe_log10(abs(b% s2% cumulative_energy_error/b% s2% total_energy_end))
-   end if
-
-   write(iounit,'(6X, A, F26.16)') 'log_rel_run_E_err: ', max(val1, val2)
+   write(iounit,'(6X, A, I12)') 'steps: ', steps
+   write(iounit,'(6X, A, I12)') 'retries: ', retries
+   write(iounit,'(6X, A, I12)') 'redos: ', redos
+   write(iounit,'(6X, A, I12)') 'solver_calls_made: ', solver_calls_made
+   write(iounit,'(6X, A, I12)') 'solver_calls_failed: ', solver_calls_failed
+   write(iounit,'(6X, A, I12)') 'solver_iterations: ', solver_iterations
 
    ! user-defined quantities
    call write_testhub_extras(iounit)
