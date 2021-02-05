@@ -31,7 +31,7 @@
       !max_number_retries = 30
       
       log_max_temp_upper_limit = 9.52d0      ! for lower masses
-      non_fe_core_infall_limit = 3d7        ! for higher masses
+      non_fe_core_infall_limit = 1d7        ! for higher masses
       
       x_logical_ctrl(6) = .true. ! for inlist_prepare
           ! checks for a required_termination_code
@@ -80,7 +80,7 @@
       num_trace_history_values = 5
       trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
-      trace_history_value_name(3) = 'bound_mass'
+      trace_history_value_name(3) = 'remnant_mass'
       trace_history_value_name(4) = 'rel_E_err'
       trace_history_value_name(5) = 'log_rel_run_E_err'
       

@@ -56,11 +56,6 @@
       C_cntr
       retries
 
-      non_fe_core_infall
-      fe_core_infall
-      bound_mass
-
-
 
 ! the following lines of the log file contain info about 1 model per row
    

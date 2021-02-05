@@ -17,7 +17,8 @@
       set_initial_number_retries = .true.
 
       ! uncomment the following to remove H env
-      !remove_initial_surface_at_he_core_boundary = 0.1d0 ! H abundance where cut
+      !relax_initial_mass_to_remove_H_env = .true.
+      !lg_max_abs_mdot = -2
 
       pgstar_flag = .false.
 

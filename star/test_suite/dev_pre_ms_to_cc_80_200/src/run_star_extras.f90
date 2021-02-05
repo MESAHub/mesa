@@ -93,7 +93,7 @@
          
          if (s% x_logical_ctrl(7)) & ! inlist_finish
             call check_termination_code( &
-               t_fe_core_infall_limit, t_log_Rsurf_upper_limit, t_bound_mass_min_limit)
+               t_fe_core_infall_limit, t_log_Rsurf_upper_limit, t_remnant_mass_min_limit)
          
          contains
          

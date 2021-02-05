@@ -327,12 +327,12 @@ Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
 Text_Summary1_name(3,1) = 'fe_core_infall'
-Text_Summary1_name(3,2) = 'log_max_T'
+Text_Summary1_name(3,2) = 'gamma1_min'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'CO_core'
 
-Text_Summary1_name(4,1) = 'gamma1_min'
+Text_Summary1_name(4,1) = 'log_max_T'
 Text_Summary1_name(4,2) = 'log_LH'
 Text_Summary1_name(4,3) = 'lg_Lnuc'
 Text_Summary1_name(4,4) = 'O_cntr'
@@ -466,23 +466,6 @@ Mixing_file_prefix = 'mixing_'
 Mixing_file_interval = 1 ! output when `mod(model_number,Mixing_file_interval)==0`
 Mixing_file_width = -1 ! (inches) negative means use same value as for window
 Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
-
-
-!-----------------------------------------------------------------------
-
-! TmaxRho window
-      ! history of central temperature vs. density
-
-    TmaxRho_txt_scale = 0.7
-    TmaxRho_title = ''
-
-    TmaxRho_logT_min = -101d0
-    TmaxRho_logT_max = -101d0
-    TmaxRho_logRho_min = -101d0
-    TmaxRho_logRho_max = -101d0
-    show_TmaxRho_degeneracy_line = .true.
-
-
 
 
 !-----------------------------------------------------------------------

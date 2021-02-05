@@ -1658,14 +1658,7 @@
       
       real(dp) function get_remnant_mass(s)
          type (star_info), pointer :: s
-         integer :: k
-         do k=1,s% nz
-            if (s% total_energy_integral_center(k) < 0d0) then
-               get_remnant_mass = s% m(k)
-               return
-            end if
-         end do
-         get_remnant_mass = 0d0
+         get_remnant_mass = s% m(1) - get_ejecta_mass(s)
       end function get_remnant_mass
       
       

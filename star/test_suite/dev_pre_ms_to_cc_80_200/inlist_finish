@@ -10,7 +10,7 @@
       save_model_filename = 'final.mod'
       !required_termination_code_string = 'fe_core_infall_limit'  ! for lower masses
       !required_termination_code_string = 'log_Rsurf_upper_limit' ! for higher masses
-      !required_termination_code_string = 'bound_mass_min_limit' ! for completely unbound cases
+      !required_termination_code_string = 'remnant_mass_min_limit' ! for completely unbound cases
       
       !set_initial_model_number = .false.
 
@@ -32,9 +32,9 @@
       max_model_number = 10000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 4.5d0 ! for higher masses
+      log_Rsurf_upper_limit = 4.495d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
-      bound_mass_min_limit = 10d0 ! for completely unbound cases
+      remnant_mass_min_limit = 1d0 ! for completely unbound cases
       
       when_to_stop_rtol = 1d99
       when_to_stop_atol = 1d99
@@ -71,10 +71,10 @@
       delta_XSi_cntr_limit = 0.01d0
       delta_XSi_cntr_hard_limit = -1
       
-      !dt_div_min_dr_div_cs_limit = 30.0
-      !dt_div_min_dr_div_cs_hard_limit = 60.0
-      !min_q_for_dt_div_min_dr_div_cs_limit = 0d0
-      !max_q_for_dt_div_min_dr_div_cs_limit = 0.9d0
+      dt_div_min_dr_div_cs_limit = 10d0
+      dt_div_min_dr_div_cs_hard_limit = 20d0
+      min_q_for_dt_div_min_dr_div_cs_limit = 0d0
+      max_q_for_dt_div_min_dr_div_cs_limit = 1d0
 
 ! mesh
 
@@ -84,14 +84,15 @@
 ! output
       gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 
-      num_trace_history_values = 7
+      num_trace_history_values = 8
       trace_history_value_name(1) = 'non_fe_core_infall'
       trace_history_value_name(2) = 'fe_core_infall'
-      trace_history_value_name(3) = 'bound_mass'
-      trace_history_value_name(4) = 'rel_E_err'
-      trace_history_value_name(5) = 'log_rel_run_E_err'
-      trace_history_value_name(6) = 'fe_core_mass'
-      trace_history_value_name(7) = 'total_energy_foe'
+      trace_history_value_name(3) = 'remnant_mass'
+      trace_history_value_name(4) = 'ejecta_mass'
+      trace_history_value_name(5) = 'rel_E_err'
+      trace_history_value_name(6) = 'log_rel_run_E_err'
+      trace_history_value_name(7) = 'fe_core_mass'
+      trace_history_value_name(8) = 'total_energy_foe'
       
 
       photo_interval = 10
@@ -166,13 +167,14 @@
 
 &pgstar
 
+!pause = .true.
+
 !Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
 Grid1_file_interval = 1     ! output when mod(model_number,Grid1_file_interval)==0
 
-
-!pause = .true.
+ History_Panels2_yaxis_name(1) = 'total_energy_foe'
 
 Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0.0
@@ -204,9 +206,11 @@ Profile_Panels3_yaxis_name(6) =  'logT' ! 'mass' ! 'logR_cm' !
     Profile_Panels3_ymin(6) = -101 ! -3d0
 Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(6) = 0.15
+    Profile_Panels3_other_ymin(6) = -0.1
+    Profile_Panels3_other_ymax(6) = 1.1d0
 
 Text_Summary1_name(2,4) = 'log_R'
-Text_Summary1_name(3,3) = 'bound_mass'
+Text_Summary1_name(3,3) = 'remnant_mass'
 Text_Summary1_name(2,3) = 'ejecta_mass'
 
 

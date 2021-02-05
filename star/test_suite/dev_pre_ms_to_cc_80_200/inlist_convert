@@ -138,5 +138,10 @@ Profile_Panels3_xaxis_reversed = .true.
 
 Text_Summary1_name(2,2) = 'star_age_sec'
 
+TRho_Profile_xmin = 2.3
+TRho_Profile_xmax = 8.2
+TRho_Profile_ymin = 8.4
+TRho_Profile_ymax = 9.7
+
 
 / ! end of pgstar namelist
