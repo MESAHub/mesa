@@ -65,7 +65,6 @@
       fe_core_infall
       bound_mass
       ejecta_mass
-      ejecta_total_energy
 
 ! the following lines of the log file contain info about 1 model per row
    

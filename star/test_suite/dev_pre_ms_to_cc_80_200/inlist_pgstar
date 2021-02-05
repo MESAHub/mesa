@@ -306,24 +306,24 @@ Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
 Text_Summary1_name(3,1) = 'log_cntr_T'  
-Text_Summary1_name(3,2) = 'log_cntr_Rho'
+Text_Summary1_name(3,2) = 'gamma1_min'
 Text_Summary1_name(3,3) = 'log_R'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'CO_core'
 
-Text_Summary1_name(4,1) = 'fe_core_infall' 
-Text_Summary1_name(4,2) = 'gamma1_min'
+Text_Summary1_name(4,1) = 'log_cntr_Rho' 
+Text_Summary1_name(4,2) = 'log_LH'
 Text_Summary1_name(4,3) = 'lg_Lnuc'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'Fe_core'
 
-Text_Summary1_name(5,1) = 'non_fe_core_infall' 
+Text_Summary1_name(5,1) = 'fe_core_infall' 
 Text_Summary1_name(5,2) = 'log_LHe'
 Text_Summary1_name(5,3) = 'lg_Lneu'
 Text_Summary1_name(5,4) = 'Ne_cntr'
 Text_Summary1_name(5,5) = 'zones'
 
-Text_Summary1_name(6,1) = '' 
+Text_Summary1_name(6,1) = 'non_fe_core_infall' 
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'
@@ -376,7 +376,7 @@ History_Panels2_ymin(3) = -101d0
 History_Panels2_ymax(3) = -101d0
 History_Panels2_dymin(3) = 5
 
-History_Panels2_other_yaxis_name(3) = 'bound_mass'
+History_Panels2_other_yaxis_name(3) = 'ejecta_mass'
 History_Panels2_other_yaxis_reversed(3) = .false.
 History_Panels2_other_ymin(3) = -101d0
 History_Panels2_other_ymax(3) = -101d0

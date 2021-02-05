@@ -440,7 +440,7 @@
                            s% model_number, k, iter, &
                            (s% lnT(k) - s% lnT_start(k))/ln10, &
                            s% lnT(k)/ln10, s% lnT_start(k)/ln10
-                     s% retry_message = 'abs(dlogT) > hydro_mtx_max_allowed_abs_dlogT'
+                     write(s% retry_message, *) 'abs(dlogT) > hydro_mtx_max_allowed_abs_dlogT', k
                      ierr = -1
                      return
                   end if
@@ -451,7 +451,7 @@
                         write(*,4) 'hydro_mtx: logT too large', &
                            s% model_number, k, iter, &
                            s% lnT(k)/ln10, s% lnT_start(k)/ln10
-                     s% retry_message = 'logT > hydro_mtx_max_allowed_logT'
+                     write(s% retry_message, *) 'logT > hydro_mtx_max_allowed_logT', k
                      ierr = -1
                      return
                   end if
@@ -460,7 +460,7 @@
                         write(*,4) 'hydro_mtx: logT too small', &
                            s% model_number, k, iter, &
                            s% lnT(k)/ln10, s% lnT_start(k)/ln10
-                     s% retry_message = 'logT < hydro_mtx_min_allowed_logT'
+                     write(s% retry_message, *) 'logT < hydro_mtx_min_allowed_logT', k
                      ierr = -1
                      return
                   end if
@@ -630,7 +630,7 @@
                      s% lnd(k) = x(i_lnd)
                      s% dxh_lnd(k) = dx(i_lnd,k)
                      if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
-                        s% retry_message = 'logRho < hydro_mtx_min_allowed_logRho'
+                        write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                         if (report) &
                            write(*,4) 'hydro_mtx: logRho too small', &
                               s% model_number, k, iter, &
@@ -641,7 +641,7 @@
                      if (s% lnd(k) > ln10*s% hydro_mtx_max_allowed_logRho .and. &
                           s% min_logT_for_hydro_mtx_max_allowed < &
                            ln10*min(s% lnT(k),s% lnT_start(k))) then
-                        s% retry_message = 'logRho > hydro_mtx_max_allowed_logRho'
+                        write(s% retry_message, *) 'logRho > hydro_mtx_max_allowed_logRho', k
                         if (s% report_ierr .or. report) &
                            write(*,4) 'hydro_mtx: logRho too large', &
                               s% model_number, k, iter, &
@@ -653,7 +653,7 @@
                            ln10*s% hydro_mtx_max_allowed_abs_dlogRho .and. &
                           s% min_logT_for_hydro_mtx_max_allowed < &
                            ln10*min(s% lnT(k),s% lnT_start(k))) then
-                        s% retry_message = 'abs(dlogRho) > hydro_mtx_max_allowed_abs_dlogRho'
+                        write(s% retry_message, *) 'abs(dlogRho) > hydro_mtx_max_allowed_abs_dlogRho', k
                         if (s% report_ierr .or. report) &
                            write(*,4) &
                               'hydro_mtx: dlogRho, logRho, logRho_start', &
@@ -665,7 +665,7 @@
                      end if
                      s% rho(k) = exp(s% lnd(k))
                      if (is_bad_num(s% rho(k))) then
-                        s% retry_message = 'bad num for rho'
+                        write(s% retry_message, *) 'bad num for rho', k
                         if (report) write(*,2) 'bad num rho', k, s% rho(k)
                         if (s% stop_for_bad_nums) then
                            write(*,2) 'set_vars_for_solver rho', k, s% rho(k)

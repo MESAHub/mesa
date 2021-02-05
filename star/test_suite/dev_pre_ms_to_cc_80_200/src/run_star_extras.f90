@@ -70,14 +70,6 @@
          else ! it is a restart
             call unpack_extra_info(s)
          end if 
-         if (s% x_logical_ctrl(7) .and. & ! inlist_finish
-             len_trim(s% x_character_ctrl(1)) > 0) then
-            call star_read_controls(id, s% x_character_ctrl(1), ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed reading ' // trim(s% x_character_ctrl(1))
-               return
-            end if         
-         end if
       end subroutine extras_startup
       
       
