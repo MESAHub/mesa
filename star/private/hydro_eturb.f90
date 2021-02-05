@@ -277,6 +277,7 @@
          
          subroutine setup_dEturb_18(ierr)
             integer, intent(out) :: ierr
+            ierr = 0
             dEturb_18 = 0d0
             dEturb_18%val = s% dxh_eturb(k) ! Eturb = Eturb_start + dxh_eturb
             dEturb_18%d1Array(i_eturb_00) = 1d0
@@ -288,6 +289,7 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: Pt_18, dV_18
             real(dp) :: DV, d_DV_dlnd
+            ierr = 0
             call calc_Pt_18_tw(s, k, Pt_18, ierr)
             if (ierr /= 0) return
             dV_18 = 1d0/d_00 - 1d0/s% rho_start(k)
