@@ -40,8 +40,8 @@
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
-      integer, parameter :: bit_for_D_omega = 10
-      integer, parameter :: bit_for_am_nu_rot = 11
+      !integer, parameter ::  = 10 ! UNUSED
+      !integer, parameter ::  = 11! UNUSED
       integer, parameter :: bit_for_j_rot = 12
       integer, parameter :: bit_for_conv_vel_var = 13
       !integer, parameter ::   = 14 ! UNUSED
@@ -52,8 +52,6 @@
       integer, parameter :: increment_for_i_eturb = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
-      integer, parameter :: increment_for_D_omega_flag = 1
-      integer, parameter :: increment_for_am_nu_rot_flag = 1
       integer, parameter :: increment_for_RTI_flag = 1
       integer, parameter :: increment_for_rsp_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
@@ -62,8 +60,6 @@
                                           + increment_for_i_eturb &
                                           + increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
-                                          + increment_for_D_omega_flag &
-                                          + increment_for_am_nu_rot_flag &
                                           + increment_for_RTI_flag &
                                           + increment_for_rsp_flag &
                                           + increment_for_conv_vel_flag
@@ -271,8 +267,6 @@
          if (i_eturb /= 0) n = n+increment_for_i_eturb ! read eturb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
-         if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
-         if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_rsp_flag ! read eturb, erad, Fr
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
@@ -346,12 +340,6 @@
                !NOTE: MESA version 10108 was first to store j_rot in saved files
                j=j+1; j_rot(i) = vec(j)
             end if
-            if (s% D_omega_flag) then
-               j=j+1; !D_omega(i) = vec(j) ! no longer used
-            end if
-            if (s% am_nu_rot_flag) then
-               j=j+1; !am_nu_rot(i) = vec(j) ! no longer used
-            end if
             if (i_u /= 0) then
                j=j+1; xh(i_u,i) = vec(j)
             end if
@@ -386,11 +374,7 @@
             return
          end if
          
-         if (s% rotation_flag .and. .not. s% D_omega_flag) &
-            s% D_omega(1:nz) = 0d0
-         
-         if (s% rotation_flag .and. .not. s% am_nu_rot_flag) &
-            s% am_nu_rot(1:nz) = 0d0
+         if (s% rotation_flag) s% am_nu_rot(1:nz) = 0d0
          
          if (want_RSP_model .and. .not. is_RSP_model) then
             ! proper values for these will be set in rsp_setup_part2
@@ -555,8 +539,6 @@
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
          s% have_j_rot = BTEST(file_type, bit_for_j_rot)
-         s% D_omega_flag = BTEST(file_type, bit_for_D_omega)
-         s% am_nu_rot_flag = BTEST(file_type, bit_for_am_nu_rot)
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
          is_RSP_model = BTEST(file_type, bit_for_RSP)

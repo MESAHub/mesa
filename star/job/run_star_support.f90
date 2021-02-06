@@ -2221,12 +2221,6 @@
             if (failed('star_set_D_omega_flag',ierr)) return
          end if
 
-         if (s% job% change_am_nu_rot_flag .or. &
-               (s% job% change_initial_am_nu_rot_flag .and. .not. restart)) then
-            call star_set_am_nu_rot_flag(id, s% job% new_am_nu_rot_flag, ierr)
-            if (failed('star_set_am_nu_rot_flag',ierr)) return
-         end if
-
          if (s% job% change_rotation_flag .or. &
                (s% job% change_initial_rotation_flag .and. .not. restart)) then
             write(*,*) 'new_rotation_flag', s% job% new_rotation_flag

@@ -776,9 +776,9 @@
       integer, parameter :: h_He_cntr = h_lg_Mdot + 1
       integer, parameter :: h_eta_cntr = h_He_cntr + 1
       integer, parameter :: h_gam_cntr = h_eta_cntr + 1
-      integer, parameter :: h_remnant_mass = h_gam_cntr + 1
-      integer, parameter :: h_ejecta_mass = h_remnant_mass + 1
-      integer, parameter :: h_v_div_cs = h_ejecta_mass + 1
+      integer, parameter :: h_remnant_M = h_gam_cntr + 1
+      integer, parameter :: h_ejecta_M = h_remnant_M + 1
+      integer, parameter :: h_v_div_cs = h_ejecta_M + 1
       integer, parameter :: h_zones = h_v_div_cs + 1
       integer, parameter :: h_lg_Dsurf = h_zones + 1
       integer, parameter :: h_C_cntr = h_lg_Dsurf + 1
@@ -1572,8 +1572,8 @@
          history_column_name(h_eta_cntr) = 'eta_cntr'
          history_column_name(h_gam_cntr) = 'gam_cntr'
          history_column_name(h_v_div_cs) = 'v_div_cs'
-         history_column_name(h_remnant_mass) = 'remnant_mass'
-         history_column_name(h_ejecta_mass) = 'ejecta_mass'
+         history_column_name(h_remnant_M) = 'remnant_M'
+         history_column_name(h_ejecta_M) = 'ejecta_M'
          history_column_name(h_zones) = 'zones'
          history_column_name(h_lg_Dsurf) = 'lg_Dsurf'
          history_column_name(h_C_cntr) = 'C_cntr'

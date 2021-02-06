@@ -519,7 +519,6 @@
          s% conv_vel_flag = .false.
          s% w_div_wc_flag = .false.
          s% D_omega_flag = .false.
-         s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% Eturb_flag = .false.
 
@@ -939,7 +938,6 @@
             s% u_flag = .false.
             s% rotation_flag = .false.
             s% D_omega_flag = .false.
-            s% am_nu_rot_flag = .false.
             s% star_mass = s% initial_mass
             s% mstar = s% initial_mass*Msun
             s% M_center = s% mstar - s% xmstar

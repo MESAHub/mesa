@@ -192,8 +192,6 @@
       logical :: change_RSP_flag, change_initial_RSP_flag, new_RSP_flag
       logical :: change_v_flag, change_initial_v_flag, new_v_flag
       logical :: change_D_omega_flag, change_initial_D_omega_flag, new_D_omega_flag
-      logical :: change_am_nu_rot_flag, change_initial_am_nu_rot_flag, &
-         new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
       real(dp) :: gamma1_integral_for_v_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag

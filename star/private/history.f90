@@ -1886,9 +1886,9 @@
                else
                   val = 0d0 ! s% r(1)*s% dlnR_dt(1)
                end if
-            case(h_remnant_mass)
+            case(h_remnant_M)
                val = get_remnant_mass(s)/Msun
-            case(h_ejecta_mass)
+            case(h_ejecta_M)
                val = get_ejecta_mass(s)/Msun
 
             case(h_log_L_div_Ledd)

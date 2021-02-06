@@ -63,8 +63,8 @@
 
       non_fe_core_infall
       fe_core_infall
-      remnant_mass
-      ejecta_mass
+      remnant_M
+      ejecta_M
 
 ! the following lines of the log file contain info about 1 model per row
    

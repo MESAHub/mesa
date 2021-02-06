@@ -328,12 +328,6 @@
          change_initial_D_omega_flag, &
          new_D_omega_flag, &
          
-         change_am_nu_rot_flag, &
-         change_initial_am_nu_rot_flag, &
-         new_am_nu_rot_flag, &
-         
-         use_D_omega_for_am_nu_rot, &
-         
          change_u_flag, &
          change_initial_u_flag, &
          new_u_flag, &
@@ -977,10 +971,6 @@
          s% job% change_D_omega_flag = change_D_omega_flag
          s% job% change_initial_D_omega_flag = change_initial_D_omega_flag
          s% job% new_D_omega_flag = new_D_omega_flag
-         s% job% change_am_nu_rot_flag = change_am_nu_rot_flag
-         s% job% change_initial_am_nu_rot_flag = change_initial_am_nu_rot_flag
-         s% job% new_am_nu_rot_flag = new_am_nu_rot_flag
-         s% job% use_D_omega_for_am_nu_rot = use_D_omega_for_am_nu_rot
 
          s% job% change_u_flag = change_u_flag
          s% job% change_initial_u_flag = change_initial_u_flag
@@ -1554,10 +1544,6 @@
          change_D_omega_flag = s% job% change_D_omega_flag
          change_initial_D_omega_flag = s% job% change_initial_D_omega_flag
          new_D_omega_flag = s% job% new_D_omega_flag
-         change_am_nu_rot_flag = s% job% change_am_nu_rot_flag
-         change_initial_am_nu_rot_flag = s% job% change_initial_am_nu_rot_flag
-         new_am_nu_rot_flag = s% job% new_am_nu_rot_flag
-         use_D_omega_for_am_nu_rot = s% job% use_D_omega_for_am_nu_rot
 
          change_u_flag = s% job% change_u_flag
          change_initial_u_flag = s% job% change_initial_u_flag

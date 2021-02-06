@@ -666,8 +666,7 @@
 
          step_min = 1
          step_max = s% model_number
-         write(*,*) 'hist_xaxis_name', trim(hist_xaxis_name)
-         write(*,*) 'automatic_star_age_units', automatic_star_age_units
+
          if (hist_xaxis_name == 'model_number') then
             max_width = int(hist_max_width)
             step_min = int(hist_xmin)
