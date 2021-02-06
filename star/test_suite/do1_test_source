@@ -1,10 +1,4 @@
 
-do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_80_200 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-
-return
-
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
 do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
@@ -35,7 +29,7 @@ do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.
 
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_80_200 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+#   needs work    do_one dev_pre_ms_to_cc_80_200 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
 
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
