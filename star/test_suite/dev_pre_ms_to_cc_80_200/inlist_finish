@@ -1,20 +1,20 @@
 
 &star_job
       load_saved_model = .true.
-      saved_model_name = 'prepared.mod'
-      
-      !load_saved_photo = .false.
-      !saved_photo_name = 'prepared.photo'
+      saved_model_name = 'converted.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
+      
       !required_termination_code_string = 'fe_core_infall_limit'  ! for lower masses
       !required_termination_code_string = 'log_Rsurf_upper_limit' ! for higher masses
       !required_termination_code_string = 'remnant_mass_min_limit' ! for completely unbound cases
       
       !set_initial_model_number = .false.
 
-      !pgstar_flag = .false.
+      pgstar_flag = .false.
+
+      pause_before_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -29,10 +29,10 @@
       !controls_namelist_name = 'controls_finish.txt'
    
       ! limit max_model_number as part of test_suite
-      max_model_number = 10000      
+      max_model_number = 20000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 4.495d0 ! for higher masses
+      log_Rsurf_upper_limit = 5d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
       remnant_mass_min_limit = 1d0 ! for completely unbound cases
       
@@ -55,44 +55,50 @@
 ! mixing
       
 ! timesteps
-      delta_lgTeff_limit =  0.2
+      dX_nuc_drop_limit = 5d-2
+      dX_nuc_drop_limit_at_high_T = 1d-2 ! for center logT > 9.45
+
+      delta_lgTeff_limit = 0.2
       delta_lgL_limit = 0.5     
       delta_lgL_He_limit = 0.5
 
-      delta_lgT_max_limit = 0.01    
-      delta_lgT_max_hard_limit = 0.05
+      delta_lgT_max_limit = 0.005d0
+      delta_lgT_max_hard_limit = 0.01d0
 
-      delta_lgT_cntr_limit = 0.01    
-      delta_lgT_cntr_hard_limit = 0.05
+      delta_lgT_cntr_limit = 0.005d0
+      delta_lgT_cntr_hard_limit = 0.01d0
 
-      delta_XHe_cntr_limit = 0.03
+      delta_lgRho_cntr_limit = 0.005d0
+      delta_lgRho_cntr_hard_limit = 0.01d0
+
+      delta_XHe_cntr_limit = 0.005d0
       delta_XHe_cntr_hard_limit = 0.1
+
+      delta_XC_cntr_limit = 0.005d0
+      delta_XC_cntr_hard_limit = 0.1
+
+      delta_XO_cntr_limit = 0.005d0
+      delta_XO_cntr_hard_limit = 0.1
  
-      delta_XSi_cntr_limit = 0.01d0
-      delta_XSi_cntr_hard_limit = -1
+      delta_XSi_cntr_limit = 0.005d0
+      delta_XSi_cntr_hard_limit = 0.1
       
-      dt_div_min_dr_div_cs_limit = 10d0
-      dt_div_min_dr_div_cs_hard_limit = 20d0
-      min_q_for_dt_div_min_dr_div_cs_limit = 0d0
-      max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+      dt_div_min_dr_div_cs_limit = 4d0
+      dt_div_min_dr_div_cs_hard_limit = 10d0
 
 ! mesh
 
 ! solver 
       use_compression_outer_BC = .true.
+      
+      use_gold2_tolerances = .true.
 
 ! output
       gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 
-      num_trace_history_values = 8
-      trace_history_value_name(1) = 'non_fe_core_infall'
-      trace_history_value_name(2) = 'fe_core_infall'
-      trace_history_value_name(3) = 'remnant_mass'
-      trace_history_value_name(4) = 'ejecta_mass'
-      trace_history_value_name(5) = 'rel_E_err'
-      trace_history_value_name(6) = 'log_rel_run_E_err'
-      trace_history_value_name(7) = 'fe_core_mass'
-      trace_history_value_name(8) = 'total_energy_foe'
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
       
 
       photo_interval = 10
@@ -101,6 +107,7 @@
       terminal_interval = 1
 
 ! FOR DEBUGGING
+   !trace_split_merge_amr = .true.
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
@@ -166,13 +173,14 @@
 / ! end of controls namelist
 
 &pgstar
+ History_Panels2_xmin = 26.3
 
 !pause = .true.
 
-!Grid1_file_flag = .true.
+Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
-Grid1_file_interval = 1     ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
 
  History_Panels2_yaxis_name(1) = 'total_energy_foe'
 

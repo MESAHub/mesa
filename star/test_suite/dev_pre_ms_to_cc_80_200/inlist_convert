@@ -22,7 +22,7 @@
 &controls
    
       ! limit max_model_number as part of test_suite
-      max_model_number = 200
+      max_model_number = 100
       !max_number_retries = 0
 
 
@@ -41,8 +41,6 @@
       max_timestep = 1d-2
 
 ! mesh
-      split_merge_amr_MaxLong = 1.4d0
-      split_merge_amr_MaxShort = 1.4d0
 
 ! solver
 

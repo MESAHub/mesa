@@ -49,13 +49,6 @@ else
    cp converted.mod standard_converted.mod
 fi
 
-if [ -z "$MESA_RUN_OPTIONAL" ]; then
-   cp standard_prepared.mod prepared.mod
-else
-   do_one inlist_prepare_header prepared.mod
-   cp prepared.mod standard_prepared.mod
-fi
-
 do_one inlist_finish_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

@@ -237,8 +237,6 @@
       Pextra_factor = 1 ! for atm
       !Pextra_factor = 1d2 ! for atm
 
-      screening_mode = 'chugunov'
-
       op_split_burn = .true.
       op_split_burn_min_T = 1d9
       burn_steps_limit = 150

@@ -349,6 +349,7 @@
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
             
+            ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
                if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
@@ -357,65 +358,81 @@
                   end if
                end if
             end if
+            
+            ! next check for cells that are too small and need to be merged
 
             if (s% merge_amr_ignore_surface_cells .and. &
                   k<=s% merge_amr_k_for_ignore_surface_cells) cycle
 
-            if(abs(dx_actual)>0d0) then
+            if (abs(dx_actual)>0d0) then
                undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))
             else
                undersize_ratio = dq_min/s% dq(k)
             end if
-
-            du_div_cs_limit_flag = .false.
-
-            if (.not. s% merge_amr_du_div_cs_limit_only_for_compression) then
-               du_div_cs_limit_flag = .true.
-            else if (associated(v)) then
-               if (k < nz) then
-                  if (v(k+1)*pow2(r_for_v(k+1)) > v(k)*pow2(r_for_v(k))) then
-                     du_div_cs_limit_flag = .true.
-                  end if
-               end if
-               if (.not. du_div_cs_limit_flag .and. k > 1) then
-                  if (v(k)*pow2(r_for_v(k)) > v(k-1)*pow2(r_for_v(k-1))) then
-                     du_div_cs_limit_flag = .true.
-                  end if
-               end if
-            end if
-
-            if (du_div_cs_limit_flag .and. associated(v)) then
-               if (k == 1) then 
-                  abs_du_div_cs = abs(v(k) - v(k+1))/s% csound(k)
-               else if (k == nz) then
-                  abs_du_div_cs = abs(v(nz-1) - v(nz))/s% csound(nz)
-               else
-                  abs_du_div_cs = max(abs(v(k) - v(k+1)), &
-                            abs(v(k) - v(k-1)))/s% csound(k)
-               end if
-            else
-               abs_du_div_cs = 0d0
-            end if
             
-            if (du_div_cs_limit_flag) then
-               if (s% merge_amr_inhibit_at_jumps) then 
-                  ! reduce undersize_ratio for large jumps
-                  ! i.e. large jumps inhibit merges but don't prohibit completely
-                  if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) &
-                     undersize_ratio = undersize_ratio * &
-                        s% merge_amr_max_abs_du_div_cs/abs_du_div_cs
-                  if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then ! switch
-                     TooSmall = undersize_ratio; iTooSmall = k
-                  end if
-               else if (TooSmall < undersize_ratio .and. &
-                        abs_du_div_cs <= s% merge_amr_max_abs_du_div_cs .and. &
-                        s% dq(k) < dq_max/5d0) then
-                  TooSmall = undersize_ratio; iTooSmall = k
-               end if
-            else
+            if (s% merge_amr_max_abs_du_div_cs < 0d0) then
+            
                if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
                   TooSmall = undersize_ratio; iTooSmall = k
+                  !write(*,2) 'candidate for merge', k, undersize_ratio
                end if
+            
+            else ! Pablo's additions to modify when merge
+               ! merge_amr_max_abs_du_div_cs
+               ! merge_amr_du_div_cs_limit_only_for_compression
+               ! merge_amr_inhibit_at_jumps
+
+               du_div_cs_limit_flag = .false.
+
+               if (.not. s% merge_amr_du_div_cs_limit_only_for_compression) then
+                  du_div_cs_limit_flag = .true.
+               else if (associated(v)) then
+                  if (k < nz) then
+                     if (v(k+1)*pow2(r_for_v(k+1)) > v(k)*pow2(r_for_v(k))) then
+                        du_div_cs_limit_flag = .true.
+                     end if
+                  end if
+                  if (.not. du_div_cs_limit_flag .and. k > 1) then
+                     if (v(k)*pow2(r_for_v(k)) > v(k-1)*pow2(r_for_v(k-1))) then
+                        du_div_cs_limit_flag = .true.
+                     end if
+                  end if
+               end if
+
+               if (du_div_cs_limit_flag .and. associated(v)) then
+                  if (k == 1) then 
+                     abs_du_div_cs = abs(v(k) - v(k+1))/s% csound(k)
+                  else if (k == nz) then
+                     abs_du_div_cs = abs(v(nz-1) - v(nz))/s% csound(nz)
+                  else
+                     abs_du_div_cs = max(abs(v(k) - v(k+1)), &
+                               abs(v(k) - v(k-1)))/s% csound(k)
+                  end if
+               else
+                  abs_du_div_cs = 0d0
+               end if
+            
+               if (du_div_cs_limit_flag) then
+                  if (s% merge_amr_inhibit_at_jumps) then 
+                     ! reduce undersize_ratio for large jumps
+                     ! i.e. large jumps inhibit merges but don't prohibit completely
+                     if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) &
+                        undersize_ratio = undersize_ratio * &
+                           s% merge_amr_max_abs_du_div_cs/abs_du_div_cs
+                     if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then ! switch
+                        TooSmall = undersize_ratio; iTooSmall = k
+                     end if
+                  else if (TooSmall < undersize_ratio .and. &
+                           abs_du_div_cs <= s% merge_amr_max_abs_du_div_cs .and. &
+                           s% dq(k) < dq_max/5d0) then
+                     TooSmall = undersize_ratio; iTooSmall = k
+                  end if
+               else
+                  if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
+                     TooSmall = undersize_ratio; iTooSmall = k
+                  end if
+               end if
+            
             end if
             
          end do
