@@ -179,6 +179,7 @@
       op_split_burn_odescal = 1d-5
 
 ! output
+      gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 
       photo_interval = 50
       profile_interval = 50

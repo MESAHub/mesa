@@ -1213,6 +1213,7 @@
 
 
       subroutine set_default_star_job_controls
+         required_termination_code_string(:) = ''
          extras_ipar(:) = 0
          extras_rpar(:) = 0
          extras_cpar(:) = ''

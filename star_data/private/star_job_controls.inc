@@ -335,8 +335,10 @@
          max_Z_for_add, max_N_for_add, max_A_for_add
 
       integer :: save_model_number
-      character (len=strlen) :: save_model_filename, required_termination_code_string
+      character (len=strlen) :: save_model_filename
       logical :: save_model_when_terminate
+
+      character (len=strlen) :: required_termination_code_string(num_termination_code_strings)
 
       logical :: profile_starting_model
       integer :: profile_model_number

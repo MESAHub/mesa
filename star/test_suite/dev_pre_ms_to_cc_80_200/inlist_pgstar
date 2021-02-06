@@ -286,7 +286,7 @@ Text_Summary1_xleft = 0.01
 Text_Summary1_xright = 0.99
 Text_Summary1_ybot = 0.0
 Text_Summary1_ytop = 1.0
-Text_Summary1_txt_scale = 0.95
+Text_Summary1_txt_scale = 0.92
 Text_Summary1_title = ''
 
 Text_Summary1_num_rows = 6 ! <= 20

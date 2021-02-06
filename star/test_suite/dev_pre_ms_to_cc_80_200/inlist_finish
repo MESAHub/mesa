@@ -1,20 +1,20 @@
 
 &star_job
       load_saved_model = .true.
-      saved_model_name = 'converted.mod'
+      saved_model_name = 'prepared.mod'
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       
-      !required_termination_code_string = 'fe_core_infall_limit'  ! for lower masses
-      !required_termination_code_string = 'log_Rsurf_upper_limit' ! for higher masses
-      !required_termination_code_string = 'remnant_mass_min_limit' ! for completely unbound cases
+      required_termination_code_string(1) = 'fe_core_infall_limit'  ! for lower masses
+      required_termination_code_string(2) = 'log_Rsurf_upper_limit' ! for higher masses
+      required_termination_code_string(3) = 'remnant_mass_min_limit' ! for completely unbound cases
       
       !set_initial_model_number = .false.
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
-      pause_before_terminate = .true.
+      !pause_before_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -24,10 +24,7 @@
 &kap
 / ! end of kap namelist
 
-&controls
-      !save_controls_namelist = .true.
-      !controls_namelist_name = 'controls_finish.txt'
-   
+&controls   
       ! limit max_model_number as part of test_suite
       max_model_number = 20000      
       !max_number_retries = 30
@@ -40,9 +37,6 @@
       when_to_stop_atol = 1d99
       
       use_other_set_pgstar_controls = .true.
-
-! tell run_star_extras that this is inlist_finish
-      x_logical_ctrl(7) = .true.
 
 ! wind
 
@@ -83,10 +77,11 @@
       delta_XSi_cntr_limit = 0.005d0
       delta_XSi_cntr_hard_limit = 0.1
       
-      dt_div_min_dr_div_cs_limit = 4d0
+      dt_div_min_dr_div_cs_limit = 5d0
       dt_div_min_dr_div_cs_hard_limit = 10d0
 
 ! mesh
+      !trace_split_merge_amr = .true.
 
 ! solver 
       use_compression_outer_BC = .true.
@@ -94,7 +89,6 @@
       use_gold2_tolerances = .true.
 
 ! output
-      gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -107,7 +101,6 @@
       terminal_interval = 1
 
 ! FOR DEBUGGING
-   !trace_split_merge_amr = .true.
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
@@ -173,16 +166,18 @@
 / ! end of controls namelist
 
 &pgstar
- History_Panels2_xmin = 26.3
 
 !pause = .true.
 
-Grid1_file_flag = .true.
+!Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
 Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
 
- History_Panels2_yaxis_name(1) = 'total_energy_foe'
+History_Panels2_xaxis_name = 'star_age'
+History_Panels2_automatic_star_age_units = .true.
+
+History_Panels2_yaxis_name(1) = 'total_energy_foe'
 
 Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0.0

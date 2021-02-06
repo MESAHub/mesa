@@ -4307,6 +4307,7 @@
     History_Panels1_xaxis_reversed = .false.
     History_Panels1_xaxis_log = .false.
     History_Panels1_xmargin = 0.0
+    History_Panels1_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4440,6 +4441,7 @@
     History_Panels2_xaxis_reversed = .false.
     History_Panels2_xaxis_log = .false.
     History_Panels2_xmargin = 0.0
+    History_Panels2_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4523,6 +4525,7 @@
     History_Panels3_xaxis_reversed = .false.
     History_Panels3_xaxis_log = .false.
     History_Panels3_xmargin = 0.0
+    History_Panels3_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4620,6 +4623,7 @@
     History_Panels4_ymargin(:) = 0.1
     History_Panels4_dymin(:) = -1
     History_Panels4_xmargin = 0.0
+    History_Panels4_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4689,6 +4693,7 @@
     History_Panels5_xaxis_reversed = .false.
     History_Panels5_xaxis_log = .false.
     History_Panels5_xmargin = 0.0
+    History_Panels5_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4778,6 +4783,7 @@
     History_Panels6_xaxis_reversed = .false.
     History_Panels6_xaxis_log = .false.
     History_Panels6_xmargin = 0.0
+    History_Panels6_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4861,6 +4867,7 @@
     History_Panels7_xaxis_reversed = .false.
     History_Panels7_xaxis_log = .false.
     History_Panels7_xmargin = 0.0
+    History_Panels7_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -4944,6 +4951,7 @@
     History_Panels8_xaxis_reversed = .false.
     History_Panels8_xaxis_log = .false.
     History_Panels8_xmargin = 0.0
+    History_Panels8_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 
@@ -5027,6 +5035,7 @@
     History_Panels9_xaxis_reversed = .false.
     History_Panels9_xaxis_log = .false.
     History_Panels9_xmargin = 0.0
+    History_Panels9_automatic_star_age_units = .false. ! if xaxis_name = 'star_age'
 
       ! ::
 

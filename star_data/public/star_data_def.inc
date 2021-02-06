@@ -591,6 +591,8 @@
 
       integer, parameter :: max_num_diffusion_classes = 100
       
+      integer, parameter :: num_termination_code_strings = 9
+      
       integer, parameter :: num_xa_function = 9           
       integer, parameter :: num_mesh_logX = 9
       

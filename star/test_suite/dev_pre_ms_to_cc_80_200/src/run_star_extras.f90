@@ -52,7 +52,6 @@
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
-         s% other_set_pgstar_controls => set_pgstar_controls       
       end subroutine extras_controls
       
       
@@ -85,36 +84,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% x_logical_ctrl(6)) & ! inlist_prepare
-            call check_termination_code( &
-               t_log_max_temp_upper_limit, t_non_fe_core_infall_limit, -1)
-         
-         if (s% x_logical_ctrl(7)) & ! inlist_finish
-            call check_termination_code( &
-               t_fe_core_infall_limit, t_log_Rsurf_upper_limit, t_remnant_mass_min_limit)
-         
-         contains
-         
-         subroutine check_termination_code(tc1, tc2, tc3)
-            integer, intent(in) :: tc1, tc2, tc3
-            if (s% termination_code /= tc1 .and. &
-                s% termination_code /= tc2 .and. &
-                s% termination_code /= tc3) then
-               if (s% termination_code > 0 .and. s% termination_code <= num_termination_codes) then
-                  write(*,*) 'Failed to get a valid termination reason. got this instead: ' // &
-                     trim(termination_code_str(s% termination_code))
-               else
-                  write(*,*) 'Failed to get a valid termination reason'
-               end if
-               ierr = -1
-            else
-               write(*,*) 'Has a valid termination reason: ' // &
-                  trim(termination_code_str(s% termination_code))
-            end if
-         end subroutine check_termination_code
-         
+         if (ierr /= 0) return         
       end subroutine extras_after_evolve
       
 
@@ -184,30 +154,6 @@
          integer, intent(in) :: id
          extras_start_step = keep_going    
       end function extras_start_step
-
-
-      subroutine set_pgstar_controls(id)
-         integer, intent(in) :: id
-         integer :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% History_Panels2_xaxis_name = 'model_number'
-         if (.not. s% x_logical_ctrl(7)) return
-         ! check age and set History_Panels2_xaxis_name
-         if (s% star_age > 1d0) then
-            s% History_Panels2_xaxis_name = 'star_age'
-         else if (s% star_age*secyer > 24*60*60) then
-            s% History_Panels2_xaxis_name = 'star_age_day'
-         else if (s% star_age*secyer > 60*60) then
-            s% History_Panels2_xaxis_name = 'star_age_hr'
-         else if (s% star_age*secyer > 60) then
-            s% History_Panels2_xaxis_name = 'star_age_min'
-         else
-            s% History_Panels2_xaxis_name = 'star_age_sec'
-         end if
-      end subroutine set_pgstar_controls
    
 
       ! returns either keep_going or terminate.

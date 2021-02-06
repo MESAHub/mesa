@@ -687,28 +687,10 @@
          if (dbg) write(*,*) 'call star_finish_step'
          result = star_finish_step(id, ierr)
          if (failed('star_finish_step',ierr)) return         
-         if (s% job% save_photo_when_terminate) then
-            if (len_trim(s% job% required_termination_code_string) > 0 .and. &
-                s% termination_code > 0) then ! check termination code
-               if (s% job% required_termination_code_string == &
-                   termination_code_str(s% termination_code)) then
-                  s% job% save_photo_number = s% model_number
-               end if
-            else
-               s% job% save_photo_number = s% model_number 
-            end if
-         end if         
-         if (s% job% save_model_when_terminate) then
-            if (len_trim(s% job% required_termination_code_string) > 0 .and. &
-                s% termination_code > 0) then ! check termination code
-               if (s% job% required_termination_code_string == &
-                   termination_code_str(s% termination_code)) then
-                  s% job% save_model_number = s% model_number
-               end if
-            else
-               s% job% save_model_number = s% model_number 
-            end if
-         end if                          
+         if (s% job% save_photo_when_terminate .and. termination_code_string_okay()) &
+            s% job% save_photo_number = s% model_number
+         if (s% job% save_model_when_terminate .and. termination_code_string_okay()) &
+            s% job% save_model_number = s% model_number 
          if (s% job% save_pulse_data_when_terminate) &
             s% job% save_pulse_data_for_model_number = s% model_number
          if (s% job% write_profile_when_terminate) then
@@ -741,6 +723,25 @@
          end if
          call do_saves(id, ierr)
          if (failed('do_saves terminate_normal_evolve_loop',ierr)) return
+         
+         contains
+         
+         logical function termination_code_string_okay()
+            integer :: j, n
+            termination_code_string_okay = .true.
+            if (s% termination_code == 0) return
+            n = num_termination_code_strings
+            j = maxval(len_trim(s% job% required_termination_code_string(1:n)))
+            if (j == 0) return
+            termination_code_string_okay = .false.
+            do j=1,num_termination_code_strings
+               if (s% job% required_termination_code_string(j) == &
+                   termination_code_str(s% termination_code)) then
+                  termination_code_string_okay = .true.
+                  return
+               end if
+            end do
+         end function termination_code_string_okay
 
       end subroutine terminate_normal_evolve_loop
 

@@ -230,11 +230,12 @@
       ! save final model when a run terminates
       ! only happens if satisfy required termination code
       ! if string is empty, then this matches all termination codes
+      ! there can be several different alternative termination codes
 
       ! ::
 
     save_model_when_terminate = .false.
-    required_termination_code_string = ''
+    required_termination_code_string(:) = ''
 
 
       ! save_model_filename
