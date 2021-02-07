@@ -1,0 +1,41 @@
+compare to Woosley ApJ 836 244, 2017.
+
+M_zams   M_He  M_CO  M_Fe  days  M_remnant   M_ejecta 
+ 80      39.4  23.3  1.19  0.16  39.4        0.0      direct to cc with no pulses
+ 90      44.0  31.3  2.58  1.18  36.4        7.6      16 pulses leading to cc
+100      49.5  34.0  2.32  3.39  39.5        10.0     14 pulses leading to cc
+110      57.5  36.4  1.93  8.10  43.6        13.9     10 pulses leading to cc
+120      60.7  36.5  2.18  24.3  44.0        16.7     10 strong pulses before stop at logR > 4
+150      80.3  55.6  0.0   3.38  54.9        25.4     large ejection by 1st pulse; stop at logR > 4 before 2nd
+200     110.2  67.2  0.0   0.01  0.0         110.2    unbound by 1st pulse; stop at remnant_M < 10 on way to 0
+
+M_He        mass of He core when remove H envelope
+M_CO        mass of final CO core
+M_Fe        mass of final Fe core
+days        time from 1st pulse to end
+M_ejecta    surface region with v > v_escape
+M_remnant   final mass excluding ejecta
+
+nothing special in run_star_extras; all done using simple-to-understand standard controls
+
+the pgstar plots have lots of useful information for understanding the progress to core collapse.
+
+Z = 1.6d-3; rotation off for these runs; wind during H and He core burning (Dutch_scaling_factor = 0.5d0), off after that
+to avoid problems with H/He ionization zones, keep surface cell at high temperature by setting tau_surface = 1d7
+semiconvection and thermohaline on during H and He core burning, off after that
+no overshooting; MLT++ on
+remove H envelope after finish core He burning; change remaining traces of H1 to He4
+use_gold2_tolerances on (except during remove envelope)
+op_split_burn for cells with logT > 9.0
+after end of core C burn, change to Riemann hydro and hybrid amr mesh to prepare for strong shocks
+also, now turn off convection for cells with T > 1d9 to avoid violating mlt assumptions during rapid changes in core
+prepare for start of pulses by evolving until reach target max temp (logTmax = 9.52) or start non_fe_core_infall (> 300 kms)
+consider mass to be "ejected" when it and all above it have v > local v_esc.
+stop run when fe_core_infall > 100 kms, logR > 4.0, or remnant mass < 10M.
+for simplicity, keep ejected mass as part of the model rather than removing it.
+can follow cases to completion that end in core collapse or complete unbinding.
+intermediate cases have such long times between pulses that the ejecta must be removed for the run to continue.
+that is beyond the scope of this test but is the subject of the ppisn case.
+
+
+

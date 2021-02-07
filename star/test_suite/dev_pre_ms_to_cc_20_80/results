@@ -1,0 +1,18 @@
+
+M_zams   M_He  M_CO  M_Fe
+20       6.34  2.35  1.52
+50       22.5  13.2  1.79
+80       39.4  23.9  1.85
+
+M_He     mass of final He core
+M_CO     mass of final CO core
+M_Fe     mass of final Fe core
+
+nothing special in run_star_extras; all done using simple-to-understand standard controls
+
+Z = 1.6d-3; rotation and wind off for these runs
+to avoid problems with H/He ionization zones, keep surface cell at high temperature by setting tau_surface = 1d6
+semiconvection and thermohaline on during H and He core burning, off after that
+no overshooting; MLT++ on; use_gold2_tolerances on; op_split_burn for cells with logT > 9.0
+
+the pgstar plots have lots of useful information for understanding the progress to core collapse.

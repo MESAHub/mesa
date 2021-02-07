@@ -20,8 +20,6 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      change_initial_Z = .true.
-
       new_rotation_flag = .true.
       near_zams_relax_omega_div_omega_crit = .true.
       change_rotation_flag = .false.  ! rotation off until near zams

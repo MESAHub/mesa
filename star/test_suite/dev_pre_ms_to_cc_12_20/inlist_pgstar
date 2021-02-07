@@ -143,7 +143,7 @@ Mixing_legend_txt_scale_factor = 0.9
 
 Profile_Panels3_yaxis_name(4) = 'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s' ! 'entropy'
-Profile_Panels3_other_dymin(4) = 1
+Profile_Panels3_other_dymin(4) = 0.14
 
 Profile_Panels3_yaxis_name(5) = 'logT'
 Profile_Panels3_other_yaxis_name(5) = 'burn_num_iters'
@@ -184,7 +184,7 @@ Profile_Panels1_num_panels = 4
 Profile_Panels1_yaxis_name(1) = 'logRho'
 Profile_Panels1_dymin(1) = 0.1
 Profile_Panels1_other_yaxis_name(1) = 'logT'
-Profile_Panels1_other_dymin(1) = 0.1
+Profile_Panels1_other_dymin(1) = 0.14
 
 Profile_Panels1_yaxis_name(2) = 'entropy'
 Profile_Panels1_other_yaxis_name(2) = 'pgas_div_p'
@@ -198,7 +198,7 @@ Profile_Panels1_other_dymin(3) = 0.08
 Profile_Panels1_yaxis_name(4) = 'log_opacity'
 Profile_Panels1_dymin(1) = 0.1
 Profile_Panels1_other_yaxis_name(4) = 'gradr'
-Profile_Panels1_other_dymin(1) = 0.1
+Profile_Panels1_other_dymin(1) = 0.14
 
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'
@@ -579,7 +579,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_yaxis_reversed(1) = .false.
     History_Panels1_ymin(1) = -101d0
     History_Panels1_ymax(1) = -101d0
-    History_Panels1_dymin(1) = 0.1
+    History_Panels1_dymin(1) = 0.14
 
       ! ::
 
@@ -587,7 +587,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_yaxis_reversed(1) = .false.
     History_Panels1_other_ymin(1) = -101d0
     History_Panels1_other_ymax(1) = -101d0
-    History_Panels1_other_dymin(1) = 0.1
+    History_Panels1_other_dymin(1) = 0.14
 
       ! ::
 
@@ -595,7 +595,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_yaxis_reversed(2) = .false.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
-    History_Panels1_dymin(2) = 0.1
+    History_Panels1_dymin(2) = 0.14
 
       ! ::
 
@@ -603,7 +603,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_yaxis_reversed(2) = .false.
     History_Panels1_other_ymin(2) = -101d0
     History_Panels1_other_ymax(2) = -101d0
-    History_Panels1_other_dymin(2) = 0.1
+    History_Panels1_other_dymin(2) = 0.14
 
       ! ::
 
@@ -611,7 +611,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_yaxis_reversed(3) = .false.
     History_Panels1_ymin(3) = -101d0
     History_Panels1_ymax(3) = -101d0
-    History_Panels1_dymin(3) = 0.1
+    History_Panels1_dymin(3) = 0.14
 
       ! ::
 
@@ -619,14 +619,14 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_yaxis_reversed(3) = .false.
     History_Panels1_other_ymin(3) = -101d0
     History_Panels1_other_ymax(3) = -101d0
-    History_Panels1_other_dymin(3) = 0.1
+    History_Panels1_other_dymin(3) = 0.14
       ! ::
 
     History_Panels1_yaxis_name(4) = 'retries'
     History_Panels1_yaxis_reversed(4) = .false.
     History_Panels1_ymin(4) = -101d0
     History_Panels1_ymax(4) = -101d0
-    History_Panels1_dymin(4) = -1
+    History_Panels1_dymin(4) = 0.14
 
       ! ::
 
@@ -634,7 +634,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
     History_Panels1_other_yaxis_reversed(4) = .false.
     History_Panels1_other_ymin(4) = -101d0
     History_Panels1_other_ymax(4) = -101d0
-    History_Panels1_other_dymin(4) = -1
+    History_Panels1_other_dymin(4) = 0.14
 
 
 !-----------------------------------------------------------------------

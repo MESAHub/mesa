@@ -63,7 +63,7 @@
       terminal_show_log_age = .false.
 
       num_trace_history_values = 4
-      trace_history_value_name(1) = 'non_fe_core_infall'
+      trace_history_value_name(1) = 'Fe_core'
       trace_history_value_name(2) = 'fe_core_infall'
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
@@ -92,10 +92,10 @@ Profile_Panels3_xmin = -101d0
 Profile_Panels3_xmax = -101d0
 Profile_Panels3_xaxis_reversed = .true.
 
-
-
 Profile_Panels3_yaxis_name(4) = 'gamma1'
+Profile_Panels3_dymin(4) = 0.14
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
+Profile_Panels3_dymin(4) = 0.14
 
 TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 10
