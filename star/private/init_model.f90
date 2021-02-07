@@ -80,7 +80,7 @@
          integer :: nz
          real(dp), dimension(:,:), pointer :: xh, xa
          real(dp), dimension(:), pointer :: &
-            q, dq, omega, am_nu_rot
+            q, dq, omega, D_omega, am_nu_rot
          real(dp) :: init_mass
          logical :: in_range
          real(dp), parameter :: lg_max_abs_mdot = -3.5d0
@@ -100,7 +100,7 @@
 
          call get1_zams_model( &
             s, zams_filename, nz, xh, xa, q, dq, &
-            omega, am_nu_rot, in_range, ierr)
+            omega, D_omega, am_nu_rot, in_range, ierr)
          if (ierr /= 0) then
             write(*,1) 'failed in get1_zams_model'
             stop 'get_zams_model'
@@ -120,6 +120,7 @@
          s% q(1:nz) = q(1:nz)
          s% dq(1:nz) = dq(1:nz)
          s% omega(1:nz) = omega(1:nz)
+         s% D_omega(1:nz) = D_omega(1:nz)
          s% am_nu_rot(1:nz) = am_nu_rot(1:nz)
 
          call dealloc
@@ -138,7 +139,7 @@
          contains
 
          subroutine dealloc
-            deallocate(xh, xa, q, dq, omega, am_nu_rot)
+            deallocate(xh, xa, q, dq, omega, D_omega, am_nu_rot)
          end subroutine dealloc
 
       end subroutine get_zams_model
@@ -146,7 +147,7 @@
 
       subroutine get1_zams_model( &
             s, zams_filename, nz, xh, xa, q, dq, &
-            omega, am_nu_rot, in_range, ierr)
+            omega, D_omega, am_nu_rot, in_range, ierr)
          use utils_lib
          use const_def, only: mesa_data_dir
          use net, only: set_net
@@ -155,7 +156,7 @@
          integer, intent(out) :: nz
          real(dp), dimension(:,:), pointer :: xh, xa
          real(dp), dimension(:), pointer :: &
-            q, dq, omega, j_rot, am_nu_rot
+            q, dq, omega, j_rot, D_omega, am_nu_rot
          logical, intent(out) :: in_range
          integer, intent(out) :: ierr
 
@@ -367,7 +368,7 @@
          real(dp) :: m_in, m_read, dprop, lnm1, lnm2
          real(dp), dimension(:, :), pointer :: xh2, xa2
          real(dp), dimension(:), pointer :: &
-            q2, dq2, omega2, j_rot2, am_nu_rot2, lnT2
+            q2, dq2, omega2, j_rot2, D_omega2, am_nu_rot2, lnT2
          real(dp) :: alfa, struct(nvar_hydro), comp(species)
          logical :: okay
          character (len=net_name_len) :: net_name
@@ -381,7 +382,7 @@
 
          allocate( &
             xh2(nvar_hydro, nz2), xa2(species, nz2), q2(nz2), dq2(nz2), &
-            omega2(nz2), j_rot2(nz2), am_nu_rot2(nz2), &
+            omega2(nz2), j_rot2(nz2), D_omega2(nz2), am_nu_rot2(nz2), &
             lnT2(nz2), names(species), perm(species), stat=ierr)
          if (ierr /= 0) return
          okay = .false.
@@ -476,7 +477,7 @@
 
          subroutine dealloc
             deallocate(xh2, xa2, q2, dq2, &
-               omega2, j_rot2, am_nu_rot2, &
+               omega2, j_rot2, D_omega2, am_nu_rot2, &
                lnT2, names, perm)
          end subroutine dealloc
 

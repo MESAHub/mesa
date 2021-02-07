@@ -3382,6 +3382,21 @@
          s% D_omega_flag = D_omega_flag
          s% D_omega(1:s% nz) = 0
       end subroutine set_D_omega_flag
+
+
+      subroutine set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
+         integer, intent(in) :: id
+         logical, intent(in) :: am_nu_rot_flag
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         include 'formats'
+         ierr = 0
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         if (s% am_nu_rot_flag .eqv. am_nu_rot_flag) return
+         s% am_nu_rot_flag = am_nu_rot_flag
+         s% am_nu_rot(1:s% nz) = 0
+      end subroutine set_am_nu_rot_flag
       
 
       subroutine set_rotation_flag(id, rotation_flag, ierr)

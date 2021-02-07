@@ -509,6 +509,18 @@
                   return
                end if
             end if
+            if (s% am_nu_rot_flag) then
+               call set_D_omega( & ! reuse the set_D_omega routine to set am_nu_rot
+                  s, nz, k_const_mass, k_newval, &
+                  rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
+                  s% am_nu_rot, oldloc, newloc, oldval, newval, work, ierr)
+               if (ierr /= 0) then
+                  s% retry_message = 'set_am_nu_rot failed in adjust mass'
+                  if (s% report_ierr) write(*,*) s% retry_message
+                  call dealloc
+                  return
+               end if
+            end if
          end if
 
          ! soften outer xa    (Pablo -- this should be the very last step)

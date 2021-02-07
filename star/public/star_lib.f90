@@ -886,6 +886,15 @@
          integer, intent(out) :: ierr
          call set_D_omega_flag(id, D_omega_flag, ierr)
       end subroutine star_set_D_omega_flag
+      
+      
+      subroutine star_set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
+         use alloc, only: set_am_nu_rot_flag
+         integer, intent(in) :: id
+         logical, intent(in) :: am_nu_rot_flag
+         integer, intent(out) :: ierr
+         call set_am_nu_rot_flag(id, am_nu_rot_flag, ierr)
+      end subroutine star_set_am_nu_rot_flag
 
       
       ! this routine is for adding or removing velocity variables.

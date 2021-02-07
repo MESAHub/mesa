@@ -1763,6 +1763,26 @@
          am_nu_ST_factor = s% am_nu_ST_factor
          am_nu_visc_factor = s% am_nu_visc_factor
          
+         if ((.not. s% am_nu_rot_flag) .and. &
+               (s% D_omega_flag .and. .not. s% job% use_D_omega_for_am_nu_rot)) then
+            ! check for any am_nu factors > 0 and not same as for D_omega
+            okay = .true.
+            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% D_DSI_factor) okay = .false.
+            if (am_nu_SH_factor >= 0 .and. am_nu_SH_factor /= s% D_SH_factor) okay = .false.
+            if (am_nu_SSI_factor >= 0 .and. am_nu_SSI_factor /= s% D_SSI_factor) okay = .false.
+            if (am_nu_DSI_factor >= 0 .and. am_nu_DSI_factor /= s% D_DSI_factor) okay = .false.
+            if (am_nu_ES_factor >= 0 .and. am_nu_ES_factor /= s% D_ES_factor) okay = .false.
+            if (am_nu_GSF_factor >= 0 .and. am_nu_GSF_factor /= s% D_GSF_factor) okay = .false.
+            if (am_nu_ST_factor >= 0 .and. am_nu_ST_factor /= s% D_ST_factor) okay = .false.
+            if (.not. okay) then
+               write(*,*) 'have an am_nu factor >= 0 and not same as corresponding D_omega factor'
+               write(*,*) 'so if want smoothing like D_omega, must set am_nu_rot_flag true'
+               write(*,*) 'please fix this'
+               ierr = -1
+               return
+            end if
+         end if
+         
          ! If am_nu_..._factor < -1, use the D_..._factor
          if (am_nu_DSI_factor < 0) am_nu_DSI_factor = s% D_DSI_factor
          if (am_nu_SH_factor < 0) am_nu_SH_factor = s% D_SH_factor
@@ -1780,6 +1800,11 @@
             s% ye(nz) >= s% min_center_Ye_for_min_am_nu_non_rot .and. &
             (.not. s% set_uniform_am_nu_non_rot)
 
+         if (s% am_nu_rot_flag) then
+            call set_am_nu_rot(ierr)
+            if (ierr /= 0) return
+         end if
+
          do k=1,nz
             if (s% set_uniform_am_nu_non_rot) then
                s% am_nu_non_rot(k) = s% uniform_am_nu_non_rot
@@ -1789,14 +1814,20 @@
             end if
             if (set_min_am_nu_non_rot) &
                s% am_nu_non_rot(k) = max(s% min_am_nu_non_rot, s% am_nu_non_rot(k))
-            s% am_nu_rot(k) = s% am_nu_factor * ( &
-               am_nu_visc_factor*s% D_visc(k) + &
-               am_nu_DSI_factor*s% D_DSI(k) + &
-               am_nu_SH_factor*s% D_SH(k) + &
-               am_nu_SSI_factor*s% D_SSI(k) + &
-               am_nu_ES_factor*s% D_ES(k) + &
-               am_nu_GSF_factor*s% D_GSF(k) + &
-               am_nu_ST_factor*s% nu_ST(k))
+            if (s% am_nu_rot_flag) then
+               ! already have am_nu_rot(k) from calling set_am_nu_rot above
+            else if (s% D_omega_flag .and. s% job% use_D_omega_for_am_nu_rot) then
+               s% am_nu_rot(k) = s% am_nu_factor*s% D_omega(k)
+            else
+               s% am_nu_rot(k) = s% am_nu_factor * ( &
+                  am_nu_visc_factor*s% D_visc(k) + &
+                  am_nu_DSI_factor*s% D_DSI(k) + &
+                  am_nu_SH_factor*s% D_SH(k) + &
+                  am_nu_SSI_factor*s% D_SSI(k) + &
+                  am_nu_ES_factor*s% D_ES(k) + &
+                  am_nu_GSF_factor*s% D_GSF(k) + &
+                  am_nu_ST_factor*s% nu_ST(k))
+            end if
             if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
             s% am_nu_omega(k) = &
                s% am_nu_omega_non_rot_factor*s% am_nu_non_rot(k) + &
@@ -1879,6 +1910,170 @@
                end if
             end do
          end subroutine check_D_omega
+         
+         subroutine set_am_nu_rot(ierr)
+            use alloc
+            use rotation_mix_info, only: smooth_for_rotation
+            integer, intent(out) :: ierr
+            integer :: i, k, nz
+            real(dp) :: &
+               dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
+               d_dt, d_dt_in, d_dt_out, am_nu_rot_source
+            include 'formats'
+         
+            ierr = 0
+            nz = s% nz
+            dt = s% dt
+         
+            if (s% am_nu_rot_flag .and. s% doing_finish_load_model) then
+               do k=1,nz
+                  s% am_nu_rot(k) = 0d0
+               end do
+            else if (s% am_nu_rot_flag) then
+                     
+               do k=1,nz
+                  if (s% q(k) <= s% max_q_for_nu_omega_zero_in_convection_region .and. &
+                      s% mixing_type(k) == convective_mixing) then
+                     s% am_nu_rot(k) = 0d0
+                     cycle
+                  end if
+                  am_nu_rot_source = s% am_nu_factor * ( &
+                     am_nu_visc_factor*s% D_visc(k) + &
+                     am_nu_DSI_factor*s% D_DSI(k) + &
+                     am_nu_SH_factor*s% D_SH(k) + &
+                     am_nu_SSI_factor*s% D_SSI(k) + &
+                     am_nu_ES_factor*s% D_ES(k) + &
+                     am_nu_GSF_factor*s% D_GSF(k) + &
+                     am_nu_ST_factor*s% nu_ST(k))
+                  if (is_bad(am_nu_rot_source)) then
+                     write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
+                     stop 'set am_nu_rot'
+                  end if
+                  s% am_nu_rot(k) = am_nu_rot_source
+                  if (is_bad(s% am_nu_rot(k))) then
+                     write(*,2) 's% am_nu_rot(k)', k, s% am_nu_rot(k)
+                     write(*,2) 'am_nu_rot_source', k, am_nu_rot_source
+                     stop 'set am_nu_rot'
+                  end if
+               end do
+               
+               if (s% smooth_am_nu_rot > 0 .or. &
+                    (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0)) then
+                  
+                  call do_alloc(ierr)
+                  if (ierr /= 0) return
+
+                  if (s% smooth_am_nu_rot > 0) then
+                     call smooth_for_rotation(s, s% am_nu_rot, s% smooth_am_nu_rot, sig)
+                  end if
+            
+                  if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
+            
+                     rate = min(s% nu_omega_mixing_rate, 1d0/dt)
+                     do k=2,nz-1
+                        if (s% am_nu_rot(k) == 0 .or. s% am_nu_rot(k+1) == 0) then
+                           sig(k) = 0
+                        else if ((.not. s% nu_omega_mixing_across_convection_boundary) .and. &
+                           s% mixing_type(k) /= convective_mixing .and. &
+                               (s% mixing_type(k-1) == convective_mixing .or. &
+                                s% mixing_type(k+1) == convective_mixing)) then
+                            sig(k) = 0
+                        else
+                           sig(k) = rate*dt
+                        end if       
+                     end do
+                     sig(1) = 0
+                     sig(nz) = 0
+            
+                     do k=1,nz
+                        if (k < nz) then
+                           d_dt_in = sig(k)*(s% am_nu_rot(k+1) - s% am_nu_rot(k))
+                        else
+                           d_dt_in = -sig(k)*s% am_nu_rot(k)
+                        end if
+                        if (k > 1) then
+                           d_dt_out = sig(k-1)*(s% am_nu_rot(k) - s% am_nu_rot(k-1))
+                           d_ddt_dm1 = sig(k-1)
+                           d_ddt_d00 = -(sig(k-1) + sig(k))
+                        else
+                           d_dt_out = 0
+                           d_ddt_dm1 = 0
+                           d_ddt_d00 = -sig(k)
+                        end if
+                        d_dt = d_dt_in - d_dt_out
+                        d_ddt_dp1 = sig(k)
+                        rhs(k) = d_dt
+                        d(k) = 1d0 - d_ddt_d00
+                        if (k < nz) then
+                           du(k) = -d_ddt_dp1
+                        else
+                           du(k) = 0
+                        end if
+                        if (k > 1) dl(k-1) = -d_ddt_dm1               
+                     end do
+                     dl(nz) = 0
+            
+                     ! solve tridiagonal
+                     bp(1) = d(1)
+                     vp(1) = rhs(1)
+                     do i = 2,nz
+                        if (bp(i-1) == 0) then
+                           write(*,*) 'failed in set_am_nu_rot', s% model_number
+                           stop 'mix_am_nu_rot'
+                           ierr = -1
+                           return
+                        end if
+                        m = dl(i-1)/bp(i-1)
+                        bp(i) = d(i) - m*du(i-1)
+                        vp(i) = rhs(i) - m*vp(i-1)
+                     end do
+                     xp(nz) = vp(nz)/bp(nz)
+                     x(nz) = xp(nz)
+                     do i = nz-1, 1, -1
+                        xp(i) = (vp(i) - du(i)*xp(i+1))/bp(i)
+                        x(i) = xp(i)
+                     end do
+            
+                     do k=2,nz
+                        if (is_bad(x(k))) then
+                           return
+                           write(*,3) 's% am_nu_rot(k) prev, x', k, &
+                              s% model_number, s% am_nu_rot(k), x(k), bp(i)
+                           stop 'mix_am_nu_rot'
+                        end if
+                     end do
+            
+                     ! update am_nu_rot
+                     do k=2,nz
+                        s% am_nu_rot(k) = s% am_nu_rot(k) + x(k)
+                        if (is_bad(s% am_nu_rot(k))) then
+                           write(*,3) 's% am_nu_rot(k)', k, s% model_number, s% am_nu_rot(k)
+                           stop 'mix_am_nu_rot'
+                        end if
+                        if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
+                     end do
+                     s% am_nu_rot(1) = 0d0
+                  
+                  end if
+                  
+                  call dealloc
+
+               end if
+            
+            end if
+         
+            if (s% am_nu_rot_flag) then ! check
+               do k=1,nz
+                  if (is_bad(s% am_nu_rot(k))) then
+                     write(*,2) 'before return s% am_nu_rot(k)', k, s% am_nu_rot(k)
+                     stop 'set_am_nu_rot'
+                  end if
+                  if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
+               end do
+            end if         
+         
+         end subroutine set_am_nu_rot
+
 
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr

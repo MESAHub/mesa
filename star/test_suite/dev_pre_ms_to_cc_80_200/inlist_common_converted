@@ -70,8 +70,8 @@
       delta_XSi_cntr_limit = 0.005d0
       delta_XSi_cntr_hard_limit = 0.1
       
-      dt_div_min_dr_div_cs_limit = 5d0
-      dt_div_min_dr_div_cs_hard_limit = 10d0
+      dt_div_min_dr_div_cs_limit = 3d0
+      dt_div_min_dr_div_cs_hard_limit = 6d0
 
 ! mesh
       use_split_merge_amr = .true.      

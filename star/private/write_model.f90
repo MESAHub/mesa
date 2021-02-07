@@ -103,6 +103,10 @@
             write(iounit,'(a)',advance='no') ', with angular velocities (omega)'
          if (BTEST(file_type, bit_for_j_rot)) &
             write(iounit,'(a)',advance='no') ', with specific angular momentum (j_rot)'
+         if (BTEST(file_type, bit_for_D_omega)) &
+            write(iounit,'(a)',advance='no') ', with omega diffusion coefficients (D_omega)'
+         if (BTEST(file_type, bit_for_am_nu_rot)) &
+            write(iounit,'(a)',advance='no') ', with am_nu_rot diffusion coefficients'
          if (BTEST(file_type, bit_for_u)) &
             write(iounit,'(a)',advance='no') ', with cell center Riemann velocities (u)'
          if (BTEST(file_type, bit_for_RTI)) &
