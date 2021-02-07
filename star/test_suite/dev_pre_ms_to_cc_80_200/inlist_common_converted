@@ -35,8 +35,6 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
       max_logT_for_mlt = 9.0d0
 
 ! mixing
