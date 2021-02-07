@@ -79,8 +79,7 @@
 
          integer :: nz
          real(dp), dimension(:,:), pointer :: xh, xa
-         real(dp), dimension(:), pointer :: &
-            q, dq, omega, D_omega, am_nu_rot
+         real(dp), dimension(:), pointer :: q, dq, omega
          real(dp) :: init_mass
          logical :: in_range
          real(dp), parameter :: lg_max_abs_mdot = -3.5d0
@@ -100,7 +99,7 @@
 
          call get1_zams_model( &
             s, zams_filename, nz, xh, xa, q, dq, &
-            omega, D_omega, am_nu_rot, in_range, ierr)
+            omega, in_range, ierr)
          if (ierr /= 0) then
             write(*,1) 'failed in get1_zams_model'
             stop 'get_zams_model'
@@ -120,8 +119,6 @@
          s% q(1:nz) = q(1:nz)
          s% dq(1:nz) = dq(1:nz)
          s% omega(1:nz) = omega(1:nz)
-         s% D_omega(1:nz) = D_omega(1:nz)
-         s% am_nu_rot(1:nz) = am_nu_rot(1:nz)
 
          call dealloc
 
@@ -139,7 +136,7 @@
          contains
 
          subroutine dealloc
-            deallocate(xh, xa, q, dq, omega, D_omega, am_nu_rot)
+            deallocate(xh, xa, q, dq, omega)
          end subroutine dealloc
 
       end subroutine get_zams_model
@@ -147,7 +144,7 @@
 
       subroutine get1_zams_model( &
             s, zams_filename, nz, xh, xa, q, dq, &
-            omega, D_omega, am_nu_rot, in_range, ierr)
+            omega, in_range, ierr)
          use utils_lib
          use const_def, only: mesa_data_dir
          use net, only: set_net
@@ -155,8 +152,7 @@
          character (len=*), intent(in) :: zams_filename
          integer, intent(out) :: nz
          real(dp), dimension(:,:), pointer :: xh, xa
-         real(dp), dimension(:), pointer :: &
-            q, dq, omega, j_rot, D_omega, am_nu_rot
+         real(dp), dimension(:), pointer :: q, dq, omega, j_rot
          logical, intent(out) :: in_range
          integer, intent(out) :: ierr
 
@@ -257,8 +253,7 @@
          nz = nz1
 
          allocate(xh(nvar_hydro,nz), xa(species,nz), q(nz), dq(nz), &
-            omega(nz), j_rot(nz), am_nu_rot(nz), &
-            lnT(nz), stat=ierr)
+            omega(nz), j_rot(nz), lnT(nz), stat=ierr)
          if (ierr /= 0) then
             close(iounit)
             return
@@ -267,7 +262,7 @@
          call get1_mass( &
                s, iounit, m1, nz1, m2, nz2, initial_mass, &
                nvar_hydro, species, xh, xa, q, dq, &
-               omega, j_rot, am_nu_rot, lnT, ierr)
+               omega, j_rot, lnT, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in get1_mass'
             stop 'get_zams_model'
@@ -350,7 +345,7 @@
       subroutine get1_mass( &
             s, iounit, m1, nz1, m2, nz2, initial_mass, &
             nvar_hydro, species, xh, xa, q, dq, &
-            omega, j_rot, am_nu_rot, lnT, ierr)
+            omega, j_rot, lnT, ierr)
          use read_model, only: read_properties, read1_model
          use chem_def, only: iso_name_length
          use read_model, only: get_chem_col_names
@@ -361,14 +356,14 @@
          real(dp), intent(inout) :: xh(:,:) ! (nvar_hydro,nz1)
          real(dp), intent(inout) :: xa(:,:) ! (species,nz1)
          real(dp), intent(inout), dimension(:) :: &
-            q, dq, omega, j_rot, am_nu_rot, lnT ! (nz1)
+            q, dq, omega, j_rot, lnT ! (nz1)
          integer, intent(out) :: ierr
 
          integer :: i, k, nz, nz_in, iprop
          real(dp) :: m_in, m_read, dprop, lnm1, lnm2
          real(dp), dimension(:, :), pointer :: xh2, xa2
          real(dp), dimension(:), pointer :: &
-            q2, dq2, omega2, j_rot2, D_omega2, am_nu_rot2, lnT2
+            q2, dq2, omega2, j_rot2, lnT2
          real(dp) :: alfa, struct(nvar_hydro), comp(species)
          logical :: okay
          character (len=net_name_len) :: net_name
@@ -382,7 +377,7 @@
 
          allocate( &
             xh2(nvar_hydro, nz2), xa2(species, nz2), q2(nz2), dq2(nz2), &
-            omega2(nz2), j_rot2(nz2), D_omega2(nz2), am_nu_rot2(nz2), &
+            omega2(nz2), j_rot2(nz2), &
             lnT2(nz2), names(species), perm(species), stat=ierr)
          if (ierr /= 0) return
          okay = .false.
@@ -426,8 +421,7 @@
                if (m_read == m1) then
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
-                     xh, xa, q, dq, omega, j_rot, am_nu_rot, &
-                     lnT, perm, ierr)
+                     xh, xa, q, dq, omega, j_rot, lnT, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
                   if (m2 == m1) exit mass_loop
@@ -436,8 +430,7 @@
                else
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
-                     xh2, xa2, q2, dq2, omega2, j_rot2, am_nu_rot2, &
-                     lnT2, perm, ierr)
+                     xh2, xa2, q2, dq2, omega2, j_rot2, lnT2, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
                   nz = nz1
@@ -477,8 +470,7 @@
 
          subroutine dealloc
             deallocate(xh2, xa2, q2, dq2, &
-               omega2, j_rot2, D_omega2, am_nu_rot2, &
-               lnT2, names, perm)
+               omega2, j_rot2, lnT2, names, perm)
          end subroutine dealloc
 
       end subroutine get1_mass
