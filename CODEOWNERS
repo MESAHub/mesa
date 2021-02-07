@@ -70,8 +70,13 @@ star/test_suite/conserve_angular_momentum/
 #star/test_suite/create_zams/
 star/test_suite/custom_colors/ @rjfarmer
 star/test_suite/custom_rates/ @jschwab @evbauer @adamjermyn
-star/test_suite/det_riemann/ @fxt
-star/test_suite/dev_* @bill-paxton
+star/test_suite/dev_Eturb/ @bill-paxton
+star/test_suite/dev_high_rot_darkening/ @orlox
+star/test_suite/dev_ppisn/ @orlox @rjfarmer
+star/test_suite/dev_pre_ms_to_cc_12_20/ @bill-paxton
+star/test_suite/dev_pre_ms_to_cc_20_80/ @bill-paxton
+star/test_suite/dev_pre_ms_to_cc_80_200/ @bill-paxton
+star/test_suite/dev_split_burn_big_net/ @bill-paxton
 #star/test_suite/diffusion_smoothness/ 
 #star/test_suite/extended_convective_penetration/ 
 star/test_suite/gyre_* @rhdtownsend @annethoul
@@ -97,18 +102,15 @@ star/test_suite/make_sdb/ @evbauer
 #star/test_suite/make_zams_low_mass/ 
 #star/test_suite/make_zams_ultra_high_mass/
 star/test_suite/multiple_stars/ @mjoyceGR
-star/test_suite/noh_riemann/ @fxt
 star/test_suite/ns_c/ @rjfarmer
 star/test_suite/ns_h/ @rjfarmer
 star/test_suite/ns_he/ @rjfarmer
 #star/test_suite/other_physics_hooks/ 
-star/test_suite/ppisn/ @orlox @rjfarmer
 star/test_suite/radiative_levitation/ @evbauer
 star/test_suite/R_CrB_star/ @jschwab
 #star/test_suite/relax_composition_j_entropy/ 
 star/test_suite/rsp_* @rsmolec
 #star/test_suite/sample_pre_ms/ 
-star/test_suite/sedov_omega_1/ @fxt
 star/test_suite/semiconvection/ @annethoul
 star/test_suite/simplex_solar_calibration/ @mjoyceGR
 star/test_suite/split_burn_* @rjfarmer
