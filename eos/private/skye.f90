@@ -219,6 +219,13 @@ module skye
             packed_ya(j) = packed_ya(j) / norm
          end do
 
+         abar = 0d0
+         zbar = 0d0
+         do j=1,relevant_species
+            abar = abar + packed_ya(j) * packed_A(j)
+            zbar = zbar + packed_ya(j) * packed_Z(j)
+         end do
+
       end subroutine pack_species
 
       !>..given a temperature temp [K], density den [g/cm**3], and a composition 
@@ -303,6 +310,7 @@ module skye
 
          ! Ideal ion free energy. We explicitly don't include composition derivatives here because we haven't included them elsewhere.
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, packed_W(1:relevant_species), packed_ya(1:relevant_species))
+
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).

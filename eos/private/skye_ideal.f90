@@ -38,12 +38,19 @@ module skye_ideal
       n = den / (amu * abar) ! Number density of ions
       nQ = pow(kT, 1.5d0) / sifac ! Quantum density for a 1-amu species
 
+      write(*,*) kT
+      write(*,*) n
+      write(*,*) nQ
+
       F_ideal_ion = 0d0
       do j=1,species
          nj = ya(j) * n
          nQj = nQ * pow(weights(j), 1.5d0)
          F_ideal_ion = F_ideal_ion + ya(j) * (log(nj / nQj) - 1d0)
       end do
+
+      write(*,*) F_ideal_ion
+
       F_ideal_ion = F_ideal_ion * kt / (amu * abar)
 
    end function compute_F_ideal_ion
