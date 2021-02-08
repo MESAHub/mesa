@@ -375,7 +375,7 @@
             else
                lum = xh_old(i_lum,k)
             end if
-            if (s% Eturb_flag) wturb = wturb_old(k)
+            if (s% et_flag) wturb = wturb_old(k)
             write(iounit, fmt='(i27, 1x, 99(1pes27.16e3,1x))', advance='no') &
                k, q_old(k), safe_log10(dq_old(k)), new_in_old(k), &
                safe_log10(delta_gval_max(k))

@@ -83,8 +83,8 @@
    Pturb
    log_Pturb
    
-   Eturb
-   log_Eturb
+   et
+   log_et
    
    COUPL
    SOURCE

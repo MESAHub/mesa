@@ -22,7 +22,7 @@ do_one create_zahb "stop because center he4 < HB_limit" skip skip
 do_one create_zams "finished create main sequence" skip skip
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
-#   not yet       do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
+do_one dev_et "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   needs work, on in stale_tests branch    do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip

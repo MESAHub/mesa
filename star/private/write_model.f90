@@ -49,7 +49,7 @@
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
-            Eturb_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
+            et_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
             rsp_flag, no_L
          integer :: time_vals(8)
 
@@ -66,7 +66,7 @@
          chem_id => s% chem_id
          nvar_hydro = s% nvar_hydro
          nz = s% nz
-         Eturb_flag = s% Eturb_flag
+         et_flag = s% et_flag
          v_flag = s% v_flag
          u_flag = s% u_flag
          RTI_flag = s% RTI_flag
@@ -81,7 +81,7 @@
          write(iounit,'(a)') '!'
          prev_flag = (s% nz_old == s% nz .and. s% generations > 1)
          file_type = 0
-         if (Eturb_flag) file_type = file_type + 2**bit_for_Eturb
+         if (et_flag) file_type = file_type + 2**bit_for_et
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
          if (prev_flag) file_type = file_type + 2**bit_for_2models
@@ -92,7 +92,7 @@
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
          if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
          
-         no_L = (s% rsp_flag .or. s% Eturb_flag)
+         no_L = (s% rsp_flag .or. s% et_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
          
          write(iounit, '(i14)', advance='no') file_type
@@ -117,7 +117,7 @@
             write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', with luminosity (L), with turbulent energy (Et) and radiative flux (Fr) for RSP'
-         if (BTEST(file_type, bit_for_Eturb)) &
+         if (BTEST(file_type, bit_for_et)) &
             write(iounit,'(a)',advance='no') ', with wturb=sqrt(turbulent energy)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
@@ -202,8 +202,8 @@
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             end if            
-            if (Eturb_flag) then
-               call write1(s% Eturb(k),ierr); if (ierr /= 0) exit
+            if (et_flag) then
+               call write1(s% et(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit
@@ -269,12 +269,12 @@
          subroutine header
             write(iounit, fmt='(10x, a9, 1x, 99(a26, 1x))', advance='no') 'lnd', 'lnT', 'lnR'
             if (rsp_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'eturb_rsp'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'et_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'erad_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
-            else if (Eturb_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'Eturb'
+            else if (et_flag) then
+               write(iounit, fmt='(a26, 1x)', advance='no') 'et'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'

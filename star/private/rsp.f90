@@ -167,7 +167,7 @@
             s% xh(s% i_lnd,k) = log(1d0/s% Vol(k))
             s% xh(s% i_lnT,k) = log(s% T(k))
             s% xh(s% i_lnR,k) = log(s% r(k))
-            s% xh(s% i_eturb_RSP,k) = s% w(k)*s% w(k)
+            s% xh(s% i_etrb_RSP,k) = s% w(k)*s% w(k)
             do j=1,s% species
                s% xa(j,k) = xa(j)
             end do
@@ -337,8 +337,8 @@
             !$OMP END PARALLEL DO
             if (ALFAC == 0d0 .or. ALFAS == 0d0) then
                s% w(1:nz) = 0d0
-               s% Et(1:nz) = 0d0
-               s% xh(s% i_eturb_RSP,1:nz) = 0d0
+               s% Eturb(1:nz) = 0d0
+               s% xh(s% i_etrb_RSP,1:nz) = 0d0
             else
                !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
                do i = 1,nz
@@ -359,9 +359,9 @@
                do k=2,nz-1
                   s% w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
                   if (s% w(k) < 0d0) s% w(k) = 0d0
-                  s% Et(k) = s% w(k)**2
-                  s% xh(s% i_eturb_RSP,k) = s% Et(k)               
-                  s% w(k) = sqrt(s% xh(s% i_eturb_RSP,k))
+                  s% Eturb(k) = s% w(k)**2
+                  s% xh(s% i_etrb_RSP,k) = s% Eturb(k)               
+                  s% w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
                end do   
             end if         
          end if
@@ -394,7 +394,7 @@
          
          real(dp), allocatable :: VEL(:,:)
          real(dp), allocatable, dimension(:) :: &
-            M, DM, DM_BAR, R, Vol, T, Et, Lr
+            M, DM, DM_BAR, R, Vol, T, Eturb, Lr
          integer :: NMODES, I, k, sz
          real(dp) :: amix1, amix2, velkm
          
@@ -409,7 +409,7 @@
          sz = NZN+1
          
          allocate(VEL(sz,15), &
-            M(sz), DM(sz), DM_BAR(sz), R(sz), Vol(sz), T(sz), Et(sz), Lr(sz))
+            M(sz), DM(sz), DM_BAR(sz), R(sz), Vol(sz), T(sz), Eturb(sz), Lr(sz))
             
          do i=1,NZN
             k = NZN+1-i 
@@ -419,7 +419,7 @@
             R(i) = s% r(k)
             Vol(i) = s% Vol(k)
             T(i) = s% T(k)
-            Et(i) = s% Et(k)
+            Eturb(i) = s% Eturb(k)
             Lr(i) = 4d0*pi*s% r(k)**2*s% Fr(k)
          end do                    
         
@@ -427,7 +427,7 @@
 
          call do_LINA(s, s% RSP_L*SUNL, NZN, NMODES, VEL, &
             s% rsp_LINA_periods, s% rsp_LINA_growth_rates, &
-            M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
+            M, DM, DM_BAR, R, Vol, T, Eturb, Lr, ierr)
          if (ierr /= 0) return
 
          write(*,'(a)') '            P(days)         growth'

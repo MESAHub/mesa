@@ -49,9 +49,9 @@
          auto_diff_wrap_d_m1 => wrap_d_m1, &
          auto_diff_wrap_d_00 => wrap_d_00, &
          auto_diff_wrap_d_p1 => wrap_d_p1, &
-         auto_diff_wrap_eturb_m1 => wrap_eturb_m1, &
-         auto_diff_wrap_eturb_00 => wrap_eturb_00, &
-         auto_diff_wrap_eturb_p1 => wrap_eturb_p1, &
+         auto_diff_wrap_et_m1 => wrap_et_m1, &
+         auto_diff_wrap_et_00 => wrap_et_00, &
+         auto_diff_wrap_et_p1 => wrap_et_p1, &
          auto_diff_wrap_kap_m1 => wrap_kap_m1, &
          auto_diff_wrap_kap_00 => wrap_kap_00, &
          auto_diff_wrap_kap_p1 => wrap_kap_p1, &
@@ -858,16 +858,16 @@
       end subroutine star_set_j_rot_flag
 
 
-      subroutine star_set_Eturb_flag(id, Eturb_flag, ierr)
-         use alloc, only: set_Eturb_flag
+      subroutine star_set_et_flag(id, et_flag, ierr)
+         use alloc, only: set_et_flag
          integer, intent(in) :: id
-         logical, intent(in) :: Eturb_flag
+         logical, intent(in) :: et_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call set_Eturb_flag(id, Eturb_flag, ierr)
-      end subroutine star_set_Eturb_flag
+         call set_et_flag(id, et_flag, ierr)
+      end subroutine star_set_et_flag
 
 
       subroutine star_set_RSP_flag(id, RSP_flag, ierr)
