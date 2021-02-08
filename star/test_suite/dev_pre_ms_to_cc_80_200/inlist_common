@@ -88,6 +88,7 @@
       D_omega_mixing_across_convection_boundary = .false.
 
 ! timesteps
+      time_delta_coeff = 0.8
       varcontrol_target = 1d-3
       
       never_skip_hard_limits = .true
@@ -140,8 +141,8 @@
       delta_Ye_highT_limit = 1d-3
 
 ! mesh
-      mesh_delta_coeff = 1.6
-      mesh_delta_coeff_for_highT = 1.5      
+      mesh_delta_coeff = 1.3
+      mesh_delta_coeff_for_highT = 1.3      
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
       min_dq_for_xa = 1d-4 

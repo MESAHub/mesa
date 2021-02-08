@@ -269,9 +269,13 @@
          hydrid_zoning = s% split_merge_amr_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
-         nz_r_core = s% split_merge_amr_nz_r_core
-         r_core_cm = s% split_merge_amr_r_core_cm
          nz_baseline = s% split_merge_amr_nz_baseline         
+         nz_r_core = s% split_merge_amr_nz_r_core
+         if (s% split_merge_amr_mesh_delta_coeff /= 1d0) then
+            nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
+            nz_r_core = int(dble(nz_r_core)/s% split_merge_amr_mesh_delta_coeff)
+         end if
+         r_core_cm = s% split_merge_amr_r_core_cm
          dq_min = s% split_merge_amr_dq_min
          dq_max = s% split_merge_amr_dq_max
          inner_outer_q = 0d0

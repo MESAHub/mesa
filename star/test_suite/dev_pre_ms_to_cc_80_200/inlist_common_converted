@@ -40,6 +40,8 @@
 ! mixing
       
 ! timesteps      
+      !time_delta_coeff = 0.75
+      
       dX_nuc_drop_limit = 5d-2
       dX_nuc_drop_limit_at_high_T = 1d-2 ! for center logT > 9.45
 
@@ -74,10 +76,12 @@
 ! mesh
       use_split_merge_amr = .true.      
       split_merge_amr_hybrid_zoning = .true.
-      split_merge_amr_nz_r_core = 250
-      split_merge_amr_r_core_cm = 1d9
       
-      split_merge_amr_nz_baseline = 1500
+      split_merge_amr_r_core_cm = 1d9
+      split_merge_amr_nz_baseline = 1500 ! 2000 ! 
+      split_merge_amr_nz_r_core = 250
+      !split_merge_amr_mesh_delta_coeff = 1d0
+
       split_merge_amr_MaxLong = 1.4d0
       split_merge_amr_MaxShort = 1.4d0
       split_merge_amr_max_iters = 20
