@@ -1,6 +1,7 @@
    
       model_number ! counting from the start of the run
       day ! elapsed simulated time in days since the start of the run
+      star_age_day
       
       rsp_phase
       !rsp_GRPDV
@@ -25,7 +26,7 @@
       log_R
       v_surf_km_s ! (km/s)
       v_surf_div_escape_v
-      !v_surf ! (cm/s)
+      v_surf ! (cm/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       v_div_csound_max
 

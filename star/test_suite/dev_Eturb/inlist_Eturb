@@ -50,61 +50,46 @@
 
 
 &controls  
-   !Eturb_Lsurf_factor = 0.25d0 ! for RSG and LBV
 
    initial_z = 0.02d0
    initial_mass = 30d0
    
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with Eturb
-      
-   use_momentum_outer_BC = .true.
+   max_years_for_timestep = 1d2
+   max_age = 1d6
+   
+   max_number_retries = 1
+   max_model_number = 2
 
+! timesteps
+   varcontrol_target = 1d-3 
+
+! atmosphere
    atm_option = 'T_tau'
    atm_T_tau_relation = 'Eddington'
    atm_T_tau_opacity = 'fixed'
    Pextra_factor = 2
-   
-   max_years_for_timestep = 1d2
-   max_age = 1d6
 
-   varcontrol_target = 1d-3 
-   
+! mesh
+   okay_to_remesh = .false.
+
+! Eturb
+!   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+!   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+!   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
+!   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq ~ Eturb_alfam
+!   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar   
+
+! solver   
+   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with Eturb
+      
+   use_momentum_outer_BC = .true.
+
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
-   
-   
-   max_number_retries = 1
-   max_model_number = 2
-   
-      !   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
-      !   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq ~ Eturb_alfam
-      !   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar   
       
-
-   !use_d_eos_dxa = .true.
-
-   okay_to_remesh = .false.
-  
-  
-  
-  ! TESTING
-  
-  !convergence_ignore_equL_residuals = .true.
-
-   !Eturb_alfa = 0d0 ! purely radiative model
-
-  !use_Fraley_time_centering = .true.
-  !use_avQ_art_visc = .true.
-
-
-! output controls
-   
-   !terminal_show_age_units = 'days'
-
+! output
    num_trace_history_values = 2
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'

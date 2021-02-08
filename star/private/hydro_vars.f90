@@ -979,14 +979,13 @@
             
          end if
          
-         if (s% need_to_reset_eturb) then
-            stop 'need_to_reset_eturb is not ready for use'
+         if (s% need_to_reset_Eturb) then
             if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, 1, s% nz, ierr)
             if (failed('set_mlt_vars')) return
             call reset_eturb_using_L(s,ierr)
             if (failed('reset_eturb_using_L')) return
-            s% need_to_reset_eturb = .false.
+            s% need_to_reset_Eturb = .false.
          end if
 
          if (.not. skip_brunt) then

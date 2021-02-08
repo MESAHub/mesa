@@ -2980,10 +2980,11 @@
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         !do j=1,s% nvar_hydro
-         !   write(*,2) trim(s% nameofvar(j)) // ' ' // trim(s% nameofequ(j)), j
-         !end do
-         !write(*,*)
+         write(*,*) 'set_Eturb_flag variables and equations'
+         do j=1,s% nvar_hydro
+            write(*,2) trim(s% nameofvar(j)) // ' ' // trim(s% nameofequ(j)), j
+         end do
+         write(*,*)
 
          call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
          if (ierr /= 0) return
