@@ -576,8 +576,8 @@
             if (failed('lnT')) exit
             call do1(s% lnR, c% lnR)
             if (failed('lnR')) exit
-            call do1(s% Et, c% Et)
-            if (failed('Et')) exit
+            call do1(s% RSP_Et, c% RSP_Et)
+            if (failed('RSP_Et')) exit
             call do1(s% L, c% L)
             if (failed('L')) exit
             call do1(s% v, c% v)

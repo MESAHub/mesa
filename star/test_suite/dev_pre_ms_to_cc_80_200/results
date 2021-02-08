@@ -4,11 +4,8 @@ M_zams   M_He  M_CO  M_Fe  days  M_remnant   M_ejecta
  80      39.4  23.3  1.19  0.16  39.4        0.0      direct to cc with no pulses
  90      44.0  31.3  2.58  1.18  36.4        7.6      16 pulses leading to cc
 100      49.5  34.0  2.32  3.39  39.5        10.0     14 pulses leading to cc
-
-110      57.5  36.4  1.93  8.10  43.6        13.9     10 pulses leading to cc
 110      57.5  36.6  1.71  27.4  43.1        14.4     11 pulses before stop at logR > 4
-
-120      60.7  36.5  2.18  24.3  44.0        16.7     10 strong pulses before stop at logR > 4
+120      60.7  36.5  2.18  24.3  44.0        16.7     10 pulses before stop at logR > 4
 150      80.3  55.6  0.0   3.38  54.9        25.4     large ejection by 1st pulse; stop at logR > 4 before 2nd
 200     110.2  67.2  0.0   0.01  0.0         110.2    unbound by 1st pulse; stop at remnant_M < 10 on way to 0
 

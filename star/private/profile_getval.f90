@@ -1894,25 +1894,25 @@
                if (s% Eturb_flag) then
                   val = s% Eturb(k)*s% rho(k)
                else if (s% RSP_flag) then
-                  val = s% Et(k)*s% rho(k)
+                  val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Pturb)
                if (s% Eturb_flag) then
                   val = safe_log10(s% Eturb(k)*s% rho(k))
                else if (s% RSP_flag) then
-                  val = safe_log10(s% Et(k)*s% rho(k))
+                  val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_Eturb)
                if (s% Eturb_flag) then
                   val = s% Eturb(k)
                else if (s% RSP_flag) then
-                  val = s% Et(k)
+                  val = s% RSP_Et(k)
                end if               
             case(p_log_Eturb)
                if (s% Eturb_flag) then
                   val = safe_log10(s% Eturb(k))
                else if (s% RSP_flag) then
-                  val = safe_log10(s% Et(k))
+                  val = safe_log10(s% RSP_Et(k))
                end if
             case(p_avQ)
                if (s% use_avQ_art_visc .or. s% RSP_flag) val = s% avQ(k)
@@ -1950,10 +1950,10 @@
                if (rsp_or_eturb) val = s% Lt(k)/s% L(k)
                
             case(p_rsp_Et)
-               if (s% rsp_flag) val = s% Et(k)
+               if (s% rsp_flag) val = s% RSP_Et(k)
             case(p_rsp_logEt)
                if (s% rsp_flag) &
-                  val = safe_log10(s% Et(k))
+                  val = safe_log10(s% RSP_Et(k))
             case(p_rsp_vt)
                if (s% rsp_flag) val = sqrt2*s% w(k)
             case(p_rsp_vt_div_cs)

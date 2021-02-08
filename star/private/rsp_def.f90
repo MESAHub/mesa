@@ -488,10 +488,10 @@
       
       
       subroutine set_build_vars(s, &
-            m, dm, dm_bar, r, Vol, T, Et, Lr, Lc)
+            m, dm, dm_bar, r, Vol, T, RSP_Et, Lr, Lc)
          type (star_info), pointer :: s
          real(dp), dimension(:), intent(in) :: &
-            m, dm, dm_bar, r, Vol, T, Et, Lr, Lc
+            m, dm, dm_bar, r, Vol, T, RSP_Et, Lr, Lc
          integer :: k, i
          include 'formats'
          do i=1, NZN
@@ -502,8 +502,8 @@
             s% r(k) = r(i)
             s% Vol(k) = Vol(i)
             s% T(k) = T(i)
-            s% Et(k) = Et(i)
-            s% w(k) = sqrt(s% Et(k))
+            s% RSP_Et(k) = RSP_Et(i)
+            s% w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = Lr(i)/(4d0*pi*s% r(k)**2)
             s% erad(k) = crad*s% T(k)**4*s% Vol(k)
             s% L(k) = Lr(i) + Lc(i)
@@ -574,8 +574,8 @@
             s% xh(s% i_lnT, k) = s% lnT(k)            
             s% lnR(k) = log(s% r(k))
             s% xh(s% i_lnR, k) = s% lnR(k)            
-            s% Et(k) = s% w(k)*s% w(k)
-            s% xh(s% i_eturb_RSP, k) = s% Et(k)               
+            s% RSP_Et(k) = s% w(k)*s% w(k)
+            s% xh(s% i_eturb_RSP, k) = s% RSP_Et(k)               
             s% xh(s% i_v, k) = s% v(k)            
          end do
       end subroutine set_star_vars
@@ -596,8 +596,8 @@
             s% T(k) = exp(s% lnT(k))
             s% lnR(k) = s% xh(s% i_lnR,k)
             s% r(k) = exp(s% lnR(k))
-            s% Et(k) = s% xh(s% i_eturb_RSP,k)
-            s% w(k) = sqrt(s% Et(k))
+            s% RSP_Et(k) = s% xh(s% i_eturb_RSP,k)
+            s% w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
             s% v(k) = s% xh(s% i_v,k)
             if (k == NZN) then ! center
@@ -716,11 +716,11 @@
       
       
       subroutine cleanup_for_LINA( &
-            s, M, DM, DM_BAR, R, Vol, T, Et, P, ierr)
+            s, M, DM, DM_BAR, R, Vol, T, RSP_Et, P, ierr)
          use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          real(dp), intent(inout), dimension(:) :: &
-            M, DM, DM_BAR, R, Vol, T, Et, P
+            M, DM, DM_BAR, R, Vol, T, RSP_Et, P
          integer, intent(out) :: ierr
          
          integer :: I, k
@@ -735,7 +735,7 @@
             s% r(k) = R(i)
             s% Vol(k) = Vol(i)
             s% T(k) = T(i)
-            s% w(k) = sqrt(Et(i))
+            s% w(k) = sqrt(RSP_Et(i))
             s% P(k) = P(i)
             s% Prad(k) = crad*s% T(k)**4/3d0
             s% Pgas(k) = s% P(k) - s% Prad(k)
@@ -775,7 +775,7 @@
             R(i) = s% r(k)
             Vol(i) = s% Vol(k)
             T(i) = s% T(k)
-            Et(i) = s% w(k)**2
+            RSP_Et(i) = s% w(k)**2
          end do                    
       
       end subroutine cleanup_for_LINA
@@ -800,8 +800,8 @@
             ! some tweaks needed for bit-for-bit with photos
             
             ! sqrt(w**2) /= original w, so need to redo
-            s% Et(k) = s% w(k)**2
-            s% xh(s% i_eturb_RSP,k) = s% Et(k)               
+            s% RSP_Et(k) = s% w(k)**2
+            s% xh(s% i_eturb_RSP,k) = s% RSP_Et(k)               
             s% w(k) = sqrt(s% xh(s% i_eturb_RSP,k))
             
             ! exp(log(r)) /= original r, so need to redo

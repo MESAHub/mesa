@@ -405,7 +405,7 @@
                   end do
                else if (j == i_eturb_RSP) then
                   do k=1,nz
-                     s% Et(k) = max(0d0,s% xh(i_eturb_RSP,k))
+                     s% RSP_Et(k) = max(0d0,s% xh(i_eturb_RSP,k))
                   end do
                else if (j == i_ln_cvpv0) then
                   do k=1,nz
@@ -440,7 +440,7 @@
                            s% model_number, s% alpha_RTI(k)
                if (i_eturb_RSP /= 0) &
                   write(*,5) 'update_vars: Et', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% Et(k)
+                           s% model_number, s% RSP_Et(k)
                if (i_ln_cvpv0 /= 0) &
                   write(*,5) 'update_vars: conv_vel', k, s% solver_iter, s% solver_adjust_iter, &
                            s% model_number, s% conv_vel(k)
@@ -1111,7 +1111,7 @@
                s% conv_vel_start(k) = s% conv_vel(k)
             end if
             if (s% RSP_flag) then
-               s% w(k) = sqrt(s% Et(k))
+               s% w(k) = sqrt(s% RSP_Et(k))
                if (s% w_start(k) < -1d90) then
                   s% w_start(k) = s% w(k)
                end if

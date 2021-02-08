@@ -471,7 +471,7 @@
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
          real(dp), pointer, dimension(:) :: &
-            Vol, Vol_start, w, w_start, Et, COUPL_start, &
+            Vol, Vol_start, w, w_start, RSP_Et, COUPL_start, &
             Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
             Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &

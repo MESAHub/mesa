@@ -2120,7 +2120,7 @@
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
          if (s% Eturb_flag) cell_total = cell_total + s% Eturb(k)
-         if (s% rsp_flag) cell_total = cell_total + s% Et(k)
+         if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
       
@@ -2208,7 +2208,7 @@
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
             if (s% rsp_flag) then
-               cell1 = dm*s% Et(k)
+               cell1 = dm*s% RSP_Et(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2256,7 +2256,7 @@
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
-               cell1 = dm*s% Et(k)
+               cell1 = dm*s% RSP_Et(k)
                cell_total = cell_total + cell1
             end if
             total_energy_profile(k) = cell_total

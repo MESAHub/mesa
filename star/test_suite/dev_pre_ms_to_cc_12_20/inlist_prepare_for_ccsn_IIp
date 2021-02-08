@@ -177,7 +177,7 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      photo_interval = 100
+      photo_interval = 50
       profile_interval = 50
       history_interval = 10
       terminal_interval = 10

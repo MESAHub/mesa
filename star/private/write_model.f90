@@ -197,7 +197,7 @@
             call write1(s% lnT(k),ierr); if (ierr /= 0) exit
             call write1(s% lnR(k),ierr); if (ierr /= 0) exit            
             if (rsp_flag) then
-               call write1(s% Et(k),ierr); if (ierr /= 0) exit
+               call write1(s% RSP_Et(k),ierr); if (ierr /= 0) exit
                call write1(s% erad(k),ierr); if (ierr /= 0) exit
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
