@@ -36,7 +36,7 @@
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
       integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
-      integer, parameter :: bit_for_et = 6
+      integer, parameter :: bit_for_Eturb = 6
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
@@ -49,7 +49,7 @@
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
       integer, parameter :: increment_for_unused = 1
-      integer, parameter :: increment_for_i_et = 1
+      integer, parameter :: increment_for_i_eturb = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
       integer, parameter :: increment_for_D_omega_flag = 1
@@ -59,7 +59,7 @@
       integer, parameter :: increment_for_conv_vel_flag = 1
       integer, parameter :: increment_for_const_L = -1
       integer, parameter :: max_increment = increment_for_unused &
-                                          + increment_for_i_et &
+                                          + increment_for_i_eturb &
                                           + increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
                                           + increment_for_D_omega_flag &
@@ -241,7 +241,7 @@
             q, dq, omega, j_rot, lnT
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_et, i_etrb_RSP, &
+         integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_eturb_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -259,26 +259,26 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          no_L = (i_lum == 0)
-         i_et = s% i_et
+         i_eturb = s% i_eturb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
-         i_etrb_RSP = s% i_etrb_RSP
+         i_eturb_RSP = s% i_eturb_RSP
          i_erad_RSP = s% i_erad_RSP
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_et /= 0) n = n+increment_for_i_et ! read et
+         if (i_eturb /= 0) n = n+increment_for_i_eturb ! read eturb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
-         if (is_RSP_model) n = n+increment_for_rsp_flag ! read et, erad, Fr
+         if (is_RSP_model) n = n+increment_for_rsp_flag ! read eturb, erad, Fr
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
          if (is_RSP_model .and. .not. want_RSP_model) then
-            if (.not. s% et_flag) then
-               write(*,*) '(is_RSP_model .and. .not. want_RSP_model) requires et_flag true'
+            if (.not. s% Eturb_flag) then
+               write(*,*) '(is_RSP_model .and. .not. want_RSP_model) requires Eturb_flag true'
                ierr = -1
                return
             end if
@@ -318,19 +318,19 @@
             j=j+1; xh(i_lnR,i) = vec(j)            
             if (is_RSP_model) then
                if (want_RSP_model) then
-                  j=j+1; xh(i_etrb_RSP,i) = vec(j)
+                  j=j+1; xh(i_eturb_RSP,i) = vec(j)
                   j=j+1; xh(i_erad_RSP,i) = vec(j)
                   j=j+1; xh(i_Fr_RSP,i) = vec(j)
                   j=j+1; s% L(i) = vec(j)
-               else ! convert from RSP to et form
-                  j=j+1; xh(i_et,i) = max(min_et,vec(j))
+               else ! convert from RSP to Eturb form
+                  j=j+1; xh(i_eturb,i) = max(min_eturb,vec(j))
                   j=j+1; !xh(i_erad,i) = vec(j)
                   j=j+1; !xh(i_Fr,i) = vec(j)
                   j=j+1; s% L(i) = vec(j)
                end if
             end if            
-            if (i_et /= 0) then
-               j=j+1; xh(i_et,i) = max(min_et,vec(j))
+            if (i_eturb /= 0) then
+               j=j+1; xh(i_eturb,i) = max(min_eturb,vec(j))
             end if            
             if (.not. no_L) then
                j=j+1; xh(i_lum,i) = vec(j)
@@ -394,7 +394,7 @@
          
          if (want_RSP_model .and. .not. is_RSP_model) then
             ! proper values for these will be set in rsp_setup_part2
-            s% xh(i_etrb_RSP,1:nz) = 0d0 
+            s% xh(i_eturb_RSP,1:nz) = 0d0 
             s% xh(i_erad_RSP,1:nz) = 0d0 
             s% xh(i_Fr_RSP,1:nz) = 0d0 
          end if
@@ -550,7 +550,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% et_flag = BTEST(file_type, bit_for_et)
+         s% Eturb_flag = BTEST(file_type, bit_for_Eturb)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -573,9 +573,9 @@
          
          if (is_RSP_model .and. .not. want_RSP_model) then
             write(*,*)
-            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to et form'
+            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to Eturb form'
             write(*,*)
-            s% et_flag = .true.
+            s% Eturb_flag = .true.
          end if
          
          if (no_L .and. s% i_lum /= 0) then

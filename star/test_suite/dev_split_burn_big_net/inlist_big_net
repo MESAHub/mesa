@@ -3,23 +3,18 @@
 &star_job
 
       load_saved_model = .true.
-      saved_model_name = 'lgTmax.mod' ! for 20M, from pre_ms_to_cc_20_80
+      saved_model_name = 'lgTmax_9.5.mod' ! from pre_ms_to_cc_lo using given inlist_mass_Z_wind_rotation
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
       required_termination_code_string = 'xa_central_lower_limit'
 
       change_initial_net = .true.
-      new_net_name = 'mesa_201.net'
-      !new_net_name = 'mesa_128.net'
-      !new_net_name = 'mesa_80.net' 
+      !new_net_name = 'mesa_201.net'
+      new_net_name = 'mesa_80.net' ! good enough for testing
 
       set_initial_age = .true.
       initial_age = 0
-
-      set_initial_dt = .true.
-      !seconds_for_initial_dt = 1d3 ! ok for mesa_80.net
-      seconds_for_initial_dt = 2d2
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -27,7 +22,7 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -40,13 +35,10 @@
 &controls
       
       xa_central_lower_limit_species(1) = 'si28'
-      xa_central_lower_limit(1) = 0.57d0
-
-      when_to_stop_rtol = 1d99
-      when_to_stop_atol = 1d99
+      xa_central_lower_limit(1) = 0.55d0
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 40
+      max_model_number = 4000
       !max_number_retries = 37
 
 ! wind
@@ -62,18 +54,17 @@
 ! mixing
 
 ! timesteps
-      delta_lgT_max_hard_limit = 0.1 
+      delta_lgT_max_hard_limit = 0.1 ! relax this limit for core collapse
 
 ! mesh
 
 ! solver
+      when_to_stop_rtol = 1d99
+      when_to_stop_atol = 1d99
+      
+      use_gold2_tolerances = .false.
 
 ! output
-      terminal_show_age_units = 'secs'
-      terminal_show_timestep_units = 'secs'
-      terminal_show_log_dt = .false.
-      terminal_show_log_age = .false.
-      
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
@@ -85,8 +76,8 @@
 
 ! FOR DEBUGGING
       
-      report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1

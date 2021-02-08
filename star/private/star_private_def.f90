@@ -41,7 +41,7 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_et = 1d-20, min_et_pow_1_pt_5 = 1d-30
+      real(dp), parameter :: min_Eturb = 1d-20, min_Eturb_pow_1_pt_5 = 1d-30
 
 
       contains

@@ -60,7 +60,7 @@
             region_bottom_q, region_top_q
          real(dp), pointer, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
-         logical :: rsp_or_et, dbg
+         logical :: rsp_or_eturb, dbg
 
          integer(8) :: time0
          real(dp) :: total
@@ -76,7 +76,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         rsp_or_et = s% RSP_flag .or. s% et_flag
+         rsp_or_eturb = s% RSP_flag .or. s% Eturb_flag
 
          if (dbg) write(*, *) 'set_mixing_info'
          if (s% doing_timing) call start_time(s, time0, total)
@@ -135,10 +135,10 @@
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
-         else if (s% conv_vel_flag .or. s% et_flag) then
+         else if (s% conv_vel_flag .or. s% Eturb_flag) then
             do k = 1, nz
-               if (s% et_flag) then
-                  s% conv_vel(k) = sqrt2*sqrt(s% et(k))
+               if (s% Eturb_flag) then
+                  s% conv_vel(k) = sqrt2*sqrt(s% Eturb(k))
                   if (s% conv_vel(k) >= min_conv_vel_for_convective_mixing_type) then
                      s% mixing_type(k) = convective_mixing
                   else
@@ -233,7 +233,7 @@
             s% q, s% cdc, ierr)
          if (failed('locate_convection_boundaries')) return
          
-         if (.not. rsp_or_et) then
+         if (.not. rsp_or_eturb) then
             if (dbg) write(*,3) 'call add_predictive_mixing', &
                k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
             call add_predictive_mixing(s, ierr)
@@ -257,7 +257,7 @@
          call locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)
          if (failed('locate_mixing_boundaries')) return
 
-         if (.not. rsp_or_et) then
+         if (.not. rsp_or_eturb) then
             if (dbg) write(*,3) 'call add_overshooting', &
                k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
             call add_overshooting(s, ierr)
@@ -544,7 +544,7 @@
          nz = s% nz
          s% cz_bdy_dq(1:nz) = 0d0
          
-         if (s% rsp_flag .or. s% et_flag) return ! don't have MLT info
+         if (s% rsp_flag .or. s% Eturb_flag) return ! don't have MLT info
 
          do k = 2, nz
             mt1 = s% mixing_type(k-1)

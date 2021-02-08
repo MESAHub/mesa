@@ -521,13 +521,13 @@
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
-         s% et_flag = .false.
+         s% Eturb_flag = .false.
 
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% need_to_reset_et = .false.
+         s% need_to_reset_eturb = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.

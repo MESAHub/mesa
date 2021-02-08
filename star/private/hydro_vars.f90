@@ -289,8 +289,8 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_et, &
-            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_etrb_RSP, &
+         integer :: i_lnd, i_lnT, i_lnR, i_eturb, &
+            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_eturb_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
 
@@ -305,11 +305,11 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_et = s% i_et
+         i_eturb = s% i_eturb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
-         i_etrb_RSP = s% i_etrb_RSP
+         i_eturb_RSP = s% i_eturb_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
 
          if (s% doing_finish_load_model .or. .not. s% RSP_flag) then
@@ -382,10 +382,10 @@
                      s% lnR(k) = s% xh(i_lnR,k)
                      s% dxh_lnR(k) = 0d0
                   end do
-               else if (j == i_et) then
+               else if (j == i_eturb) then
                   do k=1,nz
-                     s% et(k) = max(s% xh(i_et, k), min_et)
-                     s% dxh_et(k) = 0d0
+                     s% Eturb(k) = max(s% xh(i_eturb, k), min_eturb)
+                     s% dxh_eturb(k) = 0d0
                   end do
                else if (j == i_lum) then
                   do k=1,nz
@@ -403,9 +403,9 @@
                   do k=1,nz
                      s% alpha_RTI(k) = max(0d0, s% xh(i_alpha_RTI,k))
                   end do
-               else if (j == i_etrb_RSP) then
+               else if (j == i_eturb_RSP) then
                   do k=1,nz
-                     s% Et(k) = max(0d0,s% xh(i_etrb_RSP,k))
+                     s% Et(k) = max(0d0,s% xh(i_eturb_RSP,k))
                   end do
                else if (j == i_ln_cvpv0) then
                   do k=1,nz
@@ -438,7 +438,7 @@
                if (i_alpha_RTI /= 0) &
                   write(*,5) 'update_vars: alpha_RTI', k, s% solver_iter, s% solver_adjust_iter, &
                            s% model_number, s% alpha_RTI(k)
-               if (i_etrb_RSP /= 0) &
+               if (i_eturb_RSP /= 0) &
                   write(*,5) 'update_vars: Et', k, s% solver_iter, s% solver_adjust_iter, &
                            s% model_number, s% Et(k)
                if (i_ln_cvpv0 /= 0) &
@@ -446,7 +446,7 @@
                            s% model_number, s% conv_vel(k)
             end if
 
-            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% et_flag)) s% L(1:nz) = 0d0
+            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% Eturb_flag)) s% L(1:nz) = 0d0
 
             if (i_v == 0) s% v(1:nz) = 0d0
 
@@ -559,7 +559,7 @@
 
                   if (i_lnd /= 0) s% dlnd_dt(1:nz) = 0
                   if (i_lnT /= 0) s% dlnT_dt(1:nz) = 0
-                  if (i_et /= 0) s% det_dt(1:nz) = 0
+                  if (i_eturb /= 0) s% deturb_dt(1:nz) = 0
                   if (i_lnR /= 0) s% dlnR_dt(1:nz) = 0
                   if (s% v_flag) s% dv_dt(1:nz) = 0
                   if (s% u_flag) s% du_dt(1:nz) = 0
@@ -575,8 +575,8 @@
                      if (i_u /= 0) s% du_dt(k) = 0
                      if (i_lnd /= 0) s% dlnd_dt(k) = 0
                      if (i_lnT /= 0) s% dlnT_dt(k) = 0
-                     if (i_et /= 0) s% det_dt(k) = 0
-                     if (i_etrb_RSP /= 0) s% dEt_dt(k) = 0
+                     if (i_eturb /= 0) s% deturb_dt(k) = 0
+                     if (i_eturb_RSP /= 0) s% dEt_dt(k) = 0
                      if (i_alpha_RTI /= 0) s% dalpha_RTI_dt(k) = 0
                      if (i_ln_cvpv0 /= 0) s% dln_cvpv0_dt(k) = 0
                   end do
@@ -654,16 +654,16 @@
                      end do
                   end if
 
-                  if (s% et_flag) then
+                  if (s% Eturb_flag) then
                      do k=k_below_just_added,nz
-                        s% det_dt(k) = (s% xh(i_et,k) - s% et_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% det_dt(k))) then
+                        s% deturb_dt(k) = (s% xh(i_eturb,k) - s% eturb_for_d_dt_const_m(k))*dt_inv
+                        if (is_bad(s% deturb_dt(k))) then
                            ierr = -1
-                           s% retry_message = 'update_vars: bad det_dt'
+                           s% retry_message = 'update_vars: bad deturb_dt'
                            if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad det_dt', k, s% det_dt(k)
+                              write(*,2) 'update_vars: bad deturb_dt', k, s% deturb_dt(k)
                            if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad det_dt', k, &
+                              write(*,2) 'update_vars: bad deturb_dt', k, &
                                  s% du_dt(k)
                               stop 'update_vars'
                            end if
@@ -852,7 +852,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_et, only: reset_et_using_L
+         use hydro_eturb, only: reset_eturb_using_L
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -922,7 +922,7 @@
 
          if (.not. skip_mixing_info) then
          
-            if (.not. s% et_flag) then
+            if (.not. s% Eturb_flag) then
                if (dbg) write(*,*) 'call other_adjust_mlt_gradT_fraction'
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
@@ -935,7 +935,7 @@
 
          end if
          
-         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% et_flag) then
+         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% Eturb_flag) then
          
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) &
@@ -979,13 +979,13 @@
             
          end if
          
-         if (s% need_to_reset_et) then
+         if (s% need_to_reset_Eturb) then
             if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, 1, s% nz, ierr)
             if (failed('set_mlt_vars')) return
-            call reset_et_using_L(s,ierr)
-            if (failed('reset_et_using_L')) return
-            s% need_to_reset_et = .false.
+            call reset_eturb_using_L(s,ierr)
+            if (failed('reset_eturb_using_L')) return
+            s% need_to_reset_Eturb = .false.
          end if
 
          if (.not. skip_brunt) then

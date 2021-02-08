@@ -53,7 +53,7 @@
             s, nz, nz_old, xh_old, xa_old, &
             energy_old, eta_old, lnd_old, lnPgas_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, &
-            conv_vel_old, lnT_old, et_old, specific_PE_old, specific_KE_old, &
+            conv_vel_old, lnT_old, eturb_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
          use interp_1d_def
@@ -63,7 +63,7 @@
          integer, dimension(:), pointer :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, conv_vel_old, lnT_old, et_old, &
+            lnd_old, lnPgas_old, conv_vel_old, lnT_old, eturb_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
@@ -193,13 +193,13 @@
             if (failed('dPdr_dRhodr_info')) return
          end if
 
-         if (s% et_flag) then
-            if (dbg) write(*,*) 'call do_et'
-            call do_et( &
+         if (s% Eturb_flag) then
+            if (dbg) write(*,*) 'call do_Eturb'
+            call do_Eturb( &
                s, nz, nz_old, nzlo, nzhi, comes_from, &
                xh, xh_old, xq, xq_old_plus1, xq_new, &
                work, tmp1, tmp2, ierr)
-            if (failed('do_et')) return
+            if (failed('do_Eturb')) return
          end if
 
          if (dbg) write(*,*) 'call do_lnR_and_lnd'
@@ -319,7 +319,7 @@
                s, nz_old, k, species, cell_type, comes_from, &
                xa, xh, xh_old, &
                xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
-               specific_PE_old, specific_KE_old, et_old, &
+               specific_PE_old, specific_KE_old, eturb_old, &
                density_new, energy_new, op_err)
             if (op_err /= 0) then
                write(*,2) 'failed for do1_lnT', k
@@ -890,60 +890,60 @@
       end subroutine do_alpha_RTI
 
 
-      subroutine do_et( &  
-            ! this is not being careful to conserve et.  may need to improve.
-            ! similarly not taking et into account in adjusting lnT to conserve energy.
+      subroutine do_Eturb( &  
+            ! this is not being careful to conserve Eturb.  may need to improve.
+            ! similarly not taking Eturb into account in adjusting lnT to conserve energy.
             s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, et_old_plus1, et_new, ierr)
+            xq, xq_old_plus1, xq_new, work, eturb_old_plus1, eturb_new, ierr)
          use interp_1d_def
          use interp_1d_lib
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
          real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, work, et_old_plus1, et_new, xq_new
+            xq, xq_old_plus1, work, eturb_old_plus1, eturb_new, xq_new
          integer, intent(out) :: ierr
 
-         integer :: n, i_et, k
+         integer :: n, i_eturb, k
 
          include 'formats'
 
          ierr = 0
-         i_et = s% i_et
+         i_eturb = s% i_eturb
          n = nzhi - nzlo + 1
 
          do k=1,nz_old
-            et_old_plus1(k) = xh_old(i_et,k)
+            eturb_old_plus1(k) = xh_old(i_eturb,k)
          end do
-         et_old_plus1(nz_old+1) = 0
+         eturb_old_plus1(nz_old+1) = 0
 
          call interpolate_vector( &
                nz_old+1, xq_old_plus1, n, xq_new, &
-               et_old_plus1, et_new, interp_pm, nwork, work, &
-               'mesh_adjust do_et', ierr)
+               eturb_old_plus1, eturb_new, interp_pm, nwork, work, &
+               'mesh_adjust do_Eturb', ierr)
          if (ierr /= 0) then
             return
          end if
 
          do k=nzlo,nzhi
-            xh(i_et,k) = max(0d0,et_new(k+1-nzlo))
+            xh(i_eturb,k) = max(0d0,eturb_new(k+1-nzlo))
          end do
 
          n = nzlo - 1
          if (n > 0) then
             do k=1,n
-               xh(i_et,k) = xh_old(i_et,k)
+               xh(i_eturb,k) = xh_old(i_eturb,k)
             end do
          end if
 
          if (nzhi < nz) then
             n = nz - nzhi - 1 ! nz-n = nzhi+1
             do k=0,n
-               xh(i_et,nz-k) = xh_old(i_et,nz_old-k)
+               xh(i_eturb,nz-k) = xh_old(i_eturb,nz_old-k)
             end do
          end if
 
-      end subroutine do_et
+      end subroutine do_Eturb
 
 
       subroutine do_interp_pt_val( &
@@ -1465,7 +1465,7 @@
             species, cell_type, comes_from, &
             xa, xh, xh_old, &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
-            specific_PE_old, specific_KE_old, et_old, &
+            specific_PE_old, specific_KE_old, eturb_old, &
             density_new, energy_new, ierr)
          use eos_def
          use star_utils, only: set_rmid, cell_specific_PE, cell_specific_KE
@@ -1474,7 +1474,7 @@
          real(dp), dimension(:,:), pointer :: xa, xh, xh_old
          real(dp), dimension(:), pointer :: &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
-            specific_PE_old, specific_KE_old, et_old, density_new, energy_new
+            specific_PE_old, specific_KE_old, eturb_old, density_new, energy_new
          integer, intent(out) :: ierr
 
          integer :: k_old, k_old_last, i_lnT, lnT_order, energy_order
@@ -1617,7 +1617,7 @@
                if (s% show_mesh_changes) &
                   write(*,2) 'remesh: delta_energy too large to fix completely', k, &
                      delta_energy, max_delta_energy, &
-                     specific_PE_old(k_old), specific_KE_old(k_old), et_old(k_old)
+                     specific_PE_old(k_old), specific_KE_old(k_old), eturb_old(k_old)
                delta_energy = sign(max_delta_energy,delta_energy)
             end if
             energy_new(k) = avg_energy + delta_energy

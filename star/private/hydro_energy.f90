@@ -81,13 +81,13 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_18var_order1) :: resid_18, &
-            dL_dm_18, sources_18, others_18, det_dt_18, dwork_dm_18, &
+            dL_dm_18, sources_18, others_18, dEturb_dt_18, dwork_dm_18, &
             eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18, P_dV_dt_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
          real(dp) :: cell_energy_fraction_start, residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
-         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_et
+         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_eturb
          logical :: test_partials, doing_op_split_burn, eps_grav_form
                     
          include 'formats'
@@ -103,7 +103,7 @@
          call setup_dwork_dm(ierr); if (ierr /= 0) return         
          call setup_dL_dm(ierr); if (ierr /= 0) return         
          call setup_sources_and_others(ierr); if (ierr /= 0) return         
-         call setup_det_dt(ierr); if (ierr /= 0) return         
+         call setup_dEturb_dt(ierr); if (ierr /= 0) return         
          call setup_scal(ierr); if (ierr /= 0) return
          
          s% eps_grav_form_for_energy_eqn(k) = eps_grav_form
@@ -120,11 +120,11 @@
          
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 + eps_grav_18
+            esum_18 = - dL_dm_18 + sources_18 + others_18 - dEturb_dt_18 - dwork_dm_18 + eps_grav_18
          else if (s% use_dedt_form_with_total_energy_conservation .or. s% u_flag) then
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
+            esum_18 = - dL_dm_18 + sources_18 + others_18 - dEturb_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          else
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 - P_dV_dt_18 - de_dt_18
+            esum_18 = - dL_dm_18 + sources_18 + others_18 - dEturb_dt_18 - dwork_dm_18 - P_dV_dt_18 - de_dt_18
             s% PdVdt(k) = P_dV_dt_18%val
          end if
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
@@ -157,7 +157,7 @@
                write(*,2) 'residual', k, residual
                write(*,2) 'sources*scal', k, sources_18%val*scal
                write(*,2) '-dL_dm*scal', k, -dL_dm_18%val*scal
-               write(*,2) '-det_dt*scal', k, -det_dt_18%val*scal
+               write(*,2) '-dEturb_dt*scal', k, -dEturb_dt_18%val*scal
                write(*,2) '-dwork_dm*scal', k, -dwork_dm_18%val*scal
                write(*,2) '-dke_dt*scal', k, -dke_dt_18%val*scal
                write(*,2) '-dpe_dt*scal', k, -dpe_dt_18%val*scal
@@ -180,7 +180,7 @@
             i_lnR = s% i_lnR
             i_lum = s% i_lum
             i_v = s% i_v
-            i_et = s% i_et
+            i_eturb = s% i_eturb
             nz = s% nz
             dt = s% dt
             dm = s% dm(k)
@@ -224,7 +224,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_18, others_18
-            use hydro_et, only: calc_Eq_18
+            use hydro_Eturb, only: calc_Eq_18
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
                eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, RTI_diffusion_18
@@ -271,7 +271,7 @@
                others_18%val = others_18%val + s% eps_pre_mix(k)
             
             Eq_18 = 0d0
-            if (s% et_flag) then             
+            if (s% Eturb_flag) then             
                call calc_Eq_18(s, k, Eq_18, ierr)
                if (ierr /= 0) return
             end if   
@@ -328,16 +328,16 @@
             s% dedt_RTI(k) = diffusion_eps_18%val
          end subroutine setup_RTI_diffusion
          
-         subroutine setup_det_dt(ierr)
+         subroutine setup_dEturb_dt(ierr)
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            det_dt_18 = 0d0
-            if (s% et_flag) then
-               det_dt_18%val = s% dxh_et(k)/dt ! et = et_start + dxh_et
-               det_dt_18%d1Array(i_et_00) = 1d0/dt
+            dEturb_dt_18 = 0d0
+            if (s% Eturb_flag) then
+               dEturb_dt_18%val = s% dxh_eturb(k)/dt ! Eturb = Eturb_start + dxh_eturb
+               dEturb_dt_18%d1Array(i_eturb_00) = 1d0/dt
             end if
-         end subroutine setup_det_dt
+         end subroutine setup_dEturb_dt
          
          subroutine setup_eps_grav(ierr)
             integer, intent(out) :: ierr
@@ -371,8 +371,8 @@
             end if
 
             if (eps_grav_form) then
-               if (s% et_flag) then
-                  stop 'cannot use eps_grav with et yet.  fix energy eqn.'
+               if (s% Eturb_flag) then
+                  stop 'cannot use eps_grav with Eturb yet.  fix energy eqn.'
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
                if (ierr /= 0) then
@@ -653,7 +653,7 @@
                   avQR_18 = shift_m1(avQR_18)
                   avQR_18 = 0.5d0*(avQR_18 + s% avQ_start(k-1))
                end if            
-               if (s% et_flag) then
+               if (s% Eturb_flag) then
                   call calc_Pt_18_tw(s, k-1, PtR_18, ierr)
                   if (ierr /= 0) return
                   PtR_18 = shift_m1(PtR_18)
@@ -675,7 +675,7 @@
             end if
          
             PtL_18 = 0d0
-            if (s% et_flag) then
+            if (s% Eturb_flag) then
                call calc_Pt_18_tw(s, k, PtL_18, ierr)
                if (ierr /= 0) return
             end if

@@ -462,16 +462,16 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent energy et
+      ! Convective turbulent energy Eturb
          
          real(dp), pointer, dimension(:) :: &
-            et, et_start, Pt, Eq, Uq, avQ, avQ_start, &
+            Eturb, Eturb_start, Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
          real(dp), pointer, dimension(:) :: &
-            Vol, Vol_start, w, w_start, Eturb, COUPL_start, &
+            Vol, Vol_start, w, w_start, Et, COUPL_start, &
             Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
             Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
@@ -634,7 +634,7 @@
          real(dp), pointer :: lnd_for_d_dt_const_m(:)
          real(dp), pointer :: lnT_for_d_dt_const_m(:)
          real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: et_for_d_dt_const_m(:) ! only set when et_flag is true
+         real(dp), pointer :: Eturb_for_d_dt_const_m(:) ! only set when Eturb_flag is true
          real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
          real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
          real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
@@ -652,9 +652,10 @@
          real(dp), pointer :: dlnd_dt(:)
          real(dp), pointer :: dlnT_dt(:)
          real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: det_dt(:) ! only set when et_flag is true
+         real(dp), pointer :: dEturb_dt(:) ! only set when Eturb_flag is true
          real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
          real(dp), pointer :: du_dt(:) ! only set when u_flag is true
+         real(dp), pointer :: dEt_dt(:) ! only used when RSP_flag is true
          real(dp), pointer :: dln_cvpv0_dt(:) ! only set when conv_vel_flag is true
          real(dp), pointer :: dj_rot_dt(:) ! only set when implicit_j_rot_flag is true
          real(dp), pointer :: dalpha_RTI_dt(:) ! only set when alpha_RTI_flag is true
@@ -670,7 +671,7 @@
          real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
-         real(dp), pointer :: dxh_et(:) ! et(k) = dxh_et(k) + et_start(k); dxh_et from solver.
+         real(dp), pointer :: dxh_Eturb(:) ! Eturb(k) = dxh_Eturb(k) + Eturb_start(k); dxh_Eturb from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
@@ -1185,7 +1186,7 @@
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
             RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_et, using_Fraley_time_centering, okay_to_set_mixing_info
+            need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

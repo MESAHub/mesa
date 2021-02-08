@@ -1423,14 +1423,14 @@
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            det_m1, det_00, det_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            deturb_m1, deturb_00, deturb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1
          integer :: j
 
          include 'formats'
 
          call unwrap(res18, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-                     det_m1, det_00, det_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+                     deturb_m1, deturb_00, deturb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
                      dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1) 
                      
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
@@ -1439,7 +1439,7 @@
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
-         if (s% i_et /= 0) call unpack1(s% i_et, det_m1, det_00, det_p1)
+         if (s% i_eturb /= 0) call unpack1(s% i_eturb, deturb_m1, deturb_00, deturb_p1)
          
          contains
          
@@ -2119,7 +2119,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% et_flag) cell_total = cell_total + s% et(k)
+         if (s% Eturb_flag) cell_total = cell_total + s% Eturb(k)
          if (s% rsp_flag) cell_total = cell_total + s% Et(k)
       end function cell_specific_total_energy
       
@@ -2202,8 +2202,8 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% et_flag) then
-               cell1 = dm*s% et(k)
+            if (s% Eturb_flag) then
+               cell1 = dm*s% Eturb(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2251,8 +2251,8 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% et_flag) then
-               cell1 = dm*s% et(k)
+            if (s% Eturb_flag) then
+               cell1 = dm*s% Eturb(k)
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -2881,7 +2881,7 @@
       subroutine save_for_d_dt(s)
          ! these values will be modified as necessary by adjust mass
          type (star_info), pointer :: s
-         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_et, &
+         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_eturb, &
             i_v, i_u, i_alpha_RTI, i_ln_cvpv0
          include 'formats'
          
@@ -2889,7 +2889,7 @@
          i_lnR = s% i_lnR
          i_lnT = s% i_lnT
          i_lnd = s% i_lnd
-         i_et = s% i_et
+         i_eturb = s% i_eturb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -2920,9 +2920,9 @@
                s% v_for_d_dt_const_m(k) = s% xh(i_v, k)
             end do
          end if
-         if (i_et /= 0) then
+         if (i_eturb /= 0) then
             do k=1, nz
-               s% et_for_d_dt_const_m(k) = s% xh(i_et, k)
+               s% eturb_for_d_dt_const_m(k) = s% xh(i_eturb, k)
             end do
          end if
          if (i_u /= 0) then
@@ -3075,8 +3075,8 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k-1)
          end if
          
-         if (s% et_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,2) 'cannot have et_flag and partials wrt L(k-1)', k
+         if (s% Eturb_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
+            write(*,2) 'cannot have Eturb_flag and partials wrt L(k-1)', k
             stop 'em1'
          end if
          
@@ -3337,31 +3337,31 @@
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(out) :: Pt
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: et, rho
+         type(auto_diff_real_18var_order1) :: Eturb, rho
          real(dp) :: Pt_start
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% et_alfap == 0 .or. s% et_alfa == 0) then
+         if (s% Eturb_alfap == 0 .or. s% Eturb_alfa == 0) then
             Pt = 0d0
             return
          end if
 
          rho = wrap_d_00(s,k)
-         et = wrap_et_00(s,k)
-         Pt = s% et_alfap*et*rho
+         Eturb = wrap_eturb_00(s,k)
+         Pt = s% Eturb_alfap*Eturb*rho
          time_center = (s% using_Fraley_time_centering .and. &
                   s% include_P_in_Fraley_time_centering)
          if (time_center) then
-            Pt_start = s% et_alfap*s% et_start(k)*s% rho_start(k)
+            Pt_start = s% Eturb_alfap*s% Eturb_start(k)*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 
          if (is_bad(Pt%val)) then
-!$omp critical (hydro_et_crit2)
+!$omp critical (hydro_eturb_crit2)
             write(*,2) 'Pt', k, Pt%val
             stop 'calc_Pt_tw'
-!$omp end critical (hydro_et_crit2)
+!$omp end critical (hydro_eturb_crit2)
          end if
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -3415,7 +3415,7 @@
          end if
          
          Pt_18 = 0d0
-         if (s% et_flag) then
+         if (s% Eturb_flag) then
             call calc_Pt_18_tw(s, k, Pt_18, ierr) 
             if (ierr /= 0) return
             ! note that Pt_18 is already time weighted
