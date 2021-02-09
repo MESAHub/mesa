@@ -347,6 +347,7 @@
       ! returns -G*m/r^2 with possible modifications for rotation
       subroutine expected_HSE_grav_term(s, k, &
             grav, d_grav_dlnR, d_grav_dw, area, d_area_dlnR, ierr)
+         use star_utils, only: get_area_info
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: grav, d_grav_dlnR, d_grav_dw, area, d_area_dlnR
@@ -364,17 +365,8 @@
 
          m = s% m_grav(k)
          
-         if (s% using_Fraley_time_centering) then
-            area = 4d0*pi*(s% r(k)**2 + s% r(k)*s% r_start(k) + s% r_start(k)**2)/3d0
-            d_area_dlnR = 4d0*pi*s% r(k)*(2d0*s% r(k) + s% r_start(k))/3d0
-            inv_R2 = 1d0/(s% r(k)*s% r_start(k))
-            d_inv_R2_dlnR = -1d0*inv_R2
-         else
-            area = 4d0*pi*s% r(k)**2
-            d_area_dlnR = 2d0*area
-            inv_R2 = 1d0/s% r(k)**2
-            d_inv_R2_dlnR = -2d0*inv_R2
-         end if
+         call get_area_info(s, k, &
+            area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
 
          grav = -s% cgrav(k)*m*inv_R2
          d_grav_dlnR = -s% cgrav(k)*m*d_inv_R2_dlnR
