@@ -575,7 +575,7 @@
             s% lnR(k) = log(s% r(k))
             s% xh(s% i_lnR, k) = s% lnR(k)            
             s% RSP_Et(k) = s% w(k)*s% w(k)
-            s% xh(s% i_eturb_RSP, k) = s% RSP_Et(k)               
+            s% xh(s% i_etrb_RSP, k) = s% RSP_Et(k)               
             s% xh(s% i_v, k) = s% v(k)            
          end do
       end subroutine set_star_vars
@@ -596,7 +596,7 @@
             s% T(k) = exp(s% lnT(k))
             s% lnR(k) = s% xh(s% i_lnR,k)
             s% r(k) = exp(s% lnR(k))
-            s% RSP_Et(k) = s% xh(s% i_eturb_RSP,k)
+            s% RSP_Et(k) = s% xh(s% i_etrb_RSP,k)
             s% w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
             s% v(k) = s% xh(s% i_v,k)
@@ -801,8 +801,8 @@
             
             ! sqrt(w**2) /= original w, so need to redo
             s% RSP_Et(k) = s% w(k)**2
-            s% xh(s% i_eturb_RSP,k) = s% RSP_Et(k)               
-            s% w(k) = sqrt(s% xh(s% i_eturb_RSP,k))
+            s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
+            s% w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
             
             ! exp(log(r)) /= original r, so need to redo
             s% lnR(k) = log(s% r(k))

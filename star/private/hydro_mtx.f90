@@ -95,7 +95,7 @@
             skip_other_cgrav = .true.
          logical :: do_chem, do_struct, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
-            i_lnd, i_lnT, i_lnR, i_lum, i_eturb, i_v, &
+            i_lnd, i_lnT, i_lnR, i_lum, i_et, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, i_chem1, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
@@ -103,7 +103,7 @@
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
-         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_eturb, &
+         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_et, &
             do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
 
          include 'formats'
@@ -157,7 +157,7 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_eturb = s% i_eturb
+         i_et = s% i_et
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -169,7 +169,7 @@
          do_lnT = i_lnT > 0 .and. i_lnT <= nvar
          do_lnR = i_lnR > 0 .and. i_lnR <= nvar
          do_lum = i_lum > 0 .and. i_lum <= nvar
-         do_eturb = i_eturb > 0 .and. i_eturb <= nvar
+         do_et = i_et > 0 .and. i_et <= nvar
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
@@ -491,19 +491,19 @@
 
                end if
 
-               if (do_eturb) then
-                  s% Eturb(k) = max(x(i_eturb), min_Eturb)
-                  s% dxh_eturb(k) = dx(i_eturb,k)
-                  if (s% Eturb(k) <= 0d0 .or. is_bad_num(s% Eturb(k))) then
-                     s% retry_message = 'bad num for eturb'
-                     if (report) write(*,2) 'bad num eturb', k, s% eturb(k)
+               if (do_et) then
+                  s% et(k) = max(x(i_et), min_et)
+                  s% dxh_et(k) = dx(i_et,k)
+                  if (s% et(k) <= 0d0 .or. is_bad_num(s% et(k))) then
+                     s% retry_message = 'bad num for et'
+                     if (report) write(*,2) 'bad num et', k, s% et(k)
                      ierr = -1
                      if (s% stop_for_bad_nums) then
 !$omp critical (set_vars_for_solver_crit1)
-                        write(*,2) 'set_vars_for_solver eturb', k, s% eturb(k)
-                        write(*,2) 'set_vars_for_solver eturb_start', k, s% eturb_start(k)
-                        write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_eturb,k)
-                        write(*,2) 'set_vars_for_solver dx', k, dx(i_eturb,k)
+                        write(*,2) 'set_vars_for_solver et', k, s% et(k)
+                        write(*,2) 'set_vars_for_solver et_start', k, s% et_start(k)
+                        write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_et,k)
+                        write(*,2) 'set_vars_for_solver dx', k, dx(i_et,k)
                         stop 'set_vars_for_solver'
 !$omp end critical (set_vars_for_solver_crit1)
                      end if
@@ -730,7 +730,7 @@
                if (dt == 0) then
 
                   s% dlnT_dt(k) = 0
-                  s% deturb_dt(k) = 0
+                  s% det_dt(k) = 0
                   if (s% do_struct_hydro) then
                      s% dlnd_dt(k) = 0
                      s% dlnR_dt(k) = 0
@@ -745,7 +745,7 @@
                   ! use dx to get better accuracy
 
                   if (do_lnT) s% dlnT_dt(k) = dx(i_lnT,k)*d_dxdt_dx
-                  if (do_eturb) s% deturb_dt(k) = dx(i_eturb,k)*d_dxdt_dx
+                  if (do_et) s% det_dt(k) = dx(i_et,k)*d_dxdt_dx
 
                   if (s% do_struct_hydro) then
                      if (do_lnd) s% dlnd_dt(k) = dx(i_lnd,k)*d_dxdt_dx
@@ -768,8 +768,8 @@
 
                   if (do_lnT) &
                      s% dlnT_dt(k) = (x(i_lnT) - s% lnT_for_d_dt_const_m(k))*d_dxdt_dx
-                  if (do_eturb) &
-                     s% deturb_dt(k) = (x(i_eturb) - s% eturb_for_d_dt_const_m(k))*d_dxdt_dx
+                  if (do_et) &
+                     s% det_dt(k) = (x(i_et) - s% et_for_d_dt_const_m(k))*d_dxdt_dx
                   if (s% do_struct_hydro) then
                      s% dlnR_dt(k) = (x(i_lnR) - s% lnR_for_d_dt_const_m(k))*d_dxdt_dx
                      if (do_lnd) &
@@ -798,7 +798,7 @@
                else ! k < s% k_below_just_added, so new surface cell
 
                   s% dlnT_dt(k) = 0
-                  s% deturb_dt(k) = 0
+                  s% det_dt(k) = 0
                   if (s% do_struct_hydro) then
                      s% dlnR_dt(k) = 0
                      s% dlnd_dt(k) = 0

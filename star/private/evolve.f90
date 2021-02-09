@@ -1168,7 +1168,7 @@
                expected_sum_cell_others, expected_sum_cell_sources, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
-               virial, total_radiation, L_surf, sum_cell_de, sum_cell_dEturb, &
+               virial, total_radiation, L_surf, sum_cell_de, sum_cell_det, &
                sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
                sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing
                
@@ -1478,13 +1478,13 @@
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
                   sum_cell_others = dt*dot_product(s% dm(1:nz), s% energy_others(1:nz))
                   sum_cell_work = dt*dot_product(s% dm(1:nz), s% dwork_dm(1:nz))
-                  sum_cell_dEturb = dt*dot_product(s% dm(1:nz), s% dEturb_dt(1:nz))
+                  sum_cell_det = dt*dot_product(s% dm(1:nz), s% det_dt(1:nz))
                   sum_cell_dke = dt*dot_product(s% dm(1:nz), s% dkedt(1:nz))
                   sum_cell_dpe = dt*dot_product(s% dm(1:nz), s% dpedt(1:nz))
                   sum_cell_de = dt*dot_product(s% dm(1:nz), s% dedt(1:nz))
                   sum_cell_terms = &
                      - sum_cell_dL + sum_cell_sources + sum_cell_others - sum_cell_work &
-                     - sum_cell_dEturb - sum_cell_dke - sum_cell_dpe - sum_cell_de
+                     - sum_cell_det - sum_cell_dke - sum_cell_dpe - sum_cell_de
                   sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
                   
@@ -1537,9 +1537,9 @@
                   !write(*,2) 'rel err ', s% model_number, &
                   !   ( - diff_total_rotational_kinetic_energy)/s% total_energy, &
                   !   , diff_total_rotational_kinetic_energy
-                  write(*,2) 'rel err sum_cell_dEturb', s% model_number, &
-                     (sum_cell_dEturb - diff_total_turbulent_energy)/s% total_energy, &
-                     sum_cell_dEturb, diff_total_turbulent_energy
+                  write(*,2) 'rel err sum_cell_det', s% model_number, &
+                     (sum_cell_det - diff_total_turbulent_energy)/s% total_energy, &
+                     sum_cell_det, diff_total_turbulent_energy
                   write(*,*)
                      
                      
@@ -1811,7 +1811,7 @@
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
          
-         if (.not. (s% RSP_flag .or. s% Eturb_flag)) then
+         if (.not. (s% RSP_flag .or. s% et_flag)) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if

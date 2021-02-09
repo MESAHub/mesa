@@ -465,7 +465,7 @@
          end if ! v_flag
 
          Uq_18 = 0d0
-         if (s% Eturb_flag) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% et_flag) then ! Uq(k) is turbulent viscosity drag at face k
             call calc_Uq_18(s, k, Uq_18, ierr)
             if (ierr /= 0) return
          end if

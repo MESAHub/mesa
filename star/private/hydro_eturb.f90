@@ -35,14 +35,14 @@
       implicit none
 
       private
-      public :: do1_turbulent_energy_eqn, do1_Eturb_L_eqn, &
-         set_eturb_start_vars, reset_eturb_using_L, calc_Eq_18, calc_Uq_18 
+      public :: do1_turbulent_energy_eqn, do1_et_L_eqn, &
+         set_et_start_vars, reset_et_using_L, calc_Eq_18, calc_Uq_18 
       
 
       contains
       
 
-      subroutine do1_Eturb_L_eqn( &
+      subroutine do1_et_L_eqn( &
             s, k, xscale, equ, L_start_max, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
@@ -54,19 +54,19 @@
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
-         call get1_Eturb_L_eqn( &
+         call get1_et_L_eqn( &
             s, k, xscale, equ, L_start_max, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_Eturb_L_eqn', k
+            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_et_L_eqn', k
             return
          end if         
          if (skip_partials) return         
          call store_partials(s, k, xscale, s% i_equL, nvar, d_dm1, d_d00, d_dp1)
-      end subroutine do1_Eturb_L_eqn
+      end subroutine do1_et_L_eqn
 
       
-      subroutine get1_Eturb_L_eqn( &  
+      subroutine get1_et_L_eqn( &  
             s, k, xscale, equ, L_start_max, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: unpack_res18_partials
@@ -106,9 +106,9 @@
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnT
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
-            write(*,*) 'get1_Eturb_L_eqn', s% solver_test_partials_var
+            write(*,*) 'get1_et_L_eqn', s% solver_test_partials_var
          end if      
-      end subroutine get1_Eturb_L_eqn
+      end subroutine get1_et_L_eqn
       
 
       subroutine do1_turbulent_energy_eqn( &
@@ -130,7 +130,7 @@
             return
          end if         
          if (skip_partials) return         
-         call store_partials(s, k, xscale, s% i_deturb_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, xscale, s% i_det_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do1_turbulent_energy_eqn
 
       
@@ -148,14 +148,14 @@
          integer, intent(out) :: ierr
          
          real(dp) :: dt, dm, dt_div_dm, residual, scale
-         integer :: i_deturb_dt, i_eturb, i_lnd, i_lnT, i_lnR, i_v
+         integer :: i_det_dt, i_et, i_lnd, i_lnT, i_lnR, i_v
          type(auto_diff_real_18var_order1) :: resid_18, &
-            dEturb_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
+            det_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
          real(dp) :: dm_m1, dm_00, dm_p1, m_00, cgrav_00
          type(auto_diff_real_18var_order1) :: Source, D, Dr, g_00, g_p1, area_00, area_p1, g_cell_00, h_00
          type(auto_diff_real_18var_order1) :: d_m1, d_00, d_p1, P_m1, P_00, P_p1
-         type(auto_diff_real_18var_order1) :: eturb_m1, eturb_00, eturb_p1, T_m1, T_00, kap_m1, kap_00
+         type(auto_diff_real_18var_order1) :: et_m1, et_00, et_p1, T_m1, T_00, kap_m1, kap_00
          type(auto_diff_real_18var_order1) :: r_m1, r_00, r_p1, v_m1, v_00, v_p1
          type(auto_diff_real_18var_order1) :: ChiRho_00, ChiT_00, Cp_00, s_m1, s_00, s_p1
          logical :: test_partials
@@ -167,32 +167,32 @@
          ierr = 0
          call init
          
-         if (s% Eturb_alfa == 0d0) then
-            equ(i_deturb_dt, k) = s% Eturb(k) - min_Eturb
-            if (.not. skip_partials) d_d00(i_eturb) = 1d0
+         if (s% et_alfa == 0d0) then
+            equ(i_det_dt, k) = s% et(k) - min_et
+            if (.not. skip_partials) d_d00(i_et) = 1d0
             return
          end if
          
          call setup_intermediates
-         call setup_dEturb_18(ierr); if (ierr /= 0) return         
+         call setup_det_18(ierr); if (ierr /= 0) return         
          call setup_PtdV_18(ierr); if (ierr /= 0) return         
          call setup_dt_dLt_dm_18(ierr); if (ierr /= 0) return         
          call setup_dt_C_18(ierr); if (ierr /= 0) return         
          call setup_dt_Eq_18(ierr); if (ierr /= 0) return    
          
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
-         esum_18 = dEturb_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18
+         esum_18 = det_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18
          
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
          scale = 1d0/s% energy_start(k)
          resid_18 = scale*resid_18
          residual = resid_18%val
-         equ(i_deturb_dt, k) = residual
+         equ(i_det_dt, k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_turbulent_crit1)
             write(*,2) 'turbulent energy eqn residual', k, residual
-            write(*,2) 'dEturb', k, dEturb_18%val
+            write(*,2) 'det', k, det_18%val
             write(*,2) 'PtdV', k, PtdV_18%val
             write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_18%val
             write(*,2) 'dt_C', k, dt_C_18%val
@@ -210,14 +210,14 @@
             s% solver_test_partials_var = i_lnT
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
             write(*,*) 'get1_turbulent_energy_eqn', s% solver_test_partials_var, &
-               s% Eturb(k), s% Eturb_start(k)
+               s% et(k), s% et_start(k)
          end if      
 
          contains
          
          subroutine init
-            i_deturb_dt = s% i_deturb_dt
-            i_eturb = s% i_eturb
+            i_det_dt = s% i_det_dt
+            i_et = s% i_et
             i_lnd = s% i_lnd
             i_lnT = s% i_lnT
             i_lnR = s% i_lnR
@@ -244,9 +244,9 @@
             s_m1 = wrap_s_m1(s, k)
             s_00 = wrap_s_00(s, k)
             s_p1 = wrap_s_p1(s, k) ! Gradients vanish at the center, so s(nz+1) == s(nz).
-            eturb_m1 = wrap_eturb_m1(s, k)
-            eturb_00 = wrap_eturb_00(s, k)
-            eturb_p1 = wrap_eturb_p1(s, k)
+            et_m1 = wrap_et_m1(s, k)
+            et_00 = wrap_et_00(s, k)
+            et_p1 = wrap_et_p1(s, k)
             T_m1 = wrap_T_m1(s, k)
             T_00 = wrap_T_00(s, k)
             kap_m1 = wrap_kap_m1(s, k)
@@ -275,12 +275,12 @@
             g_cell_00 = (m_00 - 0.5d0 * dm_00) * cgrav_00 / (0.5d0 * (r_00 + r_p1))
          end subroutine setup_intermediates
          
-         subroutine setup_dEturb_18(ierr)
+         subroutine setup_det_18(ierr)
             integer, intent(out) :: ierr
-            dEturb_18 = 0d0
-            dEturb_18%val = s% dxh_eturb(k) ! Eturb = Eturb_start + dxh_eturb
-            dEturb_18%d1Array(i_eturb_00) = 1d0
-         end subroutine setup_dEturb_18
+            det_18 = 0d0
+            det_18%val = s% dxh_et(k) ! et = et_start + dxh_et
+            det_18%d1Array(i_et_00) = 1d0
+         end subroutine setup_det_18
          
          ! PtdV_18 = Pt_18*dV_18
          subroutine setup_PtdV_18(ierr)
@@ -301,11 +301,11 @@
             include 'formats'
             ierr = 0
             Lt_00 = compute_Lt(s, k, &
-               dm_m1, dm_00, g_00, area_00, P_m1, P_00, d_m1, d_00, eturb_m1, eturb_00, ierr)
+               dm_m1, dm_00, g_00, area_00, P_m1, P_00, d_m1, d_00, et_m1, et_00, ierr)
             if (ierr /= 0) return
             if (k < s% nz) then
                Lt_p1 = compute_Lt(s, k+1, &
-                  dm_00, dm_p1, g_p1, area_p1, P_00, P_p1, d_00, d_p1, eturb_00, eturb_p1, ierr)
+                  dm_00, dm_p1, g_p1, area_p1, P_00, P_p1, d_00, d_p1, et_00, et_p1, ierr)
                if (ierr /= 0) return
             else
                Lt_p1 = 0d0
@@ -341,14 +341,14 @@
             if (ierr /= 0) return
             ! Compute epsilon_q
             epsilon_q = compute_epsilon_q(s, k, &
-               v_p1, v_00, r_p1, r_00, d_00, dm_00, eturb_00, h_00, ierr)
+               v_p1, v_00, r_p1, r_00, d_00, dm_00, et_00, h_00, ierr)
             dt_Eq_18 = dt*epsilon_q
          end subroutine setup_dt_Eq_18
 
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials
             type(auto_diff_real_18var_order1) :: res18            
-            call unpack_res18_partials(s, k, nvar, xscale, i_deturb_dt, &
+            call unpack_res18_partials(s, k, nvar, xscale, i_det_dt, &
                res18, d_dm1, d_d00, d_dp1)
          end subroutine unpack_res18
       
@@ -364,7 +364,7 @@
          integer, intent(out) :: ierr
          real(dp) :: dm_m1, dm_00, dm_p1, m_00, cgrav
          type(auto_diff_real_18var_order1) :: Source, D, Dr, &
-            eturb_00, ChiT_00, ChiRho_00, Cp_00, s_m1, s_00, s_p1, &
+            et_00, ChiT_00, ChiRho_00, Cp_00, s_m1, s_00, s_p1, &
             d_m1, d_00, d_p1, T_00, r_00, r_p1, h_00, kap_00, &
             g_cell_00, P_00
          include 'formats'
@@ -392,7 +392,7 @@
          r_p1 = wrap_r_p1(s, k)
 
          dm_00 = s%dm(k)
-         eturb_00 = wrap_eturb_00(s, k)
+         et_00 = wrap_et_00(s, k)
          ChiT_00 = wrap_ChiT_00(s, k)
          ChiRho_00 = wrap_ChiRho_00(s, k)
          Cp_00 = wrap_Cp_00(s, k)
@@ -410,9 +410,9 @@
          if (ierr /= 0) return
          
          Source = compute_Source(s, k, &
-            eturb_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, ChiT_00, ChiRho_00, Cp_00, ierr)
+            et_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, ChiT_00, ChiRho_00, Cp_00, ierr)
          if (ierr /= 0) return
-         D = compute_D(s, k, h_00, eturb_00, ierr)
+         D = compute_D(s, k, h_00, et_00, ierr)
          if (ierr /= 0) return
          Dr = compute_Dr(s, k, T_00, d_00, Cp_00, kap_00, h_00, ierr)
          if (ierr /= 0) return
@@ -461,8 +461,8 @@
          real(dp) :: alpha, alpha_m
 
          ierr = 0
-         alpha = s% Eturb_alfa
-         alpha_m = s% Eturb_alfam
+         alpha = s% et_alfa
+         alpha_m = s% et_alfam
 
          dr_00 = dm_00 / (4d0 * pi * d_00 * (r_00**2 + r_00*r_p1 + r_p1**2))
          d_v_div_r_dr_00 = (v_p1 / r_p1 - v_00 / r_00) / dr_00
@@ -473,12 +473,12 @@
       end function compute_epsilon_q_adam
 
       function compute_epsilon_q(s, k, & ! following RSP's definition
-            v_p1, v_00, r_p1, r_00, d_00, dm_00, eturb_00, h_00, ierr) result(epsilon_q)
+            v_p1, v_00, r_p1, r_00, d_00, dm_00, et_00, h_00, ierr) result(epsilon_q)
          ! Inputs
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: dm_00
-         type(auto_diff_real_18var_order1), intent(in) :: v_p1, v_00, r_p1, r_00, d_00, eturb_00, h_00
+         type(auto_diff_real_18var_order1), intent(in) :: v_p1, v_00, r_p1, r_00, d_00, et_00, h_00
 
          ! Outputs
          type(auto_diff_real_18var_order1) :: epsilon_q
@@ -489,10 +489,10 @@
          include 'formats'
 
          ierr = 0
-         alpha = s% Eturb_alfa
-         alpha_m = s% Eturb_alfam
+         alpha = s% et_alfa
+         alpha_m = s% et_alfam
 
-         w_rho2 = sqrt(eturb_00)*d_00**2
+         w_rho2 = sqrt(et_00)*d_00**2
          r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
          if (k < s% nz) then
             d_v_div_r = v_00/r_00 - v_p1/r_p1
@@ -522,8 +522,8 @@
          
          real(dp) :: gammar, alpha
          ierr = 0
-         gammar = s% Eturb_alfar
-         alpha = s% Eturb_alfa
+         gammar = s% et_alfar
+         alpha = s% et_alfa
          Dr = (4d0 * boltz_sigma * gammar**2 / alpha**2) * (T_00**3 / (d_00**2 + cp_00 * kap_00 * h_00))
 
          s% DAMPR(k) = Dr%val
@@ -537,17 +537,17 @@
          type(auto_diff_real_18var_order1), intent(in) :: T_00, d_00, cp_00, kap_00, h_00
          type(auto_diff_real_18var_order1) :: Dr
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: eturb_00
+         type(auto_diff_real_18var_order1) :: et_00
          real(dp) :: gammar, alpha
          include 'formats'
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          if (alpha == 0d0) then
             Dr = 0d0
          else
-            gammar = s% Eturb_alfar
-            eturb_00 = wrap_eturb_00(s,k)
-            Dr = (4d0 * boltz_sigma * gammar**2 / alpha**2) * T_00**3 * eturb_00 / &
+            gammar = s% et_alfar
+            et_00 = wrap_et_00(s,k)
+            Dr = (4d0 * boltz_sigma * gammar**2 / alpha**2) * T_00**3 * et_00 / &
                   (d_00**2 * Cp_00 * kap_00 * h_00**2)
          end if
          s% DAMPR(k) = Dr%val
@@ -566,28 +566,28 @@
 
          real(dp) :: alpha
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          D = 0d0
          if (alpha /= 0d0) D = w_00**1.5d0 / (alpha * h_00)
          s% DAMP(k) = D%val
 
       end function compute_D_adam
 
-      function compute_D(s, k, h_00, eturb_00, ierr) result(D) ! following RSP's definition
+      function compute_D(s, k, h_00, et_00, ierr) result(D) ! following RSP's definition
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(in) :: h_00, eturb_00
+         type(auto_diff_real_18var_order1), intent(in) :: h_00, et_00
          type(auto_diff_real_18var_order1) :: D
          integer, intent(out) :: ierr
          include 'formats'
 
          real(dp) :: alpha
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          if (alpha == 0d0) then
             D = 0d0
          else
-            D = (pow(eturb_00,1.5d0) - min_Eturb_pow_1_pt_5)/(alpha * h_00)
+            D = (pow(et_00,1.5d0) - min_et_pow_1_pt_5)/(alpha * h_00)
          end if
          s% DAMP(k) = D%val
 
@@ -613,11 +613,11 @@
       !!
       !! Because s (entropy) is defined on cells ds/dr is naturally defined on faces.
       !! S (the source) is defined on cells though, so we have to average ds/dr onto cells.
-      !! The way Eturb handles this is by computing Y*cp on faces (i.e. -h*ds/dr, using h averaged onto faces)
+      !! The way et handles this is by computing Y*cp on faces (i.e. -h*ds/dr, using h averaged onto faces)
       !! then averaging that quantity divided by h_face onto cells. 
       !! This is equivalent to just averaging ds/dr between the two adjacent faces, so we do that.
       !!
-      !! @param alpha Eturb alpha parameter
+      !! @param alpha et alpha parameter
       !! @param dm_m1 Mass of cell k-1
       !! @param dm_00 Mass of cell k
       !! @param dm_p1 Mass of cell k+1
@@ -653,7 +653,7 @@
          
          real(dp) :: alpha
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          
          dr_bar_00 = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / (4d0 * pi * r_00**2)
          dr_bar_p1 = 0.5d0 * (dm_00 / d_00 + dm_p1 / d_p1) / (4d0 * pi * r_p1**2)
@@ -668,13 +668,13 @@
       end function compute_Source_adam
 
       function compute_Source(s, k, & ! following RSP's definition
-            eturb_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, &
+            et_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, &
             ChiT_00, ChiRho_00, Cp_00, ierr) result(Source)
          ! Inputs
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(in) :: &
-            eturb_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, &
+            et_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, &
             ChiT_00, ChiRho_00, Cp_00
          ! Outputs
          type(auto_diff_real_18var_order1) :: Source
@@ -687,7 +687,7 @@
          real(dp) :: alpha
          include 'formats'
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          if (alpha == 0d0) then
             Source = 0d0
          else
@@ -740,7 +740,7 @@
 
             Y_cell = 0.5d0*(Y1_00*r_00**2 + Y1_p1*r_p1**2)
 
-            Source = alpha * Y_cell * d_00 * T_00 * P_00 * Cp_00 * QQ_div_Cp * sqrt(eturb_00) / s% dm(k)
+            Source = alpha * Y_cell * d_00 * T_00 * P_00 * Cp_00 * QQ_div_Cp * sqrt(et_00) / s% dm(k)
 
          if (is_bad(Source%val)) then
 !$omp critical (hydro_equ_turbulent_crit3)
@@ -753,7 +753,7 @@
             write(*,2) 'T_00', k, T_00%val
             write(*,2) 'P_00', k, P_00%val
             write(*,2) 'Cp_00', k, Cp_00%val
-            write(*,2) 'eturb_00', k, eturb_00%val
+            write(*,2) 'et_00', k, et_00%val
             write(*,2) 'Y1_00', k, Y1_00%val
             write(*,2) 'Y1_p1', k, Y1_p1%val
             write(*,2) 'r_00', k, r_00%val
@@ -814,8 +814,8 @@
          integer, intent(out) :: ierr
          ierr = 0
          
-         alpha = s% Eturb_alfa
-         alpha_m = s% Eturb_alfam
+         alpha = s% et_alfa
+         alpha_m = s% et_alfam
 
          dr_00 = dm_00 / (4d0 * pi * d_00 * (r_00**2 + r_00*r_p1 + r_p1**2))
          dr_m1 = dm_m1 / (4d0 * pi * d_m1 * (r_m1**2 + r_m1*r_00 + r_00**2))
@@ -852,13 +852,13 @@
       function compute_Uq(s, k, & ! following RSP's definition
             r_m1, r_00, r_p1, v_m1, v_00, v_p1, m_m1, m_00, m_p1, &
             cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00, d_m1, d_00, &
-            P_m1, P_00, eturb_m1, eturb_00, ierr) result(Uq)
+            P_m1, P_00, et_m1, et_00, ierr) result(Uq)
          ! Inputs
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: m_m1, m_00, m_p1, cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00
          type(auto_diff_real_18var_order1), intent(in) :: r_m1, r_00, r_p1, v_m1, v_00, v_p1
-         type(auto_diff_real_18var_order1), intent(in) :: d_m1, d_00, P_m1, P_00, eturb_m1, eturb_00
+         type(auto_diff_real_18var_order1), intent(in) :: d_m1, d_00, P_m1, P_00, et_m1, et_00
          ! Outputs
          type(auto_diff_real_18var_order1) :: Uq
          integer, intent(out) :: ierr
@@ -871,16 +871,16 @@
          include 'formats'
          ierr = 0
          
-         alpha = s% Eturb_alfa
-         alpha_m = s% Eturb_alfam
+         alpha = s% et_alfa
+         alpha_m = s% et_alfam
          if (alpha == 0d0 .or. alpha_m == 0d0 .or. k == 1) then
          
             Uq = 0d0
             
          else
          
-            w_m1 = sqrt(eturb_m1)
-            w_00 = sqrt(eturb_00)
+            w_m1 = sqrt(et_m1)
+            w_00 = sqrt(et_00)
          
             cgrav_mid_00 = 0.5d0 * (cgrav_p1 + cgrav_00)
             rmid_00 = 0.5d0 * (r_00 + r_p1)
@@ -910,9 +910,9 @@
          
          if (.false.) then
             
-            write(*,2) 'eturb_00%val', k, eturb_00%val
-            if (is_bad(eturb_00%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 eturb_00', k, eturb_00%d1Array(i_lnd_m1)
+            write(*,2) 'et_00%val', k, et_00%val
+            if (is_bad(et_00%d1Array(i_lnd_m1))) then
+               write(*,2) 'lnd_m1 et_00', k, et_00%d1Array(i_lnd_m1)
                stop 'compute_Uq'
             end if
 
@@ -996,7 +996,7 @@
          if (k == 1) then ! Lr(1) proportional to Erad in cell(1)
          
             Erad = crad * pow4(T_00)
-            Lr = s% Eturb_Lsurf_factor * area * clight * Erad
+            Lr = s% et_Lsurf_factor * area * clight * Erad
             
          else 
          
@@ -1045,7 +1045,7 @@
          type(auto_diff_real_18var_order1) :: dr_bar, w_turb_face, T_rho_face, h_face, ds_dr, Y_sag_over_cp_face
 
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
 
          h_face = 0.5d0 * (P_m1 / d_m1 + P_00 / d_00) / g
          dr_bar = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / area
@@ -1093,7 +1093,7 @@
          ierr = 0
 
          ! Get reals
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          if (alpha <= 0d0 .or. k == 1) then
             area = 0d0
             T_rho_face = 0d0
@@ -1115,8 +1115,8 @@
          d_00 = wrap_d_00(s, k)
          P_m1 = wrap_P_m1(s, k)
          P_00 = wrap_P_00(s, k)
-         w_m1 = sqrt(wrap_eturb_m1(s, k))
-         w_00 = sqrt(wrap_eturb_00(s, k))
+         w_m1 = sqrt(wrap_et_m1(s, k))
+         w_00 = sqrt(wrap_et_00(s, k))
          chiT_m1 = wrap_chiT_m1(s, k)
          chiT_00 = wrap_chiT_00(s, k)
          chiRho_m1 = wrap_chiRho_m1(s, k)
@@ -1174,17 +1174,17 @@
          type(auto_diff_real_18var_order1) :: Lt_18
          integer, intent(out) :: ierr
          
-         type(auto_diff_real_18var_order1) :: rho_h_face, dr_bar, wturb_d_eturb_dr, Ft
+         type(auto_diff_real_18var_order1) :: rho_h_face, dr_bar, wturb_d_et_dr, Ft
          real(dp) :: alpha, alpha_t
          ierr = 0
-         alpha = s% Eturb_alfa
-         alpha_t = s% Eturb_alfat
+         alpha = s% et_alfa
+         alpha_t = s% et_alfat
          
          rho_h_face = 0.5d0 * (P_m1 + P_00) / g
 
          dr_bar = 0.5d0 * (dm_m1 / d_m1 + dm_00 / d_00) / area
-         wturb_d_eturb_dr = -(2d0/3d0) * (w_00**1.5d0 - w_m1**1.5d0) / dr_bar ! Minus because r(k) < r(k-1)
-         Ft = -alpha * alpha_t * rho_h_face * wturb_d_eturb_dr
+         wturb_d_et_dr = -(2d0/3d0) * (w_00**1.5d0 - w_m1**1.5d0) / dr_bar ! Minus because r(k) < r(k-1)
+         Ft = -alpha * alpha_t * rho_h_face * wturb_d_et_dr
 
          Lt_18 = area * Ft
 
@@ -1194,13 +1194,13 @@
 
       function compute_Lt(s, k, & ! copy the RSP version
             dm_m1, dm_00, g, area, &
-            P_m1, P_00, d_m1, d_00, eturb_m1, eturb_00, ierr) result(Lt_18)
+            P_m1, P_00, d_m1, d_00, et_m1, et_00, ierr) result(Lt_18)
          ! Inputs
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: dm_m1, dm_00
          type(auto_diff_real_18var_order1), intent(in) :: &
-            g, area, P_m1, P_00, d_m1, d_00, eturb_m1, eturb_00
+            g, area, P_m1, P_00, d_m1, d_00, et_m1, et_00
 
          ! Outputs
          type(auto_diff_real_18var_order1) :: Lt_18
@@ -1212,8 +1212,8 @@
          include 'formats'
          ierr = 0
 
-         alpha = s% Eturb_alfa
-         alpha_t = s% Eturb_alfat
+         alpha = s% et_alfa
+         alpha_t = s% et_alfat
          if (alpha <= 0d0 .or. alpha_t <= 0d0 .or. k == 1) then
             Lt_18 = 0d0
          else
@@ -1222,7 +1222,7 @@
             Hp_face = P_div_rho_face*r_00**2/(s% cgrav(k)*s% m(k))
             rho2_face = 0.5d0*(d_00**2 + d_m1**2)
             Lt_18 = -2d0/3d0*alpha*alpha_t*area**2*Hp_face*rho2_face*&
-               (pow(eturb_m1,1.5d0) - pow(eturb_00,1.5d0))/s% dm_bar(k)            
+               (pow(et_m1,1.5d0) - pow(et_00,1.5d0))/s% dm_bar(k)            
          end if
 
          s% Lt(k) = Lt_18%val
@@ -1245,7 +1245,7 @@
          ! Intermediates
          real(dp) :: cgrav, dm_bar, m, dm_m1, dm_00, unused
          type(auto_diff_real_18var_order1) :: r_00, T_m1, T_00, kap_m1, kap_00, d_m1, d_00
-         type(auto_diff_real_18var_order1) :: P_m1, P_00, s_m1, s_00, eturb_m1, eturb_00, g, area
+         type(auto_diff_real_18var_order1) :: P_m1, P_00, s_m1, s_00, et_m1, et_00, g, area
          type(auto_diff_real_18var_order1) :: g_cell_00, h_00, r_p1, v_00, v_p1
          
          include 'formats'
@@ -1289,8 +1289,8 @@
             s_m1 = wrap_s_m1(s, k)
             s_00 = wrap_s_00(s, k)
 
-            eturb_m1 = wrap_eturb_m1(s, k)
-            eturb_00 = wrap_eturb_00(s, k)
+            et_m1 = wrap_et_m1(s, k)
+            et_00 = wrap_et_00(s, k)
 
             v_00 = wrap_v_00(s, k)
             v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
@@ -1299,7 +1299,7 @@
             Lc = compute_Lc(s, k, ierr)
             if (ierr /= 0) return
             
-            Lt = compute_Lt(s, k, dm_m1, dm_00, g, area, P_m1, P_00, d_m1, d_00, eturb_m1, eturb_00, ierr)
+            Lt = compute_Lt(s, k, dm_m1, dm_00, g, area, P_m1, P_00, d_m1, d_00, et_m1, et_00, ierr)
             if (ierr /= 0) return
 
          end if
@@ -1324,7 +1324,7 @@
          integer, intent(out) :: ierr
          real(dp) :: m_00, dm_00, cgrav
          type(auto_diff_real_18var_order1) :: &
-            v_p1, v_00, r_p1, r_00, d_00, P_00, eturb_00, g_cell_00, h_00
+            v_p1, v_00, r_p1, r_00, d_00, P_00, et_00, g_cell_00, h_00
          include 'formats'
 
          ierr = 0
@@ -1335,7 +1335,7 @@
          r_p1 = wrap_r_p1(s, k) ! Set by wrap routine to r_center when k == nz.
          P_00 = wrap_P_00(s, k)
          d_00 = wrap_d_00(s, k)
-         eturb_00 = wrap_eturb_00(s, k)
+         et_00 = wrap_et_00(s, k)
          v_00 = wrap_v_00(s, k)
          v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
          
@@ -1345,7 +1345,7 @@
          if (ierr /= 0) return 
          
          Eq_18 = compute_epsilon_q(s, k, v_p1, v_00, &
-                                 r_p1, r_00, d_00, dm_00, eturb_00, h_00, ierr)
+                                 r_p1, r_00, d_00, dm_00, et_00, h_00, ierr)
 
       end subroutine calc_Eq_18
       
@@ -1357,7 +1357,7 @@
          integer, intent(out) :: ierr
          real(dp) :: m_m1, m_00, m_p1, cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00
          type(auto_diff_real_18var_order1) :: r_m1, r_00, r_p1, v_m1, v_00, v_p1
-         type(auto_diff_real_18var_order1) :: d_m1, d_00, P_m1, P_00, eturb_m1, eturb_00
+         type(auto_diff_real_18var_order1) :: d_m1, d_00, P_m1, P_00, et_m1, et_00
          include 'formats'
 
          ierr = 0
@@ -1392,15 +1392,15 @@
          d_m1 = wrap_d_m1(s, k)
          d_00 = wrap_d_00(s, k)
 
-         eturb_m1 = wrap_eturb_m1(s, k)
-         eturb_00 = wrap_eturb_00(s, k)
+         et_m1 = wrap_et_m1(s, k)
+         et_00 = wrap_et_00(s, k)
 
          P_00 = wrap_P_00(s, k)
          P_m1 = wrap_P_m1(s, k)
 
          Uq_18 = compute_Uq(s, k, r_m1, r_00, r_p1, v_m1, v_00, v_p1, m_m1, m_00, m_p1, &
                           cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00, d_m1, d_00, &
-                          P_m1, P_00, eturb_m1, eturb_00, ierr)
+                          P_m1, P_00, et_m1, et_00, ierr)
 
       end subroutine calc_Uq_18
 
@@ -1422,7 +1422,7 @@
       end function compute_h_00
 
 
-      subroutine set_eturb_start_vars(s, ierr)
+      subroutine set_et_start_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
@@ -1431,11 +1431,11 @@
          ierr = 0
          time_center = (s% use_Fraley_time_centering .and. s% include_L_in_Fraley_time_centering)
          do k=1,s%nz
-            call set1_eturb_start_vars(k, op_err) 
+            call set1_et_start_vars(k, op_err) 
             if (op_err /= 0) ierr = op_err  
          end do
          contains
-         subroutine set1_eturb_start_vars(k, ierr)   
+         subroutine set1_et_start_vars(k, ierr)   
             integer, intent(in) :: k
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: L, Lr, Lc, Lt
@@ -1448,16 +1448,16 @@
             else
                s% Lt_start(k) = 0d0  
             end if
-            s% Eturb_start(k) = s% Eturb(k)
-         end subroutine set1_eturb_start_vars
+            s% et_start(k) = s% et(k)
+         end subroutine set1_et_start_vars
          
-      end subroutine set_eturb_start_vars
+      end subroutine set_et_start_vars
       
       
-      subroutine reset_eturb_using_L(s, ierr)
+      subroutine reset_et_using_L(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, i_eturb, nz
+         integer :: k, i_et, nz
          real(dp) :: alpha, dm_bar, Lc_val, w_00
          type(auto_diff_real_18var_order1) :: &
             r_00, area, T_m1, T_00, kap_m1, kap_00, &
@@ -1466,11 +1466,11 @@
          logical, parameter :: dbg = .false.
          include 'formats'
          ierr = 0
-         alpha = s% Eturb_alfa
+         alpha = s% et_alfa
          if (alpha == 0d0) return
          nz = s% nz
          allocate(w_face(nz))
-         i_eturb = s% i_eturb
+         i_et = s% i_et
          w_face(1) = 0d0
          do k=2, nz
             dm_bar = s% dm_bar(k)
@@ -1494,16 +1494,16 @@
                w_00 = w_face(k)
             end if
             if (w_00 < 0d0) w_00 = 0d0
-            s% xh(i_eturb,k) = max(min_eturb, w_00**2)
-            s% Eturb(k) = s% xh(i_eturb,k)
+            s% xh(i_et,k) = max(min_et, w_00**2)
+            s% et(k) = s% xh(i_et,k)
             call compute_L(s, k, L, Lr, Lc, Lt, ierr)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
-            if (dbg) write(*,2) 'L_eturb/L, Lc_eturb/L, Lr_eturb/L, Eturb/energy, mlt_vc/cs', k, &
+            if (dbg) write(*,2) 'L_et/L, Lc_et/L, Lr_et/L, et/energy, mlt_vc/cs', k, &
                L%val/s% L(k), Lc%val/s% L(k), Lr%val/s% L(k), &
-               s% Eturb(k)/s% energy(k), s% mlt_vc(k)/s% csound(k)
+               s% et(k)/s% energy(k), s% mlt_vc(k)/s% csound(k)
          end do
-         if (dbg) stop 'reset_eturb_using_L'
-      end subroutine reset_eturb_using_L
+         if (dbg) stop 'reset_et_using_L'
+      end subroutine reset_et_using_L
 
 
       end module hydro_eturb

@@ -109,7 +109,7 @@
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
          use hydro_momentum, only: do1_momentum_eqn
-         use hydro_eturb, only: do1_turbulent_energy_eqn, do1_Eturb_L_eqn
+         use hydro_eturb, only: do1_turbulent_energy_eqn, do1_et_L_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
          use star_utils, only: show_matrix, &
@@ -123,7 +123,7 @@
 
          integer :: &
             i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
-            i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_deturb_dt, &
+            i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_det_dt, &
             equchem1, i, k, j, nvar_hydro, nvar_chem, nz, op_err
          integer :: &
             i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
@@ -136,7 +136,7 @@
             do_chem, do_mix, do_struct_hydro, do_struct_thermo, &
             do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
             do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, &
-            do_dEt_dt, do_deturb_dt
+            do_dEtRSP_dt, do_det_dt
 
          include 'formats'
 
@@ -176,7 +176,7 @@
          do_j_rot = (i_j_rot > 0 .and. i_j_rot <= nvar)
          do_dlnE_dt = (i_dlnE_dt > 0 .and. i_dlnE_dt <= nvar)
          do_equL = (i_equL > 0 .and. i_equL <= nvar)
-         do_deturb_dt = (i_deturb_dt > 0 .and. i_deturb_dt <= nvar)
+         do_det_dt = (i_det_dt > 0 .and. i_det_dt <= nvar)
 
          if (s% fill_arrays_with_NaNs) call set_nan(s% equ1)
 
@@ -342,7 +342,7 @@
                         ierr = op_err
                      end if
                   end if
-                  if (do_deturb_dt) then
+                  if (do_det_dt) then
                      call do1_turbulent_energy_eqn( &
                         s, k, xscale, equ, skip_partials, nvar, op_err)
                      if (op_err /= 0) then
@@ -352,12 +352,12 @@
                      end if
                   end if
                   if (do_equL) then
-                     if (s% Eturb_flag) then
-                        call do1_Eturb_L_eqn( &
+                     if (s% et_flag) then
+                        call do1_et_L_eqn( &
                            s, k, xscale, equ, L_start_max, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
-                           if (s% report_ierr) write(*,2) 'ierr in do1_Eturb_L_eqn', k
-                           if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Eturb_L_eqn'
+                           if (s% report_ierr) write(*,2) 'ierr in do1_et_L_eqn', k
+                           if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_et_L_eqn'
                            ierr = op_err
                         end if
                      else if (k > 1) then ! k==1 is done by T_surf BC
@@ -480,7 +480,7 @@
             i_dln_cvpv0_dt = s% i_dln_cvpv0_dt
             i_equ_w_div_wc = s% i_equ_w_div_wc
             i_dj_rot_dt = s% i_dj_rot_dt
-            i_deturb_dt = s% i_deturb_dt
+            i_det_dt = s% i_det_dt
 
             equchem1 = s% equchem1
 
@@ -505,7 +505,7 @@
 
             nvar_chem = s% nvar_chem
             
-            if (s% Eturb_flag) then
+            if (s% et_flag) then
                L_start_max = maxval(s% L_start(1:nz))
             else
                L_start_max = 0d0
@@ -1929,7 +1929,7 @@
          end if
          if (ierr /= 0) return
          
-         if (s% Eturb_flag .or. .not. do_equL) return ! no Tsurf BC
+         if (s% et_flag .or. .not. do_equL) return ! no Tsurf BC
          
          if (s% use_zero_dLdm_outer_BC) then
             call set_zero_dL_dm_BC(ierr)
@@ -2131,7 +2131,7 @@
 
             ierr = 0
             
-            if (s% Eturb_flag) return
+            if (s% et_flag) return
             i_T_BC = i_equL            
             if (i_T_BC == 0) then
                write(*,2) 'i_T_BC', s% model_number, i_T_BC
@@ -2229,7 +2229,7 @@
             if (test_partials) then
                s% solver_test_partials_var = s% i_lnT
                s% solver_test_partials_dval_dx = dlnP_bc_dlnT ! - s% chiT_for_partials(1)
-               write(*,*) 'set_Psurf_BC', s% solver_test_partials_var, s% Eturb_flag
+               write(*,*) 'set_Psurf_BC', s% solver_test_partials_var, s% et_flag
             end if
 
          end subroutine set_Psurf_BC
@@ -2277,7 +2277,7 @@
             if (test_partials) then
                s% solver_test_partials_var = s% i_lum
                s% solver_test_partials_dval_dx = P*dlnPsurf_dL
-               write(*,*) 'set_momentum_BC', s% solver_test_partials_var, s% Eturb_flag
+               write(*,*) 'set_momentum_BC', s% solver_test_partials_var, s% et_flag
             end if
 
          end subroutine set_momentum_BC

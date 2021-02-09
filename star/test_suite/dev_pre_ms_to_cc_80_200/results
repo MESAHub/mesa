@@ -1,6 +1,27 @@
 compare to Woosley ApJ 836 244, 2017.
 
-M_zams   M_He  M_CO  M_Fe  days  M_remnant   M_ejecta 
+
+need to check convergence.   test 100M and 200M.
+
+
+   inlist_common
+      mesh_delta_coeff = 0.8
+      time_delta_coeff = 0.8
+   inlist_common_converted
+      !split_merge_amr_mesh_delta_coeff = 1d0
+      split_merge_amr_nz_baseline = 2000
+      split_merge_amr_nz_r_core = 350
+
+
+M_zams   M_He  M_CO  M_Fe  days  M_remnant   M_ejecta    steps   retries  log_rel_run_E_err
+
+
+
+
+
+
+
+
  80      39.4  23.3  1.19  0.16  39.4        0.0      direct to cc with no pulses
  90      44.0  31.3  2.58  1.18  36.4        7.6      16 pulses leading to cc
 

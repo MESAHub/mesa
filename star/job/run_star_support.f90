@@ -506,11 +506,11 @@
             if (ierr /= 0) return
          end if
          
-         if (s% job% change_Eturb_flag_at_model_number == s% model_number) then
-            write(*,*) 'have reached model number for new_Eturb_flag', &
-               s% model_number, s% job% new_Eturb_flag
-            call star_set_Eturb_flag(id, s% job% new_Eturb_flag, ierr)
-            if (failed('star_set_Eturb_flag',ierr)) return
+         if (s% job% change_et_flag_at_model_number == s% model_number) then
+            write(*,*) 'have reached model number for new_et_flag', &
+               s% model_number, s% job% new_et_flag
+            call star_set_et_flag(id, s% job% new_et_flag, ierr)
+            if (failed('star_set_et_flag',ierr)) return
          end if
          
          if (s% log_max_temperature > 9d0 .and. &
@@ -2180,11 +2180,11 @@
             if (failed('star_set_RTI_flag',ierr)) return
          end if
          
-         if (s% job% change_Eturb_flag .or. &
-               (s% job% change_initial_Eturb_flag .and. .not. restart)) then
-            write(*,*) 'new_Eturb_flag', s% job% new_Eturb_flag
-            call star_set_Eturb_flag(id, s% job% new_Eturb_flag, ierr)
-            if (failed('star_set_Eturb_flag',ierr)) return
+         if (s% job% change_et_flag .or. &
+               (s% job% change_initial_et_flag .and. .not. restart)) then
+            write(*,*) 'new_et_flag', s% job% new_et_flag
+            call star_set_et_flag(id, s% job% new_et_flag, ierr)
+            if (failed('star_set_et_flag',ierr)) return
          end if
 
          if (s% job% change_RSP_flag .or. &

@@ -170,9 +170,9 @@
                do k = 1, nz
                   s% xh(j1,k) = s% L(k)
                end do
-            else if (j1 == s% i_eturb .and. s% i_eturb <= nvar) then
+            else if (j1 == s% i_et .and. s% i_et <= nvar) then
                do k = 1, nz
-                  s% xh(j1,k) = s% Eturb(k)
+                  s% xh(j1,k) = s% et(k)
                end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz

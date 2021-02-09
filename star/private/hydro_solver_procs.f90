@@ -620,27 +620,26 @@
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
          integer :: id, i, j, k, species, bad_j, bad_k, &
-            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_eturb
+            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_et
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
-            old_E, dE, new_E, old_lnd, dlnd, new_lnd, deturb, old_eturb, new_eturb, &
-            dw_div_wc, old_w_div_wc, new_w_div_wc, &
-            dconv_vel, old_conv_vel, new_conv_vel, dEt, old_Et, new_Et, &
+            old_E, dE, new_E, old_lnd, dlnd, new_lnd, det, old_et, new_et, &
+            dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
             dalpha_RTI, new_alpha_RTI, old_alpha_RTI, log_conv_vel_v0, &
             dlum_surf, old_lum_surf, new_lum_surf
          include 'formats'
          ierr = 0
          min_alpha = 1d0
 
-         if (s% Eturb_flag) then ! clip change in eturb to maintain non-negativity.
-            i_eturb = s% i_eturb
+         if (s% et_flag) then ! clip change in et to maintain non-negativity.
+            i_et = s% i_et
             do k = 1, s% nz
-               deturb = B(i_eturb,k)*xscale(i_eturb,k)*correction_factor
-               old_eturb = s% xh_start(i_eturb,k) + dx(i_eturb,k)
-               new_eturb = old_eturb + deturb
-               if (deturb >= 0) cycle
-               if (new_eturb >= 0d0) cycle
-               deturb = min_eturb*1d-6 - old_eturb
-               B(i_eturb,k) = deturb/(xscale(i_eturb,k)*correction_factor)
+               det = B(i_et,k)*xscale(i_et,k)*correction_factor
+               old_et = s% xh_start(i_et,k) + dx(i_et,k)
+               new_et = old_et + det
+               if (det >= 0) cycle
+               if (new_et >= 0d0) cycle
+               det = min_et*1d-6 - old_et
+               B(i_et,k) = det/(xscale(i_et,k)*correction_factor)
             end do
          end if
 

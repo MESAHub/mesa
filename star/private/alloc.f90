@@ -587,10 +587,10 @@
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
             
-            call do1(s% Eturb, c% Eturb)
-            if (failed('Eturb')) exit
-            call do1(s% Eturb_start, c% Eturb_start)
-            if (failed('Eturb_start')) exit
+            call do1(s% et, c% et)
+            if (failed('et')) exit
+            call do1(s% et_start, c% et_start)
+            if (failed('et_start')) exit
             
             call do1(s% dxh_lnd, c% dxh_lnd)
             if (failed('dxh_lnd')) exit
@@ -600,8 +600,8 @@
             if (failed('dxh_lnT')) exit
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
-            call do1(s% dxh_Eturb, c% dxh_Eturb)
-            if (failed('dxh_Eturb')) exit
+            call do1(s% dxh_et, c% dxh_et)
+            if (failed('dxh_et')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
             if (failed('dxh_ln_cvpv0')) exit
 
@@ -611,16 +611,16 @@
             if (failed('dlnT_dt')) exit
             call do1(s% dlnR_dt, c% dlnR_dt)
             if (failed('dlnR_dt')) exit
-            call do1(s% dEturb_dt, c% dEturb_dt)
-            if (failed('dEturb_dt')) exit
+            call do1(s% det_dt, c% det_dt)
+            if (failed('det_dt')) exit
             call do1(s% dv_dt, c% dv_dt)
             if (failed('dv_dt')) exit
             call do1(s% du_dt, c% du_dt)
             if (failed('du_dt')) exit
             call do1(s% dalpha_RTI_dt, c% dalpha_RTI_dt)
             if (failed('dalpha_RTI_dt')) exit
-            call do1(s% dEt_dt, c% dEt_dt)
-            if (failed('dEt_dt')) exit
+            call do1(s% dEtRSP_dt, c% dEtRSP_dt)
+            if (failed('dEtRSP_dt')) exit
             call do1(s% dln_cvpv0_dt, c% dln_cvpv0_dt)
             if (failed('dln_cvpv0_dt')) exit
             call do1(s% dj_rot_dt, c% dj_rot_dt)
@@ -1349,8 +1349,8 @@
             if (failed('lnd_for_d_dt_const_m')) exit
             call do1(s% lnR_for_d_dt_const_m, c% lnR_for_d_dt_const_m)
             if (failed('lnR_for_d_dt_const_m')) exit
-            call do1(s% Eturb_for_d_dt_const_m, c% Eturb_for_d_dt_const_m)
-            if (failed('Eturb_for_d_dt_const_m')) exit
+            call do1(s% et_for_d_dt_const_m, c% et_for_d_dt_const_m)
+            if (failed('et_for_d_dt_const_m')) exit
             call do1(s% v_for_d_dt_const_m, c% v_for_d_dt_const_m)
             if (failed('v_for_d_dt_const_m')) exit
             call do1(s% u_for_d_dt_const_m, c% u_for_d_dt_const_m)
@@ -2454,7 +2454,7 @@
          s% i_u = 0
          s% i_du_dt = 0
 
-         if (((.not. s% Eturb_flag) .and. (s% u_flag .or. s% v_flag)) .or. s% RSP_flag) then
+         if (((.not. s% et_flag) .and. (s% u_flag .or. s% v_flag)) .or. s% RSP_flag) then
 
             i = i+1
             s% i_lnd = i
@@ -2472,8 +2472,8 @@
             end if
             s% i_equL = s% i_lum
 
-            s% i_eturb = 0
-            s% i_deturb_dt = s% i_eturb
+            s% i_et = 0
+            s% i_det_dt = s% i_et
 
             i = i+1
             s% i_lnR = i
@@ -2508,12 +2508,12 @@
             s% i_lum = i
             s% i_dlnE_dt = s% i_lum
             
-            if (s% Eturb_flag) then
-               i = i+1; s% i_eturb = i
+            if (s% et_flag) then
+               i = i+1; s% i_et = i
             else 
-               s% i_eturb = 0
+               s% i_et = 0
             end if
-            s% i_deturb_dt = s% i_eturb
+            s% i_det_dt = s% i_et
 
             i = i+1
             s% i_lnR = i
@@ -2557,15 +2557,15 @@
          s% i_dj_rot_dt = s% i_j_rot
 
          if (s% RSP_flag) then
-            i = i+1; s% i_eturb_RSP = i
+            i = i+1; s% i_etrb_RSP = i
             i = i+1; s% i_erad_RSP = i
             i = i+1; s% i_Fr_RSP = i
          else
-            s% i_eturb_RSP = 0
+            s% i_etrb_RSP = 0
             s% i_erad_RSP = 0
             s% i_Fr_RSP = 0
          end if
-         s% i_deturb_RSP_dt = s% i_eturb_RSP
+         s% i_detrb_RSP_dt = s% i_etrb_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
 
@@ -2582,9 +2582,9 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_eturb /= 0) s% nameofvar(s% i_eturb) = 'eturb'
+         if (s% i_et /= 0) s% nameofvar(s% i_et) = 'et'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
-         if (s% i_eturb_RSP /= 0) s% nameofvar(s% i_eturb_RSP) = 'eturb_RSP'
+         if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
          if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
@@ -2598,9 +2598,9 @@
          if (s% i_dlnd_dt /= 0) s% nameofequ(s% i_dlnd_dt) = 'dlnd_dt'
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
-         if (s% i_deturb_dt /= 0) s% nameofequ(s% i_deturb_dt) = 'deturb_dt'
+         if (s% i_det_dt /= 0) s% nameofequ(s% i_det_dt) = 'det_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
-         if (s% i_deturb_RSP_dt /= 0) s% nameofequ(s% i_deturb_RSP_dt) = 'deturb_RSP_dt'
+         if (s% i_detrb_RSP_dt /= 0) s% nameofequ(s% i_detrb_RSP_dt) = 'detrb_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
          if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
@@ -2942,45 +2942,45 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_Eturb_flag(id, Eturb_flag, ierr)
+      subroutine set_et_flag(id, et_flag, ierr)
          integer, intent(in) :: id
-         logical, intent(in) :: Eturb_flag
+         logical, intent(in) :: et_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, j, nz, iounit
-         real(dp), pointer :: eturb_RSP(:)
+         real(dp), pointer :: etrb_RSP(:)
          logical, parameter :: dbg = .false.
-         logical :: have_eturb_RSP
+         logical :: have_etrb_RSP
 
          include 'formats'
 
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% Eturb_flag .eqv. Eturb_flag) return
+         if (s% et_flag .eqv. et_flag) return
 
          nz = s% nz
          
-         have_eturb_RSP = .false.
-         if (Eturb_flag .and. s% RSP_flag) then ! turn RSP off before turn Eturb on
-            have_eturb_RSP = .true.
-            allocate(eturb_RSP(nz))
+         have_etrb_RSP = .false.
+         if (et_flag .and. s% RSP_flag) then ! turn RSP off before turn et on
+            have_etrb_RSP = .true.
+            allocate(etrb_RSP(nz))
             do k=1,nz
-               eturb_RSP(k) = s% xh(s% i_eturb_RSP,k)
+               etrb_RSP(k) = s% xh(s% i_etrb_RSP,k)
             end do
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
          
-         s% Eturb_flag = Eturb_flag
+         s% et_flag = et_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. Eturb_flag) call remove1(s% i_eturb)
+         if (.not. et_flag) call remove1(s% i_et)
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_Eturb_flag variables and equations'
+         write(*,*) 'set_et_flag variables and equations'
          do j=1,s% nvar_hydro
             write(*,2) trim(s% nameofvar(j)) // ' ' // trim(s% nameofequ(j)), j
          end do
@@ -2992,9 +2992,9 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (Eturb_flag) call insert1(s% i_eturb)
+         if (et_flag) call insert1(s% i_et)
          
-         if (have_eturb_RSP) deallocate(eturb_RSP)
+         if (have_etrb_RSP) deallocate(etrb_RSP)
 
          call set_chem_names(s)
          
@@ -3006,9 +3006,9 @@
             call insert(s% xh,i_var)
             call insert(s% xh_start,i_var)
             do k=1,nz
-               s% xh(i_var,k) = min_Eturb
+               s% xh(i_var,k) = min_et
             end do
-            s% need_to_reset_Eturb = .true.
+            s% need_to_reset_et = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then
                call insert(s% xh_old,i_var)
             end if
@@ -3048,7 +3048,7 @@
             xs(i_var,1:nz) = 0d0
          end subroutine insert
 
-      end subroutine set_Eturb_flag
+      end subroutine set_et_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)
@@ -3073,7 +3073,7 @@
          if (.not. RSP_flag) then
             call remove1(s% i_Fr_RSP)
             call remove1(s% i_erad_RSP)
-            call remove1(s% i_eturb_RSP)
+            call remove1(s% i_etrb_RSP)
          else if (s% i_lum /= 0) then
             call remove1(s% i_lum)
          end if
@@ -3088,7 +3088,7 @@
          if (ierr /= 0) return
 
          if (RSP_flag) then
-            call insert1(s% i_eturb_RSP)
+            call insert1(s% i_etrb_RSP)
             call insert1(s% i_erad_RSP)
             call insert1(s% i_Fr_RSP)
          else
