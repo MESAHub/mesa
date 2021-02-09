@@ -569,6 +569,8 @@
       
       
       ! for Riemann solver      
+      type(auto_diff_real_18var_order1), pointer, dimension(:) :: &
+         u_face_18, P_face_18
       real(dp), pointer, dimension(:) :: &
          u_face, &
          d_uface_dlnR, &
