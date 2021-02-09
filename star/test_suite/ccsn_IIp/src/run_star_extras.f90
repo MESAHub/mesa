@@ -1176,7 +1176,7 @@
             kap = 0.5d0*(s% opacity(k) + s% opacity(k-1))
             dtau = -s% dm_bar(k)*kap/(4*pi*s% r(k)*s% r(k))
             vals(k,1) = (s% lnT(k) - s% lnT(k+1))/dtau
-            vals(k,2) = s% u_face(k)*3d0/clight
+            vals(k,2) = s% u_face_18(k)%val*3d0/clight
             vals(k,3) = safe_log10(vals(k,1)/max(1d-99,vals(k,2)))
          end do
          vals(s% nz,1:3) = vals(s% nz-1,1:3)

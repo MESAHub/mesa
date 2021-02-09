@@ -169,6 +169,7 @@
          if (k == 1) then
             s% u_face_18(k)%val = s% u(k)
             s% u_face_18(k)%d1Array(:) = 0d0
+            s% u_face_18(k)%d1Array(i_v_00) = 1d0
             s% P_face_18(k) = wrap_p_00(s,k)
             return            
          end if

@@ -813,8 +813,8 @@
          end if
 
          if (test_partials) then   
-            s% solver_test_partials_var = i_w_div_wc
-            s% solver_test_partials_dval_dx = uc_factor*s% d_uface_dw(k)
+            s% solver_test_partials_var = i_u
+            s% solver_test_partials_dval_dx = uc_factor*d_uface_du00
          end if
             
       end subroutine do1_Riemann_dlnRdt_eqn
