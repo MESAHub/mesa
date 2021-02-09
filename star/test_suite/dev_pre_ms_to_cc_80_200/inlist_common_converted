@@ -39,9 +39,7 @@
 
 ! mixing
       
-! timesteps      
-      !time_delta_coeff = 0.75
-      
+! timesteps            
       dX_nuc_drop_limit = 5d-2
       dX_nuc_drop_limit_at_high_T = 1d-2 ! for center logT > 9.45
 

@@ -9,7 +9,7 @@
       required_termination_code_string(1) = 'fe_core_infall_limit'  ! for lower masses
       required_termination_code_string(2) = 'log_Rsurf_upper_limit' ! for higher masses
       required_termination_code_string(3) = 'remnant_mass_min_limit' ! for completely unbound cases
-      required_termination_code_string(4) = 'max_model_number' ! for testing
+      !required_termination_code_string(4) = 'max_model_number' ! for testing
       
       !set_initial_model_number = .false.
 
@@ -27,7 +27,7 @@
 
 &controls   
       ! limit max_model_number as part of test_suite
-      max_model_number = 104 ! 10000      
+      max_model_number = 10000      
       !max_number_retries = 30
       
       log_Rsurf_upper_limit = 4d0 ! for higher masses

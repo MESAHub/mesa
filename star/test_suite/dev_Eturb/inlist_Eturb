@@ -5,10 +5,10 @@
    show_log_description_at_start = .false.
 
    load_saved_model = .true.
-   !saved_model_name = 'LBV_env.mod'    ! needs Eturb_Lsurf_factor = 0.25d0 to match MLT
-   !saved_model_name = 'RSG_env.mod'    ! needs Eturb_Lsurf_factor = 0.25d0 to match MLT
-   !saved_model_name = 'Cepheid_env.mod'    ! ok with Eturb_Lsurf_factor = 0.5d0
-   saved_model_name = 'RR_Lyrae_env.mod'    ! ok with Eturb_Lsurf_factor = 0.5d0
+   !saved_model_name = 'LBV_env.mod'    ! needs et_Lsurf_factor = 0.25d0 to match MLT
+   !saved_model_name = 'RSG_env.mod'    ! needs et_Lsurf_factor = 0.25d0 to match MLT
+   !saved_model_name = 'Cepheid_env.mod'    ! ok with et_Lsurf_factor = 0.5d0
+   saved_model_name = 'RR_Lyrae_env.mod'    ! ok with et_Lsurf_factor = 0.5d0
    
 
    save_model_when_terminate = .true.
@@ -27,8 +27,8 @@
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1d0
 
-   change_initial_Eturb_flag = .true.
-   new_Eturb_flag = .true.
+   change_initial_et_flag = .true.
+   new_et_flag = .true.
 
    change_initial_v_flag = .true.
    new_v_flag = .true.
@@ -50,12 +50,15 @@
 
 
 &controls  
-   !Eturb_Lsurf_factor = 0.25d0 ! for RSG and LBV
+   !et_Lsurf_factor = 0.25d0 ! for RSG and LBV
 
    initial_z = 0.02d0
    initial_mass = 30d0
+
+   max_number_retries = 10
+   max_model_number = 50
    
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with Eturb
+   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with et
       
    use_momentum_outer_BC = .true.
 
@@ -74,15 +77,11 @@
    dxdt_nuc_factor = 0
    mix_factor = 0
    
-   
-   max_number_retries = 1
-   max_model_number = 2
-   
-      !   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
-      !   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq ~ Eturb_alfam
-      !   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar   
+      !   et_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      !   et_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   et_alfat =     0.0d0         ! turbulent flux; Lt ~ et_alfat
+      !   et_alfam =     0.25d0        ! turbulent viscosity; Eq ~ et_alfam
+      !   et_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ et_alfar   
       
 
    !use_d_eos_dxa = .true.
@@ -95,7 +94,7 @@
   
   !convergence_ignore_equL_residuals = .true.
 
-   !Eturb_alfa = 0d0 ! purely radiative model
+   !et_alfa = 0d0 ! purely radiative model
 
   !use_Fraley_time_centering = .true.
   !use_avQ_art_visc = .true.
