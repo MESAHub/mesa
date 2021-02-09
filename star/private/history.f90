@@ -1856,13 +1856,13 @@
                val = safe_log10(maxval(abs(s% E_residual(1:nz)))/ln10)
 
             case(h_u_surf_km_s)
-               if (s% u_flag) val = s% u_face(1)*1d-5
+               if (s% u_flag) val = s% u_face_18(1)%val*1d-5
             case(h_u_surf)
-               if (s% u_flag) val = s% u_face(1)
+               if (s% u_flag) val = s% u_face_18(1)%val
             case(h_u_div_csound_max)
                if (s% u_flag) val = maxval(abs(s% u(1:nz))/s% csound(1:nz))
             case(h_u_div_csound_surf)
-               if (s% u_flag) val = s% u_face(1)/s% csound_face(1)
+               if (s% u_flag) val = s% u_face_18(1)%val/s% csound_face(1)
 
             case(h_surf_escape_v)
                val = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))

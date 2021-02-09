@@ -326,7 +326,8 @@
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
-            s% uface_start(k) = s% u_face(k)
+            s% u_face_start(k) = 0d0 ! s% u_face_18(k)%val
+            s% P_face_start(k) = -1d0 ! mark as unset s% P_face_18(k)%val
             s% L_start(k) = s% L(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)

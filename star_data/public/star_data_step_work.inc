@@ -572,27 +572,29 @@
       type(auto_diff_real_18var_order1), pointer, dimension(:) :: &
          u_face_18, P_face_18
       real(dp), pointer, dimension(:) :: &
-         u_face, &
-         d_uface_dlnR, &
-         d_uface_du00, &
-         d_uface_dum1, &
-         d_uface_dlnd00, &
-         d_uface_dlndm1, &
-         d_uface_dlnT00, &
-         d_uface_dlnTm1, &
+         !u_face, &
+         !d_uface_dlnR, &
+         !d_uface_du00, &
+         !d_uface_dum1, &
+         !d_uface_dlnd00, &
+         !d_uface_dlndm1, &
+         !d_uface_dlnT00, &
+         !d_uface_dlnTm1, &
          d_uface_dw, &
-         RTI_du_diffusion_kick
+         RTI_du_diffusion_kick, &
+         u_face_start
       real(dp), pointer, dimension(:) :: &
-         P_face, &
-         d_Pface_dL, &
-         d_Pface_dlnR, &
-         d_Pface_du00, &
-         d_Pface_dum1, &
-         d_Pface_dlnd00, &
-         d_Pface_dlndm1, &
-         d_Pface_dlnT00, &
-         d_Pface_dlnTm1, &
-         d_Pface_dw
+         !P_face, &
+         !d_Pface_dL, &
+         !d_Pface_dlnR, &
+         !d_Pface_du00, &
+         !d_Pface_dum1, &
+         !d_Pface_dlnd00, &
+         !d_Pface_dlndm1, &
+         !d_Pface_dlnT00, &
+         !d_Pface_dlnTm1, &
+         d_Pface_dw, &
+         P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
          abs_du_plus_cs

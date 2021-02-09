@@ -1267,45 +1267,49 @@
 
             call do1_18(s% u_face_18, c% u_face_18)
             if (failed('u_face_18')) exit
-            call do1(s% u_face, c% u_face)
-            if (failed('u_face')) exit
-            call do1(s% d_uface_dlnR, c% d_uface_dlnR)
-            if (failed('d_uface_dlnR')) exit
-            call do1(s% d_uface_du00, c% d_uface_du00)
-            if (failed('d_uface_du00')) exit
-            call do1(s% d_uface_dum1, c% d_uface_dum1)
-            if (failed('d_uface_dum1')) exit
-            call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
-            if (failed('d_uface_dlnd00')) exit
-            call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
-            if (failed('d_uface_dlndm1')) exit
-            call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
-            if (failed('d_uface_dlnT00')) exit
-            call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
-            if (failed('d_uface_dlnTm1')) exit
+            call do1(s% u_face_start, c% u_face_start)
+            if (failed('u_face_start')) exit
+            !call do1(s% u_face, c% u_face)
+            !if (failed('u_face')) exit
+            !call do1(s% d_uface_dlnR, c% d_uface_dlnR)
+            !if (failed('d_uface_dlnR')) exit
+            !call do1(s% d_uface_du00, c% d_uface_du00)
+            !if (failed('d_uface_du00')) exit
+            !call do1(s% d_uface_dum1, c% d_uface_dum1)
+            !if (failed('d_uface_dum1')) exit
+            !call do1(s% d_uface_dlnd00, c% d_uface_dlnd00)
+            !if (failed('d_uface_dlnd00')) exit
+            !call do1(s% d_uface_dlndm1, c% d_uface_dlndm1)
+            !if (failed('d_uface_dlndm1')) exit
+            !call do1(s% d_uface_dlnT00, c% d_uface_dlnT00)
+            !if (failed('d_uface_dlnT00')) exit
+            !call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
+            !if (failed('d_uface_dlnTm1')) exit
             call do1(s% d_uface_dw, c% d_uface_dw)
             if (failed('d_uface_dw')) exit
 
             call do1_18(s% P_face_18, c% P_face_18)
             if (failed('P_face_18')) exit
-            call do1(s% P_face, c% P_face)
-            if (failed('P_face')) exit
-            call do1(s% d_Pface_dL, c% d_Pface_dL)
-            if (failed('d_Pface_dL')) exit
-            call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
-            if (failed('d_Pface_dlnR')) exit
-            call do1(s% d_Pface_du00, c% d_Pface_du00)
-            if (failed('d_Pface_du00')) exit
-            call do1(s% d_Pface_dum1, c% d_Pface_dum1)
-            if (failed('d_Pface_dum1')) exit
-            call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
-            if (failed('d_Pface_dlnd00')) exit
-            call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
-            if (failed('d_Pface_dlndm1')) exit
-            call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
-            if (failed('d_Pface_dlnT00')) exit
-            call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
-            if (failed('d_Pface_dlnTm1')) exit
+            call do1(s% P_face_start, c% P_face_start)
+            if (failed('P_face_start')) exit
+            !call do1(s% P_face, c% P_face)
+            !if (failed('P_face')) exit
+            !call do1(s% d_Pface_dL, c% d_Pface_dL)
+            !if (failed('d_Pface_dL')) exit
+            !call do1(s% d_Pface_dlnR, c% d_Pface_dlnR)
+            !if (failed('d_Pface_dlnR')) exit
+            !call do1(s% d_Pface_du00, c% d_Pface_du00)
+            !if (failed('d_Pface_du00')) exit
+            !call do1(s% d_Pface_dum1, c% d_Pface_dum1)
+            !if (failed('d_Pface_dum1')) exit
+            !call do1(s% d_Pface_dlnd00, c% d_Pface_dlnd00)
+            !if (failed('d_Pface_dlnd00')) exit
+            !call do1(s% d_Pface_dlndm1, c% d_Pface_dlndm1)
+            !if (failed('d_Pface_dlndm1')) exit
+            !call do1(s% d_Pface_dlnT00, c% d_Pface_dlnT00)
+            !if (failed('d_Pface_dlnT00')) exit
+            !call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
+            !if (failed('d_Pface_dlnTm1')) exit
             call do1(s% d_Pface_dw, c% d_Pface_dw)
             if (failed('d_Pface_dw')) exit
 
@@ -1404,8 +1408,6 @@
             if (failed('v_start')) exit
             call do1(s% u_start, c% u_start)
             if (failed('u_start')) exit
-            call do1(s% uface_start, c% uface_start)
-            if (failed('uface_start')) exit
             call do1(s% L_start, c% L_start)
             if (failed('L_start')) exit
             call do1(s% r_start, c% r_start)
@@ -2930,8 +2932,8 @@
                s% xh(i_u,k) = 0.5d0*(s% r(k)*s% dlnR_dt(k) + s% v_center)
             end if
             if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-            s% u_face(1:nz) = 0
-            s% P_face(1:nz) = 0
+            call fill_18_with_zeros(s% u_face_18,1,-1)
+            call fill_18_with_zeros(s% P_face_18,1,-1)
             s% du_dt(1:nz) = 0
          end if
 

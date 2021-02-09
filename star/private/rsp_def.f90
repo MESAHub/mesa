@@ -855,11 +855,11 @@
          ! set some things for mesa output reporting
          i = 1
          s% rho_face(i) = s% rho(i)
-         s% P_face(i) = s% P(i)
+         s% P_face_18(i)%val = s% P(i)
          s% csound_face(i) = s% csound(i)
          do i = 2,NZN
             s% rho_face(i) = 0.5d0*(s% rho(i) + s% rho(i-1))
-            s% P_face(i) = 0.5d0*(s% P(i) + s% P(i-1))
+            s% P_face_18(i)%val = 0.5d0*(s% P(i) + s% P(i-1))
             s% csound_face(i) = 0.5d0*(s% csound(i) + s% csound(i-1))
          end do
          

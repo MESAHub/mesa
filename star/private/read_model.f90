@@ -84,6 +84,7 @@
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
          use report, only: do_report
+         use alloc, only: fill_18_with_zeros
          type (star_info), pointer :: s
          logical, intent(in) :: restart, want_rsp_model, is_rsp_model
          integer, intent(out) :: ierr
@@ -156,8 +157,8 @@
          s% ergs_error(1:nz) = 0
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
-            s% u_face(1:nz) = 0
-            s% P_face(1:nz) = 0
+            call fill_18_with_zeros(s% u_face_18,1,-1)
+            call fill_18_with_zeros(s% P_face_18,1,-1)
             s% du_dt(1:nz) = 0
          end if
 

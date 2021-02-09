@@ -56,23 +56,13 @@
 
       
       ! (g cm/s)/s from cell(k) to cell(k-1)
-      subroutine eval1_momentum_flux(s, k, &
-            momflux, d_momflux_dlnR, d_momflux_dL, &
-            d_momflux_du00, d_momflux_dum1, &
-            d_momflux_dlnd00, d_momflux_dlndm1, &
-            d_momflux_dlnT00, d_momflux_dlnTm1, &
-            d_momflux_dw, ierr)
+      subroutine eval1_momentum_flux_18(s, k, momflux_18, d_momflux_dw, ierr)
          type (star_info), pointer :: s 
          integer, intent(in) :: k
-         real(qp), intent(out) :: momflux
-         real(dp), intent(out) :: &
-            d_momflux_dlnR, d_momflux_dL, &
-            d_momflux_du00, d_momflux_dum1, &
-            d_momflux_dlnd00, d_momflux_dlndm1, &
-            d_momflux_dlnT00, d_momflux_dlnTm1, &
-            d_momflux_dw
+         type(auto_diff_real_18var_order1), intent(out) :: momflux_18
+         real(dp), intent(out) :: d_momflux_dw
          integer, intent(out) :: ierr
-         real(qp) :: r, A, Pface
+         real(dp) :: r, A
          integer :: nz
          logical :: test_partials
          include 'formats'
@@ -80,80 +70,51 @@
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0
-         d_momflux_dL = 0 
-         d_momflux_dlnR = 0 
-         d_momflux_du00 = 0 
-         d_momflux_dum1 = 0 
-         d_momflux_dlnd00 = 0 
-         d_momflux_dlndm1 = 0 
-         d_momflux_dlnT00 = 0 
-         d_momflux_dlnTm1 = 0 
          d_momflux_dw = 0 
          nz = s% nz
          if (k > nz) then
-            momflux = 0
+            momflux_18 = 0d0
             return    
          end if
          r = s% r(k)
          A = 4d0*pi*r*r
-         Pface = s% P_face(k)
-         momflux = A*Pface
-         
-         d_momflux_dlnR = 2d0*momflux + A*s% d_Pface_dlnR(k)
-         d_momflux_dL = s% d_Pface_dL(k)*A
-         d_momflux_du00 = s% d_Pface_du00(k)*A
-         d_momflux_dum1 = s% d_Pface_dum1(k)*A
-         d_momflux_dlnd00 = s% d_Pface_dlnd00(k)*A
-         d_momflux_dlndm1 = s% d_Pface_dlndm1(k)*A
-         d_momflux_dlnT00 = s% d_Pface_dlnT00(k)*A
-         d_momflux_dlnTm1 = s% d_Pface_dlnTm1(k)*A
+         momflux_18 = A*s% P_face_18(k)         
          d_momflux_dw = A*s% d_Pface_dw(k)
               
          if (test_partials) then
-            s% solver_test_partials_val = momflux
+            s% solver_test_partials_val = momflux_18%val
             s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = d_momflux_dlnTm1
+            s% solver_test_partials_dval_dx = momflux_18%d1Array(i_lnT_00)
          end if
          
-      end subroutine eval1_momentum_flux
+      end subroutine eval1_momentum_flux_18
       
       
-      subroutine eval_surf_momentum_flux(s, P_surf, &
+      subroutine eval_surf_momentum_flux_18(s, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            momflux, d_momflux_dlnR, d_momflux_dL, &
-            d_momflux_du00, d_momflux_dum1, &
-            d_momflux_dlnd00, d_momflux_dlndm1, &
-            d_momflux_dlnT00, d_momflux_dlnTm1, &
-            d_momflux_dw, ierr)
+            momflux_18, d_momflux_dw, ierr)
          type (star_info), pointer :: s 
          real(dp), intent(in) :: P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         real(qp), intent(out) :: momflux
-         real(dp), intent(out) :: &
-            d_momflux_dlnR, d_momflux_dL, &
-            d_momflux_du00, d_momflux_dum1, &
-            d_momflux_dlnd00, d_momflux_dlndm1, &
-            d_momflux_dlnT00, d_momflux_dlnTm1, &
-            d_momflux_dw
+         type(auto_diff_real_18var_order1), intent(out) :: momflux_18
+         real(dp), intent(out) :: d_momflux_dw
          integer, intent(out) :: ierr
          integer :: k
-         real(qp) :: r, A
+         real(qp) :: r, A, momflux
          include 'formats'
          ierr = 0
          k = 1
          r = s% r(k)
          A = 4d0*pi*r*r
          momflux = A*P_surf
-         d_momflux_dlnR = momflux*(2 + dlnPsurf_dlnR)
-         d_momflux_dL = momflux*dlnPsurf_dL
-         d_momflux_dlnd00 = momflux*dlnPsurf_dlnd
-         d_momflux_dlnT00 = momflux*dlnPsurf_dlnT
-         d_momflux_du00 = 0
-         d_momflux_dum1 = 0
-         d_momflux_dlndm1 = 0
-         d_momflux_dlnTm1 = 0
+         momflux_18%val = momflux
+         momflux_18%d1Array(:) = 0d0
+         momflux_18%d1Array(i_lnR_00) = momflux*(2 + dlnPsurf_dlnR)
+         momflux_18%d1Array(i_L_00) = momflux*dlnPsurf_dL
+         momflux_18%d1Array(i_lnd_00) = momflux*dlnPsurf_dlnd
+         momflux_18%d1Array((i_lnT_00)) = momflux*dlnPsurf_dlnT
          d_momflux_dw = 0
-      end subroutine eval_surf_momentum_flux
+      end subroutine eval_surf_momentum_flux_18
 
 
       subroutine do_surf_Riemann_dudt_eqn( &
@@ -294,6 +255,7 @@
             e00_csL, em1_csL, &            
             e00_w, ep1_w, &
             ierr)
+         use auto_diff_support, only: shift_p1
          use hydro_reconstruct, only: get_G
          type (star_info), pointer :: s         
          integer, intent(in) :: k
@@ -321,8 +283,10 @@
          integer, intent(out) :: ierr
       
          integer :: j, nz, i_du_dt
+         type(auto_diff_real_18var_order1) :: &
+            flux_in_18, flux_out_18, net_momflux_18
          real(qp) :: &
-            flux_out, flux_in, momflux00, momfluxp1, rR, rL, P, &
+            rR, rL, P, &
             geometry_source, gravity_source, diffusion_source, &
             sources, dm, mL, mR, dudt_ex_qp, &
             gsL, gsR, u_p1, u_00, u_m1, sigp1, sig00            
@@ -330,22 +294,6 @@
             G00, dG00_dlnR, dgsR_dlnRR, Gp1, dGp1_dlnR, dgsL_dlnRL, &
             dG00_dw, dGp1_dw, dgsR_dwR, dgsL_dwL, &
             dudt_expected, ds_dlnR00, ds_dlnRp1, ds_dlnd00, ds_dlnT00, ds_dw00, ds_dwp1, &
-            d_momflux00_dlnR00, d_momflux00_dL00, &
-            d_momflux00_du00, d_momflux00_dum1, &
-            d_momflux00_dlnd00, d_momflux00_dlndm1, &
-            d_momflux00_dlnT00, d_momflux00_dlnTm1, &
-            d_momfluxp1_dlnRp1, d_momfluxp1_dLp1, &
-            d_momfluxp1_dup1, d_momfluxp1_du00, &
-            d_momfluxp1_dlndp1, d_momfluxp1_dlnd00, &
-            d_momfluxp1_dlnTp1, d_momfluxp1_dlnT00, &
-            d_momflux00_dPR_00, d_momflux00_dPL_m1, &
-            d_momflux00_duR_00, d_momflux00_duL_m1, &
-            d_momflux00_drhoR_00, d_momflux00_drhoL_m1, &
-            d_momflux00_dcsR_00, d_momflux00_dcsL_m1, &
-            d_momfluxp1_dPR_p1, d_momfluxp1_dPL_00, &
-            d_momfluxp1_duR_p1, d_momfluxp1_duL_00, &
-            d_momfluxp1_drhoR_p1, d_momfluxp1_drhoL_00, &
-            d_momfluxp1_dcsR_p1, d_momfluxp1_dcsL_00, &
             d_momflux00_dw00, d_momfluxp1_dwp1, &
             Uq, dUq_dlnR00, dUq_dlnRp1, &
             dUq_dlnd00, dUq_dlnT00, dUq_dEt00, &
@@ -393,6 +341,17 @@
          ierr = 0
          nz = s% nz
          i_du_dt = s% i_du_dt
+         dt = s% dt
+         dm = s% dm(k)
+         rR = s% r(k)
+         mR = s% m(k)
+         if (k == nz) then
+            rL = s% R_center
+            mL = s% M_center
+         else
+            rL = s% r(k+1)
+            mL = s% m(k+1)
+         end if
          
          residual = 0
          e00_u = 0; em1_u = 0; ep1_u = 0
@@ -413,46 +372,25 @@
          
          dbg = .false.
          if (k == 1) then
-            call eval_surf_momentum_flux(s, P_surf, &
+            call eval_surf_momentum_flux_18(s, P_surf, &
                dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-               momflux00, d_momflux00_dlnR00, d_momflux00_dL00, &
-               d_momflux00_du00, d_momflux00_dum1, &
-               d_momflux00_dlnd00, d_momflux00_dlndm1, &
-               d_momflux00_dlnT00, d_momflux00_dlnTm1, &
-               d_momflux00_dw00,ierr)   
+               flux_out_18, d_momflux00_dw00,ierr)   
             if (ierr /= 0) return
          else
-            call eval1_momentum_flux(s, k, &
-               momflux00, d_momflux00_dlnR00, d_momflux00_dL00, &
-               d_momflux00_du00, d_momflux00_dum1, &
-               d_momflux00_dlnd00, d_momflux00_dlndm1, &
-               d_momflux00_dlnT00, d_momflux00_dlnTm1, &
-               d_momflux00_dw00,ierr)   
+            call eval1_momentum_flux_18(s, k, &
+               flux_out_18, d_momflux00_dw00,ierr)   
             if (ierr /= 0) return
          end if
          
-         call eval1_momentum_flux(s, k+1, &
-            momfluxp1, d_momfluxp1_dlnRp1, d_momfluxp1_dLp1, &
-            d_momfluxp1_dup1, d_momfluxp1_du00, &
-            d_momfluxp1_dlndp1, d_momfluxp1_dlnd00, &
-            d_momfluxp1_dlnTp1, d_momfluxp1_dlnT00, &
-            d_momfluxp1_dwp1, ierr)   
-         if (ierr /= 0) return
-                  
-         dt = s% dt
-         dm = s% dm(k)
-         flux_out = momflux00
-         rR = s% r(k)
-         mR = s% m(k)
-         if (k == nz) then
-            rL = s% R_center
-            mL = s% M_center
-            flux_in = 0
+         if (k < nz) then
+            call eval1_momentum_flux_18(s, k+1, &
+               flux_in_18, d_momfluxp1_dwp1, ierr)   
+            if (ierr /= 0) return
+            flux_in_18 = shift_p1(flux_in_18)
          else
-            rL = s% r(k+1)
-            mL = s% m(k+1)
-            flux_in = momfluxp1
-         end if
+            flux_in_18 = 0d0
+         end if                  
+         net_momflux_18 = flux_in_18 - flux_out_18
          
          P = s% P(k)
                   
@@ -525,7 +463,7 @@
          sources = sources + diffusion_source
          s% dudt_RTI(k) = diffusion_source/dm
          
-         dudt_ex_qp = (flux_in - flux_out + sources)/dm
+         dudt_ex_qp = (net_momflux_18%val + sources)/dm
          dudt_expected = dudt_ex_qp
          
          dudt_factor = 1d0
@@ -534,7 +472,6 @@
          ie_plus_ke = s% energy_start(k) + 0.5d0*s% u_start(k)*s% u_start(k)
          scal = dt*max(abs(s% u_start(k)),s% csound_start(k))/ie_plus_ke
          if (k == 1) scal = scal*1d-2
-         
          
          dudt_actual = s% du_dt(k)
          d_dudt_actual_du = 1d0/dt
@@ -574,32 +511,34 @@
          ds_dlnTm1 = 0d0
          ds_dlndp1 = 0d0
          ds_dlnTp1 = 0d0
-
-         d_dudt_dL00 = dudt_factor*(0 - d_momflux00_dL00 + ds_dL00)/dm
-         d_dudt_dLp1 = dudt_factor*(d_momfluxp1_dLp1 - 0 + ds_dLp1)/dm
          
-         d_dudt_dlnR00 = dudt_factor*(0 - d_momflux00_dlnR00 + ds_dlnR00)/dm
-         d_dudt_dlnRp1 = dudt_factor*(d_momfluxp1_dlnRp1 - 0 + ds_dlnRp1)/dm  
+         ! do it this crude way as a start
+
+         d_dudt_dL00 = dudt_factor*(net_momflux_18%d1Array(i_L_00) + ds_dL00)/dm
+         d_dudt_dLp1 = dudt_factor*(net_momflux_18%d1Array(i_L_p1) + ds_dLp1)/dm
+         
+         d_dudt_dlnR00 = dudt_factor*(net_momflux_18%d1Array(i_lnR_00) + ds_dlnR00)/dm
+         d_dudt_dlnRp1 = dudt_factor*(net_momflux_18%d1Array(i_lnR_p1) + ds_dlnRp1)/dm  
+               
+         d_dudt_dum1 = &
+            dudt_factor*(net_momflux_18%d1Array(i_v_m1) + d_diff_source_dum1)/dm
+         d_dudt_du00 = &
+            dudt_factor*(net_momflux_18%d1Array(i_v_00) + d_diff_source_du00)/dm
+         d_dudt_dup1 = &
+            dudt_factor*(net_momflux_18%d1Array(i_v_p1) + d_diff_source_dup1)/dm  
+                   
+         d_dudt_dlndm1 = dudt_factor*(net_momflux_18%d1Array(i_lnd_m1) + ds_dlndm1)/dm
+         d_dudt_dlnd00 = &
+            dudt_factor*(net_momflux_18%d1Array(i_lnd_00) + ds_dlnd00)/dm
+         d_dudt_dlndp1 = dudt_factor*(net_momflux_18%d1Array(i_lnd_p1) + ds_dlndp1)/dm         
+         
+         d_dudt_dlnTm1 = dudt_factor*(net_momflux_18%d1Array(i_lnT_m1) + ds_dlnTm1)/dm
+         d_dudt_dlnT00 = &
+            dudt_factor*(net_momflux_18%d1Array(i_lnT_00) + ds_dlnT00)/dm
+         d_dudt_dlnTp1 = dudt_factor*(net_momflux_18%d1Array(i_lnT_p1) + ds_dlnTp1)/dm         
          
          d_dudt_dw00 = dudt_factor*(0 - d_momflux00_dw00 + ds_dw00)/dm
          d_dudt_dwp1 = dudt_factor*(d_momfluxp1_dwp1 - 0 + ds_dwp1)/dm  
-               
-         d_dudt_dum1 = &
-            dudt_factor*(0 - d_momflux00_dum1 + 0 + d_diff_source_dum1)/dm
-         d_dudt_du00 = &
-            dudt_factor*(d_momfluxp1_du00 - d_momflux00_du00 + 0 + d_diff_source_du00)/dm
-         d_dudt_dup1 = &
-            dudt_factor*(d_momfluxp1_dup1 - 0 + 0 + d_diff_source_dup1)/dm  
-                   
-         d_dudt_dlndm1 = dudt_factor*(0 - d_momflux00_dlndm1 + ds_dlndm1)/dm
-         d_dudt_dlnd00 = &
-            dudt_factor*(d_momfluxp1_dlnd00 - d_momflux00_dlnd00 + ds_dlnd00)/dm
-         d_dudt_dlndp1 = dudt_factor*(d_momfluxp1_dlndp1 - 0 + ds_dlndp1)/dm         
-         
-         d_dudt_dlnTm1 = dudt_factor*(0 - d_momflux00_dlnTm1 + ds_dlnTm1)/dm
-         d_dudt_dlnT00 = &
-            dudt_factor*(d_momfluxp1_dlnT00 - d_momflux00_dlnT00 + ds_dlnT00)/dm
-         d_dudt_dlnTp1 = dudt_factor*(d_momfluxp1_dlnTp1- 0 + ds_dlnTp1)/dm         
             
          d_dudt_dEtp1 = 0
          d_dudt_dEt00 = 0
@@ -776,7 +715,14 @@
          
          integer :: nz, i_dlnR_dt, i_u, i_lnR, i_w_div_wc
          real(dp) :: r, r0, r_div_r0, u_expected, u_factor, c_factor, &
-            dr_div_r0_actual, dr_div_r0_expected, dt, alpha, uc_factor
+            dr_div_r0_actual, dr_div_r0_expected, dt, alpha, uc_factor, &
+            d_uface_dlnR, &
+            d_uface_du00, &
+            d_uface_dum1, &
+            d_uface_dlnd00, &
+            d_uface_dlndm1, &
+            d_uface_dlnT00, &
+            d_uface_dlnTm1
 
          logical :: test_partials
          
@@ -797,7 +743,7 @@
          r0 = s% r_start(k)
          r_div_r0 = r/r0
 
-         u_expected = s% u_face(k)
+         u_expected = s% u_face_18(k)%val
          u_factor = 1d0
 
          ! dr = r - r0 = u_expected*dt
@@ -824,7 +770,6 @@
             write(*,2) 'dr_div_r0_expected', k, dr_div_r0_expected
             write(*,2) 'dr_div_r0_actual', k, dr_div_r0_actual
             write(*,2) 'u_expected', k, u_expected
-            write(*,2) 's% u_face(k)', k, s% u_face(k)
             write(*,2) 'dt/r0', k, dt/r0
             stop 'do1_Riemann_dlnRdt_eqn'
 !$omp end critical (do1_Riemann_dlnRdt_eqn_omp)
@@ -836,23 +781,31 @@
      
          if (skip_partials) return
          
+         d_uface_dlnR = s% u_face_18(k)% d1Array(i_lnR_00)
+         d_uface_du00 = s% u_face_18(k)% d1Array(i_v_00)
+         d_uface_dum1 = s% u_face_18(k)% d1Array(i_v_m1)
+         d_uface_dlnd00 = s% u_face_18(k)% d1Array(i_lnd_00)
+         d_uface_dlndm1 = s% u_face_18(k)% d1Array(i_lnd_m1)
+         d_uface_dlnT00 = s% u_face_18(k)% d1Array(i_lnT_00)
+         d_uface_dlnTm1 = s% u_face_18(k)% d1Array(i_lnT_m1)
+         
          ! partial of -dr_div_r0_actual
          call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0)
          
          ! partials of dr_div_r0_expected = u_face*f
          uc_factor = u_factor*c_factor
-         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*s% d_uface_dlnR(k))
-         call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*s% d_uface_du00(k))
+         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
+         call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)
          
-         call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*s% d_uface_dlnd00(k))
+         call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
          if (s% do_struct_thermo) &
-            call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*s% d_uface_dlnT00(k))
+            call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)
          
          if (k > 1) then
-            call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*s% d_uface_dum1(k))            
-            call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*s% d_uface_dlndm1(k))
+            call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
+            call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
             if (s% do_struct_thermo) &
-               call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*s% d_uface_dlnTm1(k))
+               call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
          end if
 
          if (s% w_div_wc_flag) then

@@ -3667,8 +3667,8 @@
          source = s% P(k)*q1/(dt*s% rho(k))
          
          if (s% u_flag) then
-            u_face = s% u_face(k)
-            P_face = s% P_face(k)
+            u_face = s% u_face_18(k)%val
+            P_face = s% P_face_18(k)%val
          else if (s% v_flag) then
             u_face = s% v(k)
             if (k > 1) then
@@ -3688,8 +3688,8 @@
             AvPp1 = 0d0
          else
             if (s% u_flag) then
-               u_face = s% u_face(k+1)
-               P_face = s% P_face(k+1)
+               u_face = s% u_face_18(k+1)%val
+               P_face = s% P_face_18(k+1)%val
             else if (s% v_flag) then
                u_face = s% v(k+1)
                alfa = s% dq(k)/(s% dq(k) + s% dq(k+1))

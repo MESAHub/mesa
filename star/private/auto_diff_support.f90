@@ -417,34 +417,6 @@
             p_p1%d1Array(i_lnT_p1) = s%P(k+1) * s% chiT_for_partials(k+1)
          end if   
       end function wrap_p_p1
-      
-      
-      subroutine wrap_P_face(s, P_face_18, k) 
-         type (star_info), pointer :: s 
-         type(auto_diff_real_18var_order1), intent(out) :: P_face_18
-         integer, intent(in) :: k
-         call wrap(P_face_18, s% P_face(k), &
-            s% d_Pface_dlndm1(k), s% d_Pface_dlnd00(k), 0d0, &
-            s% d_Pface_dlnTm1(k), s% d_Pface_dlnT00(k), 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, s% d_Pface_dlnR(k), 0d0, &
-            s% d_Pface_dum1(k), s% d_Pface_du00(k), 0d0, &
-            0d0, s% d_Pface_dL(k), 0d0)
-      end subroutine wrap_P_face
-      
-      
-      subroutine wrap_u_face(s, u_face_18, k) 
-         type (star_info), pointer :: s 
-         type(auto_diff_real_18var_order1), intent(out) :: u_face_18
-         integer, intent(in) :: k
-         call wrap(u_face_18, s% u_face(k), &
-            s% d_uface_dlndm1(k), s% d_uface_dlnd00(k), 0d0, &
-            s% d_uface_dlnTm1(k), s% d_uface_dlnT00(k), 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, s% d_uface_dlnR(k), 0d0, &
-            s% d_uface_dum1(k), s% d_uface_du00(k), 0d0, &
-            0d0, 0d0, 0d0)
-      end subroutine wrap_u_face
 
 
       !! Wrap ChiRho for cell k with appropriate dependences on the (ordered) independent variables

@@ -45,6 +45,7 @@
 ! solver
 
 ! output
+      num_trace_history_values = 0
 
       photo_interval = 10
       !profile_interval = 1

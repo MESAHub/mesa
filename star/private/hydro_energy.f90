@@ -600,7 +600,7 @@
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, A, P_face, u_face, theta, P_theta
+         real(dp) :: alfa, beta, A, theta, P_theta, P_face, u_face
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_18var_order1) :: &
             A_18, P_face_18, u_face_18, mlt_Pturb_18, &
@@ -629,8 +629,8 @@
 
          if (s% u_flag) then ! keep it simple for now.
          
-            call wrap_P_face(s, P_face_18, k) 
-            call wrap_u_face(s, u_face_18, k) 
+            P_face_18 = s% P_face_18(k)
+            u_face_18 = s% u_face_18(k)
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0
          

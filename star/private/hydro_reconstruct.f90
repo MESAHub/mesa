@@ -75,6 +75,7 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
+         use auto_diff_support, only: wrap_p_00, wrap
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -162,34 +163,13 @@
          !test_partials = (k == s% solver_test_partials_k)
          
          s% RTI_du_diffusion_kick(k) = 0d0
-         
-         s% d_uface_du00(k) = 0
-         s% d_uface_dum1(k) = 0
-         s% d_uface_dlnd00(k) = 0
-         s% d_uface_dlndm1(k) = 0
-         s% d_uface_dlnT00(k) = 0
-         s% d_uface_dlnTm1(k) = 0
-         s% d_uface_dlnR(k) = 0
          s% d_uface_dw(k) = 0
-
-         s% d_Pface_du00(k) = 0
-         s% d_Pface_dum1(k) = 0
-         s% d_Pface_dlnd00(k) = 0
-         s% d_Pface_dlndm1(k) = 0
-         s% d_Pface_dlnT00(k) = 0
-         s% d_Pface_dlnTm1(k) = 0
-         s% d_Pface_dlnR(k) = 0
-         s% d_Pface_dL(k) = 0
          s% d_Pface_dw(k) = 0
                             
-         if (k == 1) then         
-            s% u_face(k) = s% u(k)
-            s% d_uface_du00(k) = 1d0
-            s% P_face(k) = s% P(k)
-            s% d_Pface_dlnd00(k) = s% P(k)*s% chiRho_for_partials(k)
-            s% d_Pface_dlnT00(k) = s% P(k)*s% chiT_for_partials(k)
-            s% d_Pface_dlndm1(k) = 0d0
-            s% d_Pface_dlnTm1(k) = 0d0
+         if (k == 1) then
+            s% u_face_18(k)%val = s% u(k)
+            s% u_face_18(k)%d1Array(:) = 0d0
+            s% P_face_18(k) = wrap_p_00(s,k)
             return            
          end if
 
@@ -227,7 +207,6 @@
       
          iL = k
          iR = k-1
-         
          
          PL = s% P(iL)
          PR = s% P(iR)
@@ -393,24 +372,15 @@
          d_Ss_dlnTR = d_num_dlnTR/denominator - Ss*d_den_dlnTR/denominator
          d_Ss_dv = 0
          d_Ss_dw = d_num_dw/denominator
-     
-         s% u_face(k) = Ss
-         if (is_bad(s% u_face(k))) then
-            write(*,2) 's% u_face(k)', k, s% u_face(k)
-            stop 
-         end if
-
-         s% d_uface_dlnR(k) = d_Ss_dlnR
-         s% d_uface_du00(k) = d_Ss_duL
-         s% d_uface_dlnd00(k) = d_Ss_dlndL
-         s% d_uface_dlnT00(k) = d_Ss_dlnTL
-         s% d_uface_dum1(k) = d_Ss_duR
-         s% d_uface_dlndm1(k) = d_Ss_dlndR
-         s% d_uface_dlnTm1(k) = d_Ss_dlnTR
+         
+         call wrap(s% u_face_18(k), Ss, &
+            d_Ss_dlndR, d_Ss_dlndL, 0d0, &
+            d_Ss_dlnTR, d_Ss_dlnTL, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, d_Ss_dlnR, 0d0, &
+            d_Ss_duR, d_Ss_duL, 0d0, &
+            0d0, 0d0, 0d0)
          s% d_uface_dw(k) = d_Ss_dw
-         if (k==1) then
-            write(*,*) "check k=1", s% d_uface_dw(k), d_Ss_dw
-         end if
 
          ! contact pressure (eqn 2.19)
          P_face_L = rhoL*(uL-Sl)*(uL-Ss) + PL
@@ -457,15 +427,13 @@
             stop 'do1_uface_and_Pface'
          end if
          
-         s% P_face(k) = 0.5d0*(P_face_L + P_face_R)
-         s% d_Pface_du00(k) = 0.5d0*(d_PfaceL_duL + d_PfaceR_duL)
-         s% d_Pface_dum1(k) = 0.5d0*(d_PfaceL_duR + d_PfaceR_duR)
-         s% d_Pface_dlnd00(k) = 0.5d0*(d_PfaceL_dlndL + d_PfaceR_dlndL)
-         s% d_Pface_dlnT00(k) = 0.5d0*(d_PfaceL_dlnTL + d_PfaceR_dlnTL)
-         s% d_Pface_dlndm1(k) = 0.5d0*(d_PfaceL_dlndR + d_PfaceR_dlndR)
-         s% d_Pface_dlnTm1(k) = 0.5d0*(d_PfaceL_dlnTR + d_PfaceR_dlnTR)         
-         s% d_Pface_dlnR(k) = 0.5d0*(d_PfaceL_dlnR + d_PfaceR_dlnR)
-         s% d_Pface_dL(k) = 0d0
+         call wrap(s% P_face_18(k), 0.5d0*(P_face_L + P_face_R), &
+            0.5d0*(d_PfaceL_dlndR + d_PfaceR_dlndR), 0.5d0*(d_PfaceL_dlndL + d_PfaceR_dlndL), 0d0, &
+            0.5d0*(d_PfaceL_dlnTR + d_PfaceR_dlnTR), 0.5d0*(d_PfaceL_dlnTL + d_PfaceR_dlnTL), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0.5d0*(d_PfaceL_dlnR + d_PfaceR_dlnR), 0d0, &
+            0.5d0*(d_PfaceL_duR + d_PfaceR_duR), 0.5d0*(d_PfaceL_duL + d_PfaceR_duL), 0d0, &
+            0d0, 0d0, 0d0)
          s% d_Pface_dw(k) = 0.5d0*(d_PfaceL_dw + d_PfaceR_dw)
 
          if(k < s% nz .and. s% RTI_flag) then
@@ -476,16 +444,19 @@
                 d_du_dlndL = f*rhoL
                 d_du_dlndR = -f*rhoR
                 d_du_dlnR = 2*du            
-                s% RTI_du_diffusion_kick(k) = du            
-                s% u_face(k) = s% u_face(k) + du
-                s% d_uface_dlnd00(k) = s% d_uface_dlnd00(k) + d_du_dlndL
-                s% d_uface_dlndm1(k) = s% d_uface_dlndm1(k) + d_du_dlndR
-                s% d_uface_dlnR(k) = s% d_uface_dlnR(k) + d_du_dlnR
+                s% RTI_du_diffusion_kick(k) = du       
+                s% u_face_18(k)%val = s% u_face_18(k)%val + du
+                s% u_face_18(k)%d1Array(i_lnd_00) = s% u_face_18(k)%d1Array(i_lnd_00) + d_du_dlndL
+                s% u_face_18(k)%d1Array(i_lnd_m1) = s% u_face_18(k)%d1Array(i_lnd_m1) + d_du_dlndR
+                s% u_face_18(k)%d1Array(i_lnR_00) = s% u_face_18(k)%d1Array(i_lnR_00) + d_du_dlnR
              end if
          end if
 
-            !d_PfaceR_dlnTR =  - &
-            !   rhoR*(d_Sr_dlnTR*(uR-Ss) + (uR-Sr)*d_Ss_dlnTR)               
+         if (s% P_face_start(k) < 0d0) then
+            s% u_face_start(k) = s% u_face_18(k)%val
+            s% P_face_start(k) = s% P_face_18(k)%val
+         end if
+
          if (test_partials) then
             s% solver_test_partials_val = PL
             s% solver_test_partials_var = s% i_w_div_wc           
