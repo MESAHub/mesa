@@ -66,6 +66,8 @@
       !history_interval = 1
       terminal_interval = 1
 
+      fill_arrays_with_NaNs = .true.
+
 ! FOR DEBUGGING
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
@@ -120,8 +122,6 @@
       
       !solver_epsder_struct = 1d-6
       !solver_epsder_chem = 1d-6
-
-      !fill_arrays_with_NaNs = .true.
       
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.

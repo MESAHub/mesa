@@ -28,7 +28,7 @@
 
 &eos
       use_Skye = .true.
-      use_PC = .false.
+      !use_PC = .false.
 / ! end of eos namelist
 
 &kap
