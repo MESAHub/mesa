@@ -229,7 +229,7 @@
                call screen_pair( &
                   sc, a1, z1, a2, z2, screening_mode, &
                   g% zs13(jscr), g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), &
-                  g% aznut(jscr), g% zs13inv(jscr), &
+                  g% aznut(jscr), g% zs13inv(jscr), g% logTcut_lo, &
                   scor, scordt, scordd, ierr) 
                if (ierr /= 0) write(*,*) 'screen_pair failed in screening_pair ' // &
                      trim(reaction_name(ir)) 
