@@ -189,7 +189,7 @@ module test_screen
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)),  &
             sc_mode, &
-            zs13, zhat, zhat2, lzav, aznut, zs13inv, &
+            zs13, zhat, zhat2, lzav, aznut, zs13inv, rattab_tlo,&
             sc1a, sc1adt, sc1add, ierr)
          if (ierr /= 0) return
 
