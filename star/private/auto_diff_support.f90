@@ -541,6 +541,47 @@
       end function wrap_Cp_p1
 
 
+      !! Wrap gamma1 for cell k-1 with appropriate dependences on the (ordered) independent variables
+      function wrap_gamma1_m1(s, k) result(gamma1_m1)
+         use eos_def, only: i_gamma1
+         type (star_info), pointer :: s
+         type(auto_diff_real_18var_order1) :: gamma1_m1
+         integer, intent(in) :: k
+         gamma1_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            gamma1_m1%val = s% gamma1(k-1)
+            gamma1_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_gamma1,k-1)
+            gamma1_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_gamma1,k-1)
+         end if   
+      end function wrap_gamma1_m1
+
+      !! Wrap gamma1 for cell k with appropriate dependences on the (ordered) independent variables
+      function wrap_gamma1_00(s, k) result(gamma1_00)
+         use eos_def, only: i_gamma1
+         type (star_info), pointer :: s
+         type(auto_diff_real_18var_order1) :: gamma1_00
+         integer, intent(in) :: k
+         gamma1_00 = 0d0 ! sets val and d1Array to 0
+         gamma1_00%val = s% gamma1(k)
+         gamma1_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_gamma1,k)
+         gamma1_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_gamma1,k)
+      end function wrap_gamma1_00
+
+      !! Wrap gamma1 for cell k-1 with appropriate dependences on the (ordered) independent variables
+      function wrap_gamma1_p1(s, k) result(gamma1_p1)
+         use eos_def, only: i_gamma1
+         type (star_info), pointer :: s
+         type(auto_diff_real_18var_order1) :: gamma1_p1
+         integer, intent(in) :: k
+         gamma1_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s% nz) then
+            gamma1_p1%val = s% gamma1(k+1)
+            gamma1_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_gamma1,k+1)
+            gamma1_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_gamma1,k+1)
+         end if   
+      end function wrap_gamma1_p1
+
+
       !----------------------------------------------------------------------------------------------------
       !
       ! Next we handle quantities defined on faces (r, v, L). We need these on faces k+1, k and k-1.
@@ -659,6 +700,41 @@
             ! v_center is a constant
          end if
       end function wrap_v_p1
+
+      ! u replaces v
+      function wrap_u_m1(s, k) result(v_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_18var_order1) :: v_m1
+         integer, intent(in) :: k
+         v_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            v_m1 % val = s%u(k-1)
+            v_m1 % d1Array(i_v_m1) = 1d0
+         end if
+      end function wrap_u_m1
+
+      function wrap_u_00(s, k) result(v_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_18var_order1) :: v_00
+         integer, intent(in) :: k
+         v_00 = 0d0 ! sets val and d1Array to 0
+         v_00 % val = s%u(k)
+         v_00 % d1Array(i_v_00) = 1d0
+      end function wrap_u_00
+
+      function wrap_u_p1(s, k) result(v_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_18var_order1) :: v_p1
+         integer, intent(in) :: k
+         v_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s%nz) then
+            v_p1 % val = s%u(k+1)
+            v_p1 % d1Array(i_v_p1) = 1d0
+         else
+            v_p1 % val = 0d0
+            ! v_center is a constant
+         end if
+      end function wrap_u_p1
 
 
 end module auto_diff_support

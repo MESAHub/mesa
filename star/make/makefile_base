@@ -137,7 +137,6 @@ SRCS = \
    micro.f90 \
    hydro_rotation.f90 \
    brunt.f90 \
-   hydro_reconstruct.f90 \
    hydro_riemann.f90 \
    hydro_vars.f90 \
    report.f90 \

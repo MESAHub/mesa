@@ -103,8 +103,7 @@
          use chem_def
          use utils_lib, only: set_nan
          use mesh_functions
-         use hydro_reconstruct, only: do_uface_and_Pface
-         use hydro_riemann, only: do1_Riemann_momentum_eqn
+         use hydro_riemann, only: do_uface_and_Pface, do1_Riemann_momentum_eqn
          use hydro_momentum, only: do1_momentum_eqn, do1_radius_eqn
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn

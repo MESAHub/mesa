@@ -48,7 +48,8 @@
 
 
       private
-      public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn
+      public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
+         do_uface_and_Pface, get_G
          ! Riemann energy eqn is now part of the standard energy equation
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
@@ -97,7 +98,6 @@
             xscale, equ, skip_partials, nvar, ierr)
          use auto_diff_support
          use accurate_sum_auto_diff_18var_order1
-         use hydro_reconstruct, only: get_G
          use star_utils, only: get_area_info, store_partials
          type (star_info), pointer :: s         
          integer, intent(in) :: k
@@ -393,6 +393,178 @@
          momflux_18%d1Array((i_lnT_00)) = momflux*dlnPsurf_dlnT
          d_momflux_dw = 0
       end subroutine eval_surf_momentum_flux_18
+      
+
+      subroutine do_uface_and_Pface(s, ierr)
+         type (star_info), pointer :: s 
+         integer, intent(out) :: ierr
+         integer :: k, op_err
+         include 'formats'
+         ierr = 0
+!$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+         do k = 1, s% nz
+            op_err = 0
+            call do1_uface_and_Pface(s, k, op_err)
+            if (op_err /= 0) ierr = op_err
+         end do
+!$OMP END PARALLEL DO
+      end subroutine do_uface_and_Pface
+
+
+      subroutine get_G(s, k, G, dG_dlnR, dG_dw)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: G, dG_dlnR, dG_dw
+         real(dp) :: cgrav, gr_factor, d_gr_factor_dlnR
+         cgrav = s% cgrav(k)
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
+            cgrav = cgrav*s% fp_rot(k)
+         G = cgrav
+         dG_dlnR = 0d0
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction &
+               .and. s% w_div_wc_flag) then
+            dG_dw = G/s% fp_rot(k)*s% dfp_rot_dw_div_wc(k)
+         else
+            dG_dw = 0d0
+         end if
+      end subroutine get_G
+
+      
+      subroutine do1_uface_and_Pface(s, k, ierr)
+         use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
+         use auto_diff_support
+         type (star_info), pointer :: s 
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         logical :: test_partials
+
+         type(auto_diff_real_18var_order1) :: &
+            r_18, A_18, PL_18, PR_18, uL_18, uR_18, rhoL_18, rhoR_18, &
+            gamma1L_18, gamma1R_18, csL_18, csR_18, G_18, dPdm_grav_18, &
+            Sl1_18, Sl2_18, Sr1_18, Sr2_18, numerator_18, denominator_18, &
+            Sl_18, Sr_18, Ss_18, P_face_L_18, P_face_R_18, du_18
+         ! use d1Array(i_L_00) for w_00
+         real(dp) :: G, dG_dlnR, dG_dw, delta_m, f
+            
+         include 'formats'
+         
+         ierr = 0
+         test_partials = .false.
+         !test_partials = (k == s% solver_test_partials_k)
+         
+         s% RTI_du_diffusion_kick(k) = 0d0
+         s% d_uface_dw(k) = 0
+         s% d_Pface_dw(k) = 0
+                            
+         if (k == 1) then
+            s% u_face_18(k) = wrap_u_00(s,k)
+            s% P_face_18(k) = wrap_p_00(s,k)
+            return            
+         end if
+      
+         r_18 = wrap_r_00(s,k)
+         A_18 = 4d0*pi*r_18**2
+         
+         PL_18 = wrap_p_00(s,k)
+         PR_18 = wrap_p_m1(s,k)
+
+         uL_18 = wrap_u_00(s,k)
+         uR_18 = wrap_u_m1(s,k)
+      
+         rhoL_18 = wrap_d_00(s,k)
+         rhoR_18 = wrap_d_m1(s,k)
+         
+         gamma1L_18 = wrap_gamma1_00(s,k)
+         gamma1R_18 = wrap_gamma1_m1(s,k)
+      
+         csL_18 = sqrt(gamma1L_18*PL_18/rhoL_18)
+         csR_18 = sqrt(gamma1R_18*PR_18/rhoR_18)
+         
+         ! change PR and PL for gravity
+         call get_G(s, k, G, dG_dlnR, dG_dw)
+         G_18 = 0d0
+         G_18%val = G
+         G_18%d1Array(i_lnR_00) = dG_dlnR
+         G_18%d1Array(i_L_00) = dG_dw
+         
+         dPdm_grav_18 = -G_18*s% m_grav(k)/(r_18**2*A_18)  ! cm^-1 s^-2
+         
+         delta_m = 0.5d0*s% dm(k) ! positive delta_m from left center to edge
+         PL_18 = PL_18 + delta_m*dPdm_grav_18
+
+         delta_m = -0.5d0*s% dm(k-1) ! negative delta_m from right center to edge
+         PR_18 = PR_18 + delta_m*dPdm_grav_18
+            
+         ! acoustic wavespeeds (eqn 2.38)
+         Sl1_18 = uL_18 - csL_18
+         Sl2_18 = uR_18 - csR_18
+
+         ! take Sl = min(Sl1, Sl2)
+         if (Sl1_18%val < Sl2_18%val) then
+            Sl_18 = Sl1_18
+         else
+            Sl_18 = Sl2_18
+         end if
+
+         Sr1_18 = uR_18 + csR_18         
+         Sr2_18 = uL_18 + csL_18
+         
+         ! take Sr = max(Sr1, Sr2)
+         if (Sr1_18%val > Sr2_18%val) then
+            Sr_18 = Sr1_18
+         else
+            Sr_18 = Sr2_18
+         end if
+         
+         ! contact velocity (eqn 2.20)
+         numerator_18 = uR_18*rhoR_18*(Sr_18 - uR_18) + uL_18*rhoL_18*(uL_18 - Sl_18) + (PL_18 - PR_18)         
+         denominator_18 = rhoR_18*(Sr_18 - uR_18) + rhoL_18*(uL_18 - Sl_18)         
+
+         if (denominator_18%val == 0d0 .or. is_bad(denominator_18%val)) then
+            ierr = -1
+            if (s% report_ierr) then
+               write(*,2) 'u_face denominator bad', k, denominator_18%val
+            end if
+            return
+         end if
+         
+         Ss_18 = numerator_18/denominator_18
+         
+         s% u_face_18(k) = Ss_18
+         s% d_uface_dw(k) = s% u_face_18(k)%d1Array(i_L_00)
+         s% u_face_18(k)%d1Array(i_L_00) = 0d0
+
+         ! contact pressure (eqn 2.19)
+         P_face_L_18 = rhoL_18*(uL_18-Sl_18)*(uL_18-Ss_18) + PL_18         
+         P_face_R_18 = rhoR_18*(uR_18-Sr_18)*(uR_18-Ss_18) + PR_18
+         
+         s% P_face_18(k) = 0.5d0*(P_face_L_18 + P_face_R_18) ! these are ideally equal
+         s% d_Pface_dw(k) = s% P_face_18(k)%d1Array(i_L_00)
+         s% P_face_18(k)%d1Array(i_L_00) = 0d0
+
+         if (k < s% nz .and. s% RTI_flag) then
+             if (s% eta_RTI(k) > 0d0 .and. &
+                   s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
+                f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/s% dm_bar(k)
+                du_18 = f*A_18*(rhoL_18 - rhoR_18) ! bump uface in direction of lower density
+                s% RTI_du_diffusion_kick(k) = du_18%val
+                s% u_face_18(k) = s% u_face_18(k) + du_18
+             end if
+         end if
+
+         if (s% P_face_start(k) < 0d0) then
+            s% u_face_start(k) = s% u_face_18(k)%val
+            s% P_face_start(k) = s% P_face_18(k)%val
+         end if
+
+         if (test_partials) then
+            s% solver_test_partials_val = 0
+            s% solver_test_partials_var = 0        
+            s% solver_test_partials_dval_dx = 0
+            write(*,*) 'do1_uface_and_Pface', s% solver_test_partials_var
+         end if
+     
+      end subroutine do1_uface_and_Pface
 
          
       end module hydro_riemann
