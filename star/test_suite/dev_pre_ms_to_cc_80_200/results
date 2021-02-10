@@ -6,7 +6,7 @@ testing convergence for 100M
 inlist_common
    mesh_delta_coeff = 0.8 ! to end of c core burn
    time_delta_coeff = 0.8 ! for entire run
-      
+inlist_common_converted
 case A      
       split_merge_amr_nz_baseline = 1000
       split_merge_amr_nz_r_core = 175
