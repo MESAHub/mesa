@@ -7664,8 +7664,6 @@
 
       ! no_dedt_form_during_relax
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! use_dedt_form_with_total_energy_conservation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! always_use_eps_grav_form_of_energy_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! dedt_eqn_r_scale
@@ -7674,7 +7672,6 @@
       ! ::
 
     no_dedt_form_during_relax = .true.
-    use_dedt_form_with_total_energy_conservation = .true.
     always_use_eps_grav_form_of_energy_eqn = .false.
     dedt_eqn_r_scale = 1d8
 

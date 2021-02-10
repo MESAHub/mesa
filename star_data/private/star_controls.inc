@@ -803,7 +803,6 @@
             use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
-            use_dedt_form_with_total_energy_conservation, &
             always_use_eps_grav_form_of_energy_eqn, &
             use_Fraley_time_centering, &
             include_P_in_Fraley_time_centering, &

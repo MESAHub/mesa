@@ -113,19 +113,11 @@
             ! nuclear heating, non_nuc_neu_cooling, irradiation heating, extra_heat, eps_mdot
          s% energy_others(k) = others_18%val
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
-         s% PdVdt(k) = 0d0
-         
-         
-         ! NOTE: for now, u_flag forces same as use_dedt_form_with_total_energy_conservation
-         
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
             esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 + eps_grav_18
-         else if (s% use_dedt_form_with_total_energy_conservation .or. s% u_flag) then
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          else
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 - P_dV_dt_18 - de_dt_18
-            s% PdVdt(k) = P_dV_dt_18%val
+            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          end if
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
          s% ergs_error(k) = -dm*dt*resid_18%val ! save ergs_error before scaling
@@ -197,7 +189,7 @@
             logical :: skip_P
             include 'formats'
             ierr = 0
-            skip_P = eps_grav_form .or. .not. s% use_dedt_form_with_total_energy_conservation
+            skip_P = eps_grav_form
             ! NOTE: if skip_P then dwork is only that done by turbulence and artificial viscosity
             call eval_dwork(s, k, skip_P, dwork_dm_18, dwork, &
                d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr) 
@@ -409,41 +401,25 @@
                de_dt = (s% energy(k) - s% energy_start(k))/dt
                d_de_dt_dlnd = s% dE_dRho_for_partials(k)*s% rho(k)/dt
                d_de_dt_dlnT = s% Cv_for_partials(k)*s% T(k)/dt
-               if (s% use_dedt_form_with_total_energy_conservation) then
-                  call get_dke_dt_dpe_dt(s, k, dt, &
-                     dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
-                     dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)      
-                  if (ierr /= 0) then
-                     if (s% report_ierr) write(*,2) 'failed in get_dke_dt_dpe_dt', k
-                     return
-                  end if
-                  dke_dt_18 = 0d0
-                  dke_dt_18%val = dke_dt
-                  dke_dt_18%d1Array(i_v_00) = d_dkedt_dv00
-                  dke_dt_18%d1Array(i_v_p1) = d_dkedt_dvp1
-                  dpe_dt_18 = 0d0
-                  dpe_dt_18%val = dpe_dt
-                  dpe_dt_18%d1Array(i_lnR_00) = d_dpedt_dlnR00
-                  dpe_dt_18%d1Array(i_lnR_p1) = d_dpedt_dlnRp1
-                  de_dt_18 = 0d0
-                  de_dt_18%val = de_dt
-                  de_dt_18%d1Array(i_lnd_00) = d_de_dt_dlnd
-                  de_dt_18%d1Array(i_lnT_00) = d_de_dt_dlnT
-               else
-                  call get_P_dV(s, k, P_dV, d_PdV_dlnd, d_PdV_dlnT, ierr)
-                  if (ierr /= 0) then
-                     if (s% report_ierr) write(*,2) 'failed in get_P_dV', k
-                     return
-                  P_dV_dt_18 = 0d0
-                  P_dV_dt_18%val = P_dV/dt
-                  P_dV_dt_18%d1Array(i_lnd_00) = d_PdV_dlnd/dt
-                  P_dV_dt_18%d1Array(i_lnT_00) = d_PdV_dlnT/dt
-                  de_dt_18 = 0d0
-                  de_dt_18%val = de_dt
-                  de_dt_18%d1Array(i_lnd_00) = d_de_dt_dlnd
-                  de_dt_18%d1Array(i_lnT_00) = d_de_dt_dlnT
-                  end if
+               call get_dke_dt_dpe_dt(s, k, dt, &
+                  dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+                  dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)      
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,2) 'failed in get_dke_dt_dpe_dt', k
+                  return
                end if
+               dke_dt_18 = 0d0
+               dke_dt_18%val = dke_dt
+               dke_dt_18%d1Array(i_v_00) = d_dkedt_dv00
+               dke_dt_18%d1Array(i_v_p1) = d_dkedt_dvp1
+               dpe_dt_18 = 0d0
+               dpe_dt_18%val = dpe_dt
+               dpe_dt_18%d1Array(i_lnR_00) = d_dpedt_dlnR00
+               dpe_dt_18%d1Array(i_lnR_p1) = d_dpedt_dlnRp1
+               de_dt_18 = 0d0
+               de_dt_18%val = de_dt
+               de_dt_18%d1Array(i_lnd_00) = d_de_dt_dlnd
+               de_dt_18%d1Array(i_lnT_00) = d_de_dt_dlnT
             end if
             
             s% dkedt(k) = dke_dt
@@ -784,57 +760,6 @@
          end if
          
       end subroutine eval1_work
-
-
-      subroutine get_P_dV(s, k, P_dV, d_PdV_dlnd, d_PdV_dlnT, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(out) :: P_dV
-         real(dp), intent(out) :: d_PdV_dlnd, d_PdV_dlnT
-         integer, intent(out) :: ierr
-         real(dp) :: rho, dlnd, theta, P, d_P_dlnd00, d_P_dlnT00, dV, d_dV_dlnd
-         logical :: test_partials
-         include 'formats'
-         ierr = 0         
-         
-         if (s% using_Fraley_time_centering .and. &
-               s% include_P_in_Fraley_time_centering) then
-            theta = 0.5d0
-            P = 0.5d0*(s% P(k) + s% P_start(k))
-         else
-            theta = 1d0
-            P = s% P(k)
-         end if
-         d_P_dlnd00 = theta*s% P(k)*s% chiRho_for_partials(k)
-         d_P_dlnT00 = theta*s% P(k)*s% chiT_for_partials(k)
-
-         rho = s% rho(k)
-         dlnd = s% dxh_lnd(k) ! solver value used for lnd = lnd_start + dxh_lnd
-
-         ! dV = 1/rho - 1/rho_start = 
-         ! -(rho/rho_start - 1)/rho = 
-         ! -(exp(lnd)/exp(lnd_start) - 1)/rho = 
-         ! -(exp(lnd - lnd_start) - 1)/rho =
-         ! -(exp(dlnd) - 1)/rho = 
-         ! -expm1(dlnd)/rho
-         
-         dV = -expm1(dlnd)/rho
-         d_dV_dlnd = -1d0/rho ! dV = 1/rho - 1/rho_start         
-         
-         P_dV = P*dV
-         d_PdV_dlnd = d_P_dlnd00*dV + P*d_dV_dlnd
-         d_PdV_dlnT = d_P_dlnT00*dV
-
-         !test_partials = (k == s% solver_test_partials_k) 
-         test_partials = .false.            
-         if (test_partials) then
-            s% solver_test_partials_val = P_dV
-            s% solver_test_partials_var = s% i_lnd
-            s% solver_test_partials_dval_dx = d_PdV_dlnd
-            write(*,*) 'get_P_dV', s% solver_test_partials_var
-         end if
-
-      end subroutine get_P_dV
 
       
       end module hydro_energy

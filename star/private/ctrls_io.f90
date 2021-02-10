@@ -340,7 +340,6 @@
     use_dedt_form_of_energy_eqn, use_time_centered_eps_grav, &
     use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, max_gamma_for_dedt_form_of_energy_eqn, &
     include_composition_in_eps_grav, max_eta_for_dedt_form_of_energy_eqn, no_dedt_form_during_relax, &
-    use_dedt_form_with_total_energy_conservation, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
     use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, dedt_eqn_r_scale, &
@@ -1829,7 +1828,6 @@
  s% max_eta_for_dedt_form_of_energy_eqn = max_eta_for_dedt_form_of_energy_eqn
  s% max_gamma_for_dedt_form_of_energy_eqn = max_gamma_for_dedt_form_of_energy_eqn
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
- s% use_dedt_form_with_total_energy_conservation = use_dedt_form_with_total_energy_conservation
  s% always_use_eps_grav_form_of_energy_eqn = always_use_eps_grav_form_of_energy_eqn
  s% dedt_eqn_r_scale = dedt_eqn_r_scale
  s% use_mass_corrections = use_mass_corrections
@@ -3460,7 +3458,6 @@
  max_eta_for_dedt_form_of_energy_eqn = s% max_eta_for_dedt_form_of_energy_eqn
  max_gamma_for_dedt_form_of_energy_eqn = s% max_gamma_for_dedt_form_of_energy_eqn
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
- use_dedt_form_with_total_energy_conservation = s% use_dedt_form_with_total_energy_conservation
  always_use_eps_grav_form_of_energy_eqn = s% always_use_eps_grav_form_of_energy_eqn
  dedt_eqn_r_scale = s% dedt_eqn_r_scale
  use_mass_corrections = s% use_mass_corrections

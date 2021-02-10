@@ -94,6 +94,10 @@
       use_gold2_tolerances = .true.
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 1d-3
+      
+      use_Fraley_time_centering = .true.
+      include_P_in_Fraley_time_centering = .true.
+      include_L_in_Fraley_time_centering = .true.
 
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.

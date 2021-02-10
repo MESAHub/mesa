@@ -1389,7 +1389,7 @@
 
          logical, pointer :: eps_grav_form_for_energy_eqn(:)
          real(dp), pointer, dimension(:)  :: &
-            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, PdVdt
+            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt
             
          real(dp) :: &
             total_internal_energy_old, &

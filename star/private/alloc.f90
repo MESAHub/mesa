@@ -1135,8 +1135,6 @@
             if (failed('dpedt')) exit
             call do1(s% dedt, c% dedt)
             if (failed('dedt')) exit
-            call do1(s% PdVdt, c% PdVdt)
-            if (failed('PdVdt')) exit
 
             call do1_integer(s% mlt_mixing_type, c% mlt_mixing_type)
             if (failed('mlt_mixing_type')) exit

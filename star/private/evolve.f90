@@ -1408,8 +1408,7 @@
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,*)
                
-               if (s% use_dedt_form_with_total_energy_conservation .and. &
-                   s% always_use_dedt_form_of_energy_eqn) then
+               if (s% always_use_dedt_form_of_energy_eqn) then
                   
                   write(*,*)
                   write(*,*) 'for debugging phase1_sources_and_sinks'
