@@ -804,13 +804,13 @@
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
             always_use_eps_grav_form_of_energy_eqn, &
-            use_Fraley_time_centering, &
-            include_P_in_Fraley_time_centering, &
-            include_L_in_Fraley_time_centering, &
+            use_velocity_time_centering, &
+            include_P_in_velocity_time_centering, &
+            include_L_in_velocity_time_centering, &
             use_time_centered_eps_grav
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
-            steps_before_use_Fraley_time_centering
+            steps_before_use_velocity_time_centering
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &

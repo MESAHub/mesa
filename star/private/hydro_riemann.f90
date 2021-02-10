@@ -143,7 +143,7 @@
          dm = s% dm(k)     
          d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
              
-         call get_area_info(s, k, & ! using_Fraley_time_centering
+         call get_area_info(s, k, & ! using_velocity_time_centering
             area_00, d_area_00_dlnR, inv_R2_00, d_inv_R2_00_dlnR, ierr)
          if (ierr /= 0) return
          if (k < nz) then

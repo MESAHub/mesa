@@ -1079,7 +1079,7 @@
          nz = s% nz
          species = s% species
          s% L_phot = s% L(1)/Lsun
-         if (.not. s% using_Fraley_time_centering) then
+         if (.not. s% using_velocity_time_centering) then
             s% d_vc_dv = 1d0
          else
             s% d_vc_dv = 0.5d0

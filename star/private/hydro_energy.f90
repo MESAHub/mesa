@@ -207,8 +207,8 @@
             ierr = 0         
             L00_18 = wrap_L_00(s, k)
             Lp1_18 = wrap_L_p1(s, k)
-            if (s% using_Fraley_time_centering .and. &
-                     s% include_L_in_Fraley_time_centering) then
+            if (s% using_velocity_time_centering .and. &
+                     s% include_L_in_velocity_time_centering) then
                L00_18 = 0.5d0*(L00_18 + s% L_start(k))
                if (k < s% nz) Lp1_18 = 0.5d0*(Lp1_18 + s% L_start(k+1))
             end if
@@ -613,9 +613,9 @@
             u_face_18%d1Array(i_v_00) = s% d_vc_dv
          else if (s% u_flag) then
             u_face_18 = s% u_face_18(k)
-            if (s% using_Fraley_time_centering) &
+            if (s% using_velocity_time_centering) &
                u_face_18 = 0.5d0*(u_face_18 + s% u_face_start(k))
-         else if (s% using_Fraley_time_centering) then
+         else if (s% using_velocity_time_centering) then
             u_face_18%val = 0.5d0*(s% r(k) - s% r_start(k))/s% dt
             u_face_18%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt
          else
@@ -630,25 +630,25 @@
             P_18 = 0d0
          else if (s% u_flag) then
             P_18 = s% P_face_18(k)
-            if (s% using_Fraley_time_centering .and. &
-                     s% include_P_in_Fraley_time_centering) &
+            if (s% using_velocity_time_centering .and. &
+                     s% include_P_in_velocity_time_centering) &
                P_18 = 0.5d0*(P_18 + s% P_face_start(k))
          else
             if (k > 1) then 
                PR_18 = wrap_p_m1(s,k)
-               if (s% using_Fraley_time_centering .and. &
-                        s% include_P_in_Fraley_time_centering) &
+               if (s% using_velocity_time_centering .and. &
+                        s% include_P_in_velocity_time_centering) &
                   PR_18 = 0.5d0*(PR_18 + s% P_start(k-1))
             else
                PR_18 = 0d0
             end if
             PL_18 = wrap_p_00(s,k)
-            if (s% using_Fraley_time_centering .and. &
-                     s% include_P_in_Fraley_time_centering) &
+            if (s% using_velocity_time_centering .and. &
+                     s% include_P_in_velocity_time_centering) &
                PL_18 = 0.5d0*(PL_18 + s% P_start(k))
             P_18 = alfa*PL_18 + beta*PR_18
-            if (s% using_Fraley_time_centering .and. &
-                     s% include_P_in_Fraley_time_centering) then
+            if (s% using_velocity_time_centering .and. &
+                     s% include_P_in_velocity_time_centering) then
                P_theta = 0.5d0
             else
                P_theta = 1d0

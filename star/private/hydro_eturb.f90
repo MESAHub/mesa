@@ -311,7 +311,7 @@
                Lt_p1 = 0d0
                Lt_p1_start = 0d0
             end if
-            if (s% use_Fraley_time_centering .and. s% include_L_in_Fraley_time_centering) then
+            if (s% use_velocity_time_centering .and. s% include_L_in_velocity_time_centering) then
                Lt_00_start = s% Lt_start(k)
                if (k < s% nz) then
                   Lt_p1_start = s% Lt_start(k+1)
@@ -1429,7 +1429,7 @@
          logical :: time_center
          include 'formats'
          ierr = 0
-         time_center = (s% use_Fraley_time_centering .and. s% include_L_in_Fraley_time_centering)
+         time_center = (s% use_velocity_time_centering .and. s% include_L_in_velocity_time_centering)
          do k=1,s%nz
             call set1_et_start_vars(k, op_err) 
             if (op_err /= 0) ierr = op_err  

@@ -453,9 +453,9 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if (s% steps_before_use_Fraley_time_centering >= 0 .and. &
-                s% model_number > s% steps_before_use_Fraley_time_centering) &
-               s% using_Fraley_time_centering = .true.
+            if (s% steps_before_use_velocity_time_centering >= 0 .and. &
+                s% model_number > s% steps_before_use_velocity_time_centering) &
+               s% using_velocity_time_centering = .true.
          end if
          
          call reset_epsnuc_vectors(s)
@@ -1336,8 +1336,8 @@
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
             if (.not. s% RSP_flag) then
-               if (s% using_Fraley_time_centering .and. &
-                     s% include_L_in_Fraley_time_centering) then
+               if (s% using_velocity_time_centering .and. &
+                     s% include_L_in_velocity_time_centering) then
                   L_surf = 0.5d0*(s% L(1) + s% L_start(1))
                else
                   L_surf = s% L(1)

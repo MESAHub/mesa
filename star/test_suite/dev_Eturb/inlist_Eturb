@@ -96,7 +96,7 @@
 
    !et_alfa = 0d0 ! purely radiative model
 
-  !use_Fraley_time_centering = .true.
+  !use_velocity_time_centering = .true.
   !use_avQ_art_visc = .true.
 
 

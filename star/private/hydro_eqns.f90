@@ -2344,7 +2344,7 @@
 
          ! dlnPdm_qhse = -G m / (4 pi r^4 <P>)
 
-         if (s% using_Fraley_time_centering) then
+         if (s% using_velocity_time_centering) then
             theta = 0.5d0
             rtheta = s% r_start(k)
             d_rtheta_dlnR = 0

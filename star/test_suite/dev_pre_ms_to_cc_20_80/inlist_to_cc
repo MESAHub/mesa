@@ -55,9 +55,9 @@
 ! mesh
 
 ! solver
-      use_Fraley_time_centering = .true.
-      include_P_in_Fraley_time_centering = .true.
-      include_L_in_Fraley_time_centering = .true.
+      use_velocity_time_centering = .true.
+      include_P_in_velocity_time_centering = .true.
+      include_L_in_velocity_time_centering = .true.
 
 ! output
       terminal_show_age_units = 'secs'

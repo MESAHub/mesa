@@ -331,7 +331,7 @@
          s% solver_iter = -1
 
          s% using_gold_tolerances = .false.
-         s% using_Fraley_time_centering = .false.
+         s% using_velocity_time_centering = .false.
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''

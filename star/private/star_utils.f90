@@ -2944,7 +2944,7 @@
          real(dp) :: r2
          include 'formats'
          r2 = s% r(k)*s% r(k)
-         if (s% using_Fraley_time_centering) then
+         if (s% using_velocity_time_centering) then
             s% R2(k) = &
                (r2 + s% r_start(k)*s% r(k) + s% r_start(k)*s% r_start(k))/3d0
             s% d_R2_dlnR(k) = (2d0*r2 + s% r_start(k)*s% r(k))/3d0            
@@ -2953,7 +2953,7 @@
             s% d_R2_dlnR(k) = 2d0*r2
          end if
          if (s% v_flag) then
-            if (s% using_Fraley_time_centering) then
+            if (s% using_velocity_time_centering) then
                s% vc(k) = 0.5d0*(s% v_start(k) + s% v(k))
             else
                s% vc(k) = s% v(k)
@@ -3350,8 +3350,8 @@
          rho = wrap_d_00(s,k)
          et = wrap_et_00(s,k)
          Pt = s% et_alfap*et*rho
-         time_center = (s% using_Fraley_time_centering .and. &
-                  s% include_P_in_Fraley_time_centering)
+         time_center = (s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering)
          if (time_center) then
             Pt_start = s% et_alfap*s% et_start(k)*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
@@ -3394,8 +3394,8 @@
          ierr = 0
          d_XP_dxa = 0d0
          
-         time_center = (s% using_Fraley_time_centering .and. &
-                  s% include_P_in_Fraley_time_centering)
+         time_center = (s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering)
          
          P_18 = 0d0         
          if (.not. skip_P) then
@@ -3849,7 +3849,7 @@
          real(dp), intent(out) :: area, d_area_dlnR, inv_R2, d_inv_R2_dlnR
          integer, intent(out) :: ierr
          ierr = 0
-         if (s% using_Fraley_time_centering) then
+         if (s% using_velocity_time_centering) then
             area = 4d0*pi*(s% r(k)**2 + s% r(k)*s% r_start(k) + s% r_start(k)**2)/3d0
             d_area_dlnR = 4d0*pi*s% r(k)*(2d0*s% r(k) + s% r_start(k))/3d0
             inv_R2 = 1d0/(s% r(k)*s% r_start(k))

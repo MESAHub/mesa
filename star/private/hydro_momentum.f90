@@ -358,14 +358,14 @@
 
          include 'formats'
       
-         ! using_Fraley_time_centering
+         ! using_velocity_time_centering
          ! use_gravity_rotation_correction
 
          ierr = 0
 
          m = s% m_grav(k)
          
-         call get_area_info(s, k, & ! using_Fraley_time_centering
+         call get_area_info(s, k, & ! using_velocity_time_centering
             area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
 
          grav = -s% cgrav(k)*m*inv_R2
@@ -641,7 +641,7 @@
          end if
 
          if (i_u /= 0) then
-            if (s% using_Fraley_time_centering) then
+            if (s% using_velocity_time_centering) then
                uc_18 = 0.5d0*(s% u_face_18(k) + s% u_face_start(k))
             else
                uc_18 = s% u_face_18(k)

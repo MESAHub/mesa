@@ -7943,13 +7943,13 @@
       ! inject_until_reach_delta_total_energy = 1d99
 
 
-      ! use_Fraley_time_centering
+      ! use_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_before_use_Fraley_time_centering
+      ! steps_before_use_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! include_P_in_Fraley_time_centering
+      ! include_P_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! include_L_in_Fraley_time_centering
+      ! include_L_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
@@ -7961,10 +7961,10 @@
 
       ! ::
 
-    use_Fraley_time_centering = .false.
-    steps_before_use_Fraley_time_centering = -1
-    include_P_in_Fraley_time_centering = .false.
-    include_L_in_Fraley_time_centering = .false.
+    use_velocity_time_centering = .false.
+    steps_before_use_velocity_time_centering = -1
+    include_P_in_velocity_time_centering = .false.
+    include_L_in_velocity_time_centering = .false.
 
 
       ! use_dPrad_dm_form_of_T_gradient_eqn

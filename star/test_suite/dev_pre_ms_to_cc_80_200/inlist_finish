@@ -32,7 +32,7 @@
       
       log_Rsurf_upper_limit = 4d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
-      remnant_mass_min_limit = 10d0 ! for completely unbound cases
+      remnant_mass_min_limit = 20d0 ! for completely unbound cases
 
 ! wind
 
@@ -66,7 +66,7 @@
       !history_interval = 1
       terminal_interval = 1
 
-      fill_arrays_with_NaNs = .true.
+      !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
@@ -135,7 +135,7 @@
 
 !pause = .true.
 
-Grid1_file_flag = .true.
+!Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
 Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
