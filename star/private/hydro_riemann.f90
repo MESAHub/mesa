@@ -48,79 +48,11 @@
 
 
       private
-      public :: &
-         do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn
-         ! Riemann_energy_eqn is now part of the standard energy equation
+      public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn
+         ! Riemann energy eqn is now part of the standard energy equation
+         ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
       contains
-
-      
-      ! (g cm/s)/s from cell(k) to cell(k-1)
-      subroutine eval1_momentum_flux_18(s, k, momflux_18, d_momflux_dw, ierr)
-         use star_utils, only: get_area_info
-         type (star_info), pointer :: s 
-         integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(out) :: momflux_18
-         real(dp), intent(out) :: d_momflux_dw
-         integer, intent(out) :: ierr
-         real(dp) :: area, d_area_dlnR, inv_R2, d_inv_R2_dlnR
-         integer :: nz
-         logical :: test_partials
-         include 'formats'
-         
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-         ierr = 0
-         d_momflux_dw = 0 
-         nz = s% nz
-         if (k > nz) then
-            momflux_18 = 0d0
-            return    
-         end if
-         
-         call get_area_info(s, k, &
-            area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
-         if (ierr /= 0) return
-         
-         momflux_18 = area*s% P_face_18(k)     
-         momflux_18%d1Array(i_lnR_00) = momflux_18%d1Array(i_lnR_00) + d_area_dlnR*s% P_face_18(k)%val  
-         d_momflux_dw = area*s% d_Pface_dw(k)
-              
-         if (test_partials) then
-            s% solver_test_partials_val = momflux_18%val
-            s% solver_test_partials_var = s% i_lnR
-            s% solver_test_partials_dval_dx = momflux_18%d1Array(i_lnR_00)
-            write(*,*) 'eval1_momentum_flux_18', s% solver_test_partials_var
-         end if
-         
-      end subroutine eval1_momentum_flux_18
-      
-      
-      subroutine eval_surf_momentum_flux_18(s, P_surf, &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            momflux_18, d_momflux_dw, ierr)
-         type (star_info), pointer :: s 
-         real(dp), intent(in) :: P_surf, &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         type(auto_diff_real_18var_order1), intent(out) :: momflux_18
-         real(dp), intent(out) :: d_momflux_dw
-         integer, intent(out) :: ierr
-         integer :: k
-         real(qp) :: r, A, momflux
-         include 'formats'
-         ierr = 0
-         k = 1
-         r = s% r(k)
-         A = 4d0*pi*r*r
-         momflux = A*P_surf
-         momflux_18%val = momflux
-         momflux_18%d1Array(:) = 0d0
-         momflux_18%d1Array(i_lnR_00) = momflux*(2 + dlnPsurf_dlnR)
-         momflux_18%d1Array(i_L_00) = momflux*dlnPsurf_dL
-         momflux_18%d1Array(i_lnd_00) = momflux*dlnPsurf_dlnd
-         momflux_18%d1Array((i_lnT_00)) = momflux*dlnPsurf_dlnT
-         d_momflux_dw = 0
-      end subroutine eval_surf_momentum_flux_18
 
 
       subroutine do_surf_Riemann_dudt_eqn( &
@@ -321,6 +253,7 @@
                mL = s% m(k+1)
             end if
             call get_G(s, k, G00, dG00_dlnR, dG00_dw)
+            if (dG00_dw /= 0d0) stop 'need to fix dG00_dw for riemann hydro, setup_gravity_source'
             G = 0d0
             G%val = G00
             G%d1Array(i_lnR_00) = dG00_dlnR
@@ -391,6 +324,75 @@
          end subroutine unpack_res18
          
       end subroutine do1_dudt_eqn
+
+      
+      ! (g cm/s)/s from cell(k) to cell(k-1)
+      subroutine eval1_momentum_flux_18(s, k, momflux_18, d_momflux_dw, ierr)
+         use star_utils, only: get_area_info
+         type (star_info), pointer :: s 
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1), intent(out) :: momflux_18
+         real(dp), intent(out) :: d_momflux_dw
+         integer, intent(out) :: ierr
+         real(dp) :: area, d_area_dlnR, inv_R2, d_inv_R2_dlnR
+         integer :: nz
+         logical :: test_partials
+         include 'formats'
+         
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+         ierr = 0
+         d_momflux_dw = 0 
+         nz = s% nz
+         if (k > nz) then
+            momflux_18 = 0d0
+            return    
+         end if
+         
+         call get_area_info(s, k, &
+            area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
+         if (ierr /= 0) return
+         
+         momflux_18 = area*s% P_face_18(k)     
+         momflux_18%d1Array(i_lnR_00) = &
+            momflux_18%d1Array(i_lnR_00) + d_area_dlnR*s% P_face_18(k)%val  
+         d_momflux_dw = area*s% d_Pface_dw(k)
+              
+         if (test_partials) then
+            s% solver_test_partials_val = momflux_18%val
+            s% solver_test_partials_var = s% i_lnR
+            s% solver_test_partials_dval_dx = momflux_18%d1Array(i_lnR_00)
+            write(*,*) 'eval1_momentum_flux_18', s% solver_test_partials_var
+         end if
+         
+      end subroutine eval1_momentum_flux_18
+      
+      
+      subroutine eval_surf_momentum_flux_18(s, P_surf, &
+            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
+            momflux_18, d_momflux_dw, ierr)
+         type (star_info), pointer :: s 
+         real(dp), intent(in) :: P_surf, &
+            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
+         type(auto_diff_real_18var_order1), intent(out) :: momflux_18
+         real(dp), intent(out) :: d_momflux_dw
+         integer, intent(out) :: ierr
+         integer :: k
+         real(qp) :: r, A, momflux
+         include 'formats'
+         ierr = 0
+         k = 1
+         r = s% r(k)
+         A = 4d0*pi*r*r
+         momflux = A*P_surf
+         momflux_18%val = momflux
+         momflux_18%d1Array(:) = 0d0
+         momflux_18%d1Array(i_lnR_00) = momflux*(2 + dlnPsurf_dlnR)
+         momflux_18%d1Array(i_L_00) = momflux*dlnPsurf_dL
+         momflux_18%d1Array(i_lnd_00) = momflux*dlnPsurf_dlnd
+         momflux_18%d1Array((i_lnT_00)) = momflux*dlnPsurf_dlnT
+         d_momflux_dw = 0
+      end subroutine eval_surf_momentum_flux_18
 
          
       end module hydro_riemann

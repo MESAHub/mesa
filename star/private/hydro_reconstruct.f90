@@ -32,7 +32,7 @@
       implicit none
 
       private
-      public :: do_uface_and_Pface, get_G, do1_uface_and_Pface
+      public :: do_uface_and_Pface, get_G
 
 
       contains
@@ -204,7 +204,7 @@
          dcsR_dcsL_m1 = 0
       
          r = s% r(k)
-         A = 4d0*pi*r*r
+         A = 4d0*pi*r*r ! NOT time centered area
       
          iL = k
          iR = k-1

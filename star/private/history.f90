@@ -285,13 +285,13 @@
             call dealloc
             return
          end if
-         
-         if (.not. s% v_flag) then
-            v_surf = s% r(1)*s% dlnR_dt(1)
-         else if (s% using_Fraley_time_centering) then
-            v_surf = s% vc(1)
-         else
+
+         if (s% u_flag) then
+            v_surf = s% u(1)
+         else if (s% v_flag) then
             v_surf = s% v(1)
+         else
+            v_surf = s% r(1)*s% dlnR_dt(1)
          end if
 
          if (s% initial_mass > s% he_core_mass) then

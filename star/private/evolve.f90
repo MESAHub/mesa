@@ -61,8 +61,9 @@
             stop 'do_evolve_step_part1'
          end if
          
-         if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
-            write(*,*) 'fill_arrays_with_NaNs at start of step'
+         if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            if (mod(s% model_number, s% terminal_interval) == 0) &
+               write(*,*) 'fill_arrays_with_NaNs at start of step'
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
