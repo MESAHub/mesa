@@ -323,7 +323,7 @@
          d_extra_jdot_domega_00, d_extra_omegadot_domega_00, &
          d_extra_jdot_domega_p1, d_extra_omegadot_domega_p1
 
-      ! Fraley time centering
+      ! velocity time centering
       real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
       real(dp) :: d_vc_dv
    
@@ -1190,7 +1190,7 @@
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
             RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_et, using_Fraley_time_centering, okay_to_set_mixing_info
+            need_to_reset_et, using_velocity_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass
