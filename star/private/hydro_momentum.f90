@@ -365,7 +365,7 @@
 
          m = s% m_grav(k)
          
-         call get_area_info(s, k, &
+         call get_area_info(s, k, & ! using_Fraley_time_centering
             area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
 
          grav = -s% cgrav(k)*m*inv_R2
@@ -589,6 +589,7 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
+         type(auto_diff_real_18var_order1) :: uc_18
          real(dp) :: dt, r, r0, r_div_r0, cs, v_expected, v_factor, residual, &
             dr_div_r0_actual, dr_div_r0_expected, uc_factor, unused, &
             d_uface_dlnR, d_uface_du00, d_uface_dum1, d_dlnR00, d_dv00, &
@@ -640,20 +641,22 @@
          end if
 
          if (i_u /= 0) then
-            call unwrap(s% u_face_18(k), v_expected, &
+            if (s% using_Fraley_time_centering) then
+               uc_18 = 0.5d0*(s% u_face_18(k) + s% u_face_start(k))
+            else
+               uc_18 = s% u_face_18(k)
+            end if
+            call unwrap(uc_18, v_expected, &
                d_uface_dlndm1, d_uface_dlnd00, unused, &
                d_uface_dlnTm1, d_uface_dlnT00, unused, &
                unused, unused, unused, &
                unused, d_uface_dlnR, unused, &
                d_uface_dum1, d_uface_du00, unused, &
                unused, unused, unused)
-            v_factor = 1d0
-            if (s% using_Fraley_time_centering) &
-               stop 'fix radius eqn for using_Fraley_time_centering'
          else
             v_expected = s% vc(k)
-            v_factor = s% d_vc_dv
          end if
+         v_factor = s% d_vc_dv
 
          ! dr = r - r0 = v_expected*dt
          ! eqn: dr/r0 = v_expected*dt/r0

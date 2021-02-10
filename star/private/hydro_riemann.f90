@@ -143,7 +143,7 @@
          dm = s% dm(k)     
          d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
              
-         call get_area_info(s, k, &
+         call get_area_info(s, k, & ! using_Fraley_time_centering
             area_00, d_area_00_dlnR, inv_R2_00, d_inv_R2_00_dlnR, ierr)
          if (ierr /= 0) return
          if (k < nz) then
@@ -212,11 +212,13 @@
                   flux_out_18, d_momflux00_dw00,ierr)   
                if (ierr /= 0) return
             end if
+            flux_out_18%d1Array(i_L_00) = d_momflux00_dw00
             if (k < nz) then
                call eval1_momentum_flux_18(s, k+1, &
                   flux_in_18, d_momfluxp1_dwp1, ierr)   
                if (ierr /= 0) return
                flux_in_18 = shift_p1(flux_in_18)
+               flux_in_18%d1Array(i_L_p1) = d_momfluxp1_dwp1
             else
                flux_in_18 = 0d0
             end if                  
@@ -257,11 +259,11 @@
             G = 0d0
             G%val = G00
             G%d1Array(i_lnR_00) = dG00_dlnR
+            G%d1Array(i_L_00) = dG00_dw
             inv_R2 = 0d0
             inv_R2%val = inv_R2_00
             inv_R2%d1Array(i_lnR_00) = d_inv_R2_00_dlnR
             gsR = -G*mR*0.5d0*dm*inv_R2
-            !dgsR_dwR = gsR*dG00_dw/G00
             if (k == nz) then
                gsL = 0d0
             else
@@ -269,11 +271,11 @@
                G = 0d0
                G%val = Gp1
                G%d1Array(i_lnR_p1) = dGp1_dlnR
+               G%d1Array(i_L_p1) = dGp1_dw
                inv_R2 = 0d0
                inv_R2%val = inv_R2_p1
                inv_R2%d1Array(i_lnR_p1) = d_inv_R2_p1_dlnR
                gsL = -G*mL*0.5d0*dm*inv_R2
-               !dgsL_dwL = gsL*dGp1_dw/Gp1
             end if
             gravity_source_18 = gsL + gsR ! total gravitational force on cell
 
@@ -317,9 +319,12 @@
             call unpack_res18_partials(s, k, nvar, xscale, i_du_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% w_div_wc_flag) then
-               stop 'need to finish unpack_res18 in do1_dudt_eqn for w_div_wc'
-               !call e00(s, xscale, i_du_dt, s% i_w_div_wc, k, nvar, )
-               !if (k < nz) call ep1(s, xscale, s% i_du_dt, s% i_w_div_wc, k, nvar, )
+               call e00(s, xscale, i_du_dt, s% i_w_div_wc, k, nvar, d_d00(s% i_lum))
+               d_d00(s% i_lum) = 0d0
+               if (k < nz) then
+                  call ep1(s, xscale, s% i_du_dt, s% i_w_div_wc, k, nvar, d_dp1(s% i_lum))
+                  d_dp1(s% i_lum) = 0d0
+               end if
             end if
          end subroutine unpack_res18
          
@@ -390,7 +395,7 @@
          momflux_18%d1Array(i_lnR_00) = momflux*(2 + dlnPsurf_dlnR)
          momflux_18%d1Array(i_L_00) = momflux*dlnPsurf_dL
          momflux_18%d1Array(i_lnd_00) = momflux*dlnPsurf_dlnd
-         momflux_18%d1Array((i_lnT_00)) = momflux*dlnPsurf_dlnT
+         momflux_18%d1Array(i_lnT_00) = momflux*dlnPsurf_dlnT
          d_momflux_dw = 0
       end subroutine eval_surf_momentum_flux_18
       

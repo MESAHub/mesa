@@ -600,11 +600,12 @@
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, A, theta, P_theta, P_face, u_face
+         real(dp) :: alfa, beta, P_theta, extra_P, u_face, P_face, A
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_18var_order1) :: &
             A_18, P_face_18, u_face_18, mlt_Pturb_18, &
-            PtR_18, PtL_18, avQL_18, avQR_18, PL_18, PR_18
+            PtR_18, PtL_18, avQL_18, avQR_18, PL_18, PR_18, &
+            P_18, Pt_18, avQ_18
          logical :: test_partials
          integer :: j
          include 'formats'
@@ -621,121 +622,140 @@
             d_work_dxam1 = 0d0
             return    
          end if
+
+         if (k > 1) then         
+            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+         else
+            alfa = 1d0
+         end if
+         beta = 1d0 - alfa
+         
+         ! set u_face_18
+         u_face_18 = 0d0
+         if (s% v_flag) then
+            u_face_18%val = s% vc(k)
+            u_face_18%d1Array(i_v_00) = s% d_vc_dv
+         else if (s% u_flag) then
+            u_face_18 = s% u_face_18(k)
+            if (s% using_Fraley_time_centering) &
+               u_face_18 = 0.5d0*(u_face_18 + s% u_face_start(k))
+         else if (s% using_Fraley_time_centering) then
+            u_face_18%val = 0.5d0*(s% r(k) - s% r_start(k))/s% dt
+            u_face_18%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt
+         else
+            u_face_18%val = (s% r(k) - s% r_start(k))/s% dt
+            u_face_18%d1Array(i_lnR_00) = s% r(k)/s% dt
+         end if
+
+         ! set P_18
+         d_Pface_dxa00 = 0d0
+         d_Pface_dxam1 = 0d0
+         if (skip_P) then
+            P_18 = 0d0
+         else if (s% u_flag) then
+            P_18 = s% P_face_18(k)
+            if (s% using_Fraley_time_centering .and. &
+                     s% include_P_in_Fraley_time_centering) &
+               P_18 = 0.5d0*(P_18 + s% P_face_start(k))
+         else
+            if (k > 1) then 
+               PR_18 = wrap_p_m1(s,k)
+               if (s% using_Fraley_time_centering .and. &
+                        s% include_P_in_Fraley_time_centering) &
+                  PR_18 = 0.5d0*(PR_18 + s% P_start(k-1))
+            else
+               PR_18 = 0d0
+            end if
+            PL_18 = wrap_p_00(s,k)
+            if (s% using_Fraley_time_centering .and. &
+                     s% include_P_in_Fraley_time_centering) &
+               PL_18 = 0.5d0*(PL_18 + s% P_start(k))
+            P_18 = alfa*PL_18 + beta*PR_18
+            if (s% using_Fraley_time_centering .and. &
+                     s% include_P_in_Fraley_time_centering) then
+               P_theta = 0.5d0
+            else
+               P_theta = 1d0
+            end if
+            if (k > 1) then         
+               do j=1,s% species
+                  d_Pface_dxa00(j) = &
+                     alfa*s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
+               end do
+               do j=1,s% species
+                  d_Pface_dxam1(j) = &
+                     beta*s% dlnP_dxa_for_partials(j,k-1)*P_theta*s% P(k-1)
+               end do
+            else ! k == 1
+               do j=1,s% species
+                  d_Pface_dxa00(j) = &
+                     s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
+               end do
+            end if
+         end if
+         
+         ! set avQ_18
+         if (.not. s% use_avQ_art_visc) then
+            avQ_18 = 0d0
+         else
+            if (k > 1) then 
+               call get_avQ_18(s, k-1, avQR_18, ierr)
+               if (ierr /= 0) return
+               avQR_18 = shift_m1(avQR_18)
+               ! always time center
+               avQR_18 = 0.5d0*(avQR_18 + s% avQ_start(k-1))
+            else
+               avQR_18 = 0d0
+            end if
+            call get_avQ_18(s, k, avQL_18, ierr)
+            if (ierr /= 0) return
+            ! always time center
+            avQL_18 = 0.5d0*(avQL_18 + s% avQ_start(k))
+            avQ_18 = alfa*avQL_18 + beta*avQR_18
+         end if
+         
+         ! set Pt_18
+         if (.not. s% et_flag) then
+            Pt_18 = 0d0
+         else
+            if (k > 1) then 
+               call calc_Pt_18_tw(s, k-1, PtR_18, ierr)
+               if (ierr /= 0) return
+               PtR_18 = shift_m1(PtR_18)
+            else
+               PtR_18 = 0d0
+            end if
+            call calc_Pt_18_tw(s, k, PtL_18, ierr)
+            if (ierr /= 0) return
+            Pt_18 = alfa*PtL_18 + beta*PtR_18
+         end if
+         
+         ! set extra_P
+         if (.not. s% use_other_pressure) then
+            extra_P = 0d0
+         else if (k > 1) then 
+            extra_P = alfa*s% extra_pressure(k) + beta*s% extra_pressure(k-1) 
+         else
+            extra_P = s% extra_pressure(k)
+         end if
+         
+         ! set mlt_Pturb_18
+         mlt_Pturb_18 = 0d0
+         if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
+            mlt_Pturb_18%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
+            mlt_Pturb_18%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
+            mlt_Pturb_18%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
+         end if            
+         
+         P_face_18 = P_18 + avQ_18 + Pt_18 + mlt_Pturb_18 + extra_P
          
          A_18 = 0d0
          A_18%val = 4d0*pi*s% R2(k)
          A_18%d1Array(i_lnR_00) = 4d0*pi*s% d_R2_dlnR(k)
          A = A_18%val
-
-         if (s% u_flag) then ! keep it simple for now.
-         
-            P_face_18 = s% P_face_18(k)
-            u_face_18 = s% u_face_18(k)
-            d_Pface_dxa00 = 0d0
-            d_Pface_dxam1 = 0d0
-         
-         else
-
-            theta = 1d0
-            P_theta = 1d0
-            if (s% using_Fraley_time_centering) then
-               theta = 0.5d0
-               if (s% include_P_in_Fraley_time_centering) P_theta = 0.5d0
-            end if
-
-            PR_18 = 0d0
-            avQR_18 = 0d0
-            PtR_18 = 0d0         
-            if (k > 1) then 
-               if (s% use_avQ_art_visc) then
-                  call get_avQ_18(s, k-1, avQR_18, ierr)
-                  if (ierr /= 0) return
-                  avQR_18 = shift_m1(avQR_18)
-                  avQR_18 = 0.5d0*(avQR_18 + s% avQ_start(k-1))
-               end if            
-               if (s% et_flag) then
-                  call calc_Pt_18_tw(s, k-1, PtR_18, ierr)
-                  if (ierr /= 0) return
-                  PtR_18 = shift_m1(PtR_18)
-               end if            
-               if (.not. skip_P) then
-                  PR_18 = wrap_p_m1(s, k)
-                  if (s% using_Fraley_time_centering .and. &
-                           s% include_P_in_Fraley_time_centering) &
-                     PR_18 = 0.5d0*(PR_18 + s% P_start(k))
-               end if            
-               if (s% use_other_pressure) PR_18%val = PR_18%val + s% extra_pressure(k-1)            
-            end if
-      
-            avQL_18 = 0d0
-            if (s% use_avQ_art_visc) then
-               call get_avQ_18(s, k, avQL_18, ierr)
-               if (ierr /= 0) return
-               avQL_18 = 0.5d0*(avQL_18 + s% avQ_start(k))
-            end if
-         
-            PtL_18 = 0d0
-            if (s% et_flag) then
-               call calc_Pt_18_tw(s, k, PtL_18, ierr)
-               if (ierr /= 0) return
-            end if
-         
-            if (skip_P) then
-               PL_18 = 0d0
-            else
-               PL_18 = wrap_p_00(s, k)
-               if (s% using_Fraley_time_centering .and. &
-                        s% include_P_in_Fraley_time_centering) &
-                  PL_18 = 0.5d0*(PL_18 + s% P_start(k))
-            end if
-            if (s% use_other_pressure) PL_18%val = PL_18%val + s% extra_pressure(k)
-         
-            d_Pface_dxa00 = 0d0
-            d_Pface_dxam1 = 0d0
-         
-            if (k > 1) then         
-               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-               beta = 1d0 - alfa
-               P_face_18 = alfa*(PL_18 + avQL_18 + PtL_18) + beta*(PR_18 + avQR_18 + PtR_18)            
-               if (.not. skip_P) then
-                  do j=1,s% species
-                     d_Pface_dxa00(j) = d_Pface_dxa00(j) + &
-                        alfa*s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
-                  end do
-                  do j=1,s% species
-                     d_Pface_dxam1(j) = d_Pface_dxam1(j) + &
-                        beta*s% dlnP_dxa_for_partials(j,k-1)*P_theta*s% P(k-1)
-                  end do
-               end if         
-               if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
-                  mlt_Pturb_18 = 0d0
-                  mlt_Pturb_18%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
-                  mlt_Pturb_18%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
-                  mlt_Pturb_18%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
-                  P_face_18 = P_face_18 + mlt_Pturb_18
-               end if            
-            else ! k == 1
-               P_face_18 = PL_18 + avQL_18 + PtL_18            
-               if (.not. skip_P) then
-                  do j=1,s% species
-                     d_Pface_dxa00(j) = d_Pface_dxa00(j) + &
-                        s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
-                  end do
-               end if            
-            end if
-
-            u_face_18 = 0d0
-            if (s% v_flag) then
-               u_face_18%val = s% vc(k)
-               u_face_18%d1Array(i_v_00) = s% d_vc_dv
-            else
-               u_face_18%val = theta*(s% r(k) - s% r_start(k))/s% dt
-               u_face_18%d1Array(i_lnR_00) = theta*s% r(k)/s% dt
-            end if
-            
-         end if
          
          work_18 = A_18*P_face_18*u_face_18
+         
          P_face = P_face_18%val
          u_face = u_face_18%val
          work = work_18%val

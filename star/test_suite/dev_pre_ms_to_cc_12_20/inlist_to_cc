@@ -55,6 +55,9 @@
 ! mesh
 
 ! solver
+      use_Fraley_time_centering = .true.
+      include_P_in_Fraley_time_centering = .true.
+      include_L_in_Fraley_time_centering = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
