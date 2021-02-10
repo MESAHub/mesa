@@ -105,9 +105,9 @@
          use mesh_functions
          use hydro_reconstruct, only: do_uface_and_Pface
          use hydro_riemann, only: do1_Riemann_momentum_eqn
+         use hydro_momentum, only: do1_momentum_eqn, do1_radius_eqn
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
-         use hydro_momentum, only: do1_momentum_eqn
          use hydro_eturb, only: do1_turbulent_energy_eqn, do1_et_L_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
@@ -715,128 +715,6 @@
          end if
 
       end subroutine do1_density_eqn
-
-
-      subroutine do1_radius_eqn( &
-            s, k, xscale, equ, skip_partials, nvar, ierr)
-         use auto_diff_support, only: unwrap
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
-         logical, intent(in) :: skip_partials
-         integer, intent(out) :: ierr
-
-         real(dp) :: dt, r, r0, r_div_r0, cs, v_expected, v_factor, &
-            dr_div_r0_actual, dr_div_r0_expected, c_factor, uc_factor, unused, &
-            d_uface_dlnR, d_uface_du00, d_uface_dum1, &
-            d_uface_dlnd00, d_uface_dlndm1,  d_uface_dlnT00, d_uface_dlnTm1
-         integer :: nz, i_dlnR_dt, i_v, i_u, i_lnR, i_w_div_wc
-         logical :: test_partials, force_zero_v
-
-         include 'formats'
-
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-
-         ierr = 0
-         dt = s% dt
-         nz = s% nz
-         i_dlnR_dt = s% i_dlnR_dt
-         i_v = s% i_v
-         i_u = s% i_u
-         i_lnR = s% i_lnR
-         i_w_div_wc = s% i_w_div_wc
-
-         r = s% r(k)
-         r0 = s% r_start(k)
-         r_div_r0 = r/r0
-
-         force_zero_v = (s% q(k) > s% velocity_q_upper_bound)
-         if (s% i_lnT /= 0 .and. .not. force_zero_v) &
-            force_zero_v = &
-               (s% xh_old(s% i_lnT,k)/ln10 < s% velocity_logT_lower_bound .and. &
-                  s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)
-         if (force_zero_v) then
-            cs = s% csound_start(k)
-            if (i_v /= 0) then
-               equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
-               s% lnR_residual(k) = equ(i_dlnR_dt, k)
-               if (skip_partials) return
-               call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, one/cs)
-               return
-            else if (i_u /= 0) then
-               equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
-               s% lnR_residual(k) = equ(i_dlnR_dt, k)
-               if (skip_partials) return
-               call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, one/cs)
-               return
-            end if
-         end if
-         
-         if (i_u /= 0) then
-            call unwrap(s% u_face_18(k), v_expected, &
-               d_uface_dlndm1, d_uface_dlnd00, unused, &
-               d_uface_dlnTm1, d_uface_dlnT00, unused, &
-               unused, unused, unused, &
-               unused, d_uface_dlnR, unused, &
-               d_uface_dum1, d_uface_du00, unused, &
-               unused, unused, unused)
-            v_factor = 1d0
-         else
-            v_expected = s% vc(k)
-            v_factor = s% d_vc_dv
-         end if
-
-         ! dr = r - r0 = v_expected*dt
-         ! eqn: dr/r0 = v_expected*dt/r0
-         ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
-         ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
-         ! eqn becomes: v_expected*dt/r0 = expm1(dlnR)
-         dr_div_r0_actual = expm1(s% dxh_lnR(k)) ! expm1(x) = E^x - 1
-         c_factor = dt/r0 ! factor to convert dr_dt to dr_div_r0
-         dr_div_r0_expected = v_expected*c_factor
-         
-         equ(i_dlnR_dt, k) = dr_div_r0_expected - dr_div_r0_actual
-         s% lnR_residual(k) = equ(i_dlnR_dt, k)
-
-         if (test_partials) then
-            s% solver_test_partials_val = s% lnR_residual(k)
-         end if
-
-         if (skip_partials) return
-
-         ! partial of -dr_div_r0_actual wrt lnR
-         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0) 
-
-         ! partials of dr_div_r0_expected
-         if (i_v /= 0) then
-            call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, v_factor*dt/r0)
-         else if (i_u /= 0) then ! partials of dr_div_r0_expected
-            uc_factor = v_factor*c_factor
-            call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
-            call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)         
-            call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
-            if (s% do_struct_thermo) &
-               call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
-            if (k > 1) then
-               call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
-               call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
-               if (s% do_struct_thermo) &
-                  call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
-            end if         
-            if (s% w_div_wc_flag) then
-               call e00(s, xscale, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
-            end if
-         end if
-
-         if (test_partials) then   
-            s% solver_test_partials_var = i_lnR
-            s% solver_test_partials_dval_dx = -r_div_r0
-            write(*,*) 'do1_radius_eqn', s% solver_test_partials_var
-         end if
-
-      end subroutine do1_radius_eqn
 
 
       subroutine do1_dalpha_RTI_dt_eqn( &

@@ -18,6 +18,9 @@ case C
       split_merge_amr_nz_r_core = 200
 
 
+
+
+
 case  M_zams   M_He  M_CO  M_Fe  days  pulses   M_remnant   M_ejecta    v_ejecta    totE_start  totE_end    steps retries  log_rel_run_E_err
 A     100      50.2  34.2  2.29  3.48  ~11      39.8        10.4        ~4000       -4.56       -3.43       7665  270      -7.46
 B     100      50.2  34.0  2.29  3.68  ~11      39.9        10.3        ~4000       -4.53       -3.35       9475  208      -7.44

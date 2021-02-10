@@ -35,10 +35,355 @@
       implicit none
 
       private
-      public :: do1_momentum_eqn, do_surf_momentum_eqn
+      public :: do1_momentum_eqn, do_surf_momentum_eqn, do1_radius_eqn
 
 
       contains
+
+
+      subroutine do1_radius_eqn( &
+            s, k, xscale, equ, skip_partials, nvar, ierr)
+         use auto_diff_support, only: unwrap
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         real(dp), pointer :: xscale(:,:)
+         real(dp), pointer :: equ(:,:)
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr
+
+         real(dp) :: dt, r, r0, r_div_r0, cs, v_expected, v_factor, residual, &
+            dr_div_r0_actual, dr_div_r0_expected, uc_factor, unused, &
+            d_uface_dlnR, d_uface_du00, d_uface_dum1, d_dlnR00, d_dv00, &
+            d_uface_dlnd00, d_uface_dlndm1,  d_uface_dlnT00, d_uface_dlnTm1, &
+            residual_old, d_dlnR00_old, d_dv00_old
+         integer :: nz, i_dlnR_dt, i_v, i_u, i_lnR, i_w_div_wc
+         logical :: test_partials, force_zero_v
+
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ierr = 0
+         dt = s% dt
+         nz = s% nz
+         i_dlnR_dt = s% i_dlnR_dt
+         i_v = s% i_v
+         i_u = s% i_u
+         i_lnR = s% i_lnR
+         i_w_div_wc = s% i_w_div_wc
+
+         r = s% r(k)
+         r0 = s% r_start(k)
+         r_div_r0 = r/r0
+
+         force_zero_v = (s% q(k) > s% velocity_q_upper_bound)
+         
+         if (s% i_lnT /= 0 .and. .not. force_zero_v) &
+            force_zero_v = &
+               (s% xh_old(s% i_lnT,k)/ln10 < s% velocity_logT_lower_bound .and. &
+                  s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)
+                  
+         if (force_zero_v) then
+            cs = s% csound_start(k)
+            if (i_v /= 0) then
+               equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
+               s% lnR_residual(k) = equ(i_dlnR_dt, k)
+               if (skip_partials) return
+               call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
+               return
+            else if (i_u /= 0) then
+               equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
+               s% lnR_residual(k) = equ(i_dlnR_dt, k)
+               if (skip_partials) return
+               call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, 1d0/cs)
+               return
+            end if
+         end if
+
+         if (i_u /= 0) then
+            call unwrap(s% u_face_18(k), v_expected, &
+               d_uface_dlndm1, d_uface_dlnd00, unused, &
+               d_uface_dlnTm1, d_uface_dlnT00, unused, &
+               unused, unused, unused, &
+               unused, d_uface_dlnR, unused, &
+               d_uface_dum1, d_uface_du00, unused, &
+               unused, unused, unused)
+            v_factor = 1d0
+         else
+            v_expected = s% vc(k)
+            v_factor = s% d_vc_dv
+         end if
+
+         ! dr = r - r0 = v_expected*dt
+         ! eqn: dr/r0 = v_expected*dt/r0
+         ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
+         ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
+         ! eqn becomes: v_expected*dt/r0 = expm1(dlnR)
+         dr_div_r0_actual = expm1(s% dxh_lnR(k)) ! expm1(x) = E^x - 1
+         dr_div_r0_expected = v_expected*dt/r0
+         
+         residual = dr_div_r0_expected - dr_div_r0_actual
+         equ(i_dlnR_dt, k) = residual
+         s% lnR_residual(k) = residual
+
+         if (test_partials) then
+            s% solver_test_partials_val = residual
+         end if
+
+         if (skip_partials) return
+
+         ! partials of dr_div_r0_expected
+         if (i_v /= 0) then            
+            call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, v_factor*dt/r0)            
+         else if (i_u /= 0) then
+            uc_factor = v_factor*dt/r0
+            call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
+            call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)         
+            call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
+            if (s% do_struct_thermo) &
+               call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
+            if (k > 1) then
+               call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
+               call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
+               if (s% do_struct_thermo) &
+                  call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
+            end if         
+            if (s% w_div_wc_flag) then
+               call e00(s, xscale, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
+            end if
+         end if
+
+         ! partial of -dr_div_r0_actual wrt lnR
+         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0) 
+
+         if (test_partials) then   
+            s% solver_test_partials_var = i_lnR
+            s% solver_test_partials_dval_dx = -r_div_r0
+            write(*,*) 'do1_radius_eqn', s% solver_test_partials_var
+         end if
+
+      end subroutine do1_radius_eqn
+
+         
+      subroutine do1_Riemann_dlnRdt_eqn_old( &
+            s, k, xscale, equ, skip_partials, nvar, &
+            ierr)
+         type (star_info), pointer :: s         
+         integer, intent(in) :: k, nvar
+         real(dp), pointer :: xscale(:,:)
+         real(dp), pointer :: equ(:,:)
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr
+         
+         integer :: nz, i_dlnR_dt, i_u, i_lnR, i_w_div_wc
+         real(dp) :: r, r0, r_div_r0, u_expected, u_factor, c_factor, &
+            dr_div_r0_actual, dr_div_r0_expected, dt, alpha, uc_factor, &
+            d_uface_dlnR, &
+            d_uface_du00, &
+            d_uface_dum1, &
+            d_uface_dlnd00, &
+            d_uface_dlndm1, &
+            d_uface_dlnT00, &
+            d_uface_dlnTm1
+
+         logical :: test_partials
+         
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ierr = 0
+         dt = s% dt
+         nz = s% nz
+         i_dlnR_dt = s% i_dlnR_dt
+         i_u = s% i_u
+         i_lnR = s% i_lnR
+         i_w_div_wc = s% i_w_div_wc
+         
+         r = s% r(k)
+         r0 = s% r_start(k)
+         r_div_r0 = r/r0
+
+         u_expected = s% u_face_18(k)%val
+         u_factor = 1d0
+
+         ! dr = r - r0 = u_expected*dt
+         ! eqn: dr/r0 = u_expected*dt/r0
+         ! write dr/r0 using dlnR = dlnR_dt*dt 
+         ! dr/r0 = (r - r0)/r0 = r/r0 - 1
+         !        = exp(lnR)/exp(lnR_start) - 1
+         !        = exp(lnR - lnR_start) - 1
+         !        = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
+         ! eqn becomes: u_expected*dt/r0 = expm1(dlnR)
+         dr_div_r0_actual = expm1(s% dlnR_dt(k)*dt) ! expm1(x) = E^x - 1
+
+         c_factor = dt/r0 ! factor to convert dr_dt to dr_div_r0
+         dr_div_r0_expected = u_expected*c_factor
+
+         equ(i_dlnR_dt, k) = dr_div_r0_expected - dr_div_r0_actual         
+         s% lnR_residual(k) = equ(i_dlnR_dt, k)
+         
+         if (is_bad(equ(i_dlnR_dt, k))) then
+            ierr = -1
+            if (.not. s% report_ierr) return
+!$omp critical (do1_Riemann_dlnRdt_eqn_omp)
+            write(*,2) 'equ(i_dlnR_dt, k)', k, equ(i_dlnR_dt, k)
+            write(*,2) 'dr_div_r0_expected', k, dr_div_r0_expected
+            write(*,2) 'dr_div_r0_actual', k, dr_div_r0_actual
+            write(*,2) 'u_expected', k, u_expected
+            write(*,2) 'dt/r0', k, dt/r0
+            stop 'do1_Riemann_dlnRdt_eqn'
+!$omp end critical (do1_Riemann_dlnRdt_eqn_omp)
+         end if
+
+         if (test_partials) then
+            s% solver_test_partials_val = equ(i_dlnR_dt, k) 
+         end if
+     
+         if (skip_partials) return
+         
+         d_uface_dlnR = s% u_face_18(k)% d1Array(i_lnR_00)
+         d_uface_du00 = s% u_face_18(k)% d1Array(i_v_00)
+         d_uface_dum1 = s% u_face_18(k)% d1Array(i_v_m1)
+         d_uface_dlnd00 = s% u_face_18(k)% d1Array(i_lnd_00)
+         d_uface_dlndm1 = s% u_face_18(k)% d1Array(i_lnd_m1)
+         d_uface_dlnT00 = s% u_face_18(k)% d1Array(i_lnT_00)
+         d_uface_dlnTm1 = s% u_face_18(k)% d1Array(i_lnT_m1)
+         
+         uc_factor = u_factor*c_factor
+         
+         ! partial of -dr_div_r0_actual
+         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0)
+         
+         ! partials of dr_div_r0_expected = u_face*f
+         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
+         call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)
+         
+         call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
+         if (s% do_struct_thermo) &
+            call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)
+         
+         if (k > 1) then
+            call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
+            call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
+            if (s% do_struct_thermo) &
+               call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
+         end if
+
+         if (s% w_div_wc_flag) then
+            call e00(s, xscale, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
+         end if
+
+         if (test_partials) then   
+            s% solver_test_partials_var = i_u
+            s% solver_test_partials_dval_dx = uc_factor*d_uface_du00
+            write(*,*) 'do1_Riemann_dlnRdt_eqn_old', s% solver_test_partials_var
+         end if
+            
+      end subroutine do1_Riemann_dlnRdt_eqn_old
+
+
+      subroutine do1_radius_eqn_old( &
+            s, k, xscale, equ, skip_partials, nvar, &
+            residual, d_dlnR00, d_dv00, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         real(dp), pointer :: xscale(:,:)
+         real(dp), pointer :: equ(:,:)
+         logical, intent(in) :: skip_partials
+         real(dp), intent(out) :: residual, d_dlnR00, d_dv00
+         integer, intent(out) :: ierr
+
+         real(dp) :: cs, r, PE_scal, v_expected, v_factor, alpha, &
+            r0, dr_div_r0_actual, dr_div_r0_expected, dt, r_div_r0
+         integer :: nz, i_dlnR_dt, i_v, i_lnR
+         logical :: test_partials, force_zero_v
+
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ierr = 0
+         nz = s% nz
+         i_dlnR_dt = s% i_dlnR_dt
+         i_v = s% i_v
+         i_lnR = s% i_lnR
+         r = s% r(k)
+         r0 = s% r_start(k)
+         r_div_r0 = r/r0
+         PE_scal = s% cgrav(k)*s% m(k)*s% dm_bar(k)/r ! convert dlnR/dt to PE
+         dt = s% dt
+         
+         residual = 0
+         d_dlnR00 = 0
+         d_dv00 = 0
+         
+         if (i_v /= 0) then
+            force_zero_v = (s% q(k) > s% velocity_q_upper_bound)
+            if (s% i_lnT /= 0 .and. .not. force_zero_v) &
+               force_zero_v = &
+                  (s% xh_old(s% i_lnT,k)/ln10 < s% velocity_logT_lower_bound .and. &
+                     s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)
+            if (force_zero_v) then
+               cs = s% csound_start(k)
+               residual = s% v(k)/cs ! this makes v(k) => 0
+               equ(i_dlnR_dt, k) = residual
+               s% lnR_residual(k) = residual
+               if (skip_partials) return
+               d_dv00 = 1d0/cs
+               call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
+               return
+            end if
+         end if
+
+         v_expected = s% vc(k)
+         v_factor = s% d_vc_dv
+
+         ! dr = r - r0 = v_expected*dt
+         ! eqn: dr/r0 = v_expected*dt/r0
+         ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
+         ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
+         ! eqn becomes: v_expected*dt/r0 = expm1(dlnR)
+         dr_div_r0_actual = expm1(s% dxh_lnR(k)) ! expm1(x) = E^x - 1
+         dr_div_r0_expected = v_expected*dt/r0
+         
+         residual = dr_div_r0_expected - dr_div_r0_actual
+         equ(i_dlnR_dt, k) = residual
+         s% lnR_residual(k) = residual
+
+         if (test_partials) then
+            s% solver_test_partials_val = residual
+         end if
+
+         if (skip_partials) return
+
+         ! partial of -dr_div_r0_actual wrt lnR
+         d_dlnR00 = -r_div_r0
+         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, d_dlnR00) 
+
+         ! partials of dr_div_r0_expected
+         d_dv00 = v_factor*dt/r0
+         if (i_v /= 0) call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, d_dv00)
+
+         if (test_partials) then   
+            s% solver_test_partials_var = i_lnR
+            s% solver_test_partials_dval_dx = -r_div_r0
+            write(*,*) 'do1_radius_eqn_old', s% solver_test_partials_var
+         end if
+
+      end subroutine do1_radius_eqn_old
+
+
+
+
+
+
+
+
+
 
       
       subroutine do_surf_momentum_eqn( &

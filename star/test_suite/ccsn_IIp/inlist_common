@@ -46,9 +46,6 @@
       ! this should be < Tcenter_min_for_sig_min_factor_full_on.
    ! for T > full_off and < full_on, factor changes linearly with Tcenter
 
-   velocity_logT_lower_bound = 8 
-   max_dt_yrs_for_velocity_logT_lower_bound = 0.1
-
    mesh_delta_coeff = 1.5
    mesh_delta_coeff_for_highT = 2.5
    logT_max_for_standard_mesh_delta_coeff = 9.0 
