@@ -11,7 +11,9 @@
       required_termination_code_string(3) = 'remnant_mass_min_limit' ! for completely unbound cases
       !required_termination_code_string(4) = 'max_model_number' ! for testing
       
-      !set_initial_model_number = .false.
+      set_initial_model_number = .false.
+      set_initial_age = .false.
+      set_initial_number_retries = .false.
 
       !pgstar_flag = .false.
 
@@ -50,6 +52,18 @@
 ! mesh
 
 ! solver 
+      
+! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+      !x_logical_ctrl(37) = .true. ! if true, then run GYRE
+      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
+      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      x_integer_ctrl(4) = 1 ! order
+      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
 ! output
       num_trace_history_values = 7

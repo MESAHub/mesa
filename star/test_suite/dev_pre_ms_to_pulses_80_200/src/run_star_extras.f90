@@ -26,10 +26,22 @@
       use star_def
       use const_def
       use math_lib
+      use gyre_lib
       
       implicit none
       
       include "test_suite_extras_def.inc"
+
+!gyre
+      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
+      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      !x_logical_ctrl(2) = .false. ! output eigenfunction files
+      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      !x_integer_ctrl(4) = 1 ! order
+      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
 
       contains
 
@@ -69,6 +81,25 @@
          else ! it is a restart
             call unpack_extra_info(s)
          end if 
+         
+         if (.not. s% x_logical_ctrl(37)) return
+         
+         ! Initialize GYRE
+
+         call gyre_init('gyre.in')
+
+         ! Set constants
+
+         call gyre_set_constant('G_GRAVITY', standard_cgrav)
+         call gyre_set_constant('C_LIGHT', clight)
+         call gyre_set_constant('A_RADIATION', crad)
+
+         call gyre_set_constant('M_SUN', Msun)
+         call gyre_set_constant('R_SUN', Rsun)
+         call gyre_set_constant('L_SUN', Lsun)
+
+         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+
       end subroutine extras_startup
       
       
@@ -85,6 +116,8 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
          if (ierr /= 0) return         
+         if (.not. s% x_logical_ctrl(37)) return
+         call gyre_final()
       end subroutine extras_after_evolve
       
 
@@ -154,6 +187,9 @@
          integer, intent(in) :: id
          extras_start_step = keep_going    
       end function extras_start_step
+
+  
+      include 'gyre_in_mesa_extras_finish_step.inc'
    
 
       ! returns either keep_going or terminate.
@@ -169,6 +205,10 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
          call store_extra_info(s)         
+         if (.not. s% x_logical_ctrl(37)) return
+         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
+         if (extras_finish_step == terminate) &
+             s% termination_code = t_extras_finish_step
       end function extras_finish_step
 
       
