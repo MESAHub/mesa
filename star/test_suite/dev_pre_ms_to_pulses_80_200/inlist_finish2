@@ -14,7 +14,7 @@
       set_initial_model_number = .false.
       set_initial_age = .false.
       set_initial_number_retries = .false.
-      clear_initial_pgstar_history = .false.
+      !clear_initial_pgstar_history = .false.
 
       !pgstar_flag = .false.
 
@@ -57,7 +57,7 @@
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
       !x_logical_ctrl(37) = .true. ! if true, then run GYRE
-      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      x_integer_ctrl(1) = 20 ! output GYRE info at this step interval
       x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
       x_integer_ctrl(2) = 2 ! max number of modes to output per call
       x_logical_ctrl(2) = .false. ! output eigenfunction files
@@ -151,7 +151,7 @@
 
 !pause = .true.
 
-Grid1_file_flag = .true.
+!Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
 Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0

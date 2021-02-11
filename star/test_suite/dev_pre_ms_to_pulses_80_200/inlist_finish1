@@ -30,7 +30,7 @@
       max_model_number = 100000      
       !max_number_retries = 30
       
-      ejecta_mass_max_limit = 3d0
+      ejecta_mass_max_limit = 4.8d0 ! tuned for test_suite to reduce work for testing
 
       log_Rsurf_upper_limit = 4d0 ! for higher masses
       fe_core_infall_limit = 1d7 ! for lower masses
@@ -137,7 +137,7 @@
 
 !pause = .true.
 
-Grid1_file_flag = .true.
+!Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'cc_'
 Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
