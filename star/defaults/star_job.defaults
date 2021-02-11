@@ -1539,18 +1539,6 @@
     center_ye_limit_for_v_flag = 0.45d0
 
 
-      ! gamma1_integral_for_v_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! automatically turn on velocities if ``center_gamma1_integral`` drops below this limit.
-      ! this is useful for evolution leading up to pair instability core collapse.
-      ! integral is sum over all cells of ``(gamma1-4d0/3d0)`` weighted by ``dm*P/rho``
-
-      ! ::
-
-    gamma1_integral_for_v_flag = 0d0
-
-
       ! change_u_flag
       ! ~~~~~~~~~~~~~
       ! change_initial_u_flag

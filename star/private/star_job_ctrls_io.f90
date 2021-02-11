@@ -343,7 +343,6 @@
          new_reconstruction_flag, &
          
          center_ye_limit_for_v_flag, &
-         gamma1_integral_for_v_flag, &
          logT_for_conv_vel_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
@@ -991,7 +990,6 @@
          s% job% new_reconstruction_flag = new_reconstruction_flag
          
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
-         s% job% gamma1_integral_for_v_flag = gamma1_integral_for_v_flag
          s% job% logT_for_conv_vel_flag = logT_for_conv_vel_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
@@ -1568,7 +1566,6 @@
          new_reconstruction_flag = s% job% new_reconstruction_flag
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
-         gamma1_integral_for_v_flag = s% job% gamma1_integral_for_v_flag
          logT_for_conv_vel_flag = s% job% logT_for_conv_vel_flag
          change_rotation_flag = s% job% change_rotation_flag
          change_initial_rotation_flag = s% job% change_initial_rotation_flag

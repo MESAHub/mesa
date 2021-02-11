@@ -513,26 +513,6 @@
             if (failed('star_set_et_flag',ierr)) return
          end if
          
-         if (s% log_max_temperature > 9d0 .and. &
-               (.not. s% v_flag) .and. (.not. s% u_flag)) then 
-            ! thanks to Roni Waldman for this
-            gamma1_integral = 0
-            integral_norm = 0
-            do k=1,s% nz
-               integral_norm = integral_norm + s% P(k)*s% dm(k)/s% rho(k)
-               gamma1_integral = gamma1_integral + &
-                  (s% gamma1(k)-4.d0/3.d0)*s% P(k)*s% dm(k)/s% rho(k)
-            end do
-            gamma1_integral = gamma1_integral/max(1d-99,integral_norm)
-            if (gamma1_integral <= s% job% gamma1_integral_for_v_flag) then
-               write(*,1) 'have reached gamma1 integral limit', gamma1_integral
-               write(*,1) 'set v_flag true'
-               call star_set_v_flag(id, .true., ierr)
-               if (failed('star_set_v_flag',ierr)) return
-               if (ierr /= 0) return
-            end if
-         end if
-         
          if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
          if (s% job% report_cell_for_xm > 0) call do_report_cell_for_xm(s)
          

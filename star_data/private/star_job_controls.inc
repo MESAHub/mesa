@@ -195,7 +195,6 @@
       logical :: change_am_nu_rot_flag, change_initial_am_nu_rot_flag, &
          new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
-      real(dp) :: gamma1_integral_for_v_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag
       logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
          new_reconstruction_flag
