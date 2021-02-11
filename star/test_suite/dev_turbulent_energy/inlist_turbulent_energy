@@ -1,16 +1,12 @@
-! test case for save and load file
 
 &star_job
 
    show_log_description_at_start = .false.
 
    load_saved_model = .true.
-   !saved_model_name = 'LBV_env.mod'    ! needs et_Lsurf_factor = 0.25d0 to match MLT
-   !saved_model_name = 'RSG_env.mod'    ! needs et_Lsurf_factor = 0.25d0 to match MLT
-   !saved_model_name = 'Cepheid_env.mod'    ! ok with et_Lsurf_factor = 0.5d0
    saved_model_name = 'RR_Lyrae_env.mod'    ! ok with et_Lsurf_factor = 0.5d0
+   required_termination_code_string(1) = 'max_model_number' ! just for testing
    
-
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
    

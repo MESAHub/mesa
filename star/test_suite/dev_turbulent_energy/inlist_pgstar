@@ -115,7 +115,7 @@
   Text_Summary1_name(8, 4) = ''
 
 
-  Grid2_title = 'Testing et'
+  Grid2_title = ''
   Grid2_plot_name(1) = 'Profile_Panels1'
   Grid2_plot_name(2) = 'Text_Summary1'
   Grid2_plot_name(3) = 'TRho_Profile'
