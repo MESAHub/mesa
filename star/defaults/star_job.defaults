@@ -180,6 +180,17 @@
     pgstar_flag = .false.
 
 
+      ! clear_initial_pgstar_history
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! clear_pgstar_history
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    clear_initial_pgstar_history = .true.
+    clear_pgstar_history = .false.
+
+
       ! save_pgstar_files_when_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

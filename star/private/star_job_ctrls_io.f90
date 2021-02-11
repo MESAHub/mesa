@@ -53,6 +53,8 @@
          steps_before_start_timing, &
          show_eqns_and_vars_names, &
          pgstar_flag, &
+         clear_initial_pgstar_history, &
+         clear_pgstar_history, &
          save_pgstar_files_when_terminate, &
          save_photo_when_terminate, &
          load_saved_photo, &
@@ -700,6 +702,8 @@
          s% job% steps_before_start_timing = steps_before_start_timing
          s% job% show_eqns_and_vars_names = show_eqns_and_vars_names
          s% job% pgstar_flag = pgstar_flag
+         s% job% clear_initial_pgstar_history = clear_initial_pgstar_history
+         s% job% clear_pgstar_history = clear_pgstar_history
          s% job% save_pgstar_files_when_terminate = save_pgstar_files_when_terminate
          s% job% save_photo_when_terminate = save_photo_when_terminate
          s% job% load_saved_photo = load_saved_photo
@@ -1276,6 +1280,8 @@
          steps_before_start_timing = s% job% steps_before_start_timing
          show_eqns_and_vars_names = s% job% show_eqns_and_vars_names
          pgstar_flag = s% job% pgstar_flag
+         clear_initial_pgstar_history = s% job% clear_initial_pgstar_history
+         clear_pgstar_history = s% job% clear_pgstar_history
          save_pgstar_files_when_terminate = s% job% save_pgstar_files_when_terminate
          save_photo_when_terminate = s% job% save_photo_when_terminate
          load_saved_photo = s% job% load_saved_photo

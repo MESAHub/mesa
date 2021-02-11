@@ -14,6 +14,7 @@
       set_initial_model_number = .false.
       set_initial_age = .false.
       set_initial_number_retries = .false.
+      clear_initial_pgstar_history = .false.
 
       !pgstar_flag = .false.
 

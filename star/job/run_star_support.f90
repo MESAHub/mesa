@@ -1995,7 +1995,8 @@
          call star_set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
          if (failed('star_set_profile_columns',ierr)) return
 
-         if (.not. restart) then
+         if (s% job% clear_pgstar_history .or. &
+               (s% job% clear_initial_pgstar_history .and. .not. restart)) then
             call start_new_run_for_pgstar(s, ierr)
             if (failed('start_new_run_for_pgstar',ierr)) return
          else
