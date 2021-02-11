@@ -1,11 +1,18 @@
-compare to Woosley ApJ 836 244, 2017.
+compare to Woosley ApJ 836 244, 2017
+and to MESA4 (2018), Fig 49.
 
+cases
+A     several weak pulses leading to core collapse
+B     strong pulses leading to stop for ejecta logR = 4 before core collapse
 
+even if final total energy > 0, takes time to get the ejecta accelerated so that v > v_esc.
+the initial ejecta can reach logR = 4 long before the last of the "remnant" is "ejected".
 
+examples (these have NOT been tested for convergence - so just FYI)
 case  M_zams   M_He  M_CO  M_Fe  days  M_remnant   M_ejecta    v_ejecta    steps retries  log_rel_run_E_err
-      90       45.5  31.1  2.38  0.71  38.7        6.8         ~2500       3603  72       -7.80
-
-
+A      90      45.5  31.1  2.38  0.71  38.7        6.8         ~2500       3603  72       -7.80
+B     160      83.8  53.6  0.00  3.98  69.7        14.1        ~2e4        1146  20       -7.30
+B     200      102.1 63.5  0.00  3.11  -> 0                    ~2.5e4      1234  32       -8.07
 
 M_He        mass of remaining He core after remove H envelope
 M_CO        mass of CO core at end of run
