@@ -28,6 +28,11 @@
 
    change_initial_v_flag = .true.
    new_v_flag = .true.
+   
+!   change_initial_v_flag = .true.
+!   new_v_flag = .false.
+!   change_initial_u_flag = .true.
+!   new_u_flag = .true.
 
    pgstar_flag = .true.
 
@@ -53,50 +58,52 @@
 
    max_number_retries = 10
    max_model_number = 50
-   
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with et
-      
-   use_momentum_outer_BC = .true.
 
+   max_age = 1d6
+      
+! wind
+
+! atmosphere
    atm_option = 'T_tau'
    atm_T_tau_relation = 'Eddington'
    atm_T_tau_opacity = 'fixed'
    Pextra_factor = 2
-   
-   max_years_for_timestep = 1d2
-   max_age = 1d6
 
+! rotation
+
+! mlt
+
+! mixing
+
+! timesteps
    varcontrol_target = 1d-3 
-   
+   max_years_for_timestep = 1d2
+
+! mesh
+   okay_to_remesh = .false.
+
+! solver
+   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with et
+      
+   use_momentum_outer_BC = .true.
+
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
    dxdt_nuc_factor = 0
    mix_factor = 0
    
+   use_velocity_time_centering = .true.
+   include_P_in_velocity_time_centering = .true.
+   include_L_in_velocity_time_centering = .true.
+
+! turbulent energy
       !   et_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
       !   et_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
       !   et_alfat =     0.0d0         ! turbulent flux; Lt ~ et_alfat
       !   et_alfam =     0.25d0        ! turbulent viscosity; Eq ~ et_alfam
       !   et_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ et_alfar   
-      
 
-   !use_d_eos_dxa = .true.
-
-   okay_to_remesh = .false.
-  
-  
-  
-  ! TESTING
-  
-  !convergence_ignore_equL_residuals = .true.
-
-   !et_alfa = 0d0 ! purely radiative model
-
-  !use_velocity_time_centering = .true.
-  !use_avQ_art_visc = .true.
-
-
-! output controls
+! output
    
    !terminal_show_age_units = 'days'
 

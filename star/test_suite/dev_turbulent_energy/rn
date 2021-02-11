@@ -12,7 +12,3 @@ do_one inlist_turbulent_energy_header final.mod
 #exit
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-
-echo 'finished inlists'
-echo
-
