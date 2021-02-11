@@ -33,7 +33,7 @@
    change_initial_v_flag = .true.
    new_v_flag = .true.
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
