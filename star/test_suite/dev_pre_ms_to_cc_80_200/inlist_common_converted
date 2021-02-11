@@ -76,8 +76,8 @@
       split_merge_amr_hybrid_zoning = .true.
       
       split_merge_amr_r_core_cm = 1d9
-      split_merge_amr_nz_baseline = 1200
-      split_merge_amr_nz_r_core = 200
+      split_merge_amr_nz_baseline = 1000
+      split_merge_amr_nz_r_core = 175
 
       split_merge_amr_MaxLong = 1.4d0
       split_merge_amr_MaxShort = 1.4d0
@@ -95,9 +95,9 @@
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 1d-3
       
-      use_velocity_time_centering = .true.
-      include_P_in_velocity_time_centering = .true.
-      include_L_in_velocity_time_centering = .true.
+      !use_velocity_time_centering = .true.
+      !include_P_in_velocity_time_centering = .true.
+      !include_L_in_velocity_time_centering = .true.
 
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.

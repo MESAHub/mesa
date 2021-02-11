@@ -1666,26 +1666,37 @@
          use num_lib, only: find0
          type (star_info), pointer :: s
          integer :: k
-         real(dp), pointer :: v(:)
-         real(dp) :: vesc2, vesc2_prev, dm
+         real(dp) :: v, vesc, v_div_vesc, v_div_vesc_prev, dm
+         include 'formats'
          get_ejecta_mass = 0d0
-         if (s% u_flag) then
-            v => s% u
-         else if (s% v_flag) then
-            v => s% v
-         else
-            return
-         end if
-         vesc2_prev = 0d0
+         if (.not. (s% u_flag .or. s% v_flag)) return
+         v_div_vesc_prev = 0d0
          do k=1,s% nz
-            vesc2 = 2d0*s% cgrav(k)*s% m(k)/s% r(k)
-            if (v(k) < 0d0 .or. v(k)**2 < vesc2) then
+            if (s% u_flag) then
+               v = s% u_face_18(k)%val
+            else
+               v = s% v(k)
+            end if
+            vesc = sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
+            v_div_vesc = v/vesc
+            if (v_div_vesc < 1d0) then
                if (k == 1) return
-               dm = find0(0d0, vesc2_prev, s% dm(k-1), vesc2)
-               get_ejecta_mass = s% m(1) - (s% m(k-1) + dm)
+               dm = find0(0d0, v_div_vesc_prev-1d0, s% dm(k-1), v_div_vesc-1d0)
+               if (dm < 0d0) then
+                  write(*,2) 'v_div_vesc_prev-1d0', k, v_div_vesc_prev-1d0
+                  write(*,2) 'v_div_vesc-1d0', k, v_div_vesc-1d0
+                  write(*,2) 's% dm(k-1)', k, s% dm(k-1)
+                  write(*,2) 'dm', k, dm
+                  stop 'get_ejecta_mass'
+               end if
+               if (k == 2) then
+                  get_ejecta_mass = dm
+               else
+                  get_ejecta_mass = sum(s% dm(1:k-2)) + dm
+               end if
                return
             end if
-            vesc2_prev = vesc2
+            v_div_vesc_prev = v_div_vesc
          end do
       end function get_ejecta_mass
 

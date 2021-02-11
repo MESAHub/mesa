@@ -937,7 +937,7 @@
                val = val/sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
             case (p_v_div_v_escape)
                if (s% u_flag) then
-                  val = s% u(k)
+                  val = s% u_face(k)
                else if (s% v_flag) then
                   val = s% v(k)
                end if
