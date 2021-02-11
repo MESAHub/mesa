@@ -28,7 +28,10 @@ cp converted.mod standard_converted.mod
 do_one inlist_prepare_header prepared.mod
 cp prepared.mod standard_prepared.mod
 
-do_one inlist_finish_header final.mod
+do_one inlist_finish1_header finish1.mod
+cp finish1.mod standard_finish1.mod
+
+do_one inlist_finish2_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

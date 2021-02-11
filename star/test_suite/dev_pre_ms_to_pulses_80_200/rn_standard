@@ -56,7 +56,14 @@ else
    cp prepared.mod standard_prepared.mod
 fi
 
-do_one inlist_finish_header final.mod
+if [ -z "$MESA_RUN_OPTIONAL" ]; then
+   cp standard_finish1.mod finish1.mod
+else
+   do_one inlist_finish1_header finish1.mod
+   cp finish1.mod standard_finish1.mod
+fi
+
+do_one inlist_finish2_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
