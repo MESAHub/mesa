@@ -42,9 +42,9 @@
       integer, parameter :: do_fill_arrays_with_NaNs = 6
 
       logical, parameter :: work_array_debug = .false.
-      logical, parameter :: quad_array_debug = .false.
-
       logical, parameter :: work_array_trace = .false.
+
+      logical, parameter :: quad_array_debug = .false.
       logical, parameter :: quad_array_trace = .false.
 
 
@@ -84,6 +84,25 @@
 
 
       contains
+
+      
+      subroutine init_alloc
+         integer :: i
+         num_calls=0; num_returns=0
+         num_allocs=0; num_deallocs=0
+         do i=1,num_work_arrays
+            nullify(work_pointers(i)%p)
+         end do
+         do i=1,num_quad_arrays
+            nullify(quad_pointers(i)%p)
+         end do
+         do i=1,num_int_work_arrays
+            nullify(int_work_pointers(i)%p)
+         end do
+         do i=1,num_logical_work_arrays
+            nullify(logical_work_pointers(i)%p)
+         end do
+      end subroutine init_alloc
 
 
       subroutine alloc_extras(id, liwork, lwork, ierr)
@@ -3632,7 +3651,7 @@
 
          if (crit) then
 !$omp critical (alloc_work_array1)
-            num_calls = num_calls + 1
+            num_calls = num_calls + 1 ! not safe, but just for info
             do i = 1, num_work_arrays
                if (get1(i)) then
                   okay = .true.
@@ -3705,8 +3724,8 @@
          logical :: okay
 
          if (.not. associated(ptr)) then
-            write(*,*) 'bogus call on do_return_work_array with nil ptr ' // trim(str)
-            stop 'do_return_work_array'
+            !write(*,*) 'bogus call on do_return_work_array with nil ptr ' // trim(str)
+            !stop 'do_return_work_array'
             return
          end if
 
@@ -4156,22 +4175,6 @@
          end function return1
 
       end subroutine return_logical_work_array
-
-
-      subroutine init_alloc
-         integer :: i
-         num_calls=0; num_returns=0
-         num_allocs=0; num_deallocs=0
-         do i=1,num_work_arrays
-            work_pointers(i)%p => null()
-         end do
-         do i=1,num_int_work_arrays
-            int_work_pointers(i)%p => null()
-         end do
-         do i=1,num_logical_work_arrays
-            logical_work_pointers(i)%p => null()
-         end do
-      end subroutine init_alloc
 
       
       subroutine shutdown_alloc ()

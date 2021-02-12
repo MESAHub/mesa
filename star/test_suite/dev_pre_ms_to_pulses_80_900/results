@@ -36,8 +36,8 @@ no overshooting; MLT++ on
 remove H envelope after finish core He burning; change remaining traces of H1 to He4
 use_gold2_tolerances on (except during remove envelope)
 op_split_burn for cells with logT > 9.0
-after end of core C burn, change to Riemann hydro and hybrid amr mesh to prepare for strong shocks
-also, now turn off convection for cells with T > 1d9 to avoid violating mlt assumptions during rapid changes in core
+after end of core C burn, change to Riemann hydro and hybrid amr mesh
+also, now turn off convection to avoid violating mlt assumptions during multiple strong shocks and rapid changes in core
 prepare for start of pulses by evolving until reach target max temp (logTmax = 9.52) or start non_fe_core_infall (> 300 kms)
 consider mass to be "ejected" when it and all above it have v > local v_esc.
 stop run when fe_core_infall > 100 kms, logR > 4.0, or remnant mass < 10M.

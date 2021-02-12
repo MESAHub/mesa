@@ -5,6 +5,9 @@
       new_v_flag = .false.
       new_u_flag = .true.
 
+      change_initial_RTI_flag = .true.
+      new_RTI_flag = .true.
+
       set_initial_age = .true.
       set_initial_model_number = .true.
 
@@ -35,7 +38,8 @@
 ! rotation
 
 ! mlt
-      max_logT_for_mlt = 9.0d0
+      max_logT_for_mlt = 0d0  
+      ! go purely radiative when have rapid changes and strong shocks
 
 ! mixing
       
@@ -94,6 +98,8 @@
       use_gold2_tolerances = .true.
       use_gold_tolerances = .true.
       gold_tol_max_residual3 = 1d-3
+      
+      calculate_Brunt_B = .false.
       
       !use_velocity_time_centering = .true.
       !include_P_in_velocity_time_centering = .true.

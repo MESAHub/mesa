@@ -73,6 +73,8 @@
          dbg = .false.
          !dbg = .true.
          k_dbg = -1152
+
+         nullify(eps_h, eps_he, eps_z, cdc_factor)
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
@@ -89,8 +91,6 @@
             call set_dPdr_dRhodr_info(s, ierr)
             if (failed('set_dPdr_dRhodr_info')) return
          end if
-
-         nullify(eps_h, eps_he, eps_z, cdc_factor)
 
          max_conv_bdy = 10 ! will automatically be increased if necessary
          max_mix_bdy = 10 ! will automatically be increased if necessary

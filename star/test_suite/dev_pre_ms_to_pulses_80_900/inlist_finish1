@@ -163,24 +163,24 @@ Profile_Panels3_xaxis_reversed = .true.
 !Profile_Panels3_xmin = -6d0
 !Profile_Panels3_xmax = 0d0
 
-Profile_Panels3_num_panels = 6
+Profile_Panels3_num_panels = 5
 
-Profile_Panels3_yaxis_name(4) = 'gamma1' ! 'avQ' ! 
-    Profile_Panels3_ymin(4) = 1.26d0
-    Profile_Panels3_ymax(4) = -101d0
-Profile_Panels3_other_yaxis_name(4) =  'v_div_cs'
-    Profile_Panels3_other_dymin(4) = 0.15
+Profile_Panels3_yaxis_name(3) = 'gamma1' ! 'avQ' ! 
+    Profile_Panels3_ymin(3) = 1.26d0
+    Profile_Panels3_ymax(3) = -101d0
+Profile_Panels3_other_yaxis_name(3) =  'v_div_cs'
+    Profile_Panels3_other_dymin(3) = 0.15
 
-Profile_Panels3_yaxis_name(5) = 'logRho'
-Profile_Panels3_other_yaxis_name(5) = 'vel_km_per_s'
-    Profile_Panels3_other_dymin(5) = 12
+Profile_Panels3_yaxis_name(4) = 'logRho'
+Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
+    Profile_Panels3_other_dymin(4) = 12
  
-Profile_Panels3_yaxis_name(6) =  'logT' ! 'mass' ! 'logR_cm' !
-    Profile_Panels3_ymin(6) = -101 ! -3d0
-Profile_Panels3_other_yaxis_name(6) = 'v_div_v_escape'
-    Profile_Panels3_other_dymin(6) = 0.15
-    Profile_Panels3_other_ymin(6) = -0.1
-    Profile_Panels3_other_ymax(6) = 1.1d0
+Profile_Panels3_yaxis_name(5) =  'logT' ! 'mass' ! 'logR_cm' !
+    Profile_Panels3_ymin(5) = -101 ! -3d0
+Profile_Panels3_other_yaxis_name(5) = 'v_div_v_escape'
+    Profile_Panels3_other_dymin(5) = 0.15
+    Profile_Panels3_other_ymin(5) = -0.1
+    Profile_Panels3_other_ymax(5) = 1.1d0
 
 Text_Summary1_name(2,4) = 'log_R'
 Text_Summary1_name(3,3) = 'remnant_M'
