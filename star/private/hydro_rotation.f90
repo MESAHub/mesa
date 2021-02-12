@@ -394,20 +394,18 @@
          integer, intent(out) :: ierr
 
          integer :: k, nz
-         real(dp), pointer :: am_nu(:), am_sig(:)
+         real(dp), allocatable :: am_nu(:), am_sig(:)
 
          include 'formats'
 
          ierr = 0
          nz = s% nz
          
-         call do_alloc(ierr)
-         if (ierr /= 0) return
+         allocate(am_nu(nz), am_sig(nz))
 
          call get1_am_sig(s, nzlo, nzhi, s% am_nu_j, s% am_sig_j, dt, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
-            call dealloc
             return
          end if
 
@@ -418,40 +416,12 @@
          call get1_am_sig(s, nzlo, nzhi, am_nu, am_sig, dt, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
-            call dealloc
             return
          end if
 
          do k=1,nz
             s% am_sig_omega(k) = max(0d0, am_sig(k) - s% am_sig_j(k))
          end do
-
-         call dealloc
-
-         contains
-
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               am_nu, nz, nz_alloc_extra, 'get_rotation_sigmas', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               am_sig, nz, nz_alloc_extra, 'get_rotation_sigmas', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
 
       end subroutine get_rotation_sigmas
 
@@ -460,7 +430,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          real(dp), intent(in) :: dt
-         real(dp), dimension(:), pointer :: am_nu, am_sig
+         real(dp), dimension(:) :: am_nu, am_sig
          integer, intent(out) :: ierr
 
          integer :: k, nz, nz2

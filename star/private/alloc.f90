@@ -2574,24 +2574,6 @@
       end subroutine do1D_logical
 
 
-      subroutine non_crit_do1_alloc_if_necessary(s, p, sz, str, ierr)
-         type (star_info), pointer :: s
-         real(dp), pointer :: p(:)
-         integer, intent(in) :: sz
-         character (len=*), intent(in) :: str
-         integer, intent(out) :: ierr
-         ierr = 0
-         if (.not. associated(p)) then
-            call non_crit_get_work_array( &
-               s, p, sz, nz_alloc_extra, str, ierr)
-         else if (sz > size(p,dim=1)) then
-            call non_crit_return_work_array(s, p, str)
-            call non_crit_get_work_array( &
-               s, p, sz, nz_alloc_extra, str, ierr)
-         end if
-      end subroutine non_crit_do1_alloc_if_necessary
-
-
       subroutine set_var_info(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -4322,17 +4304,6 @@
          integer, intent(out) :: ierr
          call do_get_work_array(s, .true., ptr, sz, extra, str, ierr)
       end subroutine get_work_array
-
-
-      ! okay to use this if sure don't need reentrant allocation
-      subroutine non_crit_get_work_array(s, ptr, sz, extra, str, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: sz, extra
-         real(dp), pointer :: ptr(:)
-         character (len=*), intent(in) :: str
-         integer, intent(out) :: ierr
-         call do_get_work_array(s, .false., ptr, sz, extra, str, ierr)
-      end subroutine non_crit_get_work_array
 
 
       subroutine return_work_array(s, ptr, str)

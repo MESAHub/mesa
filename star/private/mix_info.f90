@@ -58,7 +58,7 @@
          integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_dbg, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: c, rho_face, f, Tmax, conv_vel, min_conv_vel_for_convective_mixing_type, &
             region_bottom_q, region_top_q
-         real(dp), pointer, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
+         real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: rsp_or_et, dbg
 
@@ -74,7 +74,7 @@
          !dbg = .true.
          k_dbg = -1152
 
-         nullify(eps_h, eps_he, eps_z, cdc_factor)
+         allocate(eps_h(nz), eps_he(nz), eps_z(nz), cdc_factor(nz))
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
@@ -110,9 +110,6 @@
          if (.not. associated(s% burn_h_mix_region)) allocate(s% burn_h_mix_region(max_mix_bdy))
          if (.not. associated(s% burn_he_mix_region)) allocate(s% burn_he_mix_region(max_mix_bdy))
          if (.not. associated(s% burn_z_mix_region)) allocate(s% burn_z_mix_region(max_mix_bdy))
-
-         call do_alloc(ierr)
-         if (ierr /= 0) return
          
          if (.not. s% RSP_flag) then
             do k = 1, nz
@@ -446,8 +443,6 @@
 
          if (dbg) write(*,3) 'done mixing', k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
 
-         call dealloc
-
          if (s% doing_timing) &
             call update_time(s, time0, total, s% time_set_mixing_info)
 
@@ -464,38 +459,7 @@
             if (s% report_ierr .or. dbg) &
                write(*,*) 'set_mixing_info failed in call to ' // trim(str)
             failed = .true.
-            call dealloc
          end function failed
-
-
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               eps_h, nz, nz_alloc_extra, 'mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               eps_he, nz, nz_alloc_extra, 'mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               eps_z, nz, nz_alloc_extra, 'mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               cdc_factor, nz, nz_alloc_extra, 'mix_info', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
 
          subroutine check(str)
             character(len=*) :: str
@@ -1682,13 +1646,15 @@
             am_nu_GSF_factor, &
             am_nu_ST_factor, &
             f, lgT, full_off, full_on
-         real(dp), dimension(:), pointer :: & ! work vectors for tridiagonal solve
+         real(dp), dimension(:), allocatable :: & ! work vectors for tridiagonal solve
             sig, rhs, d, du, dl, bp, vp, xp, x
 
          include 'formats'
 
          ierr = 0
          nz = s% nz
+         
+         allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
 
          call set_rotation_mixing_info(s, ierr)
          if (ierr /= 0) then
@@ -1959,9 +1925,6 @@
                
                if (s% smooth_am_nu_rot > 0 .or. &
                     (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0)) then
-                  
-                  call do_alloc(ierr)
-                  if (ierr /= 0) return
 
                   if (s% smooth_am_nu_rot > 0) then
                      call smooth_for_rotation(s, s% am_nu_rot, s% smooth_am_nu_rot, sig)
@@ -2055,8 +2018,6 @@
                      s% am_nu_rot(1) = 0d0
                   
                   end if
-                  
-                  call dealloc
 
                end if
             
@@ -2073,52 +2034,6 @@
             end if         
          
          end subroutine set_am_nu_rot
-
-
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-                sig, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                rhs, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                d, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                du, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dl, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                bp, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                vp, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xp, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                x, nz, nz_alloc_extra, 'mix_am_nu_rot', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
-         
 
       end subroutine update_rotation_mixing_info
 
@@ -2299,7 +2214,7 @@
          real(dp) :: rho, r00, alfa00, beta00, P_face00, rho_face00, &
             rp1, alfap1, betap1, dr_m1, dr_00, &
             c, d, am1, a00, ap1, v, rmid
-         real(dp), pointer, dimension(:) :: dPdr, drhodr, P_face, rho_face
+         real(dp), allocatable, dimension(:) :: dPdr, drhodr, P_face, rho_face
          integer :: k, nz, width
          logical, parameter :: do_slope_limiting = .false.
          include 'formats'
@@ -2311,9 +2226,7 @@
          end if
 
          nz = s% nz
-         
-         call do_alloc(ierr)
-         if (ierr /= 0) return
+         allocate(dPdr(nz), drhodr(nz), P_face(nz), rho_face(nz))
 
          do k=2,nz
             rho = s% rho(k)
@@ -2390,8 +2303,6 @@
             s% dRhodr_info(k) = drhodr(k)
             s% dPdr_dRhodr_info(k) = min(0d0,dPdr(k)*drhodr(k))
          end do
-         
-         call dealloc
 
          contains
 
@@ -2410,35 +2321,6 @@
             end if
          end function slope_limit
 
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               P_face, nz, 0, 'set_dPdr_dRhodr_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               rho_face, nz, 0, 'set_dPdr_dRhodr_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dPdr, nz, 0, 'set_dPdr_dRhodr_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               drhodr, nz, 0, 'set_dPdr_dRhodr_info', ierr)
-         if (ierr /= 0) return
-         end subroutine do_work_arrays
-
       end subroutine set_dPdr_dRhodr_info
 
 
@@ -2447,7 +2329,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: smooth_mass
          integer, intent(in) :: number_iterations
-         real(dp), pointer :: val(:)
+         real(dp) :: val(:)
          integer, intent(out) :: ierr
          integer :: nz, iter, k_center, k_inner, k_outer, j, k
          real(dp) :: mlo, mhi, mmid, smooth_m, v, dm_half, mtotal, mass_from_cell

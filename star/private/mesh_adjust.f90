@@ -60,7 +60,7 @@
          use interp_1d_lib
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
-         integer, dimension(:), pointer :: cell_type, comes_from
+         integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
             lnd_old, lnPgas_old, conv_vel_old, lnT_old, et_old, &
@@ -69,8 +69,6 @@
             j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
          real(dp), dimension(:,:), pointer :: xh, xa
-         real(dp), dimension(:), pointer :: &
-            interp_work, density_new, energy_new, interp_y_old
          integer, intent(out) :: ierr
 
          real(dp) :: dxa, xmstar, mstar, sumx, remove1, remove2, &
@@ -78,12 +76,12 @@
          character (len=strlen) :: message
          integer :: k, from_k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species
          logical :: found_bad_one
-         real(dp), pointer :: p2(:,:)
-
-         real(dp), dimension(:), pointer :: &
-            xa1_c0, xa1_c1, xa1_c2, dqbar, dqbar_old, new_r, Vol_new, work, xq_old_plus1, &
-            xout_old, xout_new, xq_new, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7
-         real(dp), dimension(:,:), pointer :: xa_c0, xa_c1, xa_c2
+         real(dp), pointer :: work(:)
+         real(dp), dimension(:), allocatable :: &
+            dqbar, dqbar_old, new_r, Vol_new, xq_old_plus1, &
+            xout_old, xout_new, xq_new, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, &
+            energy_new, density_new
+         real(dp), dimension(:,:), allocatable :: xa_c0, xa_c1, xa_c2
 
          include 'formats'
 
@@ -403,13 +401,16 @@
 
          end subroutine show_errors
 
-
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr
+            integer :: sz
+            sz = max(nz, nz_old) + 1
             call do_work_arrays(.true.,ierr)
-            xa_c0(1:nz_old,1:species) => xa1_c0(1:nz_old*species)
-            xa_c1(1:nz_old,1:species) => xa1_c1(1:nz_old*species)
-            xa_c2(1:nz_old,1:species) => xa1_c2(1:nz_old*species)
+            allocate( &
+               dqbar(sz), dqbar_old(sz), new_r(sz), Vol_new(sz), xq_old_plus1(sz), &
+               xout_old(sz), xout_new(sz), xq_new(sz), energy_new(sz), density_new(sz), &
+               tmp1(sz), tmp2(sz), tmp3(sz), tmp4(sz), tmp5(sz), tmp6(sz), tmp7(sz), &
+               xa_c0(sz,species), xa_c1(sz,species), xa_c2(sz,species))            
          end subroutine do_alloc
 
          subroutine dealloc
@@ -422,71 +423,9 @@
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr
             logical, parameter :: crit = .false.
-            integer :: tmp_sz
             ierr = 0
-            tmp_sz = max(nz, nz_old) + 1
-            call work_array(s, alloc_flag, crit, &
-                tmp1, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                tmp2, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                tmp3, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                tmp4, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                tmp5, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                tmp6, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                tmp7, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xq_new, tmp_sz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
             call work_array(s, alloc_flag, crit, &
                 work, (nz_old+1)*pm_work_size, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xq_old_plus1, nz_old+1, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xout_old, nz_old, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xout_new, nz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                density_new, nz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                energy_new, nz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                new_r, nz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                Vol_new, nz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dqbar, nz, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dqbar_old, nz_old, nz_alloc_extra, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xa1_c0, nz_old*species, nz_alloc_extra*species, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xa1_c1, nz_old*species, nz_alloc_extra*species, 'mesh_adjust', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xa1_c2, nz_old*species, nz_alloc_extra*species, 'mesh_adjust', ierr)
             if (ierr /= 0) return
          end subroutine do_work_arrays
 
@@ -675,8 +614,9 @@
          integer, intent(in) :: i_var, nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp),intent(in) :: center_val
          real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, work, var_old_plus1, var_new, xq_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, var_old_plus1, var_new, xq_new
          integer, intent(out) :: ierr
 
          integer :: n, k
@@ -728,8 +668,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, work, L_old_plus1, L_new, xq_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, L_old_plus1, L_new, xq_new
          integer, intent(out) :: ierr
 
          integer :: n, i_lum, k
@@ -786,8 +727,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, work, cv_old_plus1, cv_new, xq_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, cv_old_plus1, cv_new, xq_new
          integer, intent(out) :: ierr
 
          integer :: n, i_ln_cvpv0, k
@@ -844,8 +786,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, work, alpha_RTI_old_plus1, alpha_RTI_new, xq_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, alpha_RTI_old_plus1, alpha_RTI_new, xq_new
          integer, intent(out) :: ierr
 
          integer :: n, i_alpha_RTI, k
@@ -900,8 +843,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, work, et_old_plus1, et_new, xq_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, et_old_plus1, et_new, xq_new
          integer, intent(out) :: ierr
 
          integer :: n, i_et, k
@@ -956,8 +900,9 @@
          integer, intent(in) :: nz, nz_old, nzlo, nzhi
          real(dp), dimension(:), pointer :: val, val_old
          real(dp), intent(in) :: center_val
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, xq_new, work, val_old_plus1, val_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, xq_new, val_old_plus1, val_new
          logical, intent(in) :: force_non_negative
          integer, intent(out) :: ierr
          integer :: n, k
@@ -1015,8 +960,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi
          real(dp), dimension(:), pointer :: val_new_out, val_old
-         real(dp), dimension(:), pointer :: &
-            xq, xq_old_plus1, dq, dq_old, work, val_old_plus1, val_new
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            xq, xq_old_plus1, dq, dq_old, val_old_plus1, val_new
          integer, intent(out) :: ierr
 
          real(dp), pointer, dimension(:) :: &
@@ -1111,9 +1057,10 @@
          integer :: cell_type(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
          real(dp), intent(in) :: xmstar
-         real(dp), dimension(:), pointer :: lnd_old, lnPgas_old, &
-            dqbar, dqbar_old, old_r, old_m, old_rho, &
-            xq, dq, dq_old, xq_old_plus1, density_new, work, &
+         real(dp), dimension(:), pointer :: work
+         real(dp), dimension(:) :: &
+            lnd_old, lnPgas_old, dqbar, dqbar_old, old_r, old_m, old_rho, &
+            xq, dq, dq_old, xq_old_plus1, density_new, &
             Vol_old_plus1, Vol_new, new_r, Vol_init, &
             interp_Vol_new, interp_xq, density_init
          integer, intent(out) :: ierr
@@ -1344,8 +1291,9 @@
          use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, species, k, cell_type(:), comes_from(:)
-         real(dp), dimension(:,:), pointer :: xa, xa_old, xa_c0, xa_c1, xa_c2
-         real(dp), dimension(:), pointer :: xq, dq, xq_old,  dq_old
+         real(dp), dimension(:,:), pointer :: xa, xa_old
+         real(dp), dimension(:,:) :: xa_c0, xa_c1, xa_c2
+         real(dp), dimension(:), pointer :: xq, dq, xq_old, dq_old
          logical, intent(in) :: mesh_adjust_use_quadratic
          integer, intent(out) :: ierr
 
@@ -1472,7 +1420,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz_old, k, species, cell_type(:), comes_from(:)
          real(dp), dimension(:,:), pointer :: xa, xh, xh_old
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:) :: &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
             specific_PE_old, specific_KE_old, et_old, density_new, energy_new
          integer, intent(out) :: ierr
@@ -2082,7 +2030,7 @@
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
-         integer, dimension(:), pointer :: comes_from
+         integer, dimension(:) :: comes_from
          real(dp), dimension(:) :: &
             old_xq, new_xq, old_dq, new_dq, old_j_rot, &
             xout_old, xout_new, old_dqbar, new_dqbar
@@ -2111,7 +2059,7 @@
          ! set new value for s% omega(k)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old
-         integer, dimension(:), pointer :: comes_from
+         integer, dimension(:) :: comes_from
          real(dp), dimension(:), intent(in) :: &
             xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot
          real(dp), intent(in) :: xh(:,:)
@@ -2275,7 +2223,7 @@
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
-         integer, dimension(:), pointer :: cell_type, comes_from
+         integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:) :: &
             xout_old, xout_new, old_dqbar, new_dqbar, &
             old_xq, new_xq, old_dq, new_dq, old_ke
@@ -2343,7 +2291,7 @@
          ! set new value for s% v(k) to conserve kinetic energy
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old, i_v
-         integer, dimension(:), pointer :: cell_type, comes_from
+         integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), intent(in) :: &
             xout_old, xout_new, old_dqbar, new_dqbar, old_ke
          real(dp), dimension(:,:) :: xh, xh_old
@@ -2533,7 +2481,7 @@
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
-         integer, dimension(:), pointer :: cell_type, comes_from
+         integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:) :: &
             xout_old, xout_new, old_xq, new_xq, old_dq, new_dq, old_ke
          real(dp), dimension(:,:) :: xh, xh_old
@@ -2592,7 +2540,7 @@
          ! set new value for s% u(k) to conserve kinetic energy
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old, i_u
-         integer, dimension(:), pointer :: cell_type, comes_from
+         integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), intent(in) :: &
             xout_old, xout_new, old_dq, new_dq, old_ke
          real(dp), dimension(:,:) :: xh, xh_old
