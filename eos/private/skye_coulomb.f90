@@ -38,11 +38,13 @@ module skye_coulomb
    !! @param latent_ddlnT The latent heat of the smoothed phase transition in lnT (T dS/dlnT)
    !! @param latent_ddlnRho The latent heat of the smoothed phase transition in lnRho (T dS/dlnRho)
    subroutine nonideal_corrections(NMIX,AY,AZion,ACMI, min_gamma_for_solid, max_gamma_for_liquid,&
-                                  RHO,temp, xnefer, abar,dF, latent_ddlnT, latent_ddlnRho,phase)
+                                   Skye_solid_mixing_rule, RHO,temp, xnefer, abar, &
+                                   dF, latent_ddlnT, latent_ddlnRho,phase)
       integer, intent(in) :: NMIX
       real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: RHO, temp, xnefer
       type(auto_diff_real_2var_order3), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
 
       integer :: IX
       integer :: LIQSOL
@@ -84,11 +86,11 @@ module skye_coulomb
       ! Compute free energy correction for liquid and solid phase.
       LIQSOL = 0
       dF_liq = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,&
-          temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
+          Skye_solid_mixing_rule, temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
 
       LIQSOL = 1
       dF_sol = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,&
-          temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
+          Skye_solid_mixing_rule, temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
 
       ! Add electron exchange-correlation energy
       dF_liq = dF_liq + F_phase_independent
@@ -198,13 +200,14 @@ module skye_coulomb
    !! @param Z2mean The mean squared ion charge (mass fraction weighted)
    !! @param Z53mean The mean of ion charge to the 5/3 power (mass fraction weighted)
    !! @param Z321mean The mean of Z(Z+1)^(3/2), where Z is the ion charge (mass fraction weighted)
-   function nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid, temp,abar,GAME,RS,LIQSOL,&
-                                       Zmean, Z2mean, Z52, Z53, Z321) result(dF)
+   function nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,Skye_solid_mixing_rule,&
+                                       temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321) result(dF)
       ! Inputs
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
       real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: temp, GAME, RS
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
 
       ! Intermediates and constants
       integer :: i,j
@@ -230,7 +233,7 @@ module skye_coulomb
       if (LIQSOL == 0) then ! liquid phase
          FMIX = liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321)
       else ! solid phase (only Madelung contribution) [22.12.12]
-         FMIX = solid_mixing_rule_correction(NMIX, AY, AZion, GAME)
+         FMIX = solid_mixing_rule_correction(Skye_solid_mixing_rule, NMIX, AY, AZion, GAME)
       endif
       dF = dF + FMIX
 

@@ -144,7 +144,8 @@ module skye
          call skye_eos( &
             T, Rho, X, abar, zbar, &
             rq%Skye_min_gamma_for_solid, rq%Skye_max_gamma_for_liquid, &
-            rq%mass_fraction_limit_for_Skye, species, chem_id, xa, &
+            rq%Skye_solid_mixing_rule, rq%mass_fraction_limit_for_Skye, &
+            species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
          ! composition derivatives not provided
@@ -191,6 +192,7 @@ module skye
       subroutine skye_eos( &
             temp_in, den_in, Xfrac, abar, zbar,  &
             Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
+            Skye_solid_mixing_rule, &
             mass_fraction_limit, species, chem_id, xa, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
 
@@ -210,6 +212,7 @@ module skye
          real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: temp_in, den_in, mass_fraction_limit, Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid
          real(dp), intent(in) :: Xfrac, abar, zbar
+         character(len=128), intent(in) :: Skye_solid_mixing_rule
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
@@ -298,7 +301,7 @@ module skye
          call nonideal_corrections(relevant_species, ya(1:relevant_species), &
                                      AZION(1:relevant_species), ACMI(1:relevant_species), &
                                      Skye_min_gamma_for_solid, Skye_max_gamma_for_liquid, &
-                                     den, temp, xnefer, abar, &
+                                     Skye_solid_mixing_rule, den, temp, xnefer, abar, &
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
 

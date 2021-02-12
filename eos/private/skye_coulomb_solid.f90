@@ -212,8 +212,9 @@ module skye_coulomb_solid
    !! @param AZion Array of length NMIX holding the charges of species
    !! @param GAME election interaction parameter
    !! @param F mixing free energy correction per ion per kT.
-   function solid_mixing_rule_correction(n, AY, AZion, GAME) result(F)      
+   function solid_mixing_rule_correction(Skye_solid_mixing_rule, n, AY, AZion, GAME) result(F)      
       ! Inputs
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
       integer, intent(in) :: n
       real(dp), intent(in) :: AZion(:), AY(:)
       type(auto_diff_real_2var_order3), intent(in) :: GAME
@@ -273,7 +274,14 @@ module skye_coulomb_solid
             ! The contribution to F scales as abundance_sum^2, so in cases where the max returns eps
             ! we don't care much about the error this incurs.
             aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))! = x2 / (x1 + x2) in MC10's language
-            dG = deltaG_Ogata93(aj, RZ)
+            if (Skye_solid_mixing_rule == 'Ogata') then
+               dG = deltaG_Ogata93(aj, RZ)
+            else if (Skye_solid_mixing_rule == 'PC') then
+               dG = deltaG_PC13(aj, RZ)
+            else
+               write(*,*) 'Error: Invalid choice for Skye_solid_mixing_rule.'
+               stop
+            end if
 
             GAMI=pow(unique_charges(i),5d0/3d0)*GAME
             F = F +  GAMI * (charge_abundances(i) * charge_abundances(j) * dG)
