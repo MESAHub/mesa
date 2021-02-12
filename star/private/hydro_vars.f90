@@ -89,7 +89,6 @@
 
       
       subroutine set_final_vars(s, dt, ierr)
-         use alloc, only: non_crit_get_work_array, non_crit_return_work_array
          use rates_def, only: num_rvs
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
@@ -111,43 +110,11 @@
             skip_set_cz_bdy_mass, &
             skip_mlt
          integer :: nz, ierr1, k, i
-         real(dp), pointer, dimension(:) :: &
-            d_mx, cv, nu_st, d_st, d_dsi, d_sh, d_ssi, d_es, d_gsf, rti_info
          
          include 'formats'
          
          ierr = 0
          nz = s% nz
-
-         nullify(d_mx, cv, nu_st, d_st, d_dsi, d_sh, d_ssi, d_es, d_gsf, rti_info)
-
-         ! save and restore mixing coeffs needed for time smoothing
-         if (s% rotation_flag) then
-            call get_cpy(s% nu_ST, nu_st, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_ST, d_st, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_DSI, d_dsi, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_SH, d_sh, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_SSI, d_ssi, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_ES, d_es, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_GSF, d_gsf, ierr1)
-            if (ierr1 /= 0) ierr = -1
-         end if
-
-         if (s% RTI_flag) then
-            call get_cpy(s% dPdr_dRhodr_info, RTI_info, ierr1)
-            if (ierr1 /= 0) ierr = -1
-         end if
-
-         call get_cpy(s% D_mix, d_mx, ierr1)
-         if (ierr1 /= 0) ierr = -1
-         
-         if (ierr /= 0) return
          
          skip_grads = .false.
          skip_rotation = .false.
@@ -200,34 +167,6 @@
                   s% eps_nuc(k) = s% burn_avg_epsnuc(k)
             end do
          end if
-
-         contains
-
-
-         subroutine get_cpy(src,cpy,ierr)
-            real(dp), pointer, dimension(:) :: src, cpy
-            integer, intent(out) :: ierr
-            integer :: k
-            ierr = 0
-            call non_crit_get_work_array( &
-               s, cpy, nz, nz_alloc_extra, 'set_final_vars', ierr)
-            if (ierr /= 0) return
-            do k=1,nz
-               cpy(k) = src(k)
-            end do
-         end subroutine get_cpy
-
-
-         subroutine restore(src,cpy)
-            real(dp), pointer, dimension(:) :: src, cpy
-            integer :: k
-            if (.not. associated(cpy)) return
-            do k=1,nz
-               src(k) = cpy(k)
-            end do
-            call non_crit_return_work_array(s, cpy, 'set_final_vars')
-         end subroutine restore
-
 
       end subroutine set_final_vars
 

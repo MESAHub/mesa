@@ -1156,8 +1156,10 @@
          integer :: burner_storage_sz_per_thread, burner_num_threads
          real(dp), pointer :: burner_storage(:)
             
-         real(dp), pointer :: solver_dx(:,:)
+         real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
          integer :: solver_iter, solver_adjust_iter
+         
+         real(dp), pointer :: x_scale(:,:), x_scale1(:)
             
          real(dp), pointer, dimension(:) :: & ! (nz)
             max_burn_correction, avg_burn_correction
@@ -1313,6 +1315,7 @@
          real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
             ! will be allocated or reallocated as necessary by solver.
             ! deallocate when free_star
+
          
       ! sizeB info
          integer :: max_zone1, max_var1, max_zone2, max_var2

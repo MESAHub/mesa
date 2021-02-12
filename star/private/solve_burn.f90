@@ -468,8 +468,8 @@
             max_del, avg_del, tol_correction_max, tol_correction_norm, T, crad_qp
          real(dp) :: total, dt_dble, alfa, kap_face, area, new_energy, &
             new_T, new_lnT, revised_energy, dxdt, dm
-         real(dp), pointer, dimension(:) :: sig
-         real(qp), pointer, dimension(:) :: &
+         real(dp), allocatable, dimension(:) :: sig
+         real(qp), allocatable, dimension(:) :: &
             du, d, dl, x, b, bp, vp, xp, dX, X_0, X_1, rhs, del, erad_start
          logical :: okay
          real(qp), parameter :: xl0 = 0, xl1 = 1
@@ -505,12 +505,9 @@
          end if
          
          n = kmax - kmin + 1
-
-         call do_alloc(ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,*) 'allocate failed in do_solve_radiative_diffusion'
-            return
-         end if
+         
+         allocate(sig(n), du(n), d(n), dl(n), x(n), b(n), bp(n), vp(n), xp(n), &
+            dX(n), X_0(n), X_1(n), rhs(n), del(n), erad_start(n))
          
          crad_qp = crad
          do i = 1, n
@@ -698,74 +695,8 @@
          
          if (dbg) stop 'solve_radiative_diffusion'
 
-         call dealloc
-
 
          contains
-
-
-         subroutine do_alloc(ierr)
-            use alloc
-            integer, intent(out) :: ierr
-
-            call non_crit_get_work_array(s, sig, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call non_crit_get_quad_array(s, erad_start, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, du, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, d, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, dl, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, x, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, b, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, bp, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, vp, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, xp, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call non_crit_get_quad_array(s, dX, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, X_0, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, X_1, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, rhs, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-            call non_crit_get_quad_array(s, del, n, 0, 'solve_radiative_diffusion', ierr)
-            if (ierr /= 0) return
-
-
-         end subroutine do_alloc
-
-
-         subroutine dealloc
-            use alloc
-            call non_crit_return_work_array(s, sig, 'solve_radiative_diffusion')
-            
-            call non_crit_return_quad_array(s, erad_start, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, du, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, d, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, dl, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, x, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, b, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, bp, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, vp, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, xp, 'solve_radiative_diffusion')
-
-            call non_crit_return_quad_array(s, dX, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, X_0, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, X_1, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, rhs, 'solve_radiative_diffusion')
-            call non_crit_return_quad_array(s, del, 'solve_radiative_diffusion')
-         end subroutine dealloc
-
 
          subroutine solve_tridiag(sub, diag, sup, rhs, x, n, ierr)
             !      sub - sub-diagonal

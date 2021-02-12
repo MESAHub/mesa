@@ -203,6 +203,14 @@
          if (ierr /= 0) return
          s% correction_weight(1:nvar,1:nz) => s% correction_weight1(1:nvar*nz)
 
+         call realloc_double(s% solver_dx1, nvar*(nz + nz_alloc_extra), ierr)
+         if (ierr /= 0) return
+         s% solver_dx(1:nvar,1:nz) => s% solver_dx1(1:nvar*nz)
+
+         call realloc_double(s% x_scale1, nvar*(nz + nz_alloc_extra), ierr)
+         if (ierr /= 0) return
+         s% x_scale(1:nvar,1:nz) => s% x_scale1(1:nvar*nz)
+
          call realloc_double2(s% xh_start, nvar_hydro, (nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
 
@@ -1558,6 +1566,18 @@
             if (action == do_remove_from_center .or. action == do_reallocate .or. &
                   (action /= do_check_size .and. action /= do_deallocate)) &
                s% correction_weight(1:nvar,1:nz) => s% correction_weight1(1:nvar*nz)
+
+            call do1_neq(s% solver_dx1, c% solver_dx1)
+            if (failed('solver_dx1')) exit
+            if (action == do_remove_from_center .or. action == do_reallocate .or. &
+                  (action /= do_check_size .and. action /= do_deallocate)) &
+               s% solver_dx(1:nvar,1:nz) => s% solver_dx1(1:nvar*nz)
+
+            call do1_neq(s% x_scale1, c% x_scale1)
+            if (failed('x_scale1')) exit
+            if (action == do_remove_from_center .or. action == do_reallocate .or. &
+                  (action /= do_check_size .and. action /= do_deallocate)) &
+               s% x_scale(1:nvar,1:nz) => s% x_scale1(1:nvar*nz)
 
             call do1(s% eps_pre_mix, c% eps_pre_mix)
             if (failed('eps_pre_mix')) exit

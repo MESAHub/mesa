@@ -93,16 +93,14 @@
       ! call this after mlt
       subroutine do_brunt_N2(s,nzlo,nzhi,ierr)
          use star_utils, only: get_face_values
-         use interp_1d_def
 
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
 
          real(dp) :: f
-         real(dp), pointer, dimension(:) :: &
-            work1, f1, rho_P_chiT_chiRho, rho_P_chiT_chiRho_face
-         integer, parameter :: nwork = pm_work_size
+         real(dp), allocatable, dimension(:) :: &
+            rho_P_chiT_chiRho, rho_P_chiT_chiRho_face
 
          integer :: nz, k, i
 
@@ -116,17 +114,15 @@
             call set_nan(s% brunt_N2_composition_term(1:nz))
             return
          end if
+         
+         allocate(rho_P_chiT_chiRho(nz), rho_P_chiT_chiRho_face(nz))
 
-         call do_alloc(ierr)
-         if (ierr /= 0) return
-
-         call smooth_brunt_B(work1)
+         call smooth_brunt_B(rho_P_chiT_chiRho) ! use rho_P_chiT_chiRho as work array here
          if (s% use_other_brunt_smoothing) then
             call s% other_brunt_smoothing(s% id, ierr)
             if (ierr /= 0) then
                s% retry_message = 'failed in other_brunt_smoothing'
                if (s% report_ierr) write(*, *) s% retry_message
-               call dealloc
                return
             end if
          end if
@@ -139,7 +135,6 @@
          if (ierr /= 0) then
             s% retry_message = 'failed in get_face_values'
             if (s% report_ierr) write(*, *) s% retry_message
-            call dealloc
             return
          end if
 
@@ -164,8 +159,6 @@
             s% brunt_N2_composition_term(k) = f*s% brunt_B(k)
          end do
 
-         call dealloc
-
          if (s% brunt_N2_coefficient /= 1d0) then
             do k=1,nz
                s% brunt_N2(k) = s% brunt_N2_coefficient*s% brunt_N2(k)
@@ -174,47 +167,17 @@
             end do
          end if
 
-
          contains
-
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true., ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false., ierr)
-         end subroutine dealloc
-            
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               rho_P_chiT_chiRho, nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               rho_P_chiT_chiRho_face, nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               work1, nwork*nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               f1, 4*nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
 
          subroutine smooth_brunt_B(work)
             use star_utils, only: threshold_smoothing
-            real(dp), pointer, dimension(:) :: work
+            real(dp) :: work(:)
             logical, parameter :: preserve_sign = .false.
             if (s% num_cells_for_smooth_brunt_B <= 0) return
             call threshold_smoothing( &
-               s% brunt_B, s% threshold_for_smooth_brunt_B, s% nz, s% num_cells_for_smooth_brunt_B, preserve_sign, work)
+               s% brunt_B, s% threshold_for_smooth_brunt_B, s% nz, &
+               s% num_cells_for_smooth_brunt_B, preserve_sign, work)
          end subroutine smooth_brunt_B
-
 
       end subroutine do_brunt_N2
 
@@ -227,7 +190,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         real(dp), pointer, dimension(:) :: T_face, rho_face, chiT_face
+         real(dp), allocatable, dimension(:) :: T_face, rho_face, chiT_face
          real(dp) :: brunt_B
          integer :: nz, species, k, i, op_err
          logical, parameter :: dbg = .false.
@@ -239,32 +202,16 @@
          nz = s% nz
          species = s% species
          
-         nullify(T_face, rho_face, chiT_face)
-
-         call do_alloc(ierr)
-         if (ierr /= 0) then
-            write(*,*) 'allocate failed in do_brunt_MHM_form'
-            ierr = -1
-            return
-         end if
+         allocate(T_face(nz), rho_face(nz), chiT_face(nz))
 
          call get_face_values(s, s% chiT, chiT_face, ierr)
-         if (ierr /= 0) then
-            call dealloc
-            return
-         end if
+         if (ierr /= 0) return
 
          call get_face_values(s, s% T, T_face, ierr)
-         if (ierr /= 0) then
-            call dealloc
-            return
-         end if
+         if (ierr /= 0) return
 
          call get_face_values(s, s% rho, rho_face, ierr)
-         if (ierr /= 0) then
-            call dealloc
-            return
-         end if
+         if (ierr /= 0) return
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k=1,nz
@@ -274,42 +221,6 @@
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
-         if (ierr /= 0) then
-            call dealloc
-            return
-         end if
-
-         call dealloc
-
-         contains
-            
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            integer :: ierr
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use interp_1d_def
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               T_face, nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               rho_face, nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               chiT_face, nz, nz_alloc_extra, 'brunt', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
 
       end subroutine do_brunt_B_MHM_form
       
