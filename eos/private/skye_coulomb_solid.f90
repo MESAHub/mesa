@@ -125,6 +125,41 @@ module skye_coulomb_solid
    end function ocp_solid_harmonic_free_energy
 
 
+   !> Calculates the electron-ion screening corrections to the free energy
+   !! of a one-component plasma in the solid phase using the fits of Potekhin & Chabrier 2013.
+   !!
+   !! @param Z ion charge
+   !! @param mi ion mass in grams
+   !! @param g ion interaction parameter
+   !! @param TPT effective T_p/T - ion quantum parameter
+   !! @param F non-ideal free energy
+   function ocp_solid_screening_free_energy_correction(Z, mi, g, TPT) result(F)
+         real(dp), intent(in) :: Z, mi
+         type(auto_diff_real_2var_order3), intent(in) :: g, TPT
+
+         real(dp) :: s, b1, b2, b3, b4
+         real(dp), parameter :: e = 2.718281828459045
+         real(dp), parameter :: aTF = 0.00352
+
+         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs
+         type(auto_diff_real_2var_order3) :: F
+
+         s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
+         b1 = 1d0 - 1.1866d0 * pow(Z, -0.267d0) + 0.27d0 / Z
+         b2 = 1d0 + (2.25d0 / pow(Z, 1d0/3d0)) * (1d0 + 0.684d0 * pow5(Z) + 0.222d0 * pow6(Z)) / (1d0 + 0.222d0 * pow6(Z))
+         b3 = 41.5d0 / (1d0 + log(Z))
+         b4 = 0.395d0 * log(Z) + 0.347d0 * pow(Z, -1.5d0)
+
+         rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
+         xr = 0.014005d0 / rs
+         A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
+         Q = sqrt(log(1d0 + exp(pow2(0.205d0 * TPT)))) / sqrt(log(e - (e - 2d0) * exp(-pow2(0.205d0*TPT))))
+         f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
+
+         F = -f_inf * g * (1d0 + A * pow(Q / g, s))
+
+   end function ocp_solid_screening_free_energy_correction
+
    !> Computes the correction deltaG to the linear mixing rule for a two-component Coulomb solid mixture.
    !! From Shuji Ogata, Hiroshi Iyetomi, and Setsuo Ichimaru 1993
    !!

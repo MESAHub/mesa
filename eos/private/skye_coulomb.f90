@@ -268,14 +268,14 @@ module skye_coulomb
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
          ! No extrapolation needed
-         F = ocp_free_energy(LIQSOL, GAMI, TPT)
+         F = ocp_free_energy(LIQSOL, Zion, CMI, GAMI, TPT)
          if (dbg) then
-            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val
+            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val, 'F', F%val
          end if
       else
          ! Extrapolate past the boundary
          if (dbg) then
-            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val
+            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Extrapolated, GAMI:', GAMI%val
          end if
 
          ! Identify the boundary
@@ -296,7 +296,7 @@ module skye_coulomb
          tp=g/sqrt(RS)*COTPT                   ! T_p/T
 
          ! Compute boundary free energy
-         F = ocp_free_energy(LIQSOL, g, tp)
+         F = ocp_free_energy(LIQSOL, Zion, CMI, g, tp)
 
          ! Extract derivative at boundary
          dF_dlnT = differentiate_1(F) * temp_boundary
@@ -340,30 +340,37 @@ module skye_coulomb
    !! just responsible for assembling different terms together.
    !! Based on EOSFI8 by Potekhin and Chabrier.
    !!
-   !! @param LIQSOL Integer specifying the phase: 0 for liquid, 1 for solid
+   !! @param LIQSOL Integer specifying the phase: 0 for liquid, 1 for solid.
+   !! @param Zion Charge of the species of interest in electron charges.
+   !! @param CMI Mass of the species of interest in AMU. 
    !! @param GAMI Ion coupling parameter (Gamma_i)
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F non-ideal free energy per ion per kT
-   function ocp_free_energy(LIQSOL,GAMI,TPT) result(F)
+   function ocp_free_energy(LIQSOL, Zion, CMI, GAMI, TPT) result(F)
       ! Inputs
+      real(dp), intent(in) :: Zion, CMI
       integer, intent(in) :: LIQSOL
       type(auto_diff_real_2var_order3), intent(in) :: GAMI, TPT
+
+      ! Intermediates
+      type(auto_diff_real_2var_order3) :: screening_factor
 
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-
-      ! i-e corrections (FSCR) ruin the phase transition at densities ~1d3 and below.
-      ! For now they're commented out till we can figure out what to do about these issues.
-      ! - ASJ May 15, 2020
+      screening_factor = pow2(TPT / GAMI) ! Proportional to RS_{ion}^{-1} ~ rho^{1/3}
+      screening_factor = pow3(screening_factor / (1d-4 + screening_factor))
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
+         F = F + screening_factor * ocp_liquid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       else     
          F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
+         F = F + screening_factor * ocp_solid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       endif
+
    end function ocp_free_energy
 
 
