@@ -250,8 +250,6 @@
          integer :: i, k, species, ierr, alph, j1, j2, gold_tolerances_level
          real(dp) :: varscale, r003, rp13, dV, frac, maxT
 
-         real(dp), parameter :: xscale_min = 1d-3
-
          include 'formats'
 
          species = s% species
@@ -493,11 +491,8 @@
          integer :: mljac, mujac, i, k, j, matrix_type, neq
          logical :: failure
          real(dp) :: varscale
-         real(dp), parameter :: xscale_min = 1
          real(dp), pointer :: dx(:,:)
 
-         real(dp), pointer, dimension(:,:) :: x_scale
-         real(dp), pointer, dimension(:) :: x_scale1
 
          logical, parameter :: dbg = .false.
 
@@ -522,21 +517,6 @@
             return
          end if
 
-         call non_crit_get_work_array( &
-            s, x_scale1, neq, nvar*nz_alloc_extra, 'hydro_solver_step', ierr)
-         if (ierr /= 0) return
-         x_scale(1:nvar,1:nz) => x_scale1(1:neq)
-
-         do i = 1, nvar
-            if (i <= s% nvar_hydro) then
-               varscale = maxval(abs(s% xh(i,1:nz)))
-               varscale = max(xscale_min, varscale)
-            else
-               varscale = 1
-            end if
-            x_scale(i, 1:nz) = varscale
-         end do
-
          if (dbg) write(*, *) 'call solver'
          call newt(ierr)
          if (ierr /= 0 .and. s% report_ierr) then
@@ -552,8 +532,6 @@
             end do
             ! s% xa has already been updated by final call to set_solver_vars from solver
          end if
-
-         call non_crit_return_work_array(s, x_scale1, 'hydro_solver_step')
 
 
          contains
@@ -577,7 +555,7 @@
             call solver( &
                s, nz, nvar, dx1, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-               x_scale1, s% equ1, &
+               s% equ1, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &
                s% AF1, failure, ierr)

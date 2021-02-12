@@ -1156,11 +1156,6 @@
          integer :: burner_storage_sz_per_thread, burner_num_threads
          real(dp), pointer :: burner_storage(:)
             
-         real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
-         integer :: solver_iter, solver_adjust_iter
-         
-         real(dp), pointer :: x_scale(:,:), x_scale1(:)
-            
          real(dp), pointer, dimension(:) :: & ! (nz)
             max_burn_correction, avg_burn_correction
          real(dp), pointer :: xa_extra1(:,:) ! (species,nz) -- for use by op split
@@ -1291,19 +1286,21 @@
             xtra1_array, xtra2_array, xtra3_array, xtra4_array, xtra5_array
 
 
-      ! equation residuals
+      ! equation residuals, etc
          ! equ(i,k) is residual for equation i of cell k            
          real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
          real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
-         
-      ! equation weights
+
+         real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
+         integer :: solver_iter, solver_adjust_iter
+         real(dp), pointer :: x_scale(:,:), x_scale1(:)
+
          ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
          ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
          ! weight = 0d0 means just ignore this item in making decisions.
          real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
          real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
-         
-      ! equation Jacobian
+
          real(dp), dimension(:,:), pointer :: jacobian
             ! NOT ALLOCATED. pointer set by enter_setmatrix
          

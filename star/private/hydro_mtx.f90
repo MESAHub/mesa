@@ -1012,13 +1012,13 @@
 
       subroutine enter_setmatrix(s, &
             iter, nvar, nz, neqns, dx, &
-            xscale, xder, need_solver_to_eval_jacobian, &
+            xder, need_solver_to_eval_jacobian, &
             ldA, A1, ierr)
          use mtx_def, only: lapack
          use rsp_def, only: ABB, LD_ABB, NV, MAX_NZN
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz, neqns ! (neqns = nvar*nz)
-         real(dp), pointer, dimension(:,:) :: dx, xscale, xder ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: dx, xder ! (nvar, nz)
          logical, intent(out) :: need_solver_to_eval_jacobian
          integer, intent(in) :: ldA ! leading dimension of A
          real(dp), pointer, dimension(:) :: A1
@@ -1072,7 +1072,7 @@
 
          if (dbg_enter_setmatrix) &
             write(*, *) 'call eval_partials with doing_check_partials = .false.'
-         call eval_partials(s, nvar, xscale, ierr)
+         call eval_partials(s, nvar, s% x_scale, ierr)
          if (ierr /= 0) return
 
          call s% other_after_enter_setmatrix(s% id,ierr)

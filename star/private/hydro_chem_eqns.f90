@@ -182,7 +182,7 @@
 
             if (skip_partials) cycle
 
-            call e00(s, xscale, i, i, k, nvar, -dVARdot_dVAR/eqn_scale)
+            call e00(s, i, i, k, nvar, -dVARdot_dVAR/eqn_scale)
 
             ! all the rest are jacobian terms for dxdt_expected/eqn_scale
 
@@ -192,7 +192,7 @@
                   ii = equchem1+jj-1
                   dxdt_expected_dxa = s% d_dxdt_nuc_dx(j,jj,k)
                   dequ = dxdt_expected_dxa/eqn_scale
-                  call e00(s, xscale, i, ii, k, nvar, dxdt_factor*dequ)
+                  call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
 
                dxdt_expected_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)
@@ -201,11 +201,11 @@
                dequ_dlnT = dxdt_expected_dlnT/eqn_scale
 
                if (s% do_struct_hydro) then ! partial wrt lnd const lnT
-                  call e00(s, xscale, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
+                  call e00(s, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
                end if
 
                if (s% do_struct_thermo) then ! partial wrt lnT const lnd
-                  call e00(s, xscale, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
+                  call e00(s, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
                end if
 
             end if
@@ -214,16 +214,16 @@
 
                dxdt_expected_dxa = d_dxdt_mix_dx00
                dequ = dxdt_expected_dxa/eqn_scale
-               call e00(s, xscale, i, i, k, nvar, dxdt_factor*dequ)
+               call e00(s, i, i, k, nvar, dxdt_factor*dequ)
                if (k > 1) then
                   dxdt_expected_dxa = d_dxdt_mix_dxm1
                   dequ = dxdt_expected_dxa/eqn_scale
-                  call em1(s, xscale, i, i, k, nvar, dxdt_factor*dequ)
+                  call em1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
                if (k < nz) then
                   dxdt_expected_dxa = d_dxdt_mix_dxp1
                   dequ = dxdt_expected_dxa/eqn_scale
-                  call ep1(s, xscale, i, i, k, nvar, dxdt_factor*dequ)
+                  call ep1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
 
             end if

@@ -1405,9 +1405,9 @@
          integer :: nz, j
          nz = s% nz
          do j=1,nvar
-            if (k > 1) call em1(s, xscale, i_eqn, j, k, nvar, d_dm1(j))
-            call e00(s, xscale, i_eqn, j, k, nvar, d_d00(j))
-            if (k < nz) call ep1(s, xscale, i_eqn, j, k, nvar, d_dp1(j))
+            if (k > 1) call em1(s, i_eqn, j, k, nvar, d_dm1(j))
+            call e00(s, i_eqn, j, k, nvar, d_d00(j))
+            if (k < nz) call ep1(s, i_eqn, j, k, nvar, d_dp1(j))
          end do            
       end subroutine store_partials
 
@@ -2998,11 +2998,10 @@
 
 
       ! e00(i,j,k) is partial of equ(i,k) wrt var(j,k)
-      subroutine e00(s,xscale,i,j,k,nvar,v)
+      subroutine e00(s,i,j,k,nvar,v)
          use num_def, only: &
             block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
          integer :: b, q, v00
@@ -3021,7 +3020,7 @@
          
          if (.false. .and. j == s% i_lnT .and. k == 30) then
             write(*,4) 'e00(i,j,k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k)
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k)
          end if
          
          if (is_bad(v)) then
@@ -3051,21 +3050,16 @@
 
          if (abs(v) < 1d-250) return
 
-         if (associated(xscale)) then
-            s% dblk(i,j,k) = s% dblk(i,j,k) + v*xscale(j,k)
-         else
-            s% dblk(i,j,k) = s% dblk(i,j,k) + v
-         end if
+         s% dblk(i,j,k) = s% dblk(i,j,k) + v*s% x_scale(j,k)
 
       end subroutine e00
 
 
       ! em1(i,j,k) is partial of equ(i,k) wrt var(j,k-1)
-      subroutine em1(s,xscale,i,j,k,nvar,v)
+      subroutine em1(s,i,j,k,nvar,v)
          use num_def, only: &
             block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
          integer :: b, q, vm1
@@ -3083,7 +3077,7 @@
          
          if (.false. .and. j == s% i_lnT .and. k == 31) then
             write(*,4) 'em1(i,j,k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k-1)
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
          
          if (s% et_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
@@ -3116,21 +3110,16 @@
 
          if (abs(v) < 1d-250) return
 
-         if (associated(xscale)) then
-            s% lblk(i,j,k) = s% lblk(i,j,k) + v*xscale(j,k-1)
-         else
-            s% lblk(i,j,k) = s% lblk(i,j,k) + v
-         end if
+         s% lblk(i,j,k) = s% lblk(i,j,k) + v*s% x_scale(j,k-1)
 
       end subroutine em1
 
 
       ! ep1(i,j,k) is partial of equ(i,k) wrt var(j,k+1)
-      subroutine ep1(s,xscale,i,j,k,nvar,v)
+      subroutine ep1(s,i,j,k,nvar,v)
          use num_def, only: &
             block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
          integer :: b, q, vp1
@@ -3148,7 +3137,7 @@
          
          if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k+1)
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k+1)
          end if
          
          if (is_bad(v)) then
@@ -3176,11 +3165,7 @@
 
          if (abs(v) < 1d-250) return
 
-         if (associated(xscale)) then
-            s% ublk(i,j,k) = s% ublk(i,j,k) + v*xscale(j,k+1)
-         else
-            s% ublk(i,j,k) = s% ublk(i,j,k) + v
-         end if
+         s% ublk(i,j,k) = s% ublk(i,j,k) + v*s% x_scale(j,k+1)
 
       end subroutine ep1
 

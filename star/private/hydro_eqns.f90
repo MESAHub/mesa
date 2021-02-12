@@ -507,7 +507,7 @@
             integer :: k
             do k=nzlo,nzhi
                equ(j,k) = 0 ! s% xs(j,k) - s% xs_pre_pass(j,k)
-               if (.not. skip_partials) call e00(s,xscale,j,j,k,nvar,one)
+               if (.not. skip_partials) call e00(s,j,j,k,nvar,one)
             end do
          end subroutine null_eqn
 
@@ -517,7 +517,7 @@
             integer :: k
             do k=nzlo,nzhi
                equ(j,k) = 0
-               if (.not. skip_partials) call e00(s,xscale,j,i,k,nvar,one)
+               if (.not. skip_partials) call e00(s,j,i,k,nvar,one)
             end do
          end subroutine dummy_eqn
 
@@ -699,13 +699,12 @@
 
          if (skip_partials) return
 
-         call e00(s, xscale, i_dlnd_dt, i_lnR, k, nvar, one)
-         if (k < nz) call ep1( &
-            s, xscale, i_dlnd_dt, i_lnR, k, nvar, -rp13/(rp13 + dr3))
+         call e00(s, i_dlnd_dt, i_lnR, k, nvar, one)
+         if (k < nz) call ep1(s, i_dlnd_dt, i_lnR, k, nvar, -rp13/(rp13 + dr3))
 
          dequ_ddr3 = -one_third/(rp13 + dr3)
          ddr3_dlnd = -dr3
-         call e00(s, xscale, i_dlnd_dt, s% i_lnd, k, nvar, dequ_ddr3*ddr3_dlnd)
+         call e00(s, i_dlnd_dt, s% i_lnd, k, nvar, dequ_ddr3*ddr3_dlnd)
 
          if (test_partials) then   
             s% solver_test_partials_var = s% i_lnd
@@ -761,14 +760,14 @@
          if (.false.) then ! don't change conv_vel
             equ(i_dln_cvpv0_dt, k) = 0d0
             if (skip_partials) return
-            call e00(s,xscale,i_dln_cvpv0_dt,i_ln_cvpv0,k,nvar,1d0)
+            call e00(s,i_dln_cvpv0_dt,i_ln_cvpv0,k,nvar,1d0)
             return
          end if
          
          if (.false.) then ! force conv_vel == 0
             equ(i_dln_cvpv0_dt, k) = s% conv_vel(k)
             if (skip_partials) return
-            call e00(s,xscale,i_dln_cvpv0_dt,i_ln_cvpv0,k,nvar,1d0)
+            call e00(s,i_dln_cvpv0_dt,i_ln_cvpv0,k,nvar,1d0)
             return
          end if
 
@@ -817,9 +816,9 @@
                s% solver_test_partials_val = equ(i_dln_cvpv0_dt, 1)
             end if
             if (skip_partials) return
-            call e00(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, 1, nvar, &
+            call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, 1, nvar, &
                1d0/scale)
-            call ep1(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, 1, nvar, &
+            call ep1(s, i_dln_cvpv0_dt, i_ln_cvpv0, 1, nvar, &
                -1d0/scale)
 
             if (test_partials) then
@@ -834,9 +833,9 @@
             equ(i_dln_cvpv0_dt, s% nz) = &
                (log(s% conv_vel(s% nz)+s% conv_vel_v0) - log(s% conv_vel(s% nz-1)+s% conv_vel_v0))/scale
             if (skip_partials) return
-            call e00(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, s% nz, nvar, &
+            call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, s% nz, nvar, &
                1d0/scale)
-            call em1(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, s% nz, nvar, &
+            call em1(s, i_dln_cvpv0_dt, i_ln_cvpv0, s% nz, nvar, &
                -1d0/scale)
             return
          end if
@@ -942,58 +941,58 @@
 
          if (.not. s% conv_vel_fully_lagrangian .and. s% conv_vel_include_homologous_term) then
             if (s% mstar_dot <= 0d0) then
-               call e00(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+               call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                   (d_d_expected_dvc - d_d_actual_dvc)/scale &
                      +alfa*dt*s% mstar_dot/s% m(1)/(s% q(k) - s% q(k+1))/scale)
             else
-               call e00(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+               call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                   (d_d_expected_dvc - d_d_actual_dvc)/scale &
                      -alfa*dt*s% mstar_dot/s% m(1)/(s% q(k-1) - s% q(k))/scale)
             end if
          else
-            call e00(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+            call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                (d_d_expected_dvc - d_d_actual_dvc)/scale)
          end if
 
          if (.not. s% conv_vel_use_mlt_vc_start) then
             ! partials of mlt_vc*dt_div_tau/scale
-            call e00(s, xscale, i_dln_cvpv0_dt, s% i_lnR, k, nvar, &
+            call e00(s, i_dln_cvpv0_dt, s% i_lnR, k, nvar, &
                2*s% mlt_vc(k)*s% d_mlt_vc_dlnR(k)*dt_div_lambda/(s% conv_vel(k)+s% conv_vel_v0)/scale)
 
-            call e00(s, xscale, i_dln_cvpv0_dt, s% i_lum, k, nvar, &
+            call e00(s, i_dln_cvpv0_dt, s% i_lum, k, nvar, &
                2*s% mlt_vc(k)*s% d_mlt_vc_dL(k)*dt_div_lambda/(s% conv_vel(k)+s% conv_vel_v0)/scale)
 
-            call e00(s, xscale, i_dln_cvpv0_dt, s% i_lnd, k, nvar, &
+            call e00(s, i_dln_cvpv0_dt, s% i_lnd, k, nvar, &
                2*s% mlt_vc(k)*s% d_mlt_vc_dlnd00(k)*dt_div_lambda/(s% conv_vel(k)+s% conv_vel_v0)/scale)
 
-            call e00(s, xscale, i_dln_cvpv0_dt, s% i_lnT, k, nvar, &
+            call e00(s, i_dln_cvpv0_dt, s% i_lnT, k, nvar, &
                2*s% mlt_vc(k)*s% d_mlt_vc_dlnT00(k)*dt_div_lambda/(s% conv_vel(k)+s% conv_vel_v0)/scale)
          end if
             
          if (k > 1) then
-            call em1(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+            call em1(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                dmix_dcvm1*dt/(s% conv_vel(k)+s% conv_vel_v0)*(s% conv_vel(k-1)+s% conv_vel_v0)/scale)
             if (.not. s% conv_vel_fully_lagrangian .and. s% conv_vel_include_homologous_term) then
                if (s% mstar_dot > 0d0) then
-                  call em1(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+                  call em1(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                      alfa*dt*s% mstar_dot/s% m(1)/(s% q(k-1) - s% q(k))/scale)
                end if
             end if
             if (.not. s% conv_vel_use_mlt_vc_start) then
                ! partials of mlt_vc*dt_div_tau/scale
-               call e00(s, xscale, i_dln_cvpv0_dt, s% i_lnd, k, nvar, &
+               call e00(s, i_dln_cvpv0_dt, s% i_lnd, k, nvar, &
                   2*s% mlt_vc(k)*s% d_mlt_vc_dlndm1(k)*dt_div_lambda/(s% conv_vel(k)+s% conv_vel_v0)/scale)
-               call e00(s, xscale, i_dln_cvpv0_dt, s% i_lnT, k, nvar, &
+               call e00(s, i_dln_cvpv0_dt, s% i_lnT, k, nvar, &
                   2*s% mlt_vc(k)*s% d_mlt_vc_dlnTm1(k)*dt_div_lambda/(s% conv_vel(k)+s% conv_vel_v0)/scale)
             end if
          end if
          
          if (k < s% nz) then
-            call ep1(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+            call ep1(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                dmix_dcvp1*dt/(s% conv_vel(k)+s% conv_vel_v0)*(s% conv_vel(k+1)+s% conv_vel_v0)/scale)
             if (.not. s% conv_vel_fully_lagrangian .and. s% conv_vel_include_homologous_term) then
                if (s% mstar_dot <= 0d0) then
-                  call ep1(s, xscale, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
+                  call ep1(s, i_dln_cvpv0_dt, i_ln_cvpv0, k, nvar, &
                      -alfa*dt*s% mstar_dot/s% m(1)/(s% q(k) - s% q(k+1))/scale)
                end if
             end if
@@ -1076,7 +1075,7 @@
             -0.5583d0/(1d0-pow4(wwc))*(-4d0*pow3(wwc))
          dC_dw = 17d0/30d0*wwc-4d0*0.3436d0*pow3(wwc)-6d0*0.4055d0*pow5(wwc)-0.9277d0/(1d0-pow4(wwc))*(-4d0*pow3(wwc))
 
-         call e00(s, xscale, i_equ_w_div_wc, i_w_div_wc, k, nvar, &
+         call e00(s, i_equ_w_div_wc, i_w_div_wc, k, nvar, &
             -two_thirds*(C/A+wwc*(dC_dw/A - C*dA_dw/pow2(A))))
 
          if (jrot_ratio > jr_lim1) then
@@ -1085,17 +1084,17 @@
             if (jrot_ratio < 0d0) then
                d_sigmoid_jrot_ratio_dx = -d_sigmoid_jrot_ratio_dx
             end if
-            call e00(s, xscale, i_equ_w_div_wc, s% i_lnR, k, nvar, &
+            call e00(s, i_equ_w_div_wc, s% i_lnR, k, nvar, &
                d_sigmoid_jrot_ratio_dx*(-0.5d0*jrot_ratio))
             if (s% j_rot_flag) then
-               call e00(s, xscale, i_equ_w_div_wc, s% i_j_rot, k, nvar, &
+               call e00(s, i_equ_w_div_wc, s% i_j_rot, k, nvar, &
                   d_sigmoid_jrot_ratio_dx/sqrt(s% cgrav(k)*s% m(k)*s% r(k)))
             end if
          else
-            call e00(s, xscale, i_equ_w_div_wc, s% i_lnR, k, nvar, &
+            call e00(s, i_equ_w_div_wc, s% i_lnR, k, nvar, &
                -0.5d0*jrot_ratio)
             if (s% j_rot_flag) then
-               call e00(s, xscale, i_equ_w_div_wc, s% i_j_rot, k, nvar, &
+               call e00(s, i_equ_w_div_wc, s% i_j_rot, k, nvar, &
                   1/sqrt(s% cgrav(k)*s% m(k)*s% r(k)))
             end if
          end if
@@ -1185,32 +1184,32 @@
 
          if (skip_partials) return
 
-         call e00(s, xscale, i_dj_rot_dt, s% i_w_div_wc, k, nvar, &
+         call e00(s, i_dj_rot_dt, s% i_w_div_wc, k, nvar, &
             +(dFm1_dw00-dF00_dw00)/s% dm_bar(k)/scale)
-         call e00(s, xscale, i_dj_rot_dt, s% i_j_rot, k, nvar, &
+         call e00(s, i_dj_rot_dt, s% i_j_rot, k, nvar, &
             (1/s% dt+(dFm1_dj00-dF00_dj00)/s% dm_bar(k))/scale)
-         call e00(s, xscale, i_dj_rot_dt, s% i_lnr, k, nvar, &
+         call e00(s, i_dj_rot_dt, s% i_lnr, k, nvar, &
             +(dFm1_dlnr00-dF00_dlnr00)/s% dm_bar(k)/scale)
-         call e00(s, xscale, i_dj_rot_dt, s% i_lnd, k, nvar, &
+         call e00(s, i_dj_rot_dt, s% i_lnd, k, nvar, &
             -dF00_dlnd00/s% dm_bar(k)/scale)
          
          if (k > 1) then
-            call em1(s, xscale, i_dj_rot_dt, s% i_w_div_wc, k, nvar, &
+            call em1(s, i_dj_rot_dt, s% i_w_div_wc, k, nvar, &
                +dFm1_dwm1/s% dm_bar(k)/scale)
-            call em1(s, xscale, i_dj_rot_dt, s% i_j_rot, k, nvar, &
+            call em1(s, i_dj_rot_dt, s% i_j_rot, k, nvar, &
                +dFm1_djm1/s% dm_bar(k)/scale)
-            call em1(s, xscale, i_dj_rot_dt, s% i_lnr, k, nvar, &
+            call em1(s, i_dj_rot_dt, s% i_lnr, k, nvar, &
                +dFm1_dlnrm1/s% dm_bar(k)/scale)
-            call em1(s, xscale, i_dj_rot_dt, s% i_lnd, k, nvar, &
+            call em1(s, i_dj_rot_dt, s% i_lnd, k, nvar, &
                +dFm1_dlndm1/s% dm_bar(k)/scale)
          end if
 
          if (k < s% nz) then
-            call ep1(s, xscale, i_dj_rot_dt, s% i_w_div_wc, k, nvar, &
+            call ep1(s, i_dj_rot_dt, s% i_w_div_wc, k, nvar, &
                -dF00_dwp1/s% dm_bar(k)/scale)
-            call ep1(s, xscale, i_dj_rot_dt, s% i_j_rot, k, nvar, &
+            call ep1(s, i_dj_rot_dt, s% i_j_rot, k, nvar, &
                -dF00_djp1/s% dm_bar(k)/scale)
-            call ep1(s, xscale, i_dj_rot_dt, s% i_lnr, k, nvar, &
+            call ep1(s, i_dj_rot_dt, s% i_lnr, k, nvar, &
                -dF00_dlnrp1/s% dm_bar(k)/scale)
          end if
 
@@ -1438,26 +1437,26 @@
          end if
 
          if (s% i_lum /= 0) & ! d/d_L00
-            call e00(s, xscale, i_equL, s% i_lum, k, nvar, dr_dL00)
+            call e00(s, i_equL, s% i_lum, k, nvar, dr_dL00)
 
          if (s% i_w_div_wc /= 0) & ! d/d_w00
-            call e00(s, xscale, i_equL, s% i_w_div_wc, k, nvar, dr_dw00)
+            call e00(s, i_equL, s% i_w_div_wc, k, nvar, dr_dw00)
             
          if (s% conv_vel_flag) then
             dr_dln_cvpv0 = -dm_bar*opacity_face*d_Lrad_dln_cvpv0/(clight*area2)/scale
-            call e00(s, xscale, i_equL, s% i_ln_cvpv0, k, nvar, dr_dln_cvpv0)
+            call e00(s, i_equL, s% i_ln_cvpv0, k, nvar, dr_dln_cvpv0)
          end if
 
-         call e00(s, xscale, i_equL, s% i_lnT, k, nvar, dr_dlnT00)
-         call em1(s, xscale, i_equL, s% i_lnT, k, nvar, dr_dlnTm1)
+         call e00(s, i_equL, s% i_lnT, k, nvar, dr_dlnT00)
+         call em1(s, i_equL, s% i_lnT, k, nvar, dr_dlnTm1)
 
          if (s% do_struct_hydro) then ! partials wrt lnR and lnd
             dr_dlnR00 = &
                -4*d_P_rad_expected/scale &
                -dm_bar*opacity_face*d_Lrad_dlnR/(clight*area2)/scale
-            call e00(s, xscale, i_equL, s% i_lnR, k, nvar, dr_dlnR00) ! d/dlnR
-            call e00(s, xscale, i_equL, s% i_lnd, k, nvar, dr_dlnd00)
-            call em1(s, xscale, i_equL, s% i_lnd, k, nvar, dr_dlndm1)
+            call e00(s, i_equL, s% i_lnR, k, nvar, dr_dlnR00) ! d/dlnR
+            call e00(s, i_equL, s% i_lnd, k, nvar, dr_dlnd00)
+            call em1(s, i_equL, s% i_lnd, k, nvar, dr_dlndm1)
          end if
 
          if (test_partials) then
@@ -1622,16 +1621,16 @@
             !d_dlnTdm_dlnw = dlnPdm*d_gradT_dlnR + d_dlnPdm_dlnR*gradT !TODO gradT rotation correction
             d_dlnTdm_dw = d_dlnPdm_dw*gradT + dlnPdm*d_gradT_dw
             dr_dw00 = delm*d_dlnTdm_dw*scale
-            call e00(s, xscale, i_equL, s% i_w_div_wc, k, nvar, dr_dw00)
+            call e00(s, i_equL, s% i_w_div_wc, k, nvar, dr_dw00)
          end if
 
          if (s% conv_vel_flag) then
             dr_dln_cvpv0 = delm*dlnPdm*d_gradT_dln_cvpv0*scale
-            call e00(s, xscale, i_equL, s% i_ln_cvpv0, k, nvar, dr_dln_cvpv0)
+            call e00(s, i_equL, s% i_ln_cvpv0, k, nvar, dr_dln_cvpv0)
          end if
 
          if (s% i_lum /= 0) &
-            call e00(s, xscale, i_equL, s% i_lum, k, nvar, dr_dL00) ! d/d_L00
+            call e00(s, i_equL, s% i_lum, k, nvar, dr_dL00) ! d/d_L00
 
          d_dlnTdm_dlnT00 = dlnPdm*d_gradT_dlnT00 + d_dlnPdm_dlnT00*gradT
          dr_dlnT00 = (delm*d_dlnTdm_dlnT00 - d_lnTdiff_dlnT00)*scale
@@ -1643,13 +1642,13 @@
          d_dlnTdm_dlndm1 = dlnPdm*d_gradT_dlndm1 + d_dlnPdm_dlndm1*gradT
          dr_dlndm1 = delm*d_dlnTdm_dlndm1*scale
       
-         call e00(s, xscale, i_equL, s% i_lnT, k, nvar, dr_dlnT00)
-         call em1(s, xscale, i_equL, s% i_lnT, k, nvar, dr_dlnTm1)
+         call e00(s, i_equL, s% i_lnT, k, nvar, dr_dlnT00)
+         call em1(s, i_equL, s% i_lnT, k, nvar, dr_dlnTm1)
 
          if (s% do_struct_hydro) then
-            call e00(s, xscale, i_equL, s% i_lnR, k, nvar, dr_dlnR00) ! d/dlnR
-            call e00(s, xscale, i_equL, s% i_lnd, k, nvar, dr_dlnd00)
-            call em1(s, xscale, i_equL, s% i_lnd, k, nvar, dr_dlndm1)
+            call e00(s, i_equL, s% i_lnR, k, nvar, dr_dlnR00) ! d/dlnR
+            call e00(s, i_equL, s% i_lnd, k, nvar, dr_dlnd00)
+            call em1(s, i_equL, s% i_lnd, k, nvar, dr_dlndm1)
          end if
 
          !dr_dL00       1e-12
@@ -1880,7 +1879,7 @@
                end if
                s% u_residual(1) = equ(i_du_dt, 1)
                if (.not. skip_partials) &
-                  call e00(s, xscale, i_du_dt, i_u, 1, nvar, 1d0/s% csound_start(1))
+                  call e00(s, i_du_dt, i_u, 1, nvar, 1d0/s% csound_start(1))
             end if
             if (do_dv_dt) then
                equ(i_dv_dt, 1) = (s% v(1) - s% fixed_vsurf)/s% csound_start(1)
@@ -1890,7 +1889,7 @@
                end if
                s% v_residual(1) = equ(i_dv_dt, 1)
                if (.not. skip_partials) &
-                  call e00(s, xscale, i_dv_dt, i_v, 1, nvar, 1d0/s% csound_start(1))
+                  call e00(s, i_dv_dt, i_v, 1, nvar, 1d0/s% csound_start(1))
             end if 
          end subroutine set_fixed_vsurf_outer_BC
 
@@ -1902,16 +1901,16 @@
                equ(i_equL,1) = s% L(1) - s% L(2)
                s% equL_residual(1) = equ(i_equL,1)
                if (.not. skip_partials) then
-                  call e00(s,xscale,i_equL,i_lum,1,nvar,1d0)
-                  call ep1(s,xscale,i_equL,i_lum,1,nvar,-1d0)
+                  call e00(s,i_equL,i_lum,1,nvar,1d0)
+                  call ep1(s,i_equL,i_lum,1,nvar,-1d0)
                end if
                return
             end if
             equ(i_equL,1) = s% L(2)/s% L(1) - 1d0
             s% equL_residual(1) = equ(i_equL,1)
             if (skip_partials) return
-            call e00(s,xscale,i_equL,i_lum,1,nvar,-s% L(2)/(s% L(1)*s% L(1)))
-            call ep1(s,xscale,i_equL,i_lum,1,nvar,1d0/s% L(1))
+            call e00(s,i_equL,i_lum,1,nvar,-s% L(2)/(s% L(1)*s% L(1)))
+            call ep1(s,i_equL,i_lum,1,nvar,1d0/s% L(1))
          end subroutine set_zero_dL_dm_BC
 
 
@@ -1939,7 +1938,7 @@
                equ(i_equL,1) = 0
                s% equL_residual(1) = equ(i_equL,1)
                if (skip_partials) return
-               call e00(s,xscale,i_equL,i_lnT,1,nvar,one)
+               call e00(s,i_equL,i_lnT,1,nvar,one)
                return
             end if
 
@@ -2004,17 +2003,17 @@
 
             if (skip_partials) return
 
-            call e00(s, xscale, i_equL, i_lnT, 1, nvar, -s% T(1)/Tscale)
+            call e00(s, i_equL, i_lnT, 1, nvar, -s% T(1)/Tscale)
             
             if (s% use_fixed_L_for_BB_outer_BC .or. s% tau_for_L_BB > 0d0) then
             else if (i_lum /= 0) then
-               call e00(s, xscale, i_equL, i_lum, 1, nvar, dT1_dL00/Tscale)
-               call ep1(s, xscale, i_equL, i_lum, 1, nvar, dT1_dLp1/Tscale)
+               call e00(s, i_equL, i_lum, 1, nvar, dT1_dL00/Tscale)
+               call ep1(s, i_equL, i_lum, 1, nvar, dT1_dLp1/Tscale)
             end if
 
             if (s% do_struct_hydro) then
-               call e00(s, xscale, i_equL, i_lnR, 1, nvar, dT1_dlnR00/Tscale)
-               call ep1(s, xscale, i_equL, i_lnR, 1, nvar, dT1_dlnRp1/Tscale)
+               call e00(s, i_equL, i_lnR, 1, nvar, dT1_dlnR00/Tscale)
+               call ep1(s, i_equL, i_lnR, 1, nvar, dT1_dlnRp1/Tscale)
             end if
             
             if (test_partials) then
@@ -2050,7 +2049,7 @@
                equ(i_T_BC,1) = 0
                s% equL_residual(1) = equ(i_T_BC,1)
                if (skip_partials) return
-               call e00(s,xscale,i_T_BC,i_lnT,1,nvar,one)
+               call e00(s,i_T_BC,i_lnT,1,nvar,one)
                return
             end if
             
@@ -2075,17 +2074,17 @@
 
             if (skip_partials) return
 
-            call e00(s, xscale, i_T_BC, i_lnT, 1, nvar, (dlnT_bc_dlnT - 1d0)*scale)
+            call e00(s, i_T_BC, i_lnT, 1, nvar, (dlnT_bc_dlnT - 1d0)*scale)
 
-            if (i_lum /= 0) call e00(s, xscale, i_T_BC, i_lum, 1, nvar, dlnT_bc_dL*scale)
+            if (i_lum /= 0) call e00(s, i_T_BC, i_lum, 1, nvar, dlnT_bc_dL*scale)
 
             if (.not. s% do_struct_hydro) return
 
             ! partial of temperature eqn wrt (lnR or v) and (lnd or lnPgas)
 
-            call e00(s, xscale, i_T_BC, i_lnR, 1, nvar, dlnT_bc_dlnR*scale)
+            call e00(s, i_T_BC, i_lnR, 1, nvar, dlnT_bc_dlnR*scale)
 
-            call e00(s, xscale, i_T_BC, i_lnd, 1, nvar, dlnT_bc_dlnd*scale)
+            call e00(s, i_T_BC, i_lnd, 1, nvar, dlnT_bc_dlnd*scale)
             if (test_partials) then
                s% solver_test_partials_var = i_lnT
                s% solver_test_partials_dval_dx = dlnT_bc_dlnT_const_Pgas
@@ -2121,18 +2120,18 @@
 
             if (skip_partials) return
 
-            call e00(s, xscale, i_eqn, i_lnR, 1, nvar, dlnP_bc_dlnR)
+            call e00(s, i_eqn, i_lnR, 1, nvar, dlnP_bc_dlnR)
 
-            call e00(s, xscale, i_eqn, i_lnd, 1, nvar, &
+            call e00(s, i_eqn, i_lnd, 1, nvar, &
                dlnP_bc_dlnd - s% chiRho_for_partials(1))
 
             if (.not. s% do_struct_thermo) return
 
-            call e00(s, xscale, i_eqn, i_lnT, 1, nvar,&
+            call e00(s, i_eqn, i_lnT, 1, nvar,&
                 dlnP_bc_dlnT - s% chiT_for_partials(1))
 
             dlnP_bc_dL = dlnP_bc_dlnPsurf*dlnPsurf_dL
-            if (i_lum /= 0) call e00(s, xscale, i_eqn, i_lum, 1, nvar, dlnP_bc_dL)
+            if (i_lum /= 0) call e00(s, i_eqn, i_lum, 1, nvar, dlnP_bc_dL)
             
             if (test_partials) then
                s% solver_test_partials_var = s% i_lnT
@@ -2245,9 +2244,9 @@
             if (skip_partials) return
             
             d = s% rho(2)*s% dVARDOT_dVAR - s% rho(1)*s% dlnd_dt(2)
-            call e00(s, xscale, i_eqn, i_lnd, 1, nvar, d)
+            call e00(s, i_eqn, i_lnd, 1, nvar, d)
             d = s% rho(2)*s% dlnd_dt(1) - s% rho(1)*s% dVARDOT_dVAR
-            call ep1(s, xscale, i_eqn, i_lnd, 1, nvar, d)
+            call ep1(s, i_eqn, i_lnd, 1, nvar, d)
          
          end subroutine set_compression_eqn
 

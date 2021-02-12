@@ -319,10 +319,10 @@
             call unpack_res18_partials(s, k, nvar, xscale, i_du_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% w_div_wc_flag) then
-               call e00(s, xscale, i_du_dt, s% i_w_div_wc, k, nvar, d_d00(s% i_lum))
+               call e00(s, i_du_dt, s% i_w_div_wc, k, nvar, d_d00(s% i_lum))
                d_d00(s% i_lum) = 0d0
                if (k < nz) then
-                  call ep1(s, xscale, s% i_du_dt, s% i_w_div_wc, k, nvar, d_dp1(s% i_lum))
+                  call ep1(s, s% i_du_dt, s% i_w_div_wc, k, nvar, d_dp1(s% i_lum))
                   d_dp1(s% i_lum) = 0d0
                end if
             end if

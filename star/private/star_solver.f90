@@ -47,7 +47,7 @@
       subroutine solver( &
             s, nz, nvar, dx, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            xscale, equ, work, lwork, iwork, liwork, AF, &
+            equ, work, lwork, iwork, liwork, AF, &
             convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
          use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
@@ -58,7 +58,6 @@
          integer, intent(in) :: nvar ! number of variables per zone
          real(dp), pointer, dimension(:) :: dx ! =(nvar,nz)
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), pointer, dimension(:) :: xscale ! =(nvar,nz)
          real(dp), pointer, dimension(:) :: equ ! =(nvar,nz)
          ! equ(i) has the residual for equation i, i.e., the difference between
          ! the left and right hand sides of the equation.
@@ -114,7 +113,7 @@
          call do_solver( &
             s, nz, nvar, dx, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            xscale, equ, work, lwork, iwork, liwork, &
+            equ, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          contains
@@ -174,7 +173,7 @@
       subroutine do_solver( &
             s, nz, nvar, dx1, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            xscale1, equ1, work, lwork, iwork, liwork, &
+            equ1, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
@@ -183,7 +182,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
-         real(dp), pointer, dimension(:) :: dx1, equ1, xscale1
+         real(dp), pointer, dimension(:) :: dx1, equ1
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
@@ -238,7 +237,7 @@
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
 
-         real(dp), pointer, dimension(:,:) :: dx, equ, xscale ! (nvar,nz)
+         real(dp), pointer, dimension(:,:) :: dx, equ ! (nvar,nz)
          real(dp), pointer, dimension(:,:) :: AF ! (ldAF,neq)
          real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
@@ -247,7 +246,6 @@
 
          dx(1:nvar,1:nz) => dx1(1:neq)
          equ(1:nvar,1:nz) => equ1(1:neq)
-         xscale(1:nvar,1:nz) => xscale1(1:neq)
          AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
          tol_msg(1) = 'avg corr'
@@ -322,7 +320,6 @@
          passed_tol_tests = .false. ! goes true when pass the tests
          convergence_failure = .false. ! goes true when time to give up
          coeff = 1.d0
-         xscale = 1.d0
 
          residual_norm=0
          max_residual=0
@@ -334,7 +331,7 @@
          f=0d0
          slope=0d0
 
-         call set_xscale_info(s, nvar, nz, xscale, ierr)
+         call set_xscale_info(s, nvar, nz, ierr)
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: set_xscale_info returned ierr', ierr
@@ -342,7 +339,7 @@
             return
          end if
          
-         call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)         
+         call eval_equations(s, iter, nvar, nz, dx, equ, ierr)         
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -411,7 +408,7 @@
                   tol_residual_norm, tol_max_residual
             end if
 
-            call setmatrix(neq, dx, xscale, dxsave, ddxsave, ierr)
+            call setmatrix(neq, dx, dxsave, ddxsave, ierr)
             if (ierr /= 0) then
                call write_msg('setmatrix returned ierr /= 0')
                convergence_failure = .true.
@@ -428,15 +425,14 @@
                exit iter_loop
             end if
 
-            ! inform caller about the correction
-            call inspectB(s, iter, nvar, nz, dx, soln, xscale, ierr)
+            call inspectB(s, iter, nvar, nz, dx, soln, ierr)
             if (ierr /= 0) then
                call oops('inspectB returned ierr')
                exit iter_loop
             end if
 
             ! compute size of scaled correction B
-            call sizeB(s, iter, nvar, nz, soln, xscale, &
+            call sizeB(s, iter, nvar, nz, soln, &
                   max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             if (ierr /= 0) then
                call oops('correction rejected by sizeB')
@@ -494,7 +490,7 @@
 
             ! fix B if out of definition domain
             call Bdomain(s, &
-               iter, nvar, nz, soln, dx, xscale, correction_factor, ierr)
+               iter, nvar, nz, soln, dx, correction_factor, ierr)
             if (ierr /= 0) then ! correction cannot be fixed
                call oops('correction rejected by Bdomain')
                exit iter_loop
@@ -825,8 +821,8 @@
                coeff = max(min_corr_coeff, alam)
                s% solver_adjust_iter = iter
 
-               call apply_coeff(nvar, nz, dx, dxsave, soln, xscale, coeff, skip_eval_f)
-               call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)
+               call apply_coeff(nvar, nz, dx, dxsave, soln, coeff, skip_eval_f)
+               call eval_equations(s, iter, nvar, nz, dx, equ, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -963,10 +959,10 @@
          end subroutine adjust_correction
 
 
-         subroutine apply_coeff(nvar, nz, dx, dxsave, soln, xscale, coeff, just_use_dx)
+         subroutine apply_coeff(nvar, nz, dx, dxsave, soln, coeff, just_use_dx)
             integer, intent(in) :: nvar, nz
             real(dp), intent(inout), dimension(:,:) :: dx
-            real(dp), intent(in), dimension(:,:) :: dxsave, soln, xscale
+            real(dp), intent(in), dimension(:,:) :: dxsave, soln
             real(dp), intent(in) :: coeff
             logical, intent(in) :: just_use_dx
             integer :: i, k
@@ -976,13 +972,13 @@
                if (coeff == 1d0) then
                   do k=1,nz
                      do i=1,nvar
-                        dx(i,k) = dx(i,k) + xscale(i,k)*soln(i,k)
+                        dx(i,k) = dx(i,k) + s% x_scale(i,k)*soln(i,k)
                      end do
                   end do
                else
                   do k=1,nz
                      do i=1,nvar
-                        dx(i,k) = dx(i,k) + coeff*xscale(i,k)*soln(i,k)
+                        dx(i,k) = dx(i,k) + coeff*s% x_scale(i,k)*soln(i,k)
                      end do
                   end do
                end if
@@ -992,14 +988,14 @@
             if (coeff == 1d0) then
                do k=1,nz
                   do i=1,nvar
-                     dx(i,k) = dxsave(i,k) + xscale(i,k)*soln(i,k)
+                     dx(i,k) = dxsave(i,k) + s% x_scale(i,k)*soln(i,k)
                   end do
                end do
                return
             end if
             do k=1,nz
                do i=1,nvar
-                  dx(i,k) = dxsave(i,k) + coeff*xscale(i,k)*soln(i,k)
+                  dx(i,k) = dxsave(i,k) + coeff*s% x_scale(i,k)*soln(i,k)
                end do
             end do
          end subroutine apply_coeff
@@ -1079,29 +1075,29 @@
          end subroutine solve_mtx
 
 
-         logical function do_enter_setmatrix(neq, dx, xscale, ierr)
+         logical function do_enter_setmatrix(neq, dx, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             implicit none
             integer, intent(in) :: neq
-            real(dp), pointer, dimension(:,:) :: dx, ddx, xscale
+            real(dp), pointer, dimension(:,:) :: dx, ddx
             integer, intent(out) :: ierr
             logical :: need_solver_to_eval_jacobian
             integer :: i, j, k
             include 'formats'
             need_solver_to_eval_jacobian = .true.
             call enter_setmatrix(s, iter,  &
-                  nvar, nz, neq, dx, xscale, xder, need_solver_to_eval_jacobian, &
+                  nvar, nz, neq, dx, xder, need_solver_to_eval_jacobian, &
                   size(A,dim=1), A1, ierr)
             do_enter_setmatrix = need_solver_to_eval_jacobian
          end function do_enter_setmatrix
 
 
          subroutine setmatrix( &
-               neq, dx, xscale, dxsave, ddxsave, ierr)
+               neq, dx, dxsave, ddxsave, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             use star_utils, only: e00, em1, ep1
             integer, intent(in) :: neq
-            real(dp), pointer, dimension(:,:) :: dx, xscale, dxsave, ddxsave
+            real(dp), pointer, dimension(:,:) :: dx, dxsave, ddxsave
             integer, intent(out) :: ierr
 
             integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
@@ -1118,17 +1114,17 @@
                s% solver_test_partials_k > 0 .and. &
                s% solver_call_number == s% solver_test_partials_call_number .and. &
                s% solver_test_partials_iter_number == iter
-            need_solver_to_eval_jacobian = do_enter_setmatrix(neq, dx, xscale, ierr)
+            need_solver_to_eval_jacobian = do_enter_setmatrix(neq, dx, ierr)
             if (ierr /= 0) return
 
             if (.not. testing_partial) return
 
             if (testing_partial) then 
                ! get solver_test_partials_var and solver_test_partials_dval_dx
-               call eval_partials(s, nvar, xscale, ierr)
+               call eval_partials(s, nvar, s% x_scale, ierr)
                if (ierr /= 0) return
             else
-               call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)
+               call eval_equations(s, iter, nvar, nz, dx, equ, ierr)
                if (ierr /= 0) then
                   write(*,3) '1st call eval_equations failed'
                   stop 'setmatrix'
@@ -1154,12 +1150,12 @@
                   k_hi = min(k_hi,s% nz)
                end if
                do k = k_lo, k_hi
-                  call test_cell_partials(k, dx, xscale, save_dx, save_equ, ierr)
+                  call test_cell_partials(k, dx, save_dx, save_equ, ierr)
                   if (ierr /= 0) stop 'failed solver_test_partials'
                end do
             else
                k = s% solver_test_partials_k
-               call test_cell_partials(k, dx, xscale, save_dx, save_equ, ierr) 
+               call test_cell_partials(k, dx, save_dx, save_equ, ierr) 
                if (ierr /= 0) stop 'failed solver_test_partials'
             end if
             deallocate(save_dx, save_equ)
@@ -1168,10 +1164,10 @@
          end subroutine setmatrix
 
 
-         subroutine test_cell_partials(k, dx, xscale, save_dx, save_equ, ierr) 
+         subroutine test_cell_partials(k, dx, save_dx, save_equ, ierr) 
             use star_utils, only: lookup_nameofvar, lookup_nameofequ
             integer, intent(in) :: k
-            real(dp), pointer, dimension(:,:) :: dx, xscale, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
             integer, intent(out) :: ierr
             integer :: i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             include 'formats'
@@ -1222,13 +1218,13 @@
                do i_equ = 1, s% nvar_hydro
                   call test_equ_partials( &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, dx, xscale, save_dx, save_equ, ierr)   
+                     k, dx, save_dx, save_equ, ierr)   
                   if (ierr /= 0) stop 'failed solver_test_partials'
                end do
             else
                call test_equ_partials( &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, dx, xscale, save_dx, save_equ, ierr)   
+                  k, dx, save_dx, save_equ, ierr)   
                if (ierr /= 0) stop 'failed solver_test_partials'
             end if     
          end subroutine test_cell_partials               
@@ -1236,10 +1232,10 @@
 
          subroutine test_equ_partials( &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, dx, xscale, save_dx, save_equ, ierr)
+               k, dx, save_dx, save_equ, ierr)
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
-            real(dp), pointer, dimension(:,:) :: dx, xscale, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
             integer, intent(out) :: ierr
             real(dp) :: dvardx_0
             integer :: i, j_var_xa_index, j_var_sink_xa_index
@@ -1249,7 +1245,7 @@
                   do i = 1, s% nvar_hydro
                      call test3_partials( &
                         i_equ, i, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                        k, dx, xscale, save_dx, save_equ, ierr)
+                        k, dx, save_dx, save_equ, ierr)
                      if (ierr /= 0) stop 'failed solver_test_partials'
                      write(*,*)
                   end do
@@ -1258,14 +1254,14 @@
                else
                   call test3_partials( &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, dx, xscale, save_dx, save_equ, ierr)
+                     k, dx, save_dx, save_equ, ierr)
                   if (ierr /= 0) stop 'failed solver_test_partials'               
                end if
             else ! i_equ == 0
                if (i_var /= 0) then
                   call test1_partial( &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, 0, s% solver_test_partials_dval_dx, dx, xscale, save_dx, save_equ, ierr)
+                     k, 0, s% solver_test_partials_dval_dx, dx, save_dx, save_equ, ierr)
                else ! i_var == 0
                   if (s% solver_test_partials_var <= 0) then
                      write(*,2) 'need to set solver_test_partials_var', s% solver_test_partials_var
@@ -1288,7 +1284,7 @@
                   call test1_partial( &
                      i_equ, s% solver_test_partials_var, s% solver_test_partials_dx_sink, &
                      j_var_xa_index, j_var_sink_xa_index, &                     
-                     k, 0, s% solver_test_partials_dval_dx, dx, xscale, save_dx, save_equ, ierr)
+                     k, 0, s% solver_test_partials_dval_dx, dx, save_dx, save_equ, ierr)
                end if
                if (ierr /= 0) stop 'failed solver_test_partials'
             end if               
@@ -1448,10 +1444,10 @@
 
          subroutine test3_partials( &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, dx, xscale, save_dx, save_equ, ierr)
+               k, dx, save_dx, save_equ, ierr)
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
-            real(dp), pointer, dimension(:,:) :: dx, xscale, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
             integer, intent(out) :: ierr
             real(dp) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0
@@ -1459,13 +1455,16 @@
             dvardx0_p1 = 0d0
             if (i_equ > 0) then
                if (i_var > s% nvar_hydro) then ! testing abundance
-                  if (k > 1) dvardx0_m1 = s% lblk(i_equ,i_var,k)/xscale(i_var,k-1) - s% lblk(i_equ,i_var_sink,k)/xscale(i_var_sink,k-1)
-                  dvardx0_00 = s% dblk(i_equ,i_var,k)/xscale(i_var,k) - s% dblk(i_equ,i_var_sink,k)/xscale(i_var_sink,k)
-                  if (k < s% nz) dvardx0_p1 = s% ublk(i_equ,i_var,k)/xscale(i_var,k+1) - s% ublk(i_equ,i_var_sink,k)/xscale(i_var_sink,k+1)
+                  if (k > 1) dvardx0_m1 = &
+                     s% lblk(i_equ,i_var,k)/s% x_scale(i_var,k-1) - s% lblk(i_equ,i_var_sink,k)/s% x_scale(i_var_sink,k-1)
+                  dvardx0_00 = &
+                     s% dblk(i_equ,i_var,k)/s% x_scale(i_var,k) - s% dblk(i_equ,i_var_sink,k)/s% x_scale(i_var_sink,k)
+                  if (k < s% nz) dvardx0_p1 = &
+                     s% ublk(i_equ,i_var,k)/s% x_scale(i_var,k+1) - s% ublk(i_equ,i_var_sink,k)/s% x_scale(i_var_sink,k+1)
                else
-                  if (k > 1) dvardx0_m1 = s% lblk(i_equ,i_var,k)/xscale(i_var,k-1)
-                  dvardx0_00 = s% dblk(i_equ,i_var,k)/xscale(i_var,k)
-                  if (k < s% nz) dvardx0_p1 = s% ublk(i_equ,i_var,k)/xscale(i_var,k+1)
+                  if (k > 1) dvardx0_m1 = s% lblk(i_equ,i_var,k)/s% x_scale(i_var,k-1)
+                  dvardx0_00 = s% dblk(i_equ,i_var,k)/s% x_scale(i_var,k)
+                  if (k < s% nz) dvardx0_p1 = s% ublk(i_equ,i_var,k)/s% x_scale(i_var,k+1)
                end if
             else if (i_equ == -1) then ! 'lnE'
                call get_lnE_partials( &
@@ -1503,17 +1502,17 @@
             if (k > 1) then
                call test1_partial( &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, -1, dvardx0_m1, dx, xscale, save_dx, save_equ, ierr)
+                  k, -1, dvardx0_m1, dx, save_dx, save_equ, ierr)
                if (ierr /= 0) stop 'test3_partials'
             end if
             call test1_partial( &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, 0, dvardx0_00, dx, xscale, save_dx, save_equ, ierr)
+               k, 0, dvardx0_00, dx, save_dx, save_equ, ierr)
             if (ierr /= 0) stop 'test3_partials'
             if (k < s% nz) then
                call test1_partial( &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, 1, dvardx0_p1, dx, xscale, save_dx, save_equ, ierr)
+                  k, 1, dvardx0_p1, dx, save_dx, save_equ, ierr)
                if (ierr /= 0) stop 'test3_partials'
             end if
          end subroutine test3_partials
@@ -1521,12 +1520,12 @@
 
          subroutine test1_partial(&
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, dvardx_0, dx, xscale, save_dx, save_equ, ierr)
+               k, k_off, dvardx_0, dx, save_dx, save_equ, ierr)
             use chem_def, only: chem_isos
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k, k_off
             real(dp), intent(in) :: dvardx_0
-            real(dp), pointer, dimension(:,:) :: dx, xscale, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
             character (len=3) :: k_off_str
             integer, intent(out) :: ierr 
             character (len = 32) :: equ_str
@@ -1640,7 +1639,7 @@
                end if
                dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations(s, iter, nvar, nz, dx, xscale, equ, ierr)            
+            call eval_equations(s, iter, nvar, nz, dx,  equ, ierr)            
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
@@ -1819,7 +1818,7 @@
             end if
             
             if (max_corr_j < 0) then
-               call sizeB(s, iter, nvar, nz, B, xscale, &
+               call sizeB(s, iter, nvar, nz, B, &
                   max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             end if
             

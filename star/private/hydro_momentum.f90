@@ -325,18 +325,18 @@
             call unpack_res18_partials(s, k, nvar, xscale, i_dv_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% rotation_flag .and. s% w_div_wc_flag .and. s% use_gravity_rotation_correction) then
-               call e00(s, xscale, i_dv_dt, s% i_w_div_wc, k, nvar, iXPavg*d_grav_dw*dm_div_A)            
+               call e00(s, i_dv_dt, s% i_w_div_wc, k, nvar, iXPavg*d_grav_dw*dm_div_A)            
             end if            
             ! do partials wrt composition   
             resid1 = resid1_18%val         
             do j=1,s% species
                d_residual_dxa00(j) = resid1*d_iXPavg_dxa00(j) - iXPavg*d_dXP_dxa00(j)
-               call e00(s, xscale, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
+               call e00(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
             end do
             if (k > 1) then 
                do j=1,s% species
                   d_residual_dxam1(j) = resid1*d_iXPavg_dxam1(j) - iXPavg*d_dXP_dxam1(j)
-                  call em1(s, xscale, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
+                  call em1(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
                end do
             end if            
          end subroutine unpack_res18
@@ -629,13 +629,13 @@
                equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
                s% lnR_residual(k) = equ(i_dlnR_dt, k)
                if (skip_partials) return
-               call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
+               call e00(s, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
                return
             else if (i_u /= 0) then
                equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
                s% lnR_residual(k) = equ(i_dlnR_dt, k)
                if (skip_partials) return
-               call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, 1d0/cs)
+               call e00(s, i_dlnR_dt, i_u, k, nvar, 1d0/cs)
                return
             end if
          end if
@@ -678,27 +678,27 @@
 
          ! partials of dr_div_r0_expected
          if (i_v /= 0) then            
-            call e00(s, xscale, i_dlnR_dt, i_v, k, nvar, v_factor*dt/r0)            
+            call e00(s, i_dlnR_dt, i_v, k, nvar, v_factor*dt/r0)            
          else if (i_u /= 0) then
             uc_factor = v_factor*dt/r0
-            call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
-            call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)         
-            call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
+            call e00(s, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
+            call e00(s, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)         
+            call e00(s, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
             if (s% do_struct_thermo) &
-               call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
+               call e00(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
             if (k > 1) then
-               call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
-               call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
+               call em1(s, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
+               call em1(s, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
                if (s% do_struct_thermo) &
-                  call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
+                  call em1(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
             end if         
             if (s% w_div_wc_flag) then
-               call e00(s, xscale, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
+               call e00(s, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
             end if
          end if
 
          ! partial of -dr_div_r0_actual wrt lnR
-         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0) 
+         call e00(s, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0) 
 
          if (test_partials) then   
             s% solver_test_partials_var = i_lnR

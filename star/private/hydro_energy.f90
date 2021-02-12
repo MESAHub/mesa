@@ -463,7 +463,7 @@
             if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
                if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
                   do j=1,s% species
-                     call e00(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
+                     call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
                               scal*s% d_epsnuc_dx(j,k))
                   end do
                end if
@@ -471,28 +471,28 @@
 
             if (.not. eps_grav_form) then          
                do j=1,s% species
-                  call e00(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
+                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
                            -scal*(s%energy(k)/dt)*s% dlnE_dxa_for_partials(j,k))
                end do                           
             else if (do_chem .and. (.not. doing_op_split_burn) .and. &
                      (s% dxdt_nuc_factor > 0d0 .or. s% mix_factor > 0d0)) then                     
                do j=1,s% species
-                  call e00(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
+                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
                      scal*s% d_eps_grav_dx(j,k))
                end do               
             end if
             
             do j=1,s% species
-               call e00(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxa00(j)/dm)
+               call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxa00(j)/dm)
             end do
             if (k > 1) then 
                do j=1,s% species
-                  call em1(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxam1(j)/dm)
+                  call em1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxam1(j)/dm)
                end do
             end if
             if (k < nz) then
                do j=1,s% species
-                  call ep1(s, xscale, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxap1(j)/dm)
+                  call ep1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxap1(j)/dm)
                end do
             end if         
             

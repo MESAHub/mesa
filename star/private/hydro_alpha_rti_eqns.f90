@@ -234,11 +234,11 @@
                d_dalpha_00 = d_dalpha_00 + d_dadt_mix_da00/eqn_scale
                if (k > 1) then
                   d_dalpha_m1 = d_dadt_mix_dam1/eqn_scale
-                  call em1(s, xscale, i, i, k, nvar, d_dalpha_m1)
+                  call em1(s, i, i, k, nvar, d_dalpha_m1)
                end if
                if (k < nz) then
                   d_dalpha_p1 = d_dadt_mix_dap1/eqn_scale
-                  call ep1(s, xscale, i, i, k, nvar, d_dalpha_p1)
+                  call ep1(s, i, i, k, nvar, d_dalpha_p1)
                end if
             end if
 
@@ -248,7 +248,7 @@
          end if
 
          
-         call e00(s, xscale, i, i, k, nvar, d_dalpha_00)
+         call e00(s, i, i, k, nvar, d_dalpha_00)
 
          if (test_partials) then   
             s% solver_test_partials_var = i
