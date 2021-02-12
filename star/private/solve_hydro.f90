@@ -306,6 +306,7 @@
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
+
          if (ierr /= 0) then
             if (report) then
                write(*, *) 'hydro_solver_step returned ierr', ierr
@@ -484,6 +485,11 @@
          logical :: failure
          real(dp) :: varscale
          real(dp), parameter :: xscale_min = 1
+         real(dp), pointer :: dx(:,:)
+
+         real(dp), pointer, dimension(:,:) :: x_scale
+         real(dp), pointer, dimension(:) :: x_scale1
+
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -491,6 +497,8 @@
          ierr = 0
 
          neq = nvar*nz
+
+         dx(1:nvar,1:nz) => dx1(1:neq)
 
          if (dbg) write(*, *) 'enter hydro_solver_step'
 
@@ -505,6 +513,11 @@
             return
          end if
 
+         call non_crit_get_work_array( &
+            s, x_scale1, neq, nvar*nz_alloc_extra, 'hydro_solver_step', ierr)
+         if (ierr /= 0) return
+         x_scale(1:nvar,1:nz) => x_scale1(1:neq)
+
          do i = 1, nvar
             if (i <= s% nvar_hydro) then
                varscale = maxval(abs(s% xh(i,1:nz)))
@@ -512,7 +525,7 @@
             else
                varscale = 1
             end if
-            s% x_scale(i, 1:nz) = varscale
+            x_scale(i, 1:nz) = varscale
          end do
 
          if (dbg) write(*, *) 'call solver'
@@ -525,11 +538,13 @@
          if (converged) then
             do k=1,nz
                do j=1,min(nvar,nvar_hydro)
-                  s% xh(j,k) = s% xh_start(j,k) + s% solver_dx(j,k)
+                  s% xh(j,k) = s% xh_start(j,k) + dx(j,k)
                end do
             end do
             ! s% xa has already been updated by final call to set_solver_vars from solver
          end if
+
+         call non_crit_return_work_array(s, x_scale1, 'hydro_solver_step')
 
 
          contains
@@ -551,9 +566,9 @@
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.        
             call solver( &
-               s, nz, nvar, s% solver_dx1, skip_global_corr_coeff_limit, &
+               s, nz, nvar, dx1, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-               s% x_scale1, s% equ1, &
+               x_scale1, s% equ1, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &
                s% AF1, failure, ierr)

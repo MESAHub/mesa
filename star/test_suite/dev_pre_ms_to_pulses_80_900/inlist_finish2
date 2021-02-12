@@ -10,6 +10,9 @@
       required_termination_code_string(2) = 'log_Rsurf_upper_limit' ! for higher masses
       required_termination_code_string(3) = 'remnant_mass_min_limit' ! for completely unbound cases
       !required_termination_code_string(4) = 'max_model_number' ! for testing
+
+      change_initial_RTI_flag = .true.
+      new_RTI_flag = .true.
       
       set_initial_model_number = .false.
       set_initial_age = .false.
@@ -44,6 +47,8 @@
 ! rotation
 
 ! mlt
+      max_logT_for_mlt = 0d0  
+      ! go purely radiative when have rapid changes and strong shocks
 
 ! mixing
       
@@ -179,7 +184,7 @@ Profile_Panels3_xaxis_reversed = .true.
 
 Profile_Panels3_num_panels = 5
 
-Profile_Panels3_yaxis_name(3) = 'gamma1' ! 'avQ' ! 
+Profile_Panels3_yaxis_name(3) = 'gamma1' 
     Profile_Panels3_ymin(3) = 1.26d0
     Profile_Panels3_ymax(3) = -101d0
 Profile_Panels3_other_yaxis_name(3) =  'v_div_cs'
@@ -189,8 +194,8 @@ Profile_Panels3_yaxis_name(4) = 'logRho'
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
     Profile_Panels3_other_dymin(4) = 12
  
-Profile_Panels3_yaxis_name(5) =  'logT' ! 'mass' ! 'logR_cm' !
-    Profile_Panels3_ymin(5) = -101 ! -3d0
+Profile_Panels3_yaxis_name(5) =  'logT'
+    Profile_Panels3_ymin(5) = -101 
 Profile_Panels3_other_yaxis_name(5) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(5) = 0.15
     Profile_Panels3_other_ymin(5) = -0.1
