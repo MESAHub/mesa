@@ -95,10 +95,6 @@
       gold_tol_max_residual3 = 1d-3
       
       calculate_Brunt_B = .false.
-      
-      !use_velocity_time_centering = .true.
-      !include_P_in_velocity_time_centering = .true.
-      !include_L_in_velocity_time_centering = .true.
 
       always_use_dedt_form_of_energy_eqn = .true.       
       use_dPrad_dm_form_of_T_gradient_eqn = .true.

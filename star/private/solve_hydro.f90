@@ -242,6 +242,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit, report
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
+         real(dp), pointer :: dx(:,:), dx1(:) ! dx => dx1
          integer, intent(in) :: solver_lwork, solver_liwork
          real(dp), pointer :: solver_work(:) ! (solver_lwork)
          integer, pointer :: solver_iwork(:) ! (solver_liwork)
@@ -280,11 +281,16 @@
             end if
          end if
 
+         call non_crit_get_work_array(s, dx1, nvar*nz, nvar*nz_alloc_extra, 'solver', ierr)
+         if (ierr /= 0) return
+         dx(1:nvar,1:nz) => dx1(1:nvar*nz)
+         s% solver_dx(1:nvar,1:nz) => dx1(1:nvar*nz)
+
          call set_xh(s, nvar) ! set xh using current structure info
 
          do k = 1, nz
             do j1 = 1, min(nvar, s% nvar_hydro)
-               s% solver_dx(j1,k) = s% xh(j1,k) - s% xh_start(j1,k)
+               dx(j1,k) = s% xh(j1,k) - s% xh_start(j1,k)
             end do
          end do
 
@@ -293,7 +299,7 @@
                j2 = 1
                do j1 = s% i_chem1, nvar
                   s% xa_sub_xa_start(j2,k) = s% xa(j2,k) - s% xa_start(j2,k)
-                  s% solver_dx(j1,k) = s% xa_sub_xa_start(j2,k)
+                  dx(j1,k) = s% xa_sub_xa_start(j2,k)
                   j2 = j2+1
                end do
             end do
@@ -301,11 +307,14 @@
 
          converged = .false.
          call hydro_solver_step( &
-            s, nz, s% nvar_hydro, nvar, s% solver_dx1, skip_global_corr_coeff_limit, &
+            s, nz, s% nvar_hydro, nvar, dx1, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
+
+         call non_crit_return_work_array(s, dx1, 'solver')
+         nullify(s% solver_dx)
 
          if (ierr /= 0) then
             if (report) then
