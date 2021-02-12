@@ -52,18 +52,17 @@
       contains
 
 
-      subroutine set_solver_vars(s, iter, nvar, dx, xscale, dt, ierr)
+      subroutine set_solver_vars(s, iter, nvar, dt, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar
-         real(dp), dimension(:,:) :: dx, xscale
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          s% num_solver_setvars = s% num_solver_setvars + 1
-         call set_vars_for_solver(s, nvar, 1, s% nz, iter, dx, xscale, dt, ierr)
+         call set_vars_for_solver(s, nvar, 1, s% nz, iter, dt, ierr)
       end subroutine set_solver_vars
 
 
-      subroutine set_vars_for_solver(s, nvar, nzlo, nzhi, iter, dx, xscale, dt, ierr)
+      subroutine set_vars_for_solver(s, nvar, nzlo, nzhi, iter, dt, ierr)
          use const_def, only: secyer, Msun, Lsun, Rsun
          use star_utils, only: set_rmid, set_dm_bar, set_m_and_dm, set_rv_info
          use star_utils, only: current_min_xa_hard_limit, current_sum_xa_hard_limit, &
@@ -74,7 +73,6 @@
          use chem_def
          type (star_info), pointer :: s
          integer, intent(in) :: nvar, nzlo, nzhi, iter
-         real(dp), dimension(:,:) :: dx, xscale
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
@@ -132,11 +130,11 @@
             i_var = lookup_nameofvar(s, s% solver_test_partials_show_dx_var_name)            
             if (i_var > 0) then
                if (i_var > nvar_hydro) then
-                  dx_for_i_var = dx(i_var,k)
-                  x_for_i_var = xa_start(i_var-nvar_hydro,k) + dx(i_var,k)
+                  dx_for_i_var = s% solver_dx(i_var,k)
+                  x_for_i_var = xa_start(i_var-nvar_hydro,k) + s% solver_dx(i_var,k)
                else
-                  dx_for_i_var = dx(i_var,k)
-                  x_for_i_var = xh_start(i_var,k) + dx(i_var,k)
+                  dx_for_i_var = s% solver_dx(i_var,k)
+                  x_for_i_var = xh_start(i_var,k) + s% solver_dx(i_var,k)
                end if
                write(*,3) 'dx, x for var name ' // &
                   trim(s% solver_test_partials_show_dx_var_name), &
@@ -180,7 +178,7 @@
          if (s% trace_k > 0 .and. s% trace_k <= nz) then
             k = s% trace_k
             if (i_lnd /= 0) write(*,3) 'set_vars_for_solver: lnd dx', &
-               k, s% solver_iter, xh_start(i_lnd,k), dx(i_lnd,k)
+               k, s% solver_iter, xh_start(i_lnd,k), s% solver_dx(i_lnd,k)
          end if
 
          fe56 = s% net_iso(ife56)
@@ -189,8 +187,8 @@
          if (nvar > nvar_hydro) then
             do k=1,nz
                do j=1,species
-                  s% xa_sub_xa_start(j,k) = dx(j+nvar_hydro,k)
-                  s% xa(j,k) = xa_start(j,k) + dx(j+nvar_hydro,k)
+                  s% xa_sub_xa_start(j,k) = s% solver_dx(j+nvar_hydro,k)
+                  s% xa(j,k) = xa_start(j,k) + s% solver_dx(j+nvar_hydro,k)
                end do
             end do
             max_fixes = 0 !5
@@ -214,7 +212,7 @@
                      do k=klo,khi
                         write(*,2) &
                            'negative ' // trim(chem_isos% name(s% chem_id(j))), &
-                           k, s% xa(j,k), xa_start(j,k), dx(nvar_hydro+j,k), s% m(k)/Msun
+                           k, s% xa(j,k), xa_start(j,k), s% solver_dx(nvar_hydro+j,k), s% m(k)/Msun
                      end do
                   end if
                   s% retry_message = 'some abundance < min_xa_hard_limit'
@@ -319,8 +317,8 @@
             do k=1,nz
                if (is_bad_num(s% L(k))) then
                   if (s% report_ierr) write(*,2) 'set_vars_for_solver L', k, s% L(k), &
-                     xh_start(i_lum,k) + dx(i_lum,k), &
-                     xh_start(i_lum,k), dx(i_lum,k)
+                     xh_start(i_lum,k) + s% solver_dx(i_lum,k), &
+                     xh_start(i_lum,k), s% solver_dx(i_lum,k)
                   s% retry_message = 'bad num for some L'
                   ierr = -1
                   if (s% stop_for_bad_nums) then
@@ -339,12 +337,12 @@
                do k=1,nz
                   if (abs(1d0 - sum(s% xa(:,k))) > 1d-3) then
                      write(*,2) 'set_vars_for_solver: bad xa sum', k, &
-                        sum(s% xa(:,k)), sum(xa_start(:,k)), sum(dx(i_chem1:nvar,k))
+                        sum(s% xa(:,k)), sum(xa_start(:,k)), sum(s% solver_dx(i_chem1:nvar,k))
                      write(*,'(51x,a)') 'xa, xa_start+dx, xa_start, dx'
                      do j=1,species
                         write(*,2) trim(chem_isos% name(s% chem_id(j))), k, &
-                           s% xa(j,k), xa_start(j,k) + dx(i_chem1-1+j,k), &
-                           xa_start(j,k), dx(i_chem1-1+j,k)
+                           s% xa(j,k), xa_start(j,k) + s% solver_dx(i_chem1-1+j,k), &
+                           xa_start(j,k), s% solver_dx(i_chem1-1+j,k)
                      end do
 
                      exit
@@ -359,7 +357,7 @@
 
          if (do_struct) then
             do_edit_lnR = do_lnR .and. .not. (s% doing_check_partials)
-            if (do_edit_lnR) call edit_lnR(s, xh_start, dx)
+            if (do_edit_lnR) call edit_lnR(s, xh_start, s% solver_dx)
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
             do k=1,nz
                if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
@@ -423,14 +421,14 @@
             if (do_struct) then
 
                do j=1,min(nvar, nvar_hydro)
-                  x(j) = xh_start(j,k) + dx(j,k)
+                  x(j) = xh_start(j,k) + s% solver_dx(j,k)
                   !write(*,2) 'new ' // s% nameofvar(j), k, x(j)
                end do
 
                if (do_lnT) then
 
                   s% lnT(k) = x(i_lnT)
-                  s% dxh_lnT(k) = dx(i_lnT,k)
+                  s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                   if (abs(s% lnT(k) - s% lnT_start(k)) > &
                           ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
                        s% min_logT_for_hydro_mtx_max_allowed < &
@@ -493,7 +491,7 @@
 
                if (do_et) then
                   s% et(k) = max(x(i_et), min_et)
-                  s% dxh_et(k) = dx(i_et,k)
+                  s% dxh_et(k) = s% solver_dx(i_et,k)
                   if (s% et(k) <= 0d0 .or. is_bad_num(s% et(k))) then
                      s% retry_message = 'bad num for et'
                      if (report) write(*,2) 'bad num et', k, s% et(k)
@@ -503,7 +501,7 @@
                         write(*,2) 'set_vars_for_solver et', k, s% et(k)
                         write(*,2) 'set_vars_for_solver et_start', k, s% et_start(k)
                         write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_et,k)
-                        write(*,2) 'set_vars_for_solver dx', k, dx(i_et,k)
+                        write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_et,k)
                         stop 'set_vars_for_solver'
 !$omp end critical (set_vars_for_solver_crit1)
                      end if
@@ -557,7 +555,7 @@
                   end if
 
                   if (do_conv_vel) then
-                     s% dxh_ln_cvpv0(k) = dx(i_ln_cvpv0,k)
+                     s% dxh_ln_cvpv0(k) = s% solver_dx(i_ln_cvpv0,k)
                      s% conv_vel(k) = max(0d0, exp(x(i_ln_cvpv0))-s% conv_vel_v0)
                      if (s% conv_vel(k) > 1d90 .or. is_bad_num(s% conv_vel(k))) then
                         s% retry_message = 'bad num for conv_vel'
@@ -571,7 +569,6 @@
                      if (s% conv_vel(k) < 0d0) then
                         s% conv_vel(k) = 0d0
                         x(i_ln_cvpv0) = log(s% conv_vel_v0)
-                        ! x(j) = xh_start(j,k) + dx(j,k)
                         s% dxh_ln_cvpv0(k) = x(i_ln_cvpv0) - xh_start(i_ln_cvpv0,k)
                      end if
                   end if
@@ -584,9 +581,6 @@
                      if (s% w_div_w_crit_roche(k) < -0.99d0) then
                         s% w_div_w_crit_roche(k) = -0.99d0
                      end if
-                     !if (k==19) then
-                     !   write(*,*) "check w_div_wc_roche", s% w_div_w_crit_roche(k), x(i_w_div_wc)
-                     !end if
                      if (is_bad_num(s% w_div_w_crit_roche(k))) then
                         s% retry_message = 'bad num for w_div_w_crit_roche'
                         if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
@@ -613,7 +607,7 @@
 
                   if (do_lnR) then
                      s% lnR(k) = x(i_lnR)
-                     s% dxh_lnR(k) = dx(i_lnR,k)
+                     s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
                      if (is_bad_num(s% lnR(k))) then
                         s% retry_message = 'bad num for lnR'
                         if (report) write(*,2) 'bad num lnR', k, s% lnR(k)
@@ -628,7 +622,7 @@
 
                   if (do_lnd) then
                      s% lnd(k) = x(i_lnd)
-                     s% dxh_lnd(k) = dx(i_lnd,k)
+                     s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
                      if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                         write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                         if (report) &
@@ -681,21 +675,21 @@
                   if (i_lnd /= 0) &
                      write(*,4) 'hydro_mtx: lgd', &
                         k, s% solver_iter, s% model_number, &
-                        s% lnd(k)/ln10, xh_start(i_lnd,k), dx(i_lnd,k)
+                        s% lnd(k)/ln10, xh_start(i_lnd,k), s% solver_dx(i_lnd,k)
                   if (i_lnT /= 0) &
                      write(*,4) 'hydro_mtx: lgT', k, s% solver_iter, &
-                        s% model_number, s% lnT(k)/ln10, xh_start(i_lnT,k), dx(i_lnT,k)
+                        s% model_number, s% lnT(k)/ln10, xh_start(i_lnT,k), s% solver_dx(i_lnT,k)
                   if (i_lum /= 0) &
                      write(*,4) 'hydro_mtx: L', k, s% solver_iter, &
-                        s% model_number, s% L(k), xh_start(i_lum,k), dx(i_lum,k)
+                        s% model_number, s% L(k), xh_start(i_lum,k), s% solver_dx(i_lum,k)
                   write(*,4) 'hydro_mtx: lgR', k, s% solver_iter, &
-                        s% model_number, s% lnR(k)/ln10, xh_start(i_lnR,k), dx(i_lnR,k)
+                        s% model_number, s% lnR(k)/ln10, xh_start(i_lnR,k), s% solver_dx(i_lnR,k)
                   if (i_v /= 0) &
                      write(*,4) 'hydro_mtx: v', k, s% solver_iter, &
-                        s% model_number, s% v(k), xh_start(i_v,k), dx(i_v,k)
+                        s% model_number, s% v(k), xh_start(i_v,k), s% solver_dx(i_v,k)
                   if (i_u /= 0) &
                      write(*,4) 'hydro_mtx: u', k, s% solver_iter, &
-                        s% model_number, s% u(k), xh_start(i_u,k), dx(i_u,k)
+                        s% model_number, s% u(k), xh_start(i_u,k), s% solver_dx(i_u,k)
                end if
 
                ! set time derivatives at constant q -- only need the ones for eps_grav
@@ -707,11 +701,11 @@
                   end if
                else if (k < s% k_below_const_q) then
                   ! use dx to get better accuracy
-                  if (i_lnT /= 0) s% dlnT_dt_const_q(k) = dx(i_lnT,k)*d_dxdt_dx
+                  if (i_lnT /= 0) s% dlnT_dt_const_q(k) = s% solver_dx(i_lnT,k)*d_dxdt_dx
                   if (s% do_struct_hydro) then
-                     if (i_lnd /= 0) s% dlnd_dt_const_q(k) = dx(i_lnd,k)*d_dxdt_dx
+                     if (i_lnd /= 0) s% dlnd_dt_const_q(k) = s% solver_dx(i_lnd,k)*d_dxdt_dx
                      if (i_ln_cvpv0 /= 0) &
-                        s% dln_cvpv0_dt_const_q(k) = dx(i_ln_cvpv0,k)*d_dxdt_dx
+                        s% dln_cvpv0_dt_const_q(k) = s% solver_dx(i_ln_cvpv0,k)*d_dxdt_dx
                   end if
                else
                   if (i_lnT /= 0) s% dlnT_dt_const_q(k) = &
@@ -744,15 +738,15 @@
                else if (k >= s% k_const_mass) then
                   ! use dx to get better accuracy
 
-                  if (do_lnT) s% dlnT_dt(k) = dx(i_lnT,k)*d_dxdt_dx
-                  if (do_et) s% det_dt(k) = dx(i_et,k)*d_dxdt_dx
+                  if (do_lnT) s% dlnT_dt(k) = s% solver_dx(i_lnT,k)*d_dxdt_dx
+                  if (do_et) s% det_dt(k) = s% solver_dx(i_et,k)*d_dxdt_dx
 
                   if (s% do_struct_hydro) then
-                     if (do_lnd) s% dlnd_dt(k) = dx(i_lnd,k)*d_dxdt_dx
-                     if (do_v) s% dv_dt(k) = dx(i_v,k)*d_dxdt_dx
-                     if (do_u) s% du_dt(k) = dx(i_u,k)*d_dxdt_dx
-                     if (do_alpha_RTI) s% dalpha_RTI_dt(k) = dx(i_alpha_RTI,k)*d_dxdt_dx
-                     if (do_lnR) s% dlnR_dt(k) = dx(i_lnR,k)*d_dxdt_dx
+                     if (do_lnd) s% dlnd_dt(k) = s% solver_dx(i_lnd,k)*d_dxdt_dx
+                     if (do_v) s% dv_dt(k) = s% solver_dx(i_v,k)*d_dxdt_dx
+                     if (do_u) s% du_dt(k) = s% solver_dx(i_u,k)*d_dxdt_dx
+                     if (do_alpha_RTI) s% dalpha_RTI_dt(k) = s% solver_dx(i_alpha_RTI,k)*d_dxdt_dx
+                     if (do_lnR) s% dlnR_dt(k) = s% solver_dx(i_lnR,k)*d_dxdt_dx
                   end if
 
                   if (k == s% trace_k) then
@@ -809,7 +803,7 @@
 
                if (s% do_struct_hydro .and. do_conv_vel) then
                   if (k >= s% k_const_mass) then
-                     s% dln_cvpv0_dt(k) = dx(i_ln_cvpv0,k)*d_dxdt_dx
+                     s% dln_cvpv0_dt(k) = s% solver_dx(i_ln_cvpv0,k)*d_dxdt_dx
                   else
                      s% dln_cvpv0_dt(k) = &
                         (x(i_ln_cvpv0) - s% ln_cvpv0_for_d_dt_const_m(k))*d_dxdt_dx
@@ -819,7 +813,7 @@
             end if
 
             if (s% do_struct_hydro .and. do_j_rot) then
-               s% dj_rot_dt(k) = dx(i_j_rot,k)*d_dxdt_dx
+               s% dj_rot_dt(k) = s% solver_dx(i_j_rot,k)*d_dxdt_dx
             end if
 
             if (do_chem) &
@@ -1011,14 +1005,14 @@
 
 
       subroutine enter_setmatrix(s, &
-            iter, nvar, nz, neqns, dx, &
+            iter, nvar, nz, neqns, &
             xder, need_solver_to_eval_jacobian, &
             ldA, A1, ierr)
          use mtx_def, only: lapack
          use rsp_def, only: ABB, LD_ABB, NV, MAX_NZN
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz, neqns ! (neqns = nvar*nz)
-         real(dp), pointer, dimension(:,:) :: dx, xder ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
          logical, intent(out) :: need_solver_to_eval_jacobian
          integer, intent(in) :: ldA ! leading dimension of A
          real(dp), pointer, dimension(:) :: A1
@@ -1072,7 +1066,7 @@
 
          if (dbg_enter_setmatrix) &
             write(*, *) 'call eval_partials with doing_check_partials = .false.'
-         call eval_partials(s, nvar, s% x_scale, ierr)
+         call eval_partials(s, nvar, ierr)
          if (ierr /= 0) return
 
          call s% other_after_enter_setmatrix(s% id,ierr)
@@ -1083,21 +1077,18 @@
       end subroutine enter_setmatrix
 
 
-      subroutine eval_partials(s, nvar, xscale, ierr)
+      subroutine eval_partials(s, nvar, ierr)
          use hydro_eqns, only: eval_equ
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         real(dp), pointer, dimension(:,:) :: xscale ! (nvar, nz)
          integer, intent(out) :: ierr
-
          logical, parameter :: skip_partials = .false.
          ierr = 0
-         call eval_equ(s, nvar, skip_partials, xscale, ierr)
+         call eval_equ(s, nvar, skip_partials, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*, *) 'eval_partials: eval_equ returned ierr', ierr
             return
          end if
-
       end subroutine eval_partials
 
 

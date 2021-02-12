@@ -59,11 +59,10 @@
       subroutine do_surf_Riemann_dudt_eqn( &
             s, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            xscale, equ, skip_partials, nvar, ierr)
+            equ, skip_partials, nvar, ierr)
          type (star_info), pointer :: s         
          real(dp), intent(in) :: P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
@@ -72,30 +71,29 @@
          call do1_dudt_eqn( &
             s, 1, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            xscale, equ, skip_partials, nvar, ierr)
+            equ, skip_partials, nvar, ierr)
       end subroutine do_surf_Riemann_dudt_eqn
       
 
       subroutine do1_Riemann_momentum_eqn( &
-            s, k, P_surf, xscale, equ, skip_partials, nvar, ierr)
+            s, k, P_surf, equ, skip_partials, nvar, ierr)
          type (star_info), pointer :: s         
          integer, intent(in) :: k
          real(dp), intent(in) :: P_surf ! only used if k==1
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          call do1_dudt_eqn( &
             s, k, P_surf, 0d0, 0d0, 0d0, 0d0, &
-            xscale, equ, skip_partials, nvar, ierr)
+            equ, skip_partials, nvar, ierr)
       end subroutine do1_Riemann_momentum_eqn
          
 
       subroutine do1_dudt_eqn( &
             s, k, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            xscale, equ, skip_partials, nvar, ierr)
+            equ, skip_partials, nvar, ierr)
          use auto_diff_support
          use accurate_sum_auto_diff_18var_order1
          use star_utils, only: get_area_info, store_partials
@@ -104,7 +102,6 @@
          real(dp), intent(in) :: P_surf ! only used if k==1
          real(dp), intent(in) :: &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
@@ -191,7 +188,7 @@
          
          if (skip_partials) return
          call unpack_res18(resid_18)
-         call store_partials(s, k, xscale, i_du_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, i_du_dt, nvar, d_dm1, d_d00, d_dp1)
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnR
@@ -316,7 +313,7 @@
             use star_utils, only: unpack_res18_partials
             type(auto_diff_real_18var_order1) :: res18
             include 'formats'
-            call unpack_res18_partials(s, k, nvar, xscale, i_du_dt, &
+            call unpack_res18_partials(s, k, nvar, i_du_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% w_div_wc_flag) then
                call e00(s, i_du_dt, s% i_w_div_wc, k, nvar, d_d00(s% i_lum))

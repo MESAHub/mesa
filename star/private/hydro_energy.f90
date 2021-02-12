@@ -42,30 +42,29 @@
       
 
       subroutine do1_energy_eqn( & ! energy conservation
-            s, k, xscale, equ, skip_partials, do_chem, nvar, ierr)
+            s, k, equ, skip_partials, do_chem, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials, do_chem
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
          call get1_energy_eqn( &
-            s, k, xscale, equ, skip_partials, do_chem, nvar, &
+            s, k, equ, skip_partials, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, k, xscale, s% i_dlnE_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, s% i_dlnE_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do1_energy_eqn
 
 
       subroutine get1_energy_eqn( &
-            s, k, xscale, equ, skip_partials, do_chem, nvar, &
+            s, k, equ, skip_partials, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
 
          use eos_def, only: i_grad_ad, i_lnPgas, i_lnE
@@ -74,7 +73,6 @@
          use auto_diff_support
          type (star_info), pointer :: s         
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials, do_chem
          real(dp), intent(out), dimension(nvar) :: d_dm1, d_d00, d_dp1
@@ -455,7 +453,7 @@
 
             include 'formats'
             
-            call unpack_res18_partials(s, k, nvar, xscale, i_dlnE_dt, &
+            call unpack_res18_partials(s, k, nvar, i_dlnE_dt, &
                res18, d_dm1, d_d00, d_dp1)
             
             ! do partials wrt composition

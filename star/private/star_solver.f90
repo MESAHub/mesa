@@ -45,7 +45,7 @@
 
 
       subroutine solver( &
-            s, nz, nvar, dx, skip_global_corr_coeff_limit, &
+            s, nz, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             equ, work, lwork, iwork, liwork, AF, &
             convergence_failure, ierr)
@@ -56,7 +56,6 @@
          ! the primary variables
          integer, intent(in) :: nz ! number of zones
          integer, intent(in) :: nvar ! number of variables per zone
-         real(dp), pointer, dimension(:) :: dx ! =(nvar,nz)
          logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), pointer, dimension(:) :: equ ! =(nvar,nz)
          ! equ(i) has the residual for equation i, i.e., the difference between
@@ -111,7 +110,7 @@
          if (s% fill_arrays_with_NaNs) call fill_with_NaNs(AF_copy)
 
          call do_solver( &
-            s, nz, nvar, dx, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
+            s, nz, nvar, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             equ, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
@@ -171,7 +170,7 @@
 
 
       subroutine do_solver( &
-            s, nz, nvar, dx1, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
+            s, nz, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             equ1, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
@@ -182,7 +181,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
-         real(dp), pointer, dimension(:) :: dx1, equ1
+         real(dp), pointer, dimension(:) :: equ1
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
@@ -237,14 +236,13 @@
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
 
-         real(dp), pointer, dimension(:,:) :: dx, equ ! (nvar,nz)
+         real(dp), pointer, dimension(:,:) :: equ ! (nvar,nz)
          real(dp), pointer, dimension(:,:) :: AF ! (ldAF,neq)
          real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
          include 'formats'
 
-         dx(1:nvar,1:nz) => dx1(1:neq)
          equ(1:nvar,1:nz) => equ1(1:neq)
          AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
@@ -339,7 +337,7 @@
             return
          end if
          
-         call eval_equations(s, iter, nvar, nz, dx, equ, ierr)         
+         call eval_equations(s, iter, nvar, nz, equ, ierr)         
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -408,7 +406,7 @@
                   tol_residual_norm, tol_max_residual
             end if
 
-            call setmatrix(neq, dx, dxsave, ddxsave, ierr)
+            call setmatrix(s, neq, dxsave, ddxsave, ierr)
             if (ierr /= 0) then
                call write_msg('setmatrix returned ierr /= 0')
                convergence_failure = .true.
@@ -425,7 +423,7 @@
                exit iter_loop
             end if
 
-            call inspectB(s, iter, nvar, nz, dx, soln, ierr)
+            call inspectB(s, iter, nvar, nz, soln, ierr)
             if (ierr /= 0) then
                call oops('inspectB returned ierr')
                exit iter_loop
@@ -490,7 +488,7 @@
 
             ! fix B if out of definition domain
             call Bdomain(s, &
-               iter, nvar, nz, soln, dx, correction_factor, ierr)
+               iter, nvar, nz, soln, correction_factor, ierr)
             if (ierr /= 0) then ! correction cannot be fixed
                call oops('correction rejected by Bdomain')
                exit iter_loop
@@ -784,7 +782,7 @@
             else
                do k=1,nz
                   do i=1,nvar
-                     dxsave(i,k) = dx(i,k)
+                     dxsave(i,k) = s% solver_dx(i,k)
                      ddxsave(i,k) = ddx(i,k)
                   end do
                end do
@@ -821,8 +819,8 @@
                coeff = max(min_corr_coeff, alam)
                s% solver_adjust_iter = iter
 
-               call apply_coeff(nvar, nz, dx, dxsave, soln, coeff, skip_eval_f)
-               call eval_equations(s, iter, nvar, nz, dx, equ, ierr)
+               call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
+               call eval_equations(s, iter, nvar, nz, equ, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -951,7 +949,7 @@
 
             do k=1,nz
                do i=1,nvar
-                  dx(i,k) = dxsave(i,k)
+                  s% solver_dx(i,k) = dxsave(i,k)
                   ddx(i,k) = ddxsave(i,k)
                end do
             end do
@@ -959,9 +957,8 @@
          end subroutine adjust_correction
 
 
-         subroutine apply_coeff(nvar, nz, dx, dxsave, soln, coeff, just_use_dx)
+         subroutine apply_coeff(nvar, nz, dxsave, soln, coeff, just_use_dx)
             integer, intent(in) :: nvar, nz
-            real(dp), intent(inout), dimension(:,:) :: dx
             real(dp), intent(in), dimension(:,:) :: dxsave, soln
             real(dp), intent(in) :: coeff
             logical, intent(in) :: just_use_dx
@@ -972,13 +969,13 @@
                if (coeff == 1d0) then
                   do k=1,nz
                      do i=1,nvar
-                        dx(i,k) = dx(i,k) + s% x_scale(i,k)*soln(i,k)
+                        s% solver_dx(i,k) = s% solver_dx(i,k) + s% x_scale(i,k)*soln(i,k)
                      end do
                   end do
                else
                   do k=1,nz
                      do i=1,nvar
-                        dx(i,k) = dx(i,k) + coeff*s% x_scale(i,k)*soln(i,k)
+                        s% solver_dx(i,k) = s% solver_dx(i,k) + coeff*s% x_scale(i,k)*soln(i,k)
                      end do
                   end do
                end if
@@ -988,14 +985,14 @@
             if (coeff == 1d0) then
                do k=1,nz
                   do i=1,nvar
-                     dx(i,k) = dxsave(i,k) + s% x_scale(i,k)*soln(i,k)
+                     s% solver_dx(i,k) = dxsave(i,k) + s% x_scale(i,k)*soln(i,k)
                   end do
                end do
                return
             end if
             do k=1,nz
                do i=1,nvar
-                  dx(i,k) = dxsave(i,k) + coeff*s% x_scale(i,k)*soln(i,k)
+                  s% solver_dx(i,k) = dxsave(i,k) + coeff*s% x_scale(i,k)*soln(i,k)
                end do
             end do
          end subroutine apply_coeff
@@ -1075,29 +1072,30 @@
          end subroutine solve_mtx
 
 
-         logical function do_enter_setmatrix(neq, dx, ierr)
+         logical function do_enter_setmatrix(s, neq, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             implicit none
+            type (star_info), pointer :: s
             integer, intent(in) :: neq
-            real(dp), pointer, dimension(:,:) :: dx, ddx
+            real(dp), pointer, dimension(:,:) :: ddx
             integer, intent(out) :: ierr
             logical :: need_solver_to_eval_jacobian
             integer :: i, j, k
             include 'formats'
             need_solver_to_eval_jacobian = .true.
-            call enter_setmatrix(s, iter,  &
-                  nvar, nz, neq, dx, xder, need_solver_to_eval_jacobian, &
+            call enter_setmatrix(s, iter, &
+                  nvar, nz, neq, xder, need_solver_to_eval_jacobian, &
                   size(A,dim=1), A1, ierr)
             do_enter_setmatrix = need_solver_to_eval_jacobian
          end function do_enter_setmatrix
 
 
-         subroutine setmatrix( &
-               neq, dx, dxsave, ddxsave, ierr)
+         subroutine setmatrix(s, neq, dxsave, ddxsave, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             use star_utils, only: e00, em1, ep1
+            type (star_info), pointer :: s
             integer, intent(in) :: neq
-            real(dp), pointer, dimension(:,:) :: dx, dxsave, ddxsave
+            real(dp), pointer, dimension(:,:) :: dxsave, ddxsave
             integer, intent(out) :: ierr
 
             integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
@@ -1114,17 +1112,17 @@
                s% solver_test_partials_k > 0 .and. &
                s% solver_call_number == s% solver_test_partials_call_number .and. &
                s% solver_test_partials_iter_number == iter
-            need_solver_to_eval_jacobian = do_enter_setmatrix(neq, dx, ierr)
+            need_solver_to_eval_jacobian = do_enter_setmatrix(s, neq, ierr)
             if (ierr /= 0) return
 
             if (.not. testing_partial) return
 
             if (testing_partial) then 
                ! get solver_test_partials_var and solver_test_partials_dval_dx
-               call eval_partials(s, nvar, s% x_scale, ierr)
+               call eval_partials(s, nvar, ierr)
                if (ierr /= 0) return
             else
-               call eval_equations(s, iter, nvar, nz, dx, equ, ierr)
+               call eval_equations(s, iter, nvar, nz, equ, ierr)
                if (ierr /= 0) then
                   write(*,3) '1st call eval_equations failed'
                   stop 'setmatrix'
@@ -1135,7 +1133,7 @@
 
             do k=1,nz
                do j=1,nvar
-                  save_dx(j,k) = dx(j,k)
+                  save_dx(j,k) = s% solver_dx(j,k)
                   save_equ(j,k) = equ(j,k)
                end do
             end do
@@ -1150,12 +1148,12 @@
                   k_hi = min(k_hi,s% nz)
                end if
                do k = k_lo, k_hi
-                  call test_cell_partials(k, dx, save_dx, save_equ, ierr)
+                  call test_cell_partials(s, k, save_dx, save_equ, ierr)
                   if (ierr /= 0) stop 'failed solver_test_partials'
                end do
             else
                k = s% solver_test_partials_k
-               call test_cell_partials(k, dx, save_dx, save_equ, ierr) 
+               call test_cell_partials(s, k, save_dx, save_equ, ierr) 
                if (ierr /= 0) stop 'failed solver_test_partials'
             end if
             deallocate(save_dx, save_equ)
@@ -1164,10 +1162,11 @@
          end subroutine setmatrix
 
 
-         subroutine test_cell_partials(k, dx, save_dx, save_equ, ierr) 
+         subroutine test_cell_partials(s, k, save_dx, save_equ, ierr) 
             use star_utils, only: lookup_nameofvar, lookup_nameofequ
+            type (star_info), pointer :: s
             integer, intent(in) :: k
-            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             integer, intent(out) :: ierr
             integer :: i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             include 'formats'
@@ -1216,26 +1215,27 @@
             end if
             if (s% solver_test_partials_equ_name == 'all') then
                do i_equ = 1, s% nvar_hydro
-                  call test_equ_partials( &
+                  call test_equ_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, dx, save_dx, save_equ, ierr)   
+                     k, save_dx, save_equ, ierr)   
                   if (ierr /= 0) stop 'failed solver_test_partials'
                end do
             else
-               call test_equ_partials( &
+               call test_equ_partials(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, dx, save_dx, save_equ, ierr)   
+                  k, save_dx, save_equ, ierr)   
                if (ierr /= 0) stop 'failed solver_test_partials'
             end if     
          end subroutine test_cell_partials               
 
 
-         subroutine test_equ_partials( &
+         subroutine test_equ_partials(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, dx, save_dx, save_equ, ierr)
+               k, save_dx, save_equ, ierr)
+            type (star_info), pointer :: s
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
-            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             integer, intent(out) :: ierr
             real(dp) :: dvardx_0
             integer :: i, j_var_xa_index, j_var_sink_xa_index
@@ -1243,25 +1243,25 @@
             if (i_equ /= 0) then
                if (s% solver_test_partials_var_name == 'all') then
                   do i = 1, s% nvar_hydro
-                     call test3_partials( &
+                     call test3_partials(s, &
                         i_equ, i, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                        k, dx, save_dx, save_equ, ierr)
+                        k, save_dx, save_equ, ierr)
                      if (ierr /= 0) stop 'failed solver_test_partials'
                      write(*,*)
                   end do
                else if (i_var == 0) then
                   write(*,*) 'failed to recognize variable name'
                else
-                  call test3_partials( &
+                  call test3_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, dx, save_dx, save_equ, ierr)
+                     k, save_dx, save_equ, ierr)
                   if (ierr /= 0) stop 'failed solver_test_partials'               
                end if
             else ! i_equ == 0
                if (i_var /= 0) then
-                  call test1_partial( &
+                  call test1_partial(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, 0, s% solver_test_partials_dval_dx, dx, save_dx, save_equ, ierr)
+                     k, 0, s% solver_test_partials_dval_dx, save_dx, save_equ, ierr)
                else ! i_var == 0
                   if (s% solver_test_partials_var <= 0) then
                      write(*,2) 'need to set solver_test_partials_var', s% solver_test_partials_var
@@ -1281,10 +1281,10 @@
                      j_var_xa_index = 0
                      j_var_sink_xa_index = 0
                   end if
-                  call test1_partial( &
+                  call test1_partial(s, &
                      i_equ, s% solver_test_partials_var, s% solver_test_partials_dx_sink, &
                      j_var_xa_index, j_var_sink_xa_index, &                     
-                     k, 0, s% solver_test_partials_dval_dx, dx, save_dx, save_equ, ierr)
+                     k, 0, s% solver_test_partials_dval_dx, save_dx, save_equ, ierr)
                end if
                if (ierr /= 0) stop 'failed solver_test_partials'
             end if               
@@ -1292,10 +1292,11 @@
          end subroutine test_equ_partials
          
          
-         subroutine get_lnE_partials( &
+         subroutine get_lnE_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
             use eos_def, only: i_lnE
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1310,10 +1311,11 @@
          end subroutine get_lnE_partials
          
          
-         subroutine get_lnP_partials( &
+         subroutine get_lnP_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
             use eos_def, only: i_lnPgas
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1328,10 +1330,11 @@
          end subroutine get_lnP_partials
          
          
-         subroutine get_grad_ad_partials( &
+         subroutine get_grad_ad_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
             use eos_def, only: i_grad_ad
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1346,9 +1349,10 @@
          end subroutine get_grad_ad_partials
          
          
-         subroutine get_eps_nuc_partials( &
+         subroutine get_eps_nuc_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1362,9 +1366,10 @@
          end subroutine get_eps_nuc_partials
          
          
-         subroutine get_non_nuc_neu_partials( &
+         subroutine get_non_nuc_neu_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1378,9 +1383,10 @@
          end subroutine get_non_nuc_neu_partials
          
          
-         subroutine get_gradT_partials( &
+         subroutine get_gradT_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1404,9 +1410,10 @@
          end subroutine get_gradT_partials
          
          
-         subroutine get_mlt_vc_partials( &
+         subroutine get_mlt_vc_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1426,9 +1433,10 @@
          end subroutine get_mlt_vc_partials
          
          
-         subroutine get_opacity_partials( &
+         subroutine get_opacity_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
+            type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
@@ -1442,12 +1450,13 @@
          end subroutine get_opacity_partials
 
 
-         subroutine test3_partials( &
+         subroutine test3_partials(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, dx, save_dx, save_equ, ierr)
+               k, save_dx, save_equ, ierr)
+            type (star_info), pointer :: s
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
-            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             integer, intent(out) :: ierr
             real(dp) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0
@@ -1467,65 +1476,66 @@
                   if (k < s% nz) dvardx0_p1 = s% ublk(i_equ,i_var,k)/s% x_scale(i_var,k+1)
                end if
             else if (i_equ == -1) then ! 'lnE'
-               call get_lnE_partials( &
+               call get_lnE_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
             elseif (i_equ == -2) then ! 'eps_nuc'
-               call get_eps_nuc_partials( &
+               call get_eps_nuc_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -3) then ! 'opacity'
-               call get_opacity_partials( &
+               call get_opacity_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -4) then ! 'lnP'
-               call get_lnP_partials( &
+               call get_lnP_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1) 
             else if (i_equ == -5) then ! 'non_nuc_neu'
-               call get_non_nuc_neu_partials( &
+               call get_non_nuc_neu_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1) 
             else if (i_equ == -6) then ! 'gradT'
-               call get_gradT_partials( &
+               call get_gradT_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1) 
             else if (i_equ == -7) then ! 'mlt_vc'
-               call get_mlt_vc_partials( &
+               call get_mlt_vc_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1) 
             else if (i_equ == -8) then ! 'grad_ad'
-               call get_grad_ad_partials( &
+               call get_grad_ad_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1) 
             end if 
             if (k > 1) then
-               call test1_partial( &
+               call test1_partial(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, -1, dvardx0_m1, dx, save_dx, save_equ, ierr)
+                  k, -1, dvardx0_m1, save_dx, save_equ, ierr)
                if (ierr /= 0) stop 'test3_partials'
             end if
-            call test1_partial( &
+            call test1_partial(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, 0, dvardx0_00, dx, save_dx, save_equ, ierr)
+               k, 0, dvardx0_00, save_dx, save_equ, ierr)
             if (ierr /= 0) stop 'test3_partials'
             if (k < s% nz) then
-               call test1_partial( &
+               call test1_partial(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, 1, dvardx0_p1, dx, save_dx, save_equ, ierr)
+                  k, 1, dvardx0_p1, save_dx, save_equ, ierr)
                if (ierr /= 0) stop 'test3_partials'
             end if
          end subroutine test3_partials
          
 
-         subroutine test1_partial(&
+         subroutine test1_partial(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, dvardx_0, dx, save_dx, save_equ, ierr)
+               k, k_off, dvardx_0, save_dx, save_equ, ierr)
             use chem_def, only: chem_isos
+            type (star_info), pointer :: s
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k, k_off
             real(dp), intent(in) :: dvardx_0
-            real(dp), pointer, dimension(:,:) :: dx, save_dx, save_equ
+            real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             character (len=3) :: k_off_str
             integer, intent(out) :: ierr 
             character (len = 32) :: equ_str
@@ -1535,20 +1545,20 @@
 
             if (i_var > s% nvar_hydro) then ! testing abundance
                dx_0 = s% solver_test_partials_dx_0 * &
-                  max(abs(s% xa_start(i_var_xa_index,k) + dx(i_var,k)), &
+                  max(abs(s% xa_start(i_var_xa_index,k) + s% solver_dx(i_var,k)), &
                       abs(s% xa_start(i_var_xa_index,k)), &
                       1d-99)
                write(*,1) 'var name ' // chem_isos% name(s% chem_id(i_var_xa_index))
                write(*,1) 'sink name ' // chem_isos% name(s% chem_id(i_var_sink_xa_index))
             else
                dx_0 = s% solver_test_partials_dx_0 * &
-                  max(abs(s% xh_start(i_var,k) + dx(i_var,k)), &
+                  max(abs(s% xh_start(i_var,k) + s% solver_dx(i_var,k)), &
                       abs(s% xh_start(i_var,k)))
                if (dx_0 == 0d0) dx_0 = s% solver_test_partials_dx_0
             end if
-            dvardx = dfridr( &
+            dvardx = dfridr(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, dx_0, dx, save_dx, err)
+               k, k_off, dx_0, save_dx, err)
             if (dvardx == 0d0 .and. abs(dvardx_0) < 1d-14) then
                xdum = 0d0
             else if (dvardx_0 == 0d0 .and. abs(dvardx) < 1d-14) then
@@ -1621,15 +1631,16 @@
          end subroutine test1_partial
             
             
-         real(dp) function dfridr_func( &
+         real(dp) function dfridr_func(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, delta_x, dx, save_dx) result(val)
+               k, k_off, delta_x, save_dx) result(val)
+            type (star_info), pointer :: s
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k, k_off
             real(dp), intent(in) :: delta_x
-            real(dp), pointer, dimension(:,:) :: dx, save_dx
+            real(dp), pointer, dimension(:,:) :: save_dx
             include 'formats'
-            dx(i_var,k+k_off) = save_dx(i_var,k+k_off) + delta_x
+            s% solver_dx(i_var,k+k_off) = save_dx(i_var,k+k_off) + delta_x
             if (i_var_xa_index > 0) then ! changing abundance
                !write(*,2) 'new dx, x for abundance', i_var, &
                !     dx(i_var,k+k_off), s% xa(i_var - s% nvar_hydro,k+k_off)
@@ -1637,9 +1648,9 @@
                   write(*,2) 'bad i_var_sink_xa_index', i_var_sink_xa_index
                   stop 'star_solver dfridr_func'
                end if
-               dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
+               s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations(s, iter, nvar, nz, dx,  equ, ierr)            
+            call eval_equations(s, iter, nvar, nz, equ, ierr)            
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
@@ -1668,19 +1679,20 @@
             else
                val = 0d0
             end if
-            dx(i_var,k+k_off) = save_dx(i_var,k+k_off)
+            s% solver_dx(i_var,k+k_off) = save_dx(i_var,k+k_off)
             if (i_var_sink > 0) & ! restore sink abundance
-               dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off)
+               s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off)
          end function dfridr_func
 
 
-         real(dp) function dfridr( &
+         real(dp) function dfridr(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, hx, dx, save_dx, err)
+               k, k_off, hx, save_dx, err)
+            type (star_info), pointer :: s
             integer, intent(in) :: &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k, k_off
             real(dp), intent(in) :: hx
-            real(dp), pointer, dimension(:,:) :: dx, save_dx
+            real(dp), pointer, dimension(:,:) :: save_dx
             real(dp), intent(out) :: err
             !  this routine returns the first derivative of a function func(x)
             !  at the point x, by ridders method of polynomial extrapolation.
@@ -1695,13 +1707,13 @@
             dfridr = 0d0
             hh = hx
             ! 2nd order central difference
-            f1 = dfridr_func( &
+            f1 = dfridr_func(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, hh, dx, save_dx)
+               k, k_off, hh, save_dx)
             !write(*,2) 'f1', 1, f1, save_dx(i_var,k) + hh
-            f2 = dfridr_func( &
+            f2 = dfridr_func(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               k, k_off, -hh, dx, save_dx)
+               k, k_off, -hh, save_dx)
             !write(*,2) 'f2', 1, f2, save_dx(i_var,k) - hh
             a(1,1) = (f1 - f2)/(2d0*hh)
             !write(*,2) 'dfdx', 1, a(1,1), &
@@ -1712,13 +1724,13 @@
             ! and higher orders of extrapolation
             do i=2,ntab
                hh = hh/con
-               f1 = dfridr_func( &
+               f1 = dfridr_func(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, k_off, hh, dx, save_dx)
+                  k, k_off, hh, save_dx)
                !write(*,2) 'f1', i, f1, save_dx(i_var,k) + hh
-               f2 = dfridr_func( &
+               f2 = dfridr_func(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, k_off, -hh, dx, save_dx)
+                  k, k_off, -hh, save_dx)
                !write(*,2) 'f2', i, f2, save_dx(i_var,k) - hh
                a(1,i) = (f1 - f2)/(2d0*hh)
                !write(*,2) 'dfdx', i, a(1,i), &

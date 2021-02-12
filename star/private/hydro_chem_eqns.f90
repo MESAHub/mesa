@@ -40,9 +40,8 @@
 
 
       subroutine do_chem_eqns( &
-            s, xscale, nvar, equchem1, species, skip_partials, equ, ierr)
+            s, nvar, equchem1, species, skip_partials, equ, ierr)
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: nvar, equchem1, species
          logical, intent(in) :: skip_partials
          real(dp), intent(inout) :: equ(:,:)
@@ -54,7 +53,7 @@
          do k = 1, s% nz
             if (ierr /= 0) cycle
             call do1_chem_eqns( &
-               s, xscale, k, nvar, equchem1, species, skip_partials, &
+               s, k, nvar, equchem1, species, skip_partials, &
                equ, op_err)
             if (op_err /= 0) ierr = op_err
          end do
@@ -63,7 +62,7 @@
 
 
       subroutine do1_chem_eqns( &
-            s, xscale, k, nvar, equchem1, species, skip_partials, &
+            s, k, nvar, equchem1, species, skip_partials, &
             equ, ierr)
 
          use chem_def
@@ -72,7 +71,6 @@
          use star_utils, only: em1, e00, ep1
 
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: k, nvar, equchem1, species
          logical, intent(in) :: skip_partials
          real(dp), intent(inout) :: equ(:,:)
@@ -152,13 +150,8 @@
 
             dxdt_factor = 1d0
 
-            if (associated(xscale)) then
-               eqn_scale = max(s% min_chem_eqn_scale, xscale(i,k)*dVARdot_dVAR)
-               residual = (dxdt_expected - dxdt_actual)/eqn_scale
-            else
-               residual = dxdt_expected
-               eqn_scale = 1d0
-            end if
+            eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)*dVARdot_dVAR)
+            residual = (dxdt_expected - dxdt_actual)/eqn_scale
             equ(i,k) = residual
             
             if (abs(residual) > max_abs_residual) &

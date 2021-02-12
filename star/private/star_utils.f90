@@ -1397,10 +1397,9 @@
       end subroutine reset_starting_vectors
       
       
-      subroutine store_partials(s, k, xscale, i_eqn, nvar, d_dm1, d_d00, d_dp1)
+      subroutine store_partials(s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1)
          type (star_info), pointer :: s
          integer, intent(in) :: k, i_eqn, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), intent(in) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          integer :: nz, j
          nz = s% nz
@@ -1412,13 +1411,12 @@
       end subroutine store_partials
 
 
-      subroutine unpack_res18_partials(s, k, nvar, xscale, i_eqn, &
+      subroutine unpack_res18_partials(s, k, nvar, i_eqn, &
             res18, d_dm1, d_d00, d_dp1)
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar, i_eqn
-         real(dp), pointer :: xscale(:,:)
          type(auto_diff_real_18var_order1) :: res18
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          

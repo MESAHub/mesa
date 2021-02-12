@@ -39,12 +39,11 @@
 
 
       subroutine do1_alpha( &
-            s, xscale, k, nvar, skip_partials, equ, ierr)
+            s, k, nvar, skip_partials, equ, ierr)
          use star_utils, only: em1, e00, ep1
          use chem_def, only: ih1, ihe4
 
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          real(dp), intent(inout) :: equ(:,:)
@@ -189,16 +188,12 @@
          if (dadt_expected == 0d0) then
             equ(i,k) = dadt_expected
             eqn_scale = 1d0
-         else if (associated(xscale)) then
-            eqn_scale = xscale(i,k)*dVARdot_dVAR
-            equ(i,k) = (dadt_expected - dadt_actual)/eqn_scale
          else
-            equ(i,k) = dadt_expected
-            eqn_scale = 1d0
+            eqn_scale = s% x_scale(i,k)*dVARdot_dVAR
+            equ(i,k) = (dadt_expected - dadt_actual)/eqn_scale
          end if
 
          if (test_partials) then
-            write(*,*) 'associated(xscale)', associated(xscale)
             write(*,2) 'a00', k, a00
             write(*,2) 'dadt_mix', k, dadt_mix
             write(*,2) 'dadt_source', k, dadt_source

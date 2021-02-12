@@ -42,11 +42,10 @@
 
       
       subroutine do_surf_momentum_eqn( &
-            s, P_surf_18, xscale, equ, skip_partials, nvar, ierr)
+            s, P_surf_18, equ, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          type(auto_diff_real_18var_order1), intent(in) :: P_surf_18
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
@@ -55,22 +54,21 @@
          include 'formats'
          ierr = 0
          call get1_momentum_eqn( &
-            s, 1, P_surf_18, xscale, equ, skip_partials, nvar, &
+            s, 1, P_surf_18, equ, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, 1, xscale, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, 1, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do_surf_momentum_eqn
 
       
-      subroutine do1_momentum_eqn(s, k, xscale, equ, skip_partials, nvar, ierr)
+      subroutine do1_momentum_eqn(s, k, equ, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
@@ -80,19 +78,19 @@
          include 'formats'
          P_surf_18 = 0d0
          call get1_momentum_eqn( &
-            s, k, P_surf_18, xscale, equ, skip_partials, nvar, &
+            s, k, P_surf_18, equ, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, k, xscale, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do1_momentum_eqn
 
 
       subroutine get1_momentum_eqn( &
-            s, k, P_surf_18, xscale, equ, skip_partials, nvar, &
+            s, k, P_surf_18, equ, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use chem_def, only: chem_isos
          use accurate_sum_auto_diff_18var_order1
@@ -101,7 +99,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(in) :: P_surf_18 ! only used if k == 1
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
@@ -322,7 +319,7 @@
             real(dp) :: resid1
             integer :: j
             include 'formats'
-            call unpack_res18_partials(s, k, nvar, xscale, i_dv_dt, &
+            call unpack_res18_partials(s, k, nvar, i_dv_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% rotation_flag .and. s% w_div_wc_flag .and. s% use_gravity_rotation_correction) then
                call e00(s, i_dv_dt, s% i_w_div_wc, k, nvar, iXPavg*d_grav_dw*dm_div_A)            
@@ -580,11 +577,10 @@
 
 
       subroutine do1_radius_eqn( &
-            s, k, xscale, equ, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          use auto_diff_support, only: unwrap
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr

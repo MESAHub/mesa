@@ -43,11 +43,10 @@
       
 
       subroutine do1_et_L_eqn( &
-            s, k, xscale, equ, L_start_max, skip_partials, nvar, ierr)
+            s, k, equ, L_start_max, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          real(dp), intent(in) :: L_start_max
          logical, intent(in) :: skip_partials
@@ -55,25 +54,24 @@
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
          call get1_et_L_eqn( &
-            s, k, xscale, equ, L_start_max, skip_partials, nvar, &
+            s, k, equ, L_start_max, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_et_L_eqn', k
             return
          end if         
          if (skip_partials) return         
-         call store_partials(s, k, xscale, s% i_equL, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, s% i_equL, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do1_et_L_eqn
 
       
       subroutine get1_et_L_eqn( &  
-            s, k, xscale, equ, L_start_max, skip_partials, nvar, &
+            s, k, equ, L_start_max, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: unpack_res18_partials
          use accurate_sum_auto_diff_18var_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          real(dp), intent(in) :: L_start_max
          logical, intent(in) :: skip_partials
@@ -100,7 +98,7 @@
             s% solver_test_partials_val = residual
          end if
          if (skip_partials) return
-         call unpack_res18_partials(s, k, nvar, xscale, s% i_equL, &
+         call unpack_res18_partials(s, k, nvar, s% i_equL, &
             res18, d_dm1, d_d00, d_dp1)
 
          if (test_partials) then
@@ -112,36 +110,34 @@
       
 
       subroutine do1_turbulent_energy_eqn( &
-            s, k, xscale, equ, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
          call get1_turbulent_energy_eqn( &
-            s, k, xscale, equ, skip_partials, nvar, &
+            s, k, equ, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_turbulent_energy_eqn', k
             return
          end if         
          if (skip_partials) return         
-         call store_partials(s, k, xscale, s% i_det_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, s% i_det_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do1_turbulent_energy_eqn
 
       
       subroutine get1_turbulent_energy_eqn( &  
-            s, k, xscale, equ, skip_partials, nvar, &
+            s, k, equ, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: calc_Pt_18_tw
          use accurate_sum_auto_diff_18var_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
@@ -348,7 +344,7 @@
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials
             type(auto_diff_real_18var_order1) :: res18            
-            call unpack_res18_partials(s, k, nvar, xscale, i_det_dt, &
+            call unpack_res18_partials(s, k, nvar, i_det_dt, &
                res18, d_dm1, d_d00, d_dp1)
          end subroutine unpack_res18
       

@@ -86,13 +86,13 @@
       end subroutine set_xscale_info
 
 
-      subroutine eval_equations(s, iter, nvar, nz, dx, equ_in, ierr)
+      subroutine eval_equations(s, iter, nvar, nz, equ_in, ierr)
          use hydro_eqns, only: eval_equ
          use mix_info, only: set_dxdt_mix
          use star_utils, only: update_time, total_times
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: dx, equ_in ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: equ_in ! (nvar, nz)
          integer, intent(out) :: ierr
 
          integer :: cnt, i, j, k
@@ -116,7 +116,7 @@
             if (dbg) write(*, *) 'skip set_solver_vars on call before 1st iter'
          else
             if (dbg) write(*, *) 'call set_solver_vars'
-            call set_solver_vars(s, iter, nvar, dx, s% x_scale, dt, ierr)
+            call set_solver_vars(s, iter, nvar, dt, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*,2) 'eval_equations: set_solver_vars returned ierr', ierr
@@ -135,7 +135,7 @@
                end do
             end do
             if (dbg) write(*, *) 'call eval_equ'
-            call eval_equ(s, nvar, skip_partials, s% x_scale, ierr)
+            call eval_equ(s, nvar, skip_partials, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr
@@ -175,7 +175,7 @@
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
-                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, dx(j, k)
+                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, s% solver_dx(j, k)
                end do
                write(*,*)
             end do
@@ -609,14 +609,14 @@
       ! edit correction_factor and/or B as necessary so that the new dx will be valid.
       ! set ierr nonzero if things are beyond repair.
       subroutine Bdomain(s, &
-            iter, nvar, nz, B, dx, correction_factor, ierr)
+            iter, nvar, nz, B, correction_factor, ierr)
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
          use rsp_def, only: EFL0
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: dx, B ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
          integer :: id, i, j, k, species, bad_j, bad_k, &
@@ -634,7 +634,7 @@
             i_et = s% i_et
             do k = 1, s% nz
                det = B(i_et,k)*s% x_scale(i_et,k)*correction_factor
-               old_et = s% xh_start(i_et,k) + dx(i_et,k)
+               old_et = s% xh_start(i_et,k) + s% solver_dx(i_et,k)
                new_et = old_et + det
                if (det >= 0) cycle
                if (new_et >= 0d0) cycle
@@ -648,7 +648,7 @@
             do k = 1, s% nz
                dalpha_RTI = B(i_alpha_RTI,k)*s% x_scale(i_alpha_RTI,k)*correction_factor
                if (dalpha_RTI >= 0) cycle
-               old_alpha_RTI = s% xh_start(i_alpha_RTI,k) + dx(i_alpha_RTI,k)
+               old_alpha_RTI = s% xh_start(i_alpha_RTI,k) + s% solver_dx(i_alpha_RTI,k)
                new_alpha_RTI = old_alpha_RTI + dalpha_RTI
                if (new_alpha_RTI >= 0d0) cycle
                dalpha_RTI = -old_alpha_RTI
@@ -662,7 +662,7 @@
             !note that dconv_vel and others refers to changes in ln(conv_vel+v0)
             do k = 1, s% nz
                dconv_vel = B(i_ln_cvpv0,k)*s% x_scale(i_ln_cvpv0,k)*correction_factor
-               old_conv_vel = s% xh_start(i_ln_cvpv0,k) + dx(i_ln_cvpv0,k)
+               old_conv_vel = s% xh_start(i_ln_cvpv0,k) + s% solver_dx(i_ln_cvpv0,k)
                new_conv_vel = old_conv_vel + dconv_vel
                if (new_conv_vel >= log_conv_vel_v0) cycle
                dconv_vel = -old_conv_vel + log_conv_vel_v0
@@ -673,7 +673,7 @@
          if (s% i_lum>=0 .and. s% scale_max_correction_for_negative_surf_lum) then
             !ensure surface luminosity does not become negative
             dlum_surf = B(s% i_lum,1)*s% x_scale(s% i_lum,1)
-            old_lum_surf = s% xh_start(s% i_lum,1) + dx(s% i_lum,1)
+            old_lum_surf = s% xh_start(s% i_lum,1) + s% solver_dx(s% i_lum,1)
             new_lum_surf = old_lum_surf + dlum_surf
             if (new_lum_surf < 0d0 .and. old_lum_surf > 0d0) then
                correction_factor = min(correction_factor, &
@@ -721,7 +721,7 @@
             do k=1,nz
                do j=1,species
                   i = j + s% nvar_hydro
-                  old_xa = s% xa_start(j,k) + dx(i,k)
+                  old_xa = s% xa_start(j,k) + s% solver_dx(i,k)
                   if (old_xa <= 1d-90) cycle
                   dxa = B(i,k)*s% x_scale(i,k)*correction_factor
                   new_xa = old_xa + dxa
@@ -756,7 +756,7 @@
             include 'formats'
             if (clip <= 0d0) return
             do k = 1, s% nz
-               old_x = s% xh_start(i,k) + dx(i,k) ! value before this iteration
+               old_x = s% xh_start(i,k) + s% solver_dx(i,k) ! value before this iteration
                delta = B(i,k)*s% x_scale(i,k)*correction_factor ! change for this iter
                ! skip if change small enough or if too big to change
                if (abs(delta) <= clip*abs(old_x) .or. is_bad(delta) .or. &
@@ -772,10 +772,10 @@
       end subroutine Bdomain
 
 
-      subroutine inspectB(s, iter, nvar, nz, dx, B, ierr)
+      subroutine inspectB(s, iter, nvar, nz, B, ierr)
          integer, intent(in) :: iter, nvar, nz
          type (star_info), pointer :: s
-         real(dp), pointer, dimension(:,:) :: dx, B ! (nvar, nz)
+         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          integer, intent(out) :: ierr
 
          integer :: id
@@ -789,9 +789,7 @@
             stop 'debug: inspectB'
          end if
 
-
          contains
-
 
          subroutine dumpB
             integer :: k, j, k0, k1
@@ -800,7 +798,7 @@
                do j=1,nvar
                   write(*,2) 'B ' // trim(s% nameofvar(j)), k, B(j, k)
                   write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, s% x_scale(j, k)
-                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, dx(j, k)
+                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, s% solver_dx(j, k)
                end do
                write(*,*)
             end do
