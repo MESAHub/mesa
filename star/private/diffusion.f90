@@ -236,7 +236,7 @@
             new_mass(nc,nz), starting_dX_dm(nc,nz), starting_mass(nc,nz), &
             ending_mass(nc,nz), ending_dX_dm(nc,nz), GT_face(nc,nz), AD_face(nz), &
             X_theta(nc,nz), X_minus_theta(nc,nz), SIG_face(nc,nc,nz), sigma_lnC(nc,nc,nz), &
-            r_face(nz), alfa_face(nz), rho_face(nz), T_face(nz), four_pi_r2_rho_face(nz), &
+            r_face(nz+1), alfa_face(nz), rho_face(nz), T_face(nz), four_pi_r2_rho_face(nz), &
             dlnP_dr_face(nz), dlnT_dr_face(nz), dlnRho_dr_face(nz), &
             limit_coeffs_face(nz), sum_starting_mass(nz), &
             cell_dm(nz), dm_bar(nz), sum_new_mass(nz), &
