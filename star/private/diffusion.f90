@@ -117,34 +117,31 @@
             tiny_X = 1d-50, tiny_C = 1d-50, max_sum_abs = 10, X_cleanup_tol = 1d-2, &
             max_flow_frac = 1d0, max_flow_X_limit = 1d-5, dx_avg_target = 0.975d0
 
-         real(dp), dimension(:), pointer :: cell_dm, dm_bar, A, sum_new_mass
-         real(dp), dimension(:,:), pointer :: &
+         real(dp), dimension(:), allocatable :: cell_dm, dm_bar, sum_new_mass
+         real(dp), dimension(:,:), allocatable :: &
             Z, X, ending_dX_dm, C, dC_dr, C_div_X, &
-            rhs, new_mass, del, X_0, X_1, dX, dX_dt
-         real(dp), dimension(:,:,:), pointer :: em1, e00, ep1
+            new_mass, X_0, X_1, dX, dX_dt
 
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:), allocatable :: &
             r_face, alfa_face, rho_face, T_face, four_pi_r2_rho_face, &
             dlnP_dr_face, dlnT_dr_face, dlnRho_dr_face, sum_starting_mass, &
             limit_coeffs_face, &
-            e_ap, e_at, e_ar, e_ax1, &
-            g_ap, g_at, g_ar, g_ax1
+            e_ap, e_at, e_ar, &
+            g_ap, g_at, g_ar
 
-         real(dp), dimension(:), pointer :: &
-            Z1, X1, ending_dX_dm1, C1, dC_dr1, C_div_X1, new_mass1, &
-            X_face1, C_div_X_face1, GT_face1, del1, X_01, X_11, dX1, dX_dt1, &
-            ending_mass1, starting_mass1, starting_dX_dm1, SIG_face1, sigma_lnC1, &
-            AD_face, rad_accel_face1, log10_g_rad1, &
-            X_theta1, X_minus_theta1, xm_face, sum_ending_mass
-         real(dp), dimension(:,:), pointer :: &
+         real(dp), dimension(:), allocatable :: &
+            AD_face, xm_face, sum_ending_mass
+         real(dp), dimension(:,:), allocatable :: &
             X_face, C_div_X_face, GT_face, &
             rad_accel_face, log10_g_rad, &
             ending_mass, starting_mass, starting_dX_dm, &
             X_theta, X_minus_theta, e_ax, g_ax
-         real(dp), dimension(:,:,:), pointer :: &
+         real(dp), dimension(:,:,:), allocatable :: &
             SIG_face, sigma_lnC
 
-         real(dp), pointer, dimension(:) :: rhs1, lblk1, dblk1, ublk1, b1
+         real(dp), pointer, dimension(:) :: del1, rhs1, lblk1, dblk1, ublk1, b1
+         real(dp), dimension(:,:), pointer :: rhs, del
+         real(dp), dimension(:,:,:), pointer :: em1, e00, ep1
          integer, pointer :: ipiv1(:)
          integer :: lrd, lid, j_bad, k_bad, kmax_rad_accel, min_num_substeps, &
             iter_dbg, j_dbg, k_dbg, k_max
@@ -152,7 +149,7 @@
          integer, pointer :: ipar_decsol(:)
          real(dp), pointer :: rpar_decsol(:)
          real(dp), dimension(species) :: xa_total_before, xa_total_after
-         real(dp), dimension(m) :: C_face, Z_face
+         real(dp), dimension(m) :: A, C_face, Z_face
          real(dp) :: X_total_atol, X_total_rtol, b_bad, flow_out, flow_in, &
             vc_target, vc, vc_old, dt_old, &
             max_timestep_factor, min_timestep_factor
@@ -175,7 +172,6 @@
          min_num_substeps = s% diffusion_min_num_substeps
          trace = s% show_diffusion_substep_info
          do_timing = s% show_diffusion_timing
-         nullify(limit_coeffs_face)
 
          if (dbg) then
             write(*,2) 'nzlo', nzlo
@@ -233,12 +229,22 @@
             endif
          enddo
          nzlo=nbound
-         
-         call do_alloc1(ierr)
-         if (ierr /= 0) then
-            if (dbg .or. s% report_ierr) write(*,*) 'diffusion failed in do_alloc1'
-            return
-         end if
+           
+         allocate( &
+            e_ap(nz), e_at(nz), e_ar(nz), e_ax(m,nz), & ! for e field
+            g_ap(nz), g_at(nz), g_ar(nz), g_ax(m,nz), & ! for g field
+            new_mass(nc,nz), starting_dX_dm(nc,nz), starting_mass(nc,nz), &
+            ending_mass(nc,nz), ending_dX_dm(nc,nz), GT_face(nc,nz), AD_face(nz), &
+            X_theta(nc,nz), X_minus_theta(nc,nz), SIG_face(nc,nc,nz), sigma_lnC(nc,nc,nz), &
+            r_face(nz), alfa_face(nz), rho_face(nz), T_face(nz), four_pi_r2_rho_face(nz), &
+            dlnP_dr_face(nz), dlnT_dr_face(nz), dlnRho_dr_face(nz), &
+            limit_coeffs_face(nz), sum_starting_mass(nz), &
+            cell_dm(nz), dm_bar(nz), sum_new_mass(nz), &
+            Z(m,nz), X(m,nz), C(m,nz), dC_dr(m,nz), C_div_X(m,nz), &
+            X_0(nc,nz), X_1(nc,nz), dX(nc,nz), dX_dt(nc,nz), &
+            xm_face(nz), sum_ending_mass(nz), &
+            X_face(m,nz), C_div_X_face(m,nz), &
+            rad_accel_face(m,nz), log10_g_rad(m,nz))
          
          call get_limit_coeffs( &
             s, nz, nzlo, nzhi, &
@@ -255,10 +261,7 @@
          if (dbg) write(*,2) 'nzlo, q', nzlo, s% q(nzlo)
          if (dbg) write(*,2) 'nzhi, q', nzhi, s% q(nzhi)
          if (dbg) write(*,2) '   n', n
-         if (n <= 1) then
-            call do_dealloc1
-            return
-         end if
+         if (n <= 1) return
 
          neqs = n*nc
          idiag = 2*nc
@@ -280,7 +283,6 @@
          call do_alloc(ierr)
          if (ierr /= 0) then
             if (dbg .or. s% report_ierr) write(*,*) 'diffusion failed in do_alloc'
-            call do_dealloc1
             return
          end if
 
@@ -1136,72 +1138,28 @@
 
          end subroutine update_coeffs
 
-
-         subroutine do_alloc1(ierr)
-            use alloc, only: work_array
-            integer, intent(out) :: ierr
-            ierr = 0
-            call work_array(s, .true., .false., &
-               limit_coeffs_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-         end subroutine do_alloc1
-
-         subroutine do_dealloc1
-            use alloc, only: work_array
-            call work_array(s, .false., .false., &
-               limit_coeffs_face, nz, nz_alloc_extra, 'mod_diffusion', ierr_dealloc)
-         end subroutine do_dealloc1
-
          subroutine do_alloc(ierr)
             use mtx_lib, only: bcyclic_dble_work_sizes
             use alloc, only: get_integer_work_array
             integer, intent(out) :: ierr
             ierr = 0
             call bcyclic_dble_work_sizes(nc, nz, lrd, lid)
-            
             call get_integer_work_array(s, ipiv1, nc*nz, nc*nz_alloc_extra, ierr)
             if (ierr /= 0) return
             call get_integer_work_array(s, ipar_decsol, lid, 0, ierr)
             if (ierr /= 0) return
             call do_work_arrays(.true.,ierr)
-            if (ierr /= 0) return            
-            
-            g_ax(1:m,1:nz) => g_ax1(1:m*nz)
-            Z(1:m,1:nz) => Z1(1:m*nz)
-            X(1:m,1:nz) => X1(1:m*nz)
-            C(1:m,1:nz) => C1(1:m*nz)
-            dC_dr(1:m,1:nz) => dC_dr1(1:m*nz)
-            C_div_X(1:m,1:nz) => C_div_X1(1:m*nz)
-            X_face(1:m,1:nz) => X_face1(1:m*nz)
-            C_div_X_face(1:m,1:nz) => C_div_X_face1(1:m*nz)
-            rad_accel_face(1:m,1:nz) => rad_accel_face1(1:m*nz)
-            log10_g_rad(1:m,1:nz) => log10_g_rad1(1:m*nz)
-            new_mass(1:nc,1:nz) => new_mass1(1:nc*nz)
-            starting_dX_dm(1:nc,1:nz) => starting_dX_dm1(1:nc*nz)
-            starting_mass(1:nc,1:nz) => starting_mass1(1:nc*nz)
-            ending_mass(1:nc,1:nz) => ending_mass1(1:nc*nz)
-            ending_dX_dm(1:nc,1:nz) => ending_dX_dm1(1:nc*nz)
-            e_ax(1:m,1:nz) => e_ax1(1:m*nz)
-            GT_face(1:nc,1:nz) => GT_face1(1:nc*nz)
-            X_theta(1:nc,1:nz) => X_theta1(1:nc*nz)
-            X_minus_theta(1:nc,1:nz) => X_minus_theta1(1:nc*nz)
-            del(1:nc,1:nz) => del1(1:nc*nz)
-            X_0(1:nc,1:nz) => X_01(1:nc*nz)
-            X_1(1:nc,1:nz) => X_11(1:nc*nz)
-            dX(1:nc,1:nz) => dX1(1:nc*nz)
-            dX_dt(1:nc,1:nz) => dX_dt1(1:nc*nz)
-            SIG_face(1:nc,1:nc,1:nz) => SIG_face1(1:nc*nc*nz)
-            sigma_lnC(1:nc,1:nc,1:nz) => sigma_lnC1(1:nc*nc*nz)
+            if (ierr /= 0) return                        
             em1(1:nc,1:nc,1:nz) => lblk1(1:nc*nc*nz)
             e00(1:nc,1:nc,1:nz) => dblk1(1:nc*nc*nz)
             ep1(1:nc,1:nc,1:nz) => ublk1(1:nc*nc*nz)
             rhs(1:nc,1:nz) => rhs1(1:nc*nz)
-            
+            del(1:nc,1:nz) => del1(1:nc*nz)
          end subroutine do_alloc
 
 
          subroutine dealloc
             use alloc, only: return_integer_work_array
-            call do_dealloc1
             call return_integer_work_array(s, ipiv1)
             call return_integer_work_array(s, ipar_decsol)
             call do_work_arrays(.false.,ierr_dealloc)
@@ -1216,93 +1174,7 @@
             ierr = 0
 
             call work_array(s, alloc_flag, crit, &
-               Z1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               C1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dC_dr1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               C_div_X1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X_face1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               C_div_X_face1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
-               rad_accel_face1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               log10_g_rad1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
-               sum_ending_mass, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               cell_dm, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dm_bar, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               sum_new_mass, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               sum_starting_mass, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               alfa_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               rho_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               T_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               four_pi_r2_rho_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnP_dr_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnT_dr_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dlnRho_dr_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               r_face, nz+1, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               xm_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
                del1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X_01, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X_11, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dX1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               dX_dt1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
             call work_array(s, alloc_flag, crit, &
                rhs1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
             if (ierr /= 0) return
@@ -1322,74 +1194,6 @@
 
             call work_array(s, alloc_flag, crit, &
                rpar_decsol, lrd, 0, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
-               A, m, 0, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            ! for e field
-            call work_array(s, alloc_flag, crit, &
-               e_ap, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               e_at, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               e_ar, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               e_ax1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            ! for g field
-            call work_array(s, alloc_flag, crit, &
-               g_ap, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               g_at, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               g_ar, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               g_ax1, m*nz, m*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
-               new_mass1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               starting_dX_dm1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               starting_mass1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               ending_mass1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               ending_dX_dm1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               GT_face1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               AD_face, nz, nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
-               X_theta1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               X_minus_theta1, nc*nz, nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-
-            call work_array(s, alloc_flag, crit, &
-               SIG_face1, nc*nc*nz, nc*nc*nz_alloc_extra, 'mod_diffusion', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               sigma_lnC1, nc*nc*nz, nc*nc*nz_alloc_extra, 'mod_diffusion', ierr)
             if (ierr /= 0) return
 
          end subroutine do_work_arrays
