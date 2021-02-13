@@ -1431,8 +1431,11 @@ contains
     ! Dump a snapshot of the current model state to file
 
     ! First, re-calculate gradL_composition_term
-
-    gradL_composition_term = s%gradL_composition_term(1:s%nz)
+    ! edited by BP to get rid of bogus warning from compiler.
+    allocate(gradL_composition_term(s%nz))
+    do k=1,s%nz
+       gradL_composition_term(k) = s%gradL_composition_term(k)
+    end do
 
     call do_brunt_B(s, 1, s%nz, ierr)
     if (ierr /= 0) then

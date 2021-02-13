@@ -110,15 +110,15 @@
          terminal_interval = 10
          write_header_frequency = 10
 
-      !photo_interval = 1
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
@@ -160,7 +160,7 @@
       
       !energy_conservation_dump_model_number = -1
       
-      !trace_evolve = .true.
+      trace_evolve = .true.
       
       !use_DGESVX_in_bcyclic = .true.
       !use_equilibration_in_DGESVX = .true.

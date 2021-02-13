@@ -2028,6 +2028,7 @@
          type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
+         khi = khi_in
          if (khi == -1) khi = size(ptr,dim=1)
          do k=klo,khi
             call set_nan(ptr(k)% val)
@@ -2040,6 +2041,7 @@
          type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
+         khi = khi_in
          if (khi == -1) khi = size(ptr,dim=1)
          do k=klo,khi
             ptr(k)% val = 0d0

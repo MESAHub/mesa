@@ -875,6 +875,10 @@
             !$omp simd
             do i=1,neq
                b1(i) = -s% equ1(i)
+               !if (is_bad(b1(i))) then
+               !   write(*,2) 'b1', i, b1(i)
+               !   stop 'solve_equ'
+               !end if
             end do
 
             info = 0
