@@ -16,3 +16,29 @@ semiconvection and thermohaline on during H and He core burning, off after that
 no overshooting; MLT++ on; use_gold2_tolerances on; op_split_burn for cells with logT > 9.0
 
 the pgstar plots have lots of useful information for understanding the progress to core collapse.
+
+
+convergence checks run Feb 12, 2021.  
+
+case A: relax inlist_common by 20%
+      mesh_delta_coeff = 1.8
+      mesh_delta_coeff_for_highT = 1.8     
+      time_delta_coeff = 1.2 
+case B: standard inlist_common
+      mesh_delta_coeff = 1.5
+      mesh_delta_coeff_for_highT = 1.5     
+      time_delta_coeff = 1.0 
+case C: tighten inlist_common by 20%
+      mesh_delta_coeff = 1.2
+      mesh_delta_coeff_for_highT = 1.2    
+      time_delta_coeff = 0.8
+case D: tighten inlist_common by 40%
+      mesh_delta_coeff = 0.9
+      mesh_delta_coeff_for_highT = 0.9 
+      time_delta_coeff = 0.6
+
+case  M_zams   M_He  M_CO  M_Fe  zones steps retries  log_rel_run_E_err    runtime inlist_to_cc
+A     50       22.3  13.4  1.77  1684   814  5        -6.82                 5.98
+B     50       22.5  13.2  1.79  1862  1004  5        -6.75                 8.49
+C     50       22.5  13.1  1.79  2239  1201  1        -6.98                10.72
+D     50       22.4  13.3  1.78  2993  1587  0        -6.72                18.23

@@ -99,7 +99,9 @@
       overshoot_bdy_loc(1) = 'any'
 
 ! timesteps
+      time_delta_coeff = 1.0
       varcontrol_target   = 1d-3
+      
       min_timestep_factor = 0.8d0
       max_timestep_factor = 1.05d0
       timestep_factor_for_retries = 0.75
@@ -156,7 +158,7 @@
 
 ! mesh
       mesh_delta_coeff = 1.5
-      mesh_delta_coeff_for_highT = 1.5      
+      mesh_delta_coeff_for_highT = 1.5  
       logT_max_for_standard_mesh_delta_coeff = 9.0 
       logT_min_for_highT_mesh_delta_coeff = 9.5 
       min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes

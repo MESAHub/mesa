@@ -45,8 +45,7 @@
 ! rotation
 
 ! mlt
-      max_logT_for_mlt = 0d0  
-      ! go purely radiative when have rapid changes and strong shocks
+      max_logT_for_mlt = 9.2d0  
 
 ! mixing
       
