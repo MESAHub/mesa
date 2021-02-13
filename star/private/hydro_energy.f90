@@ -42,17 +42,16 @@
       
 
       subroutine do1_energy_eqn( & ! energy conservation
-            s, k, equ, skip_partials, do_chem, nvar, ierr)
+            s, k, skip_partials, do_chem, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials, do_chem
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
          call get1_energy_eqn( &
-            s, k, equ, skip_partials, do_chem, nvar, &
+            s, k, skip_partials, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
@@ -64,7 +63,7 @@
 
 
       subroutine get1_energy_eqn( &
-            s, k, equ, skip_partials, do_chem, nvar, &
+            s, k, skip_partials, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
 
          use eos_def, only: i_grad_ad, i_lnPgas, i_lnE
@@ -73,7 +72,6 @@
          use auto_diff_support
          type (star_info), pointer :: s         
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials, do_chem
          real(dp), intent(out), dimension(nvar) :: d_dm1, d_d00, d_dp1
          integer, intent(out) :: ierr
@@ -121,7 +119,7 @@
          s% ergs_error(k) = -dm*dt*resid_18%val ! save ergs_error before scaling
          resid_18 = scal*resid_18
          residual = resid_18%val
-         equ(i_dlnE_dt, k) = residual
+         s% equ(i_dlnE_dt, k) = residual
          s% E_residual(k) = residual
 
          if (is_bad(residual)) then

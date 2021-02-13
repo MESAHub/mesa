@@ -39,14 +39,13 @@
 
 
       subroutine do1_alpha( &
-            s, k, nvar, skip_partials, equ, ierr)
+            s, k, nvar, skip_partials, ierr)
          use star_utils, only: em1, e00, ep1
          use chem_def, only: ih1, ihe4
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
-         real(dp), intent(inout) :: equ(:,:)
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
@@ -186,11 +185,11 @@
          dadt_actual = s% dalpha_RTI_dt(k)
 
          if (dadt_expected == 0d0) then
-            equ(i,k) = dadt_expected
+            s% equ(i,k) = dadt_expected
             eqn_scale = 1d0
          else
             eqn_scale = s% x_scale(i,k)*dVARdot_dVAR
-            equ(i,k) = (dadt_expected - dadt_actual)/eqn_scale
+            s% equ(i,k) = (dadt_expected - dadt_actual)/eqn_scale
          end if
 
          if (test_partials) then
@@ -209,8 +208,8 @@
             write(*,2) 'dadt_actual', k, dadt_actual
             write(*,2) 'eqn_scale', k, eqn_scale
             write(*,2) 's% dt', k, s% dt
-            write(*,2) 'equ(i,k)', k, equ(i,k)
-            s% solver_test_partials_val = equ(i,k)
+            write(*,2) 'equ(i,k)', k, s% equ(i,k)
+            s% solver_test_partials_val = s% equ(i,k)
          end if
 
          if (skip_partials) return

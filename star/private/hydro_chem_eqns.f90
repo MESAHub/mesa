@@ -40,11 +40,10 @@
 
 
       subroutine do_chem_eqns( &
-            s, nvar, equchem1, species, skip_partials, equ, ierr)
+            s, nvar, equchem1, species, skip_partials, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar, equchem1, species
          logical, intent(in) :: skip_partials
-         real(dp), intent(inout) :: equ(:,:)
          integer, intent(out) :: ierr
          integer :: k, op_err
          include 'formats'
@@ -53,8 +52,7 @@
          do k = 1, s% nz
             if (ierr /= 0) cycle
             call do1_chem_eqns( &
-               s, k, nvar, equchem1, species, skip_partials, &
-               equ, op_err)
+               s, k, nvar, equchem1, species, skip_partials, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -62,8 +60,7 @@
 
 
       subroutine do1_chem_eqns( &
-            s, k, nvar, equchem1, species, skip_partials, &
-            equ, ierr)
+            s, k, nvar, equchem1, species, skip_partials, ierr)
 
          use chem_def
          use net_lib, only: show_net_reactions, show_net_params
@@ -73,7 +70,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar, equchem1, species
          logical, intent(in) :: skip_partials
-         real(dp), intent(inout) :: equ(:,:)
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
@@ -152,17 +148,17 @@
 
             eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)*dVARdot_dVAR)
             residual = (dxdt_expected - dxdt_actual)/eqn_scale
-            equ(i,k) = residual
+            s% equ(i,k) = residual
             
             if (abs(residual) > max_abs_residual) &
-               max_abs_residual = abs(equ(i,k))
+               max_abs_residual = abs(residual)
 
-            if (is_bad(equ(i,k))) then
+            if (is_bad(residual)) then
                s% retry_message = 'bad residual for do1_chem_eqns'
 !$OMP critical (star_chem_eqns_bad_num)
                if (s% report_ierr) then
-                  write(*,3) 'do1_chem_eqns: equ ' // trim(s% nameofequ(i)), &
-                        i, k, equ(i,k)
+                  write(*,3) 'do1_chem_eqns: residual ' // trim(s% nameofequ(i)), &
+                        i, k, residual
                   write(*,2) 'dxdt_expected', k, dxdt_expected
                   write(*,2) 'dxdt_actual', k, dxdt_actual
                   write(*,2) 'eqn_scale', k, eqn_scale

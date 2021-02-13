@@ -86,28 +86,23 @@
       end subroutine set_xscale_info
 
 
-      subroutine eval_equations(s, iter, nvar, nz, equ_in, ierr)
+      subroutine eval_equations(s, iter, nvar, nz, ierr)
          use hydro_eqns, only: eval_equ
          use mix_info, only: set_dxdt_mix
          use star_utils, only: update_time, total_times
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: equ_in ! (nvar, nz)
          integer, intent(out) :: ierr
 
          integer :: cnt, i, j, k
          integer :: id
          real(dp) :: dt, theta_dt
-         real(dp), pointer :: equ(:,:)
 
          logical, parameter :: skip_partials = .true.
 
          include 'formats'
 
          ierr = 0
-
-         equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
-
          if (dbg) write(*, *) 'eval_equations'
 
          dt = s% dt
@@ -129,7 +124,7 @@
          if (ierr == 0) then
             do k=1,nz
                do j=1,nvar
-                  equ(j,k) = 0d0
+                  s% equ(j,k) = 0d0
                   s% residual_weight(j,k) = 1d0
                   s% correction_weight(j,k) = 1d0
                end do
@@ -148,12 +143,12 @@
          cnt = 0
          do i=1,nz
             do j=1, nvar
-               if (is_bad_num(equ(j, i))) then
+               if (is_bad_num(s% equ(j, i))) then
                   cnt = cnt + 1
                   s% retry_message = 'eval_equations: equ has a bad num'
                   if (s% report_ierr) then
                      write(*,4) 'eval_equations: equ has a bad num ' // trim(s% nameofequ(j)), &
-                        j, i, nvar, equ(j, i)
+                        j, i, nvar, s% equ(j, i)
                      write(*,2) 'cell', i
                      write(*,2) 'nz', s% nz
                   end if
@@ -187,11 +182,9 @@
 
 
       subroutine sizequ(s, &
-            iter, nvar, nz, equ, &
-            equ_norm, equ_max, k_max, j_max, ierr)
+            iter, nvar, nz, equ_norm, equ_max, k_max, j_max, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer :: equ(:,:) ! (nvar, nz)
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
@@ -231,7 +224,7 @@
                do k = 1, nz
                   do j = 1, nvar
                      if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
-                     absq = abs(equ(j,k)*s% residual_weight(j,k))
+                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                      sumequ = sumequ + absq
                      if (absq > equ_max) then
                         equ_max = absq
@@ -251,8 +244,7 @@
                do k = 1, nz
                   do j = 1, nvar_hydro
                      if (j == skip_eqn1 .or. j == skip_eqn2) cycle
-                     absq = abs(equ(j,k)*s% residual_weight(j,k))
-                     !write(*,3) 'equ(j,k)*s% residual_weight(j,k)', j, k, equ(j,k)*s% residual_weight(j,k)
+                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                      sumequ = sumequ + absq
                      if (is_bad(sumequ)) then
                         if (dbg) then
@@ -262,7 +254,7 @@
                         ierr = -1
                         if (s% report_ierr) &
                            write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
-                              j, k, equ(j,k)*s% residual_weight(j,k)
+                              j, k, s% equ(j,k)*s% residual_weight(j,k)
                         if (s% stop_for_bad_nums) stop 'sizeq 2'
                         return
                      end if
@@ -280,7 +272,7 @@
             num_terms = num_terms + nvar_chem*nz
             do k = 1, nz
                do j = i_chem1, nvar
-                  absq = abs(equ(j,k)*s% residual_weight(j,k))
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                   sumequ = sumequ + absq
                   if (absq > equ_max) then
                      equ_max = absq
@@ -293,7 +285,7 @@
          if (s% conv_vel_flag) then
             do k = 1, nz
                j = s% i_dln_cvpv0_dt
-               absq = abs(equ(j,k)*s% residual_weight(j,k))
+               absq = abs(s% equ(j,k)*s% residual_weight(j,k))
             end do
          end if
 
@@ -315,7 +307,7 @@
             do k=1,s% nz
                do j=1,nvar
                   write(*,3) 'equ ' // trim(s% nameofequ(j)), &
-                     k, iter, equ(j, k)
+                     k, iter, s% equ(j, k)
                end do
                write(*,*)
                !if (k == 6) exit

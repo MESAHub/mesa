@@ -42,11 +42,10 @@
 
       
       subroutine do_surf_momentum_eqn( &
-            s, P_surf_18, equ, skip_partials, nvar, ierr)
+            s, P_surf_18, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          type(auto_diff_real_18var_order1), intent(in) :: P_surf_18
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
@@ -54,7 +53,7 @@
          include 'formats'
          ierr = 0
          call get1_momentum_eqn( &
-            s, 1, P_surf_18, equ, skip_partials, nvar, &
+            s, 1, P_surf_18, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
@@ -65,11 +64,10 @@
       end subroutine do_surf_momentum_eqn
 
       
-      subroutine do1_momentum_eqn(s, k, equ, skip_partials, nvar, ierr)
+      subroutine do1_momentum_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
@@ -78,7 +76,7 @@
          include 'formats'
          P_surf_18 = 0d0
          call get1_momentum_eqn( &
-            s, k, P_surf_18, equ, skip_partials, nvar, &
+            s, k, P_surf_18, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
@@ -90,7 +88,7 @@
 
 
       subroutine get1_momentum_eqn( &
-            s, k, P_surf_18, equ, skip_partials, nvar, &
+            s, k, P_surf_18, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use chem_def, only: chem_isos
          use accurate_sum_auto_diff_18var_order1
@@ -99,7 +97,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(in) :: P_surf_18 ! only used if k == 1
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          real(dp), intent(out) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
@@ -178,7 +175,7 @@
          resid1_18 = residual_sum_18 ! convert back to auto_diff_real_18var_order1
          resid_18 = resid1_18*iXPavg_18 ! scaling
          residual = resid_18%val
-         equ(i_dv_dt, k) = residual      
+         s% equ(i_dv_dt, k) = residual      
          s% v_residual(k) = residual
 
          if (is_bad(residual)) then
@@ -577,11 +574,10 @@
 
 
       subroutine do1_radius_eqn( &
-            s, k, equ, skip_partials, nvar, ierr)
+            s, k, skip_partials, nvar, ierr)
          use auto_diff_support, only: unwrap
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
@@ -622,14 +618,14 @@
          if (force_zero_v) then
             cs = s% csound_start(k)
             if (i_v /= 0) then
-               equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
-               s% lnR_residual(k) = equ(i_dlnR_dt, k)
+               s% equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
+               s% lnR_residual(k) = s% equ(i_dlnR_dt, k)
                if (skip_partials) return
                call e00(s, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
                return
             else if (i_u /= 0) then
-               equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
-               s% lnR_residual(k) = equ(i_dlnR_dt, k)
+               s% equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
+               s% lnR_residual(k) = s% equ(i_dlnR_dt, k)
                if (skip_partials) return
                call e00(s, i_dlnR_dt, i_u, k, nvar, 1d0/cs)
                return
@@ -663,7 +659,7 @@
          dr_div_r0_expected = v_expected*dt/r0
          
          residual = dr_div_r0_expected - dr_div_r0_actual
-         equ(i_dlnR_dt, k) = residual
+         s% equ(i_dlnR_dt, k) = residual
          s% lnR_residual(k) = residual
 
          if (test_partials) then

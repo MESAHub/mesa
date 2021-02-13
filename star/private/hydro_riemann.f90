@@ -59,7 +59,7 @@
       subroutine do_surf_Riemann_dudt_eqn( &
             s, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            equ, skip_partials, nvar, ierr)
+            skip_partials, nvar, ierr)
          type (star_info), pointer :: s         
          real(dp), intent(in) :: P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
@@ -71,29 +71,28 @@
          call do1_dudt_eqn( &
             s, 1, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            equ, skip_partials, nvar, ierr)
+            skip_partials, nvar, ierr)
       end subroutine do_surf_Riemann_dudt_eqn
       
 
       subroutine do1_Riemann_momentum_eqn( &
-            s, k, P_surf, equ, skip_partials, nvar, ierr)
+            s, k, P_surf, skip_partials, nvar, ierr)
          type (star_info), pointer :: s         
          integer, intent(in) :: k
          real(dp), intent(in) :: P_surf ! only used if k==1
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
          call do1_dudt_eqn( &
             s, k, P_surf, 0d0, 0d0, 0d0, 0d0, &
-            equ, skip_partials, nvar, ierr)
+            skip_partials, nvar, ierr)
       end subroutine do1_Riemann_momentum_eqn
          
 
       subroutine do1_dudt_eqn( &
             s, k, P_surf, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            equ, skip_partials, nvar, ierr)
+            skip_partials, nvar, ierr)
          use auto_diff_support
          use accurate_sum_auto_diff_18var_order1
          use star_utils, only: get_area_info, store_partials
@@ -102,7 +101,6 @@
          real(dp), intent(in) :: P_surf ! only used if k==1
          real(dp), intent(in) :: &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
@@ -170,7 +168,7 @@
          
          resid_18 = scal*(dudt_expected_18 - dudt_actual_18)
          residual = resid_18%val
-         equ(i_du_dt, k) = residual
+         s% equ(i_du_dt, k) = residual
          s% u_residual(k) = residual
          
          if (is_bad(residual)) then

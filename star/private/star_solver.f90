@@ -47,7 +47,7 @@
       subroutine solver( &
             s, nz, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            equ, work, lwork, iwork, liwork, AF, &
+            work, lwork, iwork, liwork, AF, &
             convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
          use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
@@ -57,9 +57,6 @@
          integer, intent(in) :: nz ! number of zones
          integer, intent(in) :: nvar ! number of variables per zone
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), pointer, dimension(:) :: equ ! =(nvar,nz)
-         ! equ(i) has the residual for equation i, i.e., the difference between
-         ! the left and right hand sides of the equation.
 
          ! work arrays. required sizes provided by the routine solver_work_sizes.
          ! for standard use, set work and iwork to 0 before calling.
@@ -112,7 +109,7 @@
          call do_solver( &
             s, nz, nvar, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            equ, work, lwork, iwork, liwork, &
+            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          contains
@@ -172,7 +169,7 @@
       subroutine do_solver( &
             s, nz, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            equ1, work, lwork, iwork, liwork, &
+            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
@@ -181,7 +178,6 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
-         real(dp), pointer, dimension(:) :: equ1
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
@@ -236,14 +232,12 @@
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
 
-         real(dp), pointer, dimension(:,:) :: equ ! (nvar,nz)
          real(dp), pointer, dimension(:,:) :: AF ! (ldAF,neq)
          real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
          include 'formats'
 
-         equ(1:nvar,1:nz) => equ1(1:neq)
          AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
          tol_msg(1) = 'avg corr'
@@ -337,7 +331,7 @@
             return
          end if
          
-         call eval_equations(s, iter, nvar, nz, equ, ierr)         
+         call eval_equations(s, iter, nvar, nz, ierr)         
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -346,7 +340,7 @@
          end if
          
          call sizequ(s, &
-            iter, nvar, nz, equ, &
+            iter, nvar, nz, &
             residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
          if (ierr /= 0) then
             if (dbg_msg) &
@@ -497,7 +491,7 @@
             if (min_corr_coeff < 1d0) then
                ! compute gradient of f = equ<dot>jacobian
                ! NOTE: NOT jacobian<dot>equ
-               call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
+               call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, s% equ1, grad_f1)
 
                slope = eval_slope(nvar, nz, grad_f, soln)
                if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
@@ -534,7 +528,7 @@
             ! check the residuals for the equations
 
             call sizequ(s, &
-               iter, nvar, nz, equ, &
+               iter, nvar, nz, &
                residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             if (ierr /= 0) then
                call oops('sizequ returned ierr')
@@ -786,12 +780,12 @@
                      ddxsave(i,k) = ddx(i,k)
                   end do
                end do
-               f = eval_f(nvar,nz,equ)
+               f = eval_f(nvar,nz)
                if (is_bad_num(f)) then
                   ierr = -1
                   write(err_msg,*) 'adjust_correction failed in eval_f'
                   if (dbg_msg) write(*,*) &
-                     'adjust_correction: eval_f(nvar,nz,equ)', eval_f(nvar,nz,equ)
+                     'adjust_correction: eval_f(nvar,nz)', eval_f(nvar,nz)
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'f', f
                      stop 'solver adjust_correction'
@@ -820,7 +814,7 @@
                s% solver_adjust_iter = iter
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
-               call eval_equations(s, iter, nvar, nz, equ, ierr)
+               call eval_equations(s, iter, nvar, nz, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -842,12 +836,12 @@
                   do k=1,nz
                      do i=1,nvar
                         write(*,5) trim(s% nameofequ(i)), k, iter, s% solver_iter, &
-                           s% model_number, equ(i,k)
+                           s% model_number, s% equ(i,k)
                      end do
                   end do
                end if
 
-               f = eval_f(nvar,nz,equ)
+               f = eval_f(nvar,nz)
                if (is_bad_num(f)) then
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'f', f
@@ -1010,7 +1004,7 @@
             solve_equ=.true.
             !$omp simd
             do i=1,neq
-               b1(i) = -equ1(i)
+               b1(i) = -s% equ1(i)
             end do
 
             info = 0
@@ -1122,7 +1116,7 @@
                call eval_partials(s, nvar, ierr)
                if (ierr /= 0) return
             else
-               call eval_equations(s, iter, nvar, nz, equ, ierr)
+               call eval_equations(s, iter, nvar, nz, ierr)
                if (ierr /= 0) then
                   write(*,3) '1st call eval_equations failed'
                   stop 'setmatrix'
@@ -1134,7 +1128,7 @@
             do k=1,nz
                do j=1,nvar
                   save_dx(j,k) = s% solver_dx(j,k)
-                  save_equ(j,k) = equ(j,k)
+                  save_equ(j,k) = s% equ(j,k)
                end do
             end do
             
@@ -1650,14 +1644,14 @@
                end if
                s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations(s, iter, nvar, nz, equ, ierr)            
+            call eval_equations(s, iter, nvar, nz, ierr)            
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
                stop 'setmatrix'
             end if
             if (i_equ > 0) then
-               val = equ(i_equ,k) ! testing partial of residual for cell k equation
+               val = s% equ(i_equ,k) ! testing partial of residual for cell k equation
             else if (i_equ == 0) then
                val = s% solver_test_partials_val
             else if (i_equ == -1) then
@@ -1818,8 +1812,7 @@
             if (.not. dbg_msg) return
             
             if (max_resid_j < 0) then
-               call sizequ(s, &
-                  iter, nvar, nz, equ, &
+               call sizequ(s, iter, nvar, nz, &
                   residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             end if
             
@@ -1971,16 +1964,15 @@
          end function eval_slope
 
 
-         real(dp) function eval_f(nvar, nz, equ)
+         real(dp) function eval_f(nvar, nz)
             integer, intent(in) :: nvar, nz
-            real(dp), intent(in), dimension(:,:) :: equ
             integer :: k, i
             real(dp) :: q
             include 'formats'
             eval_f = 0
             do k = 1, nz
                do i = 1, nvar
-                  q = equ(i,k)
+                  q = s% equ(i,k)
                   eval_f = eval_f + q*q
                end do
             end do
