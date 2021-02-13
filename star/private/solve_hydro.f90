@@ -542,7 +542,7 @@
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &
-               s% AF1, failure, ierr)
+               failure, ierr)
             s% doing_solver_iterations = .false.
             warn_rates_for_high_temp = save_warn_rates_flag
          end subroutine newt

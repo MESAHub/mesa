@@ -303,8 +303,7 @@
             ! calculate new abundances to conserve species
             call do_xa( &
                s, nz, nz_old, k, species, cell_type, comes_from, xa, xa_old, &
-               xa_c0, xa_c1, xa_c2, xq, dq, xq_old, dq_old, &
-               s% mesh_adjust_use_quadratic, op_err)
+               xa_c0, xa_c1, xa_c2, xq, dq, xq_old, dq_old, op_err)
             if (op_err /= 0) then
                write(*,2) 'failed for do_xa', k
                stop
@@ -1287,14 +1286,13 @@
       subroutine do_xa( &
             s, nz, nz_old, k, species, cell_type, comes_from, &
             xa, xa_old, xa_c0, xa_c1, xa_c2, &
-            xq, dq, xq_old,  dq_old, mesh_adjust_use_quadratic, ierr)
+            xq, dq, xq_old,  dq_old, ierr)
          use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, species, k, cell_type(:), comes_from(:)
          real(dp), dimension(:,:), pointer :: xa, xa_old
          real(dp), dimension(:,:) :: xa_c0, xa_c1, xa_c2
          real(dp), dimension(:), pointer :: xq, dq, xq_old, dq_old
-         logical, intent(in) :: mesh_adjust_use_quadratic
          integer, intent(out) :: ierr
 
          integer :: j, jj, k_old, k_old_last, kdbg, order
@@ -1307,11 +1305,7 @@
 
          kdbg = -1074
 
-         if (mesh_adjust_use_quadratic) then
-            order = 2
-         else
-            order = 1
-         end if
+         order = 2
 
          if (cell_type(k) == unchanged_type .or. &
                cell_type(k) == revised_type) then

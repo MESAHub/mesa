@@ -77,7 +77,6 @@
          integer, intent(out) :: ierr
          integer :: i, k
          type (star_info), pointer :: s
-         real(dp), dimension(:, :), pointer :: equ
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -86,10 +85,9 @@
             write(*,3) 'nvar_hydro /= n', s% nvar_hydro, n
             stop 'equ_data_for_extra_profile_columns'
          end if
-         equ(1:n,1:nz) => s% equ1(1:n*nz)
          do i=1,n
             do k=1,nz
-               vals(k,i) = equ(i,k)
+               vals(k,i) = s% equ(i,k)
             end do
             names(i) = s% nameofequ(i)
          end do

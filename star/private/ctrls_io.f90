@@ -230,7 +230,7 @@
     max_rel_delta_IE_for_mesh_total_energy_balance, &
     trace_mesh_adjust_error_in_conservation, max_allowed_nz, mesh_max_allowed_ratio, &
     remesh_max_allowed_logT, max_delta_x_for_merge, mesh_dump_call_number, &
-    mesh_adjust_use_quadratic, mesh_ok_to_merge, mesh_max_k_old_for_split, mesh_min_k_old_for_split, &
+    mesh_ok_to_merge, mesh_max_k_old_for_split, mesh_min_k_old_for_split, &
     mesh_adjust_get_T_from_E, &
     max_dq, min_dq, min_dq_for_split, min_dq_for_xa, min_dq_for_xa_convective, &
     mesh_min_dlnR, merge_if_dlnR_too_small, min_dq_for_logT, &
@@ -1461,7 +1461,6 @@
  s% max_delta_x_for_merge = max_delta_x_for_merge
  s% mesh_dump_call_number = mesh_dump_call_number
 
- s% mesh_adjust_use_quadratic = mesh_adjust_use_quadratic
  s% mesh_ok_to_merge = mesh_ok_to_merge
  s% mesh_max_k_old_for_split = mesh_max_k_old_for_split
  s% mesh_min_k_old_for_split = mesh_min_k_old_for_split
@@ -3094,7 +3093,6 @@
  max_delta_x_for_merge = s% max_delta_x_for_merge
  mesh_dump_call_number = s% mesh_dump_call_number
 
- mesh_adjust_use_quadratic = s% mesh_adjust_use_quadratic
  mesh_ok_to_merge = s% mesh_ok_to_merge
  mesh_max_k_old_for_split = s% mesh_max_k_old_for_split
  mesh_min_k_old_for_split = s% mesh_min_k_old_for_split

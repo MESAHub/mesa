@@ -5796,16 +5796,6 @@
     max_num_merge_cells = 2
 
 
-      ! mesh_adjust_use_quadratic
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Linear or quadratic reconstruction polynomials for mesh adjustments.
-
-      ! ::
-
-    mesh_adjust_use_quadratic = .true.
-
-
       ! mesh_adjust_get_T_from_E
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 

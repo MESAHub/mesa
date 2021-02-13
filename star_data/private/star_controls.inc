@@ -553,8 +553,7 @@
 
          logical :: show_mesh_changes
 
-         logical :: mesh_adjust_use_quadratic, &
-            mesh_adjust_get_T_from_E, mesh_ok_to_merge
+         logical :: mesh_adjust_get_T_from_E, mesh_ok_to_merge
 
          integer :: mesh_dump_call_number, mesh_max_k_old_for_split, mesh_min_k_old_for_split
 

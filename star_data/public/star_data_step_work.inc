@@ -1301,19 +1301,15 @@
          real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
          real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
 
-         real(dp), dimension(:,:), pointer :: jacobian
-            ! NOT ALLOCATED. pointer set by enter_setmatrix
-         
-         real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
+         ! jacobian - block tridiagonal, unfactored and factored both needed
+         real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! unfactored (nvar,nvar,nz) 
+         real(dp), dimension(:,:,:), pointer :: ublkF, dblkF, lblkF ! factored (nvar,nvar,nz) 
          ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
          ! lblk(i,j,k) = dequ(i,k)/dx(j,k-1)
          ! ublk(i,j,k) = dequ(i,k)/dx(j,k+1)
-         
-         real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
-            ! will be allocated or reallocated as necessary by solver.
-            ! deallocate when free_star
+         real(dp), dimension(:), pointer :: lblk1, dblk1, ublk1 ! unfactored (nvar*nvar*nz) 
+         real(dp), dimension(:), pointer :: lblkF1, dblkF1, ublkF1 ! factored (nvar*nvar*nz) 
 
-         
       ! sizeB info
          integer :: max_zone1, max_var1, max_zone2, max_var2
          real(dp) :: abs_max_corr1, abs_max_corr2
