@@ -42,20 +42,15 @@
       contains
       
 
-      subroutine do1_et_L_eqn( &
-            s, k, equ, L_start_max, skip_partials, nvar, ierr)
+      subroutine do1_et_L_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
-         real(dp), intent(in) :: L_start_max
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
-         call get1_et_L_eqn( &
-            s, k, equ, L_start_max, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+         call get1_et_L_eqn(s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_et_L_eqn', k
             return
@@ -66,19 +61,16 @@
 
       
       subroutine get1_et_L_eqn( &  
-            s, k, equ, L_start_max, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: unpack_res18_partials
          use accurate_sum_auto_diff_18var_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
-         real(dp), intent(in) :: L_start_max
          logical, intent(in) :: skip_partials
          real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
          integer, intent(out) :: ierr
          type(auto_diff_real_18var_order1) :: L, Lr, Lc, Lt, L_actual, res18
-         real(dp) :: scale, residual, e_avg
+         real(dp) :: scale, residual, e_avg, L_start_max
          logical :: test_partials
          include 'formats'
 
@@ -89,10 +81,11 @@
          call compute_L(s, k, L, Lr, Lc, Lt, ierr)         
          if (ierr /= 0) return        
          L_actual = wrap_L_00(s, k)  
+         L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
          res18 = (L - L_actual)*scale         
          residual = res18%val
-         equ(s% i_equL, k) = residual
+         s% equ(s% i_equL, k) = residual
          
          if (test_partials) then
             s% solver_test_partials_val = residual
@@ -109,18 +102,16 @@
       end subroutine get1_et_L_eqn
       
 
-      subroutine do1_turbulent_energy_eqn( &
-            s, k, equ, skip_partials, nvar, ierr)
+      subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
          include 'formats'
          call get1_turbulent_energy_eqn( &
-            s, k, equ, skip_partials, nvar, &
+            s, k, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_turbulent_energy_eqn', k
@@ -132,13 +123,12 @@
 
       
       subroutine get1_turbulent_energy_eqn( &  
-            s, k, equ, skip_partials, nvar, &
+            s, k, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: calc_Pt_18_tw
          use accurate_sum_auto_diff_18var_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
          integer, intent(out) :: ierr
@@ -164,7 +154,7 @@
          call init
          
          if (s% et_alfa == 0d0) then
-            equ(i_det_dt, k) = s% et(k) - min_et
+            s% equ(i_det_dt, k) = s% et(k) - min_et
             if (.not. skip_partials) d_d00(i_et) = 1d0
             return
          end if
@@ -183,7 +173,7 @@
          scale = 1d0/s% energy_start(k)
          resid_18 = scale*resid_18
          residual = resid_18%val
-         equ(i_det_dt, k) = residual
+         s% equ(i_det_dt, k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_turbulent_crit1)
