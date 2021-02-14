@@ -506,11 +506,11 @@
             if (ierr /= 0) return
          end if
          
-         if (s% job% change_et_flag_at_model_number == s% model_number) then
-            write(*,*) 'have reached model number for new_et_flag', &
-               s% model_number, s% job% new_et_flag
-            call star_set_et_flag(id, s% job% new_et_flag, ierr)
-            if (failed('star_set_et_flag',ierr)) return
+         if (s% job% change_w_flag_at_model_number == s% model_number) then
+            write(*,*) 'have reached model number for new_w_flag', &
+               s% model_number, s% job% new_w_flag
+            call star_set_w_flag(id, s% job% new_w_flag, ierr)
+            if (failed('star_set_w_flag',ierr)) return
          end if
          
          if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
@@ -2161,11 +2161,11 @@
             if (failed('star_set_RTI_flag',ierr)) return
          end if
          
-         if (s% job% change_et_flag .or. &
-               (s% job% change_initial_et_flag .and. .not. restart)) then
-            write(*,*) 'new_et_flag', s% job% new_et_flag
-            call star_set_et_flag(id, s% job% new_et_flag, ierr)
-            if (failed('star_set_et_flag',ierr)) return
+         if (s% job% change_w_flag .or. &
+               (s% job% change_initial_w_flag .and. .not. restart)) then
+            write(*,*) 'new_w_flag', s% job% new_w_flag
+            call star_set_w_flag(id, s% job% new_w_flag, ierr)
+            if (failed('star_set_w_flag',ierr)) return
          end if
 
          if (s% job% change_RSP_flag .or. &

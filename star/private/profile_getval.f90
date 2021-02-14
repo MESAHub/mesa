@@ -244,7 +244,7 @@
          integer :: j, nz, ionization_k, klo, khi, i, ii, kk, ierr
          real(dp) :: ionization_res(num_ion_vals)
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor, Lconv, conv_vel
-         logical :: rsp_or_et
+         logical :: rsp_or_w
          include 'formats'
 
          if (s% rotation_flag) then
@@ -268,7 +268,7 @@
          ionization_k = 0
 
          int_flag = .false.
-         rsp_or_et = s% RSP_flag .or. s% et_flag
+         rsp_or_w = s% RSP_flag .or. s% w_flag
 
          if (c > extra_offset) then
             i = c - extra_offset
@@ -1891,26 +1891,26 @@
                   val = s% u(k-1)/s% rmid_start(k-1) - s% u(k)/s% rmid_start(k)
 
             case(p_Pturb)
-               if (s% et_flag) then
-                  val = s% et(k)*s% rho(k)
+               if (s% w_flag) then
+                  val = s% ww(k)**2*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Pturb)
-               if (s% et_flag) then
-                  val = safe_log10(s% et(k)*s% rho(k))
+               if (s% w_flag) then
+                  val = safe_log10(s% ww(k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_et)
-               if (s% et_flag) then
-                  val = s% et(k)
+               if (s% w_flag) then
+                  val = s% ww(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_et)
-               if (s% et_flag) then
-                  val = safe_log10(s% et(k))
+               if (s% w_flag) then
+                  val = safe_log10(s% ww(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if
@@ -1925,29 +1925,29 @@
             case(p_Chi)
                if (s% RSP_flag) val = s% Chi(k)
             case(p_COUPL)
-               if (rsp_or_et) val = s% COUPL(k)
+               if (rsp_or_w) val = s% COUPL(k)
             case(p_SOURCE)
-               if (rsp_or_et) val = s% SOURCE(k)
+               if (rsp_or_w) val = s% SOURCE(k)
             case(p_DAMP)
-               if (rsp_or_et) val = s% DAMP(k)
+               if (rsp_or_w) val = s% DAMP(k)
             case(p_DAMPR)
-               if (rsp_or_et) val = s% DAMPR(k)
+               if (rsp_or_w) val = s% DAMPR(k)
             case(p_Eq)
-               if (rsp_or_et) val = s% Eq(k)
+               if (rsp_or_w) val = s% Eq(k)
             case(p_Uq)
-               if (rsp_or_et) val = s% Uq(k)
+               if (rsp_or_w) val = s% Uq(k)
             case(p_Lr)
-               if (rsp_or_et) val = s% Lr(k)
+               if (rsp_or_w) val = s% Lr(k)
             case(p_Lr_div_L)
-               if (rsp_or_et) val = s% Lr(k)/s% L(k)
+               if (rsp_or_w) val = s% Lr(k)/s% L(k)
             case(p_Lc)
-               if (rsp_or_et) val = s% Lc(k)
+               if (rsp_or_w) val = s% Lc(k)
             case(p_Lc_div_L)
-               if (rsp_or_et) val = s% Lc(k)/s% L(k)
+               if (rsp_or_w) val = s% Lc(k)/s% L(k)
             case(p_Lt)
-               if (rsp_or_et) val = s% Lt(k)
+               if (rsp_or_w) val = s% Lt(k)
             case(p_Lt_div_L)
-               if (rsp_or_et) val = s% Lt(k)/s% L(k)
+               if (rsp_or_w) val = s% Lt(k)/s% L(k)
                
             case(p_rsp_Et)
                if (s% rsp_flag) val = s% RSP_Et(k)
@@ -1955,9 +1955,9 @@
                if (s% rsp_flag) &
                   val = safe_log10(s% RSP_Et(k))
             case(p_rsp_vt)
-               if (s% rsp_flag) val = sqrt2*s% w(k)
+               if (s% rsp_flag) val = sqrt2*s% ww(k)
             case(p_rsp_vt_div_cs)
-               if (s% rsp_flag) val = sqrt2*s% w(k)/s% csound(k)
+               if (s% rsp_flag) val = sqrt2*s% ww(k)/s% csound(k)
             case(p_rsp_Pt)
                if (s% rsp_flag) val = s% Pt(k)
             case(p_rsp_Eq)

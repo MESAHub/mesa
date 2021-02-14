@@ -620,7 +620,7 @@
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
          integer :: id, i, j, k, species, bad_j, bad_k, &
-            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_et
+            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_w
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
             old_E, dE, new_E, old_lnd, dlnd, new_lnd, det, old_et, new_et, &
             dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
@@ -630,16 +630,16 @@
          ierr = 0
          min_alpha = 1d0
 
-         if (s% et_flag) then ! clip change in et to maintain non-negativity.
-            i_et = s% i_et
+         if (s% w_flag) then ! clip change in et to maintain non-negativity.
+            i_w = s% i_w
             do k = 1, s% nz
-               det = B(i_et,k)*s% x_scale(i_et,k)*correction_factor
-               old_et = s% xh_start(i_et,k) + s% solver_dx(i_et,k)
+               det = B(i_w,k)*s% x_scale(i_w,k)*correction_factor
+               old_et = s% xh_start(i_w,k) + s% solver_dx(i_w,k)
                new_et = old_et + det
                if (det >= 0) cycle
                if (new_et >= 0d0) cycle
-               det = min_et*1d-6 - old_et
-               B(i_et,k) = det/(s% x_scale(i_et,k)*correction_factor)
+               det = min_w*1d-6 - old_et
+               B(i_w,k) = det/(s% x_scale(i_w,k)*correction_factor)
             end do
          end if
 

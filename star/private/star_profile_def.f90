@@ -149,9 +149,9 @@
       integer, parameter :: p_ergs_rel_error_integral = p_ergs_error_integral + 1
       integer, parameter :: p_ergs_error = p_ergs_rel_error_integral + 1
       integer, parameter :: p_E_residual = p_ergs_error + 1
-      integer, parameter :: p_Et_residual = p_E_residual + 1
-      integer, parameter :: p_log_Et_residual = p_Et_residual + 1
-      integer, parameter :: p_dvdt_residual = p_log_Et_residual + 1
+      integer, parameter :: p_w_residual = p_E_residual + 1
+      integer, parameter :: p_log_w_residual = p_w_residual + 1
+      integer, parameter :: p_dvdt_residual = p_log_w_residual + 1
       integer, parameter :: p_v_residual = p_dvdt_residual + 1
       integer, parameter :: p_log_E_residual = p_v_residual + 1
       integer, parameter :: p_log_lnR_residual = p_log_E_residual + 1
@@ -925,8 +925,8 @@
          profile_column_name(p_dvdt_residual) = 'dvdt_residual'
          profile_column_name(p_v_residual) = 'v_residual'
 
-         profile_column_name(p_Et_residual) = 'Et_residual'
-         profile_column_name(p_log_Et_residual) = 'log_Et_residual'
+         profile_column_name(p_w_residual) = 'w_residual'
+         profile_column_name(p_log_w_residual) = 'log_w_residual'
          profile_column_name(p_log_E_residual) = 'log_E_residual'
          profile_column_name(p_log_lnR_residual) = 'log_lnR_residual'
          profile_column_name(p_log_lnd_residual) = 'log_lnd_residual'

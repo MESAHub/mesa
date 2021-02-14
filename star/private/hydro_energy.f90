@@ -83,7 +83,7 @@
          real(dp) :: cell_energy_fraction_start, residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
-         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_et
+         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_w
          logical :: test_partials, doing_op_split_burn, eps_grav_form
                     
          include 'formats'
@@ -168,7 +168,7 @@
             i_lnR = s% i_lnR
             i_lum = s% i_lum
             i_v = s% i_v
-            i_et = s% i_et
+            i_w = s% i_w
             nz = s% nz
             dt = s% dt
             dm = s% dm(k)
@@ -212,7 +212,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_18, others_18
-            use hydro_eturb, only: calc_Eq_18
+            use hydro_tdc, only: calc_Eq_18
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
                eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, RTI_diffusion_18
@@ -259,7 +259,7 @@
                others_18%val = others_18%val + s% eps_pre_mix(k)
             
             Eq_18 = 0d0
-            if (s% et_flag) then             
+            if (s% w_flag) then             
                call calc_Eq_18(s, k, Eq_18, ierr)
                if (ierr /= 0) return
             end if   
@@ -321,9 +321,9 @@
             include 'formats'
             ierr = 0
             det_dt_18 = 0d0
-            if (s% et_flag) then
+            if (s% w_flag) then
                det_dt_18%val = s% dxh_et(k)/dt ! et = et_start + dxh_et
-               det_dt_18%d1Array(i_et_00) = 1d0/dt
+               det_dt_18%d1Array(i_w_00) = 1d0/dt
             end if
          end subroutine setup_det_dt
          
@@ -359,7 +359,7 @@
             end if
 
             if (eps_grav_form) then
-               if (s% et_flag) then
+               if (s% w_flag) then
                   stop 'cannot use eps_grav with et yet.  fix energy eqn.'
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
@@ -687,7 +687,7 @@
          end if
          
          ! set Pt_18
-         if (.not. s% et_flag) then
+         if (.not. s% w_flag) then
             Pt_18 = 0d0
          else
             if (k > 1) then 

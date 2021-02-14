@@ -166,17 +166,17 @@
          logical :: conv_vel_flag ! true for conv_vel as a solver variable     
          logical :: w_div_wc_flag ! true for w_div_wc as a solver variable     
          logical :: j_rot_flag ! true for j_rot as a solver variable     
-         logical :: et_flag ! true for turbulent energy as a solver variable    
+         logical :: w_flag ! true for turbulent velocity as a solver variable    
 
          integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at face of cell. v0 is an arbitrary user defined value.
          integer :: i_w_div_wc ! ratio of omega to critical value without the Eddington factor
          integer :: i_j_rot ! specific angular momentum associated to cell face
-         integer :: i_et ! cell specific turbulent energy. only when et_flag is true.
+         integer :: i_w ! cell turbulent velocity. only when w_flag is true.
 
          integer :: i_dln_cvpv0_dt ! equation for convection velocities
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
-         integer :: i_det_dt ! turbulent energy equation. only when et_flag is true.
+         integer :: i_dw_dt ! turbulent velocity equation. only when w_flag is true.
 
          logical :: have_previous_conv_vel ! only needed when set conv_vel_flag true
 

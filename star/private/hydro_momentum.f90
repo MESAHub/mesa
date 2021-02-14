@@ -391,7 +391,7 @@
       
       ! other = s% extra_grav(k) - s% dv_dt(k)
       subroutine expected_non_HSE_term(s, k, other_18, other, ierr)
-         use hydro_eturb, only: calc_Uq_18
+         use hydro_tdc, only: calc_Uq_18
          use accurate_sum_auto_diff_18var_order1
          use auto_diff_support
          type (star_info), pointer :: s
@@ -450,7 +450,7 @@
          end if ! v_flag
 
          Uq_18 = 0d0
-         if (s% et_flag) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% w_flag) then ! Uq(k) is turbulent viscosity drag at face k
             call calc_Uq_18(s, k, Uq_18, ierr)
             if (ierr /= 0) return
          end if
@@ -684,7 +684,7 @@
                   call em1(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
             end if         
             if (s% w_div_wc_flag) then
-               call e00(s, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
+               call e00(s, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_domega(k))
             end if
          end if
 

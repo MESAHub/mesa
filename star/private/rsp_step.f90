@@ -338,7 +338,7 @@
             write(*,'(i6, 2x, i3, 4(4x, a, 1x, i4, 1x, 1pe11.4, 1x, 1pe11.4))') &
                s% model_number, iter, &
                'T', kT_max, DXXT, s% T(max(1,kT_max)), &
-               'w', kW_max, DXXC, max(1d-99,s% w(max(1,kW_max))), &
+               'w', kW_max, DXXC, max(1d-99,s% RSP_w(max(1,kW_max))), &
                'erad', kE_max, DXXE, s% erad(max(1,kE_max)), &
                'Fr', kL_max, DXXL, s% Fr(max(1,kL_max))
          end subroutine write_msg
@@ -366,7 +366,7 @@
             integer, intent(in) :: i_var, k
             include 'formats'
             if (i_var == i_var_w) then
-               val = s% w(k)
+               val = s% RSP_w(k)
             else if (i_var == i_var_R) then
                val = s% r(k)
             else if (i_var == i_var_T) then
@@ -388,7 +388,7 @@
             real(dp), intent(in) :: val
             include 'formats'
             if (i_var == i_var_w) then
-               s% w(k) = val
+               s% RSP_w(k) = val
             else if (i_var == i_var_R) then
                s% r(k) = val
                s% v(k) = 2.d0*(s% r(k) - s% r_start(k))/s% dt - s% v_start(k)
@@ -529,7 +529,7 @@
          do i=1,NZN
             k = NZN+1-i
             ETHE = ETHE + (s% egas(k)+s% erad(k))*s% dm(k)
-            ECON = ECON + s% w(k)**2*s% dm(k)
+            ECON = ECON + s% RSP_w(k)**2*s% dm(k)
             EKIN = EKIN + cell_specific_KE(s,k,d_dv00,d_dvp1)*s% dm(k)
             EGRV = EGRV + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)*s% dm(k)           
             
@@ -653,7 +653,7 @@
             s% opacity_start(k) = s% opacity(k)
             s% egas_start(k) = s% egas(k)
             s% erad_start(k) = s% erad(k)
-            s% w_start(k) = s% w(k)
+            s% RSP_w_start(k) = s% RSP_w(k)
             s% Pt_start(k) = s% Pt(k)
             s% Chi_start(k) = s% Chi(k)
             s% v_start(k) = s% v(k)
@@ -680,7 +680,7 @@
             s% opacity(k) = s% opacity_start(k)
             s% egas(k) = s% egas_start(k)
             s% erad(k) = s% erad_start(k)
-            s% w(k) = s% w_start(k)
+            s% RSP_w(k) = s% RSP_w_start(k)
             s% Pt(k) = s% Pt_start(k)
             s% Chi(k) = s% Chi_start(k)
             s% v(k) = s% v_start(k)
@@ -966,8 +966,8 @@
             IW = i_var_w + NV*(i-1)
             IE = i_var_er + NV*(i-1)
             IL = i_var_Fr + NV*(i-1)
-            if (s% w(k) > (1.d+2)*EFL0) then
-               XXC = abs(DX(IW)/s% w(k))/DXH
+            if (s% RSP_w(k) > (1.d+2)*EFL0) then
+               XXC = abs(DX(IW)/s% RSP_w(k))/DXH
                if (XXC > XXCM) then
                   XXCM = XXC; kCM = k; iCM = IW
                end if
@@ -1012,7 +1012,7 @@
                'EZH', kEZH, EZH, &
                'r', kRM, DXRM, &
                'T', kTM, DX(iTM)/s% T(kTM), &
-               'w', kCM, DX(iCM)/max(1d-99,s% w(kCM)), &
+               'w', kCM, DX(iCM)/max(1d-99,s% RSP_w(kCM)), &
                'erad', kEM, DX(iEM)/s% erad(kEM), &
                'Fr', kLM, DX(iLM)/s% Fr(kLM)
          end if
@@ -1040,10 +1040,10 @@
             s% T(k) = s% T(k) + EZH*DX(IT)
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
-               if ((s% w(k) + EZH*DX(IW)) <= 0d0)then
-                  s% w(k) = EFL0*rand(s)*1d-6 ! NEED THIS
+               if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
+                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! NEED THIS
                else
-                  s% w(k) = s% w(k) + EZH*DX(IW)
+                  s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
             end if
             s% v(k) = s% v(k) - &
@@ -1058,10 +1058,10 @@
             DXXT = max(DXXT,abs(DX(IT)/s% T(k)))
             DXXE = max(DXXE,abs(DX(IE)/s% erad(k)))
             DXXL = max(DXXL,abs(DX(IL)/s% Fr(k)))
-            if (s% w(k) > (1.d-2)*EFL0) &
-               DXXC = max(DXXC,abs(DX(IW)/s% w(k)))
+            if (s% RSP_w(k) > (1.d-2)*EFL0) &
+               DXXC = max(DXXC,abs(DX(IW)/s% RSP_w(k)))
             if (DXXC > DXKC) then
-               kW_max = k; XXC = DX(IW)/max(1d-99,s% w(k))
+               kW_max = k; XXC = DX(IW)/max(1d-99,s% RSP_w(k))
             end if
             if (DXXT > DXKT) then
                kT_max = k; XXT = DX(IT)/s% T(k)
@@ -1515,7 +1515,7 @@
          if (I > IBOTOM .and. I < NZN .and. ALFA /= 0d0) then
          !     JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
             k = NZN+1-i
-            if (s% w(k) > EFL0) return
+            if (s% RSP_w(k) > EFL0) return
             POM = (s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))*0.5d0
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k)
             SOURS = POM*POM2
@@ -1527,7 +1527,7 @@
             if (DELTA >= 0.d0) SOL = ( - DAMPRS + sqrt(DELTA))/(2.d0*DAMPS)
             if (DELTA < 0.d0) SOL = - 99.99d0
             if (SOL >= 0.d0) SOL = SOL**2
-            if (SOL > 0.d0) s% w(k) = sqrt(SOL)
+            if (SOL > 0.d0) s% RSP_w(k) = sqrt(SOL)
          end if
       end subroutine check_omega
       
@@ -1549,10 +1549,10 @@
             dPt_dr_in(I) = 0.d0
          else
             Vol = s% Vol(k)
-            s% Pt(k) = ALFAP*s% w(k)**2/Vol
+            s% Pt(k) = ALFAP*s% RSP_w(k)**2/Vol
             dPt_dVol_00(I) = -s% Pt(k)/Vol
-            dPt_dw_00(I) = 2.d0*ALFAP*s% w(k)/Vol
-            TEM1 = - ALFAP*s% w(k)**2/Vol**2
+            dPt_dw_00(I) = 2.d0*ALFAP*s% RSP_w(k)/Vol
+            TEM1 = - ALFAP*s% RSP_w(k)**2/Vol**2
             dPt_dr_00(I) = TEM1*dVol_dr_00(I)
             dPt_dr_in(I) = TEM1*dVol_dr_in(I)
          end if
@@ -1595,7 +1595,7 @@
          else
             POM = (16.d0/3.d0)*PI*ALFA*ALFAM/s% dm(k)  
             Vol = s% Vol(k)
-            POM1 = s% w(k)/Vol**2
+            POM1 = s% RSP_w(k)/Vol**2
             POM2 = 0.5d0*(s% r(k)**6 + s% r(k+1)**6)
             POM4 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             POM3 = s% v(k)/s% r(k) - s% v(k+1)/s% r(k+1)
@@ -1618,7 +1618,7 @@
                   write(*,2) 'POM2', k, POM2
                   write(*,2) 'POM3', k, POM3
                   write(*,2) 'POM4', k, POM4
-                  write(*,2) 's% w(k)', k, s% w(k)
+                  write(*,2) 's% RSP_w(k)', k, s% RSP_w(k)
                   write(*,2) 's% Volk)', k, s% Vol(k)
                   write(*,2) 's% r(k)', k, s% r(k)
                   write(*,2) 's% r(k+1)', k+1, s% r(k+1)
@@ -1798,7 +1798,7 @@
             POM = 0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))
             QQ_div_Cp = s% QQ(k)/s% Cp(k)
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
-            POM3 = s% w(k)            
+            POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
       
             TEM1 = POM2*POM3*0.5d0
@@ -1878,7 +1878,7 @@
                - (s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k)*dCp_dr_in(I))
 
             ! DAMP TERM
-            POM = (CEDE/ALFA)*(s% w(k)**3 - EFL0**3)
+            POM = (CEDE/ALFA)*(s% RSP_w(k)**3 - EFL0**3)
             POM2 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             s% DAMP(k) = POM/POM2
       
@@ -1897,7 +1897,7 @@
             d_damp_der_00 = TEM1*(dHp_der_00(I) + dHp_der_out(i-1))
             d_damp_der_out = TEM1*dHp_der_out(I)
             d_damp_der_in = TEM1*dHp_der_00(i-1)
-            d_damp_dw_00 = 3.0d0*(CEDE/ALFA)/POM2*s% w(k)**2
+            d_damp_dw_00 = 3.0d0*(CEDE/ALFA)/POM2*s% RSP_w(k)**2
             
             ! RADIATIVE DAMP TERM
             if (GAMMAR == 0.d0)then
@@ -1921,7 +1921,7 @@
                POM2a = s% T(k)**3*s% Vol(k)**2
                POM2b = 1d0/(s% Cp(k)*s% opacity(k))
                POM2 = POM2a*POM2b
-               POM3 = s% w(k)**2
+               POM3 = s% RSP_w(k)**2
                POM4 = 0.5d0*(s% Hp_face(k)**2 + s% Hp_face(k+1)**2)
                s% DAMPR(k) = POM*POM2*POM3/POM4
       
@@ -1958,7 +1958,7 @@
                   + s% Hp_face(k+1)*dHp_der_out(i-1))
                d_dampR_der_in = TEM1*s% Hp_face(k+1)*dHp_der_00(i-1)
 
-               d_dampR_dw_00 = POM*POM2/POM4*2.d0*s% w(k)
+               d_dampR_dw_00 = POM*POM2/POM4*2.d0*s% RSP_w(k)
 
                TEM1 = POM*POM3/POM4
                d_dampR_dr_00 = d_dampR_dr_00 &
@@ -2123,7 +2123,7 @@
             dLt_dw_00 = 0.d0
             dLt_dw_out = 0.d0
          else
-            POM3 = (s% w(k-1)**3 - s% w(k)**3)/s% dm_bar(k)
+            POM3 = (s% RSP_w(k-1)**3 - s% RSP_w(k)**3)/s% dm_bar(k)
             POM = - 2.d0/3.d0*ALFA*ALFAT*(P4*(s% r(k)**2))**2
             rho2_face = 0.5d0*(1.d0/s% Vol(k)**2 + 1.d0/s% Vol(k-1)**2)
             POM2 = s% Hp_face(k)*rho2_face
@@ -2151,8 +2151,8 @@
             dLt_der_00 = TEM1*dHp_der_00(I) ! 
             dLt_der_out = TEM1*dHp_der_out(I) ! 
             TEM1 = POM*POM2*3.0d0/s% dm_bar(k) 
-            dLt_dw_00 = -TEM1*s% w(k)**2 ! 
-            dLt_dw_out = TEM1*s% w(k-1)**2 ! 
+            dLt_dw_00 = -TEM1*s% RSP_w(k)**2 ! 
+            dLt_dw_out = TEM1*s% RSP_w(k-1)**2 ! 
          end if
          if (i > 0) s% Lt(k) = Lt_00
          
@@ -2199,7 +2199,7 @@
             dLc_der_out = 0.d0
             dLc_dw_00 = 0.d0
             dLc_dw_out = 0.d0! - 
-         else if (s% w(k) < EFL0*1d-8)then
+         else if (s% RSP_w(k) < EFL0*1d-8)then
             Lc_00 = 0.d0
             dLc_dr_00 = 0.d0
             dLc_dr_in = 0.d0
@@ -2214,7 +2214,7 @@
             dLc_dw_out = 0.d0
          else
             
-            POM3 = 0.5d0*(s% w(k) + s% w(k-1))
+            POM3 = 0.5d0*(s% RSP_w(k) + s% RSP_w(k-1))
 
             POM = P4*(s% r(k)**2)*(ALFAC/ALFAS)* &
                0.5d0*(s% T(k)/s% Vol(k) + s% T(k-1)/s% Vol(k-1))
@@ -3194,7 +3194,7 @@
          residual = &
               s% egas(k) - s% egas_start(k) &
             + erad - s% erad_start(k) &
-            + s% w(k)**2 - s% w_start(k)**2 &
+            + s% RSP_w(k)**2 - s% RSP_w_start(k)**2 &
             + dt_div_dm*(L_00 - L_in) &
             + XP_00*DV &
             + erad_tw*u_div_r_factor*u_div_r &
@@ -3277,7 +3277,7 @@
             HD(i_T_dw_00,IT) = 0.d0  
          else
             HD(i_T_dw_00,IT) = &
-               2.d0*s% w(k) & 
+               2.d0*s% RSP_w(k) & 
                + dt_div_dm*WTC*(dLc_00_dw_00 - dLc_in_dw_00) &
                + dt_div_dm*WTT*(dLt_00_dw_00 - dLt_in_dw_00) &
                + DV*dXP_00_dw_00 &
@@ -3293,7 +3293,7 @@
          
          if (i == -6 .and. s% model_number == s% max_model_number) then
             write(*,5) 'HD(i_T_dw_00,IT)', k, i, iter, s% model_number, HD(i_T_dw_00,IT)
-            write(*,5) 's% w(k)', k, i, iter, s% model_number, s% w(k)
+            write(*,5) 's% RSP_w(k)', k, i, iter, s% model_number, s% RSP_w(k)
             write(*,5) 'dt_div_dm', k, i, iter, s% model_number, dt_div_dm
             write(*,5) 'WTC', k, i, iter, s% model_number, WTC
             write(*,5) 'WTT', k, i, iter, s% model_number, WTT
@@ -3390,7 +3390,7 @@
          Pt_tw = THETAT*s% Pt(k) + THETAT1*s% Pt_start(k)
 
          residual = &
-            (s% w(k)**2 - s% w_start(k)**2) &
+            (s% RSP_w(k)**2 - s% RSP_w_start(k)**2) &
             + dt_div_dm*(L_00 - L_in) &
             + DV*Pt_tw &
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
@@ -3399,7 +3399,7 @@
          HD(i_w_dw_in2,IW) = 0.d0          
          HD(i_w_dw_in,IW) = - dt_div_dm*WTT*dLt_in_dw_in  
          HD(i_w_dw_00,IW) = &
-            2.d0*s% w(k) & 
+            2.d0*s% RSP_w(k) & 
             - dt*GAM*dC_dw_00(I) &
             - dt*dEq_dw_00(I) &
             + dt_div_dm*WTT*(dLt_00_dw_00 - dLt_in_dw_00) &

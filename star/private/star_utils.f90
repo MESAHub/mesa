@@ -1391,7 +1391,7 @@
             s% tau_start(k) = -1d99
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
-            s% w_start(k) = -1d99
+            s% ww_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do
       end subroutine reset_starting_vectors
@@ -1421,14 +1421,14 @@
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            det_m1, det_00, det_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1
          integer :: j
 
          include 'formats'
 
          call unwrap(res18, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-                     det_m1, det_00, det_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+                     dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
                      dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1) 
                      
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
@@ -1437,7 +1437,7 @@
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
-         if (s% i_et /= 0) call unpack1(s% i_et, det_m1, det_00, det_p1)
+         if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
          
          contains
          
@@ -2128,7 +2128,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% et_flag) cell_total = cell_total + s% et(k)
+         if (s% w_flag) cell_total = cell_total + s% ww(k)
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2211,8 +2211,8 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% et_flag) then
-               cell1 = dm*s% et(k)
+            if (s% w_flag) then
+               cell1 = dm*s% ww(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2260,8 +2260,8 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% et_flag) then
-               cell1 = dm*s% et(k)
+            if (s% w_flag) then
+               cell1 = dm*s% ww(k)
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -2890,7 +2890,7 @@
       subroutine save_for_d_dt(s)
          ! these values will be modified as necessary by adjust mass
          type (star_info), pointer :: s
-         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_et, &
+         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_w, &
             i_v, i_u, i_alpha_RTI, i_ln_cvpv0
          include 'formats'
          
@@ -2898,7 +2898,7 @@
          i_lnR = s% i_lnR
          i_lnT = s% i_lnT
          i_lnd = s% i_lnd
-         i_et = s% i_et
+         i_w = s% i_w
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -2929,9 +2929,9 @@
                s% v_for_d_dt_const_m(k) = s% xh(i_v, k)
             end do
          end if
-         if (i_et /= 0) then
+         if (i_w /= 0) then
             do k=1, nz
-               s% et_for_d_dt_const_m(k) = s% xh(i_et, k)
+               s% w_for_d_dt_const_m(k) = s% xh(i_w, k)
             end do
          end if
          if (i_u /= 0) then
@@ -3078,8 +3078,8 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
          
-         if (s% et_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,2) 'cannot have et_flag and partials wrt L(k-1)', k
+         if (s% w_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
+            write(*,2) 'cannot have w_flag and partials wrt L(k-1)', k
             stop 'em1'
          end if
          
@@ -3331,23 +3331,25 @@
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(out) :: Pt
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: et, rho
+         type(auto_diff_real_18var_order1) :: w, rho
          real(dp) :: Pt_start
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% et_alfap == 0 .or. s% et_alfa == 0) then
+         if (s% TDC_alfap == 0 .or. s% TDC_alfa == 0) then
             Pt = 0d0
             return
          end if
-
+         
+         stop 'fix this for w replacing et'
+         
          rho = wrap_d_00(s,k)
-         et = wrap_et_00(s,k)
-         Pt = s% et_alfap*et*rho
+         w = wrap_w_00(s,k)
+         Pt = s% TDC_alfap*w**2*rho
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% et_alfap*s% et_start(k)*s% rho_start(k)
+            Pt_start = s% TDC_alfap*s% ww_start(k)*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 
@@ -3409,7 +3411,7 @@
          end if
          
          Pt_18 = 0d0
-         if (s% et_flag) then
+         if (s% w_flag) then
             call calc_Pt_18_tw(s, k, Pt_18, ierr) 
             if (ierr /= 0) return
             ! note that Pt_18 is already time weighted

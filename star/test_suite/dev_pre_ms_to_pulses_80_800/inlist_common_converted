@@ -35,6 +35,7 @@
 ! rotation
 
 ! mlt
+      max_logT_for_mlt = 9.0d0  
 
 ! mixing
       

@@ -49,7 +49,7 @@
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
-            et_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
+            w_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
             rsp_flag, no_L
          integer :: time_vals(8)
 
@@ -66,7 +66,7 @@
          chem_id => s% chem_id
          nvar_hydro = s% nvar_hydro
          nz = s% nz
-         et_flag = s% et_flag
+         w_flag = s% w_flag
          v_flag = s% v_flag
          u_flag = s% u_flag
          RTI_flag = s% RTI_flag
@@ -81,7 +81,7 @@
          write(iounit,'(a)') '!'
          prev_flag = (s% nz_old == s% nz .and. s% generations > 1)
          file_type = 0
-         if (et_flag) file_type = file_type + 2**bit_for_et
+         if (w_flag) file_type = file_type + 2**bit_for_et
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
          if (prev_flag) file_type = file_type + 2**bit_for_2models
@@ -92,7 +92,7 @@
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
          if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
          
-         no_L = (s% rsp_flag .or. s% et_flag)
+         no_L = (s% rsp_flag .or. s% w_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
          
          write(iounit, '(i14)', advance='no') file_type
@@ -202,8 +202,8 @@
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             end if            
-            if (et_flag) then
-               call write1(s% et(k),ierr); if (ierr /= 0) exit
+            if (w_flag) then
+               call write1(s% ww(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit
@@ -273,7 +273,7 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'erad_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
-            else if (et_flag) then
+            else if (w_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'et'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then

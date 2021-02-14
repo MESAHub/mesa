@@ -21,32 +21,32 @@
       
       
 
-      ! et parameters
+      ! TDC parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          
-      !   et_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   et_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   et_alfat =     0.0d0         ! turbulent flux; Lt ~ et_alfat
-      !   et_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ et_alfam
-      !   et_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ et_alfar    
+      !   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
+      !   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+      !   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar    
       !      
-      ! et time weighting is determined by the Fraley_time_centering controls.
+      ! TDC time weighting is determined by the velocity_time_centering controls.
       !     for Pt and Lt in turbulent energy equation
       !     for P and grav in momentum equation
       !     for P and L in energy equation
       !     for area when multiplied by P
-      ! et_Lsurf_factor: Lsurf = et_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      ! TDC_Lsurf_factor: Lsurf = TDC_Lsurf_factor*area(1)*clight*crad*T(1)**4
       !   
 
       ! ::
 
-    et_alfa  = 1.5d0
-    et_alfap = 0.0d0
-    et_alfat = 0.0d0
-    et_alfam = 0.25d0
-    et_alfar = 0.0d0
+    TDC_alfa  = 1.5d0
+    TDC_alfap = 0.0d0
+    TDC_alfat = 0.0d0
+    TDC_alfam = 0.25d0
+    TDC_alfar = 0.0d0
 
-    et_Lsurf_factor = 0.5d0
+    TDC_Lsurf_factor = 0.5d0
 
 
       ! use_DGESVX_in_bcyclic

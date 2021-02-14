@@ -351,7 +351,7 @@
          momflux_18 = area*s% P_face_18(k)     
          momflux_18%d1Array(i_lnR_00) = &
             momflux_18%d1Array(i_lnR_00) + d_area_dlnR*s% P_face_18(k)%val  
-         d_momflux_dw = area*s% d_Pface_dw(k)
+         d_momflux_dw = area*s% d_Pface_domega(k)
               
          if (test_partials) then
             s% solver_test_partials_val = momflux_18%val
@@ -448,8 +448,8 @@
          !test_partials = (k == s% solver_test_partials_k)
          
          s% RTI_du_diffusion_kick(k) = 0d0
-         s% d_uface_dw(k) = 0
-         s% d_Pface_dw(k) = 0
+         s% d_uface_domega(k) = 0
+         s% d_Pface_domega(k) = 0
                             
          if (k == 1) then
             s% u_face_18(k) = wrap_u_00(s,k)
@@ -526,7 +526,7 @@
          Ss_18 = numerator_18/denominator_18
          
          s% u_face_18(k) = Ss_18
-         s% d_uface_dw(k) = s% u_face_18(k)%d1Array(i_L_00)
+         s% d_uface_domega(k) = s% u_face_18(k)%d1Array(i_L_00)
          s% u_face_18(k)%d1Array(i_L_00) = 0d0
 
          ! contact pressure (eqn 2.19)
@@ -534,7 +534,7 @@
          P_face_R_18 = rhoR_18*(uR_18-Sr_18)*(uR_18-Ss_18) + PR_18
          
          s% P_face_18(k) = 0.5d0*(P_face_L_18 + P_face_R_18) ! these are ideally equal
-         s% d_Pface_dw(k) = s% P_face_18(k)%d1Array(i_L_00)
+         s% d_Pface_domega(k) = s% P_face_18(k)%d1Array(i_L_00)
          s% P_face_18(k)%d1Array(i_L_00) = 0d0
 
          if (k < s% nz .and. s% RTI_flag) then

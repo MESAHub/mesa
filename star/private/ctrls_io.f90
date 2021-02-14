@@ -400,7 +400,7 @@
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    et_alfa, et_alfap, et_alfat, et_alfam, et_alfar, et_Lsurf_factor, &
+    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, &
     
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
@@ -2055,12 +2055,12 @@
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% et_alfa = et_alfa
- s% et_alfap = et_alfap
- s% et_alfat = et_alfat 
- s% et_alfam = et_alfam
- s% et_alfar = et_alfar
- s% et_Lsurf_factor = et_Lsurf_factor
+ s% TDC_alfa = TDC_alfa
+ s% TDC_alfap = TDC_alfap
+ s% TDC_alfat = TDC_alfat 
+ s% TDC_alfam = TDC_alfam
+ s% TDC_alfar = TDC_alfar
+ s% TDC_Lsurf_factor = TDC_Lsurf_factor
 
  ! timestep
  s% max_timestep = max_timestep
@@ -3684,12 +3684,12 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- et_alfa= s% et_alfa
- et_alfap= s% et_alfap
- et_alfat= s% et_alfat 
- et_alfam= s% et_alfam
- et_alfar= s% et_alfar
- et_Lsurf_factor= s% et_Lsurf_factor
+ TDC_alfa= s% TDC_alfa
+ TDC_alfap= s% TDC_alfap
+ TDC_alfat= s% TDC_alfat 
+ TDC_alfam= s% TDC_alfam
+ TDC_alfar= s% TDC_alfar
+ TDC_Lsurf_factor= s% TDC_Lsurf_factor
 
  ! timestep
  max_timestep = s% max_timestep

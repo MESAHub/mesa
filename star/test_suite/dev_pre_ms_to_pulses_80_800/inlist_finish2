@@ -10,9 +10,6 @@
       required_termination_code_string(2) = 'log_Rsurf_upper_limit' ! for higher masses
       required_termination_code_string(3) = 'remnant_mass_min_limit' ! for completely unbound cases
       !required_termination_code_string(4) = 'max_model_number' ! for testing
-
-      change_initial_RTI_flag = .true.
-      new_RTI_flag = .true.
       
       set_initial_model_number = .false.
       set_initial_age = .false.
@@ -47,7 +44,6 @@
 ! rotation
 
 ! mlt
-      max_logT_for_mlt = 9.2d0  
 
 ! mixing
       

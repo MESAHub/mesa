@@ -1664,7 +1664,7 @@
          real(dp), pointer :: work(:)
          integer, intent(out) :: ierr
 
-         integer :: n, nwork, j, i_lnT, i_lnd, i_et, i_u
+         integer :: n, nwork, j, i_lnT, i_lnd, i_w, i_u
          logical :: dbg
          real(dp) :: p(0)
 
@@ -1677,7 +1677,7 @@
 
          i_lnT = s% i_lnT
          i_lnd = s% i_lnd
-         i_et = s% i_et
+         i_w = s% i_w
          i_u = s% i_u
 
          oldloc(1) = 0
@@ -1691,7 +1691,7 @@
          
          call set(oldloc, newloc, k_newval, &
             s% lnd_for_d_dt_const_m, s% lnT_for_d_dt_const_m, &
-            s% et_for_d_dt_const_m, s% u_for_d_dt_const_m)
+            s% w_for_d_dt_const_m, s% u_for_d_dt_const_m)
 
          call set(xq_center_old, xq_center_new, 1, &
             s% lnd_for_d_dt_const_q, s% lnT_for_d_dt_const_q, p, p)
@@ -1699,12 +1699,12 @@
          contains
 
          subroutine set(oldloc, newloc, k_below, &
-               lnd_for_d_dt, lnT_for_d_dt, et_for_d_dt, u_for_d_dt)
+               lnd_for_d_dt, lnT_for_d_dt, w_for_d_dt, u_for_d_dt)
             real(dp), dimension(:), intent(in) :: oldloc, newloc
             real(dp), dimension(:), intent(inout) :: &
-               lnd_for_d_dt, lnT_for_d_dt, et_for_d_dt, u_for_d_dt
+               lnd_for_d_dt, lnT_for_d_dt, w_for_d_dt, u_for_d_dt
             integer, intent(in) :: k_below
-            call set1var(oldloc, newloc, k_below, i_et, et_for_d_dt)
+            call set1var(oldloc, newloc, k_below, i_w, w_for_d_dt)
             call set1var(oldloc, newloc, k_below, i_u, u_for_d_dt)
             call set1var(oldloc, newloc, k_below, i_lnd, lnd_for_d_dt)
             call set1var(oldloc, newloc, k_below, i_lnT, lnT_for_d_dt)

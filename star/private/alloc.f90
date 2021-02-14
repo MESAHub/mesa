@@ -610,9 +610,9 @@
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
             
-            call do1(s% et, c% et)
+            call do1(s% ww, c% ww)
             if (failed('et')) exit
-            call do1(s% et_start, c% et_start)
+            call do1(s% ww_start, c% ww_start)
             if (failed('et_start')) exit
             
             call do1(s% dxh_lnd, c% dxh_lnd)
@@ -634,8 +634,8 @@
             if (failed('dlnT_dt')) exit
             call do1(s% dlnR_dt, c% dlnR_dt)
             if (failed('dlnR_dt')) exit
-            call do1(s% det_dt, c% det_dt)
-            if (failed('det_dt')) exit
+            call do1(s% dw_dt, c% dw_dt)
+            if (failed('dw_dt')) exit
             call do1(s% dv_dt, c% dv_dt)
             if (failed('dv_dt')) exit
             call do1(s% du_dt, c% du_dt)
@@ -837,8 +837,8 @@
             if (failed('equL_residual')) exit
             call do1(s% E_residual, c% E_residual)
             if (failed('E_residual')) exit
-            call do1(s% Et_residual, c% Et_residual)
-            if (failed('Et_residual')) exit
+            call do1(s% w_residual, c% w_residual)
+            if (failed('w_residual')) exit
             call do1(s% v_residual, c% v_residual)
             if (failed('v_residual')) exit
             call do1(s% u_residual, c% u_residual)
@@ -1306,8 +1306,8 @@
             !if (failed('d_uface_dlnT00')) exit
             !call do1(s% d_uface_dlnTm1, c% d_uface_dlnTm1)
             !if (failed('d_uface_dlnTm1')) exit
-            call do1(s% d_uface_dw, c% d_uface_dw)
-            if (failed('d_uface_dw')) exit
+            call do1(s% d_uface_domega, c% d_uface_domega)
+            if (failed('d_uface_domega')) exit
 
             call do1_18(s% P_face_18, c% P_face_18)
             if (failed('P_face_18')) exit
@@ -1331,8 +1331,8 @@
             !if (failed('d_Pface_dlnT00')) exit
             !call do1(s% d_Pface_dlnTm1, c% d_Pface_dlnTm1)
             !if (failed('d_Pface_dlnTm1')) exit
-            call do1(s% d_Pface_dw, c% d_Pface_dw)
-            if (failed('d_Pface_dw')) exit
+            call do1(s% d_Pface_domega, c% d_Pface_domega)
+            if (failed('d_Pface_domega')) exit
 
             call do1(s% abs_du_div_cs, c% abs_du_div_cs)
             if (failed('abs_du_div_cs')) exit
@@ -1378,7 +1378,7 @@
             if (failed('lnd_for_d_dt_const_m')) exit
             call do1(s% lnR_for_d_dt_const_m, c% lnR_for_d_dt_const_m)
             if (failed('lnR_for_d_dt_const_m')) exit
-            call do1(s% et_for_d_dt_const_m, c% et_for_d_dt_const_m)
+            call do1(s% w_for_d_dt_const_m, c% w_for_d_dt_const_m)
             if (failed('et_for_d_dt_const_m')) exit
             call do1(s% v_for_d_dt_const_m, c% v_for_d_dt_const_m)
             if (failed('v_for_d_dt_const_m')) exit
@@ -1626,8 +1626,8 @@
             call do1(s% DAMPR, c% DAMPR); if (failed('DAMPR')) exit
             call do1(s% COUPL, c% COUPL); if (failed('COUPL')) exit
             call do1(s% COUPL_start, c% COUPL_start); if (failed('COUPL_start')) exit
-            call do1(s% w, c% w); if (failed('w')) exit
-            call do1(s% w_start, c% w_start); if (failed('w_start')) exit
+            call do1(s% ww, c% ww); if (failed('ww')) exit
+            call do1(s% ww_start, c% ww_start); if (failed('ww_start')) exit
             call do1(s% Vol, c% Vol); if (failed('Vol')) exit
             call do1(s% Vol_start, c% Vol_start); if (failed('Vol_start')) exit
             call do1(s% Uq, c% Uq); if (failed('Uq')) exit
@@ -2578,7 +2578,7 @@
          s% i_u = 0
          s% i_du_dt = 0
 
-         if (((.not. s% et_flag) .and. (s% u_flag .or. s% v_flag)) .or. s% RSP_flag) then
+         if (((.not. s% w_flag) .and. (s% u_flag .or. s% v_flag)) .or. s% RSP_flag) then
 
             i = i+1
             s% i_lnd = i
@@ -2596,8 +2596,8 @@
             end if
             s% i_equL = s% i_lum
 
-            s% i_et = 0
-            s% i_det_dt = s% i_et
+            s% i_w = 0
+            s% i_dw_dt = s% i_w
 
             i = i+1
             s% i_lnR = i
@@ -2632,12 +2632,12 @@
             s% i_lum = i
             s% i_dlnE_dt = s% i_lum
             
-            if (s% et_flag) then
-               i = i+1; s% i_et = i
+            if (s% w_flag) then
+               i = i+1; s% i_w = i
             else 
-               s% i_et = 0
+               s% i_w = 0
             end if
-            s% i_det_dt = s% i_et
+            s% i_dw_dt = s% i_w
 
             i = i+1
             s% i_lnR = i
@@ -2706,7 +2706,7 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_et /= 0) s% nameofvar(s% i_et) = 'et'
+         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'et'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2722,7 +2722,7 @@
          if (s% i_dlnd_dt /= 0) s% nameofequ(s% i_dlnd_dt) = 'dlnd_dt'
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
-         if (s% i_det_dt /= 0) s% nameofequ(s% i_det_dt) = 'det_dt'
+         if (s% i_dw_dt /= 0) s% nameofequ(s% i_dw_dt) = 'dw_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_detrb_RSP_dt /= 0) s% nameofequ(s% i_detrb_RSP_dt) = 'detrb_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
@@ -3066,9 +3066,9 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_et_flag(id, et_flag, ierr)
+      subroutine set_w_flag(id, w_flag, ierr)
          integer, intent(in) :: id
-         logical, intent(in) :: et_flag
+         logical, intent(in) :: w_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, j, nz, iounit
@@ -3081,12 +3081,12 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% et_flag .eqv. et_flag) return
+         if (s% w_flag .eqv. w_flag) return
 
          nz = s% nz
          
          have_etrb_RSP = .false.
-         if (et_flag .and. s% RSP_flag) then ! turn RSP off before turn et on
+         if (w_flag .and. s% RSP_flag) then ! turn RSP off before turn et on
             have_etrb_RSP = .true.
             allocate(etrb_RSP(nz))
             do k=1,nz
@@ -3096,15 +3096,15 @@
             if (ierr /= 0) return
          end if
          
-         s% et_flag = et_flag
+         s% w_flag = w_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. et_flag) call remove1(s% i_et)
+         if (.not. w_flag) call remove1(s% i_w)
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_et_flag variables and equations'
+         write(*,*) 'set_w_flag variables and equations'
          do j=1,s% nvar_hydro
             write(*,2) trim(s% nameofvar(j)) // ' ' // trim(s% nameofequ(j)), j
          end do
@@ -3116,7 +3116,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (et_flag) call insert1(s% i_et)
+         if (w_flag) call insert1(s% i_w)
          
          if (have_etrb_RSP) deallocate(etrb_RSP)
 
@@ -3130,7 +3130,7 @@
             call insert(s% xh,i_var)
             call insert(s% xh_start,i_var)
             do k=1,nz
-               s% xh(i_var,k) = min_et
+               s% xh(i_var,k) = min_w
             end do
             s% need_to_reset_et = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then
@@ -3172,7 +3172,7 @@
             xs(i_var,1:nz) = 0d0
          end subroutine insert
 
-      end subroutine set_et_flag
+      end subroutine set_w_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)

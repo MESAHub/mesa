@@ -5,25 +5,23 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
-      ! change_et_flag
+      ! change_w_flag
       ! ~~~~~~~~~~~~~~~~~
-      ! change_initial_et_flag
+      ! change_initial_w_flag
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! change_et_flag_at_model_number
+      ! change_w_flag_at_model_number
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_et_flag
+      ! new_w_flag
       ! ~~~~~~~~~~~~~~
 
-      ! et variables
-      ! ``et_flag`` is true if we are use a variable for turbulent energy
       ! WARNING: These controls are not ready for use.
 
       ! ::
 
-    change_et_flag = .false.
-    change_initial_et_flag = .false.
-    change_et_flag_at_model_number = -111
-    new_et_flag = .false.
+    change_w_flag = .false.
+    change_initial_w_flag = .false.
+    change_w_flag_at_model_number = -111
+    new_w_flag = .false.
     
     
       ! remove_surface_by_relax_to_star_cut

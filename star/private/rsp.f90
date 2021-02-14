@@ -167,7 +167,7 @@
             s% xh(s% i_lnd,k) = log(1d0/s% Vol(k))
             s% xh(s% i_lnT,k) = log(s% T(k))
             s% xh(s% i_lnR,k) = log(s% r(k))
-            s% xh(s% i_etrb_RSP,k) = s% w(k)*s% w(k)
+            s% xh(s% i_etrb_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
             do j=1,s% species
                s% xa(j,k) = xa(j)
             end do
@@ -336,7 +336,7 @@
             end do
             !$OMP END PARALLEL DO
             if (ALFAC == 0d0 .or. ALFAS == 0d0) then
-               s% w(1:nz) = 0d0
+               s% RSP_w(1:nz) = 0d0
                s% RSP_Et(1:nz) = 0d0
                s% xh(s% i_etrb_RSP,1:nz) = 0d0
             else
@@ -354,14 +354,14 @@
                   POM = P4*(s% r(k)**2)*(ALFAC/ALFAS)*s% T(k)/s% Vol(k)
                   w_avg(k) = Lc/(POM*s% PII(k))
                end do
-               s% w(1) = 0d0
-               s% w(nz) = 0d0
+               s% RSP_w(1) = 0d0
+               s% RSP_w(nz) = 0d0
                do k=2,nz-1
-                  s% w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
-                  if (s% w(k) < 0d0) s% w(k) = 0d0
-                  s% RSP_Et(k) = s% w(k)**2
+                  s% RSP_w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
+                  if (s% RSP_w(k) < 0d0) s% RSP_w(k) = 0d0
+                  s% RSP_Et(k) = s% RSP_w(k)**2
                   s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
-                  s% w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
+                  s% RSP_w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
                end do   
             end if         
          end if
@@ -602,7 +602,7 @@
                      !write(io,778) FASE,I,s% T(k), &
                      !    s% Hp_face(k),s% Y_face(k),s% PII(k),s% Lc(k)/s% L(k), &
                      !    4d0*pi*s% r(k)**2*s% Fr(k)/s% L(k),s% Lt(k)/s% L(k), &
-                     !    s% w(k)**2,s% egas(k)+s% erad(k),s% csound(k), &
+                     !    s% RSP_w(k)**2,s% egas(k)+s% erad(k),s% csound(k), &
                      !    s% Pt(k),s% Pgas(k)+s% Prad(k),s% Eq(k), &
                      !    s% COUPL(k)
                   endif

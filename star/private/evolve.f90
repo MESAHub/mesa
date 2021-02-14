@@ -1478,7 +1478,7 @@
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
                   sum_cell_others = dt*dot_product(s% dm(1:nz), s% energy_others(1:nz))
                   sum_cell_work = dt*dot_product(s% dm(1:nz), s% dwork_dm(1:nz))
-                  sum_cell_det = dt*dot_product(s% dm(1:nz), s% det_dt(1:nz))
+                  sum_cell_det = dt*dot_product(s% dm(1:nz), s% dw_dt(1:nz))
                   sum_cell_dke = dt*dot_product(s% dm(1:nz), s% dkedt(1:nz))
                   sum_cell_dpe = dt*dot_product(s% dm(1:nz), s% dpedt(1:nz))
                   sum_cell_de = dt*dot_product(s% dm(1:nz), s% dedt(1:nz))
@@ -1811,7 +1811,7 @@
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
          
-         if (.not. (s% RSP_flag .or. s% et_flag)) then
+         if (.not. (s% RSP_flag .or. s% w_flag)) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if

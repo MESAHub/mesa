@@ -303,10 +303,10 @@
          change_initial_RSP_flag, &
          new_RSP_flag, &
          
-         change_et_flag, &
-         change_initial_et_flag, &
-         change_et_flag_at_model_number, &
-         new_et_flag, &
+         change_w_flag, &
+         change_initial_w_flag, &
+         change_w_flag_at_model_number, &
+         new_w_flag, &
          
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
@@ -958,10 +958,10 @@
          s% job% change_RSP_flag = change_RSP_flag
          s% job% change_initial_RSP_flag = change_initial_RSP_flag
          s% job% new_RSP_flag = new_RSP_flag
-         s% job% change_et_flag = change_et_flag
-         s% job% change_initial_et_flag = change_initial_et_flag
-         s% job% change_et_flag_at_model_number = change_et_flag_at_model_number
-         s% job% new_et_flag = new_et_flag
+         s% job% change_w_flag = change_w_flag
+         s% job% change_initial_w_flag = change_initial_w_flag
+         s% job% change_w_flag_at_model_number = change_w_flag_at_model_number
+         s% job% new_w_flag = new_w_flag
          s% job% change_conv_vel_flag = change_conv_vel_flag
          s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
          s% job% new_conv_vel_flag = new_conv_vel_flag
@@ -1537,10 +1537,10 @@
          change_RSP_flag = s% job% change_RSP_flag
          change_initial_RSP_flag = s% job% change_initial_RSP_flag
          new_RSP_flag = s% job% new_RSP_flag
-         change_et_flag = s% job% change_et_flag
-         change_initial_et_flag = s% job% change_initial_et_flag
-         change_et_flag_at_model_number = s% job% change_et_flag_at_model_number
-         new_et_flag = s% job% new_et_flag
+         change_w_flag = s% job% change_w_flag
+         change_initial_w_flag = s% job% change_initial_w_flag
+         change_w_flag_at_model_number = s% job% change_w_flag_at_model_number
+         new_w_flag = s% job% new_w_flag
          change_conv_vel_flag = s% job% change_conv_vel_flag
          change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
          new_conv_vel_flag = s% job% new_conv_vel_flag

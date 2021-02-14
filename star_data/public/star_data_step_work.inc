@@ -148,7 +148,7 @@
       real(dp), pointer :: lnd_residual(:)
       real(dp), pointer :: equL_residual(:)
       real(dp), pointer :: E_residual(:)
-      real(dp), pointer :: Et_residual(:)
+      real(dp), pointer :: w_residual(:)
       real(dp), pointer :: v_residual(:)
       real(dp), pointer :: u_residual(:)
       real(dp), pointer :: Vol_residual(:)
@@ -462,16 +462,16 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent energy et
+      ! Convective turbulent velocity w
          
          real(dp), pointer, dimension(:) :: &
-            et, et_start, Pt, Eq, Uq, avQ, avQ_start, &
+            ww, ww_start, Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
          real(dp), pointer, dimension(:) :: &
-            Vol, Vol_start, w, w_start, RSP_Et, COUPL_start, &
+            Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
             Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
             Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
@@ -572,28 +572,11 @@
       type(auto_diff_real_18var_order1), pointer, dimension(:) :: &
          u_face_18, P_face_18
       real(dp), pointer, dimension(:) :: &
-         !u_face, &
-         !d_uface_dlnR, &
-         !d_uface_du00, &
-         !d_uface_dum1, &
-         !d_uface_dlnd00, &
-         !d_uface_dlndm1, &
-         !d_uface_dlnT00, &
-         !d_uface_dlnTm1, &
-         d_uface_dw, &
+         d_uface_domega, &
          RTI_du_diffusion_kick, &
          u_face_start
       real(dp), pointer, dimension(:) :: &
-         !P_face, &
-         !d_Pface_dL, &
-         !d_Pface_dlnR, &
-         !d_Pface_du00, &
-         !d_Pface_dum1, &
-         !d_Pface_dlnd00, &
-         !d_Pface_dlndm1, &
-         !d_Pface_dlnT00, &
-         !d_Pface_dlnTm1, &
-         d_Pface_dw, &
+         d_Pface_domega, &
          P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
@@ -638,7 +621,7 @@
          real(dp), pointer :: lnd_for_d_dt_const_m(:)
          real(dp), pointer :: lnT_for_d_dt_const_m(:)
          real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: et_for_d_dt_const_m(:) ! only set when et_flag is true
+         real(dp), pointer :: w_for_d_dt_const_m(:) ! only set when w_flag is true
          real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
          real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
          real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
@@ -656,7 +639,7 @@
          real(dp), pointer :: dlnd_dt(:)
          real(dp), pointer :: dlnT_dt(:)
          real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: det_dt(:) ! only set when et_flag is true
+         real(dp), pointer :: dw_dt(:) ! only set when w_flag is true
          real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
          real(dp), pointer :: du_dt(:) ! only set when u_flag is true
          real(dp), pointer :: dEtRSP_dt(:) ! only used when RSP_flag is true

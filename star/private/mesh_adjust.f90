@@ -191,7 +191,7 @@
             if (failed('dPdr_dRhodr_info')) return
          end if
 
-         if (s% et_flag) then
+         if (s% w_flag) then
             if (dbg) write(*,*) 'call do_et'
             call do_et( &
                s, nz, nz_old, nzlo, nzhi, comes_from, &
@@ -848,16 +848,16 @@
             xq, xq_old_plus1, et_old_plus1, et_new, xq_new
          integer, intent(out) :: ierr
 
-         integer :: n, i_et, k
+         integer :: n, i_w, k
 
          include 'formats'
 
          ierr = 0
-         i_et = s% i_et
+         i_w = s% i_w
          n = nzhi - nzlo + 1
 
          do k=1,nz_old
-            et_old_plus1(k) = xh_old(i_et,k)
+            et_old_plus1(k) = xh_old(i_w,k)
          end do
          et_old_plus1(nz_old+1) = 0
 
@@ -870,20 +870,20 @@
          end if
 
          do k=nzlo,nzhi
-            xh(i_et,k) = max(0d0,et_new(k+1-nzlo))
+            xh(i_w,k) = max(0d0,et_new(k+1-nzlo))
          end do
 
          n = nzlo - 1
          if (n > 0) then
             do k=1,n
-               xh(i_et,k) = xh_old(i_et,k)
+               xh(i_w,k) = xh_old(i_w,k)
             end do
          end if
 
          if (nzhi < nz) then
             n = nz - nzhi - 1 ! nz-n = nzhi+1
             do k=0,n
-               xh(i_et,nz-k) = xh_old(i_et,nz_old-k)
+               xh(i_w,nz-k) = xh_old(i_w,nz_old-k)
             end do
          end if
 

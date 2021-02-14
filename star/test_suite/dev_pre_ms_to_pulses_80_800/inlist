@@ -8,7 +8,7 @@
       read_extra_star_job_inlist3 = .true.
       extra_star_job_inlist3_name = 'inlist_common_converted'
       read_extra_star_job_inlist4 = .true.
-      extra_star_job_inlist4_name = 'inlist_prepare'
+      extra_star_job_inlist4_name = 'inlist_finish1'
 / ! end of star_job namelist
 
 &eos
@@ -17,7 +17,7 @@
       read_extra_eos_inlist2 = .true.
       extra_eos_inlist2_name = 'inlist_common_converted'
       read_extra_eos_inlist3 = .true.
-      extra_eos_inlist3_name = 'inlist_prepare'
+      extra_eos_inlist3_name = 'inlist_finish1'
 / ! end of eos namelist
 
 &kap
@@ -28,7 +28,7 @@
       read_extra_kap_inlist3 = .true.
       extra_kap_inlist3_name = 'inlist_common_converted'
       read_extra_kap_inlist4 = .true.
-      extra_kap_inlist4_name = 'inlist_prepare'
+      extra_kap_inlist4_name = 'inlist_finish1'
 / ! end of kap namelist
 
 &controls
@@ -39,7 +39,7 @@
       read_extra_controls_inlist3 = .true.
       extra_controls_inlist3_name = 'inlist_common_converted'
       read_extra_controls_inlist4 = .true.
-      extra_controls_inlist4_name = 'inlist_prepare'
+      extra_controls_inlist4_name = 'inlist_finish1'
 / ! end of controls namelist
 
 
@@ -49,5 +49,5 @@
       read_extra_pgstar_inlist2 = .true.
       extra_pgstar_inlist2_name = 'inlist_common_converted'
       read_extra_pgstar_inlist3 = .true.
-      extra_pgstar_inlist3_name = 'inlist_prepare'
+      extra_pgstar_inlist3_name = 'inlist_finish1'
 / ! end of pgstar namelist
