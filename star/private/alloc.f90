@@ -1626,8 +1626,8 @@
             call do1(s% DAMPR, c% DAMPR); if (failed('DAMPR')) exit
             call do1(s% COUPL, c% COUPL); if (failed('COUPL')) exit
             call do1(s% COUPL_start, c% COUPL_start); if (failed('COUPL_start')) exit
-            call do1(s% w, c% w); if (failed('w')) exit
-            call do1(s% w_start, c% w_start); if (failed('w_start')) exit
+            call do1(s% RSP_w, c% RSP_w); if (failed('w')) exit
+            call do1(s% RSP_w_start, c% RSP_w_start); if (failed('w_start')) exit
             call do1(s% Vol, c% Vol); if (failed('Vol')) exit
             call do1(s% Vol_start, c% Vol_start); if (failed('Vol_start')) exit
             call do1(s% Uq, c% Uq); if (failed('Uq')) exit
@@ -1720,6 +1720,9 @@
                call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
+               if (.not. associated(ptr)) then
+                  stop 'do1 ptr not associated'
+               end if
                if (nz <= size(ptr,dim=1)) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   return

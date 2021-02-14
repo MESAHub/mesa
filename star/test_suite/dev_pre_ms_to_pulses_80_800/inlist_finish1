@@ -180,7 +180,7 @@ Profile_Panels3_yaxis_name(5) =  'logT' ! 'mass' ! 'logR_cm' !
 Profile_Panels3_other_yaxis_name(5) = 'v_div_v_escape'
     Profile_Panels3_other_dymin(5) = 0.15
     Profile_Panels3_other_ymin(5) = -0.1
-    Profile_Panels3_other_ymax(5) = 1.1d0
+    Profile_Panels3_other_ymax(5) = 1.3d0
 
 Text_Summary1_name(2,4) = 'log_R'
 Text_Summary1_name(3,3) = 'remnant_M'
