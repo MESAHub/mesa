@@ -1072,8 +1072,8 @@
    
       ! for solvers
       
-         integer, pointer :: hydro_iwork(:)
-         real(dp), pointer :: hydro_work(:)
+         integer, pointer :: solver_iwork(:)
+         real(dp), pointer :: solver_work(:)
          
          real(dp), pointer :: xh_start(:,:) ! (nvar_hydro,nz)
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
@@ -1287,9 +1287,21 @@
 
 
       ! equation residuals, etc
+      
          ! equ(i,k) is residual for equation i of cell k            
          real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
          real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
+            ! pointer set by star_solver
+
+         real(dp), dimension(:,:), pointer :: jacobian
+            ! pointer set by enter_setmatrix
+         
+         real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
+         ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
+         ! lblk(i,j,k) = dequ(i,k)/dx(j,k-1)
+         ! ublk(i,j,k) = dequ(i,k)/dx(j,k+1)
+         
+         real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
 
          real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
          integer :: solver_iter, solver_adjust_iter
@@ -1300,18 +1312,6 @@
          ! weight = 0d0 means just ignore this item in making decisions.
          real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
          real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
-
-         real(dp), dimension(:,:), pointer :: jacobian
-            ! NOT ALLOCATED. pointer set by enter_setmatrix
-         
-         real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
-         ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
-         ! lblk(i,j,k) = dequ(i,k)/dx(j,k-1)
-         ! ublk(i,j,k) = dequ(i,k)/dx(j,k+1)
-         
-         real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
-            ! will be allocated or reallocated as necessary by solver.
-            ! deallocate when free_star
 
          
       ! sizeB info

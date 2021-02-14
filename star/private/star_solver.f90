@@ -47,7 +47,7 @@
       subroutine solver( &
             s, nz, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            equ, work, lwork, iwork, liwork, AF, &
+            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
          use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
@@ -57,9 +57,6 @@
          integer, intent(in) :: nz ! number of zones
          integer, intent(in) :: nvar ! number of variables per zone
          logical, intent(in) :: skip_global_corr_coeff_limit
-         real(dp), pointer, dimension(:) :: equ ! =(nvar,nz)
-         ! equ(i) has the residual for equation i, i.e., the difference between
-         ! the left and right hand sides of the equation.
 
          ! work arrays. required sizes provided by the routine solver_work_sizes.
          ! for standard use, set work and iwork to 0 before calling.
@@ -68,8 +65,6 @@
          integer, intent(in) :: lwork, liwork
          real(dp), intent(inout), target :: work(:) ! (lwork)
          integer, intent(inout), target :: iwork(:) ! (liwork)
-         real(dp), pointer, dimension(:) :: AF ! for factored jacobian
-            ! will be allocated or reallocated as necessary.
 
          ! convergence criteria
          integer, intent(in) :: gold_tolerances_level ! 0, 1, or 2
@@ -92,7 +87,6 @@
          integer, intent(out) :: ierr ! 0 means okay.
 
          integer :: ldAF, neqns, mljac, mujac
-         real(dp), pointer :: AF_copy(:) ! =(ldAF, neq)
 
          integer(8) :: test_time1, clock_rate
 
@@ -103,16 +97,15 @@
          neqns = nvar*nz
          ldAF = 3*nvar
 
-         call realloc_if_needed_1(AF,ldAF*neqns,(ldAF+2)*200,ierr)
+         call realloc_if_needed_1(s% AF1,ldAF*neqns,(ldAF+2)*200,ierr)
          if (ierr /= 0) return
-         AF_copy => AF
 
-         if (s% fill_arrays_with_NaNs) call fill_with_NaNs(AF_copy)
+         if (s% fill_arrays_with_NaNs) call fill_with_NaNs(s% AF1)
 
          call do_solver( &
-            s, nz, nvar, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
+            s, nz, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            equ, work, lwork, iwork, liwork, &
+            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          contains
@@ -172,7 +165,7 @@
       subroutine do_solver( &
             s, nz, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            equ1, work, lwork, iwork, liwork, &
+            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
@@ -181,7 +174,6 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
-         real(dp), pointer, dimension(:) :: equ1
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
@@ -236,6 +228,7 @@
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
 
+         real(dp), pointer, dimension(:) :: equ1
          real(dp), pointer, dimension(:,:) :: equ ! (nvar,nz)
          real(dp), pointer, dimension(:,:) :: AF ! (ldAF,neq)
          real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
@@ -243,7 +236,6 @@
 
          include 'formats'
 
-         equ(1:nvar,1:nz) => equ1(1:neq)
          AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
          tol_msg(1) = 'avg corr'
@@ -1887,6 +1879,11 @@
 
             A1(1:3*nvar*neq) => work(i:i+3*nvar*neq-1); i = i+3*nvar*neq
 
+            s% equ1(1:neq) => work(i:i+neq-1); i = i+neq
+            s% equ(1:nvar,1:nz) => s% equ1(1:neq)
+            equ1 => s% equ1
+            equ => s% equ
+
             dxsave1(1:neq) => work(i:i+neq-1); i = i+neq
             dxsave(1:nvar,1:nz) => dxsave1(1:neq)
 
@@ -2003,7 +2000,7 @@
          ierr = 0
          neq = nvar*nz
          liwork = num_iwork_params + neq
-         lwork = num_work_params + neq*(6*nvar + 10)
+         lwork = num_work_params + neq*(7*nvar + 10)
 
       end subroutine get_solver_work_sizes
 

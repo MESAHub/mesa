@@ -254,13 +254,13 @@
          nullify(s% bcyclic_odd_storage)
          nullify(s% bcyclic_odd_storage_qp)
 
-         nullify(s% hydro_iwork)
-         nullify(s% hydro_work)
+         nullify(s% solver_iwork)
+         nullify(s% solver_work)
+         nullify(s% AF1)
 
          s% net_name = ''
          s% species = 0
          s% num_reactions = 0
-         nullify(s% AF1)
 
          s% M_center = 0
          s% R_center = 0
@@ -504,7 +504,7 @@
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
-         s% nvar = 0
+         s% nvar_total = 0
 
          s% nz = 0
          s% prev_mesh_nz = 0
@@ -670,7 +670,7 @@
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
-         s% nvar = 0
+         s% nvar_total = 0
 
          s% species = 0
          s% num_reactions = 0

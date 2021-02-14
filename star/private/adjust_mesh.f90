@@ -331,7 +331,7 @@
          
          nz = nz_new
          s% nz = nz
-         nvar = s% nvar
+         nvar = s% nvar_total
 
          if (dbg_remesh .or. dbg) write(*,*) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)

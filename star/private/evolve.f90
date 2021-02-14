@@ -2015,7 +2015,7 @@
          s% solver_iter = 0
          s% solver_adjust_iter = 0
          
-         nvar = s% nvar
+         nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nz = s% nz
          s% model_number = s% model_number_old + 1

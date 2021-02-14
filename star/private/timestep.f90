@@ -2341,7 +2341,7 @@
 
          integer :: j, nterms, nvar_hydro, nz, k, kk, &
             skip1, skip2, skip3, skip4, iounit, i_alpha_RTI, i_etrb_RSP, i_et
-         real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar)
+         real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
          real(dp), pointer :: vc_data(:,:)
          logical :: dbg
          real(dp), parameter :: xscale_min = 1

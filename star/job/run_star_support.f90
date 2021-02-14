@@ -1068,7 +1068,7 @@
          
          write(*,*)
          write(*,'(a50,i18)') 'nz', s% nz
-         write(*,'(a50,i18)') 'nvar', s% nvar
+         write(*,'(a50,i18)') 'nvar_total', s% nvar_total
          write(*,'(a50,i18)') trim(s% net_name) // ' species', s% species
          write(*,'(a50,i18)') 'total_num_solver_iterations', &
             s% total_num_solver_iterations
@@ -2856,7 +2856,7 @@
          end if
          
          if (s% job% show_eqns_and_vars_names) then
-            do i=1,s% nvar
+            do i=1,s% nvar_total
                write(*,*) i, s% nameofvar(i), s% nameofequ(i)
             end do
             write(*,*)

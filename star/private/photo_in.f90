@@ -78,7 +78,7 @@
          read(iounit, iostat=ierr) &
             s% initial_z, & ! need this since read_model can change what is in the inlist
             s% total_num_solver_iterations, &
-            s% nz, s% nvar_hydro, s% nvar_chem, s% nvar, &
+            s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% et_flag, s% RSP_flag, &
             s% RTI_flag, s% conv_vel_flag, s% w_div_wc_flag, s% j_rot_flag, s% D_omega_flag, s% am_nu_rot_flag, &
             s% species, s% num_reactions, &

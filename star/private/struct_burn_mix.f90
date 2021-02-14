@@ -40,7 +40,7 @@
       integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
          use mix_info, only: set_mixing_info, get_convection_sigmas
          use solve_hydro, only: &
-            set_surf_info, set_tol_correction, do_hydro_converge
+            set_surf_info, set_tol_correction, do_solver_converge
          use solve_burn, only: do_burn
          use rates_def, only: num_rvs
          use hydro_vars, only: set_vars_if_needed
@@ -153,7 +153,7 @@
 
          do_chem = (s% do_burn .or. s% do_mix)
          if (do_chem) then ! include abundances
-            nvar = s% nvar
+            nvar = s% nvar_total
          else ! no chem => just do structure
             nvar = s% nvar_hydro
          end if
@@ -180,7 +180,7 @@
          end if
                      
          if (s% trace_evolve) write(*,*) 'call solver'
-         do_struct_burn_mix = do_hydro_converge( &
+         do_struct_burn_mix = do_solver_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction)
          if (s% trace_evolve) write(*,*) 'done solver'
@@ -204,7 +204,7 @@
 
          if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
             do j=1,s% species
-               write(*,4) 'after do_hydro_converge xa(j)', &
+               write(*,4) 'after do_solver_converge xa(j)', &
                   s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
             end do
          end if

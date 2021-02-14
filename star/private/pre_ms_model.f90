@@ -267,7 +267,6 @@
          ! overwritten during the call to allocate_star_info_arrays
 
          if (ASSOCIATED(s% xh_old)) deallocate(s% xh_old)
-         if (ASSOCIATED(s% equ1)) deallocate(s% equ1)
          if (ASSOCIATED(s% xh_start)) deallocate(s% xh_start)
          
          call allocate_star_info_arrays(s, ierr)

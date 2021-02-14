@@ -12,7 +12,7 @@
       integer :: nvar_chem ! the number of chemical abundance variables per zone
          ! = 0 for operator splitting with separate evolution of abundances
          ! = species to solve for all abundances solved coupled with structure
-      integer :: nvar ! = nvar_hydro + nvar_chem
+      integer :: nvar_total ! = nvar_hydro + nvar_chem
       integer :: nz ! the number of zones in the model
       
       ! inner boundary

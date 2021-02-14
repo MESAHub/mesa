@@ -179,7 +179,7 @@
          if ((nvar_chem_old == nvar_chem) .and. (nvar_hydro_old == nvar_hydro)) return
 
          nvar = nvar_chem + nvar_hydro
-         s% nvar = nvar
+         s% nvar_total = nvar
          nz = max(s% nz, s% prev_mesh_nz)
 
          if (nvar_chem_old == 0) return
@@ -190,10 +190,6 @@
          call realloc_double2( &
             s% xh_old, nvar_hydro, s% nz_old + nz_alloc_extra, ierr)
          if (ierr /= 0) return
-
-         call realloc_double(s% equ1, nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
 
          call realloc_double(s% residual_weight1, nvar*(nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
@@ -338,8 +334,8 @@
          if (ASSOCIATED(s% nameofvar)) deallocate(s% nameofvar)
          if (ASSOCIATED(s% nameofequ)) deallocate(s% nameofequ)
 
-         if (ASSOCIATED(s% hydro_work)) deallocate(s% hydro_work)
-         if (ASSOCIATED(s% hydro_iwork)) deallocate(s% hydro_iwork)
+         if (ASSOCIATED(s% solver_work)) deallocate(s% solver_work)
+         if (ASSOCIATED(s% solver_iwork)) deallocate(s% solver_iwork)
 
          if (ASSOCIATED(s% AF1)) deallocate(s% AF1)
 
@@ -483,7 +479,7 @@
          
          species = s% species
          num_reactions = s% num_reactions
-         nvar = s% nvar
+         nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nvar_chem = s% nvar_chem
 
@@ -1548,12 +1544,6 @@
             if (failed('burn_avg_epsnuc')) exit
             call do1_integer(s% burn_num_iters, c% burn_num_iters)
             if (failed('burn_num_iters')) exit
-
-            call do1_neq(s% equ1, c% equ1)
-            if (failed('equ1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
 
             call do1_neq(s% residual_weight1, c% residual_weight1)
             if (failed('residual_weight1')) exit
@@ -2708,7 +2698,7 @@
          s% i_chem1 = s% nvar_hydro + 1
          s% equchem1 = s% i_chem1
 
-         s% nvar = s% nvar_hydro + s% nvar_chem
+         s% nvar_total = s% nvar_hydro + s% nvar_chem
 
          ! Names of the variables
          if (s% i_lnd /= 0) s% nameofvar(s% i_lnd) = 'lnd'
@@ -2759,7 +2749,7 @@
          if (s% nvar_hydro == 0) return ! not ready to set chem names yet
 
          old_size = size(s% nameofvar,dim=1)
-         if (old_size < s% nvar) then
+         if (old_size < s% nvar_total) then
             call realloc(s% nameofvar)
             call realloc(s% nameofequ)
          end if
@@ -2778,8 +2768,8 @@
             integer :: cpy_len, j
             old_p => p
             old_size = size(p,dim=1)
-            allocate(p(s% nvar))
-            cpy_len = min(old_size, s% nvar)
+            allocate(p(s% nvar_total))
+            cpy_len = min(old_size, s% nvar_total)
             do j=1,cpy_len
                p(j) = old_p(j)
             end do
@@ -2792,8 +2782,8 @@
             integer :: cpy_len, j
             old_p => p
             old_size = size(p,dim=1)
-            allocate(p(s% nvar))
-            cpy_len = min(old_size, s% nvar)
+            allocate(p(s% nvar_total))
+            cpy_len = min(old_size, s% nvar_total)
             do j=1,cpy_len
                p(j) = old_p(j)
             end do

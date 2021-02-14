@@ -644,7 +644,7 @@
          end do 
          if (count/=0) call mesa_error(__FILE__,__LINE__)
 
-         nvar = s% nvar
+         nvar = s% nvar_total
          call read1_model( &
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &

@@ -2440,7 +2440,7 @@
          character (len=*), intent(in) :: namestr
          integer :: i
          lookup_nameofvar = 0
-         do i=1,s% nvar
+         do i=1,s% nvar_total
             if (namestr == s% nameofvar(i)) then
                lookup_nameofvar = i
                return
@@ -2454,7 +2454,7 @@
          character (len=*), intent(in) :: namestr
          integer :: i
          lookup_nameofequ = 0
-         do i=1,s% nvar
+         do i=1,s% nvar_total
             if (namestr == s% nameofequ(i)) then
                lookup_nameofequ = i
                return
