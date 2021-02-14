@@ -36,7 +36,7 @@
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
       integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
-      integer, parameter :: bit_for_et = 6
+      integer, parameter :: bit_for_w = 6
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
@@ -551,7 +551,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% w_flag = BTEST(file_type, bit_for_et)
+         s% w_flag = BTEST(file_type, bit_for_w)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)

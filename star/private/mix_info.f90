@@ -135,7 +135,7 @@
          else if (s% conv_vel_flag .or. s% w_flag) then
             do k = 1, nz
                if (s% w_flag) then
-                  s% conv_vel(k) = s% ww(k)
+                  s% conv_vel(k) = s% w(k)
                   if (s% conv_vel(k) >= min_conv_vel_for_convective_mixing_type) then
                      s% mixing_type(k) = convective_mixing
                   else

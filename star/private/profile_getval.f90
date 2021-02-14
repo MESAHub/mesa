@@ -1892,25 +1892,25 @@
 
             case(p_Pturb)
                if (s% w_flag) then
-                  val = s% ww(k)**2*s% rho(k)
+                  val = s% w(k)**2*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Pturb)
                if (s% w_flag) then
-                  val = safe_log10(s% ww(k)*s% rho(k))
+                  val = safe_log10(s% w(k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_et)
                if (s% w_flag) then
-                  val = s% ww(k)
+                  val = s% w(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_et)
                if (s% w_flag) then
-                  val = safe_log10(s% ww(k))
+                  val = safe_log10(s% w(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if
@@ -1955,9 +1955,9 @@
                if (s% rsp_flag) &
                   val = safe_log10(s% RSP_Et(k))
             case(p_rsp_vt)
-               if (s% rsp_flag) val = sqrt2*s% ww(k)
+               if (s% rsp_flag) val = sqrt2*s% w(k)
             case(p_rsp_vt_div_cs)
-               if (s% rsp_flag) val = sqrt2*s% ww(k)/s% csound(k)
+               if (s% rsp_flag) val = sqrt2*s% w(k)/s% csound(k)
             case(p_rsp_Pt)
                if (s% rsp_flag) val = s% Pt(k)
             case(p_rsp_Eq)

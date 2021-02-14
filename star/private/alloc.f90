@@ -610,9 +610,9 @@
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
             
-            call do1(s% ww, c% ww)
+            call do1(s% w, c% w)
             if (failed('et')) exit
-            call do1(s% ww_start, c% ww_start)
+            call do1(s% w_start, c% w_start)
             if (failed('et_start')) exit
             
             call do1(s% dxh_lnd, c% dxh_lnd)
@@ -1626,8 +1626,8 @@
             call do1(s% DAMPR, c% DAMPR); if (failed('DAMPR')) exit
             call do1(s% COUPL, c% COUPL); if (failed('COUPL')) exit
             call do1(s% COUPL_start, c% COUPL_start); if (failed('COUPL_start')) exit
-            call do1(s% ww, c% ww); if (failed('ww')) exit
-            call do1(s% ww_start, c% ww_start); if (failed('ww_start')) exit
+            call do1(s% w, c% w); if (failed('w')) exit
+            call do1(s% w_start, c% w_start); if (failed('w_start')) exit
             call do1(s% Vol, c% Vol); if (failed('Vol')) exit
             call do1(s% Vol_start, c% Vol_start); if (failed('Vol_start')) exit
             call do1(s% Uq, c% Uq); if (failed('Uq')) exit

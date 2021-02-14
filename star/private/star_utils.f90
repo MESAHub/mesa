@@ -1391,7 +1391,7 @@
             s% tau_start(k) = -1d99
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
-            s% ww_start(k) = -1d99
+            s% w_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do
       end subroutine reset_starting_vectors
@@ -2128,7 +2128,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% w_flag) cell_total = cell_total + s% ww(k)
+         if (s% w_flag) cell_total = cell_total + s% w(k)
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2212,7 +2212,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% w_flag) then
-               cell1 = dm*s% ww(k)
+               cell1 = dm*s% w(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2261,7 +2261,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% w_flag) then
-               cell1 = dm*s% ww(k)
+               cell1 = dm*s% w(k)
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -3349,7 +3349,7 @@
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% TDC_alfap*s% ww_start(k)*s% rho_start(k)
+            Pt_start = s% TDC_alfap*s% w_start(k)*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 

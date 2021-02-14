@@ -154,7 +154,7 @@
          call init
          
          if (s% TDC_alfa == 0d0) then
-            s% equ(i_dw_dt, k) = s% ww(k) - min_w
+            s% equ(i_dw_dt, k) = s% w(k) - min_w
             if (.not. skip_partials) d_d00(i_w) = 1d0
             return
          end if
@@ -196,7 +196,7 @@
             s% solver_test_partials_var = i_lnT
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
             write(*,*) 'get1_turbulent_energy_eqn', s% solver_test_partials_var, &
-               s% ww(k), s% ww_start(k)
+               s% w(k), s% w_start(k)
          end if      
 
          contains
@@ -1435,7 +1435,7 @@
             else
                s% Lt_start(k) = 0d0  
             end if
-            s% ww_start(k) = s% ww(k)
+            s% w_start(k) = s% w(k)
          end subroutine set1_et_start_vars
          
       end subroutine set_et_start_vars
@@ -1482,12 +1482,12 @@
             end if
             if (w_00 < 0d0) w_00 = 0d0
             s% xh(i_w,k) = max(min_w, w_00**2)
-            s% ww(k) = s% xh(i_w,k)
+            s% w(k) = s% xh(i_w,k)
             call compute_L(s, k, L, Lr, Lc, Lt, ierr)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
             if (dbg) write(*,2) 'L_et/L, Lc_et/L, Lr_et/L, et/energy, mlt_vc/cs', k, &
                L%val/s% L(k), Lc%val/s% L(k), Lr%val/s% L(k), &
-               s% ww(k)/s% energy(k), s% mlt_vc(k)/s% csound(k)
+               s% w(k)/s% energy(k), s% mlt_vc(k)/s% csound(k)
          end do
          if (dbg) stop 'reset_et_using_L'
       end subroutine reset_et_using_L

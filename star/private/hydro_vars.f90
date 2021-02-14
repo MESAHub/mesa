@@ -323,7 +323,7 @@
                   end do
                else if (j == i_w) then
                   do k=1,nz
-                     s% ww(k) = max(s% xh(i_w, k), min_w)
+                     s% w(k) = max(s% xh(i_w, k), min_w)
                      s% dxh_et(k) = 0d0
                   end do
                else if (j == i_lum) then

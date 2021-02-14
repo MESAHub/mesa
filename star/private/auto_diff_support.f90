@@ -239,7 +239,7 @@
          integer, intent(in) :: k
          w_m1 = 0d0 ! sets val and d1Array to 0
          if (k > 1) then
-            w_m1 % val = s%ww(k-1)
+            w_m1 % val = s%w(k-1)
             w_m1 % d1Array(i_w_m1) = 1d0
          end if            
       end function wrap_w_m1
@@ -250,7 +250,7 @@
          type(auto_diff_real_18var_order1) :: w_00
          integer, intent(in) :: k
          w_00 = 0d0 ! sets val and d1Array to 0
-         w_00 % val = s%ww(k)
+         w_00 % val = s%w(k)
          w_00 % d1Array(i_w_00) = 1d0
       end function wrap_w_00
 
@@ -261,7 +261,7 @@
          integer, intent(in) :: k
          w_p1 = 0d0 ! sets val and d1Array to 0
          if (k < s%nz) then
-            w_p1 % val = s%ww(k+1)
+            w_p1 % val = s%w(k+1)
             w_p1 % d1Array(i_w_p1) = 1d0
          end if
       end function wrap_w_p1

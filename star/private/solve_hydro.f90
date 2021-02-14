@@ -172,7 +172,7 @@
                end do
             else if (j1 == s% i_w .and. s% i_w <= nvar) then
                do k = 1, nz
-                  s% xh(j1,k) = s% ww(k)
+                  s% xh(j1,k) = s% w(k)
                end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz

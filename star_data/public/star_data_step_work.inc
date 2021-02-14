@@ -465,7 +465,7 @@
       ! Convective turbulent velocity w
          
          real(dp), pointer, dimension(:) :: &
-            ww, ww_start, Pt, Eq, Uq, avQ, avQ_start, &
+            w, w_start, Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program

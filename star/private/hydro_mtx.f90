@@ -490,16 +490,16 @@
                end if
 
                if (do_et) then
-                  s% ww(k) = max(x(i_w), min_w)
+                  s% w(k) = max(x(i_w), min_w)
                   s% dxh_et(k) = s% solver_dx(i_w,k)
-                  if (s% ww(k) <= 0d0 .or. is_bad_num(s% ww(k))) then
+                  if (s% w(k) <= 0d0 .or. is_bad_num(s% w(k))) then
                      s% retry_message = 'bad num for et'
-                     if (report) write(*,2) 'bad num et', k, s% ww(k)
+                     if (report) write(*,2) 'bad num et', k, s% w(k)
                      ierr = -1
                      if (s% stop_for_bad_nums) then
 !$omp critical (set_vars_for_solver_crit1)
-                        write(*,2) 'set_vars_for_solver et', k, s% ww(k)
-                        write(*,2) 'set_vars_for_solver et_start', k, s% ww_start(k)
+                        write(*,2) 'set_vars_for_solver et', k, s% w(k)
+                        write(*,2) 'set_vars_for_solver et_start', k, s% w_start(k)
                         write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_w,k)
                         write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_w,k)
                         stop 'set_vars_for_solver'

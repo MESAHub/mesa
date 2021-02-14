@@ -24,8 +24,8 @@
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1d0
 
-   change_initial_et_flag = .true.
-   new_et_flag = .true.
+   change_initial_w_flag = .true.
+   new_w_flag = .true.
 
    change_initial_v_flag = .true.
    new_v_flag = .true.

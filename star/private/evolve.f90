@@ -593,7 +593,7 @@
             w_div_w_crit, w_div_w_crit_prev, mstar_dot, mstar_dot_prev, abs_mstar_delta, &
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, total, &
-            surf_w_div_w_crit_limit, dt, time, max_dt, total_energy, &
+            surf_omega_div_omega_crit_limit, dt, time, max_dt, total_energy, &
             new_R_center, amplitude, flash_max, &
             dm_nz, dm_m1, r_m1, v_m1, A_nz, A_m1, A_center, new_v_center, min_v_center
             
@@ -800,7 +800,7 @@
 
             mstar_dot = 0
             w_div_w_crit = -1
-            surf_w_div_w_crit_limit = s% surf_w_div_w_crit_limit
+            surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
             mdot_redo_cnt = 0
             max_mdot_redo_cnt = s% max_mdot_redo_cnt
 
@@ -914,9 +914,9 @@
                   return
                end if
                write(*,*)
-               if (w_div_w_crit > surf_w_div_w_crit_limit) then
-                  write(*,1) 'retry: w_div_w_crit > surf_w_div_w_crit_limit', &
-                     w_div_w_crit, surf_w_div_w_crit_limit
+               if (w_div_w_crit > surf_omega_div_omega_crit_limit) then
+                  write(*,1) 'retry: w_div_w_crit > surf_omega_div_omega_crit_limit', &
+                     w_div_w_crit, surf_omega_div_omega_crit_limit
                   do_step_part2 = retry
                   s% result_reason = nonzero_ierr
                   return
@@ -932,7 +932,7 @@
             ! i.e. if bigger mass loss makes w_div_w_crit worse,
             ! then in an unstable situation and will remove mass until regain stability.
 
-            if (w_div_w_crit <= surf_w_div_w_crit_limit &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. mdot_redo_cnt == 0) then
                s% was_in_implicit_wind_limit = .false.
                !exit implicit_mdot_loop
@@ -940,7 +940,7 @@
                return
             end if
 
-            if (w_div_w_crit <= surf_w_div_w_crit_limit &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. s% mstar_dot == explicit_mdot) then
                !exit implicit_mdot_loop
                select_mdot_action = exit_loop
@@ -997,10 +997,10 @@
             end if
 
             ! have already done at least one correction -- check if okay now
-            if (w_div_w_crit <= surf_w_div_w_crit_limit .and. &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit .and. &
                   have_too_small_wind_mdot .and. &
                   abs((wind_mdot-too_small_wind_mdot)/wind_mdot) < &
-                     s% surf_w_div_w_crit_tol) then
+                     s% surf_omega_div_omega_crit_tol) then
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
                write(*,*)
@@ -1023,8 +1023,8 @@
                return
             end if
 
-            if (w_div_w_crit > surf_w_div_w_crit_limit &
-                  .and. w_div_w_crit_prev >= surf_w_div_w_crit_limit &
+            if (w_div_w_crit > surf_omega_div_omega_crit_limit &
+                  .and. w_div_w_crit_prev >= surf_omega_div_omega_crit_limit &
                   .and. -mstar_dot >= max_wind_mdot) then
                write(*,3) 'failed to fix w > w_crit', &
                   s% model_number, mdot_redo_cnt, w_div_w_crit, &
@@ -1035,7 +1035,7 @@
                return
             end if
 
-            if (w_div_w_crit >= surf_w_div_w_crit_limit) then ! wind too small
+            if (w_div_w_crit >= surf_omega_div_omega_crit_limit) then ! wind too small
                !write(*,*) "entering too small wind mdot"
                if (.not. have_too_small_wind_mdot) then
                   !write(*,*) "setting too small wind mdot"
@@ -1045,7 +1045,7 @@
                   !write(*,*) "changing too small wind mdot"
                   too_small_wind_mdot = wind_mdot
                end if
-            else if (w_div_w_crit < surf_w_div_w_crit_limit) then ! wind too large
+            else if (w_div_w_crit < surf_omega_div_omega_crit_limit) then ! wind too large
                !write(*,*) "entering too large wind mdot"
                if (.not. have_too_large_wind_mdot) then
                   !write(*,*) "setting too large wind mdot"
@@ -1064,7 +1064,7 @@
 
             if (have_too_large_wind_mdot .and. have_too_small_wind_mdot) then
                if (abs((too_large_wind_mdot-too_small_wind_mdot)/too_large_wind_mdot) &
-                   < s% surf_w_div_w_crit_tol) then
+                   < s% surf_omega_div_omega_crit_tol) then
                   write(*,*) "too_large_wind_mdot good enough, using it"
                   s% mstar_dot = -too_large_wind_mdot
                else

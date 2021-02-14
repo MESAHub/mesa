@@ -284,7 +284,7 @@
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
     simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
-    implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_w_div_w_crit_limit, surf_w_div_w_crit_tol, &
+    implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol, &
     fitted_fp_ft_i_rot, w_div_wcrit_max, w_div_wcrit_max2, &
     fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
@@ -1671,8 +1671,8 @@
  s% mdot_revise_factor = mdot_revise_factor
  s% implicit_mdot_boost = implicit_mdot_boost
  s% min_years_dt_for_redo_mdot = min_years_dt_for_redo_mdot
- s% surf_w_div_w_crit_limit = surf_w_div_w_crit_limit
- s% surf_w_div_w_crit_tol = surf_w_div_w_crit_tol
+ s% surf_omega_div_omega_crit_limit = surf_omega_div_omega_crit_limit
+ s% surf_omega_div_omega_crit_tol = surf_omega_div_omega_crit_tol
  s% fitted_fp_ft_i_rot = fitted_fp_ft_i_rot 
  s% w_div_wcrit_max = w_div_wcrit_max
  s% w_div_wcrit_max2 = w_div_wcrit_max2
@@ -3302,8 +3302,8 @@
  mdot_revise_factor = s% mdot_revise_factor
  implicit_mdot_boost = s% implicit_mdot_boost
  min_years_dt_for_redo_mdot = s% min_years_dt_for_redo_mdot
- surf_w_div_w_crit_limit = s% surf_w_div_w_crit_limit
- surf_w_div_w_crit_tol = S% surf_w_div_w_crit_tol
+ surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
+ surf_omega_div_omega_crit_tol = S% surf_omega_div_omega_crit_tol
  fitted_fp_ft_i_rot = s% fitted_fp_ft_i_rot 
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2

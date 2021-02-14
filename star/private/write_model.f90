@@ -81,7 +81,7 @@
          write(iounit,'(a)') '!'
          prev_flag = (s% nz_old == s% nz .and. s% generations > 1)
          file_type = 0
-         if (w_flag) file_type = file_type + 2**bit_for_et
+         if (w_flag) file_type = file_type + 2**bit_for_w
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
          if (prev_flag) file_type = file_type + 2**bit_for_2models
@@ -117,8 +117,8 @@
             write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', with luminosity (L), with turbulent energy (Et) and radiative flux (Fr) for RSP'
-         if (BTEST(file_type, bit_for_et)) &
-            write(iounit,'(a)',advance='no') ', with wturb=sqrt(turbulent energy)'
+         if (BTEST(file_type, bit_for_w)) &
+            write(iounit,'(a)',advance='no') ', with w=turbulent velocity for TDC'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -203,7 +203,7 @@
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             end if            
             if (w_flag) then
-               call write1(s% ww(k),ierr); if (ierr /= 0) exit
+               call write1(s% w(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit

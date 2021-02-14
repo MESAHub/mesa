@@ -423,7 +423,7 @@
          if (dumping) then
             call write_plot_data_for_mesh_plan( &
                s, nz_old, nz, prv% xh, prv% xa, &
-               prv% lnd, prv% lnT, prv% lnPgas, prv% lnE, prv% ww, &
+               prv% lnd, prv% lnT, prv% lnPgas, prv% lnE, prv% w, &
                prv% D_mix, prv% mixing_type, &
                prv% dq, prv% q, xq_old, prv% q, &
                s% species, s% i_lnR, s% i_lum, s% i_v, s% i_u, comes_from, &
@@ -442,7 +442,7 @@
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
             prv% j_rot, prv% i_rot, prv% omega, prv% D_omega, &
-            prv% conv_vel, prv% lnT, prv% ww, specific_PE, specific_KE, &
+            prv% conv_vel, prv% lnT, prv% w, specific_PE, specific_KE, &
             prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, prv% D_mix, &
             cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then
