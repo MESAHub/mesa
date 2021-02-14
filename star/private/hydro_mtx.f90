@@ -491,7 +491,7 @@
 
                if (do_et) then
                   s% w(k) = max(x(i_w), min_w)
-                  s% dxh_et(k) = s% solver_dx(i_w,k)
+                  s% dxh_w(k) = s% solver_dx(i_w,k)
                   if (s% w(k) <= 0d0 .or. is_bad_num(s% w(k))) then
                      s% retry_message = 'bad num for et'
                      if (report) write(*,2) 'bad num et', k, s% w(k)

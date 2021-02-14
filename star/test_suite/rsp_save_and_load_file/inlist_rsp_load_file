@@ -10,17 +10,16 @@
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 
 &controls  
 
-! check for retries and backups as part of test_suite
-   !max_retries = -1
-   !max_number_backups = 0
    max_model_number = 11000
+   
+   max_timestep = 407.61 ! seconds
 
 ! RSP controls
 
@@ -37,6 +36,10 @@
    
 
 ! output controls
+      terminal_show_age_units = 'days'
+      terminal_show_timestep_units = 'secs'
+      terminal_show_log_dt = .false.
+      terminal_show_log_age = .false.
 
    ! for cases in which you have a run that has reached steady pulses
    ! and you want to look at plots of just a few periods to see the details,

@@ -623,8 +623,8 @@
             if (failed('dxh_lnT')) exit
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
-            call do1(s% dxh_et, c% dxh_et)
-            if (failed('dxh_et')) exit
+            call do1(s% dxh_w, c% dxh_w)
+            if (failed('dxh_w')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
             if (failed('dxh_ln_cvpv0')) exit
 

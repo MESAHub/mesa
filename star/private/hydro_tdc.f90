@@ -136,7 +136,7 @@
          real(dp) :: dt, dm, dt_div_dm, residual, scale
          integer :: i_dw_dt, i_w, i_lnd, i_lnT, i_lnR, i_v
          type(auto_diff_real_18var_order1) :: resid_18, &
-            det_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
+            d_turbulent_energy_dt_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
          real(dp) :: dm_m1, dm_00, dm_p1, m_00, cgrav_00
          type(auto_diff_real_18var_order1) :: Source, D, Dr, g_00, g_p1, area_00, area_p1, g_cell_00, h_00
@@ -160,14 +160,14 @@
          end if
          
          call setup_intermediates
-         call setup_det_18(ierr); if (ierr /= 0) return         
+         call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
          call setup_PtdV_18(ierr); if (ierr /= 0) return         
          call setup_dt_dLt_dm_18(ierr); if (ierr /= 0) return         
          call setup_dt_C_18(ierr); if (ierr /= 0) return         
          call setup_dt_Eq_18(ierr); if (ierr /= 0) return    
          
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
-         esum_18 = det_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18
+         esum_18 = d_turbulent_energy_dt_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18
          
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
          scale = 1d0/s% energy_start(k)
@@ -178,7 +178,7 @@
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_turbulent_crit1)
             write(*,2) 'turbulent energy eqn residual', k, residual
-            write(*,2) 'det', k, det_18%val
+            write(*,2) 'det', k, d_turbulent_energy_dt_18%val
             write(*,2) 'PtdV', k, PtdV_18%val
             write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_18%val
             write(*,2) 'dt_C', k, dt_C_18%val
@@ -261,12 +261,14 @@
             g_cell_00 = (m_00 - 0.5d0 * dm_00) * cgrav_00 / (0.5d0 * (r_00 + r_p1))
          end subroutine setup_intermediates
          
-         subroutine setup_det_18(ierr)
+         subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
-            det_18 = 0d0
-            det_18%val = s% dxh_et(k) ! et = et_start + dxh_et
-            det_18%d1Array(i_w_00) = 1d0
-         end subroutine setup_det_18
+            d_turbulent_energy_dt_18 = 0d0
+            d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
+               (s% w_start(k)*s% dxh_w(k) + s% dxh_w(k)**2)/dt ! w = w_start + dxh_w
+            d_turbulent_energy_dt_18%d1Array(i_w_00) = &
+               (s% w_start(k) + 2d0*s% dxh_w(k))/dt
+         end subroutine setup_d_turbulent_energy_dt
          
          ! PtdV_18 = Pt_18*dV_18
          subroutine setup_PtdV_18(ierr)

@@ -77,7 +77,7 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_18var_order1) :: resid_18, &
-            dL_dm_18, sources_18, others_18, det_dt_18, dwork_dm_18, &
+            dL_dm_18, sources_18, others_18, d_turbulent_energy_dt_18, dwork_dm_18, &
             eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18, P_dV_dt_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
          real(dp) :: cell_energy_fraction_start, residual, dm, dt, scal
@@ -99,7 +99,7 @@
          call setup_dwork_dm(ierr); if (ierr /= 0) return         
          call setup_dL_dm(ierr); if (ierr /= 0) return         
          call setup_sources_and_others(ierr); if (ierr /= 0) return         
-         call setup_det_dt(ierr); if (ierr /= 0) return         
+         call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
          call setup_scal(ierr); if (ierr /= 0) return
          
          s% eps_grav_form_for_energy_eqn(k) = eps_grav_form
@@ -111,9 +111,9 @@
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 + eps_grav_18
+            esum_18 = - dL_dm_18 + sources_18 + others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 + eps_grav_18
          else
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - det_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
+            esum_18 = - dL_dm_18 + sources_18 + others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          end if
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
          s% ergs_error(k) = -dm*dt*resid_18%val ! save ergs_error before scaling
@@ -145,7 +145,7 @@
                write(*,2) 'residual', k, residual
                write(*,2) 'sources*scal', k, sources_18%val*scal
                write(*,2) '-dL_dm*scal', k, -dL_dm_18%val*scal
-               write(*,2) '-det_dt*scal', k, -det_dt_18%val*scal
+               write(*,2) '-d_turbulent_energy_dt*scal', k, -d_turbulent_energy_dt_18%val*scal
                write(*,2) '-dwork_dm*scal', k, -dwork_dm_18%val*scal
                write(*,2) '-dke_dt*scal', k, -dke_dt_18%val*scal
                write(*,2) '-dpe_dt*scal', k, -dpe_dt_18%val*scal
@@ -316,16 +316,18 @@
             s% dedt_RTI(k) = diffusion_eps_18%val
          end subroutine setup_RTI_diffusion
          
-         subroutine setup_det_dt(ierr)
+         subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            det_dt_18 = 0d0
+            d_turbulent_energy_dt_18 = 0d0
             if (s% w_flag) then
-               det_dt_18%val = s% dxh_et(k)/dt ! et = et_start + dxh_et
-               det_dt_18%d1Array(i_w_00) = 1d0/dt
+               d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
+                  (s% w_start(k)*s% dxh_w(k) + s% dxh_w(k)**2)/dt ! w = w_start + dxh_w
+               d_turbulent_energy_dt_18%d1Array(i_w_00) = &
+                  (s% w_start(k) + 2d0*s% dxh_w(k))/dt
             end if
-         end subroutine setup_det_dt
+         end subroutine setup_d_turbulent_energy_dt
          
          subroutine setup_eps_grav(ierr)
             integer, intent(out) :: ierr

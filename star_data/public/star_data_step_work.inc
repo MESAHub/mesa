@@ -658,7 +658,7 @@
          real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
-         real(dp), pointer :: dxh_et(:) ! et(k) = dxh_et(k) + et_start(k); dxh_et from solver.
+         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_w from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
