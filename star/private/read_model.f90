@@ -574,7 +574,7 @@
          
          if (is_RSP_model .and. .not. want_RSP_model) then
             write(*,*)
-            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to et form'
+            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to TDC form'
             write(*,*)
             s% w_flag = .true.
          end if

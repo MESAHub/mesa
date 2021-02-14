@@ -1,0 +1,23 @@
+#!/bin/bash
+function check_okay {
+	if [ $? -ne 0 ]; then
+		exit 1
+	fi
+}
+function do_one {
+	cp $1 inlist
+	check_okay
+	rm -rf $2
+	echo 'run' $1
+	./rn1
+	check_okay
+   echo;  echo 'finished' $1
+}
+
+
+
+do_one inlist_rsp_save_file_header test_loading.mod
+do_one inlist_rsp_load_file_header final.mod
+#exit
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

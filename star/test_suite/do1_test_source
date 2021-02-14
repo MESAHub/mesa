@@ -71,6 +71,7 @@ do_one rsp_check_2nd_crossing "Teff_red_edge     5" skip skip
 do_one rsp_Delta_Scuti "good match for period" "final.mod" auto 
 do_one rsp_gyre "good match for period" skip skip
 do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
+do_one rsp_save_and_load_file "good match for period" "final.mod" auto   
 do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
 do_one sample_pre_ms "finished sample pre-ms" skip skip
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
