@@ -433,7 +433,6 @@
          did_total_fe = .false.
          did_total_co = .false.
          did_total_fe = .false.
-         did_total_ni = .false.
          did_total_other = .false.
          do j=1, species
             select case(int(chem_isos% Z(chem_id(j))))

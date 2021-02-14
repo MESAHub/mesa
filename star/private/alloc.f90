@@ -195,39 +195,6 @@
          if (ierr /= 0) return
          s% equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
 
-         call realloc_double(s% lblk1, nvar*nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% lblk(1:nvar,1:nvar,1:nz) => s% lblk1(1:nvar*nvar*nz)
-
-         call realloc_double(s% dblk1, nvar*nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% dblk(1:nvar,1:nvar,1:nz) => s% dblk1(1:nvar*nvar*nz)
-
-         call realloc_double(s% ublk1, nvar*nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% ublk(1:nvar,1:nvar,1:nz) => s% ublk1(1:nvar*nvar*nz)
-
-         call realloc_double(s% lblkF1, nvar*nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% lblkF(1:nvar,1:nvar,1:nz) => s% lblkF1(1:nvar*nvar*nz)
-
-         call realloc_double(s% dblkF1, nvar*nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% dblkF(1:nvar,1:nvar,1:nz) => s% dblkF1(1:nvar*nvar*nz)
-
-         call realloc_double(s% ublkF1, nvar*nvar*(nz + nz_alloc_extra), ierr)
-         if (ierr /= 0) return
-         s% ublkF(1:nvar,1:nvar,1:nz) => s% ublkF1(1:nvar*nvar*nz)
-
-
-
-
-
-
-
-
-
-
          call realloc_double(s% residual_weight1, nvar*(nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
          s% residual_weight(1:nvar,1:nz) => s% residual_weight1(1:nvar*nz)
@@ -373,6 +340,8 @@
 
          if (ASSOCIATED(s% hydro_work)) deallocate(s% hydro_work)
          if (ASSOCIATED(s% hydro_iwork)) deallocate(s% hydro_iwork)
+
+         if (ASSOCIATED(s% AF1)) deallocate(s% AF1)
 
       end subroutine free_other
 
@@ -1586,42 +1555,6 @@
                   (action /= do_check_size .and. action /= do_deallocate)) &
                s% equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
 
-            call do1_neq2(s% lblk1, c% lblk1)
-            if (failed('lblk1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% lblk(1:nvar,1:nvar,1:nz) => s% lblk1(1:nvar*nvar*nz)
-
-            call do1_neq2(s% dblk1, c% dblk1)
-            if (failed('dblk1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% dblk(1:nvar,1:nvar,1:nz) => s% dblk1(1:nvar*nvar*nz)
-
-            call do1_neq2(s% ublk1, c% ublk1)
-            if (failed('ublk1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% ublk(1:nvar,1:nvar,1:nz) => s% ublk1(1:nvar*nvar*nz)
-
-            call do1_neq2(s% lblkF1, c% lblkF1)
-            if (failed('lblkF1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% lblkF(1:nvar,1:nvar,1:nz) => s% lblkF1(1:nvar*nvar*nz)
-
-            call do1_neq2(s% dblkF1, c% dblkF1)
-            if (failed('dblkF1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% dblkF(1:nvar,1:nvar,1:nz) => s% dblkF1(1:nvar*nvar*nz)
-
-            call do1_neq2(s% ublkF1, c% ublkF1)
-            if (failed('ublkF1')) exit
-            if (action == do_remove_from_center .or. action == do_reallocate .or. &
-                  (action /= do_check_size .and. action /= do_deallocate)) &
-               s% ublkF(1:nvar,1:nvar,1:nz) => s% ublkF1(1:nvar*nvar*nz)
-
             call do1_neq(s% residual_weight1, c% residual_weight1)
             if (failed('residual_weight1')) exit
             if (action == do_remove_from_center .or. action == do_reallocate .or. &
@@ -1845,36 +1778,6 @@
          end subroutine do1_neq
 
 
-         subroutine do1_neq2(ptr, other)
-            real(dp), dimension(:), pointer :: ptr, other
-            real(dp), dimension(:), pointer :: tmp
-            integer :: nvar2
-            nvar2 = nvar*nvar
-            if (action == do_fill_arrays_with_NaNs) then
-               call fill_with_NaNs(ptr)
-            else if (action == do_copy_pointers_and_resize) then
-               ptr => other
-               if (nvar2*nz <= size(ptr,dim=1)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-                  if (s% zero_when_allocate) ptr(:) = 0
-                  return
-               end if
-               deallocate(ptr)
-               allocate(ptr(nvar2*sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-               if (s% zero_when_allocate) ptr(:) = 0
-            else
-               if (action == do_reallocate .and. &
-                   nvar2*nz <= size(ptr,dim=1)) return
-               call do1D(s, ptr, nvar2*sz_new, action, ierr)
-               if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
-                  if (s% zero_when_allocate) ptr(:) = 0
-               end if
-            end if
-         end subroutine do1_neq2
-
-
          subroutine do1_integer(ptr, other)
             integer, dimension(:), pointer :: ptr, other
             integer, dimension(:), pointer :: tmp
@@ -2028,7 +1931,6 @@
          type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
-         khi = khi_in
          if (khi == -1) khi = size(ptr,dim=1)
          do k=klo,khi
             call set_nan(ptr(k)% val)
@@ -2041,7 +1943,6 @@
          type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
-         khi = khi_in
          if (khi == -1) khi = size(ptr,dim=1)
          do k=klo,khi
             ptr(k)% val = 0d0

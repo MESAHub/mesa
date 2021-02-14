@@ -260,6 +260,7 @@
          s% net_name = ''
          s% species = 0
          s% num_reactions = 0
+         nullify(s% AF1)
 
          s% M_center = 0
          s% R_center = 0

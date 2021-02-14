@@ -1004,14 +1004,36 @@
       end subroutine edit_dlnR_dt_above_k_below_just_added
 
 
-      subroutine enter_setmatrix(s, iter, nvar, nz, neqns, ierr)
+      subroutine enter_setmatrix(s, &
+            iter, nvar, nz, neqns, &
+            xder, need_solver_to_eval_jacobian, &
+            ldA, A1, ierr)
          use mtx_def, only: lapack
+         use rsp_def, only: ABB, LD_ABB, NV, MAX_NZN
          type (star_info), pointer :: s
          integer, intent(in) :: iter, nvar, nz, neqns ! (neqns = nvar*nz)
+         real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
+         logical, intent(out) :: need_solver_to_eval_jacobian
+         integer, intent(in) :: ldA ! leading dimension of A
+         real(dp), pointer, dimension(:) :: A1
          integer, intent(out) :: ierr
-         integer :: i
+
+         real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
+         integer :: i, j, k, cnt, i_lnR, nnz, nzlo, nzhi
+         real(dp) :: dt, lnR00, lnRm1, lnRp1, dlnR_prev, ddx, ddx_limit, &
+            epsder_struct, epsder_chem
+         integer :: id, nvar_hydro
+         logical :: dbg_enter_setmatrix, do_chem
+         real(dp), pointer :: blk3(:, :, :, :)
+
          include 'formats'
+
+         dbg_enter_setmatrix = dbg
+
          ierr = 0
+
+         if (dbg_enter_setmatrix) write(*, '(/,/,/,/,/,/,a)') 'enter_setmatrix'
+
          if (s% model_number == 1) then
             s% num_solver_iterations = s% num_solver_iterations + 1
             if (s% num_solver_iterations > 60 .and. &
@@ -1019,14 +1041,39 @@
                write(*,*) 'first model is slow to converge: num tries', &
                   s% num_solver_iterations
          end if
-         do i = 1,nvar*nvar*nz
-            s% lblkF1(i) = 0d0
-            s% dblkF1(i) = 0d0
-            s% ublkF1(i) = 0d0
+
+         dt = s% dt
+
+         do_chem = (s% do_burn .or. s% do_mix)
+
+         s% jacobian(1:ldA,1:neqns) => A1(1:ldA*neqns)
+         A(1:ldA,1:neqns) => A1(1:ldA*neqns)
+
+         do i=1,neqns
+            do j=1,lda
+               A(j,i) = 0d0
+            end do
          end do
+         i = nvar*nvar*nz
+         if (size(A1,dim=1) < 3*i) then
+            write(*,*) 'enter_setmatrix: size(A1,dim=1) < 3*i', size(A1,dim=1), 3*i
+            ierr = -1
+            return
+         end if
+         s% ublk(1:nvar,1:nvar,1:nz) => A1(1:i)
+         s% dblk(1:nvar,1:nvar,1:nz) => A1(i+1:2*i)
+         s% lblk(1:nvar,1:nvar,1:nz) => A1(2*i+1:3*i)
+
+         if (dbg_enter_setmatrix) &
+            write(*, *) 'call eval_partials with doing_check_partials = .false.'
          call eval_partials(s, nvar, ierr)
          if (ierr /= 0) return
+
          call s% other_after_enter_setmatrix(s% id,ierr)
+
+         if (dbg_enter_setmatrix) write(*, *) 'finished enter_setmatrix'
+         need_solver_to_eval_jacobian = .false.
+
       end subroutine enter_setmatrix
 
 

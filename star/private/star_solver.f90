@@ -47,13 +47,141 @@
       subroutine solver( &
             s, nz, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
+            equ, work, lwork, iwork, liwork, AF, &
+            convergence_failure, ierr)
+         use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
+         use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
+
+         type (star_info), pointer :: s
+         ! the primary variables
+         integer, intent(in) :: nz ! number of zones
+         integer, intent(in) :: nvar ! number of variables per zone
+         logical, intent(in) :: skip_global_corr_coeff_limit
+         real(dp), pointer, dimension(:) :: equ ! =(nvar,nz)
+         ! equ(i) has the residual for equation i, i.e., the difference between
+         ! the left and right hand sides of the equation.
+
+         ! work arrays. required sizes provided by the routine solver_work_sizes.
+         ! for standard use, set work and iwork to 0 before calling.
+         ! NOTE: these arrays contain some optional parameter settings and outputs.
+         ! see num_def for details.
+         integer, intent(in) :: lwork, liwork
+         real(dp), intent(inout), target :: work(:) ! (lwork)
+         integer, intent(inout), target :: iwork(:) ! (liwork)
+         real(dp), pointer, dimension(:) :: AF ! for factored jacobian
+            ! will be allocated or reallocated as necessary.
+
+         ! convergence criteria
+         integer, intent(in) :: gold_tolerances_level ! 0, 1, or 2
+         real(dp), intent(in) :: tol_max_correction, tol_correction_norm
+            ! a trial solution is considered to have converged if
+            ! max_correction <= tol_max_correction and
+            !
+            ! either
+            !          (correction_norm <= tol_correction_norm)
+            !    .and. (residual_norm <= tol_residual_norm)
+            ! or
+            !          (correction_norm*residual_norm <= tol_corr_resid_product)
+            !    .and. (abs(slope) <= tol_abs_slope_min)
+            !
+            ! where "slope" is slope of the line for line search in the solver,
+            ! and is analogous to the slope of df/ddx in a 1D solver root finder.
+
+         ! output
+         logical, intent(out) :: convergence_failure
+         integer, intent(out) :: ierr ! 0 means okay.
+
+         integer :: ldAF, neqns, mljac, mujac
+         real(dp), pointer :: AF_copy(:) ! =(ldAF, neq)
+
+         integer(8) :: test_time1, clock_rate
+
+         include 'formats'
+
+         ierr = 0
+
+         neqns = nvar*nz
+         ldAF = 3*nvar
+
+         call realloc_if_needed_1(AF,ldAF*neqns,(ldAF+2)*200,ierr)
+         if (ierr /= 0) return
+         AF_copy => AF
+
+         if (s% fill_arrays_with_NaNs) call fill_with_NaNs(AF_copy)
+
+         call do_solver( &
+            s, nz, nvar, AF_copy, ldAF, neqns, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
+            equ, work, lwork, iwork, liwork, &
+            convergence_failure, ierr)
+
+         contains
+
+
+         logical function bad_isize(a,sz,str)
+            integer :: a(:)
+            integer, intent(in) :: sz
+            character (len=*), intent(in) :: str
+            bad_isize = (size(a,dim=1) < sz)
+            if (.not. bad_isize) return
+            ierr = -1
+            write(*,*) 'interpolation: bad sizes for ' // trim(str)
+            return
+         end function bad_isize
+
+
+         logical function bad_size(a,sz,str)
+            real(dp) :: a(:)
+            integer, intent(in) :: sz
+            character (len=*), intent(in) :: str
+            bad_size = (size(a,dim=1) < sz)
+            if (.not. bad_size) return
+            ierr = -1
+            write(*,*) 'interpolation: bad sizes for ' // trim(str)
+            return
+         end function bad_size
+
+
+         logical function bad_size_dble(a,sz,str)
+            real(dp) :: a(:)
+            integer, intent(in) :: sz
+            character (len=*), intent(in) :: str
+            bad_size_dble = (size(a,dim=1) < sz)
+            if (.not. bad_size_dble) return
+            ierr = -1
+            write(*,*) 'interpolation: bad sizes for ' // trim(str)
+            return
+         end function bad_size_dble
+
+
+         logical function bad_sizes(a,sz1,sz2,str)
+            real(dp) :: a(:,:)
+            integer, intent(in) :: sz1,sz2
+            character (len=*), intent(in) :: str
+            bad_sizes = (size(a,dim=1) < sz1 .or. size(a,dim=2) < sz2)
+            if (.not. bad_sizes) return
+            ierr = -1
+            write(*,*) 'interpolation: bad sizes for ' // trim(str)
+            return
+         end function bad_sizes
+
+
+      end subroutine solver
+
+
+      subroutine do_solver( &
+            s, nz, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
+            gold_tolerances_level, tol_max_correction, tol_correction_norm, &
+            equ1, work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
 
-         integer, intent(in) :: nz, nvar
+         integer, intent(in) :: nz, nvar, ldAF, neq
          logical, intent(in) :: skip_global_corr_coeff_limit
+
+         real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
+         real(dp), pointer, dimension(:) :: equ1
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
@@ -70,15 +198,21 @@
 
          ! info saved in work arrays
 
-         real(dp), dimension(:,:), pointer :: B, grad_f, soln
-         real(dp), dimension(:), pointer :: B1, grad_f1, soln1, &
-            row_scale_factors1, col_scale_factors1
-         integer, dimension(:), pointer :: ipiv1, ipiv_blk1
-         character (len=nz) :: equed1
-            
-         real(dp), dimension(:,:), allocatable :: &
-            rhs, ddx, dxsave, ddxsave
+         real(dp), dimension(:,:), pointer :: dxsave, ddxsave, B, grad_f, soln
+         real(dp), dimension(:), pointer :: dxsave1, ddxsave1, B1, grad_f1, &
+            row_scale_factors1, col_scale_factors1, soln1, save_ublk1, save_dblk1, save_lblk1
+         real(dp), dimension(:,:), pointer ::  rhs
+         integer, dimension(:), pointer :: ipiv1
+         real(dp), dimension(:,:), pointer :: &
+            ddx, xgg, ddxd, ddxdd, xder, equsave
 
+         integer, dimension(:), pointer :: ipiv_blk1
+         character (len=nz) :: equed1
+
+         real(dp), dimension(:,:), pointer :: A, Acopy
+         real(dp), dimension(:), pointer :: A1, Acopy1
+         real(dp), dimension(:), pointer :: lblk1, dblk1, ublk1
+         real(dp), dimension(:), pointer :: lblkF1, dblkF1, ublkF1
 
          ! locals
          real(dp)  ::  &
@@ -90,7 +224,7 @@
             tol_residual_norm3, tol_max_residual3, &
             tol_abs_slope_min, tol_corr_resid_product, &
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
-         integer :: neq, iter, max_tries, zone, tiny_corr_cnt, i, j, k, info, &
+         integer :: iter, max_tries, zone, tiny_corr_cnt, i, j, k, info, &
             last_jac_iter, max_iterations_for_jacobian, force_iter_value, &
             reuse_count, iter_for_resid_tol2, iter_for_resid_tol3, &
             max_corr_k, max_corr_j, max_resid_k, max_resid_j
@@ -102,10 +236,15 @@
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
 
+         real(dp), pointer, dimension(:,:) :: equ ! (nvar,nz)
+         real(dp), pointer, dimension(:,:) :: AF ! (ldAF,neq)
+         real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
+         real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
          include 'formats'
-         
-         neq = nvar*nz
+
+         equ(1:nvar,1:nz) => equ1(1:neq)
+         AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
          tol_msg(1) = 'avg corr'
          tol_msg(2) = 'max corr '
@@ -171,8 +310,7 @@
             iter_for_resid_tol2 = s% iter_for_resid_tol2
             iter_for_resid_tol3 = s% iter_for_resid_tol3
          end if
-            
-         allocate(rhs(nvar,nz), ddx(nvar,nz), dxsave(nvar,nz), ddxsave(nvar,nz))
+
          call pointers(ierr)
          if (ierr /= 0) return
 
@@ -199,7 +337,7 @@
             return
          end if
          
-         call eval_equations(s, iter, nvar, nz, ierr)         
+         call eval_equations(s, iter, nvar, nz, equ, ierr)         
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -208,7 +346,7 @@
          end if
          
          call sizequ(s, &
-            iter, nvar, nz, &
+            iter, nvar, nz, equ, &
             residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
          if (ierr /= 0) then
             if (dbg_msg) &
@@ -359,7 +497,7 @@
             if (min_corr_coeff < 1d0) then
                ! compute gradient of f = equ<dot>jacobian
                ! NOTE: NOT jacobian<dot>equ
-               call block_multiply_xa(nvar, nz, s% lblk1, s% dblk1, s% ublk1, s% equ1, grad_f1)
+               call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
 
                slope = eval_slope(nvar, nz, grad_f, soln)
                if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
@@ -396,7 +534,7 @@
             ! check the residuals for the equations
 
             call sizequ(s, &
-               iter, nvar, nz, &
+               iter, nvar, nz, equ, &
                residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             if (ierr /= 0) then
                call oops('sizequ returned ierr')
@@ -648,12 +786,12 @@
                      ddxsave(i,k) = ddx(i,k)
                   end do
                end do
-               f = eval_f(nvar,nz)
+               f = eval_f(nvar,nz,equ)
                if (is_bad_num(f)) then
                   ierr = -1
                   write(err_msg,*) 'adjust_correction failed in eval_f'
                   if (dbg_msg) write(*,*) &
-                     'adjust_correction: eval_f(nvar,nz)', eval_f(nvar,nz)
+                     'adjust_correction: eval_f(nvar,nz,equ)', eval_f(nvar,nz,equ)
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'f', f
                      stop 'solver adjust_correction'
@@ -682,7 +820,7 @@
                s% solver_adjust_iter = iter
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
-               call eval_equations(s, iter, nvar, nz, ierr)
+               call eval_equations(s, iter, nvar, nz, equ, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -704,12 +842,12 @@
                   do k=1,nz
                      do i=1,nvar
                         write(*,5) trim(s% nameofequ(i)), k, iter, s% solver_iter, &
-                           s% model_number, s% equ(i,k)
+                           s% model_number, equ(i,k)
                      end do
                   end do
                end if
 
-               f = eval_f(nvar,nz)
+               f = eval_f(nvar,nz,equ)
                if (is_bad_num(f)) then
                   if (s% stop_for_bad_nums) then
                      write(*,1) 'f', f
@@ -864,21 +1002,15 @@
             use star_utils, only: start_time, update_time
             use rsp_def, only: NV, MAX_NZN
             integer, intent(in) :: reuse_count
-            integer ::  i, k, blk_sz
+            integer ::  i, k
             real(dp) :: ferr, berr, total_time
-            real(dp), allocatable, dimension(:) :: &
-               save_ublk1, save_dblk1, save_lblk1
 
             include 'formats'
 
             solve_equ=.true.
             !$omp simd
             do i=1,neq
-               b1(i) = -s% equ1(i)
-               !if (is_bad(b1(i))) then
-               !   write(*,2) 'b1', i, b1(i)
-               !   stop 'solve_equ'
-               !end if
+               b1(i) = -equ1(i)
             end do
 
             info = 0
@@ -888,13 +1020,11 @@
             end if
             
             if (s% use_DGESVX_in_bcyclic) then
-               blk_sz = nvar*nvar*nz
-               allocate(save_ublk1(blk_sz), save_dblk1(blk_sz), save_lblk1(blk_sz))
                !$omp simd
-               do i = 1, blk_sz
-                  save_ublk1(i) = s% ublk1(i)
-                  save_dblk1(i) = s% dblk1(i)
-                  save_lblk1(i) = s% lblk1(i)
+               do i = 1, nvar*nvar*nz
+                  save_ublk1(i) = ublk1(i)
+                  save_dblk1(i) = dblk1(i)
+                  save_lblk1(i) = lblk1(i)
                end do
             end if
             
@@ -904,9 +1034,9 @@
             if (s% use_DGESVX_in_bcyclic) then
                !$omp simd
                do i = 1, nvar*nvar*nz
-                  s% ublk1(i) = save_ublk1(i)
-                  s% dblk1(i) = save_dblk1(i)
-                  s% lblk1(i) = save_lblk1(i)
+                  ublk1(i) = save_ublk1(i)
+                  dblk1(i) = save_dblk1(i)
+                  lblk1(i) = save_lblk1(i)
                end do
             end if
 
@@ -926,7 +1056,7 @@
             use star_bcyclic, only: bcyclic_factor
             include 'formats'
             call bcyclic_factor( &
-               s, nvar, nz, s% lblk1, s% dblk1, s% ublk1, s% lblkF1, s% dblkF1, s% ublkF1, ipiv_blk1, &
+               s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, row_scale_factors1, col_scale_factors1, &
                equed1, iter, info)
          end subroutine factor_mtx
@@ -936,10 +1066,28 @@
             use star_bcyclic, only: bcyclic_solve
             include 'formats'
             call bcyclic_solve( &
-               s, nvar, nz, s% lblk1, s% dblk1, s% ublk1, s% lblkF1, s% dblkF1, s% ublkF1, ipiv_blk1, &
+               s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
                iter, info)
          end subroutine solve_mtx
+
+
+         logical function do_enter_setmatrix(s, neq, ierr)
+            ! create jacobian by using numerical differences for partial derivatives
+            implicit none
+            type (star_info), pointer :: s
+            integer, intent(in) :: neq
+            real(dp), pointer, dimension(:,:) :: ddx
+            integer, intent(out) :: ierr
+            logical :: need_solver_to_eval_jacobian
+            integer :: i, j, k
+            include 'formats'
+            need_solver_to_eval_jacobian = .true.
+            call enter_setmatrix(s, iter, &
+                  nvar, nz, neq, xder, need_solver_to_eval_jacobian, &
+                  size(A,dim=1), A1, ierr)
+            do_enter_setmatrix = need_solver_to_eval_jacobian
+         end function do_enter_setmatrix
 
 
          subroutine setmatrix(s, neq, dxsave, ddxsave, ierr)
@@ -947,14 +1095,14 @@
             use star_utils, only: e00, em1, ep1
             type (star_info), pointer :: s
             integer, intent(in) :: neq
-            real(dp), dimension(:,:) :: dxsave, ddxsave
+            real(dp), pointer, dimension(:,:) :: dxsave, ddxsave
             integer, intent(out) :: ierr
 
             integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
             real(dp), dimension(:,:), pointer :: save_equ, save_dx
             real(dp) :: dvar, dequ, dxtra, &
                dx_0, dvardx, dvardx_0, xdum, err
-            logical :: testing_partial
+            logical :: need_solver_to_eval_jacobian, testing_partial
 
             include 'formats'
 
@@ -964,7 +1112,7 @@
                s% solver_test_partials_k > 0 .and. &
                s% solver_call_number == s% solver_test_partials_call_number .and. &
                s% solver_test_partials_iter_number == iter
-            call enter_setmatrix(s, iter, nvar, nz, neq, ierr)
+            need_solver_to_eval_jacobian = do_enter_setmatrix(s, neq, ierr)
             if (ierr /= 0) return
 
             if (.not. testing_partial) return
@@ -974,7 +1122,7 @@
                call eval_partials(s, nvar, ierr)
                if (ierr /= 0) return
             else
-               call eval_equations(s, iter, nvar, nz, ierr)
+               call eval_equations(s, iter, nvar, nz, equ, ierr)
                if (ierr /= 0) then
                   write(*,3) '1st call eval_equations failed'
                   stop 'setmatrix'
@@ -986,7 +1134,7 @@
             do k=1,nz
                do j=1,nvar
                   save_dx(j,k) = s% solver_dx(j,k)
-                  save_equ(j,k) = s% equ(j,k)
+                  save_equ(j,k) = equ(j,k)
                end do
             end do
             
@@ -1502,14 +1650,14 @@
                end if
                s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations(s, iter, nvar, nz, ierr)            
+            call eval_equations(s, iter, nvar, nz, equ, ierr)            
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
                stop 'setmatrix'
             end if
             if (i_equ > 0) then
-               val = s% equ(i_equ,k) ! testing partial of residual for cell k equation
+               val = equ(i_equ,k) ! testing partial of residual for cell k equation
             else if (i_equ == 0) then
                val = s% solver_test_partials_val
             else if (i_equ == -1) then
@@ -1670,7 +1818,8 @@
             if (.not. dbg_msg) return
             
             if (max_resid_j < 0) then
-               call sizequ(s, iter, nvar, nz, &
+               call sizequ(s, &
+                  iter, nvar, nz, equ, &
                   residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             end if
             
@@ -1736,6 +1885,14 @@
 
             i = num_work_params+1
 
+            A1(1:3*nvar*neq) => work(i:i+3*nvar*neq-1); i = i+3*nvar*neq
+
+            dxsave1(1:neq) => work(i:i+neq-1); i = i+neq
+            dxsave(1:nvar,1:nz) => dxsave1(1:neq)
+
+            ddxsave1(1:neq) => work(i:i+neq-1); i = i+neq
+            ddxsave(1:nvar,1:nz) => ddxsave1(1:neq)
+
             B1 => work(i:i+neq-1); i = i+neq
             B(1:nvar,1:nz) => B1(1:neq)
 
@@ -1745,9 +1902,19 @@
             grad_f1(1:neq) => work(i:i+neq-1); i = i+neq
             grad_f(1:nvar,1:nz) => grad_f1(1:neq)
 
+            rhs(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
+
+            xder(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
+
+            ddx(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
+
             row_scale_factors1(1:neq) => work(i:i+neq-1); i = i+neq
 
             col_scale_factors1(1:neq) => work(i:i+neq-1); i = i+neq
+
+            save_ublk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
+            save_dblk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
+            save_lblk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
 
             if (i-1 > lwork) then
                ierr = -1
@@ -1770,6 +1937,26 @@
 
             ipiv_blk1(1:neq) => ipiv1(1:neq)
 
+            A(1:3*nvar,1:neq) => A1(1:3*nvar*neq)
+            Acopy1 => A1
+            Acopy => A
+
+            ublk1(1:nvar*neq) => A1(1:nvar*neq)
+            dblk1(1:nvar*neq) => A1(1+nvar*neq:2*nvar*neq)
+            lblk1(1:nvar*neq) => A1(1+2*nvar*neq:3*nvar*neq)
+
+            lblk(1:nvar,1:nvar,1:nz) => lblk1(1:nvar*neq)
+            dblk(1:nvar,1:nvar,1:nz) => dblk1(1:nvar*neq)
+            ublk(1:nvar,1:nvar,1:nz) => ublk1(1:nvar*neq)
+
+            ublkF1(1:nvar*neq) => AF1(1:nvar*neq)
+            dblkF1(1:nvar*neq) => AF1(1+nvar*neq:2*nvar*neq)
+            lblkF1(1:nvar*neq) => AF1(1+2*nvar*neq:3*nvar*neq)
+
+            lblkF(1:nvar,1:nvar,1:nz) => lblkF1(1:nvar*neq)
+            dblkF(1:nvar,1:nvar,1:nz) => dblkF1(1:nvar*neq)
+            ublkF(1:nvar,1:nvar,1:nz) => ublkF1(1:nvar*neq)
+
          end subroutine pointers
 
 
@@ -1784,15 +1971,16 @@
          end function eval_slope
 
 
-         real(dp) function eval_f(nvar, nz)
+         real(dp) function eval_f(nvar, nz, equ)
             integer, intent(in) :: nvar, nz
+            real(dp), intent(in), dimension(:,:) :: equ
             integer :: k, i
             real(dp) :: q
             include 'formats'
             eval_f = 0
             do k = 1, nz
                do i = 1, nvar
-                  q = s% equ(i,k)
+                  q = equ(i,k)
                   eval_f = eval_f + q*q
                end do
             end do
@@ -1800,7 +1988,7 @@
          end function eval_f
 
 
-      end subroutine solver
+      end subroutine do_solver
 
 
       subroutine get_solver_work_sizes(s, nvar, nz, lwork, liwork, ierr)
@@ -1815,7 +2003,7 @@
          ierr = 0
          neq = nvar*nz
          liwork = num_iwork_params + neq
-         lwork = num_work_params + 5*neq
+         lwork = num_work_params + neq*(6*nvar + 10)
 
       end subroutine get_solver_work_sizes
 

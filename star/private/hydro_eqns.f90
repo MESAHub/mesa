@@ -77,6 +77,7 @@
          integer, intent(out) :: ierr
          integer :: i, k
          type (star_info), pointer :: s
+         real(dp), dimension(:, :), pointer :: equ
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -85,9 +86,10 @@
             write(*,3) 'nvar_hydro /= n', s% nvar_hydro, n
             stop 'equ_data_for_extra_profile_columns'
          end if
+         equ(1:n,1:nz) => s% equ1(1:n*nz)
          do i=1,n
             do k=1,nz
-               vals(k,i) = s% equ(i,k)
+               vals(k,i) = equ(i,k)
             end do
             names(i) = s% nameofequ(i)
          end do
@@ -189,7 +191,7 @@
             if (ierr == 0) &
                call do_chem_eqns( &
                   s, nvar, equchem1, nvar_chem, &
-                  skip_partials, ierr)
+                  skip_partials, equ, ierr)
 
          else ! solving structure equations
 
@@ -239,7 +241,7 @@
                if (do_struct_hydro) then
                   if (do_dlnd_dt) then
                      call do1_density_eqn( &
-                        s, k, skip_partials, nvar, op_err)
+                        s, k, equ, skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_density_eqn'
                         if (s% report_ierr) write(*,2) 'ierr in do1_density_eqn', k
@@ -248,7 +250,7 @@
                   end if
                   if (k > 1) then ! k=1 is surf P BC
                      if (do_du_dt) then
-                        call do1_Riemann_momentum_eqn(s, k, -1d0, skip_partials, nvar, op_err)
+                        call do1_Riemann_momentum_eqn(s, k, -1d0, equ, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
                            if (s% report_ierr) write(*,2) 'ierr in do1_Riemann_momentum_eqn', k
                            if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_Riemann_momentum_eqn'
@@ -256,7 +258,7 @@
                         end if
                      end if
                      if (do_dv_dt) then
-                        call do1_momentum_eqn(s, k, skip_partials, nvar, op_err)
+                        call do1_momentum_eqn(s, k, equ, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
                            if (s% report_ierr) write(*,2) 'ierr in do1_momentum_eqn', k
                            if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_momentum_eqn'
@@ -266,7 +268,7 @@
                   end if
                   if (do_dlnR_dt) then
                      call do1_radius_eqn( &
-                        s, k, skip_partials, nvar, op_err)
+                        s, k, equ, skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_radius_eqn', k
                         if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_radius_eqn'
@@ -275,7 +277,7 @@
                   end if
                   if (do_alpha_RTI) then
                      call do1_dalpha_RTI_dt_eqn( &
-                        s, k, &
+                        s, k, equ, &
                         skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_dalpha_RTI_dt_eqn', k
@@ -285,7 +287,7 @@
                   end if
                   if (do_conv_vel) then
                      call do1_dln_cvpv0_dt_eqn( &
-                        s, k, &
+                        s, k, equ, &
                         skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_dln_cvpv0_dt_eqn', k
@@ -295,7 +297,7 @@
                   end if
                   if (do_w_div_wc) then
                      call do1_w_div_wc_eqn( &
-                        s, k, &
+                        s, k, equ, &
                         skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_w_div_wc_eqn', k
@@ -305,7 +307,7 @@
                   end if
                   if (do_j_rot) then
                      call do1_dj_rot_dt_eqn( &
-                        s, k, &
+                        s, k, equ, &
                         skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_dj_rot_dt_eqn', k
@@ -318,7 +320,7 @@
                   if (do_dlnE_dt) then
                      call zero_eps_grav_and_partials(s, k)
                      call do1_energy_eqn( &
-                        s, k, skip_partials, do_chem, nvar, op_err)
+                        s, k, equ, skip_partials, do_chem, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', k
                         if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_energy_eqn'
@@ -327,7 +329,7 @@
                   end if
                   if (do_det_dt) then
                      call do1_turbulent_energy_eqn( &
-                        s, k, skip_partials, nvar, op_err)
+                        s, k, equ, skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_turbulent_energy_eqn', k
                         if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_turbulent_energy_eqn'
@@ -337,7 +339,7 @@
                   if (do_equL) then
                      if (s% et_flag) then
                         call do1_et_L_eqn( &
-                           s, k, L_start_max, skip_partials, nvar, op_err)
+                           s, k, equ, L_start_max, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
                            if (s% report_ierr) write(*,2) 'ierr in do1_et_L_eqn', k
                            if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_et_L_eqn'
@@ -345,7 +347,7 @@
                         end if
                      else if (k > 1) then ! k==1 is done by T_surf BC
                         call do1_dlnT_dm_eqn( &
-                           s, k, skip_partials, nvar, op_err)
+                           s, k, equ, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
                            if (s% report_ierr) write(*,2) 'ierr in do1_dlnT_dm_eqn', k
                            if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_dlnT_dm_eqn'
@@ -357,7 +359,7 @@
                if (do_chem) then
                   call do1_chem_eqns( &
                      s, k, nvar, equchem1, nvar_chem, &
-                     skip_partials, op_err)
+                     skip_partials, equ, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_chem_eqns', k
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_chem_eqns'
@@ -371,7 +373,7 @@
                   (do_struct_hydro .or. do_struct_thermo)) then
                if (dbg) write(*,*) 'call PT_eqns_surf'
                call PT_eqns_surf( &
-                  s, skip_partials, nvar, &
+                  s, equ, skip_partials, nvar, &
                   do_du_dt, do_dv_dt, do_equL, ierr)
                if (dbg) write(*,*) 'done PT_eqns_surf'
                if (ierr /= 0) then
@@ -647,9 +649,10 @@
 
 
       subroutine do1_density_eqn( &
-            s, k, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
@@ -682,12 +685,12 @@
          ! dm = (pi4/3)*(r(k)**3 - rp13)*rho
          ! r(k)**3 = rp13 + (dm/rho)/(pi4/3) = rp13 + dr3
          res = log(rp13 + dr3)
-         s% equ(i_dlnd_dt, k) = s% lnR(k) - res/3d0
+         equ(i_dlnd_dt, k) = s% lnR(k) - res/3d0
 
-         s% lnd_residual(k) = s% equ(i_dlnd_dt, k)
+         s% lnd_residual(k) = equ(i_dlnd_dt, k)
 
          if (test_partials) then
-            s% solver_test_partials_val = s% equ(i_dlnd_dt, k)
+            s% solver_test_partials_val = equ(i_dlnd_dt, k)
          end if
 
          if (skip_partials) return
@@ -709,22 +712,24 @@
 
 
       subroutine do1_dalpha_RTI_dt_eqn( &
-            s, k, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          use hydro_alpha_rti_eqns, only: do1_alpha
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-         call do1_alpha(s, k, nvar, skip_partials, ierr)
+         call do1_alpha(s, k, nvar, skip_partials, equ, ierr)
       end subroutine do1_dalpha_RTI_dt_eqn
 
 
       subroutine do1_dln_cvpv0_dt_eqn( &
-            s, k, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          integer :: i_dln_cvpv0_dt, i_ln_cvpv0
@@ -747,14 +752,14 @@
          i_ln_cvpv0 = s% i_ln_cvpv0
          
          if (.false.) then ! don't change conv_vel
-            s% equ(i_dln_cvpv0_dt, k) = 0d0
+            equ(i_dln_cvpv0_dt, k) = 0d0
             if (skip_partials) return
             call e00(s,i_dln_cvpv0_dt,i_ln_cvpv0,k,nvar,1d0)
             return
          end if
          
          if (.false.) then ! force conv_vel == 0
-            s% equ(i_dln_cvpv0_dt, k) = s% conv_vel(k)
+            equ(i_dln_cvpv0_dt, k) = s% conv_vel(k)
             if (skip_partials) return
             call e00(s,i_dln_cvpv0_dt,i_ln_cvpv0,k,nvar,1d0)
             return
@@ -798,11 +803,11 @@
          end if
          
          if (k==1) then
-            s% equ(i_dln_cvpv0_dt, 1) = &
+            equ(i_dln_cvpv0_dt, 1) = &
                (log(s% conv_vel(1)+s% conv_vel_v0) - log(s% conv_vel(2)+s% conv_vel_v0))/scale
             if (test_partials) then
-               write(*,*) "test partials!", s% equ(i_dln_cvpv0_dt, 1)
-               s% solver_test_partials_val = s% equ(i_dln_cvpv0_dt, 1)
+               write(*,*) "test partials!", equ(i_dln_cvpv0_dt, 1)
+               s% solver_test_partials_val = equ(i_dln_cvpv0_dt, 1)
             end if
             if (skip_partials) return
             call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, 1, nvar, &
@@ -819,7 +824,7 @@
 
             return
          else if (k==s% nz) then
-            s% equ(i_dln_cvpv0_dt, s% nz) = &
+            equ(i_dln_cvpv0_dt, s% nz) = &
                (log(s% conv_vel(s% nz)+s% conv_vel_v0) - log(s% conv_vel(s% nz-1)+s% conv_vel_v0))/scale
             if (skip_partials) return
             call e00(s, i_dln_cvpv0_dt, i_ln_cvpv0, s% nz, nvar, &
@@ -878,13 +883,14 @@
          c = a - s% conv_vel(k)*dt_div_tau + mix*dt
          d_expected = c*inv
 
-         s% equ(i_dln_cvpv0_dt, k) = (d_expected - d_actual)/scale
+         equ(i_dln_cvpv0_dt, k) = (d_expected - d_actual)/scale
 
-         if (is_bad(s% equ(i_dln_cvpv0_dt, k))) then
+
+         if (is_bad(equ(i_dln_cvpv0_dt, k))) then
             ierr = -1
             return
 !$omp critical (hydro_eqns_crit2)
-            write(*,2) 'equ(i_dln_cvpv0_dt, k)', k, s% equ(i_dln_cvpv0_dt, k)
+            write(*,2) 'equ(i_dln_cvpv0_dt, k)', k, equ(i_dln_cvpv0_dt, k)
             write(*,2) 's% dln_cvpv0_dt(k)', k, s% dln_cvpv0_dt(k)
             write(*,2) 's% mlt_vc(k)', k, s% mlt_vc(k)
             write(*,2) 's% conv_vel(k)', k, s% conv_vel(k)
@@ -997,10 +1003,11 @@
       
 
       subroutine do1_w_div_wc_eqn( &
-            s, k, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          use hydro_rotation
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
@@ -1040,13 +1047,13 @@
                sigmoid_jrot_ratio = -sigmoid_jrot_ratio
             end if
             !if (k==79) write(*,*) "check k sigmoid",k,sigmoid_jrot_ratio,jr_lim1, jr_lim2, two_thirds*wwc*C/A, wwc
-            s% equ(i_equ_w_div_wc, k) = (sigmoid_jrot_ratio - two_thirds*wwc*C/A)/scale
+            equ(i_equ_w_div_wc, k) = (sigmoid_jrot_ratio - two_thirds*wwc*C/A)/scale
          else
             !if (k==79) write(*,*) "check k normal",k,jrot_ratio,jr_lim1,jr_lim2,two_thirds*wwc*C/A, wwc
-            s% equ(i_equ_w_div_wc, k) = (jrot_ratio - two_thirds*wwc*C/A)/scale
+            equ(i_equ_w_div_wc, k) = (jrot_ratio - two_thirds*wwc*C/A)/scale
          end if
 
-         if (is_bad(s% equ(i_equ_w_div_wc, k))) then
+         if (is_bad(equ(i_equ_w_div_wc, k))) then
             ierr = -1
             return
          end if
@@ -1095,10 +1102,11 @@
       
       
       subroutine do1_dj_rot_dt_eqn( &
-            s, k, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          use hydro_rotation
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          integer :: i_dj_rot_dt, i_j_rot
@@ -1149,9 +1157,15 @@
          dF00_dlnd00 = s% dj_flux_dlnd(k)
 
          s% dj_rot_dt(k) = (s% j_rot(k)-s% j_rot_start(k))/s% dt ! for some reason not working from hydro_mtx
-         s% equ(i_dj_rot_dt, k) = (s% dj_rot_dt(k)+(Fm1-F00)/s% dm_bar(k)-s% extra_jdot(k))/scale
+         !equ(i_dj_rot_dt, k) = s% dj_rot_dt(k)/scale!(s% dj_rot_dt(k)-(Fplus-Fminus)/s% dm_bar(k))/scale
+         equ(i_dj_rot_dt, k) = (s% dj_rot_dt(k)+(Fm1-F00)/s% dm_bar(k)-s% extra_jdot(k))/scale
 
-         if (is_bad(s% equ(i_dj_rot_dt, k))) then
+         !if (k==171) then
+         !   write(*,*) "check eqn", k, equ(i_dj_rot_dt, k), s%dj_rot_dt(k), &
+         !           (Fm1-F00)/s% dm_bar(k), s% extra_jdot(k)
+         !end if
+
+         if (is_bad(equ(i_dj_rot_dt, k))) then
             ierr = -1
             return
          end if
@@ -1205,10 +1219,11 @@
       ! d_P_rad/dm = (crad/3)*(T(k-1)^4 - T(k)^4)/dm_bar
       ! L_rad = L - L_non_rad, L_non_rad = L_start - L_rad_start
       ! L_rad_start = (-d_P_rad/dm_bar*clight*area^2/<opacity_face>)_start
-      subroutine do1_alt_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_alt_dlnT_dm_eqn(s, k, equ, skip_partials, nvar, ierr)
          use eos_def
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
@@ -1347,7 +1362,7 @@
          
          ! residual
          r = (d_P_rad_expected - d_P_rad_actual)/scale 
-         s% equ(i_equL, k) = r
+         equ(i_equL, k) = r
          s% equL_residual(k) = r
 
          dr_dlnTm1 = (d_expected_dlnTm1 - d_actual_dlnTm1)/scale
@@ -1459,10 +1474,11 @@
 
 
       subroutine do1_dlnT_dm_eqn( &
-            s, k, skip_partials, nvar, ierr)
+            s, k, equ, skip_partials, nvar, ierr)
          use eos_def
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
 
@@ -1506,7 +1522,7 @@
          if (i_equL == 0) return
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
-            call do1_alt_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)
+            call do1_alt_dlnT_dm_eqn(s, k, equ, skip_partials, nvar, ierr)
             return
          end if
 
@@ -1554,20 +1570,20 @@
          
          scale = 1d0
          r = (delm*s% dlnT_dm_expected(k) - lnTdiff)*scale
-         s% equ(i_equL, k) = r
-         s% equL_residual(k) = s% equ(i_equL,k)
+         equ(i_equL, k) = r
+         s% equL_residual(k) = equ(i_equL,k)
 
          if (k == s% trace_k) then
             write(*,5) 'i_equL', k, s% solver_iter, s% solver_adjust_iter, &
-               s% model_number, s% equ(i_equL, k)
+               s% model_number, equ(i_equL, k)
          end if
 
-         if (is_bad(s% equ(i_equL, k))) then
+         if (is_bad(equ(i_equL, k))) then
             ierr = -1
-            if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, equ(i_equL, k)
             if (s% stop_for_bad_nums) stop 'hydro eqns'
             return
-            write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            write(*,2) 'equ(i_equL, k)', k, equ(i_equL, k)
             write(*,2) 'lnTdiff', k, lnTdiff
             write(*,2) 'delm', k, delm
             write(*,2) 'dlnT_dm_expected(k)', k, s% dlnT_dm_expected(k)
@@ -1649,7 +1665,7 @@
 
 
       subroutine PT_eqns_surf( &
-            s, skip_partials, nvar, &
+            s, equ, skip_partials, nvar, &
             do_du_dt, do_dv_dt, do_equL, ierr)
 
          use hydro_vars, only: set_Teff_info_for_eqns
@@ -1658,6 +1674,7 @@
          use eos_lib, only: Radiation_Pressure
 
          type (star_info), pointer :: s
+         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          logical, intent(in) :: do_du_dt, do_dv_dt, do_equL
@@ -1844,22 +1861,22 @@
                return
             end if
             if (do_du_dt) then
-               s% equ(i_du_dt, 1) = (s% u(1) - s% fixed_vsurf)/s% csound_start(1)
-               if (is_bad(s% equ(i_du_dt, 1))) then
-                  write(*,1) 'equ(i_du_dt, 1)', s% equ(i_du_dt, 1)
+               equ(i_du_dt, 1) = (s% u(1) - s% fixed_vsurf)/s% csound_start(1)
+               if (is_bad(equ(i_du_dt, 1))) then
+                  write(*,1) 'equ(i_du_dt, 1)', equ(i_du_dt, 1)
                   stop 'set_fixed_vsurf_outer_BC'
                end if
-               s% u_residual(1) = s% equ(i_du_dt, 1)
+               s% u_residual(1) = equ(i_du_dt, 1)
                if (.not. skip_partials) &
                   call e00(s, i_du_dt, i_u, 1, nvar, 1d0/s% csound_start(1))
             end if
             if (do_dv_dt) then
-               s% equ(i_dv_dt, 1) = (s% v(1) - s% fixed_vsurf)/s% csound_start(1)
-               if (is_bad(s% equ(i_dv_dt, 1))) then
-                  write(*,1) 'equ(i_dv_dt, 1)', s% equ(i_dv_dt, 1)
+               equ(i_dv_dt, 1) = (s% v(1) - s% fixed_vsurf)/s% csound_start(1)
+               if (is_bad(equ(i_dv_dt, 1))) then
+                  write(*,1) 'equ(i_dv_dt, 1)', equ(i_dv_dt, 1)
                   stop 'set_fixed_vsurf_outer_BC'
                end if
-               s% v_residual(1) = s% equ(i_dv_dt, 1)
+               s% v_residual(1) = equ(i_dv_dt, 1)
                if (.not. skip_partials) &
                   call e00(s, i_dv_dt, i_v, 1, nvar, 1d0/s% csound_start(1))
             end if 
@@ -1870,16 +1887,16 @@
             include 'formats'
             ierr = 0
             if (s% L(1) <= 0d0) then
-               s% equ(i_equL,1) = s% L(1) - s% L(2)
-               s% equL_residual(1) = s% equ(i_equL,1)
+               equ(i_equL,1) = s% L(1) - s% L(2)
+               s% equL_residual(1) = equ(i_equL,1)
                if (.not. skip_partials) then
                   call e00(s,i_equL,i_lum,1,nvar,1d0)
                   call ep1(s,i_equL,i_lum,1,nvar,-1d0)
                end if
                return
             end if
-            s% equ(i_equL,1) = s% L(2)/s% L(1) - 1d0
-            s% equL_residual(1) = s% equ(i_equL,1)
+            equ(i_equL,1) = s% L(2)/s% L(1) - 1d0
+            s% equL_residual(1) = equ(i_equL,1)
             if (skip_partials) return
             call e00(s,i_equL,i_lum,1,nvar,-s% L(2)/(s% L(1)*s% L(1)))
             call ep1(s,i_equL,i_lum,1,nvar,1d0/s% L(1))
@@ -1907,8 +1924,8 @@
             test_partials = .false.
 
             if (.not. s% do_struct_thermo) then ! dummy eqn
-               s% equ(i_equL,1) = 0
-               s% equL_residual(1) = s% equ(i_equL,1)
+               equ(i_equL,1) = 0
+               s% equL_residual(1) = equ(i_equL,1)
                if (skip_partials) return
                call e00(s,i_equL,i_lnT,1,nvar,one)
                return
@@ -1951,14 +1968,14 @@
             dT1_dlnRp1 = dT1_dlnR*s% drmid_dlnRp1(1)/rmid
 
             Tscale = 1d6*s% T_start(1) ! 1d6 to reduce equ size compared to k > 1 cases
-            s% equ(i_equL, 1) = (T1 - s% T(1))/Tscale
-            s% equL_residual(1) = s% equ(i_equL,1)
+            equ(i_equL, 1) = (T1 - s% T(1))/Tscale
+            s% equL_residual(1) = equ(i_equL,1)
             if (test_partials) then
-               s% solver_test_partials_val = s% equ(i_equL, 1)
+               s% solver_test_partials_val = equ(i_equL, 1)
             end if
 
-            if (is_bad(s% equ(i_equL, 1))) then
-               write(*,1) 'equ(i_equL, 1)', s% equ(i_equL, 1)
+            if (is_bad(equ(i_equL, 1))) then
+               write(*,1) 'equ(i_equL, 1)', equ(i_equL, 1)
                write(*,1) 's% r(1)', s% r(1)
                write(*,1) 'T1', T1
                write(*,1) 'Lmid', Lmid
@@ -2018,8 +2035,8 @@
             end if
 
             if (.not. s% do_struct_thermo) then ! dummy eqn
-               s% equ(i_T_BC,1) = 0
-               s% equL_residual(1) = s% equ(i_T_BC,1)
+               equ(i_T_BC,1) = 0
+               s% equL_residual(1) = equ(i_T_BC,1)
                if (skip_partials) return
                call e00(s,i_T_BC,i_lnT,1,nvar,one)
                return
@@ -2027,10 +2044,10 @@
             
             scale = 1d0 ! 1d-3
             
-            s% equ(i_T_BC, 1) = (lnT_bc - s% lnT(1))*scale
-            s% equL_residual(1) = s% equ(i_T_BC,1)
+            equ(i_T_BC, 1) = (lnT_bc - s% lnT(1))*scale
+            s% equL_residual(1) = equ(i_T_BC,1)
             
-            if (is_bad(s% equ(i_T_BC,1))) then
+            if (is_bad(equ(i_T_BC,1))) then
                write(*,1) 'lnT_bc', lnT_bc
                write(*,1) 's% lnT(1)', s% lnT(1)
                write(*,1) 's% L(1)', s% L(1)
@@ -2084,7 +2101,7 @@
                i_eqn = i_dv_dt
             end if
 
-            s% equ(i_eqn,1) = lnP_bc - s% lnP(1)
+            equ(i_eqn,1) = lnP_bc - s% lnP(1)
             
             if (test_partials) then
                s% solver_test_partials_val = lnP_bc ! equ(i_eqn,1)
@@ -2135,7 +2152,7 @@
             if (s% u_flag) then
                call do_surf_Riemann_dudt_eqn( &
                   s, P, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-                  skip_partials, nvar, ierr)
+                  equ, skip_partials, nvar, ierr)
             else
                call wrap(P_surf_18, P, &
                   0d0, P*dlnPsurf_dlnd, 0d0, &
@@ -2145,7 +2162,7 @@
                   0d0, 0d0, 0d0, &
                   0d0, P*dlnPsurf_dL, 0d0)
                call do_surf_momentum_eqn( &
-                  s, P_surf_18, skip_partials, nvar, ierr)
+                  s, P_surf_18, equ, skip_partials, nvar, ierr)
             end if
             
             if (test_partials) then
@@ -2200,11 +2217,11 @@
                ! d_dt(1/rho(1)) = d_dt(1/rho(2))
                ! widely used.  e.g., Grott, Chernigovski, Glatzel, 2005.
             
-            s% equ(i_eqn, 1) = s% rho(2)*s% dlnd_dt(1) - s% rho(1)*s% dlnd_dt(2)
-            residual(1) = s% equ(i_eqn, 1)
+            equ(i_eqn, 1) = s% rho(2)*s% dlnd_dt(1) - s% rho(1)*s% dlnd_dt(2)
+            residual(1) = equ(i_eqn, 1)
             
-            if (is_bad(s% equ(i_eqn, 1))) then
-               write(*,1) 'equ(i_eqn, 1)', s% equ(i_eqn, 1)
+            if (is_bad(equ(i_eqn, 1))) then
+               write(*,1) 'equ(i_eqn, 1)', equ(i_eqn, 1)
                write(*,1) 's% rho(1)', s% rho(1)
                write(*,1) 's% rho_start(1)', s% rho_start(1)
                write(*,1) 's% rho(2)', s% rho(2)
