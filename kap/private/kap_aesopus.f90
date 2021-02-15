@@ -379,6 +379,10 @@ contains
 
     end do
 
+    ! close root group
+    call h5gclose_f(group_id, ierr)
+    if (ierr /= 0) return
+
     ! close file
     call h5fclose_f(file_id, ierr)
     if (ierr /= 0) return
