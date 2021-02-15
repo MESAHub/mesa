@@ -38,12 +38,12 @@
       contains
 
 
-      subroutine set_xscale_info(s, nvar, nz, ierr)
+      subroutine set_xscale_info(s, nvar, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: nvar, nz
+         integer, intent(in) :: nvar
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, nvar_hydro
+         integer :: i, j, k, nz, nvar_hydro
          real(dp), parameter :: xscale_min = 1
          real(dp) :: var_scale, lum_scale, vel_scale, omega_scale
 
@@ -53,7 +53,7 @@
 
          if (dbg) write(*, *) 'set_xscale'
          nvar_hydro = s% nvar_hydro
-
+         nz = s% nz
          do k=1,nz
             do i=1,nvar
                if (i <= nvar_hydro) then ! structure variable
@@ -86,27 +86,24 @@
       end subroutine set_xscale_info
 
 
-      subroutine eval_equations(s, iter, nvar, nz, equ_in, ierr)
+      subroutine eval_equations(s,  nvar, ierr)
          use hydro_eqns, only: eval_equ
          use mix_info, only: set_dxdt_mix
          use star_utils, only: update_time, total_times
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: equ_in ! (nvar, nz)
+         integer, intent(in) :: nvar
          integer, intent(out) :: ierr
 
-         integer :: cnt, i, j, k
+         integer :: cnt, i, j, k, nz
          integer :: id
          real(dp) :: dt, theta_dt
-         real(dp), pointer :: equ(:,:)
 
          logical, parameter :: skip_partials = .true.
 
          include 'formats'
 
          ierr = 0
-
-         equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
+         nz = s% nz
 
          if (dbg) write(*, *) 'eval_equations'
 
@@ -116,7 +113,7 @@
             if (dbg) write(*, *) 'skip set_solver_vars on call before 1st iter'
          else
             if (dbg) write(*, *) 'call set_solver_vars'
-            call set_solver_vars(s, iter, nvar, dt, ierr)
+            call set_solver_vars(s, nvar, dt, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*,2) 'eval_equations: set_solver_vars returned ierr', ierr
@@ -129,7 +126,7 @@
          if (ierr == 0) then
             do k=1,nz
                do j=1,nvar
-                  equ(j,k) = 0d0
+                  s% equ(j,k) = 0d0
                   s% residual_weight(j,k) = 1d0
                   s% correction_weight(j,k) = 1d0
                end do
@@ -148,12 +145,12 @@
          cnt = 0
          do i=1,nz
             do j=1, nvar
-               if (is_bad_num(equ(j, i))) then
+               if (is_bad_num(s% equ(j, i))) then
                   cnt = cnt + 1
                   s% retry_message = 'eval_equations: equ has a bad num'
                   if (s% report_ierr) then
                      write(*,4) 'eval_equations: equ has a bad num ' // trim(s% nameofequ(j)), &
-                        j, i, nvar, equ(j, i)
+                        j, i, nvar, s% equ(j, i)
                      write(*,2) 'cell', i
                      write(*,2) 'nz', s% nz
                   end if
@@ -186,16 +183,13 @@
       end subroutine eval_equations
 
 
-      subroutine sizequ(s, &
-            iter, nvar, nz, equ, &
-            equ_norm, equ_max, k_max, j_max, ierr)
+      subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer :: equ(:,:) ! (nvar, nz)
+         integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, i_chem1, nvar_hydro, nvar_chem, &
+         integer :: j, k, num_terms, n, nz, i_chem1, nvar_hydro, nvar_chem, &
             max_loc, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq, max_energy_resid, avg_energy_resid
          
@@ -214,6 +208,8 @@
 
          nvar_hydro = min(nvar, s% nvar_hydro)
          nvar_chem = s% nvar_chem
+         
+         nz = s% nz
          n = nz
          num_terms = 0
          sumequ = 0
@@ -231,7 +227,7 @@
                do k = 1, nz
                   do j = 1, nvar
                      if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
-                     absq = abs(equ(j,k)*s% residual_weight(j,k))
+                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                      sumequ = sumequ + absq
                      if (absq > equ_max) then
                         equ_max = absq
@@ -251,7 +247,7 @@
                do k = 1, nz
                   do j = 1, nvar_hydro
                      if (j == skip_eqn1 .or. j == skip_eqn2) cycle
-                     absq = abs(equ(j,k)*s% residual_weight(j,k))
+                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                      !write(*,3) 'equ(j,k)*s% residual_weight(j,k)', j, k, equ(j,k)*s% residual_weight(j,k)
                      sumequ = sumequ + absq
                      if (is_bad(sumequ)) then
@@ -262,7 +258,7 @@
                         ierr = -1
                         if (s% report_ierr) &
                            write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
-                              j, k, equ(j,k)*s% residual_weight(j,k)
+                              j, k, s% equ(j,k)*s% residual_weight(j,k)
                         if (s% stop_for_bad_nums) stop 'sizeq 2'
                         return
                      end if
@@ -280,7 +276,7 @@
             num_terms = num_terms + nvar_chem*nz
             do k = 1, nz
                do j = i_chem1, nvar
-                  absq = abs(equ(j,k)*s% residual_weight(j,k))
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                   sumequ = sumequ + absq
                   if (absq > equ_max) then
                      equ_max = absq
@@ -293,13 +289,13 @@
          if (s% conv_vel_flag) then
             do k = 1, nz
                j = s% i_dln_cvpv0_dt
-               absq = abs(equ(j,k)*s% residual_weight(j,k))
+               absq = abs(s% equ(j,k)*s% residual_weight(j,k))
             end do
          end if
 
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
-            k_max, iter, s% model_number, equ_max, equ_norm
+            k_max, s% solver_iter, s% model_number, equ_max, equ_norm
          
          if (dbg) call dump_equ
          
@@ -315,7 +311,7 @@
             do k=1,s% nz
                do j=1,nvar
                   write(*,3) 'equ ' // trim(s% nameofequ(j)), &
-                     k, iter, equ(j, k)
+                     k, s% solver_iter, s% equ(j, k)
                end do
                write(*,*)
                !if (k == 6) exit
@@ -325,17 +321,15 @@
       end subroutine sizequ
 
 
-      subroutine sizeB(s, &
-            iter, nvar, nz, B, &
-            max_correction, correction_norm, max_zone, max_var, ierr)
+      subroutine sizeB(s, nvar, B, max_correction, correction_norm, max_zone, max_var, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
+         integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          real(dp), intent(out) :: correction_norm ! a measure of the average correction
          real(dp), intent(out) :: max_correction ! magnitude of the max correction
          integer, intent(out) :: max_zone, max_var, ierr
 
-         integer :: k, i, num_terms, j, n, nvar_hydro, &
+         integer :: k, i, nz, num_terms, j, n, nvar_hydro, &
             skip1, skip2, skip3, jmax, num_xa_terms, i_alpha_RTI, i_ln_cvpv0
          real(dp) :: abs_corr, sum_corr, sum_xa_corr, x_limit, &
             max_abs_correction, max_abs_correction_cv, max_abs_corr_for_k, max_abs_xa_corr_for_k
@@ -349,6 +343,7 @@
          if (dbg) write(*, *) 'enter sizeB'
 
          ierr = 0
+         nz = s% nz
          n = nz
          nvar_hydro = min(nvar, s% nvar_hydro)
 
@@ -513,7 +508,7 @@
          correction_norm = sum_corr/num_terms  !sqrt(sum_corr/num_terms)
          if (dbg) then
             write(*,2) 'sizeB: iter, correction_norm, max_correction', &
-               iter, correction_norm, max_correction
+               s% solver_iter, correction_norm, max_correction
             if (max_correction > 1d50 .or. is_bad_num(correction_norm)) then
                call show_stuff
                stop 'sizeB'
@@ -541,7 +536,7 @@
             stop 'sizeB'
          end if
 
-         if (iter < 3) return
+         if (s% solver_iter < 3) return
          ! check for flailing
          if ( &
              abs_corr > s% tol_max_correction .and. &
@@ -562,7 +557,7 @@
             integer :: j, k
             real(dp) :: dx, prev, new
             include 'formats'
-            if (iter == 1) then
+            if (s% solver_iter == 1) then
                write(*,*)
                write(*,'(4a7,12a16,99a13)') &
                   'model', 'iter', 'var', 'zone', &
@@ -580,7 +575,7 @@
             dx = B(j,k)*s% correction_weight(j,k)*s% x_scale(j,k)
             new = prev + dx
             write(*,'(2i7,a7,i7,12e16.8,99f13.8)') &
-               s% model_number, iter, trim(s% nameofvar(max_var)), k, &
+               s% model_number, s% solver_iter, trim(s% nameofvar(max_var)), k, &
                correction_norm, B(j,k)*s% correction_weight(j,k), s% x_scale(j,k), &
                dx, new - prev, new, prev, &
                s% m(k)/Msun, log10(s% dt/secyer), &
@@ -608,18 +603,17 @@
       ! the proposed change to dx is B*xscale*correction_factor
       ! edit correction_factor and/or B as necessary so that the new dx will be valid.
       ! set ierr nonzero if things are beyond repair.
-      subroutine Bdomain(s, &
-            iter, nvar, nz, B, correction_factor, ierr)
+      subroutine Bdomain(s, nvar, B, correction_factor, ierr)
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
          use rsp_def, only: EFL0
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
+         integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
-         integer :: id, i, j, k, species, bad_j, bad_k, &
+         integer :: id, i, j, k, nz, species, bad_j, bad_k, &
             i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_w
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
             old_E, dE, new_E, old_lnd, dlnd, new_lnd, det, old_et, new_et, &
@@ -629,7 +623,7 @@
          include 'formats'
          ierr = 0
          min_alpha = 1d0
-
+         nz = s% nz
          if (s% w_flag) then ! clip change in et to maintain non-negativity.
             i_w = s% i_w
             do k = 1, s% nz
@@ -743,7 +737,7 @@
          if (s% trace_solver_damping .and. min_alpha < 1d0 .and. bad_j > 0) then
             write(*,4) 'solver damping to avoid negative mass fractions: ' // &
                trim(chem_isos% name(s% chem_id(bad_j))), bad_k, &
-               s% model_number, iter, min_alpha
+               s% model_number, s% solver_iter, min_alpha
          end if
          
          contains
@@ -772,9 +766,9 @@
       end subroutine Bdomain
 
 
-      subroutine inspectB(s, iter, nvar, nz, B, ierr)
-         integer, intent(in) :: iter, nvar, nz
+      subroutine inspectB(s, nvar, B, ierr)
          type (star_info), pointer :: s
+         integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          integer, intent(out) :: ierr
 
@@ -782,9 +776,9 @@
          integer, parameter :: inspectB_iter_stop = -1
          include 'formats'
 
-         if (dbg) write(*, *) 'inspectB', iter
+         if (dbg) write(*, *) 'inspectB', s% solver_iter
          ierr = 0
-         if (iter == inspectB_iter_stop) then
+         if (s% solver_iter == inspectB_iter_stop) then
             call dumpB
             stop 'debug: inspectB'
          end if

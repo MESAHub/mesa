@@ -30,7 +30,7 @@
       use const_def, only: dp
       use num_def
       use mtx_def
-      use mtx_lib, only: band_multiply_xa, block_multiply_xa
+      use mtx_lib, only: block_multiply_xa
 
       use hydro_solver_procs
 
@@ -45,7 +45,7 @@
 
 
       subroutine solver( &
-            s, nz, nvar, skip_global_corr_coeff_limit, &
+            s, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             work, lwork, iwork, liwork, &
             convergence_failure, ierr)
@@ -54,7 +54,6 @@
 
          type (star_info), pointer :: s
          ! the primary variables
-         integer, intent(in) :: nz ! number of zones
          integer, intent(in) :: nvar ! number of variables per zone
          logical, intent(in) :: skip_global_corr_coeff_limit
 
@@ -86,15 +85,13 @@
          logical, intent(out) :: convergence_failure
          integer, intent(out) :: ierr ! 0 means okay.
 
-         integer :: ldAF, neqns, mljac, mujac
-
-         integer(8) :: test_time1, clock_rate
+         integer :: ldAF, neqns
 
          include 'formats'
 
          ierr = 0
 
-         neqns = nvar*nz
+         neqns = nvar*s% nz
          ldAF = 3*nvar
 
          call realloc_if_needed_1(s% AF1,ldAF*neqns,(ldAF+2)*200,ierr)
@@ -103,74 +100,23 @@
          if (s% fill_arrays_with_NaNs) call fill_with_NaNs(s% AF1)
 
          call do_solver( &
-            s, nz, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
+            s, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             work, lwork, iwork, liwork, &
             convergence_failure, ierr)
-
-         contains
-
-
-         logical function bad_isize(a,sz,str)
-            integer :: a(:)
-            integer, intent(in) :: sz
-            character (len=*), intent(in) :: str
-            bad_isize = (size(a,dim=1) < sz)
-            if (.not. bad_isize) return
-            ierr = -1
-            write(*,*) 'interpolation: bad sizes for ' // trim(str)
-            return
-         end function bad_isize
-
-
-         logical function bad_size(a,sz,str)
-            real(dp) :: a(:)
-            integer, intent(in) :: sz
-            character (len=*), intent(in) :: str
-            bad_size = (size(a,dim=1) < sz)
-            if (.not. bad_size) return
-            ierr = -1
-            write(*,*) 'interpolation: bad sizes for ' // trim(str)
-            return
-         end function bad_size
-
-
-         logical function bad_size_dble(a,sz,str)
-            real(dp) :: a(:)
-            integer, intent(in) :: sz
-            character (len=*), intent(in) :: str
-            bad_size_dble = (size(a,dim=1) < sz)
-            if (.not. bad_size_dble) return
-            ierr = -1
-            write(*,*) 'interpolation: bad sizes for ' // trim(str)
-            return
-         end function bad_size_dble
-
-
-         logical function bad_sizes(a,sz1,sz2,str)
-            real(dp) :: a(:,:)
-            integer, intent(in) :: sz1,sz2
-            character (len=*), intent(in) :: str
-            bad_sizes = (size(a,dim=1) < sz1 .or. size(a,dim=2) < sz2)
-            if (.not. bad_sizes) return
-            ierr = -1
-            write(*,*) 'interpolation: bad sizes for ' // trim(str)
-            return
-         end function bad_sizes
-
 
       end subroutine solver
 
 
       subroutine do_solver( &
-            s, nz, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
+            s, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
 
-         integer, intent(in) :: nz, nvar, ldAF, neq
+         integer, intent(in) :: nvar, ldAF, neq
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
@@ -199,7 +145,7 @@
             ddx, xgg, ddxd, ddxdd, xder, equsave
 
          integer, dimension(:), pointer :: ipiv_blk1
-         character (len=nz) :: equed1
+         character (len=s%nz) :: equed1
 
          real(dp), dimension(:,:), pointer :: A, Acopy
          real(dp), dimension(:), pointer :: A1, Acopy1
@@ -216,7 +162,7 @@
             tol_residual_norm3, tol_max_residual3, &
             tol_abs_slope_min, tol_corr_resid_product, &
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
-         integer :: iter, max_tries, zone, tiny_corr_cnt, i, j, k, info, &
+         integer :: nz, iter, max_tries, zone, tiny_corr_cnt, i, j, k, info, &
             last_jac_iter, max_iterations_for_jacobian, force_iter_value, &
             reuse_count, iter_for_resid_tol2, iter_for_resid_tol3, &
             max_corr_k, max_corr_j, max_resid_k, max_resid_j
@@ -235,6 +181,8 @@
          real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
 
          include 'formats'
+         
+         nz = s% nz
 
          AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
@@ -321,7 +269,7 @@
          f=0d0
          slope=0d0
 
-         call set_xscale_info(s, nvar, nz, ierr)
+         call set_xscale_info(s, nvar, ierr)
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: set_xscale_info returned ierr', ierr
@@ -329,7 +277,7 @@
             return
          end if
          
-         call eval_equations(s, iter, nvar, nz, equ, ierr)         
+         call eval_equations(s, nvar, ierr)         
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: eval_equations returned ierr', ierr
@@ -337,9 +285,7 @@
             return
          end if
          
-         call sizequ(s, &
-            iter, nvar, nz, equ, &
-            residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
+         call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
          if (ierr /= 0) then
             if (dbg_msg) &
                write(*, *) 'solver failure: sizequ returned ierr', ierr
@@ -415,14 +361,14 @@
                exit iter_loop
             end if
 
-            call inspectB(s, iter, nvar, nz, soln, ierr)
+            call inspectB(s, nvar, soln, ierr)
             if (ierr /= 0) then
                call oops('inspectB returned ierr')
                exit iter_loop
             end if
 
             ! compute size of scaled correction B
-            call sizeB(s, iter, nvar, nz, soln, &
+            call sizeB(s, nvar, soln, &
                   max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             if (ierr /= 0) then
                call oops('correction rejected by sizeB')
@@ -479,8 +425,7 @@
             correction_factor = min(correction_factor, temp_correction_factor)
 
             ! fix B if out of definition domain
-            call Bdomain(s, &
-               iter, nvar, nz, soln, correction_factor, ierr)
+            call Bdomain(s, nvar, soln, correction_factor, ierr)
             if (ierr /= 0) then ! correction cannot be fixed
                call oops('correction rejected by Bdomain')
                exit iter_loop
@@ -525,9 +470,7 @@
 
             ! check the residuals for the equations
 
-            call sizequ(s, &
-               iter, nvar, nz, equ, &
-               residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
+            call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             if (ierr /= 0) then
                call oops('sizequ returned ierr')
                exit iter_loop
@@ -694,7 +637,6 @@
          contains
 
 
-
          subroutine get_message
             include 'formats'
             i = 0
@@ -812,7 +754,7 @@
                s% solver_adjust_iter = iter
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
-               call eval_equations(s, iter, nvar, nz, equ, ierr)
+               call eval_equations(s, nvar, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -1075,8 +1017,8 @@
             integer :: i, j, k
             include 'formats'
             need_solver_to_eval_jacobian = .true.
-            call enter_setmatrix(s, iter, &
-                  nvar, nz, neq, xder, need_solver_to_eval_jacobian, &
+            call enter_setmatrix(s, &
+                  nvar, xder, need_solver_to_eval_jacobian, &
                   size(A,dim=1), A1, ierr)
             do_enter_setmatrix = need_solver_to_eval_jacobian
          end function do_enter_setmatrix
@@ -1114,7 +1056,7 @@
                call eval_partials(s, nvar, ierr)
                if (ierr /= 0) return
             else
-               call eval_equations(s, iter, nvar, nz, equ, ierr)
+               call eval_equations(s, nvar, ierr)
                if (ierr /= 0) then
                   write(*,3) '1st call eval_equations failed'
                   stop 'setmatrix'
@@ -1642,7 +1584,7 @@
                end if
                s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off) - delta_x
             end if
-            call eval_equations(s, iter, nvar, nz, equ, ierr)            
+            call eval_equations(s, nvar, ierr)            
             if (ierr /= 0) then
                !exit
                write(*,3) 'call eval_equations failed in dfridr_func'
@@ -1810,9 +1752,7 @@
             if (.not. dbg_msg) return
             
             if (max_resid_j < 0) then
-               call sizequ(s, &
-                  iter, nvar, nz, equ, &
-                  residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
+               call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             end if
             
             if (max_resid_j > 0) then
@@ -1822,7 +1762,7 @@
             end if
             
             if (max_corr_j < 0) then
-               call sizeB(s, iter, nvar, nz, B, &
+               call sizeB(s, nvar, B, &
                   max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             end if
             
@@ -1875,40 +1815,27 @@
 
             ierr = 0
 
-            i = num_work_params+1
-
+            i = 1
             A1(1:3*nvar*neq) => work(i:i+3*nvar*neq-1); i = i+3*nvar*neq
-
             s% equ1(1:neq) => work(i:i+neq-1); i = i+neq
             s% equ(1:nvar,1:nz) => s% equ1(1:neq)
             equ1 => s% equ1
             equ => s% equ
-
             dxsave1(1:neq) => work(i:i+neq-1); i = i+neq
             dxsave(1:nvar,1:nz) => dxsave1(1:neq)
-
             ddxsave1(1:neq) => work(i:i+neq-1); i = i+neq
             ddxsave(1:nvar,1:nz) => ddxsave1(1:neq)
-
             B1 => work(i:i+neq-1); i = i+neq
             B(1:nvar,1:nz) => B1(1:neq)
-
             soln1 => work(i:i+neq-1); i = i+neq
             soln(1:nvar,1:nz) => soln1(1:neq)
-
             grad_f1(1:neq) => work(i:i+neq-1); i = i+neq
             grad_f(1:nvar,1:nz) => grad_f1(1:neq)
-
             rhs(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
-
             xder(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
-
             ddx(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
-
             row_scale_factors1(1:neq) => work(i:i+neq-1); i = i+neq
-
             col_scale_factors1(1:neq) => work(i:i+neq-1); i = i+neq
-
             save_ublk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
             save_dblk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
             save_lblk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
@@ -1922,7 +1849,7 @@
                return
             end if
 
-            i = num_iwork_params+1
+            i = 1
             ipiv1(1:neq) => iwork(i:i+neq-1); i = i+neq
             if (i-1 > liwork) then
                ierr = -1
@@ -1984,7 +1911,6 @@
             eval_f = eval_f/2
          end function eval_f
 
-
       end subroutine do_solver
 
 
@@ -1992,16 +1918,11 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nvar, nz
          integer, intent(out) :: lwork, liwork, ierr
-
          integer :: neq
-
-         include 'formats'
-
          ierr = 0
          neq = nvar*nz
-         liwork = num_iwork_params + neq
-         lwork = num_work_params + neq*(7*nvar + 10)
-
+         liwork = neq
+         lwork = neq*(7*nvar + 10)
       end subroutine get_solver_work_sizes
 
 

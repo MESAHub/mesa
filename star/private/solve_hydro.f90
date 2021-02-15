@@ -538,7 +538,7 @@
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.        
             call solver( &
-               s, nz, nvar, skip_global_corr_coeff_limit, &
+               s, nvar, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &

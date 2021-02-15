@@ -2212,7 +2212,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% w_flag) then
-               cell1 = dm*s% w(k)
+               cell1 = dm*s% w(k)**2
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if

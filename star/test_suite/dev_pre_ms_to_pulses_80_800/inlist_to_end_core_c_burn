@@ -146,7 +146,7 @@ Text_Summary1_name(2,2) = 'star_age'
 TRho_Profile_xmin = 2.5
 TRho_Profile_xmax = 7.5
 TRho_Profile_ymin = 8.4
-TRho_Profile_ymax = 9.2
+TRho_Profile_ymax = 9.5
 
 !Profile_Panels3_yaxis_name(5) = 'logtau'
 !Profile_Panels3_other_yaxis_name(5) = 'log_opacity'

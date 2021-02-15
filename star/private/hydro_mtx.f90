@@ -52,17 +52,17 @@
       contains
 
 
-      subroutine set_solver_vars(s, iter, nvar, dt, ierr)
+      subroutine set_solver_vars(s, nvar, dt, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar
+         integer, intent(in) :: nvar
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          s% num_solver_setvars = s% num_solver_setvars + 1
-         call set_vars_for_solver(s, nvar, 1, s% nz, iter, dt, ierr)
+         call set_vars_for_solver(s, nvar, 1, s% nz, dt, ierr)
       end subroutine set_solver_vars
 
 
-      subroutine set_vars_for_solver(s, nvar, nzlo, nzhi, iter, dt, ierr)
+      subroutine set_vars_for_solver(s, nvar, nzlo, nzhi, dt, ierr)
          use const_def, only: secyer, Msun, Lsun, Rsun
          use star_utils, only: set_rmid, set_dm_bar, set_m_and_dm, set_rv_info
          use star_utils, only: current_min_xa_hard_limit, current_sum_xa_hard_limit, &
@@ -72,7 +72,7 @@
          use mix_info, only: get_convection_sigmas
          use chem_def
          type (star_info), pointer :: s
-         integer, intent(in) :: nvar, nzlo, nzhi, iter
+         integer, intent(in) :: nvar, nzlo, nzhi
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
@@ -122,7 +122,7 @@
             s% solver_test_partials_dx_0 > 0d0 .and. &
             s% solver_test_partials_k > 0 .and. &
             s% solver_call_number == s% solver_test_partials_call_number .and. &
-            s% solver_test_partials_iter_number == iter .and. &
+            s% solver_test_partials_iter_number == s% solver_iter .and. &
             len_trim(s% solver_test_partials_show_dx_var_name) > 0
             
          if (report_dx) then
@@ -138,7 +138,7 @@
                end if
                write(*,3) 'dx, x for var name ' // &
                   trim(s% solver_test_partials_show_dx_var_name), &
-                  k, iter, dx_for_i_var, x_for_i_var
+                  k, s% solver_iter, dx_for_i_var, x_for_i_var
             end if
          end if
 
@@ -146,7 +146,7 @@
          do_chem = (s% do_burn .or. s% do_mix)
          do_struct = (s% do_struct_hydro .or. s% do_struct_thermo)
 
-         if (dbg .and. .not. skip_mixing_info) write(*,2) 'redo mix info iter', iter
+         if (dbg .and. .not. skip_mixing_info) write(*,2) 'redo mix info iter', s% solver_iter
 
          min_xa_hard_limit = current_min_xa_hard_limit(s)
          sum_xa_hard_limit = current_sum_xa_hard_limit(s)
@@ -435,7 +435,7 @@
                         ln10*min(s% lnT(k),s% lnT_start(k))) then
                      if (report) &
                         write(*,4) 'hydro_mtx: change too large, dlogT, logT, logT_start', &
-                           s% model_number, k, iter, &
+                           s% model_number, k, s% solver_iter, &
                            (s% lnT(k) - s% lnT_start(k))/ln10, &
                            s% lnT(k)/ln10, s% lnT_start(k)/ln10
                      write(s% retry_message, *) 'abs(dlogT) > hydro_mtx_max_allowed_abs_dlogT', k
@@ -447,7 +447,7 @@
                         ln10*min(s% lnT(k),s% lnT_start(k))) then
                      if (report) &
                         write(*,4) 'hydro_mtx: logT too large', &
-                           s% model_number, k, iter, &
+                           s% model_number, k, s% solver_iter, &
                            s% lnT(k)/ln10, s% lnT_start(k)/ln10
                      write(s% retry_message, *) 'logT > hydro_mtx_max_allowed_logT', k
                      ierr = -1
@@ -456,7 +456,7 @@
                   if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT) then
                      if (report) &
                         write(*,4) 'hydro_mtx: logT too small', &
-                           s% model_number, k, iter, &
+                           s% model_number, k, s% solver_iter, &
                            s% lnT(k)/ln10, s% lnT_start(k)/ln10
                      write(s% retry_message, *) 'logT < hydro_mtx_min_allowed_logT', k
                      ierr = -1
@@ -627,7 +627,7 @@
                         write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                         if (report) &
                            write(*,4) 'hydro_mtx: logRho too small', &
-                              s% model_number, k, iter, &
+                              s% model_number, k, s% solver_iter, &
                               s% lnd(k)/ln10, s% lnd_start(k)/ln10
                         ierr = -1
                         return
@@ -638,7 +638,7 @@
                         write(s% retry_message, *) 'logRho > hydro_mtx_max_allowed_logRho', k
                         if (s% report_ierr .or. report) &
                            write(*,4) 'hydro_mtx: logRho too large', &
-                              s% model_number, k, iter, &
+                              s% model_number, k, s% solver_iter, &
                               s% lnd(k)/ln10, s% lnd_start(k)/ln10
                         ierr = -1
                         return
@@ -651,7 +651,7 @@
                         if (s% report_ierr .or. report) &
                            write(*,4) &
                               'hydro_mtx: dlogRho, logRho, logRho_start', &
-                              s% model_number, k, iter, &
+                              s% model_number, k, s% solver_iter, &
                               (s% lnd(k) - s% lnd_start(k))/ln10, &
                               s% lnd(k)/ln10, s% lnd_start(k)/ln10
                         ierr = -1
@@ -1005,13 +1005,12 @@
 
 
       subroutine enter_setmatrix(s, &
-            iter, nvar, nz, neqns, &
-            xder, need_solver_to_eval_jacobian, &
+            nvar, xder, need_solver_to_eval_jacobian, &
             ldA, A1, ierr)
          use mtx_def, only: lapack
          use rsp_def, only: ABB, LD_ABB, NV, MAX_NZN
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz, neqns ! (neqns = nvar*nz)
+         integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
          logical, intent(out) :: need_solver_to_eval_jacobian
          integer, intent(in) :: ldA ! leading dimension of A
@@ -1019,7 +1018,7 @@
          integer, intent(out) :: ierr
 
          real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
-         integer :: i, j, k, cnt, i_lnR, nnz, nzlo, nzhi
+         integer :: i, j, k, cnt, i_lnR, neqns, nz, nzlo, nzhi
          real(dp) :: dt, lnR00, lnRm1, lnRp1, dlnR_prev, ddx, ddx_limit, &
             epsder_struct, epsder_chem
          integer :: id, nvar_hydro
@@ -1031,7 +1030,9 @@
          dbg_enter_setmatrix = dbg
 
          ierr = 0
-
+         nz = s% nz
+         neqns = nvar*nz
+         
          if (dbg_enter_setmatrix) write(*, '(/,/,/,/,/,/,a)') 'enter_setmatrix'
 
          if (s% model_number == 1) then
