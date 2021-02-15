@@ -793,7 +793,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: reset_et_using_L
+         use hydro_tdc, only: reset_w_using_L
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -920,13 +920,13 @@
             
          end if
          
-         if (s% need_to_reset_et) then
+         if (s% need_to_reset_w) then
             if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, 1, s% nz, ierr)
             if (failed('set_mlt_vars')) return
-            call reset_et_using_L(s,ierr)
-            if (failed('reset_et_using_L')) return
-            s% need_to_reset_et = .false.
+            call reset_w_using_L(s,ierr)
+            if (failed('reset_w_using_L')) return
+            s% need_to_reset_w = .false.
          end if
 
          if (.not. skip_brunt) then

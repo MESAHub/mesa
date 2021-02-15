@@ -269,13 +269,13 @@
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_w /= 0) n = n+increment_for_i_w ! read et
+         if (i_w /= 0) n = n+increment_for_i_w ! read w
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
-         if (is_RSP_model) n = n+increment_for_rsp_flag ! read et, erad, Fr
+         if (is_RSP_model) n = n+increment_for_rsp_flag ! read RSP_et, erad, Fr
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
          if (is_RSP_model .and. .not. want_RSP_model) then
             if (.not. s% w_flag) then
@@ -323,14 +323,13 @@
                   j=j+1; xh(i_erad_RSP,i) = vec(j)
                   j=j+1; xh(i_Fr_RSP,i) = vec(j)
                   j=j+1; s% L(i) = vec(j)
-               else ! convert from RSP to et form
-                  j=j+1; xh(i_w,i) = max(min_w,vec(j))
+               else if (i_w /= 0) then ! convert from RSP to w form; vec(j) = RSP_et
+                  j=j+1; xh(i_w,i) = max(min_w,sqrt(max(0d0,vec(j))))
                   j=j+1; !xh(i_erad,i) = vec(j)
                   j=j+1; !xh(i_Fr,i) = vec(j)
                   j=j+1; s% L(i) = vec(j)
                end if
-            end if            
-            if (i_w /= 0) then
+            else if (i_w /= 0) then
                j=j+1; xh(i_w,i) = max(min_w,vec(j))
             end if            
             if (.not. no_L) then
@@ -574,7 +573,7 @@
          
          if (is_RSP_model .and. .not. want_RSP_model) then
             write(*,*)
-            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to TDC form'
+            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to w_flag form'
             write(*,*)
             s% w_flag = .true.
          end if

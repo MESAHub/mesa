@@ -2577,82 +2577,32 @@
 
          ierr = 0
          i = 0
+         i = i+1; s% i_lnd = i
+         i = i+1; s% i_lnT = i
+         i = i+1; s% i_lnR = i
+         
+         if (.not. (s% RSP_flag .or. s% w_flag)) then
+            i = i+1; s% i_lum = i
+         else
+            s% i_lum = 0
+         end if
+         
+         if (s% v_flag) then
+            i = i+1; s% i_v = i
+         else
+            s% i_v = 0
+         end if
 
-         s% i_u = 0
-         s% i_du_dt = 0
-
-         if (((.not. s% w_flag) .and. (s% u_flag .or. s% v_flag)) .or. s% RSP_flag) then
-
-            i = i+1
-            s% i_lnd = i
-            s% i_dlnd_dt = i
-
-            i = i+1
-            s% i_lnT = i
-            s% i_dlnE_dt = i
-
-            if (s% RSP_flag) then
-               s% i_lum = 0
-            else
-               i = i+1
-               s% i_lum = i
-            end if
-            s% i_equL = s% i_lum
-
-            s% i_w = 0
-            s% i_dw_dt = s% i_w
-
-            i = i+1
-            s% i_lnR = i
-            s% i_dlnR_dt = i
-
-            if (s% u_flag) then
-               i = i+1
-               s% i_u = i
-               s% i_du_dt = i
-            end if
-
-            if (s% v_flag) then
-               i = i+1
-               s% i_v = i
-               s% i_dv_dt = i
-            else
-               s% i_v = 0
-               s% i_dv_dt = 0
-            end if
-
-         else ! change equation order in this case for ancient numerical issues with matrix solves
-
-            i = i+1
-            s% i_lnd = i
-            s% i_dv_dt = s% i_lnd
-               
-            i = i+1
-            s% i_lnT = i
-            s% i_equL = s% i_lnT
-
-            i = i+1
-            s% i_lum = i
-            s% i_dlnE_dt = s% i_lum
+         if (s% u_flag) then
+            i = i+1;s% i_u = i
+         else
+            s% i_u = 0
+         end if
             
-            if (s% w_flag) then
-               i = i+1; s% i_w = i
-            else 
-               s% i_w = 0
-            end if
-            s% i_dw_dt = s% i_w
-
-            i = i+1
-            s% i_lnR = i
-            s% i_dlnd_dt = s% i_lnR
-
-            if (s% v_flag) then
-               i = i+1; s% i_v = i
-            else
-               s% i_v = 0
-            end if
-            s% i_dlnR_dt = s% i_v
-
+         if (s% w_flag) then
+            i = i+1; s% i_w = i
+         else 
+            s% i_w = 0
          end if
 
          if (s% RTI_flag) then
@@ -2660,28 +2610,6 @@
          else
             s% i_alpha_RTI = 0
          end if
-         s% i_dalpha_RTI_dt = s% i_alpha_RTI
-
-         if (s% conv_vel_flag) then
-            i = i+1; s% i_ln_cvpv0 = i
-         else
-            s% i_ln_cvpv0 = 0
-         end if
-         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
-
-         if (s% w_div_wc_flag) then
-            i = i+1; s% i_w_div_wc = i
-         else
-            s% i_w_div_wc = 0
-         end if
-         s% i_equ_w_div_wc = s% i_w_div_wc
-
-         if (s% j_rot_flag) then
-            i = i+1; s% i_j_rot = i
-         else
-            s% i_j_rot = 0
-         end if
-         s% i_dj_rot_dt = s% i_j_rot
 
          if (s% RSP_flag) then
             i = i+1; s% i_etrb_RSP = i
@@ -2692,9 +2620,39 @@
             s% i_erad_RSP = 0
             s% i_Fr_RSP = 0
          end if
+
+         if (s% conv_vel_flag) then
+            i = i+1; s% i_ln_cvpv0 = i
+         else
+            s% i_ln_cvpv0 = 0
+         end if
+
+         if (s% w_div_wc_flag) then
+            i = i+1; s% i_w_div_wc = i
+         else
+            s% i_w_div_wc = 0
+         end if
+
+         if (s% j_rot_flag) then
+            i = i+1; s% i_j_rot = i
+         else
+            s% i_j_rot = 0
+         end if
+
+         s% i_dv_dt = s% i_lnd
+         s% i_equL = s% i_lnT
+         s% i_dlnE_dt = s% i_lum
+         s% i_dlnd_dt = s% i_lnR
+         s% i_dlnR_dt = s% i_v
+         s% i_du_dt = s% i_u
+         s% i_dw_dt = s% i_w
+         s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_detrb_RSP_dt = s% i_etrb_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
+         s% i_dln_cvpv0_dt = s% i_ln_cvpv0
+         s% i_equ_w_div_wc = s% i_w_div_wc
+         s% i_dj_rot_dt = s% i_j_rot
 
          s% nvar_hydro = i
 
@@ -3125,7 +3083,7 @@
             do k=1,nz
                s% xh(i_var,k) = 0d0 ! min_w
             end do
-            s% need_to_reset_et = .true.
+            s% need_to_reset_w = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then
                call insert(s% xh_old,i_var)
             end if

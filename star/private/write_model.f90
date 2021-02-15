@@ -98,27 +98,27 @@
          write(iounit, '(i14)', advance='no') file_type
          write(iounit,'(a)',advance='no') ' -- model for mesa/star'
          if (BTEST(file_type, bit_for_velocity)) &
-            write(iounit,'(a)',advance='no') ', with cell boundary velocities (v)'
+            write(iounit,'(a)',advance='no') ', cell boundary velocities (v)'
          if (BTEST(file_type, bit_for_rotation)) &
-            write(iounit,'(a)',advance='no') ', with angular velocities (omega)'
+            write(iounit,'(a)',advance='no') ', angular velocities (omega)'
          if (BTEST(file_type, bit_for_j_rot)) &
-            write(iounit,'(a)',advance='no') ', with specific angular momentum (j_rot)'
+            write(iounit,'(a)',advance='no') ', specific angular momentum (j_rot)'
          if (BTEST(file_type, bit_for_D_omega)) &
-            write(iounit,'(a)',advance='no') ', with omega diffusion coefficients (D_omega)'
+            write(iounit,'(a)',advance='no') ', omega diffusion coefficients (D_omega)'
          if (BTEST(file_type, bit_for_am_nu_rot)) &
-            write(iounit,'(a)',advance='no') ', with am_nu_rot diffusion coefficients'
+            write(iounit,'(a)',advance='no') ', am_nu_rot diffusion coefficients'
          if (BTEST(file_type, bit_for_u)) &
-            write(iounit,'(a)',advance='no') ', with cell center Riemann velocities (u)'
+            write(iounit,'(a)',advance='no') ', cell center Riemann velocities (u)'
          if (BTEST(file_type, bit_for_RTI)) &
-            write(iounit,'(a)',advance='no') ', with Rayleigh-Taylor instabilities (alpha_RTI)'
+            write(iounit,'(a)',advance='no') ', Rayleigh-Taylor instabilities (alpha_RTI)'
          if (BTEST(file_type, bit_for_conv_vel)) &
-            write(iounit,'(a)',advance='no') ', with saved convection velocities (conv_vel)'
+            write(iounit,'(a)',advance='no') ', saved convection velocity - not a solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
-            write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
+            write(iounit,'(a)',advance='no') ', convection velocity as solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
-            write(iounit,'(a)',advance='no') ', with luminosity (L), with turbulent energy (Et) and radiative flux (Fr) for RSP'
+            write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
          if (BTEST(file_type, bit_for_w)) &
-            write(iounit,'(a)',advance='no') ', with w=turbulent velocity for TDC'
+            write(iounit,'(a)',advance='no') ', turbulent velocity (w)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -201,8 +201,7 @@
                call write1(s% erad(k),ierr); if (ierr /= 0) exit
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
-            end if            
-            if (w_flag) then
+            else if (w_flag) then
                call write1(s% w(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
@@ -274,7 +273,7 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (w_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'et'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'w'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
