@@ -602,6 +602,8 @@
          i_u = s% i_u
          i_lnR = s% i_lnR
          i_w_div_wc = s% i_w_div_wc
+         
+         if (i_v == 0 .and. i_u == 0) stop 'must have either v or u for do1_radius_eqn'
 
          r = s% r(k)
          r0 = s% r_start(k)

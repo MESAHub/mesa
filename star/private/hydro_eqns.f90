@@ -65,6 +65,7 @@
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
          use hydro_tdc, only: do1_turbulent_energy_eqn, do1_tdc_L_eqn
+         use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
          use star_utils, only: show_matrix, &
@@ -88,7 +89,7 @@
          logical :: v_flag, u_flag, conv_vel_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
             do_chem, do_mix, do_struct_hydro, do_struct_thermo, &
             do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_det_dt
+            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_dw_dt
 
          include 'formats'
 
@@ -117,7 +118,7 @@
 
          call unpack
          
-         ! set flags indicating the equations currently in use
+         ! set flags indicating the variables currently in use
          do_dlnd_dt = (i_dlnd_dt > 0 .and. i_dlnd_dt <= nvar)
          do_dv_dt = (i_dv_dt > 0 .and. i_dv_dt <= nvar)
          do_du_dt = (i_du_dt > 0 .and. i_du_dt <= nvar)
@@ -128,7 +129,7 @@
          do_j_rot = (i_j_rot > 0 .and. i_j_rot <= nvar)
          do_dlnE_dt = (i_dlnE_dt > 0 .and. i_dlnE_dt <= nvar)
          do_equL = (i_equL > 0 .and. i_equL <= nvar)
-         do_det_dt = (i_dw_dt > 0 .and. i_dw_dt <= nvar)
+         do_dw_dt = (i_dw_dt > 0 .and. i_dw_dt <= nvar)
 
          if (s% fill_arrays_with_NaNs) call set_nan(s% equ1)
 
@@ -271,7 +272,7 @@
                         ierr = op_err
                      end if
                   end if
-                  if (do_det_dt) then
+                  if (do_dw_dt) then
                      call do1_turbulent_energy_eqn(s, k, skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_turbulent_energy_eqn', k
@@ -636,18 +637,6 @@
          end if
 
       end subroutine do1_density_eqn
-
-
-      subroutine do1_dalpha_RTI_dt_eqn(s, k, skip_partials, nvar, ierr)
-         use hydro_alpha_rti_eqns, only: do1_alpha
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
-         integer, intent(out) :: ierr
-         include 'formats'
-         ierr = 0
-         call do1_alpha(s, k, nvar, skip_partials, ierr)
-      end subroutine do1_dalpha_RTI_dt_eqn
 
 
       subroutine do1_dln_cvpv0_dt_eqn(s, k, skip_partials, nvar, ierr)

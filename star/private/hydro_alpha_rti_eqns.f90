@@ -32,13 +32,13 @@
       implicit none
 
       private
-      public :: do1_alpha
+      public :: do1_dalpha_RTI_dt_eqn
 
 
       contains
 
 
-      subroutine do1_alpha(s, k, nvar, skip_partials, ierr)
+      subroutine do1_dalpha_RTI_dt_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: em1, e00, ep1
          use chem_def, only: ih1, ihe4
 
@@ -48,7 +48,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, i, j, kk, i_lnd, i_lnT, i_lnR
+         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk, i_lnd, i_lnT, i_lnR
          real(dp), pointer, dimension(:) :: sig
          logical :: okay
          real(dp) :: &
@@ -72,7 +72,8 @@
          test_partials = .false.
 
          dVARdot_dVAR = s% dVARdot_dVAR
-         i = s% i_alpha_RTI
+         i_alpha_RTI = s% i_alpha_RTI
+         i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
          nz = s% nz
 
          i_lnd = s% i_lnd
@@ -184,11 +185,11 @@
          dadt_actual = s% dalpha_RTI_dt(k)
 
          if (dadt_expected == 0d0) then
-            s% equ(i,k) = dadt_expected
+            s% equ(i_dalpha_RTI_dt,k) = dadt_expected
             eqn_scale = 1d0
          else
-            eqn_scale = s% x_scale(i,k)*dVARdot_dVAR
-            s% equ(i,k) = (dadt_expected - dadt_actual)/eqn_scale
+            eqn_scale = s% x_scale(i_dalpha_RTI_dt,k)*dVARdot_dVAR
+            s% equ(i_dalpha_RTI_dt,k) = (dadt_expected - dadt_actual)/eqn_scale
          end if
 
          if (test_partials) then
@@ -207,8 +208,8 @@
             write(*,2) 'dadt_actual', k, dadt_actual
             write(*,2) 'eqn_scale', k, eqn_scale
             write(*,2) 's% dt', k, s% dt
-            write(*,2) 'equ(i,k)', k, s% equ(i,k)
-            s% solver_test_partials_val = s% equ(i,k)
+            write(*,2) 'equ(i,k)', k, s% equ(i_dalpha_RTI_dt,k)
+            s% solver_test_partials_val = s% equ(i_dalpha_RTI_dt,k)
          end if
 
          if (skip_partials) return
@@ -227,11 +228,11 @@
                d_dalpha_00 = d_dalpha_00 + d_dadt_mix_da00/eqn_scale
                if (k > 1) then
                   d_dalpha_m1 = d_dadt_mix_dam1/eqn_scale
-                  call em1(s, i, i, k, nvar, d_dalpha_m1)
+                  call em1(s, i_dalpha_RTI_dt, i_alpha_RTI, k, nvar, d_dalpha_m1)
                end if
                if (k < nz) then
                   d_dalpha_p1 = d_dadt_mix_dap1/eqn_scale
-                  call ep1(s, i, i, k, nvar, d_dalpha_p1)
+                  call ep1(s, i_dalpha_RTI_dt, i_alpha_RTI, k, nvar, d_dalpha_p1)
                end if
             end if
 
@@ -241,15 +242,15 @@
          end if
 
          
-         call e00(s, i, i, k, nvar, d_dalpha_00)
+         call e00(s, i_dalpha_RTI_dt, i_alpha_RTI, k, nvar, d_dalpha_00)
 
          if (test_partials) then   
-            s% solver_test_partials_var = i
+            s% solver_test_partials_var = i_alpha_RTI
             s% solver_test_partials_dval_dx = d_dalpha_00
-            write(*,*) 'do1_alpha', s% solver_test_partials_var
+            write(*,*) 'do1_dalpha_RTI_dt_eqn', s% solver_test_partials_var
          end if
 
-      end subroutine do1_alpha
+      end subroutine do1_dalpha_RTI_dt_eqn
 
 
       end module hydro_alpha_rti_eqns

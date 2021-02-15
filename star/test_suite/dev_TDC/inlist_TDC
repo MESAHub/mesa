@@ -4,9 +4,16 @@
    show_log_description_at_start = .false.
 
    create_RSP_model = .false.
-
-   load_saved_model_for_RSP = .true.
+   
    saved_model_name = 'rsp.mod'
+! either run with RSP
+   !load_saved_model_for_RSP = .true.
+! or run with w_flag and the w from RSP model
+! if not loading RSP model, then will estimate w from L
+   change_initial_w_flag = .true.
+   new_w_flag = .true.
+   load_saved_model = .true.
+! end
    
    required_termination_code_string(1) = 'max_model_number' ! just for testing
    
@@ -25,22 +32,19 @@
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1d0
 
-   !change_initial_w_flag = .true.
-   !new_w_flag = .true.
-
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-      use_Skye = .true.
+   use_Skye = .true.
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-      kap_file_prefix = 'a09'
-      kap_lowT_prefix = 'lowT_fa05_a09p'
-      kap_CO_prefix = 'a09_co'
+   Zbase = 0.02d0
+   kap_file_prefix = 'a09'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   kap_CO_prefix = 'a09_co'
 / ! end of kap namelist
 
 
@@ -49,11 +53,11 @@
    initial_z = 0.02d0
    initial_mass = 1d0
 
-   max_number_retries = 100
+   max_number_retries = 0 ! 100
    max_model_number = 5000
 
    max_age = 1d6
-   max_timestep = 407.61 ! seconds for rsp.mod
+   max_timestep = 407.61 ! seconds for rsp.mod of Cepheid
       
 ! wind
 
@@ -64,15 +68,14 @@
    Pextra_factor = 2
 
 ! RSP controls
-
    x_integer_ctrl(1) = 10 ! which period to check
    x_ctrl(1) = 4.035357d0 ! expected period (in days) 
    
-   RSP_mass = 4.165d0
-   RSP_Teff = 6050
-   RSP_L = 1438.8d0
-   RSP_X = 0.73d0
-   RSP_Z = 0.007d0
+!   RSP_mass = 4.165d0
+!   RSP_Teff = 6050
+!   RSP_L = 1438.8d0
+!   RSP_X = 0.73d0
+!   RSP_Z = 0.007d0
          
    RSP_initial_dt_factor = 1d0
 
@@ -125,17 +128,17 @@
    !history_interval = 10
    !terminal_interval = 4000
 
-      !photo_interval = 1
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
-      !fill_arrays_with_NaNs = .true.
+      fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
@@ -203,9 +206,9 @@
 
 &pgstar
 
-      !pause = .true.
+      pause = .true.
 
-      pgstar_interval = 6
+      pgstar_interval = 1
          
       Grid2_win_flag = .true.
 

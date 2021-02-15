@@ -283,6 +283,7 @@
                ierr = -1
                return
             end if
+            s% need_to_reset_w = .false. ! get w from file instead
          end if
 
 !$omp critical (read1_model_loop)

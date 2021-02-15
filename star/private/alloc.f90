@@ -2639,12 +2639,24 @@
             s% i_j_rot = 0
          end if
 
-         s% i_dv_dt = s% i_lnd
-         s% i_equL = s% i_lnT
-         s% i_dlnE_dt = s% i_lum
-         s% i_dlnd_dt = s% i_lnR
-         s% i_dlnR_dt = s% i_v
-         s% i_du_dt = s% i_u
+         s% i_equL = s% i_lum
+         s% i_dlnE_dt = s% i_lnT
+         s% i_dlnd_dt = s% i_lnd
+         
+         if (s% i_v /= 0) then
+            s% i_dv_dt = s% i_v
+            s% i_dlnR_dt = s% i_lnR
+            s% i_du_dt = 0
+         else if (s% i_u /= 0) then
+            s% i_du_dt = s% i_u
+            s% i_dlnR_dt = s% i_lnR
+            s% i_dv_dt = 0
+         else ! HSE is included in dv_dt, so drop dlnR_dt
+            s% i_dv_dt = s% i_lnR
+            s% i_dlnR_dt = 0
+            s% i_du_dt = 0
+         end if
+         
          s% i_dw_dt = s% i_w
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_detrb_RSP_dt = s% i_etrb_RSP
