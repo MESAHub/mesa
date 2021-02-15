@@ -286,7 +286,7 @@
 
       subroutine write_plot_data_for_mesh_plan( &
             s, nz_old, nz_new, xh_old, xa_old, &
-            lnd_old, lnT_old, lnPgas_old, lnE_old, wturb_old, &
+            lnd_old, lnT_old, lnPgas_old, lnE_old, w_old, &
             D_mix, mixing_type, &
             dq_old, q_old, xq_old, q_new, &
             species, i_lnR, i_lum, i_v, i_u, comes_from, &
@@ -304,7 +304,7 @@
          real(dp), intent(in) :: xmstar
          real(dp), dimension(:), pointer :: &
             dq_old, q_old, xq_old, q_new, &
-            lnd_old, lnT_old, lnPgas_old, lnE_old, wturb_old, &
+            lnd_old, lnT_old, lnPgas_old, lnE_old, w_old, &
             D_mix
          real(dp), dimension(:, :), pointer :: xh_old, xa_old
 
@@ -315,7 +315,7 @@
 
          integer, intent(out) :: ierr
 
-         real(dp) :: v, u, lum, mstar, wturb
+         real(dp) :: v, u, lum, mstar, w
          integer :: k, iounit, j
          character (len=100) :: filename, name
          
@@ -356,9 +356,9 @@
          write(iounit, fmt='(99(a27, 1x))', advance='no') &
             'log_D', 'mixing_type', 'mass', &
             'xq', 'radius', 'logR', 'logRho', 'logT', 'logP', 'logPgas', &
-            'logE', 'wturb', 'lum', 'v', 'u'
+            'logE', 'lum', 'v', 'u', 'w'
          write(iounit,*)
-         wturb = 0
+         w = 0
          do k=1,nz_old
             if (i_v == 0) then
                v = 0
@@ -375,7 +375,7 @@
             else
                lum = xh_old(i_lum,k)
             end if
-            if (s% w_flag) wturb = wturb_old(k)
+            if (s% w_flag) w = w_old(k)
             write(iounit, fmt='(i27, 1x, 99(1pes27.16e3,1x))', advance='no') &
                k, q_old(k), safe_log10(dq_old(k)), new_in_old(k), &
                safe_log10(delta_gval_max(k))
@@ -394,7 +394,7 @@
                (s% M_center + xmstar*q_old(k))/Msun, xq_old(k), exp(xh_old(i_lnR,k))/Rsun, &
                xh_old(i_lnR,k)/ln10, lnd_old(k)/ln10, lnT_old(k)/ln10, &
                log10(exp(lnPgas_old(k)) + Radiation_Pressure(exp(lnT_old(k)))), &
-               lnPgas_old(k)/ln10, lnE_old(k)/ln10, wturb, lum/Lsun, v, u
+               lnPgas_old(k)/ln10, lnE_old(k)/ln10, lum/Lsun, v, u, w
             write(iounit,*)
          end do
 

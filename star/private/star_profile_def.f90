@@ -641,7 +641,8 @@
       
       integer, parameter :: p_Pturb = p_total_energy + 1
       integer, parameter :: p_log_Pturb = p_Pturb + 1
-      integer, parameter :: p_et = p_log_Pturb + 1
+      integer, parameter :: p_w = p_log_Pturb + 1
+      integer, parameter :: p_et = p_w + 1
       integer, parameter :: p_log_et = p_et + 1
       integer, parameter :: p_avQ = p_log_et + 1
       integer, parameter :: p_Hp_face = p_avQ + 1
@@ -1381,6 +1382,7 @@
 
          profile_column_name(p_Pturb) = 'Pturb'
          profile_column_name(p_log_Pturb) = 'log_Pturb'
+         profile_column_name(p_w) = 'w'
          profile_column_name(p_et) = 'et'
          profile_column_name(p_log_et) = 'log_et'
          profile_column_name(p_avQ) = 'avQ'

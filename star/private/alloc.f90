@@ -2709,7 +2709,7 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'et'
+         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -3075,9 +3075,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, j, nz, iounit
-         real(dp), pointer :: etrb_RSP(:)
          logical, parameter :: dbg = .false.
-         logical :: have_etrb_RSP
 
          include 'formats'
 
@@ -3088,13 +3086,7 @@
 
          nz = s% nz
          
-         have_etrb_RSP = .false.
-         if (w_flag .and. s% RSP_flag) then ! turn RSP off before turn et on
-            have_etrb_RSP = .true.
-            allocate(etrb_RSP(nz))
-            do k=1,nz
-               etrb_RSP(k) = s% xh(s% i_etrb_RSP,k)
-            end do
+         if (w_flag .and. s% RSP_flag) then ! turn RSP off before turn w on
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
@@ -3120,8 +3112,6 @@
          if (ierr /= 0) return
 
          if (w_flag) call insert1(s% i_w)
-         
-         if (have_etrb_RSP) deallocate(etrb_RSP)
 
          call set_chem_names(s)
          
@@ -3133,7 +3123,7 @@
             call insert(s% xh,i_var)
             call insert(s% xh_start,i_var)
             do k=1,nz
-               s% xh(i_var,k) = min_w
+               s% xh(i_var,k) = 0d0 ! min_w
             end do
             s% need_to_reset_et = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then

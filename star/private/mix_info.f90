@@ -60,7 +60,7 @@
             region_bottom_q, region_top_q
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
-         logical :: rsp_or_et, dbg
+         logical :: rsp_or_w, dbg
 
          integer(8) :: time0
          real(dp) :: total
@@ -76,7 +76,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         rsp_or_et = s% RSP_flag .or. s% w_flag
+         rsp_or_w = s% RSP_flag .or. s% w_flag
 
          if (dbg) write(*, *) 'set_mixing_info'
          if (s% doing_timing) call start_time(s, time0, total)
@@ -230,7 +230,7 @@
             s% q, s% cdc, ierr)
          if (failed('locate_convection_boundaries')) return
          
-         if (.not. rsp_or_et) then
+         if (.not. rsp_or_w) then
             if (dbg) write(*,3) 'call add_predictive_mixing', &
                k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
             call add_predictive_mixing(s, ierr)
@@ -254,7 +254,7 @@
          call locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)
          if (failed('locate_mixing_boundaries')) return
 
-         if (.not. rsp_or_et) then
+         if (.not. rsp_or_w) then
             if (dbg) write(*,3) 'call add_overshooting', &
                k_dbg, s% mixing_type(k_dbg), s% D_mix(k_dbg)
             call add_overshooting(s, ierr)

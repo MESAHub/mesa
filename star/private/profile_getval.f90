@@ -1902,15 +1902,19 @@
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
-            case(p_et)
+            case(p_w)
                if (s% w_flag) then
                   val = s% w(k)
+               end if               
+            case(p_et)
+               if (s% w_flag) then
+                  val = s% w(k)**2
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_et)
                if (s% w_flag) then
-                  val = safe_log10(s% w(k))
+                  val = safe_log10(s% w(k)**2)
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if

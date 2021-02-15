@@ -616,7 +616,7 @@
          integer :: id, i, j, k, nz, species, bad_j, bad_k, &
             i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_w
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
-            old_E, dE, new_E, old_lnd, dlnd, new_lnd, det, old_et, new_et, &
+            old_E, dE, new_E, old_lnd, dlnd, new_lnd, dw, old_w, new_w, &
             dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
             dalpha_RTI, new_alpha_RTI, old_alpha_RTI, log_conv_vel_v0, &
             dlum_surf, old_lum_surf, new_lum_surf
@@ -624,31 +624,13 @@
          ierr = 0
          min_alpha = 1d0
          nz = s% nz
-         if (s% w_flag) then ! clip change in et to maintain non-negativity.
-            i_w = s% i_w
-            do k = 1, s% nz
-               det = B(i_w,k)*s% x_scale(i_w,k)*correction_factor
-               old_et = s% xh_start(i_w,k) + s% solver_dx(i_w,k)
-               new_et = old_et + det
-               if (det >= 0) cycle
-               if (new_et >= 0d0) cycle
-               det = min_w*1d-6 - old_et
-               B(i_w,k) = det/(s% x_scale(i_w,k)*correction_factor)
-            end do
-         end if
+         
+         
+         if (s% w_flag) & ! clip change in w to maintain non-negativity.
+            call clip_so_non_negative(s% i_w, min_w*1d-6)
 
-         if (s% RTI_flag) then ! clip change in alpha_RTI to maintain non-negativity.
-            i_alpha_RTI = s% i_alpha_RTI
-            do k = 1, s% nz
-               dalpha_RTI = B(i_alpha_RTI,k)*s% x_scale(i_alpha_RTI,k)*correction_factor
-               if (dalpha_RTI >= 0) cycle
-               old_alpha_RTI = s% xh_start(i_alpha_RTI,k) + s% solver_dx(i_alpha_RTI,k)
-               new_alpha_RTI = old_alpha_RTI + dalpha_RTI
-               if (new_alpha_RTI >= 0d0) cycle
-               dalpha_RTI = -old_alpha_RTI
-               B(i_alpha_RTI,k) = dalpha_RTI/(s% x_scale(i_alpha_RTI,k)*correction_factor)
-            end do
-         end if
+         if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
+            call clip_so_non_negative(s% i_alpha_RTI, 0d0)
 
          if (s% conv_vel_flag) then ! clip change in conv_vel to maintain non-negativity.
             log_conv_vel_v0 = log(s% conv_vel_v0)
@@ -741,6 +723,21 @@
          end if
          
          contains
+         
+         subroutine clip_so_non_negative(i,minval)
+            integer, intent(in) :: i
+            real(dp), intent(in) :: minval
+            real(dp) :: dval, old_val, new_val
+            do k = 1, s% nz
+               dval = B(i,k)*s% x_scale(i,k)*correction_factor
+               old_val = s% xh_start(i,k) + s% solver_dx(i,k)
+               new_val = old_val + dval
+               if (dval >= 0) cycle
+               if (new_val >= 0d0) cycle
+               dval = minval - old_val
+               B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
+            end do
+         end subroutine clip_so_non_negative
             
          subroutine clip1(i, clip)
             integer, intent(in) :: i

@@ -391,6 +391,8 @@
 
             if (i_u == 0) s% u(1:nz) = 0d0
 
+            if (i_w == 0) s% w(1:nz) = 0d0
+
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
                write(*,*) 'update_vars failed in set_qs'

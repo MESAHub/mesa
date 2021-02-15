@@ -64,7 +64,7 @@
          use hydro_momentum, only: do1_momentum_eqn, do1_radius_eqn
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
-         use hydro_tdc, only: do1_turbulent_energy_eqn, do1_et_L_eqn
+         use hydro_tdc, only: do1_turbulent_energy_eqn, do1_tdc_L_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
          use star_utils, only: show_matrix, &
@@ -281,10 +281,10 @@
                   end if
                   if (do_equL) then
                      if (s% w_flag) then
-                        call do1_et_L_eqn(s, k, skip_partials, nvar, op_err)
+                        call do1_tdc_L_eqn(s, k, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
-                           if (s% report_ierr) write(*,2) 'ierr in do1_et_L_eqn', k
-                           if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_et_L_eqn'
+                           if (s% report_ierr) write(*,2) 'ierr in do1_tdc_L_eqn', k
+                           if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_tdc_L_eqn'
                            ierr = op_err
                         end if
                      else if (k > 1) then ! k==1 is done by T_surf BC
@@ -2040,7 +2040,7 @@
             if (test_partials) then
                s% solver_test_partials_var = s% i_lnT
                s% solver_test_partials_dval_dx = dlnP_bc_dlnT ! - s% chiT_for_partials(1)
-               write(*,*) 'set_Psurf_BC', s% solver_test_partials_var, s% w_flag
+               write(*,*) 'set_Psurf_BC', s% solver_test_partials_var
             end if
 
          end subroutine set_Psurf_BC
@@ -2088,7 +2088,7 @@
             if (test_partials) then
                s% solver_test_partials_var = s% i_lum
                s% solver_test_partials_dval_dx = P*dlnPsurf_dL
-               write(*,*) 'set_momentum_BC', s% solver_test_partials_var, s% w_flag
+               write(*,*) 'set_momentum_BC', s% solver_test_partials_var
             end if
 
          end subroutine set_momentum_BC

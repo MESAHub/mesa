@@ -1446,6 +1446,7 @@
          real(dp) :: mesh_adjust_IE_conservation
          real(dp) :: mesh_adjust_PE_conservation
          real(dp) :: mesh_adjust_KE_conservation
+         real(dp) :: mesh_adjust_Eturb_conservation
          
          character (len=strlen) :: most_recent_photo_name
          

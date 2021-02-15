@@ -2128,7 +2128,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% w_flag) cell_total = cell_total + s% w(k)
+         if (s% w_flag) cell_total = cell_total + s% w(k)**2
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2261,7 +2261,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% w_flag) then
-               cell1 = dm*s% w(k)
+               cell1 = dm*s% w(k)**2
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -3025,14 +3025,14 @@
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop 'e00'
+            if (s% stop_for_bad_nums) stop '1 e00'
 !$omp end critical (star_utils_e00_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop 'e00'
+            stop '2 e00'
          end if
          
          if (j > nvar) return ! hybrid
@@ -3042,7 +3042,7 @@
             write(*,5) 'bad i e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop 'e00'
+            stop '3 e00'
 !$omp end critical (star_utils_e00_crit2)
          end if
 

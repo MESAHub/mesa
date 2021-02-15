@@ -35,14 +35,14 @@
       implicit none
 
       private
-      public :: do1_turbulent_energy_eqn, do1_et_L_eqn, &
-         set_et_start_vars, reset_et_using_L, calc_Eq_18, calc_Uq_18 
+      public :: do1_turbulent_energy_eqn, do1_tdc_L_eqn, &
+         set_w_start_vars, reset_et_using_L, calc_Eq_18, calc_Uq_18 
       
 
       contains
       
 
-      subroutine do1_et_L_eqn(s, k, skip_partials, nvar, ierr)
+      subroutine do1_tdc_L_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -57,7 +57,7 @@
          end if         
          if (skip_partials) return         
          call store_partials(s, k, s% i_equL, nvar, d_dm1, d_d00, d_dp1)
-      end subroutine do1_et_L_eqn
+      end subroutine do1_tdc_L_eqn
 
       
       subroutine get1_et_L_eqn( &  
@@ -1411,7 +1411,7 @@
       end function compute_h_00
 
 
-      subroutine set_et_start_vars(s, ierr)
+      subroutine set_w_start_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
@@ -1440,7 +1440,7 @@
             s% w_start(k) = s% w(k)
          end subroutine set1_et_start_vars
          
-      end subroutine set_et_start_vars
+      end subroutine set_w_start_vars
       
       
       subroutine reset_et_using_L(s, ierr)

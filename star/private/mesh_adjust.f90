@@ -191,15 +191,6 @@
             if (failed('dPdr_dRhodr_info')) return
          end if
 
-         if (s% w_flag) then
-            if (dbg) write(*,*) 'call do_et'
-            call do_et( &
-               s, nz, nz_old, nzlo, nzhi, comes_from, &
-               xh, xh_old, xq, xq_old_plus1, xq_new, &
-               work, tmp1, tmp2, ierr)
-            if (failed('do_et')) return
-         end if
-
          if (dbg) write(*,*) 'call do_lnR_and_lnd'
          call do_lnR_and_lnd( &
             s, nz, nz_old, nzlo, nzhi, cell_type, comes_from, &
@@ -225,6 +216,15 @@
                xq_old, xq, dq_old, dq, xh, xh_old, &
                xout_old, xout_new, tmp1, ierr)
             if (failed('do_u')) return
+         end if
+
+         if (s% w_flag) then ! calculate new w to conserve kinetic energy
+            if (dbg) write(*,*) 'call do_w'
+            call do_w( &
+               s, nz, nz_old, cell_type, comes_from, &
+               xq_old, xq, dq_old, dq, xh, xh_old, &
+               xout_old, xout_new, tmp1, ierr)
+            if (failed('do_w')) return
          end if
 
          if (s% conv_vel_flag) then
@@ -831,63 +831,6 @@
          end if
 
       end subroutine do_alpha_RTI
-
-
-      subroutine do_et( &  
-            ! this is not being careful to conserve et.  may need to improve.
-            ! similarly not taking et into account in adjusting lnT to conserve energy.
-            s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, et_old_plus1, et_new, ierr)
-         use interp_1d_def
-         use interp_1d_lib
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
-         real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: work
-         real(dp), dimension(:) :: &
-            xq, xq_old_plus1, et_old_plus1, et_new, xq_new
-         integer, intent(out) :: ierr
-
-         integer :: n, i_w, k
-
-         include 'formats'
-
-         ierr = 0
-         i_w = s% i_w
-         n = nzhi - nzlo + 1
-
-         do k=1,nz_old
-            et_old_plus1(k) = xh_old(i_w,k)
-         end do
-         et_old_plus1(nz_old+1) = 0
-
-         call interpolate_vector( &
-               nz_old+1, xq_old_plus1, n, xq_new, &
-               et_old_plus1, et_new, interp_pm, nwork, work, &
-               'mesh_adjust do_et', ierr)
-         if (ierr /= 0) then
-            return
-         end if
-
-         do k=nzlo,nzhi
-            xh(i_w,k) = max(0d0,et_new(k+1-nzlo))
-         end do
-
-         n = nzlo - 1
-         if (n > 0) then
-            do k=1,n
-               xh(i_w,k) = xh_old(i_w,k)
-            end do
-         end if
-
-         if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
-            do k=0,n
-               xh(i_w,nz-k) = xh_old(i_w,nz_old-k)
-            end do
-         end if
-
-      end subroutine do_et
 
 
       subroutine do_interp_pt_val( &
@@ -2706,6 +2649,242 @@
          end if
 
       end subroutine adjust1_u
+
+      
+      ! the logic for w is identical to that for u
+      ! could merge the code, but the extra complexity is not worth it
+      subroutine do_w( &
+            s, nz, nz_old, cell_type, comes_from, &
+            old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
+            xout_old, xout_new, old_eturb, ierr)
+         use alloc
+         type (star_info), pointer :: s
+         integer, intent(in) :: nz, nz_old
+         integer, dimension(:) :: cell_type, comes_from
+         real(dp), dimension(:) :: &
+            xout_old, xout_new, old_xq, new_xq, old_dq, new_dq, old_eturb
+         real(dp), dimension(:,:) :: xh, xh_old
+         integer, intent(out) :: ierr
+
+         integer :: k, j, op_err, old_k, new_k, i_w
+         real(dp) :: old_eturb_tot, new_eturb_tot, xmstar, err
+
+         include 'formats'
+         ierr = 0
+         i_w = s% i_w
+         xmstar = s% xmstar
+
+         old_eturb_tot = 0d0
+         do k=1,nz_old ! skip common factor 1/2 xmstar in ke
+            old_eturb(k) = old_dq(k)*xh_old(i_w,k)*xh_old(i_w,k)
+            old_eturb_tot = old_eturb_tot + old_eturb(k)
+         end do
+
+!$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+         do k = 1, nz
+            op_err = 0
+            call adjust1_w( &
+               s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
+               old_dq, new_dq, old_eturb, i_w, xh, xh_old, op_err)
+            if (op_err /= 0) ierr = op_err
+         end do
+!$OMP END PARALLEL DO
+         if (ierr /= 0) then
+            return
+         end if
+
+         new_eturb_tot = 0
+         do k=1,nz
+            new_eturb_tot = new_eturb_tot + new_dq(k)*xh(i_w,k)*xh(i_w,k)
+         end do
+
+         err = abs(old_eturb_tot - new_eturb_tot)/max(new_eturb_tot,old_eturb_tot,1d0)
+         s% mesh_adjust_Eturb_conservation = err
+
+         if (s% trace_mesh_adjust_error_in_conservation) then
+            write(*,2) 'mesh adjust error in conservation of turbulent energy', s% model_number, &
+               err, new_eturb_tot, old_eturb_tot
+            if (err > 1d-10) then
+               write(*,*) 'err too large'
+               stop 'do_w'
+            end if
+         end if
+
+      end subroutine do_w
+
+
+      subroutine adjust1_w( &
+            s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
+            old_dq, new_dq, old_eturb, i_w, xh, xh_old, ierr)
+         ! set new value for s% w(k) to conserve turbulent energy
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nz, nz_old, i_w
+         integer, dimension(:) :: cell_type, comes_from
+         real(dp), dimension(:), intent(in) :: &
+            xout_old, xout_new, old_dq, new_dq, old_eturb
+         real(dp), dimension(:,:) :: xh, xh_old
+         integer, intent(out) :: ierr
+
+         real(dp) :: xq_outer, xq_inner, eturb_sum, &
+            xq0, xq1, new_cell_dq, dq_sum, dq
+         integer :: kk, k_outer, j
+
+         integer, parameter :: k_dbg = -1
+
+         include 'formats'
+
+         ierr = 0
+
+         if (cell_type(k) == unchanged_type .or. &
+               cell_type(k) == revised_type) then
+            if (k == 1) then
+               xh(i_w,k) = xh_old(i_w,comes_from(k))
+               return
+            end if
+            if (cell_type(k-1) == unchanged_type) then
+               xh(i_w,k) = xh_old(i_w,comes_from(k))
+               return
+            end if
+         end if
+
+         xq_outer = xout_new(k)
+         new_cell_dq = new_dq(k)
+         if (k < nz) then
+            xq_inner = xq_outer + new_cell_dq
+         else
+            xq_inner = 1d0
+         end if
+
+         if (k == k_dbg) then
+            write(*,2) 'xq_outer', k, xq_outer
+            write(*,2) 'xq_inner', k, xq_inner
+            write(*,2) 'new_cell_dq', k, new_cell_dq
+         end if
+
+         dq_sum = 0d0
+         eturb_sum = 0
+         if (xq_outer >= xout_old(nz_old)) then
+            ! new contained entirely in old center zone
+            k_outer = nz_old
+            if (k == k_dbg) &
+               write(*,2) 'new contained in old center', &
+                  k_outer, xout_old(k_outer)
+         else if (k == 1) then
+            k_outer = 1
+         else
+            k_outer = comes_from(k-1)
+         end if
+
+         do kk = k_outer, nz_old ! loop until reach xq_inner
+
+            if (kk == nz_old) then
+               xq1 = 1d0
+            else
+               xq1 = xout_old(kk+1)
+            end if
+            if (xq1 <= xq_outer) cycle
+
+            if (xq1 < xq_outer) then
+               ierr = -1
+               return
+            end if
+
+            xq0 = xout_old(kk)
+            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then ! entire old kk is in new k
+
+               dq = old_dq(kk)
+               dq_sum = dq_sum + dq
+
+               if (dq_sum > new_cell_dq) then
+                  ! dq too large -- numerical roundoff problems
+                  dq = dq - (new_cell_dq - dq_sum)
+                  dq_sum = new_cell_dq
+               end if
+
+               eturb_sum = eturb_sum + old_eturb(kk)*dq/old_dq(kk)
+
+               if (k == k_dbg) &
+                  write(*,3) 'new k contains all of old kk', &
+                     k, kk, old_eturb(kk)*dq, eturb_sum
+
+            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then ! entire new k is in old kk
+
+               dq = new_dq(k)
+               dq_sum = dq_sum + dq
+               eturb_sum = eturb_sum + old_eturb(kk)*dq/old_dq(kk)
+
+               if (k == k_dbg) &
+                  write(*,3) 'all new k is in old kk', &
+                     k, kk, old_eturb(kk)*dq, eturb_sum
+
+            else ! only use the part of old kk that is in new k
+
+               if (k == k_dbg) then
+                  write(*,*) 'only use the part of old kk that is in new k', xq_inner <= xq1
+                  write(*,1) 'xq_outer', xq_outer
+                  write(*,1) 'xq_inner', xq_inner
+                  write(*,1) 'xq0', xq0
+                  write(*,1) 'xq1', xq1
+                  write(*,1) 'dq_sum', dq_sum
+                  write(*,1) 'new_cell_dq', new_cell_dq
+                  write(*,1) 'new_cell_dq - dq_sum', new_cell_dq - dq_sum
+               end if
+
+               if (xq_inner <= xq1) then ! this is the last part of new k
+
+                  dq = new_cell_dq - dq_sum
+                  dq_sum = new_cell_dq
+
+               else ! we avoid this case if possible because of numerical roundoff
+
+                  if (k == k_dbg) write(*,3) 'we avoid this case if possible', k, kk
+
+                  dq = max(0d0, xq1 - xq_outer)
+                  if (dq_sum + dq > new_cell_dq) dq = new_cell_dq - dq_sum
+                  dq_sum = dq_sum + dq
+
+               end if
+
+               if (k == k_dbg) then
+                  write(*,3) 'new k use only part of old kk', k, kk
+                  write(*,2) 'dq_sum', k, dq_sum
+                  write(*,2) 'dq', k, dq
+                  write(*,2) 'old_eturb(kk)', kk, old_eturb(kk)
+                  write(*,2) 'old eturb_sum', k, eturb_sum
+                  write(*,2) 'new eturb_sum', k, eturb_sum + old_eturb(kk)*dq
+               end if
+
+               eturb_sum = eturb_sum + old_eturb(kk)*dq/old_dq(kk)
+
+               if (dq <= 0) then
+                  ierr = -1
+                  !return
+                  write(*,*) 'dq <= 0', dq
+                  stop 'debugging: adjust1_w'
+               end if
+
+            end if
+
+            if (dq_sum >= new_cell_dq) then
+               exit
+            end if
+
+         end do
+
+         xh(i_w,k) = sqrt(eturb_sum/new_cell_dq) ! we have skipped the 1/2 xmstar factor
+         if (xh_old(i_w,comes_from(k)) < 0d0) xh(i_w,k) = -xh(i_w,k)
+
+         if (k == k_dbg) then
+!$OMP critical (adjust1_w_dbg)
+            write(*,2) 'xh(i_w,k) new_dq', k, xh(i_w,k), new_dq(k)
+            write(*,2) 'xh_old(i_w,comes_from(k)) old_dq', &
+               comes_from(k), xh_old(i_w,comes_from(k)), old_dq(comes_from(k))
+            if (k == k_dbg) stop 'adjust1_w'
+!$OMP end critical (adjust1_w_dbg)
+            !stop
+         end if
+
+      end subroutine adjust1_w
 
 
 
