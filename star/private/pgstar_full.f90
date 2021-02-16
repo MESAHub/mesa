@@ -1307,9 +1307,13 @@
          
          call update_pgstar_history_file(s,ierr)
          if (failed('save_text_data')) return
-         pause = s% pause
-         if ((.not. pause) .and. s% pause_interval > 0) &
+         
+         if (s% pause_interval > 0) then
             pause = (mod(s% model_number, s% pause_interval) == 0)
+         else
+            pause = s% pause
+         end if
+            
          if (pause) then
             write(*,*)
             write(*,*) 'model_number', s% model_number

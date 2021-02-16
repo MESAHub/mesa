@@ -79,6 +79,7 @@ do_one semiconvection "all values are within tolerances" "final.mod" auto
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
+do_one twin_studies "stars have reached stopping age" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto
 do_one wd_aic "PASS: A=20 electron captures have started a thermal runaway in the core" "final.mod" auto
 do_one wd_c_core_ignition "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto

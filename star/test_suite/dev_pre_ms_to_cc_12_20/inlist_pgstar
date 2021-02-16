@@ -641,10 +641,12 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
 ! some global grid plot settings
 
-pgstar_title_scale = 1.3
-pgstar_title_disp = 1.1
-pgstar_title_coord = 0.5
-pgstar_title_fjust = 0.5
+pgstar_grid_show_title = .true.
+pgstar_grid_title_scale = 1.0
+pgstar_grid_title_lw = 3
+pgstar_grid_title_disp = 2.5 ! 1.8
+pgstar_grid_title_coord = 0.5
+pgstar_grid_title_fjust = 0.5
 
 pgstar_age_scale = 0.8
 pgstar_age_disp = 3.0

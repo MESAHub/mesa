@@ -3,7 +3,7 @@
 
 !pause = .true.
 
-pgstar_interval = 2
+pgstar_interval = 1
 pgstar_show_age_in_years = .true.
 pgstar_show_age_in_seconds = .false.
 pgstar_sleep = 0.0
@@ -16,8 +16,8 @@ pgstar_show_age = .false.
 !------------------------------------------------------------------------------------
 
 Grid1_win_flag = .true.
-Grid1_win_width = 12
-Grid1_win_aspect_ratio = 0.666
+Grid1_win_width = 9
+Grid1_win_aspect_ratio = 0.8 ! 0.666
 
 ! file output
 !Grid1_file_flag = .true.
@@ -36,7 +36,7 @@ Grid1_plot_col(:) =  1          ! number from 1 at left
 Grid1_plot_colspan(:) = 1       ! plot spans this number of columns
 Grid1_plot_pad_left(:) = 0.0    ! fraction of full window width for padding on left
 Grid1_plot_pad_right(:) = 0.0   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for padding at top
+Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for paddin g at top
 Grid1_plot_pad_bot(:) = 0.0     ! fraction of full window height for padding at bottom
 Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
 
@@ -56,7 +56,7 @@ Grid1_plot_colspan(1) = 3       ! plot spans this number of columns
 
 Grid1_plot_pad_left(1) = -0.03   ! fraction of full window width for padding on left
 Grid1_plot_pad_right(1) = 0.0   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(1) = -0.06     ! fraction of full window height for padding at top
+Grid1_plot_pad_top(1) = -0.03     ! fraction of full window height for padding at top
 Grid1_plot_pad_bot(1) = 0.07     ! fraction of full window height for padding at bottom
 Grid1_txt_scale_factor(1) = 1 ! 0.8 ! multiply txt_scale for subplot by this
 
@@ -142,7 +142,7 @@ Profile_Panels3_yaxis_name(3) = 'Mixing'
 Mixing_legend_txt_scale_factor = 0.9
 
 Profile_Panels3_yaxis_name(4) = 'logRho'
-Profile_Panels3_other_yaxis_name(4) = 'v_div_cs' ! 'vel_km_per_s' ! 'entropy'
+Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s' ! 'entropy'
 Profile_Panels3_other_dymin(4) = 0.14
 
 Profile_Panels3_yaxis_name(5) = 'logT'
@@ -178,10 +178,11 @@ Profile_Panels3_show_mix_regions_on_xaxis = .true.
 Profile_Panels1_title = ''
 
 Profile_Panels1_txt_scale = 0.7
+
 Profile_Panels1_num_panels = 4
 
 Profile_Panels1_yaxis_name(1) = 'logRho'
-Profile_Panels1_dymin(1) = 0.14
+Profile_Panels1_dymin(1) = 0.1
 Profile_Panels1_other_yaxis_name(1) = 'logT'
 Profile_Panels1_other_dymin(1) = 0.14
 
@@ -195,14 +196,14 @@ Profile_Panels1_other_dymin(3) = 0.08
 
 
 Profile_Panels1_yaxis_name(4) = 'log_opacity'
-Profile_Panels1_dymin(1) = 0.14
+Profile_Panels1_dymin(1) = 0.1
 Profile_Panels1_other_yaxis_name(4) = 'gradr'
 Profile_Panels1_other_dymin(1) = 0.14
 
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'logtau'
 Profile_Panels1_xmin = -101d0
-Profile_Panels1_xmax = 8.1
+Profile_Panels1_xmax = 6.1
 Profile_Panels1_xaxis_reversed = .true.
 
 !Profile_Panels1_xaxis_name = 'zone'
@@ -312,28 +313,27 @@ Text_Summary1_xleft = 0.01
 Text_Summary1_xright = 0.99
 Text_Summary1_ybot = 0.0
 Text_Summary1_ytop = 1.0
-Text_Summary1_txt_scale = 0.95
+Text_Summary1_txt_scale = 0.72
 Text_Summary1_title = ''
 
 Text_Summary1_num_rows = 6 ! <= 20
 Text_Summary1_num_cols = 5 ! <= 20
 Text_Summary1_name(:,:) = ''
 
-
 Text_Summary1_name(1,1) = 'model_number'
-Text_Summary1_name(1,2) = 'log_dt'
+Text_Summary1_name(1,2) = 'Teff'
 Text_Summary1_name(1,3) = 'Mass'
 Text_Summary1_name(1,4) = 'H_cntr'
 Text_Summary1_name(1,5) = 'H_rich'
 
-Text_Summary1_name(2,1) = 'non_fe_core_infall'  
-Text_Summary1_name(2,2) = 'star_age'
+Text_Summary1_name(2,1) = 'log_dt'  
+Text_Summary1_name(2,2) = 'log_R'
 Text_Summary1_name(2,3) = 'lg_Mdot'
 Text_Summary1_name(2,4) = 'He_cntr'
 Text_Summary1_name(2,5) = 'He_core'
 
-Text_Summary1_name(3,1) = 'fe_core_infall'
-Text_Summary1_name(3,2) = 'gamma1_min'
+Text_Summary1_name(3,1) = 'star_age'
+Text_Summary1_name(3,2) = 'log_L'
 Text_Summary1_name(3,3) = 'eta_cntr'
 Text_Summary1_name(3,4) = 'C_cntr'
 Text_Summary1_name(3,5) = 'CO_core'
@@ -591,7 +591,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = 'v_div_cs'
+    History_Panels1_yaxis_name(2) = 'log_R'
     History_Panels1_yaxis_reversed(2) = .false.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
@@ -599,7 +599,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_other_yaxis_name(2) = 'log_max_T' ! 'v_surf_km_s'
+    History_Panels1_other_yaxis_name(2) = 'v_div_cs' ! 'v_surf_km_s'
     History_Panels1_other_yaxis_reversed(2) = .false.
     History_Panels1_other_ymin(2) = -101d0
     History_Panels1_other_ymax(2) = -101d0
@@ -607,7 +607,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(3) = 'log_R'
+    History_Panels1_yaxis_name(3) = 'log_cntr_Rho'
     History_Panels1_yaxis_reversed(3) = .false.
     History_Panels1_ymin(3) = -101d0
     History_Panels1_ymax(3) = -101d0
@@ -615,7 +615,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_other_yaxis_name(3) = 'log_cntr_Rho'
+    History_Panels1_other_yaxis_name(3) = 'log_max_T'
     History_Panels1_other_yaxis_reversed(3) = .false.
     History_Panels1_other_ymin(3) = -101d0
     History_Panels1_other_ymax(3) = -101d0
@@ -642,9 +642,9 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 ! some global grid plot settings
 
 pgstar_grid_show_title = .true.
-pgstar_grid_title_scale = 1.0
+pgstar_grid_title_scale = 0.9
 pgstar_grid_title_lw = 3
-pgstar_grid_title_disp = 2.5 ! 1.8
+pgstar_grid_title_disp = 2.7 ! 1.8
 pgstar_grid_title_coord = 0.5
 pgstar_grid_title_fjust = 0.5
 

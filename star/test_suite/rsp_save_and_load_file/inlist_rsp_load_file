@@ -10,7 +10,7 @@
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -62,7 +62,7 @@
       !photo_interval = 100
       !profile_interval = 100
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
@@ -133,9 +133,9 @@
 
 &pgstar
 
-      !pause = .true.
-
-      pgstar_interval = 6
+      pause = .true.
+      pause_interval = 10
+      pgstar_interval = 10
          
       Grid2_win_flag = .true.
 

@@ -1103,7 +1103,7 @@
       !     if you want to show luminosities, include some or all of
       !            log_L, log_Lneu, log_LH, log_LHe
       !     if you want to show mass boundaries, then include some or all of
-      !            he_core_mass, c_core_mass, o_core_mass, si_core_mass, fe_core_mass
+      !            he_core_mass, co_core_mass, fe_core_mass
 
       ! ::
 
@@ -1208,7 +1208,7 @@
     Kipp_show_mass_boundaries = .true.
 
       ! to use this option, include the following in your ``history_columns.list``
-      ! ``he_core_mass``, ``c_core_mass``, ``o_core_mass``, ``si_core_mass``, ``fe_core_mass``
+      ! ``he_core_mass``, ``co_core_mass``, ``fe_core_mass``
 
       ! ::
 
@@ -6285,7 +6285,7 @@
     Text_Summary1_name(1,2) = 'star_mass'
     Text_Summary1_name(2,2) = 'log_abs_mdot'
     Text_Summary1_name(3,2) = 'he_core_mass'
-    Text_Summary1_name(4,2) = 'c_core_mass'
+    Text_Summary1_name(4,2) = 'co_core_mass'
     Text_Summary1_name(5,2) = 'cz_bot_mass'
     Text_Summary1_name(6,2) = 'cz_top_mass'
     Text_Summary1_name(7,2) = 'cz_bot_radius'
