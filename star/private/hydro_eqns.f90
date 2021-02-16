@@ -281,7 +281,7 @@
                      end if
                   end if
                   if (do_equL) then
-                     if (s% w_flag) then
+                     if (s% TDC_flag) then
                         call do1_tdc_L_eqn(s, k, skip_partials, nvar, op_err)
                         if (op_err /= 0) then
                            if (s% report_ierr) write(*,2) 'ierr in do1_tdc_L_eqn', k
@@ -1729,7 +1729,7 @@
          end if
          if (ierr /= 0) return
          
-         if (s% w_flag .or. .not. do_equL) return ! no Tsurf BC
+         if (s% TDC_flag .or. .not. do_equL) return ! no Tsurf BC
          
          if (s% use_zero_dLdm_outer_BC) then
             call set_zero_dL_dm_BC(ierr)
@@ -1931,7 +1931,7 @@
 
             ierr = 0
             
-            if (s% w_flag) return
+            if (s% TDC_flag) return
             i_T_BC = i_equL            
             if (i_T_BC == 0) then
                write(*,2) 'i_T_BC', s% model_number, i_T_BC

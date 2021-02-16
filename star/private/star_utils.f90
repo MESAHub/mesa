@@ -2128,7 +2128,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% w_flag) cell_total = cell_total + s% w(k)**2
+         if (s% TDC_flag) cell_total = cell_total + s% w(k)**2
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2211,7 +2211,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% w_flag) then
+            if (s% TDC_flag) then
                cell1 = dm*s% w(k)**2
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
@@ -2260,7 +2260,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% w_flag) then
+            if (s% TDC_flag) then
                cell1 = dm*s% w(k)**2
                cell_total = cell_total + cell1
             end if
@@ -3078,8 +3078,8 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
          
-         if (s% w_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,2) 'cannot have w_flag and partials wrt L(k-1)', k
+         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
+            write(*,2) 'cannot have TDC_flag and partials wrt L(k-1)', k
             stop 'em1'
          end if
          
@@ -3411,7 +3411,7 @@
          end if
          
          Pt_18 = 0d0
-         if (s% w_flag) then
+         if (s% TDC_flag) then
             call calc_Pt_18_tw(s, k, Pt_18, ierr) 
             if (ierr /= 0) return
             ! note that Pt_18 is already time weighted

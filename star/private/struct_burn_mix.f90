@@ -367,7 +367,7 @@
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
-         if (s% w_flag) call set_w_start_vars(s,ierr)
+         if (s% TDC_flag) call set_w_start_vars(s,ierr)
 
          do k=1,s% nz
             do j=1,s% nvar_hydro

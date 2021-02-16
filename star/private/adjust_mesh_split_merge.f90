@@ -47,7 +47,7 @@
 
          include 'formats'
          
-         if (s% w_flag) stop 'remesh_split_merge does not yet support w_flag'
+         if (s% TDC_flag) stop 'remesh_split_merge does not yet support TDC_flag'
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 

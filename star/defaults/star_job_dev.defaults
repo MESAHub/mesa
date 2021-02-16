@@ -5,13 +5,13 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
-      ! change_w_flag
+      ! change_TDC_flag
       ! ~~~~~~~~~~~~~~~~~
-      ! change_initial_w_flag
+      ! change_initial_TDC_flag
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! change_w_flag_at_model_number
+      ! change_TDC_flag_at_model_number
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_w_flag
+      ! new_TDC_flag
       ! ~~~~~~~~~~~~~~
 
       ! WARNING: These controls are not ready for use.
@@ -19,10 +19,10 @@
 
       ! ::
 
-    change_w_flag = .false.
-    change_initial_w_flag = .false.
-    change_w_flag_at_model_number = -111
-    new_w_flag = .false.
+    change_TDC_flag = .false.
+    change_initial_TDC_flag = .false.
+    change_TDC_flag_at_model_number = -111
+    new_TDC_flag = .false.
     
     
       ! remove_surface_by_relax_to_star_cut

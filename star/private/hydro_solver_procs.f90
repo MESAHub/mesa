@@ -626,7 +626,7 @@
          nz = s% nz
          
          
-         if (s% w_flag) & ! clip change in w to maintain non-negativity.
+         if (s% TDC_flag) & ! clip change in w to maintain non-negativity.
             call clip_so_non_negative(s% i_w, min_w*1d-6)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.

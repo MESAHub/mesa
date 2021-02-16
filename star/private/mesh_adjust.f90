@@ -218,7 +218,7 @@
             if (failed('do_u')) return
          end if
 
-         if (s% w_flag) then ! calculate new w to conserve kinetic energy
+         if (s% TDC_flag) then ! calculate new w to conserve kinetic energy
             if (dbg) write(*,*) 'call do_w'
             call do_w( &
                s, nz, nz_old, cell_type, comes_from, &

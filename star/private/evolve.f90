@@ -1811,7 +1811,7 @@
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
          
-         if (.not. (s% RSP_flag .or. s% w_flag)) then
+         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if

@@ -268,7 +268,7 @@
          ionization_k = 0
 
          int_flag = .false.
-         rsp_or_w = s% RSP_flag .or. s% w_flag
+         rsp_or_w = s% RSP_flag .or. s% TDC_flag
 
          if (c > extra_offset) then
             i = c - extra_offset
@@ -1891,29 +1891,29 @@
                   val = s% u(k-1)/s% rmid_start(k-1) - s% u(k)/s% rmid_start(k)
 
             case(p_Pturb)
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   val = s% w(k)**2*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Pturb)
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   val = safe_log10(s% w(k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_w)
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   val = s% w(k)
                end if               
             case(p_et)
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   val = s% w(k)**2
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_et)
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   val = safe_log10(s% w(k)**2)
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))

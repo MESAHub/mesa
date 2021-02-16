@@ -278,8 +278,8 @@
          if (is_RSP_model) n = n+increment_for_rsp_flag ! read RSP_et, erad, Fr
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
          if (is_RSP_model .and. .not. want_RSP_model) then
-            if (.not. s% w_flag) then
-               write(*,*) '(is_RSP_model .and. .not. want_RSP_model) requires w_flag true'
+            if (.not. s% TDC_flag) then
+               write(*,*) '(is_RSP_model .and. .not. want_RSP_model) requires TDC_flag true'
                ierr = -1
                return
             end if
@@ -551,7 +551,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% w_flag = BTEST(file_type, bit_for_w)
+         s% TDC_flag = BTEST(file_type, bit_for_w)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -574,9 +574,9 @@
          
          if (is_RSP_model .and. .not. want_RSP_model) then
             write(*,*)
-            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to w_flag form'
+            write(*,*) 'automatically converting ' // trim(filename) // ' from RSP to TDC_flag form'
             write(*,*)
-            s% w_flag = .true.
+            s% TDC_flag = .true.
          end if
          
          if (no_L .and. s% i_lum /= 0) then

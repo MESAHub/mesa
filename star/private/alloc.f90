@@ -2581,7 +2581,7 @@
          i = i+1; s% i_lnT = i
          i = i+1; s% i_lnR = i
          
-         if (.not. (s% RSP_flag .or. s% w_flag)) then
+         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
             i = i+1; s% i_lum = i
          else
             s% i_lum = 0
@@ -2599,7 +2599,7 @@
             s% i_u = 0
          end if
             
-         if (s% w_flag) then
+         if (s% TDC_flag) then
             i = i+1; s% i_w = i
          else 
             s% i_w = 0
@@ -3039,9 +3039,9 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_w_flag(id, w_flag, ierr)
+      subroutine set_TDC_flag(id, TDC_flag, ierr)
          integer, intent(in) :: id
-         logical, intent(in) :: w_flag
+         logical, intent(in) :: TDC_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, j, nz, iounit
@@ -3052,24 +3052,24 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% w_flag .eqv. w_flag) return
+         if (s% TDC_flag .eqv. TDC_flag) return
 
          nz = s% nz
          
-         if (w_flag .and. s% RSP_flag) then ! turn RSP off before turn w on
+         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn w on
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
          
-         s% w_flag = w_flag
+         s% TDC_flag = TDC_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. w_flag) call remove1(s% i_w)
+         if (.not. TDC_flag) call remove1(s% i_w)
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
          
-         write(*,*) 'set_w_flag variables and equations'
+         write(*,*) 'set_TDC_flag variables and equations'
          do j=1,s% nvar_hydro
             write(*,2) trim(s% nameofvar(j)) // ' ' // trim(s% nameofequ(j)), j
          end do
@@ -3081,7 +3081,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (w_flag) call insert1(s% i_w)
+         if (TDC_flag) call insert1(s% i_w)
 
          call set_chem_names(s)
          
@@ -3135,7 +3135,7 @@
             xs(i_var,1:nz) = 0d0
          end subroutine insert
 
-      end subroutine set_w_flag
+      end subroutine set_TDC_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)

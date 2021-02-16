@@ -259,7 +259,7 @@
                others_18%val = others_18%val + s% eps_pre_mix(k)
             
             Eq_18 = 0d0
-            if (s% w_flag) then             
+            if (s% TDC_flag) then             
                call calc_Eq_18(s, k, Eq_18, ierr)
                if (ierr /= 0) return
             end if   
@@ -321,7 +321,7 @@
             include 'formats'
             ierr = 0
             d_turbulent_energy_dt_18 = 0d0
-            if (s% w_flag) then
+            if (s% TDC_flag) then
                d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
                   (s% w_start(k)*s% dxh_w(k) + s% dxh_w(k)**2)/dt ! w = w_start + dxh_w
                d_turbulent_energy_dt_18%d1Array(i_w_00) = &
@@ -361,7 +361,7 @@
             end if
 
             if (eps_grav_form) then
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   stop 'cannot use eps_grav with et yet.  fix energy eqn.'
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
@@ -689,7 +689,7 @@
          end if
          
          ! set Pt_18
-         if (.not. s% w_flag) then
+         if (.not. s% TDC_flag) then
             Pt_18 = 0d0
          else
             if (k > 1) then 

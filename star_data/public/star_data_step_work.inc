@@ -621,7 +621,7 @@
          real(dp), pointer :: lnd_for_d_dt_const_m(:)
          real(dp), pointer :: lnT_for_d_dt_const_m(:)
          real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: w_for_d_dt_const_m(:) ! only set when w_flag is true
+         real(dp), pointer :: w_for_d_dt_const_m(:) ! only set when TDC_flag is true
          real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
          real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
          real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
@@ -639,7 +639,7 @@
          real(dp), pointer :: dlnd_dt(:)
          real(dp), pointer :: dlnT_dt(:)
          real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: dw_dt(:) ! only set when w_flag is true
+         real(dp), pointer :: dw_dt(:) ! only set when TDC_flag is true
          real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
          real(dp), pointer :: du_dt(:) ! only set when u_flag is true
          real(dp), pointer :: dEtRSP_dt(:) ! only used when RSP_flag is true

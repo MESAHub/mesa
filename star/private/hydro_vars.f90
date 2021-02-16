@@ -385,7 +385,7 @@
                            s% model_number, s% conv_vel(k)
             end if
 
-            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% w_flag)) s% L(1:nz) = 0d0
+            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% TDC_flag)) s% L(1:nz) = 0d0
 
             if (i_v == 0) s% v(1:nz) = 0d0
 
@@ -595,7 +595,7 @@
                      end do
                   end if
 
-                  if (s% w_flag) then
+                  if (s% TDC_flag) then
                      do k=k_below_just_added,nz
                         s% dw_dt(k) = (s% xh(i_w,k) - s% w_for_d_dt_const_m(k))*dt_inv
                         if (is_bad(s% dw_dt(k))) then
@@ -863,7 +863,7 @@
 
          if (.not. skip_mixing_info) then
          
-            if (.not. s% w_flag) then
+            if (.not. s% TDC_flag) then
                if (dbg) write(*,*) 'call other_adjust_mlt_gradT_fraction'
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
@@ -876,7 +876,7 @@
 
          end if
          
-         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% w_flag) then
+         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% TDC_flag) then
          
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) &

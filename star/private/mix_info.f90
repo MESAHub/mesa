@@ -76,7 +76,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         rsp_or_w = s% RSP_flag .or. s% w_flag
+         rsp_or_w = s% RSP_flag .or. s% TDC_flag
 
          if (dbg) write(*, *) 'set_mixing_info'
          if (s% doing_timing) call start_time(s, time0, total)
@@ -132,9 +132,9 @@
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
-         else if (s% conv_vel_flag .or. s% w_flag) then
+         else if (s% conv_vel_flag .or. s% TDC_flag) then
             do k = 1, nz
-               if (s% w_flag) then
+               if (s% TDC_flag) then
                   s% conv_vel(k) = s% w(k)
                   if (s% conv_vel(k) >= min_conv_vel_for_convective_mixing_type) then
                      s% mixing_type(k) = convective_mixing
@@ -508,7 +508,7 @@
          nz = s% nz
          s% cz_bdy_dq(1:nz) = 0d0
          
-         if (s% rsp_flag .or. s% w_flag) return ! don't have MLT info
+         if (s% rsp_flag .or. s% TDC_flag) return ! don't have MLT info
 
          do k = 2, nz
             mt1 = s% mixing_type(k-1)
