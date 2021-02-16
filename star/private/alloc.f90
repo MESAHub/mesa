@@ -2578,7 +2578,7 @@
          ierr = 0
          i = 0
          
-         if (.true.) then ! the old way
+         if (.false.) then ! the old way
          
             s% i_u = 0
             s% i_du_dt = 0
@@ -2700,11 +2700,12 @@
          
          else
          
+            ! first assign variable numbers
             i = i+1; s% i_lnd = i
             i = i+1; s% i_lnT = i
             i = i+1; s% i_lnR = i
          
-            if (.not. (s% RSP_flag .or. s% TDC_flag)) then
+            if (.not. s% RSP_flag) then
                i = i+1; s% i_lum = i
             else
                s% i_lum = 0
@@ -2721,12 +2722,6 @@
             else
                s% i_u = 0
             end if
-            
-            if (s% TDC_flag) then
-               i = i+1; s% i_w = i
-            else 
-               s% i_w = 0
-            end if
 
             if (s% RTI_flag) then
                i = i+1; s% i_alpha_RTI = i
@@ -2742,6 +2737,12 @@
                s% i_etrb_RSP = 0
                s% i_erad_RSP = 0
                s% i_Fr_RSP = 0
+            end if
+            
+            if (s% TDC_flag) then
+               i = i+1; s% i_w = i
+            else 
+               s% i_w = 0
             end if
 
             if (s% conv_vel_flag) then
@@ -2761,21 +2762,20 @@
             else
                s% i_j_rot = 0
             end if
-
-            s% i_equL = s% i_lum
-            s% i_dlnE_dt = s% i_lnT
-            s% i_dlnd_dt = s% i_lnd
-         
-            if (s% i_v /= 0) then
+            
+            ! now assign equation numbers
+            if (s% i_v /= 0 .or. s% i_u /= 0) then
+               s% i_dlnd_dt = s% i_lnd
+               s% i_dlnE_dt = s% i_lnT
+               s% i_equL = s% i_lum
+               s% i_dlnR_dt = s% i_lnR
                s% i_dv_dt = s% i_v
-               s% i_dlnR_dt = s% i_lnR
-               s% i_du_dt = 0
-            else if (s% i_u /= 0) then
                s% i_du_dt = s% i_u
-               s% i_dlnR_dt = s% i_lnR
-               s% i_dv_dt = 0
             else ! HSE is included in dv_dt, so drop dlnR_dt
-               s% i_dv_dt = s% i_lnR
+               s% i_equL = s% i_lnd
+               s% i_dv_dt = s% i_lnT
+               s% i_dlnE_dt = s% i_lum
+               s% i_dlnd_dt = s% i_lnR
                s% i_dlnR_dt = 0
                s% i_du_dt = 0
             end if
@@ -2831,6 +2831,12 @@
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'
 
          ! chem names are done later by set_chem_names when have set up the net
+         
+         if (.false.) then
+            do i=1,s% nvar_hydro
+               write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
+            end do
+         end if
 
          s% need_to_setvars = .true.
 
