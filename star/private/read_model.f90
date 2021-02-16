@@ -91,7 +91,7 @@
          integer :: k, i, j, i_u, i_du,  nz
          real(dp) :: u00, um1, xm, total_radiation
 
-         logical, parameter :: dbg = .true.
+         logical, parameter :: dbg = .false.
 
          include 'formats'
 
@@ -658,20 +658,18 @@
                   j=j+1; xh(i_etrb_RSP,i) = vec(j)
                   j=j+1; xh(i_erad_RSP,i) = vec(j)
                   j=j+1; xh(i_Fr_RSP,i) = vec(j)
-               else if (i_w /= 0) then ! convert from RSP to w form; vec(j) = RSP_et
+                  j=j+1; s% L(i) = vec(j)
+               else if (i_w /= 0) then ! convert from RSP to TDC
                   j=j+1; xh(i_w,i) = max(min_w,sqrt(max(0d0,vec(j))))
                   j=j+1; !discard xh(i_erad,i) = vec(j)
                   j=j+1; !discard xh(i_Fr,i) = vec(j)
+                  j=j+1; xh(i_lum,i) = vec(j)
                end if
             else if (i_w /= 0) then
                j=j+1; xh(i_w,i) = max(min_w,vec(j))
-            end if
-            if (.not. no_L) then
-               if (want_RSP_model) then
-                  j=j+1; s% L(i) = vec(j)
-               else
-                  j=j+1; xh(i_lum,i) = vec(j)
-               end if
+               j=j+1; xh(i_lum,i) = vec(j)
+            else if (.not. no_L) then
+               j=j+1; xh(i_lum,i) = vec(j)
             end if            
             j=j+1; dq(i) = vec(j)
             if (i_v /= 0) then

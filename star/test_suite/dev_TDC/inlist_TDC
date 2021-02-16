@@ -2,13 +2,12 @@
 &star_job
 
    show_log_description_at_start = .false.
-
-   create_RSP_model = .false.
    
    saved_model_name = 'rsp.mod'
-   load_saved_model = .true.
+   
    !load_saved_model_for_RSP = .true.
-
+   
+   load_saved_model = .true.
    change_initial_TDC_flag = .true.
    new_TDC_flag = .true.
    
@@ -29,6 +28,11 @@
    set_initial_tau_factor = .true.
    set_to_this_tau_factor = 1d0
 
+   profile_starting_model = .true.
+   
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
    !pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -38,7 +42,7 @@
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.02d0
+   Zbase = 0.007d0
    kap_file_prefix = 'a09'
    kap_lowT_prefix = 'lowT_fa05_a09p'
    kap_CO_prefix = 'a09_co'
@@ -47,11 +51,11 @@
 
 &controls  
 
-   initial_z = 0.02d0
-   initial_mass = 1d0
+   initial_z = 0.007d0
+   initial_mass = 4.165d0
 
    max_number_retries = 0 ! 100
-   max_model_number = 5000
+   max_model_number = 11000
 
    max_age = 1d6
    max_timestep = 407.61 ! seconds for rsp.mod of Cepheid
@@ -65,16 +69,18 @@
    Pextra_factor = 2
 
 ! RSP controls
+
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 4.035357d0 ! expected period (in days) 
+   x_ctrl(1) = 4.0172246d0 ! expected period (in days) 
    
-!   RSP_mass = 4.165d0
-!   RSP_Teff = 6050
-!   RSP_L = 1438.8d0
-!   RSP_X = 0.73d0
-!   RSP_Z = 0.007d0
+   RSP_mass = 4.165d0
+   RSP_Teff = 6050
+   RSP_L = 1438.8d0
+   RSP_X = 0.73d0
+   RSP_Z = 0.007d0
          
    RSP_initial_dt_factor = 1d0
+   RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
 
 ! rotation
 
@@ -91,7 +97,8 @@
 ! solver
    always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with et
       
-   use_momentum_outer_BC = .true.
+   !use_compression_outer_BC = .true.
+   use_zero_Pgas_outer_BC = .true.
 
    eps_nuc_factor = 0
    non_nuc_neu_factor = 0
@@ -102,6 +109,8 @@
    include_P_in_velocity_time_centering = .true.
    include_L_in_velocity_time_centering = .true.
 
+   set_rho_to_dm_div_dV = .false.
+
 ! turbulent energy
       !   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
       !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
@@ -111,7 +120,7 @@
 
 ! output
 
-   terminal_show_age_units = 'days'
+   terminal_show_age_units = 'secs'
    terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
@@ -120,23 +129,23 @@
    trace_history_value_name(1) = 'rel_E_err'
    trace_history_value_name(2) = 'log_rel_run_E_err'
 
-   !photo_interval = 4000
-   !profile_interval = 4000
-   !history_interval = 10
-   !terminal_interval = 4000
+   photo_interval = 4000
+   profile_interval = 4000
+   history_interval = 10
+   terminal_interval = 4000
 
-      photo_interval = 1
+      !photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      !terminal_interval = 1
 
-      fill_arrays_with_NaNs = .true.
+      !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
-      stop_for_bad_nums = .true.
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
@@ -178,7 +187,7 @@
       
       !energy_conservation_dump_model_number = -1
       
-      trace_evolve = .true.
+      !trace_evolve = .true.
       
       !use_DGESVX_in_bcyclic = .true.
       !use_equilibration_in_DGESVX = .true.

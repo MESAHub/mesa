@@ -1132,7 +1132,7 @@
             (s% use_momentum_outer_BC .and. trim(s% atm_option) == 'fixed_Psurf')
             
          do_not_need_atm_Tsurf = &
-            s% i_lum == 0 .or. &
+            s% i_lum == 0 .or. s% TDC_flag .or. &
             ((s% use_fixed_L_for_BB_outer_BC .or. s% tau_for_L_BB > 0d0) .and. &
              (s% use_T_black_body_outer_BC))
 

@@ -337,6 +337,7 @@
                write(*,2) 's% solver_call_number', s% solver_call_number
                write(*,2) 'nz', nz
                write(*,2) 's% num_retries', s% num_retries
+               write(*,1) 'dt', s% dt
                write(*,1) 'log dt/secyer', log10(s% dt/secyer)
                write(*, *)
             end if

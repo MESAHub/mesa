@@ -569,7 +569,6 @@
          s% f_Edd(1:NZN) = f_Edd_isotropic ! fake it for 1st call on eval_vars
          call eval_vars(s,0,i_min,i_max,ierr)
          if (ierr /= 0) return
-         ierr = 0
          call set_f_Edd(s,ierr) ! needs opacities
          if (ierr /= 0) return
          call save_start_vars(s) ! needed by eval_eqns

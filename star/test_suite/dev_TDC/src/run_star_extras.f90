@@ -155,13 +155,35 @@
       integer function extras_finish_step(id)
          integer, intent(in) :: id
          integer :: ierr
+         real(dp) :: target_period, rel_run_E_err
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+         if (s% x_integer_ctrl(1) <= 0) return
+         if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
+         write(*,*)
+         write(*,*)
+         write(*,*)
+         target_period = s% x_ctrl(1)
+         rel_run_E_err = s% cumulative_energy_error/s% total_energy
+         write(*,*) 'rel_run_E_err', rel_run_E_err
+         if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
+            write(*,*) '*** BAD rel_run_E_error ***', &
+            s% cumulative_energy_error/s% total_energy
+         else if (abs(s% rsp_period/(24*3600) - target_period) > 1d-2) then
+            write(*,*) '*** BAD ***', s% rsp_period/(24*3600) - target_period, &
+               s% rsp_period/(24*3600), target_period
+         else
+            write(*,*) 'good match for period', &
+               s% rsp_period/(24*3600), target_period
+         end if
+         write(*,*)
+         write(*,*)
+         write(*,*)
+         extras_finish_step = terminate
       end function extras_finish_step
-      
       
 
       end module run_star_extras
