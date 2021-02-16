@@ -1,3 +1,5 @@
+do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" auto
+return
 
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
