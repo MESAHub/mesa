@@ -603,6 +603,8 @@
  if (ierr /= 0) return
 
  call read_controls_file(s, filename, 1, ierr)
+ call mkdir(s% photo_directory)
+ call mkdir(s% log_directory)
 
  end subroutine read_controls
 
@@ -936,7 +938,6 @@
  s% photo_interval = photo_interval
  s% photo_digits = photo_digits
  s% photo_directory = photo_directory
- call mkdir(s% photo_directory)
  ! output of history and profiles.
  s% do_history_file = do_history_file
  s% history_interval = history_interval
@@ -952,7 +953,6 @@
  s% trace_history_value_name = trace_history_value_name
 
  s% log_directory = log_directory
- call mkdir(s% log_directory)
  s% star_history_name = star_history_name
  s% star_history_header_name = star_history_header_name
  s% star_history_dbl_format = star_history_dbl_format
