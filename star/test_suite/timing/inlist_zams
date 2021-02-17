@@ -15,6 +15,9 @@
 
 / ! end of star_job namelist
 
+&eos
+/
+
 &kap
       Zbase = 0.02
 

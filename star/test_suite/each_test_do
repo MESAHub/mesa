@@ -82,12 +82,14 @@ function do_onex {
 
 function do_one {
   echo $1
-  diff $1/inlist_to_end_core_he_burn pre_ms_shared_inlists
-  echo
+  cd $1
+  cat history_columns.list >> ../history_columns.combined.list
+  rm history_columns.combined.list
+  cd ..
 }
 
 
 date
-source do1_diff_source
+source do1_test_source
 echo ""
 date

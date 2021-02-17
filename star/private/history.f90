@@ -285,13 +285,13 @@
             call dealloc
             return
          end if
-         
-         if (.not. s% v_flag) then
-            v_surf = s% r(1)*s% dlnR_dt(1)
-         else if (s% using_Fraley_time_centering) then
-            v_surf = s% vc(1)
-         else
+
+         if (s% u_flag) then
+            v_surf = s% u(1)
+         else if (s% v_flag) then
             v_surf = s% v(1)
+         else
+            v_surf = s% r(1)*s% dlnR_dt(1)
          end if
 
          if (s% initial_mass > s% he_core_mass) then
@@ -1856,13 +1856,13 @@
                val = safe_log10(maxval(abs(s% E_residual(1:nz)))/ln10)
 
             case(h_u_surf_km_s)
-               if (s% u_flag) val = s% u_face(1)*1d-5
+               if (s% u_flag) val = s% u_face_18(1)%val*1d-5
             case(h_u_surf)
-               if (s% u_flag) val = s% u_face(1)
+               if (s% u_flag) val = s% u_face_18(1)%val
             case(h_u_div_csound_max)
                if (s% u_flag) val = maxval(abs(s% u(1:nz))/s% csound(1:nz))
             case(h_u_div_csound_surf)
-               if (s% u_flag) val = s% u_face(1)/s% csound_face(1)
+               if (s% u_flag) val = s% u_face_18(1)%val/s% csound_face(1)
 
             case(h_surf_escape_v)
                val = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
@@ -1886,12 +1886,10 @@
                else
                   val = 0d0 ! s% r(1)*s% dlnR_dt(1)
                end if
-            case(h_bound_mass)
-               val = get_bound_mass(s)/Msun
-            case(h_ejecta_mass)
+            case(h_remnant_M)
+               val = get_remnant_mass(s)/Msun
+            case(h_ejecta_M)
                val = get_ejecta_mass(s)/Msun
-            case(h_ejecta_total_energy)
-               val = get_ejecta_total_energy(s)
 
             case(h_log_L_div_Ledd)
                Ledd = eval_Ledd(s, ierr)

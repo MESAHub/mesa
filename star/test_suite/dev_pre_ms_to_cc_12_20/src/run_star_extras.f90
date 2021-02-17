@@ -239,8 +239,6 @@
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step
       end function extras_finish_step
-      
-      
 
       end module run_star_extras
       

@@ -1,0 +1,21 @@
+
+M_zams   M_He  M_CO  M_Fe
+12       3.56  2.12  1.42
+15       4.70  2.95  1.51
+20       6.73  4.67  1.50
+
+M_He     mass of final He core
+M_CO     mass of final CO core
+M_Fe     mass of final Fe core
+
+nothing special in run_star_extras other than alpha_mlt_routine and option for running GYRE
+all done using simple-to-understand standard controls
+
+Z = 0.02; rotation and wind off for these runs
+semiconvection, thermohaline, and overshooting on during H and He core burning, off after that
+use_gold2_tolerances on; alpha_mlt on; op_split_burn for cells with logT > 9.0
+
+the pgstar plots have lots of useful information for understanding the progress to core collapse.
+
+at end, optional inlist_prepare_for_ccsn_IIp turns on Riemann hydro and switches to amr mesh
+the final model from that can be used as starting model for ccsn_IIp test

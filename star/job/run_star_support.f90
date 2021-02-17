@@ -506,31 +506,11 @@
             if (ierr /= 0) return
          end if
          
-         if (s% job% change_Eturb_flag_at_model_number == s% model_number) then
-            write(*,*) 'have reached model number for new_Eturb_flag', &
-               s% model_number, s% job% new_Eturb_flag
-            call star_set_Eturb_flag(id, s% job% new_Eturb_flag, ierr)
-            if (failed('star_set_Eturb_flag',ierr)) return
-         end if
-         
-         if (s% log_max_temperature > 9d0 .and. &
-               (.not. s% v_flag) .and. (.not. s% u_flag)) then 
-            ! thanks to Roni Waldman for this
-            gamma1_integral = 0
-            integral_norm = 0
-            do k=1,s% nz
-               integral_norm = integral_norm + s% P(k)*s% dm(k)/s% rho(k)
-               gamma1_integral = gamma1_integral + &
-                  (s% gamma1(k)-4.d0/3.d0)*s% P(k)*s% dm(k)/s% rho(k)
-            end do
-            gamma1_integral = gamma1_integral/max(1d-99,integral_norm)
-            if (gamma1_integral <= s% job% gamma1_integral_for_v_flag) then
-               write(*,1) 'have reached gamma1 integral limit', gamma1_integral
-               write(*,1) 'set v_flag true'
-               call star_set_v_flag(id, .true., ierr)
-               if (failed('star_set_v_flag',ierr)) return
-               if (ierr /= 0) return
-            end if
+         if (s% job% change_TDC_flag_at_model_number == s% model_number) then
+            write(*,*) 'have reached model number for new_TDC_flag', &
+               s% model_number, s% job% new_TDC_flag
+            call star_set_TDC_flag(id, s% job% new_TDC_flag, ierr)
+            if (failed('star_set_TDC_flag',ierr)) return
          end if
          
          if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
@@ -687,28 +667,10 @@
          if (dbg) write(*,*) 'call star_finish_step'
          result = star_finish_step(id, ierr)
          if (failed('star_finish_step',ierr)) return         
-         if (s% job% save_photo_when_terminate) then
-            if (len_trim(s% job% required_termination_code_string) > 0 .and. &
-                s% termination_code > 0) then ! check termination code
-               if (s% job% required_termination_code_string == &
-                   termination_code_str(s% termination_code)) then
-                  s% job% save_photo_number = s% model_number
-               end if
-            else
-               s% job% save_photo_number = s% model_number 
-            end if
-         end if         
-         if (s% job% save_model_when_terminate) then
-            if (len_trim(s% job% required_termination_code_string) > 0 .and. &
-                s% termination_code > 0) then ! check termination code
-               if (s% job% required_termination_code_string == &
-                   termination_code_str(s% termination_code)) then
-                  s% job% save_model_number = s% model_number
-               end if
-            else
-               s% job% save_model_number = s% model_number 
-            end if
-         end if                          
+         if (s% job% save_photo_when_terminate .and. termination_code_string_okay()) &
+            s% job% save_photo_number = s% model_number
+         if (s% job% save_model_when_terminate .and. termination_code_string_okay()) &
+            s% job% save_model_number = s% model_number 
          if (s% job% save_pulse_data_when_terminate) &
             s% job% save_pulse_data_for_model_number = s% model_number
          if (s% job% write_profile_when_terminate) then
@@ -741,6 +703,25 @@
          end if
          call do_saves(id, ierr)
          if (failed('do_saves terminate_normal_evolve_loop',ierr)) return
+         
+         contains
+         
+         logical function termination_code_string_okay()
+            integer :: j, n
+            termination_code_string_okay = .true.
+            if (s% termination_code == 0) return
+            n = num_termination_code_strings
+            j = maxval(len_trim(s% job% required_termination_code_string(1:n)))
+            if (j == 0) return
+            termination_code_string_okay = .false.
+            do j=1,num_termination_code_strings
+               if (s% job% required_termination_code_string(j) == &
+                   termination_code_str(s% termination_code)) then
+                  termination_code_string_okay = .true.
+                  return
+               end if
+            end do
+         end function termination_code_string_okay
 
       end subroutine terminate_normal_evolve_loop
 
@@ -1087,7 +1068,7 @@
          
          write(*,*)
          write(*,'(a50,i18)') 'nz', s% nz
-         write(*,'(a50,i18)') 'nvar', s% nvar
+         write(*,'(a50,i18)') 'nvar_total', s% nvar_total
          write(*,'(a50,i18)') trim(s% net_name) // ' species', s% species
          write(*,'(a50,i18)') 'total_num_solver_iterations', &
             s% total_num_solver_iterations
@@ -2014,7 +1995,8 @@
          call star_set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
          if (failed('star_set_profile_columns',ierr)) return
 
-         if (.not. restart) then
+         if (s% job% clear_pgstar_history .or. &
+               (s% job% clear_initial_pgstar_history .and. .not. restart)) then
             call start_new_run_for_pgstar(s, ierr)
             if (failed('start_new_run_for_pgstar',ierr)) return
          else
@@ -2179,11 +2161,11 @@
             if (failed('star_set_RTI_flag',ierr)) return
          end if
          
-         if (s% job% change_Eturb_flag .or. &
-               (s% job% change_initial_Eturb_flag .and. .not. restart)) then
-            write(*,*) 'new_Eturb_flag', s% job% new_Eturb_flag
-            call star_set_Eturb_flag(id, s% job% new_Eturb_flag, ierr)
-            if (failed('star_set_Eturb_flag',ierr)) return
+         if (s% job% change_TDC_flag .or. &
+               (s% job% change_initial_TDC_flag .and. .not. restart)) then
+            write(*,*) 'new_TDC_flag', s% job% new_TDC_flag
+            call star_set_TDC_flag(id, s% job% new_TDC_flag, ierr)
+            if (failed('star_set_TDC_flag',ierr)) return
          end if
 
          if (s% job% change_RSP_flag .or. &
@@ -2520,7 +2502,7 @@
          end if
 
          if (s% job% relax_mass_to_remove_H_env) then
-            write(*, 1) 'relaxrelax_mass_to_remove_H_env_mass'
+            write(*, 1) 'relax_mass_to_remove_H_env_mass'
             call star_relax_mass_to_remove_H_env(id, s% job% lg_max_abs_mdot, ierr)
             if (failed('star_relax_mass_to_remove_H_env',ierr)) return
          end if
@@ -2874,7 +2856,7 @@
          end if
          
          if (s% job% show_eqns_and_vars_names) then
-            do i=1,s% nvar
+            do i=1,s% nvar_total
                write(*,*) i, s% nameofvar(i), s% nameofequ(i)
             end do
             write(*,*)

@@ -41,7 +41,7 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_Eturb = 1d-20, min_Eturb_pow_1_pt_5 = 1d-30
+      real(dp), parameter :: min_w = 1d-20
 
 
       contains
@@ -100,8 +100,8 @@
          termination_code_str(t_HB_limit) = 'HB_limit'
          termination_code_str(t_star_mass_min_limit) = 'star_mass_min_limit'
          termination_code_str(t_star_mass_max_limit) = 'star_mass_max_limit'
-         termination_code_str(t_bound_mass_min_limit) = 'bound_mass_min_limit'
-         termination_code_str(t_bound_mass_max_limit) = 'bound_mass_max_limit'
+         termination_code_str(t_remnant_mass_min_limit) = 'remnant_mass_min_limit'
+         termination_code_str(t_ejecta_mass_max_limit) = 'ejecta_mass_max_limit'
          
          termination_code_str(t_star_species_mass_min_limit) = 'star_species_mass_min_limit'
          termination_code_str(t_star_species_mass_max_limit) = 'star_species_mass_max_limit'
@@ -113,6 +113,7 @@
 
          termination_code_str(t_he_core_mass_limit) = 'he_core_mass_limit'
          termination_code_str(t_co_core_mass_limit) = 'co_core_mass_limit'
+         termination_code_str(t_one_core_mass_limit) = 'one_core_mass_limit'
          termination_code_str(t_fe_core_mass_limit) = 'fe_core_mass_limit'
          termination_code_str(t_neutron_rich_core_mass_limit) = 'neutron_rich_core_mass_limit'
 

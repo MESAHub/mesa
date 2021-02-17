@@ -31,11 +31,12 @@
 
 / ! end of star_job namelist
 
+&eos
+/ ! end of eos namelist
+
 &kap
       Zbase = 0.02d0
-
       kap_file_prefix = 'gs98'
-
 / ! end of kap namelist
 
 &controls

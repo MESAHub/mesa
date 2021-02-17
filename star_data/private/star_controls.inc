@@ -12,6 +12,7 @@
          real(dp) :: &
             he_core_boundary_h1_fraction, &
             co_core_boundary_he4_fraction, &
+            one_core_boundary_he4_c12_fraction, &
             fe_core_boundary_si28_fraction, &
             neutron_rich_core_boundary_Ye_max, &
             min_boundary_fraction
@@ -62,7 +63,7 @@
          real(dp) :: HB_limit
 
          real(dp) :: star_mass_min_limit, star_mass_max_limit
-         real(dp) :: bound_mass_min_limit, bound_mass_max_limit
+         real(dp) :: remnant_mass_min_limit, ejecta_mass_max_limit
          
          real(dp) :: star_species_mass_min_limit, star_species_mass_max_limit
          character (len=iso_name_length) :: &
@@ -75,6 +76,7 @@
 
          real(dp) :: he_core_mass_limit
          real(dp) :: co_core_mass_limit
+         real(dp) :: one_core_mass_limit
          real(dp) :: fe_core_mass_limit
          real(dp) :: neutron_rich_core_mass_limit
 
@@ -551,8 +553,7 @@
 
          logical :: show_mesh_changes
 
-         logical :: mesh_adjust_use_quadratic, &
-            mesh_adjust_get_T_from_E, mesh_ok_to_merge
+         logical :: mesh_adjust_get_T_from_E, mesh_ok_to_merge
 
          integer :: mesh_dump_call_number, mesh_max_k_old_for_split, mesh_min_k_old_for_split
 
@@ -654,7 +655,7 @@
             split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_r_core_cm
+            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells
@@ -801,15 +802,14 @@
             use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
-            use_dedt_form_with_total_energy_conservation, &
             always_use_eps_grav_form_of_energy_eqn, &
-            use_Fraley_time_centering, &
-            include_P_in_Fraley_time_centering, &
-            include_L_in_Fraley_time_centering, &
+            use_velocity_time_centering, &
+            include_P_in_velocity_time_centering, &
+            include_L_in_velocity_time_centering, &
             use_time_centered_eps_grav
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
-            steps_before_use_Fraley_time_centering
+            steps_before_use_velocity_time_centering
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -993,7 +993,7 @@
          integer :: max_mdot_redo_cnt
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
             mdot_revise_factor, implicit_mdot_boost
-         real(dp) :: surf_w_div_w_crit_limit, surf_w_div_w_crit_tol
+         real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
          logical :: fitted_fp_ft_i_rot
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
@@ -1361,6 +1361,7 @@
          logical :: use_other_edit_pulse_data
          logical :: use_other_astero_freq_corr
          logical :: use_other_timestep_limit
+         logical :: use_other_set_pgstar_controls
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)
