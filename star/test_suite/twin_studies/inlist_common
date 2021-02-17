@@ -70,7 +70,7 @@
       photo_interval = 50
       profile_interval = 100
       history_interval = 10
-      terminal_interval = 10
+      terminal_interval = 1
       write_header_frequency = 10
 
 

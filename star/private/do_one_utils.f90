@@ -320,7 +320,7 @@
          sum_Lphoto = abs(s% power_photo)
          sum_Lz = s% power_z_burn 
          
-         if (s% id == 1) then
+         if (how_many_allocated_star_ids() == 1) then
             id_str = ''
          else
             write(id_str,'(i3)') s% id
