@@ -29,10 +29,6 @@
 
    initial_zfracs = 6
 
-   ! I re-implement this to turn on u_flag
-   ! check run_star_extras
-   gamma1_integral_for_v_flag = -1d50
-
    ! this are options for the relaxation of the model in-between pulses
    timescale_for_relax_entropy = 1d-15
    max_dt_for_relax_entropy = 5d-17
@@ -215,8 +211,8 @@
     surf_avg_tau = 10
     !max_mdot_redo_cnt = 200 ! this is set in inlist_hydro_on and inlist_hydro_off
     min_years_dt_for_redo_mdot = 0
-    surf_w_div_w_crit_limit = 0.98d0
-    surf_w_div_w_crit_tol = 0.02d0
+    surf_omega_div_omega_crit_limit = 0.98d0
+    surf_omega_div_omega_crit_tol = 0.02d0
     rotational_mdot_boost_fac = 1d10
     rotational_mdot_kh_fac = 1d10
     mdot_revise_factor = 1.1

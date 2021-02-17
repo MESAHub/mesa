@@ -60,19 +60,19 @@
 
 
 
-varcontrol_target = 1d-3
-min_allowed_varcontrol_target = 5d-4
-never_skip_hard_limits = .true.
-relax_hard_limits_after_retry = .false.
-mlt_make_surface_no_mixing = .true. 
+      varcontrol_target = 1d-3
+      min_allowed_varcontrol_target = 5d-4
+      never_skip_hard_limits = .true.
+      relax_hard_limits_after_retry = .false.
+      mlt_make_surface_no_mixing = .true. 
 
 
 
-    gold2_tol_residual_norm2 = 1d-8
-    gold2_tol_max_residual2 = 1d-5
-    gold2_iter_for_resid_tol3 = 999
-    gold2_tol_residual_norm3 = 0
-    gold2_tol_max_residual3 = 0
+      gold2_tol_residual_norm2 = 1d-8
+      gold2_tol_max_residual2 = 1d-5
+      gold2_iter_for_resid_tol3 = 999
+      gold2_tol_residual_norm3 = 0
+      gold2_tol_max_residual3 = 0
 
       
 

@@ -57,8 +57,8 @@
     initial_mass, initial_z, initial_y, initial_he3, &
     
     ! definition of core boundaries
-    he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, fe_core_boundary_si28_fraction, &
-    neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
+    he_core_boundary_h1_fraction, co_core_boundary_he4_fraction, one_core_boundary_he4_c12_fraction, &
+    fe_core_boundary_si28_fraction, neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
     
     ! when to stop
     max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, &
@@ -84,13 +84,13 @@
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
     star_species_mass_min_limit, star_species_mass_min_limit_iso, star_species_mass_max_limit, star_species_mass_max_limit_iso, &
     xmstar_min_limit, xmstar_max_limit, envelope_mass_limit, envelope_fraction_left_limit, &
-    he_core_mass_limit, co_core_mass_limit, &
+    he_core_mass_limit, co_core_mass_limit, one_core_mass_limit, &
     fe_core_mass_limit, neutron_rich_core_mass_limit, HB_limit, star_mass_min_limit, star_mass_max_limit, &
     he_layer_mass_lower_limit, abs_diff_lg_LH_lg_Ls_limit, Teff_upper_limit, Teff_lower_limit, &
     photosphere_m_upper_limit, photosphere_m_lower_limit, photosphere_m_sub_M_center_limit, &
     photosphere_r_upper_limit, photosphere_r_lower_limit, log_Teff_upper_limit, log_Teff_lower_limit, &
     log_Tsurf_upper_limit, log_Tsurf_lower_limit, log_Rsurf_upper_limit, log_Rsurf_lower_limit, &
-    log_Psurf_upper_limit, log_Psurf_lower_limit, bound_mass_min_limit, bound_mass_max_limit, &
+    log_Psurf_upper_limit, log_Psurf_lower_limit, remnant_mass_min_limit, ejecta_mass_max_limit, &
     log_Dsurf_upper_limit, log_Dsurf_lower_limit, log_L_upper_limit, log_L_lower_limit, &
     log_g_upper_limit, log_g_lower_limit, power_nuc_burn_upper_limit, power_h_burn_upper_limit, &
     power_he_burn_upper_limit, power_z_burn_upper_limit, power_nuc_burn_lower_limit, &
@@ -180,7 +180,7 @@
    use_other_RSP_linear_analysis, RSP_use_atm_grey_with_kap_for_Psurf, &
    RSP_fraction_1st_overtone,RSP_fraction_2nd_overtone, RSP_testing, RSP_use_Prad_for_Psurf, RSP_map_zone_interval, &
    RSP_write_map, RSP_map_filename, RSP_map_history_filename, RSP_map_first_period, RSP_map_last_period, &
-   use_other_RSP_build_model, RSP_Psurf, RSP_work_period, RSP_work_filename, RSP_nmodes, &
+   use_other_RSP_build_model, RSP_Psurf, RSP_work_period, RSP_work_filename, RSP_nmodes, RSP_surface_tau, &
    set_RSP_Psurf_to_multiple_of_initial_P1, use_RSP_new_start_scheme, &
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
@@ -230,7 +230,7 @@
     max_rel_delta_IE_for_mesh_total_energy_balance, &
     trace_mesh_adjust_error_in_conservation, max_allowed_nz, mesh_max_allowed_ratio, &
     remesh_max_allowed_logT, max_delta_x_for_merge, mesh_dump_call_number, &
-    mesh_adjust_use_quadratic, mesh_ok_to_merge, mesh_max_k_old_for_split, mesh_min_k_old_for_split, &
+    mesh_ok_to_merge, mesh_max_k_old_for_split, mesh_min_k_old_for_split, &
     mesh_adjust_get_T_from_E, &
     max_dq, min_dq, min_dq_for_split, min_dq_for_xa, min_dq_for_xa_convective, &
     mesh_min_dlnR, merge_if_dlnR_too_small, min_dq_for_logT, &
@@ -258,7 +258,7 @@
     R_function3_weight, M_function_weight, M_function_param, &
     gradT_function_weight, log_tau_function_weight, log_kap_function_weight, omega_function_weight, &
     gam_function_weight, gam_function_param1, gam_function_param2, &
-    xa_function_species, xa_function_weight, xa_function_param, xa_mesh_delta_coeff, &
+    xa_function_species, xa_function_weight, xa_function_param, xa_mesh_delta_coeff, split_merge_amr_mesh_delta_coeff, &
     use_split_merge_amr, split_merge_amr_nz_baseline, split_merge_amr_log_zoning, split_merge_amr_hybrid_zoning, &
     split_merge_amr_logtau_zoning, split_merge_amr_okay_to_split_nz, split_merge_amr_nz_r_core, &
     split_merge_amr_okay_to_split_1, merge_amr_inhibit_at_jumps, split_merge_amr_MaxLong,&
@@ -284,7 +284,7 @@
     do_adjust_J_lost, premix_omega, angular_momentum_error_warn, angular_momentum_error_retry, &
     simple_i_rot_flag, recalc_mixing_info_each_substep, adjust_J_fraction, &
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
-    implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_w_div_w_crit_limit, surf_w_div_w_crit_tol, &
+    implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol, &
     fitted_fp_ft_i_rot, w_div_wcrit_max, w_div_wcrit_max2, &
     fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
@@ -340,14 +340,13 @@
     use_dedt_form_of_energy_eqn, use_time_centered_eps_grav, &
     use_mass_corrections, use_gravity_rotation_correction, eps_grav_factor, eps_mdot_factor, max_gamma_for_dedt_form_of_energy_eqn, &
     include_composition_in_eps_grav, max_eta_for_dedt_form_of_energy_eqn, no_dedt_form_during_relax, &
-    use_dedt_form_with_total_energy_conservation, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
-    use_dPrad_dm_form_of_T_gradient_eqn, use_Fraley_time_centering, dedt_eqn_r_scale, &
-    RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_Fraley_time_centering, &
+    use_dPrad_dm_form_of_T_gradient_eqn, use_velocity_time_centering, dedt_eqn_r_scale, &
+    RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
-    conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_Fraley_time_centering, include_L_in_Fraley_time_centering, &
+    conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
     conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, &
@@ -401,7 +400,7 @@
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    Eturb_alfa, Eturb_alfap, Eturb_alfat, Eturb_alfam, Eturb_alfar, Eturb_Lsurf_factor, &
+    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, &
     
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
@@ -519,7 +518,7 @@
     use_other_D_mix, use_other_neu, use_other_net_get, use_other_opacity_factor, use_other_pressure, &
     use_other_diffusion_coefficients, use_other_pgstar_plots, use_other_eval_fp_ft, use_other_eval_i_rot, use_other_torque, &
     use_other_torque_implicit, use_other_wind, use_other_accreting_state, use_other_after_struct_burn_mix, use_other_mesh_delta_coeff_factor, &
-    use_other_before_struct_burn_mix, use_other_astero_freq_corr, use_other_timestep_limit, &
+    use_other_before_struct_burn_mix, use_other_astero_freq_corr, use_other_timestep_limit, use_other_set_pgstar_controls, &
     x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, &
     
     ! extra files
@@ -604,6 +603,8 @@
  if (ierr /= 0) return
 
  call read_controls_file(s, filename, 1, ierr)
+ call mkdir(s% photo_directory)
+ call mkdir(s% log_directory)
 
  end subroutine read_controls
 
@@ -783,6 +784,7 @@
  ! definition of core boundaries
  s% he_core_boundary_h1_fraction = he_core_boundary_h1_fraction
  s% co_core_boundary_he4_fraction = co_core_boundary_he4_fraction
+ s% one_core_boundary_he4_c12_fraction = one_core_boundary_he4_c12_fraction
  s% fe_core_boundary_si28_fraction = fe_core_boundary_si28_fraction
  s% neutron_rich_core_boundary_Ye_max = neutron_rich_core_boundary_Ye_max
  s% min_boundary_fraction = min_boundary_fraction
@@ -880,8 +882,8 @@
 
  s% star_mass_max_limit = star_mass_max_limit
  s% star_mass_min_limit = star_mass_min_limit
- s% bound_mass_max_limit = bound_mass_max_limit
- s% bound_mass_min_limit = bound_mass_min_limit
+ s% ejecta_mass_max_limit = ejecta_mass_max_limit
+ s% remnant_mass_min_limit = remnant_mass_min_limit
  
  s% star_species_mass_min_limit = star_species_mass_min_limit
  s% star_species_mass_min_limit_iso = star_species_mass_min_limit_iso
@@ -895,6 +897,7 @@
 
  s% he_core_mass_limit = he_core_mass_limit
  s% co_core_mass_limit = co_core_mass_limit
+ s% one_core_mass_limit = one_core_mass_limit
  s% fe_core_mass_limit = fe_core_mass_limit
  s% neutron_rich_core_mass_limit = neutron_rich_core_mass_limit
 
@@ -935,7 +938,6 @@
  s% photo_interval = photo_interval
  s% photo_digits = photo_digits
  s% photo_directory = photo_directory
- call mkdir(s% photo_directory)
  ! output of history and profiles.
  s% do_history_file = do_history_file
  s% history_interval = history_interval
@@ -951,7 +953,6 @@
  s% trace_history_value_name = trace_history_value_name
 
  s% log_directory = log_directory
- call mkdir(s% log_directory)
  s% star_history_name = star_history_name
  s% star_history_header_name = star_history_header_name
  s% star_history_dbl_format = star_history_dbl_format
@@ -1460,7 +1461,6 @@
  s% max_delta_x_for_merge = max_delta_x_for_merge
  s% mesh_dump_call_number = mesh_dump_call_number
 
- s% mesh_adjust_use_quadratic = mesh_adjust_use_quadratic
  s% mesh_ok_to_merge = mesh_ok_to_merge
  s% mesh_max_k_old_for_split = mesh_max_k_old_for_split
  s% mesh_min_k_old_for_split = mesh_min_k_old_for_split
@@ -1570,6 +1570,7 @@
  s% use_split_merge_amr = use_split_merge_amr
  s% split_merge_amr_nz_baseline = split_merge_amr_nz_baseline
  s% split_merge_amr_nz_r_core = split_merge_amr_nz_r_core
+ s% split_merge_amr_mesh_delta_coeff = split_merge_amr_mesh_delta_coeff
  s% split_merge_amr_log_zoning = split_merge_amr_log_zoning
  s% split_merge_amr_hybrid_zoning = split_merge_amr_hybrid_zoning
  s% split_merge_amr_logtau_zoning = split_merge_amr_logtau_zoning
@@ -1670,8 +1671,8 @@
  s% mdot_revise_factor = mdot_revise_factor
  s% implicit_mdot_boost = implicit_mdot_boost
  s% min_years_dt_for_redo_mdot = min_years_dt_for_redo_mdot
- s% surf_w_div_w_crit_limit = surf_w_div_w_crit_limit
- s% surf_w_div_w_crit_tol = surf_w_div_w_crit_tol
+ s% surf_omega_div_omega_crit_limit = surf_omega_div_omega_crit_limit
+ s% surf_omega_div_omega_crit_tol = surf_omega_div_omega_crit_tol
  s% fitted_fp_ft_i_rot = fitted_fp_ft_i_rot 
  s% w_div_wcrit_max = w_div_wcrit_max
  s% w_div_wcrit_max2 = w_div_wcrit_max2
@@ -1826,7 +1827,6 @@
  s% max_eta_for_dedt_form_of_energy_eqn = max_eta_for_dedt_form_of_energy_eqn
  s% max_gamma_for_dedt_form_of_energy_eqn = max_gamma_for_dedt_form_of_energy_eqn
  s% no_dedt_form_during_relax = no_dedt_form_during_relax
- s% use_dedt_form_with_total_energy_conservation = use_dedt_form_with_total_energy_conservation
  s% always_use_eps_grav_form_of_energy_eqn = always_use_eps_grav_form_of_energy_eqn
  s% dedt_eqn_r_scale = dedt_eqn_r_scale
  s% use_mass_corrections = use_mass_corrections
@@ -1840,10 +1840,10 @@
  s% Gamma_lnS_eps_grav_full_on = Gamma_lnS_eps_grav_full_on
 
  s% use_dPrad_dm_form_of_T_gradient_eqn = use_dPrad_dm_form_of_T_gradient_eqn
- s% use_Fraley_time_centering = use_Fraley_time_centering
- s% include_P_in_Fraley_time_centering = include_P_in_Fraley_time_centering
- s% include_L_in_Fraley_time_centering = include_L_in_Fraley_time_centering
- s% steps_before_use_Fraley_time_centering = steps_before_use_Fraley_time_centering
+ s% use_velocity_time_centering = use_velocity_time_centering
+ s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
+ s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
+ s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -2055,12 +2055,12 @@
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% Eturb_alfa = Eturb_alfa
- s% Eturb_alfap = Eturb_alfap
- s% Eturb_alfat = Eturb_alfat 
- s% Eturb_alfam = Eturb_alfam
- s% Eturb_alfar = Eturb_alfar
- s% Eturb_Lsurf_factor = Eturb_Lsurf_factor
+ s% TDC_alfa = TDC_alfa
+ s% TDC_alfap = TDC_alfap
+ s% TDC_alfat = TDC_alfat 
+ s% TDC_alfam = TDC_alfam
+ s% TDC_alfar = TDC_alfar
+ s% TDC_Lsurf_factor = TDC_Lsurf_factor
 
  ! timestep
  s% max_timestep = max_timestep
@@ -2386,6 +2386,7 @@
  s% use_other_before_struct_burn_mix = use_other_before_struct_burn_mix
  s% use_other_astero_freq_corr = use_other_astero_freq_corr
  s% use_other_timestep_limit = use_other_timestep_limit
+ s% use_other_set_pgstar_controls = use_other_set_pgstar_controls
 
  s% x_ctrl = x_ctrl
  s% x_integer_ctrl = x_integer_ctrl
@@ -2420,6 +2421,7 @@
  ! definition of core boundaries
  he_core_boundary_h1_fraction = s% he_core_boundary_h1_fraction
  co_core_boundary_he4_fraction = s% co_core_boundary_he4_fraction
+ one_core_boundary_he4_c12_fraction = s% one_core_boundary_he4_c12_fraction
  fe_core_boundary_si28_fraction = s% fe_core_boundary_si28_fraction
  neutron_rich_core_boundary_Ye_max = s% neutron_rich_core_boundary_Ye_max
  min_boundary_fraction = s% min_boundary_fraction
@@ -2517,8 +2519,8 @@
 
  star_mass_max_limit = s% star_mass_max_limit
  star_mass_min_limit = s% star_mass_min_limit
- bound_mass_max_limit = s% bound_mass_max_limit
- bound_mass_min_limit = s% bound_mass_min_limit
+ ejecta_mass_max_limit = s% ejecta_mass_max_limit
+ remnant_mass_min_limit = s% remnant_mass_min_limit
  
  star_species_mass_min_limit = s% star_species_mass_min_limit
  star_species_mass_min_limit_iso = s% star_species_mass_min_limit_iso
@@ -2532,6 +2534,7 @@
 
  he_core_mass_limit = s% he_core_mass_limit
  co_core_mass_limit = s% co_core_mass_limit
+ one_core_mass_limit = s% one_core_mass_limit
  fe_core_mass_limit = s% fe_core_mass_limit
  neutron_rich_core_mass_limit = s% neutron_rich_core_mass_limit
 
@@ -3090,7 +3093,6 @@
  max_delta_x_for_merge = s% max_delta_x_for_merge
  mesh_dump_call_number = s% mesh_dump_call_number
 
- mesh_adjust_use_quadratic = s% mesh_adjust_use_quadratic
  mesh_ok_to_merge = s% mesh_ok_to_merge
  mesh_max_k_old_for_split = s% mesh_max_k_old_for_split
  mesh_min_k_old_for_split = s% mesh_min_k_old_for_split
@@ -3200,6 +3202,7 @@
  use_split_merge_amr = s% use_split_merge_amr
  split_merge_amr_nz_baseline = s% split_merge_amr_nz_baseline
  split_merge_amr_nz_r_core = s% split_merge_amr_nz_r_core
+ split_merge_amr_mesh_delta_coeff = s% split_merge_amr_mesh_delta_coeff
  split_merge_amr_log_zoning = s% split_merge_amr_log_zoning
  split_merge_amr_hybrid_zoning = s% split_merge_amr_hybrid_zoning
  split_merge_amr_logtau_zoning = s% split_merge_amr_logtau_zoning
@@ -3299,8 +3302,8 @@
  mdot_revise_factor = s% mdot_revise_factor
  implicit_mdot_boost = s% implicit_mdot_boost
  min_years_dt_for_redo_mdot = s% min_years_dt_for_redo_mdot
- surf_w_div_w_crit_limit = s% surf_w_div_w_crit_limit
- surf_w_div_w_crit_tol = S% surf_w_div_w_crit_tol
+ surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
+ surf_omega_div_omega_crit_tol = S% surf_omega_div_omega_crit_tol
  fitted_fp_ft_i_rot = s% fitted_fp_ft_i_rot 
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2
@@ -3453,7 +3456,6 @@
  max_eta_for_dedt_form_of_energy_eqn = s% max_eta_for_dedt_form_of_energy_eqn
  max_gamma_for_dedt_form_of_energy_eqn = s% max_gamma_for_dedt_form_of_energy_eqn
  no_dedt_form_during_relax = s% no_dedt_form_during_relax
- use_dedt_form_with_total_energy_conservation = s% use_dedt_form_with_total_energy_conservation
  always_use_eps_grav_form_of_energy_eqn = s% always_use_eps_grav_form_of_energy_eqn
  dedt_eqn_r_scale = s% dedt_eqn_r_scale
  use_mass_corrections = s% use_mass_corrections
@@ -3467,10 +3469,10 @@
  Gamma_lnS_eps_grav_full_on = s% Gamma_lnS_eps_grav_full_on
 
  use_dPrad_dm_form_of_T_gradient_eqn = s% use_dPrad_dm_form_of_T_gradient_eqn
- use_Fraley_time_centering = s% use_Fraley_time_centering
- steps_before_use_Fraley_time_centering = s% steps_before_use_Fraley_time_centering
- include_P_in_Fraley_time_centering = s% include_P_in_Fraley_time_centering
- include_L_in_Fraley_time_centering = s% include_L_in_Fraley_time_centering
+ use_velocity_time_centering = s% use_velocity_time_centering
+ steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
+ include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
+ include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
 
  RTI_A = s% RTI_A
  RTI_B = s% RTI_B
@@ -3682,12 +3684,12 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- Eturb_alfa= s% Eturb_alfa
- Eturb_alfap= s% Eturb_alfap
- Eturb_alfat= s% Eturb_alfat 
- Eturb_alfam= s% Eturb_alfam
- Eturb_alfar= s% Eturb_alfar
- Eturb_Lsurf_factor= s% Eturb_Lsurf_factor
+ TDC_alfa= s% TDC_alfa
+ TDC_alfap= s% TDC_alfap
+ TDC_alfat= s% TDC_alfat 
+ TDC_alfam= s% TDC_alfam
+ TDC_alfar= s% TDC_alfar
+ TDC_Lsurf_factor= s% TDC_Lsurf_factor
 
  ! timestep
  max_timestep = s% max_timestep
@@ -4013,6 +4015,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_other_before_struct_burn_mix = s% use_other_before_struct_burn_mix
  use_other_astero_freq_corr = s% use_other_astero_freq_corr
  use_other_timestep_limit = s% use_other_timestep_limit
+ use_other_set_pgstar_controls = s% use_other_set_pgstar_controls
 
  x_ctrl = s% x_ctrl
  x_integer_ctrl = s% x_integer_ctrl

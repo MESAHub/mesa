@@ -577,7 +577,7 @@
          type (star_info), pointer :: s
          integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
-         real(dp) :: log_surface_gravity, v_div_csound_max, bound_mass, &
+         real(dp) :: log_surface_gravity, v_div_csound_max, remnant_mass, ejecta_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
             ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
@@ -621,7 +621,8 @@
             v_div_csound_max = 0d0
          end if
          
-         bound_mass = get_bound_mass(s)/Msun
+         remnant_mass = get_remnant_mass(s)/Msun
+         ejecta_mass = get_ejecta_mass(s)/Msun
          
          if(s%u_flag) then
             max_abs_vel_loc = maxloc(abs(s%u(1:nz)),dim=1)
@@ -871,13 +872,13 @@
             call compare_to_target('star_mass >= star_mass_max_limit', &
                s% star_mass, s% star_mass_max_limit, t_star_mass_max_limit)
             
-         else if (s% bound_mass_min_limit > 0 .and. bound_mass <= s% bound_mass_min_limit) then 
-            call compare_to_target('bound_mass <= bound_mass_min_limit', &
-               bound_mass, s% bound_mass_min_limit, t_bound_mass_min_limit)
+         else if (s% remnant_mass_min_limit > 0 .and. remnant_mass <= s% remnant_mass_min_limit) then 
+            call compare_to_target('remnant_mass <= remnant_mass_min_limit', &
+               remnant_mass, s% remnant_mass_min_limit, t_remnant_mass_min_limit)
             
-         else if (s% bound_mass_max_limit > 0 .and. bound_mass >= s% bound_mass_max_limit) then 
-            call compare_to_target('bound_mass >= bound_mass_max_limit', &
-               bound_mass, s% bound_mass_max_limit, t_bound_mass_max_limit)
+         else if (s% ejecta_mass_max_limit > 0 .and. ejecta_mass >= s% ejecta_mass_max_limit) then 
+            call compare_to_target('ejecta_mass >= ejecta_mass_max_limit', &
+               ejecta_mass, s% ejecta_mass_max_limit, t_ejecta_mass_max_limit)
             
          else if (species_mass_for_min_limit >= 0 .and. &
                species_mass_for_min_limit <= s% star_species_mass_min_limit) then 
@@ -915,6 +916,10 @@
          else if (s% co_core_mass >= s% co_core_mass_limit) then 
             call compare_to_target('co_core_mass >= co_core_mass_limit', &
                s% co_core_mass, s% co_core_mass_limit, t_co_core_mass_limit)
+            
+         else if (s% one_core_mass >= s% one_core_mass_limit) then 
+            call compare_to_target('one_core_mass >= one_core_mass_limit', &
+               s% one_core_mass, s% one_core_mass_limit, t_one_core_mass_limit)
             
          else if (s% fe_core_mass >= s% fe_core_mass_limit) then 
             call compare_to_target('fe_core_mass >= fe_core_mass_limit', &

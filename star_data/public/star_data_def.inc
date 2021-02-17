@@ -129,19 +129,18 @@
       integer, parameter :: t_HB_limit = t_log_max_temp_lower_limit + 1 
       integer, parameter :: t_star_mass_min_limit = t_HB_limit + 1 
       integer, parameter :: t_star_mass_max_limit = t_star_mass_min_limit + 1 
-      integer, parameter :: t_bound_mass_min_limit = t_star_mass_max_limit + 1 
-      integer, parameter :: t_bound_mass_max_limit = t_bound_mass_min_limit + 1 
-      
-      integer, parameter :: t_star_species_mass_min_limit = t_bound_mass_max_limit + 1 
-      integer, parameter :: t_star_species_mass_max_limit = t_star_species_mass_min_limit + 1 
-      
+      integer, parameter :: t_remnant_mass_min_limit = t_star_mass_max_limit + 1 
+      integer, parameter :: t_ejecta_mass_max_limit = t_remnant_mass_min_limit + 1 
+      integer, parameter :: t_star_species_mass_min_limit = t_ejecta_mass_max_limit + 1 
+      integer, parameter :: t_star_species_mass_max_limit = t_star_species_mass_min_limit + 1       
       integer, parameter :: t_xmstar_min_limit = t_star_species_mass_max_limit + 1 
       integer, parameter :: t_xmstar_max_limit = t_xmstar_min_limit + 1 
       integer, parameter :: t_envelope_mass_limit = t_xmstar_max_limit + 1 
       integer, parameter :: t_envelope_fraction_left_limit = t_envelope_mass_limit + 1 
       integer, parameter :: t_he_core_mass_limit = t_envelope_fraction_left_limit + 1 
       integer, parameter :: t_co_core_mass_limit = t_he_core_mass_limit + 1 
-      integer, parameter :: t_fe_core_mass_limit = t_co_core_mass_limit + 1 
+      integer, parameter :: t_one_core_mass_limit = t_co_core_mass_limit + 1 
+      integer, parameter :: t_fe_core_mass_limit = t_one_core_mass_limit + 1 
       integer, parameter :: t_neutron_rich_core_mass_limit = t_fe_core_mass_limit + 1 
       integer, parameter :: t_he_layer_mass_lower_limit = t_neutron_rich_core_mass_limit + 1 
       integer, parameter :: t_abs_diff_lg_LH_lg_Ls_limit = t_he_layer_mass_lower_limit + 1 
@@ -265,9 +264,9 @@
       integer, parameter :: i_lnT_m1 = 4
       integer, parameter :: i_lnT_00 = 5
       integer, parameter :: i_lnT_p1 = 6
-      integer, parameter :: i_eturb_m1 = 7
-      integer, parameter :: i_eturb_00 = 8
-      integer, parameter :: i_eturb_p1 = 9
+      integer, parameter :: i_w_m1 = 7
+      integer, parameter :: i_w_00 = 8
+      integer, parameter :: i_w_p1 = 9
       integer, parameter :: i_lnR_m1 = 10
       integer, parameter :: i_lnR_00 = 11
       integer, parameter :: i_lnR_p1 = 12
@@ -591,6 +590,8 @@
       integer, parameter :: max_num_accretion_species = 250
 
       integer, parameter :: max_num_diffusion_classes = 100
+      
+      integer, parameter :: num_termination_code_strings = 9
       
       integer, parameter :: num_xa_function = 9           
       integer, parameter :: num_mesh_logX = 9
@@ -1450,6 +1451,11 @@
          subroutine other_set_current_to_old_interface(id)
             integer, intent(in) :: id
          end subroutine other_set_current_to_old_interface
+      
+      
+         subroutine other_set_pgstar_controls_interface(id)
+            integer, intent(in) :: id
+         end subroutine other_set_pgstar_controls_interface
       
       
          subroutine other_astero_freq_corr_interface(id, ierr)

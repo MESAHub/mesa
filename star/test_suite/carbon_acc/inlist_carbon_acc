@@ -60,7 +60,6 @@
 
   ! ok result with dedt w/out v_flag; bad result w/ v_flag
   ! always_use_dedt_form_of_energy_eqn = .true.
-  ! use_dedt_form_with_total_energy_conservation = .true.
 
   ! when to stop
   log_center_density_limit = 9.5
