@@ -61,8 +61,9 @@
             stop 'do_evolve_step_part1'
          end if
          
-         if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
-            write(*,*) 'fill_arrays_with_NaNs at start of step'
+         if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            if (mod(s% model_number, s% terminal_interval) == 0) &
+               write(*,*) 'fill_arrays_with_NaNs at start of step'
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -452,9 +453,9 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if (s% steps_before_use_Fraley_time_centering >= 0 .and. &
-                s% model_number > s% steps_before_use_Fraley_time_centering) &
-               s% using_Fraley_time_centering = .true.
+            if (s% steps_before_use_velocity_time_centering >= 0 .and. &
+                s% model_number > s% steps_before_use_velocity_time_centering) &
+               s% using_velocity_time_centering = .true.
          end if
          
          call reset_epsnuc_vectors(s)
@@ -592,7 +593,7 @@
             w_div_w_crit, w_div_w_crit_prev, mstar_dot, mstar_dot_prev, abs_mstar_delta, &
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, total, &
-            surf_w_div_w_crit_limit, dt, time, max_dt, total_energy, &
+            surf_omega_div_omega_crit_limit, dt, time, max_dt, total_energy, &
             new_R_center, amplitude, flash_max, &
             dm_nz, dm_m1, r_m1, v_m1, A_nz, A_m1, A_center, new_v_center, min_v_center
             
@@ -799,7 +800,7 @@
 
             mstar_dot = 0
             w_div_w_crit = -1
-            surf_w_div_w_crit_limit = s% surf_w_div_w_crit_limit
+            surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
             mdot_redo_cnt = 0
             max_mdot_redo_cnt = s% max_mdot_redo_cnt
 
@@ -913,9 +914,9 @@
                   return
                end if
                write(*,*)
-               if (w_div_w_crit > surf_w_div_w_crit_limit) then
-                  write(*,1) 'retry: w_div_w_crit > surf_w_div_w_crit_limit', &
-                     w_div_w_crit, surf_w_div_w_crit_limit
+               if (w_div_w_crit > surf_omega_div_omega_crit_limit) then
+                  write(*,1) 'retry: w_div_w_crit > surf_omega_div_omega_crit_limit', &
+                     w_div_w_crit, surf_omega_div_omega_crit_limit
                   do_step_part2 = retry
                   s% result_reason = nonzero_ierr
                   return
@@ -931,7 +932,7 @@
             ! i.e. if bigger mass loss makes w_div_w_crit worse,
             ! then in an unstable situation and will remove mass until regain stability.
 
-            if (w_div_w_crit <= surf_w_div_w_crit_limit &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. mdot_redo_cnt == 0) then
                s% was_in_implicit_wind_limit = .false.
                !exit implicit_mdot_loop
@@ -939,7 +940,7 @@
                return
             end if
 
-            if (w_div_w_crit <= surf_w_div_w_crit_limit &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. s% mstar_dot == explicit_mdot) then
                !exit implicit_mdot_loop
                select_mdot_action = exit_loop
@@ -996,10 +997,10 @@
             end if
 
             ! have already done at least one correction -- check if okay now
-            if (w_div_w_crit <= surf_w_div_w_crit_limit .and. &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit .and. &
                   have_too_small_wind_mdot .and. &
                   abs((wind_mdot-too_small_wind_mdot)/wind_mdot) < &
-                     s% surf_w_div_w_crit_tol) then
+                     s% surf_omega_div_omega_crit_tol) then
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
                write(*,*)
@@ -1022,8 +1023,8 @@
                return
             end if
 
-            if (w_div_w_crit > surf_w_div_w_crit_limit &
-                  .and. w_div_w_crit_prev >= surf_w_div_w_crit_limit &
+            if (w_div_w_crit > surf_omega_div_omega_crit_limit &
+                  .and. w_div_w_crit_prev >= surf_omega_div_omega_crit_limit &
                   .and. -mstar_dot >= max_wind_mdot) then
                write(*,3) 'failed to fix w > w_crit', &
                   s% model_number, mdot_redo_cnt, w_div_w_crit, &
@@ -1034,7 +1035,7 @@
                return
             end if
 
-            if (w_div_w_crit >= surf_w_div_w_crit_limit) then ! wind too small
+            if (w_div_w_crit >= surf_omega_div_omega_crit_limit) then ! wind too small
                !write(*,*) "entering too small wind mdot"
                if (.not. have_too_small_wind_mdot) then
                   !write(*,*) "setting too small wind mdot"
@@ -1044,7 +1045,7 @@
                   !write(*,*) "changing too small wind mdot"
                   too_small_wind_mdot = wind_mdot
                end if
-            else if (w_div_w_crit < surf_w_div_w_crit_limit) then ! wind too large
+            else if (w_div_w_crit < surf_omega_div_omega_crit_limit) then ! wind too large
                !write(*,*) "entering too large wind mdot"
                if (.not. have_too_large_wind_mdot) then
                   !write(*,*) "setting too large wind mdot"
@@ -1063,7 +1064,7 @@
 
             if (have_too_large_wind_mdot .and. have_too_small_wind_mdot) then
                if (abs((too_large_wind_mdot-too_small_wind_mdot)/too_large_wind_mdot) &
-                   < s% surf_w_div_w_crit_tol) then
+                   < s% surf_omega_div_omega_crit_tol) then
                   write(*,*) "too_large_wind_mdot good enough, using it"
                   s% mstar_dot = -too_large_wind_mdot
                else
@@ -1168,7 +1169,7 @@
                expected_sum_cell_others, expected_sum_cell_sources, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
-               virial, total_radiation, L_surf, sum_cell_de, sum_cell_dEturb, &
+               virial, total_radiation, L_surf, sum_cell_de, sum_cell_det, &
                sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
                sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing
                
@@ -1335,8 +1336,8 @@
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
             if (.not. s% RSP_flag) then
-               if (s% using_Fraley_time_centering .and. &
-                     s% include_L_in_Fraley_time_centering) then
+               if (s% using_velocity_time_centering .and. &
+                     s% include_L_in_velocity_time_centering) then
                   L_surf = 0.5d0*(s% L(1) + s% L_start(1))
                else
                   L_surf = s% L(1)
@@ -1407,8 +1408,7 @@
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,*)
                
-               if (s% use_dedt_form_with_total_energy_conservation .and. &
-                   s% always_use_dedt_form_of_energy_eqn) then
+               if (s% always_use_dedt_form_of_energy_eqn) then
                   
                   write(*,*)
                   write(*,*) 'for debugging phase1_sources_and_sinks'
@@ -1478,13 +1478,13 @@
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
                   sum_cell_others = dt*dot_product(s% dm(1:nz), s% energy_others(1:nz))
                   sum_cell_work = dt*dot_product(s% dm(1:nz), s% dwork_dm(1:nz))
-                  sum_cell_dEturb = dt*dot_product(s% dm(1:nz), s% dEturb_dt(1:nz))
+                  sum_cell_det = dt*dot_product(s% dm(1:nz), s% dw_dt(1:nz))
                   sum_cell_dke = dt*dot_product(s% dm(1:nz), s% dkedt(1:nz))
                   sum_cell_dpe = dt*dot_product(s% dm(1:nz), s% dpedt(1:nz))
                   sum_cell_de = dt*dot_product(s% dm(1:nz), s% dedt(1:nz))
                   sum_cell_terms = &
                      - sum_cell_dL + sum_cell_sources + sum_cell_others - sum_cell_work &
-                     - sum_cell_dEturb - sum_cell_dke - sum_cell_dpe - sum_cell_de
+                     - sum_cell_det - sum_cell_dke - sum_cell_dpe - sum_cell_de
                   sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
                   
@@ -1537,9 +1537,9 @@
                   !write(*,2) 'rel err ', s% model_number, &
                   !   ( - diff_total_rotational_kinetic_energy)/s% total_energy, &
                   !   , diff_total_rotational_kinetic_energy
-                  write(*,2) 'rel err sum_cell_dEturb', s% model_number, &
-                     (sum_cell_dEturb - diff_total_turbulent_energy)/s% total_energy, &
-                     sum_cell_dEturb, diff_total_turbulent_energy
+                  write(*,2) 'rel err sum_cell_det', s% model_number, &
+                     (sum_cell_det - diff_total_turbulent_energy)/s% total_energy, &
+                     sum_cell_det, diff_total_turbulent_energy
                   write(*,*)
                      
                      
@@ -1811,7 +1811,7 @@
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
          
-         if (.not. (s% RSP_flag .or. s% Eturb_flag)) then
+         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if
@@ -2015,7 +2015,7 @@
          s% solver_iter = 0
          s% solver_adjust_iter = 0
          
-         nvar = s% nvar
+         nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nz = s% nz
          s% model_number = s% model_number_old + 1

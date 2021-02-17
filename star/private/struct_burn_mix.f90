@@ -40,7 +40,7 @@
       integer function do_struct_burn_mix(s, skip_global_corr_coeff_limit)
          use mix_info, only: set_mixing_info, get_convection_sigmas
          use solve_hydro, only: &
-            set_surf_info, set_tol_correction, do_hydro_converge
+            set_surf_info, set_tol_correction, do_solver_converge
          use solve_burn, only: do_burn
          use rates_def, only: num_rvs
          use hydro_vars, only: set_vars_if_needed
@@ -153,7 +153,7 @@
 
          do_chem = (s% do_burn .or. s% do_mix)
          if (do_chem) then ! include abundances
-            nvar = s% nvar
+            nvar = s% nvar_total
          else ! no chem => just do structure
             nvar = s% nvar_hydro
          end if
@@ -180,7 +180,7 @@
          end if
                      
          if (s% trace_evolve) write(*,*) 'call solver'
-         do_struct_burn_mix = do_hydro_converge( &
+         do_struct_burn_mix = do_solver_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction)
          if (s% trace_evolve) write(*,*) 'done solver'
@@ -204,7 +204,7 @@
 
          if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
             do j=1,s% species
-               write(*,4) 'after do_hydro_converge xa(j)', &
+               write(*,4) 'after do_solver_converge xa(j)', &
                   s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
             end do
          end if
@@ -289,7 +289,7 @@
       subroutine save_start_values(s, ierr)
          use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
-         use hydro_eturb, only: set_eturb_start_vars
+         use hydro_tdc, only: set_w_start_vars
          use star_utils, only: eval_total_energy_integrals
          use chem_def, only: ih1
          type (star_info), pointer :: s
@@ -326,7 +326,8 @@
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
-            s% uface_start(k) = s% u_face(k)
+            s% u_face_start(k) = 0d0 ! s% u_face_18(k)%val
+            s% P_face_start(k) = -1d0 ! mark as unset s% P_face_18(k)%val
             s% L_start(k) = s% L(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)
@@ -366,7 +367,7 @@
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
-         if (s% Eturb_flag) call set_eturb_start_vars(s,ierr)
+         if (s% TDC_flag) call set_w_start_vars(s,ierr)
 
          do k=1,s% nz
             do j=1,s% nvar_hydro

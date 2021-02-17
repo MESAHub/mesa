@@ -1418,13 +1418,14 @@
       subroutine get_core_info(s)
          type (star_info), pointer :: s
 
-         integer :: k, j, A_max, h1, he4, c12, o16, si28, species, nz
+         integer :: k, j, A_max, h1, he4, c12, o16, ne20, si28, species, nz
          integer, pointer :: net_iso(:)
-         logical :: have_he, have_co, have_fe
+         logical :: have_he, have_co, have_one, have_fe
          real(dp) :: sumx, min_x
          integer, parameter :: &
             A_max_fe = 47, &
             A_max_si = 28, &
+            A_max_one = 20, &
             A_max_co = 16, &
             A_max_he = 4
 
@@ -1437,6 +1438,7 @@
          he4 = net_iso(ihe4)
          c12 = net_iso(ic12)
          o16 = net_iso(io16)
+         ne20 = net_iso(ine20)
          si28 = net_iso(isi28)
          min_x = s% min_boundary_fraction
 
@@ -1463,6 +1465,10 @@
             s% co_core_mass, s% co_core_radius, s% co_core_lgT, &
             s% co_core_lgRho, s% co_core_L, s% co_core_v, &
             s% co_core_omega, s% co_core_omega_div_omega_crit)
+         call clear_core_info(s% one_core_k, &
+            s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
+            s% one_core_lgRho, s% one_core_L, s% one_core_v, &
+            s% one_core_omega, s% one_core_omega_div_omega_crit)
          call clear_core_info(s% he_core_k, &
             s% he_core_mass, s% he_core_radius, s% he_core_lgT, &
             s% he_core_lgRho, s% he_core_L, s% he_core_v, &
@@ -1470,6 +1476,7 @@
 
          have_he = .false.
          have_co = .false.
+         have_one = .false.
          have_fe = .false.
 
          do k=1,nz
@@ -1500,6 +1507,27 @@
                            s% fe_core_omega, s% fe_core_omega_div_omega_crit)
                         exit
                      end if
+                  end if
+               end if
+            end if
+
+            if (.not. have_one) then
+               if (s% one_core_boundary_he4_c12_fraction < 0) then
+                  if (A_max >= A_max_one) then
+                     call set_core_info(s, k, s% one_core_k, &
+                        s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
+                        s% one_core_lgRho, s% one_core_L, s% one_core_v, &
+                        s% one_core_omega, s% one_core_omega_div_omega_crit)
+                     have_one = .true.
+                  end if
+               else if (he4 /= 0 .and. c12 /= 0 .and. o16 /= 0) then
+                  if (s% xa(he4,k)+s% xa(c12,k) <= s% one_core_boundary_he4_c12_fraction .and. &
+                      s% xa(o16,k)+s% xa(ne20,k) >= min_x) then
+                     call set_core_info(s, k, s% one_core_k, &
+                        s% one_core_mass, s% one_core_radius, s% one_core_lgT, &
+                        s% one_core_lgRho, s% one_core_L, s% one_core_v, &
+                        s% one_core_omega, s% one_core_omega_div_omega_crit)
+                     have_one = .true.
                   end if
                end if
             end if

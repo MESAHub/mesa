@@ -254,13 +254,13 @@
          nullify(s% bcyclic_odd_storage)
          nullify(s% bcyclic_odd_storage_qp)
 
-         nullify(s% hydro_iwork)
-         nullify(s% hydro_work)
+         nullify(s% solver_iwork)
+         nullify(s% solver_work)
+         nullify(s% AF1)
 
          s% net_name = ''
          s% species = 0
          s% num_reactions = 0
-         nullify(s% AF1)
 
          s% M_center = 0
          s% R_center = 0
@@ -331,7 +331,7 @@
          s% solver_iter = -1
 
          s% using_gold_tolerances = .false.
-         s% using_Fraley_time_centering = .false.
+         s% using_velocity_time_centering = .false.
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''
@@ -458,6 +458,7 @@
          use other_overshooting_scheme, only: null_other_overshooting_scheme
          use other_photo_write, only: default_other_photo_write
          use other_photo_read, only: default_other_photo_read
+         use other_set_pgstar_controls, only: default_other_set_pgstar_controls
          use other_eos
          use other_kap
          use pgstar_decorator
@@ -503,7 +504,7 @@
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
-         s% nvar = 0
+         s% nvar_total = 0
 
          s% nz = 0
          s% prev_mesh_nz = 0
@@ -520,13 +521,13 @@
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
-         s% Eturb_flag = .false.
+         s% TDC_flag = .false.
 
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% need_to_reset_eturb = .false.
+         s% need_to_reset_w = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
@@ -645,6 +646,8 @@
          s% other_photo_write => default_other_photo_write
          s% other_photo_read => default_other_photo_read
 
+         s% other_set_pgstar_controls => default_other_set_pgstar_controls
+
          s% other_new_generation => null_other_new_generation
          s% other_set_current_to_old => null_other_set_current_to_old
 
@@ -667,7 +670,7 @@
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
-         s% nvar = 0
+         s% nvar_total = 0
 
          s% species = 0
          s% num_reactions = 0

@@ -23,15 +23,13 @@ do_one create_zahb "stop because center he4 < HB_limit" skip skip
 do_one create_zams "finished create main sequence" skip skip
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
-#   not yet       do_one dev_Eturb "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   needs work, on in stale_tests branch    do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-
-do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-do_one dev_pre_ms_to_cc_25_75 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-# work in progress    do_one dev_pre_ms_to_cc_80_200 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-
+do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
+#  under construction.   do_one dev_TDC "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 do_one gyre_in_mesa_bcep "matched target" skip skip
@@ -55,7 +53,7 @@ do_one make_metals "stop because have dropped below central lower limit for he4"
 do_one make_env "stop because star_age >= max_age" "env.mod" skip 
 do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
 do_one make_planets "stop because star_age >= max_age"  "planet_evolve_1.0_MJ_10.0_ME_2.0_RJ.mod" auto
-do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" auto
+do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" skip
 do_one make_zams "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
 do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
 do_one make_zams_ultra_high_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
@@ -74,12 +72,14 @@ do_one rsp_check_2nd_crossing "Teff_red_edge     5" skip skip
 do_one rsp_Delta_Scuti "good match for period" "final.mod" auto 
 do_one rsp_gyre "good match for period" skip skip
 do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
+do_one rsp_save_and_load_file "good match for period" "final.mod" skip   
 do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
 do_one sample_pre_ms "finished sample pre-ms" skip skip
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
+do_one twin_studies "stars have reached stopping age" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto
 do_one wd_aic "PASS: A=20 electron captures have started a thermal runaway in the core" "final.mod" auto
 do_one wd_c_core_ignition "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto

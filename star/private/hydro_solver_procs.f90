@@ -38,13 +38,12 @@
       contains
 
 
-      subroutine set_xscale_info(s, nvar, nz, xscale, ierr)
+      subroutine set_xscale_info(s, nvar, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: nvar, nz
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
+         integer, intent(in) :: nvar
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, nvar_hydro
+         integer :: i, j, k, nz, nvar_hydro
          real(dp), parameter :: xscale_min = 1
          real(dp) :: var_scale, lum_scale, vel_scale, omega_scale
 
@@ -54,17 +53,17 @@
 
          if (dbg) write(*, *) 'set_xscale'
          nvar_hydro = s% nvar_hydro
-
+         nz = s% nz
          do k=1,nz
             do i=1,nvar
                if (i <= nvar_hydro) then ! structure variable
                   if (i /= s% i_j_rot) then
-                     xscale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
+                     s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
                   else
-                     xscale(i,k) = 10d0*sqrt(s% cgrav(k)*s% m(k)*s% r_start(k))
+                     s% x_scale(i,k) = 10d0*sqrt(s% cgrav(k)*s% m(k)*s% r_start(k))
                   end if
                else ! abundance variable
-                  xscale(i,k) = max(s% xa_scale, s% xa_start(i-nvar_hydro,k))
+                  s% x_scale(i,k) = max(s% xa_scale, s% xa_start(i-nvar_hydro,k))
                end if
             end do
          end do
@@ -77,7 +76,7 @@
             !write(*,1) 's% xa_scale', s% xa_scale
             do k=1,s% nz
                do j=1,nvar
-                  write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, xscale(j,k)
+                  write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, s% x_scale(j,k)
                end do
                write(*,*)
             end do
@@ -87,27 +86,24 @@
       end subroutine set_xscale_info
 
 
-      subroutine eval_equations(s, iter, nvar, nz, dx, xscale, equ_in, ierr)
+      subroutine eval_equations(s,  nvar, ierr)
          use hydro_eqns, only: eval_equ
          use mix_info, only: set_dxdt_mix
          use star_utils, only: update_time, total_times
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: dx, xscale, equ_in ! (nvar, nz)
+         integer, intent(in) :: nvar
          integer, intent(out) :: ierr
 
-         integer :: cnt, i, j, k
+         integer :: cnt, i, j, k, nz
          integer :: id
          real(dp) :: dt, theta_dt
-         real(dp), pointer :: equ(:,:)
 
          logical, parameter :: skip_partials = .true.
 
          include 'formats'
 
          ierr = 0
-
-         equ(1:nvar,1:nz) => s% equ1(1:nvar*nz)
+         nz = s% nz
 
          if (dbg) write(*, *) 'eval_equations'
 
@@ -117,7 +113,7 @@
             if (dbg) write(*, *) 'skip set_solver_vars on call before 1st iter'
          else
             if (dbg) write(*, *) 'call set_solver_vars'
-            call set_solver_vars(s, iter, nvar, dx, xscale, dt, ierr)
+            call set_solver_vars(s, nvar, dt, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*,2) 'eval_equations: set_solver_vars returned ierr', ierr
@@ -130,13 +126,13 @@
          if (ierr == 0) then
             do k=1,nz
                do j=1,nvar
-                  equ(j,k) = 0d0
+                  s% equ(j,k) = 0d0
                   s% residual_weight(j,k) = 1d0
                   s% correction_weight(j,k) = 1d0
                end do
             end do
             if (dbg) write(*, *) 'call eval_equ'
-            call eval_equ(s, nvar, skip_partials, xscale, ierr)
+            call eval_equ(s, nvar, skip_partials, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr
@@ -149,12 +145,12 @@
          cnt = 0
          do i=1,nz
             do j=1, nvar
-               if (is_bad_num(equ(j, i))) then
+               if (is_bad_num(s% equ(j, i))) then
                   cnt = cnt + 1
                   s% retry_message = 'eval_equations: equ has a bad num'
                   if (s% report_ierr) then
                      write(*,4) 'eval_equations: equ has a bad num ' // trim(s% nameofequ(j)), &
-                        j, i, nvar, equ(j, i)
+                        j, i, nvar, s% equ(j, i)
                      write(*,2) 'cell', i
                      write(*,2) 'nz', s% nz
                   end if
@@ -176,7 +172,7 @@
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
-                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, dx(j, k)
+                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, s% solver_dx(j, k)
                end do
                write(*,*)
             end do
@@ -187,16 +183,13 @@
       end subroutine eval_equations
 
 
-      subroutine sizequ(s, &
-            iter, nvar, nz, equ, &
-            equ_norm, equ_max, k_max, j_max, ierr)
+      subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer :: equ(:,:) ! (nvar, nz)
+         integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, i_chem1, nvar_hydro, nvar_chem, &
+         integer :: j, k, num_terms, n, nz, i_chem1, nvar_hydro, nvar_chem, &
             max_loc, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq, max_energy_resid, avg_energy_resid
          
@@ -215,6 +208,8 @@
 
          nvar_hydro = min(nvar, s% nvar_hydro)
          nvar_chem = s% nvar_chem
+         
+         nz = s% nz
          n = nz
          num_terms = 0
          sumequ = 0
@@ -232,7 +227,7 @@
                do k = 1, nz
                   do j = 1, nvar
                      if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
-                     absq = abs(equ(j,k)*s% residual_weight(j,k))
+                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                      sumequ = sumequ + absq
                      if (absq > equ_max) then
                         equ_max = absq
@@ -252,7 +247,7 @@
                do k = 1, nz
                   do j = 1, nvar_hydro
                      if (j == skip_eqn1 .or. j == skip_eqn2) cycle
-                     absq = abs(equ(j,k)*s% residual_weight(j,k))
+                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                      !write(*,3) 'equ(j,k)*s% residual_weight(j,k)', j, k, equ(j,k)*s% residual_weight(j,k)
                      sumequ = sumequ + absq
                      if (is_bad(sumequ)) then
@@ -263,7 +258,7 @@
                         ierr = -1
                         if (s% report_ierr) &
                            write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
-                              j, k, equ(j,k)*s% residual_weight(j,k)
+                              j, k, s% equ(j,k)*s% residual_weight(j,k)
                         if (s% stop_for_bad_nums) stop 'sizeq 2'
                         return
                      end if
@@ -281,7 +276,7 @@
             num_terms = num_terms + nvar_chem*nz
             do k = 1, nz
                do j = i_chem1, nvar
-                  absq = abs(equ(j,k)*s% residual_weight(j,k))
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
                   sumequ = sumequ + absq
                   if (absq > equ_max) then
                      equ_max = absq
@@ -294,13 +289,13 @@
          if (s% conv_vel_flag) then
             do k = 1, nz
                j = s% i_dln_cvpv0_dt
-               absq = abs(equ(j,k)*s% residual_weight(j,k))
+               absq = abs(s% equ(j,k)*s% residual_weight(j,k))
             end do
          end if
 
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
-            k_max, iter, s% model_number, equ_max, equ_norm
+            k_max, s% solver_iter, s% model_number, equ_max, equ_norm
          
          if (dbg) call dump_equ
          
@@ -316,7 +311,7 @@
             do k=1,s% nz
                do j=1,nvar
                   write(*,3) 'equ ' // trim(s% nameofequ(j)), &
-                     k, iter, equ(j, k)
+                     k, s% solver_iter, s% equ(j, k)
                end do
                write(*,*)
                !if (k == 6) exit
@@ -326,17 +321,15 @@
       end subroutine sizequ
 
 
-      subroutine sizeB(s, &
-            iter, nvar, nz, B, xscale, &
-            max_correction, correction_norm, max_zone, max_var, ierr)
+      subroutine sizeB(s, nvar, B, max_correction, correction_norm, max_zone, max_var, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: B, xscale ! (nvar, nz)
+         integer, intent(in) :: nvar
+         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          real(dp), intent(out) :: correction_norm ! a measure of the average correction
          real(dp), intent(out) :: max_correction ! magnitude of the max correction
          integer, intent(out) :: max_zone, max_var, ierr
 
-         integer :: k, i, num_terms, j, n, nvar_hydro, &
+         integer :: k, i, nz, num_terms, j, n, nvar_hydro, &
             skip1, skip2, skip3, jmax, num_xa_terms, i_alpha_RTI, i_ln_cvpv0
          real(dp) :: abs_corr, sum_corr, sum_xa_corr, x_limit, &
             max_abs_correction, max_abs_correction_cv, max_abs_corr_for_k, max_abs_xa_corr_for_k
@@ -350,6 +343,7 @@
          if (dbg) write(*, *) 'enter sizeB'
 
          ierr = 0
+         nz = s% nz
          n = nz
          nvar_hydro = min(nvar, s% nvar_hydro)
 
@@ -461,7 +455,8 @@
                   if (check_for_bad_nums) then
                      if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
                         found_bad_num = .true.
-                        if (report) write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', j, k, B(j,k)*s% correction_weight(j,k)
+                        if (report) write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', j, k, &
+                           B(j,k)*s% correction_weight(j,k)
                         if (s% stop_for_bad_nums) then
                            found_NaN = .true.
                            write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', j, k, B(j,k)*s% correction_weight(j,k)
@@ -513,7 +508,7 @@
          correction_norm = sum_corr/num_terms  !sqrt(sum_corr/num_terms)
          if (dbg) then
             write(*,2) 'sizeB: iter, correction_norm, max_correction', &
-               iter, correction_norm, max_correction
+               s% solver_iter, correction_norm, max_correction
             if (max_correction > 1d50 .or. is_bad_num(correction_norm)) then
                call show_stuff
                stop 'sizeB'
@@ -541,7 +536,7 @@
             stop 'sizeB'
          end if
 
-         if (iter < 3) return
+         if (s% solver_iter < 3) return
          ! check for flailing
          if ( &
              abs_corr > s% tol_max_correction .and. &
@@ -562,7 +557,7 @@
             integer :: j, k
             real(dp) :: dx, prev, new
             include 'formats'
-            if (iter == 1) then
+            if (s% solver_iter == 1) then
                write(*,*)
                write(*,'(4a7,12a16,99a13)') &
                   'model', 'iter', 'var', 'zone', &
@@ -577,11 +572,11 @@
             else
                prev = s% xh_start(j,k)
             end if
-            dx = B(j,k)*s% correction_weight(j,k)*xscale(j,k)
+            dx = B(j,k)*s% correction_weight(j,k)*s% x_scale(j,k)
             new = prev + dx
             write(*,'(2i7,a7,i7,12e16.8,99f13.8)') &
-               s% model_number, iter, trim(s% nameofvar(max_var)), k, &
-               correction_norm, B(j,k)*s% correction_weight(j,k), xscale(j,k), &
+               s% model_number, s% solver_iter, trim(s% nameofvar(max_var)), k, &
+               correction_norm, B(j,k)*s% correction_weight(j,k), s% x_scale(j,k), &
                dx, new - prev, new, prev, &
                s% m(k)/Msun, log10(s% dt/secyer), &
                s% lnE(k)/ln10, s% lnT(k)/ln10, &
@@ -608,111 +603,53 @@
       ! the proposed change to dx is B*xscale*correction_factor
       ! edit correction_factor and/or B as necessary so that the new dx will be valid.
       ! set ierr nonzero if things are beyond repair.
-      subroutine Bdomain(s, &
-            iter, nvar, nz, B, dx, xscale, correction_factor, ierr)
+      subroutine Bdomain(s, nvar, B, correction_factor, ierr)
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
          use rsp_def, only: EFL0
          type (star_info), pointer :: s
-         integer, intent(in) :: iter, nvar, nz
-         real(dp), pointer, dimension(:,:) :: dx, xscale, B ! (nvar, nz)
+         integer, intent(in) :: nvar
+         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
-         integer :: id, i, j, k, species, bad_j, bad_k, &
-            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_eturb
+         integer :: id, i, j, k, nz, species, bad_j, bad_k, &
+            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_w
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
-            old_E, dE, new_E, old_lnd, dlnd, new_lnd, deturb, old_eturb, new_eturb, &
-            dw_div_wc, old_w_div_wc, new_w_div_wc, &
-            dconv_vel, old_conv_vel, new_conv_vel, dEt, old_Et, new_Et, &
+            old_E, dE, new_E, old_lnd, dlnd, new_lnd, dw, old_w, new_w, &
+            dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
             dalpha_RTI, new_alpha_RTI, old_alpha_RTI, log_conv_vel_v0, &
             dlum_surf, old_lum_surf, new_lum_surf
          include 'formats'
          ierr = 0
          min_alpha = 1d0
+         nz = s% nz
+         
+         
+         if (s% TDC_flag) & ! clip change in w to maintain non-negativity.
+            call clip_so_non_negative(s% i_w, min_w*1d-6)
 
-         if (s% Eturb_flag) then ! clip change in eturb to maintain non-negativity.
-            i_eturb = s% i_eturb
-            do k = 1, s% nz
-               deturb = B(i_eturb,k)*xscale(i_eturb,k)*correction_factor
-               old_eturb = s% xh_start(i_eturb,k) + dx(i_eturb,k)
-               new_eturb = old_eturb + deturb
-               if (deturb >= 0) cycle
-               if (new_eturb >= 0d0) cycle
-               deturb = min_eturb*1d-6 - old_eturb
-               B(i_eturb,k) = deturb/(xscale(i_eturb,k)*correction_factor)
-            end do
-         end if
-
-         if (s% RTI_flag) then ! clip change in alpha_RTI to maintain non-negativity.
-            i_alpha_RTI = s% i_alpha_RTI
-            do k = 1, s% nz
-               dalpha_RTI = B(i_alpha_RTI,k)*xscale(i_alpha_RTI,k)*correction_factor
-               if (dalpha_RTI >= 0) cycle
-               old_alpha_RTI = s% xh_start(i_alpha_RTI,k) + dx(i_alpha_RTI,k)
-               new_alpha_RTI = old_alpha_RTI + dalpha_RTI
-               if (new_alpha_RTI >= 0d0) cycle
-               dalpha_RTI = -old_alpha_RTI
-               B(i_alpha_RTI,k) = dalpha_RTI/(xscale(i_alpha_RTI,k)*correction_factor)
-            end do
-         end if
+         if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
+            call clip_so_non_negative(s% i_alpha_RTI, 0d0)
 
          if (s% conv_vel_flag) then ! clip change in conv_vel to maintain non-negativity.
             log_conv_vel_v0 = log(s% conv_vel_v0)
             i_ln_cvpv0 = s% i_ln_cvpv0
             !note that dconv_vel and others refers to changes in ln(conv_vel+v0)
             do k = 1, s% nz
-               dconv_vel = B(i_ln_cvpv0,k)*xscale(i_ln_cvpv0,k)*correction_factor
-               old_conv_vel = s% xh_start(i_ln_cvpv0,k) + dx(i_ln_cvpv0,k)
+               dconv_vel = B(i_ln_cvpv0,k)*s% x_scale(i_ln_cvpv0,k)*correction_factor
+               old_conv_vel = s% xh_start(i_ln_cvpv0,k) + s% solver_dx(i_ln_cvpv0,k)
                new_conv_vel = old_conv_vel + dconv_vel
                if (new_conv_vel >= log_conv_vel_v0) cycle
                dconv_vel = -old_conv_vel + log_conv_vel_v0
-               B(i_ln_cvpv0,k) = dconv_vel/(xscale(i_ln_cvpv0,k)*correction_factor)
+               B(i_ln_cvpv0,k) = dconv_vel/(s% x_scale(i_ln_cvpv0,k)*correction_factor)
             end do
          end if
 
-         !if (s% w_div_wc_flag) then ! clip change in w_div_wc to keep it between 0 and 1.
-         !   i_w_div_wc = s% i_w_div_wc
-         !   do k = 1, s% nz
-         !      dw_div_wc = B(i_w_div_wc,k)*xscale(i_w_div_wc,k)*correction_factor
-         !      old_w_div_wc = s% xh_start(i_w_div_wc,k) + dx(i_w_div_wc,k)
-         !      new_w_div_wc = old_w_div_wc + dw_div_wc
-         !      !if (k== 19) write(*,*) "check new_w_div_wc", new_w_div_wc, dw_div_wc, s% j_rot(k), &
-         !      !   correction_factor
-         !      if (new_w_div_wc > 0.99) then
-         !         dw_div_wc = 0.9d0*(0.99d0-old_w_div_wc)
-         !         B(i_w_div_wc,k) = dw_div_wc/(xscale(i_w_div_wc,k)*correction_factor)
-         !         !if (k== 19) write(*,*) "adjust new_w_div_wc", old_w_div_wc+dw_div_wc, dw_div_wc 
-         !      else if (new_w_div_wc < -0.99d0) then
-         !         dw_div_wc = 0.9d0*(-0.99d0-old_w_div_wc)
-         !         B(i_w_div_wc,k) = dw_div_wc/(xscale(i_w_div_wc,k)*correction_factor)
-         !         !if (k== 19) write(*,*) "adjust new_w_div_wc", old_w_div_wc+dw_div_wc, dw_div_wc 
-         !      end if
-         !   end do
-         !end if
-         !if (s% w_div_wc_flag) then ! clip change in w_div_wc to keep it between 0 and 1.
-         !   i_w_div_wc = s% i_w_div_wc
-         !   do k = 1, s% nz
-         !      dw_div_wc = B(i_w_div_wc,k)*xscale(i_w_div_wc,k)*correction_factor
-         !      old_w_div_wc = s% xh_start(i_w_div_wc,k) + dx(i_w_div_wc,k)
-         !      new_w_div_wc = old_w_div_wc + dw_div_wc
-         !      !if (k== 19) write(*,*) "check new_w_div_wc", new_w_div_wc, dw_div_wc, s% j_rot(k), &
-         !      !   correction_factor
-         !      if (dw_div_wc > 0.05d0) then
-         !         B(i_w_div_wc,k) = 0.05d0/(xscale(i_w_div_wc,k)*correction_factor)
-         !         !if (k== 19) write(*,*) "adjust new_w_div_wc", old_w_div_wc+dw_div_wc, dw_div_wc 
-         !      else if (dw_div_wc < -0.05d0) then
-         !         B(i_w_div_wc,k) = -0.05d0/(xscale(i_w_div_wc,k)*correction_factor)
-         !         !if (k== 19) write(*,*) "adjust new_w_div_wc", old_w_div_wc+dw_div_wc, dw_div_wc 
-         !      end if
-         !   end do
-         !end if
-
-
          if (s% i_lum>=0 .and. s% scale_max_correction_for_negative_surf_lum) then
             !ensure surface luminosity does not become negative
-            dlum_surf = B(s% i_lum,1)*xscale(s% i_lum,1)
-            old_lum_surf = s% xh_start(s% i_lum,1) + dx(s% i_lum,1)
+            dlum_surf = B(s% i_lum,1)*s% x_scale(s% i_lum,1)
+            old_lum_surf = s% xh_start(s% i_lum,1) + s% solver_dx(s% i_lum,1)
             new_lum_surf = old_lum_surf + dlum_surf
             if (new_lum_surf < 0d0 .and. old_lum_surf > 0d0) then
                correction_factor = min(correction_factor, &
@@ -760,9 +697,9 @@
             do k=1,nz
                do j=1,species
                   i = j + s% nvar_hydro
-                  old_xa = s% xa_start(j,k) + dx(i,k)
+                  old_xa = s% xa_start(j,k) + s% solver_dx(i,k)
                   if (old_xa <= 1d-90) cycle
-                  dxa = B(i,k)*xscale(i,k)*correction_factor
+                  dxa = B(i,k)*s% x_scale(i,k)*correction_factor
                   new_xa = old_xa + dxa
                   if (new_xa >= 0d0) cycle
                   alpha = -(old_xa + eps)/dxa
@@ -782,10 +719,25 @@
          if (s% trace_solver_damping .and. min_alpha < 1d0 .and. bad_j > 0) then
             write(*,4) 'solver damping to avoid negative mass fractions: ' // &
                trim(chem_isos% name(s% chem_id(bad_j))), bad_k, &
-               s% model_number, iter, min_alpha
+               s% model_number, s% solver_iter, min_alpha
          end if
          
          contains
+         
+         subroutine clip_so_non_negative(i,minval)
+            integer, intent(in) :: i
+            real(dp), intent(in) :: minval
+            real(dp) :: dval, old_val, new_val
+            do k = 1, s% nz
+               dval = B(i,k)*s% x_scale(i,k)*correction_factor
+               old_val = s% xh_start(i,k) + s% solver_dx(i,k)
+               new_val = old_val + dval
+               if (dval >= 0) cycle
+               if (new_val >= 0d0) cycle
+               dval = minval - old_val
+               B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
+            end do
+         end subroutine clip_so_non_negative
             
          subroutine clip1(i, clip)
             integer, intent(in) :: i
@@ -795,13 +747,13 @@
             include 'formats'
             if (clip <= 0d0) return
             do k = 1, s% nz
-               old_x = s% xh_start(i,k) + dx(i,k) ! value before this iteration
-               delta = B(i,k)*xscale(i,k)*correction_factor ! change for this iter
+               old_x = s% xh_start(i,k) + s% solver_dx(i,k) ! value before this iteration
+               delta = B(i,k)*s% x_scale(i,k)*correction_factor ! change for this iter
                ! skip if change small enough or if too big to change
                if (abs(delta) <= clip*abs(old_x) .or. is_bad(delta) .or. &
                    abs(old_x) < 1d0 .or. abs(delta) > 10d0*clip*abs(old_x)) cycle
                abs_delta = clip*abs(old_x)
-               abs_B = abs_delta/(xscale(i,k)*correction_factor)
+               abs_B = abs_delta/(s% x_scale(i,k)*correction_factor)
                B(i,k) = sign(abs_B,B(i,k))
                write(*,2) 'clip change ' // trim(s% nameofvar(i)), k, delta, old_x
                !stop 'Bdomain'
@@ -811,26 +763,24 @@
       end subroutine Bdomain
 
 
-      subroutine inspectB(s, iter, nvar, nz, dx, B, xscale, ierr)
-         integer, intent(in) :: iter, nvar, nz
+      subroutine inspectB(s, nvar, B, ierr)
          type (star_info), pointer :: s
-         real(dp), pointer, dimension(:,:) :: dx, B, xscale ! (nvar, nz)
+         integer, intent(in) :: nvar
+         real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          integer, intent(out) :: ierr
 
          integer :: id
          integer, parameter :: inspectB_iter_stop = -1
          include 'formats'
 
-         if (dbg) write(*, *) 'inspectB', iter
+         if (dbg) write(*, *) 'inspectB', s% solver_iter
          ierr = 0
-         if (iter == inspectB_iter_stop) then
+         if (s% solver_iter == inspectB_iter_stop) then
             call dumpB
             stop 'debug: inspectB'
          end if
 
-
          contains
-
 
          subroutine dumpB
             integer :: k, j, k0, k1
@@ -838,8 +788,8 @@
             do k=1,s% nz
                do j=1,nvar
                   write(*,2) 'B ' // trim(s% nameofvar(j)), k, B(j, k)
-                  write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, xscale(j, k)
-                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, dx(j, k)
+                  write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, s% x_scale(j, k)
+                  write(*,2) 'dx ' // trim(s% nameofvar(j)), k, s% solver_dx(j, k)
                end do
                write(*,*)
             end do

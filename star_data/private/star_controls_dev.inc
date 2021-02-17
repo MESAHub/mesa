@@ -1,10 +1,12 @@
       
-         real(dp) :: Eturb_Lsurf_factor
-         real(dp) :: Eturb_alfa
-         real(dp) :: Eturb_alfap
-         real(dp) :: Eturb_alfat
-         real(dp) :: Eturb_alfam
-         real(dp) :: Eturb_alfar
+         real(dp) :: TDC_Lsurf_factor
+         real(dp) :: TDC_alfa
+         real(dp) :: TDC_alfap
+         real(dp) :: TDC_alfat
+         real(dp) :: TDC_alfam
+         real(dp) :: TDC_alfar
+         
+         
          real(dp) :: accretion_entropy_at_surface
          
          real(dp) :: D_mix_zero_region_bottom_q, D_mix_zero_region_top_q, &
