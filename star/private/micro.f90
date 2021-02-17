@@ -450,7 +450,7 @@ contains
     s% gamma3(k) = res(i_gamma3)
     s% eta(k) = res(i_eta)
     s% gam(k) = s% z53bar(k)*qe*qe * &
-         pow((4d0/3d0)*pi*avo*rho*s% zbar(k)/s% abar(k),one_third) / (kerg*T)
+         pow(four_thirds_pi*avo*rho*s% zbar(k)/s% abar(k),one_third) / (kerg*T)
     s% mu(k) = res(i_mu)
     s% lnfree_e(k) = res(i_lnfree_e)
 

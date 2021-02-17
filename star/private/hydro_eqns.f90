@@ -610,8 +610,8 @@
          else
             rp13 = s% R_center*s% R_center*s% R_center
          end if
-         ! dm = (pi4/3)*(r(k)**3 - rp13)*rho
-         ! r(k)**3 = rp13 + (dm/rho)/(pi4/3) = rp13 + dr3
+         ! dm = four_thirds_pi*(r(k)**3 - rp13)*rho
+         ! r(k)**3 = rp13 + (dm/rho)/four_thirds_pi = rp13 + dr3
          res = log(rp13 + dr3)
          s% equ(i_dlnd_dt, k) = s% lnR(k) - res/3d0
 
@@ -683,7 +683,7 @@
             sigmid_00 = 0d0
          else
             rc = 0.5d0*(s% r_start(k) + s% r_start(k+1))
-            f = 4d0*pi*rc*rc*s% rho_start(k) ! gm/cm
+            f = pi4*rc*rc*s% rho_start(k) ! gm/cm
             sigmid_00 = min(D*f*f, siglimit*dt)/s% dm(k) ! gm/s
          end if
 
@@ -691,7 +691,7 @@
             sigmid_m1 = 0d0
          else
             rc = 0.5d0*(s% r_start(k-1) + s% r_start(k))
-            f = 4d0*pi*rc*rc*s% rho_start(k-1)
+            f = pi4*rc*rc*s% rho_start(k-1)
             sigmid_m1 = min(D*f*f, siglimit*dt)/s% dm(k-1) ! gm/s
          end if
          
@@ -1168,7 +1168,7 @@
          scale = s% energy_start(k)*s% rho_start(k)
          dm_bar = s% dm_bar(k)
          L = s% L(k)
-         area = 4d0*pi*s% r(k)*s% r(k); area2 = area*area
+         area = pi4*s% r(k)*s% r(k); area2 = area*area
 
          ! set Lrad partials for usual case; revise below if necessary.
          d_Lrad_dL = 1d0

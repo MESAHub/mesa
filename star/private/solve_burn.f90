@@ -514,7 +514,7 @@
             k = i + kmin - 1
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             kap_face = alfa*s% opacity(k) + (1d0-alfa)*s% opacity(k-1)
-            area = 4d0*pi*s% r(k)*s% r(k)
+            area = pi4*s% r(k)*s% r(k)
             sig(i) = area*area*clight/(3d0*kap_face*s% dm_bar(k))
             T = s% T(k)
             erad_start(i) = crad_qp*T*T*T*T ! erad(k)

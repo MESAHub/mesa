@@ -336,14 +336,14 @@
             rp1 = exp(s% xh(s% i_lnR,k+1))
          end if
          rp13 = rp1*rp1*rp1
-         r_in = pow(0.5*(r003 + rp13),1d0/3d0)
+         r_in = pow(0.5*(r003 + rp13),one_third)
 
          if (k == 1) then
             r_out = r00
          else
             rm1 = exp(s% xh(s% i_lnR,k-1))
             rm13 = rm1*rm1*rm1
-            r_out = pow(0.5*(r003 + rm13),1d0/3d0)
+            r_out = pow(0.5*(r003 + rm13),one_third)
          end if
 
          call eval_i_rot(s,k,r_in,r00,r_out,0d0,&
@@ -450,7 +450,7 @@
             k = nz
             D = am_nu_E00
             r = 0.5d0*s% r(k)
-            s1 = 4*pi*r*r*s% rho(k)
+            s1 = pi4*r*r*s% rho(k)
             am_sig(k) = s1*s1*D/s% dm(k)
             nz2 = nz-1
          end if
@@ -460,7 +460,7 @@
             ! Meynet, Maeder, & Mowlavi, A&A 416, 1023-1036, 2004, eqn 51 with f = 1/2.
             D = 2*(am_nu_E00*am_nu_Ep1)/max(1d-99, am_nu_E00 + am_nu_Ep1)
             r = 0.5d0*(s% r(k) + s% r(k+1)) ! consistent with f = 1/2
-            s1 = 4*pi*r*r*s% rho(k)
+            s1 = pi4*r*r*s% rho(k)
             am_sig(k) = s1*s1*D/s% dm(k)
          end do
 

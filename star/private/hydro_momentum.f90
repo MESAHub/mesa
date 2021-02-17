@@ -280,6 +280,7 @@
             type(auto_diff_real_18var_order1) :: v_p1, v_00, v_m1, dvdt_diffusion, &
                f, rho_00, rho_m1, dvdt_kick
             real(dp) :: sigm1, sig00
+            ierr = 0
             RTI_terms_18 = 0d0
             if (.not. s% RTI_flag) return
             if (k >= s% nz .or. k <= 1) return

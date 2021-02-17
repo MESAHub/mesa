@@ -1170,7 +1170,7 @@
             T_surf = s% T_start(1)
             lnT_surf = log(T_surf)
             T_surf4 = T_surf*T_surf*T_surf*T_surf
-            Teff = pow(4._dp/3._dp*T_surf4/(tau_surf + 2._dp/3._dp), 0.25_dp)
+            Teff = pow(four_thirds*T_surf4/(tau_surf + two_thirds), 0.25_dp)
 
             if (.not. skip_partials) then
                dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
@@ -1199,7 +1199,7 @@
 
                Teff = s% atm_fixed_Teff
                Teff4 = Teff*Teff*Teff*Teff
-               T_surf = pow(3._dp/4._dp*Teff4*(tau_surf + 2._dp/3._dp), 0.25_dp)
+               T_surf = pow(0.75_dp*Teff4*(tau_surf + two_thirds), 0.25_dp)
                lnT_surf = log(T_surf)
                lnP_surf = Radiation_Pressure(T_surf)
 
@@ -1217,7 +1217,7 @@
                T_surf = s% atm_fixed_Tsurf
                lnT_surf = log(T_surf)
                T_surf4 = T_surf*T_surf*T_surf*T_surf
-               Teff = pow(4._dp/3._dp*T_surf4/(tau_surf + 2._dp/3._dp), 0.25_dp)
+               Teff = pow(four_thirds*T_surf4/(tau_surf + two_thirds), 0.25_dp)
                lnP_surf = Radiation_Pressure(T_surf)
 
                if (.not. skip_partials) then
@@ -1251,13 +1251,13 @@
                   endif
                   Teff = s% T(1)
                else
-                  Teff = pow(L_surf/(4._dp*pi*R_surf*R_surf*boltz_sigma), 0.25_dp)
-                  T_surf4 = 3d0/4d0*pow(Teff, 4.d0)*(tau_surf + 2._dp/3._dp)
+                  Teff = pow(L_surf/(pi4*R_surf*R_surf*boltz_sigma), 0.25_dp)
+                  T_surf4 = 0.75_dp*pow4(Teff)*(tau_surf + two_thirds)
                   T_surf = pow(T_surf4, 0.25_dp)
                   lnT_surf = log(T_surf)
                   if (.not. skip_partials) then
                      dlnT_dlnR = -0.5_dp
-                     dlnT_dL = 1._dp/(4._dp*L_surf)
+                     dlnT_dL = 0.25_dp/L_surf
                   endif
                end if
 
@@ -1272,7 +1272,7 @@
                T_surf = s% atm_fixed_Tsurf
                lnT_surf = log(T_surf)
                T_surf4 = T_surf*T_surf*T_surf*T_surf
-               Teff = pow(4d0/3d0*T_surf4/(tau_surf + 2d0/3d0), 0.25d0)
+               Teff = pow(four_thirds*T_surf4/(tau_surf + two_thirds), 0.25d0)
 
                if (.not. skip_partials) then
                   dlnT_dL = 0; dlnT_dlnR = 0; dlnT_dlnM = 0; dlnT_dlnkap = 0

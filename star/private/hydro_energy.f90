@@ -588,7 +588,7 @@
          if (k > s% nz .or. (s% dt <= 0d0 .and. .not. (s% v_flag .or. s% u_flag))) then
             work_18 = 0d0
             if (k == s% nz+1) then
-               work = 4*pi*s% r_center*s% r_center*s% P_start(s% nz)*s% v_center
+               work = pi4*s% r_center*s% r_center*s% P_start(s% nz)*s% v_center
                s% work_inward_at_center = work
             end if
             work_18%val = work
@@ -596,7 +596,6 @@
             d_work_dxam1 = 0d0
             return    
          end if
-
          if (k > 1) then         
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
          else

@@ -294,7 +294,7 @@
             rL = rR
             rR = exp(s% xh(i_lnR,k))
             dm = s% dm(k)
-            dV = 4d0*pi/3d0*(rR*rR*rR - rL*rL*rL)
+            dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
             rho = dm/dV
             if (rho <= 0d0) then
                write(*,3) 'set_rho_to_dm_div_dV: rho <= 0', &
@@ -528,7 +528,7 @@
          ierr = 0
          k = 1
          kap = s% opacity(1)
-         get_dtau1 = s% dm(1)*kap/(4*pi*s% rmid(1)*s% rmid(1))
+         get_dtau1 = s% dm(1)*kap/(pi4*s% rmid(1)*s% rmid(1))
          if (is_bad(get_dtau1)) then
             ierr = -1
             if (.not. s% report_ierr) return
@@ -573,7 +573,7 @@
             end if
             if (s% tau_start(k) < 0) s% tau_start(k) = s% tau(k)
             kap = s% opacity(k)
-            dtau = s% dm(k)*kap/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))
             if (is_bad(dtau)) then
                ierr = -1
                if (.not. s% report_ierr) return
@@ -717,7 +717,7 @@
             else
                rp13 = s% R_center*s% R_center*s% R_center
             end if
-            rmid = pow(0.5d0*(r003 + rp13),1d0/3d0)
+            rmid = pow(0.5d0*(r003 + rp13),one_third)
             s% rmid(k) = rmid
             if (s% rmid_start(k) < 0) s% rmid_start(k) = s% rmid(k)
             rmid2 = rmid*rmid
@@ -756,7 +756,7 @@
                   (tau_00*(s% r(k-1)-r) + tau_m1*(r-s% r(k)))/(s% r(k-1)-s% r(k))
                return
             end if
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          end do
       end function get_tau_at_r
 
@@ -778,7 +778,7 @@
          tau_phot = s% tau_base
          tau00 = s% tau_factor*s% tau_base
          do k = 1, s% nz
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
             if (taup1 >= tau_phot) then
                find_tau_phot = k
@@ -832,7 +832,7 @@
          tau00 = s% tau_factor*s% tau_base
          if (tau00 >= tau_phot) return
          do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
             ysum = ysum + s% rho(k)*(s% r(k) - s% r(k+1))
             if (taup1 >= tau_phot .and. dtau > 0d0) then
@@ -846,7 +846,7 @@
                r003 = s% r(k)*s% r(k)*s% r(k)
                rp13 = s% r(k+1)*s% r(k+1)*s% r(k+1)
                r3 = r003 + (rp13 - r003)*(tau_phot - tau00)/dtau
-               r = pow(r3,1d0/3d0)
+               r = pow(r3,one_third)
                m = s% m(k) - s% dm(k)*(tau_phot - tau00)/dtau
                if (s% u_flag) then
                   v = s% v_center
@@ -889,7 +889,7 @@
          tau00 = s% tau_factor*s% tau_base
          if (tau00 >= tau_phot) return
          do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
             if (taup1 >= tau_phot .and. dtau > 0d0) then
                get_phot_kap = s% opacity(k)
@@ -1194,7 +1194,7 @@
             CMImean = CMImean + AY(IX)*ACMI(IX)
          end do
 
-         RS=pow(0.75d0/PI/s% rho(k),1d0/3d0)
+         RS=pow(0.75d0/PI/s% rho(k),one_third)
          RSI=RS*CMImean*Z73*AUM
          
          if (is_bad(RSI)) then
@@ -1522,14 +1522,14 @@
          dtau = dtau1
          tau = s% tau_factor*s% tau_base
          dqsum = s% dq(1)
-         Ledd_sum = s% dq(1)*4*pi*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(1)
+         Ledd_sum = s% dq(1)*pi4*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(1)
          do k = 2, s% nz
             tau = tau + dtau
             if (tau > s% surf_avg_tau) exit
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             dqsum = dqsum + s% dq(k)
             Ledd_sum = Ledd_sum + &
-               s% dq(k)*4*pi*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(k)
+               s% dq(k)*pi4*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(k)
          end do
          eval_Ledd = Ledd_sum/dqsum
       end function eval_Ledd
@@ -1591,7 +1591,7 @@
          real(dp) :: irradiation_dq, xq, eps
          eval_irradiation_heat = 0
          if (s% irradiation_flux /= 0) then
-            irradiation_dq = 4*pi*s% r(1)*s% r(1)*s% column_depth_for_irradiation/s% xmstar
+            irradiation_dq = pi4*s% r(1)*s% r(1)*s% column_depth_for_irradiation/s% xmstar
             xq = 1 - s% q(k)
             if (irradiation_dq > xq) then ! add irradiation heat for cell k
                eps = 0.25d0 * s% irradiation_flux / s% column_depth_for_irradiation
@@ -1833,7 +1833,7 @@
             v = s% r(1)*s% dlnR_dt(1)
          end if
          r = s% rmid(k)
-         get_Ladv = 4*pi*r*r*v*Erad
+         get_Ladv = pi4*r*r*v*Erad
       end function get_Ladv
 
 
@@ -1853,7 +1853,7 @@
          end if
          del_m = s% dm_bar(j)
          del_T4 = pow4(s% T(j-1)) - pow4(s% T(j))
-         area = 4*pi*s% r(j)*s% r(j)
+         area = pi4*s% r(j)*s% r(j)
          L_rad_div_Ledd = &
             -(area*area*crad*(del_T4/del_m)/3)/(pi4*s% cgrav(j)*s% m_grav(j))
       end function get_Lrad_div_Ledd
@@ -2476,12 +2476,12 @@
             else
                rp13 = s% R_center*s% R_center*s% R_center
             end if
-            rmid = pow(0.5d0*(r003 + rp13),1d0/3d0)
+            rmid = pow(0.5d0*(r003 + rp13),one_third)
          else
            rmid = s% rmid(k)
          end if
 
-         Ledd = 4*pi*clight*s% cgrav(k)*s% m_grav(k)/s% opacity(k)
+         Ledd = pi4*clight*s% cgrav(k)*s% m_grav(k)/s% opacity(k)
          Lrad_div_Ledd = get_Lrad_div_Ledd(s,k)
          gamma_factor = 1d0 - min(Lrad_div_Ledd, 0.9999d0)
          omega_crit = sqrt(gamma_factor*s% cgrav(k)*s% m_grav(k)/pow3(rmid))
@@ -2535,7 +2535,7 @@
             Lmid = 0.5d0*(s% L(k) + s% L(k+1))
             cgrav = 0.5d0*(s% cgrav(k) + s% cgrav(k+1))
             dm = s% dm(k)
-            dtau = dm*kap/(4*pi*rmid*rmid)
+            dtau = dm*kap/(pi4*rmid*rmid)
 
             if (tau + dtau <= s% surf_avg_tau_min) then
                tau = tau + dtau
@@ -2587,7 +2587,7 @@
               rmid = s% rmid(k)
             end if
             dm = s% dm(k)
-            dtau = dm*kap/(4*pi*rmid*rmid)
+            dtau = dm*kap/(pi4*rmid*rmid)
 
             if (tau + dtau <= s% surf_avg_tau_min) then
                tau = tau + dtau
@@ -3678,7 +3678,7 @@
             u_face = 0d0
             P_face = 0d0
          end if
-         AvP00 = 4d0*pi*s% r(k)*s% r(k)*u_face*P_face
+         AvP00 = pi4*s% r(k)*s% r(k)*u_face*P_face
 
          if (k == nz) then
             AvPp1 = 0d0
@@ -3695,7 +3695,7 @@
                u_face = 0d0
                P_face = 0d0
             end if
-            AvPp1 = 4d0*pi*s% r(k+1)*s% r(k+1)*u_face*P_face
+            AvPp1 = pi4*s% r(k+1)*s% r(k+1)*u_face*P_face
          end if
          d_AvP_dm = (AvP00 - AvPp1)/dm
 

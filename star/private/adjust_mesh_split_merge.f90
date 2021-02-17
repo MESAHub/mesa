@@ -102,7 +102,7 @@
          MaxTooBig = s% split_merge_amr_MaxLong
          k = nz_old
          tau_center = s% tau(k) + &
-            s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
             if (mod(iter,2) == 0) then
@@ -852,8 +852,8 @@
          dr_old = dr
          rC = 0.5d0*(rR + rL) ! split at center by radius
 
-         dV = 4d0*pi/3d0*(rR*rR*rR - rL*rL*rL)
-         dVR = 4d0*pi/3d0*(rR*rR*rR - rC*rC*rC)
+         dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
+         dVR = four_thirds_pi*(rR*rR*rR - rC*rC*rC)
          dVL = dV - dVR
 
          dm = s% dm(i)
@@ -1295,9 +1295,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          if (k == s% nz) then
-            get_dV = 4*pi/3*(s% r(k)*s% r(k)*s% r(k) - s% R_center*s% R_center*s% R_center)
+            get_dV = four_thirds_pi*(s% r(k)*s% r(k)*s% r(k) - s% R_center*s% R_center*s% R_center)
          else
-            get_dV = 4*pi/3*(s% r(k)*s% r(k)*s% r(k) - s% r(k+1)*s% r(k+1)*s% r(k+1))
+            get_dV = four_thirds_pi*(s% r(k)*s% r(k)*s% r(k) - s% r(k+1)*s% r(k+1)*s% r(k+1))
          end if
       end function get_dV
 

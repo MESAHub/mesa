@@ -562,7 +562,7 @@
                dlnPdm(k) = 0; dlnT_dm(k) = 0; return
             end if
             grav = -s% cgrav(k)*s% m(k)/s% r(k)**2
-            area = 4d0*pi*s% r(k)**2
+            area = pi4*s% r(k)**2
             P_face = 0.5d0*(s% P(k) + s% P(k-1))
             dlnPdm(k) = grav/(area*P_face) ! estimate based on QHSE
             dlnT_dm(k) = s% gradT(k)*dlnPdm(k)

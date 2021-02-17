@@ -574,7 +574,7 @@
             case (p_logdq)
                val = safe_log10(s% dq(k))
             case (p_log_column_depth)
-               val = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(4*pi*s% r(k)*s% r(k)))
+               val = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
             case (p_log_radial_depth)
                val = safe_log10(s% r(1) - s% r(k))
 
@@ -845,7 +845,7 @@
                end if
             case (p_logT_bb)
                val = safe_log10( &
-                        pow(s% L(k)/(4*pi*s% r(k)*s% r(k)*boltz_sigma), 0.25d0))
+                        pow(s% L(k)/(pi4*s% r(k)*s% r(k)*boltz_sigma), 0.25d0))
             case (p_logT_face_div_logT_bb)
                if (k == 1) then
                   val = safe_log10(s% Teff)
@@ -854,7 +854,7 @@
                          s% dq(k)*s% lnT(k-1))/(s% dq(k-1) + s% dq(k))/ln10
                end if
                val = val / safe_log10( &
-                        pow(s% L(k)/(4*pi*s% r(k)*s% r(k)*boltz_sigma), 0.25d0))
+                        pow(s% L(k)/(pi4*s% r(k)*s% r(k)*boltz_sigma), 0.25d0))
 
             case (p_density)
                val = s% rho(k)
@@ -1083,12 +1083,12 @@
                if (s% v_flag) then
                   if (k == s% nz) then
                      vp1 = s% V_center
-                     Ap1 = 4*pi*s% R_center*s% R_center
+                     Ap1 = pi4*s% R_center*s% R_center
                   else
                      vp1 = s% v(k+1)
-                     Ap1 = 4*pi*s% r(k+1)*s% r(k+1)
+                     Ap1 = pi4*s% r(k+1)*s% r(k+1)
                   end if
-                  val = (4*pi*s% r(k)*s% r(k)*s% v(k) - Ap1*vp1)*s% rho(k)/s% dm(k)
+                  val = (pi4*s% r(k)*s% r(k)*s% v(k) - Ap1*vp1)*s% rho(k)/s% dm(k)
                end if
 
             case (p_d_v_div_r_dm)
@@ -1119,7 +1119,7 @@
                   v00 = s% v(k)
                   r00 = s% r(k)
                   if (rp1 > 0) then
-                     val = 4*pi*s% rmid(k)*s% rmid(k)*s% rho(k)* &
+                     val = pi4*s% rmid(k)*s% rmid(k)*s% rho(k)* &
                            (v00/r00 - vp1/rp1)/s% dm(k)
                   end if
                end if
@@ -1145,15 +1145,15 @@
 
             case (p_hse_ratio)
                if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0) then
-                  val = (s% P(k-1) - s% P(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*pow4(s% r(k)))) - 1d0
+                  val = (s% P(k-1) - s% P(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(pi4*pow4(s% r(k)))) - 1d0
                end if
             case (p_hse_ratio_gyre)
                if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0) then
                   Pbar_00 = (s% P(k-1)*s% dm(k) + s% P(k)*s% dm(k-1))/(s% dm(k) + s% dm(k-1))
                   Pbar_p1 = (s% P(k)*s% dm(k+1) + s% P(k+1)*s% dm(k))/(s% dm(k+1) + s% dm(k))
                   val = (Pbar_00 - Pbar_p1)/(-0.5d0*s% dm(k)*( &
-                     s% cgrav(k)*s% m(k)/(4d0*pi*pow4(s% r(k))) + &
-                     s% cgrav(k+1)*s% m(k+1)/(4d0*pi*pow4(s% r(k+1))))) - 1d0
+                     s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))) + &
+                     s% cgrav(k+1)*s% m(k+1)/(pi4*pow4(s% r(k+1))))) - 1d0
                end if
 
             case (p_dPdr_div_grav)
@@ -1162,7 +1162,7 @@
                end if
 
             case (p_gradP_div_rho)
-               if (k > 1) val = 4*pi*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
+               if (k > 1) val = pi4*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
             case (p_dlnP_dlnR)
                if (k > 1) val = log(s% P_face_18(k-1)%val/s% P_face_18(k)%val) / (s% lnR(k-1) - s% lnR(k))
             case (p_dlnRho_dlnR)
@@ -1171,7 +1171,7 @@
             case (p_dvdt_grav)
                val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
             case (p_dvdt_dPdm)
-               if (k > 1) val = -4*pi*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
+               if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
 
             case (p_dm_eps_grav)
                val = s% eps_grav(k)*s% dm(k)
@@ -1185,7 +1185,7 @@
 
             case (p_env_eps_grav)
                val = -s% gradT_sub_grada(k)*s% grav(k)*s% mstar_dot*s% Cp(k)*s% T(k) / &
-                        (4*pi*s% r(k)*s% r(k)*s% P(k))
+                        (pi4*s% r(k)*s% r(k)*s% P(k))
 
             case (p_mlt_mixing_type)
                int_val = s% mlt_mixing_type(k)
@@ -1711,7 +1711,7 @@
                r00_start = s% r_start(k)
                dr3 = r00*r00*r00 - rp1*rp1*rp1
                dr3_start = r00_start*r00_start*r00_start - rp1_start*rp1_start*rp1_start
-               val = 4d0/3d0*pi*(dr3 - dr3_start)
+               val = four_thirds_pi*(dr3 - dr3_start)
             case (p_delta_entropy)
                val = s% entropy(k) - exp(s% lnS_start(k))/(avo*kerg)
             case (p_delta_T)
@@ -2020,9 +2020,9 @@
                   end if
                end if               
             case(p_rsp_Lr)
-               if (s% rsp_flag) val = s% Fr(k)*4d0*pi*s% r(k)*s% r(k)
+               if (s% rsp_flag) val = s% Fr(k)*pi4*s% r(k)*s% r(k)
             case(p_rsp_Lr_div_L)
-               if (s% rsp_flag) val = s% Fr(k)*4d0*pi*s% r(k)*s% r(k)/s% L(k)
+               if (s% rsp_flag) val = s% Fr(k)*pi4*s% r(k)*s% r(k)/s% L(k)
             case(p_rsp_Lc)
                if (s% rsp_flag) then
                   val = s% Lc(k)
@@ -2236,12 +2236,12 @@
             case (p_cs_at_cell_bdy)
                val = s% csound_face(k)
             case (p_log_mdot_cs) ! log10(4 Pi r^2 csound rho / (Msun/year))
-               val = safe_log10(4*pi*s% r(k)*s% r(k)*s% csound(k)*s% rho(k)/(Msun/secyer))
+               val = safe_log10(pi4*s% r(k)*s% r(k)*s% csound(k)*s% rho(k)/(Msun/secyer))
             case (p_log_mdot_v) ! log10(4 Pi r^2 v rho / (Msun/year))
                if (s% u_flag) then
                   val = safe_log10(4*pi*s% r(k)*s% r(k)*s% u_face_18(k)%val*s% rho(k)/(Msun/secyer))
                else if (s% v_flag) then
-                  val = safe_log10(4*pi*s% r(k)*s% r(k)*s% v(k)*s% rho(k)/(Msun/secyer))
+                  val = safe_log10(pi4*s% r(k)*s% r(k)*s% v(k)*s% rho(k)/(Msun/secyer))
                end if
             case (p_log_L_div_CpTMdot)
                if (s% star_mdot == 0) then
@@ -2319,7 +2319,7 @@
                j = k
             end if
             rho_face = interp_val_to_pt(s% rho,j,nz,s% dq,'profile get_L_vel')
-            v = pow(max(1d0,s% L(k))/(4*pi*s% r(k)*s% r(k)*rho_face),1d0/3d0)
+            v = pow(max(1d0,s% L(k))/(pi4*s% r(k)*s% r(k)*rho_face),one_third)
          end function get_L_vel
 
 

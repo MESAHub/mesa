@@ -114,7 +114,7 @@
          do k = 2, nz
             rho_face = (s% dq(k-1)*s% rho(k) + s% dq(k)*s% rho(k-1))/&
                            (s% dq(k-1) + s% dq(k))
-            f = 4d0*pi*s% r(k)*s% r(k)*rho_face
+            f = pi4*s% r(k)*s% r(k)*rho_face
             cdc_factor(k) = f*f
          end do
          
@@ -1039,7 +1039,7 @@
             if (s% cdc(k) == 0) then
                if (s% cdc(k-1) /= 0 .and. s% cdc(k+1) /= 0) then
                   s% cdc(k) = (s% cdc(k-1) + s% cdc(k+1))/2
-                  s% D_mix(k) = s% cdc(k)/pow2(4*pi*s% r(k)*s% r(k)*s% rho(k))
+                  s% D_mix(k) = s% cdc(k)/pow2(pi4*s% r(k)*s% r(k)*s% rho(k))
                   lambda = s% alpha_mlt(k)* &
                      (s% scale_height(k-1) + s% scale_height(k+1))/2
                   if (.not. s% conv_vel_flag) then
@@ -1437,7 +1437,7 @@
             end if
             rho_face = (s% dq(k-1)*s% rho(k) + s% dq(k)*s% rho(k-1))/ &
                         (s% dq(k-1) + s% dq(k))
-            f1 = 4*pi*s% r(k)*s% r(k)*rho_face
+            f1 = pi4*s% r(k)*s% r(k)*rho_face
             f = f1*f1
             cdc = D*f
             cdcterm = s% mix_factor*cdc
@@ -2136,7 +2136,7 @@
                sig(k) = 0d0
                cycle
             end if
-            f1 = 4*pi*r(k)*r(k)*rho(k)
+            f1 = pi4*r(k)*r(k)*rho(k)
             f = f1*f1
             cdcterm = s% mix_factor*D*f
             sig(k) = cdcterm/dm_bar(k)
@@ -2211,7 +2211,7 @@
             else
                !dr_00 = s% r(k) - s% r(k+1)
                rmid = 0.5d0*(s% r(k) + s% r(k+1))
-               dr_00 = s% dm(k)/(4d0*pi*rmid*rmid*s% rho(k)) ! don't subtract r's to get dr
+               dr_00 = s% dm(k)/(pi4*rmid*rmid*s% rho(k)) ! don't subtract r's to get dr
                dPdr(k) = (P_face(k) - P_face(k+1))/dr_00
                drhodr(k) = (rho_face(k) - rho_face(k+1))/dr_00
             end if

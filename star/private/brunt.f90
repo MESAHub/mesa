@@ -296,7 +296,7 @@
          if (delta_lnP > -1d-50) then
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*s% P(k) + (1-alfa)*s% P(k-1)
-            dlnP_dm = -s% cgrav(k)*s% m(k)/(4*pi*pow4(s% r(k))*Ppoint)
+            dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))*Ppoint)
             delta_lnP = dlnP_dm*s% dm_bar(k)
          end if
 

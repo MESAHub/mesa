@@ -565,7 +565,7 @@
                      if (ii == 10) exit
                      dm = -pi4*pow4(rmid)*(P-P0)/(cgrav*mmid)
                      m = m0 + dm ! mass at point k
-                     r = pow(r0*r0*r0 + dm/((4*pi/3)*rho_mid),one_third)
+                     r = pow(r0*r0*r0 + dm/(four_thirds_pi*rho_mid),one_third)
                      if (dbg) write(*,2) 'r', ii, r, m, dm
                   end do
                   

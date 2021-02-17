@@ -64,6 +64,11 @@ something like
 It is essential to make use of ``test_suite_helpers`` as this ensures
 that important information is produced in a TestHub-friendly format.
 
+A test case must not write to stderr.  The presence of output on
+stderr will cause the test to be classified as a failure.  This
+restriction catches ``stop`` statements, calls to ``mesa_error``, or
+other error conditions.
+
 A good test should run relatively quickly.  Costly parts can be
 skipped over using a saved model and only run when
 ``MESA_RUN_OPTIONAL`` is set.

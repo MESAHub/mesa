@@ -24,8 +24,11 @@ instead of
     x**1.5d0
 
 Use ``powN(x)`` to raise ``x`` to an integer power ``N``.
-You should *always* use these for integer powers greater than 2.
-``**2`` has so far not been a problem and is tolerated.
+For ``real`` types you should *always* use these for integer powers greater than 2.
+``**2`` has so far not been a problem and is tolerated though not recommended.
+For ``auto_diff`` types you *must* use ``powN`` for integer powers *including* 2.
+Doing otherwise will result in a compiler error.
+
 
 Errors
 ------
@@ -55,17 +58,17 @@ When signalling a critical error which can not be recovered from you should use:
 
 .. code-block:: fortran
 
-    use utils_lib, only mesa_error
+    use utils_lib, only: mesa_error
 
     call mesa_error(__FILE__,__LINE__)
 
 Which will generate a backtrace where the error occurs, which aids in debugging. The 
-subroutine mesa_error can also have a optional error message:
+subroutine ``mesa_error`` can also have a optional error message:
 
 
 .. code-block:: fortran
 
-    use utils_lib, only mesa_error
+    use utils_lib, only: mesa_error
 
     call mesa_error(__FILE__,__LINE__,"An error occurred")
 
@@ -94,23 +97,22 @@ instead of
 
     double precision :: x
 
-
 When using a numerical value in an expression you must make sure it is evaluated as a double.
 Thus use:
 
 .. code-block:: fortran
 
-    y1 = 1.5d0 * x
+    y1 = 1.1d0 * x
     ! or
-    y2 = 1.5_dp * x
+    y2 = 1.1_dp * x
 
 Do not leave values as a bare float:
 
 .. code-block:: fortran
 
-    y3 = 1.5 * x
+    y3 = 1.1 * x
 
-As the ``1.5`` gets interpreted as a single precision value, and will lead ``y3`` to have a different value 
+As the ``1.1`` gets interpreted as a single precision value, and will lead ``y3`` to have a different value 
 to ``y1`` or ``y2``.
 
 
@@ -123,6 +125,8 @@ They can also be given a name:
 .. code-block:: fortran
 
     !$omp critical my_block
+
+and this name should differ from any other code entities (e.g. subroutines).
 
 Each named critical block will be executed by one thread at a time. Different named critical blocks can be executed
 at the same time. However, all unnamed critical blocks act like one block and thus can not be executed in parallel.
@@ -147,6 +151,17 @@ Unformatted statements are likely to cause unit tests to fail.  They also make i
 different compilers.
 
 Some helpful formats are provided in ``include/formats``.
+
+
+Constants
+---------
+
+The ``const`` module defines many commonly used mathematical
+(e.g. ``pi``) and physical constants (e.g. ``hbar``), which should be
+used for consistency across the code.  This includes simple fractions
+(e.g. ``one_third``) and simple functions of mathematical constants
+(e.g. ``sqrt2``, ``pi4 = 4*pi``).
+
 
 Environment variables
 ---------------------
