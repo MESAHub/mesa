@@ -73,11 +73,10 @@ master_doc = 'index'
 html_logo = 'mesa-logo-200.png'
 
 # Override theme stylesheet
-html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  # overrides for wide tables in RTD theme
-        ],
-    }
+html_css_files = [
+    'theme_overrides.css',  # overrides for wide tables in RTD theme
+]
+
 
 # standard substitutions
 rst_prolog = r"""
