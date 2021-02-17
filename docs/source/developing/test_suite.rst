@@ -158,41 +158,54 @@ the TestHub by ``mesa_test``.  The file will look similar to this:
     ---
     test_case: make_co_wd
     module: :star
-    omp_num_threads: 2
+    omp_num_threads: 36
+    run_optional: false
+    fpe_checks: false
     inlists:
         - inlist: inlist_co_core_header
-          runtime_minutes:   2.29
-          steps:    151
-          retries:      0
-          redos:      0
-          solver_calls_made:    151
-          solver_calls_failed:      0
-          solver_iterations:    846
-          log_rel_run_E_err:        -3.8240036219155993
+          runtime_minutes:   3.20
+          model_number:         1008
+          star_age:     4.3063267775397134E+08
+          num_retries:            7
+          log_rel_run_E_err:        -7.0353816429993685
+          steps:         1008
+          retries:            7
+          redos:            0
+          solver_calls_made:         1015
+          solver_calls_failed:            7
+          solver_iterations:        10280
         - inlist: inlist_remove_env_header
-          runtime_minutes:   2.08
-          steps:    438
-          retries:     18
-          redos:      0
-          solver_calls_made:    456
-          solver_calls_failed:     18
-          solver_iterations:   1361
-          log_rel_run_E_err:        -3.8220395900315363
+          runtime_minutes:   2.62
+          model_number:         1568
+          star_age:     4.3064418442484504E+08
+          num_retries:           30
+          log_rel_run_E_err:        -6.9640200618973518
+          steps:          961
+          retries:           34
+          redos:            0
+          solver_calls_made:          995
+          solver_calls_failed:           34
+          solver_iterations:         6403
         - inlist: inlist_settle_header
-          runtime_minutes:   3.55
-          steps:    161
-          retries:      0
-          redos:      0
-          solver_calls_made:    161
-          solver_calls_failed:      0
-          solver_iterations:    735
-          log_rel_run_E_err:        -7.2371589938451679
-    mem_rn: 7814204
+          runtime_minutes:   2.44
+          model_number:         1746
+          star_age:     4.3359174056506151E+08
+          num_retries:           10
+          log_rel_run_E_err:       -10.1236273392339484
+          steps:          184
+          retries:            4
+          redos:            0
+          solver_calls_made:          184
+          solver_calls_failed:            0
+          solver_iterations:         1097
+    mem_rn: 11815904
     success_type: :run_test_string
-    mem_re: 3471908
+    restart_photo: x650
+    mem_re: 4635248
     success_type: :photo_checksum
-    checksum: 48f31b30ef89bb579de45f68919d57be
+    checksum: cb6df95a221722e7317a6e53c9c61272
     outcome: :pass
+
 
 The output is collected in a variety of places.  The highest level
 information (i.e. no indent) that summarizes the test case itself
