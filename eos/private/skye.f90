@@ -224,7 +224,7 @@ module skye
          real(dp) :: ytot1, ye, norm
          type(auto_diff_real_2var_order3) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
          type(auto_diff_real_2var_order3) :: F_ion_gas, F_rad, F_ideal_ion, F_coul
-         type(auto_diff_real_2var_order3) :: pele, eele, eep, sele
+         type(auto_diff_real_2var_order3) :: F_ele
 
          ht => eos_ht
 
@@ -247,9 +247,7 @@ module skye
          F_ion_gas = 0d0
          F_ideal_ion = 0d0
          F_coul = 0d0
-         sele = 0d0
-         pele = 0d0
-         eele = 0d0
+         F_ele = 0d0
 
          ! Radiation free energy, independent of composition
          F_rad = compute_F_rad(temp, den)
@@ -288,7 +286,7 @@ module skye
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
          call compute_ideal_ele(temp%val, den%val, din%val, logtemp%val, logden%val, zbar, ytot1, ye, ht, &
-                               sele, eele, pele, etaele, xnefer, ierr)
+                               F_ele, etaele, xnefer, ierr)
 
          xnefer = compute_xne(den, ytot1, zbar)
 
@@ -304,10 +302,10 @@ module skye
                                      Skye_solid_mixing_rule, den, temp, xnefer, abar, &
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
+         write(*,*) temp%val, den%val, F_coul%d1val1, F_rad%d1val1, F_ideal_ion%d1val1, F_ele%d1val1
 
-         call  pack_for_export(F_ideal_ion, F_coul, F_rad, temp, den, xnefer, etaele, abar, zbar, &
-                                 pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
-                                 res, d_dlnd, d_dlnT)
+         call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
+                                 phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
 
       end subroutine skye_eos
 

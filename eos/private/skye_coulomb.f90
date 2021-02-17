@@ -364,14 +364,16 @@ module skye_coulomb
       screening_factor = pow2(TPT / GAMI) ! Proportional to RS_{ion}^{-1} ~ rho^{1/3}
       screening_factor = pow3(screening_factor / (1d-4 + screening_factor))
 
+      screening_factor = 0d0
+
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
-         F = F + screening_factor * ocp_liquid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
+         F = F !+ screening_factor * ocp_liquid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       else     
          F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
-         F = F + screening_factor * ocp_solid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
+         F = F !+ screening_factor * ocp_solid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       endif
 
    end function ocp_free_energy
