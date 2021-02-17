@@ -458,7 +458,7 @@
          end if
       
          r_18 = wrap_r_00(s,k)
-         A_18 = 4d0*pi*r_18**2
+         A_18 = 4d0*pi*pow2(r_18)
          
          PL_18 = wrap_p_00(s,k)
          PR_18 = wrap_p_m1(s,k)
@@ -482,7 +482,7 @@
          G_18%d1Array(i_lnR_00) = dG_dlnR
          G_18%d1Array(i_L_00) = dG_dw
          
-         dPdm_grav_18 = -G_18*s% m_grav(k)/(r_18**2*A_18)  ! cm^-1 s^-2
+         dPdm_grav_18 = -G_18*s% m_grav(k)/(pow2(r_18)*A_18)  ! cm^-1 s^-2
          
          delta_m = 0.5d0*s% dm(k) ! positive delta_m from left center to edge
          PL_18 = PL_18 + delta_m*dPdm_grav_18

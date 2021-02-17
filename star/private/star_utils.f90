@@ -3345,7 +3345,7 @@
          
          rho = wrap_d_00(s,k)
          w = wrap_w_00(s,k)
-         Pt = s% TDC_alfap*w**2*rho
+         Pt = s% TDC_alfap*pow2(w)*rho
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then

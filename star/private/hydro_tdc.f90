@@ -248,14 +248,14 @@
             v_00 = wrap_v_00(s, k)
             v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
             ! Compute areas on faces (used by L_turb)
-            area_00 = 4d0 * pi * r_00**2
-            area_p1 = 4d0 * pi * r_p1**2
+            area_00 = 4d0 * pi * pow2(r_00)
+            area_p1 = 4d0 * pi * pow2(r_p1)
             ! Compute gravity on faces (used by L_turb)
             m_00 = s% m(k)
             cgrav_00 = s% cgrav(k)
-            g_00 = m_00 * cgrav_00 / r_00**2
+            g_00 = m_00 * cgrav_00 / pow2(r_00)
             if (r_p1 > 0d0) then
-               g_p1 = (m_00 - dm_00) * cgrav_00 / r_p1**2
+               g_p1 = (m_00 - dm_00) * cgrav_00 / pow2(r_p1)
             else
                g_p1 = 0d0
             end if            
@@ -266,7 +266,7 @@
             integer, intent(out) :: ierr
             d_turbulent_energy_dt_18 = 0d0
             d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
-               (s% w_start(k)*s% dxh_w(k) + s% dxh_w(k)**2)/dt ! w = w_start + dxh_w
+               (s% w_start(k)*s% dxh_w(k) + pow2(s% dxh_w(k)))/dt ! w = w_start + dxh_w
             d_turbulent_energy_dt_18%d1Array(i_w_00) = &
                (s% w_start(k) + 2d0*s% dxh_w(k))/dt
          end subroutine setup_d_turbulent_energy_dt
@@ -442,7 +442,7 @@
          alpha = s% TDC_alfa
          alpha_m = s% TDC_alfam
 
-         w_rho2 = w_00*d_00**2
+         w_rho2 = w_00*pow2(d_00)
          r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
          if (k < s% nz) then
             d_v_div_r = v_00/r_00 - v_p1/r_p1
@@ -474,8 +474,8 @@
          else
             gammar = s% TDC_alfar
             w_00 = wrap_w_00(s,k)
-            Dr = (4d0 * boltz_sigma * gammar**2 / alpha**2) * T_00**3 * w_00**2 / &
-                  (d_00**2 * Cp_00 * kap_00 * h_00**2)
+            Dr = (4d0 * boltz_sigma * pow2(gammar) / alpha**2) * pow3(T_00) * pow2(w_00) / &
+                  (pow2(d_00) * Cp_00 * kap_00 * pow2(h_00))
          end if
          s% DAMPR(k) = Dr%val
       end function compute_Dr
@@ -573,7 +573,7 @@
                
             QQ_div_Cp = 0.5d0*(QQ_div_Cp_face_00 + QQ_div_Cp_face_p1)
 
-            Y_cell = 0.5d0*(Y1_00*r_00**2 + Y1_p1*r_p1**2)
+            Y_cell = 0.5d0*(Y1_00*pow2(r_00) + Y1_p1*pow2(r_p1))
 
             Source = alpha * Y_cell * d_00 * T_00 * P_00 * Cp_00 * QQ_div_Cp * w_00 / s% dm(k)
 
@@ -637,23 +637,23 @@
             cgrav_mid_00 = 0.5d0 * (cgrav_p1 + cgrav_00)
             rmid_00 = 0.5d0 * (r_00 + r_p1)
             mmid_00 = 0.5d0 * (m_00 + m_p1)
-            g_00 = cgrav_mid_00 * mmid_00 / rmid_00**2 ! gravity in cell k
+            g_00 = cgrav_mid_00 * mmid_00 / pow2(rmid_00) ! gravity in cell k
 
             cgrav_mid_m1 = 0.5d0 * (cgrav_00 + cgrav_m1)
             rmid_m1 = 0.5d0 * (r_m1 + r_00)
             mmid_m1 = 0.5d0 * (m_m1 + m_00)
-            g_m1 = cgrav_mid_m1 * mmid_m1 / rmid_m1**2 ! gravity in cell k-1
+            g_m1 = cgrav_mid_m1 * mmid_m1 / pow2(rmid_m1) ! gravity in cell k-1
 
             h_00 = P_00 / (d_00 * g_00) ! Scale height in cell k
             h_m1 = P_m1 / (d_m1 * g_m1) ! Scale height in cell k-1
          
             r6_00 = pow6(r_00)
-            w_rho2_00 = w_00*d_00**2
+            w_rho2_00 = w_00*pow2(d_00)
             r6_cell_00 = 0.5d0*(r6_00 + pow6(r_p1))
             d_v_div_r_00 = v_00/r_00 - v_p1/r_p1
             Chi_00 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_00*r6_cell_00*h_00*d_v_div_r_00/dm_00         
 
-            w_rho2_m1 = w_m1*d_m1**2
+            w_rho2_m1 = w_m1*pow2(d_m1)
             r6_cell_m1 = 0.5d0*(pow6(r_m1) + r6_00)
             d_v_div_r_m1 = v_m1/r_m1 - v_00/r_00
             Chi_m1 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_m1*r6_cell_m1*h_m1*d_v_div_r_m1/dm_m1         
@@ -707,7 +707,7 @@
             d_P_rad = crad/3d0*(T4m1 - T400)
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
-            Lr = -d_P_rad/dm_bar*clight*area**2/kap_face
+            Lr = -d_P_rad/dm_bar*clight*pow2(area)/kap_face
             
          end if
          
@@ -788,17 +788,17 @@
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
          
          P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-         Hp_face = P_div_rho_face*r_00**2/(cgrav*m)
+         Hp_face = P_div_rho_face*pow2(r_00)/(cgrav*m)
          QQ_div_Cp_face = 0.5d0*(QQ_m1/Cp_m1 + QQ_00/Cp_00)
          Y1 = QQ_div_Cp_face*(P_m1 - P_00) - (lnT_m1 - lnT_00)
          avg_Vol = 0.5d0*(1d0/d_00 + 1d0/d_m1)
-         area = 4d0*pi*r_00**2
+         area = 4d0*pi*pow2(r_00)
          Y2 = area*Hp_face/(avg_Vol*dm_bar)
          Y_face = Y1*Y2
          
          Cp_face = 0.5d0*(Cp_m1 + Cp_00)
          PII_face = alpha*Cp_face*Y_face
-         eturb_face = 0.5d0*(w_m1**2 + w_00**2)
+         eturb_face = 0.5d0*(pow2(w_m1) + pow2(w_00))
          T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
          Lc_eturb_face_factor = area*T_rho_face*PII_face
          Lc = Lc_eturb_face_factor*eturb_face
@@ -833,9 +833,9 @@
          else
             r_00 = wrap_r_00(s,k)
             P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-            Hp_face = P_div_rho_face*r_00**2/(s% cgrav(k)*s% m(k))
-            rho2_face = 0.5d0*(d_00**2 + d_m1**2)
-            Lt_18 = -2d0/3d0*alpha*alpha_t*area**2*Hp_face*rho2_face*&
+            Hp_face = P_div_rho_face*pow2(r_00)/(s% cgrav(k)*s% m(k))
+            rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
+            Lt_18 = -2d0/3d0*alpha*alpha_t*pow2(area)*Hp_face*rho2_face*&
                (pow(w_m1,3d0) - pow(w_00,3d0))/s% dm_bar(k)            
          end if
 
@@ -875,7 +875,7 @@
          kap_m1 = wrap_kap_m1(s, k)
          kap_00 = wrap_kap_00(s, k)
 
-         area = 4d0 * pi * r_00**2
+         area = 4d0 * pi * pow2(r_00)
 
          ! Radiative luminosity               
          Lr = compute_Lr(s, k, dm_bar, area, T_m1, T_00, kap_m1, kap_00, ierr)
@@ -889,7 +889,7 @@
             m = s% m(k)
             cgrav = s% cgrav(k)
 
-            g = m * cgrav / r_00**2
+            g = m * cgrav / pow2(r_00)
 
             r_p1 = wrap_r_p1(s, k)
 
@@ -1090,7 +1090,7 @@
          do k=2, nz
             dm_bar = s% dm_bar(k)
             r_00 = wrap_r_00(s,k)
-            area = 4d0*pi*r_00**2
+            area = 4d0*pi*pow2(r_00)
             T_m1 = wrap_T_m1(s,k)
             T_00 = wrap_T_00(s,k)
             kap_m1 = wrap_kap_m1(s,k)
