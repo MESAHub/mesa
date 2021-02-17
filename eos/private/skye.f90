@@ -302,8 +302,6 @@ module skye
                                      Skye_solid_mixing_rule, den, temp, xnefer, abar, &
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
-         write(*,*) temp%val, den%val, F_coul%d1val1, F_rad%d1val1, F_ideal_ion%d1val1, F_ele%d1val1
-
          call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
                                  phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
 
