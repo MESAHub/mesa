@@ -141,7 +141,7 @@ module skye_coulomb_solid
          real(dp), parameter :: e = 2.718281828459045
          real(dp), parameter :: aTF = 0.00352
 
-         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs
+         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp
          type(auto_diff_real_2var_order3) :: F
 
          s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
@@ -152,8 +152,9 @@ module skye_coulomb_solid
 
          rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
          xr = 0.014005d0 / rs
+         supp = exp(pow2(0.205d0 * min(100,TPT))) ! min(100,TPT) prevents overflow
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
-         Q = sqrt(log(1d0 + exp(pow2(0.205d0 * TPT)))) / sqrt(log(e - (e - 2d0) * exp(-pow2(0.205d0*TPT))))
+         Q = sqrt(log(1d0 + supp)) / sqrt(log(e - (e - 2d0) * supp))
          f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
 
          F = -f_inf * g * (1d0 + A * pow(Q / g, s))
