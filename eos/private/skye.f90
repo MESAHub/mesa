@@ -219,7 +219,7 @@ module skye
          
          integer :: relevant_species, lookup(species)
          type(auto_diff_real_2var_order3) :: temp, logtemp, den, logden, din
-         real(dp) :: AZION(species), ACMI(species), select_xa(species), ya(species)
+         real(dp) :: AZION(species), ACMI(species), A(species), select_xa(species), ya(species)
          type (Helm_Table), pointer :: ht
          real(dp) :: ytot1, ye, norm
          type(auto_diff_real_2var_order3) :: etaele, xnefer, phase, latent_ddlnT, latent_ddlnRho
@@ -260,6 +260,7 @@ module skye
                relevant_species = relevant_species + 1
                AZION(relevant_species) = chem_isos% Z(chem_id(j))
                ACMI(relevant_species) = chem_isos% W(chem_id(j))
+               A(relevant_species) = chem_isos% Z_plus_N(chem_id(j))
                select_xa(relevant_species) = xa(j)
                norm = norm + xa(j)
             end if
@@ -273,7 +274,7 @@ module skye
          ! Compute number fractions
          norm = 0d0
          do j=1,relevant_species
-            ya(j) = select_xa(j) / ACMI(j)
+            ya(j) = select_xa(j) / A(j)
             norm = norm + ya(j)
          end do
          do j=1,relevant_species
