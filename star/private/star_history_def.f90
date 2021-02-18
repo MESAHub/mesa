@@ -114,11 +114,9 @@
 
       integer, parameter :: h_h_rich_layer_mass = h_power_he_burn + 1
       integer, parameter :: h_he_rich_layer_mass = h_h_rich_layer_mass + 1
-      integer, parameter :: h_c_rich_layer_mass = h_he_rich_layer_mass + 1
-      integer, parameter :: h_o_rich_layer_mass = h_c_rich_layer_mass + 1
-      integer, parameter :: h_si_rich_layer_mass = h_o_rich_layer_mass + 1
+      integer, parameter :: h_co_rich_layer_mass = h_he_rich_layer_mass + 1
 
-      integer, parameter :: h_he_core_mass = h_si_rich_layer_mass + 1
+      integer, parameter :: h_he_core_mass = h_co_rich_layer_mass + 1
       integer, parameter :: h_he_core_radius = h_he_core_mass + 1
       integer, parameter :: h_he_core_lgT = h_he_core_radius + 1
       integer, parameter :: h_he_core_lgRho = h_he_core_lgT + 1
@@ -128,37 +126,17 @@
       integer, parameter :: h_he_core_omega_div_omega_crit = h_he_core_omega + 1
       integer, parameter :: h_he_core_k = h_he_core_omega_div_omega_crit + 1
 
-      integer, parameter :: h_c_core_mass = h_he_core_k + 1
-      integer, parameter :: h_c_core_radius = h_c_core_mass + 1
-      integer, parameter :: h_c_core_lgT = h_c_core_radius + 1
-      integer, parameter :: h_c_core_lgRho = h_c_core_lgT + 1
-      integer, parameter :: h_c_core_L = h_c_core_lgRho + 1
-      integer, parameter :: h_c_core_v = h_c_core_L + 1
-      integer, parameter :: h_c_core_omega = h_c_core_v + 1
-      integer, parameter :: h_c_core_omega_div_omega_crit = h_c_core_omega + 1
-      integer, parameter :: h_c_core_k = h_c_core_omega_div_omega_crit + 1
+      integer, parameter :: h_co_core_mass = h_he_core_k + 1
+      integer, parameter :: h_co_core_radius = h_co_core_mass + 1
+      integer, parameter :: h_co_core_lgT = h_co_core_radius + 1
+      integer, parameter :: h_co_core_lgRho = h_co_core_lgT + 1
+      integer, parameter :: h_co_core_L = h_co_core_lgRho + 1
+      integer, parameter :: h_co_core_v = h_co_core_L + 1
+      integer, parameter :: h_co_core_omega = h_co_core_v + 1
+      integer, parameter :: h_co_core_omega_div_omega_crit = h_co_core_omega + 1
+      integer, parameter :: h_co_core_k = h_co_core_omega_div_omega_crit + 1
 
-      integer, parameter :: h_o_core_mass = h_c_core_k + 1
-      integer, parameter :: h_o_core_radius = h_o_core_mass + 1
-      integer, parameter :: h_o_core_lgT = h_o_core_radius + 1
-      integer, parameter :: h_o_core_lgRho = h_o_core_lgT + 1
-      integer, parameter :: h_o_core_L = h_o_core_lgRho + 1
-      integer, parameter :: h_o_core_v = h_o_core_L + 1
-      integer, parameter :: h_o_core_omega = h_o_core_v + 1
-      integer, parameter :: h_o_core_omega_div_omega_crit = h_o_core_omega + 1
-      integer, parameter :: h_o_core_k = h_o_core_omega_div_omega_crit + 1
-
-      integer, parameter :: h_si_core_mass = h_o_core_k + 1
-      integer, parameter :: h_si_core_radius = h_si_core_mass + 1
-      integer, parameter :: h_si_core_lgT = h_si_core_radius + 1
-      integer, parameter :: h_si_core_lgRho = h_si_core_lgT + 1
-      integer, parameter :: h_si_core_L = h_si_core_lgRho + 1
-      integer, parameter :: h_si_core_v = h_si_core_L + 1
-      integer, parameter :: h_si_core_omega = h_si_core_v + 1
-      integer, parameter :: h_si_core_omega_div_omega_crit = h_si_core_omega + 1
-      integer, parameter :: h_si_core_k = h_si_core_omega_div_omega_crit + 1
-
-      integer, parameter :: h_fe_core_mass = h_si_core_k + 1
+      integer, parameter :: h_fe_core_mass = h_co_core_k + 1
       integer, parameter :: h_fe_core_radius = h_fe_core_mass + 1
       integer, parameter :: h_fe_core_lgT = h_fe_core_radius + 1
       integer, parameter :: h_fe_core_lgRho = h_fe_core_lgT + 1
@@ -229,7 +207,8 @@
       integer, parameter :: h_total_turbulent_energy = h_total_gravitational_energy + 1
       integer, parameter :: h_total_radial_kinetic_energy = h_total_turbulent_energy + 1
       integer, parameter :: h_total_rotational_kinetic_energy = h_total_radial_kinetic_energy + 1
-      integer, parameter :: h_total_energy = h_total_rotational_kinetic_energy + 1
+      integer, parameter :: h_total_energy_foe = h_total_rotational_kinetic_energy + 1
+      integer, parameter :: h_total_energy = h_total_energy_foe + 1
 
       integer, parameter :: h_log_total_internal_energy = h_total_energy + 1
       integer, parameter :: h_log_total_gravitational_energy = h_log_total_internal_energy + 1
@@ -524,7 +503,8 @@
       integer, parameter :: h_compactness = h_log_Ledd + 1
       integer, parameter :: h_compactness_parameter = h_compactness + 1
       integer, parameter :: h_max_infall_speed = h_compactness_parameter + 1
-      integer, parameter :: h_non_fe_core_infall = h_max_infall_speed + 1
+      integer, parameter :: h_non_fe_core_rebound = h_max_infall_speed + 1
+      integer, parameter :: h_non_fe_core_infall = h_non_fe_core_rebound + 1
       integer, parameter :: h_fe_core_infall = h_non_fe_core_infall + 1
 
       integer, parameter :: h_cz_bot_mass = h_fe_core_infall + 1
@@ -750,11 +730,7 @@
       integer, parameter :: h_q_for_test_CpT_absMdot_div_L = h_k_for_test_CpT_absMdot_div_L + 1
       integer, parameter :: h_logxq_for_test_CpT_absMdot_div_L = h_q_for_test_CpT_absMdot_div_L + 1
 
-      integer, parameter :: h_k_CpTMdot_lt_L = h_logxq_for_test_CpT_absMdot_div_L + 1
-      integer, parameter :: h_q_CpTMdot_lt_L = h_k_CpTMdot_lt_L + 1
-      integer, parameter :: h_logxq_CpTMdot_lt_L = h_q_CpTMdot_lt_L + 1
-
-      integer, parameter :: h_tot_E = h_logxq_CpTMdot_lt_L + 1
+      integer, parameter :: h_tot_E = h_logxq_for_test_CpT_absMdot_div_L + 1
       integer, parameter :: h_log_tot_E = h_tot_E + 1
       integer, parameter :: h_tot_KE = h_log_tot_E + 1
       integer, parameter :: h_log_tot_KE = h_tot_KE + 1
@@ -776,9 +752,7 @@
       integer, parameter :: h_rotation_solver_steps = h_burn_solver_maxsteps + 1
       integer, parameter :: h_diffusion_solver_steps = h_rotation_solver_steps + 1
       integer, parameter :: h_diffusion_solver_iters = h_diffusion_solver_steps + 1
-      integer, parameter :: h_total_radiation = h_diffusion_solver_iters + 1
-      integer, parameter :: h_total_energy_plus_total_radiation = h_total_radiation + 1
-      integer, parameter :: h_grav_dark_L_polar = h_total_energy_plus_total_radiation + 1
+      integer, parameter :: h_grav_dark_L_polar = h_diffusion_solver_iters + 1
       integer, parameter :: h_grav_dark_Teff_polar = h_grav_dark_L_polar + 1
       integer, parameter :: h_grav_dark_L_equatorial = h_grav_dark_Teff_polar + 1
       integer, parameter :: h_grav_dark_Teff_equatorial = h_grav_dark_L_equatorial + 1
@@ -792,10 +766,8 @@
       integer, parameter :: h_He_core = h_lg_Lneu + 1
       integer, parameter :: h_O_cntr = h_He_core + 1
       integer, parameter :: h_lg_Lphoto = h_O_cntr + 1
-      integer, parameter :: h_C_core = h_lg_Lphoto + 1
-      integer, parameter :: h_O_core = h_C_core + 1
-      integer, parameter :: h_Si_core = h_O_core + 1
-      integer, parameter :: h_Fe_core = h_Si_core + 1
+      integer, parameter :: h_CO_core = h_lg_Lphoto + 1
+      integer, parameter :: h_Fe_core = h_CO_core + 1
       integer, parameter :: h_Ne_cntr = h_Fe_core + 1
       integer, parameter :: h_Mass = h_Ne_cntr + 1
       integer, parameter :: h_H_cntr = h_Mass + 1
@@ -804,7 +776,9 @@
       integer, parameter :: h_He_cntr = h_lg_Mdot + 1
       integer, parameter :: h_eta_cntr = h_He_cntr + 1
       integer, parameter :: h_gam_cntr = h_eta_cntr + 1
-      integer, parameter :: h_v_div_cs = h_gam_cntr + 1
+      integer, parameter :: h_remnant_M = h_gam_cntr + 1
+      integer, parameter :: h_ejecta_M = h_remnant_M + 1
+      integer, parameter :: h_v_div_cs = h_ejecta_M + 1
       integer, parameter :: h_zones = h_v_div_cs + 1
       integer, parameter :: h_lg_Dsurf = h_zones + 1
       integer, parameter :: h_C_cntr = h_lg_Dsurf + 1
@@ -927,6 +901,7 @@
          history_column_name(h_max_infall_speed) = 'max_infall_speed'
          history_column_name(h_fe_core_infall) = 'fe_core_infall'
          history_column_name(h_non_fe_core_infall) = 'non_fe_core_infall'
+         history_column_name(h_non_fe_core_rebound) = 'non_fe_core_rebound'
          history_column_name(h_compactness) = 'compactness'
          history_column_name(h_compactness_parameter) = 'compactness_parameter'
          history_column_name(h_v_surf_div_escape_v) = 'v_surf_div_escape_v'
@@ -994,6 +969,7 @@
          history_column_name(h_total_radial_kinetic_energy) = 'total_radial_kinetic_energy'
          history_column_name(h_total_rotational_kinetic_energy) = 'total_rotational_kinetic_energy'
          history_column_name(h_total_turbulent_energy) = 'total_turbulent_energy'
+         history_column_name(h_total_energy_foe) = 'total_energy_foe'
          history_column_name(h_total_energy) = 'total_energy'
 
          history_column_name(h_log_total_internal_energy) = 'log_total_internal_energy'
@@ -1171,9 +1147,7 @@
 
          history_column_name(h_h_rich_layer_mass) = 'h_rich_layer_mass'
          history_column_name(h_he_rich_layer_mass) = 'he_rich_layer_mass'
-         history_column_name(h_c_rich_layer_mass) = 'c_rich_layer_mass'
-         history_column_name(h_o_rich_layer_mass) = 'o_rich_layer_mass'
-         history_column_name(h_si_rich_layer_mass) = 'si_rich_layer_mass'
+         history_column_name(h_co_rich_layer_mass) = 'co_rich_layer_mass'
 
          history_column_name(h_he_core_mass) = 'he_core_mass'
          history_column_name(h_he_core_radius) = 'he_core_radius'
@@ -1185,35 +1159,15 @@
          history_column_name(h_he_core_omega_div_omega_crit) = 'he_core_omega_div_omega_crit'
          history_column_name(h_he_core_k) = 'he_core_k'
 
-         history_column_name(h_c_core_mass) = 'c_core_mass'
-         history_column_name(h_c_core_radius) = 'c_core_radius'
-         history_column_name(h_c_core_lgT) = 'c_core_lgT'
-         history_column_name(h_c_core_lgRho) = 'c_core_lgRho'
-         history_column_name(h_c_core_L) = 'c_core_L'
-         history_column_name(h_c_core_v) = 'c_core_v'
-         history_column_name(h_c_core_omega) = 'c_core_omega'
-         history_column_name(h_c_core_omega_div_omega_crit) = 'c_core_omega_div_omega_crit'
-         history_column_name(h_c_core_k) = 'c_core_k'
-
-         history_column_name(h_o_core_mass) = 'o_core_mass'
-         history_column_name(h_o_core_radius) = 'o_core_radius'
-         history_column_name(h_o_core_lgT) = 'o_core_lgT'
-         history_column_name(h_o_core_lgRho) = 'o_core_lgRho'
-         history_column_name(h_o_core_L) = 'o_core_L'
-         history_column_name(h_o_core_v) = 'o_core_v'
-         history_column_name(h_o_core_omega) = 'o_core_omega'
-         history_column_name(h_o_core_omega_div_omega_crit) = 'o_core_omega_div_omega_crit'
-         history_column_name(h_o_core_k) = 'o_core_k'
-
-         history_column_name(h_si_core_mass) = 'si_core_mass'
-         history_column_name(h_si_core_radius) = 'si_core_radius'
-         history_column_name(h_si_core_lgT) = 'si_core_lgT'
-         history_column_name(h_si_core_lgRho) = 'si_core_lgRho'
-         history_column_name(h_si_core_L) = 'si_core_L'
-         history_column_name(h_si_core_v) = 'si_core_v'
-         history_column_name(h_si_core_omega) = 'si_core_omega'
-         history_column_name(h_si_core_omega_div_omega_crit) = 'si_core_omega_div_omega_crit'
-         history_column_name(h_si_core_k) = 'si_core_k'
+         history_column_name(h_co_core_mass) = 'co_core_mass'
+         history_column_name(h_co_core_radius) = 'co_core_radius'
+         history_column_name(h_co_core_lgT) = 'co_core_lgT'
+         history_column_name(h_co_core_lgRho) = 'co_core_lgRho'
+         history_column_name(h_co_core_L) = 'co_core_L'
+         history_column_name(h_co_core_v) = 'co_core_v'
+         history_column_name(h_co_core_omega) = 'co_core_omega'
+         history_column_name(h_co_core_omega_div_omega_crit) = 'co_core_omega_div_omega_crit'
+         history_column_name(h_co_core_k) = 'co_core_k'
 
          history_column_name(h_fe_core_mass) = 'fe_core_mass'
          history_column_name(h_fe_core_radius) = 'fe_core_radius'
@@ -1569,17 +1523,10 @@
          history_column_name(h_q_for_test_CpT_absMdot_div_L) = 'q_for_test_CpT_absMdot_div_L'
          history_column_name(h_logxq_for_test_CpT_absMdot_div_L) = 'logxq_for_test_CpT_absMdot_div_L'
 
-         history_column_name(h_k_CpTMdot_lt_L) = 'k_CpTMdot_lt_L'
-         history_column_name(h_q_CpTMdot_lt_L) = 'q_CpTMdot_lt_L'
-         history_column_name(h_logxq_CpTMdot_lt_L) = 'logxq_CpTMdot_lt_L'
-
          history_column_name(h_burn_solver_maxsteps) = 'burn_solver_maxsteps'
          history_column_name(h_rotation_solver_steps) = 'rotation_solver_steps'
          history_column_name(h_diffusion_solver_steps) = 'diffusion_solver_steps'
          history_column_name(h_diffusion_solver_iters) = 'diffusion_solver_iters'
-         history_column_name(h_total_radiation) = 'total_radiation'
-         history_column_name(h_total_energy_plus_total_radiation) = &
-            'total_energy_plus_total_radiation'
 
          history_column_name(h_tot_E) = 'tot_E'
          history_column_name(h_log_tot_E) = 'log_tot_E'
@@ -1614,9 +1561,7 @@
          history_column_name(h_He_core) = 'He_core'
          history_column_name(h_O_cntr) = 'O_cntr'
          history_column_name(h_lg_Lphoto) = 'lg_Lphoto'
-         history_column_name(h_C_core) = 'C_core'
-         history_column_name(h_O_core) = 'O_core'
-         history_column_name(h_Si_core) = 'Si_core'
+         history_column_name(h_CO_core) = 'CO_core'
          history_column_name(h_Fe_core) = 'Fe_core'
          history_column_name(h_Ne_cntr) = 'Ne_cntr'
          history_column_name(h_Mass) = 'Mass'
@@ -1627,6 +1572,8 @@
          history_column_name(h_eta_cntr) = 'eta_cntr'
          history_column_name(h_gam_cntr) = 'gam_cntr'
          history_column_name(h_v_div_cs) = 'v_div_cs'
+         history_column_name(h_remnant_M) = 'remnant_M'
+         history_column_name(h_ejecta_M) = 'ejecta_M'
          history_column_name(h_zones) = 'zones'
          history_column_name(h_lg_Dsurf) = 'lg_Dsurf'
          history_column_name(h_C_cntr) = 'C_cntr'

@@ -233,7 +233,7 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
 
-         include 'formats.inc'
+         include 'formats'
 
          ! to save a profile, 
             ! s% need_to_save_profiles_now = .true.

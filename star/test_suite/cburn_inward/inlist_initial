@@ -29,6 +29,10 @@
 
 / ! end of star_job namelist
 
+&eos
+
+
+/ ! end of eos namelist
 
 
 &kap
@@ -46,7 +50,7 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      initial_mass = 8.5d0
+      initial_mass = 7.5d0
       initial_z = 0.02d0
       
       xa_central_lower_limit_species(1) = 'he4'
@@ -94,9 +98,6 @@
 
       report_solver_progress = .false. ! set true to see info about solver iterations
       report_ierr = .false. ! if true, produce terminal output when have some internal error
-
-      report_why_dt_limits = .false.
-      report_all_dt_limits = .false.
       
       !show_mesh_changes = .true.
       !mesh_dump_call_number = 8242

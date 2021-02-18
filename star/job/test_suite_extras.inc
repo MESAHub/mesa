@@ -29,21 +29,25 @@ subroutine test_suite_testhub_end(s, ierr)
    ! timing
    write(iounit,'(6X, A, F6.2)') 'runtime_minutes: ', test_suite_runtime
 
-
-   ! performance counters
-   write(iounit,'(6X, A, I6)') 'steps: ', s% total_steps_finished
-   write(iounit,'(6X, A, I6)') 'retries: ', s% total_step_retries
-   write(iounit,'(6X, A, I6)') 'redos: ', s% total_step_redos
-   write(iounit,'(6X, A, I6)') 'solver_calls_made: ', s% total_num_solver_calls_made
-   write(iounit,'(6X, A, I6)') 'solver_calls_failed: ', (s% total_num_solver_calls_made - s% total_num_solver_calls_converged)
-   write(iounit,'(6X, A, I6)') 'solver_iterations: ', s% total_num_solver_iterations
-
-
-   ! log_rel_run_E_err
+   ! calculate log_rel_run_E_err
    val = -99
    if (s% total_energy_end /= 0d0) &
         val = safe_log10(abs(s% cumulative_energy_error/s% total_energy_end))
+
+   ! model information
+   ! these quantities can be cumulative as they are stored in saved models
+   write(iounit,'(6X, A, I12)') 'model_number: ', s% model_number
+   write(iounit,'(6X, A, ES26.16)') 'star_age: ', s% star_age
+   write(iounit,'(6X, A, I12)') 'num_retries: ', s% num_retries
    write(iounit,'(6X, A, F26.16)') 'log_rel_run_E_err: ', val
+
+   ! per-part performance counters
+   write(iounit,'(6X, A, I12)') 'steps: ', s% total_steps_finished
+   write(iounit,'(6X, A, I12)') 'retries: ', s% total_step_retries
+   write(iounit,'(6X, A, I12)') 'redos: ', s% total_step_redos
+   write(iounit,'(6X, A, I12)') 'solver_calls_made: ', s% total_num_solver_calls_made
+   write(iounit,'(6X, A, I12)') 'solver_calls_failed: ', (s% total_num_solver_calls_made - s% total_num_solver_calls_converged)
+   write(iounit,'(6X, A, I12)') 'solver_iterations: ', s% total_num_solver_iterations
 
    ! user-defined quantities
    call write_testhub_extras(iounit)

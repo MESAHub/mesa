@@ -159,14 +159,14 @@
          call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
 
 
-         vol00 = (4*pi/3)*s% R_center*s% R_center*s% R_center
+         vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
          do j=nz,1,-1
 
             volp1 = vol00
             cell_vol = s% dm(j)/s% rho(j)
             vol00 = volp1 + cell_vol
 
-            r_new = exp(log(vol00/(4*pi/3))/3)
+            r_new = exp(log(vol00/four_thirds_pi)*one_third)
 
             s%r(j) = r_new
             s%R2(j) = pow2(r_new)
@@ -197,15 +197,14 @@
             frac, env_mass, mmax, alfa, new_xmstar, old_xmstar, removed, &
             q_for_just_added, xq_for_CpT_absMdot_div_L, sum_dq, dm, sumx
 
-         real(dp), target, dimension(species) :: &
-            xaccrete_array, mtot_init_array, mtot_final_array
-         real(dp), dimension(:), pointer :: &
-            xaccrete, mtot_init, mtot_final, &
+         real(dp), dimension(species) :: &
+            xaccrete, mtot_init, mtot_final
+         real(dp), dimension(:), allocatable :: &
             rxm_old, rxm_new, old_cell_mass, new_cell_mass, &
-            oldloc, newloc, oldval, newval, work, xm_old, xm_new, &
+            oldloc, newloc, oldval, newval, xm_old, xm_new, &
             xq_center_old, xq_center_new
-         real(dp), dimension(:), pointer :: xa_old1
-         real(dp), dimension(:,:), pointer :: xa_old
+         real(dp), dimension(:,:), allocatable :: xa_old
+         real(dp), pointer :: work(:)
 
          integer :: j, k, l, m, k_const_mass, nz, k_below_just_added, k_newval
          integer(8) :: time0
@@ -221,10 +220,6 @@
          call save_for_eps_mdot(s)
 
          ierr = 0
-
-         xaccrete => xaccrete_array
-         mtot_init => mtot_init_array
-         mtot_final => mtot_final_array
 
          nz = s% nz
          dt = s% dt
@@ -625,6 +620,9 @@
             
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr
+            allocate(rxm_old(nz), rxm_new(nz), old_cell_mass(nz), new_cell_mass(nz), &
+               xa_old(species,nz), oldloc(nz), newloc(nz), oldval(nz), newval(nz), &
+               xm_old(nz), xm_new(nz), xq_center_old(nz), xq_center_new(nz))
             call do_work_arrays(.true.,ierr)
          end subroutine do_alloc
 
@@ -641,47 +639,7 @@
             logical, parameter :: crit = .false.
             ierr = 0
             call work_array(s, alloc_flag, crit, &
-               rxm_old, nz, nz_alloc_extra, 'adjust_mass rxm_old', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                rxm_new, nz, nz_alloc_extra, 'adjust_mass rxm_new', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                old_cell_mass, nz, nz_alloc_extra, 'adjust_mass old_cell_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                new_cell_mass, nz, nz_alloc_extra, 'adjust_mass new_cell_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xa_old1, species*nz, nz_alloc_extra, 'adjust_mass xa_old', ierr)
-            if (ierr /= 0) return
-            xa_old(1:species,1:nz) => xa_old1(1:species*nz)
-            call work_array(s, alloc_flag, crit, &
-                oldloc, nz, nz_alloc_extra, 'adjust_mass oldloc', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                newloc, nz, nz_alloc_extra, 'adjust_mass newloc', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                oldval, nz, nz_alloc_extra, 'adjust_mass oldval', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                newval, nz, nz_alloc_extra, 'adjust_mass newval', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
                 work, nz*pm_work_size, nz_alloc_extra, 'adjust_mass work', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xm_old, nz, 0, 'adjust_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xm_new, nz, 0, 'adjust_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xq_center_old, nz, 0, 'adjust_mass', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                xq_center_new, nz, 0, 'adjust_mass', ierr)
             if (ierr /= 0) return
          end subroutine do_work_arrays            
 
@@ -937,8 +895,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, species
          real(dp), intent(in) :: mmax
-         real(dp), intent(in), pointer :: xa_old(:, :), xaccrete(:)
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), intent(in) :: xa_old(:, :), xaccrete(:)
+         real(dp), dimension(:), intent(in) :: &
             old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass ! (nz)
          integer, intent(out) :: ierr
          integer :: k, j, op_err
@@ -980,8 +938,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, species
          real(dp), intent(in) :: mmax
-         real(dp), intent(in), pointer :: xa_old(:,:), xaccrete(:)
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), intent(in) :: xa_old(:,:), xaccrete(:)
+         real(dp), dimension(:), intent(in) :: &
             old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass
          integer, intent(out) :: ierr
 
@@ -1220,9 +1178,9 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_below_just_added
          real(dp), intent(in) :: mmax, delta_m
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), dimension(:), intent(in) :: &
             old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass ! (nz)
-         real(dp), pointer, dimension(:) :: &
+         real(dp), dimension(:) :: &
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot, extra_work
          integer, intent(out) :: ierr
 
@@ -1232,7 +1190,7 @@
             f, jtot_bdy, goal_total, bdy_j, bdy_total, inner_total, outer_total, &
             msum, isum, jsum, omega_uniform
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -1369,8 +1327,8 @@
             else
                rm13 = exp(3*s% lnR_for_d_dt_const_m(k-1))
             end if
-            ri = pow((r003 + rp13)/2,1d0/3d0)
-            ro = pow((r003 + rm13)/2,1d0/3d0)
+            ri = pow((r003 + rp13)/2,one_third)
+            ro = pow((r003 + rm13)/2,one_third)
             call eval_i_rot(s, k, ri, r00, ro, 0d0,&
                s% i_rot(k), s% di_rot_dlnr(k), s% di_rot_dw_div_wc(k))
          end if
@@ -1386,7 +1344,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k, k_below_just_added, nz
          real(dp), intent(in) :: mmax
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), dimension(:), intent(in) :: &
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot
          integer, intent(out) :: ierr
 
@@ -1396,7 +1354,7 @@
 
          integer, parameter :: k_dbg = -1
 
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 
@@ -1698,17 +1656,17 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: &
+         real(dp), dimension(:), intent(in) :: &
             rxm_old, rxm_new, xq_center_old, xq_center_new, &
             old_cell_mass, new_cell_mass ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: oldloc, newloc, oldval, newval
+         real(dp), dimension(:) :: oldloc, newloc, oldval, newval
          real(dp), pointer :: work(:)
          integer, intent(out) :: ierr
 
-         integer :: n, nwork, j, i_lnT, i_lnd, i_eturb, i_u
+         integer :: n, nwork, j, i_lnT, i_lnd, i_w, i_u
          logical :: dbg
-         real(dp), pointer :: p(:)
+         real(dp) :: p(0)
 
          include 'formats'
          ierr = 0
@@ -1719,7 +1677,7 @@
 
          i_lnT = s% i_lnT
          i_lnd = s% i_lnd
-         i_eturb = s% i_eturb
+         i_w = s% i_w
          i_u = s% i_u
 
          oldloc(1) = 0
@@ -1733,21 +1691,20 @@
          
          call set(oldloc, newloc, k_newval, &
             s% lnd_for_d_dt_const_m, s% lnT_for_d_dt_const_m, &
-            s% eturb_for_d_dt_const_m, s% u_for_d_dt_const_m)
+            s% w_for_d_dt_const_m, s% u_for_d_dt_const_m)
 
-         nullify(p)
          call set(xq_center_old, xq_center_new, 1, &
             s% lnd_for_d_dt_const_q, s% lnT_for_d_dt_const_q, p, p)
 
          contains
 
          subroutine set(oldloc, newloc, k_below, &
-               lnd_for_d_dt, lnT_for_d_dt, eturb_for_d_dt, u_for_d_dt)
-            real(dp), pointer, dimension(:), intent(in) :: oldloc, newloc
-            real(dp), pointer, dimension(:), intent(inout) :: &
-               lnd_for_d_dt, lnT_for_d_dt, eturb_for_d_dt, u_for_d_dt
+               lnd_for_d_dt, lnT_for_d_dt, w_for_d_dt, u_for_d_dt)
+            real(dp), dimension(:), intent(in) :: oldloc, newloc
+            real(dp), dimension(:), intent(inout) :: &
+               lnd_for_d_dt, lnT_for_d_dt, w_for_d_dt, u_for_d_dt
             integer, intent(in) :: k_below
-            call set1var(oldloc, newloc, k_below, i_eturb, eturb_for_d_dt)
+            call set1var(oldloc, newloc, k_below, i_w, w_for_d_dt)
             call set1var(oldloc, newloc, k_below, i_u, u_for_d_dt)
             call set1var(oldloc, newloc, k_below, i_lnd, lnd_for_d_dt)
             call set1var(oldloc, newloc, k_below, i_lnT, lnT_for_d_dt)
@@ -1755,13 +1712,13 @@
 
 
          subroutine set1var(oldloc, newloc, k_below, i, v)
-            real(dp), pointer, dimension(:), intent(in) :: oldloc, newloc
+            real(dp), dimension(:), intent(in) :: oldloc, newloc
             integer, intent(in) :: k_below,i
-            real(dp), pointer, intent(inout) :: v(:)
+            real(dp), intent(inout) :: v(:)
             integer :: j
             include 'formats'
             if (i == 0) return
-            if (.not. associated(v)) return
+            if (size(v,dim=1) == 0) return
             do j=1,n
                oldval(j) = s% xh(i,j)
             end do
@@ -1788,9 +1745,9 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: rxm_old, rxm_new ! (nz)
+         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: oldloc, newloc, oldval, newval
+         real(dp), dimension(:) :: oldloc, newloc, oldval, newval
 
          real(dp), pointer :: work(:)
 
@@ -1903,9 +1860,9 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: rxm_old, rxm_new ! (nz)
+         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: &
+         real(dp), dimension(:) :: &
             D_omega, oldloc, newloc, oldval, newval
 
          real(dp), pointer :: work(:)
@@ -1954,9 +1911,9 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in), pointer :: rxm_old, rxm_new ! (nz)
+         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), pointer, dimension(:) :: &
+         real(dp), dimension(:) :: &
             D_smooth, oldloc, newloc, oldval, newval
 
          real(dp), pointer :: work(:)

@@ -50,7 +50,7 @@
             A, B, dA_dlnT, dA_dlnRho, dB_dlnT, dB_dlnRho, dlogGe_dlogT, dlogGe_dlogRho, &
             logT_lo, logT_hi, logRho_lo, logRho_hi
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -61,11 +61,11 @@
          logRho_hi = rq% logRho1_PC_limit ! okay for pure PC for logRho > this
          
          if (rq% PC_use_Gamma_limit_instead_of_T) then
-            !gamma_e = (qe**2)*((4.0d0/3.0d0)*pi*avo*Rho*zbar/abar)**one_third/(kerg*T)
+            !gamma_e = (qe**2)*(four_thirds_pi*avo*Rho*zbar/abar)**one_third/(kerg*T)
             !logGe = logGe0 + logRho/3 - logT
-            ! where Ge0 = (qe**2)*((4.0d0/3.0d0)*pi*avo*zbar/abar)**one_third/kerg
+            ! where Ge0 = (qe**2)*(four_thirds_pi*avo*zbar/abar)**one_third/kerg
             logGe0 = log10( & 
-                 qe*qe*pow((4.0d0/3.0d0)*pi*avo*zbar/abar,(1d0/3d0))/kerg)
+                 qe*qe*pow(four_thirds_pi*avo*zbar/abar, one_third)/kerg)
             logGe = logGe0 + logRho/3 - logT
             logGe_lo = rq% log_Gamma_e_all_HELM ! HELM for logGe <= this
             logGe_hi = rq% log_Gamma_e_all_PC ! PC for logGe >= this
@@ -172,7 +172,7 @@
          real(dp), dimension(species) :: AY, AZion, ACMI
          integer :: i, j
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          AZion(1:species) = chem_isos% Z(chem_id(1:species))
@@ -218,7 +218,7 @@
             real(dp) :: Zmean,CMImean,Z2mean
             real(dp), parameter :: UN_T6=0.3157746d0
 
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             

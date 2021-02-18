@@ -236,7 +236,7 @@
 
          type (Atm_Info), pointer :: ai
          
-         include 'formats.dek'
+         include 'formats'
          
          gtv_dbg = dbg
          
@@ -401,7 +401,7 @@
             integer :: j
             real(dp), pointer :: f(:)
             
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             

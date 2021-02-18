@@ -85,7 +85,7 @@ contains
       type(auto_diff_real_2var_order1) :: logT_auto, logRho_auto, logQ_auto
       type(auto_diff_real_2var_order1) :: blend, blend_logT, blend_logRho, blend_logQ
 
-      include 'formats.dek'
+      include 'formats'
 
       ierr = 0
 

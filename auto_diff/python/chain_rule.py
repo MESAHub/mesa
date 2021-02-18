@@ -1,9 +1,10 @@
-from sympy import symbols, factorial, diff, DiracDelta, simplify
-from utils import wrap_element, fortran_substitutions, ddelta, zero_function
+from sympy import symbols, factorial, diff, DiracDelta, simplify, sign, Derivative
+from utils import wrap_element, fortran_substitutions, ddelta, zero_function, sgn
 from sympy.simplify.cse_main import cse
 from sympy.utilities.iterables import numbered_symbols
+from measure import weighted_count_ops
 
-def unary_generic_chain_rule(auto_diff_type):
+def unary_generic_chain_rule(auto_diff_type, fixed_length=None):
 	'''
 	Produces a list of lines of Fortran code to compute all specified partial derivatives of a generic unary function z(x),
 	where x is itself a function of independent variables (val1, val2, val3, ...).
@@ -25,10 +26,10 @@ def unary_generic_chain_rule(auto_diff_type):
 		z = sum(sym * x**p.orders[0] / factorial(p.orders[0]) for sym,p in zip(*(z_syms, auto_diff_type.unary_partials)))
 		return z
 
-	return unary_specific_chain_rule(auto_diff_type, operator, xval=0)
+	return unary_specific_chain_rule(auto_diff_type, operator, xval=0, fixed_length=fixed_length)
 
 
-def binary_generic_chain_rule(auto_diff_type):
+def binary_generic_chain_rule(auto_diff_type, fixed_length=None):
 	'''
 	Produces a list of lines of Fortran code to compute all specified partial derivatives of a generic unary function z(x),
 	where x is itself a function of independent variables (val1, val2, val3, ...).
@@ -50,10 +51,10 @@ def binary_generic_chain_rule(auto_diff_type):
 		z = sum(sym * x**p.orders[0] * y**p.orders[1] / (factorial(p.orders[0]) * factorial(p.orders[1])) for sym,p in zip(*(z_syms, auto_diff_type.binary_partials)))
 		return z
 
-	return binary_specific_chain_rule(auto_diff_type, operator, xval=0, yval=0)
+	return binary_specific_chain_rule(auto_diff_type, operator, xval=0, yval=0, fixed_length=fixed_length)
 
 
-def unary_specific_chain_rule(auto_diff_type, operator, xval=None):
+def unary_specific_chain_rule(auto_diff_type, operator, xval=None, fixed_length=None):
 	'''
 	Produces a list of lines of Fortran code to compute all specified partial derivatives of a specified unary function z(x),
 	where x is itself a function of independent variables (val1, val2, val3, ...) and z(x) === operator(x).
@@ -109,12 +110,24 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None):
 		for order, indep in zip(*(p.orders, indep_syms)):
 			d = diff(d, indep, order)
 			d = d.replace(DiracDelta, zero_function) # Diract Delta is only non-zero in a set of measure zero, so we set it to zero.
+			d = d.replace(sign, sgn) # simplify can do weird things with sign, turning it into the piecewise operator. We want to avoid that so we redirect to a custom sgn function.
+			d = d.replace(Derivative, zero_function) # Eliminates derivatives of the Dirac Delta and Sign, which are non-zero only at sets of measure zero.
 			d = d.subs(indep, 0)
 
 		if xval is not None:
 			d = d.subs(x_syms[0], 0)
 
-		d = simplify(d)
+		d_before = d
+		d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
+		cost_before = weighted_count_ops(d_before, verbose=False)
+		cost_after = weighted_count_ops(d, verbose=False)
+		if cost_before != cost_after:
+			cost_before = weighted_count_ops(d_before, verbose=True)
+			cost_after = weighted_count_ops(d, verbose=True)
+			print('Cost before:', cost_before)
+			print('Cost after: ', cost_after)
+			print('')
+
 
 		expressions.append(d)
 		left_hand_names.append(unary_symbol_str)
@@ -127,19 +140,25 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None):
 	# Determine which sub-expressions are array-valued.
 	is_array = {}
 	for sym, sub_expr in common_sub_expressions[0]:
-		if 'colon' in str(sub_expr): # Intermediate is an array type.
-			is_array[sym] = True
-		else:
-			is_array[sym] = False
-			for s in sub_expr.args:
-				if s in is_array:
-					if is_array[s]:
-						is_array[sym] = True # Intermediate is defined in terms of an array type and so is an array type.
+		is_array[sym] = False
+
+	for i in range(len(common_sub_expressions[0])):
+		for sym, sub_expr in common_sub_expressions[0]:
+			if 'colon' in str(sub_expr): # Intermediate is an array type.
+				is_array[sym] = True
+			else:
+				for s in sub_expr.free_symbols:
+					if s in is_array:
+						if is_array[s]:
+							is_array[sym] = True # Intermediate is defined in terms of an array type and so is an array type.
 
 	# Write the lines defining the sub-expressions
 	for sym, sub_expr in common_sub_expressions[0][::-1]: # Have to go in reverse order because we're prepending.
 		if is_array[sym]: # # Intermediate is an array type.
-			sym_str = str(sym) + '(1:x%n)' # All of these expressions have x defined as an auto_diff type, so it has an %n property.
+			if fixed_length is None:
+				sym_str = str(sym) + '(1:x%n)' # All of these expressions have x defined as an auto_diff type, so it has an %n property.
+			else:
+				sym_str = str(sym) + '(1:' + str(fixed_length) + ')'
 		else:
 			sym_str = str(sym)
 
@@ -157,7 +176,7 @@ def unary_specific_chain_rule(auto_diff_type, operator, xval=None):
 	return derivatives, declarations
 
 
-def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None):
+def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None, fixed_length=None):
 	'''
 	Produces a list of lines of Fortran code to compute all specified partial derivatives of a specific
 	binary function z(x,y), where x and y are functions of independent variables (val1, val2, val3, ...)
@@ -224,13 +243,27 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None):
 
 		for order, indep in zip(*(p.orders, indep_syms)):
 			d = diff(d, indep, order)
-			d = d.replace(DiracDelta, zero_function) # Diract Delta is only non-zero in a set of measure zero, so we set it to zero.
+			d = d.replace(DiracDelta, zero_function) # Dirac Delta is only non-zero in a set of measure zero, so we set it to zero.
+			d = d.replace(sign, sgn) # simplify can do weird things with sign, turning it into the piecewise operator. We want to avoid that so we redirect to a custom sgn function.
+			d = d.replace(Derivative, zero_function) # Eliminates derivatives of the Dirac Delta and Sign, which are non-zero only at sets of measure zero.
 			d = d.subs(indep, 0)
 
 		if xval is not None:
 			d = d.subs(x_syms[0], xval)
 		if yval is not None:
 			d = d.subs(y_syms[0], yval)
+
+		d_before = d
+		d = simplify(d, measure=weighted_count_ops, force=True, ratio=1)
+		cost_before = weighted_count_ops(d_before, verbose=False)
+		cost_after = weighted_count_ops(d, verbose=False)
+		if cost_before != cost_after:
+			cost_before = weighted_count_ops(d_before, verbose=True)
+			cost_after = weighted_count_ops(d, verbose=True)
+			print('Cost before:', cost_before)
+			print('Cost after: ', cost_after)
+			print('')
+
 
 		expressions.append(d)
 		left_hand_names.append(binary_symbol_str)
@@ -243,19 +276,25 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None):
 	# Determine which sub-expressions are array-valued.
 	is_array = {}
 	for sym, sub_expr in common_sub_expressions[0]:
-		if 'colon' in str(sub_expr): # Intermediate is an array type.
-			is_array[sym] = True
-		else:
-			is_array[sym] = False
-			for s in sub_expr.args:
-				if s in is_array:
-					if is_array[s]:
-						is_array[sym] = True # Intermediate is defined in terms of an array type and so is an array type.
+		is_array[sym] = False
+
+	for i in range(len(common_sub_expressions[0])):
+		for sym, sub_expr in common_sub_expressions[0]:
+			if 'colon' in str(sub_expr): # Intermediate is an array type.
+				is_array[sym] = True
+			else:
+				for s in sub_expr.free_symbols:
+					if s in is_array:
+						if is_array[s]:
+							is_array[sym] = True # Intermediate is defined in terms of an array type and so is an array type.
 
 	# Write the lines defining the sub-expressions
 	for sym, sub_expr in common_sub_expressions[0][::-1]: # Have to go in reverse order because we're prepending.
 		if is_array[sym]: # # Intermediate is an array type.
-			sym_str = str(sym) + '(1:x%n)' # All of these expressions have x defined as an auto_diff type, so it has an %n property.
+			if fixed_length is None:
+				sym_str = str(sym) + '(1:x%n)' # All of these expressions have x defined as an auto_diff type, so it has an %n property.
+			else:
+				sym_str = str(sym) + '(1:' + str(fixed_length) + ')'
 		else:
 			sym_str = str(sym)
 

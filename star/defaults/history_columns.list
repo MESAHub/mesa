@@ -336,38 +336,16 @@
       !he_core_omega_div_omega_crit
       !he_core_k
 
-   !## carbon core
-      c_core_mass
-      !c_core_radius
-      !c_core_lgT
-      !c_core_lgRho
-      !c_core_L
-      !c_core_v
-      !c_core_omega
-      !c_core_omega_div_omega_crit
-      !c_core_k
-
-   !## oxygen core
-      o_core_mass
-      !o_core_radius
-      !o_core_lgT
-      !o_core_lgRho
-      !o_core_L
-      !o_core_v
-      !o_core_omega
-      !o_core_omega_div_omega_crit
-      !o_core_k
-
-   !## silicon core
-      si_core_mass
-      !si_core_radius
-      !si_core_lgT
-      !si_core_lgRho
-      !si_core_L
-      !si_core_v
-      !si_core_omega
-      !si_core_omega_div_omega_crit
-      !si_core_k
+   !## CO core
+      co_core_mass
+      !co_core_radius
+      !co_core_lgT
+      !co_core_lgRho
+      !co_core_L
+      !co_core_v
+      !co_core_omega
+      !co_core_omega_div_omega_crit
+      !co_core_k
 
    !## iron core
       fe_core_mass

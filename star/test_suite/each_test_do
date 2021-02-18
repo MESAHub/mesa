@@ -81,12 +81,15 @@ function do_onex {
 
 
 function do_one {
-  #echo $1
-  grep " $1" */inlist_*
+  echo $1
+  cd $1
+  cat history_columns.list >> ../history_columns.combined.list
+  rm history_columns.combined.list
+  cd ..
 }
 
 
 date
-source do1_private_controls
+source do1_test_source
 echo ""
 date

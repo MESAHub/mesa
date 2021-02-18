@@ -122,7 +122,7 @@
             real :: ymin,ymax,r,g,b,log10_min_abun,log10_max_abun
             real,parameter :: pad=2.5,step=0.5
 
-            include 'formats.inc'
+            include 'formats'
             ierr = 0
 
             call pgsave

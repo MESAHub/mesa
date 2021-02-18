@@ -40,7 +40,7 @@
          integer :: i, j, iounit, ierr, iounit_out, k
          real(dp) :: Prad, Teff_in, logg_in
          
-         include 'formats.dek'
+         include 'formats'
 
          my_mesa_dir = '../..'
          call const_init(my_mesa_dir, ierr)      

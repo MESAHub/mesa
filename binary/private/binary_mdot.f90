@@ -49,7 +49,7 @@
          logical :: use_sum
          character (len=90) :: rlo_result
          
-         include 'formats.inc'
+         include 'formats'
          ierr = 0
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then
@@ -326,7 +326,7 @@
          
          real(dp) :: starting_mdot, current_change_factor
          logical :: do_cubic
-         include 'formats.inc'
+         include 'formats'
          
          ! NOTE: keep in mind that for mass loss, mdot is negative
          
@@ -428,7 +428,7 @@
          real(dp), intent(out) :: mdot_edd_eta ! fraction of rest mass energy released as radiation
          integer, intent(out) :: ierr
          type(binary_info), pointer :: b
-         include 'formats.inc'
+         include 'formats'
 
          ierr = 0
          call binary_ptr(binary_id, b, ierr)
@@ -461,10 +461,10 @@
          else
             ! eg., eq. (9) of Podsiadlowski, Rappaport & Han 2003, MNRAS, 341, 385
             if (.not. b% use_es_opacity_for_mdot_edd) then
-               mdot_edd = 4d0*pi*standard_cgrav*b% m(b% a_i) &
+               mdot_edd = pi4*standard_cgrav*b% m(b% a_i) &
                   /(clight*b% s_donor% opacity(1)*mdot_edd_eta)
             else
-               mdot_edd = 4d0*pi*standard_cgrav*b% m(b% a_i)&
+               mdot_edd = pi4*standard_cgrav*b% m(b% a_i)&
                   /(clight*0.2d0*(1d0+b% s_donor% surface_h1)*mdot_edd_eta)
             end if
          end if
@@ -622,7 +622,7 @@
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
 
-         include 'formats.inc'
+         include 'formats'
 
          ierr = 0
          call binary_ptr(binary_id, b, ierr)
@@ -680,7 +680,7 @@
       subroutine get_info_for_ritter(b)
          type(binary_info), pointer :: b
          real(dp) :: rho_exponent, F1, q, rho, p, grav, hp, v_th, rl3, q_temp
-         include 'formats.inc'
+         include 'formats'
 
          !--------------------- Optically thin MT rate -----------------------------------------------
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
@@ -727,7 +727,7 @@
          real(dp) :: F1, F3, G1, dP, q, rho, p, grav, hp, v_th, rl3, q_temp
          integer :: i
          type(binary_info), pointer :: b
-         include 'formats.inc'
+         include 'formats'
 
          !--------------------- Optically thin MT rate -----------------------------------------------
          ! As described in Kolb and H. Ritter 1990, A&A 236,385-392
@@ -761,7 +761,7 @@
          real(dp) :: F3, FF, G1, x_L1, q, g
          real(dp) :: mdot_thick0,  R_gas, dP, rl, s_div_rl
          integer :: i, indexR
-         include 'formats.inc'
+         include 'formats'
 
          !--------------------- Optically thick MT rate -----------------------------------------------
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
@@ -789,7 +789,7 @@
          real(dp) :: q, rho, p, grav, hp, v_th
          real(dp) :: area,Asl,G,ma,md,mfac1,mfac2,my_mdot_thin,my_ritter_exponent,Omega,&
             phi,phiL1,q13,rfac,rhoL1,rv,rvL1,sep
-         include 'formats.inc'
+         include 'formats'
 
          !--------------------- Optically thin MT rate -----------------------------------------------
          ! Ritter 1988 but with better fits for the various formulas that work at extreme q
@@ -832,7 +832,7 @@
          integer :: i
          real(dp) :: rho_exponent, F1, q, q_temp, rho, p, grav, hp, v_th, dm
          real(dp), DIMENSION(b% anomaly_steps):: mdot0, mdot, Erit, rl_d
-         include 'formats.inc'
+         include 'formats'
          
          ! Optically thin MT rate adapted for eccentric orbits 
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
@@ -897,7 +897,7 @@
          real(dp) :: e, dm
          integer :: i, j
          real(dp), DIMENSION(b% anomaly_steps):: rl_d_i, mdot_thick_i
-         include 'formats.inc'
+         include 'formats'
          
          ! Optically thick MT rate adapted for eccentric orbits
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
@@ -950,7 +950,7 @@
          type(binary_info), pointer :: b
          real(dp) :: qratio, min_r
          logical, parameter :: dbg = .false.
-         include 'formats.inc'
+         include 'formats'
 
          ierr = 0
          call binary_ptr(binary_id, b, ierr)

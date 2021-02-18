@@ -47,7 +47,7 @@
          
          logical, parameter :: dbg = .false.
 
-         include 'formats.dek'
+         include 'formats'
          
          iounit = 33
 

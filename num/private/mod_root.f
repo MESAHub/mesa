@@ -83,7 +83,7 @@
          real(dp) :: x, y, x1, x3, y1, y3, dydx, absy, absy_prev
          
          logical, parameter :: dbg = .false.
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          do_safe_root_with_guess = 0
@@ -202,7 +202,7 @@
          integer :: i
          logical :: move_x1, move_x3
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = -1
          y1 = 0

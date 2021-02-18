@@ -225,7 +225,7 @@
          type (Net_Info), pointer :: netinfo
          type (Net_General_Info), pointer :: g
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          told = 0
@@ -852,7 +852,7 @@
             character (len=256) :: buffer, string
             integer :: i, n, iounit, t, num_isos, id, k
             
-            include 'formats.dek'
+            include 'formats'
             
             ierr = 0
             write(*,*) 'read T Rho history from ' // trim(T_Rho_history_filename)
@@ -904,7 +904,7 @@
             character (len=256) :: buffer, string
             integer :: i, n, iounit, t, num_isos, id, k
             
-            include 'formats.dek'
+            include 'formats'
             
             write(*,*) 'read initial abundances from ' // trim(initial_abundances_filename)
             open(newunit=iounit, file=trim(initial_abundances_filename), &
@@ -975,7 +975,7 @@
             integer, pointer :: index(:) 
             integer :: j
             real(dp) :: xsum
-            include 'formats.dek'
+            include 'formats'
             v => v_t
             index => index_t
 
@@ -1088,7 +1088,7 @@
             type (Net_General_Info), pointer  :: g
             logical :: skip_jacobian
 
-            include 'formats.dek'
+            include 'formats'
          
             irtrn = 0
             if (time == 0) return
@@ -1151,7 +1151,7 @@
                T = exp10(logT)
                Rho = exp10(logRho)
          
-               call eosDT_get( &
+               call eosDT_get_legacy( &
                   eos_handle, Z, xh, abar, zbar, &
                   species, chem_id, net_iso, x, &
                   Rho, logRho, T, logT, &
@@ -1325,7 +1325,7 @@
          character (len=*), intent(in) :: net_file_in
          integer :: ierr, i
          
-         include 'formats.dek'
+         include 'formats'
          
          net_file = net_file_in
 
@@ -1517,7 +1517,7 @@
       character(len=*) :: filename
       logical, intent(in) :: qt
       
-      include 'formats.dek'
+      include 'formats'
       
       ! set defaults
       

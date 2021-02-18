@@ -59,6 +59,12 @@
             5776      3.76162718      4.83676375      1.00000000      1.00277250      0.70000000      0.02000000
 
 
+ test_T_tau_varying: Trampedach solar
+
+               T           log T           log P          M/Msun          L/Lsun               X               Z
+            5776      3.76162762      4.89369975      1.00000000      1.00277250      0.70000000      0.02000000
+
+
  test_T_tau_varying: Eddington
 
                T           log T           log P          M/Msun          L/Lsun               X               Z

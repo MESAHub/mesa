@@ -24,39 +24,39 @@ c ***********************************************************************
       use gauss_fermi
       implicit none
 
-		contains
+      contains
       
       
       subroutine interpolate_opal_scvh(
-     >					opal_only, scvh_only, include_radiation, search_for_SCVH,
-     >					logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in,
+     >               opal_only, scvh_only, include_radiation, search_for_SCVH,
+     >               logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in,
      >               logPgas, logE, logS, chiRho, chiT, 
      >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
      >               mu, logNe, gamma1, gamma3, grad_ad, eta, dlnPgas_dlnY,
      >               data_dir,info)
-		use scvh_core
-		use const_def
+      use scvh_core
+      use const_def
       implicit none
-		logical, intent(in) :: opal_only, scvh_only,search_for_SCVH, include_radiation
+      logical, intent(in) :: opal_only, scvh_only,search_for_SCVH, include_radiation
       double precision, intent(in) :: logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in
       double precision, intent(out) ::  
      >               logPgas, logE, logS, chiRho, chiT, 
      >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
      >               mu, logNe, gamma1, gamma3, grad_ad, eta, dlnPgas_dlnY
       character (len=*), intent(in) ::  data_dir
-		integer, intent(out) :: info ! returned = 0 if AOK
-		
-		double precision :: X, Y, Z, lnY, dlnY, Y0, Y1, X0, X1, logPgas0, logPgas1
-		
-		info = 0
-		X = X_in
-		Z = Z_in
-		
-		! NOT DOING dlnPgas_dlnY ANY MORE.   remove it.
-		
-		call do_opal_scvh(
-     >					opal_only, scvh_only,include_radiation, search_for_SCVH,
-     >					logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X,Z,
+      integer, intent(out) :: info ! returned = 0 if AOK
+
+      double precision :: X, Y, Z, lnY, dlnY, Y0, Y1, X0, X1, logPgas0, logPgas1
+
+      info = 0
+      X = X_in
+      Z = Z_in
+
+      ! NOT DOING dlnPgas_dlnY ANY MORE.   remove it.
+
+      call do_opal_scvh(
+     >               opal_only, scvh_only,include_radiation, search_for_SCVH,
+     >               logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X,Z,
      >               logPgas, logE, logS, chiRho, chiT, 
      >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
      >               mu, logNe, gamma1, gamma3, grad_ad, eta,
@@ -64,30 +64,30 @@ c ***********************************************************************
       if (info /= 0) return
       
       dlnPgas_dlnY = 0
-		
-		end subroutine 
+
+      end subroutine
 
 
       subroutine do_opal_scvh(
-     >					opal_only, scvh_only, include_radiation, search_for_SCVH,
-     >					logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in,
+     >               opal_only, scvh_only, include_radiation, search_for_SCVH,
+     >               logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in,
      >               logPgas, logE, logS, chiRho, chiT, 
      >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
      >               mu, logNe, gamma1, gamma3, grad_ad, eta,
      >               data_dir,info)
-		use scvh_core
-		use const_def
+      use scvh_core
+      use const_def
       implicit none
-		logical, intent(in) :: opal_only, scvh_only, search_for_SCVH, include_radiation
+      logical, intent(in) :: opal_only, scvh_only, search_for_SCVH, include_radiation
       double precision, intent(in) :: logT_in,logRho_in,temp_in,den_in,abar_in,zbar_in,X_in,Z_in
       double precision, intent(out) ::  
      >               logPgas, logE, logS, chiRho, chiT, 
      >               Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
      >               mu, logNe, gamma1, gamma3, grad_ad, eta
       character (len=*), intent(in) ::  data_dir
-		integer, intent(out) :: info ! returned = 0 if AOK
-		
-		
+      integer, intent(out) :: info ! returned = 0 if AOK
+
+
 !..logT and logRho are log10's of temp and den
 
 
@@ -122,9 +122,9 @@ c ***********************************************************************
       integer i
       double precision c_x, c_y, c_dx, c_dy, logRho_min, logRho_max, xnhp, xnhepp
       double precision log_free_e, log_free_e0, log_free_e1, Prad
-		
-		double precision, parameter :: tiny_eta_ele = -20d0
-		double precision :: a
+
+      double precision, parameter :: tiny_eta_ele = -20d0
+      double precision :: a
       
 !..some constants
       double precision, parameter ::  CLN = ln10
@@ -145,7 +145,7 @@ c ***********************************************************************
      >      logRho_scvh,den_scvh,logT_scvh,temp_scvh,logQ_scvh
       logical :: scvh_okay
       integer :: irad
-		double precision :: pout_opal, dpoutdd_opal, dpoutdt_opal, eout_opal, deoutdd_opal,
+      double precision :: pout_opal, dpoutdd_opal, dpoutdt_opal, eout_opal, deoutdd_opal,
      >      sout_opal, dsoutdd_opal, dsoutdt_opal, pgas_out, prad_out
 
 !..define the interior boundary between opal and scvh
@@ -164,7 +164,7 @@ c ***********************************************************************
       double precision, parameter :: logRho5 = -5.80d0
       double precision, parameter :: logRho6 = -6.8d0 !-6.3d0
       
-      include 'formats.dek'
+      include 'formats'
       
       logAvo = log10(avo)
       mecc = me*clight*clight
@@ -185,10 +185,10 @@ c ***********************************************************************
       end if
 
 
-		if (scvh_only) then
-			alfa = 0
-		else if (opal_only) then
-			alfa = 1
+      if (scvh_only) then
+         alfa = 0
+      else if (opal_only) then
+         alfa = 1
       else if (logT >= logT1) then
          alfa = 1
       else if (logT >= logT2) then
@@ -257,26 +257,26 @@ c ***********************************************************************
       if (alfa .ne. 0D0 .or. opal_only) then
          t6 = temp * 1d-6
          r = den
-			if (include_radiation) then
-			   irad = 1
-			else
-			   irad = 0
-			end if
+         if (include_radiation) then
+            irad = 1
+         else
+            irad = 0
+         end if
          call opal_eos (X, Z, t6, r, num_opal_results, 
-     >				irad, opal_results, pgas_out, prad_out, data_dir, info)
-			if (info /= 0) then
-			   return
-			   
-				write(*,*) 'opal_eos returned info', info
-				write(*,*) ' opal_only', opal_only
-				write(*,*) ' alfa', alfa
-				write(*,*) ' beta', beta
-				write(*,*) ' X', X
-				write(*,*) ' Z', Z
-				write(*,*) 't6', t6
-				write(*,*) ' r', r
-				stop 1
-			end if
+     >            irad, opal_results, pgas_out, prad_out, data_dir, info)
+         if (info /= 0) then
+            return
+
+            write(*,*) 'opal_eos returned info', info
+            write(*,*) ' opal_only', opal_only
+            write(*,*) ' alfa', alfa
+            write(*,*) ' beta', beta
+            write(*,*) ' X', X
+            write(*,*) ' Z', Z
+            write(*,*) 't6', t6
+            write(*,*) ' r', r
+            stop 1
+         end if
          
          pout_opal    = opal_results(1) * 1d12
          dpoutdd_opal = opal_results(6) * pout_opal / den
@@ -299,32 +299,32 @@ c ***********************************************************************
          dsoutdd_opal = (deoutdd_opal - pout_opal / den**2) / temp
          dsoutdt_opal = opal_results(5) * 1d6 / temp
 
-			mu_opal = opal_results(10)
-			logNe_opal = opal_results(11)
-			
+         mu_opal = opal_results(10)
+         logNe_opal = opal_results(11)
+
          if (include_radiation .and. Prad >= pout_opal) then
             write(*,*) 'opal_scvh_driver: Prad >= pout_opal'
             stop 1
          end if
          
-			logPgas_opal = log10(pgas_out)
-			logE_opal = log10(eout_opal)
-			logS_opal = log10(sout_opal)
-			chiRho_opal = dpoutdd_opal*den/pout_opal
-			chiT_opal = dpoutdt_opal*temp/pout_opal
-			gamma1_opal = opal_results(8)
+         logPgas_opal = log10(pgas_out)
+         logE_opal = log10(eout_opal)
+         logS_opal = log10(sout_opal)
+         chiRho_opal = dpoutdd_opal*den/pout_opal
+         chiT_opal = dpoutdt_opal*temp/pout_opal
+         gamma1_opal = opal_results(8)
          ! gam1 / (gam3 - 1) = gam2 / (gam2 - 1)
          ! gam2 / (gam2 - 1) = opal_results(9)
          gamma3_opal = 1 + opal_results(8)/opal_results(9)
-			Cv_opal = chiT_opal * pout_opal / (den * temp * opal_results(8)/opal_results(9)) ! C&G 9.93
+         Cv_opal = chiT_opal * pout_opal / (den * temp * opal_results(8)/opal_results(9)) ! C&G 9.93
          Cp_opal = Cv_opal*gamma1_opal/chiRho_opal
-			grad_ad_opal = 1/opal_results(9)
-			dE_dRho_opal = deoutdd_opal
-			dS_dRho_opal = dsoutdd_opal
-			dS_dT_opal = dsoutdt_opal
-			
-			!write(*,1) 'opal_scvh_driver gamma1_opal', gamma1_opal
-			
+         grad_ad_opal = 1/opal_results(9)
+         dE_dRho_opal = deoutdd_opal
+         dS_dRho_opal = dsoutdd_opal
+         dS_dT_opal = dsoutdt_opal
+
+         !write(*,1) 'opal_scvh_driver gamma1_opal', gamma1_opal
+
 
       end if
 
@@ -355,7 +355,7 @@ c ***********************************************************************
                cycle
             end if
             if (info < 0) exit
-		   end do
+         end do
          if (.not. scvh_okay) then 
             info = -1
             return
@@ -445,83 +445,83 @@ c ***********************************************************************
          end if
 
       end if
-			
 
-		! calculate eta_ele as function of Ne and T
-		! get guess to start the process
-		
-		log_free_e = logNe - logAvo - logRho
-		log_free_e0 = -2d0
-		log_free_e1 = -4d0
-		! when number of free electrons per nucleon gets too low, eta becomes meaningless
-		! so cut it off
-		
+
+      ! calculate eta_ele as function of Ne and T
+      ! get guess to start the process
+
+      log_free_e = logNe - logAvo - logRho
+      log_free_e0 = -2d0
+      log_free_e1 = -4d0
+      ! when number of free electrons per nucleon gets too low, eta becomes meaningless
+      ! so cut it off
+
 
       kt      = kerg * temp
-		theta = kt/mecc
+      theta = kt/mecc
 
-		if (log_free_e < log_free_e1) then
-		
-			eta_ele = tiny_eta_ele
-			call dfermi(0.5d0, eta_ele, theta, fd, fdeta, fdtheta)
-			
-		else
-		
-			eta_min = -1200d0
-			eta_max = 1200d0
-			eta_ele = 0d0
-	
-			coef	  = 4 * pi * (2 * me * kt) ** 1.5d0 / planck_h**3
-			ne      = 10**logNe
-		
-			do i = 1, 100
-	
-				! get fermi dirac integral
-				call dfermi(0.5d0, eta_ele, theta, fd, fdeta, fdtheta)
-		
-				if (fdeta < 0) then
-					write(*,*) fd, fdeta
-					write(*,*) 'expected fdeta > 0'
-					stop 1
-				end if
-			
-				f = coef * fd - ne
-				if (f > 0) then ! fd too large, make eta smaller to reduce it
-					eta_max = eta_ele
-				else  ! fd too small, make eta larger to reduce it
-					eta_min = eta_ele
-				end if
-				new_eta = 0.5d0 * (eta_min + eta_max)
-				if (abs(eta_ele - new_eta) < eostol) exit
-				if (i == 100) then
-					write(*,*) 'logT', logT
-					write(*,*) 'logRho', logRho
-					write(*,*) 'failed to find eta_ele by root solve'
-					stop 1
-				end if
-		
-				eta_ele = new_eta
-				if (eta_ele > 1000d0) then
-				 	eta_ele = 1000d0; exit
-				end if
-				if (eta_ele < -1000d0) then
-				 	eta_ele = -1000d0; exit
-				end if
-	
-			end do
-		
-			if (log_free_e < log_free_e0) then
-				alfa = (log_free_e - log_free_e1) / (log_free_e0 - log_free_e1)
-				alfa = 0.5d0 * (1d0 - cos(pi*alfa))
-				beta = 1 - alfa
-				eta_ele = alfa * eta_ele + beta * tiny_eta_ele
-			end if
-		   
-		end if
+      if (log_free_e < log_free_e1) then
 
-		eta = eta_ele
-		
-		return
+         eta_ele = tiny_eta_ele
+         call dfermi(0.5d0, eta_ele, theta, fd, fdeta, fdtheta)
+
+      else
+
+         eta_min = -1200d0
+         eta_max = 1200d0
+         eta_ele = 0d0
+
+         coef     = 4 * pi * (2 * me * kt) ** 1.5d0 / planck_h**3
+         ne      = 10**logNe
+
+         do i = 1, 100
+
+            ! get fermi dirac integral
+            call dfermi(0.5d0, eta_ele, theta, fd, fdeta, fdtheta)
+
+            if (fdeta < 0) then
+               write(*,*) fd, fdeta
+               write(*,*) 'expected fdeta > 0'
+               stop 1
+            end if
+
+            f = coef * fd - ne
+            if (f > 0) then ! fd too large, make eta smaller to reduce it
+               eta_max = eta_ele
+            else  ! fd too small, make eta larger to reduce it
+               eta_min = eta_ele
+            end if
+            new_eta = 0.5d0 * (eta_min + eta_max)
+            if (abs(eta_ele - new_eta) < eostol) exit
+            if (i == 100) then
+               write(*,*) 'logT', logT
+               write(*,*) 'logRho', logRho
+               write(*,*) 'failed to find eta_ele by root solve'
+               stop 1
+            end if
+
+            eta_ele = new_eta
+            if (eta_ele > 1000d0) then
+                eta_ele = 1000d0; exit
+            end if
+            if (eta_ele < -1000d0) then
+                eta_ele = -1000d0; exit
+            end if
+
+         end do
+
+         if (log_free_e < log_free_e0) then
+            alfa = (log_free_e - log_free_e1) / (log_free_e0 - log_free_e1)
+            alfa = 0.5d0 * (1d0 - cos(pi*alfa))
+            beta = 1 - alfa
+            eta_ele = alfa * eta_ele + beta * tiny_eta_ele
+         end if
+
+      end if
+
+      eta = eta_ele
+
+      return
 
       end subroutine
       
@@ -549,7 +549,7 @@ c ***********************************************************************
      >      Pgas_1, Pgas_2, P_1, P_2, Pgas, P, s_1, s_2, s, dP_dT, dP_dRho,
      >      e_1, e_2, e, dE_dT, dP_dT_1, dP_dT_2, dP_dRho_1, dP_dRho_2, x   
          
-         include 'formats.dek'
+         include 'formats'
          
          Pgas_1 = 10**logPgas_1
          Pgas_2 = 10**logPgas_2

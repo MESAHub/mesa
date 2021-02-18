@@ -31,7 +31,8 @@
       use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY
+         ATM_T_TAU_KRISHNA_SWAMY, &
+         ATM_T_TAU_TRAMPEDACH_SOLAR
       
       implicit none
 
@@ -140,6 +141,8 @@
             case ('solar_Hopf')
                s% atm_T_tau_relation = 'Krishna_Swamy'
             case ('Krishna_Swamy')
+               s% atm_T_tau_relation = 'Trampedach_solar'
+            case ('Trampedach_solar')
                s% atm_T_tau_relation = 'Eddington'
             case default
                write(*,*) 'Invalid atm_T_tau_relation: ', s% atm_T_tau_relation
@@ -222,6 +225,8 @@
          character(*), intent(in) :: name
          real(dp), intent(in) :: tau
 
+         real(dp) :: x
+
          select case (name)
          case ('Eddington')
             q = two_thirds
@@ -231,6 +236,10 @@
          case ('Krishna_Swamy')
             q = 1.39_dp - 0.815_dp*exp(-2.54_dp*tau) &
                   - 0.025_dp*exp(-30.0_dp*tau)
+         case ('Trampedach_solar')
+            x = log10(tau)
+            q = 0.6887302005929656_dp + 0.0668697860833449_dp*(x-0.1148742902769433_dp) &
+                  + 0.7657856893402466_dp*exp((x-0.9262126497691250_dp)/0.7657856893402466_dp)
          case default
             write(*,*) 'Invalid name in q: ', name
             call mesa_error(__FILE__,__LINE__)

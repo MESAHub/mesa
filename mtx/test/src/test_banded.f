@@ -97,7 +97,7 @@
          real(dp) :: mstar, dt, init_xtotal, banded_xtotal
          integer :: lrd, lid
          
-         include 'formats.dek'
+         include 'formats'
          
          write(*,*) 'test_diffusion'
          
@@ -167,7 +167,7 @@
             real(dp), pointer :: a(:,:), b(:,:)
             integer, pointer :: ip(:)
 
-            include 'formats.dek'
+            include 'formats'
             rpar_decsol => rpar_decsol_ary
             ipar_decsol => ipar_decsol_ary
             a1(1:lda*neq) => a1_ary

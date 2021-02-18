@@ -2154,7 +2154,7 @@
          next_M_center = next*Msun
          s% M_center = next_M_center
          s% xmstar = s% mstar - s% M_center
-         next_R_center = pow(s% M_center/(core_avg_rho*4*pi/3),1d0/3d0)
+         next_R_center = pow(s% M_center/(core_avg_rho*four_thirds_pi),one_third)
          call do1_relax_R_center(s, next_R_center, ierr)
          if (ierr /= 0) return
          next_L_center = s% M_center*core_avg_eps
@@ -2599,8 +2599,8 @@
          do k = s% nz, 1, -1
             dm = s% dm(k)
             rho = s% rho(k)
-            dr3 = (dm/rho)/(pi4/3) ! dm/rho is cell volume
-            s% xh(s% i_lnR,k) = log(rp13 + dr3)/3
+            dr3 = dm/(rho*four_thirds_pi) ! dm/rho is cell volume
+            s% xh(s% i_lnR,k) = log(rp13 + dr3)*one_third
             rp13 = rp13 + dr3
          end do
       end subroutine do1_relax_R_center
@@ -4370,7 +4370,7 @@
       subroutine error_check(name,ierr)
          character(len=*), intent(in) :: name
          integer, intent(in) :: ierr
-         include 'formats.inc'
+         include 'formats'
 
          if (ierr /= 0) then
             write(*,*) 'failed in ', name

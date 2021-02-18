@@ -49,9 +49,8 @@
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
-            Eturb_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
+            TDC_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
             rsp_flag, no_L
-         integer :: time_vals(8)
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
@@ -66,7 +65,7 @@
          chem_id => s% chem_id
          nvar_hydro = s% nvar_hydro
          nz = s% nz
-         Eturb_flag = s% Eturb_flag
+         TDC_flag = s% TDC_flag
          v_flag = s% v_flag
          u_flag = s% u_flag
          RTI_flag = s% RTI_flag
@@ -81,7 +80,7 @@
          write(iounit,'(a)') '!'
          prev_flag = (s% nz_old == s% nz .and. s% generations > 1)
          file_type = 0
-         if (Eturb_flag) file_type = file_type + 2**bit_for_Eturb
+         if (TDC_flag) file_type = file_type + 2**bit_for_w
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
          if (prev_flag) file_type = file_type + 2**bit_for_2models
@@ -92,33 +91,33 @@
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
          if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
          
-         no_L = (s% rsp_flag .or. s% Eturb_flag)
+         no_L = (s% rsp_flag .or. s% TDC_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
          
          write(iounit, '(i14)', advance='no') file_type
          write(iounit,'(a)',advance='no') ' -- model for mesa/star'
          if (BTEST(file_type, bit_for_velocity)) &
-            write(iounit,'(a)',advance='no') ', with cell boundary velocities (v)'
+            write(iounit,'(a)',advance='no') ', cell boundary velocities (v)'
          if (BTEST(file_type, bit_for_rotation)) &
-            write(iounit,'(a)',advance='no') ', with angular velocities (omega)'
+            write(iounit,'(a)',advance='no') ', angular velocities (omega)'
          if (BTEST(file_type, bit_for_j_rot)) &
-            write(iounit,'(a)',advance='no') ', with specific angular momentum (j_rot)'
+            write(iounit,'(a)',advance='no') ', specific angular momentum (j_rot)'
          if (BTEST(file_type, bit_for_D_omega)) &
-            write(iounit,'(a)',advance='no') ', with omega diffusion coefficients (D_omega)'
+            write(iounit,'(a)',advance='no') ', omega diffusion coefficients (D_omega)'
          if (BTEST(file_type, bit_for_am_nu_rot)) &
-            write(iounit,'(a)',advance='no') ', with am_nu_rot diffusion coefficients'
+            write(iounit,'(a)',advance='no') ', am_nu_rot diffusion coefficients'
          if (BTEST(file_type, bit_for_u)) &
-            write(iounit,'(a)',advance='no') ', with cell center Riemann velocities (u)'
+            write(iounit,'(a)',advance='no') ', cell center Riemann velocities (u)'
          if (BTEST(file_type, bit_for_RTI)) &
-            write(iounit,'(a)',advance='no') ', with Rayleigh-Taylor instabilities (alpha_RTI)'
+            write(iounit,'(a)',advance='no') ', Rayleigh-Taylor instabilities (alpha_RTI)'
          if (BTEST(file_type, bit_for_conv_vel)) &
-            write(iounit,'(a)',advance='no') ', with saved convection velocities (conv_vel)'
+            write(iounit,'(a)',advance='no') ', saved convection velocity - not a solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
-            write(iounit,'(a)',advance='no') ', with convection velocity solver variables (conv_vel)'
+            write(iounit,'(a)',advance='no') ', convection velocity as solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
-            write(iounit,'(a)',advance='no') ', with luminosity (L), with turbulent energy (Et) and radiative flux (Fr) for RSP'
-         if (BTEST(file_type, bit_for_Eturb)) &
-            write(iounit,'(a)',advance='no') ', with wturb=sqrt(turbulent energy)'
+            write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
+         if (BTEST(file_type, bit_for_w)) &
+            write(iounit,'(a)',advance='no') ', turbulent velocity (w)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -150,7 +149,7 @@
          if (s% R_center /= 0) then
             write(iounit, 11) 'R_center', s% R_center, &
                '! radius of core (cm).  R/Rsun, avg core density (g/cm^3):', &
-                  s% R_center/Rsun, s% M_center/(4*pi/3*pow3(s% R_center))
+                  s% R_center/Rsun, s% M_center/(four_thirds_pi*pow3(s% R_center))
          end if
          if (s% v_center /= 0) then
             write(iounit, 11) 'v_center', s% v_center, &
@@ -186,7 +185,6 @@
                s% cumulative_energy_error/s% total_energy, &
                'log_rel_run_E_err', &
                safe_log10(abs(s% cumulative_energy_error/s% total_energy))
-         write(iounit, 1) 'time', s% time
          write(iounit, 2) 'num_retries', s% num_retries
          write(iounit, '(a)') ! blank line for end of property list      
 
@@ -198,13 +196,12 @@
             call write1(s% lnT(k),ierr); if (ierr /= 0) exit
             call write1(s% lnR(k),ierr); if (ierr /= 0) exit            
             if (rsp_flag) then
-               call write1(s% Et(k),ierr); if (ierr /= 0) exit
+               call write1(s% RSP_Et(k),ierr); if (ierr /= 0) exit
                call write1(s% erad(k),ierr); if (ierr /= 0) exit
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
-            end if            
-            if (Eturb_flag) then
-               call write1(s% Eturb(k),ierr); if (ierr /= 0) exit
+            else if (TDC_flag) then
+               call write1(s% w(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit
@@ -270,12 +267,12 @@
          subroutine header
             write(iounit, fmt='(10x, a9, 1x, 99(a26, 1x))', advance='no') 'lnd', 'lnT', 'lnR'
             if (rsp_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'eturb_rsp'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'et_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'erad_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
-            else if (Eturb_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'Eturb'
+            else if (TDC_flag) then
+               write(iounit, fmt='(a26, 1x)', advance='no') 'w'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'

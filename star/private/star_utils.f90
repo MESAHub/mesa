@@ -294,7 +294,7 @@
             rL = rR
             rR = exp(s% xh(i_lnR,k))
             dm = s% dm(k)
-            dV = 4d0*pi/3d0*(rR*rR*rR - rL*rL*rL)
+            dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
             rho = dm/dV
             if (rho <= 0d0) then
                write(*,3) 'set_rho_to_dm_div_dV: rho <= 0', &
@@ -318,7 +318,7 @@
             if (s% dm(k) <= 0d0 .or. is_bad(s% m(k) + s% dm(k))) then
                write(*,2) 'dm m dq q M_center', k, &
                   s% dm(k), s% m(k), s% dq(k), s% q(k), s% M_center
-               stop 'set_m_and_dm'
+               if (s% stop_for_bad_nums) stop 'set_m_and_dm'
             end if
          end do
       end subroutine set_m_and_dm
@@ -528,7 +528,7 @@
          ierr = 0
          k = 1
          kap = s% opacity(1)
-         get_dtau1 = s% dm(1)*kap/(4*pi*s% rmid(1)*s% rmid(1))
+         get_dtau1 = s% dm(1)*kap/(pi4*s% rmid(1)*s% rmid(1))
          if (is_bad(get_dtau1)) then
             ierr = -1
             if (.not. s% report_ierr) return
@@ -573,7 +573,7 @@
             end if
             if (s% tau_start(k) < 0) s% tau_start(k) = s% tau(k)
             kap = s% opacity(k)
-            dtau = s% dm(k)*kap/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))
             if (is_bad(dtau)) then
                ierr = -1
                if (.not. s% report_ierr) return
@@ -717,7 +717,7 @@
             else
                rp13 = s% R_center*s% R_center*s% R_center
             end if
-            rmid = pow(0.5d0*(r003 + rp13),1d0/3d0)
+            rmid = pow(0.5d0*(r003 + rp13),one_third)
             s% rmid(k) = rmid
             if (s% rmid_start(k) < 0) s% rmid_start(k) = s% rmid(k)
             rmid2 = rmid*rmid
@@ -756,7 +756,7 @@
                   (tau_00*(s% r(k-1)-r) + tau_m1*(r-s% r(k)))/(s% r(k-1)-s% r(k))
                return
             end if
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          end do
       end function get_tau_at_r
 
@@ -778,7 +778,7 @@
          tau_phot = s% tau_base
          tau00 = s% tau_factor*s% tau_base
          do k = 1, s% nz
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
             if (taup1 >= tau_phot) then
                find_tau_phot = k
@@ -832,7 +832,7 @@
          tau00 = s% tau_factor*s% tau_base
          if (tau00 >= tau_phot) return
          do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
             ysum = ysum + s% rho(k)*(s% r(k) - s% r(k+1))
             if (taup1 >= tau_phot .and. dtau > 0d0) then
@@ -846,7 +846,7 @@
                r003 = s% r(k)*s% r(k)*s% r(k)
                rp13 = s% r(k+1)*s% r(k+1)*s% r(k+1)
                r3 = r003 + (rp13 - r003)*(tau_phot - tau00)/dtau
-               r = pow(r3,1d0/3d0)
+               r = pow(r3,one_third)
                m = s% m(k) - s% dm(k)*(tau_phot - tau00)/dtau
                if (s% u_flag) then
                   v = s% v_center
@@ -889,7 +889,7 @@
          tau00 = s% tau_factor*s% tau_base
          if (tau00 >= tau_phot) return
          do k = 1, s% nz-1
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             taup1 = tau00 + dtau
             if (taup1 >= tau_phot .and. dtau > 0d0) then
                get_phot_kap = s% opacity(k)
@@ -1194,7 +1194,7 @@
             CMImean = CMImean + AY(IX)*ACMI(IX)
          end do
 
-         RS=pow(0.75d0/PI/s% rho(k),1d0/3d0)
+         RS=pow(0.75d0/PI/s% rho(k),one_third)
          RSI=RS*CMImean*Z73*AUM
          
          if (is_bad(RSI)) then
@@ -1320,11 +1320,15 @@
          nz = s% nz
          min_k = nz
          min_dr_div_cs = 1d99
+         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
+         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
+         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
          if (s% v_flag) then
-            r00 = s% R_center
-            do k=nz,1,-1
-               rp1 = r00
+            do k = k_min, nz-1
+               if (s% q(k) > max_q) cycle
+               if (s% q(k) < min_q) exit
                r00 = s% r(k)
+               rp1 = s% r(k+1)
                dr_div_cs = (r00 - rp1)/s% csound(k)
                if (dr_div_cs < min_dr_div_cs) then
                   min_dr_div_cs = dr_div_cs
@@ -1336,9 +1340,6 @@
          if (.not. s% u_flag) return
          min_abs_du_div_cs = &
             s% min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit
-         min_q = s% min_q_for_dt_div_min_dr_div_cs_limit
-         max_q = s% max_q_for_dt_div_min_dr_div_cs_limit
-         k_min = max(1, s% min_k_for_dt_div_min_dr_div_cs_limit)
          do k = k_min, nz-1
             if (s% q(k) > max_q) cycle
             if (s% q(k) < min_q) exit
@@ -1351,26 +1352,7 @@
             end if
          end do
       end function min_dr_div_cs
-
-
-      ! largest k s.t. for all k' < k, cell k' has Cp(k')*T(k')*mstar_dot < L(k).
-      subroutine set_k_CpTMdot_lt_L(s)
-         type (star_info), pointer :: s
-         integer :: k, nz
-         if (s% mstar_dot <= 0d0) then
-            s% k_CpTMdot_lt_L = 1
-            return
-         end if
-         nz = s% nz
-         do k = 2, nz
-            if (s% Cp(k)*s% T(k)*s% mstar_dot >= max(1d-99,s% L(k))) then
-               s% k_CpTMdot_lt_L = k-1
-               return
-            end if
-         end do
-         s% k_CpTMdot_lt_L = nz
-      end subroutine set_k_CpTMdot_lt_L
-
+      
 
       subroutine reset_epsnuc_vectors(s)
          type (star_info), pointer :: s
@@ -1415,48 +1397,47 @@
       end subroutine reset_starting_vectors
       
       
-      subroutine store_partials(s, k, xscale, i_eqn, nvar, d_dm1, d_d00, d_dp1)
+      subroutine store_partials(s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1)
          type (star_info), pointer :: s
          integer, intent(in) :: k, i_eqn, nvar
-         real(dp), pointer :: xscale(:,:)
          real(dp), intent(in) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          integer :: nz, j
          nz = s% nz
          do j=1,nvar
-            if (k > 1) call em1(s, xscale, i_eqn, j, k, nvar, d_dm1(j))
-            call e00(s, xscale, i_eqn, j, k, nvar, d_d00(j))
-            if (k < nz) call ep1(s, xscale, i_eqn, j, k, nvar, d_dp1(j))
+            if (k > 1) call em1(s, i_eqn, j, k, nvar, d_dm1(j))
+            call e00(s, i_eqn, j, k, nvar, d_d00(j))
+            if (k < nz) call ep1(s, i_eqn, j, k, nvar, d_dp1(j))
          end do            
       end subroutine store_partials
 
 
-      subroutine unpack_res18_partials(s, k, nvar, xscale, i_eqn, &
+      subroutine unpack_res18_partials(s, k, nvar, i_eqn, &
             res18, d_dm1, d_d00, d_dp1)
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar, i_eqn
-         real(dp), pointer :: xscale(:,:)
          type(auto_diff_real_18var_order1) :: res18
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            deturb_m1, deturb_00, deturb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1
          integer :: j
 
          include 'formats'
 
          call unwrap(res18, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-                     deturb_m1, deturb_00, deturb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+                     dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
                      dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1) 
                      
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
          call unpack1(s% i_lnT, dlnT_m1, dlnT_00, dlnT_p1)
          call unpack1(s% i_lnR, dlnR_m1, dlnR_00, dlnR_p1)
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
+         if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
-         if (s% i_eturb /= 0) call unpack1(s% i_eturb, deturb_m1, deturb_00, deturb_p1)
+         if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
          
          contains
          
@@ -1541,14 +1522,14 @@
          dtau = dtau1
          tau = s% tau_factor*s% tau_base
          dqsum = s% dq(1)
-         Ledd_sum = s% dq(1)*4*pi*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(1)
+         Ledd_sum = s% dq(1)*pi4*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(1)
          do k = 2, s% nz
             tau = tau + dtau
             if (tau > s% surf_avg_tau) exit
-            dtau = s% dm(k)*s% opacity(k)/(4*pi*s% rmid(k)*s% rmid(k))
+            dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
             dqsum = dqsum + s% dq(k)
             Ledd_sum = Ledd_sum + &
-               s% dq(k)*4*pi*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(k)
+               s% dq(k)*pi4*clight*s% cgrav(1)*s% m_grav(1)/s% opacity(k)
          end do
          eval_Ledd = Ledd_sum/dqsum
       end function eval_Ledd
@@ -1610,7 +1591,7 @@
          real(dp) :: irradiation_dq, xq, eps
          eval_irradiation_heat = 0
          if (s% irradiation_flux /= 0) then
-            irradiation_dq = 4*pi*s% r(1)*s% r(1)*s% column_depth_for_irradiation/s% xmstar
+            irradiation_dq = pi4*s% r(1)*s% r(1)*s% column_depth_for_irradiation/s% xmstar
             xq = 1 - s% q(k)
             if (irradiation_dq > xq) then ! add irradiation heat for cell k
                eps = 0.25d0 * s% irradiation_flux / s% column_depth_for_irradiation
@@ -1672,6 +1653,50 @@
             s% time_set_mixing_info
       end function total_times
 
+      
+      real(dp) function get_remnant_mass(s)
+         type (star_info), pointer :: s
+         get_remnant_mass = s% m(1) - get_ejecta_mass(s)
+      end function get_remnant_mass
+      
+      
+      real(dp) function get_ejecta_mass(s)
+         use num_lib, only: find0
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: v, vesc, v_div_vesc, v_div_vesc_prev, dm
+         include 'formats'
+         get_ejecta_mass = 0d0
+         if (.not. (s% u_flag .or. s% v_flag)) return
+         v_div_vesc_prev = 0d0
+         do k=1,s% nz
+            if (s% u_flag) then
+               v = s% u_face_18(k)%val
+            else
+               v = s% v(k)
+            end if
+            vesc = sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
+            v_div_vesc = v/vesc
+            if (v_div_vesc < 1d0) then
+               if (k == 1) return
+               dm = find0(0d0, v_div_vesc_prev-1d0, s% dm(k-1), v_div_vesc-1d0)
+               if (dm < 0d0) then
+                  write(*,2) 'v_div_vesc_prev-1d0', k, v_div_vesc_prev-1d0
+                  write(*,2) 'v_div_vesc-1d0', k, v_div_vesc-1d0
+                  write(*,2) 's% dm(k-1)', k, s% dm(k-1)
+                  write(*,2) 'dm', k, dm
+                  stop 'get_ejecta_mass'
+               end if
+               if (k == 2) then
+                  get_ejecta_mass = dm
+               else
+                  get_ejecta_mass = sum(s% dm(1:k-2)) + dm
+               end if
+               return
+            end if
+            v_div_vesc_prev = v_div_vesc
+         end do
+      end function get_ejecta_mass
 
 
       subroutine smooth(dc, sz)
@@ -1808,7 +1833,7 @@
             v = s% r(1)*s% dlnR_dt(1)
          end if
          r = s% rmid(k)
-         get_Ladv = 4*pi*r*r*v*Erad
+         get_Ladv = pi4*r*r*v*Erad
       end function get_Ladv
 
 
@@ -1828,7 +1853,7 @@
          end if
          del_m = s% dm_bar(j)
          del_T4 = pow4(s% T(j-1)) - pow4(s% T(j))
-         area = 4*pi*s% r(j)*s% r(j)
+         area = pi4*s% r(j)*s% r(j)
          L_rad_div_Ledd = &
             -(area*area*crad*(del_T4/del_m)/3)/(pi4*s% cgrav(j)*s% m_grav(j))
       end function get_Lrad_div_Ledd
@@ -2034,6 +2059,38 @@
          end if
          cell_specific_rotational_energy = 0.5d0*(e_p1 + e_00)
       end function cell_specific_rotational_energy
+
+      
+      subroutine get_dke_dt_dpe_dt(s, k, dt, &
+            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)
+         type (star_info), pointer :: s      
+         integer, intent(in) :: k 
+         real(dp), intent(in) :: dt
+         real(dp), intent(out) :: &
+            dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
+            dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1
+         integer, intent(out) :: ierr
+         real(dp) :: PE_start, PE_new, KE_start, KE_new, q1
+         real(dp) :: dpe_dlnR00, dpe_dlnRp1, dke_dv00, dke_dvp1
+         integer :: nz
+         include 'formats'
+         ierr = 0
+         ! rate of change in specific PE (erg/g/s)
+         PE_start = cell_start_specific_PE_qp(s,k)
+         PE_new = cell_specific_PE_qp(s,k,dpe_dlnR00,dpe_dlnRp1)
+         q1 = PE_new - PE_start
+         dpe_dt = q1/dt ! erg/g/s
+         d_dpedt_dlnR00 = dpe_dlnR00/dt
+         d_dpedt_dlnRp1 = dpe_dlnRp1/dt    
+         ! rate of change in specific KE (erg/g/s)
+         KE_start = cell_start_specific_KE_qp(s,k)
+         KE_new = cell_specific_KE_qp(s,k,dke_dv00,dke_dvp1)
+         q1 = KE_new - KE_start
+         dke_dt = q1/dt ! erg/g/s
+         d_dkedt_dv00 = dke_dv00/dt
+         d_dkedt_dvp1 = dke_dvp1/dt   
+      end subroutine get_dke_dt_dpe_dt
       
       
       real(dp) function eval_deltaM_total_from_profile( &
@@ -2071,8 +2128,8 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% Eturb_flag) cell_total = cell_total + s% Eturb(k)
-         if (s% rsp_flag) cell_total = cell_total + s% Et(k)
+         if (s% TDC_flag) cell_total = cell_total + s% w(k)**2
+         if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
       
@@ -2154,13 +2211,13 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% Eturb_flag) then
-               cell1 = dm*s% Eturb(k)
+            if (s% TDC_flag) then
+               cell1 = dm*s% w(k)**2
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
             if (s% rsp_flag) then
-               cell1 = dm*s% Et(k)
+               cell1 = dm*s% RSP_Et(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2203,12 +2260,12 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% Eturb_flag) then
-               cell1 = dm*s% Eturb(k)
+            if (s% TDC_flag) then
+               cell1 = dm*s% w(k)**2
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
-               cell1 = dm*s% Et(k)
+               cell1 = dm*s% RSP_Et(k)
                cell_total = cell_total + cell1
             end if
             total_energy_profile(k) = cell_total
@@ -2383,7 +2440,7 @@
          character (len=*), intent(in) :: namestr
          integer :: i
          lookup_nameofvar = 0
-         do i=1,s% nvar
+         do i=1,s% nvar_total
             if (namestr == s% nameofvar(i)) then
                lookup_nameofvar = i
                return
@@ -2397,7 +2454,7 @@
          character (len=*), intent(in) :: namestr
          integer :: i
          lookup_nameofequ = 0
-         do i=1,s% nvar
+         do i=1,s% nvar_total
             if (namestr == s% nameofequ(i)) then
                lookup_nameofequ = i
                return
@@ -2419,12 +2476,12 @@
             else
                rp13 = s% R_center*s% R_center*s% R_center
             end if
-            rmid = pow(0.5d0*(r003 + rp13),1d0/3d0)
+            rmid = pow(0.5d0*(r003 + rp13),one_third)
          else
            rmid = s% rmid(k)
          end if
 
-         Ledd = 4*pi*clight*s% cgrav(k)*s% m_grav(k)/s% opacity(k)
+         Ledd = pi4*clight*s% cgrav(k)*s% m_grav(k)/s% opacity(k)
          Lrad_div_Ledd = get_Lrad_div_Ledd(s,k)
          gamma_factor = 1d0 - min(Lrad_div_Ledd, 0.9999d0)
          omega_crit = sqrt(gamma_factor*s% cgrav(k)*s% m_grav(k)/pow3(rmid))
@@ -2478,7 +2535,7 @@
             Lmid = 0.5d0*(s% L(k) + s% L(k+1))
             cgrav = 0.5d0*(s% cgrav(k) + s% cgrav(k+1))
             dm = s% dm(k)
-            dtau = dm*kap/(4*pi*rmid*rmid)
+            dtau = dm*kap/(pi4*rmid*rmid)
 
             if (tau + dtau <= s% surf_avg_tau_min) then
                tau = tau + dtau
@@ -2530,7 +2587,7 @@
               rmid = s% rmid(k)
             end if
             dm = s% dm(k)
-            dtau = dm*kap/(4*pi*rmid*rmid)
+            dtau = dm*kap/(pi4*rmid*rmid)
 
             if (tau + dtau <= s% surf_avg_tau_min) then
                tau = tau + dtau
@@ -2791,7 +2848,7 @@
          else if (s% L_by_category(icc) > 1d2 .and. center_he4 < 1d-4) then
             s% phase_of_evolution = phase_C_Burn
          else if (center_he4 < 1d-4 .and. &
-            s% he_core_mass - s% c_core_mass <= 0.1d0 .and. &
+            s% he_core_mass - s% co_core_mass <= 0.1d0 .and. &
             any(s% burn_he_conv_region(1:s% num_conv_boundaries))) then
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then
@@ -2833,7 +2890,7 @@
       subroutine save_for_d_dt(s)
          ! these values will be modified as necessary by adjust mass
          type (star_info), pointer :: s
-         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_eturb, &
+         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_w, &
             i_v, i_u, i_alpha_RTI, i_ln_cvpv0
          include 'formats'
          
@@ -2841,7 +2898,7 @@
          i_lnR = s% i_lnR
          i_lnT = s% i_lnT
          i_lnd = s% i_lnd
-         i_eturb = s% i_eturb
+         i_w = s% i_w
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -2872,9 +2929,9 @@
                s% v_for_d_dt_const_m(k) = s% xh(i_v, k)
             end do
          end if
-         if (i_eturb /= 0) then
+         if (i_w /= 0) then
             do k=1, nz
-               s% eturb_for_d_dt_const_m(k) = s% xh(i_eturb, k)
+               s% w_for_d_dt_const_m(k) = s% xh(i_w, k)
             end do
          end if
          if (i_u /= 0) then
@@ -2896,7 +2953,7 @@
          real(dp) :: r2
          include 'formats'
          r2 = s% r(k)*s% r(k)
-         if (s% using_Fraley_time_centering) then
+         if (s% using_velocity_time_centering) then
             s% R2(k) = &
                (r2 + s% r_start(k)*s% r(k) + s% r_start(k)*s% r_start(k))/3d0
             s% d_R2_dlnR(k) = (2d0*r2 + s% r_start(k)*s% r(k))/3d0            
@@ -2905,7 +2962,7 @@
             s% d_R2_dlnR(k) = 2d0*r2
          end if
          if (s% v_flag) then
-            if (s% using_Fraley_time_centering) then
+            if (s% using_velocity_time_centering) then
                s% vc(k) = 0.5d0*(s% v_start(k) + s% v(k))
             else
                s% vc(k) = s% v(k)
@@ -2939,11 +2996,10 @@
 
 
       ! e00(i,j,k) is partial of equ(i,k) wrt var(j,k)
-      subroutine e00(s,xscale,i,j,k,nvar,v)
+      subroutine e00(s,i,j,k,nvar,v)
          use num_def, only: &
             block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
          integer :: b, q, v00
@@ -2962,21 +3018,21 @@
          
          if (.false. .and. j == s% i_lnT .and. k == 30) then
             write(*,4) 'e00(i,j,k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k)
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k)
          end if
          
          if (is_bad(v)) then
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            if (s% stop_for_bad_nums) stop 'e00'
+            if (s% stop_for_bad_nums) stop '1 e00'
 !$omp end critical (star_utils_e00_crit1)
          end if
          
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-            stop 'e00'
+            stop '2 e00'
          end if
          
          if (j > nvar) return ! hybrid
@@ -2986,27 +3042,22 @@
             write(*,5) 'bad i e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
                s% solver_iter, i, j, k, v
-            stop 'e00'
+            stop '3 e00'
 !$omp end critical (star_utils_e00_crit2)
          end if
 
          if (abs(v) < 1d-250) return
 
-         if (associated(xscale)) then
-            s% dblk(i,j,k) = s% dblk(i,j,k) + v*xscale(j,k)
-         else
-            s% dblk(i,j,k) = s% dblk(i,j,k) + v
-         end if
+         s% dblk(i,j,k) = s% dblk(i,j,k) + v*s% x_scale(j,k)
 
       end subroutine e00
 
 
       ! em1(i,j,k) is partial of equ(i,k) wrt var(j,k-1)
-      subroutine em1(s,xscale,i,j,k,nvar,v)
+      subroutine em1(s,i,j,k,nvar,v)
          use num_def, only: &
             block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
          integer :: b, q, vm1
@@ -3024,11 +3075,11 @@
          
          if (.false. .and. j == s% i_lnT .and. k == 31) then
             write(*,4) 'em1(i,j,k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k-1)
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
          
-         if (s% Eturb_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,2) 'cannot have Eturb_flag and partials wrt L(k-1)', k
+         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
+            write(*,2) 'cannot have TDC_flag and partials wrt L(k-1)', k
             stop 'em1'
          end if
          
@@ -3057,21 +3108,16 @@
 
          if (abs(v) < 1d-250) return
 
-         if (associated(xscale)) then
-            s% lblk(i,j,k) = s% lblk(i,j,k) + v*xscale(j,k-1)
-         else
-            s% lblk(i,j,k) = s% lblk(i,j,k) + v
-         end if
+         s% lblk(i,j,k) = s% lblk(i,j,k) + v*s% x_scale(j,k-1)
 
       end subroutine em1
 
 
       ! ep1(i,j,k) is partial of equ(i,k) wrt var(j,k+1)
-      subroutine ep1(s,xscale,i,j,k,nvar,v)
+      subroutine ep1(s,i,j,k,nvar,v)
          use num_def, only: &
             block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
          integer :: b, q, vp1
@@ -3089,7 +3135,7 @@
          
          if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, xscale(j,k+1)
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k+1)
          end if
          
          if (is_bad(v)) then
@@ -3117,11 +3163,7 @@
 
          if (abs(v) < 1d-250) return
 
-         if (associated(xscale)) then
-            s% ublk(i,j,k) = s% ublk(i,j,k) + v*xscale(j,k+1)
-         else
-            s% ublk(i,j,k) = s% ublk(i,j,k) + v
-         end if
+         s% ublk(i,j,k) = s% ublk(i,j,k) + v*s% x_scale(j,k+1)
 
       end subroutine ep1
 
@@ -3289,31 +3331,33 @@
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(out) :: Pt
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Eturb, rho
+         type(auto_diff_real_18var_order1) :: w, rho
          real(dp) :: Pt_start
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% Eturb_alfap == 0 .or. s% Eturb_alfa == 0) then
+         if (s% TDC_alfap == 0 .or. s% TDC_alfa == 0) then
             Pt = 0d0
             return
          end if
-
+         
+         stop 'fix this for w replacing et'
+         
          rho = wrap_d_00(s,k)
-         Eturb = wrap_eturb_00(s,k)
-         Pt = s% Eturb_alfap*Eturb*rho
-         time_center = (s% using_Fraley_time_centering .and. &
-                  s% include_P_in_Fraley_time_centering)
+         w = wrap_w_00(s,k)
+         Pt = s% TDC_alfap*pow2(w)*rho
+         time_center = (s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% Eturb_alfap*s% Eturb_start(k)*s% rho_start(k)
+            Pt_start = s% TDC_alfap*s% w_start(k)*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 
          if (is_bad(Pt%val)) then
-!$omp critical (hydro_eturb_crit2)
+!$omp critical (hydro_et_crit2)
             write(*,2) 'Pt', k, Pt%val
             stop 'calc_Pt_tw'
-!$omp end critical (hydro_eturb_crit2)
+!$omp end critical (hydro_et_crit2)
          end if
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -3346,8 +3390,8 @@
          ierr = 0
          d_XP_dxa = 0d0
          
-         time_center = (s% using_Fraley_time_centering .and. &
-                  s% include_P_in_Fraley_time_centering)
+         time_center = (s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering)
          
          P_18 = 0d0         
          if (.not. skip_P) then
@@ -3367,7 +3411,7 @@
          end if
          
          Pt_18 = 0d0
-         if (s% Eturb_flag) then
+         if (s% TDC_flag) then
             call calc_Pt_18_tw(s, k, Pt_18, ierr) 
             if (ierr /= 0) return
             ! note that Pt_18 is already time weighted
@@ -3425,6 +3469,7 @@
          call get1_avQ(s, k, avQ, &
             d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
          if (ierr /= 0) return
+         s% avQ(k) = avQ
          if (s% avQ_start(k) < -1d90) s% avQ_start(k) = avQ
       end subroutine get_avQ
       
@@ -3618,8 +3663,8 @@
          source = s% P(k)*q1/(dt*s% rho(k))
          
          if (s% u_flag) then
-            u_face = s% u_face(k)
-            P_face = s% P_face(k)
+            u_face = s% u_face_18(k)%val
+            P_face = s% P_face_18(k)%val
          else if (s% v_flag) then
             u_face = s% v(k)
             if (k > 1) then
@@ -3633,14 +3678,14 @@
             u_face = 0d0
             P_face = 0d0
          end if
-         AvP00 = 4d0*pi*s% r(k)*s% r(k)*u_face*P_face
+         AvP00 = pi4*s% r(k)*s% r(k)*u_face*P_face
 
          if (k == nz) then
             AvPp1 = 0d0
          else
             if (s% u_flag) then
-               u_face = s% u_face(k+1)
-               P_face = s% P_face(k+1)
+               u_face = s% u_face_18(k+1)%val
+               P_face = s% P_face_18(k+1)%val
             else if (s% v_flag) then
                u_face = s% v(k+1)
                alfa = s% dq(k)/(s% dq(k) + s% dq(k+1))
@@ -3650,7 +3695,7 @@
                u_face = 0d0
                P_face = 0d0
             end if
-            AvPp1 = 4d0*pi*s% r(k+1)*s% r(k+1)*u_face*P_face
+            AvPp1 = pi4*s% r(k+1)*s% r(k+1)*u_face*P_face
          end if
          d_AvP_dm = (AvP00 - AvPp1)/dm
 
@@ -3791,6 +3836,27 @@
          end do
          center_avg_x = sum_x/sum_dq
       end function center_avg_x
+      
+      
+      subroutine get_area_info(s, k, &
+            area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: area, d_area_dlnR, inv_R2, d_inv_R2_dlnR
+         integer, intent(out) :: ierr
+         ierr = 0
+         if (s% using_velocity_time_centering) then
+            area = 4d0*pi*(s% r(k)**2 + s% r(k)*s% r_start(k) + s% r_start(k)**2)/3d0
+            d_area_dlnR = 4d0*pi*s% r(k)*(2d0*s% r(k) + s% r_start(k))/3d0
+            inv_R2 = 1d0/(s% r(k)*s% r_start(k))
+            d_inv_R2_dlnR = -1d0*inv_R2
+         else
+            area = 4d0*pi*s% r(k)**2
+            d_area_dlnR = 2d0*area
+            inv_R2 = 1d0/s% r(k)**2
+            d_inv_R2_dlnR = -2d0*inv_R2
+         end if
+      end subroutine get_area_info
 
 
       end module star_utils

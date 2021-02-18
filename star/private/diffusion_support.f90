@@ -439,7 +439,7 @@
          do i=1, nc
             ni=ni+c(i)*ne
          end do
-         ao=pow(0.23873d0/ni,1d0/3d0) 
+         ao=pow(0.23873d0/ni,one_third) 
          ! calculate debye length (lambdad):
          cz=0.d0
          do i=1, m
@@ -1630,7 +1630,7 @@
         do i = 1,nc
            ni_tot = ni_tot + nd(i)
         end do
-        kappa = pow(3d0/(pi4*ni_tot),1d0/3d0)/lam_e
+        kappa = pow(3d0/(pi4*ni_tot),one_third)/lam_e
 
         rhotot = 0d0
         do i = 1,nc
@@ -1638,7 +1638,7 @@
            rhotot = rhotot + Z(i)*qe*nd(i) ! = qe*ne?
         end do
         do i = 1,nc
-           ai(i) = pow(3d0*Z(i)*qe/(pi4*rhotot),1d0/3d0)
+           ai(i) = pow(Z(i)*qe/(four_thirds_pi*rhotot), one_third)
            gam_is(i) = Z(i)*Z(i)*qe*qe/(ai(i)*boltzm*T)
            ! Number densities that are 0 or tiny cause screening length to diverge.
            ! This is physical; nothing is there to screen anything.

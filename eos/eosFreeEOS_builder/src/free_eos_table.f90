@@ -544,7 +544,7 @@ contains
       Rho = exp(logRho)
       log10Rho = logRho/ln10
          
-      call eosDT_get(eos_handle, X, Z, abar, zbar, &
+      call eosDT_get_legacy(eos_handle, X, Z, abar, zbar, &
          Neps, chem_id, net_iso, mass_frac, &
          Rho, log10Rho, T, log10T, &
          res, d_dlnRho_const_T, d_dlnT_const_Rho, &

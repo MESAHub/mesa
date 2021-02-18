@@ -184,7 +184,7 @@
          
             if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
             if (s% job% report_cell_for_xm > 0) call do_report_cell_for_xm(s)
-         
+            
             first_try = .true.
             
             model_number = get_model_number(id, ierr)
@@ -272,7 +272,7 @@
             if (s% doing_timing) call show_times(id,s)
          
             result_reason = get_result_reason(id, ierr)
-            if (result_reason /= result_reason_normal) then
+            if (result_reason /= result_reason_normal .and. result_reason > 0) then
                write(*, *) 
                write(*, *) 'terminated evolution because ' // trim(result_reason_str(result_reason))
                write(*, *)

@@ -21,32 +21,32 @@
       
       
 
-      ! Eturb parameters
+      ! TDC parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          
-      !   Eturb_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   Eturb_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   Eturb_alfat =     0.0d0         ! turbulent flux; Lt ~ Eturb_alfat
-      !   Eturb_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ Eturb_alfam
-      !   Eturb_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ Eturb_alfar    
+      !   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
+      !   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+      !   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar    
       !      
-      ! Eturb time weighting is determined by the Fraley_time_centering controls.
+      ! TDC time weighting is determined by the velocity_time_centering controls.
       !     for Pt and Lt in turbulent energy equation
       !     for P and grav in momentum equation
       !     for P and L in energy equation
       !     for area when multiplied by P
-      ! Eturb_Lsurf_factor: Lsurf = Eturb_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      ! TDC_Lsurf_factor: Lsurf = TDC_Lsurf_factor*area(1)*clight*crad*T(1)**4
       !   
 
       ! ::
 
-    Eturb_alfa  = 1.5d0
-    Eturb_alfap = 0.0d0
-    Eturb_alfat = 0.0d0
-    Eturb_alfam = 0.25d0
-    Eturb_alfar = 0.0d0
+    TDC_alfa  = 1.5d0
+    TDC_alfap = 0.0d0
+    TDC_alfat = 0.0d0
+    TDC_alfam = 0.25d0
+    TDC_alfar = 0.0d0
 
-    Eturb_Lsurf_factor = 0.5d0
+    TDC_Lsurf_factor = 0.5d0
 
 
       ! use_DGESVX_in_bcyclic
@@ -71,24 +71,6 @@
       ! ::
 
     mlt_make_surface_no_mixing = .false.
-
-
-      ! drag_coefficient
-      ! ~~~~~~~~~~~~~~~~
-      ! min_q_for_drag
-      ! ~~~~~~~~~~~~~~
-      ! turn_on_drag_in_H_envelope
-      ! ~~~~~~~~~~~~~~
-
-      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
-      ! only for v(k) when q(k) > min_q_for_drag.
-      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
-
-      ! ::
-
-    drag_coefficient = 0d0
-    min_q_for_drag = 0d0
-    turn_on_drag_in_H_envelope = .false.
 
 
       ! use_superad_reduction

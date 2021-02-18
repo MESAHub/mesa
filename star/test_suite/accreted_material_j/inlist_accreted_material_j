@@ -76,8 +76,8 @@
 
       max_mdot_redo_cnt = 200
       min_years_dt_for_redo_mdot = 1d-5
-      surf_w_div_w_crit_limit = 0.999d0
-      surf_w_div_w_crit_tol = 0.055
+      surf_omega_div_omega_crit_limit = 0.999d0
+      surf_omega_div_omega_crit_tol = 0.055
       rotational_mdot_boost_fac = 1d10
       rotational_mdot_kh_fac = 1d10
       mdot_revise_factor = 1.1

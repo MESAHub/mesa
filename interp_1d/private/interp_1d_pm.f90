@@ -57,7 +57,7 @@
          real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          

@@ -13,7 +13,7 @@
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
          logical, parameter :: sparse = .false.
-         include 'formats.dek'
+         include 'formats'
          ierr = 0
          if (iop == 0) then ! factor
             call bcyclic_factor( &

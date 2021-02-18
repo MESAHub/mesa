@@ -55,7 +55,7 @@ module test_screen
       integer :: h1, he3, he4, c12, n14, o16, ne20, mg24
       character (len=32) :: my_mesa_dir
       
-      include 'formats.dek'
+      include 'formats'
       
       ierr = 0
       my_mesa_dir = '../..'         
@@ -162,7 +162,7 @@ module test_screen
          integer, intent(in) :: sc_mode
          integer, intent(out) :: ierr
          character (len=64) :: sc_str
-         include 'formats.dek'
+         include 'formats'
          call screening_option_str(sc_mode, sc_str, ierr)
          if (ierr /= 0) return
          write(*,*) trim(sc_str)
@@ -173,7 +173,7 @@ module test_screen
          call screen_init_AZ_info( &
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)), &
-            zg1, zg2, zg3, zg4, zs13, &
+            zs13, &
             zhat, zhat2, lzav, aznut, zs13inv, &
             ierr)
          if (ierr /= 0) return
@@ -189,7 +189,7 @@ module test_screen
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)),  &
             sc_mode, &
-            zg1, zg2, zg3, zg4, zs13, zhat, zhat2, lzav, aznut, zs13inv, &
+            zs13, zhat, zhat2, lzav, aznut, zs13inv, rattab_tlo,&
             sc1a, sc1adt, sc1add, ierr)
          if (ierr /= 0) return
 

@@ -49,9 +49,9 @@
          auto_diff_wrap_d_m1 => wrap_d_m1, &
          auto_diff_wrap_d_00 => wrap_d_00, &
          auto_diff_wrap_d_p1 => wrap_d_p1, &
-         auto_diff_wrap_eturb_m1 => wrap_eturb_m1, &
-         auto_diff_wrap_eturb_00 => wrap_eturb_00, &
-         auto_diff_wrap_eturb_p1 => wrap_eturb_p1, &
+         auto_diff_wrap_w_m1 => wrap_w_m1, &
+         auto_diff_wrap_w_00 => wrap_w_00, &
+         auto_diff_wrap_w_p1 => wrap_w_p1, &
          auto_diff_wrap_kap_m1 => wrap_kap_m1, &
          auto_diff_wrap_kap_00 => wrap_kap_00, &
          auto_diff_wrap_kap_p1 => wrap_kap_p1, &
@@ -710,12 +710,13 @@
          call write_controls(s, filename, ierr)
       end subroutine star_write_controls
 
-      subroutine star_build_atm(s, ierr)
+      subroutine star_build_atm(s, L, R, M, cgrav, ierr)
          ! sets s% atm_structure_num_pts and s% atm_structure
         use atm_support
          type (star_info), pointer :: s
+         real(dp), intent(in) :: L, R, M, cgrav
          integer, intent(out) :: ierr
-         call build_atm(s, ierr)
+         call build_atm(s, L, R, M, cgrav, ierr)
        end subroutine star_build_atm
 
       
@@ -857,16 +858,16 @@
       end subroutine star_set_j_rot_flag
 
 
-      subroutine star_set_Eturb_flag(id, Eturb_flag, ierr)
-         use alloc, only: set_Eturb_flag
+      subroutine star_set_TDC_flag(id, et_flag, ierr)
+         use alloc, only: set_TDC_flag
          integer, intent(in) :: id
-         logical, intent(in) :: Eturb_flag
+         logical, intent(in) :: et_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call set_Eturb_flag(id, Eturb_flag, ierr)
-      end subroutine star_set_Eturb_flag
+         call set_TDC_flag(id, et_flag, ierr)
+      end subroutine star_set_TDC_flag
 
 
       subroutine star_set_RSP_flag(id, RSP_flag, ierr)
@@ -1296,6 +1297,23 @@
          integer, intent(out) :: ierr
          call do_relax_mass(id, new_mass, lg_max_abs_mdot, ierr)      
       end subroutine star_relax_mass
+      
+      
+      subroutine star_relax_mass_to_remove_H_env(id, lg_max_abs_mdot, ierr) ! also resets initial_mass
+         use relax, only: do_relax_mass
+         use report, only: get_mass_info
+         integer, intent(in) :: id
+         real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
+            ! e.g., -8.0 for mdot of -10^-8 Msun/year
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call get_mass_info(s, s% dm, ierr)
+         if (ierr /= 0) return
+         call do_relax_mass(id, s% he_core_mass, lg_max_abs_mdot, ierr)      
+      end subroutine star_relax_mass_to_remove_H_env
       
       
       subroutine star_relax_mass_scale( &
@@ -2286,13 +2304,13 @@
        end subroutine star_do_kap_for_cell
        
        subroutine star_get_atm_PT( &
-             id, tau_surf, skip_partials, Teff, &
+             id, tau_surf, L, R, M, cgrav, skip_partials, Teff, &
              lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
              lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
              ierr)
          use atm_support, only: get_atm_PT
          integer, intent(in) :: id
-         real(dp), intent(in) :: tau_surf
+         real(dp), intent(in) :: tau_surf, L, R, M, cgrav
          logical, intent(in) :: skip_partials
          real(dp), intent(out) :: &
             Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
@@ -2303,7 +2321,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call get_atm_PT( &
-             s, tau_surf, skip_partials, &
+             s, tau_surf, L, R, M, cgrav, skip_partials, &
              Teff, &
              lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
              lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -2677,6 +2695,15 @@
       end subroutine star_remove_surface_at_cell_k
       
       
+      subroutine star_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)
+         use remove_shells, only: do_remove_surface_at_he_core_boundary
+         integer, intent(in) :: id
+         real(dp), intent(in) :: h1_fraction
+         integer, intent(out) :: ierr
+         call do_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)      
+      end subroutine star_remove_surface_at_he_core_boundary
+      
+      
       subroutine star_remove_surface_by_optical_depth(id, optical_depth, ierr)
          use remove_shells, only: do_remove_surface_by_optical_depth
          integer, intent(in) :: id
@@ -2684,8 +2711,7 @@
          integer, intent(out) :: ierr
          call do_remove_surface_by_optical_depth(id, optical_depth, ierr)      
       end subroutine star_remove_surface_by_optical_depth
-      
-      
+
       
       subroutine star_remove_surface_by_density(id, density, ierr)
          use remove_shells, only: do_remove_surface_by_density

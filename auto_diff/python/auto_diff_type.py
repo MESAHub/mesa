@@ -212,7 +212,7 @@ class AutoDiffType:
 		function_arguments = [('x', self.declare_name(ref='*'), 'in')]
 		function_arguments = function_arguments + [('z_' + str(p).replace('val1','x'), 'real(dp)', 'in') for p in self.unary_partials]
 		function_result = ('unary', self.declare_name(ref='x'))
-		function_body, function_declarations = unary_generic_chain_rule(self)
+		function_body, function_declarations = unary_generic_chain_rule(self, fixed_length=self.array_length)
 		function_body = function_declarations + function_body
 
 
@@ -227,7 +227,7 @@ class AutoDiffType:
 		function_arguments = [('x', self.declare_name(ref='*'), 'in'), ('y', self.declare_name(ref='*'), 'in')]
 		function_arguments = function_arguments + [('z_' + str(p).replace('val1','x').replace('val2','y'), 'real(dp)', 'in') for p in self.binary_partials]
 		function_result = ('binary', self.declare_name(ref='x'))
-		function_body, function_declarations = binary_generic_chain_rule(self)
+		function_body, function_declarations = binary_generic_chain_rule(self, fixed_length=self.array_length)
 		function_body = function_declarations + function_body
 
 		return FortranFunction(function_name, function_arguments, function_result, function_body)
@@ -240,7 +240,7 @@ class AutoDiffType:
 		function_name = operator_name + '_self'
 		function_arguments = [('x', self.declare_name(ref='*'), 'in')]
 		function_result = ('unary', self.declare_name(ref='x'))
-		function_body, function_declarations = unary_specific_chain_rule(self, operator)
+		function_body, function_declarations = unary_specific_chain_rule(self, operator, fixed_length=self.array_length)
 		function_body = function_declarations + function_body
 
 		# Special case handling for safe_log
@@ -258,7 +258,7 @@ class AutoDiffType:
 		function_name = operator_name + '_self'
 		function_arguments = [('x', self.declare_name(ref='*'), 'in'), ('y', self.declare_name(ref='*'), 'in')]
 		function_result = ('binary', self.declare_name(ref='x'))
-		function_body, function_declarations = binary_specific_chain_rule(self, operator)
+		function_body, function_declarations = binary_specific_chain_rule(self, operator, fixed_length=self.array_length)
 		function_body = function_declarations + function_body
 
 		return FortranFunction(function_name, function_arguments, function_result, function_body)
@@ -279,7 +279,7 @@ class AutoDiffType:
 		unary_operator = lambda x: operator(x, y)
 
 		function_result = ('unary', self.declare_name(ref='x'))
-		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator)
+		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator, fixed_length=self.array_length)
 		function_body = function_declarations + function_body
 		function_1 = FortranFunction(function_name, function_arguments, function_result, function_body)
 
@@ -291,7 +291,7 @@ class AutoDiffType:
 		unary_operator = lambda x: operator(y, x)
 
 		function_result = ('unary', self.declare_name(ref='x'))
-		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator)
+		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator, fixed_length=self.array_length)
 		function_body = function_declarations + function_body
 		function_2 = FortranFunction(function_name, function_arguments, function_result, function_body)
 
@@ -313,7 +313,7 @@ class AutoDiffType:
 		unary_operator = lambda x: operator(x, y)
 
 		function_result = ('unary', self.declare_name(ref='x'))
-		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator)
+		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator, fixed_length=self.array_length)
 		function_body = ['real(dp) :: y_dp'] + function_declarations + ['y_dp = y'] + function_body
 		function_1 = FortranFunction(function_name, function_arguments, function_result, function_body)
 
@@ -325,7 +325,7 @@ class AutoDiffType:
 		unary_operator = lambda x: operator(y, x)
 
 		function_result = ('unary', self.declare_name(ref='x'))
-		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator)
+		function_body, function_declarations = unary_specific_chain_rule(self, unary_operator, fixed_length=self.array_length)
 		function_body = ['real(dp) :: y_dp'] + function_declarations + ['y_dp = z'] + function_body
 
 		function_2 = FortranFunction(function_name, function_arguments, function_result, function_body)

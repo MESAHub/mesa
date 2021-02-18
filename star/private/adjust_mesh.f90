@@ -111,13 +111,6 @@
             return
          end if
 
-         if (s% L_nuc_burn_total > 0 .and. s% M_center == 0 .and. &
-               s% chem_id(maxloc(s% xa(:,s% nz),dim=1)) == ih1 .and. &
-               safe_log10(s% L_nuc_burn_total) < s% remesh_log_L_nuc_burn_min) then
-            if (dbg_remesh) write(*,*) 'remesh_log_L_nuc_burn_min'
-            return
-         end if
-
          species = s% species
          nz_old = s% nz
          nz = nz_old
@@ -338,7 +331,7 @@
          
          nz = nz_new
          s% nz = nz
-         nvar = s% nvar
+         nvar = s% nvar_total
 
          if (dbg_remesh .or. dbg) write(*,*) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)
@@ -430,7 +423,7 @@
          if (dumping) then
             call write_plot_data_for_mesh_plan( &
                s, nz_old, nz, prv% xh, prv% xa, &
-               prv% lnd, prv% lnT, prv% lnPgas, prv% lnE, prv% eturb, &
+               prv% lnd, prv% lnT, prv% lnPgas, prv% lnE, prv% w, &
                prv% D_mix, prv% mixing_type, &
                prv% dq, prv% q, xq_old, prv% q, &
                s% species, s% i_lnR, s% i_lum, s% i_v, s% i_u, comes_from, &
@@ -449,7 +442,7 @@
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
             prv% j_rot, prv% i_rot, prv% omega, prv% D_omega, &
-            prv% conv_vel, prv% lnT, prv% eturb, specific_PE, specific_KE, &
+            prv% conv_vel, prv% lnT, prv% w, specific_PE, specific_KE, &
             prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, prv% D_mix, &
             cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then

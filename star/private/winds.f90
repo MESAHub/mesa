@@ -29,6 +29,7 @@
       use star_private_def
       use const_def
       use chem_def, only: ih1, ihe4, ic12, ic13, in14, io16
+      use utils_lib, only: is_bad
 
       implicit none
 
@@ -114,10 +115,11 @@
             return
          end if
          s% doing_rlo_wind = (mdot /= 0)
+         if (dbg) write(*,*) 's% doing_rlo_wind', s% doing_rlo_wind, mdot, wind_mdot
 
          if (s% doing_rlo_wind .and. mdot > wind_mdot) then
-            if (dbg) write(*,1) 's% doing_rlo_wind mdot', log10(mdot/(Msun/secyer))
             wind_mdot = mdot
+            if (dbg) write(*,1) 's% doing_rlo_wind mdot', wind_mdot
          end if
 
          if (h1 > 0) then
@@ -206,13 +208,13 @@
             if (s% dt > 0 .and. s% dt < s% mass_change_full_on_dt) then
                if (s% dt <= s% mass_change_full_off_dt) then
                   s% mstar_dot = 0
-                  if (s% trace_dt_control_mass_change) &
+                  if (s% trace_dt_control_mass_change .or. dbg) &
                      write(*,1) 'no wind: dt <= mass_change_full_off_dt'
                   return
                end if
                alfa = (s% dt - s% mass_change_full_off_dt)/ &
                         (s% mass_change_full_on_dt - s% mass_change_full_off_dt)
-               if (s% trace_dt_control_mass_change) &
+               if (s% trace_dt_control_mass_change .or. dbg) &
                   write(*,1) 'reduce wind: dt <= mass_change_full_on_dt', alfa
                wind_mdot = wind_mdot*alfa
             end if
@@ -232,7 +234,7 @@
                      1 + (max_boost-1)*(L_div_Ledd - full_off)/(full_on - full_off)
                end if
                wind_mdot = wind_mdot*super_eddington_boost
-               if (s% trace_super_eddington_wind_boost) then
+               if (s% trace_super_eddington_wind_boost .or. dbg) then
                   write(*,1) 'super eddington wind boost factor, L_div_Ledd', &
                      super_eddington_boost, L_div_Ledd
                   write(*,*)
@@ -255,15 +257,16 @@
             if (dbg) write(*,1) 'use s% max_wind', s% max_wind
             wind_mdot = s% max_wind*Msun/secyer
          end if
-
          if (dbg) write(*,1) 'wind_mdot 4', wind_mdot
 
          if (wind_mdot >= 0) then
             if (s% starting_T_center > s% max_T_center_for_any_mass_loss) then
-            if (dbg) write(*,1) 'starting_T_center > max_T_center_for_any_mass_loss', &
-                     s% max_T_center_for_any_mass_loss
+               if (dbg) write(*,1) 'starting_T_center > max_T_center_for_any_mass_loss', &
+                        s% starting_T_center, s% max_T_center_for_any_mass_loss
                wind_mdot = 0
             else if (s% starting_T_center > s% max_T_center_for_full_mass_loss) then
+               if (dbg) write(*,1) 'starting_T_center > max_T_center_for_full_mass_loss', &
+                        s% starting_T_center, s% max_T_center_for_full_mass_loss
                wind_mdot = wind_mdot* &
                   (s% max_T_center_for_any_mass_loss - s% starting_T_center)/ &
                   (s% max_T_center_for_any_mass_loss - &
@@ -274,10 +277,8 @@
 
          if (wind_mdot >= 0) then
              H_env_mass = s% star_mass - s% he_core_mass
-             H_He_env_mass = s% star_mass - s% c_core_mass
-             He_layer_mass = s% he_core_mass - s% c_core_mass
-             !write(*,2) 'He_layer_mass', s% model_number, He_layer_mass, &
-             !   s% he_core_mass, s% c_core_mass
+             H_He_env_mass = s% star_mass - s% co_core_mass
+             He_layer_mass = s% he_core_mass - s% co_core_mass
              if (s% wind_H_envelope_limit > 0 .and. &
                    H_env_mass < s% wind_H_envelope_limit) then
                 wind_mdot = 0
@@ -297,6 +298,10 @@
                   using_wind_scheme_mdot .or. &
                      s% v_div_v_crit_avg_surf > 0.8d0)) then
             call rotation_enhancement(ierr)
+            if (is_bad(s% rotational_mdot_boost)) then
+               write(*,2) 'is_bad(s% rotational_mdot_boost)', s% model_number
+               if (s% stop_for_bad_nums) stop 'winds: rotation_enhancement'
+            end if
             if (ierr /= 0) then
                if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: rotation_enhancement ierr'
                return
@@ -306,7 +311,8 @@
          s% explicit_mstar_dot = s% mstar_dot
 
          if (dbg) then
-            write(*,1) 'final lg s% mstar_dot/(Msun/secyer)', safe_log10(abs(s% mstar_dot/(Msun/secyer)))
+            write(*,1) 'final star_mdot', s% mstar_dot/(Msun/secyer)
+            write(*,1) 'final lg abs s% mstar_dot/(Msun/secyer)', safe_log10(abs(s% mstar_dot/(Msun/secyer)))
             write(*,*)
          end if
 
@@ -484,7 +490,7 @@
                else if (T1 < Teff_jump - dT) then
                   alfa = 0
                else
-                  alfa = (T1 - (Teff_jump - dT)) / (2*dT)
+                  alfa = 0.5d0*(T1 - (Teff_jump - dT)) / dT
                end if
             end if
 
@@ -494,7 +500,7 @@
                logMdot = &
                   - 6.697d0 &
                   + 2.194d0*log10(L1/Lsun/1d5) &
-                  - 1.313d0*log10(M1/Msun/30) &
+                  - 1.313d0*log10(M1/Msun/30d0) &
                   - 1.226d0*log10(vinf_div_vesc/2d0) &
                   + 0.933d0*log10(T1/4d4) &
                   - 10.92d0*pow2(log10(T1/4d4)) &
@@ -510,7 +516,7 @@
                logMdot = &
                   - 6.688d0 &
                   + 2.210d0*log10(L1/Lsun/1d5) &
-                  - 1.339d0*log10(M1/Msun/30) &
+                  - 1.339d0*log10(M1/Msun/30d0) &
                   - 1.601d0*log10(vinf_div_vesc/2d0) &
                   + 1.07d0*log10(T1/2d4) &
                   + 0.85d0*log10(Z/Zsolar)
@@ -637,16 +643,20 @@
          real(dp), intent(inout) :: xfer_ratio
          integer, intent(out) :: ierr
          real(dp) :: roche_lobe_radius ! Rsun
-         real(dp) :: ratio, rho, p, grav, hp, v_th, h, rho_exponent, rho_rl, rho_rl0, mdot
+         real(dp) :: ratio, rho, p, grav, hp, scale_height, h, rho_exponent, rho_rl, rho_rl0, mdot
          include 'formats'
          ierr = 0
          eval_rlo_wind = 0
          if (s% rlo_scaling_factor <= 0) return
          if (L_surf < s% rlo_wind_min_L) return
          if (Teff > s% rlo_wind_max_Teff) return
-         if (s% rlo_wind_scale_height <= 0) return
+         scale_height = s% rlo_wind_scale_height
+         if (scale_height <= 0) then
+            scale_height = s% P(1) / (s% cgrav(1)*s% m(1)*s% rho(1) / (s% r(1)**2)) / Rsun
+         end if 
          roche_lobe_radius = s% rlo_wind_roche_lobe_radius
          ratio = R/roche_lobe_radius
+         !write(*,2) 'R/roche_lobe_radius', s% model_number, ratio
          if (ratio < 1) then
             ! check for reduction in transfer ratio for almost full Roche lobe
             if (ratio < s% roche_lobe_xfer_full_on) return
@@ -660,11 +670,14 @@
             return
          end if
          mdot = s% rlo_wind_base_mdot* &
-            exp(min(6*ln10,(R - roche_lobe_radius)/s% rlo_wind_scale_height))
+            exp(min(6*ln10,(R - roche_lobe_radius)/scale_height))
          eval_rlo_wind = s% rlo_scaling_factor*mdot ! Msun/year
-
-         write(*,1) 'log rlo mdot Msun/yr, R/R_L', log10(eval_rlo_wind), &
-            R/roche_lobe_radius
+         
+         !write(*,1) 's% rlo_wind_base_mdot', s% rlo_wind_base_mdot
+         !write(*,1) 'R - roche_lobe_radius', R - roche_lobe_radius, R, roche_lobe_radius
+         !write(*,1) 'scale_height', scale_height
+         !write(*,1) 's% rlo_scaling_factor', s% rlo_scaling_factor
+         !write(*,1) 'eval_rlo_wind, log eval_rlo_wind, R/R_L', log10(eval_rlo_wind), R/roche_lobe_radius
 
       end function eval_rlo_wind
 

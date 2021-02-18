@@ -19,17 +19,17 @@ else
 endif
 
 SRCS = \
-   utils_def.f \
-   utils_dict.f \
-   utils_idict.f \
-   utils_lib.f \
+   utils_def.f90 \
+   utils_dict.f90 \
+   utils_idict.f90 \
+   utils_lib.f90 \
    utils_nan.f90 \
    utils_nan_sp.f90 \
    utils_nan_dp.f90 \
    utils_nan_qp.f90 \
    utils_c_system.c \
    utils_system.f90 \
-   $(UTILS_OMP).f \
+   $(UTILS_OMP).f90 \
 
 #################################################################
 #
@@ -37,7 +37,7 @@ SRCS = \
 
 LIB = libutils.$(LIB_SUFFIX)
 
-OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SRCS))))
+OBJS = $(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SRCS)))
 
 $(LIB) : $(OBJS)
 ifneq ($(QUIET),)
@@ -51,9 +51,7 @@ clean:
 	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
 
 install:
-	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include
-	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include/formats.inc
-	@$(CP_IF_NEWER) ../formats.dek $(MESA_DIR)/include/formats
+	@$(CP_IF_NEWER) ../formats $(MESA_DIR)/include
 	@$(CP_IF_NEWER) *.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) libutils.$(LIB_SUFFIX) $(MESA_DIR)/lib
 
@@ -77,14 +75,6 @@ endif
 
 %.o : %.mod
 
-%.o : %.f
-ifneq ($(QUIET),)
-	@echo COMPILE_CMD $<
-	@$(COMPILE_CMD) $<
-else
-	$(COMPILE_CMD) $<
-endif
-
 %.o : %.f90
 ifneq ($(QUIET),)
 	@echo COMPILE_CMD $<
@@ -102,7 +92,6 @@ endif
 
 SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
 
-vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)
 vpath %.c $(SRC_PATH)
 vpath %.h $(SRC_PATH)

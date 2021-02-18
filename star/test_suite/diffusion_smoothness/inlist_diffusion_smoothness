@@ -31,11 +31,12 @@
 
 / ! end of star_job namelist
 
+&eos
+/ ! end of eos namelist
+
 &kap
       Zbase = 0.02d0
-
       kap_file_prefix = 'gs98'
-
 / ! end of kap namelist
 
 &controls
@@ -77,7 +78,6 @@
       
       
       num_cells_for_smooth_brunt_B = 0
-      !use_brunt_gradmuX_form = .true.
       
       !show_diffusion_info = .true. ! terminal output for diffusion
          !show_diffusion_substep_info = .true.         

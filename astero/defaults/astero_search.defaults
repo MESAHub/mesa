@@ -1055,16 +1055,20 @@
 
    ! You can stop the run if |chi^2| is rising.
 
-   ! chi2_relative_increase_limit
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! limit_num_chi2_too_big
    ! ~~~~~~~~~~~~~~~~~~~~~~
-   ! If ``limit_num_chi2_too_big`` consecutive values of |chi^2|
-   ! are greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run,
-   ! then stop the run. ::
+   ! chi2_relative_increase_limit
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! If any of the following conditions are met in ``limit_num_chi2_too_big`` consecutive models
+   ! after a minimum |chi^2| has been found, stop the run for that sample.
 
-      chi2_relative_increase_limit = 2.0
+   ! + |chi^2| is greater than ``chi2_relative_increase_limit`` times the best |chi^2| for the run.
+   ! + ``chi2_spectro``, ``chi2_delta_nu`` or ``chi2_radial`` is greater than its corresponding ``_limit``.
+   ! + MESA fails to evaluate |chi^2| (because e.g. it can't match all the modes of a particular degree).
+   ! ::
+
       limit_num_chi2_too_big = 20
+      chi2_relative_increase_limit = 2.0
 
    ! chi2_search_limit1
    ! ~~~~~~~~~~~~~~~~~~

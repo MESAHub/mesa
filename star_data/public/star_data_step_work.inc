@@ -93,7 +93,6 @@
          ! (d_ln(p)/d_ln(rho)) at constant entropy.
       real(dp), pointer :: gamma3(:)      ! gamma3 := 1 + dlnT_dlnRho at constant S, 
       real(dp), pointer :: eta(:)        ! electron degeneracy parameter
-      real(dp), pointer :: theta_e(:)    ! electron degeneracy factor for graboske screening
       real(dp), pointer :: gam(:)        ! plasma interaction parameter
       real(dp), pointer :: mu(:)         
          ! mean molecular weight per particle (ions + free electrons)
@@ -149,7 +148,7 @@
       real(dp), pointer :: lnd_residual(:)
       real(dp), pointer :: equL_residual(:)
       real(dp), pointer :: E_residual(:)
-      real(dp), pointer :: Et_residual(:)
+      real(dp), pointer :: w_residual(:)
       real(dp), pointer :: v_residual(:)
       real(dp), pointer :: u_residual(:)
       real(dp), pointer :: Vol_residual(:)
@@ -324,7 +323,7 @@
          d_extra_jdot_domega_00, d_extra_omegadot_domega_00, &
          d_extra_jdot_domega_p1, d_extra_omegadot_domega_p1
 
-      ! Fraley time centering
+      ! velocity time centering
       real(dp), pointer, dimension(:) :: vc, R2, d_R2_dlnR
       real(dp) :: d_vc_dv
    
@@ -463,16 +462,16 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent energy Eturb
+      ! Convective turbulent velocity w
          
          real(dp), pointer, dimension(:) :: &
-            Eturb, Eturb_start, Pt, Eq, Uq, avQ, avQ_start, &
+            w, w_start, Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
          real(dp), pointer, dimension(:) :: &
-            Vol, Vol_start, w, w_start, Et, COUPL_start, &
+            Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
             Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
             Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
@@ -570,28 +569,15 @@
       
       
       ! for Riemann solver      
+      type(auto_diff_real_18var_order1), pointer, dimension(:) :: &
+         u_face_18, P_face_18
       real(dp), pointer, dimension(:) :: &
-         u_face, &
-         d_uface_dlnR, &
-         d_uface_du00, &
-         d_uface_dum1, &
-         d_uface_dlnd00, &
-         d_uface_dlndm1, &
-         d_uface_dlnT00, &
-         d_uface_dlnTm1, &
-         d_uface_dw, &
-         RTI_du_diffusion_kick
+         d_uface_domega, &
+         RTI_du_diffusion_kick, &
+         u_face_start
       real(dp), pointer, dimension(:) :: &
-         P_face, &
-         d_Pface_dL, &
-         d_Pface_dlnR, &
-         d_Pface_du00, &
-         d_Pface_dum1, &
-         d_Pface_dlnd00, &
-         d_Pface_dlndm1, &
-         d_Pface_dlnT00, &
-         d_Pface_dlnTm1, &
-         d_Pface_dw
+         d_Pface_domega, &
+         P_face_start
       real(dp), pointer, dimension(:) :: &
          abs_du_div_cs, &
          abs_du_plus_cs
@@ -635,7 +621,7 @@
          real(dp), pointer :: lnd_for_d_dt_const_m(:)
          real(dp), pointer :: lnT_for_d_dt_const_m(:)
          real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: Eturb_for_d_dt_const_m(:) ! only set when Eturb_flag is true
+         real(dp), pointer :: w_for_d_dt_const_m(:) ! only set when TDC_flag is true
          real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
          real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
          real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
@@ -653,10 +639,10 @@
          real(dp), pointer :: dlnd_dt(:)
          real(dp), pointer :: dlnT_dt(:)
          real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: dEturb_dt(:) ! only set when Eturb_flag is true
+         real(dp), pointer :: dw_dt(:) ! only set when TDC_flag is true
          real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
          real(dp), pointer :: du_dt(:) ! only set when u_flag is true
-         real(dp), pointer :: dEt_dt(:) ! only used when RSP_flag is true
+         real(dp), pointer :: dEtRSP_dt(:) ! only used when RSP_flag is true
          real(dp), pointer :: dln_cvpv0_dt(:) ! only set when conv_vel_flag is true
          real(dp), pointer :: dj_rot_dt(:) ! only set when implicit_j_rot_flag is true
          real(dp), pointer :: dalpha_RTI_dt(:) ! only set when alpha_RTI_flag is true
@@ -672,7 +658,7 @@
          real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
-         real(dp), pointer :: dxh_Eturb(:) ! Eturb(k) = dxh_Eturb(k) + Eturb_start(k); dxh_Eturb from solver.
+         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_w from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
@@ -902,35 +888,25 @@
       real(dp) :: he_core_omega_div_omega_crit
       integer :: he_core_k ! boundary is in this cell
       
-      real(dp) :: c_core_mass ! baryonic (Msun)
-      real(dp) :: c_core_radius ! Rsun
-      real(dp) :: c_core_lgT
-      real(dp) :: c_core_lgRho
-      real(dp) :: c_core_L ! Lsun
-      real(dp) :: c_core_v
-      real(dp) :: c_core_omega ! (s^-1)
-      real(dp) :: c_core_omega_div_omega_crit
-      integer :: c_core_k ! boundary is in this cell
+      real(dp) :: co_core_mass ! baryonic (Msun)
+      real(dp) :: co_core_radius ! Rsun
+      real(dp) :: co_core_lgT
+      real(dp) :: co_core_lgRho
+      real(dp) :: co_core_L ! Lsun
+      real(dp) :: co_core_v
+      real(dp) :: co_core_omega ! (s^-1)
+      real(dp) :: co_core_omega_div_omega_crit
+      integer :: co_core_k ! boundary is in this cell
       
-      real(dp) :: o_core_mass ! baryonic (Msun)
-      real(dp) :: o_core_radius ! Rsun
-      real(dp) :: o_core_lgT
-      real(dp) :: o_core_lgRho
-      real(dp) :: o_core_L ! Lsun
-      real(dp) :: o_core_v
-      real(dp) :: o_core_omega ! (s^-1)
-      real(dp) :: o_core_omega_div_omega_crit
-      integer :: o_core_k ! boundary is in this cell
-      
-      real(dp) :: si_core_mass ! baryonic (Msun)
-      real(dp) :: si_core_radius ! Rsun
-      real(dp) :: si_core_lgT
-      real(dp) :: si_core_lgRho
-      real(dp) :: si_core_L ! Lsun
-      real(dp) :: si_core_v
-      real(dp) :: si_core_omega ! (s^-1)
-      real(dp) :: si_core_omega_div_omega_crit
-      integer :: si_core_k ! boundary is in this cell
+      real(dp) :: one_core_mass ! baryonic (Msun)
+      real(dp) :: one_core_radius ! Rsun
+      real(dp) :: one_core_lgT
+      real(dp) :: one_core_lgRho
+      real(dp) :: one_core_L ! Lsun
+      real(dp) :: one_core_v
+      real(dp) :: one_core_omega ! (s^-1)
+      real(dp) :: one_core_omega_div_omega_crit
+      integer :: one_core_k ! boundary is in this cell
 
       real(dp) :: fe_core_mass ! baryonic (Msun)
       real(dp) :: fe_core_radius ! Rsun
@@ -1057,6 +1033,8 @@
       real(dp) :: tau100_lgRho
       real(dp) :: tau100_L
 
+      real(dp) :: min_gamma1
+
       ! timescales
       real(dp) :: dynamic_timescale 
          ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
@@ -1077,8 +1055,8 @@
    
       ! for solvers
       
-         integer, pointer :: hydro_iwork(:)
-         real(dp), pointer :: hydro_work(:)
+         integer, pointer :: solver_iwork(:)
+         real(dp), pointer :: solver_work(:)
          
          real(dp), pointer :: xh_start(:,:) ! (nvar_hydro,nz)
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
@@ -1161,9 +1139,6 @@
          integer :: burner_storage_sz_per_thread, burner_num_threads
          real(dp), pointer :: burner_storage(:)
             
-         real(dp), pointer :: solver_dx(:,:)
-         integer :: solver_iter, solver_adjust_iter
-            
          real(dp), pointer, dimension(:) :: & ! (nz)
             max_burn_correction, avg_burn_correction
          real(dp), pointer :: xa_extra1(:,:) ! (species,nz) -- for use by op split
@@ -1195,10 +1170,9 @@
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
             RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_Eturb, using_Fraley_time_centering, okay_to_set_mixing_info
+            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
-         real(dp) :: profile_age
          real(dp) :: h1_czb_mass
          real(dp) :: total_angular_momentum
          real(dp) :: total_abs_angular_momentum
@@ -1295,21 +1269,15 @@
             xtra1_array, xtra2_array, xtra3_array, xtra4_array, xtra5_array
 
 
-      ! equation residuals
+      ! equation residuals, etc
+      
          ! equ(i,k) is residual for equation i of cell k            
          real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
          real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
-         
-      ! equation weights
-         ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
-         ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
-         ! weight = 0d0 means just ignore this item in making decisions.
-         real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
-         real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
-         
-      ! equation Jacobian
+            ! pointer set by star_solver
+
          real(dp), dimension(:,:), pointer :: jacobian
-            ! NOT ALLOCATED. pointer set by enter_setmatrix
+            ! pointer set by enter_setmatrix
          
          real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
          ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
@@ -1317,8 +1285,17 @@
          ! ublk(i,j,k) = dequ(i,k)/dx(j,k+1)
          
          real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
-            ! will be allocated or reallocated as necessary by solver.
-            ! deallocate when free_star
+
+         real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
+         integer :: solver_iter, solver_adjust_iter
+         real(dp), pointer :: x_scale(:,:), x_scale1(:)
+
+         ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
+         ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
+         ! weight = 0d0 means just ignore this item in making decisions.
+         real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
+         real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
+
          
       ! sizeB info
          integer :: max_zone1, max_var1, max_zone2, max_var2
@@ -1331,6 +1308,7 @@
       ! misc
          
          character (len=strlen) :: retry_message
+         integer :: retry_message_k
 
          real(dp), pointer :: eps_pre_mix(:) ! (nz)
          real(dp), pointer, dimension(:) :: burn_avg_epsnuc
@@ -1340,7 +1318,6 @@
          integer :: boost_mlt_alfa
          integer :: burn_nstep_max
          integer :: burn_nfcn_total
-         integer :: k_CpTMdot_lt_L
          integer :: dX_nuc_drop_max_k
          integer :: dX_nuc_drop_max_j
          integer :: solver_test_partials_var
@@ -1382,7 +1359,7 @@
          real(dp) :: total_angular_momentum_old
          real(dp) :: h1_czb_mass_old ! baryonic (Msun)
          real(dp) :: he_core_mass_old
-         real(dp) :: c_core_mass_old
+         real(dp) :: co_core_mass_old
          real(dp) :: Teff_old
          real(dp) :: center_eps_nuc_old
 
@@ -1395,7 +1372,7 @@
 
          logical, pointer :: eps_grav_form_for_energy_eqn(:)
          real(dp), pointer, dimension(:)  :: &
-            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, PdVdt
+            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt
             
          real(dp) :: &
             total_internal_energy_old, &
@@ -1449,7 +1426,6 @@
             virial_thm_P_avg, &
             total_eps_grav, &
             total_eps_mdot, &
-            total_radiation, &
             work_outward_at_surface, &
             work_inward_at_center, &
             non_epsnuc_energy_change_from_split_burn, &
@@ -1465,12 +1441,12 @@
          real(dp) :: &
             log_P_center_old, &
             cumulative_energy_error_old, &
-            cumulative_extra_heating_old, &
-            total_radiation_old
+            cumulative_extra_heating_old
             
          real(dp) :: mesh_adjust_IE_conservation
          real(dp) :: mesh_adjust_PE_conservation
          real(dp) :: mesh_adjust_KE_conservation
+         real(dp) :: mesh_adjust_Eturb_conservation
          
          character (len=strlen) :: most_recent_photo_name
          

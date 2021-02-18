@@ -267,7 +267,6 @@
          ! overwritten during the call to allocate_star_info_arrays
 
          if (ASSOCIATED(s% xh_old)) deallocate(s% xh_old)
-         if (ASSOCIATED(s% equ1)) deallocate(s% equ1)
          if (ASSOCIATED(s% xh_start)) deallocate(s% xh_start)
          
          call allocate_star_info_arrays(s, ierr)
@@ -566,7 +565,7 @@
                      if (ii == 10) exit
                      dm = -pi4*pow4(rmid)*(P-P0)/(cgrav*mmid)
                      m = m0 + dm ! mass at point k
-                     r = pow(r0*r0*r0 + dm/((4*pi/3)*rho_mid),one_third)
+                     r = pow(r0*r0*r0 + dm/(four_thirds_pi*rho_mid),one_third)
                      if (dbg) write(*,2) 'r', ii, r, m, dm
                   end do
                   

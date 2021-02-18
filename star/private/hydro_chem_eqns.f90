@@ -40,12 +40,10 @@
 
 
       subroutine do_chem_eqns( &
-            s, xscale, nvar, equchem1, species, skip_partials, equ, ierr)
+            s, nvar, skip_partials, ierr)
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
-         integer, intent(in) :: nvar, equchem1, species
+         integer, intent(in) :: nvar
          logical, intent(in) :: skip_partials
-         real(dp), intent(inout) :: equ(:,:)
          integer, intent(out) :: ierr
          integer :: k, op_err
          include 'formats'
@@ -53,18 +51,14 @@
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             if (ierr /= 0) cycle
-            call do1_chem_eqns( &
-               s, xscale, k, nvar, equchem1, species, skip_partials, &
-               equ, op_err)
+            call do1_chem_eqns(s, k, nvar, skip_partials, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
       end subroutine do_chem_eqns
 
 
-      subroutine do1_chem_eqns( &
-            s, xscale, k, nvar, equchem1, species, skip_partials, &
-            equ, ierr)
+      subroutine do1_chem_eqns(s, k, nvar, skip_partials, ierr)
 
          use chem_def
          use net_lib, only: show_net_reactions, show_net_params
@@ -72,14 +66,12 @@
          use star_utils, only: em1, e00, ep1
 
          type (star_info), pointer :: s
-         real(dp), pointer :: xscale(:,:) ! (nvar, nz)
-         integer, intent(in) :: k, nvar, equchem1, species
+         integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
-         real(dp), intent(inout) :: equ(:,:)
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, i_lnd, i_lnT, i_lnR, j, i, jj, ii
+         integer :: nz, i_lnd, i_lnT, i_lnR, j, i, jj, ii, equchem1, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, dVARdot_dVAR, &
             dxdt_expected_dlnd, dxdt_expected_dlnT, &
@@ -96,7 +88,8 @@
          ierr = 0
 
          dVARdot_dVAR = s% dVARdot_dVAR
-
+         equchem1 = s% equchem1
+         species = s% species
          nz = s% nz
          i_lnd = s% i_lnd
          i_lnT = s% i_lnT
@@ -152,24 +145,19 @@
 
             dxdt_factor = 1d0
 
-            if (associated(xscale)) then
-               eqn_scale = max(s% min_chem_eqn_scale, xscale(i,k)*dVARdot_dVAR)
-               residual = (dxdt_expected - dxdt_actual)/eqn_scale
-            else
-               residual = dxdt_expected
-               eqn_scale = 1d0
-            end if
-            equ(i,k) = residual
+            eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)*dVARdot_dVAR)
+            residual = (dxdt_expected - dxdt_actual)/eqn_scale
+            s% equ(i,k) = residual
             
             if (abs(residual) > max_abs_residual) &
-               max_abs_residual = abs(equ(i,k))
+               max_abs_residual = abs(s% equ(i,k))
 
-            if (is_bad(equ(i,k))) then
+            if (is_bad(s% equ(i,k))) then
                s% retry_message = 'bad residual for do1_chem_eqns'
 !$OMP critical (star_chem_eqns_bad_num)
                if (s% report_ierr) then
                   write(*,3) 'do1_chem_eqns: equ ' // trim(s% nameofequ(i)), &
-                        i, k, equ(i,k)
+                        i, k, s% equ(i,k)
                   write(*,2) 'dxdt_expected', k, dxdt_expected
                   write(*,2) 'dxdt_actual', k, dxdt_actual
                   write(*,2) 'eqn_scale', k, eqn_scale
@@ -182,7 +170,7 @@
 
             if (skip_partials) cycle
 
-            call e00(s, xscale, i, i, k, nvar, -dVARdot_dVAR/eqn_scale)
+            call e00(s, i, i, k, nvar, -dVARdot_dVAR/eqn_scale)
 
             ! all the rest are jacobian terms for dxdt_expected/eqn_scale
 
@@ -192,7 +180,7 @@
                   ii = equchem1+jj-1
                   dxdt_expected_dxa = s% d_dxdt_nuc_dx(j,jj,k)
                   dequ = dxdt_expected_dxa/eqn_scale
-                  call e00(s, xscale, i, ii, k, nvar, dxdt_factor*dequ)
+                  call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
 
                dxdt_expected_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)
@@ -201,11 +189,11 @@
                dequ_dlnT = dxdt_expected_dlnT/eqn_scale
 
                if (s% do_struct_hydro) then ! partial wrt lnd const lnT
-                  call e00(s, xscale, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
+                  call e00(s, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
                end if
 
                if (s% do_struct_thermo) then ! partial wrt lnT const lnd
-                  call e00(s, xscale, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
+                  call e00(s, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
                end if
 
             end if
@@ -214,16 +202,16 @@
 
                dxdt_expected_dxa = d_dxdt_mix_dx00
                dequ = dxdt_expected_dxa/eqn_scale
-               call e00(s, xscale, i, i, k, nvar, dxdt_factor*dequ)
+               call e00(s, i, i, k, nvar, dxdt_factor*dequ)
                if (k > 1) then
                   dxdt_expected_dxa = d_dxdt_mix_dxm1
                   dequ = dxdt_expected_dxa/eqn_scale
-                  call em1(s, xscale, i, i, k, nvar, dxdt_factor*dequ)
+                  call em1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
                if (k < nz) then
                   dxdt_expected_dxa = d_dxdt_mix_dxp1
                   dequ = dxdt_expected_dxa/eqn_scale
-                  call ep1(s, xscale, i, i, k, nvar, dxdt_factor*dequ)
+                  call ep1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
 
             end if

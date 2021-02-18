@@ -99,13 +99,13 @@ contains
     do k=nzlo, nzhi
        if (k == 1) then
           s% rho_face(k) = s% rho(k)
-          if (.not. s% u_flag) s% P_face(k) = s% P(k)
+          if (.not. s% u_flag) s% P_face_18(k)%val = s% P(k)
           s% csound_face(1) = s% csound(1)
        else
           alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
           beta = 1 - alfa
           s% rho_face(k) = alfa*s% rho(k) + beta*s% rho(k-1)
-          if (.not. s% u_flag) s% P_face(k) = alfa*s% P(k) + beta*s% P(k-1)
+          if (.not. s% u_flag) s% P_face_18(k)%val = alfa*s% P(k) + beta*s% P(k-1)
           s% csound_face(k) = alfa*s% csound(k) + beta*s% csound(k-1)
        end if
     end do
@@ -384,7 +384,6 @@ contains
 
     use eos_def
     use chem_def
-    use eos_lib, only: eos_theta_e
     use star_utils, only: eval_csound, write_eos_call_info
 
     type (star_info), pointer :: s
@@ -394,7 +393,7 @@ contains
     integer, intent(out) :: ierr
     integer :: i, j
 
-    real(dp) :: d_theta_e_deta, T, rho, &
+    real(dp) :: T, rho, &
          dlnd_dV, Pgas, Prad, &
          P, PV, PT, E, EV, ET, CP, dCp_dV, dCp_dT, &
          chiT, dchiT_dlnd, dchiT_dlnT, &
@@ -435,11 +434,7 @@ contains
        return
     end if
     s% Prad(k) = crad * T*T*T*T / 3
-    if (s% use_eosDT_ideal_gas) then
-       s% P(k) = s% Pgas(k)
-    else
-       s% P(k) = s% Prad(k) + s% Pgas(k)
-    end if
+    s% P(k) = s% Prad(k) + s% Pgas(k)
     s% lnP(k) = log(s% P(k))
     s% lnS(k) = res(i_lnS)
     s% lnE(k) = res(i_lnE)
@@ -455,7 +450,7 @@ contains
     s% gamma3(k) = res(i_gamma3)
     s% eta(k) = res(i_eta)
     s% gam(k) = s% z53bar(k)*qe*qe * &
-         pow((4d0/3d0)*pi*avo*rho*s% zbar(k)/s% abar(k),one_third) / (kerg*T)
+         pow(four_thirds_pi*avo*rho*s% zbar(k)/s% abar(k),one_third) / (kerg*T)
     s% mu(k) = res(i_mu)
     s% lnfree_e(k) = res(i_lnfree_e)
 
@@ -484,11 +479,6 @@ contains
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
     s% d_QQ_dlnd(k) = s% QQ(k)*(d_dlnd(i_chiT)/s% chiT(k) - d_dlnd(i_chiRho)/s% chiRho(k) - 1d0)
     s% d_QQ_dlnT(k) = s% QQ(k)*(d_dlnT(i_chiT)/s% chiT(k) - d_dlnT(i_chiRho)/s% chiRho(k) - 1d0)
-    if (s% screening_mode == 'classic') then
-       s% theta_e(k) = eos_theta_e(res(i_eta), d_theta_e_deta)
-    else
-       s% theta_e(k) = 0d0
-    end if
     s% csound(k) = eval_csound(s,k,ierr)
 
     ! check some key values

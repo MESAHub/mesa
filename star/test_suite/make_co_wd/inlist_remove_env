@@ -16,6 +16,7 @@
       num_timescales_for_relax_entropy = 30
       max_steps_to_relax_entropy = 10000
       
+      remove_surface_by_relax_to_star_cut = .true.
       remove_surface_do_jrot = .false.
       remove_surface_do_entropy = .true.
       remove_surface_turn_off_energy_sources_and_sinks = .true.
@@ -44,7 +45,7 @@
 
       x_ctrl(1) = 1d-3 ! remove mass until this H envelope mass remains
       he_core_boundary_h1_fraction = 0.1d0 ! ignore hydrogen tail in calculating envelope mass
-      c_core_boundary_he4_fraction = 0.1d0 ! slightly redefines he_layer_mass calculation
+      co_core_boundary_he4_fraction = 0.1d0 ! slightly redefines he_layer_mass calculation
 
       ! after relaxation, the model is cool, but will brighten and heat up quickly
       log_Teff_upper_limit = 4.8

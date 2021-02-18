@@ -56,7 +56,7 @@
                      frac_HI, frac_HII, &
                      frac_HeI, frac_HeII, frac_HeIII, &
                      avg_charge_He, energy_comp
-         include 'formats.inc'
+         include 'formats'
 
          ! TODO: no care is taken in here when model_twins_flag is true
          ! not a priority, but needs to be sorted out whenever double core

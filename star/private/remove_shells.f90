@@ -214,6 +214,7 @@
          integer :: k, k0, k1, nz
          real(dp) :: ie, ke, pe, rR, rL, rC, m_cntr, &
             sum_total_energy, speed_limit
+         real(dp), pointer :: v(:)
          
          include 'formats'
          
@@ -223,9 +224,11 @@
             return
          end if
          
-         if (.not. s% u_flag) then
-            write(*,*) 'only remove fallback with u_flag'
-            ierr = -1
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
             return
          end if
          
@@ -239,7 +242,7 @@
             sum_total_energy = 0d0
             do k = nz,1,-1
                ie = s% energy(k)*s% dm(k)
-               ke = 0.5d0*s% u(k)*s% u(k)*s% dm(k)
+               ke = 0.5d0*v(k)*v(k)*s% dm(k)
                if (k == s% nz) then   
                   rL = s% R_center
                else
@@ -273,7 +276,7 @@
             end if
             do k=k0-1,1,-1
                ie = s% energy(k)*s% dm(k)
-               ke = 0.5d0*s% u(k)*s% u(k)*s% dm(k)
+               ke = 0.5d0*v(k)*v(k)*s% dm(k)
                rL = s% r(k+1)
                rR = s% r(k)
                rC = 0.5d0*(rR + rL)
@@ -287,12 +290,10 @@
             end do
          else
             speed_limit = s% job% remove_fallback_speed_limit
-            !write(*,3) '-u/limit', s% model_number, nz, -s% u(nz)/(speed_limit*s% csound(nz))
-            if (-s% u(nz) <= speed_limit*s% csound(nz)) return
+            if (-v(nz) <= speed_limit*s% csound(nz)) return
             do k = nz-1,1,-1
                k0 = k+1
-               !write(*,3) '-u/limit', s% model_number, k, -s% u(k)/(speed_limit*s% csound(k))
-               if (-s% u(k) < speed_limit*s% csound(k)) exit
+               if (-v(k) < speed_limit*s% csound(k)) exit
             end do
          end if
          
@@ -352,7 +353,7 @@
          type (star_info), pointer :: s
          integer :: k, k0
          real(dp) :: lnP_limit
-         include 'formats'        
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_limit_center_logP: get_star_ptr ierr', ierr
@@ -416,21 +417,32 @@
          real(dp), intent(in) :: infall_kms
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: v
+         integer :: k, k_infall
+         real(dp) :: v_infall, v
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_by_infall_kms: get_star_ptr ierr', ierr
             return
          end if
-         v = -abs(infall_kms)*1d5
-         do k=1,s% nz
-            if (s% v(k) <= v) then
-               call do_remove_inner_fraction_q(id, s% q(k), ierr)
+         v_infall = -abs(infall_kms)*1d5
+         k_infall = 0
+         do k=s% nz,1,-1
+            if (s% v_flag) then
+               v = s% v(k)
+            else if (s% u_flag) then
+               v = s% u(k)
+            else
+               write(*,*) 'must have v or u for do_remove_center_by_infall_kms'
+               ierr = -1
                return
             end if
+            if (v > v_infall) exit ! not falling fast enough
+            k_infall = k
          end do
-         ierr = -1
+         if (k_infall == 0) return ! no infall
+         call do_remove_inner_fraction_q(id, s% q(k_infall), ierr)
+         write(*,1) 'new inner boundary mass', s% m_center/Msun
       end subroutine do_remove_center_by_infall_kms
 
 
@@ -480,22 +492,27 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: q_max, abs_v_max
-         integer :: k
+         integer :: k_max
+         real(dp), pointer :: v(:)
+         include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_at_inner_max_abs_v: get_star_ptr ierr', ierr
             return
          end if
-         q_max = 0
-         abs_v_max = 0
-         do k=s% nz-1, 1, -1
-            if (abs(s% v(k)) > abs_v_max) then
-               q_max = s% q(k)
-               abs_v_max = abs(s% v(k))
-               exit
-            end if
-         end do
-         call do_remove_inner_fraction_q(id, q_max, ierr)
+         if (s% u_flag) then
+            v => s% u
+         else if (s% v_flag) then
+            v => s% v
+         else
+            stop 'no u or v for do_remove_center_at_inner_max_abs_v?'
+            return
+         end if
+         k_max = minloc(v(1:s% nz),dim=1)
+         q_max = s% q(k_max)
+         abs_v_max = abs(v(k_max))
+         !write(*,2) 'v abs_v_max q_max', k_max, v(k_max), abs_v_max, q_max
+         call do_remove_center(id, k_max, ierr)
       end subroutine do_remove_center_at_inner_max_abs_v
 
 
@@ -582,17 +599,20 @@
          new_xmstar = s% m(1) - s% M_center
          s% xmstar = new_xmstar
          s% R_center = s% r(k)
+         
+         
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
          if (s% u_flag) then
+            kk = minloc(s% u(1:s% nz),dim=1)
             s% v_center = s% u(k)
             if (is_bad(s% v_center)) then
-               write(*,2) 's% u(k)', k, s% u(k)
+               write(*,2) 'center s% u(k)', k, s% u(k)
                stop 'do_remove_center'
             end if
          else if (s% v_flag) then
             s% v_center = s% v(k)
             if (is_bad(s% v_center)) then
-               write(*,2) 's% v(k)', k, s% v(k)
+               write(*,2) 'center s% v(k)', k, s% v(k)
                stop 'do_remove_center'
             end if
          else
@@ -661,6 +681,28 @@
          if (k <= 1) return
          call do_remove_surface(id, k, ierr)
       end subroutine do_remove_surface_at_cell_k
+
+
+      subroutine do_remove_surface_at_he_core_boundary(id, h1_fraction, ierr)
+         integer, intent(in) :: id
+         real(dp), intent(in) :: h1_fraction
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+         integer :: k
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'do_remove_surface_at_he_core_boundary: get_star_ptr ierr', ierr
+            return
+         end if
+         if (s% X(1) <= h1_fraction) return
+         do k=2,s% nz
+            if (s% X(k) <= h1_fraction) then
+               call do_remove_surface(id, k-1, ierr)
+               return
+            end if
+         end do
+         ierr = -1
+      end subroutine do_remove_surface_at_he_core_boundary
 
 
       subroutine do_remove_surface_by_optical_depth(id, optical_depth, ierr)
@@ -756,7 +798,7 @@
          real(dp), intent(in) :: v_surf_div_v_escape
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
+         integer :: k, k_vesc
          real(dp) :: vesc, vesc_m1
          real(dp), dimension(:), pointer :: v
          include 'formats'
@@ -772,17 +814,16 @@
          else
             return
          end if
-         vesc = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
-         if (v(1) < vesc*v_surf_div_v_escape) return
-         do k=2,3 ! s% nz
-            vesc_m1 = vesc
+         k_vesc = 0
+         do k=2, s% nz
+            if (s% q(k) > s% job% max_q_for_remove_surface_by_v_surf_div_v_escape) cycle
+            if (s% q(k) < s% job% min_q_for_remove_surface_by_v_surf_div_v_escape) exit
             vesc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
-            if (v(k) < vesc*v_surf_div_v_escape) exit
-            write(*,2) 'v/vesc', k-1, v(k-1)/vesc_m1
+            if (v(k) >= vesc*v_surf_div_v_escape) k_vesc = k
          end do
-         write(*,2) 'do_remove_surface_by_v_surf_div_v_escape', k-1, v(k-1)/vesc_m1
-         call do_remove_surface(id, k-1, ierr)
-         return
+         if (k_vesc == 0) return
+         write(*,2) 'do_remove_surface_by_v_surf_div_v_escape q', k_vesc, s% q(k_vesc)
+         call do_remove_surface(id, k_vesc, ierr)
       end subroutine do_remove_surface_by_v_surf_div_v_escape
 
 
@@ -898,26 +939,166 @@
 
 
       subroutine do_remove_surface(id, surface_k, ierr)
+         use read_model, only: finish_load_model
+         use mesh_adjust, only: do_prune_mesh_surface
+         use alloc, only: resize_star_info_arrays
+         use star_utils, only: tau_eff
          integer, intent(in) :: id, surface_k
          integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% R_center /= 0d0) then
-            write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
-            ierr = -1
-            stop 'do_remove_surface'
+         type (star_info), pointer :: s, c, prv
+         type (star_info), target :: copy_info
+         real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P, T_black_body
+         integer :: k, k_old, nz, nz_old, skip
+
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         if (surface_k == 1) then
+            ierr = 0
+            return
          end if
-         call do_relax_to_star_cut( &
-            id, surface_k, s% job% remove_surface_do_jrot, &
-            s% job% remove_surface_do_entropy, &
-            s% job% remove_surface_turn_off_energy_sources_and_sinks, ierr)
+
+         call get_star_ptr(id, s, ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) &
+               write(*,*) 'do_remove_surface: get_star_ptr ierr'
+            return
+         end if
+
+         if (s% job% remove_surface_by_relax_to_star_cut) then
+            if (s% R_center /= 0d0) then
+               write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
+               ierr = -1
+               stop 'do_remove_surface'
+            end if         
+            call do_relax_to_star_cut( &
+               id, surface_k, s% job% remove_surface_do_jrot, &
+               s% job% remove_surface_do_entropy, &
+               s% job% remove_surface_turn_off_energy_sources_and_sinks, ierr)
+            return
+         end if
+
+         nz_old = s% nz
+         skip = surface_k - 1
+
+         if (dbg) write(*,2) 'do remove surface skip', skip
+         if (skip < 1 .or. skip >= nz_old) return
+
+         tau_surf_new = tau_eff(s,1+skip)
+         tau_factor_new = s% tau_factor*tau_surf_new/s% tau(1)
+
+         if (dbg) write(*,1) 'tau_surf_old', s% tau(1)
+         if (dbg) write(*,1) 'tau_factor_old', s% tau_factor
+         if (dbg) write(*,1) 'tau_surf_new', tau_surf_new
+         if (dbg) write(*,1) 'tau_factor_new', tau_factor_new
+
+         rmid = s% rmid(1+skip)
+         Lmid = (s% L(1+skip) + s% L(2+skip))/2
+         T = s% T(1+skip)
+         P = s% P(1+skip)
+
+         if (.not. associated(s% other_star_info)) then
+            allocate(s% other_star_info)
+            prv => s% other_star_info
+            c => null()
+            if (dbg) write(*,1) 'c is null'
+         else
+            prv => s% other_star_info
+            c => copy_info
+            c = prv
+         end if
+
+         prv = s ! this makes copies of pointers and scalars
+
+         nz = nz_old - skip
+         s% nz = nz
+         if (dbg) write(*,2) 'nz_old', nz_old
+         if (dbg) write(*,2) 'nz', nz
+
+         if (dbg) write(*,1) 'call resize_star_info_arrays'
+         call resize_star_info_arrays(s, c, ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) &
+               write(*,*) 'resize_star_info_arrays failed in do_remove_surface'
+            return
+         end if
+
+         if (dbg) write(*,2) 'prv% dm(1)/Msun', 1, prv% dm(1)/Msun
+         if (dbg) write(*,2) 'prv% m(1)/msun', 1, prv% m(1)/Msun
+         if (dbg) write(*,2) 'prv% dm(nz_old)/Msun', nz_old, prv% dm(nz_old)/Msun
+         if (dbg) write(*,2) 'prv% m(nz_old)/msun', nz_old, prv% m(nz_old)/Msun
+
+         s% mstar = prv% m(1 + skip)
+         s% xmstar = s% mstar - prv% M_center
+         s% q(1) = 1d0
+         do k = 1, nz
+            k_old = k + skip
+            s% dq(k) = prv% dm(k_old)/s% xmstar
+            if (k > 1) s% q(k) = s% q(k-1) - s% dq(k-1)
+         end do
+         s% dq(nz) = s% q(nz)
+         do k = 1, nz
+            s% dm(k) = s% dq(k)*s% xmstar
+            s% m(k) = s% q(k)*s% xmstar + s% M_center
+         end do
+         if (dbg) write(*,2) 's% dq(1)', 1, s% dq(1)
+         if (dbg) write(*,2) 's% dm(1)/Msun', 1, s% dm(1)/Msun
+         if (dbg) write(*,2) 's% m(1)/msun', 1, s% m(1)/Msun
+         if (dbg) write(*,2) 's% dm(nz)/Msun', nz, s% dm(nz)/Msun
+         if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
+
+         if (dbg) write(*,1) 'call do_prune_mesh_surface'
+         call do_prune_mesh_surface( &
+            s, nz, nz_old, prv% xh, prv% xa, &
+            prv% j_rot, prv% i_rot, &
+            prv% omega, prv% D_omega, prv% am_nu_rot, &
+            prv% conv_vel, prv% lnT, &
+            prv% dPdr_dRhodr_info, prv% nu_ST, prv% D_ST, prv% D_DSI, prv% D_SH, &
+            prv% D_SSI, prv% D_ES, prv% D_GSF, prv% D_mix, &
+            s% xh, s% xa, ierr)
+         if (ierr /= 0) then
+            return
+         end if
+         if (dbg) write(*,2) 's% dq(1)', 1, s% dq(1)
+         if (dbg) write(*,2) 's% dm(1)/Msun', 1, s% dm(1)/Msun
+         if (dbg) write(*,2) 's% m(1)/msun', 1, s% m(1)/Msun
+         if (dbg) write(*,2) 's% dm(nz)/Msun', nz, s% dm(nz)/Msun
+         if (dbg) write(*,2) 's% m(nz)/msun', nz, s% m(nz)/Msun
+
+         if (Lmid > 0d0) then
+            T_black_body = pow(Lmid/(pi4*rmid*rmid*boltz_sigma), 0.25d0)
+            s% Tsurf_factor = T/T_black_body
+         else
+            s% Tsurf_factor = 1d0
+         end if
+         s% force_Tsurf_factor = s% Tsurf_factor
+
+         if (s% use_momentum_outer_bc) then
+            s% tau_factor = tau_factor_new
+            s% force_tau_factor = s% tau_factor
+         end if
+
+         s% need_to_setvars = .true.
+
+         if (dbg) write(*,1) 'call finish_load_model'
+         call finish_load_model(s, .false., .false., .false., ierr)
+         if (ierr /= 0) then
+            if (s% report_ierr) &
+               write(*,*) 'finish_load_model failed in do_remove_surface'
+            return
+         end if
+
+         if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
+            s% tau_factor, s% Tsurf_factor
+            
+         if (dbg) stop 'do_remove_surface'
+            
       end subroutine do_remove_surface
 
 
-      ! Relax to a trimmed stellar model with all surface cells removed
-      ! down to k_remove (the cell k_remove will be the outermost in the new model).
+      ! Relax to a trimmed stellar model with surface cells removed down to k_remove
+      ! (the cell k_remove will be the outermost in the new model).
       subroutine do_relax_to_star_cut( &
             id, k_remove, do_jrot, do_entropy, turn_off_energy_sources_and_sinks, ierr)
 
@@ -932,7 +1113,8 @@
 
          integer, intent(in) :: id, k_remove
          logical, intent(in) :: do_jrot, do_entropy
-         logical, intent(in) :: turn_off_energy_sources_and_sinks ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
+         logical, intent(in) :: turn_off_energy_sources_and_sinks 
+            ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
          logical :: conv_vel_flag, v_flag, u_flag, rotation_flag

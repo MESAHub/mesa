@@ -61,7 +61,9 @@
             stop 'do_evolve_step_part1'
          end if
          
-         if ( first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+         if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
+            if (mod(s% model_number, s% terminal_interval) == 0) &
+               write(*,*) 'fill_arrays_with_NaNs at start of step'
             call test_set_undefined
             call fill_star_info_arrays_with_NaNs(s, ierr)
             if (ierr /= 0) return
@@ -139,257 +141,210 @@
             s% boost_mlt_alfa = -999
             s% burn_nstep_max = -999
             s% burn_nfcn_total = -999
-            s% k_CpTMdot_lt_L = -999
             s% dX_nuc_drop_max_k = -999
             s% dX_nuc_drop_max_j = -999
             s% solver_test_partials_var = -999
             s% solver_test_partials_dx_sink = -999
             s% n_conv_regions_old = -999
-
-            call set_to_NaN(s% time_old)
-            call set_to_NaN(s% dt_old)
-            call set_to_NaN(s% mstar_old)
-            call set_to_NaN(s% xmstar_old)
-            call set_to_NaN(s% M_center_old)
-            call set_to_NaN(s% R_center_old)
-            call set_to_NaN(s% L_center_old)
-            call set_to_NaN(s% v_center_old)
-            call set_to_NaN(s% cumulative_energy_error_old)
-            call set_to_NaN(s% total_energy_old)
-            call set_to_NaN(s% Teff_old)
-            call set_to_NaN(s% mstar_dot_old)
-            call set_to_NaN(s% L_phot_old)
-            call set_to_NaN(s% L_surf_old)
-            call set_to_NaN(s% dt_limit_ratio_old)
-            call set_to_NaN(s% total_radiation_old)
-            call set_to_NaN(s% total_angular_momentum_old)
-            call set_to_NaN(s% revised_max_yr_dt_old)
-            call set_to_NaN(s% astero_revised_max_yr_dt_old)
-            call set_to_NaN(s% total_internal_energy_old)
-            call set_to_NaN(s% total_gravitational_energy_old)
-            call set_to_NaN(s% total_radial_kinetic_energy_old)
-            call set_to_NaN(s% total_turbulent_energy_old)
-            call set_to_NaN(s% total_rotational_kinetic_energy_old)
-            call set_to_NaN(s% h1_czb_mass_old)
-            call set_to_NaN(s% he_core_mass_old)
-            call set_to_NaN(s% c_core_mass_old)
-            call set_to_NaN(s% center_eps_nuc_old)
-            call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
-            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
             do j=1,max_num_mixing_regions
                call set_to_NaN(s% cz_top_mass_old(j))
                call set_to_NaN(s% cz_bot_mass_old(j))
             end do      
 
-            call set_to_NaN(s% mstar_dot)
-            call set_to_NaN(s% explicit_mstar_dot)
-            call set_to_NaN(s% adjust_J_q)
-            call set_to_NaN(s% rotational_mdot_boost)
-            call set_to_NaN(s% d_vc_dv)
-            call set_to_NaN(s% mdot_acoustic_surface)
-            call set_to_NaN(s% mdot_adiabatic_surface)
-            call set_to_NaN(s% gradT_excess_min_beta)
-            call set_to_NaN(s% gradT_excess_max_lambda)
-            call set_to_NaN(s% delta_Pg)
-            call set_to_NaN(s% nu_max)
-            call set_to_NaN(s% acoustic_cutoff)
-            call set_to_NaN(s% delta_nu)
-            call set_to_NaN(s% conv_mx1_top)
-            call set_to_NaN(s% conv_mx1_bot)
-            call set_to_NaN(s% conv_mx2_top)
-            call set_to_NaN(s% conv_mx2_bot)
-            call set_to_NaN(s% mx1_top)
-            call set_to_NaN(s% mx1_bot)
-            call set_to_NaN(s% mx2_top)
-            call set_to_NaN(s% mx2_bot)
-            call set_to_NaN(s% conv_mx1_top_r)
-            call set_to_NaN(s% conv_mx1_bot_r)
-            call set_to_NaN(s% conv_mx2_top_r)
-            call set_to_NaN(s% conv_mx2_bot_r)
-            call set_to_NaN(s% mx1_top_r)
-            call set_to_NaN(s% mx1_bot_r)
-            call set_to_NaN(s% mx2_top_r)
-            call set_to_NaN(s% mx2_bot_r)
-            call set_to_NaN(s% L_nuc_burn_total)
-            call set_to_NaN(s% power_nuc_burn_old)
-            call set_to_NaN(s% power_nuc_neutrinos)
-            call set_to_NaN(s% power_nonnuc_neutrinos)
-            call set_to_NaN(s% power_neutrinos)
-            call set_to_NaN(s% power_h_burn_old)
-            call set_to_NaN(s% power_he_burn_old)
-            call set_to_NaN(s% power_z_burn_old)
-            call set_to_NaN(s% power_PP)
-            call set_to_NaN(s% power_CNO)
-            call set_to_NaN(s% power_tri_alpha)
-            call set_to_NaN(s% power_c_alpha)
-            call set_to_NaN(s% power_n_alpha)
-            call set_to_NaN(s% power_o_alpha)
-            call set_to_NaN(s% power_ne_alpha)
-            call set_to_NaN(s% power_na_alpha)
-            call set_to_NaN(s% power_mg_alpha)
-            call set_to_NaN(s% power_si_alpha)
-            call set_to_NaN(s% power_s_alpha)
-            call set_to_NaN(s% power_ar_alpha)
-            call set_to_NaN(s% power_ca_alpha)
-            call set_to_NaN(s% power_ti_alpha)
-            call set_to_NaN(s% power_cr_alpha)
-            call set_to_NaN(s% power_fe_co_ni)
-            call set_to_NaN(s% power_c12_c12)
-            call set_to_NaN(s% power_c12_o16)
-            call set_to_NaN(s% power_o16_o16)
-            call set_to_NaN(s% power_pnhe4)
-            call set_to_NaN(s% power_ni56_co56)
-            call set_to_NaN(s% power_co56_fe56)
-            call set_to_NaN(s% power_other)
-            call set_to_NaN(s% L_surf)
-            call set_to_NaN(s% log_L_surf)
-            call set_to_NaN(s% star_age)
-            call set_to_NaN(s% time_days)
-            call set_to_NaN(s% time_years)
-            call set_to_NaN(s% time_step)
-            call set_to_NaN(s% dt_days)
-            call set_to_NaN(s% dt_years)
-            call set_to_NaN(s% dt_start)
-            call set_to_NaN(s% prev_Ledd)
-            call set_to_NaN(s% starting_T_center)
-            call set_to_NaN(s% min_dr_div_cs_start)
-            call set_to_NaN(s% surf_r_equatorial)
-            call set_to_NaN(s% surf_opacity)
-            call set_to_NaN(s% surf_csound)
-            call set_to_NaN(s% surf_rho)
-            call set_to_NaN(s% shock_mass_start)
-            call set_to_NaN(s% photosphere_opacity_start)
-            call set_to_NaN(s% adjust_mass_outer_frac_sub1)
-            call set_to_NaN(s% adjust_mass_mid_frac_sub1)
-            call set_to_NaN(s% adjust_mass_inner_frac_sub1)
-            call set_to_NaN(s% h1_czb_mass)
-            call set_to_NaN(s% profile_age)
-            call set_to_NaN(s% h1_czb_mass)            
-            call set_to_NaN(s% total_angular_momentum)
-            call set_to_NaN(s% total_abs_angular_momentum)
-            call set_to_NaN(s% angular_momentum_removed)
-            call set_to_NaN(s% angular_momentum_added)
-            call set_to_NaN(s% residual_norm)
-            call set_to_NaN(s% max_residual)
-            call set_to_NaN(s% max_fixup_for_mix)
-            call set_to_NaN(s% initial_timestep)   
-            call set_to_NaN(s% initial_L_center)
-            call set_to_NaN(s% initial_R_center)
-            call set_to_NaN(s% initial_v_center)
-            call set_to_NaN(s% tau_center)  
-            call set_to_NaN(s% super_eddington_wind_mdot)
             do j=1,num_categories
                call set_to_NaN(s% L_by_category(j))
             end do
             
-            call set_to_NaN(s% dVARdot_dVAR)
-            call set_to_NaN(s% surf_accel_grav_ratio)
-            call set_to_NaN(s% prev_create_atm_R0_div_R)
+            ! sorted to help remove duplicates
+            call set_to_NaN(s% L_center_old)
             call set_to_NaN(s% L_for_BB_outer_BC)
-            call set_to_NaN(s% dX_nuc_drop_max_drop)
-            call set_to_NaN(s% solver_test_partials_val)
-            call set_to_NaN(s% solver_test_partials_dval_dx)
-
-            ! variation control value for timestep controller
-            call set_to_NaN(s% dt_limit_ratio_old)
-
-            ! surface info
-            call set_to_NaN(s% v_surf_old) ! (cm/second)
-            call set_to_NaN(s% L_surf_old) ! surface luminosity (Lsun units)
-            call set_to_NaN(s% L_phot_old) ! photosphere luminosity (Lsun units)
+            call set_to_NaN(s% L_nuc_burn_total)
+            call set_to_NaN(s% L_phot_old)
+            call set_to_NaN(s% L_surf)
+            call set_to_NaN(s% L_surf_old)
             call set_to_NaN(s% Lrad_div_Ledd_avg_surf_old)
-            
-            call set_to_NaN(s% total_angular_momentum_old)
-            call set_to_NaN(s% h1_czb_mass_old) ! baryonic (Msun)
-            call set_to_NaN(s% he_core_mass_old)
-            call set_to_NaN(s% c_core_mass_old)
+            call set_to_NaN(s% M_center_old)
+            call set_to_NaN(s% R_center_old)
+            call set_to_NaN(s% Teff_old)
+            call set_to_NaN(s% acoustic_cutoff)
+            call set_to_NaN(s% adjust_J_q)
+            call set_to_NaN(s% adjust_mass_inner_frac_sub1)
+            call set_to_NaN(s% adjust_mass_mid_frac_sub1)
+            call set_to_NaN(s% adjust_mass_outer_frac_sub1)
+            call set_to_NaN(s% angular_momentum_added)
+            call set_to_NaN(s% angular_momentum_removed)
+            call set_to_NaN(s% astero_revised_max_yr_dt_old)
             call set_to_NaN(s% center_eps_nuc_old)
-            
-            call set_to_NaN(s% total_internal_energy_old)
-            call set_to_NaN(s% total_gravitational_energy_old)
-            call set_to_NaN(s% total_radial_kinetic_energy_old)
-            call set_to_NaN(s% total_turbulent_energy_old)
-            call set_to_NaN(s% total_rotational_kinetic_energy_old)
-            call set_to_NaN(s% total_energy_old)   
-            call set_to_NaN(s% total_internal_energy_before_adjust_mass)
-            call set_to_NaN(s% total_gravitational_energy_before_adjust_mass)
-            call set_to_NaN(s% total_radial_kinetic_energy_before_adjust_mass)
-            call set_to_NaN(s% total_turbulent_energy_before_adjust_mass)
-            call set_to_NaN(s% total_rotational_kinetic_energy_before_adjust_mass)
-            call set_to_NaN(s% total_energy_before_adjust_mass)          
-            call set_to_NaN(s% total_internal_energy_after_adjust_mass)
-            call set_to_NaN(s% total_gravitational_energy_after_adjust_mass)
-            call set_to_NaN(s% total_radial_kinetic_energy_after_adjust_mass)
-            call set_to_NaN(s% total_turbulent_energy_after_adjust_mass)
-            call set_to_NaN(s% total_rotational_kinetic_energy_after_adjust_mass)
-            call set_to_NaN(s% total_energy_after_adjust_mass)                
-            call set_to_NaN(s% total_internal_energy_start)
-            call set_to_NaN(s% total_gravitational_energy_start)
-            call set_to_NaN(s% total_radial_kinetic_energy_start)
-            call set_to_NaN(s% total_turbulent_energy_start)
-            call set_to_NaN(s% total_rotational_kinetic_energy_start)
-            call set_to_NaN(s% total_energy_start)           
-            call set_to_NaN(s% total_internal_energy_end)
-            call set_to_NaN(s% total_gravitational_energy_end)
-            call set_to_NaN(s% total_radial_kinetic_energy_end)
-            call set_to_NaN(s% total_turbulent_energy_end)
-            call set_to_NaN(s% total_rotational_kinetic_energy_end)
-            call set_to_NaN(s% total_energy_end)                  
-            call set_to_NaN(s% total_internal_energy)
-            call set_to_NaN(s% total_gravitational_energy)
-            call set_to_NaN(s% total_radial_kinetic_energy)
-            call set_to_NaN(s% total_turbulent_energy)
-            call set_to_NaN(s% total_rotational_kinetic_energy)
-            call set_to_NaN(s% total_energy)           
-            call set_to_NaN(s% surface_cell_specific_total_energy_old)
-            call set_to_NaN(s% total_energy_change_from_mdot) 
-            call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)               
-            call set_to_NaN(s% total_energy_sources_and_sinks)
-            call set_to_NaN(s% virial_thm_P_avg)
-            call set_to_NaN(s% total_eps_grav)
-            call set_to_NaN(s% total_eps_mdot)
-            call set_to_NaN(s% total_radiation)
-            call set_to_NaN(s% work_outward_at_surface)
-            call set_to_NaN(s% work_inward_at_center)
-            call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
-            call set_to_NaN(s% total_nuclear_heating)
-            call set_to_NaN(s% total_non_nuc_neu_cooling)
-            call set_to_NaN(s% total_irradiation_heating)
-            call set_to_NaN(s% total_WD_sedimentation_heating)
-            call set_to_NaN(s% total_energy_from_diffusion)
-            call set_to_NaN(s% total_extra_heating)
-            call set_to_NaN(s% error_in_energy_conservation)
-            call set_to_NaN(s% log_P_center)
-            call set_to_NaN(s% log_P_center_old)
+            call set_to_NaN(s% co_core_mass_old)
+            call set_to_NaN(s% conv_mx1_bot)
+            call set_to_NaN(s% conv_mx1_bot_r)
+            call set_to_NaN(s% conv_mx1_top)
+            call set_to_NaN(s% conv_mx1_top_r)
+            call set_to_NaN(s% conv_mx2_bot)
+            call set_to_NaN(s% conv_mx2_bot_r)
+            call set_to_NaN(s% conv_mx2_top)
+            call set_to_NaN(s% conv_mx2_top_r)
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% cumulative_extra_heating_old)
-            call set_to_NaN(s% total_radiation_old)        
+            call set_to_NaN(s% dVARdot_dVAR)
+            call set_to_NaN(s% dX_nuc_drop_max_drop)
+            call set_to_NaN(s% d_vc_dv)
+            call set_to_NaN(s% delta_Pg)
+            call set_to_NaN(s% delta_nu)
+            call set_to_NaN(s% dt_days)
+            call set_to_NaN(s% dt_limit_ratio_old)
+            call set_to_NaN(s% dt_old)
+            call set_to_NaN(s% dt_start)
+            call set_to_NaN(s% dt_years)
+            call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)               
+            call set_to_NaN(s% error_in_energy_conservation)
+            call set_to_NaN(s% explicit_mstar_dot)
+            call set_to_NaN(s% gradT_excess_max_lambda)
+            call set_to_NaN(s% gradT_excess_min_beta)
+            call set_to_NaN(s% h1_czb_mass)            
+            call set_to_NaN(s% h1_czb_mass_old)
+            call set_to_NaN(s% he_core_mass_old)
+            call set_to_NaN(s% initial_L_center)
+            call set_to_NaN(s% initial_R_center)
+            call set_to_NaN(s% initial_timestep)   
+            call set_to_NaN(s% initial_v_center)
+            call set_to_NaN(s% log_L_surf)
+            call set_to_NaN(s% log_P_center)
+            call set_to_NaN(s% log_P_center_old)
+            call set_to_NaN(s% max_fixup_for_mix)
+            call set_to_NaN(s% max_residual)
+            call set_to_NaN(s% mdot_acoustic_surface)
+            call set_to_NaN(s% mdot_adiabatic_surface)
             call set_to_NaN(s% mesh_adjust_IE_conservation)
-            call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% mesh_adjust_KE_conservation)
-            
-            call set_to_NaN(s% total_internal_energy_initial)
+            call set_to_NaN(s% mesh_adjust_PE_conservation)
+            call set_to_NaN(s% min_dr_div_cs_start)
+            call set_to_NaN(s% mstar_dot_old)
+            call set_to_NaN(s% mstar_old)
+            call set_to_NaN(s% mx1_bot)
+            call set_to_NaN(s% mx1_bot_r)
+            call set_to_NaN(s% mx1_top)
+            call set_to_NaN(s% mx1_top_r)
+            call set_to_NaN(s% mx2_bot)
+            call set_to_NaN(s% mx2_bot_r)
+            call set_to_NaN(s% mx2_top)
+            call set_to_NaN(s% mx2_top_r)
+            call set_to_NaN(s% non_epsnuc_energy_change_from_split_burn)
+            call set_to_NaN(s% nu_max)
+            call set_to_NaN(s% photosphere_opacity_start)
+            call set_to_NaN(s% power_CNO)
+            call set_to_NaN(s% power_PP)
+            call set_to_NaN(s% power_ar_alpha)
+            call set_to_NaN(s% power_c12_c12)
+            call set_to_NaN(s% power_c12_o16)
+            call set_to_NaN(s% power_c_alpha)
+            call set_to_NaN(s% power_ca_alpha)
+            call set_to_NaN(s% power_co56_fe56)
+            call set_to_NaN(s% power_cr_alpha)
+            call set_to_NaN(s% power_fe_co_ni)
+            call set_to_NaN(s% power_h_burn_old)
+            call set_to_NaN(s% power_he_burn_old)
+            call set_to_NaN(s% power_mg_alpha)
+            call set_to_NaN(s% power_n_alpha)
+            call set_to_NaN(s% power_na_alpha)
+            call set_to_NaN(s% power_ne_alpha)
+            call set_to_NaN(s% power_neutrinos)
+            call set_to_NaN(s% power_ni56_co56)
+            call set_to_NaN(s% power_nonnuc_neutrinos)
+            call set_to_NaN(s% power_nuc_burn_old)
+            call set_to_NaN(s% power_nuc_neutrinos)
+            call set_to_NaN(s% power_o16_o16)
+            call set_to_NaN(s% power_o_alpha)
+            call set_to_NaN(s% power_other)
+            call set_to_NaN(s% power_pnhe4)
+            call set_to_NaN(s% power_s_alpha)
+            call set_to_NaN(s% power_si_alpha)
+            call set_to_NaN(s% power_ti_alpha)
+            call set_to_NaN(s% power_tri_alpha)
+            call set_to_NaN(s% power_z_burn_old)
+            call set_to_NaN(s% prev_Ledd)
+            call set_to_NaN(s% prev_create_atm_R0_div_R)
+            call set_to_NaN(s% residual_norm)
+            call set_to_NaN(s% revised_max_yr_dt_old)
+            call set_to_NaN(s% rotational_mdot_boost)
+            call set_to_NaN(s% shock_mass_start)
+            call set_to_NaN(s% solver_test_partials_dval_dx)
+            call set_to_NaN(s% solver_test_partials_val)
+            call set_to_NaN(s% star_age)
+            call set_to_NaN(s% starting_T_center)
+            call set_to_NaN(s% super_eddington_wind_mdot)
+            call set_to_NaN(s% surf_accel_grav_ratio)
+            call set_to_NaN(s% surf_csound)
+            call set_to_NaN(s% surf_opacity)
+            call set_to_NaN(s% surf_r_equatorial)
+            call set_to_NaN(s% surf_rho)
+            call set_to_NaN(s% surface_cell_specific_total_energy_old)
+            call set_to_NaN(s% tau_center)  
+            call set_to_NaN(s% time_days)
+            call set_to_NaN(s% time_old)
+            call set_to_NaN(s% time_step)
+            call set_to_NaN(s% time_years)
+            call set_to_NaN(s% total_WD_sedimentation_heating)
+            call set_to_NaN(s% total_abs_angular_momentum)
+            call set_to_NaN(s% total_angular_momentum)
+            call set_to_NaN(s% total_angular_momentum_old)
+            call set_to_NaN(s% total_energy)           
+            call set_to_NaN(s% total_energy_after_adjust_mass)                
+            call set_to_NaN(s% total_energy_before_adjust_mass)          
+            call set_to_NaN(s% total_energy_change_from_mdot) 
+            call set_to_NaN(s% total_energy_end)                  
+            call set_to_NaN(s% total_energy_from_diffusion)
+            call set_to_NaN(s% total_energy_old)
+            call set_to_NaN(s% total_energy_sources_and_sinks)
+            call set_to_NaN(s% total_energy_start)           
+            call set_to_NaN(s% total_eps_grav)
+            call set_to_NaN(s% total_eps_mdot)
+            call set_to_NaN(s% total_extra_heating)
+            call set_to_NaN(s% total_gravitational_energy)
+            call set_to_NaN(s% total_gravitational_energy_after_adjust_mass)
+            call set_to_NaN(s% total_gravitational_energy_before_adjust_mass)
+            call set_to_NaN(s% total_gravitational_energy_end)
             call set_to_NaN(s% total_gravitational_energy_initial)
+            call set_to_NaN(s% total_gravitational_energy_old)
+            call set_to_NaN(s% total_gravitational_energy_start)
+            call set_to_NaN(s% total_internal_energy)
+            call set_to_NaN(s% total_internal_energy_after_adjust_mass)
+            call set_to_NaN(s% total_internal_energy_before_adjust_mass)
+            call set_to_NaN(s% total_internal_energy_end)
+            call set_to_NaN(s% total_internal_energy_initial)
+            call set_to_NaN(s% total_internal_energy_old)
+            call set_to_NaN(s% total_internal_energy_start)
+            call set_to_NaN(s% total_irradiation_heating)
+            call set_to_NaN(s% total_non_nuc_neu_cooling)
+            call set_to_NaN(s% total_nuclear_heating)
+            call set_to_NaN(s% total_radial_kinetic_energy)
+            call set_to_NaN(s% total_radial_kinetic_energy_after_adjust_mass)
+            call set_to_NaN(s% total_radial_kinetic_energy_before_adjust_mass)
+            call set_to_NaN(s% total_radial_kinetic_energy_end)
             call set_to_NaN(s% total_radial_kinetic_energy_initial)
-            call set_to_NaN(s% total_turbulent_energy_initial)
+            call set_to_NaN(s% total_radial_kinetic_energy_old)
+            call set_to_NaN(s% total_radial_kinetic_energy_start)
+            call set_to_NaN(s% total_rotational_kinetic_energy)
+            call set_to_NaN(s% total_rotational_kinetic_energy_after_adjust_mass)
+            call set_to_NaN(s% total_rotational_kinetic_energy_before_adjust_mass)
+            call set_to_NaN(s% total_rotational_kinetic_energy_end)
             call set_to_NaN(s% total_rotational_kinetic_energy_initial)
-            call set_to_NaN(s% time_evolve_step)
-            call set_to_NaN(s% time_remesh)
-            call set_to_NaN(s% time_adjust_mass)
-            call set_to_NaN(s% time_conv_premix)
-            call set_to_NaN(s% time_element_diffusion)
-            call set_to_NaN(s% time_struct_burn_mix)
-            call set_to_NaN(s% time_solver_matrix)
-            call set_to_NaN(s% time_solve_mix)
-            call set_to_NaN(s% time_solve_burn)
-            call set_to_NaN(s% time_solve_omega_mix)
-            call set_to_NaN(s% time_eos)
-            call set_to_NaN(s% time_neu_kap)
-            call set_to_NaN(s% time_nonburn_net)
-            call set_to_NaN(s% time_mlt)
-            call set_to_NaN(s% time_set_hydro_vars)
-            call set_to_NaN(s% time_set_mixing_info)
-            call set_to_NaN(s% time_total)
+            call set_to_NaN(s% total_rotational_kinetic_energy_old)
+            call set_to_NaN(s% total_rotational_kinetic_energy_start)
+            call set_to_NaN(s% total_turbulent_energy)
+            call set_to_NaN(s% total_turbulent_energy_after_adjust_mass)
+            call set_to_NaN(s% total_turbulent_energy_before_adjust_mass)
+            call set_to_NaN(s% total_turbulent_energy_end)
+            call set_to_NaN(s% total_turbulent_energy_initial)
+            call set_to_NaN(s% total_turbulent_energy_old)
+            call set_to_NaN(s% total_turbulent_energy_start)
+            call set_to_NaN(s% v_center_old)
+            call set_to_NaN(s% v_surf_old) ! (cm/second)
+            call set_to_NaN(s% virial_thm_P_avg)
+            call set_to_NaN(s% w_div_w_crit_avg_surf_old)
+            call set_to_NaN(s% work_inward_at_center)
+            call set_to_NaN(s% work_outward_at_surface)
+            call set_to_NaN(s% xmstar_old)
             
          end subroutine test_set_undefined
          
@@ -404,9 +359,7 @@
          use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
-         use star_utils, only: eval_total_energy_integrals, save_for_d_dt, &
-            cell_specific_total_energy, reset_epsnuc_vectors, set_qs, &
-            set_m_and_dm, set_dm_bar, total_angular_momentum, set_rmid
+         use star_utils
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
@@ -431,6 +384,7 @@
          s% doing_solver_iterations = .false.
          s% num_rotation_solver_steps = 0
          s% have_mixing_info = .false.
+         s% rotational_mdot_boost = 0d0
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
@@ -446,7 +400,7 @@
             return
          end if
 
-         ! unpack some of the input information
+         call reset_starting_vectors(s)
          nz = s% nz
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (failed('set_qs')) return
@@ -499,9 +453,9 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if (s% steps_before_use_Fraley_time_centering >= 0 .and. &
-                s% model_number > s% steps_before_use_Fraley_time_centering) &
-               s% using_Fraley_time_centering = .true.
+            if (s% steps_before_use_velocity_time_centering >= 0 .and. &
+                s% model_number > s% steps_before_use_velocity_time_centering) &
+               s% using_velocity_time_centering = .true.
          end if
          
          call reset_epsnuc_vectors(s)
@@ -639,7 +593,7 @@
             w_div_w_crit, w_div_w_crit_prev, mstar_dot, mstar_dot_prev, abs_mstar_delta, &
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, total, &
-            surf_w_div_w_crit_limit, dt, time, max_dt, total_energy, &
+            surf_omega_div_omega_crit_limit, dt, time, max_dt, total_energy, &
             new_R_center, amplitude, flash_max, &
             dm_nz, dm_m1, r_m1, v_m1, A_nz, A_m1, A_center, new_v_center, min_v_center
             
@@ -676,6 +630,7 @@
             
             dt = s% dt
             s% time = s% time_old + dt
+            s% star_age = s% time/secyer
             s% okay_to_set_mixing_info = .true.
 
             if (s% v_center /= 0d0) then ! adjust R_center               
@@ -699,6 +654,7 @@
 
                call do_adjust_mass(s, s% species, ierr)
                if (failed('do_adjust_mass')) return
+               s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
                if (failed('set_vars_if_needed after do_adjust_mass')) return
 
@@ -752,7 +708,6 @@
                call set_vars_if_needed(s, dt, 'after do_solve_omega_mix', ierr)
                if (failed('after do_solve_omega_mix')) return
             end if
-         
             
             if (s% use_other_pressure) then
                call s% other_pressure(s% id, ierr)
@@ -816,7 +771,7 @@
          call do_report(s, ierr)
          if (failed('do_report')) return
          call set_phase_of_evolution(s)
-
+            
          call system_clock(time0,clock_rate)
          s% current_system_clock_time = time0
          s% total_elapsed_time = &
@@ -845,7 +800,7 @@
 
             mstar_dot = 0
             w_div_w_crit = -1
-            surf_w_div_w_crit_limit = s% surf_w_div_w_crit_limit
+            surf_omega_div_omega_crit_limit = s% surf_omega_div_omega_crit_limit
             mdot_redo_cnt = 0
             max_mdot_redo_cnt = s% max_mdot_redo_cnt
 
@@ -959,9 +914,9 @@
                   return
                end if
                write(*,*)
-               if (w_div_w_crit > surf_w_div_w_crit_limit) then
-                  write(*,1) 'retry: w_div_w_crit > surf_w_div_w_crit_limit', &
-                     w_div_w_crit, surf_w_div_w_crit_limit
+               if (w_div_w_crit > surf_omega_div_omega_crit_limit) then
+                  write(*,1) 'retry: w_div_w_crit > surf_omega_div_omega_crit_limit', &
+                     w_div_w_crit, surf_omega_div_omega_crit_limit
                   do_step_part2 = retry
                   s% result_reason = nonzero_ierr
                   return
@@ -977,7 +932,7 @@
             ! i.e. if bigger mass loss makes w_div_w_crit worse,
             ! then in an unstable situation and will remove mass until regain stability.
 
-            if (w_div_w_crit <= surf_w_div_w_crit_limit &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. mdot_redo_cnt == 0) then
                s% was_in_implicit_wind_limit = .false.
                !exit implicit_mdot_loop
@@ -985,7 +940,7 @@
                return
             end if
 
-            if (w_div_w_crit <= surf_w_div_w_crit_limit &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit &
                   .and. s% mstar_dot == explicit_mdot) then
                !exit implicit_mdot_loop
                select_mdot_action = exit_loop
@@ -1042,10 +997,10 @@
             end if
 
             ! have already done at least one correction -- check if okay now
-            if (w_div_w_crit <= surf_w_div_w_crit_limit .and. &
+            if (w_div_w_crit <= surf_omega_div_omega_crit_limit .and. &
                   have_too_small_wind_mdot .and. &
                   abs((wind_mdot-too_small_wind_mdot)/wind_mdot) < &
-                     s% surf_w_div_w_crit_tol) then
+                     s% surf_omega_div_omega_crit_tol) then
                write(*,3) 'OKAY', s% model_number, mdot_redo_cnt, w_div_w_crit, &
                   log10(abs(s% mstar_dot)/(Msun/secyer))
                write(*,*)
@@ -1068,8 +1023,8 @@
                return
             end if
 
-            if (w_div_w_crit > surf_w_div_w_crit_limit &
-                  .and. w_div_w_crit_prev >= surf_w_div_w_crit_limit &
+            if (w_div_w_crit > surf_omega_div_omega_crit_limit &
+                  .and. w_div_w_crit_prev >= surf_omega_div_omega_crit_limit &
                   .and. -mstar_dot >= max_wind_mdot) then
                write(*,3) 'failed to fix w > w_crit', &
                   s% model_number, mdot_redo_cnt, w_div_w_crit, &
@@ -1080,7 +1035,7 @@
                return
             end if
 
-            if (w_div_w_crit >= surf_w_div_w_crit_limit) then ! wind too small
+            if (w_div_w_crit >= surf_omega_div_omega_crit_limit) then ! wind too small
                !write(*,*) "entering too small wind mdot"
                if (.not. have_too_small_wind_mdot) then
                   !write(*,*) "setting too small wind mdot"
@@ -1090,7 +1045,7 @@
                   !write(*,*) "changing too small wind mdot"
                   too_small_wind_mdot = wind_mdot
                end if
-            else if (w_div_w_crit < surf_w_div_w_crit_limit) then ! wind too large
+            else if (w_div_w_crit < surf_omega_div_omega_crit_limit) then ! wind too large
                !write(*,*) "entering too large wind mdot"
                if (.not. have_too_large_wind_mdot) then
                   !write(*,*) "setting too large wind mdot"
@@ -1109,7 +1064,7 @@
 
             if (have_too_large_wind_mdot .and. have_too_small_wind_mdot) then
                if (abs((too_large_wind_mdot-too_small_wind_mdot)/too_large_wind_mdot) &
-                   < s% surf_w_div_w_crit_tol) then
+                   < s% surf_omega_div_omega_crit_tol) then
                   write(*,*) "too_large_wind_mdot good enough, using it"
                   s% mstar_dot = -too_large_wind_mdot
                else
@@ -1214,7 +1169,7 @@
                expected_sum_cell_others, expected_sum_cell_sources, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
                diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
-               virial, total_radiation, L_surf, sum_cell_de, sum_cell_dEturb, &
+               virial, total_radiation, L_surf, sum_cell_de, sum_cell_det, &
                sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
                sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing
                
@@ -1283,10 +1238,10 @@
             virial = 3*sum(s% dm(1:nz)*s% P(1:nz)/s% rho(1:nz))
             s% virial_thm_P_avg = virial
 
-            if (s% u_flag) then ! .or. s% use_dedt_form_of_energy_eqn) then
+            s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
+            if (s% u_flag .and. s% total_eps_grav /= 0d0) then ! .or. s% use_dedt_form_of_energy_eqn) then
+               write(*,2) 'u_flag energy accounting ignores total_eps_grav', s% model_number, s% total_eps_grav
                s% total_eps_grav = 0
-            else
-               s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
             end if
             
             ! notes from Adam:
@@ -1377,18 +1332,12 @@
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             
             s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz))
-            
-            if (s% u_flag) then ! ignore total_work for Riemann hydro
-               s% work_outward_at_surface = 0d0
-               s% work_inward_at_center = 0d0
-            else ! these are set in energy equation
-            end if
 
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
             
             if (.not. s% RSP_flag) then
-               if (s% using_Fraley_time_centering .and. &
-                     s% include_L_in_Fraley_time_centering) then
+               if (s% using_velocity_time_centering .and. &
+                     s% include_L_in_velocity_time_centering) then
                   L_surf = 0.5d0*(s% L(1) + s% L_start(1))
                else
                   L_surf = s% L(1)
@@ -1434,6 +1383,12 @@
             s% cumulative_energy_error = s% cumulative_energy_error_old + &
                s% error_in_energy_conservation
 
+            s% total_internal_energy = s% total_internal_energy_end
+            s% total_gravitational_energy = s% total_gravitational_energy_end
+            s% total_radial_kinetic_energy = s% total_radial_kinetic_energy_end
+            s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
+            s% total_turbulent_energy = s% total_turbulent_energy_end
+            s% total_energy = s% total_energy_end
          
             if (s% model_number == s% energy_conservation_dump_model_number &
                   .and. .not. s% doing_relax) then
@@ -1453,9 +1408,7 @@
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,*)
                
-               if (s% use_dedt_form_with_total_energy_conservation .and. &
-                   s% always_use_dedt_form_of_energy_eqn .and. &
-                   .not. s% u_flag) then
+               if (s% always_use_dedt_form_of_energy_eqn) then
                   
                   write(*,*)
                   write(*,*) 'for debugging phase1_sources_and_sinks'
@@ -1525,13 +1478,13 @@
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
                   sum_cell_others = dt*dot_product(s% dm(1:nz), s% energy_others(1:nz))
                   sum_cell_work = dt*dot_product(s% dm(1:nz), s% dwork_dm(1:nz))
-                  sum_cell_dEturb = dt*dot_product(s% dm(1:nz), s% dEturb_dt(1:nz))
+                  sum_cell_det = dt*dot_product(s% dm(1:nz), s% dw_dt(1:nz))
                   sum_cell_dke = dt*dot_product(s% dm(1:nz), s% dkedt(1:nz))
                   sum_cell_dpe = dt*dot_product(s% dm(1:nz), s% dpedt(1:nz))
                   sum_cell_de = dt*dot_product(s% dm(1:nz), s% dedt(1:nz))
                   sum_cell_terms = &
                      - sum_cell_dL + sum_cell_sources + sum_cell_others - sum_cell_work &
-                     - sum_cell_dEturb - sum_cell_dke - sum_cell_dpe - sum_cell_de
+                     - sum_cell_det - sum_cell_dke - sum_cell_dpe - sum_cell_de
                   sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
                   
@@ -1572,21 +1525,21 @@
                   diff_total_turbulent_energy = &
                      s% total_turbulent_energy_end - s% total_turbulent_energy_start
                      
-                  write(*,2) 'post split rel err sum_cell_de', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_de', s% model_number, &
                      (sum_cell_de - diff_total_internal_energy)/s% total_energy, &
                      sum_cell_de, diff_total_internal_energy
-                  write(*,2) 'post split rel err sum_cell_dpe', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_dpe', s% model_number, &
                      (sum_cell_dpe - diff_total_gravitational_energy)/s% total_energy, &
                      sum_cell_dpe, diff_total_gravitational_energy
-                  write(*,2) 'post split rel err sum_cell_dke', s% model_number, &
+                  write(*,2) 'phase2 rel err sum_cell_dke', s% model_number, &
                      (sum_cell_dke - diff_total_kinetic_energy)/s% total_energy, &
                      sum_cell_dke, diff_total_kinetic_energy
                   !write(*,2) 'rel err ', s% model_number, &
                   !   ( - diff_total_rotational_kinetic_energy)/s% total_energy, &
                   !   , diff_total_rotational_kinetic_energy
-                  write(*,2) 'rel err sum_cell_dEturb', s% model_number, &
-                     (sum_cell_dEturb - diff_total_turbulent_energy)/s% total_energy, &
-                     sum_cell_dEturb, diff_total_turbulent_energy
+                  write(*,2) 'rel err sum_cell_det', s% model_number, &
+                     (sum_cell_det - diff_total_turbulent_energy)/s% total_energy, &
+                     sum_cell_det, diff_total_turbulent_energy
                   write(*,*)
                      
                      
@@ -1629,7 +1582,7 @@
                write(*,2) 's% Fr(1)', s% model_number, s% Fr(1)
                write(*,2) 's% Lc(1)', s% model_number, s% Lc(1)
                write(*,2) 's% Lt(1)', s% model_number, s% Lt(1)
-               write(*,2) 'sum L', s% model_number, s% Fr(1)*4d0*pi*s% r(1)*s% r(1)+s% Lc(1)+s% Lt(1)
+               write(*,2) 'sum L', s% model_number, s% Fr(1)*pi4*s% r(1)*s% r(1)+s% Lc(1)+s% Lt(1)
                okay_energy_conservation = .false.
                stop 'okay_energy_conservation'
                return
@@ -1655,13 +1608,6 @@
                stop 'okay_energy_conservation'
                return
             end if
-
-            s% total_internal_energy = s% total_internal_energy_end
-            s% total_gravitational_energy = s% total_gravitational_energy_end
-            s% total_radial_kinetic_energy = s% total_radial_kinetic_energy_end
-            s% total_rotational_kinetic_energy = s% total_rotational_kinetic_energy_end
-            s% total_turbulent_energy = s% total_turbulent_energy_end
-            s% total_energy = s% total_energy_end
 
             okay_energy_conservation = .true.
 
@@ -1754,7 +1700,7 @@
                tau_gamma_sum = 0
                do k=k1,1,-1 ! move eps_nuc outward from k1 to extra_heat at k
                   tau_gamma_sum = tau_gamma_sum + &
-                     kap_gamma*s% dm(k)/(4*pi*s% rmid(k)*s% rmid(k))
+                     kap_gamma*s% dm(k)/(pi4*s% rmid(k)*s% rmid(k))
                   if (tau_gamma_sum >= s% dtau_gamma_NiCo_decay_heat) then
                      s% extra_heat(k) = s% extra_heat(k) + &
                         s% eps_nuc(k1)*s% dm(k1)/s% dm(k)
@@ -1865,7 +1811,7 @@
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
          
-         if (.not. (s% RSP_flag .or. s% Eturb_flag)) then
+         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if
@@ -2069,7 +2015,7 @@
          s% solver_iter = 0
          s% solver_adjust_iter = 0
          
-         nvar = s% nvar
+         nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nz = s% nz
          s% model_number = s% model_number_old + 1
@@ -2346,11 +2292,16 @@
          retry_factor = s% timestep_factor_for_retries
          s% dt = s% dt*retry_factor
          if (len_trim(s% retry_message) > 0) then
-            write(*,'(a, i8)') ' retry: ' // trim(s% retry_message), s% model_number
+            if (s% retry_message_k > 0) then
+               write(*,'(a, 2i8)') ' retry: ' // trim(s% retry_message), s% retry_message_k, s% model_number
+            else
+               write(*,'(a, i8)') ' retry: ' // trim(s% retry_message), s% model_number
+            end if
          else
             write(*,'(a, i8)') ' retry', s% model_number
             !if (.true.) stop 'failed to set retry_message'
          end if
+         s% retry_message_k = 0
          if (s% report_ierr) &
             write(*,'(a50,2i6,3f16.6)') 'retry log10(dt/yr), log10(dt), retry_factor', &
                s% retry_cnt, s% model_number, log10(s% dt*retry_factor/secyer), &
@@ -2523,7 +2474,6 @@
          write(*,1) 'set_age', age
          s% time = age*secyer
          s% star_age = age
-         s% profile_age = age
       end subroutine set_age
 
 
