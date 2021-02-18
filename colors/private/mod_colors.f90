@@ -222,7 +222,7 @@
          character(len=strlen) :: tmp
          integer :: num_entries, num_made, IO_UBV
          
-         include 'formats.dek'
+         include 'formats'
          
          ! Try local folder first
          open(NEWUNIT=IO_UBV, FILE=trim(fname), ACTION='READ', STATUS='OLD', IOSTAT=ios)

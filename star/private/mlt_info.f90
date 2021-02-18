@@ -640,7 +640,7 @@
          else
             Q_face = chiT_face/(T_face*chiRho_face)
             s% grad_superad(k) = &
-               4*pi*r*r*s% scale_height(k)*rho_face* &
+               pi4*r*r*s% scale_height(k)*rho_face* &
                   (Q_face/Cp_face*(s% P(k-1)-s% P(k)) - (s% lnT(k-1)-s% lnT(k)))/s% dm_bar(k)
             ! grad_superad = area*Hp_face*rho_face*(Q_face/Cp_face*dP - dlogT)/dmbar
             ! Q_face = chiT_face/(T_face*chiRho_face)
@@ -1140,7 +1140,7 @@
          call smooth(s% grad_density,nz)
          call smooth(s% grad_temperature,nz)
 
-         if (s% use_Ledoux_criterion) then
+         if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
             do k=1,nz
                s% gradL_composition_term(k) = s% unsmoothed_brunt_B(k)
             end do

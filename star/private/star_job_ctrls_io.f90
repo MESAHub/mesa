@@ -53,6 +53,8 @@
          steps_before_start_timing, &
          show_eqns_and_vars_names, &
          pgstar_flag, &
+         clear_initial_pgstar_history, &
+         clear_pgstar_history, &
          save_pgstar_files_when_terminate, &
          save_photo_when_terminate, &
          load_saved_photo, &
@@ -103,6 +105,8 @@
          relax_initial_mass, &
          new_mass, &
          lg_max_abs_mdot, &
+         relax_mass_to_remove_H_env, &
+         relax_initial_mass_to_remove_H_env, &
          relax_mass_scale, &
          relax_initial_mass_scale, &
          dlgm_per_step, &
@@ -192,6 +196,7 @@
          zero_inner_v_by_mass_Msun, &
 
          remove_surface_at_cell_k, &
+         remove_surface_at_he_core_boundary, &
          remove_surface_by_optical_depth, &
          remove_surface_by_density, &
          remove_surface_by_pressure, &
@@ -203,12 +208,16 @@
          remove_surface_by_v_surf_km_s, &
          remove_surface_by_v_surf_div_cs, &
          remove_surface_by_v_surf_div_v_escape, &
+         min_q_for_remove_surface_by_v_surf_div_v_escape, &
+         max_q_for_remove_surface_by_v_surf_div_v_escape, &
 
          remove_surface_do_jrot, &
          remove_surface_do_entropy, &
          remove_surface_turn_off_energy_sources_and_sinks, &
+         remove_surface_by_relax_to_star_cut, &
          
          remove_initial_surface_at_cell_k, &
+         remove_initial_surface_at_he_core_boundary, &
          remove_initial_surface_by_optical_depth, &
          remove_initial_surface_by_density, &
          remove_initial_surface_by_pressure, &
@@ -294,10 +303,10 @@
          change_initial_RSP_flag, &
          new_RSP_flag, &
          
-         change_Eturb_flag, &
-         change_initial_Eturb_flag, &
-         change_Eturb_flag_at_model_number, &
-         new_Eturb_flag, &
+         change_TDC_flag, &
+         change_initial_TDC_flag, &
+         change_TDC_flag_at_model_number, &
+         new_TDC_flag, &
          
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
@@ -336,7 +345,6 @@
          new_reconstruction_flag, &
          
          center_ye_limit_for_v_flag, &
-         gamma1_integral_for_v_flag, &
          logT_for_conv_vel_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
@@ -694,6 +702,8 @@
          s% job% steps_before_start_timing = steps_before_start_timing
          s% job% show_eqns_and_vars_names = show_eqns_and_vars_names
          s% job% pgstar_flag = pgstar_flag
+         s% job% clear_initial_pgstar_history = clear_initial_pgstar_history
+         s% job% clear_pgstar_history = clear_pgstar_history
          s% job% save_pgstar_files_when_terminate = save_pgstar_files_when_terminate
          s% job% save_photo_when_terminate = save_photo_when_terminate
          s% job% load_saved_photo = load_saved_photo
@@ -746,6 +756,8 @@
          s% job% relax_initial_mass = relax_initial_mass
          s% job% new_mass = new_mass
          s% job% lg_max_abs_mdot = lg_max_abs_mdot
+         s% job% relax_mass_to_remove_H_env = relax_mass_to_remove_H_env
+         s% job% relax_initial_mass_to_remove_H_env = relax_initial_mass_to_remove_H_env
          s% job% relax_mass_scale = relax_mass_scale
          s% job% relax_initial_mass_scale = relax_initial_mass_scale
          s% job% dlgm_per_step = dlgm_per_step
@@ -837,6 +849,8 @@
          s% job% zero_inner_v_by_mass_Msun = zero_inner_v_by_mass_Msun
 
          s% job% remove_initial_surface_at_cell_k = remove_initial_surface_at_cell_k
+         s% job% remove_initial_surface_at_he_core_boundary = &
+            remove_initial_surface_at_he_core_boundary
          s% job% remove_initial_surface_by_optical_depth = &
             remove_initial_surface_by_optical_depth
          s% job% remove_initial_surface_by_density = &
@@ -854,6 +868,7 @@
          s% job% remove_initial_surface_by_v_surf_div_v_escape = remove_initial_surface_by_v_surf_div_v_escape
 
          s% job% remove_surface_at_cell_k = remove_surface_at_cell_k
+         s% job% remove_surface_at_he_core_boundary = remove_surface_at_he_core_boundary
          s% job% remove_surface_by_optical_depth = remove_surface_by_optical_depth
          s% job% remove_surface_by_density = remove_surface_by_density
          s% job% remove_surface_by_pressure = remove_surface_by_pressure
@@ -865,10 +880,13 @@
          s% job% remove_surface_by_v_surf_km_s = remove_surface_by_v_surf_km_s
          s% job% remove_surface_by_v_surf_div_cs = remove_surface_by_v_surf_div_cs
          s% job% remove_surface_by_v_surf_div_v_escape = remove_surface_by_v_surf_div_v_escape
+         s% job% min_q_for_remove_surface_by_v_surf_div_v_escape = min_q_for_remove_surface_by_v_surf_div_v_escape
+         s% job% max_q_for_remove_surface_by_v_surf_div_v_escape = max_q_for_remove_surface_by_v_surf_div_v_escape
          
          s% job% remove_surface_do_jrot = remove_surface_do_jrot
          s% job% remove_surface_do_entropy = remove_surface_do_entropy
          s% job% remove_surface_turn_off_energy_sources_and_sinks = remove_surface_turn_off_energy_sources_and_sinks
+         s% job% remove_surface_by_relax_to_star_cut = remove_surface_by_relax_to_star_cut
 
          s% job% report_mass_not_fe56 = report_mass_not_fe56
          s% job% relax_dxdt_nuc_factor = relax_dxdt_nuc_factor
@@ -940,10 +958,10 @@
          s% job% change_RSP_flag = change_RSP_flag
          s% job% change_initial_RSP_flag = change_initial_RSP_flag
          s% job% new_RSP_flag = new_RSP_flag
-         s% job% change_Eturb_flag = change_Eturb_flag
-         s% job% change_initial_Eturb_flag = change_initial_Eturb_flag
-         s% job% change_Eturb_flag_at_model_number = change_Eturb_flag_at_model_number
-         s% job% new_Eturb_flag = new_Eturb_flag
+         s% job% change_TDC_flag = change_TDC_flag
+         s% job% change_initial_TDC_flag = change_initial_TDC_flag
+         s% job% change_TDC_flag_at_model_number = change_TDC_flag_at_model_number
+         s% job% new_TDC_flag = new_TDC_flag
          s% job% change_conv_vel_flag = change_conv_vel_flag
          s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
          s% job% new_conv_vel_flag = new_conv_vel_flag
@@ -976,7 +994,6 @@
          s% job% new_reconstruction_flag = new_reconstruction_flag
          
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
-         s% job% gamma1_integral_for_v_flag = gamma1_integral_for_v_flag
          s% job% logT_for_conv_vel_flag = logT_for_conv_vel_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
@@ -1198,6 +1215,7 @@
 
 
       subroutine set_default_star_job_controls
+         required_termination_code_string(:) = ''
          extras_ipar(:) = 0
          extras_rpar(:) = 0
          extras_cpar(:) = ''
@@ -1262,6 +1280,8 @@
          steps_before_start_timing = s% job% steps_before_start_timing
          show_eqns_and_vars_names = s% job% show_eqns_and_vars_names
          pgstar_flag = s% job% pgstar_flag
+         clear_initial_pgstar_history = s% job% clear_initial_pgstar_history
+         clear_pgstar_history = s% job% clear_pgstar_history
          save_pgstar_files_when_terminate = s% job% save_pgstar_files_when_terminate
          save_photo_when_terminate = s% job% save_photo_when_terminate
          load_saved_photo = s% job% load_saved_photo
@@ -1314,6 +1334,8 @@
          relax_initial_mass = s% job% relax_initial_mass
          new_mass = s% job% new_mass
          lg_max_abs_mdot = s% job% lg_max_abs_mdot
+         relax_mass_to_remove_H_env = s% job% relax_mass_to_remove_H_env
+         relax_initial_mass_to_remove_H_env = s% job% relax_initial_mass_to_remove_H_env
          relax_mass_scale = s% job% relax_mass_scale
          relax_initial_mass_scale = s% job% relax_initial_mass_scale
          dlgm_per_step = s% job% dlgm_per_step
@@ -1406,6 +1428,7 @@
          zero_inner_v_by_mass_Msun = s% job% zero_inner_v_by_mass_Msun
 
          remove_surface_at_cell_k = s% job% remove_surface_at_cell_k
+         remove_surface_at_he_core_boundary = s% job% remove_surface_at_he_core_boundary
          remove_surface_by_optical_depth = s% job% remove_surface_by_optical_depth
          remove_surface_by_density = s% job% remove_surface_by_density
          remove_surface_by_pressure = s% job% remove_surface_by_pressure
@@ -1417,12 +1440,17 @@
          remove_surface_by_v_surf_km_s = s% job% remove_surface_by_v_surf_km_s
          remove_surface_by_v_surf_div_cs = s% job% remove_surface_by_v_surf_div_cs
          remove_surface_by_v_surf_div_v_escape = s% job% remove_surface_by_v_surf_div_v_escape
+         min_q_for_remove_surface_by_v_surf_div_v_escape = s% job% min_q_for_remove_surface_by_v_surf_div_v_escape
+         max_q_for_remove_surface_by_v_surf_div_v_escape = s% job% max_q_for_remove_surface_by_v_surf_div_v_escape
          
          remove_surface_do_jrot = s% job% remove_surface_do_jrot
          remove_surface_do_entropy = s% job% remove_surface_do_entropy
          remove_surface_turn_off_energy_sources_and_sinks = s% job% remove_surface_turn_off_energy_sources_and_sinks
+         remove_surface_by_relax_to_star_cut = s% job% remove_surface_by_relax_to_star_cut
          
          remove_initial_surface_at_cell_k = s% job% remove_initial_surface_at_cell_k
+         remove_initial_surface_at_he_core_boundary = &
+            s% job% remove_initial_surface_at_he_core_boundary
          remove_initial_surface_by_optical_depth = &
             s% job% remove_initial_surface_by_optical_depth
          remove_initial_surface_by_density = &
@@ -1509,10 +1537,10 @@
          change_RSP_flag = s% job% change_RSP_flag
          change_initial_RSP_flag = s% job% change_initial_RSP_flag
          new_RSP_flag = s% job% new_RSP_flag
-         change_Eturb_flag = s% job% change_Eturb_flag
-         change_initial_Eturb_flag = s% job% change_initial_Eturb_flag
-         change_Eturb_flag_at_model_number = s% job% change_Eturb_flag_at_model_number
-         new_Eturb_flag = s% job% new_Eturb_flag
+         change_TDC_flag = s% job% change_TDC_flag
+         change_initial_TDC_flag = s% job% change_initial_TDC_flag
+         change_TDC_flag_at_model_number = s% job% change_TDC_flag_at_model_number
+         new_TDC_flag = s% job% new_TDC_flag
          change_conv_vel_flag = s% job% change_conv_vel_flag
          change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
          new_conv_vel_flag = s% job% new_conv_vel_flag
@@ -1544,7 +1572,6 @@
          new_reconstruction_flag = s% job% new_reconstruction_flag
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
-         gamma1_integral_for_v_flag = s% job% gamma1_integral_for_v_flag
          logT_for_conv_vel_flag = s% job% logT_for_conv_vel_flag
          change_rotation_flag = s% job% change_rotation_flag
          change_initial_rotation_flag = s% job% change_initial_rotation_flag

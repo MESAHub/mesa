@@ -47,7 +47,7 @@
       real(dp), dimension(num_helm_results) :: helm_res_alfa, helm_res_beta
       integer :: i
       
-      include 'formats.dek'
+      include 'formats'
       
       ierr = 0
       off_table = .false.

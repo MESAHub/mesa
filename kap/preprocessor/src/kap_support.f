@@ -102,7 +102,7 @@
          use ferg, only: logT_for_smooth_lowT, num_smooth_lowT
          character (len=*) :: inlist_fname
          integer :: io_unit, ios
-         include 'formats.dek'
+         include 'formats'
          
          !set default values of namelist variables
          output_dir = ''
@@ -178,7 +178,7 @@
          real(dp) :: zalf, ztemp, w(6)
          integer i,iz
          
-         include 'formats.dek'
+         include 'formats'
          
          Z = Zbase + dXC + dXO
          if (Z + X > 1d0+1d-9) then
@@ -210,7 +210,7 @@
       subroutine read_output_logTs
          integer :: iounit, ierr, cnt
          
-         include 'formats.dek'
+         include 'formats'
          
          iounit = 33
          open(unit=iounit, file=trim(logT_file), action='read', status='old', iostat=ierr)
@@ -273,7 +273,7 @@
          real(dp) :: dXC, dXO, T6, R, frac, opac, Y, logT, T, logRho, Rho, logR
          character (len=256) :: type1_filename
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          

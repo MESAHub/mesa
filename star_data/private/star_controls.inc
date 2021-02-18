@@ -11,9 +11,8 @@
       ! definition of core boundaries
          real(dp) :: &
             he_core_boundary_h1_fraction, &
-            c_core_boundary_he4_fraction, &
-            o_core_boundary_c12_fraction, &
-            si_core_boundary_o16_fraction, &
+            co_core_boundary_he4_fraction, &
+            one_core_boundary_he4_c12_fraction, &
             fe_core_boundary_si28_fraction, &
             neutron_rich_core_boundary_Ye_max, &
             min_boundary_fraction
@@ -25,8 +24,7 @@
          real(dp) :: when_to_stop_rtol
 
          real(dp) :: max_age, max_age_in_seconds, &
-            dt_years_for_steps_before_max_age, &
-            reduction_factor_for_max_timestep
+            dt_years_for_steps_before_max_age, reduction_factor_for_max_timestep
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit
          real(dp) :: eta_center_limit
@@ -65,6 +63,7 @@
          real(dp) :: HB_limit
 
          real(dp) :: star_mass_min_limit, star_mass_max_limit
+         real(dp) :: remnant_mass_min_limit, ejecta_mass_max_limit
          
          real(dp) :: star_species_mass_min_limit, star_species_mass_max_limit
          character (len=iso_name_length) :: &
@@ -76,9 +75,8 @@
          real(dp) :: envelope_fraction_left_limit
 
          real(dp) :: he_core_mass_limit
-         real(dp) :: c_core_mass_limit
-         real(dp) :: o_core_mass_limit
-         real(dp) :: si_core_mass_limit
+         real(dp) :: co_core_mass_limit
+         real(dp) :: one_core_mass_limit
          real(dp) :: fe_core_mass_limit
          real(dp) :: neutron_rich_core_mass_limit
 
@@ -101,6 +99,9 @@
 
          real(dp) :: log_Tsurf_upper_limit
          real(dp) :: log_Tsurf_lower_limit
+
+         real(dp) :: log_Rsurf_upper_limit
+         real(dp) :: log_Rsurf_lower_limit
 
          real(dp) :: log_L_upper_limit
          real(dp) :: log_L_lower_limit
@@ -140,7 +141,7 @@
             stop_at_phase_TP_AGB, stop_at_phase_C_Burn, stop_at_phase_Ne_Burn, &
             stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS
          real(dp) :: Pgas_div_P_limit, Pgas_div_P_limit_max_q
-         real(dp) :: gamma1_limit, gamma1_limit_max_q
+         real(dp) :: gamma1_limit, gamma1_limit_max_q, gamma1_limit_max_v_div_vesc
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
          real(dp) :: delta_Pg_lower_limit, delta_Pg_upper_limit
@@ -362,7 +363,7 @@
          integer :: RTI_smooth_iterations
 
       ! brunt
-         logical :: calculate_Brunt_N2, use_brunt_gradmuX_form
+         logical :: calculate_Brunt_B, calculate_Brunt_N2
          real(dp) :: min_magnitude_brunt_B, brunt_N2_coefficient
          integer :: num_cells_for_smooth_brunt_B
          real(dp) :: threshold_for_smooth_brunt_B
@@ -405,7 +406,6 @@
          logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          logical :: use_fixed_L_for_BB_outer_BC
-         logical :: use_Psurf_for_surface_eflux
 
       ! create atmosphere
 
@@ -538,7 +538,6 @@
          real(dp) :: logT_max_for_standard_mesh_delta_coeff
          real(dp) :: logT_min_for_highT_mesh_delta_coeff
          real(dp) :: remesh_dt_limit
-         real(dp) :: remesh_log_L_nuc_burn_min
          real(dp) :: mesh_Pgas_div_P_exponent
 
          logical :: okay_to_remesh, trace_mesh_adjust_error_in_conservation
@@ -554,8 +553,7 @@
 
          logical :: show_mesh_changes
 
-         logical :: mesh_adjust_use_quadratic, &
-            mesh_adjust_get_T_from_E, mesh_ok_to_merge
+         logical :: mesh_adjust_get_T_from_E, mesh_ok_to_merge
 
          integer :: mesh_dump_call_number, mesh_max_k_old_for_split, mesh_min_k_old_for_split
 
@@ -647,15 +645,17 @@
          
          logical :: use_split_merge_amr, trace_split_merge_amr, &
             equal_split_density_amr, split_merge_amr_skip_inner_cell, &
+            split_merge_amr_hybrid_zoning, &
             split_merge_amr_log_zoning, &
             split_merge_amr_logtau_zoning, &
             split_merge_amr_okay_to_split_nz, &
             split_merge_amr_okay_to_split_1, &
             merge_amr_inhibit_at_jumps
-         integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters
+         integer :: split_merge_amr_nz_baseline, split_merge_amr_max_iters, &
+            split_merge_amr_nz_r_core
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
-            split_merge_amr_cntr_dq_min
+            split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff
 
          logical :: merge_amr_ignore_surface_cells
          integer :: merge_amr_k_for_ignore_surface_cells
@@ -763,7 +763,6 @@
 
       ! eos controls
          logical :: &
-            use_eosDT_ideal_gas, use_eosDT_HELMEOS, &
             report_eos_settings_at_start_of_run, &
             use_fixed_XZ_for_eos
          real(dp) :: fixed_X_for_eos, fixed_Z_for_eos
@@ -803,21 +802,14 @@
             use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
-            use_dedt_form_with_total_energy_conservation, &
             always_use_eps_grav_form_of_energy_eqn, &
-            use_Fraley_time_centering, &
-            include_P_in_Fraley_time_centering, &
-            include_L_in_Fraley_time_centering, &
+            use_velocity_time_centering, &
+            include_P_in_velocity_time_centering, &
+            include_L_in_velocity_time_centering, &
             use_time_centered_eps_grav
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
-            steps_before_use_Fraley_time_centering
-         
-         real(dp) :: &
-            v_drag_factor, &
-            v_drag, &
-            q_for_v_drag_full_off, &
-            q_for_v_drag_full_on
+            steps_before_use_velocity_time_centering
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -1001,7 +993,7 @@
          integer :: max_mdot_redo_cnt
          real(dp) :: min_years_dt_for_redo_mdot, mdot_crit_boost_factor, &
             mdot_revise_factor, implicit_mdot_boost
-         real(dp) :: surf_w_div_w_crit_limit, surf_w_div_w_crit_tol
+         real(dp) :: surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol
          logical :: fitted_fp_ft_i_rot
          real(dp) :: w_div_wcrit_max, w_div_wcrit_max2
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
@@ -1097,6 +1089,8 @@
          integer :: diffusion_iters_hard_limit
 
          real(dp) :: &
+            dt_div_dt_cell_collapse_limit, &
+            dt_div_dt_cell_collapse_hard_limit, &
             dt_div_min_dr_div_cs_limit, &
             dt_div_min_dr_div_cs_hard_limit, &
             min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, &
@@ -1226,6 +1220,20 @@
 
          real(dp) :: delta_log_eps_nuc_limit
          real(dp) :: delta_log_eps_nuc_hard_limit
+         
+         logical :: delta_dX_div_X_drop_only
+         logical :: delta_lg_XH_drop_only
+         logical :: delta_lg_XHe_drop_only
+         logical :: delta_lg_XC_drop_only
+         logical :: delta_lg_XNe_drop_only
+         logical :: delta_lg_XO_drop_only
+         logical :: delta_lg_XSi_drop_only
+         logical :: delta_XH_drop_only
+         logical :: delta_XHe_drop_only
+         logical :: delta_XC_drop_only
+         logical :: delta_XNe_drop_only
+         logical :: delta_XO_drop_only
+         logical :: delta_XSi_drop_only
 
          real(dp) :: delta_dX_div_X_cntr_limit
          real(dp) :: delta_dX_div_X_cntr_hard_limit
@@ -1298,11 +1306,8 @@
             hard_limit_for_rel_error_in_energy_conservation
 
          logical :: relax_hard_limits_after_retry, never_skip_hard_limits
-
-         logical :: report_all_dt_limits, report_dX_nuc_drop_dt_limits
-         logical :: report_why_dt_limits, report_solver_dt_info
-
-         logical :: trace_evolve
+         logical :: report_dt_hard_limit_retries, report_solver_dt_info
+         logical :: trace_evolve, report_min_dr_div_cs
 
       ! misc
 
@@ -1356,6 +1361,7 @@
          logical :: use_other_edit_pulse_data
          logical :: use_other_astero_freq_corr
          logical :: use_other_timestep_limit
+         logical :: use_other_set_pgstar_controls
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

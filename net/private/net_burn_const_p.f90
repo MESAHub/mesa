@@ -108,7 +108,7 @@
          real(dp), pointer :: rpar(:), work(:), v(:), rpar_burn_const_P_decsol(:)
          real(dp) :: t, lgT, lgRho, tend
          
-         include 'formats.dek'
+         include 'formats'
          
          netinfo => netinfo_target
          
@@ -265,7 +265,7 @@
             caller_id = 0
             nvar_blk = 0
             nz_blk = 0
-            include 'formats.dek'            
+            include 'formats'
             ierr = 0
             ! NOTE: don't use x_max for const_P since x includes other variables
             call isolve( &
@@ -355,7 +355,7 @@
             actual_neuQs => null()
             from_weaklib => null()
          
-            include 'formats.dek'
+            include 'formats'
          
             num_isos = nvar-1
          
@@ -567,7 +567,7 @@
             integer, intent(out) :: ierr ! nonzero means terminate integration
             real(dp), pointer :: dfdv(:,:) ! (n,n)
             integer :: ld_dfdv, nz, i, j, cnt, nnz
-            include 'formats.dek'
+            include 'formats'
             !write(*,1) 'burn_sjac', x
             ierr = 0
             ld_dfdv = n

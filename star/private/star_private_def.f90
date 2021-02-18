@@ -41,7 +41,7 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_Eturb = 1d-20, min_Eturb_pow_1_pt_5 = 1d-30
+      real(dp), parameter :: min_w = 1d-20
 
 
       contains
@@ -100,6 +100,8 @@
          termination_code_str(t_HB_limit) = 'HB_limit'
          termination_code_str(t_star_mass_min_limit) = 'star_mass_min_limit'
          termination_code_str(t_star_mass_max_limit) = 'star_mass_max_limit'
+         termination_code_str(t_remnant_mass_min_limit) = 'remnant_mass_min_limit'
+         termination_code_str(t_ejecta_mass_max_limit) = 'ejecta_mass_max_limit'
          
          termination_code_str(t_star_species_mass_min_limit) = 'star_species_mass_min_limit'
          termination_code_str(t_star_species_mass_max_limit) = 'star_species_mass_max_limit'
@@ -110,9 +112,8 @@
          termination_code_str(t_envelope_fraction_left_limit) = 'envelope_fraction_left_limit'
 
          termination_code_str(t_he_core_mass_limit) = 'he_core_mass_limit'
-         termination_code_str(t_c_core_mass_limit) = 'c_core_mass_limit'
-         termination_code_str(t_o_core_mass_limit) = 'o_core_mass_limit'
-         termination_code_str(t_si_core_mass_limit) = 'si_core_mass_limit'
+         termination_code_str(t_co_core_mass_limit) = 'co_core_mass_limit'
+         termination_code_str(t_one_core_mass_limit) = 'one_core_mass_limit'
          termination_code_str(t_fe_core_mass_limit) = 'fe_core_mass_limit'
          termination_code_str(t_neutron_rich_core_mass_limit) = 'neutron_rich_core_mass_limit'
 
@@ -135,6 +136,8 @@
          termination_code_str(t_log_Teff_upper_limit) = 'log_Teff_upper_limit'
          termination_code_str(t_log_Tsurf_lower_limit) = 'log_Tsurf_lower_limit'
          termination_code_str(t_log_Tsurf_upper_limit) = 'log_Tsurf_upper_limit'
+         termination_code_str(t_log_Rsurf_lower_limit) = 'log_Rsurf_lower_limit'
+         termination_code_str(t_log_Rsurf_upper_limit) = 'log_Rsurf_upper_limit'
          termination_code_str(t_log_Psurf_lower_limit) = 'log_Psurf_lower_limit'
          termination_code_str(t_log_Psurf_upper_limit) = 'log_Psurf_upper_limit'
          termination_code_str(t_log_Dsurf_lower_limit) = 'log_Dsurf_lower_limit'
@@ -237,13 +240,10 @@
          dt_why_str(Tlim_struc) = 'varcontrol'
          dt_why_str(Tlim_max_timestep_factor) = 'max increase'
          dt_why_str(Tlim_min_timestep_factor) = 'max decrease'
-         dt_why_str(Tlim_solver) = 'solver iters'
+         dt_why_str(Tlim_solver) = 'solver'
          dt_why_str(Tlim_num_burn_steps) = 'burn steps'
          dt_why_str(Tlim_num_diff_solver_steps) = 'diff steps'
          dt_why_str(Tlim_num_diff_solver_iters) = 'diff iters'
-         dt_why_str(Tlim_burn_max_num_substeps) = 'burn steps'
-         dt_why_str(Tlim_burn_max_num_iters) = 'burn iters'
-         dt_why_str(Tlim_max_mix_fixup) = 'mix fixup'
          dt_why_str(Tlim_dH) = 'dH'
          dt_why_str(Tlim_dHe) = 'dHe'
          dt_why_str(Tlim_dHe3) = 'dHe3'
@@ -272,11 +272,12 @@
          dt_why_str(Tlim_dlog_eps_nuc) = 'log_eps_nuc'
          dt_why_str(Tlim_lg_XH_cntr) = 'lg_XH_cntr'
          dt_why_str(Tlim_dmstar) = 'delta_mstar'
+         dt_why_str(Tlim_dt_div_dt_cell_collapse) = 'dt_collapse'
          dt_why_str(Tlim_dt_div_min_dr_div_cs) = 'min_dr_div_cs'
          dt_why_str(Tlim_lgL) = 'lgL'
          dt_why_str(Tlim_max_timestep) = 'max_dt'
          dt_why_str(Tlim_timestep_hold) = 'hold'
-         dt_why_str(Tlim_dX_nuc_drop) = 'dX_burn'
+         dt_why_str(Tlim_dX_nuc_drop) = 'dX_nuc'
          dt_why_str(Tlim_dX_div_X_cntr) = 'dX_div_X_cntr'
          dt_why_str(Tlim_lg_XHe_cntr) = 'lg_XHe_cntr'
          dt_why_str(Tlim_lg_XC_cntr) = 'lg_XC_cntr'

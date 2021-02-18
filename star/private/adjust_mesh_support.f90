@@ -58,7 +58,7 @@
 
          integer :: j, k, other_ierr
          logical, parameter :: dbg = .false.
-         real(dp), pointer, dimension(:) :: src
+         real(dp), allocatable, dimension(:) :: src
          real(dp) :: eps_min_for_delta, &
                dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on, alfa_czb
          real(dp), dimension(:,:), pointer :: gvals
@@ -78,32 +78,20 @@
             s, num_gvals, gval_names, &
             gval_is_xa_function, gval_is_logT_function, gvals1, ierr)
          if (ierr /= 0) return
-
-         call work_array(s, .true., .false., &
-            src, nz, nz_alloc_extra, 'adjust_mesh_support', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'allocate failed in ', nz
-            return
-         end if
+         
+         allocate(src(nz))
 
          call set_delta_gval_max(src, ierr)
-         if (ierr /= 0) then
-            call work_array(s, .false., .false., &
-               src, nz, nz_alloc_extra, 'adjust_mesh_support', other_ierr)
-            return
-         end if
+         if (ierr /= 0) return
          
          call smooth_gvals(nz,src,num_gvals,gvals)
-
-         call work_array(s, .false., .false., &
-            src, nz, nz_alloc_extra, 'adjust_mesh_support', ierr)
 
 
          contains
 
 
          subroutine set_delta_gval_max(src, ierr)
-            real(dp), pointer :: src(:)
+            real(dp) :: src(:)
             integer, intent(out) :: ierr
             real(dp) :: P_exp, beta
 
@@ -384,7 +372,7 @@
 
       subroutine smooth_gvals(nz,src,num_gvals,gvals)
          integer, intent(in) :: nz, num_gvals
-         real(dp), pointer :: src(:), gvals(:,:)
+         real(dp) :: src(:), gvals(:,:)
          integer :: k, i
 
          do i=1,num_gvals

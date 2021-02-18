@@ -91,7 +91,7 @@
          
          logical, parameter :: use_cache = .true.
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          
@@ -262,7 +262,7 @@
 
          logical, parameter :: dbg = .false.
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          

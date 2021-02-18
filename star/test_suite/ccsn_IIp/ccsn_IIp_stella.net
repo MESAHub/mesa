@@ -1,0 +1,27 @@
+      ! for times when expansion has cooled the core so that only decay reactions active (ni56 -> co56 -> fe56)
+      
+      add_isos(
+         h1      
+         he4     
+         c12     
+         n14     
+         o16     
+         ne20    
+         mg24    
+         si28    
+         s32     
+         ar36    
+         ca40    
+         fe56    
+         co56    
+         ni56    
+         )
+         
+      add_reactions(
+         rni56ec_to_co56
+         rco56ec_to_fe56           
+         )     
+     
+     
+     
+     

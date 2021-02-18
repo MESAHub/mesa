@@ -51,7 +51,8 @@
 
             real(dp), allocatable, dimension(:) :: xa
             real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
-            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
+            real(dp), dimension(:,:), allocatable :: d_dxa
 
             real(dp) :: rho_c, T_c
             real(dp) :: dmk, r0, dr, rp, rm
@@ -59,6 +60,9 @@
             ierr = 0
             call star_ptr(id, s, ierr)
             if (ierr /= 0) return
+
+            ! array for composition derivatives
+            allocate(d_dxa(num_eos_d_dxa_results, s% species))
 
             ! choose a uniform composition
             allocate(xa(s% species))
@@ -103,10 +107,10 @@
 
             ! call eos to get pressure
             call eosDT_get( &
-                   s% eos_handle, z, x, abar, zbar, &
+                   s% eos_handle, &
                    s% species, s% chem_id, s% net_iso, xa, &
                    Rho_c, log10(Rho_c), T_c, log10(T_c), &
-                   res, d_dlnd, d_dlnT, d_dabar, d_dzbar, ierr)
+                   res, d_dlnd, d_dlnT, d_dxa, ierr)
 
             constant_lnT = log(T_c)
             constant_lnP = res(i_lnPgas)
@@ -141,7 +145,7 @@
                 end if
             end do
 
-            deallocate(xa)
+            deallocate(xa, d_dxa)
 
          end subroutine build_isothermal_ball
 

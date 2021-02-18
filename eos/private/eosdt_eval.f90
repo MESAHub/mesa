@@ -861,7 +861,7 @@
          
          logical :: debug
          
-         include 'formats.dek' 
+         include 'formats'
 
          logRho1_max = 3.71d0
 
@@ -1181,7 +1181,7 @@
             
             real(dp) :: zfactor
             
-            include 'formats.dek'
+            include 'formats'
             
             d_alfa_dlogT = 0d0
             d_alfa_dlogRho = 0
@@ -1429,7 +1429,7 @@
 
          integer :: iz, j, ci
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -1552,7 +1552,7 @@
          logical, parameter :: dbg_for_X = dbg ! .or. .true.
          logical :: what_we_use_is_equal_spaced
          
-         include 'formats.dek'
+         include 'formats'
          
          ierr = 0
          tiny = rq% tiny_fuzz
@@ -1886,7 +1886,7 @@
          logical, parameter :: show = .false.
          real(dp) :: logRho, logT, logQ
          
-         include 'formats.dek'
+         include 'formats'
 
          logRho = logRho_in
          logT = logT_in

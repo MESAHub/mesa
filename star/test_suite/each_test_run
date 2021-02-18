@@ -17,6 +17,15 @@ function testhub_log {
     echo "$1" >> testhub.yml
 }
 
+# remove known false positive messages from stderr output file (err.txt)
+function filter_stderr {
+    cp err.txt err.tmp
+    # ignore lines like
+    #     PGPLOT /xw: cannot connect to X server []
+    grep -v PGPLOT err.tmp > err.txt
+    rm err.tmp
+}
+
 function antepenultimate_photo {
     (
         cd photos
@@ -68,8 +77,12 @@ function check_restart {
         rm -f "$3"
         command time -q -f '%M' -o mem-re.txt ./re "$photo" >> out.txt 2> err.txt
         testhub_log "mem_re: $(<mem-re.txt)"
-        tee -a out.txt < err.txt
-        rm err.txt
+        filter_stderr
+        if [ -s err.txt ]; then
+            failure_msg "$1 failed: wrote to stderr"
+            testhub_log "failure_type: :stderr"
+            return 1
+        fi
 
         # check that final model matches
 
@@ -104,8 +117,12 @@ function check_run {
     date "+   start %H:%M:%S"
     command time -q -f '%M' -o mem-rn.txt ./rn > out.txt 2> err.txt
     testhub_log "mem_rn: $(<mem-rn.txt)"
-    tee -a out.txt < err.txt
-    rm err.txt
+    filter_stderr
+    if [ -s err.txt ]; then
+        failure_msg "$1 failed: wrote to stderr"
+        testhub_log "failure_type: :stderr"
+        return 1
+    fi
     date "+  finish %H:%M:%S"
 
     # handle case that case was intentionally skipped
@@ -201,7 +218,7 @@ function do_one {
 
 id=$((id+1))
 if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
-    cd "$1" || exit
+    cd "$1" || return
     touch .running
 
     echo "---" > testhub.yml

@@ -35,19 +35,16 @@
       implicit none
 
       private
-      public :: do1_momentum_eqn, do_surf_momentum_eqn
+      public :: do1_momentum_eqn, do_surf_momentum_eqn, do1_radius_eqn
 
 
       contains
 
       
-      subroutine do_surf_momentum_eqn( &
-            s, P_surf_18, xscale, equ, skip_partials, nvar, ierr)
+      subroutine do_surf_momentum_eqn(s, P_surf_18, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          type(auto_diff_real_18var_order1), intent(in) :: P_surf_18
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
@@ -55,23 +52,21 @@
          include 'formats'
          ierr = 0
          call get1_momentum_eqn( &
-            s, 1, P_surf_18, xscale, equ, skip_partials, nvar, &
+            s, 1, P_surf_18, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, 1, xscale, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, 1, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do_surf_momentum_eqn
 
       
-      subroutine do1_momentum_eqn(s, k, xscale, equ, skip_partials, nvar, ierr)
+      subroutine do1_momentum_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
@@ -80,19 +75,19 @@
          include 'formats'
          P_surf_18 = 0d0
          call get1_momentum_eqn( &
-            s, k, P_surf_18, xscale, equ, skip_partials, nvar, &
+            s, k, P_surf_18, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, k, xscale, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials(s, k, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
       end subroutine do1_momentum_eqn
 
 
       subroutine get1_momentum_eqn( &
-            s, k, P_surf_18, xscale, equ, skip_partials, nvar, &
+            s, k, P_surf_18, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use chem_def, only: chem_isos
          use accurate_sum_auto_diff_18var_order1
@@ -101,8 +96,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1), intent(in) :: P_surf_18 ! only used if k == 1
-         real(dp), pointer :: xscale(:,:)
-         real(dp), pointer :: equ(:,:)
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          real(dp), intent(out) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
@@ -117,7 +110,8 @@
          
          type(auto_diff_real_18var_order1) :: resid1_18, resid_18, &
             other_18, dm_div_A_18, grav_18, area_18, dXP_18, d_mlt_Pturb_18, &
-            iXPavg_18, other_dm_div_A_18, grav_dm_div_A_18
+            iXPavg_18, other_dm_div_A_18, grav_dm_div_A_18, &
+            RTI_terms_18, RTI_terms_dm_div_A_18
          type(accurate_auto_diff_real_18var_order1) :: residual_sum_18
 
          include 'formats'
@@ -127,20 +121,33 @@
          
          ierr = 0
          call init
-         
-         ! equation is accel = grav + extra_grav - area*dXP/dm
-         ! accel = dv/dt
-         ! grav = -G*m/r^2 with possible factors for rotation and GR
-         ! extra_grav is from the other_momentum hook
-         ! dXP includes a variety of pressures
+
+!   dv/dt = - G*m/r^2 - (dXP_18 + d_mlt_Pturb_18)*area/dm + extra_grav + Uq + RTI_diffusion + RTI_kick
+! 
+!   grav_18 = expected_HSE_grav_term = -G*m/r^2 with possible modifications for rotation
+!   other_18 = expected_non_HSE_term = extra_grav - dv/dt + Uq
+!   extra_grav is from the other_momentum hook
+!   dXP_18 = pressure difference across face from center to center of adjacent cells (excluding mlt_Pturb effects)
+!        XP = P_18 + avQ_18 + Pt_18 + extra_pressure, with time centering
+!   iXPavg_18 = 1/(avg XP).  for normalizing equation
+!   d_mlt_Pturb_18 = difference in MLT convective pressure across face
+!   RTI_terms_18 = RTI_diffusion + RTI_kick
+!   dm_div_A_18 = dm/area
+! 
+!   0  = extra_grav - dv/dt + Uq - G*m/r^2 - RTI_diffusion - RTI_kick - (dXP_18 + d_mlt_Pturb_18)*area/dm
+!   0  = other + grav - RTI_terms - (dXP_18 + d_mlt_Pturb_18)*area/dm
+!   0  = (other + grav - RTI_terms)*dm/area - dXP_18 - d_mlt_Pturb_18
+!   0  = other_dm_div_A_18 + grav_dm_div_A_18 - dXP_18 - d_mlt_Pturb_18 + RTI_terms_dm_div_A_18
 
          call setup_HSE(d_grav_dw, dm_div_A, ierr); if (ierr /= 0) return ! grav_18 and dm_div_A_18
-         call setup_non_HSE(ierr); if (ierr /= 0) return ! other_18
+         call setup_non_HSE(ierr); if (ierr /= 0) return ! other = s% extra_grav(k) - s% dv_dt(k)
          call setup_dXP(ierr); if (ierr /= 0) return ! dXP_18, iXPavg_18
          call setup_d_mlt_Pturb(ierr); if (ierr /= 0) return ! d_mlt_Pturb_18
+         call setup_RTI_terms(ierr); if (ierr /= 0) return ! RTI_terms_18
          
          other_dm_div_A_18 = other_18*dm_div_A_18
          grav_dm_div_A_18 = grav_18*dm_div_A_18
+         RTI_terms_dm_div_A_18 = RTI_terms_18*dm_div_A_18
          
          if (.false.) then
             if (is_bad(other_dm_div_A_18%d1Array(i_lnd_m1))) then
@@ -162,12 +169,12 @@
          end if
          
          ! sum terms in residual_sum_18 using accurate_auto_diff_real_18var_order1
-         residual_sum_18 = other_dm_div_A_18 + grav_dm_div_A_18 - dXP_18 - d_mlt_Pturb_18
+         residual_sum_18 = other_dm_div_A_18 + grav_dm_div_A_18 - dXP_18 - d_mlt_Pturb_18 + RTI_terms_dm_div_A_18
          
          resid1_18 = residual_sum_18 ! convert back to auto_diff_real_18var_order1
          resid_18 = resid1_18*iXPavg_18 ! scaling
          residual = resid_18%val
-         equ(i_dv_dt, k) = residual      
+         s% equ(i_dv_dt, k) = residual      
          s% v_residual(k) = residual
 
          if (is_bad(residual)) then
@@ -266,28 +273,64 @@
             d_mlt_Pturb_18%d1Array(i_lnd_m1) = d_dmltPturb_dlndm1
             d_mlt_Pturb_18%d1Array(i_lnd_00) = d_dmltPturb_dlnd00
          end subroutine setup_d_mlt_Pturb         
+                  
+         subroutine setup_RTI_terms(ierr)
+            use auto_diff_support
+            integer, intent(out) :: ierr
+            type(auto_diff_real_18var_order1) :: v_p1, v_00, v_m1, dvdt_diffusion, &
+               f, rho_00, rho_m1, dvdt_kick
+            real(dp) :: sigm1, sig00
+            ierr = 0
+            RTI_terms_18 = 0d0
+            if (.not. s% RTI_flag) return
+            if (k >= s% nz .or. k <= 1) return
+            ! diffusion of specific momentum (i.e. v)
+            if (s% dudt_RTI_diffusion_factor > 0d0) then ! add diffusion source term to dvdt
+               ! sigmid_RTI(k) is mixing flow at center k in (gm sec^1)
+               sigm1 = s% dudt_RTI_diffusion_factor*s% sigmid_RTI(k-1)
+               sig00 = s% dudt_RTI_diffusion_factor*s% sigmid_RTI(k)
+               v_p1 = wrap_v_p1(s, k)
+               v_00 = wrap_v_00(s, k)
+               v_m1 = wrap_v_m1(s, k)
+               dvdt_diffusion = sig00*(v_p1 - v_00) - sigm1*(v_00 - v_m1) ! (g/s)*(cm/s)
+               dvdt_diffusion = dvdt_diffusion/s% dm_bar(k) ! divide by g to get units of cm/s^2
+            else
+               dvdt_diffusion = 0d0
+            end if
+            ! kick to adjust densities
+            if (s% eta_RTI(k) > 0d0 .and. &
+               s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
+               f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/dm_div_A_18
+               rho_00 = wrap_d_00(s, k)
+               rho_m1 = wrap_d_m1(s, k)
+               dvdt_kick = f*(rho_00 - rho_m1)/s% dt ! change v according to direction of lower density
+            else
+               dvdt_kick = 0d0
+            end if            
+            RTI_terms_18 = dvdt_diffusion + dvdt_kick            
+         end subroutine setup_RTI_terms
          
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials
             type(auto_diff_real_18var_order1) :: res18
             real(dp) :: resid1
             integer :: j
-            include 'formats'            
-            call unpack_res18_partials(s, k, nvar, xscale, i_dv_dt, &
+            include 'formats'
+            call unpack_res18_partials(s, k, nvar, i_dv_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% rotation_flag .and. s% w_div_wc_flag .and. s% use_gravity_rotation_correction) then
-               call e00(s, xscale, i_dv_dt, s% i_w_div_wc, k, nvar, iXPavg*d_grav_dw*dm_div_A)            
+               call e00(s, i_dv_dt, s% i_w_div_wc, k, nvar, iXPavg*d_grav_dw*dm_div_A)            
             end if            
             ! do partials wrt composition   
             resid1 = resid1_18%val         
             do j=1,s% species
                d_residual_dxa00(j) = resid1*d_iXPavg_dxa00(j) - iXPavg*d_dXP_dxa00(j)
-               call e00(s, xscale, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
+               call e00(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
             end do
             if (k > 1) then 
                do j=1,s% species
                   d_residual_dxam1(j) = resid1*d_iXPavg_dxam1(j) - iXPavg*d_dXP_dxam1(j)
-                  call em1(s, xscale, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
+                  call em1(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
                end do
             end if            
          end subroutine unpack_res18
@@ -298,6 +341,7 @@
       ! returns -G*m/r^2 with possible modifications for rotation
       subroutine expected_HSE_grav_term(s, k, &
             grav, d_grav_dlnR, d_grav_dw, area, d_area_dlnR, ierr)
+         use star_utils, only: get_area_info
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: grav, d_grav_dlnR, d_grav_dw, area, d_area_dlnR
@@ -308,24 +352,15 @@
 
          include 'formats'
       
-         ! using_Fraley_time_centering
+         ! using_velocity_time_centering
          ! use_gravity_rotation_correction
 
          ierr = 0
 
          m = s% m_grav(k)
          
-         if (s% using_Fraley_time_centering) then
-            area = 4d0*pi*(s% r(k)**2 + s% r(k)*s% r_start(k) + s% r_start(k)**2)/3d0
-            d_area_dlnR = 4d0*pi*s% r(k)*(2d0*s% r(k) + s% r_start(k))/3d0
-            inv_R2 = 1d0/(s% r(k)*s% r_start(k))
-            d_inv_R2_dlnR = -1d0*inv_R2
-         else
-            area = 4d0*pi*s% r(k)**2
-            d_area_dlnR = 2d0*area
-            inv_R2 = 1d0/s% r(k)**2
-            d_inv_R2_dlnR = -2d0*inv_R2
-         end if
+         call get_area_info(s, k, & ! using_velocity_time_centering
+            area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
 
          grav = -s% cgrav(k)*m*inv_R2
          d_grav_dlnR = -s% cgrav(k)*m*d_inv_R2_dlnR
@@ -357,7 +392,7 @@
       
       ! other = s% extra_grav(k) - s% dv_dt(k)
       subroutine expected_non_HSE_term(s, k, other_18, other, ierr)
-         use hydro_eturb, only: calc_Uq_18
+         use hydro_tdc, only: calc_Uq_18
          use accurate_sum_auto_diff_18var_order1
          use auto_diff_support
          type (star_info), pointer :: s
@@ -366,13 +401,11 @@
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_18var_order1) :: &
-            extra_18, accel_18, v_00, drag_18, Uq_18
+            extra_18, accel_18, v_00, Uq_18
          real(dp) :: accel, d_accel_dv, fraction_on
          logical :: test_partials, local_v_flag
 
          include 'formats'
-         ! use_other_momentum, use_other_momentum_implicit
-         ! dv_dt, drag, Uq
 
          ierr = 0
          
@@ -392,7 +425,6 @@
          end if
          
          accel_18 = 0d0
-         drag_18 = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
@@ -415,26 +447,16 @@
             end if
             accel_18%val = accel
             accel_18%d1Array(i_v_00) = d_accel_dv
-
-            s% dvdt_drag(k) = 0
-            if (s% drag_coefficient > 0) then
-                if (s% q(k) > s% min_q_for_drag .or. &
-                   (s% turn_on_drag_in_H_envelope .and. k <= s% start_H_envelope_base_k)) then
-                  v_00 = wrap_v_00(s,k)
-                  drag_18 = -s% drag_coefficient*v_00/s% dt
-                  s% dvdt_drag(k) = drag_18%val
-               end if
-            end if
          
          end if ! v_flag
 
          Uq_18 = 0d0
-         if (s% Eturb_flag) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% TDC_flag) then ! Uq(k) is turbulent viscosity drag at face k
             call calc_Uq_18(s, k, Uq_18, ierr)
             if (ierr /= 0) return
          end if
          
-         other_18 = extra_18 - accel_18 + drag_18 + Uq_18
+         other_18 = extra_18 - accel_18 + Uq_18
          other = other_18%val
          
          if (.false.) then
@@ -444,10 +466,6 @@
             end if
             if (is_bad(accel_18%d1Array(i_lnd_m1))) then
                write(*,2) 'lnd_m1 accel_18', k, accel_18%d1Array(i_lnd_m1)
-               stop 'expected_non_HSE_term'
-            end if
-            if (is_bad(drag_18%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 drag_18', k, drag_18%d1Array(i_lnd_m1)
                stop 'expected_non_HSE_term'
             end if
             if (is_bad(Uq_18%d1Array(i_lnd_m1))) then
@@ -553,6 +571,136 @@
          end if
         
       end subroutine get_dXP_face_info      
+
+
+      subroutine do1_radius_eqn( &
+            s, k, skip_partials, nvar, ierr)
+         use auto_diff_support, only: unwrap
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_18var_order1) :: uc_18
+         real(dp) :: dt, r, r0, r_div_r0, cs, v_expected, v_factor, residual, &
+            dr_div_r0_actual, dr_div_r0_expected, uc_factor, unused, &
+            d_uface_dlnR, d_uface_du00, d_uface_dum1, d_dlnR00, d_dv00, &
+            d_uface_dlnd00, d_uface_dlndm1,  d_uface_dlnT00, d_uface_dlnTm1, &
+            residual_old, d_dlnR00_old, d_dv00_old
+         integer :: nz, i_dlnR_dt, i_v, i_u, i_lnR, i_w_div_wc
+         logical :: test_partials, force_zero_v
+
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ierr = 0
+         dt = s% dt
+         nz = s% nz
+         i_dlnR_dt = s% i_dlnR_dt
+         i_v = s% i_v
+         i_u = s% i_u
+         i_lnR = s% i_lnR
+         i_w_div_wc = s% i_w_div_wc
+         
+         if (i_v == 0 .and. i_u == 0) stop 'must have either v or u for do1_radius_eqn'
+
+         r = s% r(k)
+         r0 = s% r_start(k)
+         r_div_r0 = r/r0
+
+         force_zero_v = (s% q(k) > s% velocity_q_upper_bound)
+         
+         if (s% i_lnT /= 0 .and. .not. force_zero_v) &
+            force_zero_v = &
+               (s% xh_old(s% i_lnT,k)/ln10 < s% velocity_logT_lower_bound .and. &
+                  s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)
+                  
+         if (force_zero_v) then
+            cs = s% csound_start(k)
+            if (i_v /= 0) then
+               s% equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
+               s% lnR_residual(k) = s% equ(i_dlnR_dt, k)
+               if (skip_partials) return
+               call e00(s, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
+               return
+            else if (i_u /= 0) then
+               s% equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
+               s% lnR_residual(k) = s% equ(i_dlnR_dt, k)
+               if (skip_partials) return
+               call e00(s, i_dlnR_dt, i_u, k, nvar, 1d0/cs)
+               return
+            end if
+         end if
+
+         if (i_u /= 0) then
+            if (s% using_velocity_time_centering) then
+               uc_18 = 0.5d0*(s% u_face_18(k) + s% u_face_start(k))
+            else
+               uc_18 = s% u_face_18(k)
+            end if
+            call unwrap(uc_18, v_expected, &
+               d_uface_dlndm1, d_uface_dlnd00, unused, &
+               d_uface_dlnTm1, d_uface_dlnT00, unused, &
+               unused, unused, unused, &
+               unused, d_uface_dlnR, unused, &
+               d_uface_dum1, d_uface_du00, unused, &
+               unused, unused, unused)
+         else
+            v_expected = s% vc(k)
+         end if
+         v_factor = s% d_vc_dv
+
+         ! dr = r - r0 = v_expected*dt
+         ! eqn: dr/r0 = v_expected*dt/r0
+         ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
+         ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
+         ! eqn becomes: v_expected*dt/r0 = expm1(dlnR)
+         dr_div_r0_actual = expm1(s% dxh_lnR(k)) ! expm1(x) = E^x - 1
+         dr_div_r0_expected = v_expected*dt/r0
+         
+         residual = dr_div_r0_expected - dr_div_r0_actual
+         s% equ(i_dlnR_dt, k) = residual
+         s% lnR_residual(k) = residual
+
+         if (test_partials) then
+            s% solver_test_partials_val = residual
+         end if
+
+         if (skip_partials) return
+
+         ! partials of dr_div_r0_expected
+         if (i_v /= 0) then            
+            call e00(s, i_dlnR_dt, i_v, k, nvar, v_factor*dt/r0)            
+         else if (i_u /= 0) then
+            uc_factor = v_factor*dt/r0
+            call e00(s, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
+            call e00(s, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)         
+            call e00(s, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
+            if (s% do_struct_thermo) &
+               call e00(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
+            if (k > 1) then
+               call em1(s, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
+               call em1(s, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
+               if (s% do_struct_thermo) &
+                  call em1(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
+            end if         
+            if (s% w_div_wc_flag) then
+               call e00(s, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_domega(k))
+            end if
+         end if
+
+         ! partial of -dr_div_r0_actual wrt lnR
+         call e00(s, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0) 
+
+         if (test_partials) then   
+            s% solver_test_partials_var = i_lnR
+            s% solver_test_partials_dval_dx = -r_div_r0
+            write(*,*) 'do1_radius_eqn', s% solver_test_partials_var
+         end if
+
+      end subroutine do1_radius_eqn
 
 
       end module hydro_momentum

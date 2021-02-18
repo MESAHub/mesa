@@ -1,7 +1,7 @@
 program eos_plotter
 
    use eos_def
-   use eos_lib, only: eosDT_get_new
+   use eos_lib, only: eosDT_get
    use chem_def
    use chem_lib
    use const_lib
@@ -547,7 +547,7 @@ contains
          end if
 
          if (i_eos == 0) then
-            call eosDT_get_new( &
+            call eosDT_get( &
             handle, species, chem_id, net_iso, xa, &
             Rho, log10Rho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)

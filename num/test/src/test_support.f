@@ -56,7 +56,7 @@
          integer, intent(out) :: ierr
          integer :: i
          logical :: okay
-         include 'formats.dek'
+         include 'formats'
          okay = .true.
          ierr = 0
          do i=1,nv
@@ -585,7 +585,7 @@
       subroutine test_find0_quadratic
          real*8 :: xx1, yy1, xx2, yy2, xx3, yy3, x, y
          integer :: ierr
-         include 'formats.dek'
+         include 'formats'
          write(*,*) 'test_find0_quadratic'
          xx1 = 1
          yy1 = g(xx1)
@@ -621,7 +621,7 @@
       subroutine test_find_max_quadratic
          real*8 :: x1, y1, x2, y2, x3, y3, dx1, dx2, xmax, ymax
          integer :: ierr
-         include 'formats.dek'
+         include 'formats'
          write(*,*) 'test_find_max_quadratic'
          dx1 = 1; dx2 = 2; y1 = 1; y2 = 10; y3 = 8
          x1 = 0; x2 = x1 + dx1; x3 = x2 + dx2

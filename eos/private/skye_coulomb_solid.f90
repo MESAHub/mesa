@@ -36,7 +36,7 @@ module skye_coulomb_solid
 
       TPT2=TPT*TPT
 
-      F = -(A1 / GAMI + A2 / GAMI**2 + A3 / GAMI**3)
+      F = -(A1 / GAMI + A2 / pow2(GAMI) + A3 / pow3(GAMI))
       F = F * exp(-(B1 / A1) * TPT2) ! suppress.factor of classical anharmonicity
       F = F - B1 * TPT2 / GAMI ! Quantum correction
    end function ocp_solid_anharmonic_free_energy
@@ -207,6 +207,7 @@ module skye_coulomb_solid
             if (unique_charges(j) == AZion(i)) then
                found = .true.
                found_index = j
+               exit
             end if
          end do
 
@@ -215,7 +216,7 @@ module skye_coulomb_solid
             unique_charges(num_unique_charges) = AZion(i)
             charge_abundances(num_unique_charges) = AY(i)
          else
-            charge_abundances(j) = charge_abundances(j) + AY(i)
+            charge_abundances(found_index) = charge_abundances(found_index) + AY(i)
          end if
       end do
 

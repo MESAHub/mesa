@@ -53,7 +53,8 @@ contains
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY
+         ATM_T_TAU_KRISHNA_SWAMY, &
+         ATM_T_TAU_TRAMPEDACH_SOLAR
 
     integer, intent(in)   :: id
     real(dp), intent(out) :: tau_base
@@ -70,6 +71,8 @@ contains
        tau_base = 0.4116433502_dp
     case (ATM_T_TAU_KRISHNA_SWAMY)
        tau_base = 0.3121563_dp
+    case (ATM_T_TAU_TRAMPEDACH_SOLAR)
+       tau_base = 0.5147929058057147_dp
     case default
        write(*,*) 'Invalid id in get_T_tau_base: ', id
        call mesa_error(__FILE__,__LINE__)
@@ -88,7 +91,8 @@ contains
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY
+         ATM_T_TAU_KRISHNA_SWAMY, &
+         ATM_T_TAU_TRAMPEDACH_SOLAR
 
     integer, intent(in)   :: id
     real(dp), intent(in)  :: tau
@@ -107,6 +111,8 @@ contains
        call eval_solar_Hopf(tau, Teff, lnT)
     case (ATM_T_TAU_KRISHNA_SWAMY)
        call eval_Krishna_Swamy(tau, Teff, lnT)
+    case (ATM_T_TAU_TRAMPEDACH_SOLAR)
+       call eval_Trampedach_solar(tau, Teff, lnT)
     case default
        write(*,*) 'Invalid id in eval_T_tau: ', id
        call mesa_error(__FILE__,__LINE__)
@@ -219,12 +225,52 @@ contains
 
   !****
 
+  subroutine eval_Trampedach_solar (tau, Teff, lnT)
+
+    real(dp), intent(in)  :: tau
+    real(dp), intent(in)  :: Teff
+    real(dp), intent(out) :: lnT
+
+    real(dp), parameter :: c0 = 0.6887302005929656_dp
+    real(dp), parameter :: c1 = 0.0668697860833449_dp
+    real(dp), parameter ::  a = 0.9262126497691250_dp
+    real(dp), parameter ::  v = 0.7657856893402466_dp
+    real(dp), parameter ::  b = 0.1148742902769433_dp
+
+    real(dp) :: x
+    real(dp) :: Teff4
+    real(dp) :: T4
+
+    ! Evaluate the T-tau relation by Ball (2021, RNAAS 5, 7),
+    ! which is a fit to the solar simulation by Trampedach
+    ! et al. (2014, MNRAS 442, 805–820)
+
+    x = log10(tau)
+
+    if (x >= 0.07407427) then
+       write(*,*) 'WARNING: evaluating Trampedach_solar T-tau relation beyond valid region (log10(tau) < 0.0741):', x
+    end if
+
+    Teff4 = Teff*Teff*Teff*Teff
+    T4 = 0.75d0*Teff4*(tau + c0 + c1*(x-b) + v*exp((x-a)/v))
+
+    lnT = log(T4)*0.25d0
+
+    ! Finish
+
+    return
+
+  end subroutine eval_Trampedach_solar
+
+  !****
+
   subroutine eval_T_tau_dq_dtau (id, tau, dq_dtau, ierr)
     
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
-         ATM_T_TAU_KRISHNA_SWAMY
+         ATM_T_TAU_KRISHNA_SWAMY, &
+         ATM_T_TAU_TRAMPEDACH_SOLAR
 
     integer, intent(in)   :: id
     real(dp), intent(in)  :: tau
@@ -246,6 +292,8 @@ contains
        call eval_solar_Hopf_dq_dtau(tau, dq_dtau)
     case (ATM_T_TAU_KRISHNA_SWAMY)
        call eval_Krishna_Swamy_dq_dtau(tau, dq_dtau)
+    case (ATM_T_TAU_TRAMPEDACH_SOLAR)
+       call eval_Trampedach_solar_dq_dtau(tau, dq_dtau)
     case default
        write(*,*) 'Invalid id in eval_T_tau_dq_dtau: ', id
        call mesa_error(__FILE__,__LINE__)
@@ -334,5 +382,34 @@ contains
     return
 
   end subroutine eval_Krishna_Swamy_dq_dtau
+
+  !****
+
+  subroutine eval_Trampedach_solar_dq_dtau (tau, dq_dtau)
+
+    real(dp), intent(in)  :: tau
+    real(dp), intent(out) :: dq_dtau
+
+    real(dp), parameter :: c1 = 0.0668697860833449_dp
+    real(dp), parameter ::  a = 0.9262126497691250_dp
+    real(dp), parameter ::  v = 0.7657856893402466_dp
+    real(dp), parameter ::  b = 0.1148742902769433_dp
+    real(dp), parameter ::  w = 0.0514999047169869_dp
+
+    real(dp) :: x
+
+    ! Evaluate q'(τ) for Ball (2021, RNAAS ...)
+    ! using fit to solar simulation by
+    ! Trampedach et al. (2014, MNRAS 442, 805–820)
+
+    x = log10(tau)
+
+    dq_dtau = (c1 + exp((x-a)/v))/(1._dp + exp((x-b)/w))/tau*iln10
+
+    ! Finish
+
+    return
+
+  end subroutine eval_Trampedach_solar_dq_dtau
 
 end module atm_T_tau_relations

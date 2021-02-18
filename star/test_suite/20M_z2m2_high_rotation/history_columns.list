@@ -92,9 +92,7 @@
    ! information about abundance transitions
    
       he_core_mass
-      c_core_mass
-      o_core_mass   
-      si_core_mass
+      co_core_mass
       fe_core_mass
    
    ! info about locations where optical depth is 10 or 100

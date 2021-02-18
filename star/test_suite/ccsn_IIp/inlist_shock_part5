@@ -11,7 +11,7 @@
   seconds_for_initial_dt = 0.1
   limit_initial_dt = .true.
 
-  pgstar_flag = .false.
+  !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -39,7 +39,8 @@
   log_L_upper_limit = 8.8
 
 
-  use_compression_outer_BC = .true.
+  !use_compression_outer_BC = .true.
+      use_momentum_outer_BC = .true.
 
   split_merge_amr_log_zoning = .false.
 

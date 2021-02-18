@@ -169,7 +169,7 @@
 
             character (len=256) :: fname, cache_filename, temp_cache_filename
             
-            include 'formats.dek'
+            include 'formats'
             
             call Get_ion_Table_Filenames(&
                      ion_Zs(iz), ion_Xs(ix), fname, cache_filename, temp_cache_filename)
@@ -244,7 +244,7 @@
          character (len=500) :: message, input_line
          real(dp), parameter :: tiny = 1e-6
          
-         include 'formats.dek'
+         include 'formats'
 
          info = 0            
 

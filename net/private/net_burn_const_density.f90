@@ -173,7 +173,7 @@
             rate_screened, rate_screened_dT, rate_screened_dRho
          integer :: iwork, cid
          
-         include 'formats.dek'
+         include 'formats'
          
          !dbg = .true.
          dbg = burn_dbg
@@ -416,7 +416,7 @@
             real(dp) :: res(num_helm_results)
             real(dp) :: d_eta_dlnRho
          
-            include 'formats.dek'
+            include 'formats'
          
             ierr = 0
 

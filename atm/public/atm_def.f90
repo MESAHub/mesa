@@ -41,6 +41,7 @@ module atm_def
   integer, parameter :: ATM_T_TAU_EDDINGTON = 1
   integer, parameter :: ATM_T_TAU_SOLAR_HOPF = 2
   integer, parameter :: ATM_T_TAU_KRISHNA_SWAMY = 3
+  integer, parameter :: ATM_T_TAU_TRAMPEDACH_SOLAR = 4
 
   ! Tables
 

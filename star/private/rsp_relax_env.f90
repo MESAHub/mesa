@@ -206,7 +206,7 @@
       real(dp) :: XX_max, XX_max_val, XX_max_dx
       integer :: i_XX_max, var_XX_max, n, op_err
 
-      write(*,*) 'RELAX_ENV'
+      !write(*,*) 'RELAX_ENV'
       EFL02 = EFL0*EFL0
       FSUB = s% RSP_dq_1_factor         
       EMR = s% RSP_mass

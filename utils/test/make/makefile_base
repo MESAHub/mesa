@@ -12,7 +12,7 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-SRCS = test_utils.f
+SRCS = test_utils.f90
 
 #################################################################
 #
@@ -32,7 +32,7 @@ LOAD_OTHER = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_OTHER))
 
 TEST = $(TEST_DIR)/tester
 
-OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SRCS))))
+OBJS = $(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SRCS)))
 
 $(TEST) : $(OBJS) $(DEPS_LOCAL) $(DEPS_OTHER)
 ifneq ($(QUIET),)
@@ -51,7 +51,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(FCfree) $<
@@ -65,7 +65,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

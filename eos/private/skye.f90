@@ -43,10 +43,10 @@ module skye
          big = 12d0
          skye_blend_width = 0.1d0
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = 8d0
+         bounds(1,2) = 7.5d0
 
          bounds(2,1) = 4d0
-         bounds(2,2) = 8d0
+         bounds(2,2) = 7.5d0
 
          bounds(3,1) = 0.6d0
          bounds(3,2) = 6.2d0
@@ -137,7 +137,7 @@ module skye
          
          real(dp) :: logT_ion, logT_neutral
          
-         include 'formats.dek'
+         include 'formats'
 
          ierr = 0
 

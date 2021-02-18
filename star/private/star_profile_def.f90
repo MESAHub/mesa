@@ -149,9 +149,9 @@
       integer, parameter :: p_ergs_rel_error_integral = p_ergs_error_integral + 1
       integer, parameter :: p_ergs_error = p_ergs_rel_error_integral + 1
       integer, parameter :: p_E_residual = p_ergs_error + 1
-      integer, parameter :: p_Et_residual = p_E_residual + 1
-      integer, parameter :: p_log_Et_residual = p_Et_residual + 1
-      integer, parameter :: p_dvdt_residual = p_log_Et_residual + 1
+      integer, parameter :: p_w_residual = p_E_residual + 1
+      integer, parameter :: p_log_w_residual = p_w_residual + 1
+      integer, parameter :: p_dvdt_residual = p_log_w_residual + 1
       integer, parameter :: p_v_residual = p_dvdt_residual + 1
       integer, parameter :: p_log_E_residual = p_v_residual + 1
       integer, parameter :: p_log_lnR_residual = p_log_E_residual + 1
@@ -232,8 +232,7 @@
       integer, parameter :: p_gamma1 = p_logS_per_baryon + 1
       integer, parameter :: p_gamma3 = p_gamma1 + 1
       integer, parameter :: p_eta = p_gamma3 + 1
-      integer, parameter :: p_theta_e = p_eta + 1
-      integer, parameter :: p_gam = p_theta_e + 1
+      integer, parameter :: p_gam = p_eta + 1
       integer, parameter :: p_mu = p_gam + 1
 
       integer, parameter :: p_eos_frac_OPAL_SCVH = p_mu + 1
@@ -634,16 +633,18 @@
       integer, parameter :: p_log_L_div_CpTMdot = p_log_mdot_v + 1
       integer, parameter :: p_cs_at_cell_bdy = p_log_L_div_CpTMdot + 1
 
-      integer, parameter :: p_total_energy_integral_outward = p_cs_at_cell_bdy + 1
+      integer, parameter :: p_binding = p_cs_at_cell_bdy + 1
+      integer, parameter :: p_total_energy_integral_outward = p_binding + 1
       integer, parameter :: p_total_energy_integral = p_total_energy_integral_outward + 1
       integer, parameter :: p_total_energy_sign = p_total_energy_integral + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
       
       integer, parameter :: p_Pturb = p_total_energy + 1
       integer, parameter :: p_log_Pturb = p_Pturb + 1
-      integer, parameter :: p_Eturb = p_log_Pturb + 1
-      integer, parameter :: p_log_Eturb = p_Eturb + 1
-      integer, parameter :: p_avQ = p_log_Eturb + 1
+      integer, parameter :: p_w = p_log_Pturb + 1
+      integer, parameter :: p_et = p_w + 1
+      integer, parameter :: p_log_et = p_et + 1
+      integer, parameter :: p_avQ = p_log_et + 1
       integer, parameter :: p_Hp_face = p_avQ + 1
       integer, parameter :: p_Y_face = p_Hp_face + 1
       integer, parameter :: p_PII_face = p_Y_face + 1
@@ -925,8 +926,8 @@
          profile_column_name(p_dvdt_residual) = 'dvdt_residual'
          profile_column_name(p_v_residual) = 'v_residual'
 
-         profile_column_name(p_Et_residual) = 'Et_residual'
-         profile_column_name(p_log_Et_residual) = 'log_Et_residual'
+         profile_column_name(p_w_residual) = 'w_residual'
+         profile_column_name(p_log_w_residual) = 'log_w_residual'
          profile_column_name(p_log_E_residual) = 'log_E_residual'
          profile_column_name(p_log_lnR_residual) = 'log_lnR_residual'
          profile_column_name(p_log_lnd_residual) = 'log_lnd_residual'
@@ -998,7 +999,6 @@
          profile_column_name(p_gamma1) = 'gamma1'
          profile_column_name(p_gamma3) = 'gamma3'
          profile_column_name(p_eta) = 'eta'
-         profile_column_name(p_theta_e) = 'theta_e'
          profile_column_name(p_gam) = 'gam'
          profile_column_name(p_mu) = 'mu'
 
@@ -1376,13 +1376,15 @@
 
          profile_column_name(p_total_energy) = 'total_energy'
          profile_column_name(p_total_energy_sign) = 'total_energy_sign'
+         profile_column_name(p_binding) = 'binding'
          profile_column_name(p_total_energy_integral_outward) = 'total_energy_integral_outward'
          profile_column_name(p_total_energy_integral) = 'total_energy_integral'
 
          profile_column_name(p_Pturb) = 'Pturb'
          profile_column_name(p_log_Pturb) = 'log_Pturb'
-         profile_column_name(p_Eturb) = 'Eturb'
-         profile_column_name(p_log_Eturb) = 'log_Eturb'
+         profile_column_name(p_w) = 'w'
+         profile_column_name(p_et) = 'et'
+         profile_column_name(p_log_et) = 'log_et'
          profile_column_name(p_avQ) = 'avQ'
          profile_column_name(p_Hp_face) = 'Hp_face'
          profile_column_name(p_Y_face) = 'Y_face'

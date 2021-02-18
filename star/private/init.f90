@@ -254,13 +254,13 @@
          nullify(s% bcyclic_odd_storage)
          nullify(s% bcyclic_odd_storage_qp)
 
-         nullify(s% hydro_iwork)
-         nullify(s% hydro_work)
+         nullify(s% solver_iwork)
+         nullify(s% solver_work)
+         nullify(s% AF1)
 
          s% net_name = ''
          s% species = 0
          s% num_reactions = 0
-         nullify(s% AF1)
 
          s% M_center = 0
          s% R_center = 0
@@ -324,7 +324,6 @@
 
          s% phase_of_evolution = phase_starting
          s% recent_log_header = -1000
-         s% profile_age = -1d0
 
          s% tau_base = 2d0/3d0
          s% tau_factor = 1
@@ -332,7 +331,7 @@
          s% solver_iter = -1
 
          s% using_gold_tolerances = .false.
-         s% using_Fraley_time_centering = .false.
+         s% using_velocity_time_centering = .false.
 
          s% using_revised_net_name = .false.
          s% revised_net_name = ''
@@ -344,7 +343,6 @@
          s% astero_revised_max_yr_dt = 0
 
          s% cumulative_energy_error = 0
-
          s% cumulative_extra_heating = 0
 
          s% have_initial_energy_integrals = .false.
@@ -358,7 +356,9 @@
          s% model_number = 0
          s% RSP_have_set_velocities = .false.
          s% RSP_just_set_velocities = .false.
-
+         
+         s% dt = 0d0
+         s% mstar_dot = 0d0
          s% boost_mlt_alfa = 0
 
          s% power_nuc_burn = -1
@@ -370,7 +370,6 @@
          s% k_const_mass = 1
          s% k_below_just_added = 1
          s% k_below_const_q = 1
-         s% k_CpTMdot_lt_L = 1
 
          s% why_Tlim = Tlim_struc
          s% dt_why_count(:) = 0
@@ -459,6 +458,7 @@
          use other_overshooting_scheme, only: null_other_overshooting_scheme
          use other_photo_write, only: default_other_photo_write
          use other_photo_read, only: default_other_photo_read
+         use other_set_pgstar_controls, only: default_other_set_pgstar_controls
          use other_eos
          use other_kap
          use pgstar_decorator
@@ -504,7 +504,7 @@
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
-         s% nvar = 0
+         s% nvar_total = 0
 
          s% nz = 0
          s% prev_mesh_nz = 0
@@ -521,13 +521,13 @@
          s% D_omega_flag = .false.
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
-         s% Eturb_flag = .false.
+         s% TDC_flag = .false.
 
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% need_to_reset_eturb = .false.
+         s% need_to_reset_w = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
@@ -629,11 +629,6 @@
          s% other_eosDT_get_T => null_other_eosDT_get_T
          s% other_eosDT_get_Rho => null_other_eosDT_get_Rho
 
-         s% other_eosPT_get => null_other_eosPT_get
-         s% other_eosPT_get_T => null_other_eosPT_get_T
-         s% other_eosPT_get_Pgas => null_other_eosPT_get_Pgas
-         s% other_eosPT_get_Pgas_for_Rho => null_other_eosPT_get_Pgas_for_Rho
-
          s% other_eosDE_get => null_other_eosDE_get
 
          s% other_kap_get => null_other_kap_get
@@ -650,6 +645,8 @@
 
          s% other_photo_write => default_other_photo_write
          s% other_photo_read => default_other_photo_read
+
+         s% other_set_pgstar_controls => default_other_set_pgstar_controls
 
          s% other_new_generation => null_other_new_generation
          s% other_set_current_to_old => null_other_set_current_to_old
@@ -673,7 +670,7 @@
 
          s% nvar_hydro = 0
          s% nvar_chem = 0
-         s% nvar = 0
+         s% nvar_total = 0
 
          s% species = 0
          s% num_reactions = 0
@@ -686,7 +683,6 @@
          s% R_center = 0
          s% L_center = 0
          s% time = 0
-         s% total_radiation = 0
          s% total_angular_momentum = 0
          s% prev_create_atm_R0_div_R = 0
 
@@ -710,7 +706,7 @@
          s% h1_czb_mass = 0
 
          s% he_core_mass = 0
-         s% c_core_mass = 0
+         s% co_core_mass = 0
          s% Teff = -1 ! need to calculate it
          s% center_eps_nuc = 0
          s% Lrad_div_Ledd_avg_surf = 0
@@ -738,8 +734,6 @@
 
          s% recent_log_header = -1000
          s% phase_of_evolution = 0
-
-         s% profile_age = 0
 
          s% num_solver_iterations = 0
          s% num_skipped_setvars = 0

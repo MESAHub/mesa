@@ -294,7 +294,7 @@
                   .not. s% nonlocal_NiCo_decay_heat) then
                tau_gamma = 0
                do kk = 1, k
-                  tau_gamma = tau_gamma + s% dm(kk)/(4*pi*s% rmid(kk)*s% rmid(kk))
+                  tau_gamma = tau_gamma + s% dm(kk)/(pi4*s% rmid(kk)*s% rmid(kk))
                end do
                tau_gamma = tau_gamma*s% nonlocal_NiCo_kap_gamma
                s% eps_nuc(k) = s% eps_nuc(k)*(1d0 - exp(-tau_gamma))

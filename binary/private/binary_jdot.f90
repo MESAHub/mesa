@@ -214,7 +214,7 @@
          real(dp) :: qrad_core
          integer :: i, k, id
 
-         include 'formats.inc'
+         include 'formats'
 
          ! calculate how much of inner region is convective
          qrad_core = 0d0

@@ -59,12 +59,6 @@
 
   max_num_profile_models = 1000
 
-  he_core_boundary_h1_fraction = 0.5
-  c_core_boundary_he4_fraction = 0.5
-  o_core_boundary_c12_fraction = 0.5
-  si_core_boundary_o16_fraction = 0.5
-  fe_core_boundary_si28_fraction = 0.5
-
   max_model_number = 500
   when_to_stop_rtol = 0.0001
   when_to_stop_atol = 10000
@@ -144,7 +138,7 @@
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+      stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1

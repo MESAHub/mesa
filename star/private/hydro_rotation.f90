@@ -336,14 +336,14 @@
             rp1 = exp(s% xh(s% i_lnR,k+1))
          end if
          rp13 = rp1*rp1*rp1
-         r_in = pow(0.5*(r003 + rp13),1d0/3d0)
+         r_in = pow(0.5*(r003 + rp13),one_third)
 
          if (k == 1) then
             r_out = r00
          else
             rm1 = exp(s% xh(s% i_lnR,k-1))
             rm13 = rm1*rm1*rm1
-            r_out = pow(0.5*(r003 + rm13),1d0/3d0)
+            r_out = pow(0.5*(r003 + rm13),one_third)
          end if
 
          call eval_i_rot(s,k,r_in,r00,r_out,0d0,&
@@ -394,20 +394,18 @@
          integer, intent(out) :: ierr
 
          integer :: k, nz
-         real(dp), pointer :: am_nu(:), am_sig(:)
+         real(dp), allocatable :: am_nu(:), am_sig(:)
 
          include 'formats'
 
          ierr = 0
          nz = s% nz
          
-         call do_alloc(ierr)
-         if (ierr /= 0) return
+         allocate(am_nu(nz), am_sig(nz))
 
          call get1_am_sig(s, nzlo, nzhi, s% am_nu_j, s% am_sig_j, dt, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
-            call dealloc
             return
          end if
 
@@ -418,40 +416,12 @@
          call get1_am_sig(s, nzlo, nzhi, am_nu, am_sig, dt, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
-            call dealloc
             return
          end if
 
          do k=1,nz
             s% am_sig_omega(k) = max(0d0, am_sig(k) - s% am_sig_j(k))
          end do
-
-         call dealloc
-
-         contains
-
-         subroutine do_alloc(ierr)
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true.,ierr)
-         end subroutine do_alloc
-
-         subroutine dealloc
-            call do_work_arrays(.false.,ierr)
-         end subroutine dealloc
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-               am_nu, nz, nz_alloc_extra, 'get_rotation_sigmas', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-               am_sig, nz, nz_alloc_extra, 'get_rotation_sigmas', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays
 
       end subroutine get_rotation_sigmas
 
@@ -460,7 +430,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          real(dp), intent(in) :: dt
-         real(dp), dimension(:), pointer :: am_nu, am_sig
+         real(dp), dimension(:) :: am_nu, am_sig
          integer, intent(out) :: ierr
 
          integer :: k, nz, nz2
@@ -480,7 +450,7 @@
             k = nz
             D = am_nu_E00
             r = 0.5d0*s% r(k)
-            s1 = 4*pi*r*r*s% rho(k)
+            s1 = pi4*r*r*s% rho(k)
             am_sig(k) = s1*s1*D/s% dm(k)
             nz2 = nz-1
          end if
@@ -490,7 +460,7 @@
             ! Meynet, Maeder, & Mowlavi, A&A 416, 1023-1036, 2004, eqn 51 with f = 1/2.
             D = 2*(am_nu_E00*am_nu_Ep1)/max(1d-99, am_nu_E00 + am_nu_Ep1)
             r = 0.5d0*(s% r(k) + s% r(k+1)) ! consistent with f = 1/2
-            s1 = 4*pi*r*r*s% rho(k)
+            s1 = pi4*r*r*s% rho(k)
             am_sig(k) = s1*s1*D/s% dm(k)
          end do
 

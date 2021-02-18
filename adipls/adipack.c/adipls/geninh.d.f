@@ -54,6 +54,7 @@ c
 c  dummy routine
 c
       implicit double precision (a-h,o-z)
+      dimension x(nn),y(iy,nn)
       external rhs
       return
       end

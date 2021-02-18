@@ -441,7 +441,7 @@
       integer :: k, ip1, jp1
       real(dp), pointer :: fin(:,:,:,:)
       
-      include 'formats.dek'
+      include 'formats'
       
       ierr = 0
       
@@ -830,7 +830,7 @@
       integer :: v, vlist(3), var, i, j, ii, jj
       character (len=256) :: message
       
-      include 'formats.dek'
+      include 'formats'
 
       ierr = 0
 
@@ -897,7 +897,7 @@
       integer :: Zion_in, nlnRS_in, nlnGAME_in, io_unit, i, j
       real(dp), parameter :: tiny = 1d-10
       
-      include 'formats.dek'
+      include 'formats'
       
       ierr = 0
       

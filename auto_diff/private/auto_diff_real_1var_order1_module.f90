@@ -57,11 +57,10 @@ module auto_diff_real_1var_order1_module
       operator(+), &
       operator(*), &
       operator(/), &
-      operator(**), &
+      pow, &
       max, &
       min, &
       dim, &
-      pow, &
       differentiate_1
    type :: auto_diff_real_1var_order1
       real(dp) :: val
@@ -314,13 +313,13 @@ module auto_diff_real_1var_order1_module
       module procedure div_int_self
    end interface operator(/)
    
-   interface operator(**)
+   interface pow
       module procedure pow_self
       module procedure pow_self_real
       module procedure pow_real_self
       module procedure pow_self_int
       module procedure pow_int_self
-   end interface operator(**)
+   end interface pow
    
    interface max
       module procedure max_self
@@ -345,14 +344,6 @@ module auto_diff_real_1var_order1_module
       module procedure dim_self_int
       module procedure dim_int_self
    end interface dim
-   
-   interface pow
-      module procedure pow_self
-      module procedure pow_self_real
-      module procedure pow_real_self
-      module procedure pow_self_int
-      module procedure pow_int_self
-   end interface pow
    
    interface differentiate_1
       module procedure differentiate_auto_diff_real_1var_order1_1
@@ -638,7 +629,7 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       real(dp) :: q0
-      q0 = pow(10, x%val)
+      q0 = pow(10.0_dp, x%val)
       unary%val = q0
       unary%d1val1 = q0*x%d1val1*ln10
    end function exp10_self
@@ -693,7 +684,7 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       real(dp) :: q0
-      q0 = powm1(log(2))
+      q0 = powm1(log(2.0_dp))
       unary%val = q0*log(x%val)
       unary%d1val1 = q0*x%d1val1*powm1(x%val)
    end function log2_self
@@ -715,8 +706,10 @@ module auto_diff_real_1var_order1_module
    function tan_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
-      unary%val = tan(x%val)
-      unary%d1val1 = x%d1val1*powm1(pow2(cos(x%val)))
+      real(dp) :: q0
+      q0 = tan(x%val)
+      unary%val = q0
+      unary%d1val1 = x%d1val1*(pow2(q0) + 1)
    end function tan_self
    
    function sinpi_self(x) result(unary)
@@ -741,9 +734,9 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       real(dp) :: q0
-      q0 = pi*x%val
-      unary%val = tan(q0)
-      unary%d1val1 = pi*x%d1val1*powm1(pow2(cos(q0)))
+      q0 = tan(pi*x%val)
+      unary%val = q0
+      unary%d1val1 = pi*x%d1val1*(pow2(q0) + 1)
    end function tanpi_self
    
    function sinh_self(x) result(unary)
@@ -763,8 +756,10 @@ module auto_diff_real_1var_order1_module
    function tanh_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
-      unary%val = tanh(x%val)
-      unary%d1val1 = x%d1val1*powm1(pow2(cosh(x%val)))
+      real(dp) :: q0
+      q0 = tanh(x%val)
+      unary%val = q0
+      unary%d1val1 = -x%d1val1*(pow2(q0) - 1)
    end function tanh_self
    
    function asin_self(x) result(unary)
@@ -809,10 +804,8 @@ module auto_diff_real_1var_order1_module
    function atanpi_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
-      real(dp) :: q0
-      q0 = powm1(pi)
-      unary%val = q0*atan(x%val)
-      unary%d1val1 = q0*x%d1val1*powm1(pow2(x%val) + 1)
+      unary%val = powm1(pi)*atan(x%val)
+      unary%d1val1 = x%d1val1*powm1(pi*pow2(x%val) + pi)
    end function atanpi_self
    
    function asinh_self(x) result(unary)
@@ -849,49 +842,49 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow2(x%val)
-      unary%d1val1 = 2*x%d1val1*x%val
+      unary%d1val1 = 2.0_dp*x%d1val1*x%val
    end function pow2_self
    
    function pow3_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow3(x%val)
-      unary%d1val1 = 3*x%d1val1*pow2(x%val)
+      unary%d1val1 = 3.0_dp*x%d1val1*pow2(x%val)
    end function pow3_self
    
    function pow4_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow4(x%val)
-      unary%d1val1 = 4*x%d1val1*pow3(x%val)
+      unary%d1val1 = 4.0_dp*x%d1val1*pow3(x%val)
    end function pow4_self
    
    function pow5_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow5(x%val)
-      unary%d1val1 = 5*x%d1val1*pow4(x%val)
+      unary%d1val1 = 5.0_dp*x%d1val1*pow4(x%val)
    end function pow5_self
    
    function pow6_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow6(x%val)
-      unary%d1val1 = 6*x%d1val1*pow5(x%val)
+      unary%d1val1 = 6.0_dp*x%d1val1*pow5(x%val)
    end function pow6_self
    
    function pow7_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow7(x%val)
-      unary%d1val1 = 7*x%d1val1*pow6(x%val)
+      unary%d1val1 = 7.0_dp*x%d1val1*pow6(x%val)
    end function pow7_self
    
    function pow8_self(x) result(unary)
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1) :: unary
       unary%val = pow8(x%val)
-      unary%d1val1 = 8*x%d1val1*pow7(x%val)
+      unary%d1val1 = 8.0_dp*x%d1val1*pow7(x%val)
    end function pow8_self
    
    function abs_self(x) result(unary)
@@ -1037,10 +1030,8 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1), intent(in) :: y
       type(auto_diff_real_1var_order1) :: binary
-      real(dp) :: q0
-      q0 = powm1(y%val)
-      binary%val = q0*x%val
-      binary%d1val1 = q0*x%d1val1 - x%val*y%d1val1*powm1(pow2(y%val))
+      binary%val = x%val*powm1(y%val)
+      binary%d1val1 = (x%d1val1*y%val - x%val*y%d1val1)*powm1(pow2(y%val))
    end function div_self
    
    function div_self_real(x, y) result(unary)
@@ -1087,10 +1078,8 @@ module auto_diff_real_1var_order1_module
       type(auto_diff_real_1var_order1), intent(in) :: x
       type(auto_diff_real_1var_order1), intent(in) :: y
       type(auto_diff_real_1var_order1) :: binary
-      real(dp) :: q0
-      q0 = pow(x%val, y%val)
-      binary%val = q0
-      binary%d1val1 = q0*(x%d1val1*y%val*powm1(x%val) + y%d1val1*log(x%val))
+      binary%val = pow(x%val, y%val)
+      binary%d1val1 = (x%d1val1*y%val + x%val*y%d1val1*log(x%val))*pow(x%val, y%val - 1)
    end function pow_self
    
    function pow_self_real(x, y) result(unary)
