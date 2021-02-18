@@ -51,7 +51,6 @@
          logical :: v_flag, RTI_flag, conv_vel_flag, &
             TDC_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
             rsp_flag, no_L
-         integer :: time_vals(8)
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
