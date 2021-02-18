@@ -960,7 +960,7 @@ contains
   
   end subroutine mv
   
-  subroutine cp(file_in,file_out,skip_errors)
+  subroutine cp_file(file_in,file_out,skip_errors)
     use utils_system, only: cp_c => cp
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
@@ -988,7 +988,7 @@ contains
             call mesa_error(__FILE__,__LINE__)
       end subroutine error
   
-  end subroutine cp
+  end subroutine cp_file
 
   integer function alloc_iounit(ierr)
     use utils_def
