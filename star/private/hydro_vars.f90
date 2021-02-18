@@ -323,7 +323,8 @@
                   end do
                else if (j == i_w) then
                   do k=1,nz
-                     s% w(k) = max(s% xh(i_w, k), min_w)
+                     s% w(k) = s% xh(i_w, k)
+                     if (s% w(k) < 2d0*min_w) s% w(k) = 0d0 ! clip noise
                      s% dxh_w(k) = 0d0
                   end do
                else if (j == i_lum) then
@@ -921,9 +922,9 @@
          end if
          
          if (s% need_to_reset_w) then
-            if (dbg) write(*,*) 'call set_mlt_vars'
-            call set_mlt_vars(s, 1, s% nz, ierr)
-            if (failed('set_mlt_vars')) return
+            !if (dbg) write(*,*) 'call set_mlt_vars'
+            !call set_mlt_vars(s, 1, s% nz, ierr)
+            !if (failed('set_mlt_vars')) return
             call reset_w_using_L(s,ierr)
             if (failed('reset_w_using_L')) return
             s% need_to_reset_w = .false.

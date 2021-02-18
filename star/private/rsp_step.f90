@@ -1040,7 +1040,7 @@
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
                if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
-                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! NEED THIS
+                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS  ???
                else
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
@@ -1050,6 +1050,7 @@
                 2.d0/s% dt*(EZH*DX(IR) + (s% r(k) - s% r_start(k)))
             s% r(k) = s% r(k) + EZH*DX(IR)
             s% Fr(k) = s% Fr(k) + EZH*DX(IL)
+            s% Lr(k) = s% Fr(k)*4d0*pi*s% r(k)**2
             DXKT = DXXT
             DXKC = DXXC
             DXKE = DXXE

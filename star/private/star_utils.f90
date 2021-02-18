@@ -334,7 +334,7 @@
             dm_bar(k) = 0.5d0*(dm(k-1) + dm(k))
          end do
          dm_bar(1) = 0.5d0*dm(1)
-         if (s% rsp_flag) then ! rsp uses this definition
+         if (s% rsp_flag .or. s% tdc_flag) then ! rsp and tdc use this definition
             dm_bar(nz) = 0.5d0*(dm(nz-1) + dm(nz))
          else
             dm_bar(nz) = 0.5d0*dm(nz-1) + dm(nz)
@@ -3021,6 +3021,12 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k)
          end if
          
+         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
+            write(*,4) 'cannot have TDC_flag and partials wrt L(k) ' // &
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k
+            stop 'e00'
+         end if
+         
          if (is_bad(v)) then
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
@@ -3079,7 +3085,8 @@
          end if
          
          if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,2) 'cannot have TDC_flag and partials wrt L(k-1)', k
+            write(*,4) 'cannot have TDC_flag and partials wrt L(k-1) ' // &
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k
             stop 'em1'
          end if
          
@@ -3136,6 +3143,12 @@
          if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k+1)
+         end if
+         
+         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
+            write(*,4) 'cannot have TDC_flag and partials wrt L(k) ' // &
+               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k
+            stop 'ep1'
          end if
          
          if (is_bad(v)) then

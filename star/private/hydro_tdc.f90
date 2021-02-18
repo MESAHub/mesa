@@ -35,7 +35,7 @@
       implicit none
 
       private
-      public :: do1_turbulent_energy_eqn, do1_tdc_L_eqn, &
+      public :: do1_turbulent_energy_eqn, do1_tdc_L_eqn, compute_L, &
          set_w_start_vars, reset_w_using_L, calc_Eq_18, calc_Uq_18 
       
 
@@ -875,6 +875,15 @@
          include 'formats'
          ierr = 0
          
+         if (k > s% nz) then
+            L = 0d0
+            L%val = s% L_center
+            Lr = 0d0
+            Lc = 0d0
+            Lt = 0d0
+            return
+         end if
+         
          ! Get reals
          dm_bar = s% dm_bar(k)
 
@@ -1118,7 +1127,8 @@
             else
                w_00 = sqrt(max(0d0,eturb_face(k)))
             end if
-            s% xh(i_w,k) = max(min_w, w_00)
+            s% xh(i_w,k) = w_00
+            if (s% xh(i_w,k) < 2d0*min_w) s% xh(i_w,k) = 0d0 ! clip
             s% w(k) = s% xh(i_w,k)
             call compute_L(s, k, L, Lr, Lc, Lt, ierr)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'

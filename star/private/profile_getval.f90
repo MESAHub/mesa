@@ -221,10 +221,6 @@
       end function get_profile_val
 
 
-
-
-
-
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
          use chem_def
          use rates_def

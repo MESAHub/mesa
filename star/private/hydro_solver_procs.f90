@@ -626,8 +626,8 @@
          nz = s% nz
          
          
-         if (s% TDC_flag) & ! clip change in w to maintain non-negativity.
-            call clip_so_non_negative(s% i_w, min_w*1d-6)
+         if (s% TDC_flag) & 
+            call clip_if_too_small(s% i_w, min_w)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)
@@ -723,6 +723,21 @@
          end if
          
          contains
+         
+         subroutine clip_if_too_small(i,minval)
+            integer, intent(in) :: i
+            real(dp), intent(in) :: minval
+            real(dp) :: dval, old_val, new_val
+            do k = 1, s% nz
+               dval = B(i,k)*s% x_scale(i,k)*correction_factor
+               old_val = s% xh_start(i,k) + s% solver_dx(i,k)
+               new_val = old_val + dval
+               if (dval >= 0) cycle
+               if (new_val >= minval) cycle
+               dval = -old_val
+               B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
+            end do
+         end subroutine clip_if_too_small
          
          subroutine clip_so_non_negative(i,minval)
             integer, intent(in) :: i

@@ -37,10 +37,7 @@
       private
       public :: eval_equ
 
-      real(dp), parameter :: one = 1, zero = 0
-
       logical, parameter :: dbg = .false.
-
       integer, parameter :: dbg_cell = -1
 
 
@@ -433,7 +430,7 @@
             integer :: k
             do k=nzlo,nzhi
                s% equ(j,k) = 0 ! s% xs(j,k) - s% xs_pre_pass(j,k)
-               if (.not. skip_partials) call e00(s,j,j,k,nvar,one)
+               if (.not. skip_partials) call e00(s,j,j,k,nvar,1d0)
             end do
          end subroutine null_eqn
 
@@ -443,7 +440,7 @@
             integer :: k
             do k=nzlo,nzhi
                s% equ(j,k) = 0
-               if (.not. skip_partials) call e00(s,j,i,k,nvar,one)
+               if (.not. skip_partials) call e00(s,j,i,k,nvar,1d0)
             end do
          end subroutine dummy_eqn
 
@@ -623,7 +620,7 @@
 
          if (skip_partials) return
 
-         call e00(s, i_dlnd_dt, i_lnR, k, nvar, one)
+         call e00(s, i_dlnd_dt, i_lnR, k, nvar, 1d0)
          if (k < nz) call ep1(s, i_dlnd_dt, i_lnR, k, nvar, -rp13/(rp13 + dr3))
 
          dequ_ddr3 = -one_third/(rp13 + dr3)
@@ -1831,7 +1828,7 @@
                s% equ(i_equL,1) = 0
                s% equL_residual(1) = s% equ(i_equL,1)
                if (skip_partials) return
-               call e00(s,i_equL,i_lnT,1,nvar,one)
+               call e00(s,i_equL,i_lnT,1,nvar,1d0)
                return
             end if
 
@@ -1942,7 +1939,7 @@
                s% equ(i_T_BC,1) = 0
                s% equL_residual(1) = s% equ(i_T_BC,1)
                if (skip_partials) return
-               call e00(s,i_T_BC,i_lnT,1,nvar,one)
+               call e00(s,i_T_BC,i_lnT,1,nvar,1d0)
                return
             end if
             

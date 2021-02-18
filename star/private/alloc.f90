@@ -2583,7 +2583,7 @@
          i = i+1; s% i_lnT = i
          i = i+1; s% i_lnR = i
       
-         if (.not. s% RSP_flag) then
+         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
             i = i+1; s% i_lum = i
          else
             s% i_lum = 0
