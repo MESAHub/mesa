@@ -56,7 +56,7 @@
       public :: id_from_read_star_job
       public :: MESA_INLIST_RESOLVED
       
-      ! for use by binary
+      ! deprecated, but kept around for use by binary
       public :: before_evolve_loop, after_step_loop, before_step_loop, do_saves, &
          resolve_inlist_fname, terminate_normal_evolve_loop
       

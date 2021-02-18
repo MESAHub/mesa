@@ -6,6 +6,8 @@
          real(dp) :: TDC_alfam
          real(dp) :: TDC_alfar
          
+         logical :: TDC_use_Stellingwerf_Lr
+         
          
          real(dp) :: accretion_entropy_at_surface
          

@@ -688,7 +688,8 @@
          integer, intent(out) :: ierr
 
          ! Intermediates
-         type(auto_diff_real_18var_order1) :: Erad, T400, T4m1, d_P_rad, kap_face
+         type(auto_diff_real_18var_order1) :: &
+            Erad, T400, T4m1, kap_face, BW, BK, diff_T4_div_kap
          real(dp) :: alfa
          
          include 'formats'
@@ -699,15 +700,24 @@
          
             Erad = crad * pow4(T_00)
             Lr = s% TDC_Lsurf_factor * area * clight * Erad
-            
-         else 
+         
+         else
          
             T400 = pow4(T_00)
-            T4m1 = pow4(T_m1)
-            d_P_rad = crad/3d0*(T4m1 - T400)
+            T4m1 = pow4(T_m1)            
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
-            Lr = -d_P_rad/dm_bar*clight*pow2(area)/kap_face
+            diff_T4_div_kap = (T4m1 - T400)/kap_face
+            if (s% TDC_use_Stellingwerf_Lr) then ! RSP style
+               BW = log(T4m1/T400)
+               if (abs(BW%val) > 1d-20) then
+                  BK = log(kap_m1/kap_00)
+                  if (abs(1d0 - BK%val/BW%val) > 1d-15 .and. abs(BW%val - BK%val) > 1d-15) then
+                     diff_T4_div_kap = (T4m1/kap_m1 - T400/kap_00)/(1d0 - BK/BW)
+                  end if
+               end if
+            end if
+            Lr = -crad*clight/3d0*diff_T4_div_kap*pow2(area)/dm_bar
             
          end if
          

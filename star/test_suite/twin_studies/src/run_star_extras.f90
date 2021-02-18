@@ -204,7 +204,6 @@
       
       
       subroutine do_run
-         use utils_lib, only: cp
          integer :: id, ierr, i, i_prev, result, result_reason, model_number
          type (star_info), pointer :: s
          character (len=64) :: inlist_fname
