@@ -272,7 +272,7 @@
             if (s% doing_timing) call show_times(id,s)
          
             result_reason = get_result_reason(id, ierr)
-            if (result_reason /= result_reason_normal) then
+            if (result_reason /= result_reason_normal .and. result_reason > 0) then
                write(*, *) 
                write(*, *) 'terminated evolution because ' // trim(result_reason_str(result_reason))
                write(*, *)

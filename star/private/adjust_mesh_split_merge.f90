@@ -46,17 +46,15 @@
          integer :: ierr
 
          include 'formats'
+         
+         if (s% TDC_flag) stop 'remesh_split_merge does not yet support TDC_flag'
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
          remesh_split_merge = keep_going
          if (.not. s% okay_to_remesh) return
 
-         !if (.not. s% u_flag) stop 'remesh_split_merge requires u_flag = true'
-
-         if (s% rotation_flag) then
-            old_J = total_angular_momentum(s)
-         end if
+         if (s% rotation_flag) old_J = total_angular_momentum(s)
 
          call amr(s,ierr)
          if (ierr /= 0) then
@@ -257,7 +255,8 @@
          real(dp) :: &
             oversize_ratio, undersize_ratio, abs_du_div_cs, outer_fraction, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
-            outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm
+            outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
+            target_dr_core, target_dlnR_envelope
          logical :: hydrid_zoning, log_zoning, logtau_zoning, du_div_cs_limit_flag
          integer :: nz, nz_baseline, k, kmin, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
@@ -270,6 +269,10 @@
          logtau_zoning = s% split_merge_amr_logtau_zoning
          nz_baseline = s% split_merge_amr_nz_baseline         
          nz_r_core = s% split_merge_amr_nz_r_core
+         if (s% split_merge_amr_mesh_delta_coeff /= 1d0) then
+            nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
+            nz_r_core = int(dble(nz_r_core)/s% split_merge_amr_mesh_delta_coeff)
+         end if
          r_core_cm = s% split_merge_amr_r_core_cm
          dq_min = s% split_merge_amr_dq_min
          dq_max = s% split_merge_amr_dq_max
@@ -285,7 +288,9 @@
          end if
          
          if (hydrid_zoning) then
-            stop 'hydrid_zoning not ready'
+            target_dr_core = (r_core_cm - s% R_center)/nz_r_core
+            target_dlnR_envelope = &
+               (s% lnR(1) - log(max(1d0,r_core_cm)))/(nz_baseline - nz_r_core)
          else if (logtau_zoning) then
             k = nz
             xmin = log(tau_center)
@@ -314,19 +319,39 @@
          
             xL = xR
             dx_baseline = inner_dx_baseline
-            if (logtau_zoning) then
+            if (hydrid_zoning) then
+               if (s% r(k) < r_core_cm) then
+                  xR = s% r(k)
+                  if (k == nz) then
+                     xL = s% R_center
+                  else
+                     xL = s% r(k+1)
+                  end if
+                  dx_baseline = target_dr_core
+               else
+                  xR = log(s% r(k))
+                  if (k == nz) then
+                     xL = log(max(1d0,s% R_center))
+                  else
+                     xL = log(s% r(k+1))
+                  end if
+                  dx_baseline = target_dlnR_envelope
+               end if
+            else if (logtau_zoning) then
                xR = log(s% tau(k))
             else if (log_zoning) then
                xR = log(s% r(k)) ! s% lnR(k) may not be set since making many changes
             else
                xR = s% r(k)
             end if
+            
             if (s% split_merge_amr_avoid_repeated_remesh .and. &
                   (s% split_merge_amr_avoid_repeated_remesh .and. &
                      s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
             
+            ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
                if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
@@ -335,16 +360,34 @@
                   end if
                end if
             end if
+            
+            ! next check for cells that are too small and need to be merged
 
-            if (s% merge_amr_ignore_surface_cells .and. k<=s% merge_amr_k_for_ignore_surface_cells) then
-               cycle
-            end if
+            if (s% merge_amr_ignore_surface_cells .and. &
+                  k<=s% merge_amr_k_for_ignore_surface_cells) cycle
 
-            if(abs(dx_actual)>0d0) then
+            if (abs(dx_actual)>0d0) then
                undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))
             else
                undersize_ratio = dq_min/s% dq(k)
             end if
+            
+            if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
+               call check_merge_limits
+            else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
+               TooSmall = undersize_ratio; iTooSmall = k
+            end if
+            
+         end do
+         
+         
+         contains
+         
+         subroutine check_merge_limits
+            ! Pablo's additions to modify when merge
+            ! merge_amr_max_abs_du_div_cs
+            ! merge_amr_du_div_cs_limit_only_for_compression
+            ! merge_amr_inhibit_at_jumps
 
             du_div_cs_limit_flag = .false.
 
@@ -375,7 +418,7 @@
             else
                abs_du_div_cs = 0d0
             end if
-            
+         
             if (du_div_cs_limit_flag) then
                if (s% merge_amr_inhibit_at_jumps) then 
                   ! reduce undersize_ratio for large jumps
@@ -396,8 +439,8 @@
                   TooSmall = undersize_ratio; iTooSmall = k
                end if
             end if
-            
-         end do
+         end subroutine check_merge_limits
+         
          
       end subroutine biggest_smallest
 
@@ -458,7 +501,8 @@
          if (merge_center) i = i-1
          ip = i+1
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
-               (s% amr_split_merge_has_undergone_remesh(i) .or. s% amr_split_merge_has_undergone_remesh(ip))) then
+               (s% amr_split_merge_has_undergone_remesh(i) .or. &
+                  s% amr_split_merge_has_undergone_remesh(ip))) then
             s% amr_split_merge_has_undergone_remesh(i) = .true.
             s% amr_split_merge_has_undergone_remesh(ip) = .true.
             
@@ -1113,7 +1157,8 @@
             end do
          end if
          
-         if (s% u_flag) s% u_face(ip) = 0.5d0*(s% u(i) + s% u(ip))
+         if (s% u_flag) s% u_face_18(ip)%val = 0.5d0*(s% u(i) + s% u(ip))
+            ! just for setting u_face_start so don't need partials
 
          ! r, q, m, u_face unchanged for face i
          dVR = dV - dVL

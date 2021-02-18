@@ -25,6 +25,8 @@
       new_cumulative_energy_error = 0d0
 
       history_columns_file = 'history_columns.list' 
+      
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -99,9 +101,10 @@
 
 
 &pgstar
+
       Grid4_win_flag = .true.
       Kipp_mass_max = 0.2 ! (Msun units) negative means use default
       
-      Grid4_file_flag = .true.
+      !Grid4_file_flag = .true.
 
 / ! end of pgstar namelist

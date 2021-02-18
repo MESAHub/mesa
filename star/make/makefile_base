@@ -110,6 +110,7 @@ SRCS = \
    other_solver_monitor.f90 \
    other_photo_write.f90 \
    other_photo_read.f90 \
+   other_set_pgstar_controls.f90 \
    other_astero_freq_corr.f90 \
    other_eval_fp_ft.f90 \
    other_eval_i_rot.f90 \
@@ -136,7 +137,6 @@ SRCS = \
    micro.f90 \
    hydro_rotation.f90 \
    brunt.f90 \
-   hydro_reconstruct.f90 \
    hydro_riemann.f90 \
    hydro_vars.f90 \
    report.f90 \
@@ -169,7 +169,7 @@ SRCS = \
    hydro_alpha_rti_eqns.f90 \
    hydro_energy.f90 \
    hydro_momentum.f90 \
-   hydro_eturb.f90 \
+   hydro_tdc.f90 \
    hydro_eqns.f90 \
    hydro_mtx.f90 \
    hydro_solver_procs.f90 \

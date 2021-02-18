@@ -5,25 +5,24 @@
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
-      ! change_Eturb_flag
+      ! change_TDC_flag
       ! ~~~~~~~~~~~~~~~~~
-      ! change_initial_Eturb_flag
+      ! change_initial_TDC_flag
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! change_Eturb_flag_at_model_number
+      ! change_TDC_flag_at_model_number
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_Eturb_flag
+      ! new_TDC_flag
       ! ~~~~~~~~~~~~~~
 
-      ! Eturb variables
-      ! ``Eturb_flag`` is true if we are use a variable for turbulent energy
       ! WARNING: These controls are not ready for use.
+      ! w is turbulent velocity according to TDC
 
       ! ::
 
-    change_Eturb_flag = .false.
-    change_initial_Eturb_flag = .false.
-    change_Eturb_flag_at_model_number = -111
-    new_Eturb_flag = .false.
+    change_TDC_flag = .false.
+    change_initial_TDC_flag = .false.
+    change_TDC_flag_at_model_number = -111
+    new_TDC_flag = .false.
     
     
       ! remove_surface_by_relax_to_star_cut

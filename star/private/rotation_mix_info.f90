@@ -61,7 +61,7 @@
          ! the following are all defined at cell boundaries
          real(dp), dimension(:), pointer :: & ! just copies of pointers
             r, m, L, j_rot, gradT, grada, grav, visc, Ri
-         real(dp), dimension(:), pointer :: & ! allocated temporary storage
+         real(dp), dimension(:), allocatable :: & ! allocated temporary storage
             csound, rho, T, P, cp, cv, chiRho, abar, zbar, gradT_sub_grada, &
             opacity, gamma1, mu_alt, eps_nuc, enu, L_neu, delta, &
             scale_height, omega, cell_dr, &
@@ -75,11 +75,8 @@
             v_es, H_es, &
             v_gsf, H_gsf, &
             N2, N2_mu
-
-         real(dp), dimension(:), pointer :: saved1, smooth_work1, p_tmp, D_omega
-         real(dp), pointer :: smooth_work(:,:), saved(:,:)
-         logical, pointer :: unstable1(:) ! =(num_instabilities, nz)
-         logical, pointer :: unstable(:,:) ! (num_instabilities, nz)
+         real(dp), allocatable :: smooth_work(:,:), saved(:,:)
+         logical, allocatable :: unstable(:,:) ! (num_instabilities, nz)
 
          integer :: nz, i, j, k, which, op_err
          real(dp) :: alfa, beta, growth_limit, age_fraction, &
@@ -111,12 +108,10 @@
          unstable(:,1:nz) = .false.
          growth_limit = 1d-10
 
-!$OMP PARALLEL DO PRIVATE(which, k, q, p_tmp, age_fraction, op_err) SCHEDULE(dynamic,2)
+!$OMP PARALLEL DO PRIVATE(which, k, q, age_fraction, op_err) SCHEDULE(dynamic,2)
          do which = 1, num_instabilities
 
             if (ierr /= 0) cycle
-            p_tmp(1:nz) => smooth_work(1:nz,which)
-
             op_err = 0
 
             select case (which)
@@ -128,7 +123,7 @@
                      if (failed('set_D_DSI', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_DSI, s% smooth_D_DSI, p_tmp)
+                     call smooth_for_rotation(s, s% D_DSI, s% smooth_D_DSI, smooth_work(1:nz,which))
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_DSI)
                      call zero_if_tiny(s,s% D_DSI)
@@ -141,7 +136,7 @@
                      if (failed('set_D_SH', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_SH, s% smooth_D_SH, p_tmp)
+                     call smooth_for_rotation(s, s% D_SH, s% smooth_D_SH, smooth_work(1:nz,which))
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SH)
                      call zero_if_tiny(s,s% D_SH)
@@ -154,7 +149,7 @@
                      if (failed('set_D_SSI', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_SSI, s% smooth_D_SSI, p_tmp)
+                     call smooth_for_rotation(s, s% D_SSI, s% smooth_D_SSI, smooth_work(1:nz,which))
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SSI)
                      call zero_if_tiny(s,s% D_SSI)
@@ -167,7 +162,7 @@
                      if (failed('set_D_ES', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_ES, s% smooth_D_ES, p_tmp)
+                     call smooth_for_rotation(s, s% D_ES, s% smooth_D_ES, smooth_work(1:nz,which))
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_ES)
                      call zero_if_tiny(s,s% D_ES)
@@ -180,7 +175,7 @@
                      if (failed('set_D_GSF', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_GSF, s% smooth_D_GSF, p_tmp)
+                     call smooth_for_rotation(s, s% D_GSF, s% smooth_D_GSF, smooth_work(1:nz,which))
                      if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_GSF)
                      call zero_if_tiny(s,s% D_GSF)
@@ -197,8 +192,8 @@
                         ierr = -1; cycle
                      end if
 
-                     call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, p_tmp)
-                     call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, p_tmp)
+                     call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, smooth_work(1:nz,which))
+                     call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
 
                      ! calculate B_r and B_phi
                      do k = 1, nz
@@ -275,8 +270,7 @@
             end do
             
             if (s% smooth_D_omega > 0) then
-               p_tmp(1:nz) => smooth_work(1:nz,1)
-               call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, p_tmp)
+               call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, smooth_work(1:nz,1))
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after smooth_for_rotation s% D_omega(k)', k, s% D_omega(k)
@@ -307,35 +301,24 @@
             end do
          end if
 
-         call dealloc
-
 
          contains
          
          
          subroutine mix_D_omega
             integer :: i, k, nz
-            real(dp), dimension(:), pointer :: & ! work vectors
+            real(dp), dimension(:), allocatable :: & ! work vectors
                sig, rhs, d, du, dl, bp, vp, xp, x
             real(dp) :: &
                dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
                d_dt, d_dt_in, d_dt_out
             include 'formats'
             
-            ! reuse some already allocated work vectors
-            sig => t_dyn
-            rhs => t_kh
-            d => ve0
-            du => ve_mu
-            dl => v_ssi
-            bp => v_es
-            vp => v_gsf
-            xp => H_es
-            x => h_ssi
-            
             nz = s% nz
             dt = s% dt
             if (dt == 0) return
+            
+            allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
             
             rate = min(s% D_omega_mixing_rate, 1d0/dt)
             do k=2,nz-1
@@ -419,188 +402,6 @@
          end subroutine mix_D_omega
 
 
-         subroutine do_alloc(ierr)
-            use alloc, only: get_logical_work_array
-            integer, intent(out) :: ierr
-            call do_work_arrays(.true., ierr)
-            smooth_work(1:nz,1:num_instabilities) => smooth_work1(1:nz*num_instabilities)
-            saved(1:nz,1:num_instabilities) => saved1(1:nz*num_instabilities)
-            call get_logical_work_array(s, unstable1, nz*num_instabilities, nz_alloc_extra, ierr)
-            if (ierr /= 0) return
-            unstable(1:num_instabilities,1:nz) => unstable1(1:num_instabilities*nz)
-         end subroutine do_alloc
-
-
-         subroutine dealloc
-            use alloc, only: return_logical_work_array
-            call do_work_arrays(.false., ierr)
-            call return_logical_work_array(s, unstable1)
-         end subroutine dealloc
-
-
-         subroutine do_work_arrays(alloc_flag, ierr)
-            use interp_1d_def
-            use alloc, only: work_array
-            logical, intent(in) :: alloc_flag
-            integer, intent(out) :: ierr
-            logical, parameter :: crit = .false.
-            ierr = 0
-            call work_array(s, alloc_flag, crit, &
-                csound, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                rho, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                T, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                P, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                cp, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                cv, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                chiRho, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                abar, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                zbar, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                gradT_sub_grada, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                opacity, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                gamma1, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                mu_alt, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                omega, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                cell_dr, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                eps_nuc, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                enu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                L_neu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dRho, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dr, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dPressure, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                domega, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                d_j_rot, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                d_mu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dRho_dr, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dRho_dr_ad, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dr2omega, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                domega_dlnR, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                dlnR_domega, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                delta, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                Ri_mu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                Ri_T, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                t_dyn, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                t_kh, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                ve0, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                ve_mu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                scale_height, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                H_T, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                v_ssi, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                h_ssi, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                Hj, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                Ris_1, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                Ris_2, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                v_es, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                H_es, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                v_gsf, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                H_gsf, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                N2, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                N2_mu, nz, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                smooth_work1, nz*num_instabilities, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-            call work_array(s, alloc_flag, crit, &
-                saved1, nz*num_instabilities, nz_alloc_extra, 'rotation_mix_info', ierr)
-            if (ierr /= 0) return
-         end subroutine do_work_arrays            
-
-
          subroutine setup(ierr)
             integer, intent(out) :: ierr
 
@@ -627,9 +428,19 @@
             grav => s% grav
             visc => s% D_visc
             Ri => s% richardson_number
-
-            call do_alloc(ierr)
-            if (ierr /= 0) return
+            
+            allocate( &
+               csound(nz), rho(nz), T(nz), P(nz), cp(nz), cv(nz), chiRho(nz), abar(nz), zbar(nz), &
+               opacity(nz), gamma1(nz), mu_alt(nz), omega(nz), cell_dr(nz), eps_nuc(nz), enu(nz), L_neu(nz), &
+               gradT_sub_grada(nz), delta(nz), scale_height(nz), &
+               dRho(nz), dr(nz), dPressure(nz), domega(nz), d_mu(nz), d_j_rot(nz), &
+               dRho_dr(nz), dRho_dr_ad(nz), dr2omega(nz), H_T(nz), &
+               domega_dlnR(nz), Hj(nz), dlnR_domega(nz), t_dyn(nz), t_kh(nz), &
+               Ri_mu(nz), Ri_T(nz), ve0(nz), ve_mu(nz), &
+               v_ssi(nz), h_ssi(nz), Ris_1(nz), Ris_2(nz), &
+               v_es(nz), H_es(nz), v_gsf(nz), H_gsf(nz), N2(nz), N2_mu(nz), &
+               smooth_work(nz,num_instabilities), saved(nz,num_instabilities), &
+               unstable(num_instabilities,nz))
 
             ! interpolate by mass to get values at cell boundaries
             enu00 = s% eps_nuc_neu_total(1) + s% non_nuc_neu(1)
@@ -1275,7 +1086,7 @@
       subroutine smooth_for_rotation(s, v, width, work)
          use star_utils, only: weighed_smoothing
          type (star_info), pointer :: s
-         real(dp), dimension(:), pointer :: v, work
+         real(dp), dimension(:) :: v, work
          integer :: width
          logical, parameter :: preserve_sign = .false.
          if (width <= 0) return
@@ -1289,7 +1100,7 @@
             ierr)
          ! with modifications by S.-C. Yoon, July 2003
          type (star_info), pointer :: s
-         real(dp), dimension(:), pointer :: & ! allocated temporary storage
+         real(dp), dimension(:) :: & ! allocated temporary storage
             rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
             N2, N2_mu, opacity, scale_height
          integer, intent(out) :: ierr
@@ -1517,14 +1328,13 @@
          s% nu_ST(1) = s% nu_ST(2)
          s% nu_ST(nz) = s% nu_ST(nz-1)
 
-
       end subroutine set_ST
 
 
       subroutine zero_if_convective(nz, mixing_type, D_mix, dc)
          integer, intent(in) :: nz
-         integer, dimension(:), pointer :: mixing_type
-         real(dp), dimension(:), pointer :: D_mix, dc
+         integer, dimension(:) :: mixing_type
+         real(dp), dimension(:) :: D_mix, dc
          integer :: k
          do k=1,nz
             if (mixing_type(k) == convective_mixing) dc(k) = 0
@@ -1534,7 +1344,7 @@
 
       subroutine zero_if_tiny(s, dc)
          type (star_info), pointer :: s
-         real(dp), dimension(:), pointer :: dc
+         real(dp), dimension(:) :: dc
          integer :: k
          real(dp) :: tiny
          tiny = s% clip_D_limit

@@ -117,7 +117,7 @@
          History_Panels1_ymax(2) = -101d0 ! only used if /= -101d0        
          History_Panels1_dymin(2) = -1 
          
-         History_Panels1_other_yaxis_name(2) = 'v_surf'
+         History_Panels1_other_yaxis_name(2) = 'v_surf_km_s'
          History_Panels1_other_yaxis_reversed(2) = .false.
          History_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
          History_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0        
@@ -150,9 +150,11 @@
          Profile_Panels1_yaxis_name(1) = 'v_div_cs'         
          Profile_Panels1_ymax(1) = -101D0 ! 1
          Profile_Panels1_ymin(1) = -101D0 ! -1
+         Profile_Panels1_dymin(1) = 0.1
          Profile_Panels1_other_yaxis_name(1) = 'vel_km_per_s'
          Profile_Panels1_other_ymax(1) = -101D0 !  2e6 
          Profile_Panels1_other_ymin(1) = -101D0 ! -2e6
+         Profile_Panels1_other_dymin(1) = 0.1
                   
          Profile_Panels1_yaxis_name(2) = 'entropy'         
          Profile_Panels1_other_yaxis_name(2) = 'opacity' 

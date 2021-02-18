@@ -21,7 +21,8 @@
 
       logical :: show_eqns_and_vars_names
 
-      logical :: pgstar_flag, save_pgstar_files_when_terminate
+      logical :: pgstar_flag, save_pgstar_files_when_terminate, &
+         clear_initial_pgstar_history, clear_pgstar_history
 
       logical :: save_photo_when_terminate
       logical :: write_profile_when_terminate
@@ -195,7 +196,6 @@
       logical :: change_am_nu_rot_flag, change_initial_am_nu_rot_flag, &
          new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
-      real(dp) :: gamma1_integral_for_v_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag
       logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
          new_reconstruction_flag
@@ -335,8 +335,10 @@
          max_Z_for_add, max_N_for_add, max_A_for_add
 
       integer :: save_model_number
-      character (len=strlen) :: save_model_filename, required_termination_code_string
+      character (len=strlen) :: save_model_filename
       logical :: save_model_when_terminate
+
+      character (len=strlen) :: required_termination_code_string(num_termination_code_strings)
 
       logical :: profile_starting_model
       integer :: profile_model_number
