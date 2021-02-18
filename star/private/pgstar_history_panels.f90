@@ -66,6 +66,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels1_xaxis_name, &
+            s% History_Panels1_automatic_star_age_units, &
             s% History_Panels1_xmin, &
             s% History_Panels1_xmax, &
             s% History_Panels1_dxmin, &
@@ -132,6 +133,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels2_xaxis_name, &
+            s% History_Panels2_automatic_star_age_units, &
             s% History_Panels2_xmin, &
             s% History_Panels2_xmax, &
             s% History_Panels2_dxmin, &
@@ -193,6 +195,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels3_xaxis_name, &
+            s% History_Panels3_automatic_star_age_units, &
             s% History_Panels3_xmin, &
             s% History_Panels3_xmax, &
             s% History_Panels3_dxmin, &
@@ -254,6 +257,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels4_xaxis_name, &
+            s% History_Panels4_automatic_star_age_units, &
             s% History_Panels4_xmin, &
             s% History_Panels4_xmax, &
             s% History_Panels4_dxmin, &
@@ -315,6 +319,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels5_xaxis_name, &
+            s% History_Panels5_automatic_star_age_units, &
             s% History_Panels5_xmin, &
             s% History_Panels5_xmax, &
             s% History_Panels5_dxmin, &
@@ -376,6 +381,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels6_xaxis_name, &
+            s% History_Panels6_automatic_star_age_units, &
             s% History_Panels6_xmin, &
             s% History_Panels6_xmax, &
             s% History_Panels6_dxmin, &
@@ -437,6 +443,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels7_xaxis_name, &
+            s% History_Panels7_automatic_star_age_units, &
             s% History_Panels7_xmin, &
             s% History_Panels7_xmax, &
             s% History_Panels7_dxmin, &
@@ -498,6 +505,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels8_xaxis_name, &
+            s% History_Panels8_automatic_star_age_units, &
             s% History_Panels8_xmin, &
             s% History_Panels8_xmax, &
             s% History_Panels8_dxmin, &
@@ -559,6 +567,7 @@
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             s% History_Panels9_xaxis_name, &
+            s% History_Panels9_automatic_star_age_units, &
             s% History_Panels9_xmin, &
             s% History_Panels9_xmax, &
             s% History_Panels9_dxmin, &
@@ -592,7 +601,7 @@
       subroutine do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            hist_xaxis_name, hist_xmin_in, hist_xmax, dxmin,hist_xmargin, &
+            hist_xaxis_name_in, automatic_star_age_units, hist_xmin_in, hist_xmax, dxmin, hist_xmargin, &
             hist_max_width, hist_num_panels, &
             hist_other_ymin, hist_other_ymax, &
             hist_other_yaxis_reversed, hist_other_yaxis_log, &
@@ -614,8 +623,8 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id, hist_num_panels
-         logical, intent(in) :: subplot, hist_xaxis_reversed, hist_xaxis_log
-         character (len=*), intent(in) :: title, hist_xaxis_name
+         logical, intent(in) :: subplot, automatic_star_age_units, hist_xaxis_reversed, hist_xaxis_log
+         character (len=*), intent(in) :: title, hist_xaxis_name_in
          real, intent(in) :: &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
             hist_xmin_in, hist_xmax, hist_max_width, hist_xmargin, dxmin
@@ -632,7 +641,7 @@
          integer, intent(out) :: ierr
          procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
-         character (len=strlen) :: yname, other_yname
+         character (len=strlen) :: yname, other_yname, hist_xaxis_name
          real, pointer, dimension(:) :: xvec, yvec, other_yvec
          real, pointer, dimension(:) :: yfile_xdata, other_yfile_xdata
          real, pointer, dimension(:) :: yfile_ydata, other_yfile_ydata
@@ -652,17 +661,11 @@
 
          ierr = 0
 
-         call integer_dict_lookup(s% history_names_dict, hist_xaxis_name, ix, ierr)
-         if (ierr /= 0) ix = -1
-         if (ix <= 0) then
-            write(*,*)
-            write(*,*) 'ERROR: failed to find ' // &
-               trim(hist_xaxis_name) // ' in history data'
-            write(*,*)
-            ierr = -1
-         end if
-
+         hist_xaxis_name = hist_xaxis_name_in
          hist_xmin = hist_xmin_in
+
+         step_min = 1
+         step_max = s% model_number
 
          if (hist_xaxis_name == 'model_number') then
             max_width = int(hist_max_width)
@@ -672,9 +675,28 @@
             if (step_max <= 0) step_max = s% model_number
             if (step_min >= s% model_number) step_min = 1
             if (max_width > 0) step_min = max(step_min, step_max - max_width)
-         else
-            step_min = 1
-            step_max = s% model_number
+         else if (hist_xaxis_name == 'star_age' .and. automatic_star_age_units) then
+            if (s% star_age > 1d0) then
+               hist_xaxis_name = 'star_age'
+            else if (s% star_age*secyer > 24*60*60) then
+               hist_xaxis_name = 'star_age_day'
+            else if (s% star_age*secyer > 60*60) then
+               hist_xaxis_name = 'star_age_hr'
+            else if (s% star_age*secyer > 60) then
+               hist_xaxis_name = 'star_age_min'
+            else
+               hist_xaxis_name = 'star_age_sec'
+            end if
+         end if
+
+         call integer_dict_lookup(s% history_names_dict, hist_xaxis_name, ix, ierr)
+         if (ierr /= 0) ix = -1
+         if (ix <= 0) then
+            write(*,*)
+            write(*,*) 'ERROR: failed to find ' // &
+               trim(hist_xaxis_name) // ' in history data'
+            write(*,*)
+            ierr = -1
          end if
 
          n = count_hist_points(s, step_min, step_max)

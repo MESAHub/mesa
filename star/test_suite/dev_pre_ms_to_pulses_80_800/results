@@ -1,0 +1,50 @@
+compare to Woosley ApJ 836 244, 2017
+and to MESA4 (2018), Fig 49.
+
+cases
+A     several weak pulses leading to core collapse
+B     strong pulses leading to stop for ejecta logR = 4 before core collapse
+C     direct collapse to BH with no ejecta
+
+even if final total energy > 0, takes time to get the ejecta accelerated so that v > v_esc.
+the initial ejecta can reach logR = 4 long before the last of the "remnant" is "ejected".
+
+examples (these have NOT been tested for convergence - so just FYI)
+case  M_zams   M_He  M_CO  M_Fe  days  M_remnant   M_ejecta    v_ejecta    steps retries  log_rel_run_E_err
+A      90      45.5  31.1  2.38  0.71  38.7        6.8         ~2500       3603  72       -7.80
+B     160      83.8  53.6  0.00  3.98  69.7        14.1        ~2e4        1146  20       -7.30
+B     200      102.1 63.5  0.00  3.11  -> 0                    ~2.5e4      1234  32       -8.07
+C     900      559.5 457.2 stop run with unchecked infall when M_Fe > 100. 561    1       -7.28
+
+M_He        mass of remaining He core after remove H envelope
+M_CO        mass of CO core at end of run
+M_Fe        mass of Fe core at end of run
+days        time from 1st pulse to end of run
+M_remnant   final mass excluding ejecta
+M_ejecta    surface region with v > v_escape
+v_ejecta    approximate velocity range of ejecta
+
+
+nothing special in run_star_extras; all done using simple-to-understand standard controls
+
+the pgstar plots have lots of useful information for understanding the progress to core collapse.
+
+Z = 1.6d-3; rotation off for these runs; wind during H and He core burning (Dutch_scaling_factor = 0.5d0), off after that
+to avoid problems with H/He ionization zones, keep surface cell at high temperature by setting tau_surface = 1d7
+semiconvection and thermohaline on during H and He core burning, off after that
+no overshooting; MLT++ on
+remove H envelope after finish core He burning; change remaining traces of H1 to He4
+use_gold2_tolerances on (except during remove envelope)
+op_split_burn for cells with logT > 9.0
+after end of core C burn, change to Riemann hydro and hybrid amr mesh
+also, now turn off convection to avoid violating mlt assumptions during multiple strong shocks and rapid changes in core
+prepare for start of pulses by evolving until reach target max temp (logTmax = 9.52) or start non_fe_core_infall (> 300 kms)
+consider mass to be "ejected" when it and all above it have v > local v_esc.
+stop run when fe_core_infall > 100 kms, logR > 4.0, or remnant mass < 10M.
+for simplicity, keep ejected mass as part of the model rather than removing it.
+can follow cases to completion that end in core collapse or complete unbinding.
+intermediate cases have such long times between pulses that the ejecta must be removed for the run to continue.
+that is beyond the scope of this test but is the subject of the ppisn case.
+
+
+

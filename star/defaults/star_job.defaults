@@ -180,6 +180,17 @@
     pgstar_flag = .false.
 
 
+      ! clear_initial_pgstar_history
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! clear_pgstar_history
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    clear_initial_pgstar_history = .true.
+    clear_pgstar_history = .false.
+
+
       ! save_pgstar_files_when_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -230,11 +241,12 @@
       ! save final model when a run terminates
       ! only happens if satisfy required termination code
       ! if string is empty, then this matches all termination codes
+      ! there can be several different alternative termination codes
 
       ! ::
 
     save_model_when_terminate = .false.
-    required_termination_code_string = ''
+    required_termination_code_string(:) = ''
 
 
       ! save_model_filename
@@ -1538,18 +1550,6 @@
     center_ye_limit_for_v_flag = 0.45d0
 
 
-      ! gamma1_integral_for_v_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! automatically turn on velocities if ``center_gamma1_integral`` drops below this limit.
-      ! this is useful for evolution leading up to pair instability core collapse.
-      ! integral is sum over all cells of ``(gamma1-4d0/3d0)`` weighted by ``dm*P/rho``
-
-      ! ::
-
-    gamma1_integral_for_v_flag = 0d0
-
-
       ! change_u_flag
       ! ~~~~~~~~~~~~~
       ! change_initial_u_flag
@@ -2322,8 +2322,8 @@
     remove_surface_by_v_surf_km_s = 0
     remove_surface_by_v_surf_div_cs = 0
     remove_surface_by_v_surf_div_v_escape = 0
-    min_q_for_remove_surface_by_v_surf_div_v_escape = 0
-    max_q_for_remove_surface_by_v_surf_div_v_escape = 0
+    min_q_for_remove_surface_by_v_surf_div_v_escape = 0d0
+    max_q_for_remove_surface_by_v_surf_div_v_escape = 1d0
 
 
       ! report_mass_not_fe56

@@ -177,8 +177,6 @@
       when_to_stop_rtol = 1d-3
       when_to_stop_atol = 1d-3
 
-      screening_mode = 'chugunov'
-
       sig_min_factor_for_high_Tcenter = 0.01
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9

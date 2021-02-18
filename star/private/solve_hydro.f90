@@ -32,7 +32,7 @@
 
       private
       public :: set_luminosity_by_category, &
-         set_surf_info, set_tol_correction, do_hydro_converge
+         set_surf_info, set_tol_correction, do_solver_converge
 
       integer, parameter :: stencil_neighbors = 1
             ! number of neighbors on each side (e.g., =1 for 3 point stencil)
@@ -41,7 +41,7 @@
       contains
 
 
-      integer function do_hydro_converge( &
+      integer function do_solver_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction)
          ! return keep_going, retry, or terminate
@@ -56,17 +56,17 @@
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
          integer :: ierr, nz, k, mljac, mujac, n, nzmax, &
-            hydro_lwork, hydro_liwork, num_jacobians
+            solver_lwork, solver_liwork, num_jacobians
          logical :: report
 
          include 'formats'
 
          if (s% dt <= 0d0) then
-            do_hydro_converge = keep_going
+            do_solver_converge = keep_going
             return
          end if
 
-         do_hydro_converge = terminate
+         do_solver_converge = terminate
 
          ierr = 0
 
@@ -78,8 +78,8 @@
 
          call work_sizes_for_solver(ierr)
          if (ierr /= 0) then
-            if (s% report_ierr) write(*, *) 'do_hydro_converge: work_sizes_for_solver failed'
-            do_hydro_converge = retry
+            if (s% report_ierr) write(*, *) 'do_solver_converge: work_sizes_for_solver failed'
+            do_solver_converge = retry
             s% result_reason = nonzero_ierr
             s% termination_code = t_solve_hydro
             return
@@ -96,11 +96,11 @@
          
          s% solver_call_number = s% solver_call_number + 1
 
-         do_hydro_converge = do_hydro_solver( &
+         do_solver_converge = do_solver( &
             s, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction, &
-            report, nz, nvar, s% hydro_work, hydro_lwork, &
-            s% hydro_iwork, hydro_liwork)
+            report, nz, nvar, s% solver_work, solver_lwork, &
+            s% solver_iwork, solver_liwork)
 
 
          contains
@@ -110,17 +110,17 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            if (.not. associated(s% hydro_iwork)) then
-               allocate(s% hydro_iwork(hydro_liwork))
-            else if (size(s% hydro_iwork, dim=1) < hydro_liwork) then
-               deallocate(s% hydro_iwork)
-               allocate(s% hydro_iwork(int(1.3d0*hydro_liwork)+100))
+            if (.not. associated(s% solver_iwork)) then
+               allocate(s% solver_iwork(solver_liwork))
+            else if (size(s% solver_iwork, dim=1) < solver_liwork) then
+               deallocate(s% solver_iwork)
+               allocate(s% solver_iwork(int(1.3d0*solver_liwork)+100))
             end if
-            if (.not. associated(s% hydro_work)) then
-               allocate(s% hydro_work(hydro_lwork))
-            else if (size(s% hydro_work, dim=1) < hydro_lwork) then
-               deallocate(s% hydro_work)
-               allocate(s% hydro_work(int(1.3d0*hydro_lwork)+100))
+            if (.not. associated(s% solver_work)) then
+               allocate(s% solver_work(solver_lwork))
+            else if (size(s% solver_work, dim=1) < solver_lwork) then
+               deallocate(s% solver_work)
+               allocate(s% solver_work(int(1.3d0*solver_lwork)+100))
             end if
          end subroutine alloc_for_solver
 
@@ -128,11 +128,11 @@
          subroutine work_sizes_for_solver(ierr)
             use star_solver, only: get_solver_work_sizes
             integer, intent(out) :: ierr
-            call get_solver_work_sizes(s, nvar, nz, hydro_lwork, hydro_liwork, ierr)
+            call get_solver_work_sizes(s, nvar, nz, solver_lwork, solver_liwork, ierr)
          end subroutine work_sizes_for_solver
 
 
-      end function do_hydro_converge
+      end function do_solver_converge
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
@@ -170,9 +170,9 @@
                do k = 1, nz
                   s% xh(j1,k) = s% L(k)
                end do
-            else if (j1 == s% i_eturb .and. s% i_eturb <= nvar) then
+            else if (j1 == s% i_w .and. s% i_w <= nvar) then
                do k = 1, nz
-                  s% xh(j1,k) = s% Eturb(k)
+                  s% xh(j1,k) = s% w(k)
                end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz
@@ -221,7 +221,7 @@
       end subroutine set_tol_correction
 
 
-      integer function do_hydro_solver( &
+      integer function do_solver( &
             s, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction, &
             report, nz, nvar, solver_work, solver_lwork, &
@@ -242,7 +242,6 @@
          logical, intent(in) :: skip_global_corr_coeff_limit, report
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
-         real(dp), pointer :: dx(:,:), dx1(:) ! dx => dx1
          integer, intent(in) :: solver_lwork, solver_liwork
          real(dp), pointer :: solver_work(:) ! (solver_lwork)
          integer, pointer :: solver_iwork(:) ! (solver_liwork)
@@ -250,12 +249,10 @@
          integer :: i, k, species, ierr, alph, j1, j2, gold_tolerances_level
          real(dp) :: varscale, r003, rp13, dV, frac, maxT
 
-         real(dp), parameter :: xscale_min = 1d-3
-
          include 'formats'
 
          species = s% species
-         do_hydro_solver = keep_going
+         do_solver = keep_going
          s% using_gold_tolerances = .false.
          gold_tolerances_level = 0
          
@@ -281,16 +278,11 @@
             end if
          end if
 
-         call non_crit_get_work_array(s, dx1, nvar*nz, nvar*nz_alloc_extra, 'solver', ierr)
-         if (ierr /= 0) return
-         dx(1:nvar,1:nz) => dx1(1:nvar*nz)
-         s% solver_dx(1:nvar,1:nz) => dx1(1:nvar*nz)
-
          call set_xh(s, nvar) ! set xh using current structure info
 
          do k = 1, nz
             do j1 = 1, min(nvar, s% nvar_hydro)
-               dx(j1,k) = s% xh(j1,k) - s% xh_start(j1,k)
+               s% solver_dx(j1,k) = s% xh(j1,k) - s% xh_start(j1,k)
             end do
          end do
 
@@ -299,7 +291,7 @@
                j2 = 1
                do j1 = s% i_chem1, nvar
                   s% xa_sub_xa_start(j2,k) = s% xa(j2,k) - s% xa_start(j2,k)
-                  dx(j1,k) = s% xa_sub_xa_start(j2,k)
+                  s% solver_dx(j1,k) = s% xa_sub_xa_start(j2,k)
                   j2 = j2+1
                end do
             end do
@@ -307,14 +299,11 @@
 
          converged = .false.
          call hydro_solver_step( &
-            s, nz, s% nvar_hydro, nvar, dx1, skip_global_corr_coeff_limit, &
+            s, nz, s% nvar_hydro, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
             converged, ierr)
-
-         call non_crit_return_work_array(s, dx1, 'solver')
-         nullify(s% solver_dx)
 
          if (ierr /= 0) then
             if (report) then
@@ -324,7 +313,7 @@
                write(*, *) 's% num_retries', s% num_retries
                write(*, *)
             end if
-            do_hydro_solver = retry
+            do_solver = retry
             s% result_reason = nonzero_ierr
             s% dt_why_retry_count(Tlim_solver) = &
                s% dt_why_retry_count(Tlim_solver) + 1
@@ -338,7 +327,7 @@
          end if
 
          if (.not. converged) then
-            do_hydro_solver = retry
+            do_solver = retry
             s% result_reason = hydro_failed_to_converge
             s% dt_why_retry_count(Tlim_solver) = &
                s% dt_why_retry_count(Tlim_solver) + 1
@@ -348,13 +337,14 @@
                write(*,2) 's% solver_call_number', s% solver_call_number
                write(*,2) 'nz', nz
                write(*,2) 's% num_retries', s% num_retries
+               write(*,1) 'dt', s% dt
                write(*,1) 'log dt/secyer', log10(s% dt/secyer)
                write(*, *)
             end if
             return
          end if
 
-      end function do_hydro_solver
+      end function do_solver
 
 
       logical function RTI_check_after_converge(s, report, ierr) result(converged)
@@ -463,7 +453,7 @@
 
 
       subroutine hydro_solver_step( &
-            s, nz, nvar_hydro, nvar, dx1, skip_global_corr_coeff_limit, &
+            s, nz, nvar_hydro, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             solver_work, solver_lwork, &
             solver_iwork, solver_liwork, &
@@ -478,7 +468,6 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nvar_hydro, nvar
-         real(dp), pointer :: dx1(:)
          logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), intent(in) :: tol_max_correction, tol_correction_norm
          integer, intent(in) :: gold_tolerances_level
@@ -493,12 +482,6 @@
          integer :: mljac, mujac, i, k, j, matrix_type, neq
          logical :: failure
          real(dp) :: varscale
-         real(dp), parameter :: xscale_min = 1
-         real(dp), pointer :: dx(:,:)
-
-         real(dp), pointer, dimension(:,:) :: x_scale
-         real(dp), pointer, dimension(:) :: x_scale1
-
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -506,8 +489,6 @@
          ierr = 0
 
          neq = nvar*nz
-
-         dx(1:nvar,1:nz) => dx1(1:neq)
 
          if (dbg) write(*, *) 'enter hydro_solver_step'
 
@@ -522,21 +503,6 @@
             return
          end if
 
-         call non_crit_get_work_array( &
-            s, x_scale1, neq, nvar*nz_alloc_extra, 'hydro_solver_step', ierr)
-         if (ierr /= 0) return
-         x_scale(1:nvar,1:nz) => x_scale1(1:neq)
-
-         do i = 1, nvar
-            if (i <= s% nvar_hydro) then
-               varscale = maxval(abs(s% xh(i,1:nz)))
-               varscale = max(xscale_min, varscale)
-            else
-               varscale = 1
-            end if
-            x_scale(i, 1:nz) = varscale
-         end do
-
          if (dbg) write(*, *) 'call solver'
          call newt(ierr)
          if (ierr /= 0 .and. s% report_ierr) then
@@ -547,13 +513,11 @@
          if (converged) then
             do k=1,nz
                do j=1,min(nvar,nvar_hydro)
-                  s% xh(j,k) = s% xh_start(j,k) + dx(j,k)
+                  s% xh(j,k) = s% xh_start(j,k) + s% solver_dx(j,k)
                end do
             end do
             ! s% xa has already been updated by final call to set_solver_vars from solver
          end if
-
-         call non_crit_return_work_array(s, x_scale1, 'hydro_solver_step')
 
 
          contains
@@ -575,12 +539,11 @@
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.        
             call solver( &
-               s, nz, nvar, dx1, skip_global_corr_coeff_limit, &
+               s, nvar, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-               x_scale1, s% equ1, &
                solver_work, solver_lwork, &
                solver_iwork, solver_liwork, &
-               s% AF1, failure, ierr)
+               failure, ierr)
             s% doing_solver_iterations = .false.
             warn_rates_for_high_temp = save_warn_rates_flag
          end subroutine newt

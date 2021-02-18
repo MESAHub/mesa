@@ -89,7 +89,6 @@
 
       
       subroutine set_final_vars(s, dt, ierr)
-         use alloc, only: non_crit_get_work_array, non_crit_return_work_array
          use rates_def, only: num_rvs
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
@@ -111,43 +110,11 @@
             skip_set_cz_bdy_mass, &
             skip_mlt
          integer :: nz, ierr1, k, i
-         real(dp), pointer, dimension(:) :: &
-            d_mx, cv, nu_st, d_st, d_dsi, d_sh, d_ssi, d_es, d_gsf, rti_info
          
          include 'formats'
          
          ierr = 0
          nz = s% nz
-
-         nullify(d_mx, cv, nu_st, d_st, d_dsi, d_sh, d_ssi, d_es, d_gsf, rti_info)
-
-         ! save and restore mixing coeffs needed for time smoothing
-         if (s% rotation_flag) then
-            call get_cpy(s% nu_ST, nu_st, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_ST, d_st, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_DSI, d_dsi, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_SH, d_sh, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_SSI, d_ssi, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_ES, d_es, ierr1)
-            if (ierr1 /= 0) ierr = -1
-            call get_cpy(s% D_GSF, d_gsf, ierr1)
-            if (ierr1 /= 0) ierr = -1
-         end if
-
-         if (s% RTI_flag) then
-            call get_cpy(s% dPdr_dRhodr_info, RTI_info, ierr1)
-            if (ierr1 /= 0) ierr = -1
-         end if
-
-         call get_cpy(s% D_mix, d_mx, ierr1)
-         if (ierr1 /= 0) ierr = -1
-         
-         if (ierr /= 0) return
          
          skip_grads = .false.
          skip_rotation = .false.
@@ -200,34 +167,6 @@
                   s% eps_nuc(k) = s% burn_avg_epsnuc(k)
             end do
          end if
-
-         contains
-
-
-         subroutine get_cpy(src,cpy,ierr)
-            real(dp), pointer, dimension(:) :: src, cpy
-            integer, intent(out) :: ierr
-            integer :: k
-            ierr = 0
-            call non_crit_get_work_array( &
-               s, cpy, nz, nz_alloc_extra, 'set_final_vars', ierr)
-            if (ierr /= 0) return
-            do k=1,nz
-               cpy(k) = src(k)
-            end do
-         end subroutine get_cpy
-
-
-         subroutine restore(src,cpy)
-            real(dp), pointer, dimension(:) :: src, cpy
-            integer :: k
-            if (.not. associated(cpy)) return
-            do k=1,nz
-               src(k) = cpy(k)
-            end do
-            call non_crit_return_work_array(s, cpy, 'set_final_vars')
-         end subroutine restore
-
 
       end subroutine set_final_vars
 
@@ -289,8 +228,8 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_eturb, &
-            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_eturb_RSP, &
+         integer :: i_lnd, i_lnT, i_lnR, i_w, &
+            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_etrb_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
 
@@ -305,11 +244,11 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_eturb = s% i_eturb
+         i_w = s% i_w
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
-         i_eturb_RSP = s% i_eturb_RSP
+         i_etrb_RSP = s% i_etrb_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
 
          if (s% doing_finish_load_model .or. .not. s% RSP_flag) then
@@ -382,10 +321,10 @@
                      s% lnR(k) = s% xh(i_lnR,k)
                      s% dxh_lnR(k) = 0d0
                   end do
-               else if (j == i_eturb) then
+               else if (j == i_w) then
                   do k=1,nz
-                     s% Eturb(k) = max(s% xh(i_eturb, k), min_eturb)
-                     s% dxh_eturb(k) = 0d0
+                     s% w(k) = max(s% xh(i_w, k), min_w)
+                     s% dxh_w(k) = 0d0
                   end do
                else if (j == i_lum) then
                   do k=1,nz
@@ -403,9 +342,9 @@
                   do k=1,nz
                      s% alpha_RTI(k) = max(0d0, s% xh(i_alpha_RTI,k))
                   end do
-               else if (j == i_eturb_RSP) then
+               else if (j == i_etrb_RSP) then
                   do k=1,nz
-                     s% Et(k) = max(0d0,s% xh(i_eturb_RSP,k))
+                     s% RSP_Et(k) = max(0d0,s% xh(i_etrb_RSP,k))
                   end do
                else if (j == i_ln_cvpv0) then
                   do k=1,nz
@@ -438,19 +377,21 @@
                if (i_alpha_RTI /= 0) &
                   write(*,5) 'update_vars: alpha_RTI', k, s% solver_iter, s% solver_adjust_iter, &
                            s% model_number, s% alpha_RTI(k)
-               if (i_eturb_RSP /= 0) &
+               if (i_etrb_RSP /= 0) &
                   write(*,5) 'update_vars: Et', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% Et(k)
+                           s% model_number, s% RSP_Et(k)
                if (i_ln_cvpv0 /= 0) &
                   write(*,5) 'update_vars: conv_vel', k, s% solver_iter, s% solver_adjust_iter, &
                            s% model_number, s% conv_vel(k)
             end if
 
-            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% Eturb_flag)) s% L(1:nz) = 0d0
+            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% TDC_flag)) s% L(1:nz) = 0d0
 
             if (i_v == 0) s% v(1:nz) = 0d0
 
             if (i_u == 0) s% u(1:nz) = 0d0
+
+            if (i_w == 0) s% w(1:nz) = 0d0
 
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
@@ -559,12 +500,12 @@
 
                   if (i_lnd /= 0) s% dlnd_dt(1:nz) = 0
                   if (i_lnT /= 0) s% dlnT_dt(1:nz) = 0
-                  if (i_eturb /= 0) s% deturb_dt(1:nz) = 0
+                  if (i_w /= 0) s% dw_dt(1:nz) = 0
                   if (i_lnR /= 0) s% dlnR_dt(1:nz) = 0
                   if (s% v_flag) s% dv_dt(1:nz) = 0
                   if (s% u_flag) s% du_dt(1:nz) = 0
                   if (s% RTI_flag) s% dalpha_RTI_dt(1:nz) = 0
-                  if (s% RSP_flag) s% dEt_dt(1:nz) = 0
+                  if (s% RSP_flag) s% dEtRSP_dt(1:nz) = 0
                   if (s% conv_vel_flag) s% dln_cvpv0_dt(1:nz) = 0
 
                else
@@ -575,8 +516,8 @@
                      if (i_u /= 0) s% du_dt(k) = 0
                      if (i_lnd /= 0) s% dlnd_dt(k) = 0
                      if (i_lnT /= 0) s% dlnT_dt(k) = 0
-                     if (i_eturb /= 0) s% deturb_dt(k) = 0
-                     if (i_eturb_RSP /= 0) s% dEt_dt(k) = 0
+                     if (i_w /= 0) s% dw_dt(k) = 0
+                     if (i_etrb_RSP /= 0) s% dEtRSP_dt(k) = 0
                      if (i_alpha_RTI /= 0) s% dalpha_RTI_dt(k) = 0
                      if (i_ln_cvpv0 /= 0) s% dln_cvpv0_dt(k) = 0
                   end do
@@ -654,16 +595,16 @@
                      end do
                   end if
 
-                  if (s% Eturb_flag) then
+                  if (s% TDC_flag) then
                      do k=k_below_just_added,nz
-                        s% deturb_dt(k) = (s% xh(i_eturb,k) - s% eturb_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% deturb_dt(k))) then
+                        s% dw_dt(k) = (s% xh(i_w,k) - s% w_for_d_dt_const_m(k))*dt_inv
+                        if (is_bad(s% dw_dt(k))) then
                            ierr = -1
-                           s% retry_message = 'update_vars: bad deturb_dt'
+                           s% retry_message = 'update_vars: bad dw_dt'
                            if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad deturb_dt', k, s% deturb_dt(k)
+                              write(*,2) 'update_vars: bad dw_dt', k, s% dw_dt(k)
                            if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad deturb_dt', k, &
+                              write(*,2) 'update_vars: bad dw_dt', k, &
                                  s% du_dt(k)
                               stop 'update_vars'
                            end if
@@ -852,7 +793,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_eturb, only: reset_eturb_using_L
+         use hydro_tdc, only: reset_w_using_L
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -922,7 +863,7 @@
 
          if (.not. skip_mixing_info) then
          
-            if (.not. s% Eturb_flag) then
+            if (.not. s% TDC_flag) then
                if (dbg) write(*,*) 'call other_adjust_mlt_gradT_fraction'
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
@@ -935,7 +876,7 @@
 
          end if
          
-         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% Eturb_flag) then
+         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% TDC_flag) then
          
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) &
@@ -979,14 +920,13 @@
             
          end if
          
-         if (s% need_to_reset_eturb) then
-            stop 'need_to_reset_eturb is not ready for use'
+         if (s% need_to_reset_w) then
             if (dbg) write(*,*) 'call set_mlt_vars'
             call set_mlt_vars(s, 1, s% nz, ierr)
             if (failed('set_mlt_vars')) return
-            call reset_eturb_using_L(s,ierr)
-            if (failed('reset_eturb_using_L')) return
-            s% need_to_reset_eturb = .false.
+            call reset_w_using_L(s,ierr)
+            if (failed('reset_w_using_L')) return
+            s% need_to_reset_w = .false.
          end if
 
          if (.not. skip_brunt) then
@@ -1080,7 +1020,7 @@
          nz = s% nz
          species = s% species
          s% L_phot = s% L(1)/Lsun
-         if (.not. s% using_Fraley_time_centering) then
+         if (.not. s% using_velocity_time_centering) then
             s% d_vc_dv = 1d0
          else
             s% d_vc_dv = 0.5d0
@@ -1112,9 +1052,9 @@
                s% conv_vel_start(k) = s% conv_vel(k)
             end if
             if (s% RSP_flag) then
-               s% w(k) = sqrt(s% Et(k))
-               if (s% w_start(k) < -1d90) then
-                  s% w_start(k) = s% w(k)
+               s% RSP_w(k) = sqrt(s% RSP_Et(k))
+               if (s% RSP_w_start(k) < -1d90) then
+                  s% RSP_w_start(k) = s% RSP_w(k)
                end if
             end if
             s% r(k) = exp(s% lnR(k))
@@ -1192,7 +1132,7 @@
             (s% use_momentum_outer_BC .and. trim(s% atm_option) == 'fixed_Psurf')
             
          do_not_need_atm_Tsurf = &
-            s% i_lum == 0 .or. &
+            s% i_lum == 0 .or. s% TDC_flag .or. &
             ((s% use_fixed_L_for_BB_outer_BC .or. s% tau_for_L_BB > 0d0) .and. &
              (s% use_T_black_body_outer_BC))
 

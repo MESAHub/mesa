@@ -53,6 +53,8 @@
          steps_before_start_timing, &
          show_eqns_and_vars_names, &
          pgstar_flag, &
+         clear_initial_pgstar_history, &
+         clear_pgstar_history, &
          save_pgstar_files_when_terminate, &
          save_photo_when_terminate, &
          load_saved_photo, &
@@ -301,10 +303,10 @@
          change_initial_RSP_flag, &
          new_RSP_flag, &
          
-         change_Eturb_flag, &
-         change_initial_Eturb_flag, &
-         change_Eturb_flag_at_model_number, &
-         new_Eturb_flag, &
+         change_TDC_flag, &
+         change_initial_TDC_flag, &
+         change_TDC_flag_at_model_number, &
+         new_TDC_flag, &
          
          change_conv_vel_flag, &
          change_initial_conv_vel_flag, &
@@ -343,7 +345,6 @@
          new_reconstruction_flag, &
          
          center_ye_limit_for_v_flag, &
-         gamma1_integral_for_v_flag, &
          logT_for_conv_vel_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
@@ -701,6 +702,8 @@
          s% job% steps_before_start_timing = steps_before_start_timing
          s% job% show_eqns_and_vars_names = show_eqns_and_vars_names
          s% job% pgstar_flag = pgstar_flag
+         s% job% clear_initial_pgstar_history = clear_initial_pgstar_history
+         s% job% clear_pgstar_history = clear_pgstar_history
          s% job% save_pgstar_files_when_terminate = save_pgstar_files_when_terminate
          s% job% save_photo_when_terminate = save_photo_when_terminate
          s% job% load_saved_photo = load_saved_photo
@@ -955,10 +958,10 @@
          s% job% change_RSP_flag = change_RSP_flag
          s% job% change_initial_RSP_flag = change_initial_RSP_flag
          s% job% new_RSP_flag = new_RSP_flag
-         s% job% change_Eturb_flag = change_Eturb_flag
-         s% job% change_initial_Eturb_flag = change_initial_Eturb_flag
-         s% job% change_Eturb_flag_at_model_number = change_Eturb_flag_at_model_number
-         s% job% new_Eturb_flag = new_Eturb_flag
+         s% job% change_TDC_flag = change_TDC_flag
+         s% job% change_initial_TDC_flag = change_initial_TDC_flag
+         s% job% change_TDC_flag_at_model_number = change_TDC_flag_at_model_number
+         s% job% new_TDC_flag = new_TDC_flag
          s% job% change_conv_vel_flag = change_conv_vel_flag
          s% job% change_initial_conv_vel_flag = change_initial_conv_vel_flag
          s% job% new_conv_vel_flag = new_conv_vel_flag
@@ -991,7 +994,6 @@
          s% job% new_reconstruction_flag = new_reconstruction_flag
          
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
-         s% job% gamma1_integral_for_v_flag = gamma1_integral_for_v_flag
          s% job% logT_for_conv_vel_flag = logT_for_conv_vel_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
@@ -1213,6 +1215,7 @@
 
 
       subroutine set_default_star_job_controls
+         required_termination_code_string(:) = ''
          extras_ipar(:) = 0
          extras_rpar(:) = 0
          extras_cpar(:) = ''
@@ -1277,6 +1280,8 @@
          steps_before_start_timing = s% job% steps_before_start_timing
          show_eqns_and_vars_names = s% job% show_eqns_and_vars_names
          pgstar_flag = s% job% pgstar_flag
+         clear_initial_pgstar_history = s% job% clear_initial_pgstar_history
+         clear_pgstar_history = s% job% clear_pgstar_history
          save_pgstar_files_when_terminate = s% job% save_pgstar_files_when_terminate
          save_photo_when_terminate = s% job% save_photo_when_terminate
          load_saved_photo = s% job% load_saved_photo
@@ -1532,10 +1537,10 @@
          change_RSP_flag = s% job% change_RSP_flag
          change_initial_RSP_flag = s% job% change_initial_RSP_flag
          new_RSP_flag = s% job% new_RSP_flag
-         change_Eturb_flag = s% job% change_Eturb_flag
-         change_initial_Eturb_flag = s% job% change_initial_Eturb_flag
-         change_Eturb_flag_at_model_number = s% job% change_Eturb_flag_at_model_number
-         new_Eturb_flag = s% job% new_Eturb_flag
+         change_TDC_flag = s% job% change_TDC_flag
+         change_initial_TDC_flag = s% job% change_initial_TDC_flag
+         change_TDC_flag_at_model_number = s% job% change_TDC_flag_at_model_number
+         new_TDC_flag = s% job% new_TDC_flag
          change_conv_vel_flag = s% job% change_conv_vel_flag
          change_initial_conv_vel_flag = s% job% change_initial_conv_vel_flag
          new_conv_vel_flag = s% job% new_conv_vel_flag
@@ -1567,7 +1572,6 @@
          new_reconstruction_flag = s% job% new_reconstruction_flag
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
-         gamma1_integral_for_v_flag = s% job% gamma1_integral_for_v_flag
          logT_for_conv_vel_flag = s% job% logT_for_conv_vel_flag
          change_rotation_flag = s% job% change_rotation_flag
          change_initial_rotation_flag = s% job% change_initial_rotation_flag

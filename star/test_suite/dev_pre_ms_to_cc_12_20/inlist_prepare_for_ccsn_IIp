@@ -60,9 +60,6 @@
       eps_nuc_factor = 0d0
       dxdt_nuc_factor = 0d0
 
-      velocity_logT_lower_bound = 7 
-      max_dt_yrs_for_velocity_logT_lower_bound = 0.1
-
 ! mixing controls
 
       mixing_length_alpha = 3 ! 1.5
@@ -177,7 +174,7 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      photo_interval = 100
+      photo_interval = 50
       profile_interval = 50
       history_interval = 10
       terminal_interval = 10
