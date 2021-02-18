@@ -36,7 +36,7 @@ module skye_coulomb_solid
 
       TPT2=TPT*TPT
 
-      F = -(A1 / GAMI + A2 / pow2(GAMI) + A3 / pow3(GAMI))
+      F = -(A1 / GAMI + A2 / (2d0 * pow2(GAMI)) + A3 / (3d0 * pow3(GAMI)))
       F = F * exp(-(B1 / A1) * TPT2) ! suppress.factor of classical anharmonicity
       F = F - B1 * TPT2 / GAMI ! Quantum correction
    end function ocp_solid_anharmonic_free_energy
