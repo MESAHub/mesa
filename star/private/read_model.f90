@@ -31,7 +31,7 @@
       implicit none
 
       integer, parameter :: bit_for_zams_file = 0
-      !integer, parameter ::  = 1 ! UNUSED
+      integer, parameter :: bit_for_lnPgas = 1 ! UNUSED, but needed to detect old models
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
@@ -282,6 +282,15 @@
 
          read(iounit, *, iostat=ierr) ! skip the blank line after the file type
          if (ierr /= 0) then
+            return
+         end if
+
+         ! refuse to load old models using lnPgas as a structure variable
+         if (BTEST(file_type, bit_for_lnPgas)) then
+            write(*,*)
+            write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
+            write(*,*)
+            ierr = -1
             return
          end if
 
