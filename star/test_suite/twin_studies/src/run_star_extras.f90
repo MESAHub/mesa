@@ -263,9 +263,6 @@
 
          end do
          
-         write(*,*) 'finished startup for stars'
-         write(*,*)
-         
          continue_evolve_loop = .true.
          i_prev = 0
 
@@ -277,6 +274,11 @@
             end if
             call star_ptr(star_ids(i), s, ierr)
             if (failed('star_ptr',ierr)) return
+            
+            if (s% star_age >= stopping_age) then
+               write(*,*) 'stars have reached stopping age'
+               exit
+            end if
          
             continue_evolve_loop = do_evolve_one_step(s, dbg, ierr)
             if (failed('do_evolve_one_step',ierr)) return
@@ -284,11 +286,8 @@
          end do evolve_loop
 
          do i = 1, num_stars
-            
-            call star_ptr(star_ids(i), s, ierr)
-            if (failed('star_ptr',ierr)) return
 
-            call after_evolve_loop(s% id, do_free_star, ierr)
+            call after_evolve_loop(star_ids(i), do_free_star, ierr)
             if (failed('after_evolve_loop',ierr)) return
             
          end do

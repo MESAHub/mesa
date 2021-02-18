@@ -40,7 +40,6 @@
 
       implicit none
       
-       
       integer :: id_from_read_star_job = 0
 
       ! Set MESA_INLIST_RESOLVED to true when you no longer want the routine
@@ -56,6 +55,10 @@
       public :: failed
       public :: id_from_read_star_job
       public :: MESA_INLIST_RESOLVED
+      
+      ! for use by binary
+      public :: before_evolve_loop, after_step_loop, before_step_loop, do_saves, &
+         resolve_inlist_fname, terminate_normal_evolve_loop
       
       contains 
             
@@ -102,7 +105,7 @@
             extras_controls, &
             ierr, &
             inlist_fname_arg)
-         if (failed('before_evolve_loop',ierr)) return
+         if (failed('do_before_evolve_loop',ierr)) return
 
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
@@ -157,12 +160,12 @@
          call resolve_inlist_fname(inlist_fname,inlist_fname_arg)
 
          ! star is initialized here
-         call before_evolve_loop( &
+         call do_before_evolve_loop( &
               do_alloc_star, okay_to_restart, restart, pgstar_ok, &
               null_binary_controls, extras_controls, &
               id_from_read_star_job, inlist_fname, "restart_photo", &
               dbg, 0, id, ierr)
-         if (failed('before_evolve_loop',ierr)) return
+         if (failed('do_before_evolve_loop',ierr)) return
 
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
@@ -289,6 +292,37 @@
       ! binary_controls and binary_id are arguments. These do nothing
       ! for the case of single star evolution.
       subroutine before_evolve_loop( &
+              do_alloc_star, okay_to_restart, restart, &
+              binary_controls, extras_controls, &
+              id_from_read_star_job, inlist_fname, restart_filename, &
+              dbg, binary_id, id, ierr)
+         logical, intent(in) :: do_alloc_star, okay_to_restart
+         logical :: restart
+         interface
+            subroutine binary_controls(id, binary_id, ierr)
+               integer, intent(in) :: id, binary_id
+               integer, intent(out) :: ierr
+            end subroutine binary_controls     
+            subroutine extras_controls(id, ierr)
+               integer, intent(in) :: id
+               integer, intent(out) :: ierr
+            end subroutine extras_controls      
+         end interface
+         integer :: id_from_read_star_job
+         character (len=*) :: inlist_fname, restart_filename
+         character (len=512) :: temp_fname
+         logical, intent(in) :: dbg
+         integer, intent(in) :: binary_id
+         integer, intent(out) :: id, ierr
+         call do_before_evolve_loop( &
+              do_alloc_star, okay_to_restart, restart, .true., &
+              binary_controls, extras_controls, &
+              id_from_read_star_job, inlist_fname, restart_filename, &
+              dbg, binary_id, id, ierr)
+      end subroutine before_evolve_loop
+      
+      
+      subroutine do_before_evolve_loop( &
               do_alloc_star, okay_to_restart, restart, pgstar_ok, &
               binary_controls, extras_controls, &
               id_from_read_star_job, inlist_fname, restart_filename, &
@@ -457,7 +491,7 @@
             write(*,*)
          end if
 
-      end subroutine before_evolve_loop
+      end subroutine do_before_evolve_loop
 
 
       subroutine before_step_loop(id, ierr)

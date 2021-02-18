@@ -12,6 +12,6 @@
    
    which_for_pgstar = -1 ! do both
    
-   stopping_age = 1.015e7
+   stopping_age = 1.013e7
 
 / ! end of multi_stars_job namelist

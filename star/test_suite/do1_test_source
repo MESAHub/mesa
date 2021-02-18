@@ -19,8 +19,6 @@ do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one conductive_flame "flame reached halfway point" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
-do_one create_zahb "stop because center he4 < HB_limit" skip skip
-do_one create_zams "finished create main sequence" skip skip
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
@@ -73,7 +71,6 @@ do_one rsp_gyre "good match for period" skip skip
 do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
 do_one rsp_save_and_load_file "good match for period" "final.mod" skip   
 do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
-do_one sample_pre_ms "finished sample pre-ms" skip skip
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
