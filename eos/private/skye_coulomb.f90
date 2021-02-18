@@ -362,7 +362,7 @@ module skye_coulomb
       type(auto_diff_real_2var_order3) :: F
 
       screening_factor = pow2(TPT / GAMI) ! Proportional to RS_{ion}^{-1} ~ rho^{1/3}
-      screening_factor = pow3(screening_factor / (1d-4 + screening_factor))
+      screening_factor = pow7(screening_factor / (1d-6 + screening_factor))
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
