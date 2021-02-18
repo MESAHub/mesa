@@ -124,6 +124,14 @@ module skye_coulomb_solid
 
    end function ocp_solid_harmonic_free_energy
 
+   !> Calculates a log with cutoffs to prevent over/underflow.
+   !!
+   !! @param x Input to take the exponential of.
+   !! @param ex Output (exp(x) clipped to avoid over/underflow).
+   type(auto_diff_real_2var_order3) function safe_exp(x) result(ex)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      ex = exp(max(-3d1,min(3d1,x)))
+   end function safe_exp
 
    !> Calculates the electron-ion screening corrections to the free energy
    !! of a one-component plasma in the solid phase using the fits of Potekhin & Chabrier 2013.
@@ -152,9 +160,9 @@ module skye_coulomb_solid
 
          rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
          xr = 0.014005d0 / rs
-         supp = exp(pow2(0.205d0 * min(100,TPT))) ! min(100,TPT) prevents overflow
+         supp = safe_exp(-pow2(0.205d0 * TPT))
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
-         Q = sqrt(log(1d0 + supp)) / sqrt(log(e - (e - 2d0) * supp))
+         Q = sqrt(log(1d0 + 1d0/supp)) / sqrt(log(e - (e - 2d0) * supp))
          f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
 
          F = -f_inf * g * (1d0 + A * pow(Q / g, s))
