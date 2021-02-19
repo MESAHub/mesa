@@ -1,3 +1,14 @@
+do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
+do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
+do_one c13_pocket "all values are within tolerance" "final.mod" auto
+do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto              
+do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
+
+
+
+
+
+return
 
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip

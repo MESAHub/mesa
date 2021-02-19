@@ -195,21 +195,13 @@
          end subroutine setup_dwork_dm
          
          subroutine setup_dL_dm(ierr)  
-            use hydro_tdc, only: compute_L
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
                L00_18, Lp1_18, unused
             include 'formats'
             ierr = 0         
-            if (s% TDC_flag) then
-               call compute_L(s, k, L00_18, unused, unused, unused, ierr)         
-               if (ierr /= 0) return        
-               call compute_L(s, k, Lp1_18, unused, unused, unused, ierr)         
-               if (ierr /= 0) return        
-            else
-               L00_18 = wrap_L_00(s, k)
-               Lp1_18 = wrap_L_p1(s, k)
-            end if
+            L00_18 = wrap_L_00(s, k)
+            Lp1_18 = wrap_L_p1(s, k)
             if (s% using_velocity_time_centering .and. &
                      s% include_L_in_velocity_time_centering) then
                L00_18 = 0.5d0*(L00_18 + s% L_start(k))

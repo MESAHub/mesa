@@ -1,3 +1,6 @@
+do_one jdot_ls_check "stop because star_age >= max_age" "final.mod" x100
+return
+
 
 do_one star_plus_point_mass "termination code: xa_central_lower_limit" "final.mod" x100
 do_one star_plus_point_mass_explicit_mdot "termination code: xa_central_lower_limit" "final.mod" x400

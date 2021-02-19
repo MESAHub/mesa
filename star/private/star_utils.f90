@@ -3021,12 +3021,6 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k)
          end if
          
-         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,4) 'cannot have TDC_flag and partials wrt L(k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k
-            stop 'e00'
-         end if
-         
          if (is_bad(v)) then
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
@@ -3084,12 +3078,6 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
          
-         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,4) 'cannot have TDC_flag and partials wrt L(k-1) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k
-            stop 'em1'
-         end if
-         
          if (is_bad(v)) then
 !$omp critical (star_utils_em1_crit1)
             write(*,4) 'em1(i,j,k) ' // &
@@ -3139,16 +3127,9 @@
          
          if (v == 0d0) return
          
-         
          if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k+1)
-         end if
-         
-         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,4) 'cannot have TDC_flag and partials wrt L(k) ' // &
-               trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k
-            stop 'ep1'
          end if
          
          if (is_bad(v)) then
@@ -3165,7 +3146,7 @@
             stop 'ep1'
          end if
          
-         if (j > nvar) return ! hybrid
+         if (j > nvar) return
          
          if (i > nvar) then
             write(*,5) 'bad i ep1(i,j,k) ' // &
