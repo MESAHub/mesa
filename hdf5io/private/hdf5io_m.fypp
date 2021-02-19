@@ -1,0 +1,751 @@
+! Module  : hdf5io
+! Purpose : definition of hdf5io_t type, supporting HDF5 input/output
+!
+! Copyright 2021 Rich Townsend
+!
+! This file is part of the ForUM (Fortran Utility Modules)
+! package. ForUM is free software: you can redistribute it and/or
+! modify it under the terms of the GNU General Public License as
+! published by the Free Software Foundation, version 3.
+!
+! ForUM is distributed in the hope that it will be useful, but WITHOUT
+! ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+! or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+! License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#:include 'forum.inc'
+#:include 'hdf5io.inc'
+
+module hdf5io_m
+
+   ! Uses
+
+   use kinds_m
+
+   use hdf5
+
+   use ISO_FORTRAN_ENV
+   use ISO_C_BINDING
+
+   ! No implicit typing
+
+   implicit none
+
+   ! Parameters
+
+   integer, parameter :: CREATE_FILE = 1
+   integer, parameter :: OPEN_FILE = 2
+
+   integer, parameter :: TYPE_LEN = 31
+
+   ! Derived-type definitions
+
+   type hdf5io_t
+      private
+      integer(HID_T)   :: file_id = 0
+      integer(HID_T)   :: group_id = 0
+      integer          :: comp_level = 0
+      integer, pointer :: ref_count => null()
+   contains
+      private
+      procedure, public :: final => final_
+      #:for obj_type in ('group', 'attr', 'dset')
+         procedure, public :: ${obj_type}$_exists
+      #:endfor
+      #:for obj_type in ('attr', 'dset')
+         procedure, public :: get_${obj_type}$_shape
+      #:endfor
+      #:for op in ('read', 'alloc_read', 'write')
+         #:for obj_type in ('attr', 'dset')
+            #:set proc_list = []
+            #:for rank in range(RANK_MAX+1)
+               #:for type, suffix in zip(ALL_TYPES, ALL_SUFFIXES)
+                  #:set proc = '{:s}_{:s}_{:s}_{:d}_'.format(op, obj_type, suffix, rank)
+                  #:set proc_list = proc_list + [proc]
+                  procedure :: ${proc}$
+               #:endfor
+            #:endfor
+            generic, public :: ${op}$_${obj_type}$ => ${','.join(proc_list)}$
+         #:endfor
+      #:endfor
+   end type hdf5io_t
+
+   ! Module variables
+  
+   integer, save :: ref_count = 0
+
+   #:for suffix in NUM_SUFFIXES
+      integer(HID_T), save :: mem_type_id_${suffix}$
+      integer(HID_T), save :: file_type_id_${suffix}$
+   #:endfor
+      
+   ! Interfaces
+
+   interface hdf5io_t
+      module procedure hdf5io_t_file_
+      module procedure hdf5io_t_group_
+   end interface hdf5io_t
+   
+   ! Access specifiers
+
+   private
+
+   public :: CREATE_FILE
+   public :: OPEN_FILE
+   public :: TYPE_LEN
+   public :: hdf5io_t
+   
+   ! Procedures
+
+contains
+
+   function hdf5io_t_file_(file_name, access_type, comp_level) result (hi)
+
+      character(*), intent(in)      :: file_name
+      integer, intent(in)           :: access_type
+      integer, intent(in), optional :: comp_level
+      type(hdf5io_t)                :: hi
+
+      integer        :: hdf_err
+      integer(HID_T) :: file_id
+      integer(HID_T) :: group_id
+
+      ! If necessary, open the HDF5 library
+
+      if (ref_count == 0) then
+         call open_library_()
+      endif
+
+      ref_count = ref_count + 1
+
+      ! Depending on the access_type, open or create the file
+
+      select case(access_type)
+      case(CREATE_FILE)
+         @:HDF5_CALL(h5fcreate_f, file_name, H5F_ACC_TRUNC_F, file_id)
+      case(OPEN_FILE)
+         @:HDF5_CALL(h5fopen_f, file_name, H5F_ACC_RDWR_F, file_id)
+      case default
+         @:ABORT(invalid access_type)
+      end select
+
+      ! Open the root group
+
+      @:HDF5_CALL(h5gopen_f, file_id, '/', group_id)
+
+      ! Construct the hdf5io_t
+
+      hi%file_id = file_id
+      hi%group_id = group_id
+      if (PRESENT(comp_level)) then
+         hi%comp_level = comp_level
+      else
+         hi%comp_level = 0
+      endif
+
+      allocate(hi%ref_count)
+      hi%ref_count = 1
+
+      ! Finish
+
+      return
+
+   end function hdf5io_t_file_
+
+   !****
+
+   function hdf5io_t_group_(hi_parent, group_name) result (hi)
+
+      type(hdf5io_t), intent(inout) :: hi_parent
+      character(*), intent(in)      :: group_name
+      type(hdf5io_t)                :: hi
+
+      integer        :: hdf_err
+      integer(HID_T) :: group_id
+
+      ! Depending on whether the group already exists, open or create it
+
+      if (hi_parent%group_exists(group_name)) then
+         @:HDF5_CALL(h5gopen_f, hi_parent%group_id, group_name, group_id)
+      else
+         @:HDF5_CALL(h5gcreate_f, hi_parent%group_id, group_name, group_id)
+      endif
+
+      ! Construct the hdf5io_t
+
+      hi%file_id = hi_parent%file_id
+      hi%group_id = group_id
+      hi%comp_level = hi_parent%comp_level
+
+      hi%ref_count => hi_parent%ref_count
+      hi%ref_count = hi%ref_count + 1
+
+      ! Finish
+
+      return
+
+   end function hdf5io_t_group_
+
+   !****
+
+   subroutine final_(self)
+
+      class(hdf5io_t), intent(inout) :: self
+
+      integer :: hdf_err
+
+      ! Close the group
+
+      @:HDF5_CALL(h5gclose_f, self%group_id)
+
+      self%ref_count = self%ref_count - 1
+
+      ! If necessary, close the file also
+
+      if (self%ref_count == 0) then
+         @:HDF5_CALL(h5fclose_f, self%file_id)
+         deallocate(self%ref_count)
+         ref_count = ref_count - 1
+      endif
+
+      ! If necessary, close the HDF5 library
+
+      if (ref_count == 0) then
+         call close_library_()
+      endif
+
+      ! Finish
+
+      return
+
+   end subroutine final_
+
+   !****
+
+   subroutine open_library_()
+
+      integer       :: hdf_err
+
+      ! Open the HDF5 library
+      
+      @:HDF5_CALL(h5open_f)
+
+      @:ASSERT(hdf_err == 0,Failed to open HDF5 library)
+
+      ! Set up data types
+
+      mem_type_id_is = h5kind_to_type(is, H5_INTEGER_KIND)
+      mem_type_id_id = h5kind_to_type(id, H5_INTEGER_KIND)
+
+      mem_type_id_rs = h5kind_to_type(rs, H5_REAL_KIND)
+      mem_type_id_rd = h5kind_to_type(rd, H5_REAL_KIND)
+
+      call create_complex_type_(mem_type_id_rs, mem_type_id_cs)
+      call create_complex_type_(mem_type_id_rd, mem_type_id_cd)
+
+      file_type_id_is = H5T_STD_I32LE
+      file_type_id_id = H5T_STD_I64LE
+
+      file_type_id_rs = H5T_IEEE_F32LE
+      file_type_id_rd = H5T_IEEE_F64LE
+
+      call create_complex_type_(file_type_id_rs, file_type_id_cs)
+      call create_complex_type_(file_type_id_rd, file_type_id_cd)
+
+      ! Finish
+
+      return
+
+   contains
+
+      subroutine create_complex_type_(comp_type_id, type_id)
+
+         integer(HID_T), intent(in)  :: comp_type_id
+         integer(HID_T), intent(out) :: type_id
+
+         integer         :: hdf_err
+         integer(SIZE_T) :: comp_size
+
+         ! Create a complex data type
+
+         @:HDF5_CALL(h5tget_size_f, comp_type_id, comp_size)
+
+         @:HDF5_CALL(h5tcreate_f, H5T_COMPOUND_F, INT(2*comp_size, SIZE_T), type_id)
+         @:HDF5_CALL(h5tinsert_f, type_id, 're', INT(0, SIZE_T), comp_type_id)
+         @:HDF5_CALL(h5tinsert_f, type_id, 'im', INT(comp_size, SIZE_T), comp_type_id)
+
+         ! Finish
+
+         return
+
+      end subroutine create_complex_type_
+
+   end subroutine open_library_
+
+   !****
+
+   subroutine close_library_()
+
+      integer :: hdf_err
+
+      ! Close complex data types
+
+      #:for suffix in COMPLEX_SUFFIXES
+         @:HDF5_CALL(h5tclose_f, mem_type_id_${suffix}$)
+         @:HDF5_CALL(h5tclose_f, file_type_id_${suffix}$)
+      #:endfor
+
+      ! Close the HDF5 library
+
+      @:HDF5_CALL(h5close_f)
+
+      ! Finish
+
+      return
+
+   end subroutine close_library_
+
+   !****
+
+   function group_exists(self, group_name)
+
+      class(hdf5io_t), intent(inout) :: self
+      character(*), intent(in)       :: group_name
+      logical                        :: group_exists
+
+      integer        :: hdf_err
+      integer(HID_T) :: group_id
+
+      ! Determine whether the named group already exists
+
+      call h5eset_auto_f(0, hdf_err)
+
+      call h5gopen_f(self%group_id, group_name, group_id, hdf_err)
+
+      if (hdf_err >= 0) then
+         group_exists = .TRUE.
+         call h5gclose_f(group_id, hdf_err)
+      else
+         group_exists = .FALSE.
+      endif
+
+      call h5eset_auto_f(1, hdf_err)
+
+      ! Finish
+
+      return
+
+   end function group_exists
+
+   !****
+
+   function attr_exists(self, attr_name)
+
+      class(hdf5io_t), intent(inout) :: self
+      character(*), intent(in)       :: attr_name
+      logical                        :: attr_exists
+
+      integer :: hdf_err
+
+      ! Check if the attribute exists
+
+      @:HDF5_CALL(h5aexists_f, self%group_id, attr_name, attr_exists)
+
+      ! Finish
+
+      return
+
+   end function attr_exists
+
+   !****
+
+   function dset_exists(self, dset_name)
+
+      class(hdf5io_t), intent(inout) :: self
+      character(*), intent(in)       :: dset_name
+      logical                        :: dset_exists
+
+      integer          :: hdf_err
+      logical          :: link_exists
+      type(h5o_info_t) :: obj_info
+
+      ! Check if the dataset exists
+
+      @:HDF5_CALL(h5lexists_f, self%group_id, dset_name, link_exists)
+
+      if (link_exists) then
+
+         @:HDF5_CALL(h5oget_info_by_name_f, self%group_id, dset_name, obj_info)
+
+         dset_exists = obj_info%type == H5O_TYPE_DATASET_F
+
+      else
+
+         dset_exists = .FALSE.
+
+      endif
+
+      ! Finish
+
+      return
+
+   end function dset_exists
+
+   !****
+
+   #:for obj_type, prefix in (('attr', 'h5a'), ('dset', 'h5d'))
+
+      subroutine get_${obj_type}$_shape(self, item_name, shape)
+
+         class(hdf5io_t), intent(inout) :: self
+         character(*), intent(in)       :: item_name
+         integer(HSIZE_T), intent(out)  :: shape(:)
+
+         integer          :: hdf_err
+         integer(HID_T)   :: item_id
+         integer(HID_T)   :: space_id
+         integer          :: rank
+         integer(HSIZE_T) :: max_shape(SIZE(shape))
+
+         ! Get the shape of the item
+
+         @:HDF5_CALL(${prefix}$open_f, self%group_id, item_name, item_id)
+
+         @:HDF5_CALL(${prefix}$get_space_f, item_id, space_id)
+
+         @:HDF5_CALL(h5sget_simple_extent_ndims_f, space_id, rank)
+         @:ASSERT(rank == SIZE(shape),rank mismatch)
+
+         @:HDF5_CALL(h5sget_simple_extent_dims_f, space_id, shape, max_shape)
+
+         @:HDF5_CALL(h5sclose_f, space_id)
+         @:HDF5_CALL(${prefix}$close_f, item_id)
+
+         ! Finish
+
+         return
+
+      end subroutine get_${obj_type}$_shape
+
+   #:endfor
+
+   !****
+
+   #:for obj_type, prefix in (('attr', 'h5a'), ('dset', 'h5d'))
+      #:for rank in range(RANK_MAX+1)
+
+         #:for type, suffix in zip(NUM_TYPES, NUM_SUFFIXES)
+
+            subroutine read_${obj_type}$_${suffix}$_${rank}$_(self, item_name, data)
+
+               class(hdf5io_t), intent(inout) :: self
+               character(*), intent(in)       :: item_name
+               ${type}$, target, intent(out)  :: data${ARRAY_SPEC(rank)}$
+               #:if rank > 0
+                  contiguous :: data
+               #:endif
+
+               #:if rank > 0
+                  integer(HSIZE_T) :: item_shape(${rank}$)
+               #:endif
+               integer(HID_T) :: mem_type_id
+               integer        :: hdf_err
+               integer(HID_T) :: item_id
+               type(C_PTR)    :: data_ptr
+
+               #:if rank > 0
+
+                  ! Check shapes
+
+                  call self%get_${obj_type}$_shape(item_name, item_shape)
+                  @:ASSERT(ALL(item_shape == SHAPE(data)),shape mismatch)
+
+               #:endif
+
+               ! Read the item
+
+               mem_type_id = mem_type_id_${suffix}$
+
+               data_ptr = C_LOC(data)
+
+               @:HDF5_CALL(${prefix}$open_f, self%group_id, item_name, item_id)
+               @:HDF5_CALL(${prefix}$read_f, item_id, mem_type_id, data_ptr)
+               @:HDF5_CALL(${prefix}$close_f, item_id)
+
+               ! Finish
+
+               return
+
+            end subroutine read_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+
+         #:for type, suffix in zip(CHAR_TYPES, CHAR_SUFFIXES)
+            
+            subroutine read_${obj_type}$_${suffix}$_${rank}$_(self, item_name, data)
+
+               class(hdf5io_t), intent(inout) :: self
+               character(*), intent(in)       :: item_name
+               ${type}$, target, intent(out)  :: data${ARRAY_SPEC(rank)}$
+               #:if rank > 0
+                  contiguous :: data
+               #:endif
+
+               #:if rank > 0
+                  integer(HSIZE_T) :: item_shape(${rank}$)
+               #:endif
+               integer          :: hdf_err
+               integer(HID_T)   :: mem_type_id
+               type(C_PTR)      :: data_ptr
+               integer(HID_T)   :: item_id
+
+               #:if rank > 0
+
+                  ! Check shapes
+
+                  call self%get_${obj_type}$_shape(item_name, item_shape)
+                  @:ASSERT(ALL(item_shape == SHAPE(data)),shape mismatch)
+
+               #:endif
+         
+               ! Read the character item
+
+               @:HDF5_CALL(h5tcopy_f, H5T_NATIVE_CHARACTER, mem_type_id)
+               @:HDF5_CALL(h5tset_size_f, mem_type_id, LEN(data, SIZE_T))
+
+               data_ptr = C_LOC(data)
+
+               @:HDF5_CALL(${prefix}$open_f, self%group_id, item_name, item_id)
+               @:HDF5_CALL(${prefix}$read_f, item_id, mem_type_id, data_ptr)
+               @:HDF5_CALL(${prefix}$close_f, item_id)
+
+               @:HDF5_CALL(h5tclose_f, mem_type_id)
+
+               ! Finish
+
+               return
+
+            end subroutine read_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+
+         #:for type, suffix in zip(LOGICAL_TYPES, LOGICAL_SUFFIXES)   
+            
+            subroutine read_${obj_type}$_${suffix}$_${rank}$_(self, item_name, data)
+
+               class(hdf5io_t), intent(inout) :: self
+               character(*), intent(in)       :: item_name
+               ${type}$, target, intent(out)  :: data${ARRAY_SPEC(rank)}$
+               #:if rank > 0
+                  contiguous :: data
+               #:endif
+
+               integer, allocatable :: data_i${ARRAY_SPEC(rank)}$
+
+               ! Read the logical item
+
+               call self%alloc_read_${obj_type}$(item_name, data_i)
+
+               data = data_i /= 0
+
+               ! Finish
+
+               return
+
+            end subroutine read_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+            
+      #:endfor
+   #:endfor
+
+   !****
+
+   #:for obj_type in ('attr', 'dset')
+      #:for rank in range(RANK_MAX+1)
+         #:for type, suffix in zip(ALL_TYPES, ALL_SUFFIXES)
+         
+            subroutine alloc_read_${obj_type}$_${suffix}$_${rank}$_(self, item_name, data)
+
+               class(hdf5io_t), intent(inout)     :: self
+               character(*), intent(in)           :: item_name
+               ${type}$, allocatable, intent(out) :: data${ARRAY_SPEC(rank)}$
+
+               #:if rank > 0
+                  integer(HSIZE_T) :: item_shape(${rank}$)
+               #:endif
+
+               ! Allocate the item
+                  
+               #:if rank > 0
+
+                  call self%get_${obj_type}$_shape(item_name, item_shape)
+                  allocate(data${ARRAY_SPEC(rank, 'item_shape({0:d})')}$)
+
+               #:else
+
+                  allocate(data)
+
+               #:endif
+
+               ! Read the item
+
+               call self%read_${obj_type}$(item_name, data)
+
+               ! Finish
+
+               return
+
+            end subroutine alloc_read_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+      #:endfor
+   #:endfor
+
+   !****
+
+   #:for obj_type, prefix in (('attr', 'h5a'), ('dset', 'h5d'))
+      #:for rank in range(RANK_MAX+1)
+
+         #:for type, suffix in zip(NUM_TYPES, NUM_SUFFIXES)
+
+            subroutine write_${obj_type}$_${suffix}$_${rank}$_(self, item_name, data)
+            
+               class(hdf5io_t), intent(inout) :: self
+               character(*), intent(in)       :: item_name
+               ${type}$, target, intent(in)   :: data${ARRAY_SPEC(rank)}$
+               #:if rank > 0
+               contiguous :: data
+               #:endif
+
+               integer        :: hdf_err
+               integer(HID_T) :: dspace_id
+               integer(HID_T) :: plist_id
+               integer(HID_T) :: mem_type_id
+               integer(HID_T) :: file_type_id
+               type(C_PTR)    :: data_ptr
+               integer(HID_T) :: item_id
+
+               ! Write the item
+
+               #:if rank > 0
+                  @:HDF5_CALL(h5screate_simple_f, ${rank}$, INT(SHAPE(data), HSIZE_T), dspace_id)
+               #:else
+                  @:HDF5_CALL(h5screate_f, H5S_SCALAR_F, dspace_id)
+               #:endif
+
+               #:if obj_type == 'attr'
+                  @:HDF5_CALL(h5pcreate_f, H5P_ATTRIBUTE_CREATE_F, plist_id)
+               #:else
+                  @:HDF5_CALL(h5pcreate_f, H5P_DATASET_CREATE_F, plist_id)
+                  #:if rank > 0
+                     @:HDF5_CALL(h5pset_chunk_f, plist_id, ${rank}$, INT(SHAPE(data), HSIZE_T))
+                     @:HDF5_CALL(h5pset_deflate_f, plist_id, self%comp_level)
+                  #:endif
+               #:endif
+
+               mem_type_id = mem_type_id_${suffix}$
+               file_type_id = file_type_id_${suffix}$
+
+               data_ptr = C_LOC(data)
+
+               #:if obj_type == 'attr'
+                  @:HDF5_CALL(${prefix}$create_f, self%group_id, item_name, file_type_id, dspace_id, item_id, acpl_id=plist_id)
+               #:else
+                  @:HDF5_CALL(${prefix}$create_f, self%group_id, item_name, file_type_id, dspace_id, item_id, dcpl_id=plist_id)
+               #:endif
+
+               @:HDF5_CALL(${prefix}$write_f, item_id, mem_type_id, data_ptr)
+               @:HDF5_CALL(h5pclose_f, plist_id)
+               @:HDF5_CALL(${prefix}$close_f, item_id)
+               @:HDF5_CALL(h5sclose_f, dspace_id)
+
+               ! Finish
+
+               return
+
+            end subroutine write_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+
+         #:for type, suffix in zip(CHAR_TYPES, CHAR_SUFFIXES)
+
+            subroutine write_${obj_type}$_${suffix}$_${rank}$_(self, item_name, data)
+
+               class(hdf5io_t), intent(inout) :: self
+               character(*), intent(in)       :: item_name
+               ${type}$, target, intent(in)   :: data${ARRAY_SPEC(rank)}$
+               #:if rank > 0
+                  contiguous :: data
+               #:endif
+
+               integer        :: hdf_err
+               integer(HID_T) :: mem_type_id
+               integer(HID_T) :: file_type_id
+               integer(HID_T) :: dspace_id
+               type(C_PTR)    :: data_ptr
+               integer(HID_T) :: item_id
+
+               ! Write the character item
+
+               @:HDF5_CALL(h5tcopy_f, H5T_NATIVE_CHARACTER, mem_type_id)
+               @:HDF5_CALL(h5tset_size_f, mem_type_id, LEN(data, SIZE_T))
+
+               @:HDF5_CALL(h5tcopy_f, H5T_NATIVE_CHARACTER, file_type_id)
+               @:HDF5_CALL(h5tset_size_f, file_type_id, LEN(data, SIZE_T))
+
+               #:if rank > 0
+                  @:HDF5_CALL(h5screate_simple_f, ${rank}$, INT(SHAPE(data), HSIZE_T), dspace_id)
+               #:else
+                  @:HDF5_CALL(h5screate_f, H5S_SCALAR_F, dspace_id)
+               #:endif
+
+               data_ptr = C_LOC(data)
+
+               @:HDF5_CALL(${prefix}$create_f, self%group_id, item_name, file_type_id, dspace_id, item_id)
+               @:HDF5_CALL(${prefix}$write_f, item_id, mem_type_id, data_ptr)
+               @:HDF5_CALL(${prefix}$close_f, item_id)
+
+               @:HDF5_CALL(h5sclose_f, dspace_id)
+
+               @:HDF5_CALL(h5tclose_f, mem_type_id)
+               @:HDF5_CALL(h5tclose_f, file_type_id)
+
+               ! Finish
+
+               return
+
+            end subroutine write_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+
+         #:for type, suffix in zip(LOGICAL_TYPES, LOGICAL_SUFFIXES)
+
+            subroutine write_${obj_type}$_${suffix}$_${rank}$_ (self, item_name, data)
+
+               class(hdf5io_t), intent(inout) :: self
+               character(*), intent(in)       :: item_name
+               ${type}$, target, intent(in)   :: data${ARRAY_SPEC(rank)}$
+               #:if rank > 0
+                  contiguous :: data
+               #:endif
+
+               ! Write the logical item
+
+               call self%write_${obj_type}$(item_name, MERGE(1, 0, MASK=data))
+
+               ! Finish
+
+               return
+
+            end subroutine write_${obj_type}$_${suffix}$_${rank}$_
+
+         #:endfor
+
+      #:endfor
+   #:endfor
+            
+end module hdf5io_m
