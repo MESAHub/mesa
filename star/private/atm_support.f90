@@ -272,6 +272,7 @@ contains
     integer, intent(out)      :: ierr
 
     integer  :: T_tau_id
+    real(dp) :: kap_guess
 
     include 'formats'
 
@@ -320,9 +321,14 @@ contains
          if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
-
+       
+       if (s% solver_iter > 0) then
+          kap_guess = s% opacity_start(1)
+       else
+          kap_guess = s% opacity(1)
+       end if
        call atm_eval_T_tau_uniform( &
-            tau_surf, L, R, M, cgrav, s% opacity_start(1), s% Pextra_factor, &
+            tau_surf, L, R, M, cgrav, kap_guess, s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
             s%atm_T_tau_errtol, s%atm_T_tau_max_iters, skip_partials, &
             Teff, kap, &
@@ -799,8 +805,12 @@ contains
     real(dp) :: tau_surf
 
     include 'formats'
-
-    kap_guess = s% opacity_start(1)
+    
+    if (s% solver_iter > 0) then
+       kap_guess = s% opacity_start(1)
+    else
+       kap_guess = s% opacity(1)
+    end if
 
     ! Sanity check on L
 
