@@ -1,0 +1,24 @@
+character dataset
+  scalar T
+  array  T
+integer(i4) dataset
+  scalar T
+  array  T
+integer(i8) dataset
+  scalar T
+  array  T
+real(sp) dataset
+  scalar T
+  array  T
+real(dp) dataset
+  scalar T
+  array  T
+complex(sp) dataset
+  scalar T
+  array  T
+complex(dp) dataset
+  scalar T
+  array  T
+logical dataset
+  scalar T
+  array  T
