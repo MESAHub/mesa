@@ -81,6 +81,7 @@
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
+         use report, only: do_report
          use alloc, only: fill_18_with_zeros
          type (star_info), pointer :: s
          logical, intent(in) :: restart, want_rsp_model, is_rsp_model
@@ -210,6 +211,14 @@
                write(*,4) 'finish_load_model after set_vars xa(j)', &
                   s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
             end do
+         end if
+
+         s% doing_finish_load_model = .true.
+         call do_report(s, ierr)
+         s% doing_finish_load_model = .false.
+         if (ierr /= 0) then
+            write(*,*) 'finish_load_model: failed in do_report'
+            return
          end if
 
       end subroutine finish_load_model

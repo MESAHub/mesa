@@ -46,7 +46,7 @@
          logical, intent(in) :: first_try
          integer, intent(in) :: id
          type (star_info), pointer :: s
-         integer :: ierr, k
+         integer :: ierr
          include 'formats'
          
          do_evolve_step_part1 = terminate
@@ -54,7 +54,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         if (s% trace_evolve) write(*,'(/,a)') 'start evolve step part1'
+         if (s% trace_evolve) write(*,'(/,a)') 'start evolve step'
          
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
@@ -354,6 +354,7 @@
       integer function do_step_part1(id, first_try)
          use hydro_vars, only: set_vars
          use winds, only: set_mdot
+         use alloc, only: check_sizes, fill_star_info_arrays_with_NaNs
          use do_one_utils, only: write_terminal_header
          use hydro_vars, only: set_vars_if_needed, set_vars, set_cgrav
          use mix_info, only: set_cz_bdy_mass
@@ -559,7 +560,7 @@
       integer function do_step_part2(id, first_try)
          use num_def
          use chem_def
-         use report, only: do_report, set_power_info, set_phot_info
+         use report, only: do_report, set_power_info
          use adjust_mass, only: do_adjust_mass
          use element_diffusion, only: do_element_diffusion, finish_element_diffusion
          use conv_premix, only: do_conv_premix
@@ -610,8 +611,6 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         if (s% trace_evolve) write(*,'(/,a)') 'start evolve step part2'
 
          if (s% dt <= 0d0) then
             do_step_part2 = terminate
@@ -767,7 +766,6 @@
 
          call set_luminosity_by_category(s) ! final values for use in selecting timestep
          call set_power_info(s)
-         call set_phot_info(s)
 
          s% total_angular_momentum = total_angular_momentum(s)
          call do_report(s, ierr)
@@ -1788,15 +1786,15 @@
          trace = s% trace_evolve
          nz = s% nz
 
-         if (.not. s% RSP_flag ) then
+         if (.not. s% RSP_flag) then
             call save_for_d_dt(s)
             call set_vars_if_needed(s, s% dt, str, ierr)
             if (failed('set_vars_if_needed')) return     
-            s% edv(1:s% species, 1:s% nz) = 0
+            s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
             call set_luminosity_by_category(s)
             s% total_angular_momentum = total_angular_momentum(s)
-            !call do_report(s, ierr)
-            !if (failed('do_report ierr')) return     
+            call do_report(s, ierr)
+            if (failed('do_report ierr')) return     
          end if
 
          ! save a few things from start of step that will need later
@@ -1838,6 +1836,7 @@
          use evolve_support, only: new_generation
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
+         use report, only: set_phot_info
          use hydro_vars, only: set_vars_if_needed
 
          type (star_info), pointer :: s
@@ -1905,6 +1904,7 @@
          
          call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
          if (failed('set_vars_if_needed ierr')) return
+         call set_phot_info(s)
          
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return

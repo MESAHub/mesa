@@ -31,7 +31,7 @@
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
-      use star_utils, only: em1, e00, ep1
+      use star_utils, only: em1, e00, ep1, set_energy_eqn_scal
 
       implicit none
 
@@ -80,7 +80,7 @@
             dL_dm_18, sources_18, others_18, d_turbulent_energy_dt_18, dwork_dm_18, &
             eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18, P_dV_dt_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
-         real(dp) :: cell_energy_fraction_start, residual, dm, dt, scal
+         real(dp) :: residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
          integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_w
@@ -100,7 +100,7 @@
          call setup_dL_dm(ierr); if (ierr /= 0) return         
          call setup_sources_and_others(ierr); if (ierr /= 0) return         
          call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
-         call setup_scal(ierr); if (ierr /= 0) return
+         call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return
          
          s% eps_grav_form_for_energy_eqn(k) = eps_grav_form
          s% dL_dm(k) = dL_dm_18%val
@@ -172,8 +172,6 @@
             nz = s% nz
             dt = s% dt
             dm = s% dm(k)
-            cell_energy_fraction_start = &
-               s% energy_start(k)*s% dm(k)/s% total_internal_energy_old                    
             doing_op_split_burn = s% op_split_burn .and. &
                s% T_start(k) >= s% op_split_burn_min_T
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
@@ -435,25 +433,6 @@
             s% dedt(k) = de_dt
          
          end subroutine setup_de_dt_and_friends
-         
-         subroutine setup_scal(ierr)
-            integer, intent(out) :: ierr
-            real(dp) :: scal_qp, dt_qp, e0_dq
-            include 'formats'
-            ierr = 0
-            if (k > 1) then
-               scal = 1d0
-            else
-               scal = 1d-6
-            end if
-            if (s% dedt_eqn_r_scale > 0d0) &
-               scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale) 
-            scal_qp = scal              
-            dt_qp = dt
-            e0_dq = s% energy_start(k)
-            scal_qp = scal_qp*dt_qp/e0_dq ! tests show that need qp for this (14700)
-            scal = scal_qp
-         end subroutine setup_scal
          
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials

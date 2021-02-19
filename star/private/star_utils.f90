@@ -3870,6 +3870,28 @@
             d_inv_R2_dlnR = -2d0*inv_R2
          end if
       end subroutine get_area_info
+      
+      
+      subroutine set_energy_eqn_scal(s, k, scal, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: scal
+         integer, intent(out) :: ierr
+         real(dp) :: cell_energy_fraction_start
+         include 'formats'
+         ierr = 0
+         if (k > 1) then
+            scal = 1d0
+         else
+            scal = 1d-6
+         end if
+         if (s% dedt_eqn_r_scale > 0d0) then
+            cell_energy_fraction_start = &
+               s% energy_start(k)*s% dm(k)/s% total_internal_energy_old                    
+            scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale) 
+         end if
+         scal = scal*s% dt/s% energy_start(k)
+      end subroutine set_energy_eqn_scal
 
 
       end module star_utils

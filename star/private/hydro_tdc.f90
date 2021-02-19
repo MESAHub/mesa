@@ -125,7 +125,7 @@
       subroutine get1_turbulent_energy_eqn( &  
             s, k, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: calc_Pt_18_tw
+         use star_utils, only: calc_Pt_18_tw, set_energy_eqn_scal
          use accurate_sum_auto_diff_18var_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -133,7 +133,7 @@
          real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
          integer, intent(out) :: ierr
          
-         real(dp) :: dt, dm, dt_div_dm, residual, scale
+         real(dp) :: dt, dm, dt_div_dm, scal, residual
          integer :: i_dw_dt, i_w, i_lnd, i_lnT, i_lnR, i_v
          type(auto_diff_real_18var_order1) :: resid_18, &
             d_turbulent_energy_dt_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
@@ -166,13 +166,13 @@
          call setup_dt_dLt_dm_18(ierr); if (ierr /= 0) return         
          call setup_dt_C_18(ierr); if (ierr /= 0) return         
          call setup_dt_Eq_18(ierr); if (ierr /= 0) return    
+         call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return
          
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          esum_18 = d_turbulent_energy_dt_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18
          
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
-         scale = 1d0/s% energy_start(k)
-         resid_18 = scale*resid_18
+         resid_18 = scal*resid_18
          residual = resid_18%val
          s% equ(i_dw_dt, k) = residual
 
