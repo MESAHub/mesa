@@ -491,7 +491,7 @@
 
                if (do_et) then
                   s% w(k) = x(i_w)
-                  if (s% w(k) < 2d0*min_w) s% w(k) = 0d0 ! clip noise
+                  if (s% w(k) < min_w) s% w(k) = 0d0 ! trim noise
                   s% dxh_w(k) = s% solver_dx(i_w,k)
                   if (s% w(k) < 0d0 .or. is_bad_num(s% w(k))) then
                      s% retry_message = 'bad num for et'

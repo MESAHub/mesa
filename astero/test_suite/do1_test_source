@@ -1,4 +1,3 @@
-return
 do_one astero_adipls "got ok match for expected frequency" "final.mod" skip
 do_one astero_gyre "got ok match for expected frequency" skip skip
 do_one example_astero "chi square within limit" "final.mod" skip

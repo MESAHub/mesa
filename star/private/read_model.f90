@@ -658,17 +658,17 @@
                   j=j+1; xh(i_etrb_RSP,i) = vec(j)
                   j=j+1; xh(i_erad_RSP,i) = vec(j)
                   j=j+1; xh(i_Fr_RSP,i) = vec(j)
-                  j=j+1; !s% L(i) = vec(j)
+                  j=j+1; ! discard
                else if (i_w /= 0) then ! convert from RSP to TDC
                   j=j+1; xh(i_w,i) = sqrt(max(0d0,vec(j)))
-                  if (xh(i_w,i) < 2d0*min_w) xh(i_w,i) = 0d0 ! clip noise
-                  j=j+1; !discard xh(i_erad,i) = vec(j)
-                  j=j+1; !discard xh(i_Fr,i) = vec(j)
+                  if (xh(i_w,i) < min_w) xh(i_w,i) = 0d0 ! trim noise
+                  j=j+1; ! discard
+                  j=j+1; ! discard
                   j=j+1; xh(i_lum,i) = vec(j)
                end if
             else if (i_w /= 0) then
                j=j+1; xh(i_w,i) = vec(j)
-               if (xh(i_w,i) < 2d0*min_w) xh(i_w,i) = 0d0 ! clip noise
+               if (xh(i_w,i) < min_w) xh(i_w,i) = 0d0 ! trim noise
                j=j+1; xh(i_lum,i) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,i) = vec(j)

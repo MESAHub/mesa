@@ -324,7 +324,7 @@
                else if (j == i_w) then
                   do k=1,nz
                      s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < 2d0*min_w) s% w(k) = 0d0 ! clip noise
+                     if (s% w(k) < min_w) s% w(k) = 0d0 ! trim noise
                      s% dxh_w(k) = 0d0
                   end do
                else if (j == i_lum) then
@@ -1296,7 +1296,14 @@
                     lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                     ierr)
                if (ierr /= 0) then
-                  if (s% report_ierr) write(*,*) 'failed in get_atm_PT'
+                  if (s% report_ierr) then
+                     write(*,1) 'tau_surf', tau_surf
+                     write(*,1) 'L_surf', L_surf
+                     write(*,1) 'R_surf', R_surf
+                     write(*,1) 's% m(1)', s% m(1)
+                     write(*,1) 's% cgrav(1)', s% cgrav(1)
+                     write(*,*) 'failed in get_atm_PT'
+                  end if
                   return
                end if
 

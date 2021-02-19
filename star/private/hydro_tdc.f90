@@ -69,7 +69,7 @@
          logical, intent(in) :: skip_partials
          real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: L, Lr, Lc, Lt, L_actual, res18
+         type(auto_diff_real_18var_order1) :: L_expected, Lr, Lc, Lt, L_actual, res18
          real(dp) :: scale, residual, e_avg, L_start_max
          logical :: test_partials
          include 'formats'
@@ -78,14 +78,36 @@
          test_partials = .false.
 
          ierr = 0
-         call compute_L(s, k, L, Lr, Lc, Lt, ierr)         
+         call compute_L(s, k, L_expected, Lr, Lc, Lt, ierr)         
          if (ierr /= 0) return        
          L_actual = wrap_L_00(s, k)  
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
-         res18 = (L - L_actual)*scale         
+         if (is_bad(scale)) then
+            write(*,2) 'get1_tdc_L_eqn scale', k, scale
+            stop 'get1_tdc_L_eqn'
+         end if
+         res18 = (L_expected - L_actual)*scale         
          residual = res18%val
          s% equ(s% i_equL, k) = residual
+
+         if (is_bad(res18%d1Array(i_lnd_00))) then
+!$omp critical (get1_tdc_L_eqn_crit1)
+            write(*,2) 'get1_tdc_L_eqn res18%d1Array(i_lnd_00)', k, res18%d1Array(i_lnd_00)
+            write(*,2) 'L_expected%val', k, L_expected%val
+            write(*,2) 'Lr%val', k, Lr%val
+            write(*,2) 'Lc%val', k, Lc%val
+            write(*,2) 'Lt%val', k, Lt%val
+            write(*,2) 'L_actual%val', k, L_actual%val
+            write(*,2) 'residual', k, residual
+            write(*,2) 'L_expected%d1Array(i_lnd_00)', k, L_expected%d1Array(i_lnd_00)
+            write(*,2) 'Lr%d1Array(i_lnd_00)', k, Lr%d1Array(i_lnd_00)
+            write(*,2) 'Lc%d1Array(i_lnd_00)', k, Lc%d1Array(i_lnd_00)
+            write(*,2) 'Lt%d1Array(i_lnd_00)', k, Lt%d1Array(i_lnd_00)
+            write(*,2) 'L_actual%d1Array(i_lnd_00)', k, L_actual%d1Array(i_lnd_00)
+            stop 'get1_tdc_L_eqn'
+!$omp end critical (get1_tdc_L_eqn_crit1)
+         end if
          
          if (test_partials) then
             s% solver_test_partials_val = residual
@@ -755,23 +777,17 @@
          include 'formats'
 
          ierr = 0
+         Lc_eturb_face_factor = 0d0
+         Lc = 0d0
 
-         ! Get reals
          alpha = s% TDC_alfa
-         if (alpha <= 0d0 .or. k == 1) then
-            area = 0d0
-            T_rho_face = 0d0
-            PII_face = 0d0
-            eturb_face = 0d0
-            Lc = 0d0
-            return
-         end if
-         
+         if (alpha <= 0d0 .or. k == 1) return
+         w_m1 = wrap_w_m1(s, k)
+         w_00 = wrap_w_00(s, k)
+         if (w_m1%val < min_w .and. w_00% val < min_w) return         
          dm_bar = s% dm_bar(k)
          cgrav = s% cgrav(k)
          m = s% m(k)
-
-         ! Wrap auto_diff variables
          r_00 = wrap_r_00(s, k)
          T_m1 = wrap_T_m1(s, k)
          T_00 = wrap_T_00(s, k)         
@@ -779,8 +795,6 @@
          d_00 = wrap_d_00(s, k)
          P_m1 = wrap_P_m1(s, k)
          P_00 = wrap_P_00(s, k)
-         w_m1 = sqrt(wrap_w_m1(s, k))
-         w_00 = sqrt(wrap_w_00(s, k))
          chiT_m1 = wrap_chiT_m1(s, k)
          chiT_00 = wrap_chiT_00(s, k)
          chiRho_m1 = wrap_chiRho_m1(s, k)
@@ -795,8 +809,7 @@
          lnT_00% d1Array(i_lnT_00) = 1d0
 
          QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1) ! thermal expansion coefficient
-         QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
-         
+         QQ_00 = chiT_00/(d_00*T_00*chiRho_00)         
          P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
          Hp_face = P_div_rho_face*pow2(r_00)/(cgrav*m)
          QQ_div_Cp_face = 0.5d0*(QQ_m1/Cp_m1 + QQ_00/Cp_00)
@@ -804,8 +817,7 @@
          avg_Vol = 0.5d0*(1d0/d_00 + 1d0/d_m1)
          area = 4d0*pi*pow2(r_00)
          Y2 = area*Hp_face/(avg_Vol*dm_bar)
-         Y_face = Y1*Y2
-         
+         Y_face = Y1*Y2         
          Cp_face = 0.5d0*(Cp_m1 + Cp_00)
          PII_face = alpha*Cp_face*Y_face
          eturb_face = 0.5d0*(pow2(w_m1) + pow2(w_00))
@@ -867,10 +879,8 @@
          integer, intent(out) :: ierr         
 
          ! Intermediates
-         real(dp) :: cgrav, dm_bar, m, dm_m1, dm_00, unused
          type(auto_diff_real_18var_order1) :: r_00, T_m1, T_00, kap_m1, kap_00, d_m1, d_00
-         type(auto_diff_real_18var_order1) :: P_m1, P_00, s_m1, s_00, w_m1, w_00, g, area
-         type(auto_diff_real_18var_order1) :: g_cell_00, h_00, r_p1, v_00, v_p1
+         type(auto_diff_real_18var_order1) :: P_m1, P_00, w_m1, w_00, g, area
          
          include 'formats'
          ierr = 0
@@ -884,20 +894,15 @@
             return
          end if
          
-         ! Get reals
-         dm_bar = s% dm_bar(k)
-
-         ! Wrap auto_diff variables
-         r_00 = wrap_r_00(s, k)
          T_m1 = wrap_T_m1(s, k)
          T_00 = wrap_T_00(s, k)
          kap_m1 = wrap_kap_m1(s, k)
          kap_00 = wrap_kap_00(s, k)
-
+         r_00 = wrap_r_00(s, k)
          area = 4d0 * pi * pow2(r_00)
 
          ! Radiative luminosity               
-         Lr = compute_Lr(s, k, dm_bar, area, T_m1, T_00, kap_m1, kap_00, ierr)
+         Lr = compute_Lr(s, k, s% dm_bar(k), area, T_m1, T_00, kap_m1, kap_00, ierr)
          if (ierr /= 0) return
 
          ! Turbulent and convective luminosities.
@@ -905,33 +910,18 @@
             Lc = 0d0
             Lt = 0d0
          else
-            m = s% m(k)
-            cgrav = s% cgrav(k)
-
-            g = m * cgrav / pow2(r_00)
-
-            r_p1 = wrap_r_p1(s, k)
-
-            dm_m1 = s%dm(k-1)
-            dm_00 = s%dm(k)
-
+            g = s% m(k) * s% cgrav(k) / pow2(r_00)
             d_m1 = wrap_d_m1(s, k)
             d_00 = wrap_d_00(s, k)
             P_m1 = wrap_P_m1(s, k)
             P_00 = wrap_P_00(s, k)
-            s_m1 = wrap_s_m1(s, k)
-            s_00 = wrap_s_00(s, k)
-
             w_m1 = wrap_w_m1(s, k)
             w_00 = wrap_w_00(s, k)
-
-            v_00 = wrap_v_00(s, k)
-            v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
 
             Lc = compute_Lc(s, k, ierr)
             if (ierr /= 0) return
             
-            Lt = compute_Lt(s, k, dm_m1, dm_00, g, area, P_m1, P_00, d_m1, d_00, w_m1, w_00, ierr)
+            Lt = compute_Lt(s, k, s% dm(k-1), s% dm(k), g, area, P_m1, P_00, d_m1, d_00, w_m1, w_00, ierr)
             if (ierr /= 0) return
 
          end if
@@ -1119,7 +1109,11 @@
             Lc = compute_Lc_terms(s, k, Lc_eturb_face_factor, ierr)
             if (ierr /= 0) stop 'failed in compute_Lc_terms'
             Lc_val = s% L(k) - Lr%val ! assume Lt = 0
-            eturb_face(k) = Lc_val/Lc_eturb_face_factor%val
+            if (abs(Lc_eturb_face_factor%val) < 1d-20) then
+               eturb_face(k) = 0d0
+            else
+               eturb_face(k) = Lc_val/Lc_eturb_face_factor%val
+            end if
          end do
          do k=1, nz
             if (k < nz) then
@@ -1128,7 +1122,7 @@
                w_00 = sqrt(max(0d0,eturb_face(k)))
             end if
             s% xh(i_w,k) = w_00
-            if (s% xh(i_w,k) < 2d0*min_w) s% xh(i_w,k) = 0d0 ! clip
+            if (s% xh(i_w,k) < min_w) s% xh(i_w,k) = 0d0 ! trim noise
             s% w(k) = s% xh(i_w,k)
             call compute_L(s, k, L, Lr, Lc, Lt, ierr)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'

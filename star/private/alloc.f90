@@ -2583,7 +2583,7 @@
          i = i+1; s% i_lnT = i
          i = i+1; s% i_lnR = i
       
-         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
+         if (.not. s% RSP_flag) then
             i = i+1; s% i_lum = i
          else
             s% i_lum = 0
@@ -3099,7 +3099,7 @@
             call insert(s% xh,i_var)
             call insert(s% xh_start,i_var)
             do k=1,nz
-               s% xh(i_var,k) = 0d0 ! min_w
+               s% xh(i_var,k) = 0d0
             end do
             s% need_to_reset_w = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then
