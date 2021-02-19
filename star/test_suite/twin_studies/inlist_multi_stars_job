@@ -13,5 +13,7 @@
    which_for_pgstar = -1 ! do both
    
    stopping_age = 1.013e7
-
+   
+   stop_when_1st_finishes = .false.
+   
 / ! end of multi_stars_job namelist
