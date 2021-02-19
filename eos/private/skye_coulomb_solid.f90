@@ -154,12 +154,12 @@ module skye_coulomb_solid
 
          s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
          b1 = 1d0 - 1.1866d0 * pow(Z, -0.267d0) + 0.27d0 / Z
-         b2 = 1d0 + (2.25d0 / pow(Z, 1d0/3d0)) * (1d0 + 0.684d0 * pow5(Z) + 0.222d0 * pow6(Z)) / (1d0 + 0.222d0 * pow6(Z))
+         b2 = 1d0 + (2.25d0 * pow(Z, -1d0/3d0)) * (1d0 + 0.684d0 * pow5(Z) + 0.222d0 * pow6(Z)) / (1d0 + 0.222d0 * pow6(Z))
          b3 = 41.5d0 / (1d0 + log(Z))
          b4 = 0.395d0 * log(Z) + 0.347d0 * pow(Z, -1.5d0)
 
          rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
-         xr = 0.014005d0 / rs
+         xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
          supp = safe_exp(-pow2(0.205d0 * TPT))
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
          Q = sqrt(log(1d0 + 1d0/supp)) / sqrt(log(e - (e - 2d0) * supp))
