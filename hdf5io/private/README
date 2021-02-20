@@ -1,9 +1,8 @@
 NOTE: the .fypp and .inc files are copied from the ForUM project
 (https://github.com/rhdtownsend/forum). They are designed to be
 processed using the fypp preprocessor
-(https://github.com/aradi/fypp). Example fypp usage:
-
-fypp kinds_m.fypp kinds_m.f90
+(https://github.com/aradi/fypp). This can be done by running the
+regen_src script
 
 Given that not all users will have fypp installed, for now we're
 storing both .fypp/.inc *and* .f90 files in the repo. Longer term, we
@@ -15,4 +14,3 @@ fypp.
 
 Rich Townsend
 February 2021
-
