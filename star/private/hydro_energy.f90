@@ -317,14 +317,13 @@
          
          subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
+            type(auto_diff_real_18var_order1) :: w_00
             include 'formats'
             ierr = 0
             d_turbulent_energy_dt_18 = 0d0
             if (s% TDC_flag) then
-               d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
-                  (s% w_start(k)*s% dxh_w(k) + s% dxh_w(k)**2)/dt ! w = w_start + dxh_w
-               d_turbulent_energy_dt_18%d1Array(i_w_00) = &
-                  (s% w_start(k) + 2d0*s% dxh_w(k))/dt
+               w_00 = wrap_w_00(s,k)
+               d_turbulent_energy_dt_18 = (pow2(w_00) - pow2(s% w_start(k)))/dt 
             end if
          end subroutine setup_d_turbulent_energy_dt
          

@@ -3318,8 +3318,8 @@
 
       end subroutine get1_lpp
 
-
-      subroutine calc_Pt_18_tw(s, k, Pt, ierr)
+ 
+      subroutine calc_Pt_18_tw(s, k, Pt, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
@@ -3335,24 +3335,21 @@
             Pt = 0d0
             return
          end if
-         
-         stop 'fix this for w replacing et'
-         
          rho = wrap_d_00(s,k)
          w = wrap_w_00(s,k)
-         Pt = s% TDC_alfap*pow2(w)*rho
+         Pt = s% TDC_alfap*pow2(w)*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% TDC_alfap*s% w_start(k)*s% rho_start(k)
+            Pt_start = s% TDC_alfap*pow2(s% w_start(k))*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 
          if (is_bad(Pt%val)) then
-!$omp critical (hydro_et_crit2)
+!$omp critical (calc_Pt_18_tw_crit)
             write(*,2) 'Pt', k, Pt%val
             stop 'calc_Pt_tw'
-!$omp end critical (hydro_et_crit2)
+!$omp end critical (calc_Pt_18_tw_crit)
          end if
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -3854,7 +3851,7 @@
       end subroutine get_area_info
       
       
-      subroutine set_energy_eqn_scal(s, k, scal, ierr)
+      subroutine set_energy_eqn_scal(s, k, scal, ierr) ! 1/(erg g^-1 s^-1)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: scal

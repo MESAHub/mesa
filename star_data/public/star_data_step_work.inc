@@ -481,7 +481,7 @@
                d_PII_dlndm1, d_PII_dlnTm1, &
             Chi, Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
                d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
-            f_Edd, rsp_mesh_function
+            f_Edd
          integer :: RSP_num_periods
          real(dp) :: RSP_dt, RSP_period, g_Edd, &
             rsp_DeltaR, rsp_DeltaMag, rsp_GRPDV, rsp_GREKM, rsp_GREKM_avg_abs

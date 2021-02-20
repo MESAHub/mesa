@@ -1372,7 +1372,7 @@
          logical :: test_partials
          include 'formats'
          k = NZN+1-i
-         if (i == nzn .or. ALFA == 0d0) then
+         if (k == 1 .or. k == s% nz .or. ALFA == 0d0) then
             s% PII(k) = 0
             dPII_dr_00(I) = 0
             dPII_dr_in(I) = 0 
