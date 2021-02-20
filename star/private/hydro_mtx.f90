@@ -101,7 +101,7 @@
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
-         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_et, &
+         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_w, &
             do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
 
          include 'formats'
@@ -167,7 +167,7 @@
          do_lnT = i_lnT > 0 .and. i_lnT <= nvar
          do_lnR = i_lnR > 0 .and. i_lnR <= nvar
          do_lum = i_lum > 0 .and. i_lum <= nvar
-         do_et = i_w > 0 .and. i_w <= nvar
+         do_w = i_w > 0 .and. i_w <= nvar
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
@@ -489,9 +489,8 @@
 
                end if
 
-               if (do_et) then
-                  s% w(k) = x(i_w)
-                  if (s% w(k) < min_w) s% w(k) = 0d0 ! trim noise
+               if (do_w) then
+                  s% w(k) = max(x(i_w),0d0)
                   s% dxh_w(k) = s% solver_dx(i_w,k)
                   if (s% w(k) < 0d0 .or. is_bad_num(s% w(k))) then
                      s% retry_message = 'bad num for et'
@@ -740,7 +739,7 @@
                   ! use dx to get better accuracy
 
                   if (do_lnT) s% dlnT_dt(k) = s% solver_dx(i_lnT,k)*d_dxdt_dx
-                  if (do_et) s% dw_dt(k) = s% solver_dx(i_w,k)*d_dxdt_dx
+                  if (do_w) s% dw_dt(k) = s% solver_dx(i_w,k)*d_dxdt_dx
 
                   if (s% do_struct_hydro) then
                      if (do_lnd) s% dlnd_dt(k) = s% solver_dx(i_lnd,k)*d_dxdt_dx
@@ -763,7 +762,7 @@
 
                   if (do_lnT) &
                      s% dlnT_dt(k) = (x(i_lnT) - s% lnT_for_d_dt_const_m(k))*d_dxdt_dx
-                  if (do_et) &
+                  if (do_w) &
                      s% dw_dt(k) = (x(i_w) - s% w_for_d_dt_const_m(k))*d_dxdt_dx
                   if (s% do_struct_hydro) then
                      s% dlnR_dt(k) = (x(i_lnR) - s% lnR_for_d_dt_const_m(k))*d_dxdt_dx

@@ -49,6 +49,9 @@
 
     TDC_Lsurf_factor = 0.5d0
     TDC_use_Stellingwerf_Lr = .true.
+    TDC_w_min_for_damping = 1d2
+    TDC_num_outermost_cells_forced_nonturbulent = 0
+    TDC_num_innermost_cells_forced_nonturbulent = 0
 
 
       ! use_DGESVX_in_bcyclic

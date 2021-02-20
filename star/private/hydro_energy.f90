@@ -211,7 +211,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_18, others_18
-            use hydro_tdc, only: calc_Eq_18
+            use hydro_tdc, only: get_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
                eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, RTI_diffusion_18
@@ -259,7 +259,7 @@
             
             Eq_18 = 0d0
             if (s% TDC_flag) then             
-               call calc_Eq_18(s, k, Eq_18, ierr)
+               Eq_18 = get_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if   
             

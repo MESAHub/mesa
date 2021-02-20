@@ -1391,6 +1391,7 @@
             s% tau_start(k) = -1d99
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
+            s% opacity_start(k) = -1d99
             s% w_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do

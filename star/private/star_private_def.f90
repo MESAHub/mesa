@@ -41,8 +41,6 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_w = 1d-10
-
 
       contains
 

@@ -323,8 +323,7 @@
                   end do
                else if (j == i_w) then
                   do k=1,nz
-                     s% w(k) = s% xh(i_w, k)
-                     if (s% w(k) < min_w) s% w(k) = 0d0 ! trim noise
+                     s% w(k) = max(s% xh(i_w, k), 0d0)
                      s% dxh_w(k) = 0d0
                   end do
                else if (j == i_lum) then

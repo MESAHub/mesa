@@ -400,7 +400,8 @@
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, &
+    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
+    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, &
     
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
@@ -2062,6 +2063,9 @@
  s% TDC_alfar = TDC_alfar
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
+ s% TDC_w_min_for_damping = TDC_w_min_for_damping
+ s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
+ s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
 
  ! timestep
  s% max_timestep = max_timestep
@@ -3692,6 +3696,9 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alfar= s% TDC_alfar
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
+ TDC_w_min_for_damping = s% TDC_w_min_for_damping
+ TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
+ TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
 
  ! timestep
  max_timestep = s% max_timestep

@@ -661,14 +661,12 @@
                   j=j+1; ! discard
                else if (i_w /= 0) then ! convert from RSP to TDC
                   j=j+1; xh(i_w,i) = sqrt(max(0d0,vec(j)))
-                  if (xh(i_w,i) < min_w) xh(i_w,i) = 0d0 ! trim noise
                   j=j+1; ! discard
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,i) = vec(j)
                end if
             else if (i_w /= 0) then
-               j=j+1; xh(i_w,i) = vec(j)
-               if (xh(i_w,i) < min_w) xh(i_w,i) = 0d0 ! trim noise
+               j=j+1; xh(i_w,i) = max(vec(j),0d0)
                j=j+1; xh(i_lum,i) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,i) = vec(j)
