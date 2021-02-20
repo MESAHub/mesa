@@ -24,7 +24,7 @@ LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
 
 LIBS_OTHER = 
 DEPS_OTHER = 
-LOAD_OTHER = `hdf5_link`
+LOAD_OTHER = $(LOAD_HDF5)
 
 #################################################################
 #
