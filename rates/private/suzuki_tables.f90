@@ -468,12 +468,12 @@ contains
      do i = 1, num_suzuki_reactions
         hi_rxn = hdf5io_t(hi, group_names(i))
         call load_suzuki_rxn(hi_rxn, i, 'r_'//group_names(i))
-        call hi_rxn%final()
+        call hi_rxn% final()
      end do
 
      ! close file
 
-     call hi%final()
+     call hi% final()
 
      ! set up reaction dictionary
 
@@ -522,10 +522,10 @@ contains
 
         ! read table axes
 
-        call hi%alloc_read_dset('logTs', logTs)
+        call hi% alloc_read_dset('logTs', logTs)
         if (dbg) write(*,*) "num logTs", SIZE(logTs)
 
-        call hi%alloc_read_dset('lYeRhos', lYeRhos)
+        call hi% alloc_read_dset('lYeRhos', lYeRhos)
         if (dbg) write(*,*) "num lYeRhos", SIZE(lYeRhos)
 
         table = suzuki_rate_table(logTs, lYeRhos)
@@ -533,7 +533,7 @@ contains
 
         ! read capture data
 
-        table% has_capture_data = hi%group_exists('capture')
+        table% has_capture_data = hi% group_exists('capture')
 
         if (table% has_capture_data) then
 
@@ -541,20 +541,20 @@ contains
 
            hi_data = hdf5io_t(hi, 'capture')
 
-           call hi_data%read_dset('mu', table% data(1,:,:,table%i_capture_mu))
-           call hi_data%read_dset('dQ', table% data(1,:,:,table%i_capture_dQ))
-           call hi_data%read_dset('Vs', table% data(1,:,:,table%i_capture_Vs))
-           call hi_data%read_dset('rate', table% data(1,:,:,table%i_capture_rate))
-           call hi_data%read_dset('nu', table% data(1,:,:,table%i_capture_nu))
-           call hi_data%read_dset('gamma', table% data(1,:,:,table%i_capture_gamma))
+           call hi_data% read_dset('mu', table% data(1,:,:,table%i_capture_mu))
+           call hi_data% read_dset('dQ', table% data(1,:,:,table%i_capture_dQ))
+           call hi_data% read_dset('Vs', table% data(1,:,:,table%i_capture_Vs))
+           call hi_data% read_dset('rate', table% data(1,:,:,table%i_capture_rate))
+           call hi_data% read_dset('nu', table% data(1,:,:,table%i_capture_nu))
+           call hi_data% read_dset('gamma', table% data(1,:,:,table%i_capture_gamma))
 
-           call hi_data%final()
+           call hi_data% final()
 
         end if
 
         ! read decay data
 
-        table% has_decay_data = hi%group_exists('decay')
+        table% has_decay_data = hi% group_exists('decay')
 
         if (table% has_decay_data) then
 
@@ -562,14 +562,14 @@ contains
 
            hi_data = hdf5io_t(hi, 'decay')
 
-           call hi_data%read_dset('mu', table% data(1,:,:,table%i_decay_mu))
-           call hi_data%read_dset('dQ', table% data(1,:,:,table%i_decay_dQ))
-           call hi_data%read_dset('Vs', table% data(1,:,:,table%i_decay_Vs))
-           call hi_data%read_dset('rate', table% data(1,:,:,table%i_decay_rate))
-           call hi_data%read_dset('nu', table% data(1,:,:,table%i_decay_nu))
-           call hi_data%read_dset('gamma', table% data(1,:,:,table%i_decay_gamma))
+           call hi_data% read_dset('mu', table% data(1,:,:,table%i_decay_mu))
+           call hi_data% read_dset('dQ', table% data(1,:,:,table%i_decay_dQ))
+           call hi_data% read_dset('Vs', table% data(1,:,:,table%i_decay_Vs))
+           call hi_data% read_dset('rate', table% data(1,:,:,table%i_decay_rate))
+           call hi_data% read_dset('nu', table% data(1,:,:,table%i_decay_nu))
+           call hi_data% read_dset('gamma', table% data(1,:,:,table%i_decay_gamma))
 
-           call hi_data%final()
+           call hi_data% final()
 
         end if
 
