@@ -24,6 +24,7 @@ module hdf5io_m
    ! Uses
 
    use kinds_m
+   use cinter_m
 
    use hdf5
 
@@ -55,8 +56,11 @@ module hdf5io_m
       #:for obj_type in ('group', 'attr', 'dset')
          procedure, public :: ${obj_type}$_exists
       #:endfor
+      #:for obj_type in ('group', 'dset')
+         procedure, public :: ${obj_type}$_names
+      #:endfor
       #:for obj_type in ('attr', 'dset')
-         procedure, public :: get_${obj_type}$_shape
+         procedure, public :: ${obj_type}$_shape
       #:endfor
       #:for op in ('read', 'alloc_read', 'write')
          #:for obj_type in ('attr', 'dset')
@@ -396,13 +400,129 @@ contains
 
    !****
 
+   #:for obj_type, hdf_type in (('group', 'H5O_TYPE_GROUP_F'), ('dset', 'H5O_TYPE_DATASET_F'))
+
+      function ${obj_type}$_names(self) result(names)
+
+         class(hdf5io_t), intent(inout) :: self
+         character(:), allocatable      :: names(:)
+
+         integer(HSIZE_T) :: i
+         integer          :: n_names
+         integer          :: max_len
+         type(C_FUNPTR)   :: op
+         integer          :: ret_value
+         integer          :: hdf_err
+         integer          :: i_name
+
+         ! Iterate to get number of items and maximum name length
+
+         i = 0
+
+         n_names = 0
+         max_len = 0
+
+         op = C_FUNLOC(op_len_)
+
+         @:HDF5_CALL(h5literate_f, self%group_id, H5_INDEX_NAME_F, H5_ITER_NATIVE_F, i, op, C_NULL_PTR, ret_value)
+
+         ! Allocate space
+
+         allocate(character(LEN=max_len)::names(n_names))
+
+         ! Iterate again to store the names
+
+         i = 0
+
+         i_name = 0
+
+         op = C_FUNLOC(op_name_)
+
+         @:HDF5_CALL(h5literate_f, self%group_id, H5_INDEX_NAME_F, H5_ITER_NATIVE_F, i, op, C_NULL_PTR, ret_value)
+
+         ! Finish
+
+         return
+
+      contains
+      
+         function op_len_(loc_id, c_name, c_info, c_data) result(ret_value) bind(C)
+
+            integer(HID_T), value :: loc_id
+            character(C_CHAR)     :: c_name(*)
+            type(C_PTR), value    :: c_info
+            type(C_PTR), value    :: c_data
+            integer(C_INT)        :: ret_value
+
+            type(H5O_INFO_T) :: info
+            integer          :: hdf_err
+
+            ! Check that the link points to the appropriate object type
+
+            @:HDF5_CALL(h5oget_info_f, loc_id, info)
+
+            if (info%type == ${hdf_type}$) then
+
+               ! Update counters
+
+               n_names = n_names + 1
+
+               max_len = MAX(c_f_len(c_name), max_len)
+
+            endif
+
+            ! Finish
+
+            ret_value = 0
+
+         end function op_len_
+
+         !****
+
+         function op_name_(loc_id, c_name, c_info, c_data) result(ret_value) bind(C)
+
+            integer(HID_T), value :: loc_id
+            character(C_CHAR)     :: c_name(*)
+            type(C_PTR), value    :: c_info
+            type(C_PTR), value    :: c_data
+            integer(C_INT)        :: ret_value
+
+            type(H5O_INFO_T) :: info
+            integer          :: hdf_err
+
+            ! Check that the link points to the appropriate object type
+
+            @:HDF5_CALL(h5oget_info_f, loc_id, info)
+
+            if (info%type == ${hdf_type}$) then
+
+               ! Store the name
+
+               i_name = i_name + 1
+
+               names(i_name) = c_f_string(c_name)
+
+            end if
+
+            ! Finish
+
+            ret_value = 0
+
+         end function op_name_
+
+      end function ${obj_type}$_names
+         
+   #:endfor
+
+   !****
+
    #:for obj_type, prefix in (('attr', 'h5a'), ('dset', 'h5d'))
 
-      subroutine get_${obj_type}$_shape(self, item_name, shape)
+      function ${obj_type}$_shape(self, item_name) result(shape)
 
          class(hdf5io_t), intent(inout) :: self
          character(*), intent(in)       :: item_name
-         integer(HSIZE_T), intent(out)  :: shape(:)
+         integer(HSIZE_T), allocatable  :: shape(:)
 
          integer          :: hdf_err
          integer(HID_T)   :: item_id
@@ -428,7 +548,7 @@ contains
 
          return
 
-      end subroutine get_${obj_type}$_shape
+      end function ${obj_type}$_shape
 
    #:endfor
 
@@ -460,7 +580,7 @@ contains
 
                   ! Check shapes
 
-                  call self%get_${obj_type}$_shape(item_name, item_shape)
+                  item_shape = self%${obj_type}$_shape(item_name)
                   @:ASSERT(ALL(item_shape == SHAPE(data)),shape mismatch)
 
                #:endif
@@ -506,7 +626,7 @@ contains
 
                   ! Check shapes
 
-                  call self%get_${obj_type}$_shape(item_name, item_shape)
+                  item_shape = self%${obj_type}$_shape(item_name)
                   @:ASSERT(ALL(item_shape == SHAPE(data)),shape mismatch)
 
                #:endif
@@ -582,7 +702,7 @@ contains
                   
                #:if rank > 0
 
-                  call self%get_${obj_type}$_shape(item_name, item_shape)
+                  item_shape = self%${obj_type}$_shape(item_name)
                   allocate(data${ARRAY_SPEC(rank, 'item_shape({0:d})')}$)
 
                #:else
