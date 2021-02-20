@@ -46,6 +46,7 @@ module hdf5io_m
    ! Uses
 
    use kinds_m
+   use cinter_m
 
    use hdf5
 
@@ -77,8 +78,10 @@ module hdf5io_m
          procedure, public :: group_exists
          procedure, public :: attr_exists
          procedure, public :: dset_exists
-         procedure, public :: get_attr_shape
-         procedure, public :: get_dset_shape
+         procedure, public :: group_names
+         procedure, public :: dset_names
+         procedure, public :: attr_shape
+         procedure, public :: dset_shape
                   procedure :: read_attr_is_0_
                   procedure :: read_attr_id_0_
                   procedure :: read_attr_rs_0_
@@ -594,7 +597,7 @@ contains
    call h5fcreate_f(file_name,H5F_ACC_TRUNC_F,file_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 128 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 132 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5fcreate_f'
    error stop
    endif
@@ -602,12 +605,12 @@ contains
    call h5fopen_f(file_name,H5F_ACC_RDWR_F,file_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 130 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 134 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5fopen_f'
    error stop
    endif
       case default
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 132 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 136 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'invalid access_type'
    error stop
       end select
@@ -617,7 +620,7 @@ contains
    call h5gopen_f(file_id,'/',group_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 137 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 141 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5gopen_f'
    error stop
    endif
@@ -658,7 +661,7 @@ contains
    call h5gopen_f(hi_parent%group_id,group_name,group_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 172 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 176 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5gopen_f'
    error stop
    endif
@@ -666,7 +669,7 @@ contains
    call h5gcreate_f(hi_parent%group_id,group_name,group_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 174 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 178 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5gcreate_f'
    error stop
    endif
@@ -700,7 +703,7 @@ contains
    call h5gclose_f(self%group_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 202 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 206 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5gclose_f'
    error stop
    endif
@@ -713,7 +716,7 @@ contains
    call h5fclose_f(self%file_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 209 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 213 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5fclose_f'
    error stop
    endif
@@ -744,13 +747,13 @@ contains
    call h5open_f(hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 234 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 238 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5open_f'
    error stop
    endif
 
    if (.NOT. (hdf_err == 0)) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 236 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 240 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "hdf_err == 0" failed with message "Failed to open HDF5 library"'
    error stop
    end if
@@ -794,7 +797,7 @@ contains
    call h5tget_size_f(comp_type_id,comp_size,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 274 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 278 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tget_size_f'
    error stop
    endif
@@ -802,21 +805,21 @@ contains
    call h5tcreate_f(H5T_COMPOUND_F,INT(2*comp_size, SIZE_T),type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 276 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 280 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcreate_f'
    error stop
    endif
    call h5tinsert_f(type_id,'re',INT(0, SIZE_T),comp_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 277 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 281 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tinsert_f'
    error stop
    endif
    call h5tinsert_f(type_id,'im',INT(comp_size, SIZE_T),comp_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 278 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 282 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tinsert_f'
    error stop
    endif
@@ -840,28 +843,28 @@ contains
    call h5tclose_f(mem_type_id_cs,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 297 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 301 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id_cs,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 298 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 302 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(mem_type_id_cd,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 297 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 301 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id_cd,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 298 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 302 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -871,7 +874,7 @@ contains
    call h5close_f(hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 303 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 307 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5close_f'
    error stop
    endif
@@ -929,7 +932,7 @@ contains
    call h5aexists_f(self%group_id,attr_name,attr_exists,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 355 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 359 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aexists_f'
    error stop
    endif
@@ -957,7 +960,7 @@ contains
    call h5lexists_f(self%group_id,dset_name,link_exists,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 377 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 381 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5lexists_f'
    error stop
    endif
@@ -967,7 +970,7 @@ contains
    call h5oget_info_by_name_f(self%group_id,dset_name,obj_info,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 381 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 385 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5oget_info_by_name_f'
    error stop
    endif
@@ -989,11 +992,284 @@ contains
    !****
 
 
-      subroutine get_attr_shape(self, item_name, shape)
+      function group_names(self) result(names)
+
+         class(hdf5io_t), intent(inout) :: self
+         character(:), allocatable      :: names(:)
+
+         integer(HSIZE_T) :: i
+         integer          :: n_names
+         integer          :: max_len
+         type(C_FUNPTR)   :: op
+         integer          :: ret_value
+         integer          :: hdf_err
+         integer          :: i_name
+
+         ! Iterate to get number of items and maximum name length
+
+         i = 0
+
+         n_names = 0
+         max_len = 0
+
+         op = C_FUNLOC(op_len_)
+
+   call h5literate_f(self%group_id,H5_INDEX_NAME_F,H5_ITER_NATIVE_F,i,op,C_NULL_PTR,ret_value,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 427 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5literate_f'
+   error stop
+   endif
+
+         ! Allocate space
+
+         allocate(character(LEN=max_len)::names(n_names))
+
+         ! Iterate again to store the names
+
+         i = 0
+
+         i_name = 0
+
+         op = C_FUNLOC(op_name_)
+
+   call h5literate_f(self%group_id,H5_INDEX_NAME_F,H5_ITER_NATIVE_F,i,op,C_NULL_PTR,ret_value,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 441 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5literate_f'
+   error stop
+   endif
+
+         ! Finish
+
+         return
+
+      contains
+      
+         function op_len_(loc_id, c_name, c_info, c_data) result(ret_value) bind(C)
+
+            integer(HID_T), value :: loc_id
+            character(C_CHAR)     :: c_name(*)
+            type(C_PTR), value    :: c_info
+            type(C_PTR), value    :: c_data
+            integer(C_INT)        :: ret_value
+
+            type(H5O_INFO_T) :: info
+            integer          :: hdf_err
+
+            ! Check that the link points to the appropriate object type
+
+   call h5oget_info_f(loc_id,info,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 462 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5oget_info_f'
+   error stop
+   endif
+
+            if (info%type == H5O_TYPE_GROUP_F) then
+
+               ! Update counters
+
+               n_names = n_names + 1
+
+               max_len = MAX(c_f_len(c_name), max_len)
+
+            endif
+
+            ! Finish
+
+            ret_value = 0
+
+         end function op_len_
+
+         !****
+
+         function op_name_(loc_id, c_name, c_info, c_data) result(ret_value) bind(C)
+
+            integer(HID_T), value :: loc_id
+            character(C_CHAR)     :: c_name(*)
+            type(C_PTR), value    :: c_info
+            type(C_PTR), value    :: c_data
+            integer(C_INT)        :: ret_value
+
+            type(H5O_INFO_T) :: info
+            integer          :: hdf_err
+
+            ! Check that the link points to the appropriate object type
+
+   call h5oget_info_f(loc_id,info,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 495 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5oget_info_f'
+   error stop
+   endif
+
+            if (info%type == H5O_TYPE_GROUP_F) then
+
+               ! Store the name
+
+               i_name = i_name + 1
+
+               names(i_name) = c_f_string(c_name)
+
+            end if
+
+            ! Finish
+
+            ret_value = 0
+
+         end function op_name_
+
+      end function group_names
+         
+
+      function dset_names(self) result(names)
+
+         class(hdf5io_t), intent(inout) :: self
+         character(:), allocatable      :: names(:)
+
+         integer(HSIZE_T) :: i
+         integer          :: n_names
+         integer          :: max_len
+         type(C_FUNPTR)   :: op
+         integer          :: ret_value
+         integer          :: hdf_err
+         integer          :: i_name
+
+         ! Iterate to get number of items and maximum name length
+
+         i = 0
+
+         n_names = 0
+         max_len = 0
+
+         op = C_FUNLOC(op_len_)
+
+   call h5literate_f(self%group_id,H5_INDEX_NAME_F,H5_ITER_NATIVE_F,i,op,C_NULL_PTR,ret_value,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 427 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5literate_f'
+   error stop
+   endif
+
+         ! Allocate space
+
+         allocate(character(LEN=max_len)::names(n_names))
+
+         ! Iterate again to store the names
+
+         i = 0
+
+         i_name = 0
+
+         op = C_FUNLOC(op_name_)
+
+   call h5literate_f(self%group_id,H5_INDEX_NAME_F,H5_ITER_NATIVE_F,i,op,C_NULL_PTR,ret_value,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 441 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5literate_f'
+   error stop
+   endif
+
+         ! Finish
+
+         return
+
+      contains
+      
+         function op_len_(loc_id, c_name, c_info, c_data) result(ret_value) bind(C)
+
+            integer(HID_T), value :: loc_id
+            character(C_CHAR)     :: c_name(*)
+            type(C_PTR), value    :: c_info
+            type(C_PTR), value    :: c_data
+            integer(C_INT)        :: ret_value
+
+            type(H5O_INFO_T) :: info
+            integer          :: hdf_err
+
+            ! Check that the link points to the appropriate object type
+
+   call h5oget_info_f(loc_id,info,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 462 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5oget_info_f'
+   error stop
+   endif
+
+            if (info%type == H5O_TYPE_DATASET_F) then
+
+               ! Update counters
+
+               n_names = n_names + 1
+
+               max_len = MAX(c_f_len(c_name), max_len)
+
+            endif
+
+            ! Finish
+
+            ret_value = 0
+
+         end function op_len_
+
+         !****
+
+         function op_name_(loc_id, c_name, c_info, c_data) result(ret_value) bind(C)
+
+            integer(HID_T), value :: loc_id
+            character(C_CHAR)     :: c_name(*)
+            type(C_PTR), value    :: c_info
+            type(C_PTR), value    :: c_data
+            integer(C_INT)        :: ret_value
+
+            type(H5O_INFO_T) :: info
+            integer          :: hdf_err
+
+            ! Check that the link points to the appropriate object type
+
+   call h5oget_info_f(loc_id,info,hdf_err)
+   if (hdf_err == -1) then
+      call h5eprint_f(hdf_err)
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 495 of hdf5io_m.fypp'
+      write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5oget_info_f'
+   error stop
+   endif
+
+            if (info%type == H5O_TYPE_DATASET_F) then
+
+               ! Store the name
+
+               i_name = i_name + 1
+
+               names(i_name) = c_f_string(c_name)
+
+            end if
+
+            ! Finish
+
+            ret_value = 0
+
+         end function op_name_
+
+      end function dset_names
+         
+
+   !****
+
+
+      function attr_shape(self, item_name) result(shape)
 
          class(hdf5io_t), intent(inout) :: self
          character(*), intent(in)       :: item_name
-         integer(HSIZE_T), intent(out)  :: shape(:)
+         integer(HSIZE_T), allocatable  :: shape(:)
 
          integer          :: hdf_err
          integer(HID_T)   :: item_id
@@ -1006,7 +1282,7 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 415 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 535 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
@@ -1014,7 +1290,7 @@ contains
    call h5aget_space_f(item_id,space_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 417 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 537 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aget_space_f'
    error stop
    endif
@@ -1022,12 +1298,12 @@ contains
    call h5sget_simple_extent_ndims_f(space_id,rank,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 419 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 539 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sget_simple_extent_ndims_f'
    error stop
    endif
    if (.NOT. (rank == SIZE(shape))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 420 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 540 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "rank == SIZE(shape)" failed with message "rank mismatch"'
    error stop
    end if
@@ -1035,7 +1311,7 @@ contains
    call h5sget_simple_extent_dims_f(space_id,shape,max_shape,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 422 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 542 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sget_simple_extent_dims_f'
    error stop
    endif
@@ -1043,14 +1319,14 @@ contains
    call h5sclose_f(space_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 424 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 544 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 425 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 545 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1059,14 +1335,14 @@ contains
 
          return
 
-      end subroutine get_attr_shape
+      end function attr_shape
 
 
-      subroutine get_dset_shape(self, item_name, shape)
+      function dset_shape(self, item_name) result(shape)
 
          class(hdf5io_t), intent(inout) :: self
          character(*), intent(in)       :: item_name
-         integer(HSIZE_T), intent(out)  :: shape(:)
+         integer(HSIZE_T), allocatable  :: shape(:)
 
          integer          :: hdf_err
          integer(HID_T)   :: item_id
@@ -1079,7 +1355,7 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 415 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 535 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
@@ -1087,7 +1363,7 @@ contains
    call h5dget_space_f(item_id,space_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 417 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 537 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dget_space_f'
    error stop
    endif
@@ -1095,12 +1371,12 @@ contains
    call h5sget_simple_extent_ndims_f(space_id,rank,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 419 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 539 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sget_simple_extent_ndims_f'
    error stop
    endif
    if (.NOT. (rank == SIZE(shape))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 420 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 540 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "rank == SIZE(shape)" failed with message "rank mismatch"'
    error stop
    end if
@@ -1108,7 +1384,7 @@ contains
    call h5sget_simple_extent_dims_f(space_id,shape,max_shape,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 422 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 542 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sget_simple_extent_dims_f'
    error stop
    endif
@@ -1116,14 +1392,14 @@ contains
    call h5sclose_f(space_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 424 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 544 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 425 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 545 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -1132,7 +1408,7 @@ contains
 
          return
 
-      end subroutine get_dset_shape
+      end function dset_shape
 
 
    !****
@@ -1160,21 +1436,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1207,21 +1483,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1254,21 +1530,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1301,21 +1577,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1348,21 +1624,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1395,21 +1671,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1439,14 +1715,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -1456,21 +1732,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1478,7 +1754,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -1530,9 +1806,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1547,21 +1823,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1589,9 +1865,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1606,21 +1882,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1648,9 +1924,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1665,21 +1941,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1707,9 +1983,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1724,21 +2000,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1766,9 +2042,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1783,21 +2059,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1825,9 +2101,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1842,21 +2118,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1885,9 +2161,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -1898,14 +2174,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -1915,21 +2191,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -1937,7 +2213,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -1990,9 +2266,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2007,21 +2283,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2049,9 +2325,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2066,21 +2342,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2108,9 +2384,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2125,21 +2401,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2167,9 +2443,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2184,21 +2460,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2226,9 +2502,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2243,21 +2519,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2285,9 +2561,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2302,21 +2578,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2345,9 +2621,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2358,14 +2634,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -2375,21 +2651,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2397,7 +2673,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -2450,9 +2726,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2467,21 +2743,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2509,9 +2785,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2526,21 +2802,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2568,9 +2844,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2585,21 +2861,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2627,9 +2903,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2644,21 +2920,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2686,9 +2962,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2703,21 +2979,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2745,9 +3021,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2762,21 +3038,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2805,9 +3081,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2818,14 +3094,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -2835,21 +3111,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2857,7 +3133,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -2910,9 +3186,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2927,21 +3203,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -2969,9 +3245,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -2986,21 +3262,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3028,9 +3304,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3045,21 +3321,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3087,9 +3363,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3104,21 +3380,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3146,9 +3422,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3163,21 +3439,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3205,9 +3481,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3222,21 +3498,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3265,9 +3541,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3278,14 +3554,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -3295,21 +3571,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3317,7 +3593,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -3370,9 +3646,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3387,21 +3663,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3429,9 +3705,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3446,21 +3722,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3488,9 +3764,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3505,21 +3781,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3547,9 +3823,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3564,21 +3840,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3606,9 +3882,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3623,21 +3899,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3665,9 +3941,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3682,21 +3958,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3725,9 +4001,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3738,14 +4014,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -3755,21 +4031,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3777,7 +4053,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -3830,9 +4106,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3847,21 +4123,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3889,9 +4165,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3906,21 +4182,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -3948,9 +4224,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -3965,21 +4241,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4007,9 +4283,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4024,21 +4300,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4066,9 +4342,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4083,21 +4359,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4125,9 +4401,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4142,21 +4418,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4185,9 +4461,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4198,14 +4474,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -4215,21 +4491,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4237,7 +4513,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -4290,9 +4566,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4307,21 +4583,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4349,9 +4625,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4366,21 +4642,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4408,9 +4684,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4425,21 +4701,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4467,9 +4743,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4484,21 +4760,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4526,9 +4802,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4543,21 +4819,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4585,9 +4861,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4602,21 +4878,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4645,9 +4921,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -4658,14 +4934,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -4675,21 +4951,21 @@ contains
    call h5aopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aopen_f'
    error stop
    endif
    call h5aread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aread_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -4697,7 +4973,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -4755,21 +5031,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -4802,21 +5078,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -4849,21 +5125,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -4896,21 +5172,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -4943,21 +5219,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -4990,21 +5266,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5034,14 +5310,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -5051,21 +5327,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5073,7 +5349,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -5125,9 +5401,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5142,21 +5418,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5184,9 +5460,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5201,21 +5477,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5243,9 +5519,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5260,21 +5536,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5302,9 +5578,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5319,21 +5595,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5361,9 +5637,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5378,21 +5654,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5420,9 +5696,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5437,21 +5713,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5480,9 +5756,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5493,14 +5769,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -5510,21 +5786,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5532,7 +5808,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -5585,9 +5861,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5602,21 +5878,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5644,9 +5920,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5661,21 +5937,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5703,9 +5979,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5720,21 +5996,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5762,9 +6038,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5779,21 +6055,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5821,9 +6097,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5838,21 +6114,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5880,9 +6156,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5897,21 +6173,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5940,9 +6216,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -5953,14 +6229,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -5970,21 +6246,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -5992,7 +6268,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -6045,9 +6321,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6062,21 +6338,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6104,9 +6380,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6121,21 +6397,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6163,9 +6439,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6180,21 +6456,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6222,9 +6498,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6239,21 +6515,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6281,9 +6557,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6298,21 +6574,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6340,9 +6616,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6357,21 +6633,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6400,9 +6676,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6413,14 +6689,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -6430,21 +6706,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6452,7 +6728,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -6505,9 +6781,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6522,21 +6798,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6564,9 +6840,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6581,21 +6857,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6623,9 +6899,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6640,21 +6916,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6682,9 +6958,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6699,21 +6975,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6741,9 +7017,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6758,21 +7034,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6800,9 +7076,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6817,21 +7093,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6860,9 +7136,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6873,14 +7149,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -6890,21 +7166,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -6912,7 +7188,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -6965,9 +7241,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -6982,21 +7258,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7024,9 +7300,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7041,21 +7317,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7083,9 +7359,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7100,21 +7376,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7142,9 +7418,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7159,21 +7435,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7201,9 +7477,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7218,21 +7494,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7260,9 +7536,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7277,21 +7553,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7320,9 +7596,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7333,14 +7609,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -7350,21 +7626,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7372,7 +7648,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -7425,9 +7701,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7442,21 +7718,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7484,9 +7760,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7501,21 +7777,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7543,9 +7819,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7560,21 +7836,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7602,9 +7878,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7619,21 +7895,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7661,9 +7937,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7678,21 +7954,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7720,9 +7996,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7737,21 +8013,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7780,9 +8056,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7793,14 +8069,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -7810,21 +8086,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7832,7 +8108,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -7885,9 +8161,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7902,21 +8178,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -7944,9 +8220,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -7961,21 +8237,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -8003,9 +8279,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -8020,21 +8296,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -8062,9 +8338,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -8079,21 +8355,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -8121,9 +8397,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -8138,21 +8414,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -8180,9 +8456,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 464 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 584 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -8197,21 +8473,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 474 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 594 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 475 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 595 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 476 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 596 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -8240,9 +8516,9 @@ contains
 
                   ! Check shapes
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
    if (.NOT. (ALL(item_shape == SHAPE(data)))) then
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 510 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 630 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'assertion "ALL(item_shape == SHAPE(data))" failed with message "shape mismatch"'
    error stop
    end if
@@ -8253,14 +8529,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 516 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 636 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 517 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -8270,21 +8546,21 @@ contains
    call h5dopen_f(self%group_id,item_name,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 521 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dopen_f'
    error stop
    endif
    call h5dread_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 522 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 642 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dread_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 523 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -8292,7 +8568,7 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 525 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -8534,7 +8810,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8560,7 +8836,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8586,7 +8862,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8612,7 +8888,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8638,7 +8914,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8664,7 +8940,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8690,7 +8966,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8716,7 +8992,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -8742,7 +9018,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8768,7 +9044,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8794,7 +9070,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8820,7 +9096,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8846,7 +9122,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8872,7 +9148,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8898,7 +9174,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8924,7 +9200,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -8950,7 +9226,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -8976,7 +9252,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9002,7 +9278,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9028,7 +9304,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9054,7 +9330,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9080,7 +9356,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9106,7 +9382,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9132,7 +9408,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -9158,7 +9434,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9184,7 +9460,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9210,7 +9486,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9236,7 +9512,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9262,7 +9538,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9288,7 +9564,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9314,7 +9590,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9340,7 +9616,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -9366,7 +9642,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9392,7 +9668,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9418,7 +9694,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9444,7 +9720,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9470,7 +9746,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9496,7 +9772,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9522,7 +9798,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9548,7 +9824,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -9574,7 +9850,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9600,7 +9876,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9626,7 +9902,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9652,7 +9928,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9678,7 +9954,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9704,7 +9980,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9730,7 +10006,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9756,7 +10032,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -9782,7 +10058,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9808,7 +10084,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9834,7 +10110,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9860,7 +10136,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9886,7 +10162,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9912,7 +10188,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9938,7 +10214,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -9964,7 +10240,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_attr_shape(item_name, item_shape)
+                  item_shape = self%attr_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -10182,7 +10458,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10208,7 +10484,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10234,7 +10510,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10260,7 +10536,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10286,7 +10562,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10312,7 +10588,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10338,7 +10614,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10364,7 +10640,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1)))
 
 
@@ -10390,7 +10666,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10416,7 +10692,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10442,7 +10718,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10468,7 +10744,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10494,7 +10770,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10520,7 +10796,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10546,7 +10822,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10572,7 +10848,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2)))
 
 
@@ -10598,7 +10874,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10624,7 +10900,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10650,7 +10926,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10676,7 +10952,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10702,7 +10978,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10728,7 +11004,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10754,7 +11030,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10780,7 +11056,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3)))
 
 
@@ -10806,7 +11082,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10832,7 +11108,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10858,7 +11134,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10884,7 +11160,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10910,7 +11186,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10936,7 +11212,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10962,7 +11238,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -10988,7 +11264,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4)))
 
 
@@ -11014,7 +11290,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11040,7 +11316,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11066,7 +11342,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11092,7 +11368,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11118,7 +11394,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11144,7 +11420,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11170,7 +11446,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11196,7 +11472,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5)))
 
 
@@ -11222,7 +11498,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11248,7 +11524,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11274,7 +11550,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11300,7 +11576,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11326,7 +11602,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11352,7 +11628,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11378,7 +11654,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11404,7 +11680,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6)))
 
 
@@ -11430,7 +11706,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11456,7 +11732,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11482,7 +11758,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11508,7 +11784,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11534,7 +11810,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11560,7 +11836,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11586,7 +11862,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11612,7 +11888,7 @@ contains
                ! Allocate the item
                   
 
-                  call self%get_dset_shape(item_name, item_shape)
+                  item_shape = self%dset_shape(item_name)
                   allocate(data(item_shape(1),item_shape(2),item_shape(3),item_shape(4),item_shape(5),item_shape(6),item_shape(7)))
 
 
@@ -11650,7 +11926,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -11658,7 +11934,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -11671,7 +11947,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -11679,28 +11955,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -11731,7 +12007,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -11739,7 +12015,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -11752,7 +12028,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -11760,28 +12036,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -11812,7 +12088,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -11820,7 +12096,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -11833,7 +12109,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -11841,28 +12117,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -11893,7 +12169,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -11901,7 +12177,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -11914,7 +12190,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -11922,28 +12198,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -11974,7 +12250,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -11982,7 +12258,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -11995,7 +12271,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12003,28 +12279,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12055,7 +12331,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -12063,7 +12339,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12076,7 +12352,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12084,28 +12360,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12136,14 +12412,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -12151,14 +12427,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -12166,7 +12442,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 703 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 823 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -12176,21 +12452,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -12198,7 +12474,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12206,14 +12482,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -12265,7 +12541,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12273,7 +12549,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12286,7 +12562,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12294,28 +12570,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12347,7 +12623,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12355,7 +12631,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12368,7 +12644,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12376,28 +12652,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12429,7 +12705,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12437,7 +12713,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12450,7 +12726,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12458,28 +12734,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12511,7 +12787,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12519,7 +12795,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12532,7 +12808,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12540,28 +12816,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12593,7 +12869,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12601,7 +12877,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12614,7 +12890,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12622,28 +12898,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12675,7 +12951,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12683,7 +12959,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12696,7 +12972,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12704,28 +12980,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12757,14 +13033,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -12772,14 +13048,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -12787,7 +13063,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12797,21 +13073,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -12819,7 +13095,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12827,14 +13103,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -12887,7 +13163,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12895,7 +13171,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12908,7 +13184,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12916,28 +13192,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -12969,7 +13245,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -12977,7 +13253,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -12990,7 +13266,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -12998,28 +13274,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13051,7 +13327,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13059,7 +13335,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13072,7 +13348,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13080,28 +13356,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13133,7 +13409,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13141,7 +13417,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13154,7 +13430,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13162,28 +13438,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13215,7 +13491,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13223,7 +13499,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13236,7 +13512,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13244,28 +13520,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13297,7 +13573,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13305,7 +13581,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13318,7 +13594,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13326,28 +13602,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13379,14 +13655,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -13394,14 +13670,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -13409,7 +13685,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13419,21 +13695,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -13441,7 +13717,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13449,14 +13725,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -13509,7 +13785,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13517,7 +13793,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13530,7 +13806,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13538,28 +13814,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13591,7 +13867,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13599,7 +13875,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13612,7 +13888,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13620,28 +13896,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13673,7 +13949,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13681,7 +13957,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13694,7 +13970,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13702,28 +13978,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13755,7 +14031,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13763,7 +14039,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13776,7 +14052,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13784,28 +14060,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13837,7 +14113,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13845,7 +14121,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13858,7 +14134,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13866,28 +14142,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -13919,7 +14195,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -13927,7 +14203,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -13940,7 +14216,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -13948,28 +14224,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14001,14 +14277,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -14016,14 +14292,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -14031,7 +14307,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14041,21 +14317,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -14063,7 +14339,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14071,14 +14347,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -14131,7 +14407,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14139,7 +14415,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14152,7 +14428,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14160,28 +14436,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14213,7 +14489,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14221,7 +14497,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14234,7 +14510,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14242,28 +14518,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14295,7 +14571,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14303,7 +14579,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14316,7 +14592,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14324,28 +14600,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14377,7 +14653,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14385,7 +14661,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14398,7 +14674,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14406,28 +14682,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14459,7 +14735,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14467,7 +14743,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14480,7 +14756,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14488,28 +14764,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14541,7 +14817,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14549,7 +14825,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14562,7 +14838,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14570,28 +14846,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14623,14 +14899,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -14638,14 +14914,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -14653,7 +14929,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14663,21 +14939,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -14685,7 +14961,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14693,14 +14969,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -14753,7 +15029,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14761,7 +15037,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14774,7 +15050,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14782,28 +15058,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14835,7 +15111,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14843,7 +15119,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14856,7 +15132,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14864,28 +15140,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14917,7 +15193,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -14925,7 +15201,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -14938,7 +15214,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -14946,28 +15222,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -14999,7 +15275,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15007,7 +15283,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15020,7 +15296,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15028,28 +15304,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15081,7 +15357,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15089,7 +15365,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15102,7 +15378,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15110,28 +15386,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15163,7 +15439,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15171,7 +15447,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15184,7 +15460,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15192,28 +15468,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15245,14 +15521,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -15260,14 +15536,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -15275,7 +15551,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15285,21 +15561,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -15307,7 +15583,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15315,14 +15591,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -15375,7 +15651,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15383,7 +15659,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15396,7 +15672,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15404,28 +15680,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15457,7 +15733,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15465,7 +15741,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15478,7 +15754,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15486,28 +15762,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15539,7 +15815,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15547,7 +15823,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15560,7 +15836,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15568,28 +15844,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15621,7 +15897,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15629,7 +15905,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15642,7 +15918,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15650,28 +15926,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15703,7 +15979,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15711,7 +15987,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15724,7 +16000,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15732,28 +16008,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15785,7 +16061,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15793,7 +16069,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -15806,7 +16082,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -15814,28 +16090,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15867,14 +16143,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -15882,14 +16158,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -15897,7 +16173,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -15907,21 +16183,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -15929,7 +16205,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -15937,14 +16213,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -15997,7 +16273,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16005,7 +16281,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16018,7 +16294,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -16026,28 +16302,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16079,7 +16355,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16087,7 +16363,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16100,7 +16376,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -16108,28 +16384,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16161,7 +16437,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16169,7 +16445,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16182,7 +16458,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -16190,28 +16466,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16243,7 +16519,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16251,7 +16527,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16264,7 +16540,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -16272,28 +16548,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16325,7 +16601,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16333,7 +16609,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16346,7 +16622,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -16354,28 +16630,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16407,7 +16683,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16415,7 +16691,7 @@ contains
    call h5pcreate_f(H5P_ATTRIBUTE_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 641 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 761 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16428,7 +16704,7 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,acpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 656 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 776 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
@@ -16436,28 +16712,28 @@ contains
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16489,14 +16765,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -16504,14 +16780,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -16519,7 +16795,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -16529,21 +16805,21 @@ contains
    call h5acreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5acreate_f'
    error stop
    endif
    call h5awrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5awrite_f'
    error stop
    endif
    call h5aclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5aclose_f'
    error stop
    endif
@@ -16551,7 +16827,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16559,14 +16835,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -16618,7 +16894,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -16626,7 +16902,7 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16639,7 +16915,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -16647,28 +16923,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16699,7 +16975,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -16707,7 +16983,7 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16720,7 +16996,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -16728,28 +17004,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16780,7 +17056,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -16788,7 +17064,7 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16801,7 +17077,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -16809,28 +17085,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16861,7 +17137,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -16869,7 +17145,7 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16882,7 +17158,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -16890,28 +17166,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -16942,7 +17218,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -16950,7 +17226,7 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -16963,7 +17239,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -16971,28 +17247,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17023,7 +17299,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 637 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 757 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -17031,7 +17307,7 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
@@ -17044,7 +17320,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17052,28 +17328,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17104,14 +17380,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -17119,14 +17395,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -17134,7 +17410,7 @@ contains
    call h5screate_f(H5S_SCALAR_F,dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 703 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 823 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_f'
    error stop
    endif
@@ -17144,21 +17420,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -17166,7 +17442,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17174,14 +17450,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -17233,7 +17509,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17241,21 +17517,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,1,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17268,7 +17544,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17276,28 +17552,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17329,7 +17605,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17337,21 +17613,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,1,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17364,7 +17640,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17372,28 +17648,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17425,7 +17701,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17433,21 +17709,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,1,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17460,7 +17736,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17468,28 +17744,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17521,7 +17797,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17529,21 +17805,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,1,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17556,7 +17832,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17564,28 +17840,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17617,7 +17893,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17625,21 +17901,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,1,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17652,7 +17928,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17660,28 +17936,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17713,7 +17989,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17721,21 +17997,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,1,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17748,7 +18024,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17756,28 +18032,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17809,14 +18085,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -17824,14 +18100,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -17839,7 +18115,7 @@ contains
    call h5screate_simple_f(1,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17849,21 +18125,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -17871,7 +18147,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -17879,14 +18155,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -17939,7 +18215,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -17947,21 +18223,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,2,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -17974,7 +18250,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -17982,28 +18258,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18035,7 +18311,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18043,21 +18319,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,2,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18070,7 +18346,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18078,28 +18354,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18131,7 +18407,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18139,21 +18415,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,2,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18166,7 +18442,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18174,28 +18450,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18227,7 +18503,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18235,21 +18511,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,2,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18262,7 +18538,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18270,28 +18546,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18323,7 +18599,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18331,21 +18607,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,2,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18358,7 +18634,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18366,28 +18642,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18419,7 +18695,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18427,21 +18703,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,2,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18454,7 +18730,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18462,28 +18738,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18515,14 +18791,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -18530,14 +18806,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -18545,7 +18821,7 @@ contains
    call h5screate_simple_f(2,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18555,21 +18831,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -18577,7 +18853,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18585,14 +18861,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -18645,7 +18921,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18653,21 +18929,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,3,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18680,7 +18956,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18688,28 +18964,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18741,7 +19017,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18749,21 +19025,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,3,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18776,7 +19052,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18784,28 +19060,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18837,7 +19113,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18845,21 +19121,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,3,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18872,7 +19148,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18880,28 +19156,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -18933,7 +19209,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -18941,21 +19217,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,3,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -18968,7 +19244,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -18976,28 +19252,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19029,7 +19305,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19037,21 +19313,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,3,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19064,7 +19340,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19072,28 +19348,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19125,7 +19401,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19133,21 +19409,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,3,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19160,7 +19436,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19168,28 +19444,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19221,14 +19497,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -19236,14 +19512,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -19251,7 +19527,7 @@ contains
    call h5screate_simple_f(3,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19261,21 +19537,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -19283,7 +19559,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19291,14 +19567,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -19351,7 +19627,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19359,21 +19635,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,4,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19386,7 +19662,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19394,28 +19670,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19447,7 +19723,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19455,21 +19731,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,4,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19482,7 +19758,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19490,28 +19766,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19543,7 +19819,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19551,21 +19827,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,4,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19578,7 +19854,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19586,28 +19862,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19639,7 +19915,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19647,21 +19923,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,4,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19674,7 +19950,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19682,28 +19958,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19735,7 +20011,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19743,21 +20019,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,4,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19770,7 +20046,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19778,28 +20054,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19831,7 +20107,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19839,21 +20115,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,4,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -19866,7 +20142,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -19874,28 +20150,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19927,14 +20203,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -19942,14 +20218,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -19957,7 +20233,7 @@ contains
    call h5screate_simple_f(4,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -19967,21 +20243,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -19989,7 +20265,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -19997,14 +20273,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -20057,7 +20333,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20065,21 +20341,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,5,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20092,7 +20368,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20100,28 +20376,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20153,7 +20429,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20161,21 +20437,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,5,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20188,7 +20464,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20196,28 +20472,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20249,7 +20525,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20257,21 +20533,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,5,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20284,7 +20560,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20292,28 +20568,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20345,7 +20621,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20353,21 +20629,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,5,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20380,7 +20656,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20388,28 +20664,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20441,7 +20717,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20449,21 +20725,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,5,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20476,7 +20752,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20484,28 +20760,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20537,7 +20813,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20545,21 +20821,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,5,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20572,7 +20848,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20580,28 +20856,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20633,14 +20909,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -20648,14 +20924,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -20663,7 +20939,7 @@ contains
    call h5screate_simple_f(5,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20673,21 +20949,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -20695,7 +20971,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20703,14 +20979,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -20763,7 +21039,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20771,21 +21047,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,6,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20798,7 +21074,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20806,28 +21082,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20859,7 +21135,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20867,21 +21143,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,6,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20894,7 +21170,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20902,28 +21178,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -20955,7 +21231,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -20963,21 +21239,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,6,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -20990,7 +21266,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -20998,28 +21274,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21051,7 +21327,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21059,21 +21335,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,6,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21086,7 +21362,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21094,28 +21370,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21147,7 +21423,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21155,21 +21431,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,6,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21182,7 +21458,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21190,28 +21466,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21243,7 +21519,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21251,21 +21527,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,6,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21278,7 +21554,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21286,28 +21562,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21339,14 +21615,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -21354,14 +21630,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -21369,7 +21645,7 @@ contains
    call h5screate_simple_f(6,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21379,21 +21655,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -21401,7 +21677,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21409,14 +21685,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
@@ -21469,7 +21745,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21477,21 +21753,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,7,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21504,7 +21780,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21512,28 +21788,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21565,7 +21841,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21573,21 +21849,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,7,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21600,7 +21876,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21608,28 +21884,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21661,7 +21937,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21669,21 +21945,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,7,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21696,7 +21972,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21704,28 +21980,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21757,7 +22033,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21765,21 +22041,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,7,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21792,7 +22068,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21800,28 +22076,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21853,7 +22129,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21861,21 +22137,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,7,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21888,7 +22164,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21896,28 +22172,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -21949,7 +22225,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 635 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 755 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -21957,21 +22233,21 @@ contains
    call h5pcreate_f(H5P_DATASET_CREATE_F,plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 643 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 763 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pcreate_f'
    error stop
    endif
    call h5pset_chunk_f(plist_id,7,INT(SHAPE(data), HSIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 645 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 765 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_chunk_f'
    error stop
    endif
    call h5pset_deflate_f(plist_id,self%comp_level,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 646 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 766 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pset_deflate_f'
    error stop
    endif
@@ -21984,7 +22260,7 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err,dcpl_id=plist_id)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 658 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 778 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
@@ -21992,28 +22268,28 @@ contains
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 661 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 781 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5pclose_f(plist_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 662 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 782 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5pclose_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 663 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 783 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 664 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 784 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -22045,14 +22321,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 694 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 814 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(mem_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 695 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 815 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -22060,14 +22336,14 @@ contains
    call h5tcopy_f(H5T_NATIVE_CHARACTER,file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 697 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 817 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tcopy_f'
    error stop
    endif
    call h5tset_size_f(file_type_id,LEN(data, SIZE_T),hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 698 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 818 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tset_size_f'
    error stop
    endif
@@ -22075,7 +22351,7 @@ contains
    call h5screate_simple_f(7,INT(SHAPE(data), HSIZE_T),dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 701 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 821 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5screate_simple_f'
    error stop
    endif
@@ -22085,21 +22361,21 @@ contains
    call h5dcreate_f(self%group_id,item_name,file_type_id,dspace_id,item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 708 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 828 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dcreate_f'
    error stop
    endif
    call h5dwrite_f(item_id,mem_type_id,data_ptr,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 709 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 829 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dwrite_f'
    error stop
    endif
    call h5dclose_f(item_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 710 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 830 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5dclose_f'
    error stop
    endif
@@ -22107,7 +22383,7 @@ contains
    call h5sclose_f(dspace_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 712 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 832 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5sclose_f'
    error stop
    endif
@@ -22115,14 +22391,14 @@ contains
    call h5tclose_f(mem_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 714 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 834 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
    call h5tclose_f(file_type_id,hdf_err)
    if (hdf_err == -1) then
       call h5eprint_f(hdf_err)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 715 of hdf5io_m.fypp'
+   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line 835 of hdf5io_m.fypp'
       write(UNIT=ERROR_UNIT, FMT=*) 'error in call to h5tclose_f'
    error stop
    endif
