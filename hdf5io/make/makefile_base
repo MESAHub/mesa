@@ -15,7 +15,8 @@ include $(MESA_DIR)/utils/makefile_header
 SRCS = \
    hdf5io_lib.f90 \
    kinds_m.f90 \
-   hdf5io_m.f90
+   hdf5io_m.f90 \
+   cinter_m.f90
 
 #################################################################
 #
