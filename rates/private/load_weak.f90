@@ -592,171 +592,52 @@
 
         subroutine read_hd5_file
 
-          use hdf5
-          use iso_c_binding
+          use hdf5io_lib
 
-          character (len=256) :: filename
-          integer(hid_t) :: file_id, dset_id, dspace_id
-          type(h5o_info_t) :: object_info
-          integer(hsize_t), dimension(2) :: data_dims, max_dims
-          integer :: num_T9, num_lYeRho
+          character (len=256)                 :: filename
+          type(hdf5io_t)                      :: hi
           real(dp), allocatable, dimension(:) :: T9s, lYeRhos
-          real(dp), allocatable, dimension(:,:) :: tbl
-          logical :: has_cc
-
-          type(weaklib_rate_table) :: table
+          integer                             :: num_T9, num_lYeRho
+          logical                             :: has_cc
+          type(weaklib_rate_table)            :: table
 
           logical, parameter :: dbg = .false.
-
-          ! open hdf5 interface
-          call h5open_f(ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5open'
 
           filename = trim(dir) // '/' // trim(rate_fname)
           write(*,*) 'reading user weak rate file ', trim(filename)
 
           ! open file (read-only)
-          call h5fopen_f(filename, H5F_ACC_RDONLY_F, file_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5fopen'
 
-          ! get dataset size
+          hi = hdf5io_t(filename, OPEN_FILE)
 
-          data_dims = 0
+          ! read axis data
 
-          call h5dopen_f(file_id, "T9s", dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dopen (T9s)'
+          call hi% alloc_read_dset('T9s', T9s)
+          num_T9 = SIZE(T9s)
 
-          call h5dget_space_f(dset_id, dspace_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dget_space'
-
-          call h5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5sget_simple_extent_dims_f'
-          if (ierr /= 1) then
-             if (dbg) write(*,*) 'T9s array should have dim 1; has dim = ', ierr
-             ierr = -1
-             return
-          end if
-
-          allocate(T9s(data_dims(1)))
-          call h5dread_f(dset_id, H5T_IEEE_F64LE, T9s, data_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dread (T9s)'
-
-          call h5dclose_f(dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called hd5close (T9s)'
-
-          data_dims = 0
-
-          call h5dopen_f(file_id, "lYeRhos", dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dopen (lYeRhos)'
-
-          call h5dget_space_f(dset_id, dspace_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dget_space'
-
-          call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5sget_simple_extent_dims_f'
-          if (ierr /= 1) then
-             if (dbg) write(*,*) 'lYeRhos array should have dim 1; has dim = ', ierr
-             ierr = -1
-             return
-          end if
-
-          allocate(lYeRhos(data_dims(1)))
-          call h5dread_f(dset_id, H5T_IEEE_F64LE, lYeRhos, data_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dread (lYeRhos)'
-
-          call h5dclose_f(dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called hd5close (lYeRhos)'
-
+          call hi% alloc_read_dset('lYeRhos', lYeRhos)
+          num_lYeRho = SIZE(lYeRhos)
 
           ! check if table has coulomb corrections
-          has_cc = .true.
-          ! we know we may not find them, so silence errors
-          call h5eset_auto_f(0, ierr)
 
-          call h5oget_info_by_name_f(file_id, "delta_Q", object_info, ierr)
-          if (ierr /= 0) has_cc = .false.
-
-          call h5oget_info_by_name_f(file_id, "Vs", object_info, ierr)
-          if (ierr /= 0) has_cc = .false.
-
-          ! un-silence errors
-          call h5eset_auto_f(1, ierr)
+          has_cc = hi% dset_exists('delta_Q') .AND. hi% dset_exists('Vs')
+          
+          ! create the table
 
           table = weaklib_rate_table(T9s, lYeRhos, has_cc)
 
-          allocate(tbl(size(T9s), size(lYeRhos)))
+          ! read data into it
 
-          data_dims(1) = size(T9s)
-          data_dims(2) = size(lYeRhos)
-
-          call h5dopen_f(file_id, "ldecay", dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dopen (ldecay)'
-
-          call h5dread_f(dset_id, H5T_IEEE_F64LE, tbl, data_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dread (ldecay)'
-
-          call h5dclose_f(dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called hd5close (ldecay)'
-
-          table % data(1, 1:size(T9s), 1:size(lYeRhos), table% i_ldecay) = tbl
-
-
-          call h5dopen_f(file_id, "lcapture", dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dopen (lcapture)'
-
-          call h5dread_f(dset_id, H5T_IEEE_F64LE, tbl, data_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dread (lcapture)'
-
-          call h5dclose_f(dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called hd5close (lcapture)'
-
-          table % data(1, 1:size(T9s), 1:size(lYeRhos), table% i_lcapture) = tbl
-
-
-          call h5dopen_f(file_id, "lneutrino", dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dopen (lneutrino)'
-
-          call h5dread_f(dset_id, H5T_IEEE_F64LE, tbl, data_dims, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5dread (lneutrino)'
-
-          call h5dclose_f(dset_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called hd5close (lneutrino)'
-
-          table % data(1, 1:size(T9s), 1:size(lYeRhos), table% i_lneutrino) = tbl
-
+          call hi% read_dset('ldecay', table% data(1, 1:num_T9, 1:num_lYeRho, table% i_ldecay))
+          call hi% read_dset('lcapture', table% data(1, 1:num_T9, 1:num_lYeRho, table% i_lcapture))
+          call hi% read_dset('lneutrino', table% data(1, 1:num_T9, 1:num_lYeRho, table% i_lneutrino))
 
           if (has_cc) then
-             call h5dopen_f(file_id, "delta_Q", dset_id, ierr)
-             call h5dread_f(dset_id, H5T_IEEE_F64LE, tbl, data_dims, ierr)
-             call h5dclose_f(dset_id, ierr)
-             table % data(1, 1:size(T9s), 1:size(lYeRhos), table% i_delta_Q) = tbl
-
-             call h5dopen_f(file_id, "Vs", dset_id, ierr)
-             call h5dread_f(dset_id, H5T_IEEE_F64LE, tbl, data_dims, ierr)
-             call h5dclose_f(dset_id, ierr)
-             table % data(1, 1:size(T9s), 1:size(lYeRhos), table% i_Vs) = tbl
+             call hi% read_dset('delta_Q', table% data(1, 1:num_T9, 1:num_lYeRho, table% i_delta_Q))
+             call hi% read_dset('Vs', table% data(1, 1:num_T9, 1:num_lYeRho, table% i_Vs))
           end if
+
+          ! store the table
 
           allocate(weak_reactions_tables(ir)% t, source=table)
           associate(t => weak_reactions_tables(ir) % t)
@@ -765,14 +646,8 @@
           end associate
 
           ! close file
-          call h5fclose_f(file_id, ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5fclose'
 
-          ! close interface
-          call h5close_f(ierr)
-          if (ierr < 0) return
-          if (dbg) write(*,*) 'successfully called h5close'
+          call hi% final()
 
         end subroutine read_hd5_file
 
