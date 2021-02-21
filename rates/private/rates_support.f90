@@ -51,14 +51,17 @@
          
          integer :: imax, iat0, iat, ir, i, j, irho
          integer, parameter :: mp = 4
-         real(dp) :: dtab(num_reactions), ddtab(num_reactions), fac
-         real(dp), pointer :: rattab_f(:,:,:)
-         real(dp) :: logtemp
+         real(dp), allocatable :: dtab(:), ddtab(:)
+         real(dp), pointer :: rattab_f(:,:,:) 
+         real(dp) :: logtemp, fac
          
          include 'formats'
-         
+
          ierr = 0
-         
+
+         nullify(rattab_f)
+         allocate(dtab(num_reactions), ddtab(num_reactions))
+
          rattab_f(1:4,1:nT8s,1:num_reactions) => rattab_f1(1:4*nT8s*num_reactions)
 
          do i = 1,num_reactions
@@ -122,7 +125,7 @@
 
          do i=1,num_reactions
             if(raw_rate_factor(i).gt. max_safe_rate_for_any_temp) then
-               write(*,*) "Rate has exceeded a sensible limit for reaction rates"
+               write(*,*) "Rate has exceeded any sensible limit for a reaction rate"
                write(*,*) trim(reaction_Name(reaction_id(i)))
                write(*,*) raw_rate_factor(i),max_safe_rate_for_any_temp,raw_rate_factor(i)/max_safe_rate_for_any_temp
                call mesa_error(__FILE__,__LINE__)
@@ -139,6 +142,8 @@
          if(logtemp .ge. max_safe_logT_for_rates) then
             rate_raw_dT(1:num_reactions) = 0d0
          end if
+
+         nullify(rattab_f)
          
          contains
          
@@ -198,8 +203,8 @@
          
          integer :: i, j, operr, ir, num_to_add_to_cache,thread_num
          real(dp) :: logT, btemp
-         real(dp), pointer :: work(:), work1(:), f1(:), rattab_f(:,:,:)
-         integer, pointer :: reaction_id(:)
+         real(dp), pointer :: work(:)=>null(), work1(:)=>null(), f1(:)=>null(), rattab_f(:,:,:)=>null()
+         integer, pointer :: reaction_id(:) =>null()
 
          logical :: all_okay, a_okay, all_in_cache
          
@@ -302,6 +307,8 @@
                call interp_m3q(logttab, nrattab, f1, mp_work_size, work1,  &
                         'rates do_make_rate_tables', operr)
                if (operr /= 0) ierr = -1
+               nullify(work1)
+               nullify(f1)
             end do
 !$OMP END PARALLEL DO
             deallocate(work)

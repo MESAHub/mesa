@@ -1924,7 +1924,11 @@
          type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
-         if (khi == -1) khi = size(ptr,dim=1)
+         if (khi_in == -1) then
+            khi = size(ptr,dim=1)
+         else
+            khi = khi_in
+         end if
          do k=klo,khi
             call set_nan(ptr(k)% val)
             call fill_with_NaNs(ptr(k)% d1Array)
@@ -1936,7 +1940,11 @@
          type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
-         if (khi == -1) khi = size(ptr,dim=1)
+         if (khi_in == -1) then
+            khi = size(ptr,dim=1)
+         else
+            khi = khi_in
+         end if
          do k=klo,khi
             ptr(k)% val = 0d0
             ptr(k)% d1Array(:) = 0d0
