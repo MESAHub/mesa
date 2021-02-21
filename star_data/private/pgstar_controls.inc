@@ -31,7 +31,8 @@
          pgstar_model_lw, &
          pgstar_xaxis_label_lw, &
          pgstar_left_yaxis_label_lw, &
-         pgstar_right_yaxis_label_lw
+         pgstar_right_yaxis_label_lw, &
+         pgstar_profile_line_style
 
       real :: &
          pgstar_grid_title_scale, &

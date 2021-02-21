@@ -1715,6 +1715,8 @@
          else if (s% use_zero_Pgas_outer_BC) then
             P_rad = Radiation_Pressure(s% T_start(1))
             call set_momentum_BC(P_rad, 0d0, 0d0, 0d0, 0d0, ierr)
+         else if (s% use_fixed_Psurf_outer_BC) then
+            call set_momentum_BC(s% fixed_Psurf, 0d0, 0d0, 0d0, 0d0, ierr)
          else if (s% use_momentum_outer_BC) then
             call set_momentum_BC( &
                P_surf, dlnPsurf_dL, dlnPsurf_dlnR, &

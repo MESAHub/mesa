@@ -1901,7 +1901,16 @@
             case(p_w)
                if (s% TDC_flag) then
                   val = s% w(k)
+               else if (s% RSP_flag) then
+                  val = s% RSP_w(k)
                end if               
+            case(p_log_w)
+               if (s% TDC_flag) then
+                  val = s% w(k)
+               else if (s% RSP_flag) then
+                  val = s% RSP_w(k)
+               end if    
+               val = safe_log10(val)           
             case(p_et)
                if (s% TDC_flag) then
                   val = s% w(k)**2

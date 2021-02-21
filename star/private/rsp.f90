@@ -691,7 +691,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: i, k
-         real(dp) :: dr_div_cs, r_in, r_00, max_dt, target_dt, total_radiation
+         real(dp) :: dr_div_cs, r_in, r_00, max_dt, target_dt, total_radiation, rsp_max_dt
 
          include 'formats'
          
@@ -699,9 +699,11 @@
       
          !call rsp_dump_for_debug(s)
          !stop 'rsp_dump_for_debug'
-                  
+         rsp_max_dt = s% rsp_max_dt
+         if (rsp_max_dt <= 0d0) rsp_max_dt = 1d99
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
+            rsp_max_dt, &
             s% dt*s% max_timestep_factor)
          s% dt = target_dt
 

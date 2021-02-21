@@ -4500,6 +4500,19 @@
     fixed_vsurf = 0
 
 
+      ! use_fixed_Psurf_outer_BC
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! fixed_Psurf
+      ! ~~~~~~~~~~~
+
+      ! P at outer boundary of model is set to be fixed_Psurf
+
+      ! ::
+
+    use_fixed_Psurf_outer_BC = .false.
+    fixed_Psurf = 0
+
+
       ! use_fixed_L_for_BB_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! fixed_L_for_BB_outer_BC

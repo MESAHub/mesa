@@ -482,7 +482,7 @@
 
     surface_extra_Pgas, use_atm_PT_at_center_of_surface_cell, &
     use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, use_T_black_body_outer_BC, &
-    fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
+    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
     use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
@@ -1287,6 +1287,8 @@
  s% use_T_black_body_outer_BC = use_T_black_body_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
+ s% fixed_Psurf = fixed_Psurf
+ s% use_fixed_Psurf_outer_BC = use_fixed_Psurf_outer_BC
  s% use_fixed_L_for_BB_outer_BC = use_fixed_L_for_BB_outer_BC
  s% tau_for_L_BB = tau_for_L_BB
  s% fixed_L_for_BB_outer_BC = fixed_L_for_BB_outer_BC
@@ -2929,6 +2931,8 @@
  use_T_black_body_outer_BC = s% use_T_black_body_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
+ fixed_Psurf = s% fixed_Psurf
+ use_fixed_Psurf_outer_BC = s% use_fixed_Psurf_outer_BC
  use_fixed_L_for_BB_outer_BC = s% use_fixed_L_for_BB_outer_BC
  fixed_L_for_BB_outer_BC = s% fixed_L_for_BB_outer_BC
  tau_for_L_BB = s% tau_for_L_BB
