@@ -6,9 +6,10 @@
    inlist_names(1) = 'inlist_star1_header' 
    inlist_names(2) = 'inlist_star2_header'
    
+   ! for restart, set restart_flag true, set restart filenames, then ./rn (not ./re)
    !restart_flag = .true.
-   restart_names(1) = 'photos1/x050'
-   restart_names(2) = 'photos2/x150'
+   restart_names(1) = 'x050'
+   restart_names(2) = 'x150'
    
    which_for_pgstar = -1 ! do both
    

@@ -88,6 +88,7 @@
          
          logical :: continue_evolve_loop
          type (star_info), pointer :: s
+         character (len=strlen) :: restart_filename
             
          logical, parameter :: pgstar_ok = .true.
          logical, parameter :: dbg = .false.
@@ -99,12 +100,11 @@
 
          11 format(a35, f20.10)
 
+         restart_filename = 'restart_photo'
          call start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
-            id, restart, pgstar_ok, dbg, &
-            extras_controls, &
-            ierr, &
-            inlist_fname_arg)
+            id, restart, restart_filename, pgstar_ok, dbg, &
+            extras_controls, ierr, inlist_fname_arg)
          if (failed('do_before_evolve_loop',ierr)) return
 
          call star_ptr(id, s, ierr)
@@ -128,16 +128,14 @@
       
       subroutine start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
-            id, restart, pgstar_ok, dbg, &
-            extras_controls, &
-            ierr, &
-            inlist_fname_arg)
+            id, restart, restart_filename, pgstar_ok, dbg, &
+            extras_controls, ierr, inlist_fname_arg)
             
          logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
          integer, intent(inout) :: id ! input if not do_alloc_star
          logical, intent(inout) :: restart ! input if not do_alloc_star
          logical, intent(in) :: pgstar_ok, dbg
-         character (len=*) :: inlist_fname_arg
+         character (len=*) :: restart_filename, inlist_fname_arg
          optional inlist_fname_arg
          integer, intent(out) :: ierr
          
@@ -163,7 +161,7 @@
          call do_before_evolve_loop( &
               do_alloc_star, okay_to_restart, restart, pgstar_ok, &
               null_binary_controls, extras_controls, &
-              id_from_read_star_job, inlist_fname, "restart_photo", &
+              id_from_read_star_job, inlist_fname, restart_filename, &
               dbg, 0, id, ierr)
          if (failed('do_before_evolve_loop',ierr)) return
 
@@ -391,7 +389,8 @@
          if (failed('pgstar_env_check',ierr)) return        
 
          ! testing module-level (atm/eos/kap/net) partials requires single-threaded execution
-         if (s% solver_test_atm_partials .or. s% solver_test_eos_partials .or. s% solver_test_kap_partials .or. s% solver_test_net_partials) then
+         if (s% solver_test_atm_partials .or. s% solver_test_eos_partials .or. &
+               s% solver_test_kap_partials .or. s% solver_test_net_partials) then
             if (s% solver_test_partials_k > 0 .and. s% solver_test_partials_dx_0 > 0) then
                write(*,*) 'Forcing single-thread mode for testing of module-level partials'
                call omp_set_num_threads(1)

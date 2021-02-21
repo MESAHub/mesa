@@ -1128,6 +1128,7 @@
          do_not_need_atm_Psurf = &
             s% use_compression_outer_BC .or. &
             s% use_zero_Pgas_outer_BC .or. &
+            s% use_fixed_Psurf_outer_BC .or. &
             s% use_fixed_vsurf_outer_BC .or. &
             (s% use_momentum_outer_BC .and. trim(s% atm_option) == 'fixed_Psurf')
             

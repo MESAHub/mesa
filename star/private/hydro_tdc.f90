@@ -36,7 +36,7 @@
 
       private
       public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, &
-         get_Eq_cell, get_Uq_face, set_w_start_vars, reset_w_using_L
+         compute_Eq_cell, compute_Uq_face, set_w_start_vars, reset_w_using_L
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &
@@ -143,7 +143,7 @@
       subroutine get1_turbulent_energy_eqn( &  
             s, k, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: calc_Pt_18_tw, set_energy_eqn_scal
+         use star_utils, only: set_energy_eqn_scal
          use accurate_sum_auto_diff_18var_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -288,7 +288,7 @@
          subroutine setup_dt_Eq_18(ierr) ! erg g^-1
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: Eq_cell
-            Eq_cell = get_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
+            Eq_cell = compute_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
             dt_Eq_18 = dt*Eq_cell
          end subroutine setup_dt_Eq_18
@@ -312,12 +312,12 @@
          real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
          include 'formats'
          ierr = 0
-         r_00 = wrap_r_00(s, k)
+         r_00 = wrap_opt_time_center_r_00(s, k)
          cgrav_00 = s% cgrav(k)
          m_00 = s% m(k)
          d_00 = wrap_d_00(s, k)
          P_00 = wrap_P_00(s, k)
-         r_p1 = wrap_r_p1(s, k)
+         r_p1 = wrap_opt_time_center_r_p1(s, k)
          if (k < s% nz) then
             cgrav_p1 = s% cgrav(k+1)
             m_p1 = s% m(k+1)
@@ -341,7 +341,7 @@
          type(auto_diff_real_18var_order1) :: r_00, P_00, d_00, P_m1, d_m1
          include 'formats'
          ierr = 0
-         r_00 = wrap_r_00(s, k)
+         r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
          P_00 = wrap_P_00(s, k)
          if (k > 1) then
@@ -375,7 +375,7 @@
          Hp_face = compute_Hp_face(s, k, ierr)
          if (ierr /= 0) return
          
-         r_00 = wrap_r_00(s, k)
+         r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
          P_00 = wrap_P_00(s, k)
          Cp_00 = wrap_Cp_00(s, k)
@@ -387,7 +387,7 @@
          lnT_00%val = s% lnT(k)
          lnT_00% d1Array(i_lnT_00) = 1d0
          
-         r_m1 = wrap_r_m1(s, k)
+         r_m1 = wrap_opt_time_center_r_m1(s, k)
          d_m1 = wrap_d_m1(s, k)
          P_m1 = wrap_P_m1(s, k)
          Cp_m1 = wrap_Cp_m1(s, k)
@@ -453,10 +453,10 @@
          type(auto_diff_real_18var_order1) :: v_00, v_p1, r_00, r_p1
          include 'formats'
          ierr = 0
-         v_00 = wrap_v_00(s,k)
-         v_p1 = wrap_v_p1(s,k)
-         r_00 = wrap_r_00(s,k)
-         r_p1 = wrap_r_p1(s,k)
+         r_00 = wrap_opt_time_center_r_00(s,k)
+         v_00 = wrap_opt_time_center_v_00(s,k)
+         r_p1 = wrap_opt_time_center_r_p1(s,k)
+         v_p1 = wrap_opt_time_center_v_p1(s,k)
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
       end function compute_d_v_div_r
       
@@ -485,8 +485,8 @@
          d_00 = wrap_d_00(s,k)
          f = (16d0/3d0)*pi*ALFA*ALFAM/s% dm(k)  
          w_rho2 = w_00*pow2(d_00)
-         r_00 = wrap_r_00(s,k)
-         r_p1 = wrap_r_p1(s,k)
+         r_00 = wrap_opt_time_center_r_00(s,k)
+         r_p1 = wrap_opt_time_center_r_p1(s,k)
          r6_face = 0.5d0*(pow6(r_00) + pow6(r_p1))
          Chi_cell = f*w_rho2*r6_face*d_v_div_r*Hp_cell
          ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
@@ -496,7 +496,7 @@
       end function compute_Chi_cell
 
       
-      function get_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
+      function compute_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1) :: Eq_cell
@@ -514,11 +514,10 @@
          if (ierr /= 0) return
          Eq_cell = Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
          s% Eq(k) = Eq_cell%val
-      end function get_Eq_cell
+      end function compute_Eq_cell
 
 
-      function get_Uq_face(s, k, ierr) result(Uq_face) ! cm s^-2, acceleration
-         ! Inputs
+      function compute_Uq_face(s, k, ierr) result(Uq_face) ! cm s^-2, acceleration
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1) :: Uq_face
@@ -534,11 +533,11 @@
          else
             Chi_out = 0d0
          end if
-         r_00 = wrap_r_00(s,k)
+         r_00 = wrap_opt_time_center_r_00(s,k)
          Uq_face = 4d0*pi*(Chi_out - Chi_00)/(s% dm_bar(k)*r_00)   
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
          s% Uq(k) = Uq_face%val
-      end function get_Uq_face
+      end function compute_Uq_face
 
 
       function compute_Source(s, k, ierr) result(Source) ! erg g^-1 s^-1
@@ -677,7 +676,6 @@
 
 
       function compute_L_face(s, k, ierr) result(L_face) ! erg s^-1
-         ! Inputs
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_18var_order1) :: L_face
@@ -699,7 +697,7 @@
          real(dp) :: alfa
          include 'formats'
          ierr = 0
-         r_00 = wrap_r_00(s,k)
+         r_00 = wrap_r_00(s,k) ! not time centered for luminosity
          area = 4d0*pi*pow2(r_00)
          T_00 = wrap_T_00(s,k)
          T400 = pow4(T_00)
@@ -757,7 +755,7 @@
             Lc_w_face_factor = 0d0
             Lc = 0d0
          else
-            r_00 = wrap_r_00(s, k)
+            r_00 = wrap_r_00(s, k) ! not time centered for luminosity
             area = 4d0*pi*pow2(r_00)
             T_m1 = wrap_T_m1(s, k)
             T_00 = wrap_T_00(s, k)         
@@ -794,7 +792,7 @@
             Lt = 0d0
             return
          end if
-         r_00 = wrap_r_00(s,k)         
+         r_00 = wrap_r_00(s,k) ! not time centered for luminosity         
          area2 = (4d0*pi)**2*pow4(r_00)
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)

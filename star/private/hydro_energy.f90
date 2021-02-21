@@ -77,8 +77,8 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_18var_order1) :: resid_18, &
-            dL_dm_18, sources_18, others_18, d_turbulent_energy_dt_18, dwork_dm_18, &
-            eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18, P_dV_dt_18
+            dL_dm_18, sources_18, others_18, d_turbulent_energy_dt_18, &
+            dwork_dm_18, eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
          real(dp) :: residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
@@ -111,9 +111,11 @@
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 + eps_grav_18
+            esum_18 = - dL_dm_18 + sources_18 + &
+               others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 + eps_grav_18
          else
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
+            esum_18 = - dL_dm_18 + sources_18 + &
+               others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          end if
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
          s% ergs_error(k) = -dm*dt*resid_18%val ! save ergs_error before scaling
@@ -211,7 +213,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_18, others_18
-            use hydro_tdc, only: get_Eq_cell
+            use hydro_tdc, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
                eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, RTI_diffusion_18
@@ -259,7 +261,7 @@
             
             Eq_18 = 0d0
             if (s% TDC_flag) then             
-               Eq_18 = get_Eq_cell(s, k, ierr)
+               Eq_18 = compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if   
             
@@ -381,7 +383,6 @@
          subroutine setup_de_dt_and_friends(ierr)
             use star_utils, only: get_dke_dt_dpe_dt
             integer, intent(out) :: ierr
-            real(dp) :: P_dV
             real(dp) :: dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
                dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, &
                de_dt, d_de_dt_dlnd, d_de_dt_dlnT, d_PdV_dlnd, d_PdV_dlnT
@@ -391,7 +392,6 @@
             dke_dt = 0d0; d_dkedt_dv00 = 0d0; d_dkedt_dvp1 = 0d0
             dpe_dt = 0d0; d_dpedt_dlnR00 = 0d0; d_dpedt_dlnRp1 = 0d0
             de_dt = 0d0; d_de_dt_dlnd = 0d0; d_de_dt_dlnT = 0d0
-            P_dV = 0d0; d_PdV_dlnd = 0d0; d_PdV_dlnT = 0d0
 
             if (.not. eps_grav_form) then
                de_dt = (s% energy(k) - s% energy_start(k))/dt

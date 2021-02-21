@@ -3416,7 +3416,8 @@
             rho_00 = wrap_d_00(s,k)
             mlt_Pturb_18 = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(rho_m1 + rho_00)/6d0
             if (time_center) then
-               mlt_Pturb_start = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho_start(k-1) + s% rho_start(k))/6d0
+               mlt_Pturb_start = &
+                  s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho_start(k-1) + s% rho_start(k))/6d0
                mlt_Pturb_18 = 0.5d0*(mlt_Pturb_18 + mlt_Pturb_start)
             end if
          end if           

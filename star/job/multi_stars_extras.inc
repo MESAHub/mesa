@@ -4,14 +4,13 @@
          integer :: id, ierr, i, i_prev, result, result_reason, model_number
          type (star_info), pointer :: s
          character (len=64) :: inlist_fname
-         logical :: first_try, continue_evolve_loop
+         logical :: okay_to_restart, restart, first_try, continue_evolve_loop
          real(dp) :: sum_times
          real(dp) :: dt
-         logical :: restart, pgstar_ok
+         logical :: pgstar_ok
          logical, parameter :: &
             do_alloc_star = .true., &
             do_free_star = .true., &
-            okay_to_restart = .true., &
             dbg = .false.
          
          include 'formats'
@@ -33,6 +32,8 @@
             return
          end if
          
+         okay_to_restart = restart_flag
+
          do i = 1, num_stars
             
             id_from_read_star_job = 0
@@ -45,12 +46,11 @@
             if (failed('star_ptr',ierr)) return
             
             pgstar_ok = (i == which_for_pgstar .or. which_for_pgstar < 0)
-
+         
             call start_run1_star( &
                do_alloc_star, do_free_star, okay_to_restart, &
-               id, restart, pgstar_ok, dbg, &
-               extras_controls, &
-               ierr, inlist_names(i))
+               id, restart, restart_names(i), pgstar_ok, dbg, &
+               extras_controls, ierr, inlist_names(i))
             if (failed('before_evolve_loop',ierr)) return
 
             call star_ptr(id, s, ierr)
@@ -130,7 +130,8 @@
             character (len=*) :: filename
             integer, intent(out) :: ierr         
             character (len=256) :: message
-            integer :: unit
+            integer :: unit, i
+            include 'formats'
             ! set defaults
             num_stars = 0
             restart_flag = .false.
@@ -155,6 +156,18 @@
                   close(unit)
                end if  
             end if
+            write(*,*) 'read ' // trim(filename)
+            write(*,*) 'stop_when_1st_finishes', stop_when_1st_finishes
+            write(*,*) 'num_stars', num_stars
+            write(*,*) 'which_for_pgstar', which_for_pgstar
+            write(*,*) 'stopping_age', stopping_age
+            write(*,*) 'restart_flag', restart_flag
+            if (restart_flag) then
+               do i=1,num_stars
+                  write(*,*) 'restart_names', i, trim(restart_names(i))
+               end do
+            end if
+            write(*,*)
          end subroutine read_controls
 
       end subroutine do_run_multi_stars   

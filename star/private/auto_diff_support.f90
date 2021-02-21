@@ -700,6 +700,93 @@
             ! v_center is a constant
          end if
       end function wrap_v_p1
+      
+      
+      function wrap_opt_time_center_r_m1(s, k) result(r_tc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1) :: r_tc
+         r_tc = wrap_r_m1(s,k)
+         if (s% using_velocity_time_centering) then
+            if (k > 1) r_tc = 0.5d0*(r_tc + s% r_start(k-1))
+         end if
+      end function wrap_opt_time_center_r_m1
+      
+      
+      function wrap_opt_time_center_r_00(s, k) result(r_tc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1) :: r_tc
+         r_tc = wrap_r_00(s,k)
+         if (s% using_velocity_time_centering) &
+            r_tc = 0.5d0*(r_tc + s% r_start(k))
+      end function wrap_opt_time_center_r_00
+      
+      
+      function wrap_opt_time_center_r_p1(s, k) result(r_tc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1) :: r_tc
+         r_tc = wrap_r_p1(s,k)
+         if (s% using_velocity_time_centering) then
+            if (k < s% nz) then
+               r_tc = 0.5d0*(r_tc + s% r_start(k+1))
+            else
+               r_tc = 0.5d0*(r_tc + s% r_center)
+            end if
+         end if
+      end function wrap_opt_time_center_r_p1
+      
+      
+      function wrap_opt_time_center_v_m1(s, k) result(v_tc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1) :: v_tc
+         v_tc = wrap_v_m1(s,k)
+         if (s% using_velocity_time_centering) then
+            if (s% v_flag) then
+               if (k > 1) then
+                  v_tc = 0.5d0*(v_tc + s% v_start(k-1))
+               end if
+            else
+               stop 'fix wrap_opt_time_center_v'
+            end if
+         end if
+      end function wrap_opt_time_center_v_m1
+      
+      
+      function wrap_opt_time_center_v_00(s, k) result(v_tc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1) :: v_tc
+         v_tc = wrap_v_00(s,k)
+         if (s% using_velocity_time_centering) then
+            if (s% v_flag) then
+               v_tc = 0.5d0*(v_tc + s% v_start(k))
+            else
+               stop 'fix wrap_opt_time_center_v'
+            end if
+         end if
+      end function wrap_opt_time_center_v_00
+      
+      
+      function wrap_opt_time_center_v_p1(s, k) result(v_tc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_18var_order1) :: v_tc
+         v_tc = wrap_v_p1(s,k)
+         if (s% using_velocity_time_centering) then
+            if (s% v_flag) then
+               if (k < s% nz) then
+                  v_tc = 0.5d0*(v_tc + s% v_start(k+1))
+               else
+                  v_tc = 0.5d0*(v_tc + s% v_center)
+               end if
+            else
+               stop 'fix wrap_opt_time_center_v'
+            end if
+         end if
+      end function wrap_opt_time_center_v_p1
 
       ! u replaces v
       function wrap_u_m1(s, k) result(v_m1)
