@@ -1431,6 +1431,7 @@ contains
     ! Dump a snapshot of the current model state to file
 
     ! First, re-calculate gradL_composition_term
+    allocate(gradL_composition_term(1:s%nz))
 
     gradL_composition_term = s%gradL_composition_term(1:s%nz)
 

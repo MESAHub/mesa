@@ -41,12 +41,13 @@
          integer,dimension(:),intent(in) :: num_colors
          character(len=*),dimension(:),intent(in) :: fnames 
          character(len=strlen) :: fname
-         type (lgt_list), pointer :: thead
-         character(len=strlen),dimension(:),pointer :: col_names
+         type (lgt_list), pointer :: thead =>null()
+         character(len=strlen),dimension(:),pointer :: col_names=>null()
          
          integer, intent(out) :: ierr
          integer :: i
          
+         ierr = 0
          num_thead=num_files
          
          if(num_thead<1)THEN
@@ -87,7 +88,7 @@
 
             thead_all(i)%thead=>thead
             bc_total_num_colors=bc_total_num_colors+thead_all(i)%n_colors
-            
+            nullify(thead)
          end do
 
          color_is_initialized=.true.
@@ -249,8 +250,9 @@
             if (ios /= 0) exit
             cnt = cnt + 1
             lgt = log10(lgt)  
-            
 
+            if(cnt==1) thead%lgt = lgt
+            
             call get_tlist(thead, lgt, tlist, ierr)
             if (ierr /= 0) exit            
             
