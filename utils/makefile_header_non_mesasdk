@@ -153,10 +153,8 @@ endif
 LOAD_HDF5 = `mesasdk_hdf5_link`
 INCLUDE_HDF5 = -I${MESASDK_ROOT}/include
 
-# If not YES then we don't use HDF5, thus you wont have access to custom weak rates
-# Also the rates test suite will not pass so do: /usr/bin/touch $MESA_DIR/rates/skip_test
-# if you change this option
-USE_HDF5 = NO
+# Note that the USE_HDF5 flag (which used to default to NO) has been retired; you now need
+# an HDF5 library installed to build mesa
 
 
 # step 6) now do the mesa install

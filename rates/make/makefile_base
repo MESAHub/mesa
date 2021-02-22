@@ -83,11 +83,7 @@ nodeps : $(.DEFAULT_GOAL)
 #COMPILE = $(COMPILE_TO_TEST) $(FCfree)
 COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
 
-ifeq ($(USE_HDF5),YES)
-	COMPILE_CMD = $(COMPILE) -DUSE_HDF5
-else
-	COMPILE_CMD = $(COMPILE)
-endif
+COMPILE_CMD = $(COMPILE)
 
 rates_names.o : rates_names.f90
 ifneq ($(QUIET),)
@@ -132,11 +128,7 @@ NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
 
 ifeq ($(NODEPS),)
 
-  ifeq ($(USE_HDF5),YES)
-    DEPEND_FLAGS = -DUSE_HDF5
-  else
-    DEPEND_FLAGS =
-  endif
+  DEPEND_FLAGS =
 
   .depend :
   ifneq ($(QUIET),)

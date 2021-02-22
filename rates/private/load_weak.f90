@@ -29,9 +29,8 @@
       use const_def, only: dp
       use utils_lib, only: mesa_error
       use weaklib_tables, only: weaklib_rate_table
-#ifdef USE_HDF5
       use suzuki_tables, only: private_load_suzuki_tables
-#endif
+
       implicit none
       
       private :: private_load_weak_tables
@@ -44,14 +43,14 @@
          ierr = 0         
          call private_load_weak_tables(ierr)
          if (ierr /= 0) return
-#ifdef USE_HDF5
+
          call load_user_weak_tables(ierr)
          if (ierr /= 0) return
          if (use_suzuki_tables) then
             call private_load_suzuki_tables(ierr)
             if (ierr /= 0) return
          end if
-#endif
+
          call load_weak_info_list(ierr)
       end subroutine load_weak_data
       
@@ -471,7 +470,6 @@
 
       end subroutine private_load_weak_tables
 
-#ifdef USE_HDF5
       subroutine load_user_weak_tables(ierr)
         use utils_def
         use utils_lib
@@ -725,7 +723,6 @@
 
 
       end subroutine load_user_weak_tables
-#endif
 
       end module load_weak
 
