@@ -79,6 +79,8 @@ contains
     
     if (is_bad(tau_surf)) then
        write(*,*) 'tau_surf', tau_surf
+       ierr = -1
+       return
        stop 'bad tau_surf arg for get_atm_PT'
     end if
 
@@ -272,6 +274,7 @@ contains
     integer, intent(out)      :: ierr
 
     integer  :: T_tau_id
+    real(dp) :: kap_guess
 
     include 'formats'
 
@@ -302,7 +305,8 @@ contains
     select case (T_tau_opacity)
 
     case ('fixed')
-
+       
+       ! ok to use s% opacity(1) for fixed
        call atm_eval_T_tau_uniform( &
             tau_surf, L, R, M, cgrav, s% opacity(1), s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
@@ -320,9 +324,15 @@ contains
          if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
-
+       
+       ! need to start iterations from same kap each time, so use opacity_start
+       if (s% solver_iter > 0) then
+          kap_guess = s% opacity_start(1)
+       else
+          kap_guess = s% opacity(1)
+       end if
        call atm_eval_T_tau_uniform( &
-            tau_surf, L, R, M, cgrav, s% opacity_start(1), s% Pextra_factor, &
+            tau_surf, L, R, M, cgrav, kap_guess, s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
             s%atm_T_tau_errtol, s%atm_T_tau_max_iters, skip_partials, &
             Teff, kap, &
@@ -794,13 +804,17 @@ contains
     real(dp), intent(out)     :: dlnP_dlnkap
     integer, intent(out)      :: ierr
 
-    real(dp) :: kap_guess
+    real(dp) :: kap_for_atm
     real(dp) :: kap
     real(dp) :: tau_surf
 
     include 'formats'
-
-    kap_guess = s% opacity_start(1)
+    
+    if (s% solver_iter > 0) then
+       kap_for_atm = s% opacity_start(1)
+    else
+       kap_for_atm = s% opacity(1)
+    end if
 
     ! Sanity check on L
 
@@ -823,7 +837,7 @@ contains
 
        call atm_eval_irradiated( &
             L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
-            kap_guess, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
+            kap_for_atm, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
             eos_proc_for_get_irradiated, kap_proc_for_get_irradiated, &
             s% atm_irradiated_errtol, 0, skip_partials, &
             Teff, kap, tau_surf, &
@@ -841,7 +855,7 @@ contains
 
        call atm_eval_irradiated( &
             L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
-            kap_guess, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
+            kap_for_atm, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
             eos_proc_for_get_irradiated, kap_proc_for_get_irradiated, &
             s% atm_irradiated_errtol, s% atm_irradiated_max_iters, skip_partials, &
             Teff, kap, tau_surf, &
@@ -1308,6 +1322,8 @@ contains
     integer, intent(out)     :: ierr
 
     real(dp) :: kap_fracs(num_kap_fracs)
+    
+    include 'formats'
 
     call get_kap( &
          s, 0, s% zbar(1), s% xa(:,1), lnRho/ln10, lnT/ln10, &
@@ -1321,6 +1337,17 @@ contains
     end if
 
     ! Finish
+    
+    if (kap <= 0d0 .or. is_bad(kap)) then
+       write(*,1) 'bad kap', kap
+       write(*,1) 's% zbar(1)', s% zbar(1)
+       write(*,1) 'lnRho/ln10', lnRho/ln10
+       write(*,1) 'lnT/ln10', lnT/ln10
+       write(*,1) 'res(i_eta)', res(i_eta)
+       ierr = -1
+       return
+       stop 'atm kap_proc'
+    end if
 
     return
 

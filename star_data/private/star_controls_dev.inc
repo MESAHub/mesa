@@ -6,6 +6,11 @@
          real(dp) :: TDC_alfam
          real(dp) :: TDC_alfar
          
+         logical :: TDC_use_Stellingwerf_Lr
+         real(dp) :: TDC_w_min_for_damping
+         integer :: TDC_num_outermost_cells_forced_nonturbulent, &
+            TDC_num_innermost_cells_forced_nonturbulent
+         
          
          real(dp) :: accretion_entropy_at_surface
          

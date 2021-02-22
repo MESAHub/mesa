@@ -87,7 +87,7 @@
       real(dp), parameter :: Qconv = mev_to_ergs*avo
       real(dp), parameter :: kev = kerg / ev2erg ! converts temp to ev (ev K^-1)
       real(dp), parameter :: boltz_sigma = (pi*pi * boltzm*boltzm*boltzm*boltzm) / (60 * hbar*hbar*hbar * clight*clight) ! Stefan-Boltzmann constant (erg cm^-2 K^-4 s^-1)
-      real(dp), parameter :: crad = boltz_sigma*4/clight ! radiation density constant, a (erg cm^-3 K^-4); Prad = crad * T^4 / 3
+      real(dp), parameter :: crad = boltz_sigma*4/clight ! radiation density constant, AKA "a" (erg cm^-3 K^-4); Prad = crad * T^4 / 3
 
       ! IAU
       real(dp), parameter :: au = 1.49597870700D13 ! (cm) - exact value defined by IAU 2009, 2012

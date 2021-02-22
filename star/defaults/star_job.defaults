@@ -1019,14 +1019,17 @@
       ! ~~~~~~~~~~
       ! relax_initial_mass_to_remove_H_env
       ! ~~~~~~~~
+      ! extra_mass_retained_by_remove_H_env
+      ! ~~~~~~~~
 
       ! Gradually reduce total mass by a wind to remove the H envelope.
-      ! Equivalent to relax_mass with new_mass = He_core_mass.
+      ! Equivalent to relax_mass with new_mass = He_core_mass + extra_mass.
 
       ! ::
 
     relax_mass_to_remove_H_env = .false.
     relax_initial_mass_to_remove_H_env = .false.
+    extra_mass_retained_by_remove_H_env = 5d-3 ! (Msun)
 
 
       ! relax_mass_scale

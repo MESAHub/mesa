@@ -40,15 +40,28 @@
 
       implicit none
       
-       
       integer :: id_from_read_star_job = 0
 
       ! Set MESA_INLIST_RESOLVED to true when you no longer want the routine
       ! resolve_inlist_fname to look at the MESA_INLIST environment variable
       logical :: MESA_INLIST_RESOLVED = .false.
+
+      private
+      public :: do_read_star_job, do_read_star_job_and_return_id
+      public :: run1_star
+      public :: start_run1_star
+      public :: do_evolve_one_step
+      public :: after_evolve_loop
+      public :: failed
+      public :: id_from_read_star_job
+      public :: MESA_INLIST_RESOLVED
+      
+      ! deprecated, but kept around for use by binary
+      public :: before_evolve_loop, after_step_loop, before_step_loop, do_saves, &
+         resolve_inlist_fname, terminate_normal_evolve_loop
       
       contains 
-
+            
 
       subroutine run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
@@ -73,11 +86,11 @@
      
          end interface
          
-         integer :: result, model_number, source, nsteps, j, ci, nz
-         logical :: continue_evolve_loop, first_try
+         logical :: continue_evolve_loop
          type (star_info), pointer :: s
-         character (len=strlen) :: inlist_fname
+         character (len=strlen) :: restart_filename
             
+         logical, parameter :: pgstar_ok = .true.
          logical, parameter :: dbg = .false.
          
          1 format(a35, 99(1pe26.16))
@@ -87,116 +100,184 @@
 
          11 format(a35, f20.10)
 
-         ierr = 0
-
-         call resolve_inlist_fname(inlist_fname,inlist_fname_arg)
-
-         ! star is initialized here
-         call before_evolve_loop(do_alloc_star, okay_to_restart, restart, &
-              null_binary_controls, extras_controls, &
-              id_from_read_star_job, inlist_fname, "restart_photo", &
-              dbg, 0, id, ierr)
-         if (failed('before_evolve_loop',ierr)) return
+         restart_filename = 'restart_photo'
+         call start_run1_star( &
+            do_alloc_star, do_free_star, okay_to_restart, &
+            id, restart, restart_filename, pgstar_ok, dbg, &
+            extras_controls, ierr, inlist_fname_arg)
+         if (failed('do_before_evolve_loop',ierr)) return
 
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
 
          continue_evolve_loop = .true.
+
+         if (dbg) write(*,*) 'start evolve_loop'
+         evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
+         
+            continue_evolve_loop = do_evolve_one_step(s, dbg, ierr)
+            if (failed('do_evolve_one_step',ierr)) return
+
+         end do evolve_loop
+
+         call after_evolve_loop(s% id, do_free_star, ierr)
+         if (failed('after_evolve_loop',ierr)) return
+
+      end subroutine run1_star  
+      
+      
+      subroutine start_run1_star( &
+            do_alloc_star, do_free_star, okay_to_restart, &
+            id, restart, restart_filename, pgstar_ok, dbg, &
+            extras_controls, ierr, inlist_fname_arg)
+            
+         logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
+         integer, intent(inout) :: id ! input if not do_alloc_star
+         logical, intent(inout) :: restart ! input if not do_alloc_star
+         logical, intent(in) :: pgstar_ok, dbg
+         character (len=*) :: restart_filename, inlist_fname_arg
+         optional inlist_fname_arg
+         integer, intent(out) :: ierr
+         
+         interface
+
+            subroutine extras_controls(id, ierr)
+               integer, intent(in) :: id
+               integer, intent(out) :: ierr
+            end subroutine extras_controls      
+     
+         end interface
+
+         type (star_info), pointer :: s
+         character (len=strlen) :: inlist_fname
+         
+         include 'formats'
+
+         ierr = 0
+
+         call resolve_inlist_fname(inlist_fname,inlist_fname_arg)
+
+         ! star is initialized here
+         call do_before_evolve_loop( &
+              do_alloc_star, okay_to_restart, restart, pgstar_ok, &
+              null_binary_controls, extras_controls, &
+              id_from_read_star_job, inlist_fname, restart_filename, &
+              dbg, 0, id, ierr)
+         if (failed('do_before_evolve_loop',ierr)) return
+
+         call star_ptr(id, s, ierr)
+         if (failed('star_ptr',ierr)) return
+
          s% doing_timing = .false.
          s% job% check_before_step_timing = 0
          s% job% check_step_loop_timing = 0
          s% job% check_after_step_timing = 0
          s% job% time0_initial = 0
 
-         if (dbg) write(*,*) 'start evolve_loop'
-         evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
-
-            call before_step_loop(s% id, ierr)
-            if (failed('before_step_loop',ierr)) return
-
-            result = s% extras_start_step(id)  
-            if (result /= keep_going) exit evolve_loop             
-
-            first_try = .true.
+      end subroutine start_run1_star
+      
+      
+      logical function do_evolve_one_step(s, dbg, ierr) result(continue_evolve_loop)
+         type (star_info), pointer :: s
+         logical, intent(in) :: dbg
+         integer, intent(out) :: ierr
          
-            step_loop: do ! may need to repeat this loop
+         logical :: first_try
+         integer :: id
+         integer :: result, model_number, source, nsteps, j, ci, nz
+         
+         include 'formats'
+         
+         ierr = 0
+         id = s% id
+         continue_evolve_loop = .true.
+
+         call before_step_loop(s% id, ierr)
+         if (failed('before_step_loop',ierr)) return
+
+         result = s% extras_start_step(id)  
+         if (result /= keep_going) then
+            continue_evolve_loop = .false.
+            return 
+         end if        
+
+         first_try = .true.
+      
+         step_loop: do ! may need to repeat this loop
+         
+            if (stop_is_requested(s)) then
+               continue_evolve_loop = .false.
+               result = terminate
+               exit
+            end if
+         
+            result = star_evolve_step(id, first_try)
+            if (result == keep_going) result = star_check_model(id)
+            if (result == keep_going) result = s% extras_check_model(id)
+            if (result == keep_going) result = star_pick_next_timestep(id)            
+            if (result == keep_going) exit step_loop
             
-               if (stop_is_requested(s)) then
-                  continue_evolve_loop = .false.
-                  result = terminate
-                  exit
-               end if
-            
-               result = star_evolve_step(id, first_try)
-               if (result == keep_going) result = star_check_model(id)
-               if (result == keep_going) result = s% extras_check_model(id)
-               if (result == keep_going) result = star_pick_next_timestep(id)            
-               if (result == keep_going) exit step_loop
-               
-               model_number = get_model_number(id, ierr)
-               if (failed('get_model_number',ierr)) return
-                              
-               if (result == retry .and. s% job% report_retries) then
-                  write(*,'(i6,3x,a,/)') model_number, &
-                     'retry reason ' // trim(result_reason_str(s% result_reason))
-               end if
-               
-               if (result == redo) then
-                  result = star_prepare_to_redo(id)
-               end if
-               if (result == retry) then
-                  result = star_prepare_to_retry(id)
-               end if
-               if (result == terminate) then
-                  continue_evolve_loop = .false.
-                  exit step_loop
-               end if
-               first_try = .false.
-               
-            end do step_loop
-            
-            ! once we get here, the only options are keep_going or terminate.
-            ! redo or retry must be done inside the step_loop
-            
-            call after_step_loop(s% id, inlist_fname, &
-                dbg, result, ierr)
-            if (failed('after_step_loop',ierr)) return
-               
-            if (result /= keep_going) then
-               if (result /= terminate) then
-                  write(*,2) 'ERROR in result value in run_star_extras: model', &
-                     s% model_number
-                  write(*,2) 'extras_finish_step must return keep_going or terminate'
-                  write(*,2) 'result', result
-                  exit evolve_loop
-               end if
-               if (s% result_reason == result_reason_normal) then
-                  call terminate_normal_evolve_loop(s% id, &
-                     dbg, result, ierr)
-                  if (failed('terminate_normal_evolve_loop',ierr)) return
-               end if
-               exit evolve_loop
+            model_number = get_model_number(id, ierr)
+            if (failed('get_model_number',ierr)) return
+                           
+            if (result == retry .and. s% job% report_retries) then
+               write(*,'(i6,3x,a,/)') model_number, &
+                  'retry reason ' // trim(result_reason_str(s% result_reason))
             end if
             
-            call do_saves(id, ierr)
-            if (failed('do_saves',ierr)) return
-
-            if (s% doing_timing) then
-               call system_clock(s% job% time1_extra,s% job% clock_rate)
-               s% job% after_step_timing = s% job% after_step_timing + &
-                  dble(s% job% time1_extra - s% job% time0_extra) / s% job% clock_rate
-               s% job% check_time_end = eval_total_times(s% id, ierr)
-               s% job% check_after_step_timing = s% job% check_after_step_timing + &
-                  (s% job% check_time_end - s% job% check_time_start)
+            if (result == redo) then
+               result = star_prepare_to_redo(id)
             end if
+            if (result == retry) then
+               result = star_prepare_to_retry(id)
+            end if
+            if (result == terminate) then
+               continue_evolve_loop = .false.
+               exit step_loop
+            end if
+            first_try = .false.
             
-         end do evolve_loop
+         end do step_loop
+         
+         ! once we get here, the only options are keep_going or terminate.
+         ! redo or retry must be done inside the step_loop
+         
+         call after_step_loop(s% id, s% inlist_fname, &
+             dbg, result, ierr)
+         if (failed('after_step_loop',ierr)) return
+            
+         if (result /= keep_going) then
+            if (result /= terminate) then
+               write(*,2) 'ERROR in result value in run_star_extras: model', &
+                  s% model_number
+               write(*,2) 'extras_finish_step must return keep_going or terminate'
+               write(*,2) 'result', result
+               continue_evolve_loop = .false.
+               return 
+            end if
+            if (s% result_reason == result_reason_normal) then
+               call terminate_normal_evolve_loop(s% id, &
+                  dbg, result, ierr)
+               if (failed('terminate_normal_evolve_loop',ierr)) return
+            end if
+            continue_evolve_loop = .false.
+            return 
+         end if
+         
+         call do_saves(id, ierr)
+         if (failed('do_saves',ierr)) return
 
-         call after_evolve_loop(s% id, do_free_star, ierr)
-         if (failed('after_evolve_loop',ierr)) return
-
-      end subroutine run1_star     
-
+         if (s% doing_timing) then
+            call system_clock(s% job% time1_extra,s% job% clock_rate)
+            s% job% after_step_timing = s% job% after_step_timing + &
+               dble(s% job% time1_extra - s% job% time0_extra) / s% job% clock_rate
+            s% job% check_time_end = eval_total_times(s% id, ierr)
+            s% job% check_after_step_timing = s% job% check_after_step_timing + &
+               (s% job% check_time_end - s% job% check_time_start)
+         end if
+         
+      end function do_evolve_one_step
+            
 
       subroutine null_binary_controls(id, binary_id, ierr)
          integer, intent(in) :: id, binary_id
@@ -208,11 +289,43 @@
       ! Binary requires to set some controls in here, which is why
       ! binary_controls and binary_id are arguments. These do nothing
       ! for the case of single star evolution.
-      subroutine before_evolve_loop(do_alloc_star, okay_to_restart, restart, &
+      subroutine before_evolve_loop( &
+              do_alloc_star, okay_to_restart, restart, &
               binary_controls, extras_controls, &
               id_from_read_star_job, inlist_fname, restart_filename, &
               dbg, binary_id, id, ierr)
          logical, intent(in) :: do_alloc_star, okay_to_restart
+         logical :: restart
+         interface
+            subroutine binary_controls(id, binary_id, ierr)
+               integer, intent(in) :: id, binary_id
+               integer, intent(out) :: ierr
+            end subroutine binary_controls     
+            subroutine extras_controls(id, ierr)
+               integer, intent(in) :: id
+               integer, intent(out) :: ierr
+            end subroutine extras_controls      
+         end interface
+         integer :: id_from_read_star_job
+         character (len=*) :: inlist_fname, restart_filename
+         character (len=512) :: temp_fname
+         logical, intent(in) :: dbg
+         integer, intent(in) :: binary_id
+         integer, intent(out) :: id, ierr
+         call do_before_evolve_loop( &
+              do_alloc_star, okay_to_restart, restart, .true., &
+              binary_controls, extras_controls, &
+              id_from_read_star_job, inlist_fname, restart_filename, &
+              dbg, binary_id, id, ierr)
+      end subroutine before_evolve_loop
+      
+      
+      subroutine do_before_evolve_loop( &
+              do_alloc_star, okay_to_restart, restart, pgstar_ok, &
+              binary_controls, extras_controls, &
+              id_from_read_star_job, inlist_fname, restart_filename, &
+              dbg, binary_id, id, ierr)
+         logical, intent(in) :: do_alloc_star, okay_to_restart, pgstar_ok
          logical :: restart
          interface
             subroutine binary_controls(id, binary_id, ierr)
@@ -274,10 +387,10 @@
          if(dbg) write(*,*) 'call pgstar_env_check'
          call pgstar_env_check(id, s, ierr)
          if (failed('pgstar_env_check',ierr)) return        
-         
 
          ! testing module-level (atm/eos/kap/net) partials requires single-threaded execution
-         if (s% solver_test_atm_partials .or. s% solver_test_eos_partials .or. s% solver_test_kap_partials .or. s% solver_test_net_partials) then
+         if (s% solver_test_atm_partials .or. s% solver_test_eos_partials .or. &
+               s% solver_test_kap_partials .or. s% solver_test_net_partials) then
             if (s% solver_test_partials_k > 0 .and. s% solver_test_partials_dx_0 > 0) then
                write(*,*) 'Forcing single-thread mode for testing of module-level partials'
                call omp_set_num_threads(1)
@@ -335,7 +448,7 @@
          if (failed('do_load1_star',ierr)) return
          
          if (dbg) write(*,*) 'call do_star_job_controls_after'
-         call do_star_job_controls_after(id, s, restart, ierr)
+         call do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          if (failed('do_star_job_controls_after',ierr)) return
 
          write(*,*)
@@ -377,7 +490,7 @@
             write(*,*)
          end if
 
-      end subroutine before_evolve_loop
+      end subroutine do_before_evolve_loop
 
 
       subroutine before_step_loop(id, ierr)
@@ -1969,7 +2082,7 @@
       end subroutine before_evolve         
        
 
-      subroutine do_star_job_controls_after(id, s, restart, ierr)
+      subroutine do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          use const_def
          use rates_def
          use rates_lib
@@ -1977,7 +2090,7 @@
 
          integer, intent(in) :: id
          type (star_info), pointer :: s
-         logical, intent(in) :: restart
+         logical, intent(in) :: restart, pgstar_ok
          integer, intent(out) :: ierr
          
          real(dp) :: log_m, log_lifetime, max_dt, max_timestep, minq, maxq
@@ -1994,14 +2107,16 @@
             write(*,*) 'read ' // trim(s% job% profile_columns_file)
          call star_set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
          if (failed('star_set_profile_columns',ierr)) return
-
-         if (s% job% clear_pgstar_history .or. &
-               (s% job% clear_initial_pgstar_history .and. .not. restart)) then
-            call start_new_run_for_pgstar(s, ierr)
-            if (failed('start_new_run_for_pgstar',ierr)) return
-         else
-            call restart_run_for_pgstar(s, ierr)
-            if (failed('restart_run_for_pgstar',ierr)) return
+         
+         if (pgstar_ok) then
+            if (s% job% clear_pgstar_history .or. &
+                  (s% job% clear_initial_pgstar_history .and. .not. restart)) then
+               call start_new_run_for_pgstar(s, ierr)
+               if (failed('start_new_run_for_pgstar',ierr)) return
+            else
+               call restart_run_for_pgstar(s, ierr)
+               if (failed('restart_run_for_pgstar',ierr)) return
+            end if
          end if
          
          if (s% job% set_tau_factor .or. &
@@ -2503,7 +2618,8 @@
 
          if (s% job% relax_mass_to_remove_H_env) then
             write(*, 1) 'relax_mass_to_remove_H_env_mass'
-            call star_relax_mass_to_remove_H_env(id, s% job% lg_max_abs_mdot, ierr)
+            call star_relax_mass_to_remove_H_env( &
+               id, s% job% extra_mass_retained_by_remove_H_env, s% job% lg_max_abs_mdot, ierr)
             if (failed('star_relax_mass_to_remove_H_env',ierr)) return
          end if
 
@@ -2554,7 +2670,8 @@
 
          if (s% job% relax_initial_mass_to_remove_H_env .and. .not. restart) then
             write(*, 1) 'relax_initial_mass_to_remove_H_env'
-            call star_relax_mass_to_remove_H_env(id, s% job% lg_max_abs_mdot, ierr)
+            call star_relax_mass_to_remove_H_env( &
+               id, s% job% extra_mass_retained_by_remove_H_env, s% job% lg_max_abs_mdot, ierr)
             if (failed('relax_initial_mass_to_remove_H_env',ierr)) return
          end if
 

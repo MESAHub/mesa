@@ -396,6 +396,7 @@
          real(dp) :: surface_extra_Pgas
          real(dp) :: Tsurf_factor
          real(dp) :: fixed_vsurf
+         real(dp) :: fixed_Psurf
          real(dp) :: fixed_L_for_BB_outer_BC
          real(dp) :: tau_for_L_BB
          logical :: use_atm_PT_at_center_of_surface_cell
@@ -405,6 +406,7 @@
          logical :: use_zero_dLdm_outer_BC
          logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
+         logical :: use_fixed_Psurf_outer_BC
          logical :: use_fixed_L_for_BB_outer_BC
 
       ! create atmosphere

@@ -772,8 +772,6 @@
          real(dp), target, dimension(species+1) :: &
             del_array, x0_array, x1_array, dx_array
          real(dp), pointer, dimension(:) :: del, x0, x1, dx
-
-         real(dp), parameter :: one = 1, zero = 0
          real(dp) :: &
             tol_max_corr, tol_avg_corr, max_resid, total_burn, time, dt, remaining_time, &
             lambda, lambda0, min_lambda, Cv0, lnT0, dCv_dlnT, Cv, T, prev_max_correction, &
@@ -893,12 +891,12 @@
                      do i=1,species
                         mtx(j,i) = -dt*s% d_dxdt_nuc_dx(j,i,k)
                      end do
-                     mtx(j,j) = one + mtx(j,j)
+                     mtx(j,j) = 1d0 + mtx(j,j)
                      mtx(nvar,j) = -dt*s% d_epsnuc_dx(j,k)/(Cv*T)
                      mtx(j,nvar) = -dt*s% d_dxdt_nuc_dT(j,k)*T
                   end do
                   del(nvar) = dt*s% eps_nuc(k)/(Cv*T) - dx(nvar)
-                  mtx(nvar,nvar) = one + dt/(Cv*Cv*T)* &
+                  mtx(nvar,nvar) = 1d0 + dt/(Cv*Cv*T)* &
                      (s% eps_nuc(k)*dCv_dlnT + Cv*(s% eps_nuc(k) - s% d_epsnuc_dlnT(k)))
 
                   ! solve mtx*del = rhs (rhs is in del at start)
@@ -963,7 +961,7 @@
                   end if
                   prev_max_correction = s% max_burn_correction(k)
 
-                  if (lambda0 == one) then
+                  if (lambda0 == 1d0) then
 
                      ! if magnitude of max correction is small enough, consider converged.
                      if (is_bad(s% max_burn_correction(k))) then

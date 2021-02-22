@@ -3099,7 +3099,7 @@
             call insert(s% xh,i_var)
             call insert(s% xh_start,i_var)
             do k=1,nz
-               s% xh(i_var,k) = 0d0 ! min_w
+               s% xh(i_var,k) = 0d0
             end do
             s% need_to_reset_w = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then

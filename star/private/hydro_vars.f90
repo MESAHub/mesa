@@ -323,7 +323,7 @@
                   end do
                else if (j == i_w) then
                   do k=1,nz
-                     s% w(k) = max(s% xh(i_w, k), min_w)
+                     s% w(k) = max(s% xh(i_w, k), 0d0)
                      s% dxh_w(k) = 0d0
                   end do
                else if (j == i_lum) then
@@ -921,9 +921,9 @@
          end if
          
          if (s% need_to_reset_w) then
-            if (dbg) write(*,*) 'call set_mlt_vars'
-            call set_mlt_vars(s, 1, s% nz, ierr)
-            if (failed('set_mlt_vars')) return
+            !if (dbg) write(*,*) 'call set_mlt_vars'
+            !call set_mlt_vars(s, 1, s% nz, ierr)
+            !if (failed('set_mlt_vars')) return
             call reset_w_using_L(s,ierr)
             if (failed('reset_w_using_L')) return
             s% need_to_reset_w = .false.
@@ -1128,6 +1128,7 @@
          do_not_need_atm_Psurf = &
             s% use_compression_outer_BC .or. &
             s% use_zero_Pgas_outer_BC .or. &
+            s% use_fixed_Psurf_outer_BC .or. &
             s% use_fixed_vsurf_outer_BC .or. &
             (s% use_momentum_outer_BC .and. trim(s% atm_option) == 'fixed_Psurf')
             
@@ -1295,7 +1296,14 @@
                     lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                     ierr)
                if (ierr /= 0) then
-                  if (s% report_ierr) write(*,*) 'failed in get_atm_PT'
+                  if (s% report_ierr) then
+                     write(*,1) 'tau_surf', tau_surf
+                     write(*,1) 'L_surf', L_surf
+                     write(*,1) 'R_surf', R_surf
+                     write(*,1) 's% m(1)', s% m(1)
+                     write(*,1) 's% cgrav(1)', s% cgrav(1)
+                     write(*,*) 'failed in get_atm_PT'
+                  end if
                   return
                end if
 

@@ -279,6 +279,14 @@
 
     pgstar_lw = 8
 
+
+      ! line style for profile panels plot (the left side one, not the "other" one on the right)
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
+
+    pgstar_profile_line_style = 1 
+
 ! TRho Profile window
 ! ===================
 

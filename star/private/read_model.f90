@@ -31,7 +31,7 @@
       implicit none
 
       integer, parameter :: bit_for_zams_file = 0
-      integer, parameter :: bit_for_lnPgas = 1 ! UNUSED, but needed to detect old models
+      integer, parameter :: bit_for_lnPgas = 1 ! OBSOLETE: includes lnPgas variables in place of lnd
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
@@ -48,7 +48,6 @@
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
-      integer, parameter :: increment_for_unused = 1
       integer, parameter :: increment_for_i_w = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
@@ -57,9 +56,8 @@
       integer, parameter :: increment_for_RTI_flag = 1
       integer, parameter :: increment_for_RSP_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
-      integer, parameter :: increment_for_const_L = -1
-      integer, parameter :: max_increment = increment_for_unused &
-                                          + increment_for_i_w &
+      
+      integer, parameter :: max_increment = increment_for_i_w &
                                           + increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
                                           + increment_for_D_omega_flag &
@@ -215,7 +213,6 @@
             end do
          end if
 
-         ! actual brunt_B is set as part of do_report
          s% doing_finish_load_model = .true.
          call do_report(s, ierr)
          s% doing_finish_load_model = .false.
@@ -389,6 +386,14 @@
          s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
+         
+         if (BTEST(file_type, bit_for_lnPgas)) then
+            write(*,*)
+            write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
+            write(*,*)
+            ierr = -1
+            return
+         end if
          
          s% RSP_flag = is_RSP_model .and. want_RSP_model
          
@@ -654,28 +659,23 @@
                exit
             end if
             j = 1
-            j=j+1; if (i_lnd /= 0) xh(i_lnd,i) = vec(j)
-            j=j+1
-            if (i_lnT /= 0) then
-               xh(i_lnT,i) = vec(j)
-            else
-               lnT(i) = vec(j)
-            end if
+            j=j+1; xh(i_lnd,i) = vec(j)
+            j=j+1; xh(i_lnT,i) = vec(j)
             j=j+1; xh(i_lnR,i) = vec(j)            
             if (is_RSP_model) then
                if (want_RSP_model) then
                   j=j+1; xh(i_etrb_RSP,i) = vec(j)
                   j=j+1; xh(i_erad_RSP,i) = vec(j)
                   j=j+1; xh(i_Fr_RSP,i) = vec(j)
-                  j=j+1; s% L(i) = vec(j)
+                  j=j+1; ! discard
                else if (i_w /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_w,i) = max(min_w,sqrt(max(0d0,vec(j))))
-                  j=j+1; !discard xh(i_erad,i) = vec(j)
-                  j=j+1; !discard xh(i_Fr,i) = vec(j)
+                  j=j+1; xh(i_w,i) = sqrt(max(0d0,vec(j)))
+                  j=j+1; ! discard
+                  j=j+1; ! discard
                   j=j+1; xh(i_lum,i) = vec(j)
                end if
             else if (i_w /= 0) then
-               j=j+1; xh(i_w,i) = max(min_w,vec(j))
+               j=j+1; xh(i_w,i) = max(vec(j),0d0)
                j=j+1; xh(i_lum,i) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,i) = vec(j)

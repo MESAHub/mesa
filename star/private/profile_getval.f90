@@ -221,10 +221,6 @@
       end function get_profile_val
 
 
-
-
-
-
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
          use chem_def
          use rates_def
@@ -1905,7 +1901,16 @@
             case(p_w)
                if (s% TDC_flag) then
                   val = s% w(k)
+               else if (s% RSP_flag) then
+                  val = s% RSP_w(k)
                end if               
+            case(p_log_w)
+               if (s% TDC_flag) then
+                  val = s% w(k)
+               else if (s% RSP_flag) then
+                  val = s% RSP_w(k)
+               end if    
+               val = safe_log10(val)           
             case(p_et)
                if (s% TDC_flag) then
                   val = s% w(k)**2
@@ -1921,13 +1926,13 @@
             case(p_avQ)
                if (s% use_avQ_art_visc .or. s% RSP_flag) val = s% avQ(k)
             case(p_Hp_face)
-               if (s% RSP_flag) val = s% Hp_face(k)
+               if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
-               if (s% RSP_flag) val = s% Y_face(k)
+               if (rsp_or_w) val = s% Y_face(k)
             case(p_PII_face)
-               if (s% RSP_flag) val = s% PII(k)
+               if (rsp_or_w) val = s% PII(k)
             case(p_Chi)
-               if (s% RSP_flag) val = s% Chi(k)
+               if (rsp_or_w) val = s% Chi(k)
             case(p_COUPL)
                if (rsp_or_w) val = s% COUPL(k)
             case(p_SOURCE)
@@ -1958,10 +1963,6 @@
             case(p_rsp_logEt)
                if (s% rsp_flag) &
                   val = safe_log10(s% RSP_Et(k))
-            case(p_rsp_vt)
-               if (s% rsp_flag) val = sqrt2*s% w(k)
-            case(p_rsp_vt_div_cs)
-               if (s% rsp_flag) val = sqrt2*s% w(k)/s% csound(k)
             case(p_rsp_Pt)
                if (s% rsp_flag) val = s% Pt(k)
             case(p_rsp_Eq)

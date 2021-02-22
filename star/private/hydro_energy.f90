@@ -31,7 +31,7 @@
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
-      use star_utils, only: em1, e00, ep1
+      use star_utils, only: em1, e00, ep1, set_energy_eqn_scal
 
       implicit none
 
@@ -77,10 +77,10 @@
          integer, intent(out) :: ierr
          
          type(auto_diff_real_18var_order1) :: resid_18, &
-            dL_dm_18, sources_18, others_18, d_turbulent_energy_dt_18, dwork_dm_18, &
-            eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18, P_dV_dt_18
+            dL_dm_18, sources_18, others_18, d_turbulent_energy_dt_18, &
+            dwork_dm_18, eps_grav_18, dke_dt_18, dpe_dt_18, de_dt_18
          type(accurate_auto_diff_real_18var_order1) :: esum_18
-         real(dp) :: cell_energy_fraction_start, residual, dm, dt, scal
+         real(dp) :: residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
          integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_w
@@ -100,7 +100,7 @@
          call setup_dL_dm(ierr); if (ierr /= 0) return         
          call setup_sources_and_others(ierr); if (ierr /= 0) return         
          call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
-         call setup_scal(ierr); if (ierr /= 0) return
+         call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return
          
          s% eps_grav_form_for_energy_eqn(k) = eps_grav_form
          s% dL_dm(k) = dL_dm_18%val
@@ -111,9 +111,11 @@
             ! eps_WD_sedimentation, eps_diffusion, eps_pre_mix
          ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 + eps_grav_18
+            esum_18 = - dL_dm_18 + sources_18 + &
+               others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 + eps_grav_18
          else
-            esum_18 = - dL_dm_18 + sources_18 + others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
+            esum_18 = - dL_dm_18 + sources_18 + &
+               others_18 - d_turbulent_energy_dt_18 - dwork_dm_18 - dke_dt_18 - dpe_dt_18 - de_dt_18
          end if
          resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
          s% ergs_error(k) = -dm*dt*resid_18%val ! save ergs_error before scaling
@@ -172,8 +174,6 @@
             nz = s% nz
             dt = s% dt
             dm = s% dm(k)
-            cell_energy_fraction_start = &
-               s% energy_start(k)*s% dm(k)/s% total_internal_energy_old                    
             doing_op_split_burn = s% op_split_burn .and. &
                s% T_start(k) >= s% op_split_burn_min_T
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
@@ -196,9 +196,10 @@
             dwork_dm_18 = dwork_dm_18/dm
          end subroutine setup_dwork_dm
          
-         subroutine setup_dL_dm(ierr)
+         subroutine setup_dL_dm(ierr)  
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: L00_18, Lp1_18
+            type(auto_diff_real_18var_order1) :: &
+               L00_18, Lp1_18, unused
             include 'formats'
             ierr = 0         
             L00_18 = wrap_L_00(s, k)
@@ -212,7 +213,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_18, others_18
-            use hydro_tdc, only: calc_Eq_18
+            use hydro_tdc, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_18var_order1) :: &
                eps_nuc_18, non_nuc_neu_18, extra_heat_18, Eq_18, RTI_diffusion_18
@@ -260,7 +261,7 @@
             
             Eq_18 = 0d0
             if (s% TDC_flag) then             
-               call calc_Eq_18(s, k, Eq_18, ierr)
+               Eq_18 = compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if   
             
@@ -318,14 +319,13 @@
          
          subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
+            type(auto_diff_real_18var_order1) :: w_00
             include 'formats'
             ierr = 0
             d_turbulent_energy_dt_18 = 0d0
             if (s% TDC_flag) then
-               d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
-                  (s% w_start(k)*s% dxh_w(k) + s% dxh_w(k)**2)/dt ! w = w_start + dxh_w
-               d_turbulent_energy_dt_18%d1Array(i_w_00) = &
-                  (s% w_start(k) + 2d0*s% dxh_w(k))/dt
+               w_00 = wrap_w_00(s,k)
+               d_turbulent_energy_dt_18 = (pow2(w_00) - pow2(s% w_start(k)))/dt 
             end if
          end subroutine setup_d_turbulent_energy_dt
          
@@ -383,7 +383,6 @@
          subroutine setup_de_dt_and_friends(ierr)
             use star_utils, only: get_dke_dt_dpe_dt
             integer, intent(out) :: ierr
-            real(dp) :: P_dV
             real(dp) :: dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
                dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, &
                de_dt, d_de_dt_dlnd, d_de_dt_dlnT, d_PdV_dlnd, d_PdV_dlnT
@@ -393,7 +392,6 @@
             dke_dt = 0d0; d_dkedt_dv00 = 0d0; d_dkedt_dvp1 = 0d0
             dpe_dt = 0d0; d_dpedt_dlnR00 = 0d0; d_dpedt_dlnRp1 = 0d0
             de_dt = 0d0; d_de_dt_dlnd = 0d0; d_de_dt_dlnT = 0d0
-            P_dV = 0d0; d_PdV_dlnd = 0d0; d_PdV_dlnT = 0d0
 
             if (.not. eps_grav_form) then
                de_dt = (s% energy(k) - s% energy_start(k))/dt
@@ -426,25 +424,6 @@
             s% dedt(k) = de_dt
          
          end subroutine setup_de_dt_and_friends
-         
-         subroutine setup_scal(ierr)
-            integer, intent(out) :: ierr
-            real(dp) :: scal_qp, dt_qp, e0_dq
-            include 'formats'
-            ierr = 0
-            if (k > 1) then
-               scal = 1d0
-            else
-               scal = 1d-6
-            end if
-            if (s% dedt_eqn_r_scale > 0d0) &
-               scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale) 
-            scal_qp = scal              
-            dt_qp = dt
-            e0_dq = s% energy_start(k)
-            scal_qp = scal_qp*dt_qp/e0_dq ! tests show that need qp for this (14700)
-            scal = scal_qp
-         end subroutine setup_scal
          
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials

@@ -259,8 +259,6 @@
          ni56 = net_iso(ini56)
          
          s% log_P_center = s% lnP(nz)/ln10
-         
-         call set_phot_info(s)
 
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)

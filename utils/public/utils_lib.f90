@@ -959,6 +959,36 @@ contains
       end subroutine error
   
   end subroutine mv
+  
+  subroutine cp_file(file_in,file_out,skip_errors)
+    use utils_system, only: cp_c => cp
+    character(len=*),intent(in) :: file_in,file_out
+    logical, optional, intent(in) :: skip_errors
+    integer res
+    
+    res = cp_c(file_in,file_out)
+    
+    if(res/=0)then
+       if (present(skip_errors))then
+          if (skip_errors) then
+             write(*,*) "cp failed for '"//trim(file_in)//"' '"//trim(file_out)//"' skipping"
+          else
+            call error()
+          end if
+       else
+          call error()
+       end if
+    end if
+    
+    contains 
+    
+      subroutine error()
+            write(*,*) "cp failed for '"//trim(file_in)//"' '"//trim(file_out)//"'"
+            write(*,*) "Error code: ",res
+            call mesa_error(__FILE__,__LINE__)
+      end subroutine error
+  
+  end subroutine cp_file
 
   integer function alloc_iounit(ierr)
     use utils_def

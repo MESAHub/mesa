@@ -41,8 +41,6 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_w = 1d-20
-
 
       contains
 
@@ -367,7 +365,6 @@
       
       integer function find_next_star_id()
          integer :: id
-         
          id = 0
 !$omp critical (star_handle_next)
          if (have_initialized_star_handles) then
@@ -376,9 +373,20 @@
             end do
          end if
 !$omp end critical (star_handle_next)         
-      
-      find_next_star_id  = id
+         find_next_star_id  = id
       end function find_next_star_id
+      
+      
+      integer function how_many_allocated_star_ids()
+         integer :: id
+         how_many_allocated_star_ids = 0
+         if (have_initialized_star_handles) then
+            do id = 1, max_star_handles
+               if (star_handles(id)% in_use .eqv. .true.) &
+                  how_many_allocated_star_ids = how_many_allocated_star_ids+1
+            end do
+         end if
+      end function how_many_allocated_star_ids
       
 
 
