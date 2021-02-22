@@ -1286,8 +1286,8 @@
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
 
-            call do1_18(s% u_face_18, c% u_face_18)
-            if (failed('u_face_18')) exit
+            call do1_ad(s% u_face_ad, c% u_face_ad)
+            if (failed('u_face_ad')) exit
             call do1(s% u_face_start, c% u_face_start)
             if (failed('u_face_start')) exit
             !call do1(s% u_face, c% u_face)
@@ -1309,8 +1309,8 @@
             call do1(s% d_uface_domega, c% d_uface_domega)
             if (failed('d_uface_domega')) exit
 
-            call do1_18(s% P_face_18, c% P_face_18)
-            if (failed('P_face_18')) exit
+            call do1_ad(s% P_face_ad, c% P_face_ad)
+            if (failed('P_face_ad')) exit
             call do1(s% P_face_start, c% P_face_start)
             if (failed('P_face_start')) exit
             !call do1(s% P_face, c% P_face)
@@ -1686,31 +1686,31 @@
          contains
 
 
-         subroutine do1_18(ptr, other)
-            type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr, other
-            type(auto_diff_real_18var_order1), dimension(:), pointer :: tmp
+         subroutine do1_ad(ptr, other)
+            type(auto_diff_real_star_order1), dimension(:), pointer :: ptr, other
+            type(auto_diff_real_star_order1), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
-               call fill_18_with_NaNs(ptr,1,-1)
+               call fill_ad_with_NaNs(ptr,1,-1)
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nz <= size(ptr,dim=1)) then
-                  if (s% fill_arrays_with_NaNs) call fill_18_with_NaNs(ptr,1,-1)
+                  if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_18_with_NaNs(ptr,1,-1)
-               if (s% zero_when_allocate) call fill_18_with_zeros(ptr,1,-1)
+               if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+               if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
             else
                if (action == do_reallocate .and. &
                    nz <= size(ptr,dim=1)) return
-               call do1D_18(s, ptr, sz_new, action, ierr)
+               call do1D_ad(s, ptr, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_18_with_NaNs(ptr,1,-1)
-                  if (s% zero_when_allocate) call fill_18_with_zeros(ptr,1,-1)
+                  if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
+                  if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
                end if
             end if
-         end subroutine do1_18
+         end subroutine do1_ad
 
 
          subroutine do1(ptr, other)
@@ -1920,8 +1920,8 @@
       end subroutine star_info_arrays
          
          
-      subroutine fill_18_with_NaNs(ptr, klo, khi_in)
-         type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
+      subroutine fill_ad_with_NaNs(ptr, klo, khi_in)
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
          if (khi == -1) khi = size(ptr,dim=1)
@@ -1929,11 +1929,11 @@
             call set_nan(ptr(k)% val)
             call fill_with_NaNs(ptr(k)% d1Array)
          end do
-      end subroutine fill_18_with_NaNs
+      end subroutine fill_ad_with_NaNs
       
       
-      subroutine fill_18_with_zeros(ptr, klo, khi_in)
-         type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
+      subroutine fill_ad_with_zeros(ptr, klo, khi_in)
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
          integer :: k, khi
          if (khi == -1) khi = size(ptr,dim=1)
@@ -1941,15 +1941,15 @@
             ptr(k)% val = 0d0
             ptr(k)% d1Array(:) = 0d0
          end do
-      end subroutine fill_18_with_zeros
+      end subroutine fill_ad_with_zeros
 
 
-      subroutine do1D_18(s, ptr, sz, action, ierr)
+      subroutine do1D_ad(s, ptr, sz, action, ierr)
          type (star_info), pointer :: s
-         type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: sz, action
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1), dimension(:), pointer :: ptr2
+         type(auto_diff_real_star_order1), dimension(:), pointer :: ptr2
          integer :: old_sz, j
          include 'formats'
          ierr = 0
@@ -1962,9 +1962,9 @@
             case (do_allocate)
                allocate(ptr(sz), stat=ierr)
                if (s% fill_arrays_with_NaNs) then
-                  call fill_18_with_NaNs(ptr,1,-1)
+                  call fill_ad_with_NaNs(ptr,1,-1)
                else if (s% zero_when_allocate) then
-                  call fill_18_with_zeros(ptr,1,-1)
+                  call fill_ad_with_zeros(ptr,1,-1)
                end if
             case (do_check_size)
                if (size(ptr,dim=1) < sz) ierr = -1
@@ -1990,17 +1990,17 @@
                   ptr2(j) = ptr(j)
                end do
                if (s% fill_arrays_with_NaNs) then
-                  call fill_18_with_NaNs(ptr,old_sz+1,sz)                  
+                  call fill_ad_with_NaNs(ptr,old_sz+1,sz)                  
                else if (s% zero_when_allocate) then
-                  call fill_18_with_zeros(ptr,old_sz+1,sz)                  
+                  call fill_ad_with_zeros(ptr,old_sz+1,sz)                  
                end if
                deallocate(ptr)
                if (ierr /= 0) return
                ptr => ptr2
             case (do_fill_arrays_with_NaNs)
-               if (associated(ptr)) call fill_18_with_NaNs(ptr,1,-1)
+               if (associated(ptr)) call fill_ad_with_NaNs(ptr,1,-1)
          end select
-      end subroutine do1D_18
+      end subroutine do1D_ad
 
 
       subroutine do1D(s, ptr, sz, action, ierr)
@@ -2916,8 +2916,8 @@
                s% xh(i_u,k) = 0.5d0*(s% r(k)*s% dlnR_dt(k) + s% v_center)
             end if
             if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
-            call fill_18_with_zeros(s% u_face_18,1,-1)
-            call fill_18_with_zeros(s% P_face_18,1,-1)
+            call fill_ad_with_zeros(s% u_face_ad,1,-1)
+            call fill_ad_with_zeros(s% P_face_ad,1,-1)
             s% du_dt(1:nz) = 0
          end if
 

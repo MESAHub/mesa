@@ -474,14 +474,14 @@
                end if
             case (p_v_div_r)
                if (s% u_flag) then
-                  val = s% u_face_18(k)%val/s% r(k)
+                  val = s% u_face_ad(k)%val/s% r(k)
                else if (s% v_flag) then
                   val = s% v(k)/s% r(k)
                end if
 
             case (p_v_times_t_div_r)
                if (s% u_flag) then
-                  val = s% u_face_18(k)%val*s% time/s% r(k)
+                  val = s% u_face_ad(k)%val*s% time/s% r(k)
                else if (s% v_flag) then
                   val = s% v(k)*s% time/s% r(k)
                end if
@@ -933,7 +933,7 @@
                val = val/sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
             case (p_v_div_v_escape)
                if (s% u_flag) then
-                  val = s% u_face_18(k)%val
+                  val = s% u_face_ad(k)%val
                else if (s% v_flag) then
                   val = s% v(k)
                end if
@@ -1135,9 +1135,9 @@
                end if
 
             case(p_P_face)
-               if (s% u_flag) val = s% P_face_18(k)%val
+               if (s% u_flag) val = s% P_face_ad(k)%val
             case(p_log_P_face)
-               if (s% u_flag) val = safe_log10(s% P_face_18(k)%val)
+               if (s% u_flag) val = safe_log10(s% P_face_ad(k)%val)
 
             case (p_hse_ratio)
                if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0) then
@@ -1160,7 +1160,7 @@
             case (p_gradP_div_rho)
                if (k > 1) val = pi4*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
             case (p_dlnP_dlnR)
-               if (k > 1) val = log(s% P_face_18(k-1)%val/s% P_face_18(k)%val) / (s% lnR(k-1) - s% lnR(k))
+               if (k > 1) val = log(s% P_face_ad(k-1)%val/s% P_face_ad(k)%val) / (s% lnR(k-1) - s% lnR(k))
             case (p_dlnRho_dlnR)
                if (k > 1) val = log(s% rho_face(k-1)/s% rho_face(k)) / (s% lnR(k-1) - s% lnR(k))
 
@@ -2240,7 +2240,7 @@
                val = safe_log10(pi4*s% r(k)*s% r(k)*s% csound(k)*s% rho(k)/(Msun/secyer))
             case (p_log_mdot_v) ! log10(4 Pi r^2 v rho / (Msun/year))
                if (s% u_flag) then
-                  val = safe_log10(4*pi*s% r(k)*s% r(k)*s% u_face_18(k)%val*s% rho(k)/(Msun/secyer))
+                  val = safe_log10(4*pi*s% r(k)*s% r(k)*s% u_face_ad(k)%val*s% rho(k)/(Msun/secyer))
                else if (s% v_flag) then
                   val = safe_log10(pi4*s% r(k)*s% r(k)*s% v(k)*s% rho(k)/(Msun/secyer))
                end if
@@ -2277,7 +2277,7 @@
             case(p_u)
                if (s% u_flag) val = s% u(k)
             case(p_u_face)
-               if (s% u_flag) val = s% u_face_18(k)%val
+               if (s% u_flag) val = s% u_face_ad(k)%val
             case (p_dPdr_dRhodr_info)
                if (s% RTI_flag) val = s% dPdr_dRhodr_info(k)
             case(p_signed_log_ergs_err)
@@ -2288,8 +2288,8 @@
                if (s% u_flag) val = s% RTI_du_diffusion_kick(k)
             case(p_log_du_kick_div_du)
                if (s% u_flag .and. k > 1) then
-                  if (abs(s% u_face_18(k)%val) > 1d0) &
-                     val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_18(k)%val))
+                  if (abs(s% u_face_ad(k)%val) > 1d0) &
+                     val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_ad(k)%val))
                end if
                
             case(p_max_abs_xa_corr)

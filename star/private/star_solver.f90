@@ -1704,14 +1704,14 @@
                return
             end if
             do k=1,nz
-               x(1,k) = s% u_face_18(k)%val
+               x(1,k) = s% u_face_ad(k)%val
                if (is_bad_num(x(1,k))) then
                   write(*,2) 'exit_setmatrix x(1,k)', k, x(1,k)
                   stop
                end if
             end do
             do k=1,nz
-               x(2,k) = s% P_face_18(k)%val
+               x(2,k) = s% P_face_ad(k)%val
                if (is_bad_num(x(2,k))) then
                   write(*,2) 'exit_setmatrix x(2,k)', k, x(2,k)
                   stop

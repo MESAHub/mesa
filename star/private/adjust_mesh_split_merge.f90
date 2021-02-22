@@ -1157,7 +1157,7 @@
             end do
          end if
          
-         if (s% u_flag) s% u_face_18(ip)%val = 0.5d0*(s% u(i) + s% u(ip))
+         if (s% u_flag) s% u_face_ad(ip)%val = 0.5d0*(s% u(i) + s% u(ip))
             ! just for setting u_face_start so don't need partials
 
          ! r, q, m, u_face unchanged for face i

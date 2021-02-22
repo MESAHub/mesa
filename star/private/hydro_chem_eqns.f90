@@ -71,7 +71,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, i_lnd, i_lnT, i_lnR, j, i, jj, ii, equchem1, species
+         integer :: nz, i_lnd, i_lnT, j, i, jj, ii, equchem1, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, dVARdot_dVAR, &
             dxdt_expected_dlnd, dxdt_expected_dlnT, &
@@ -93,7 +93,6 @@
          nz = s% nz
          i_lnd = s% i_lnd
          i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
 
          dq = s% dq(k)
          dm = s% dm(k)

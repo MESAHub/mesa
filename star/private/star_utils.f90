@@ -1418,7 +1418,7 @@
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar, i_eqn
-         type(auto_diff_real_18var_order1) :: res18
+         type(auto_diff_real_star_order1) :: res18
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
@@ -1672,7 +1672,7 @@
          v_div_vesc_prev = 0d0
          do k=1,s% nz
             if (s% u_flag) then
-               v = s% u_face_18(k)%val
+               v = s% u_face_ad(k)%val
             else
                v = s% v(k)
             end if
@@ -3319,14 +3319,14 @@
       end subroutine get1_lpp
 
  
-      subroutine calc_Pt_18_tw(s, k, Pt, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
+      subroutine calc_Pt_ad_tw(s, k, Pt, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(out) :: Pt
+         type(auto_diff_real_star_order1), intent(out) :: Pt
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: w, rho
+         type(auto_diff_real_star_order1) :: w, rho
          real(dp) :: Pt_start
          logical :: time_center, test_partials
          include 'formats'
@@ -3346,10 +3346,10 @@
          end if
 
          if (is_bad(Pt%val)) then
-!$omp critical (calc_Pt_18_tw_crit)
+!$omp critical (calc_Pt_ad_tw_crit)
             write(*,2) 'Pt', k, Pt%val
             stop 'calc_Pt_tw'
-!$omp end critical (calc_Pt_18_tw_crit)
+!$omp end critical (calc_Pt_ad_tw_crit)
          end if
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -3358,25 +3358,25 @@
             s% solver_test_partials_val = Pt%val
             !s% solver_test_partials_var = i_var_R
             !s% solver_test_partials_dval_dx = 0 ! d_residual_dr_00
-            write(*,*) 'calc_Pt_18_tw', s% solver_test_partials_var
+            write(*,*) 'calc_Pt_ad_tw', s% solver_test_partials_var
          end if
          
-      end subroutine calc_Pt_18_tw
+      end subroutine calc_Pt_ad_tw
 
 
-      ! XP_18 = P_18 + avQ_18 + Pt_18 + mlt_Pturb_18 with time weighting
-      subroutine calc_XP_18_tw(s, k, skip_P, skip_mlt_Pturb, XP_18, d_XP_dxa, ierr)
+      ! XP_ad = P_ad + avQ_ad + Pt_ad + mlt_Pturb_ad with time weighting
+      subroutine calc_XP_ad_tw(s, k, skip_P, skip_mlt_Pturb, XP_ad, d_XP_dxa, ierr)
          use auto_diff_support
           type (star_info), pointer :: s 
          integer, intent(in) :: k
          logical, intent(in) :: skip_P, skip_mlt_Pturb
-         type(auto_diff_real_18var_order1), intent(out) :: XP_18
+         type(auto_diff_real_star_order1), intent(out) :: XP_ad
          real(dp), dimension(s% species), intent(out) :: d_XP_dxa
          integer, intent(out) :: ierr
          integer :: j
          real(dp) :: mlt_Pturb_start
-         type(auto_diff_real_18var_order1) :: rho_m1, rho_00, &
-            P_18, avQ_18, Pt_18, mlt_Pturb_18
+         type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
+            P_ad, avQ_ad, Pt_ad, mlt_Pturb_ad
          logical :: time_center
          
          ierr = 0
@@ -3385,67 +3385,67 @@
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          
-         P_18 = 0d0         
+         P_ad = 0d0         
          if (.not. skip_P) then
-            P_18 = wrap_p_00(s, k)
-            if (time_center) P_18 = 0.5d0*(P_18 + s% P_start(k))
+            P_ad = wrap_p_00(s, k)
+            if (time_center) P_ad = 0.5d0*(P_ad + s% P_start(k))
             do j=1,s% species
                d_XP_dxa(j) = s% P(k)*s% dlnP_dxa_for_partials(j,k)
                if (time_center) d_XP_dxa(j) = 0.5d0*d_XP_dxa(j)
             end do
          end if
 
-         avQ_18 = 0d0
+         avQ_ad = 0d0
          if (s% use_avQ_art_visc) then
-            call get_avQ_18(s, k, avQ_18, ierr)
+            call get_avQ_ad(s, k, avQ_ad, ierr)
             if (ierr /= 0) return
-            if (time_center) avQ_18 = 0.5d0*(avQ_18 + s% avQ_start(k))
+            if (time_center) avQ_ad = 0.5d0*(avQ_ad + s% avQ_start(k))
          end if
          
-         Pt_18 = 0d0
+         Pt_ad = 0d0
          if (s% TDC_flag) then
-            call calc_Pt_18_tw(s, k, Pt_18, ierr) 
+            call calc_Pt_ad_tw(s, k, Pt_ad, ierr) 
             if (ierr /= 0) return
-            ! note that Pt_18 is already time weighted
+            ! note that Pt_ad is already time weighted
          end if
 
-         mlt_Pturb_18 = 0d0
+         mlt_Pturb_ad = 0d0
          if ((.not. skip_mlt_Pturb) .and. &
              s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
             rho_m1 = wrap_d_m1(s,k)
             rho_00 = wrap_d_00(s,k)
-            mlt_Pturb_18 = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(rho_m1 + rho_00)/6d0
+            mlt_Pturb_ad = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(rho_m1 + rho_00)/6d0
             if (time_center) then
                mlt_Pturb_start = &
                   s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho_start(k-1) + s% rho_start(k))/6d0
-               mlt_Pturb_18 = 0.5d0*(mlt_Pturb_18 + mlt_Pturb_start)
+               mlt_Pturb_ad = 0.5d0*(mlt_Pturb_ad + mlt_Pturb_start)
             end if
          end if           
          
-         XP_18 = P_18 + avQ_18 + Pt_18 + mlt_Pturb_18
+         XP_ad = P_ad + avQ_ad + Pt_ad + mlt_Pturb_ad
          
-         if (s% use_other_pressure) XP_18%val = XP_18%val + s% extra_pressure(k)
+         if (s% use_other_pressure) XP_ad%val = XP_ad%val + s% extra_pressure(k)
 
-      end subroutine calc_XP_18_tw
+      end subroutine calc_XP_ad_tw
       
       
-      subroutine get_avQ_18(s, k, avQ_18, ierr)
+      subroutine get_avQ_ad(s, k, avQ_ad, ierr)
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s      
          integer, intent(in) :: k 
-         type(auto_diff_real_18var_order1), intent(out) :: avQ_18
+         type(auto_diff_real_star_order1), intent(out) :: avQ_ad
          integer, intent(out) :: ierr
          real(dp) :: avQ, d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1
          call get_avQ(s, k, avQ, &
             d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
          if (ierr /= 0) return
-         avQ_18%val = avQ
-         avQ_18%d1Array(i_lnd_00) = d_avQ_dlnd
-         avQ_18%d1Array(i_lnT_00) = d_avQ_dlnT
-         avQ_18%d1Array(i_v_00) = d_avQ_dv00
-         avQ_18%d1Array(i_v_p1) = d_avQ_dvp1
-      end subroutine get_avQ_18
+         avQ_ad%val = avQ
+         avQ_ad%d1Array(i_lnd_00) = d_avQ_dlnd
+         avQ_ad%d1Array(i_lnT_00) = d_avQ_dlnT
+         avQ_ad%d1Array(i_v_00) = d_avQ_dv00
+         avQ_ad%d1Array(i_v_p1) = d_avQ_dvp1
+      end subroutine get_avQ_ad
       
       
       subroutine get_avQ(s, k, avQ, & ! artificial pressure for cell k
@@ -3656,8 +3656,8 @@
          source = s% P(k)*q1/(dt*s% rho(k))
          
          if (s% u_flag) then
-            u_face = s% u_face_18(k)%val
-            P_face = s% P_face_18(k)%val
+            u_face = s% u_face_ad(k)%val
+            P_face = s% P_face_ad(k)%val
          else if (s% v_flag) then
             u_face = s% v(k)
             if (k > 1) then
@@ -3677,8 +3677,8 @@
             AvPp1 = 0d0
          else
             if (s% u_flag) then
-               u_face = s% u_face_18(k+1)%val
-               P_face = s% P_face_18(k+1)%val
+               u_face = s% u_face_ad(k+1)%val
+               P_face = s% P_face_ad(k+1)%val
             else if (s% v_flag) then
                u_face = s% v(k+1)
                alfa = s% dq(k)/(s% dq(k) + s% dq(k+1))
@@ -3831,23 +3831,22 @@
       end function center_avg_x
       
       
-      subroutine get_area_info(s, k, &
-            area, d_area_dlnR, inv_R2, d_inv_R2_dlnR, ierr)
+      subroutine get_area_info(s, k, area, inv_R2, ierr)
+         use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(out) :: area, d_area_dlnR, inv_R2, d_inv_R2_dlnR
+         type(auto_diff_real_star_order1), intent(out) :: area, inv_R2
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: r_00, r2_00
          ierr = 0
+         r_00 = wrap_r_00(s,k)
+         r2_00 = pow2(r_00)
          if (s% using_velocity_time_centering) then
-            area = 4d0*pi*(s% r(k)**2 + s% r(k)*s% r_start(k) + s% r_start(k)**2)/3d0
-            d_area_dlnR = 4d0*pi*s% r(k)*(2d0*s% r(k) + s% r_start(k))/3d0
-            inv_R2 = 1d0/(s% r(k)*s% r_start(k))
-            d_inv_R2_dlnR = -1d0*inv_R2
+            area = 4d0*pi*(r2_00 + r_00*s% r_start(k) + s% r_start(k)**2)/3d0
+            inv_R2 = 1d0/(r_00*s% r_start(k))
          else
-            area = 4d0*pi*s% r(k)**2
-            d_area_dlnR = 2d0*area
-            inv_R2 = 1d0/s% r(k)**2
-            d_inv_R2_dlnR = -2d0*inv_R2
+            area = 4d0*pi*r2_00
+            inv_R2 = 1d0/r2_00
          end if
       end subroutine get_area_info
       

@@ -99,13 +99,13 @@ contains
     do k=nzlo, nzhi
        if (k == 1) then
           s% rho_face(k) = s% rho(k)
-          if (.not. s% u_flag) s% P_face_18(k)%val = s% P(k)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = s% P(k)
           s% csound_face(1) = s% csound(1)
        else
           alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
           beta = 1 - alfa
           s% rho_face(k) = alfa*s% rho(k) + beta*s% rho(k-1)
-          if (.not. s% u_flag) s% P_face_18(k)%val = alfa*s% P(k) + beta*s% P(k-1)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = alfa*s% P(k) + beta*s% P(k-1)
           s% csound_face(k) = alfa*s% csound(k) + beta*s% csound(k-1)
        end if
     end do

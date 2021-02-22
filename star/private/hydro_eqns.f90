@@ -2044,7 +2044,7 @@
                dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
             integer, intent(out) :: ierr
 
-            type(auto_diff_real_18var_order1) :: P_surf_18
+            type(auto_diff_real_star_order1) :: P_surf_ad
             logical :: test_partials
             include 'formats'
             ierr = 0
@@ -2057,7 +2057,7 @@
                   s, P, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
                   skip_partials, nvar, ierr)
             else
-               call wrap(P_surf_18, P, &
+               call wrap(P_surf_ad, P, &
                   0d0, P*dlnPsurf_dlnd, 0d0, &
                   0d0, P*dlnPsurf_dlnT, 0d0, &
                   0d0, 0d0, 0d0, &
@@ -2065,7 +2065,7 @@
                   0d0, 0d0, 0d0, &
                   0d0, P*dlnPsurf_dL, 0d0)
                call do_surf_momentum_eqn( &
-                  s, P_surf_18, skip_partials, nvar, ierr)
+                  s, P_surf_ad, skip_partials, nvar, ierr)
             end if
             
             if (test_partials) then

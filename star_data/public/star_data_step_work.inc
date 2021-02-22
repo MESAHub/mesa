@@ -569,8 +569,8 @@
       
       
       ! for Riemann solver      
-      type(auto_diff_real_18var_order1), pointer, dimension(:) :: &
-         u_face_18, P_face_18
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+         u_face_ad, P_face_ad ! 'ad' for auto_diff
       real(dp), pointer, dimension(:) :: &
          d_uface_domega, &
          RTI_du_diffusion_kick, &

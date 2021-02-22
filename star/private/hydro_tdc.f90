@@ -79,13 +79,13 @@
       subroutine get1_tdc_L_eqn( &  
             s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: unpack_res18_partials
-         use accurate_sum_auto_diff_18var_order1
+         use accurate_sum_auto_diff_star_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: L_expected, L_actual, res18
+         type(auto_diff_real_star_order1) :: L_expected, L_actual, res18
          real(dp) :: scale, residual, e_avg, L_start_max
          logical :: test_partials
          include 'formats'
@@ -144,7 +144,7 @@
             s, k, skip_partials, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          use star_utils, only: set_energy_eqn_scal
-         use accurate_sum_auto_diff_18var_order1
+         use accurate_sum_auto_diff_star_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
@@ -153,9 +153,9 @@
          
          real(dp) :: dt, dm, dt_div_dm, scal, residual
          integer :: i_dw_dt, i_w, i_lnd, i_lnT, i_lnR, i_v
-         type(auto_diff_real_18var_order1) :: resid_18, &
-            d_turbulent_energy_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
-         type(accurate_auto_diff_real_18var_order1) :: esum_18
+         type(auto_diff_real_star_order1) :: resid_ad, &
+            d_turbulent_energy_ad, PtdV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
+         type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: test_partials
          include 'formats'
 
@@ -174,28 +174,28 @@
          end if
          
          call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
-         call setup_PtdV_18(ierr); if (ierr /= 0) return ! erg g^-1
-         call setup_dt_dLt_dm_18(ierr); if (ierr /= 0) return ! erg g^-1
-         call setup_dt_C_18(ierr); if (ierr /= 0) return ! erg g^-1
-         call setup_dt_Eq_18(ierr); if (ierr /= 0) return ! erg g^-1
+         call setup_PtdV_ad(ierr); if (ierr /= 0) return ! erg g^-1
+         call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
+         call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
+         call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
          call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
          
-         ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
-         esum_18 = d_turbulent_energy_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18 ! erg g^-1
+         ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
+         esum_ad = d_turbulent_energy_ad + PtdV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
          
-         resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
-         resid_18 = resid_18*scal/s% dt ! to make residual unitless, must cancel out the dt in scal
-         residual = resid_18%val
+         resid_ad = esum_ad ! convert back to auto_diff_real_star_order1
+         resid_ad = resid_ad*scal/s% dt ! to make residual unitless, must cancel out the dt in scal
+         residual = resid_ad%val
          s% equ(i_dw_dt, k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_turbulent_crit1)
             write(*,2) 'turbulent energy eqn residual', k, residual
-            write(*,2) 'det', k, d_turbulent_energy_18%val
-            write(*,2) 'PtdV', k, PtdV_18%val
-            write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_18%val
-            write(*,2) 'dt_C', k, dt_C_18%val
-            write(*,2) 'dt_Eq', k, dt_Eq_18%val
+            write(*,2) 'det', k, d_turbulent_energy_ad%val
+            write(*,2) 'PtdV', k, PtdV_ad%val
+            write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_ad%val
+            write(*,2) 'dt_C', k, dt_C_ad%val
+            write(*,2) 'dt_Eq', k, dt_Eq_ad%val
             stop 'get1_turbulent_energy_eqn'
 !$omp end critical (hydro_equ_turbulent_crit1)
          end if
@@ -203,7 +203,7 @@
             s% solver_test_partials_val = residual
          end if
          if (skip_partials) return
-         call unpack_res18(resid_18)
+         call unpack_res18(resid_ad)
 
          if (test_partials) then
             s% solver_test_partials_var = i_lnT
@@ -229,26 +229,26 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: w_00
+            type(auto_diff_real_star_order1) :: w_00
             w_00 = wrap_w_00(s,k)
-            d_turbulent_energy_18 = pow2(w_00) - pow2(s% w_start(k))
+            d_turbulent_energy_ad = pow2(w_00) - pow2(s% w_start(k))
          end subroutine setup_d_turbulent_energy
          
-         ! PtdV_18 = Pt_18*dV_18
-         subroutine setup_PtdV_18(ierr) ! erg g^-1
-            use star_utils, only: calc_Pt_18_tw
+         ! PtdV_ad = Pt_ad*dV_ad
+         subroutine setup_PtdV_ad(ierr) ! erg g^-1
+            use star_utils, only: calc_Pt_ad_tw
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: Pt_18, dV_18, d_00
-            call calc_Pt_18_tw(s, k, Pt_18, ierr)
+            type(auto_diff_real_star_order1) :: Pt_ad, dV_ad, d_00
+            call calc_Pt_ad_tw(s, k, Pt_ad, ierr)
             if (ierr /= 0) return
             d_00 = wrap_d_00(s,k)
-            dV_18 = 1d0/d_00 - 1d0/s% rho_start(k)
-            PtdV_18 = Pt_18*dV_18 ! erg cm^-3 cm^-3 g^-1 = erg g^-1
-         end subroutine setup_PtdV_18
+            dV_ad = 1d0/d_00 - 1d0/s% rho_start(k)
+            PtdV_ad = Pt_ad*dV_ad ! erg cm^-3 cm^-3 g^-1 = erg g^-1
+         end subroutine setup_PtdV_ad
 
-         subroutine setup_dt_dLt_dm_18(ierr) ! erg g^-1
+         subroutine setup_dt_dLt_dm_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr            
-            type(auto_diff_real_18var_order1) :: Lt_00, Lt_p1, dLt_18
+            type(auto_diff_real_star_order1) :: Lt_00, Lt_p1, dLt_ad
             real(dp) :: Lt_00_start, Lt_p1_start
             include 'formats'
             ierr = 0
@@ -270,32 +270,32 @@
                else
                   Lt_p1_start = 0d0
                end if
-               dLt_18 = 0.5d0*(Lt_00 + Lt_00_start) - 0.5d0*(Lt_p1 + Lt_p1_start)
+               dLt_ad = 0.5d0*(Lt_00 + Lt_00_start) - 0.5d0*(Lt_p1 + Lt_p1_start)
             else
-               dLt_18 = Lt_00 - Lt_p1
+               dLt_ad = Lt_00 - Lt_p1
             end if
-            dt_dLt_dm_18 = dt*dLt_18/dm
-         end subroutine setup_dt_dLt_dm_18
+            dt_dLt_dm_ad = dt*dLt_ad/dm
+         end subroutine setup_dt_dLt_dm_ad
          
-         subroutine setup_dt_C_18(ierr) ! erg g^-1
+         subroutine setup_dt_C_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: C
+            type(auto_diff_real_star_order1) :: C
             C = compute_C(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
-            dt_C_18 = dt*C
-         end subroutine setup_dt_C_18
+            dt_C_ad = dt*C
+         end subroutine setup_dt_C_ad
                   
-         subroutine setup_dt_Eq_18(ierr) ! erg g^-1
+         subroutine setup_dt_Eq_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: Eq_cell
+            type(auto_diff_real_star_order1) :: Eq_cell
             Eq_cell = compute_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
-            dt_Eq_18 = dt*Eq_cell
-         end subroutine setup_dt_Eq_18
+            dt_Eq_ad = dt*Eq_cell
+         end subroutine setup_dt_Eq_ad
 
          subroutine unpack_res18(res18)
             use star_utils, only: unpack_res18_partials
-            type(auto_diff_real_18var_order1) :: res18            
+            type(auto_diff_real_star_order1) :: res18            
             call unpack_res18_partials(s, k, nvar, i_dw_dt, &
                res18, d_dm1, d_d00, d_dp1)
          end subroutine unpack_res18
@@ -307,8 +307,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Hp_cell
-         type(auto_diff_real_18var_order1) :: r_mid, r_00, r_p1, P_00, d_00, P_m1, d_m1
+         type(auto_diff_real_star_order1) :: Hp_cell
+         type(auto_diff_real_star_order1) :: r_mid, r_00, r_p1, P_00, d_00, P_m1, d_m1
          real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
          include 'formats'
          ierr = 0
@@ -337,8 +337,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Hp_face
-         type(auto_diff_real_18var_order1) :: r_00, P_00, d_00, P_m1, d_m1
+         type(auto_diff_real_star_order1) :: Hp_face
+         type(auto_diff_real_star_order1) :: r_00, P_00, d_00, P_m1, d_m1
          include 'formats'
          ierr = 0
          r_00 = wrap_opt_time_center_r_00(s, k)
@@ -360,8 +360,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Y_face
-         type(auto_diff_real_18var_order1) :: Hp_face, Y1, Y2, QQ_div_Cp_face, &
+         type(auto_diff_real_star_order1) :: Y_face
+         type(auto_diff_real_star_order1) :: Hp_face, Y1, Y2, QQ_div_Cp_face, &
             r_00, d_00, P_00, Cp_00, T_00, chiT_00, chiRho_00, QQ_00, lnT_00, &
             r_m1, d_m1, P_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1
          real(dp) :: dm_bar
@@ -423,9 +423,9 @@
       function compute_PII_face(s, k, ierr) result(PII_face) ! ergs g^-1 K^-1 (like Cp)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: PII_face
+         type(auto_diff_real_star_order1) :: PII_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Cp_00, Cp_m1, Cp_face, Y_face
+         type(auto_diff_real_star_order1) :: Cp_00, Cp_m1, Cp_face, Y_face
          real(dp) :: ALFAS, ALFA
          include 'formats'
          ierr = 0
@@ -448,9 +448,9 @@
       function compute_d_v_div_r(s, k, ierr) result(d_v_div_r) ! s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: d_v_div_r
+         type(auto_diff_real_star_order1) :: d_v_div_r
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: v_00, v_p1, r_00, r_p1
+         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
          include 'formats'
          ierr = 0
          r_00 = wrap_opt_time_center_r_00(s,k)
@@ -464,9 +464,9 @@
       function compute_Chi_cell(s, k, ierr) result(Chi_cell) ! eddy viscosity (Kuhfuss 1986) [erg]
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Chi_cell
+         type(auto_diff_real_star_order1) :: Chi_cell
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: &
+         type(auto_diff_real_star_order1) :: &
             w_rho2, r6_face, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
          real(dp) :: f, ALFAM, ALFA
          include 'formats'
@@ -499,9 +499,9 @@
       function compute_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Eq_cell
+         type(auto_diff_real_star_order1) :: Eq_cell
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: d_v_div_r, Chi_cell
+         type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
          if (k == 1 .or. k == s% nz .or. s% TDC_alfa == 0d0) then
@@ -520,9 +520,9 @@
       function compute_Uq_face(s, k, ierr) result(Uq_face) ! cm s^-2, acceleration
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Uq_face
+         type(auto_diff_real_star_order1) :: Uq_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Chi_00, Chi_out, r_00
+         type(auto_diff_real_star_order1) :: Chi_00, Chi_out, r_00
          include 'formats'
          ierr = 0         
          Chi_00 = compute_Chi_cell(s,k,ierr)
@@ -543,9 +543,9 @@
       function compute_Source(s, k, ierr) result(Source) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Source
+         type(auto_diff_real_star_order1) :: Source
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: &
+         type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, P_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell
          include 'formats'
@@ -599,9 +599,9 @@
       function compute_D(s, k, ierr) result(D) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: D
+         type(auto_diff_real_star_order1) :: D
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Hp_cell, w_00, dw3
+         type(auto_diff_real_star_order1) :: Hp_cell, w_00, dw3
          include 'formats'
          real(dp) :: alpha, cede
          ierr = 0
@@ -625,9 +625,9 @@
       function compute_Dr(s, k, ierr) result(Dr) ! erg g^-1 s^-1 = cm^2 s^-3
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Dr
+         type(auto_diff_real_star_order1) :: Dr
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: &
+         type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
          real(dp) :: gammar, alpha, POM
          include 'formats'
@@ -661,9 +661,9 @@
       function compute_C(s, k, ierr) result(C) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: C
+         type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Source, D, Dr
+         type(auto_diff_real_star_order1) :: Source, D, Dr
          Source = compute_Source(s, k, ierr)
          if (ierr /= 0) return
          D = compute_D(s, k, ierr)
@@ -678,9 +678,9 @@
       function compute_L_face(s, k, ierr) result(L_face) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: L_face
+         type(auto_diff_real_star_order1) :: L_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Lr, Lc, Lt
+         type(auto_diff_real_star_order1) :: Lr, Lc, Lt
          call compute_L_terms(s, k, L_face, Lr, Lc, Lt, ierr)
          return
       end function compute_L_face
@@ -689,9 +689,9 @@
       function compute_Lr(s, k, ierr) result(Lr) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Lr
+         type(auto_diff_real_star_order1) :: Lr
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: &
+         type(auto_diff_real_star_order1) :: &
             r_00, area, T_00, T400, Erad, T_m1, T4m1, &
             kap_00, kap_m1, kap_face, diff_T4_div_kap, BW, BK
          real(dp) :: alfa
@@ -732,9 +732,9 @@
       function compute_Lc(s, k, ierr) result(Lc) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Lc
+         type(auto_diff_real_star_order1) :: Lc
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Lc_w_face_factor
+         type(auto_diff_real_star_order1) :: Lc_w_face_factor
          Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
          s% Lc(k) = Lc%val
       end function compute_Lc
@@ -743,9 +743,9 @@
       function compute_Lc_terms(s, k, Lc_w_face_factor, ierr) result(Lc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Lc, Lc_w_face_factor
+         type(auto_diff_real_star_order1) :: Lc, Lc_w_face_factor
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: r_00, area, &
+         type(auto_diff_real_star_order1) :: r_00, area, &
             T_m1, T_00, d_m1, d_00, w_m1, w_00, T_rho_face, PII_face, w_face
          real(dp) :: ALFAC, ALFAS
          include 'formats'
@@ -779,9 +779,9 @@
       function compute_Lt(s, k, ierr) result(Lt) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1) :: Lt
+         type(auto_diff_real_star_order1) :: Lt
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: &
+         type(auto_diff_real_star_order1) :: &
             r_00, area2, d_m1, d_00, rho2_face, Hp_face, w_m1, w_00
          real(dp) :: alpha, alpha_t
          include 'formats'
@@ -811,7 +811,7 @@
       subroutine compute_L_terms(s, k, L, Lr, Lc, Lt, ierr)
          type (star_info), pointer, intent(in) :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(out) :: L, Lr, Lc, Lt
+         type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
          integer, intent(out) :: ierr         
          include 'formats'
          ierr = 0
@@ -864,7 +864,7 @@
          subroutine set1_w_start_vars(k, ierr)   
             integer, intent(in) :: k
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: L, Lr, Lc, Lt
+            type(auto_diff_real_star_order1) :: L, Lr, Lc, Lt
             include 'formats'
             ierr = 0               
             if (time_center) then
@@ -885,7 +885,7 @@
          integer, intent(out) :: ierr   
          integer :: k, i_w, nz
          real(dp) :: Lc_val, w_00
-         type(auto_diff_real_18var_order1) :: &
+         type(auto_diff_real_star_order1) :: &
             Lc_w_face_factor, L, Lr, Lc, Lt
          real(dp), allocatable :: w_face(:)
          logical, parameter :: dbg = .false.
