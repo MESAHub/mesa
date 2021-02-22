@@ -869,7 +869,7 @@
       ! make calls in exactly the same order as for screen_init_AZ_info   
       subroutine screen_pair( &
                sc, a1, z1, a2, z2, screening_mode, &
-               zs13, zhat, zhat2, lzav, aznut, zs13inv, &
+               zs13, zhat, zhat2, lzav, aznut, zs13inv, low_logT_lim, &
                scor, scordt, scordd, ierr)
          use rates_def
          use screen5, only: fxt_screen5
@@ -880,12 +880,20 @@
          integer, intent(in) :: screening_mode ! see screen_def.
          ! cached info
          real(dp), intent(in) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
+         real(dp), intent(in) :: low_logT_lim ! scor==0 for T < low_logT_lim
          ! outputs
          real(dp), intent(out) :: scor ! screening factor
          real(dp), intent(out) :: scordt ! partial wrt temperature
          real(dp), intent(out) :: scordd ! partial wrt density
          integer, intent(out) :: ierr
          
+         if(sc% logT < low_logT_lim ) then
+            scor = 0d0
+            scordt=0d0
+            scordd=0d0
+            return
+         end if
+
          if (screening_mode == extended_screening) then
             call fxt_screen5( &
                sc, zs13, zhat, zhat2, lzav, aznut, zs13inv,  &

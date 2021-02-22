@@ -282,6 +282,15 @@
             return
          end if
 
+         ! refuse to load old models using lnPgas as a structure variable
+         if (BTEST(file_type, bit_for_lnPgas)) then
+            write(*,*)
+            write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
+            write(*,*)
+            ierr = -1
+            return
+         end if
+
          s% model_number = 0
          s% star_age = 0
          s% xmstar = -1
