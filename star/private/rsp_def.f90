@@ -32,6 +32,7 @@
       implicit none
       
       integer, parameter :: MAX_NZN = 1501
+      integer, parameter :: MAX_MODES = 15
       
       real(dp), parameter :: f_Edd_isotropic = 1d0/3d0, f_Edd_free_stream = 1d0
 

@@ -389,6 +389,7 @@
 
       subroutine get_LINA_info(s,ierr)
          use rsp_lina, only: do_LINA
+         use utils_lib, only: mesa_error
          type (star_info), pointer :: s      
          integer, intent(out) :: ierr  
          
@@ -424,6 +425,9 @@
          end do                    
         
          NMODES = s% RSP_nmodes
+        if(NMODES > MAX_MODES) &
+            call mesa_error(__FILE__,__LINE__,"Maximum allowed number of modes exceeded")
+
 
          call do_LINA(s, s% RSP_L*SUNL, NZN, NMODES, VEL, &
             s% rsp_LINA_periods, s% rsp_LINA_growth_rates, &
@@ -901,7 +905,7 @@
       
       subroutine calculate_work_integrals(s)
          type (star_info), pointer :: s
-         integer :: i, k
+         integer :: i, k, iounit
          real(dp) :: dt, dm, dVol, P_tw, avQ_tw, Pt_tw
          character (len=256) :: fname
          dt = s% dt
@@ -926,15 +930,15 @@
             if (s% rsp_num_periods == s% RSP_work_period) then
                fname = trim(s% log_directory) // '/' // trim(s% RSP_work_filename)
                write(*,*) 'write work integral data to ' // trim(fname)
-               open(78,file=trim(fname),status='unknown')
+               open(newunit=iounit,file=trim(fname),status='unknown')
                do I=1,NZN
                   k = NZN+1-i
-                  write(78,'(I3,tr1,F7.4,4(tr1,d16.10))') &
+                  write(iounit,'(I3,tr1,F7.4,4(tr1,d16.10))') &
                      I, log10(sum(s% dm(1:k))), &
                      WORK(I)/EKDEL, WORKQ(I)/EKDEL, &
                      WORKT(I)/EKDEL, WORKC(I)/EKDEL
                enddo
-               close(78)
+               close(iounit)
             end if
             PDVWORK=0.d0
             do I=1,NZN

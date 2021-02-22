@@ -25,8 +25,8 @@
 
       module rsp_build
       use star_def, only: star_info
-      use utils_lib, only: is_bad
-      use const_def, only: dp, crad
+      use utils_lib, only: is_bad, mesa_error
+      use const_def, only: dp, crad, two_thirds, pi4, four_thirds_pi, Msun, Lsun, Rsun
       use eos_lib, only: Radiation_Pressure
       use rsp_def
       use rsp_eval_eos_and_kap, only: X, Y, Z
@@ -38,11 +38,11 @@
       private
       public :: do_rsp_build
 
-      real(dp) :: PREC,FSUB,TIN,CFIDDLE,ALF, &
-         HHFAC,DdmFAC,SVEL,EFL02,EMR,ELR, &
+      real(dp) :: PREC,FSUB,TIN,CFIDDLE,ALF,&
+         HHFAC,DdmFAC,EFL02,EMR,ELR, &
          E_0,E_1,T_0,T_1,V_0,V_1,P_0,P_1,QQ_0,QQ_1, &
          CP_0,CP_1,OP_0,OP_1,R_1,M_0,dm_bar_0
-      real(dp), dimension(15) :: PERS,ETO
+      real(dp), dimension(MAX_MODES) :: PERS,ETO
       real(dp), pointer, dimension(:) :: &
          M, DM, DM_BAR, R, Vol, T, w, Et, E, P, Lr, Lc, Hp_face, Y_face, K, CPS, QQS
       logical, parameter :: RSP_eddi = .true. ! use Eddington approx at surface
@@ -54,32 +54,19 @@
       !use rsp_create_env, only: do_rsp_create_env
       type (star_info), pointer :: s    
       integer, intent(out) :: ierr
-      integer :: NZT    ! warst. z joniz./il. warstw 
-      real(dp) :: TH0                ! temp. warstwy jonizacji              
+      integer :: NZT
+      real(dp) :: TH0
       real(dp) :: Mass,L
       real(dp) :: H,dmN
-      integer :: NMODES            ! ilosc modow rozwazanych (N=NMODES)
-      integer :: NDIM1,NDIM2       ! maks. ilosc modow/warstw 
-      real(dp) :: VEL0(15)
-      character (len=10) PARA
-      character (len=30) HEAD
-      character (len=72) HEAD2      
-      integer :: I,J,kk,NSEQ,NIT
-      real(dp) ::  GEFF,MBOL,DU,TET
-      integer :: IARG
-      character (len=8) II1,II2,II3,II4,II5
-      character (len=15) PROGNAME
+      integer :: NMODES
+      integer :: I,J,kk,NSEQ, iounit
       character (len=250) FILENAME
-      integer :: IFROZEN,IRELAX,ICASTOR
-      
-      integer :: IO,II,IX,iter
-      real(dp) :: SS,AA,BB,XX
+      integer :: IO,II
+      real(dp) :: SS,AA,BB
       real(dp), allocatable :: TA(:), VEL(:,:), TEMP(:)
       real(dp) :: TAUTEFF,TAUATTEFF
       logical RELAX
-      complex(8) xC
-      real(dp) :: X1,X2,Y1,Y2,amix1,amix2
-      integer :: ISTAT
+      real(dp) :: amix1,amix2
       type (star_info), target :: copy_info
       type (star_info), pointer :: c, prv
       
@@ -101,27 +88,27 @@
       FSUB = s% RSP_dq_1_factor         
       ddmfac = 1d0 ! s% RSP_ddmfac
       hhfac = 1.02d0 ! s% RSP_hhfac
+      
       nmodes = s% RSP_nmodes
+      if(nmodes > MAX_MODES) call mesa_error(__FILE__,__LINE__,"Maximum allowed number of modes exceeded")
+
       RELAX = s% RSP_relax_initial_model
       EFL02 = EFL0*EFL0
 
 !     START MAIN CYCLE
    
 !     INITIALIZE ARRAYS
-      NDIM1=15 !max. number of modes
-      NDIM2=NZN+1
-      do J=1,NDIM1
-         do I=1,NDIM2
+   
+      do J=1,MAX_MODES
+         do I=1,NZN+1
             VEL(I,J)=0.d0
-         enddo
-      enddo
-      do I=1,NDIM1
+         end do
+      end do
+      do I=1,MAX_MODES
          PERS(I)= 0.d0
-         VEL0(I)= 0.d0
          ETO(I) = 0.d0
-         !SGR(I) = 0.d0
-      enddo
-      do I=1,NDIM2
+      end do
+      do I=1,NZN+1
          R(I) = 0.d0
          P(I) = 0.d0
          Vol(I) = 0.d0
@@ -132,14 +119,14 @@
          dm(I)= 0.d0
          dm_bar(I)= 0.d0
          w(I)=0.d0
-         Hp_face(I)    = 0.d0
-         Y_face(I)   = 0.d0
+         Hp_face(I)= 0.d0
+         Y_face(I) = 0.d0
          CPS(I)    = 0.d0
          QQS(I)    = 0.d0
          Lc(I) = 0.d0
          Lr(I) = 0.d0
          w(I) = 0.d0
-      enddo
+      end do
 
 !     SET STANDARD PARAMETERS
 !     NSEQ = SEQUENCE NUMBER (DUMMY)
@@ -153,8 +140,8 @@
       EMR = s% RSP_mass
       ELR = s% RSP_L
       TE = s% RSP_Teff
-      Mass=EMR*SUNM
-      L=ELR*SUNL       
+      Mass = EMR*Msun
+      L = ELR*Lsun       
       
       if (s% RSP_trace_RSP_build_model) then
          write(*,*) '*** build initial model ***'
@@ -199,16 +186,16 @@
       do I=NZN,2,-1
          SS=SS+K(I)*(R(I)-R(I-1))/Vol(I)
          TA(I-1)=SS
-      enddo
+      end do
       II=0; IO=0
       do I=NZN,1,-1
-         if(TA(I).gt.2.d0/3.d0)then
+         if(TA(I) > two_thirds)then
             II=I
             IO=I+1
-            goto 77
-         endif
-      enddo
- 77   continue
+            exit
+         end if
+      end do
+
       if (IO == 0) then
          write(*,*) 'failed to find photosphere'
          ierr = -1
@@ -216,29 +203,24 @@
       end if
       AA=(T(IO)-T(II))/(TA(IO)-TA(II))
       BB=T(IO)-AA*TA(IO)
-      TAUTEFF=AA*2.d0/3.d0+BB
+      TAUTEFF=AA*two_thirds+BB
 
       do I=NZN,1,-1
-         if(T(I).gt.TE)then
+         if(T(I) > TE)then
             II=I
             IO=I+1
-            goto 78
-         endif
-      enddo
- 78   continue
+            exit
+         end if
+      end do
+
       AA=(T(IO)-T(II))/(TA(IO)-TA(II))
       BB=T(IO)-AA*TA(IO)
       TAUATTEFF=(TE-BB)/AA
       
       call cleanup_for_LINA(s, M, DM, DM_BAR, R, Vol, T, w, P, ierr)
 
- 1    format(1X,1P,5D26.16)
-
-      GEFF=G*Mass/R(NZN)**2
-      MBOL=-2.5d0*dlog10(ELR)+4.79d0    
-      
-      if(NMODES.eq.0) goto 11 ! jesli masz liczyc tylko static envelope
-      
+ 1    format(1X,1P,5D26.16) 
+   
       if (.not. (s% use_RSP_new_start_scheme .or. s% use_other_RSP_linear_analysis)) then          
          if (s% RSP_trace_RSP_build_model) write(*,*) '*** linear analysis ***'
          do I=1,NZN ! LINA changes Et, so make a work copy for it
@@ -250,32 +232,26 @@
             return
          end if
          FILENAME=trim(s% log_directory) // '/' // 'LINA_period_growth.data'
-         open(15,file=trim(FILENAME),status='unknown')
+         open(newunit=iounit,file=trim(FILENAME),status='unknown')
          do I=1,NMODES
             s% rsp_LINA_periods(i) = PERS(I)
             s% rsp_LINA_growth_rates(i) = ETO(I)
             write(*,'(I3,2X,99e16.5)') I-1, &
                PERS(I)/86400.d0,ETO(I)
-            write(15,'(I3,2X,99e16.5)') I-1, &
+            write(iounit,'(I3,2X,99e16.5)') I-1, &
                PERS(I)/86400.d0,ETO(I)
-         enddo
-         close(15)
+         end do
+         close(iounit)
          s% RSP_have_set_velocities = .true.
       else      
          PERS(1:NMODES) = 0d0
-         VEL0(1:NMODES) = 0d0
          do I=1,NZN
             do j=1,nmodes
                VEL(I,J) = 0d0
             end do
          enddo         
       end if
-
- 11   continue
   
-5568  format(1X,1P,5E15.6)
-
- 444  format(F6.3,tr2,f8.2,tr2,f7.2,tr2,d9.3) 
       if (s% RSP_trace_RSP_build_model) then
          write(*,*) '*** done creating initial model ***'
          write(*,*)
@@ -332,14 +308,12 @@
          integer, intent(out) :: ierr
       
          real(dp) :: dmN,dm_0,H,Psurf,DDT
-         real(dp) :: OPVV,OPTT,POM
          real(dp) :: GPF
-         real(dp) :: DTN,DTLAST,RS00,RIN
-         real(dp) :: F2,F1,D,HH,TT,RAMA,dmL
-         real(dp) :: T4_1,RM,T4_0,WE,TNL,dmNL
+         real(dp) :: F2,F1,D,HH,TT,dmL
+         real(dp) :: T4_1,RM,T4_0,WE,dmNL
          real(dp) :: FACQ,HH1,HH2
-         integer :: N,N1,N2,I,ITIN,dmN_cnt,NCHANG,IG,H_cnt
-         real(dp) :: HP_0,HP_1,IGR_0,IGR_1,PII,w_0
+         integer :: N,N1,I,ITIN,dmN_cnt,NCHANG,IG,H_cnt
+         real(dp) :: HP_0,HP_1,IGR_0,IGR_1,w_0
          real(dp) :: Lr_0,Lc_0,SVEL_0,HSTART,tau_sum,TH0_tol,TIN_tol, &
             dmN_too_large, dmN_too_small, H_too_large, H_too_small
          logical :: adjusting_dmN, in_photosphere, in_outer_env, &
@@ -379,7 +353,7 @@
             if (s% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
             call store_N
             zone_loop: do
-               R_1=pow(R_1**3-3.d0*V_0*dm_0/P4,1.d0/3.d0)
+               R_1=pow(R_1**3-3.d0*V_0*dm_0/pi4,1.d0/3.d0)
                N=N-1  
                if (s% RSP_trace_RSP_build_model) write(*,*) 'zone_loop', N, T_0, TIN
                if (N.eq.0 .or. T_0 >= TIN) then
@@ -388,11 +362,11 @@
                   if (N.eq.0 .and. abs(T(1)-TIN).lt.TIN*TIN_tol) then
                      s% M_center = M_0 - dm_0
                      s% star_mass = s% RSP_mass
-                     s% mstar = s% star_mass*SUNM
+                     s% mstar = s% star_mass*Msun
                      s% xmstar = s% mstar - s% M_center
                      s% M_center = s% mstar - s% xmstar ! this is how it is set when read file
-                     s% L_center = s% RSP_L*SUNL
-                     s% R_center = pow(r(1)**3 - Vol(1)*dm(1)/P43, 1d0/3d0)
+                     s% L_center = s% RSP_L*Lsun
+                     s% R_center = pow(r(1)**3 - Vol(1)*dm(1)/four_thirds_pi, 1d0/3d0)
                      s% v_center = 0                     
                      if (s% RSP_trace_RSP_build_model) &
                         write(*,*) '   inner dm growth scale', HH
@@ -439,10 +413,10 @@
                   if(NZN-N+1.eq.NZT.and.abs(T_0-TH0).lt.TH0_tol*TH0) then
                      adjusting_dmN = .false.
                      if (s% RSP_trace_RSP_build_model) &
-                        write(*,*) '           outer dm/Msun', dmN/SUNM
+                        write(*,*) '           outer dm/Msun', dmN/Msun
                   end if
                   ! one last repeat with final dmN
-                  !if (s% RSP_trace_RSP_build_model) write(*,*) 'cycle start_from_top_loop', dmN_cnt, dmN/SUNM
+                  !if (s% RSP_trace_RSP_build_model) write(*,*) 'cycle start_from_top_loop', dmN_cnt, dmN/Msun
                   cycle start_from_top_loop            
                end if
                if (s% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
@@ -461,11 +435,11 @@
          include 'formats'
          tau = 0d0 ! surface currently at tau=0
          do i=NZN,1,-1
-            dtau = dm(i)*K(i)/(4d0*pi*r(i)**2)
+            dtau = dm(i)*K(i)/(pi4*r(i)**2)
             tau = tau + dtau
-            if (tau >= 2d0/3d0) then
+            if (tau >= two_thirds) then
                write(*,2) 'cells from surface tau=0 to tau=2/3', &
-                  NZN+1-i, tau-dtau, 2d0/3d0, tau, T(i), TE
+                  NZN+1-i, tau-dtau, two_thirds, tau, T(i), TE
                return
             end if
          end do
@@ -478,17 +452,17 @@
          include 'formats'
          dm_0=dmN*FSUB
          M_0=MX
-         dm_bar_0=(dm_0/2.d0)
+         dm_bar_0=(dm_0*0.5d0)
          if(.not.RSP_eddi) then !     EXACT GREY RELATION
             WE=TE**4
             T4_0=WE*sqrt(3.d0)/4.d0               !0.4330127018d0 
             T_0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE !0.811194802d0*TE
          else !     EDDINGTON APPROXIMATION
-            WE=TE**4
+            WE=pow4(TE)
             T4_0=WE*0.5d0 ! T4_0=WE*1.0d0/2.d0
             T_0=pow(0.5d0, 0.25d0)*TE ! T_0= pow(1.0d0/2.d0,0.25d0)*TE
          endif      
-         RM=sqrt(L/(P4*SIG*WE))
+         RM=sqrt(L/(pi4*SIG*WE))
          R_1=RM
          if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
             tau_surf = s% RSP_tau_surf_for_atm_grey_with_kap
@@ -507,7 +481,7 @@
             Psurf = 0d0
          end if
          Psurf_from_atm = Psurf
-         P_0=Psurf+G*M_0*dm_bar_0/(P4*R_1**4)
+         P_0=Psurf+G*M_0*dm_bar_0/(pi4*R_1**4)
          call EOP(s,-1,T_0,P_0,V_0, &
                   E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)
          if (ierr /= 0) return
@@ -609,7 +583,7 @@
          Lc(N) = Lc_0
          Lr(N) = Lr_0
          w(N) = w_0
-         dtau = dm(N)*K(N)/(P4*R(N)**2)
+         dtau = dm(N)*K(N)/(pi4*R(N)**2)
          if (in_photosphere .and. T(N) >= TE) then
             if (s% RSP_testing) &
                write(*,*) 'nz phot, tau_sum, T', &
@@ -643,7 +617,7 @@
             dm_0=dm_0*H
          end if         
          dm_bar_0=(dm_0+dmL)/2.d0
-         P_0=P_1+G*M_0*dm_bar_0/(P4*R_1**4)         
+         P_0=P_1+G*M_0*dm_bar_0/(pi4*R_1**4)         
       end subroutine setup_next_zone
       
       real(dp) function eval_T_residual(ierr)
@@ -652,7 +626,7 @@
             T_0,P_0,V_0,E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)     
          if (ierr /= 0) return 
          call CFLUX(HP_0,IGR_0,Lc_0,w_0,GPF,N)
-         TT=4.d0*SIG*P4**2*R_1**4/(3.d0*dm_bar_0*L)
+         TT=4.d0*SIG*pi4**2*R_1**4/(3.d0*dm_bar_0*L)
          T4_0 = T_0**4
          Lr_0=TT*(T4_0/OP_0-T4_1/OP_1)/ &
                (1.d0-dlog(OP_0/OP_1)/dlog(T4_0/T4_1))*L
@@ -679,7 +653,7 @@
          use num_lib, only: safe_root_with_brackets
          real(dp) :: Tmax, epsx, epsy, residual, lnT, &
             lnT_min, lnT_max, resid_T_min, resid_T_max, dfdx
-         integer :: i, n, ierr
+         integer :: n, ierr
          integer, parameter :: lrpar=1, lipar=1, imax=50
          real(dp), target :: rpar_target(lrpar)
          integer, target :: ipar_target(lipar)
@@ -750,7 +724,7 @@
             T4_0=T_0**4
          end do Lc_loop1
          
-         TT=4.d0*SIG*P4**2*R_1**4/(3.d0*dm_bar_0*L)
+         TT=4.d0*SIG*pi4**2*R_1**4/(3.d0*dm_bar_0*L)
          Lr_0=TT*(T4_0/OP_0-T4_1/OP_1)/ &
                (1.d0-dlog(OP_0/OP_1)/dlog(T4_0/T4_1))*L
          F1=(Lr_0+Lc_0)/L-1.d0  
@@ -860,9 +834,9 @@
       subroutine ZNVAR(s,H,dmN,L,TE,M,ierr)
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
-      real(dp) :: H,dmN,L,TE,M,ha,Psurf
-      real(dp) :: T0,R,TAU0,Pdm,CKP,P,PZ,V,OP,DU1,DU2,CP,QQ, &
-         dtau, kap, alfa, G_M_dtau_div_R2, Prad, Pgas_0, Pgas_1, &
+      real(dp) :: H,dmN,L,TE,M,Psurf
+      real(dp) :: T0,R,TAU0,P,V, &
+         dtau, kap, alfa, G_M_dtau_div_R2, Prad, Pgas_0, &
          dP_dV, dkap_dV, xx, residual, d_residual_dlnV, &
          dkap_dlnV, dlnV, dP_dlnV, lnV
       integer :: I
@@ -935,7 +909,7 @@
       !write(*,*) 'V, P, kap, residual', i, V, P, kap, residual
       
       dmN = 4*pi*R**2*dtau/kap
-      if (s% RSP_testing) write(*,*) 'initial dmN', dmN/SUNM
+      if (s% RSP_testing) write(*,*) 'initial dmN', dmN/Msun
       !stop 
       end subroutine ZNVAR
 
@@ -955,8 +929,8 @@
       endif
 
 !     PRESSURE SCALE HEIGHT
-      HP_0=R_1**2/(G*M_0)*(P_0*V_0+P_1*V_1)/2.d0
-      POM=P4*R_1**2*HP_0/dm_bar_0/(V_0+V_1)*2.d0
+      HP_0=pow2(R_1)/(G*M_0)*(P_0*V_0+P_1*V_1)*0.5d0
+      POM=pi4*pow2(R_1)*HP_0/dm_bar_0/(V_0+V_1)*2.d0
 
 !     SUPERADIABATIC GRADIENT, Y
       IGR_0=POM*((QQ_0/CP_0+QQ_1/CP_1)/2.d0*(P_1-P_0) &
@@ -997,7 +971,7 @@
             OMEGA_0=(-BB+sqrt(DELTA))/(2.d0*AA)
          endif
          PII=FF*OMEGA_0*GPF
-         Lc_0=P4*R_1**2*(T_0/V_0+T_1/V_1)*0.5d0*PII*(ALFAC/ALFAS)
+         Lc_0=pi4*R_1**2*(T_0/V_0+T_1/V_1)*0.5d0*PII*(ALFAC/ALFAS)
 !                                                 (REPLACES ALFAS BY ALFAC)
       else
          OMEGA_0=0.d0
