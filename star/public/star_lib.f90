@@ -1299,10 +1299,12 @@
       end subroutine star_relax_mass
       
       
-      subroutine star_relax_mass_to_remove_H_env(id, lg_max_abs_mdot, ierr) ! also resets initial_mass
+      subroutine star_relax_mass_to_remove_H_env( &
+            id, extra_mass, lg_max_abs_mdot, ierr) ! also resets initial_mass
          use relax, only: do_relax_mass
          use report, only: get_mass_info
          integer, intent(in) :: id
+         real(dp), intent(in) :: extra_mass
          real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
             ! e.g., -8.0 for mdot of -10^-8 Msun/year
          integer, intent(out) :: ierr
@@ -1312,7 +1314,7 @@
          if (ierr /= 0) return
          call get_mass_info(s, s% dm, ierr)
          if (ierr /= 0) return
-         call do_relax_mass(id, s% he_core_mass, lg_max_abs_mdot, ierr)      
+         call do_relax_mass(id, s% he_core_mass + extra_mass, lg_max_abs_mdot, ierr)      
       end subroutine star_relax_mass_to_remove_H_env
       
       

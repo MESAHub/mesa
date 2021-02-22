@@ -36,6 +36,7 @@
       !     for P and L in energy equation
       !     for area when multiplied by P
       ! TDC_Lsurf_factor: Lsurf = TDC_Lsurf_factor*area(1)*clight*crad*T(1)**4
+      ! TDC_use_Stellingwerf_Lr as in RSP
       !   
 
       ! ::
@@ -47,6 +48,10 @@
     TDC_alfar = 0.0d0
 
     TDC_Lsurf_factor = 0.5d0
+    TDC_use_Stellingwerf_Lr = .true.
+    TDC_w_min_for_damping = 1d2
+    TDC_num_outermost_cells_forced_nonturbulent = 0
+    TDC_num_innermost_cells_forced_nonturbulent = 0
 
 
       ! use_DGESVX_in_bcyclic

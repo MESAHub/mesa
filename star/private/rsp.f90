@@ -44,7 +44,6 @@
          ! multiple calls are ok to search.
          use rsp_build, only: do_rsp_build
          use hydro_vars, only: set_vars, set_Teff
-         !use report, only: do_report
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k
@@ -67,8 +66,6 @@
          s% doing_finish_load_model = .false.
          call set_Teff(s, ierr)
          if (ierr /= 0) return
-         !call do_report(s, ierr)
-         !if (ierr /= 0) return
       end subroutine do1_rsp_build
 
 
@@ -702,10 +699,10 @@
       
          !call rsp_dump_for_debug(s)
          !stop 'rsp_dump_for_debug'
-                  
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
+         if (s% rsp_max_dt > 0) target_dt = s% rsp_max_dt ! force the timestep
          s% dt = target_dt
 
          if (is_bad(s% dt)) then

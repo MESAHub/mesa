@@ -400,7 +400,8 @@
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, &
+    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
+    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, &
     
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
@@ -481,7 +482,7 @@
 
     surface_extra_Pgas, use_atm_PT_at_center_of_surface_cell, &
     use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, use_T_black_body_outer_BC, &
-    fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
+    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
     use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
@@ -1286,6 +1287,8 @@
  s% use_T_black_body_outer_BC = use_T_black_body_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
+ s% fixed_Psurf = fixed_Psurf
+ s% use_fixed_Psurf_outer_BC = use_fixed_Psurf_outer_BC
  s% use_fixed_L_for_BB_outer_BC = use_fixed_L_for_BB_outer_BC
  s% tau_for_L_BB = tau_for_L_BB
  s% fixed_L_for_BB_outer_BC = fixed_L_for_BB_outer_BC
@@ -2061,6 +2064,10 @@
  s% TDC_alfam = TDC_alfam
  s% TDC_alfar = TDC_alfar
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
+ s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
+ s% TDC_w_min_for_damping = TDC_w_min_for_damping
+ s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
+ s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
 
  ! timestep
  s% max_timestep = max_timestep
@@ -2924,6 +2931,8 @@
  use_T_black_body_outer_BC = s% use_T_black_body_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
+ fixed_Psurf = s% fixed_Psurf
+ use_fixed_Psurf_outer_BC = s% use_fixed_Psurf_outer_BC
  use_fixed_L_for_BB_outer_BC = s% use_fixed_L_for_BB_outer_BC
  fixed_L_for_BB_outer_BC = s% fixed_L_for_BB_outer_BC
  tau_for_L_BB = s% tau_for_L_BB
@@ -3690,6 +3699,10 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alfam= s% TDC_alfam
  TDC_alfar= s% TDC_alfar
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
+ TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
+ TDC_w_min_for_damping = s% TDC_w_min_for_damping
+ TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
+ TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
 
  ! timestep
  max_timestep = s% max_timestep

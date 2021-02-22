@@ -370,7 +370,7 @@
          subroutine get_initial_guess_for_atm(ierr)
             integer, intent(out) :: ierr
             skip_partials = .true.
-            s% opacity_start(1) = 1d-2 ! kap_guess
+            s% opacity(1) = 1d-2 ! kap_guess
             call star_get_atm_PT( &
                 s% id, tau_surf, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                 s% Teff, &
@@ -399,7 +399,13 @@
          
          subroutine get_atm(ierr)
             integer, intent(out) :: ierr
+            include 'formats'
+            ierr = 0
             skip_partials = .true.
+            if (s% opacity(1) <= 0d0 .or. is_bad(s% opacity(1))) then
+               write(*,1) 's% opacity(1)', s% opacity(1)
+               stop 'run_star_extras get_atm'
+            end if
             s% opacity_start(1) = s% opacity(1)
             call star_get_surf_PT( &
                s% id, skip_partials, &

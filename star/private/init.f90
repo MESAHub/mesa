@@ -328,7 +328,7 @@
          s% tau_base = 2d0/3d0
          s% tau_factor = 1
 
-         s% solver_iter = -1
+         s% solver_iter = 0
 
          s% using_gold_tolerances = .false.
          s% using_velocity_time_centering = .false.

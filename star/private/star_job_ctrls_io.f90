@@ -107,6 +107,7 @@
          lg_max_abs_mdot, &
          relax_mass_to_remove_H_env, &
          relax_initial_mass_to_remove_H_env, &
+         extra_mass_retained_by_remove_H_env, &
          relax_mass_scale, &
          relax_initial_mass_scale, &
          dlgm_per_step, &
@@ -758,6 +759,7 @@
          s% job% lg_max_abs_mdot = lg_max_abs_mdot
          s% job% relax_mass_to_remove_H_env = relax_mass_to_remove_H_env
          s% job% relax_initial_mass_to_remove_H_env = relax_initial_mass_to_remove_H_env
+         s% job% extra_mass_retained_by_remove_H_env = extra_mass_retained_by_remove_H_env
          s% job% relax_mass_scale = relax_mass_scale
          s% job% relax_initial_mass_scale = relax_initial_mass_scale
          s% job% dlgm_per_step = dlgm_per_step
@@ -1336,6 +1338,7 @@
          lg_max_abs_mdot = s% job% lg_max_abs_mdot
          relax_mass_to_remove_H_env = s% job% relax_mass_to_remove_H_env
          relax_initial_mass_to_remove_H_env = s% job% relax_initial_mass_to_remove_H_env
+         extra_mass_retained_by_remove_H_env = s% job% extra_mass_retained_by_remove_H_env
          relax_mass_scale = s% job% relax_mass_scale
          relax_initial_mass_scale = s% job% relax_initial_mass_scale
          dlgm_per_step = s% job% dlgm_per_step

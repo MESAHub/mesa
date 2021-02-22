@@ -1,7 +1,4 @@
 
-! the contents of this are set to match the needs of pre_ms_to_cc_12_20
-! so local inlist_common files show differences from what is used for that case.
-
 &star_job
       show_log_description_at_start = .false.
 
@@ -35,7 +32,6 @@
       kap_CO_prefix   = 'a09_co' ! 'gs98_co' 'a09_co'
       kap_lowT_prefix = 'lowT_fa05_a09p'
       use_Type2_opacities = .true.
-      
 / ! end of kap namelist
 
 &controls

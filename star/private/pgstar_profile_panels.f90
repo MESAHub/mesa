@@ -960,11 +960,15 @@
             end if
             call pgslw(s% pgstar_lw)
             if (yfile_data_len > 0) then
+               call pgsls(s% pgstar_profile_line_style)
                call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
+               call pgsls(1)
                deallocate(yfile_xdata, yfile_ydata)
                nullify(yfile_xdata, yfile_ydata)
             else
+               call pgsls(s% pgstar_profile_line_style)
                call pgline(npts, xvec, yvec)
+               call pgsls(1)
                if (panels_show_grid) then
                   ishape = 21
                   do k=1,npts

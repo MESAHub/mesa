@@ -334,7 +334,7 @@
             dm_bar(k) = 0.5d0*(dm(k-1) + dm(k))
          end do
          dm_bar(1) = 0.5d0*dm(1)
-         if (s% rsp_flag) then ! rsp uses this definition
+         if (s% rsp_flag .or. s% tdc_flag) then ! rsp and tdc use this definition
             dm_bar(nz) = 0.5d0*(dm(nz-1) + dm(nz))
          else
             dm_bar(nz) = 0.5d0*dm(nz-1) + dm(nz)
@@ -1391,6 +1391,7 @@
             s% tau_start(k) = -1d99
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
+            s% opacity_start(k) = -1d99
             s% w_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do
@@ -3078,11 +3079,6 @@
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
          
-         if (s% TDC_flag .and. j == s% i_lum) then ! assume j = 0 means partial wrt L
-            write(*,2) 'cannot have TDC_flag and partials wrt L(k-1)', k
-            stop 'em1'
-         end if
-         
          if (is_bad(v)) then
 !$omp critical (star_utils_em1_crit1)
             write(*,4) 'em1(i,j,k) ' // &
@@ -3132,7 +3128,6 @@
          
          if (v == 0d0) return
          
-         
          if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k+1)
@@ -3152,7 +3147,7 @@
             stop 'ep1'
          end if
          
-         if (j > nvar) return ! hybrid
+         if (j > nvar) return
          
          if (i > nvar) then
             write(*,5) 'bad i ep1(i,j,k) ' // &
@@ -3323,8 +3318,8 @@
 
       end subroutine get1_lpp
 
-
-      subroutine calc_Pt_18_tw(s, k, Pt, ierr)
+ 
+      subroutine calc_Pt_18_tw(s, k, Pt, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
@@ -3340,24 +3335,21 @@
             Pt = 0d0
             return
          end if
-         
-         stop 'fix this for w replacing et'
-         
          rho = wrap_d_00(s,k)
          w = wrap_w_00(s,k)
-         Pt = s% TDC_alfap*pow2(w)*rho
+         Pt = s% TDC_alfap*pow2(w)*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% TDC_alfap*s% w_start(k)*s% rho_start(k)
+            Pt_start = s% TDC_alfap*pow2(s% w_start(k))*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 
          if (is_bad(Pt%val)) then
-!$omp critical (hydro_et_crit2)
+!$omp critical (calc_Pt_18_tw_crit)
             write(*,2) 'Pt', k, Pt%val
             stop 'calc_Pt_tw'
-!$omp end critical (hydro_et_crit2)
+!$omp end critical (calc_Pt_18_tw_crit)
          end if
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -3424,7 +3416,8 @@
             rho_00 = wrap_d_00(s,k)
             mlt_Pturb_18 = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(rho_m1 + rho_00)/6d0
             if (time_center) then
-               mlt_Pturb_start = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho_start(k-1) + s% rho_start(k))/6d0
+               mlt_Pturb_start = &
+                  s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho_start(k-1) + s% rho_start(k))/6d0
                mlt_Pturb_18 = 0.5d0*(mlt_Pturb_18 + mlt_Pturb_start)
             end if
          end if           
@@ -3857,6 +3850,28 @@
             d_inv_R2_dlnR = -2d0*inv_R2
          end if
       end subroutine get_area_info
+      
+      
+      subroutine set_energy_eqn_scal(s, k, scal, ierr) ! 1/(erg g^-1 s^-1)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: scal
+         integer, intent(out) :: ierr
+         real(dp) :: cell_energy_fraction_start
+         include 'formats'
+         ierr = 0
+         if (k > 1) then
+            scal = 1d0
+         else
+            scal = 1d-6
+         end if
+         if (s% dedt_eqn_r_scale > 0d0) then
+            cell_energy_fraction_start = &
+               s% energy_start(k)*s% dm(k)/s% total_internal_energy_old                    
+            scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale) 
+         end if
+         scal = scal*s% dt/s% energy_start(k)
+      end subroutine set_energy_eqn_scal
 
 
       end module star_utils
