@@ -7,7 +7,6 @@ module suzuki_tables
 
   implicit none
 
-#ifdef USE_HDF5
   integer :: num_suzuki_reactions
 
   integer, pointer, dimension(:) :: & ! (num_suzuki_reactions)
@@ -603,6 +602,5 @@ contains
      end function failed
 
   end subroutine private_load_suzuki_tables
-#endif
 
 end module suzuki_tables

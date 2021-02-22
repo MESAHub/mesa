@@ -71,7 +71,7 @@ LOAD_CRMATH = `mesasdk_crmath_link`
 export MESASDK_MATH_SLOT = crmath
 endif
 
-# step 3) specify which LAPACK and BLADS libraries to use for mesa/mtx
+# step 3) specify which LAPACK and BLAS libraries to use for mesa/mtx
 
 WHICH_LAPACK95 =
 WHICH_LAPACK =
@@ -92,9 +92,7 @@ LOAD_PGPLOT = `mesasdk_pgplot_link` -lz
 # SE is now supported using run_star_extras.  contact Falk Herwig for info.
 
 
-# step 6) do you want to use HDF5 with mesa/star? 
-# Currently we use HDF5 for weak nuclear reaction rates
-USE_HDF5 = YES
+# step 6) specify which HDF library to use for mesa/hdf5io
 LOAD_HDF5 = `mesasdk_hdf5_link`
 
 
