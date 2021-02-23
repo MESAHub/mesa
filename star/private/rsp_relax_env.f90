@@ -25,8 +25,9 @@
 
       module rsp_relax_env
       use star_def, only: star_info
-      use utils_lib, only: is_bad
-      use const_def, only: dp, crad
+      use utils_lib, only: is_bad, mesa_error
+      use const_def, only: dp, crad, one_third, four_thirds_pi, pi4, &
+           boltz_sigma, two_thirds
       use eos_lib, only: Radiation_Pressure
       use rsp_def
       use rsp_eval_eos_and_kap, only: X, Y, Z
@@ -45,16 +46,17 @@
          eval1_mesa_Rho_given_PT, eval1_gamma_PT_getRho
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
-      real(dp) :: T,V,P1,DPV,E,OP,F2,P,U,SVEL,CP,QQ
-      real(dp) :: DU1,DU2,DU3,DU4,DU5,DU6,DU7,DU8,DU9,DU10,DU11,DU12
+      real(dp) :: T,V,P1,DPV,E,OP,F2,P,SVEL,CP,QQ
+      real(dp) :: DU1,DU2,DU3,DU4,DU5,DU6,DU7,DU8,DU9
       integer :: k,I
-      real(dp) :: RES(12)
+      real(dp) :: rho_guess, rho, Prad
+      real(dp), parameter :: PRECEQ = 5.d-13
 
-      real(dp) :: R,A,PRECEQ,rho_guess,rho,Prad,P_test
-      data R,A/8.317d7,7.5641d-15/
-      data PRECEQ/5.d-13/
-
-      if(P.le.0.d0) goto 100 !negative pressure, stop
+      if(P <= 0.d0) then
+         write(*,*) 'Negative or zero pressure in EOP'
+         ierr = -1
+         return 
+      end if
       
       ierr = 0
       Prad = Radiation_Pressure(T)
@@ -62,7 +64,6 @@
          write(*,*) 'P <= Prad', k, P, Prad, T
          ierr = -1
          return
-         stop 'EOP'
       end if
       rho_guess = eval1_gamma_PT_getRho(s, 0, P, T, ierr)
       if (ierr /= 0) then
@@ -71,7 +72,6 @@
          write(*,*) 'T', T
          ierr = -1
          return
-         stop 'EOP'
       end if
       call eval1_mesa_Rho_given_PT(s, 0, P, T, rho_guess, rho, ierr)
       if (ierr /= 0) then
@@ -81,54 +81,38 @@
          write(*,*) 'rho_guess', rho_guess
          ierr = -1
          return
-         stop 'EOP'
       end if
       V = 1d0/rho ! initial guess to be improved below
-      
-         !write(*,*) 'eval1_mesa_Rho_given_PT', k
-         !write(*,*) 'P', P
-         !write(*,*) 'T', T
-         !write(*,*) 'rho_guess', rho_guess
-         !write(*,*) 'V', 0, V
-      
+
+!     Newton-Rhapson iteration (to make P1->P)
       I=0
-      !     NEWTON-RAPHSON ITERATION (TO MAKE P1->P)
- 1    I=I+1
-      call mesa_eos_kap(s,0, &
-        T,V,P1,DPV,DU1,E,DU2,DU3,CP,DU4,DU5,QQ,DU6,DU7,OP &
-           ,DU8,DU9,ierr)
-      if (ierr /= 0) return
-      if(I.gt.25) goto 2 !no convergence, stop
-      F2=P1/P-1.d0
-      V=V-F2*P/DPV
-      if (is_bad(V)) then
-         write(*,*) 'V', V
-         write(*,*) 'F2', F2
-         write(*,*) 'DPV', DPV
-         write(*,*) 'P', P
-         write(*,*) 'EOP I', I
-         ierr = -1
-         return
-         stop
-      end if
-      
-         !write(*,*) 'V', I, V
-         
-      if(abs(F2).lt.PRECEQ) goto 3
-      goto 1
- 3    continue
-       if (abs(P - P_test) > 1d-10*P) then
-       end if
+      do
+         I=I+1
+         if(I > 25) then
+            write(*,*) 'No convergence in EOP; T,P= ',T,P
+            ierr = -1
+            return      
+         end if
+         call mesa_eos_kap(s,0, &
+           T,V,P1,DPV,DU1,E,DU2,DU3,CP,DU4,DU5,QQ,DU6,DU7,OP &
+              ,DU8,DU9,ierr)
+         if (ierr /= 0) return
+         F2=P1/P-1.d0
+         V=V-F2*P/DPV
+         if (is_bad(V)) then
+            write(*,*) 'V', V
+            write(*,*) 'F2', F2
+            write(*,*) 'DPV', DPV
+            write(*,*) 'P', P
+            write(*,*) 'EOP I', I
+            ierr = -1
+            return
+         end if   
+         if(abs(F2) < PRECEQ) exit
+      end do
+
       return
 
- 2    write(*,*) 'NO CONVERGENCE IN EOP; T,P= ',T,P
-         ierr = -1
-         return
-      stop
- 100  write(*,*) 'NEGATIVE OR ZERO PRESSURE IN EOP'
-         ierr = -1
-         return
-      stop
       end subroutine EOP
 
 
@@ -252,11 +236,11 @@
 
       if (s% RSP_use_Prad_for_Psurf) then
          if(.not.RSP_eddi) then !     EXACT GREY RELATION
-            T_0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE !0.811194802d0*TE
+            T_0= pow(0.25d0*sqrt(3.d0),0.25d0)*TE !0.811194802d0*TE
          else !     EDDINGTON APPROXIMATION
-            T_0= pow(0.5d0, 0.25d0)*TE ! T_0= pow(1.0d0/2.d0,0.25d0)*TE 
+            T_0= pow(0.5d0, 0.25d0)*TE
          endif      
-         Psurf = crad*T_0*T_0*T_0*T_0/3d0
+         Psurf = one_third*crad*T_0*T_0*T_0*T_0
       else
          Psurf = 0d0
       end if
@@ -459,7 +443,6 @@
          write(*,*) 'RELAX_ENV has reached max num allowed tries for outer dm', max_dmN_cnt
          ierr = -1
          return
-         stop 1
       end if
 
  24   TNL  = TT
@@ -470,36 +453,37 @@
       
          dmN  = dmN-DDT
 
-         if(IOP.ge.1) then
+         if(IOP >= 1) then
    !        CALCULATE HAHA - ZONE MASS RATIO BELOW ANCHOR
    !        TOTAL MASS BELOW ANCHOR: SUMM, FIRST ZONE MASS: AONE
             AONE=dmN
             HAHA=1.01d0
             do I=1,100
                POM=1.d0/(NZN-NZT+1)*dlog10(1.d0-SUMM/AONE*(1.d0-HAHA))
-               if(dabs(HAHA-10.d0**POM).lt.1d-10) goto 22
-               HAHA=10.d0**POM         
-            enddo
-            write(*,*) 'NO CONVERGENCE IN RELAX_ENV ITERATION FOR H'
-            stop
- 22      continue
-            HAHA=10.d0**POM  
+               if(dabs(HAHA-pow(10.d0,POM)) < 1d-10) exit
+               if(i == 100) then
+                  write(*,*) 'No convergence in RSP/RELAX_ENV iteration for mass zone ratio, H'
+                  call mesa_error(__FILE__,__LINE__,"RSP/RELAX_ENV: No convergence in iteration for mass zone ratio")
+               end if
+               HAHA=pow(10.d0,POM)         
+            end do
+            HAHA=pow(10.d0,POM)  
    !        SET NEW MASS DISTRIBUTION
             do I=NZN,1,-1
-               if(I.eq.NZN) then
+               if(I == NZN) then
    !              SPECIAL DEFINITIONS FOR THE OUTER ZONE
                   M(I)=MSTAR
                   dm(I)=dmN*FSUB
                   dm_bar(I)=dm(I)*0.5d0
                else
-                  if(I.ge.NZN-NZT+1) dm(I)=dmN !DEFINITION DOWN TO ANCHOR
-                  if(I.lt.NZN-NZT+1.and.ok_to_adjust_mass)  &
+                  if(I >= NZN-NZT+1) dm(I)=dmN !DEFINITION DOWN TO ANCHOR
+                  if(I <  NZN-NZT+1 .and. ok_to_adjust_mass)  &
                                      dm(I)=AONE*pow(HAHA,(NZN-NZT+1)-I)
                   dm_bar(I)=(dm(I)+dm(I+1))*0.5d0
                   M(I)=M(I+1)-dm(I+1)             
-               endif
-            enddo
-         endif
+               end if
+            end do
+         end if
          
       end if
 
@@ -510,18 +494,18 @@
 !     LOOP 1 .. EOS
       !$OMP PARALLEL DO PRIVATE(I,T1,POM,EDFAC,op_err) SCHEDULE(dynamic,2)
       do 1 I=2,NZN
-         T1=P43/dm(I)
-         Vol(I)=T1*(R(I)**3-R(I-1)**3)
-         DVRM(I) = -3.d0*T1*R(I-1)**2
-         DVR(I)  =  3.d0*T1*R(I)**2
+         T1=four_thirds_pi/dm(I)
+         Vol(I)=T1*(pow3(R(I))-pow3(R(I-1)))
+         DVRM(I) = -3.d0*T1*pow2(R(I-1))
+         DVR(I)  =  3.d0*T1*pow2(R(I))
 
          if(I.eq.NZN.and.ok_to_adjust_Tsurf)then
             if(RSP_eddi)then
-               EDFAC=1.d0/2.d0
+               EDFAC=0.5d0
             else
-               EDFAC=sqrt(3.d0)/4.d0
+               EDFAC=0.25d0*sqrt(3.d0)
             end if
-            POM=(EDFAC*L0/(4.d0*PI*SIG*R(NZN)**2))**0.25d0
+            POM=(EDFAC*L0/(pi4*boltz_sigma*R(NZN)**2))**0.25d0
             T(NZN)=POM
          endif
 
@@ -550,12 +534,12 @@
       if (ierr /= 0) return
 
 !     FIRST ZONE, CALCULATION OF R0 AND EOS
-      P(1)=P(2)+G*M(1)*dm_bar(1)/(P4*R(1)**4)
+      P(1)=P(2)+G*M(1)*dm_bar(1)/(pi4*R(1)**4)
 !     WITH GIVEN T AND P ITERATE FOR V AND CALCULATE ITS DERIVATIVES
       call EOP(s,0,T(1),P(1),Vol(1),E(1),CPS(1),QQS(1),SVEL,K(1),ierr)
       if (ierr /= 0) return
-      s% R_center=pow(R(1)**3-3.d0*Vol(1)*dm(1)/P4,1.d0/3.d0)
-      T1=P43/dm(1)
+      s% R_center=pow(R(1)**3-3.d0*Vol(1)*dm(1)/pi4,one_third)
+      T1=four_thirds_pi/dm(1)
       DVRM(1) = -3.d0*T1*s% R_center**2
       DVR(1)  =  3.d0*T1*R(1)**2
 !     CALCULATE EOS FOR THE FIRST ZONE TO OBTAIN DERIVATIVES
@@ -618,8 +602,8 @@
                 +POM*(dP_dT_00(I+1))-1.d0/T(I+1)
 
          POM=2.d0/(Vol(I)+Vol(I+1))
-         POM2=8.d0*PI*(R(I)**2)/dm_bar(I)*Hp_face(I)
-         IGR2=4.d0*PI*(R(I)**2)*Hp_face(I)*POM/dm_bar(I)
+         POM2=2.d0*pi4*(R(I)**2)/dm_bar(I)*Hp_face(I)
+         IGR2=pi4*(R(I)**2)*Hp_face(I)*POM/dm_bar(I)
          IGR2X0=2.d0*IGR2/R(I)+IGR2/Hp_face(I)*dHp_dr_00(I) &
                -POM2/(Vol(I)+Vol(I+1))**2*(DVR(I)+DVRM(I+1))
          IGR2XM=-POM2/(Vol(I)+Vol(I+1))**2*DVRM(I)    &
@@ -646,7 +630,7 @@
       enddo
 
       do I=1,NZN-1
-         POM=sqrt(2.d0/3.d0)*0.5d0
+         POM=sqrt(two_thirds)*0.5d0
          FF=POM*((E(I)  +P(I)  *Vol(I)  )/T(I) &
               +(E(I+1)+P(I+1)*Vol(I+1))/T(I+1))
          FFY0=POM*(dE_dT_00(I)+dP_dT_00(I)*Vol(I)-(E(I)+P(I)*Vol(I))/T(I))/T(I)
@@ -767,7 +751,7 @@
             d_dampR_dT_00(I) = 0.d0
             d_dampR_dw_00(I) = 0.d0
          else
-            POM=(GAMMAR**2)/(ALFA**2)*4.d0*SIG
+            POM=(GAMMAR**2)/(ALFA**2)*4.d0*boltz_sigma
             POM2=T(I)**3*Vol(I)**2/(CPS(I)*K(I))
             POM3=Et(I)
             POM4=0.5d0*(Hp_face(I)**2+Hp_face(I-1)**2)
@@ -837,7 +821,7 @@
             DLCZP(I)=0d0
             if (Et(I) /= 0d0) DLCZ0(I)=POM*PII(I)*0.25d0/sqrt(Et(I))
             if (Et(I+1) /= 0d0) DLCZP(I)=POM*PII(I)*0.25d0/sqrt(Et(I+1))
-            POM2=4.d0*PI*(R(I)**2)*PII(I)*0.5d0*(ALFAC/ALFAS)*POM3
+            POM2=pi4*(R(I)**2)*PII(I)*0.5d0*(ALFAC/ALFAS)*POM3
             POM=POM*POM3
             DLCX0(I)=POM*dPII_dr_00(I)+2.d0*Lc(I)/R(I) &
                             -POM2*(T(I)  /(Vol(I)**2  )*DVR(I)+ &
@@ -880,16 +864,17 @@
             DLTZ0(I)=0.d0
             DLTZP(I)=0.d0
          else
-            POM=-2.d0/3.d0*ALFA*ALFAT*(4.d0*PI*(R(I)**2))**2
+            POM=-two_thirds*ALFA*ALFAT*(pi4*(R(I)**2))**2
             POM2=Hp_face(I)*(1.d0/Vol(I)**2+1.d0/Vol(I+1)**2)*0.5d0
             POM3=(Et(I+1)**1.5d0-Et(I)**1.5d0)/dm_bar(I)
             Lt(I)=POM*POM2*POM3
             if (is_bad(Lt(I))) then
-               write(*,*) 'Lt(I)', I, Lt(I)
-               write(*,*) 'POM', I, POM
-               write(*,*) 'POM2', I, POM2
-               write(*,*) 'POM3', I, POM3
-               stop
+               write(*,*) 'RSP/RELAX_ENV: NaN/inf turbulent luminosity, zone =', I
+               write(*,*) 'Lt(I)', Lt(I)
+               write(*,*) 'POM  ', POM
+               write(*,*) 'POM2 ', POM2
+               write(*,*) 'POM3 ', POM3
+               call mesa_error(__FILE__,__LINE__,"RSP/RELAX_ENV: NaN/inf turbulent luminosity")
             end if
             DLTX0(I)=4.d0*Lt(I)/R(I) &
                  +Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I)**3*DVR(I) &
@@ -1051,11 +1036,12 @@
          HR(IW)    = -(Lr(I)/L0+Lc(I)/L0+Lt(I)/L0-1.d0)
          !write(*,*) 'energy', I, HR(IW)
          if (is_bad(HR(IW))) then
-            write(*,*) 'L0', I, L0
-            write(*,*) 'Lt(I)', I, Lt(I)
-            write(*,*) 'Lc(I)', I, Lc(I)
-            write(*,*) 'Lr(I)', I, Lr(I)
-            stop
+            write(*,*) 'NaN/inf residual for energy equation, I=', I
+            write(*,*) 'L0', L0
+            write(*,*) 'Lt(I)', Lt(I)
+            write(*,*) 'Lc(I)', Lc(I)
+            write(*,*) 'Lr(I)', Lr(I)
+            call mesa_error(__FILE__,__LINE__,"RSP/RELAX_ENV: NaN/inf residual for energy equation")
          end if
          HD(6,IW)  = (DLT +DLCY0(I)+DLTY0(I))/L0     !Y(i)
          HD(9,IW)  = (DLTP+DLCYP(I)+DLTYP(I))/L0     !Y(i+1)
@@ -1065,13 +1051,12 @@
          HD(7,IW)  = (     DLCZ0(I)+DLTZ0(I))/L0     !Z(i)
          HD(10,IW) = (     DLCZP(I)+DLTZP(I))/L0     !Z(i+1) 
 !        CALC MOMEMTUM EQUATION(I)
-         T1=-P4*(R(I)**2)/dm_bar(I)
+         T1=-pi4*pow2(R(I))/dm_bar(I)
          if(I.eq.NZN) then
             HR(IR) = -T1*(Psurf-P(I)-PTURB(I))+G*M(I)/R(I)**2
          else
             HR(IR)=-T1*(P(I+1)-P(I)+PTURB(I+1)-PTURB(I))+G*M(I)/R(I)**2
          end if
-         !write(*,*) 'momentum', I, HR(IR)
          HD(3,IR) = +T1*(-dP_dr_in(I)-dPt_dr_in(I))  !X(i-1)
          HD(4,IR) = +T1*(-dP_dT_00(I))            !Y(i)
 
@@ -1100,25 +1085,25 @@
          else
             T1=-1.d0/dm(I)
             HR(IC)= -(T1*(Lt(I)-Lt(I-1))+SOURCE(I)-DAMP(I)-DAMPR(I))
-            !write(*,*) 'conv energy', I, HR(IC)
             if (is_bad(HR(IC))) then
-               write(*,*) 'Lt(I', I, Lt(I)
-               write(*,*) 'Lt(I-1)', I-1, Lt(I-1)
-               write(*,*) 'SOURCE(I)', I, SOURCE(I)
-               write(*,*) 'DAMP(I)', I, DAMP(I)
-               write(*,*) 'DAMPR(I)', I, DAMPR(I)
-               stop
+               write(*,*) 'NaN/inf residual for turbulent energy equation, I=', I
+               write(*,*) 'Lt(I)    ', Lt(I)
+               write(*,*) 'Lt(I-1)  ', Lt(I-1)
+               write(*,*) 'SOURCE(I)', SOURCE(I)
+               write(*,*) 'DAMP(I)  ', DAMP(I)
+               write(*,*) 'DAMPR(I) ', DAMPR(I)
+               call mesa_error(__FILE__,__LINE__,"RSP/RELAX_ENV: NaN/inf residual for turbulent energy equation")
             end if
-            HD(3,IC)  =          +T1*(        -DLTZ0(I-1))  !Z(i-1)
+            HD(3,IC)  =             +T1*(        -DLTZ0(I-1))  !Z(i-1)
             HD(6,IC)  = dC_dw_00(I) +T1*(DLTZ0(I)-DLTZP(I-1))  !Z(i)
-            HD(9,IC)  =          +T1*(DLTZP(I))             !Z(i+1)
+            HD(9,IC)  =             +T1*(DLTZP(I))             !Z(i+1)
             HD(1,IC)  = dC_dr_in2(I)+T1*(        -DLTXM(I-1))  !X(i-2)
             HD(4,IC)  = dC_dr_in(I) +T1*(DLTXM(I)-DLTX0(I-1))  !X(i-1)
             HD(7,IC)  = dC_dr_00(I) +T1*(DLTX0(I)-DLTXP(I-1))  !X(i)
-            HD(10,IC) = dC_dr_out(I) +T1*(DLTXP(I))             !X(i+1)
+            HD(10,IC) = dC_dr_out(I)+T1*(DLTXP(I))             !X(i+1)
             HD(2,IC)  = dC_dT_in(I) +T1*(        -DLTY0(I-1))  !Y(i-1)
             HD(5,IC)  = dC_dT_00(I) +T1*(DLTY0(I)-DLTYP(I-1))  !Y(i)
-            HD(8,IC)  = dC_dT_out(I) +T1*(DLTYP(I))             !Y(i+1)
+            HD(8,IC)  = dC_dT_out(I)+T1*(DLTYP(I))             !Y(i+1)
          end if
 
 !        SET ANCHOR T(NZN)=CONST
@@ -1159,24 +1144,16 @@
          ABB(11,I)=HD(6,I)
       enddo  
 
-!-    LAPACK
       call DGBTRF(3*NZN,3*NZN,5,5,ABB,LD_ABB,IPVT,INFO)
-      if(INFO.ne.0) then
-         write(*,*) 'hyd: LAPACK/dgbtrf problem no., iter.',INFO,II
-         open(61,file='x.dat',status='unknown')
-         write(61,'(F6.3,tr2,f8.2,tr2,f7.2,tr2,d9.3)')EMR,ELR,TE-0.5d0, &
-              gam
-         close(61) 
-         open(61,file='logic.dat',status='unknown')
-         write(61,'(I1)') 3
-         close(61)
-         stop
-      endif
+      if(INFO /= 0) then
+         write(*,*) 'RELAX_ENV: LAPACK/dgbtrf problem no., iter.',INFO,II
+         call mesa_error(__FILE__,__LINE__,"RSP/RELAX_ENV: Lapack/dgbtrf problem")
+      end if
       call DGBTRS('n',3*NZN,5,5,1,ABB,LD_ABB,IPVT,HR,3*NZN,INFO)
-      if(INFO.ne.0) then
-         write(*,*) 'hyd: LAPACK/dgbtrs problem no., iter.',INFO,II
-         stop
-      endif            
+      if(INFO /= 0) then
+         write(*,*) 'RELAX_ENV: LAPACK/dgbtrs problem no., iter.',INFO,II
+         call mesa_error(__FILE__,__LINE__,"RSP/RELAX_ENV: Lapack/dgbtrs problem")
+      end if            
 !-
       do I=1,3*NZN,1
          DX(I) = HR(I)
@@ -1191,7 +1168,7 @@
          XX_max_dx = 0
          i_XX_max = 0
          var_XX_max = 0
-      do 14 I=2,NZN
+      do I=2,NZN
          IR = 3+3*(I-1)
          IC = IR-1
          IW = IR-2
@@ -1222,7 +1199,7 @@
          end if
             
          EZH=1.d0/dmax1(1.d0/EZH,XXR,XXT,XXC)
-   14 continue
+      end do
 
       DXXR = 0.d0
       DXXT = 0.d0
@@ -1230,13 +1207,13 @@
       ITROUBT = 0
       ITROUBC = 0
 !     It seems that for BL Her models fixed undercorrection factor works best
-      do 103 I=1,NZN
+      do I=1,NZN
          IW=1+3*(I-1)
          IR=IW+2
          IC=IW+1  
-         T(I)      = T(I)     +EZH*DX(IW)/2d0
-         R(I)      = R(I)     +EZH*DX(IR)/2d0
-         Et(I) = Et(I)+EZH*DX(IC)/2d0
+         T(I)  = T(I) +0.5d0*EZH*DX(IW)
+         R(I)  = R(I) +0.5d0*EZH*DX(IR)
+         Et(I) = Et(I)+0.5d0*EZH*DX(IC)
          if(Et(I).le.0.d0) then
             Et(I)=EFL02*1d-4*rand(s)
          end if
@@ -1248,7 +1225,7 @@
             DXXC=dmax1(DXXC,dabs(DX(IC)/Et(I)))
          if(DXXC.gt.DXKC) ITROUBC=I
          if(DXXT.gt.DXKT) ITROUBT=I
- 103  continue
+      end do
       !write(*,*) 'apply corr', II,dabs(DXXC),dabs(DXXR),dabs(DXXT),ITROUBC, &
       !      Et(ITROUBC),EZH
       !stop 'debug'
@@ -1258,7 +1235,7 @@
          IZIP=1
          IOP=IOP+1
          goto 999
-      endif
+      end if
 
  102  continue
  
@@ -1268,7 +1245,6 @@
       write(*,*)
       ierr = -1
       return
-      stop
 
  889  continue
 
@@ -1287,13 +1263,13 @@
          write(*,*) '  outer radius rel. diff',(R(NZN)-ROUTER)/ROUTER
          write(*,*) ' envelope mass rel. diff',(POM-MENVEL)/MENVEL
       end if
- 222  format(A,d14.8)
+
       if (.false.) then
          MAXR=-1d0
          MAXW=-1d0
          MAXC=-1d0
          write(*,*) 'static structure check'
-         !open(15,file='ss_lin.dat',status='unknown')
+
          do J=1,NZN
             IR=4+3*(J-1)
             IW=2+3*(J-1)            
@@ -1303,7 +1279,7 @@
             else
                PPB=P(J+1)+PTURB(J+1)
             end if
-            T1=P4*(R(J)**2)
+            T1=pi4*(R(J)**2)
             T2=(PPB-PB)/dm_bar(J)
             T3=G*M(J)/(R(J)**2)
             if (dabs((T3+T1*T2)/T3).gt.MAXR)then

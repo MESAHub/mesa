@@ -38,7 +38,7 @@
       private
       public :: do_rsp_build
 
-      real(dp) :: PREC,FSUB,TIN,CFIDDLE,ALF,&
+      real(dp) :: PREC,FSUB,TIN,CFIDDLE,&
          HHFAC,DdmFAC,EFL02,EMR,ELR, &
          E_0,E_1,T_0,T_1,V_0,V_1,P_0,P_1,QQ_0,QQ_1, &
          CP_0,CP_1,OP_0,OP_1,R_1,M_0,dm_bar_0
@@ -59,7 +59,7 @@
       real(dp) :: Mass,L
       real(dp) :: H,dmN
       integer :: NMODES
-      integer :: I,J,kk,NSEQ, iounit
+      integer :: I,J,kk,iounit
       character (len=250) FILENAME
       integer :: IO,II
       real(dp) :: SS,AA,BB
@@ -129,19 +129,14 @@
       end do
 
 !     SET STANDARD PARAMETERS
-!     NSEQ = SEQUENCE NUMBER (DUMMY)
-      NSEQ    = 1
-
       CFIDDLE = 0.02d0 !0.02
-      ALF     = 1.0d-6
-!     PRECISIONS
       PREC    = 1d-10
       
-      EMR = s% RSP_mass
-      ELR = s% RSP_L
-      TE = s% RSP_Teff
+      EMR  = s% RSP_mass
+      ELR  = s% RSP_L
+      TE   = s% RSP_Teff
       Mass = EMR*Msun
-      L = ELR*Lsun       
+      L    = ELR*Lsun       
       
       if (s% RSP_trace_RSP_build_model) then
          write(*,*) '*** build initial model ***'
