@@ -82,6 +82,7 @@
             dxdt_factor, alpha, eqn_scale, d_dxdt_dx, &
             dequ_dlnd, dequ_dlnT, dequ_dlnPgas_const_T, dequ_dlnT_const_Pgas
          logical :: test_partials, doing_op_split_burn
+         logical, parameter :: checking = .false.
 
          include 'formats'
 
@@ -117,7 +118,6 @@
          sum_dx_burning = 0
          sum_dx_mixing = 0
          
-
          do j=1,species ! composition equation for species j in cell k
 
             !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
@@ -179,6 +179,7 @@
                   ii = equchem1+jj-1
                   dxdt_expected_dxa = s% d_dxdt_nuc_dx(j,jj,k)
                   dequ = dxdt_expected_dxa/eqn_scale
+                  if (checking) call check_dequ(dequ,'d_dxdt_nuc_dx')
                   call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
 
@@ -201,15 +202,18 @@
 
                dxdt_expected_dxa = d_dxdt_mix_dx00
                dequ = dxdt_expected_dxa/eqn_scale
+               if (checking) call check_dequ(dequ,'d_dxdt_mix_dx00')
                call e00(s, i, i, k, nvar, dxdt_factor*dequ)
                if (k > 1) then
                   dxdt_expected_dxa = d_dxdt_mix_dxm1
                   dequ = dxdt_expected_dxa/eqn_scale
+                  if (checking) call check_dequ(dequ,'d_dxdt_mix_dxm1')
                   call em1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
                if (k < nz) then
                   dxdt_expected_dxa = d_dxdt_mix_dxp1
                   dequ = dxdt_expected_dxa/eqn_scale
+                  if (checking) call check_dequ(dequ,'d_dxdt_mix_dxp1')
                   call ep1(s, i, i, k, nvar, dxdt_factor*dequ)
                end if
 
@@ -226,6 +230,22 @@
          end do
          
          s% max_abs_xa_residual(k) = max_abs_residual
+         
+         contains
+         
+         subroutine check_dequ(dequ, str)
+            real(dp), intent(in) :: dequ
+            character (len=*), intent(in) :: str
+            include 'formats'
+            if (is_bad(dequ)) then
+               ierr = -1
+               if (s% report_ierr) then
+                  write(*,2) 'do1_chem_eqns: bad ' // trim(str), k
+               end if
+               if (s% stop_for_bad_nums) stop 'do1_chem_eqns'
+               return
+            end if
+         end subroutine check_dequ
 
       end subroutine do1_chem_eqns
 

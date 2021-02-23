@@ -180,7 +180,8 @@
          
          if (skip_partials) return
          call unpack_res18(resid_ad)
-         call store_partials(s, k, i_du_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, k, i_du_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_dudt_eqn', ierr)
 
          if (test_partials) then
             s% solver_test_partials_var = 0
@@ -284,10 +285,10 @@
          end subroutine setup_diffusion_source
          
          subroutine unpack_res18(res18)
-            use star_utils, only: unpack_res18_partials
+            use star_utils, only: unpack_residual_partials
             type(auto_diff_real_star_order1) :: res18
             include 'formats'
-            call unpack_res18_partials(s, k, nvar, i_du_dt, &
+            call unpack_residual_partials(s, k, nvar, i_du_dt, &
                res18, d_dm1, d_d00, d_dp1)
             if (s% w_div_wc_flag) then
                call e00(s, i_du_dt, s% i_w_div_wc, k, nvar, d_d00(s% i_lum))

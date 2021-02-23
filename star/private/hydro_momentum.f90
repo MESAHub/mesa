@@ -35,7 +35,8 @@
       implicit none
 
       private
-      public :: do1_momentum_eqn, do_surf_momentum_eqn, do1_radius_eqn
+      public :: do1_momentum_eqn, do_surf_momentum_eqn, do1_radius_eqn, &
+         expected_HSE_grav_term
 
 
       contains
@@ -59,7 +60,8 @@
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, 1, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, 1, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1, 'do_surf_momentum_eqn', ierr)
       end subroutine do_surf_momentum_eqn
 
       
@@ -82,7 +84,8 @@
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, k, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, k, s% i_dv_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_momentum_eqn', ierr)
       end subroutine do1_momentum_eqn
 
 
@@ -101,7 +104,7 @@
          real(dp), intent(out) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          integer, intent(out) :: ierr
          
-         real(dp) :: residual, dm_face, d_grav_dw, dXP, iXPavg, dm_div_A
+         real(dp) :: residual, dm_face, dXP, iXPavg, dm_div_A
          real(dp), dimension(s% species) :: &
             d_dXP_dxam1, d_dXP_dxa00, d_iXPavg_dxam1, d_iXPavg_dxa00, &
             d_residual_dxam1, d_residual_dxa00
@@ -139,7 +142,7 @@
 !   0  = (other + grav - RTI_terms)*dm/area - dXP_ad - d_mlt_Pturb_ad
 !   0  = other_dm_div_A_ad + grav_dm_div_A_ad - dXP_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
 
-         call setup_HSE(d_grav_dw, dm_div_A, ierr); if (ierr /= 0) return ! grav_ad and dm_div_A_ad
+         call setup_HSE(dm_div_A, ierr); if (ierr /= 0) return ! grav_ad and dm_div_A_ad
          call setup_non_HSE(ierr); if (ierr /= 0) return ! other = s% extra_grav(k) - s% dv_dt(k)
          call setup_dXP(ierr); if (ierr /= 0) return ! dXP_ad, iXPavg_ad
          call setup_d_mlt_Pturb(ierr); if (ierr /= 0) return ! d_mlt_Pturb_ad
@@ -213,12 +216,12 @@
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
          end subroutine init
          
-         subroutine setup_HSE(d_grav_dw, dm_div_A, ierr)
-            real(dp), intent(out) :: d_grav_dw, dm_div_A
+         subroutine setup_HSE(dm_div_A, ierr)
+            real(dp), intent(out) :: dm_div_A
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            call expected_HSE_grav_term(s, k, grav_ad, d_grav_dw, area_ad, ierr)
+            call expected_HSE_grav_term(s, k, grav_ad, area_ad, ierr)
             if (ierr /= 0) return
             dm_div_A_ad = dm_face/area_ad
             dm_div_A = dm_div_A_ad%val
@@ -303,40 +306,53 @@
          end subroutine setup_RTI_terms
          
          subroutine unpack_res18(res18)
-            use star_utils, only: unpack_res18_partials
+            use star_utils, only: unpack_residual_partials
             type(auto_diff_real_star_order1) :: res18
             real(dp) :: resid1
+            logical, parameter :: checking = .false.
             integer :: j
             include 'formats'
-            call unpack_res18_partials(s, k, nvar, i_dv_dt, &
+            call unpack_residual_partials(s, k, nvar, i_dv_dt, &
                res18, d_dm1, d_d00, d_dp1)
-            if (s% rotation_flag .and. s% w_div_wc_flag .and. s% use_gravity_rotation_correction) then
-               call e00(s, i_dv_dt, s% i_w_div_wc, k, nvar, iXPavg*d_grav_dw*dm_div_A)            
-            end if            
             ! do partials wrt composition   
             resid1 = resid1_ad%val         
             do j=1,s% species
                d_residual_dxa00(j) = resid1*d_iXPavg_dxa00(j) - iXPavg*d_dXP_dxa00(j)
+               if (checking) call check_dequ(d_residual_dxa00(j),'d_residual_dxa00(j)')
                call e00(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
             end do
             if (k > 1) then 
                do j=1,s% species
                   d_residual_dxam1(j) = resid1*d_iXPavg_dxam1(j) - iXPavg*d_dXP_dxam1(j)
+                  if (checking) call check_dequ(d_residual_dxam1(j),'d_residual_dxam1(j)')
                   call em1(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
                end do
             end if            
          end subroutine unpack_res18
+
+         subroutine check_dequ(dequ, str)
+            real(dp), intent(in) :: dequ
+            character (len=*), intent(in) :: str
+            include 'formats'
+            if (is_bad(dequ)) then
+               ierr = -1
+               if (s% report_ierr) then
+                  write(*,2) 'get1_momentum_eqn: bad ' // trim(str), k, dequ
+               end if
+               if (s% stop_for_bad_nums) stop 'get1_momentum_eqn'
+               return
+            end if
+         end subroutine check_dequ
             
       end subroutine get1_momentum_eqn
       
       
       ! returns -G*m/r^2 with possible modifications for rotation.  MESA 2, eqn 22.
-      subroutine expected_HSE_grav_term(s, k, grav, d_grav_dw_div_wc, area, ierr)
+      subroutine expected_HSE_grav_term(s, k, grav, area, ierr)
          use star_utils, only: get_area_info
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: area, grav
-         real(dp), intent(out) :: d_grav_dw_div_wc
          integer, intent(out) :: ierr
          
          type(auto_diff_real_star_order1) :: inv_R2
@@ -350,11 +366,8 @@
 
          grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
          
-         d_grav_dw_div_wc = 0d0
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
-            if (s% w_div_wc_flag) d_grav_dw_div_wc = grav%val*s% dfp_rot_dw_div_wc(k)
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
             grav = grav*s% fp_rot(k) 
-         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -397,7 +410,10 @@
                   0d0, 0d0, 0d0, &
                   0d0, s% d_extra_grav_dlnR(k), 0d0, &
                   0d0, 0d0, 0d0, &
-                  0d0, s% d_extra_grav_dL(k), 0d0)
+                  0d0, s% d_extra_grav_dL(k), 0d0, &
+                  0d0, 0d0, 0d0, &
+                  0d0, 0d0, 0d0, &
+                  0d0, 0d0, 0d0)
             else
                extra_ad%val = s% extra_grav(k)
             end if
@@ -627,6 +643,9 @@
                unused, unused, unused, &
                unused, d_uface_dlnR, unused, &
                d_uface_dum1, d_uface_du00, unused, &
+               unused, unused, unused, &
+               unused, unused, unused, &
+               unused, unused, unused, &
                unused, unused, unused)
          else
             v_expected = s% vc(k)

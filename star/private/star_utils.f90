@@ -1396,42 +1396,49 @@
             s% dPdr_dRhodr_info(k) = -1d99
          end do
       end subroutine reset_starting_vectors
-      
-      
-      subroutine store_partials(s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1)
+
+
+      subroutine save_eqn_residual_info(s, k, nvar, i_eqn, resid, str, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: k, i_eqn, nvar
-         real(dp), intent(in) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
-         integer :: nz, j
-         nz = s% nz
-         do j=1,nvar
-            if (k > 1) call em1(s, i_eqn, j, k, nvar, d_dm1(j))
-            call e00(s, i_eqn, j, k, nvar, d_d00(j))
-            if (k < nz) call ep1(s, i_eqn, j, k, nvar, d_dp1(j))
-         end do            
-      end subroutine store_partials
+         integer, intent(in) :: k, nvar, i_eqn
+         type(auto_diff_real_star_order1), intent(in) :: resid
+         character (len=*), intent(in) :: str
+         integer, intent(out) :: ierr
+         real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
+         call unpack_residual_partials(s, k, nvar, i_eqn, &
+            resid, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1, str, ierr)
+      end subroutine save_eqn_residual_info
 
 
-      subroutine unpack_res18_partials(s, k, nvar, i_eqn, &
-            res18, d_dm1, d_d00, d_dp1)
+      subroutine unpack_residual_partials(s, k, nvar, i_eqn, &
+            residual, d_dm1, d_d00, d_dp1)
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar, i_eqn
-         type(auto_diff_real_star_order1) :: res18
+         type(auto_diff_real_star_order1) :: residual
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
-            dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1
+            dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dxtra1_m1, dxtra1_00, dxtra1_p1, &
+            dxtra2_m1, dxtra2_00, dxtra2_p1, &
+            dxtra3_m1, dxtra3_00, dxtra3_p1
          integer :: j
 
          include 'formats'
 
-         call unwrap(res18, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
+         call unwrap(residual, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
                      dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
-                     dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1) 
+                     dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+                     dxtra1_m1, dxtra1_00, dxtra1_p1, &
+                     dxtra2_m1, dxtra2_00, dxtra2_p1, &
+                     dxtra3_m1, dxtra3_00, dxtra3_p1) 
                      
+         d_dm1 = 0; d_d00 = 0; d_dp1 = 0
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
          call unpack1(s% i_lnT, dlnT_m1, dlnT_00, dlnT_p1)
          call unpack1(s% i_lnR, dlnR_m1, dlnR_00, dlnR_p1)
@@ -1450,7 +1457,49 @@
             d_dp1(j) = dvar_p1
          end subroutine unpack1         
          
-      end subroutine unpack_res18_partials
+      end subroutine unpack_residual_partials
+      
+      
+      subroutine store_partials(s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1, str, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, i_eqn, nvar
+         real(dp), intent(in) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
+         character (len=*), intent(in) :: str
+         integer, intent(out) :: ierr
+         integer :: nz, j
+         logical, parameter :: checking = .false.
+         ierr = 0
+         nz = s% nz
+         do j=1,nvar
+            if (k > 1) then
+               if (checking) call check_dequ(d_dm1(j),trim(str) // ' d_dm1')
+               call em1(s, i_eqn, j, k, nvar, d_dm1(j))
+            end if
+            if (checking) call check_dequ(d_d00(j),trim(str) // ' d_d00')
+            call e00(s, i_eqn, j, k, nvar, d_d00(j))
+            if (k < nz) then
+               if (checking) call check_dequ(d_dp1(j),trim(str) // ' d_dp1')
+               call ep1(s, i_eqn, j, k, nvar, d_dp1(j))
+            end if
+         end do            
+         
+         contains
+
+         subroutine check_dequ(dequ, str)
+            real(dp), intent(in) :: dequ
+            character (len=*), intent(in) :: str
+            include 'formats'
+            if (is_bad(dequ)) then
+               ierr = -1
+               if (s% report_ierr) then
+                  write(*,2) 'store_partials: bad ' // trim(str), k, dequ
+               end if
+               if (s% stop_for_bad_nums) stop 'store_partials'
+               return
+            end if
+         end subroutine check_dequ
+         
+      end subroutine store_partials
 
 
       subroutine set_scale_height(s)

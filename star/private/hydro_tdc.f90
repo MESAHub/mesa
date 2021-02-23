@@ -72,13 +72,14 @@
             return
          end if         
          if (skip_partials) return         
-         call store_partials(s, k, s% i_equL, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, k, s% i_equL, nvar, d_dm1, d_d00, d_dp1, 'do1_tdc_L_eqn', ierr)
       end subroutine do1_tdc_L_eqn
 
       
       subroutine get1_tdc_L_eqn( &  
             s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: unpack_res18_partials
+         use star_utils, only: unpack_residual_partials
          use accurate_sum_auto_diff_star_order1
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -110,7 +111,7 @@
             s% solver_test_partials_val = residual
          end if
          if (skip_partials) return
-         call unpack_res18_partials(s, k, nvar, s% i_equL, &
+         call unpack_residual_partials(s, k, nvar, s% i_equL, &
             res18, d_dm1, d_d00, d_dp1)
          if (test_partials) then
             s% solver_test_partials_var = s% i_lnT
@@ -136,7 +137,8 @@
             return
          end if         
          if (skip_partials) return         
-         call store_partials(s, k, s% i_dw_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, k, s% i_dw_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_turbulent_energy_eqn', ierr)
       end subroutine do1_turbulent_energy_eqn
 
       
@@ -294,9 +296,9 @@
          end subroutine setup_dt_Eq_ad
 
          subroutine unpack_res18(res18)
-            use star_utils, only: unpack_res18_partials
+            use star_utils, only: unpack_residual_partials
             type(auto_diff_real_star_order1) :: res18            
-            call unpack_res18_partials(s, k, nvar, i_dw_dt, &
+            call unpack_residual_partials(s, k, nvar, i_dw_dt, &
                res18, d_dm1, d_d00, d_dp1)
          end subroutine unpack_res18
       

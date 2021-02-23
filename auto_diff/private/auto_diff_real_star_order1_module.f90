@@ -5,9 +5,11 @@ module auto_diff_real_star_order1_module
       use math_lib
    
       implicit none
+      
+      integer, parameter :: auto_diff_star_num_vars = 27 ! for 9 solver vars at 3 cells each
+      public :: auto_diff_star_num_vars
       private
       
-      integer, parameter :: num_vars = 27 ! for 9 solver vars at 3 cells each
       
    public :: auto_diff_real_star_order1, &
       assignment(=), &
@@ -67,7 +69,7 @@ module auto_diff_real_star_order1_module
       
    type :: auto_diff_real_star_order1
       real(dp) :: val
-      real(dp) :: d1Array(num_vars)
+      real(dp) :: d1Array(auto_diff_star_num_vars)
    end type auto_diff_real_star_order1
    
    interface assignment(=)
@@ -587,7 +589,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: z_d1x
       type(auto_diff_real_star_order1) :: unary
       unary%val = z_val
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*z_d1x
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*z_d1x
    end function make_unary_operator
    
    function make_binary_operator(x, y, z_val, z_d1x, z_d1y) result(binary)
@@ -598,14 +600,14 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: z_d1y
       type(auto_diff_real_star_order1) :: binary
       binary%val = z_val
-      binary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*z_d1x + y%d1Array(1:num_vars)*z_d1y
+      binary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*z_d1x + y%d1Array(1:auto_diff_star_num_vars)*z_d1y
    end function make_binary_operator
    
    function unary_minus_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = -x%val
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)
    end function unary_minus_self
    
    function exp_self(x) result(unary)
@@ -614,14 +616,14 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = exp(x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)
    end function exp_self
    
    function expm1_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = expm1(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*exp(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*exp(x%val)
    end function expm1_self
    
    function exp10_self(x) result(unary)
@@ -630,35 +632,35 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = pow(10.0_dp, x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*ln10
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*ln10
    end function exp10_self
    
    function powm1_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = powm1(x%val)
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*powm1(pow2(x%val))
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*powm1(pow2(x%val))
    end function powm1_self
    
    function log_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = log(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(x%val)
    end function log_self
    
    function log1p_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = log1p(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(x%val + 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(x%val + 1)
    end function log1p_self
    
    function safe_log_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = safe_log(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(x%val)
    end function safe_log_self
    
    function log10_self(x) result(unary)
@@ -667,7 +669,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = powm1(ln10)
       unary%val = q0*log(x%val)
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*powm1(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*powm1(x%val)
    end function log10_self
    
    function safe_log10_self(x) result(unary)
@@ -676,7 +678,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = powm1(ln10)
       unary%val = q0*safe_log(x%val)
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*powm1(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*powm1(x%val)
    end function safe_log10_self
    
    function log2_self(x) result(unary)
@@ -685,21 +687,21 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = powm1(log(2.0_dp))
       unary%val = q0*log(x%val)
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*powm1(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*powm1(x%val)
    end function log2_self
    
    function sin_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = sin(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*cos(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*cos(x%val)
    end function sin_self
    
    function cos_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = cos(x%val)
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*sin(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*sin(x%val)
    end function cos_self
    
    function tan_self(x) result(unary)
@@ -708,7 +710,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = tan(x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*(pow2(q0) + 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*(pow2(q0) + 1)
    end function tan_self
    
    function sinpi_self(x) result(unary)
@@ -717,7 +719,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = pi*x%val
       unary%val = sin(q0)
-      unary%d1Array(1:num_vars) = pi*x%d1Array(1:num_vars)*cos(q0)
+      unary%d1Array(1:auto_diff_star_num_vars) = pi*x%d1Array(1:auto_diff_star_num_vars)*cos(q0)
    end function sinpi_self
    
    function cospi_self(x) result(unary)
@@ -726,7 +728,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = pi*x%val
       unary%val = cos(q0)
-      unary%d1Array(1:num_vars) = -pi*x%d1Array(1:num_vars)*sin(q0)
+      unary%d1Array(1:auto_diff_star_num_vars) = -pi*x%d1Array(1:auto_diff_star_num_vars)*sin(q0)
    end function cospi_self
    
    function tanpi_self(x) result(unary)
@@ -735,21 +737,21 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = tan(pi*x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = pi*x%d1Array(1:num_vars)*(pow2(q0) + 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = pi*x%d1Array(1:auto_diff_star_num_vars)*(pow2(q0) + 1)
    end function tanpi_self
    
    function sinh_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = sinh(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*cosh(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*cosh(x%val)
    end function sinh_self
    
    function cosh_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = cosh(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*sinh(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*sinh(x%val)
    end function cosh_self
    
    function tanh_self(x) result(unary)
@@ -758,28 +760,28 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = tanh(x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*(pow2(q0) - 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*(pow2(q0) - 1)
    end function tanh_self
    
    function asin_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = asin(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(sqrt(1 - pow2(x%val)))
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(sqrt(1 - pow2(x%val)))
    end function asin_self
    
    function acos_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = acos(x%val)
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*powm1(sqrt(1 - pow2(x%val)))
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*powm1(sqrt(1 - pow2(x%val)))
    end function acos_self
    
    function atan_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = atan(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(pow2(x%val) + 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(pow2(x%val) + 1)
    end function atan_self
    
    function asinpi_self(x) result(unary)
@@ -788,7 +790,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = powm1(pi)
       unary%val = q0*asin(x%val)
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*powm1(sqrt(1 - pow2(x%val)))
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*powm1(sqrt(1 - pow2(x%val)))
    end function asinpi_self
    
    function acospi_self(x) result(unary)
@@ -797,35 +799,35 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = powm1(pi)
       unary%val = q0*acos(x%val)
-      unary%d1Array(1:num_vars) = -q0*x%d1Array(1:num_vars)*powm1(sqrt(1 - pow2(x%val)))
+      unary%d1Array(1:auto_diff_star_num_vars) = -q0*x%d1Array(1:auto_diff_star_num_vars)*powm1(sqrt(1 - pow2(x%val)))
    end function acospi_self
    
    function atanpi_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = powm1(pi)*atan(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(pi*pow2(x%val) + pi)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(pi*pow2(x%val) + pi)
    end function atanpi_self
    
    function asinh_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = asinh(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(sqrt(pow2(x%val) + 1))
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(sqrt(pow2(x%val) + 1))
    end function asinh_self
    
    function acosh_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = acosh(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*powm1(sqrt(pow2(x%val) - 1))
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*powm1(sqrt(pow2(x%val) - 1))
    end function acosh_self
    
    function atanh_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = atanh(x%val)
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*powm1(pow2(x%val) - 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*powm1(pow2(x%val) - 1)
    end function atanh_self
    
    function sqrt_self(x) result(unary)
@@ -834,63 +836,63 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = sqrt(x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = 0.5_dp*x%d1Array(1:num_vars)*powm1(q0)
+      unary%d1Array(1:auto_diff_star_num_vars) = 0.5_dp*x%d1Array(1:auto_diff_star_num_vars)*powm1(q0)
    end function sqrt_self
    
    function pow2_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow2(x%val)
-      unary%d1Array(1:num_vars) = 2.0_dp*x%d1Array(1:num_vars)*x%val
+      unary%d1Array(1:auto_diff_star_num_vars) = 2.0_dp*x%d1Array(1:auto_diff_star_num_vars)*x%val
    end function pow2_self
    
    function pow3_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow3(x%val)
-      unary%d1Array(1:num_vars) = 3.0_dp*x%d1Array(1:num_vars)*pow2(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = 3.0_dp*x%d1Array(1:auto_diff_star_num_vars)*pow2(x%val)
    end function pow3_self
    
    function pow4_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow4(x%val)
-      unary%d1Array(1:num_vars) = 4.0_dp*x%d1Array(1:num_vars)*pow3(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = 4.0_dp*x%d1Array(1:auto_diff_star_num_vars)*pow3(x%val)
    end function pow4_self
    
    function pow5_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow5(x%val)
-      unary%d1Array(1:num_vars) = 5.0_dp*x%d1Array(1:num_vars)*pow4(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = 5.0_dp*x%d1Array(1:auto_diff_star_num_vars)*pow4(x%val)
    end function pow5_self
    
    function pow6_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow6(x%val)
-      unary%d1Array(1:num_vars) = 6.0_dp*x%d1Array(1:num_vars)*pow5(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = 6.0_dp*x%d1Array(1:auto_diff_star_num_vars)*pow5(x%val)
    end function pow6_self
    
    function pow7_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow7(x%val)
-      unary%d1Array(1:num_vars) = 7.0_dp*x%d1Array(1:num_vars)*pow6(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = 7.0_dp*x%d1Array(1:auto_diff_star_num_vars)*pow6(x%val)
    end function pow7_self
    
    function pow8_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow8(x%val)
-      unary%d1Array(1:num_vars) = 8.0_dp*x%d1Array(1:num_vars)*pow7(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = 8.0_dp*x%d1Array(1:auto_diff_star_num_vars)*pow7(x%val)
    end function pow8_self
    
    function abs_self(x) result(unary)
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = Abs(x%val)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*sgn(x%val)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*sgn(x%val)
    end function abs_self
    
    function add_self(x, y) result(binary)
@@ -898,7 +900,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = x%val + y%val
-      binary%d1Array(1:num_vars) = x%d1Array(1:num_vars) + y%d1Array(1:num_vars)
+      binary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars) + y%d1Array(1:auto_diff_star_num_vars)
    end function add_self
    
    function add_self_real(x, y) result(unary)
@@ -906,7 +908,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: y
       type(auto_diff_real_star_order1) :: unary
       unary%val = x%val + y
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)
    end function add_self_real
    
    function add_real_self(z, x) result(unary)
@@ -914,7 +916,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = x%val + z
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)
    end function add_real_self
    
    function add_self_int(x, y) result(unary)
@@ -924,7 +926,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = y
       unary%val = x%val + y_dp
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)
    end function add_self_int
    
    function add_int_self(z, x) result(unary)
@@ -934,7 +936,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = z
       unary%val = x%val + y_dp
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)
    end function add_int_self
    
    function sub_self(x, y) result(binary)
@@ -942,7 +944,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = x%val - y%val
-      binary%d1Array(1:num_vars) = x%d1Array(1:num_vars) - y%d1Array(1:num_vars)
+      binary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars) - y%d1Array(1:auto_diff_star_num_vars)
    end function sub_self
    
    function sub_self_real(x, y) result(unary)
@@ -950,7 +952,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: y
       type(auto_diff_real_star_order1) :: unary
       unary%val = x%val - y
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)
    end function sub_self_real
    
    function sub_real_self(z, x) result(unary)
@@ -958,7 +960,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = -x%val + z
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)
    end function sub_real_self
    
    function sub_self_int(x, y) result(unary)
@@ -968,7 +970,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = y
       unary%val = x%val - y_dp
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)
    end function sub_self_int
    
    function sub_int_self(z, x) result(unary)
@@ -978,7 +980,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = z
       unary%val = -x%val + y_dp
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)
    end function sub_int_self
    
    function mul_self(x, y) result(binary)
@@ -986,7 +988,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = x%val*y%val
-      binary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*y%val + x%val*y%d1Array(1:num_vars)
+      binary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*y%val + x%val*y%d1Array(1:auto_diff_star_num_vars)
    end function mul_self
    
    function mul_self_real(x, y) result(unary)
@@ -994,7 +996,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: y
       type(auto_diff_real_star_order1) :: unary
       unary%val = x%val*y
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*y
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*y
    end function mul_self_real
    
    function mul_real_self(z, x) result(unary)
@@ -1002,7 +1004,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = x%val*z
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*z
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*z
    end function mul_real_self
    
    function mul_self_int(x, y) result(unary)
@@ -1012,7 +1014,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = y
       unary%val = x%val*y_dp
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*y_dp
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*y_dp
    end function mul_self_int
    
    function mul_int_self(z, x) result(unary)
@@ -1022,7 +1024,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = z
       unary%val = x%val*y_dp
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*y_dp
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*y_dp
    end function mul_int_self
    
    function div_self(x, y) result(binary)
@@ -1030,7 +1032,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = x%val*powm1(y%val)
-      binary%d1Array(1:num_vars) = (x%d1Array(1:num_vars)*y%val - x%val*y%d1Array(1:num_vars))*powm1(pow2(y%val))
+      binary%d1Array(1:auto_diff_star_num_vars) = (x%d1Array(1:auto_diff_star_num_vars)*y%val - x%val*y%d1Array(1:auto_diff_star_num_vars))*powm1(pow2(y%val))
    end function div_self
    
    function div_self_real(x, y) result(unary)
@@ -1040,7 +1042,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = powm1(y)
       unary%val = q0*x%val
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)
    end function div_self_real
    
    function div_real_self(z, x) result(unary)
@@ -1048,7 +1050,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = z*powm1(x%val)
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*z*powm1(pow2(x%val))
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*z*powm1(pow2(x%val))
    end function div_real_self
    
    function div_self_int(x, y) result(unary)
@@ -1060,7 +1062,7 @@ module auto_diff_real_star_order1_module
       y_dp = y
       q0 = powm1(y_dp)
       unary%val = q0*x%val
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)
    end function div_self_int
    
    function div_int_self(z, x) result(unary)
@@ -1070,7 +1072,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = z
       unary%val = y_dp*powm1(x%val)
-      unary%d1Array(1:num_vars) = -x%d1Array(1:num_vars)*y_dp*powm1(pow2(x%val))
+      unary%d1Array(1:auto_diff_star_num_vars) = -x%d1Array(1:auto_diff_star_num_vars)*y_dp*powm1(pow2(x%val))
    end function div_int_self
    
    function pow_self(x, y) result(binary)
@@ -1078,7 +1080,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = pow(x%val, y%val)
-      binary%d1Array(1:num_vars) = (x%d1Array(1:num_vars)*y%val + x%val*y%d1Array(1:num_vars)*log(x%val))*pow(x%val, y%val - 1)
+      binary%d1Array(1:auto_diff_star_num_vars) = (x%d1Array(1:auto_diff_star_num_vars)*y%val + x%val*y%d1Array(1:auto_diff_star_num_vars)*log(x%val))*pow(x%val, y%val - 1)
    end function pow_self
    
    function pow_self_real(x, y) result(unary)
@@ -1086,7 +1088,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: y
       type(auto_diff_real_star_order1) :: unary
       unary%val = pow(x%val, y)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*y*pow(x%val, y - 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*y*pow(x%val, y - 1)
    end function pow_self_real
    
    function pow_real_self(z, x) result(unary)
@@ -1096,7 +1098,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = pow(z, x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*log(z)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*log(z)
    end function pow_real_self
    
    function pow_self_int(x, y) result(unary)
@@ -1106,7 +1108,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = y
       unary%val = pow(x%val, y_dp)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*y_dp*pow(x%val, y_dp - 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*y_dp*pow(x%val, y_dp - 1)
    end function pow_self_int
    
    function pow_int_self(z, x) result(unary)
@@ -1118,7 +1120,7 @@ module auto_diff_real_star_order1_module
       y_dp = z
       q0 = pow(y_dp, x%val)
       unary%val = q0
-      unary%d1Array(1:num_vars) = q0*x%d1Array(1:num_vars)*log(y_dp)
+      unary%d1Array(1:auto_diff_star_num_vars) = q0*x%d1Array(1:auto_diff_star_num_vars)*log(y_dp)
    end function pow_int_self
    
    function max_self(x, y) result(binary)
@@ -1126,7 +1128,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = Max(x%val, y%val)
-      binary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(x%val - y%val) + y%d1Array(1:num_vars)*Heaviside(-x%val + y%val)
+      binary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(x%val - y%val) + y%d1Array(1:auto_diff_star_num_vars)*Heaviside(-x%val + y%val)
    end function max_self
    
    function max_self_real(x, y) result(unary)
@@ -1134,7 +1136,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: y
       type(auto_diff_real_star_order1) :: unary
       unary%val = Max(x%val, y)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(x%val - y)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(x%val - y)
    end function max_self_real
    
    function max_real_self(z, x) result(unary)
@@ -1142,7 +1144,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = Max(x%val, z)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(x%val - z)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(x%val - z)
    end function max_real_self
    
    function max_self_int(x, y) result(unary)
@@ -1152,7 +1154,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = y
       unary%val = Max(x%val, y_dp)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(x%val - y_dp)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(x%val - y_dp)
    end function max_self_int
    
    function max_int_self(z, x) result(unary)
@@ -1162,7 +1164,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = z
       unary%val = Max(x%val, y_dp)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(x%val - y_dp)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(x%val - y_dp)
    end function max_int_self
    
    function min_self(x, y) result(binary)
@@ -1170,7 +1172,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: y
       type(auto_diff_real_star_order1) :: binary
       binary%val = Min(x%val, y%val)
-      binary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(-x%val + y%val) + y%d1Array(1:num_vars)*Heaviside(x%val - y%val)
+      binary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(-x%val + y%val) + y%d1Array(1:auto_diff_star_num_vars)*Heaviside(x%val - y%val)
    end function min_self
    
    function min_self_real(x, y) result(unary)
@@ -1178,7 +1180,7 @@ module auto_diff_real_star_order1_module
       real(dp), intent(in) :: y
       type(auto_diff_real_star_order1) :: unary
       unary%val = Min(x%val, y)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(-x%val + y)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(-x%val + y)
    end function min_self_real
    
    function min_real_self(z, x) result(unary)
@@ -1186,7 +1188,7 @@ module auto_diff_real_star_order1_module
       type(auto_diff_real_star_order1), intent(in) :: x
       type(auto_diff_real_star_order1) :: unary
       unary%val = Min(x%val, z)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(-x%val + z)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(-x%val + z)
    end function min_real_self
    
    function min_self_int(x, y) result(unary)
@@ -1196,7 +1198,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = y
       unary%val = Min(x%val, y_dp)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(-x%val + y_dp)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(-x%val + y_dp)
    end function min_self_int
    
    function min_int_self(z, x) result(unary)
@@ -1206,7 +1208,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: y_dp
       y_dp = z
       unary%val = Min(x%val, y_dp)
-      unary%d1Array(1:num_vars) = x%d1Array(1:num_vars)*Heaviside(-x%val + y_dp)
+      unary%d1Array(1:auto_diff_star_num_vars) = x%d1Array(1:auto_diff_star_num_vars)*Heaviside(-x%val + y_dp)
    end function min_int_self
    
    function dim_self(x, y) result(binary)
@@ -1216,7 +1218,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = x%val - y%val
       binary%val = -0.5_dp*y%val + 0.5_dp*x%val + 0.5_dp*Abs(q0)
-      binary%d1Array(1:num_vars) = -0.5_dp*y%d1Array(1:num_vars) + 0.5_dp*x%d1Array(1:num_vars) + 0.5_dp*(x%d1Array(1:num_vars) - y%d1Array(1:num_vars))*sgn(q0)
+      binary%d1Array(1:auto_diff_star_num_vars) = -0.5_dp*y%d1Array(1:auto_diff_star_num_vars) + 0.5_dp*x%d1Array(1:auto_diff_star_num_vars) + 0.5_dp*(x%d1Array(1:auto_diff_star_num_vars) - y%d1Array(1:auto_diff_star_num_vars))*sgn(q0)
    end function dim_self
    
    function dim_self_real(x, y) result(unary)
@@ -1226,7 +1228,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = x%val - y
       unary%val = -0.5_dp*y + 0.5_dp*x%val + 0.5_dp*Abs(q0)
-      unary%d1Array(1:num_vars) = 0.5_dp*x%d1Array(1:num_vars)*(sgn(q0) + 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = 0.5_dp*x%d1Array(1:auto_diff_star_num_vars)*(sgn(q0) + 1)
    end function dim_self_real
    
    function dim_real_self(z, x) result(unary)
@@ -1236,7 +1238,7 @@ module auto_diff_real_star_order1_module
       real(dp) :: q0
       q0 = x%val - z
       unary%val = -0.5_dp*x%val + 0.5_dp*z + 0.5_dp*Abs(q0)
-      unary%d1Array(1:num_vars) = 0.5_dp*x%d1Array(1:num_vars)*(sgn(q0) - 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = 0.5_dp*x%d1Array(1:auto_diff_star_num_vars)*(sgn(q0) - 1)
    end function dim_real_self
    
    function dim_self_int(x, y) result(unary)
@@ -1248,7 +1250,7 @@ module auto_diff_real_star_order1_module
       y_dp = y
       q0 = x%val - y_dp
       unary%val = -0.5_dp*y_dp + 0.5_dp*x%val + 0.5_dp*Abs(q0)
-      unary%d1Array(1:num_vars) = 0.5_dp*x%d1Array(1:num_vars)*(sgn(q0) + 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = 0.5_dp*x%d1Array(1:auto_diff_star_num_vars)*(sgn(q0) + 1)
    end function dim_self_int
    
    function dim_int_self(z, x) result(unary)
@@ -1260,7 +1262,7 @@ module auto_diff_real_star_order1_module
       y_dp = z
       q0 = x%val - y_dp
       unary%val = -0.5_dp*x%val + 0.5_dp*y_dp + 0.5_dp*Abs(q0)
-      unary%d1Array(1:num_vars) = 0.5_dp*x%d1Array(1:num_vars)*(sgn(q0) - 1)
+      unary%d1Array(1:auto_diff_star_num_vars) = 0.5_dp*x%d1Array(1:auto_diff_star_num_vars)*(sgn(q0) - 1)
    end function dim_int_self
    
 end module auto_diff_real_star_order1_module

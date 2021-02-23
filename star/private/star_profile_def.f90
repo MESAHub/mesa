@@ -538,15 +538,7 @@
       integer, parameter :: p_gradT = p_gradT_sub_grada + 1
       integer, parameter :: p_gradr = p_gradT + 1
 
-      integer, parameter :: p_d_gradT_dlnd00 = p_gradr + 1
-      integer, parameter :: p_d_gradT_dlnT00 = p_d_gradT_dlnd00 + 1
-      integer, parameter :: p_d_gradT_dlndm1 = p_d_gradT_dlnT00 + 1
-      integer, parameter :: p_d_gradT_dlnTm1 = p_d_gradT_dlndm1 + 1
-      integer, parameter :: p_d_gradT_dlnR = p_d_gradT_dlnTm1 + 1
-      integer, parameter :: p_d_gradT_dln_cvpv0 = p_d_gradT_dlnR + 1
-      integer, parameter :: p_d_gradT_dL = p_d_gradT_dln_cvpv0 + 1
-
-      integer, parameter :: p_accel_div_grav = p_d_gradT_dL + 1
+      integer, parameter :: p_accel_div_grav = p_gradr + 1
 
       integer, parameter :: p_dlnd_dt_const_q = p_accel_div_grav + 1
       integer, parameter :: p_dlnT_dt_const_q = p_dlnd_dt_const_q + 1
@@ -1293,14 +1285,6 @@
          profile_column_name(p_actual_gradT) = 'actual_gradT'
          profile_column_name(p_gradT_sub_actual_gradT) = 'gradT_sub_actual_gradT'
          profile_column_name(p_grada_sub_actual_gradT) = 'grada_sub_actual_gradT'
-
-         profile_column_name(p_d_gradT_dlnd00) = 'd_gradT_dlnd00'
-         profile_column_name(p_d_gradT_dlnT00) = 'd_gradT_dlnT00'
-         profile_column_name(p_d_gradT_dlndm1) = 'd_gradT_dlndm1'
-         profile_column_name(p_d_gradT_dlnTm1) = 'd_gradT_dlnTm1'
-         profile_column_name(p_d_gradT_dlnR) = 'd_gradT_dlnR'
-         profile_column_name(p_d_gradT_dL) = 'd_gradT_dL'
-         profile_column_name(p_d_gradT_dln_cvpv0) = 'd_gradT_dln_cvpv0'
 
          profile_column_name(p_gradT) = 'gradT'
          profile_column_name(p_gradr) = 'gradr'

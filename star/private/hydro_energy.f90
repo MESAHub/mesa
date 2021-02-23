@@ -58,7 +58,8 @@
             return
          end if         
          if (skip_partials) return
-         call store_partials(s, k, s% i_dlnE_dt, nvar, d_dm1, d_d00, d_dp1)
+         call store_partials( &
+            s, k, s% i_dlnE_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_energy_eqn', ierr)
       end subroutine do1_energy_eqn
 
 
@@ -244,6 +245,9 @@
                0d0, 0d0, 0d0, &
                0d0, s% d_extra_heat_dlnR00(k), s% d_extra_heat_dlnRp1(k), &
                0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             
             ! other = eps_WD_sedimentation + eps_diffusion + eps_pre_mix
@@ -375,7 +379,10 @@
                   0d0, 0d0, 0d0, &
                   0d0, s% d_eps_grav_dlnR00(k), s% d_eps_grav_dlnRp1(k), &
                   0d0, s% d_eps_grav_dv00(k), s% d_eps_grav_dvp1(k), &
-                  0d0, s% d_eps_grav_dL00(k), s% d_eps_grav_dLp1(k))
+                  0d0, s% d_eps_grav_dL00(k), s% d_eps_grav_dLp1(k), &
+                  0d0, 0d0, 0d0, &
+                  0d0, 0d0, 0d0, &
+                  0d0, 0d0, 0d0)
             end if
             
          end subroutine setup_eps_grav
@@ -426,13 +433,15 @@
          end subroutine setup_de_dt_and_friends
          
          subroutine unpack_res18(res18)
-            use star_utils, only: unpack_res18_partials
+            use star_utils, only: unpack_residual_partials
             type(auto_diff_real_star_order1) :: res18
+            real(dp) :: dequ
             integer :: j
+            logical, parameter :: checking = .false.
 
             include 'formats'
             
-            call unpack_res18_partials(s, k, nvar, i_dlnE_dt, &
+            call unpack_residual_partials(s, k, nvar, i_dlnE_dt, &
                res18, d_dm1, d_d00, d_dp1)
             
             ! do partials wrt composition
@@ -440,40 +449,63 @@
             if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
                if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
                   do j=1,s% species
-                     call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
-                              scal*s% d_epsnuc_dx(j,k))
+                     dequ = scal*s% d_epsnuc_dx(j,k)
+                     if (checking) call check_dequ(dequ,'d_epsnuc_dx')
+                     call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
                   end do
                end if
             end if
 
             if (.not. eps_grav_form) then          
                do j=1,s% species
-                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
-                           -scal*(s%energy(k)/dt)*s% dlnE_dxa_for_partials(j,k))
+                  dequ = -scal*(s%energy(k)/dt)*s% dlnE_dxa_for_partials(j,k)
+                  if (checking) call check_dequ(dequ,'dlnE_dxa_for_partials')
+                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
                end do                           
             else if (do_chem .and. (.not. doing_op_split_burn) .and. &
                      (s% dxdt_nuc_factor > 0d0 .or. s% mix_factor > 0d0)) then                     
                do j=1,s% species
-                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, &
-                     scal*s% d_eps_grav_dx(j,k))
+                  dequ = scal*s% d_eps_grav_dx(j,k)
+                  if (checking) call check_dequ(dequ,'d_eps_grav_dx')
+                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
                end do               
             end if
             
             do j=1,s% species
-               call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxa00(j)/dm)
+               dequ = -scal*d_dwork_dxa00(j)/dm
+               if (checking) call check_dequ(dequ,'d_dwork_dxa00')
+               call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
             end do
             if (k > 1) then 
                do j=1,s% species
-                  call em1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxam1(j)/dm)
+                  dequ = -scal*d_dwork_dxam1(j)/dm
+                  if (checking) call check_dequ(dequ,'d_dwork_dxam1')
+                  call em1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
                end do
             end if
             if (k < nz) then
                do j=1,s% species
-                  call ep1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, -scal*d_dwork_dxap1(j)/dm)
+                  dequ = -scal*d_dwork_dxap1(j)/dm
+                  if (checking) call check_dequ(dequ,'d_dwork_dxap1')
+                  call ep1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
                end do
             end if         
             
          end subroutine unpack_res18
+
+         subroutine check_dequ(dequ, str)
+            real(dp), intent(in) :: dequ
+            character (len=*), intent(in) :: str
+            include 'formats'
+            if (is_bad(dequ)) then
+               ierr = -1
+               if (s% report_ierr) then
+                  write(*,2) 'get1_energy_eqn: bad ' // trim(str), k, dequ
+               end if
+               if (s% stop_for_bad_nums) stop 'get1_energy_eqn'
+               return
+            end if
+         end subroutine check_dequ
          
          subroutine unpack1(j, dvar_m1, dvar_00, dvar_p1)
             integer, intent(in) :: j

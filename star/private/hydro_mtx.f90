@@ -954,8 +954,6 @@
             write(*,2) 'd_eps_grav_dlnT00', k, s% d_eps_grav_dlnT00(k)
             write(*,2) 'd_eps_grav_dlnTp1', k, s% d_eps_grav_dlnTp1(k)
             write(*,2) 'gradT', k, s% gradT(k)
-            write(*,2) 'd_gradT_dlnd00', k, s% d_gradT_dlnd00(k)
-            write(*,2) 'd_gradT_dlndm1', k, s% d_gradT_dlndm1(k)
             !write(*,2) '', k, s% (k)
             do j=1,s% species
                write(*,3) 'xa(j,k)', j, k, s% xa(j,k)
