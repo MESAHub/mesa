@@ -2066,11 +2066,10 @@
             character (len=*), intent(in) :: str
             include 'formats'
             call eosDT_test_component( &
-               handle, which_eos, Z, X, abar, zbar, &
+               handle, which_eos, &
                species, chem_id, net_iso, xa, &
                exp10(logRho), logRho, exp10(logT), logT, &
-               res, d_dlnd, d_dlnT, &
-               Pgas, Prad, energy, entropy, ierr)       
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
             if (ierr /= 0) then
                write(*,1) trim(str) // ' no results'
             else

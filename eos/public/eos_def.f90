@@ -82,16 +82,22 @@
             ! T*dS/dlnRho from phase transition
 
       ! blend information
+      integer, parameter :: i_eos_HELM = 1
       integer, parameter :: i_frac_HELM = i_latent_ddlnRho+1
             ! fraction HELM
+      integer, parameter :: i_eos_OPAL_SCVH = 2
       integer, parameter :: i_frac_OPAL_SCVH = i_frac_HELM+1
             ! fraction OPAL/SCVH
+      integer, parameter :: i_eos_FreeEOS = 3
       integer, parameter :: i_frac_FreeEOS = i_frac_OPAL_SCVH+1
             ! fraction FreeEOS
+      integer, parameter :: i_eos_PC = 4
       integer, parameter :: i_frac_PC = i_frac_FreeEOS+1
             ! fraction PC
+      integer, parameter :: i_eos_Skye = 5
       integer, parameter :: i_frac_Skye = i_frac_PC+1
             ! fraction Skye
+      integer, parameter :: i_eos_CMS = 6
       integer, parameter :: i_frac_CMS = i_frac_Skye+1
             ! fraction CMS
 
