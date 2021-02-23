@@ -96,8 +96,7 @@
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             arho, alogrho, atemp, alogtemp, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            Pgas, Prad, energy, entropy, ierr)
+            res, d_dlnd, d_dlnT, d_dxa, ierr)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X, abar, zbar
          integer, intent(in) :: which_eos, species
@@ -106,7 +105,6 @@
          real(dp), intent(in) :: arho, alogrho, atemp, alogtemp
          real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
-         real(dp), intent(out) :: Pgas, Prad, energy, entropy
          integer, intent(out) :: ierr
          
          real(dp) :: rho, logRho, T, logT
@@ -141,52 +139,53 @@
             ierr = -1
             return
          end if
-         
-         if (which_eos == 1) then !
-            call get_opal_scvh_for_eosdt( &
-               rq% handle, dbg, Z, X, abar, zbar, &
-               species, chem_id, net_iso, xa, &
-               rho, logRho, T, logT, 1d0, &
-               res, d_dlnd, d_dlnT, d_dxa, &
-               skip, ierr)
-         else if (which_eos == 2) then !
+
+         select case(which_eos)
+         case(i_eos_HELM)
             call get_helm_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 4) then !
-            call get_PC_for_eosdt( &
+         case(i_eos_OPAL_SCVH)
+            call get_opal_scvh_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 5) then !
+         case(i_eos_FreeEOS)
             call get_FreeEOS_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 6) then !
-            call get_CMS_for_eosdt( &
+         case(i_eos_PC)
+            call get_PC_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else if (which_eos == 7) then !
+         case(i_eos_Skye)
             call get_Skye_for_eosdt( &
                rq% handle, dbg, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                rho, logRho, T, logT, 1d0, &
                res, d_dlnd, d_dlnT, d_dxa, &
                skip, ierr)
-         else
+         case(i_eos_CMS)
+            call get_CMS_for_eosdt( &
+               rq% handle, dbg, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, 1d0, &
+               res, d_dlnd, d_dlnT, d_dxa, &
+               skip, ierr)
+         case default
             ierr = -1
-         end if
+         end select
          
          if (ierr /= 0) then
             write(*,*) 'failed in Test_one_eosDT_component', which_eos
@@ -197,11 +196,6 @@
             write(*,*) 'skipped - no results Test_one_eosDT_component', which_eos
             return
          end if
-         
-         Pgas = exp(res(i_lnPgas))
-         Prad = crad*T*T*T*T/3d0
-         energy = exp(res(i_lnE))
-         entropy = exp(res(i_lnS))
          
       end subroutine Test_one_eosDT_component
 

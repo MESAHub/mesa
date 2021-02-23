@@ -558,11 +558,9 @@ contains
             d_dxa = 0
 
             call eosDT_test_component( &
-                  handle, i_eos, Z, X, abar, zbar, &
-                  species, chem_id, net_iso, xa, &
+                  handle, i_eos, species, chem_id, net_iso, xa, &
                   Rho, logRho, T, logT, &
-                  res, d_dlnd, d_dlnT, &
-                  Pgas, Prad, energy, entropy, ierr)
+                  res, d_dlnd, d_dlnT, d_dxa, ierr)
          end if
 
    end subroutine eos_call

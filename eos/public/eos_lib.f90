@@ -249,14 +249,15 @@
          d_dxa(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
       end subroutine eosDT_get
       
-      
+
       subroutine eosDT_test_component( &
-               handle, which_eos, Z, X, abar, zbar, &
+               handle, which_eos, &
                species, chem_id, net_iso, xa, &
                Rho, log10Rho, T, log10T, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-               Pgas, Prad, energy, entropy, ierr)
+               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, &
+               ierr)
 
+         use chem_lib, only: basic_composition_info
          use eos_def
          use eosDT_eval, only: Test_one_eosDT_component
 
@@ -264,15 +265,8 @@
          
          integer, intent(in) :: handle
          
-         integer, intent(in) :: which_eos ! 1=opal_scvh, 2=helm, 3=pteh, 4=pc, 5=FreeEOS
+         integer, intent(in) :: which_eos ! see eos_def: i_eos_<component>
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-         real(dp), intent(in) :: abar
-            ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
@@ -299,27 +293,29 @@
          ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
          real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
          ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
-
-         real(dp) :: d_dxa(num_eos_basic_results,species) ! (num_eos_basic_results,species)
-         
-         real(dp), intent(out) :: Pgas, Prad, energy, entropy
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results,species)
          
          integer, intent(out) :: ierr ! 0 means AOK.
          
          type (EoS_General_Info), pointer :: rq
+
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0) then
             write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
             return
          end if
+
+         call basic_composition_info( &
+            species, chem_id, xa, X, Y, Z, &
+            abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
          
          call Test_one_eosDT_component( &
                rq, which_eos, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, log10Rho, T, log10T, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa, &
-               Pgas, Prad, energy, entropy, ierr)
+               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, ierr)
          
       end subroutine eosDT_test_component
 
