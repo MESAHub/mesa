@@ -1,6 +1,6 @@
-      subroutine derivs(x,y,dydt,nvar,ierr)
+      subroutine derivs(x,h,y,dydt,nvar,ierr)
          use const_def, only: dp
          integer, intent(in) :: nvar
-         real(dp) :: x,y(:),dydt(:)
+         real(dp) :: x,h,y(:),dydt(:)
          integer, intent(out) :: ierr
       end subroutine derivs

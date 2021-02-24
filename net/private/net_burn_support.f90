@@ -127,7 +127,7 @@
        if (ierr /= 0) return
 
 ! get the right hand sides and form scaling vector
-       call derivs(x,y,dydx,nvar,ierr)
+       call derivs(x,h,y,dydx,nvar,ierr)
        if (ierr /= 0) then
          return
          write(*,*) 'derivs failed in netint'
@@ -289,7 +289,7 @@
       enddo
 
 ! get the dense jacobian in dens_dfdy
-      call jakob(x,y,dens_dfdy,nvar,ierr)
+      call jakob(x,h,y,dens_dfdy,nvar,ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'jakob failed in stifbs'
          return
@@ -522,7 +522,7 @@
       enddo
 
       x = xs + h
-      call derivs(x,ytemp,yout,nvar,ierr)
+      call derivs(x,h,ytemp,yout,nvar,ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'init derivs failed in simpr'
          return
@@ -557,7 +557,7 @@
        enddo
 
        x = x + h
-       call derivs(x,ytemp,yout,nvar,ierr)
+       call derivs(x,h,ytemp,yout,nvar,ierr)
        if (ierr /= 0) then
          if (dbg) write(*,*) 'derivs failed in simpr general step'
          return

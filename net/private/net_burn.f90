@@ -324,9 +324,9 @@
       
       contains
          
-         subroutine burner_derivs(x,y,f,species,ierr)
+         subroutine burner_derivs(x,h,y,f,species,ierr)
             integer, intent(in) :: species
-            real(dp) :: x, y(:), f(:)
+            real(dp) :: x, h, y(:), f(:)
             integer, intent(out) :: ierr
             integer, parameter :: ld_dfdx = 0
             real(dp), target :: dfdx_arry(ld_dfdx,species)
@@ -345,14 +345,14 @@
             nfcn = nfcn + 1
             dfdx => dfdx_arry
             reuse_rates = .false. ! use_aprox21_rates .or. set_aprox21_rates
-            call jakob_or_derivs(x,y,f,dfdx,reuse_rates,ierr)
+            call jakob_or_derivs(x,h,y,f,dfdx,reuse_rates,ierr)
             if (ierr /= 0) return            
          
          end subroutine burner_derivs
 
-         subroutine burner_jakob(x,y,dfdy,species,ierr)
+         subroutine burner_jakob(x,h,y,dfdy,species,ierr)
             integer, intent(in) :: species
-            real(dp) :: x, y(:)
+            real(dp) :: x, h, y(:)
             real(dp), pointer :: dfdy(:,:)
             integer, intent(out) :: ierr
             real(dp), target :: f_arry(0)
@@ -370,12 +370,12 @@
             f => f_arry
 
             reuse_rates = .false.
-            call jakob_or_derivs(x,y,f,dfdy,reuse_rates,ierr)
+            call jakob_or_derivs(x,h,y,f,dfdy,reuse_rates,ierr)
             if (ierr /= 0) return
                      
          end subroutine burner_jakob
 
-         subroutine jakob_or_derivs(time,y,f,dfdy,reuse_rates,ierr)
+         subroutine jakob_or_derivs(time,dt,y,f,dfdy,reuse_rates,ierr)
             use chem_lib, only: basic_composition_info
             use chem_def, only: chem_isos, num_categories, category_name, ih1
             use net_eval, only: eval_net
@@ -384,7 +384,7 @@
             use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_eta
             use eos_lib, only: eosDT_get
          
-            real(dp) :: time, y(:), f(:)
+            real(dp) :: time, dt, y(:), f(:)
             real(dp), pointer :: dfdy(:,:)
             logical, intent(in) :: reuse_rates
             integer, intent(out) :: ierr
