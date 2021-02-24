@@ -296,7 +296,9 @@
          real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results,species)
          
          integer, intent(out) :: ierr ! 0 means AOK.
-         
+
+         real(dp) :: d_dxa_eos(num_eos_basic_results,species) ! eos internally returns derivs of all quantities
+
          type (EoS_General_Info), pointer :: rq
 
          real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
@@ -315,7 +317,10 @@
                rq, which_eos, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, log10Rho, T, log10T, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, ierr)
+               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_eos, ierr)
+
+         ! only return 1st two d_dxa results (lnE and lnPgas)
+         d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
          
       end subroutine eosDT_test_component
 
