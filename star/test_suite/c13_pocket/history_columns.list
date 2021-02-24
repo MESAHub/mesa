@@ -1011,24 +1011,6 @@
       !diffusion_solver_steps
       !diffusion_solver_iters
 
-
-   !## maximum solver residuals
-      !log_max_abs_lgE_residual
-      !log_max_abs_v_residual
-      !log_max_dlnEdt_residual
-      !log_max_drdt_residual
-      !log_max_dvdt_residual
-      !log_max_lnd_residual
-
-      !avg_lgE_residual
-      !avg_v_residual
-
-      !log_avg_lgE_residual
-      !log_avg_v_residual
-
-      !max_abs_lgE_residual
-      !max_abs_v_residual
-
    !## conservation during mesh adjust
       !log_mesh_adjust_IE_conservation
       !log_mesh_adjust_KE_conservation

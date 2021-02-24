@@ -50,8 +50,6 @@
       num_zones ! number of zones in the model
       log_total_angular_momentum
       
-      log_max_residual
-      log_residual_norm
       num_solver_iterations ! iterations at this step
       rel_E_err
       log_rel_E_err
