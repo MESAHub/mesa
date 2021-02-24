@@ -480,9 +480,6 @@
          real(dp), dimension(max_num_rsp_LINA_modes) :: &
             rsp_LINA_periods, rsp_LINA_growth_rates
       
-      ! convection velocity equation info
-
-         real(dp), pointer, dimension(:) :: conv_vel_residual
 
       ! adjusted (non-local) mixing info -- evaluated at start of step.
          

@@ -1149,9 +1149,6 @@
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
-
-            call do1(s% conv_vel_residual, c% conv_vel_residual)
-            if (failed('conv_vel_residual')) exit
             
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit
@@ -1649,8 +1646,9 @@
                if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
                if (s% zero_when_allocate) call fill_ad_with_zeros(ptr,1,-1)
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D_ad(s, ptr, sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_ad_with_NaNs(ptr,1,-1)
@@ -1679,8 +1677,9 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                if (s% zero_when_allocate) ptr(:) = 0
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D(s, ptr, sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
@@ -1707,8 +1706,9 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                if (s% zero_when_allocate) ptr(:) = 0
             else
-               if (action == do_reallocate .and. &
-                   nvar*nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nvar*nz <= size(ptr,dim=1)) return
+               end if
                call do1D(s, ptr, nvar*sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
@@ -1727,8 +1727,9 @@
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D_integer(s, ptr, sz_new, action, ierr)
             end if
          end subroutine do1_integer
@@ -1744,8 +1745,9 @@
                deallocate(ptr)
                allocate(ptr(sz1, sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
+               if (action == do_reallocate) then
+                  if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
+               end if
                call do2D_integer(s, ptr, sz1, sz_new, action, ierr)
             end if
          end subroutine do2_integer
@@ -1760,8 +1762,9 @@
                deallocate(ptr)
                allocate(ptr(sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   nz <= size(ptr,dim=1)) return
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
                call do1D_logical(s, ptr, sz_new, action, ierr)
             end if
          end subroutine do1_logical
@@ -1787,10 +1790,8 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
                if (s% zero_when_allocate) ptr(:,:) = 0
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. &
-                   nz <= size(ptr, dim=2)) then
-                  return
+               if (action == do_reallocate) then
+                  if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
                end if
                call do2D(s, ptr, sz1, sz_new, action, ierr)
                if (action == do_allocate) then
@@ -1820,10 +1821,11 @@
                if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
                if (s% zero_when_allocate) ptr(:,:,:) = 0
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. &
-                   sz2 == size(ptr, dim=2) .and. &
-                   nz <= size(ptr, dim=3)) return
+               if (action == do_reallocate) then
+                   if (sz1 == size(ptr, dim=1) .and. &
+                       sz2 == size(ptr, dim=2) .and. &
+                       nz <= size(ptr, dim=3)) return
+               end if
                call do3D(s, ptr, sz1, sz2, sz_new, action, ierr)
                if (action == do_allocate) then
                   if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
@@ -1843,9 +1845,9 @@
                deallocate(ptr)
                allocate(ptr(sz1, sz_new), stat=ierr)
             else
-               if (action == do_reallocate .and. &
-                   sz1 == size(ptr, dim=1) .and. &
-                   nz <= size(ptr, dim=2)) return
+               if (action == do_reallocate) then
+                  if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
+               end if
                call do2D_quad(s, ptr, sz1, sz_new, action, ierr)
             end if
          end subroutine do2_quad
