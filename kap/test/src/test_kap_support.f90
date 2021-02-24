@@ -506,7 +506,7 @@
             call mesa_error(__FILE__,__LINE__)
          end if
 
-         call eos_init('', '', '', use_cache, ierr)
+         call eos_init('', use_cache, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
          call kap_init(use_cache, '', ierr) 

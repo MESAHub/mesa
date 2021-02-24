@@ -33,7 +33,6 @@ SRCS = \
    helm.f90 \
    gauss_fermi.f90 \
    eosdt_load_tables.f90 \
-   eospt_load_tables.f90 \
    eoscms_eval.f90 \
    eospc_eval.f90 \
    eosdt_support.f90 \

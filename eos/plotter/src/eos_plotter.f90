@@ -417,7 +417,7 @@ contains
 
       eos_file_prefix = 'mesa'
 
-      call eos_init(' ', ' ', ' ', use_cache, ierr)
+      call eos_init(' ', use_cache, ierr)
       if (ierr /= 0 .and. .not. ignore_ierr) then
          write(*,*) 'eos_init failed in Setup_eos'
          stop 1
