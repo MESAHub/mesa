@@ -1070,7 +1070,7 @@
 
       ! a 1-zone integrator for nets -- for given temperature and density as functions of time
       subroutine net_1_zone_burn( &
-            handle, num_isos, num_reactions, t_start, t_end, starting_x, &
+            net_handle, eos_handle, num_isos, num_reactions, t_start, t_end, starting_x, &
             num_times_for_interpolation, times, log10Ts_f1, log10Rhos_f1, etas_f1, &
             dxdt_source_term, rate_factors, &
             weak_rate_factor, reaction_Qs, reaction_neuQs, &
@@ -1087,7 +1087,7 @@
          use net_def
          use chem_def, only: num_categories
          
-         integer, intent(in) :: handle
+         integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (num_isos)
@@ -1133,7 +1133,7 @@
          integer, intent(out) :: ierr
          
          call burn_1_zone( &
-            handle, num_isos, num_reactions, t_start, t_end, starting_x, &
+            net_handle, eos_handle, num_isos, num_reactions, t_start, t_end, starting_x, &
             num_times_for_interpolation, times, log10Ts_f1, log10Rhos_f1, etas_f1, &
             dxdt_source_term, rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, screening_mode, &
@@ -1186,7 +1186,7 @@
       ! a 1-zone integrator for nets -- for given density
       ! evolve lnT according to dlnT/dt = eps_nuc/(Cv*T)
       subroutine net_1_zone_burn_const_density( &
-            handle, num_isos, num_reactions, t_start, t_end, &
+            net_handle, eos_handle, num_isos, num_reactions, t_start, t_end, &
             starting_x, starting_log10T, log10Rho, &
             get_eos_info_for_burn_at_const_density, &
             rate_factors, weak_rate_factor, reaction_Qs, reaction_neuQs, &
@@ -1202,7 +1202,7 @@
          use net_def
          use chem_def, only: num_categories
          
-         integer, intent(in) :: handle, num_isos, num_reactions
+         integer, intent(in) :: net_handle, eos_handle, num_isos, num_reactions
          real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (num_isos)
          real(dp), intent(in) :: starting_log10T, log10Rho
          interface
@@ -1235,7 +1235,7 @@
          integer, intent(out) :: ierr
          
          call burn_const_density_1_zone( &
-            handle, num_isos, num_isos+1, num_reactions, t_start, t_end, &
+            net_handle, eos_handle, num_isos, num_isos+1, num_reactions, t_start, t_end, &
             starting_x, starting_log10T, log10Rho, &
             get_eos_info_for_burn_at_const_density, &
             rate_factors, weak_rate_factor, reaction_Qs, reaction_neuQs, &
