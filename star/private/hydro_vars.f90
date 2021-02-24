@@ -324,6 +324,7 @@
                   do k=1,nz
                      s% etrb(k) = max(s% xh(i_etrb, k), 0d0)
                      s% dxh_etrb(k) = 0d0
+                     s% w(k) = sqrt(s% etrb(k))
                   end do
                else if (j == i_lum) then
                   do k=1,nz

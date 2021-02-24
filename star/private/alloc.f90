@@ -609,6 +609,8 @@
             if (failed('u')) exit
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
+            call do1(s% w, c% w)
+            if (failed('w')) exit
             call do1(s% etrb, c% etrb)
             if (failed('etrb')) exit
             call do1(s% etrb_start, c% etrb_start)

@@ -40,6 +40,7 @@
          compute_Eq_cell, compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
+         min_w = 1d-6, &
          x_ALFAP = 2.d0/3.d0, &
          x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
          x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
@@ -415,7 +416,7 @@
       end function compute_d_v_div_r
       
       
-      function compute_Chi_cell(s, k, ierr) result(Chi_cell) ! eddy viscosity (Kuhfuss 1986) [erg]
+      function compute_Chi_cell(s, k, ierr) result(Chi_cell) ! eddy viscosity energy (Kuhfuss 1986) [erg]
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Chi_cell
@@ -427,7 +428,8 @@
          ierr = 0
          ALFAM = s% TDC_alfam
          ALFA = s% TDC_alfa
-         if (k == 1 .or. k == s% nz .or. ALFAM == 0d0 .or. ALFA == 0d0) then
+         if (k == 1 .or. k == s% nz .or. s% w(k) < min_w .or. &
+             ALFAM == 0d0 .or. ALFA == 0d0) then
             Chi_cell = 0d0
             return
          end if
@@ -504,12 +506,16 @@
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell
          include 'formats'
          ierr = 0
-         if (s% TDC_alfa == 0d0 .or. k == 1 .or. k == s% nz .or. s% w(k) == 0d0) then
+         if (s% TDC_alfa == 0d0 .or. k == 1 .or. k == s% nz) then
             Source = 0d0
             s% SOURCE(k) = Source%val
             return
          end if
-         w_00 = wrap_w_00(s, k)
+         if (s% w(k) < min_w) then
+            w_00 = min_w*1d-2 ! must be > 0 to provide a seed for turbulence
+         else
+            w_00 = wrap_w_00(s, k)
+         end if
          T_00 = wrap_T_00(s, k)                  
          d_00 = wrap_d_00(s, k)         
          P_00 = wrap_P_00(s, k)         
@@ -555,22 +561,22 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: D
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Hp_cell, w_00, dw3
+         type(auto_diff_real_star_order1) :: Hp_cell, etrb_00, w_00, dw3
          include 'formats'
-         real(dp) :: alpha, cede
+         real(dp) :: alpha
          ierr = 0
          alpha = s% TDC_alfa
-         cede = x_CEDE
-         if (alpha == 0d0) then
+         if (alpha == 0d0 .or. s% w(k) < min_w) then
             D = 0d0
             s% DAMP(k) = 0d0
             return
          end if
          Hp_cell = compute_Hp_cell(s, k, ierr)
          if (ierr /= 0) return
-         w_00 = wrap_w_00(s, k)
-         dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
-         D = (cede/alpha)*dw3/Hp_cell
+         etrb_00 = wrap_etrb_00(s,k)
+         w_00 = wrap_w_00(s,k)
+         dw3 = etrb_00*w_00 - pow3(s% TDC_w_min_for_damping)
+         D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          s% DAMP(k) = D%val
       end function compute_D
@@ -582,18 +588,18 @@
          type(auto_diff_real_star_order1) :: Dr
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            w_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
+            etrb_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
          real(dp) :: gammar, alpha, POM
          include 'formats'
          ierr = 0
          alpha = s% TDC_alfa
          gammar = s% TDC_alfar*x_GAMMAR
-         if (gammar == 0d0) then
+         if (gammar == 0d0 .or. s% w(k) < min_w) then
             Dr = 0d0
             s% DAMPR(k) = 0d0
             return
          end if
-         w_00 = wrap_w_00(s,k)
+         etrb_00 = wrap_etrb_00(s,k)
          T_00 = wrap_T_00(s,k)
          d_00 = wrap_d_00(s,k)
          Cp_00 = wrap_Cp_00(s,k)
@@ -604,10 +610,9 @@
          POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00) 
             ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
             ! K^3 / (cm^-4 erg K^-1) = K^4 cm^4 erg^-1
-         Dr = POM*POM2*pow2(w_00/Hp_cell)
+         Dr = POM*POM2*etrb_00/pow2(Hp_cell)
          ! (erg cm^-2 K^-4 s^-1) (K^4 cm^4 erg^-1) cm^2 s^-2 cm^-2
          ! cm^2 s^-3 = erg g^-1 s^-1
-         
          s% DAMPR(k) = Dr%val
       end function compute_Dr
 
@@ -704,8 +709,10 @@
          real(dp) :: ALFAC, ALFAS
          include 'formats'
          ierr = 0
-         if (s% TDC_alfa <= 0d0 .or. k == 1 .or. k == s% nz .or. &
-               s% w(k) < 1d-6) then ! this last check is for compatibility with RSP
+         if (s% TDC_alfa <= 0d0 .or. k == 1 .or. k == s% nz) then
+            Lc_w_face_factor = 0d0
+            Lc = 0d0
+         else if (s% w(k-1) < min_w .and. s% w(k) < min_w) then
             Lc_w_face_factor = 0d0
             Lc = 0d0
          else
@@ -715,8 +722,16 @@
             T_00 = wrap_T_00(s, k)         
             d_m1 = wrap_d_m1(s, k)
             d_00 = wrap_d_00(s, k)
-            w_m1 = wrap_w_m1(s, k)
-            w_00 = wrap_w_00(s, k)
+            if (s% w(k-1) < min_w) then
+               w_m1 = 0d0
+            else
+               w_m1 = wrap_w_m1(s, k)
+            end if
+            if (s% w(k) < min_w) then
+               w_00 = 0d0
+            else
+               w_00 = wrap_w_00(s, k)
+            end if
             T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
             PII_face = compute_PII_face(s, k, ierr)
             w_face = 0.5d0*(w_m1 + w_00)
@@ -747,17 +762,21 @@
             Lt = 0d0
             return
          end if
+         if (s% w(k-1) < min_w .and. s% w(k) < min_w) then
+            Lt = 0d0
+            return
+         end if
          r_00 = wrap_r_00(s,k) ! not time centered for luminosity         
          area2 = (4d0*pi)**2*pow4(r_00)
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
          rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
-         if (s% w(k-1) < 1d-3) then ! avoid exploding partials
+         if (s% w(k-1) < min_w) then
             w_m1 = 0d0
          else
             w_m1 = wrap_w_m1(s,k)
          end if
-         if (s% w(k) < 1d-3) then ! avoid exploding partials
+         if (s% w(k) < min_w) then
             w_00 = 0d0
          else
             w_00 = wrap_w_00(s,k)

@@ -1040,7 +1040,7 @@
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
                if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
-                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS  ???
+                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS to give seed for SOURCE
                else
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
