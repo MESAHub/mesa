@@ -1,6 +1,6 @@
 cd make; make clean
 
-for i in eosDT_builder eosPT_builder eosFreeEOS_builder eosSCVH_PT_builder
+for i in eosDT_builder eosFreeEOS_builder
 do
 	cd ../$i
 	./clean

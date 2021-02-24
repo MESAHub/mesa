@@ -93,20 +93,11 @@
       subroutine test_eosPT(which)
          integer, intent(in) :: which
          real(dp) :: Z, X, logPgas, logT, logRho, logP
-         logical :: save_use_max_SCVH_for_PT
          Z =  0.02d0
          X =  0.6d0
          logT = 4d0
          logPgas = 5d0
-         save_use_max_SCVH_for_PT = rq% use_max_SCVH_for_PT
-         if (which == 1) then
-            rq% use_max_SCVH_for_PT = .true.
-         else
-            rq% use_max_SCVH_for_PT = .false.
-         end if
-         write(*,*) 'test_eosPT rq% use_max_SCVH_for_PT', rq% use_max_SCVH_for_PT
          call test1_eosPT(Z, X, logPgas, logT, .false., .false., logRho, logP)
-         rq% use_max_SCVH_for_PT = save_use_max_SCVH_for_PT
       end subroutine test_eosPT
             
       

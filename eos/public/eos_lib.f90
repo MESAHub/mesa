@@ -39,18 +39,14 @@
             
             
       subroutine eos_init( &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
-            use_cache, info)      
+            eosDT_cache_dir, use_cache, info)      
          use eos_initialize, only : Init_eos
          character(*), intent(in) :: eosDT_cache_dir ! blank string means use default
-         character(*), intent(in) :: eosPT_cache_dir ! blank means use default
-         character(*), intent(in) :: eosDE_cache_dir ! blank means use default
          logical, intent(in) :: use_cache
          integer, intent(out) :: info ! 0 means AOK. 
          info = 0
          call Init_eos( &
-            eosDT_cache_dir, eosPT_cache_dir, &
-            use_cache, info)
+            eosDT_cache_dir, use_cache, info)
          if (info /= 0) return      
       end subroutine eos_init      
       
@@ -1679,12 +1675,11 @@
 
 
       subroutine num_eos_files_loaded( &
-            num_DT, num_PT, num_FreeEOS)
+            num_DT, num_FreeEOS)
          use eos_def
          integer, intent(out) :: &
-            num_DT, num_PT, num_FreeEOS
+            num_DT, num_FreeEOS
          num_DT = count(eosDT_XZ_loaded)
-         num_PT = count(eosPT_XZ_loaded)
          num_FreeEOS = count(FreeEOS_XZ_loaded)
       end subroutine num_eos_files_loaded
 

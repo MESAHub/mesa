@@ -226,7 +226,7 @@
          integer, intent(out) :: handle
          integer :: ierr
          logical, parameter :: use_cache = .true.
-         call eos_init('', '', '', use_cache, ierr)
+         call eos_init('', use_cache, ierr)
          if (ierr /= 0) then
             write(*,*) 'eos_init failed in Setup_eos'
             call mesa_error(__FILE__,__LINE__)

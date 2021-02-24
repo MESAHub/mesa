@@ -32,14 +32,13 @@
             
       
       subroutine Init_eos( &
-           eosDT_cache_dir_in, eosPT_cache_dir_in, &
+           eosDT_cache_dir_in, &
            use_cache, ierr)
          use eos_def
          use helm_alloc
          use utils_lib, only : mkdir
          use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir
-         character(*), intent(IN) :: &
-            eosDT_cache_dir_in, eosPT_cache_dir_in
+         character(*), intent(IN) :: eosDT_cache_dir_in
          logical, intent(in) :: use_cache
          integer, intent(OUT) :: ierr ! 0 means AOK.
          !integer, parameter :: imax = 261, jmax = 101  
@@ -49,12 +48,11 @@
          integer, parameter :: imax = 2701, jmax = 1001
             ! dimensions of large version of helm table; 100 points per decade
          ! helm table lives in eosDT_data
-         character (len=256) :: eosDT_data_dir, eosPT_data_dir
+         character (len=256) :: eosDT_data_dir
          ierr = 0
          if (eos_root_is_initialized) return
          use_cache_for_eos = use_cache
          eosDT_data_dir = trim(mesa_data_dir) // '/eosDT_data'
-         eosPT_data_dir = trim(mesa_data_dir) // '/eosPT_data'
          if (use_cache_for_eos) then
             if (len_trim(eosDT_cache_dir_in) > 0) then
                eosDT_cache_dir = eosDT_cache_dir_in
@@ -66,16 +64,6 @@
             call mkdir(eosDT_cache_dir)
             eosDT_temp_cache_dir = trim(mesa_temp_caches_dir) // '/eosDT_cache'
             if(use_mesa_temp_cache) call mkdir(eosDT_temp_cache_dir)
-            if (len_trim(eosPT_cache_dir_in) > 0) then
-               eosPT_cache_dir = eosPT_cache_dir_in
-            else if (len_trim(mesa_caches_dir) > 0) then
-               eosPT_cache_dir = trim(mesa_caches_dir) // '/eosPT_cache'
-            else
-               eosPT_cache_dir = trim(eosPT_data_dir) // '/cache'
-            end if
-            call mkdir(eosPT_cache_dir)
-            eosPT_temp_cache_dir = trim(mesa_temp_caches_dir) // '/eosPT_cache'
-            if(use_mesa_temp_cache) call mkdir(eosPT_temp_cache_dir)
          end if
          
          call alloc_helm_table(eos_ht, imax, jmax, ierr)

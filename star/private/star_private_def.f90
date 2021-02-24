@@ -404,7 +404,7 @@
             reaclib_min_T9_in, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -429,7 +429,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
@@ -478,11 +478,8 @@
          if (dbg) write(*,*) 'call eos_init'
          !write(*,*) 'eos_file_prefix "' // trim(eos_file_prefix) // '"'
          !write(*,*) 'eosDT_cache_dir "' // trim(eosDT_cache_dir) // '"'
-         !write(*,*) 'eosPT_cache_dir "' // trim(eosPT_cache_dir) // '"'
-         !write(*,*) 'eosDE_cache_dir "' // trim(eosDE_cache_dir) // '"'
          call eos_init( &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
-            use_cache, ierr)
+            eosDT_cache_dir, use_cache, ierr)
          if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call kap_init'

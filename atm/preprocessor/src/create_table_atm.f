@@ -150,7 +150,7 @@ contains
     call chem_init('isotopes.data',ierr)
     if(ierr/=0) call mesa_error(__FILE__,__LINE__)
 
-    call eos_init(' ', ' ', ' ', use_cache, ierr)
+    call eos_init(' ', use_cache, ierr)
     if(ierr/=0) call mesa_error(__FILE__,__LINE__)
 
     eos_handle = alloc_eos_handle(ierr)
