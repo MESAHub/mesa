@@ -299,12 +299,6 @@
       non_nuc_neu_factor = 0d0
       eps_nuc_factor = 0d0
       
-! eos controls
-      !use_eosPTEH_for_low_density = .true.
-      !use_eosPTEH_for_high_Z = .true.
-      !use_eosELM = .true.
-      !use_eosDT2 = .true.
-      
 ! opacity controls
       !cubic_interpolation_in_X = .false.
       !cubic_interpolation_in_Z = .false.
