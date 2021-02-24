@@ -312,22 +312,24 @@
             logical, parameter :: checking = .false.
             integer :: j
             include 'formats'
-            call unpack_residual_partials(s, k, nvar, i_dv_dt, &
-               res18, d_dm1, d_d00, d_dp1)
             ! do partials wrt composition   
             resid1 = resid1_ad%val         
             do j=1,s% species
                d_residual_dxa00(j) = resid1*d_iXPavg_dxa00(j) - iXPavg*d_dXP_dxa00(j)
-               if (checking) call check_dequ(d_residual_dxa00(j),'d_residual_dxa00(j)')
+               if (checking) call check_dequ(d_dXP_dxa00(j),'d_dXP_dxa00(j)')
+               if (checking) call check_dequ(d_iXPavg_dxa00(j),'d_iXPavg_dxa00(j)')
                call e00(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
             end do
             if (k > 1) then 
                do j=1,s% species
                   d_residual_dxam1(j) = resid1*d_iXPavg_dxam1(j) - iXPavg*d_dXP_dxam1(j)
-                  if (checking) call check_dequ(d_residual_dxam1(j),'d_residual_dxam1(j)')
+                  if (checking) call check_dequ(d_dXP_dxam1(j),'d_dXP_dxam1(j)')
+                  if (checking) call check_dequ(d_iXPavg_dxam1(j),'d_iXPavg_dxam1(j)')
                   call em1(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
                end do
             end if            
+            call unpack_residual_partials(s, k, nvar, i_dv_dt, &
+               res18, d_dm1, d_d00, d_dp1)
          end subroutine unpack_res18
 
          subroutine check_dequ(dequ, str)
@@ -335,11 +337,13 @@
             character (len=*), intent(in) :: str
             include 'formats'
             if (is_bad(dequ)) then
+!$omp critical (hydro_momentum_crit2)
                ierr = -1
                if (s% report_ierr) then
                   write(*,2) 'get1_momentum_eqn: bad ' // trim(str), k, dequ
                end if
                if (s% stop_for_bad_nums) stop 'get1_momentum_eqn'
+!$omp end critical (hydro_momentum_crit2)
                return
             end if
          end subroutine check_dequ
@@ -528,6 +532,7 @@
             
          dXP_ad = XPm1_ad - XP00_ad
          dXP = XPm1 - XP00
+         
          do j=1,s% species
             d_dXP_dxam1(j) = d_XPm1_dxam1(j)
             d_dXP_dxa00(j) = -d_XP00_dxa00(j)

@@ -1087,6 +1087,8 @@
             call do1(s% d_R2_dlnR, c% d_R2_dlnR)
             if (failed('d_R2_dlnR')) exit
 
+            call do1_ad(s% eps_grav_ad, c% eps_grav_ad)
+            if (failed('eps_grav_ad')) exit
             call do1(s% eps_grav, c% eps_grav)
             if (failed('eps_grav')) exit
             call do1(s% d_eps_grav_dlndm1, c% d_eps_grav_dlndm1)
@@ -1170,6 +1172,21 @@
             call do1(s% mlt_D_thrm, c% mlt_D_thrm)
             if (failed('mlt_D_thrm')) exit
 
+            call do1(s% mlt_vc, c% mlt_vc)
+            if (failed('mlt_vc')) exit
+            call do1(s% d_mlt_vc_dlnd00, c% d_mlt_vc_dlnd00)
+            if (failed('d_mlt_vc_dlnd00')) exit
+            call do1(s% d_mlt_vc_dlnT00, c% d_mlt_vc_dlnT00)
+            if (failed('d_mlt_vc_dlnT00')) exit
+            call do1(s% d_mlt_vc_dlndm1, c% d_mlt_vc_dlndm1)
+            if (failed('d_mlt_vc_dlndm1')) exit
+            call do1(s% d_mlt_vc_dlnTm1, c% d_mlt_vc_dlnTm1)
+            if (failed('d_mlt_vc_dlnTm1')) exit
+            call do1(s% d_mlt_vc_dlnR, c% d_mlt_vc_dlnR)
+            if (failed('d_mlt_vc_dlnR')) exit
+            call do1(s% d_mlt_vc_dL, c% d_mlt_vc_dL)
+            if (failed('d_mlt_vc_dL')) exit
+
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
 
@@ -1203,23 +1220,50 @@
             call do1(s% cz_bdy_dq, c% cz_bdy_dq)
             if (failed('cz_bdy_dq')) exit
 
-            call do1(s% actual_gradT, c% actual_gradT)
-            if (failed('actual_gradT')) exit
-
             call do1_ad(s% gradT_ad, c% gradT_ad)
             if (failed('gradT_ad')) exit
-            call do1(s% gradT, c% gradT)
-            if (failed('gradT')) exit
-
             call do1_ad(s% gradr_ad, c% gradr_ad)
             if (failed('gradr_ad')) exit
-            call do1(s% gradr, c% gradr)
-            if (failed('gradr')) exit
-
             call do1_ad(s% mlt_vc_ad, c% mlt_vc_ad)
             if (failed('mlt_vc_ad')) exit
-            call do1(s% mlt_vc, c% mlt_vc)
-            if (failed('mlt_vc')) exit
+
+            call do1(s% actual_gradT, c% actual_gradT)
+            if (failed('actual_gradT')) exit
+            call do1(s% gradT, c% gradT)
+            if (failed('gradT')) exit
+            call do1(s% d_gradT_dlnd00, c% d_gradT_dlnd00)
+            if (failed('d_gradT_dlnd00')) exit
+            call do1(s% d_gradT_dlnT00, c% d_gradT_dlnT00)
+            if (failed('d_gradT_dlnT00')) exit
+            call do1(s% d_gradT_dlndm1, c% d_gradT_dlndm1)
+            if (failed('d_gradT_dlndm1')) exit
+            call do1(s% d_gradT_dlnTm1, c% d_gradT_dlnTm1)
+            if (failed('d_gradT_dlnTm1')) exit
+            call do1(s% d_gradT_dlnR, c% d_gradT_dlnR)
+            if (failed('d_gradT_dlnR')) exit
+            call do1(s% d_gradT_dL, c% d_gradT_dL)
+            if (failed('d_gradT_dL')) exit
+            call do1(s% d_gradT_dln_cvpv0, c% d_gradT_dln_cvpv0)
+            if (failed('d_gradT_dln_cvpv0')) exit
+            call do1(s% d_gradT_dw_div_wc, c% d_gradT_dw_div_wc)
+            if (failed('d_gradT_dw_div_wc')) exit
+
+            call do1(s% gradr, c% gradr)
+            if (failed('gradr')) exit
+            call do1(s% d_gradr_dlnd00, c% d_gradr_dlnd00)
+            if (failed('d_gradr_dlnd00')) exit
+            call do1(s% d_gradr_dlnT00, c% d_gradr_dlnT00)
+            if (failed('d_gradr_dlnT00')) exit
+            call do1(s% d_gradr_dlndm1, c% d_gradr_dlndm1)
+            if (failed('d_gradr_dlndm1')) exit
+            call do1(s% d_gradr_dlnTm1, c% d_gradr_dlnTm1)
+            if (failed('d_gradr_dlnTm1')) exit
+            call do1(s% d_gradr_dlnR, c% d_gradr_dlnR)
+            if (failed('d_gradr_dlnR')) exit
+            call do1(s% d_gradr_dL, c% d_gradr_dL)
+            if (failed('d_gradr_dL')) exit
+            call do1(s% d_gradr_dw_div_wc, c% d_gradr_dw_div_wc)
+            if (failed('d_gradr_dw_div_wc')) exit
 
             call do1(s% grad_density, c% grad_density)
             if (failed('grad_density')) exit

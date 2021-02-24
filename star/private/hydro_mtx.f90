@@ -947,12 +947,6 @@
             write(*,2) 'd_nonnucneu_dlnd', k, s% d_nonnucneu_dlnd(k)
             write(*,2) 'd_nonnucneu_dlnT', k, s% d_nonnucneu_dlnT(k)
             write(*,2) 'eps_grav', k, s% eps_grav(k)
-            write(*,2) 'd_eps_grav_dlndm1', k, s% d_eps_grav_dlndm1(k)
-            write(*,2) 'd_eps_grav_dlnd00', k, s% d_eps_grav_dlnd00(k)
-            write(*,2) 'd_eps_grav_dlndp1', k, s% d_eps_grav_dlndp1(k)
-            write(*,2) 'd_eps_grav_dlnTm1', k, s% d_eps_grav_dlnTm1(k)
-            write(*,2) 'd_eps_grav_dlnT00', k, s% d_eps_grav_dlnT00(k)
-            write(*,2) 'd_eps_grav_dlnTp1', k, s% d_eps_grav_dlnTp1(k)
             write(*,2) 'gradT', k, s% gradT(k)
             !write(*,2) '', k, s% (k)
             do j=1,s% species

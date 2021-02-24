@@ -373,16 +373,7 @@
                   if (s% report_ierr) write(*,2) 'failed in eval_eps_grav_and_partials', k
                   return
                end if
-               call wrap(eps_grav_ad, s% eps_grav(k), &
-                  s% d_eps_grav_dlndm1(k), s% d_eps_grav_dlnd00(k), s% d_eps_grav_dlndp1(k), &
-                  s% d_eps_grav_dlnTm1(k), s% d_eps_grav_dlnT00(k), s% d_eps_grav_dlnTp1(k), &
-                  0d0, 0d0, 0d0, &
-                  0d0, s% d_eps_grav_dlnR00(k), s% d_eps_grav_dlnRp1(k), &
-                  0d0, s% d_eps_grav_dv00(k), s% d_eps_grav_dvp1(k), &
-                  0d0, s% d_eps_grav_dL00(k), s% d_eps_grav_dLp1(k), &
-                  0d0, 0d0, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, 0d0, 0d0)
+               eps_grav_ad = s% eps_grav_ad(k)
             end if
             
          end subroutine setup_eps_grav
@@ -498,11 +489,13 @@
             character (len=*), intent(in) :: str
             include 'formats'
             if (is_bad(dequ)) then
+!$omp critical (hydro_energy_crit2)
                ierr = -1
                if (s% report_ierr) then
                   write(*,2) 'get1_energy_eqn: bad ' // trim(str), k, dequ
                end if
                if (s% stop_for_bad_nums) stop 'get1_energy_eqn'
+!$omp end critical (hydro_energy_crit2)
                return
             end if
          end subroutine check_dequ

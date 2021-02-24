@@ -276,10 +276,6 @@
       integer, parameter :: i_L_m1 = 16
       integer, parameter :: i_L_00 = 17
       integer, parameter :: i_L_p1 = 18
-      ! current use of xtra's
-      ! xtra1 is ln_cvpv0
-      ! xtra2 is w_div_wc
-      ! xtra3 is unused
       integer, parameter :: i_xtra1_m1 = 19
       integer, parameter :: i_xtra1_00 = 20
       integer, parameter :: i_xtra1_p1 = 21

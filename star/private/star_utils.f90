@@ -1490,11 +1490,13 @@
             character (len=*), intent(in) :: str
             include 'formats'
             if (is_bad(dequ)) then
+!$omp critical (store_partials_crit)
                ierr = -1
                if (s% report_ierr) then
                   write(*,2) 'store_partials: bad ' // trim(str), k, dequ
                end if
                if (s% stop_for_bad_nums) stop 'store_partials'
+!$omp end critical (store_partials_crit)
                return
             end if
          end subroutine check_dequ

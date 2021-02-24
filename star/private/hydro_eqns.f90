@@ -475,6 +475,8 @@
 
             real(dp) :: dxa_threshold = 1d-4
 
+            logical, parameter :: checking = .true.
+
             include 'formats'
 
             ierr = 0
@@ -532,7 +534,15 @@
                         s, k, xa_start_1, &
                         s% Rho(k), s% lnd(k)/ln10, s% T(k), s% lnT(k)/ln10, &
                         res, dres_dlnd, dres_dlnT, dres_dxa, ierr)
+                     if (is_bad(res(i_lnPgas))) ierr = -1
                      if (ierr /= 0) then
+                        
+                        ! punt silently for now
+                        s% dlnE_dxa_for_partials(:,k) = 0d0
+                        s% dlnP_dxa_for_partials(:,k) = 0d0
+                        ierr = 0
+                        return
+                        
                         if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start_1', k
                         return
                      end if
@@ -544,9 +554,25 @@
 
                      s% dlnE_dxa_for_partials(j,k) = dres_dxa(i_lnE, j) + &
                         frac_without_dxa * (res(i_lnE) - lnE_with_xa_start) / dxa
+                     if (checking) call check_dxa(j,k,s% dlnE_dxa_for_partials(j,k),'dlnE_dxa_for_partials')
 
                      s% dlnP_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% P(k) + &
                         frac_without_dxa * (s% Pgas(k)/s% P(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
+                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnP_dxa_for_partials(j,k))) then
+                        write(*,2) 's% Pgas(k)', k, s% Pgas(k)
+                        write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
+                        write(*,2) 's% P(k)', k, s% P(k)
+                        write(*,2) 'frac_without_dxa', k, frac_without_dxa
+                        write(*,2) 'res(i_lnPgas)', k, res(i_lnPgas)
+                        write(*,2) 'lnPgas_with_xa_start', k, lnPgas_with_xa_start
+                        write(*,2) 'dxa', k, dxa
+                        write(*,2) 'dxa_threshold', k, dxa_threshold
+                        write(*,2) 's% xa_start(j,k)', j, s% xa_start(j,k)
+                        write(*,2) 'xa_start_1(j)', j, xa_start_1(j)
+                        write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
+                        write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
+                     end if
+                     if (checking) call check_dxa(j,k,s% dlnP_dxa_for_partials(j,k),'dlnP_dxa_for_partials')
 
                   else
 
@@ -571,6 +597,23 @@
             end if
 
          end subroutine fix_d_eos_dxa_partials
+
+         subroutine check_dxa(j, k, dxa, str)
+            integer, intent(in) :: j, k
+            real(dp), intent(in) :: dxa
+            character (len=*), intent(in) :: str
+            include 'formats'
+            if (is_bad(dxa)) then
+!$omp critical (eval_equ_for_solver_crit1)
+               ierr = -1
+               if (s% report_ierr) then
+                  write(*,3) 'eval_equ_for_solver: bad ' // trim(str), j, k, dxa
+               end if
+               if (s% stop_for_bad_nums) stop 'eval_equ_for_solver'
+!$omp end critical (eval_equ_for_solver_crit1)
+               return
+            end if
+         end subroutine check_dxa
 
 
       end subroutine eval_equ_for_solver

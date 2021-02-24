@@ -29,6 +29,7 @@
       use const_def
       use chem_def, only: chem_isos
       use utils_lib, only: mesa_error, is_bad
+      use auto_diff
 
       implicit none
 
@@ -39,6 +40,7 @@
 
 
       subroutine eval_eps_grav_and_partials(s, k, ierr)
+         use auto_diff_support, only: wrap
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -56,6 +58,9 @@
 
          if (s% use_other_eps_grav) then
             ! note: call this after 1st doing the standard calculation
+            
+            stop 'need to change other_eps_grav to auto_diff'
+            
             call s% other_eps_grav(s% id, k, s% dt, ierr)
             if (ierr /= 0) return
          end if
@@ -71,6 +76,7 @@
             s% d_eps_grav_dlnTp1(k) = f*s% d_eps_grav_dlnTp1(k)
             s% d_eps_grav_dlnR00(k) = f*s% d_eps_grav_dlnR00(k)
             s% d_eps_grav_dL00(k) = f*s% d_eps_grav_dL00(k)
+            s% d_eps_grav_dLp1(k) = f*s% d_eps_grav_dLp1(k)
             s% d_eps_grav_dlnPgas00_const_T(k) = f*s% d_eps_grav_dlnPgas00_const_T(k)
             s% d_eps_grav_dlnPgasm1_const_T(k) = f*s% d_eps_grav_dlnPgasm1_const_T(k)
             s% d_eps_grav_dlnPgasp1_const_T(k) = f*s% d_eps_grav_dlnPgasp1_const_T(k)
@@ -81,6 +87,19 @@
             s% d_eps_grav_dv00(k) = f*s% d_eps_grav_dv00(k)
             s% d_eps_grav_dvp1(k) = f*s% d_eps_grav_dvp1(k)
          end if
+         
+         ! this is an interim solution so that users of eps_grav can convert to the auto_diff form 
+         ! when change eps_grav to use auto_diff, can delete the s% d_eps_grav_d... 
+         call wrap(s% eps_grav_ad(k), s% eps_grav(k), &
+            s% d_eps_grav_dlndm1(k), s% d_eps_grav_dlnd00(k), s% d_eps_grav_dlndp1(k), &
+            s% d_eps_grav_dlnTm1(k), s% d_eps_grav_dlnT00(k), s% d_eps_grav_dlnTp1(k), &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_eps_grav_dlnR00(k), s% d_eps_grav_dlnRp1(k), &
+            0d0, s% d_eps_grav_dv00(k), s% d_eps_grav_dvp1(k), &
+            0d0, s% d_eps_grav_dL00(k), s% d_eps_grav_dLp1(k), &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0)
 
       end subroutine eval_eps_grav_and_partials
 
@@ -686,6 +705,7 @@
       subroutine zero_eps_grav_and_partials(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         s% eps_grav_ad(k) = 0
          s% eps_grav(k) = 0
          s% d_eps_grav_dlndm1(k) = 0
          s% d_eps_grav_dlnd00(k) = 0

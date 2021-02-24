@@ -76,6 +76,7 @@
             call do1_mlt_2(s, k, s% alpha_mlt(k), gradL_composition_term, &
                opacity, chiRho, chiT, Cp, grada, P, xh, &
                make_gradr_sticky_in_solver_iters, op_err)
+            call wrap_mlt_ad(s,k)
             if (op_err /= 0) then
                ierr = op_err
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
@@ -111,7 +112,44 @@
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             make_gradr_sticky_in_solver_iters, ierr)
+         call wrap_mlt_ad(s,k)
       end subroutine do1_mlt
+      
+      
+      subroutine wrap_mlt_ad(s,k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         call wrap(s% gradT_ad(k), s% gradT(k), &
+            s% d_gradT_dlndm1(k), s% d_gradT_dlnd00(k), 0d0, &
+            s% d_gradT_dlnTm1(k), s% d_gradT_dlnT00(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradT_dlnR(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradT_dL(k), 0d0, &
+            0d0, s% d_gradT_dln_cvpv0(k), 0d0, &   ! xtra1 is ln_cvpv0
+            0d0, s% d_gradT_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
+            0d0, 0d0, 0d0)
+         call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
+            s% d_mlt_vc_dlndm1(k), s% d_mlt_vc_dlnd00(k), 0d0, &
+            s% d_mlt_vc_dlnTm1(k), s% d_mlt_vc_dlnT00(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_mlt_vc_dlnR(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_mlt_vc_dL(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0)            
+         call wrap(s% gradr_ad(k), s% gradr(k), &
+            s% d_gradr_dlndm1(k), s% d_gradr_dlnd00(k), 0d0, &
+            s% d_gradr_dlnTm1(k), s% d_gradr_dlnT00(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dlnR(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dL(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
+            0d0, 0d0, 0d0)
+      end subroutine wrap_mlt_ad
 
 
       subroutine do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &
@@ -155,11 +193,7 @@
             opacity_m1, d_opacity_m1_dlnd, d_opacity_m1_dlnT, &
             grada_00, d_grada_00_dlnd, d_grada_00_dlnT, &
             grada_m1, d_grada_m1_dlnd, d_grada_m1_dlnT, &
-            normal_mlt_gradT_factor, &
-            d_mlt_vc_dlnR, d_mlt_vc_dL, d_mlt_vc_dlnd00, &
-            d_mlt_vc_dlnT00, d_mlt_vc_dlndm1, d_mlt_vc_dlnTm1, &
-            d_gradT_dlnR, d_gradT_dL, d_gradT_dw_div_wc, d_gradT_dln_cvpv0, &
-            d_gradT_dlnd00, d_gradT_dlnT00, d_gradT_dlndm1, d_gradT_dlnTm1
+            normal_mlt_gradT_factor
          real(dp), target :: mlt_partials1_ary(num_mlt_partials*num_mlt_results)
          real(dp), pointer :: mlt_partials1(:), mlt_partials(:,:), vel(:)
          integer :: i, mixing_type, h1, nz, k_T_max
@@ -572,69 +606,49 @@
          s% mlt_D(k) = mlt_basics(mlt_D)
          s% mlt_D_semi(k) = mlt_basics(mlt_D_semi)
          s% mlt_D_thrm(k) = mlt_basics(mlt_D_thrm)
+         s% gradr(k) = mlt_basics(mlt_gradr)
          s% scale_height(k) = mlt_basics(mlt_scale_height)
          s% gradL(k) = mlt_basics(mlt_gradL)
          s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*r*r*rho_face)
 
-         s% gradr(k) = mlt_basics(mlt_gradr)
          call store_gradr_partials
 
          s% gradT(k) = mlt_basics(mlt_gradT)         
-         d_gradT_dlnR = mlt_partials(mlt_dlnR, mlt_gradT)
-         d_gradT_dL = mlt_partials(mlt_dL, mlt_gradT)
-         d_gradT_dw_div_wc = mlt_partials(mlt_w_div_wc_var, mlt_gradT)
+         s% d_gradT_dlnR(k) = mlt_partials(mlt_dlnR, mlt_gradT)
+         s% d_gradT_dL(k) = mlt_partials(mlt_dL, mlt_gradT)
+         s% d_gradT_dw_div_wc(k) = mlt_partials(mlt_w_div_wc_var, mlt_gradT)
          if (s% conv_vel_flag) then
-            d_gradT_dln_cvpv0 = & ! convert from d_dcv to d_dlncvp0
+            s% d_gradT_dln_cvpv0(k) = & ! convert from d_dcv to d_dlncvp0
                mlt_partials(mlt_cv_var, mlt_gradT)*(s% conv_vel(k) + s% conv_vel_v0)
-            if (is_bad(d_gradT_dln_cvpv0)) then
-               write(*,2) 'd_gradT_dln_cvpv0', k, d_gradT_dln_cvpv0
+            if (is_bad(s% d_gradT_dln_cvpv0(k))) then
+               write(*,2) 's% d_gradT_dln_cvpv0(k)', k, s% d_gradT_dln_cvpv0(k)
                if (s% stop_for_bad_nums) stop 'mlt_info'
             end if
          else
-            d_gradT_dln_cvpv0 = 0d0
+            s% d_gradT_dln_cvpv0(k) = 0d0
          end if
-         d_gradT_dlnd00 = mlt_partials(mlt_dlnd00, mlt_gradT)  
-         d_gradT_dlnT00 = mlt_partials(mlt_dlnT00, mlt_gradT) 
+         s% d_gradT_dlnd00(k) = mlt_partials(mlt_dlnd00, mlt_gradT)  
+         s% d_gradT_dlnT00(k) = mlt_partials(mlt_dlnT00, mlt_gradT) 
          if (k == 1) then
-            d_gradT_dlndm1 = 0d0
-            d_gradT_dlnTm1 = 0d0
+            s% d_gradT_dlndm1(k) = 0d0
+            s% d_gradT_dlnTm1(k) = 0d0
          else
-            d_gradT_dlndm1 = mlt_partials(mlt_dlndm1, mlt_gradT)
-            d_gradT_dlnTm1 = mlt_partials(mlt_dlnTm1, mlt_gradT)
+            s% d_gradT_dlndm1(k) = mlt_partials(mlt_dlndm1, mlt_gradT)
+            s% d_gradT_dlnTm1(k) = mlt_partials(mlt_dlnTm1, mlt_gradT)
          end if
-         call wrap(s% gradT_ad(k), s% gradT(k), &
-            d_gradT_dlndm1, d_gradT_dlnd00, 0d0, &
-            d_gradT_dlnTm1, d_gradT_dlnT00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, d_gradT_dlnR, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, d_gradT_dL, 0d0, &
-            0d0, d_gradT_dln_cvpv0, 0d0, &   ! xtra1 is ln_cvpv0
-            0d0, d_gradT_dw_div_wc, 0d0, &   ! xtra2 is w_div_wc
-            0d0, 0d0, 0d0)
 
          s% mlt_vc(k) = mlt_basics(mlt_convection_velocity)     
-         d_mlt_vc_dlnR = mlt_partials(mlt_dlnR, mlt_convection_velocity)
-         d_mlt_vc_dL = mlt_partials(mlt_dL, mlt_convection_velocity)
-         d_mlt_vc_dlnd00 = mlt_partials(mlt_dlnd00, mlt_convection_velocity)  
-         d_mlt_vc_dlnT00 = mlt_partials(mlt_dlnT00, mlt_convection_velocity) 
+         s% d_mlt_vc_dlnR(k) = mlt_partials(mlt_dlnR, mlt_convection_velocity)
+         s% d_mlt_vc_dL(k) = mlt_partials(mlt_dL, mlt_convection_velocity)
+         s% d_mlt_vc_dlnd00(k) = mlt_partials(mlt_dlnd00, mlt_convection_velocity)  
+         s% d_mlt_vc_dlnT00(k) = mlt_partials(mlt_dlnT00, mlt_convection_velocity) 
          if (k == 1) then
-            d_mlt_vc_dlndm1 = 0d0
-            d_mlt_vc_dlnTm1 = 0d0
+            s% d_mlt_vc_dlndm1(k) = 0d0
+            s% d_mlt_vc_dlnTm1(k) = 0d0
          else
-            d_mlt_vc_dlndm1 = mlt_partials(mlt_dlndm1, mlt_convection_velocity)
-            d_mlt_vc_dlnTm1 = mlt_partials(mlt_dlnTm1, mlt_convection_velocity)
+            s% d_mlt_vc_dlndm1(k) = mlt_partials(mlt_dlndm1, mlt_convection_velocity)
+            s% d_mlt_vc_dlnTm1(k) = mlt_partials(mlt_dlnTm1, mlt_convection_velocity)
          end if
-         call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
-            d_mlt_vc_dlndm1, d_mlt_vc_dlnd00, 0d0, &
-            d_mlt_vc_dlnTm1, d_mlt_vc_dlnT00, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, d_mlt_vc_dlnR, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, d_mlt_vc_dL, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0)
 
          if (mixing_type == 0 .and. s% mlt_vc(k) /= 0d0) then
             write(*,2) 'mixing_type mlt_vc', mixing_type, s% mlt_vc(k)
@@ -675,6 +689,22 @@
                s% grad_superad_actual(k) = &
                   (s% lnT(k-1)-s% lnT(k))/(s% lnP(k-1)-s% lnP(k)) - grada_face
             end if
+         end if
+
+         if (is_bad_num(s% d_gradT_dlnT00(k))) then
+            if (s% report_ierr) then
+               write(*,2) 's% d_gradT_dlnT00(k)', k, s% d_gradT_dlnT00(k)
+               return
+            end if
+            if (s% stop_for_bad_nums) then
+!$OMP critical (mlt_info_crit3)
+               write(*,2) 's% d_gradT_dlnT00(k)', k, s% d_gradT_dlnT00(k)
+               call show_stuff(.true.)
+               stop 'mlt info'
+!$OMP end critical (mlt_info_crit3)
+            end if
+            ierr = -1
+            return
          end if
          
          !if (k == 100) then
@@ -749,30 +779,18 @@
 
          
          subroutine store_gradr_partials
-            real(dp) :: d_gradr_dlnR, d_gradr_dL, d_gradr_dw_div_wc, &
-               d_gradr_dlnd00, d_gradr_dlnT00, d_gradr_dlndm1, d_gradr_dlnTm1
-            d_gradr_dlnR = mlt_partials(mlt_dlnR, mlt_gradr)
-            d_gradr_dL = mlt_partials(mlt_dL, mlt_gradr)
-            d_gradr_dw_div_wc = mlt_partials(mlt_w_div_wc_var, mlt_gradr)
-            d_gradr_dlnd00 = mlt_partials(mlt_dlnd00, mlt_gradr)
-            d_gradr_dlnT00 = mlt_partials(mlt_dlnT00, mlt_gradr)
+            s% d_gradr_dlnR(k) = mlt_partials(mlt_dlnR, mlt_gradr)
+            s% d_gradr_dL(k) = mlt_partials(mlt_dL, mlt_gradr)
+            s% d_gradr_dw_div_wc(k) = mlt_partials(mlt_w_div_wc_var, mlt_gradr)
+            s% d_gradr_dlnd00(k) = mlt_partials(mlt_dlnd00, mlt_gradr)
+            s% d_gradr_dlnT00(k) = mlt_partials(mlt_dlnT00, mlt_gradr)
             if (k == 1) then
-               d_gradr_dlndm1 = 0d0
-               d_gradr_dlnTm1 = 0d0
+               s% d_gradr_dlndm1(k) = 0d0
+               s% d_gradr_dlnTm1(k) = 0d0
             else
-               d_gradr_dlndm1 = mlt_partials(mlt_dlndm1, mlt_gradr)
-               d_gradr_dlnTm1 = mlt_partials(mlt_dlnTm1, mlt_gradr)
+               s% d_gradr_dlndm1(k) = mlt_partials(mlt_dlndm1, mlt_gradr)
+               s% d_gradr_dlnTm1(k) = mlt_partials(mlt_dlnTm1, mlt_gradr)
             end if
-            call wrap(s% gradr_ad(k), s% gradr(k), &
-               d_gradr_dlndm1, d_gradr_dlnd00, 0d0, &
-               d_gradr_dlnTm1, d_gradr_dlnT00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, d_gradr_dlnR, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, d_gradr_dL, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0,d_gradr_dw_div_wc, 0d0, &   ! xtra2 is w_div_wc
-               0d0, 0d0, 0d0)
          end subroutine store_gradr_partials
 
 
@@ -864,6 +882,19 @@
             write(*,1) 's% mlt_vc(k)', s% mlt_vc(k)
             write(*,2) 's% mlt_mixing_type(k)', s% mlt_mixing_type(k)
             write(*,1) 's% mlt_mixing_length(k)', s% mlt_mixing_length(k)
+            write(*,1) 's% d_gradT_dlnd00(k)', s% d_gradT_dlnd00(k)
+            write(*,1) 's% d_gradT_dlnT00(k)', s% d_gradT_dlnT00(k)
+            write(*,1) 's% d_gradT_dlndm1(k)', s% d_gradT_dlndm1(k)
+            write(*,1) 's% d_gradT_dlnTm1(k)', s% d_gradT_dlnTm1(k)
+            write(*,1) 's% d_gradT_dlnR(k)', s% d_gradT_dlnR(k)
+            write(*,1) 's% d_gradT_dL(k)', s% d_gradT_dL(k)
+            write(*,*)
+            write(*,1) 's% d_gradr_dlnd00(k)', s% d_gradr_dlnd00(k)
+            write(*,1) 's% d_gradr_dlnT00(k)', s% d_gradr_dlnT00(k)
+            write(*,1) 's% d_gradr_dlndm1(k)', s% d_gradr_dlndm1(k)
+            write(*,1) 's% d_gradr_dlnTm1(k)', s% d_gradr_dlnTm1(k)
+            write(*,1) 's% d_gradr_dlnR(k)', s% d_gradr_dlnR(k)
+            write(*,1) 's% d_gradr_dL(k)', s% d_gradr_dL(k)
             write(*,*)
             write(*,*) 'Schwarzschild_stable', Schwarzschild_stable
             write(*,*) 'Ledoux_stable', Ledoux_stable
@@ -874,20 +905,21 @@
          subroutine set_no_MLT_results()
             s% mlt_mixing_type(k) = no_mixing
             s% mlt_mixing_length(k) = 0d0
-            s% mlt_vc_ad(k)%val = 0d0
-            s% mlt_vc_ad(k)%d1Array = 0d0
             s% mlt_vc(k) = 0d0
             s% mlt_Gamma(k) = 0d0
             s% grada_face(k) = 0d0
             s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
-            s% gradr_ad(k)%val = 0d0
-            s% gradr_ad(k)%d1Array = 0d0
-            s% gradr(k) = 0d0
-            s% gradT_ad(k)%val = 0d0
-            s% gradT_ad(k)%d1Array = 0d0
             s% gradT(k) = 0d0
+            s% d_gradT_dlnR(k) = 0d0
+            s% d_gradT_dL(k) = 0d0
+            s% d_gradT_dw_div_wc(k) = 0d0
+            if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
+            s% d_gradT_dlnd00(k) = 0d0
+            s% d_gradT_dlnT00(k) = 0d0
+            s% d_gradT_dlndm1(k) = 0d0
+            s% d_gradT_dlnTm1(k) = 0d0
             s% mlt_D(k) = 0d0
             s% mlt_D_semi(k) = 0d0
             s% mlt_D_thrm(k) = 0d0
@@ -907,8 +939,15 @@
             s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
-            s% gradT_ad(k) = s% gradr_ad(k)
             s% gradT(k) = s% gradr(k)
+            s% d_gradT_dlnR(k) = s% d_gradr_dlnR(k)
+            s% d_gradT_dL(k) = s% d_gradr_dL(k)
+            s% d_gradT_dw_div_wc(k) = s% d_gradr_dw_div_wc(k)
+            if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
+            s% d_gradT_dlnd00(k) = s% d_gradr_dlnd00(k)
+            s% d_gradT_dlnT00(k) = s% d_gradr_dlnT00(k)
+            s% d_gradT_dlndm1(k) = s% d_gradr_dlndm1(k)
+            s% d_gradT_dlnTm1(k) = s% d_gradr_dlnTm1(k)
             s% mlt_D(k) = 0d0
             s% mlt_D_semi(k) = 0d0
             s% mlt_D_thrm(k) = 0d0
@@ -953,9 +992,7 @@
          real(dp), intent(in) :: f
          integer, intent(in) :: k
 
-         real(dp) :: alfa, beta, one_m_f, &
-            d_gradT_dlnR, d_gradT_dL, d_gradT_dw_div_wc, d_gradT_dln_cvpv0, &
-            d_gradT_dlnd00, d_gradT_dlnT00, d_gradT_dlndm1, d_gradT_dlnTm1            
+         real(dp) :: alfa, beta, one_m_f
 
          include 'formats'
 
@@ -971,38 +1008,34 @@
 
             if (f == 0d0) then
                s% gradT(k) = s% gradr(k)
-               s% gradT_ad(k) = s% gradr_ad(k)
+               s% d_gradT_dlnR(k) = s% d_gradr_dlnR(k)
+               s% d_gradT_dL(k) = s% d_gradr_dL(k)
+               s% d_gradT_dw_div_wc(k) = s% d_gradr_dw_div_wc(k)
+               s% d_gradT_dlnd00(k) = s% d_gradr_dlnd00(k)
+               s% d_gradT_dlnT00(k) = s% d_gradr_dlnT00(k)
+               if (k > 1) then
+                  s% d_gradT_dlndm1(k) = s% d_gradr_dlndm1(k)
+                  s% d_gradT_dlnTm1(k) = s% d_gradr_dlnTm1(k)
+               end if
             else ! mix
                one_m_f = 1.0d0 - f
                s% gradT(k) = f*s% grada_face(k) + one_m_f*s% gradr(k)
-               d_gradT_dlnR = one_m_f*s% gradr_ad(k)%d1Array(i_lnR_00)
-               d_gradT_dL = one_m_f*s% gradr_ad(k)%d1Array(i_L_00)
-               d_gradT_dw_div_wc = one_m_f*s% gradr_ad(k)%d1Array(i_xtra2_00)
-               d_gradT_dlnd00 = &
-                  f*alfa*s% d_eos_dlnd(i_grad_ad, k) + one_m_f*s% gradr_ad(k)%d1Array(i_lnd_00)
-               d_gradT_dlnT00 = &
-                  f*alfa*s% d_eos_dlnT(i_grad_ad, k) + one_m_f*s% gradr_ad(k)%d1Array(i_lnT_00)
+               s% d_gradT_dlnR(k) = one_m_f*s% d_gradr_dlnR(k)
+               s% d_gradT_dL(k) = one_m_f*s% d_gradr_dL(k)
+               s% d_gradT_dw_div_wc(k) = one_m_f*s% d_gradr_dw_div_wc(k)
+               s% d_gradT_dlnd00(k) = &
+                  f*alfa*s% d_eos_dlnd(i_grad_ad, k) + one_m_f*s% d_gradr_dlnd00(k)
+               s% d_gradT_dlnT00(k) = &
+                  f*alfa*s% d_eos_dlnT(i_grad_ad, k) + one_m_f*s% d_gradr_dlnT00(k)
                if (k > 1) then
-                  d_gradT_dlndm1 = &
-                     f*beta*s% d_eos_dlnd(i_grad_ad, k-1) + one_m_f*s% gradr_ad(k)%d1Array(i_lnd_m1)
-                  d_gradT_dlnTm1 = &
-                     f*beta*s% d_eos_dlnT(i_grad_ad, k-1) + one_m_f*s% gradr_ad(k)%d1Array(i_lnT_m1)
-               else
-                  d_gradT_dlndm1 = 0d0
-                  d_gradT_dlnTm1 = 0d0
+                  s% d_gradT_dlndm1(k) = &
+                     f*beta*s% d_eos_dlnd(i_grad_ad, k-1) + one_m_f*s% d_gradr_dlndm1(k)
+                  s% d_gradT_dlnTm1(k) = &
+                     f*beta*s% d_eos_dlnT(i_grad_ad, k-1) + one_m_f*s% d_gradr_dlnTm1(k)
                end if
-               d_gradT_dln_cvpv0 = 0.0d0
-               call wrap(s% gradT_ad(k), s% gradT(k), &
-                  d_gradT_dlndm1, d_gradT_dlnd00, 0d0, &
-                  d_gradT_dlnTm1, d_gradT_dlnT00, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, d_gradT_dlnR, 0d0, &
-                  0d0, 0d0, 0d0, &
-                  0d0, d_gradT_dL, 0d0, &
-                  0d0, d_gradT_dln_cvpv0, 0d0, &   ! xtra1 is ln_cvpv0
-                  0d0, d_gradT_dw_div_wc, 0d0, &   ! xtra2 is w_div_wc
-                  0d0, 0d0, 0d0)
             end if
+            if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0.0d0
+
          end if
 
 ! fxt 02jun2019
@@ -1027,9 +1060,6 @@
          real(dp) :: alfa, beta, log_tau, gradT_excess_alpha, &
             d_grada_face_dlnd00, d_grada_face_dlnT00, &
             d_grada_face_dlndm1, d_grada_face_dlnTm1
-         type(auto_diff_real_star_order1) :: gradT_ad
-            
-            
 
          include 'formats'
 
@@ -1081,17 +1111,24 @@
          end if
          beta = 1.d0 - alfa
 
+         s% gradT(k) = alfa*s% gradT(k) + beta*s% grada_face(k)
          s% gradT_excess_effect(k) = beta
 
-         s% gradT(k) = alfa*s% gradT(k) + beta*s% grada_face(k)
-         gradT_ad = s% gradT_ad(k) ! save
-         s% gradT_ad(k)%val = alfa*gradT_ad%val
-         s% gradT_ad(k)%d1Array = 0d0
-         s% gradT_ad(k)%d1Array(i_lnd_00) = alfa*gradT_ad%d1Array(i_lnd_00) + beta*d_grada_face_dlnd00
-         s% gradT_ad(k)%d1Array(i_lnT_00) = alfa*gradT_ad%d1Array(i_lnT_00) + beta*d_grada_face_dlnT00
+         s% d_gradT_dlnR(k) = alfa*s% d_gradT_dlnR(k)
+         s% d_gradT_dL(k) = alfa*s% d_gradT_dL(k)
+         s% d_gradT_dw_div_wc(k) = alfa*s% d_gradT_dw_div_wc(k)
+         if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = alfa*s% d_gradT_dln_cvpv0(k)
+
+         s% d_gradT_dlnd00(k) = &
+            alfa*s% d_gradT_dlnd00(k) + beta*d_grada_face_dlnd00
+         s% d_gradT_dlnT00(k) = &
+            alfa*s% d_gradT_dlnT00(k) + beta*d_grada_face_dlnT00
+
          if (k > 1) then
-            s% gradT_ad(k)%d1Array(i_lnd_m1) = alfa*gradT_ad%d1Array(i_lnd_m1) + beta*d_grada_face_dlndm1
-            s% gradT_ad(k)%d1Array(i_lnT_m1) = alfa*gradT_ad%d1Array(i_lnT_m1) + beta*d_grada_face_dlnTm1
+            s% d_gradT_dlndm1(k) = &
+               alfa*s% d_gradT_dlndm1(k) + beta*d_grada_face_dlndm1
+            s% d_gradT_dlnTm1(k) = &
+               alfa*s% d_gradT_dlnTm1(k) + beta*d_grada_face_dlnTm1
          end if
 
       end subroutine adjust_gradT_excess
@@ -1238,7 +1275,14 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          s% gradT(k) = s% gradr(k)
-         s% gradT_ad(k) = s% gradr_ad(k)
+         s% d_gradT_dlnd00(k) = s% d_gradr_dlnd00(k)
+         s% d_gradT_dlnT00(k) = s% d_gradr_dlnT00(k)
+         s% d_gradT_dlndm1(k) = s% d_gradr_dlndm1(k)
+         s% d_gradT_dlnTm1(k) = s% d_gradr_dlnTm1(k)
+         s% d_gradT_dlnR(k) = s% d_gradr_dlnR(k)
+         s% d_gradT_dL(k) = s% d_gradr_dL(k)
+         if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
+         s% d_gradT_dw_div_wc(k) = s% d_gradr_dw_div_wc(k)
       end subroutine switch_to_radiative
 
 
@@ -1247,10 +1291,14 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          s% gradT(k) = s% grada(k)
-         s% gradT_ad(k)%val = s% gradT(k)
-         s% gradT_ad(k)%d1Array = 0d0
-         s% gradT_ad(k)%d1Array(i_lnd_00) = s% d_eos_dlnd(i_grad_ad, k)
-         s% gradT_ad(k)%d1Array(i_lnT_00) = s% d_eos_dlnT(i_grad_ad, k)
+         s% d_gradT_dlnd00(k) = s% d_eos_dlnd(i_grad_ad, k)
+         s% d_gradT_dlnT00(k) = s% d_eos_dlnT(i_grad_ad, k)
+         s% d_gradT_dlndm1(k) = 0
+         s% d_gradT_dlnTm1(k) = 0
+         s% d_gradT_dlnR(k) = 0
+         s% d_gradT_dL(k) = 0
+         if (s% conv_vel_flag) s% d_gradT_dln_cvpv0(k) = 0d0
+         s% d_gradT_dw_div_wc(k) = 0
       end subroutine switch_to_adiabatic
 
 

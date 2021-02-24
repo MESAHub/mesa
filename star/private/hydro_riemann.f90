@@ -90,7 +90,7 @@
             skip_partials, nvar, ierr)
          use auto_diff_support
          use accurate_sum_auto_diff_star_order1
-         use star_utils, only: get_area_info, store_partials
+         use star_utils, only: get_area_info, save_eqn_residual_info
          type (star_info), pointer :: s         
          integer, intent(in) :: k
          real(dp), intent(in) :: P_surf ! only used if k==1
@@ -109,7 +109,6 @@
          type(accurate_auto_diff_real_star_order1) :: sum_ad       
          real(dp) :: dt, dm, ie_plus_ke, scal, &
             d_momflux00_dw_div_wc00, d_momfluxp1_dw_div_wcp1, residual
-         real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1
          logical :: dbg, do_diffusion, test_partials
 
          include 'formats'
@@ -130,7 +129,6 @@
          i_du_dt = s% i_du_dt
          dt = s% dt
          dm = s% dm(k)     
-         d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
              
          call get_area_info(s, k, area_00, inv_R2_00, ierr)
          if (ierr /= 0) return
@@ -179,13 +177,11 @@
          end if
          
          if (skip_partials) return
-         call unpack_res18(resid_ad)
-         call store_partials( &
-            s, k, i_du_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_dudt_eqn', ierr)
+         call save_eqn_residual_info(s, k, nvar, i_du_dt, resid_ad, 'do1_dudt_eqn', ierr)
 
          if (test_partials) then
             s% solver_test_partials_var = 0
-            s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)  
+            s% solver_test_partials_dval_dx = 0
             write(*,*) 'do1_dudt_eqn', s% solver_test_partials_var
          end if
          
@@ -283,22 +279,6 @@
             end if
             s% dudt_RTI(k) = diffusion_source_ad%val/dm
          end subroutine setup_diffusion_source
-         
-         subroutine unpack_res18(res18)
-            use star_utils, only: unpack_residual_partials
-            type(auto_diff_real_star_order1) :: res18
-            include 'formats'
-            call unpack_residual_partials(s, k, nvar, i_du_dt, &
-               res18, d_dm1, d_d00, d_dp1)
-            if (s% w_div_wc_flag) then
-               call e00(s, i_du_dt, s% i_w_div_wc, k, nvar, d_d00(s% i_lum))
-               d_d00(s% i_lum) = 0d0
-               if (k < nz) then
-                  call ep1(s, s% i_du_dt, s% i_w_div_wc, k, nvar, d_dp1(s% i_lum))
-                  d_dp1(s% i_lum) = 0d0
-               end if
-            end if
-         end subroutine unpack_res18
          
       end subroutine do1_dudt_eqn
 
