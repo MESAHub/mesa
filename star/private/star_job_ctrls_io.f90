@@ -37,8 +37,6 @@
       namelist /star_job/ &
          mesa_dir, &
          eosDT_cache_dir, &
-         eosPT_cache_dir, &
-         eosDE_cache_dir, &
          ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir, &
@@ -687,8 +685,6 @@
 
          s% job% mesa_dir = mesa_dir
          s% job% eosDT_cache_dir = eosDT_cache_dir
-         s% job% eosPT_cache_dir = eosPT_cache_dir
-         s% job% eosDE_cache_dir = eosDE_cache_dir
          s% job% ionization_cache_dir = ionization_cache_dir
          s% job% kap_cache_dir = kap_cache_dir
          s% job% rates_cache_dir = rates_cache_dir
@@ -1266,8 +1262,6 @@
 
          mesa_dir = s% job% mesa_dir
          eosDT_cache_dir = s% job% eosDT_cache_dir
-         eosPT_cache_dir = s% job% eosPT_cache_dir
-         eosDE_cache_dir = s% job% eosDE_cache_dir
          ionization_cache_dir = s% job% ionization_cache_dir
          kap_cache_dir = s% job% kap_cache_dir
          rates_cache_dir = s% job% rates_cache_dir

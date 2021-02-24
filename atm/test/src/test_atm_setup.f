@@ -38,7 +38,7 @@
             write(*,*) 'chem_init failed'
             call mesa_error(__FILE__,__LINE__)
          end if        
-         call eos_init(' ', ' ', ' ', use_cache, ierr)
+         call eos_init(' ', use_cache, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
          eos_handle = alloc_eos_handle(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)        

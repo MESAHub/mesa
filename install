@@ -333,9 +333,6 @@ rm -rf data/eos_data
 if [ ! -r data/eosDT_data ]
 then
 	do_input_data eos
-elif [ ! -r data/eosPT_data ]
-then
-	do_input_data eos
 fi
 
 # now have installed eos data, so can install the eos module

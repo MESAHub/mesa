@@ -468,7 +468,7 @@ contains
 
       use_cache = .true.
 
-      call eos_init( ' ', ' ', ' ', use_cache, info)
+      call eos_init( ' ', use_cache, info)
       if (info /= 0) then
          write(*,*) 'failed in eos_init'
          stop 1

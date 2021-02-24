@@ -30,7 +30,7 @@
 
 
 &eos
-      use_max_SCVH_for_PT = .true.
+
 / ! end of eos namelist
 
 

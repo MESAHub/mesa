@@ -23,7 +23,3 @@ function do1 {
 
 do1 eosDT_builder
 
-do1 eosPT_builder
-
-do1 eosSCVH_PT_builder
-

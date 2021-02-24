@@ -174,7 +174,7 @@
             s% job% jina_reaclib_min_T9, &
             s% job% rate_tables_dir, s% job% rate_cache_suffix, &
             s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
-            s% job% eosDT_cache_dir, s% job% eosPT_cache_dir, s% job% eosDE_cache_dir, &
+            s% job% eosDT_cache_dir, &
             s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
             s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
@@ -190,7 +190,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -201,7 +201,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          real(dp), intent(in) :: &
             reaclib_min_T9
@@ -219,7 +219,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -3295,9 +3295,7 @@
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
-         call do_garbage_collection(s% job% eosDT_cache_dir,&
-               s% job% eosPT_cache_dir, &
-               s% job% eosDE_cache_dir,ierr)
+         call do_garbage_collection(s% job% eosDT_cache_dir, ierr)
          if (ierr /= 0) return               
       end subroutine star_do_garbage_collection
             

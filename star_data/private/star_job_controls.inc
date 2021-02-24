@@ -4,8 +4,6 @@
 
       character (len=1000) :: mesa_dir, &
          eosDT_cache_dir, &
-         eosPT_cache_dir, &
-         eosDE_cache_dir, &
          ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir
