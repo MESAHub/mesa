@@ -264,9 +264,9 @@
       integer, parameter :: i_lnT_m1 = 4
       integer, parameter :: i_lnT_00 = 5
       integer, parameter :: i_lnT_p1 = 6
-      integer, parameter :: i_w_m1 = 7
-      integer, parameter :: i_w_00 = 8
-      integer, parameter :: i_w_p1 = 9
+      integer, parameter :: i_etrb_m1 = 7
+      integer, parameter :: i_etrb_00 = 8
+      integer, parameter :: i_etrb_p1 = 9
       integer, parameter :: i_lnR_m1 = 10
       integer, parameter :: i_lnR_00 = 11
       integer, parameter :: i_lnR_p1 = 12

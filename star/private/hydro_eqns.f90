@@ -76,7 +76,7 @@
 
          integer :: &
             i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
-            i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_dw_dt, &
+            i_dalpha_RTI_dt, i_dln_cvpv0_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
             i, k, j, nvar_hydro, nz, op_err
          integer :: &
             i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
@@ -87,7 +87,7 @@
          logical :: v_flag, u_flag, conv_vel_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
             do_chem, do_mix, do_struct_hydro, do_struct_thermo, &
             do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_dw_dt
+            do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
 
          include 'formats'
 
@@ -127,11 +127,9 @@
          do_j_rot = (i_j_rot > 0 .and. i_j_rot <= nvar)
          do_dlnE_dt = (i_dlnE_dt > 0 .and. i_dlnE_dt <= nvar)
          do_equL = (i_equL > 0 .and. i_equL <= nvar)
-         do_dw_dt = (i_dw_dt > 0 .and. i_dw_dt <= nvar)
+         do_detrb_dt = (i_detrb_dt > 0 .and. i_detrb_dt <= nvar)
 
          if (s% fill_arrays_with_NaNs) call set_nan(s% equ1)
-
-         if (s% v_flag) s% v_residual(1) = 0
 
          if (.not. (do_struct_hydro .or. do_struct_thermo)) then
 
@@ -270,7 +268,7 @@
                         ierr = op_err
                      end if
                   end if
-                  if (do_dw_dt) then
+                  if (do_detrb_dt) then
                      call do1_turbulent_energy_eqn(s, k, skip_partials, nvar, op_err)
                      if (op_err /= 0) then
                         if (s% report_ierr) write(*,2) 'ierr in do1_turbulent_energy_eqn', k
@@ -402,7 +400,7 @@
             i_dln_cvpv0_dt = s% i_dln_cvpv0_dt
             i_equ_w_div_wc = s% i_equ_w_div_wc
             i_dj_rot_dt = s% i_dj_rot_dt
-            i_dw_dt = s% i_dw_dt
+            i_detrb_dt = s% i_detrb_dt
 
             i_lnd = s% i_lnd
             i_lnT = s% i_lnT
@@ -654,8 +652,6 @@
          resid_ad = lnR_actual - lnR_expected
          s% equ(i_dlnd_dt, k) = resid_ad%val
 
-         s% lnd_residual(k) = s% equ(i_dlnd_dt, k)
-
          if (test_partials) then
             s% solver_test_partials_val = s% equ(i_dlnd_dt, k)
          end if
@@ -820,7 +816,6 @@
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale 
          s% equ(i_equL, k) = resid%val
-         s% equL_residual(k) = resid%val
          
          if (is_bad(resid%val)) then
 !$OMP critical (star_alt_dlntdm_bad_num)
@@ -911,7 +906,6 @@
          
          resid = delm*dlnTdm - lnTdiff
          s% equ(i_equL, k) = resid%val
-         s% equL_residual(k) = s% equ(i_equL,k)
 
          if (k == s% trace_k) then
             write(*,5) 'i_equL', k, s% solver_iter, s% solver_adjust_iter, &
@@ -1150,7 +1144,6 @@
                   write(*,1) 'equ(i_du_dt, 1)', s% equ(i_du_dt, 1)
                   stop 'set_fixed_vsurf_outer_BC'
                end if
-               s% u_residual(1) = s% equ(i_du_dt, 1)
                if (.not. skip_partials) &
                   call e00(s, i_du_dt, i_u, 1, nvar, 1d0/s% csound_start(1))
             end if
@@ -1160,7 +1153,6 @@
                   write(*,1) 'equ(i_dv_dt, 1)', s% equ(i_dv_dt, 1)
                   stop 'set_fixed_vsurf_outer_BC'
                end if
-               s% v_residual(1) = s% equ(i_dv_dt, 1)
                if (.not. skip_partials) &
                   call e00(s, i_dv_dt, i_v, 1, nvar, 1d0/s% csound_start(1))
             end if 
@@ -1172,7 +1164,6 @@
             ierr = 0
             if (s% L(1) <= 0d0) then
                s% equ(i_equL,1) = s% L(1) - s% L(2)
-               s% equL_residual(1) = s% equ(i_equL,1)
                if (.not. skip_partials) then
                   call e00(s,i_equL,i_lum,1,nvar,1d0)
                   call ep1(s,i_equL,i_lum,1,nvar,-1d0)
@@ -1180,7 +1171,6 @@
                return
             end if
             s% equ(i_equL,1) = s% L(2)/s% L(1) - 1d0
-            s% equL_residual(1) = s% equ(i_equL,1)
             if (skip_partials) return
             call e00(s,i_equL,i_lum,1,nvar,-s% L(2)/(s% L(1)*s% L(1)))
             call ep1(s,i_equL,i_lum,1,nvar,1d0/s% L(1))
@@ -1209,7 +1199,6 @@
 
             if (.not. s% do_struct_thermo) then ! dummy eqn
                s% equ(i_equL,1) = 0
-               s% equL_residual(1) = s% equ(i_equL,1)
                if (skip_partials) return
                call e00(s,i_equL,i_lnT,1,nvar,1d0)
                return
@@ -1253,7 +1242,6 @@
 
             Tscale = 1d6*s% T_start(1) ! 1d6 to reduce equ size compared to k > 1 cases
             s% equ(i_equL, 1) = (T1 - s% T(1))/Tscale
-            s% equL_residual(1) = s% equ(i_equL,1)
             if (test_partials) then
                s% solver_test_partials_val = s% equ(i_equL, 1)
             end if
@@ -1320,7 +1308,6 @@
 
             if (.not. s% do_struct_thermo) then ! dummy eqn
                s% equ(i_T_BC,1) = 0
-               s% equL_residual(1) = s% equ(i_T_BC,1)
                if (skip_partials) return
                call e00(s,i_T_BC,i_lnT,1,nvar,1d0)
                return
@@ -1329,7 +1316,6 @@
             scale = 1d0 ! 1d-3
             
             s% equ(i_T_BC, 1) = (lnT_bc - s% lnT(1))*scale
-            s% equL_residual(1) = s% equ(i_T_BC,1)
             
             if (is_bad(s% equ(i_T_BC,1))) then
                write(*,1) 'lnT_bc', lnT_bc
@@ -1486,26 +1472,23 @@
                stop 'set_compression_BC'
             end if
 
-            if (s% u_flag) call set_compression_eqn(i_du_dt, s% u_residual)
+            if (s% u_flag) call set_compression_eqn(i_du_dt)
             
-            if (s% v_flag) call set_compression_eqn(i_dv_dt, s% v_residual)
+            if (s% v_flag) call set_compression_eqn(i_dv_dt)
 
          end subroutine set_compression_BC
          
          
-         subroutine set_compression_eqn(i_eqn, residual)
+         subroutine set_compression_eqn(i_eqn)
             integer, intent(in) :: i_eqn
-            real(dp), pointer :: residual(:)
 
-            real(dp) :: d
+            real(dp) :: d, dt
             include 'formats'
 
             ! gradient of compression vanishes fixes density for cell 1
-               ! d_dt(1/rho(1)) = d_dt(1/rho(2))
-               ! widely used.  e.g., Grott, Chernigovski, Glatzel, 2005.
-            
-            s% equ(i_eqn, 1) = s% rho(2)*s% dlnd_dt(1) - s% rho(1)*s% dlnd_dt(2)
-            residual(1) = s% equ(i_eqn, 1)
+               ! d_dt(1/rho(1)) = d_dt(1/rho(2))  e.g., Grott, Chernigovski, Glatzel, 2005.
+            dt = s% dt
+            s% equ(i_eqn, 1) = (s% rho(2)*s% dxh_lnd(1) - s% rho(1)*s% dxh_lnd(2))/dt
             
             if (is_bad(s% equ(i_eqn, 1))) then
                write(*,1) 'equ(i_eqn, 1)', s% equ(i_eqn, 1)
@@ -1519,10 +1502,10 @@
 
             if (skip_partials) return
             
-            d = s% rho(2)*s% dVARDOT_dVAR - s% rho(1)*s% dlnd_dt(2)
-            call e00(s, i_eqn, i_lnd, 1, nvar, d)
-            d = s% rho(2)*s% dlnd_dt(1) - s% rho(1)*s% dVARDOT_dVAR
-            call ep1(s, i_eqn, i_lnd, 1, nvar, d)
+            d = s% rho(2) - s% rho(1)*s% dxh_lnd(2)
+            call e00(s, i_eqn, i_lnd, 1, nvar, d/dt)
+            d = s% rho(2)*s% dxh_lnd(1) - s% rho(1)
+            call ep1(s, i_eqn, i_lnd, 1, nvar, d/dt)
          
          end subroutine set_compression_eqn
 

@@ -30,13 +30,14 @@
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
+      use accurate_sum_auto_diff_star_order1
       use star_utils, only: em1, e00, ep1
 
       implicit none
 
       private
       public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, &
-         compute_Eq_cell, compute_Uq_face, set_w_start_vars, reset_w_using_L
+         compute_Eq_cell, compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &
@@ -45,48 +46,26 @@
          x_CEDE  = (8.d0/3.d0)*sqrt(2.d0/3.d0), &
          x_GAMMAR = 2.d0*sqrt(3.d0)
 
-!         RSP     TDC
+!         RSP       TDC
 !         ALFA  =>  TDC_alfa
 !         ALFAP =>  TDC_alfap*x_ALFAP
 !         ALFAM =>  TDC_alfam
 !         ALFAT =>  TDC_alfat
-!         ALFAS =>  1d0*x_ALFAS
-!         ALFAC =>  1d0*x_ALFAC
-!         CEDE  =>  1d0*x_CEDE
+!         ALFAS =>  x_ALFAS
+!         ALFAC =>  x_ALFAC
+!         CEDE  =>  x_CEDE
 !         GAMMAR => TDC_alfar*x_GAMMAR
 
       contains
       
 
       subroutine do1_tdc_L_eqn(s, k, skip_partials, nvar, ierr)
-         use star_utils, only: store_partials
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
-         real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'
-         call get1_tdc_L_eqn(s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_tdc_L_eqn', k
-            return
-         end if         
-         if (skip_partials) return         
-         call store_partials( &
-            s, k, s% i_equL, nvar, d_dm1, d_d00, d_dp1, 'do1_tdc_L_eqn', ierr)
-      end subroutine do1_tdc_L_eqn
-
-      
-      subroutine get1_tdc_L_eqn( &  
-            s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: unpack_residual_partials
-         use accurate_sum_auto_diff_star_order1
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
-         real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: L_expected, L_actual, res18
+         type(auto_diff_real_star_order1) :: L_expected, L_actual, resid
          real(dp) :: scale, residual, e_avg, L_start_max
          logical :: test_partials
          include 'formats'
@@ -101,60 +80,36 @@
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
          if (is_bad(scale)) then
-            write(*,2) 'get1_tdc_L_eqn scale', k, scale
-            stop 'get1_tdc_L_eqn'
+            write(*,2) 'do1_tdc_L_eqn scale', k, scale
+            stop 'do1_tdc_L_eqn'
          end if
-         res18 = (L_expected - L_actual)*scale         
-         residual = res18%val
+         resid = (L_expected - L_actual)*scale         
+         residual = resid%val
          s% equ(s% i_equL, k) = residual         
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
+         
          if (skip_partials) return
-         call unpack_residual_partials(s, k, nvar, s% i_equL, &
-            res18, d_dm1, d_d00, d_dp1)
+         call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_tdc_L_eqn', ierr)
+         if (ierr /= 0) return
+
          if (test_partials) then
-            s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
-            write(*,*) 'get1_tdc_L_eqn', s% solver_test_partials_var
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
+            write(*,*) 'do1_tdc_L_eqn', s% solver_test_partials_var
          end if      
-      end subroutine get1_tdc_L_eqn
+      end subroutine do1_tdc_L_eqn
       
 
       subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
-         use star_utils, only: store_partials
+         use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
-         real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'
-         call get1_turbulent_energy_eqn( &
-            s, k, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_turbulent_energy_eqn', k
-            return
-         end if         
-         if (skip_partials) return         
-         call store_partials( &
-            s, k, s% i_dw_dt, nvar, d_dm1, d_d00, d_dp1, 'do1_turbulent_energy_eqn', ierr)
-      end subroutine do1_turbulent_energy_eqn
-
-      
-      subroutine get1_turbulent_energy_eqn( &  
-            s, k, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: set_energy_eqn_scal
-         use accurate_sum_auto_diff_star_order1
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
-         real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
-         integer, intent(out) :: ierr
-         
          real(dp) :: dt, dm, dt_div_dm, scal, residual
-         integer :: i_dw_dt, i_w, i_lnd, i_lnT, i_lnR, i_v
+         integer :: i_detrb_dt, i_etrb, i_lnd, i_lnT, i_lnR, i_v
          type(auto_diff_real_star_order1) :: resid_ad, &
             d_turbulent_energy_ad, PtdV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
@@ -170,25 +125,28 @@
          if (s% TDC_alfa == 0d0 .or. & ! TDC_alfa == 0d0 means purely radiative
              k == 1 .or. k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
              k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
-            s% equ(i_dw_dt, k) = s% w(k)
-            if (.not. skip_partials) d_d00(i_w) = 1d0
-            return
+             
+            resid_ad = wrap_etrb_00(s,k) ! make etrb = 0
+            
+         else
+         
+            call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
+            call setup_PtdV_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
+         
+            ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
+            esum_ad = d_turbulent_energy_ad + PtdV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
+         
+            resid_ad = esum_ad ! convert back to auto_diff_real_star_order1
+            resid_ad = resid_ad*scal/s% dt ! to make residual unitless, must cancel out the dt in scal
+         
          end if
-         
-         call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
-         call setup_PtdV_ad(ierr); if (ierr /= 0) return ! erg g^-1
-         call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
-         call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
-         call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
-         call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
-         
-         ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
-         esum_ad = d_turbulent_energy_ad + PtdV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
-         
-         resid_ad = esum_ad ! convert back to auto_diff_real_star_order1
-         resid_ad = resid_ad*scal/s% dt ! to make residual unitless, must cancel out the dt in scal
+
          residual = resid_ad%val
-         s% equ(i_dw_dt, k) = residual
+         s% equ(i_detrb_dt, k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_turbulent_crit1)
@@ -201,24 +159,26 @@
             stop 'get1_turbulent_energy_eqn'
 !$omp end critical (hydro_equ_turbulent_crit1)
          end if
+
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
+         
          if (skip_partials) return
-         call unpack_res18(resid_ad)
+         call save_eqn_residual_info(s, k, nvar, i_detrb_dt, resid_ad, 'do1_turbulent_energy_eqn', ierr)
+         if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = i_lnT
-            s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
-            write(*,*) 'get1_turbulent_energy_eqn', s% solver_test_partials_var, &
-               s% w(k), s% w_start(k)
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
+            write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var
          end if      
 
          contains
          
          subroutine init
-            i_dw_dt = s% i_dw_dt
-            i_w = s% i_w
+            i_detrb_dt = s% i_detrb_dt
+            i_etrb = s% i_etrb
             i_lnd = s% i_lnd
             i_lnT = s% i_lnT
             i_lnR = s% i_lnR
@@ -226,14 +186,13 @@
             dt = s% dt
             dm = s% dm(k)
             dt_div_dm = dt/dm
-            d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
          end subroutine init
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: w_00
-            w_00 = wrap_w_00(s,k)
-            d_turbulent_energy_ad = pow2(w_00) - pow2(s% w_start(k))
+            d_turbulent_energy_ad%val = s% dxh_etrb(k) ! = etrb_00 - s% etrb_start(k)
+            d_turbulent_energy_ad%d1Array(:) = 0
+            d_turbulent_energy_ad%d1Array(i_etrb_00) = 1d0
          end subroutine setup_d_turbulent_energy
          
          ! PtdV_ad = Pt_ad*dV_ad
@@ -294,15 +253,8 @@
             if (ierr /= 0) return
             dt_Eq_ad = dt*Eq_cell
          end subroutine setup_dt_Eq_ad
-
-         subroutine unpack_res18(res18)
-            use star_utils, only: unpack_residual_partials
-            type(auto_diff_real_star_order1) :: res18            
-            call unpack_residual_partials(s, k, nvar, i_dw_dt, &
-               res18, d_dm1, d_d00, d_dp1)
-         end subroutine unpack_res18
       
-      end subroutine get1_turbulent_energy_eqn
+      end subroutine do1_turbulent_energy_eqn
       
       
       function compute_Hp_cell(s, k, ierr) result(Hp_cell) ! cm
@@ -784,7 +736,8 @@
          type(auto_diff_real_star_order1) :: Lt
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            r_00, area2, d_m1, d_00, rho2_face, Hp_face, w_m1, w_00
+            r_00, area2, d_m1, d_00, rho2_face, Hp_face, &
+            etrb_m1, etrb_00, w_m1, w_00
          real(dp) :: alpha, alpha_t
          include 'formats'
          ierr = 0
@@ -799,12 +752,22 @@
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
          rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
-         w_m1 = wrap_w_m1(s,k)
-         w_00 = wrap_w_00(s,k)
+         if (s% w(k-1) < 1d-3) then ! avoid exploding partials
+            w_m1 = 0d0
+         else
+            w_m1 = wrap_w_m1(s,k)
+         end if
+         if (s% w(k) < 1d-3) then ! avoid exploding partials
+            w_00 = 0d0
+         else
+            w_00 = wrap_w_00(s,k)
+         end if
+         etrb_m1 = wrap_etrb_m1(s,k)
+         etrb_00 = wrap_etrb_00(s,k)
          Hp_face = compute_Hp_face(s, k, ierr)
          if (ierr /= 0) return
          Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
-            (pow(w_m1,3d0) - pow(w_00,3d0))/s% dm_bar(k)         
+            (w_m1*etrb_m1 - w_00*etrb_00)/s% dm_bar(k)         
          ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
          s% Lt(k) = Lt%val
       end function compute_Lt
@@ -847,7 +810,7 @@
       end subroutine compute_L_terms
 
 
-      subroutine set_w_start_vars(s, ierr)
+      subroutine set_etrb_start_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
@@ -857,13 +820,13 @@
          time_center = (s% use_velocity_time_centering .and. &
                         s% include_L_in_velocity_time_centering)
          do k=1,s%nz
-            call set1_w_start_vars(k, op_err) 
+            call set1_etrb_start_vars(k, op_err) 
             if (op_err /= 0) ierr = op_err  
          end do
          
          contains
          
-         subroutine set1_w_start_vars(k, ierr)   
+         subroutine set1_etrb_start_vars(k, ierr)   
             integer, intent(in) :: k
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: L, Lr, Lc, Lt
@@ -876,16 +839,16 @@
             else
                s% Lt_start(k) = 0d0  
             end if
-            s% w_start(k) = s% w(k)
-         end subroutine set1_w_start_vars
+            s% etrb_start(k) = s% etrb(k)
+         end subroutine set1_etrb_start_vars
          
-      end subroutine set_w_start_vars
+      end subroutine set_etrb_start_vars
       
       
-      subroutine reset_w_using_L(s, ierr)
+      subroutine reset_etrb_using_L(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, i_w, nz
+         integer :: k, i_etrb, nz
          real(dp) :: Lc_val, w_00
          type(auto_diff_real_star_order1) :: &
             Lc_w_face_factor, L, Lr, Lc, Lt
@@ -896,7 +859,7 @@
          if (s% TDC_alfa == 0d0) return ! no convection
          nz = s% nz
          allocate(w_face(nz))
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          w_face(1) = 0d0
          do k=2, nz
             Lr = compute_Lr(s, k, ierr)
@@ -916,13 +879,13 @@
             else
                w_00 = max(w_face(k), 0d0)
             end if
-            s% xh(i_w,k) = w_00
+            s% xh(i_etrb,k) = w_00
             s% w(k) = w_00
             call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new w(k)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
          end do
-         if (dbg) stop 'reset_w_using_L'
-      end subroutine reset_w_using_L
+         if (dbg) stop 'reset_etrb_using_L'
+      end subroutine reset_etrb_using_L
 
 
       end module hydro_tdc

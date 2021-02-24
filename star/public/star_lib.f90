@@ -1767,39 +1767,6 @@
          call do_terminal_summary(s)
       end subroutine write_terminal_summary
 
-      subroutine star_set_vars_in_part1(id, dt, ierr)
-         use hydro_vars, only: set_vars
-         integer, intent(in) :: id
-         real(dp), intent(in) :: dt
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% i_lnd /= 0) then
-            s% lnd_for_d_dt_const_q(:) = 0d0
-            s% lnd_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% i_lnT /= 0) then
-            s% lnT_for_d_dt_const_q(:) = 0d0
-            s% lnT_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% i_ln_cvpv0 /= 0) then
-            s% ln_cvpv0_for_d_dt_const_q(:) = 0d0
-            s% ln_cvpv0_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% v_flag) then
-            s% v_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% u_flag) then
-            s% u_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% RTI_flag) then
-            s% alpha_RTI_for_d_dt_const_m(:) = 0d0
-         end if
-         s% lnR_for_d_dt_const_m(:) = 0d0
-         call set_vars(s, dt, ierr)
-      end subroutine star_set_vars_in_part1
 
       subroutine star_set_vars(id, dt, ierr)
          use hydro_vars, only: set_vars

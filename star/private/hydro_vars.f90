@@ -64,7 +64,6 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          logical, parameter :: &
-            skip_time_derivatives = .false., &
             skip_m_grav_and_grav = .false., &
             skip_net = .false., &
             skip_neu = .false., &
@@ -81,7 +80,7 @@
          skip_set_cz_bdy_mass = .not. s% have_new_generation
          skip_mixing_info = .not. s% okay_to_set_mixing_info
          call set_some_vars( &
-            s, skip_time_derivatives, skip_m_grav_and_grav, &
+            s, skip_m_grav_and_grav, &
             skip_net, skip_neu, skip_kap, skip_grads, skip_rotation, &
             skip_brunt, skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             dt, ierr)
@@ -172,14 +171,14 @@
 
 
       subroutine set_some_vars( &
-            s, skip_time_derivatives, skip_m_grav_and_grav, &
+            s, skip_m_grav_and_grav, &
             skip_net, skip_neu, skip_kap, skip_grads, skip_rotation, &
             skip_brunt, skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             dt, ierr)
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
          logical, intent(in) :: &
-            skip_time_derivatives, skip_m_grav_and_grav, &
+            skip_m_grav_and_grav, &
             skip_net, skip_neu, skip_kap, skip_grads, &
             skip_rotation, skip_brunt, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat
@@ -197,7 +196,7 @@
          include 'formats'
             
          call update_vars(s, &
-            skip_time_derivatives, skip_basic_vars, skip_micro_vars, &
+            skip_basic_vars, skip_micro_vars, &
             skip_m_grav_and_grav, skip_net, skip_neu, skip_kap, &
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
@@ -212,7 +211,7 @@
 
 
       subroutine update_vars(s, &
-            skip_time_derivatives, skip_basic_vars, skip_micro_vars, &
+            skip_basic_vars, skip_micro_vars, &
             skip_m_grav_and_grav, skip_net, skip_neu, skip_kap, &
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
@@ -220,7 +219,7 @@
          use star_utils, only: eval_irradiation_heat, set_qs, set_dm_bar, set_m_and_dm
          type (star_info), pointer :: s
          logical, intent(in) :: &
-            skip_time_derivatives, skip_basic_vars, skip_micro_vars, &
+            skip_basic_vars, skip_micro_vars, &
             skip_m_grav_and_grav, skip_net, skip_neu, skip_kap, skip_grads, &
             skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
@@ -228,7 +227,7 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_w, &
+         integer :: i_lnd, i_lnT, i_lnR, i_etrb, &
             i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_etrb_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
@@ -244,7 +243,7 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -321,10 +320,10 @@
                      s% lnR(k) = s% xh(i_lnR,k)
                      s% dxh_lnR(k) = 0d0
                   end do
-               else if (j == i_w) then
+               else if (j == i_etrb) then
                   do k=1,nz
-                     s% w(k) = max(s% xh(i_w, k), 0d0)
-                     s% dxh_w(k) = 0d0
+                     s% etrb(k) = max(s% xh(i_etrb, k), 0d0)
+                     s% dxh_etrb(k) = 0d0
                   end do
                else if (j == i_lum) then
                   do k=1,nz
@@ -333,14 +332,17 @@
                else if (j == i_v) then
                   do k=1,nz
                      s% v(k) = s% xh(i_v,k)
+                     s% dxh_v(k) = 0d0
                   end do
                else if (j == i_u) then
                   do k=1,nz
                      s% u(k) = s% xh(i_u,k)
+                     s% dxh_u(k) = 0d0
                   end do
                else if (j == i_alpha_RTI) then
                   do k=1,nz
                      s% alpha_RTI(k) = max(0d0, s% xh(i_alpha_RTI,k))
+                     s% dxh_alpha_RTI(k) = 0d0
                   end do
                else if (j == i_etrb_RSP) then
                   do k=1,nz
@@ -391,7 +393,7 @@
 
             if (i_u == 0) s% u(1:nz) = 0d0
 
-            if (i_w == 0) s% w(1:nz) = 0d0
+            if (i_etrb == 0) s% etrb(1:nz) = 0d0
 
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
@@ -406,269 +408,12 @@
                s% adjust_mlt_gradT_fraction(1:nz) = -1
             end if
 
-            if (.not. skip_time_derivatives) then
-
-               ! time derivatives at constant q for use by eps_grav and convective velocities
-               if (s% generations < 2 .or. dt <= 0 .or. s% nz /= s% nz_old) then
-
-                  if (i_lnd /= 0) s% dlnd_dt_const_q(1:nz) = 0
-                  if (i_lnT /= 0) s% dlnT_dt_const_q(1:nz) = 0
-                  if (i_ln_cvpv0 /= 0) s% dln_cvpv0_dt_const_q(1:nz) = 0
-
-               else
-
-                  dt_inv = 1/dt
-                  if (i_lnd /= 0) then
-                     do k=1,nz
-                        s% dlnd_dt_const_q(k) = &
-                           (s% xh(i_lnd,k) - s% lnd_for_d_dt_const_q(k))*dt_inv
-                        if (is_bad(s% dlnd_dt_const_q(k))) then
-                           s% retry_message = 'update_vars: bad dlnd_dt_const_q'
-                           ierr = -1
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dlnd_dt_const_q', k, &
-                                 s% dlnd_dt_const_q(k), &
-                                 s% lnd_for_d_dt_const_q(k), s% xh(i_lnd,k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dlnd_dt_const_q', k, s% dlnd_dt_const_q(k)
-                              write(*,2) 's% lnd_for_d_dt_const_q(k)', k, s% lnd_for_d_dt_const_q(k)
-                              write(*,2) 's% xh(i_lnd,k)', k, s% xh(i_lnd,k)
-                              stop 'update_vars'
-                           end if
-                           return
-                           stop 'update_vars'
-                        end if
-                     end do
-                  end if
-
-                  if (i_lnT /= 0) then
-                     do k=1,nz
-                        s% dlnT_dt_const_q(k) = &
-                           (s% xh(i_lnT,k) - s% lnT_for_d_dt_const_q(k))*dt_inv
-                        if (is_bad(s% dlnT_dt_const_q(k))) then
-                           s% retry_message = 'update_vars: bad dlnT_dt_const_q'
-                           ierr = -1
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dlnT_dt_const_q', k, &
-                                 s% dlnT_dt_const_q(k), &
-                                 s% lnT_for_d_dt_const_q(k), s% xh(i_lnT,k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dlnT_dt_const_q', k, &
-                                 s% dlnT_dt_const_q(k), &
-                                 s% lnT_for_d_dt_const_q(k), s% xh(i_lnT,k)
-                              stop 'update_vars'
-                           end if
-                           return
-                        end if
-                     end do
-                  end if
-
-                  if (i_ln_cvpv0 /= 0) then
-                     do k=1,nz
-                        s% dln_cvpv0_dt_const_q(k) = &
-                           (s% xh(i_ln_cvpv0,k) - s% ln_cvpv0_for_d_dt_const_q(k))*dt_inv
-                        if (is_bad(s% dln_cvpv0_dt_const_q(k))) then
-                           ierr = -1
-                           s% retry_message = 'update_vars: bad dln_cvpv0_dt_const_q'
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dln_cvpv0_dt_const_q', k, &
-                                 s% dln_cvpv0_dt_const_q(k), &
-                                 s% ln_cvpv0_for_d_dt_const_q(k), s% xh(i_ln_cvpv0,k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dln_cvpv0_dt_const_q', k, &
-                                 s% dln_cvpv0_dt_const_q(k), &
-                                 s% ln_cvpv0_for_d_dt_const_q(k), s% xh(i_ln_cvpv0,k)
-                              stop 'update_vars'
-                           end if
-                           return
-                        end if
-                     end do
-                  end if
-
-               end if
-
-               ! time derivatives at constant mass
-               if (dt > 0d0) then
-                  dt_inv = 1/dt
-                  s% dVARdot_dVAR = dt_inv
-               else
-                  s% dVARdot_dVAR = 0
-                  dt_inv = 0
-               end if
-            
-               if (s% generations < 2 .or. dt <= 0 .or. s% nz /= s% nz_old) then
-
-                  if (i_lnd /= 0) s% dlnd_dt(1:nz) = 0
-                  if (i_lnT /= 0) s% dlnT_dt(1:nz) = 0
-                  if (i_w /= 0) s% dw_dt(1:nz) = 0
-                  if (i_lnR /= 0) s% dlnR_dt(1:nz) = 0
-                  if (s% v_flag) s% dv_dt(1:nz) = 0
-                  if (s% u_flag) s% du_dt(1:nz) = 0
-                  if (s% RTI_flag) s% dalpha_RTI_dt(1:nz) = 0
-                  if (s% RSP_flag) s% dEtRSP_dt(1:nz) = 0
-                  if (s% conv_vel_flag) s% dln_cvpv0_dt(1:nz) = 0
-
-               else
-
-                  do k=1,k_below_just_added-1
-                     if (i_lnR /= 0) s% dlnR_dt(k) = 0
-                     if (i_v /= 0) s% dv_dt(k) = 0
-                     if (i_u /= 0) s% du_dt(k) = 0
-                     if (i_lnd /= 0) s% dlnd_dt(k) = 0
-                     if (i_lnT /= 0) s% dlnT_dt(k) = 0
-                     if (i_w /= 0) s% dw_dt(k) = 0
-                     if (i_etrb_RSP /= 0) s% dEtRSP_dt(k) = 0
-                     if (i_alpha_RTI /= 0) s% dalpha_RTI_dt(k) = 0
-                     if (i_ln_cvpv0 /= 0) s% dln_cvpv0_dt(k) = 0
-                  end do
-
-                  if (i_lnd /= 0) then
-                     do k=k_below_just_added,nz
-                        s% dlnd_dt(k) = &
-                           (s% xh(i_lnd,k) - s% lnd_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% dlnd_dt(k))) then
-                           s% retry_message = 'update_vars: bad dlnd_dt'
-                           ierr = -1
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dlnd_dt', k, &
-                                 s% dlnd_dt(k), s% lnd_for_d_dt_const_m(k), s% xh(i_lnd,k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dlnd_dt', k, &
-                                 s% dlnd_dt(k)
-                              stop 'update_vars'
-                           end if
-                           return
-                           stop 'update_vars'
-                        end if
-                     end do
-                  end if
-
-                  if (i_lnT /= 0) then
-                     do k=k_below_just_added,nz
-                        s% dlnT_dt(k) = (s% xh(i_lnT,k) - s% lnT_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% dlnT_dt(k))) then
-                           s% retry_message = 'update_vars: bad dlnT_dt'
-                           ierr = -1
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dlnT_dt', k, s% dlnT_dt(k), &
-                                 s% xh(i_lnT,k), s% lnT_for_d_dt_const_m(k), dt_inv
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dlnT_dt', k, &
-                                 s% dlnT_dt(k)
-                              stop 'update_vars'
-                           end if
-                        end if
-                     end do
-                  end if
-
-                  if (s% v_flag) then
-                     do k=k_below_just_added,nz
-                        s% dv_dt(k) = (s% xh(i_v,k) - s% v_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% dv_dt(k))) then
-                           s% retry_message = 'update_vars: bad dv_dt'
-                           ierr = -1
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dv_dt', k, s% dv_dt(k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dv_dt', k, &
-                                 s% dv_dt(k), s% xh(i_v,k), s% v_for_d_dt_const_m(k)
-                              stop 'update_vars'
-                           end if
-                        end if
-                     end do
-                  end if
-
-                  if (s% u_flag) then
-                     do k=k_below_just_added,nz
-                        s% du_dt(k) = (s% xh(i_u,k) - s% u_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% du_dt(k))) then
-                           ierr = -1
-                           s% retry_message = 'update_vars: bad du_dt'
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad du_dt', k, s% du_dt(k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad du_dt', k, &
-                                 s% du_dt(k)
-                              stop 'update_vars'
-                           end if
-                        end if
-                     end do
-                  end if
-
-                  if (s% TDC_flag) then
-                     do k=k_below_just_added,nz
-                        s% dw_dt(k) = (s% xh(i_w,k) - s% w_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% dw_dt(k))) then
-                           ierr = -1
-                           s% retry_message = 'update_vars: bad dw_dt'
-                           if (s% report_ierr) &
-                              write(*,2) 'update_vars: bad dw_dt', k, s% dw_dt(k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dw_dt', k, &
-                                 s% du_dt(k)
-                              stop 'update_vars'
-                           end if
-                        end if
-                     end do
-                  end if
-
-                  if (s% RTI_flag) then
-                     do k=k_below_just_added,nz
-                        s% dalpha_RTI_dt(k) = &
-                           (s% xh(i_alpha_RTI,k) - s% alpha_RTI_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% dalpha_RTI_dt(k))) then
-                           ierr = -1
-                           s% retry_message = 'update_vars: bad dalpha_RTI_dt'
-                           if (s% report_ierr) &
-                              write(*,3) 'update_vars: bad dalpha_RTI_dt', k, k_below_just_added, &
-                                 s% alpha_RTI_for_d_dt_const_m(k), s% dalpha_RTI_dt(k), &
-                                 s% xh(i_alpha_RTI,k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dalpha_RTI_dt', k, &
-                                 s% dalpha_RTI_dt(k)
-                              stop 'update_vars'
-                           end if
-                        end if
-                     end do
-                  end if
-
-                  if (s% conv_vel_flag) then
-                     do k=k_below_just_added,nz
-                        s% dln_cvpv0_dt(k) = &
-                           (s% xh(i_ln_cvpv0,k) - s% ln_cvpv0_for_d_dt_const_m(k))*dt_inv
-                        if (is_bad(s% dln_cvpv0_dt(k))) then
-                           ierr = -1
-                           s% retry_message = 'update_vars: bad dln_cvpv0_dt'
-                           if (s% report_ierr) &
-                              write(*,3) 'update_vars: bad dln_cvpv0_dt', k, k_below_just_added, &
-                                 s% ln_cvpv0_for_d_dt_const_m(k), s% dln_cvpv0_dt(k), &
-                                 s% xh(i_ln_cvpv0,k), s% ln_cvpv0_for_d_dt_const_m(k)
-                           if (s% stop_for_bad_nums) then
-                              write(*,2) 'update_vars: bad dln_cvpv0_dt', k, &
-                                 s% dln_cvpv0_dt(k)
-                              stop 'update_vars'
-                           end if
-                        end if
-                     end do
-                  end if
-
-                  do k=k_below_just_added,nz
-                     s% dlnR_dt(k) = (s% xh(i_lnR,k) - s% lnR_for_d_dt_const_m(k))*dt_inv
-                     if (is_bad(s% dlnR_dt(k))) then
-                        ierr = -1
-                        s% retry_message = 'update_vars: bad dlnR_dt'
-                        if (s% report_ierr) &
-                           write(*,2) 'update_vars: bad dlnR_dt', k, s% dlnR_dt(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'update_vars: bad dlnR_dt', k, &
-                              s% dlnR_dt(k)
-                           stop 'update_vars'
-                        end if
-                     end if
-                  end do
-
-               end if
-
+            if (dt > 0d0) then
+               dt_inv = 1/dt
+               s% dVARdot_dVAR = dt_inv
+            else
+               s% dVARdot_dVAR = 0
+               dt_inv = 0
             end if
 
          end subroutine unpack
@@ -793,7 +538,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: reset_w_using_L
+         use hydro_tdc, only: reset_etrb_using_L
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -924,8 +669,8 @@
             !if (dbg) write(*,*) 'call set_mlt_vars'
             !call set_mlt_vars(s, 1, s% nz, ierr)
             !if (failed('set_mlt_vars')) return
-            call reset_w_using_L(s,ierr)
-            if (failed('reset_w_using_L')) return
+            call reset_etrb_using_L(s,ierr)
+            if (failed('reset_etrb_using_L')) return
             s% need_to_reset_w = .false.
          end if
 

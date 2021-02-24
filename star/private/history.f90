@@ -291,7 +291,7 @@
          else if (s% v_flag) then
             v_surf = s% v(1)
          else
-            v_surf = s% r(1)*s% dlnR_dt(1)
+            v_surf = 0d0
          end if
 
          if (s% initial_mass > s% he_core_mass) then
@@ -1683,8 +1683,6 @@
             case(h_log_mesh_adjust_KE_conservation)
                val = safe_log10(s% mesh_adjust_KE_conservation)
 
-            case(h_rms_dvdt_div_v)
-               val = eval_rms_dvdt_div_v(s, 1, s% nz)
            case(h_total_IE_div_IE_plus_KE)
                val = s% total_internal_energy_end / &
                         (s% total_internal_energy_end + s% total_radial_kinetic_energy_end)
@@ -1792,7 +1790,7 @@
                val = safe_log10(abs(s% error_in_energy_conservation/s% total_energy_end))
                
            case(h_tot_E_equ_err)
-               val = sum(s% E_residual(1:nz)*s% dm(1:nz))
+               val = sum(s% ergs_error(1:nz))
            case(h_tot_E_err)
                val = s% error_in_energy_conservation
            case(h_rel_E_err)
@@ -1819,41 +1817,6 @@
            case(h_log_rel_run_E_err)
                if (s% total_energy_end /= 0d0) &
                   val = safe_log10(abs(s% cumulative_energy_error/s% total_energy_end))
-
-           case(h_log_residual_norm)
-               val = safe_log10(s% residual_norm)
-           case(h_log_max_residual)
-               val = safe_log10(s% max_residual)
-
-           case(h_log_max_dvdt_residual)
-               val = safe_log10(maxval(abs(s% v_residual(1:nz))))
-           case(h_log_max_lnd_residual)
-               val = safe_log10(maxval(abs(s% lnd_residual(1:nz))))
-           case(h_log_max_dEdt_residual)
-               val = safe_log10(maxval(abs(s% E_residual(1:nz))))
-           case(h_log_max_drdt_residual)
-               val = safe_log10(maxval(abs(s% lnR_residual(1:nz))))
-
-           case(h_avg_v_residual)
-               val = dot_product(s% dq(1:nz),s% v_residual(1:nz))
-           case(h_log_avg_v_residual)
-               val = safe_log10(abs(dot_product(s% dq(1:nz),s% v_residual(1:nz))))
-
-           case(h_max_abs_v_residual)
-               k = maxloc(abs(s% v_residual(1:nz)),dim=1)
-               val = s% v_residual(k)
-           case(h_log_max_abs_v_residual)
-               val = safe_log10(maxval(abs(s% v_residual(1:nz))))
-
-           case(h_avg_E_residual)
-               val = dot_product(s% dq(1:nz),s% E_residual(1:nz))/ln10
-           case(h_log_avg_E_residual)
-               val = safe_log10(abs(dot_product(s% dq(1:nz),s% E_residual(1:nz)))/ln10)
-
-           case(h_max_abs_E_residual)
-               val = maxval(abs(s% E_residual(1:nz)))/ln10
-           case(h_log_max_abs_E_residual)
-               val = safe_log10(maxval(abs(s% E_residual(1:nz)))/ln10)
 
             case(h_u_surf_km_s)
                if (s% u_flag) val = s% u_face_ad(1)%val*1d-5
@@ -1884,7 +1847,7 @@
                else if (s% v_flag) then
                   val = s% v(1) / s% csound(1)
                else
-                  val = 0d0 ! s% r(1)*s% dlnR_dt(1)
+                  val = 0d0
                end if
             case(h_remnant_M)
                val = get_remnant_mass(s)/Msun
@@ -1997,16 +1960,6 @@
                val = s% d_center_eps_nuc_dlnT
             case(h_d_center_eps_nuc_dlnd)
                val = s% d_center_eps_nuc_dlnd
-
-            case(h_center_dlogT)
-               val = s% dt*center_value(s, s% dlnT_dt)/ln10
-            case(h_center_dlogRho)
-               val = s% dt*center_value(s, s% dlnd_dt)/ln10
-
-            case(h_center_dlnT_dt)
-               val = center_value(s, s% dlnT_dt)
-            case(h_center_dlnd_dt)
-               val = center_value(s, s% dlnd_dt)
 
             case(h_center_dL_dm)
                val = center_value(s, s% dL_dm_expected)
@@ -3454,7 +3407,7 @@
          else if (s% v_flag) then
             v_surf = s% v(1)
          else
-            v_surf = s% r(1)*s% dlnR_dt(1)
+            v_surf = 0d0
          end if
 
          if (s% initial_mass > s% he_core_mass) then

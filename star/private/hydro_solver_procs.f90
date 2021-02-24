@@ -614,9 +614,9 @@
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
          integer :: id, i, j, k, nz, species, bad_j, bad_k, &
-            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_w
+            i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_etrb
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
-            old_E, dE, new_E, old_lnd, dlnd, new_lnd, dw, old_w, new_w, &
+            old_E, dE, new_E, old_lnd, dlnd, new_lnd, dw, new_w, &
             dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
             dalpha_RTI, new_alpha_RTI, old_alpha_RTI, log_conv_vel_v0, &
             dlum_surf, old_lum_surf, new_lum_surf
@@ -627,7 +627,7 @@
          
          
          if (s% TDC_flag) & 
-            call clip_so_non_negative(s% i_w, 0d0)
+            call clip_so_non_negative(s% i_etrb, 0d0)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)

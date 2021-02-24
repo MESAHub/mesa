@@ -1392,7 +1392,7 @@
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
             s% opacity_start(k) = -1d99
-            s% w_start(k) = -1d99
+            s% etrb_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do
       end subroutine reset_starting_vectors
@@ -1422,7 +1422,7 @@
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1, &
@@ -1432,7 +1432,7 @@
          include 'formats'
 
          call unwrap(residual, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-                     dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+                     detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
                      dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
                      dxtra1_m1, dxtra1_00, dxtra1_p1, &
                      dxtra2_m1, dxtra2_00, dxtra2_p1, &
@@ -1445,7 +1445,7 @@
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
-         if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
+         if (s% i_etrb /= 0) call unpack1(s% i_etrb, detrb_m1, detrb_00, detrb_p1)
          
          contains
          
@@ -1882,7 +1882,7 @@
          else if (s% v_flag) then
             v = s% v(k)
          else
-            v = s% r(1)*s% dlnR_dt(1)
+            v = 0d0
          end if
          r = s% rmid(k)
          get_Ladv = pi4*r*r*v*Erad
@@ -1909,24 +1909,6 @@
          L_rad_div_Ledd = &
             -(area*area*crad*(del_T4/del_m)/3)/(pi4*s% cgrav(j)*s% m_grav(j))
       end function get_Lrad_div_Ledd
-
-
-      real(dp) function eval_rms_dvdt_div_v(s, klo, khi)
-         type (star_info), pointer :: s
-         integer, intent(in) :: klo, khi ! sum from klo to khi
-         integer :: k
-         real(dp) :: term, sum
-         if (khi <= klo) then
-            eval_rms_dvdt_div_v = 0d0
-            return
-         end if
-         sum = 0
-         do k=klo, khi
-            term = s% dv_dt(k)/max(1d-50,abs(s% v(k)))
-            sum = sum + term*term
-         end do
-         eval_rms_dvdt_div_v = sqrt(sum/(khi - klo + 1))
-      end function eval_rms_dvdt_div_v
       
       
       real(dp) function cell_start_specific_KE(s,k)
@@ -2180,7 +2162,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% TDC_flag) cell_total = cell_total + s% w(k)**2
+         if (s% TDC_flag) cell_total = cell_total + s% etrb(k)
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2264,7 +2246,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% TDC_flag) then
-               cell1 = dm*s% w(k)**2
+               cell1 = dm*s% etrb(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2313,7 +2295,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% TDC_flag) then
-               cell1 = dm*s% w(k)**2
+               cell1 = dm*s% etrb(k)
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -2937,66 +2919,6 @@
          write(*,*) 'arrived_main_seq',  arrived_main_seq
          write(*,*)
       end function arrived_main_seq
-
-
-      subroutine save_for_d_dt(s)
-         ! these values will be modified as necessary by adjust mass
-         type (star_info), pointer :: s
-         integer :: k, nz, i_lnR, i_lnT, i_lnd, i_w, &
-            i_v, i_u, i_alpha_RTI, i_ln_cvpv0
-         include 'formats'
-         
-         nz = s% nz
-         i_lnR = s% i_lnR
-         i_lnT = s% i_lnT
-         i_lnd = s% i_lnd
-         i_w = s% i_w
-         i_v = s% i_v
-         i_u = s% i_u
-         i_alpha_RTI = s% i_alpha_RTI
-         i_ln_cvpv0 = s% i_ln_cvpv0
-         do k=1, nz
-            s% lnR_for_d_dt_const_m(k) = s% xh(i_lnR, k)
-         end do
-         if (i_lnT /= 0) then
-            do k=1, nz
-               s% lnT_for_d_dt_const_m(k) = s% xh(i_lnT, k)
-               s% lnT_for_d_dt_const_q(k) = s% xh(i_lnT, k)
-            end do
-         end if
-         if (i_lnd /= 0) then
-            do k=1, nz
-               s% lnd_for_d_dt_const_m(k) = s% xh(i_lnd, k)
-               s% lnd_for_d_dt_const_q(k) = s% xh(i_lnd, k)
-            end do
-         end if
-         if (i_ln_cvpv0 /= 0) then
-            do k=1, nz
-               s% ln_cvpv0_for_d_dt_const_m(k) = s% xh(i_ln_cvpv0, k)
-               s% ln_cvpv0_for_d_dt_const_q(k) = s% xh(i_ln_cvpv0, k)
-            end do
-         end if
-         if (i_v /= 0) then
-            do k=1, nz
-               s% v_for_d_dt_const_m(k) = s% xh(i_v, k)
-            end do
-         end if
-         if (i_w /= 0) then
-            do k=1, nz
-               s% w_for_d_dt_const_m(k) = s% xh(i_w, k)
-            end do
-         end if
-         if (i_u /= 0) then
-            do k=1, nz
-               s% u_for_d_dt_const_m(k) = s% xh(i_u, k)
-            end do
-         end if
-         if (i_alpha_RTI /= 0) then
-            do k=1, nz
-               s% alpha_RTI_for_d_dt_const_m(k) = s% xh(i_alpha_RTI, k)
-            end do
-         end if
-      end subroutine save_for_d_dt
       
       
       subroutine set_rv_info(s,k)
@@ -3377,7 +3299,7 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: Pt
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: w, rho
+         type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Pt_start
          logical :: time_center, test_partials
          include 'formats'
@@ -3387,12 +3309,12 @@
             return
          end if
          rho = wrap_d_00(s,k)
-         w = wrap_w_00(s,k)
-         Pt = s% TDC_alfap*pow2(w)*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
+         etrb = wrap_etrb_00(s,k)
+         Pt = s% TDC_alfap*etrb*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% TDC_alfap*pow2(s% w_start(k))*s% rho_start(k)
+            Pt_start = s% TDC_alfap*s% etrb_start(k)*s% rho_start(k)
             Pt = 0.5d0*(Pt + Pt_start)
          end if
 

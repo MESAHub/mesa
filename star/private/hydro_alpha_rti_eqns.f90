@@ -181,7 +181,7 @@
          dadt_source = source_plus - source_minus
 
          dadt_expected = dadt_mix + dadt_source
-         dadt_actual = s% dalpha_RTI_dt(k)
+         dadt_actual = s% dxh_alpha_RTI(k)/s% dt
 
          if (dadt_expected == 0d0) then
             s% equ(i_dalpha_RTI_dt,k) = dadt_expected

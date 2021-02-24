@@ -3200,7 +3200,6 @@
             + erad_tw*u_div_r_factor*u_div_r &
             - dt*s% Eq(k)
 
-         s% E_residual(k) = residual
          s% ergs_error(k) = s% dm(k)*residual
 
          HR(IT) = -residual

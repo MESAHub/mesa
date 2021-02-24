@@ -142,18 +142,6 @@
       real(dp), pointer :: lntau(:) ! log(tau)
       real(dp), pointer :: dr_div_csound(:) ! sound crossing time for cell
 
-      real(dp), pointer :: lnR_residual(:)
-      real(dp), pointer :: lnd_residual(:)
-      real(dp), pointer :: equL_residual(:)
-      real(dp), pointer :: E_residual(:)
-      real(dp), pointer :: etrb_residual(:)
-      real(dp), pointer :: v_residual(:)
-      real(dp), pointer :: u_residual(:)
-      real(dp), pointer :: Vol_residual(:)
-      real(dp), pointer :: max_abs_xa_residual(:)
-
-      real(dp), pointer :: w_residual(:) ! temporary for backward compatibility debugging.
-
       real(dp), pointer :: ergs_error(:)
 
       real(dp), pointer :: gradr_factor(:)
@@ -617,52 +605,16 @@
          ! defined at points in atmosphere
          ! atm_structure(:,1) is base of atmosphere
          ! atm_structure(:,atm_structure_num_pts) is top of atmosphere
-         
-      ! for time derivatives
-         
-         ! for calculating Lagrangian time derivatives using differences at constant m
-         ! holds values from previous model interpolated to new m(k)
-         real(dp), pointer :: lnd_for_d_dt_const_m(:)
-         real(dp), pointer :: lnT_for_d_dt_const_m(:)
-         real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: w_for_d_dt_const_m(:) ! only set when TDC_flag is true
-         real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
-         real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
-         real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
-         real(dp), pointer :: ln_cvpv0_for_d_dt_const_m(:) ! only set when conv_vel_flag is true
-         
-         ! for calculating "Eulerian" time derivatives using differences at constant q
-         ! holds values from previous model interpolated to new q(k)
-         ! these are only used for eps_grav
-         real(dp), pointer :: lnd_for_d_dt_const_q(:)
-         real(dp), pointer :: lnT_for_d_dt_const_q(:)
-         real(dp), pointer :: ln_cvpv0_for_d_dt_const_q(:)
         
-      ! lagrangian time derivatives
+      ! changes in values for cells during solver iterations 
       
-         real(dp), pointer :: dlnd_dt(:)
-         real(dp), pointer :: dlnT_dt(:)
-         real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: dw_dt(:) ! only set when TDC_flag is true
-         real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
-         real(dp), pointer :: du_dt(:) ! only set when u_flag is true
-         real(dp), pointer :: dEtRSP_dt(:) ! only used when RSP_flag is true
-         real(dp), pointer :: dln_cvpv0_dt(:) ! only set when conv_vel_flag is true
-         real(dp), pointer :: dj_rot_dt(:) ! only set when implicit_j_rot_flag is true
-         real(dp), pointer :: dalpha_RTI_dt(:) ! only set when alpha_RTI_flag is true
-         
-         ! these are only used for eps_grav
-         real(dp), pointer :: dlnd_dt_const_q(:)
-         real(dp), pointer :: dlnT_dt_const_q(:)
-         ! this is for the calculation of the time derivative of convective velocities
-         real(dp), pointer :: dln_cvpv0_dt_const_q(:)
-        
-      ! changes in values for cells during solver iterations
-         real(dp), pointer :: dxh_lnPgas(:) ! lnPgas(k) = dxh_lnPgas(k) + lnPgas_start(k); dxh_lnPgas from solver.
          real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
-         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_w from solver.
+         real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
+         real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
+         real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
+         real(dp), pointer :: dxh_etrb(:) ! etrb(k) = dxh_etrb(k) + etrb_start(k); dxh_etrb from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
@@ -1078,6 +1030,7 @@
          real(dp), pointer :: Pgas_start(:) ! (nz)
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
+         real(dp), pointer :: etrb_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)
@@ -1376,7 +1329,7 @@
 
          logical, pointer :: eps_grav_form_for_energy_eqn(:)
          real(dp), pointer, dimension(:)  :: &
-            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt
+            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, detrbdt
             
          real(dp) :: &
             total_internal_energy_old, &

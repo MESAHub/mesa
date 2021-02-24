@@ -229,8 +229,6 @@
 
          end do
          
-         s% max_abs_xa_residual(k) = max_abs_residual
-         
          contains
          
          subroutine check_dequ(dequ, str)

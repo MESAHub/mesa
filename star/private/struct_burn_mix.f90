@@ -289,7 +289,7 @@
       subroutine save_start_values(s, ierr)
          use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
-         use hydro_tdc, only: set_w_start_vars
+         use hydro_tdc, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals
          use chem_def, only: ih1
          type (star_info), pointer :: s
@@ -367,7 +367,7 @@
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
-         if (s% TDC_flag) call set_w_start_vars(s,ierr)
+         if (s% TDC_flag) call set_etrb_start_vars(s,ierr)
 
          do k=1,s% nz
             do j=1,s% nvar_hydro

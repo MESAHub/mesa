@@ -93,7 +93,7 @@
             skip_other_cgrav = .true.
          logical :: do_chem, do_struct, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
-            i_lnd, i_lnT, i_lnR, i_lum, i_w, i_v, &
+            i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, i_chem1, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
@@ -101,7 +101,7 @@
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
-         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_w, &
+         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_etrb, &
             do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
 
          include 'formats'
@@ -155,7 +155,7 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -167,7 +167,7 @@
          do_lnT = i_lnT > 0 .and. i_lnT <= nvar
          do_lnR = i_lnR > 0 .and. i_lnR <= nvar
          do_lum = i_lum > 0 .and. i_lum <= nvar
-         do_w = i_w > 0 .and. i_w <= nvar
+         do_etrb = i_etrb > 0 .and. i_etrb <= nvar
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
@@ -489,19 +489,20 @@
 
                end if
 
-               if (do_w) then
-                  s% w(k) = max(x(i_w),0d0)
-                  s% dxh_w(k) = s% solver_dx(i_w,k)
-                  if (s% w(k) < 0d0 .or. is_bad_num(s% w(k))) then
-                     s% retry_message = 'bad num for et'
-                     if (report) write(*,2) 'bad num et', k, s% w(k)
+               if (do_etrb) then
+                  s% etrb(k) = max(x(i_etrb),0d0)
+                  s% dxh_etrb(k) = s% solver_dx(i_etrb,k)
+                  s% w(k) = sqrt(s% etrb(k))
+                  if (is_bad_num(s% etrb(k))) then
+                     s% retry_message = 'bad num for etrb'
+                     if (report) write(*,2) 'bad num etrb', k, s% etrb(k)
                      ierr = -1
                      if (s% stop_for_bad_nums) then
 !$omp critical (set_vars_for_solver_crit1)
-                        write(*,2) 'set_vars_for_solver et', k, s% w(k)
-                        write(*,2) 'set_vars_for_solver et_start', k, s% w_start(k)
-                        write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_w,k)
-                        write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_w,k)
+                        write(*,2) 'set_vars_for_solver etrb', k, s% etrb(k)
+                        write(*,2) 'set_vars_for_solver etrb_start', k, s% etrb_start(k)
+                        write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_etrb,k)
+                        write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_etrb,k)
                         stop 'set_vars_for_solver'
 !$omp end critical (set_vars_for_solver_crit1)
                      end if
@@ -513,6 +514,7 @@
 
                   if (do_v) then
                      s% v(k) = x(i_v)
+                     s% dxh_v(k) = s% solver_dx(i_v,k)
                      if (is_bad_num(s% v(k))) then
                         s% retry_message = 'bad num for v'
                         if (report) write(*,2) 'bad num v', k, s% v(k)
@@ -526,6 +528,7 @@
 
                   if (do_u) then
                      s% u(k) = x(i_u)
+                     s% dxh_u(k) = s% solver_dx(i_u,k)
                      if (is_bad_num(s% u(k))) then
                         s% retry_message = 'bad num for u'
                         if (report) write(*,2) 'bad num u', k, s% u(k)
@@ -539,6 +542,7 @@
 
                   if (do_alpha_RTI) then
                      s% alpha_RTI(k) = max(0d0, x(i_alpha_RTI))
+                     s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
                      if (is_bad_num(s% alpha_RTI(k))) then
                         s% retry_message = 'bad num for alpha_RTI'
                         if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
@@ -692,128 +696,7 @@
                         s% model_number, s% u(k), xh_start(i_u,k), s% solver_dx(i_u,k)
                end if
 
-               ! set time derivatives at constant q -- only need the ones for eps_grav
-               if (dt == 0) then
-                  s% dlnT_dt_const_q(k) = 0
-                  if (s% do_struct_hydro) then
-                     s% dlnd_dt_const_q(k) = 0
-                     if (i_ln_cvpv0 /= 0) s% dln_cvpv0_dt_const_q(k) = 0
-                  end if
-               else if (k < s% k_below_const_q) then
-                  ! use dx to get better accuracy
-                  if (i_lnT /= 0) s% dlnT_dt_const_q(k) = s% solver_dx(i_lnT,k)*d_dxdt_dx
-                  if (s% do_struct_hydro) then
-                     if (i_lnd /= 0) s% dlnd_dt_const_q(k) = s% solver_dx(i_lnd,k)*d_dxdt_dx
-                     if (i_ln_cvpv0 /= 0) &
-                        s% dln_cvpv0_dt_const_q(k) = s% solver_dx(i_ln_cvpv0,k)*d_dxdt_dx
-                  end if
-               else
-                  if (i_lnT /= 0) s% dlnT_dt_const_q(k) = &
-                     (x(i_lnT) - s% lnT_for_d_dt_const_q(k))*d_dxdt_dx
-                  if (s% do_struct_hydro) then
-                     if (i_lnd /= 0) &
-                        s% dlnd_dt_const_q(k) = &
-                           (x(i_lnd) - s% lnd_for_d_dt_const_q(k))*d_dxdt_dx
-                     if (i_ln_cvpv0 /= 0) &
-                        s% dln_cvpv0_dt_const_q(k) = &
-                           (x(i_ln_cvpv0) - s% ln_cvpv0_for_d_dt_const_q(k))*d_dxdt_dx
-                  end if
-               end if
-
-               ! set time derivatives at constant mass
-               if (dt == 0) then
-
-                  s% dlnT_dt(k) = 0
-                  s% dw_dt(k) = 0
-                  if (s% do_struct_hydro) then
-                     s% dlnd_dt(k) = 0
-                     s% dlnR_dt(k) = 0
-                     if (i_v /= 0) s% dv_dt(k) = 0
-                     if (i_u /= 0) s% du_dt(k) = 0
-                     if (i_alpha_RTI /= 0) s% dalpha_RTI_dt(k) = 0
-                     if (i_ln_cvpv0 /= 0) s% dln_cvpv0_dt(k) = 0
-                     if (i_j_rot /= 0) s% dj_rot_dt(k) = 0
-                  end if
-
-               else if (k >= s% k_const_mass) then
-                  ! use dx to get better accuracy
-
-                  if (do_lnT) s% dlnT_dt(k) = s% solver_dx(i_lnT,k)*d_dxdt_dx
-                  if (do_w) s% dw_dt(k) = s% solver_dx(i_w,k)*d_dxdt_dx
-
-                  if (s% do_struct_hydro) then
-                     if (do_lnd) s% dlnd_dt(k) = s% solver_dx(i_lnd,k)*d_dxdt_dx
-                     if (do_v) s% dv_dt(k) = s% solver_dx(i_v,k)*d_dxdt_dx
-                     if (do_u) s% du_dt(k) = s% solver_dx(i_u,k)*d_dxdt_dx
-                     if (do_alpha_RTI) s% dalpha_RTI_dt(k) = s% solver_dx(i_alpha_RTI,k)*d_dxdt_dx
-                     if (do_lnR) s% dlnR_dt(k) = s% solver_dx(i_lnR,k)*d_dxdt_dx
-                  end if
-
-                  if (k == s% trace_k) then
-                     write(*,4) 'd_dxdt_dx', k, s% solver_iter, &
-                        s% model_number, d_dxdt_dx
-                     if (do_lnT) write(*,4) 's% dlnT_dt(k)', k, s% solver_iter, &
-                        s% model_number, s% dlnT_dt(k)
-                     write(*,2) 'd_dxdt_dx', k, d_dxdt_dx
-                     write(*,*)
-                  end if
-
-               else if (k >= k_below_just_added) then
-
-                  if (do_lnT) &
-                     s% dlnT_dt(k) = (x(i_lnT) - s% lnT_for_d_dt_const_m(k))*d_dxdt_dx
-                  if (do_w) &
-                     s% dw_dt(k) = (x(i_w) - s% w_for_d_dt_const_m(k))*d_dxdt_dx
-                  if (s% do_struct_hydro) then
-                     s% dlnR_dt(k) = (x(i_lnR) - s% lnR_for_d_dt_const_m(k))*d_dxdt_dx
-                     if (do_lnd) &
-                        s% dlnd_dt(k) = (x(i_lnd) - s% lnd_for_d_dt_const_m(k))*d_dxdt_dx
-                     if (do_v) s% dv_dt(k) = &
-                        (x(i_v) - s% v_for_d_dt_const_m(k))*d_dxdt_dx
-                     if (do_u) s% du_dt(k) = &
-                        (x(i_u) - s% u_for_d_dt_const_m(k))*d_dxdt_dx
-                     if (do_alpha_RTI) s% dalpha_RTI_dt(k) = &
-                        (x(i_alpha_RTI) - s% alpha_RTI_for_d_dt_const_m(k))*d_dxdt_dx
-                  end if
-
-                  if (k == s% trace_k) then
-                     write(*,4) 's% dlnT_dt(k)', k, s% solver_iter, &
-                        s% model_number, s% dlnT_dt(k)
-                     write(*,4) 'x(i_lnT)', k, s% solver_iter, &
-                        s% model_number, x(i_lnT)
-                     write(*,4) 's% lnT_for_d_dt_const_m(k)', k, &
-                        s% solver_iter, s% model_number, s% lnT_for_d_dt_const_m(k)
-                     write(*,4) 'xh_start(i_lnT,1)', 1, s% solver_iter, &
-                        s% model_number, xh_start(i_lnT,1)
-                     write(*,2) 'd_dxdt_dx', k, d_dxdt_dx
-                     write(*,*)
-                  end if
-
-               else ! k < s% k_below_just_added, so new surface cell
-
-                  s% dlnT_dt(k) = 0
-                  s% dw_dt(k) = 0
-                  if (s% do_struct_hydro) then
-                     s% dlnR_dt(k) = 0
-                     s% dlnd_dt(k) = 0
-                     s% dv_dt(k) = 0
-                  end if
-
-               end if
-
-               if (s% do_struct_hydro .and. do_conv_vel) then
-                  if (k >= s% k_const_mass) then
-                     s% dln_cvpv0_dt(k) = s% solver_dx(i_ln_cvpv0,k)*d_dxdt_dx
-                  else
-                     s% dln_cvpv0_dt(k) = &
-                        (x(i_ln_cvpv0) - s% ln_cvpv0_for_d_dt_const_m(k))*d_dxdt_dx
-                  end if
-               end if
-
-            end if
-
-            if (s% do_struct_hydro .and. do_j_rot) then
-               s% dj_rot_dt(k) = s% solver_dx(i_j_rot,k)*d_dxdt_dx
+               
             end if
 
             if (do_chem) &
@@ -974,9 +857,6 @@
             vol00 = volp1 + cell_vol
             s% lnR(k) = log(vol00/four_thirds_pi)/3
             dx(s% i_lnR,k) = s% lnR(k) - xh_start(s% i_lnR,k)
-            if (k >= s% k_below_just_added) &
-               s% dlnR_dt(k) = &
-                  (s% lnR(k) - s% lnR_for_d_dt_const_m(k))*s% dVARDOT_dVAR
          end do
          call edit_dlnR_dt_above_k_below_just_added(s, xh_start)
       end subroutine edit_lnR
@@ -990,9 +870,6 @@
          k_below_just_added = s% k_below_just_added
          if (k_below_just_added == 1) return
          lnR_start = xh_start(s% i_lnR,1)
-         do k = 1, k_below_just_added - 1
-            s% dlnR_dt(k) = 0d0
-         end do
       end subroutine edit_dlnR_dt_above_k_below_just_added
 
 

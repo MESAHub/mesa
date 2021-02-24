@@ -178,7 +178,6 @@
          resid_ad = resid1_ad*iXPavg_ad ! scaling
          residual = resid_ad%val
          s% equ(i_dv_dt, k) = residual      
-         s% v_residual(k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_momentum_crit1)
@@ -434,7 +433,7 @@
             end if
 
             if (local_v_flag) then
-               accel = s% dv_dt(k)
+               accel = s% dxh_v(k)/s% dt
                d_accel_dv = s% dVARDOT_dVAR
             else ! assume vstart(k) = 0 and
                ! constant acceleration dv_dt so vfinal(k) = dv_dt*dt
@@ -623,13 +622,11 @@
             cs = s% csound_start(k)
             if (i_v /= 0) then
                s% equ(i_dlnR_dt, k) = s% v(k)/cs ! this makes v(k) => 0
-               s% lnR_residual(k) = s% equ(i_dlnR_dt, k)
                if (skip_partials) return
                call e00(s, i_dlnR_dt, i_v, k, nvar, 1d0/cs)
                return
             else if (i_u /= 0) then
                s% equ(i_dlnR_dt, k) = s% u(k)/cs ! this makes u(k) => 0
-               s% lnR_residual(k) = s% equ(i_dlnR_dt, k)
                if (skip_partials) return
                call e00(s, i_dlnR_dt, i_u, k, nvar, 1d0/cs)
                return
@@ -667,7 +664,6 @@
          
          residual = dr_div_r0_expected - dr_div_r0_actual
          s% equ(i_dlnR_dt, k) = residual
-         s% lnR_residual(k) = residual
 
          if (test_partials) then
             s% solver_test_partials_val = residual

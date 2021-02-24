@@ -65,7 +65,7 @@
       subroutine unwrap(var, val, &
             dlnd_m1, dlnd_00, dlnd_p1, &
             dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, &
+            detrb_m1, detrb_00, detrb_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
@@ -75,7 +75,7 @@
          type(auto_diff_real_star_order1), intent(in) :: var
          real(dp), intent(out) :: &
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1, &
@@ -87,9 +87,9 @@
          dlnT_m1 = var%d1Array(i_lnT_m1)
          dlnT_00 = var%d1Array(i_lnT_00)
          dlnT_p1 = var%d1Array(i_lnT_p1)
-         dw_m1 = var%d1Array(i_w_m1)
-         dw_00 = var%d1Array(i_w_00)
-         dw_p1 = var%d1Array(i_w_p1)
+         detrb_m1 = var%d1Array(i_etrb_m1)
+         detrb_00 = var%d1Array(i_etrb_00)
+         detrb_p1 = var%d1Array(i_etrb_p1)
          dlnR_m1 = var%d1Array(i_lnR_m1)
          dlnR_00 = var%d1Array(i_lnR_00)
          dlnR_p1 = var%d1Array(i_lnR_p1)
@@ -113,7 +113,7 @@
       subroutine wrap(var, val, &
             dlnd_m1, dlnd_00, dlnd_p1, &
             dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, &
+            detrb_m1, detrb_00, detrb_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
@@ -123,7 +123,7 @@
          type(auto_diff_real_star_order1), intent(out) :: var
          real(dp), intent(in) :: &
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1, &
@@ -135,9 +135,9 @@
          var%d1Array(i_lnT_m1) = dlnT_m1
          var%d1Array(i_lnT_00) = dlnT_00
          var%d1Array(i_lnT_p1) = dlnT_p1
-         var%d1Array(i_w_m1) = dw_m1
-         var%d1Array(i_w_00) = dw_00
-         var%d1Array(i_w_p1) = dw_p1
+         var%d1Array(i_etrb_m1) = detrb_m1
+         var%d1Array(i_etrb_00) = detrb_00
+         var%d1Array(i_etrb_p1) = detrb_p1
          var%d1Array(i_lnR_m1) = dlnR_m1
          var%d1Array(i_lnR_00) = dlnR_00
          var%d1Array(i_lnR_p1) = dlnR_p1
@@ -241,7 +241,42 @@
       end function wrap_d_p1
 
 
-      !! Wrap et at cell k-1 with appropriate dependences on the (ordered) independent variables.
+      !! Wrap etrb at cell k-1 with appropriate dependences on the (ordered) independent variables.
+      function wrap_etrb_m1(s, k) result(etrb_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: etrb_m1
+         integer, intent(in) :: k
+         etrb_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            etrb_m1 % val = s%etrb(k-1)
+            etrb_m1 % d1Array(i_etrb_m1) = 1d0
+         end if            
+      end function wrap_etrb_m1
+
+      !! Wrap etrb at cell k with appropriate dependences on the (ordered) independent variables.
+      function wrap_etrb_00(s, k) result(etrb_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: etrb_00
+         integer, intent(in) :: k
+         etrb_00 = 0d0 ! sets val and d1Array to 0
+         etrb_00 % val = s%etrb(k)
+         etrb_00 % d1Array(i_etrb_00) = 1d0
+      end function wrap_etrb_00
+
+      !! Wrap etrb at cell k+1 with appropriate dependences on the (ordered) independent variables.
+      function wrap_etrb_p1(s, k) result(etrb_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: etrb_p1
+         integer, intent(in) :: k
+         etrb_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s%nz) then
+            etrb_p1 % val = s%etrb(k+1)
+            etrb_p1 % d1Array(i_etrb_p1) = 1d0
+         end if
+      end function wrap_etrb_p1
+
+
+      !! Wrap w at cell k-1 with appropriate dependences on the (ordered) independent variables.
       function wrap_w_m1(s, k) result(w_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: w_m1
@@ -249,21 +284,21 @@
          w_m1 = 0d0 ! sets val and d1Array to 0
          if (k > 1) then
             w_m1 % val = s%w(k-1)
-            w_m1 % d1Array(i_w_m1) = 1d0
+            w_m1 % d1Array(i_etrb_m1) = 0.5d0/s%w(k-1)
          end if            
       end function wrap_w_m1
 
-      !! Wrap et at cell k with appropriate dependences on the (ordered) independent variables.
+      !! Wrap w at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_w_00(s, k) result(w_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: w_00
          integer, intent(in) :: k
          w_00 = 0d0 ! sets val and d1Array to 0
          w_00 % val = s%w(k)
-         w_00 % d1Array(i_w_00) = 1d0
+         w_00 % d1Array(i_etrb_00) = 0.5d0/s%w(k)
       end function wrap_w_00
 
-      !! Wrap et at cell k+1 with appropriate dependences on the (ordered) independent variables.
+      !! Wrap w at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_w_p1(s, k) result(w_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: w_p1
@@ -271,7 +306,7 @@
          w_p1 = 0d0 ! sets val and d1Array to 0
          if (k < s%nz) then
             w_p1 % val = s%w(k+1)
-            w_p1 % d1Array(i_w_p1) = 1d0
+            w_p1 % d1Array(i_etrb_p1) = 0.5d0/s%w(k+1)
          end if
       end function wrap_w_p1
 

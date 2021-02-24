@@ -308,7 +308,7 @@
          else if (s% v_flag) then
             v = s% v(1)
          else
-            v = 0 ! s% r(1)*s% dlnR_dt(1)
+            v = 0d0
          end if
          vsurf_div_csound = v / s% csound(1)
 
@@ -617,7 +617,7 @@
             v_surf = s% v(1)
             v_div_csound_max = maxval(abs(s% v(1:nz)/s% csound_face(1:nz)))
          else
-            v_surf = abs(s% r(1) * s% dlnR_dt(1))
+            v_surf = 0d0
             v_div_csound_max = 0d0
          end if
          
@@ -1503,7 +1503,7 @@
          else if (s% v_flag) then
             v = s% v(1)
          else
-            v = s% r(1) * s% dlnR_dt(1)
+            v = 0d0
          end if
          
          power_he_burn = s% power_he_burn

@@ -304,7 +304,7 @@
          else if (s% v_flag) then
             s% v_surf = s% v(1)
          else
-            s% v_surf = s% r(1)*s% dlnR_dt(1)
+            s% v_surf = 0d0
          end if
 
          call set_surf_avg_rotation_info(s)
@@ -416,7 +416,7 @@
             else if (s% v_flag) then
                v = s% v(k)
             else
-               v = s% r(k)*s% dlnR_dt(k)
+               v = 0d0
             end if
 
             if (is_bad(v)) then
@@ -1178,8 +1178,10 @@
          bdy_L = s% L(1)/Lsun
          if (s% v_flag) then
             bdy_v = s% v(1)
+         else if (s% u_flag) then
+            bdy_v = s% u_face_ad(1)%val
          else
-            bdy_v = s% r(1)*s% dlnR_dt(1)
+            bdy_v = 0d0
          end if
          if (s% rotation_flag) then
             bdy_omega = s% omega_avg_surf

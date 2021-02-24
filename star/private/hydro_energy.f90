@@ -84,7 +84,7 @@
          real(dp) :: residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
-         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v, i_w
+         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v
          logical :: test_partials, doing_op_split_burn, eps_grav_form
                     
          include 'formats'
@@ -123,7 +123,6 @@
          resid_ad = scal*resid_ad
          residual = resid_ad%val
          s% equ(i_dlnE_dt, k) = residual
-         s% E_residual(k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_l_crit1)
@@ -171,7 +170,6 @@
             i_lnR = s% i_lnR
             i_lum = s% i_lum
             i_v = s% i_v
-            i_w = s% i_w
             nz = s% nz
             dt = s% dt
             dm = s% dm(k)
@@ -323,14 +321,14 @@
          
          subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: w_00
             include 'formats'
             ierr = 0
             d_turbulent_energy_dt_ad = 0d0
             if (s% TDC_flag) then
-               w_00 = wrap_w_00(s,k)
-               d_turbulent_energy_dt_ad = (pow2(w_00) - pow2(s% w_start(k)))/dt 
+               d_turbulent_energy_dt_ad%val = s% dxh_etrb(k)/dt 
+               d_turbulent_energy_dt_ad%d1Array(i_etrb_00) = 1d0/dt
             end if
+            s% detrbdt(k) = d_turbulent_energy_dt_ad%val
          end subroutine setup_d_turbulent_energy_dt
          
          subroutine setup_eps_grav(ierr)

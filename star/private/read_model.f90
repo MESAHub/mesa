@@ -35,8 +35,8 @@
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
-      integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
-      integer, parameter :: bit_for_w = 6
+      integer, parameter :: bit_for_conv_vel = 5 ! for saving the data, but not using as variable
+      integer, parameter :: bit_for_etrb = 6
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
@@ -48,7 +48,7 @@
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
-      integer, parameter :: increment_for_i_w = 1
+      integer, parameter :: increment_for_i_etrb = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
       integer, parameter :: increment_for_D_omega_flag = 1
@@ -57,7 +57,7 @@
       integer, parameter :: increment_for_RSP_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
       
-      integer, parameter :: max_increment = increment_for_i_w &
+      integer, parameter :: max_increment = increment_for_i_etrb &
                                           + increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
                                           + increment_for_D_omega_flag &
@@ -77,7 +77,7 @@
       subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, reset_epsnuc_vectors, &
-            set_qs, save_for_d_dt
+            set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
@@ -147,20 +147,12 @@
          s% adjust_mlt_gradT_fraction(1:nz) = -1
          s% eps_mdot(1:nz) = 0
          s% eps_grav(1:nz) = 0
-         s% equL_residual(1:nz) = 0
-         s% lnR_residual(1:nz) = 0
-         s% lnd_residual(1:nz) = 0
-         s% E_residual(1:nz) = 0
-         s% u_residual(1:nz) = 0
          s% ergs_error(1:nz) = 0
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
-            s% du_dt(1:nz) = 0
          end if
-
-         call save_for_d_dt(s)
 
          if (dbg) write(*,2) 'load_model: s% dq(1)', 1, s% dq(1)
          if (dbg) write(*,2) 'load_model: s% dm(1)', 1, s% dm(1)
@@ -375,7 +367,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% TDC_flag = BTEST(file_type, bit_for_w)
+         s% TDC_flag = BTEST(file_type, bit_for_etrb)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -598,7 +590,7 @@
             q, dq, omega, j_rot, lnT
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_etrb_RSP, &
+         integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -616,7 +608,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          no_L = (i_lum == 0)
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -625,7 +617,7 @@
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_w /= 0) n = n+increment_for_i_w ! read w
+         if (i_etrb /= 0) n = n+increment_for_i_etrb ! read etrb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
@@ -668,14 +660,14 @@
                   j=j+1; xh(i_erad_RSP,i) = vec(j)
                   j=j+1; xh(i_Fr_RSP,i) = vec(j)
                   j=j+1; ! discard
-               else if (i_w /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_w,i) = sqrt(max(0d0,vec(j)))
+               else if (i_etrb /= 0) then ! convert from RSP to TDC
+                  j=j+1; xh(i_etrb,i) = max(0d0,vec(j))
                   j=j+1; ! discard
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,i) = vec(j)
                end if
-            else if (i_w /= 0) then
-               j=j+1; xh(i_w,i) = max(vec(j),0d0)
+            else if (i_etrb /= 0) then
+               j=j+1; xh(i_etrb,i) = max(vec(j),0d0)
                j=j+1; xh(i_lum,i) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,i) = vec(j)

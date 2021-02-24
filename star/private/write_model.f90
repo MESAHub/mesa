@@ -80,7 +80,7 @@
          write(iounit,'(a)') '!'
          prev_flag = (s% nz_old == s% nz .and. s% generations > 1)
          file_type = 0
-         if (TDC_flag) file_type = file_type + 2**bit_for_w
+         if (TDC_flag) file_type = file_type + 2**bit_for_etrb
          if (RTI_flag) file_type = file_type + 2**bit_for_RTI
          if (conv_vel_flag) file_type = file_type + 2**bit_for_conv_vel_var
          if (prev_flag) file_type = file_type + 2**bit_for_2models
@@ -116,8 +116,8 @@
             write(iounit,'(a)',advance='no') ', convection velocity as solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
-         if (BTEST(file_type, bit_for_w)) &
-            write(iounit,'(a)',advance='no') ', turbulent velocity (w)'
+         if (BTEST(file_type, bit_for_etrb)) &
+            write(iounit,'(a)',advance='no') ', turbulent energy (etrb)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -201,7 +201,7 @@
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             else if (TDC_flag) then
-               call write1(s% w(k),ierr); if (ierr /= 0) exit
+               call write1(s% etrb(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit
@@ -272,7 +272,7 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_rsp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (TDC_flag) then
-               write(iounit, fmt='(a26, 1x)', advance='no') 'w'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'etrb'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'

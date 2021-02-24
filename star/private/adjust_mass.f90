@@ -43,7 +43,6 @@
       contains
 
       real(dp) function compute_delta_m(s) result(delta_m)
-         use star_utils, only: save_for_d_dt
          type (star_info), pointer :: s
          include 'formats'
          delta_m = s% dt*s% mstar_dot
@@ -61,7 +60,6 @@
             .or. (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
                   .and. s% star_mass >= s% max_star_mass_for_gain)) then
             s% mstar_dot = 0d0
-            call save_for_d_dt(s)
          end if
 
          delta_m = s% dt*s% mstar_dot
@@ -436,29 +434,6 @@
                rxm_new(k) = rxm_new(k-1) + new_cell_mass(k-1)
             end if
          end do
-
-         call set_cell_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, xq_center_old, xq_center_new, &
-            old_cell_mass, new_cell_mass, delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         if (ierr /= 0) then
-            s% retry_message = 'set_cell_stuff_for_d_dt failed in adjust mass'
-            if (s% report_ierr) write(*,*) s% retry_message
-            call dealloc
-            return
-         end if
-
-         call set_face_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         if (ierr /= 0) then
-            s% retry_message = 'set_face_stuff_for_d_dt failed in adjust mass'
-            if (s% report_ierr) write(*,*) s% retry_message
-            call dealloc
-            return
-         end if
 
          call set_xa(s, nz, k_const_mass, species, xa_old, xaccrete, &
             rxm_old, rxm_new, mmax, old_cell_mass, new_cell_mass, ierr)
@@ -1296,7 +1271,6 @@
          real(dp) :: r00, r003, ri, ro, rp13, rm13
          real(dp) :: w_div_wcrit_roche
 
-         !r00 = exp(s% lnR_for_d_dt_const_m(k))
          r00 = exp(s% xh(s% i_lnR, k))
          ! when using the fitted i_rot, the moment of inertia depends
          ! on the ratio of rotational frequency to its critical value.
@@ -1320,12 +1294,12 @@
             if (k == s% nz) then
                rp13 = pow3(s% R_center)
             else
-               rp13 = exp(3*s% lnR_for_d_dt_const_m(k+1))
+               rp13 = exp(3*s% xh(s% i_lnR, k+1))
             end if
             if (k == 1) then
                rm13 = r003
             else
-               rm13 = exp(3*s% lnR_for_d_dt_const_m(k-1))
+               rm13 = exp(3*s% xh(s% i_lnR, k-1))
             end if
             ri = pow((r003 + rp13)/2,one_third)
             ro = pow((r003 + rm13)/2,one_third)
@@ -1645,211 +1619,6 @@
          s% angular_momentum_removed = actual_J_lost
 
       end subroutine adjust_J_lost
-
-      subroutine set_cell_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, xq_center_old, xq_center_new,&
-             old_cell_mass, new_cell_mass, &
-            delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         use interp_1d_lib
-         use interp_1d_def
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in) :: &
-            rxm_old, rxm_new, xq_center_old, xq_center_new, &
-            old_cell_mass, new_cell_mass ! (nz)
-         real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), dimension(:) :: oldloc, newloc, oldval, newval
-         real(dp), pointer :: work(:)
-         integer, intent(out) :: ierr
-
-         integer :: n, nwork, j, i_lnT, i_lnd, i_w, i_u
-         logical :: dbg
-         real(dp) :: p(0)
-
-         include 'formats'
-         ierr = 0
-
-         dbg = .false.
-         n = nz ! k_const_mass
-         nwork = pm_work_size
-
-         i_lnT = s% i_lnT
-         i_lnd = s% i_lnd
-         i_w = s% i_w
-         i_u = s% i_u
-
-         oldloc(1) = 0
-         do j=2,n
-            oldloc(j) = rxm_old(j) + 0.5d0*old_cell_mass(j)
-         end do
-
-         do j=1,n
-            newloc(j) = rxm_new(j) + 0.5d0*new_cell_mass(j)
-         end do
-         
-         call set(oldloc, newloc, k_newval, &
-            s% lnd_for_d_dt_const_m, s% lnT_for_d_dt_const_m, &
-            s% w_for_d_dt_const_m, s% u_for_d_dt_const_m)
-
-         call set(xq_center_old, xq_center_new, 1, &
-            s% lnd_for_d_dt_const_q, s% lnT_for_d_dt_const_q, p, p)
-
-         contains
-
-         subroutine set(oldloc, newloc, k_below, &
-               lnd_for_d_dt, lnT_for_d_dt, w_for_d_dt, u_for_d_dt)
-            real(dp), dimension(:), intent(in) :: oldloc, newloc
-            real(dp), dimension(:), intent(inout) :: &
-               lnd_for_d_dt, lnT_for_d_dt, w_for_d_dt, u_for_d_dt
-            integer, intent(in) :: k_below
-            call set1var(oldloc, newloc, k_below, i_w, w_for_d_dt)
-            call set1var(oldloc, newloc, k_below, i_u, u_for_d_dt)
-            call set1var(oldloc, newloc, k_below, i_lnd, lnd_for_d_dt)
-            call set1var(oldloc, newloc, k_below, i_lnT, lnT_for_d_dt)
-         end subroutine set
-
-
-         subroutine set1var(oldloc, newloc, k_below, i, v)
-            real(dp), dimension(:), intent(in) :: oldloc, newloc
-            integer, intent(in) :: k_below,i
-            real(dp), intent(inout) :: v(:)
-            integer :: j
-            include 'formats'
-            if (i == 0) return
-            if (size(v,dim=1) == 0) return
-            do j=1,n
-               oldval(j) = s% xh(i,j)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_cell_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do j=1,k_below-1
-               v(j) = 0
-            end do
-            do j=k_below,n
-               v(j) = newval(j)
-            end do
-         end subroutine set1var
-
-      end subroutine set_cell_stuff_for_d_dt
-
-
-      subroutine set_face_stuff_for_d_dt( &
-            s, nz, k_const_mass, k_newval, &
-            rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
-            oldloc, newloc, oldval, newval, work, ierr)
-         use interp_1d_lib
-         use interp_1d_def
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
-         real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
-         real(dp), dimension(:) :: oldloc, newloc, oldval, newval
-
-         real(dp), pointer :: work(:)
-
-         integer, intent(out) :: ierr
-
-         integer :: n, nwork, k
-         logical :: dbg
-
-         include 'formats'
-
-         ierr = 0
-
-         dbg = .false.
-         n = nz! k_const_mass
-         nwork = pm_work_size
-
-         oldloc(1) = 0
-         do k=2,n
-            oldloc(k) = rxm_old(k)
-         end do
-         do k=1,n
-            newloc(k) = rxm_new(k)
-            oldval(k) = s% xh(s% i_lnR, k)
-         end do
-         call interpolate_vector( &
-            n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-            'adjust_mass set_face_stuff_for_d_dt', ierr)
-         if (ierr /= 0) return
-         do k=1,k_newval-1
-            s% lnR_for_d_dt_const_m(k) = s% xh(s% i_lnR, 1)
-         end do
-         do k=k_newval,n
-            s% lnR_for_d_dt_const_m(k) = newval(k)
-         end do
-
-         if (s% v_flag) then
-            do k=1,n
-               oldval(k) = s% xh(s% i_v, k)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% v_for_d_dt_const_m(k) = 0
-            end do
-            do k=k_newval,n
-               s% v_for_d_dt_const_m(k) = newval(k)
-            end do
-         end if
-
-         if (s% RTI_flag) then
-            do k=1,n
-               oldval(k) = s% xh(s% i_alpha_RTI, k)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% alpha_RTI_for_d_dt_const_m(k) = 0
-            end do
-            do k=k_newval,n
-               s% alpha_RTI_for_d_dt_const_m(k) = newval(k)
-            end do
-         end if
-
-         if (s% conv_vel_flag) then
-            do k=1,n
-               oldval(k) = max(0d0, exp(s% xh(s% i_ln_cvpv0, k)) - s% conv_vel_v0)
-            end do
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,k_newval-1
-               s% ln_cvpv0_for_d_dt_const_m(k) = log(s% conv_vel_v0)
-            end do
-            do k=k_newval,n
-               if (newval(k) + s% conv_vel_v0 <= 0) then
-                  s% ln_cvpv0_for_d_dt_const_m(k) = log(s% conv_vel_v0)
-               else
-                  s% ln_cvpv0_for_d_dt_const_m(k) = log(newval(k) + s% conv_vel_v0)
-               end if
-            end do
-            ! setup for derivatives wrt to q as well
-            oldloc(1:n) = (oldloc(1:n) - oldloc(1))/oldloc(n)
-            newloc(1:n) = (newloc(1:n) - newloc(1))/newloc(n)
-            call interpolate_vector( &
-               n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
-               'adjust_mass set_face_stuff_for_d_dt', ierr)
-            if (ierr /= 0) return
-            do k=1,n
-               if (newval(k) + s% conv_vel_v0 <= 0) then
-                  s% ln_cvpv0_for_d_dt_const_q(k) = log(s% conv_vel_v0)
-               else
-                  s% ln_cvpv0_for_d_dt_const_q(k) = log(newval(k) + s% conv_vel_v0)
-               end if
-            end do
-         end if
-
-      end subroutine set_face_stuff_for_d_dt
 
 
       subroutine set_D_omega( &

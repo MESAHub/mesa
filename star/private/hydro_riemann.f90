@@ -155,13 +155,12 @@
          if (k == 1) scal = scal*1d-2
          
          dudt_actual_ad = 0d0
-         dudt_actual_ad%val = s% du_dt(k)
+         dudt_actual_ad%val = s% dxh_u(k)/dt
          dudt_actual_ad%d1Array(i_v_00) = 1d0/dt
          
          resid_ad = scal*(dudt_expected_ad - dudt_actual_ad)
          residual = resid_ad%val
          s% equ(i_du_dt, k) = residual
-         s% u_residual(k) = residual
          
          if (is_bad(residual)) then
             ierr = -1

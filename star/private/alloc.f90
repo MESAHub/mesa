@@ -609,57 +609,32 @@
             if (failed('u')) exit
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
-            
-            call do1(s% w, c% w)
-            if (failed('et')) exit
-            call do1(s% w_start, c% w_start)
-            if (failed('et_start')) exit
+            call do1(s% etrb, c% etrb)
+            if (failed('etrb')) exit
+            call do1(s% etrb_start, c% etrb_start)
+            if (failed('etrb_start')) exit
             
             call do1(s% dxh_lnd, c% dxh_lnd)
             if (failed('dxh_lnd')) exit
-            call do1(s% dxh_lnPgas, c% dxh_lnPgas)
-            if (failed('dxh_lnPgas')) exit
             call do1(s% dxh_lnT, c% dxh_lnT)
             if (failed('dxh_lnT')) exit
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
-            call do1(s% dxh_w, c% dxh_w)
-            if (failed('dxh_w')) exit
+            call do1(s% dxh_v, c% dxh_v)
+            if (failed('dxh_v')) exit
+            call do1(s% dxh_u, c% dxh_u)
+            if (failed('dxh_u')) exit
+            call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
+            if (failed('dxh_alpha_RTI')) exit
+            call do1(s% dxh_etrb, c% dxh_etrb)
+            if (failed('dxh_etrb')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
             if (failed('dxh_ln_cvpv0')) exit
-
-            call do1(s% dlnd_dt, c% dlnd_dt)
-            if (failed('dlnd_dt')) exit
-            call do1(s% dlnT_dt, c% dlnT_dt)
-            if (failed('dlnT_dt')) exit
-            call do1(s% dlnR_dt, c% dlnR_dt)
-            if (failed('dlnR_dt')) exit
-            call do1(s% dw_dt, c% dw_dt)
-            if (failed('dw_dt')) exit
-            call do1(s% dv_dt, c% dv_dt)
-            if (failed('dv_dt')) exit
-            call do1(s% du_dt, c% du_dt)
-            if (failed('du_dt')) exit
-            call do1(s% dalpha_RTI_dt, c% dalpha_RTI_dt)
-            if (failed('dalpha_RTI_dt')) exit
-            call do1(s% dEtRSP_dt, c% dEtRSP_dt)
-            if (failed('dEtRSP_dt')) exit
-            call do1(s% dln_cvpv0_dt, c% dln_cvpv0_dt)
-            if (failed('dln_cvpv0_dt')) exit
-            call do1(s% dj_rot_dt, c% dj_rot_dt)
-            if (failed('dj_rot_dt')) exit
 
             call do1(s% dudt_RTI, c% dudt_RTI)
             if (failed('dudt_RTI')) exit
             call do1(s% dedt_RTI, c% dedt_RTI)
             if (failed('dedt_RTI')) exit
-
-            call do1(s% dlnd_dt_const_q, c% dlnd_dt_const_q)
-            if (failed('dlnd_dt_const_q')) exit
-            call do1(s% dlnT_dt_const_q, c% dlnT_dt_const_q)
-            if (failed('dlnT_dt_const_q')) exit
-            call do1(s% dln_cvpv0_dt_const_q, c% dln_cvpv0_dt_const_q)
-            if (failed('dln_cvpv0_dt_const_q')) exit
 
             call do1(s% T, c% T)
             if (failed('T')) exit
@@ -828,31 +803,6 @@
             if (failed('lntau')) exit
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
-
-            call do1(s% lnR_residual, c% lnR_residual)
-            if (failed('lnR_residual')) exit
-            call do1(s% lnd_residual, c% lnd_residual)
-            if (failed('lnd_residual')) exit
-            call do1(s% equL_residual, c% equL_residual)
-            if (failed('equL_residual')) exit
-            call do1(s% E_residual, c% E_residual)
-            if (failed('E_residual')) exit
-            call do1(s% etrb_residual, c% etrb_residual)
-            if (failed('etrb_residual')) exit
-            call do1(s% v_residual, c% v_residual)
-            if (failed('v_residual')) exit
-            call do1(s% u_residual, c% u_residual)
-            if (failed('u_residual')) exit
-            call do1(s% Vol_residual, c% Vol_residual)
-            if (failed('Vol_residual')) exit
-            call do1(s% max_abs_xa_residual, c% max_abs_xa_residual)
-            if (failed('max_abs_xa_residual')) exit
-
-
-            call do1(s% w_residual, c% w_residual) ! temporary for backward compatibility debugging.
-            if (failed('w_residual')) exit
-
-
 
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit            
@@ -1166,6 +1116,8 @@
             if (failed('dpedt')) exit
             call do1(s% dedt, c% dedt)
             if (failed('dedt')) exit
+            call do1(s% detrbdt, c% detrbdt)
+            if (failed('detrbdt')) exit
 
             call do1_integer(s% mlt_mixing_type, c% mlt_mixing_type)
             if (failed('mlt_mixing_type')) exit
@@ -1387,30 +1339,6 @@
             call do1(s% L_nuc_burn, c% L_nuc_burn)
             if (failed('L_nuc_burn')) exit
 
-            call do1(s% lnT_for_d_dt_const_m, c% lnT_for_d_dt_const_m)
-            if (failed('lnT_for_d_dt_const_m')) exit
-            call do1(s% lnd_for_d_dt_const_m, c% lnd_for_d_dt_const_m)
-            if (failed('lnd_for_d_dt_const_m')) exit
-            call do1(s% lnR_for_d_dt_const_m, c% lnR_for_d_dt_const_m)
-            if (failed('lnR_for_d_dt_const_m')) exit
-            call do1(s% w_for_d_dt_const_m, c% w_for_d_dt_const_m)
-            if (failed('et_for_d_dt_const_m')) exit
-            call do1(s% v_for_d_dt_const_m, c% v_for_d_dt_const_m)
-            if (failed('v_for_d_dt_const_m')) exit
-            call do1(s% u_for_d_dt_const_m, c% u_for_d_dt_const_m)
-            if (failed('u_for_d_dt_const_m')) exit
-            call do1(s% alpha_RTI_for_d_dt_const_m, c% alpha_RTI_for_d_dt_const_m)
-            if (failed('alpha_RTI_for_d_dt_const_m')) exit
-            call do1(s% ln_cvpv0_for_d_dt_const_m, c% ln_cvpv0_for_d_dt_const_m)
-            if (failed('ln_cvpv0_for_d_dt_const_m')) exit
-
-            call do1(s% lnT_for_d_dt_const_q, c% lnT_for_d_dt_const_q)
-            if (failed('lnT_for_d_dt_const_q')) exit
-            call do1(s% lnd_for_d_dt_const_q, c% lnd_for_d_dt_const_q)
-            if (failed('lnd_for_d_dt_const_q')) exit
-            call do1(s% ln_cvpv0_for_d_dt_const_q, c% ln_cvpv0_for_d_dt_const_q)
-            if (failed('ln_cvpv0_for_d_dt_const_q')) exit
-
             call do2(s% xa_start, c% xa_start, species, 'xa_start')
             if (failed('xa_start')) exit
             call do2(s% xa_sub_xa_start, c% xa_sub_xa_start, species, 'xa_sub_xa_start')
@@ -1440,6 +1368,8 @@
             if (failed('Prad_start')) exit
             call do1(s% lnR_start, c% lnR_start)
             if (failed('lnR_start')) exit
+            call do1(s% etrb_start, c% etrb_start)
+            if (failed('etrb_start')) exit
             call do1(s% v_start, c% v_start)
             if (failed('v_start')) exit
             call do1(s% u_start, c% u_start)
@@ -2633,9 +2563,9 @@
          end if
          
          if (s% TDC_flag) then
-            i = i+1; s% i_w = i
+            i = i+1; s% i_etrb = i
          else 
-            s% i_w = 0
+            s% i_etrb = 0
          end if
 
          if (s% conv_vel_flag) then
@@ -2673,7 +2603,7 @@
             s% i_du_dt = 0
          end if
       
-         s% i_dw_dt = s% i_w
+         s% i_detrb_dt = s% i_etrb
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_detrb_RSP_dt = s% i_etrb_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
@@ -2695,7 +2625,7 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
+         if (s% i_etrb /= 0) s% nameofvar(s% i_etrb) = 'etrb'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2711,7 +2641,7 @@
          if (s% i_dlnd_dt /= 0) s% nameofequ(s% i_dlnd_dt) = 'dlnd_dt'
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
-         if (s% i_dw_dt /= 0) s% nameofequ(s% i_dw_dt) = 'dw_dt'
+         if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_detrb_RSP_dt /= 0) s% nameofequ(s% i_detrb_RSP_dt) = 'detrb_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
@@ -2835,7 +2765,7 @@
                s% v(1:nz) = 0d0
             else
                do k=1,nz
-                  s% xh(i_v,k) = s% r(k)*s% dlnR_dt(k)
+                  s% xh(i_v,k) = 0d0
                   if (is_bad(s% xh(i_v,k))) s% xh(i_v,k) = 0d0
                   s% v(k) = s% xh(i_v,k)
                end do
@@ -2923,17 +2853,13 @@
                k = nz
                s% xh(i_u,k) = 0.5d0*(s% xh(i_v,k) + s% v_center)
             else
-               do k=1,nz-1
-                  s% xh(i_u,k) = 0.5d0* &
-                     (s% r(k)*s% dlnR_dt(k) + s% r(k+1)*s% dlnR_dt(k+1))
+               do k=1,nz
+                  s% xh(i_u,k) = 0d0
                end do
-               k = nz
-               s% xh(i_u,k) = 0.5d0*(s% r(k)*s% dlnR_dt(k) + s% v_center)
             end if
             if (associated(s% xh_old) .and. s% generations > 1) call insert(s% xh_old)
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
-            s% du_dt(1:nz) = 0
          end if
 
          call set_chem_names(s)
@@ -3076,7 +3002,7 @@
 
          nz = s% nz
          
-         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn w on
+         if (TDC_flag .and. s% RSP_flag) then ! turn RSP off before turn TDC on
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
@@ -3084,7 +3010,7 @@
          s% TDC_flag = TDC_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. TDC_flag) call remove1(s% i_w)
+         if (.not. TDC_flag) call remove1(s% i_etrb)
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
@@ -3102,7 +3028,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (TDC_flag) call insert1(s% i_w)
+         if (TDC_flag) call insert1(s% i_etrb)
 
          call set_chem_names(s)
          
