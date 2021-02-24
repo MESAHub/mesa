@@ -307,7 +307,7 @@
             Cv0 = s% Cv(k)
             eta0 = s% eta(k)
             call net_1_zone_burn_const_density( &
-               s% net_handle, species, s% num_reactions, 0d0, dt, &
+               s% net_handle, s% eos_handle, species, s% num_reactions, 0d0, dt, &
                xa_start, starting_log10T, s% lnd(k)/ln10, &
                get_eos_info_for_burn_at_const_density, &
                s% rate_factors, s% weak_rate_factor, &
@@ -337,7 +337,7 @@
             log10Rhos_f1(1) = s% lnd(k)/ln10
             etas_f1(1) = s% eta(k)
             call net_1_zone_burn( &
-               s% net_handle, species, s% num_reactions, 0d0, dt, xa_start, &
+               s% net_handle, s% eos_handle, species, s% num_reactions, 0d0, dt, xa_start, &
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
                s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
@@ -386,44 +386,45 @@
          contains
          
          subroutine get_eos_info_for_burn_at_const_density( &
-               z, xh, abar, zbar, xa, rho, logRho, T, logT, &
+               eos_handle, species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, &
                Cv, d_Cv_dlnT, eta, d_eta_dlnT, ierr)
-            use eos_lib, only: eos_get_helm_results
+            use eos_lib, only: eosDT_get
             use eos_def
+            integer, intent(in) :: eos_handle, species
+            integer, pointer :: chem_id(:) ! maps species to chem id
+            integer, pointer :: net_iso(:) ! maps chem id to species number
             real(dp), intent(in) :: &
-               z, xh, abar, zbar, xa(:), rho, logRho, T, logT
+               xa(:), rho, logRho, T, logT
             real(dp), intent(out) :: &
                Cv, d_Cv_dlnT, eta, d_eta_dlnT
-            integer, intent(out) :: ierr            
-            real(dp) :: res(num_helm_results)
-            real(dp), parameter :: coulomb_temp_cut = 1d6, coulomb_den_cut = 1d3
+            integer, intent(out) :: ierr
+
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
+            real(dp) :: d_dxa(num_eos_d_dxa_results,species)
+
             include 'formats'
             ierr = 0
             
-            Cv = Cv0
-            d_Cv_dlnT = 0d0
-            
-            eta = eta0
-            d_eta_dlnT = 0d0
-            
-            !return
-            
-            call eos_get_helm_results( &
-               xh, abar, zbar, rho, logRho, T, logT, &
-               coulomb_temp_cut, coulomb_den_cut, &
-               .true., .false., .false., &
-               s% eos_rq% logT_ion_HELM, s% eos_rq% logT_neutral_HELM, &
-               res, ierr)
+            call eosDT_get( &
+               eos_handle, species, chem_id, net_iso, xa, &
+               Rho, logRho, T, logT, &
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
+
             if (ierr /= 0) then
-               !write(*,2) 'burn1_zone failed in eos_get_helm_results', k
+               write(*,*) 'failed in eosDT_get'
                return
-            end if            
-            Cv = res(h_cv)
-            d_Cv_dlnT = res(h_dcvdt)*T
-            eta = res(h_etaele)
-            d_eta_dlnT = res(h_detat)*T
-         end subroutine get_eos_info_for_burn_at_const_density
+            end if
+
+            Cv = res(i_cv)
+            d_Cv_dlnT = d_dlnT(i_cv)
+
+            eta = res(i_eta)
+            d_eta_dlnT = d_dlnT(i_eta)
          
+         end subroutine get_eos_info_for_burn_at_const_density
+
+
          subroutine burn_finish_substep(nstp, time, y, ierr)
             use chem_def, only: category_name
             integer,intent(in) :: nstp
