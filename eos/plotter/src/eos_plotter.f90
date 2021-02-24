@@ -536,10 +536,8 @@ contains
          real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
          integer, intent(out) :: ierr ! 0 means AOK.
-         real(dp) :: d_dxa_eos(num_eos_basic_results,species) ! eos internally returns derivs of all quantities
          type (EoS_General_Info), pointer :: rq
-         real(dp) :: Pgas, Prad, energy, entropy, Y, Z, X, abar, zbar, &
-            z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0 .and. .not. ignore_ierr) then
             write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
@@ -552,11 +550,6 @@ contains
             Rho, log10Rho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          else
-            call basic_composition_info( &
-               species, chem_id, xa, X, Y, Z, &
-               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-            d_dxa = 0
-
             call eosDT_test_component( &
                   handle, i_eos, species, chem_id, net_iso, xa, &
                   Rho, logRho, T, logT, &
