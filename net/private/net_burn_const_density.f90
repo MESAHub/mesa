@@ -523,11 +523,8 @@
                         stop 'jakob_or_derivs'
                      end if
                   end do
-                  !dfdy(j,nvar) = T*d_dxdt_dT(j) ! d_dxdt_dlnT
-                  dfdy(j,nvar) = 0d0 ! TESTING
-                  !if (j /= 22) dfdy(j,nvar) = 0d0 ! TESTING
-                  !if (j==5 .or. j==13 .or. j==14 .or. j==19 .or. j==20 .or. j==22) dfdy(j,nvar) = 0d0 ! TESTING
-                  !if (j== 11) dfdy(j,nvar) = 0d0 ! TESTING
+                  dfdy(j,nvar) = T*d_dxdt_dT(j)/aion(j) ! d_dxdt_dlnT
+                  !dfdy(j,nvar) = 0d0 ! TESTING
                end do
                do j = 1,species
                   dfdy(nvar,j) = d_eps_nuc_dx(j)/(Cv*T) ! d_lnT_dx(j)
