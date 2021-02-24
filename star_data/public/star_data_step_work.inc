@@ -36,12 +36,10 @@
       real(dp), pointer :: rho(:) ! density
       real(dp), pointer :: lnd(:) ! log(rho)
       real(dp), pointer :: lnPgas(:) ! log(Pgas)
-      real(dp), pointer :: L(:)
-         ! L(k) is luminosity at outer edge of cell k
-      real(dp), pointer :: r(:)
-         ! r(k) is radius at outer edge of cell k
-      real(dp), pointer :: lnR(:)
-         ! lnR(k) is log(r(k))
+      real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
+      real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
+      real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
+      real(dp), pointer :: etrb(:) ! specific turbulent energy.  only used when TDC_flag is true
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -148,11 +146,13 @@
       real(dp), pointer :: lnd_residual(:)
       real(dp), pointer :: equL_residual(:)
       real(dp), pointer :: E_residual(:)
-      real(dp), pointer :: w_residual(:)
+      real(dp), pointer :: etrb_residual(:)
       real(dp), pointer :: v_residual(:)
       real(dp), pointer :: u_residual(:)
       real(dp), pointer :: Vol_residual(:)
       real(dp), pointer :: max_abs_xa_residual(:)
+
+      real(dp), pointer :: w_residual(:) ! temporary for backward compatibility debugging.
 
       real(dp), pointer :: ergs_error(:)
 
@@ -466,7 +466,7 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent velocity w
+      ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
             w, w_start, Pt, Eq, Uq, avQ, avQ_start, &

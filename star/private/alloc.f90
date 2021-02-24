@@ -837,8 +837,8 @@
             if (failed('equL_residual')) exit
             call do1(s% E_residual, c% E_residual)
             if (failed('E_residual')) exit
-            call do1(s% w_residual, c% w_residual)
-            if (failed('w_residual')) exit
+            call do1(s% etrb_residual, c% etrb_residual)
+            if (failed('etrb_residual')) exit
             call do1(s% v_residual, c% v_residual)
             if (failed('v_residual')) exit
             call do1(s% u_residual, c% u_residual)
@@ -847,6 +847,12 @@
             if (failed('Vol_residual')) exit
             call do1(s% max_abs_xa_residual, c% max_abs_xa_residual)
             if (failed('max_abs_xa_residual')) exit
+
+
+            call do1(s% w_residual, c% w_residual) ! temporary for backward compatibility debugging.
+            if (failed('w_residual')) exit
+
+
 
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit            

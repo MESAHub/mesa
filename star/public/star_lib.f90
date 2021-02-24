@@ -1302,7 +1302,7 @@
       subroutine star_relax_mass_to_remove_H_env( &
             id, extra_mass, lg_max_abs_mdot, ierr) ! also resets initial_mass
          use relax, only: do_relax_mass
-         use hydro_vars, only: get_mass_info
+         use report, only: get_mass_info
          integer, intent(in) :: id
          real(dp), intent(in) :: extra_mass
          real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
@@ -2066,7 +2066,7 @@
             lgP, g, X, Y, edv_H, edv_He, &
             scale_height, dlnX_dr, dlnY_dr, dlnRho_dr, &
             omega, omega_div_omega_crit)
-         use hydro_vars, only: get_info_at_q
+         use report, only: get_info_at_q
          type (star_info), pointer :: s
          real(dp), intent(in) :: q ! relative mass coord
          integer, intent(out) :: kbdy

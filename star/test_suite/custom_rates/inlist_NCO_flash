@@ -81,7 +81,7 @@
       varcontrol_target = 1d-4
 
       ! limit timestep based on T and eps_nuc
-      ! this helps prevent retries/backups during the runaway
+      ! this helps prevent retries during the runaway
       delta_log_eps_nuc_limit = 0.03
       delta_lgT_cntr_limit = 0.001
 

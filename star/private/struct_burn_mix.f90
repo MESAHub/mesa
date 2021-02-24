@@ -287,7 +287,7 @@
 
 
       subroutine save_start_values(s, ierr)
-         use hydro_vars, only: set_luminosity_by_category
+         use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
          use hydro_tdc, only: set_w_start_vars
          use star_utils, only: eval_total_energy_integrals

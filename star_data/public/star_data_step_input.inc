@@ -51,6 +51,7 @@
          logical :: rotation_flag ! true for rotation variables     
          logical :: RTI_flag ! true for Rayleigh-Taylor instabilities     
          logical :: RSP_flag ! true if we using RSP      
+         logical :: TDC_flag ! true for turbulent velocity as a solver variable    
 
       ! index definitions for the variables (= 0 if variable not in use)
          integer :: i_lnd ! ln(cell density average by mass)
@@ -61,6 +62,9 @@
          integer :: i_u ! Lagrangian velocity at center of cell
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
          integer :: i_etrb_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
+         integer :: i_etrb ! cell turbulent energy. only when TDC_flag is true.
+         
+         integer :: i_w, i_dw_dt ! temporary for backward compatibility debugging.
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r
@@ -71,6 +75,7 @@
          integer :: i_equL ! luminosity
          integer :: i_dalpha_RTI_dt ! alpha for Rayleigh-Taylor instabilities
          integer :: i_detrb_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
+         integer :: i_detrb_dt ! turbulent energy equation. only when TDC_flag is true.
 
       ! names of variables and equations
          character (len=name_len), dimension(:), pointer :: nameofvar, nameofequ ! (nvar)
@@ -161,22 +166,19 @@
          real(dp) :: power_photo
    
    
-      ! experimental work in progress.  not for public use yet.
+      ! experimental work in progress.
       
          logical :: conv_vel_flag ! true for conv_vel as a solver variable     
          logical :: w_div_wc_flag ! true for w_div_wc as a solver variable     
          logical :: j_rot_flag ! true for j_rot as a solver variable     
-         logical :: TDC_flag ! true for turbulent velocity as a solver variable    
 
          integer :: i_ln_cvpv0 ! ln(conv_vel + v0) at face of cell. v0 is an arbitrary user defined value.
          integer :: i_w_div_wc ! ratio of omega to critical value without the Eddington factor
          integer :: i_j_rot ! specific angular momentum associated to cell face
-         integer :: i_w ! cell turbulent velocity. only when TDC_flag is true.
 
          integer :: i_dln_cvpv0_dt ! equation for convection velocities
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
-         integer :: i_dw_dt ! turbulent velocity equation. only when TDC_flag is true.
 
          logical :: have_previous_conv_vel ! only needed when set conv_vel_flag true
 
