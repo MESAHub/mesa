@@ -76,12 +76,11 @@
 
       subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          use hydro_vars, only: set_vars
-         use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, reset_epsnuc_vectors, &
+         use star_utils, only: set_m_and_dm, set_dm_bar, reset_epsnuc_vectors, &
             set_qs, save_for_d_dt
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
-         use report, only: do_report
          use alloc, only: fill_ad_with_zeros
          type (star_info), pointer :: s
          logical, intent(in) :: restart, want_rsp_model, is_rsp_model
@@ -182,18 +181,6 @@
          end if
          s% doing_finish_load_model = .false.
 
-         if (s% rotation_flag) then
-            s% total_angular_momentum = total_angular_momentum(s)
-            if (s% trace_k > 0 .and. s% trace_k <= nz) then
-               do k=1,nz
-                  write(*,3) 'lnr', s% model_number, k, s% xh(s% i_lnR, k)
-                  write(*,3) 'i_rot', s% model_number, k, s% i_rot(k)
-                  write(*,3) 'j_rot', s% model_number, k, s% j_rot(k)
-                  write(*,3) 'omega', s% model_number, k, s% omega(k)
-               end do
-            end if
-         end if
-
          if (s% RSP_flag) then
             call rsp_setup_part2(s, restart, want_rsp_model, is_rsp_model, ierr)
             if (ierr /= 0) then
@@ -211,14 +198,6 @@
                write(*,4) 'finish_load_model after set_vars xa(j)', &
                   s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
             end do
-         end if
-
-         s% doing_finish_load_model = .true.
-         call do_report(s, ierr)
-         s% doing_finish_load_model = .false.
-         if (ierr /= 0) then
-            write(*,*) 'finish_load_model: failed in do_report'
-            return
          end if
 
       end subroutine finish_load_model

@@ -52,7 +52,7 @@
 &controls
 
       use_dedt_form_of_energy_eqn = .true.
-      use_gold2_tolerances = .true.
+      use_gold2_tolerances = .false.
       use_d_eos_dxa = .true.
 
       num_trace_history_values = 2

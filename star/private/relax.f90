@@ -3555,7 +3555,7 @@
 
       integer function relax_to_radiative_core_check_model(s, id, lipar, ipar, lrpar, rpar)
          use do_one_utils, only:do_bare_bones_check_model
-         use report, only: set_power_info
+         use hydro_vars, only: set_power_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)

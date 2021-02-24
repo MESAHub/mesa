@@ -360,7 +360,6 @@
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils
-         use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
          integer, intent(in) :: id
@@ -560,7 +559,6 @@
       integer function do_step_part2(id, first_try)
          use num_def
          use chem_def
-         use report, only: do_report, set_power_info
          use adjust_mass, only: do_adjust_mass
          use element_diffusion, only: do_element_diffusion, finish_element_diffusion
          use conv_premix, only: do_conv_premix
@@ -573,7 +571,6 @@
          use solve_omega_mix, only: do_solve_omega_mix
          use mix_info, only: set_cz_bdy_mass, set_mixing_info
          use hydro_rotation, only: set_rotation_info, set_i_rot
-         use solve_hydro, only: set_luminosity_by_category
          use winds, only: set_mdot
          use star_utils, only: &
             eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals, &
@@ -764,12 +761,6 @@
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_surface, -1, ierr)
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
 
-         call set_luminosity_by_category(s) ! final values for use in selecting timestep
-         call set_power_info(s)
-
-         s% total_angular_momentum = total_angular_momentum(s)
-         call do_report(s, ierr)
-         if (failed('do_report')) return
          call set_phase_of_evolution(s)
             
          call system_clock(time0,clock_rate)
@@ -1765,10 +1756,8 @@
 
 
       subroutine set_start_of_step_info(s, str, ierr)
-         use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
          use mlt_info, only: set_gradT_excess_alpha
-         use solve_hydro, only: set_luminosity_by_category
          use star_utils, only: min_dr_div_cs, save_for_d_dt, &
             total_angular_momentum, eval_Ledd
 
@@ -1790,11 +1779,6 @@
             call save_for_d_dt(s)
             call set_vars_if_needed(s, s% dt, str, ierr)
             if (failed('set_vars_if_needed')) return     
-            s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
-            call set_luminosity_by_category(s)
-            s% total_angular_momentum = total_angular_momentum(s)
-            call do_report(s, ierr)
-            if (failed('do_report ierr')) return     
          end if
 
          ! save a few things from start of step that will need later
@@ -1836,7 +1820,6 @@
          use evolve_support, only: new_generation
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV
-         use report, only: set_phot_info
          use hydro_vars, only: set_vars_if_needed
 
          type (star_info), pointer :: s
@@ -1904,7 +1887,6 @@
          
          call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
          if (failed('set_vars_if_needed ierr')) return
-         call set_phot_info(s)
          
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
