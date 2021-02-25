@@ -808,6 +808,7 @@
             use_velocity_time_centering, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
+            use_Fraley_PdV_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &

@@ -7954,6 +7954,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_Fraley_PdV_work_when_time_centering_velocity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -7968,6 +7970,7 @@
     steps_before_use_velocity_time_centering = -1
     include_P_in_velocity_time_centering = .false.
     include_L_in_velocity_time_centering = .false.
+    use_Fraley_PdV_work_when_time_centering_velocity = .false.
 
 
       ! use_dPrad_dm_form_of_T_gradient_eqn

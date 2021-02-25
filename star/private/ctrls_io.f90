@@ -348,7 +348,7 @@
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
-    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, &
+    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_Fraley_PdV_work_when_time_centering_velocity, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
 
@@ -1846,6 +1846,7 @@
  s% use_velocity_time_centering = use_velocity_time_centering
  s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
+ s% use_Fraley_PdV_work_when_time_centering_velocity = use_Fraley_PdV_work_when_time_centering_velocity
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
 
  s% RTI_A = RTI_A
@@ -3482,6 +3483,7 @@
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
+ use_Fraley_PdV_work_when_time_centering_velocity = s% use_Fraley_PdV_work_when_time_centering_velocity
 
  RTI_A = s% RTI_A
  RTI_B = s% RTI_B
