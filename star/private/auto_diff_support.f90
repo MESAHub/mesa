@@ -171,7 +171,6 @@
       !----------------------------------------------------------------------------------------------------
 
 
-      !! Wrap the temperature at cell k-1 with appropriate dependences on the (ordered) independent variables.
       function wrap_T_m1(s, k) result(T_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: T_m1
@@ -183,7 +182,6 @@
          end if
       end function wrap_T_m1
 
-      !! Wrap the temperature at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_T_00(s, k) result(T_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: T_00
@@ -193,7 +191,6 @@
          T_00 % d1Array(i_lnT_00) = s%T(k)
       end function wrap_T_00
 
-      !! Wrap the temperature at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_T_p1(s, k) result(T_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: T_p1
@@ -205,8 +202,37 @@
          end if
       end function wrap_T_p1
 
+      function wrap_lnT_m1(s, k) result(lnT_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnT_m1
+         integer, intent(in) :: k
+         lnT_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            lnT_m1 % val = s%lnT(k-1)
+            lnT_m1 % d1Array(i_lnT_m1) = 1d0
+         end if
+      end function wrap_lnT_m1
 
-      !! Wrap the density at cell k-1 with appropriate dependences on the (ordered) independent variables.
+      function wrap_lnT_00(s, k) result(lnT_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnT_00
+         integer, intent(in) :: k
+         lnT_00 = 0d0 ! sets val and d1Array to 0
+         lnT_00 % val = s%lnT(k)
+         lnT_00 % d1Array(i_lnT_00) = 1d0
+      end function wrap_lnT_00
+
+      function wrap_lnT_p1(s, k) result(lnT_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnT_p1
+         integer, intent(in) :: k
+         lnT_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s%nz) then
+            lnT_p1 % val = s%lnT(k+1)
+            lnT_p1 % d1Array(i_lnT_p1) = 1d0
+         end if
+      end function wrap_lnT_p1
+
       function wrap_d_m1(s, k) result(d_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: d_m1
@@ -218,7 +244,6 @@
          end if
       end function wrap_d_m1
 
-      !! Wrap the density at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_d_00(s, k) result(d_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: d_00
@@ -228,7 +253,6 @@
          d_00 % d1Array(i_lnd_00) = s%rho(k)
       end function wrap_d_00
 
-      !! Wrap the density at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_d_p1(s, k) result(d_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: d_p1
@@ -240,8 +264,37 @@
          end if
       end function wrap_d_p1
 
+      function wrap_lnd_m1(s, k) result(lnd_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnd_m1
+         integer, intent(in) :: k
+         lnd_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            lnd_m1 % val = s%lnd(k-1)
+            lnd_m1 % d1Array(i_lnd_m1) = 1d0
+         end if
+      end function wrap_lnd_m1
 
-      !! Wrap etrb at cell k-1 with appropriate dependences on the (ordered) independent variables.
+      function wrap_lnd_00(s, k) result(lnd_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnd_00
+         integer, intent(in) :: k
+         lnd_00 = 0d0 ! sets val and d1Array to 0
+         lnd_00 % val = s%lnd(k)
+         lnd_00 % d1Array(i_lnd_00) = 1d0
+      end function wrap_lnd_00
+
+      function wrap_lnd_p1(s, k) result(lnd_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnd_p1
+         integer, intent(in) :: k
+         lnd_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s%nz) then
+            lnd_p1 % val = s%lnd(k+1)
+            lnd_p1 % d1Array(i_lnd_p1) = 1d0
+         end if
+      end function wrap_lnd_p1
+
       function wrap_etrb_m1(s, k) result(etrb_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: etrb_m1
@@ -253,7 +306,6 @@
          end if            
       end function wrap_etrb_m1
 
-      !! Wrap etrb at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_etrb_00(s, k) result(etrb_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: etrb_00
@@ -263,7 +315,6 @@
          etrb_00 % d1Array(i_etrb_00) = 1d0
       end function wrap_etrb_00
 
-      !! Wrap etrb at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_etrb_p1(s, k) result(etrb_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: etrb_p1
@@ -275,8 +326,6 @@
          end if
       end function wrap_etrb_p1
 
-
-      !! Wrap w at cell k-1 with appropriate dependences on the (ordered) independent variables.
       function wrap_w_m1(s, k) result(w_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: w_m1
@@ -288,7 +337,6 @@
          end if            
       end function wrap_w_m1
 
-      !! Wrap w at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_w_00(s, k) result(w_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: w_00
@@ -298,7 +346,6 @@
          w_00 % d1Array(i_etrb_00) = 0.5d0/s%w(k)
       end function wrap_w_00
 
-      !! Wrap w at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_w_p1(s, k) result(w_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: w_p1
@@ -310,8 +357,6 @@
          end if
       end function wrap_w_p1
 
-
-      !! Wrap opacity at cell k-1 with appropriate dependences on the (ordered) independent variables.
       function wrap_kap_m1(s, k) result(kap_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: kap_m1
@@ -324,7 +369,6 @@
          end if
       end function wrap_kap_m1
 
-      !! Wrap opacity at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_kap_00(s, k) result(kap_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: kap_00
@@ -335,7 +379,6 @@
          kap_00 % d1Array(i_lnT_00) = s%d_opacity_dlnT(k)
       end function wrap_kap_00
 
-      !! Wrap opacity at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_kap_p1(s, k) result(kap_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: kap_p1
@@ -348,8 +391,6 @@
          end if
       end function wrap_kap_p1
 
-
-      !! Wrap s for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_s_m1(s, k) result(s_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: s_m1
@@ -362,7 +403,6 @@
          end if   
       end function wrap_s_m1
 
-      !! Wrap s for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_s_00(s, k) result(s_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: s_00
@@ -373,7 +413,6 @@
          s_00%d1Array(i_lnT_00) = s% dS_dT_for_partials(k)*s% T(k)
       end function wrap_s_00
 
-      !! Wrap s for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_s_p1(s, k) result(s_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: s_p1
@@ -386,8 +425,6 @@
          end if
       end function wrap_s_p1
 
-
-      !! Wrap internal energy for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_e_m1(s, k) result(e_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: e_m1
@@ -400,7 +437,6 @@
          end if   
       end function wrap_e_m1
 
-      !! Wrap internal energy for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_e_00(s, k) result(e_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: e_00
@@ -411,7 +447,6 @@
          e_00%d1Array(i_lnT_00) = s% Cv_for_partials(k)*s% T(k)
       end function wrap_e_00
 
-      !! Wrap internal energy for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_e_p1(s, k) result(e_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: e_p1
@@ -424,8 +459,6 @@
          end if
       end function wrap_e_p1
 
-
-      !! Wrap P for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_p_m1(s, k) result(p_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: p_m1
@@ -438,7 +471,6 @@
          end if   
       end function wrap_p_m1
 
-      !! Wrap P for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_p_00(s, k) result(p_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: p_00
@@ -449,7 +481,6 @@
          p_00%d1Array(i_lnT_00) = s%P(k) * s% chiT_for_partials(k)
       end function wrap_p_00
 
-      !! Wrap P for cell k+1 with appropriate dependences on the (ordered) independent variables
       function wrap_p_p1(s, k) result(p_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: p_p1
@@ -462,8 +493,40 @@
          end if   
       end function wrap_p_p1
 
+      function wrap_lnP_m1(s, k) result(lnP_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnP_m1
+         integer, intent(in) :: k
+         lnP_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            lnP_m1%val = s% lnP(k-1)
+            lnP_m1%d1Array(i_lnd_m1) = s% chiRho_for_partials(k-1)
+            lnP_m1%d1Array(i_lnT_m1) = s% chiT_for_partials(k-1)
+         end if   
+      end function wrap_lnP_m1
 
-      !! Wrap ChiRho for cell k with appropriate dependences on the (ordered) independent variables
+      function wrap_lnP_00(s, k) result(lnP_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnP_00
+         integer, intent(in) :: k
+         lnP_00 = 0d0 ! sets val and d1Array to 0
+         lnP_00%val = s% lnP(k)
+         lnP_00%d1Array(i_lnd_00) = s% chiRho_for_partials(k)
+         lnP_00%d1Array(i_lnT_00) = s% chiT_for_partials(k)
+      end function wrap_lnP_00
+
+      function wrap_lnP_p1(s, k) result(lnP_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnP_p1
+         integer, intent(in) :: k
+         lnP_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s%nz) then
+            lnP_p1%val = s% lnP(k+1)
+            lnP_p1%d1Array(i_lnd_p1) = s% chiRho_for_partials(k+1)
+            lnP_p1%d1Array(i_lnT_p1) = s% chiT_for_partials(k+1)
+         end if   
+      end function wrap_lnP_p1
+
       function wrap_ChiRho_m1(s, k) result(ChiRho_m1)
          use eos_def, only: i_ChiRho
          type (star_info), pointer :: s
@@ -477,7 +540,6 @@
          end if
       end function wrap_ChiRho_m1
 
-      !! Wrap ChiRho for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_ChiRho_00(s, k) result(ChiRho_00)
          use eos_def, only: i_ChiRho
          type (star_info), pointer :: s
@@ -489,7 +551,6 @@
          ChiRho_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_ChiRho,k)
       end function wrap_ChiRho_00
 
-      !! Wrap ChiRho for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_ChiRho_p1(s, k) result(ChiRho_p1)
          use eos_def, only: i_ChiRho
          type (star_info), pointer :: s
@@ -503,7 +564,6 @@
          end if
       end function wrap_ChiRho_p1
 
-      !! Wrap ChiT for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_ChiT_m1(s, k) result(ChiT_m1)
          use eos_def, only: i_ChiT
          type (star_info), pointer :: s
@@ -517,7 +577,6 @@
          end if
       end function wrap_ChiT_m1
 
-      !! Wrap ChiT for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_ChiT_00(s, k) result(ChiT_00)
          use eos_def, only: i_ChiT
          type (star_info), pointer :: s
@@ -529,7 +588,6 @@
          ChiT_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_ChiT,k)
       end function wrap_ChiT_00
 
-      !! Wrap ChiT for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_ChiT_p1(s, k) result(ChiT_p1)
          use eos_def, only: i_ChiT
          type (star_info), pointer :: s
@@ -543,8 +601,6 @@
          end if
       end function wrap_ChiT_p1
 
-
-      !! Wrap Cp for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_Cp_m1(s, k) result(Cp_m1)
          use eos_def, only: i_Cp
          type (star_info), pointer :: s
@@ -558,7 +614,6 @@
          end if   
       end function wrap_Cp_m1
 
-      !! Wrap Cp for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_Cp_00(s, k) result(Cp_00)
          use eos_def, only: i_Cp
          type (star_info), pointer :: s
@@ -570,7 +625,6 @@
          Cp_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_Cp,k)
       end function wrap_Cp_00
 
-      !! Wrap Cp for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_Cp_p1(s, k) result(Cp_p1)
          use eos_def, only: i_Cp
          type (star_info), pointer :: s
@@ -584,8 +638,6 @@
          end if   
       end function wrap_Cp_p1
 
-
-      !! Wrap gamma1 for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_gamma1_m1(s, k) result(gamma1_m1)
          use eos_def, only: i_gamma1
          type (star_info), pointer :: s
@@ -599,7 +651,6 @@
          end if   
       end function wrap_gamma1_m1
 
-      !! Wrap gamma1 for cell k with appropriate dependences on the (ordered) independent variables
       function wrap_gamma1_00(s, k) result(gamma1_00)
          use eos_def, only: i_gamma1
          type (star_info), pointer :: s
@@ -611,7 +662,6 @@
          gamma1_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_gamma1,k)
       end function wrap_gamma1_00
 
-      !! Wrap gamma1 for cell k-1 with appropriate dependences on the (ordered) independent variables
       function wrap_gamma1_p1(s, k) result(gamma1_p1)
          use eos_def, only: i_gamma1
          type (star_info), pointer :: s
@@ -625,15 +675,6 @@
          end if   
       end function wrap_gamma1_p1
 
-
-      !----------------------------------------------------------------------------------------------------
-      !
-      ! Next we handle quantities defined on faces (r, v, L). We need these on faces k+1, k and k-1.
-      !
-      !----------------------------------------------------------------------------------------------------
-
-
-      !! Wrap L at cell k-1 with appropriate dependences on the (ordered) independent variables.
       function wrap_L_m1(s, k) result(L_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: L_m1
@@ -645,7 +686,6 @@
          end if
       end function wrap_L_m1
 
-      !! Wrap L at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_L_00(s, k) result(L_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: L_00
@@ -655,7 +695,6 @@
          L_00 % d1Array(i_L_00) = 1d0
       end function wrap_L_00
 
-      !! Wrap L at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_L_p1(s, k) result(L_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: L_p1
@@ -670,8 +709,6 @@
          end if
       end function wrap_L_p1
 
-
-      !! Wrap r at cell k-1 with appropriate dependences on the (ordered) independent variables.
       function wrap_r_m1(s, k) result(r_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: r_m1
@@ -683,7 +720,6 @@
          end if
       end function wrap_r_m1
 
-      !! Wrap r at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_r_00(s, k) result(r_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: r_00
@@ -693,7 +729,6 @@
          r_00 % d1Array(i_lnR_00) = s%r(k)
       end function wrap_r_00
 
-      !! Wrap r at cell k+1 with appropriate dependences on the (ordered) independent variables.
       function wrap_r_p1(s, k) result(r_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: r_p1
@@ -707,8 +742,39 @@
          end if
       end function wrap_r_p1
 
+      function wrap_lnR_m1(s, k) result(lnR_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnR_m1
+         integer, intent(in) :: k
+         lnR_m1 = 0d0 ! sets val and d1Array to 0
+         if (k > 1) then
+            lnR_m1 % val = s%lnR(k-1)
+            lnR_m1 % d1Array(i_lnR_m1) = 1d0
+         end if
+      end function wrap_lnR_m1
 
-      !! Wrap v at cell k with appropriate dependences on the (ordered) independent variables.
+      function wrap_lnR_00(s, k) result(lnR_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnR_00
+         integer, intent(in) :: k
+         lnR_00 = 0d0 ! sets val and d1Array to 0
+         lnR_00 % val = s%lnR(k)
+         lnR_00 % d1Array(i_lnR_00) = 1d0
+      end function wrap_lnR_00
+
+      function wrap_lnR_p1(s, k) result(lnR_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: lnR_p1
+         integer, intent(in) :: k
+         lnR_p1 = 0d0 ! sets val and d1Array to 0
+         if (k < s%nz) then
+            lnR_p1 % val = s%lnR(k+1)
+            lnR_p1 % d1Array(i_lnR_p1) = 1d0
+         else
+            lnR_p1 % val = log(s%r_center)
+         end if
+      end function wrap_lnR_p1
+
       function wrap_v_m1(s, k) result(v_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_m1
@@ -720,7 +786,6 @@
          end if
       end function wrap_v_m1
 
-      !! Wrap v at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_v_00(s, k) result(v_00)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_00
@@ -730,7 +795,6 @@
          v_00 % d1Array(i_v_00) = 1d0
       end function wrap_v_00
 
-      !! Wrap v at cell k with appropriate dependences on the (ordered) independent variables.
       function wrap_v_p1(s, k) result(v_p1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_p1
@@ -745,7 +809,6 @@
          end if
       end function wrap_v_p1
       
-      
       function wrap_opt_time_center_r_m1(s, k) result(r_tc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -755,8 +818,7 @@
             if (k > 1) r_tc = 0.5d0*(r_tc + s% r_start(k-1))
          end if
       end function wrap_opt_time_center_r_m1
-      
-      
+            
       function wrap_opt_time_center_r_00(s, k) result(r_tc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -765,8 +827,7 @@
          if (s% using_velocity_time_centering) &
             r_tc = 0.5d0*(r_tc + s% r_start(k))
       end function wrap_opt_time_center_r_00
-      
-      
+            
       function wrap_opt_time_center_r_p1(s, k) result(r_tc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -779,8 +840,7 @@
                r_tc = 0.5d0*(r_tc + s% r_center)
             end if
          end if
-      end function wrap_opt_time_center_r_p1
-      
+      end function wrap_opt_time_center_r_p1      
       
       function wrap_opt_time_center_v_m1(s, k) result(v_tc)
          type (star_info), pointer :: s
@@ -796,8 +856,7 @@
                stop 'fix wrap_opt_time_center_v'
             end if
          end if
-      end function wrap_opt_time_center_v_m1
-      
+      end function wrap_opt_time_center_v_m1      
       
       function wrap_opt_time_center_v_00(s, k) result(v_tc)
          type (star_info), pointer :: s
@@ -811,8 +870,7 @@
                stop 'fix wrap_opt_time_center_v'
             end if
          end if
-      end function wrap_opt_time_center_v_00
-      
+      end function wrap_opt_time_center_v_00     
       
       function wrap_opt_time_center_v_p1(s, k) result(v_tc)
          type (star_info), pointer :: s
@@ -832,7 +890,6 @@
          end if
       end function wrap_opt_time_center_v_p1
 
-      ! u replaces v
       function wrap_u_m1(s, k) result(v_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_m1

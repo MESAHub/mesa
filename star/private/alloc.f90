@@ -1305,13 +1305,6 @@
             call do1(s% abs_du_plus_cs, c% abs_du_plus_cs)
             if (failed('abs_du_plus_cs')) exit
 
-            call do1(s% dL_dm_expected, c% dL_dm_expected)
-            if (failed('dL_dm_expected')) exit
-            call do1(s% dlnP_dm_expected, c% dlnP_dm_expected)
-            if (failed('dlnP_dm_expected')) exit
-            call do1(s% dlnT_dm_expected, c% dlnT_dm_expected)
-            if (failed('dlnT_dm_expected')) exit
-
             call do1(s% dPdr_dRhodr_info, c% dPdr_dRhodr_info)
             if (failed('dPdr_dRhodr_info')) exit
             call do1(s% dPdr_info, c% dPdr_info)

@@ -30,6 +30,7 @@
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff
+      use auto_diff_support
       
       implicit none
 
@@ -56,46 +57,35 @@
       contains
 
 
-      subroutine do_surf_Riemann_dudt_eqn( &
-            s, P_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            skip_partials, nvar, ierr)
+      subroutine do_surf_Riemann_dudt_eqn(s, P_surf_ad, skip_partials, nvar, ierr)
          type (star_info), pointer :: s         
-         real(dp), intent(in) :: P_surf, &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
+         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
-         include 'formats'
-         call do1_dudt_eqn( &
-            s, 1, P_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            skip_partials, nvar, ierr)
+         call do1_dudt_eqn(s, 1, P_surf_ad, skip_partials, nvar, ierr)
       end subroutine do_surf_Riemann_dudt_eqn
       
 
-      subroutine do1_Riemann_momentum_eqn(s, k, P_surf, skip_partials, nvar, ierr)
+      subroutine do1_Riemann_momentum_eqn(s, k, skip_partials, nvar, ierr)
          type (star_info), pointer :: s         
          integer, intent(in) :: k
-         real(dp), intent(in) :: P_surf ! only used if k==1
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
-         call do1_dudt_eqn( &
-            s, k, P_surf, 0d0, 0d0, 0d0, 0d0, &
-            skip_partials, nvar, ierr)
+         type(auto_diff_real_star_order1) :: P_surf_ad
+         P_surf_ad = 0
+         call do1_dudt_eqn(s, k, P_surf_ad, skip_partials, nvar, ierr)
       end subroutine do1_Riemann_momentum_eqn
          
 
       subroutine do1_dudt_eqn( &
-            s, k, P_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
-            skip_partials, nvar, ierr)
-         use auto_diff_support
+            s, k, P_surf_ad, skip_partials, nvar, ierr)
          use accurate_sum_auto_diff_star_order1
          use star_utils, only: get_area_info, save_eqn_residual_info
          type (star_info), pointer :: s         
          integer, intent(in) :: k
-         real(dp), intent(in) :: P_surf ! only used if k==1
-         real(dp), intent(in) :: &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
+         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only for k=1
          logical, intent(in) :: skip_partials
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
@@ -188,8 +178,7 @@
          
          subroutine setup_momentum_flux
             if (k == 1) then
-               call eval_surf_momentum_flux_ad(s, P_surf, &
-                  dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
+               call eval_surf_momentum_flux_ad(s, P_surf_ad, &
                   flux_out_ad, d_momflux00_dw_div_wc00, ierr)   
                if (ierr /= 0) return
             else
@@ -321,27 +310,20 @@
       end subroutine eval1_momentum_flux_ad
       
       
-      subroutine eval_surf_momentum_flux_ad(s, P_surf, &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT, &
+      subroutine eval_surf_momentum_flux_ad(s, P_surf_ad, &
             momflux_ad, d_momflux_dw, ierr)
-         use auto_diff_support
+         use star_utils, only: get_area_info
          type (star_info), pointer :: s 
-         real(dp), intent(in) :: P_surf, &
-            dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnd, dlnPsurf_dlnT
+         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
          type(auto_diff_real_star_order1), intent(out) :: momflux_ad
          real(dp), intent(out) :: d_momflux_dw
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: r, P_ad
+         type(auto_diff_real_star_order1) :: area, inv_R2
          include 'formats'
          ierr = 0
-         r = wrap_r_00(s,1)
-         P_ad = 0
-         P_ad%val = P_surf
-         P_ad%d1Array(i_lnd_00) = P_surf*dlnPsurf_dlnd
-         P_ad%d1Array(i_lnT_00) = P_surf*dlnPsurf_dlnT
-         P_ad%d1Array(i_lnr_00) = P_surf*dlnPsurf_dlnR
-         P_ad%d1Array(i_L_00) = P_surf*dlnPsurf_dL
-         momflux_ad = 4d0*pi*pow2(r)*P_ad
+         call get_area_info(s, 1, area, inv_R2, ierr)
+         if (ierr /= 0) return
+         momflux_ad = area*P_surf_ad
          d_momflux_dw = 0
       end subroutine eval_surf_momentum_flux_ad
       
@@ -383,7 +365,6 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
-         use auto_diff_support
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          integer, intent(out) :: ierr

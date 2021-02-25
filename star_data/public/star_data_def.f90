@@ -74,9 +74,9 @@
          
          ! private
             logical :: in_use
-            logical :: do_struct_hydro, do_struct_thermo, do_burn, do_mix
+            logical :: do_burn, do_mix
             logical :: used_extra_iter_in_solver_for_accretion
-            integer :: retry_cnt, redo_cnt, hydro_decsol_option
+            integer :: retry_cnt, redo_cnt
             type (EoS_General_Info), pointer :: eos_rq ! from call eos_ptr(s% eos_handle,s% eos_rq,ierr)
             type (Kap_General_Info), pointer :: kap_rq ! from call kap_ptr(s% kap_handle,s% kap_rq,ierr)
             type (Net_General_Info), pointer :: net_rq ! from call net_ptr(s% net_handle,s% net_rq, ierr)

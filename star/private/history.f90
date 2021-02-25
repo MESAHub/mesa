@@ -1937,7 +1937,6 @@
 
             case(h_center_degeneracy)
                val = s% center_degeneracy
-
             case(h_log_center_eps_nuc)
                val = safe_log10(s% center_eps_nuc)
             case(h_center_eps_nuc)
@@ -1946,12 +1945,8 @@
                val = s% d_center_eps_nuc_dlnT
             case(h_d_center_eps_nuc_dlnd)
                val = s% d_center_eps_nuc_dlnd
-
-            case(h_center_dL_dm)
-               val = center_value(s, s% dL_dm_expected)
             case(h_center_eps_grav)
                val = center_value(s, s% eps_grav)
-
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
@@ -2792,13 +2787,6 @@
                if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,2d0)
             case(h_int_k_r_dr_0pt5_nu_max_Sl3)
                if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,0.5d0)
-
-            case (h_min_L)
-               val = minval(s% L(1:nz))/Lsun
-            case (h_min_dL_dm)
-               val = minval(s% dL_dm_expected(1:nz))
-            case (h_min_dL_dm_m)
-               val = s% m(minloc(s% dL_dm_expected(1:nz),dim=1))/Msun
 
             case (h_k_below_const_q)
                int_val = s% k_below_const_q

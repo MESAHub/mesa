@@ -679,13 +679,11 @@
             call e00(s, i_dlnR_dt, i_lnR, k, nvar, uc_factor*d_uface_dlnR)
             call e00(s, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_du00)         
             call e00(s, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlnd00)
-            if (s% do_struct_thermo) &
-               call e00(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
+             call e00(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnT00)         
             if (k > 1) then
                call em1(s, i_dlnR_dt, i_u, k, nvar, uc_factor*d_uface_dum1)            
                call em1(s, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*d_uface_dlndm1)
-               if (s% do_struct_thermo) &
-                  call em1(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
+               call em1(s, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*d_uface_dlnTm1)
             end if         
             if (s% w_div_wc_flag) then
                call e00(s, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_domega(k))

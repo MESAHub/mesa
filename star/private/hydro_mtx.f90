@@ -91,7 +91,7 @@
             skip_mixing_info = .true., &
             skip_set_cz_bdy_mass = .true., &
             skip_other_cgrav = .true.
-         logical :: do_chem, do_struct, try_again, do_edit_lnR, report_dx
+         logical :: do_chem, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
             i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
@@ -144,7 +144,6 @@
 
 
          do_chem = (s% do_burn .or. s% do_mix)
-         do_struct = (s% do_struct_hydro .or. s% do_struct_thermo)
 
          if (dbg .and. .not. skip_mixing_info) write(*,2) 'redo mix info iter', s% solver_iter
 
@@ -355,18 +354,16 @@
             return
          end if
 
-         if (do_struct) then
-            do_edit_lnR = do_lnR .and. .not. (s% doing_check_partials)
-            if (do_edit_lnR) call edit_lnR(s, xh_start, s% solver_dx)
+         do_edit_lnR = do_lnR .and. .not. (s% doing_check_partials)
+         if (do_edit_lnR) call edit_lnR(s, xh_start, s% solver_dx)
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
-            do k=1,nz
-               if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
-               call set_rv_info(s,k)
-               ! note: m_grav is held constant during solver iterations
-               s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
-            end do
+         do k=1,nz
+            if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
+            call set_rv_info(s,k)
+            ! note: m_grav is held constant during solver iterations
+            s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
+         end do
 !$OMP END PARALLEL DO
-         end if
 
          if (do_lnR) then
             call set_rmid(s, 1, nz, ierr)
@@ -418,285 +415,275 @@
             
             k_below_just_added = 1
 
-            if (do_struct) then
+            do j=1,min(nvar, nvar_hydro)
+               x(j) = xh_start(j,k) + s% solver_dx(j,k)
+               !write(*,2) 'new ' // s% nameofvar(j), k, x(j)
+            end do
 
-               do j=1,min(nvar, nvar_hydro)
-                  x(j) = xh_start(j,k) + s% solver_dx(j,k)
-                  !write(*,2) 'new ' // s% nameofvar(j), k, x(j)
-               end do
+            if (do_lnT) then
 
-               if (do_lnT) then
-
-                  s% lnT(k) = x(i_lnT)
-                  s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
-                  if (abs(s% lnT(k) - s% lnT_start(k)) > &
-                          ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
-                       s% min_logT_for_hydro_mtx_max_allowed < &
-                        ln10*min(s% lnT(k),s% lnT_start(k))) then
-                     if (report) &
-                        write(*,4) 'hydro_mtx: change too large, dlogT, logT, logT_start', &
-                           s% model_number, k, s% solver_iter, &
-                           (s% lnT(k) - s% lnT_start(k))/ln10, &
-                           s% lnT(k)/ln10, s% lnT_start(k)/ln10
-                     write(s% retry_message, *) 'abs(dlogT) > hydro_mtx_max_allowed_abs_dlogT', k
-                     ierr = -1
-                     return
+               s% lnT(k) = x(i_lnT)
+               s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
+               if (abs(s% lnT(k) - s% lnT_start(k)) > &
+                       ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
+                     ln10*min(s% lnT(k),s% lnT_start(k))) then
+                  if (report) &
+                     write(*,4) 'hydro_mtx: change too large, dlogT, logT, logT_start', &
+                        s% model_number, k, s% solver_iter, &
+                        (s% lnT(k) - s% lnT_start(k))/ln10, &
+                        s% lnT(k)/ln10, s% lnT_start(k)/ln10
+                  write(s% retry_message, *) 'abs(dlogT) > hydro_mtx_max_allowed_abs_dlogT', k
+                  ierr = -1
+                  return
+               end if
+               if (s% lnT(k) > ln10*s% hydro_mtx_max_allowed_logT .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
+                     ln10*min(s% lnT(k),s% lnT_start(k))) then
+                  if (report) &
+                     write(*,4) 'hydro_mtx: logT too large', &
+                        s% model_number, k, s% solver_iter, &
+                        s% lnT(k)/ln10, s% lnT_start(k)/ln10
+                  write(s% retry_message, *) 'logT > hydro_mtx_max_allowed_logT', k
+                  ierr = -1
+                  return
+               end if
+               if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT) then
+                  if (report) &
+                     write(*,4) 'hydro_mtx: logT too small', &
+                        s% model_number, k, s% solver_iter, &
+                        s% lnT(k)/ln10, s% lnT_start(k)/ln10
+                  write(s% retry_message, *) 'logT < hydro_mtx_min_allowed_logT', k
+                  ierr = -1
+                  return
+               end if
+               s% T(k) = exp(s% lnT(k))
+               if (is_bad_num(s% T(k))) then
+                  s% retry_message = 'bad num for T'
+                  if (report) write(*,2) 'bad num T', k, s% T(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver T', k, s% T(k)
+                     stop 'set_vars_for_solver'
                   end if
-                  if (s% lnT(k) > ln10*s% hydro_mtx_max_allowed_logT .and. &
-                       s% min_logT_for_hydro_mtx_max_allowed < &
-                        ln10*min(s% lnT(k),s% lnT_start(k))) then
-                     if (report) &
-                        write(*,4) 'hydro_mtx: logT too large', &
-                           s% model_number, k, s% solver_iter, &
-                           s% lnT(k)/ln10, s% lnT_start(k)/ln10
-                     write(s% retry_message, *) 'logT > hydro_mtx_max_allowed_logT', k
-                     ierr = -1
-                     return
-                  end if
-                  if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT) then
-                     if (report) &
-                        write(*,4) 'hydro_mtx: logT too small', &
-                           s% model_number, k, s% solver_iter, &
-                           s% lnT(k)/ln10, s% lnT_start(k)/ln10
-                     write(s% retry_message, *) 'logT < hydro_mtx_min_allowed_logT', k
-                     ierr = -1
-                     return
-                  end if
-                  s% T(k) = exp(s% lnT(k))
-                  if (is_bad_num(s% T(k))) then
-                     s% retry_message = 'bad num for T'
-                     if (report) write(*,2) 'bad num T', k, s% T(k)
-                     if (s% stop_for_bad_nums) then
-                        write(*,2) 'set_vars_for_solver T', k, s% T(k)
-                        stop 'set_vars_for_solver'
-                     end if
-                     ierr = -1
-                  end if
-
+                  ierr = -1
                end if
 
-               if (do_lum) then
-                  s% L(k) = x(i_lum)
-                  if (is_bad_num(s% L(k))) then
-                     s% retry_message = 'bad num for L'
-                     if (report) write(*,2) 'bad num L', k, s% L(k)
-                     ierr = -1
-                     if (s% stop_for_bad_nums) then
-                        write(*,2) 'set_vars_for_solver L', k, s% L(k)
-                        stop 'set_vars_for_solver'
-                     end if
-                  end if
+            end if
 
+            if (do_lum) then
+               s% L(k) = x(i_lum)
+               if (is_bad_num(s% L(k))) then
+                  s% retry_message = 'bad num for L'
+                  if (report) write(*,2) 'bad num L', k, s% L(k)
+                  ierr = -1
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver L', k, s% L(k)
+                     stop 'set_vars_for_solver'
+                  end if
                end if
 
-               if (do_etrb) then
-                  s% etrb(k) = max(x(i_etrb),0d0)
-                  s% dxh_etrb(k) = s% solver_dx(i_etrb,k)
-                  s% w(k) = sqrt(s% etrb(k))
-                  if (is_bad_num(s% etrb(k))) then
-                     s% retry_message = 'bad num for etrb'
-                     if (report) write(*,2) 'bad num etrb', k, s% etrb(k)
-                     ierr = -1
-                     if (s% stop_for_bad_nums) then
+            end if
+
+            if (do_etrb) then
+               s% etrb(k) = max(x(i_etrb),0d0)
+               s% dxh_etrb(k) = s% solver_dx(i_etrb,k)
+               s% w(k) = sqrt(s% etrb(k))
+               if (is_bad_num(s% etrb(k))) then
+                  s% retry_message = 'bad num for etrb'
+                  if (report) write(*,2) 'bad num etrb', k, s% etrb(k)
+                  ierr = -1
+                  if (s% stop_for_bad_nums) then
 !$omp critical (set_vars_for_solver_crit1)
-                        write(*,2) 'set_vars_for_solver etrb', k, s% etrb(k)
-                        write(*,2) 'set_vars_for_solver etrb_start', k, s% etrb_start(k)
-                        write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_etrb,k)
-                        write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_etrb,k)
-                        stop 'set_vars_for_solver'
+                     write(*,2) 'set_vars_for_solver etrb', k, s% etrb(k)
+                     write(*,2) 'set_vars_for_solver etrb_start', k, s% etrb_start(k)
+                     write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_etrb,k)
+                     write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_etrb,k)
+                     stop 'set_vars_for_solver'
 !$omp end critical (set_vars_for_solver_crit1)
-                     end if
                   end if
-
                end if
 
-               if (s% do_struct_hydro) then
-
-                  if (do_v) then
-                     s% v(k) = x(i_v)
-                     s% dxh_v(k) = s% solver_dx(i_v,k)
-                     if (is_bad_num(s% v(k))) then
-                        s% retry_message = 'bad num for v'
-                        if (report) write(*,2) 'bad num v', k, s% v(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver v', k, s% v(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
+            end if
+            if (do_v) then
+               s% v(k) = x(i_v)
+               s% dxh_v(k) = s% solver_dx(i_v,k)
+               if (is_bad_num(s% v(k))) then
+                  s% retry_message = 'bad num for v'
+                  if (report) write(*,2) 'bad num v', k, s% v(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver v', k, s% v(k)
+                     stop 'set_vars_for_solver'
                   end if
-
-                  if (do_u) then
-                     s% u(k) = x(i_u)
-                     s% dxh_u(k) = s% solver_dx(i_u,k)
-                     if (is_bad_num(s% u(k))) then
-                        s% retry_message = 'bad num for u'
-                        if (report) write(*,2) 'bad num u', k, s% u(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver u', k, s% u(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                  end if
-
-                  if (do_alpha_RTI) then
-                     s% alpha_RTI(k) = max(0d0, x(i_alpha_RTI))
-                     s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
-                     if (is_bad_num(s% alpha_RTI(k))) then
-                        s% retry_message = 'bad num for alpha_RTI'
-                        if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver alpha_RTI', k, s% alpha_RTI(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                     if (s% alpha_RTI(k) < 0d0) then
-                        s% alpha_RTI(k) = 0d0
-                        x(i_alpha_RTI) = 0d0
-                     end if
-                  end if
-
-                  if (do_conv_vel) then
-                     s% dxh_ln_cvpv0(k) = s% solver_dx(i_ln_cvpv0,k)
-                     s% conv_vel(k) = max(0d0, exp(x(i_ln_cvpv0))-s% conv_vel_v0)
-                     if (s% conv_vel(k) > 1d90 .or. is_bad_num(s% conv_vel(k))) then
-                        s% retry_message = 'bad num for conv_vel'
-                        if (report) write(*,2) 'bad num conv_vel', k, s% conv_vel(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver conv_vel', k, s% conv_vel(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                     if (s% conv_vel(k) < 0d0) then
-                        s% conv_vel(k) = 0d0
-                        x(i_ln_cvpv0) = log(s% conv_vel_v0)
-                        s% dxh_ln_cvpv0(k) = x(i_ln_cvpv0) - xh_start(i_ln_cvpv0,k)
-                     end if
-                  end if
-
-                  if (do_w_div_wc) then
-                     s% w_div_w_crit_roche(k) = x(i_w_div_wc)
-                     if (s% w_div_w_crit_roche(k) > 0.99d0) then
-                        s% w_div_w_crit_roche(k) = 0.99d0
-                     end if
-                     if (s% w_div_w_crit_roche(k) < -0.99d0) then
-                        s% w_div_w_crit_roche(k) = -0.99d0
-                     end if
-                     if (is_bad_num(s% w_div_w_crit_roche(k))) then
-                        s% retry_message = 'bad num for w_div_w_crit_roche'
-                        if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                  end if
-
-                  if (do_j_rot) then
-                     s% j_rot(k) = x(i_j_rot)
-                     if (is_bad_num(s% j_rot(k))) then
-                        s% retry_message = 'bad num for j_rot'
-                        if (report) write(*,2) 'bad num j_rot', k, s% j_rot(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver j_rot', k, s% j_rot(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                  end if
-
-                  if (do_lnR) then
-                     s% lnR(k) = x(i_lnR)
-                     s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
-                     if (is_bad_num(s% lnR(k))) then
-                        s% retry_message = 'bad num for lnR'
-                        if (report) write(*,2) 'bad num lnR', k, s% lnR(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver lnR', k, s% lnR(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                     s% r(k) = exp(s% lnR(k))
-                  end if
-
-                  if (do_lnd) then
-                     s% lnd(k) = x(i_lnd)
-                     s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
-                     if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
-                        write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
-                        if (report) &
-                           write(*,4) 'hydro_mtx: logRho too small', &
-                              s% model_number, k, s% solver_iter, &
-                              s% lnd(k)/ln10, s% lnd_start(k)/ln10
-                        ierr = -1
-                        return
-                     end if
-                     if (s% lnd(k) > ln10*s% hydro_mtx_max_allowed_logRho .and. &
-                          s% min_logT_for_hydro_mtx_max_allowed < &
-                           ln10*min(s% lnT(k),s% lnT_start(k))) then
-                        write(s% retry_message, *) 'logRho > hydro_mtx_max_allowed_logRho', k
-                        if (s% report_ierr .or. report) &
-                           write(*,4) 'hydro_mtx: logRho too large', &
-                              s% model_number, k, s% solver_iter, &
-                              s% lnd(k)/ln10, s% lnd_start(k)/ln10
-                        ierr = -1
-                        return
-                     end if
-                     if (abs(s% lnd(k) - s% lnd_start(k)) > &
-                           ln10*s% hydro_mtx_max_allowed_abs_dlogRho .and. &
-                          s% min_logT_for_hydro_mtx_max_allowed < &
-                           ln10*min(s% lnT(k),s% lnT_start(k))) then
-                        write(s% retry_message, *) 'abs(dlogRho) > hydro_mtx_max_allowed_abs_dlogRho', k
-                        if (s% report_ierr .or. report) &
-                           write(*,4) &
-                              'hydro_mtx: dlogRho, logRho, logRho_start', &
-                              s% model_number, k, s% solver_iter, &
-                              (s% lnd(k) - s% lnd_start(k))/ln10, &
-                              s% lnd(k)/ln10, s% lnd_start(k)/ln10
-                        ierr = -1
-                        return
-                     end if
-                     s% rho(k) = exp(s% lnd(k))
-                     if (is_bad_num(s% rho(k))) then
-                        write(s% retry_message, *) 'bad num for rho', k
-                        if (report) write(*,2) 'bad num rho', k, s% rho(k)
-                        if (s% stop_for_bad_nums) then
-                           write(*,2) 'set_vars_for_solver rho', k, s% rho(k)
-                           stop 'set_vars_for_solver'
-                        end if
-                        ierr = -1
-                     end if
-                  end if
-
+                  ierr = -1
                end if
+            end if
 
-               if (k == s% trace_k) then
-                  if (i_lnd /= 0) &
-                     write(*,4) 'hydro_mtx: lgd', &
-                        k, s% solver_iter, s% model_number, &
-                        s% lnd(k)/ln10, xh_start(i_lnd,k), s% solver_dx(i_lnd,k)
-                  if (i_lnT /= 0) &
-                     write(*,4) 'hydro_mtx: lgT', k, s% solver_iter, &
-                        s% model_number, s% lnT(k)/ln10, xh_start(i_lnT,k), s% solver_dx(i_lnT,k)
-                  if (i_lum /= 0) &
-                     write(*,4) 'hydro_mtx: L', k, s% solver_iter, &
-                        s% model_number, s% L(k), xh_start(i_lum,k), s% solver_dx(i_lum,k)
-                  write(*,4) 'hydro_mtx: lgR', k, s% solver_iter, &
-                        s% model_number, s% lnR(k)/ln10, xh_start(i_lnR,k), s% solver_dx(i_lnR,k)
-                  if (i_v /= 0) &
-                     write(*,4) 'hydro_mtx: v', k, s% solver_iter, &
-                        s% model_number, s% v(k), xh_start(i_v,k), s% solver_dx(i_v,k)
-                  if (i_u /= 0) &
-                     write(*,4) 'hydro_mtx: u', k, s% solver_iter, &
-                        s% model_number, s% u(k), xh_start(i_u,k), s% solver_dx(i_u,k)
+            if (do_u) then
+               s% u(k) = x(i_u)
+               s% dxh_u(k) = s% solver_dx(i_u,k)
+               if (is_bad_num(s% u(k))) then
+                  s% retry_message = 'bad num for u'
+                  if (report) write(*,2) 'bad num u', k, s% u(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver u', k, s% u(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
                end if
+            end if
 
-               
+            if (do_alpha_RTI) then
+               s% alpha_RTI(k) = max(0d0, x(i_alpha_RTI))
+               s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
+               if (is_bad_num(s% alpha_RTI(k))) then
+                  s% retry_message = 'bad num for alpha_RTI'
+                  if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver alpha_RTI', k, s% alpha_RTI(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
+               end if
+               if (s% alpha_RTI(k) < 0d0) then
+                  s% alpha_RTI(k) = 0d0
+                  x(i_alpha_RTI) = 0d0
+               end if
+            end if
+
+            if (do_conv_vel) then
+               s% dxh_ln_cvpv0(k) = s% solver_dx(i_ln_cvpv0,k)
+               s% conv_vel(k) = max(0d0, exp(x(i_ln_cvpv0))-s% conv_vel_v0)
+               if (s% conv_vel(k) > 1d90 .or. is_bad_num(s% conv_vel(k))) then
+                  s% retry_message = 'bad num for conv_vel'
+                  if (report) write(*,2) 'bad num conv_vel', k, s% conv_vel(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver conv_vel', k, s% conv_vel(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
+               end if
+               if (s% conv_vel(k) < 0d0) then
+                  s% conv_vel(k) = 0d0
+                  x(i_ln_cvpv0) = log(s% conv_vel_v0)
+                  s% dxh_ln_cvpv0(k) = x(i_ln_cvpv0) - xh_start(i_ln_cvpv0,k)
+               end if
+            end if
+
+            if (do_w_div_wc) then
+               s% w_div_w_crit_roche(k) = x(i_w_div_wc)
+               if (s% w_div_w_crit_roche(k) > 0.99d0) then
+                  s% w_div_w_crit_roche(k) = 0.99d0
+               end if
+               if (s% w_div_w_crit_roche(k) < -0.99d0) then
+                  s% w_div_w_crit_roche(k) = -0.99d0
+               end if
+               if (is_bad_num(s% w_div_w_crit_roche(k))) then
+                  s% retry_message = 'bad num for w_div_w_crit_roche'
+                  if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
+               end if
+            end if
+
+            if (do_j_rot) then
+               s% j_rot(k) = x(i_j_rot)
+               if (is_bad_num(s% j_rot(k))) then
+                  s% retry_message = 'bad num for j_rot'
+                  if (report) write(*,2) 'bad num j_rot', k, s% j_rot(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver j_rot', k, s% j_rot(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
+               end if
+            end if
+
+            if (do_lnR) then
+               s% lnR(k) = x(i_lnR)
+               s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
+               if (is_bad_num(s% lnR(k))) then
+                  s% retry_message = 'bad num for lnR'
+                  if (report) write(*,2) 'bad num lnR', k, s% lnR(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver lnR', k, s% lnR(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
+               end if
+               s% r(k) = exp(s% lnR(k))
+            end if
+
+            if (do_lnd) then
+               s% lnd(k) = x(i_lnd)
+               s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
+               if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
+                  write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
+                  if (report) &
+                     write(*,4) 'hydro_mtx: logRho too small', &
+                        s% model_number, k, s% solver_iter, &
+                        s% lnd(k)/ln10, s% lnd_start(k)/ln10
+                  ierr = -1
+                  return
+               end if
+               if (s% lnd(k) > ln10*s% hydro_mtx_max_allowed_logRho .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
+                     ln10*min(s% lnT(k),s% lnT_start(k))) then
+                  write(s% retry_message, *) 'logRho > hydro_mtx_max_allowed_logRho', k
+                  if (s% report_ierr .or. report) &
+                     write(*,4) 'hydro_mtx: logRho too large', &
+                        s% model_number, k, s% solver_iter, &
+                        s% lnd(k)/ln10, s% lnd_start(k)/ln10
+                  ierr = -1
+                  return
+               end if
+               if (abs(s% lnd(k) - s% lnd_start(k)) > &
+                     ln10*s% hydro_mtx_max_allowed_abs_dlogRho .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
+                     ln10*min(s% lnT(k),s% lnT_start(k))) then
+                  write(s% retry_message, *) 'abs(dlogRho) > hydro_mtx_max_allowed_abs_dlogRho', k
+                  if (s% report_ierr .or. report) &
+                     write(*,4) &
+                        'hydro_mtx: dlogRho, logRho, logRho_start', &
+                        s% model_number, k, s% solver_iter, &
+                        (s% lnd(k) - s% lnd_start(k))/ln10, &
+                        s% lnd(k)/ln10, s% lnd_start(k)/ln10
+                  ierr = -1
+                  return
+               end if
+               s% rho(k) = exp(s% lnd(k))
+               if (is_bad_num(s% rho(k))) then
+                  write(s% retry_message, *) 'bad num for rho', k
+                  if (report) write(*,2) 'bad num rho', k, s% rho(k)
+                  if (s% stop_for_bad_nums) then
+                     write(*,2) 'set_vars_for_solver rho', k, s% rho(k)
+                     stop 'set_vars_for_solver'
+                  end if
+                  ierr = -1
+               end if
+            end if
+
+            if (k == s% trace_k) then
+               if (i_lnd /= 0) &
+                  write(*,4) 'hydro_mtx: lgd', &
+                     k, s% solver_iter, s% model_number, &
+                     s% lnd(k)/ln10, xh_start(i_lnd,k), s% solver_dx(i_lnd,k)
+               if (i_lnT /= 0) &
+                  write(*,4) 'hydro_mtx: lgT', k, s% solver_iter, &
+                     s% model_number, s% lnT(k)/ln10, xh_start(i_lnT,k), s% solver_dx(i_lnT,k)
+               if (i_lum /= 0) &
+                  write(*,4) 'hydro_mtx: L', k, s% solver_iter, &
+                     s% model_number, s% L(k), xh_start(i_lum,k), s% solver_dx(i_lum,k)
+               write(*,4) 'hydro_mtx: lgR', k, s% solver_iter, &
+                     s% model_number, s% lnR(k)/ln10, xh_start(i_lnR,k), s% solver_dx(i_lnR,k)
+               if (i_v /= 0) &
+                  write(*,4) 'hydro_mtx: v', k, s% solver_iter, &
+                     s% model_number, s% v(k), xh_start(i_v,k), s% solver_dx(i_v,k)
+               if (i_u /= 0) &
+                  write(*,4) 'hydro_mtx: u', k, s% solver_iter, &
+                     s% model_number, s% u(k), xh_start(i_u,k), s% solver_dx(i_u,k)
             end if
 
             if (do_chem) &

@@ -547,14 +547,6 @@
       real(dp), pointer :: eps_WD_sedimentation(:) ! (nz)
       real(dp), pointer :: eps_diffusion(:) ! (nz)
       real(dp), pointer :: g_field_element_diffusion(:) ! (nz)
-            
-
-      ! gradients expected from structure equations
-      ! to be compared to actual gradients in model
-      ! note: these may not be set when you are using hydro-dynamics
-      real(dp), pointer :: dL_dm_expected(:) ! expected difference across cell
-      real(dp), pointer :: dlnP_dm_expected(:) ! expected difference at outer boundary of cell    
-      real(dp), pointer :: dlnT_dm_expected(:) ! expected difference at outer boundary of cell    
       
       
       ! for Riemann solver      

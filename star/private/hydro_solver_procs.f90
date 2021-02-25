@@ -218,58 +218,56 @@
          skip_eqn3 = 0
          if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
          if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
-         if (s% do_struct_hydro .or. s% do_struct_thermo) then
-            if (s% do_burn .or. s% do_mix) then
-               num_terms = num_terms + nvar*nz
-               if (skip_eqn1 > 0) num_terms = num_terms - nz
-               if (skip_eqn2 > 0) num_terms = num_terms - nz
-               if (skip_eqn3 > 0) num_terms = num_terms - nz
-               do k = 1, nz
-                  do j = 1, nvar
-                     if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
-                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                     sumequ = sumequ + absq
-                     if (absq > equ_max) then
-                        equ_max = absq
-                        j_max = j
-                        k_max = k
-                     end if
-                  end do
+         if (s% do_burn .or. s% do_mix) then
+            num_terms = num_terms + nvar*nz
+            if (skip_eqn1 > 0) num_terms = num_terms - nz
+            if (skip_eqn2 > 0) num_terms = num_terms - nz
+            if (skip_eqn3 > 0) num_terms = num_terms - nz
+            do k = 1, nz
+               do j = 1, nvar
+                  if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
+                  sumequ = sumequ + absq
+                  if (absq > equ_max) then
+                     equ_max = absq
+                     j_max = j
+                     k_max = k
+                  end if
                end do
+            end do
+         else
+            if (skip_eqn1 == 0 .and. skip_eqn2 == 0) then
+               num_terms = num_terms + nvar_hydro*nz
+            else if (skip_eqn1 > 0 .and. skip_eqn2 > 0) then
+               num_terms = num_terms + (nvar_hydro-2)*nz
             else
-               if (skip_eqn1 == 0 .and. skip_eqn2 == 0) then
-                  num_terms = num_terms + nvar_hydro*nz
-               else if (skip_eqn1 > 0 .and. skip_eqn2 > 0) then
-                  num_terms = num_terms + (nvar_hydro-2)*nz
-               else
-                  num_terms = num_terms + (nvar_hydro-1)*nz
-               end if
-               do k = 1, nz
-                  do j = 1, nvar_hydro
-                     if (j == skip_eqn1 .or. j == skip_eqn2) cycle
-                     absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                     !write(*,3) 'equ(j,k)*s% residual_weight(j,k)', j, k, equ(j,k)*s% residual_weight(j,k)
-                     sumequ = sumequ + absq
-                     if (is_bad(sumequ)) then
-                        if (dbg) then
-                           write(*,3) trim(s% nameofequ(j)) // ' sumequ', j, k, sumequ
-                           stop 'sizeq 1'
-                        end if
-                        ierr = -1
-                        if (s% report_ierr) &
-                           write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
-                              j, k, s% equ(j,k)*s% residual_weight(j,k)
-                        if (s% stop_for_bad_nums) stop 'sizeq 2'
-                        return
-                     end if
-                     if (absq > equ_max) then
-                        equ_max = absq
-                        j_max = j
-                        k_max = k
-                     end if
-                  end do
-               end do
+               num_terms = num_terms + (nvar_hydro-1)*nz
             end if
+            do k = 1, nz
+               do j = 1, nvar_hydro
+                  if (j == skip_eqn1 .or. j == skip_eqn2) cycle
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
+                  !write(*,3) 'equ(j,k)*s% residual_weight(j,k)', j, k, equ(j,k)*s% residual_weight(j,k)
+                  sumequ = sumequ + absq
+                  if (is_bad(sumequ)) then
+                     if (dbg) then
+                        write(*,3) trim(s% nameofequ(j)) // ' sumequ', j, k, sumequ
+                        stop 'sizeq 1'
+                     end if
+                     ierr = -1
+                     if (s% report_ierr) &
+                        write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
+                           j, k, s% equ(j,k)*s% residual_weight(j,k)
+                     if (s% stop_for_bad_nums) stop 'sizeq 2'
+                     return
+                  end if
+                  if (absq > equ_max) then
+                     equ_max = absq
+                     j_max = j
+                     k_max = k
+                  end if
+               end do
+            end do
          end if
          if (s% do_burn .or. s% do_mix) then
             i_chem1 = s% i_chem1
@@ -384,72 +382,71 @@
             max_abs_corr_for_k = 0
             max_abs_xa_corr_for_k = 0
 
-            if (s% do_struct_hydro .or. s% do_struct_thermo) then
-               if (s% do_burn .or. s% do_mix) then
-                  jmax = nvar
-               else
-                  jmax = nvar_hydro
-               end if
-               var_loop: do j = 1, jmax
-                  if (j == skip1 .or. &
-                      j == skip2 .or. &
-                      j == skip3 .or. &
-                      j == i_alpha_RTI) cycle
-                  if (check_for_bad_nums) then
-                     if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
-                        found_bad_num = .true.
-                        if (report) write(*,2) 'sizeB: bad num for correction ' // &
-                           s% nameofvar(j), k, B(j,k)*s% correction_weight(j,k)
-                        if (s% stop_for_bad_nums) then
-                           found_NaN = .true.
-                           write(*,3) s% nameofvar(j) // ' B(j,k)*s% correction_weight(j,k)', &
-                              j, k, B(j,k)*s% correction_weight(j,k)
-                           stop 'sizeB'
-                        end if
-                        
-                        max_zone = k
-                        max_var = j
-                        exit cell_loop
-                        
-                        cycle
-                     end if
-                  end if
-                  if (j > nvar_hydro) then
-                     if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle
-                  end if
-
-                  abs_corr = abs(B(j,k)*s% correction_weight(j,k))
-                  if (is_bad_num(abs_corr)) then
+            if (s% do_burn .or. s% do_mix) then
+               jmax = nvar
+            else
+               jmax = nvar_hydro
+            end if
+            var_loop: do j = 1, jmax
+               if (j == skip1 .or. &
+                   j == skip2 .or. &
+                   j == skip3 .or. &
+                   j == i_alpha_RTI) cycle
+               if (check_for_bad_nums) then
+                  if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
                      found_bad_num = .true.
-                     if (report) write(*,3) 'B(j,k)*s% correction_weight(j,k)', &
-                        j, k, B(j,k)*s% correction_weight(j,k)
-                     if (s% stop_for_bad_nums) found_NaN = .true.
-                  end if
-                  if (abs_corr > max_abs_corr_for_k &
-                     .and. .not. (j > nvar_hydro .and. s% ignore_species_in_max_correction)) &
-                        max_abs_corr_for_k = abs_corr
-                  if (abs_corr > max_abs_correction &
-                     .and. .not. (j > nvar_hydro .and. s% ignore_species_in_max_correction)) then
-                     max_correction = B(j,k)*s% correction_weight(j,k)
-                     max_abs_correction = abs_corr
+                     if (report) write(*,2) 'sizeB: bad num for correction ' // &
+                        s% nameofvar(j), k, B(j,k)*s% correction_weight(j,k)
+                     if (s% stop_for_bad_nums) then
+                        found_NaN = .true.
+                        write(*,3) s% nameofvar(j) // ' B(j,k)*s% correction_weight(j,k)', &
+                           j, k, B(j,k)*s% correction_weight(j,k)
+                        stop 'sizeB'
+                     end if
+                     
                      max_zone = k
                      max_var = j
+                     exit cell_loop
+                     
+                     cycle
                   end if
-                  if (j > nvar_hydro) then
-                     num_xa_terms = num_xa_terms + 1
-                     sum_xa_corr = sum_xa_corr + abs_corr
-                     if (abs_corr > max_abs_xa_corr_for_k) &
-                        max_abs_xa_corr_for_k = abs_corr
-                  else
-                     num_terms = num_terms + 1
-                     sum_corr = sum_corr + abs_corr
-                  end if
-               end do var_loop
-               if (num_xa_terms > 0) then
-                  num_terms = num_terms + 1
-                  sum_corr = sum_corr + sum_xa_corr/num_xa_terms
                end if
-            else if (s% do_burn .or. s% do_mix) then
+               if (j > nvar_hydro) then
+                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle
+               end if
+
+               abs_corr = abs(B(j,k)*s% correction_weight(j,k))
+               if (is_bad_num(abs_corr)) then
+                  found_bad_num = .true.
+                  if (report) write(*,3) 'B(j,k)*s% correction_weight(j,k)', &
+                     j, k, B(j,k)*s% correction_weight(j,k)
+                  if (s% stop_for_bad_nums) found_NaN = .true.
+               end if
+               if (abs_corr > max_abs_corr_for_k &
+                  .and. .not. (j > nvar_hydro .and. s% ignore_species_in_max_correction)) &
+                     max_abs_corr_for_k = abs_corr
+               if (abs_corr > max_abs_correction &
+                  .and. .not. (j > nvar_hydro .and. s% ignore_species_in_max_correction)) then
+                  max_correction = B(j,k)*s% correction_weight(j,k)
+                  max_abs_correction = abs_corr
+                  max_zone = k
+                  max_var = j
+               end if
+               if (j > nvar_hydro) then
+                  num_xa_terms = num_xa_terms + 1
+                  sum_xa_corr = sum_xa_corr + abs_corr
+                  if (abs_corr > max_abs_xa_corr_for_k) &
+                     max_abs_xa_corr_for_k = abs_corr
+               else
+                  num_terms = num_terms + 1
+                  sum_corr = sum_corr + abs_corr
+               end if
+            end do var_loop
+            if (num_xa_terms > 0) then
+               num_terms = num_terms + 1
+               sum_corr = sum_corr + sum_xa_corr/num_xa_terms
+            end if
+            if (s% do_burn .or. s% do_mix) then
                species_loop: do j = s% i_chem1, nvar
                   i = j - s% nvar_hydro
                   if (check_for_bad_nums) then

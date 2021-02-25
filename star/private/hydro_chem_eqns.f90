@@ -188,13 +188,8 @@
                dxdt_expected_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)
                dequ_dlnT = dxdt_expected_dlnT/eqn_scale
 
-               if (s% do_struct_hydro) then ! partial wrt lnd const lnT
-                  call e00(s, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
-               end if
-
-               if (s% do_struct_thermo) then ! partial wrt lnT const lnd
-                  call e00(s, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
-               end if
+               call e00(s, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
+               call e00(s, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
 
             end if
 

@@ -321,8 +321,7 @@
       integer, parameter :: h_center_eps_nuc = h_d_center_eps_nuc_dlnd + 1
       integer, parameter :: h_center_non_nuc_neu = h_center_eps_nuc + 1
 
-      integer, parameter :: h_center_dL_dm = h_center_non_nuc_neu + 1
-      integer, parameter :: h_center_eps_grav = h_center_dL_dm + 1
+      integer, parameter :: h_center_eps_grav = h_center_non_nuc_neu + 1
       integer, parameter :: h_center_degeneracy = h_center_eps_grav + 1
       integer, parameter :: h_center_gamma = h_center_degeneracy + 1
 
@@ -718,10 +717,7 @@
 
       integer, parameter :: h_tot_IE_div_IE_plus_KE = h_log_tot_Et + 1      
 
-      integer, parameter :: h_min_L = h_tot_IE_div_IE_plus_KE + 1
-      integer, parameter :: h_min_dL_dm_m = h_min_L + 1
-      integer, parameter :: h_min_dL_dm = h_min_dL_dm_m + 1
-      integer, parameter :: h_burn_solver_maxsteps = h_min_dL_dm + 1
+      integer, parameter :: h_burn_solver_maxsteps = h_tot_IE_div_IE_plus_KE + 1
       integer, parameter :: h_rotation_solver_steps = h_burn_solver_maxsteps + 1
       integer, parameter :: h_diffusion_solver_steps = h_rotation_solver_steps + 1
       integer, parameter :: h_diffusion_solver_iters = h_diffusion_solver_steps + 1
@@ -1084,7 +1080,6 @@
          history_column_name(h_center_degeneracy) = 'center_degeneracy'
          history_column_name(h_center_eps_grav) = 'center_eps_grav'
          history_column_name(h_center_non_nuc_neu) = 'center_non_nuc_neu'
-         history_column_name(h_center_dL_dm) = 'center_dL_dm'
          history_column_name(h_log_center_eps_nuc) = 'log_center_eps_nuc'
          history_column_name(h_d_center_eps_nuc_dlnT) = 'd_center_eps_nuc_dlnT'
          history_column_name(h_d_center_eps_nuc_dlnd) = 'd_center_eps_nuc_dlnd'
@@ -1446,10 +1441,6 @@
 
          history_column_name(h_cz_top_zone_logdq) = 'cz_top_zone_logdq'
          history_column_name(h_log_Lnuc_sub_log_L) = 'log_Lnuc_sub_log_L'
-
-         history_column_name(h_min_L) = 'min_L'
-         history_column_name(h_min_dL_dm_m) = 'min_dL_dm_m'
-         history_column_name(h_min_dL_dm) = 'min_dL_dm'
 
          history_column_name(h_k_below_const_q) = 'k_below_const_q'
          history_column_name(h_q_below_const_q) = 'q_below_const_q'
