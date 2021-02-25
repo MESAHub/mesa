@@ -810,40 +810,6 @@
       end subroutine eos_convert_helm_results
 
       
-      subroutine eos_eval_PC( & ! Potekhin-Chabrier eos
-            handle, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, d_dlnd, d_dlnT, &
-            ierr)
-         use eos_def
-         use eosDT_eval, only: Get_PC_Results
-         integer, intent(in) :: handle
-         real(dp), intent(in) :: Z, X, abar, zbar
-         integer, intent(in) :: species
-         integer, pointer :: chem_id(:), net_iso(:)
-         real(dp), intent(in) :: xa(:)
-         real(dp), intent(in) :: Rho, logRho, T, logT
-         real(dp), intent(inout), dimension(:) :: res, d_dlnd, d_dlnT
-         real(dp), dimension(num_eos_basic_results, species) :: d_dxa
-         integer, intent(out) :: ierr
-         
-         
-         type (EoS_General_Info), pointer :: rq
-         call get_eos_ptr(handle,rq,ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
-            return
-         end if
-         call Get_PC_Results( &
-            rq, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            Rho, logRho, T, logT, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            ierr)
-      end subroutine eos_eval_PC
-      
-      
       ! eosDT search routines.  these use num_lib safe_root to find T or Rho.
       
       subroutine eosDT_get_T( &
