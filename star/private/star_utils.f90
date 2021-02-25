@@ -563,14 +563,6 @@
          do k = 2, s% nz
             s% tau(k) = s% tau(k-1) + dtau
             s% lntau(k) = log(s% tau(k))
-            if (s% tau_for_L_BB > 0d0 .and. s% L_for_BB_outer_BC <= 0d0) then
-               dm_sum = dm_sum + s% dm(k-1)
-               L_sum = L_sum + s% L(k-1)*s% dm(k-1)
-               if (s% tau(k) >= s% tau_for_L_BB) then
-                  s% L_for_BB_outer_BC = L_sum/dm_sum
-                  !write(*,2) 's% L_for_BB_outer_BC', k, s% L_for_BB_outer_BC
-               end if
-            end if
             if (s% tau_start(k) < 0) s% tau_start(k) = s% tau(k)
             kap = s% opacity(k)
             dtau = s% dm(k)*kap/(pi4*s% rmid(k)*s% rmid(k))
@@ -587,10 +579,6 @@
             !write(*,*) 'dtau, dlogtau', k, tau(k) - tau(k-1), &
             !   log10(tau(k)/tau(k-1))
          end do
-         if (s% tau_for_L_BB > 0d0 .and. s% L_for_BB_outer_BC < 0d0) then
-            write(*,1) 'failed to set s% L_for_BB_outer_BC', s% L_for_BB_outer_BC
-            stop 'get_tau'
-         end if
       end subroutine get_tau
 
 

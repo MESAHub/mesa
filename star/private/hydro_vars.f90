@@ -879,17 +879,11 @@
             (s% use_momentum_outer_BC .and. trim(s% atm_option) == 'fixed_Psurf')
             
          do_not_need_atm_Tsurf = &
-            s% i_lum == 0 .or. s% TDC_flag .or. &
-            ((s% use_fixed_L_for_BB_outer_BC .or. s% tau_for_L_BB > 0d0) .and. &
-             (s% use_T_black_body_outer_BC))
+            s% i_lum == 0 .or. s% TDC_flag
 
          ! Set up stellar surface parameters
          
-         if (s% use_T_black_body_outer_BC .and. s% use_fixed_L_for_BB_outer_BC) then
-            L_surf = s% fixed_L_for_BB_outer_BC
-         else
-            L_surf = s% L(1)
-         end if
+         L_surf = s% L(1)
          R_surf = s% r(1)
          
          ! Initialize partials
@@ -1061,30 +1055,6 @@
 
             end select
 
-         end if
-
-         ! Add in extra surface pressure
-
-         if (s% surface_extra_Pgas /= 0._dp) then
-            P_surf_atm = exp(lnP_surf)
-            P_surf = P_surf_atm + s% surface_extra_Pgas
-            if (P_surf < 1E-50_dp) then
-               lnP_surf = -50*ln10
-               if (.not. skip_partials) then
-                  dlnP_dL = 0._dp
-                  dlnP_dlnR = 0._dp
-                  dlnP_dlnM = 0._dp
-                  dlnP_dlnkap = 0._dp
-               endif
-            else
-               lnP_surf = log(P_surf)
-               if (.not. skip_partials) then
-                  dlnP_dL = dlnP_dL*P_surf_atm/P_surf
-                  dlnP_dlnR = dlnP_dlnR*P_surf_atm/P_surf
-                  dlnP_dlnM = dlnP_dlnM*P_surf_atm/P_surf
-                  dlnP_dlnkap = dlnP_dlnkap*P_surf_atm/P_surf
-               endif
-            end if
          end if
 
          ! Check outputs

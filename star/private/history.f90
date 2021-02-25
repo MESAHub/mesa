@@ -1917,20 +1917,6 @@
             case(h_surf_avg_logRho)
                val = s% logRho_avg_surf
 
-            case(h_luminosity_for_BB_outer_BC)
-               if (s% tau_for_L_BB >= 0) then
-                  val = s% L_for_BB_outer_BC/Lsun
-               else
-                  val = s% L(1)/Lsun
-               end if
-            case(h_logL_for_BB_outer_BC)
-               if (s% tau_for_L_BB >= 0) then
-                  val = s% L_for_BB_outer_BC/Lsun
-               else
-                  val = s% L(1)/Lsun
-               end if
-               val = safe_log10(val)
-
             case(h_v_wind_Km_per_s)
                val = 1d-5*s% opacity(1)*max(0d0,-s% mstar_dot)/ &
                         (pi4*s% photosphere_r*Rsun*s% tau_base)
@@ -2806,9 +2792,6 @@
                if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,2d0)
             case(h_int_k_r_dr_0pt5_nu_max_Sl3)
                if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,0.5d0)
-
-            case (h_surface_extra_Pgas)
-               val = s% surface_extra_Pgas
 
             case (h_min_L)
                val = minval(s% L(1:nz))/Lsun

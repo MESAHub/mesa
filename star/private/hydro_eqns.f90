@@ -963,8 +963,6 @@
             P_surf, T_surf, dlnP_bc_dlnPsurf, P_rad, &
             dlnT_bc_dlnTsurf, P_bc, T_bc, lnT_bc, lnP_bc, &
             dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
-            dlnP_bc_dlnPgas_const_T, dlnP_bc_dlnT_const_Pgas, dlnP_dlnPgas_const_T, &
-            dlnP_dlnT_const_Pgas, dlnT_bc_dlnPgas_const_T, dlnT_bc_dlnT_const_Pgas, &
             dlnT_bc_dlnE_const_Rho, dlnT_dlnE_const_Rho, dlnP_dlnE_c_Rho, &
             dlnP_bc_dlnE_c_Rho, dlnT_bc_dlnd_c_E, dlnP_bc_dlnd_c_E, &
             d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL
@@ -1108,8 +1106,6 @@
          
          if (s% use_zero_dLdm_outer_BC) then
             call set_zero_dL_dm_BC(ierr)
-         else if (s% use_T_black_body_outer_BC) then
-            call set_T_black_body_BC(ierr)
          else
             call set_Tsurf_BC(ierr)
          end if
@@ -1176,116 +1172,6 @@
             call ep1(s,i_equL,i_lum,1,nvar,1d0/s% L(1))
          end subroutine set_zero_dL_dm_BC
 
-
-         subroutine set_T_black_body_BC(ierr)
-            integer, intent(out) :: ierr
-            call set_BB_BC(4d0,ierr)
-         end subroutine set_T_black_body_BC
-
-
-         subroutine set_BB_BC(factor,ierr)
-            real(dp), intent(in) :: factor
-            integer, intent(out) :: ierr
-
-            real(dp) :: rmid, Lmid, Tscale, T1, dT1_dL, &
-               dT1_dL00, dT1_dLp1, dT1_dlnR, dT1_dlnR00, dT1_dlnRp1
-            logical :: test_partials
-
-            include 'formats'
-            ierr = 0
-            
-            !test_partials = (s% solver_test_partials_k == 1) 
-            test_partials = .false.
-
-            if (.not. s% do_struct_thermo) then ! dummy eqn
-               s% equ(i_equL,1) = 0
-               if (skip_partials) return
-               call e00(s,i_equL,i_lnT,1,nvar,1d0)
-               return
-            end if
-
-            rmid = s% rmid(1)
-            if (s% use_fixed_L_for_BB_outer_BC) then
-               Lmid = s% fixed_L_for_BB_outer_BC
-               T1 = s% Tsurf_factor* &
-                  pow(Lmid/(factor*pi*rmid*rmid*boltz_sigma), 0.25d0)
-               dT1_dL = 0
-            else
-               if (s% tau_for_L_BB > 0d0) then
-                  Lmid = s% L_for_BB_outer_BC
-               else
-                  Lmid = (s% L(1) + s% L(2))/2
-               end if
-               T1 = s% Tsurf_factor* &
-                  pow(Lmid/(factor*pi*rmid*rmid*boltz_sigma), 0.25d0)
-               dT1_dL = T1/(4*Lmid)
-            end if
-            if (Lmid <= 0) then
-               if (s% report_ierr) then
-                  write(*,2) 'Lmid <= 0 for set_BB_BC', s% model_number
-                  write(*,*) 's% use_fixed_L_for_BB_outer_BC', s% use_fixed_L_for_BB_outer_BC
-                  write(*,2) 's% tau_for_L_BB', s% model_number, s% tau_for_L_BB
-                  write(*,2) 's% L_for_BB_outer_BC', s% model_number, s% L_for_BB_outer_BC
-                  write(*,2) 's% L(1)', s% model_number, s% L(1)
-                  write(*,2) 'L(2)', s% model_number, s% L(2)
-                  stop 'set_BB_BC'
-               end if
-               ierr = -1
-               return
-            end if
-
-            dT1_dL00 = dT1_dL/2
-            dT1_dLp1 = dT1_dL/2
-            dT1_dlnR = -T1/2
-            dT1_dlnR00 = dT1_dlnR*s% drmid_dlnR00(1)/rmid
-            dT1_dlnRp1 = dT1_dlnR*s% drmid_dlnRp1(1)/rmid
-
-            Tscale = 1d6*s% T_start(1) ! 1d6 to reduce equ size compared to k > 1 cases
-            s% equ(i_equL, 1) = (T1 - s% T(1))/Tscale
-            if (test_partials) then
-               s% solver_test_partials_val = s% equ(i_equL, 1)
-            end if
-
-            if (is_bad(s% equ(i_equL, 1))) then
-               write(*,1) 'equ(i_equL, 1)', s% equ(i_equL, 1)
-               write(*,1) 's% r(1)', s% r(1)
-               write(*,1) 'T1', T1
-               write(*,1) 'Lmid', Lmid
-               write(*,1) 'rmid', rmid
-               write(*,1) 's% L(1)', s% L(1)
-               write(*,1) 's% L(2)', s% L(2)
-               write(*,1) 's% r(1)', s% r(1)
-               write(*,1) 's% r(2)', s% r(2)
-               write(*,1) 's% T(1)', s% T(1)
-               write(*,1) 's% T_start(1)', s% T_start(1)
-               write(*,1) 'Tscale', Tscale
-               stop 'set_BB_BC'
-            end if
-
-            if (skip_partials) return
-
-            call e00(s, i_equL, i_lnT, 1, nvar, -s% T(1)/Tscale)
-            
-            if (s% use_fixed_L_for_BB_outer_BC .or. s% tau_for_L_BB > 0d0) then
-            else if (i_lum /= 0) then
-               call e00(s, i_equL, i_lum, 1, nvar, dT1_dL00/Tscale)
-               call ep1(s, i_equL, i_lum, 1, nvar, dT1_dLp1/Tscale)
-            end if
-
-            if (s% do_struct_hydro) then
-               call e00(s, i_equL, i_lnR, 1, nvar, dT1_dlnR00/Tscale)
-               call ep1(s, i_equL, i_lnR, 1, nvar, dT1_dlnRp1/Tscale)
-            end if
-            
-            if (test_partials) then
-               s% solver_test_partials_var = i_lnT
-               s% solver_test_partials_dval_dx = -s% T(1)/Tscale
-               write(*,*) 'set_BB_BC', s% solver_test_partials_var
-            end if
-
-         end subroutine set_BB_BC
-
-
          subroutine set_Tsurf_BC(ierr)
             integer, intent(out) :: ierr
 
@@ -1346,7 +1232,7 @@
             call e00(s, i_T_BC, i_lnd, 1, nvar, dlnT_bc_dlnd*scale)
             if (test_partials) then
                s% solver_test_partials_var = i_lnT
-               s% solver_test_partials_dval_dx = dlnT_bc_dlnT_const_Pgas
+               s% solver_test_partials_dval_dx = 0
                write(*,*) 'set_Tsurf_BC', s% solver_test_partials_var
             end if
 

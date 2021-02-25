@@ -718,8 +718,7 @@
 
       integer, parameter :: h_tot_IE_div_IE_plus_KE = h_log_tot_Et + 1      
 
-      integer, parameter :: h_surface_extra_Pgas = h_tot_IE_div_IE_plus_KE + 1
-      integer, parameter :: h_min_L = h_surface_extra_Pgas + 1
+      integer, parameter :: h_min_L = h_tot_IE_div_IE_plus_KE + 1
       integer, parameter :: h_min_dL_dm_m = h_min_L + 1
       integer, parameter :: h_min_dL_dm = h_min_dL_dm_m + 1
       integer, parameter :: h_burn_solver_maxsteps = h_min_dL_dm + 1
@@ -1447,8 +1446,6 @@
 
          history_column_name(h_cz_top_zone_logdq) = 'cz_top_zone_logdq'
          history_column_name(h_log_Lnuc_sub_log_L) = 'log_Lnuc_sub_log_L'
-
-         history_column_name(h_surface_extra_Pgas) = 'surface_extra_Pgas'
 
          history_column_name(h_min_L) = 'min_L'
          history_column_name(h_min_dL_dm_m) = 'min_dL_dm_m'

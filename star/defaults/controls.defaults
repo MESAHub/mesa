@@ -4392,17 +4392,6 @@
     atm_irradiated_P_surf = 1d6
 
 
-      ! surface_extra_Pgas
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Extra gas pressure at surface. Added to surface pressure from atm.
-      ! In ergs/cm^3.
-
-      ! ::
-
-    surface_extra_Pgas = 0d0
-
-
       ! use_atm_PT_at_center_of_surface_cell
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4477,16 +4466,6 @@
     use_zero_dLdm_outer_BC = .false.
 
 
-      ! use_T_black_body_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``T_surf`` is set to ``Tsurf_factor*T_black_body(L_surf,R_surf)``
-
-      ! ::
-
-    use_T_black_body_outer_BC = .false.
-
-
       ! use_fixed_vsurf_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! fixed_vsurf
@@ -4511,30 +4490,6 @@
 
     use_fixed_Psurf_outer_BC = .false.
     fixed_Psurf = 0
-
-
-      ! use_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! for ``use_T_black_body_outer_BC``
-
-      ! ::
-
-    use_fixed_L_for_BB_outer_BC = .false.
-    fixed_L_for_BB_outer_BC = 0
-
-
-      ! tau_for_L_BB
-      ! ~~~~~~~~~~~~
-
-      ! determines location where get L for use with BB outer BCs
-      ! use the L at outermost location where tau >= tau_for_L_BB
-
-      ! ::
-
-    tau_for_L_BB = -1
 
 
       ! Tsurf_factor

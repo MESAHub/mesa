@@ -2647,13 +2647,6 @@
             if (failed('star_relax_opacity_max',ierr)) return
          end if
 
-         if (s% job% relax_fixed_L_for_BB_outer_BC .or. &
-               (s% job% relax_initial_fixed_L_for_BB_outer_BC .and. .not. restart)) then
-            write(*, 2) 'relax_fixed_L_for_BB_outer_BC steps', s% job% steps_for_relax_fixed_L
-            call star_relax_fixed_L_for_BB_outer_BC(id, s% job% steps_for_relax_fixed_L, ierr)
-            if (failed('star_relax_fixed_L_for_BB_outer_BC',ierr)) return
-         end if
-
          if (s% job% relax_max_surf_dq .or. &
                (s% job% relax_initial_max_surf_dq .and. .not. restart)) then
             write(*, 1) 'relax_max_surf_dq', s% job% new_max_surf_dq

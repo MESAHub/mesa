@@ -149,9 +149,6 @@
       real(dp) :: new_eps_nuc_factor
       real(dp) :: eps_nuc_factor_multiplier
 
-      logical :: relax_fixed_L_for_BB_outer_BC, relax_initial_fixed_L_for_BB_outer_BC
-      integer :: steps_for_relax_fixed_L
-
       logical :: relax_opacity_max, relax_initial_opacity_max
       real(dp) :: new_opacity_max
       real(dp) :: opacity_max_multiplier

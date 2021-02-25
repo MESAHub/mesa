@@ -1426,15 +1426,6 @@
       end subroutine star_relax_opacity_max
       
       
-      subroutine star_relax_fixed_L_for_BB_outer_BC(id, steps, ierr)
-         use relax, only: do_relax_fixed_L
-         integer, intent(in) :: id
-         integer, intent(in) :: steps
-         integer, intent(out) :: ierr
-         call do_relax_fixed_L(id, steps, ierr)      
-      end subroutine star_relax_fixed_L_for_BB_outer_BC
-      
-      
       subroutine star_relax_max_surf_dq(id, new_value, per_step_multiplier, ierr)
          use relax, only: do_relax_max_surf_dq
          integer, intent(in) :: id
