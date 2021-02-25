@@ -29,8 +29,6 @@
 
       use const_def, only: dp, crad
       use math_lib
-      use skye, only: Get_Skye_EOS_Results
-      use eosdt_eval, only: get_FreeEOS_for_eosdt, get_CMS_for_eosdt, Get_CMS_alfa, Get_FreeEOS_alfa, get_opal_scvh_alfa_and_partials
 
       implicit none
 
