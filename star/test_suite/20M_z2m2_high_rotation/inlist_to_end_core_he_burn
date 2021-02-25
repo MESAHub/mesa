@@ -222,7 +222,8 @@
       !max_abs_rel_run_E_err = 1d99
       !warn_when_large_rel_run_E_err = 1d99
 
-      use_gold2_tolerances = .true.
+      use_gold2_tolerances = .false.
+      use_gold_tolerances = .false.
       
       scale_max_correction = 0.1d0
       ignore_species_in_max_correction = .true.
