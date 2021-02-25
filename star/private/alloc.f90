@@ -1367,8 +1367,6 @@
             if (failed('Prad_start')) exit
             call do1(s% lnR_start, c% lnR_start)
             if (failed('lnR_start')) exit
-            call do1(s% etrb_start, c% etrb_start)
-            if (failed('etrb_start')) exit
             call do1(s% v_start, c% v_start)
             if (failed('v_start')) exit
             call do1(s% u_start, c% u_start)
