@@ -483,7 +483,7 @@
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &
                s% xh, s% xa, s% q, s% dq, &
-               s% omega, s% j_rot, s% lnT, &
+               s% omega, s% j_rot, &
                perm, ierr)
          deallocate(names, perm)
          if (ierr /= 0) then
@@ -587,7 +587,7 @@
             s, species, nvar_hydro, nz, iounit, &
             is_RSP_model, want_RSP_model, &
             xh, xa, q, dq, omega, j_rot, &
-            lnT, perm, ierr)
+            perm, ierr)
          use star_utils, only: set_qs
          use chem_def
          type (star_info), pointer :: s
@@ -595,7 +595,7 @@
          logical, intent(in) :: is_RSP_model, want_RSP_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
-            q, dq, omega, j_rot, lnT
+            q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
          integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_etrb_RSP, &
