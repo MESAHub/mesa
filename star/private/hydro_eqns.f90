@@ -584,6 +584,7 @@
 
 
       subroutine do1_density_eqn(s, k, skip_partials, nvar, ierr)
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
@@ -591,7 +592,6 @@
 
          type(auto_diff_real_star_order1) :: &
             rho, dr3, r_p1, rp13, lnR_expected, lnR_actual, resid_ad
-         integer :: nz, i_dlnd_dt, i_lnd, i_lnR
          logical :: test_partials
          include 'formats'
 
@@ -599,34 +599,24 @@
          test_partials = .false.
 
          ierr = 0
-         nz = s% nz
-         i_dlnd_dt = s% i_dlnd_dt
-         i_lnd = s% i_lnd
-         i_lnR = s% i_lnR
          rho = wrap_d_00(s,k)
-         dr3 = (s% dm(k)/rho)/(pi4/3d0)
+         dr3 = (s% dm(k)/rho)/(4d0*pi/3d0)
          r_p1 = wrap_r_p1(s,k)
          rp13 = pow3(r_p1)
-         ! dm should = four_thirds_pi*(r(k)**3 - rp13)*rho
-         ! r(k)**3 = rp13 + (dm/rho)/four_thirds_pi = rp13 + dr3
+
          lnR_expected = log(rp13 + dr3)/3d0
-         
-         lnR_actual = 0d0
-         lnR_actual% val = s% lnR(k)
-         lnR_actual%d1Array(i_lnR_00) = 1d0
+         lnR_actual = wrap_lnR_00(s,k)
          
          resid_ad = lnR_actual - lnR_expected
-         s% equ(i_dlnd_dt, k) = resid_ad%val
+         s% equ(s% i_dlnd_dt, k) = resid_ad%val
 
          if (test_partials) then
-            s% solver_test_partials_val = s% equ(i_dlnd_dt, k)
+            s% solver_test_partials_val = 0
          end if
 
          if (skip_partials) return
-
-         call e00(s, i_dlnd_dt, i_lnR, k, nvar, resid_ad%d1Array(i_lnR_00))
-         if (k < nz) call ep1(s, i_dlnd_dt, i_lnR, k, nvar, resid_ad%d1Array(i_lnR_p1))
-         call e00(s, i_dlnd_dt, i_lnd, k, nvar, resid_ad%d1Array(i_lnd_00))
+         call save_eqn_residual_info( &
+            s, k, nvar, s% i_dlnd_dt, resid_ad, 'do1_density_eqn', ierr)           
 
          if (test_partials) then   
             s% solver_test_partials_var = 0
@@ -1226,16 +1216,21 @@
 
          subroutine set_compression_BC(ierr)
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: rho1, rho2, dV1, dV2
+            type(auto_diff_real_star_order1) :: &
+               rho1, rho2, lnd1, lnd2, dlnd1, dlnd2
             include 'formats'
             ! gradient of compression vanishes fixes density for cell 1
                ! d_dt(1/rho(1)) = d_dt(1/rho(2))  e.g., Grott, Chernigovski, Glatzel, 2005.
+               ! -dlnd_dt(1)/rho(1) = -dlnd_dt(2)/rho(2)
+               ! rho(2)*dlnd_dt(1) = rho(1)*dlnd_dt(2)
             ierr = 0            
             rho1 = wrap_d_00(s,1)
             rho2 = wrap_d_p1(s,1)
-            dV1 = 1d0/(rho1 - s% rho_start(1))
-            dV2 = 1d0/(rho2 - s% rho_start(2))            
-            resid_ad = (dV1 - dV2)/s% dt            
+            lnd1 = wrap_lnd_00(s,1)
+            lnd2 = wrap_lnd_p1(s,1)
+            dlnd1 = lnd1 - s% lnd_start(1)
+            dlnd2 = lnd2 - s% lnd_start(2)
+            resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt            
             s% equ(i_P_eqn, 1) = resid_ad%val     
             if (skip_partials) return            
             call save_eqn_residual_info( &
