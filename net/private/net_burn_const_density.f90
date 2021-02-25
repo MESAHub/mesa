@@ -385,6 +385,8 @@
             use net_eval, only: eval_net
             use rates_def, only: rates_reaction_id_max, i_rate, i_rate_dT, i_rate_dRho
             use interp_1d_lib, only: interp_value
+            use eos_def, only: i_lnE, num_eos_basic_results, num_eos_d_dxa_results
+            use eos_lib, only: eosDT_get
          
             real(dp) :: time, dt, y(:), f(:)
             real(dp), pointer :: dfdy(:,:)
@@ -411,7 +413,14 @@
             real(dp), target :: x_a(nvar), dfdx_a(nvar,nvar)
             real(dp), pointer :: x(:), dfdx(:,:)
             real(dp) :: d_eta_dlnRho
-         
+
+            real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT, &
+               res_plus_dx, d_dlnd_plus_dx, d_dlnT_plus_dx
+            real(dp), dimension(num_eos_d_dxa_results,species) :: d_dxa, d_dxa_plus_dx
+
+            real(dp) :: dedt, dedt_dT
+            real(dp) :: dx(species), dedt_dx(species)
+
             include 'formats'
          
             ierr = 0
@@ -504,12 +513,41 @@
                write(*,1) 'd_eta_dlnT', d_eta_dlnT
                stop 'net burn const density'
             end if
+
+            ! calculate the term
+            ! dedt = sum_j (\partial_e/\partial Y_j)(dY_j/dt)
+
+            ! redundant with previous eos call
+            ! leave for now; can consolidate later
+            call eosDT_get( &
+               eos_handle, species, g% chem_id, g% net_iso, x, &
+               Rho, lgRho, T, lgT, &
+               res, d_dlnd, d_dlnT, d_dxa, ierr)
+
+            ! calculate finite composition change
+            do j = 1, species
+               dx(j) = dxdt(j) * dt
+            end do
+
+            ! evaluate eos with perturbed composition
+            call eosDT_get( &
+               eos_handle, species, g% chem_id, g% net_iso, x+dx, &
+               Rho, lgRho, T, lgT, &
+               res_plus_dx, d_dlnd_plus_dx, d_dlnT_plus_dx, d_dxa_plus_dx, ierr)
+
+            ! construct finite difference approximation
+            ! dedt ~= [e(rho,T,X+dx) - e(rho,T,X)]/dt
+            dedt = (exp(res_plus_dx(i_lnE)) - exp(res(i_lnE)))/dt
+            dedt_dT = T*(exp(d_dlnT_plus_dx(i_lnE)) - exp(d_dlnT(i_lnE)))/dt
+            do j = 1, species
+               dedt_dx(j) = (exp(d_dxa_plus_dx(i_lnE, j)) - exp(d_dxa(i_lnE, j)))/dt
+            end do
             
             if (size(f,dim=1) > 0) then
                do j = 1, species
                   f(j) = dxdt(j)/aion(j)
                end do
-               f(nvar) = eps_nuc/(Cv*T) ! dlnT_dt
+               f(nvar) = (eps_nuc-dedt)/(Cv*T) ! dlnT_dt
                !f(nvar) = 0d0 ! TESTING
             end if
 
@@ -527,11 +565,11 @@
                   !dfdy(j,nvar) = 0d0 ! TESTING
                end do
                do j = 1,species
-                  dfdy(nvar,j) = d_eps_nuc_dx(j)/(Cv*T) ! d_lnT_dx(j)
+                  dfdy(nvar,j) = (d_eps_nuc_dx(j)-dedt_dx(j))/(Cv*T) ! d_lnT_dx(j)
                   !dfdy(nvar,j) = 0d0 ! TESTING
                end do               
                dfdy(nvar,nvar) = &
-                  d_eps_nuc_dT/Cv - (1d0 + d_Cv_dlnT/Cv)*eps_nuc/(Cv*T)
+                  (d_eps_nuc_dT-dedt_dT)/Cv - (1d0 + d_Cv_dlnT/Cv)*(eps_nuc-dedt)/(Cv*T)
                !dfdy(nvar,nvar) = -1d0 ! TESTING
                if (is_bad(dfdy(nvar,nvar))) then
                   ierr = -1
