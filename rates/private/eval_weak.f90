@@ -252,7 +252,6 @@
             out = weak_rhs_nuclide_id(ir)
             Qx = chem_isos% mass_excess(in) - chem_isos% mass_excess(out)
 
-#ifdef USE_HDF5
             if (use_suzuki_tables) then
                ! now, if there's a suzuki reaction, use that one instead
                call create_weak_dict_key(weak_lhs_nuclide_name(ir), weak_rhs_nuclide_name(ir), key)
@@ -281,7 +280,6 @@
                   ierr = 0
                end if
             end if
-#endif
 
           ! neg is true for electron capture and positron emission
           neg = ((chem_isos% Z(in) - chem_isos% Z(out)) == 1.0d0)

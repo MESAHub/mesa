@@ -34,6 +34,7 @@ module pulse
   use pulse_fgong
   use pulse_osc
   use pulse_gyre
+  use pulse_gsm
   use pulse_saio
   use pulse_gr1d
 
@@ -140,6 +141,8 @@ contains
        call get_osc_data(id, add_center_point, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
     case ('gyre')
        call get_gyre_data(id, add_center_point, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
+    case ('gsm')
+       call get_gyre_data(id, add_center_point, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
     case ('saio')
        call get_saio_data(id, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
     case ('gr1d')
@@ -183,6 +186,8 @@ contains
        call write_osc_data(id, filename, global_data, point_data, ierr)
     case ('gyre')
        call write_gyre_data(id, filename, global_data, point_data, ierr)
+    case ('gsm')
+       call write_gsm_data(id, filename, global_data, point_data, ierr)
     case ('saio')
        call write_saio_data(id, filename, global_data, point_data, ierr)
     case ('gr1d')

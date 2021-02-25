@@ -71,7 +71,7 @@ LOAD_CRMATH = `mesasdk_crmath_link`
 export MESASDK_MATH_SLOT = crmath
 endif
 
-# step 3) specify which LAPACK and BLADS libraries to use for mesa/mtx
+# step 3) specify which LAPACK and BLAS libraries to use for mesa/mtx
 
 WHICH_LAPACK95 =
 WHICH_LAPACK =
@@ -92,9 +92,7 @@ LOAD_PGPLOT = `mesasdk_pgplot_link` -lz
 # SE is now supported using run_star_extras.  contact Falk Herwig for info.
 
 
-# step 6) do you want to use HDF5 with mesa/star? 
-# Currently we use HDF5 for weak nuclear reaction rates
-USE_HDF5 = YES
+# step 6) specify which HDF library to use for mesa/hdf5io
 LOAD_HDF5 = `mesasdk_hdf5_link`
 
 
@@ -252,7 +250,7 @@ LOAD_MATRIX_INT = $(addprefix -l,$(LIBS_MATRIX))
 LOAD_MATRIX_EXT = $(LOAD_CRMATH) $(LOAD_LAPACK95) $(LOAD_LAPACK) $(LOAD_BLAS)
 LOAD_MATRIX = $(LOAD_MATRIX_INT) $(LOAD_MATRIX_EXT)
 
-LIBS_MESA_NUMERICS = interp_2d interp_1d num auto_diff $(LIBS_MATRIX)
+LIBS_MESA_NUMERICS = interp_2d interp_1d num auto_diff hdf5io $(LIBS_MATRIX)
 LOAD_MESA_NUMERICS_INT = $(addprefix -l,$(LIBS_MESA_NUMERICS))
 LOAD_MESA_NUMERICS_EXT = $(LOAD_MATRIX_EXT) $(LOAD_HDF5)
 LOAD_MESA_NUMERICS = $(LOAD_MESA_NUMERICS_INT) $(LOAD_MESA_NUMERICS_EXT)

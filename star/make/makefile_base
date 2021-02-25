@@ -156,6 +156,7 @@ SRCS = \
    pulse_fgong.f90 \
    pulse_osc.f90 \
    pulse_gyre.f90 \
+   pulse_gsm.f90 \
    pulse_saio.f90 \
    pulse_gr1d.f90 \
    pulse_utils.f90 \

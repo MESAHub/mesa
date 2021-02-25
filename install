@@ -276,6 +276,7 @@ do_one utils
 do_one_parallel math
 do_one_parallel mtx
 do_one_parallel auto_diff
+do_one_parallel hdf5io
 do_one_parallel num
 
 do_one_parallel interp_1d
