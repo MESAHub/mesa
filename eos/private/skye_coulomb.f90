@@ -7,6 +7,7 @@ module skye_coulomb
 
    implicit none
 
+   real(dp), parameter :: AUM = amu / me
    logical, parameter :: dbg = .false.
    !logical, parameter :: dbg = .true.
 
@@ -260,8 +261,6 @@ module skye_coulomb
       real(dp) :: COTPT, gamma_boundary
       type(auto_diff_real_2var_order3) :: temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT
 
-      real(dp), parameter :: AUM = amu / me
-
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
@@ -356,13 +355,18 @@ module skye_coulomb
       type(auto_diff_real_2var_order3), intent(in) :: GAMI, TPT
 
       ! Intermediates
-      type(auto_diff_real_2var_order3) :: screening_factor
+      type(auto_diff_real_2var_order3) :: screening_factor, RS, COTPT
 
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-      screening_factor = pow2(TPT / GAMI) ! Proportional to RS_{ion}^{-1} ~ rho^{1/3}
-      screening_factor = pow7(screening_factor / (1d-6 + screening_factor))
+
+
+      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
+      RS = GAMI * COTPT / TPT ! Electron sphere radius / Bohr radius
+
+      screening_factor = pow7(1d0 / (1d0 + RS/1d0))
+      write(*,*) RS%val, screening_factor%val
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
