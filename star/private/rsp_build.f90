@@ -29,8 +29,8 @@
       use const_def, only: dp, crad, two_thirds, pi4, four_thirds_pi, Msun, Lsun, Rsun
       use eos_lib, only: Radiation_Pressure
       use rsp_def
-      use rsp_eval_eos_and_kap, only: X, Y, Z
-      use rsp_lina, only: mesa_eos_kap, do_LINA
+      use rsp_eval_eos_and_kap, only: X, Y, Z, mesa_eos_kap
+      use rsp_lina, only: do_LINA
       use rsp_relax_env, only: EOP, RELAX_ENV
       
       implicit none

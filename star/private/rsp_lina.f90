@@ -27,12 +27,13 @@
       use star_def, only: star_info
       use utils_lib, only: is_bad
       use const_def, only: dp, crad
+      use rsp_eval_eos_and_kap, only: mesa_eos_kap
       use rsp_def
       
       implicit none
       
       private
-      public :: mesa_eos_kap, SORT, do_LINA
+      public :: SORT, do_LINA
 
       
       contains
@@ -1175,45 +1176,6 @@
       return
       end subroutine do_LINA
      
-     
-      SUBROUTINE mesa_eos_kap (s,k,G,H, &   !input: temp,volume  &
-               P,PV,PT,E,EV,ET,CP,CPV,dCp_dT_00, &
-               Q,QV,QT,OP,OPV,OPT,ierr) 
-      use rsp_eval_eos_and_kap, only : eval_mesa_eos_and_kap
-      implicit none
-      type (star_info), pointer :: s
-      integer, intent(out) :: ierr
-      integer :: k, j
-      real(8) :: G,H,P,PV,PT, &
-         E,EV,ET,CP,CPV,dCp_dT_00, &
-         Q,QV,QT,OP,OPV,OPT,cs, &
-         Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
-         egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT
-      include 'formats'
-      if (k <= 0 .or. k > NZN) then
-         j = 0
-      else
-         j = NZN+1-k
-      end if
-      if (is_bad(G+H)) then
-         write(*,2) 'LINA mesa_eos_kap G H', k, G, H
-         stop 'mesa_eos_kap'
-      end if
-      call eval_mesa_eos_and_kap(s,j,G,H, &
-               Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT,&
-               egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-               cs,CP,CPV,dCp_dT_00, &
-               Q,QV,QT,OP,OPV,OPT,ierr) 
-      if (ierr /= 0) return
-      E = egas + erad
-      EV = d_egas_dV + d_erad_dV
-      ET = d_egas_dT + d_erad_dT
-      P = Pgas + Prad
-      PV = d_Pg_dV
-      PT = d_Pg_dT + d_Pr_dT
-      end SUBROUTINE mesa_eos_kap
-
-
 ! THIS IS A MODIFIED "NUMERICAL RECIPIES" SORTING SUBROUTINE
 ! IT SORTS THE VECTOR RA (DIMENSION N) IN ASCENDING ORDER
 ! AND IN THE SAME WAY REARRANGES THE ELEMENTS OF RB (RB IS NOT SORTED)

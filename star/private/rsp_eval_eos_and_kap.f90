@@ -40,7 +40,43 @@
       integer, pointer, dimension(:) :: net_iso, chem_id
       integer :: eos_handle, kap_handle
       
-      contains
+      contains  
+     
+      subroutine mesa_eos_kap (s,k,G,H, &   !input: temp,volume  &
+               P,PV,PT,E,EV,ET,CP,CPV,dCp_dT_00, &
+               Q,QV,QT,OP,OPV,OPT,ierr) 
+      implicit none
+      type (star_info), pointer :: s
+      integer, intent(out) :: ierr
+      integer :: k, j
+      real(8) :: G,H,P,PV,PT, &
+         E,EV,ET,CP,CPV,dCp_dT_00, &
+         Q,QV,QT,OP,OPV,OPT,cs, &
+         Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
+         egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT
+      include 'formats'
+      if (k <= 0 .or. k > s% nz) then
+         j = 0
+      else
+         j = s% nz + 1 - k
+      end if
+      if (is_bad(G+H)) then
+         write(*,2) 'LINA mesa_eos_kap G H', k, G, H
+         stop 'mesa_eos_kap'
+      end if
+      call eval1_mesa_eos_and_kap(s,j,.false.,G,H, &
+               Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT,&
+               egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
+               cs,CP,CPV,dCp_dT_00, &
+               Q,QV,QT,OP,OPV,OPT,ierr) 
+      if (ierr /= 0) return
+      E = egas + erad
+      EV = d_egas_dV + d_erad_dV
+      ET = d_egas_dT + d_erad_dT
+      P = Pgas + Prad
+      PV = d_Pg_dV
+      PT = d_Pg_dT + d_Pr_dT
+      end subroutine mesa_eos_kap
       
       
       subroutine restart_rsp_eos_and_kap(s)
@@ -142,14 +178,7 @@
 
          write(*,1) 'init_for_rsp_eos_and_kap X', X
          write(*,1) 'Y', Y
-         write(*,1) 'Z', Z
-         
-         
-         
-         
-         
-         
-         
+         write(*,1) 'Z', Z       
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
          write(*,1) 'XC', XC
@@ -162,27 +191,6 @@
          write(*,*) trim(s% net_name)
          stop 'init_for_rsp_eos_and_kap'
       end subroutine init_for_rsp_eos_and_kap
-      
-      
-      subroutine eval_mesa_eos_and_kap(&
-            s,k,T_in,V, &
-            Pg,d_Pg_dV,d_Pg_dT,Pr,d_Pr_dT, &
-            egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: T_in,V
-         real(dp), intent(out) :: &
-            Pg,d_Pg_dV,d_Pg_dT,Pr,d_Pr_dT, &
-            egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT
-         integer, intent(out) :: ierr
-         call eval1_mesa_eos_and_kap(&
-            s,k,.false.,T_in,V, &
-            Pg,d_Pg_dV,d_Pg_dT,Pr,d_Pr_dT, &
-            egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)
-      end subroutine eval_mesa_eos_and_kap
       
       
       subroutine eval1_mesa_eos_and_kap( &
@@ -335,277 +343,6 @@
       end subroutine eval1_mesa_eos_and_kap
       
       
-      subroutine eval1_mesa_eosDEgas_and_kap( &
-            s, k, skip_kap, egas, V, T, Pgas, CSND, CP, Q, OP, ierr)
-         use star_utils, only: write_eos_call_info
-         use eos_support, only: solve_eos_given_DEgas
-         use micro, only: store_eos_for_cell
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         logical, intent(in) :: skip_kap
-         real(dp), intent(in) :: egas, V
-         real(dp), intent(out) :: T, Pgas, CSND, CP, Q, OP
-         integer, intent(out) :: ierr
-         
-         integer :: j, eos_calls
-         real(dp) :: rho, logRho, dlnd_dV, egas_tol, logT, &
-            logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
-         
-         include 'formats'
-         ierr = 0
-
-         rho = 1d0/V
-         logRho = log10(rho)
-         dlnd_dV = -rho
-         
-         if (egas <= 0d0 .or. is_bad(egas)) then
-            !$OMP critical (RSP_eosDEgas)
-            write(*,2) 'egas', k, egas
-            write(*,*) 'called eval1_mesa_eosDEgas_and_kap with bad value for egas'
-            stop 'eval1_mesa_eosDEgas_and_kap'
-            !$OMP end critical (RSP_eosDEgas)
-            ierr = -1
-            return
-         end if
-
-         if (k > 0 .and. k <= s% nz) then
-            egas_tol = egas*1d-11
-            s% rho(k) = rho
-            s% lnd(k) = logRho*ln10
-            s% xh(s% i_lnd,k) = s% lnd(k)
-            s% abar(k) = abar
-            s% zbar(k) = zbar
-            logT_guess = s% lnT(k)/ln10
-            logT_tol = 1d-11
-            call solve_eos_given_DEgas( &
-               s, k, Z, X, abar, zbar, xa, &
-               logRho, egas, logT_guess, logT_tol, egas_tol, &
-               logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-               ierr)
-            if (ierr == 0) then
-               s% lnT(k) = logT*ln10
-               s% xh(s% i_lnT,k) = s% lnT(k)
-               s% T(k) = exp(s% lnT(k))
-               T = s% T(k)
-               new_erad = crad*T**4/rho
-               new_egas = exp(res(i_lnE)) - new_erad
-               if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
-                     abs(new_egas - egas) > 1d3*egas_tol) then               
-                  !$OMP critical (RSP_eosDEgas)
-                  write(*,1) 'logRho', s% lnd(k)/ln10
-                  write(*,1) 'logT_guess', logT_guess
-                  write(*,1) 'egas', egas
-                  write(*,1) 'Z', Z
-                  write(*,1) 'X', X
-                  write(*,1) 'abar', abar
-                  write(*,1) 'zbar', zbar
-                  write(*,1) 'logT_tol', logT_tol
-                  write(*,1) 'egas_tol', egas_tol
-                  write(*,*)
-                  write(*,1) 'guess logT', logT_guess
-                  write(*,1) 'found logT', logT
-                  write(*,1) 'wanted egas', egas
-                  write(*,1) 'got egas', new_egas
-                  write(*,1) '(want - got)/got', (egas - new_egas)/new_egas
-                  write(*,*)
-                  write(*,2) 'eos_calls', eos_calls
-                  write(*,*)
-                  write(*,2) 'failed eval1_mesa_eosDEgas_and_kap', k
-                  write(*,*)
-                  write(*,*) 'is_bad(new_egas)', is_bad(new_egas)
-                  write(*,*) 'new_egas <= 0d0', new_egas <= 0d0
-                  write(*,*) 'abs(new_egas - egas) > egas_tol', &
-                     abs(new_egas - egas) > egas_tol, &
-                     abs(new_egas - egas) - egas_tol, &
-                     abs(new_egas - egas), egas_tol
-                  stop 'eval1_mesa_eosDEgas_and_kap'
-                  !$OMP end critical (RSP_eosDEgas)
-               end if
-               s% lnPgas(k) = res(i_lnPgas)
-               s% Pgas(k) = exp(s% lnPgas(k))
-               Pgas = s% Pgas(k)
-               do j=1,num_eos_basic_results
-                  s% d_eos_dlnd(j,k) = d_dlnd(j)
-                  s% d_eos_dlnT(j,k) = d_dlnT(j)
-               end do
-               call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
-               CSND = s% csound(k)
-            end if
-         else ! k <= 0 or k > nz
-            write(*,*) 'cannot call eval1_mesa_eosDEgas_and_kap with k <= 0 or k > nz'
-            ierr = -1
-            return
-         end if
-                   
-         if (ierr /= 0) then
-            !$OMP critical (RSP_eosDEgas)
-            if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
-            write(*,2) 'X', k, X
-            write(*,2) 'Z', k, Z
-            write(*,2) 'zbar', k, zbar
-            write(*,2) 'abar', k, abar
-            write(*,2) 'V', k, V
-            write(*,2) 'rho', k, rho
-            write(*,2) 'egas', k, egas
-            write(*,2) 'logRho', k, logRho
-            write(*,2) 'T', k, T
-            write(*,2) 'logT', k, logT
-            if (s% stop_for_bad_nums .and. egas <= 0d0) stop 'do_eos_for_cell'
-            !$OMP end critical (RSP_eosDEgas)
-            return
-            stop 'RSP failed in eval1_mesa_eosDEgas_and_kap'
-         end if
-         
-         if (skip_kap) then
-            OP=0
-         else
-            call eval1_kap(s, k, skip_kap, &
-               V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
-               res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
-         end if
-         
-         Pgas = exp(res(i_lnPgas))
-         CP = res(i_Cp)
-         Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
-         
-      end subroutine eval1_mesa_eosDEgas_and_kap
-      
-      
-      subroutine eval1_mesa_eosDE_and_kap( &  ! for eos, energy = egas + erad
-            s, k, skip_kap, energy, V, T, Pgas, CSND, CP, Q, OP, ierr)
-         use star_utils, only: write_eos_call_info
-         use eos_support, only: solve_eos_given_DE
-         use micro, only: store_eos_for_cell
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         logical, intent(in) :: skip_kap
-         real(dp), intent(in) :: energy, V
-         real(dp), intent(out) :: T, Pgas, CSND, CP, Q, OP
-         integer, intent(out) :: ierr
-         
-         integer :: j, eos_calls
-         real(dp) :: rho, logRho, dlnd_dV, logE, logE_want, logE_tol, logT, &
-            logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
-         
-         include 'formats'
-         ierr = 0
-
-         rho = 1d0/V
-         logRho = log10(rho)
-         logE_want = log10(energy)
-         dlnd_dV = -rho
-         
-         if (energy <= 0d0 .or. is_bad(energy)) then
-            !$OMP critical (RSP_eosDE)
-            write(*,2) 'energy', k, energy
-            write(*,*) 'called eval1_mesa_eosDE_and_kap with bad value for energy'
-            stop 'eval1_mesa_eosDE_and_kap'
-            !$OMP end critical (RSP_eosDE)
-            ierr = -1
-            return
-         end if
-
-         if (k > 0 .and. k <= s% nz) then
-            s% rho(k) = rho
-            s% lnd(k) = logRho*ln10
-            s% xh(s% i_lnd,k) = s% lnd(k)
-            s% abar(k) = abar
-            s% zbar(k) = zbar
-            logT_guess = s% lnT(k)/ln10
-            logT_tol = 1d-11
-            logE_tol = 1d-11
-            
-            call solve_eos_given_DE( &
-               s, k, Z, X, abar, zbar, xa, &
-               logRho, logE_want, logT_guess, logT_tol, logE_tol, &
-               logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-               ierr)
-            if (ierr == 0) then
-               s% lnT(k) = logT*ln10
-               s% xh(s% i_lnT,k) = s% lnT(k)
-               s% T(k) = exp(s% lnT(k))
-               T = s% T(k)
-               new_erad = crad*T**4/rho
-               new_egas = exp(res(i_lnE)) - new_erad
-               logE = res(i_lnE)/ln10
-               if (is_bad(logE) .or. logE <= -20d0) then               
-                  !$OMP critical (RSP_eosDE)
-                  write(*,1) 'logRho', s% lnd(k)/ln10
-                  write(*,1) 'Z', Z
-                  write(*,1) 'X', X
-                  write(*,1) 'abar', abar
-                  write(*,1) 'zbar', zbar
-                  write(*,1) 'logT_tol', logT_tol
-                  write(*,1) 'logE_tol', logE_tol
-                  write(*,*)
-                  write(*,1) 'guess logT', logT_guess
-                  write(*,1) 'found logT', logT
-                  write(*,*)
-                  write(*,1) 'wanted logE', logE_want
-                  write(*,1) 'got logE', logE
-                  write(*,*)
-                  write(*,2) 'eos_calls', eos_calls
-                  write(*,*)
-                  write(*,2) 'failed eval1_mesa_eosDE_and_kap', k
-                  write(*,*)
-                  stop 'eval1_mesa_eosDE_and_kap'
-                  !$OMP end critical (RSP_eosDE)
-               end if
-               s% lnPgas(k) = res(i_lnPgas)
-               s% Pgas(k) = exp(s% lnPgas(k))
-               Pgas = s% Pgas(k)
-               do j=1,num_eos_basic_results
-                  s% d_eos_dlnd(j,k) = d_dlnd(j)
-                  s% d_eos_dlnT(j,k) = d_dlnT(j)
-               end do
-               call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
-               CSND = s% csound(k)
-            end if
-         else ! k <= 0 or k > nz
-            write(*,*) 'cannot call eval1_mesa_eosDE_and_kap with k <= 0 or k > nz'
-            ierr = -1
-            return
-         end if
-                   
-         if (ierr /= 0) then
-            !$OMP critical (RSP_eosDE)
-            if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
-            write(*,2) 'X', k, X
-            write(*,2) 'Z', k, Z
-            write(*,2) 'zbar', k, zbar
-            write(*,2) 'abar', k, abar
-            write(*,2) 'V', k, V
-            write(*,2) 'rho', k, rho
-            write(*,2) 'logE', k, logE
-            write(*,2) 'logRho', k, logRho
-            write(*,2) 'T', k, T
-            write(*,2) 'logT', k, logT
-            !$OMP end critical (RSP_eosDE)
-            return
-            stop 'RSP failed in eval1_mesa_eosDE_and_kap'
-         end if
-         
-         if (skip_kap) then
-            OP=0
-         else
-            call eval1_kap(s, k, skip_kap, &
-               V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
-               res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
-         end if
-         
-         Pgas = exp(res(i_lnPgas))
-         CP = res(i_Cp)
-         Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
-         
-      end subroutine eval1_mesa_eosDE_and_kap
-      
-      
       subroutine eval1_kap(s, k, skip_kap, &
             V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
             res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
@@ -705,35 +442,7 @@
       
       end subroutine eval1_kap
       
-      
-      subroutine eval1_mesa_T_given_DP(s, k, Vol, P, T_guess, T, ierr)
-         use eos_support, only: solve_eos_given_DP
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(in) :: Vol, P, T_guess
-         real(dp), intent(out) :: T
-         integer, intent(out) :: ierr         
-         real(dp) :: rho, logRho, logP, logT_guess, &
-            logT_tol, logP_tol, logT
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         include 'formats'
-         ierr = 0
-         rho = 1d0/Vol
-         logRho = log10(rho)
-         logP = log10(P)
-         logT_guess = log10(T_guess)
-         logT_tol = 1d-11
-         logP_tol = 1d-11
-         call solve_eos_given_DP( &
-            s, k, Z, X, abar, zbar, xa, &
-            logRho, logP, logT_guess, logT_tol, logP_tol, &
-            logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-            ierr)
-         T = exp10(logT)
-      end subroutine eval1_mesa_T_given_DP
-      
-      
+            
       subroutine eval1_mesa_Rho_given_PT(s, k, P, T, rho_guess, rho, ierr)
          use eos_support, only: solve_eos_given_PT
          type (star_info), pointer :: s
@@ -838,223 +547,6 @@
          P = exp(lnP)
          
       end subroutine get_surf_P_T_kap
-
-
-      subroutine update_eos_and_kap(s,kk,ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
-         real(dp) :: &
-            T,V,Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
-            egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT
-         T = s% T(kk)
-         V = 1d0/s% rho(kk)
-         call eval_mesa_eos_and_kap( &
-            s,kk,T,V, &
-            Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
-            egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)       
-      end subroutine update_eos_and_kap
-
-
-      subroutine set_Rho_for_new_Pgas(s,kk,ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
-         real(dp) :: &
-            other_value, other_tol, logRho_bnd1, other_at_bnd1, &
-            logRho_bnd2, other_at_bnd2, logRho_guess, logRho_result, logRho_tol
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         integer :: max_iter, which_other, eos_calls, iter
-            
-         include 'formats'
-         ierr = 0         
-         max_iter = 100
-         which_other = i_lnPgas
-         other_value = log(s% Pgas(kk))
-         other_tol = 1d-11
-         logRho_tol = 1d-11
-         logRho_bnd1 = arg_not_provided
-         other_at_bnd1 = arg_not_provided
-         logRho_bnd2 = arg_not_provided
-         other_at_bnd2 = arg_not_provided
-         logRho_guess = log10(s% rho(kk))
-         s% lnT(kk) = log(s% T(kk))
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         
-         call eosDT_get_Rho( &
-            eos_handle, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            s% lnT(kk)/ln10, which_other, other_value, &
-            logRho_tol, other_tol, max_iter, logRho_guess, &
-            logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
-            logRho_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
-         if (ierr /= 0) return
-               
-         s% lnd(kk) = logRho_result*ln10
-         s% xh(s% i_lnd,kk) = s% lnd(kk)
-         s% rho(kk) = exp(s% lnd(kk))
-         s% Vol(kk) = 1d0/s% rho(kk)
-         
-      end subroutine set_Rho_for_new_Pgas
-
-
-      subroutine set_T_for_new_egas(s,kk,ierr)  ! uses s% T(kk), s% egas(kk) and s% lnd(kk)
-         type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
-
-         real(dp) :: &
-            egas_tol, logT_bnd1, egas_at_bnd1, new_egas, egas_want, &
-            logT_bnd2, egas_at_bnd2, logT_guess, logT_result, logT_tol
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         integer :: max_iter, which_other, eos_calls, iter
-            
-         include 'formats'
-         ierr = 0         
-         max_iter = 100
-         egas_want = s% egas(kk)
-         egas_tol = egas_want*1d-12
-         logT_tol = 1d-11
-         logT_bnd1 = arg_not_provided
-         egas_at_bnd1 = arg_not_provided
-         logT_bnd2 = arg_not_provided
-         egas_at_bnd2 = arg_not_provided
-         logT_guess = log10(s% T(kk))
-         
-         call eosDT_get_T_given_egas( &
-            eos_handle, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            s% lnd(kk)/ln10, egas_want, &
-            logT_tol, egas_tol, max_iter, logT_guess, &
-            logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, &
-            logT_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
-         if (ierr /= 0) return
-               
-         s% lnT(kk) = logT_result*ln10
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         s% T(kk) = exp(s% lnT(kk))
-         
-         new_egas = exp(res(i_lnE)) - crad*s% T(kk)**4/s% rho(kk)
-         if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
-               abs(new_egas - egas_want) > 1d3*egas_tol) then               
-            write(*,1) 'logRho', s% lnd(kk)/ln10
-            write(*,1) 'logT_guess', logT_guess
-            write(*,1) 'egas_want', egas_want
-            write(*,1) 'Z', Z
-            write(*,1) 'X', X
-            write(*,1) 'abar', abar
-            write(*,1) 'zbar', zbar
-            write(*,1) 'logT_tol', logT_tol
-            write(*,1) 'egas_tol', egas_tol
-            write(*,*)
-            write(*,1) 'guess logT', logT_guess
-            write(*,1) 'found logT', logT_result
-            write(*,1) 'wanted egas', egas_want
-            write(*,1) 'got egas', new_egas
-            write(*,1) '(want - got)/got', (egas_want - new_egas)/new_egas
-            write(*,*)
-            write(*,*) 'eos_calls', eos_calls
-            write(*,*)
-            write(*,2) 'failed set_T_for_new_egas', kk
-            write(*,*)
-            write(*,*) 'is_bad(new_egas)', is_bad(new_egas)
-            write(*,*) 'new_egas <= 0d0', new_egas <= 0d0
-            write(*,*) 'abs(new_egas - egas_want) > egas_tol', &
-               abs(new_egas - egas_want) > egas_tol, &
-               abs(new_egas - egas_want) - egas_tol, &
-               abs(new_egas - egas_want), egas_tol
-            stop 'set_T_for_new_egas'
-         end if
-         
-      end subroutine set_T_for_new_egas
-
-
-      subroutine set_T_for_new_Pgas(s,kk,ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
-         real(dp) :: &
-            other_value, other_tol, logT_bnd1, other_at_bnd1, &
-            logT_bnd2, other_at_bnd2, logT_guess, logT_result, logT_tol
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         integer :: max_iter, which_other, eos_calls, iter
-            
-         include 'formats'
-         ierr = 0         
-         max_iter = 100
-         which_other = i_lnPgas
-         other_value = log(s% Pgas(kk))
-         other_tol = 1d-11
-         logT_tol = 1d-11
-         logT_bnd1 = arg_not_provided
-         other_at_bnd1 = arg_not_provided
-         logT_bnd2 = arg_not_provided
-         other_at_bnd2 = arg_not_provided
-         logT_guess = log10(s% T(kk))
-         
-         call eosDT_get_T( &
-            eos_handle, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            s% lnd(kk)/ln10, which_other, other_value, &
-            logT_tol, other_tol, max_iter, logT_guess, &
-            logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-            logT_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
-         if (ierr /= 0) return
-               
-         s% lnT(kk) = logT_result*ln10
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         s% T(kk) = exp(s% lnT(kk))
-
-      end subroutine set_T_for_new_Pgas
-
-
-      subroutine set_T_for_new_energy(s,kk,logT_tol,other_tol,ierr)
-         use eos_lib, only: eosDT_get_T
-         type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         real(dp), intent(in) :: logT_tol, other_tol  
-         integer, intent(out) :: ierr  
-         real(dp) :: &
-            other_value, logT_bnd1, other_at_bnd1, &
-            logT_bnd2, other_at_bnd2, logT_guess, logT_result
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
-         integer :: max_iter, which_other, eos_calls, iter
-         ierr = 0         
-         max_iter = 100
-         which_other = i_lnE
-         other_value = log(s% energy(kk))
-         !other_tol = 1d-12
-         !logT_tol = 1d-12
-         logT_bnd1 = arg_not_provided
-         other_at_bnd1 = arg_not_provided
-         logT_bnd2 = arg_not_provided
-         other_at_bnd2 = arg_not_provided
-         logT_guess = log10(s% T(kk))
-         
-         call eosDT_get_T( &
-            eos_handle, Z, X, abar, zbar, &
-            species, chem_id, net_iso, xa, &
-            s% lnd(kk)/ln10, which_other, other_value, &
-            logT_tol, other_tol, max_iter, logT_guess, &
-            logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-            logT_result, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, eos_calls, ierr)
-         if (ierr /= 0) return
-               
-         s% lnT(kk) = logT_result*ln10
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         s% T(kk) = exp(s% lnT(kk))
-      end subroutine set_T_for_new_energy                
-
 
       end module rsp_eval_eos_and_kap
       

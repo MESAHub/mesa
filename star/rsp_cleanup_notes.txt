@@ -1,0 +1,25 @@
+Controls to be removed from MESA:
+s% RSP_relax_adjust_inner_mass_distribution
+
+
+
+s,k,G   ,H, P ,PV     ,PT                ,E    ,EV       ,ET                                      ,CP,CPV,dCp_dT_00, Q,QV,QT,OP,OPV,OPT,ierr)
+mesa_eos_kap
+calls eval_mesa_eos_and_kap and joins gas + radiation contribs
+
+          
+s,k,         T_in,V, Pg,  d_Pg_dV,d_Pg_dT,Pr,  d_Pr_dT, egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)
+eval_mesa_eos_and_kap
+
+s,k,skip_kap,T_in,V, Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)
+eval1_mesa_eos_and_kap
+
+Seem unused:
+set_T_for_new_energy
+set_T_for_new_Pgas
+set_T_for_new_egas
+set_Rho_for_new_Pgas
+update_eos_and_kap
+eval1_mesa_T_given_DP
+eval1_mesa_eosDE_and_kap
+eval1_mesa_eosDEgas_and_kap

@@ -1077,7 +1077,7 @@
 
 
       subroutine do1_eos_and_kap(s,i,ierr)
-         use rsp_eval_eos_and_kap, only : eval_mesa_eos_and_kap
+         use rsp_eval_eos_and_kap, only : eval1_mesa_eos_and_kap
          type (star_info), pointer :: s
          integer, intent(in) :: i
          integer, intent(out) :: ierr
@@ -1085,8 +1085,8 @@
          integer :: k
          include 'formats'
          k = NZN + 1 - i
-         call eval_mesa_eos_and_kap(&
-            s, k, s% T(k), s% Vol(k), &
+         call eval1_mesa_eos_and_kap(&
+            s, k, .false., s% T(k), s% Vol(k), &
             s% Pgas(k), d_Pg_dVol(I), d_Pg_dT(I), &
             Prad, d_Pr_dT, &
             s% egas(k), d_egas_dVol(I), d_egas_dT(I), &
