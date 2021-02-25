@@ -123,8 +123,6 @@
    gradr ! dlnT/dlnP required for purely radiative transport
    dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
    dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
-   signed_dlnd ! sign(dlnd)*log10(max(1,abs(1d6*dlnd)))
-   signed_dlnT ! sign(dlnT)*log10(max(1,abs(1d6*dlnT)))
    !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
    !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.

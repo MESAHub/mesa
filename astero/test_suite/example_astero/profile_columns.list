@@ -141,9 +141,6 @@
    eps_grav_plus_eps_mdot
    ergs_eps_grav_plus_eps_mdot
    
-      log_dvdt_residual
-      log_v_residual
-
       gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
       !dlnR_dm ! for structure equation
       !dlnP_dm ! for structure equation
