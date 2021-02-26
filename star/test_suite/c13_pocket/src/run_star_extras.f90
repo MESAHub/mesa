@@ -552,10 +552,10 @@
 
             if (abs(max_c13 - max_c13_expected) > 1d-2) then
                write(*,*) 'bad value for max_c13'
-               write(*,1) 'mass_max_c13', max_c13
+               write(*,1) 'max_c13', max_c13
                write(*,1) 'expected', max_c13_expected
-               write(*,1) 'mass_max_c13-expected', max_c13-max_c13_expected
-            else if (abs(mass_max_c13 - mass_max_c13_expected) > 5d-3) then
+               write(*,1) 'max_c13-expected', max_c13-max_c13_expected
+            else if (abs(mass_max_c13 - mass_max_c13_expected) > 1d-2) then
                write(*,*) 'bad value for mass_max_c13'
                write(*,1) 'mass_max_c13', mass_max_c13
                write(*,1) 'expected', mass_max_c13_expected
