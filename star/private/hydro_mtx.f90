@@ -173,12 +173,6 @@
          do_w_div_wc = i_w_div_wc > 0 .and. i_w_div_wc <= nvar
          do_j_rot = i_j_rot > 0 .and. i_j_rot <= nvar
 
-         if (s% trace_k > 0 .and. s% trace_k <= nz) then
-            k = s% trace_k
-            if (i_lnd /= 0) write(*,3) 'set_vars_for_solver: lnd dx', &
-               k, s% solver_iter, xh_start(i_lnd,k), s% solver_dx(i_lnd,k)
-         end if
-
          fe56 = s% net_iso(ife56)
          if (fe56 /= 0) fe56 = i_chem1+fe56-1
 
@@ -650,27 +644,6 @@
                   if (report) write(*,2) 'bad num rho', k, s% rho(k)
                   ierr = -1
                end if
-            end if
-
-            if (k == s% trace_k) then
-               if (i_lnd /= 0) &
-                  write(*,4) 'hydro_mtx: lgd', &
-                     k, s% solver_iter, s% model_number, &
-                     s% lnd(k)/ln10, xh_start(i_lnd,k), s% solver_dx(i_lnd,k)
-               if (i_lnT /= 0) &
-                  write(*,4) 'hydro_mtx: lgT', k, s% solver_iter, &
-                     s% model_number, s% lnT(k)/ln10, xh_start(i_lnT,k), s% solver_dx(i_lnT,k)
-               if (i_lum /= 0) &
-                  write(*,4) 'hydro_mtx: L', k, s% solver_iter, &
-                     s% model_number, s% L(k), xh_start(i_lum,k), s% solver_dx(i_lum,k)
-               write(*,4) 'hydro_mtx: lgR', k, s% solver_iter, &
-                     s% model_number, s% lnR(k)/ln10, xh_start(i_lnR,k), s% solver_dx(i_lnR,k)
-               if (i_v /= 0) &
-                  write(*,4) 'hydro_mtx: v', k, s% solver_iter, &
-                     s% model_number, s% v(k), xh_start(i_v,k), s% solver_dx(i_v,k)
-               if (i_u /= 0) &
-                  write(*,4) 'hydro_mtx: u', k, s% solver_iter, &
-                     s% model_number, s% u(k), xh_start(i_u,k), s% solver_dx(i_u,k)
             end if
 
             if (do_chem) &

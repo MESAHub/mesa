@@ -1200,8 +1200,10 @@
             from_k = comes_from(k)
             if (new_r(k) == old_r(from_k)) then
                xh(i_lnR,k) = xh_old(i_lnR,from_k)
-            else
+            else if (s% solver_uses_lnR) then
                xh(i_lnR,k) = log(new_r(k))
+            else
+               xh(i_lnR,k) = new_r(k)
             end if
             if (density_new(k) == old_rho(from_k)) then
                xh(i_lnd,k) = lnd_old(from_k)
@@ -2139,7 +2141,7 @@
          end do
 
          s% j_rot(k) = j_tot/dq_sum
-         r00 = exp(xh(s% i_lnR, k))
+         r00 = get_r_from_xh(s,k)
          if (s% fitted_fp_ft_i_rot) then
             s% w_div_w_crit_roche(k) = &
                w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &

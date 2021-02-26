@@ -85,6 +85,7 @@
       subroutine amr(s,ierr)
          use chem_def, only: ih1
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
+         use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: TooBig, TooSmall, MaxTooBig, MaxTooSmall, dr, minE
@@ -165,10 +166,9 @@
             write(*,*) '                 split', num_split
             write(*,*) '                merged', num_merge
          end if
-         if (s% rotation_flag) then
-            !update moments of inertia and omega
+         if (s% rotation_flag) then !update moments of inertia and omega
             do k=1, s% nz
-               r00 = exp(s% xh(s% i_lnR, k))
+               r00 = get_r_from_xh(s,k)
                if (s% fitted_fp_ft_i_rot) then
                   s% w_div_w_crit_roche(k) = &
                      w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
@@ -670,8 +670,8 @@
          do k=1,s% nz
             s% r(k) = s% r(k)*frac
             if (s% model_number == -6918) write(*,2) 's% r(k)', k, s% r(k)
-            s% lnR(k) = log(s% r(k))
-            s% xh(s% i_lnR,k) = s% lnR(k)
+            call store_r_in_xh(s, k, s% r(k))
+            call use_xh_to_set_lnR(s, k, s% lnR(k))
          end do
          s% r_center = frac*s% r_center
       end subroutine revise_star_radius
@@ -769,7 +769,7 @@
 
       subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
          use alloc, only: reallocate_star_info_arrays
-         use star_utils, only: set_rmid
+         use star_utils, only: set_rmid, store_r_in_xh
          type (star_info), pointer :: s
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
@@ -1224,8 +1224,8 @@
                   0.5d0*(s% xh(s% i_lum,i) + s% L_center)
             end if
          end if
-
-         s% xh(s% i_lnR,ip) = log(s% r(ip))
+         
+         call store_r_in_xh(s, ip, s% r(ip))
          if (s% u_flag) then
             s% xh(s% i_u,i) = s% u(i)
             s% xh(s% i_u,ip) = s% u(ip)

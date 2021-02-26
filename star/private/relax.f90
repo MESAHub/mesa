@@ -2585,7 +2585,7 @@
 
       subroutine do1_relax_R_center(s, new_Rcenter, ierr)
          ! adjust all lnR's to keep same density for each cell as 1st guess for next model
-         use star_utils, only: set_qs
+         use star_utils, only: set_qs, store_lnR_in_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: new_Rcenter ! cm
          integer, intent(out) :: ierr
@@ -2600,7 +2600,7 @@
             dm = s% dm(k)
             rho = s% rho(k)
             dr3 = dm/(rho*four_thirds_pi) ! dm/rho is cell volume
-            s% xh(s% i_lnR,k) = log(rp13 + dr3)*one_third
+            call store_lnR_in_xh(s, k, log(rp13 + dr3)*one_third)
             rp13 = rp13 + dr3
          end do
       end subroutine do1_relax_R_center

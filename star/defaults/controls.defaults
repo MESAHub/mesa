@@ -11138,16 +11138,6 @@
     xa_clip_limit = 1d-99
 
 
-      ! trace_k
-      ! ~~~~~~~
-
-      ! Print out trace information about cell with number = ``trace_k``.
-
-      ! ::
-
-    trace_k = -1
-
-
       ! fill_arrays_with_NaNs
       ! ~~~~~~~~~~~~~~~~~~~~~
 

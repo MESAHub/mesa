@@ -33,6 +33,7 @@
       module hydro_rotation
 
       use const_def, only: pi, pi4, ln10, two_thirds, one_third
+      use star_utils, only: get_r_from_xh
 
       use star_private_def
 
@@ -317,7 +318,7 @@
          real(dp) :: r00, r003, rp1, rp13, rm1, rm13, r_in, r_out
          include 'formats'
 
-         r00 = exp(s% xh(s% i_lnR,k))
+         r00 = get_r_from_xh(s,k)
 
          if (s% fitted_fp_ft_i_rot .or. s% simple_i_rot_flag) then
             call eval_i_rot(s, k, r00, r00, r00, s% w_div_w_crit_roche(k), &
@@ -327,13 +328,13 @@
 
          ! Compute the moment of inertia of a thin shell, ignoring rotational deformation
          ! need to compute rmid at k+1 and k-1. These are respectively r_in and r_out
-         r00 = exp(s% xh(s% i_lnR,k))
+         r00 = get_r_from_xh(s,k)
          r003 = r00*r00*r00
 
          if (k == s% nz) then
             rp1 = s% R_center
          else
-            rp1 = exp(s% xh(s% i_lnR,k+1))
+            rp1 = get_r_from_xh(s,k+1)
          end if
          rp13 = rp1*rp1*rp1
          r_in = pow(0.5*(r003 + rp13),one_third)
@@ -341,7 +342,7 @@
          if (k == 1) then
             r_out = r00
          else
-            rm1 = exp(s% xh(s% i_lnR,k-1))
+            rm1 = get_r_from_xh(s,k-1)
             rm13 = rm1*rm1*rm1
             r_out = pow(0.5*(r003 + rm13),one_third)
          end if
@@ -358,7 +359,7 @@
             do k=1,s% nz
                if (s% j_rot(k) /= 0d0) then
                   s% w_div_w_crit_roche(k) = &
-                     w_div_w_roche_jrot(exp(s% xh(s% i_lnR,k)),s% m(k),s% j_rot(k),s% cgrav(k), &
+                     w_div_w_roche_jrot(get_r_from_xh(s,k),s% m(k),s% j_rot(k),s% cgrav(k), &
                         s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
                else
                   s% w_div_w_crit_roche(k) = 0d0
@@ -376,7 +377,7 @@
          if (s% fitted_fp_ft_i_rot) then
             do k=1,s% nz
                s% w_div_w_crit_roche(k) = &
-                  w_div_w_roche_omega(exp(s% xh(s% i_lnR,k)),s% m(k),s% omega(k),s% cgrav(k), &
+                  w_div_w_roche_omega(get_r_from_xh(s,k),s% m(k),s% omega(k),s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             end do
          end if

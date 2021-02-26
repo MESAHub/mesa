@@ -315,35 +315,6 @@
             write(*,*) 'do_lnd_eps_grav chiT', s% solver_test_partials_var
          end if
 
-         if (k == s% trace_k) then
-            write(*,5) 'do_lnd_eps_grav', &
-               k, s% solver_iter, s% solver_adjust_iter, &
-               s% model_number, s% eps_grav(k)
-            write(*,2) 's% T(k)', k, s% T(k)
-            write(*,2) 's% rho(k)', k, s% rho(k)
-            write(*,2) 'dlnd_dt', k, dlnd_dt
-            write(*,2) 'dlnT_dt', k, dlnT_dt
-            write(*,2) 's% cp(k)', k, s% cp(k)
-            write(*,2) 's% grada(k)', k, s% grada(k)
-            write(*,2) 's% chiT(k)', k, s% chiT(k)
-            write(*,2) 'a1', k, a1
-            write(*,2) 'da1_dlnd', k, da1_dlnd
-            write(*,2) 'da1_dlnT', k, da1_dlnT
-            write(*,2) 's% chiRho(k)', k, s% chiRho(k)
-            write(*,2) 'a2', k, a2
-            write(*,2) 'da2_dlnd', k, da2_dlnd
-            write(*,2) 'da2_dlnT', k, da2_dlnT
-            write(*,2) 'T1', k, T1
-            write(*,2) 'T2', k, T2
-            write(*,2) 'T3', k, T3
-            write(*,2) 'dT1_dlnd', k, dT1_dlnd
-            write(*,2) 'dT2_dlnd00', k, dT2_dlnd00
-            write(*,2) 'dT3_dlnd', k, dT3_dlnd
-            write(*,2) 'dT1_dlnT00', k, dT1_dlnT00
-            write(*,2) 'dT2_dlnT', k, dT2_dlnT
-            write(*,2) 'dT3_dlnT', k, dT3_dlnT
-         end if
-
       end subroutine do_lnd_eps_grav
 
 
@@ -404,15 +375,6 @@
          dS_dlnd = s% dS_drho_for_partials(k)*s% rho(k) ! instead of   entropy*s% d_eos_dlnd(i_lnS,k)
          s% d_eps_grav_dlnT00(k) = -T*dS_dlnT*s% dVARDOT_dVAR + s% eps_grav(k)
          s% d_eps_grav_dlnd00(k) = -T*dS_dlnd*s% dVARDOT_dVAR
-
-         if (k == s% trace_k) then
-            write(*,5) 'do_lnS_eps_grav', &
-               k, s% solver_iter, s% solver_adjust_iter, &
-               s% model_number, s% eps_grav(k)
-            write(*,2) 'entropy', k, entropy
-            write(*,2) 'T', k, T
-            write(*,2) 'entropy_start', k, entropy_start
-         end if
 
       end subroutine do_lnS_eps_grav
 
@@ -689,12 +651,6 @@
             s% solver_test_partials_var = s% i_lnT
             s% solver_test_partials_dval_dx = d_de_dlnT
             write(*,*) 'get_dedt', s% solver_test_partials_var
-         end if
-
-         if (k == s% trace_k) then
-            write(*,5) 'include_composition_in_eps_grav', &
-               k, s% solver_iter, s% solver_adjust_iter, &
-               s% model_number, s% eps_grav(k)
          end if
 
          if (is_bad(s% eps_grav(k))) then

@@ -366,14 +366,6 @@ contains
          return
       end if
 
-      if (k == s% trace_k) then
-         write(*,5) 'grada', k, s% solver_iter, s% solver_adjust_iter, &
-              s% model_number, s% grada(k)
-      end if
-      if (s% model_number == -1) then
-         write(*,4) 'grada', k, s% solver_iter, s% model_number, s% grada(k)
-      end if
-
     end subroutine store_stuff
 
   end subroutine do_eos_for_cell

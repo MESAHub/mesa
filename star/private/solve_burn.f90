@@ -156,8 +156,6 @@
             end if
             s% max_burn_correction(k) = 0d0
             op_err = 0
-            if (k == s% trace_k) &
-               write(*,1) 'call do1_burn from do_burn loop'
             call burn1_zone( &
                s, k, species, min_T_for_const_density_solver, skip_burn, &
                net_lwork, burn_lwork, screening_mode, &

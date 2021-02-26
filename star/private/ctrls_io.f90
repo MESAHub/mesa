@@ -395,7 +395,7 @@
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
-    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, trace_k, &
+    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, &
     solver_test_partials_var_name, solver_test_partials_equ_name, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
@@ -2042,7 +2042,6 @@
  s% solver_test_partials_equ_name = solver_test_partials_equ_name
  s% solver_test_partials_show_dx_var_name = solver_test_partials_show_dx_var_name
  s% solver_save_photo_call_number = solver_save_photo_call_number
- s% trace_k = trace_k
  s% fill_arrays_with_NaNs = fill_arrays_with_NaNs
  s% zero_when_allocate = zero_when_allocate
  s% warn_when_large_rel_run_E_err = warn_when_large_rel_run_E_err
@@ -3672,7 +3671,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  solver_test_partials_equ_name = s% solver_test_partials_equ_name
  solver_test_partials_show_dx_var_name = s% solver_test_partials_show_dx_var_name
  solver_save_photo_call_number = s% solver_save_photo_call_number
- trace_k = s% trace_k
  fill_arrays_with_NaNs = s% fill_arrays_with_NaNs
  zero_when_allocate = s% zero_when_allocate
  warn_when_large_rel_run_E_err = s% warn_when_large_rel_run_E_err

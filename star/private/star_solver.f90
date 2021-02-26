@@ -704,7 +704,7 @@
 
             ierr = 0
             coeff = 0
-            dbg_adjust = .false.  !  (s% trace_k > 0 .and. s% trace_k <= nz)
+            dbg_adjust = .false.
 
             skip_eval_f = (min_corr_coeff_in == 1)
             if (skip_eval_f) then

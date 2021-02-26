@@ -414,13 +414,7 @@
             s% total_angular_momentum = total_angular_momentum(s)
             ! set r and rmid from xh
             do k=1,nz
-               if (s% solver_use_lnR) then
-                  s% lnR(k) = s% xh(s% i_lnR,k)
-                  s% r(k) = exp(s% lnR(k))
-               else
-                  s% r(k) = s% xh(s% i_lnR,k)
-                  s% lnR(k) = log(s% r(k))
-               end if
+               call get_r_and_lnR_from_xh(s, s% r(k), s% lnR(k))
             end do
             call set_rmid(s, 1, nz, ierr)
             if (failed('set_rmid')) return

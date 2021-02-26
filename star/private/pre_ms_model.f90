@@ -253,7 +253,6 @@
             write(*,*) 'finished pre-MS model'
             write(*,1) 'mstar1/Msun', mstar1/Msun
             write(*,1) '(mstar-mstar1)/mstar', (mstar-mstar1)/mstar
-            write(*,1) 'log10(r/Rsun)', log10(exp(xh(s% i_lnR,1))/Rsun)
             if (s% i_lum /= 0) write(*,1) 'log10(L/Lsun)', log10(xh(s% i_lum,1)/Lsun)
             write(*,1) 'log10(Tsurf)', xh(s% i_lnT,1)/ln10
             write(*,1) 'Tsurf', exp(xh(s% i_lnT,1))
@@ -516,7 +515,11 @@
          
          xh(i_lnd, nz) = logRho*ln10
          xh(i_lnT, nz) = lnT
-         xh(i_lnR, nz) = log(r)
+         if (s% solver_use_lnR) then
+            xh(i_lnR, nz) = log(r)
+         else
+            xh(i_lnR, nz) = r
+         end if
          if (s% i_lum /= 0) xh(s% i_lum,nz) = L
          
          q(nz) = q_at_nz
@@ -620,7 +623,11 @@
          
                xh(i_lnd, k) = logRho*ln10
                xh(i_lnT, k) = lnT
-               xh(i_lnR, k) = log(r)
+               if (s% solver_use_lnR) then
+                  xh(i_lnR, nz) = log(r)
+               else
+                  xh(i_lnR, nz) = r
+               end if
                if (s% i_lum /= 0) xh(s% i_lum,k) = L
                q(k) = m/mstar
                dq(k) = dm/mstar

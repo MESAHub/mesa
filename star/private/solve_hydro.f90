@@ -136,11 +136,14 @@
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
+         use star_utils, only: get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
+         real(dp) :: r
          if (s% i_lnd > 0 .and. s% i_lnd <= nvar) s% surf_lnd = s% xh(s% i_lnd,1)
          if (s% i_lnT > 0 .and. s% i_lnT <= nvar) s% surf_lnT = s% xh(s% i_lnT,1)
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) s% surf_lnR = s% xh(s% i_lnR,1)
+         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
+            call get_r_and_lnR_from_xh(s, r, s% surf_lnR)
          if (s% i_v > 0 .and. s% i_v <= nvar) s% surf_v = s% xh(s% i_v,1)
          s% surf_lnS = s% lnS(1)
          s% num_surf_revisions = 0

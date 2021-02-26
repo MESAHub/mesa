@@ -1037,7 +1037,6 @@
          logical :: solver_show_correction_info
          real(dp) :: solver_epsder_chem, solver_epsder_struct
          
-         integer :: trace_k
          logical :: fill_arrays_with_NaNs
          logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
             warn_rates_for_high_temp

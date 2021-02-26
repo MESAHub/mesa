@@ -171,10 +171,10 @@
             s%r_start(j) = s%r(j)
             s%rmid(j) = r_new
             s%rmid_start(j) = r_new
-            s%lnR(j) = log(s%r(j))
-
-            s% xh(s% i_lnR, j) = s%lnR(j)
-            s% xh_start(s% i_lnR, j) = s%lnR(j)
+            call store_r_in_xh(r_new)
+            call get_r_and_lnR_from_xh(s, j, s% r(j), s% lnR(j))
+            s% xh_start(s% i_lnR,j) = s% xh(s% i_lnR,j)
+            
          end do
 
       end subroutine update_radius
@@ -1264,6 +1264,7 @@
 
       subroutine set1_irot(s, k, k_below_just_added, jrot_known) ! using lnR_for_d_dt_const_m
          use hydro_rotation, only: eval_i_rot, w_div_w_roche_jrot, w_div_w_roche_omega
+         use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: k, k_below_just_added
          logical, intent(in) :: jrot_known
@@ -1271,7 +1272,7 @@
          real(dp) :: r00, r003, ri, ro, rp13, rm13
          real(dp) :: w_div_wcrit_roche
 
-         r00 = exp(s% xh(s% i_lnR, k))
+         r00 = get_r_from_xh(s,k)
          ! when using the fitted i_rot, the moment of inertia depends
          ! on the ratio of rotational frequency to its critical value.
          ! This ratio is computed in two different ways depending on whether
@@ -1294,12 +1295,12 @@
             if (k == s% nz) then
                rp13 = pow3(s% R_center)
             else
-               rp13 = exp(3*s% xh(s% i_lnR, k+1))
+               rp13 = pow3(get_r_from_xh(s,k+1))
             end if
             if (k == 1) then
                rm13 = r003
             else
-               rm13 = exp(3*s% xh(s% i_lnR, k-1))
+               rm13 = pow3(get_r_from_xh(s,k-1))
             end if
             ri = pow((r003 + rp13)/2,one_third)
             ro = pow((r003 + rm13)/2,one_third)

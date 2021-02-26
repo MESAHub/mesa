@@ -133,13 +133,6 @@
             !end if
 
          end if
-         
-         if (s% trace_k > 0 .and. s% trace_k <= nz) then
-            do j=1,s% species
-               write(*,4) 'finish_load_model before set_vars xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
 
          ! clear some just to avoid getting NaNs at start
          ! e.g., from profile_starting_model
@@ -176,14 +169,6 @@
 
          if (s% rotation_flag) then
             s% total_angular_momentum = total_angular_momentum(s)
-            if (s% trace_k > 0 .and. s% trace_k <= nz) then
-               do k=1,nz
-                  write(*,3) 'lnr', s% model_number, k, s% xh(s% i_lnR, k)
-                  write(*,3) 'i_rot', s% model_number, k, s% i_rot(k)
-                  write(*,3) 'j_rot', s% model_number, k, s% j_rot(k)
-                  write(*,3) 'omega', s% model_number, k, s% omega(k)
-               end do
-            end if
          end if
 
          if (s% RSP_flag) then
@@ -197,13 +182,6 @@
          if (dbg) write(*,2) 'load_model: s% dq(1)', 1, s% dq(1)
          if (dbg) write(*,2) 'load_model: s% dm(1)', 1, s% dm(1)
          if (dbg) write(*,2) 'load_model: s% m(1)/msun', 1, s% m(1)/Msun
-
-         if (s% trace_k > 0 .and. s% trace_k <= nz) then
-            do j=1,s% species
-               write(*,4) 'finish_load_model after set_vars xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
 
          s% doing_finish_load_model = .true.
          call do_report(s, ierr)

@@ -838,11 +838,6 @@
          resid = delm*dlnTdm - lnTdiff
          s% equ(i_equL, k) = resid%val
 
-         if (k == s% trace_k) then
-            write(*,5) 'i_equL', k, s% solver_iter, s% solver_adjust_iter, &
-               s% model_number, s% equ(i_equL, k)
-         end if
-
          if (is_bad(s% equ(i_equL, k))) then
             ierr = -1
             if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)

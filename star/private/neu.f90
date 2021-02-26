@@ -136,12 +136,6 @@
             return
          end if
 
-         if (k == s% trace_k) then
-            write(*,5) 'non_nuc_neu', k, &
-               s% solver_iter, s% model_number, s% solver_adjust_iter, &
-                        s% non_nuc_neu(k)
-         end if
-
       end subroutine do_neu_for_cell
 
 
