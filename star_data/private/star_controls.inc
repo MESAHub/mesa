@@ -553,7 +553,7 @@
 
          logical :: mesh_adjust_get_T_from_E, mesh_ok_to_merge
 
-         integer :: mesh_dump_call_number, mesh_max_k_old_for_split, mesh_min_k_old_for_split
+         integer :: mesh_max_k_old_for_split, mesh_min_k_old_for_split
 
          real(dp) :: max_dq, min_dq, min_dq_for_split, min_dq_for_logT, &
             min_dq_for_xa, min_dq_for_xa_convective

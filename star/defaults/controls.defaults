@@ -11078,16 +11078,6 @@
     show_mesh_changes = .false.
 
 
-      ! mesh_dump_call_number
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! When ``mesh_call_number == mesh_dump_call_number``, various plotting information is written..
-
-      ! ::
-
-    mesh_dump_call_number = -1
-
-
       ! trace_evolve
       ! ~~~~~~~~~~~~
 
