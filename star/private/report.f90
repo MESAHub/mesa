@@ -228,6 +228,7 @@
          use rates_def, only: &
             i_rate, i_rate_dRho, i_rate_dT, std_reaction_Qs, std_reaction_neuQs
          use star_utils, only: get_phot_info
+         use hydro_rotation, only: set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 

@@ -1299,8 +1299,8 @@
 
       integer function relax_omega_check_model(s, id, lipar, ipar, lrpar, rpar)
          use do_one_utils, only: do_bare_bones_check_model
-         use hydro_rotation, only: set_uniform_omega, set_i_rot
-         use star_utils, only: set_surf_avg_rotation_info
+         use hydro_rotation, only: set_uniform_omega, set_i_rot, &
+            set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)

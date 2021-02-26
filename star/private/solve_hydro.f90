@@ -143,7 +143,7 @@
          if (s% i_lnd > 0 .and. s% i_lnd <= nvar) s% surf_lnd = s% xh(s% i_lnd,1)
          if (s% i_lnT > 0 .and. s% i_lnT <= nvar) s% surf_lnT = s% xh(s% i_lnT,1)
          if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
-            call get_r_and_lnR_from_xh(s, r, s% surf_lnR)
+            call get_r_and_lnR_from_xh(s, 1, r, s% surf_lnR)
          if (s% i_v > 0 .and. s% i_v <= nvar) s% surf_v = s% xh(s% i_v,1)
          s% surf_lnS = s% lnS(1)
          s% num_surf_revisions = 0

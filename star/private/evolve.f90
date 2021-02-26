@@ -414,7 +414,7 @@
             s% total_angular_momentum = total_angular_momentum(s)
             ! set r and rmid from xh
             do k=1,nz
-               call get_r_and_lnR_from_xh(s, s% r(k), s% lnR(k))
+               call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
             end do
             call set_rmid(s, 1, nz, ierr)
             if (failed('set_rmid')) return
@@ -836,6 +836,7 @@
 
 
          integer function select_mdot_action(ierr)
+            use hydro_rotation, only: set_surf_avg_rotation_info
             integer, intent(out) :: ierr
             include 'formats'
             select_mdot_action = exit_loop

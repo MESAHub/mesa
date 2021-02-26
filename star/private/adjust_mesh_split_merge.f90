@@ -657,6 +657,7 @@
       
       
       subroutine revise_star_radius(s, star_PE0, star_PE1)
+         use star_utils, only: store_r_in_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
          integer :: k
@@ -671,7 +672,7 @@
             s% r(k) = s% r(k)*frac
             if (s% model_number == -6918) write(*,2) 's% r(k)', k, s% r(k)
             call store_r_in_xh(s, k, s% r(k))
-            call use_xh_to_set_lnR(s, k, s% lnR(k))
+            s% lnR(k) = get_lnR_from_xh(s,k)
          end do
          s% r_center = frac*s% r_center
       end subroutine revise_star_radius

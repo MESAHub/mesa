@@ -2887,6 +2887,9 @@
          
          if (s% j_rot_flag) &
             write(*,*) 'j_rot_flag', s% j_rot_flag
+                     
+         if (.not. s% solver_use_lnR) &
+            write(*,*) 'solver_use_lnR', s% solver_use_lnR
          
          if (s% mix_factor /= 1d0) &
             write(*,1) 'mix_factor', s% mix_factor

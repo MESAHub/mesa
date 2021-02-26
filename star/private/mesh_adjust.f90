@@ -994,6 +994,7 @@
             interp_Vol_new, interp_xq, density_init, ierr)
          use interp_1d_def
          use interp_1d_lib
+         use star_utils, only: store_r_in_xh
          use num_lib
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
@@ -1200,10 +1201,8 @@
             from_k = comes_from(k)
             if (new_r(k) == old_r(from_k)) then
                xh(i_lnR,k) = xh_old(i_lnR,from_k)
-            else if (s% solver_uses_lnR) then
-               xh(i_lnR,k) = log(new_r(k))
             else
-               xh(i_lnR,k) = new_r(k)
+               call store_r_in_xh(s,k,new_r(k))
             end if
             if (density_new(k) == old_rho(from_k)) then
                xh(i_lnd,k) = lnd_old(from_k)
@@ -2001,6 +2000,7 @@
       subroutine adjust1_omega(s, k, nz, nz_old, comes_from, &
             xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot, xh, ierr)
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
+         use star_utils, only: get_r_from_xh
          ! set new value for s% omega(k)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old

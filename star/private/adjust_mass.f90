@@ -144,6 +144,7 @@
       ! places in s. Currently those are: r, r_start, rmid, rmid_start, R2 (r^2), and lnR (log(r)).
       ! If more of these are added they should also be updated here.
       subroutine update_radius(s)
+         use star_utils, only: store_r_in_xh, get_r_and_lnR_from_xh
          ! Inputs
          type (star_info), pointer :: s
 
@@ -171,7 +172,7 @@
             s%r_start(j) = s%r(j)
             s%rmid(j) = r_new
             s%rmid_start(j) = r_new
-            call store_r_in_xh(r_new)
+            call store_r_in_xh(s, j, r_new)
             call get_r_and_lnR_from_xh(s, j, s% r(j), s% lnR(j))
             s% xh_start(s% i_lnR,j) = s% xh(s% i_lnR,j)
             

@@ -388,7 +388,7 @@
          use chem_lib
          use eos_lib, only: Radiation_Pressure
          use eos_support, only: get_eos, solve_eos_given_PgasT_auto
-         use star_utils, only: normalize_dqs, set_qs
+         use star_utils, only: normalize_dqs, set_qs, store_r_in_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: &
             T_c, rho_c, d_log10_P_in, eps_grav_in, &
@@ -515,11 +515,7 @@
          
          xh(i_lnd, nz) = logRho*ln10
          xh(i_lnT, nz) = lnT
-         if (s% solver_use_lnR) then
-            xh(i_lnR, nz) = log(r)
-         else
-            xh(i_lnR, nz) = r
-         end if
+         call store_r_in_xh(s, nz, r)
          if (s% i_lum /= 0) xh(s% i_lum,nz) = L
          
          q(nz) = q_at_nz
@@ -623,11 +619,7 @@
          
                xh(i_lnd, k) = logRho*ln10
                xh(i_lnT, k) = lnT
-               if (s% solver_use_lnR) then
-                  xh(i_lnR, nz) = log(r)
-               else
-                  xh(i_lnR, nz) = r
-               end if
+               call store_r_in_xh(s, nz, r)
                if (s% i_lum /= 0) xh(s% i_lum,k) = L
                q(k) = m/mstar
                dq(k) = dm/mstar

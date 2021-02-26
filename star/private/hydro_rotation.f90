@@ -556,6 +556,164 @@
       end subroutine set_rotation_info
 
 
+      subroutine set_surf_avg_rotation_info(s)
+         use star_utils, only: get_Lrad_div_Ledd
+         type (star_info), pointer :: s
+         real(dp) :: &
+            dm, dmsum, omega_sum, omega_crit_sum, omega_div_omega_crit_sum, &
+            v_rot_sum, v_crit_sum, v_div_v_crit_sum, Lrad_div_Ledd_sum, &
+            kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
+            j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
+            cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
+         integer :: k, ierr
+         logical, parameter :: dbg = .false.
+         include 'formats'
+
+         if (.not. s% rotation_flag) then
+            s% omega_avg_surf = 0
+            s% omega_crit_avg_surf = 0
+            s% w_div_w_crit_avg_surf = 0
+            s% j_rot_avg_surf = 0
+            s% v_rot_avg_surf = 0
+            s% v_crit_avg_surf = 0
+            s% v_div_v_crit_avg_surf = 0
+            s% Lrad_div_Ledd_avg_surf = 0
+            s% opacity_avg_surf = 0
+            s% logT_avg_surf = 0
+            s% logRho_avg_surf = 0
+            return
+         end if
+         
+         ierr = 0
+         call set_rotation_info(s,.true.,ierr)
+         if (ierr /= 0) then
+            write(*,*) 'got ierr from call set_rotation_info in set_surf_avg_rotation_info'
+            write(*,*) 'just ignore it'
+         end if
+
+         tau = s% tau_factor*s% tau_base
+         dmsum = 0d0
+         Lrad_div_Ledd_sum = 0d0
+         rmid = 0d0
+
+         do k = 1, s% nz - 1
+            kap = s% opacity(k)
+            rmid = s% rmid(k)
+            mmid = 0.5d0*(s% m_grav(k) + s% m_grav(k+1))
+            Lmid = 0.5d0*(s% L(k) + s% L(k+1))
+            cgrav = 0.5d0*(s% cgrav(k) + s% cgrav(k+1))
+            dm = s% dm(k)
+            dtau = dm*kap/(pi4*rmid*rmid)
+
+            if (tau + dtau <= s% surf_avg_tau_min) then
+               tau = tau + dtau
+               cycle
+            end if
+
+            ! check for partial contribution from cell
+            ! the tau < s% surf_avg_tau is meant for the case in which the surface tau is set
+            ! equal or larger to surf_avg_tau. In that case we just use the values of the surface cell.
+            if (tau < s% surf_avg_tau) then
+               if (tau < s% surf_avg_tau_min) then ! only use part of this cell
+                  dm = dm*(tau + dtau - s% surf_avg_tau_min)/dtau
+               else if (tau + dtau > s% surf_avg_tau) then ! only use part of this cell
+                  dm = dm*(s% surf_avg_tau - tau)/dtau
+                  !write(*,2) 'tau limit', k, (s% surf_avg_tau - tau)/dtau
+               end if
+            end if
+            dmsum = dmsum + dm
+            Lrad_div_Ledd = get_Lrad_div_Ledd(s,k)
+            Lrad_div_Ledd_sum = Lrad_div_Ledd_sum + dm*Lrad_div_Ledd
+            tau = tau + dtau
+            if (tau >= s% surf_avg_tau) exit
+         end do
+
+         s% Lrad_div_Ledd_avg_surf = Lrad_div_Ledd_sum/dmsum
+         gamma_factor = 1d0 - min(s% Lrad_div_Ledd_avg_surf, 0.9999d0)
+
+         tau = s% tau_factor*s% tau_base
+         dmsum = 0
+         j_rot_sum = 0
+         omega_sum = 0
+         omega_crit_sum = 0
+         omega_div_omega_crit_sum = 0
+         v_rot_sum = 0
+         v_crit_sum = 0
+         v_div_v_crit_sum = 0
+         kap_sum = 0
+         logT_sum = 0
+         logRho_sum = 0
+
+         do k = 1, s% nz - 1
+
+            kap = s% opacity(k)
+            if (s% fitted_fp_ft_i_rot) then
+               ! TODO: better explain
+               ! Use equatorial radius
+               rmid = 0.5d0*(s% r_equatorial(k) + s% r_equatorial(k+1))
+            else
+              rmid = s% rmid(k)
+            end if
+            dm = s% dm(k)
+            dtau = dm*kap/(pi4*rmid*rmid)
+
+            if (tau + dtau <= s% surf_avg_tau_min) then
+               tau = tau + dtau
+               cycle
+            end if
+
+            ! check for partial contribution from cell
+            ! the tau < s% surf_avg_tau is meant for the case in which the surface tau is set
+            ! equal or larger to surf_avg_tau. In this case we just use the values of the surface cell.
+            if (tau < s% surf_avg_tau) then
+               if (tau < s% surf_avg_tau_min) then ! only use part of this cell
+                  dm = dm*(tau + dtau - s% surf_avg_tau_min)/dtau
+               else if (tau + dtau > s% surf_avg_tau) then ! only use part of this cell
+                  dm = dm*(s% surf_avg_tau - tau)/dtau
+               end if
+            end if
+
+            dmsum = dmsum + dm
+            cgrav = 0.5d0*(s% cgrav(k) + s% cgrav(k+1))
+            mmid = 0.5d0*(s% m_grav(k) + s% m_grav(k+1))
+            omega = 0.5d0*(s% omega(k) + s% omega(k+1))
+            j_rot = 0.5d0*(s% j_rot(k) + s% j_rot(k+1))
+
+            kap_sum = kap_sum + dm*kap
+            j_rot_sum = j_rot_sum + dm*j_rot
+
+            omega_crit = sqrt(gamma_factor*cgrav*mmid/pow3(rmid))
+            omega_div_omega_crit_sum = omega_div_omega_crit_sum + dm*abs(omega/omega_crit)
+
+            v_rot = omega*rmid
+            v_crit = omega_crit*rmid
+            omega_sum = omega_sum + dm*omega
+            omega_crit_sum = omega_crit_sum + dm*omega_crit
+            v_rot_sum = v_rot_sum + dm*v_rot
+            v_crit_sum = v_crit_sum + dm*v_crit
+            v_div_v_crit_sum = v_div_v_crit_sum + dm*abs(v_rot/v_crit)
+            logT_sum = logT_sum + dm*s% lnT(k)/ln10
+            logRho_sum = logRho_sum + dm*s% lnd(k)/ln10
+            kap_sum = kap_sum + dm*kap
+            tau = tau + dtau
+            if (tau >= s% surf_avg_tau) exit
+
+         end do
+
+         s% logT_avg_surf = logT_sum/dmsum
+         s% logRho_avg_surf = logRho_sum/dmsum
+         s% opacity_avg_surf = kap_sum/dmsum
+         s% j_rot_avg_surf = j_rot_sum/dmsum
+         s% omega_avg_surf = omega_sum/dmsum
+         s% omega_crit_avg_surf = omega_crit_sum/dmsum
+         s% w_div_w_crit_avg_surf = omega_div_omega_crit_sum/dmsum
+         s% v_rot_avg_surf = v_rot_sum/dmsum
+         s% v_crit_avg_surf = v_crit_sum/dmsum
+         s% v_div_v_crit_avg_surf = v_div_v_crit_sum/dmsum
+
+      end subroutine set_surf_avg_rotation_info
+
+
       ! Input variables:
       !  N     Number of meshpoints used by the model (arrays are this size)
       !  XM    Mass coordinate [gram]

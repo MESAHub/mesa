@@ -81,6 +81,7 @@
          use chem_lib, only: basic_composition_info, chem_Xsol
          use adjust_xyz, only: get_xa_for_standard_metals
          use alloc, only: allocate_star_info_arrays
+         use star_utils, only: store_r_in_xh
 
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -248,11 +249,7 @@
             i = s% nz - k + 2 ! skip center point
             s% xh(i_lnd, k) = log(cs% rhog(i))
             s% xh(i_lnT, k) = log(cs% Tg(i))
-            if (s% solver_use_lnR) then
-               s% xh(i_lnR, k) = log(cs% rg(i))
-            else
-               s% xh(i_lnR, k) = cs% rg(i)
-            end if
+            call store_r_in_xh(s, k, cs% rg(i))
             if (i_lum /= 0) s% xh(i_lum, k) = cs% Lg(i)
             do j=1,species
                s% xa(j,k) = xa(j)

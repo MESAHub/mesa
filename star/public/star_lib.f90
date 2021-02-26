@@ -2381,7 +2381,7 @@
       
       
       real(dp) function star_surface_omega_crit(id, ierr)
-         use star_utils, only: set_surf_avg_rotation_info
+         use hydro_rotation, only: set_surf_avg_rotation_info
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
