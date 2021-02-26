@@ -25,8 +25,8 @@
 
       module rsp_lina
       use star_def, only: star_info
-      use utils_lib, only: is_bad
-      use const_def, only: dp, crad
+      use utils_lib, only: is_bad, mesa_error
+      use const_def, only: dp, crad, pi4, four_thirds_pi, two_thirds, boltz_sigma, Msun, Rsun
       use rsp_eval_eos_and_kap, only: mesa_eos_kap
       use rsp_def
       
@@ -41,19 +41,22 @@
 
       subroutine do_LINA(s, L0, NZN, NMODES, VEL, PERS, ETO, &
          M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
-!     LINear Analysis (LINA) USING LAPACK/EISPACK
-!     SETS THE MATRIX FOR THE LINEAR EIGENVALUE PROBLEM
+!     LINear Analysis (LINA)
+!     Sets the matrix for the linear eigenvalue problem and solves with Lapack
 
       type (star_info), pointer :: s
       real(dp), intent(in) :: L0
       integer, intent(in) :: NMODES, NZN
-      real(dp), intent(out) :: VEL(:,:) ! (NZN+1,15)
-      real(dp), intent(out), dimension(15) :: PERS, ETO
+      real(dp), intent(out) :: VEL(:,:) ! (NZN+1,MAX_MODES)
+      real(dp), intent(out), dimension(MAX_MODES) :: PERS, ETO
       real(dp), intent(inout), dimension(:) :: &
          M, DM, DM_BAR, R, Vol, T, Et, Lr
       integer, intent(out) :: ierr
       
-      real(dp), dimension(15) :: OMEG, EK
+      integer :: iounit
+      logical :: debug
+      
+      real(dp), dimension(MAX_MODES) :: OMEG, EK
       real(dp), allocatable, dimension(:) :: &
          E, P, Lc, Hp_face, Y_face, K, CPS, QQS, &
          MX10,MX00,MX01,MY00,MY01, &
@@ -91,11 +94,15 @@
          DLCYP,DLCZ0,DLCZP, &
          DLTXM,DLTX0,DLTXP,DLTY0, &
          DLTYP,DLTZ0,DLTZP,Lt, &
-         PTURB,dPt_dw_00,dPt_dr_00,dPt_dr_in,XXL
+         PTURB,dPt_dw_00,dPt_dr_00,dPt_dr_in,XXL, &
+         QCHECK,ETOIEV,ETOI,ETOIPT,SGR,VRRS,Q
       real(dp), allocatable, dimension(:,:) :: &
-         QWK,QWKEV,PHR,PHT,PHL,PHU,PHC,ZZZ
+         QWK,QWKEV,PHR,PHT,PHL,PHU,PHC,ZZZ,QWKPT
+      complex(8), allocatable, dimension(:) :: &
+         VTTS,SCALE
       complex(8), allocatable, dimension(:,:) :: &
          VRR,VRT,VRL,VRC,DVRR,DVRT,DVRL,DVRC,VRU
+
       
       real(dp) :: FFXM,FFX0,FFXP,FFY0,FFYP,FF,POM1
       real(dp) :: IGR1,IGR1XM,IGR1X0,IGR1XP,IGR1Y0,IGR1YP
@@ -103,45 +110,27 @@
       real(dp) :: GGXM,GGX0,GGXP,GGY0,GGYP,GG,GPF
       real(dp) :: DFCX0,DFCXM,DFCXP,DFCY0,DFCYP,DFCZ0,DFCZP
       real(dp) :: DFCMX0,DFCMXM,DFCMXP,DFCMY0,DFCMYP,DFCMZ0,DFCMZP
-      real(dp) :: FLIM,FLD
       real(dp) :: T1,DLR,DLRP,DLRM,DLT,DLTP,DLMR,DLMRP,DLMRM,DLMT,DLMTP
       real(dp) :: W_00,W_out,BW,BK,T2,T3,DLK,DLKP,MINI
-      real(dp) :: T4,T5,P2,P3,P5,P6,P7,P8,P9,P10,POM3,POM2,POM,POM4
+      real(dp) :: T4,POM3,POM2,POM,POM4
       integer :: I,J,NZN3,IG,IE,IR,IC,INFO,IMI,LD_VL,LD_VR,n,op_err
-      real(dp) :: RES(12),VRRS(15),Q(15)
+
       character (len=250) FILENAME
       character (len=1) NUMER1
       character (len=2) NUMER2
-      complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),CPOM,DPEV,dP_dT_00URB
+      complex(8):: DP_0,DV_0,DPEV,dP_dT_00URB
       real(dp) :: SGRP,SGRM
-      real(dp) :: PSIG,TEMI,TEMM,TEM1
+      real(dp) :: TEMI,TEMM,TEM1
       real(dp) :: NORMC
-      real(dp) :: QCHECK(15),ETOIEV(15),QWKPT(1000,15),ETOIPT(15),SGR(15)
-      real(dp) :: TT4,TT4P,EFL02   
-      real(dp) :: ETOI(15)
+      real(dp) :: EFL02   
+       
+      debug = .false. 
       
-      !write(*,'(a55,i12,99(1pd26.16))') 'start LINA s% w(2)**2', &
-      !   2, s% w(2)**2, Et(NZN-1)
-      
-      if (.false.) then
-      write(*,*) 'L0', L0
-      do I=1,NZN
-         write(*,*) 'M', I, M(I)
-         write(*,*) 'DM', I, DM(I)
-         write(*,*) 'DM_BAR', I, DM_BAR(I)
-         write(*,*) 'R', I, R(I)
-         write(*,*) 'R**3', I, R(I)**3
-         write(*,*) 'Vol', I, Vol(I)
-         write(*,*) 'T', I, T(I)
-         write(*,*) 'Lr', I, Lr(I)
-         write(*,*) 'Et', I, Et(I)
-      end do
-      stop 'do_LINA'
-      end if
-      
+      if(nmodes > MAX_MODES) call mesa_error(__FILE__,__LINE__,"RSP/do_LINA: Maximum allowed number of modes exceeded")
+            
       ierr = 0
       EFL02 = EFL0*EFL0
-      n = NZN+1
+      n = NZN+1 
       allocate( &
          E(n), P(n), Lc(n), Hp_face(n), Y_face(n), K(n), CPS(n), QQS(n), &
          MX10(n),MX00(n),MX01(n),MY00(n),MY01(n), &
@@ -180,11 +169,17 @@
          DLTXM(n),DLTX0(n),DLTXP(n),DLTY0(n), &
          DLTYP(n),DLTZ0(n),DLTZP(n),Lt(n), &
          PTURB(n),dPt_dw_00(n),dPt_dr_00(n),dPt_dr_in(n), &
-         QWK(n,15),QWKEV(n,15),VRU(n,15), &
-         VRR(n,15), VRT(n,15), VRL(n,15), VRC(n,15), &
-         DVRR(n,15),DVRT(n,15),DVRL(n,15),DVRC(n,15), &
-         PHR(n,15), PHT(n,15), PHL(n,15), PHU(n,15), PHC(n,15), &
-         ZZZ(4*n,4*n),XXL(4*n))
+         QWK(n,NMODES),QWKEV(n,NMODES),VRU(n,NMODES), &
+         VRR(n,NMODES), VRT(n,NMODES), VRL(n,NMODES), VRC(n,NMODES), &
+         DVRR(n,NMODES),DVRT(n,NMODES),DVRL(n,NMODES),DVRC(n,NMODES), &
+         PHR(n,NMODES), PHT(n,NMODES), PHL(n,NMODES), PHU(n,NMODES), PHC(n,NMODES), &
+         ZZZ(4*n,4*n),XXL(4*n),QCHECK(NMODES),ETOIEV(NMODES),ETOI(NMODES),&
+         ETOIPT(NMODES),SGR(NMODES),VRRS(NMODES),Q(NMODES),&
+         VTTS(NMODES),SCALE(NMODES),&
+         QWKPT(MAX_NZN,NMODES))
+
+
+
 
       NZN3=4*NZN
       LD_VL = LD_LLL
@@ -230,7 +225,7 @@
 !     LOOP 1 .. EOS
  
       !$OMP PARALLEL DO PRIVATE(I,T1,op_err) SCHEDULE(dynamic,2)
-      do 1 I=1,NZN
+      do I=1,NZN
 
          if(Et(I).le.EFL02) Et(I)=EFL02
 
@@ -241,28 +236,27 @@
          if (op_err /= 0) ierr = op_err
          if (ierr /= 0) cycle
 
-         T1=P43/dm(I)
+         T1=four_thirds_pi/dm(I)
          DVR(I)=3.d0*T1*R(I)**2    
-         if(I.eq.1) goto 2        
-         DVRM(I)=-3.d0*T1*R(max(1,I-1))**2 
-             ! bp: max(1,i-1) to prevent bogus warning from gfortran
-         goto 3
- 2       DVRM(I)=-3.d0*T1*s% R_center**2
- 3       continue
+         if(I == 1) then
+            DVRM(I)=-3.d0*T1*s% R_center**2
+         else 
+            DVRM(I)=-3.d0*T1*R(max(1,I-1))**2 
+            ! bp: max(1,i-1) to prevent bogus warning from gfortran
+         end if
          dP_dr_00(I) =DPV(I)*DVR(I) 
-         dP_dr_in(I)=DPV(I)*DVRM(I)
-         dCp_dr_00(I) =CPV(I)*DVR(I)
+         dP_dr_in(I) =DPV(I)*DVRM(I)
+         dCp_dr_00(I)=CPV(I)*DVR(I)
          dCp_dr_in(I)=CPV(I)*DVRM(I)
-         dQQ_dr_00(I) =QQV(I)*DVR(I)
+         dQQ_dr_00(I)=QQV(I)*DVR(I)
          dQQ_dr_in(I)=QQV(I)*DVRM(I)
-         
- 1    continue
+      end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) return
 
 !     SKIP ALL DERIVATIVE CALCULATIONS IN CASE OF FROZEN-IN
 !     APPROXIMATION OR ALFA=0 (RADIATIVE CASE)
-      if(ALFA.eq.0.d0) goto 999
+      if(ALFA == 0.d0) goto 999
 
 !     SET E_T (NOW =w) BELOW AND ABOVE BOUNDARIES
       Et(NZN) = 0.d0
@@ -280,7 +274,7 @@
          dHp_dr_out(I)=POM*(P(I+1)*DVR(I+1)+Vol(I+1)*dP_dr_00(I+1))
          dHp_dT_00(I)=POM*Vol(I)*dP_dT_00(I)
          dHp_dT_out(I)=POM*Vol(I+1)*dP_dT_00(I+1)
-      enddo
+      end do
       POM=(R(NZN)**2)/(2.d0*G*M(NZN))
       Hp_face(NZN)=POM*P(NZN)*Vol(NZN)
       dHp_dr_in(NZN)=POM*(P(NZN)*DVRM(NZN)+Vol(NZN)*dP_dr_in(NZN))     
@@ -290,8 +284,6 @@
       dHp_dT_00(NZN)=POM*Vol(NZN)*dP_dT_00(NZN)
       dHp_dT_out(NZN)=0.d0
       
-      !stop 'Hp_face'
-
       do I=1,NZN-1
          POM=0.5d0*(QQS(I)/CPS(I)+QQS(I+1)/CPS(I+1))
          POM2=0.5d0*(P(I+1)-P(I))
@@ -310,8 +302,8 @@
                 +POM*(dP_dT_00(I+1))-1.d0/T(I+1)
 
          POM=2.d0/(Vol(I)+Vol(I+1))
-         POM2=8.d0*PI*(R(I)**2)/dm_bar(I)*Hp_face(I)
-         IGR2=4.d0*PI*(R(I)**2)*Hp_face(I)*POM/dm_bar(I)
+         POM2=2.d0*pi4*(R(I)**2)/dm_bar(I)*Hp_face(I)
+         IGR2=pi4*(R(I)**2)*Hp_face(I)*POM/dm_bar(I)
          IGR2X0=2.d0*IGR2/R(I)+IGR2/Hp_face(I)*dHp_dr_00(I) &
                -POM2/(Vol(I)+Vol(I+1))**2*(DVR(I)+DVRM(I+1))
          IGR2XM=-POM2/(Vol(I)+Vol(I+1))**2*DVRM(I)    &
@@ -329,10 +321,8 @@
          dY_dT_out(I)=IGR1*IGR2YP+IGR2*IGR1YP
       enddo
       
-      !stop 'IGRS'
-
       do I=1,NZN-1
-         POM=sqrt(2.d0/3.d0)*0.5d0
+         POM=sqrt(two_thirds)*0.5d0
          FF=POM*((E(I)  +P(I)  *Vol(I)  )/T(I) &
               +(E(I+1)+P(I+1)*Vol(I+1))/T(I+1))
          FFY0=POM*(dE_dT_00(I)+dP_dT_00(I)*Vol(I)-(E(I)+P(I)*Vol(I))/T(I))/T(I)
@@ -355,18 +345,14 @@
          GPF=GG/FF
 
 !        corelation PI defined without e_t
-         POM=1.d0
-
-         PII(I)=POM*GG
-         DPIIZ0(I)=0.d0
-         dPII_dr_00(I)=POM*GGX0
-         dPII_dr_in(I)=POM*GGXM 
-         dPII_dr_out(I)=POM*GGXP
-         dPII_dT_00(I)=POM*GGY0
-         dPII_dT_out(I)=POM*GGYP
+         PII(I)=GG
+         DPIIZ0(I)     =0.d0
+         dPII_dr_00(I) =GGX0
+         dPII_dr_in(I) =GGXM 
+         dPII_dr_out(I)=GGXP
+         dPII_dT_00(I) =GGY0
+         dPII_dT_out(I)=GGYP
       enddo
- 
-      !stop 'LINA'
 
       do I=IBOTOM+1,NZN-1
 !        SOURCE TERM
@@ -451,7 +437,7 @@
             d_dampR_dT_00(I) = 0.d0
             d_dampR_dw_00(I) = 0.d0
          else
-            POM=(GAMMAR**2)/(ALFA**2)*4.d0*SIG
+            POM=(GAMMAR**2)/(ALFA**2)*4.d0*boltz_sigma
             POM2=T(I)**3*Vol(I)**2/(CPS(I)*K(I))
             POM3=Et(I)
             POM4=0.5d0*(Hp_face(I)**2+Hp_face(I-1)**2)
@@ -500,13 +486,11 @@
          dC_dT_out(I) =dsrc_dT_out(I) -d_damp_dT_out(I) -d_dampR_dT_out(I)
          dC_dw_00(I) =dsrc_dw_00(I) -d_damp_dw_00(I) -d_dampR_dw_00(I)
          
-      enddo
- 
-       !stop 'LINA'
+      end do
 
       do I=IBOTOM,NZN-1
 !        CONVECTIVE LUMINOSITY
-         POM=4.d0*PI*(R(I)**2)*(T(I)/Vol(I)+T(I+1)/Vol(I+1))*0.5d0* &
+         POM=pi4*(R(I)**2)*(T(I)/Vol(I)+T(I+1)/Vol(I+1))*0.5d0* &
              (ALFAC/ALFAS)
          POM3=(sqrt(Et(I))+sqrt(Et(I+1)))*0.5d0
          Lc(I)=POM*PII(I)*POM3
@@ -514,7 +498,7 @@
          DLCZP(I)=0d0
          if (Et(I) /= 0d0) DLCZ0(I)=POM*PII(I)*0.25d0/sqrt(Et(I))
          if (Et(I+1) /= 0d0) DLCZP(I)=POM*PII(I)*0.25d0/sqrt(Et(I+1))
-         POM2=4.d0*PI*(R(I)**2)*PII(I)*0.5d0*(ALFAC/ALFAS)*POM3
+         POM2=pi4*(R(I)**2)*PII(I)*0.5d0*(ALFAC/ALFAS)*POM3
          POM=POM*POM3
          DLCX0(I)=POM*dPII_dr_00(I)+2.d0*Lc(I)/R(I) &
                             -POM2*(T(I)  /(Vol(I)**2  )*DVR(I)+ &
@@ -559,7 +543,7 @@
             DLTZ0(I)=0.d0
             DLTZP(I)=0.d0
          else
-            POM=-2.d0/3.d0*ALFA*ALFAT*(4.d0*PI*(R(I)**2))**2
+            POM=-two_thirds*ALFA*ALFAT*(pi4*(R(I)**2))**2
             POM2=Hp_face(I)*(1.d0/Vol(I)**2+1.d0/Vol(I+1)**2)*0.5d0
             POM3=(Et(I+1)**1.5d0-Et(I)**1.5d0)/dm_bar(I)
             Lt(I)=POM*POM2*POM3
@@ -699,7 +683,7 @@
       DFCYP = 0.d0
       DFCZ0 = 0.d0
       DFCZP = 0.d0
-      do 5 I=1,NZN
+      do I=1,NZN
 !        SET LUM(I-1)
          DLMR  = DLR
          DLMRP = DLRP
@@ -714,47 +698,45 @@
          DFCMYP = DFCYP
          DFCMZ0 = DFCZ0
          DFCMZP = DFCZP
-         if(I.eq.NZN) goto 6
-!        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
-!        CALC LUM(I)
-         W_00=T(I)**4
-         W_out=T(I+1)**4
-         BW=dlog(W_out/W_00)
-         BK=dlog(K(I+1)/K(I))
-         T1=-CL*R(I)**4/dm_bar(I)
-         T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
-         T3=T1/(BW-BK)
-         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
-         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2) !dL(i)/dK(i+1)
-         DLRP= DLKP*dK_dV_00(I+1)*DVR(I+1)
-         DLRM= DLK *dK_dV_00(I)  *DVRM(I)         
-         DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
-         DLTP=4.d0*(T3/T(I+1))*(W_out*BW/K(I+1)-T2*BK/BW)+DLKP*dK_dT_00(I+1)
-         DLT=-4.d0*(T3/T(I))*(W_00*BW/K(I)-T2*BK/BW)+DLK*dK_dT_00(I)
-!-----------------------------
-         DFCX0=DLCX0(I)
-         DFCXM=DLCXM(I)
-         DFCXP=DLCXP(I)
-         DFCY0=DLCY0(I)
-         DFCYP=DLCYP(I)
-         DFCZ0=DLCZ0(I)
-         DFCZP=DLCZP(I)
-         goto 7
-!        OUTER LUM BOUNDARY CONDITION
- 6       continue
-         DLT = 4.d0*L0/T(I)  !L=4piR^2sigT^4
-         DLR = 2.d0*L0/R(I)  !L=4piR^2sigT^4
-         DLRM = 0.d0
-         DLRP = 0.d0
-         DLTP = 0.d0
-         DFCX0 = 0.d0
-         DFCXM = 0.d0
-         DFCXP = 0.d0
-         DFCY0 = 0.d0
-         DFCYP = 0.d0
-         DFCZ0 = 0.d0
-         DFCZP = 0.d0
- 7       continue
+         if(I == NZN) then
+            ! outer lum. boundary condition
+            DLT = 4.d0*L0/T(I)  !L=4piR^2sigT^4
+            DLR = 2.d0*L0/R(I)  !L=4piR^2sigT^4
+            DLRM = 0.d0
+            DLRP = 0.d0
+            DLTP = 0.d0
+            DFCX0 = 0.d0
+            DFCXM = 0.d0
+            DFCXP = 0.d0
+            DFCY0 = 0.d0
+            DFCYP = 0.d0
+            DFCZ0 = 0.d0
+            DFCZP = 0.d0
+         else         
+!           Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
+!           CALC LUM(I)
+            W_00=T(I)**4
+            W_out=T(I+1)**4
+            BW=dlog(W_out/W_00)
+            BK=dlog(K(I+1)/K(I))
+            T1=-CL*R(I)**4/dm_bar(I)
+            T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
+            T3=T1/(BW-BK)
+            DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
+            DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2) !dL(i)/dK(i+1)
+            DLRP= DLKP*dK_dV_00(I+1)*DVR(I+1)
+            DLRM= DLK *dK_dV_00(I)  *DVRM(I)         
+            DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
+            DLTP=4.d0*(T3/T(I+1))*(W_out*BW/K(I+1)-T2*BK/BW)+DLKP*dK_dT_00(I+1)
+            DLT=-4.d0*(T3/T(I))*(W_00*BW/K(I)-T2*BK/BW)+DLK*dK_dT_00(I)
+            DFCX0=DLCX0(I)
+            DFCXM=DLCXM(I)
+            DFCXP=DLCXP(I)
+            DFCY0=DLCY0(I)
+            DFCYP=DLCYP(I)
+            DFCZ0=DLCZ0(I)
+            DFCZP=DLCZP(I)
+         end if
          ELRP(I) = DLRP  +DFCXP +DLTXP(I)
          ELRM(I) = DLRM  +DFCXM +DLTXM(I)
          ELR(I)  = DLR   +DFCX0 +DLTX0(I)
@@ -764,7 +746,7 @@
          ELZP(I) =        DFCZP +DLTZP(I) 
 
 !        CALC ENERGY EQUATION(I)
-         T2=P4/dm(I)
+         T2=pi4/dm(I)
          T3=T2*(P(I)+DEV(I))
          T4=1.d0/dm(I)
          EX20(I) = -T4*(    -DLMRM) -dC_dr_in2(I) -T4*(     -DFCMXM)
@@ -786,7 +768,7 @@
          EU00(I) = -T3*R(I)**2
 
 !        CALC CONVECTIVE ENERGY EQUATION(I)
-         T3=P4/dm(I)*PTURB(I)
+         T3=pi4/dm(I)*PTURB(I)
          T4=1.d0/dm(I)
          if (I == 1) then
             CX20(I) = dC_dr_in2(I) -T4*(        -0)
@@ -817,8 +799,8 @@
          CU00(I) = -T3*R(I)**2
 
 !        CALC MOMENTUM EQUATION(I)
-         T1=P4*R(I)**2/dm_bar(I)
-         if(ALFAM.ge.0.d0) T4=P4/(dm_bar(I)*R(I))
+         T1=pi4*R(I)**2/dm_bar(I)
+         if(ALFAM.ge.0.d0) T4=pi4/(dm_bar(I)*R(I))
          if(ALFAM.lt.0.d0) T4=-T1
          MU10(I) =  T4*(-EVUUM(I))
          MZ00(I) = -T1*(-dPt_dw_00(I))
@@ -842,7 +824,7 @@
             MZ01(I) = 0.d0
          endif
       
-  5    continue
+      end do
 
       do I=1,NZN3
          do J=1,NZN3
@@ -931,66 +913,39 @@
 
          if(IC-4.ge.1)    LLL(IC,IC-4)  = CZ10(I) 
                           LLL(IC,IC)    = CZ00(I)
-         if(IC+4.le.NZN3) LLL(IC,IC+4)  = CZ01(I)
-         
-         IF (IE+4 <= NZN3) then
-            if(LLL(IE,IE+4).lt.0.d0)then
-               !write(*,*) 'rerrrrrrrrrrrrrrrrrrrrrrrr',i
-            endif
-         endif
+         if(IC+4.le.NZN3) LLL(IC,IC+4)  = CZ01(I)      
+
       enddo
       
       if (s% RSP_trace_RSP_build_model) &
          write(*,*) 'waiting for DGEEV to solve eigenvalue problem....'
       call DGEEV('n','v',NZN3,LLL,LD_LLL,WRx,WIx,VLx,LD_VL,VRx,LD_VR, &
                  WORKx,4*NZN3,INFO)         
-      if(INFO.ne.0)then
-         write(*,*) 'FAILED!'
-         write(*,*) 'LAPACK/DGEEV error, ier= ',INFO
+      if(INFO /= 0)then
+         write(*,*) 'RSP/do_LINA: Failed in Lapack/DGEEV, error code ', INFO
          ierr = -1
          return
-         stop
-      endif
+      end if
 
-! THIS IS A MODIFIED "NUMERICAL RECIPIES" SORTING SUBROUTINE
-! IT SORTS THE VECTOR WI (DIMENSION NZN3) IN ASCENDING ORDER
-! AND IN THE SAME WAY REARRANGES THE ELEMENTS OF WR (WR IS NOT SORTED)
-! THE INTEGER VECTOR ISORT CONTAINS INFORMATION ABOUT CHANGES DONE
-! NAMELY ELEMENT I OF SORTED WI (AND REARRANGED WR) WAS ISORT(I) ELEMENT
-! OF UNSORTED WI (AND NOT REARANGED WR)
       call SORT(NZN3,WIx,WRx,ISORTx)
 
 !     THIS LOOP FINDS THE SMALLEST BUT POSITIVE VALUE OF VECTOR WI (MINI)
 !     AND RETURNS THE CORRESPONDING INDEX (IMI)
-      FILENAME=trim(s% log_directory) // '/' // 'LINA_period_growth_info.data'
-      !open(15,file=trim(FILENAME),status='unknown')
       MINI=5.d0
       IMI=0
-      !write(15,'(a)') '     I                R              PERIOD'
       do I=1,NZN3
-!         if(WIx(I).lt.MINI.and.WIx(I).gt.1d-9)then
-         if((WIx(I).lt.MINI) &
-               .and.(P4*WRx(I)/WIx(I).gt.-.3d+1) &
-               .and.(WIx(I).gt.1.d-9))then
+         if((WIx(I) < MINI) .and. &
+            (pi4*WRx(I)/WIx(I) > -.3d+1) .and. &
+            (WIx(I) > 1.d-9))then
             MINI=WIx(I)
             IMI=I
          endif
-         if (abs(WIx(I)) > 1d-50) then
-            !write(15,'(2(d14.8,tr2),f11.6)') &
-            !   WIx(I),WRx(I),2.d0*PI/WIx(I)/86400d0
-         else
-            !write(15,'(2(d14.8,tr2),f11.6)') &
-            !   0d0,WRx(I),0d0
-         end if
       enddo
-      !close(15)
 
       do J=1,NMODES
- 444     continue
-         if(P4*WRx(IMI+J-1)/WIx(IMI+J-1).lt.-.5d+1)then
+         do while (pi4*WRx(IMI+J-1)/WIx(IMI+J-1) < -.5d+1)
             IMI=IMI+1
-            goto 444
-         endif
+         end do
 !        VRRS(J) IS THE MODULI OF THE SUTFACE R-EIGENVECTOR OF THE MODE J
          VRRS(J)=sqrt(VRx(4*NZN-3,ISORTx(IMI+J-1))**2+ &
                        VRx(4*NZN-3,ISORTx(IMI+J-1)+1)**2) !surface value
@@ -1001,9 +956,9 @@
 !        PERS(J) IS THE PERIOD OF THE MODE J (IN SECONDS)
          OMEG(J)=WIx(IMI+J-1)
          PERS(J)=2.d0*PI/OMEG(J)
-         Q(J)=PERS(J)*SQRT((M(NZN)/SUNM)*(SUNR/R(NZN))**3)/86400.d0
+         Q(J)=PERS(J)*dsqrt((M(NZN)/Msun)*pow3(Rsun/R(NZN)))/86400.d0
 !        ETO(J) IS THE GROWTH RATE OF MODE J
-         ETO(J)= P4*WRx(IMI+J-1)/OMEG(J)
+         ETO(J)= pi4*WRx(IMI+J-1)/OMEG(J)
          EK(J)=0.d0
          SGRP=0.d0
          SGRM=0.d0
@@ -1092,8 +1047,8 @@
             FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER2//'.data'
          endif
 
-         open(57,file=trim(FILENAME),status='unknown')
-         write(57,'(a)') &
+         open(newunit=iounit,file=trim(FILENAME),status='unknown')
+         write(iounit,'(a)') &
             '#ZONE  log(T)         X              WORK(P)' // &
             '         WORK(P_NU)      WORK(P_T)        CWORK(P)' // &
             '        CWORK(P_NU)        CWORK(P_T)'
@@ -1104,13 +1059,13 @@
             ETOI(J)  =ETOI(J)  +QWK(I,J)
             ETOIEV(J)=ETOIEV(J)+QWKEV(I,J)
             ETOIPT(J)=ETOIPT(J)+QWKPT(I,J)
-            write(57,'(I3,2(tr1,e15.8),6(tr1,e15.8))') &
+            write(iounit,'(I3,2(tr1,e15.8),6(tr1,e15.8))') &
               NZN+1-I,dlog10(T(I)),R(I)/R(NZN), &
                 QWK(I,J)/EK(J), QWKEV(I,J)/EK(J), QWKPT(I,J)/EK(J), &
                 ETOI(J)/EK(J),ETOIEV(J)/EK(J),ETOIPT(J)/EK(J)
          enddo
-         write(57,'("#KINETIC ENERGY:",e15.8)') EK(J)
-         close(57)
+         write(iounit,'("#KINETIC ENERGY:",e15.8)') EK(J)
+         close(iounit)
 
 !        CALCULATE LUMINOSITY EIGENFUNCTIONS
          do I=1,NZN
@@ -1138,42 +1093,34 @@
             write(NUMER2,'(I2)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER2//'.data'
          endif
-         open(56,file=trim(FILENAME),status='unknown')
-         write(56,'(a)') &
+         open(newunit=iounit,file=trim(FILENAME),status='unknown')
+         write(iounit,'(a)') &
             '#ZONE  TEMP.           FRAC. RADIUS  ABS(dR/R)       ' // &
             'PH(dR/R)        ABS(dT/T)       PH(dT/T)        ' // &
             'ABS(dL/L)       PH(dL/L)        ABS(dE_T)       PH(dE_T)'
          do I=1,NZN
-            write(56,'(I3,tr1,e15.6,tr1,e15.6,8(tr1,e15.8))') &
+            write(iounit,'(I3,tr1,e15.6,tr1,e15.6,8(tr1,e15.8))') &
                 NZN+1-i,T(I),R(I)/R(NZN),abs(DVRR(I,J)),PHR(I,J), &
                 abs(DVRT(I,J)),PHT(I,J), &
                 abs(DVRL(I,J)),PHL(I,J), &
                 abs(DVRC(I,J))/NORMC,PHC(I,J)
          end do
-         close(56)
+         close(iounit)
 
+         !Stellingwerf growth rate
          SGR(J)=(SGRP-SGRM)/(SGRP+SGRM)
 
-         PSIG=M(NZN)/(P43*R(NZN)**3)
-         PSIG=sqrt(P4*G*PSIG)
-
-         QCHECK(J)=100.d0*(ETO(J)-(ETOI(J)+ETOIEV(J)+ETOIPT(J))/EK(J)) &
+         if (debug)then ! growth rate check
+            QCHECK(J)=100.d0*(ETO(J)-(ETOI(J)+ETOIEV(J)+ETOIPT(J))/EK(J)) &
                           /ETO(J)
- 19      format('nonadiabatic solution, MODE: ',I2)
- 20      format('eigenvalue: (',1P,D15.8,' , ',D15.8,')')
- 21      format(14X,'freq.[Hz]: ',D11.5,' , sigma: ',D12.6)
- 22      format(14X,'period[d]:',F11.6,1X,' ,     Q:',F9.6)
- 23      format(9X,'KE growte rate:',F13.9,2X,',    KE: ',D12.6)
- 24      format('control: KE growte rate:',F13.9)
- 25      format('         f: (',1P,D15.8,' , ',D15.8,'), abs(f):',D15.8)
- 26      format('control: f: (',1P,D15.8,' , ',D15.8,'), abs(f):',D15.8)
+            write (*,*) "Growth rate check: ", J, QCHECK(J)
+         end if 
+
 
       enddo
       
-      !write(*,'(a55,i12,99(1pd26.16))') 'end LINA s% w(2)**2 Et', &
-      !   2, s% w(2)**2, Et(NZN-1)
-
       return
+
       end subroutine do_LINA
      
 ! THIS IS A MODIFIED "NUMERICAL RECIPIES" SORTING SUBROUTINE
@@ -1195,8 +1142,8 @@
 
       L=N/2+1
       IR=N
-10    continue
-        if(L.gt.1)then
+      do 
+        if(L > 1)then
            L=L-1
            RRA=RA(L)
            RRB=RB(L)
@@ -1209,20 +1156,20 @@
            RB(IR)=RB(1)
            ISORT(IR)=ISORT(1)
            IR=IR-1
-           if(IR.eq.1)then
+           if(IR == 1)then
               RA(1)=RRA
               RB(1)=RRB
               ISORT(1)=RRI
               return
-           endif
-        endif
+           end if
+        end if
         I=L
         J=L+L
- 20     if(J.le.IR)then
-           if(J.lt.IR)then
-              if(RA(J).lt.RA(J+1))J=J+1
-           endif
-           if(RRA.lt.RA(J))then
+        do while (J <= IR)
+           if(J < IR)then
+              if (RA(J) < RA(J+1)) J=J+1
+           end if
+           if(RRA < RA(J))then
               RA(I)=RA(J)
               RB(I)=RB(J)
               ISORT(I)=ISORT(J)
@@ -1230,13 +1177,13 @@
               J=J+J
            else
               J=IR+1
-           endif
-           goto 20
-        endif
+           end if
+        end do
         RA(I)=RRA
         RB(I)=RRB
         ISORT(I)=RRI
-      goto 10
+      end do
+      
       end subroutine SORT
 
             

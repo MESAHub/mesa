@@ -80,7 +80,7 @@
             CPS(NZN+1), QQS(NZN+1))
       end if
          
-      allocate(TA(NZN+1),VEL(NZN+1,15),TEMP(NZN))
+      allocate(TA(NZN+1),VEL(NZN+1,MAX_MODES),TEMP(NZN))
 
       TH0 = s% RSP_T_anchor
       TIN = s% RSP_T_inner
