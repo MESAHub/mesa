@@ -138,7 +138,7 @@
             s% solver_test_partials_val = residual
          end if
          if (skip_partials) return
-         call unpack_res18(resid_ad)
+         call unpack_res18(s% species, resid_ad)
 
          if (test_partials) then  
             s% solver_test_partials_var = s% i_u
@@ -432,26 +432,24 @@
          
          end subroutine setup_de_dt_and_friends
          
-         subroutine unpack_res18(res18)
-            use star_utils, only: unpack_residual_partials
+         subroutine unpack_res18(species,res18)
+            use star_utils, only: save_eqn_dxa_partials, unpack_residual_partials
             type(auto_diff_real_star_order1) :: res18
+            integer, intent(in) :: species
             real(dp) :: dequ
             integer :: j
+            real(dp), dimension(species) :: dxam1, dxa00, dxap1
             logical, parameter :: checking = .false.
-
             include 'formats'
             
-            call unpack_residual_partials(s, k, nvar, i_dlnE_dt, &
-               res18, d_dm1, d_d00, d_dp1)
-            
             ! do partials wrt composition
-
+            dxam1 = 0d0; dxa00 = 0d0; dxap1 = 0d0
             if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
                if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
                   do j=1,s% species
                      dequ = scal*s% d_epsnuc_dx(j,k)
                      if (checking) call check_dequ(dequ,'d_epsnuc_dx')
-                     call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
+                     dxa00(j) = dxa00(j) + dequ
                   end do
                end if
             end if
@@ -460,36 +458,42 @@
                do j=1,s% species
                   dequ = -scal*(s%energy(k)/dt)*s% dlnE_dxa_for_partials(j,k)
                   if (checking) call check_dequ(dequ,'dlnE_dxa_for_partials')
-                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
+                  dxa00(j) = dxa00(j) + dequ
                end do                           
             else if (do_chem .and. (.not. doing_op_split_burn) .and. &
                      (s% dxdt_nuc_factor > 0d0 .or. s% mix_factor > 0d0)) then                     
                do j=1,s% species
                   dequ = scal*s% d_eps_grav_dx(j,k)
                   if (checking) call check_dequ(dequ,'d_eps_grav_dx')
-                  call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
+                  dxa00(j) = dxa00(j) + dequ
                end do               
             end if
             
             do j=1,s% species
                dequ = -scal*d_dwork_dxa00(j)/dm
                if (checking) call check_dequ(dequ,'d_dwork_dxa00')
-               call e00(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
+               dxa00(j) = dxa00(j) + dequ
             end do
             if (k > 1) then 
                do j=1,s% species
                   dequ = -scal*d_dwork_dxam1(j)/dm
                   if (checking) call check_dequ(dequ,'d_dwork_dxam1')
-                  call em1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
+                  dxam1(j) = dxam1(j) + dequ
                end do
             end if
             if (k < nz) then
                do j=1,s% species
                   dequ = -scal*d_dwork_dxap1(j)/dm
                   if (checking) call check_dequ(dequ,'d_dwork_dxap1')
-                  call ep1(s, i_dlnE_dt, j+s% nvar_hydro, k, nvar, dequ)
+                  dxap1(j) = dxap1(j) + dequ
                end do
             end if         
+
+            call save_eqn_dxa_partials(&
+               s, k, nvar, i_dlnE_dt, species, dxam1, dxa00, dxap1, 'get1_energy_eqn', ierr)
+            
+            call unpack_residual_partials(s, k, nvar, i_dlnE_dt, &
+               res18, d_dm1, d_d00, d_dp1)
             
          end subroutine unpack_res18
 
@@ -564,9 +568,9 @@
          test_partials = .false.
             
          if (test_partials) then
-            s% solver_test_partials_val = dwork
-            s% solver_test_partials_var = s% i_u
-            s% solver_test_partials_dval_dx = dwork_ad%d1Array(i_v_00)
+            s% solver_test_partials_val = 0
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
             write(*,*) 'eval_dwork', s% solver_test_partials_var
          end if
 

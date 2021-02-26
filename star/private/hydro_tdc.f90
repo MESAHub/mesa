@@ -191,9 +191,8 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
+            d_turbulent_energy_ad = wrap_etrb_00(s,k)
             d_turbulent_energy_ad%val = s% dxh_etrb(k) ! = etrb_00 - s% etrb_start(k)
-            d_turbulent_energy_ad%d1Array(:) = 0
-            d_turbulent_energy_ad%d1Array(i_etrb_00) = 1d0
          end subroutine setup_d_turbulent_energy
          
          ! PtdV_ad = Pt_ad*dV_ad
@@ -338,9 +337,7 @@
          chiT_00 = wrap_chiT_00(s, k)
          chiRho_00 = wrap_chiRho_00(s, k)
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
-         lnT_00 = 0d0
-         lnT_00%val = s% lnT(k)
-         lnT_00% d1Array(i_lnT_00) = 1d0
+         lnT_00 = wrap_lnT_00(s,k)
          
          r_m1 = wrap_opt_time_center_r_m1(s, k)
          d_m1 = wrap_d_m1(s, k)
@@ -350,9 +347,7 @@
          chiT_m1 = wrap_chiT_m1(s, k)
          chiRho_m1 = wrap_chiRho_m1(s, k)
          QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1)
-         lnT_m1 = 0d0
-         lnT_m1%val = s% lnT(k-1)
-         lnT_m1% d1Array(i_lnT_m1) = 1d0
+         lnT_m1 = wrap_lnT_m1(s,k)
          QQ_div_Cp_face = 0.5d0*(QQ_00/Cp_00 + QQ_m1/Cp_m1)
          ! QQ units (g cm^-3 K)^-1 = g^-1 cm^3 K^-1
          ! Cp units erg g^-1 K^-1 = g cm^2 s^-2 g^-1 K^-1 = cm^2 s^-2 K^-1

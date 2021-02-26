@@ -152,25 +152,6 @@
          grav_dm_div_A_ad = grav_ad*dm_div_A_ad
          RTI_terms_dm_div_A_ad = RTI_terms_ad*dm_div_A_ad
          
-         if (.false.) then
-            if (is_bad(other_dm_div_A_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 other_dm_div_A_ad', k, other_dm_div_A_ad%d1Array(i_lnd_m1)
-               stop 'get1_momentum_eqn'
-            end if
-            if (is_bad(grav_dm_div_A_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 grav_dm_div_A_ad', k, grav_dm_div_A_ad%d1Array(i_lnd_m1)
-               stop 'get1_momentum_eqn'
-            end if
-            if (is_bad(dXP_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 dXP_ad', k, dXP_ad%d1Array(i_lnd_m1)
-               stop 'get1_momentum_eqn'
-            end if
-            if (is_bad(d_mlt_Pturb_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 d_mlt_Pturb_ad', k, d_mlt_Pturb_ad%d1Array(i_lnd_m1)
-               stop 'get1_momentum_eqn'
-            end if
-         end if
-         
          ! sum terms in residual_sum_ad using accurate_auto_diff_real_star_order1
          residual_sum_ad = other_dm_div_A_ad + grav_dm_div_A_ad - dXP_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
          
@@ -189,7 +170,7 @@
             s% solver_test_partials_val = residual
          end if
          if (skip_partials) return
-         call unpack_res18(resid_ad)
+         call unpack_res18(s% species, resid_ad)
 
          if (test_partials) then
             s% solver_test_partials_var = i_lnR
@@ -304,29 +285,34 @@
             RTI_terms_ad = dvdt_diffusion + dvdt_kick            
          end subroutine setup_RTI_terms
          
-         subroutine unpack_res18(res18)
-            use star_utils, only: unpack_residual_partials
+         subroutine unpack_res18(species, res18)
+            use star_utils, only: save_eqn_dxa_partials, unpack_residual_partials
+            integer, intent(in) :: species
             type(auto_diff_real_star_order1) :: res18
-            real(dp) :: resid1
+            real(dp) :: resid1, dxap1(species)
             logical, parameter :: checking = .false.
             integer :: j
             include 'formats'
             ! do partials wrt composition   
             resid1 = resid1_ad%val         
-            do j=1,s% species
+            do j=1,species
                d_residual_dxa00(j) = resid1*d_iXPavg_dxa00(j) - iXPavg*d_dXP_dxa00(j)
                if (checking) call check_dequ(d_dXP_dxa00(j),'d_dXP_dxa00(j)')
                if (checking) call check_dequ(d_iXPavg_dxa00(j),'d_iXPavg_dxa00(j)')
-               call e00(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxa00(j))
             end do
             if (k > 1) then 
-               do j=1,s% species
+               do j=1,species
                   d_residual_dxam1(j) = resid1*d_iXPavg_dxam1(j) - iXPavg*d_dXP_dxam1(j)
                   if (checking) call check_dequ(d_dXP_dxam1(j),'d_dXP_dxam1(j)')
                   if (checking) call check_dequ(d_iXPavg_dxam1(j),'d_iXPavg_dxam1(j)')
-                  call em1(s, i_dv_dt, j+s% nvar_hydro, k, nvar, d_residual_dxam1(j))
                end do
+            else
+               d_residual_dxam1 = 0d0
             end if            
+            dxap1 = 0d0
+            call save_eqn_dxa_partials(&
+               s, k, nvar, i_dv_dt, species, &
+               d_residual_dxam1, d_residual_dxa00, dxap1, 'get1_momentum_eqn', ierr)
             call unpack_residual_partials(s, k, nvar, i_dv_dt, &
                res18, d_dm1, d_d00, d_dp1)
          end subroutine unpack_res18
@@ -456,21 +442,6 @@
          
          other_ad = extra_ad - accel_ad + Uq_ad
          other = other_ad%val
-         
-         if (.false.) then
-            if (is_bad(extra_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 extra_ad', k, extra_ad%d1Array(i_lnd_m1)
-               stop 'expected_non_HSE_term'
-            end if
-            if (is_bad(accel_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 accel_ad', k, accel_ad%d1Array(i_lnd_m1)
-               stop 'expected_non_HSE_term'
-            end if
-            if (is_bad(Uq_ad%d1Array(i_lnd_m1))) then
-               write(*,2) 'lnd_m1 Uq_ad', k, Uq_ad%d1Array(i_lnd_m1)
-               stop 'expected_non_HSE_term'
-            end if
-         end if
          
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.

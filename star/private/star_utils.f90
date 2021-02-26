@@ -1386,6 +1386,23 @@
       end subroutine reset_starting_vectors
 
 
+      subroutine save_eqn_dxa_partials(&
+            s, k, nvar, i_eqn, species, dxam1, dxa00, dxap1, str, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar, i_eqn, species
+         real(dp), intent(in), dimension(species) :: dxam1, dxa00, dxap1
+         character (len=*), intent(in) :: str
+         integer, intent(out) :: ierr
+         integer :: j
+         ierr = 0
+         do j=1,species
+            call em1(s, i_eqn, j+s% nvar_hydro, k, nvar, dxam1(j))
+            call e00(s, i_eqn, j+s% nvar_hydro, k, nvar, dxa00(j))
+            call ep1(s, i_eqn, j+s% nvar_hydro, k, nvar, dxap1(j))
+         end do
+      end subroutine save_eqn_dxa_partials
+
+
       subroutine save_eqn_residual_info(s, k, nvar, i_eqn, resid, str, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar, i_eqn
@@ -3401,11 +3418,16 @@
          call get_avQ(s, k, avQ, &
             d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
          if (ierr /= 0) return
-         avQ_ad%val = avQ
-         avQ_ad%d1Array(i_lnd_00) = d_avQ_dlnd
-         avQ_ad%d1Array(i_lnT_00) = d_avQ_dlnT
-         avQ_ad%d1Array(i_v_00) = d_avQ_dv00
-         avQ_ad%d1Array(i_v_p1) = d_avQ_dvp1
+         call wrap(avQ_ad, avQ, &
+            0d0, d_avQ_dlnd, 0d0, &
+            0d0, d_avQ_dlnT, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, d_avQ_dv00, d_avQ_dvp1, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0)
       end subroutine get_avQ_ad
       
       

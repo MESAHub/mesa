@@ -389,27 +389,6 @@
 
          end subroutine unpack
 
-
-         subroutine null_eqn(j)
-            integer, intent(in) :: j
-            integer :: k
-            do k=nzlo,nzhi
-               s% equ(j,k) = 0 ! s% xs(j,k) - s% xs_pre_pass(j,k)
-               if (.not. skip_partials) call e00(s,j,j,k,nvar,1d0)
-            end do
-         end subroutine null_eqn
-
-
-         subroutine dummy_eqn(j,i,nzlo,nzhi)
-            integer, intent(in) :: j, i, nzlo, nzhi
-            integer :: k
-            do k=nzlo,nzhi
-               s% equ(j,k) = 0
-               if (.not. skip_partials) call e00(s,j,i,k,nvar,1d0)
-            end do
-         end subroutine dummy_eqn
-
-
          subroutine fix_d_eos_dxa_partials(s, k, ierr)
 
             ! revise composition partials
@@ -751,10 +730,8 @@
          kap_00 = wrap_kap_00(s,k)
          kap_m1 = wrap_kap_m1(s,k)
          kap_face = alfa*kap_00 + beta*kap_m1
-         if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) then
-            kap_face%val = s% min_kap_for_dPrad_dm_eqn
-            kap_face%d1Array = 0d0
-         end if
+         if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) &
+            kap_face = s% min_kap_for_dPrad_dm_eqn
                   
          ! calculate expected d_P_rad from current L_rad
          d_P_rad_expected_ad = -dm_bar*kap_face*Lrad_ad/(clight*area2)
