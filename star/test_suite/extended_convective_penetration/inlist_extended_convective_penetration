@@ -51,7 +51,7 @@
     profile_interval = 100    
     history_interval = 1
     terminal_interval = 10
-    photo_interval = 25
+    photo_interval = 10
 
 !OPTIONS
     do_conv_premix = .true.
