@@ -159,7 +159,6 @@
          integer :: iounit, nz1, nz2, file_type, nvar_hydro, species
          character (len=250) :: fname, line
          real(dp) :: m1, m2, initial_mass
-         real(dp), dimension(:), pointer :: lnT
          logical :: okay
 
          include 'formats'
@@ -253,7 +252,7 @@
          nz = nz1
 
          allocate(xh(nvar_hydro,nz), xa(species,nz), q(nz), dq(nz), &
-            omega(nz), j_rot(nz), lnT(nz), stat=ierr)
+            omega(nz), j_rot(nz), stat=ierr)
          if (ierr /= 0) then
             close(iounit)
             return
@@ -262,13 +261,13 @@
          call get1_mass( &
                s, iounit, m1, nz1, m2, nz2, initial_mass, &
                nvar_hydro, species, xh, xa, q, dq, &
-               omega, j_rot, lnT, ierr)
+               omega, j_rot, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in get1_mass'
             stop 'get_zams_model'
          end if
          close(iounit)
-         deallocate(j_rot, lnT)
+         deallocate(j_rot)
 
          contains
 
@@ -345,7 +344,7 @@
       subroutine get1_mass( &
             s, iounit, m1, nz1, m2, nz2, initial_mass, &
             nvar_hydro, species, xh, xa, q, dq, &
-            omega, j_rot, lnT, ierr)
+            omega, j_rot, ierr)
          use read_model, only: read_properties, read1_model
          use chem_def, only: iso_name_length
          use read_model, only: get_chem_col_names
@@ -356,14 +355,14 @@
          real(dp), intent(inout) :: xh(:,:) ! (nvar_hydro,nz1)
          real(dp), intent(inout) :: xa(:,:) ! (species,nz1)
          real(dp), intent(inout), dimension(:) :: &
-            q, dq, omega, j_rot, lnT ! (nz1)
+            q, dq, omega, j_rot ! (nz1)
          integer, intent(out) :: ierr
 
          integer :: i, k, nz, nz_in, iprop
          real(dp) :: m_in, m_read, dprop, lnm1, lnm2
          real(dp), dimension(:, :), pointer :: xh2, xa2
          real(dp), dimension(:), pointer :: &
-            q2, dq2, omega2, j_rot2, lnT2
+            q2, dq2, omega2, j_rot2
          real(dp) :: alfa, struct(nvar_hydro), comp(species)
          logical :: okay
          character (len=net_name_len) :: net_name
@@ -378,7 +377,7 @@
          allocate( &
             xh2(nvar_hydro, nz2), xa2(species, nz2), q2(nz2), dq2(nz2), &
             omega2(nz2), j_rot2(nz2), &
-            lnT2(nz2), names(species), perm(species), stat=ierr)
+            names(species), perm(species), stat=ierr)
          if (ierr /= 0) return
          okay = .false.
          mass_loop: do ! loop until find desired mass
@@ -421,7 +420,7 @@
                if (m_read == m1) then
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
-                     xh, xa, q, dq, omega, j_rot, lnT, perm, ierr)
+                     xh, xa, q, dq, omega, j_rot, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
                   if (m2 == m1) exit mass_loop
@@ -430,7 +429,7 @@
                else
                   call read1_model( &
                      s, species, nvar_hydro, nz, iounit, .false., .false., &
-                     xh2, xa2, q2, dq2, omega2, j_rot2, lnT2, perm, ierr)
+                     xh2, xa2, q2, dq2, omega2, j_rot2, perm, ierr)
                   if (ierr /= 0) exit mass_loop
                   okay = .true.
                   nz = nz1
@@ -469,8 +468,7 @@
          contains
 
          subroutine dealloc
-            deallocate(xh2, xa2, q2, dq2, &
-               omega2, j_rot2, lnT2, names, perm)
+            deallocate(xh2, xa2, q2, dq2, omega2, j_rot2, names, perm)
          end subroutine dealloc
 
       end subroutine get1_mass

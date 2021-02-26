@@ -290,7 +290,7 @@
             integer, intent(in) :: species
             type(auto_diff_real_star_order1) :: res18
             real(dp) :: resid1, dxap1(species)
-            logical, parameter :: checking = .false.
+            logical, parameter :: checking = .true.
             integer :: j
             include 'formats'
             ! do partials wrt composition   
@@ -383,7 +383,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             extra_ad, accel_ad, v_00, Uq_ad
-         real(dp) :: accel, d_accel_dv, fraction_on
+         real(dp) :: accel, d_accel_dv, fraction_on, dlnR00
          logical :: test_partials, local_v_flag
 
          include 'formats'
@@ -393,11 +393,13 @@
          extra_ad = 0d0
          if (s% use_other_momentum .or. s% use_other_momentum_implicit) then
             if (s% use_other_momentum_implicit) then
+               dlnR00 = s% d_extra_grav_dlnR(k)
+               if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
                call wrap(extra_ad, s% extra_grav(k), &
                   s% d_extra_grav_dlndm1(k), s% d_extra_grav_dlnd00(k), 0d0, &
                   s% d_extra_grav_dlnTm1(k), s% d_extra_grav_dlnT00(k), 0d0, &
                   0d0, 0d0, 0d0, &
-                  0d0, s% d_extra_grav_dlnR(k), 0d0, &
+                  0d0, dlnR00, 0d0, &
                   0d0, 0d0, 0d0, &
                   0d0, s% d_extra_grav_dL(k), 0d0, &
                   0d0, 0d0, 0d0, &

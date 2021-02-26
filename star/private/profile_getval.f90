@@ -1663,42 +1663,6 @@
             case (p_delta_mu)
                val = s% mu(k) - s% mu_start(k)
 
-            case (p_super_ad)
-               val = max(0d0, s% gradT(k) - s% grada_face(k))
-
-            case (p_dlnd)
-               val = s% dxh_lnd(k)
-            case (p_dlnT)
-               val = s% dxh_lnT(k)
-            case (p_dlnR)
-               val = s% dxh_lnR(k)
-
-            case (p_dlnd_dt)
-               val = s% dxh_lnd(k)/s% dt
-            case (p_dlnT_dt)
-               val = s% dxh_lnT(k)/s% dt
-            case (p_dlnR_dt)
-               val = s% dxh_lnR(k)/s% dt
-            case (p_dr_dt)
-               val = s% dxh_lnR(k)/s% dt*s% r(k)
-            case (p_dv_dt)
-               if (s% v_flag) val = s% dxh_v(k)/s% dt
-            case (p_du_dt)
-               if (s% u_flag) val = s% dxh_u(k)/s% dt
-
-            case (p_del_entropy)
-               val = s% entropy(k) - exp(s% lnS_start(k))/(avo*kerg)
-            case (p_ds_from_eps_grav)
-               val = -s% dt*s% eps_grav(k)/s% T(k)/(avo*kerg)
-
-            case(p_dt_dm_eps_grav)
-               val = s% eps_grav(k)*s% dm(k)*s% dt
-
-            case(p_dm_de)
-               val = s% dm(k)*(s% energy(k) - s% energy_start(k))
-            case(p_dt_dL)
-               if (k < s% nz) val = s% dt*(s% L(k) - s% L(k+1))
-
             case (p_cno_div_z)
                cno = s% xa(s% net_iso(ic12),k) + &
                      s% xa(s% net_iso(in14),k) + s% xa(s% net_iso(io16),k)

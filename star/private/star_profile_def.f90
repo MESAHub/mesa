@@ -439,9 +439,8 @@
       integer, parameter :: p_log_mlt_vc = p_log_mlt_Gamma + 1
       integer, parameter :: p_conv_vel_div_mlt_vc = p_log_mlt_vc + 1
       integer, parameter :: p_mlt_vc = p_conv_vel_div_mlt_vc + 1
-      integer, parameter :: p_super_ad = p_mlt_vc + 1
 
-      integer, parameter :: p_delta_r = p_super_ad + 1
+      integer, parameter :: p_delta_r = p_mlt_vc + 1
       integer, parameter :: p_delta_L = p_delta_r + 1
       integer, parameter :: p_delta_cell_vol = p_delta_L + 1
       integer, parameter :: p_delta_entropy = p_delta_cell_vol + 1
@@ -522,26 +521,7 @@
       integer, parameter :: p_gradT_sub_grada = p_grad_superad + 1
       integer, parameter :: p_gradT = p_gradT_sub_grada + 1
       integer, parameter :: p_gradr = p_gradT + 1
-
-      integer, parameter :: p_dlnd = p_gradr + 1
-      integer, parameter :: p_dlnT = p_dlnd + 1
-      integer, parameter :: p_dlnR = p_dlnT + 1
-
-      integer, parameter :: p_dlnd_dt = p_dlnR + 1
-      integer, parameter :: p_dlnT_dt = p_dlnd_dt + 1
-      integer, parameter :: p_dlnR_dt = p_dlnT_dt + 1
-      integer, parameter :: p_dr_dt = p_dlnR_dt + 1
-      integer, parameter :: p_du_dt = p_dr_dt + 1
-      integer, parameter :: p_dv_dt = p_du_dt + 1
-
-      integer, parameter :: p_dt_dm_eps_grav = p_dv_dt + 1
-
-      integer, parameter :: p_dm_de = p_dt_dm_eps_grav + 1
-      integer, parameter :: p_dt_dL = p_dm_de + 1
-
-      integer, parameter :: p_ds_from_eps_grav = p_dt_dL + 1
-      integer, parameter :: p_del_entropy = p_ds_from_eps_grav + 1
-      integer, parameter :: p_cno_div_z = p_del_entropy + 1
+      integer, parameter :: p_cno_div_z = p_gradr + 1
 
       integer, parameter :: p_dE = p_cno_div_z + 1
       integer, parameter :: p_dr = p_dE + 1
@@ -1124,11 +1104,7 @@
          profile_column_name(p_dlnddt_RTI_diffusion) = 'dlnddt_RTI_diffusion'
          profile_column_name(p_log_abs_eps_grav_dm_div_L) = 'log_abs_eps_grav_dm_div_L'
          profile_column_name(p_eps_grav_composition_term) = 'eps_grav_composition_term'
-
-         profile_column_name(p_dt_dm_eps_grav) = 'dt_dm_eps_grav'
          profile_column_name(p_dm_eps_grav) = 'dm_eps_grav'
-         profile_column_name(p_dm_de) = 'dm_de'
-         profile_column_name(p_dt_dL) = 'dt_dL'
 
          profile_column_name(p_eps_grav_plus_eps_mdot) = 'eps_grav_plus_eps_mdot'
          profile_column_name(p_ergs_eps_grav_plus_eps_mdot) = 'ergs_eps_grav_plus_eps_mdot'
@@ -1166,7 +1142,6 @@
          profile_column_name(p_log_mlt_vc) = 'log_mlt_vc'
          profile_column_name(p_conv_vel_div_mlt_vc) = 'conv_vel_div_mlt_vc'
          profile_column_name(p_mlt_vc) = 'mlt_vc'
-         profile_column_name(p_super_ad) = 'super_ad'
 
          profile_column_name(p_delta_r) = 'delta_r'
          profile_column_name(p_delta_L) = 'delta_L'
@@ -1243,21 +1218,6 @@
 
          profile_column_name(p_gradT) = 'gradT'
          profile_column_name(p_gradr) = 'gradr'
-
-         profile_column_name(p_dlnd_dt) = 'dlnd_dt'
-         profile_column_name(p_dlnT_dt) = 'dlnT_dt'
-         profile_column_name(p_dlnR_dt) = 'dlnR_dt'
-         profile_column_name(p_dr_dt) = 'dr_dt'
-         profile_column_name(p_dv_dt) = 'dv_dt'
-         profile_column_name(p_du_dt) = 'du_dt'
-
-         profile_column_name(p_dlnd) = 'dlnd'
-         profile_column_name(p_dlnT) = 'dlnT'
-         profile_column_name(p_dlnR) = 'dlnR'
-
-
-         profile_column_name(p_del_entropy) = 'del_entropy'
-         profile_column_name(p_ds_from_eps_grav) = 'ds_from_eps_grav'
 
          profile_column_name(p_cno_div_z) = 'cno_div_z'
 

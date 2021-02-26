@@ -316,10 +316,17 @@
                      s% dxh_lnT(k) = 0d0
                   end do
                else if (j == i_lnR) then
-                  do k=1,nz
-                     s% lnR(k) = s% xh(i_lnR,k)
-                     s% dxh_lnR(k) = 0d0
-                  end do
+                  if (s% solver_use_lnR) then
+                     do k=1,nz
+                        s% lnR(k) = s% xh(i_lnR,k)
+                        s% r(k) = exp(s% lnR(k))
+                     end do
+                  else
+                     do k=1,nz
+                        s% r(k) = s% xh(i_lnR,k)
+                        s% lnR(k) = log(s% r(k))
+                     end do
+                  end if
                else if (j == i_etrb) then
                   do k=1,nz
                      s% etrb(k) = max(s% xh(i_etrb, k), 0d0)
@@ -356,37 +363,6 @@
                   end do
                end if
             end do
-
-            if (s% trace_k > 0 .and. s% trace_k <= nz) then
-               k = s% trace_k
-               if (i_lnd /= 0) &
-                  write(*,5) 'update_vars: lnd', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% lnd(k)
-               if (i_lnT /= 0) &
-                  write(*,5) 'update_vars: lnT', k, s% solver_iter, s% solver_adjust_iter, &
-                              s% model_number, s% lnT(k)
-               if (i_lum /= 0) &
-                  write(*,5) 'update_vars: L', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% L(k)
-               if (i_lnR /= 0) &
-                  write(*,5) 'update_vars: lnR', k, s% solver_iter, s% solver_adjust_iter, &
-                        s% model_number, s% lnR(k)
-               if (i_v /= 0) &
-                  write(*,5) 'update_vars: v', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% v(k)
-               if (i_u /= 0) &
-                  write(*,5) 'update_vars: u', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% u(k)
-               if (i_alpha_RTI /= 0) &
-                  write(*,5) 'update_vars: alpha_RTI', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% alpha_RTI(k)
-               if (i_etrb_RSP /= 0) &
-                  write(*,5) 'update_vars: Et', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% RSP_Et(k)
-               if (i_ln_cvpv0 /= 0) &
-                  write(*,5) 'update_vars: conv_vel', k, s% solver_iter, s% solver_adjust_iter, &
-                           s% model_number, s% conv_vel(k)
-            end if
 
             if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% TDC_flag)) s% L(1:nz) = 0d0
 
@@ -803,7 +779,6 @@
                   s% RSP_w_start(k) = s% RSP_w(k)
                end if
             end if
-            s% r(k) = exp(s% lnR(k))
             if (s% r_start(k) < 0) s% r_start(k) = s% r(k)
             call set_rv_info(s,k)        
             do j=1,species

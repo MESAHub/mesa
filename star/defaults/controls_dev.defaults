@@ -6,6 +6,8 @@
 ! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
 
 
+
+
       D_mix_zero_region_bottom_q = 1d99
       D_mix_zero_region_top_q = -1d99
       dq_D_mix_zero_at_H_He_crossover = -1d0
@@ -19,6 +21,8 @@
       do_normalize_dqs_as_part_of_set_qs = .false.
       
       
+      
+      solver_use_lnR = .true.
       
 
       ! TDC parameters

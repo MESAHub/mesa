@@ -183,7 +183,7 @@
       end subroutine eval_equations
 
 
-      subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)
+      subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr) ! equ = residuals
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
@@ -247,7 +247,6 @@
                do j = 1, nvar_hydro
                   if (j == skip_eqn1 .or. j == skip_eqn2) cycle
                   absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                  !write(*,3) 'equ(j,k)*s% residual_weight(j,k)', j, k, equ(j,k)*s% residual_weight(j,k)
                   sumequ = sumequ + absq
                   if (is_bad(sumequ)) then
                      if (dbg) then
@@ -357,10 +356,14 @@
             skip2 = s% i_v
          end if
 
-         if (s% include_u_in_error_est) then
+         if (skip2 == 0 .and. .not. s% include_u_in_error_est) then
+            skip2 = s% i_u
+         end if
+         
+         if (s% solver_use_lnR) then
             skip3 = 0
          else
-            skip3 = s% i_u
+            skip3 = s% i_lnR
          end if
          
          i_alpha_RTI = s% i_alpha_RTI
@@ -456,7 +459,8 @@
                            B(j,k)*s% correction_weight(j,k)
                         if (s% stop_for_bad_nums) then
                            found_NaN = .true.
-                           write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', j, k, B(j,k)*s% correction_weight(j,k)
+                           write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', &
+                              j, k, B(j,k)*s% correction_weight(j,k)
                            stop 'sizeB'
                         max_zone = k
                         max_var = j
@@ -660,8 +664,14 @@
          if (s% i_lnd > 0 .and. s% i_lnd <= nvar) &
             call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
          
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
-            call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
+         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) then
+            if (s% solver_use_lnR) then
+               call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
+            else
+               call clip_so_non_negative(s% i_lnR, 1d0)
+            end if
+         end if
+               
 
          !if (s% w_div_wc_flag) then
          !   do k=1,nz

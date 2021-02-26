@@ -34,7 +34,12 @@
       ! current use of xtra's
       ! xtra1 is ln_cvpv0
       ! xtra2 is w_div_wc
-      ! xtra3 is unused
+      ! xtra3 is r
+      
+      !integer, parameter :: &
+      !   i_r_m1 = i_lnR_m1, &
+      !   i_r_00 = i_lnR_00, &
+      !   i_r_p1 = i_lnR_p1
 
       public
 
@@ -716,7 +721,11 @@
          r_m1 = 0d0 ! sets val and d1Array to 0
          if (k > 1) then
             r_m1 % val = s%r(k-1)
-            r_m1 % d1Array(i_lnR_m1) = s%r(k-1)
+            if (s% solver_use_lnR) then
+               r_m1 % d1Array(i_lnR_m1) = s%r(k-1)
+            else
+               r_m1 % d1Array(i_lnR_m1) = 1d0
+            end if
          end if
       end function wrap_r_m1
 
@@ -726,7 +735,11 @@
          integer, intent(in) :: k
          r_00 = 0d0 ! sets val and d1Array to 0
          r_00 % val = s%r(k)
-         r_00 % d1Array(i_lnR_00) = s%r(k)
+         if (s% solver_use_lnR) then
+            r_00 % d1Array(i_lnR_00) = s%r(k)
+         else
+            r_00 % d1Array(i_lnR_00) = 1d0
+         end if
       end function wrap_r_00
 
       function wrap_r_p1(s, k) result(r_p1)
@@ -736,7 +749,11 @@
          r_p1 = 0d0 ! sets val and d1Array to 0
          if (k < s%nz) then
             r_p1 % val = s%r(k+1)
-            r_p1 % d1Array(i_lnR_p1) = s%r(k+1)
+            if (s% solver_use_lnR) then
+               r_p1 % d1Array(i_lnR_p1) = s%r(k+1)
+            else
+               r_p1 % d1Array(i_lnR_p1) = 1d0
+            end if
          else
             r_p1 % val = s%r_center
          end if
@@ -749,7 +766,11 @@
          lnR_m1 = 0d0 ! sets val and d1Array to 0
          if (k > 1) then
             lnR_m1 % val = s%lnR(k-1)
-            lnR_m1 % d1Array(i_lnR_m1) = 1d0
+            if (s% solver_use_lnR) then
+               lnR_m1 % d1Array(i_lnR_m1) = 1d0
+            else
+               lnR_m1 % d1Array(i_lnR_m1) = 1d0/s% r(k-1)
+            end if
          end if
       end function wrap_lnR_m1
 
@@ -759,7 +780,11 @@
          integer, intent(in) :: k
          lnR_00 = 0d0 ! sets val and d1Array to 0
          lnR_00 % val = s%lnR(k)
-         lnR_00 % d1Array(i_lnR_00) = 1d0
+         if (s% solver_use_lnR) then
+            lnR_00 % d1Array(i_lnR_00) = 1d0
+         else
+            lnR_00 % d1Array(i_lnR_00) = 1d0/s% r(k)
+         end if
       end function wrap_lnR_00
 
       function wrap_lnR_p1(s, k) result(lnR_p1)
@@ -769,9 +794,13 @@
          lnR_p1 = 0d0 ! sets val and d1Array to 0
          if (k < s%nz) then
             lnR_p1 % val = s%lnR(k+1)
-            lnR_p1 % d1Array(i_lnR_p1) = 1d0
+            if (s% solver_use_lnR) then
+               lnR_p1 % d1Array(i_lnR_p1) = 1d0
+            else
+               lnR_p1 % d1Array(i_lnR_p1) = 1d0/s% r(k+1)
+            end if
          else
-            lnR_p1 % val = log(s%r_center)
+            lnR_p1 % val = log(max(1d0,s%r_center))
          end if
       end function wrap_lnR_p1
 

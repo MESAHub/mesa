@@ -1,4 +1,7 @@
-      
+         logical :: solver_use_lnR
+         
+         
+         
          real(dp) :: TDC_Lsurf_factor
          real(dp) :: TDC_alfa
          real(dp) :: TDC_alfap

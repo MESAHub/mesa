@@ -163,9 +163,15 @@
                   s% xh(j1,k) = s% lnT(k)
                end do
             else if (j1 == s% i_lnR .and. s% i_lnR <= nvar) then
-               do k = 1, nz
-                  s% xh(j1,k) = s% lnR(k)
-               end do
+               if (s% solver_use_lnR) then
+                  do k = 1, nz
+                     s% xh(j1,k) = s% lnR(k)
+                  end do
+               else
+                  do k = 1, nz
+                     s% xh(j1,k) = s% r(k)
+                  end do
+               end if
             else if (j1 == s% i_lum .and. s% i_lum <= nvar) then
                do k = 1, nz
                   s% xh(j1,k) = s% L(k)

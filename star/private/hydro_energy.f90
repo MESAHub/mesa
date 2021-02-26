@@ -227,6 +227,7 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
+            real(dp) :: d_extra_heat_dlnR00, d_extra_heat_dlnRp1
             include 'formats'
             ierr = 0
          
@@ -248,11 +249,21 @@
             non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
             non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
             
+            d_extra_heat_dlnR00 = s% d_extra_heat_dlnR00(k)
+            d_extra_heat_dlnRp1 = s% d_extra_heat_dlnRp1(k)
+            if (.not. s% solver_use_lnR) then
+               d_extra_heat_dlnR00 = d_extra_heat_dlnR00/s% r(k)
+               if (k < s% nz) then
+                  d_extra_heat_dlnRp1 = d_extra_heat_dlnRp1/s% r(k+1)
+               else
+                  d_extra_heat_dlnRp1 = 0d0
+               end if
+            end if
             call wrap(extra_heat_ad, s% extra_heat(k), &
                s% d_extra_heat_dlndm1(k), s% d_extra_heat_dlnd00(k), s% d_extra_heat_dlndp1(k), &
                s% d_extra_heat_dlnTm1(k), s% d_extra_heat_dlnT00(k), s% d_extra_heat_dlnTp1(k), &
                0d0, 0d0, 0d0, &
-               0d0, s% d_extra_heat_dlnR00(k), s% d_extra_heat_dlnRp1(k), &
+               0d0, d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
@@ -417,8 +428,17 @@
                dke_dt_ad%d1Array(i_v_p1) = d_dkedt_dvp1
                dpe_dt_ad = 0d0
                dpe_dt_ad%val = dpe_dt
-               dpe_dt_ad%d1Array(i_lnR_00) = d_dpedt_dlnR00
-               dpe_dt_ad%d1Array(i_lnR_p1) = d_dpedt_dlnRp1
+               if (s% solver_use_lnR) then
+                  dpe_dt_ad%d1Array(i_lnR_00) = d_dpedt_dlnR00
+                  dpe_dt_ad%d1Array(i_lnR_p1) = d_dpedt_dlnRp1
+               else
+                  dpe_dt_ad%d1Array(i_lnR_00) = d_dpedt_dlnR00/s% r(k)
+                  if (k < s% nz) then
+                     dpe_dt_ad%d1Array(i_lnR_p1) = d_dpedt_dlnRp1/s% r(k+1)
+                  else
+                     dpe_dt_ad%d1Array(i_lnR_p1) = 0d0
+                  end if
+               end if
                de_dt_ad = 0d0
                de_dt_ad%val = de_dt
                de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
@@ -439,7 +459,7 @@
             real(dp) :: dequ
             integer :: j
             real(dp), dimension(species) :: dxam1, dxa00, dxap1
-            logical, parameter :: checking = .false.
+            logical, parameter :: checking = .true.
             include 'formats'
             
             ! do partials wrt composition
@@ -780,10 +800,18 @@
                u_face_ad = 0.5d0*(u_face_ad + s% u_face_start(k))
          else if (s% using_velocity_time_centering) then
             u_face_ad%val = 0.5d0*(s% r(k) - s% r_start(k))/s% dt
-            u_face_ad%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt
+            if (s% solver_use_lnR) then
+               u_face_ad%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt
+            else
+               u_face_ad%d1Array(i_lnR_00) = 0.5d0/s% dt
+            end if
          else
             u_face_ad%val = (s% r(k) - s% r_start(k))/s% dt
-            u_face_ad%d1Array(i_lnR_00) = s% r(k)/s% dt
+            if (s% solver_use_lnR) then
+               u_face_ad%d1Array(i_lnR_00) = s% r(k)/s% dt
+            else
+               u_face_ad%d1Array(i_lnR_00) = 1d0/s% dt
+            end if
          end if
          
          Av_face_ad = A_ad*u_face_ad

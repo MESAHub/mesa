@@ -199,23 +199,8 @@
 
          if (do_struct_burn_mix /= keep_going) return
 
-         if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-            do j=1,s% species
-               write(*,4) 'after do_solver_converge xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
-
-         if (.not. s% j_rot_flag) then
+         if (.not. s% j_rot_flag) &
             do_struct_burn_mix = do_mix_omega(s,dt)
-         end if
-
-         if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-            do j=1,s% species
-               write(*,4) 'after do_mix_omega xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
 
          if (s% use_other_after_struct_burn_mix) &
             call s% other_after_struct_burn_mix(s% id, dt, do_struct_burn_mix)

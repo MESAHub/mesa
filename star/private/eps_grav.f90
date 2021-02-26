@@ -44,7 +44,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         real(dp) :: f
+         real(dp) :: f, d_eps_grav_dlnR00, d_eps_grav_dlnRp1
          include 'formats'
          ierr = 0
 
@@ -90,11 +90,23 @@
          
          ! this is an interim solution so that users of eps_grav can convert to the auto_diff form 
          ! when change eps_grav to use auto_diff, can delete the s% d_eps_grav_d... 
+         
+         d_eps_grav_dlnR00 = s% d_eps_grav_dlnR00(k)
+         d_eps_grav_dlnRp1 = s% d_eps_grav_dlnRp1(k)
+         if (.not. s% solver_use_lnR) then
+            d_eps_grav_dlnR00 = d_eps_grav_dlnR00/s% r(k)
+            if (k < s% nz) then
+               d_eps_grav_dlnRp1 = d_eps_grav_dlnRp1/s% r(k+1)
+            else
+               d_eps_grav_dlnRp1 = 0d0
+            end if
+         end if
+         
          call wrap(s% eps_grav_ad(k), s% eps_grav(k), &
             s% d_eps_grav_dlndm1(k), s% d_eps_grav_dlnd00(k), s% d_eps_grav_dlndp1(k), &
             s% d_eps_grav_dlnTm1(k), s% d_eps_grav_dlnT00(k), s% d_eps_grav_dlnTp1(k), &
             0d0, 0d0, 0d0, &
-            0d0, s% d_eps_grav_dlnR00(k), s% d_eps_grav_dlnRp1(k), &
+            0d0, d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
             0d0, s% d_eps_grav_dv00(k), s% d_eps_grav_dvp1(k), &
             0d0, s% d_eps_grav_dL00(k), s% d_eps_grav_dLp1(k), &
             0d0, 0d0, 0d0, &

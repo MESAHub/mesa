@@ -292,7 +292,8 @@
          rR = s% R_center
          do k = nz, 1, -1
             rL = rR
-            rR = exp(s% xh(i_lnR,k))
+            rR = s% xh(i_lnR,k)
+            if (s% solver_use_lnR) rR = exp(rR)
             dm = s% dm(k)
             dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
             rho = dm/dV
@@ -1436,16 +1437,22 @@
 
          include 'formats'
 
-         call unwrap(residual, val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-                     detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
-                     dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-                     dxtra1_m1, dxtra1_00, dxtra1_p1, &
-                     dxtra2_m1, dxtra2_00, dxtra2_p1, &
-                     dxtra3_m1, dxtra3_00, dxtra3_p1) 
+         call unwrap(residual, val, &
+            dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
+            detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
+            dxtra1_m1, dxtra1_00, dxtra1_p1, &
+            dxtra2_m1, dxtra2_00, dxtra2_p1, &
+            dxtra3_m1, dxtra3_00, dxtra3_p1) 
                      
          d_dm1 = 0; d_d00 = 0; d_dp1 = 0
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
          call unpack1(s% i_lnT, dlnT_m1, dlnT_00, dlnT_p1)
+         !if (.not. s% solver_use_lnR) then
+         !   if (k > 1) dlnR_m1 = dlnR_m1/s% r(k-1)
+         !   dlnR_00 = dlnR_00/s% r(k)
+         !   if (k < s% nz) dlnR_p1 = dlnR_p1/s% r(k+1)
+         !end if
          call unpack1(s% i_lnR, dlnR_m1, dlnR_00, dlnR_p1)
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
@@ -1472,7 +1479,7 @@
          character (len=*), intent(in) :: str
          integer, intent(out) :: ierr
          integer :: nz, j
-         logical, parameter :: checking = .false.
+         logical, parameter :: checking = .true.
          ierr = 0
          nz = s% nz
          do j=1,nvar

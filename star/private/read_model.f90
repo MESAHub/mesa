@@ -465,7 +465,7 @@
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &
                s% xh, s% xa, s% q, s% dq, &
-               s% omega, s% j_rot, s% lnT, &
+               s% omega, s% j_rot, &
                perm, ierr)
          deallocate(names, perm)
          if (ierr /= 0) then
@@ -569,7 +569,7 @@
             s, species, nvar_hydro, nz, iounit, &
             is_RSP_model, want_RSP_model, &
             xh, xa, q, dq, omega, j_rot, &
-            lnT, perm, ierr)
+            perm, ierr)
          use star_utils, only: set_qs
          use chem_def
          type (star_info), pointer :: s
@@ -577,10 +577,10 @@
          logical, intent(in) :: is_RSP_model, want_RSP_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
-            q, dq, omega, j_rot, lnT
+            q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -618,79 +618,83 @@
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
-         do i = 1, nz
+         do k = 1, nz
             read(iounit,'(a)',iostat=ierr) buf
             if (ierr /= 0) then
-               write(*,3) 'read failed i', i, nz
+               write(*,3) 'read failed i', k, nz
                exit
             end if
             call str_to_vector(buf, vec, nvec, ierr)
             if (ierr /= 0) then
                write(*,*) 'str_to_vector failed'
-               write(*,'(a,i8,1x,a)') 'buf', i, trim(buf)
+               write(*,'(a,i8,1x,a)') 'buf', k, trim(buf)
                exit
             end if
             j = int(vec(1))
-            if (j /= i) then
+            if (j /= k) then
                ierr = -1
-               write(*, *) 'error in reading model data   j /= i'
+               write(*, *) 'error in reading model data   j /= k'
                write(*, *) 'species', species
                write(*, *) 'j', j
-               write(*, *) 'i', i
+               write(*, *) 'k', k
                write(*,'(a,1x,a)') 'buf', trim(buf)
                exit
             end if
             j = 1
-            j=j+1; xh(i_lnd,i) = vec(j)
-            j=j+1; xh(i_lnT,i) = vec(j)
-            j=j+1; xh(i_lnR,i) = vec(j)            
+            j=j+1; xh(i_lnd,k) = vec(j)
+            j=j+1; xh(i_lnT,k) = vec(j)
+            if (s% solver_use_lnR) then
+               j=j+1; xh(i_lnR,k) = vec(j)
+            else
+               j=j+1; xh(i_lnR,k) = exp(vec(j))
+            end if
             if (is_RSP_model) then
                if (want_RSP_model) then
-                  j=j+1; xh(i_etrb_RSP,i) = vec(j)
-                  j=j+1; xh(i_erad_RSP,i) = vec(j)
-                  j=j+1; xh(i_Fr_RSP,i) = vec(j)
+                  j=j+1; xh(i_etrb_RSP,k) = vec(j)
+                  j=j+1; xh(i_erad_RSP,k) = vec(j)
+                  j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
                else if (i_etrb /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_etrb,i) = max(0d0,vec(j))
+                  j=j+1; xh(i_etrb,k) = max(0d0,vec(j))
                   j=j+1; ! discard
                   j=j+1; ! discard
-                  j=j+1; xh(i_lum,i) = vec(j)
+                  j=j+1; xh(i_lum,k) = vec(j)
                end if
             else if (i_etrb /= 0) then
-               j=j+1; xh(i_etrb,i) = max(vec(j),0d0)
-               j=j+1; xh(i_lum,i) = vec(j)
+               j=j+1; xh(i_etrb,k) = max(vec(j),0d0)
+               j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
-               j=j+1; xh(i_lum,i) = vec(j)
+               j=j+1; xh(i_lum,k) = vec(j)
             end if            
-            j=j+1; dq(i) = vec(j)
+            j=j+1; dq(k) = vec(j)
             if (i_v /= 0) then
-               j=j+1; xh(i_v,i) = vec(j)
+               j=j+1; xh(i_v,k) = vec(j)
             end if
             if (s% rotation_flag) then
-               j=j+1; omega(i) = vec(j)
+               j=j+1; omega(k) = vec(j)
             end if
             if (s% have_j_rot) then
                !NOTE: MESA version 10108 was first to store j_rot in saved files
-               j=j+1; j_rot(i) = vec(j)
+               j=j+1; j_rot(k) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1; !D_omega(i) = vec(j) ! no longer used
+               j=j+1; !D_omega(k) = vec(j) ! no longer used
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1; !am_nu_rot(i) = vec(j) ! no longer used
+               j=j+1; !am_nu_rot(k) = vec(j) ! no longer used
             end if
             if (i_u /= 0) then
-               j=j+1; xh(i_u,i) = vec(j)
+               j=j+1; xh(i_u,k) = vec(j)
             end if
             if (s% RTI_flag) then
-               j=j+1; xh(i_alpha_RTI,i) = vec(j)
+               j=j+1; xh(i_alpha_RTI,k) = vec(j)
             end if
             if (s% conv_vel_flag .or. s% have_previous_conv_vel) then
                j=j+1
                if (s% conv_vel_flag) then
-                  xh(i_ln_cvpv0,i) = log(vec(j)+s% conv_vel_v0)
+                  xh(i_ln_cvpv0,k) = log(vec(j)+s% conv_vel_v0)
                else
-                  s% conv_vel(i) = vec(j)
+                  s% conv_vel(k) = vec(j)
                end if
             end if
             if (j+species > nvec) then
@@ -704,7 +708,7 @@
                exit
             end if
             do ii=1,species
-               xa(perm(ii),i) = vec(j+ii)
+               xa(perm(ii),k) = vec(j+ii)
             end do
          end do
 !$omp end critical (read1_model_loop)

@@ -653,14 +653,10 @@
 
 
          subroutine set_param_defaults
-
-
-
             if (s% corr_param_factor == 0) s% corr_param_factor = 10d0
             if (s% scale_max_correction == 0) s% scale_max_correction = 1d99
             if (s% corr_norm_jump_limit == 0) s% corr_norm_jump_limit = 1d99
             if (s% max_corr_jump_limit == 0) s% max_corr_jump_limit = 1d99
-
          end subroutine set_param_defaults
 
 

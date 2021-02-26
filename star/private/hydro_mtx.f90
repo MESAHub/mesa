@@ -142,7 +142,6 @@
             end if
          end if
 
-
          do_chem = (s% do_burn .or. s% do_mix)
 
          if (dbg .and. .not. skip_mixing_info) write(*,2) 'redo mix info iter', s% solver_iter
@@ -266,13 +265,6 @@
          if (s% solver_test_partials_k > 0 .and. &
              s% solver_test_partials_k <= nz) then
             k = s% solver_test_partials_k
-            !write(*,2) 'set_vars_for_solver iter before', s% solver_iter
-            !write(*,2) 'rho', k, exp(s% lnd(k))
-            !write(*,2) 'T', k, exp(s% lnT(k))
-            !write(*,2) 'r', k, exp(s% lnR(k))
-            !write(*,2) 'Et', k, s% Et(k)
-            !write(*,2) 'v', k, s% v(k)
-            !write(*,*)
          end if
 
          kbad = 0
@@ -300,16 +292,6 @@
          if (s% solver_test_partials_k > 0 .and. &
              s% solver_test_partials_k <= nz) then
             k = s% solver_test_partials_k
-            !write(*,2) 'set_vars_for_solver iter after', s% solver_iter
-            !write(*,2) 'rho', k, exp(s% lnd(k))
-            !write(*,2) 'T', k, exp(s% lnT(k))
-            !write(*,2) 'T_start', k, s% T_start(k)
-            !write(*,2) 'T - T_start', k, exp(s% lnT(k)) - s% T_start(k)
-            !write(*,2) 'r', k, exp(s% lnR(k))
-            !write(*,2) 'Et', k, s% Et(k)
-            !write(*,2) 'v', k, s% v(k)
-            !write(*,*)
-            !stop 'set_vars_for_solver'
          end if
 
          if (do_lum) then
@@ -354,16 +336,14 @@
             return
          end if
 
-         do_edit_lnR = do_lnR .and. .not. (s% doing_check_partials)
+         do_edit_lnR = do_lnR .and. (.not. s% doing_check_partials) .and. s% solver_use_lnR
          if (do_edit_lnR) call edit_lnR(s, xh_start, s% solver_dx)
-!$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
          do k=1,nz
             if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
             call set_rv_info(s,k)
             ! note: m_grav is held constant during solver iterations
             s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
          end do
-!$OMP END PARALLEL DO
 
          if (do_lnR) then
             call set_rmid(s, 1, nz, ierr)
@@ -460,11 +440,11 @@
                s% T(k) = exp(s% lnT(k))
                if (is_bad_num(s% T(k))) then
                   s% retry_message = 'bad num for T'
-                  if (report) write(*,2) 'bad num T', k, s% T(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver T', k, s% T(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num T', k, s% T(k)
                   ierr = -1
                end if
 
@@ -474,12 +454,12 @@
                s% L(k) = x(i_lum)
                if (is_bad_num(s% L(k))) then
                   s% retry_message = 'bad num for L'
-                  if (report) write(*,2) 'bad num L', k, s% L(k)
                   ierr = -1
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver L', k, s% L(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num L', k, s% L(k)
                end if
 
             end if
@@ -501,6 +481,7 @@
                      stop 'set_vars_for_solver'
 !$omp end critical (set_vars_for_solver_crit1)
                   end if
+                  if (report) write(*,2) 'bad num etrb', k, s% etrb(k)
                end if
 
             end if
@@ -509,11 +490,11 @@
                s% dxh_v(k) = s% solver_dx(i_v,k)
                if (is_bad_num(s% v(k))) then
                   s% retry_message = 'bad num for v'
-                  if (report) write(*,2) 'bad num v', k, s% v(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver v', k, s% v(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num v', k, s% v(k)
                   ierr = -1
                end if
             end if
@@ -523,11 +504,11 @@
                s% dxh_u(k) = s% solver_dx(i_u,k)
                if (is_bad_num(s% u(k))) then
                   s% retry_message = 'bad num for u'
-                  if (report) write(*,2) 'bad num u', k, s% u(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver u', k, s% u(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num u', k, s% u(k)
                   ierr = -1
                end if
             end if
@@ -537,11 +518,11 @@
                s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
                if (is_bad_num(s% alpha_RTI(k))) then
                   s% retry_message = 'bad num for alpha_RTI'
-                  if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver alpha_RTI', k, s% alpha_RTI(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
                   ierr = -1
                end if
                if (s% alpha_RTI(k) < 0d0) then
@@ -555,11 +536,11 @@
                s% conv_vel(k) = max(0d0, exp(x(i_ln_cvpv0))-s% conv_vel_v0)
                if (s% conv_vel(k) > 1d90 .or. is_bad_num(s% conv_vel(k))) then
                   s% retry_message = 'bad num for conv_vel'
-                  if (report) write(*,2) 'bad num conv_vel', k, s% conv_vel(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver conv_vel', k, s% conv_vel(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num conv_vel', k, s% conv_vel(k)
                   ierr = -1
                end if
                if (s% conv_vel(k) < 0d0) then
@@ -579,11 +560,11 @@
                end if
                if (is_bad_num(s% w_div_w_crit_roche(k))) then
                   s% retry_message = 'bad num for w_div_w_crit_roche'
-                  if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                   ierr = -1
                end if
             end if
@@ -592,28 +573,34 @@
                s% j_rot(k) = x(i_j_rot)
                if (is_bad_num(s% j_rot(k))) then
                   s% retry_message = 'bad num for j_rot'
-                  if (report) write(*,2) 'bad num j_rot', k, s% j_rot(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver j_rot', k, s% j_rot(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num j_rot', k, s% j_rot(k)
                   ierr = -1
                end if
             end if
 
             if (do_lnR) then
-               s% lnR(k) = x(i_lnR)
-               s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
+               if (s% solver_use_lnR) then
+                  s% lnR(k) = x(i_lnR)
+                  s% r(k) = exp(s% lnR(k))
+               else
+                  s% r(k) = x(i_lnR)
+                  s% lnR(k) = log(s% r(k))
+               end if
                if (is_bad_num(s% lnR(k))) then
                   s% retry_message = 'bad num for lnR'
-                  if (report) write(*,2) 'bad num lnR', k, s% lnR(k)
                   if (s% stop_for_bad_nums) then
-                     write(*,2) 'set_vars_for_solver lnR', k, s% lnR(k)
+                     write(*,2) 'set_vars_for_solver r lnR solver_dx', &
+                        k, s% r(k), s% lnR(k), s% solver_dx(i_lnR,k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num r lnR solver_dx', &
+                     k, s% r(k), s% lnR(k), s% solver_dx(i_lnR,k)
                   ierr = -1
                end if
-               s% r(k) = exp(s% lnR(k))
             end if
 
             if (do_lnd) then
@@ -656,11 +643,11 @@
                s% rho(k) = exp(s% lnd(k))
                if (is_bad_num(s% rho(k))) then
                   write(s% retry_message, *) 'bad num for rho', k
-                  if (report) write(*,2) 'bad num rho', k, s% rho(k)
                   if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver rho', k, s% rho(k)
                      stop 'set_vars_for_solver'
                   end if
+                  if (report) write(*,2) 'bad num rho', k, s% rho(k)
                   ierr = -1
                end if
             end if
@@ -740,14 +727,14 @@
 
          sum_xa = sum(s% xa(1:species,k))
          if (is_bad_num(sum_xa)) then
-            if (report) then
-               write(*,'(a60,i8,99f20.10)') 'bad num sum X', k, s% m(k)/Msun, sum_xa
-            end if
             ierr = -1
             s% retry_message = 'bad num for mass fractions'
             if (s% stop_for_bad_nums) then
                write(*,2) 'set_vars_for_solver sum_xa', k, sum_xa
                stop 'set_vars_for_solver'
+            end if
+            if (report) then
+               write(*,'(a60,i8,99f20.10)') 'bad num sum X', k, s% m(k)/Msun, sum_xa
             end if
 !$omp critical (hydro_mtx_crit2)
             if (s% why_Tlim /= Tlim_neg_X) s% why_Tlim = Tlim_bad_Xsum
@@ -874,9 +861,8 @@
          integer, intent(out) :: ierr
 
          real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
-         integer :: i, j, k, cnt, i_lnR, neqns, nz, nzlo, nzhi
-         real(dp) :: dt, lnR00, lnRm1, lnRp1, dlnR_prev, ddx, ddx_limit, &
-            epsder_struct, epsder_chem
+         integer :: i, j, nz, neqns
+         real(dp) :: dt
          integer :: id, nvar_hydro
          logical :: dbg_enter_setmatrix, do_chem
          real(dp), pointer :: blk3(:, :, :, :)

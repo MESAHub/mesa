@@ -248,7 +248,11 @@
             i = s% nz - k + 2 ! skip center point
             s% xh(i_lnd, k) = log(cs% rhog(i))
             s% xh(i_lnT, k) = log(cs% Tg(i))
-            s% xh(i_lnR, k) = log(cs% rg(i))
+            if (s% solver_use_lnR) then
+               s% xh(i_lnR, k) = log(cs% rg(i))
+            else
+               s% xh(i_lnR, k) = cs% rg(i)
+            end if
             if (i_lum /= 0) s% xh(i_lum, k) = cs% Lg(i)
             do j=1,species
                s% xa(j,k) = xa(j)

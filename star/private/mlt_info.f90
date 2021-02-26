@@ -119,31 +119,38 @@
       subroutine wrap_mlt_ad(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         real(dp) :: dlnR00
+         dlnR00 = s% d_gradT_dlnR(k)
+         if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
          call wrap(s% gradT_ad(k), s% gradT(k), &
             s% d_gradT_dlndm1(k), s% d_gradT_dlnd00(k), 0d0, &
             s% d_gradT_dlnTm1(k), s% d_gradT_dlnT00(k), 0d0, &
             0d0, 0d0, 0d0, &
-            0d0, s% d_gradT_dlnR(k), 0d0, &
+            0d0, dlnR00, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, s% d_gradT_dL(k), 0d0, &
             0d0, s% d_gradT_dln_cvpv0(k), 0d0, &   ! xtra1 is ln_cvpv0
             0d0, s% d_gradT_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
             0d0, 0d0, 0d0)
+         dlnR00 = s% d_mlt_vc_dlnR(k)
+         if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
          call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
             s% d_mlt_vc_dlndm1(k), s% d_mlt_vc_dlnd00(k), 0d0, &
             s% d_mlt_vc_dlnTm1(k), s% d_mlt_vc_dlnT00(k), 0d0, &
             0d0, 0d0, 0d0, &
-            0d0, s% d_mlt_vc_dlnR(k), 0d0, &
+            0d0, dlnR00, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, s% d_mlt_vc_dL(k), 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0)            
+         dlnR00 = s% d_gradr_dlnR(k)
+         if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
          call wrap(s% gradr_ad(k), s% gradr(k), &
             s% d_gradr_dlndm1(k), s% d_gradr_dlnd00(k), 0d0, &
             s% d_gradr_dlnTm1(k), s% d_gradr_dlnT00(k), 0d0, &
             0d0, 0d0, 0d0, &
-            0d0, s% d_gradr_dlnR(k), 0d0, &
+            0d0, dlnR00, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, s% d_gradr_dL(k), 0d0, &
             0d0, 0d0, 0d0, &
