@@ -51,7 +51,7 @@
 
 ! values to check
       x_ctrl(1) = 0.075d0 ! max_c13_expected (tol 1d-2)
-      x_ctrl(2) = 0.575d0 ! mass_max_c13_expected (tol 5d-3)
+      x_ctrl(2) = 0.580d0 ! mass_max_c13_expected (tol 1d-2)
       x_ctrl(3) = 4.0d-5  ! pocket_mass_c13_expected (tol 1d-5)
       x_ctrl(4) = 3.0d-4  ! delta_surface_c12_expected (tol 2d-4)
       
