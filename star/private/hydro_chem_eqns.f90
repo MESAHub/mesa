@@ -73,7 +73,7 @@
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
          integer :: nz, i_lnd, i_lnT, j, i, jj, ii, equchem1, species
          real(dp) :: &
-            dxdt_expected_dxa, dxdt_expected, dxdt_actual, dVARdot_dVAR, &
+            dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
             dxdt_expected_dlnd, dxdt_expected_dlnT, &
             dq, dm, dequ, dxdt_nuc, dxdt_mix, max_abs_residual, &
             sum_dxdt_nuc, dx_expected_dlnd, dx_expected_dlnT, &
@@ -88,7 +88,6 @@
 
          ierr = 0
 
-         dVARdot_dVAR = s% dVARdot_dVAR
          equchem1 = s% equchem1
          species = s% species
          nz = s% nz
@@ -125,7 +124,7 @@
 
             i = equchem1+j-1
 
-            dxdt_actual = s% xa_sub_xa_start(j,k)*dVARdot_dVAR
+            dxdt_actual = s% xa_sub_xa_start(j,k)/s% dt
             
             doing_op_split_burn = s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T
             if (s% do_burn .and. .not. doing_op_split_burn) then
@@ -144,7 +143,7 @@
 
             dxdt_factor = 1d0
 
-            eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)*dVARdot_dVAR)
+            eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)/s% dt)
             residual = (dxdt_expected - dxdt_actual)/eqn_scale
             s% equ(i,k) = residual
             
@@ -169,7 +168,7 @@
 
             if (skip_partials) cycle
 
-            call e00(s, i, i, k, nvar, -dVARdot_dVAR/eqn_scale)
+            call e00(s, i, i, k, nvar, -1d0/eqn_scale/s% dt)
 
             ! all the rest are jacobian terms for dxdt_expected/eqn_scale
 
@@ -182,13 +181,19 @@
                   if (checking) call check_dequ(dequ,'d_dxdt_nuc_dx')
                   call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
-
-               dxdt_expected_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)
-               dequ_dlnd = dxdt_expected_dlnd/eqn_scale
-               dxdt_expected_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)
-               dequ_dlnT = dxdt_expected_dlnT/eqn_scale
-
+               
+               if (s% solver_use_lnd) then
+                  dequ_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)/eqn_scale
+               else
+                  dequ_dlnd = s% d_dxdt_nuc_drho(j,k)/eqn_scale
+               end if
                call e00(s, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
+               
+               if (s% solver_use_lnT) then
+                  dequ_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)/eqn_scale
+               else
+                  dequ_dlnT = s% d_dxdt_nuc_dT(j,k)/eqn_scale
+               end if
                call e00(s, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
 
             end if

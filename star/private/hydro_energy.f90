@@ -240,15 +240,31 @@
             else
                eps_nuc_ad = 0d0
                eps_nuc_ad%val = s% eps_nuc(k)
-               eps_nuc_ad%d1Array(i_lnd_00) = s% d_epsnuc_dlnd(k)
-               eps_nuc_ad%d1Array(i_lnT_00) = s% d_epsnuc_dlnT(k)
+               if (s% solver_use_lnd) then
+                  eps_nuc_ad%d1Array(i_lnd_00) = s% d_epsnuc_dlnd(k)
+               else
+                  eps_nuc_ad%d1Array(i_lnd_00) = s% d_epsnuc_dlnd(k)/s% rho(k)
+               end if
+               if (s% solver_use_lnT) then
+                  eps_nuc_ad%d1Array(i_lnT_00) = s% d_epsnuc_dlnT(k)
+               else
+                  eps_nuc_ad%d1Array(i_lnT_00) = s% d_epsnuc_dlnT(k)/s% T(k)
+               end if
             end if
             
             non_nuc_neu_ad = 0d0
             ! for reasons lost in the past, we always time center non_nuc_neu
             non_nuc_neu_ad%val = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-            non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
-            non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
+            if (s% solver_use_lnd) then
+               non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
+            else
+               non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)/s% rho(k)
+            end if
+            if (s% solver_use_lnT) then
+               non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
+            else
+               non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)/s% T(k)
+            end if
             
             d_extra_heat_dlnR00 = s% d_extra_heat_dlnR00(k)
             d_extra_heat_dlnRp1 = s% d_extra_heat_dlnRp1(k)

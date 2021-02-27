@@ -81,7 +81,7 @@
          integer :: &
             i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             i_alpha_RTI, i_chem1, i_xh1, i_xhe4, kmax_equ(nvar), species
-         real(dp) :: max_equ(nvar), dVARdot_dVAR, L_phot_old
+         real(dp) :: max_equ(nvar), L_phot_old
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
          logical :: v_flag, u_flag, conv_vel_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
@@ -354,7 +354,6 @@
             L => s% L
             lnP => s% lnP
             energy => s% energy
-            dVARdot_dVAR = s% dVARdot_dVAR
 
             i_dv_dt = s% i_dv_dt
             i_du_dt = s% i_du_dt

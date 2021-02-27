@@ -1,3 +1,14 @@
+do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
+do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
+do_one make_metals "stop because have dropped below central lower limit for he4" "final.mod" auto        
+do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
+do_one gyre_in_mesa_envelope "matched target" skip skip
+do_one make_o_ne_wd "stop because log_surface_luminosity <= log_L_lower_limit" "settled_envelope.mod" auto
+do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
+
+return
 
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip

@@ -306,10 +306,17 @@
          
             do j=1,s% nvar_hydro
                if (j == i_lnd) then
-                  do k=1,nz
-                     s% lnd(k) = s% xh(i_lnd,k)
-                     s% dxh_lnd(k) = 0d0
-                  end do
+                  if (s% solver_use_lnd) then
+                     do k=1,nz
+                        s% lnd(k) = s% xh(i_lnd,k)
+                        s% rho(k) = exp(s% lnd(k))
+                     end do
+                  else
+                     do k=1,nz
+                        s% rho(k) = s% xh(i_lnd,k)
+                        s% lnd(k) = log(s% rho(k))
+                     end do
+                  end if
                else if (j == i_lnT) then
                   if (s% solver_use_lnT) then
                      do k=1,nz
@@ -394,9 +401,7 @@
 
             if (dt > 0d0) then
                dt_inv = 1/dt
-               s% dVARdot_dVAR = dt_inv
             else
-               s% dVARdot_dVAR = 0
                dt_inv = 0
             end if
 
@@ -757,7 +762,6 @@
 
 !$OMP PARALLEL DO PRIVATE(j,k,twoGmrc2,sum_xa) SCHEDULE(dynamic,2)
          do k=nzlo, nzhi
-            s% rho(k) = exp(s% lnd(k))
             if (s% lnd_start(k) < -1d90) then
                s% lnd_start(k) = s% lnd(k)
                s% rho_start(k) = s% rho(k)

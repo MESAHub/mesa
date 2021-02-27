@@ -61,7 +61,7 @@
             r00, rp1, ravg_start, dP, drho, rho, rmid, cs, ds_da, &
             dadt_source, dequ_dE_const_Rho, dequ_dlnd, &
             dequ_dlnd_const_E, dequ_dlnPgas_const_T, dequ_dlnT, &
-            dequ_dlnT_const_Pgas, dlnT_dlnd_const_E, dVARdot_dVAR, fac, &
+            dequ_dlnT_const_Pgas, dlnT_dlnd_const_E, fac, &
             d_dalpha_00, d_dalpha_m1, d_dalpha_p1
          logical :: test_partials
 
@@ -71,7 +71,6 @@
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
-         dVARdot_dVAR = s% dVARdot_dVAR
          i_alpha_RTI = s% i_alpha_RTI
          i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
          nz = s% nz
@@ -187,7 +186,7 @@
             s% equ(i_dalpha_RTI_dt,k) = dadt_expected
             eqn_scale = 1d0
          else
-            eqn_scale = s% x_scale(i_dalpha_RTI_dt,k)*dVARdot_dVAR
+            eqn_scale = s% x_scale(i_dalpha_RTI_dt,k)/s% dt
             s% equ(i_dalpha_RTI_dt,k) = (dadt_expected - dadt_actual)/eqn_scale
          end if
 
@@ -221,7 +220,7 @@
             d_dalpha_00 = 1d0
          else
             ! partial of -dadt_actual/eqn_scale
-            d_dalpha_00 = -dVARdot_dVAR/eqn_scale
+            d_dalpha_00 = -1d0/eqn_scale/s% dt
 
             if (dadt_mix /= 0d0) then ! partials of dadt_mix/eqn_scale
                d_dalpha_00 = d_dalpha_00 + d_dadt_mix_da00/eqn_scale

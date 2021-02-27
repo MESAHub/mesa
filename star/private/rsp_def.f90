@@ -371,7 +371,6 @@
          integer, intent(in) :: iounit
          integer :: n
          include 'formats'
-         !call copy_from_xh_to_rsp(s, NZN) ! resynch before photo
          n = NZN + 1
          write(iounit) NZN
          write(iounit) xa(1:s% species), &
@@ -516,7 +515,9 @@
       
       
       subroutine set_star_vars(s, ierr)
-         use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
+         use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+            store_T_in_xh, get_T_and_lnT_from_xh, store_r_in_xh, get_r_and_lnR_from_xh
+            
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: sum_dm
@@ -569,11 +570,16 @@
             s% lnd(k) = log(s% rho(k))
             s% rho(k) = exp(s% lnd(k))
             s% Vol(k) = 1d0/s% rho(k)  
-            s% xh(s% i_lnd, k) = s% lnd(k)            
-            s% lnT(k) = log(s% T(k))
-            s% xh(s% i_lnT, k) = s% lnT(k)            
-            s% lnR(k) = log(s% r(k))
-            s% xh(s% i_lnR, k) = s% lnR(k)            
+            
+            
+            s% xh(s% i_lnd, k) = s% lnd(k)   
+            
+            call store_T_in_xh(s, k, s% T(k))
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
+            
+            call store_r_in_xh(s, k, s% r(k))
+            call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
+
             s% RSP_Et(k) = s% RSP_w(k)*s% RSP_w(k)
             s% xh(s% i_etrb_RSP, k) = s% RSP_Et(k)               
             s% xh(s% i_v, k) = s% v(k)            
@@ -581,8 +587,8 @@
       end subroutine set_star_vars
       
       
-      subroutine copy_from_xh_to_rsp(s, nz_new) 
-         ! do this when load a file and after remesh
+      subroutine copy_from_xh_to_rsp(s, nz_new) ! do this when load a file
+         use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nz_new
          integer :: k
@@ -592,10 +598,8 @@
          do k=NZN,1,-1
             s% lnd(k) = s% xh(s% i_lnd,k)
             s% rho(k) = exp(s% lnd(k))
-            s% lnT(k) = s% xh(s% i_lnT,k)
-            s% T(k) = exp(s% lnT(k))
-            s% lnR(k) = s% xh(s% i_lnR,k)
-            s% r(k) = exp(s% lnR(k))
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
+            call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
             s% RSP_Et(k) = s% xh(s% i_etrb_RSP,k)
             s% RSP_w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
@@ -782,7 +786,9 @@
       
       
       subroutine copy_results(s)
-         use star_utils, only: set_rmid
+         use star_utils, only: set_rmid, store_r_in_xh, &
+            get_r_and_lnR_from_xh, store_r_in_xh, &
+            get_T_and_lnT_from_xh, store_T_in_xh
          use const_def, only: convective_mixing, no_mixing, qp
          type (star_info), pointer :: s
          integer :: i, k, ierr
@@ -797,22 +803,18 @@
             s% xh(s% i_erad_RSP,k) = s% erad(k)
             s% xh(s% i_Fr_RSP,k) = s% Fr(k)
             
-            ! some tweaks needed for bit-for-bit with photos
-            
             ! sqrt(w**2) /= original w, so need to redo
             s% RSP_Et(k) = s% RSP_w(k)**2
             s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
             s% RSP_w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
             
             ! exp(log(r)) /= original r, so need to redo
-            s% lnR(k) = log(s% r(k))
-            s% xh(s% i_lnR,k) = s% lnR(k)
-            s% r(k) = exp(s% xh(s% i_lnR,k))
+            call store_r_in_xh(s, k, s% r(k))
+            call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
             
             ! exp(log(T)) /= original T, so need to redo
-            s% lnT(k) = log(s% T(k))
-            s% xh(s% i_lnT,k) = s% lnT(k)
-            s% T(k) = exp(s% xh(s% i_lnT,k))
+            call store_T_in_xh(s, k, s% T(k))
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             
             s% P(k) = s% Pgas(k) + s% Prad(k)
             if (k > 1) s% gradT(k) = &

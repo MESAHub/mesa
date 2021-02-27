@@ -186,7 +186,6 @@
             call set_to_NaN(s% conv_mx2_top_r)
             call set_to_NaN(s% cumulative_energy_error_old)
             call set_to_NaN(s% cumulative_extra_heating_old)
-            call set_to_NaN(s% dVARdot_dVAR)
             call set_to_NaN(s% dX_nuc_drop_max_drop)
             call set_to_NaN(s% d_vc_dv)
             call set_to_NaN(s% delta_Pg)

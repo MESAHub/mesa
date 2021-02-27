@@ -2890,6 +2890,12 @@
                      
          if (.not. s% solver_use_lnR) &
             write(*,*) 'solver_use_lnR', s% solver_use_lnR
+                     
+         if (.not. s% solver_use_lnT) &
+            write(*,*) 'solver_use_lnT', s% solver_use_lnT
+                     
+         if (.not. s% solver_use_lnd) &
+            write(*,*) 'solver_use_lnd', s% solver_use_lnd
          
          if (s% mix_factor /= 1d0) &
             write(*,1) 'mix_factor', s% mix_factor

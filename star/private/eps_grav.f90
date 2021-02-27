@@ -190,8 +190,8 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          real(dp) :: dlnd_dt, dlnT_dt
-         dlnd_dt = s% dxh_lnd(k) * s% dVARDOT_dVAR
-         dlnT_dt = (s% lnT(k) - s% lnT_start(k)) * s% dVARDOT_dVAR
+         dlnd_dt = (s% lnd(k) - s% lnd_start(k))/s% dt
+         dlnT_dt = (s% lnT(k) - s% lnT_start(k))/s% dt
          call do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
       end subroutine do_eps_grav_with_lnd_Lagrangian
 
@@ -240,7 +240,7 @@
          dT1_dlnd = dlnT_dt*da1_dlnd
 
          dT1_d_dlnTdt = a1
-         dT1_dlnT00 = s% dVARDOT_dVAR*a1 + dlnT_dt*da1_dlnT
+         dT1_dlnT00 = a1/s% dt + dlnT_dt*da1_dlnT
 
          a2 = s% grada(k)*s% chiRho(k)
          da2_dlnd = s% d_eos_dlnd(i_grad_ad,k)*s% chiRho(k) + s% grada(k)*s% d_eos_dlnd(i_chiRho,k)
@@ -249,7 +249,7 @@
          T2 = dlnd_dt*a2
          dT2_dlnT = dlnd_dt*da2_dlnT
 
-         dT2_dlnd00 = s% dVARDOT_dVAR*a2 + dlnd_dt*da2_dlnd
+         dT2_dlnd00 = a2/s% dt + dlnd_dt*da2_dlnd
 
          T3 = -s% T(k)*s% cp(k)
          dT3_dlnd = -s% T(k)*s% d_eos_dlnd(i_Cp,k)
@@ -278,7 +278,7 @@
             dT1_dlnd = dlnT_dt*da1_dlnd
 
             dT1_d_dlnTdt = a1
-            dT1_dlnT00 = s% dVARDOT_dVAR*a1 + dlnT_dt*da1_dlnT
+            dT1_dlnT00 = a1/s% dt + dlnT_dt*da1_dlnT
 
             a2 = s% grada_start(k)*s% chiRho_start(k)
             da2_dlnd = 0d0
@@ -287,7 +287,7 @@
             T2 = dlnd_dt*a2
             dT2_dlnT = dlnd_dt*da2_dlnT
 
-            dT2_dlnd00 = s% dVARDOT_dVAR*a2 + dlnd_dt*da2_dlnd
+            dT2_dlnd00 = a2/s% dt + dlnd_dt*da2_dlnd
 
             T3 = -s% T_start(k)*s% cp_start(k)
             dT3_dlnd = 0d0
@@ -308,9 +308,9 @@
 
          ! phase transition latent heat
          latent_heat = dlnd_dt * s%latent_ddlnRho(k) + dlnT_dt * s%latent_ddlnT(k)
-         d_latent_heat_dlnT = s% dVARDOT_dVAR * s%latent_ddlnT(k) + &
+         d_latent_heat_dlnT = s%latent_ddlnT(k)/s% dt + &
                         dlnT_dt * s% d_eos_dlnT(i_latent_ddlnT, k) + dlnd_dt * s% d_eos_dlnT(i_latent_ddlnRho, k)
-         d_latent_heat_dlnRho = s% dVARDOT_dVAR * s%latent_ddlnRho(k) + &
+         d_latent_heat_dlnRho = s%latent_ddlnRho(k)/s% dt + &
                         dlnT_dt * s% d_eos_dlnd(i_latent_ddlnT, k) + dlnd_dt * s% d_eos_dlnd(i_latent_ddlnRho, k)
 
          s% eps_grav(k) = s%eps_grav(k) - latent_heat
@@ -378,7 +378,7 @@
          T = s% T(k)
          entropy_start = exp(lnS_start)
 
-         s% eps_grav(k) = -T*(entropy - entropy_start)*s% dVARDOT_dVAR
+         s% eps_grav(k) = -T*(entropy - entropy_start)/s% dt
 
          if (is_bad(s% eps_grav(k))) then
             ierr = -1
@@ -391,8 +391,8 @@
 
          dS_dlnT = s% dS_dT_for_partials(k)*s% T(k) ! instead of   entropy*s% d_eos_dlnT(i_lnS,k)
          dS_dlnd = s% dS_drho_for_partials(k)*s% rho(k) ! instead of   entropy*s% d_eos_dlnd(i_lnS,k)
-         s% d_eps_grav_dlnT00(k) = -T*dS_dlnT*s% dVARDOT_dVAR + s% eps_grav(k)
-         s% d_eps_grav_dlnd00(k) = -T*dS_dlnd*s% dVARDOT_dVAR
+         s% d_eps_grav_dlnT00(k) = -T*dS_dlnT/s% dt + s% eps_grav(k)
+         s% d_eps_grav_dlnd00(k) = -T*dS_dlnd/s% dt
 
       end subroutine do_lnS_eps_grav
 
@@ -596,8 +596,9 @@
          ! we only have lnE and lnP derivs, so use
          ! eps_grav = -de/dt + (P/rho) * dlnd/dt
          do j=1, s% species
-            s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k) * s% dVARDOT_dVAR + &
-               (s% P(k) / s% Rho(k)) * s% dlnP_dxa_for_partials(j,k) * s% dxh_lnd(k) * s% dVARDOT_dVAR
+            s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k)/s% dt + &
+               (s% P(k) / s% Rho(k)) * s% dlnP_dxa_for_partials(j,k) * &
+               (s% lnd(k) - s% lnd_start(k))/s% dt
          end do
 
          e = s% energy(k)
@@ -646,19 +647,14 @@
             ! combine with end-of-step composition derivatives
             ! until EOSes always provide composition derivatives, ignore this
             ! the end-of-step term should generally be similar enough
-            ! do j=1, s% species
-            !    s% d_eps_grav_dx(j,k) = theta * s% d_eps_grav_dx(j,k) + (1d0 - theta) *  &
-            !       (-e_with_DT_start * dres_dxa(i_lnE, j) * s% dVARDOT_dVAR + &
-            !       (Pgas_with_DT_start/s% rho_start(k)) * dres_dxa(i_lnPgas, j) * s% dxh_lnd(k) * s% dVARDOT_dVAR)
-            ! end do
 
          end if
 
-         s% eps_grav_composition_term(k) = -de * s% dVARDOT_dVAR
+         s% eps_grav_composition_term(k) = -de/s% dt
          s% eps_grav(k) = s% eps_grav(k) + s% eps_grav_composition_term(k)
 
-         s% d_eps_grav_dlnd00(k) = s% d_eps_grav_dlnd00(k) - d_de_dlnd * s% dVARDOT_dVAR
-         s% d_eps_grav_dlnT00(k) = s% d_eps_grav_dlnT00(k) - d_de_dlnT * s% dVARDOT_dVAR
+         s% d_eps_grav_dlnd00(k) = s% d_eps_grav_dlnd00(k) - d_de_dlnd/s% dt
+         s% d_eps_grav_dlnT00(k) = s% d_eps_grav_dlnT00(k) - d_de_dlnT/s% dt
 
 
          !test_partials = (k == s% solver_test_partials_k)

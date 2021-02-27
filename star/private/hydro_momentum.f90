@@ -429,14 +429,14 @@
 
             if (local_v_flag) then
                accel = s% dxh_v(k)/s% dt
-               d_accel_dv = s% dVARDOT_dVAR
+               d_accel_dv = 1d0/s% dt
             else ! assume vstart(k) = 0 and
                ! constant acceleration dv_dt so vfinal(k) = dv_dt*dt
                ! v(k) = dr/dt = average velocity =
                !      (vstart + vfinal)/2 = dv_dt*dt/2 when vstart = 0
                ! so (1/2)*dv_dt*dt = v(k)
-               accel = 2d0*s% v(k)*s% dVARDOT_dVAR
-               d_accel_dv = 2d0*s% dVARDOT_dVAR
+               accel = 2d0*s% v(k)/s% dt
+               d_accel_dv = 2d0/s% dt
             end if
             accel_ad%val = accel
             accel_ad%d1Array(i_v_00) = d_accel_dv

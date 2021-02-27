@@ -112,7 +112,7 @@
          nvar_chem = s% nvar_chem
          species = s% species
          nvar_hydro = s% nvar_hydro
-         d_dxdt_dx = s% dVARdot_dVAR
+         d_dxdt_dx = 1d0/s% dt
          i_chem1 = s% i_chem1
 
          xh_start => s% xh_start
@@ -604,7 +604,6 @@
 
             if (do_lnd) then
                s% lnd(k) = x(i_lnd)
-               s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
                if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                   write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                   if (report) &
