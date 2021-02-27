@@ -21,6 +21,7 @@
    max_timestep = 407.61 ! seconds for rsp.mod of Cepheid
    
 ! solver   
+   solver_use_lnR = .false.
 
 ! TDC
 

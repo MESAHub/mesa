@@ -348,6 +348,78 @@
             s% xh(s% i_lnR,k) = exp(lnR)
          end if
       end subroutine store_lnR_in_xh
+      
+      
+      subroutine get_T_and_lnT_from_xh(s, k, T, lnT)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: T, lnT
+         if (s% solver_use_lnT) then
+            lnT = s% xh(s% i_lnT,k)
+             T =  exp(lnT)
+         else
+             T =  s% xh(s% i_lnT,k)
+            lnT = log(T)
+         end if
+      end subroutine get_T_and_lnT_from_xh
+      
+      
+      real(dp) function get_T_from_xh(s,k) result(T)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         if (s% solver_use_lnT) then
+             T =  exp(s% xh(s% i_lnT,k))
+         else
+             T =  s% xh(s% i_lnT,k)
+         end if
+      end function get_T_from_xh
+      
+      
+      real(dp) function get_lnT_from_xh(s,k) result(lnT)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         if (s% solver_use_lnT) then
+            lnT = s% xh(s% i_lnT,k)
+         else
+            lnT = log(s% xh(s% i_lnT,k))
+         end if
+      end function get_lnT_from_xh
+      
+      
+      subroutine store_T_or_lnT_in_xh(s, k, T, lnT)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: T, lnT
+         if (s% solver_use_lnT) then
+            s% xh(s% i_lnT,k) = lnT
+         else
+            s% xh(s% i_lnT,k) = T
+         end if
+      end subroutine store_T_or_lnT_in_xh
+      
+      
+      subroutine store_T_in_xh(s, k, T)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: T
+         if (s% solver_use_lnT) then
+            s% xh(s% i_lnT,k) = log(T)
+         else
+            s% xh(s% i_lnT,k) = T
+         end if
+      end subroutine store_T_in_xh
+      
+      
+      subroutine store_lnT_in_xh(s, k, lnT)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: lnT
+         if (s% solver_use_lnT) then
+            s% xh(s% i_lnT,k) = lnT
+         else
+            s% xh(s% i_lnT,k) = exp(lnT)
+         end if
+      end subroutine store_lnT_in_xh
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)

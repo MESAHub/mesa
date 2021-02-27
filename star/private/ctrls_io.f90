@@ -131,7 +131,7 @@
     ! for reported surface/center abundances
     surface_avg_abundance_dq, center_avg_value_dq, &
     
-    ! mixing parameters
+    ! mixing parameters 
     min_convective_gap, min_thermohaline_gap, min_semiconvection_gap, min_thermohaline_dropout, &
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
@@ -146,7 +146,7 @@
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     no_MLT_below_T_max, MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
-    max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, solver_use_lnR, &
+    max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, solver_use_lnR, solver_use_lnT, &
     limit_overshoot_Hp_using_size_of_convection_zone, RSP_min_tau_for_turbulent_flux, &
     predictive_mix, predictive_superad_thresh, predictive_avoid_reversal, predictive_limit_ingestion,&
     predictive_ingestion_factor, predictive_zone_type, predictive_zone_loc, predictive_bdy_loc, &
@@ -1071,6 +1071,7 @@
  s% mlt_make_surface_no_mixing = mlt_make_surface_no_mixing
  s% do_normalize_dqs_as_part_of_set_qs = do_normalize_dqs_as_part_of_set_qs
  s% solver_use_lnR = solver_use_lnR
+ s% solver_use_lnT = solver_use_lnT
 
  s% thermohaline_coeff = thermohaline_coeff
  s% thermohaline_option = thermohaline_option
@@ -2710,6 +2711,7 @@
  mlt_make_surface_no_mixing = s% mlt_make_surface_no_mixing
  do_normalize_dqs_as_part_of_set_qs = s% do_normalize_dqs_as_part_of_set_qs
  solver_use_lnR = s% solver_use_lnR
+ solver_use_lnT = s% solver_use_lnT
 
  thermohaline_coeff = s% thermohaline_coeff
  thermohaline_option = s% thermohaline_option
