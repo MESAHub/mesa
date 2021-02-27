@@ -618,7 +618,11 @@
                end if
          
                xh(i_lnd, k) = logRho*ln10
-               xh(i_lnT, k) = lnT
+               if (s% solver_use_lnT) then
+                  xh(i_lnT, k) = lnT
+               else
+                  xh(i_lnT, k) = exp(lnT)
+               end if
                if (s% solver_use_lnR) then
                   xh(i_lnR, k) = log(r)
                else

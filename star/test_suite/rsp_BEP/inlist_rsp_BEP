@@ -66,7 +66,10 @@
 
    RSP_max_num_periods = 3000
    
-
+! solver
+   solver_use_lnR = .true.
+   solver_use_lnT = .true.
+   
 ! output controls
    
       terminal_show_age_units = 'days'

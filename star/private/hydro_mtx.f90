@@ -397,7 +397,6 @@
             if (do_lnT) then
 
                s% lnT(k) = x(i_lnT)
-               s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                if (abs(s% lnT(k) - s% lnT_start(k)) > &
                        ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
                     s% min_logT_for_hydro_mtx_max_allowed < &

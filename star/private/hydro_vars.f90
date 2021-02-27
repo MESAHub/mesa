@@ -311,10 +311,17 @@
                      s% dxh_lnd(k) = 0d0
                   end do
                else if (j == i_lnT) then
-                  do k=1,nz
-                     s% lnT(k) = s% xh(i_lnT,k)
-                     s% dxh_lnT(k) = 0d0
-                  end do
+                  if (s% solver_use_lnT) then
+                     do k=1,nz
+                        s% lnT(k) = s% xh(i_lnT,k)
+                        s% T(k) = exp(s% lnT(k))
+                     end do
+                  else
+                     do k=1,nz
+                        s% T(k) = s% xh(i_lnT,k)
+                        s% lnT(k) = log(s% T(k))
+                     end do
+                  end if
                else if (j == i_lnR) then
                   if (s% solver_use_lnR) then
                      do k=1,nz
@@ -755,7 +762,6 @@
                s% lnd_start(k) = s% lnd(k)
                s% rho_start(k) = s% rho(k)
             end if
-            s% T(k) = exp(s% lnT(k))
             if (s% T_start(k) < 0d0) then
                s% T_start(k) = s% T(k)
                s% lnT_start(k) = s% lnT(k)

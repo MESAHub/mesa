@@ -70,6 +70,10 @@
 
    ! initial kick velocity-amplitude
    RSP_kick_vsurf_km_per_sec = 0.5d0
+   
+! solver
+   solver_use_lnR = .true.
+   solver_use_lnT = .true.
 
 ! output controls
    

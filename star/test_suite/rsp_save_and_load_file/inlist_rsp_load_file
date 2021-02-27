@@ -35,6 +35,10 @@
    RSP_initial_dt_factor = 1d0
    RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
    
+! solver
+   solver_use_lnR = .true.
+   solver_use_lnT = .true.
+   
 
 ! output controls
       terminal_show_age_units = 'days'

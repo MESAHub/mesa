@@ -620,7 +620,11 @@
             end if
             j = 1
             j=j+1; xh(i_lnd,k) = vec(j)
-            j=j+1; xh(i_lnT,k) = vec(j)
+            if (s% solver_use_lnT) then
+               j=j+1; xh(i_lnT,k) = vec(j)
+            else
+               j=j+1; xh(i_lnT,k) = exp(vec(j))
+            end if
             if (s% solver_use_lnR) then
                j=j+1; xh(i_lnR,k) = vec(j)
             else

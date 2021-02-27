@@ -119,12 +119,18 @@
       subroutine wrap_mlt_ad(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: dlnR00
+         real(dp) :: dlnR00, dlnTm1, dlnT00
          dlnR00 = s% d_gradT_dlnR(k)
          if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
+         dlnTm1 = s% d_gradT_dlnTm1(k)
+         dlnT00 = s% d_gradT_dlnT00(k)
+         if (.not. s% solver_use_lnT) then
+            if (k > 1) dlnTm1 = dlnTm1/s% T(k-1)
+            dlnT00 = dlnT00/s% T(k)
+         end if
          call wrap(s% gradT_ad(k), s% gradT(k), &
             s% d_gradT_dlndm1(k), s% d_gradT_dlnd00(k), 0d0, &
-            s% d_gradT_dlnTm1(k), s% d_gradT_dlnT00(k), 0d0, &
+            dlnTm1, dlnT00, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, dlnR00, 0d0, &
             0d0, 0d0, 0d0, &
@@ -134,9 +140,15 @@
             0d0, 0d0, 0d0)
          dlnR00 = s% d_mlt_vc_dlnR(k)
          if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
+         dlnTm1 = s% d_mlt_vc_dlnR(k)
+         dlnT00 = s% d_mlt_vc_dlnR(k)
+         if (.not. s% solver_use_lnT) then
+            if (k > 1) dlnTm1 = dlnTm1/s% T(k-1)
+            dlnT00 = dlnT00/s% T(k)
+         end if
          call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
             s% d_mlt_vc_dlndm1(k), s% d_mlt_vc_dlnd00(k), 0d0, &
-            s% d_mlt_vc_dlnTm1(k), s% d_mlt_vc_dlnT00(k), 0d0, &
+            dlnTm1, dlnT00, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, dlnR00, 0d0, &
             0d0, 0d0, 0d0, &
@@ -146,9 +158,15 @@
             0d0, 0d0, 0d0)            
          dlnR00 = s% d_gradr_dlnR(k)
          if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
+         dlnTm1 = s% d_gradr_dlnTm1(k)
+         dlnT00 = s% d_gradr_dlnT00(k)
+         if (.not. s% solver_use_lnT) then
+            if (k > 1) dlnTm1 = dlnTm1/s% T(k-1)
+            dlnT00 = dlnT00/s% T(k)
+         end if
          call wrap(s% gradr_ad(k), s% gradr(k), &
             s% d_gradr_dlndm1(k), s% d_gradr_dlnd00(k), 0d0, &
-            s% d_gradr_dlnTm1(k), s% d_gradr_dlnT00(k), 0d0, &
+            dlnTm1, dlnT00, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, dlnR00, 0d0, &
             0d0, 0d0, 0d0, &

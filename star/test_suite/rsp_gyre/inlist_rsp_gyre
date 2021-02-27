@@ -63,6 +63,10 @@
    RSP_nz_outer = 40 ! number of zones in outer region of initial model
    RSP_T_anchor = 11d3 ! approx temperature at base of outer region
    RSP_T_inner = 2d6 ! T at inner boundary of initial model
+   
+! solver
+   solver_use_lnR = .true.
+   solver_use_lnT = .true.
 
 ! output controls
    

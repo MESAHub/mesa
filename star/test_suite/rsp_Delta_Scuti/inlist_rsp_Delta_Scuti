@@ -85,6 +85,10 @@
    RSP_map_zone_interval = 2
    RSP_map_history_filename = 'map_history.data'
 
+   
+! solver
+   solver_use_lnR = .true.
+   solver_use_lnT = .true.
 
 ! output controls
    
