@@ -18,7 +18,7 @@ rm -rf ../data/eos*
 # we are in mesa/eos at the start of this.
 
 # Scripts to loop over
-names=(build_SCVH_PT_data_and_export build_DT_data_and_export build_PT_data_and_export build_PC_support_data_and_export build_FreeEOS_data_and_export build_CMS_data_and_export)
+names=(build_DT_data_and_export build_PC_support_data_and_export build_FreeEOS_data_and_export build_CMS_data_and_export)
 
 # Loop over the length of the array
 for ((i=0;i<${#names[@]};++i))

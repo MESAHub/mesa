@@ -623,6 +623,7 @@
       integer, parameter :: num_x_ctrls = 100
       
       integer, parameter :: GYRE_MODEL_VERSION = 101
+      integer, parameter :: GSM_MODEL_VERSION = 110
 
       ! interfaces for procedure pointers
       abstract interface
@@ -1167,14 +1168,13 @@
       
       
          subroutine other_eosDT_get_T_interface( &
-                  id, k, handle, Z, X, abar, zbar, &
+                  id, k, handle, &
                   species, chem_id, net_iso, xa, &
                   logRho, which_other, other_value, &
                   logT_tol, other_tol, max_iter, logT_guess, & 
                   logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                   logT_result, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, &
-                  eos_calls, ierr)
+                  d_dxa_const_TRho, eos_calls, ierr)
      
             ! finds log10 T given values for density and 'other', and initial guess for temperature.
             ! does up to max_iter attempts until logT changes by less than tol.
@@ -1188,13 +1188,6 @@
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: handle
 
-            real(dp), intent(in) :: Z ! the metals mass fraction
-            real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-            real(dp), intent(in) :: abar
-               ! mean atomic number (nucleons per nucleus; grams per mole)
-            real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
             integer, intent(in) :: species
             integer, pointer :: chem_id(:) ! maps species to chem id
                ! index from 1 to species
@@ -1223,8 +1216,7 @@
             real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
             real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
             real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-            real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+            real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
          
             integer, intent(out) :: eos_calls
             integer, intent(out) :: ierr ! 0 means AOK.
@@ -1233,14 +1225,13 @@
       
 
          subroutine other_eosDT_get_Rho_interface( &
-                  id, k, handle, Z, X, abar, zbar, &
+                  id, k, handle, &
                   species, chem_id, net_iso, xa, &
                   logT, which_other, other_value, &
                   logRho_tol, other_tol, max_iter, logRho_guess,  &
                   logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
                   logRho_result, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, &
-                  eos_calls, ierr)
+                  d_dxa_const_TRho, eos_calls, ierr)
      
             ! finds log10 Rho given values for temperature and 'other', and initial guess for density.
             ! does up to max_iter attempts until logRho changes by less than tol.
@@ -1254,13 +1245,6 @@
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: handle
 
-            real(dp), intent(in) :: Z ! the metals mass fraction
-            real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-            real(dp), intent(in) :: abar
-               ! mean atomic number (nucleons per nucleus; grams per mole)
-            real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
             integer, intent(in) :: species
             integer, pointer :: chem_id(:) ! maps species to chem id
                ! index from 1 to species
@@ -1292,8 +1276,7 @@
             real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
             real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
             real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-            real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+            real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
 
             integer, intent(out) :: eos_calls
             integer, intent(out) :: ierr ! 0 means AOK.

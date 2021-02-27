@@ -535,8 +535,8 @@
             if(mod(s% model_number, s% job% num_steps_for_garbage_collection) == 0)then
                if (s% job% report_garbage_collection) then
                   call num_eos_files_loaded( &
-                     num_DT, num_PT, num_FreeEOS)
-                  write(*,*) "Start garbage collection model_number", s%model_number,"num eosDT", num_DT, "num eosPT",num_PT, &
+                     num_DT, num_FreeEOS)
+                  write(*,*) "Start garbage collection model_number", s%model_number,"num eosDT", num_DT, &
                               "num FreeEOS",num_FreeEOS
                end if
                call star_do_garbage_collection(s% id,ierr)
@@ -547,8 +547,8 @@
             if(mod(s% model_number-1, s% job% num_steps_for_garbage_collection) == 0 &
                   .and. s% job% report_garbage_collection)then
                   call num_eos_files_loaded( &
-                     num_DT, num_PT, num_FreeEOS)
-                  write(*,*) "End garbage collection model_number  ", s%model_number,"num eosDT", num_DT, "num eosPT",num_PT, &
+                     num_DT, num_FreeEOS)
+                  write(*,*) "End garbage collection model_number  ", s%model_number,"num eosDT", num_DT, &
                               "num FreeEOS",num_FreeEOS
             end if
          end if

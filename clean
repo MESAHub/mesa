@@ -11,10 +11,7 @@ function check_okay {
 
 echo "removing some data to force reinstall"
 rm -rf data/atm_data
-rm -rf data/eosOPAL_data
 rm -rf data/eosDT_data
-rm -rf data/eosPT_data
-rm -rf data/eosSCVH_PT_data
 rm -rf data/kap_data
 rm -rf data/ionization_data
 rm -rf data/chem_data
@@ -22,11 +19,6 @@ rm -rf data/colors_data
 rm -rf data/rates_data/cache
 
 rm -rf data/rates_data/cache/*
-
-# cleanup of some old stuff no longer needed
-rm -rf data/kap_data/ferg8_data
-rm -rf data/kap_data/OPALkappa
-rm -f data/kap_data/version_number
 
 echo "finished clean"
 echo

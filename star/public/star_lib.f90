@@ -174,7 +174,7 @@
             s% job% jina_reaclib_min_T9, &
             s% job% rate_tables_dir, s% job% rate_cache_suffix, &
             s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
-            s% job% eosDT_cache_dir, s% job% eosPT_cache_dir, s% job% eosDE_cache_dir, &
+            s% job% eosDT_cache_dir, &
             s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
             s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
@@ -190,7 +190,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -201,7 +201,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          real(dp), intent(in) :: &
             reaclib_min_T9
@@ -219,7 +219,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -2159,56 +2159,58 @@
       end subroutine star_get_peos
       
       subroutine star_solve_eos_given_PgasT( &
-            id, k, z, xh, abar, zbar, xa, &
+            id, k, xa, &
             logT, logPgas, logRho_guess, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
-         use eos_def, only: num_eos_basic_results
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
          use eos_support, only : solve_eos_given_PgasT
          integer, intent(in) :: id
          integer, intent(in) :: k ! 0 indicates not for a particular cell.
          real(dp), intent(in) :: &
-            z, xh, abar, zbar, xa(:), logT, logPgas, &
+            xa(:), logT, logPgas, &
             logRho_guess, logRho_tol, logPgas_tol
          real(dp), intent(out) :: logRho
          real(dp), dimension(num_eos_basic_results), intent(out) :: &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+            res, dres_dlnRho, dres_dlnT
+         real(dp), dimension(:,:), intent(out) :: dres_dxa         
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call solve_eos_given_PgasT( &
-            s, k, z, xh, abar, zbar, xa, &
+            s, k, xa, &
             logT, logPgas, logRho_guess, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
       end subroutine star_solve_eos_given_PgasT      
       
       subroutine star_solve_eos_given_PgasT_auto( &
-            id, k, z, xh, abar, zbar, xa, &
+            id, k, xa, &
             logT, logPgas, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
-         use eos_def, only: num_eos_basic_results
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
          use eos_support, only: solve_eos_given_PgasT_auto
          use star_def
          integer, intent(in) :: id ! id for star         
          integer, intent(in) :: k ! 0 indicates not for a particular cell.
          real(dp), intent(in) :: &
-            z, xh, abar, zbar, xa(:), logT, logPgas, &
+            xa(:), logT, logPgas, &
             logRho_tol, logPgas_tol
          real(dp), intent(out) :: logRho
          real(dp), dimension(num_eos_basic_results), intent(out) :: &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+            res, dres_dlnRho, dres_dlnT
+         real(dp), dimension(:,:), intent(out) :: dres_dxa
          integer, intent(out) :: ierr
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
          call solve_eos_given_PgasT_auto( &
-            s, k, z, xh, abar, zbar, xa, &
+            s, k, xa, &
             logT, logPgas, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
       end subroutine star_solve_eos_given_PgasT_auto
 
@@ -3251,9 +3253,7 @@
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
-         call do_garbage_collection(s% job% eosDT_cache_dir,&
-               s% job% eosPT_cache_dir, &
-               s% job% eosDE_cache_dir,ierr)
+         call do_garbage_collection(s% job% eosDT_cache_dir, ierr)
          if (ierr /= 0) return               
       end subroutine star_do_garbage_collection
             

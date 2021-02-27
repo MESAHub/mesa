@@ -476,9 +476,9 @@
          
          ! density at nz
          call solve_eos_given_PgasT_auto( &
-              s, 0, z, xa(s% net_iso(ih1)), abar, zbar, xa, &
+              s, 0, xa, &
               lnT/ln10, log10(Pgas), LOGRHO_TOL, LOGPGAS_TOL, &
-              logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dabar, d_eos_dzbar, &
+              logRho, res, d_eos_dlnd, d_eos_dlnT, dres_dxa, &
               ierr)
          if (ierr /= 0) return
          rho = exp10(logRho)
@@ -595,9 +595,9 @@
                   if (i == 2) exit
                   
                   call solve_eos_given_PgasT_auto( &
-                       s, 0, z, x, abar, zbar, xa, &
+                       s, 0, xa, &
                        lnT/ln10, logPgas, LOGRHO_TOL, LOGPGAS_TOL, &
-                       logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dabar, d_eos_dzbar, &
+                       logRho, res, d_eos_dlnd, d_eos_dlnT, dres_dxa, &
                        ierr)
                   rho = exp10(logRho)
                   if (ierr /= 0) return

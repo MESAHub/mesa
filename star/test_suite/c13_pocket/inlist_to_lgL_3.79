@@ -34,7 +34,8 @@
 / ! end of kap namelist
 
 &controls
-    log_L_upper_limit = 3.79d0
+! stopping condition
+      log_L_upper_limit = 3.79d0
 
 ! see inlist_common and inlist_TP_AGB
 
@@ -45,15 +46,5 @@
 
       dH_div_H_limit_min_H = 1d-3
       dH_div_H_limit = 0.9
-
-! stopping condition
-      ! one thermal pulse cycle
-      ! see run_star_extras
-
-! values to check
-      x_ctrl(1) = 0.075d0 ! max_c13_expected (tol 1d-2)
-      x_ctrl(2) = 0.575d0 ! mass_max_c13_expected (tol 5d-3)
-      x_ctrl(3) = 4.0d-5  ! pocket_mass_c13_expected (tol 1d-5)
-      x_ctrl(4) = 3.0d-4  ! delta_surface_c12_expected (tol 2d-4)
 
 / ! end of controls namelist

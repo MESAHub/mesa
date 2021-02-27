@@ -8,7 +8,7 @@
 
   save_model_when_terminate = .true.
   save_model_filename = 'final.mod'
-  required_termination_code_string = 'max_model_number'
+  required_termination_code_string = 'xa_central_lower_limit'
 
   set_initial_model_number = .true.
   initial_model_number = 0
@@ -56,7 +56,7 @@
   ! stop when the center mass fraction of h1 drops below this limit
 
   xa_central_lower_limit_species(1) = 'h1'
-  xa_central_lower_limit(1) = 1d-3
+  xa_central_lower_limit(1) = 1d-2
 
   ! write GYRE eigenfunctions
 
@@ -72,11 +72,11 @@
   trace_history_value_name(2) = 'log_rel_run_E_err'
    
   ! limit max_model_number as part of test_suite
-  max_model_number = 100  
+  max_model_number = 200
 
   ! output. note that profile_interval sets how often gyre is called
 
-  photo_interval = 50
+  photo_interval = 25
   profile_interval = 100
   history_interval = 10
   terminal_interval = 10

@@ -468,7 +468,7 @@ contains
 
       use_cache = .true.
 
-      call eos_init( ' ', ' ', ' ', use_cache, info)
+      call eos_init( ' ', use_cache, info)
       if (info /= 0) then
          write(*,*) 'failed in eos_init'
          stop 1
@@ -529,10 +529,8 @@ contains
       real(dp) :: T, Pgas, Rho, log10Rho, log10Pgas, log10T, logRho
       real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
       real(dp), dimension(num_eos_basic_results) :: &
-         res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-         d_dabar_const_TRho, d_dzbar_const_TRho, &
-         d_dlnR
-      real(dp) :: helm_res(num_helm_results)
+         res, d_dlnRho_const_T, d_dlnT_const_Rho
+      real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results,neps)
       logical :: off_table
       real(dp), parameter :: logRho_min = -32.23619130191664_dp !-14 * ln10
       integer :: ierr      
@@ -544,11 +542,11 @@ contains
       Rho = exp(logRho)
       log10Rho = logRho/ln10
          
-      call eosDT_get_legacy(eos_handle, X, Z, abar, zbar, &
+      call eosDT_get(eos_handle, &
          Neps, chem_id, net_iso, mass_frac, &
          Rho, log10Rho, T, log10T, &
          res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-         d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
+         d_dxa_const_TRho, ierr)
 
       if (ierr/=0) then !bail to HELM
 
@@ -556,13 +554,11 @@ contains
          Rho = exp(logRho)
          log10Rho = logRho/ln10
          
-         call eosDT_HELMEOS_get( eos_handle, X, Z, abar, zbar, &
+         call eosDT_test_component(eos_handle, i_eos_HELM, &
             Neps, chem_id, net_iso, mass_frac, &
             Rho, log10Rho, T, log10T, &
-            .true., .false., .false., 5.0_dp, 4.5_dp, &
             res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-            d_dabar_const_TRho, d_dzbar_const_TRho, &
-            helm_res, off_table, ierr)
+            d_dxa_const_TRho, ierr)
       endif
 
       if(ierr/=0) then

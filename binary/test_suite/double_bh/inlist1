@@ -34,8 +34,6 @@
 &eos
     !logRho_min_for_all_OPAL = -9.5d0
     !logRho_min_for_any_OPAL = -9.6d0
-    !logRho_max_for_all_PTEH = 2.92d0
-    !logRho_max_for_any_PTEH = 3.52d0
 / ! end of eos namelist
 
 &kap

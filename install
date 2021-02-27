@@ -276,6 +276,7 @@ do_one utils
 do_one_parallel math
 do_one_parallel mtx
 do_one_parallel auto_diff
+do_one_parallel hdf5io
 do_one_parallel num
 
 do_one_parallel interp_1d
@@ -331,9 +332,6 @@ rm -rf data/eos_data
 
 # check that the eos data directories exist
 if [ ! -r data/eosDT_data ]
-then
-	do_input_data eos
-elif [ ! -r data/eosPT_data ]
 then
 	do_input_data eos
 fi

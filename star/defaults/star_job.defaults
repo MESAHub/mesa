@@ -46,10 +46,6 @@
 
       ! eosDT_cache_dir
       ! ~~~~~~~~~~~~~~~
-      ! eosPT_cache_dir
-      ! ~~~~~~~~~~~~~~~
-      ! eosDE_cache_dir
-      ! ~~~~~~~~~~~~~~~
       ! ionization_cache_dir
       ! ~~~~~~~~~~~~~~~~~~~~
       ! kap_cache_dir
@@ -77,8 +73,6 @@
       ! ::
 
       !     eosDT_cache_dir = '/Users/bpaxton/mesa_caches/eosDT_cache'
-      !     eosPT_cache_dir = '/Users/bpaxton/mesa_caches/eosPT_cache'
-      !     eosDE_cache_dir = '/Users/bpaxton/mesa_caches/eosDE_cache'
       !     ionization_cache_dir = '/Users/bpaxton/mesa_caches/ionization_cache'
       !     kap_cache_dir = '/Users/bpaxton/mesa_caches/kap_cache'
       !     rates_cache_dir = '/Users/bpaxton/mesa_caches/rates_cache'
@@ -86,7 +80,7 @@
       ! If you give an empty string for the ``cache_dir``, then
       ! if you have set the environment variable ``MESA_CACHES_DIR``, then
       ! the cache is a subdirectory of that with one of the following names:
-      ! ``eosDT_cache``, ``eosPT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
+      ! ``eosDT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
       ! if ``MESA_CACHES_DIR`` is not set or is the empty string, then
       ! the cache is a subdirectory of the corresponding data subdirectory,
       ! such as ``data/rates_data/cache`` for the rates cache.
@@ -94,8 +88,6 @@
       ! ::
 
     eosDT_cache_dir = ''
-    eosPT_cache_dir = ''
-    eosDE_cache_dir = ''
     ionization_cache_dir = ''
     kap_cache_dir = ''
     rates_cache_dir = ''
