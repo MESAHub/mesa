@@ -54,6 +54,8 @@
 
 &controls
 
+      solver_use_lnR = .true. ! fails with r
+
       ! mesh adjustment
       mesh_delta_coeff = 0.5
 

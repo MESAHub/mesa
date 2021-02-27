@@ -1,37 +1,3 @@
-do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
-do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-do_one c13_pocket "all values are within tolerance" "final.mod" auto
-do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
-do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
-do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
-do_one gyre_in_mesa_ms "matched target" skip skip
-do_one gyre_in_mesa_rsg "matched target" skip skip                                                       
-do_one gyre_in_mesa_spb "matched target" skip skip
-do_one high_z "stop because have dropped below central lower limit for he4" "final.mod" auto             
-do_one hot_cool_wind "all values are within tolerance" "final.mod" auto                                
-do_one magnetic_braking "Test is ok: surf_avg_v_rot < 1" "final.mod" auto
-do_one make_co_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
-do_one make_he_wd "stop because star_age >= max_age" "final.mod" auto
-do_one make_sdb "stop because have risen above central upper limit for c12" "sdb.mod" skip
-do_one make_zams_low_mass "stop because Lnuc_div_L >= Lnuc_div_L_zams_limit" "zams.mod" skip
-do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
-do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
-do_one semiconvection "all values are within tolerances" "final.mod" auto  
-do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
-do_one wd_c_core_ignition "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto
-do_one wd_diffusion "passed test for electric field in the core" "final.mod" auto
-do_one wd_he_shell_ignition "stop because power_he_burn >= power_he_burn_upper_limit" "final.mod" auto
-do_one wd_nova_burst "have finished burst" "final.mod" auto
-
-
-
-! ok
-do_one adjust_net "finished with expected number of species" "final.mod" auto
-do_one conductive_flame "flame reached halfway point" "final.mod" auto
-
-
-
-return
 
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip

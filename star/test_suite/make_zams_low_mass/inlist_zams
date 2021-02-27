@@ -29,6 +29,8 @@
 
 &controls
 
+      solver_use_lnR = .true. ! fails with r
+
       initial_mass = 0.085d0
       initial_z = 0.014d0
       

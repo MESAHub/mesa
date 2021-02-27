@@ -1265,6 +1265,7 @@
          use micro, only: do_kap_for_cell
          use eos_lib, only: eos_gamma_DE_get_PT
          use chem_lib, only: basic_composition_info
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: i, species
          real(dp) :: new_xa(species)
@@ -1286,9 +1287,8 @@
             species, new_xa, rho, logRho, s% energy(i), s% lnT(i), &
             new_lnT, revised_energy, ierr)
          if (ierr /= 0) return
-         s% xh(s% i_lnT,i) = new_lnT
-         s% lnT(i) = new_lnT
-         s% T(i) = exp(new_lnT)
+         call store_lnT_in_xh(s, i, new_lnT)
+         call get_T_and_lnT_from_xh(s, i, s% T(i), s% lnT(i))
       end subroutine update_xh_eos_and_kap
 
 

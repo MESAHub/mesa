@@ -28,6 +28,8 @@
 
 &controls
 
+      solver_use_lnR = .true. ! fails with r
+
       initial_mass = 3.1d0 ! this default produces a ~0.6 Msun WD.
       ! initial_mass in the range 1.0-6.5 Msun will produce CO WDs
       ! with masses 0.5-1.0 Msun.

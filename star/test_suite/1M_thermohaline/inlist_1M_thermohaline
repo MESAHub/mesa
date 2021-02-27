@@ -52,6 +52,8 @@
 / ! end of kap namelist
 
 &controls
+
+         solver_use_lnR = .true. ! fails with r
          
          he_core_mass_limit = 0.24d0
 

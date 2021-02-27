@@ -228,6 +228,7 @@
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs
          use chem_def, only: chem_isos, num_categories, category_name
          use net, only: do1_net
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: k, species, &
             net_lwork, burn_lwork, screening_mode
@@ -317,9 +318,8 @@
                stop 'burn1_zone'
             end if
             ! restore temperature
-            s% xh(s% i_lnT,k) = starting_log10T*ln10
-            s% lnT(k) = s% xh(s% i_lnT,k)
-            s% T(k) = exp(s% lnT(k))
+            call store_lnT_in_xh(s, k, starting_log10T*ln10)
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
          else
             log10Ts_f1 => log10Ts_ary
             log10Rhos_f1 => log10Rhos_ary

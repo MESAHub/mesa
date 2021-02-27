@@ -110,7 +110,7 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp) :: dt, dm, dt_div_dm, scal, residual
-         integer :: i_detrb_dt, i_etrb, i_lnd, i_lnT, i_lnR, i_v
+         integer :: i_detrb_dt, i_etrb, i_lnd, i_lnR, i_v
          type(auto_diff_real_star_order1) :: resid_ad, &
             d_turbulent_energy_ad, PtdV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
@@ -181,7 +181,6 @@
             i_detrb_dt = s% i_detrb_dt
             i_etrb = s% i_etrb
             i_lnd = s% i_lnd
-            i_lnT = s% i_lnT
             i_lnR = s% i_lnR
             i_v = s% i_v
             dt = s% dt

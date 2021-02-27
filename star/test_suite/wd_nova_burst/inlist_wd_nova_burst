@@ -51,6 +51,9 @@
       max_model_number = 2250
       
 ! solver
+
+      solver_use_lnR = .true. ! fails with r
+
       use_dedt_form_of_energy_eqn = .false.
       always_use_eps_grav_form_of_energy_eqn = .true.
       

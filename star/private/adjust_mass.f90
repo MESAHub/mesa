@@ -232,9 +232,6 @@
          s% k_below_just_added = 1
 
          ! NOTE: don't assume that vars are all set at this point.
-         ! use values from s% xh(:,:) and s% xa(:,:) only.
-         ! e.g., don't use s% lnT(:) -- use s% xh(s% i_lnT,:) instead.
-
          ! exceptions: omega, i_rot, j_rot, and total_angular_momentum have been set.
          ! store surface j_rot, to later adjust angular momentum lost
          if (s% rotation_flag) then
@@ -624,12 +621,13 @@
 
       subroutine revise_q_and_dq( &
             s, nz, old_xmstar, new_xmstar, delta_m, k_const_mass, ierr)
+         use star_utils, only: get_lnT_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nz
          real(dp), intent(in) :: old_xmstar, new_xmstar, delta_m
          integer, intent(out) :: k_const_mass, ierr
 
-         integer :: k, kA, kB, i_lnT, j00, jp1, k_check
+         integer :: k, kA, kB, j00, jp1, k_check
          real(dp) :: lnTlim_A, lnTlim_B, sumdq, sumdq1, sumdq2, sumdq3, &
             min_xq_const_mass, min_q_for_kB, mold_o_mnew, lnTmax, lnT_A, lnT_B, &
             xqA, xqB_old, xqB_new, qfrac, frac, dqacc
@@ -699,15 +697,10 @@
          do k = 2, nz
             xq(k) = xq(k-1) + s% dq(k-1)
          end do
-
-         i_lnT = s% i_lnT
-         if (i_lnT /= 0) then
-            lnTmax = maxval(s% xh(i_lnT,1:nz))
-            lnT_A = min(lnTmax, lnTlim_A)
-         else
-            lnTmax = 0
-            lnT_A = 0
-         end if
+         
+         k = maxloc(s% xh(s% i_lnT,1:nz),dim=1)
+         lnTmax = get_lnT_from_xh(s, k)
+         lnT_A = min(lnTmax, lnTlim_A)
          
          if (is_bad(s% max_q_for_k_below_const_q)) then
             write(*,*) 's% max_q_for_k_below_const_q', s% max_q_for_k_below_const_q
@@ -723,17 +716,11 @@
             kA = k
             if ( (1-xq(k)) > s% max_q_for_k_below_const_q) cycle
             if ( 1.0d0-xq(k) <= s% min_q_for_k_below_const_q) exit
-            if (i_lnT /= 0) then
-               if (s% xh(i_lnT,k) >= lnT_A) exit
-            end if
+            if (get_lnT_from_xh(s, k) >= lnT_A) exit
          end do
          xqA = xq(kA)
 
-         if (i_lnT /= 0) then
-            lnT_B = min(lnTmax, lnTlim_B)
-         else
-            lnT_B = 0
-         end if
+         lnT_B = min(lnTmax, lnTlim_B)
          
          if (is_bad(s% max_q_for_k_const_mass)) then
             write(*,*) 's% max_q_for_k_const_mass', s% max_q_for_k_const_mass
@@ -749,9 +736,7 @@
             kB = k
             if ( (1-xq(k)) > s% max_q_for_k_const_mass) cycle
             if ( (1-xq(k)) <= s% min_q_for_k_const_mass) exit
-            if (i_lnT /= 0) then
-               if (s% xh(i_lnT,k) >= lnT_B) exit
-            end if
+            if (get_lnT_from_xh(s, k) >= lnT_B) exit
          end do
 
          xqB_old = xq(kB)
