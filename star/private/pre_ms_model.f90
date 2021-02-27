@@ -619,7 +619,11 @@
          
                xh(i_lnd, k) = logRho*ln10
                xh(i_lnT, k) = lnT
-               call store_r_in_xh(s, nz, r)
+               if (s% solver_use_lnR) then
+                  xh(i_lnR, k) = log(r)
+               else
+                  xh(i_lnR, k) = r
+               end if
                if (s% i_lum /= 0) xh(s% i_lum,k) = L
                q(k) = m/mstar
                dq(k) = dm/mstar
