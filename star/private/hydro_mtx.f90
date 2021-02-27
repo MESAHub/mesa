@@ -395,8 +395,14 @@
             end do
 
             if (do_lnT) then
-
-               s% lnT(k) = x(i_lnT)
+               
+               if (s% solver_use_lnT) then
+                  s% lnT(k) = x(i_lnT)
+                  s% T(k) = exp(s% lnT(k))
+               else
+                  s% T(k) = x(i_lnT)
+                  s% lnT(k) = log(s% T(k))
+               end if
                if (abs(s% lnT(k) - s% lnT_start(k)) > &
                        ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
                     s% min_logT_for_hydro_mtx_max_allowed < &

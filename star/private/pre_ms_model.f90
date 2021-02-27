@@ -253,9 +253,6 @@
             write(*,*) 'finished pre-MS model'
             write(*,1) 'mstar1/Msun', mstar1/Msun
             write(*,1) '(mstar-mstar1)/mstar', (mstar-mstar1)/mstar
-            if (s% i_lum /= 0) write(*,1) 'log10(L/Lsun)', log10(xh(s% i_lum,1)/Lsun)
-            write(*,1) 'log10(Tsurf)', xh(s% i_lnT,1)/ln10
-            write(*,1) 'Tsurf', exp(xh(s% i_lnT,1))
             write(*,*) 'nz', nz
             write(*,*)
             stop 'debug: pre ms'
@@ -388,7 +385,8 @@
          use chem_lib
          use eos_lib, only: Radiation_Pressure
          use eos_support, only: get_eos, solve_eos_given_PgasT_auto
-         use star_utils, only: normalize_dqs, set_qs, store_r_in_xh
+         use star_utils, only: normalize_dqs, set_qs, &
+            store_r_in_xh, store_lnT_in_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: &
             T_c, rho_c, d_log10_P_in, eps_grav_in, &
@@ -400,7 +398,7 @@
          real(dp), parameter :: LOGRHO_TOL = 1E-6_dp
          real(dp), parameter :: LOGPGAS_TOL = 1E-6_dp
          
-         integer :: i, ii, k, j, i_lnd, i_lnT, i_lnR, prune, max_retries
+         integer :: i, ii, k, j, i_lnd, prune, max_retries
          real(dp), parameter :: &
             delta_logPgas = 0.004d0, q_at_nz = 1d-5
          real(dp) :: &
@@ -433,8 +431,6 @@
          if (dbg) write(*,1) 'logT_surf_limit', logT_surf_limit
 
          i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
          
          cgrav = standard_cgrav
          
@@ -514,8 +510,8 @@
          s% q => q
          
          xh(i_lnd, nz) = logRho*ln10
-         xh(i_lnT, nz) = lnT
-         call store_r_in_xh(s, nz, r)
+         call store_lnT_in_xh(s, nz, lnT, xh)
+         call store_r_in_xh(s, nz, r, xh)
          if (s% i_lum /= 0) xh(s% i_lum,nz) = L
          
          q(nz) = q_at_nz
@@ -618,24 +614,13 @@
                end if
          
                xh(i_lnd, k) = logRho*ln10
-               if (s% solver_use_lnT) then
-                  xh(i_lnT, k) = lnT
-               else
-                  xh(i_lnT, k) = exp(lnT)
-               end if
-               if (s% solver_use_lnR) then
-                  xh(i_lnR, k) = log(r)
-               else
-                  xh(i_lnR, k) = r
-               end if
+               call store_lnT_in_xh(s, k, lnT, xh)
+               call store_r_in_xh(s, k, r, xh)
                if (s% i_lum /= 0) xh(s% i_lum,k) = L
                q(k) = m/mstar
                dq(k) = dm/mstar
                
                if (dbg) then
-                  write(*,2) 'xh(i_lnd, k)', k, xh(i_lnd, k)
-                  write(*,2) 'xh(i_lnT, k)', k, xh(i_lnT, k)
-                  write(*,2) 'xh(i_lnR, k)', k, xh(i_lnR, k)
                   write(*,2) 'L', k, L
                   write(*,2) 'q(k)', k, q(k)
                   write(*,2) 'dq(k)', k, dq(k)

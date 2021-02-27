@@ -1,4 +1,4 @@
-         logical :: solver_use_lnR, solver_use_lnT
+         logical :: solver_use_lnR, solver_use_lnT, solver_use_lnd
          
          
          

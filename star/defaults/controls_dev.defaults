@@ -24,6 +24,7 @@
       
       solver_use_lnR = .false.
       solver_use_lnT = .true.
+      solver_use_lnd = .true.
       
 
       ! TDC parameters

@@ -136,12 +136,13 @@
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
-         use star_utils, only: get_r_and_lnR_from_xh
+         use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         real(dp) :: r
+         real(dp) :: r, T
          if (s% i_lnd > 0 .and. s% i_lnd <= nvar) s% surf_lnd = s% xh(s% i_lnd,1)
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) s% surf_lnT = s% xh(s% i_lnT,1)
+         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) &
+            call get_T_and_lnT_from_xh(s, 1, T, s% surf_lnT)
          if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
             call get_r_and_lnR_from_xh(s, 1, r, s% surf_lnR)
          if (s% i_v > 0 .and. s% i_v <= nvar) s% surf_v = s% xh(s% i_v,1)
@@ -366,6 +367,7 @@
          use mesh_adjust, only: set_lnT_for_energy
          use micro, only: do_eos_for_cell
          use chem_def, only: ih1, ihe3, ihe4
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
          logical, intent(in) :: report
          integer, intent(out) :: ierr
@@ -392,9 +394,8 @@
                   s% rho(k), s% lnd(k)/ln10, s% energy(k), s% lnT(k), &
                   new_lnT, revised_energy, ierr)
                if (ierr /= 0) return ! stop 'do_merge failed in set_lnT_for_energy'
-               s% xh(s% i_lnT,k) = new_lnT
-               s% lnT(k) = new_lnT
-               s% T(k) = exp(new_lnT)
+               call store_lnT_in_xh(s, k, new_lnT)
+               call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             end if
             new_IE = s% energy(k)*s% dm(k)
             if (s% u_flag) then

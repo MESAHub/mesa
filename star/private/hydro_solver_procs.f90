@@ -326,8 +326,8 @@
          real(dp), intent(out) :: max_correction ! magnitude of the max correction
          integer, intent(out) :: max_zone, max_var, ierr
 
-         integer :: k, i, nz, num_terms, j, n, nvar_hydro, &
-            skip1, skip2, skip3, jmax, num_xa_terms, i_alpha_RTI, i_ln_cvpv0
+         integer :: k, i, nz, num_terms, j, n, nvar_hydro, jmax, num_xa_terms, &
+            skip1, skip2, skip3, skip4, skip5, i_alpha_RTI, i_ln_cvpv0
          real(dp) :: abs_corr, sum_corr, sum_xa_corr, x_limit, &
             max_abs_correction, max_abs_correction_cv, max_abs_corr_for_k, max_abs_xa_corr_for_k
          logical :: found_NaN, found_bad_num, report
@@ -366,6 +366,18 @@
             skip3 = s% i_lnR
          end if
          
+         if (s% solver_use_lnT) then
+            skip4 = 0
+         else
+            skip4 = s% i_lnT
+         end if
+         
+         if (s% solver_use_lnd) then
+            skip5 = 0
+         else
+            skip5 = s% i_lnd
+         end if
+         
          i_alpha_RTI = s% i_alpha_RTI
          i_ln_cvpv0 = s% i_ln_cvpv0
 
@@ -394,6 +406,8 @@
                if (j == skip1 .or. &
                    j == skip2 .or. &
                    j == skip3 .or. &
+                   j == skip4 .or. &
+                   j == skip5 .or. &
                    j == i_alpha_RTI) cycle
                if (check_for_bad_nums) then
                   if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
@@ -658,11 +672,16 @@
             end if
          end if
          
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) &
-            call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
-         
          if (s% i_lnd > 0 .and. s% i_lnd <= nvar) &
             call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
+         
+         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) then
+            if (s% solver_use_lnT) then
+               call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
+            else
+               call clip_so_non_negative(s% i_lnT, 1d0)
+            end if
+         end if
          
          if (s% i_lnR > 0 .and. s% i_lnR <= nvar) then
             if (s% solver_use_lnR) then

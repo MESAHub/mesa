@@ -31,6 +31,8 @@
       use chem_def
       use interp_1d_def, only: pm_work_size
       use utils_lib
+      use star_utils, only: get_r_from_xh, store_r_in_xh, &
+         get_lnT_from_xh, store_lnT_in_xh
 
       implicit none
 
@@ -994,7 +996,6 @@
             interp_Vol_new, interp_xq, density_init, ierr)
          use interp_1d_def
          use interp_1d_lib
-         use star_utils, only: store_r_in_xh
          use num_lib
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
@@ -1398,7 +1399,7 @@
          cell_dq = dq(k)
 
          if (cell_type(k) == revised_type) then
-            avg_lnT = xh_old(i_lnT, k_old)
+            avg_lnT = get_lnT_from_xh(s, k, xh_old)  !  xh_old(i_lnT, k_old)
          else ! find average lnT between xq_outer and xq_inner
             call get_old_value_integral( &
                k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
@@ -1421,7 +1422,7 @@
          end if
 
          if (.not. s% mesh_adjust_get_T_from_E) then
-            xh(i_lnT, k) = avg_lnT
+            call store_lnT_in_xh(s, k, avg_lnT, xh) ! xh(i_lnT, k) = avg_lnT
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
@@ -1431,7 +1432,7 @@
          end if
 
          if (eta_old(k_old) >= eta_limit) then
-            xh(i_lnT, k) = avg_lnT
+            call store_lnT_in_xh(s, k, avg_lnT, xh) ! xh(i_lnT, k) = avg_lnT
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'eta_old(k_old)', k_old, eta_old(k_old)
@@ -1535,8 +1536,8 @@
             energy_new(k) = energy_old(k_old)
             ierr = 0
          end if
-
-         xh(i_lnT,k) = new_lnT
+         
+         call store_lnT_in_xh(s, k, new_lnT, xh) ! xh(i_lnT,k) = new_lnT
 
          if (ierr /= 0) then
             write(*,2) 'mesh_adjust do1_lnT ierr', ierr
@@ -1993,7 +1994,6 @@
       subroutine adjust1_omega(s, k, nz, nz_old, comes_from, &
             xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot, xh, ierr)
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
-         use star_utils, only: get_r_from_xh
          ! set new value for s% omega(k)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old

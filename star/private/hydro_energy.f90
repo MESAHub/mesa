@@ -227,7 +227,8 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
-            real(dp) :: d_extra_heat_dlnR00, d_extra_heat_dlnRp1
+            real(dp) :: d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
+               d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1
             include 'formats'
             ierr = 0
          
@@ -259,9 +260,24 @@
                   d_extra_heat_dlnRp1 = 0d0
                end if
             end if
+            d_extra_heat_dlnTm1 = s% d_extra_heat_dlnTm1(k)
+            d_extra_heat_dlnT00 = s% d_extra_heat_dlnT00(k)
+            d_extra_heat_dlnTp1 = s% d_extra_heat_dlnTp1(k)
+            if (.not. s% solver_use_lnT) then
+               if (k > 1) then
+                  d_extra_heat_dlnTm1 = d_extra_heat_dlnTm1/s% T(k-1)
+               else
+               end if
+               d_extra_heat_dlnT00 = d_extra_heat_dlnT00/s% T(k)
+               if (k < s% nz) then
+                  d_extra_heat_dlnTp1 = d_extra_heat_dlnTp1/s% T(k+1)
+               else
+                  d_extra_heat_dlnTp1 = 0d0
+               end if
+            end if
             call wrap(extra_heat_ad, s% extra_heat(k), &
                s% d_extra_heat_dlndm1(k), s% d_extra_heat_dlnd00(k), s% d_extra_heat_dlndp1(k), &
-               s% d_extra_heat_dlnTm1(k), s% d_extra_heat_dlnT00(k), s% d_extra_heat_dlnTp1(k), &
+               d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
                0d0, 0d0, 0d0, &
                0d0, d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
                0d0, 0d0, 0d0, &
@@ -412,9 +428,19 @@
             de_dt = 0d0; d_de_dt_dlnd = 0d0; d_de_dt_dlnT = 0d0
 
             if (.not. eps_grav_form) then
+            
                de_dt = (s% energy(k) - s% energy_start(k))/dt
                d_de_dt_dlnd = s% dE_dRho_for_partials(k)*s% rho(k)/dt
                d_de_dt_dlnT = s% Cv_for_partials(k)*s% T(k)/dt
+               de_dt_ad = 0d0
+               de_dt_ad%val = de_dt
+               de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
+               if (s% solver_use_lnT) then
+                  de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT
+               else
+                  de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT/s% T(k)
+               end if
+               
                call get_dke_dt_dpe_dt(s, k, dt, &
                   dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
                   dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)      
@@ -426,6 +452,7 @@
                dke_dt_ad%val = dke_dt
                dke_dt_ad%d1Array(i_v_00) = d_dkedt_dv00
                dke_dt_ad%d1Array(i_v_p1) = d_dkedt_dvp1
+               
                dpe_dt_ad = 0d0
                dpe_dt_ad%val = dpe_dt
                if (s% solver_use_lnR) then
@@ -439,10 +466,7 @@
                      dpe_dt_ad%d1Array(i_lnR_p1) = 0d0
                   end if
                end if
-               de_dt_ad = 0d0
-               de_dt_ad%val = de_dt
-               de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
-               de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT
+               
             end if
             
             s% dkedt(k) = dke_dt

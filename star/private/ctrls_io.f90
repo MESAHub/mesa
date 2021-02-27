@@ -146,7 +146,7 @@
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     no_MLT_below_T_max, MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
-    max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, solver_use_lnR, solver_use_lnT, &
+    max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, solver_use_lnR, solver_use_lnT, solver_use_lnd, &
     limit_overshoot_Hp_using_size_of_convection_zone, RSP_min_tau_for_turbulent_flux, &
     predictive_mix, predictive_superad_thresh, predictive_avoid_reversal, predictive_limit_ingestion,&
     predictive_ingestion_factor, predictive_zone_type, predictive_zone_loc, predictive_bdy_loc, &
@@ -1072,6 +1072,7 @@
  s% do_normalize_dqs_as_part_of_set_qs = do_normalize_dqs_as_part_of_set_qs
  s% solver_use_lnR = solver_use_lnR
  s% solver_use_lnT = solver_use_lnT
+ s% solver_use_lnd = solver_use_lnd
 
  s% thermohaline_coeff = thermohaline_coeff
  s% thermohaline_option = thermohaline_option
@@ -2712,6 +2713,7 @@
  do_normalize_dqs_as_part_of_set_qs = s% do_normalize_dqs_as_part_of_set_qs
  solver_use_lnR = s% solver_use_lnR
  solver_use_lnT = s% solver_use_lnT
+ solver_use_lnd = s% solver_use_lnd
 
  thermohaline_coeff = s% thermohaline_coeff
  thermohaline_option = s% thermohaline_option

@@ -2339,8 +2339,8 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: j, nterms, nvar_hydro, nz, k, kk, &
-            skip1, skip2, skip3, skip4, iounit, i_alpha_RTI, i_etrb_RSP, i_etrb
+         integer :: j, nterms, nvar_hydro, nz, k, kk, iounit, &
+            skip1, skip2, skip3, skip4, skip5, skip6, i_alpha_RTI, i_etrb_RSP, i_etrb
          real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
          real(dp), pointer :: vc_data(:,:)
          logical :: dbg
@@ -2383,6 +2383,24 @@
             skip3 = s% i_u
          end if
 
+         if (s% solver_use_lnR) then
+            skip4 = 0
+         else
+            skip4 = s% i_lnR
+         end if
+
+         if (s% solver_use_lnT) then
+            skip5 = 0
+         else
+            skip5 = s% i_lnT
+         end if
+
+         if (s% solver_use_lnd) then
+            skip6 = 0
+         else
+            skip6 = s% i_lnd
+         end if
+
          i_alpha_RTI = s% i_alpha_RTI
          i_etrb_RSP = s% i_etrb_RSP
          i_etrb = s% i_etrb
@@ -2402,6 +2420,9 @@
             if (j == skip1 .or. &
                 j == skip2 .or. &
                 j == skip3 .or. &
+                j == skip4 .or. &
+                j == skip5 .or. &
+                j == skip6 .or. &
                 j == s% i_ln_cvpv0 .or. &
                 j == s% i_j_rot .or. &
                 j == s% i_w_div_wc .or. & ! TODO: check why not including this makes restart varcontrol inconsistent
