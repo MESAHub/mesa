@@ -108,7 +108,7 @@
          real(dp), dimension(s% species) :: &
             d_dXP_dxam1, d_dXP_dxa00, d_iXPavg_dxam1, d_iXPavg_dxa00, &
             d_residual_dxam1, d_residual_dxa00
-         integer :: nz, j, i_dv_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v
+         integer :: nz, j, i_dv_dt, i_lum, i_v
          logical :: test_partials
          
          type(auto_diff_real_star_order1) :: resid1_ad, resid_ad, &
@@ -173,7 +173,7 @@
          call unpack_res18(s% species, resid_ad)
 
          if (test_partials) then
-            s% solver_test_partials_var = i_lnR
+            s% solver_test_partials_var = 0
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
             write(*,*) 'get1_momentum_eqn', s% solver_test_partials_var
          end if
@@ -182,9 +182,6 @@
          
          subroutine init
             i_dv_dt = s% i_dv_dt
-            i_lnd = s% i_lnd
-            i_lnT = s% i_lnT
-            i_lnR = s% i_lnR
             i_lum = s% i_lum
             i_v = s% i_v
             nz = s% nz
@@ -238,6 +235,10 @@
                d_mlt_Pturb = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) - s% rho(k))/3d0
                d_dmltPturb_dlndm1 = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/3d0
                d_dmltPturb_dlnd00 = -s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/3d0
+               if (.not. s% solver_use_lnd) then
+                  d_dmltPturb_dlndm1 = d_dmltPturb_dlndm1/s% rho(k-1)
+                  d_dmltPturb_dlnd00 = d_dmltPturb_dlnd00/s% rho(k)
+               end if
             else
                d_mlt_Pturb = 0d0
                d_dmltPturb_dlndm1 = 0d0
@@ -384,7 +385,7 @@
          type(auto_diff_real_star_order1) :: &
             extra_ad, accel_ad, v_00, Uq_ad
          real(dp) :: accel, d_accel_dv, fraction_on, dlnR00, &
-            dlnTm1, dlnT00
+            dlnTm1, dlnT00, dlndm1, dlnd00
          logical :: test_partials, local_v_flag
 
          include 'formats'
@@ -402,8 +403,14 @@
                   dlnTm1 = dlnTm1/s% T(k-1)
                   dlnT00 = dlnT00/s% T(k)
                end if
+               dlndm1 = s% d_extra_grav_dlndm1(k)
+               dlnd00 = s% d_extra_grav_dlnd00(k)
+               if (.not. s% solver_use_lnd) then
+                  dlndm1 = dlndm1/s% rho(k-1)
+                  dlnd00 = dlnd00/s% rho(k)
+               end if
                call wrap(extra_ad, s% extra_grav(k), &
-                  s% d_extra_grav_dlndm1(k), s% d_extra_grav_dlnd00(k), 0d0, &
+                  dlndm1, dlnd00, 0d0, &
                   dlnTm1, dlnT00, 0d0, &
                   0d0, 0d0, 0d0, &
                   0d0, dlnR00, 0d0, &
@@ -456,8 +463,8 @@
          test_partials = .false.
          
          if (test_partials) then
-            s% solver_test_partials_val = other
-            s% solver_test_partials_var = s% i_lnd
+            s% solver_test_partials_val = 0
+            s% solver_test_partials_var = 0
             s% solver_test_partials_dval_dx = 0d0
             write(*,*) 'expected_non_HSE_term', s% solver_test_partials_var
          end if

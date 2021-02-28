@@ -71,7 +71,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, i_lnd, i_lnT, j, i, jj, ii, equchem1, species
+         integer :: nz, j, i, jj, ii, equchem1, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
             dxdt_expected_dlnd, dxdt_expected_dlnT, &
@@ -91,8 +91,6 @@
          equchem1 = s% equchem1
          species = s% species
          nz = s% nz
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
 
          dq = s% dq(k)
          dm = s% dm(k)
@@ -187,14 +185,14 @@
                else
                   dequ_dlnd = s% d_dxdt_nuc_drho(j,k)/eqn_scale
                end if
-               call e00(s, i, i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
+               call e00(s, i, s% i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
                
                if (s% solver_use_lnT) then
                   dequ_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)/eqn_scale
                else
                   dequ_dlnT = s% d_dxdt_nuc_dT(j,k)/eqn_scale
                end if
-               call e00(s, i, i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
+               call e00(s, i, s% i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
 
             end if
 

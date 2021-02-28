@@ -672,8 +672,13 @@
             end if
          end if
          
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) &
-            call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
+         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) then
+            if (s% solver_use_lnd) then
+               call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
+            else
+               call clip_so_non_negative(s% i_lnd, 1d0)
+            end if
+         end if
          
          if (s% i_lnT > 0 .and. s% i_lnT <= nvar) then
             if (s% solver_use_lnT) then
@@ -851,8 +856,9 @@
                   s% max_abs_rel_change_surf_lnS*max(s% lnS(1),s% surf_lnS)) then
             s% surf_lnT = s% lnT(1)
             s% surf_lnR = s% lnR(1)
-            if (s% i_lnd /= 0) s% surf_lnd = s% lnd(1)
+            s% surf_lnd = s% lnd(1)
             if (s% i_v /= 0) s% surf_v = s% v(1)
+            if (s% i_u /= 0) s% surf_v = s% u_face_ad(1)%val
             s% surf_lnS = s% lnS(1)
             s% num_surf_revisions = s% num_surf_revisions + 1
             force_another_iteration = 1

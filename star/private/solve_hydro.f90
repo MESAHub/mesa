@@ -27,6 +27,8 @@
 
       use star_private_def
       use const_def
+      use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh, &
+         get_lnd_from_xh, get_lnR_from_xh, get_lnT_from_xh
 
       implicit none
 
@@ -124,28 +126,28 @@
             end if
          end subroutine alloc_for_solver
 
-
          subroutine work_sizes_for_solver(ierr)
             use star_solver, only: get_solver_work_sizes
             integer, intent(out) :: ierr
             call get_solver_work_sizes(s, nvar, nz, solver_lwork, solver_liwork, ierr)
          end subroutine work_sizes_for_solver
 
-
       end function do_solver_converge
 
 
       subroutine set_surf_info(s, nvar) ! set to values at start of step
-         use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         real(dp) :: r, T
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) s% surf_lnd = s% xh(s% i_lnd,1)
+         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) &
+            s% surf_lnd = get_lnd_from_xh(s, 1)
          if (s% i_lnT > 0 .and. s% i_lnT <= nvar) &
-            call get_T_and_lnT_from_xh(s, 1, T, s% surf_lnT)
+            s% surf_lnT = get_lnT_from_xh(s, 1)
          if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
-            call get_r_and_lnR_from_xh(s, 1, r, s% surf_lnR)
-         if (s% i_v > 0 .and. s% i_v <= nvar) s% surf_v = s% xh(s% i_v,1)
+            s% surf_lnR = get_lnR_from_xh(s, 1)
+         if (s% i_v > 0 .and. s% i_v <= nvar) &
+            s% surf_v = s% xh(s% i_v,1)
+         if (s% i_u > 0 .and. s% i_u <= nvar) &
+            s% surf_v = s% xh(s% i_u,1)
          s% surf_lnS = s% lnS(1)
          s% num_surf_revisions = 0
       end subroutine set_surf_info

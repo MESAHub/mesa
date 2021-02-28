@@ -1265,7 +1265,8 @@
          use micro, only: do_kap_for_cell
          use eos_lib, only: eos_gamma_DE_get_PT
          use chem_lib, only: basic_composition_info
-         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh, &
+            store_rho_in_xh, get_rho_and_lnd_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: i, species
          real(dp) :: new_xa(species)
@@ -1275,9 +1276,8 @@
          include 'formats'
          ierr = 0
          rho = s% dm(i)/get_dV(s,i)
-         s% rho(i) = rho
-         s% lnd(i) = log(rho)
-         s% xh(s% i_lnd,i) = s% lnd(i)
+         call store_rho_in_xh(s, i, rho)
+         call get_rho_and_lnd_from_xh(s, i, s% rho(i), s% lnd(i))
          logRho = s% lnd(i)/ln10
          do q=1,species
             new_xa(q) = s% xa(q,i)

@@ -84,7 +84,7 @@
          real(dp) :: residual, dm, dt, scal
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
-         integer :: nz, i_dlnE_dt, i_lnd, i_lnT, i_lnR, i_lum, i_v
+         integer :: nz, i_dlnE_dt, i_lum, i_v
          logical :: test_partials, doing_op_split_burn, eps_grav_form
                     
          include 'formats'
@@ -169,9 +169,6 @@
          
          subroutine init
             i_dlnE_dt = s% i_dlnE_dt
-            i_lnd = s% i_lnd
-            i_lnT = s% i_lnT
-            i_lnR = s% i_lnR
             i_lum = s% i_lum
             i_v = s% i_v
             nz = s% nz
@@ -228,7 +225,8 @@
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
             real(dp) :: d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
-               d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1
+               d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
+               d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1
             include 'formats'
             ierr = 0
          
@@ -291,8 +289,23 @@
                   d_extra_heat_dlnTp1 = 0d0
                end if
             end if
+            d_extra_heat_dlndm1 = s% d_extra_heat_dlndm1(k)
+            d_extra_heat_dlnd00 = s% d_extra_heat_dlnd00(k)
+            d_extra_heat_dlndp1 = s% d_extra_heat_dlndp1(k)
+            if (.not. s% solver_use_lnd) then
+               if (k > 1) then
+                  d_extra_heat_dlndm1 = d_extra_heat_dlndm1/s% rho(k-1)
+               else
+               end if
+               d_extra_heat_dlnd00 = d_extra_heat_dlnd00/s% rho(k)
+               if (k < s% nz) then
+                  d_extra_heat_dlndp1 = d_extra_heat_dlndp1/s% rho(k+1)
+               else
+                  d_extra_heat_dlndp1 = 0d0
+               end if
+            end if
             call wrap(extra_heat_ad, s% extra_heat(k), &
-               s% d_extra_heat_dlndm1(k), s% d_extra_heat_dlnd00(k), s% d_extra_heat_dlndp1(k), &
+               d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1, &
                d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
                0d0, 0d0, 0d0, &
                0d0, d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
@@ -450,7 +463,11 @@
                d_de_dt_dlnT = s% Cv_for_partials(k)*s% T(k)/dt
                de_dt_ad = 0d0
                de_dt_ad%val = de_dt
-               de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
+               if (s% solver_use_lnd) then
+                  de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
+               else
+                  de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd/s% rho(k)
+               end if
                if (s% solver_use_lnT) then
                   de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT
                else
@@ -782,6 +799,10 @@
             mlt_Pturb_ad%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
             mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
             mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
+            if (.not. s% solver_use_lnd) then
+               mlt_Pturb_ad%d1Array(i_lnd_m1) = mlt_Pturb_ad%d1Array(i_lnd_m1)/s% rho(k-1)
+               mlt_Pturb_ad%d1Array(i_lnd_00) = mlt_Pturb_ad%d1Array(i_lnd_00)/s% rho(k)
+            end if
          end if            
          
          P_face_ad = P_ad + avQ_ad + Pt_ad + mlt_Pturb_ad + extra_P

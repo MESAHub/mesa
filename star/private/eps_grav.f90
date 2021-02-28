@@ -137,7 +137,7 @@
                d_eps_grav_dlndm1 = 0d0
             end if
          end if
-         
+          
          call wrap(s% eps_grav_ad(k), s% eps_grav(k), &
             d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1, &
             d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
@@ -345,9 +345,9 @@
          end if
 
          if (test_partials) then
-            s% solver_test_partials_val = s% chiT(k) ! s% grada(k) ! a1 ! s% eps_grav(k)
-            s% solver_test_partials_var = s% i_lnd
-            s% solver_test_partials_dval_dx = s% d_eos_dlnd(i_chiT,k) ! s% d_eos_dlnd(i_grad_ad,k) ! da1_dlnd ! s% d_eps_grav_dlnd00(k)
+            s% solver_test_partials_val = 0
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
             write(*,*) 'do_lnd_eps_grav chiT', s% solver_test_partials_var
          end if
 

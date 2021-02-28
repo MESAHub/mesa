@@ -972,7 +972,8 @@
                dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
                dlnT_bc_dlnE_const_Rho, dlnT_dlnE_const_Rho, dlnP_dlnE_c_Rho, &
                dlnP_bc_dlnE_c_Rho, dlnT_bc_dlnd_c_E, dlnP_bc_dlnd_c_E, &
-               d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, dlnR00, dlnT00
+               d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, &
+               dlnR00, dlnT00, dlnd00
             include 'formats'
             ierr = 0
          
@@ -1071,8 +1072,10 @@
             if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = P_bc*dlnP_bc_dlnT
             if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
+            dlnd00 = P_bc*dlnP_bc_dlnd
+            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(P_bc_ad, P_bc, &
-               0d0, P_bc*dlnP_bc_dlnd, 0d0, &
+               0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnR00, 0d0, &
@@ -1085,8 +1088,10 @@
             if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = dlnP_bc_dlnT
             if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
+            dlnd00 = dlnP_bc_dlnd
+            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(lnP_bc_ad, lnP_bc, &
-               0d0, dlnP_bc_dlnd, 0d0, &
+               0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnR00, 0d0, &
@@ -1107,8 +1112,10 @@
             if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = T_bc*dlnT_bc_dlnT
             if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
+            dlnd00 = T_bc*dlnT_bc_dlnd
+            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(T_bc_ad, T_bc, &
-               0d0, T_bc*dlnT_bc_dlnd, 0d0, &
+               0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnR00, 0d0, &
@@ -1121,8 +1128,10 @@
             if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = dlnT_bc_dlnT
             if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
+            dlnd00 = dlnT_bc_dlnd
+            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(lnT_bc_ad, lnT_bc, &
-               0d0, dlnT_bc_dlnd, 0d0, &
+               0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, dlnR00, 0d0, &

@@ -28,6 +28,9 @@
       use math_lib
       use utils_lib, only: is_bad
       use star_def, only: star_info
+      use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+         store_T_in_xh, get_T_and_lnT_from_xh, store_r_in_xh, get_r_and_lnR_from_xh, &
+         store_rho_in_xh, get_rho_and_lnd_from_xh
 
       implicit none
       
@@ -515,9 +518,6 @@
       
       
       subroutine set_star_vars(s, ierr)
-         use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
-            store_T_in_xh, get_T_and_lnT_from_xh, store_r_in_xh, get_r_and_lnR_from_xh
-            
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: sum_dm
@@ -555,6 +555,7 @@
          s% dm(k) = s% m(k) - s% m_center         
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)                  
          do k=1, NZN
+         
             if (k==NZN) then
                s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
@@ -565,15 +566,13 @@
             if (is_bad(s% Vol(k)))then
                write(*, 2) 's% Vol(k)', k, s% Vol(k)
                stop 'set_star_vars'
-            end if            
+            end if       
+                 
             s% rho(k) = 1d0/s% Vol(k)
-            s% lnd(k) = log(s% rho(k))
-            s% rho(k) = exp(s% lnd(k))
+            call store_rho_in_xh(s, k, s% rho(k))
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             s% Vol(k) = 1d0/s% rho(k)  
-            
-            
-            s% xh(s% i_lnd, k) = s% lnd(k)   
-            
+
             call store_T_in_xh(s, k, s% T(k))
             call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             
@@ -596,8 +595,7 @@
          include 'formats'
          if (nz_new > 0) NZN = nz_new
          do k=NZN,1,-1
-            s% lnd(k) = s% xh(s% i_lnd,k)
-            s% rho(k) = exp(s% lnd(k))
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
             s% RSP_Et(k) = s% xh(s% i_etrb_RSP,k)
@@ -842,10 +840,9 @@
                s% Vol(k) = dble(q4)
             end if
             s% rho(k) = 1d0/s% Vol(k)            
-            ! exp(log(rho)) /= original rho, so need to redo
-            s% lnd(k) = log(s% rho(k))    
-            s% xh(s% i_lnd,k) = s% lnd(k)
-            s% rho(k) = exp(s% xh(s% i_lnd,k))
+            call store_rho_in_xh(s, k, s% rho(k))
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
+            s% Vol(k) = 1d0/s% rho(k)
             s% L(k) = 4d0*pi*s% r(k)**2*s% Fr(k) + s% Lc(k) + s% Lt(k)
             if (s% RSP_w(k) > 1d4) then ! arbitrary cut
                s% mixing_type(k) = convective_mixing

@@ -386,7 +386,7 @@
          use eos_lib, only: Radiation_Pressure
          use eos_support, only: get_eos, solve_eos_given_PgasT_auto
          use star_utils, only: normalize_dqs, set_qs, &
-            store_r_in_xh, store_lnT_in_xh
+            store_r_in_xh, store_lnT_in_xh, store_lnd_in_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: &
             T_c, rho_c, d_log10_P_in, eps_grav_in, &
@@ -398,7 +398,7 @@
          real(dp), parameter :: LOGRHO_TOL = 1E-6_dp
          real(dp), parameter :: LOGPGAS_TOL = 1E-6_dp
          
-         integer :: i, ii, k, j, i_lnd, prune, max_retries
+         integer :: i, ii, k, j, prune, max_retries
          real(dp), parameter :: &
             delta_logPgas = 0.004d0, q_at_nz = 1d-5
          real(dp) :: &
@@ -430,8 +430,6 @@
          
          if (dbg) write(*,1) 'logT_surf_limit', logT_surf_limit
 
-         i_lnd = s% i_lnd
-         
          cgrav = standard_cgrav
          
          eps_grav = eps_grav_in
@@ -509,7 +507,7 @@
          s% dq => dq
          s% q => q
          
-         xh(i_lnd, nz) = logRho*ln10
+         call store_lnd_in_xh(s, nz, logRho*ln10, xh)
          call store_lnT_in_xh(s, nz, lnT, xh)
          call store_r_in_xh(s, nz, r, xh)
          if (s% i_lum /= 0) xh(s% i_lum,nz) = L
@@ -613,7 +611,7 @@
                   exit step_loop
                end if
          
-               xh(i_lnd, k) = logRho*ln10
+               call store_lnd_in_xh(s, k, logRho*ln10, xh)
                call store_lnT_in_xh(s, k, lnT, xh)
                call store_r_in_xh(s, k, r, xh)
                if (s% i_lum /= 0) xh(s% i_lum,k) = L

@@ -48,7 +48,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk, i_lnd, i_lnT
+         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk
          real(dp), pointer, dimension(:) :: sig
          logical :: okay
          real(dp) :: &
@@ -75,8 +75,6 @@
          i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
          nz = s% nz
 
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
          sig => s% sig_RTI
          dq = s% dq(k)
          dm = s% dm(k)

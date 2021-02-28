@@ -603,7 +603,13 @@
             end if
 
             if (do_lnd) then
-               s% lnd(k) = x(i_lnd)
+               if (s% solver_use_lnd) then
+                  s% lnd(k) = x(i_lnd)
+                  s% rho(k) = exp(s% lnd(k))
+               else
+                  s% rho(k) = x(i_lnd)
+                  s% lnd(k) = log(s% rho(k))
+               end if
                if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                   write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                   if (report) &
@@ -638,7 +644,6 @@
                   ierr = -1
                   return
                end if
-               s% rho(k) = exp(s% lnd(k))
                if (is_bad_num(s% rho(k))) then
                   write(s% retry_message, *) 'bad num for rho', k
                   if (s% stop_for_bad_nums) then

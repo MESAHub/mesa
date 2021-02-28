@@ -31,8 +31,8 @@
       use chem_def
       use interp_1d_def, only: pm_work_size
       use utils_lib
-      use star_utils, only: get_r_from_xh, store_r_in_xh, &
-         get_lnT_from_xh, store_lnT_in_xh
+      use star_utils, only: get_r_from_xh, store_r_in_xh, store_rho_in_xh, &
+         get_lnT_from_xh, store_lnT_in_xh, store_lnd_in_xh
 
       implicit none
 
@@ -1010,8 +1010,7 @@
             interp_Vol_new, interp_xq, density_init
          integer, intent(out) :: ierr
 
-         integer :: k, from_k, kk, n, interp_lo, interp_hi, interp_n, &
-            num_revise, i_lnR, i_lnd
+         integer :: k, from_k, kk, n, interp_lo, interp_hi, interp_n, num_revise
          real(dp) :: Vol_min, Vol_max, cell_Vol, Vol_center, Vm1, V00, Vp1
 
          logical, parameter :: dbg = .false., trace_PE_residual = .false.
@@ -1021,8 +1020,6 @@
          ! NOTE: for interpolating volume, need to add point at center
 
          ierr = 0
-         i_lnR = s% i_lnR
-         i_lnd = s% i_lnd
 
          interp_lo = max(1, nzlo-1)
          interp_hi = min(nz, nzhi+1)
@@ -1130,7 +1127,7 @@
             call set1_new_r(k+1)
 
             if (cell_type(k) == unchanged_type) then
-               xh(i_lnd,k) = lnd_old(comes_from(k))
+               call store_lnd_in_xh(s, k, lnd_old(comes_from(k)), xh)
                density_new(k) = old_rho(comes_from(k))
                cycle
             end if
@@ -1157,7 +1154,7 @@
                ierr = -1; cycle
             end if
             density_new(k) = xmstar*dq(k)/cell_Vol
-            xh(i_lnd,k) = log(density_new(k))
+            call store_rho_in_xh(s, k, density_new(k), xh)
 
          end do
 
@@ -1201,14 +1198,14 @@
          do k=1,nz
             from_k = comes_from(k)
             if (new_r(k) == old_r(from_k)) then
-               xh(i_lnR,k) = xh_old(i_lnR,from_k)
+               xh(s%i_lnR,k) = xh_old(s%i_lnR,from_k)
             else
-               call store_r_in_xh(s,k,new_r(k))
+               call store_r_in_xh(s,k,new_r(k),xh)
             end if
             if (density_new(k) == old_rho(from_k)) then
-               xh(i_lnd,k) = lnd_old(from_k)
+               xh(s%i_lnd,k) = xh_old(s%i_lnd,from_k)
             else 
-               xh(i_lnd,k) = log(density_new(k))
+               call store_rho_in_xh(s,k,density_new(k),xh)
             end if
          end do
 
@@ -1370,7 +1367,7 @@
             specific_PE_old, specific_KE_old, et_old, density_new, energy_new
          integer, intent(out) :: ierr
 
-         integer :: k_old, k_old_last, i_lnT, lnT_order, energy_order
+         integer :: k_old, k_old_last, lnT_order, energy_order
          real(dp) :: &
             Rho, logRho, xq_outer, cell_dq, avg_energy, avg_PE, avg_KE, &
             new_PE, new_KE, max_delta_energy, delta_energy, revised_energy, &
@@ -1381,12 +1378,11 @@
          include 'formats'
 
          ierr = 0
-         i_lnT = s% i_lnT
          new_xa(:) = xa(:,k)
          k_old = comes_from(k)
 
          if (cell_type(k) == unchanged_type) then
-            xh(i_lnT, k) = xh_old(i_lnT, k_old)
+            xh(s%i_lnT, k) = xh_old(s%i_lnT, k_old)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
@@ -1399,7 +1395,7 @@
          cell_dq = dq(k)
 
          if (cell_type(k) == revised_type) then
-            avg_lnT = get_lnT_from_xh(s, k, xh_old)  !  xh_old(i_lnT, k_old)
+            avg_lnT = get_lnT_from_xh(s, k, xh_old)
          else ! find average lnT between xq_outer and xq_inner
             call get_old_value_integral( &
                k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
@@ -1422,7 +1418,7 @@
          end if
 
          if (.not. s% mesh_adjust_get_T_from_E) then
-            call store_lnT_in_xh(s, k, avg_lnT, xh) ! xh(i_lnT, k) = avg_lnT
+            call store_lnT_in_xh(s, k, avg_lnT, xh)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
@@ -1432,7 +1428,7 @@
          end if
 
          if (eta_old(k_old) >= eta_limit) then
-            call store_lnT_in_xh(s, k, avg_lnT, xh) ! xh(i_lnT, k) = avg_lnT
+            call store_lnT_in_xh(s, k, avg_lnT, xh)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'eta_old(k_old)', k_old, eta_old(k_old)
@@ -1492,9 +1488,10 @@
                avg_KE = sum_energy/cell_dq
             end if
          
-            s% r(k) = exp(s% xh(s% i_lnr,k))
-            if (k < s% nz) s% r(k+1) = exp(s% xh(s% i_lnr,k+1))
+            s% r(k) = get_r_from_xh(s,k)
+            if (k < s% nz) s% r(k+1) = get_r_from_xh(s,k+1)
             if (ierr /= 0) return
+            
             new_PE = cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
             if (s% u_flag) then
                s% u(k) = s% xh(s% i_u,k)
@@ -1537,7 +1534,7 @@
             ierr = 0
          end if
          
-         call store_lnT_in_xh(s, k, new_lnT, xh) ! xh(i_lnT,k) = new_lnT
+         call store_lnT_in_xh(s, k, new_lnT, xh)
 
          if (ierr /= 0) then
             write(*,2) 'mesh_adjust do1_lnT ierr', ierr

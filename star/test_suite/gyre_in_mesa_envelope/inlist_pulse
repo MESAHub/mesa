@@ -26,6 +26,8 @@
 
 &controls
 
+  solver_use_lnR = .true. ! fails with r
+
   initial_z = 0.02
   calculate_Brunt_N2 = .true.
 

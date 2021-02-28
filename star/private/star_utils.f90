@@ -645,8 +645,7 @@
                ierr = -1
                return
             end if
-            new_lnd = log(rho)
-            s% xh(i_lnd,k) = new_lnd
+            call store_rho_in_xh(s, k, rho)
          end do
       end subroutine use_xh_to_set_rho_to_dm_div_dV
 
