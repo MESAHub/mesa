@@ -51,7 +51,7 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
+      !solver_use_lnR = .true. ! fails with r
 
       use_dedt_form_of_energy_eqn = .true.
       use_gold2_tolerances = .false.
@@ -80,7 +80,7 @@
       ! A few broad resolution controls
       mesh_delta_coeff = 0.4 !1.2
       max_allowed_nz = 12000
-      varcontrol_target = 1d-4
+      !varcontrol_target = 1d-4
 
       ! limit timestep based on T and eps_nuc
       ! this helps prevent retries during the runaway

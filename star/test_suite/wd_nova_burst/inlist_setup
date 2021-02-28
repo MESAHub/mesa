@@ -51,6 +51,8 @@
 
 &controls
 
+      solver_use_lnR = .true. ! fails with r
+
       ! limit max_model_number as part of test_suite
       max_model_number = 1800 ! 1300
       
