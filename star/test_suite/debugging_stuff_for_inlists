@@ -65,5 +65,3 @@
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.
       !report_bad_negative_xa = .true.
-      
-      !trace_k = 0

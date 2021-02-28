@@ -1153,7 +1153,7 @@
             test_partials = .false.
             ierr = 0           
             lnT1_ad = wrap_lnT_00(s,1)            
-            resid_ad = lnT_bc_ad - lnT1_ad
+            resid_ad = lnT_bc_ad/lnT1_ad - 1d0
             s% equ(i_T_eqn, 1) = resid_ad%val
             if (test_partials) then
                s% solver_test_partials_val = 0
@@ -1178,7 +1178,7 @@
             test_partials = .false.
             ierr = 0           
             lnP1_ad = wrap_lnP_00(s,1)            
-            resid_ad = lnP_bc_ad - lnP1_ad
+            resid_ad = lnP_bc_ad/lnP1_ad - 1d0
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
                s% solver_test_partials_val = 0

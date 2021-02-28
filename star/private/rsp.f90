@@ -142,7 +142,8 @@
 
       subroutine finish_build_rsp_model(s,ierr)
          use star_utils, only: &
-            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
+            normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+            store_rho_in_xh, store_T_in_xh, store_r_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: i, k, j
@@ -161,9 +162,9 @@
                write(*,2) 's% Vol(k)', I, s% Vol(k)
                stop 'build_rsp_model'
             end if
-            s% xh(s% i_lnd,k) = log(1d0/s% Vol(k))
-            s% xh(s% i_lnT,k) = log(s% T(k))
-            s% xh(s% i_lnR,k) = log(s% r(k))
+            call store_rho_in_xh(s, k, 1d0/s% Vol(k))
+            call store_T_in_xh(s, k, s% T(k))
+            call store_r_in_xh(s, k, s% r(k))
             s% xh(s% i_etrb_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
             do j=1,s% species
                s% xa(j,k) = xa(j)
