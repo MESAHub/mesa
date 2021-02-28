@@ -29,6 +29,8 @@
 / ! end of kap namelist
 
 &controls
+
+      solver_use_lnR = .true. ! fails with r
       
       ! NOTE: suppress late flashes for test suite
       ! remove this if want to allow them.

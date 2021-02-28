@@ -504,6 +504,120 @@
             xh(s% i_lnT,k) = exp(lnT)
          end if
       end subroutine store_lnT_in_xh
+      
+      
+      subroutine get_rho_and_lnd_from_xh(s, k, rho, lnd, xh_in)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: rho, lnd
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         if (s% solver_use_lnd) then
+            lnd = xh(s% i_lnd,k)
+            rho =  exp(lnd)
+         else
+            rho =  xh(s% i_lnd,k)
+            lnd = log(rho)
+         end if
+      end subroutine get_rho_and_lnd_from_xh
+      
+      
+      real(dp) function get_rho_from_xh(s, k, xh_in) result(rho)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         if (s% solver_use_lnd) then
+            rho =  exp(xh(s% i_lnd,k))
+         else
+            rho =  xh(s% i_lnd,k)
+         end if
+      end function get_rho_from_xh
+      
+      
+      real(dp) function get_lnd_from_xh(s, k, xh_in) result(lnd)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         if (s% solver_use_lnd) then
+            lnd = xh(s% i_lnd,k)
+         else
+            lnd = log(xh(s% i_lnd,k))
+         end if
+      end function get_lnd_from_xh
+      
+      
+      subroutine store_rho_or_lnd_in_xh(s, k, rho, lnd, xh_in)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: rho, lnd
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         if (s% solver_use_lnd) then
+            xh(s% i_lnd,k) = lnd
+         else
+            xh(s% i_lnd,k) = rho
+         end if
+      end subroutine store_rho_or_lnd_in_xh
+      
+      
+      subroutine store_rho_in_xh(s, k, rho, xh_in)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: rho
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         if (s% solver_use_lnd) then
+            xh(s% i_lnd,k) = log(rho)
+         else
+            xh(s% i_lnd,k) = rho
+         end if
+      end subroutine store_rho_in_xh
+      
+      
+      subroutine store_lnd_in_xh(s, k, lnd, xh_in)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: lnd
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         if (s% solver_use_lnd) then
+            xh(s% i_lnd,k) = lnd
+         else
+            xh(s% i_lnd,k) = exp(lnd)
+         end if
+      end subroutine store_lnd_in_xh
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)

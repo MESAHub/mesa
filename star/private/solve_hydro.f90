@@ -159,9 +159,15 @@
          nz = s% nz
          do j1 = 1, min(nvar,s% nvar_hydro)
             if (j1 == s% i_lnd .and. s% i_lnd <= nvar) then
-               do k = 1, nz
-                  s% xh(j1,k) = s% lnd(k)
-               end do
+               if (s% solver_use_lnd) then
+                  do k = 1, nz
+                     s% xh(j1,k) = s% lnd(k)
+                  end do
+               else
+                  do k = 1, nz
+                     s% xh(j1,k) = s% rho(k)
+                  end do
+               end if
             else if (j1 == s% i_lnT .and. s% i_lnT <= nvar) then
                if (s% solver_use_lnT) then
                   do k = 1, nz

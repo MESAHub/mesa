@@ -45,7 +45,8 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          real(dp) :: f, d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
-            d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1
+            d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
+            d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1
          include 'formats'
          ierr = 0
 
@@ -120,8 +121,25 @@
             end if
          end if
          
+         d_eps_grav_dlndm1 = s% d_eps_grav_dlndm1(k)
+         d_eps_grav_dlnd00 = s% d_eps_grav_dlnd00(k)
+         d_eps_grav_dlndp1 = s% d_eps_grav_dlndp1(k)
+         if (.not. s% solver_use_lnd) then
+            d_eps_grav_dlnd00 = d_eps_grav_dlnd00/s% rho(k)
+            if (k < s% nz) then
+               d_eps_grav_dlndp1 = d_eps_grav_dlndp1/s% rho(k+1)
+            else
+               d_eps_grav_dlndp1 = 0d0
+            end if
+            if (k > 1) then
+               d_eps_grav_dlndm1 = d_eps_grav_dlndm1/s% rho(k-1)
+            else
+               d_eps_grav_dlndm1 = 0d0
+            end if
+         end if
+         
          call wrap(s% eps_grav_ad(k), s% eps_grav(k), &
-            s% d_eps_grav_dlndm1(k), s% d_eps_grav_dlnd00(k), s% d_eps_grav_dlndp1(k), &
+            d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1, &
             d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
             0d0, 0d0, 0d0, &
             0d0, d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &

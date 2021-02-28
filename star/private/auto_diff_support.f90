@@ -269,7 +269,11 @@
          d_m1 = 0d0 
          if (k > 1) then
             d_m1 % val = s%rho(k-1)
-            d_m1 % d1Array(i_lnd_m1) = s%rho(k-1)
+            if (s% solver_use_lnd) then
+               d_m1 % d1Array(i_lnd_m1) = s%rho(k-1)
+            else
+               d_m1 % d1Array(i_lnd_m1) = 1d0
+            end if
          end if
       end function wrap_d_m1
 
@@ -279,7 +283,11 @@
          integer, intent(in) :: k
          d_00 = 0d0 
          d_00 % val = s%rho(k)
-         d_00 % d1Array(i_lnd_00) = s%rho(k)
+         if (s% solver_use_lnd) then
+            d_00 % d1Array(i_lnd_00) = s%rho(k)
+         else
+            d_00 % d1Array(i_lnd_00) = 1d0
+         end if
       end function wrap_d_00
 
       function wrap_d_p1(s, k) result(d_p1)
@@ -289,7 +297,11 @@
          d_p1 = 0d0 
          if (k < s%nz) then
             d_p1 % val = s%rho(k+1)
-            d_p1 % d1Array(i_lnd_p1) = s%rho(k+1)
+            if (s% solver_use_lnd) then
+               d_p1 % d1Array(i_lnd_p1) = s%rho(k+1)
+            else
+               d_p1 % d1Array(i_lnd_p1) = 1d0
+            end if
          end if
       end function wrap_d_p1
 
@@ -300,7 +312,11 @@
          lnd_m1 = 0d0 
          if (k > 1) then
             lnd_m1 % val = s%lnd(k-1)
-            lnd_m1 % d1Array(i_lnd_m1) = 1d0
+            if (s% solver_use_lnd) then
+               lnd_m1 % d1Array(i_lnd_m1) = 1d0
+            else
+               lnd_m1 % d1Array(i_lnd_m1) = 1d0/s% rho(k-1)
+            end if
          end if
       end function wrap_lnd_m1
 
@@ -310,7 +326,11 @@
          integer, intent(in) :: k
          lnd_00 = 0d0 
          lnd_00 % val = s%lnd(k)
-         lnd_00 % d1Array(i_lnd_00) = 1d0
+         if (s% solver_use_lnd) then
+            lnd_00 % d1Array(i_lnd_00) = 1d0
+         else
+            lnd_00 % d1Array(i_lnd_00) = 1d0/s% rho(k)
+         end if
       end function wrap_lnd_00
 
       function wrap_lnd_p1(s, k) result(lnd_p1)
@@ -320,7 +340,11 @@
          lnd_p1 = 0d0 
          if (k < s%nz) then
             lnd_p1 % val = s%lnd(k+1)
-            lnd_p1 % d1Array(i_lnd_p1) = 1d0
+            if (s% solver_use_lnd) then
+               lnd_p1 % d1Array(i_lnd_p1) = 1d0
+            else
+               lnd_p1 % d1Array(i_lnd_p1) = 1d0/s% rho(k+1)
+            end if
          end if
       end function wrap_lnd_p1
 
@@ -393,7 +417,11 @@
          kap_m1 = 0d0 
          if (k > 1) then
             kap_m1 % val = s%opacity(k-1)
-            kap_m1 % d1Array(i_lnd_m1) = s%d_opacity_dlnd(k-1)
+            if (s% solver_use_lnd) then
+               kap_m1 % d1Array(i_lnd_m1) = s%d_opacity_dlnd(k-1)
+            else
+               kap_m1 % d1Array(i_lnd_m1) = s%d_opacity_dlnd(k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                kap_m1 % d1Array(i_lnT_m1) = s%d_opacity_dlnT(k-1)
             else
@@ -408,7 +436,11 @@
          integer, intent(in) :: k
          kap_00 = 0d0 
          kap_00 % val = s%opacity(k)
-         kap_00 % d1Array(i_lnd_00) = s%d_opacity_dlnd(k)
+         if (s% solver_use_lnd) then
+            kap_00 % d1Array(i_lnd_00) = s%d_opacity_dlnd(k)
+         else
+            kap_00 % d1Array(i_lnd_00) = s%d_opacity_dlnd(k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             kap_00 % d1Array(i_lnT_00) = s%d_opacity_dlnT(k)
          else
@@ -423,7 +455,11 @@
          kap_p1 = 0d0 
          if (k < s%nz) then
             kap_p1 % val = s%opacity(k+1)
-            kap_p1 % d1Array(i_lnd_p1) = s%d_opacity_dlnd(k+1)
+            if (s% solver_use_lnd) then
+               kap_p1 % d1Array(i_lnd_p1) = s%d_opacity_dlnd(k+1)/s% rho(k+1)
+            else
+               kap_p1 % d1Array(i_lnd_p1) = s%d_opacity_dlnd(k+1)
+            end if
             if (s% solver_use_lnT) then
                kap_p1 % d1Array(i_lnT_p1) = s%d_opacity_dlnT(k+1)
             else
@@ -439,7 +475,11 @@
          s_m1 = 0d0 
          if (k > 1) then
             s_m1%val = s% entropy(k-1)
-            s_m1%d1Array(i_lnd_m1) = s% dS_dRho_for_partials(k-1)*s% rho(k-1)
+            if (s% solver_use_lnd) then
+               s_m1%d1Array(i_lnd_m1) = s% dS_dRho_for_partials(k-1)*s% rho(k-1)
+            else
+               s_m1%d1Array(i_lnd_m1) = s% dS_dRho_for_partials(k-1)
+            end if
             if (s% solver_use_lnT) then
                s_m1%d1Array(i_lnT_m1) = s% dS_dT_for_partials(k-1)*s% T(k-1)
             else
@@ -454,7 +494,11 @@
          integer, intent(in) :: k
          s_00 = 0d0 
          s_00%val = s% entropy(k)
-         s_00%d1Array(i_lnd_00) = s% dS_dRho_for_partials(k)*s% rho(k)
+         if (s% solver_use_lnd) then
+            s_00%d1Array(i_lnd_00) = s% dS_dRho_for_partials(k)*s% rho(k)
+         else
+            s_00%d1Array(i_lnd_00) = s% dS_dRho_for_partials(k)
+         end if
          if (s% solver_use_lnT) then
             s_00%d1Array(i_lnT_00) = s% dS_dT_for_partials(k)*s% T(k)
          else
@@ -469,7 +513,11 @@
          s_p1 = 0d0 
          if (k < s%nz) then
             s_p1%val = s% entropy(k+1)
-            s_p1%d1Array(i_lnd_p1) = s% dS_dRho_for_partials(k+1)*s% rho(k+1)
+            if (s% solver_use_lnd) then
+               s_p1%d1Array(i_lnd_p1) = s% dS_dRho_for_partials(k+1)*s% rho(k+1)
+            else
+               s_p1%d1Array(i_lnd_p1) = s% dS_dRho_for_partials(k+1)
+            end if
             if (s% solver_use_lnT) then
                s_p1%d1Array(i_lnT_p1) = s% dS_dT_for_partials(k+1)*s% T(k+1)
             else
@@ -485,7 +533,11 @@
          e_m1 = 0d0 
          if (k > 1) then
             e_m1%val = s% energy(k-1)
-            e_m1%d1Array(i_lnd_m1) = s% dE_dRho_for_partials(k-1)*s% rho(k-1)
+            if (s% solver_use_lnd) then
+               e_m1%d1Array(i_lnd_m1) = s% dE_dRho_for_partials(k-1)*s% rho(k-1)
+            else
+               e_m1%d1Array(i_lnd_m1) = s% dE_dRho_for_partials(k-1)
+            end if
             if (s% solver_use_lnT) then
                e_m1%d1Array(i_lnT_m1) = s% Cv_for_partials(k-1)*s% T(k-1)
             else
@@ -500,7 +552,11 @@
          integer, intent(in) :: k
          e_00 = 0d0 
          e_00%val = s% energy(k)
-         e_00%d1Array(i_lnd_00) = s% dE_dRho_for_partials(k)*s% rho(k)
+         if (s% solver_use_lnd) then
+            e_00%d1Array(i_lnd_00) = s% dE_dRho_for_partials(k)*s% rho(k)
+         else
+            e_00%d1Array(i_lnd_00) = s% dE_dRho_for_partials(k)
+         end if
          if (s% solver_use_lnT) then
             e_00%d1Array(i_lnT_00) = s% Cv_for_partials(k)*s% T(k)
          else
@@ -531,7 +587,11 @@
          p_m1 = 0d0 
          if (k > 1) then
             p_m1%val = s% P(k-1)
-            p_m1%d1Array(i_lnd_m1) = s%P(k-1) * s% chiRho_for_partials(k-1)
+            if (s% solver_use_lnd) then
+               p_m1%d1Array(i_lnd_m1) = s%P(k-1) * s% chiRho_for_partials(k-1)
+            else
+               p_m1%d1Array(i_lnd_m1) = s%P(k-1) * s% chiRho_for_partials(k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                p_m1%d1Array(i_lnT_m1) = s%P(k-1) * s% chiT_for_partials(k-1)
             else
@@ -546,7 +606,11 @@
          integer, intent(in) :: k
          p_00 = 0d0 
          p_00%val = s% P(k)
-         p_00%d1Array(i_lnd_00) = s%P(k) * s% chiRho_for_partials(k)
+         if (s% solver_use_lnd) then
+            p_00%d1Array(i_lnd_00) = s%P(k) * s% chiRho_for_partials(k)
+         else
+            p_00%d1Array(i_lnd_00) = s%P(k) * s% chiRho_for_partials(k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             p_00%d1Array(i_lnT_00) = s%P(k) * s% chiT_for_partials(k)
          else
@@ -561,7 +625,11 @@
          p_p1 = 0d0 
          if (k < s%nz) then
             p_p1%val = s% P(k+1)
-            p_p1%d1Array(i_lnd_p1) = s%P(k+1) * s% chiRho_for_partials(k+1)
+            if (s% solver_use_lnd) then
+               p_p1%d1Array(i_lnd_p1) = s%P(k+1) * s% chiRho_for_partials(k+1)
+            else
+               p_p1%d1Array(i_lnd_p1) = s%P(k+1) * s% chiRho_for_partials(k+1)/s% rho(k+1)
+            end if
             if (s% solver_use_lnT) then
                p_p1%d1Array(i_lnT_p1) = s%P(k+1) * s% chiT_for_partials(k+1)
             else
@@ -577,7 +645,11 @@
          lnP_m1 = 0d0 
          if (k > 1) then
             lnP_m1%val = s% lnP(k-1)
-            lnP_m1%d1Array(i_lnd_m1) = s% chiRho_for_partials(k-1)
+            if (s% solver_use_lnd) then
+               lnP_m1%d1Array(i_lnd_m1) = s% chiRho_for_partials(k-1)
+            else
+               lnP_m1%d1Array(i_lnd_m1) = s% chiRho_for_partials(k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                lnP_m1%d1Array(i_lnT_m1) = s% chiT_for_partials(k-1)
             else
@@ -592,7 +664,11 @@
          integer, intent(in) :: k
          lnP_00 = 0d0 
          lnP_00%val = s% lnP(k)
-         lnP_00%d1Array(i_lnd_00) = s% chiRho_for_partials(k)
+         if (s% solver_use_lnd) then
+            lnP_00%d1Array(i_lnd_00) = s% chiRho_for_partials(k)
+         else
+            lnP_00%d1Array(i_lnd_00) = s% chiRho_for_partials(k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             lnP_00%d1Array(i_lnT_00) = s% chiT_for_partials(k)
          else
@@ -607,7 +683,11 @@
          lnP_p1 = 0d0 
          if (k < s%nz) then
             lnP_p1%val = s% lnP(k+1)
-            lnP_p1%d1Array(i_lnd_p1) = s% chiRho_for_partials(k+1)
+            if (s% solver_use_lnd) then
+               lnP_p1%d1Array(i_lnd_p1) = s% chiRho_for_partials(k+1)
+            else
+               lnP_p1%d1Array(i_lnd_p1) = s% chiRho_for_partials(k+1)/s% rho(k+1)
+            end if
             if (s% solver_use_lnT) then
                lnP_p1%d1Array(i_lnT_p1) = s% chiT_for_partials(k+1)
             else
@@ -624,7 +704,11 @@
          ChiRho_m1 = 0d0 
          if (k > 1) then
             ChiRho_m1%val = s% ChiRho(k-1)
-            ChiRho_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_ChiRho,k-1)
+            if (s% solver_use_lnd) then
+               ChiRho_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_ChiRho,k-1)
+            else
+               ChiRho_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_ChiRho,k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                ChiRho_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_ChiRho,k-1)
             else
@@ -640,7 +724,11 @@
          integer, intent(in) :: k
          ChiRho_00 = 0d0 
          ChiRho_00%val = s% ChiRho(k)
-         ChiRho_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_ChiRho,k)
+         if (s% solver_use_lnd) then
+            ChiRho_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_ChiRho,k)
+         else
+            ChiRho_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_ChiRho,k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             ChiRho_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_ChiRho,k)
          else
@@ -656,7 +744,11 @@
          ChiRho_p1 = 0d0 
          if (k < s% nz) then
             ChiRho_p1%val = s% ChiRho(k+1)
-            ChiRho_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_ChiRho,k+1)
+            if (s% solver_use_lnd) then
+               ChiRho_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_ChiRho,k+1)
+            else
+               ChiRho_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_ChiRho,k+1)/s% rho(k+1)
+            end if
             if (s% solver_use_lnT) then
                ChiRho_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_ChiRho,k+1)
             else
@@ -673,7 +765,11 @@
          ChiT_m1 = 0d0 
          if (k > 1) then
             ChiT_m1%val = s% ChiT(k-1)
-            ChiT_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_ChiT,k-1)
+            if (s% solver_use_lnd) then
+               ChiT_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_ChiT,k-1)
+            else
+               ChiT_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_ChiT,k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                ChiT_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_ChiT,k-1)
             else
@@ -689,7 +785,11 @@
          integer, intent(in) :: k
          ChiT_00 = 0d0 
          ChiT_00%val = s% ChiT(k)
-         ChiT_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_ChiT,k)
+         if (s% solver_use_lnd) then
+            ChiT_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_ChiT,k)
+         else
+            ChiT_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_ChiT,k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             ChiT_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_ChiT,k)
          else
@@ -705,7 +805,11 @@
          ChiT_p1 = 0d0 
          if (k < s% nz) then
             ChiT_p1%val = s% ChiT(k+1)
-            ChiT_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_ChiT,k+1)
+            if (s% solver_use_lnd) then
+               ChiT_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_ChiT,k+1)
+            else
+               ChiT_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_ChiT,k+1)/s% rho(k+1)
+            end if
             if (s% solver_use_lnT) then
                ChiT_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_ChiT,k+1)
             else
@@ -722,7 +826,11 @@
          Cp_m1 = 0d0 
          if (k > 1) then
             Cp_m1%val = s% Cp(k-1)
-            Cp_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_Cp,k-1)
+            if (s% solver_use_lnd) then
+               Cp_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_Cp,k-1)
+            else
+               Cp_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_Cp,k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                Cp_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_Cp,k-1)
             else
@@ -738,7 +846,11 @@
          integer, intent(in) :: k
          Cp_00 = 0d0 
          Cp_00%val = s% Cp(k)
-         Cp_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_Cp,k)
+         if (s% solver_use_lnd) then
+            Cp_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_Cp,k)
+         else
+            Cp_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_Cp,k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             Cp_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_Cp,k)
          else
@@ -754,7 +866,11 @@
          Cp_p1 = 0d0 
          if (k < s% nz) then
             Cp_p1%val = s% Cp(k+1)
-            Cp_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_Cp,k+1)
+            if (s% solver_use_lnd) then
+               Cp_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_Cp,k+1)
+            else
+               Cp_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_Cp,k+1)/s% rho(k+1)
+            end if
             if (s% solver_use_lnT) then
                Cp_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_Cp,k+1)
             else
@@ -771,7 +887,11 @@
          gamma1_m1 = 0d0 
          if (k > 1) then
             gamma1_m1%val = s% gamma1(k-1)
-            gamma1_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_gamma1,k-1)
+            if (s% solver_use_lnd) then
+               gamma1_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_gamma1,k-1)
+            else
+               gamma1_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_gamma1,k-1)/s% rho(k-1)
+            end if
             if (s% solver_use_lnT) then
                gamma1_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_gamma1,k-1)
             else
@@ -787,7 +907,11 @@
          integer, intent(in) :: k
          gamma1_00 = 0d0 
          gamma1_00%val = s% gamma1(k)
-         gamma1_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_gamma1,k)
+         if (s% solver_use_lnd) then
+            gamma1_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_gamma1,k)
+         else
+            gamma1_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_gamma1,k)/s% rho(k)
+         end if
          if (s% solver_use_lnT) then
             gamma1_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_gamma1,k)
          else
@@ -803,7 +927,11 @@
          gamma1_p1 = 0d0 
          if (k < s% nz) then
             gamma1_p1%val = s% gamma1(k+1)
-            gamma1_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_gamma1,k+1)
+            if (s% solver_use_lnd) then
+               gamma1_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_gamma1,k+1)
+            else
+               gamma1_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_gamma1,k+1)/s% rho(k+1)
+            end if
             if (s% solver_use_lnT) then
                gamma1_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_gamma1,k+1)
             else
