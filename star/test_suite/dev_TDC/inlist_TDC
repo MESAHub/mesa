@@ -1,151 +1,80 @@
 
 &star_job
-
-   show_log_description_at_start = .false.
-   
-   saved_model_name = 'rsp.mod'
-   
-   !load_saved_model_for_RSP = .true.
    
    load_saved_model = .true.
    change_initial_TDC_flag = .true.
    new_TDC_flag = .true.
-   
-   required_termination_code_string(1) = 'max_model_number' ! just for testing
-   
-   save_model_when_terminate = .true.
-   save_model_filename = 'final.mod'
-   
-   set_initial_age = .true.
-   initial_age = 0
-   
-   set_initial_model_number = .true.
-   initial_model_number = 0
-
-   !set_initial_dt = .true.
-   !seconds_for_initial_dt = 1d-6
-
-   set_initial_tau_factor = .true.
-   set_to_this_tau_factor = 1d0
-
-   profile_starting_model = .true.
-   
-   set_initial_cumulative_energy_error = .true.
-   new_cumulative_energy_error = 0d0
 
    pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-   use_Skye = .true.
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.007d0
-   kap_file_prefix = 'a09'
-   kap_lowT_prefix = 'lowT_fa05_a09p'
-   kap_CO_prefix = 'a09_co'
 / ! end of kap namelist
 
-
 &controls  
-
-   initial_z = 0.007d0
-   initial_mass = 4.165d0
-
-   max_number_retries = 0 ! 100
-   max_model_number = 11000
-
-   max_age = 1d6
    max_timestep = 407.61 ! seconds for rsp.mod of Cepheid
-      
-! wind
-
-! atmosphere
-   atm_option = 'T_tau'
-   atm_T_tau_relation = 'Eddington'
-   atm_T_tau_opacity = 'fixed'
-   Pextra_factor = 2
-
-! RSP controls
-
-   x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 4.0172246d0 ! expected period (in days) 
    
-   RSP_mass = 4.165d0
-   RSP_Teff = 6050
-   RSP_L = 1438.8d0
-   RSP_X = 0.73d0
-   RSP_Z = 0.007d0
-         
-   RSP_initial_dt_factor = 1d0
-   RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
+! solver   
+   solver_use_lnR = .false.
+   solver_use_lnT = .false.
+   solver_use_lnd = .false.
 
-! rotation
+! TDC
 
-! mlt
+   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
+   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq ~ TDC_alfam
+   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
 
-! mixing
-
-! timesteps
-   varcontrol_target = 1d-3 
-
-! mesh
-   okay_to_remesh = .false.
+   TDC_num_outermost_cells_forced_nonturbulent = 1
+   TDC_num_innermost_cells_forced_nonturbulent = 5
 
 ! solver
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav with et
-      
-   !use_compression_outer_BC = .true.
-   use_zero_Pgas_outer_BC = .true.
-
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
    
-   use_velocity_time_centering = .true.
+   steps_before_use_velocity_time_centering = 0
    include_P_in_velocity_time_centering = .true.
    include_L_in_velocity_time_centering = .true.
-
-   set_rho_to_dm_div_dV = .false.
-
-! turbulent energy
-      !   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
-      !   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq ~ TDC_alfam
-      !   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
-
+   use_Fraley_PdV_work_when_time_centering_velocity = .true.
+   
+   use_fixed_Psurf_outer_BC = .true.
+   fixed_Psurf = 0
+   
+   
+   
+   
+   
+   tol_correction_norm = 1d-2
+   
+   
+   
+   
+   
+   
 ! output
 
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
 
-   !num_trace_history_values = 2
-   !trace_history_value_name(1) = 'rel_E_err'
-   !trace_history_value_name(2) = 'log_rel_run_E_err'
-
-   photo_interval = 4000
-   profile_interval = 4000
-   history_interval = 10
-   terminal_interval = 4000
-
-      !photo_interval = 10
+      photo_interval = 1000
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 100
 
-      fill_arrays_with_NaNs = .true.
+      !photo_interval = 1
+      !profile_interval = 1
+      !history_interval = 1
+      terminal_interval = 50
+
+      !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
-      stop_for_bad_nums = .true.
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
@@ -203,40 +132,22 @@
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.
       !report_bad_negative_xa = .true.
-      
-      !trace_k = 0
+
 
 / ! end of controls namelist
 
 
-
 &pgstar
 
-      pause = .true.
-      pause_interval = 10
-      pgstar_interval = 10
-         
-      Grid2_win_flag = .true.
+   !pause = .true.
+   !pause_interval = 1
+   pgstar_interval = 10
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
-      
-      History_Panels1_xaxis_name='star_age_day'
-      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
-
-      !Grid2_file_flag = .true.
-      file_digits = 7
-      Grid2_file_dir = 'png'
-      Grid2_file_prefix = 'grid'
-      Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
-      
-      !Profile_Panels1_show_grid = .true.
-
-      Profile_Panels1_xaxis_name = 'logtau'
-      Profile_Panels1_xaxis_reversed = .true.
-      Profile_Panels1_xmin = -101D0
-      Profile_Panels1_xmax = -101D0
-
-      Profile_Panels1_dymin(4) = 0.02
-      !Profile_Panels1_yaxis_name(2) = 'avg_charge_He'         
+   Grid2_title = 'Cepheid - TDC'
+   
+   !Grid2_file_flag = .true.
+   Grid2_file_dir = 'png'
+   Grid2_file_prefix = 'TDC'
+   Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
 
 / ! end of pgstar namelist
