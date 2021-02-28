@@ -23,7 +23,7 @@
       
       
       solver_use_lnR = .true.
-      solver_use_lnT = .true.
+      solver_use_lnT = .false.
       solver_use_lnd = .true.
       
 
