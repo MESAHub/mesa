@@ -220,7 +220,7 @@
                Lt_p1 = 0d0
                Lt_p1_start = 0d0
             end if
-            if (s% use_velocity_time_centering .and. &
+            if (s% using_velocity_time_centering .and. &
                   s% include_L_in_velocity_time_centering) then
                Lt_00_start = s% Lt_start(k)
                if (k < s% nz) then
@@ -828,7 +828,7 @@
          logical :: time_center
          include 'formats'
          ierr = 0
-         time_center = (s% use_velocity_time_centering .and. &
+         time_center = (s% using_velocity_time_centering .and. &
                         s% include_L_in_velocity_time_centering)
          do k=1,s%nz
             call set1_etrb_start_vars(k, op_err) 

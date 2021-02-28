@@ -1313,6 +1313,9 @@
          else
             pause = s% pause
          end if
+         
+         if (pause .and. s% pgstar_interval > 0) &
+            pause = (mod(s% model_number, s% pgstar_interval) == 0)
             
          if (pause) then
             write(*,*)

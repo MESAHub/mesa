@@ -257,6 +257,7 @@
             min_logT_for_make_gradr_sticky_in_solver_iters
          logical :: mlt_use_rotation_correction, make_gradr_sticky_in_solver_iters, &
             no_MLT_below_shock, no_MLT_below_T_max
+         logical :: mlt_make_surface_no_mixing
 
          real(dp) :: T_mix_limit
 
@@ -467,7 +468,7 @@
          real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
          real(dp) :: min_q_for_k_const_mass, max_q_for_k_const_mass
 
-         ! composition of accreted material
+         ! specification of accreted material
          logical :: accrete_same_as_surface
 
          logical :: accrete_given_mass_fractions
@@ -722,6 +723,9 @@
          real(dp) :: diffusion_T_full_on
          real(dp) :: diffusion_T_full_off
          real(dp) :: D_mix_ignore_diffusion
+         
+         real(dp) :: D_mix_zero_region_bottom_q, D_mix_zero_region_top_q, &
+            dq_D_mix_zero_at_H_He_crossover, dq_D_mix_zero_at_H_C_crossover
 
          real(dp) :: diffusion_Vlimit_dm_full_on
          real(dp) :: diffusion_Vlimit_dm_full_off
@@ -801,7 +805,6 @@
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
             always_use_eps_grav_form_of_energy_eqn, &
-            use_velocity_time_centering, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
             use_Fraley_PdV_work_when_time_centering_velocity, &
@@ -830,6 +833,11 @@
 
          logical :: include_L_in_error_est, &
             include_v_in_error_est, include_u_in_error_est
+
+         logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
+         logical :: report_min_rcond_from_DGESXV
+         
+         logical :: do_normalize_dqs_as_part_of_set_qs
 
          logical :: trace_solver_damping
 

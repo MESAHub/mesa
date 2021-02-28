@@ -51,8 +51,11 @@
    zone ! numbers start with 1 at the surface
    
    logT ! log10(temperature) at center of zone
+   temperature
    logRho ! log10(rho) at center of zone
+   rho
    logP ! log10(pressure) at center of zone
+   pressure
    logE ! log10(specific internal energy) at center of zone
    logR_cm
    entropy ! specific entropy divided by (avo*kerg)
@@ -76,7 +79,6 @@
    
    logL ! log(max(1d-6,L/Lsun))
    log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
-   rho
    gamma1
    !conv_mixing_type ! mixing types are defined in mesa/const
    csound ! sound speed
@@ -90,14 +92,8 @@
    
    !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s
-   
-   !dr_dt ! time derivative of radius at fixed mass coordinate (Langranian)
-   !dv_dt ! time derivative of velocity at fixed mass coordinate (Langranian)
-   !dlnR_dt ! time derivative of log(radius) at fixed mass coordinate (Langranian)
-   !log_sig_RTI
 
    v_div_csound ! velocity divided by sound speed
-   !dr
    
    !scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
    !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)

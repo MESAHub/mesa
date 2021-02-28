@@ -1,13 +1,9 @@
 
 &star_job
    
-   !load_saved_model_for_RSP = .true.
-   
-   load_saved_model = .true.
-   change_initial_TDC_flag = .true.
-   new_TDC_flag = .true.
+   load_saved_model_for_RSP = .true.
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -18,33 +14,47 @@
 / ! end of kap namelist
 
 &controls  
-   max_timestep = 407.61 ! seconds for rsp.mod of Cepheid
-   
-! solver   
-   solver_use_lnR = .false.
-   solver_use_lnT = .false.
-
-! TDC
-
-   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
-   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq ~ TDC_alfam
-   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
-
-   TDC_num_outermost_cells_forced_nonturbulent = 1
-   TDC_num_innermost_cells_forced_nonturbulent = 5
 
 ! solver
+   solver_use_lnR = .true.
+   solver_use_lnT = .true.
+   solver_use_lnd = .true.
+
+! RSP
    
-   use_velocity_time_centering = .true.
-   include_P_in_velocity_time_centering = .true.
-   include_L_in_velocity_time_centering = .true.
-   use_Fraley_PdV_work_when_time_centering_velocity = .true.
+   RSP_mass = 4.165d0
+   RSP_Teff = 6050
+   RSP_L = 1438.8d0
+   RSP_X = 0.73d0
+   RSP_Z = 0.007d0
+
    
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0
+   RSP_alfa =      1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   RSP_alfac =     1.0d0         ! convective flux; Lc ~ RSP_alfac
+   RSP_alfas =     1.0d0         ! turbulent source; Lc ~ 1/ALFAS; PII ~ RSP_alfas
+   RSP_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP_alfad
+   RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
+   RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
+   RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
+
+   RSP_theta =   0.5d0        ! Pgas and Prad
+   RSP_thetat =  0.5d0        ! Pturb
+   RSP_thetae =  0.5d0        ! erad in terms using f_Edd
+   RSP_thetaq =  1.0d0        ! avQ
+   RSP_thetau =  1.0d0        ! Eq and Uq
+   RSP_wtr =     0.5d0 ! 0.6667d0     ! Lr
+   RSP_wtc =     0.5d0 ! 0.6667d0     ! Lc
+   RSP_wtt =     0.5d0 ! 0.6667d0     ! Lt
+   RSP_gam =     1.0d0        ! Et src_snk
+
+   RSP_fixed_Psurf = .true.
+   RSP_Psurf = 0d0
+   !RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
    
+   RSP_initial_dt_factor = 1d0
+   RSP_max_dt = 407.61 ! seconds for rsp.mod of Cepheid
+
 ! output
 
    photo_directory = 'photos1'
@@ -53,19 +63,17 @@
       photo_interval = 1000
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 100
+      !terminal_interval = 100
 
-      !photo_interval = 1
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
-
-      !fill_arrays_with_NaNs = .true.
+      terminal_interval = 50
 
 ! FOR DEBUGGING
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
@@ -136,11 +144,11 @@
    !pause_interval = 1
    pgstar_interval = 10
 
-   Grid2_title = 'star1 - TDC'
+   Grid2_title = 'star1 - RSP'
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png1'
-   Grid2_file_prefix = 'TDC'
+   Grid2_file_prefix = 'RSP'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
 
 / ! end of pgstar namelist

@@ -7,24 +7,10 @@
 
 
 
-
-      D_mix_zero_region_bottom_q = 1d99
-      D_mix_zero_region_top_q = -1d99
-      dq_D_mix_zero_at_H_He_crossover = -1d0
-      dq_D_mix_zero_at_H_C_crossover = -1d0
-      
-      
-      
-      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
-      ! ok for create pre ms etc., but not for read model
-      ! create_pre_ms calls normalize_dqs even if this flag is false.
-      do_normalize_dqs_as_part_of_set_qs = .false.
-      
-      
       
       solver_use_lnR = .true.
       solver_use_lnT = .true.
-      solver_use_lnd = .false.
+      solver_use_lnd = .true.
       
 
       ! TDC parameters
@@ -58,30 +44,8 @@
     TDC_w_min_for_damping = 1d2
     TDC_num_outermost_cells_forced_nonturbulent = 0
     TDC_num_innermost_cells_forced_nonturbulent = 0
-
-
-      ! use_DGESVX_in_bcyclic
-      ! use_equilibration_in_DGESVX
-      ! report_min_rcond_from_DGESXV
-      
-      ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
-
-      ! ::
-
-    use_DGESVX_in_bcyclic = .false.
-    use_equilibration_in_DGESVX = .false.
-    report_min_rcond_from_DGESXV = .false.
-
-
-      ! mlt_make_surface_no_mixing
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! this defaults to false for (temoporary) backward compatibility.
-      ! it should be true.
-
-      ! ::
-
-    mlt_make_surface_no_mixing = .false.
+    
+    
 
 
       ! use_superad_reduction

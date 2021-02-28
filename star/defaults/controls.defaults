@@ -2350,6 +2350,18 @@
     no_MLT_below_T_max = .false.
 
 
+      ! mlt_make_surface_no_mixing
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! this defaults to false for (temoporary) backward compatibility.
+      ! it should be true.
+
+      ! ::
+
+    mlt_make_surface_no_mixing = .false.
+    
+
+
       ! T_mix_limit
       ! ~~~~~~~~~~~
 
@@ -6943,6 +6955,25 @@
     diffusion_Vlimit = 0
 
 
+      ! D_mix_zero_region_bottom_q
+      ! ~~~~~~~~~~~~~~~~
+      ! D_mix_zero_region_top_q
+      ! ~~~~~~~~~~~~~~~~
+      ! dq_D_mix_zero_at_H_He_crossover
+      ! ~~~~~~~~~~~~~~~~
+      ! dq_D_mix_zero_at_H_C_crossover
+      ! ~~~~~~~~~~~~~~~~
+
+      ! ::
+
+   D_mix_zero_region_bottom_q = 1d99
+   D_mix_zero_region_top_q = -1d99
+   dq_D_mix_zero_at_H_He_crossover = -1d0
+   dq_D_mix_zero_at_H_C_crossover = -1d0
+
+
+
+
       ! diffusion_min_T_for_radaccel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! diffusion_max_T_for_radaccel
@@ -7901,8 +7932,6 @@
       ! inject_until_reach_delta_total_energy = 1d99
 
 
-      ! use_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! steps_before_use_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_P_in_velocity_time_centering
@@ -7918,10 +7947,10 @@
       ! as discussed in the 3rd mesa instrument paper (2015).
       ! time centering applies to velocities, pressures, and luminosities.
       ! not for u_flag.
+      ! steps_before_use_velocity_time_centering < 0 means no time centering.
 
       ! ::
 
-    use_velocity_time_centering = .false.
     steps_before_use_velocity_time_centering = -1
     include_P_in_velocity_time_centering = .false.
     include_L_in_velocity_time_centering = .false.
@@ -8366,6 +8395,30 @@
       ! ::
 
     trace_solver_damping = .false.
+
+      ! do_normalize_dqs_as_part_of_set_qs
+      ! ~~~~~~~~~~~~~~~~~~~~
+      
+      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
+      ! ok for create pre ms etc., but not for read model
+      ! create_pre_ms calls normalize_dqs even if this flag is false.
+
+      ! ::
+
+   do_normalize_dqs_as_part_of_set_qs = .false.
+   
+
+      ! use_DGESVX_in_bcyclic
+      ! use_equilibration_in_DGESVX
+      ! report_min_rcond_from_DGESXV
+      
+      ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
+
+      ! ::
+
+    use_DGESVX_in_bcyclic = .false.
+    use_equilibration_in_DGESVX = .false.
+    report_min_rcond_from_DGESXV = .false.
 
 
       ! solver_max_tries_before_reject

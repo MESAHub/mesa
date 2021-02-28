@@ -114,7 +114,7 @@
          if (eps_grav_form) then ! for this case, dwork_dm doesn't include work by P since that is in eps_grav
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad + eps_grav_ad
-         else if (s% use_velocity_time_centering .and. &
+         else if (s% using_velocity_time_centering .and. &
                 s% use_Fraley_PdV_work_when_time_centering_velocity) then
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - de_dt_ad
@@ -186,7 +186,7 @@
             include 'formats'
             ierr = 0
             skip_P = eps_grav_form
-            if (s% use_velocity_time_centering .and. &
+            if (s% using_velocity_time_centering .and. &
                 s% use_Fraley_PdV_work_when_time_centering_velocity) then
                call eval_Fraley_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr) 

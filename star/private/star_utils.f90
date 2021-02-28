@@ -3572,6 +3572,10 @@
             ! note that Pt_ad is already time weighted
          end if
 
+         s% xtra1_array(k) = 0.5d0*P_ad%val
+         s% xtra2_array(k) = avQ_ad%val
+         s% xtra3_array(k) = 0.5d0*Pt_ad%val
+
          mlt_Pturb_ad = 0d0
          if ((.not. skip_mlt_Pturb) .and. &
              s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
