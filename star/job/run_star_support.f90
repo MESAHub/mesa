@@ -2184,7 +2184,7 @@
             s% num_retries = s% job% initial_number_retries
          end if
 
-         if (s% job% steps_to_take_before_terminate > 0) then
+         if (s% job% steps_to_take_before_terminate >= 0) then
             s% max_model_number = s% model_number + s% job% steps_to_take_before_terminate
             write(*,2) 'steps_to_take_before_terminate', &
                s% job% steps_to_take_before_terminate

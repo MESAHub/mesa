@@ -15,8 +15,6 @@
 
 &controls
 
-  solver_use_lnR = .true. ! fails with r
-
   initial_z = 0.02
 
   ! GYRE output controls

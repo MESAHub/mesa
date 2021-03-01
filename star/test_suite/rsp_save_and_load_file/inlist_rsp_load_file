@@ -17,9 +17,7 @@
 
 &controls  
 
-   max_model_number = 11000
-   
-   max_timestep = 407.61 ! seconds
+   max_model_number = 20000
 
 ! RSP controls
 
@@ -33,11 +31,8 @@
    RSP_Z = 0.007d0
          
    RSP_initial_dt_factor = 1d0
-   RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
    
 ! solver
-   solver_use_lnR = .true.
-   solver_use_lnT = .true.
    
 
 ! output controls

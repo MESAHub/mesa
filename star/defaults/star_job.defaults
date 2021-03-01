@@ -587,9 +587,9 @@
       ! steps_to_take_before_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If > 0, stop after taking this many steps.
+      ! If >= 0, stop after taking this many steps.
       ! Sets ``max_model_number`` = ``model_number`` + ``steps_to_take_before_terminate``.
-      ! Ignore if <= 0.
+      ! Ignore if < 0.
 
       ! ::
 

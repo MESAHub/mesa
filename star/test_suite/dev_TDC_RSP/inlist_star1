@@ -21,39 +21,10 @@
    solver_use_lnd = .true.
 
 ! RSP
-   
-   RSP_mass = 4.165d0
-   RSP_Teff = 6050
-   RSP_L = 1438.8d0
-   RSP_X = 0.73d0
-   RSP_Z = 0.007d0
-
-   
-   RSP_alfa =      1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-   RSP_alfac =     1.0d0         ! convective flux; Lc ~ RSP_alfac
-   RSP_alfas =     1.0d0         ! turbulent source; Lc ~ 1/ALFAS; PII ~ RSP_alfas
-   RSP_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP_alfad
-   RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-   RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-   RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
-
-   RSP_theta =   0.5d0        ! Pgas and Prad
-   RSP_thetat =  0.5d0        ! Pturb
-   RSP_thetae =  0.5d0        ! erad in terms using f_Edd
-   RSP_thetaq =  1.0d0        ! avQ
-   RSP_thetau =  1.0d0        ! Eq and Uq
-   RSP_wtr =     0.5d0 ! 0.6667d0     ! Lr
-   RSP_wtc =     0.5d0 ! 0.6667d0     ! Lc
-   RSP_wtt =     0.5d0 ! 0.6667d0     ! Lt
-   RSP_gam =     1.0d0        ! Et src_snk
 
    RSP_fixed_Psurf = .true.
-   RSP_Psurf = 0d0
-   !RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
-   
+   RSP_Psurf = 0d0   
    RSP_initial_dt_factor = 1d0
-   RSP_max_dt = 407.61 ! seconds for rsp.mod of Cepheid
 
 ! output
 
