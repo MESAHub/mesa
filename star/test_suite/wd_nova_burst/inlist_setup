@@ -131,7 +131,7 @@
       atm_T_tau_opacity = 'fixed'
       Pextra_factor = 4
 
-      varcontrol_target = 3d-4
+      !varcontrol_target = 3d-4
 
       mesh_delta_coeff = 1.0
       max_allowed_nz = 20000

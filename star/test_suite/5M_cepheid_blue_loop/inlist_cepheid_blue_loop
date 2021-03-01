@@ -95,7 +95,7 @@
    predictive_superad_thresh(1) = 0.01
    predictive_avoid_reversal(1) = 'he4'
 
-   varcontrol_target = 1d-4
+   !varcontrol_target = 1d-4
 
    delta_HR_limit = 0.002
 

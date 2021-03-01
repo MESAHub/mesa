@@ -76,7 +76,7 @@
    predictive_zone_loc(2) = 'surf' 
    predictive_bdy_loc(2) = 'any'
 
-   varcontrol_target = 1d-4
+   !varcontrol_target = 1d-4
 
    delta_HR_limit = 0.002
 

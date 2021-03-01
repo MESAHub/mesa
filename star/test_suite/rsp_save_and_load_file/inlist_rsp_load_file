@@ -22,7 +22,7 @@
 ! RSP controls
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 4.0172246d0 ! expected period (in days) 
+   x_ctrl(1) = 4.0353d0 ! expected period (in days) 
    
    RSP_mass = 4.165d0
    RSP_Teff = 6050

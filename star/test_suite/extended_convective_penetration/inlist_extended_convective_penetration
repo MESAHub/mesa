@@ -77,7 +77,7 @@
 
 
 ! MESH & TIMESTEPS
-    varcontrol_target = 1d-4
+    !varcontrol_target = 1d-4
     mesh_delta_coeff = 1
     okay_to_remesh = .true.
 
