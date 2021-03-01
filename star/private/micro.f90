@@ -588,19 +588,14 @@ contains
 
     if (is_bad_num(s% opacity(k)) .or. ierr /= 0) then
        if (s% report_ierr) then
+          write(*,*) 'do_kap_for_cell: get_kap ierr', ierr
           !$omp critical (star_kap_get)
           call show_stuff()
-          stop 'debug1: do_kap_for_cell'
+          if (s% stop_for_bad_nums) stop 'do_kap_for_cell'
           !$omp end critical (star_kap_get)
        end if
        ierr = -1
        return
-    end if
-
-    if (s% opacity(k) < 1d-99) then
-       s% opacity(k) = 1d-99
-       dlnkap_dlnd = 0
-       dlnkap_dlnT = 0
     end if
 
     opacity_factor = s% extra_opacity_factor(k)
@@ -629,24 +624,12 @@ contains
        s% d_opacity_dlnT(k) = 0
     end if
 
-    if (ierr /= 0 .or. is_bad_num(s% opacity(k))) then
+    if (is_bad_num(s% opacity(k))) then
        if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)
-          write(*,*)
-          write(*,2) 's% opacity(k)', k, s% opacity(k)
-          write(*,2) 's% kap_frac_Type2(k)', k, s% kap_frac_Type2(k)
-          write(*,*)
           call show_stuff()
           stop 'do_kap_for_cell'
           !$omp end critical (star_kap_get_bad_num)
-       end if
-       if (s% report_ierr) then
-          return
-          !$omp critical (star_kap_get_bad_num2)
-          write(*,*) 'do_kap_for_cell: kap_get failure for cell ', k
-          call show_stuff()
-          stop 'debug: do_kap_for_cell'
-          !$omp end critical (star_kap_get_bad_num2)
        end if
        ierr = -1
        return
