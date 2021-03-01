@@ -146,10 +146,10 @@ module skye_coulomb_solid
          type(auto_diff_real_2var_order3), intent(in) :: g, TPT
 
          real(dp) :: s, b1, b2, b3, b4
-         real(dp), parameter :: e = 2.718281828459045
-         real(dp), parameter :: aTF = 0.00352
+         real(dp), parameter :: e = 2.718281828459045d0
+         real(dp), parameter :: aTF = 0.00352d0
 
-         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp
+         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, asym
          type(auto_diff_real_2var_order3) :: F
 
          s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
@@ -159,6 +159,8 @@ module skye_coulomb_solid
          b4 = 0.395d0 * log(Z) + 0.347d0 * pow(Z, -1.5d0)
 
          rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
+         ge = g * pow(Z, -5d0/3d0)
+
          xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
          supp = safe_exp(-pow2(0.205d0 * TPT))
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
@@ -166,6 +168,10 @@ module skye_coulomb_solid
          f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
 
          F = -f_inf * g * (1d0 + A * pow(Q / g, s))
+
+         asym = (1d0 / (1d0 + (rs / ge) * 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0))) ! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
+         asym = asym * (1d0 / (1d0 + rs)) ! Fixes the PC asymptotic limit at low density to scale like rs^0.
+         F = F * asym
 
    end function ocp_solid_screening_free_energy_correction
 

@@ -360,13 +360,8 @@ module skye_coulomb
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-
-
       COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
       RS = GAMI * COTPT / TPT ! Electron sphere radius / Bohr radius
-
-      screening_factor = pow7(1d0 / (1d0 + RS/1d0))
-      write(*,*) RS%val, screening_factor%val
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
