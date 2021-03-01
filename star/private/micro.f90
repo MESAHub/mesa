@@ -731,8 +731,11 @@ contains
       write(*,*)
       write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
       write(*,*)
-      write(*,*)
+      write(*,1) 'kap_frac_lowT', s% kap_frac_lowT(k)
+      write(*,1) 'kap_frac_highT', s% kap_frac_highT(k)
       write(*,1) 'kap_frac_Type2', s% kap_frac_Type2(k)
+      write(*,1) 'kap_frac_Compton', s% kap_frac_Compton(k)
+      write(*,*)
       write(*,1) 'extra_opacity_factor', s% extra_opacity_factor(k)
       write(*,*)
       write(*,*)
