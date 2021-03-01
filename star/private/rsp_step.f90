@@ -2824,12 +2824,6 @@
             dvdt_factor*(s% v(k) - s% v_start(k))/dt &
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
-         
-         s% xtra1_array(k) = THETA*(s% Pgas(k) + s% Prad(k))
-         s% xtra2_array(k) = THETAQ*s% avQ(k)
-         s% xtra3_array(k) = THETAT*s% Pt(k)
-         s% xtra4_array(k) = s% Uq(k)
-         !s% xtra5_array(k) = residual
             
          HD(i_r_dFr_00,IR) = - d_Fr_term_dFr_00
 

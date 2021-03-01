@@ -23,7 +23,7 @@
          real(dp) :: when_to_stop_atol
          real(dp) :: when_to_stop_rtol
 
-         real(dp) :: max_age, max_age_in_seconds, &
+         real(dp) :: max_age, max_age_in_days, max_age_in_seconds, &
             dt_years_for_steps_before_max_age, reduction_factor_for_max_timestep
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit

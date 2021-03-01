@@ -764,6 +764,10 @@
             call compare_to_target('star_age >= max_age', s% star_age, s% max_age, &
                   t_max_age)
                   
+         else if (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) then 
+            call compare_to_target('time >= max_age_in_days', &
+               s% time/(60*60*24), s% max_age_in_days, t_max_age)
+                  
          else if (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0) then 
             call compare_to_target('time >= max_age_in_seconds', &
                s% time, s% max_age_in_seconds, t_max_age)

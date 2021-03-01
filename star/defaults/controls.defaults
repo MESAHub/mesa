@@ -943,6 +943,10 @@
 
       ! max_age
       ! ~~~~~~~
+      ! max_age_in_days
+      ! ~~~~~~~~~~~~~~~~~~
+      ! max_age_in_seconds
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! Stop when the age of the star exceeds this value (in years).
       ! only applies when > 0.
@@ -950,16 +954,7 @@
       ! ::
 
     max_age = 1d36
-
-
-      ! max_age_in_seconds
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Stop when the age of the star exceeds this value (in seconds).
-      ! only applies when > 0.
-
-      ! ::
-
+    max_age_in_days = -1
     max_age_in_seconds = -1
 
 

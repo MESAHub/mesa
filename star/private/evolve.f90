@@ -1715,8 +1715,12 @@
 
          if (s% duration_for_inject_extra_ergs_sec > 0) then
             end_time = start_time + s% duration_for_inject_extra_ergs_sec
-         else
+         else if (s% max_age_in_seconds > 0) then
             end_time = s% max_age_in_seconds
+         else if (s% max_age_in_days > 0) then
+            end_time = s% max_age_in_days*(60*60*24)
+         else
+            end_time = s% max_age*secyer
          end if
          if (s% time_old > end_time) return
          
@@ -1852,6 +1856,7 @@
             write(*, *) 's% dt_next', s% dt_next
             prepare_for_new_step = terminate
             if ((s% time >= s% max_age*secyer .and. s% max_age > 0) .or. &
+                (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) .or. &
                 (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0)) then
                s% result_reason = result_reason_normal
                s% termination_code = t_max_age
@@ -1916,6 +1921,9 @@
          else if ((s% time + s% dt_next) > s% max_age_in_seconds &
                   .and. s% max_age_in_seconds > 0) then
             s% dt_next = max(0d0, s% max_age_in_seconds - s% time)
+         else if ((s% time + s% dt_next) > s% max_age_in_days*(60*60*24) &
+                  .and. s% max_age_in_days > 0) then
+            s% dt_next = max(0d0, s% max_age_in_days*(60*60*24) - s% time)
          end if
          
          s% dt = s% dt_next
@@ -2150,6 +2158,9 @@
             s% dt_next = -s% time
          else if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
             s% dt_next = max(0d0, s% max_age*secyer - s% time)
+         else if ((s% time + s% dt_next) > s% max_age_in_days*(60*60*24) &
+                  .and. s% max_age_in_days > 0) then
+            s% dt_next = max(0d0, s% max_age_in_days*(60*60*24) - s% time)
          else if ((s% time + s% dt_next) > s% max_age_in_seconds &
                   .and. s% max_age_in_seconds > 0) then
             s% dt_next = max(0d0, s% max_age_in_seconds - s% time)
@@ -2157,6 +2168,8 @@
                   s% max_years_for_timestep > 0) then
             if (s% max_age > 0) then
                remaining_years = s% max_age - s% star_age
+            else if (s% max_age_in_days > 0) then
+               remaining_years = (s% max_age_in_days*(60*60*24) - s% time)/secyer
             else if (s% max_age_in_seconds > 0) then
                remaining_years = (s% max_age_in_seconds - s% time)/secyer
             else

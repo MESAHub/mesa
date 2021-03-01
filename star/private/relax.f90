@@ -3853,6 +3853,7 @@
          type (star_info), pointer :: s
          s% dxdt_nuc_factor = 0
          s% max_age = 1d50
+         s% max_age_in_days = 1d50
          s% max_age_in_seconds = 1d50
          s% max_timestep_factor = 2
          s% max_model_number = -1111
@@ -3926,7 +3927,7 @@
             model_number_old, max_number_retries, &
             solver_iters_timestep_limit, iter_for_resid_tol2, iter_for_resid_tol3, &
             steps_before_use_gold_tolerances, steps_before_use_gold2_tolerances
-         real(dp) :: star_age, time, max_age, max_age_in_seconds, max_timestep, &
+         real(dp) :: star_age, time, max_age, max_age_in_days, max_age_in_seconds, max_timestep, &
             Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, Dutch_scaling_factor, &
             van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
             dxdt_nuc_factor, tol_correction_norm, tol_max_correction, warning_limit_for_max_residual, &
@@ -4152,6 +4153,7 @@
             model_number = s% model_number
             dxdt_nuc_factor = s% dxdt_nuc_factor
             max_age = s% max_age
+            max_age_in_days = s% max_age_in_days
             max_age_in_seconds = s% max_age_in_seconds
             max_timestep_factor = s% max_timestep_factor
             varcontrol_target = s% varcontrol_target
@@ -4206,6 +4208,7 @@
             s% model_number = model_number
             s% dxdt_nuc_factor = dxdt_nuc_factor
             s% max_age = max_age
+            s% max_age_in_days = max_age_in_days
             s% max_age_in_seconds = max_age_in_seconds
             s% max_timestep_factor = max_timestep_factor
             s% varcontrol_target = varcontrol_target

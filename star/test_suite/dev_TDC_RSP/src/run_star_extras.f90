@@ -280,7 +280,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 19
+         how_many_extra_profile_columns = 9
       end function how_many_extra_profile_columns
       
       
@@ -315,24 +315,13 @@
          names(7) = 'logT_alt'
          names(8) = 'logRho_alt'
          names(9) = 'logL_alt'
-         names(10) = 'dvdt'
-         names(11) = 'dvdt_alt'
-         
-         names(12) = 'P'
-         names(13) = 'P_alt'
-         names(14) = 'avQ'
-         names(15) = 'avQ_alt'
-         names(16) = 'Pt'
-         names(17) = 'Pt_alt'
-         names(18) = 'Uq'
-         names(19) = 'Uq_alt'
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0
          else if (s_other% nz /= nz) then
             vals(1:nz,:) = 0d0
          else
             do k=1,nz
-               vals(k,1) = s_other% v(k)
+               vals(k,1) = s_other% v(k)*1d-5
                vals(k,2) = s_other% Y_face(k)
                if (s_other% TDC_flag) then
                   vals(k,3) = s_other% w(k)
@@ -342,23 +331,12 @@
                   vals(k,3) = 0d0
                end if
                vals(k,4) = s_other% Lr(k)/s_other% L(k)
+               
                vals(k,5) = safe_log10(s_other% r(k)/Rsun)
                vals(k,6) = s_other% lnP(k)/ln10
                vals(k,7) = s_other% lnT(k)/ln10
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
-               vals(k,10) = (s% v(k) - s% v_start(k))/s% dt
-               vals(k,11) = (s_other% v(k) - s_other% v_start(k))/s_other% dt
-
-               vals(k,12) = s% xtra1_array(k)
-               vals(k,13) = s_other% xtra1_array(k)
-               vals(k,14) = s% xtra2_array(k)
-               vals(k,15) = s_other% xtra2_array(k)
-               vals(k,16) = s% xtra3_array(k)
-               vals(k,17) = s_other% xtra3_array(k)
-               vals(k,18) = s% xtra4_array(k)
-               vals(k,19) = s_other% xtra4_array(k)
-               
             end do
          end if
       end subroutine data_for_extra_profile_columns

@@ -1,8 +1,6 @@
 
 &star_job
    
-   !load_saved_model_for_RSP = .true.
-   
    load_saved_model = .true.
    change_initial_TDC_flag = .true.
    new_TDC_flag = .true.
@@ -18,25 +16,14 @@
 / ! end of kap namelist
 
 &controls  
-   max_timestep = 407.61 ! seconds for rsp.mod of Cepheid
    
 ! solver   
    solver_use_lnR = .false.
    solver_use_lnT = .false.
    solver_use_lnd = .false.
-
-! TDC
-
-   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
-   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq ~ TDC_alfam
-   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
-
-   TDC_num_outermost_cells_forced_nonturbulent = 1
-   TDC_num_innermost_cells_forced_nonturbulent = 5
-
-! solver
+   
+   tol_correction_norm = 1d99 ! turn off when not using lnR/lnT/lnd
+   tol_max_correction = 1d99
    
    steps_before_use_velocity_time_centering = 0
    include_P_in_velocity_time_centering = .true.
@@ -45,17 +32,6 @@
    
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0
-   
-   
-   
-   
-   
-   tol_correction_norm = 1d-2
-   
-   
-   
-   
-   
    
 ! output
 
@@ -145,9 +121,7 @@
 
    !pause = .true.
    !pause_interval = 1
-   pgstar_interval = 10
-
-   Grid2_title = 'star2 - TDC'
+   pgstar_interval = 3
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'

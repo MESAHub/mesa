@@ -3,7 +3,7 @@
    
    load_saved_model_for_RSP = .true.
 
-   !pgstar_flag = .true.
+   pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -143,8 +143,6 @@
    !pause = .true.
    !pause_interval = 1
    pgstar_interval = 10
-
-   Grid2_title = 'star1 - RSP'
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png1'

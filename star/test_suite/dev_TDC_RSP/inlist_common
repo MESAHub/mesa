@@ -1,9 +1,9 @@
 
 &star_job
+   read_extra_star_job_inlist1 = .true.
+   extra_star_job_inlist1_name = 'inlist_which'
 
    show_log_description_at_start = .false.
-   
-   saved_model_name = 'cepheid.mod'
    
    required_termination_code_string(1) = 'max_model_number' ! just for testing
    
@@ -30,25 +30,21 @@
 / ! end of star_job namelist
 
 &eos
-   use_Skye = .true.
+   read_extra_eos_inlist1 = .true.
+   extra_eos_inlist1_name = 'inlist_which'
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.007d0
-   kap_file_prefix = 'a09'
-   kap_lowT_prefix = 'lowT_fa05_a09p'
-   kap_CO_prefix = 'a09_co'
+   read_extra_kap_inlist1 = .true.
+   extra_kap_inlist1_name = 'inlist_which'
 / ! end of kap namelist
 
 &controls  
+   read_extra_controls_inlist1 = .true.
+   extra_controls_inlist1_name = 'inlist_which'
 
-   initial_z = 0.007d0
-   initial_mass = 4.165d0
-
-   max_number_retries = 1000
    max_model_number = 100000
-
-   max_age = 1d6
+   max_number_retries = 10000
       
 ! wind
 
@@ -331,6 +327,9 @@
 
 
 &pgstar
+   read_extra_pgstar_inlist1 = .true.
+   extra_pgstar_inlist1_name = 'inlist_which'
+
    !pause = .true.
 
    pgstar_xaxis_label_scale = 1.0
@@ -430,32 +429,33 @@
 
 
    History_Panels1_title = ''      
-   History_Panels1_num_panels = 3
+   History_Panels1_num_panels = 4
 
    History_Panels1_xaxis_name='star_age_day'
    History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+   !History_Panels1_xmin = 0.1
    
-   History_Panels1_yaxis_name(1) = 'radius' 
+   History_Panels1_yaxis_name(1) = 'v_surf_km_s' 
    History_Panels1_yaxis_reversed(1) = .false.
    History_Panels1_ymin(1) = -101d0 ! only used if /= -101d0
    History_Panels1_ymax(1) = -101d0 ! only used if /= -101d0        
    History_Panels1_dymin(1) = -1 
    History_Panels1_same_yaxis_range(1) = .true.
    
-   History_Panels1_other_yaxis_name(1) = 'r_alt' 
+   History_Panels1_other_yaxis_name(1) = 'v_alt' 
    History_Panels1_other_yaxis_reversed(1) = .false.
    History_Panels1_other_ymin(1) = -101d0 ! only used if /= -101d0
    History_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0        
    History_Panels1_other_dymin(1) = -1 
    
-   History_Panels1_yaxis_name(2) = 'v_surf_km_s'
+   History_Panels1_yaxis_name(2) = 'radius'
    History_Panels1_yaxis_reversed(2) = .false.
    History_Panels1_ymin(2) = -101d0 ! only used if /= -101d0
    History_Panels1_ymax(2) = -101d0 ! only used if /= -101d0        
    History_Panels1_dymin(2) = -1 
    History_Panels1_same_yaxis_range(2) = .true.
    
-   History_Panels1_other_yaxis_name(2) = 'v_alt'
+   History_Panels1_other_yaxis_name(2) = 'r_alt'
    History_Panels1_other_yaxis_reversed(2) = .false.
    History_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
    History_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0        
@@ -500,38 +500,38 @@
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
    Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = 20 ! -101D0
+   Profile_Panels1_xmax = -101D0
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
-   Profile_Panels1_num_panels = 6 ! 7
+   Profile_Panels1_num_panels = 7
            
-   Profile_Panels1_yaxis_name(1) = 'v'         
+   Profile_Panels1_yaxis_name(1) = 'vel_km_per_s'         
    Profile_Panels1_other_yaxis_name(1) = 'v_alt'
    Profile_Panels1_same_yaxis_range(1) = .true.
             
-   Profile_Panels1_yaxis_name(2) = 'dvdt' !'Y_face'
-   Profile_Panels1_other_yaxis_name(2) = 'dvdt_alt' !'Y_face_alt'
+   Profile_Panels1_yaxis_name(2) = 'Y_face'
+   Profile_Panels1_other_yaxis_name(2) = 'Y_face_alt'
    Profile_Panels1_same_yaxis_range(2) = .true.
    
-   Profile_Panels1_yaxis_name(3) = 'P' ! 'w'         
-   Profile_Panels1_other_yaxis_name(3) = 'P_alt' ! 'w_alt' 
+   Profile_Panels1_yaxis_name(3) = 'w'         
+   Profile_Panels1_other_yaxis_name(3) = 'w_alt' 
    Profile_Panels1_same_yaxis_range(3) = .true.
             
-   Profile_Panels1_yaxis_name(4) = 'avQ' ! 'logR'
-   Profile_Panels1_other_yaxis_name(4) = 'avQ_alt' ! 'logR_alt' 
+   Profile_Panels1_yaxis_name(4) = 'logR'
+   Profile_Panels1_other_yaxis_name(4) = 'logR_alt' 
    Profile_Panels1_same_yaxis_range(4) = .true.
             
-   Profile_Panels1_yaxis_name(5) = 'Pt' ! 'logP' 
-   Profile_Panels1_other_yaxis_name(5) = 'Pt_alt' ! 'logP_alt' 
+   Profile_Panels1_yaxis_name(5) = 'logP' 
+   Profile_Panels1_other_yaxis_name(5) = 'logP_alt' 
    Profile_Panels1_same_yaxis_range(5) = .true.
             
-   Profile_Panels1_yaxis_name(6) = 'Uq'
-   Profile_Panels1_other_yaxis_name(6) = 'Uq_alt' 
+   Profile_Panels1_yaxis_name(6) = 'logT'
+   Profile_Panels1_other_yaxis_name(6) = 'logT_alt' 
    Profile_Panels1_same_yaxis_range(6) = .true.
             
             
-   Profile_Panels1_yaxis_name(7) = 'dvdt' 
-   Profile_Panels1_other_yaxis_name(7) = 'dvdt_alt' 
+   Profile_Panels1_yaxis_name(7) = 'logRho' 
+   Profile_Panels1_other_yaxis_name(7) = 'logRho_alt' 
    Profile_Panels1_same_yaxis_range(7) = .true.
    
 

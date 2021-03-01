@@ -61,7 +61,7 @@
     fe_core_boundary_si28_fraction, neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
     
     ! when to stop
-    max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, &
+    max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, max_age_in_days, &
     num_adjusted_dt_steps_before_max_age, dt_years_for_steps_before_max_age, max_abs_rel_run_E_err, &
     reduction_factor_for_max_timestep, when_to_stop_rtol, when_to_stop_atol, &
     gamma_center_limit, eta_center_limit, log_center_temp_limit, log_max_temp_upper_limit, &
@@ -795,6 +795,7 @@
  s% max_abs_rel_run_E_err = max_abs_rel_run_E_err
  s% relax_max_number_retries = relax_max_number_retries
  s% max_age = max_age
+ s% max_age_in_days = max_age_in_days
  s% max_age_in_seconds = max_age_in_seconds
  s% num_adjusted_dt_steps_before_max_age = num_adjusted_dt_steps_before_max_age
  s% dt_years_for_steps_before_max_age = dt_years_for_steps_before_max_age
@@ -2433,6 +2434,7 @@
  max_number_retries = s% max_number_retries
  relax_max_number_retries = s% relax_max_number_retries
  max_age = s% max_age
+ max_age_in_days = s% max_age_in_days
  max_age_in_seconds = s% max_age_in_seconds
  num_adjusted_dt_steps_before_max_age = s% num_adjusted_dt_steps_before_max_age
  dt_years_for_steps_before_max_age = s% dt_years_for_steps_before_max_age

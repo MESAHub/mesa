@@ -159,12 +159,6 @@
          resid_ad = resid1_ad*iXPavg_ad ! scaling
          residual = resid_ad%val
          s% equ(i_dv_dt, k) = residual      
-         
-         !s% xtra1_array(k) = area_ad%val
-         !s% xtra2_array(k) = dXP_ad%val/s% dm(k)
-         !s% xtra3_array(k) = log10(-grav_ad%val)
-         s% xtra4_array(k) = Uq_ad%val
-         !s% xtra5_array(k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_momentum_crit1)

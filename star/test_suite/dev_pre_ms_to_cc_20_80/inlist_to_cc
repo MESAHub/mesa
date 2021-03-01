@@ -55,7 +55,7 @@
 ! mesh
 
 ! solver
-      use_velocity_time_centering = .true.
+      steps_before_use_velocity_time_centering = 0
       include_P_in_velocity_time_centering = .true.
       include_L_in_velocity_time_centering = .true.
       
