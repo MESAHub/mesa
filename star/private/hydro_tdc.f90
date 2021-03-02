@@ -108,7 +108,9 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face
-         type(auto_diff_real_star_order1) :: r_00, P_00, d_00, P_m1, d_m1
+         type(auto_diff_real_star_order1) :: &
+            r_00, P_00, d_00, P_m1, d_m1, P_div_rho, &
+            d_face, P_face, alt_Hp_face, alfa
          include 'formats'
          ierr = 0
          r_00 = wrap_opt_time_center_r_00(s, k)
@@ -117,13 +119,23 @@
          if (k > 1) then
             d_m1 = wrap_d_m1(s, k)
             P_m1 = wrap_P_m1(s, k)
-            Hp_face = &
-               pow2(r_00)*0.5d0*(P_00/d_00 + P_m1/d_m1)/(s% cgrav(k)*s% m(k))
+            P_div_rho = 0.5d0*(P_00/d_00 + P_m1/d_m1)
+            Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
+            if (s% alt_scale_height_flag) then
+               ! consider sound speed*hydro time scale as an alternative scale height
+               ! (this comes from Eggleton's code.)
+               d_face = 0.5d0*(d_00 + d_m1)
+               P_face = 0.5d0*(P_00 + P_m1)
+               alt_Hp_face = sqrt(P_face/s% cgrav(k))/d_face
+               if (alt_Hp_face%val < Hp_face%val) then ! blend
+                  alfa = pow2(alt_Hp_face/Hp_face) ! 0 <= alfa%val < 1
+                  Hp_face = alfa*Hp_face + (1d0 - alfa)*alt_Hp_face
+               end if
+            end if
          else ! surface
             Hp_face = pow2(r_00)*P_00/(d_00*s% cgrav(k)*s% m(k))
          end if
       end function compute_Hp_face
-      
       
 
       subroutine do1_tdc_Hp_eqn(s, k, skip_partials, nvar, ierr)
@@ -144,7 +156,7 @@
          Hp_expected = compute_Hp_face(s, k, ierr)
          if (ierr /= 0) return        
          Hp_actual = wrap_Hp_00(s, k)  
-         resid = Hp_expected - Hp_actual      
+         resid = (Hp_expected - Hp_actual)/s% Hp_start(k)    
          residual = resid%val
          s% equ(s% i_equ_Hp, k) = residual         
          if (test_partials) then
@@ -559,6 +571,15 @@
          if (is_bad(Source%val)) then
             !$omp critical (hydro_equ_turbulent_crit3)
             write(*,2) 'Source', k, Source%val
+            write(*,2) 'Hp_face_00', k, Hp_face_00%val
+            write(*,2) 'Hp_face_p1', k, Hp_face_p1%val
+            write(*,2) 'PII_face_00', k, PII_face_00%val
+            write(*,2) 'PII_face_p1', k, PII_face_p1%val
+            write(*,2) 'Cp_00', k, Cp_00%val
+            write(*,2) 'QQ_00', k, QQ_00%val
+            write(*,2) 'P_00', k, P_00%val
+            write(*,2) 'T_00', k, T_00%val
+            write(*,2) 'w_00', k, w_00%val
             stop 'compute_Source'
             !$omp end critical (hydro_equ_turbulent_crit3)
          end if
@@ -866,6 +887,7 @@
                s% Lt_start(k) = 0d0  
             end if
             s% etrb_start(k) = s% etrb(k)
+            s% Hp_start(k) = s% Hp_face(k)
          end subroutine set1_etrb_start_vars
          
       end subroutine set_etrb_start_vars
@@ -893,6 +915,10 @@
             if (ierr /= 0) return
             s% xh(i_Hp,k) = Hp_face%val
             s% Hp_face(k) = Hp_face%val
+            if (s% Hp_face(k) <= 0d0 .or. is_bad(s% Hp_face(k))) then
+               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
+               stop 'compute_Hp_face failed in compute_L reset_wturb_using_L'
+            end if
          end do
          do k=2, nz
             Lr = compute_Lr(s, k, ierr)

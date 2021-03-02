@@ -369,8 +369,8 @@
             if (.not. s% TDC_flag) then
                write(*,*) 'and setting TDC_flag to .true.'
                s% TDC_flag = .true.
+               s% need_to_reset_w = .true.
             end if
-            s% need_to_reset_w = .false.
          end if
          
          if (no_L .and. s% i_lum /= 0) then

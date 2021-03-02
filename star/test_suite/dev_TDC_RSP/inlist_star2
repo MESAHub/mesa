@@ -49,15 +49,15 @@
       photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      terminal_interval = 1
 
       !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1

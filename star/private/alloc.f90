@@ -615,6 +615,8 @@
             if (failed('etrb')) exit
             call do1(s% etrb_start, c% etrb_start)
             if (failed('etrb_start')) exit
+            call do1(s% Hp_start, c% Hp_start)
+            if (failed('Hp_start')) exit
             
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
