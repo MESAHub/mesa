@@ -256,6 +256,15 @@
          end if
       end function wrap_lnT_p1
 
+      function wrap_dxh_lnT(s, k) result(dxh_lnT)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: dxh_lnT
+         integer, intent(in) :: k
+         dxh_lnT = 0d0 
+         dxh_lnT % val = s%dxh_lnT(k)
+         dxh_lnT % d1Array(i_lnT_00) = 1d0
+      end function wrap_dxh_lnT
+
       function wrap_d_m1(s, k) result(d_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: d_m1
@@ -342,6 +351,15 @@
          end if
       end function wrap_lnd_p1
 
+      function wrap_dxh_lnd(s, k) result(dxh_lnd)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: dxh_lnd
+         integer, intent(in) :: k
+         dxh_lnd = 0d0 
+         dxh_lnd % val = s%dxh_lnd(k)
+         dxh_lnd % d1Array(i_lnd_00) = 1d0
+      end function wrap_dxh_lnd
+
       function wrap_etrb_m1(s, k) result(etrb_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: etrb_m1
@@ -372,6 +390,15 @@
             etrb_p1 % d1Array(i_etrb_p1) = 1d0
          end if
       end function wrap_etrb_p1
+
+      function wrap_dxh_etrb(s, k) result(dxh_etrb)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: dxh_etrb
+         integer, intent(in) :: k
+         dxh_etrb = 0d0 
+         dxh_etrb % val = s%dxh_etrb(k)
+         dxh_etrb % d1Array(i_etrb_00) = 1d0
+      end function wrap_dxh_etrb
 
       function wrap_w_m1(s, k) result(w_m1)
          type (star_info), pointer :: s
@@ -1057,6 +1084,15 @@
             lnR_p1 % val = log(max(1d0,s%r_center))
          end if
       end function wrap_lnR_p1
+
+      function wrap_dxh_lnR(s, k) result(dxh_lnR)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: dxh_lnR
+         integer, intent(in) :: k
+         dxh_lnR = 0d0 
+         dxh_lnR % val = s%dxh_lnR(k) 
+         dxh_lnR % d1Array(i_lnR_00) = 1d0
+      end function wrap_dxh_lnR
 
       function wrap_v_m1(s, k) result(v_m1)
          type (star_info), pointer :: s

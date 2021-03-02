@@ -24,7 +24,7 @@ do_one custom_colors "stop because have dropped below central lower limit for h1
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
 #   Pablo needs to rewrite for auto diff   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   needs work, on in stale_tests branch    do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
-do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+# needs work      do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip

@@ -248,9 +248,8 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            d_turbulent_energy_ad%val = s% etrb(k) - s% etrb_start(k)
-            d_turbulent_energy_ad%d1Array(:) = 0d0
-            d_turbulent_energy_ad%d1Array(i_etrb_00) = 1d0
+            ierr = 0
+            d_turbulent_energy_ad = wrap_dxh_etrb(s,k)
          end subroutine setup_d_turbulent_energy
          
          ! PtdV_ad = Pt_ad*dV_ad

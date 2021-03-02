@@ -569,13 +569,15 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            v00, r_actual, r_expected, resid_ad
+            v00, r_actual, r_expected, dxh_lnR, resid_ad, &
+            dr_div_r0_actual, dr_div_r0_expected, dr
          logical :: test_partials, force_zero_v
          include 'formats'
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0         
          if (.not. (s% u_flag .or. s% v_flag)) stop 'must have either v or u for do1_radius_eqn'
+         
          force_zero_v = (s% q(k) > s% velocity_q_upper_bound) .or. &
             (s% lnT_start(k)/ln10 < s% velocity_logT_lower_bound .and. &
                s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)                  
@@ -591,6 +593,7 @@
                s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
             return
          end if
+         
          if (s% u_flag) then
             v00 = s% u_face_ad(k)
             if (s% using_velocity_time_centering) &
@@ -598,10 +601,24 @@
          else
             v00 = wrap_opt_time_center_v_00(s,k)
          end if         
-         r_actual = wrap_r_00(s,k)
-         r_expected = v00*s% dt + s% r_start(k)
-         resid_ad = (r_expected - r_actual)/s% r_start(k)
+         
+         if (s% solver_use_lnR) then
+            ! dr = r - r0 = v00*dt
+            ! eqn: dr/r0 = v00*dt/r0
+            ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
+            ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
+            ! eqn becomes: v00*dt/r0 = expm1(dlnR)
+            dxh_lnR = wrap_dxh_lnR(s,k) ! lnR - lnR_start
+            dr_div_r0_actual = expm1(dxh_lnR) ! expm1(x) = E^x - 1
+            dr_div_r0_expected = v00*s% dt/s% r_start(k)
+            resid_ad = dr_div_r0_expected - dr_div_r0_actual
+         else ! not solver_use_lnR
+            dr = wrap_dxh_lnR(s,k) ! r - r_start
+            resid_ad = (dr - v00*s% dt)/s% r_start(k)
+         end if
+         
          s% equ(s% i_dlnR_dt, k) = resid_ad%val
+         
          if (test_partials) then
             s% solver_test_partials_val = 0
          end if

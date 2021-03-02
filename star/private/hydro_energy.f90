@@ -391,9 +391,8 @@
             include 'formats'
             ierr = 0
             d_turbulent_energy_dt_ad = 0d0
-            if (s% TDC_flag) then
-               d_turbulent_energy_dt_ad%val = (s% etrb(k) - s% etrb_start(k))/dt 
-               d_turbulent_energy_dt_ad%d1Array(i_etrb_00) = 1d0/dt
+            if (s% TDC_flag) then ! dxh_etrb = etrb - etrb_start
+               d_turbulent_energy_dt_ad = wrap_dxh_etrb(s,k)/dt
             end if
             s% detrbdt(k) = d_turbulent_energy_dt_ad%val
          end subroutine setup_d_turbulent_energy_dt
@@ -448,7 +447,7 @@
             integer, intent(out) :: ierr
             real(dp) :: dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
                dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, &
-               de_dt, d_de_dt_dlnd, d_de_dt_dlnT, d_PdV_dlnd, d_PdV_dlnT
+               de_dt, d_de_dt_dlnd, d_de_dt_dlnT
             include 'formats'
             ierr = 0
 
@@ -893,7 +892,8 @@
          real(dp), intent(out), dimension(s% species) :: d_dwork_dxa00
          integer, intent(out) :: ierr
 
-         type(auto_diff_real_star_order1) :: Av_face00_ad, Av_facep1_ad, XP_ad
+         type(auto_diff_real_star_order1) :: &
+            Av_face00_ad, Av_facep1_ad, XP_ad, rho, dxh_lnd, dV
          real(dp), dimension(s% species) :: d_XP_dxa
          real(dp) :: Av_face00, Av_facep1
          logical :: include_mlt_Pturb
@@ -901,19 +901,27 @@
 
          include 'formats'
          ierr = 0
-         call eval1_Av_face_ad(s, k, Av_face00_ad, ierr)
-         if (ierr /= 0) return
          
-         if (k < s% nz) then
-            call eval1_Av_face_ad(s, k+1, Av_facep1_ad, ierr)
-            if (ierr /= 0) return
-            Av_facep1_ad = shift_p1(Av_facep1_ad)
+         ! dV = 1/rho - 1/rho_start 
+         if (.not. s% solver_use_lnd) then 
+            rho = wrap_d_00(s,k)
+            dxh_lnd = wrap_dxh_lnd(s,k) ! rho - rho_start
+            dV = -dxh_lnd/(rho*s% rho_start(k))
          else
-            Av_facep1_ad = 0d0
-            Av_facep1_ad%val = 4*pi*pow2(s% r_center)*s% v_center
+            call eval1_Av_face_ad(s, k, Av_face00_ad, ierr)
+            if (ierr /= 0) return
+            if (k < s% nz) then
+               call eval1_Av_face_ad(s, k+1, Av_facep1_ad, ierr)
+               if (ierr /= 0) return
+               Av_facep1_ad = shift_p1(Av_facep1_ad)
+            else
+               Av_facep1_ad = 0d0
+               Av_facep1_ad%val = 4*pi*pow2(s% r_center)*s% v_center
+            end if
+            Av_face00 = Av_face00_ad%val
+            Av_facep1 = Av_facep1_ad%val
+            dV = Av_face00_ad - Av_facep1_ad
          end if
-         Av_face00 = Av_face00_ad%val
-         Av_facep1 = Av_facep1_ad%val
 
          include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
             .and. s% mlt_vc_start(k) > 0d0 .and. k > 1
@@ -922,7 +930,7 @@
             s, k, skip_P, .not. include_mlt_Pturb, XP_ad, d_XP_dxa, ierr)
          if (ierr /= 0) return
          
-         dwork_ad = XP_ad*(Av_face00_ad - Av_facep1_ad)
+         dwork_ad = XP_ad*dV
          dwork = dwork_ad%val
          
          if (k == 1) s% work_outward_at_surface = XP_ad%val*Av_face00

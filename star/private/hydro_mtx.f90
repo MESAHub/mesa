@@ -401,12 +401,11 @@
                if (s% solver_use_lnT) then
                   s% lnT(k) = x(i_lnT)
                   s% T(k) = exp(s% lnT(k))
-                  s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                else
                   s% T(k) = x(i_lnT)
                   s% lnT(k) = log(s% T(k))
-                  s% dxh_lnT(k) = 0d0
                end if
+               s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                if (abs(s% lnT(k) - s% lnT_start(k)) > &
                        ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
                     s% min_logT_for_hydro_mtx_max_allowed < &
@@ -481,6 +480,7 @@
 
             if (do_etrb) then
                s% etrb(k) = max(x(i_etrb),0d0)
+               s% dxh_etrb(k) = s% solver_dx(i_etrb,k)
                s% w(k) = sqrt(s% etrb(k))
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
@@ -601,12 +601,11 @@
                if (s% solver_use_lnR) then
                   s% lnR(k) = x(i_lnR)
                   s% r(k) = exp(s% lnR(k))
-                  s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
                else
                   s% r(k) = x(i_lnR)
                   s% lnR(k) = log(s% r(k))
-                  s% dxh_lnR(k) = 0d0
                end if
+               s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
                if (is_bad_num(s% lnR(k))) then
                   s% retry_message = 'bad num for lnR'
                   if (s% stop_for_bad_nums) then
@@ -624,12 +623,11 @@
                if (s% solver_use_lnd) then
                   s% lnd(k) = x(i_lnd)
                   s% rho(k) = exp(s% lnd(k))
-                  s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
                else
                   s% rho(k) = x(i_lnd)
                   s% lnd(k) = log(s% rho(k))
-                  s% dxh_lnd(k) = 0d0
                end if
+               s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
                if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                   write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                   if (report) &

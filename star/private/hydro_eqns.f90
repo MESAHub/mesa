@@ -1219,20 +1219,22 @@
          subroutine set_compression_BC(ierr)
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               rho1, rho2, lnd1, lnd2, dlnd1, dlnd2
+               rho1, rho2, lnd1, lnd2, dlnd1, dlnd2, drho1, drho2
             include 'formats'
             ! gradient of compression vanishes fixes density for cell 1
                ! d_dt(1/rho(1)) = d_dt(1/rho(2))  e.g., Grott, Chernigovski, Glatzel, 2005.
-               ! -dlnd_dt(1)/rho(1) = -dlnd_dt(2)/rho(2)
-               ! rho(2)*dlnd_dt(1) = rho(1)*dlnd_dt(2)
             ierr = 0            
             rho1 = wrap_d_00(s,1)
             rho2 = wrap_d_p1(s,1)
-            lnd1 = wrap_lnd_00(s,1)
-            lnd2 = wrap_lnd_p1(s,1)
-            dlnd1 = lnd1 - s% lnd_start(1)
-            dlnd2 = lnd2 - s% lnd_start(2)
-            resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt            
+            if (s% solver_use_lnd) then
+               dlnd1 = wrap_dxh_lnd(s,1) ! lnd(1) - lnd_start(1)
+               dlnd2 = shift_p1(wrap_dxh_lnd(s,2)) ! lnd(2) - lnd_start(2)
+               resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt            
+            else ! not solver_use_lnd
+               drho1 = wrap_dxh_lnd(s,1) ! rho(1) - rho_start(1)
+               drho2 = shift_p1(wrap_dxh_lnd(s,2)) ! rho(2) - rho_start(2)
+               resid_ad = (1d0/drho1 - 1d0/drho2)/s% dt
+            end if
             s% equ(i_P_eqn, 1) = resid_ad%val     
             if (skip_partials) return            
             call save_eqn_residual_info( &

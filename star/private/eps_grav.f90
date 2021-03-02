@@ -210,11 +210,15 @@
          real(dp) :: dlnd_dt, dlnT_dt
          if (s% solver_use_lnd) then
             dlnd_dt = s% dxh_lnd(k)/s% dt
+         !else  - when using autodiff
+         !   dlnd_dt = s% dxh_lnd(k)/s% rho(k)/s% dt
          else
             dlnd_dt = (s% lnd(k) - s% lnd_start(k))/s% dt
          end if
          if (s% solver_use_lnT) then
             dlnT_dt = s% dxh_lnT(k)/s% dt
+         !else  - when using autodiff
+         !      dlnT_dt = s% dxh_lnT(k)/s% T(k)/s% dt
          else
             dlnT_dt = (s% lnT(k) - s% lnT_start(k))/s% dt
          end if
@@ -624,6 +628,8 @@
          do j=1, s% species
             if (s% solver_use_lnd) then
                dxh_lnd = s% dxh_lnd(k)
+            ! else - auto_diff
+               !dxh_lnd = s% dxh_lnd(k)/s% rho(k)
             else
                dxh_lnd = s% lnd(k) - s% lnd_start(k)
             end if
