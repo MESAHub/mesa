@@ -24,8 +24,6 @@
    RSP_Z = 0.007d0
    
 ! solver
-   solver_use_lnR = .true.
-   solver_use_lnT = .true.
 
 ! output controls
 

@@ -52,8 +52,6 @@
 / ! end of kap namelist
 
 &controls
-
-         solver_use_lnR = .true. ! fails with r
          
          he_core_mass_limit = 0.22
 
@@ -94,7 +92,8 @@
          
          xa_scale = 1d-5
          
-         !varcontrol_target = 1d-4
+         varcontrol_target = 5d-4
+         max_abs_rel_run_E_err = 0.05d0
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)

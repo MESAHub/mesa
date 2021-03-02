@@ -51,8 +51,6 @@
 
 &controls
 
-      !solver_use_lnR = .true. ! fails with r
-
       use_dedt_form_of_energy_eqn = .true.
       use_gold2_tolerances = .false.
       use_d_eos_dxa = .true.

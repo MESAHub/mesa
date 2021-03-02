@@ -2340,7 +2340,8 @@
          integer, intent(out) :: ierr
 
          integer :: j, nterms, nvar_hydro, nz, k, kk, iounit, &
-            skip1, skip2, skip3, skip4, skip5, skip6, i_alpha_RTI, i_etrb_RSP, i_etrb
+            skip1, skip2, skip3, skip4, skip5, skip6, &
+            i_alpha_RTI, i_etrb_RSP, i_etrb, i_Hp
          real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
          real(dp), pointer :: vc_data(:,:)
          logical :: dbg
@@ -2404,6 +2405,7 @@
          i_alpha_RTI = s% i_alpha_RTI
          i_etrb_RSP = s% i_etrb_RSP
          i_etrb = s% i_etrb
+         i_Hp = s% i_Hp
 
          nterms = 0
          sumvar = 0
@@ -2428,6 +2430,7 @@
                 j == s% i_w_div_wc .or. & ! TODO: check why not including this makes restart varcontrol inconsistent
                 j == i_alpha_RTI .or. &
                 j == i_etrb .or. &
+                j == i_Hp .or. &
                 j == i_etrb_RSP) cycle
 
             nterms = nterms + nz

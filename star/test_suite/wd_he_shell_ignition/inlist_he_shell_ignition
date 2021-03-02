@@ -55,8 +55,6 @@
 
 
 &controls
-
-      solver_use_lnR = .true. ! fails with r
       
       power_he_burn_upper_limit = 1d11
 

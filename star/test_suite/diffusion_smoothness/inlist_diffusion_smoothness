@@ -41,8 +41,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
       use_dedt_form_of_energy_eqn = .true.
       calculate_Brunt_N2 = .true.
 

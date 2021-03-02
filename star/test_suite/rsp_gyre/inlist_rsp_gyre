@@ -65,8 +65,6 @@
    RSP_T_inner = 2d6 ! T at inner boundary of initial model
    
 ! solver
-   solver_use_lnR = .true.
-   solver_use_lnT = .true.
 
 ! output controls
    

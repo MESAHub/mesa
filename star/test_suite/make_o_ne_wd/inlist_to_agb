@@ -32,8 +32,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
       log_max_temp_upper_limit = 8.6d0
 
       ! limit max_model_number as part of test_suite

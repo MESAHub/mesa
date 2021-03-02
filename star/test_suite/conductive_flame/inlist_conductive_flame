@@ -66,9 +66,6 @@
       x_ctrl(6) = 0.50 ! mass fraction c12
       x_ctrl(7) = 0.50 ! mass fraction o16
       x_ctrl(8) = 0.00 ! mass fraction ne20
-      
-      solver_use_lnR = .true.
-      solver_use_lnT = .true.
 
     ! set up constant pressure/temperature boundary conditions
       use_other_surface_PT = .true.

@@ -66,8 +66,6 @@
       
    
 ! solver
-   solver_use_lnR = .true.
-   solver_use_lnT = .true.
 
 ! output controls
    

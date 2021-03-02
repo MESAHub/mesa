@@ -2565,8 +2565,10 @@
          
          if (s% TDC_flag) then
             i = i+1; s% i_etrb = i
+            i = i+1; s% i_Hp = i
          else 
             s% i_etrb = 0
+            s% i_Hp = 0
          end if
 
          if (s% conv_vel_flag) then
@@ -2605,6 +2607,7 @@
          end if
       
          s% i_detrb_dt = s% i_etrb
+         s% i_equ_Hp = s% i_Hp
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_detrb_RSP_dt = s% i_etrb_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
@@ -2627,6 +2630,7 @@
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
          if (s% i_etrb /= 0) s% nameofvar(s% i_etrb) = 'etrb'
+         if (s% i_Hp /= 0) s% nameofvar(s% i_etrb) = 'Hp'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2643,6 +2647,7 @@
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
+         if (s% i_equ_Hp /= 0) s% nameofequ(s% i_equ_Hp) = 'equ_Hp'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_detrb_RSP_dt /= 0) s% nameofequ(s% i_detrb_RSP_dt) = 'detrb_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
@@ -3011,7 +3016,10 @@
          s% TDC_flag = TDC_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. TDC_flag) call remove1(s% i_etrb)
+         if (.not. TDC_flag) then
+            call remove1(s% i_etrb)
+            call remove1(s% i_Hp)
+         end if
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
@@ -3029,7 +3037,11 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (TDC_flag) call insert1(s% i_etrb)
+         if (TDC_flag) then
+            call insert1(s% i_etrb)
+            call insert1(s% i_Hp)
+            s% need_to_reset_w = .true.
+         end if
 
          call set_chem_names(s)
          
@@ -3043,7 +3055,6 @@
             do k=1,nz
                s% xh(i_var,k) = 0d0
             end do
-            s% need_to_reset_w = .true.
             if (associated(s% xh_old) .and. s% generations > 1) then
                call insert(s% xh_old,i_var)
             end if

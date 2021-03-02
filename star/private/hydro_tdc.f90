@@ -36,7 +36,7 @@
       implicit none
 
       private
-      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, &
+      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, do1_tdc_Hp_eqn, &
          compute_Eq_cell, compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
@@ -101,6 +101,66 @@
             write(*,*) 'do1_tdc_L_eqn', s% solver_test_partials_var
          end if      
       end subroutine do1_tdc_L_eqn
+      
+      
+      function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Hp_face
+         type(auto_diff_real_star_order1) :: r_00, P_00, d_00, P_m1, d_m1
+         include 'formats'
+         ierr = 0
+         r_00 = wrap_opt_time_center_r_00(s, k)
+         d_00 = wrap_d_00(s, k)
+         P_00 = wrap_P_00(s, k)
+         if (k > 1) then
+            d_m1 = wrap_d_m1(s, k)
+            P_m1 = wrap_P_m1(s, k)
+            Hp_face = &
+               pow2(r_00)*0.5d0*(P_00/d_00 + P_m1/d_m1)/(s% cgrav(k)*s% m(k))
+         else ! surface
+            Hp_face = pow2(r_00)*P_00/(d_00*s% cgrav(k)*s% m(k))
+         end if
+      end function compute_Hp_face
+      
+      
+
+      subroutine do1_tdc_Hp_eqn(s, k, skip_partials, nvar, ierr)
+         use star_utils, only: save_eqn_residual_info
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr         
+         type(auto_diff_real_star_order1) :: Hp_expected, Hp_actual, resid
+         real(dp) :: residual
+         logical :: test_partials
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         ierr = 0
+         Hp_expected = compute_Hp_face(s, k, ierr)
+         if (ierr /= 0) return        
+         Hp_actual = wrap_Hp_00(s, k)  
+         resid = Hp_expected - Hp_actual      
+         residual = resid%val
+         s% equ(s% i_equ_Hp, k) = residual         
+         if (test_partials) then
+            s% solver_test_partials_val = residual
+         end if
+         
+         if (skip_partials) return
+         call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_tdc_Hp_eqn', ierr)
+         if (ierr /= 0) return
+
+         if (test_partials) then
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
+            write(*,*) 'do1_tdc_Hp_eqn', s% solver_test_partials_var
+         end if      
+      end subroutine do1_tdc_Hp_eqn
       
 
       subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
@@ -255,58 +315,21 @@
       end subroutine do1_turbulent_energy_eqn
       
       
-      function compute_Hp_cell(s, k, ierr) result(Hp_cell) ! cm
+      function wrap_Hp_cell(s, k) result(Hp_cell) ! cm
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
-         type(auto_diff_real_star_order1) :: r_mid, r_00, r_p1, P_00, d_00, P_m1, d_m1
-         real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
+         type(auto_diff_real_star_order1) :: Hp_00, Hp_p1
          include 'formats'
-         ierr = 0
-         r_00 = wrap_opt_time_center_r_00(s, k)
-         cgrav_00 = s% cgrav(k)
-         m_00 = s% m(k)
-         d_00 = wrap_d_00(s, k)
-         P_00 = wrap_P_00(s, k)
-         r_p1 = wrap_opt_time_center_r_p1(s, k)
-         if (k < s% nz) then
-            cgrav_p1 = s% cgrav(k+1)
-            m_p1 = s% m(k+1)
-         else
-            cgrav_p1 = s% cgrav(k)
-            m_p1 = s% m_center
-            if (s% m_center == 0d0) stop 'need to fix TDC Hp for m_center = 0'
+         Hp_00 = wrap_Hp_00(s, k)
+         if (k == s% nz) then
+            Hp_cell = Hp_00
+            return
          end if
-         cgrav_mid = 0.5d0*(cgrav_00 + cgrav_p1)
-         m_mid = 0.5d0*(m_00 + m_p1)
-         r_mid = 0.5d0*(r_00 + r_p1)
-         Hp_cell = pow2(r_mid)*P_00 / (d_00*cgrav_mid*m_mid)
-      end function compute_Hp_cell
-      
-      
-      function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Hp_face
-         type(auto_diff_real_star_order1) :: r_00, P_00, d_00, P_m1, d_m1
-         include 'formats'
-         ierr = 0
-         r_00 = wrap_opt_time_center_r_00(s, k)
-         d_00 = wrap_d_00(s, k)
-         P_00 = wrap_P_00(s, k)
-         if (k > 1) then
-            d_m1 = wrap_d_m1(s, k)
-            P_m1 = wrap_P_m1(s, k)
-            Hp_face = &
-               pow2(r_00)*0.5d0*(P_00/d_00 + P_m1/d_m1)/(s% cgrav(k)*s% m(k))
-         else ! surface
-            Hp_face = pow2(r_00)*P_00/(d_00*s% cgrav(k)*s% m(k))
-         end if
-         s% Hp_face(k) = Hp_face%val
-      end function compute_Hp_face
-      
+         Hp_p1 = wrap_Hp_p1(s, k)
+         Hp_cell = 0.5d0*(Hp_00 + Hp_p1)
+      end function wrap_Hp_cell
+
       
       function compute_Y_face(s, k, ierr) result(Y_face) ! superadiabatic gradient [unitless]
          type (star_info), pointer :: s
@@ -324,8 +347,7 @@
             return
          end if
          dm_bar = s% dm_bar(k)
-         Hp_face = compute_Hp_face(s, k, ierr)
-         if (ierr /= 0) return
+         Hp_face = wrap_Hp_00(s,k)
          
          r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
@@ -426,8 +448,7 @@
             Chi_cell = 0d0
             return
          end if
-         Hp_cell = compute_Hp_cell(s, k, ierr)
-         if (ierr /= 0) return
+         Hp_cell = wrap_Hp_00(s, k)
          d_v_div_r = compute_d_v_div_r(s, k, ierr)
          if (ierr /= 0) return
          w_00 = wrap_w_00(s,k)
@@ -517,11 +538,8 @@
          chiRho_00 = wrap_chiRho_00(s, k)
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
             
-         Hp_face_00 = compute_Hp_face(s, k, ierr)
-         if (ierr /= 0) return
-         Hp_face_p1 = compute_Hp_face(s, k+1, ierr)
-         if (ierr /= 0) return
-         Hp_face_p1 = shift_p1(Hp_face_p1)
+         Hp_face_00 = wrap_Hp_00(s, k)
+         Hp_face_p1 = wrap_Hp_p1(s, k)
 
          PII_face_00 = compute_PII_face(s, k, ierr)
          if (ierr /= 0) return
@@ -564,8 +582,7 @@
             s% DAMP(k) = 0d0
             return
          end if
-         Hp_cell = compute_Hp_cell(s, k, ierr)
-         if (ierr /= 0) return
+         Hp_cell = wrap_Hp_cell(s, k)
          etrb_00 = wrap_etrb_00(s,k)
          w_00 = wrap_w_00(s,k)
          dw3 = etrb_00*w_00 - pow3(s% TDC_w_min_for_damping)
@@ -597,8 +614,7 @@
          d_00 = wrap_d_00(s,k)
          Cp_00 = wrap_Cp_00(s,k)
          kap_00 = wrap_kap_00(s,k)
-         Hp_cell = compute_Hp_cell(s,k,ierr)
-         if (ierr /= 0) return
+         Hp_cell = wrap_Hp_cell(s,k)
          POM = 4d0*boltz_sigma*(gammar/alpha)**2 ! erg cm^-2 K^-4 s^-1
          POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00) 
             ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
@@ -776,8 +792,7 @@
          end if
          etrb_m1 = wrap_etrb_m1(s,k)
          etrb_00 = wrap_etrb_00(s,k)
-         Hp_face = compute_Hp_face(s, k, ierr)
-         if (ierr /= 0) return
+         Hp_face = wrap_Hp_00(s, k)
          Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
             (w_m1*etrb_m1 - w_00*etrb_00)/s% dm_bar(k)         
          ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
@@ -860,10 +875,10 @@
       subroutine reset_etrb_using_L(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, i_etrb, nz
+         integer :: k, i_etrb, i_Hp, nz
          real(dp) :: Lc_val, w_00
          type(auto_diff_real_star_order1) :: &
-            Lc_w_face_factor, L, Lr, Lc, Lt
+            Lc_w_face_factor, L, Lr, Lc, Lt, Hp_face
          real(dp), allocatable :: w_face(:)
          logical, parameter :: dbg = .false.
          include 'formats'
@@ -872,7 +887,14 @@
          nz = s% nz
          allocate(w_face(nz))
          i_etrb = s% i_etrb
+         i_Hp = s% i_Hp
          w_face(1) = 0d0
+         do k=1, nz
+            Hp_face = compute_Hp_face(s, k, ierr)
+            if (ierr /= 0) return
+            s% xh(i_Hp,k) = Hp_face%val
+            s% Hp_face(k) = Hp_face%val
+         end do
          do k=2, nz
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'

@@ -33,8 +33,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
       envelope_mass_limit = 1d-2 ! Msun
 
       use_dedt_form_of_energy_eqn = .true.

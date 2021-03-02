@@ -40,6 +40,7 @@
       real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
       real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
       real(dp), pointer :: etrb(:) ! specific turbulent energy.  only used when TDC_flag is true
+      real(dp), pointer :: Hp_face(:) ! pressure scale height.  only used for TDC or RSP
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -465,7 +466,7 @@
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
             Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
-            Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
+            d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
             Y_face, d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
                d_Y_face_dlndm1, d_Y_face_dlnTm1, &

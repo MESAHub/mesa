@@ -62,7 +62,7 @@
          use hydro_momentum, only: do1_momentum_eqn, do1_radius_eqn
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
-         use hydro_tdc, only: do1_turbulent_energy_eqn, do1_tdc_L_eqn
+         use hydro_tdc, only: do1_turbulent_energy_eqn, do1_tdc_L_eqn, do1_tdc_Hp_eqn
          use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
@@ -253,6 +253,12 @@
                if (op_err /= 0) then
                   if (s% report_ierr) write(*,2) 'ierr in do1_turbulent_energy_eqn', k
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_turbulent_energy_eqn'
+                  ierr = op_err
+               end if
+               call do1_tdc_Hp_eqn(s, k, skip_partials, nvar, op_err)
+               if (op_err /= 0) then
+                  if (s% report_ierr) write(*,2) 'ierr in do1_tdc_Hp_eqn', k
+                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_tdc_Hp_eqn'
                   ierr = op_err
                end if
             end if

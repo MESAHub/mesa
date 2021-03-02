@@ -36,8 +36,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
 ! wind
       cool_wind_full_on_T = 0.8d4
       hot_wind_full_on_T = 1.2d4
