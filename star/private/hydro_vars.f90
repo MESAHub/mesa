@@ -310,11 +310,13 @@
                      do k=1,nz
                         s% lnd(k) = s% xh(i_lnd,k)
                         s% rho(k) = exp(s% lnd(k))
+                        s% dxh_lnd(k) = 0d0
                      end do
                   else
                      do k=1,nz
                         s% rho(k) = s% xh(i_lnd,k)
                         s% lnd(k) = log(s% rho(k))
+                        s% dxh_lnd(k) = 0d0
                      end do
                   end if
                else if (j == i_lnT) then
@@ -322,11 +324,13 @@
                      do k=1,nz
                         s% lnT(k) = s% xh(i_lnT,k)
                         s% T(k) = exp(s% lnT(k))
+                        s% dxh_lnT(k) = 0d0
                      end do
                   else
                      do k=1,nz
                         s% T(k) = s% xh(i_lnT,k)
                         s% lnT(k) = log(s% T(k))
+                        s% dxh_lnT(k) = 0d0
                      end do
                   end if
                else if (j == i_lnR) then
@@ -334,17 +338,18 @@
                      do k=1,nz
                         s% lnR(k) = s% xh(i_lnR,k)
                         s% r(k) = exp(s% lnR(k))
+                        s% dxh_lnR(k) = 0d0
                      end do
                   else
                      do k=1,nz
                         s% r(k) = s% xh(i_lnR,k)
                         s% lnR(k) = log(s% r(k))
+                        s% dxh_lnR(k) = 0d0
                      end do
                   end if
                else if (j == i_etrb) then
                   do k=1,nz
                      s% etrb(k) = max(s% xh(i_etrb, k), 0d0)
-                     s% dxh_etrb(k) = 0d0
                      s% w(k) = sqrt(s% etrb(k))
                   end do
                else if (j == i_lum) then
@@ -401,7 +406,9 @@
 
             if (dt > 0d0) then
                dt_inv = 1/dt
+               s% dVARdot_dVAR = dt_inv
             else
+               s% dVARdot_dVAR = dt_inv
                dt_inv = 0
             end if
 

@@ -616,14 +616,18 @@
             call do1(s% etrb_start, c% etrb_start)
             if (failed('etrb_start')) exit
             
+            call do1(s% dxh_lnR, c% dxh_lnR)
+            if (failed('dxh_lnR')) exit
+            call do1(s% dxh_lnd, c% dxh_lnd)
+            if (failed('dxh_lnd')) exit
+            call do1(s% dxh_lnT, c% dxh_lnT)
+            if (failed('dxh_lnT')) exit
             call do1(s% dxh_v, c% dxh_v)
             if (failed('dxh_v')) exit
             call do1(s% dxh_u, c% dxh_u)
             if (failed('dxh_u')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
-            call do1(s% dxh_etrb, c% dxh_etrb)
-            if (failed('dxh_etrb')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
             if (failed('dxh_ln_cvpv0')) exit
 

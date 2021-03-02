@@ -36,15 +36,15 @@
       !history_interval = 1
       !terminal_interval = 100
 
-      !photo_interval = 100
+      photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 50
+      terminal_interval = 10
 
 ! FOR DEBUGGING
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0

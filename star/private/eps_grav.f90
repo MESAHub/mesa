@@ -208,8 +208,16 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          real(dp) :: dlnd_dt, dlnT_dt
-         dlnd_dt = (s% lnd(k) - s% lnd_start(k))/s% dt
-         dlnT_dt = (s% lnT(k) - s% lnT_start(k))/s% dt
+         if (s% solver_use_lnd) then
+            dlnd_dt = s% dxh_lnd(k)/s% dt
+         else
+            dlnd_dt = (s% lnd(k) - s% lnd_start(k))/s% dt
+         end if
+         if (s% solver_use_lnT) then
+            dlnT_dt = s% dxh_lnT(k)/s% dt
+         else
+            dlnT_dt = (s% lnT(k) - s% lnT_start(k))/s% dt
+         end if
          call do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
       end subroutine do_eps_grav_with_lnd_Lagrangian
 
@@ -591,7 +599,7 @@
 
          real(dp) :: Pgas_with_DT_start
 
-         real(dp) :: theta
+         real(dp) :: theta, dxh_lnd
 
          include 'formats'
          ierr = 0
@@ -614,9 +622,13 @@
          ! we only have lnE and lnP derivs, so use
          ! eps_grav = -de/dt + (P/rho) * dlnd/dt
          do j=1, s% species
+            if (s% solver_use_lnd) then
+               dxh_lnd = s% dxh_lnd(k)
+            else
+               dxh_lnd = s% lnd(k) - s% lnd_start(k)
+            end if
             s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k)/s% dt + &
-               (s% P(k) / s% Rho(k)) * s% dlnP_dxa_for_partials(j,k) * &
-               (s% lnd(k) - s% lnd_start(k))/s% dt
+               (s% P(k) / s% Rho(k)) * s% dlnP_dxa_for_partials(j,k) *  dxh_lnd/s% dt
          end do
 
          e = s% energy(k)

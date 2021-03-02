@@ -597,10 +597,12 @@
         
       ! changes in values for cells during solver iterations 
       
+         real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
+         real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
+         real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
          real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
          real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
-         real(dp), pointer :: dxh_etrb(:) ! etrb(k) = dxh_etrb(k) + etrb_start(k); dxh_etrb from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
@@ -1274,6 +1276,7 @@
          
          real(dp) :: save1, save2, save3, save4, save5, save6, save7
          
+         real(dp) :: dVARdot_dVAR
          real(dp) :: surf_accel_grav_ratio
          real(dp) :: prev_create_atm_R0_div_R
          real(dp) :: dt_next_unclipped

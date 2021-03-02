@@ -341,7 +341,7 @@
    pgstar_right_yaxis_label_disp = 4.4
    
    pgstar_history_line_style = 4
-   pgstar_profile_line_style = 2
+   pgstar_profile_line_style = 1
       ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
 
    Grid2_win_flag = .true.
@@ -499,11 +499,11 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = -101D0
+   Profile_Panels1_xmin = 20 ! -101D0
+   Profile_Panels1_xmax = 100 ! -101D0
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
-   Profile_Panels1_num_panels = 7
+   Profile_Panels1_num_panels = 8
            
    Profile_Panels1_yaxis_name(1) = 'vel_km_per_s'         
    Profile_Panels1_other_yaxis_name(1) = 'v_alt'
@@ -529,10 +529,33 @@
    Profile_Panels1_other_yaxis_name(6) = 'logT_alt' 
    Profile_Panels1_same_yaxis_range(6) = .true.
             
-            
    Profile_Panels1_yaxis_name(7) = 'logRho' 
    Profile_Panels1_other_yaxis_name(7) = 'logRho_alt' 
    Profile_Panels1_same_yaxis_range(7) = .true.
+
+
+   ! DEBUGGING
+   Profile_Panels1_yaxis_name(4) = 'my_xtra1'
+   Profile_Panels1_other_yaxis_name(4) = 'my_xtra1_alt' 
+   Profile_Panels1_same_yaxis_range(4) = .true.
+            
+   Profile_Panels1_yaxis_name(5) = 'my_xtra2' 
+   Profile_Panels1_other_yaxis_name(5) = 'my_xtra2_alt' 
+   Profile_Panels1_same_yaxis_range(5) = .true.
+            
+   Profile_Panels1_yaxis_name(6) = 'my_xtra3'
+   Profile_Panels1_other_yaxis_name(6) = 'my_xtra3_alt' 
+   Profile_Panels1_same_yaxis_range(6) = .true.
+            
+   Profile_Panels1_yaxis_name(7) = 'my_xtra4' 
+   Profile_Panels1_other_yaxis_name(7) = 'my_xtra4_alt' 
+   Profile_Panels1_same_yaxis_range(7) = .true.
+            
+   Profile_Panels1_yaxis_name(8) = 'my_xtra5' 
+   Profile_Panels1_other_yaxis_name(8) = 'my_xtra5_alt' 
+   Profile_Panels1_same_yaxis_range(8) = .true.
+
+
    
 
    Profile_Panels1_file_flag = .false.

@@ -392,7 +392,7 @@
             ierr = 0
             d_turbulent_energy_dt_ad = 0d0
             if (s% TDC_flag) then
-               d_turbulent_energy_dt_ad%val = s% dxh_etrb(k)/dt 
+               d_turbulent_energy_dt_ad%val = (s% etrb(k) - s% etrb_start(k))/dt 
                d_turbulent_energy_dt_ad%d1Array(i_etrb_00) = 1d0/dt
             end if
             s% detrbdt(k) = d_turbulent_energy_dt_ad%val
