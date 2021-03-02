@@ -1207,14 +1207,44 @@
          end if
       end function wrap_u_p1
 
+      function wrap_Hp_m1(s, k) result(Hp_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_m1
+         integer, intent(in) :: k
+         Hp_m1 = 0d0 
+         if (k > 1) then
+            Hp_m1 % val = s% Hp_face(k-1)
+            Hp_m1 % d1Array(i_Hp_m1) = 1d0
+         end if            
+      end function wrap_Hp_m1
+
+      function wrap_Hp_00(s, k) result(Hp_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_00
+         integer, intent(in) :: k
+         Hp_00 = 0d0 
+         Hp_00 % val = s% Hp_face(k)
+         Hp_00 % d1Array(i_Hp_00) = 1d0
+      end function wrap_Hp_00
+
+      function wrap_Hp_p1(s, k) result(Hp_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: Hp_p1
+         integer, intent(in) :: k
+         Hp_p1 = 0d0 
+         if (k < s%nz) then
+            Hp_p1 % val = s% Hp_face(k+1)
+            Hp_p1 % d1Array(i_Hp_p1) = 1d0
+         end if
+      end function wrap_Hp_p1
+
 
       function wrap_xtra1_m1(s, k) result(xtra1_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: xtra1_m1
          integer, intent(in) :: k
          xtra1_m1 = 0d0 
-         if (k > 1) then
-            xtra1_m1 % val = 0d0 ! s%w(k-1)
+         if (k > 1) then ! s%w(k-1)
             xtra1_m1 % d1Array(i_xtra1_m1) = 1d0
          end if            
       end function wrap_xtra1_m1
@@ -1224,7 +1254,7 @@
          type(auto_diff_real_star_order1) :: xtra1_00
          integer, intent(in) :: k
          xtra1_00 = 0d0 
-         xtra1_00 % val = 0d0 ! s%w(k)
+         xtra1_00 % val = 0d0
          xtra1_00 % d1Array(i_xtra1_00) = 1d0
       end function wrap_xtra1_00
 
@@ -1234,7 +1264,7 @@
          integer, intent(in) :: k
          xtra1_p1 = 0d0 
          if (k < s%nz) then
-            xtra1_p1 % val = 0d0 ! s%w(k+1)
+            xtra1_p1 % val = 0d0 
             xtra1_p1 % d1Array(i_xtra1_p1) = 1d0
          end if
       end function wrap_xtra1_p1
@@ -1246,7 +1276,7 @@
          integer, intent(in) :: k
          xtra2_m1 = 0d0 
          if (k > 1) then
-            xtra2_m1 % val = 0d0 ! s%w(k-1)
+            xtra2_m1 % val = 0d0
             xtra2_m1 % d1Array(i_xtra2_m1) = 1d0
          end if            
       end function wrap_xtra2_m1
@@ -1256,7 +1286,7 @@
          type(auto_diff_real_star_order1) :: xtra2_00
          integer, intent(in) :: k
          xtra2_00 = 0d0 
-         xtra2_00 % val = 0d0 ! s%w(k)
+         xtra2_00 % val = 0d0 
          xtra2_00 % d1Array(i_xtra2_00) = 1d0
       end function wrap_xtra2_00
 
@@ -1266,41 +1296,10 @@
          integer, intent(in) :: k
          xtra2_p1 = 0d0 
          if (k < s%nz) then
-            xtra2_p1 % val = 0d0 ! s%w(k+1)
+            xtra2_p1 % val = 0d0 
             xtra2_p1 % d1Array(i_xtra2_p1) = 1d0
          end if
       end function wrap_xtra2_p1
-
-      function wrap_Hp_m1(s, k) result(Hp_m1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_m1
-         integer, intent(in) :: k
-         Hp_m1 = 0d0 
-         if (k > 1) then
-            Hp_m1 % val = 0d0 ! s%w(k-1)
-            Hp_m1 % d1Array(i_Hp_m1) = 1d0
-         end if            
-      end function wrap_Hp_m1
-
-      function wrap_Hp_00(s, k) result(Hp_00)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_00
-         integer, intent(in) :: k
-         Hp_00 = 0d0 
-         Hp_00 % val = 0d0 ! s%w(k)
-         Hp_00 % d1Array(i_Hp_00) = 1d0
-      end function wrap_Hp_00
-
-      function wrap_Hp_p1(s, k) result(Hp_p1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_p1
-         integer, intent(in) :: k
-         Hp_p1 = 0d0 
-         if (k < s%nz) then
-            Hp_p1 % val = 0d0 ! s%w(k+1)
-            Hp_p1 % d1Array(i_Hp_p1) = 1d0
-         end if
-      end function wrap_Hp_p1
 
 
 end module auto_diff_support
