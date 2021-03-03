@@ -30,8 +30,8 @@
    initial_z = 0.007d0
    initial_mass = 4.165d0
 
-   max_timestep = 581.09 ! seconds
-   max_age_in_days = 44.531
+   !max_timestep = 581.09 ! seconds
+   !max_age_in_days = 44.531
    
    RSP_max_dt = 500 ! for debugging
    max_timestep = 500 ! for debugging
