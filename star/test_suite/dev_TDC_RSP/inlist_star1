@@ -35,10 +35,10 @@
       !history_interval = 1
       terminal_interval = 100
 
-      !photo_interval = 100
+      photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 10
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
@@ -111,8 +111,8 @@
 &pgstar
 
    !pause = .true.
-   !pause_interval = 1
-   pgstar_interval = 10
+   !pause_interval = 100
+   !pgstar_interval = 1
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png1'

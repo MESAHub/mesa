@@ -72,7 +72,8 @@
       integer, parameter :: p_log_L_div_Ledd = p_log_Ledd + 1
       integer, parameter :: p_lum_div_Ledd = p_log_L_div_Ledd + 1
       integer, parameter :: p_signed_log_power = p_lum_div_Ledd + 1
-      integer, parameter :: p_vel_km_per_s = p_signed_log_power + 1
+      integer, parameter :: p_v_kms = p_signed_log_power + 1
+      integer, parameter :: p_vel_km_per_s = p_v_kms + 1
       integer, parameter :: p_log_abs_v = p_vel_km_per_s + 1
       integer, parameter :: p_superad_reduction_factor = p_log_abs_v + 1
       integer, parameter :: p_gradT_excess_effect = p_superad_reduction_factor + 1
@@ -789,6 +790,7 @@
 
          profile_column_name(p_v) = 'v'
          profile_column_name(p_velocity) = 'velocity'
+         profile_column_name(p_v_kms) = 'v_kms'
          profile_column_name(p_vel_km_per_s) = 'vel_km_per_s'
          profile_column_name(p_radius_km) = 'radius_km'
          profile_column_name(p_radius_cm) = 'radius_cm'

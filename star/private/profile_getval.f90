@@ -460,6 +460,12 @@
                else if (s% v_flag) then
                   val = s% v(k)
                end if
+            case (p_v_kms)
+               if (s% u_flag) then
+                  val = s% u(k)*1d-5
+               else if (s% v_flag) then
+                  val = s% v(k)*1d-5
+               end if
             case (p_vel_km_per_s)
                if (s% u_flag) then
                   val = s% u(k)*1d-5

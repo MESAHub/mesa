@@ -134,19 +134,21 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% TDC_flag) then
-            if (id == 1) then
-               id_other = 2
-            else if (id == 2) then
-               id_other = 1
-            else
-               ierr = -1
-               return
-            end if
-            call star_ptr(id_other, s_other, ierr)
-            if (ierr /= 0) return
-            if (s_other% dt > 0d0) s% dt_next = s_other% dt
-         end if
+         !if (s% TDC_flag) then
+         !   if (id == 1) then
+         !      id_other = 2
+         !   else if (id == 2) then
+         !      id_other = 1
+         !   else
+         !      ierr = -1
+         !      return
+         !   end if
+         !   call star_ptr(id_other, s_other, ierr)
+         !   if (ierr /= 0) return
+         !   if (s_other% dt > 0d0) s% dt_next = s_other% dt
+         !end if
+         s% dt_next = s% max_timestep
+         s% force_timestep_min = s% max_timestep
          extras_finish_step = keep_going
          call report(s)
          if (s% x_integer_ctrl(1) <= 0) return
@@ -330,16 +332,16 @@
          names(8) = 'logRho_alt'
          names(9) = 'logL_alt'
 
-         names(10) = 'my_Lr_div_L'
-         names(11) = 'my_Lr_div_L_alt'
-         names(12) = 'my_SOURCE'
-         names(13) = 'my_SOURCE_alt'
-         names(14) = 'my_DAMP'
-         names(15) = 'my_DAMP_alt'
-         names(16) = 'my_Eq'
-         names(17) = 'my_Eq_alt'
-         names(18) = 'my_Uq'
-         names(19) = 'my_Uq_alt'
+         names(10) = 'xLr_div_L'
+         names(11) = 'Lr_div_L_alt'
+         names(12) = 'xSOURCE'
+         names(13) = 'SOURCE_alt'
+         names(14) = 'xDAMP'
+         names(15) = 'DAMP_alt'
+         names(16) = 'xEq'
+         names(17) = 'Eq_alt'
+         names(18) = 'xUq'
+         names(19) = 'Uq_alt'
 
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0

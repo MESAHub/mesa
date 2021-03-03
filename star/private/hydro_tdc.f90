@@ -149,11 +149,12 @@
                end if
             end if
          else ! surface
-            Hp_face = pow2(r_00)*P_00/(d_00*s% cgrav(k)*s% m(k))
+            P_div_rho = P_00/d_00
+            Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
          end if
       end function compute_Hp_face
       
-
+      
       subroutine do1_tdc_Hp_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: save_eqn_residual_info, save_eqn_dxa_partials
          type (star_info), pointer :: s
@@ -197,6 +198,15 @@
          end if      
       end subroutine do1_tdc_Hp_eqn
       
+      
+      logical function non_turbulent_cell(s,k) 
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         non_turbulent_cell = (s% TDC_alfa == 0d0 .or. & ! TDC_alfa == 0d0 means purely radiative
+             k == 1 .or. k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent)
+      end function non_turbulent_cell
+      
 
       subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
@@ -218,9 +228,7 @@
          ierr = 0
          call init
          
-         if (s% TDC_alfa == 0d0 .or. & ! TDC_alfa == 0d0 means purely radiative
-             k == 1 .or. k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+         if (non_turbulent_cell(s,k)) then
              
             resid_ad = wrap_etrb_00(s,k) ! make etrb = 0
             
@@ -348,7 +356,7 @@
       
       end subroutine do1_turbulent_energy_eqn
       
-      
+
       function wrap_Hp_cell(s, k) result(Hp_cell) ! cm
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -376,8 +384,9 @@
          real(dp) :: dm_bar
          include 'formats'
          ierr = 0
-         if (k == 1) then
+         if (k == 1 .or. s% TDC_alfa == 0d0) then
             Y_face = 0d0
+            s% Y_face(k) = 0d0
             return
          end if
          dm_bar = s% dm_bar(k)
@@ -433,8 +442,9 @@
          real(dp) :: ALFAS, ALFA
          include 'formats'
          ierr = 0
-         if (k == 1) then
+         if (k == 1 .or. k == s% nz .or. s% TDC_alfa == 0d0) then
             PII_face = 0d0
+            s% PII(k) = 0d0
             return
          end if
          Y_face = compute_Y_face(s, k, ierr)
@@ -472,14 +482,13 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             w_rho2, r6_face, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
-         real(dp) :: f, ALFAM, ALFA
+         real(dp) :: f, ALFAM_ALFA
          include 'formats'
          ierr = 0
-         ALFAM = s% TDC_alfam
-         ALFA = s% TDC_alfa
-         if (k == 1 .or. k == s% nz .or. s% w(k) < min_w .or. &
-             ALFAM == 0d0 .or. ALFA == 0d0) then
+         ALFAM_ALFA = s% TDC_alfam*s% TDC_alfa
+         if (non_turbulent_cell(s,k) .or. ALFAM_ALFA == 0d0 .or. s% w(k) < min_w) then
             Chi_cell = 0d0
+            s% Chi(k) = 0d0
             return
          end if
          Hp_cell = wrap_Hp_00(s, k)
@@ -487,7 +496,7 @@
          if (ierr /= 0) return
          w_00 = wrap_w_00(s,k)
          d_00 = wrap_d_00(s,k)
-         f = (16d0/3d0)*pi*ALFA*ALFAM/s% dm(k)  
+         f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
          w_rho2 = w_00*pow2(d_00)
          r_00 = wrap_opt_time_center_r_00(s,k)
          r_p1 = wrap_opt_time_center_r_p1(s,k)
@@ -508,15 +517,18 @@
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
-         if (k == 1 .or. k == s% nz .or. s% TDC_alfa == 0d0) then
+         if (non_turbulent_cell(s,k)) then
             Eq_cell = 0d0
+            s% Eq(k) = 9d9
             return
          end if
          Chi_cell = compute_Chi_cell(s,k,ierr)
          if (ierr /= 0) return
          d_v_div_r = compute_d_v_div_r(s, k, ierr)
          if (ierr /= 0) return
-         Eq_cell = Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
+         Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
+         !s% xtra4_array(k) = 4d0*pi*d_v_div_r%val/s% dm(k)
+         !s% xtra5_array(k) = Chi_cell%val
          s% Eq(k) = Eq_cell%val
       end function compute_Eq_cell
 
@@ -554,7 +566,7 @@
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell
          include 'formats'
          ierr = 0
-         if (s% TDC_alfa == 0d0 .or. k == 1 .or. k == s% nz) then
+         if (non_turbulent_cell(s,k)) then
             Source = 0d0
             s% SOURCE(k) = Source%val
             return
@@ -615,19 +627,20 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: D
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Hp_cell, etrb_00, w_00, dw3
+         type(auto_diff_real_star_order1) :: Hp_cell, w_00, dw3
          include 'formats'
          real(dp) :: alpha
          ierr = 0
          alpha = s% TDC_alfa
-         if (alpha == 0d0 .or. s% w(k) < min_w) then
+         if (alpha == 0d0) then
             D = 0d0
             s% DAMP(k) = 0d0
             return
          end if
          Hp_cell = wrap_Hp_cell(s, k)
-         etrb_00 = wrap_etrb_00(s,k)
          w_00 = wrap_w_00(s,k)
+         ! partials bad if w -> 0 for this, so must test to avoid that case
+         if (w_00%val < min_w) w_00 = 0
          dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
          D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
@@ -647,7 +660,7 @@
          ierr = 0
          alpha = s% TDC_alfa
          gammar = s% TDC_alfar*x_GAMMAR
-         if (gammar == 0d0 .or. s% w(k) < min_w) then
+         if (gammar == 0d0) then
             Dr = 0d0
             s% DAMPR(k) = 0d0
             return
@@ -675,6 +688,13 @@
          type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Source, D, Dr
+         if (non_turbulent_cell(s,k)) then
+            s% SOURCE(k) = 0d0
+            s% DAMP(k) = 0d0
+            s% DAMPR(k) = 0d0
+            s% COUPL(k) = 0d0
+            return
+         end if
          Source = compute_Source(s, k, ierr)
          if (ierr /= 0) return
          D = compute_D(s, k, ierr)

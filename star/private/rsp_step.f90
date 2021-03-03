@@ -1188,7 +1188,7 @@
 
          else ! surface
          
-            POM = (s% r(k)**2)/(2.d0*s% cgrav(k)*s% M(k))
+            POM = (s% r(k)**2)/(s% cgrav(k)*s% M(k))
             s% Hp_face(k) = POM*(s% Pgas(k) + s% Prad(k))*s% Vol(k)
             
             dHp_dVol_00(I) = POM*( &
@@ -1729,6 +1729,8 @@
             POM2 = P4/s% dm(k)*(THETAU*s% Chi(k) + THETAU1*s% Chi_start(k))
          
             s% Eq(k) = POM*(THETAU*s% Chi(k) + THETAU1*s% Chi_start(k))
+            !s% xtra4_array(k) = POM
+            !s% xtra5_array(k) = (THETAU*s% Chi(k) + THETAU1*s% Chi_start(k))
       
             POM = POM*THETAU
 

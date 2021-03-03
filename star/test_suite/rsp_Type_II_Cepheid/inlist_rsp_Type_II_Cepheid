@@ -52,7 +52,7 @@
 &controls
 
    ! limit max_model_number as part of test_suite
-   max_model_number = 700 ! 18000
+   max_model_number = 18000
 
 ! RSP controls
 
