@@ -53,7 +53,7 @@
       photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
 
@@ -127,15 +127,15 @@
 &pgstar
 
    !pause = .true.
-   pause_interval = 200
-   pgstar_interval = 2 ! 20
+   !pause_interval = 100
+   pgstar_interval = 20
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
    Grid2_file_prefix = 'TDC'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
    
-   Profile_Panels1_xmin = 35 ! -101D0
-   Profile_Panels1_xmax = 50 ! -101D0
+   Profile_Panels1_xmin = -101D0
+   Profile_Panels1_xmax = 140 ! -101D0
 
 / ! end of pgstar namelist

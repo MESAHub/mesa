@@ -131,22 +131,10 @@
          real(dp) :: target_period, rel_run_E_err
          type (star_info), pointer :: s, s_other
          integer :: id_other
+         include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         !if (s% TDC_flag) then
-         !   if (id == 1) then
-         !      id_other = 2
-         !   else if (id == 2) then
-         !      id_other = 1
-         !   else
-         !      ierr = -1
-         !      return
-         !   end if
-         !   call star_ptr(id_other, s_other, ierr)
-         !   if (ierr /= 0) return
-         !   if (s_other% dt > 0d0) s% dt_next = s_other% dt
-         !end if
          s% dt_next = s% max_timestep
          s% force_timestep_min = s% max_timestep
          extras_finish_step = keep_going
@@ -342,6 +330,19 @@
          names(17) = 'Eq_alt'
          names(18) = 'xUq'
          names(19) = 'Uq_alt'
+         
+         if (.false.) then ! debugging
+            names(10) = 'diff_rho' ! 'xtr1'
+            names(11) = 'xtr1_alt'
+            names(12) = 'diff_T' ! 'xtr2'
+            names(13) = 'xtr2_alt'
+            names(14) = 'diff_w' ! 'xtr3'
+            names(15) = 'xtr3_alt'
+            names(16) = 'diff_v' ! 'xtr4'
+            names(17) = 'xtr4_alt'
+            names(18) = 'diff_r' ! 'xtr5'
+            names(19) = 'xtr5_alt'
+         end if
 
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0
@@ -365,23 +366,71 @@
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
                
-               vals(k,10) = s% Lr(k)/s% L(k) ! s% xtra1_array(k)
-               vals(k,11) = s_other% Lr(k)/s_other% L(k) ! s_other% xtra1_array(k)
+               vals(k,10) = s% Lr(k)/s% L(k)
+               vals(k,11) = s_other% Lr(k)/s_other% L(k)
 
-               vals(k,12) = s% SOURCE(k) ! s% Eq(k) ! s% xtra2_array(k)
-               vals(k,13) = s_other% SOURCE(k) ! s_other% Eq(k) ! s_other% xtra2_array(k)
+               vals(k,12) = s% SOURCE(k)
+               vals(k,13) = s_other% SOURCE(k)
 
-               vals(k,14) = s% DAMP(k) ! s% Uq(k) ! s% xtra3_array(k)
-               vals(k,15) = s_other% DAMP(k) ! s_other% Uq(k) ! s_other% xtra3_array(k)
+               vals(k,14) = s% DAMP(k)
+               vals(k,15) = s_other% DAMP(k)
 
-               vals(k,16) = s% Eq(k) ! xtra4_array
-               vals(k,17) = s_other% Eq(k) ! 
+               vals(k,16) = s% Eq(k)
+               vals(k,17) = s_other% Eq(k)
 
-               vals(k,18) = s% Uq(k) ! xtra5_array
-               vals(k,19) = s_other% Uq(k) !
+               vals(k,18) = s% Uq(k)
+               vals(k,19) = s_other% Uq(k)
+               
+               if (.false.) then ! debugging values
+                  vals(k,10) = s% xtra1_array(k)
+                  vals(k,11) = s_other% xtra1_array(k)
+                  vals(k,12) = s% xtra2_array(k)
+                  vals(k,13) = s_other% xtra2_array(k)
+                  vals(k,14) = s% xtra3_array(k)
+                  vals(k,15) = s_other% xtra3_array(k)
+                  vals(k,16) = s% xtra4_array(k)
+                  vals(k,17) = s_other% xtra4_array(k)
+                  vals(k,18) = s% xtra5_array(k)
+                  vals(k,19) = s_other% xtra5_array(k)
+               end if
+               
+               if (.false.) then ! debugging ratios
+                  vals(k,10) = fix_if_bad(err(s% xtra1_array(k),s_other% xtra1_array(k)))
+                  vals(k,11) = 0
+                  vals(k,12) = fix_if_bad(err(s% xtra2_array(k),s_other% xtra2_array(k)))
+                  vals(k,13) = 0
+                  vals(k,14) = fix_if_bad(err(s% xtra3_array(k),s_other% xtra3_array(k)))
+                  vals(k,15) = 0
+                  vals(k,16) = fix_if_bad(err(s% xtra4_array(k),s_other% xtra4_array(k)))
+                  vals(k,17) = 0
+                  vals(k,18) = fix_if_bad(err(s% xtra5_array(k),s_other% xtra5_array(k)))
+                  vals(k,19) = 0
+               end if
                
             end do
          end if
+         
+         contains
+         
+            real(dp) function err(v1,v2)
+               real(dp), intent(in) :: v1,v2
+               real(dp) :: absdiff, tol
+               real(dp), parameter :: rtol = 1d-6, atol = 1d0
+               absdiff = abs(v1 - v2)
+               tol = abs(v2)*rtol + atol
+               err = max(absdiff/tol - 1d0, 0d0) ! positive means err > tol
+            end function err
+         
+            real(dp) function fix_if_bad(v)
+               use utils_lib, only: is_bad
+               real(dp), intent(in) :: v
+               if (is_bad(v)) then
+                  fix_if_bad = 100
+               else
+                  fix_if_bad = v
+               end if
+            end function fix_if_bad
+            
       end subroutine data_for_extra_profile_columns
 
 !   Hp_face

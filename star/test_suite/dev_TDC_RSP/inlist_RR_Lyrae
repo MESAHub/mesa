@@ -4,6 +4,10 @@
 
 &star_job
    saved_model_name = 'RR_Lyrae.mod'
+   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 90 ! for debugging
+   
 / ! end of star_job namelist
 
 &eos
@@ -23,6 +27,10 @@
 
    max_timestep = 100.18 ! seconds
    max_age_in_days = 7.8764
+   
+   RSP_max_dt = 90 ! for debugging
+   max_timestep = 90 ! for debugging
+   force_timestep_min = 90 ! for debugging
    
 
 ! TDC

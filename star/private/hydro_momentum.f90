@@ -114,7 +114,7 @@
          type(auto_diff_real_star_order1) :: resid1_ad, resid_ad, &
             other_ad, dm_div_A_ad, grav_ad, area_ad, dXP_ad, d_mlt_Pturb_ad, &
             iXPavg_ad, other_dm_div_A_ad, grav_dm_div_A_ad, &
-            RTI_terms_ad, RTI_terms_dm_div_A_ad, Uq_ad
+            RTI_terms_ad, RTI_terms_dm_div_A_ad, accel_ad, Uq_ad
          type(accurate_auto_diff_real_star_order1) :: residual_sum_ad
 
          include 'formats'
@@ -153,12 +153,19 @@
          RTI_terms_dm_div_A_ad = RTI_terms_ad*dm_div_A_ad
          
          ! sum terms in residual_sum_ad using accurate_auto_diff_real_star_order1
-         residual_sum_ad = other_dm_div_A_ad + grav_dm_div_A_ad - dXP_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
+         residual_sum_ad = &
+            other_dm_div_A_ad + grav_dm_div_A_ad - dXP_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
          
          resid1_ad = residual_sum_ad ! convert back to auto_diff_real_star_order1
          resid_ad = resid1_ad*iXPavg_ad ! scaling
          residual = resid_ad%val
          s% equ(i_dv_dt, k) = residual      
+         
+         !s% xtra1_array(k) = accel_ad%val
+         !s% xtra2_array(k) = safe_log10(-dXP_ad%val/dm_div_A_ad%val)
+         !s% xtra3_array(k) = safe_log10(-grav_ad%val)
+         !s% xtra4_array(k) = Uq_ad%val
+         !s% xtra5_array(k) = s% Chi(k)
 
          if (is_bad(residual)) then
 !$omp critical (hydro_momentum_crit1)
@@ -210,7 +217,7 @@
             include 'formats'
             ierr = 0
             ! other = extra_grav - dv/dt
-            call expected_non_HSE_term(s, k, other_ad, other, Uq_ad, ierr)
+            call expected_non_HSE_term(s, k, other_ad, other, accel_ad, Uq_ad, ierr)
          end subroutine setup_non_HSE
 
          subroutine setup_dXP(ierr)
@@ -373,17 +380,18 @@
       
       
       ! other = s% extra_grav(k) - s% dv_dt(k)
-      subroutine expected_non_HSE_term(s, k, other_ad, other, Uq_ad, ierr)
+      subroutine expected_non_HSE_term( &
+            s, k, other_ad, other, accel_ad, Uq_ad, ierr)
          use hydro_tdc, only: compute_Uq_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: other_ad, Uq_ad
+         type(auto_diff_real_star_order1), intent(out) :: &
+            other_ad, accel_ad,Uq_ad
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: &
-            extra_ad, accel_ad, v_00
+         type(auto_diff_real_star_order1) :: extra_ad, v_00
          real(dp) :: accel, d_accel_dv, fraction_on, dlnR00, &
             dlnTm1, dlnT00, dlndm1, dlnd00
          logical :: test_partials, local_v_flag

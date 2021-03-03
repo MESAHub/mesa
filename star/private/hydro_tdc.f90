@@ -429,7 +429,7 @@
          
          Y_face = Y1*Y2 ! unitless
          s% Y_face(k) = Y_face%val
-         
+
       end function compute_Y_face
       
       
@@ -472,6 +472,13 @@
          r_p1 = wrap_opt_time_center_r_p1(s,k)
          v_p1 = wrap_opt_time_center_v_p1(s,k)
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
+         
+         !s% xtra1_array(k) = v_00%val
+         !s% xtra2_array(k) = r_00%val
+         !s% xtra3_array(k) = d_v_div_r%val
+         !s% xtra4_array(k) = 1
+         !s% xtra5_array(k) = 1
+
       end function compute_d_v_div_r
       
       
@@ -481,7 +488,7 @@
          type(auto_diff_real_star_order1) :: Chi_cell
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            w_rho2, r6_face, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
+            w_rho2, r6_cell, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
          real(dp) :: f, ALFAM_ALFA
          include 'formats'
          ierr = 0
@@ -491,7 +498,7 @@
             s% Chi(k) = 0d0
             return
          end if
-         Hp_cell = wrap_Hp_00(s, k)
+         Hp_cell = wrap_Hp_cell(s, k)
          d_v_div_r = compute_d_v_div_r(s, k, ierr)
          if (ierr /= 0) return
          w_00 = wrap_w_00(s,k)
@@ -500,12 +507,19 @@
          w_rho2 = w_00*pow2(d_00)
          r_00 = wrap_opt_time_center_r_00(s,k)
          r_p1 = wrap_opt_time_center_r_p1(s,k)
-         r6_face = 0.5d0*(pow6(r_00) + pow6(r_p1))
-         Chi_cell = f*w_rho2*r6_face*d_v_div_r*Hp_cell
+         r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
+         Chi_cell = f*w_rho2*r6_cell*d_v_div_r*Hp_cell
          ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
          !       = g cm^2 s^-2
          !       = erg
          s% Chi(k) = Chi_cell%val
+         
+         !s% xtra1_array(k) = f
+         !s% xtra2_array(k) = safe_log10(w_rho2%val)
+         !s% xtra3_array(k) = safe_log10(r6_cell%val)
+         !s% xtra4_array(k) = d_v_div_r%val
+         !s% xtra5_array(k) = Hp_cell%val
+
       end function compute_Chi_cell
 
       
@@ -519,7 +533,7 @@
          ierr = 0
          if (non_turbulent_cell(s,k)) then
             Eq_cell = 0d0
-            s% Eq(k) = 9d9
+            s% Eq(k) = 0d0
             return
          end if
          Chi_cell = compute_Chi_cell(s,k,ierr)

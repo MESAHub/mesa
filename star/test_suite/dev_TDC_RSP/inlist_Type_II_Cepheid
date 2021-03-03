@@ -9,6 +9,10 @@
 
 &star_job
    saved_model_name = 'Type_II_Cepheid.mod'
+   
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 100 ! for debugging
+
 / ! end of star_job namelist
 
 &eos
@@ -28,6 +32,10 @@
 
    max_timestep = 119.83 ! seconds
    max_age_in_days = 18.291
+   
+   RSP_max_dt = 100 ! for debugging
+   max_timestep = 100 ! for debugging
+   force_timestep_min = 100 ! for debugging
    
 
 ! TDC

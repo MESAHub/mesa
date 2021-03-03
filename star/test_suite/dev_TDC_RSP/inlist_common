@@ -514,26 +514,71 @@
    Profile_Panels1_other_yaxis_name(3) = 'Y_face_alt'
    Profile_Panels1_same_yaxis_range(3) = .true.
 
-   Profile_Panels1_yaxis_name(4) = 'Lr_div_L'
-   Profile_Panels1_other_yaxis_name(4) = 'Lr_div_L_alt' 
-   Profile_Panels1_same_yaxis_range(4) = .true.
-            
-   Profile_Panels1_yaxis_name(5) = 'SOURCE' 
-   Profile_Panels1_other_yaxis_name(5) = 'SOURCE_alt' 
-   Profile_Panels1_same_yaxis_range(5) = .true.
-            
-   Profile_Panels1_yaxis_name(6) = 'DAMP'
-   Profile_Panels1_other_yaxis_name(6) = 'DAMP_alt' 
-   Profile_Panels1_same_yaxis_range(6) = .true.
-            
-   Profile_Panels1_yaxis_name(7) = 'Eq' 
-   Profile_Panels1_other_yaxis_name(7) = 'Eq_alt' 
-   Profile_Panels1_same_yaxis_range(7) = .true.
-            
-   Profile_Panels1_yaxis_name(8) = 'Uq' 
-   Profile_Panels1_other_yaxis_name(8) = 'Uq_alt' 
-   Profile_Panels1_same_yaxis_range(8) = .true.
+! debugging output
 
+      Profile_Panels1_yaxis_name(4) = 'xtr1'
+      Profile_Panels1_other_yaxis_name(4) = 'xtr1_alt' 
+      Profile_Panels1_same_yaxis_range(4) = .true.
+            
+      Profile_Panels1_yaxis_name(5) = 'xtr2' 
+      Profile_Panels1_other_yaxis_name(5) = 'xtr2_alt' 
+      Profile_Panels1_same_yaxis_range(5) = .true.
+            
+      Profile_Panels1_yaxis_name(6) = 'xtr3'
+      Profile_Panels1_other_yaxis_name(6) = 'xtr3_alt' 
+      Profile_Panels1_same_yaxis_range(6) = .true.
+            
+      Profile_Panels1_yaxis_name(7) = 'xtr4' 
+      Profile_Panels1_other_yaxis_name(7) = 'xtr4_alt' 
+      Profile_Panels1_same_yaxis_range(7) = .true.
+            
+      Profile_Panels1_yaxis_name(8) = 'xtr5' 
+      Profile_Panels1_other_yaxis_name(8) = 'xtr5_alt' 
+      Profile_Panels1_same_yaxis_range(8) = .true.
+
+! rel error debugging output
+
+      Profile_Panels1_yaxis_name(4) = 'diff_rho'
+      Profile_Panels1_other_yaxis_name(4) = 'xtr1_alt' 
+      Profile_Panels1_same_yaxis_range(4) = .true.
+            
+      Profile_Panels1_yaxis_name(5) = 'diff_T' 
+      Profile_Panels1_other_yaxis_name(5) = 'xtr2_alt' 
+      Profile_Panels1_same_yaxis_range(5) = .true.
+            
+      Profile_Panels1_yaxis_name(6) = 'diff_w'
+      Profile_Panels1_other_yaxis_name(6) = 'xtr3_alt' 
+      Profile_Panels1_same_yaxis_range(6) = .true.
+            
+      Profile_Panels1_yaxis_name(7) = 'diff_v' 
+      Profile_Panels1_other_yaxis_name(7) = 'xtr4_alt' 
+      Profile_Panels1_same_yaxis_range(7) = .true.
+            
+      Profile_Panels1_yaxis_name(8) = 'diff_r' 
+      Profile_Panels1_other_yaxis_name(8) = 'xtr5_alt' 
+      Profile_Panels1_same_yaxis_range(8) = .true.
+
+! standard output
+
+      Profile_Panels1_yaxis_name(4) = 'Lr_div_L'
+      Profile_Panels1_other_yaxis_name(4) = 'Lr_div_L_alt' 
+      Profile_Panels1_same_yaxis_range(4) = .true.
+            
+      Profile_Panels1_yaxis_name(5) = 'SOURCE' 
+      Profile_Panels1_other_yaxis_name(5) = 'SOURCE_alt' 
+      Profile_Panels1_same_yaxis_range(5) = .true.
+            
+      Profile_Panels1_yaxis_name(6) = 'DAMP'
+      Profile_Panels1_other_yaxis_name(6) = 'DAMP_alt' 
+      Profile_Panels1_same_yaxis_range(6) = .true.
+            
+      Profile_Panels1_yaxis_name(7) = 'Eq' 
+      Profile_Panels1_other_yaxis_name(7) = 'Eq_alt' 
+      Profile_Panels1_same_yaxis_range(7) = .true.
+            
+      Profile_Panels1_yaxis_name(8) = 'Uq' 
+      Profile_Panels1_other_yaxis_name(8) = 'Uq_alt' 
+      Profile_Panels1_same_yaxis_range(8) = .true.
 
    
 
