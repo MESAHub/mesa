@@ -4,6 +4,8 @@
    load_saved_model = .true.
    change_initial_TDC_flag = .true.
    new_TDC_flag = .true.
+   save_model_when_terminate = .true.
+   save_model_filename = 'tdc_final.mod'
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
@@ -36,6 +38,8 @@
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0
    
+   alt_scale_height_flag = .false.
+   
 ! output
 
    photo_directory = 'photos2'
@@ -49,15 +53,15 @@
       photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
-      stop_for_bad_nums = .true.
+      !report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
+      !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
@@ -123,12 +127,15 @@
 &pgstar
 
    !pause = .true.
-   pause_interval = 200
+   !pause_interval = 200
    pgstar_interval = 2
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
    Grid2_file_prefix = 'TDC'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
+
+   Profile_Panels1_xmin = 20 ! -101D0
+   Profile_Panels1_xmax = 130 ! -101D0
 
 / ! end of pgstar namelist

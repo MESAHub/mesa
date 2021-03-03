@@ -36,8 +36,8 @@
       implicit none
 
       private
-      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, do1_tdc_Hp_eqn, &
-         compute_Eq_cell, compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
+      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, do1_tdc_Hp_eqn, compute_Eq_cell, &
+         compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L, reset_Hp
       
       real(dp), parameter :: &
          min_w = 1d-6, &
@@ -103,25 +103,41 @@
       end subroutine do1_tdc_L_eqn
       
       
-      function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
+      function compute_Hp_face(s, k, d_Hp_dxa00, d_Hp_dxam1, ierr) result(Hp_face) ! cm
+         ! no time_centering for Hp
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         real(dp), dimension(s% species), intent(out) :: d_Hp_dxa00, d_Hp_dxam1
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face
          type(auto_diff_real_star_order1) :: &
             r_00, P_00, d_00, P_m1, d_m1, P_div_rho, &
             d_face, P_face, alt_Hp_face, alfa
+         real(dp), dimension(s% species) :: &
+            d_P00_dxa00, d_Pm1_dxam1
+         integer :: j
          include 'formats'
          ierr = 0
+         
+         d_Hp_dxa00(:) = 0d0 ! not yet
+         d_Hp_dxam1(:) = 0d0 ! not yet
+         
          r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
-         P_00 = wrap_P_00(s, k)
+         P_00 = wrap_p_00(s, k)
+         !do j=1,s% species
+         !   d_P00_dxa00(j) = s% P(k)*s% dlnP_dxa_for_partials(j,k)
+         !end do            
          if (k > 1) then
             d_m1 = wrap_d_m1(s, k)
             P_m1 = wrap_P_m1(s, k)
+            !do j=1,s% species
+            !   d_Pm1_dxam1(j) = s% P(k-1)*s% dlnP_dxa_for_partials(j,k-1)
+            !end do
+
             P_div_rho = 0.5d0*(P_00/d_00 + P_m1/d_m1)
             Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
-            if (s% alt_scale_height_flag) then
+            if (.false. .and. s% alt_scale_height_flag) then
                ! consider sound speed*hydro time scale as an alternative scale height
                ! (this comes from Eggleton's code.)
                d_face = 0.5d0*(d_00 + d_m1)
@@ -139,13 +155,14 @@
       
 
       subroutine do1_tdc_Hp_eqn(s, k, skip_partials, nvar, ierr)
-         use star_utils, only: save_eqn_residual_info
+         use star_utils, only: save_eqn_residual_info, save_eqn_dxa_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          type(auto_diff_real_star_order1) :: Hp_expected, Hp_actual, resid
          real(dp) :: residual
+         real(dp), dimension(s% species) :: d_Hp_dxa00, d_Hp_dxam1, dxap1
          logical :: test_partials
          include 'formats'
 
@@ -153,7 +170,7 @@
          test_partials = .false.
 
          ierr = 0
-         Hp_expected = compute_Hp_face(s, k, ierr)
+         Hp_expected = compute_Hp_face(s, k, d_Hp_dxa00, d_Hp_dxam1, ierr)
          if (ierr /= 0) return        
          Hp_actual = wrap_Hp_00(s, k)  
          resid = (Hp_expected - Hp_actual)/s% Hp_start(k)    
@@ -166,6 +183,12 @@
          if (skip_partials) return
          call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_tdc_Hp_eqn', ierr)
          if (ierr /= 0) return
+         
+         !dxap1(:) = 0d0
+         !call save_eqn_dxa_partials(&
+         !   s, k, nvar, s% i_equ_Hp, s%species, &
+         !   d_Hp_dxam1, d_Hp_dxa00, dxap1, 'do1_tdc_Hp_eqn', ierr)
+         !if (ierr /= 0) return
 
          if (test_partials) then
             s% solver_test_partials_var = 0
@@ -605,10 +628,12 @@
          Hp_cell = wrap_Hp_cell(s, k)
          etrb_00 = wrap_etrb_00(s,k)
          w_00 = wrap_w_00(s,k)
-         dw3 = etrb_00*w_00 - pow3(s% TDC_w_min_for_damping)
+         dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
          D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          s% DAMP(k) = D%val
+         s% xtra4_array(k) = w_00%val
+         s% xtra5_array(k) = pow2(w_00%val)
       end function compute_D
 
 
@@ -893,13 +918,34 @@
       end subroutine set_etrb_start_vars
       
       
+      subroutine reset_Hp(s, ierr)
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr 
+         integer :: k
+         type(auto_diff_real_star_order1) :: Hp_face
+         real(dp), dimension(s% species) :: d_Hp_dxa00, d_Hp_dxam1
+         include 'formats'
+         ierr = 0
+         do k=1, s% nz
+            Hp_face = compute_Hp_face(s, k, d_Hp_dxa00, d_Hp_dxam1, ierr)
+            if (ierr /= 0) return
+            s% xh(s% i_Hp,k) = Hp_face%val
+            s% Hp_face(k) = Hp_face%val
+            if (s% Hp_face(k) <= 0d0 .or. is_bad(s% Hp_face(k))) then
+               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
+               stop 'compute_Hp_face failed in compute_L reset_wturb_using_L'
+            end if
+         end do
+      end subroutine reset_Hp
+      
+      
       subroutine reset_etrb_using_L(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, i_etrb, i_Hp, nz
+         integer :: k, i_etrb, nz
          real(dp) :: Lc_val, w_00
          type(auto_diff_real_star_order1) :: &
-            Lc_w_face_factor, L, Lr, Lc, Lt, Hp_face
+            Lc_w_face_factor, L, Lr, Lc, Lt
          real(dp), allocatable :: w_face(:)
          logical, parameter :: dbg = .false.
          include 'formats'
@@ -908,18 +954,7 @@
          nz = s% nz
          allocate(w_face(nz))
          i_etrb = s% i_etrb
-         i_Hp = s% i_Hp
          w_face(1) = 0d0
-         do k=1, nz
-            Hp_face = compute_Hp_face(s, k, ierr)
-            if (ierr /= 0) return
-            s% xh(i_Hp,k) = Hp_face%val
-            s% Hp_face(k) = Hp_face%val
-            if (s% Hp_face(k) <= 0d0 .or. is_bad(s% Hp_face(k))) then
-               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
-               stop 'compute_Hp_face failed in compute_L reset_wturb_using_L'
-            end if
-         end do
          do k=2, nz
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'
@@ -938,8 +973,9 @@
             else
                w_00 = max(w_face(k), 0d0)
             end if
-            s% xh(i_etrb,k) = w_00
             s% w(k) = w_00
+            s% etrb(k) = pow2(w_00)
+            s% xh(i_etrb,k) = s% etrb(k)
             call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new w(k)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
          end do

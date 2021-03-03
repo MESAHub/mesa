@@ -6,10 +6,7 @@
    show_log_description_at_start = .false.
    
    required_termination_code_string(1) = 'max_model_number' ! just for testing
-   
-   save_model_when_terminate = .true.
-   save_model_filename = 'final.mod'
-   
+      
    set_initial_age = .true.
    initial_age = 0
    
@@ -341,7 +338,7 @@
    pgstar_right_yaxis_label_disp = 4.4
    
    pgstar_history_line_style = 4
-   pgstar_profile_line_style = 1
+   pgstar_profile_line_style = 4
       ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
 
    Grid2_win_flag = .true.
@@ -499,8 +496,8 @@
    
    Profile_Panels1_xaxis_name = 'zone'
    Profile_Panels1_xaxis_reversed = .true.
-   Profile_Panels1_xmin = 20 ! -101D0
-   Profile_Panels1_xmax = 100 ! -101D0
+   Profile_Panels1_xmin = -101D0
+   Profile_Panels1_xmax = -101D0
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
    Profile_Panels1_num_panels = 8

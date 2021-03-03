@@ -3044,7 +3044,8 @@
          if (TDC_flag) then
             call insert1(s% i_etrb)
             call insert1(s% i_Hp)
-            s% need_to_reset_w = .true.
+            s% need_to_reset_etrb = .true.
+            s% need_to_reset_Hp = .true.
          end if
 
          call set_chem_names(s)

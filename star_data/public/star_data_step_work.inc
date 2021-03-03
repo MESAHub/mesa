@@ -1118,7 +1118,7 @@
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
             RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
+            need_to_reset_etrb, need_to_reset_Hp, using_velocity_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

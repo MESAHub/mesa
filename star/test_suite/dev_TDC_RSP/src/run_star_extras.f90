@@ -352,17 +352,17 @@
                vals(k,10) = s% COUPL(k) ! s% xtra1_array(k)
                vals(k,11) = s_other% COUPL(k) ! s_other% xtra1_array(k)
 
-               vals(k,12) = s% Eq(k) ! s% xtra2_array(k)
-               vals(k,13) = s_other% Eq(k) ! s_other% xtra2_array(k)
+               vals(k,12) = s% SOURCE(k) ! s% Eq(k) ! s% xtra2_array(k)
+               vals(k,13) = s_other% SOURCE(k) ! s_other% Eq(k) ! s_other% xtra2_array(k)
 
-               vals(k,14) = s% Uq(k) ! s% xtra3_array(k)
-               vals(k,15) = s_other% Uq(k) ! s_other% xtra3_array(k)
+               vals(k,14) = s% DAMP(k) ! s% Uq(k) ! s% xtra3_array(k)
+               vals(k,15) = s_other% DAMP(k) ! s_other% Uq(k) ! s_other% xtra3_array(k)
 
-               vals(k,16) = s% Chi(k) ! s% DAMP(k) ! s% xtra4_array(k)
-               vals(k,17) = s_other% Chi(k) ! s_other% DAMP(k) ! s_other% xtra4_array(k)
+               vals(k,16) = s% xtra4_array(k) ! s% Chi(k) ! s% DAMP(k) ! 
+               vals(k,17) = s_other% xtra4_array(k) ! s_other% Chi(k) ! s_other% DAMP(k) ! 
 
-               vals(k,18) = 0 ! s% Chi(k)
-               vals(k,19) = 0 ! s_other% Chi(k)
+               vals(k,18) = s% xtra5_array(k) ! s% Lr(k)/s% L(k) ! xtra5_array
+               vals(k,19) = s_other% xtra5_array(k) ! s% s_other% Lr(k)/s_other% L(k)
                
             end do
          end if

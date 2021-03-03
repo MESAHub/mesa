@@ -1376,7 +1376,25 @@
 
             s% total_energy_sources_and_sinks = &
                phase1_sources_and_sinks + phase2_sources_and_sinks
-
+            if (is_bad(s% total_energy_sources_and_sinks)) then
+               write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
+               write(*,2) 'phase1_sources_and_sinks', s% model_number, phase1_sources_and_sinks
+               write(*,2) 'phase2_sources_and_sinks', s% model_number, phase2_sources_and_sinks
+               write(*,2) 'total_energy_from_pre_mixing', s% model_number, total_energy_from_pre_mixing
+               write(*,2) 's% total_WD_sedimentation_heating', s% model_number, s% total_WD_sedimentation_heating
+               write(*,2) 'phase2_total_energy_from_mdot', s% model_number, phase2_total_energy_from_mdot
+               write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
+               write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
+               write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
+               write(*,2) 's% total_extra_heating', s% model_number, s% total_extra_heating
+               write(*,2) 'phase2_work', s% model_number, phase2_work
+               write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
+               write(*,2) 's% work_inward_at_center', s% model_number, s% work_inward_at_center
+               !write(*,2) '', s% model_number, 
+               !write(*,2) '', s% model_number, 
+               stop 'okay_energy_conservation'
+            end if
+  
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
 

@@ -369,7 +369,8 @@
             if (.not. s% TDC_flag) then
                write(*,*) 'and setting TDC_flag to .true.'
                s% TDC_flag = .true.
-               s% need_to_reset_w = .true.
+               s% need_to_reset_etrb = .false.
+               s% need_to_reset_Hp = .true.
             end if
          end if
          

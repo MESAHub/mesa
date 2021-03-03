@@ -2,6 +2,8 @@
 &star_job
    
    load_saved_model_for_RSP = .true.
+   save_model_when_terminate = .true.
+   save_model_filename = 'rsp_final.mod'
 
    pgstar_flag = .false.
 

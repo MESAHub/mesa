@@ -893,7 +893,7 @@
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
-            Av_face00_ad, Av_facep1_ad, XP_ad, rho, dxh_lnd, dV
+            Av_face00_ad, Av_facep1_ad, XP_ad, dV
          real(dp), dimension(s% species) :: d_XP_dxa
          real(dp) :: Av_face00, Av_facep1
          logical :: include_mlt_Pturb
@@ -903,25 +903,19 @@
          ierr = 0
          
          ! dV = 1/rho - 1/rho_start 
-         if (.not. s% solver_use_lnd) then 
-            rho = wrap_d_00(s,k)
-            dxh_lnd = wrap_dxh_lnd(s,k) ! rho - rho_start
-            dV = -dxh_lnd/(rho*s% rho_start(k))
-         else
-            call eval1_Av_face_ad(s, k, Av_face00_ad, ierr)
+         call eval1_Av_face_ad(s, k, Av_face00_ad, ierr)
+         if (ierr /= 0) return
+         if (k < s% nz) then
+            call eval1_Av_face_ad(s, k+1, Av_facep1_ad, ierr)
             if (ierr /= 0) return
-            if (k < s% nz) then
-               call eval1_Av_face_ad(s, k+1, Av_facep1_ad, ierr)
-               if (ierr /= 0) return
-               Av_facep1_ad = shift_p1(Av_facep1_ad)
-            else
-               Av_facep1_ad = 0d0
-               Av_facep1_ad%val = 4*pi*pow2(s% r_center)*s% v_center
-            end if
-            Av_face00 = Av_face00_ad%val
-            Av_facep1 = Av_facep1_ad%val
-            dV = Av_face00_ad - Av_facep1_ad
+            Av_facep1_ad = shift_p1(Av_facep1_ad)
+         else
+            Av_facep1_ad = 0d0
+            Av_facep1_ad%val = 4*pi*pow2(s% r_center)*s% v_center
          end if
+         Av_face00 = Av_face00_ad%val
+         Av_facep1 = Av_facep1_ad%val
+         dV = Av_face00_ad - Av_facep1_ad
 
          include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
             .and. s% mlt_vc_start(k) > 0d0 .and. k > 1
@@ -930,13 +924,13 @@
             s, k, skip_P, .not. include_mlt_Pturb, XP_ad, d_XP_dxa, ierr)
          if (ierr /= 0) return
          
-         dwork_ad = XP_ad*dV
-         dwork = dwork_ad%val
-         
-         if (k == 1) s% work_outward_at_surface = XP_ad%val*Av_face00
          do j=1,s% species
             d_dwork_dxa00(j) = d_XP_dxa(j)*(Av_face00 - Av_facep1)
          end do
+         if (k == 1) s% work_outward_at_surface = XP_ad%val*Av_face00
+         
+         dwork_ad = XP_ad*dV
+         dwork = dwork_ad%val
 
       end subroutine eval_Fraley_PdV_work
 

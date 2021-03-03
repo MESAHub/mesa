@@ -527,7 +527,8 @@
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% need_to_reset_w = .false.
+         s% need_to_reset_etrb = .false.
+         s% need_to_reset_Hp = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
