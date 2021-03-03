@@ -1881,8 +1881,6 @@
             POM = (CEDE/ALFA)*(s% RSP_w(k)**3 - EFL0**3)
             POM2 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             s% DAMP(k) = POM/POM2
-            s% xtra4_array(k) = s% RSP_w(k)
-            s% xtra5_array(k) = s% RSP_w(k)**2
       
             TEM1 = - 0.5d0*POM/POM2**2
             

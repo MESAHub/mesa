@@ -38,7 +38,7 @@
    TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
 
    !TDC_alfam =     0.05d0        ! "lots of struggling"
-   TDC_alfam =     0.25d0        ! standard value
+   TDC_alfam =     0.25d0        ! standard value        change RSP_alfam to match
 
    TDC_num_outermost_cells_forced_nonturbulent = 1
    TDC_num_innermost_cells_forced_nonturbulent = 5
@@ -55,10 +55,13 @@
    RSP_Z = 0.0001d0
    
    ! parameters for equations
+   RSP_alfa   = 1.5d0
    RSP_alfap  = 0.0d0
    RSP_alfat  = 0.0d0
-   RSP_alfam  = 0.05d0
    RSP_gammar = 0d0
+
+   !RSP_alfam  = 0.05d0
+   RSP_alfam  = 0.25d0 ! standard value        change TDC_alfam to match
 
 / ! end of controls namelist
 

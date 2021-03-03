@@ -505,51 +505,33 @@
    Profile_Panels1_yaxis_name(1) = 'vel_km_per_s'         
    Profile_Panels1_other_yaxis_name(1) = 'v_alt'
    Profile_Panels1_same_yaxis_range(1) = .true.
-            
-   Profile_Panels1_yaxis_name(2) = 'Y_face'
-   Profile_Panels1_other_yaxis_name(2) = 'Y_face_alt'
-   Profile_Panels1_same_yaxis_range(2) = .true.
    
-   Profile_Panels1_yaxis_name(3) = 'w'         
-   Profile_Panels1_other_yaxis_name(3) = 'w_alt' 
+   Profile_Panels1_yaxis_name(2) = 'w'         
+   Profile_Panels1_other_yaxis_name(2) = 'w_alt' 
+   Profile_Panels1_same_yaxis_range(2) = .true.
+            
+   Profile_Panels1_yaxis_name(3) = 'Y_face'
+   Profile_Panels1_other_yaxis_name(3) = 'Y_face_alt'
    Profile_Panels1_same_yaxis_range(3) = .true.
-            
-   Profile_Panels1_yaxis_name(4) = 'logR'
-   Profile_Panels1_other_yaxis_name(4) = 'logR_alt' 
+
+   Profile_Panels1_yaxis_name(4) = 'my_Lr_div_L'
+   Profile_Panels1_other_yaxis_name(4) = 'my_Lr_div_L_alt' 
    Profile_Panels1_same_yaxis_range(4) = .true.
             
-   Profile_Panels1_yaxis_name(5) = 'logP' 
-   Profile_Panels1_other_yaxis_name(5) = 'logP_alt' 
+   Profile_Panels1_yaxis_name(5) = 'my_SOURCE' 
+   Profile_Panels1_other_yaxis_name(5) = 'my_SOURCE_alt' 
    Profile_Panels1_same_yaxis_range(5) = .true.
             
-   Profile_Panels1_yaxis_name(6) = 'logT'
-   Profile_Panels1_other_yaxis_name(6) = 'logT_alt' 
+   Profile_Panels1_yaxis_name(6) = 'my_DAMP'
+   Profile_Panels1_other_yaxis_name(6) = 'my_DAMP_alt' 
    Profile_Panels1_same_yaxis_range(6) = .true.
             
-   Profile_Panels1_yaxis_name(7) = 'logRho' 
-   Profile_Panels1_other_yaxis_name(7) = 'logRho_alt' 
-   Profile_Panels1_same_yaxis_range(7) = .true.
-
-
-   ! DEBUGGING
-   Profile_Panels1_yaxis_name(4) = 'my_xtra1'
-   Profile_Panels1_other_yaxis_name(4) = 'my_xtra1_alt' 
-   Profile_Panels1_same_yaxis_range(4) = .true.
-            
-   Profile_Panels1_yaxis_name(5) = 'my_xtra2' 
-   Profile_Panels1_other_yaxis_name(5) = 'my_xtra2_alt' 
-   Profile_Panels1_same_yaxis_range(5) = .true.
-            
-   Profile_Panels1_yaxis_name(6) = 'my_xtra3'
-   Profile_Panels1_other_yaxis_name(6) = 'my_xtra3_alt' 
-   Profile_Panels1_same_yaxis_range(6) = .true.
-            
-   Profile_Panels1_yaxis_name(7) = 'my_xtra4' 
-   Profile_Panels1_other_yaxis_name(7) = 'my_xtra4_alt' 
+   Profile_Panels1_yaxis_name(7) = 'my_Eq' 
+   Profile_Panels1_other_yaxis_name(7) = 'my_Eq_alt' 
    Profile_Panels1_same_yaxis_range(7) = .true.
             
-   Profile_Panels1_yaxis_name(8) = 'my_xtra5' 
-   Profile_Panels1_other_yaxis_name(8) = 'my_xtra5_alt' 
+   Profile_Panels1_yaxis_name(8) = 'my_Uq' 
+   Profile_Panels1_other_yaxis_name(8) = 'my_Uq_alt' 
    Profile_Panels1_same_yaxis_range(8) = .true.
 
 

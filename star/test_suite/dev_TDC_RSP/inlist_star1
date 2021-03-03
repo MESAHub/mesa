@@ -33,12 +33,12 @@
       photo_interval = 1000
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 100
+      terminal_interval = 100
 
-      photo_interval = 100
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      !terminal_interval = 10
 
 ! FOR DEBUGGING
 

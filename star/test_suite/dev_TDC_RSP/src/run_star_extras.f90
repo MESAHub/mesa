@@ -129,10 +129,24 @@
          integer, intent(in) :: id
          integer :: ierr
          real(dp) :: target_period, rel_run_E_err
-         type (star_info), pointer :: s
+         type (star_info), pointer :: s, s_other
+         integer :: id_other
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         if (s% TDC_flag) then
+            if (id == 1) then
+               id_other = 2
+            else if (id == 2) then
+               id_other = 1
+            else
+               ierr = -1
+               return
+            end if
+            call star_ptr(id_other, s_other, ierr)
+            if (ierr /= 0) return
+            if (s_other% dt > 0d0) s% dt_next = s_other% dt
+         end if
          extras_finish_step = keep_going
          call report(s)
          if (s% x_integer_ctrl(1) <= 0) return
@@ -316,16 +330,16 @@
          names(8) = 'logRho_alt'
          names(9) = 'logL_alt'
 
-         names(10) = 'my_xtra1'
-         names(11) = 'my_xtra1_alt'
-         names(12) = 'my_xtra2'
-         names(13) = 'my_xtra2_alt'
-         names(14) = 'my_xtra3'
-         names(15) = 'my_xtra3_alt'
-         names(16) = 'my_xtra4'
-         names(17) = 'my_xtra4_alt'
-         names(18) = 'my_xtra5'
-         names(19) = 'my_xtra5_alt'
+         names(10) = 'my_Lr_div_L'
+         names(11) = 'my_Lr_div_L_alt'
+         names(12) = 'my_SOURCE'
+         names(13) = 'my_SOURCE_alt'
+         names(14) = 'my_DAMP'
+         names(15) = 'my_DAMP_alt'
+         names(16) = 'my_Eq'
+         names(17) = 'my_Eq_alt'
+         names(18) = 'my_Uq'
+         names(19) = 'my_Uq_alt'
 
          if (.not. associated(s_other% Y_face)) then
             vals(1:nz,:) = 0d0
@@ -349,8 +363,8 @@
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
                
-               vals(k,10) = s% COUPL(k) ! s% xtra1_array(k)
-               vals(k,11) = s_other% COUPL(k) ! s_other% xtra1_array(k)
+               vals(k,10) = s% Lr(k)/s% L(k) ! s% xtra1_array(k)
+               vals(k,11) = s_other% Lr(k)/s_other% L(k) ! s_other% xtra1_array(k)
 
                vals(k,12) = s% SOURCE(k) ! s% Eq(k) ! s% xtra2_array(k)
                vals(k,13) = s_other% SOURCE(k) ! s_other% Eq(k) ! s_other% xtra2_array(k)
@@ -358,11 +372,11 @@
                vals(k,14) = s% DAMP(k) ! s% Uq(k) ! s% xtra3_array(k)
                vals(k,15) = s_other% DAMP(k) ! s_other% Uq(k) ! s_other% xtra3_array(k)
 
-               vals(k,16) = s% xtra4_array(k) ! s% Chi(k) ! s% DAMP(k) ! 
-               vals(k,17) = s_other% xtra4_array(k) ! s_other% Chi(k) ! s_other% DAMP(k) ! 
+               vals(k,16) = s% Eq(k) ! xtra4_array
+               vals(k,17) = s_other% Eq(k) ! 
 
-               vals(k,18) = s% xtra5_array(k) ! s% Lr(k)/s% L(k) ! xtra5_array
-               vals(k,19) = s_other% xtra5_array(k) ! s% s_other% Lr(k)/s_other% L(k)
+               vals(k,18) = s% Uq(k) ! xtra5_array
+               vals(k,19) = s_other% Uq(k) !
                
             end do
          end if

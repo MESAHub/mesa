@@ -50,10 +50,10 @@
       !history_interval = 1
       terminal_interval = 100
 
-      photo_interval = 100
+      !photo_interval = 100
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      !terminal_interval = 10
 
       !fill_arrays_with_NaNs = .true.
 
@@ -135,7 +135,9 @@
    Grid2_file_prefix = 'TDC'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
 
-   Profile_Panels1_xmin = 20 ! -101D0
-   Profile_Panels1_xmax = 130 ! -101D0
+   !History_Panels1_xmin =  0.1D0
+   
+   Profile_Panels1_xmin =  30 ! -101D0
+   Profile_Panels1_xmax = 110 ! -101D0
 
 / ! end of pgstar namelist

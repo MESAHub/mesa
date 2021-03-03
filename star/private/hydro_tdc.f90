@@ -632,8 +632,6 @@
          D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          s% DAMP(k) = D%val
-         s% xtra4_array(k) = w_00%val
-         s% xtra5_array(k) = pow2(w_00%val)
       end function compute_D
 
 

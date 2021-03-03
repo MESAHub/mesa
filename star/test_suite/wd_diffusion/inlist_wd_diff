@@ -32,8 +32,6 @@
 
 &controls
 
-      solver_use_lnT = .true.    ! fails with T
-
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
