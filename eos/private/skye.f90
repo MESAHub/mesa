@@ -153,7 +153,7 @@ module skye
 
          if (ierr /= 0) then
             if (dbg) then
-               write(*,*) 'failed in Get_Skye_EOS_Resultskye_EOS'
+               write(*,*) 'failed in Get_Skye_EOS_Results'
                write(*,1) 'T', T
                write(*,1) 'logT', logT
                write(*,1) 'Rho', Rho
