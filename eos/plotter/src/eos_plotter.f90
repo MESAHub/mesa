@@ -550,7 +550,7 @@ contains
             Rho, log10Rho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          else
-            call eosDT_test_component( &
+            call eosDT_get_component( &
                   handle, i_eos, species, chem_id, net_iso, xa, &
                   Rho, logRho, T, logT, &
                   res, d_dlnd, d_dlnT, d_dxa, ierr)
