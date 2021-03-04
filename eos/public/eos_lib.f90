@@ -246,7 +246,7 @@
       end subroutine eosDT_get
       
 
-      subroutine eosDT_test_component( &
+      subroutine eosDT_get_component( &
                handle, which_eos, &
                species, chem_id, net_iso, xa, &
                Rho, log10Rho, T, log10T, &
@@ -318,7 +318,7 @@
          ! only return 1st two d_dxa results (lnE and lnPgas)
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
          
-      end subroutine eosDT_test_component
+      end subroutine eosDT_get_component
 
 
       subroutine helmeos2_eval( &

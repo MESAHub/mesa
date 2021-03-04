@@ -554,7 +554,7 @@ contains
          Rho = exp(logRho)
          log10Rho = logRho/ln10
          
-         call eosDT_test_component(eos_handle, i_eos_HELM, &
+         call eosDT_get_component(eos_handle, i_eos_HELM, &
             Neps, chem_id, net_iso, mass_frac, &
             Rho, log10Rho, T, log10T, &
             res, d_dlnRho_const_T, d_dlnT_const_Rho, &

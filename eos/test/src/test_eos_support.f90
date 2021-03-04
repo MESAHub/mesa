@@ -2056,7 +2056,7 @@
             integer, intent(in) :: which_eos
             character (len=*), intent(in) :: str
             include 'formats'
-            call eosDT_test_component( &
+            call eosDT_get_component( &
                handle, which_eos, &
                species, chem_id, net_iso, xa, &
                exp10(logRho), logRho, exp10(logT), logT, &
