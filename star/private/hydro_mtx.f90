@@ -93,7 +93,7 @@
             skip_other_cgrav = .true.
          logical :: do_chem, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
-            i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_Hp, i_v, &
+            i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, i_chem1, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
@@ -101,7 +101,7 @@
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
-         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_etrb, do_Hp, &
+         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_etrb, &
             do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
 
          include 'formats'
@@ -154,7 +154,6 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_etrb = s% i_etrb
-         i_Hp = s% i_Hp
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -167,7 +166,6 @@
          do_lnR = i_lnR > 0 .and. i_lnR <= nvar
          do_lum = i_lum > 0 .and. i_lum <= nvar
          do_etrb = i_etrb > 0 .and. i_etrb <= nvar
-         do_Hp = i_Hp > 0 .and. i_Hp <= nvar
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
@@ -457,19 +455,6 @@
                      stop 'set_vars_for_solver'
                   end if
                   if (report) write(*,2) 'bad num L', k, s% L(k)
-               end if
-            end if
-
-            if (do_Hp) then
-               s% Hp_face(k) = x(i_Hp)
-               if (is_bad_num(s% Hp_face(k))) then
-                  s% retry_message = 'bad num for Hp_face'
-                  ierr = -1
-                  if (s% stop_for_bad_nums) then
-                     write(*,2) 'set_vars_for_solver Hp_face', k, s% Hp_face(k)
-                     stop 'set_vars_for_solver'
-                  end if
-                  if (report) write(*,2) 'bad num Hp_face', k, s% Hp_face(k)
                end if
             end if
 

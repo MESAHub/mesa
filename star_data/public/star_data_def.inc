@@ -282,9 +282,9 @@
       integer, parameter :: i_xtra2_m1 = 22
       integer, parameter :: i_xtra2_00 = 23
       integer, parameter :: i_xtra2_p1 = 24
-      integer, parameter :: i_Hp_m1 = 25
-      integer, parameter :: i_Hp_00 = 26
-      integer, parameter :: i_Hp_p1 = 27
+      integer, parameter :: i_xtra3_m1 = 25
+      integer, parameter :: i_xtra3_00 = 26
+      integer, parameter :: i_xtra3_p1 = 27
       
 
       ! mesh cell types

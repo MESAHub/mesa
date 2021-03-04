@@ -36,8 +36,8 @@
       implicit none
 
       private
-      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, do1_tdc_Hp_eqn, compute_Eq_cell, &
-         compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L, reset_Hp
+      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
+         compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
          min_w = 1d-6, &
@@ -103,41 +103,66 @@
       end subroutine do1_tdc_L_eqn
       
       
-      function compute_Hp_face(s, k, d_Hp_dxa00, d_Hp_dxam1, ierr) result(Hp_face) ! cm
+      function compute_Hp_cell(s, k, ierr) result(Hp_cell) ! cm
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Hp_cell
+         type(auto_diff_real_star_order1) :: r_mid, r_00, r_p1, &
+            P_00, d_00, P_m1, d_m1, alt_Hp_cell, alfa
+         real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
+         include 'formats'
+         ierr = 0
+         r_00 = wrap_opt_time_center_r_00(s, k)
+         cgrav_00 = s% cgrav(k)
+         m_00 = s% m(k)
+         d_00 = wrap_d_00(s, k)
+         P_00 = wrap_P_00(s, k)
+         r_p1 = wrap_opt_time_center_r_p1(s, k)
+         if (k < s% nz) then
+            cgrav_p1 = s% cgrav(k+1)
+            m_p1 = s% m(k+1)
+         else
+            cgrav_p1 = s% cgrav(k)
+            m_p1 = s% m_center
+         end if
+         cgrav_mid = 0.5d0*(cgrav_00 + cgrav_p1)
+         m_mid = 0.5d0*(m_00 + m_p1)
+         r_mid = 0.5d0*(r_00 + r_p1)
+         Hp_cell = pow2(r_mid)*P_00 / (d_00*cgrav_mid*m_mid)
+         if (s% alt_scale_height_flag) then
+            ! consider sound speed*hydro time scale as an alternative scale height
+            ! (this comes from Eggleton's code.)
+            alt_Hp_cell = sqrt(P_00/cgrav_mid)/d_00
+            if (alt_Hp_cell%val < Hp_cell%val) then ! blend
+               alfa = pow2(alt_Hp_cell/Hp_cell) ! 0 <= alfa%val < 1
+               Hp_cell = alfa*Hp_cell + (1d0 - alfa)*alt_Hp_cell
+            end if
+         end if
+      end function compute_Hp_cell
+      
+      
+      function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
          ! no time_centering for Hp
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), dimension(s% species), intent(out) :: d_Hp_dxa00, d_Hp_dxam1
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face
          type(auto_diff_real_star_order1) :: &
             r_00, P_00, d_00, P_m1, d_m1, P_div_rho, &
             d_face, P_face, alt_Hp_face, alfa
-         real(dp), dimension(s% species) :: &
-            d_P00_dxa00, d_Pm1_dxam1
          integer :: j
          include 'formats'
          ierr = 0
-         
-         d_Hp_dxa00(:) = 0d0 ! not yet
-         d_Hp_dxam1(:) = 0d0 ! not yet
-         
          r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
          P_00 = wrap_p_00(s, k)
-         !do j=1,s% species
-         !   d_P00_dxa00(j) = s% P(k)*s% dlnP_dxa_for_partials(j,k)
-         !end do            
          if (k > 1) then
             d_m1 = wrap_d_m1(s, k)
             P_m1 = wrap_P_m1(s, k)
-            !do j=1,s% species
-            !   d_Pm1_dxam1(j) = s% P(k-1)*s% dlnP_dxa_for_partials(j,k-1)
-            !end do
-
             P_div_rho = 0.5d0*(P_00/d_00 + P_m1/d_m1)
             Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
-            if (.false. .and. s% alt_scale_height_flag) then
+            if (s% alt_scale_height_flag) then
                ! consider sound speed*hydro time scale as an alternative scale height
                ! (this comes from Eggleton's code.)
                d_face = 0.5d0*(d_00 + d_m1)
@@ -153,50 +178,6 @@
             Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
          end if
       end function compute_Hp_face
-      
-      
-      subroutine do1_tdc_Hp_eqn(s, k, skip_partials, nvar, ierr)
-         use star_utils, only: save_eqn_residual_info, save_eqn_dxa_partials
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
-         integer, intent(out) :: ierr         
-         type(auto_diff_real_star_order1) :: Hp_expected, Hp_actual, resid
-         real(dp) :: residual
-         real(dp), dimension(s% species) :: d_Hp_dxa00, d_Hp_dxam1, dxap1
-         logical :: test_partials
-         include 'formats'
-
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-
-         ierr = 0
-         Hp_expected = compute_Hp_face(s, k, d_Hp_dxa00, d_Hp_dxam1, ierr)
-         if (ierr /= 0) return        
-         Hp_actual = wrap_Hp_00(s, k)  
-         resid = (Hp_expected - Hp_actual)/s% Hp_start(k)    
-         residual = resid%val
-         s% equ(s% i_equ_Hp, k) = residual         
-         if (test_partials) then
-            s% solver_test_partials_val = residual
-         end if
-         
-         if (skip_partials) return
-         call save_eqn_residual_info(s, k, nvar, s% i_equ_Hp, resid, 'do1_tdc_Hp_eqn', ierr)
-         if (ierr /= 0) return
-         
-         !dxap1(:) = 0d0
-         !call save_eqn_dxa_partials(&
-         !   s, k, nvar, s% i_equ_Hp, s%species, &
-         !   d_Hp_dxam1, d_Hp_dxa00, dxap1, 'do1_tdc_Hp_eqn', ierr)
-         !if (ierr /= 0) return
-
-         if (test_partials) then
-            s% solver_test_partials_var = 0
-            s% solver_test_partials_dval_dx = 0
-            write(*,*) 'do1_tdc_Hp_eqn', s% solver_test_partials_var
-         end if      
-      end subroutine do1_tdc_Hp_eqn
       
       
       logical function non_turbulent_cell(s,k) 
@@ -355,22 +336,6 @@
          end subroutine setup_dt_Eq_ad
       
       end subroutine do1_turbulent_energy_eqn
-      
-
-      function wrap_Hp_cell(s, k) result(Hp_cell) ! cm
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Hp_cell
-         type(auto_diff_real_star_order1) :: Hp_00, Hp_p1
-         include 'formats'
-         Hp_00 = wrap_Hp_00(s, k)
-         if (k == s% nz) then
-            Hp_cell = Hp_00
-            return
-         end if
-         Hp_p1 = wrap_Hp_p1(s, k)
-         Hp_cell = 0.5d0*(Hp_00 + Hp_p1)
-      end function wrap_Hp_cell
 
       
       function compute_Y_face(s, k, ierr) result(Y_face) ! superadiabatic gradient [unitless]
@@ -390,8 +355,8 @@
             return
          end if
          dm_bar = s% dm_bar(k)
-         Hp_face = wrap_Hp_00(s,k)
-         
+         Hp_face = compute_Hp_face(s,k,ierr)
+         if (ierr /= 0) return
          r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
          P_00 = wrap_P_00(s, k)
@@ -498,7 +463,8 @@
             s% Chi(k) = 0d0
             return
          end if
-         Hp_cell = wrap_Hp_cell(s, k)
+         Hp_cell = compute_Hp_cell(s, k, ierr)
+         if (ierr /= 0) return
          d_v_div_r = compute_d_v_div_r(s, k, ierr)
          if (ierr /= 0) return
          w_00 = wrap_w_00(s,k)
@@ -598,8 +564,11 @@
          chiRho_00 = wrap_chiRho_00(s, k)
          QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
             
-         Hp_face_00 = wrap_Hp_00(s, k)
-         Hp_face_p1 = wrap_Hp_p1(s, k)
+         Hp_face_00 = compute_Hp_face(s,k,ierr)
+         if (ierr /= 0) return
+         Hp_face_p1 = compute_Hp_face(s,k+1,ierr)
+         if (ierr /= 0) return
+         Hp_face_p1 = shift_p1(Hp_face_p1)
 
          PII_face_00 = compute_PII_face(s, k, ierr)
          if (ierr /= 0) return
@@ -651,7 +620,8 @@
             s% DAMP(k) = 0d0
             return
          end if
-         Hp_cell = wrap_Hp_cell(s, k)
+         Hp_cell = compute_Hp_cell(s,k,ierr)
+         if (ierr /= 0) return
          w_00 = wrap_w_00(s,k)
          ! partials bad if w -> 0 for this, so must test to avoid that case
          if (w_00%val < min_w) w_00 = 0
@@ -684,7 +654,8 @@
          d_00 = wrap_d_00(s,k)
          Cp_00 = wrap_Cp_00(s,k)
          kap_00 = wrap_kap_00(s,k)
-         Hp_cell = wrap_Hp_cell(s,k)
+         Hp_cell = compute_Hp_cell(s,k,ierr)
+         if (ierr /= 0) return
          POM = 4d0*boltz_sigma*(gammar/alpha)**2 ! erg cm^-2 K^-4 s^-1
          POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00) 
             ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
@@ -869,7 +840,8 @@
          end if
          etrb_m1 = wrap_etrb_m1(s,k)
          etrb_00 = wrap_etrb_00(s,k)
-         Hp_face = wrap_Hp_00(s, k)
+         Hp_face = compute_Hp_face(s,k,ierr)
+         if (ierr /= 0) return
          Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
             (w_m1*etrb_m1 - w_00*etrb_00)/s% dm_bar(k)         
          ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
@@ -944,31 +916,9 @@
                s% Lt_start(k) = 0d0  
             end if
             s% etrb_start(k) = s% etrb(k)
-            s% Hp_start(k) = s% Hp_face(k)
          end subroutine set1_etrb_start_vars
          
       end subroutine set_etrb_start_vars
-      
-      
-      subroutine reset_Hp(s, ierr)
-         type (star_info), pointer :: s
-         integer, intent(out) :: ierr 
-         integer :: k
-         type(auto_diff_real_star_order1) :: Hp_face
-         real(dp), dimension(s% species) :: d_Hp_dxa00, d_Hp_dxam1
-         include 'formats'
-         ierr = 0
-         do k=1, s% nz
-            Hp_face = compute_Hp_face(s, k, d_Hp_dxa00, d_Hp_dxam1, ierr)
-            if (ierr /= 0) return
-            s% xh(s% i_Hp,k) = Hp_face%val
-            s% Hp_face(k) = Hp_face%val
-            if (s% Hp_face(k) <= 0d0 .or. is_bad(s% Hp_face(k))) then
-               write(*,2) 's% Hp_face(k)', k, s% Hp_face(k)
-               stop 'compute_Hp_face failed in compute_L reset_wturb_using_L'
-            end if
-         end do
-      end subroutine reset_Hp
       
       
       subroutine reset_etrb_using_L(s, ierr)

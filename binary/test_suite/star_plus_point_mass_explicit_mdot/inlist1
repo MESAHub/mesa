@@ -18,8 +18,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
       ! check for retries as part of test_suite
       ! you can/should delete this for use outside of test_suite
       max_number_retries = 80

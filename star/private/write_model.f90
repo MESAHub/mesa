@@ -117,7 +117,7 @@
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
          if (BTEST(file_type, bit_for_etrb)) &
-            write(iounit,'(a)',advance='no') ', turbulent energy for cell (etrb), pressure scale height at face (Hp)'
+            write(iounit,'(a)',advance='no') ', turbulent energy for cell (etrb)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then
@@ -199,7 +199,6 @@
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             else if (TDC_flag) then
                call write1(s% etrb(k),ierr); if (ierr /= 0) exit
-               call write1(s% Hp_face(k),ierr); if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit
@@ -271,7 +270,6 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (TDC_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'etrb'
-               write(iounit, fmt='(a26, 1x)', advance='no') 'Hp'
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             else if (.not. no_L) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'L'

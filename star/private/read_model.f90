@@ -48,7 +48,7 @@
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
-      integer, parameter :: increment_for_i_etrb = 2
+      integer, parameter :: increment_for_i_etrb = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
       integer, parameter :: increment_for_D_omega_flag = 1
@@ -370,7 +370,6 @@
                write(*,*) 'and setting TDC_flag to .true.'
                s% TDC_flag = .true.
                s% need_to_reset_etrb = .false.
-               s% need_to_reset_Hp = .true.
             end if
          end if
          
@@ -559,7 +558,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_Hp, i_etrb_RSP, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -578,7 +577,6 @@
          i_lum = s% i_lum
          no_L = (i_lum == 0)
          i_etrb = s% i_etrb
-         i_Hp = s% i_Hp
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -631,14 +629,13 @@
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
                else if (i_etrb /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_etrb,k) = max(0d0,vec(j)); xh(i_Hp,k) = 0d0
+                  j=j+1; xh(i_etrb,k) = max(0d0,vec(j))
                   j=j+1; ! discard
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,k) = vec(j)
                end if
             else if (i_etrb /= 0) then
                j=j+1; xh(i_etrb,k) = max(vec(j),0d0)
-               j=j+1; xh(i_Hp,k) = max(vec(j),0d0)
                j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,k) = vec(j)

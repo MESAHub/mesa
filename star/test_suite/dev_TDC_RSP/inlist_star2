@@ -24,7 +24,7 @@
    
 ! solver   
    
-   tol_correction_norm = 1d99 ! turn off when not using lnR/lnT/lnd
+   tol_correction_norm = 1d99 
    tol_max_correction = 1d99
    
    steps_before_use_velocity_time_centering = 0
@@ -125,7 +125,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 1 ! 20
+   pgstar_interval = 10
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'

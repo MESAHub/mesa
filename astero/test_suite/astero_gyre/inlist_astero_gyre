@@ -27,8 +27,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
       x_ctrl(1) = 383d0 ! target frequency
 
       use_dedt_form_of_energy_eqn = .true.

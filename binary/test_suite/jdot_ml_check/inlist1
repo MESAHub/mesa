@@ -21,8 +21,6 @@
 
 &controls
 
-      solver_use_lnR = .true. ! fails with r
-
       max_age = 1.4e10
       mesh_delta_coeff = 0.8
 

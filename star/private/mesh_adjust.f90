@@ -227,11 +227,6 @@
                xq_old, xq, dq_old, dq, xh, xh_old, &
                xout_old, xout_new, tmp1, ierr)
             if (failed('do_etrb')) return
-            call do_Hp( &
-               s, nz, nz_old, nzlo, nzhi, comes_from, &
-               xh, xh_old, xq, xq_old_plus1, xq_new, &
-               work, tmp1, tmp2, ierr)
-            if (failed('do_Hp')) return
          end if
 
          if (s% conv_vel_flag) then
@@ -2869,65 +2864,6 @@
          xh(i_etrb,k) = eturb_sum/new_cell_dq
 
       end subroutine adjust1_etrb
-
-
-      subroutine do_Hp( &
-            s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, Hp_old_plus1, Hp_new, ierr)
-         use interp_1d_def
-         use interp_1d_lib
-         type (star_info), pointer :: s
-         integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
-         real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), dimension(:), pointer :: work
-         real(dp), dimension(:) :: &
-            xq, xq_old_plus1, Hp_old_plus1, Hp_new, xq_new
-         integer, intent(out) :: ierr
-
-         integer :: n, i_Hp, k
-
-         include 'formats'
-
-         ierr = 0
-         i_Hp = s% i_Hp
-         if (i_Hp == 0) return
-         n = nzhi - nzlo + 1
-
-         do k=1,nz_old
-            Hp_old_plus1(k) = xh_old(i_Hp,k)
-         end do
-         Hp_old_plus1(nz_old+1) = xh_old(i_Hp,nz_old)
-
-         call interpolate_vector( &
-               nz_old+1, xq_old_plus1, n, xq_new, &
-               Hp_old_plus1, Hp_new, interp_pm, nwork, work, &
-               'mesh_adjust do_Hp', ierr)
-         if (ierr /= 0) then
-            return
-
-            write(*,*) 'interpolate_vector failed in do_Hp for remesh'
-            stop 'debug: mesh adjust: do_Hp'
-         end if
-
-         do k=nzlo,nzhi
-            xh(i_Hp,k) = Hp_new(k+1-nzlo)
-         end do
-
-         n = nzlo - 1
-         if (n > 0) then
-            do k=1,n
-               xh(i_Hp,k) = xh_old(i_Hp,k)
-            end do
-         end if
-
-         if (nzhi < nz) then
-            n = nz - nzhi - 1 ! nz-n = nzhi+1
-            do k=0,n
-               xh(i_Hp,nz-k) = xh_old(i_Hp,nz_old-k)
-            end do
-         end if
-
-      end subroutine do_Hp
 
 
 

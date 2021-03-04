@@ -227,7 +227,7 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_etrb, i_Hp, &
+         integer :: i_lnd, i_lnT, i_lnR, i_etrb, &
             i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_etrb_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
@@ -244,7 +244,6 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_etrb = s% i_etrb
-         i_Hp = s% i_Hp
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -330,10 +329,6 @@
                      s% w(k) = sqrt(s% etrb(k))
                   end do
                   s% dxh_etrb(1:nz) = 0d0
-               else if (j == i_Hp) then
-                  do k=1,nz
-                     s% Hp_face(k) = max(s% xh(i_Hp, k), 0d0)
-                  end do
                else if (j == i_lum) then
                   do k=1,nz
                      s% L(k) = s% xh(i_lum, k)
@@ -372,7 +367,6 @@
             if (i_u == 0) s% u(1:nz) = 0d0
 
             if (i_etrb == 0) s% etrb(1:nz) = 0d0
-            if (i_Hp == 0 .and. s% TDC_flag) s% Hp_face(1:nz) = 0d0
 
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
@@ -517,7 +511,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: reset_etrb_using_L, reset_Hp
+         use hydro_tdc, only: reset_etrb_using_L
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -642,12 +636,6 @@
             call check_for_redo_MLT(s, nzlo, nzhi, ierr)
             if (failed('check_for_redo_MLT')) return
             
-         end if
-         
-         if (s% need_to_reset_Hp) then
-            call reset_Hp(s,ierr)
-            if (failed('reset_Hp')) return
-            s% need_to_reset_Hp = .false.
          end if
          
          if (s% need_to_reset_etrb) then
