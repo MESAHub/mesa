@@ -1211,9 +1211,11 @@
       ! these arrays are NOT automatically managed during restarts
 
          integer, pointer, dimension(:) :: &
-            ixtra1_array, ixtra2_array, ixtra3_array, ixtra4_array, ixtra5_array
+            ixtra1_array, ixtra2_array, ixtra3_array, &
+            ixtra4_array, ixtra5_array, ixtra6_array
          real(dp), pointer, dimension(:) :: &
-            xtra1_array, xtra2_array, xtra3_array, xtra4_array, xtra5_array
+            xtra1_array, xtra2_array, xtra3_array, &
+            xtra4_array, xtra5_array, xtra6_array
 
 
       ! equation residuals, etc

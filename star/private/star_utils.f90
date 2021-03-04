@@ -3516,134 +3516,30 @@
       end subroutine calc_XP_ad_tw
       
       
-      subroutine get_avQ_ad(s, k, avQ_ad, ierr)
+      subroutine get_avQ_ad(s, k, avQ, ierr)
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s      
          integer, intent(in) :: k 
-         type(auto_diff_real_star_order1), intent(out) :: avQ_ad
+         type(auto_diff_real_star_order1), intent(out) :: avQ
          integer, intent(out) :: ierr
-         real(dp) :: avQ, d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1
-         call get_avQ(s, k, avQ, &
-            d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
-         if (ierr /= 0) return
-         call wrap(avQ_ad, avQ, &
-            0d0, d_avQ_dlnd, 0d0, &
-            0d0, d_avQ_dlnT, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, d_avQ_dv00, d_avQ_dvp1, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0, &
-            0d0, 0d0, 0d0)
-      end subroutine get_avQ_ad
-      
-      
-      subroutine get_avQ(s, k, avQ, & ! artificial pressure for cell k
-            d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
-         ! avQ(k) = CQ*rho(k)*max(0d0,dv)**2
-         ! dv = v(k+1) - v(k) - ZSH*sqrt(P(k)/rho(k))
-         ! CQ = avQ_cq, ZSH = avQ_zsh
-         type (star_info), pointer :: s      
-         integer, intent(in) :: k 
-         real(dp), intent(out) :: avQ
-         real(dp), intent(out) :: &
-            d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1
-         integer, intent(out) :: ierr
-         call get1_avQ(s, k, avQ, &
-            d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
-         if (ierr /= 0) return
-         s% avQ(k) = avQ
-         if (s% avQ_start(k) < -1d90) s% avQ_start(k) = avQ
-      end subroutine get_avQ
-      
-      
-      subroutine get1_avQ(s, k, avQ, &
-            d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1, ierr)
-         ! avQ(k) = CQ*rho(k)*max(0d0,dv)**2
-         ! dv = v(k+1) - v(k) - ZSH*sqrt(P(k)/rho(k))
-         ! CQ = avQ_cq, ZSH = avQ_zsh
-         type (star_info), pointer :: s      
-         integer, intent(in) :: k 
-         real(dp), intent(out) :: avQ
-         real(dp), intent(out) :: &
-            d_avQ_dlnd, d_avQ_dlnT, d_avQ_dv00, d_avQ_dvp1
-         integer, intent(out) :: ierr
-         real(dp) :: d_P_div_rho_dlnd, &
-            d_P_div_rho_dlnT, d_sqrt_P_div_rho_dlnd, &
-            d_sqrt_P_div_rho_dlnT, d_dv2_dlnd, d_dv2_dlnT, &
-            d_dv2_dv00, d_dv2_dvp1
-         real(qp) :: cq, zsh, v00, vp1, P, rho, P_div_rho, &
-            sqrt_P_div_rho, dv, dv2
-         logical :: test_partials
-         include 'formats'
-         ierr = 0
-         
-         avQ = 0d0
-         d_avQ_dlnd = 0d0
-         d_avQ_dlnT = 0d0
-         d_avQ_dv00 = 0d0
-         d_avQ_dvp1 = 0d0
-         
-         if (.not. s% v_flag) return
-         if (.not. s% use_avQ_art_visc) return
-
-         !test_partials = (k+1 == s% solver_test_partials_k)
-         test_partials = .false.
-         
-         if (test_partials) then
-            s% solver_test_partials_val = avQ
-            s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = d_avQ_dlnT
-         end if
-         
+         type(auto_diff_real_star_order1) :: v00, vp1, P, rho, &
+            P_div_rho, dv
+         real(dp) :: cq, zsh
+         avQ = 0
+         if (.not. (s% v_flag .and. s% use_avQ_art_visc)) return
          cq = s% avQ_cq
          if (cq == 0d0) return
-         
          zsh = s% avQ_zsh
-         
-         v00 = s% v(k)
-         if (k < s% nz) then
-            vp1 = s% v(k+1)
-         else
-            vp1 = s% v_center
-         end if
-            
-         P = s% P(k)    ! Note: not time-centered.  time-centering of avQ done at higher level.
-         rho = s% rho(k)
+         v00 = wrap_v_00(s,k)
+         vp1 = wrap_v_p1(s,k)
+         P = wrap_p_00(s,k)
+         rho = wrap_d_00(s,k)
          P_div_rho = P/rho
-         d_P_div_rho_dlnd = (s% chiRho_for_partials(k) - 1d0)*P_div_rho
-         d_P_div_rho_dlnT = s% chiT_for_partials(k)*P_div_rho
-         
-         sqrt_P_div_rho = sqrt(P_div_rho)
-         d_sqrt_P_div_rho_dlnd = 0.5d0*d_P_div_rho_dlnd/sqrt_P_div_rho
-         d_sqrt_P_div_rho_dlnT = 0.5d0*d_P_div_rho_dlnT/sqrt_P_div_rho
-         
-         dv = (vp1 - v00) - zsh*sqrt_P_div_rho
-         if (dv <= 0d0) return
-         
-         dv2 = dv**2
-         d_dv2_dlnd = -2d0*dv*zsh*d_sqrt_P_div_rho_dlnd
-         d_dv2_dlnT = -2d0*dv*zsh*d_sqrt_P_div_rho_dlnT
-         d_dv2_dv00 = -2d0*dv
-         d_dv2_dvp1 = 2d0*dv
-         
-         avQ = cq*rho*dv2
-         
-         d_avQ_dlnd = cq*rho*d_dv2_dlnd + avQ
-         d_avQ_dlnT = cq*rho*d_dv2_dlnT
-         d_avQ_dv00 = cq*rho*d_dv2_dv00
-         d_avQ_dvp1 = cq*rho*d_dv2_dvp1
-      
-         if (test_partials) then
-            s% solver_test_partials_val = avQ
-            s% solver_test_partials_var = s% i_v
-            s% solver_test_partials_dval_dx = d_avQ_dvp1
-            write(*,*) 'get1_avQ', s% solver_test_partials_var
-         end if
-      
-      end subroutine get1_avQ
+         dv = (vp1 - v00) - zsh*sqrt(P_div_rho)
+         if (dv%val <= 0d0) return
+         avQ = cq*rho*pow2(dv)
+      end subroutine get_avQ_ad
       
       
       ! marsaglia and zaman random number generator. period is 2**43 with

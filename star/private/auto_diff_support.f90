@@ -810,10 +810,38 @@
          dxh_lnR % d1Array(i_lnR_00) = 1d0
       end function wrap_dxh_lnR
 
+      function wrap_u_face_m1(s, k) result(v_m1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: v_m1
+         integer, intent(in) :: k
+         v_m1 = 0
+         if (k > 1) v_m1 = shift_m1(s% u_face_ad(k-1))
+      end function wrap_u_face_m1
+
+      function wrap_u_face_00(s, k) result(v_00)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: v_00
+         integer, intent(in) :: k
+         v_00 = 0
+         if (k > 1) v_00 = s% u_face_ad(k)
+      end function wrap_u_face_00
+
+      function wrap_u_face_p1(s, k) result(v_p1)
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: v_p1
+         integer, intent(in) :: k
+         v_p1 = 0
+         if (k < s% nz) v_p1 = shift_p1(s% u_face_ad(k+1))
+      end function wrap_u_face_p1
+
       function wrap_v_m1(s, k) result(v_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_m1
          integer, intent(in) :: k
+         if (s% u_flag) then
+            v_m1 = wrap_u_face_m1(s,k)
+            return
+         end if
          v_m1 = 0d0 
          if (k > 1) then
             v_m1 % val = s%v(k-1)
@@ -825,6 +853,10 @@
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_00
          integer, intent(in) :: k
+         if (s% u_flag) then
+            v_00 = wrap_u_face_00(s,k)
+            return
+         end if
          v_00 = 0d0 
          v_00 % val = s%v(k)
          v_00 % d1Array(i_v_00) = 1d0
@@ -834,6 +866,10 @@
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_p1
          integer, intent(in) :: k
+         if (s% u_flag) then
+            v_p1 = wrap_u_face_p1(s,k)
+            return
+         end if
          v_p1 = 0d0 
          if (k < s%nz) then
             v_p1 % val = s%v(k+1)
@@ -881,15 +917,16 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: v_tc
-         v_tc = wrap_v_m1(s,k)
-         if (s% using_velocity_time_centering) then
-            if (s% v_flag) then
-               if (k > 1) then
-                  v_tc = 0.5d0*(v_tc + s% v_start(k-1))
-               end if
-            else
-               stop 'fix wrap_opt_time_center_v'
-            end if
+         v_tc = 0
+         if (k == 1) return
+         if (s% v_flag) then
+            v_tc = wrap_v_m1(s,k) 
+            if (s% using_velocity_time_centering) &
+               v_tc = 0.5d0*(v_tc + s% v_start(k-1))
+         else if (s% u_flag) then
+            v_tc = wrap_u_face_m1(s,k)
+            if (s% using_velocity_time_centering) &
+               v_tc = 0.5d0*(v_tc + s% u_face_start(k-1))
          end if
       end function wrap_opt_time_center_v_m1      
       
@@ -897,13 +934,15 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: v_tc
-         v_tc = wrap_v_00(s,k)
-         if (s% using_velocity_time_centering) then
-            if (s% v_flag) then
+         v_tc = 0
+         if (s% v_flag) then
+            v_tc = wrap_v_00(s,k)
+            if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% v_start(k))
-            else
-               stop 'fix wrap_opt_time_center_v'
-            end if
+         else if (s% u_flag) then
+            v_tc = wrap_u_face_00(s,k)
+            if (s% using_velocity_time_centering) &
+               v_tc = 0.5d0*(v_tc + s% u_face_start(k))
          end if
       end function wrap_opt_time_center_v_00     
       
@@ -911,17 +950,16 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: v_tc
-         v_tc = wrap_v_p1(s,k)
-         if (s% using_velocity_time_centering) then
-            if (s% v_flag) then
-               if (k < s% nz) then
-                  v_tc = 0.5d0*(v_tc + s% v_start(k+1))
-               else
-                  v_tc = 0.5d0*(v_tc + s% v_center)
-               end if
-            else
-               stop 'fix wrap_opt_time_center_v'
-            end if
+         v_tc = 0
+         if (k == s% nz) return
+         if (s% v_flag) then
+            v_tc = wrap_v_p1(s,k) 
+            if (s% using_velocity_time_centering) &
+               v_tc = 0.5d0*(v_tc + s% v_start(k+1))
+         else if (s% u_flag) then
+            v_tc = wrap_u_face_p1(s,k)
+            if (s% using_velocity_time_centering) &
+               v_tc = 0.5d0*(v_tc + s% u_face_start(k+1))
          end if
       end function wrap_opt_time_center_v_p1
 

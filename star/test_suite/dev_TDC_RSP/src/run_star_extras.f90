@@ -284,7 +284,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 19
+         how_many_extra_profile_columns = 21
       end function how_many_extra_profile_columns
       
       
@@ -319,9 +319,9 @@
          names(7) = 'logT_R'
          names(8) = 'logRho_R'
          names(9) = 'logL_R'
-
-         names(10) = 'xLr_div_L'
-         names(11) = 'Lr_div_L_R'
+         
+         names(10) = 'xCOUPL'
+         names(11) = 'COUPL_R'
          names(12) = 'xSOURCE'
          names(13) = 'SRC_R'
          names(14) = 'xDAMP'
@@ -330,18 +330,22 @@
          names(17) = 'Eq_R'
          names(18) = 'xUq'
          names(19) = 'Uq_R'
+         names(20) = 'xavQ'
+         names(21) = 'avQ_R'
          
          if (.false.) then ! debugging
-            names(10) = 'diff_rho' ! 'xtr1'
+            names(10) = 'xtr1'
             names(11) = 'xtr1_R'
-            names(12) = 'diff_T' ! 'xtr2'
+            names(12) = 'xtr2'
             names(13) = 'xtr2_R'
-            names(14) = 'diff_w' ! 'xtr3'
+            names(14) = 'xtr3'
             names(15) = 'xtr3_R'
-            names(16) = 'diff_v' ! 'xtr4'
+            names(16) = 'xtr4'
             names(17) = 'xtr4_R'
-            names(18) = 'diff_r' ! 'xtr5'
+            names(18) = 'xtr5'
             names(19) = 'xtr5_R'
+            names(20) = 'xtr6'
+            names(21) = 'xtr6_R'
          end if
 
          if (.not. associated(s_other% Y_face)) then
@@ -365,23 +369,20 @@
                vals(k,7) = s_other% lnT(k)/ln10
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
-               
-               vals(k,10) = s% Lr(k)/s% L(k)
-               vals(k,11) = s_other% Lr(k)/s_other% L(k)
-
+               vals(k,10) = s% COUPL(k)
+               vals(k,11) = s_other% COUPL(k)
                vals(k,12) = s% SOURCE(k)
                vals(k,13) = s_other% SOURCE(k)
-
                vals(k,14) = s% DAMP(k)
                vals(k,15) = s_other% DAMP(k)
-
                vals(k,16) = s% Eq(k)
                vals(k,17) = s_other% Eq(k)
-
                vals(k,18) = s% Uq(k)
-               vals(k,19) = s_other% Uq(k)
+               vals(k,19) = s_other% Uq(k)               
+               vals(k,20) = s% avQ(k)
+               vals(k,21) = s_other% avQ(k)
                
-               if (.false.) then ! debugging values
+               if (.false.) then ! debugging xtra values
                   vals(k,10) = s% xtra1_array(k)
                   vals(k,11) = s_other% xtra1_array(k)
                   vals(k,12) = s% xtra2_array(k)
@@ -392,9 +393,11 @@
                   vals(k,17) = s_other% xtra4_array(k)
                   vals(k,18) = s% xtra5_array(k)
                   vals(k,19) = s_other% xtra5_array(k)
+                  vals(k,20) = s% xtra6_array(k)
+                  vals(k,21) = s_other% xtra6_array(k)
                end if
                
-               if (.false.) then ! debugging ratios
+               if (.false.) then ! debugging xtra ratios
                   vals(k,10) = fix_if_bad(err(s% xtra1_array(k),s_other% xtra1_array(k)))
                   vals(k,11) = 0
                   vals(k,12) = fix_if_bad(err(s% xtra2_array(k),s_other% xtra2_array(k)))
@@ -405,6 +408,8 @@
                   vals(k,17) = 0
                   vals(k,18) = fix_if_bad(err(s% xtra5_array(k),s_other% xtra5_array(k)))
                   vals(k,19) = 0
+                  vals(k,20) = fix_if_bad(err(s% xtra6_array(k),s_other% xtra6_array(k)))
+                  vals(k,21) = 0
                end if
                
             end do

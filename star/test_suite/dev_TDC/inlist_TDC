@@ -1,17 +1,14 @@
 
 &star_job
+
    load_saved_model = .true.
    change_initial_TDC_flag = .true.
    new_TDC_flag = .true.
+   
    save_model_when_terminate = .true.
    save_model_filename = 'tdc_final.mod'
-   
-   change_initial_v_flag = .true.
-   new_v_flag = .true.
 
    !pgstar_flag = .true.
-
-      first_model_for_timing = 2
 
 / ! end of star_job namelist
 
@@ -22,34 +19,21 @@
 / ! end of kap namelist
 
 &controls  
-
-max_model_number = 1000
    
-! solver   
-   
-   steps_before_use_velocity_time_centering = 0
-   include_P_in_velocity_time_centering = .true.
-   include_L_in_velocity_time_centering = .true.
-   use_Fraley_PdV_work_when_time_centering_velocity = .true.
-   
-   use_fixed_Psurf_outer_BC = .true.
-   fixed_Psurf = 0
-   
-   alt_scale_height_flag = .false.
+! solver      
    
 ! output
+   photo_interval = 1000
+   !profile_interval = 1
+   !history_interval = 1
+   terminal_interval = 100
 
-      photo_interval = 1000
-      !profile_interval = 1
-      !history_interval = 1
-      terminal_interval = 100
+   photo_interval = 500
+   !profile_interval = 1
+   !history_interval = 1
+   terminal_interval = 50
 
-      photo_interval = 500
-      !profile_interval = 1
-      !history_interval = 1
-      terminal_interval = 50
-
-      !fill_arrays_with_NaNs = .true.
+   !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 

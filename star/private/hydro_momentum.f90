@@ -589,13 +589,7 @@
             return
          end if
          
-         if (s% u_flag) then
-            v00 = s% u_face_ad(k)
-            if (s% using_velocity_time_centering) &
-               v00 = 0.5d0*(v00 + s% u_face_start(k))
-         else
-            v00 = wrap_opt_time_center_v_00(s,k)
-         end if         
+         v00 = wrap_opt_time_center_v_00(s,k)
          
          ! dr = r - r0 = v00*dt
          ! eqn: dr/r0 = v00*dt/r0

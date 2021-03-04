@@ -1578,6 +1578,8 @@
             if (failed('xtra4_array')) exit
             call do1(s% xtra5_array, c% xtra5_array)
             if (failed('xtra5_array')) exit
+            call do1(s% xtra6_array, c% xtra6_array)
+            if (failed('xtra6_array')) exit
 
             call do1_integer(s% ixtra1_array, c% ixtra1_array)
             if (failed('ixtra1_array')) exit
@@ -1589,6 +1591,8 @@
             if (failed('ixtra4_array')) exit
             call do1_integer(s% ixtra5_array, c% ixtra5_array)
             if (failed('ixtra5_array')) exit
+            call do1_integer(s% ixtra6_array, c% ixtra6_array)
+            if (failed('ixtra6_array')) exit
 
             if (action_in /= do_check_size) then
                if (action_in /= do_copy_pointers_and_resize .and. &

@@ -437,13 +437,6 @@
          r_p1 = wrap_opt_time_center_r_p1(s,k)
          v_p1 = wrap_opt_time_center_v_p1(s,k)
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
-         
-         !s% xtra1_array(k) = v_00%val
-         !s% xtra2_array(k) = r_00%val
-         !s% xtra3_array(k) = d_v_div_r%val
-         !s% xtra4_array(k) = 1
-         !s% xtra5_array(k) = 1
-
       end function compute_d_v_div_r
       
       

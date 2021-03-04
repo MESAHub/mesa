@@ -365,6 +365,7 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
+         use hydro_tdc, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -374,7 +375,7 @@
             r_ad, A_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
-            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad
+            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
          ! use d1Array(i_L_00) for w_00
          real(dp) :: dG_dw_div_wc, delta_m, f
             
@@ -479,6 +480,12 @@
                 s% RTI_du_diffusion_kick(k) = du_ad%val
                 s% u_face_ad(k) = s% u_face_ad(k) + du_ad
              end if
+         end if
+         
+         if (s% TDC_flag) then ! include Uq in u_face
+            Uq_ad = compute_Uq_face(s, k, ierr)
+            if (ierr /= 0) return
+            s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          end if
 
          if (s% P_face_start(k) < 0d0) then

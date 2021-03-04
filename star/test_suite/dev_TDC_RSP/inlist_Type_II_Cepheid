@@ -45,8 +45,8 @@
    TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
    TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
 
-   !TDC_alfam =     0.05d0        ! "lots of struggling"
-   TDC_alfam =     0.25d0        ! standard value        change RSP_alfam to match
+   !TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+   TDC_alfam =     0.05d0        ! "lots of struggling"
 
    TDC_num_outermost_cells_forced_nonturbulent = 1
    TDC_num_innermost_cells_forced_nonturbulent = 5
@@ -68,8 +68,8 @@
    RSP_alfat  = 0.0d0
    RSP_gammar = 0d0
 
-   !RSP_alfam  = 0.05d0
-   RSP_alfam  = 0.25d0 ! standard value        change TDC_alfam to match
+   !RSP_alfam  = 0.25d0 ! standard value        change TDC_alfam to match
+   RSP_alfam  = 0.05d0
 
 / ! end of controls namelist
 

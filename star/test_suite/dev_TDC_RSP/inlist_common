@@ -73,6 +73,9 @@
 
    set_rho_to_dm_div_dV = .false.
    
+   avQ_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   avQ_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+   
 ! output
    terminal_show_age_units = 'days'
    terminal_show_timestep_units = 'secs'
@@ -123,7 +126,7 @@
    RSP_wtc =        0.6667d0     ! Lc
    RSP_wtt =        0.6667d0     ! Lt
    RSP_gam =        1.0d0        ! Et src_snk
-   
+
    ! controls for building the initial model
    RSP_nz = 150 ! total number of zones in initial model
    RSP_nz_outer = 40 ! number of zones in outer region of initial model
@@ -330,12 +333,14 @@
    !pause = .true.
 
    pgstar_xaxis_label_scale = 1.0
-   pgstar_left_yaxis_label_scale = 1.0
-   pgstar_right_yaxis_label_scale = 1.0
+   pgstar_left_yaxis_label_scale = 0.9
+   pgstar_right_yaxis_label_scale = 0.9
 
    pgstar_xaxis_label_disp = 2.5
-   pgstar_left_yaxis_label_disp = 5.2 ! 4.2 ! 3.4
-   pgstar_right_yaxis_label_disp = 5.4 !4.4
+   pgstar_left_yaxis_label_disp = 4.6 ! 4.2 ! 3.4
+   pgstar_right_yaxis_label_disp = 5.2 !4.4
+
+   pgstar_num_scale = 0.85
    
    pgstar_history_line_style = 4
    pgstar_profile_line_style = 4
@@ -500,7 +505,7 @@
    Profile_Panels1_xmax = -101D0
    Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
-   Profile_Panels1_num_panels = 8
+   Profile_Panels1_num_panels = 9
            
    Profile_Panels1_yaxis_name(1) = 'v_kms'         
    Profile_Panels1_other_yaxis_name(1) = 'v_R'
@@ -535,6 +540,10 @@
       Profile_Panels1_yaxis_name(8) = 'xtr5' 
       Profile_Panels1_other_yaxis_name(8) = 'xtr5_R' 
       Profile_Panels1_same_yaxis_range(8) = .true.
+            
+      Profile_Panels1_yaxis_name(9) = 'xtr6' 
+      Profile_Panels1_other_yaxis_name(9) = 'xtr6_R' 
+      Profile_Panels1_same_yaxis_range(9) = .true.
 
 ! rel error debugging output
 
@@ -557,6 +566,10 @@
       Profile_Panels1_yaxis_name(8) = 'diff_r' 
       Profile_Panels1_other_yaxis_name(8) = 'xtr5_R' 
       Profile_Panels1_same_yaxis_range(8) = .true.
+            
+      Profile_Panels1_yaxis_name(9) = '' 
+      Profile_Panels1_other_yaxis_name(9) = '' 
+      Profile_Panels1_same_yaxis_range(9) = .true.
 
 ! standard output
 
@@ -579,6 +592,10 @@
       Profile_Panels1_yaxis_name(8) = 'Uq' 
       Profile_Panels1_other_yaxis_name(8) = 'Uq_R' 
       Profile_Panels1_same_yaxis_range(8) = .true.
+
+      Profile_Panels1_yaxis_name(9) = 'avQ'
+      Profile_Panels1_other_yaxis_name(9) = 'avQ_R' 
+      Profile_Panels1_same_yaxis_range(9) = .true.
 
    
 
