@@ -939,13 +939,13 @@
             call pgsci(1)
             if (j < panels_num_panels) then
                if (other_yaxis_id <= 0 .and. other_yfile_data_len <= 0) then
-                  call show_box_pgstar(s,'BCST1','BCMNSTV1')
+                  call show_box_pgstar(s,'BCST','BCMNSTV')
                else
                   call show_box_pgstar(s,'BCST','BNSTV')
                end if
             else
                if (other_yaxis_id <= 0 .and. other_yfile_data_len <= 0) then
-                  call show_box_pgstar(s,'BCNST1','BCMNSTV1')
+                  call show_box_pgstar(s,'BCNST','BCMNSTV')
                else
                   call show_box_pgstar(s,'BCNST','BNSTV')
                end if

@@ -28,9 +28,6 @@
    include_P_in_velocity_time_centering = .true.
    include_L_in_velocity_time_centering = .true.
    use_Fraley_PdV_work_when_time_centering_velocity = .true.
-
-   tol_correction_norm = 1d99 
-   tol_max_correction = 1d99
    
    use_fixed_Psurf_outer_BC = .true.
    fixed_Psurf = 0

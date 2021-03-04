@@ -342,13 +342,13 @@
 
    pgstar_num_scale = 0.85
    
-   pgstar_history_line_style = 4
-   pgstar_profile_line_style = 4
+   pgstar_history_line_style = 2
+   pgstar_profile_line_style = 2
       ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
 
    Grid2_win_flag = .true.
 
-   Grid2_win_width = 12
+   Grid2_win_width = 16
    Grid2_win_aspect_ratio = 0.667 ! aspect_ratio = height/width
    Grid2_num_cols = 4 ! divide plotting region into this many equal width cols
    Grid2_num_rows = 8 ! divide plotting region into this many equal height rows

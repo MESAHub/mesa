@@ -460,6 +460,10 @@
          real(dp), pointer, dimension(:) :: &
             w, w_start, Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
+
+         integer :: TDC_num_periods
+         real(dp) :: TDC_period, &
+            TDC_DeltaR, TDC_DeltaMag, TDC_GRPDV, TDC_GREKM, TDC_GREKM_avg_abs
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
@@ -1115,7 +1119,7 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
+            RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_etrb, using_velocity_time_centering, okay_to_set_mixing_info
          

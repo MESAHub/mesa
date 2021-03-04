@@ -572,7 +572,6 @@
          use solve_omega_mix, only: do_solve_omega_mix
          use mix_info, only: set_cz_bdy_mass, set_mixing_info
          use hydro_rotation, only: set_rotation_info, set_i_rot
-         use solve_hydro, only: set_luminosity_by_category
          use winds, only: set_mdot
          use star_utils, only: &
             eval_integrated_total_energy_profile, eval_deltaM_total_energy_integrals, &
@@ -763,13 +762,8 @@
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_surface, -1, ierr)
          call eval_integrated_total_energy_profile(s, s%total_energy_integral_center, 1, ierr)
 
-         call set_luminosity_by_category(s) ! final values for use in selecting timestep
-         call set_power_info(s)
-
-         s% total_angular_momentum = total_angular_momentum(s)
          call do_report(s, ierr)
          if (failed('do_report')) return
-         call set_phase_of_evolution(s)
             
          call system_clock(time0,clock_rate)
          s% current_system_clock_time = time0
@@ -1786,7 +1780,6 @@
          use report, only: do_report
          use hydro_vars, only: set_vars_if_needed
          use mlt_info, only: set_gradT_excess_alpha
-         use solve_hydro, only: set_luminosity_by_category
          use star_utils, only: min_dr_div_cs, &
             total_angular_momentum, eval_Ledd
 
@@ -1808,8 +1801,6 @@
             call set_vars_if_needed(s, s% dt, str, ierr)
             if (failed('set_vars_if_needed')) return     
             s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
-            call set_luminosity_by_category(s)
-            s% total_angular_momentum = total_angular_momentum(s)
             call do_report(s, ierr)
             if (failed('do_report ierr')) return     
          end if

@@ -401,7 +401,11 @@
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
-    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, &
+    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_etrb_xscale_min, &
+    TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
+    TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
+    TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
+    
     
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
@@ -2058,8 +2062,23 @@
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
  s% TDC_w_min_for_damping = TDC_w_min_for_damping
+ s% TDC_etrb_xscale_min = TDC_etrb_xscale_min
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
+ s% TDC_target_steps_per_cycle = TDC_target_steps_per_cycle
+ s% TDC_max_num_periods = TDC_max_num_periods
+ s% TDC_work_period = TDC_work_period
+ s% TDC_map_first_period = TDC_map_first_period
+ s% TDC_map_last_period = TDC_map_last_period
+ s% TDC_min_max_R_for_periods = TDC_min_max_R_for_periods
+ s% TDC_GREKM_avg_abs_frac_new = TDC_GREKM_avg_abs_frac_new
+ s% TDC_GREKM_avg_abs_limit = TDC_GREKM_avg_abs_limit
+ s% TDC_map_zone_interval = TDC_map_zone_interval
+ s% TDC_work_filename = TDC_work_filename
+ s% TDC_map_columns_filename = TDC_map_columns_filename
+ s% TDC_map_filename = TDC_map_filename
+ s% TDC_map_history_filename = TDC_map_history_filename
+ s% TDC_write_map = TDC_write_map
 
  ! timestep
  s% max_timestep = max_timestep
@@ -3686,8 +3705,23 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
  TDC_w_min_for_damping = s% TDC_w_min_for_damping
+ TDC_etrb_xscale_min = s% TDC_etrb_xscale_min
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
+ TDC_target_steps_per_cycle = s% TDC_target_steps_per_cycle
+ TDC_max_num_periods = s% TDC_max_num_periods
+ TDC_work_period = s% TDC_work_period
+ TDC_map_first_period = s% TDC_map_first_period
+ TDC_map_last_period = s% TDC_map_last_period
+ TDC_min_max_R_for_periods = s% TDC_min_max_R_for_periods
+ TDC_GREKM_avg_abs_frac_new = s% TDC_GREKM_avg_abs_frac_new
+ TDC_GREKM_avg_abs_limit = s% TDC_GREKM_avg_abs_limit
+ TDC_map_zone_interval = s% TDC_map_zone_interval
+ TDC_work_filename = s% TDC_work_filename
+ TDC_map_columns_filename = s% TDC_map_columns_filename
+ TDC_map_filename = s% TDC_map_filename
+ TDC_map_history_filename = s% TDC_map_history_filename
+ TDC_write_map = s% TDC_write_map
 
  ! timestep
  max_timestep = s% max_timestep

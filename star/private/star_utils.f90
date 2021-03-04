@@ -2960,9 +2960,44 @@
             yrs_for_init_timestep = 1d5 / pow(s% initial_mass,2.5d0)
          end if
       end function yrs_for_init_timestep
+      
+      
+      subroutine set_phot_info(s)
+         use atm_lib, only: atm_black_body_T
+         type (star_info), pointer :: s
+         real(dp) :: luminosity
+         include 'formats'
+         call get_phot_info(s, &
+            s% photosphere_r, s% photosphere_m, s% photosphere_v, &
+            s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
+            s% photosphere_opacity, s% photosphere_logg, &
+            s% photosphere_column_density, s% photosphere_cell_k)
+         s% photosphere_black_body_T = &
+            atm_black_body_T(s% photosphere_L, s% photosphere_r)
+         s% photosphere_r = s% photosphere_r/Rsun
+         s% photosphere_m = s% photosphere_m/Msun
+         s% photosphere_L = s% photosphere_L/Lsun
+         s% L_phot = s% photosphere_L
+         luminosity = s% L(1)
+         if (is_bad(luminosity)) then
+            write(*,2) 's% L(1)', s% model_number, s% L(1)
+            write(*,2) 's% xh(s% i_lum,1)', s% model_number, s% xh(s% i_lum,1)
+            stop 'set_phot_info'
+            luminosity = 0d0
+         end if
+         if (s% Teff < 0 .or. is_bad(s% Teff)) s% Teff = s% photosphere_black_body_T
+         s% L_surf = luminosity/Lsun
+         s% log_surface_luminosity = log10(max(1d-99,luminosity/Lsun))
+            ! log10(stellar luminosity in solar units)
+         s% log_L_surf = s% log_surface_luminosity
+         if (is_bad(s% L_surf)) then
+            write(*,2) 's% L_surf', s% model_number, s% L_surf
+            stop 'set_phot_info'
+         end if
+      end subroutine set_phot_info
 
 
-      subroutine set_phase_of_evolution(s) ! from evolve after call do_report
+      subroutine set_phase_of_evolution(s)
          use rates_def, only: i_rate
          use chem_def
          type (star_info), pointer :: s
@@ -2970,6 +3005,10 @@
             center_h1, center_he4
          integer :: nz, j
          include 'formats'
+         
+         call set_power_info(s)
+         call set_phot_info(s)
+         
          nz = s% nz
          
          j = s% net_iso(ih1)
@@ -3859,6 +3898,210 @@
          end if
          scal = scal*s% dt/s% energy_start(k)
       end subroutine set_energy_eqn_scal
+
+
+      subroutine set_power_info(s)
+         use chem_def
+         type (star_info), pointer :: s
+         integer :: j, k, nz
+         real(dp) :: eps_nuc
+         include 'formats'
+         nz = s% nz
+
+         do j=1,num_categories
+            s% L_by_category(j) = &
+               dot_product(s% dm(1:nz), s% eps_nuc_categories(j,1:nz))/Lsun
+            s% center_eps_burn(j) = center_value_eps_burn(j)
+            if (is_bad(s% L_by_category(j))) then
+               do k=1,nz
+                  if (is_bad(s% eps_nuc_categories(j,k))) then
+                     write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
+                     if (s% stop_for_bad_nums) stop 'set_power_info'
+                  end if
+               end do
+            end if
+         end do  
+                
+         if (s% eps_nuc_factor == 0d0) then
+            s% power_nuc_burn = 0d0
+            s% power_nuc_neutrinos = 0d0
+            s% power_nonnuc_neutrinos = 0d0
+            s% power_neutrinos = 0d0
+            s% power_h_burn = 0d0
+            s% power_he_burn = 0d0
+            s% power_z_burn = 0d0
+            s% power_PP = 0d0
+            s% power_CNO = 0d0
+            s% power_tri_alpha = 0d0
+            s% power_c_alpha = 0d0
+            s% power_n_alpha = 0d0
+            s% power_o_alpha = 0d0
+            s% power_ne_alpha = 0d0
+            s% power_na_alpha = 0d0
+            s% power_mg_alpha = 0d0
+            s% power_si_alpha = 0d0
+            s% power_s_alpha = 0d0
+            s% power_ar_alpha = 0d0
+            s% power_ca_alpha = 0d0
+            s% power_ti_alpha = 0d0
+            s% power_cr_alpha = 0d0
+            s% power_fe_co_ni = 0d0
+            s% power_c12_c12 = 0d0
+            s% power_c12_o16 = 0d0
+            s% power_o16_o16 = 0d0
+            s% power_photo = 0d0
+            s% power_pnhe4 = 0d0
+            s% power_ni56_co56 = 0d0
+            s% power_co56_fe56 = 0d0
+            s% power_other = 0d0
+         else            
+            ! better if set power_nuc_burn using eps_nuc instead of categories
+            ! categories can be subject to numerical jitters at very high temperatures
+            s% power_nuc_burn = 0d0
+            do k=1,nz
+               if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
+                  eps_nuc = s% burn_avg_epsnuc(k)
+               else
+                  eps_nuc = s% eps_nuc(k)
+               end if
+               s% power_nuc_burn = s% power_nuc_burn + eps_nuc*s% dm(k)
+            end do
+            s% power_nuc_burn = s% power_nuc_burn/Lsun            
+            s% power_nuc_neutrinos = dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
+            s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
+            s% power_he_burn = s% L_by_category(i3alf)
+            s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
+            s% power_PP = s% L_by_category(ipp)
+            s% power_CNO = s% L_by_category(icno)
+            s% power_tri_alpha = s% L_by_category(i3alf)
+            s% power_c_alpha = s% L_by_category(i_burn_c)
+            s% power_n_alpha = s% L_by_category(i_burn_n)
+            s% power_o_alpha = s% L_by_category(i_burn_o)
+            s% power_ne_alpha = s% L_by_category(i_burn_ne)
+            s% power_na_alpha = s% L_by_category(i_burn_na)
+            s% power_mg_alpha = s% L_by_category(i_burn_mg)
+            s% power_si_alpha = s% L_by_category(i_burn_si)
+            s% power_s_alpha = s% L_by_category(i_burn_s)
+            s% power_ar_alpha = s% L_by_category(i_burn_ar)
+            s% power_ca_alpha = s% L_by_category(i_burn_ca)
+            s% power_ti_alpha = s% L_by_category(i_burn_ti)
+            s% power_cr_alpha = s% L_by_category(i_burn_cr)
+            s% power_fe_co_ni = s% L_by_category(i_burn_fe)
+            s% power_c12_c12 = s% L_by_category(icc)
+            s% power_c12_o16 = s% L_by_category(ico)
+            s% power_o16_o16 = s% L_by_category(ioo)
+            s% power_photo = s% L_by_category(iphoto)
+            s% power_pnhe4 = s% L_by_category(ipnhe4)
+            s% power_ni56_co56 = s% L_by_category(i_ni56_co56)
+            s% power_co56_fe56 = s% L_by_category(i_co56_fe56)
+            s% power_other = s% L_by_category(iother)
+         end if
+         
+         if (s% non_nuc_neu_factor == 0d0) then
+            s% power_nonnuc_neutrinos = 0d0
+         else
+            s% power_nonnuc_neutrinos = &
+                 dot_product(s% dm(1:nz),s% non_nuc_neu(1:nz))/Lsun
+         end if
+         s% power_neutrinos = s% power_nuc_neutrinos + s% power_nonnuc_neutrinos
+         s% L_nuc_burn_total = s% power_nuc_burn
+         
+         contains
+
+         real(dp) function center_value_eps_burn(j)
+            integer, intent(in) :: j
+            real(dp) :: sum_x, sum_dq, dx, dq
+            integer :: k
+            sum_x = 0
+            sum_dq = 0
+            do k = s% nz, 1, -1
+               dq = s% dq(k)
+               dx = s% eps_nuc_categories(j,k)*dq
+               if (sum_dq+dq >= s% center_avg_value_dq) then
+                  sum_x = sum_x + dx*(s% center_avg_value_dq - sum_dq)/dq
+                  sum_dq = s% center_avg_value_dq
+                  exit
+               end if
+               sum_x = sum_x + dx
+               sum_dq = sum_dq + dq
+            end do
+            center_value_eps_burn = sum_x/sum_dq
+         end function center_value_eps_burn
+
+      end subroutine set_power_info
+         
+      subroutine set_surf_center_abundance_info(s)
+         use chem_def
+         type (star_info), pointer :: s
+         integer :: h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56
+         integer, pointer :: net_iso(:)
+         net_iso => s% net_iso
+         h1 = net_iso(ih1)
+         h2 = net_iso(ih2)
+         he3 = net_iso(ihe3)
+         he4 = net_iso(ihe4)
+         c12 = net_iso(ic12)
+         n14 = net_iso(in14)
+         o16 = net_iso(io16)
+         ne20 = net_iso(ine20)
+         si28 = net_iso(isi28)
+         co56 = net_iso(ico56)
+         ni56 = net_iso(ini56)
+         if (h1 /= 0) then
+            s% center_h1 = center_avg_x(s,h1)
+            s% surface_h1 = surface_avg_x(s,h1)
+         end if
+         if (he3 /= 0) then
+            s% center_he3 = center_avg_x(s,he3)
+            s% surface_he3 = surface_avg_x(s,he3)
+         end if
+         if (he4 /= 0) then
+            s% center_he4 = center_avg_x(s,he4)
+            s% surface_he4 = surface_avg_x(s,he4)
+         end if
+         if (c12 /= 0) then
+            s% center_c12 = center_avg_x(s,c12)
+            s% surface_c12 = surface_avg_x(s,c12)
+         end if
+         if (n14 /= 0) then
+            s% center_n14 = center_avg_x(s,n14)
+            s% surface_n14 = surface_avg_x(s,n14)
+         end if
+         if (o16 /= 0) then
+            s% center_o16 = center_avg_x(s,o16)
+            s% surface_o16 = surface_avg_x(s,o16)
+         end if
+         if (ne20 /= 0) then
+            s% center_ne20 = center_avg_x(s,ne20)
+            s% surface_ne20 = surface_avg_x(s,ne20)
+         end if
+         if (si28 /= 0) then
+            s% center_si28 = center_avg_x(s,si28)
+         end if
+      end subroutine set_surf_center_abundance_info
+
+
+      subroutine set_luminosity_by_category(s) ! integral by mass from center out
+         use chem_def, only: category_name
+         use rates_def, only: i_rate
+         use utils_lib, only: is_bad
+         type (star_info), pointer :: s
+         integer :: k, j
+         real(dp) :: L_burn_by_category(num_categories)
+         include 'formats'
+         L_burn_by_category(:) = 0
+         do k = s% nz, 1, -1
+            do j = 1, num_categories
+               L_burn_by_category(j) = &
+                  L_burn_by_category(j) + s% dm(k)*s% eps_nuc_categories(j, k)
+               if (is_bad(L_burn_by_category(j))) then
+                  write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
+                  if (s% stop_for_bad_nums) stop 'set_luminosity_by_category'
+               end if
+               s% luminosity_by_category(j,k) = L_burn_by_category(j)
+            end do
+         end do
+      end subroutine set_luminosity_by_category
 
 
       end module star_utils

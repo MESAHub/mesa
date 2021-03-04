@@ -57,10 +57,12 @@
          do k=1,nz
             do i=1,nvar
                if (i <= nvar_hydro) then ! structure variable
-                  if (i /= s% i_j_rot) then
-                     s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
-                  else
+                  if (i == s% i_j_rot) then
                      s% x_scale(i,k) = 10d0*sqrt(s% cgrav(k)*s% m(k)*s% r_start(k))
+                  else if (i == s% i_etrb) then
+                     s% x_scale(i,k) = max(s% TDC_etrb_xscale_min, abs(s% xh_start(i,k)))
+                  else
+                     s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
                   end if
                else ! abundance variable
                   s% x_scale(i,k) = max(s% xa_scale, s% xa_start(i-nvar_hydro,k))
