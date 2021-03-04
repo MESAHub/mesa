@@ -125,10 +125,12 @@
 / ! end of controls namelist
 
 &pgstar
+   
+   Grid2_win_flag = .true.
 
    ! HR window -- lg_L vs. lg_Teff
 
-   HR_win_flag = .true.
+   !HR_win_flag = .true.
 
    HR_win_width = 8
    HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width

@@ -332,7 +332,7 @@
             return
          end if
 
-         do_edit_lnR = do_lnR .and. (.not. s% doing_check_partials) .and. s% solver_use_lnR
+         do_edit_lnR = do_lnR .and. (.not. s% doing_check_partials)
          if (do_edit_lnR) call edit_lnR(s, xh_start, s% solver_dx)
          do k=1,nz
             if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
@@ -398,13 +398,8 @@
 
             if (do_lnT) then
                
-               if (s% solver_use_lnT) then
-                  s% lnT(k) = x(i_lnT)
-                  s% T(k) = exp(s% lnT(k))
-               else
-                  s% T(k) = x(i_lnT)
-                  s% lnT(k) = log(s% T(k))
-               end if
+               s% lnT(k) = x(i_lnT)
+               s% T(k) = exp(s% lnT(k))
                s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                if (abs(s% lnT(k) - s% lnT_start(k)) > &
                        ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
@@ -598,13 +593,8 @@
             end if
 
             if (do_lnR) then
-               if (s% solver_use_lnR) then
-                  s% lnR(k) = x(i_lnR)
-                  s% r(k) = exp(s% lnR(k))
-               else
-                  s% r(k) = x(i_lnR)
-                  s% lnR(k) = log(s% r(k))
-               end if
+               s% lnR(k) = x(i_lnR)
+               s% r(k) = exp(s% lnR(k))
                s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
                if (is_bad_num(s% lnR(k))) then
                   s% retry_message = 'bad num for lnR'
@@ -620,13 +610,8 @@
             end if
 
             if (do_lnd) then
-               if (s% solver_use_lnd) then
-                  s% lnd(k) = x(i_lnd)
-                  s% rho(k) = exp(s% lnd(k))
-               else
-                  s% rho(k) = x(i_lnd)
-                  s% lnd(k) = log(s% rho(k))
-               end if
+               s% lnd(k) = x(i_lnd)
+               s% rho(k) = exp(s% lnd(k))
                s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
                if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                   write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k

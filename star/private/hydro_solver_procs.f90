@@ -360,23 +360,11 @@
             skip2 = s% i_u
          end if
          
-         if (s% solver_use_lnR) then
-            skip3 = 0
-         else
-            skip3 = s% i_lnR
-         end if
+         skip3 = 0
          
-         if (s% solver_use_lnT) then
-            skip4 = 0
-         else
-            skip4 = s% i_lnT
-         end if
+         skip4 = 0
          
-         if (s% solver_use_lnd) then
-            skip5 = 0
-         else
-            skip5 = s% i_lnd
-         end if
+         skip5 = 0
          
          i_alpha_RTI = s% i_alpha_RTI
          i_ln_cvpv0 = s% i_ln_cvpv0
@@ -672,27 +660,15 @@
          end if
          
          if (s% i_lnd > 0 .and. s% i_lnd <= nvar) then
-            if (s% solver_use_lnd) then
-               call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
-            else
-               call clip_so_non_negative(s% i_lnd, 1d0)
-            end if
+            call clip1(s% i_lnd, s% solver_clip_dlogRho*ln10)
          end if
          
          if (s% i_lnT > 0 .and. s% i_lnT <= nvar) then
-            if (s% solver_use_lnT) then
-               call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
-            else
-               call clip_so_non_negative(s% i_lnT, 1d0)
-            end if
+            call clip1(s% i_lnT, s% solver_clip_dlogT*ln10)
          end if
          
          if (s% i_lnR > 0 .and. s% i_lnR <= nvar) then
-            if (s% solver_use_lnR) then
-               call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
-            else
-               call clip_so_non_negative(s% i_lnR, 1d0)
-            end if
+            call clip1(s% i_lnR, s% solver_clip_dlogR*ln10)
          end if
                
 

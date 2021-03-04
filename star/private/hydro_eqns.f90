@@ -1075,11 +1075,8 @@
             dlnP_bc_dlnR = dlnP_bc_dlnPsurf*dlnPsurf_dlnR + dlnP_bc_dP0*dP0_dlnR
 
             dlnR00 = P_bc*dlnP_bc_dlnR
-            if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = P_bc*dlnP_bc_dlnT
-            if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
             dlnd00 = P_bc*dlnP_bc_dlnd
-            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(P_bc_ad, P_bc, &
                0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
@@ -1091,11 +1088,8 @@
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             dlnR00 = dlnP_bc_dlnR
-            if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = dlnP_bc_dlnT
-            if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
             dlnd00 = dlnP_bc_dlnd
-            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(lnP_bc_ad, lnP_bc, &
                0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
@@ -1115,11 +1109,8 @@
             dlnT_bc_dlnR = dlnT_bc_dlnTsurf*dlnTsurf_dlnR + dlnT_bc_dT0*dT0_dlnR
 
             dlnR00 = T_bc*dlnT_bc_dlnR
-            if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = T_bc*dlnT_bc_dlnT
-            if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
             dlnd00 = T_bc*dlnT_bc_dlnd
-            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(T_bc_ad, T_bc, &
                0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
@@ -1131,11 +1122,8 @@
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
             dlnR00 = dlnT_bc_dlnR
-            if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(1)
             dlnT00 = dlnT_bc_dlnT
-            if (.not. s% solver_use_lnT) dlnT00 = dlnT00/s% T(1)
             dlnd00 = dlnT_bc_dlnd
-            if (.not. s% solver_use_lnd) dlnd00 = dlnd00/s% rho(1)
             call wrap(lnT_bc_ad, lnT_bc, &
                0d0, dlnd00, 0d0, &
                0d0, dlnT00, 0d0, &
@@ -1226,15 +1214,9 @@
             ierr = 0            
             rho1 = wrap_d_00(s,1)
             rho2 = wrap_d_p1(s,1)
-            if (s% solver_use_lnd) then
-               dlnd1 = wrap_dxh_lnd(s,1) ! lnd(1) - lnd_start(1)
-               dlnd2 = shift_p1(wrap_dxh_lnd(s,2)) ! lnd(2) - lnd_start(2)
-               resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt            
-            else ! not solver_use_lnd
-               drho1 = wrap_dxh_lnd(s,1) ! rho(1) - rho_start(1)
-               drho2 = shift_p1(wrap_dxh_lnd(s,2)) ! rho(2) - rho_start(2)
-               resid_ad = (1d0/drho1 - 1d0/drho2)/s% dt
-            end if
+            dlnd1 = wrap_dxh_lnd(s,1) ! lnd(1) - lnd_start(1)
+            dlnd2 = shift_p1(wrap_dxh_lnd(s,2)) ! lnd(2) - lnd_start(2)
+            resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt            
             s% equ(i_P_eqn, 1) = resid_ad%val     
             if (skip_partials) return            
             call save_eqn_residual_info( &

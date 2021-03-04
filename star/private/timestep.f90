@@ -2384,23 +2384,9 @@
             skip3 = s% i_u
          end if
 
-         if (s% solver_use_lnR) then
-            skip4 = 0
-         else
-            skip4 = s% i_lnR
-         end if
-
-         if (s% solver_use_lnT) then
-            skip5 = 0
-         else
-            skip5 = s% i_lnT
-         end if
-
-         if (s% solver_use_lnd) then
-            skip6 = 0
-         else
-            skip6 = s% i_lnd
-         end if
+         skip4 = 0
+         skip5 = 0
+         skip6 = 0
 
          i_alpha_RTI = s% i_alpha_RTI
          i_etrb_RSP = s% i_etrb_RSP

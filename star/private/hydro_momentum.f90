@@ -242,10 +242,6 @@
                d_mlt_Pturb = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) - s% rho(k))/3d0
                d_dmltPturb_dlndm1 = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/3d0
                d_dmltPturb_dlnd00 = -s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/3d0
-               if (.not. s% solver_use_lnd) then
-                  d_dmltPturb_dlndm1 = d_dmltPturb_dlndm1/s% rho(k-1)
-                  d_dmltPturb_dlnd00 = d_dmltPturb_dlnd00/s% rho(k)
-               end if
             else
                d_mlt_Pturb = 0d0
                d_dmltPturb_dlndm1 = 0d0
@@ -404,19 +400,10 @@
          if (s% use_other_momentum .or. s% use_other_momentum_implicit) then
             if (s% use_other_momentum_implicit) then
                dlnR00 = s% d_extra_grav_dlnR(k)
-               if (.not. s% solver_use_lnR) dlnR00 = dlnR00/s% r(k)
                dlnTm1 = s% d_extra_grav_dlnTm1(k)
                dlnT00 = s% d_extra_grav_dlnT00(k)
-               if (.not. s% solver_use_lnT) then
-                  dlnTm1 = dlnTm1/s% T(k-1)
-                  dlnT00 = dlnT00/s% T(k)
-               end if
                dlndm1 = s% d_extra_grav_dlndm1(k)
                dlnd00 = s% d_extra_grav_dlnd00(k)
-               if (.not. s% solver_use_lnd) then
-                  dlndm1 = dlndm1/s% rho(k-1)
-                  dlnd00 = dlnd00/s% rho(k)
-               end if
                call wrap(extra_ad, s% extra_grav(k), &
                   dlndm1, dlnd00, 0d0, &
                   dlnTm1, dlnT00, 0d0, &
@@ -610,20 +597,15 @@
             v00 = wrap_opt_time_center_v_00(s,k)
          end if         
          
-         if (s% solver_use_lnR) then
-            ! dr = r - r0 = v00*dt
-            ! eqn: dr/r0 = v00*dt/r0
-            ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
-            ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
-            ! eqn becomes: v00*dt/r0 = expm1(dlnR)
-            dxh_lnR = wrap_dxh_lnR(s,k) ! lnR - lnR_start
-            dr_div_r0_actual = expm1(dxh_lnR) ! expm1(x) = E^x - 1
-            dr_div_r0_expected = v00*s% dt/s% r_start(k)
-            resid_ad = dr_div_r0_expected - dr_div_r0_actual
-         else ! not solver_use_lnR
-            dr = wrap_dxh_lnR(s,k) ! r - r_start
-            resid_ad = (dr - v00*s% dt)/s% r_start(k)
-         end if
+         ! dr = r - r0 = v00*dt
+         ! eqn: dr/r0 = v00*dt/r0
+         ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
+         ! = exp(lnR - lnR0) - 1 = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
+         ! eqn becomes: v00*dt/r0 = expm1(dlnR)
+         dxh_lnR = wrap_dxh_lnR(s,k) ! lnR - lnR_start
+         dr_div_r0_actual = expm1(dxh_lnR) ! expm1(x) = E^x - 1
+         dr_div_r0_expected = v00*s% dt/s% r_start(k)
+         resid_ad = dr_div_r0_expected - dr_div_r0_actual
          
          s% equ(s% i_dlnR_dt, k) = resid_ad%val
          

@@ -621,21 +621,9 @@
                exit
             end if
             j = 1
-            if (s% solver_use_lnd) then
-               j=j+1; xh(i_lnd,k) = vec(j)
-            else
-               j=j+1; xh(i_lnd,k) = exp(vec(j))
-            end if
-            if (s% solver_use_lnT) then
-               j=j+1; xh(i_lnT,k) = vec(j)
-            else
-               j=j+1; xh(i_lnT,k) = exp(vec(j))
-            end if
-            if (s% solver_use_lnR) then
-               j=j+1; xh(i_lnR,k) = vec(j)
-            else
-               j=j+1; xh(i_lnR,k) = exp(vec(j))
-            end if
+            j=j+1; xh(i_lnd,k) = vec(j)
+            j=j+1; xh(i_lnT,k) = vec(j)
+            j=j+1; xh(i_lnR,k) = vec(j)
             if (is_RSP_model) then
                if (want_RSP_model) then
                   j=j+1; xh(i_etrb_RSP,k) = vec(j)

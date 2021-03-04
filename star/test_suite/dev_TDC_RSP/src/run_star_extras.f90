@@ -265,10 +265,10 @@
          end if
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
-         names(1) = 'r_alt'
-         names(2) = 'v_alt'
-         names(3) = 'Teff_alt'
-         names(4) = 'L_alt'
+         names(1) = 'r_Rsp'
+         names(2) = 'v_Rsp'
+         names(3) = 'Teff_Rsp'
+         names(4) = 'L_Rsp'
          vals(1) = s_other% r(1)/Rsun
          vals(2) = s_other% v(1)/1d5 ! kms
          vals(3) = s_other% Teff
@@ -310,38 +310,38 @@
          end if
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
-         names(1) = 'v_alt'
-         names(2) = 'Y_face_alt'
-         names(3) = 'w_alt'
-         names(4) = 'Lr_div_L_alt'
-         names(5) = 'logR_alt'
-         names(6) = 'logP_alt'
-         names(7) = 'logT_alt'
-         names(8) = 'logRho_alt'
-         names(9) = 'logL_alt'
+         names(1) = 'v_R'
+         names(2) = 'Y_face_R'
+         names(3) = 'w_R'
+         names(4) = 'Lr_div_L_R'
+         names(5) = 'logR_R'
+         names(6) = 'logP_R'
+         names(7) = 'logT_R'
+         names(8) = 'logRho_R'
+         names(9) = 'logL_R'
 
          names(10) = 'xLr_div_L'
-         names(11) = 'Lr_div_L_alt'
+         names(11) = 'Lr_div_L_R'
          names(12) = 'xSOURCE'
-         names(13) = 'SOURCE_alt'
+         names(13) = 'SRC_R'
          names(14) = 'xDAMP'
-         names(15) = 'DAMP_alt'
+         names(15) = 'DAMP_R'
          names(16) = 'xEq'
-         names(17) = 'Eq_alt'
+         names(17) = 'Eq_R'
          names(18) = 'xUq'
-         names(19) = 'Uq_alt'
+         names(19) = 'Uq_R'
          
          if (.false.) then ! debugging
             names(10) = 'diff_rho' ! 'xtr1'
-            names(11) = 'xtr1_alt'
+            names(11) = 'xtr1_R'
             names(12) = 'diff_T' ! 'xtr2'
-            names(13) = 'xtr2_alt'
+            names(13) = 'xtr2_R'
             names(14) = 'diff_w' ! 'xtr3'
-            names(15) = 'xtr3_alt'
+            names(15) = 'xtr3_R'
             names(16) = 'diff_v' ! 'xtr4'
-            names(17) = 'xtr4_alt'
+            names(17) = 'xtr4_R'
             names(18) = 'diff_r' ! 'xtr5'
-            names(19) = 'xtr5_alt'
+            names(19) = 'xtr5_R'
          end if
 
          if (.not. associated(s_other% Y_face)) then

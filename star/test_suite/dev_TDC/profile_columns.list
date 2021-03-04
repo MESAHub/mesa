@@ -1,3 +1,52 @@
+! profile_columns.list -- determines the contents of star model profiles
+! you can use a non-standard version by setting profile_columns_file in your inlist
+
+! units are cgs unless otherwise noted.
+
+! reorder the following names as desired to reorder columns.
+! comment out the name to omit a column (fewer columns => less IO => faster running).
+! remove '!' to restore a column.
+
+! if you have a situation where you want a non-standard set of columns,
+! make a copy of this file, edit as desired, and give the new filename in your inlist
+! as profile_columns_file.   if you are just adding columns, you can 'include' this file,
+! and just list the additions in your file.   note: to include the standard default
+! version, use include '' -- the 0 length string means include the default file.
+
+! if you need to have something added to the list of options, let me know....
+
+
+! the first few lines of the profile contain general info about the model.
+! for completeness, those items are described at the end of this file.
+
+
+! note: you can include another list by doing
+!        include 'filename'
+!        include '' means include the default standard list file
+
+
+! the following lines of the profile contain info for 1 zone per row, surface to center.
+
+!   extra 1
+!   extra 2
+!   extra 3
+!   extra 4
+!   extra 5
+!   extra 6
+!   extra 7
+!   extra 8
+!   extra 9
+!   extra 10
+!   extra 11
+!   extra 12
+!   extra 13
+!   extra 14
+!   extra 15
+!   extra 16
+!   extra 17
+!   extra 18
+!   extra 19
+!   extra 20
    
    zone ! numbers start with 1 at the surface
    
@@ -10,16 +59,45 @@
    logE ! log10(specific internal energy) at center of zone
    logR_cm
    entropy ! specific entropy divided by (avo*kerg)
+   !ye
+   !abar ! average atomic weight (g/mole)
+
+
+
+
+
+   
    logR ! log10(radius/Rsun) at outer boundary of zone
+   
+   
+   !conv_vel
+   !conv_L_div_L
+   !log_conv_L_div_L
+   !lum_rad
+   !lum_conv
    luminosity ! luminosity at outer boundary of zone (in Lsun units)
    
    logL ! log(max(1d-6,L/Lsun))
    log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
    gamma1
+   !conv_mixing_type ! mixing types are defined in mesa/const
    csound ! sound speed
+   !log_csound
+   !acoustic_depth
+   !dr_div_cs
    log_dr_div_cs
+   !log_cell_collapse_time
+   !total_energy
+   !total_energy_integral ! total from surface inward. negative if bound. (ergs)
+   
+   !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
    vel_km_per_s
+
    v_div_csound ! velocity divided by sound speed
+   
+   !scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
+   !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
+   !mu ! mean molecular weight per gas particle (ions + free electrons)
    logdq ! log10(dq)
    dq_ratio ! dq(k-1)/dq(k)
    q ! fraction of star mass interior to outer boundary of this zone

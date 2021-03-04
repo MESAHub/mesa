@@ -307,43 +307,22 @@
          
             do j=1,s% nvar_hydro
                if (j == i_lnd) then
-                  if (s% solver_use_lnd) then
-                     do k=1,nz
-                        s% lnd(k) = s% xh(i_lnd,k)
-                        s% rho(k) = exp(s% lnd(k))
-                     end do
-                  else
-                     do k=1,nz
-                        s% rho(k) = s% xh(i_lnd,k)
-                        s% lnd(k) = log(s% rho(k))
-                     end do
-                  end if
+                  do k=1,nz
+                     s% lnd(k) = s% xh(i_lnd,k)
+                     s% rho(k) = exp(s% lnd(k))
+                  end do
                   s% dxh_lnd(1:nz) = 0d0
                else if (j == i_lnT) then
-                  if (s% solver_use_lnT) then
-                     do k=1,nz
-                        s% lnT(k) = s% xh(i_lnT,k)
-                        s% T(k) = exp(s% lnT(k))
-                     end do
-                  else
-                     do k=1,nz
-                        s% T(k) = s% xh(i_lnT,k)
-                        s% lnT(k) = log(s% T(k))
-                     end do
-                  end if
+                  do k=1,nz
+                     s% lnT(k) = s% xh(i_lnT,k)
+                     s% T(k) = exp(s% lnT(k))
+                  end do
                   s% dxh_lnT(1:nz) = 0d0
                else if (j == i_lnR) then
-                  if (s% solver_use_lnR) then
-                     do k=1,nz
-                        s% lnR(k) = s% xh(i_lnR,k)
-                        s% r(k) = exp(s% lnR(k))
-                     end do
-                  else
-                     do k=1,nz
-                        s% r(k) = s% xh(i_lnR,k)
-                        s% lnR(k) = log(s% r(k))
-                     end do
-                  end if
+                  do k=1,nz
+                     s% lnR(k) = s% xh(i_lnR,k)
+                     s% r(k) = exp(s% lnR(k))
+                  end do
                   s% dxh_lnR(1:nz) = 0d0
                else if (j == i_etrb) then
                   do k=1,nz

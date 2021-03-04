@@ -1235,10 +1235,8 @@
                         s% d_eos_dxa(i_lnE,i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% dE_dRho_for_partials(k)*s% rho(k)/s% energy(k)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_00 = s% Cv_for_partials(k)*s% T(k)/s% energy(k)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             end if
          end subroutine get_lnE_partials
          
@@ -1256,10 +1254,8 @@
                   (s% d_eos_dxa(i_lnPgas,i_var_xa_index,k) - s% d_eos_dxa(i_lnPgas,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% chiRho_for_partials(k)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_00 = s% chiT_for_partials(k)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             end if
          end subroutine get_lnP_partials
          
@@ -1277,10 +1273,8 @@
                   (s% d_eos_dxa(i_grad_ad,i_var_xa_index,k) - s% d_eos_dxa(i_grad_ad,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_eos_dlnd(i_grad_ad,k)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_00 = s% d_eos_dlnT(i_grad_ad,k)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             end if
          end subroutine get_grad_ad_partials
          
@@ -1296,10 +1290,8 @@
                dvardx0_00 = s% d_epsnuc_dx(i_var_xa_index,k) - s% d_epsnuc_dx(i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_epsnuc_dlnd(k)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_00 = s% d_epsnuc_dlnT(k)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             end if
          end subroutine get_eps_nuc_partials
          
@@ -1315,10 +1307,8 @@
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_nonnucneu_dlnd(k)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_00 = s% d_nonnucneu_dlnT(k)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             end if
          end subroutine get_non_nuc_neu_partials
          
@@ -1334,14 +1324,10 @@
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
                dvardx0_m1 = s% gradT_ad(k)%d1Array(i_lnd_m1)
-               if (.not. s% solver_use_lnd .and. k > 1) dvardx0_m1 = dvardx0_m1/s% rho(k-1)
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnd_00)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_m1 = s% gradT_ad(k)%d1Array(i_lnT_m1)
-               if (.not. s% solver_use_lnT .and. k > 1) dvardx0_m1 = dvardx0_m1/s% T(k-1)
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnT_00)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             else if (i_var == s% i_lnR) then
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnR_00)
             else if (i_var == s% i_lum) then
@@ -1365,14 +1351,10 @@
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
                dvardx0_m1 = s% mlt_vc_ad(k)%d1Array(i_lnd_m1)
-               if (.not. s% solver_use_lnd .and. k > 1) dvardx0_m1 = dvardx0_m1/s% rho(k-1)
                dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_lnd_00)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_m1 = s% mlt_vc_ad(k)%d1Array(i_lnT_m1)
-               if (.not. s% solver_use_lnT .and. k > 1) dvardx0_m1 = dvardx0_m1/s% T(k-1)
                dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_lnT_00)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             else if (i_var == s% i_lnR) then
                dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_lnR_00)
             else if (i_var == s% i_lum) then
@@ -1392,10 +1374,8 @@
                dvardx0_00 = 0d0 ! s% d_opacity_dx(i_var_xa_index,k) - s% d_opacity_dx(i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_opacity_dlnd(k)
-               if (.not. s% solver_use_lnd) dvardx0_00 = dvardx0_00/s% rho(k)
             else if (i_var == s% i_lnT) then
                dvardx0_00 = s% d_opacity_dlnT(k)
-               if (.not. s% solver_use_lnT) dvardx0_00 = dvardx0_00/s% T(k)
             end if
          end subroutine get_opacity_partials
 

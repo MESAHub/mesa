@@ -161,35 +161,17 @@
          nz = s% nz
          do j1 = 1, min(nvar,s% nvar_hydro)
             if (j1 == s% i_lnd .and. s% i_lnd <= nvar) then
-               if (s% solver_use_lnd) then
-                  do k = 1, nz
-                     s% xh(j1,k) = s% lnd(k)
-                  end do
-               else
-                  do k = 1, nz
-                     s% xh(j1,k) = s% rho(k)
-                  end do
-               end if
+               do k = 1, nz
+                  s% xh(j1,k) = s% lnd(k)
+               end do
             else if (j1 == s% i_lnT .and. s% i_lnT <= nvar) then
-               if (s% solver_use_lnT) then
-                  do k = 1, nz
-                     s% xh(j1,k) = s% lnT(k)
-                  end do
-               else
-                  do k = 1, nz
-                     s% xh(j1,k) = s% T(k)
-                  end do
-               end if
+               do k = 1, nz
+                  s% xh(j1,k) = s% lnT(k)
+               end do
             else if (j1 == s% i_lnR .and. s% i_lnR <= nvar) then
-               if (s% solver_use_lnR) then
-                  do k = 1, nz
-                     s% xh(j1,k) = s% lnR(k)
-                  end do
-               else
-                  do k = 1, nz
-                     s% xh(j1,k) = s% r(k)
-                  end do
-               end if
+               do k = 1, nz
+                  s% xh(j1,k) = s% lnR(k)
+               end do
             else if (j1 == s% i_lum .and. s% i_lum <= nvar) then
                do k = 1, nz
                   s% xh(j1,k) = s% L(k)

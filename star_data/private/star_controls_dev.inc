@@ -1,6 +1,3 @@
-         logical :: solver_use_lnR, solver_use_lnT, solver_use_lnd
-         
-      
          real(dp) :: TDC_Lsurf_factor
          real(dp) :: TDC_alfa
          real(dp) :: TDC_alfap

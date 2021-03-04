@@ -180,18 +180,10 @@
                   call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
                
-               if (s% solver_use_lnd) then
-                  dequ_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)/eqn_scale
-               else
-                  dequ_dlnd = s% d_dxdt_nuc_drho(j,k)/eqn_scale
-               end if
+               dequ_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)/eqn_scale
                call e00(s, i, s% i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
                
-               if (s% solver_use_lnT) then
-                  dequ_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)/eqn_scale
-               else
-                  dequ_dlnT = s% d_dxdt_nuc_dT(j,k)/eqn_scale
-               end if
+               dequ_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)/eqn_scale
                call e00(s, i, s% i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
 
             end if

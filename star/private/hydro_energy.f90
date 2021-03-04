@@ -238,72 +238,24 @@
             else
                eps_nuc_ad = 0d0
                eps_nuc_ad%val = s% eps_nuc(k)
-               if (s% solver_use_lnd) then
-                  eps_nuc_ad%d1Array(i_lnd_00) = s% d_epsnuc_dlnd(k)
-               else
-                  eps_nuc_ad%d1Array(i_lnd_00) = s% d_epsnuc_dlnd(k)/s% rho(k)
-               end if
-               if (s% solver_use_lnT) then
-                  eps_nuc_ad%d1Array(i_lnT_00) = s% d_epsnuc_dlnT(k)
-               else
-                  eps_nuc_ad%d1Array(i_lnT_00) = s% d_epsnuc_dlnT(k)/s% T(k)
-               end if
+               eps_nuc_ad%d1Array(i_lnd_00) = s% d_epsnuc_dlnd(k)
+               eps_nuc_ad%d1Array(i_lnT_00) = s% d_epsnuc_dlnT(k)
             end if
             
             non_nuc_neu_ad = 0d0
             ! for reasons lost in the past, we always time center non_nuc_neu
             non_nuc_neu_ad%val = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-            if (s% solver_use_lnd) then
-               non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
-            else
-               non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)/s% rho(k)
-            end if
-            if (s% solver_use_lnT) then
-               non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
-            else
-               non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)/s% T(k)
-            end if
+            non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
+            non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
             
             d_extra_heat_dlnR00 = s% d_extra_heat_dlnR00(k)
             d_extra_heat_dlnRp1 = s% d_extra_heat_dlnRp1(k)
-            if (.not. s% solver_use_lnR) then
-               d_extra_heat_dlnR00 = d_extra_heat_dlnR00/s% r(k)
-               if (k < s% nz) then
-                  d_extra_heat_dlnRp1 = d_extra_heat_dlnRp1/s% r(k+1)
-               else
-                  d_extra_heat_dlnRp1 = 0d0
-               end if
-            end if
             d_extra_heat_dlnTm1 = s% d_extra_heat_dlnTm1(k)
             d_extra_heat_dlnT00 = s% d_extra_heat_dlnT00(k)
             d_extra_heat_dlnTp1 = s% d_extra_heat_dlnTp1(k)
-            if (.not. s% solver_use_lnT) then
-               if (k > 1) then
-                  d_extra_heat_dlnTm1 = d_extra_heat_dlnTm1/s% T(k-1)
-               else
-               end if
-               d_extra_heat_dlnT00 = d_extra_heat_dlnT00/s% T(k)
-               if (k < s% nz) then
-                  d_extra_heat_dlnTp1 = d_extra_heat_dlnTp1/s% T(k+1)
-               else
-                  d_extra_heat_dlnTp1 = 0d0
-               end if
-            end if
             d_extra_heat_dlndm1 = s% d_extra_heat_dlndm1(k)
             d_extra_heat_dlnd00 = s% d_extra_heat_dlnd00(k)
             d_extra_heat_dlndp1 = s% d_extra_heat_dlndp1(k)
-            if (.not. s% solver_use_lnd) then
-               if (k > 1) then
-                  d_extra_heat_dlndm1 = d_extra_heat_dlndm1/s% rho(k-1)
-               else
-               end if
-               d_extra_heat_dlnd00 = d_extra_heat_dlnd00/s% rho(k)
-               if (k < s% nz) then
-                  d_extra_heat_dlndp1 = d_extra_heat_dlndp1/s% rho(k+1)
-               else
-                  d_extra_heat_dlndp1 = 0d0
-               end if
-            end if
             call wrap(extra_heat_ad, s% extra_heat(k), &
                d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1, &
                d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
@@ -462,16 +414,8 @@
                d_de_dt_dlnT = s% Cv_for_partials(k)*s% T(k)/dt
                de_dt_ad = 0d0
                de_dt_ad%val = de_dt
-               if (s% solver_use_lnd) then
-                  de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
-               else
-                  de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd/s% rho(k)
-               end if
-               if (s% solver_use_lnT) then
-                  de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT
-               else
-                  de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT/s% T(k)
-               end if
+               de_dt_ad%d1Array(i_lnd_00) = d_de_dt_dlnd
+               de_dt_ad%d1Array(i_lnT_00) = d_de_dt_dlnT
                
                call get_dke_dt_dpe_dt(s, k, dt, &
                   dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
@@ -487,17 +431,8 @@
                
                dpe_dt_ad = 0d0
                dpe_dt_ad%val = dpe_dt
-               if (s% solver_use_lnR) then
-                  dpe_dt_ad%d1Array(i_lnR_00) = d_dpedt_dlnR00
-                  dpe_dt_ad%d1Array(i_lnR_p1) = d_dpedt_dlnRp1
-               else
-                  dpe_dt_ad%d1Array(i_lnR_00) = d_dpedt_dlnR00/s% r(k)
-                  if (k < s% nz) then
-                     dpe_dt_ad%d1Array(i_lnR_p1) = d_dpedt_dlnRp1/s% r(k+1)
-                  else
-                     dpe_dt_ad%d1Array(i_lnR_p1) = 0d0
-                  end if
-               end if
+               dpe_dt_ad%d1Array(i_lnR_00) = d_dpedt_dlnR00
+               dpe_dt_ad%d1Array(i_lnR_p1) = d_dpedt_dlnRp1
                
             end if
             
@@ -798,10 +733,6 @@
             mlt_Pturb_ad%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
             mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
             mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
-            if (.not. s% solver_use_lnd) then
-               mlt_Pturb_ad%d1Array(i_lnd_m1) = mlt_Pturb_ad%d1Array(i_lnd_m1)/s% rho(k-1)
-               mlt_Pturb_ad%d1Array(i_lnd_00) = mlt_Pturb_ad%d1Array(i_lnd_00)/s% rho(k)
-            end if
          end if            
          
          P_face_ad = P_ad + avQ_ad + Pt_ad + mlt_Pturb_ad + extra_P
@@ -860,18 +791,10 @@
                u_face_ad = 0.5d0*(u_face_ad + s% u_face_start(k))
          else if (s% using_velocity_time_centering) then
             u_face_ad%val = 0.5d0*(s% r(k) - s% r_start(k))/s% dt
-            if (s% solver_use_lnR) then
-               u_face_ad%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt
-            else
-               u_face_ad%d1Array(i_lnR_00) = 0.5d0/s% dt
-            end if
+            u_face_ad%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt
          else
             u_face_ad%val = (s% r(k) - s% r_start(k))/s% dt
-            if (s% solver_use_lnR) then
-               u_face_ad%d1Array(i_lnR_00) = s% r(k)/s% dt
-            else
-               u_face_ad%d1Array(i_lnR_00) = 1d0/s% dt
-            end if
+            u_face_ad%d1Array(i_lnR_00) = s% r(k)/s% dt
          end if
          
          Av_face_ad = A_ad*u_face_ad

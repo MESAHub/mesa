@@ -95,48 +95,14 @@
          
          d_eps_grav_dlnR00 = s% d_eps_grav_dlnR00(k)
          d_eps_grav_dlnRp1 = s% d_eps_grav_dlnRp1(k)
-         if (.not. s% solver_use_lnR) then
-            d_eps_grav_dlnR00 = d_eps_grav_dlnR00/s% r(k)
-            if (k < s% nz) then
-               d_eps_grav_dlnRp1 = d_eps_grav_dlnRp1/s% r(k+1)
-            else
-               d_eps_grav_dlnRp1 = 0d0
-            end if
-         end if
          
          d_eps_grav_dlnTm1 = s% d_eps_grav_dlnTm1(k)
          d_eps_grav_dlnT00 = s% d_eps_grav_dlnT00(k)
          d_eps_grav_dlnTp1 = s% d_eps_grav_dlnTp1(k)
-         if (.not. s% solver_use_lnT) then
-            d_eps_grav_dlnT00 = d_eps_grav_dlnT00/s% T(k)
-            if (k < s% nz) then
-               d_eps_grav_dlnTp1 = d_eps_grav_dlnTp1/s% T(k+1)
-            else
-               d_eps_grav_dlnTp1 = 0d0
-            end if
-            if (k > 1) then
-               d_eps_grav_dlnTm1 = d_eps_grav_dlnTm1/s% T(k-1)
-            else
-               d_eps_grav_dlnTm1 = 0d0
-            end if
-         end if
          
          d_eps_grav_dlndm1 = s% d_eps_grav_dlndm1(k)
          d_eps_grav_dlnd00 = s% d_eps_grav_dlnd00(k)
          d_eps_grav_dlndp1 = s% d_eps_grav_dlndp1(k)
-         if (.not. s% solver_use_lnd) then
-            d_eps_grav_dlnd00 = d_eps_grav_dlnd00/s% rho(k)
-            if (k < s% nz) then
-               d_eps_grav_dlndp1 = d_eps_grav_dlndp1/s% rho(k+1)
-            else
-               d_eps_grav_dlndp1 = 0d0
-            end if
-            if (k > 1) then
-               d_eps_grav_dlndm1 = d_eps_grav_dlndm1/s% rho(k-1)
-            else
-               d_eps_grav_dlndm1 = 0d0
-            end if
-         end if
           
          call wrap(s% eps_grav_ad(k), s% eps_grav(k), &
             d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1, &
@@ -208,20 +174,8 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          real(dp) :: dlnd_dt, dlnT_dt
-         if (s% solver_use_lnd) then
-            dlnd_dt = s% dxh_lnd(k)/s% dt
-         !else  - when using autodiff
-         !   dlnd_dt = s% dxh_lnd(k)/s% rho(k)/s% dt
-         else
-            dlnd_dt = (s% lnd(k) - s% lnd_start(k))/s% dt
-         end if
-         if (s% solver_use_lnT) then
-            dlnT_dt = s% dxh_lnT(k)/s% dt
-         !else  - when using autodiff
-         !      dlnT_dt = s% dxh_lnT(k)/s% T(k)/s% dt
-         else
-            dlnT_dt = (s% lnT(k) - s% lnT_start(k))/s% dt
-         end if
+         dlnd_dt = s% dxh_lnd(k)/s% dt
+         dlnT_dt = s% dxh_lnT(k)/s% dt
          call do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
       end subroutine do_eps_grav_with_lnd_Lagrangian
 
@@ -626,13 +580,7 @@
          ! we only have lnE and lnP derivs, so use
          ! eps_grav = -de/dt + (P/rho) * dlnd/dt
          do j=1, s% species
-            if (s% solver_use_lnd) then
-               dxh_lnd = s% dxh_lnd(k)
-            ! else - auto_diff
-               !dxh_lnd = s% dxh_lnd(k)/s% rho(k)
-            else
-               dxh_lnd = s% lnd(k) - s% lnd_start(k)
-            end if
+            dxh_lnd = s% dxh_lnd(k)
             s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k)/s% dt + &
                (s% P(k) / s% Rho(k)) * s% dlnP_dxa_for_partials(j,k) *  dxh_lnd/s% dt
          end do

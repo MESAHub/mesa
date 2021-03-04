@@ -23,9 +23,6 @@
 &controls  
    
 ! solver   
-   solver_use_lnR = .false.
-   solver_use_lnT = .false.
-   solver_use_lnd = .false.
    
    tol_correction_norm = 1d99 ! turn off when not using lnR/lnT/lnd
    tol_max_correction = 1d99
@@ -128,7 +125,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 20
+   pgstar_interval = 1 ! 20
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'

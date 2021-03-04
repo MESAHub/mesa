@@ -289,13 +289,8 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnR) then
-            lnR = xh(s% i_lnR,k)
-            r = exp(lnR)
-         else
-            r = xh(s% i_lnR,k)
-            lnR = log(r)
-         end if
+         lnR = xh(s% i_lnR,k)
+         r = exp(lnR)
       end subroutine get_r_and_lnR_from_xh
       
       
@@ -309,11 +304,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnR) then
-            r = exp(xh(s% i_lnR,k))
-         else
-            r = xh(s% i_lnR,k)
-         end if
+         r = exp(xh(s% i_lnR,k))
       end function get_r_from_xh
       
       
@@ -327,11 +318,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnR) then
-            lnR = xh(s% i_lnR,k)
-         else
-            lnR = log(xh(s% i_lnR,k))
-         end if
+         lnR = xh(s% i_lnR,k)
       end function get_lnR_from_xh
       
       
@@ -346,11 +333,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnR) then
-            xh(s% i_lnR,k) = lnR
-         else
-            xh(s% i_lnR,k) = r
-         end if
+         xh(s% i_lnR,k) = lnR
       end subroutine store_r_or_lnR_in_xh
       
       
@@ -365,11 +348,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnR) then
-            xh(s% i_lnR,k) = log(r)
-         else
-            xh(s% i_lnR,k) = r
-         end if
+         xh(s% i_lnR,k) = log(r)
       end subroutine store_r_in_xh
       
       
@@ -384,11 +363,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnR) then
-            xh(s% i_lnR,k) = lnR
-         else
-            xh(s% i_lnR,k) = exp(lnR)
-         end if
+         xh(s% i_lnR,k) = lnR
       end subroutine store_lnR_in_xh
       
       
@@ -403,13 +378,8 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnT) then
-            lnT = xh(s% i_lnT,k)
-             T =  exp(lnT)
-         else
-             T =  xh(s% i_lnT,k)
-            lnT = log(T)
-         end if
+         lnT = xh(s% i_lnT,k)
+         T =  exp(lnT)
       end subroutine get_T_and_lnT_from_xh
       
       
@@ -423,11 +393,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnT) then
-             T =  exp(xh(s% i_lnT,k))
-         else
-             T =  xh(s% i_lnT,k)
-         end if
+         T =  exp(xh(s% i_lnT,k))
       end function get_T_from_xh
       
       
@@ -441,11 +407,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnT) then
-            lnT = xh(s% i_lnT,k)
-         else
-            lnT = log(xh(s% i_lnT,k))
-         end if
+         lnT = xh(s% i_lnT,k)
       end function get_lnT_from_xh
       
       
@@ -460,11 +422,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnT) then
-            xh(s% i_lnT,k) = lnT
-         else
-            xh(s% i_lnT,k) = T
-         end if
+         xh(s% i_lnT,k) = lnT
       end subroutine store_T_or_lnT_in_xh
       
       
@@ -479,11 +437,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnT) then
-            xh(s% i_lnT,k) = log(T)
-         else
-            xh(s% i_lnT,k) = T
-         end if
+         xh(s% i_lnT,k) = log(T)
       end subroutine store_T_in_xh
       
       
@@ -498,11 +452,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnT) then
-            xh(s% i_lnT,k) = lnT
-         else
-            xh(s% i_lnT,k) = exp(lnT)
-         end if
+         xh(s% i_lnT,k) = lnT
       end subroutine store_lnT_in_xh
       
       
@@ -517,13 +467,8 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnd) then
-            lnd = xh(s% i_lnd,k)
-            rho =  exp(lnd)
-         else
-            rho =  xh(s% i_lnd,k)
-            lnd = log(rho)
-         end if
+         lnd = xh(s% i_lnd,k)
+         rho =  exp(lnd)
       end subroutine get_rho_and_lnd_from_xh
       
       
@@ -537,11 +482,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnd) then
-            rho =  exp(xh(s% i_lnd,k))
-         else
-            rho =  xh(s% i_lnd,k)
-         end if
+         rho =  exp(xh(s% i_lnd,k))
       end function get_rho_from_xh
       
       
@@ -555,11 +496,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnd) then
-            lnd = xh(s% i_lnd,k)
-         else
-            lnd = log(xh(s% i_lnd,k))
-         end if
+         lnd = xh(s% i_lnd,k)
       end function get_lnd_from_xh
       
       
@@ -574,11 +511,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnd) then
-            xh(s% i_lnd,k) = lnd
-         else
-            xh(s% i_lnd,k) = rho
-         end if
+         xh(s% i_lnd,k) = lnd
       end subroutine store_rho_or_lnd_in_xh
       
       
@@ -593,11 +526,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnd) then
-            xh(s% i_lnd,k) = log(rho)
-         else
-            xh(s% i_lnd,k) = rho
-         end if
+         xh(s% i_lnd,k) = log(rho)
       end subroutine store_rho_in_xh
       
       
@@ -612,11 +541,7 @@
          else
             xh => s% xh
          end if
-         if (s% solver_use_lnd) then
-            xh(s% i_lnd,k) = lnd
-         else
-            xh(s% i_lnd,k) = exp(lnd)
-         end if
+         xh(s% i_lnd,k) = lnd
       end subroutine store_lnd_in_xh
 
 
@@ -634,8 +559,7 @@
          rR = s% R_center
          do k = nz, 1, -1
             rL = rR
-            rR = s% xh(i_lnR,k)
-            if (s% solver_use_lnR) rR = exp(rR)
+            rR = get_r_from_xh(s,k)
             dm = s% dm(k)
             dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
             rho = dm/dV
