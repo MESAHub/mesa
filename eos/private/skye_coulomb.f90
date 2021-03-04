@@ -106,7 +106,7 @@ module skye_coulomb
       call decide_phase(dF_liq, dF_sol, kT, temp, rho, dF, phase, latent_ddlnT, latent_ddlnRho)
 
       if (dbg) then
-         write(*,*) 'Phase', phase%val
+         write(*,*) 'GAME',GAME%val,'Phase', phase%val
       end if
 
    end subroutine nonideal_corrections
