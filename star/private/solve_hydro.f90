@@ -33,7 +33,8 @@
       implicit none
 
       private
-      public :: set_surf_info, set_tol_correction, do_solver_converge
+      public :: set_luminosity_by_category, &
+         set_surf_info, set_tol_correction, do_solver_converge
 
       integer, parameter :: stencil_neighbors = 1
             ! number of neighbors on each side (e.g., =1 for 3 point stencil)
@@ -555,6 +556,29 @@
 
 
       end subroutine hydro_solver_step
+
+
+      subroutine set_luminosity_by_category(s) ! integral by mass from center out
+         use chem_def, only: category_name
+         use rates_def, only: i_rate
+         use utils_lib, only: is_bad
+         type (star_info), pointer :: s
+         integer :: k, j
+         real(dp) :: L_burn_by_category(num_categories)
+         include 'formats'
+         L_burn_by_category(:) = 0
+         do k = s% nz, 1, -1
+            do j = 1, num_categories
+               L_burn_by_category(j) = &
+                  L_burn_by_category(j) + s% dm(k)*s% eps_nuc_categories(j, k)
+               if (is_bad(L_burn_by_category(j))) then
+                  write(*,2) trim(category_name(j)) // ' eps_nuc logT', k, s% eps_nuc_categories(j,k), s% lnT(k)/ln10
+                  if (s% stop_for_bad_nums) stop 'set_luminosity_by_category'
+               end if
+               s% luminosity_by_category(j,k) = L_burn_by_category(j)
+            end do
+         end do
+      end subroutine set_luminosity_by_category
 
 
       end module solve_hydro

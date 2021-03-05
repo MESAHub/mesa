@@ -269,9 +269,10 @@
 
 
       subroutine save_start_values(s, ierr)
+         use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
          use hydro_tdc, only: set_etrb_start_vars
-         use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category
+         use star_utils, only: eval_total_energy_integrals
          use chem_def, only: ih1
          type (star_info), pointer :: s
          integer, intent(out) :: ierr

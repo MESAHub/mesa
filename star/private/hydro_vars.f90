@@ -216,10 +216,7 @@
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_irradiation_heat, &
             skip_mlt, skip_eos, dt, ierr)
-         use star_utils, only: eval_irradiation_heat, set_qs, &
-            set_dm_bar, set_m_and_dm, set_surf_center_abundance_info, &
-            set_luminosity_by_category, set_phase_of_evolution, set_power_info, &
-            total_angular_momentum
+         use star_utils, only: eval_irradiation_heat, set_qs, set_dm_bar, set_m_and_dm
          type (star_info), pointer :: s
          logical, intent(in) :: &
             skip_basic_vars, skip_micro_vars, &
@@ -300,12 +297,6 @@
                s% irradiation_heat(1:nz) = 0
             end if
          end if
-         
-         call set_surf_center_abundance_info(s)
-         call set_luminosity_by_category(s)
-         call set_power_info(s)
-         call set_phase_of_evolution(s)
-         s% total_angular_momentum = total_angular_momentum(s)
          
          contains
          

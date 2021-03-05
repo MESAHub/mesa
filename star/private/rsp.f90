@@ -772,22 +772,9 @@
          call calculate_work_integrals(s)      
          call calculate_energies(s,total_radiation)
          call gather_pulse_statistics(s)
-
          if (s% RSP_max_num_periods < 0 .or. &
              s% rsp_num_periods < s% RSP_max_num_periods) return
-         PDVWORK=0.d0
-         do I=1,NZN
-            k = NZN+1-i
-            WORK(I)=  WORK(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
-                 (THETA*(PPP0(I)+PPQ0(I))+ &
-                 THETA1*((s% Pgas(k)+s% Prad(k))+s% avQ(k))) &
-                 -s% dt*s% dm(k)*s% Eq(k)
-            WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
-                 (THETA*PPQ0(I)+THETA1*s% avQ(k))
-            PDVWORK=PDVWORK+WORK(i)
-         enddo
-         s% rsp_GRPDV=PDVWORK/EKDEL
-         if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
+         call get_GRPDV(s)
                   
          contains
 
@@ -853,6 +840,25 @@
             LMAX = -LMIN
          end if
       end subroutine gather_pulse_statistics
+
+
+      subroutine get_GRPDV(s)
+         type (star_info), pointer :: s
+         integer :: I, k
+         PDVWORK=0.d0
+         do I=1,NZN
+            k = NZN+1-i
+            WORK(I)=  WORK(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
+                 (THETA*(PPP0(I)+PPQ0(I))+ &
+                 THETA1*((s% Pgas(k)+s% Prad(k))+s% avQ(k))) &
+                 -s% dt*s% dm(k)*s% Eq(k)
+            WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
+                 (THETA*PPQ0(I)+THETA1*s% avQ(k))
+            PDVWORK=PDVWORK+WORK(i)
+         enddo
+         s% rsp_GRPDV=PDVWORK/EKDEL
+         if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
+      end subroutine get_GRPDV
       
       
       subroutine begin_calculation(s,restart,ierr)
