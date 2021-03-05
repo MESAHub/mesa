@@ -77,6 +77,8 @@
       overshoot_f0(3) = 0.005
 
 ! timesteps
+    delta_XC_cntr_hard_limit = 0.15d0
+    delta_XNe_cntr_hard_limit = 0.15d0
 
 ! mesh
 

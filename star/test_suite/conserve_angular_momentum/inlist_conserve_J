@@ -62,7 +62,7 @@
          trace_history_value_name(2) = 'log_rel_run_E_err'
 
          ! limit max_model_number as part of test_suite
-         max_model_number = 1500
+         max_model_number = 2500
 
          initial_mass = 1.0
          initial_z = 2d-2
@@ -92,7 +92,8 @@
          
          xa_scale = 1d-5
          
-         varcontrol_target = 1d-4
+         varcontrol_target = 5d-4
+         max_abs_rel_run_E_err = 0.05d0
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)

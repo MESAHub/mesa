@@ -55,9 +55,6 @@
 ! mesh
 
 ! solver
-      use_velocity_time_centering = .true.
-      include_P_in_velocity_time_centering = .true.
-      include_L_in_velocity_time_centering = .true.
       
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
@@ -116,6 +113,9 @@ TRho_Profile_xmin = 3.0
 TRho_Profile_xmax = 10
 TRho_Profile_ymin = 8.5
 TRho_Profile_ymax = 10.1
+
+TRho_logT_max = 10d0
+TRho_logRho_max = 10d0
 
 Text_Summary1_name(1,2) = 'time_step_sec'
 Text_Summary1_name(2,2) = 'star_age_sec'

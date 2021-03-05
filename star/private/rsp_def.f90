@@ -28,6 +28,9 @@
       use math_lib
       use utils_lib, only: is_bad
       use star_def, only: star_info
+      use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, &
+         store_T_in_xh, get_T_and_lnT_from_xh, store_r_in_xh, get_r_and_lnR_from_xh, &
+         store_rho_in_xh, get_rho_and_lnd_from_xh
 
       implicit none
       
@@ -371,7 +374,6 @@
          integer, intent(in) :: iounit
          integer :: n
          include 'formats'
-         !call copy_from_xh_to_rsp(s, NZN) ! resynch before photo
          n = NZN + 1
          write(iounit) NZN
          write(iounit) xa(1:s% species), &
@@ -516,7 +518,6 @@
       
       
       subroutine set_star_vars(s, ierr)
-         use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: sum_dm
@@ -554,6 +555,7 @@
          s% dm(k) = s% m(k) - s% m_center         
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)                  
          do k=1, NZN
+         
             if (k==NZN) then
                s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
@@ -564,16 +566,19 @@
             if (is_bad(s% Vol(k)))then
                write(*, 2) 's% Vol(k)', k, s% Vol(k)
                stop 'set_star_vars'
-            end if            
+            end if       
+                 
             s% rho(k) = 1d0/s% Vol(k)
-            s% lnd(k) = log(s% rho(k))
-            s% rho(k) = exp(s% lnd(k))
+            call store_rho_in_xh(s, k, s% rho(k))
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             s% Vol(k) = 1d0/s% rho(k)  
-            s% xh(s% i_lnd, k) = s% lnd(k)            
-            s% lnT(k) = log(s% T(k))
-            s% xh(s% i_lnT, k) = s% lnT(k)            
-            s% lnR(k) = log(s% r(k))
-            s% xh(s% i_lnR, k) = s% lnR(k)            
+
+            call store_T_in_xh(s, k, s% T(k))
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
+            
+            call store_r_in_xh(s, k, s% r(k))
+            call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
+
             s% RSP_Et(k) = s% RSP_w(k)*s% RSP_w(k)
             s% xh(s% i_etrb_RSP, k) = s% RSP_Et(k)               
             s% xh(s% i_v, k) = s% v(k)            
@@ -581,8 +586,8 @@
       end subroutine set_star_vars
       
       
-      subroutine copy_from_xh_to_rsp(s, nz_new) 
-         ! do this when load a file and after remesh
+      subroutine copy_from_xh_to_rsp(s, nz_new) ! do this when load a file
+         use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nz_new
          integer :: k
@@ -590,12 +595,9 @@
          include 'formats'
          if (nz_new > 0) NZN = nz_new
          do k=NZN,1,-1
-            s% lnd(k) = s% xh(s% i_lnd,k)
-            s% rho(k) = exp(s% lnd(k))
-            s% lnT(k) = s% xh(s% i_lnT,k)
-            s% T(k) = exp(s% lnT(k))
-            s% lnR(k) = s% xh(s% i_lnR,k)
-            s% r(k) = exp(s% lnR(k))
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
+            call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
             s% RSP_Et(k) = s% xh(s% i_etrb_RSP,k)
             s% RSP_w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
@@ -782,7 +784,9 @@
       
       
       subroutine copy_results(s)
-         use star_utils, only: set_rmid
+         use star_utils, only: set_rmid, store_r_in_xh, &
+            get_r_and_lnR_from_xh, store_r_in_xh, &
+            get_T_and_lnT_from_xh, store_T_in_xh
          use const_def, only: convective_mixing, no_mixing, qp
          type (star_info), pointer :: s
          integer :: i, k, ierr
@@ -797,22 +801,18 @@
             s% xh(s% i_erad_RSP,k) = s% erad(k)
             s% xh(s% i_Fr_RSP,k) = s% Fr(k)
             
-            ! some tweaks needed for bit-for-bit with photos
-            
             ! sqrt(w**2) /= original w, so need to redo
             s% RSP_Et(k) = s% RSP_w(k)**2
             s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
             s% RSP_w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
             
             ! exp(log(r)) /= original r, so need to redo
-            s% lnR(k) = log(s% r(k))
-            s% xh(s% i_lnR,k) = s% lnR(k)
-            s% r(k) = exp(s% xh(s% i_lnR,k))
+            call store_r_in_xh(s, k, s% r(k))
+            call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
             
             ! exp(log(T)) /= original T, so need to redo
-            s% lnT(k) = log(s% T(k))
-            s% xh(s% i_lnT,k) = s% lnT(k)
-            s% T(k) = exp(s% xh(s% i_lnT,k))
+            call store_T_in_xh(s, k, s% T(k))
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             
             s% P(k) = s% Pgas(k) + s% Prad(k)
             if (k > 1) s% gradT(k) = &
@@ -840,10 +840,9 @@
                s% Vol(k) = dble(q4)
             end if
             s% rho(k) = 1d0/s% Vol(k)            
-            ! exp(log(rho)) /= original rho, so need to redo
-            s% lnd(k) = log(s% rho(k))    
-            s% xh(s% i_lnd,k) = s% lnd(k)
-            s% rho(k) = exp(s% xh(s% i_lnd,k))
+            call store_rho_in_xh(s, k, s% rho(k))
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
+            s% Vol(k) = 1d0/s% rho(k)
             s% L(k) = 4d0*pi*s% r(k)**2*s% Fr(k) + s% Lc(k) + s% Lt(k)
             if (s% RSP_w(k) > 1d4) then ! arbitrary cut
                s% mixing_type(k) = convective_mixing
@@ -855,11 +854,11 @@
          ! set some things for mesa output reporting
          i = 1
          s% rho_face(i) = s% rho(i)
-         s% P_face_18(i)%val = s% P(i)
+         s% P_face_ad(i)%val = s% P(i)
          s% csound_face(i) = s% csound(i)
          do i = 2,NZN
             s% rho_face(i) = 0.5d0*(s% rho(i) + s% rho(i-1))
-            s% P_face_18(i)%val = 0.5d0*(s% P(i) + s% P(i-1))
+            s% P_face_ad(i)%val = 0.5d0*(s% P(i) + s% P(i-1))
             s% csound_face(i) = 0.5d0*(s% csound(i) + s% csound(i-1))
          end do
          

@@ -939,11 +939,15 @@
                end if               
                call pgslw(s% pgstar_lw)
                if (yfile_data_len > 0) then
+                  call pgsls(s% pgstar_history_line_style)
                   call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
+                  call pgsls(1)
                   deallocate(yfile_xdata, yfile_ydata)
                   nullify(yfile_xdata, yfile_ydata)
                else
+                  call pgsls(s% pgstar_history_line_style)
                   call pgline(n, xvec, yvec)
+                  call pgsls(1)
                end if
                call pgslw(1)
             end if

@@ -286,7 +286,7 @@
                s% net_name, iprop, iprop, year_month_day_when_created, &
                dprop, initial_z, initial_y, &
                dprop, iprop, dprop, dprop, &
-               dprop, dprop, dprop, dprop, dprop, &
+               dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, iprop, ierr)
             if (ierr /= 0) then
@@ -385,7 +385,7 @@
             m_in = -1; nz_in = -1; net_name = ''
             call read_properties(iounit, &
                net_name, iprop, nz_in, iprop, m_in, &
-               dprop, dprop, dprop, iprop, dprop, &
+               dprop, dprop, dprop, iprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, &
                dprop, dprop, dprop, dprop, dprop, iprop, ierr)
@@ -468,8 +468,7 @@
          contains
 
          subroutine dealloc
-            deallocate(xh2, xa2, q2, dq2, &
-               omega2, j_rot2, names, perm)
+            deallocate(xh2, xa2, q2, dq2, omega2, j_rot2, names, perm)
          end subroutine dealloc
 
       end subroutine get1_mass

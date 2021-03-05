@@ -2,7 +2,7 @@
 
 
 
-      module accurate_sum_auto_diff_18var_order1
+      module accurate_sum_auto_diff_star_order1
 
       use const_def
       use auto_diff
@@ -10,18 +10,18 @@
       implicit none
 
       private
-      public :: accurate_auto_diff_real_18var_order1, neumaier_sum, operator(+), operator(-), assignment(=), &
+      public :: accurate_auto_diff_real_star_order1, neumaier_sum, operator(+), operator(-), assignment(=), &
                   operator(<), operator(>), operator(*), operator(/)
 
       ! Type for easily using Neumaier's summation algorithm in place of normal addition.
-      type accurate_auto_diff_real_18var_order1
-         type(auto_diff_real_18var_order1) :: sum, compensator
+      type accurate_auto_diff_real_star_order1
+         type(auto_diff_real_star_order1) :: sum, compensator
 
          contains
 
          procedure :: value
 
-      end type accurate_auto_diff_real_18var_order1
+      end type accurate_auto_diff_real_star_order1
 
       interface operator(+)
          procedure add_acc_adr
@@ -67,11 +67,11 @@
 
       contains
 
-      ! Helper method for evaluating an accurate_auto_diff_real_18var_order1.
+      ! Helper method for evaluating an accurate_auto_diff_real_star_order1.
       function value(this) result(res)
         ! Inputs
-        class(accurate_auto_diff_real_18var_order1), intent(in) :: this
-        type(auto_diff_real_18var_order1) :: res
+        class(accurate_auto_diff_real_star_order1), intent(in) :: this
+        type(auto_diff_real_star_order1) :: res
 
         res = this % sum + this % compensator
       end function value
@@ -83,10 +83,10 @@
       ! accuracy.
       subroutine neumaier_sum(sum, compensator, summand)
          ! Inputs
-         type(auto_diff_real_18var_order1) sum, compensator, summand
+         type(auto_diff_real_star_order1) sum, compensator, summand
 
          ! Intermediates
-         type(auto_diff_real_18var_order1) provisional
+         type(auto_diff_real_star_order1) provisional
 
          provisional = sum + summand
          if (abs(sum) >= abs(summand)) then
@@ -99,12 +99,12 @@
       end subroutine neumaier_sum
 
       ! The remaining are helper methods which overload +,-,*,/,=,<,>
-      ! to work with accurate_auto_diff_real_18var_order1 and type(auto_diff_real_18var_order1) numbers interchangeably.
+      ! to work with accurate_auto_diff_real_star_order1 and type(auto_diff_real_star_order1) numbers interchangeably.
 
       ! *************
-      type(accurate_auto_diff_real_18var_order1) function mult_acc_acc(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function mult_acc_acc(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum*op2%sum
          ret%compensator = op1%compensator * op2%sum
@@ -114,18 +114,18 @@
 
       end function mult_acc_acc
 
-      type(accurate_auto_diff_real_18var_order1) function mult_acc_adr(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function mult_acc_adr(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum * op2
          ret%compensator = op1%compensator * op2
 
       end function mult_acc_adr
 
-      type(accurate_auto_diff_real_18var_order1) function mult_adr_acc(op1, op2) result (ret)
-         type(auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function mult_adr_acc(op1, op2) result (ret)
+         type(auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op2%sum * op1
          ret%compensator = op2%compensator * op1
@@ -133,27 +133,27 @@
       end function mult_adr_acc
 
       ! ///////////
-      type(accurate_auto_diff_real_18var_order1) function div_acc_acc(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function div_acc_acc(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret % sum = op1 % value() / op2 % value()
          ret % compensator = 0
 
       end function div_acc_acc
 
-      type(accurate_auto_diff_real_18var_order1) function div_acc_adr(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function div_acc_adr(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum / op2
          ret%compensator = op1%compensator / op2
 
       end function div_acc_adr
 
-      type(accurate_auto_diff_real_18var_order1) function div_adr_acc(op1, op2) result (ret)
-         type(auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function div_adr_acc(op1, op2) result (ret)
+         type(auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1 / op2%value()
          ret%compensator = 0
@@ -162,29 +162,29 @@
 
       ! ============
       subroutine set_acc_adr(this, new)
-         type(accurate_auto_diff_real_18var_order1), intent(out) :: this
-         type(auto_diff_real_18var_order1), intent(in) :: new
+         type(accurate_auto_diff_real_star_order1), intent(out) :: this
+         type(auto_diff_real_star_order1), intent(in) :: new
          this % sum = new
          this % compensator = 0
       end subroutine set_acc_adr
 
       subroutine set_adr_acc(this, new)
-         type(auto_diff_real_18var_order1), intent(out) :: this
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: new
+         type(auto_diff_real_star_order1), intent(out) :: this
+         type(accurate_auto_diff_real_star_order1), intent(in) :: new
          this = new % value()
       end subroutine set_adr_acc
 
       subroutine set_acc_acc(this, new)
-         type(accurate_auto_diff_real_18var_order1), intent(out) :: this
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: new
+         type(accurate_auto_diff_real_star_order1), intent(out) :: this
+         type(accurate_auto_diff_real_star_order1), intent(in) :: new
          this % sum = new % sum
          this % compensator = new % compensator
       end subroutine set_acc_acc
 
       ! <<<<<<<<<<<
       logical function acc_less_than_adr(acc, num) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: acc
-         type(auto_diff_real_18var_order1), intent(in) :: num
+         type(accurate_auto_diff_real_star_order1), intent(in) :: acc
+         type(auto_diff_real_star_order1), intent(in) :: num
          if (acc % value() < num) then
             ret = .true.
          else
@@ -194,8 +194,8 @@
 
 
       logical function num_less_than_acc(num, acc) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: acc
-         type(auto_diff_real_18var_order1), intent(in) :: num
+         type(accurate_auto_diff_real_star_order1), intent(in) :: acc
+         type(auto_diff_real_star_order1), intent(in) :: num
          if (num < acc % value()) then
             ret = .true.
          else
@@ -205,8 +205,8 @@
 
       ! >>>>>>>>>>>
       logical function acc_greater_than_adr(acc, num) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: acc
-         type(auto_diff_real_18var_order1), intent(in) :: num
+         type(accurate_auto_diff_real_star_order1), intent(in) :: acc
+         type(auto_diff_real_star_order1), intent(in) :: num
          if (acc % value() > num) then
             ret = .true.
          else
@@ -215,8 +215,8 @@
       end function acc_greater_than_adr
 
       logical function num_greater_than_acc(num, acc) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: acc
-         type(auto_diff_real_18var_order1), intent(in) :: num
+         type(accurate_auto_diff_real_star_order1), intent(in) :: acc
+         type(auto_diff_real_star_order1), intent(in) :: num
          if (num > acc % value()) then
             ret = .true.
          else
@@ -225,9 +225,9 @@
       end function num_greater_than_acc
 
       ! +++++++++++
-      type(accurate_auto_diff_real_18var_order1) function add_acc_acc(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function add_acc_acc(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum
          ret%compensator = op1%compensator
@@ -236,9 +236,9 @@
 
       end function add_acc_acc
 
-      type(accurate_auto_diff_real_18var_order1) function add_acc_adr(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function add_acc_adr(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum
          ret%compensator = op1%compensator
@@ -246,9 +246,9 @@
 
       end function add_acc_adr
 
-      type(accurate_auto_diff_real_18var_order1) function add_adr_acc(op1, op2) result (ret)
-         type(auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function add_adr_acc(op1, op2) result (ret)
+         type(auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op2%sum
          ret%compensator = op2%compensator
@@ -257,9 +257,9 @@
       end function add_adr_acc
 
       ! -----------
-      type(accurate_auto_diff_real_18var_order1) function sub_acc_acc(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function sub_acc_acc(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum
          ret%compensator = op1%compensator
@@ -268,9 +268,9 @@
 
       end function sub_acc_acc
 
-      type(accurate_auto_diff_real_18var_order1) function sub_acc_adr(op1, op2) result (ret)
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op1
-         type(auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function sub_acc_adr(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         type(auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1%sum
          ret%compensator = op1%compensator
@@ -278,9 +278,9 @@
 
       end function sub_acc_adr
 
-      type(accurate_auto_diff_real_18var_order1) function sub_adr_acc(op1, op2) result (ret)
-         type(auto_diff_real_18var_order1), intent(in) :: op1
-         type(accurate_auto_diff_real_18var_order1), intent(in) :: op2
+      type(accurate_auto_diff_real_star_order1) function sub_adr_acc(op1, op2) result (ret)
+         type(auto_diff_real_star_order1), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
 
          ret%sum = op1
          ret%compensator = -op2%compensator
@@ -288,4 +288,4 @@
 
       end function sub_adr_acc
 
-  end module accurate_sum_auto_diff_18var_order1
+  end module accurate_sum_auto_diff_star_order1

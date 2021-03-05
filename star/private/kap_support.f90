@@ -482,12 +482,6 @@ contains
     dlnkap_dlnd = lnkap% d1val1
     dlnkap_dlnT = lnkap% d1val2
 
-    if (k == s% trace_k) then
-       write(*,5) 'opacity', &
-            k, s% solver_iter, s% model_number, s% solver_adjust_iter, &
-            kap
-    end if
-
   end subroutine get_kap
 
 end module kap_support

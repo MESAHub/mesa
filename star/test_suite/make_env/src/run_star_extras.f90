@@ -506,7 +506,7 @@
                end if
                
                gradT = s% gradT(k)
-               d_gradT_dT = s% d_gradT_dlnT00(k)/T_00
+               d_gradT_dT = s% gradT_ad(k)%d1Array(i_lnT_00)/T_00
                T_face = 0.5d0*(T_m1 + T_00)
                d_T_face_dT = 0.5d0
                T_expected = T_m1 - T_face*gradT*dlnP_face

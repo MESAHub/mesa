@@ -49,6 +49,7 @@
 / ! end of eos namelist
 
 &controls
+
       initial_mass = 1
       initial_z = 0.02d0
 

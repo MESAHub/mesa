@@ -284,13 +284,6 @@
 
          if (s% rotation_flag) then
 
-            if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-               do k=1,nz
-                  write(*,3) 'before update_rotation_mixing_info D_mix', &
-                     s% model_number, k, s% D_mix(k)
-               end do
-            end if
-
             call update_rotation_mixing_info(s,ierr)
             if (failed('update_rotation_mixing_info')) return
 
@@ -302,13 +295,6 @@
                end if
             end do
             s% cdc(1) = s% cdc(2)
-
-            if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-               do k=1,nz
-                  write(*,3) 'after do rotation mixing D_mix', &
-                     s% model_number, k, s% D_mix(k)
-               end do
-            end if
 
          end if
          
@@ -1645,31 +1631,6 @@
          end do
          
          call check('after include rotation part for mixing abundances')
-
-         if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-            do k=2,nz
-               write(*,2) 's% D_visc(k)', k, s% D_visc(k)
-               write(*,2) 's% D_DSI(k)', k, s% D_DSI(k)
-               write(*,2) 's% D_SH(k)', k, s% D_SH(k)
-               write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
-               write(*,2) 's% D_ES(k)', k, s% D_ES(k)
-               write(*,2) 's% D_GSF(k)', k, s% D_GSF(k)
-               write(*,2) 's% D_ST(k)', k, s% D_ST(k)
-            end do
-         end if
-
-         if (s% model_number == -1) then
-            k = 3
-            write(*,2) 's% D_visc(k)', k, s% D_visc(k)
-            write(*,2) 's% D_DSI(k)', k, s% D_DSI(k)
-            write(*,2) 's% D_SH(k)', k, s% D_SH(k)
-            write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
-            write(*,2) 's% D_ES(k)', k, s% D_ES(k)
-            write(*,2) 's% D_GSF(k)', k, s% D_GSF(k)
-            write(*,2) 's% D_ST(k)', k, s% D_ST(k)
-            write(*,2) 's% D_mix_non_rotation(k)', k, s% D_mix_non_rotation(k)
-            write(*,2) 's% D_mix(k)', k, s% D_mix(k)
-         end if
 
          am_nu_DSI_factor = s% am_nu_DSI_factor
          am_nu_SH_factor = s% am_nu_SH_factor

@@ -3,22 +3,8 @@
 ! ============
 
 ! CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
-! IN PARTICULAR, THESE ARE NOT FOR USE IN RESEARCH TO BE PUBLISHED.
+! IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
-
-      D_mix_zero_region_bottom_q = 1d99
-      D_mix_zero_region_top_q = -1d99
-      dq_D_mix_zero_at_H_He_crossover = -1d0
-      dq_D_mix_zero_at_H_C_crossover = -1d0
-      
-      
-      
-      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
-      ! ok for create pre ms etc., but not for read model
-      ! create_pre_ms calls normalize_dqs even if this flag is false.
-      do_normalize_dqs_as_part_of_set_qs = .false.
-      
-      
       
 
       ! TDC parameters
@@ -50,32 +36,53 @@
     TDC_Lsurf_factor = 0.5d0
     TDC_use_Stellingwerf_Lr = .true.
     TDC_w_min_for_damping = 1d2
+    TDC_etrb_xscale_min = 1d4
     TDC_num_outermost_cells_forced_nonturbulent = 0
     TDC_num_innermost_cells_forced_nonturbulent = 0
 
-
-      ! use_DGESVX_in_bcyclic
-      ! use_equilibration_in_DGESVX
-      ! report_min_rcond_from_DGESXV
-      
-      ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
+      ! period controls
 
       ! ::
 
-    use_DGESVX_in_bcyclic = .false.
-    use_equilibration_in_DGESVX = .false.
-    report_min_rcond_from_DGESXV = .false.
+    TDC_target_steps_per_cycle = 600
+    TDC_min_max_R_for_periods = -1
 
-
-      ! mlt_make_surface_no_mixing
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! this defaults to false for (temoporary) backward compatibility.
-      ! it should be true.
+      ! when to stop
 
       ! ::
 
-    mlt_make_surface_no_mixing = .false.
+    TDC_max_num_periods = -1
+    TDC_GREKM_avg_abs_frac_new = 0.1d0
+    TDC_GREKM_avg_abs_limit = -1
+
+      ! output data for work integrals during a particular period
+
+      ! ::
+
+    TDC_work_period = -1
+    TDC_work_filename = 'work.data'
+
+      ! output data for 3d map.  format same as for gnuplot pm3d
+
+      ! ::
+
+    TDC_write_map = .false.
+    TDC_map_columns_filename = 'map_columns.list'
+
+      ! items listed in your map columns must also appear in your profile columns
+
+      ! ::
+
+    TDC_map_filename = 'map.data'
+    TDC_map_first_period = -1
+    TDC_map_last_period = -1
+    TDC_map_zone_interval = 2
+    TDC_map_history_filename = 'map_history.data'
+
+
+
+
+    
 
 
       ! use_superad_reduction

@@ -221,9 +221,7 @@
 
       integer, parameter :: h_total_entropy = h_total_IE_div_IE_plus_KE + 1
 
-      integer, parameter :: h_rms_dvdt_div_v = h_total_entropy + 1
-
-      integer, parameter :: h_virial_thm_P_avg = h_rms_dvdt_div_v + 1
+      integer, parameter :: h_virial_thm_P_avg = h_total_entropy + 1
       integer, parameter :: h_virial_thm_rel_err = h_virial_thm_P_avg + 1
       integer, parameter :: h_total_eps_grav = h_virial_thm_rel_err + 1
       integer, parameter :: h_work_outward_at_surface = h_total_eps_grav + 1
@@ -250,25 +248,7 @@
       integer, parameter :: h_log_rel_run_E_err = h_rel_run_E_err + 1
       integer, parameter :: h_log_rel_cumulative_energy_error = h_log_rel_run_E_err + 1
 
-      integer, parameter :: h_log_residual_norm = h_log_rel_cumulative_energy_error + 1
-      integer, parameter :: h_log_max_residual = h_log_residual_norm + 1
-
-      integer, parameter :: h_log_max_dvdt_residual = h_log_max_residual + 1
-      integer, parameter :: h_log_max_drdt_residual = h_log_max_dvdt_residual + 1
-      integer, parameter :: h_log_max_lnd_residual = h_log_max_drdt_residual + 1
-      integer, parameter :: h_log_max_dEdt_residual = h_log_max_lnd_residual + 1
-
-      integer, parameter :: h_max_abs_v_residual = h_log_max_dEdt_residual + 1
-      integer, parameter :: h_log_max_abs_v_residual = h_max_abs_v_residual + 1
-      integer, parameter :: h_avg_v_residual = h_log_max_abs_v_residual + 1
-      integer, parameter :: h_log_avg_v_residual = h_avg_v_residual + 1
-
-      integer, parameter :: h_log_max_abs_E_residual = h_log_avg_v_residual + 1
-      integer, parameter :: h_log_avg_E_residual = h_log_max_abs_E_residual + 1
-      integer, parameter :: h_max_abs_E_residual = h_log_avg_E_residual + 1
-      integer, parameter :: h_avg_E_residual = h_max_abs_E_residual + 1
-
-      integer, parameter :: h_u_surf_km_s = h_avg_E_residual + 1
+      integer, parameter :: h_u_surf_km_s = h_log_rel_cumulative_energy_error + 1
       integer, parameter :: h_u_surf = h_u_surf_km_s + 1
       integer, parameter :: h_u_div_csound_max = h_u_surf + 1
       integer, parameter :: h_u_div_csound_surf = h_u_div_csound_max + 1
@@ -341,18 +321,11 @@
       integer, parameter :: h_center_eps_nuc = h_d_center_eps_nuc_dlnd + 1
       integer, parameter :: h_center_non_nuc_neu = h_center_eps_nuc + 1
 
-      integer, parameter :: h_center_dL_dm = h_center_non_nuc_neu + 1
-      integer, parameter :: h_center_eps_grav = h_center_dL_dm + 1
+      integer, parameter :: h_center_eps_grav = h_center_non_nuc_neu + 1
       integer, parameter :: h_center_degeneracy = h_center_eps_grav + 1
       integer, parameter :: h_center_gamma = h_center_degeneracy + 1
 
-      integer, parameter :: h_center_dlogT = h_center_gamma + 1
-      integer, parameter :: h_center_dlogRho = h_center_dlogT + 1
-
-      integer, parameter :: h_center_dlnT_dt = h_center_dlogRho + 1
-      integer, parameter :: h_center_dlnd_dt = h_center_dlnT_dt + 1
-
-      integer, parameter :: h_envelope_mass = h_center_dlnd_dt + 1
+      integer, parameter :: h_envelope_mass = h_center_gamma + 1
       integer, parameter :: h_envelope_fraction_left = h_envelope_mass + 1
 
       integer, parameter :: h_tau10_mass = h_envelope_fraction_left + 1
@@ -744,11 +717,7 @@
 
       integer, parameter :: h_tot_IE_div_IE_plus_KE = h_log_tot_Et + 1      
 
-      integer, parameter :: h_surface_extra_Pgas = h_tot_IE_div_IE_plus_KE + 1
-      integer, parameter :: h_min_L = h_surface_extra_Pgas + 1
-      integer, parameter :: h_min_dL_dm_m = h_min_L + 1
-      integer, parameter :: h_min_dL_dm = h_min_dL_dm_m + 1
-      integer, parameter :: h_burn_solver_maxsteps = h_min_dL_dm + 1
+      integer, parameter :: h_burn_solver_maxsteps = h_tot_IE_div_IE_plus_KE + 1
       integer, parameter :: h_rotation_solver_steps = h_burn_solver_maxsteps + 1
       integer, parameter :: h_diffusion_solver_steps = h_rotation_solver_steps + 1
       integer, parameter :: h_diffusion_solver_iters = h_diffusion_solver_steps + 1
@@ -978,9 +947,6 @@
          history_column_name(h_log_total_rotational_kinetic_energy) = 'log_total_rotational_kinetic_energy'
          history_column_name(h_log_total_turbulent_energy) = 'log_total_turbulent_energy'
          history_column_name(h_log_total_energy) = 'log_total_energy'
-
-         history_column_name(h_rms_dvdt_div_v) = 'rms_dvdt_div_v'
-
          history_column_name(h_total_entropy) = 'total_entropy'
          history_column_name(h_total_IE_div_IE_plus_KE) = 'total_IE_div_IE_plus_KE'
 
@@ -1014,28 +980,10 @@
          history_column_name(h_log_rel_run_E_err) = 'log_rel_run_E_err'
          history_column_name(h_log_rel_cumulative_energy_error) = 'log_rel_cumulative_energy_error'
 
-         history_column_name(h_log_residual_norm) = 'log_residual_norm'
-         history_column_name(h_log_max_residual) = 'log_max_residual'
-
-         history_column_name(h_log_max_dvdt_residual) = 'log_max_dvdt_residual'
-         history_column_name(h_log_max_drdt_residual) = 'log_max_drdt_residual'
-         history_column_name(h_log_max_lnd_residual) = 'log_max_lnd_residual'
-         history_column_name(h_log_max_dEdt_residual) = 'log_max_dEdt_residual'
-
-         history_column_name(h_log_max_abs_E_residual) = 'log_max_abs_E_residual'
-         history_column_name(h_log_avg_E_residual) = 'log_avg_E_residual'
-         history_column_name(h_max_abs_E_residual) = 'max_abs_E_residual'
-         history_column_name(h_avg_E_residual) = 'avg_E_residual'
-
          history_column_name(h_u_surf_km_s) = 'u_surf_km_s'
          history_column_name(h_u_surf) = 'u_surf'
          history_column_name(h_u_div_csound_max) = 'u_div_csound_max'
          history_column_name(h_u_div_csound_surf) = 'u_div_csound_surf'
-
-         history_column_name(h_max_abs_v_residual) = 'max_abs_v_residual'
-         history_column_name(h_log_max_abs_v_residual) = 'log_max_abs_v_residual'
-         history_column_name(h_avg_v_residual) = 'avg_v_residual'
-         history_column_name(h_log_avg_v_residual) = 'log_avg_v_residual'
 
          history_column_name(h_log_Lneu_nuc) = 'log_Lneu_nuc'
          history_column_name(h_log_Lneu_nonnuc) = 'log_Lneu_nonnuc'
@@ -1132,18 +1080,11 @@
          history_column_name(h_center_degeneracy) = 'center_degeneracy'
          history_column_name(h_center_eps_grav) = 'center_eps_grav'
          history_column_name(h_center_non_nuc_neu) = 'center_non_nuc_neu'
-         history_column_name(h_center_dL_dm) = 'center_dL_dm'
          history_column_name(h_log_center_eps_nuc) = 'log_center_eps_nuc'
          history_column_name(h_d_center_eps_nuc_dlnT) = 'd_center_eps_nuc_dlnT'
          history_column_name(h_d_center_eps_nuc_dlnd) = 'd_center_eps_nuc_dlnd'
          history_column_name(h_center_eps_nuc) = 'center_eps_nuc'
          history_column_name(h_center_gamma) = 'center_gamma'
-
-         history_column_name(h_center_dlogT) = 'center_dlogT'
-         history_column_name(h_center_dlogRho) = 'center_dlogRho'
-
-         history_column_name(h_center_dlnT_dt) = 'center_dlnT_dt'
-         history_column_name(h_center_dlnd_dt) = 'center_dlnd_dt'
 
          history_column_name(h_h_rich_layer_mass) = 'h_rich_layer_mass'
          history_column_name(h_he_rich_layer_mass) = 'he_rich_layer_mass'
@@ -1500,12 +1441,6 @@
 
          history_column_name(h_cz_top_zone_logdq) = 'cz_top_zone_logdq'
          history_column_name(h_log_Lnuc_sub_log_L) = 'log_Lnuc_sub_log_L'
-
-         history_column_name(h_surface_extra_Pgas) = 'surface_extra_Pgas'
-
-         history_column_name(h_min_L) = 'min_L'
-         history_column_name(h_min_dL_dm_m) = 'min_dL_dm_m'
-         history_column_name(h_min_dL_dm) = 'min_dL_dm'
 
          history_column_name(h_k_below_const_q) = 'k_below_const_q'
          history_column_name(h_q_below_const_q) = 'q_below_const_q'

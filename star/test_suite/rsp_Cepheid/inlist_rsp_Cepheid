@@ -64,10 +64,15 @@
    RSP_X = 0.73d0
    RSP_Z = 0.007d0
       
+   
+! solver
 
 ! output controls
    
-      terminal_show_age_units = 'days'
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
 
       !num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

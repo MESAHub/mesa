@@ -85,6 +85,7 @@
       subroutine amr(s,ierr)
          use chem_def, only: ih1
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
+         use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: TooBig, TooSmall, MaxTooBig, MaxTooSmall, dr, minE
@@ -165,10 +166,9 @@
             write(*,*) '                 split', num_split
             write(*,*) '                merged', num_merge
          end if
-         if (s% rotation_flag) then
-            !update moments of inertia and omega
+         if (s% rotation_flag) then !update moments of inertia and omega
             do k=1, s% nz
-               r00 = exp(s% xh(s% i_lnR, k))
+               r00 = get_r_from_xh(s,k)
                if (s% fitted_fp_ft_i_rot) then
                   s% w_div_w_crit_roche(k) = &
                      w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
@@ -657,6 +657,7 @@
       
       
       subroutine revise_star_radius(s, star_PE0, star_PE1)
+         use star_utils, only: store_r_in_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
          integer :: k
@@ -670,8 +671,8 @@
          do k=1,s% nz
             s% r(k) = s% r(k)*frac
             if (s% model_number == -6918) write(*,2) 's% r(k)', k, s% r(k)
-            s% lnR(k) = log(s% r(k))
-            s% xh(s% i_lnR,k) = s% lnR(k)
+            call store_r_in_xh(s, k, s% r(k))
+            s% lnR(k) = get_lnR_from_xh(s,k)
          end do
          s% r_center = frac*s% r_center
       end subroutine revise_star_radius
@@ -769,7 +770,7 @@
 
       subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
          use alloc, only: reallocate_star_info_arrays
-         use star_utils, only: set_rmid
+         use star_utils, only: set_rmid, store_r_in_xh
          type (star_info), pointer :: s
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
@@ -1157,7 +1158,7 @@
             end do
          end if
          
-         if (s% u_flag) s% u_face_18(ip)%val = 0.5d0*(s% u(i) + s% u(ip))
+         if (s% u_flag) s% u_face_ad(ip)%val = 0.5d0*(s% u(i) + s% u(ip))
             ! just for setting u_face_start so don't need partials
 
          ! r, q, m, u_face unchanged for face i
@@ -1224,8 +1225,8 @@
                   0.5d0*(s% xh(s% i_lum,i) + s% L_center)
             end if
          end if
-
-         s% xh(s% i_lnR,ip) = log(s% r(ip))
+         
+         call store_r_in_xh(s, ip, s% r(ip))
          if (s% u_flag) then
             s% xh(s% i_u,i) = s% u(i)
             s% xh(s% i_u,ip) = s% u(ip)
@@ -1264,6 +1265,8 @@
          use micro, only: do_kap_for_cell
          use eos_lib, only: eos_gamma_DE_get_PT
          use chem_lib, only: basic_composition_info
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh, &
+            store_rho_in_xh, get_rho_and_lnd_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: i, species
          real(dp) :: new_xa(species)
@@ -1273,9 +1276,8 @@
          include 'formats'
          ierr = 0
          rho = s% dm(i)/get_dV(s,i)
-         s% rho(i) = rho
-         s% lnd(i) = log(rho)
-         s% xh(s% i_lnd,i) = s% lnd(i)
+         call store_rho_in_xh(s, i, rho)
+         call get_rho_and_lnd_from_xh(s, i, s% rho(i), s% lnd(i))
          logRho = s% lnd(i)/ln10
          do q=1,species
             new_xa(q) = s% xa(q,i)
@@ -1285,9 +1287,8 @@
             species, new_xa, rho, logRho, s% energy(i), s% lnT(i), &
             new_lnT, revised_energy, ierr)
          if (ierr /= 0) return
-         s% xh(s% i_lnT,i) = new_lnT
-         s% lnT(i) = new_lnT
-         s% T(i) = exp(new_lnT)
+         call store_lnT_in_xh(s, i, new_lnT)
+         call get_T_and_lnT_from_xh(s, i, s% T(i), s% lnT(i))
       end subroutine update_xh_eos_and_kap
 
 
