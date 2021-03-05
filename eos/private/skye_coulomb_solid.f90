@@ -146,7 +146,6 @@ module skye_coulomb_solid
          type(auto_diff_real_2var_order3), intent(in) :: g, TPT
 
          real(dp) :: s, b1, b2, b3, b4, cX
-         real(dp), parameter :: e = 2.718281828459045d0
          real(dp), parameter :: aTF = 0.00352d0
 
          type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, asym, alpha, w, gr
@@ -165,9 +164,8 @@ module skye_coulomb_solid
          xr = cx / rs
 
          supp = safe_exp(pow2(0.205d0 * TPT))
-         Q = sqrt(log(1d0 + supp) / log(e - (e - 2d0) / supp))
+         Q = sqrt(log(1d0 + supp) / log(eulernum - (eulernum - 2d0) / supp))
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
-         Q = sqrt(log(1d0 + 1d0/supp)) / sqrt(log(e - (e - 2d0) * supp))
          f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
 
          F = -f_inf * g * (1d0 + A * pow(Q / g, s))
