@@ -23,6 +23,7 @@
 / ! end of kap namelist
 
 &controls
+
       initial_mass = 10
       initial_z = 0.02d0 
 
@@ -56,7 +57,7 @@
        overshoot_f0(1) = 0.004
 
 ! timesteps
-      varcontrol_target = 1d-3
+      varcontrol_target = 1d-2 ! 1d-3     TESTING
       dX_nuc_drop_limit = 1d-2
 
 ! mesh

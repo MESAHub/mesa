@@ -192,10 +192,10 @@
         call check('grada fraction of gradT at 1.1 Msun', fraction, 0.1_dp, 0.9_dp )
         write(*,*)
 
-        call check('gradT at 0.8 Msun', s%gradT(k1), s%grada(k1) - 1.0d-4, s%grada(k1) + 1.0d-4)   ! gradT = grada
-        call check('gradT at 0.95 Msun', s%gradT(k2), s%grada(k2) - 1.0d-4, s%grada(k2) + 1.0d-4)   ! gradT = grada
-        call check('gradT at 1.1 Msun', s%gradT(k3), gradient - 1.0d-4, gradient + 1.0d-4)   ! gradT = f*grada + (1-f)*gradr
-        call check('gradT at 1.5 Msun', s%gradT(k4), s%gradr(k4) - 1.0d-4, s%gradr(k4)+ 1.0d-4)   ! gradT = gradr
+        call check('gradT at 0.8 Msun', s%gradT(k1), s%grada(k1) - 1.0d-3, s%grada(k1) + 1.0d-3)   ! gradT = grada
+        call check('gradT at 0.95 Msun', s%gradT(k2), s%grada(k2) - 1.0d-3, s%grada(k2) + 1.0d-3)   ! gradT = grada
+        call check('gradT at 1.1 Msun', s%gradT(k3), gradient - 1.0d-3, gradient + 1.0d-3)   ! gradT = f*grada + (1-f)*gradr
+        call check('gradT at 1.5 Msun', s%gradT(k4), s%gradr(k4) - 1.0d-3, s%gradr(k4)+ 1.0d-3)   ! gradT = gradr
         write(*,*)
 
         call check('Dmix at 0.95 Msun', s%d_mix(k2), s%d_mix(s%conv_bdy_loc(1))*0.95d0, s%d_mix(s%conv_bdy_loc(1))*1.05d0)

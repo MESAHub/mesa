@@ -895,13 +895,9 @@
          nz = s% nz
 
          if (.not. s% write_profiles_flag) return
-         if (.not. s% v_flag) then
-            s% v(1:nz) = 0
-            s% dv_dt(1:nz)  = 0
-         end if
-         if (.not. s% rotation_flag) then
-            s% omega(1:nz) = 0
-         end if
+         if (.not. s% v_flag) s% v(1:nz) = 0
+         if (.not. s% u_flag) s% u(1:nz) = 0
+         if (.not. s% rotation_flag) s% omega(1:nz) = 0
 
          max_num_mods = s% max_num_profile_models
          if (max_num_mods < 0) max_num_mods = s% model_number

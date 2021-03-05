@@ -943,6 +943,10 @@
 
       ! max_age
       ! ~~~~~~~
+      ! max_age_in_days
+      ! ~~~~~~~~~~~~~~~~~~
+      ! max_age_in_seconds
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! Stop when the age of the star exceeds this value (in years).
       ! only applies when > 0.
@@ -950,16 +954,7 @@
       ! ::
 
     max_age = 1d36
-
-
-      ! max_age_in_seconds
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Stop when the age of the star exceeds this value (in seconds).
-      ! only applies when > 0.
-
-      ! ::
-
+    max_age_in_days = -1
     max_age_in_seconds = -1
 
 
@@ -2348,6 +2343,18 @@
       ! ::
 
     no_MLT_below_T_max = .false.
+
+
+      ! mlt_make_surface_no_mixing
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! this defaults to false for (temoporary) backward compatibility.
+      ! it should be true.
+
+      ! ::
+
+    mlt_make_surface_no_mixing = .false.
+    
 
 
       ! T_mix_limit
@@ -4392,17 +4399,6 @@
     atm_irradiated_P_surf = 1d6
 
 
-      ! surface_extra_Pgas
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! Extra gas pressure at surface. Added to surface pressure from atm.
-      ! In ergs/cm^3.
-
-      ! ::
-
-    surface_extra_Pgas = 0d0
-
-
       ! use_atm_PT_at_center_of_surface_cell
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4477,16 +4473,6 @@
     use_zero_dLdm_outer_BC = .false.
 
 
-      ! use_T_black_body_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``T_surf`` is set to ``Tsurf_factor*T_black_body(L_surf,R_surf)``
-
-      ! ::
-
-    use_T_black_body_outer_BC = .false.
-
-
       ! use_fixed_vsurf_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! fixed_vsurf
@@ -4511,30 +4497,6 @@
 
     use_fixed_Psurf_outer_BC = .false.
     fixed_Psurf = 0
-
-
-      ! use_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! for ``use_T_black_body_outer_BC``
-
-      ! ::
-
-    use_fixed_L_for_BB_outer_BC = .false.
-    fixed_L_for_BB_outer_BC = 0
-
-
-      ! tau_for_L_BB
-      ! ~~~~~~~~~~~~
-
-      ! determines location where get L for use with BB outer BCs
-      ! use the L at outermost location where tau >= tau_for_L_BB
-
-      ! ::
-
-    tau_for_L_BB = -1
 
 
       ! Tsurf_factor
@@ -6988,6 +6950,25 @@
     diffusion_Vlimit = 0
 
 
+      ! D_mix_zero_region_bottom_q
+      ! ~~~~~~~~~~~~~~~~
+      ! D_mix_zero_region_top_q
+      ! ~~~~~~~~~~~~~~~~
+      ! dq_D_mix_zero_at_H_He_crossover
+      ! ~~~~~~~~~~~~~~~~
+      ! dq_D_mix_zero_at_H_C_crossover
+      ! ~~~~~~~~~~~~~~~~
+
+      ! ::
+
+   D_mix_zero_region_bottom_q = 1d99
+   D_mix_zero_region_top_q = -1d99
+   dq_D_mix_zero_at_H_He_crossover = -1d0
+   dq_D_mix_zero_at_H_C_crossover = -1d0
+
+
+
+
       ! diffusion_min_T_for_radaccel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! diffusion_max_T_for_radaccel
@@ -7946,13 +7927,13 @@
       ! inject_until_reach_delta_total_energy = 1d99
 
 
-      ! use_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! steps_before_use_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_P_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_Fraley_PdV_work_when_time_centering_velocity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
@@ -7961,13 +7942,14 @@
       ! as discussed in the 3rd mesa instrument paper (2015).
       ! time centering applies to velocities, pressures, and luminosities.
       ! not for u_flag.
+      ! steps_before_use_velocity_time_centering < 0 means no time centering.
 
       ! ::
 
-    use_velocity_time_centering = .false.
     steps_before_use_velocity_time_centering = -1
     include_P_in_velocity_time_centering = .false.
     include_L_in_velocity_time_centering = .false.
+    use_Fraley_PdV_work_when_time_centering_velocity = .false.
 
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
@@ -8408,6 +8390,30 @@
       ! ::
 
     trace_solver_damping = .false.
+
+      ! do_normalize_dqs_as_part_of_set_qs
+      ! ~~~~~~~~~~~~~~~~~~~~
+      
+      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
+      ! ok for create pre ms etc., but not for read model
+      ! create_pre_ms calls normalize_dqs even if this flag is false.
+
+      ! ::
+
+   do_normalize_dqs_as_part_of_set_qs = .false.
+   
+
+      ! use_DGESVX_in_bcyclic
+      ! use_equilibration_in_DGESVX
+      ! report_min_rcond_from_DGESXV
+      
+      ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
+
+      ! ::
+
+    use_DGESVX_in_bcyclic = .false.
+    use_equilibration_in_DGESVX = .false.
+    report_min_rcond_from_DGESXV = .false.
 
 
       ! solver_max_tries_before_reject
@@ -11120,16 +11126,6 @@
     show_mesh_changes = .false.
 
 
-      ! mesh_dump_call_number
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! When ``mesh_call_number == mesh_dump_call_number``, various plotting information is written..
-
-      ! ::
-
-    mesh_dump_call_number = -1
-
-
       ! trace_evolve
       ! ~~~~~~~~~~~~
 
@@ -11188,16 +11184,6 @@
       ! ::
 
     xa_clip_limit = 1d-99
-
-
-      ! trace_k
-      ! ~~~~~~~
-
-      ! Print out trace information about cell with number = ``trace_k``.
-
-      ! ::
-
-    trace_k = -1
 
 
       ! fill_arrays_with_NaNs

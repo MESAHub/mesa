@@ -128,8 +128,6 @@
    sch_stable ! 1 if grada > gradr, 0 otherwise
    ledoux_stable ! 1 if gradL > gradr, 0 otherwise
    
-   dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
-   dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
    !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
    !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.

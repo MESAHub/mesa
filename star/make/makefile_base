@@ -185,7 +185,6 @@ SRCS = \
    adjust_mass.f90 \
    adjust_mesh_split_merge.f90 \
    adjust_mesh_support.f90 \
-   adjust_mesh_plot.f90 \
    adjust_mesh.f90 \
    paquette_coeffs.f90 \
    diffusion_support.f90 \

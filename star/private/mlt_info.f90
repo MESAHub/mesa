@@ -31,6 +31,7 @@
       use num_lib
       use utils_lib
       use mlt_get_results, only: Get_results
+      use auto_diff_support, only: wrap
 
       implicit none
 
@@ -75,6 +76,7 @@
             call do1_mlt_2(s, k, s% alpha_mlt(k), gradL_composition_term, &
                opacity, chiRho, chiT, Cp, grada, P, xh, &
                make_gradr_sticky_in_solver_iters, op_err)
+            call wrap_mlt_ad(s,k)
             if (op_err /= 0) then
                ierr = op_err
                if (s% report_ierr) write(*,2) 'set_mlt_vars failed', k
@@ -110,7 +112,60 @@
             opacity_face_in, chiRho_face_in, &
             chiT_face_in, Cp_face_in, grada_face_in, P_face_in, xh_face_in, &
             make_gradr_sticky_in_solver_iters, ierr)
+         call wrap_mlt_ad(s,k)
       end subroutine do1_mlt
+      
+      
+      subroutine wrap_mlt_ad(s,k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: dlnR00, dlnTm1, dlnT00, dlndm1, dlnd00
+         dlnR00 = s% d_gradT_dlnR(k)
+         dlnTm1 = s% d_gradT_dlnTm1(k)
+         dlnT00 = s% d_gradT_dlnT00(k)
+         dlndm1 = s% d_gradT_dlndm1(k)
+         dlnd00 = s% d_gradT_dlnd00(k)
+         call wrap(s% gradT_ad(k), s% gradT(k), &
+            dlndm1, dlnd00, 0d0, &
+            dlnTm1, dlnT00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, dlnR00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradT_dL(k), 0d0, &
+            0d0, s% d_gradT_dln_cvpv0(k), 0d0, &   ! xtra1 is ln_cvpv0
+            0d0, s% d_gradT_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
+            0d0, 0d0, 0d0)
+         dlnR00 = s% d_mlt_vc_dlnR(k)
+         dlnTm1 = s% d_mlt_vc_dlnR(k)
+         dlnT00 = s% d_mlt_vc_dlnR(k)
+         dlndm1 = s% d_mlt_vc_dlnR(k)
+         dlnd00 = s% d_mlt_vc_dlnR(k)
+         call wrap(s% mlt_vc_ad(k), s% mlt_vc(k), &
+            dlndm1, dlnd00, 0d0, &
+            dlnTm1, dlnT00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, dlnR00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_mlt_vc_dL(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, 0d0, 0d0)            
+         dlnR00 = s% d_gradr_dlnR(k)
+         dlnTm1 = s% d_gradr_dlnTm1(k)
+         dlnT00 = s% d_gradr_dlnT00(k)
+         dlndm1 = s% d_gradr_dlndm1(k)
+         dlnd00 = s% d_gradr_dlnd00(k)
+         call wrap(s% gradr_ad(k), s% gradr(k), &
+            dlndm1, dlnd00, 0d0, &
+            dlnTm1, dlnT00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, dlnR00, 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dL(k), 0d0, &
+            0d0, 0d0, 0d0, &
+            0d0, s% d_gradr_dw_div_wc(k), 0d0, &   ! xtra2 is w_div_wc
+            0d0, 0d0, 0d0)
+      end subroutine wrap_mlt_ad
 
 
       subroutine do1_mlt_2(s, k, mixing_length_alpha, gradL_composition_term_in, &

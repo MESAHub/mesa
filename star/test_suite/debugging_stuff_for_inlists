@@ -1,13 +1,16 @@
-      !photo_interval = 1
+      
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      stop_for_bad_nums = .true.
+      trace_evolve = .true.
+      fill_arrays_with_NaNs = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
@@ -49,23 +52,16 @@
       
       !energy_conservation_dump_model_number = -1
       
-      !trace_evolve = .true.
-      
       !use_DGESVX_in_bcyclic = .true.
       !use_equilibration_in_DGESVX = .true.
       !report_min_rcond_from_DGESXV = .true.
-
 
       ! solver debugging
       !solver_check_everything = .true.
       
       !solver_epsder_struct = 1d-6
       !solver_epsder_chem = 1d-6
-
-      !fill_arrays_with_NaNs = .true.
       
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.
       !report_bad_negative_xa = .true.
-      
-      !trace_k = 0

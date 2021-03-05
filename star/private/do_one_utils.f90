@@ -106,9 +106,9 @@
          write(*,'(a)') "      'Mass' is the total stellar baryonic mass (Msun),"
          write(*,'(a)') "      'lg_Mdot' is log10 magnitude of rate of change of mass (Msun/year),"
          write(*,'(a)') "      'lg_Dsurf' is log10 surface density (g/cm^3),"
-         write(*,'(a)') "      'H_env' is the amount of mass where H is the most abundant iso,"
-         write(*,'(a,e9.2)') "      'He_core' is the largest mass where He is most abundant iso."
-         write(*,'(a,e9.2)') "      'C_core' is the largest mass where C is most abundant iso."
+         write(*,'(a)') "      'H_env' is the amount of mass where H is dominant,"
+         write(*,'(a,e9.2)') "      'He_core' is the largest mass where He is dominant."
+         write(*,'(a,e9.2)') "      'CO_core' is the largest mass where CO is dominant."
          write(*,'(a)') "      'H_cntr' is the center H1 mass fraction,"
          write(*,'(a)') "      'He_cntr' is the center He4 mass fraction,"
          write(*,'(a)') "      'C_cntr' is the center C12 mass fraction,"
@@ -308,7 +308,7 @@
          else if (s% v_flag) then
             v = s% v(1)
          else
-            v = 0 ! s% r(1)*s% dlnR_dt(1)
+            v = 0d0
          end if
          vsurf_div_csound = v / s% csound(1)
 
@@ -617,7 +617,7 @@
             v_surf = s% v(1)
             v_div_csound_max = maxval(abs(s% v(1:nz)/s% csound_face(1:nz)))
          else
-            v_surf = abs(s% r(1) * s% dlnR_dt(1))
+            v_surf = 0d0
             v_div_csound_max = 0d0
          end if
          
@@ -763,6 +763,10 @@
          if (s% star_age >= s% max_age .and. s% max_age > 0) then 
             call compare_to_target('star_age >= max_age', s% star_age, s% max_age, &
                   t_max_age)
+                  
+         else if (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) then 
+            call compare_to_target('time >= max_age_in_days', &
+               s% time/(60*60*24), s% max_age_in_days, t_max_age)
                   
          else if (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0) then 
             call compare_to_target('time >= max_age_in_seconds', &
@@ -1503,7 +1507,7 @@
          else if (s% v_flag) then
             v = s% v(1)
          else
-            v = s% r(1) * s% dlnR_dt(1)
+            v = 0d0
          end if
          
          power_he_burn = s% power_he_burn

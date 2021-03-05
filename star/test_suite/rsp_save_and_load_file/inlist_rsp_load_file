@@ -17,14 +17,12 @@
 
 &controls  
 
-   max_model_number = 11000
-   
-   max_timestep = 407.61 ! seconds
+   max_model_number = 20000
 
 ! RSP controls
 
    x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 4.0172246d0 ! expected period (in days) 
+   x_ctrl(1) = 4.0353d0 ! expected period (in days) 
    
    RSP_mass = 4.165d0
    RSP_Teff = 6050
@@ -33,7 +31,8 @@
    RSP_Z = 0.007d0
          
    RSP_initial_dt_factor = 1d0
-   RSP_use_Prad_for_Psurf = .true. ! to match TDC use_zero_Pgas_outer_BC
+   
+! solver
    
 
 ! output controls

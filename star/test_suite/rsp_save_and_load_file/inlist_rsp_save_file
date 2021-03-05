@@ -13,8 +13,7 @@
 
 ! check for retries and backups as part of test_suite
    !max_number_retries = 5
-   !max_number_backups = 0
-   max_model_number = 50 ! save model after reaches steady timestep
+   max_model_number = 50
 
 ! RSP controls
 
@@ -23,6 +22,8 @@
    RSP_L = 1438.8d0
    RSP_X = 0.73d0
    RSP_Z = 0.007d0
+   
+! solver
 
 ! output controls
 

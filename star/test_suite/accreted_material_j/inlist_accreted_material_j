@@ -93,7 +93,7 @@
 
       star_mass_max_limit = 25d0
 
-      varcontrol_target = 5d-4
+      !varcontrol_target = 5d-4
       delta_lg_star_mass_limit = 2d-4
       delta_lg_star_mass_hard_limit = 4d-4
    

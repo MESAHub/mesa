@@ -70,10 +70,15 @@
 
    ! initial kick velocity-amplitude
    RSP_kick_vsurf_km_per_sec = 0.5d0
+   
+! solver
 
 ! output controls
    
-      terminal_show_age_units = 'days'
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
 
    ! for cases in which you have a run that has reached steady pulses
    ! and you want to look at plots of just a few periods to see the details,

@@ -95,6 +95,7 @@
             pgstar_num_scale, &
             pgstar_lw, &
             pgstar_profile_line_style, &
+            pgstar_history_line_style, &
             pgstar_model_lw, &
             pgstar_box_lw, &
 
@@ -3263,6 +3264,7 @@
          s% pgstar_num_scale = pgstar_num_scale
          s% pgstar_lw = pgstar_lw
          s% pgstar_profile_line_style = pgstar_profile_line_style
+         s% pgstar_history_line_style = pgstar_history_line_style
          s% pgstar_model_lw = pgstar_model_lw
          s% pgstar_box_lw = pgstar_box_lw
 

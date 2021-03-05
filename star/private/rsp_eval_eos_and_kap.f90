@@ -29,6 +29,9 @@
       use kap_def
       use const_lib
       use utils_lib
+      use star_utils, only: &
+         store_rho_in_xh, store_lnd_in_xh, get_rho_and_lnd_from_xh, &
+         store_T_in_xh, store_lnT_in_xh, get_T_and_lnT_from_xh
       use star_private_def
       use rsp_def, only: xa, X, Z, Y, &
          abar, zbar, z53bar, XC, XN, XO, Xne
@@ -224,12 +227,10 @@
          logT = log10(T)  
          
          if (k > 0 .and. k <= s% nz) then
-            s% rho(k) = rho
-            s% lnd(k) = logRho*ln10
-            s% xh(s% i_lnd,k) = s% lnd(k)
-            s% T(k) = T
-            s% lnT(k) = logT*ln10
-            s% xh(s% i_lnT,k) = s% lnT(k)
+            call store_rho_in_xh(s, k, rho)
+            call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
+            call store_T_in_xh(s, k, T)
+            call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             s% abar(k) = abar
             s% zbar(k) = zbar
             s% z53bar(k) = z53bar
@@ -386,9 +387,8 @@
                logT, res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
                ierr)
             if (ierr == 0) then
-               s% lnT(k) = logT*ln10
-               s% xh(s% i_lnT,k) = s% lnT(k)
-               s% T(k) = exp(s% lnT(k))
+               call store_lnT_in_xh(s, k, logT*ln10)
+               call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
                T = s% T(k)
                new_erad = crad*T**4/rho
                new_egas = exp(res(i_lnE)) - new_erad
@@ -527,9 +527,8 @@
                logT, res, d_dlnd, d_dlnT, d_dxa, &
                ierr)
             if (ierr == 0) then
-               s% lnT(k) = logT*ln10
-               s% xh(s% i_lnT,k) = s% lnT(k)
-               s% T(k) = exp(s% lnT(k))
+               call store_lnT_in_xh(s, k, logT*ln10)
+               call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
                T = s% T(k)
                new_erad = crad*T**4/rho
                new_egas = exp(res(i_lnE)) - new_erad
@@ -882,8 +881,8 @@
          logRho_bnd2 = arg_not_provided
          other_at_bnd2 = arg_not_provided
          logRho_guess = log10(s% rho(kk))
-         s% lnT(kk) = log(s% T(kk))
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
+         call store_T_in_xh(s, kk, s% T(kk))
+         call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
          
          call eosDT_get_Rho( &
             eos_handle, &
@@ -937,9 +936,8 @@
             d_dabar, d_dzbar, eos_calls, ierr)
          if (ierr /= 0) return
                
-         s% lnT(kk) = logT_result*ln10
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         s% T(kk) = exp(s% lnT(kk))
+         call store_lnT_in_xh(s, kk, logT_result*ln10)
+         call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
          
          new_egas = exp(res(i_lnE)) - crad*s% T(kk)**4/s% rho(kk)
          if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
@@ -1011,9 +1009,8 @@
             d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
                
-         s% lnT(kk) = logT_result*ln10
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         s% T(kk) = exp(s% lnT(kk))
+         call store_lnT_in_xh(s, kk, logT_result*ln10)
+         call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
 
       end subroutine set_T_for_new_Pgas
 
@@ -1053,9 +1050,8 @@
             d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
                
-         s% lnT(kk) = logT_result*ln10
-         s% xh(s% i_lnT,kk) = s% lnT(kk)
-         s% T(kk) = exp(s% lnT(kk))
+         call store_lnT_in_xh(s, kk, logT_result*ln10)
+         call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
       end subroutine set_T_for_new_energy                
 
 

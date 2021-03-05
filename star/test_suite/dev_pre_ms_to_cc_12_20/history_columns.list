@@ -87,8 +87,6 @@
       total_mass ni56
       
       
-      log_max_residual
-      log_residual_norm
       num_solver_iterations ! iterations this step
       rel_E_err
       log_rel_E_err

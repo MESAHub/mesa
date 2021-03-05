@@ -2339,8 +2339,9 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: j, nterms, nvar_hydro, nz, k, kk, &
-            skip1, skip2, skip3, skip4, iounit, i_alpha_RTI, i_etrb_RSP, i_w
+         integer :: j, nterms, nvar_hydro, nz, k, kk, iounit, &
+            skip1, skip2, skip3, skip4, skip5, skip6, &
+            i_alpha_RTI, i_etrb_RSP, i_etrb
          real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
          real(dp), pointer :: vc_data(:,:)
          logical :: dbg
@@ -2383,9 +2384,13 @@
             skip3 = s% i_u
          end if
 
+         skip4 = 0
+         skip5 = 0
+         skip6 = 0
+
          i_alpha_RTI = s% i_alpha_RTI
          i_etrb_RSP = s% i_etrb_RSP
-         i_w = s% i_w
+         i_etrb = s% i_etrb
 
          nterms = 0
          sumvar = 0
@@ -2402,11 +2407,14 @@
             if (j == skip1 .or. &
                 j == skip2 .or. &
                 j == skip3 .or. &
+                j == skip4 .or. &
+                j == skip5 .or. &
+                j == skip6 .or. &
                 j == s% i_ln_cvpv0 .or. &
                 j == s% i_j_rot .or. &
                 j == s% i_w_div_wc .or. & ! TODO: check why not including this makes restart varcontrol inconsistent
                 j == i_alpha_RTI .or. &
-                j == i_w .or. &
+                j == i_etrb .or. &
                 j == i_etrb_RSP) cycle
 
             nterms = nterms + nz
@@ -2422,10 +2430,6 @@
             sumterm(j) = sumterm(j) + sumj
             k = nz-1
             sumj = abs(sum(s% xh(j,k-1:k+1)) - sum(s% xh_old(j,k-1:k+1)))/3
-
-            if (j == s% i_lnd) then
-               sumterm(j) = sumterm(j)/3 ! Seems to help. from Eggleton.
-            end if
 
             sumvar = sumvar + sumterm(j)
             sumscales = sumscales + max(xscale_min, abs(s% xh_old(j,1)))

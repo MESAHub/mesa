@@ -95,8 +95,6 @@
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
-   dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
-   dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
    !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
    !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.

@@ -10,7 +10,7 @@ do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit
 do_one 1M_thermohaline "all values are within tolerances" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-#  Josiah says skip this one for now   do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
+#   Josiah says skip this one for now   do_one 8.8M_urca "PASS: Urca process cooling occurred as expected" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one c13_pocket "all values are within tolerance" "final.mod" auto
@@ -21,13 +21,13 @@ do_one conductive_flame "flame reached halfway point" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
 do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
-do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
+#   Pablo needs to rewrite for auto diff   do_one dev_high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 #   needs work, on in stale_tests branch    do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
-#  under construction.   do_one dev_TDC "stop because model_number >= max_model_number" "final.mod" skip                 
+#   under construction.   do_one dev_TDC "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto       
 do_one gyre_in_mesa_bcep "matched target" skip skip

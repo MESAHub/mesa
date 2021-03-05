@@ -61,7 +61,7 @@
     fe_core_boundary_si28_fraction, neutron_rich_core_boundary_Ye_max, min_boundary_fraction, &
     
     ! when to stop
-    max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, &
+    max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, max_age_in_days, &
     num_adjusted_dt_steps_before_max_age, dt_years_for_steps_before_max_age, max_abs_rel_run_E_err, &
     reduction_factor_for_max_timestep, when_to_stop_rtol, when_to_stop_atol, &
     gamma_center_limit, eta_center_limit, log_center_temp_limit, log_max_temp_upper_limit, &
@@ -131,7 +131,7 @@
     ! for reported surface/center abundances
     surface_avg_abundance_dq, center_avg_value_dq, &
     
-    ! mixing parameters
+    ! mixing parameters 
     min_convective_gap, min_thermohaline_gap, min_semiconvection_gap, min_thermohaline_dropout, &
     max_dropout_gradL_sub_grada, remove_embedded_semiconvection, recalc_mix_info_after_evolve, remove_mixing_glitches, &
     okay_to_remove_mixing_singleton, prune_bad_cz_min_Hp_height, prune_bad_cz_min_log_eps_nuc, &
@@ -229,7 +229,7 @@
     show_mesh_changes, okay_to_remesh, restore_mesh_on_retry, num_steps_to_hold_mesh_after_retry, &
     max_rel_delta_IE_for_mesh_total_energy_balance, &
     trace_mesh_adjust_error_in_conservation, max_allowed_nz, mesh_max_allowed_ratio, &
-    remesh_max_allowed_logT, max_delta_x_for_merge, mesh_dump_call_number, &
+    remesh_max_allowed_logT, max_delta_x_for_merge, &
     mesh_ok_to_merge, mesh_max_k_old_for_split, mesh_min_k_old_for_split, &
     mesh_adjust_get_T_from_E, &
     max_dq, min_dq, min_dq_for_split, min_dq_for_xa, min_dq_for_xa_convective, &
@@ -342,13 +342,13 @@
     include_composition_in_eps_grav, max_eta_for_dedt_form_of_energy_eqn, no_dedt_form_during_relax, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
-    use_dPrad_dm_form_of_T_gradient_eqn, use_velocity_time_centering, dedt_eqn_r_scale, &
+    use_dPrad_dm_form_of_T_gradient_eqn, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     conv_vel_D, conv_vel_siglimit, conv_vel_v0, include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     min_q_for_normal_mlt_gradT_full_off, max_q_for_normal_mlt_gradT_full_on, &
-    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, &
+    conv_vel_ignore_thermohaline, conv_vel_ignore_semiconvection, use_Fraley_PdV_work_when_time_centering_velocity, &
     conv_vel_fully_lagrangian, conv_vel_include_homologous_term, conv_vel_use_mlt_vc_start, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
 
@@ -395,13 +395,17 @@
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
-    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, trace_k, &
+    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, &
     solver_test_partials_var_name, solver_test_partials_equ_name, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
-    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, &
+    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_etrb_xscale_min, &
+    TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
+    TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
+    TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
+    
     
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
@@ -480,10 +484,9 @@
     atm_irradiated_kap_v, atm_irradiated_kap_v_div_kap_th, atm_irradiated_P_surf, &
     atm_irradiated_max_iters, &
 
-    surface_extra_Pgas, use_atm_PT_at_center_of_surface_cell, &
-    use_compression_outer_BC, use_momentum_outer_BC, use_zero_Pgas_outer_BC, use_T_black_body_outer_BC, &
+    use_atm_PT_at_center_of_surface_cell, &
+    use_compression_outer_BC, use_momentum_outer_BC, Tsurf_factor, use_zero_Pgas_outer_BC, &
     fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
-    use_fixed_L_for_BB_outer_BC, tau_for_L_BB, fixed_L_for_BB_outer_BC, Tsurf_factor, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
@@ -796,6 +799,7 @@
  s% max_abs_rel_run_E_err = max_abs_rel_run_E_err
  s% relax_max_number_retries = relax_max_number_retries
  s% max_age = max_age
+ s% max_age_in_days = max_age_in_days
  s% max_age_in_seconds = max_age_in_seconds
  s% num_adjusted_dt_steps_before_max_age = num_adjusted_dt_steps_before_max_age
  s% dt_years_for_steps_before_max_age = dt_years_for_steps_before_max_age
@@ -1279,21 +1283,15 @@
  s% atm_irradiated_P_surf = atm_irradiated_P_surf
  s% atm_irradiated_max_iters = atm_irradiated_max_iters
 
- s% surface_extra_Pgas = surface_extra_Pgas
  s% use_atm_PT_at_center_of_surface_cell = use_atm_PT_at_center_of_surface_cell
  s% use_compression_outer_BC = use_compression_outer_BC
  s% use_momentum_outer_BC = use_momentum_outer_BC
+ s% Tsurf_factor = Tsurf_factor
  s% use_zero_Pgas_outer_BC = use_zero_Pgas_outer_BC
- s% use_T_black_body_outer_BC = use_T_black_body_outer_BC
  s% fixed_vsurf = fixed_vsurf
  s% use_fixed_vsurf_outer_BC = use_fixed_vsurf_outer_BC
  s% fixed_Psurf = fixed_Psurf
  s% use_fixed_Psurf_outer_BC = use_fixed_Psurf_outer_BC
- s% use_fixed_L_for_BB_outer_BC = use_fixed_L_for_BB_outer_BC
- s% tau_for_L_BB = tau_for_L_BB
- s% fixed_L_for_BB_outer_BC = fixed_L_for_BB_outer_BC
- s% use_zero_dLdm_outer_BC = use_zero_dLdm_outer_BC
- s% Tsurf_factor = Tsurf_factor
 
  s% atm_build_tau_outer = atm_build_tau_outer
  s% atm_build_dlogtau = atm_build_dlogtau
@@ -1462,7 +1460,6 @@
  s% mesh_max_allowed_ratio = mesh_max_allowed_ratio
  s% remesh_max_allowed_logT = remesh_max_allowed_logT
  s% max_delta_x_for_merge = max_delta_x_for_merge
- s% mesh_dump_call_number = mesh_dump_call_number
 
  s% mesh_ok_to_merge = mesh_ok_to_merge
  s% mesh_max_k_old_for_split = mesh_max_k_old_for_split
@@ -1843,9 +1840,9 @@
  s% Gamma_lnS_eps_grav_full_on = Gamma_lnS_eps_grav_full_on
 
  s% use_dPrad_dm_form_of_T_gradient_eqn = use_dPrad_dm_form_of_T_gradient_eqn
- s% use_velocity_time_centering = use_velocity_time_centering
  s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
+ s% use_Fraley_PdV_work_when_time_centering_velocity = use_Fraley_PdV_work_when_time_centering_velocity
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
 
  s% RTI_A = RTI_A
@@ -2048,7 +2045,6 @@
  s% solver_test_partials_equ_name = solver_test_partials_equ_name
  s% solver_test_partials_show_dx_var_name = solver_test_partials_show_dx_var_name
  s% solver_save_photo_call_number = solver_save_photo_call_number
- s% trace_k = trace_k
  s% fill_arrays_with_NaNs = fill_arrays_with_NaNs
  s% zero_when_allocate = zero_when_allocate
  s% warn_when_large_rel_run_E_err = warn_when_large_rel_run_E_err
@@ -2066,8 +2062,23 @@
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
  s% TDC_w_min_for_damping = TDC_w_min_for_damping
+ s% TDC_etrb_xscale_min = TDC_etrb_xscale_min
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
+ s% TDC_target_steps_per_cycle = TDC_target_steps_per_cycle
+ s% TDC_max_num_periods = TDC_max_num_periods
+ s% TDC_work_period = TDC_work_period
+ s% TDC_map_first_period = TDC_map_first_period
+ s% TDC_map_last_period = TDC_map_last_period
+ s% TDC_min_max_R_for_periods = TDC_min_max_R_for_periods
+ s% TDC_GREKM_avg_abs_frac_new = TDC_GREKM_avg_abs_frac_new
+ s% TDC_GREKM_avg_abs_limit = TDC_GREKM_avg_abs_limit
+ s% TDC_map_zone_interval = TDC_map_zone_interval
+ s% TDC_work_filename = TDC_work_filename
+ s% TDC_map_columns_filename = TDC_map_columns_filename
+ s% TDC_map_filename = TDC_map_filename
+ s% TDC_map_history_filename = TDC_map_history_filename
+ s% TDC_write_map = TDC_write_map
 
  ! timestep
  s% max_timestep = max_timestep
@@ -2439,6 +2450,7 @@
  max_number_retries = s% max_number_retries
  relax_max_number_retries = s% relax_max_number_retries
  max_age = s% max_age
+ max_age_in_days = s% max_age_in_days
  max_age_in_seconds = s% max_age_in_seconds
  num_adjusted_dt_steps_before_max_age = s% num_adjusted_dt_steps_before_max_age
  dt_years_for_steps_before_max_age = s% dt_years_for_steps_before_max_age
@@ -2923,21 +2935,15 @@
  atm_irradiated_P_surf = s% atm_irradiated_P_surf
  atm_irradiated_max_iters = s% atm_irradiated_max_iters
 
- surface_extra_Pgas = s% surface_extra_Pgas
  use_atm_PT_at_center_of_surface_cell = s% use_atm_PT_at_center_of_surface_cell
  use_compression_outer_BC = s% use_compression_outer_BC
  use_momentum_outer_BC = s% use_momentum_outer_BC
+ Tsurf_factor = s% Tsurf_factor
  use_zero_Pgas_outer_BC = s% use_zero_Pgas_outer_BC
- use_T_black_body_outer_BC = s% use_T_black_body_outer_BC
  fixed_vsurf = s% fixed_vsurf
  use_fixed_vsurf_outer_BC = s% use_fixed_vsurf_outer_BC
  fixed_Psurf = s% fixed_Psurf
  use_fixed_Psurf_outer_BC = s% use_fixed_Psurf_outer_BC
- use_fixed_L_for_BB_outer_BC = s% use_fixed_L_for_BB_outer_BC
- fixed_L_for_BB_outer_BC = s% fixed_L_for_BB_outer_BC
- tau_for_L_BB = s% tau_for_L_BB
- use_zero_dLdm_outer_BC = s% use_zero_dLdm_outer_BC
- Tsurf_factor = s% Tsurf_factor
 
  atm_build_tau_outer = s% atm_build_tau_outer
  atm_build_dlogtau = s% atm_build_dlogtau
@@ -3100,7 +3106,6 @@
  mesh_max_allowed_ratio = s% mesh_max_allowed_ratio
  remesh_max_allowed_logT = s% remesh_max_allowed_logT
  max_delta_x_for_merge = s% max_delta_x_for_merge
- mesh_dump_call_number = s% mesh_dump_call_number
 
  mesh_ok_to_merge = s% mesh_ok_to_merge
  mesh_max_k_old_for_split = s% mesh_max_k_old_for_split
@@ -3478,10 +3483,10 @@
  Gamma_lnS_eps_grav_full_on = s% Gamma_lnS_eps_grav_full_on
 
  use_dPrad_dm_form_of_T_gradient_eqn = s% use_dPrad_dm_form_of_T_gradient_eqn
- use_velocity_time_centering = s% use_velocity_time_centering
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
+ use_Fraley_PdV_work_when_time_centering_velocity = s% use_Fraley_PdV_work_when_time_centering_velocity
 
  RTI_A = s% RTI_A
  RTI_B = s% RTI_B
@@ -3683,7 +3688,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  solver_test_partials_equ_name = s% solver_test_partials_equ_name
  solver_test_partials_show_dx_var_name = s% solver_test_partials_show_dx_var_name
  solver_save_photo_call_number = s% solver_save_photo_call_number
- trace_k = s% trace_k
  fill_arrays_with_NaNs = s% fill_arrays_with_NaNs
  zero_when_allocate = s% zero_when_allocate
  warn_when_large_rel_run_E_err = s% warn_when_large_rel_run_E_err
@@ -3701,8 +3705,23 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
  TDC_w_min_for_damping = s% TDC_w_min_for_damping
+ TDC_etrb_xscale_min = s% TDC_etrb_xscale_min
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
+ TDC_target_steps_per_cycle = s% TDC_target_steps_per_cycle
+ TDC_max_num_periods = s% TDC_max_num_periods
+ TDC_work_period = s% TDC_work_period
+ TDC_map_first_period = s% TDC_map_first_period
+ TDC_map_last_period = s% TDC_map_last_period
+ TDC_min_max_R_for_periods = s% TDC_min_max_R_for_periods
+ TDC_GREKM_avg_abs_frac_new = s% TDC_GREKM_avg_abs_frac_new
+ TDC_GREKM_avg_abs_limit = s% TDC_GREKM_avg_abs_limit
+ TDC_map_zone_interval = s% TDC_map_zone_interval
+ TDC_work_filename = s% TDC_work_filename
+ TDC_map_columns_filename = s% TDC_map_columns_filename
+ TDC_map_filename = s% TDC_map_filename
+ TDC_map_history_filename = s% TDC_map_history_filename
+ TDC_write_map = s% TDC_write_map
 
  ! timestep
  max_timestep = s% max_timestep

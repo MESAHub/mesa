@@ -246,9 +246,6 @@
          relax_initial_max_surf_dq, &
          new_max_surf_dq, &
          max_surf_dq_multiplier, &
-         relax_fixed_L_for_BB_outer_BC, &
-         relax_initial_fixed_L_for_BB_outer_BC, &
-         steps_for_relax_fixed_L, &
 
          relax_tau_factor, &
          relax_initial_tau_factor, &
@@ -903,9 +900,6 @@
          s% job% relax_initial_max_surf_dq = relax_initial_max_surf_dq
          s% job% new_max_surf_dq = new_max_surf_dq
          s% job% max_surf_dq_multiplier = max_surf_dq_multiplier
-         s% job% relax_fixed_L_for_BB_outer_BC = relax_fixed_L_for_BB_outer_BC
-         s% job% relax_initial_fixed_L_for_BB_outer_BC = relax_initial_fixed_L_for_BB_outer_BC
-         s% job% steps_for_relax_fixed_L = steps_for_relax_fixed_L
 
          s% job% relax_tau_factor = relax_tau_factor
          s% job% relax_initial_tau_factor = relax_initial_tau_factor
@@ -1481,9 +1475,6 @@
          relax_initial_max_surf_dq = s% job% relax_initial_max_surf_dq
          new_max_surf_dq = s% job% new_max_surf_dq
          max_surf_dq_multiplier = s% job% max_surf_dq_multiplier
-         relax_fixed_L_for_BB_outer_BC = s% job% relax_fixed_L_for_BB_outer_BC
-         relax_initial_fixed_L_for_BB_outer_BC = s% job% relax_initial_fixed_L_for_BB_outer_BC
-         steps_for_relax_fixed_L = s% job% steps_for_relax_fixed_L
 
          relax_tau_factor = s% job% relax_tau_factor
          relax_initial_tau_factor = s% job% relax_initial_tau_factor

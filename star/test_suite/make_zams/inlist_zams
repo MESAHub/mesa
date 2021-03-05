@@ -10,9 +10,6 @@
       save_model_filename = 'zams.mod'
       required_termination_code_string = 'Lnuc_div_L_zams_limit'
 
-
-      !pgstar_flag = .true.
-
 / ! end of star_job namelist
 
 &eos

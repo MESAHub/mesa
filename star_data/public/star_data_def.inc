@@ -257,16 +257,16 @@
       
       
       ! auto_diff constants for solver variables
-      ! used to access auto_diff_real_18var_order1 d1Array
+      ! used to access auto_diff_real_star_order1 d1Array
       integer, parameter :: i_lnd_m1 = 1
       integer, parameter :: i_lnd_00 = 2
       integer, parameter :: i_lnd_p1 = 3
       integer, parameter :: i_lnT_m1 = 4
       integer, parameter :: i_lnT_00 = 5
       integer, parameter :: i_lnT_p1 = 6
-      integer, parameter :: i_w_m1 = 7
-      integer, parameter :: i_w_00 = 8
-      integer, parameter :: i_w_p1 = 9
+      integer, parameter :: i_etrb_m1 = 7
+      integer, parameter :: i_etrb_00 = 8
+      integer, parameter :: i_etrb_p1 = 9
       integer, parameter :: i_lnR_m1 = 10
       integer, parameter :: i_lnR_00 = 11
       integer, parameter :: i_lnR_p1 = 12
@@ -276,6 +276,15 @@
       integer, parameter :: i_L_m1 = 16
       integer, parameter :: i_L_00 = 17
       integer, parameter :: i_L_p1 = 18
+      integer, parameter :: i_xtra1_m1 = 19
+      integer, parameter :: i_xtra1_00 = 20
+      integer, parameter :: i_xtra1_p1 = 21
+      integer, parameter :: i_xtra2_m1 = 22
+      integer, parameter :: i_xtra2_00 = 23
+      integer, parameter :: i_xtra2_p1 = 24
+      integer, parameter :: i_xtra3_m1 = 25
+      integer, parameter :: i_xtra3_00 = 26
+      integer, parameter :: i_xtra3_p1 = 27
       
 
       ! mesh cell types

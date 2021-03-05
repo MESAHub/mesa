@@ -73,7 +73,7 @@
          thermohaline_coeff = 2  
          thermohaline_option = 'Kippenhahn'
 
-         varcontrol_target = 1d-4
+         !varcontrol_target = 1d-4
 
          dX_mix_dist_limit = 1d-4 
          

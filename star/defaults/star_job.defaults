@@ -587,9 +587,9 @@
       ! steps_to_take_before_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If > 0, stop after taking this many steps.
+      ! If >= 0, stop after taking this many steps.
       ! Sets ``max_model_number`` = ``model_number`` + ``steps_to_take_before_terminate``.
-      ! Ignore if <= 0.
+      ! Ignore if < 0.
 
       ! ::
 
@@ -1245,22 +1245,6 @@
     relax_initial_opacity_max = .false.
     new_opacity_max = 0
     opacity_max_multiplier = 0
-
-
-      ! relax_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! relax_initial_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_for_relax_fixed_L
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Gradually modify ``fixed_L_for_BB_outer_BC``.
-
-      ! ::
-
-    relax_fixed_L_for_BB_outer_BC = .false.
-    relax_initial_fixed_L_for_BB_outer_BC = .false.
-    steps_for_relax_fixed_L = 0
 
 
       ! relax_max_surf_dq

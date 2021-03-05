@@ -88,9 +88,6 @@
          
          s% dVARdot_dVAR = 1d0/dt     
 
-         s% do_struct_hydro = .true.
-         s% do_struct_thermo = .true.
-
          s% do_burn = (s% dxdt_nuc_factor > 0d0)
          s% do_mix = (s% mix_factor > 0d0)
          
@@ -202,23 +199,8 @@
 
          if (do_struct_burn_mix /= keep_going) return
 
-         if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-            do j=1,s% species
-               write(*,4) 'after do_solver_converge xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
-
-         if (.not. s% j_rot_flag) then
+         if (.not. s% j_rot_flag) &
             do_struct_burn_mix = do_mix_omega(s,dt)
-         end if
-
-         if (s% trace_k > 0 .and. s% trace_k <= s% nz) then
-            do j=1,s% species
-               write(*,4) 'after do_mix_omega xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
 
          if (s% use_other_after_struct_burn_mix) &
             call s% other_after_struct_burn_mix(s% id, dt, do_struct_burn_mix)
@@ -289,7 +271,7 @@
       subroutine save_start_values(s, ierr)
          use solve_hydro, only: set_luminosity_by_category
          use chem_def, only: num_categories
-         use hydro_tdc, only: set_w_start_vars
+         use hydro_tdc, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals
          use chem_def, only: ih1
          type (star_info), pointer :: s
@@ -326,8 +308,8 @@
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
-            s% u_face_start(k) = 0d0 ! s% u_face_18(k)%val
-            s% P_face_start(k) = -1d0 ! mark as unset s% P_face_18(k)%val
+            s% u_face_start(k) = 0d0 ! s% u_face_ad(k)%val
+            s% P_face_start(k) = -1d0 ! mark as unset s% P_face_ad(k)%val
             s% L_start(k) = s% L(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)
@@ -367,7 +349,16 @@
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
-         if (s% TDC_flag) call set_w_start_vars(s,ierr)
+         if (s% TDC_flag) then
+            call set_etrb_start_vars(s,ierr)
+            !do k=1,s% nz ! DEBUGGING INFO
+            !   s% xtra1_array(k) = s% rho(k)
+            !   s% xtra2_array(k) = s% T(k)
+            !   s% xtra3_array(k) = abs(s% w(k)) + 1d0
+            !   s% xtra4_array(k) = abs(s% v(k)) + 1d0
+            !   s% xtra5_array(k) = s% r(k)
+            !end do
+         end if
 
          do k=1,s% nz
             do j=1,s% nvar_hydro

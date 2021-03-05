@@ -2184,7 +2184,7 @@
             s% num_retries = s% job% initial_number_retries
          end if
 
-         if (s% job% steps_to_take_before_terminate > 0) then
+         if (s% job% steps_to_take_before_terminate >= 0) then
             s% max_model_number = s% model_number + s% job% steps_to_take_before_terminate
             write(*,2) 'steps_to_take_before_terminate', &
                s% job% steps_to_take_before_terminate
@@ -2645,13 +2645,6 @@
             call star_relax_opacity_max( &
                id, s% job% new_opacity_max, s% job% opacity_max_multiplier, ierr)
             if (failed('star_relax_opacity_max',ierr)) return
-         end if
-
-         if (s% job% relax_fixed_L_for_BB_outer_BC .or. &
-               (s% job% relax_initial_fixed_L_for_BB_outer_BC .and. .not. restart)) then
-            write(*, 2) 'relax_fixed_L_for_BB_outer_BC steps', s% job% steps_for_relax_fixed_L
-            call star_relax_fixed_L_for_BB_outer_BC(id, s% job% steps_for_relax_fixed_L, ierr)
-            if (failed('star_relax_fixed_L_for_BB_outer_BC',ierr)) return
          end if
 
          if (s% job% relax_max_surf_dq .or. &
