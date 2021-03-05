@@ -38,7 +38,8 @@ module hdf5io_m
    ! Parameters
 
    integer, parameter :: CREATE_FILE = 1
-   integer, parameter :: OPEN_FILE = 2
+   integer, parameter :: OPEN_FILE_RO = 2
+   integer, parameter :: OPEN_FILE_RW = 3
 
    integer, parameter :: TYPE_LEN = 31
 
@@ -98,7 +99,8 @@ module hdf5io_m
    private
 
    public :: CREATE_FILE
-   public :: OPEN_FILE
+   public :: OPEN_FILE_RO
+   public :: OPEN_FILE_RW
    public :: TYPE_LEN
    public :: hdf5io_t
    
@@ -130,7 +132,9 @@ contains
       select case(access_type)
       case(CREATE_FILE)
          @:HDF5_CALL(h5fcreate_f, file_name, H5F_ACC_TRUNC_F, file_id)
-      case(OPEN_FILE)
+      case(OPEN_FILE_RO)
+         @:HDF5_CALL(h5fopen_f, file_name, H5F_ACC_RDONLY_F, file_id)
+      case(OPEN_FILE_RW)
          @:HDF5_CALL(h5fopen_f, file_name, H5F_ACC_RDWR_F, file_id)
       case default
          @:ABORT(invalid access_type)
@@ -708,7 +712,7 @@ contains
 
                   item_shape = self%${obj_type}$_shape(item_name)
                   @:ASSERT(SIZE(item_shape) == ${rank}$, rank mismatch)
-                  
+
                   allocate(data${ARRAY_SPEC(rank, 'item_shape({0:d})')}$)
 
                #:else
@@ -873,5 +877,5 @@ contains
 
       #:endfor
    #:endfor
-            
+
 end module hdf5io_m
