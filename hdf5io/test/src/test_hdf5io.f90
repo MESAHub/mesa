@@ -126,7 +126,7 @@ contains
 
       ! Open the file
 
-      hi = hdf5io_t('test.h5', OPEN_FILE)
+      hi = hdf5io_t('test.h5', OPEN_FILE_RO)
       
       ! Read and check values
 

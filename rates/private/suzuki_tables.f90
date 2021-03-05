@@ -448,7 +448,7 @@ contains
 
      ! open file (read-only)
 
-     hi = hdf5io_t(filename, OPEN_FILE)
+     hi = hdf5io_t(filename, OPEN_FILE_RO)
 
      ! get a list of group names
 

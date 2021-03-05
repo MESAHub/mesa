@@ -12,16 +12,9 @@ echo 'create ionization_data'
 
 rm -rf ionization_data
 
-cp test/ionization_data.tar.xz .
+echo 'tar xfJ ionization_data.tar.xz'
+tar xfJ test/ionization_data.tar.xz
 check_okay
-
-echo 'xz -d ionization_data.tar.xz'
-xz -d ionization_data.tar.xz
-check_okay
-
-tar -xf ionization_data.tar
-check_okay
-rm ionization_data.tar
 
 rm -rf ../data/ionization_data
 check_okay

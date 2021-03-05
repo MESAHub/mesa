@@ -195,6 +195,18 @@
    Skye_min_gamma_for_solid = 170
    Skye_max_gamma_for_liquid = 200
 
+   ! Skye Solid Mixing Corrections
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! Skye computes corrections to the linear mixing rule in the solid phase using the prescription from either
+   ! Ogata+1993 or Potekhin & Chabrier 2013. The former provides better agreement with calculations done at
+   ! typical white dwarf charge ratios (R = Z2 / Z1 ~ 4/3 for C/O), see e.g. Blouin+2020. The latter gives better
+   ! agreement with analytic expectations at large charge ratios R > 2.
+   ! Select between these choices by specifying either `"Ogata" or "PC".
+   ! :: 
+
+   Skye_solid_mixing_rule = "PC"
+
+
 
 ! CMS controls
 ! ------------
