@@ -137,14 +137,14 @@ program eos_plotter
             end if
          else if (doing_consistency) then
             if (i_cons == 1) then
-               write(*,*) 'plotting thermodynamic consistency metric log10(dpe)'
-               write(iounit,*) 'log10(dpe)'
+               write(*,*) 'plotting thermodynamic consistency metric dpe'
+               write(iounit,*) 'dpe'
             else if (i_cons == 2) then
-               write(*,*) 'plotting thermodynamic consistency metric log10(dse)'
-               write(iounit,*) 'log10(dse)'
+               write(*,*) 'plotting thermodynamic consistency metric dse'
+               write(iounit,*) 'dse'
             else if (i_cons == 3) then
-               write(*,*) 'plotting thermodynamic consistency metric log10(dsp)'
-               write(iounit,*) 'log10(dsp)'
+               write(*,*) 'plotting thermodynamic consistency metric dsp'
+               write(iounit,*) 'dsp'
             end if
          else
             write(*,*) 'plotting ' // eosDT_result_names(i_var)
@@ -366,7 +366,7 @@ program eos_plotter
             else if (i_cons == 3) then
                res1 = -T * rho * (exp(res(i_lnS)) * d_dlnd(i_lnS)) / (d_dlnT(i_lnPgas) * exp(res(i_lnPgas)) + (4d0 / 3d0) * crad * pow4(T)) - 1
             end if
-            res1 = log10(abs(res1))
+            res1 = abs(res1)
          end if
 
 
