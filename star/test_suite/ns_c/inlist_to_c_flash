@@ -93,7 +93,7 @@
 ! timesteps
       varcontrol_target = 1d-3 
       delta_lgL_nuc_limit = 0.01
-      delta_lgL_nuc_hard_limit = 0.15
+      !delta_lgL_nuc_hard_limit = 0.15
       lgL_nuc_burn_min = -2d0
       
       ! reduce limit for rel error since total_energy is tiny
@@ -135,10 +135,10 @@
       terminal_interval = 10
       write_header_frequency = 10
    
-      !photo_interval = 10
+      photo_interval = 10
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 

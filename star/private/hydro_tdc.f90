@@ -71,8 +71,8 @@
          logical :: test_partials
          include 'formats'
 
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
+         test_partials = (k == s% solver_test_partials_k)
+         !test_partials = .false.
 
          ierr = 0
          L_expected = compute_L_face(s, k, ierr)
@@ -88,7 +88,16 @@
          residual = resid%val
          s% equ(s% i_equL, k) = residual         
          if (test_partials) then
-            s% solver_test_partials_val = residual
+            s% solver_test_partials_val = residual 
+            if (.false.) then
+               write(*,2) 'L_expected%val', k, L_expected%val
+               write(*,2) 'L_actual%val', k, L_actual%val
+               write(*,2) 'diff', k, L_expected%val - L_actual%val
+               write(*,2) 'diff*scale', k, (L_expected%val - L_actual%val)*scale
+               write(*,2) 's% Lc(k)', k, s% Lc(k)
+               write(*,2) 's% w(k)', k, s% w(k)
+               write(*,2) 's% w(k-1)', k-1, s% w(k-1)
+            end if
          end if
          
          if (skip_partials) return
@@ -96,9 +105,9 @@
          if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = 0
-            s% solver_test_partials_dval_dx = 0
-            write(*,*) 'do1_tdc_L_eqn', s% solver_test_partials_var
+            s% solver_test_partials_var = s% i_etrb
+            s% solver_test_partials_dval_dx = resid%d1Array(i_etrb_00)
+            write(*,*) 'do1_tdc_L_eqn', s% solver_test_partials_var, k, s% nz
          end if      
       end subroutine do1_tdc_L_eqn
       
