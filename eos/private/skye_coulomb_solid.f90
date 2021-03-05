@@ -163,7 +163,9 @@ module skye_coulomb_solid
 
          cx = pow(9d0 * pi / 4d0, 1d0/3d0) * fine
          xr = cx / rs
-         supp = safe_exp(-pow2(0.205d0 * TPT))
+
+         supp = safe_exp(pow2(0.205d0 * TPT))
+         Q = sqrt(log(1d0 + supp) / log(e - (e - 2d0) / supp))
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
          Q = sqrt(log(1d0 + 1d0/supp)) / sqrt(log(e - (e - 2d0) * supp))
          f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
