@@ -36,7 +36,7 @@ module skye_coulomb_solid
 
       TPT2=TPT*TPT
 
-      F = -(A1 / GAMI + A2 / pow2(GAMI) + A3 / pow3(GAMI))
+      F = -(A1 / GAMI + A2 / (2d0 * pow2(GAMI)) + A3 / (3d0 * pow3(GAMI)))
       F = F * exp(-(B1 / A1) * TPT2) ! suppress.factor of classical anharmonicity
       F = F - B1 * TPT2 / GAMI ! Quantum correction
    end function ocp_solid_anharmonic_free_energy
@@ -124,6 +124,63 @@ module skye_coulomb_solid
 
    end function ocp_solid_harmonic_free_energy
 
+   !> Calculates a log with cutoffs to prevent over/underflow.
+   !!
+   !! @param x Input to take the exponential of.
+   !! @param ex Output (exp(x) clipped to avoid over/underflow).
+   type(auto_diff_real_2var_order3) function safe_exp(x) result(ex)
+      type(auto_diff_real_2var_order3), intent(in) :: x
+      ex = exp(max(-3d1,min(3d1,x)))
+   end function safe_exp
+
+   !> Calculates the electron-ion screening corrections to the free energy
+   !! of a one-component plasma in the solid phase using the fits of Potekhin & Chabrier 2013.
+   !!
+   !! @param Z ion charge
+   !! @param mi ion mass in grams
+   !! @param g ion interaction parameter
+   !! @param TPT effective T_p/T - ion quantum parameter
+   !! @param F non-ideal free energy
+   function ocp_solid_screening_free_energy_correction(Z, mi, g, TPT) result(F)
+         real(dp), intent(in) :: Z, mi
+         type(auto_diff_real_2var_order3), intent(in) :: g, TPT
+
+         real(dp) :: s, b1, b2, b3, b4, cX
+         real(dp), parameter :: e = 2.718281828459045d0
+         real(dp), parameter :: aTF = 0.00352d0
+
+         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, asym, alpha, w, gr
+         type(auto_diff_real_2var_order3) :: F
+
+         s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
+         b1 = 1d0 - 1.1866d0 * pow(Z, -0.267d0) + 0.27d0 / Z
+         b2 = 1d0 + (2.25d0 * pow(Z, -1d0/3d0)) * (1d0 + 0.684d0 * pow5(Z) + 0.222d0 * pow6(Z)) / (1d0 + 0.222d0 * pow6(Z))
+         b3 = 41.5d0 / (1d0 + log(Z))
+         b4 = 0.395d0 * log(Z) + 0.347d0 * pow(Z, -1.5d0)
+
+         rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
+         ge = g * pow(Z, -5d0/3d0)
+
+         cx = pow(9d0 * pi / 4d0, 1d0/3d0) * fine
+         xr = cx / rs
+         supp = safe_exp(-pow2(0.205d0 * TPT))
+         A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
+         Q = sqrt(log(1d0 + 1d0/supp)) / sqrt(log(e - (e - 2d0) * supp))
+         f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
+
+         F = -f_inf * g * (1d0 + A * pow(Q / g, s))
+
+         gr = sqrt(1d0 + pow2(xr))
+         alpha = 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0) * (rs / ge) * gr
+
+         w = -(aTF / cx) * rs * pow(Z, 7d0/3d0) * sqrt(3 / ge)
+         w = w / (pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))
+
+         asym = 1d0 / (1d0 + tanh(alpha) * (w - 1d0))! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
+
+         F = F * asym
+
+   end function ocp_solid_screening_free_energy_correction
 
    !> Computes the correction deltaG to the linear mixing rule for a two-component Coulomb solid mixture.
    !! From Shuji Ogata, Hiroshi Iyetomi, and Setsuo Ichimaru 1993
@@ -177,8 +234,9 @@ module skye_coulomb_solid
    !! @param AZion Array of length NMIX holding the charges of species
    !! @param GAME election interaction parameter
    !! @param F mixing free energy correction per ion per kT.
-   function solid_mixing_rule_correction(n, AY, AZion, GAME) result(F)      
+   function solid_mixing_rule_correction(Skye_solid_mixing_rule, n, AY, AZion, GAME) result(F)      
       ! Inputs
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
       integer, intent(in) :: n
       real(dp), intent(in) :: AZion(:), AY(:)
       type(auto_diff_real_2var_order3), intent(in) :: GAME
@@ -238,7 +296,14 @@ module skye_coulomb_solid
             ! The contribution to F scales as abundance_sum^2, so in cases where the max returns eps
             ! we don't care much about the error this incurs.
             aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))! = x2 / (x1 + x2) in MC10's language
-            dG = deltaG_Ogata93(aj, RZ)
+            if (Skye_solid_mixing_rule == 'Ogata') then
+               dG = deltaG_Ogata93(aj, RZ)
+            else if (Skye_solid_mixing_rule == 'PC') then
+               dG = deltaG_PC13(aj, RZ)
+            else
+               write(*,*) 'Error: Invalid choice for Skye_solid_mixing_rule.'
+               stop
+            end if
 
             GAMI=pow(unique_charges(i),5d0/3d0)*GAME
             F = F +  GAMI * (charge_abundances(i) * charge_abundances(j) * dG)

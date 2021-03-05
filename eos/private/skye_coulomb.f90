@@ -7,6 +7,7 @@ module skye_coulomb
 
    implicit none
 
+   real(dp), parameter :: AUM = amu / me
    logical, parameter :: dbg = .false.
    !logical, parameter :: dbg = .true.
 
@@ -38,11 +39,13 @@ module skye_coulomb
    !! @param latent_ddlnT The latent heat of the smoothed phase transition in lnT (T dS/dlnT)
    !! @param latent_ddlnRho The latent heat of the smoothed phase transition in lnRho (T dS/dlnRho)
    subroutine nonideal_corrections(NMIX,AY,AZion,ACMI, min_gamma_for_solid, max_gamma_for_liquid,&
-                                  RHO,temp, xnefer, abar,dF, latent_ddlnT, latent_ddlnRho,phase)
+                                   Skye_solid_mixing_rule, RHO,temp, xnefer, abar, &
+                                   dF, latent_ddlnT, latent_ddlnRho,phase)
       integer, intent(in) :: NMIX
       real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: RHO, temp, xnefer
       type(auto_diff_real_2var_order3), intent(out) :: dF, phase, latent_ddlnT, latent_ddlnRho
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
 
       integer :: IX
       integer :: LIQSOL
@@ -84,11 +87,11 @@ module skye_coulomb
       ! Compute free energy correction for liquid and solid phase.
       LIQSOL = 0
       dF_liq = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,&
-          temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
+          Skye_solid_mixing_rule, temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
 
       LIQSOL = 1
       dF_sol = nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,&
-          temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
+          Skye_solid_mixing_rule, temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321)
 
       ! Add electron exchange-correlation energy
       dF_liq = dF_liq + F_phase_independent
@@ -103,7 +106,7 @@ module skye_coulomb
       call decide_phase(dF_liq, dF_sol, kT, temp, rho, dF, phase, latent_ddlnT, latent_ddlnRho)
 
       if (dbg) then
-         write(*,*) 'Phase', phase%val
+         write(*,*) 'GAME',GAME%val,'Phase', phase%val
       end if
 
    end subroutine nonideal_corrections
@@ -198,17 +201,18 @@ module skye_coulomb
    !! @param Z2mean The mean squared ion charge (mass fraction weighted)
    !! @param Z53mean The mean of ion charge to the 5/3 power (mass fraction weighted)
    !! @param Z321mean The mean of Z(Z+1)^(3/2), where Z is the ion charge (mass fraction weighted)
-   function nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid, temp,abar,GAME,RS,LIQSOL,&
-                                       Zmean, Z2mean, Z52, Z53, Z321) result(dF)
+   function nonideal_corrections_phase(NMIX,AY,AZion,ACMI,min_gamma_for_solid, max_gamma_for_liquid,Skye_solid_mixing_rule,&
+                                       temp,abar,GAME,RS,LIQSOL,Zmean, Z2mean, Z52, Z53, Z321) result(dF)
       ! Inputs
       integer, intent(in) :: NMIX
       integer, intent(in) :: LIQSOL
       real(dp), intent(in) :: AZion(:), ACMI(:), abar, AY(:), Zmean, Z2mean, Z52, Z53, Z321, min_gamma_for_solid, max_gamma_for_liquid
       type(auto_diff_real_2var_order3), intent(in) :: temp, GAME, RS
+      character(len=128), intent(in) :: Skye_solid_mixing_rule
 
       ! Intermediates and constants
       integer :: i,j
-      type(auto_diff_real_2var_order3) :: FMIX, f
+      type(auto_diff_real_2var_order3) :: GAMI, COTPT, TPT, FMIX, f
       real(dp), parameter :: TINY=1.d-7
 
       ! Output
@@ -219,8 +223,18 @@ module skye_coulomb
       ! Composition loop
       do i=1,nmix
          if (AY(i) > TINY .and. AZion(i) /= 0d0) then ! skip low-abundance species and neutrons
+
+            GAMI = pow(AZion(i),5d0/3d0) * GAME
+            COTPT=sqrt(3d0/AUM/ACMI(i))/pow(AZion(i),7d0/6d0) ! auxiliary coefficient
+            TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
+
             ! Add up non-ideal corrections
             f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i), min_gamma_for_solid, max_gamma_for_liquid)
+            if (LIQSOL == 0) then
+               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAMI, TPT) ! screening corrections
+            else
+               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAMI, TPT) ! screening corrections
+            end if               
             dF = dF + AY(i) * f
 
          end if
@@ -230,7 +244,7 @@ module skye_coulomb
       if (LIQSOL == 0) then ! liquid phase
          FMIX = liquid_mixing_rule_correction(RS,GAME,Zmean,Z2mean,Z52,Z53,Z321)
       else ! solid phase (only Madelung contribution) [22.12.12]
-         FMIX = solid_mixing_rule_correction(NMIX, AY, AZion, GAME)
+         FMIX = solid_mixing_rule_correction(Skye_solid_mixing_rule, NMIX, AY, AZion, GAME)
       endif
       dF = dF + FMIX
 
@@ -257,8 +271,6 @@ module skye_coulomb
       real(dp) :: COTPT, gamma_boundary
       type(auto_diff_real_2var_order3) :: temp_boundary, fake_dens, GAMI, TPT, g, tp, dF_dlnT
 
-      real(dp), parameter :: AUM = amu / me
-
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
@@ -268,14 +280,14 @@ module skye_coulomb
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
          ! No extrapolation needed
-         F = ocp_free_energy(LIQSOL, GAMI, TPT)
+         F = ocp_free_energy(LIQSOL, Zion, CMI, GAMI, TPT)
          if (dbg) then
-            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val
+            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val, 'F', F%val
          end if
       else
          ! Extrapolate past the boundary
          if (dbg) then
-            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Normal, GAMI:', GAMI%val
+            write(*,*) 'Species:', Zion, 'LIQSOL', LIQSOL, 'Extrapolated, GAMI:', GAMI%val
          end if
 
          ! Identify the boundary
@@ -296,7 +308,7 @@ module skye_coulomb
          tp=g/sqrt(RS)*COTPT                   ! T_p/T
 
          ! Compute boundary free energy
-         F = ocp_free_energy(LIQSOL, g, tp)
+         F = ocp_free_energy(LIQSOL, Zion, CMI, g, tp)
 
          ! Extract derivative at boundary
          dF_dlnT = differentiate_1(F) * temp_boundary
@@ -340,30 +352,38 @@ module skye_coulomb
    !! just responsible for assembling different terms together.
    !! Based on EOSFI8 by Potekhin and Chabrier.
    !!
-   !! @param LIQSOL Integer specifying the phase: 0 for liquid, 1 for solid
+   !! @param LIQSOL Integer specifying the phase: 0 for liquid, 1 for solid.
+   !! @param Zion Charge of the species of interest in electron charges.
+   !! @param CMI Mass of the species of interest in AMU. 
    !! @param GAMI Ion coupling parameter (Gamma_i)
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F non-ideal free energy per ion per kT
-   function ocp_free_energy(LIQSOL,GAMI,TPT) result(F)
+   function ocp_free_energy(LIQSOL, Zion, CMI, GAMI, TPT) result(F)
       ! Inputs
+      real(dp), intent(in) :: Zion, CMI
       integer, intent(in) :: LIQSOL
       type(auto_diff_real_2var_order3), intent(in) :: GAMI, TPT
+
+      ! Intermediates
+      type(auto_diff_real_2var_order3) :: RS, COTPT
 
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
+      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
+      RS = GAMI * COTPT / TPT ! Electron sphere radius / Bohr radius
 
-      ! i-e corrections (FSCR) ruin the phase transition at densities ~1d3 and below.
-      ! For now they're commented out till we can figure out what to do about these issues.
-      ! - ASJ May 15, 2020
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
+         !F = F + screening_factor * ocp_liquid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       else     
          F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
+         !F = F + screening_factor * ocp_solid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       endif
+
    end function ocp_free_energy
 
 

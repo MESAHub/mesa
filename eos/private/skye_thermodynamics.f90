@@ -85,6 +85,7 @@ module skye_thermodynamics
    !! @param F_ideal_ion Ideal ion free energy (erg/g)
    !! @param F_coul Coulomb corrections to the free energy (erg/g)
    !! @param F_rad Radiation free energy (erg/g)
+   !! @param F_ele Ideal electron-positron free energy (erg/g)
    !! @param temp Temperature (K)
    !! @param den Density (g/cm^3)
    !! @param xnefer Electron density (1/cm^3)
@@ -92,9 +93,6 @@ module skye_thermodynamics
    !! @param abar The mean atomic mass number.
    !! @param zbar The mean atomic charge number.
    !! @param abar The mean atomic mass number.
-   !! @param pele Ideal electron positron pressure (erg/cm^3)
-   !! @param sele Ideal electron positron entropy (erg/g/K)
-   !! @param eele Ideal electron positron internal energy (erg/g)
    !! @param phase The blended phase. 0 for liquid, 1 for solid, smoothly interpolates in between.
    !! @param latent_ddlnT The latent heat of the smoothed phase transition in lnT (T dS/dlnT)
    !! @param latent_ddlnRho The latent heat of the smoothed phase transition in lnRho (T dS/dlnRho)
@@ -102,17 +100,16 @@ module skye_thermodynamics
    !! @param res The EOS return vector.
    !! @param d_dlnRho The derivative of the EOS return vector with respect to lnRho.
    !! @param d_dlnT The derivative of the EOS return vector with respect to lnT.
-   subroutine pack_for_export(F_ideal_ion, F_coul, F_rad, temp, dens, xnefer, etaele, abar, zbar, &
-                                          pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho, &
-                                          res, d_dlnRho, d_dlnT)
+   subroutine pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele, abar, zbar, &
+                                          phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT)
       use eos_def
-      type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_rad, temp, dens, xnefer, etaele
-      type(auto_diff_real_2var_order3), intent(in) :: pele, eele, sele, phase, latent_ddlnT, latent_ddlnRho
+      type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele
+      type(auto_diff_real_2var_order3), intent(in) :: phase, latent_ddlnT, latent_ddlnRho
       real(dp), intent(in) :: abar, zbar
 
       ! Intermediates
       type(auto_diff_real_2var_order3) :: srad, erad, prad, sgas, egas, pgas, p, e, s
-      type(auto_diff_real_2var_order3) :: F_ion_gas, lnS, lnE, lnPgas, mu, lnfree_e
+      type(auto_diff_real_2var_order3) :: F_gas, lnS, lnE, lnPgas, mu, lnfree_e
       type(auto_diff_real_2var_order3) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
 
       ! Outputs
@@ -120,17 +117,11 @@ module skye_thermodynamics
       real(dp), intent(inout) :: d_dlnRho(nv)
       real(dp), intent(inout) :: d_dlnT(nv)
 
-      ! Form the ion gas plus Coulomb corrections
-      F_ion_gas = F_ideal_ion + F_coul
+      ! Form the electron-positron-ion gas plus Coulomb corrections
+      F_gas = F_ideal_ion + F_coul + F_ele
 
       ! Compute base thermodynamic quantities
-      call thermodynamics_from_free_energy(F_ion_gas, temp, dens, sgas, egas, pgas)
-
-      ! Sum with ideal electron gas contributions
-      pgas = pele + pgas
-      egas = eele + egas
-      sgas = sele + sgas
-
+      call thermodynamics_from_free_energy(F_gas, temp, dens, sgas, egas, pgas)
       call thermodynamics_from_free_energy(F_rad, temp, dens, srad, erad, prad)
       p = prad + pgas
       e = erad + egas
