@@ -230,6 +230,7 @@
          real(dp) :: mass_fraction_limit_for_Skye
          real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
          real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+         character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
 
          ! misc
          logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos

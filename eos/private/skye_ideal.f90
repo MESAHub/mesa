@@ -60,7 +60,7 @@ module skye_ideal
 
    end function compute_xne
 
-   subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye, ht, s, e, p, adr_etaele, adr_xnefer, ierr)
+   subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
       use helm_polynomials
       use eos_def
       real(dp), intent(in) :: temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye
@@ -166,10 +166,7 @@ module skye_ideal
                        df_ttt, df_dtt, df_ddt, df_ddd
       real(dp) :: etaele,detadd,detadt
       real(dp) :: detaddd,detaddt,detadtt
-      type(auto_diff_real_2var_order3), intent(out) :: adr_etaele, adr_xnefer, s, e, p
-      real(dp) :: sele, dsepdt, dsepdd, dsepddt, dsepdtt, dsepddd, &
-                 eele, deepdt, deepdd, deepddt, deepdtt, deepddd, &
-                 pele, dpepdt, dpepdd, dpepddt, dpepdtt, dpepddd
+      type(auto_diff_real_2var_order3), intent(out) :: adr_etaele, adr_xnefer, F
 
       integer, intent(out) :: ierr
 
@@ -412,43 +409,6 @@ module skye_ideal
         dddsi0md = -xdddpsi0(mxd) * ht% dd3i_sav(iat)
         dddsi1md = xdddpsi1(mxd) * ht% dd2i_sav(iat)      
 
-!..look in the pressure derivative only once
-        fi(1)  = ht% dpdf(iat,jat)
-        fi(2)  = ht% dpdf(iat+1,jat)
-        fi(3)  = ht% dpdf(iat,jat+1)
-        fi(4)  = ht% dpdf(iat+1,jat+1)
-        fi(5)  = ht% dpdft(iat,jat)
-        fi(6)  = ht% dpdft(iat+1,jat)
-        fi(7)  = ht% dpdft(iat,jat+1)
-        fi(8)  = ht% dpdft(iat+1,jat+1)
-        fi(9)  = ht% dpdfd(iat,jat)
-        fi(10) = ht% dpdfd(iat+1,jat)
-        fi(11) = ht% dpdfd(iat,jat+1)
-        fi(12) = ht% dpdfd(iat+1,jat+1)
-        fi(13) = ht% dpdfdt(iat,jat)
-        fi(14) = ht% dpdfdt(iat+1,jat)
-        fi(15) = ht% dpdfdt(iat,jat+1)
-        fi(16) = ht% dpdfdt(iat+1,jat+1)         
-
-!..pressure derivative with density
-        dpepdd_in = h3(iat,jat,fi, &
-                       si0t,   si1t,   si0mt,   si1mt, &
-                       si0d,   si1d,   si0md,   si1md)
-        dpepdd_in = max(dpepdd_in,1.0d-30)
-        dpepdd    = dpepdd_in * dindd
-
-!..second pressure derivative with density**2
-        dpepddd_in = h3(iat,jat,fi, &
-                       si0t,   si1t,   si0mt,   si1mt, &
-                       dsi0d,   dsi1d, dsi0md,  dsi1md)
-        dpepddd  = dpepddd_in * dindd * dindd
-
-!..second pressure derivative with density temperature
-        dpepddt_in = h3(iat,jat,fi, &
-                       dsi0t,   dsi1t,   dsi0mt,   dsi1mt, &
-                       si0d,   si1d, si0md,  si1md)
-        dpepddt  = dpepddt_in * dindd
-
 !..look in the electron chemical potential table only once
         fi(1)  = ht% ef(iat,jat)
         fi(2)  = ht% ef(iat+1,jat)
@@ -647,115 +607,23 @@ module skye_ideal
         dxneferddtz = din * ytot1 * dxneferdddt
 
 
-!..the desired electron-positron thermodynamic quantities
-
-!..evaluating the pressure, entropy, and energy in that order
-!..guarantees thermodymic consistency
-
-!..dpepdd at high temperatures and low densities is below the
-!..floating point limit of the subtraction of two large terms.
-!..since dpresdd doesn't enter the maxwell relations at all, use the
-!..bicubic interpolation done above instead of the formally correct expression,
-!..which are commented out below.
-
-!..pressure in erg/vol
-        x       = din * din
-        pele    = x * df_d
-
-        ww = x*df_dd + 2.0d0*din*df_d
-        zz = x*df_ddd + 4.0d0*din*df_dd + 2.0d0*df_d
-        y = x * df_ddt + 2.0d0*din*df_dt
-
-!..first derivatives
-        dpepdt  = x * df_dt
-        dpepdd  = ww*dindd
-        dpepda  = ww*dinda
-        dpepdz  = ww*dindz
-
-!..second derivatives
-        dpepddd = zz * dindd * dindd
-        dpepddt = y*dindd
-        dpepdda = (zz*dindd + ww)*dindda
-        dpepddz = (zz*dindd + ww)*dinddz
-        dpepdtt = x * df_dtt
-        dpepdta = y * dinda
-        dpepdtz = y * dindz
-        dpepdaa = (zz*dinda + ww)*dindaa
-        dpepdaz = (zz*dinda + ww)*dindaz
-        dpepdzz = zz*dindz*dindz 
-
-
-
-!..entropy in erg/g/k
-        x       = ye * ye
-        y       = ye * ytot1
-        sele    = -df_t * ye
-
-!..first derivatives
-        dsepdt  = -df_tt * ye
-        if (dsepdt < 0d0) then
-         ierr = -1
-         if (dbg) then
-            write(*,*) 'dsepdt < 0d0 in helm_electron_positron'
-            write(*,*) 'dsepdt', dsepdt
-            write(*,*)  'df_tt', df_tt
-            write(*,*) '   ye', ye
-            stop
-         end if
-         return
-        end if
-        dsepdd  = -df_dt * x
-        dsepda  = -df_dt*dinda*ye + df_t*y
-        dsepdz  = -df_dt*dindz*ye - df_t*ytot1
-
-!..second derivatives
-        dsepddd = -df_ddt * x * ye
-        dsepddt = -df_dtt * x
-        dsepdda = -df_ddt * dinda * x + 2.0d0*df_dt*x*ytot1
-        dsepddz = -df_ddt * dindz * x - 2.0d0*df_dt*y
-        dsepdtt = -df_ttt * ye
-        dsepdta = -df_dtt*dinda*ye + df_tt*y
-        dsepdtz = -df_dtt * dindz * ye - df_tt*ytot1
-        dsepdaa = -df_ddt*dinda*dinda*ye  &
-                  - df_dt*(dindaa*ye - 2.0d0*dinda*ye*ytot1) &
-                  - 2.0d0*df_t*y*ytot1
-        dsepdaz = -df_ddt*dindz*dinda*ye  &
-                  - df_dt*(dindaz*ye + dinda*ytot1  + dindz*dindda) &
-                  - df_t*dinddaz
-        dsepdzz = -df_ddt*dindz*dindz*ye  &
-                  - df_dt*(dindzz*ye + dindz*ytot1 + dindz*dinddz)
-
-
-
-!..energy in erg/g
-        eele    = ye*free + temp*sele
-
-!..first derivatives
-        deepdt  = temp * dsepdt
-        deepdd  = ye*df_d*dindd + temp*dsepdd
-        deepda  = -y*free +  ye*df_d*dinda + temp*dsepda
-        deepdz  = ytot1*free + ye*df_d*dindz + temp*dsepdz
-
-!..second derivatives
-        deepddd = ye*df_dd*dindd*dindd + temp*dsepddd
-        deepddt = ye*df_dt*dindd + dsepdd + temp*dsepddt
-        deepdda = -y*df_d*dindd + ye*df_dd*dinda*dindd  &
-                  + ye*df_d*dindda + temp*dsepdda
-        deepddz = ytot1*df_d*dindd + ye*df_dd*dindz*dindd  &
-                  + ye*df_d*dinddz + temp*dsepddz
-        deepdtt = dsepdt + temp*dsepdtt
-        deepdta = temp * dsepdta
-        deepdtz = temp * dsepdtz
-        deepdaa  = 2.0d0*y*(ytot1*free - df_d*dinda)  &
-                    + ye*(df_d*dindaa + df_dd*dinda*dinda)  &
-                    + temp*dsepdaa
-        deepdaz  = -ytot1*ytot1*free - y*df_d*dindz +  ytot1*df_d*dinda  &
-                  + ye*df_dd*dindz*dinda + ye*df_d*dindaz + temp*dsepdaz
-        deepdzz  = (2.0d0*ytot1*df_d + ye*df_dd*dindz)*dindz  &
-                   + temp*dsepdzz
-
-
       ! Pack quantities into auto_diff types
+
+      ! Free energy
+      F%val = free * ye
+
+      F%d1val1 = df_t * ye
+      F%d1val2 = df_d * pow2(ye)
+
+      F%d2val1 = df_tt * ye
+      F%d1val1_d1val2 = df_dt * pow2(ye)
+      F%d2val2 = df_dd * pow3(ye)
+
+      F%d3val1 = df_ttt * ye
+      F%d2val1_d1val2 = df_dtt * pow2(ye)
+      F%d1val1_d2val2 = df_ddt * pow3(ye)
+      F%d3val2 = df_ddd * pow4(ye)
+
 
       ! Electron chemical potential
       adr_etaele = etaele
@@ -814,59 +682,7 @@ module skye_ideal
 !      adr_xnefer%d1val1_d1val2_d1val4 = dxneferddtz
 
 
-      ! Entropy
-      s%val = sele
 
-      s%d1val1 = dsepdt
-      s%d1val2 = dsepdd
-!      s%d1val3 = dsepda ! d/dabar
-!      s%d1val4 = dsepdz ! d/dzbar
-
-      s%d2val1 = dsepdtt
-      s%d2val2 = dsepddd
-      s%d1val1_d1val2 = dsepddt
-
-!      s%d1val1_d1val3 = dsepdta ! d/dabar
-!      s%d1val1_d1val4 = dsepdtz ! d/dzbar
-
-!      s%d1val2_d1val3 = dsepdda ! d/dabar
-!      s%d1val2_d1val4 = dsepddz ! d/dzbar
-
-      ! Energy
-      e%val = eele
-
-      e%d1val1 = deepdt
-      e%d1val2 = deepdd
-!      e%d1val3 = deepda ! d/dabar
-!      e%d1val4 = deepdz ! d/dzbar
-
-      e%d2val1 = deepdtt
-      e%d2val2 = deepddd
-      e%d1val1_d1val2 = deepddt
-
-!      e%d1val1_d1val3 = deepdta ! d/dabar
-!      e%d1val1_d1val4 = deepdtz ! d/dzbar
-
-!      e%d1val2_d1val3 = deepdda ! d/dabar
-!      e%d1val2_d1val4 = deepddz ! d/dzbar
-
-      ! Pressure
-      p%val = pele
-
-      p%d1val1 = dpepdt
-      p%d1val2 = dpepdd
-!      p%d1val3 = dpepda ! d/dabar
-!      p%d1val4 = dpepdz ! d/dzbar
-
-      p%d2val1 = dpepdtt
-      p%d2val2 = dpepddd
-      p%d1val1_d1val2 = dpepddt
-
-!      p%d1val1_d1val3 = dpepdta ! d/dabar
-!      p%d1val1_d1val4 = dpepdtz ! d/dzbar
-
-!      p%d1val2_d1val3 = dpepdda ! d/dabar
-!      p%d1val2_d1val4 = dpepddz ! d/dzbar
 
    end subroutine compute_ideal_ele
 
