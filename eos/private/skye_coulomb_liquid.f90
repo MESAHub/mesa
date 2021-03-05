@@ -76,7 +76,7 @@ module skye_coulomb_liquid
 
          real(dp) :: cDH, cTF, a, b, nu
 
-         type(auto_diff_real_2var_order3) :: rs, ge, g1, g2, h, gr, xr, asym
+         type(auto_diff_real_2var_order3) :: rs, ge, g1, g2, h, gr, xr
          type(auto_diff_real_2var_order3) :: F
 
          a = 1.11d0 * pow(Z, 0.475d0)
@@ -95,10 +95,6 @@ module skye_coulomb_liquid
          h = (1d0 + 0.2d0 * pow2(xr)) / (1d0 + 0.18d0 * xr * pow(Z, -0.25d0) + 0.37d0 * pow(Z, -0.5d0) * pow2(xr) + 0.2d0 * pow2(xr))
 
          F = -ge * (cDH * sqrt(ge) + cTF * a * pow(ge, nu) * g1 * h) / (1d0 + (b * sqrt(ge) + a * g2 * pow(ge, nu) / rs) / gr)
-
-         asym = 1d0
-!         asym = (1d0 / (1d0 + (rs / ge) * 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0))) ! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
-         F = F * asym
 
    end function ocp_liquid_screening_free_energy_correction
 

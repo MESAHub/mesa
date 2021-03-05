@@ -145,7 +145,7 @@ module skye_coulomb_solid
          real(dp), intent(in) :: Z, mi
          type(auto_diff_real_2var_order3), intent(in) :: g, TPT
 
-         real(dp) :: s, b1, b2, b3, b4
+         real(dp) :: s, b1, b2, b3, b4, cX
          real(dp), parameter :: e = 2.718281828459045d0
          real(dp), parameter :: aTF = 0.00352d0
 
@@ -161,7 +161,8 @@ module skye_coulomb_solid
          rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
          ge = g * pow(Z, -5d0/3d0)
 
-         xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
+         cx = pow(9d0 * pi / 4d0, 1d0/3d0) * fine
+         xr = cx / rs
          supp = safe_exp(-pow2(0.205d0 * TPT))
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
          Q = sqrt(log(1d0 + 1d0/supp)) / sqrt(log(e - (e - 2d0) * supp))
@@ -171,8 +172,12 @@ module skye_coulomb_solid
 
          gr = sqrt(1d0 + pow2(xr))
          alpha = 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0) * (rs / ge) * gr
-         w = rs * (pow(Z, 2d0/3d0) + pow(Z, 1d0/3d0) / sqrt(ge*gr))
-         asym = (1d0 + alpha) / (1d0 + alpha * w)! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
+
+         w = -(aTF / cx) * rs * pow(Z, 7d0/3d0) * sqrt(3 / ge)
+         w = w / (pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))
+
+         asym = 1d0 / (1d0 + tanh(alpha) * (w - 1d0))! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
+
          F = F * asym
 
    end function ocp_solid_screening_free_energy_correction
