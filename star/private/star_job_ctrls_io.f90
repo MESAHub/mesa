@@ -37,8 +37,6 @@
       namelist /star_job/ &
          mesa_dir, &
          eosDT_cache_dir, &
-         eosPT_cache_dir, &
-         eosDE_cache_dir, &
          ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir, &
@@ -107,6 +105,7 @@
          lg_max_abs_mdot, &
          relax_mass_to_remove_H_env, &
          relax_initial_mass_to_remove_H_env, &
+         extra_mass_retained_by_remove_H_env, &
          relax_mass_scale, &
          relax_initial_mass_scale, &
          dlgm_per_step, &
@@ -247,9 +246,6 @@
          relax_initial_max_surf_dq, &
          new_max_surf_dq, &
          max_surf_dq_multiplier, &
-         relax_fixed_L_for_BB_outer_BC, &
-         relax_initial_fixed_L_for_BB_outer_BC, &
-         steps_for_relax_fixed_L, &
 
          relax_tau_factor, &
          relax_initial_tau_factor, &
@@ -686,8 +682,6 @@
 
          s% job% mesa_dir = mesa_dir
          s% job% eosDT_cache_dir = eosDT_cache_dir
-         s% job% eosPT_cache_dir = eosPT_cache_dir
-         s% job% eosDE_cache_dir = eosDE_cache_dir
          s% job% ionization_cache_dir = ionization_cache_dir
          s% job% kap_cache_dir = kap_cache_dir
          s% job% rates_cache_dir = rates_cache_dir
@@ -758,6 +752,7 @@
          s% job% lg_max_abs_mdot = lg_max_abs_mdot
          s% job% relax_mass_to_remove_H_env = relax_mass_to_remove_H_env
          s% job% relax_initial_mass_to_remove_H_env = relax_initial_mass_to_remove_H_env
+         s% job% extra_mass_retained_by_remove_H_env = extra_mass_retained_by_remove_H_env
          s% job% relax_mass_scale = relax_mass_scale
          s% job% relax_initial_mass_scale = relax_initial_mass_scale
          s% job% dlgm_per_step = dlgm_per_step
@@ -905,9 +900,6 @@
          s% job% relax_initial_max_surf_dq = relax_initial_max_surf_dq
          s% job% new_max_surf_dq = new_max_surf_dq
          s% job% max_surf_dq_multiplier = max_surf_dq_multiplier
-         s% job% relax_fixed_L_for_BB_outer_BC = relax_fixed_L_for_BB_outer_BC
-         s% job% relax_initial_fixed_L_for_BB_outer_BC = relax_initial_fixed_L_for_BB_outer_BC
-         s% job% steps_for_relax_fixed_L = steps_for_relax_fixed_L
 
          s% job% relax_tau_factor = relax_tau_factor
          s% job% relax_initial_tau_factor = relax_initial_tau_factor
@@ -1264,8 +1256,6 @@
 
          mesa_dir = s% job% mesa_dir
          eosDT_cache_dir = s% job% eosDT_cache_dir
-         eosPT_cache_dir = s% job% eosPT_cache_dir
-         eosDE_cache_dir = s% job% eosDE_cache_dir
          ionization_cache_dir = s% job% ionization_cache_dir
          kap_cache_dir = s% job% kap_cache_dir
          rates_cache_dir = s% job% rates_cache_dir
@@ -1336,6 +1326,7 @@
          lg_max_abs_mdot = s% job% lg_max_abs_mdot
          relax_mass_to_remove_H_env = s% job% relax_mass_to_remove_H_env
          relax_initial_mass_to_remove_H_env = s% job% relax_initial_mass_to_remove_H_env
+         extra_mass_retained_by_remove_H_env = s% job% extra_mass_retained_by_remove_H_env
          relax_mass_scale = s% job% relax_mass_scale
          relax_initial_mass_scale = s% job% relax_initial_mass_scale
          dlgm_per_step = s% job% dlgm_per_step
@@ -1484,9 +1475,6 @@
          relax_initial_max_surf_dq = s% job% relax_initial_max_surf_dq
          new_max_surf_dq = s% job% new_max_surf_dq
          max_surf_dq_multiplier = s% job% max_surf_dq_multiplier
-         relax_fixed_L_for_BB_outer_BC = s% job% relax_fixed_L_for_BB_outer_BC
-         relax_initial_fixed_L_for_BB_outer_BC = s% job% relax_initial_fixed_L_for_BB_outer_BC
-         steps_for_relax_fixed_L = s% job% steps_for_relax_fixed_L
 
          relax_tau_factor = s% job% relax_tau_factor
          relax_initial_tau_factor = s% job% relax_initial_tau_factor

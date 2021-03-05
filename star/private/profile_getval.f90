@@ -221,10 +221,6 @@
       end function get_profile_val
 
 
-
-
-
-
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
          use chem_def
          use rates_def
@@ -437,12 +433,6 @@
                val = s% L(k)/get_Ledd(s,k)
             case (p_log_L_div_Ledd)
                val = safe_log10(max(1d-12,s% L(k)/get_Ledd(s,k)))
-            case (p_log_abs_dvdt_div_v)
-               if (s% u_flag) then
-                  val = safe_log10(abs(s% du_dt(k))/max(1d-50,abs(s% u(k))))
-               else if (s% v_flag) then
-                  val = safe_log10(abs(s% dv_dt(k))/max(1d-50,abs(s% v(k))))
-               end if
             case (p_log_abs_v)
                if (s% u_flag) then
                   val = safe_log10(abs(s% u(k)))
@@ -470,6 +460,12 @@
                else if (s% v_flag) then
                   val = s% v(k)
                end if
+            case (p_v_kms)
+               if (s% u_flag) then
+                  val = s% u(k)*1d-5
+               else if (s% v_flag) then
+                  val = s% v(k)*1d-5
+               end if
             case (p_vel_km_per_s)
                if (s% u_flag) then
                   val = s% u(k)*1d-5
@@ -478,14 +474,14 @@
                end if
             case (p_v_div_r)
                if (s% u_flag) then
-                  val = s% u_face_18(k)%val/s% r(k)
+                  val = s% u_face_ad(k)%val/s% r(k)
                else if (s% v_flag) then
                   val = s% v(k)/s% r(k)
                end if
 
             case (p_v_times_t_div_r)
                if (s% u_flag) then
-                  val = s% u_face_18(k)%val*s% time/s% r(k)
+                  val = s% u_face_ad(k)%val*s% time/s% r(k)
                else if (s% v_flag) then
                   val = s% v(k)*s% time/s% r(k)
                end if
@@ -621,41 +617,6 @@
                   val = sum(s% dr_div_csound(1:k-1))
             case (p_acoustic_r_div_R_phot)
                val = sum(s% dr_div_csound(k:nz))/s% photosphere_acoustic_r
-
-            case (p_lnR_residual)
-               if (s% i_dlnR_dt > 0) val = s% lnR_residual(k)
-            case (p_log_lnR_residual)
-               if (s% i_dlnR_dt > 0) &
-                  val = safe_log10(abs(s% lnR_residual(k)))
-
-            case (p_lnd_residual)
-               if (s% i_dlnd_dt > 0) val = s% lnd_residual(k)
-            case (p_log_lnd_residual)
-               if (s% i_dlnd_dt > 0) &
-                  val = safe_log10(abs(s% lnd_residual(k)))
-
-            case (p_equL_residual)
-               if (k > 1 .and. s% i_equL > 0) val = s% equL_residual(k)
-            case (p_log_equL_residual)
-               if (k > 1 .and. s% i_equL > 0) &
-                  val = safe_log10(abs(s% equL_residual(k)))
-               
-            case (p_E_residual)
-               if (s% i_dlnE_dt > 0) val = s% E_residual(k)
-            case (p_log_E_residual)
-               if (s% i_dlnE_dt > 0) val = safe_log10(s% E_residual(k))
-
-            case (p_v_residual)
-               if (s% i_dv_dt > 0 .and. k > 1) val = s% v_residual(k)
-            case (p_log_v_residual)
-               if (s% i_dv_dt > 0 .and. k > 1) &
-                  val = safe_log10(abs(s% v_residual(k)))
-
-            case (p_dvdt_residual)
-               if (s% i_dv_dt > 0 .and. k > 1) val = s% v_residual(k)
-            case (p_log_dvdt_residual)
-               if (s% i_dv_dt > 0 .and. k > 1) &
-                  val = safe_log10(abs(s% v_residual(k)))
 
             case (p_ergs_error)
                val = s% ergs_error(k)
@@ -937,7 +898,7 @@
                val = val/sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
             case (p_v_div_v_escape)
                if (s% u_flag) then
-                  val = s% u_face_18(k)%val
+                  val = s% u_face_ad(k)%val
                else if (s% v_flag) then
                   val = s% v(k)
                end if
@@ -1139,9 +1100,9 @@
                end if
 
             case(p_P_face)
-               if (s% u_flag) val = s% P_face_18(k)%val
+               if (s% u_flag) val = s% P_face_ad(k)%val
             case(p_log_P_face)
-               if (s% u_flag) val = safe_log10(s% P_face_18(k)%val)
+               if (s% u_flag) val = safe_log10(s% P_face_ad(k)%val)
 
             case (p_hse_ratio)
                if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0) then
@@ -1164,7 +1125,7 @@
             case (p_gradP_div_rho)
                if (k > 1) val = pi4*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
             case (p_dlnP_dlnR)
-               if (k > 1) val = log(s% P_face_18(k-1)%val/s% P_face_18(k)%val) / (s% lnR(k-1) - s% lnR(k))
+               if (k > 1) val = log(s% P_face_ad(k-1)%val/s% P_face_ad(k)%val) / (s% lnR(k-1) - s% lnR(k))
             case (p_dlnRho_dlnR)
                if (k > 1) val = log(s% rho_face(k-1)/s% rho_face(k)) / (s% lnR(k-1) - s% lnR(k))
 
@@ -1349,21 +1310,6 @@
                val = safe_log10(s% sig(k))
             case (p_log_sig_raw_mix)
                val = safe_log10(s% sig_raw(k))
-
-            case (p_d_gradT_dlnd00)
-               val = s% d_gradT_dlnd00(k)
-            case (p_d_gradT_dlnT00)
-               val = s% d_gradT_dlnT00(k)
-            case (p_d_gradT_dlndm1)
-               val = s% d_gradT_dlndm1(k)
-            case (p_d_gradT_dlnTm1)
-               val = s% d_gradT_dlnTm1(k)
-            case (p_d_gradT_dlnR)
-               val = s% d_gradT_dlnR(k)
-            case (p_d_gradT_dL)
-               val = s% d_gradT_dL(k)
-            case (p_d_gradT_dln_cvpv0)
-               val = s% d_gradT_dln_cvpv0(k)
 
             case (p_burn_avg_epsnuc)
                if (s% op_split_burn) val = s% burn_avg_epsnuc(k)
@@ -1723,56 +1669,6 @@
             case (p_delta_mu)
                val = s% mu(k) - s% mu_start(k)
 
-            case (p_super_ad)
-               val = max(0d0, s% gradT(k) - s% grada_face(k))
-
-            case (p_accel_div_grav)
-               if (s% v_flag) val = s% dv_dt(k)/s% grav(k)
-
-            case (p_dlnd_dt_const_q)
-               val = s% dlnd_dt_const_q(k)
-            case (p_dlnT_dt_const_q)
-               val = s% dlnT_dt_const_q(k)
-
-            case (p_dlnd)
-               val = s% dt*s% dlnd_dt(k)
-            case (p_dlnT)
-               val = s% dt*s% dlnT_dt(k)
-            case (p_dlnR)
-               val = s% dt*s% dlnR_dt(k)
-
-            case (p_dlnd_dt)
-               val = s% dlnd_dt(k)
-            case (p_dlnT_dt)
-               val = s% dlnT_dt(k)
-            case (p_dlnR_dt)
-               val = s% dlnR_dt(k)
-            case (p_dr_dt)
-               val = s% dlnR_dt(k)*s% r(k)
-            case (p_dv_dt)
-               if (s% v_flag) val = s% dv_dt(k)
-            case (p_du_dt)
-               if (s% u_flag) val = s% du_dt(k)
-
-            case (p_del_entropy)
-               val = s% entropy(k) - exp(s% lnS_start(k))/(avo*kerg)
-            case (p_ds_from_eps_grav)
-               val = -s% dt*s% eps_grav(k)/s% T(k)/(avo*kerg)
-
-            case(p_dt_dm_eps_grav)
-               val = s% eps_grav(k)*s% dm(k)*s% dt
-
-            case(p_dm_de)
-               val = s% dm(k)*(s% energy(k) - s% energy_start(k))
-            case(p_dt_dL)
-               if (k < s% nz) val = s% dt*(s% L(k) - s% L(k+1))
-
-            case (p_signed_dlnd)
-               val = 1d6*s% dlnd_dt(k)*s% dt
-               val = sign(1d0,val)*log10(max(1d0,abs(val)))
-            case (p_signed_dlnT)
-               val = 1d6*s% dlnT_dt(k)*s% dt
-               val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_cno_div_z)
                cno = s% xa(s% net_iso(ic12),k) + &
                      s% xa(s% net_iso(in14),k) + s% xa(s% net_iso(io16),k)
@@ -1892,42 +1788,51 @@
 
             case(p_Pturb)
                if (s% TDC_flag) then
-                  val = s% w(k)**2*s% rho(k)
+                  val = s% etrb(k)*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Pturb)
                if (s% TDC_flag) then
-                  val = safe_log10(s% w(k)*s% rho(k))
+                  val = safe_log10(s% etrb(k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_w)
                if (s% TDC_flag) then
                   val = s% w(k)
+               else if (s% RSP_flag) then
+                  val = s% RSP_w(k)
                end if               
-            case(p_et)
+            case(p_log_w)
                if (s% TDC_flag) then
-                  val = s% w(k)**2
+                  val = s% w(k)
+               else if (s% RSP_flag) then
+                  val = s% RSP_w(k)
+               end if    
+               val = safe_log10(val)           
+            case(p_etrb)
+               if (s% TDC_flag) then
+                  val = s% etrb(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
-            case(p_log_et)
+            case(p_log_etrb)
                if (s% TDC_flag) then
-                  val = safe_log10(s% w(k)**2)
+                  val = safe_log10(s% etrb(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if
             case(p_avQ)
                if (s% use_avQ_art_visc .or. s% RSP_flag) val = s% avQ(k)
             case(p_Hp_face)
-               if (s% RSP_flag) val = s% Hp_face(k)
+               if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
-               if (s% RSP_flag) val = s% Y_face(k)
+               if (rsp_or_w) val = s% Y_face(k)
             case(p_PII_face)
-               if (s% RSP_flag) val = s% PII(k)
+               if (rsp_or_w) val = s% PII(k)
             case(p_Chi)
-               if (s% RSP_flag) val = s% Chi(k)
+               if (rsp_or_w) val = s% Chi(k)
             case(p_COUPL)
                if (rsp_or_w) val = s% COUPL(k)
             case(p_SOURCE)
@@ -1958,10 +1863,6 @@
             case(p_rsp_logEt)
                if (s% rsp_flag) &
                   val = safe_log10(s% RSP_Et(k))
-            case(p_rsp_vt)
-               if (s% rsp_flag) val = sqrt2*s% w(k)
-            case(p_rsp_vt_div_cs)
-               if (s% rsp_flag) val = sqrt2*s% w(k)/s% csound(k)
             case(p_rsp_Pt)
                if (s% rsp_flag) val = s% Pt(k)
             case(p_rsp_Eq)
@@ -2066,12 +1967,8 @@
             case(p_rsp_WORKC)
                if (s% rsp_flag) val = rsp_WORKC(s,k)
                
-            case(p_conv_vel_residual)
-               val = s% conv_vel_residual(k)
-            case(p_log_conv_vel_residual)
-               val = safe_log10(abs(s% conv_vel_residual(k)))
             case(p_dconv_vel_dt)
-               val = s% dln_cvpv0_dt(k)*(s% conv_vel(k) + s% conv_vel_v0)
+               val = s% dxh_ln_cvpv0(k)*(s% conv_vel(k) + s% conv_vel_v0)/s% dt
 
             case (p_total_energy) ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)/s% dm(k)               
@@ -2239,7 +2136,7 @@
                val = safe_log10(pi4*s% r(k)*s% r(k)*s% csound(k)*s% rho(k)/(Msun/secyer))
             case (p_log_mdot_v) ! log10(4 Pi r^2 v rho / (Msun/year))
                if (s% u_flag) then
-                  val = safe_log10(4*pi*s% r(k)*s% r(k)*s% u_face_18(k)%val*s% rho(k)/(Msun/secyer))
+                  val = safe_log10(4*pi*s% r(k)*s% r(k)*s% u_face_ad(k)%val*s% rho(k)/(Msun/secyer))
                else if (s% v_flag) then
                   val = safe_log10(pi4*s% r(k)*s% r(k)*s% v(k)*s% rho(k)/(Msun/secyer))
                end if
@@ -2269,26 +2166,18 @@
                do j=1,s% species
                   if (chem_isos% Z(s% chem_id(j)) >= 24) val = val + s% xa(j,k)
                end do
-            case(p_log_u_residual)
-               if (s% u_flag) val = safe_log10(abs(s% u_residual(k)))
-            case(p_u_residual)
-               if (s% u_flag) val = s% u_residual(k)
             case(p_u)
                if (s% u_flag) val = s% u(k)
             case(p_u_face)
-               if (s% u_flag) val = s% u_face_18(k)%val
+               if (s% u_flag) val = s% u_face_ad(k)%val
             case (p_dPdr_dRhodr_info)
                if (s% RTI_flag) val = s% dPdr_dRhodr_info(k)
-            case(p_signed_log_ergs_err)
-               val = sign(safe_log10( &
-                        abs(s% E_residual(k)*s% energy_start(k)*s% dm(k))), &
-                        s% E_residual(k))
             case(p_RTI_du_diffusion_kick)
                if (s% u_flag) val = s% RTI_du_diffusion_kick(k)
             case(p_log_du_kick_div_du)
                if (s% u_flag .and. k > 1) then
-                  if (abs(s% u_face_18(k)%val) > 1d0) &
-                     val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_18(k)%val))
+                  if (abs(s% u_face_ad(k)%val) > 1d0) &
+                     val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_ad(k)%val))
                end if
                
             case(p_max_abs_xa_corr)

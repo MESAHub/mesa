@@ -48,6 +48,9 @@
       !use_equilibration_in_DGESVX = .true.
       
 
+      stop_for_bad_nums = .true.
+      max_number_retries = 0
+
 ! FOR DEBUGGING
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
@@ -57,8 +60,8 @@
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
          ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_k = 131
-      !solver_test_partials_call_number = 189
+      !solver_test_partials_k = 1873
+      !solver_test_partials_call_number = 1
       !solver_test_partials_iter_number = 9
       !solver_test_partials_dx_0 = 1d-6
       !solver_test_partials_var_name = 'all' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
@@ -86,8 +89,6 @@
       !okay_to_remesh = .false.
       
       !trace_evolve = .true.
-
-      !stop_for_bad_nums = .true.
       
 / ! end of star_job namelist
       

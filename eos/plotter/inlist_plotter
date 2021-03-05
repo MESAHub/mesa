@@ -15,13 +15,13 @@
 
   !### pick which EOS to use
   ! eosdT = 0 (blended)
-  ! SCVH = 1
-  ! HELM = 2
+  ! HELM = 1
+  ! OPAL_SCVH = 2
+  ! FreeEOS = 3
   ! PC = 4
-  ! FreeEOS = 5
+  ! Skye = 5
   ! CMS = 6
-  ! Skye = 7
-  i_eos = 2
+  i_eos = 1
 
 
   !### pick which eos quantity to plot
@@ -55,7 +55,7 @@
   ! zero value used for special logic in the plotter
   ! regions = 0 (also use special script regions.py)
 
-  i_var = 1
+  i_var = 5
 
   !### check derivatives?
   ! if doing_dfridr is true, do dfridr and show the error
@@ -87,8 +87,8 @@
   !### pick number of points
   ! values for non-xname, non-yname variables are ignored
 
-  nT = 100
-  nRho = 200
+  nT = 10
+  nRho = 10
   nX = 100
   nZ = 150
 
@@ -98,7 +98,7 @@
   ! center is used when var is not xname/yname
 
   X_center = 0.00
-  Z_center = 1.00
+  Z_center = 0.00
 
   delta_X = 0.1
   delta_Z = 0.1
@@ -109,17 +109,17 @@
   Z_min = 0
   Z_max = 0.1
 
-  logT_center = 6.4D+00
-  logRho_center = -3.76D+00
+  logT_center = 7.3d0
+  logRho_center = 0d0
 
-  !delta_logT = 0.01d0
-  !delta_logRho = 0.01d0
+  delta_logT = 0.01!1d0
+  delta_logRho = 0.01!1d0
 
-  logT_min = 3
-  logT_max = 10.2
+  ! logT_min = 3
+  ! logT_max = 10.2
 
-  logRho_min = -10
-  logRho_max = 10
+  ! logRho_min = -10
+  ! logRho_max = 10
 
 
 /

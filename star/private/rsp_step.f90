@@ -261,6 +261,8 @@
                   write(*,4) 'limit dt to max_dt set by compressing innermost cell', s% model_number
             end if
          end if
+         if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &
+            s% dt = s% force_timestep_min
 
          retry_loop: do num_tries = 1, max_retries+1
 
@@ -660,6 +662,14 @@
             s% Lc_start(k) = s% Lc(k)
             s% Lt_start(k) = s% Lt(k)
             s% COUPL_start(k) = s% COUPL(k)
+            
+            ! for debugging
+            !s% xtra1_array(k) = 1d0/s% Vol(k)
+            !s% xtra2_array(k) = s% T(k)
+            !s% xtra3_array(k) = abs(s% RSP_w(k)) + 1d0
+            !s% xtra4_array(k) = abs(s% v(k)) + 1d0
+            !s% xtra5_array(k) = s% r(k)
+
          end do
       end subroutine save_start_vars
       
@@ -1040,7 +1050,7 @@
             s% erad(k) = s% erad(k) + EZH*DX(IE)
             if (I > IBOTOM .and. I < NZN)then
                if ((s% RSP_w(k) + EZH*DX(IW)) <= 0d0)then
-                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! NEED THIS
+                  s% RSP_w(k) = EFL0*rand(s)*1d-6 ! RSP NEEDS THIS to give seed for SOURCE
                else
                   s% RSP_w(k) = s% RSP_w(k) + EZH*DX(IW)
                end if
@@ -1050,6 +1060,7 @@
                 2.d0/s% dt*(EZH*DX(IR) + (s% r(k) - s% r_start(k)))
             s% r(k) = s% r(k) + EZH*DX(IR)
             s% Fr(k) = s% Fr(k) + EZH*DX(IL)
+            s% Lr(k) = s% Fr(k)*4d0*pi*s% r(k)**2
             DXKT = DXXT
             DXKC = DXXC
             DXKE = DXXE
@@ -1187,7 +1198,7 @@
 
          else ! surface
          
-            POM = (s% r(k)**2)/(2.d0*s% cgrav(k)*s% M(k))
+            POM = (s% r(k)**2)/(s% cgrav(k)*s% M(k))
             s% Hp_face(k) = POM*(s% Pgas(k) + s% Prad(k))*s% Vol(k)
             
             dHp_dVol_00(I) = POM*( &
@@ -1312,6 +1323,7 @@
             d_Y2_der_out = Y2/s% Hp_face(k)*dHp_der_out(I)
 
             s% Y_face(k) = Y1*Y2
+
             dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 ! 
             dY_dr_in(I) = Y1*d_Y2_dr_in + Y2*d_Y1_dr_in ! 
             dY_dr_out(I) = Y1*d_Y2_dr_out + Y2*d_Y1_dr_out ! 
@@ -1371,7 +1383,7 @@
          logical :: test_partials
          include 'formats'
          k = NZN+1-i
-         if (i == nzn .or. ALFA == 0d0) then
+         if (k == 1 .or. k == s% nz .or. ALFA == 0d0) then
             s% PII(k) = 0
             dPII_dr_00(I) = 0
             dPII_dr_in(I) = 0 
@@ -1386,6 +1398,7 @@
             POM = ALFAS*ALFA
             POM2 = 0.5d0*(s% Cp(k) + s% Cp(k-1))
             s% PII(k) = POM*POM2*s% Y_face(k)
+
             dPII_dVol_00(I) = &
                POM*(POM2*dY_dVol_00(I) + s% Y_face(k)*0.5d0*dCp_dVol(I))
             dPII_dVol_out(I) = &
@@ -1608,6 +1621,18 @@
             !s% profile_extra(k,4) = POMT3*POM3
 
             s% Chi(k) = POMT1*POM1
+         
+            !s% xtra1_array(k) = POM
+            !s% xtra2_array(k) = safe_log10(POM1)
+            !s% xtra3_array(k) = safe_log10(POM2)
+            !s% xtra4_array(k) = POM3
+            !s% xtra5_array(k) = POM4
+         
+            !s% xtra1_array(k) = s% v(k)
+            !s% xtra2_array(k) = s% r(k)
+            !s% xtra3_array(k) = POM3
+            !s% xtra4_array(k) = 1
+            !s% xtra5_array(k) = 1
             
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
@@ -1799,6 +1824,12 @@
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
+         
+            !s% xtra1_array(k) = POM
+            !s% xtra2_array(k) = s% PII(k)
+            !s% xtra3_array(k) = s% Hp_face(k)
+            !s% xtra4_array(k) = POM3
+            !s% xtra5_array(k) = s% QQ(k)
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
@@ -2823,6 +2854,12 @@
             dvdt_factor*(s% v(k) - s% v_start(k))/dt &
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
+         
+         !s% xtra1_array(k) = dvdt_factor*(s% v(k) - s% v_start(k))/dt
+         !s% xtra2_array(k) = safe_log10(-area*dXP_dm)
+         !s% xtra3_array(k) = safe_log10(-grav)
+         !s% xtra4_array(k) = s% Uq(k)
+         !s% xtra5_array(k) = s% Chi(k)
             
          HD(i_r_dFr_00,IR) = - d_Fr_term_dFr_00
 
@@ -3199,7 +3236,6 @@
             + erad_tw*u_div_r_factor*u_div_r &
             - dt*s% Eq(k)
 
-         s% E_residual(k) = residual
          s% ergs_error(k) = s% dm(k)*residual
 
          HR(IT) = -residual

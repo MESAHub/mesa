@@ -46,10 +46,6 @@
 
       ! eosDT_cache_dir
       ! ~~~~~~~~~~~~~~~
-      ! eosPT_cache_dir
-      ! ~~~~~~~~~~~~~~~
-      ! eosDE_cache_dir
-      ! ~~~~~~~~~~~~~~~
       ! ionization_cache_dir
       ! ~~~~~~~~~~~~~~~~~~~~
       ! kap_cache_dir
@@ -77,8 +73,6 @@
       ! ::
 
       !     eosDT_cache_dir = '/Users/bpaxton/mesa_caches/eosDT_cache'
-      !     eosPT_cache_dir = '/Users/bpaxton/mesa_caches/eosPT_cache'
-      !     eosDE_cache_dir = '/Users/bpaxton/mesa_caches/eosDE_cache'
       !     ionization_cache_dir = '/Users/bpaxton/mesa_caches/ionization_cache'
       !     kap_cache_dir = '/Users/bpaxton/mesa_caches/kap_cache'
       !     rates_cache_dir = '/Users/bpaxton/mesa_caches/rates_cache'
@@ -86,7 +80,7 @@
       ! If you give an empty string for the ``cache_dir``, then
       ! if you have set the environment variable ``MESA_CACHES_DIR``, then
       ! the cache is a subdirectory of that with one of the following names:
-      ! ``eosDT_cache``, ``eosPT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
+      ! ``eosDT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
       ! if ``MESA_CACHES_DIR`` is not set or is the empty string, then
       ! the cache is a subdirectory of the corresponding data subdirectory,
       ! such as ``data/rates_data/cache`` for the rates cache.
@@ -94,8 +88,6 @@
       ! ::
 
     eosDT_cache_dir = ''
-    eosPT_cache_dir = ''
-    eosDE_cache_dir = ''
     ionization_cache_dir = ''
     kap_cache_dir = ''
     rates_cache_dir = ''
@@ -595,9 +587,9 @@
       ! steps_to_take_before_terminate
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If > 0, stop after taking this many steps.
+      ! If >= 0, stop after taking this many steps.
       ! Sets ``max_model_number`` = ``model_number`` + ``steps_to_take_before_terminate``.
-      ! Ignore if <= 0.
+      ! Ignore if < 0.
 
       ! ::
 
@@ -1019,14 +1011,17 @@
       ! ~~~~~~~~~~
       ! relax_initial_mass_to_remove_H_env
       ! ~~~~~~~~
+      ! extra_mass_retained_by_remove_H_env
+      ! ~~~~~~~~
 
       ! Gradually reduce total mass by a wind to remove the H envelope.
-      ! Equivalent to relax_mass with new_mass = He_core_mass.
+      ! Equivalent to relax_mass with new_mass = He_core_mass + extra_mass.
 
       ! ::
 
     relax_mass_to_remove_H_env = .false.
     relax_initial_mass_to_remove_H_env = .false.
+    extra_mass_retained_by_remove_H_env = 5d-3 ! (Msun)
 
 
       ! relax_mass_scale
@@ -1250,22 +1245,6 @@
     relax_initial_opacity_max = .false.
     new_opacity_max = 0
     opacity_max_multiplier = 0
-
-
-      ! relax_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! relax_initial_fixed_L_for_BB_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! steps_for_relax_fixed_L
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Gradually modify ``fixed_L_for_BB_outer_BC``.
-
-      ! ::
-
-    relax_fixed_L_for_BB_outer_BC = .false.
-    relax_initial_fixed_L_for_BB_outer_BC = .false.
-    steps_for_relax_fixed_L = 0
 
 
       ! relax_max_surf_dq

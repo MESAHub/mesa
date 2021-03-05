@@ -92,8 +92,6 @@
    pressure_scale_height ! in Rsun units
    gradT ! mlt value for required temperature gradient dlnT/dlnP
    gradr ! dlnT/dlnP required for purely radiative transport
-   dlnd_dt ! time derivative of log(density) at fixed mass coordinate (Lagrangian)
-   dlnT_dt ! time derivative of log(temperature) at fixed mass coordinate (Lagrangian)
    !dv_dt ! time derivative of velocity at fixed mass coordinate (Lagrangian)
    !accel_div_grav ! dv_dt/grav  --  only if v_flag is true.  0 otherwise.
    mass ! m/Msun. mass coordinate of outer boundary of cell.
@@ -141,9 +139,6 @@
    eps_grav_plus_eps_mdot
    ergs_eps_grav_plus_eps_mdot
    
-      log_dvdt_residual
-      log_v_residual
-
       gradr_sub_grada ! gradr - grada; > 0 => Schwarzschild unstable for convection
       !dlnR_dm ! for structure equation
       !dlnP_dm ! for structure equation

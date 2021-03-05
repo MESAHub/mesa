@@ -156,6 +156,7 @@ SRCS = \
    pulse_fgong.f90 \
    pulse_osc.f90 \
    pulse_gyre.f90 \
+   pulse_gsm.f90 \
    pulse_saio.f90 \
    pulse_gr1d.f90 \
    pulse_utils.f90 \
@@ -184,7 +185,6 @@ SRCS = \
    adjust_mass.f90 \
    adjust_mesh_split_merge.f90 \
    adjust_mesh_support.f90 \
-   adjust_mesh_plot.f90 \
    adjust_mesh.f90 \
    paquette_coeffs.f90 \
    diffusion_support.f90 \

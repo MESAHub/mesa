@@ -41,8 +41,6 @@
       real(dp), parameter :: center_h_going = 1d0/3d0
       real(dp), parameter :: center_he_going = 5d-2
 
-      real(dp), parameter :: min_w = 1d-20
-
 
       contains
 
@@ -367,7 +365,6 @@
       
       integer function find_next_star_id()
          integer :: id
-         
          id = 0
 !$omp critical (star_handle_next)
          if (have_initialized_star_handles) then
@@ -376,9 +373,20 @@
             end do
          end if
 !$omp end critical (star_handle_next)         
-      
-      find_next_star_id  = id
+         find_next_star_id  = id
       end function find_next_star_id
+      
+      
+      integer function how_many_allocated_star_ids()
+         integer :: id
+         how_many_allocated_star_ids = 0
+         if (have_initialized_star_handles) then
+            do id = 1, max_star_handles
+               if (star_handles(id)% in_use .eqv. .true.) &
+                  how_many_allocated_star_ids = how_many_allocated_star_ids+1
+            end do
+         end if
+      end function how_many_allocated_star_ids
       
 
 
@@ -396,7 +404,7 @@
             reaclib_min_T9_in, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -421,7 +429,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
@@ -470,11 +478,8 @@
          if (dbg) write(*,*) 'call eos_init'
          !write(*,*) 'eos_file_prefix "' // trim(eos_file_prefix) // '"'
          !write(*,*) 'eosDT_cache_dir "' // trim(eosDT_cache_dir) // '"'
-         !write(*,*) 'eosPT_cache_dir "' // trim(eosPT_cache_dir) // '"'
-         !write(*,*) 'eosDE_cache_dir "' // trim(eosDE_cache_dir) // '"'
          call eos_init( &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
-            use_cache, ierr)
+            eosDT_cache_dir, use_cache, ierr)
          if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call kap_init'

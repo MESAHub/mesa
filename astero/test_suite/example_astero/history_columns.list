@@ -46,8 +46,6 @@
       !time_step ! timestep in years since previous model
       log_dt ! log10 time_step
       num_zones ! number of zones in the model
-      log_residual_norm
-      log_max_residual
       
       num_solver_iterations ! iterations at this step
       rel_E_err

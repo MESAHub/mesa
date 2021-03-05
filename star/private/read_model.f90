@@ -31,12 +31,12 @@
       implicit none
 
       integer, parameter :: bit_for_zams_file = 0
-      !integer, parameter ::  = 1 ! UNUSED
+      integer, parameter :: bit_for_lnPgas = 1 ! OBSOLETE: includes lnPgas variables in place of lnd
       integer, parameter :: bit_for_2models = 2
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
-      integer, parameter :: bit_for_conv_vel = 5 ! saving the data, but not using as variable
-      integer, parameter :: bit_for_w = 6
+      integer, parameter :: bit_for_conv_vel = 5 ! for saving the data, but not using as variable
+      integer, parameter :: bit_for_etrb = 6
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
@@ -48,8 +48,7 @@
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
-      integer, parameter :: increment_for_unused = 1
-      integer, parameter :: increment_for_i_w = 1
+      integer, parameter :: increment_for_i_etrb = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
       integer, parameter :: increment_for_D_omega_flag = 1
@@ -57,9 +56,8 @@
       integer, parameter :: increment_for_RTI_flag = 1
       integer, parameter :: increment_for_RSP_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
-      integer, parameter :: increment_for_const_L = -1
-      integer, parameter :: max_increment = increment_for_unused &
-                                          + increment_for_i_w &
+      
+      integer, parameter :: max_increment = increment_for_i_etrb &
                                           + increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
                                           + increment_for_D_omega_flag &
@@ -79,12 +77,12 @@
       subroutine finish_load_model(s, restart, want_rsp_model, is_rsp_model, ierr)
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_dm_bar, total_angular_momentum, reset_epsnuc_vectors, &
-            set_qs, save_for_d_dt
+            set_qs
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, set_i_rot_from_omega_and_j_rot, &
             use_xh_to_update_i_rot, set_rotation_info
          use rsp, only: rsp_setup_part1, rsp_setup_part2
          use report, only: do_report
-         use alloc, only: fill_18_with_zeros
+         use alloc, only: fill_ad_with_zeros
          type (star_info), pointer :: s
          logical, intent(in) :: restart, want_rsp_model, is_rsp_model
          integer, intent(out) :: ierr
@@ -135,13 +133,6 @@
             !end if
 
          end if
-         
-         if (s% trace_k > 0 .and. s% trace_k <= nz) then
-            do j=1,s% species
-               write(*,4) 'finish_load_model before set_vars xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
 
          ! clear some just to avoid getting NaNs at start
          ! e.g., from profile_starting_model
@@ -149,20 +140,12 @@
          s% adjust_mlt_gradT_fraction(1:nz) = -1
          s% eps_mdot(1:nz) = 0
          s% eps_grav(1:nz) = 0
-         s% equL_residual(1:nz) = 0
-         s% lnR_residual(1:nz) = 0
-         s% lnd_residual(1:nz) = 0
-         s% E_residual(1:nz) = 0
-         s% u_residual(1:nz) = 0
          s% ergs_error(1:nz) = 0
          if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
-            call fill_18_with_zeros(s% u_face_18,1,-1)
-            call fill_18_with_zeros(s% P_face_18,1,-1)
-            s% du_dt(1:nz) = 0
+            call fill_ad_with_zeros(s% u_face_ad,1,-1)
+            call fill_ad_with_zeros(s% P_face_ad,1,-1)
          end if
-
-         call save_for_d_dt(s)
 
          if (dbg) write(*,2) 'load_model: s% dq(1)', 1, s% dq(1)
          if (dbg) write(*,2) 'load_model: s% dm(1)', 1, s% dm(1)
@@ -186,14 +169,6 @@
 
          if (s% rotation_flag) then
             s% total_angular_momentum = total_angular_momentum(s)
-            if (s% trace_k > 0 .and. s% trace_k <= nz) then
-               do k=1,nz
-                  write(*,3) 'lnr', s% model_number, k, s% xh(s% i_lnR, k)
-                  write(*,3) 'i_rot', s% model_number, k, s% i_rot(k)
-                  write(*,3) 'j_rot', s% model_number, k, s% j_rot(k)
-                  write(*,3) 'omega', s% model_number, k, s% omega(k)
-               end do
-            end if
          end if
 
          if (s% RSP_flag) then
@@ -208,14 +183,6 @@
          if (dbg) write(*,2) 'load_model: s% dm(1)', 1, s% dm(1)
          if (dbg) write(*,2) 'load_model: s% m(1)/msun', 1, s% m(1)/Msun
 
-         if (s% trace_k > 0 .and. s% trace_k <= nz) then
-            do j=1,s% species
-               write(*,4) 'finish_load_model after set_vars xa(j)', &
-                  s% model_number, s% trace_k, j, s% xa(j,s% trace_k)
-            end do
-         end if
-
-         ! actual brunt_B is set as part of do_report
          s% doing_finish_load_model = .true.
          call do_report(s, ierr)
          s% doing_finish_load_model = .false.
@@ -245,8 +212,7 @@
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
-            tau_factor, Teff, fixed_L_for_BB_outer_BC, &
-            Tsurf_factor, opacity_factor, mixing_length_alpha
+            tau_factor, Teff, Tsurf_factor, opacity_factor, mixing_length_alpha
          character (len=strlen) :: buffer, string, message
          character (len=net_name_len) :: net_name
          character(len=iso_name_length), pointer :: names(:) ! (species)
@@ -285,12 +251,20 @@
             return
          end if
 
+         ! refuse to load old models using lnPgas as a structure variable
+         if (BTEST(file_type, bit_for_lnPgas)) then
+            write(*,*)
+            write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
+            write(*,*)
+            ierr = -1
+            return
+         end if
+
          s% model_number = 0
          s% star_age = 0
          s% xmstar = -1
          
          Teff = s% Teff
-         fixed_L_for_BB_outer_BC = s% fixed_L_for_BB_outer_BC
          tau_factor = s% tau_factor
          Tsurf_factor = s% Tsurf_factor
          mixing_length_alpha = s% mixing_length_alpha
@@ -301,7 +275,7 @@
             initial_mass, initial_z, initial_y, mixing_length_alpha, &
             s% model_number, s% star_age, tau_factor, s% Teff, &
             s% power_nuc_burn, s% power_h_burn, s% power_he_burn, s% power_z_burn, s% power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             s% xmstar, s% R_center, s% L_center, s% v_center, &
             s% cumulative_energy_error, s% num_retries, ierr)
 
@@ -330,14 +304,6 @@
             write(*,*)
             s% tau_factor = tau_factor
             s% force_tau_factor = tau_factor
-         end if
-
-         if (abs(fixed_L_for_BB_outer_BC - s% fixed_L_for_BB_outer_BC) > &
-                  fixed_L_for_BB_outer_BC*1d-9) then
-            write(*,*)
-            write(*,1) 'WARNING: changing to saved fixed_L_for_BB_outer_BC =', fixed_L_for_BB_outer_BC
-            write(*,*)
-            s% fixed_L_for_BB_outer_BC = fixed_L_for_BB_outer_BC
          end if
 
          if (abs(Tsurf_factor - s% Tsurf_factor) > Tsurf_factor*1d-9 .and. &
@@ -369,7 +335,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% TDC_flag = BTEST(file_type, bit_for_w)
+         s% TDC_flag = BTEST(file_type, bit_for_etrb)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -380,6 +346,14 @@
          s% conv_vel_flag = BTEST(file_type, bit_for_conv_vel_var)
          is_RSP_model = BTEST(file_type, bit_for_RSP)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
+         
+         if (BTEST(file_type, bit_for_lnPgas)) then
+            write(*,*)
+            write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
+            write(*,*)
+            ierr = -1
+            return
+         end if
          
          s% RSP_flag = is_RSP_model .and. want_RSP_model
          
@@ -395,8 +369,8 @@
             if (.not. s% TDC_flag) then
                write(*,*) 'and setting TDC_flag to .true.'
                s% TDC_flag = .true.
+               s% need_to_reset_etrb = .false.
             end if
-            s% need_to_reset_w = .false.
          end if
          
          if (no_L .and. s% i_lum /= 0) then
@@ -469,7 +443,7 @@
                s, s% species, s% nvar_hydro, nz, iounit, &
                is_RSP_model, want_RSP_model, &
                s% xh, s% xa, s% q, s% dq, &
-               s% omega, s% j_rot, s% lnT, &
+               s% omega, s% j_rot, &
                perm, ierr)
          deallocate(names, perm)
          if (ierr /= 0) then
@@ -573,7 +547,7 @@
             s, species, nvar_hydro, nz, iounit, &
             is_RSP_model, want_RSP_model, &
             xh, xa, q, dq, omega, j_rot, &
-            lnT, perm, ierr)
+            perm, ierr)
          use star_utils, only: set_qs
          use chem_def
          type (star_info), pointer :: s
@@ -581,10 +555,10 @@
          logical, intent(in) :: is_RSP_model, want_RSP_model
          real(dp), dimension(:,:), intent(out) :: xh, xa
          real(dp), dimension(:), intent(out) :: &
-            q, dq, omega, j_rot, lnT
+            q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_etrb_RSP, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -602,7 +576,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          no_L = (i_lum == 0)
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -611,7 +585,7 @@
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_w /= 0) n = n+increment_for_i_w ! read w
+         if (i_etrb /= 0) n = n+increment_for_i_etrb ! read etrb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
@@ -622,84 +596,79 @@
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
-         do i = 1, nz
+         do k = 1, nz
             read(iounit,'(a)',iostat=ierr) buf
             if (ierr /= 0) then
-               write(*,3) 'read failed i', i, nz
+               write(*,3) 'read failed i', k, nz
                exit
             end if
             call str_to_vector(buf, vec, nvec, ierr)
             if (ierr /= 0) then
                write(*,*) 'str_to_vector failed'
-               write(*,'(a,i8,1x,a)') 'buf', i, trim(buf)
+               write(*,'(a,i8,1x,a)') 'buf', k, trim(buf)
                exit
             end if
             j = int(vec(1))
-            if (j /= i) then
+            if (j /= k) then
                ierr = -1
-               write(*, *) 'error in reading model data   j /= i'
+               write(*, *) 'error in reading model data   j /= k'
                write(*, *) 'species', species
                write(*, *) 'j', j
-               write(*, *) 'i', i
+               write(*, *) 'k', k
                write(*,'(a,1x,a)') 'buf', trim(buf)
                exit
             end if
             j = 1
-            j=j+1; if (i_lnd /= 0) xh(i_lnd,i) = vec(j)
-            j=j+1
-            if (i_lnT /= 0) then
-               xh(i_lnT,i) = vec(j)
-            else
-               lnT(i) = vec(j)
-            end if
-            j=j+1; xh(i_lnR,i) = vec(j)            
+            j=j+1; xh(i_lnd,k) = vec(j)
+            j=j+1; xh(i_lnT,k) = vec(j)
+            j=j+1; xh(i_lnR,k) = vec(j)
             if (is_RSP_model) then
                if (want_RSP_model) then
-                  j=j+1; xh(i_etrb_RSP,i) = vec(j)
-                  j=j+1; xh(i_erad_RSP,i) = vec(j)
-                  j=j+1; xh(i_Fr_RSP,i) = vec(j)
-                  j=j+1; s% L(i) = vec(j)
-               else if (i_w /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_w,i) = max(min_w,sqrt(max(0d0,vec(j))))
-                  j=j+1; !discard xh(i_erad,i) = vec(j)
-                  j=j+1; !discard xh(i_Fr,i) = vec(j)
-                  j=j+1; xh(i_lum,i) = vec(j)
+                  j=j+1; xh(i_etrb_RSP,k) = vec(j)
+                  j=j+1; xh(i_erad_RSP,k) = vec(j)
+                  j=j+1; xh(i_Fr_RSP,k) = vec(j)
+                  j=j+1; ! discard
+               else if (i_etrb /= 0) then ! convert from RSP to TDC
+                  j=j+1; xh(i_etrb,k) = max(0d0,vec(j))
+                  j=j+1; ! discard
+                  j=j+1; ! discard
+                  j=j+1; xh(i_lum,k) = vec(j)
                end if
-            else if (i_w /= 0) then
-               j=j+1; xh(i_w,i) = max(min_w,vec(j))
-               j=j+1; xh(i_lum,i) = vec(j)
+            else if (i_etrb /= 0) then
+               j=j+1; xh(i_etrb,k) = max(vec(j),0d0)
+               j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
-               j=j+1; xh(i_lum,i) = vec(j)
+               j=j+1; xh(i_lum,k) = vec(j)
             end if            
-            j=j+1; dq(i) = vec(j)
+            j=j+1; dq(k) = vec(j)
             if (i_v /= 0) then
-               j=j+1; xh(i_v,i) = vec(j)
+               j=j+1; xh(i_v,k) = vec(j)
             end if
             if (s% rotation_flag) then
-               j=j+1; omega(i) = vec(j)
+               j=j+1; omega(k) = vec(j)
             end if
             if (s% have_j_rot) then
                !NOTE: MESA version 10108 was first to store j_rot in saved files
-               j=j+1; j_rot(i) = vec(j)
+               j=j+1; j_rot(k) = vec(j)
             end if
             if (s% D_omega_flag) then
-               j=j+1; !D_omega(i) = vec(j) ! no longer used
+               j=j+1; !D_omega(k) = vec(j) ! no longer used
             end if
             if (s% am_nu_rot_flag) then
-               j=j+1; !am_nu_rot(i) = vec(j) ! no longer used
+               j=j+1; !am_nu_rot(k) = vec(j) ! no longer used
             end if
             if (i_u /= 0) then
-               j=j+1; xh(i_u,i) = vec(j)
+               j=j+1; xh(i_u,k) = vec(j)
             end if
             if (s% RTI_flag) then
-               j=j+1; xh(i_alpha_RTI,i) = vec(j)
+               j=j+1; xh(i_alpha_RTI,k) = vec(j)
             end if
             if (s% conv_vel_flag .or. s% have_previous_conv_vel) then
                j=j+1
                if (s% conv_vel_flag) then
-                  xh(i_ln_cvpv0,i) = log(vec(j)+s% conv_vel_v0)
+                  xh(i_ln_cvpv0,k) = log(vec(j)+s% conv_vel_v0)
                else
-                  s% conv_vel(i) = vec(j)
+                  s% conv_vel(k) = vec(j)
                end if
             end if
             if (j+species > nvec) then
@@ -713,7 +682,7 @@
                exit
             end if
             do ii=1,species
-               xa(perm(ii),i) = vec(j+ii)
+               xa(perm(ii),k) = vec(j+ii)
             end do
          end do
 !$omp end critical (read1_model_loop)
@@ -753,7 +722,7 @@
          integer :: species, n_shells, &
             num_retries, year_month_day_when_created
          real(dp) :: m_div_msun, initial_z, &
-            mixing_length_alpha, star_age, fixed_L_for_BB_outer_BC, &
+            mixing_length_alpha, star_age, &
             Teff, tau_factor, Tsurf_factor, opacity_factor, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
@@ -762,7 +731,7 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_saved_model_number
@@ -773,7 +742,7 @@
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
          use utils_lib
@@ -784,7 +753,7 @@
          real(dp), intent(inout) :: m_div_msun, initial_z, &
             mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          integer, intent(out) :: ierr
          integer :: iounit
@@ -810,7 +779,7 @@
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
          close(iounit)
@@ -826,14 +795,14 @@
          real(dp) :: m_div_msun, initial_z, initial_y, &
             mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          call read_properties(iounit, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_net_name
@@ -850,14 +819,14 @@
             mixing_length_alpha, cumulative_energy_error, &
             Teff, tau_factor, Tsurf_factor, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, opacity_factor, &
+            opacity_factor, &
             xmstar, R_center, L_center, v_center
          call do_read_saved_model_properties(fname, &
             net_name, species, n_shells, year_month_day_when_created, &
             m_div_msun, initial_z, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
       end subroutine do_read_saved_model_age
@@ -868,7 +837,7 @@
             m_div_msun, initial_z, initial_y, mixing_length_alpha, &
             model_number, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, &
             cumulative_energy_error, num_retries, ierr)
          integer, intent(in) :: iounit
@@ -878,7 +847,7 @@
          real(dp), intent(inout) :: m_div_msun, initial_z, initial_y, &
             mixing_length_alpha, star_age, tau_factor, Teff, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, power_photo, &
-            fixed_L_for_BB_outer_BC, Tsurf_factor, opacity_factor, &
+            Tsurf_factor, opacity_factor, &
             xmstar, R_center, L_center, v_center, cumulative_energy_error
          integer, intent(out) :: ierr
          character (len=132) :: line
@@ -904,7 +873,6 @@
             if (match_keyword('power_he_burn', line, power_he_burn)) cycle
             if (match_keyword('power_z_burn', line, power_z_burn)) cycle
             if (match_keyword('power_photo', line, power_photo)) cycle
-            if (match_keyword('fixed_L_for_BB_outer_BC', line, fixed_L_for_BB_outer_BC)) cycle
             if (match_keyword('Tsurf_factor', line, Tsurf_factor)) cycle
             if (match_keyword('opacity_factor', line, opacity_factor)) cycle
             if (match_keyword('xmstar', line, xmstar)) cycle

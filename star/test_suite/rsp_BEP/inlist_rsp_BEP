@@ -30,6 +30,8 @@
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
+
+      !pgstar_flag = .true.
    
 / ! end of star_job namelist
 
@@ -37,7 +39,8 @@
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.01d0
+
+      Zbase = 0.01d0
 
       kap_file_prefix = 'a09'
       kap_lowT_prefix = 'lowT_fa05_a09p'
@@ -63,10 +66,14 @@
 
    RSP_max_num_periods = 3000
    
-
+! solver
+   
 ! output controls
    
-      terminal_show_age_units = 'days'
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
 
       !num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -97,7 +104,8 @@
          
       Grid2_win_flag = .true.
 
-      Grid2_title = ''
+      Grid2_title = '0.26 M\d\(2281)\u  Z=0.01  Binary Evolution Pulsator (BEP)'
+
       
       History_Panels1_xaxis_name='star_age_day'
       History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.

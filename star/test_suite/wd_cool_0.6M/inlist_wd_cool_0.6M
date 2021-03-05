@@ -30,6 +30,10 @@
 
 &eos
 	  use_Skye = .true.
+
+          ! For more accurate C/O phase diagram
+          Skye_solid_mixing_rule = "Ogata"
+
    !dbg = .true.
    logT_lo = 6.59473
    logT_hi = 6.59473

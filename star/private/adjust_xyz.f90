@@ -433,6 +433,7 @@
          did_total_fe = .false.
          did_total_co = .false.
          did_total_fe = .false.
+         did_total_ni = .false.
          did_total_other = .false.
          do j=1, species
             select case(int(chem_isos% Z(chem_id(j))))
@@ -591,21 +592,14 @@
          contains
 
          real(dp) function get_test_lgT(loc)
+            use star_utils, only: get_lnT_from_xh
             integer, intent(in) :: loc
-            integer :: k, kmax, i_lnT
-            i_lnT = s% i_lnT
-            if (i_lnT == 0) then
-               get_test_lgT = 0d0
-            else
-               get_test_lgT = xh(i_lnT,loc)/ln10
-            end if
+            integer :: k, kmax
+            get_test_lgT = get_lnT_from_xh(s,loc)/ln10
             kmax = min(min(s%nz,nz),size(s% mlt_D,dim=1))
-            ! may be using mlt_D for different generation
-            ! okay for this purpose, but don't want to go beyond size.
-            ! Also make sure we would have the array set to something
             do k=loc+1, kmax
                if (s% mlt_D(k) < 1d2) return
-               get_test_lgT = xh(i_lnT,k)/ln10
+               get_test_lgT = get_lnT_from_xh(s,k)/ln10
             end do
          end function get_test_lgT
 

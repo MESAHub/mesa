@@ -99,13 +99,13 @@ contains
     do k=nzlo, nzhi
        if (k == 1) then
           s% rho_face(k) = s% rho(k)
-          if (.not. s% u_flag) s% P_face_18(k)%val = s% P(k)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = s% P(k)
           s% csound_face(1) = s% csound(1)
        else
           alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
           beta = 1 - alfa
           s% rho_face(k) = alfa*s% rho(k) + beta*s% rho(k-1)
-          if (.not. s% u_flag) s% P_face_18(k)%val = alfa*s% P(k) + beta*s% P(k-1)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = alfa*s% P(k) + beta*s% P(k-1)
           s% csound_face(k) = alfa*s% csound(k) + beta*s% csound(k-1)
        end if
     end do
@@ -366,14 +366,6 @@ contains
          return
       end if
 
-      if (k == s% trace_k) then
-         write(*,5) 'grada', k, s% solver_iter, s% solver_adjust_iter, &
-              s% model_number, s% grada(k)
-      end if
-      if (s% model_number == -1) then
-         write(*,4) 'grada', k, s% solver_iter, s% model_number, s% grada(k)
-      end if
-
     end subroutine store_stuff
 
   end subroutine do_eos_for_cell
@@ -588,19 +580,14 @@ contains
 
     if (is_bad_num(s% opacity(k)) .or. ierr /= 0) then
        if (s% report_ierr) then
+          write(*,*) 'do_kap_for_cell: get_kap ierr', ierr
           !$omp critical (star_kap_get)
           call show_stuff()
-          stop 'debug1: do_kap_for_cell'
+          if (s% stop_for_bad_nums) stop 'do_kap_for_cell'
           !$omp end critical (star_kap_get)
        end if
        ierr = -1
        return
-    end if
-
-    if (s% opacity(k) < 1d-99) then
-       s% opacity(k) = 1d-99
-       dlnkap_dlnd = 0
-       dlnkap_dlnT = 0
     end if
 
     opacity_factor = s% extra_opacity_factor(k)
@@ -629,24 +616,12 @@ contains
        s% d_opacity_dlnT(k) = 0
     end if
 
-    if (ierr /= 0 .or. is_bad_num(s% opacity(k))) then
+    if (is_bad_num(s% opacity(k))) then
        if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)
-          write(*,*)
-          write(*,2) 's% opacity(k)', k, s% opacity(k)
-          write(*,2) 's% kap_frac_Type2(k)', k, s% kap_frac_Type2(k)
-          write(*,*)
           call show_stuff()
           stop 'do_kap_for_cell'
           !$omp end critical (star_kap_get_bad_num)
-       end if
-       if (s% report_ierr) then
-          return
-          !$omp critical (star_kap_get_bad_num2)
-          write(*,*) 'do_kap_for_cell: kap_get failure for cell ', k
-          call show_stuff()
-          stop 'debug: do_kap_for_cell'
-          !$omp end critical (star_kap_get_bad_num2)
        end if
        ierr = -1
        return
@@ -731,8 +706,11 @@ contains
       write(*,*)
       write(*,1) 'logQ = ', s% lnd(k)/ln10 - 2*s% lnT(k)/ln10 + 12
       write(*,*)
-      write(*,*)
+      write(*,1) 'kap_frac_lowT', s% kap_frac_lowT(k)
+      write(*,1) 'kap_frac_highT', s% kap_frac_highT(k)
       write(*,1) 'kap_frac_Type2', s% kap_frac_Type2(k)
+      write(*,1) 'kap_frac_Compton', s% kap_frac_Compton(k)
+      write(*,*)
       write(*,1) 'extra_opacity_factor', s% extra_opacity_factor(k)
       write(*,*)
       write(*,*)

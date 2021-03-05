@@ -27,6 +27,8 @@
 
       use star_private_def
       use const_def
+      use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh, &
+         get_lnd_from_xh, get_lnR_from_xh, get_lnT_from_xh
 
       implicit none
 
@@ -124,13 +126,11 @@
             end if
          end subroutine alloc_for_solver
 
-
          subroutine work_sizes_for_solver(ierr)
             use star_solver, only: get_solver_work_sizes
             integer, intent(out) :: ierr
             call get_solver_work_sizes(s, nvar, nz, solver_lwork, solver_liwork, ierr)
          end subroutine work_sizes_for_solver
-
 
       end function do_solver_converge
 
@@ -138,10 +138,16 @@
       subroutine set_surf_info(s, nvar) ! set to values at start of step
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
-         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) s% surf_lnd = s% xh(s% i_lnd,1)
-         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) s% surf_lnT = s% xh(s% i_lnT,1)
-         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) s% surf_lnR = s% xh(s% i_lnR,1)
-         if (s% i_v > 0 .and. s% i_v <= nvar) s% surf_v = s% xh(s% i_v,1)
+         if (s% i_lnd > 0 .and. s% i_lnd <= nvar) &
+            s% surf_lnd = get_lnd_from_xh(s, 1)
+         if (s% i_lnT > 0 .and. s% i_lnT <= nvar) &
+            s% surf_lnT = get_lnT_from_xh(s, 1)
+         if (s% i_lnR > 0 .and. s% i_lnR <= nvar) &
+            s% surf_lnR = get_lnR_from_xh(s, 1)
+         if (s% i_v > 0 .and. s% i_v <= nvar) &
+            s% surf_v = s% xh(s% i_v,1)
+         if (s% i_u > 0 .and. s% i_u <= nvar) &
+            s% surf_v = s% xh(s% i_u,1)
          s% surf_lnS = s% lnS(1)
          s% num_surf_revisions = 0
       end subroutine set_surf_info
@@ -170,9 +176,9 @@
                do k = 1, nz
                   s% xh(j1,k) = s% L(k)
                end do
-            else if (j1 == s% i_w .and. s% i_w <= nvar) then
+            else if (j1 == s% i_etrb .and. s% i_etrb <= nvar) then
                do k = 1, nz
-                  s% xh(j1,k) = s% w(k)
+                  s% xh(j1,k) = s% etrb(k)
                end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz
@@ -351,6 +357,7 @@
          use mesh_adjust, only: set_lnT_for_energy
          use micro, only: do_eos_for_cell
          use chem_def, only: ih1, ihe3, ihe4
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
          logical, intent(in) :: report
          integer, intent(out) :: ierr
@@ -377,9 +384,8 @@
                   s% rho(k), s% lnd(k)/ln10, s% energy(k), s% lnT(k), &
                   new_lnT, revised_energy, ierr)
                if (ierr /= 0) return ! stop 'do_merge failed in set_lnT_for_energy'
-               s% xh(s% i_lnT,k) = new_lnT
-               s% lnT(k) = new_lnT
-               s% T(k) = exp(new_lnT)
+               call store_lnT_in_xh(s, k, new_lnT)
+               call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             end if
             new_IE = s% energy(k)*s% dm(k)
             if (s% u_flag) then

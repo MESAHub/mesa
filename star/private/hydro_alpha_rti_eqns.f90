@@ -48,7 +48,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
-         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk, i_lnd, i_lnT, i_lnR
+         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk
          real(dp), pointer, dimension(:) :: sig
          logical :: okay
          real(dp) :: &
@@ -61,7 +61,7 @@
             r00, rp1, ravg_start, dP, drho, rho, rmid, cs, ds_da, &
             dadt_source, dequ_dE_const_Rho, dequ_dlnd, &
             dequ_dlnd_const_E, dequ_dlnPgas_const_T, dequ_dlnT, &
-            dequ_dlnT_const_Pgas, dlnT_dlnd_const_E, dVARdot_dVAR, fac, &
+            dequ_dlnT_const_Pgas, dlnT_dlnd_const_E, fac, &
             d_dalpha_00, d_dalpha_m1, d_dalpha_p1
          logical :: test_partials
 
@@ -71,14 +71,10 @@
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
-         dVARdot_dVAR = s% dVARdot_dVAR
          i_alpha_RTI = s% i_alpha_RTI
          i_dalpha_RTI_dt = s% i_dalpha_RTI_dt
          nz = s% nz
 
-         i_lnd = s% i_lnd
-         i_lnT = s% i_lnT
-         i_lnR = s% i_lnR
          sig => s% sig_RTI
          dq = s% dq(k)
          dm = s% dm(k)
@@ -182,13 +178,13 @@
          dadt_source = source_plus - source_minus
 
          dadt_expected = dadt_mix + dadt_source
-         dadt_actual = s% dalpha_RTI_dt(k)
+         dadt_actual = s% dxh_alpha_RTI(k)/s% dt
 
          if (dadt_expected == 0d0) then
             s% equ(i_dalpha_RTI_dt,k) = dadt_expected
             eqn_scale = 1d0
          else
-            eqn_scale = s% x_scale(i_dalpha_RTI_dt,k)*dVARdot_dVAR
+            eqn_scale = s% x_scale(i_dalpha_RTI_dt,k)/s% dt
             s% equ(i_dalpha_RTI_dt,k) = (dadt_expected - dadt_actual)/eqn_scale
          end if
 
@@ -222,7 +218,7 @@
             d_dalpha_00 = 1d0
          else
             ! partial of -dadt_actual/eqn_scale
-            d_dalpha_00 = -dVARdot_dVAR/eqn_scale
+            d_dalpha_00 = -1d0/eqn_scale/s% dt
 
             if (dadt_mix /= 0d0) then ! partials of dadt_mix/eqn_scale
                d_dalpha_00 = d_dalpha_00 + d_dadt_mix_da00/eqn_scale

@@ -68,7 +68,7 @@
       ! A few broad resolution controls
       mesh_delta_coeff = 0.4 !1.2
       max_allowed_nz = 12000
-      varcontrol_target = 1d-4
+      !varcontrol_target = 1d-4
 
 
       ! Some more specific resolution controls inspired by wd3

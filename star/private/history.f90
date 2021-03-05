@@ -291,7 +291,7 @@
          else if (s% v_flag) then
             v_surf = s% v(1)
          else
-            v_surf = s% r(1)*s% dlnR_dt(1)
+            v_surf = 0d0
          end if
 
          if (s% initial_mass > s% he_core_mass) then
@@ -1683,8 +1683,6 @@
             case(h_log_mesh_adjust_KE_conservation)
                val = safe_log10(s% mesh_adjust_KE_conservation)
 
-            case(h_rms_dvdt_div_v)
-               val = eval_rms_dvdt_div_v(s, 1, s% nz)
            case(h_total_IE_div_IE_plus_KE)
                val = s% total_internal_energy_end / &
                         (s% total_internal_energy_end + s% total_radial_kinetic_energy_end)
@@ -1792,7 +1790,7 @@
                val = safe_log10(abs(s% error_in_energy_conservation/s% total_energy_end))
                
            case(h_tot_E_equ_err)
-               val = sum(s% E_residual(1:nz)*s% dm(1:nz))
+               val = sum(s% ergs_error(1:nz))
            case(h_tot_E_err)
                val = s% error_in_energy_conservation
            case(h_rel_E_err)
@@ -1820,49 +1818,14 @@
                if (s% total_energy_end /= 0d0) &
                   val = safe_log10(abs(s% cumulative_energy_error/s% total_energy_end))
 
-           case(h_log_residual_norm)
-               val = safe_log10(s% residual_norm)
-           case(h_log_max_residual)
-               val = safe_log10(s% max_residual)
-
-           case(h_log_max_dvdt_residual)
-               val = safe_log10(maxval(abs(s% v_residual(1:nz))))
-           case(h_log_max_lnd_residual)
-               val = safe_log10(maxval(abs(s% lnd_residual(1:nz))))
-           case(h_log_max_dEdt_residual)
-               val = safe_log10(maxval(abs(s% E_residual(1:nz))))
-           case(h_log_max_drdt_residual)
-               val = safe_log10(maxval(abs(s% lnR_residual(1:nz))))
-
-           case(h_avg_v_residual)
-               val = dot_product(s% dq(1:nz),s% v_residual(1:nz))
-           case(h_log_avg_v_residual)
-               val = safe_log10(abs(dot_product(s% dq(1:nz),s% v_residual(1:nz))))
-
-           case(h_max_abs_v_residual)
-               k = maxloc(abs(s% v_residual(1:nz)),dim=1)
-               val = s% v_residual(k)
-           case(h_log_max_abs_v_residual)
-               val = safe_log10(maxval(abs(s% v_residual(1:nz))))
-
-           case(h_avg_E_residual)
-               val = dot_product(s% dq(1:nz),s% E_residual(1:nz))/ln10
-           case(h_log_avg_E_residual)
-               val = safe_log10(abs(dot_product(s% dq(1:nz),s% E_residual(1:nz)))/ln10)
-
-           case(h_max_abs_E_residual)
-               val = maxval(abs(s% E_residual(1:nz)))/ln10
-           case(h_log_max_abs_E_residual)
-               val = safe_log10(maxval(abs(s% E_residual(1:nz)))/ln10)
-
             case(h_u_surf_km_s)
-               if (s% u_flag) val = s% u_face_18(1)%val*1d-5
+               if (s% u_flag) val = s% u_face_ad(1)%val*1d-5
             case(h_u_surf)
-               if (s% u_flag) val = s% u_face_18(1)%val
+               if (s% u_flag) val = s% u_face_ad(1)%val
             case(h_u_div_csound_max)
                if (s% u_flag) val = maxval(abs(s% u(1:nz))/s% csound(1:nz))
             case(h_u_div_csound_surf)
-               if (s% u_flag) val = s% u_face_18(1)%val/s% csound_face(1)
+               if (s% u_flag) val = s% u_face_ad(1)%val/s% csound_face(1)
 
             case(h_surf_escape_v)
                val = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
@@ -1884,7 +1847,7 @@
                else if (s% v_flag) then
                   val = s% v(1) / s% csound(1)
                else
-                  val = 0d0 ! s% r(1)*s% dlnR_dt(1)
+                  val = 0d0
                end if
             case(h_remnant_M)
                val = get_remnant_mass(s)/Msun
@@ -1954,20 +1917,6 @@
             case(h_surf_avg_logRho)
                val = s% logRho_avg_surf
 
-            case(h_luminosity_for_BB_outer_BC)
-               if (s% tau_for_L_BB >= 0) then
-                  val = s% L_for_BB_outer_BC/Lsun
-               else
-                  val = s% L(1)/Lsun
-               end if
-            case(h_logL_for_BB_outer_BC)
-               if (s% tau_for_L_BB >= 0) then
-                  val = s% L_for_BB_outer_BC/Lsun
-               else
-                  val = s% L(1)/Lsun
-               end if
-               val = safe_log10(val)
-
             case(h_v_wind_Km_per_s)
                val = 1d-5*s% opacity(1)*max(0d0,-s% mstar_dot)/ &
                         (pi4*s% photosphere_r*Rsun*s% tau_base)
@@ -1988,7 +1937,6 @@
 
             case(h_center_degeneracy)
                val = s% center_degeneracy
-
             case(h_log_center_eps_nuc)
                val = safe_log10(s% center_eps_nuc)
             case(h_center_eps_nuc)
@@ -1997,22 +1945,8 @@
                val = s% d_center_eps_nuc_dlnT
             case(h_d_center_eps_nuc_dlnd)
                val = s% d_center_eps_nuc_dlnd
-
-            case(h_center_dlogT)
-               val = s% dt*center_value(s, s% dlnT_dt)/ln10
-            case(h_center_dlogRho)
-               val = s% dt*center_value(s, s% dlnd_dt)/ln10
-
-            case(h_center_dlnT_dt)
-               val = center_value(s, s% dlnT_dt)
-            case(h_center_dlnd_dt)
-               val = center_value(s, s% dlnd_dt)
-
-            case(h_center_dL_dm)
-               val = center_value(s, s% dL_dm_expected)
             case(h_center_eps_grav)
                val = center_value(s, s% eps_grav)
-
             case(h_center_non_nuc_neu)
                val = s% center_non_nuc_neu
             case(h_center_gamma)
@@ -2854,16 +2788,6 @@
             case(h_int_k_r_dr_0pt5_nu_max_Sl3)
                if (s% calculate_Brunt_N2) val = get_int_k_r_dr(s,3,0.5d0)
 
-            case (h_surface_extra_Pgas)
-               val = s% surface_extra_Pgas
-
-            case (h_min_L)
-               val = minval(s% L(1:nz))/Lsun
-            case (h_min_dL_dm)
-               val = minval(s% dL_dm_expected(1:nz))
-            case (h_min_dL_dm_m)
-               val = s% m(minloc(s% dL_dm_expected(1:nz),dim=1))/Msun
-
             case (h_k_below_const_q)
                int_val = s% k_below_const_q
                is_int_val = .true.
@@ -3454,7 +3378,7 @@
          else if (s% v_flag) then
             v_surf = s% v(1)
          else
-            v_surf = s% r(1)*s% dlnR_dt(1)
+            v_surf = 0d0
          end if
 
          if (s% initial_mass > s% he_core_mass) then

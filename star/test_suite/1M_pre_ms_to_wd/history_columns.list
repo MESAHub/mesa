@@ -50,9 +50,6 @@
       log_total_angular_momentum
       log_rotational_mdot_boost
       
-      log_max_residual
-      log_residual_norm
-      
       num_solver_iterations ! iterations at this step
 
       rel_E_err

@@ -34,8 +34,6 @@
    public :: read_namelist, write_namelist
    private
 
-   logical :: use_max_SCVH_for_PT, use_max_CMS_for_PT
-
    ! controls for HELM
    real(dp) :: Z_all_HELM ! all HELM for Z >= this unless use_FreeEOS
    real(dp) :: logT_all_HELM ! all HELM for lgT >= this
@@ -118,7 +116,6 @@
    logical :: eosDT_use_linear_interp_for_X
    logical :: eosDT_use_linear_interp_to_HELM
    character(len=128) :: eosDT_file_prefix
-   character(len=128) :: eosPT_file_prefix
    logical :: okay_to_convert_ierr_to_skip
    real(dp) :: tiny_fuzz
 
@@ -148,9 +145,6 @@
 
    namelist /eos/ &
       use_FreeEOS, &
-      use_max_SCVH_for_PT, &
-      use_max_CMS_for_PT, &
-
       
       ! controls for HELM
       Z_all_HELM, & ! all HELM for Z >= this unless use_FreeEOS
@@ -245,7 +239,6 @@
       eosDT_use_linear_interp_for_X, &
       eosDT_use_linear_interp_to_HELM, &
       eosDT_file_prefix, &
-      eosPT_file_prefix, &
       
       okay_to_convert_ierr_to_skip, &
       tiny_fuzz, &
@@ -406,8 +399,6 @@
 
    subroutine store_controls(rq)
       type (EoS_General_Info), pointer :: rq
-      rq% use_max_SCVH_for_PT = use_max_SCVH_for_PT
-      rq% use_max_CMS_for_PT = use_max_CMS_for_PT      
       ! controls for HELM
       rq% Z_all_HELM = Z_all_HELM
       rq% logT_all_HELM = logT_all_HELM
@@ -495,7 +486,6 @@
       rq% eosDT_use_linear_interp_for_X = eosDT_use_linear_interp_for_X
       rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM      
       rq% eosDT_file_prefix = eosDT_file_prefix      
-      rq% eosPT_file_prefix = eosPT_file_prefix
       rq% okay_to_convert_ierr_to_skip = okay_to_convert_ierr_to_skip
       rq% tiny_fuzz = tiny_fuzz
       ! debugging
@@ -536,8 +526,6 @@
 
    subroutine set_controls_for_writing(rq)
       type (EoS_General_Info), pointer :: rq
-      use_max_SCVH_for_PT = rq% use_max_SCVH_for_PT
-      use_max_CMS_for_PT = rq% use_max_CMS_for_PT      
       ! controls for HELM
       Z_all_HELM = rq% Z_all_HELM
       logT_all_HELM = rq% logT_all_HELM
@@ -625,7 +613,6 @@
       eosDT_use_linear_interp_for_X = rq% eosDT_use_linear_interp_for_X
       eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM      
       eosDT_file_prefix = rq% eosDT_file_prefix      
-      eosPT_file_prefix = rq% eosPT_file_prefix
       okay_to_convert_ierr_to_skip = rq% okay_to_convert_ierr_to_skip
       tiny_fuzz = rq% tiny_fuzz
       ! debugging

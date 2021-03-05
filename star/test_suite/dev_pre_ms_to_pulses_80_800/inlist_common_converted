@@ -142,5 +142,7 @@
 
 &pgstar
 !pause = .true.
+TRho_logT_max = 10d0
+TRho_logRho_max = 10d0
 
 / ! end of pgstar namelist

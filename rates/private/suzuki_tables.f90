@@ -7,7 +7,6 @@ module suzuki_tables
 
   implicit none
 
-#ifdef USE_HDF5
   integer :: num_suzuki_reactions
 
   integer, pointer, dimension(:) :: & ! (num_suzuki_reactions)
@@ -418,327 +417,190 @@ contains
 
   subroutine private_load_suzuki_tables(ierr)
 
-    use hdf5
-    use iso_c_binding
+     use utils_lib
+     use hdf5io_lib
+     use chem_lib, only: chem_get_iso_id
+     use chem_def, only: iso_name_length
 
-    use utils_lib
-    use chem_lib, only: chem_get_iso_id
-    use chem_def, only: iso_name_length
+     integer, intent(out) :: ierr
 
-    integer, intent(out) :: ierr
+     character (len=256)       :: filename
+     character (len=256)       :: suzuki_data_dir
+     type(hdf5io_t)            :: hi
+     type(hdf5io_t)            :: hi_rxn
+     character(:), allocatable :: group_names(:)
+     integer                   :: num_suzuki_reactions
+     integer                   :: i
 
-    character (len=256) :: filename, cache_filename, string
-    character (len=256) :: suzuki_data_dir
+     character(len=2*iso_name_length+1) :: key
 
-    integer(hid_t) :: file_id, group_id
+     logical, parameter :: dbg = .false.
 
-    type(c_funptr) :: funptr
-    type(c_ptr) :: ptr
-    integer(hsize_t) :: idx
-    integer :: ret_value
+     if (dbg) write(*,*) 'private_load_suzuki_tables'
 
-    integer :: i, storage_type, nlinks, max_corder, attr_num, rxn_idx
+     suzuki_data_dir = trim(mesa_data_dir) // '/rates_data'
+     filename = trim(suzuki_data_dir) // '/suzuki/Suzuki2016.h5'
+     if (dbg) then
+        write(*,*)
+        write(*,*) 'read filename <' // trim(filename) // '>'
+        write(*,*)
+     end if
 
-    character(len=2*iso_name_length+1) :: key
+     ! open file (read-only)
 
-    logical, parameter :: dbg = .false.
+     hi = hdf5io_t(filename, OPEN_FILE_RO)
 
-    integer :: num_suzuki_reactions
+     ! get a list of group names
 
-    if (dbg) write(*,*) 'private_load_suzuki_tables'
+     group_names = hi%group_names()
+     num_suzuki_reactions = SIZE(group_names)
 
-    suzuki_data_dir = trim(mesa_data_dir) // '/rates_data'
-    filename = trim(suzuki_data_dir) // '/suzuki/Suzuki2016.h5'
-    if (dbg) then
-       write(*,*)
-       write(*,*) 'read filename <' // trim(filename) // '>'
-       write(*,*)
-    end if
+     ! allocate space for all this data
 
-    ! open hdf5 interface
-    call h5open_f(ierr)
-    if (ierr /= 0) return
+     call alloc
+     if (failed('allocate')) return
 
-    ! open file (read-only)
-    call h5fopen_f(filename, h5f_acc_rdonly_f, file_id, ierr)
-    if (ierr /= 0) return
+     ! load the data
 
-    ! open root group and count number of links
-    call h5gopen_f(file_id, "/", group_id, ierr)
-    call h5gget_info_f(group_id, storage_type, num_suzuki_reactions, max_corder, ierr)
-    if (dbg) write(*,*) 'read ', num_suzuki_reactions, ' reactions'
+     nullify(suzuki_reactions_dict)
 
-    ! allocate space for all this data
-    call alloc
-    if (failed('allocate')) return
+     do i = 1, num_suzuki_reactions
+        hi_rxn = hdf5io_t(hi, group_names(i))
+        call load_suzuki_rxn(hi_rxn, i, 'r_'//group_names(i))
+        call hi_rxn% final()
+     end do
 
-    ! this next part iterates through the hdf files and loads the data
-    nullify(suzuki_reactions_dict)
+     ! close file
 
-    idx = 0
-    funptr = c_funloc(op_func)
-    ptr    = c_null_ptr
+     call hi% final()
 
-    rxn_idx = 0
-    call h5literate_f(file_id, h5_index_name_f, h5_iter_native_f, idx, funptr, ptr, ret_value, ierr)
+     ! set up reaction dictionary
 
-    ! check that we read the right number of reactions
-    if (rxn_idx /= num_suzuki_reactions) then
-       write(*,*) rxn_idx, num_suzuki_reactions
-       call mesa_error(__FILE__, __LINE__)
-    end if
+     call integer_dict_create_hash(suzuki_reactions_dict, ierr)
+     if (failed('integer_dict_create_hash')) return
 
-    ! close file
-    call h5fclose_f(file_id, ierr)
-    if (ierr /= 0) return
+     ! pre-construct interpolants
 
-    ! close interface
-    call h5close_f(ierr)
-    if (ierr /= 0) return
+     do i = 1, num_suzuki_reactions
+        associate(t => suzuki_reactions_tables(i) % t)
+          if (ierr == 0) call t% setup(ierr)
+        end associate
+        if (failed('setup')) return
+     end do
 
-    ! set up reaction dictionary
-    call integer_dict_create_hash(suzuki_reactions_dict, ierr)
-    if (failed('integer_dict_create_hash')) return
-
-    ! pre-construct interpolants
-    do i = 1, num_suzuki_reactions
-       associate(t => suzuki_reactions_tables(i) % t)
-         if (ierr == 0) call t% setup(ierr)
-       end associate
-       if (failed('setup')) return
-    end do
-
-    if (dbg) write(*,*) 'finished load_suzuki_tables'
-
+     if (dbg) write(*,*) 'finished load_suzuki_tables'
 
   contains
 
-    ! this function is taken from the example
-    integer function op_func(loc_id, name, info, operator_data) bind(C)
+     subroutine load_suzuki_rxn(hi, rxn_idx, rxn_name)
 
-      use hdf5
-      use iso_c_binding
-      use weak_support, only : parse_weak_rate_name
+        use weak_support, only : parse_weak_rate_name
 
-      implicit none
+        type(hdf5io_t), intent(inout) :: hi
+        integer, intent(in)           :: rxn_idx
+        character(*), intent(in)      :: rxn_name
 
-      integer(hid_t), value :: loc_id
-      character(len=1), dimension(1:32) :: name ! must have len=1 for bind(C) strings
-      type(c_ptr) :: info
-      type(c_ptr) :: operator_data
+        type(hdf5io_t)                      :: hi_data
+        real(dp), allocatable, dimension(:) :: logTs, lYeRhos
+        type(suzuki_rate_table)             :: table
+        character(len=iso_name_length)      :: lhs, rhs
+        character(len=2*iso_name_length+1)  :: key
 
-      integer :: status, i, len
-      integer :: storage_type, nlinks, max_corder
+        ! parse the name
 
-      type(h5o_info_t), target :: infobuf
-      type(c_ptr) :: ptr
-      character(len=32) :: name_string
+        call parse_weak_rate_name(rxn_name, lhs, rhs, ierr)
+        if (dbg) write(*,*) 'parse_weak_rate_name gives ', trim(lhs), ' ', trim(rhs), ierr
 
-      integer(hid_t) :: group_id, dspace_id, dset_id, subgroup_id
+        suzuki_lhs_nuclide_id = chem_get_iso_id(lhs)
+        suzuki_lhs_nuclide_name(rxn_idx) = lhs
+        suzuki_rhs_nuclide_id = chem_get_iso_id(rhs)
+        suzuki_rhs_nuclide_name(rxn_idx) = rhs
+        call create_weak_dict_key(lhs, rhs, key)
+        call integer_dict_define(suzuki_reactions_dict, key, rxn_idx, ierr)
+        if (failed('integer_dict_define')) return
 
-      real(dp), allocatable, dimension(:) :: logTs, lYeRhos
-      real(dp), allocatable, dimension(:,:) :: dset_data ! Data buffers
+        ! read table axes
 
-      integer(hsize_t), dimension(2) :: data_dims, max_dims
+        call hi% alloc_read_dset('logTs', logTs)
+        if (dbg) write(*,*) "num logTs", SIZE(logTs)
 
-      type(suzuki_rate_table) :: table
+        call hi% alloc_read_dset('lYeRhos', lYeRhos)
+        if (dbg) write(*,*) "num lYeRhos", SIZE(lYeRhos)
 
-      character(len=32) :: rxn_name
-      character(len=iso_name_length) :: lhs, rhs
-      character(len=2*iso_name_length+1) :: key
+        table = suzuki_rate_table(logTs, lYeRhos)
+        call set_nan(table% data)
 
+        ! read capture data
 
-      !
-      ! Get type of the object and display its name and type.  The
-      ! name of the object is passed to this function by the library.
-      !
+        table% has_capture_data = hi% group_exists('capture')
 
-      do i = 1, 32
-         name_string(i:i) = name(i)(1:1)
-      enddo
+        if (table% has_capture_data) then
 
-      call h5oget_info_by_name_f(loc_id, name_string, infobuf, status)
+           if (dbg) write(*,*) "found capture group; reading..."
 
-      ! Include the string up to the C NULL CHARACTER
-      len = 0
-      do
-         if(name_string(len+1:len+1).eq.c_null_char.or.len.ge.32) exit
-         len = len + 1
-      enddo
+           hi_data = hdf5io_t(hi, 'capture')
 
-      if(infobuf%type.eq.h5o_type_group_f)then
+           call hi_data% read_dset('mu', table% data(1,:,:,table%i_capture_mu))
+           call hi_data% read_dset('dQ', table% data(1,:,:,table%i_capture_dQ))
+           call hi_data% read_dset('Vs', table% data(1,:,:,table%i_capture_Vs))
+           call hi_data% read_dset('rate', table% data(1,:,:,table%i_capture_rate))
+           call hi_data% read_dset('nu', table% data(1,:,:,table%i_capture_nu))
+           call hi_data% read_dset('gamma', table% data(1,:,:,table%i_capture_gamma))
 
-         if (dbg) write(*,*) "Group: ", name_string(1:len)
-         call h5gopen_f(loc_id, name_string(1:len), group_id, ierr)
+           call hi_data% final()
 
-         rxn_name = "r_" // name_string(1:len)
-         call parse_weak_rate_name(rxn_name, lhs, rhs, ierr)
-         if (dbg) write(*,*) 'parse_weak_rate_name gives ', trim(lhs), ' ', trim(rhs), ierr
+        end if
 
-         ! increment rxn_idx
-         rxn_idx = rxn_idx + 1
+        ! read decay data
 
-         suzuki_lhs_nuclide_id = chem_get_iso_id(lhs)
-         suzuki_lhs_nuclide_name(rxn_idx) = lhs
-         suzuki_rhs_nuclide_id = chem_get_iso_id(rhs)
-         suzuki_rhs_nuclide_name(rxn_idx) = rhs
-         call create_weak_dict_key(lhs, rhs, key)
-         call integer_dict_define(suzuki_reactions_dict, key, rxn_idx, ierr)
-         if (failed('integer_dict_define')) return
+        table% has_decay_data = hi% group_exists('decay')
 
-         ! get dataset size
-         data_dims = 0
-         call h5dopen_f(group_id, "logTs", dset_id, ierr)
-         call h5dget_space_f(dset_id, dspace_id, ierr)
-         call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-         if (dbg) write(*,*) "num logTs", data_dims(1)
-         allocate(logTs(data_dims(1)))
-         call h5dread_f(dset_id, H5T_IEEE_F64LE, logTs, data_dims, ierr)
-         call h5dclose_f(dset_id, ierr)
+        if (table% has_decay_data) then
 
-         data_dims = 0
-         call h5dopen_f(group_id, "lYeRhos", dset_id, ierr)
-         call h5dget_space_f(dset_id, dspace_id, ierr)
-         call H5sget_simple_extent_dims_f(dspace_id, data_dims, max_dims, ierr)
-         if (dbg) write(*,*) "num lYeRhos", data_dims(1)
-         allocate(lYeRhos(data_dims(1)))
-         call h5dread_f(dset_id, H5T_IEEE_F64LE, lYeRhos, data_dims, ierr)
-         call h5dclose_f(dset_id, ierr)
+           if (dbg) write(*,*) "found decay group; reading..."
 
-         table = suzuki_rate_table(logTs, lYeRhos)
-         call set_nan(table % data)
+           hi_data = hdf5io_t(hi, 'decay')
 
-         data_dims(1) = size(logTs)
-         data_dims(2) = size(lYeRhos)
+           call hi_data% read_dset('mu', table% data(1,:,:,table%i_decay_mu))
+           call hi_data% read_dset('dQ', table% data(1,:,:,table%i_decay_dQ))
+           call hi_data% read_dset('Vs', table% data(1,:,:,table%i_decay_Vs))
+           call hi_data% read_dset('rate', table% data(1,:,:,table%i_decay_rate))
+           call hi_data% read_dset('nu', table% data(1,:,:,table%i_decay_nu))
+           call hi_data% read_dset('gamma', table% data(1,:,:,table%i_decay_gamma))
 
-         ! we know we may not find some groups, so silence errors
-         call h5eset_auto_f(0, ierr)
+           call hi_data% final()
 
-         ! read capture group
-         table % has_capture_data = .false.
-         call h5gopen_f(group_id, "capture", subgroup_id, ierr)
-         if (ierr == 0) then
+        end if
 
-            table % has_capture_data = .true.
-            if (dbg) write(*,*) "found capture group; reading..."
+        ! assign the table
 
-            call h5dopen_f(subgroup_id, "mu", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_capture_mu), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
+        allocate(suzuki_reactions_tables(rxn_idx)% t, source=table)
 
-            call h5dopen_f(subgroup_id, "dQ", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_capture_dQ), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
+        ! finish
 
-            call h5dopen_f(subgroup_id, "Vs", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_capture_Vs), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
+     end subroutine load_suzuki_rxn
 
-            call h5dopen_f(subgroup_id, "rate", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_capture_rate), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
+     subroutine alloc
 
-            call h5dopen_f(subgroup_id, "nu", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_capture_nu), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
+        allocate( &
+             suzuki_reaclib_id(num_suzuki_reactions), &
+             suzuki_lhs_nuclide_name(num_suzuki_reactions), &
+             suzuki_rhs_nuclide_name(num_suzuki_reactions), &
+             suzuki_lhs_nuclide_id(num_suzuki_reactions), &
+             suzuki_rhs_nuclide_id(num_suzuki_reactions), &
+             suzuki_reactions_tables(num_suzuki_reactions), &
+             stat=ierr)
 
-            call h5dopen_f(subgroup_id, "gamma", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_capture_gamma), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
+     end subroutine alloc
 
-            if (ierr /= 0) then
-               write(*,*) 'failed to read capture data'
-               call mesa_error(__FILE__, __LINE__)
-            end if
-
-         end if
-         call h5gclose_f(subgroup_id, ierr)
-
-
-         ! read decay group
-         table % has_decay_data = .false.
-         call h5gopen_f(group_id, "decay", subgroup_id, ierr)
-         if (ierr == 0) then
-
-            table % has_decay_data = .true.
-            if (dbg) write(*,*) "found decay group; reading..."
-
-            call h5dopen_f(subgroup_id, "mu", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_decay_mu), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
-
-            call h5dopen_f(subgroup_id, "dQ", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_decay_dQ), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
-
-            call h5dopen_f(subgroup_id, "Vs", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_decay_Vs), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
-
-            call h5dopen_f(subgroup_id, "rate", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_decay_rate), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
-
-            call h5dopen_f(subgroup_id, "nu", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_decay_nu), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
-
-            call h5dopen_f(subgroup_id, "gamma", dset_id, ierr)
-            call h5dread_f(dset_id,  H5T_IEEE_F64LE, table% data(1,:,:,table%i_decay_gamma), data_dims, ierr)
-            call h5dclose_f(dset_id, ierr)
-
-            if (ierr /= 0) then
-               write(*,*) 'failed to read decay data'
-               call mesa_error(__FILE__, __LINE__)
-            end if
-
-         end if
-         call h5gclose_f(subgroup_id, ierr)
-
-         ! un-silence errors
-         call h5eset_auto_f(1, ierr)
-
-         ! assign table
-         allocate(suzuki_reactions_tables(rxn_idx)% t, source=table)
-
-      else if(infobuf%type.eq.h5o_type_dataset_f)then
-         write(*,*) 'no datasets in root'
-         call mesa_error(__FILE__, __LINE__)
-      else if(infobuf%type.eq.h5o_type_named_datatype_f)then
-         write(*,*) 'no datatypes in root'
-         call mesa_error(__FILE__, __LINE__)
-      else
-         write(*,*) 'no unknowns in root'
-         call mesa_error(__FILE__, __LINE__)
-      endif
-
-      op_func = 0 ! return successful
-
-    end function op_func
-
-    subroutine alloc
-
-      allocate( &
-           suzuki_reaclib_id(num_suzuki_reactions), &
-           suzuki_lhs_nuclide_name(num_suzuki_reactions), &
-           suzuki_rhs_nuclide_name(num_suzuki_reactions), &
-           suzuki_lhs_nuclide_id(num_suzuki_reactions), &
-           suzuki_rhs_nuclide_id(num_suzuki_reactions), &
-           suzuki_reactions_tables(num_suzuki_reactions), &
-           stat=ierr)
-
-    end subroutine alloc
-
-    logical function failed(str)
-      character (len=*) :: str
-      failed = (ierr /= 0)
-      if (failed) then
-         write(*,*) 'failed: ' // trim(str)
-      end if
-    end function failed
-
+     logical function failed(str)
+        character (len=*) :: str
+        failed = (ierr /= 0)
+        if (failed) then
+           write(*,*) 'failed: ' // trim(str)
+        end if
+     end function failed
 
   end subroutine private_load_suzuki_tables
-#endif
 
 end module suzuki_tables

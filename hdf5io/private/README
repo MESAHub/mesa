@@ -1,0 +1,16 @@
+NOTE: the .fypp and .inc files are copied from the ForUM project
+(https://github.com/rhdtownsend/forum). They are designed to be
+processed using the fypp preprocessor
+(https://github.com/aradi/fypp). This can be done by running the
+regen_src script
+
+Given that not all users will have fypp installed, for now we're
+storing both .fypp/.inc *and* .f90 files in the repo. Longer term, we
+may want to add fypp to the MESA SDK, allowing us to ship only the
+.fypp/.inc files.
+
+TL;DR: Don't edit the .f90 files, edit the .fypp/.inc files and run
+fypp.
+
+Rich Townsend
+February 2021

@@ -30,121 +30,185 @@
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
+      use accurate_sum_auto_diff_star_order1
       use star_utils, only: em1, e00, ep1
 
       implicit none
 
       private
-      public :: do1_turbulent_energy_eqn, do1_tdc_L_eqn, &
-         set_w_start_vars, reset_w_using_L, calc_Eq_18, calc_Uq_18 
+      public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
+         compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
       
+      real(dp), parameter :: &
+         min_w = 1d-6, &
+         x_ALFAP = 2.d0/3.d0, &
+         x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
+         x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
+         x_CEDE  = (8.d0/3.d0)*sqrt(2.d0/3.d0), &
+         x_GAMMAR = 2.d0*sqrt(3.d0)
+
+!         RSP       TDC
+!         ALFA  =>  TDC_alfa
+!         ALFAP =>  TDC_alfap*x_ALFAP
+!         ALFAM =>  TDC_alfam
+!         ALFAT =>  TDC_alfat
+!         ALFAS =>  x_ALFAS
+!         ALFAC =>  x_ALFAC
+!         CEDE  =>  x_CEDE
+!         GAMMAR => TDC_alfar*x_GAMMAR
 
       contains
       
 
       subroutine do1_tdc_L_eqn(s, k, skip_partials, nvar, ierr)
-         use star_utils, only: store_partials
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
-         real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'
-         call get1_tdc_L_eqn(s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_tdc_L_eqn', k
-            return
-         end if         
-         if (skip_partials) return         
-         call store_partials(s, k, s% i_equL, nvar, d_dm1, d_d00, d_dp1)
-      end subroutine do1_tdc_L_eqn
-
-      
-      subroutine get1_tdc_L_eqn( &  
-            s, k, skip_partials, nvar, d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: unpack_res18_partials
-         use accurate_sum_auto_diff_18var_order1
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
-         real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
-         integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: L, Lr, Lc, Lt, L_actual, res18
+         type(auto_diff_real_star_order1) :: L_expected, L_actual, resid
          real(dp) :: scale, residual, e_avg, L_start_max
          logical :: test_partials
          include 'formats'
 
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
+         test_partials = (k == s% solver_test_partials_k)
+         !test_partials = .false.
 
          ierr = 0
-         call compute_L(s, k, L, Lr, Lc, Lt, ierr)         
+         L_expected = compute_L_face(s, k, ierr)
          if (ierr /= 0) return        
          L_actual = wrap_L_00(s, k)  
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
-         res18 = (L - L_actual)*scale         
-         residual = res18%val
-         s% equ(s% i_equL, k) = residual
-         
-         if (test_partials) then
-            s% solver_test_partials_val = residual
+         if (is_bad(scale)) then
+            write(*,2) 'do1_tdc_L_eqn scale', k, scale
+            stop 'do1_tdc_L_eqn'
          end if
+         resid = (L_expected - L_actual)*scale         
+         residual = resid%val
+         s% equ(s% i_equL, k) = residual         
+         if (test_partials) then
+            s% solver_test_partials_val = residual 
+            if (.false.) then
+               write(*,2) 'L_expected%val', k, L_expected%val
+               write(*,2) 'L_actual%val', k, L_actual%val
+               write(*,2) 'diff', k, L_expected%val - L_actual%val
+               write(*,2) 'diff*scale', k, (L_expected%val - L_actual%val)*scale
+               write(*,2) 's% Lc(k)', k, s% Lc(k)
+               write(*,2) 's% w(k)', k, s% w(k)
+               write(*,2) 's% w(k-1)', k-1, s% w(k-1)
+            end if
+         end if
+         
          if (skip_partials) return
-         call unpack_res18_partials(s, k, nvar, s% i_equL, &
-            res18, d_dm1, d_d00, d_dp1)
+         call save_eqn_residual_info(s, k, nvar, s% i_equL, resid, 'do1_tdc_L_eqn', ierr)
+         if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = s% i_lnT
-            s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
-            write(*,*) 'get1_tdc_L_eqn', s% solver_test_partials_var
+            s% solver_test_partials_var = s% i_etrb
+            s% solver_test_partials_dval_dx = resid%d1Array(i_etrb_00)
+            write(*,*) 'do1_tdc_L_eqn', s% solver_test_partials_var, k, s% nz
          end if      
-      end subroutine get1_tdc_L_eqn
+      end subroutine do1_tdc_L_eqn
+      
+      
+      function compute_Hp_cell(s, k, ierr) result(Hp_cell) ! cm
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Hp_cell
+         type(auto_diff_real_star_order1) :: r_mid, r_00, r_p1, &
+            P_00, d_00, P_m1, d_m1, alt_Hp_cell, alfa
+         real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
+         include 'formats'
+         ierr = 0
+         r_00 = wrap_opt_time_center_r_00(s, k)
+         cgrav_00 = s% cgrav(k)
+         m_00 = s% m(k)
+         d_00 = wrap_d_00(s, k)
+         P_00 = wrap_P_00(s, k)
+         r_p1 = wrap_opt_time_center_r_p1(s, k)
+         if (k < s% nz) then
+            cgrav_p1 = s% cgrav(k+1)
+            m_p1 = s% m(k+1)
+         else
+            cgrav_p1 = s% cgrav(k)
+            m_p1 = s% m_center
+         end if
+         cgrav_mid = 0.5d0*(cgrav_00 + cgrav_p1)
+         m_mid = 0.5d0*(m_00 + m_p1)
+         r_mid = 0.5d0*(r_00 + r_p1)
+         Hp_cell = pow2(r_mid)*P_00 / (d_00*cgrav_mid*m_mid)
+         if (s% alt_scale_height_flag) then
+            ! consider sound speed*hydro time scale as an alternative scale height
+            ! (this comes from Eggleton's code.)
+            alt_Hp_cell = sqrt(P_00/cgrav_mid)/d_00
+            if (alt_Hp_cell%val < Hp_cell%val) then ! blend
+               alfa = pow2(alt_Hp_cell/Hp_cell) ! 0 <= alfa%val < 1
+               Hp_cell = alfa*Hp_cell + (1d0 - alfa)*alt_Hp_cell
+            end if
+         end if
+      end function compute_Hp_cell
+      
+      
+      function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
+         ! no time_centering for Hp
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Hp_face
+         type(auto_diff_real_star_order1) :: &
+            r_00, P_00, d_00, P_m1, d_m1, P_div_rho, &
+            d_face, P_face, alt_Hp_face, alfa
+         integer :: j
+         include 'formats'
+         ierr = 0
+         r_00 = wrap_opt_time_center_r_00(s, k)
+         d_00 = wrap_d_00(s, k)
+         P_00 = wrap_p_00(s, k)
+         if (k > 1) then
+            d_m1 = wrap_d_m1(s, k)
+            P_m1 = wrap_P_m1(s, k)
+            P_div_rho = 0.5d0*(P_00/d_00 + P_m1/d_m1)
+            Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
+            if (s% alt_scale_height_flag) then
+               ! consider sound speed*hydro time scale as an alternative scale height
+               ! (this comes from Eggleton's code.)
+               d_face = 0.5d0*(d_00 + d_m1)
+               P_face = 0.5d0*(P_00 + P_m1)
+               alt_Hp_face = sqrt(P_face/s% cgrav(k))/d_face
+               if (alt_Hp_face%val < Hp_face%val) then ! blend
+                  alfa = pow2(alt_Hp_face/Hp_face) ! 0 <= alfa%val < 1
+                  Hp_face = alfa*Hp_face + (1d0 - alfa)*alt_Hp_face
+               end if
+            end if
+         else ! surface
+            P_div_rho = P_00/d_00
+            Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
+         end if
+      end function compute_Hp_face
+      
+      
+      logical function non_turbulent_cell(s,k) 
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         non_turbulent_cell = (s% TDC_alfa == 0d0 .or. & ! TDC_alfa == 0d0 means purely radiative
+             k == 1 .or. k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent)
+      end function non_turbulent_cell
       
 
       subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
-         use star_utils, only: store_partials
+         use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
-         real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1      
-         include 'formats'
-         call get1_turbulent_energy_eqn( &
-            s, k, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_turbulent_energy_eqn', k
-            return
-         end if         
-         if (skip_partials) return         
-         call store_partials(s, k, s% i_dw_dt, nvar, d_dm1, d_d00, d_dp1)
-      end subroutine do1_turbulent_energy_eqn
-
-      
-      subroutine get1_turbulent_energy_eqn( &  
-            s, k, skip_partials, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
-         use star_utils, only: calc_Pt_18_tw
-         use accurate_sum_auto_diff_18var_order1
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nvar
-         logical, intent(in) :: skip_partials
-         real(dp), dimension(nvar), intent(out) :: d_dm1, d_d00, d_dp1      
-         integer, intent(out) :: ierr
-         
-         real(dp) :: dt, dm, dt_div_dm, residual, scale
-         integer :: i_dw_dt, i_w, i_lnd, i_lnT, i_lnR, i_v
-         type(auto_diff_real_18var_order1) :: resid_18, &
-            d_turbulent_energy_dt_18, PtdV_18, dt_dLt_dm_18, dt_C_18, dt_Eq_18
-         type(accurate_auto_diff_real_18var_order1) :: esum_18
-         real(dp) :: dm_m1, dm_00, dm_p1, m_00, cgrav_00
-         type(auto_diff_real_18var_order1) :: &
-            Source, D, Dr, g_00, g_p1, area_00, area_p1, g_cell_00, h_00
-         type(auto_diff_real_18var_order1) :: d_m1, d_00, d_p1, P_m1, P_00, P_p1
-         type(auto_diff_real_18var_order1) :: w_m1, w_00, w_p1, T_m1, T_00, kap_m1, kap_00
-         type(auto_diff_real_18var_order1) :: r_m1, r_00, r_p1, v_m1, v_00, v_p1
-         type(auto_diff_real_18var_order1) :: ChiRho_00, ChiT_00, Cp_00, s_m1, s_00, s_p1
+         real(dp) :: dt, dm, dt_div_dm, scal, residual
+         integer :: i_detrb_dt, i_etrb, i_v
+         type(auto_diff_real_star_order1) :: resid_ad, &
+            d_turbulent_energy_ad, PtdV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
+         type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: test_partials
          include 'formats'
 
@@ -154,771 +218,666 @@
          ierr = 0
          call init
          
-         if (s% TDC_alfa == 0d0) then ! purely radiative model
-            s% equ(i_dw_dt, k) = s% w(k) - min_w
-            if (.not. skip_partials) d_d00(i_w) = 1d0
-            return
+         if (non_turbulent_cell(s,k)) then
+             
+            resid_ad = wrap_etrb_00(s,k) ! make etrb = 0
+            
+         else
+         
+            call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
+            call setup_PtdV_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
+         
+            ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
+            esum_ad = d_turbulent_energy_ad + PtdV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
+         
+            resid_ad = esum_ad ! convert back to auto_diff_real_star_order1
+            resid_ad = resid_ad*scal/s% dt ! to make residual unitless, must cancel out the dt in scal
+         
          end if
-         
-         call setup_intermediates
-         call setup_d_turbulent_energy_dt(ierr); if (ierr /= 0) return         
-         call setup_PtdV_18(ierr); if (ierr /= 0) return         
-         call setup_dt_dLt_dm_18(ierr); if (ierr /= 0) return         
-         call setup_dt_C_18(ierr); if (ierr /= 0) return         
-         call setup_dt_Eq_18(ierr); if (ierr /= 0) return    
-         
-         ! sum terms in esum_18 using accurate_auto_diff_real_18var_order1
-         esum_18 = d_turbulent_energy_dt_18 + PtdV_18 + dt_dLt_dm_18 - dt_C_18 - dt_Eq_18
-         
-         resid_18 = esum_18 ! convert back to auto_diff_real_18var_order1
-         scale = 1d0/s% energy_start(k)
-         resid_18 = scale*resid_18
-         residual = resid_18%val
-         s% equ(i_dw_dt, k) = residual
+
+         residual = resid_ad%val
+         s% equ(i_detrb_dt, k) = residual
 
          if (is_bad(residual)) then
 !$omp critical (hydro_equ_turbulent_crit1)
             write(*,2) 'turbulent energy eqn residual', k, residual
-            write(*,2) 'det', k, d_turbulent_energy_dt_18%val
-            write(*,2) 'PtdV', k, PtdV_18%val
-            write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_18%val
-            write(*,2) 'dt_C', k, dt_C_18%val
-            write(*,2) 'dt_Eq', k, dt_Eq_18%val
+            write(*,2) 'det', k, d_turbulent_energy_ad%val
+            write(*,2) 'PtdV', k, PtdV_ad%val
+            write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_ad%val
+            write(*,2) 'dt_C', k, dt_C_ad%val
+            write(*,2) 'dt_Eq', k, dt_Eq_ad%val
             stop 'get1_turbulent_energy_eqn'
 !$omp end critical (hydro_equ_turbulent_crit1)
          end if
+
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
+         
          if (skip_partials) return
-         call unpack_res18(resid_18)
+         call save_eqn_residual_info(s, k, nvar, i_detrb_dt, resid_ad, 'do1_turbulent_energy_eqn', ierr)
+         if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = i_lnT
-            s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)
-            write(*,*) 'get1_turbulent_energy_eqn', s% solver_test_partials_var, &
-               s% w(k), s% w_start(k)
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
+            write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var
          end if      
 
          contains
          
          subroutine init
-            i_dw_dt = s% i_dw_dt
-            i_w = s% i_w
-            i_lnd = s% i_lnd
-            i_lnT = s% i_lnT
-            i_lnR = s% i_lnR
+            i_detrb_dt = s% i_detrb_dt
+            i_etrb = s% i_etrb
             i_v = s% i_v
             dt = s% dt
             dm = s% dm(k)
             dt_div_dm = dt/dm
-            d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
          end subroutine init
          
-         subroutine setup_intermediates         
-            if (k > 1) then
-               dm_m1 = s%dm(k-1)
-            else
-               dm_m1 = 0d0
-            end if
-            dm_00 = s%dm(k)
-            d_m1 = wrap_d_m1(s, k)
-            d_00 = wrap_d_00(s, k)
-            d_p1 = wrap_d_p1(s, k) ! Gradients vanish at the center, so d(nz+1) == d(nz).
-            P_m1 = wrap_P_m1(s, k)
-            P_00 = wrap_P_00(s, k)
-            P_p1 = wrap_P_p1(s, k)
-            s_m1 = wrap_s_m1(s, k)
-            s_00 = wrap_s_00(s, k)
-            s_p1 = wrap_s_p1(s, k) ! Gradients vanish at the center, so s(nz+1) == s(nz).
-            w_m1 = wrap_w_m1(s, k)
-            w_00 = wrap_w_00(s, k)
-            w_p1 = wrap_w_p1(s, k)
-            T_m1 = wrap_T_m1(s, k)
-            T_00 = wrap_T_00(s, k)
-            kap_m1 = wrap_kap_m1(s, k)
-            kap_00 = wrap_kap_00(s, k)
-            ChiRho_00 = wrap_ChiRho_00(s, k)
-            ChiT_00 = wrap_ChiT_00(s, k)
-            Cp_00 = wrap_Cp_00(s, k)
-            r_m1 = wrap_r_m1(s, k)
-            r_00 = wrap_r_00(s, k)
-            r_p1 = wrap_r_p1(s, k) ! Set by wrap routine to r_center when k == nz.
-            v_m1 = wrap_v_m1(s, k)
-            v_00 = wrap_v_00(s, k)
-            v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
-            ! Compute areas on faces (used by L_turb)
-            area_00 = 4d0 * pi * pow2(r_00)
-            area_p1 = 4d0 * pi * pow2(r_p1)
-            ! Compute gravity on faces (used by L_turb)
-            m_00 = s% m(k)
-            cgrav_00 = s% cgrav(k)
-            g_00 = m_00 * cgrav_00 / pow2(r_00)
-            if (r_p1 > 0d0) then
-               g_p1 = (m_00 - dm_00) * cgrav_00 / pow2(r_p1)
-            else
-               g_p1 = 0d0
-            end if            
-            g_cell_00 = (m_00 - 0.5d0 * dm_00) * cgrav_00 / (0.5d0 * (r_00 + r_p1))
-         end subroutine setup_intermediates
-         
-         subroutine setup_d_turbulent_energy_dt(ierr)
+         subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            d_turbulent_energy_dt_18 = 0d0
-            d_turbulent_energy_dt_18%val = & ! specific turbulent_energy = w**2
-               (s% w_start(k)*s% dxh_w(k) + pow2(s% dxh_w(k)))/dt ! w = w_start + dxh_w
-            d_turbulent_energy_dt_18%d1Array(i_w_00) = &
-               (s% w_start(k) + 2d0*s% dxh_w(k))/dt
-         end subroutine setup_d_turbulent_energy_dt
+            ierr = 0
+            d_turbulent_energy_ad = wrap_dxh_etrb(s,k)
+         end subroutine setup_d_turbulent_energy
          
-         ! PtdV_18 = Pt_18*dV_18
-         subroutine setup_PtdV_18(ierr)
-            use star_utils, only: calc_Pt_18_tw
+         ! PtdV_ad = Pt_ad*dV_ad
+         subroutine setup_PtdV_ad(ierr) ! erg g^-1
+            use star_utils, only: calc_Pt_ad_tw
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: Pt_18, dV_18
-            real(dp) :: DV, d_DV_dlnd
-            call calc_Pt_18_tw(s, k, Pt_18, ierr)
+            type(auto_diff_real_star_order1) :: Pt_ad, dV_ad, d_00
+            call calc_Pt_ad_tw(s, k, Pt_ad, ierr)
             if (ierr /= 0) return
-            dV_18 = 1d0/d_00 - 1d0/s% rho_start(k)
-            PtdV_18 = Pt_18*dV_18
-         end subroutine setup_PtdV_18
+            d_00 = wrap_d_00(s,k)
+            dV_ad = 1d0/d_00 - 1d0/s% rho_start(k)
+            PtdV_ad = Pt_ad*dV_ad ! erg cm^-3 cm^-3 g^-1 = erg g^-1
+         end subroutine setup_PtdV_ad
 
-         subroutine setup_dt_dLt_dm_18(ierr)
+         subroutine setup_dt_dLt_dm_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr            
-            type(auto_diff_real_18var_order1) :: Lt_00, Lt_p1, dLt_18
+            type(auto_diff_real_star_order1) :: Lt_00, Lt_p1, dLt_ad
             real(dp) :: Lt_00_start, Lt_p1_start
             include 'formats'
             ierr = 0
-            Lt_00 = compute_Lt(s, k, &
-               dm_m1, dm_00, g_00, area_00, P_m1, P_00, d_m1, d_00, w_m1, w_00, ierr)
+            Lt_00 = compute_Lt(s, k, ierr)
             if (ierr /= 0) return
             if (k < s% nz) then
-               Lt_p1 = compute_Lt(s, k+1, &
-                  dm_00, dm_p1, g_p1, area_p1, P_00, P_p1, d_00, d_p1, w_00, w_p1, ierr)
+               Lt_p1 = compute_Lt(s, k+1, ierr)
                if (ierr /= 0) return
+               Lt_p1 = shift_p1(Lt_p1)
             else
                Lt_p1 = 0d0
                Lt_p1_start = 0d0
             end if
-            if (s% use_velocity_time_centering .and. s% include_L_in_velocity_time_centering) then
+            if (s% using_velocity_time_centering .and. &
+                  s% include_L_in_velocity_time_centering) then
                Lt_00_start = s% Lt_start(k)
                if (k < s% nz) then
                   Lt_p1_start = s% Lt_start(k+1)
                else
                   Lt_p1_start = 0d0
                end if
-               dLt_18 = 0.5d0*(Lt_00 + Lt_00_start) - 0.5d0*(Lt_p1 + Lt_p1_start)
+               dLt_ad = 0.5d0*(Lt_00 + Lt_00_start) - 0.5d0*(Lt_p1 + Lt_p1_start)
             else
-               dLt_18 = Lt_00 - Lt_p1
+               dLt_ad = Lt_00 - Lt_p1
             end if
-            dt_dLt_dm_18 = dt*dLt_18/dm
-         end subroutine setup_dt_dLt_dm_18
+            dt_dLt_dm_ad = dt*dLt_ad/dm
+         end subroutine setup_dt_dLt_dm_ad
          
-         subroutine setup_dt_C_18(ierr)
+         subroutine setup_dt_C_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: C
-            C = compute_C(s, k, ierr)
+            type(auto_diff_real_star_order1) :: C
+            C = compute_C(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
-            dt_C_18 = dt*C
-         end subroutine setup_dt_C_18
+            dt_C_ad = dt*C
+         end subroutine setup_dt_C_ad
                   
-         subroutine setup_dt_Eq_18(ierr)
+         subroutine setup_dt_Eq_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: h_00, epsilon_q
-            ! Compute scale height on cell k (used by epsilon_q)
-            h_00 = compute_h_00(s, k, P_00, g_cell_00, d_00, ierr)
+            type(auto_diff_real_star_order1) :: Eq_cell
+            Eq_cell = compute_Eq_cell(s, k, ierr) ! erg g^-1 s^-1
             if (ierr /= 0) return
-            ! Compute epsilon_q
-            epsilon_q = compute_epsilon_q(s, k, &
-               v_p1, v_00, r_p1, r_00, d_00, dm_00, w_00, h_00, ierr)
-            dt_Eq_18 = dt*epsilon_q
-         end subroutine setup_dt_Eq_18
+            dt_Eq_ad = dt*Eq_cell
+         end subroutine setup_dt_Eq_ad
+      
+      end subroutine do1_turbulent_energy_eqn
 
-         subroutine unpack_res18(res18)
-            use star_utils, only: unpack_res18_partials
-            type(auto_diff_real_18var_order1) :: res18            
-            call unpack_res18_partials(s, k, nvar, i_dw_dt, &
-               res18, d_dm1, d_d00, d_dp1)
-         end subroutine unpack_res18
       
-      end subroutine get1_turbulent_energy_eqn
-      
-      
-      function compute_C(s, k, ierr) result(C)
-         ! Inputs
+      function compute_Y_face(s, k, ierr) result(Y_face) ! superadiabatic gradient [unitless]
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: C
          integer, intent(out) :: ierr
-         real(dp) :: dm_m1, dm_00, dm_p1, m_00, cgrav
-         type(auto_diff_real_18var_order1) :: Source, D, Dr, &
-            w_00, ChiT_00, ChiRho_00, Cp_00, s_m1, s_00, s_p1, &
-            d_m1, d_00, d_p1, T_00, r_00, r_p1, h_00, kap_00, &
-            g_cell_00, P_00
+         type(auto_diff_real_star_order1) :: Y_face
+         type(auto_diff_real_star_order1) :: Hp_face, Y1, Y2, QQ_div_Cp_face, &
+            r_00, d_00, P_00, Cp_00, T_00, chiT_00, chiRho_00, QQ_00, lnT_00, &
+            r_m1, d_m1, P_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1
+         real(dp) :: dm_bar
          include 'formats'
          ierr = 0
-         
-         if (k > 1) then
-            dm_m1 = s%dm(k-1)
-            s_m1 = wrap_s_m1(s, k)
-            d_m1 = wrap_d_m1(s, k)
-         else
-            dm_m1 = 0d0
-            s_m1 = 0d0
-            d_m1 = 0d0
+         if (k == 1 .or. s% TDC_alfa == 0d0) then
+            Y_face = 0d0
+            s% Y_face(k) = 0d0
+            return
          end if
-         if (k < s% nz) then
-            dm_p1 = s%dm(k+1)
-            s_p1 = wrap_s_p1(s, k)
-            d_p1 = wrap_d_p1(s, k)
-         else
-            dm_p1 = 0d0
-            s_p1 = 0d0
-            d_p1 = 0d0
-         end if
-         
-         r_p1 = wrap_r_p1(s, k)
-
-         dm_00 = s%dm(k)
-         w_00 = wrap_w_00(s, k)
-         ChiT_00 = wrap_ChiT_00(s, k)
-         ChiRho_00 = wrap_ChiRho_00(s, k)
-         Cp_00 = wrap_Cp_00(s, k)
-         s_00 = wrap_s_00(s, k)
+         dm_bar = s% dm_bar(k)
+         Hp_face = compute_Hp_face(s,k,ierr)
+         if (ierr /= 0) return
+         r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
-         T_00 = wrap_T_00(s, k)
-         r_00 = wrap_r_00(s, k)
-         kap_00 = wrap_kap_00(s, k)
-         
-         m_00 = s% m(k)
-         cgrav = s% cgrav(k)
          P_00 = wrap_P_00(s, k)
-         g_cell_00 = (m_00 - 0.5d0 * dm_00) * cgrav / (0.5d0 * (r_00 + r_p1))
-         h_00 = compute_h_00(s, k, P_00, g_cell_00, d_00, ierr)
-         if (ierr /= 0) return
+         Cp_00 = wrap_Cp_00(s, k)
+         T_00 = wrap_T_00(s, k)
+         chiT_00 = wrap_chiT_00(s, k)
+         chiRho_00 = wrap_chiRho_00(s, k)
+         QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
+         lnT_00 = wrap_lnT_00(s,k)
          
-         Source = compute_Source(s, k, &
-            w_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, ChiT_00, ChiRho_00, Cp_00, ierr)
-         if (ierr /= 0) return
-         D = compute_D(s, k, h_00, w_00, ierr)
-         if (ierr /= 0) return
-         Dr = compute_Dr(s, k, T_00, d_00, Cp_00, kap_00, h_00, ierr)
-         if (ierr /= 0) return
-         C = Source - D - Dr
+         r_m1 = wrap_opt_time_center_r_m1(s, k)
+         d_m1 = wrap_d_m1(s, k)
+         P_m1 = wrap_P_m1(s, k)
+         Cp_m1 = wrap_Cp_m1(s, k)
+         T_m1 = wrap_T_m1(s, k)
+         chiT_m1 = wrap_chiT_m1(s, k)
+         chiRho_m1 = wrap_chiRho_m1(s, k)
+         QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1)
+         lnT_m1 = wrap_lnT_m1(s,k)
+         QQ_div_Cp_face = 0.5d0*(QQ_00/Cp_00 + QQ_m1/Cp_m1)
+         ! QQ units (g cm^-3 K)^-1 = g^-1 cm^3 K^-1
+         ! Cp units erg g^-1 K^-1 = g cm^2 s^-2 g^-1 K^-1 = cm^2 s^-2 K^-1
+         ! QQ/Cp units = (g^-1 cm^3 K^-1)/(cm^2 s^-2 K^-1)
+         !  = g^-1 cm^3 K^-1 cm^-2 s^2 K
+         !  = g^-1 cm s^2
+         ! P units = erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
+         ! QQ/Cp*P is unitless.
          
-         s% COUPL(k) = C%val
-
-         if (is_bad(C%val)) then
-!$omp critical (hydro_equ_turbulent_crit2)
-            write(*,2) 'C', k, C%val
-            write(*,2) 'Source', k, Source%val
-            write(*,2) 'D', k, D%val
-            write(*,2) 'Dr', k, Dr%val
-            stop 'compute_C'
-!$omp end critical (hydro_equ_turbulent_crit2)
-         end if
+         Y1 = QQ_div_Cp_face*(P_m1 - P_00) - (lnT_m1 - lnT_00)
+         ! Y1 unitless
          
-      end function compute_C
+         Y2 = 4d0*pi*pow2(r_00)*Hp_face*2d0/(1/d_00 + 1/d_m1)/dm_bar
+         ! units = cm^2 cm / (cm^3 g^-1) / g
+         !       = cm^2 cm cm^-3 g g^-1 = unitless
+         
+         Y_face = Y1*Y2 ! unitless
+         s% Y_face(k) = Y_face%val
 
-
-      function compute_epsilon_q(s, k, & ! following RSP's definition
-            v_p1, v_00, r_p1, r_00, d_00, dm_00, w_00, h_00, ierr) result(epsilon_q)
-         ! Inputs
+      end function compute_Y_face
+      
+      
+      function compute_PII_face(s, k, ierr) result(PII_face) ! ergs g^-1 K^-1 (like Cp)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: dm_00
-         type(auto_diff_real_18var_order1), intent(in) :: v_p1, v_00, r_p1, r_00, d_00, w_00, h_00
-
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: epsilon_q
+         type(auto_diff_real_star_order1) :: PII_face
          integer, intent(out) :: ierr
-
-         type(auto_diff_real_18var_order1) :: w_rho2, r6_cell, d_v_div_r, Chi
-         real(dp) :: alpha, alpha_m
+         type(auto_diff_real_star_order1) :: Cp_00, Cp_m1, Cp_face, Y_face
+         real(dp) :: ALFAS, ALFA
          include 'formats'
-
          ierr = 0
-         alpha = s% TDC_alfa
-         alpha_m = s% TDC_alfam
-
+         if (k == 1 .or. k == s% nz .or. s% TDC_alfa == 0d0) then
+            PII_face = 0d0
+            s% PII(k) = 0d0
+            return
+         end if
+         Y_face = compute_Y_face(s, k, ierr)
+         if (ierr /= 0) return
+         Cp_00 = wrap_Cp_00(s, k)
+         Cp_m1 = wrap_Cp_m1(s, k)
+         Cp_face = 0.5d0*(Cp_00 + Cp_m1) ! ergs g^-1 K^-1
+         ALFAS = x_ALFAS
+         ALFA = s% TDC_alfa
+         PII_face = ALFAS*ALFA*Cp_face*Y_face
+         s% PII(k) = PII_face%val
+      end function compute_PII_face
+      
+      
+      function compute_d_v_div_r(s, k, ierr) result(d_v_div_r) ! s^-1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: d_v_div_r
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
+         include 'formats'
+         ierr = 0
+         r_00 = wrap_opt_time_center_r_00(s,k)
+         v_00 = wrap_opt_time_center_v_00(s,k)
+         r_p1 = wrap_opt_time_center_r_p1(s,k)
+         v_p1 = wrap_opt_time_center_v_p1(s,k)
+         d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
+      end function compute_d_v_div_r
+      
+      
+      function compute_Chi_cell(s, k, ierr) result(Chi_cell) ! eddy viscosity energy (Kuhfuss 1986) [erg]
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Chi_cell
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: &
+            w_rho2, r6_cell, d_v_div_r, Hp_cell, w_00, d_00, r_00, r_p1
+         real(dp) :: f, ALFAM_ALFA
+         include 'formats'
+         ierr = 0
+         ALFAM_ALFA = s% TDC_alfam*s% TDC_alfa
+         if (non_turbulent_cell(s,k) .or. ALFAM_ALFA == 0d0 .or. s% w(k) < min_w) then
+            Chi_cell = 0d0
+            s% Chi(k) = 0d0
+            return
+         end if
+         Hp_cell = compute_Hp_cell(s, k, ierr)
+         if (ierr /= 0) return
+         d_v_div_r = compute_d_v_div_r(s, k, ierr)
+         if (ierr /= 0) return
+         w_00 = wrap_w_00(s,k)
+         d_00 = wrap_d_00(s,k)
+         f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
          w_rho2 = w_00*pow2(d_00)
+         r_00 = wrap_opt_time_center_r_00(s,k)
+         r_p1 = wrap_opt_time_center_r_p1(s,k)
          r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
-         if (k < s% nz) then
-            d_v_div_r = v_00/r_00 - v_p1/r_p1
-         else
-            d_v_div_r = v_00/r_00
-         end if
-         Chi = (16d0/3d0)*pi*alpha*alpha_m*w_rho2*r6_cell*h_00*d_v_div_r/dm_00         
-         epsilon_q = 4d0*pi*Chi*d_v_div_r/dm_00
+         Chi_cell = f*w_rho2*r6_cell*d_v_div_r*Hp_cell
+         ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
+         !       = g cm^2 s^-2
+         !       = erg
+         s% Chi(k) = Chi_cell%val
+         
+         !s% xtra1_array(k) = f
+         !s% xtra2_array(k) = safe_log10(w_rho2%val)
+         !s% xtra3_array(k) = safe_log10(r6_cell%val)
+         !s% xtra4_array(k) = d_v_div_r%val
+         !s% xtra5_array(k) = Hp_cell%val
 
-         s% Eq(k) = epsilon_q%val
+      end function compute_Chi_cell
 
-      end function compute_epsilon_q
-
-
-      function compute_Dr(s, k, & ! following RSP's definition
-            T_00, d_00, cp_00, kap_00, h_00, ierr) result(Dr)
+      
+      function compute_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(in) :: T_00, d_00, cp_00, kap_00, h_00
-         type(auto_diff_real_18var_order1) :: Dr
+         type(auto_diff_real_star_order1) :: Eq_cell
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: w_00
-         real(dp) :: gammar, alpha
+         type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
-         alpha = s% TDC_alfa
-         if (alpha == 0d0) then
-            Dr = 0d0
-         else
-            gammar = s% TDC_alfar
-            w_00 = wrap_w_00(s,k)
-            Dr = (4d0 * boltz_sigma * pow2(gammar) / alpha**2) * pow3(T_00) * pow2(w_00) / &
-                  (pow2(d_00) * Cp_00 * kap_00 * pow2(h_00))
+         if (non_turbulent_cell(s,k)) then
+            Eq_cell = 0d0
+            s% Eq(k) = 0d0
+            return
          end if
-         s% DAMPR(k) = Dr%val
-      end function compute_Dr
+         Chi_cell = compute_Chi_cell(s,k,ierr)
+         if (ierr /= 0) return
+         d_v_div_r = compute_d_v_div_r(s, k, ierr)
+         if (ierr /= 0) return
+         Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
+         !s% xtra4_array(k) = 4d0*pi*d_v_div_r%val/s% dm(k)
+         !s% xtra5_array(k) = Chi_cell%val
+         s% Eq(k) = Eq_cell%val
+      end function compute_Eq_cell
 
 
-      function compute_D(s, k, h_00, w_00, ierr) result(D) ! following RSP's definition
+      function compute_Uq_face(s, k, ierr) result(Uq_face) ! cm s^-2, acceleration
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(in) :: h_00, w_00
-         type(auto_diff_real_18var_order1) :: D
+         type(auto_diff_real_star_order1) :: Uq_face
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Chi_00, Chi_out, r_00
          include 'formats'
+         ierr = 0         
+         Chi_00 = compute_Chi_cell(s,k,ierr)
+         if (k > 1) then
+            Chi_out = compute_Chi_cell(s,k-1,ierr)
+            Chi_out = shift_m1(Chi_out)
+            if (ierr /= 0) return
+         else
+            Chi_out = 0d0
+         end if
+         r_00 = wrap_opt_time_center_r_00(s,k)
+         Uq_face = 4d0*pi*(Chi_out - Chi_00)/(s% dm_bar(k)*r_00)   
+         ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
+         s% Uq(k) = Uq_face%val
+      end function compute_Uq_face
 
+
+      function compute_Source(s, k, ierr) result(Source) ! erg g^-1 s^-1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Source
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: &
+            w_00, T_00, d_00, P_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
+            Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell
+         include 'formats'
+         ierr = 0
+         if (non_turbulent_cell(s,k)) then
+            Source = 0d0
+            s% SOURCE(k) = Source%val
+            return
+         end if
+         if (s% w(k) < min_w) then
+            w_00 = min_w*1d-2 ! must be > 0 to provide a seed for turbulence
+         else
+            w_00 = wrap_w_00(s, k)
+         end if
+         T_00 = wrap_T_00(s, k)                  
+         d_00 = wrap_d_00(s, k)         
+         P_00 = wrap_P_00(s, k)         
+         Cp_00 = wrap_Cp_00(s, k)
+         chiT_00 = wrap_chiT_00(s, k)
+         chiRho_00 = wrap_chiRho_00(s, k)
+         QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
+            
+         Hp_face_00 = compute_Hp_face(s,k,ierr)
+         if (ierr /= 0) return
+         Hp_face_p1 = compute_Hp_face(s,k+1,ierr)
+         if (ierr /= 0) return
+         Hp_face_p1 = shift_p1(Hp_face_p1)
+
+         PII_face_00 = compute_PII_face(s, k, ierr)
+         if (ierr /= 0) return
+         PII_face_p1 = compute_PII_face(s, k+1, ierr)
+         if (ierr /= 0) return
+         PII_face_p1 = shift_p1(PII_face_p1)
+
+         PII_div_Hp_cell = 0.5d0*(PII_face_00/Hp_face_00 + PII_face_p1/Hp_face_p1)
+         Source = PII_div_Hp_cell*w_00*T_00*P_00*QQ_00/Cp_00  
+         
+         ! PII units same as Cp = erg g^-1 K^-1
+         ! P*QQ/Cp is unitless (see Y_face)
+         ! Source units = (erg g^-1 K^-1) cm^-1 cm s^-1 K
+         !     = erg g^-1 s^-1
+
+         s% SOURCE(k) = Source%val
+
+         if (is_bad(Source%val)) then
+            !$omp critical (hydro_equ_turbulent_crit3)
+            write(*,2) 'Source', k, Source%val
+            write(*,2) 'Hp_face_00', k, Hp_face_00%val
+            write(*,2) 'Hp_face_p1', k, Hp_face_p1%val
+            write(*,2) 'PII_face_00', k, PII_face_00%val
+            write(*,2) 'PII_face_p1', k, PII_face_p1%val
+            write(*,2) 'Cp_00', k, Cp_00%val
+            write(*,2) 'QQ_00', k, QQ_00%val
+            write(*,2) 'P_00', k, P_00%val
+            write(*,2) 'T_00', k, T_00%val
+            write(*,2) 'w_00', k, w_00%val
+            stop 'compute_Source'
+            !$omp end critical (hydro_equ_turbulent_crit3)
+         end if
+
+      end function compute_Source
+
+
+      function compute_D(s, k, ierr) result(D) ! erg g^-1 s^-1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: D
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Hp_cell, w_00, dw3
+         include 'formats'
          real(dp) :: alpha
          ierr = 0
          alpha = s% TDC_alfa
          if (alpha == 0d0) then
             D = 0d0
-         else
-            D = (pow(w_00,3d0) - pow(min_w,3d0))/(alpha * h_00)
+            s% DAMP(k) = 0d0
+            return
          end if
+         Hp_cell = compute_Hp_cell(s,k,ierr)
+         if (ierr /= 0) return
+         w_00 = wrap_w_00(s,k)
+         ! partials bad if w -> 0 for this, so must test to avoid that case
+         if (w_00%val < min_w) w_00 = 0
+         dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
+         D = (x_CEDE/alpha)*dw3/Hp_cell
+         ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          s% DAMP(k) = D%val
-
       end function compute_D
 
 
-      function compute_Source(s, k, & ! following RSP's definition
-            w_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, &
-            ChiT_00, ChiRho_00, Cp_00, ierr) result(Source)
-         ! Inputs
+      function compute_Dr(s, k, ierr) result(Dr) ! erg g^-1 s^-1 = cm^2 s^-3
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(in) :: &
-            w_00, d_00, d_p1, T_00, P_00, h_00, r_00, r_p1, &
-            ChiT_00, ChiRho_00, Cp_00
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: Source
+         type(auto_diff_real_star_order1) :: Dr
          integer, intent(out) :: ierr
-         
-         type(auto_diff_real_18var_order1) :: &
-            T_m1, T_p1, d_m1, P_m1, P_p1, chiT_m1, chiT_p1, chiRho_m1, chiRho_p1, &
-            Cp_m1, Cp_p1, QQ_m1, QQ_00, QQ_p1, lnT_m1, lnT_00, lnT_p1, &
-            QQ_div_Cp_face_00, QQ_div_Cp_face_p1, QQ_div_Cp, Y1_00, Y1_p1, Y_cell, PII
-         real(dp) :: alpha
+         type(auto_diff_real_star_order1) :: &
+            etrb_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
+         real(dp) :: gammar, alpha, POM
          include 'formats'
          ierr = 0
          alpha = s% TDC_alfa
-         if (alpha == 0d0) then
-            Source = 0d0
-         else
-         
-            T_m1 = wrap_T_m1(s, k)
-            T_p1 = wrap_T_p1(s, k)                  
-            d_m1 = wrap_d_m1(s, k)         
-            P_m1 = wrap_P_m1(s, k)
-            P_p1 = wrap_P_p1(s, k)
-            chiT_m1 = wrap_chiT_m1(s, k)
-            chiT_p1 = wrap_chiT_p1(s, k)         
-            chiRho_m1 = wrap_chiRho_m1(s, k)
-            chiRho_p1 = wrap_chiRho_p1(s, k)
-            Cp_m1 = wrap_Cp_m1(s, k)
-            Cp_p1 = wrap_Cp_p1(s, k)        
-            QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1) ! thermal expansion coefficient
-            QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
-            QQ_p1 = chiT_p1/(d_p1*T_p1*chiRho_p1)         
-            lnT_m1 = 0d0
-            if (k > 1) then
-               lnT_m1%val = s% lnT(k-1)
-               lnT_m1% d1Array(i_lnT_m1) = 1d0
-            end if
-            lnT_00 = 0d0
-            lnT_00%val = s% lnT(k)
-            lnT_00% d1Array(i_lnT_00) = 1d0
-            lnT_p1 = 0d0
-            if (k < s% nz) then
-               lnT_p1%val = s% lnT(k+1)
-               lnT_p1% d1Array(i_lnT_p1) = 1d0
-            end if
-            
-            if (k > 1) then
-               QQ_div_Cp_face_00 = 0.5d0*(QQ_m1/Cp_m1 + QQ_00/Cp_00)
-               Y1_00 = QQ_div_Cp_face_00*(P_m1 - P_00) - (lnT_m1 - lnT_00)
-            else
-               QQ_div_Cp_face_00 = 0d0
-               Y1_00 = 0d0
-            end if
-            
-            if (k < s% nz) then
-               QQ_div_Cp_face_p1 = 0.5d0*(QQ_00/Cp_00 + QQ_p1/Cp_p1)
-               Y1_p1 = QQ_div_Cp_face_p1*(P_00 - P_p1) - (lnT_00 - lnT_p1)
-            else
-               QQ_div_Cp_face_p1 = 0d0
-               Y1_p1 = 0d0
-            end if
-               
-            QQ_div_Cp = 0.5d0*(QQ_div_Cp_face_00 + QQ_div_Cp_face_p1)
-
-            Y_cell = 0.5d0*(Y1_00*pow2(r_00) + Y1_p1*pow2(r_p1))
-
-            Source = alpha * Y_cell * d_00 * T_00 * P_00 * Cp_00 * QQ_div_Cp * w_00 / s% dm(k)
-
-         if (is_bad(Source%val)) then
-!$omp critical (hydro_equ_turbulent_crit3)
-            write(*,2) 'Source', k, Source%val
-            write(*,2) 'Y_cell', k, Y_cell%val
-            write(*,2) 'QQ_div_Cp', k, QQ_div_Cp%val
-            write(*,2) 'QQ_div_Cp_face_00', k, QQ_div_Cp_face_00%val
-            write(*,2) 'QQ_div_Cp_face_p1', k, QQ_div_Cp_face_p1%val
-            write(*,2) 'd_00', k, d_00%val
-            write(*,2) 'T_00', k, T_00%val
-            write(*,2) 'P_00', k, P_00%val
-            write(*,2) 'Cp_00', k, Cp_00%val
-            write(*,2) 'w_00', k, w_00%val
-            write(*,2) 'Y1_00', k, Y1_00%val
-            write(*,2) 'Y1_p1', k, Y1_p1%val
-            write(*,2) 'r_00', k, r_00%val
-            write(*,2) 'r_p1', k, r_p1%val
-            stop 'compute_Source'
-!$omp end critical (hydro_equ_turbulent_crit3)
+         gammar = s% TDC_alfar*x_GAMMAR
+         if (gammar == 0d0) then
+            Dr = 0d0
+            s% DAMPR(k) = 0d0
+            return
          end if
-            
-         end if
+         etrb_00 = wrap_etrb_00(s,k)
+         T_00 = wrap_T_00(s,k)
+         d_00 = wrap_d_00(s,k)
+         Cp_00 = wrap_Cp_00(s,k)
+         kap_00 = wrap_kap_00(s,k)
+         Hp_cell = compute_Hp_cell(s,k,ierr)
+         if (ierr /= 0) return
+         POM = 4d0*boltz_sigma*(gammar/alpha)**2 ! erg cm^-2 K^-4 s^-1
+         POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00) 
+            ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
+            ! K^3 / (cm^-4 erg K^-1) = K^4 cm^4 erg^-1
+         Dr = POM*POM2*etrb_00/pow2(Hp_cell)
+         ! (erg cm^-2 K^-4 s^-1) (K^4 cm^4 erg^-1) cm^2 s^-2 cm^-2
+         ! cm^2 s^-3 = erg g^-1 s^-1
+         s% DAMPR(k) = Dr%val
+      end function compute_Dr
 
-         s% SOURCE(k) = Source%val
 
-      end function compute_Source
-
-
-      function compute_Uq(s, k, & ! following RSP's definition
-            r_m1, r_00, r_p1, v_m1, v_00, v_p1, m_m1, m_00, m_p1, &
-            cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00, d_m1, d_00, &
-            P_m1, P_00, w_m1, w_00, ierr) result(Uq)
-         ! Inputs
+      function compute_C(s, k, ierr) result(C) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: m_m1, m_00, m_p1, cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00
-         type(auto_diff_real_18var_order1), intent(in) :: r_m1, r_00, r_p1, v_m1, v_00, v_p1
-         type(auto_diff_real_18var_order1), intent(in) :: d_m1, d_00, P_m1, P_00, w_m1, w_00
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: Uq
+         type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
-         real(dp) :: alpha, alpha_m
-         type(auto_diff_real_18var_order1) :: r6_00, &
-            cgrav_mid_00, rmid_00, mmid_00, g_00, h_00, &
-            w_rho2_00, r6_cell_00, d_v_div_r_00, Chi_00, &
-            cgrav_mid_m1, rmid_m1, mmid_m1, g_m1, h_m1, &
-            w_rho2_m1, r6_cell_m1, d_v_div_r_m1, Chi_m1
-         include 'formats'
-         ierr = 0
-         
-         alpha = s% TDC_alfa
-         alpha_m = s% TDC_alfam
-         if (alpha == 0d0 .or. alpha_m == 0d0 .or. k == 1) then
-         
-            Uq = 0d0
-            
-         else
-         
-            cgrav_mid_00 = 0.5d0 * (cgrav_p1 + cgrav_00)
-            rmid_00 = 0.5d0 * (r_00 + r_p1)
-            mmid_00 = 0.5d0 * (m_00 + m_p1)
-            g_00 = cgrav_mid_00 * mmid_00 / pow2(rmid_00) ! gravity in cell k
-
-            cgrav_mid_m1 = 0.5d0 * (cgrav_00 + cgrav_m1)
-            rmid_m1 = 0.5d0 * (r_m1 + r_00)
-            mmid_m1 = 0.5d0 * (m_m1 + m_00)
-            g_m1 = cgrav_mid_m1 * mmid_m1 / pow2(rmid_m1) ! gravity in cell k-1
-
-            h_00 = P_00 / (d_00 * g_00) ! Scale height in cell k
-            h_m1 = P_m1 / (d_m1 * g_m1) ! Scale height in cell k-1
-         
-            r6_00 = pow6(r_00)
-            w_rho2_00 = w_00*pow2(d_00)
-            r6_cell_00 = 0.5d0*(r6_00 + pow6(r_p1))
-            d_v_div_r_00 = v_00/r_00 - v_p1/r_p1
-            Chi_00 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_00*r6_cell_00*h_00*d_v_div_r_00/dm_00         
-
-            w_rho2_m1 = w_m1*pow2(d_m1)
-            r6_cell_m1 = 0.5d0*(pow6(r_m1) + r6_00)
-            d_v_div_r_m1 = v_m1/r_m1 - v_00/r_00
-            Chi_m1 = (16d0/3d0)*pi*alpha*alpha_m*w_rho2_m1*r6_cell_m1*h_m1*d_v_div_r_m1/dm_m1         
-         
-            Uq = 4d0*pi*(Chi_m1 - Chi_00)/(s% dm_bar(k)*r_00)
-            
+         type(auto_diff_real_star_order1) :: Source, D, Dr
+         if (non_turbulent_cell(s,k)) then
+            s% SOURCE(k) = 0d0
+            s% DAMP(k) = 0d0
+            s% DAMPR(k) = 0d0
+            s% COUPL(k) = 0d0
+            return
          end if
+         Source = compute_Source(s, k, ierr)
+         if (ierr /= 0) return
+         D = compute_D(s, k, ierr)
+         if (ierr /= 0) return
+         Dr = compute_Dr(s, k, ierr)
+         if (ierr /= 0) return
+         C = Source - D - Dr
+         s% COUPL(k) = C%val
+      end function compute_C
 
-         s% Uq(k) = Uq%val
 
-      end function compute_Uq
-
-      !! Computes the radiative luminosity at face k
-      !!
-      !! @param k Face index
-      !! @param dm_bar Face mass
-      !! @param r Face radius
-      !! @param T_m1 Temperature of cell k-1
-      !! @param T_00 Temperature of cell k
-      !! @param kap_m1 Opacity of cell k-1
-      !! @param kap_00 Opacity of cell k
-      !! @param Lr Radiative Luminosity
-      function compute_Lr(s, k, dm_bar, area, T_m1, T_00, kap_m1, kap_00, ierr) result(Lr)
-         ! Inputs
+      function compute_L_face(s, k, ierr) result(L_face) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: dm_bar
-         type(auto_diff_real_18var_order1), intent(in) :: area, T_m1, T_00, kap_m1, kap_00
-
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: Lr
+         type(auto_diff_real_star_order1) :: L_face
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Lr, Lc, Lt
+         call compute_L_terms(s, k, L_face, Lr, Lc, Lt, ierr)
+         return
+      end function compute_L_face
 
-         ! Intermediates
-         type(auto_diff_real_18var_order1) :: Erad, T400, T4m1, d_P_rad, kap_face
+
+      function compute_Lr(s, k, ierr) result(Lr) ! erg s^-1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Lr
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: &
+            r_00, area, T_00, T400, Erad, T_m1, T4m1, &
+            kap_00, kap_m1, kap_face, diff_T4_div_kap, BW, BK
          real(dp) :: alfa
-         
          include 'formats'
-         
          ierr = 0
-
+         r_00 = wrap_r_00(s,k) ! not time centered for luminosity
+         area = 4d0*pi*pow2(r_00)
+         T_00 = wrap_T_00(s,k)
+         T400 = pow4(T_00)
          if (k == 1) then ! Lr(1) proportional to Erad in cell(1)
-         
-            Erad = crad * pow4(T_00)
+            Erad = crad * T400
             Lr = s% TDC_Lsurf_factor * area * clight * Erad
-            
-         else 
-         
-            T400 = pow4(T_00)
-            T4m1 = pow4(T_m1)
-            d_P_rad = crad/3d0*(T4m1 - T400)
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
-            Lr = -d_P_rad/dm_bar*clight*pow2(area)/kap_face
-            
+            s% Lr(k) = Lr%val
+            return
          end if
-         
+         T_m1 = wrap_T_m1(s,k)
+         T4m1 = pow4(T_m1)            
+         alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+         kap_00 = wrap_kap_00(s,k)
+         kap_m1 = wrap_kap_m1(s,k)
+         kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
+         diff_T4_div_kap = (T4m1 - T400)/kap_face
+         if (s% TDC_use_Stellingwerf_Lr) then ! RSP style
+            BW = log(T4m1/T400)
+            if (abs(BW%val) > 1d-20) then
+               BK = log(kap_m1/kap_00)
+               if (abs(1d0 - BK%val/BW%val) > 1d-15 .and. abs(BW%val - BK%val) > 1d-15) then
+                  diff_T4_div_kap = (T4m1/kap_m1 - T400/kap_00)/(1d0 - BK/BW)
+               end if
+            end if
+         end if
+         Lr = -crad*clight/3d0*diff_T4_div_kap*pow2(area)/s% dm_bar(k)       
+         ! units (erg cm^-3 K^-4) (cm s^-1) (K^4 cm^-2 g cm^4) g^-1 = erg s^-1  
          s% Lr(k) = Lr%val
-
       end function compute_Lr
 
 
-      function compute_Lc(s, k, ierr) result(Lc) ! copy the RSP version
-         ! Inputs
+      function compute_Lc(s, k, ierr) result(Lc) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: Lc
+         type(auto_diff_real_star_order1) :: Lc
          integer, intent(out) :: ierr
-         type(auto_diff_real_18var_order1) :: Lc_eturb_face_factor
-         Lc = compute_Lc_terms(s, k, Lc_eturb_face_factor, ierr)
+         type(auto_diff_real_star_order1) :: Lc_w_face_factor
+         Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
          s% Lc(k) = Lc%val
       end function compute_Lc
 
-      function compute_Lc_terms(s, k, Lc_eturb_face_factor, ierr) result(Lc) ! copy the RSP version
-         ! Inputs
+
+      function compute_Lc_terms(s, k, Lc_w_face_factor, ierr) result(Lc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: Lc, Lc_eturb_face_factor
+         type(auto_diff_real_star_order1) :: Lc, Lc_w_face_factor
          integer, intent(out) :: ierr
-         ! Intermediates
-         real(dp) :: alpha, dm_bar, cgrav, m
-         type(auto_diff_real_18var_order1) :: &
-            T_m1, lnT_m1, d_m1, P_m1, w_m1, chiT_m1, chiRho_m1, Cp_m1, QQ_m1, &
-            T_00, lnT_00, d_00, P_00, w_00, chiT_00, chiRho_00, Cp_00, QQ_00, r_00, &
-            P_div_rho_face, Hp_face, QQ_div_Cp_face, Y1, avg_Vol, area, Y2, Y_face, &
-            Cp_face, PII_face, eturb_face, T_rho_face
+         type(auto_diff_real_star_order1) :: r_00, area, &
+            T_m1, T_00, d_m1, d_00, w_m1, w_00, T_rho_face, PII_face, w_face
+         real(dp) :: ALFAC, ALFAS
          include 'formats'
-
          ierr = 0
-
-         ! Get reals
-         alpha = s% TDC_alfa
-         if (alpha <= 0d0 .or. k == 1) then
-            area = 0d0
-            T_rho_face = 0d0
-            PII_face = 0d0
-            eturb_face = 0d0
+         if (s% TDC_alfa <= 0d0 .or. k == 1 .or. k == s% nz) then
+            Lc_w_face_factor = 0d0
             Lc = 0d0
-            return
+         else if (s% w(k-1) < min_w .and. s% w(k) < min_w) then
+            Lc_w_face_factor = 0d0
+            Lc = 0d0
+         else
+            r_00 = wrap_r_00(s, k) ! not time centered for luminosity
+            area = 4d0*pi*pow2(r_00)
+            T_m1 = wrap_T_m1(s, k)
+            T_00 = wrap_T_00(s, k)         
+            d_m1 = wrap_d_m1(s, k)
+            d_00 = wrap_d_00(s, k)
+            if (s% w(k-1) < min_w) then
+               w_m1 = 0d0
+            else
+               w_m1 = wrap_w_m1(s, k)
+            end if
+            if (s% w(k) < min_w) then
+               w_00 = 0d0
+            else
+               w_00 = wrap_w_00(s, k)
+            end if
+            T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
+            PII_face = compute_PII_face(s, k, ierr)
+            w_face = 0.5d0*(w_m1 + w_00)
+            ALFAC = x_ALFAC
+            ALFAS = x_ALFAS
+            Lc_w_face_factor = area*(ALFAC/ALFAS)*T_rho_face*PII_face
+            ! units = cm^2 K g cm^-3 ergs g^-1 K^-1 = ergs cm^-1
+            Lc = w_face*Lc_w_face_factor
+            ! units = cm s^-1 ergs cm^-1 = ergs s^-1
          end if
-         
-         dm_bar = s% dm_bar(k)
-         cgrav = s% cgrav(k)
-         m = s% m(k)
-
-         ! Wrap auto_diff variables
-         r_00 = wrap_r_00(s, k)
-         T_m1 = wrap_T_m1(s, k)
-         T_00 = wrap_T_00(s, k)         
-         d_m1 = wrap_d_m1(s, k)
-         d_00 = wrap_d_00(s, k)
-         P_m1 = wrap_P_m1(s, k)
-         P_00 = wrap_P_00(s, k)
-         w_m1 = sqrt(wrap_w_m1(s, k))
-         w_00 = sqrt(wrap_w_00(s, k))
-         chiT_m1 = wrap_chiT_m1(s, k)
-         chiT_00 = wrap_chiT_00(s, k)
-         chiRho_m1 = wrap_chiRho_m1(s, k)
-         chiRho_00 = wrap_chiRho_00(s, k)
-         Cp_m1 = wrap_Cp_m1(s, k)
-         Cp_00 = wrap_Cp_00(s, k)
-         lnT_m1 = 0d0
-         lnT_m1%val = s% lnT(k-1)
-         lnT_m1% d1Array(i_lnT_m1) = 1d0
-         lnT_00 = 0d0
-         lnT_00%val = s% lnT(k)
-         lnT_00% d1Array(i_lnT_00) = 1d0
-
-         QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1) ! thermal expansion coefficient
-         QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
-         
-         P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-         Hp_face = P_div_rho_face*pow2(r_00)/(cgrav*m)
-         QQ_div_Cp_face = 0.5d0*(QQ_m1/Cp_m1 + QQ_00/Cp_00)
-         Y1 = QQ_div_Cp_face*(P_m1 - P_00) - (lnT_m1 - lnT_00)
-         avg_Vol = 0.5d0*(1d0/d_00 + 1d0/d_m1)
-         area = 4d0*pi*pow2(r_00)
-         Y2 = area*Hp_face/(avg_Vol*dm_bar)
-         Y_face = Y1*Y2
-         
-         Cp_face = 0.5d0*(Cp_m1 + Cp_00)
-         PII_face = alpha*Cp_face*Y_face
-         eturb_face = 0.5d0*(pow2(w_m1) + pow2(w_00))
-         T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
-         Lc_eturb_face_factor = area*T_rho_face*PII_face
-         Lc = Lc_eturb_face_factor*eturb_face
-
       end function compute_Lc_terms
 
 
-      function compute_Lt(s, k, & ! copy the RSP version
-            dm_m1, dm_00, g, area, &
-            P_m1, P_00, d_m1, d_00, w_m1, w_00, ierr) result(Lt_18)
-         ! Inputs
+      function compute_Lt(s, k, ierr) result(Lt) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: dm_m1, dm_00
-         type(auto_diff_real_18var_order1), intent(in) :: &
-            g, area, P_m1, P_00, d_m1, d_00, w_m1, w_00
-
-         ! Outputs
-         type(auto_diff_real_18var_order1) :: Lt_18
+         type(auto_diff_real_star_order1) :: Lt
          integer, intent(out) :: ierr
-         
-         type(auto_diff_real_18var_order1) :: &
-            r_00, P_div_rho_face, Hp_face, rho2_face
+         type(auto_diff_real_star_order1) :: &
+            r_00, area2, d_m1, d_00, rho2_face, Hp_face, &
+            etrb_m1, etrb_00, w_m1, w_00
          real(dp) :: alpha, alpha_t
          include 'formats'
          ierr = 0
-
          alpha = s% TDC_alfa
          alpha_t = s% TDC_alfat
          if (alpha <= 0d0 .or. alpha_t <= 0d0 .or. k == 1) then
-            Lt_18 = 0d0
-         else
-            r_00 = wrap_r_00(s,k)
-            P_div_rho_face = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-            Hp_face = P_div_rho_face*pow2(r_00)/(s% cgrav(k)*s% m(k))
-            rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
-            Lt_18 = -2d0/3d0*alpha*alpha_t*pow2(area)*Hp_face*rho2_face*&
-               (pow(w_m1,3d0) - pow(w_00,3d0))/s% dm_bar(k)            
+            Lt = 0d0
+            return
          end if
-
-         s% Lt(k) = Lt_18%val
-
+         if (s% w(k-1) < min_w .and. s% w(k) < min_w) then
+            Lt = 0d0
+            return
+         end if
+         r_00 = wrap_r_00(s,k) ! not time centered for luminosity         
+         area2 = (4d0*pi)**2*pow4(r_00)
+         d_m1 = wrap_d_m1(s,k)
+         d_00 = wrap_d_00(s,k)
+         rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
+         if (s% w(k-1) < min_w) then
+            w_m1 = 0d0
+         else
+            w_m1 = wrap_w_m1(s,k)
+         end if
+         if (s% w(k) < min_w) then
+            w_00 = 0d0
+         else
+            w_00 = wrap_w_00(s,k)
+         end if
+         etrb_m1 = wrap_etrb_m1(s,k)
+         etrb_00 = wrap_etrb_00(s,k)
+         Hp_face = compute_Hp_face(s,k,ierr)
+         if (ierr /= 0) return
+         Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
+            (w_m1*etrb_m1 - w_00*etrb_00)/s% dm_bar(k)         
+         ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
+         s% Lt(k) = Lt%val
       end function compute_Lt
 
-      !! Compute the luminosity L = L_rad + L_conv + L_turb.
-      !!
-      !! @param s Star pointer
-      !! @param k Face index
-      subroutine compute_L(s, k, L, Lr, Lc, Lt, ierr)
-         ! Inputs
+
+      subroutine compute_L_terms(s, k, L, Lr, Lc, Lt, ierr)
          type (star_info), pointer, intent(in) :: s
          integer, intent(in) :: k
-
-         ! Outputs
-         type(auto_diff_real_18var_order1), intent(out) :: L, Lr, Lc, Lt
+         type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
          integer, intent(out) :: ierr         
-
-         ! Intermediates
-         real(dp) :: cgrav, dm_bar, m, dm_m1, dm_00, unused
-         type(auto_diff_real_18var_order1) :: r_00, T_m1, T_00, kap_m1, kap_00, d_m1, d_00
-         type(auto_diff_real_18var_order1) :: P_m1, P_00, s_m1, s_00, w_m1, w_00, g, area
-         type(auto_diff_real_18var_order1) :: g_cell_00, h_00, r_p1, v_00, v_p1
-         
          include 'formats'
          ierr = 0
-         
-         ! Get reals
-         dm_bar = s% dm_bar(k)
-
-         ! Wrap auto_diff variables
-         r_00 = wrap_r_00(s, k)
-         T_m1 = wrap_T_m1(s, k)
-         T_00 = wrap_T_00(s, k)
-         kap_m1 = wrap_kap_m1(s, k)
-         kap_00 = wrap_kap_00(s, k)
-
-         area = 4d0 * pi * pow2(r_00)
-
-         ! Radiative luminosity               
-         Lr = compute_Lr(s, k, dm_bar, area, T_m1, T_00, kap_m1, kap_00, ierr)
+         if (k > s% nz) then
+            L = 0d0
+            L%val = s% L_center
+            Lr = 0d0
+            Lc = 0d0
+            Lt = 0d0
+            return
+         end if
+         Lr = compute_Lr(s, k, ierr)
          if (ierr /= 0) return
-
-         ! Turbulent and convective luminosities.
          if (k == 1) then            
             Lc = 0d0
             Lt = 0d0
          else
-            m = s% m(k)
-            cgrav = s% cgrav(k)
-
-            g = m * cgrav / pow2(r_00)
-
-            r_p1 = wrap_r_p1(s, k)
-
-            dm_m1 = s%dm(k-1)
-            dm_00 = s%dm(k)
-
-            d_m1 = wrap_d_m1(s, k)
-            d_00 = wrap_d_00(s, k)
-            P_m1 = wrap_P_m1(s, k)
-            P_00 = wrap_P_00(s, k)
-            s_m1 = wrap_s_m1(s, k)
-            s_00 = wrap_s_00(s, k)
-
-            w_m1 = wrap_w_m1(s, k)
-            w_00 = wrap_w_00(s, k)
-
-            v_00 = wrap_v_00(s, k)
-            v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
-
             Lc = compute_Lc(s, k, ierr)
             if (ierr /= 0) return
-            
-            Lt = compute_Lt(s, k, dm_m1, dm_00, g, area, P_m1, P_00, d_m1, d_00, w_m1, w_00, ierr)
+            Lt = compute_Lt(s, k, ierr)
             if (ierr /= 0) return
-
          end if
-
          L = Lr + Lc + Lt
-                     
          if (abs(Lt%val)/max(1d-99,abs(L%val)) > 1d-2) then
             s% mixing_type(k) = overshoot_mixing
          else if (abs(Lc%val)/max(1d-99,abs(L%val)) > 1d-2) then
@@ -926,195 +885,86 @@
          else
             s% mixing_type(k) = no_mixing
          end if
-
-      end subroutine compute_L
-
-
-      subroutine calc_Eq_18(s, k, Eq_18, ierr) ! used by energy equation
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(out) :: Eq_18
-         integer, intent(out) :: ierr
-         real(dp) :: m_00, dm_00, cgrav
-         type(auto_diff_real_18var_order1) :: &
-            v_p1, v_00, r_p1, r_00, d_00, P_00, w_00, g_cell_00, h_00
-         include 'formats'
-
-         ierr = 0
-         m_00 = s% m(k)
-         dm_00 = s% dm(k)
-         cgrav = s% cgrav(k)
-         r_00 = wrap_r_00(s, k)
-         r_p1 = wrap_r_p1(s, k) ! Set by wrap routine to r_center when k == nz.
-         P_00 = wrap_P_00(s, k)
-         d_00 = wrap_d_00(s, k)
-         w_00 = wrap_w_00(s, k)
-         v_00 = wrap_v_00(s, k)
-         v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
-         
-         ! Compute scale height on cell k (used by epsilon_q)
-         g_cell_00 = (m_00 - 0.5d0 * dm_00) * cgrav / (0.5d0 * (r_00 + r_p1))
-         h_00 = compute_h_00(s, k, P_00, g_cell_00, d_00, ierr)
-         if (ierr /= 0) return 
-         
-         Eq_18 = compute_epsilon_q(s, k, v_p1, v_00, &
-                                 r_p1, r_00, d_00, dm_00, w_00, h_00, ierr)
-
-      end subroutine calc_Eq_18
-      
-
-      subroutine calc_Uq_18(s, k, Uq_18, ierr) ! used by momentum equation
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(out) :: Uq_18
-         integer, intent(out) :: ierr
-         real(dp) :: m_m1, m_00, m_p1, cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00
-         type(auto_diff_real_18var_order1) :: r_m1, r_00, r_p1, v_m1, v_00, v_p1
-         type(auto_diff_real_18var_order1) :: d_m1, d_00, P_m1, P_00, w_m1, w_00
-         include 'formats'
-
-         ierr = 0
-         
-         if (k == 1) then
-            Uq_18 = 0d0
-            return
-         end if
-         
-         cgrav_m1 = s% cgrav(k-1)
-         m_m1 = s% m(k-1)
-         dm_m1 = s% dm(k-1)
-         cgrav_00 = s% cgrav(k)
-         m_00 = s% m(k)
-         dm_00 = s% dm(k)
-         if (k == s% nz) then
-            cgrav_p1 = cgrav_00
-            m_p1 = s% m_center
-         else
-            cgrav_p1 = s% cgrav(k+1)
-            m_p1 = s% m(k+1)
-         end if
-
-         r_m1 = wrap_r_m1(s, k)
-         r_00 = wrap_r_00(s, k)
-         r_p1 = wrap_r_p1(s, k) ! Set by wrap routine to r_center when k == nz.
-
-         v_m1 = wrap_v_m1(s, k)
-         v_00 = wrap_v_00(s, k)
-         v_p1 = wrap_v_p1(s, k) ! Set by wrap routine to zero when k == nz.
-
-         d_m1 = wrap_d_m1(s, k)
-         d_00 = wrap_d_00(s, k)
-
-         w_m1 = wrap_w_m1(s, k)
-         w_00 = wrap_w_00(s, k)
-
-         P_00 = wrap_P_00(s, k)
-         P_m1 = wrap_P_m1(s, k)
-
-         Uq_18 = compute_Uq(s, k, r_m1, r_00, r_p1, v_m1, v_00, v_p1, m_m1, m_00, m_p1, &
-                          cgrav_m1, cgrav_00, cgrav_p1, dm_m1, dm_00, d_m1, d_00, &
-                          P_m1, P_00, w_m1, w_00, ierr)
-
-      end subroutine calc_Uq_18
+      end subroutine compute_L_terms
 
 
-      !! Calculates the pressure scale height in cell k
-      !!
-      !! @param P_00 Pressure in cell k
-      !! @param g_00 Gravity in cell k
-      !! @param d_00 Density in cell k
-      function compute_h_00(s, k, P_00, g_cell_00, d_00, ierr) result(h_00)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_18var_order1), intent(in) :: P_00, g_cell_00, d_00
-         type(auto_diff_real_18var_order1) :: h_00
-         integer, intent(out) :: ierr
-         include 'formats'
-         ierr = 0
-         h_00 = P_00 / (d_00 * g_cell_00)
-      end function compute_h_00
-
-
-      subroutine set_w_start_vars(s, ierr)
+      subroutine set_etrb_start_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
          logical :: time_center
          include 'formats'
          ierr = 0
-         time_center = (s% use_velocity_time_centering .and. s% include_L_in_velocity_time_centering)
+         time_center = (s% using_velocity_time_centering .and. &
+                        s% include_L_in_velocity_time_centering)
          do k=1,s%nz
-            call set1_w_start_vars(k, op_err) 
+            call set1_etrb_start_vars(k, op_err) 
             if (op_err /= 0) ierr = op_err  
          end do
          
          contains
          
-         subroutine set1_w_start_vars(k, ierr)   
+         subroutine set1_etrb_start_vars(k, ierr)   
             integer, intent(in) :: k
             integer, intent(out) :: ierr
-            type(auto_diff_real_18var_order1) :: L, Lr, Lc, Lt
+            type(auto_diff_real_star_order1) :: L, Lr, Lc, Lt
             include 'formats'
             ierr = 0               
             if (time_center) then
-               call compute_L(s, k, L, Lr, Lc, Lt, ierr)
+               call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr)
                if (ierr /= 0) return
                s% Lt_start(k) = Lt%val  
             else
                s% Lt_start(k) = 0d0  
             end if
-            s% w_start(k) = s% w(k)
-         end subroutine set1_w_start_vars
+            s% etrb_start(k) = s% etrb(k)
+         end subroutine set1_etrb_start_vars
          
-      end subroutine set_w_start_vars
+      end subroutine set_etrb_start_vars
       
       
-      subroutine reset_w_using_L(s, ierr)
+      subroutine reset_etrb_using_L(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, i_w, nz
-         real(dp) :: alpha, dm_bar, Lc_val, w_00
-         type(auto_diff_real_18var_order1) :: &
-            r_00, area, T_m1, T_00, kap_m1, kap_00, &
-            Lc_eturb_face_factor, L, Lr, Lc, Lt
-         real(dp), allocatable :: eturb_face(:)
+         integer :: k, i_etrb, nz
+         real(dp) :: Lc_val, w_00
+         type(auto_diff_real_star_order1) :: &
+            Lc_w_face_factor, L, Lr, Lc, Lt
+         real(dp), allocatable :: w_face(:)
          logical, parameter :: dbg = .false.
          include 'formats'
          ierr = 0
-         alpha = s% TDC_alfa
-         if (alpha == 0d0) return
+         if (s% TDC_alfa == 0d0) return ! no convection
          nz = s% nz
-         allocate(eturb_face(nz))
-         i_w = s% i_w
-         eturb_face(1) = 0d0
+         allocate(w_face(nz))
+         i_etrb = s% i_etrb
+         w_face(1) = 0d0
          do k=2, nz
-            dm_bar = s% dm_bar(k)
-            r_00 = wrap_r_00(s,k)
-            area = 4d0*pi*pow2(r_00)
-            T_m1 = wrap_T_m1(s,k)
-            T_00 = wrap_T_00(s,k)
-            kap_m1 = wrap_kap_m1(s,k)
-            kap_00 = wrap_kap_00(s,k)
-            Lr = compute_Lr(s, k, dm_bar, area, T_m1, T_00, kap_m1, kap_00, ierr)
+            Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'
-            Lc = compute_Lc_terms(s, k, Lc_eturb_face_factor, ierr)
+            Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
             if (ierr /= 0) stop 'failed in compute_Lc_terms'
-            Lc_val = s% L(k) - Lr%val ! assume Lt = 0
-            eturb_face(k) = Lc_val/Lc_eturb_face_factor%val
+            Lc_val = s% L(k) - Lr%val ! assume Lt = 0 for this
+            if (abs(Lc_w_face_factor%val) < 1d-20) then
+               w_face(k) = 0d0
+            else
+               w_face(k) = Lc_val/Lc_w_face_factor%val
+            end if
          end do
          do k=1, nz
             if (k < nz) then
-               w_00 = sqrt(max(0d0,0.5d0*(eturb_face(k) + eturb_face(k+1))))
+               w_00 = max(0.5d0*(w_face(k) + w_face(k+1)), 0d0)
             else
-               w_00 = sqrt(max(0d0,eturb_face(k)))
+               w_00 = max(w_face(k), 0d0)
             end if
-            s% xh(i_w,k) = max(min_w, w_00)
-            s% w(k) = s% xh(i_w,k)
-            call compute_L(s, k, L, Lr, Lc, Lt, ierr)
+            s% w(k) = w_00
+            s% etrb(k) = pow2(w_00)
+            s% xh(i_etrb,k) = s% etrb(k)
+            call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new w(k)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
          end do
-         if (dbg) stop 'reset_w_using_L'
-      end subroutine reset_w_using_L
+         if (dbg) stop 'reset_etrb_using_L'
+      end subroutine reset_etrb_using_L
 
 
       end module hydro_tdc

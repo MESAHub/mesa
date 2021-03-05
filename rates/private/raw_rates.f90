@@ -989,7 +989,7 @@
          integer, intent(out) :: ierr
          integer, parameter :: nv = 1
          real(dp) :: x(nv), vals(nv)
-         type (rate_table_info), pointer :: ri
+         type (rate_table_info), pointer :: ri=> null()
          include 'formats'
          ierr = 0
 
@@ -1070,12 +1070,12 @@
          
          integer :: iounit, j, nvec
          real(dp) :: tmp
-         real(dp), pointer :: work(:)
-         real(dp), pointer :: T8s(:)
-         real(dp), pointer :: f1(:), f(:,:)
+         real(dp), pointer :: work(:)=> null()
+         real(dp), pointer :: T8s(:)=> null()
+         real(dp), pointer :: f1(:)=> null(), f(:,:)=> null()
          character (len=256) :: line, rate_file
          real(dp), target :: vec_ary(20)
-         real(dp), pointer :: vec(:)
+         real(dp), pointer :: vec(:)=> null()
          
          ierr = 0
          vec => vec_ary

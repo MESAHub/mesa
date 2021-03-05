@@ -31,6 +31,8 @@
       use chem_def
       use interp_1d_def, only: pm_work_size
       use utils_lib
+      use star_utils, only: get_r_from_xh, store_r_in_xh, store_rho_in_xh, &
+         get_lnT_from_xh, store_lnT_in_xh, store_lnd_in_xh
 
       implicit none
 
@@ -218,13 +220,13 @@
             if (failed('do_u')) return
          end if
 
-         if (s% TDC_flag) then ! calculate new w to conserve kinetic energy
-            if (dbg) write(*,*) 'call do_w'
-            call do_w( &
+         if (s% TDC_flag) then ! calculate new etrb to conserve turbulent energy
+            if (dbg) write(*,*) 'call do_etrb'
+            call do_etrb( &
                s, nz, nz_old, cell_type, comes_from, &
                xq_old, xq, dq_old, dq, xh, xh_old, &
                xout_old, xout_new, tmp1, ierr)
-            if (failed('do_w')) return
+            if (failed('do_etrb')) return
          end if
 
          if (s% conv_vel_flag) then
@@ -1008,8 +1010,7 @@
             interp_Vol_new, interp_xq, density_init
          integer, intent(out) :: ierr
 
-         integer :: k, from_k, kk, n, interp_lo, interp_hi, interp_n, &
-            num_revise, i_lnR, i_lnd
+         integer :: k, from_k, kk, n, interp_lo, interp_hi, interp_n, num_revise
          real(dp) :: Vol_min, Vol_max, cell_Vol, Vol_center, Vm1, V00, Vp1
 
          logical, parameter :: dbg = .false., trace_PE_residual = .false.
@@ -1019,8 +1020,6 @@
          ! NOTE: for interpolating volume, need to add point at center
 
          ierr = 0
-         i_lnR = s% i_lnR
-         i_lnd = s% i_lnd
 
          interp_lo = max(1, nzlo-1)
          interp_hi = min(nz, nzhi+1)
@@ -1128,7 +1127,7 @@
             call set1_new_r(k+1)
 
             if (cell_type(k) == unchanged_type) then
-               xh(i_lnd,k) = lnd_old(comes_from(k))
+               call store_lnd_in_xh(s, k, lnd_old(comes_from(k)), xh)
                density_new(k) = old_rho(comes_from(k))
                cycle
             end if
@@ -1155,7 +1154,7 @@
                ierr = -1; cycle
             end if
             density_new(k) = xmstar*dq(k)/cell_Vol
-            xh(i_lnd,k) = log(density_new(k))
+            call store_rho_in_xh(s, k, density_new(k), xh)
 
          end do
 
@@ -1199,14 +1198,14 @@
          do k=1,nz
             from_k = comes_from(k)
             if (new_r(k) == old_r(from_k)) then
-               xh(i_lnR,k) = xh_old(i_lnR,from_k)
+               xh(s%i_lnR,k) = xh_old(s%i_lnR,from_k)
             else
-               xh(i_lnR,k) = log(new_r(k))
+               call store_r_in_xh(s,k,new_r(k),xh)
             end if
             if (density_new(k) == old_rho(from_k)) then
-               xh(i_lnd,k) = lnd_old(from_k)
+               xh(s%i_lnd,k) = xh_old(s%i_lnd,from_k)
             else 
-               xh(i_lnd,k) = log(density_new(k))
+               call store_rho_in_xh(s,k,density_new(k),xh)
             end if
          end do
 
@@ -1368,7 +1367,7 @@
             specific_PE_old, specific_KE_old, et_old, density_new, energy_new
          integer, intent(out) :: ierr
 
-         integer :: k_old, k_old_last, i_lnT, lnT_order, energy_order
+         integer :: k_old, k_old_last, lnT_order, energy_order
          real(dp) :: &
             Rho, logRho, xq_outer, cell_dq, avg_energy, avg_PE, avg_KE, &
             new_PE, new_KE, max_delta_energy, delta_energy, revised_energy, &
@@ -1379,12 +1378,11 @@
          include 'formats'
 
          ierr = 0
-         i_lnT = s% i_lnT
          new_xa(:) = xa(:,k)
          k_old = comes_from(k)
 
          if (cell_type(k) == unchanged_type) then
-            xh(i_lnT, k) = xh_old(i_lnT, k_old)
+            xh(s%i_lnT, k) = xh_old(s%i_lnT, k_old)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
@@ -1397,7 +1395,7 @@
          cell_dq = dq(k)
 
          if (cell_type(k) == revised_type) then
-            avg_lnT = xh_old(i_lnT, k_old)
+            avg_lnT = get_lnT_from_xh(s, k, xh_old)
          else ! find average lnT between xq_outer and xq_inner
             call get_old_value_integral( &
                k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
@@ -1420,7 +1418,7 @@
          end if
 
          if (.not. s% mesh_adjust_get_T_from_E) then
-            xh(i_lnT, k) = avg_lnT
+            call store_lnT_in_xh(s, k, avg_lnT, xh)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'energy_old(k_old)', k_old, energy_old(k_old)
@@ -1430,7 +1428,7 @@
          end if
 
          if (eta_old(k_old) >= eta_limit) then
-            xh(i_lnT, k) = avg_lnT
+            call store_lnT_in_xh(s, k, avg_lnT, xh)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
                write(*,2) 'eta_old(k_old)', k_old, eta_old(k_old)
@@ -1490,9 +1488,10 @@
                avg_KE = sum_energy/cell_dq
             end if
          
-            s% r(k) = exp(s% xh(s% i_lnr,k))
-            if (k < s% nz) s% r(k+1) = exp(s% xh(s% i_lnr,k+1))
+            s% r(k) = get_r_from_xh(s,k)
+            if (k < s% nz) s% r(k+1) = get_r_from_xh(s,k+1)
             if (ierr /= 0) return
+            
             new_PE = cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
             if (s% u_flag) then
                s% u(k) = s% xh(s% i_u,k)
@@ -1534,8 +1533,8 @@
             energy_new(k) = energy_old(k_old)
             ierr = 0
          end if
-
-         xh(i_lnT,k) = new_lnT
+         
+         call store_lnT_in_xh(s, k, new_lnT, xh)
 
          if (ierr /= 0) then
             write(*,2) 'mesh_adjust do1_lnT ierr', ierr
@@ -1677,7 +1676,7 @@
             s, k, h1, he3, he4, species, xa, tol, &
             Rho, logRho, energy, lnT_guess, lnT, result_energy, ierr)
          use eos_support, only: solve_eos_given_DE
-         use eos_def, only: num_eos_basic_results, i_lnE
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnE
          use chem_lib, only: basic_composition_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, h1, he3, he4, species
@@ -1688,25 +1687,22 @@
          real(dp) :: &
             X, Y, Z, T, logT, res(num_eos_basic_results), &
             d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
-            d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
-            abar, zbar, z53bar, z2bar, ye, mass_correction, sumx, logT_tol, logE_tol
+            d_dxa(num_eos_d_dxa_results, s% species), &
+            logT_tol, logE_tol
          integer :: j
 
          include 'formats'
 
          ierr = 0
 
-         call basic_composition_info(species, s% chem_id, xa(:), X, Y, Z, &
-               abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-
          logT_tol = tol ! 1d-11
          logE_tol = tol ! 1d-11
          call solve_eos_given_DE( &
-            s, k, Z, X, abar, zbar, xa(:), &
+            s, k, xa(:), &
             logRho, log10(energy), lnT_guess/ln10, &
             logT_tol, logE_tol, &
             logT, res, d_dlnd, d_dlnT, &
-            d_dabar, d_dzbar, &
+            d_dxa, &
             ierr)
          lnT = logT*ln10
          
@@ -1734,10 +1730,6 @@
             write(*,1) 'logRho =', logRho
             write(*,1) 'logT_guess =', lnT_guess/ln10
             write(*,1) 'energy =', energy
-            write(*,1) 'Z =', Z
-            write(*,1) 'X =', X
-            write(*,1) 'abar =', abar
-            write(*,1) 'zbar =', zbar
             write(*,*)
             write(*,*)
          end subroutine show
@@ -2139,7 +2131,7 @@
          end do
 
          s% j_rot(k) = j_tot/dq_sum
-         r00 = exp(xh(s% i_lnR, k))
+         r00 = get_r_from_xh(s,k)
          if (s% fitted_fp_ft_i_rot) then
             s% w_div_w_crit_roche(k) = &
                w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
@@ -2651,9 +2643,7 @@
       end subroutine adjust1_u
 
       
-      ! the logic for w is identical to that for u
-      ! could merge the code, but the extra complexity is not worth it
-      subroutine do_w( &
+      subroutine do_etrb( & ! same logic as do_u
             s, nz, nz_old, cell_type, comes_from, &
             old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
             xout_old, xout_new, old_eturb, ierr)
@@ -2666,26 +2656,26 @@
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
-         integer :: k, j, op_err, old_k, new_k, i_w
+         integer :: k, j, op_err, old_k, new_k, i_etrb
          real(dp) :: old_eturb_tot, new_eturb_tot, xmstar, err
 
          include 'formats'
          ierr = 0
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          xmstar = s% xmstar
 
          old_eturb_tot = 0d0
-         do k=1,nz_old ! skip common factor 1/2 xmstar in ke
-            old_eturb(k) = old_dq(k)*xh_old(i_w,k)*xh_old(i_w,k)
+         do k=1,nz_old
+            old_eturb(k) = old_dq(k)*xh_old(i_etrb,k)*xh_old(i_etrb,k)
             old_eturb_tot = old_eturb_tot + old_eturb(k)
          end do
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, nz
             op_err = 0
-            call adjust1_w( &
+            call adjust1_etrb( &
                s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
-               old_dq, new_dq, old_eturb, i_w, xh, xh_old, op_err)
+               old_dq, new_dq, old_eturb, i_etrb, xh, xh_old, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -2695,7 +2685,7 @@
 
          new_eturb_tot = 0
          do k=1,nz
-            new_eturb_tot = new_eturb_tot + new_dq(k)*xh(i_w,k)*xh(i_w,k)
+            new_eturb_tot = new_eturb_tot + new_dq(k)*xh(i_etrb,k)
          end do
 
          err = abs(old_eturb_tot - new_eturb_tot)/max(new_eturb_tot,old_eturb_tot,1d0)
@@ -2706,19 +2696,19 @@
                err, new_eturb_tot, old_eturb_tot
             if (err > 1d-10) then
                write(*,*) 'err too large'
-               stop 'do_w'
+               stop 'do_etrb'
             end if
          end if
 
-      end subroutine do_w
+      end subroutine do_etrb
 
 
-      subroutine adjust1_w( &
+      subroutine adjust1_etrb( &
             s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
-            old_dq, new_dq, old_eturb, i_w, xh, xh_old, ierr)
+            old_dq, new_dq, old_eturb, i_etrb, xh, xh_old, ierr)
          ! set new value for s% w(k) to conserve turbulent energy
          type (star_info), pointer :: s
-         integer, intent(in) :: k, nz, nz_old, i_w
+         integer, intent(in) :: k, nz, nz_old, i_etrb
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), intent(in) :: &
             xout_old, xout_new, old_dq, new_dq, old_eturb
@@ -2738,11 +2728,11 @@
          if (cell_type(k) == unchanged_type .or. &
                cell_type(k) == revised_type) then
             if (k == 1) then
-               xh(i_w,k) = xh_old(i_w,comes_from(k))
+               xh(i_etrb,k) = xh_old(i_etrb,comes_from(k))
                return
             end if
             if (cell_type(k-1) == unchanged_type) then
-               xh(i_w,k) = xh_old(i_w,comes_from(k))
+               xh(i_etrb,k) = xh_old(i_etrb,comes_from(k))
                return
             end if
          end if
@@ -2860,7 +2850,7 @@
                   ierr = -1
                   !return
                   write(*,*) 'dq <= 0', dq
-                  stop 'debugging: adjust1_w'
+                  stop 'debugging: adjust1_etrb'
                end if
 
             end if
@@ -2871,20 +2861,9 @@
 
          end do
 
-         xh(i_w,k) = sqrt(eturb_sum/new_cell_dq) ! we have skipped the 1/2 xmstar factor
-         if (xh_old(i_w,comes_from(k)) < 0d0) xh(i_w,k) = -xh(i_w,k)
+         xh(i_etrb,k) = eturb_sum/new_cell_dq
 
-         if (k == k_dbg) then
-!$OMP critical (adjust1_w_dbg)
-            write(*,2) 'xh(i_w,k) new_dq', k, xh(i_w,k), new_dq(k)
-            write(*,2) 'xh_old(i_w,comes_from(k)) old_dq', &
-               comes_from(k), xh_old(i_w,comes_from(k)), old_dq(comes_from(k))
-            if (k == k_dbg) stop 'adjust1_w'
-!$OMP end critical (adjust1_w_dbg)
-            !stop
-         end if
-
-      end subroutine adjust1_w
+      end subroutine adjust1_etrb
 
 
 

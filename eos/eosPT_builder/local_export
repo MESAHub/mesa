@@ -1,4 +1,0 @@
-rm -rf ../data/eosPT_data/
-mkdir ../data/eosPT_data
-mkdir ../data/eosPT_data/cache
-cp data/eosPT_data/mesa*.data ../data/eosPT_data

@@ -10,9 +10,7 @@
   save_model_when_terminate = .true.
   save_model_filename = 'pulse.mod'
 
-  ! terminate immediately
-
-  steps_to_take_before_terminate = 0
+  steps_to_take_before_terminate = 5
 
 / !end of star_job namelist
 

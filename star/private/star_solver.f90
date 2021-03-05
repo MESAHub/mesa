@@ -653,14 +653,10 @@
 
 
          subroutine set_param_defaults
-
-
-
             if (s% corr_param_factor == 0) s% corr_param_factor = 10d0
             if (s% scale_max_correction == 0) s% scale_max_correction = 1d99
             if (s% corr_norm_jump_limit == 0) s% corr_norm_jump_limit = 1d99
             if (s% max_corr_jump_limit == 0) s% max_corr_jump_limit = 1d99
-
          end subroutine set_param_defaults
 
 
@@ -708,7 +704,7 @@
 
             ierr = 0
             coeff = 0
-            dbg_adjust = .false.  !  (s% trace_k > 0 .and. s% trace_k <= nz)
+            dbg_adjust = .false.
 
             skip_eval_f = (min_corr_coeff_in == 1)
             if (skip_eval_f) then
@@ -1327,19 +1323,19 @@
             if (i_var > s% nvar_hydro) then 
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
-               dvardx0_m1 = s% d_gradT_dlndm1(k)
-               dvardx0_00 = s% d_gradT_dlnd00(k)
+               dvardx0_m1 = s% gradT_ad(k)%d1Array(i_lnd_m1)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnd_00)
             else if (i_var == s% i_lnT) then
-               dvardx0_m1 = s% d_gradT_dlnTm1(k)
-               dvardx0_00 = s% d_gradT_dlnT00(k)
+               dvardx0_m1 = s% gradT_ad(k)%d1Array(i_lnT_m1)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnT_00)
             else if (i_var == s% i_lnR) then
-               dvardx0_00 = s% d_gradT_dlnR(k)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_lnR_00)
             else if (i_var == s% i_lum) then
-               dvardx0_00 = s% d_gradT_dL(k)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_L_00)
             else if (i_var == s% i_ln_cvpv0) then
-               dvardx0_00 = s% d_gradT_dln_cvpv0(k)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_xtra1_00)
             else if (i_var == s% i_w_div_wc) then
-               dvardx0_00 = s% d_gradT_dw_div_wc(k)
+               dvardx0_00 = s% gradT_ad(k)%d1Array(i_xtra2_00)
             end if
          end subroutine get_gradT_partials
          
@@ -1354,15 +1350,15 @@
             if (i_var > s% nvar_hydro) then 
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
-               dvardx0_m1 = s% d_mlt_vc_dlndm1(k)
-               dvardx0_00 = s% d_mlt_vc_dlnd00(k)
+               dvardx0_m1 = s% mlt_vc_ad(k)%d1Array(i_lnd_m1)
+               dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_lnd_00)
             else if (i_var == s% i_lnT) then
-               dvardx0_m1 = s% d_mlt_vc_dlnTm1(k)
-               dvardx0_00 = s% d_mlt_vc_dlnT00(k)
+               dvardx0_m1 = s% mlt_vc_ad(k)%d1Array(i_lnT_m1)
+               dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_lnT_00)
             else if (i_var == s% i_lnR) then
-               dvardx0_00 = s% d_mlt_vc_dlnR(k)
+               dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_lnR_00)
             else if (i_var == s% i_lum) then
-               dvardx0_00 = s% d_mlt_vc_dL(k)
+               dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_L_00)
             end if
          end subroutine get_mlt_vc_partials
          
@@ -1704,14 +1700,14 @@
                return
             end if
             do k=1,nz
-               x(1,k) = s% u_face_18(k)%val
+               x(1,k) = s% u_face_ad(k)%val
                if (is_bad_num(x(1,k))) then
                   write(*,2) 'exit_setmatrix x(1,k)', k, x(1,k)
                   stop
                end if
             end do
             do k=1,nz
-               x(2,k) = s% P_face_18(k)%val
+               x(2,k) = s% P_face_ad(k)%val
                if (is_bad_num(x(2,k))) then
                   write(*,2) 'exit_setmatrix x(2,k)', k, x(2,k)
                   stop

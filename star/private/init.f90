@@ -96,7 +96,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -109,7 +109,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          real(dp), intent(in) :: reaclib_min_T9
@@ -132,7 +132,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -328,7 +328,7 @@
          s% tau_base = 2d0/3d0
          s% tau_factor = 1
 
-         s% solver_iter = -1
+         s% solver_iter = 0
 
          s% using_gold_tolerances = .false.
          s% using_velocity_time_centering = .false.
@@ -527,7 +527,7 @@
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% need_to_reset_w = .false.
+         s% need_to_reset_etrb = .false.
 
          s% just_wrote_terminal_header = .false.
          s% doing_relax = .false.
@@ -1206,19 +1206,15 @@
       end subroutine null_data_for_extra_binary_history_columns
 
 
-      subroutine do_garbage_collection(eosDT_cache_dir, &
-               eosPT_cache_dir, eosDE_cache_dir, ierr)
+      subroutine do_garbage_collection(eosDT_cache_dir, ierr)
          use eos_lib, only: eos_init, eos_shutdown
          use eos_def, only: use_cache_for_eos
          integer, intent(inout) :: ierr
-         character (len=*), intent(in) :: eosDT_cache_dir, &
-               eosPT_cache_dir, eosDE_cache_dir
+         character (len=*), intent(in) :: eosDT_cache_dir
          ! Remove existing eos data 
          call eos_shutdown()
          ! Re-initliaze eos
          call eos_init(eosDT_cache_dir,&
-               eosPT_cache_dir, &
-               eosDE_cache_dir, &
                ! After first init this is set in eos_def
                use_cache_for_eos,&
                ierr)

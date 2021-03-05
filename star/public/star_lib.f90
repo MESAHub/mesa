@@ -174,7 +174,7 @@
             s% job% jina_reaclib_min_T9, &
             s% job% rate_tables_dir, s% job% rate_cache_suffix, &
             s% job% ionization_file_prefix, s% job% ionization_Z1_suffix, &
-            s% job% eosDT_cache_dir, s% job% eosPT_cache_dir, s% job% eosDE_cache_dir, &
+            s% job% eosDT_cache_dir, &
             s% job% ionization_cache_dir, s% job% kap_cache_dir, s% job% rates_cache_dir, &
             s% job% color_num_files, s% job% color_file_names, s% job% color_num_colors, &
             ierr)
@@ -190,7 +190,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -201,7 +201,7 @@
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir
          real(dp), intent(in) :: &
             reaclib_min_T9
@@ -219,7 +219,7 @@
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
-            eosDT_cache_dir, eosPT_cache_dir, eosDE_cache_dir, &
+            eosDT_cache_dir, &
             ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
@@ -1299,10 +1299,12 @@
       end subroutine star_relax_mass
       
       
-      subroutine star_relax_mass_to_remove_H_env(id, lg_max_abs_mdot, ierr) ! also resets initial_mass
+      subroutine star_relax_mass_to_remove_H_env( &
+            id, extra_mass, lg_max_abs_mdot, ierr) ! also resets initial_mass
          use relax, only: do_relax_mass
          use report, only: get_mass_info
          integer, intent(in) :: id
+         real(dp), intent(in) :: extra_mass
          real(dp), intent(in) :: lg_max_abs_mdot ! in log10(Msun/year)
             ! e.g., -8.0 for mdot of -10^-8 Msun/year
          integer, intent(out) :: ierr
@@ -1312,7 +1314,7 @@
          if (ierr /= 0) return
          call get_mass_info(s, s% dm, ierr)
          if (ierr /= 0) return
-         call do_relax_mass(id, s% he_core_mass, lg_max_abs_mdot, ierr)      
+         call do_relax_mass(id, s% he_core_mass + extra_mass, lg_max_abs_mdot, ierr)      
       end subroutine star_relax_mass_to_remove_H_env
       
       
@@ -1422,15 +1424,6 @@
          integer, intent(out) :: ierr
          call do_relax_opacity_max(id, new_value, per_step_multiplier, ierr)      
       end subroutine star_relax_opacity_max
-      
-      
-      subroutine star_relax_fixed_L_for_BB_outer_BC(id, steps, ierr)
-         use relax, only: do_relax_fixed_L
-         integer, intent(in) :: id
-         integer, intent(in) :: steps
-         integer, intent(out) :: ierr
-         call do_relax_fixed_L(id, steps, ierr)      
-      end subroutine star_relax_fixed_L_for_BB_outer_BC
       
       
       subroutine star_relax_max_surf_dq(id, new_value, per_step_multiplier, ierr)
@@ -1765,39 +1758,6 @@
          call do_terminal_summary(s)
       end subroutine write_terminal_summary
 
-      subroutine star_set_vars_in_part1(id, dt, ierr)
-         use hydro_vars, only: set_vars
-         integer, intent(in) :: id
-         real(dp), intent(in) :: dt
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         if (s% i_lnd /= 0) then
-            s% lnd_for_d_dt_const_q(:) = 0d0
-            s% lnd_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% i_lnT /= 0) then
-            s% lnT_for_d_dt_const_q(:) = 0d0
-            s% lnT_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% i_ln_cvpv0 /= 0) then
-            s% ln_cvpv0_for_d_dt_const_q(:) = 0d0
-            s% ln_cvpv0_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% v_flag) then
-            s% v_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% u_flag) then
-            s% u_for_d_dt_const_m(:) = 0d0
-         end if
-         if (s% RTI_flag) then
-            s% alpha_RTI_for_d_dt_const_m(:) = 0d0
-         end if
-         s% lnR_for_d_dt_const_m(:) = 0d0
-         call set_vars(s, dt, ierr)
-      end subroutine star_set_vars_in_part1
 
       subroutine star_set_vars(id, dt, ierr)
          use hydro_vars, only: set_vars
@@ -2199,56 +2159,58 @@
       end subroutine star_get_peos
       
       subroutine star_solve_eos_given_PgasT( &
-            id, k, z, xh, abar, zbar, xa, &
+            id, k, xa, &
             logT, logPgas, logRho_guess, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
-         use eos_def, only: num_eos_basic_results
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
          use eos_support, only : solve_eos_given_PgasT
          integer, intent(in) :: id
          integer, intent(in) :: k ! 0 indicates not for a particular cell.
          real(dp), intent(in) :: &
-            z, xh, abar, zbar, xa(:), logT, logPgas, &
+            xa(:), logT, logPgas, &
             logRho_guess, logRho_tol, logPgas_tol
          real(dp), intent(out) :: logRho
          real(dp), dimension(num_eos_basic_results), intent(out) :: &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+            res, dres_dlnRho, dres_dlnT
+         real(dp), dimension(:,:), intent(out) :: dres_dxa         
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call solve_eos_given_PgasT( &
-            s, k, z, xh, abar, zbar, xa, &
+            s, k, xa, &
             logT, logPgas, logRho_guess, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
       end subroutine star_solve_eos_given_PgasT      
       
       subroutine star_solve_eos_given_PgasT_auto( &
-            id, k, z, xh, abar, zbar, xa, &
+            id, k, xa, &
             logT, logPgas, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
-         use eos_def, only: num_eos_basic_results
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
          use eos_support, only: solve_eos_given_PgasT_auto
          use star_def
          integer, intent(in) :: id ! id for star         
          integer, intent(in) :: k ! 0 indicates not for a particular cell.
          real(dp), intent(in) :: &
-            z, xh, abar, zbar, xa(:), logT, logPgas, &
+            xa(:), logT, logPgas, &
             logRho_tol, logPgas_tol
          real(dp), intent(out) :: logRho
          real(dp), dimension(num_eos_basic_results), intent(out) :: &
-            res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar
+            res, dres_dlnRho, dres_dlnT
+         real(dp), dimension(:,:), intent(out) :: dres_dxa
          integer, intent(out) :: ierr
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
          call solve_eos_given_PgasT_auto( &
-            s, k, z, xh, abar, zbar, xa, &
+            s, k, xa, &
             logT, logPgas, logRho_tol, logPgas_tol, &
-            logRho, res, dres_dlnRho, dres_dlnT, dres_dabar, dres_dzbar, &
+            logRho, res, dres_dlnRho, dres_dlnT, dres_dxa, &
             ierr)
       end subroutine star_solve_eos_given_PgasT_auto
 
@@ -2421,7 +2383,7 @@
       
       
       real(dp) function star_surface_omega_crit(id, ierr)
-         use star_utils, only: set_surf_avg_rotation_info
+         use hydro_rotation, only: set_surf_avg_rotation_info
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -3291,9 +3253,7 @@
          type (star_info), pointer :: s         
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return                  
-         call do_garbage_collection(s% job% eosDT_cache_dir,&
-               s% job% eosPT_cache_dir, &
-               s% job% eosDE_cache_dir,ierr)
+         call do_garbage_collection(s% job% eosDT_cache_dir, ierr)
          if (ierr /= 0) return               
       end subroutine star_do_garbage_collection
             

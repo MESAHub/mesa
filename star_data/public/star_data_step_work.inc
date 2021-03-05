@@ -36,12 +36,11 @@
       real(dp), pointer :: rho(:) ! density
       real(dp), pointer :: lnd(:) ! log(rho)
       real(dp), pointer :: lnPgas(:) ! log(Pgas)
-      real(dp), pointer :: L(:)
-         ! L(k) is luminosity at outer edge of cell k
-      real(dp), pointer :: r(:)
-         ! r(k) is radius at outer edge of cell k
-      real(dp), pointer :: lnR(:)
-         ! lnR(k) is log(r(k))
+      real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
+      real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
+      real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
+      real(dp), pointer :: etrb(:) ! specific turbulent energy.  only used when TDC_flag is true
+      real(dp), pointer :: Hp_face(:) ! pressure scale height.  only used for TDC or RSP
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -143,16 +142,6 @@
       real(dp), pointer :: tau(:) ! optical depth at cell outer boundary
       real(dp), pointer :: lntau(:) ! log(tau)
       real(dp), pointer :: dr_div_csound(:) ! sound crossing time for cell
-
-      real(dp), pointer :: lnR_residual(:)
-      real(dp), pointer :: lnd_residual(:)
-      real(dp), pointer :: equL_residual(:)
-      real(dp), pointer :: E_residual(:)
-      real(dp), pointer :: w_residual(:)
-      real(dp), pointer :: v_residual(:)
-      real(dp), pointer :: u_residual(:)
-      real(dp), pointer :: Vol_residual(:)
-      real(dp), pointer :: max_abs_xa_residual(:)
 
       real(dp), pointer :: ergs_error(:)
 
@@ -341,6 +330,7 @@
       logical, pointer :: amr_split_merge_has_undergone_remesh(:)
 
       ! -T*Ds/Dt energy generation rate related to change in entropy
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: eps_grav_ad(:) ! '_ad' for auto diff
       real(dp), pointer :: eps_grav(:)
       ! partials
       real(dp), pointer, dimension(:) :: &
@@ -430,6 +420,9 @@
             ! Q_face = chiT_face/(T_face*chiRho_face)
          real(dp), pointer :: grad_superad_actual(:) ! face, actual dlnT/dlnP - grada
          
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            gradT_ad, gradr_ad, mlt_vc_ad ! 'ad' for auto_diff
+         
          real(dp), pointer :: actual_gradT(:) ! actual dlnT/dlnP (at boundary)
             ! (dT/T_face)/(dP/P_face) with face values interpolated by mass
          
@@ -462,18 +455,22 @@
          
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
          
-      ! Convective turbulent velocity w
+      ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
             w, w_start, Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
+
+         integer :: TDC_num_periods
+         real(dp) :: TDC_period, &
+            TDC_DeltaR, TDC_DeltaMag, TDC_GRPDV, TDC_GREKM, TDC_GREKM_avg_abs
          
       ! RSP: Radial Stellar Pulsations. RSP derived from Radec Smolec's Program
 
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
             Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
-            Hp_face, d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
+            d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
             Y_face, d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
                d_Y_face_dlndm1, d_Y_face_dlnTm1, &
@@ -481,16 +478,13 @@
                d_PII_dlndm1, d_PII_dlnTm1, &
             Chi, Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
                d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
-            f_Edd, rsp_mesh_function
+            f_Edd
          integer :: RSP_num_periods
          real(dp) :: RSP_dt, RSP_period, g_Edd, &
             rsp_DeltaR, rsp_DeltaMag, rsp_GRPDV, rsp_GREKM, rsp_GREKM_avg_abs
          real(dp), dimension(max_num_rsp_LINA_modes) :: &
             rsp_LINA_periods, rsp_LINA_growth_rates
       
-      ! convection velocity equation info
-
-         real(dp), pointer, dimension(:) :: conv_vel_residual
 
       ! adjusted (non-local) mixing info -- evaluated at start of step.
          
@@ -558,19 +552,11 @@
       real(dp), pointer :: eps_WD_sedimentation(:) ! (nz)
       real(dp), pointer :: eps_diffusion(:) ! (nz)
       real(dp), pointer :: g_field_element_diffusion(:) ! (nz)
-            
-
-      ! gradients expected from structure equations
-      ! to be compared to actual gradients in model
-      ! note: these may not be set when you are using hydro-dynamics
-      real(dp), pointer :: dL_dm_expected(:) ! expected difference across cell
-      real(dp), pointer :: dlnP_dm_expected(:) ! expected difference at outer boundary of cell    
-      real(dp), pointer :: dlnT_dm_expected(:) ! expected difference at outer boundary of cell    
       
       
       ! for Riemann solver      
-      type(auto_diff_real_18var_order1), pointer, dimension(:) :: &
-         u_face_18, P_face_18
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+         u_face_ad, P_face_ad ! 'ad' for auto_diff
       real(dp), pointer, dimension(:) :: &
          d_uface_domega, &
          RTI_du_diffusion_kick, &
@@ -613,52 +599,16 @@
          ! defined at points in atmosphere
          ! atm_structure(:,1) is base of atmosphere
          ! atm_structure(:,atm_structure_num_pts) is top of atmosphere
-         
-      ! for time derivatives
-         
-         ! for calculating Lagrangian time derivatives using differences at constant m
-         ! holds values from previous model interpolated to new m(k)
-         real(dp), pointer :: lnd_for_d_dt_const_m(:)
-         real(dp), pointer :: lnT_for_d_dt_const_m(:)
-         real(dp), pointer :: lnR_for_d_dt_const_m(:)
-         real(dp), pointer :: w_for_d_dt_const_m(:) ! only set when TDC_flag is true
-         real(dp), pointer :: v_for_d_dt_const_m(:) ! only set when v_flag is true
-         real(dp), pointer :: u_for_d_dt_const_m(:) ! only set when u_flag is true
-         real(dp), pointer :: alpha_RTI_for_d_dt_const_m(:) ! only set when alpha_RTI_flag is true
-         real(dp), pointer :: ln_cvpv0_for_d_dt_const_m(:) ! only set when conv_vel_flag is true
-         
-         ! for calculating "Eulerian" time derivatives using differences at constant q
-         ! holds values from previous model interpolated to new q(k)
-         ! these are only used for eps_grav
-         real(dp), pointer :: lnd_for_d_dt_const_q(:)
-         real(dp), pointer :: lnT_for_d_dt_const_q(:)
-         real(dp), pointer :: ln_cvpv0_for_d_dt_const_q(:)
         
-      ! lagrangian time derivatives
+      ! changes in values for cells during solver iterations 
       
-         real(dp), pointer :: dlnd_dt(:)
-         real(dp), pointer :: dlnT_dt(:)
-         real(dp), pointer :: dlnR_dt(:)
-         real(dp), pointer :: dw_dt(:) ! only set when TDC_flag is true
-         real(dp), pointer :: dv_dt(:) ! only set when v_flag is true
-         real(dp), pointer :: du_dt(:) ! only set when u_flag is true
-         real(dp), pointer :: dEtRSP_dt(:) ! only used when RSP_flag is true
-         real(dp), pointer :: dln_cvpv0_dt(:) ! only set when conv_vel_flag is true
-         real(dp), pointer :: dj_rot_dt(:) ! only set when implicit_j_rot_flag is true
-         real(dp), pointer :: dalpha_RTI_dt(:) ! only set when alpha_RTI_flag is true
-         
-         ! these are only used for eps_grav
-         real(dp), pointer :: dlnd_dt_const_q(:)
-         real(dp), pointer :: dlnT_dt_const_q(:)
-         ! this is for the calculation of the time derivative of convective velocities
-         real(dp), pointer :: dln_cvpv0_dt_const_q(:)
-        
-      ! changes in values for cells during solver iterations
-         real(dp), pointer :: dxh_lnPgas(:) ! lnPgas(k) = dxh_lnPgas(k) + lnPgas_start(k); dxh_lnPgas from solver.
+         real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
          real(dp), pointer :: dxh_lnd(:) ! lnd(k) = dxh_lnd(k) + lnd_start(k); dxh_lnd from solver.
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
-         real(dp), pointer :: dxh_lnR(:) ! lnR(k) = dxh_lnR(k) + lnR_start(k); dxh_lnR from solver.
-         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_w from solver.
+         real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
+         real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
+         real(dp), pointer :: dxh_etrb(:) ! etrb(k) = dxh_etrb(k) + etrb_start(k); dxh_etrb from solver.
+         real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
       ! Rayleigh Taylor Instabilities  --  only used when RTI_flag is true
@@ -1074,6 +1024,7 @@
          real(dp), pointer :: Pgas_start(:) ! (nz)
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
+         real(dp), pointer :: etrb_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)
@@ -1168,9 +1119,9 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_make_static, RSP_just_did_remesh, RSP_just_set_velocities, &
+            RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
+            need_to_reset_etrb, using_velocity_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass
@@ -1264,9 +1215,11 @@
       ! these arrays are NOT automatically managed during restarts
 
          integer, pointer, dimension(:) :: &
-            ixtra1_array, ixtra2_array, ixtra3_array, ixtra4_array, ixtra5_array
+            ixtra1_array, ixtra2_array, ixtra3_array, &
+            ixtra4_array, ixtra5_array, ixtra6_array
          real(dp), pointer, dimension(:) :: &
-            xtra1_array, xtra2_array, xtra3_array, xtra4_array, xtra5_array
+            xtra1_array, xtra2_array, xtra3_array, &
+            xtra4_array, xtra5_array, xtra6_array
 
 
       ! equation residuals, etc
@@ -1372,7 +1325,7 @@
 
          logical, pointer :: eps_grav_form_for_energy_eqn(:)
          real(dp), pointer, dimension(:)  :: &
-            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt
+            dL_dm, energy_sources, energy_others, dwork_dm, dkedt, dpedt, dedt, detrbdt
             
          real(dp) :: &
             total_internal_energy_old, &

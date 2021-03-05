@@ -59,14 +59,10 @@ GYRE_DIRS = $(subst $(eval) ,:,$(shell test -d ../gyre && find ../gyre/src -type
 COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) -Wno-uninitialized -L$(MESA_DIR)/lib -lconst $(LOAD_MATRIX)
 #COMPILE = $(COMPILE_TO_TEST) $(FCfree) -Wno-uninitialized
 
-FPX3FLAGS = -DOMP -DDOUBLE_PRECISION -I.:$(GYRE_DIRS):../gyre/src/mesa
+FPX3FLAGS = -DOMP -DHDF5 -DDOUBLE_PRECISION -I.:$(GYRE_DIRS):../gyre/src/mesa
 
 ifeq ($(USE_OPENMP),YES)
 FPX3FLAGS := $(FPX3FLAGS) -DOMP
-endif
-
-ifeq ($(USE_HDF5),YES)
-FPX3FLAGS := $(FPX3FLAGS) -DHDF5
 endif
 
 .PRECIOUS : %.f90

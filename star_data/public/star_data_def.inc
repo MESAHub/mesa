@@ -257,16 +257,16 @@
       
       
       ! auto_diff constants for solver variables
-      ! used to access auto_diff_real_18var_order1 d1Array
+      ! used to access auto_diff_real_star_order1 d1Array
       integer, parameter :: i_lnd_m1 = 1
       integer, parameter :: i_lnd_00 = 2
       integer, parameter :: i_lnd_p1 = 3
       integer, parameter :: i_lnT_m1 = 4
       integer, parameter :: i_lnT_00 = 5
       integer, parameter :: i_lnT_p1 = 6
-      integer, parameter :: i_w_m1 = 7
-      integer, parameter :: i_w_00 = 8
-      integer, parameter :: i_w_p1 = 9
+      integer, parameter :: i_etrb_m1 = 7
+      integer, parameter :: i_etrb_00 = 8
+      integer, parameter :: i_etrb_p1 = 9
       integer, parameter :: i_lnR_m1 = 10
       integer, parameter :: i_lnR_00 = 11
       integer, parameter :: i_lnR_p1 = 12
@@ -276,6 +276,15 @@
       integer, parameter :: i_L_m1 = 16
       integer, parameter :: i_L_00 = 17
       integer, parameter :: i_L_p1 = 18
+      integer, parameter :: i_xtra1_m1 = 19
+      integer, parameter :: i_xtra1_00 = 20
+      integer, parameter :: i_xtra1_p1 = 21
+      integer, parameter :: i_xtra2_m1 = 22
+      integer, parameter :: i_xtra2_00 = 23
+      integer, parameter :: i_xtra2_p1 = 24
+      integer, parameter :: i_xtra3_m1 = 25
+      integer, parameter :: i_xtra3_00 = 26
+      integer, parameter :: i_xtra3_p1 = 27
       
 
       ! mesh cell types
@@ -614,6 +623,7 @@
       integer, parameter :: num_x_ctrls = 100
       
       integer, parameter :: GYRE_MODEL_VERSION = 101
+      integer, parameter :: GSM_MODEL_VERSION = 110
 
       ! interfaces for procedure pointers
       abstract interface
@@ -1158,14 +1168,13 @@
       
       
          subroutine other_eosDT_get_T_interface( &
-                  id, k, handle, Z, X, abar, zbar, &
+                  id, k, handle, &
                   species, chem_id, net_iso, xa, &
                   logRho, which_other, other_value, &
                   logT_tol, other_tol, max_iter, logT_guess, & 
                   logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
                   logT_result, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, &
-                  eos_calls, ierr)
+                  d_dxa_const_TRho, eos_calls, ierr)
      
             ! finds log10 T given values for density and 'other', and initial guess for temperature.
             ! does up to max_iter attempts until logT changes by less than tol.
@@ -1179,13 +1188,6 @@
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: handle
 
-            real(dp), intent(in) :: Z ! the metals mass fraction
-            real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-            real(dp), intent(in) :: abar
-               ! mean atomic number (nucleons per nucleus; grams per mole)
-            real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
             integer, intent(in) :: species
             integer, pointer :: chem_id(:) ! maps species to chem id
                ! index from 1 to species
@@ -1214,8 +1216,7 @@
             real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
             real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
             real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-            real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+            real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
          
             integer, intent(out) :: eos_calls
             integer, intent(out) :: ierr ! 0 means AOK.
@@ -1224,14 +1225,13 @@
       
 
          subroutine other_eosDT_get_Rho_interface( &
-                  id, k, handle, Z, X, abar, zbar, &
+                  id, k, handle, &
                   species, chem_id, net_iso, xa, &
                   logT, which_other, other_value, &
                   logRho_tol, other_tol, max_iter, logRho_guess,  &
                   logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
                   logRho_result, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
-                  d_dabar_const_TRho, d_dzbar_const_TRho, &
-                  eos_calls, ierr)
+                  d_dxa_const_TRho, eos_calls, ierr)
      
             ! finds log10 Rho given values for temperature and 'other', and initial guess for density.
             ! does up to max_iter attempts until logRho changes by less than tol.
@@ -1245,13 +1245,6 @@
             integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
             integer, intent(in) :: handle
 
-            real(dp), intent(in) :: Z ! the metals mass fraction
-            real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
-            real(dp), intent(in) :: abar
-               ! mean atomic number (nucleons per nucleus; grams per mole)
-            real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
             integer, intent(in) :: species
             integer, pointer :: chem_id(:) ! maps species to chem id
                ! index from 1 to species
@@ -1283,8 +1276,7 @@
             real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
             real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
             real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-            real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+            real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
 
             integer, intent(out) :: eos_calls
             integer, intent(out) :: ierr ! 0 means AOK.

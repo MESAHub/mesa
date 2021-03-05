@@ -4,8 +4,6 @@
 
       character (len=1000) :: mesa_dir, &
          eosDT_cache_dir, &
-         eosPT_cache_dir, &
-         eosDE_cache_dir, &
          ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir
@@ -74,6 +72,7 @@
       logical :: relax_M_center, relax_initial_M_center
      
       logical :: relax_mass_to_remove_H_env, relax_initial_mass_to_remove_H_env
+      real(dp) :: extra_mass_retained_by_remove_H_env
 
       logical :: relax_core, relax_initial_core
       real(dp) :: new_core_mass, dlg_core_mass_per_step, &
@@ -147,9 +146,6 @@
       logical :: relax_eps_nuc_factor, relax_initial_eps_nuc_factor
       real(dp) :: new_eps_nuc_factor
       real(dp) :: eps_nuc_factor_multiplier
-
-      logical :: relax_fixed_L_for_BB_outer_BC, relax_initial_fixed_L_for_BB_outer_BC
-      integer :: steps_for_relax_fixed_L
 
       logical :: relax_opacity_max, relax_initial_opacity_max
       real(dp) :: new_opacity_max

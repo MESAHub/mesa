@@ -23,7 +23,7 @@
          real(dp) :: when_to_stop_atol
          real(dp) :: when_to_stop_rtol
 
-         real(dp) :: max_age, max_age_in_seconds, &
+         real(dp) :: max_age, max_age_in_days, max_age_in_seconds, &
             dt_years_for_steps_before_max_age, reduction_factor_for_max_timestep
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit
@@ -257,6 +257,7 @@
             min_logT_for_make_gradr_sticky_in_solver_iters
          logical :: mlt_use_rotation_correction, make_gradr_sticky_in_solver_iters, &
             no_MLT_below_shock, no_MLT_below_T_max
+         logical :: mlt_make_surface_no_mixing
 
          real(dp) :: T_mix_limit
 
@@ -393,19 +394,17 @@
          real(dp) :: atm_irradiated_P_surf
          integer :: atm_irradiated_max_iters
 
-         real(dp) :: surface_extra_Pgas
-         real(dp) :: Tsurf_factor
-         real(dp) :: fixed_vsurf
-         real(dp) :: fixed_L_for_BB_outer_BC
-         real(dp) :: tau_for_L_BB
          logical :: use_atm_PT_at_center_of_surface_cell
          logical :: use_compression_outer_BC
          logical :: use_momentum_outer_BC
          logical :: use_zero_Pgas_outer_BC
          logical :: use_zero_dLdm_outer_BC
-         logical :: use_T_black_body_outer_BC
          logical :: use_fixed_vsurf_outer_BC
-         logical :: use_fixed_L_for_BB_outer_BC
+         real(dp) :: fixed_vsurf
+         logical :: use_fixed_Psurf_outer_BC
+         real(dp) :: fixed_Psurf
+         
+         real(dp) :: Tsurf_factor
 
       ! create atmosphere
 
@@ -469,7 +468,7 @@
          real(dp) :: min_q_for_k_below_const_q, max_q_for_k_below_const_q
          real(dp) :: min_q_for_k_const_mass, max_q_for_k_const_mass
 
-         ! composition of accreted material
+         ! specification of accreted material
          logical :: accrete_same_as_surface
 
          logical :: accrete_given_mass_fractions
@@ -555,7 +554,7 @@
 
          logical :: mesh_adjust_get_T_from_E, mesh_ok_to_merge
 
-         integer :: mesh_dump_call_number, mesh_max_k_old_for_split, mesh_min_k_old_for_split
+         integer :: mesh_max_k_old_for_split, mesh_min_k_old_for_split
 
          real(dp) :: max_dq, min_dq, min_dq_for_split, min_dq_for_logT, &
             min_dq_for_xa, min_dq_for_xa_convective
@@ -724,6 +723,9 @@
          real(dp) :: diffusion_T_full_on
          real(dp) :: diffusion_T_full_off
          real(dp) :: D_mix_ignore_diffusion
+         
+         real(dp) :: D_mix_zero_region_bottom_q, D_mix_zero_region_top_q, &
+            dq_D_mix_zero_at_H_He_crossover, dq_D_mix_zero_at_H_C_crossover
 
          real(dp) :: diffusion_Vlimit_dm_full_on
          real(dp) :: diffusion_Vlimit_dm_full_off
@@ -803,9 +805,9 @@
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
             always_use_eps_grav_form_of_energy_eqn, &
-            use_velocity_time_centering, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
+            use_Fraley_PdV_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
@@ -831,6 +833,11 @@
 
          logical :: include_L_in_error_est, &
             include_v_in_error_est, include_u_in_error_est
+
+         logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
+         logical :: report_min_rcond_from_DGESXV
+         
+         logical :: do_normalize_dqs_as_part_of_set_qs
 
          logical :: trace_solver_damping
 
@@ -1038,7 +1045,6 @@
          logical :: solver_show_correction_info
          real(dp) :: solver_epsder_chem, solver_epsder_struct
          
-         integer :: trace_k
          logical :: fill_arrays_with_NaNs
          logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
             warn_rates_for_high_temp

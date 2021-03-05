@@ -236,14 +236,6 @@
    logT_max_for_any_CMS_pure_He = -1
 
 
-! eosPT controls
-! --------------
-! choose which component EOSes to use with eosPT
-! ::
-
-   use_max_SCVH_for_PT = .false.
-   use_max_CMS_for_PT = .false.
-
 ! Miscellaneous controls
 ! ----------------------
 ! ::
@@ -251,7 +243,6 @@
    eosDT_use_linear_interp_for_X = .false.
    eosDT_use_linear_interp_to_HELM = .false.
    eosDT_file_prefix = 'mesa'
-   eosPT_file_prefix = 'mesa'
    okay_to_convert_ierr_to_skip = .true.
    tiny_fuzz = 1d-6
 

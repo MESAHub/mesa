@@ -214,8 +214,6 @@
       !rsp_mesh_function
 
 
-      E_residual
-      log_E_residual
       ergs_error
       ergs_error_integral
       ergs_rel_error_integral
