@@ -30,7 +30,8 @@ module hdf5io_lib
    private
 
    public :: hdf5io_t
-   public :: OPEN_FILE
+   public :: OPEN_FILE_RO
+   public :: OPEN_FILE_RW
    public :: CREATE_FILE
 
 end module hdf5io_lib

@@ -116,7 +116,7 @@ contains
     ierr = 0
 
     ! open file (read-only)
-    hi = hdf5io_t(filename, OPEN_FILE)
+    hi = hdf5io_t(filename, OPEN_FILE_RO)
     
     if (rq% show_info) write(*,*) 'AESOPUS composition parameters'
 
