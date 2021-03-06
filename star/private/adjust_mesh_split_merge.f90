@@ -46,8 +46,6 @@
          integer :: ierr
 
          include 'formats'
-         
-         if (s% TDC_flag) stop 'remesh_split_merge does not yet support TDC_flag'
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
@@ -456,17 +454,14 @@
          integer :: i, ip, i0, im, k, q, nz, qi_max, qim_max, op_err
          real(dp) :: &
             rR, rL, drR, drL, rC, rho, P, v, &
-            dm, dm_i, dm_ip, m_old, &
-            star_PE0, star_PE1, &
-            cell_mom, cell_ie, min_IE, d_IE, d_KE, d_Esum, &
-            Esum_i, KE_i, PE_i, IE_i, &
-            Esum_ip, KE_ip, PE_ip, IE_ip, &
-            Esum, KE, PE, IE, cell_IE_plus_KE, &
-            Esum1, KE1, PE1, IE1, &
+            dm, dm_i, dm_ip, m_old, star_PE0, star_PE1, &
+            cell_mom, cell_ie, cell_etrb, min_IE, d_IE, d_KE, d_Esum, &
+            Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
+            Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
+            Esum, KE, PE, IE, Esum1, KE1, PE1, IE1, &
             Etot0, KEtot0, PEtot0, IEtot0, &
             Etot1, KEtot1, PEtot1, IEtot1, &
-            Et, Et_i, Et_ip, vt_i, vt_ip, &
-            j_rot_new, j_rot_p1_new, J_old, &
+            vt_i, vt_ip, j_rot_new, j_rot_p1_new, J_old, &
             dmbar_old, dmbar_p1_old, dmbar_p2_old, &
             dmbar_new, dmbar_p1_new
          include 'formats'
@@ -511,9 +506,8 @@
 
          ! merge contents of zone ip into zone i; remove zone ip
          ! get energies for i and ip before merge
-         call get_cell_energies(s, i, Esum_i, KE_i, PE_i, IE_i)
-         call get_cell_energies(s, ip, Esum_ip, KE_ip, PE_ip, IE_ip)
-         cell_IE_plus_KE = KE_i + KE_ip + IE_i + IE_ip
+         call get_cell_energies(s, i, Esum_i, KE_i, PE_i, IE_i, Etrb_i)
+         call get_cell_energies(s, ip, Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip)
 
          if (s% rotation_flag) then
             ! WARNING! this is designed to conserve angular momentum, but not to explicitly conserve energy
@@ -584,6 +578,11 @@
 
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
+         
+         if (s% TDC_flag) then
+            cell_etrb = Etrb_i + Etrb_ip
+            s% w(i) = sqrt(cell_etrb/dm)
+         end if
 
          if (s% rotation_flag) then
             s% j_rot(i) = j_rot_new
@@ -613,6 +612,7 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
+            if (s% TDC_flag) s% w(im) = s% w(i0)
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
@@ -639,6 +639,8 @@
          end if
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
+         
+         if (s% TDC_flag) s% xh(s% i_w,i) = s% w(i)
          
          if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
 
@@ -698,10 +700,10 @@
       end function get_star_PE
 
 
-      subroutine get_cell_energies(s, k, Etot, KE, PE, IE)
+      subroutine get_cell_energies(s, k, Etot, KE, PE, IE, Etrb)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(out) :: Etot, KE, PE, IE
+         real(dp), intent(out) :: Etot, KE, PE, IE, Etrb
          real(dp) :: dm, mC, v0, v1, P, rL, rC
          include 'formats'
          dm = s% dm(k)
@@ -718,6 +720,11 @@
          end if
          P = s% P(k)
          IE = s% energy(k)*dm
+         if (s% TDC_flag) then
+            Etrb = pow2(s% w(k))*dm
+         else
+            Etrb = 0d0
+         end if
          if (s% cgrav(k) == 0) then
             PE = 0
          else
@@ -778,15 +785,15 @@
          integer :: i, ip, j, jp, q, nz, nz_old, &
             iR, iC, iL, imin, imax, op_err
          real(dp) :: &
-            cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, rho_RR, rho_iR, &
-            rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, v, v2, energy, &
-            v2_R, energy_R, rho_R, v2_C, energy_C, rho_C, v2_L, energy_L, rho_L, &
+            cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old, &
+            rho_RR, rho_iR, rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, &
+            v, v2, energy, v2_R, energy_R, rho_R, v2_C, energy_C, rho_C, v2_L, energy_L, rho_L, &
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v2, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, got_cell_Esum, &
             got_cell_Esum_R, got_cell_KE_R, got_cell_PE_R, got_cell_IE_R, &
             got_cell_Esum_L, got_cell_KE_L, got_cell_PE_L, got_cell_IE_L, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
-            conv_velL, conv_velR, tauL, tauR, Et, Et_L, Et_C, Et_R, grad_Et, &
+            conv_velL, conv_velR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
          logical :: okay, done, use_new_grad_rho
          include 'formats'
@@ -803,7 +810,7 @@
          ip = i+1
 
          call get_cell_energies( &
-            s, i, cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old)
+            s, i, cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old)
 
          if (s% rotation_flag .and. i<nz) then
             ! WARNING! this is designed to conserve angular momentum, but not to explicitly conserve energy
@@ -864,6 +871,7 @@
          v2 = v*v
          
          energy = s% energy(i)
+         if (s% TDC_flag) etrb = pow2(s% w(i))
             
          ! estimate values of energy and velocity^2 at cell boundaries
 
@@ -919,6 +927,13 @@
             
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
+         
+         if (s% TDC_flag) then
+            etrb_R = pow2(s% w(iR))
+            etrb_C = pow2(s% w(iC))
+            etrb_L = pow2(s% w(iL))
+            grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
+         end if
          
          if (s% u_flag) then
             v_R = s% u(iR)
@@ -1078,6 +1093,17 @@
          
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
+         
+         if (s% TDC_flag) then
+            etrb_R = etrb + grad_etrb*dr/4
+            etrb_L = (dm*etrb - dmR*etrb_R)/dmL
+            if (etrb_R < 0d0 .or. etrb_L < 0d0) then
+               etrb_R = etrb
+               etrb_L = etrb
+            end if
+            s% w(i) = sqrt(max(0d0,etrb_R))
+            s% w(ip) = sqrt(max(0d0,etrb_L))
+         end if
 
          if (s% u_flag) then
             v2_R = v2 + grad_v2*dr/4
