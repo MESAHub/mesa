@@ -774,6 +774,7 @@
          type (star_info), pointer, intent(in) :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
+         real(dp) :: L_val
          integer, intent(out) :: ierr         
          include 'formats'
          ierr = 0
@@ -797,9 +798,12 @@
             if (ierr /= 0) return
          end if
          L = Lr + Lc + Lt
-         if (abs(Lt%val)/max(1d-99,abs(L%val)) > 1d-2) then
+         L_val = max(1d-99,abs(L%val))
+         if (abs(Lt%val)/L_val > &
+               s% TDC_min_Lt_div_L_for_overshooting_mixing_type) then
             s% mixing_type(k) = overshoot_mixing
-         else if (abs(Lc%val)/max(1d-99,abs(L%val)) > 1d-2) then
+         else if (abs(Lc%val)/L_val > &
+               s% TDC_min_Lc_div_L_for_convective_mixing_type) then
             s% mixing_type(k) = convective_mixing
          else
             s% mixing_type(k) = no_mixing

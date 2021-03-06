@@ -32,6 +32,9 @@
     TDC_alfat = 0.0d0
     TDC_alfam = 0.25d0
     TDC_alfar = 0.0d0
+    
+    TDC_min_Lt_div_L_for_overshooting_mixing_type = 1d-2
+    TDC_min_Lc_div_L_for_convective_mixing_type = 1d-2
 
     TDC_Lsurf_factor = 0.5d0
     TDC_use_Stellingwerf_Lr = .true.

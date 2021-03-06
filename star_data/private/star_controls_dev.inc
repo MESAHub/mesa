@@ -5,6 +5,9 @@
          real(dp) :: TDC_alfam
          real(dp) :: TDC_alfar
          
+         real(dp) :: TDC_min_Lt_div_L_for_overshooting_mixing_type
+         real(dp) :: TDC_min_Lc_div_L_for_convective_mixing_type
+         
          logical :: TDC_use_Stellingwerf_Lr
          real(dp) :: TDC_w_min_for_damping, TDC_etrb_xscale_min
          integer :: TDC_num_outermost_cells_forced_nonturbulent, &

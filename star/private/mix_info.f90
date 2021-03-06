@@ -130,17 +130,8 @@
                s% conv_vel(k) = abs(s% w(k))
                s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
+               ! mixing_type set by compute_L_terms in hydro_tdc
             end do
-
-
-
-            do k = 1, nz
-               s% mixing_type(k) = no_mixing
-               s% D_mix(k) = 0d0
-               s% cdc(k) = 0d0
-               s% conv_vel(k) = 0d0
-            end do
-         
          else if (s% conv_vel_flag) then
             do k = 1, nz
                s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0

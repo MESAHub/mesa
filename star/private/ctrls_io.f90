@@ -395,8 +395,8 @@
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
-    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, &
-    solver_test_partials_var_name, solver_test_partials_equ_name, &
+    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, TDC_min_Lc_div_L_for_convective_mixing_type, &
+    solver_test_partials_var_name, solver_test_partials_equ_name, TDC_min_Lt_div_L_for_overshooting_mixing_type, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
@@ -2059,6 +2059,8 @@
  s% TDC_alfat = TDC_alfat 
  s% TDC_alfam = TDC_alfam
  s% TDC_alfar = TDC_alfar
+ s% TDC_min_Lt_div_L_for_overshooting_mixing_type = TDC_min_Lt_div_L_for_overshooting_mixing_type
+ s% TDC_min_Lc_div_L_for_convective_mixing_type = TDC_min_Lc_div_L_for_convective_mixing_type
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
  s% TDC_w_min_for_damping = TDC_w_min_for_damping
@@ -3702,6 +3704,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alfat= s% TDC_alfat 
  TDC_alfam= s% TDC_alfam
  TDC_alfar= s% TDC_alfar
+ TDC_min_Lt_div_L_for_overshooting_mixing_type = s% TDC_min_Lt_div_L_for_overshooting_mixing_type
+ TDC_min_Lc_div_L_for_convective_mixing_type = s% TDC_min_Lc_div_L_for_convective_mixing_type
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
  TDC_w_min_for_damping = s% TDC_w_min_for_damping
