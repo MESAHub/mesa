@@ -3,23 +3,29 @@
    show_log_description_at_start = .false.
 
    load_saved_model = .true.
-   saved_model_name = '1M_zams.mod'
-
-   change_initial_TDC_flag = .true.
-   new_TDC_flag = .true.
+   saved_model_name = 'wd_c_core_ignition.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'tdc_final.mod'
    required_termination_code_string(1) = 'max_model_number' ! just for testing
 
-   change_initial_net = .true. ! switch nuclear reaction network
-   new_net_name = 'pp_and_cno_extras.net'
+   change_initial_net = .true.      
+   new_net_name = 'approx21.net'
+   
+   set_rate_3a = 'FL87' ! Fushiki and Lamb, Apj, 317, 368-388, 1987
 
-   set_rate_c12ag = 'Kunz'
-   set_rate_n14pg = 'jina reaclib'
+   ! move the surface down to larger optical depth
+   set_tau_factor = .true.
+   set_to_this_tau_factor = 30
+
+   change_initial_TDC_flag = .true.
+   new_TDC_flag = .true.
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
+
+   change_D_omega_flag = .true.
+   new_D_omega_flag = .true.
       
    set_initial_age = .true.
    initial_age = 0
@@ -28,7 +34,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1d-4
+   seconds_for_initial_dt = 1d-2
    
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
@@ -43,70 +49,46 @@
 / ! end of eos namelist
 
 &kap
-   use_Type2_opacities = .false.
-   kap_file_prefix = 'OP_gs98'
-   kap_lowT_prefix = 'lowT_fa05_gs98' ! for lower temperatures.
+   Zbase = 0.02d0
+   use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls  
 
+   power_nuc_burn_upper_limit = 1d8 
+
    ! limit max_model_number as part of test_suite
    max_model_number = 1200
-   max_number_retries = 100
+   max_number_retries = 0 ! 100
+
+   initial_mass =  0.45
+   initial_z = 0.02d0
    
-! mesh
-   
+! mesh  
    ! SKIP REMESHING FOR NOW
    okay_to_remesh = .false.
-
    mesh_delta_coeff = 0.5
-   
-   ! custom mesh spacing function to resolve convective boundary
-   ! see run_star_extras.f90
-   !use_other_mesh_functions = .true.
-   x_ctrl(1) = 500    ! weight
-   x_ctrl(2) = 0.02d0 ! width
-   x_ctrl(3) = 0d0    ! center
 
-! atmosphere
-   atm_option = 'table'
-   atm_table = 'photosphere'
+! wind
+   cool_wind_full_on_T = 9.99d9
+   hot_wind_full_on_T = 1d10 
+   cool_wind_RGB_scheme = 'Reimers'
+   cool_wind_AGB_scheme = 'Blocker'
+   RGB_to_AGB_wind_switch = 1d-4
+   Reimers_scaling_factor = 0.4d0  
+   Blocker_scaling_factor = 0.7d0 ! 0.8d0        
       
 ! timesteps
-   max_years_for_timestep = 1d7           
    varcontrol_target = 1d-3
-   max_timestep_factor = 2d0
-   delta_lgT_cntr_limit = 0.1  
-   delta_lgRho_cntr_limit = 0.5 
+   min_timestep_limit = 1d-4 ! seconds
 
-! diffusion
-   ! SKIP DIFFUSION FOR NOW.
-   !do_element_diffusion = .true. ! determines whether or not we do diffusion
-   
-   do_diffusion_heating = .true.
-   diffusion_dt_limit = 7d11 ! no element diffusion if dt < this limit (in seconds)
-   diffusion_T_full_on = 1d3
-   diffusion_T_full_off = 1d3
-   
-   diffusion_calculates_ionization = .true.
+   delta_lgL_nuc_limit = 0.01
+   delta_lgL_nuc_hard_limit = 0.05
+   lgL_nuc_burn_min = 0d0
 
-   diffusion_num_classes = 4 ! number of classes of species for diffusion calculations
-   diffusion_class_representative(1) = 'h1'
-   diffusion_class_representative(2) = 'he4'
-   diffusion_class_representative(3) = 'o16'
-   diffusion_class_representative(4) = 'fe56'
-
-   ! in ascending order.  species goes into 1st class with A_max >= species A
-   diffusion_class_A_max(1) = 2
-   diffusion_class_A_max(2) = 4
-   diffusion_class_A_max(3) = 16
-   diffusion_class_A_max(4) = 10000
-      
-   diffusion_use_isolve = .true.
-   diffusion_rtol_for_isolve = 1d-4
-   diffusion_atol_for_isolve = 1d-5
-   diffusion_maxsteps_for_isolve = 1000
-   diffusion_isolve_solver = 'ros2_solver'
+! accretion
+   accrete_same_as_surface = .true.
+   mass_change = 1d-9 ! rate of accretion (Msun/year)
 
 ! TDC default settings
 
@@ -122,26 +104,19 @@
 ! solver      
    ! TURN OFF GOLD FOR NOW
    use_gold2_tolerances = .false.
-   use_gold_tolerances = .false.
+   !use_gold_tolerances = .false.
    
    ! USE SIMPLE BC FOR NOW
    use_compression_outer_BC = .true.
 
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
-
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
-
-   set_rho_to_dm_div_dV = .false.
+   !convergence_ignore_equL_residuals = .true.
    
    avQ_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    avQ_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
    
 ! output
-   terminal_show_age_units = 'years'
-   terminal_show_timestep_units = 'years'
+   terminal_show_age_units = 'secs'
+   terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
 
@@ -163,16 +138,16 @@
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
          ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 13
-      !solver_test_partials_k = 202
+      !solver_test_partials_call_number = 1
+      !solver_test_partials_k = 46
       !solver_test_partials_iter_number = 2
       !solver_test_partials_dx_0 = 1d-6
       !solver_test_partials_var_name = 'all' ! 'etrb' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
@@ -229,9 +204,9 @@
 
 &pgstar
 
-   !pause = .true.
+   pause = .true.
    !pause_interval = 100
-   pgstar_interval = 10 ! 20
+   pgstar_interval = 1 ! 20
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
@@ -239,7 +214,7 @@
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
    
    Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = 50 ! -101D0
+   Profile_Panels1_xmax = 60 ! -101D0
 
 
 
