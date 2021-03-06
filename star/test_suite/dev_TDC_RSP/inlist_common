@@ -348,7 +348,7 @@
 
    Grid2_win_flag = .true.
 
-   Grid2_win_width = 16
+   Grid2_win_width = 10
    Grid2_win_aspect_ratio = 0.667 ! aspect_ratio = height/width
    Grid2_num_cols = 4 ! divide plotting region into this many equal width cols
    Grid2_num_rows = 8 ! divide plotting region into this many equal height rows

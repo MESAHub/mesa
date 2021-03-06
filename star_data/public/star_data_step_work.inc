@@ -39,7 +39,7 @@
       real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
       real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
       real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
-      real(dp), pointer :: etrb(:) ! specific turbulent energy.  only used when TDC_flag is true
+      real(dp), pointer :: w(:) ! turbulent velocity.  only used when TDC_flag is true
       real(dp), pointer :: Hp_face(:) ! pressure scale height.  only used for TDC or RSP
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
@@ -458,7 +458,7 @@
       ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
-            w, w_start, Pt, Eq, Uq, avQ, avQ_start, &
+            Pt, Eq, Uq, avQ, avQ_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
 
          integer :: TDC_num_periods
@@ -607,7 +607,7 @@
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
          real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
-         real(dp), pointer :: dxh_etrb(:) ! etrb(k) = dxh_etrb(k) + etrb_start(k); dxh_etrb from solver.
+         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_w from solver.
          real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
@@ -1024,7 +1024,7 @@
          real(dp), pointer :: Pgas_start(:) ! (nz)
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
-         real(dp), pointer :: etrb_start(:) ! (nz)
+         real(dp), pointer :: w_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)

@@ -220,13 +220,13 @@
             if (failed('do_u')) return
          end if
 
-         if (s% TDC_flag) then ! calculate new etrb to conserve turbulent energy
-            if (dbg) write(*,*) 'call do_etrb'
-            call do_etrb( &
+         if (s% TDC_flag) then ! calculate new w to conserve turbulent energy
+            if (dbg) write(*,*) 'call do_w'
+            call do_w( &
                s, nz, nz_old, cell_type, comes_from, &
                xq_old, xq, dq_old, dq, xh, xh_old, &
                xout_old, xout_new, tmp1, ierr)
-            if (failed('do_etrb')) return
+            if (failed('do_w')) return
          end if
 
          if (s% conv_vel_flag) then
@@ -2643,7 +2643,7 @@
       end subroutine adjust1_u
 
       
-      subroutine do_etrb( & ! same logic as do_u
+      subroutine do_w( & ! same logic as do_u
             s, nz, nz_old, cell_type, comes_from, &
             old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
             xout_old, xout_new, old_eturb, ierr)
@@ -2656,26 +2656,26 @@
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
-         integer :: k, j, op_err, old_k, new_k, i_etrb
+         integer :: k, j, op_err, old_k, new_k, i_w
          real(dp) :: old_eturb_tot, new_eturb_tot, xmstar, err
 
          include 'formats'
          ierr = 0
-         i_etrb = s% i_etrb
+         i_w = s% i_w
          xmstar = s% xmstar
 
          old_eturb_tot = 0d0
          do k=1,nz_old
-            old_eturb(k) = old_dq(k)*xh_old(i_etrb,k)*xh_old(i_etrb,k)
+            old_eturb(k) = old_dq(k)*pow2(xh_old(i_w,k))
             old_eturb_tot = old_eturb_tot + old_eturb(k)
          end do
 
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, nz
             op_err = 0
-            call adjust1_etrb( &
+            call adjust1_w( &
                s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
-               old_dq, new_dq, old_eturb, i_etrb, xh, xh_old, op_err)
+               old_dq, new_dq, old_eturb, i_w, xh, xh_old, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -2685,7 +2685,7 @@
 
          new_eturb_tot = 0
          do k=1,nz
-            new_eturb_tot = new_eturb_tot + new_dq(k)*xh(i_etrb,k)
+            new_eturb_tot = new_eturb_tot + new_dq(k)*pow2(xh(i_w,k))
          end do
 
          err = abs(old_eturb_tot - new_eturb_tot)/max(new_eturb_tot,old_eturb_tot,1d0)
@@ -2696,19 +2696,19 @@
                err, new_eturb_tot, old_eturb_tot
             if (err > 1d-10) then
                write(*,*) 'err too large'
-               stop 'do_etrb'
+               stop 'do_w'
             end if
          end if
 
-      end subroutine do_etrb
+      end subroutine do_w
 
 
-      subroutine adjust1_etrb( &
+      subroutine adjust1_w( &
             s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
-            old_dq, new_dq, old_eturb, i_etrb, xh, xh_old, ierr)
+            old_dq, new_dq, old_eturb, i_w, xh, xh_old, ierr)
          ! set new value for s% w(k) to conserve turbulent energy
          type (star_info), pointer :: s
-         integer, intent(in) :: k, nz, nz_old, i_etrb
+         integer, intent(in) :: k, nz, nz_old, i_w
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), intent(in) :: &
             xout_old, xout_new, old_dq, new_dq, old_eturb
@@ -2728,11 +2728,11 @@
          if (cell_type(k) == unchanged_type .or. &
                cell_type(k) == revised_type) then
             if (k == 1) then
-               xh(i_etrb,k) = xh_old(i_etrb,comes_from(k))
+               xh(i_w,k) = xh_old(i_w,comes_from(k))
                return
             end if
             if (cell_type(k-1) == unchanged_type) then
-               xh(i_etrb,k) = xh_old(i_etrb,comes_from(k))
+               xh(i_w,k) = xh_old(i_w,comes_from(k))
                return
             end if
          end if
@@ -2850,7 +2850,7 @@
                   ierr = -1
                   !return
                   write(*,*) 'dq <= 0', dq
-                  stop 'debugging: adjust1_etrb'
+                  stop 'debugging: adjust1_w'
                end if
 
             end if
@@ -2861,9 +2861,9 @@
 
          end do
 
-         xh(i_etrb,k) = eturb_sum/new_cell_dq
+         xh(i_w,k) = sqrt(eturb_sum/new_cell_dq) ! ignore w < 0 case
 
-      end subroutine adjust1_etrb
+      end subroutine adjust1_w
 
 
 

@@ -611,10 +611,8 @@
             if (failed('alpha_RTI')) exit
             call do1(s% w, c% w)
             if (failed('w')) exit
-            call do1(s% etrb, c% etrb)
-            if (failed('etrb')) exit
-            call do1(s% etrb_start, c% etrb_start)
-            if (failed('etrb_start')) exit
+            call do1(s% w_start, c% w_start)
+            if (failed('w_start')) exit
             
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
@@ -626,8 +624,8 @@
             if (failed('dxh_v')) exit
             call do1(s% dxh_u, c% dxh_u)
             if (failed('dxh_u')) exit
-            call do1(s% dxh_etrb, c% dxh_etrb)
-            if (failed('dxh_etrb')) exit
+            call do1(s% dxh_w, c% dxh_w)
+            if (failed('dxh_w')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
@@ -2570,9 +2568,9 @@
          end if
          
          if (s% TDC_flag) then
-            i = i+1; s% i_etrb = i
+            i = i+1; s% i_w = i
          else 
-            s% i_etrb = 0
+            s% i_w = 0
          end if
 
          if (s% conv_vel_flag) then
@@ -2610,7 +2608,7 @@
             s% i_du_dt = 0
          end if
       
-         s% i_detrb_dt = s% i_etrb
+         s% i_detrb_dt = s% i_w
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_detrb_RSP_dt = s% i_etrb_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
@@ -2632,7 +2630,7 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_etrb /= 0) s% nameofvar(s% i_etrb) = 'etrb'
+         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -3018,7 +3016,7 @@
          nvar_hydro_old = s% nvar_hydro
 
          if (.not. TDC_flag) then
-            call remove1(s% i_etrb)
+            call remove1(s% i_w)
          end if
 
          call set_var_info(s, ierr)
@@ -3038,7 +3036,7 @@
          if (ierr /= 0) return
 
          if (TDC_flag) then
-            call insert1(s% i_etrb) 
+            call insert1(s% i_w) 
             s% need_to_reset_etrb = .true.
          end if
 

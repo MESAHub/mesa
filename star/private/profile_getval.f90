@@ -1788,13 +1788,13 @@
 
             case(p_Pturb)
                if (s% TDC_flag) then
-                  val = s% etrb(k)*s% rho(k)
+                  val = pow2(s% w(k))*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Pturb)
                if (s% TDC_flag) then
-                  val = safe_log10(s% etrb(k)*s% rho(k))
+                  val = safe_log10(pow2(s% w(k))*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
@@ -1813,13 +1813,13 @@
                val = safe_log10(val)           
             case(p_etrb)
                if (s% TDC_flag) then
-                  val = s% etrb(k)
+                  val = pow2(s% w(k))
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_etrb)
                if (s% TDC_flag) then
-                  val = safe_log10(s% etrb(k))
+                  val = safe_log10(pow2(s% w(k)))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if

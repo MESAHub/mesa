@@ -40,7 +40,6 @@
          compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
-         min_w = 1d-6, &
          x_ALFAP = 2.d0/3.d0, &
          x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
          x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
@@ -105,8 +104,8 @@
          if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = s% i_etrb
-            s% solver_test_partials_dval_dx = resid%d1Array(i_etrb_00)
+            s% solver_test_partials_var = s% i_w
+            s% solver_test_partials_dval_dx = resid%d1Array(i_w_00)
             write(*,*) 'do1_tdc_L_eqn', s% solver_test_partials_var, k, s% nz
          end if      
       end subroutine do1_tdc_L_eqn
@@ -188,15 +187,6 @@
          end if
       end function compute_Hp_face
       
-      
-      logical function non_turbulent_cell(s,k) 
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         non_turbulent_cell = (s% TDC_alfa == 0d0 .or. & ! TDC_alfa == 0d0 means purely radiative
-             k == 1 .or. k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent)
-      end function non_turbulent_cell
-      
 
       subroutine do1_turbulent_energy_eqn(s, k, skip_partials, nvar, ierr)
          use star_utils, only: set_energy_eqn_scal, save_eqn_residual_info
@@ -205,11 +195,11 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          real(dp) :: dt, dm, dt_div_dm, scal, residual
-         integer :: i_detrb_dt, i_etrb, i_v
+         integer :: i_detrb_dt, i_v
          type(auto_diff_real_star_order1) :: resid_ad, &
             d_turbulent_energy_ad, PtdV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
-         logical :: test_partials
+         logical :: non_turbulent_cell, test_partials
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -218,9 +208,13 @@
          ierr = 0
          call init
          
-         if (non_turbulent_cell(s,k)) then
+         non_turbulent_cell = (s% TDC_alfa == 0d0 .or. & ! TDC_alfa == 0d0 means purely radiative
+             k == 1 .or. k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent)
+         
+         if (non_turbulent_cell) then
              
-            resid_ad = wrap_etrb_00(s,k) ! make etrb = 0
+            resid_ad = wrap_w_00(s,k) - s% TDC_w_min_for_damping
             
          else
          
@@ -272,7 +266,6 @@
          
          subroutine init
             i_detrb_dt = s% i_detrb_dt
-            i_etrb = s% i_etrb
             i_v = s% i_v
             dt = s% dt
             dm = s% dm(k)
@@ -281,8 +274,10 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: w_00
             ierr = 0
-            d_turbulent_energy_ad = wrap_dxh_etrb(s,k)
+            w_00 = wrap_w_00(s,k) ! wrap_dxh_w = w_00 - s% w_start(k)
+            d_turbulent_energy_ad = wrap_dxh_w(s,k)*(w_00 + s% w_start(k))
          end subroutine setup_d_turbulent_energy
          
          ! PtdV_ad = Pt_ad*dV_ad
@@ -460,11 +455,6 @@
          include 'formats'
          ierr = 0
          ALFAM_ALFA = s% TDC_alfam*s% TDC_alfa
-         if (non_turbulent_cell(s,k) .or. ALFAM_ALFA == 0d0 .or. s% w(k) < min_w) then
-            Chi_cell = 0d0
-            s% Chi(k) = 0d0
-            return
-         end if
          Hp_cell = compute_Hp_cell(s, k, ierr)
          if (ierr /= 0) return
          d_v_div_r = compute_d_v_div_r(s, k, ierr)
@@ -499,11 +489,6 @@
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
-         if (non_turbulent_cell(s,k)) then
-            Eq_cell = 0d0
-            s% Eq(k) = 0d0
-            return
-         end if
          Chi_cell = compute_Chi_cell(s,k,ierr)
          if (ierr /= 0) return
          d_v_div_r = compute_d_v_div_r(s, k, ierr)
@@ -548,16 +533,7 @@
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell
          include 'formats'
          ierr = 0
-         if (non_turbulent_cell(s,k)) then
-            Source = 0d0
-            s% SOURCE(k) = Source%val
-            return
-         end if
-         if (s% w(k) < min_w) then
-            w_00 = min_w*1d-2 ! must be > 0 to provide a seed for turbulence
-         else
-            w_00 = wrap_w_00(s, k)
-         end if
+         w_00 = wrap_w_00(s, k)
          T_00 = wrap_T_00(s, k)                  
          d_00 = wrap_d_00(s, k)         
          P_00 = wrap_P_00(s, k)         
@@ -617,17 +593,10 @@
          real(dp) :: alpha
          ierr = 0
          alpha = s% TDC_alfa
-         if (alpha == 0d0) then
-            D = 0d0
-            s% DAMP(k) = 0d0
-            return
-         end if
          Hp_cell = compute_Hp_cell(s,k,ierr)
          if (ierr /= 0) return
          w_00 = wrap_w_00(s,k)
-         ! partials bad if w -> 0 for this, so must test to avoid that case
-         if (w_00%val < min_w) w_00 = 0
-         dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
+         dw3 = pow3(w_00 - s% TDC_w_min_for_damping) ! keep nonzero partial even when w = 0
          D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          s% DAMP(k) = D%val
@@ -640,7 +609,7 @@
          type(auto_diff_real_star_order1) :: Dr
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            etrb_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
+            w_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
          real(dp) :: gammar, alpha, POM
          include 'formats'
          ierr = 0
@@ -651,7 +620,7 @@
             s% DAMPR(k) = 0d0
             return
          end if
-         etrb_00 = wrap_etrb_00(s,k)
+         w_00 = wrap_w_00(s,k)
          T_00 = wrap_T_00(s,k)
          d_00 = wrap_d_00(s,k)
          Cp_00 = wrap_Cp_00(s,k)
@@ -662,7 +631,7 @@
          POM2 = pow3(T_00)/(pow2(d_00)*Cp_00*kap_00) 
             ! K^3 / ((g cm^-3)^2 (erg g^-1 K^-1) (cm^2 g^-1))
             ! K^3 / (cm^-4 erg K^-1) = K^4 cm^4 erg^-1
-         Dr = POM*POM2*etrb_00/pow2(Hp_cell)
+         Dr = POM*POM2*pow2(w_00)/pow2(Hp_cell)
          ! (erg cm^-2 K^-4 s^-1) (K^4 cm^4 erg^-1) cm^2 s^-2 cm^-2
          ! cm^2 s^-3 = erg g^-1 s^-1
          s% DAMPR(k) = Dr%val
@@ -675,13 +644,6 @@
          type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Source, D, Dr
-         if (non_turbulent_cell(s,k)) then
-            s% SOURCE(k) = 0d0
-            s% DAMP(k) = 0d0
-            s% DAMPR(k) = 0d0
-            s% COUPL(k) = 0d0
-            return
-         end if
          Source = compute_Source(s, k, ierr)
          if (ierr /= 0) return
          D = compute_D(s, k, ierr)
@@ -768,39 +730,28 @@
          real(dp) :: ALFAC, ALFAS
          include 'formats'
          ierr = 0
-         if (s% TDC_alfa <= 0d0 .or. k == 1 .or. k == s% nz) then
-            Lc_w_face_factor = 0d0
+         if (k == 1) then
             Lc = 0d0
-         else if (s% w(k-1) < min_w .and. s% w(k) < min_w) then
-            Lc_w_face_factor = 0d0
-            Lc = 0d0
-         else
-            r_00 = wrap_r_00(s, k) ! not time centered for luminosity
-            area = 4d0*pi*pow2(r_00)
-            T_m1 = wrap_T_m1(s, k)
-            T_00 = wrap_T_00(s, k)         
-            d_m1 = wrap_d_m1(s, k)
-            d_00 = wrap_d_00(s, k)
-            if (s% w(k-1) < min_w) then
-               w_m1 = 0d0
-            else
-               w_m1 = wrap_w_m1(s, k)
-            end if
-            if (s% w(k) < min_w) then
-               w_00 = 0d0
-            else
-               w_00 = wrap_w_00(s, k)
-            end if
-            T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
-            PII_face = compute_PII_face(s, k, ierr)
-            w_face = 0.5d0*(w_m1 + w_00)
-            ALFAC = x_ALFAC
-            ALFAS = x_ALFAS
-            Lc_w_face_factor = area*(ALFAC/ALFAS)*T_rho_face*PII_face
-            ! units = cm^2 K g cm^-3 ergs g^-1 K^-1 = ergs cm^-1
-            Lc = w_face*Lc_w_face_factor
-            ! units = cm s^-1 ergs cm^-1 = ergs s^-1
+            Lc_w_face_factor = 1
+            return
          end if
+         r_00 = wrap_r_00(s, k) ! not time centered for luminosity
+         area = 4d0*pi*pow2(r_00)
+         T_m1 = wrap_T_m1(s, k)
+         T_00 = wrap_T_00(s, k)         
+         d_m1 = wrap_d_m1(s, k)
+         d_00 = wrap_d_00(s, k)
+         w_m1 = wrap_w_m1(s, k)
+         w_00 = wrap_w_00(s, k)
+         T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
+         PII_face = compute_PII_face(s, k, ierr)
+         w_face = 0.5d0*(w_m1 + w_00)
+         ALFAC = x_ALFAC
+         ALFAS = x_ALFAS
+         Lc_w_face_factor = area*(ALFAC/ALFAS)*T_rho_face*PII_face
+         ! units = cm^2 K g cm^-3 ergs g^-1 K^-1 = ergs cm^-1
+         Lc = w_face*Lc_w_face_factor
+         ! units = cm s^-1 ergs cm^-1 = ergs s^-1
       end function compute_Lc_terms
 
 
@@ -810,42 +761,27 @@
          type(auto_diff_real_star_order1) :: Lt
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            r_00, area2, d_m1, d_00, rho2_face, Hp_face, &
-            etrb_m1, etrb_00, w_m1, w_00
+            r_00, area2, d_m1, d_00, rho2_face, Hp_face, w_m1, w_00
          real(dp) :: alpha, alpha_t
          include 'formats'
          ierr = 0
+         if (k == 1) then
+            Lt = 0d0
+            return
+         end if
          alpha = s% TDC_alfa
          alpha_t = s% TDC_alfat
-         if (alpha <= 0d0 .or. alpha_t <= 0d0 .or. k == 1) then
-            Lt = 0d0
-            return
-         end if
-         if (s% w(k-1) < min_w .and. s% w(k) < min_w) then
-            Lt = 0d0
-            return
-         end if
          r_00 = wrap_r_00(s,k) ! not time centered for luminosity         
          area2 = (4d0*pi)**2*pow4(r_00)
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
          rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
-         if (s% w(k-1) < min_w) then
-            w_m1 = 0d0
-         else
-            w_m1 = wrap_w_m1(s,k)
-         end if
-         if (s% w(k) < min_w) then
-            w_00 = 0d0
-         else
-            w_00 = wrap_w_00(s,k)
-         end if
-         etrb_m1 = wrap_etrb_m1(s,k)
-         etrb_00 = wrap_etrb_00(s,k)
+         w_m1 = wrap_w_m1(s,k)
+         w_00 = wrap_w_00(s,k)
          Hp_face = compute_Hp_face(s,k,ierr)
          if (ierr /= 0) return
          Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
-            (w_m1*etrb_m1 - w_00*etrb_00)/s% dm_bar(k)         
+            (pow3(w_m1) - pow3(w_00))/s% dm_bar(k)         
          ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
          s% Lt(k) = Lt%val
       end function compute_Lt
@@ -892,41 +828,22 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
-         logical :: time_center
+         type(auto_diff_real_star_order1) :: Lt
          include 'formats'
          ierr = 0
-         time_center = (s% using_velocity_time_centering .and. &
-                        s% include_L_in_velocity_time_centering)
          do k=1,s%nz
-            call set1_etrb_start_vars(k, op_err) 
-            if (op_err /= 0) ierr = op_err  
-         end do
-         
-         contains
-         
-         subroutine set1_etrb_start_vars(k, ierr)   
-            integer, intent(in) :: k
-            integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: L, Lr, Lc, Lt
-            include 'formats'
-            ierr = 0               
-            if (time_center) then
-               call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr)
-               if (ierr /= 0) return
-               s% Lt_start(k) = Lt%val  
-            else
-               s% Lt_start(k) = 0d0  
-            end if
-            s% etrb_start(k) = s% etrb(k)
-         end subroutine set1_etrb_start_vars
-         
+            Lt = compute_Lt(s, k, ierr)
+            if (ierr /= 0) return
+            s% Lt_start(k) = Lt%val  
+            s% w_start(k) = s% w(k)
+         end do         
       end subroutine set_etrb_start_vars
       
       
       subroutine reset_etrb_using_L(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, i_etrb, nz
+         integer :: k, nz
          real(dp) :: Lc_val, w_00
          type(auto_diff_real_star_order1) :: &
             Lc_w_face_factor, L, Lr, Lc, Lt
@@ -937,7 +854,6 @@
          if (s% TDC_alfa == 0d0) return ! no convection
          nz = s% nz
          allocate(w_face(nz))
-         i_etrb = s% i_etrb
          w_face(1) = 0d0
          do k=2, nz
             Lr = compute_Lr(s, k, ierr)
@@ -958,8 +874,7 @@
                w_00 = max(w_face(k), 0d0)
             end if
             s% w(k) = w_00
-            s% etrb(k) = pow2(w_00)
-            s% xh(i_etrb,k) = s% etrb(k)
+            s% xh(s%i_w,k) = s% w(k)
             call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new w(k)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
          end do

@@ -340,11 +340,14 @@
          
          subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: w_00
             include 'formats'
             ierr = 0
-            d_turbulent_energy_dt_ad = 0d0
             if (s% TDC_flag) then ! dxh_etrb = etrb - etrb_start
-               d_turbulent_energy_dt_ad = wrap_dxh_etrb(s,k)/dt
+               w_00 = wrap_w_00(s,k) ! wrap_dxh_w = w_00 - s% w_start(k)
+               d_turbulent_energy_dt_ad = wrap_dxh_w(s,k)*(w_00 + s% w_start(k))/dt
+            else
+               d_turbulent_energy_dt_ad = 0d0
             end if
             s% detrbdt(k) = d_turbulent_energy_dt_ad%val
          end subroutine setup_d_turbulent_energy_dt

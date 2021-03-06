@@ -59,8 +59,6 @@
                if (i <= nvar_hydro) then ! structure variable
                   if (i == s% i_j_rot) then
                      s% x_scale(i,k) = 10d0*sqrt(s% cgrav(k)*s% m(k)*s% r_start(k))
-                  else if (i == s% i_etrb) then
-                     s% x_scale(i,k) = max(s% TDC_etrb_xscale_min, abs(s% xh_start(i,k)))
                   else
                      s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
                   end if
@@ -629,9 +627,6 @@
          ierr = 0
          min_alpha = 1d0
          nz = s% nz
-         
-         
-         if (s% TDC_flag) call clip_so_non_negative(s% i_etrb, 0d0)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)

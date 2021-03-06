@@ -62,7 +62,7 @@
          integer :: i_u ! Lagrangian velocity at center of cell
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
          integer :: i_etrb_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
-         integer :: i_etrb ! cell turbulent energy. only when TDC_flag is true.
+         integer :: i_w ! cell turbulent velocity. only when TDC_flag is true.
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r

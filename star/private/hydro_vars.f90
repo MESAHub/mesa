@@ -227,7 +227,7 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_etrb, &
+         integer :: i_lnd, i_lnT, i_lnR, i_w, &
             i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_etrb_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
@@ -243,7 +243,7 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_etrb = s% i_etrb
+         i_w = s% i_w
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -323,12 +323,11 @@
                      s% r(k) = exp(s% lnR(k))
                   end do
                   s% dxh_lnR(1:nz) = 0d0
-               else if (j == i_etrb) then
+               else if (j == i_w) then
                   do k=1,nz
-                     s% etrb(k) = max(s% xh(i_etrb, k), 0d0)
-                     s% w(k) = sqrt(s% etrb(k))
+                     s% w(k) = s% xh(i_w, k)
+                     s% dxh_w(k) = 0d0
                   end do
-                  s% dxh_etrb(1:nz) = 0d0
                else if (j == i_lum) then
                   do k=1,nz
                      s% L(k) = s% xh(i_lum, k)
@@ -366,7 +365,7 @@
 
             if (i_u == 0) s% u(1:nz) = 0d0
 
-            if (i_etrb == 0) s% etrb(1:nz) = 0d0
+            if (i_w == 0) s% w(1:nz) = 0d0
 
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then

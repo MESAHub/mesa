@@ -558,7 +558,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_etrb_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -576,7 +576,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          no_L = (i_lum == 0)
-         i_etrb = s% i_etrb
+         i_w = s% i_w
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -585,7 +585,7 @@
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_etrb /= 0) n = n+increment_for_i_etrb ! read etrb
+         if (i_w /= 0) n = n+increment_for_i_etrb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
@@ -628,14 +628,14 @@
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
-               else if (i_etrb /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_etrb,k) = max(0d0,vec(j))
+               else if (i_w /= 0) then ! convert from RSP to TDC
+                  j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j)))
                   j=j+1; ! discard
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,k) = vec(j)
                end if
-            else if (i_etrb /= 0) then
-               j=j+1; xh(i_etrb,k) = max(vec(j),0d0)
+            else if (i_w /= 0) then
+               j=j+1; xh(i_w,k) = vec(j)
                j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,k) = vec(j)

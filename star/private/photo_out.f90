@@ -91,7 +91,7 @@
 
          write(iounit) &
             s% i_lnd, s% i_lnT, s% i_lnR, s% i_lum, s% i_etrb_RSP, s% i_erad_RSP, s% i_Fr_RSP, &
-            s% i_v, s% i_u, s% i_alpha_RTI, s% i_ln_cvpv0, s% i_etrb, &
+            s% i_v, s% i_u, s% i_alpha_RTI, s% i_ln_cvpv0, s% i_w, &
             s% i_w_div_wc, s% i_j_rot, &
             s% i_dv_dt, s% i_equL, s% i_dlnd_dt, s% i_dlnE_dt, &
             s% i_detrb_RSP_dt, s% i_derad_RSP_dt, s% i_dFr_RSP_dt, s% i_du_dt, s% i_dlnR_dt, &
