@@ -130,7 +130,7 @@ module skye_coulomb_solid
    !! @param ex Output (exp(x) clipped to avoid over/underflow).
    type(auto_diff_real_2var_order3) function safe_exp(x) result(ex)
       type(auto_diff_real_2var_order3), intent(in) :: x
-      ex = exp(max(-3d1,min(3d1,x)))
+      ex = exp(max(-1d2,min(1d2,x)))
    end function safe_exp
 
    !> Calculates the electron-ion screening corrections to the free energy
@@ -142,13 +142,14 @@ module skye_coulomb_solid
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F non-ideal free energy
    function ocp_solid_screening_free_energy_correction(Z, mi, g, TPT) result(F)
+         use skye_coulomb_liquid
          real(dp), intent(in) :: Z, mi
          type(auto_diff_real_2var_order3), intent(in) :: g, TPT
 
-         real(dp) :: s, b1, b2, b3, b4, cX
+         real(dp) :: s, b1, b2, b3, b4
          real(dp), parameter :: aTF = 0.00352d0
 
-         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, asym, alpha, w, gr
+         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, asym, alpha, Fliq, gr, switch
          type(auto_diff_real_2var_order3) :: F
 
          s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
@@ -160,11 +161,11 @@ module skye_coulomb_solid
          rs = (me / mi) * (3d0 * pow2(g / TPT)) * pow(Z, -7d0/3d0)
          ge = g * pow(Z, -5d0/3d0)
 
-         cx = pow(9d0 * pi / 4d0, 1d0/3d0) * fine
-         xr = cx / rs
+         xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
 
-         supp = safe_exp(pow2(0.205d0 * TPT))
-         Q = sqrt(log(1d0 + supp) / log(eulernum - (eulernum - 2d0) / supp))
+         supp = safe_exp(-pow2(0.205d0 * TPT))
+         Q = sqrt((pow2(0.205d0 * TPT) + log(1d0 + supp)) / log(eulernum - (eulernum - 2d0) * supp))
+
          A = (b3 + 17.9d0 * pow2(xr)) / (1d0 + b4 * pow2(xr))
          f_inf = aTF * pow(Z, 2d0/3d0) * b1 * sqrt(1d0 + b2 / pow2(xr))
 
@@ -173,12 +174,18 @@ module skye_coulomb_solid
          gr = sqrt(1d0 + pow2(xr))
          alpha = 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0) * (rs / ge) * gr
 
-         w = -(aTF / cx) * rs * pow(Z, 7d0/3d0) * sqrt(3 / ge)
-         w = w / (pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))
+         Fliq = ocp_liquid_screening_free_energy_correction(Z, mi, g, TPT)
 
-         asym = 1d0 / (1d0 + tanh(alpha) * (w - 1d0))! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
 
-         F = F * asym
+!         w = -(aTF / xr) * b1 * sqrt(b2) * pow(Z, 7d0/3d0) * sqrt(3 / ge)
+!         w = w / (pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))
+!         w = w * (1d0 + A * pow(Q / g, s))
+
+         switch = pow3(tanh(2d0*alpha))
+         F = switch * Fliq + (1d0 - switch) * F
+!         asym = switch / w + (1-switch) ! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
+!         write(*,*) g%val, TPT%val, rs%val, alpha%val, w%val, asym%val, F%val*asym%val/(pow(ge%val,1.5d0))/(pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))/(1d0/sqrt(3d0))
+!         F = F * asym
 
    end function ocp_solid_screening_free_energy_correction
 
