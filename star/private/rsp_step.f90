@@ -662,14 +662,6 @@
             s% Lc_start(k) = s% Lc(k)
             s% Lt_start(k) = s% Lt(k)
             s% COUPL_start(k) = s% COUPL(k)
-            
-            ! for debugging
-            !s% xtra1_array(k) = 1d0/s% Vol(k)
-            !s% xtra2_array(k) = s% T(k)
-            !s% xtra3_array(k) = abs(s% RSP_w(k)) + 1d0
-            !s% xtra4_array(k) = abs(s% v(k)) + 1d0
-            !s% xtra5_array(k) = s% r(k)
-
          end do
       end subroutine save_start_vars
       
@@ -1825,11 +1817,12 @@
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
          
-            !s% xtra1_array(k) = POM
+            !s% xtra1_array(k) = s% SOURCE(k)
             !s% xtra2_array(k) = s% PII(k)
             !s% xtra3_array(k) = s% Hp_face(k)
-            !s% xtra4_array(k) = POM3
-            !s% xtra5_array(k) = s% QQ(k)
+            !s% xtra4_array(k) = s% PII(k+1)
+            !s% xtra5_array(k) = s% Hp_face(k+1)
+            !s% xtra6_array(k) = POM2*POM3
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2

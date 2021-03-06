@@ -76,12 +76,6 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
-      
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-
-      !corr_coeff_limit = 1d0
 
       !photo_interval = 1
       !profile_interval = 1

@@ -3,20 +3,14 @@
    show_log_description_at_start = .false.
 
    load_saved_model = .true.
-   saved_model_name = '1M_zams.mod'
-
-   change_initial_TDC_flag = .true.
-   new_TDC_flag = .true.
+   saved_model_name = 'lgTmax.mod'
    
    save_model_when_terminate = .true.
    save_model_filename = 'tdc_final.mod'
    required_termination_code_string(1) = 'max_model_number' ! just for testing
 
-   change_initial_net = .true. ! switch nuclear reaction network
-   new_net_name = 'pp_and_cno_extras.net'
-
-   set_rate_c12ag = 'Kunz'
-   set_rate_n14pg = 'jina reaclib'
+   change_initial_TDC_flag = .true.
+   new_TDC_flag = .true.
    
    change_initial_v_flag = .true.
    new_v_flag = .true.
@@ -28,14 +22,14 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1d-4
+   seconds_for_initial_dt = 1d0
    
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
 
    !remove_initial_center_by_radius_Rsun = 0.15
 
-   pgstar_flag = .true.
+   !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -43,70 +37,35 @@
 / ! end of eos namelist
 
 &kap
-   use_Type2_opacities = .false.
-   kap_file_prefix = 'OP_gs98'
-   kap_lowT_prefix = 'lowT_fa05_gs98' ! for lower temperatures.
 / ! end of kap namelist
 
 &controls  
 
+   fe_core_infall_limit = 1d7
+
    ! limit max_model_number as part of test_suite
    max_model_number = 1200
-   max_number_retries = 100
+   max_number_retries = 0 ! 100
    
-! mesh
-   
+! mesh  
    ! SKIP REMESHING FOR NOW
-   okay_to_remesh = .false.
-
+   !okay_to_remesh = .false.
    mesh_delta_coeff = 0.5
-   
-   ! custom mesh spacing function to resolve convective boundary
-   ! see run_star_extras.f90
-   !use_other_mesh_functions = .true.
-   x_ctrl(1) = 500    ! weight
-   x_ctrl(2) = 0.02d0 ! width
-   x_ctrl(3) = 0d0    ! center
 
-! atmosphere
-   atm_option = 'table'
-   atm_table = 'photosphere'
+! wind
       
 ! timesteps
-   max_years_for_timestep = 1d7           
-   varcontrol_target = 1d-3
-   max_timestep_factor = 2d0
-   delta_lgT_cntr_limit = 0.1  
-   delta_lgRho_cntr_limit = 0.5 
+   limit_for_rel_error_in_energy_conservation = 1d-4
+   hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-! diffusion
-   ! SKIP DIFFUSION FOR NOW.
-   !do_element_diffusion = .true. ! determines whether or not we do diffusion
-   
-   do_diffusion_heating = .true.
-   diffusion_dt_limit = 7d11 ! no element diffusion if dt < this limit (in seconds)
-   diffusion_T_full_on = 1d3
-   diffusion_T_full_off = 1d3
-   
-   diffusion_calculates_ionization = .true.
+   delta_XSi_cntr_limit = 0.008
+   delta_XSi_cntr_hard_limit = 0.025
 
-   diffusion_num_classes = 4 ! number of classes of species for diffusion calculations
-   diffusion_class_representative(1) = 'h1'
-   diffusion_class_representative(2) = 'he4'
-   diffusion_class_representative(3) = 'o16'
-   diffusion_class_representative(4) = 'fe56'
+! rotation
 
-   ! in ascending order.  species goes into 1st class with A_max >= species A
-   diffusion_class_A_max(1) = 2
-   diffusion_class_A_max(2) = 4
-   diffusion_class_A_max(3) = 16
-   diffusion_class_A_max(4) = 10000
-      
-   diffusion_use_isolve = .true.
-   diffusion_rtol_for_isolve = 1d-4
-   diffusion_atol_for_isolve = 1d-5
-   diffusion_maxsteps_for_isolve = 1000
-   diffusion_isolve_solver = 'ros2_solver'
+! mlt
+   alpha_semiconvection = 0
+   thermohaline_coeff = 0
 
 ! TDC default settings
 
@@ -127,21 +86,14 @@
    ! USE SIMPLE BC FOR NOW
    use_compression_outer_BC = .true.
 
-   always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
-
-   eps_nuc_factor = 0
-   non_nuc_neu_factor = 0
-   dxdt_nuc_factor = 0
-   mix_factor = 0
-
-   set_rho_to_dm_div_dV = .false.
+   !convergence_ignore_equL_residuals = .true.
    
    avQ_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    avQ_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
    
 ! output
-   terminal_show_age_units = 'years'
-   terminal_show_timestep_units = 'years'
+   terminal_show_age_units = 'secs'
+   terminal_show_timestep_units = 'secs'
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
 
@@ -154,7 +106,7 @@
    !history_interval = 1
    terminal_interval = 100
 
-   photo_interval = 10
+   photo_interval = 1
    !profile_interval = 1
    !history_interval = 1
    terminal_interval = 1
@@ -163,8 +115,8 @@
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
@@ -231,7 +183,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 10 ! 20
+   pgstar_interval = 1 ! 20
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'

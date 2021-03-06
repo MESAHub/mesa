@@ -543,6 +543,21 @@
          end if
          xh(s% i_lnd,k) = lnd
       end subroutine store_lnd_in_xh
+      
+      
+      subroutine store_w_in_xh(s, k, w, xh_in)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: w
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         xh(s% i_w,k) = w
+      end subroutine store_w_in_xh
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)

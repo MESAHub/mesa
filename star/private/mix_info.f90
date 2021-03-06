@@ -118,23 +118,31 @@
             cdc_factor(k) = f*f
          end do
          
-         if (TDC_or_RSP) then
+         if (s% RSP_flag) then
             do k = 1, nz
                s% mixing_type(k) = no_mixing
                s% D_mix(k) = 0d0
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
+         else if (s% TDC_flag) then
+            do k = 1, nz
+               s% conv_vel(k) = abs(s% w(k))
+               s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
+               s% cdc(k) = cdc_factor(k)*s% D_mix(k)
+            end do
+
+
+
+            do k = 1, nz
+               s% mixing_type(k) = no_mixing
+               s% D_mix(k) = 0d0
+               s% cdc(k) = 0d0
+               s% conv_vel(k) = 0d0
+            end do
+         
          else if (s% conv_vel_flag) then
             do k = 1, nz
-               if (s% TDC_flag) then
-                  s% conv_vel(k) = s% w(k)
-                  if (s% conv_vel(k) >= min_conv_vel_for_convective_mixing_type) then
-                     s% mixing_type(k) = convective_mixing
-                  else
-                     s% mixing_type(k) = no_mixing
-                  end if
-               end if
                s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0
                if (s% conv_vel_ignore_thermohaline) then
                   s% D_mix(k) = s% D_mix(k) + s% mlt_D_thrm(k)
