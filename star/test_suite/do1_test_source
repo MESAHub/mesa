@@ -1,4 +1,9 @@
 
+
+
+# move twin_studies to start of list so that for [ci split] it will go to cannon instead of helios (until helios is fixed)
+do_one twin_studies "stars have reached stopping age" skip skip
+
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
 do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
 do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
@@ -75,7 +80,6 @@ do_one semiconvection "all values are within tolerances" "final.mod" auto
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
 do_one timing "stop because have dropped below central lower limit for h1" skip skip
-do_one twin_studies "stars have reached stopping age" skip skip
 do_one wd_acc_small_dm "All accretion tests passed successfully" "final.mod" auto
 do_one wd_aic "PASS: A=20 electron captures have started a thermal runaway in the core" "final.mod" auto
 do_one wd_c_core_ignition "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto
