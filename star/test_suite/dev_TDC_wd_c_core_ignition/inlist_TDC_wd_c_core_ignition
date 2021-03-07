@@ -111,8 +111,8 @@
 
    !convergence_ignore_equL_residuals = .true.
    
-   avQ_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   avQ_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
    
 ! output
    terminal_show_age_units = 'secs'
@@ -417,7 +417,7 @@
    Profile_Panels1_other_yaxis_name(8) = '' 
    Profile_Panels1_same_yaxis_range(8) = .true.
 
-   Profile_Panels1_yaxis_name(9) = 'avQ'
+   Profile_Panels1_yaxis_name(9) = 'Pvsc'
    Profile_Panels1_other_yaxis_name(9) = '' 
    Profile_Panels1_same_yaxis_range(9) = .true.
 

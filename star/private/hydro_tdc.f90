@@ -111,7 +111,7 @@
          integer, intent(out) :: ierr         
          real(dp) :: scal, residual
          type(auto_diff_real_star_order1) :: resid_ad, &
-            d_turbulent_energy_ad, PtdV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
+            d_turbulent_energy_ad, Ptrb_dV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, test_partials
          include 'formats'
@@ -133,14 +133,14 @@
          else
          
             call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
-            call setup_PtdV_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
             call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
          
             ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
-            esum_ad = d_turbulent_energy_ad + PtdV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
+            esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
          
             resid_ad = esum_ad ! convert back to auto_diff_real_star_order1
             resid_ad = resid_ad*scal/s% dt ! to make residual unitless, must cancel out the dt in scal
@@ -154,7 +154,7 @@
 !$omp critical (hydro_equ_turbulent_crit1)
             write(*,2) 'turbulent energy eqn residual', k, residual
             write(*,2) 'det', k, d_turbulent_energy_ad%val
-            write(*,2) 'PtdV', k, PtdV_ad%val
+            write(*,2) 'Ptrb_dV', k, Ptrb_dV_ad%val
             write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_ad%val
             write(*,2) 'dt_C', k, dt_C_ad%val
             write(*,2) 'dt_Eq', k, dt_Eq_ad%val
@@ -186,17 +186,17 @@
             d_turbulent_energy_ad = wrap_dxh_w(s,k)*(w_00 + s% w_start(k))
          end subroutine setup_d_turbulent_energy
          
-         ! PtdV_ad = Pt_ad*dV_ad
-         subroutine setup_PtdV_ad(ierr) ! erg g^-1
-            use star_utils, only: calc_Pt_ad_tw
+         ! Ptrb_dV_ad = Ptrb_ad*dV_ad
+         subroutine setup_Ptrb_dV_ad(ierr) ! erg g^-1
+            use star_utils, only: calc_Ptrb_ad_tw
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: Pt_ad, dV_ad, d_00
-            call calc_Pt_ad_tw(s, k, Pt_ad, ierr)
+            type(auto_diff_real_star_order1) :: Ptrb_ad, dV_ad, d_00
+            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, ierr)
             if (ierr /= 0) return
             d_00 = wrap_d_00(s,k)
             dV_ad = 1d0/d_00 - 1d0/s% rho_start(k)
-            PtdV_ad = Pt_ad*dV_ad ! erg cm^-3 cm^-3 g^-1 = erg g^-1
-         end subroutine setup_PtdV_ad
+            Ptrb_dV_ad = Ptrb_ad*dV_ad ! erg cm^-3 cm^-3 g^-1 = erg g^-1
+         end subroutine setup_Ptrb_dV_ad
 
          subroutine setup_dt_dLt_dm_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr            

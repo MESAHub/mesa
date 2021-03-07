@@ -586,14 +586,14 @@
       integer, parameter :: p_total_energy_sign = p_total_energy_integral + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
       
-      integer, parameter :: p_Pturb = p_total_energy + 1
-      integer, parameter :: p_log_Pturb = p_Pturb + 1
-      integer, parameter :: p_log_w = p_log_Pturb + 1
+      integer, parameter :: p_Ptrb = p_total_energy + 1
+      integer, parameter :: p_log_Ptrb = p_Ptrb + 1
+      integer, parameter :: p_log_w = p_log_Ptrb + 1
       integer, parameter :: p_w = p_log_w + 1
       integer, parameter :: p_etrb = p_w + 1
       integer, parameter :: p_log_etrb = p_etrb + 1
-      integer, parameter :: p_avQ = p_log_etrb + 1
-      integer, parameter :: p_Hp_face = p_avQ + 1
+      integer, parameter :: p_Pvsc = p_log_etrb + 1
+      integer, parameter :: p_Hp_face = p_Pvsc + 1
       integer, parameter :: p_Y_face = p_Hp_face + 1
       integer, parameter :: p_PII_face = p_Y_face + 1
       integer, parameter :: p_Chi = p_PII_face + 1
@@ -633,8 +633,8 @@
       integer, parameter :: p_rsp_log_heat_exchange_timescale = p_rsp_Y_face + 1
       integer, parameter :: p_rsp_log_dt_div_heat_exchange_timescale = p_rsp_log_heat_exchange_timescale + 1
       integer, parameter :: p_rsp_heat_exchange_timescale = p_rsp_log_dt_div_heat_exchange_timescale + 1
-      integer, parameter :: p_rsp_avQ = p_rsp_heat_exchange_timescale + 1
-      integer, parameter :: p_rsp_Chi = p_rsp_avQ + 1
+      integer, parameter :: p_rsp_Pvsc = p_rsp_heat_exchange_timescale + 1
+      integer, parameter :: p_rsp_Chi = p_rsp_Pvsc + 1
       integer, parameter :: p_rsp_gradT = p_rsp_Chi + 1
       integer, parameter :: p_rsp_Lr_div_L = p_rsp_gradT + 1
       integer, parameter :: p_rsp_Lc_div_L = p_rsp_Lr_div_L + 1
@@ -1268,13 +1268,13 @@
          profile_column_name(p_total_energy_integral_outward) = 'total_energy_integral_outward'
          profile_column_name(p_total_energy_integral) = 'total_energy_integral'
 
-         profile_column_name(p_Pturb) = 'Pturb'
-         profile_column_name(p_log_Pturb) = 'log_Pturb'
+         profile_column_name(p_Ptrb) = 'Ptrb'
+         profile_column_name(p_log_Ptrb) = 'log_Ptrb'
          profile_column_name(p_w) = 'w'
          profile_column_name(p_log_w) = 'log_w'
          profile_column_name(p_etrb) = 'etrb'
          profile_column_name(p_log_etrb) = 'log_etrb'
-         profile_column_name(p_avQ) = 'avQ'
+         profile_column_name(p_Pvsc) = 'Pvsc'
          profile_column_name(p_Hp_face) = 'Hp_face'
          profile_column_name(p_Y_face) = 'Y_face'
          profile_column_name(p_PII_face) = 'PII_face'
@@ -1316,7 +1316,7 @@
          profile_column_name(p_rsp_heat_exchange_timescale) = 'rsp_heat_exchange_timescale'
          profile_column_name(p_rsp_log_dt_div_heat_exchange_timescale) = 'rsp_log_dt_div_heat_exchange_timescale'
          profile_column_name(p_rsp_log_heat_exchange_timescale) = 'rsp_log_heat_exchange_timescale'
-         profile_column_name(p_rsp_avQ) = 'rsp_avQ'
+         profile_column_name(p_rsp_Pvsc) = 'rsp_Pvsc'
          profile_column_name(p_rsp_gradT) = 'rsp_gradT'
          profile_column_name(p_rsp_Lr_div_L) = 'rsp_Lr_div_L'
          profile_column_name(p_rsp_Lc_div_L) = 'rsp_Lc_div_L'

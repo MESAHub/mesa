@@ -1547,12 +1547,12 @@
             
             call do1(s% Fr, c% Fr); if (failed('Fr')) exit
             call do1(s% Fr_start, c% Fr_start); if (failed('Fr_start')) exit
-            call do1(s% avQ, c% avQ); if (failed('avQ')) exit
-            call do1(s% avQ_start, c% avQ_start); if (failed('avQ_start')) exit
-            call do1(s% Pt, c% Pt); if (failed('Pt')) exit
-            call do1(s% Pt_start, c% Pt_start); if (failed('Pt_start')) exit
-            call do1(s% d_Pt_dV_00, c% d_Pt_dV_00); if (failed('d_Pt_dV_00')) exit
-            call do1(s% d_Pt_dw_00, c% d_Pt_dw_00); if (failed('d_Pt_dw_00')) exit
+            call do1(s% Pvsc, c% Pvsc); if (failed('Pvsc')) exit
+            call do1(s% Pvsc_start, c% Pvsc_start); if (failed('Pvsc_start')) exit
+            call do1(s% Ptrb, c% Ptrb); if (failed('Ptrb')) exit
+            call do1(s% Ptrb_start, c% Ptrb_start); if (failed('Ptrb_start')) exit
+            call do1(s% d_Ptrb_dV_00, c% d_Ptrb_dV_00); if (failed('d_Ptrb_dV_00')) exit
+            call do1(s% d_Ptrb_dw_00, c% d_Ptrb_dw_00); if (failed('d_Ptrb_dw_00')) exit
             call do1(s% Eq, c% Eq); if (failed('Eq')) exit
             call do1(s% SOURCE, c% SOURCE); if (failed('SOURCE')) exit
             call do1(s% DAMP, c% DAMP); if (failed('DAMP')) exit

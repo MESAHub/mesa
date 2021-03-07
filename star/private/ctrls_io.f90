@@ -388,7 +388,7 @@
     corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, &
     corr_coeff_limit, tiny_corr_factor, solver_test_partials_call_number, solver_test_partials_iter_number, &
     max_tries1, solver_max_tries_before_reject, max_tries_for_retry, max_tries_after_5_retries, solver_test_partials_sink_name, &
-    max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_avQ_art_visc, avQ_cq, avQ_zsh, &
+    max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_Pvsc_art_visc, Pvsc_cq, Pvsc_zsh, &
     min_xa_hard_limit, min_xa_hard_limit_for_highT, logT_max_for_min_xa_hard_limit, logT_min_for_min_xa_hard_limit_for_highT, &
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
     xa_clip_limit, report_solver_progress, solver_test_partials_k_high, &
@@ -2004,9 +2004,9 @@
  s% retry_limit = retry_limit
  s% redo_limit = redo_limit
 
- s% use_avQ_art_visc = use_avQ_art_visc
- s% avQ_cq = avQ_cq
- s% avQ_zsh = avQ_zsh
+ s% use_Pvsc_art_visc = use_Pvsc_art_visc
+ s% Pvsc_cq = Pvsc_cq
+ s% Pvsc_zsh = Pvsc_zsh
 
  s% min_xa_hard_limit = min_xa_hard_limit
  s% min_xa_hard_limit_for_highT = min_xa_hard_limit_for_highT
@@ -3649,9 +3649,9 @@
  retry_limit = s% retry_limit
  redo_limit = s% redo_limit
 
- use_avQ_art_visc = s% use_avQ_art_visc
- avQ_cq = s% avQ_cq
- avQ_zsh = s% avQ_zsh
+ use_Pvsc_art_visc = s% use_Pvsc_art_visc
+ Pvsc_cq = s% Pvsc_cq
+ Pvsc_zsh = s% Pvsc_zsh
 
  min_xa_hard_limit = s% min_xa_hard_limit
  min_xa_hard_limit_for_highT = s% min_xa_hard_limit_for_highT

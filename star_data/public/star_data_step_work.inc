@@ -458,7 +458,7 @@
       ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
-            Pt, Eq, Uq, avQ, avQ_start, &
+            Ptrb, Eq, Uq, Pvsc, Pvsc_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
 
          integer :: TDC_num_periods
@@ -469,7 +469,7 @@
 
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
-            Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
+            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &               
             d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
             Y_face, d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &

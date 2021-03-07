@@ -330,8 +330,8 @@
          names(17) = 'Eq_R'
          names(18) = 'xUq'
          names(19) = 'Uq_R'
-         names(20) = 'xavQ'
-         names(21) = 'avQ_R'
+         names(20) = 'xPvsc'
+         names(21) = 'Pvsc_R'
          
          if (.false.) then ! debugging
             names(10) = 'xtr1'
@@ -379,8 +379,8 @@
                vals(k,17) = s_other% Eq(k)
                vals(k,18) = s% Uq(k)
                vals(k,19) = s_other% Uq(k)               
-               vals(k,20) = s% avQ(k)
-               vals(k,21) = s_other% avQ(k)
+               vals(k,20) = s% Pvsc(k)
+               vals(k,21) = s_other% Pvsc(k)
                
                if (.false.) then ! debugging xtra values
                   vals(k,10) = s% xtra1_array(k)

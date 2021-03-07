@@ -65,10 +65,10 @@
          dPII_dT_00, dPII_dT_out, &
          dPII_der_00, dPII_der_out, &
          
-         d_avQ_dr_00, d_avQ_dr_in, &
-         d_avQ_dVol, d_avQ_dT, d_avQ_der, &
+         d_Pvsc_dr_00, d_Pvsc_dr_in, &
+         d_Pvsc_dVol, d_Pvsc_dT, d_Pvsc_der, &
          
-         dPt_dr_00, dPt_dr_in, dPt_dVol_00, dPt_dw_00, &
+         dPtrb_dr_00, dPtrb_dr_in, dPtrb_dVol_00, dPtrb_dw_00, &
          
          dChi_dr_in2, dChi_dr_in, dChi_dr_00, dChi_dr_out, &  
          dChi_dVol_in, dChi_dVol_00, dChi_dVol_out, &
@@ -268,8 +268,8 @@
             dPII_dr_in(n), dPII_dr_00(n), dPII_dr_out(n), &
             dPII_dVol_00(n), dPII_dVol_out(n), &
             dPII_dT_00(n), dPII_dT_out(n), dPII_der_00(n), dPII_der_out(n), &         
-            d_avQ_dr_00(n), d_avQ_dr_in(n), d_avQ_dVol(n), d_avQ_dT(n), d_avQ_der(n), &         
-            dPt_dr_00(n), dPt_dr_in(n), dPt_dVol_00(n), dPt_dw_00(n), &         
+            d_Pvsc_dr_00(n), d_Pvsc_dr_in(n), d_Pvsc_dVol(n), d_Pvsc_dT(n), d_Pvsc_der(n), &         
+            dPtrb_dr_00(n), dPtrb_dr_in(n), dPtrb_dVol_00(n), dPtrb_dw_00(n), &         
             dChi_dr_in2(n), dChi_dr_in(n), dChi_dr_00(n), dChi_dr_out(n), &  
             dChi_dVol_in(n), dChi_dVol_00(n), dChi_dVol_out(n), &
             dChi_dT_in(n), dChi_dT_00(n), dChi_dT_out(n), &
@@ -312,8 +312,8 @@
             dPII_dr_in, dPII_dr_00, dPII_dr_out, &
             dPII_dVol_00, dPII_dVol_out, &
             dPII_dT_00, dPII_dT_out, dPII_der_00, dPII_der_out, &         
-            d_avQ_dr_00, d_avQ_dr_in, d_avQ_dVol, d_avQ_dT, d_avQ_der, &         
-            dPt_dr_00, dPt_dr_in, dPt_dVol_00, dPt_dw_00, &         
+            d_Pvsc_dr_00, d_Pvsc_dr_in, d_Pvsc_dVol, d_Pvsc_dT, d_Pvsc_der, &         
+            dPtrb_dr_00, dPtrb_dr_in, dPtrb_dVol_00, dPtrb_dw_00, &         
             dChi_dr_in2, dChi_dr_in, dChi_dr_00, dChi_dr_out, &  
             dChi_dVol_in, dChi_dVol_00, dChi_dVol_out, &
             dChi_dT_in, dChi_dT_00, dChi_dT_out, &
@@ -383,7 +383,7 @@
             rsp_tau_factor, rsp_min_dr_div_cs, rsp_min_rad_diff_time, &
             i_min_dr_div_cs, i_min_rad_diff_time, Psurf_from_atm, &
             s% Fr(1:n), s% Lc(1:n), s% Lt(1:n), s% Y_face(1:n), &
-            s% Pt(1:n), s% Chi(1:n), s% COUPL(1:n), s% avQ(1:n), &
+            s% Ptrb(1:n), s% Chi(1:n), s% COUPL(1:n), s% Pvsc(1:n), &
             s% T(1:n), s% r(1:n), s% Vol(1:n), s% RSP_w(1:n), &
             s% Pgas(1:n), s% Prad(1:n), s% csound(1:n), s% Cp(1:n), &
             s% egas(1:n), s% erad(1:n), s% opacity(1:n), s% QQ(1:n), &
@@ -421,7 +421,7 @@
             rsp_tau_factor, rsp_min_dr_div_cs, rsp_min_rad_diff_time, &
             i_min_dr_div_cs, i_min_rad_diff_time, Psurf_from_atm, &
             s% Fr(1:n), s% Lc(1:n), s% Lt(1:n), s% Y_face(1:n), &
-            s% Pt(1:n), s% Chi(1:n), s% COUPL(1:n), s% avQ(1:n), &
+            s% Ptrb(1:n), s% Chi(1:n), s% COUPL(1:n), s% Pvsc(1:n), &
             photo_T(1:n), photo_r(1:n), photo_Vol(1:n), photo_w(1:n), &
             photo_Pgas(1:n), photo_Prad(1:n), photo_csound(1:n), photo_Cp(1:n), &
             photo_egas(1:n), photo_erad(1:n), photo_opacity(1:n), photo_QQ(1:n), &
@@ -645,7 +645,7 @@
          do k=2, s% nz
             if (s% Peos(k) <= s% Peos(k-1)) then
                write(*,3) trim(str) // ' Peos inversion', k, s% model_number, s% Peos(k), s% Peos(k-1), &
-                  s% Pt(k), s% Pt(k-1), s% avQ(k), s% avQ(k-1), s% v(k+1), s% v(k), s% v(k-1)
+                  s% Ptrb(k), s% Ptrb(k-1), s% Pvsc(k), s% Pvsc(k-1), s% v(k+1), s% v(k), s% v(k-1)
                okay = .false.
             end if
          end do

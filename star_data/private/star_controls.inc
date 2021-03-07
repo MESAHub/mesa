@@ -950,8 +950,8 @@
 
          integer :: retry_limit, redo_limit
 
-         logical :: use_avQ_art_visc
-         real(dp) :: avQ_cq, avQ_zsh
+         logical :: use_Pvsc_art_visc
+         real(dp) :: Pvsc_cq, Pvsc_zsh
 
          real(dp) :: sig_term_limit, sig_min_factor_for_high_Tcenter, &
             Tcenter_min_for_sig_min_factor_full_on, &

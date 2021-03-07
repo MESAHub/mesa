@@ -3421,69 +3421,69 @@
       end subroutine get1_lpp
 
  
-      subroutine calc_Pt_ad_tw(s, k, Pt, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
+      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: Pt
+         type(auto_diff_real_star_order1), intent(out) :: Ptrb
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: w, rho
-         real(dp) :: Pt_start
+         real(dp) :: Ptrb_start
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
          if (s% TDC_alfap == 0 .or. s% TDC_alfa == 0) then
-            Pt = 0d0
+            Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          w = wrap_w_00(s,k)
-         Pt = s% TDC_alfap*pow2(w)*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
+         Ptrb = s% TDC_alfap*pow2(w)*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Pt_start = s% TDC_alfap*pow2(s% w_start(k))*s% rho_start(k)
-            Pt = 0.5d0*(Pt + Pt_start)
+            Ptrb_start = s% TDC_alfap*pow2(s% w_start(k))*s% rho_start(k)
+            Ptrb = 0.5d0*(Ptrb + Ptrb_start)
          end if
 
-         if (is_bad(Pt%val)) then
-!$omp critical (calc_Pt_ad_tw_crit)
-            write(*,2) 'Pt', k, Pt%val
-            stop 'calc_Pt_tw'
-!$omp end critical (calc_Pt_ad_tw_crit)
+         if (is_bad(Ptrb%val)) then
+!$omp critical (calc_Ptrb_ad_tw_crit)
+            write(*,2) 'Ptrb', k, Ptrb%val
+            stop 'calc_Ptrb_tw'
+!$omp end critical (calc_Ptrb_ad_tw_crit)
          end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
-            s% solver_test_partials_val = Pt%val
+            s% solver_test_partials_val = Ptrb%val
             !s% solver_test_partials_var = i_var_R
             !s% solver_test_partials_dval_dx = 0 ! d_residual_dr_00
-            write(*,*) 'calc_Pt_ad_tw', s% solver_test_partials_var
+            write(*,*) 'calc_Ptrb_ad_tw', s% solver_test_partials_var
          end if
          
-      end subroutine calc_Pt_ad_tw
+      end subroutine calc_Ptrb_ad_tw
 
 
-      ! XP_ad = Peos_ad + avQ_ad + Pt_ad + mlt_Pturb_ad with time weighting
-      subroutine calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, XP_ad, d_XP_dxa, ierr)
+      ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad with time weighting
+      subroutine calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
          use auto_diff_support
           type (star_info), pointer :: s 
          integer, intent(in) :: k
          logical, intent(in) :: skip_Peos, skip_mlt_Pturb
-         type(auto_diff_real_star_order1), intent(out) :: XP_ad
-         real(dp), dimension(s% species), intent(out) :: d_XP_dxa
+         type(auto_diff_real_star_order1), intent(out) :: Ptot_ad
+         real(dp), dimension(s% species), intent(out) :: d_Ptot_dxa
          integer, intent(out) :: ierr
          integer :: j
          real(dp) :: mlt_Pturb_start
          type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
-            Peos_ad, avQ_ad, Pt_ad, mlt_Pturb_ad
+            Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad
          logical :: time_center
          include 'formats'
          
          ierr = 0
-         d_XP_dxa = 0d0
+         d_Ptot_dxa = 0d0
          
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
@@ -3493,23 +3493,23 @@
             Peos_ad = wrap_peos_00(s, k)
             if (time_center) Peos_ad = 0.5d0*(Peos_ad + s% Peos_start(k))
             do j=1,s% species
-               d_XP_dxa(j) = s% Peos(k)*s% dlnPeos_dxa_for_partials(j,k)
-               if (time_center) d_XP_dxa(j) = 0.5d0*d_XP_dxa(j)
+               d_Ptot_dxa(j) = s% Peos(k)*s% dlnPeos_dxa_for_partials(j,k)
+               if (time_center) d_Ptot_dxa(j) = 0.5d0*d_Ptot_dxa(j)
             end do
          end if
 
-         avQ_ad = 0d0
-         if (s% use_avQ_art_visc) then
-            call get_avQ_ad(s, k, avQ_ad, ierr)
+         Pvsc_ad = 0d0
+         if (s% use_Pvsc_art_visc) then
+            call get_Pvsc_ad(s, k, Pvsc_ad, ierr)
             if (ierr /= 0) return
-            if (time_center) avQ_ad = 0.5d0*(avQ_ad + s% avQ_start(k))
+            if (time_center) Pvsc_ad = 0.5d0*(Pvsc_ad + s% Pvsc_start(k))
          end if
          
-         Pt_ad = 0d0
+         Ptrb_ad = 0d0
          if (s% TDC_flag) then
-            call calc_Pt_ad_tw(s, k, Pt_ad, ierr) 
+            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, ierr) 
             if (ierr /= 0) return
-            ! note that Pt_ad is already time weighted
+            ! note that Ptrb_ad is already time weighted
          end if
 
          mlt_Pturb_ad = 0d0
@@ -3525,28 +3525,28 @@
             end if
          end if           
          
-         XP_ad = Peos_ad + avQ_ad + Pt_ad + mlt_Pturb_ad
+         Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad
          
-         if (s% use_other_pressure) XP_ad%val = XP_ad%val + s% extra_pressure(k)
+         if (s% use_other_pressure) Ptot_ad%val = Ptot_ad%val + s% extra_pressure(k)
 
-      end subroutine calc_XP_ad_tw
+      end subroutine calc_Ptot_ad_tw
       
       
-      subroutine get_avQ_ad(s, k, avQ, ierr)
+      subroutine get_Pvsc_ad(s, k, Pvsc, ierr)
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s      
          integer, intent(in) :: k 
-         type(auto_diff_real_star_order1), intent(out) :: avQ
+         type(auto_diff_real_star_order1), intent(out) :: Pvsc
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: v00, vp1, Peos, rho, &
             Peos_div_rho, dv
          real(dp) :: cq, zsh
-         avQ = 0
-         if (.not. (s% v_flag .and. s% use_avQ_art_visc)) return
-         cq = s% avQ_cq
+         Pvsc = 0
+         if (.not. (s% v_flag .and. s% use_Pvsc_art_visc)) return
+         cq = s% Pvsc_cq
          if (cq == 0d0) return
-         zsh = s% avQ_zsh
+         zsh = s% Pvsc_zsh
          v00 = wrap_v_00(s,k)
          vp1 = wrap_v_p1(s,k)
          Peos = wrap_Peos_00(s,k)
@@ -3554,8 +3554,8 @@
          Peos_div_rho = Peos/rho
          dv = (vp1 - v00) - zsh*sqrt(Peos_div_rho)
          if (dv%val <= 0d0) return
-         avQ = cq*rho*pow2(dv)
-      end subroutine get_avQ_ad
+         Pvsc = cq*rho*pow2(dv)
+      end subroutine get_Pvsc_ad
       
       
       ! marsaglia and zaman random number generator. period is 2**43 with

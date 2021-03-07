@@ -542,7 +542,7 @@
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr) 
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
-         use star_utils, only: calc_XP_ad_tw
+         use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          logical, intent(in) :: skip_P
@@ -555,9 +555,9 @@
          real(dp) :: work_00, work_p1, dm, dV
          real(dp), dimension(s% species) :: &
             d_work_00_dxa00, d_work_00_dxam1, &
-            d_work_p1_dxap1, d_work_p1_dxa00, d_XP_dxa
+            d_work_p1_dxap1, d_work_p1_dxa00, d_Ptot_dxa
          type(auto_diff_real_star_order1) :: work_00_ad, work_p1_ad, &
-            XP_ad, dV_ad, rho_ad
+            Ptot_ad, dV_ad, rho_ad
          logical :: test_partials
          integer :: j
          include 'formats'
@@ -594,7 +594,7 @@
       ! ergs/s at face(k)
       subroutine eval1_work(s, k, skip_Peos, &
             work_ad, work, d_work_dxa00, d_work_dxam1, ierr)
-         use star_utils, only: get_avQ_ad, calc_Pt_ad_tw
+         use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s 
@@ -609,8 +609,8 @@
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
-            PtR_ad, PtL_ad, avQL_ad, avQR_ad, PL_ad, PR_ad, &
-            Peos_ad, Pt_ad, avQ_ad, inv_R2
+            PtrbR_ad, PtrbL_ad, PvscL_ad, PvscR_ad, PL_ad, PR_ad, &
+            Peos_ad, Ptrb_ad, Pvsc_ad, inv_R2
          logical :: test_partials
          integer :: j
          include 'formats'
@@ -687,40 +687,40 @@
                end if
             end if
          
-            ! set avQ_ad
-            if (.not. s% use_avQ_art_visc) then
-               avQ_ad = 0d0
+            ! set Pvsc_ad
+            if (.not. s% use_Pvsc_art_visc) then
+               Pvsc_ad = 0d0
             else
                if (k > 1) then 
-                  call get_avQ_ad(s, k-1, avQR_ad, ierr)
+                  call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
-                  avQR_ad = shift_m1(avQR_ad)
+                  PvscR_ad = shift_m1(PvscR_ad)
                   ! always time center
-                  avQR_ad = 0.5d0*(avQR_ad + s% avQ_start(k-1))
+                  PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
-                  avQR_ad = 0d0
+                  PvscR_ad = 0d0
                end if
-               call get_avQ_ad(s, k, avQL_ad, ierr)
+               call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
                ! always time center
-               avQL_ad = 0.5d0*(avQL_ad + s% avQ_start(k))
-               avQ_ad = alfa*avQL_ad + beta*avQR_ad
+               PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
+               Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
          
-            ! set Pt_ad
+            ! set Ptrb_ad
             if (.not. s% TDC_flag) then
-               Pt_ad = 0d0
+               Ptrb_ad = 0d0
             else
                if (k > 1) then 
-                  call calc_Pt_ad_tw(s, k-1, PtR_ad, ierr)
+                  call calc_Ptrb_ad_tw(s, k-1, PtrbR_ad, ierr)
                   if (ierr /= 0) return
-                  PtR_ad = shift_m1(PtR_ad)
+                  PtrbR_ad = shift_m1(PtrbR_ad)
                else
-                  PtR_ad = 0d0
+                  PtrbR_ad = 0d0
                end if
-               call calc_Pt_ad_tw(s, k, PtL_ad, ierr)
+               call calc_Ptrb_ad_tw(s, k, PtrbL_ad, ierr)
                if (ierr /= 0) return
-               Pt_ad = alfa*PtL_ad + beta*PtR_ad
+               Ptrb_ad = alfa*PtrbL_ad + beta*PtrbR_ad
             end if
          
             ! set extra_P
@@ -740,7 +740,7 @@
                mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
             end if            
          
-            P_face_ad = Peos_ad + avQ_ad + Pt_ad + mlt_Pturb_ad + extra_P
+            P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
          
          end if
          
@@ -813,7 +813,7 @@
             s, k, skip_P, dwork_ad, dwork, d_dwork_dxa00, ierr) 
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
-         use star_utils, only: calc_XP_ad_tw
+         use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          logical, intent(in) :: skip_P
@@ -823,8 +823,8 @@
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
-            Av_face00_ad, Av_facep1_ad, XP_ad, dV
-         real(dp), dimension(s% species) :: d_XP_dxa
+            Av_face00_ad, Av_facep1_ad, Ptot_ad, dV
+         real(dp), dimension(s% species) :: d_Ptot_dxa
          real(dp) :: Av_face00, Av_facep1
          logical :: include_mlt_Pturb
          integer :: j
@@ -850,16 +850,16 @@
          include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
             .and. s% mlt_vc_start(k) > 0d0 .and. k > 1
          
-         call calc_XP_ad_tw( &
-            s, k, skip_P, .not. include_mlt_Pturb, XP_ad, d_XP_dxa, ierr)
+         call calc_Ptot_ad_tw( &
+            s, k, skip_P, .not. include_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
          if (ierr /= 0) return
          
          do j=1,s% species
-            d_dwork_dxa00(j) = d_XP_dxa(j)*(Av_face00 - Av_facep1)
+            d_dwork_dxa00(j) = d_Ptot_dxa(j)*(Av_face00 - Av_facep1)
          end do
-         if (k == 1) s% work_outward_at_surface = XP_ad%val*Av_face00
+         if (k == 1) s% work_outward_at_surface = Ptot_ad%val*Av_face00
          
-         dwork_ad = XP_ad*dV
+         dwork_ad = Ptot_ad*dV
          dwork = dwork_ad%val
 
       end subroutine eval_Fraley_PdV_work

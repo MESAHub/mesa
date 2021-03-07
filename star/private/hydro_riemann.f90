@@ -189,18 +189,14 @@
          end subroutine setup_momentum_flux
 
          subroutine setup_geometry_source(ierr)
-            use star_utils, only: calc_XP_ad_tw
+            use star_utils, only: calc_Ptot_ad_tw
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: P
-            real(dp), dimension(s% species) :: d_XP_dxa
+            real(dp), dimension(s% species) :: d_Ptot_dxa
             logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
             ierr = 0
             ! use same P here as the cell pressure in P_face calculation
-            if (.true.) then
-               P = wrap_Peos_00(s,k)
-            else ! this breaks dev_pre_ms_to_pulses_80_800
-               call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_XP_dxa, ierr)
-            end if
+            call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_Ptot_dxa, ierr)
             if (ierr /= 0) return
             if (k == nz) then 
                ! no flux in from left, so only have geometry source on right
@@ -309,7 +305,7 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
-         use star_utils, only: calc_XP_ad_tw
+         use star_utils, only: calc_Ptot_ad_tw
          use hydro_tdc, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
@@ -321,7 +317,7 @@
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
-         real(dp), dimension(s% species) :: d_XP_dxa
+         real(dp), dimension(s% species) :: d_Ptot_dxa ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
          real(dp) :: dG_dw_div_wc, delta_m, f
             
@@ -344,16 +340,11 @@
          r_ad = wrap_r_00(s,k)
          A_ad = 4d0*pi*pow2(r_ad)
          
-         if (.true.) then
-            PL_ad = wrap_Peos_00(s,k)
-            PR_ad = wrap_Peos_m1(s,k)
-         else ! this breaks dev_pre_ms_to_pulses_80_800
-            call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_XP_dxa, ierr)
-            if (ierr /= 0) return
-            call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PR_ad, d_XP_dxa, ierr)
-            if (ierr /= 0) return
-            PR_ad = shift_m1(PR_ad)
-         end if
+         call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr)
+         if (ierr /= 0) return
+         call calc_Ptot_ad_tw(s, k-1, skip_Peos, skip_mlt_Pturb, PR_ad, d_Ptot_dxa, ierr)
+         if (ierr /= 0) return
+         PR_ad = shift_m1(PR_ad)
 
          uL_ad = wrap_u_00(s,k)
          uR_ad = wrap_u_m1(s,k)

@@ -73,8 +73,8 @@
 
    set_rho_to_dm_div_dV = .false.
    
-   avQ_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   avQ_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
    
 ! output
    terminal_show_age_units = 'days'
@@ -120,7 +120,7 @@
    RSP_theta =      0.5d0        ! Pgas and Prad
    RSP_thetat =     0.5d0        ! Pturb
    RSP_thetae =     0.5d0        ! erad in terms using f_Edd
-   RSP_thetaq =     1.0d0        ! avQ
+   RSP_thetaq =     1.0d0        ! Pvsc
    RSP_thetau =     1.0d0        ! Eq and Uq
    RSP_wtr =        0.6667d0     ! Lr
    RSP_wtc =        0.6667d0     ! Lc
@@ -593,8 +593,8 @@
       Profile_Panels1_other_yaxis_name(8) = 'Uq_R' 
       Profile_Panels1_same_yaxis_range(8) = .true.
 
-      Profile_Panels1_yaxis_name(9) = 'avQ'
-      Profile_Panels1_other_yaxis_name(9) = 'avQ_R' 
+      Profile_Panels1_yaxis_name(9) = 'Pvsc'
+      Profile_Panels1_other_yaxis_name(9) = 'Pvsc_R' 
       Profile_Panels1_same_yaxis_range(9) = .true.
 
    

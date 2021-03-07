@@ -1773,13 +1773,13 @@
                if (s% u_flag .and. k > 1) &
                   val = s% u(k-1)/s% rmid_start(k-1) - s% u(k)/s% rmid_start(k)
 
-            case(p_Pturb)
+            case(p_Ptrb)
                if (s% TDC_flag) then
                   val = pow2(s% w(k))*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
-            case(p_log_Pturb)
+            case(p_log_Ptrb)
                if (s% TDC_flag) then
                   val = safe_log10(pow2(s% w(k))*s% rho(k))
                else if (s% RSP_flag) then
@@ -1810,8 +1810,8 @@
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if
-            case(p_avQ)
-               if (s% use_avQ_art_visc .or. s% RSP_flag) val = s% avQ(k)
+            case(p_Pvsc)
+               if (s% use_Pvsc_art_visc .or. s% RSP_flag) val = s% Pvsc(k)
             case(p_Hp_face)
                if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
@@ -1851,7 +1851,7 @@
                if (s% rsp_flag) &
                   val = safe_log10(s% RSP_Et(k))
             case(p_rsp_Pt)
-               if (s% rsp_flag) val = s% Pt(k)
+               if (s% rsp_flag) val = s% Ptrb(k)
             case(p_rsp_Eq)
                if (s% rsp_flag) val = s% Eq(k)
             case(p_rsp_PII_face)
@@ -1870,8 +1870,8 @@
                if (s% rsp_flag) val = s% Hp_face(k)
             case(p_rsp_Chi)
                if (s% rsp_flag) val = s% Chi(k)
-            case(p_rsp_avQ)
-               if (s% rsp_flag) val = s% avQ(k)
+            case(p_rsp_Pvsc)
+               if (s% rsp_flag) val = s% Pvsc(k)
             case(p_rsp_erad)
                if (s% rsp_flag) val = s% erad(k)
             case(p_rsp_log_erad)

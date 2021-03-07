@@ -104,16 +104,16 @@
          real(dp), intent(out) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          integer, intent(out) :: ierr
          
-         real(dp) :: residual, dm_face, dXP, iXPavg, dm_div_A
+         real(dp) :: residual, dm_face, dPtot, iPtotavg, dm_div_A
          real(dp), dimension(s% species) :: &
-            d_dXP_dxam1, d_dXP_dxa00, d_iXPavg_dxam1, d_iXPavg_dxa00, &
+            d_dPtot_dxam1, d_dPtot_dxa00, d_iPtotavg_dxam1, d_iPtotavg_dxa00, &
             d_residual_dxam1, d_residual_dxa00
          integer :: nz, j, i_dv_dt, i_lum, i_v
          logical :: test_partials
          
          type(auto_diff_real_star_order1) :: resid1_ad, resid_ad, &
-            other_ad, dm_div_A_ad, grav_ad, area_ad, dXP_ad, d_mlt_Pturb_ad, &
-            iXPavg_ad, other_dm_div_A_ad, grav_dm_div_A_ad, &
+            other_ad, dm_div_A_ad, grav_ad, area_ad, dPtot_ad, d_mlt_Pturb_ad, &
+            iPtotavg_ad, other_dm_div_A_ad, grav_dm_div_A_ad, &
             RTI_terms_ad, RTI_terms_dm_div_A_ad, accel_ad, Uq_ad
          type(accurate_auto_diff_real_star_order1) :: residual_sum_ad
 
@@ -125,26 +125,26 @@
          ierr = 0
          call init
 
-!   dv/dt = - G*m/r^2 - (dXP_ad + d_mlt_Pturb_ad)*area/dm + extra_grav + Uq + RTI_diffusion + RTI_kick
+!   dv/dt = - G*m/r^2 - (dPtot_ad + d_mlt_Pturb_ad)*area/dm + extra_grav + Uq + RTI_diffusion + RTI_kick
 ! 
 !   grav_ad = expected_HSE_grav_term = -G*m/r^2 with possible modifications for rotation
 !   other_ad = expected_non_HSE_term = extra_grav - dv/dt + Uq
 !   extra_grav is from the other_momentum hook
-!   dXP_ad = pressure difference across face from center to center of adjacent cells (excluding mlt_Pturb effects)
-!        XP = P_ad + avQ_ad + Pt_ad + extra_pressure, with time centering
-!   iXPavg_ad = 1/(avg XP).  for normalizing equation
+!   dPtot_ad = pressure difference across face from center to center of adjacent cells (excluding mlt_Pturb effects)
+!        Ptot = P_ad + Pvsc_ad + Ptrb_ad + extra_pressure, with time centering
+!   iPtotavg_ad = 1/(avg Ptot).  for normalizing equation
 !   d_mlt_Pturb_ad = difference in MLT convective pressure across face
 !   RTI_terms_ad = RTI_diffusion + RTI_kick
 !   dm_div_A_ad = dm/area
 ! 
-!   0  = extra_grav - dv/dt + Uq - G*m/r^2 - RTI_diffusion - RTI_kick - (dXP_ad + d_mlt_Pturb_ad)*area/dm
-!   0  = other + grav - RTI_terms - (dXP_ad + d_mlt_Pturb_ad)*area/dm
-!   0  = (other + grav - RTI_terms)*dm/area - dXP_ad - d_mlt_Pturb_ad
-!   0  = other_dm_div_A_ad + grav_dm_div_A_ad - dXP_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
+!   0  = extra_grav - dv/dt + Uq - G*m/r^2 - RTI_diffusion - RTI_kick - (dPtot_ad + d_mlt_Pturb_ad)*area/dm
+!   0  = other + grav - RTI_terms - (dPtot_ad + d_mlt_Pturb_ad)*area/dm
+!   0  = (other + grav - RTI_terms)*dm/area - dPtot_ad - d_mlt_Pturb_ad
+!   0  = other_dm_div_A_ad + grav_dm_div_A_ad - dPtot_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
 
          call setup_HSE(dm_div_A, ierr); if (ierr /= 0) return ! grav_ad and dm_div_A_ad
          call setup_non_HSE(ierr); if (ierr /= 0) return ! other = s% extra_grav(k) - dv_dt
-         call setup_dXP(ierr); if (ierr /= 0) return ! dXP_ad, iXPavg_ad
+         call setup_dPtot(ierr); if (ierr /= 0) return ! dPtot_ad, iPtotavg_ad
          call setup_d_mlt_Pturb(ierr); if (ierr /= 0) return ! d_mlt_Pturb_ad
          call setup_RTI_terms(ierr); if (ierr /= 0) return ! RTI_terms_ad
          
@@ -154,15 +154,15 @@
          
          ! sum terms in residual_sum_ad using accurate_auto_diff_real_star_order1
          residual_sum_ad = &
-            other_dm_div_A_ad + grav_dm_div_A_ad - dXP_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
+            other_dm_div_A_ad + grav_dm_div_A_ad - dPtot_ad - d_mlt_Pturb_ad + RTI_terms_dm_div_A_ad
          
          resid1_ad = residual_sum_ad ! convert back to auto_diff_real_star_order1
-         resid_ad = resid1_ad*iXPavg_ad ! scaling
+         resid_ad = resid1_ad*iPtotavg_ad ! scaling
          residual = resid_ad%val
          s% equ(i_dv_dt, k) = residual      
          
          !s% xtra1_array(k) = accel_ad%val
-         !s% xtra2_array(k) = safe_log10(-dXP_ad%val/dm_div_A_ad%val)
+         !s% xtra2_array(k) = safe_log10(-dPtot_ad%val/dm_div_A_ad%val)
          !s% xtra3_array(k) = safe_log10(-grav_ad%val)
          !s% xtra4_array(k) = Uq_ad%val
          !s% xtra5_array(k) = s% Chi(k)
@@ -220,17 +220,17 @@
             call expected_non_HSE_term(s, k, other_ad, other, accel_ad, Uq_ad, ierr)
          end subroutine setup_non_HSE
 
-         subroutine setup_dXP(ierr)
+         subroutine setup_dPtot(ierr)
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            ! dXP = pressure difference across face from center to center of adjacent cells.
-            ! iXPavg = average pressure at face for normalization of the equation to something like dlnP/dm
-            call get_dXP_face_info(s, k, P_surf_ad, &
-               dXP_ad, dXP, d_dXP_dxam1, d_dXP_dxa00, &
-               iXPavg_ad, iXPavg, d_iXPavg_dxam1, d_iXPavg_dxa00, ierr)
+            ! dPtot = pressure difference across face from center to center of adjacent cells.
+            ! iPtotavg = average pressure at face for normalization of the equation to something like dlnP/dm
+            call get_dPtot_face_info(s, k, P_surf_ad, &
+               dPtot_ad, dPtot, d_dPtot_dxam1, d_dPtot_dxa00, &
+               iPtotavg_ad, iPtotavg, d_iPtotavg_dxam1, d_iPtotavg_dxa00, ierr)
             if (ierr /= 0) return
-         end subroutine setup_dXP
+         end subroutine setup_dPtot
                   
          subroutine setup_d_mlt_Pturb(ierr)
             integer, intent(out) :: ierr
@@ -300,15 +300,15 @@
             ! do partials wrt composition   
             resid1 = resid1_ad%val         
             do j=1,species
-               d_residual_dxa00(j) = resid1*d_iXPavg_dxa00(j) - iXPavg*d_dXP_dxa00(j)
-               if (checking) call check_dequ(d_dXP_dxa00(j),'d_dXP_dxa00(j)')
-               if (checking) call check_dequ(d_iXPavg_dxa00(j),'d_iXPavg_dxa00(j)')
+               d_residual_dxa00(j) = resid1*d_iPtotavg_dxa00(j) - iPtotavg*d_dPtot_dxa00(j)
+               if (checking) call check_dequ(d_dPtot_dxa00(j),'d_dPtot_dxa00(j)')
+               if (checking) call check_dequ(d_iPtotavg_dxa00(j),'d_iPtotavg_dxa00(j)')
             end do
             if (k > 1) then 
                do j=1,species
-                  d_residual_dxam1(j) = resid1*d_iXPavg_dxam1(j) - iXPavg*d_dXP_dxam1(j)
-                  if (checking) call check_dequ(d_dXP_dxam1(j),'d_dXP_dxam1(j)')
-                  if (checking) call check_dequ(d_iXPavg_dxam1(j),'d_iXPavg_dxam1(j)')
+                  d_residual_dxam1(j) = resid1*d_iPtotavg_dxam1(j) - iPtotavg*d_dPtot_dxam1(j)
+                  if (checking) call check_dequ(d_dPtot_dxam1(j),'d_dPtot_dxam1(j)')
+                  if (checking) call check_dequ(d_iPtotavg_dxam1(j),'d_iPtotavg_dxam1(j)')
                end do
             else
                d_residual_dxam1 = 0d0
@@ -466,28 +466,28 @@
         
       end subroutine expected_non_HSE_term
 
-      ! dXP = pressure difference across face from center to center of adjacent cells.
+      ! dPtot = pressure difference across face from center to center of adjacent cells.
       ! excluding mlt_Pturb effects
-      subroutine get_dXP_face_info(s, k, P_surf_ad, &
-            dXP_ad, dXP, d_dXP_dxam1, d_dXP_dxa00, &
-            iXPavg_ad, iXPavg, d_iXPavg_dxam1, d_iXPavg_dxa00, ierr)
-         use star_utils, only: calc_XP_ad_tw
+      subroutine get_dPtot_face_info(s, k, P_surf_ad, &
+            dPtot_ad, dPtot, d_dPtot_dxam1, d_dPtot_dxa00, &
+            iPtotavg_ad, iPtotavg, d_iPtotavg_dxam1, d_iPtotavg_dxa00, ierr)
+         use star_utils, only: calc_Ptot_ad_tw
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad ! only used if k == 1
-         type(auto_diff_real_star_order1), intent(out) :: dXP_ad, iXPavg_ad
-         real(dp), intent(out) :: dXP, iXPavg
+         type(auto_diff_real_star_order1), intent(out) :: dPtot_ad, iPtotavg_ad
+         real(dp), intent(out) :: dPtot, iPtotavg
          real(dp), intent(out), dimension(s% species) :: &
-            d_dXP_dxam1, d_dXP_dxa00, d_iXPavg_dxam1, d_iXPavg_dxa00
+            d_dPtot_dxam1, d_dPtot_dxa00, d_iPtotavg_dxam1, d_iPtotavg_dxa00
          integer, intent(out) :: ierr
          
-         real(dp) :: XPm1, XP00, XPavg, alfa, beta
+         real(dp) :: Ptotm1, Ptot00, Ptotavg, alfa, beta
          real(dp), dimension(s% species) :: &
-            d_XPm1_dxam1, d_XP00_dxa00, d_XPavg_dxam1, d_XPavg_dxa00
+            d_Ptotm1_dxam1, d_Ptot00_dxa00, d_Ptotavg_dxam1, d_Ptotavg_dxa00
          type(auto_diff_real_star_order1) :: &
-            XP00_ad, XPm1_ad, XPavg_ad
+            Ptot00_ad, Ptotm1_ad, Ptotavg_ad
          integer :: j
          logical, parameter :: skip_P = .false., skip_mlt_Pturb = .true.
          logical :: test_partials
@@ -496,64 +496,64 @@
 
          ierr = 0
          
-         call calc_XP_ad_tw( &
-            s, k, skip_P, skip_mlt_Pturb, XP00_ad, d_XP00_dxa00, ierr)
+         call calc_Ptot_ad_tw( &
+            s, k, skip_P, skip_mlt_Pturb, Ptot00_ad, d_Ptot00_dxa00, ierr)
          if (ierr /= 0) return
-         XP00 = XP00_ad%val
+         Ptot00 = Ptot00_ad%val
             
          if (k > 1) then
-            call calc_XP_ad_tw( &
-               s, k-1, skip_P, skip_mlt_Pturb, XPm1_ad, d_XPm1_dxam1, ierr)
+            call calc_Ptot_ad_tw( &
+               s, k-1, skip_P, skip_mlt_Pturb, Ptotm1_ad, d_Ptotm1_dxam1, ierr)
             if (ierr /= 0) return
-            XPm1_ad = shift_m1(XPm1_ad)
+            Ptotm1_ad = shift_m1(Ptotm1_ad)
          else ! k == 1
-            XPm1_ad = P_surf_ad
+            Ptotm1_ad = P_surf_ad
          end if
-         XPm1 = XPm1_ad%val
+         Ptotm1 = Ptotm1_ad%val
             
-         dXP_ad = XPm1_ad - XP00_ad
-         dXP = XPm1 - XP00
+         dPtot_ad = Ptotm1_ad - Ptot00_ad
+         dPtot = Ptotm1 - Ptot00
          
          do j=1,s% species
-            d_dXP_dxam1(j) = d_XPm1_dxam1(j)
-            d_dXP_dxa00(j) = -d_XP00_dxa00(j)
+            d_dPtot_dxam1(j) = d_Ptotm1_dxam1(j)
+            d_dPtot_dxa00(j) = -d_Ptot00_dxa00(j)
          end do
 
          if (k == 1) then
-            XPavg_ad = XP00_ad
+            Ptotavg_ad = Ptot00_ad
             do j=1,s% species
-               d_XPavg_dxam1(j) = 0d0  
-               d_XPavg_dxa00(j) = d_XP00_dxa00(j)
+               d_Ptotavg_dxam1(j) = 0d0  
+               d_Ptotavg_dxa00(j) = d_Ptot00_dxa00(j)
             end do
          else
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1d0 - alfa
-            XPavg_ad = alfa*XP00_ad + beta*XPm1_ad
+            Ptotavg_ad = alfa*Ptot00_ad + beta*Ptotm1_ad
             do j=1,s% species
-               d_XPavg_dxam1(j) = beta*d_XPm1_dxam1(j)
-               d_XPavg_dxa00(j) = alfa*d_XP00_dxa00(j)
+               d_Ptotavg_dxam1(j) = beta*d_Ptotm1_dxam1(j)
+               d_Ptotavg_dxa00(j) = alfa*d_Ptot00_dxa00(j)
             end do
          end if
-         XPavg = XPavg_ad%val
+         Ptotavg = Ptotavg_ad%val
          
-         iXPavg_ad = 1d0/XPavg_ad
-         iXPavg = 1d0/XPavg         
+         iPtotavg_ad = 1d0/Ptotavg_ad
+         iPtotavg = 1d0/Ptotavg         
          do j=1,s% species
-            d_iXPavg_dxam1(j) = -iXPavg*d_XPavg_dxam1(j)/XPavg   
-            d_iXPavg_dxa00(j) = -iXPavg*d_XPavg_dxa00(j)/XPavg
+            d_iPtotavg_dxam1(j) = -iPtotavg*d_Ptotavg_dxam1(j)/Ptotavg   
+            d_iPtotavg_dxa00(j) = -iPtotavg*d_Ptotavg_dxa00(j)/Ptotavg
          end do
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
-            s% solver_test_partials_val = XP00
+            s% solver_test_partials_val = Ptot00
             s% solver_test_partials_var = s% i_lnT
             s% solver_test_partials_dval_dx = 0d0
-            write(*,*) 'get_dXP_face_info', s% solver_test_partials_var
+            write(*,*) 'get_dPtot_face_info', s% solver_test_partials_var
          end if
         
-      end subroutine get_dXP_face_info      
+      end subroutine get_dPtot_face_info      
 
 
       subroutine do1_radius_eqn(s, k, skip_partials, nvar, ierr)

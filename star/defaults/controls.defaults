@@ -2998,7 +2998,7 @@
       !   RSP_theta =      0.5d0        ! Pgas and Prad
       !   RSP_thetat =     0.5d0        ! Pturb
       !   RSP_thetae =     0.5d0        ! erad in terms using f_Edd
-      !   RSP_thetaq =     1.0d0        ! avQ
+      !   RSP_thetaq =     1.0d0        ! Pvsc
       !   RSP_thetau =     1.0d0        ! Eq and Uq
       !   RSP_wtr =        0.6667d0     ! Lr
       !   RSP_wtc =        0.6667d0     ! Lc
@@ -8829,14 +8829,14 @@
       ! artificial viscosity
 
 
-      ! use_avQ_art_visc
+      ! use_Pvsc_art_visc
       ! ~~~~~~~~~~~~~~~~
-      ! avQ_cq
+      ! Pvsc_cq
       ! ~~~~~~
-      ! avQ_zsh
+      ! Pvsc_zsh
       ! ~~~~~~~
 
-      ! avQ is artificial pressure to push back against compression
+      ! Pvsc is artificial pressure to push back against compression
       ! this is the form of artificial viscosity used in RSP
       ! if using this, do not set use_artificial_viscosity true.
 
@@ -8853,15 +8853,15 @@
 
       ! ::
 
-    use_avQ_art_visc = .false.
-    avQ_cq = 4.0d0
-    avQ_zsh = 0.1d0
+    use_Pvsc_art_visc = .false.
+    Pvsc_cq = 4.0d0
+    Pvsc_zsh = 0.1d0
 
 
       ! use_artificial_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! use_artificial_viscosity has been replaced by use_avQ_art_visc.
+      ! use_artificial_viscosity has been replaced by use_Pvsc_art_visc.
 
 ! split burn
 ! ==========
