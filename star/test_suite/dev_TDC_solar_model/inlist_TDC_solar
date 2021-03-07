@@ -52,7 +52,7 @@
 
    ! limit max_model_number as part of test_suite
    max_model_number = 1200
-   max_number_retries = 100
+   max_number_retries = 0 ! 100
    
 ! mesh
    
@@ -123,9 +123,8 @@
    ! TURN OFF GOLD FOR NOW
    use_gold2_tolerances = .false.
    use_gold_tolerances = .false.
-   
-   ! USE SIMPLE BC FOR NOW
-   use_compression_outer_BC = .true.
+
+   TDC_use_L_eqn_at_surface = .false.
 
    always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
 

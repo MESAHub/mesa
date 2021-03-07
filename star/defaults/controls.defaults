@@ -4098,21 +4098,6 @@
       ! See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       ! ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       ! ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
-      ! + ``'fixed_Teff'`` :
-      ! set Tsurf from Eddington T(tau) relation
-      !     for current surface tau and Teff = ``atm_fixed_Teff``.
-      ! set Psurf = Radiation_Pressure(Tsurf)
-      ! + ``'fixed_Tsurf'`` :
-      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
-      ! set Teff from Eddington T(tau) relation for given Tsurf and tau=2/3
-      ! set Psurf = Radiation_Pressure(Tsurf)
-      ! + ``'fixed_Psurf'`` :
-      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
-      ! set Tsurf from L and R using ``L = 4*pi*R^2*boltz_sigma*T^4``.
-      ! set Teff using Eddington T(tau) relation for tau=2/3 and T=Tsurf.
-      ! + ``'fixed_Psurf_and_Tsurf'`` :
-      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
-      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
 
       ! ::
 
@@ -4397,30 +4382,6 @@
       ! ::
 
     atm_irradiated_P_surf = 1d6
-
-
-      ! use_atm_PT_at_center_of_surface_cell
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! The surface boundary conditions for pressure and temperature,
-      ! compare the model values at the center of the surface cell to
-      ! values derived from the P and T returned by the atm module.
-      ! If this flag is true, then the atm values are directly used.
-      ! If false, then the values from the atm are treated as being
-      ! for the outer boundary of the surface cell, and those values
-      ! are used to estimate corresponding values for the cell center
-      ! for comparison to the model values at the cell center.
-
-      ! Most cases will have this flag false.
-      ! An example that sets this flag true is a case in which are
-      ! using a special boundary condition (BC) routine to force
-      ! a certain entropy for the surface cell.  In that situation,
-      ! it is better to have the special BC directly return P and T
-      ! for the center of cell 1 to produce the desired entropy.
-
-      ! ::
-
-    use_atm_PT_at_center_of_surface_cell = .false.
 
 
       ! use_compression_outer_BC

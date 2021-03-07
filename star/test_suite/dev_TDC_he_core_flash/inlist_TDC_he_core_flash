@@ -56,7 +56,9 @@
 
    initial_mass = 1.0
    initial_z = 0.02d0
-   
+
+! atmosphere BCs
+
 ! mesh  
    ! SKIP REMESHING FOR NOW
    okay_to_remesh = .false.
@@ -100,11 +102,8 @@
    ! TURN OFF GOLD FOR NOW
    use_gold2_tolerances = .false.
    !use_gold_tolerances = .false.
-   
-   ! USE SIMPLE BC FOR NOW
-   use_compression_outer_BC = .true.
 
-   !convergence_ignore_equL_residuals = .true.
+   TDC_use_L_eqn_at_surface = .false.
    
    Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.

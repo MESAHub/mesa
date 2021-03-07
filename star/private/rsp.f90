@@ -64,7 +64,7 @@
          call set_vars(s, 0d0, ierr)
          if (ierr /= 0) return
          s% doing_finish_load_model = .false.
-         call set_Teff(s, ierr)
+         call set_Teff(s, .true., .true., ierr)
          if (ierr /= 0) return
       end subroutine do1_rsp_build
 
@@ -365,7 +365,7 @@
          end if
          call finish_after_build_model(s)
          call copy_results(s)  
-         call set_Teff(s, ierr)
+         call set_Teff(s, .true., .true., ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
                write(*,*) 'rsp_setup_part2: set_Teff returned ierr', ierr

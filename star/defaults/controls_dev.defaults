@@ -37,7 +37,10 @@
     TDC_min_Lc_div_L_for_convective_mixing_type = 1d-2
 
     TDC_Lsurf_factor = 0.5d0
+    
+    TDC_use_L_eqn_at_surface = .true.
     TDC_use_Stellingwerf_Lr = .true.
+    
     TDC_w_min_for_damping = 1d2
     TDC_etrb_xscale_min = 1d4
     TDC_num_outermost_cells_forced_nonturbulent = 0

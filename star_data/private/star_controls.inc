@@ -394,7 +394,6 @@
          real(dp) :: atm_irradiated_P_surf
          integer :: atm_irradiated_max_iters
 
-         logical :: use_atm_PT_at_center_of_surface_cell
          logical :: use_compression_outer_BC
          logical :: use_momentum_outer_BC
          logical :: use_zero_Pgas_outer_BC

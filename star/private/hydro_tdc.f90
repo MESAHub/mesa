@@ -37,7 +37,7 @@
 
       private
       public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
-         compute_Uq_face, set_etrb_start_vars, reset_etrb_using_L
+         compute_Uq_face, set_TDC_vars, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &
@@ -57,6 +57,20 @@
 !         GAMMAR => TDC_alfar*x_GAMMAR
 
       contains
+      
+      
+      subroutine set_TDC_vars(s,ierr) ! for now, just Hp_face, Lr, Lt, Lc
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr    
+         type(auto_diff_real_star_order1) :: x
+         integer :: k
+         do k=1,s%nz
+            x = compute_Hp_face(s, k, ierr)
+            if (ierr /= 0) return
+            x = compute_L_face(s, k, ierr) ! sets Lr, Lt, Lc
+            if (ierr /= 0) return
+         end do
+      end subroutine set_TDC_vars
       
 
       subroutine do1_tdc_L_eqn(s, k, skip_partials, nvar, ierr)
@@ -644,6 +658,37 @@
       end function compute_L_face
 
 
+      subroutine compute_L_terms(s, k, L, Lr, Lc, Lt, ierr)
+         type (star_info), pointer, intent(in) :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
+         real(dp) :: L_val
+         integer, intent(out) :: ierr         
+         include 'formats'
+         ierr = 0
+         if (k > s% nz) then
+            L = 0d0
+            L%val = s% L_center
+            Lr = 0d0
+            Lc = 0d0
+            Lt = 0d0
+            return
+         end if
+         Lr = compute_Lr(s, k, ierr)
+         if (ierr /= 0) return
+         if (k == 1) then            
+            Lc = 0d0
+            Lt = 0d0
+         else
+            Lc = compute_Lc(s, k, ierr)
+            if (ierr /= 0) return
+            Lt = compute_Lt(s, k, ierr)
+            if (ierr /= 0) return
+         end if
+         L = Lr + Lc + Lt
+      end subroutine compute_L_terms
+
+
       function compute_Lr(s, k, ierr) result(Lr) ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -768,47 +813,6 @@
          ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
          s% Lt(k) = Lt%val
       end function compute_Lt
-
-
-      subroutine compute_L_terms(s, k, L, Lr, Lc, Lt, ierr)
-         type (star_info), pointer, intent(in) :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
-         real(dp) :: L_val
-         integer, intent(out) :: ierr         
-         include 'formats'
-         ierr = 0
-         if (k > s% nz) then
-            L = 0d0
-            L%val = s% L_center
-            Lr = 0d0
-            Lc = 0d0
-            Lt = 0d0
-            return
-         end if
-         Lr = compute_Lr(s, k, ierr)
-         if (ierr /= 0) return
-         if (k == 1) then            
-            Lc = 0d0
-            Lt = 0d0
-         else
-            Lc = compute_Lc(s, k, ierr)
-            if (ierr /= 0) return
-            Lt = compute_Lt(s, k, ierr)
-            if (ierr /= 0) return
-         end if
-         L = Lr + Lc + Lt
-         L_val = max(1d-99,abs(L%val))
-         if (abs(Lt%val)/L_val > &
-               s% TDC_min_Lt_div_L_for_overshooting_mixing_type) then
-            s% mixing_type(k) = overshoot_mixing
-         else if (abs(Lc%val)/L_val > &
-               s% TDC_min_Lc_div_L_for_convective_mixing_type) then
-            s% mixing_type(k) = convective_mixing
-         else
-            s% mixing_type(k) = no_mixing
-         end if
-      end subroutine compute_L_terms
 
 
       subroutine set_etrb_start_vars(s, ierr)

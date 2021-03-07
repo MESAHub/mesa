@@ -52,6 +52,12 @@
    !okay_to_remesh = .false.
    mesh_delta_coeff = 0.5
 
+! atmosphere
+   Pextra_factor = 4 
+   atm_option = 'T_tau'
+   atm_T_tau_relation = 'Eddington'
+   atm_T_tau_opacity = 'fixed'
+
 ! wind
       
 ! timesteps
@@ -83,8 +89,7 @@
    use_gold2_tolerances = .false.
    use_gold_tolerances = .false.
    
-   ! USE SIMPLE BC FOR NOW
-   use_compression_outer_BC = .true.
+   TDC_use_L_eqn_at_surface = .false.
 
    !convergence_ignore_equL_residuals = .true.
    

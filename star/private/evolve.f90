@@ -1922,7 +1922,7 @@
          
          call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
          if (failed('set_vars_if_needed ierr')) return
-         call set_phot_info(s)
+         call set_phot_info(s) ! this sets Teff and other stuff
          
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return

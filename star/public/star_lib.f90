@@ -2257,14 +2257,14 @@
        end subroutine star_get_atm_PT
        
        subroutine star_get_surf_PT( &
-            id, skip_partials, &
+            id, skip_partials, do_not_need_atm_Psurf, do_not_need_atm_Tsurf, &
             Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
          use hydro_vars, only: get_surf_PT
          integer, intent(in) :: id
-         logical, intent(in) :: skip_partials
+         logical, intent(in) :: skip_partials, do_not_need_atm_Psurf, do_not_need_atm_Tsurf
          real(dp), intent(out) :: &
             Teff, lnT_surf, dlnT_dL, dlnT_dlnR,  dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -2274,7 +2274,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call get_surf_PT( &
-            s, skip_partials, &
+            s, skip_partials, do_not_need_atm_Psurf, do_not_need_atm_Tsurf, &
             Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &

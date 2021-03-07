@@ -152,13 +152,6 @@
                write(*,*) 'update_vars: set_hydro_vars returned ierr', ierr
             return
          end if
-
-         call set_Teff(s, ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr .or. dbg) &
-               write(*,*) 'update_vars: set_Teff returned ierr', ierr
-            return
-         end if
          
          if (s% op_split_burn) then
             do k = 1, nz
@@ -268,15 +261,6 @@
             if (s% report_ierr .or. dbg) &
                write(*,*) 'update_vars: set_hydro_vars returned ierr', ierr
             return
-         end if
-
-         if (s% Teff <= 0 .and. .not. s% doing_finish_load_model) then
-            call set_Teff(s, ierr)
-            if (ierr /= 0) then
-               if (s% report_ierr .or. dbg) &
-                  write(*,*) 'update_vars: set_Teff returned ierr', ierr
-               return
-            end if
          end if
 
          if (s% use_other_momentum) then
@@ -393,8 +377,9 @@
       end subroutine update_vars
 
 
-      subroutine set_Teff(s, ierr)
+      subroutine set_Teff(s, do_not_need_atm_Psurf, do_not_need_atm_Tsurf, ierr)
          type (star_info), pointer :: s
+         logical, intent(in) :: do_not_need_atm_Psurf, do_not_need_atm_Tsurf
          integer, intent(out) :: ierr
          real(dp) :: r_phot, L_surf
          logical, parameter :: skip_partials = .true.
@@ -402,20 +387,23 @@
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          ierr = 0
-         call set_Teff_info_for_eqns(s, skip_partials, r_phot, L_surf, Teff, &
+         call set_Teff_info_for_eqns(s, skip_partials, &
+            do_not_need_atm_Psurf, do_not_need_atm_Tsurf, r_phot, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
       end subroutine set_Teff
 
 
-      subroutine set_Teff_info_for_eqns(s, skip_partials, r_surf, L_surf, Teff, &
+      subroutine set_Teff_info_for_eqns(s, skip_partials, &
+            do_not_need_atm_Psurf, do_not_need_atm_Tsurf, r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
          use star_utils, only: get_phot_info
          type (star_info), pointer :: s
-         logical, intent(in) :: skip_partials
+         logical, intent(in) :: skip_partials, &
+            do_not_need_atm_Psurf, do_not_need_atm_Tsurf
          real(dp), intent(out) :: r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -468,7 +456,7 @@
                ierr)
          else
             call get_surf_PT( &
-               s, skip_partials, &
+               s, skip_partials, do_not_need_atm_Psurf, do_not_need_atm_Tsurf, &
                Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
@@ -510,7 +498,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: reset_etrb_using_L
+         use hydro_tdc, only: reset_etrb_using_L, set_TDC_vars
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -647,6 +635,11 @@
             if (dbg) write(*,*) 'call do_brunt_N2'
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
+         end if
+         
+         if (s% TDC_flag) then
+            call set_TDC_vars(s,ierr)
+            if (failed('set_TDC_vars')) return
          end if
 
          if (.not. skip_mixing_info) then
@@ -806,7 +799,7 @@
 
       subroutine get_surf_PT( &
             s, skip_partials, &
-            Teff, &
+            do_not_need_atm_Psurf, do_not_need_atm_Tsurf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -818,7 +811,8 @@
          use eos_lib, only: Radiation_Pressure
 
          type (star_info), pointer :: s
-         logical, intent(in) :: skip_partials
+         logical, intent(in) :: skip_partials, &
+            do_not_need_atm_Psurf, do_not_need_atm_Tsurf
          real(dp), intent(out) :: Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -832,19 +826,8 @@
          real(dp) :: T_surf
          real(dp) :: P_surf_atm
          real(dp) :: P_surf
-         logical :: do_not_need_atm_Psurf, do_not_need_atm_Tsurf
 
          include 'formats'
-         
-         do_not_need_atm_Psurf = &
-            s% use_compression_outer_BC .or. &
-            s% use_zero_Pgas_outer_BC .or. &
-            s% use_fixed_Psurf_outer_BC .or. &
-            s% use_fixed_vsurf_outer_BC .or. &
-            (s% use_momentum_outer_BC .and. trim(s% atm_option) == 'fixed_Psurf')
-            
-         do_not_need_atm_Tsurf = &
-            s% i_lum == 0 .or. s% TDC_flag
 
          ! Set up stellar surface parameters
          
@@ -890,135 +873,34 @@
          else
 
             ! Evaluate temperature and pressure based on atm_option
-            ! (yes, we might want to translate atm_option into an integer,
-            ! but these string comparisons are cheap)
-
-            ! The first few are special, 'trivial-atmosphere' options
-
-            select case (s% atm_option)
-
-            case ('fixed_Teff')
-
-               ! set Tsurf from Eddington T-tau relation
-               !     for current surface tau and Teff = `atm_fixed_Teff`.
-               ! set Psurf = Radiation_Pressure(Tsurf)
-
-               Teff = s% atm_fixed_Teff
-               Teff4 = Teff*Teff*Teff*Teff
-               T_surf = pow(0.75_dp*Teff4*(tau_surf + two_thirds), 0.25_dp)
-               lnT_surf = log(T_surf)
-               lnP_surf = Radiation_Pressure(T_surf)
-
-               if (.not. skip_partials) then
-                  dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
-                  dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-               endif
                
-            case ('fixed_Tsurf')
+            if (.false. .and. 1 == s% solver_test_partials_k .and. &
+                  s% solver_iter == s% solver_test_partials_iter_number) then
+               star_debugging_atm_flag = .true.
+            end if
 
-               ! set Teff from Eddington T-tau relation for given
-               ! Tsurf and tau=2/3 set Psurf =
-               ! Radiation_Pressure(Tsurf)
-
-               T_surf = s% atm_fixed_Tsurf
-               lnT_surf = log(T_surf)
-               T_surf4 = T_surf*T_surf*T_surf*T_surf
-               Teff = pow(four_thirds*T_surf4/(tau_surf + two_thirds), 0.25_dp)
-               lnP_surf = Radiation_Pressure(T_surf)
-
-               if (.not. skip_partials) then
-                  dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
-                  dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-               endif
-
-            case ('fixed_Psurf')
-
-               ! set Teff from L and R using L = 4*pi*R^2*boltz_sigma*T^4.
-               ! set Tsurf using Eddington T-tau relation
-
-               if (L_surf < 0._dp) then
-                  if (s% report_ierr) then
-                     write(*,2) 'get_surf_PT: L_surf <= 0', s% model_number, L_surf
-                     call mesa_error(__FILE__,__LINE__)
-                  end if
-                  s% retry_message = 'L_surf < 0'
-                  ierr = -1
-                  return
+            call get_atm_PT( &
+                 s, tau_surf, L_surf, R_surf, s% m(1), s% cgrav(1), skip_partials, &
+                 Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+                 lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
+                 ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) then
+                  write(*,1) 'tau_surf', tau_surf
+                  write(*,1) 'L_surf', L_surf
+                  write(*,1) 'R_surf', R_surf
+                  write(*,1) 's% m(1)', s% m(1)
+                  write(*,1) 's% cgrav(1)', s% cgrav(1)
+                  write(*,*) 'failed in get_atm_PT'
                end if
+               return
+            end if
 
-               lnP_surf = safe_log(s% atm_fixed_Psurf)
-               if (R_surf <= 0._dp) then
-                  T_surf4 = 1._dp
-                  T_surf = 1._dp
-                  lnT_surf = 0._dp
-                  if (.not. skip_partials) then
-                     dlnT_dlnR = 0._dp
-                     dlnT_dL = 0._dp
-                  endif
-                  Teff = s% T(1)
-               else
-                  Teff = pow(L_surf/(pi4*R_surf*R_surf*boltz_sigma), 0.25_dp)
-                  T_surf4 = 0.75_dp*pow4(Teff)*(tau_surf + two_thirds)
-                  T_surf = pow(T_surf4, 0.25_dp)
-                  lnT_surf = log(T_surf)
-                  if (.not. skip_partials) then
-                     dlnT_dlnR = -0.5_dp
-                     dlnT_dL = 0.25_dp/L_surf
-                  endif
-               end if
-
-               if (.not. skip_partials) then
-                  dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
-                  dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
-               endif
-
-            case ('fixed_Psurf_and_Tsurf')
-
-               lnP_surf = safe_log(s% atm_fixed_Psurf)
-               T_surf = s% atm_fixed_Tsurf
-               lnT_surf = log(T_surf)
-               T_surf4 = T_surf*T_surf*T_surf*T_surf
-               Teff = pow(four_thirds*T_surf4/(tau_surf + two_thirds), 0.25d0)
-
-               if (.not. skip_partials) then
-                  dlnT_dL = 0; dlnT_dlnR = 0; dlnT_dlnM = 0; dlnT_dlnkap = 0
-                  dlnP_dL = 0; dlnP_dlnR = 0; dlnP_dlnM = 0; dlnP_dlnkap = 0
-               endif
-
-            case default
-
-               ! Everything else -- the 'non-trivial atmospheres' ---
-               ! gets passed to atm_support
-               
-               if (.false. .and. 1 == s% solver_test_partials_k .and. &
-                     s% solver_iter == s% solver_test_partials_iter_number) then
-                  star_debugging_atm_flag = .true.
-               end if
-
-               call get_atm_PT( &
-                    s, tau_surf, L_surf, R_surf, s% m(1), s% cgrav(1), skip_partials, &
-                    Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-                    lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-                    ierr)
-               if (ierr /= 0) then
-                  if (s% report_ierr) then
-                     write(*,1) 'tau_surf', tau_surf
-                     write(*,1) 'L_surf', L_surf
-                     write(*,1) 'R_surf', R_surf
-                     write(*,1) 's% m(1)', s% m(1)
-                     write(*,1) 's% cgrav(1)', s% cgrav(1)
-                     write(*,*) 'failed in get_atm_PT'
-                  end if
-                  return
-               end if
-
-               if (.false. .and. 1 == s% solver_test_partials_k .and. &
-                     s% solver_iter == s% solver_test_partials_iter_number) then
-                  s% solver_test_partials_val = atm_test_partials_val
-                  s% solver_test_partials_dval_dx = atm_test_partials_dval_dx
-               end if
-
-            end select
+            if (.false. .and. 1 == s% solver_test_partials_k .and. &
+                  s% solver_iter == s% solver_test_partials_iter_number) then
+               s% solver_test_partials_val = atm_test_partials_val
+               s% solver_test_partials_dval_dx = atm_test_partials_dval_dx
+            end if
 
          end if
 

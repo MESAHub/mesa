@@ -57,7 +57,7 @@
 
          integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: c, rho_face, f, Tmax, conv_vel, min_conv_vel_for_convective_mixing_type, &
-            region_bottom_q, region_top_q
+            region_bottom_q, region_top_q, L_val
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: TDC_or_RSP
@@ -130,7 +130,16 @@
                s% conv_vel(k) = abs(s% w(k))
                s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
-               ! mixing_type set by compute_L_terms in hydro_tdc
+               L_val = max(1d-99,abs(s% L(k)))
+               if (abs(s% Lt(k)) > &
+                     L_val*s% TDC_min_Lt_div_L_for_overshooting_mixing_type) then
+                  s% mixing_type(k) = overshoot_mixing
+               else if (abs(s% Lc(k)) > &
+                     L_val*s% TDC_min_Lc_div_L_for_convective_mixing_type) then
+                  s% mixing_type(k) = convective_mixing
+               else
+                  s% mixing_type(k) = no_mixing
+               end if
             end do
          else if (s% conv_vel_flag) then
             do k = 1, nz
@@ -153,7 +162,7 @@
          
          call check('after get mlt_D')
          
-         if (s% remove_mixing_glitches) then
+         if (s% remove_mixing_glitches .and. .not. TDC_or_RSP) then
 
             call remove_tiny_mixing(s, ierr)
             if (failed('remove_tiny_mixing')) return
@@ -189,10 +198,10 @@
             eps_z(k) = s% eps_nuc(k) - (eps_h(k) + eps_he(k))
          end do
          
-         if (.not. TDC_or_RSP) then
+         if (.not. s% RSP_flag) then
 
-            call set_mlt_cz_boundary_info(s, ierr)
-            if (failed('set_mlt_cz_boundary_info')) return
+            call set_cz_boundary_info(s, ierr)
+            if (failed('set_cz_boundary_info')) return
 
             call locate_convection_boundaries( &
                s, nz, eps_h, eps_he, eps_z, s% mstar, &
@@ -209,17 +218,19 @@
          ! NB: re-call locate_convection_boundries to take into
          ! account changes from add_predictive_mixing
 
-         call locate_convection_boundaries( &
-            s, nz, eps_h, eps_he, eps_z, s% mstar, &
-            s% q, s% cdc, ierr)
-         if (failed('locate_convection_boundaries')) return
+         if (.not. s% RSP_flag) then
 
-         call locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)
-         if (failed('locate_mixing_boundaries')) return
+            call locate_convection_boundaries( &
+               s, nz, eps_h, eps_he, eps_z, s% mstar, &
+               s% q, s% cdc, ierr)
+            if (failed('locate_convection_boundaries')) return
 
-         if (.not. TDC_or_RSP) then
+            call locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)
+            if (failed('locate_mixing_boundaries')) return
+         
             call add_overshooting(s, ierr)
             if (failed('add_overshooting')) return
+            
          end if
          
          call check('after add_overshooting')
@@ -230,7 +241,7 @@
          call s% other_after_set_mixing_info(s% id, ierr)
          if (failed('other_after_set_mixing_info')) return
 
-         if (.not. skip_set_cz_bdy_mass) then
+         if (.not. (skip_set_cz_bdy_mass .or. TDC_or_RSP)) then
             call set_cz_bdy_mass(s, ierr)
             if (failed('set_cz_bdy_mass')) return
          end if
@@ -427,7 +438,7 @@
       end subroutine set_mixing_info
 
 
-      subroutine set_mlt_cz_boundary_info(s, ierr)
+      subroutine set_cz_boundary_info(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
@@ -444,8 +455,6 @@
          ierr = 0
          nz = s% nz
          s% cz_bdy_dq(1:nz) = 0d0
-         
-         if (s% rsp_flag .or. s% TDC_flag) return ! don't have MLT info
 
          do k = 2, nz
             mt1 = s% mixing_type(k-1)
@@ -464,13 +473,13 @@
             s% cz_bdy_dq(k-1) = find0(0d0,dg0,s% dq(k-1),dg1)
             if (s% cz_bdy_dq(k-1) < 0d0 .or. s% cz_bdy_dq(k-1) > s% dq(k-1)) then
                write(*,2) 'bad cz_bdy_dq', k-1, s% cz_bdy_dq(k-1), s% dq(k-1)
-               stop 'set_mlt_cz_boundary_info'
+               stop 'set_cz_boundary_info'
                ierr = -1
                return
             end if
          end do
 
-      end subroutine set_mlt_cz_boundary_info
+      end subroutine set_cz_boundary_info
 
 
       subroutine set_cz_bdy_mass(s, ierr)

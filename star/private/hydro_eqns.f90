@@ -257,7 +257,7 @@
                end if
             end if
             if (do_equL) then
-               if (s% TDC_flag) then
+               if (s% TDC_flag .and. (k > 1 .or. s% TDC_use_L_eqn_at_surface)) then
                   call do1_tdc_L_eqn(s, k, skip_partials, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_tdc_L_eqn', k
@@ -875,8 +875,9 @@
 
          type(auto_diff_real_star_order1) :: &
             P_bc_ad, T_bc_ad, lnP_bc_ad, lnT_bc_ad, resid_ad
-         integer :: i_P_eqn, i_T_eqn
-         logical :: need_P_surf, need_T_surf, test_partials
+         integer :: i_P_eqn
+         logical :: offset_T_to_cell_center, offset_P_to_cell_center, &
+            need_P_surf, need_T_surf, test_partials
 
          include 'formats'
 
@@ -885,10 +886,9 @@
          ierr = 0
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
-         else
+         else ! use this even if not v_flag
             i_P_eqn = s% i_dv_dt
          end if
-         i_T_eqn = s% i_equL
 
          need_P_surf = .false.
          if (s% use_compression_outer_BC) then
@@ -907,7 +907,8 @@
          if (ierr /= 0) return
 
          need_T_surf = .false.
-         if (s% TDC_flag .or. .not. do_equL) then 
+         if ((.not. do_equL) .or. &
+               (s% TDC_flag .and. s% TDC_use_L_eqn_at_surface)) then 
             ! no Tsurf BC
          else if (s% use_zero_dLdm_outer_BC) then
             call set_zero_dL_dm_BC(ierr)
@@ -915,17 +916,14 @@
             need_T_surf = .true.
          end if
          if (ierr /= 0) return
+            
+         offset_T_to_cell_center = .not. &
+            (s% use_other_surface_PT .or. s% TDC_flag .or. s% use_momentum_outer_BC)
+         offset_P_to_cell_center = .not. &
+            (s% use_other_surface_PT .or. s% TDC_flag)
          
-         if (need_P_surf .or. need_T_surf) then
-            call get_PT_bc_ad(ierr) 
-            if (ierr /= 0) return
-         else
-            s% P_surf = s% Peos(1)
-            s% T_surf = s% T(1)
-            return
-         end if
-         
-         ! use P_bc_ad and T_bc_ad
+         call get_PT_bc_ad(ierr) ! has important side-effect of setting Teff for current model
+         if (ierr /= 0) return
          
          if (need_P_surf) then
             if (s% use_momentum_outer_BC) then
@@ -977,7 +975,8 @@
             include 'formats'
             ierr = 0
          
-            call set_Teff_info_for_eqns(s, skip_partials, r, L, Teff, &
+            call set_Teff_info_for_eqns(s, skip_partials, &
+               .not. need_P_surf, .not. need_T_surf, r, L, Teff, &
                lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
                lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, &
                ierr)
@@ -995,17 +994,12 @@
             s% P_surf = P_surf
             s% T_surf = T_surf
 
-            if (s% use_atm_PT_at_center_of_surface_cell .or. r <= 0d0) then
-               dP0 = 0
-               dT0 = 0
-            else
-               if (s% use_momentum_outer_BC) then
-                  dP0 = 0
-               else
-                  dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*r*r*r*r)
-               end if
+            dP0 = 0
+            dT0 = 0
+            if (offset_P_to_cell_center) &
+               dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(r))
+            if (offset_T_to_cell_center) &
                dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
-            end if
          
             P_bc = P_surf + dP0
             T_bc = T_surf + dT0
@@ -1021,25 +1015,31 @@
                write(*,1) 'lnP_surf', lnP_surf
                stop 'bc'
             end if
-
-            if (s% use_atm_PT_at_center_of_surface_cell .or. r <= 0d0) then
-
-               dP0_dlnR = 0
-               dT0_dlnR = 0
-               dT0_dlnT = 0
-               dT0_dlnd = 0
-               dT0_dL = 0
-
-            else
          
+            if (is_bad(T_bc)) then
+               write(*,1) 'lnT_bc', lnT_bc
+               write(*,1) 'T_bc', T_bc
+               write(*,1) 'T_surf', T_surf
+               write(*,1) 'dP0', dP0
+               write(*,1) 'lnT_surf', lnT_surf
+               stop 'bc'
+            end if
+            
+            dP0_dlnR = 0
+            if (offset_P_to_cell_center) then ! include partials of dP0
+               dP0_dlnR = -4*dP0
+            end if
+            
+            dT0_dlnR = 0
+            dT0_dlnT = 0
+            dT0_dlnd = 0
+            dT0_dL = 0
+            if (offset_T_to_cell_center) then ! include partials of dT0         
                d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
                d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
                d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
                d_gradT_dL = s% gradT_ad(1)%d1Array(i_L_00)
-
-               dP0_dlnR = -4*dP0
                dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% Peos(1)
-
                dPinv_dlnT = -s% chiT_for_partials(1)/s% Peos(1)
                dT0_dlnT = &
                     dT0 + &
@@ -1049,9 +1049,7 @@
                dT0_dlnd = &
                     dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
-
                dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
-
             endif
 
             dlnP_bc_dP0 = 1/P_bc
@@ -1136,19 +1134,27 @@
             integer, intent(out) :: ierr
             logical :: test_partials
             type(auto_diff_real_star_order1) :: lnT1_ad
+            real(dp) :: residual
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
-            ierr = 0           
+            ierr = 0  
             lnT1_ad = wrap_lnT_00(s,1)            
             resid_ad = lnT_bc_ad/lnT1_ad - 1d0
-            s% equ(i_T_eqn, 1) = resid_ad%val
+            residual = resid_ad%val
+            s% equ(s% i_equL, 1) = residual
+            if (is_bad(residual)) then
+               write(*,1) 'set_Tsurf_BC residual', residual
+               write(*,1) 'lnT1_ad%val', lnT1_ad%val
+               write(*,1) 'lnT_bc_ad%val', lnT_bc_ad%val
+               stop 'set_Tsurf_BC'
+            end if
             if (test_partials) then
                s% solver_test_partials_val = 0
             end if
             if (skip_partials) return
             call save_eqn_residual_info( &
-               s, 1, nvar, i_T_eqn, resid_ad, 'set_Tsurf_BC', ierr)           
+               s, 1, nvar, s% i_equL, resid_ad, 'set_Tsurf_BC', ierr)           
             if (test_partials) then
                s% solver_test_partials_var = 0
                s% solver_test_partials_dval_dx = 0
@@ -1248,10 +1254,10 @@
             L1 = wrap_L_00(s,1)
             L2 = wrap_L_p1(s,1)
             resid_ad = L2/L1 - 1d0
-            s% equ(i_T_eqn,1) = resid_ad%val
+            s% equ(s% i_equL,1) = resid_ad%val
             if (skip_partials) return
             call save_eqn_residual_info( &
-               s, 1, nvar, i_T_eqn, resid_ad, 'set_zero_dL_dm_BC', ierr)           
+               s, 1, nvar, s% i_equL, resid_ad, 'set_zero_dL_dm_BC', ierr)           
          end subroutine set_zero_dL_dm_BC
 
 

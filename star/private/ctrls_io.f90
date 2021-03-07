@@ -391,7 +391,7 @@
     max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_Pvsc_art_visc, Pvsc_cq, Pvsc_zsh, &
     min_xa_hard_limit, min_xa_hard_limit_for_highT, logT_max_for_min_xa_hard_limit, logT_min_for_min_xa_hard_limit_for_highT, &
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
-    xa_clip_limit, report_solver_progress, solver_test_partials_k_high, &
+    xa_clip_limit, report_solver_progress, solver_test_partials_k_high, TDC_use_L_eqn_at_surface, &
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
@@ -484,7 +484,6 @@
     atm_irradiated_kap_v, atm_irradiated_kap_v_div_kap_th, atm_irradiated_P_surf, &
     atm_irradiated_max_iters, &
 
-    use_atm_PT_at_center_of_surface_cell, &
     use_compression_outer_BC, use_momentum_outer_BC, Tsurf_factor, use_zero_Pgas_outer_BC, &
     fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
     
@@ -1283,7 +1282,6 @@
  s% atm_irradiated_P_surf = atm_irradiated_P_surf
  s% atm_irradiated_max_iters = atm_irradiated_max_iters
 
- s% use_atm_PT_at_center_of_surface_cell = use_atm_PT_at_center_of_surface_cell
  s% use_compression_outer_BC = use_compression_outer_BC
  s% use_momentum_outer_BC = use_momentum_outer_BC
  s% Tsurf_factor = Tsurf_factor
@@ -2063,6 +2061,7 @@
  s% TDC_min_Lc_div_L_for_convective_mixing_type = TDC_min_Lc_div_L_for_convective_mixing_type
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
+ s% TDC_use_L_eqn_at_surface = TDC_use_L_eqn_at_surface
  s% TDC_w_min_for_damping = TDC_w_min_for_damping
  s% TDC_etrb_xscale_min = TDC_etrb_xscale_min
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
@@ -2937,7 +2936,6 @@
  atm_irradiated_P_surf = s% atm_irradiated_P_surf
  atm_irradiated_max_iters = s% atm_irradiated_max_iters
 
- use_atm_PT_at_center_of_surface_cell = s% use_atm_PT_at_center_of_surface_cell
  use_compression_outer_BC = s% use_compression_outer_BC
  use_momentum_outer_BC = s% use_momentum_outer_BC
  Tsurf_factor = s% Tsurf_factor
@@ -3708,6 +3706,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_min_Lc_div_L_for_convective_mixing_type = s% TDC_min_Lc_div_L_for_convective_mixing_type
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
+ TDC_use_L_eqn_at_surface = s% TDC_use_L_eqn_at_surface
  TDC_w_min_for_damping = s% TDC_w_min_for_damping
  TDC_etrb_xscale_min = s% TDC_etrb_xscale_min
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent

@@ -597,7 +597,7 @@ contains
 
     ! Store the mass-fractional location of the new convective
     ! boundary, and reset the locations for the old convective
-    ! boundary (cf. set_mlt_cz_boundary_info)
+    ! boundary (cf. set_cz_boundary_info)
 
     if (outward) then
 
