@@ -252,7 +252,7 @@
                         k = k+1
                      end do
                      if (xtra_dist > 0) then
-                        Hp = s% P(k)/(s% rho(k)*s% grav(k))
+                        Hp = s% Peos(k)/(s% rho(k)*s% grav(k))
                         r_extra = max(0d0, s% r(k) - xtra_dist*Hp)
                         if (dbg) write(*,2) 'extra below overshoot region', &
                            k, s% r(k)/Rsun, Hp/Rsun, r_extra/Rsun
@@ -332,7 +332,7 @@
                         k = k-1
                      end do
                      if (xtra_dist > 0) then
-                        Hp = s% P(k)/(s% rho(k)*s% grav(k))
+                        Hp = s% Peos(k)/(s% rho(k)*s% grav(k))
                         r_extra = min(s% r(1), s% r(k) + xtra_dist*Hp)
                         if (dbg) write(*,2) 'extra above overshoot region', &
                            k, s% r(k)/Rsun, Hp/Rsun, r_extra/Rsun

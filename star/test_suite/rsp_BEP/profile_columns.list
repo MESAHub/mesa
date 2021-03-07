@@ -66,8 +66,6 @@
    dq
    log_dq
    
-   hse_ratio
-   
       rsp_logEt
       rsp_Et
       rsp_Pt

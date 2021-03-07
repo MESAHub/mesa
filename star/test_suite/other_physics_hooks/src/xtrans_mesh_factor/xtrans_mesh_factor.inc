@@ -66,7 +66,7 @@
                jmax = maxloc(s% xa(:,k),dim=1)
                if (jmax /= prev_jmax) then ! at a change in max abundance species
                   prev_jmax = jmax
-                  Hp = s% P(k)/(s% rho(k)*s% grav(k))
+                  Hp = s% Peos(k)/(s% rho(k)*s% grav(k))
                   r_extra = max(0d0, s% r(k) - xtra_dist*Hp)
                   do ! toward center from a transition
                      if (s% r(k) < r_extra) exit
@@ -89,7 +89,7 @@
                jmax = maxloc(s% xa(:,k),dim=1)
                if (jmax /= prev_jmax) then ! at a change in max abundance species
                   prev_jmax = jmax
-                  Hp = s% P(k)/(s% rho(k)*s% grav(k))
+                  Hp = s% Peos(k)/(s% rho(k)*s% grav(k))
                   r_extra = max(0d0, s% r(k) + xtra_dist*Hp)
                   do ! toward surface from a transition
                      if (s% r(k) > r_extra) exit

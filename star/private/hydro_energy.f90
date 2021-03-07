@@ -643,6 +643,8 @@
             if (s% using_velocity_time_centering .and. &
                      s% include_P_in_velocity_time_centering) &
                P_face_ad = 0.5d0*(P_face_ad + s% P_face_start(k))
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
          else ! set P_ad
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0

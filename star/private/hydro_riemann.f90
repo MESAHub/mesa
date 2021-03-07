@@ -196,7 +196,11 @@
             logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
             ierr = 0
             ! use same P here as the cell pressure in P_face calculation
-            call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_XP_dxa, ierr)
+            if (.true.) then
+               P = wrap_Peos_00(s,k)
+            else ! this breaks dev_pre_ms_to_pulses_80_800
+               call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_XP_dxa, ierr)
+            end if
             if (ierr /= 0) return
             if (k == nz) then 
                ! no flux in from left, so only have geometry source on right
@@ -340,11 +344,16 @@
          r_ad = wrap_r_00(s,k)
          A_ad = 4d0*pi*pow2(r_ad)
          
-         call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_XP_dxa, ierr)
-         if (ierr /= 0) return
-         call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PR_ad, d_XP_dxa, ierr)
-         if (ierr /= 0) return
-         PR_ad = shift_m1(PR_ad)
+         if (.true.) then
+            PL_ad = wrap_Peos_00(s,k)
+            PR_ad = wrap_Peos_m1(s,k)
+         else ! this breaks dev_pre_ms_to_pulses_80_800
+            call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_XP_dxa, ierr)
+            if (ierr /= 0) return
+            call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PR_ad, d_XP_dxa, ierr)
+            if (ierr /= 0) return
+            PR_ad = shift_m1(PR_ad)
+         end if
 
          uL_ad = wrap_u_00(s,k)
          uR_ad = wrap_u_m1(s,k)

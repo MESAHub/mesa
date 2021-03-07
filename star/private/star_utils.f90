@@ -3480,6 +3480,7 @@
          type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
             Peos_ad, avQ_ad, Pt_ad, mlt_Pturb_ad
          logical :: time_center
+         include 'formats'
          
          ierr = 0
          d_XP_dxa = 0d0
