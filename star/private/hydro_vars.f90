@@ -377,18 +377,18 @@
       end subroutine update_vars
 
 
-      subroutine set_Teff(s, do_not_need_atm_Psurf, do_not_need_atm_Tsurf, ierr)
+      subroutine set_Teff(s, ierr)
          type (star_info), pointer :: s
-         logical, intent(in) :: do_not_need_atm_Psurf, do_not_need_atm_Tsurf
          integer, intent(out) :: ierr
          real(dp) :: r_phot, L_surf
-         logical, parameter :: skip_partials = .true.
+         logical, parameter :: skip_partials = .true., &
+            need_atm_Psurf = .false., need_atm_Tsurf = .false.
          real(dp) :: Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          ierr = 0
          call set_Teff_info_for_eqns(s, skip_partials, &
-            do_not_need_atm_Psurf, do_not_need_atm_Tsurf, r_phot, L_surf, Teff, &
+            need_atm_Psurf, need_atm_Tsurf, r_phot, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -396,14 +396,14 @@
 
 
       subroutine set_Teff_info_for_eqns(s, skip_partials, &
-            do_not_need_atm_Psurf, do_not_need_atm_Tsurf, r_surf, L_surf, Teff, &
+            need_atm_Psurf, need_atm_Tsurf, r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
          use star_utils, only: get_phot_info
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
-            do_not_need_atm_Psurf, do_not_need_atm_Tsurf
+            need_atm_Psurf, need_atm_Tsurf
          real(dp), intent(out) :: r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -456,7 +456,7 @@
                ierr)
          else
             call get_surf_PT( &
-               s, skip_partials, do_not_need_atm_Psurf, do_not_need_atm_Tsurf, &
+               s, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
                Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
@@ -799,7 +799,7 @@
 
       subroutine get_surf_PT( &
             s, skip_partials, &
-            do_not_need_atm_Psurf, do_not_need_atm_Tsurf, Teff, &
+            need_atm_Psurf, need_atm_Tsurf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -812,7 +812,7 @@
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
-            do_not_need_atm_Psurf, do_not_need_atm_Tsurf
+            need_atm_Psurf, need_atm_Tsurf
          real(dp), intent(out) :: Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -850,9 +850,9 @@
 
          ! Evaluate surface temperature and pressure
              
-         if (do_not_need_atm_Psurf .and. do_not_need_atm_Tsurf) then
+         if (.not. (need_atm_Psurf .or. need_atm_Tsurf)) then
 
-            ! Special-case boundary conditions
+            ! Special-case boundary condition
 
             lnP_surf = s% lnPeos_start(1)
             if (is_bad(lnP_surf)) lnP_surf = 0._dp
@@ -865,10 +865,6 @@
                dlnT_dL = 0._dp; dlnT_dlnR = 0._dp; dlnT_dlnM = 0._dp; dlnT_dlnkap = 0._dp
                dlnP_dL = 0._dp; dlnP_dlnR = 0._dp; dlnP_dlnM = 0._dp; dlnP_dlnkap = 0._dp
             endif
-             
-         !else if (do_not_need_atm_Tsurf) then
-             
-         !else if (do_not_need_atm_Psurf) then
 
          else
 

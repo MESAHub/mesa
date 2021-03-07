@@ -916,12 +916,15 @@
             need_T_surf = .true.
          end if
          if (ierr /= 0) return
-            
-         offset_T_to_cell_center = .not. &
-            (s% use_other_surface_PT .or. s% TDC_flag .or. s% use_momentum_outer_BC)
-         offset_P_to_cell_center = .not. &
-            (s% use_other_surface_PT .or. s% TDC_flag)
          
+         offset_P_to_cell_center = .true.
+         if (s% use_other_surface_PT .or. s% TDC_flag .or. s% use_momentum_outer_BC) &
+            offset_P_to_cell_center = .false.
+         
+         offset_T_to_cell_center = .true.
+         if (s% use_other_surface_PT .or. s% TDC_flag) &
+            offset_T_to_cell_center = .false.
+
          call get_PT_bc_ad(ierr) ! has important side-effect of setting Teff for current model
          if (ierr /= 0) return
          
@@ -976,7 +979,7 @@
             ierr = 0
          
             call set_Teff_info_for_eqns(s, skip_partials, &
-               .not. need_P_surf, .not. need_T_surf, r, L, Teff, &
+               need_P_surf, need_T_surf, r, L, Teff, &
                lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
                lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, &
                ierr)
@@ -1133,14 +1136,24 @@
          subroutine set_Tsurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
-            type(auto_diff_real_star_order1) :: lnT1_ad
+            type(auto_diff_real_star_order1) :: &
+               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected
             real(dp) :: residual
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0  
-            lnT1_ad = wrap_lnT_00(s,1)            
-            resid_ad = lnT_bc_ad/lnT1_ad - 1d0
+            if (s% TDC_flag) then ! interpolate lnT by mass
+               T4_p1 = pow4(wrap_T_p1(s,1))
+               T4_surf = pow4(T_bc_ad)
+               dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
+               T4_00_expected = T4_surf - 0.5d0*s% dm(1)*dT4_dm
+               T4_00_actual = pow4(wrap_T_00(s,1))
+               resid_ad = T4_00_expected/T4_00_actual - 1d0
+            else
+               lnT1_ad = wrap_lnT_00(s,1)            
+               resid_ad = lnT_bc_ad/lnT1_ad - 1d0
+            end if
             residual = resid_ad%val
             s% equ(s% i_equL, 1) = residual
             if (is_bad(residual)) then

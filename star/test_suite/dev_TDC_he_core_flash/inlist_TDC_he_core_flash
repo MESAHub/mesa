@@ -52,7 +52,7 @@
 
    ! limit max_model_number as part of test_suite
    max_model_number = 1200
-   max_number_retries = 0 ! 100
+   max_number_retries = 100
 
    initial_mass = 1.0
    initial_z = 0.02d0
@@ -128,11 +128,11 @@
    !history_interval = 1
    terminal_interval = 1
 
-   fill_arrays_with_NaNs = .true.
+   !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
 
@@ -198,7 +198,7 @@
 
 &pgstar
 
-   pause = .true.
+   !pause = .true.
    !pause_interval = 100
    pgstar_interval = 1 ! 20
    
@@ -208,7 +208,7 @@
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
    
    Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = 60 ! -101D0
+   Profile_Panels1_xmax = -101D0
 
 
 
