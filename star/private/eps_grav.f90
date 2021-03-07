@@ -582,7 +582,7 @@
          do j=1, s% species
             dxh_lnd = s% dxh_lnd(k)
             s% d_eps_grav_dx(j,k) = -s% energy(k) * s% dlnE_dxa_for_partials(j,k)/s% dt + &
-               (s% P(k) / s% Rho(k)) * s% dlnP_dxa_for_partials(j,k) *  dxh_lnd/s% dt
+               (s% Peos(k) / s% Rho(k)) * s% dlnPeos_dxa_for_partials(j,k) *  dxh_lnd/s% dt
          end do
 
          e = s% energy(k)

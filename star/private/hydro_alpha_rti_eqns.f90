@@ -197,7 +197,7 @@
             write(*,2) 'A_plus_B_div_rho', k, A_plus_B_div_rho
             write(*,2) 'instability', k, instability
             write(*,2) 's% q(k)', k, s% q(k)
-            write(*,2) 's% P(k)', k, s% P(k)
+            write(*,2) 's% Peos(k)', k, s% Peos(k)
             write(*,2) 's% rho(k)', k, s% rho(k)
             write(*,2) 's% alpha_RTI_src_max_q', k, s% alpha_RTI_src_max_q
             write(*,2) 'dadt_expected', k, dadt_expected

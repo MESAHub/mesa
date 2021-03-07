@@ -28,6 +28,7 @@
 
       use const_def, only: dp
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
+      use auto_diff ! wholesale include
 
       use pulse, only: &
            star_export_pulse_data => export_pulse_data, &
@@ -39,41 +40,6 @@
            star_eval_conv_bdy_r => eval_conv_bdy_r, &
            star_eval_conv_bdy_Hp => eval_conv_bdy_Hp, &
            star_eval_over_bdy_params => eval_over_bdy_params
-
-      use auto_diff_support, only: &
-         auto_diff_unwrap => unwrap, &
-         auto_diff_wrap => wrap, &
-         auto_diff_wrap_T_m1 => wrap_T_m1, &
-         auto_diff_wrap_T_00 => wrap_T_00, &
-         auto_diff_wrap_T_p1 => wrap_T_p1, &
-         auto_diff_wrap_d_m1 => wrap_d_m1, &
-         auto_diff_wrap_d_00 => wrap_d_00, &
-         auto_diff_wrap_d_p1 => wrap_d_p1, &
-         auto_diff_wrap_w_m1 => wrap_w_m1, &
-         auto_diff_wrap_w_00 => wrap_w_00, &
-         auto_diff_wrap_w_p1 => wrap_w_p1, &
-         auto_diff_wrap_kap_m1 => wrap_kap_m1, &
-         auto_diff_wrap_kap_00 => wrap_kap_00, &
-         auto_diff_wrap_kap_p1 => wrap_kap_p1, &
-         auto_diff_wrap_s_m1 => wrap_s_m1, &
-         auto_diff_wrap_s_00 => wrap_s_00, &
-         auto_diff_wrap_s_p1 => wrap_s_p1, &
-         auto_diff_wrap_e_m1 => wrap_e_m1, &
-         auto_diff_wrap_e_00 => wrap_e_00, &
-         auto_diff_wrap_e_p1 => wrap_e_p1, &
-         auto_diff_wrap_p_m1 => wrap_p_m1, &
-         auto_diff_wrap_p_00 => wrap_p_00, &
-         auto_diff_wrap_p_p1 => wrap_p_p1, &
-         auto_diff_wrap_L_m1 => wrap_L_m1, &
-         auto_diff_wrap_L_00 => wrap_L_00, &
-         auto_diff_wrap_L_p1 => wrap_L_p1, &
-         auto_diff_wrap_r_m1 => wrap_r_m1, &
-         auto_diff_wrap_r_00 => wrap_r_00, &
-         auto_diff_wrap_r_p1 => wrap_r_p1, &
-         auto_diff_wrap_v_m1 => wrap_v_m1, &
-         auto_diff_wrap_v_00 => wrap_v_00, &
-         auto_diff_wrap_v_p1 => wrap_v_p1
-
 
       implicit none
 

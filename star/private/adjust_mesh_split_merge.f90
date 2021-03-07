@@ -704,7 +704,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: Etot, KE, PE, IE, Etrb
-         real(dp) :: dm, mC, v0, v1, P, rL, rC
+         real(dp) :: dm, mC, v0, v1, rL, rC
          include 'formats'
          dm = s% dm(k)
          if (s% u_flag) then
@@ -718,7 +718,6 @@
             end if
             KE = 0.25d0*dm*(v0**2 + v1**2)
          end if
-         P = s% P(k)
          IE = s% energy(k)*dm
          if (s% TDC_flag) then
             Etrb = pow2(s% w(k))*dm

@@ -390,10 +390,7 @@
 
       integer, parameter :: p_log_P_face = p_P_face + 1
 
-      integer, parameter :: p_hse_ratio = p_log_P_face + 1
-      integer, parameter :: p_hse_ratio_gyre = p_hse_ratio + 1
-
-      integer, parameter :: p_dvdt_RTI_diffusion = p_hse_ratio_gyre + 1
+      integer, parameter :: p_dvdt_RTI_diffusion = p_log_P_face + 1
       integer, parameter :: p_dlnddt_RTI_diffusion = p_dvdt_RTI_diffusion + 1
 
       integer, parameter :: p_dlnP_dlnR = p_dlnddt_RTI_diffusion + 1
@@ -1093,9 +1090,6 @@
          profile_column_name(p_du) = 'du'
          profile_column_name(p_P_face) = 'P_face'
          profile_column_name(p_log_P_face) = 'log_P_face'
-
-         profile_column_name(p_hse_ratio) = 'hse_ratio'
-         profile_column_name(p_hse_ratio_gyre) = 'hse_ratio_gyre'
 
          profile_column_name(p_dlnP_dlnR) = 'dlnP_dlnR'
          profile_column_name(p_dlnRho_dlnR) = 'dlnRho_dlnR'

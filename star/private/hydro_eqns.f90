@@ -352,7 +352,7 @@
             lnT => s% lnT
             lnR => s% lnR
             L => s% L
-            lnP => s% lnP
+            lnP => s% lnPeos
             energy => s% energy
 
             i_dv_dt = s% i_dv_dt
@@ -481,7 +481,7 @@
                         
                         ! punt silently for now
                         s% dlnE_dxa_for_partials(:,k) = 0d0
-                        s% dlnP_dxa_for_partials(:,k) = 0d0
+                        s% dlnPeos_dxa_for_partials(:,k) = 0d0
                         ierr = 0
                         return
                         
@@ -498,12 +498,12 @@
                         frac_without_dxa * (res(i_lnE) - lnE_with_xa_start) / dxa
                      if (checking) call check_dxa(j,k,s% dlnE_dxa_for_partials(j,k),'dlnE_dxa_for_partials')
 
-                     s% dlnP_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% P(k) + &
-                        frac_without_dxa * (s% Pgas(k)/s% P(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
-                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnP_dxa_for_partials(j,k))) then
+                     s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% Peos(k) + &
+                        frac_without_dxa * (s% Pgas(k)/s% Peos(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
+                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
                         write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                         write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
-                        write(*,2) 's% P(k)', k, s% P(k)
+                        write(*,2) 's% Peos(k)', k, s% Peos(k)
                         write(*,2) 'frac_without_dxa', k, frac_without_dxa
                         write(*,2) 'res(i_lnPgas)', k, res(i_lnPgas)
                         write(*,2) 'lnPgas_with_xa_start', k, lnPgas_with_xa_start
@@ -514,7 +514,7 @@
                         write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
                         write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
                      end if
-                     if (checking) call check_dxa(j,k,s% dlnP_dxa_for_partials(j,k),'dlnP_dxa_for_partials')
+                     if (checking) call check_dxa(j,k,s% dlnPeos_dxa_for_partials(j,k),'dlnPeos_dxa_for_partials')
 
                   else
 
@@ -920,7 +920,7 @@
             call get_PT_bc_ad(ierr) 
             if (ierr /= 0) return
          else
-            s% P_surf = s% P(1)
+            s% P_surf = s% Peos(1)
             s% T_surf = s% T(1)
             return
          end if
@@ -1004,7 +1004,7 @@
                else
                   dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*r*r*r*r)
                end if
-               dT0 = dP0*s% gradT(1)*s% T(1)/s% P(1)
+               dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
             end if
          
             P_bc = P_surf + dP0
@@ -1038,19 +1038,19 @@
                d_gradT_dL = s% gradT_ad(1)%d1Array(i_L_00)
 
                dP0_dlnR = -4*dP0
-               dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% P(1)
+               dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% Peos(1)
 
-               dPinv_dlnT = -s% chiT_for_partials(1)/s% P(1)
+               dPinv_dlnT = -s% chiT_for_partials(1)/s% Peos(1)
                dT0_dlnT = &
                     dT0 + &
-                    dP0*d_gradT_dlnT00*s% T(1)/s% P(1) + &
+                    dP0*d_gradT_dlnT00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnT
-               dPinv_dlnd = -s% chiRho_for_partials(1)/s% P(1)
+               dPinv_dlnd = -s% chiRho_for_partials(1)/s% Peos(1)
                dT0_dlnd = &
-                    dP0*d_gradT_dlnd00*s% T(1)/s% P(1) + &
+                    dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
 
-               dT0_dL = dP0*d_gradT_dL*s% T(1)/s% P(1)
+               dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
 
             endif
 
@@ -1165,7 +1165,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0           
-            lnP1_ad = wrap_lnP_00(s,1)            
+            lnP1_ad = wrap_lnPeos_00(s,1)            
             resid_ad = lnP_bc_ad/lnP1_ad - 1d0
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
@@ -1281,14 +1281,14 @@
          call expected_HSE_grav_term(s, k, grav, area, ierr)
          if (ierr /= 0) return
          
-         P00 = wrap_p_00(s,k)
-         if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% P_start(k))
+         P00 = wrap_Peos_00(s,k)
+         if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
          
          if (k == 1) then
             Pm1 = 0d0
             Ppoint = P00
          else
-            Pm1 = wrap_p_m1(s,k)
+            Pm1 = wrap_Peos_m1(s,k)
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if

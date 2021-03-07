@@ -676,10 +676,10 @@
             call do1(s% m_grav, c% m_grav)
             if (failed('m_grav')) exit
 
-            call do1(s% P, c% P)
-            if (failed('P')) exit
-            call do1(s% lnP, c% lnP)
-            if (failed('lnP')) exit
+            call do1(s% Peos, c% Peos)
+            if (failed('Peos')) exit
+            call do1(s% lnPeos, c% lnPeos)
+            if (failed('lnPeos')) exit
             call do1(s% lnPgas, c% lnPgas)
             if (failed('lnPgas')) exit
             call do1(s% Pgas, c% Pgas)
@@ -777,8 +777,8 @@
             if (failed('dS_dT_for_partials')) exit
             call do2(s% dlnE_dxa_for_partials, c% dlnE_dxa_for_partials, species, null_str)
             if (failed('dlnE_dxa_for_partials')) exit
-            call do2(s% dlnP_dxa_for_partials, c% dlnP_dxa_for_partials, species, null_str)
-            if (failed('dlnP_dxa_for_partials')) exit
+            call do2(s% dlnPeos_dxa_for_partials, c% dlnPeos_dxa_for_partials, species, null_str)
+            if (failed('dlnPeos_dxa_for_partials')) exit
 
             ! other model variables
             call do1(s% csound, c% csound)
@@ -1338,10 +1338,10 @@
             if (failed('lnd_start')) exit
             call do1(s% lnPgas_start, c% lnPgas_start)
             if (failed('lnPgas_start')) exit
-            call do1(s% lnP_start, c% lnP_start)
-            if (failed('lnP_start')) exit
-            call do1(s% P_start, c% P_start)
-            if (failed('P_start')) exit
+            call do1(s% lnPeos_start, c% lnPeos_start)
+            if (failed('lnPeos_start')) exit
+            call do1(s% Peos_start, c% Peos_start)
+            if (failed('Peos_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
             call do1(s% lnE_start, c% lnE_start)

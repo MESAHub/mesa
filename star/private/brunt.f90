@@ -128,7 +128,7 @@
          end if
 
          do k=1,nz
-            rho_P_chiT_chiRho(k) = (s% rho(k)/s% P(k))*(s% chiT(k)/s% chiRho(k))
+            rho_P_chiT_chiRho(k) = (s% rho(k)/s% Peos(k))*(s% chiT(k)/s% chiRho(k))
          end do
          call get_face_values( &
             s, rho_P_chiT_chiRho, rho_P_chiT_chiRho_face, ierr)
@@ -292,10 +292,10 @@
          if (ierr /= 0) return
          lnP2 = log(Prad_face + exp(res(i_lnPgas)))
 
-         delta_lnP = s% lnP(k-1) - s% lnP(k)
+         delta_lnP = s% lnPeos(k-1) - s% lnPeos(k)
          if (delta_lnP > -1d-50) then
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            Ppoint = alfa*s% P(k) + (1-alfa)*s% P(k-1)
+            Ppoint = alfa*s% Peos(k) + (1-alfa)*s% Peos(k-1)
             dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))*Ppoint)
             delta_lnP = dlnP_dm*s% dm_bar(k)
          end if
@@ -308,8 +308,8 @@
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
                write(*,2) 'chiT_face', k, chiT_face
                write(*,2) 'delta_lnP', k, delta_lnP
-               write(*,2) 's% lnP(k)', k, s% lnP(k)
-               write(*,2) 's% lnP(k-1)', k-1, s% lnP(k-1)
+               write(*,2) 's% lnPeos(k)', k, s% lnPeos(k)
+               write(*,2) 's% lnPeos(k-1)', k-1, s% lnPeos(k-1)
                write(*,2) 'lnP1', k, lnP1
                write(*,2) 'lnP2', k, lnP2
                write(*,*)

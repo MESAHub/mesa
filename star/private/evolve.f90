@@ -1138,7 +1138,7 @@
             grada = alfa*s% grada(k) + beta*s% grada(k-1)
             Pgas = alfa*s% Pgas(k) + beta*s% Pgas(k-1)
             Prad = alfa*s% Prad(k) + beta*s% Prad(k-1)
-            P = alfa*s% P(k) + beta*s% P(k-1)
+            P = alfa*s% Peos(k) + beta*s% Peos(k-1)
             opacity = alfa*s% opacity(k) + beta*s% opacity(k-1)
 
             write(*,2) 'at end of step', s% model_number
@@ -1235,7 +1235,7 @@
                s% total_eps_mdot = dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             end if
                
-            virial = 3*sum(s% dm(1:nz)*s% P(1:nz)/s% rho(1:nz))
+            virial = 3*sum(s% dm(1:nz)*s% Peos(1:nz)/s% rho(1:nz))
             s% virial_thm_P_avg = virial
 
             s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))

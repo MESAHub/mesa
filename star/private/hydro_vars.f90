@@ -448,7 +448,7 @@
             dlnT_dlnR = 0d0
             dlnT_dlnM = 0d0
             dlnT_dlnkap = 0d0
-            lnP_surf = s% lnP(1)
+            lnP_surf = s% lnPeos(1)
             dlnP_dL = 0d0
             dlnP_dlnR = 0d0
             dlnP_dlnM = 0d0
@@ -871,7 +871,7 @@
 
             ! Special-case boundary conditions
 
-            lnP_surf = s% lnP_start(1)
+            lnP_surf = s% lnPeos_start(1)
             if (is_bad(lnP_surf)) lnP_surf = 0._dp
             T_surf = s% T_start(1)
             lnT_surf = log(T_surf)

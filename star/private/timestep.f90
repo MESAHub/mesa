@@ -805,8 +805,8 @@
          i = 0
          max_dlnP = 0
          do k=1,s% nz
-            if (s% lnP(k) < lim) cycle
-            dlnP = abs(s% lnP(k) - s% lnP_start(k))
+            if (s% lnPeos(k) < lim) cycle
+            dlnP = abs(s% lnPeos(k) - s% lnPeos_start(k))
             if (dlnP > max_dlnP) then               
                max_dlnP = dlnP
                i = k
@@ -830,9 +830,9 @@
             s% delta_lgP_limit, s% delta_lgP_hard_limit, &
             i, 'check_dlgP_change', skip_hard_limit, dt_limit_ratio, relative_excess)
          if (check_dlgP_change /= keep_going .and. s% report_dt_hard_limit_retries) then
-            write(*,3) 'lgP', i, s% lnP(i)/ln10
-            write(*,3) 'lgP_old', i, s% lnP_start(i)/ln10
-            write(*,3) 'dlgP', i, (s% lnP(i) - s% lnP_start(i))/ln10
+            write(*,3) 'lgP', i, s% lnPeos(i)/ln10
+            write(*,3) 'lgP_old', i, s% lnPeos_start(i)/ln10
+            write(*,3) 'dlgP', i, (s% lnPeos(i) - s% lnPeos_start(i))/ln10
             write(*,3) 'hard_limit', i, s% delta_lgP_hard_limit
          end if
       end function check_dlgP_change
@@ -1444,13 +1444,13 @@
          check_dlgP_cntr_change = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         change = (s% lnP(s% nz) - s% lnP_start(s% nz))/ln10
+         change = (s% lnPeos(s% nz) - s% lnPeos_start(s% nz))/ln10
          check_dlgP_cntr_change = check_change(s, change, &
             s% delta_lgP_cntr_limit, s% delta_lgP_cntr_hard_limit, &
             s% nz, 'check_dlgP_cntr_change', skip_hard_limit, dt_limit_ratio, relative_excess)
          if (check_dlgP_cntr_change /= keep_going .and. s% report_dt_hard_limit_retries) then
-            write(*,1) 'lgP_cntr', s% lnP(s% nz)/ln10
-            write(*,1) 'lgP_cntr_old', s% lnP_start(s% nz)/ln10
+            write(*,1) 'lgP_cntr', s% lnPeos(s% nz)/ln10
+            write(*,1) 'lgP_cntr_old', s% lnPeos_start(s% nz)/ln10
          end if
       end function check_dlgP_cntr_change
 

@@ -79,14 +79,14 @@
       real(dp), pointer :: erad(:) ! specific radiation energy (erg/g)
       real(dp), pointer :: Pgas(:) ! gas pressure (Pgas = Pion + Pelec)
       real(dp), pointer :: Prad(:) ! radiation pressure
-      real(dp), pointer :: P(:) ! total pressure (P = Prad + Pgas)
-      real(dp), pointer :: lnP(:) ! log(P)
+      real(dp), pointer :: Peos(:) ! eos pressure (Peos = Prad + Pgas)
+      real(dp), pointer :: lnPeos(:) ! log(Peos)
       real(dp), pointer :: grada(:)   ! d ln T / d ln P | adiabatic
       real(dp), pointer :: dE_dRho(:) ! dE_dRho at constant T&abundances
       real(dp), pointer :: Cv(:)   ! dE/dT at constant density&abundances
-      real(dp), pointer :: Cp(:)         ! heat capacity at constant pressure&abundances
-         ! Cp := dh_dT at constant P, specific heat at constant pressure
-         ! where h is enthalpy, h = E + P/Rho
+      real(dp), pointer :: Cp(:)         ! heat capacity at constant Peos&abundances
+         ! Cp := dh_dT at constant Peos, specific heat at constant pressure
+         ! where h is enthalpy, h = E + Peos/Rho
       real(dp), pointer :: lnS(:)   ! log(specific entropy)
       real(dp), pointer :: gamma1(:)      ! adiabatic coefficient.
          ! (d_ln(p)/d_ln(rho)) at constant entropy.
@@ -99,8 +99,8 @@
       real(dp), pointer :: phase(:) ! phase (0 for liquid, 1 for solid, in-between for blend)
       real(dp), pointer :: latent_ddlnT(:) ! latent heat of phase transition per unit lnT (erg/g) because we blur the transition
       real(dp), pointer :: latent_ddlnRho(:) ! latent heat of phase transition per unit lnRho (erg/g) because we blur the transition
-      real(dp), pointer :: chiRho(:) ! dlnP_dlnRho at constant T
-      real(dp), pointer :: chiT(:) ! dlnP_dlnT at constant Rho
+      real(dp), pointer :: chiRho(:) ! dlnPeos_dlnRho at constant T
+      real(dp), pointer :: chiT(:) ! dlnPeos_dlnT at constant Rho
       real(dp), pointer :: QQ(:) ! thermal expansion coefficient
       real(dp), pointer :: d_QQ_dlnd(:)
       real(dp), pointer :: d_QQ_dlnT(:)
@@ -130,7 +130,7 @@
       real(dp), pointer :: dS_dRho_for_partials(:)
       real(dp), pointer :: dS_dT_for_partials(:)
       real(dp), pointer :: dlnE_dxa_for_partials(:,:) ! (species,nz)
-      real(dp), pointer :: dlnP_dxa_for_partials(:,:) ! (species,nz)
+      real(dp), pointer :: dlnPeos_dxa_for_partials(:,:) ! (species,nz)
       
       real(dp), pointer :: csound(:) ! at cell center -- set when call eos
       real(dp), pointer :: csound_face(:) ! interpolated 
@@ -1012,8 +1012,8 @@
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)          
          real(dp), pointer :: lnd_start(:) ! (nz)
-         real(dp), pointer :: lnP_start(:) ! (nz)
-         real(dp), pointer :: P_start(:) ! (nz)
+         real(dp), pointer :: lnPeos_start(:) ! (nz)
+         real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
          real(dp), pointer :: lnE_start(:) ! (nz)

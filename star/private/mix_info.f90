@@ -1147,7 +1147,7 @@
                if (s% mixing_type(k) == mix_type) then ! start of region
                   ktop = k
                   rtop = s% r(ktop)
-                  Hp = s% P(ktop)/(s% rho(ktop)*s% grav(ktop))
+                  Hp = s% Peos(ktop)/(s% rho(ktop)*s% grav(ktop))
                   if (dbg) write(*,2) 'start of region', ktop, rtop
                   if (dbg) write(*,1) 'rtop - rbot < Hp*min_gap', (rtop - rbot) - Hp*min_gap, &
                      rtop - rbot, Hp*min_gap, Hp, min_gap, (rtop-rbot)/Hp
@@ -1209,7 +1209,7 @@
                else ! end of radiative region
                   ktop = k+1
                   rtop = s% r(ktop)
-                  Hp = s% P(ktop)/(s% rho(ktop)*s% grav(ktop))
+                  Hp = s% Peos(ktop)/(s% rho(ktop)*s% grav(ktop))
                   q_upper = s% q(ktop-1)
                   q_lower = s% q(kbot+1)
                   if (rtop - rbot < Hp*s% min_thermohaline_dropout .and. &
@@ -2146,10 +2146,10 @@
             r00 = s% r(k)
             alfa00 = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta00 = 1d0 - alfa00
-            P_face(k) = alfa00*s% P(k) + beta00*s% P(k-1)
+            P_face(k) = alfa00*s% Peos(k) + beta00*s% Peos(k-1)
             rho_face(k) = alfa00*s% rho(k) + beta00*s% rho(k-1)
          end do
-         P_face(1) = s% P(1)
+         P_face(1) = s% Peos(1)
          rho_face(1) = s% rho(1)
 
          do k=1,nz
@@ -2412,7 +2412,7 @@
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1 - alfa
             rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
-            P_face = alfa*s% P(k) + beta*s% P(k-1)
+            P_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
             r_face = s% r(k)
             q_face = s% q(k)
             cdc = pow2(pi4*s% r(k)*s% r(k)*rho_face)*D ! gm^2/sec

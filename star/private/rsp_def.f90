@@ -466,7 +466,7 @@
             s% T(k) = photo_T(k)
             s% Pgas(k) = photo_Pgas(k)
             s% Prad(k) = photo_Prad(k)
-            s% P(k) = s% Pgas(k) + s% Prad(k)
+            s% Peos(k) = s% Pgas(k) + s% Prad(k)
             s% egas(k) = photo_egas(k)
             s% erad(k) = photo_erad(k)
             s% opacity(k) = photo_opacity(k)
@@ -643,8 +643,8 @@
             end if
          end do
          do k=2, s% nz
-            if (s% P(k) <= s% P(k-1)) then
-               write(*,3) trim(str) // ' P inversion', k, s% model_number, s% P(k), s% P(k-1), &
+            if (s% Peos(k) <= s% Peos(k-1)) then
+               write(*,3) trim(str) // ' Peos inversion', k, s% model_number, s% Peos(k), s% Peos(k-1), &
                   s% Pt(k), s% Pt(k-1), s% avQ(k), s% avQ(k-1), s% v(k+1), s% v(k), s% v(k-1)
                okay = .false.
             end if
@@ -718,11 +718,11 @@
       
       
       subroutine cleanup_for_LINA( &
-            s, M, DM, DM_BAR, R, Vol, T, RSP_Et, P, ierr)
+            s, M, DM, DM_BAR, R, Vol, T, RSP_Et, Peos, ierr)
          use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          real(dp), intent(inout), dimension(:) :: &
-            M, DM, DM_BAR, R, Vol, T, RSP_Et, P
+            M, DM, DM_BAR, R, Vol, T, RSP_Et, Peos
          integer, intent(out) :: ierr
          
          integer :: I, k
@@ -738,9 +738,9 @@
             s% Vol(k) = Vol(i)
             s% T(k) = T(i)
             s% RSP_w(k) = sqrt(RSP_Et(i))
-            s% P(k) = P(i)
+            s% Peos(k) = Peos(i)
             s% Prad(k) = crad*s% T(k)**4/3d0
-            s% Pgas(k) = s% P(k) - s% Prad(k)
+            s% Pgas(k) = s% Peos(k) - s% Prad(k)
          end do                    
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
          
@@ -814,7 +814,7 @@
             call store_T_in_xh(s, k, s% T(k))
             call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             
-            s% P(k) = s% Pgas(k) + s% Prad(k)
+            s% Peos(k) = s% Pgas(k) + s% Prad(k)
             if (k > 1) s% gradT(k) = &
                s% Y_face(k) + 0.5d0*(s% grada(k-1) + s% grada(k))
             
@@ -854,11 +854,11 @@
          ! set some things for mesa output reporting
          i = 1
          s% rho_face(i) = s% rho(i)
-         s% P_face_ad(i)%val = s% P(i)
+         s% P_face_ad(i)%val = s% Peos(i)
          s% csound_face(i) = s% csound(i)
          do i = 2,NZN
             s% rho_face(i) = 0.5d0*(s% rho(i) + s% rho(i-1))
-            s% P_face_ad(i)%val = 0.5d0*(s% P(i) + s% P(i-1))
+            s% P_face_ad(i)%val = 0.5d0*(s% Peos(i) + s% Peos(i-1))
             s% csound_face(i) = 0.5d0*(s% csound(i) + s% csound(i-1))
          end do
          

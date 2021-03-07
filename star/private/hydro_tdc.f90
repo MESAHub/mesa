@@ -247,7 +247,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
          type(auto_diff_real_star_order1) :: r_mid, r_00, r_p1, &
-            P_00, d_00, P_m1, d_m1, alt_Hp_cell, alfa
+            Peos_00, d_00, alt_Hp_cell, alfa
          real(dp) :: cgrav_00, cgrav_p1, cgrav_mid, m_00, m_p1, m_mid
          include 'formats'
          ierr = 0
@@ -255,7 +255,7 @@
          cgrav_00 = s% cgrav(k)
          m_00 = s% m(k)
          d_00 = wrap_d_00(s, k)
-         P_00 = wrap_P_00(s, k)
+         Peos_00 = wrap_Peos_00(s, k)
          r_p1 = wrap_opt_time_center_r_p1(s, k)
          if (k < s% nz) then
             cgrav_p1 = s% cgrav(k+1)
@@ -267,10 +267,10 @@
          cgrav_mid = 0.5d0*(cgrav_00 + cgrav_p1)
          m_mid = 0.5d0*(m_00 + m_p1)
          r_mid = 0.5d0*(r_00 + r_p1)
-         Hp_cell = pow2(r_mid)*P_00 / (d_00*cgrav_mid*m_mid)
+         Hp_cell = pow2(r_mid)*Peos_00 / (d_00*cgrav_mid*m_mid)
          if (s% alt_scale_height_flag) then
             ! consider sound speed*hydro time scale as an alternative scale height
-            alt_Hp_cell = sqrt(P_00/cgrav_mid)/d_00
+            alt_Hp_cell = sqrt(Peos_00/cgrav_mid)/d_00
             if (alt_Hp_cell%val < Hp_cell%val) then ! blend
                alfa = pow2(alt_Hp_cell/Hp_cell) ! 0 <= alfa%val < 1
                Hp_cell = alfa*Hp_cell + (1d0 - alfa)*alt_Hp_cell
@@ -285,8 +285,8 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face
          type(auto_diff_real_star_order1) :: &
-            r_00, P_00, d_00, P_m1, d_m1, P_div_rho, &
-            d_face, P_face, alt_Hp_face, alfa
+            r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
+            d_face, Peos_face, alt_Hp_face, alfa
          integer :: j
          include 'formats'
          ierr = 0
@@ -296,20 +296,20 @@
          else
             r_00 = wrap_opt_time_center_r_00(s, k)
             d_00 = wrap_d_00(s, k)
-            P_00 = wrap_p_00(s, k)
+            Peos_00 = wrap_Peos_00(s, k)
             if (k == 1) then
-               P_div_rho = P_00/d_00
-               Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
+               Peos_div_rho = Peos_00/d_00
+               Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
             else
                d_m1 = wrap_d_m1(s, k)
-               P_m1 = wrap_P_m1(s, k)
-               P_div_rho = 0.5d0*(P_00/d_00 + P_m1/d_m1)
-               Hp_face = pow2(r_00)*P_div_rho/(s% cgrav(k)*s% m(k))
+               Peos_m1 = wrap_Peos_m1(s, k)
+               Peos_div_rho = 0.5d0*(Peos_00/d_00 + Peos_m1/d_m1)
+               Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
                if (s% alt_scale_height_flag) then
                   ! consider sound speed*hydro time scale as an alternative scale height
                   d_face = 0.5d0*(d_00 + d_m1)
-                  P_face = 0.5d0*(P_00 + P_m1)
-                  alt_Hp_face = sqrt(P_face/s% cgrav(k))/d_face
+                  Peos_face = 0.5d0*(Peos_00 + Peos_m1)
+                  alt_Hp_face = sqrt(Peos_face/s% cgrav(k))/d_face
                   if (alt_Hp_face%val < Hp_face%val) then ! blend
                      alfa = pow2(alt_Hp_face/Hp_face) ! 0 <= alfa%val < 1
                      Hp_face = alfa*Hp_face + (1d0 - alfa)*alt_Hp_face
@@ -327,8 +327,8 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Y_face
          type(auto_diff_real_star_order1) :: Hp_face, Y1, Y2, QQ_div_Cp_face, &
-            r_00, d_00, P_00, Cp_00, T_00, chiT_00, chiRho_00, QQ_00, lnT_00, &
-            r_m1, d_m1, P_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1
+            r_00, d_00, Peos_00, Cp_00, T_00, chiT_00, chiRho_00, QQ_00, lnT_00, &
+            r_m1, d_m1, Peos_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1
          real(dp) :: dm_bar
          include 'formats'
          ierr = 0
@@ -348,7 +348,7 @@
          
          r_00 = wrap_opt_time_center_r_00(s, k)
          d_00 = wrap_d_00(s, k)
-         P_00 = wrap_P_00(s, k)
+         Peos_00 = wrap_Peos_00(s, k)
          Cp_00 = wrap_Cp_00(s, k)
          T_00 = wrap_T_00(s, k)
          chiT_00 = wrap_chiT_00(s, k)
@@ -358,7 +358,7 @@
          
          r_m1 = wrap_opt_time_center_r_m1(s, k)
          d_m1 = wrap_d_m1(s, k)
-         P_m1 = wrap_P_m1(s, k)
+         Peos_m1 = wrap_Peos_m1(s, k)
          Cp_m1 = wrap_Cp_m1(s, k)
          T_m1 = wrap_T_m1(s, k)
          chiT_m1 = wrap_chiT_m1(s, k)
@@ -374,7 +374,7 @@
          ! P units = erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          ! QQ/Cp*P is unitless.
          
-         Y1 = QQ_div_Cp_face*(P_m1 - P_00) - (lnT_m1 - lnT_00)
+         Y1 = QQ_div_Cp_face*(Peos_m1 - Peos_00) - (lnT_m1 - lnT_00)
          ! Y1 unitless
          
          Y2 = 4d0*pi*pow2(r_00)*Hp_face*2d0/(1/d_00 + 1/d_m1)/dm_bar
@@ -513,14 +513,14 @@
          type(auto_diff_real_star_order1) :: Source
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            w_00, T_00, d_00, P_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
+            w_00, T_00, d_00, Peos_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, fac
          include 'formats'
          ierr = 0
          w_00 = wrap_w_00(s, k)
          T_00 = wrap_T_00(s, k)                  
          d_00 = wrap_d_00(s, k)         
-         P_00 = wrap_P_00(s, k)         
+         Peos_00 = wrap_Peos_00(s, k)         
          Cp_00 = wrap_Cp_00(s, k)
          chiT_00 = wrap_chiT_00(s, k)
          chiRho_00 = wrap_chiRho_00(s, k)
@@ -541,7 +541,7 @@
             PII_div_Hp_cell = 0.5d0*(PII_face_00/Hp_face_00 + PII_face_p1/Hp_face_p1)
          end if
          
-         fac = w_00*T_00*P_00*QQ_00/Cp_00  ! create separate term just for debugging
+         fac = w_00*T_00*Peos_00*QQ_00/Cp_00  ! create separate term just for debugging
 
          Source = PII_div_Hp_cell*fac
          

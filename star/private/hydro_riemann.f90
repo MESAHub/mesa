@@ -193,10 +193,10 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: P
             real(dp), dimension(s% species) :: d_XP_dxa
-            logical, parameter :: skip_P = .false., skip_mlt_Pturb = .false.
+            logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
             ierr = 0
             ! use same P here as the cell pressure in P_face calculation
-            call calc_XP_ad_tw(s, k, skip_P, skip_mlt_Pturb, P, d_XP_dxa, ierr)
+            call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_XP_dxa, ierr)
             if (ierr /= 0) return
             if (k == nz) then 
                ! no flux in from left, so only have geometry source on right
@@ -318,7 +318,7 @@
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
          real(dp), dimension(s% species) :: d_XP_dxa
-         logical, parameter :: skip_P = .false., skip_mlt_Pturb = .false.
+         logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
          real(dp) :: dG_dw_div_wc, delta_m, f
             
          include 'formats'
@@ -333,16 +333,16 @@
                             
          if (k == 1) then
             s% u_face_ad(k) = wrap_u_00(s,k)
-            s% P_face_ad(k) = wrap_p_00(s,k)
+            s% P_face_ad(k) = wrap_Peos_00(s,k)
             return            
          end if
       
          r_ad = wrap_r_00(s,k)
          A_ad = 4d0*pi*pow2(r_ad)
          
-         call calc_XP_ad_tw(s, k, skip_P, skip_mlt_Pturb, PL_ad, d_XP_dxa, ierr)
+         call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_XP_dxa, ierr)
          if (ierr /= 0) return
-         call calc_XP_ad_tw(s, k, skip_P, skip_mlt_Pturb, PR_ad, d_XP_dxa, ierr)
+         call calc_XP_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PR_ad, d_XP_dxa, ierr)
          if (ierr /= 0) return
          PR_ad = shift_m1(PR_ad)
 
