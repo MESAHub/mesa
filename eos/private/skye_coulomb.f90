@@ -399,7 +399,7 @@ module skye_coulomb
       type(auto_diff_real_2var_order3) :: CHT1, SHT1, CHT2, SHT2
       type(auto_diff_real_2var_order3) :: T1, T2
       type(auto_diff_real_2var_order3) :: A0, A1, A, B0, B1, B
-      type(auto_diff_real_2var_order3) :: C, CDH, CDHH, C3, C3DH, C3DHH
+      type(auto_diff_real_2var_order3) :: C, C3
       type(auto_diff_real_2var_order3) :: D0, D1, D, E0, E1, E
       type(auto_diff_real_2var_order3) :: DISCR, SQGE
       type(auto_diff_real_2var_order3) :: B2, B3, R3, S1, S2, S3, B4, C4
