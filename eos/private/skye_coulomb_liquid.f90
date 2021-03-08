@@ -67,16 +67,16 @@ module skye_coulomb_liquid
    !!
    !! @param Z ion charge
    !! @param mi ion mass in grams
-   !! @param Gamma_ion ion interaction parameter
-   !! @param TPT effective T_p/T - ion quantum parameter
+   !! @param ge electron interaction parameter
+   !! @param rs non-dimensionalized electron radius
    !! @param F non-ideal free energy
-   function ocp_liquid_screening_free_energy_correction(Z, mi, Gamma_ion, TPT) result(F)
+   function ocp_liquid_screening_free_energy_correction(Z, mi, ge, rs) result(F)
          real(dp), intent(in) :: Z, mi
-         type(auto_diff_real_2var_order3), intent(in) :: Gamma_ion, TPT
+         type(auto_diff_real_2var_order3), intent(in) :: ge, rs
 
-         real(dp) :: cDH, cTF, a, b, nu
+         real(dp) :: cDH, cTF, a, b, nu, COTPT
 
-         type(auto_diff_real_2var_order3) :: rs, ge, g1, g2, h, gr, xr
+         type(auto_diff_real_2var_order3) :: TPT, g, g1, g2, h, gr, xr
          type(auto_diff_real_2var_order3) :: F
 
          a = 1.11d0 * pow(Z, 0.475d0)
@@ -85,8 +85,9 @@ module skye_coulomb_liquid
          cDH = (Z / sqrt(3d0)) * (pow(1d0 + Z, 1.5d0) - 1d0 - pow(Z, 1.5d0))
          cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pow(Z, 7d0/3d0) * (1d0 - pow(Z, -1d0/3d0) + 0.2d0 * pow(Z, -0.5d0))
 
-         ge = Gamma_ion * pow(Z, -5d0/3d0)
-         rs = (me / mi) * (3d0 * pow2(Gamma_ion / TPT)) * pow(Z, -7d0/3d0)
+         g = ge * pow(Z, 5d0/3d0)
+         COTPT = sqrt(3d0 * me / mi) / pow(Z, 7d0/6d0)
+         TPT = g / sqrt(rs) * COTPT
 
          xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
          gr = sqrt(1d0 + pow2(xr))

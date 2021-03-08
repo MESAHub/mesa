@@ -212,7 +212,7 @@ module skye_coulomb
 
       ! Intermediates and constants
       integer :: i,j
-      type(auto_diff_real_2var_order3) :: GAMI, COTPT, TPT, FMIX, f
+      type(auto_diff_real_2var_order3) :: FMIX, f
       real(dp), parameter :: TINY=1.d-7
 
       ! Output
@@ -224,16 +224,12 @@ module skye_coulomb
       do i=1,nmix
          if (AY(i) > TINY .and. AZion(i) /= 0d0) then ! skip low-abundance species and neutrons
 
-            GAMI = pow(AZion(i),5d0/3d0) * GAME
-            COTPT=sqrt(3d0/AUM/ACMI(i))/pow(AZion(i),7d0/6d0) ! auxiliary coefficient
-            TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
-
             ! Add up non-ideal corrections
             f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i), min_gamma_for_solid, max_gamma_for_liquid)
             if (LIQSOL == 0) then
-               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAMI, TPT) ! screening corrections
+               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAME, RS) ! screening corrections
             else
-               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAMI, TPT) ! screening corrections
+               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAME, RS) ! screening corrections
             end if               
             dF = dF + AY(i) * f
 
