@@ -360,24 +360,15 @@ module skye_coulomb
       integer, intent(in) :: LIQSOL
       type(auto_diff_real_2var_order3), intent(in) :: GAMI, TPT
 
-      ! Intermediates
-      type(auto_diff_real_2var_order3) :: RS, COTPT
-
       ! Output
       type(auto_diff_real_2var_order3) :: F
-
-      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
-      RS = GAMI * COTPT / TPT ! Electron sphere radius / Bohr radius
-
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
-         !F = F + screening_factor * ocp_liquid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       else     
          F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
-         !F = F + screening_factor * ocp_solid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       endif
 
    end function ocp_free_energy
