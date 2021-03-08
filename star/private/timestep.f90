@@ -355,13 +355,26 @@
          else
             max_timestep_factor = s% max_timestep_factor
          end if
+         
          if (max_timestep_factor > 0 .and. s% dt_next > max_timestep_factor*s% dt) then
             s% dt_next = max_timestep_factor*s% dt
+            if (s% report_solver_dt_info) then
+               write(*,2) 's% dt', s% model_number, s% dt
+               write(*,2) 'max_timestep_factor', s% model_number, max_timestep_factor
+               write(*,2) 's% dt_next', s% model_number, s% dt_next
+               if (s% dt_next == 0d0) stop 'filter_dt_next'
+            end if
             if (i_limit == Tlim_struc) i_limit = Tlim_max_timestep_factor
          end if
 
          if (s% min_timestep_factor > 0 .and. s% dt_next < s% min_timestep_factor*s% dt) then
             s% dt_next = s% min_timestep_factor*s% dt
+            if (s% report_solver_dt_info) then
+               write(*,2) 's% dt', s% model_number, s% dt
+               write(*,2) 'min_timestep_factor', s% model_number, s% min_timestep_factor
+               write(*,2) 's% dt_next', s% model_number, s% dt_next
+               if (s% dt_next == 0d0) stop 'filter_dt_next'
+            end if
             if (i_limit == Tlim_struc) i_limit = Tlim_min_timestep_factor
          end if
 
@@ -2518,6 +2531,13 @@
 
          else ! no history available, so fall back to the 1st order controller
             s% dt_next = s% dt*dt_limit_ratio_target/dt_limit_ratio
+            if (s% report_solver_dt_info) then
+               write(*,2) 's% dt', s% model_number, s% dt
+               write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
+               write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio
+               write(*,2) 'filter_dt_next', s% model_number, s% dt_next
+               if (s% dt_next == 0d0) stop 'filter_dt_next'
+            end if
          end if
 
 

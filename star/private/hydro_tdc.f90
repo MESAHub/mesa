@@ -164,18 +164,6 @@
          residual = resid_ad%val
          s% equ(s% i_detrb_dt, k) = residual
 
-         if (is_bad(residual)) then
-!$omp critical (hydro_equ_turbulent_crit1)
-            write(*,2) 'turbulent energy eqn residual', k, residual
-            write(*,2) 'det', k, d_turbulent_energy_ad%val
-            write(*,2) 'Ptrb_dV', k, Ptrb_dV_ad%val
-            write(*,2) 'dt_dLt_dm', k, dt_dLt_dm_ad%val
-            write(*,2) 'dt_C', k, dt_C_ad%val
-            write(*,2) 'dt_Eq', k, dt_Eq_ad%val
-            stop 'get1_turbulent_energy_eqn'
-!$omp end critical (hydro_equ_turbulent_crit1)
-         end if
-
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
@@ -428,6 +416,16 @@
          ALFA = s% TDC_alfa
          PII_face = ALFAS*ALFA*Cp_face*Y_face
          s% PII(k) = PII_face%val
+         if (k == -2 .and. s% PII(k) < 0d0) then
+            write(*,2) 's% PII(k)', k, s% PII(k)
+            write(*,2) 'Cp_face', k, Cp_face%val
+            write(*,2) 'Y_face', k, Y_face%val
+            !write(*,2) 'PII_face%val', k, PII_face%val
+            !write(*,2) 'T_rho_face%val', k, T_rho_face%val
+            !write(*,2) '', k, 
+            !write(*,2) '', k, 
+            stop 'compute_PII_face'
+         end if
       end function compute_PII_face
       
       
@@ -481,16 +479,6 @@
             !       = erg
          end if
          s% Chi(k) = Chi_cell%val
-         if (is_bad(Chi_cell%d1Array(i_lnd_00))) then
-            !$omp critical (hydro_tdc_crit)
-            write(*,2) 'Chi_cell%d1Array(i_lnd_00)', k, Chi_cell%d1Array(i_lnd_00)
-            write(*,2) 'd w_rho2', k, w_rho2%d1Array(i_lnd_00)
-            write(*,2) 'd r6_cell', k, r6_cell%d1Array(i_lnd_00)
-            write(*,2) 'd d_v_div_r', k, d_v_div_r%d1Array(i_lnd_00)
-            write(*,2) 'd Hp_cell', k, Hp_cell%d1Array(i_lnd_00)
-            stop 'compute_Eq_cell'
-            !$omp end critical (hydro_tdc_crit)
-         end if
 
       end function compute_Chi_cell
 
@@ -514,14 +502,6 @@
             Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
          end if
          s% Eq(k) = Eq_cell%val
-         if (is_bad(Eq_cell%d1Array(i_lnd_00))) then
-            !$omp critical (hydro_tdc_crit)
-            write(*,2) 'Eq_cell%d1Array(i_lnd_00)', k, Eq_cell%d1Array(i_lnd_00)
-            write(*,2) 'd Chi_cell', k, Chi_cell%d1Array(i_lnd_00)
-            write(*,2) 'd d_v_div_r', k, d_v_div_r%d1Array(i_lnd_00)
-            stop 'compute_Eq_cell'
-            !$omp end critical (hydro_tdc_crit)
-         end if
       end function compute_Eq_cell
 
 
@@ -812,6 +792,16 @@
          ! units = cm^2 K g cm^-3 ergs g^-1 K^-1 = ergs cm^-1
          Lc = w_face*Lc_w_face_factor
          ! units = cm s^-1 ergs cm^-1 = ergs s^-1
+         if (k == -2 .and. Lc_w_face_factor < 0d0) then
+            write(*,2) 'Lc%val', k, Lc%val
+            write(*,2) 'w_face%val', k, w_face%val
+            write(*,2) 'Lc_w_face_factor', k, Lc_w_face_factor%val
+            write(*,2) 'PII_face%val', k, PII_face%val
+            write(*,2) 'T_rho_face%val', k, T_rho_face%val
+            !write(*,2) '', k, 
+            !write(*,2) '', k, 
+            stop 'compute_Lc_terms'
+         end if
       end function compute_Lc_terms
 
 
@@ -883,14 +873,24 @@
          do k=2, nz
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'
-            Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
-            if (ierr /= 0) stop 'failed in compute_Lc_terms'
-            Lc_val = s% L(k) - Lr%val ! assume Lt = 0 for this
-            if (abs(Lc_w_face_factor%val) < 1d-20) then
+            ! filter out negative Lc
+            if (s% L(k) < Lr%val) then
+               Lc = 0 
+               Lc_val = 0
+               Lc_w_face_factor = 1
                w_face(k) = 0d0
             else
-               w_face(k) = Lc_val/Lc_w_face_factor%val
+               Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+               if (ierr /= 0) stop 'failed in compute_Lc_terms'
+               Lc_val = s% L(k) - Lr%val ! assume Lt = 0 for this
+               if (Lc_w_face_factor%val < 1d-20) then
+                  w_face(k) = 0d0
+               else
+                  w_face(k) = Lc_val/Lc_w_face_factor%val
+               end if
             end if
+            if (dbg) write(*,2) 'new w_face Lc w_factor', k, &
+               w_face(k), Lc_val, Lc_w_face_factor%val
          end do
          do k=1, nz
             if (k < nz) then
@@ -899,7 +899,8 @@
                w_00 = 0.5d0*w_face(k)
             end if
             call store_etrb_in_xh(s,k,pow2(w_00))
-            call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new w(k)
+            if (dbg) write(*,2) 'new w', k, w_00
+            call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new etrb(k)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
          end do
          if (dbg) stop 'reset_etrb_using_L'

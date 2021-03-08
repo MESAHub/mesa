@@ -115,7 +115,7 @@
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad + eps_grav_ad
          else if (s% using_velocity_time_centering .and. &
-                s% use_Fraley_PdV_work_when_time_centering_velocity) then
+                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - de_dt_ad
          else
@@ -127,32 +127,6 @@
          resid_ad = scal*resid_ad
          residual = resid_ad%val
          s% equ(i_dlnE_dt, k) = residual
-
-         if (is_bad(residual)) then
-!$omp critical (hydro_equ_l_crit1)
-            write(*,2) 'energy eqn residual', k, residual
-            stop 'get1_energy_eqn'
-!$omp end critical (hydro_equ_l_crit1)
-         end if
-
-         if (is_bad(resid_ad%d1Array(i_lnd_00))) then
-!$omp critical (hydro_equ_l_crit1)
-            write(*,2) 'energy eqn resid_ad%d1Array(i_lnd_00)', k, resid_ad%d1Array(i_lnd_00)
-            write(*,2) 'd dL_dm_ad', k, dL_dm_ad%d1Array(i_lnd_00)
-            write(*,2) 'd sources_ad', k, sources_ad%d1Array(i_lnd_00)
-            write(*,2) 'd others_ad', k, others_ad%d1Array(i_lnd_00)
-            write(*,2) 'd d_turbulent_energy_dt_ad', k, d_turbulent_energy_dt_ad%d1Array(i_lnd_00)
-            write(*,2) 'd dwork_dm_ad', k, dwork_dm_ad%d1Array(i_lnd_00)
-            write(*,2) 'd dke_dt_ad', k, dke_dt_ad%d1Array(i_lnd_00)
-            write(*,2) 'd dpe_dt_ad', k, dpe_dt_ad%d1Array(i_lnd_00)
-            write(*,2) 'd de_dt_ad', k, de_dt_ad%d1Array(i_lnd_00)
-            stop 'get1_energy_eqn'
-!$omp end critical (hydro_equ_l_crit1)
-         end if
-         
-         
-         
-         
          
          if (test_partials) then
             s% solver_test_partials_val = residual
@@ -207,7 +181,7 @@
             ierr = 0
             skip_P = eps_grav_form
             if (s% using_velocity_time_centering .and. &
-                s% use_Fraley_PdV_work_when_time_centering_velocity) then
+                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
                call eval_Fraley_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr) 
                d_dwork_dxam1 = 0
@@ -313,18 +287,6 @@
             sources_ad%val = sources_ad%val + s% irradiation_heat(k)
             
             if (s% mstar_dot /= 0d0) sources_ad%val = sources_ad%val + s% eps_mdot(k)
-
-            if (is_bad(sources_ad%d1Array(i_lnd_00))) then
-               !$omp critical (hydro_equ_l_crit1)
-               write(*,2) 'energy eqn sources_ad%d1Array(i_lnd_00)', k, sources_ad%d1Array(i_lnd_00)
-               write(*,2) 'd eps_nuc_ad', k, eps_nuc_ad%d1Array(i_lnd_00)
-               write(*,2) 'd non_nuc_neu_ad', k, non_nuc_neu_ad%d1Array(i_lnd_00)
-               write(*,2) 'd extra_heat_ad', k, extra_heat_ad%d1Array(i_lnd_00)
-               write(*,2) 'd Eq_ad', k, Eq_ad%d1Array(i_lnd_00)
-               write(*,2) 'd RTI_diffusion_ad', k, RTI_diffusion_ad%d1Array(i_lnd_00)
-               stop 'setup_sources_and_others'
-               !$omp end critical (hydro_equ_l_crit1)
-            end if
 
          end subroutine setup_sources_and_others
          
@@ -784,13 +746,6 @@
             d_work_dxa00(j) = Av_face*d_Pface_dxa00(j)
             d_work_dxam1(j) = Av_face*d_Pface_dxam1(j)
          end do
-
-         if (is_bad(work)) then
-!$omp critical (hydro_equ_l_crit2)
-            write(*,2) 'work', k, work
-            stop 'eval1_work'
-!$omp end critical (hydro_equ_l_crit2)
-         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.

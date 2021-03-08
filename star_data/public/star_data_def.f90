@@ -162,6 +162,7 @@
          result_reason_str(variable_change_limits) = 'variable_change_limits'
          result_reason_str(explicit_hydro_failed) = 'explicit_hydro_failed'
          result_reason_str(abs_rel_run_E_err) = 'abs_rel_run_E_err'
+         result_reason_str(forced_stop) = 'forced_stop'
       end subroutine result_reason_init
 
       

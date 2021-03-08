@@ -90,7 +90,7 @@
    !use_gold_tolerances = .false.
    
    use_momentum_outer_BC = .true.
-   !TDC_use_L_eqn_at_surface = .false.
+   TDC_use_L_eqn_at_surface = .false.
 
    !convergence_ignore_equL_residuals = .true.
    

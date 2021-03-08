@@ -28,7 +28,6 @@
 
       use const_def, only: dp
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
-      use auto_diff ! wholesale include
 
       use pulse, only: &
            star_export_pulse_data => export_pulse_data, &
@@ -40,6 +39,34 @@
            star_eval_conv_bdy_r => eval_conv_bdy_r, &
            star_eval_conv_bdy_Hp => eval_conv_bdy_Hp, &
            star_eval_over_bdy_params => eval_over_bdy_params
+
+      use auto_diff_support, only: & ! for variables of type auto_diff_real_star_order1
+            shift_p1, shift_m1, & ! my_val_m1 = shift_m1(get_my_val(s,k-1)) for use in terms going into equation at k
+            wrap_T_m1, wrap_T_00, wrap_T_p1, & ! for s% T
+            wrap_lnT_m1, wrap_lnT_00, wrap_lnT_p1, & ! for s% lnT
+            wrap_d_m1, wrap_d_00, wrap_d_p1, & !  ! values from s% rho
+            wrap_lnd_m1, wrap_lnd_00, wrap_lnd_p1, & ! values from s% lnd
+            wrap_etrb_m1, wrap_etrb_00, wrap_etrb_p1, & ! values from s% etrb
+            wrap_kap_m1, wrap_kap_00, wrap_kap_p1, & ! values from s% opacity
+            wrap_s_m1, wrap_s_00, wrap_s_p1, & ! values from s% entropy
+            wrap_e_m1, wrap_e_00, wrap_e_p1, & ! values from s% energy
+            wrap_Peos_m1, wrap_Peos_00, wrap_Peos_p1, & ! values from s% Peos
+            wrap_lnPeos_m1, wrap_lnPeos_00, wrap_lnPeos_p1, & ! values from s% lnPeos
+            wrap_ChiRho_m1, wrap_ChiRho_00, wrap_ChiRho_p1, & ! values from s% ChiRho
+            wrap_ChiT_m1, wrap_ChiT_00, wrap_ChiT_p1, & ! values from s% ChiT
+            wrap_Cp_m1, wrap_Cp_00, wrap_Cp_p1, & ! values from s% Cp
+            wrap_gamma1_m1, wrap_gamma1_00, wrap_gamma1_p1, & ! values from s% gamma1
+            wrap_L_m1, wrap_L_00, wrap_L_p1, & ! values from s% L
+            wrap_r_m1, wrap_r_00, wrap_r_p1, & ! values from s% r
+            wrap_lnR_m1, wrap_lnR_00, wrap_lnR_p1, & ! values from s% lnr
+            wrap_v_m1, wrap_v_00, wrap_v_p1, & ! Riemann or non-Riemann velocity at face, s% v or s% u_face
+            wrap_u_m1, wrap_u_00, wrap_u_p1, & ! Riemann cell velocity s% u
+            ! the following check the flag using_velocity_time_centering
+            wrap_opt_time_center_r_m1, wrap_opt_time_center_r_00, wrap_opt_time_center_r_p1, &
+            wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1, &
+            ! "safe" w routines take care of w=sqrt(etrb) for etrb=0 by directly setting w=0 instead of sqrt(0)
+            safe_wrap_w_m1, safe_wrap_w_00, safe_wrap_w_p1 ! from sqrt(s% etrb)
+
 
       implicit none
 

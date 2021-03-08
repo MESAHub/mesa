@@ -324,8 +324,9 @@
       integer, parameter :: variable_change_limits = 14
       integer, parameter :: explicit_hydro_failed = 15
       integer, parameter :: abs_rel_run_E_err = 16
+      integer, parameter :: forced_stop = 17
       
-      integer, parameter :: num_reasons = 16
+      integer, parameter :: num_reasons = 17
       
       character (len=strlen) :: result_reason_str(num_reasons)
          

@@ -2823,17 +2823,12 @@
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
          
-         s% xtra1_array(k) = s% Pgas(k) + s% Prad(k)
-         s% xtra2_array(k) = s% Vol(k)
-         s% xtra3_array(k) = s% T(k)
-         s% xtra4_array(k) = s% v(k)
-         s% xtra5_array(k) = s% RSP_w(k)**2
-         s% xtra6_array(k) = s% r(k)
-         
-         if (k==-30) then
-            write(*,2) 'RSP', k, s% xtra1_array(k), s% xtra2_array(k), s% xtra3_array(k), &
-               s% xtra4_array(k), s% xtra5_array(k), s% xtra6_array(k)
-         end if
+         !s% xtra1_array(k) = s% Pgas(k) + s% Prad(k)
+         !s% xtra2_array(k) = s% Vol(k)
+         !s% xtra3_array(k) = s% T(k)
+         !s% xtra4_array(k) = s% v(k)
+         !s% xtra5_array(k) = s% RSP_w(k)**2
+         !s% xtra6_array(k) = s% r(k)
             
          HD(i_r_dFr_00,IR) = - d_Fr_term_dFr_00
 

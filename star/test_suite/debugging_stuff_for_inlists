@@ -42,7 +42,6 @@
       !solver_test_net_partials = .true.
       !solver_test_atm_partials = .true.
 
-      !report_why_dt_limits = .true.
       !report_all_dt_limits = .true.
       !report_solver_dt_info = .true.
       

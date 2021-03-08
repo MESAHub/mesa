@@ -104,7 +104,7 @@
    !use_gold_tolerances = .false.
 
    use_momentum_outer_BC = .true.
-   !TDC_use_L_eqn_at_surface = .false.
+   TDC_use_L_eqn_at_surface = .false.
    
    Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
@@ -129,13 +129,13 @@
    !history_interval = 1
    terminal_interval = 1
 
-   !fill_arrays_with_NaNs = .true.
+   fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+      report_solver_progress = .true. ! set true to see info about solver iterations
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1

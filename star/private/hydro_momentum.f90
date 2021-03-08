@@ -161,17 +161,12 @@
          residual = resid_ad%val
          s% equ(i_dv_dt, k) = residual     
          
-         s% xtra1_array(k) = s% Peos(k)
-         s% xtra2_array(k) = 1d0/s% rho(k)
-         s% xtra3_array(k) = s% T(k)
-         s% xtra4_array(k) = s% v(k)
-         s% xtra5_array(k) = s% etrb(k)
-         s% xtra6_array(k) = s% r(k)
-         
-         if (k==-30) then
-            write(*,2) 'TDC', k, s% xtra1_array(k), s% xtra2_array(k), s% xtra3_array(k), &
-               s% xtra4_array(k), s% xtra5_array(k), s% xtra6_array(k)
-         end if
+         !s% xtra1_array(k) = s% Peos(k)
+         !s% xtra2_array(k) = 1d0/s% rho(k)
+         !s% xtra3_array(k) = s% T(k)
+         !s% xtra4_array(k) = s% v(k)
+         !s% xtra5_array(k) = s% etrb(k)
+         !s% xtra6_array(k) = s% r(k)
          
          if (is_bad(residual)) then
 !$omp critical (hydro_momentum_crit1)

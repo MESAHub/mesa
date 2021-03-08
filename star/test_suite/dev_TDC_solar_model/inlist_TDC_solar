@@ -125,7 +125,7 @@
    !use_gold_tolerances = .false.
 
    use_momentum_outer_BC = .true.
-   !TDC_use_L_eqn_at_surface = .false.
+   TDC_use_L_eqn_at_surface = .false.
 
    always_use_dedt_form_of_energy_eqn = .true. ! no eps_grav
 
@@ -164,8 +164,8 @@
 ! FOR DEBUGGING
 
       report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+      report_ierr = .true. ! if true, produce terminal output when have some internal error
+      stop_for_bad_nums = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1

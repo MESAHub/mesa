@@ -80,29 +80,6 @@
       terminal_interval = 10
       write_header_frequency = 10
 
-      !report_hydro_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-
-      !report_why_dt_limits = .true.
-      !report_all_dt_limits = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !trace_evolve = .true.
-
-      ! hydro debugging
-      !hydro_check_everything = .true.
-      !hydro_inspectB_flag = .true.
-      
-      !hydro_numerical_jacobian = .true.
-      !hydro_save_numjac_plot_data = .true.
-      !small_mtx_decsol = 'lapack'
-      !large_mtx_decsol = 'lapack'
-      !hydro_dump_call_number = 1
-      
-
 / ! end of controls namelist
 
 

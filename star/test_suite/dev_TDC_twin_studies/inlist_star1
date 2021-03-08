@@ -1,0 +1,61 @@
+
+&star_job
+   saved_model_name = 'test.mod'
+
+   change_initial_v_flag = .true.
+   new_v_flag = .true.
+
+   set_initial_dt = .true.
+   seconds_for_initial_dt = 500 ! for debugging
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls  
+   max_timestep = 500 ! for debugging
+   force_timestep_min = 500 ! for debugging
+
+! starting specifications
+
+! when to stop
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+
+! mixing
+
+! timesteps
+
+! mesh
+   okay_to_remesh = .false.
+
+! solver
+
+! output
+
+   photo_directory = 'photos1'
+   log_directory = 'LOGS1'
+
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+
+/ ! end of controls namelist
+
+
+&pgstar
+/ ! end of pgstar namelist

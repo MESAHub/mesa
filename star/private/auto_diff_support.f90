@@ -1008,7 +1008,8 @@
          type(auto_diff_real_star_order1) :: xtra1_m1
          integer, intent(in) :: k
          xtra1_m1 = 0d0 
-         if (k > 1) then ! s%w(k-1)
+         if (k > 1) then 
+            xtra1_m1% val = s% xtra1_array(k)
             xtra1_m1 % d1Array(i_xtra1_m1) = 1d0
          end if            
       end function wrap_xtra1_m1
