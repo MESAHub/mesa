@@ -104,7 +104,7 @@ contains
 
       call hi%write_dset('kap', kap)
       call hi%write_dset('kap_kap_T', kap_T)
-      call hi%write_dset('kap_kap_T', kap_rho)
+      call hi%write_dset('kap_kap_rho', kap_rho)
 
       call hi%write_dset('eps', eps)
       call hi%write_dset('eps_eps_T', eps_T)
