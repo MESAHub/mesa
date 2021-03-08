@@ -485,7 +485,7 @@
     atm_irradiated_max_iters, &
 
     use_compression_outer_BC, use_momentum_outer_BC, Tsurf_factor, use_zero_Pgas_outer_BC, &
-    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_zero_dLdm_outer_BC, &
+    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, &
     
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 

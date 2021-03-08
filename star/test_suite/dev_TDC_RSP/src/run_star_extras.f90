@@ -89,10 +89,8 @@
             write(iounit,2) 'Y_face', k, s% Y_face(k)
             write(iounit,2) 'PII', k, s% PII(k)
             if (s% TDC_flag) then 
-               write(iounit,2) 'w', k, s% w(k)
-               write(iounit,2) 'eturb', k, s% w(k)**2
+               write(iounit,2) 'eturb', k, s% etrb(k)
             else if (s% RSP_flag) then
-               write(iounit,2) 'w', k, s% RSP_w(k)
                write(iounit,2) 'eturb', k, s% RSP_Et(k)
             end if
          end do
@@ -357,7 +355,7 @@
                vals(k,1) = s_other% v(k)*1d-5
                vals(k,2) = s_other% Y_face(k)
                if (s_other% TDC_flag) then
-                  vals(k,3) = s_other% w(k)
+                  vals(k,3) = s_other% etrb(k)
                else if (s_other% RSP_flag) then
                   vals(k,3) = s_other% RSP_w(k)
                else
@@ -365,7 +363,7 @@
                end if
                vals(k,4) = s_other% Lr(k)/s_other% L(k)               
                vals(k,5) = safe_log10(s_other% r(k)/Rsun)
-               vals(k,6) = s_other% lnP(k)/ln10
+               vals(k,6) = s_other% lnPeos(k)/ln10
                vals(k,7) = s_other% lnT(k)/ln10
                vals(k,8) = s_other% lnd(k)/ln10
                vals(k,9) = safe_log10(s_other% L(k)/Lsun)
@@ -397,6 +395,21 @@
                   vals(k,21) = s_other% xtra6_array(k)
                end if
                
+               if (.false.) then ! debugging xtra differences
+                  vals(k,10) = 100d0*(s% xtra1_array(k) - s_other% xtra1_array(k))
+                  vals(k,11) = 0
+                  vals(k,12) = 100d0*(s% xtra2_array(k) - s_other% xtra2_array(k))
+                  vals(k,13) = 0
+                  vals(k,14) = 100d0*(s% xtra3_array(k) - s_other% xtra3_array(k))
+                  vals(k,15) = 0
+                  vals(k,16) = 100d0*(s% xtra4_array(k) - s_other% xtra4_array(k))
+                  vals(k,17) = 0
+                  vals(k,18) = 100d0*(s% xtra5_array(k) - s_other% xtra5_array(k))
+                  vals(k,19) = 0
+                  vals(k,20) = 100d0*(s% xtra6_array(k) - s_other% xtra6_array(k))
+                  vals(k,21) = 0
+               end if
+               
                if (.false.) then ! debugging xtra ratios
                   vals(k,10) = fix_if_bad(err(s% xtra1_array(k),s_other% xtra1_array(k)))
                   vals(k,11) = 0
@@ -420,7 +433,7 @@
             real(dp) function err(v1,v2)
                real(dp), intent(in) :: v1,v2
                real(dp) :: absdiff, tol
-               real(dp), parameter :: rtol = 1d-6, atol = 1d0
+               real(dp), parameter :: rtol = 1d-10, atol = 0 
                absdiff = abs(v1 - v2)
                tol = abs(v2)*rtol + atol
                err = max(absdiff/tol - 1d0, 0d0) ! positive means err > tol

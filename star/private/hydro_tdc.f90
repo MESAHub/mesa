@@ -65,7 +65,7 @@
          type(auto_diff_real_star_order1) :: x
          integer :: k
          do k=1,s%nz
-            x = compute_Hp_face(s, k, ierr)
+            x = compute_Hp_face(s, k, ierr) ! sets Hp_face
             if (ierr /= 0) return
             x = compute_L_face(s, k, ierr) ! sets Lr, Lt, Lc
             if (ierr /= 0) return
@@ -109,8 +109,8 @@
          if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = s% i_w
-            s% solver_test_partials_dval_dx = resid%d1Array(i_w_00)
+            s% solver_test_partials_var = s% i_etrb
+            s% solver_test_partials_dval_dx = resid%d1Array(i_etrb_00)
             write(*,4) 'do1_tdc_L_eqn', s% solver_test_partials_var, k, s% nz, &
                L_actual%val, L_expected%val, 1d0/scale, s% T(k-1), s% T(k)
          end if      
@@ -142,7 +142,7 @@
          
          if (non_turbulent_cell) then
              
-            resid_ad = wrap_w_00(s,k) - s% TDC_w_min_for_damping
+            resid_ad = wrap_etrb_00(s,k) ! make etrb = 0
             
          else
          
@@ -194,10 +194,8 @@
          
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: w_00
             ierr = 0
-            w_00 = wrap_w_00(s,k) ! wrap_dxh_w = w_00 - s% w_start(k)
-            d_turbulent_energy_ad = wrap_dxh_w(s,k)*(w_00 + s% w_start(k))
+            d_turbulent_energy_ad = wrap_dxh_etrb(s,k)
          end subroutine setup_d_turbulent_energy
          
          ! Ptrb_dV_ad = Ptrb_ad*dV_ad
@@ -332,6 +330,7 @@
             end if
          end if
          s% Hp_face(k) = Hp_face%val
+
       end function compute_Hp_face
 
       
@@ -414,7 +413,8 @@
             PII_face = 0d0
             return
          end if
-         if (k == 1 .or. s% TDC_alfa == 0d0) then
+         if (k == 1 .or. s% TDC_alfa == 0d0 .or. &
+               k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
             PII_face = 0d0
             s% PII(k) = 0d0
             return
@@ -459,22 +459,39 @@
          include 'formats'
          ierr = 0
          ALFAM_ALFA = s% TDC_alfam*s% TDC_alfa
-         Hp_cell = compute_Hp_cell(s, k, ierr)
-         if (ierr /= 0) return
-         d_v_div_r = compute_d_v_div_r(s, k, ierr)
-         if (ierr /= 0) return
-         w_00 = wrap_w_00(s,k)
-         d_00 = wrap_d_00(s,k)
-         f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
-         w_rho2 = w_00*pow2(d_00)
-         r_00 = wrap_opt_time_center_r_00(s,k)
-         r_p1 = wrap_opt_time_center_r_p1(s,k)
-         r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
-         Chi_cell = f*w_rho2*r6_cell*d_v_div_r*Hp_cell
-         ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
-         !       = g cm^2 s^-2
-         !       = erg
+         if (ALFAM_ALFA == 0d0 .or. &
+               k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+               k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+            Chi_cell = 0d0
+         else
+            Hp_cell = compute_Hp_cell(s, k, ierr)
+            if (ierr /= 0) return
+            d_v_div_r = compute_d_v_div_r(s, k, ierr)
+            if (ierr /= 0) return
+            w_00 = safe_wrap_w_00(s,k)
+            d_00 = wrap_d_00(s,k)
+            f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
+            w_rho2 = w_00*pow2(d_00)
+            r_00 = wrap_opt_time_center_r_00(s,k)
+            r_p1 = wrap_opt_time_center_r_p1(s,k)
+            r6_cell = 0.5d0*(pow6(r_00) + pow6(r_p1))
+            Chi_cell = f*w_rho2*r6_cell*d_v_div_r*Hp_cell
+            ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
+            !       = g cm^2 s^-2
+            !       = erg
+         end if
          s% Chi(k) = Chi_cell%val
+         if (is_bad(Chi_cell%d1Array(i_lnd_00))) then
+            !$omp critical (hydro_tdc_crit)
+            write(*,2) 'Chi_cell%d1Array(i_lnd_00)', k, Chi_cell%d1Array(i_lnd_00)
+            write(*,2) 'd w_rho2', k, w_rho2%d1Array(i_lnd_00)
+            write(*,2) 'd r6_cell', k, r6_cell%d1Array(i_lnd_00)
+            write(*,2) 'd d_v_div_r', k, d_v_div_r%d1Array(i_lnd_00)
+            write(*,2) 'd Hp_cell', k, Hp_cell%d1Array(i_lnd_00)
+            stop 'compute_Eq_cell'
+            !$omp end critical (hydro_tdc_crit)
+         end if
+
       end function compute_Chi_cell
 
       
@@ -486,12 +503,25 @@
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
-         Chi_cell = compute_Chi_cell(s,k,ierr)
-         if (ierr /= 0) return
-         d_v_div_r = compute_d_v_div_r(s, k, ierr)
-         if (ierr /= 0) return
-         Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
+         if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+            Eq_cell = 0d0
+         else
+            Chi_cell = compute_Chi_cell(s,k,ierr)
+            if (ierr /= 0) return
+            d_v_div_r = compute_d_v_div_r(s, k, ierr)
+            if (ierr /= 0) return
+            Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
+         end if
          s% Eq(k) = Eq_cell%val
+         if (is_bad(Eq_cell%d1Array(i_lnd_00))) then
+            !$omp critical (hydro_tdc_crit)
+            write(*,2) 'Eq_cell%d1Array(i_lnd_00)', k, Eq_cell%d1Array(i_lnd_00)
+            write(*,2) 'd Chi_cell', k, Chi_cell%d1Array(i_lnd_00)
+            write(*,2) 'd d_v_div_r', k, d_v_div_r%d1Array(i_lnd_00)
+            stop 'compute_Eq_cell'
+            !$omp end critical (hydro_tdc_crit)
+         end if
       end function compute_Eq_cell
 
 
@@ -503,7 +533,8 @@
          type(auto_diff_real_star_order1) :: Chi_00, Chi_out, r_00
          include 'formats'
          ierr = 0         
-         if (k > s% nz) then
+         if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
             Uq_face = 0d0
          else
             Chi_00 = compute_Chi_cell(s,k,ierr)
@@ -531,7 +562,7 @@
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, fac
          include 'formats'
          ierr = 0
-         w_00 = wrap_w_00(s, k)
+         w_00 = safe_wrap_w_00(s, k)
          T_00 = wrap_T_00(s, k)                  
          d_00 = wrap_d_00(s, k)         
          Peos_00 = wrap_Peos_00(s, k)         
@@ -559,13 +590,6 @@
 
          Source = PII_div_Hp_cell*fac
          
-         !s% xtra1_array(k) = Source%val
-         !s% xtra2_array(k) = PII_face_00%val
-         !s% xtra3_array(k) = Hp_face_00%val
-         !s% xtra4_array(k) = PII_face_p1%val
-         !s% xtra5_array(k) = Hp_face_p1%val
-         !s% xtra6_array(k) = fac%val
-         
          ! PII units same as Cp = erg g^-1 K^-1
          ! P*QQ/Cp is unitless (see Y_face)
          ! Source units = (erg g^-1 K^-1) cm^-1 cm s^-1 K
@@ -588,7 +612,7 @@
          alpha = s% TDC_alfa
          Hp_cell = compute_Hp_cell(s,k,ierr)
          if (ierr /= 0) return
-         w_00 = wrap_w_00(s,k)
+         w_00 = safe_wrap_w_00(s,k)
          dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
          D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
@@ -613,7 +637,7 @@
             s% DAMPR(k) = 0d0
             return
          end if
-         w_00 = wrap_w_00(s,k)
+         w_00 = safe_wrap_w_00(s,k)
          T_00 = wrap_T_00(s,k)
          d_00 = wrap_d_00(s,k)
          Cp_00 = wrap_Cp_00(s,k)
@@ -637,6 +661,15 @@
          type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Source, D, Dr
+         if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
+            s% SOURCE(k) = 0d0
+            s% DAMP(k) = 0d0
+            s% DAMPR(k) = 0d0
+            s% COUPL(k) = 0d0
+            C = 0d0
+            return
+         end if
          Source = compute_Source(s, k, ierr)
          if (ierr /= 0) return
          D = compute_D(s, k, ierr)
@@ -768,8 +801,8 @@
          T_00 = wrap_T_00(s, k)         
          d_m1 = wrap_d_m1(s, k)
          d_00 = wrap_d_00(s, k)
-         w_m1 = wrap_w_m1(s, k)
-         w_00 = wrap_w_00(s, k)
+         w_m1 = safe_wrap_w_m1(s, k)
+         w_00 = safe_wrap_w_00(s, k)
          T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
          PII_face = compute_PII_face(s, k, ierr)
          w_face = 0.5d0*(w_m1 + w_00)
@@ -804,8 +837,8 @@
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
          rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
-         w_m1 = wrap_w_m1(s,k)
-         w_00 = wrap_w_00(s,k)
+         w_m1 = safe_wrap_w_m1(s,k)
+         w_00 = safe_wrap_w_00(s,k)
          Hp_face = compute_Hp_face(s,k,ierr)
          if (ierr /= 0) return
          Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
@@ -826,13 +859,13 @@
             Lt = compute_Lt(s, k, ierr)
             if (ierr /= 0) return
             s% Lt_start(k) = Lt%val  
-            s% w_start(k) = s% w(k)
+            s% etrb_start(k) = s% etrb(k)
          end do         
       end subroutine set_etrb_start_vars
       
       
       subroutine reset_etrb_using_L(s, ierr)
-         use star_utils, only: store_w_in_xh
+         use star_utils, only: store_etrb_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
          integer :: k, nz
@@ -865,7 +898,7 @@
             else ! w_center = 0
                w_00 = 0.5d0*w_face(k)
             end if
-            call store_w_in_xh(s,k,w_00)
+            call store_etrb_in_xh(s,k,pow2(w_00))
             call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new w(k)
             if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
          end do

@@ -134,6 +134,26 @@
             stop 'get1_energy_eqn'
 !$omp end critical (hydro_equ_l_crit1)
          end if
+
+         if (is_bad(resid_ad%d1Array(i_lnd_00))) then
+!$omp critical (hydro_equ_l_crit1)
+            write(*,2) 'energy eqn resid_ad%d1Array(i_lnd_00)', k, resid_ad%d1Array(i_lnd_00)
+            write(*,2) 'd dL_dm_ad', k, dL_dm_ad%d1Array(i_lnd_00)
+            write(*,2) 'd sources_ad', k, sources_ad%d1Array(i_lnd_00)
+            write(*,2) 'd others_ad', k, others_ad%d1Array(i_lnd_00)
+            write(*,2) 'd d_turbulent_energy_dt_ad', k, d_turbulent_energy_dt_ad%d1Array(i_lnd_00)
+            write(*,2) 'd dwork_dm_ad', k, dwork_dm_ad%d1Array(i_lnd_00)
+            write(*,2) 'd dke_dt_ad', k, dke_dt_ad%d1Array(i_lnd_00)
+            write(*,2) 'd dpe_dt_ad', k, dpe_dt_ad%d1Array(i_lnd_00)
+            write(*,2) 'd de_dt_ad', k, de_dt_ad%d1Array(i_lnd_00)
+            stop 'get1_energy_eqn'
+!$omp end critical (hydro_equ_l_crit1)
+         end if
+         
+         
+         
+         
+         
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
@@ -294,6 +314,18 @@
             
             if (s% mstar_dot /= 0d0) sources_ad%val = sources_ad%val + s% eps_mdot(k)
 
+            if (is_bad(sources_ad%d1Array(i_lnd_00))) then
+               !$omp critical (hydro_equ_l_crit1)
+               write(*,2) 'energy eqn sources_ad%d1Array(i_lnd_00)', k, sources_ad%d1Array(i_lnd_00)
+               write(*,2) 'd eps_nuc_ad', k, eps_nuc_ad%d1Array(i_lnd_00)
+               write(*,2) 'd non_nuc_neu_ad', k, non_nuc_neu_ad%d1Array(i_lnd_00)
+               write(*,2) 'd extra_heat_ad', k, extra_heat_ad%d1Array(i_lnd_00)
+               write(*,2) 'd Eq_ad', k, Eq_ad%d1Array(i_lnd_00)
+               write(*,2) 'd RTI_diffusion_ad', k, RTI_diffusion_ad%d1Array(i_lnd_00)
+               stop 'setup_sources_and_others'
+               !$omp end critical (hydro_equ_l_crit1)
+            end if
+
          end subroutine setup_sources_and_others
          
          subroutine setup_RTI_diffusion(diffusion_eps_ad)
@@ -340,12 +372,10 @@
          
          subroutine setup_d_turbulent_energy_dt(ierr)
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: w_00
             include 'formats'
             ierr = 0
-            if (s% TDC_flag) then ! dxh_etrb = etrb - etrb_start
-               w_00 = wrap_w_00(s,k) ! wrap_dxh_w = w_00 - s% w_start(k)
-               d_turbulent_energy_dt_ad = wrap_dxh_w(s,k)*(w_00 + s% w_start(k))/dt
+            if (s% TDC_flag) then
+               d_turbulent_energy_dt_ad = wrap_dxh_etrb(s,k)/dt
             else
                d_turbulent_energy_dt_ad = 0d0
             end if

@@ -165,7 +165,7 @@
             call store_rho_in_xh(s, k, 1d0/s% Vol(k))
             call store_T_in_xh(s, k, s% T(k))
             call store_r_in_xh(s, k, s% r(k))
-            s% xh(s% i_etrb_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
+            s% xh(s% i_Et_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
             do j=1,s% species
                s% xa(j,k) = xa(j)
             end do
@@ -336,7 +336,7 @@
             if (ALFAC == 0d0 .or. ALFAS == 0d0) then
                s% RSP_w(1:nz) = 0d0
                s% RSP_Et(1:nz) = 0d0
-               s% xh(s% i_etrb_RSP,1:nz) = 0d0
+               s% xh(s% i_Et_RSP,1:nz) = 0d0
             else
                !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
                do i = 1,nz
@@ -358,8 +358,8 @@
                   s% RSP_w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
                   if (s% RSP_w(k) < 0d0) s% RSP_w(k) = 0d0
                   s% RSP_Et(k) = s% RSP_w(k)**2
-                  s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
-                  s% RSP_w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
+                  s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
+                  s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
                end do   
             end if         
          end if

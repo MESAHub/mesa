@@ -609,10 +609,10 @@
             if (failed('u')) exit
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
-            call do1(s% w, c% w)
-            if (failed('w')) exit
-            call do1(s% w_start, c% w_start)
-            if (failed('w_start')) exit
+            call do1(s% etrb, c% etrb)
+            if (failed('etrb')) exit
+            call do1(s% etrb_start, c% etrb_start)
+            if (failed('etrb_start')) exit
             
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
@@ -624,8 +624,8 @@
             if (failed('dxh_v')) exit
             call do1(s% dxh_u, c% dxh_u)
             if (failed('dxh_u')) exit
-            call do1(s% dxh_w, c% dxh_w)
-            if (failed('dxh_w')) exit
+            call do1(s% dxh_etrb, c% dxh_etrb)
+            if (failed('dxh_etrb')) exit
             call do1(s% dxh_alpha_RTI, c% dxh_alpha_RTI)
             if (failed('dxh_alpha_RTI')) exit
             call do1(s% dxh_ln_cvpv0, c% dxh_ln_cvpv0)
@@ -2558,19 +2558,19 @@
          end if
 
          if (s% RSP_flag) then
-            i = i+1; s% i_etrb_RSP = i
+            i = i+1; s% i_Et_RSP = i
             i = i+1; s% i_erad_RSP = i
             i = i+1; s% i_Fr_RSP = i
          else
-            s% i_etrb_RSP = 0
+            s% i_Et_RSP = 0
             s% i_erad_RSP = 0
             s% i_Fr_RSP = 0
          end if
          
          if (s% TDC_flag) then
-            i = i+1; s% i_w = i
+            i = i+1; s% i_etrb = i
          else 
-            s% i_w = 0
+            s% i_etrb = 0
          end if
 
          if (s% conv_vel_flag) then
@@ -2608,9 +2608,9 @@
             s% i_du_dt = 0
          end if
       
-         s% i_detrb_dt = s% i_w
+         s% i_detrb_dt = s% i_etrb
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
-         s% i_detrb_RSP_dt = s% i_etrb_RSP
+         s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
          s% i_dln_cvpv0_dt = s% i_ln_cvpv0
@@ -2630,9 +2630,9 @@
          if (s% i_lnR /= 0) s% nameofvar(s% i_lnR) = 'lnR'
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
-         if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
+         if (s% i_etrb /= 0) s% nameofvar(s% i_etrb) = 'etrb'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
-         if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
+         if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
          if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
@@ -2648,7 +2648,7 @@
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
-         if (s% i_detrb_RSP_dt /= 0) s% nameofequ(s% i_detrb_RSP_dt) = 'detrb_RSP_dt'
+         if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
          if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
@@ -3016,7 +3016,7 @@
          nvar_hydro_old = s% nvar_hydro
 
          if (.not. TDC_flag) then
-            call remove1(s% i_w)
+            call remove1(s% i_etrb)
          end if
 
          call set_var_info(s, ierr)
@@ -3036,7 +3036,7 @@
          if (ierr /= 0) return
 
          if (TDC_flag) then
-            call insert1(s% i_w) 
+            call insert1(s% i_etrb) 
             s% need_to_reset_etrb = .true.
          end if
 
@@ -3116,7 +3116,7 @@
          if (.not. RSP_flag) then
             call remove1(s% i_Fr_RSP)
             call remove1(s% i_erad_RSP)
-            call remove1(s% i_etrb_RSP)
+            call remove1(s% i_Et_RSP)
          else if (s% i_lum /= 0) then
             call remove1(s% i_lum)
          end if
@@ -3131,7 +3131,7 @@
          if (ierr /= 0) return
 
          if (RSP_flag) then
-            call insert1(s% i_etrb_RSP)
+            call insert1(s% i_Et_RSP)
             call insert1(s% i_erad_RSP)
             call insert1(s% i_Fr_RSP)
          else

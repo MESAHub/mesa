@@ -1775,38 +1775,38 @@
 
             case(p_Ptrb)
                if (s% TDC_flag) then
-                  val = pow2(s% w(k))*s% rho(k)
+                  val = s% etrb(k)*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Ptrb)
                if (s% TDC_flag) then
-                  val = safe_log10(pow2(s% w(k))*s% rho(k))
+                  val = safe_log10(s% etrb(k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_w)
                if (s% TDC_flag) then
-                  val = s% w(k)
+                  val = sqrt(max(0d0,s% etrb(k)))
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if               
             case(p_log_w)
                if (s% TDC_flag) then
-                  val = s% w(k)
+                  val = sqrt(max(0d0,s% etrb(k)))
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if    
                val = safe_log10(val)           
             case(p_etrb)
                if (s% TDC_flag) then
-                  val = pow2(s% w(k))
+                  val = s% etrb(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_etrb)
                if (s% TDC_flag) then
-                  val = safe_log10(pow2(s% w(k)))
+                  val = safe_log10(s% etrb(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if

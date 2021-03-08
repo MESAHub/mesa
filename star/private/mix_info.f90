@@ -127,7 +127,7 @@
             end do
          else if (s% TDC_flag) then
             do k = 1, nz
-               s% conv_vel(k) = abs(s% w(k))
+               s% conv_vel(k) = sqrt(abs(s% etrb(k)))
                s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))

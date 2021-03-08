@@ -910,16 +910,12 @@
          if ((.not. do_equL) .or. &
                (s% TDC_flag .and. s% TDC_use_L_eqn_at_surface)) then 
             ! no Tsurf BC
-         else if (s% use_zero_dLdm_outer_BC) then
-            call set_zero_dL_dm_BC(ierr)
          else
             need_T_surf = .true.
          end if
          if (ierr /= 0) return
          
-         offset_P_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% TDC_flag .or. s% use_momentum_outer_BC) &
-            offset_P_to_cell_center = .false.
+         offset_P_to_cell_center = .not. s% use_momentum_outer_BC
          
          offset_T_to_cell_center = .true.
          if (s% use_other_surface_PT .or. s% TDC_flag) &
@@ -1257,21 +1253,6 @@
             call save_eqn_residual_info( &
                s, 1, nvar, i_P_eqn, resid_ad, 'set_fixed_vsurf_outer_BC', ierr)           
          end subroutine set_fixed_vsurf_outer_BC
-
-
-         subroutine set_zero_dL_dm_BC(ierr)
-            integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: L1, L2
-            include 'formats'
-            ierr = 0
-            L1 = wrap_L_00(s,1)
-            L2 = wrap_L_p1(s,1)
-            resid_ad = L2/L1 - 1d0
-            s% equ(s% i_equL,1) = resid_ad%val
-            if (skip_partials) return
-            call save_eqn_residual_info( &
-               s, 1, nvar, s% i_equL, resid_ad, 'set_zero_dL_dm_BC', ierr)           
-         end subroutine set_zero_dL_dm_BC
 
 
       end subroutine PT_eqns_surf

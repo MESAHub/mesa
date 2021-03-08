@@ -106,10 +106,8 @@
    use_gold2_tolerances = .false.
    !use_gold_tolerances = .false.
    
-   ! USE SIMPLE BC FOR NOW
-   use_compression_outer_BC = .true.
-
-   !convergence_ignore_equL_residuals = .true.
+   use_momentum_outer_BC = .true.
+   !TDC_use_L_eqn_at_surface = .false.
    
    Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
    Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.

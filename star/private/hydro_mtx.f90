@@ -93,7 +93,7 @@
             skip_other_cgrav = .true.
          logical :: do_chem, try_again, do_edit_lnR, report_dx
          integer :: i, j, k, kk, klo, khi, i_var, &
-            i_lnd, i_lnT, i_lnR, i_lum, i_w, i_v, &
+            i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_v, &
             i_u, i_alpha_RTI, i_ln_cvpv0, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, i_chem1, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
@@ -101,7 +101,7 @@
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
          real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
-         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_w, &
+         logical :: do_lnd, do_lnT, do_lnR, do_lum, do_etrb, &
             do_u, do_v, do_alpha_RTI, do_conv_vel, do_w_div_wc, do_j_rot
 
          include 'formats'
@@ -153,7 +153,7 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -165,7 +165,7 @@
          do_lnT = i_lnT > 0 .and. i_lnT <= nvar
          do_lnR = i_lnR > 0 .and. i_lnR <= nvar
          do_lum = i_lum > 0 .and. i_lum <= nvar
-         do_w = i_w > 0 .and. i_w <= nvar
+         do_etrb = i_etrb > 0 .and. i_etrb <= nvar
          do_v = i_v > 0 .and. i_v <= nvar
          do_u = i_u > 0 .and. i_u <= nvar
          do_alpha_RTI = i_alpha_RTI > 0 .and. i_alpha_RTI <= nvar
@@ -458,17 +458,17 @@
                end if
             end if
 
-            if (do_w) then
-               s% w(k) = x(i_w)
-               s% dxh_w(k) = s% solver_dx(i_w,k)
-               if (is_bad_num(s% w(k))) then
-                  s% retry_message = 'bad num for w'
+            if (do_etrb) then
+               s% etrb(k) = x(i_etrb)
+               s% dxh_etrb(k) = s% solver_dx(i_etrb,k)
+               if (is_bad_num(s% etrb(k))) then
+                  s% retry_message = 'bad num for etrb'
                   ierr = -1
                   if (s% stop_for_bad_nums) then
-                     write(*,2) 'set_vars_for_solver w', k, s% w(k)
+                     write(*,2) 'set_vars_for_solver etrb', k, s% etrb(k)
                      stop 'set_vars_for_solver'
                   end if
-                  if (report) write(*,2) 'bad num w', k, s% w(k)
+                  if (report) write(*,2) 'bad num etrb', k, s% etrb(k)
                end if
             end if
             

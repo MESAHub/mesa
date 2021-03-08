@@ -582,7 +582,7 @@
          type (star_info), pointer :: s
          real(dp) :: EH1,EHJT
          integer :: k
-         include 'formats'
+         include 'formats'         
          EHJT = 1.d0
          do k = 1,NZN
             if (k /= NZN) then
@@ -1608,23 +1608,7 @@
             POMT2 = POM*POM1*POM3*POM4
             POMT4 = POM*POM1*POM2*POM3
 
-            !s% profile_extra(k,2) = POMT3
-            !s% profile_extra(k,3) = POM3
-            !s% profile_extra(k,4) = POMT3*POM3
-
             s% Chi(k) = POMT1*POM1
-         
-            !s% xtra1_array(k) = POM
-            !s% xtra2_array(k) = safe_log10(POM1)
-            !s% xtra3_array(k) = safe_log10(POM2)
-            !s% xtra4_array(k) = POM3
-            !s% xtra5_array(k) = POM4
-         
-            !s% xtra1_array(k) = s% v(k)
-            !s% xtra2_array(k) = s% r(k)
-            !s% xtra3_array(k) = POM3
-            !s% xtra4_array(k) = 1
-            !s% xtra5_array(k) = 1
             
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
@@ -1816,13 +1800,6 @@
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
-         
-            !s% xtra1_array(k) = s% SOURCE(k)
-            !s% xtra2_array(k) = s% PII(k)
-            !s% xtra3_array(k) = s% Hp_face(k)
-            !s% xtra4_array(k) = s% PII(k+1)
-            !s% xtra5_array(k) = s% Hp_face(k+1)
-            !s% xtra6_array(k) = POM2*POM3
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
@@ -2510,11 +2487,9 @@
          end if
          
          XP = THETA*(s% Pgas(k) + Prad_factor*s% Prad(k)) &
-            + THETAQ*s% Pvsc(k) &
-            + THETAT*s% Ptrb(k) &
             + THETA1*(s% Pgas_start(k) + Prad_factor*s% Prad_start(k)) &
-            + THETAQ1*s% Pvsc_start(k) &
-            + THETAT1*s% Ptrb_start(k)
+            + THETAQ*s% Pvsc(k) + THETAQ1*s% Pvsc_start(k) &
+            + THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k)
          d_XP_dVol_00 = &
               THETA*(d_Pg_dVol(i) + Prad_factor*d_Pr_dVol(i)) &
             + THETAQ*d_Pvsc_dVol(i) &
@@ -2848,11 +2823,17 @@
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
          
-         !s% xtra1_array(k) = dvdt_factor*(s% v(k) - s% v_start(k))/dt
-         !s% xtra2_array(k) = safe_log10(-area*dXP_dm)
-         !s% xtra3_array(k) = safe_log10(-grav)
-         !s% xtra4_array(k) = s% Uq(k)
-         !s% xtra5_array(k) = s% Chi(k)
+         s% xtra1_array(k) = s% Pgas(k) + s% Prad(k)
+         s% xtra2_array(k) = s% Vol(k)
+         s% xtra3_array(k) = s% T(k)
+         s% xtra4_array(k) = s% v(k)
+         s% xtra5_array(k) = s% RSP_w(k)**2
+         s% xtra6_array(k) = s% r(k)
+         
+         if (k==-30) then
+            write(*,2) 'RSP', k, s% xtra1_array(k), s% xtra2_array(k), s% xtra3_array(k), &
+               s% xtra4_array(k), s% xtra5_array(k), s% xtra6_array(k)
+         end if
             
          HD(i_r_dFr_00,IR) = - d_Fr_term_dFr_00
 

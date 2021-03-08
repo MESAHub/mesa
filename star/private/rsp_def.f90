@@ -580,7 +580,7 @@
             call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
 
             s% RSP_Et(k) = s% RSP_w(k)*s% RSP_w(k)
-            s% xh(s% i_etrb_RSP, k) = s% RSP_Et(k)               
+            s% xh(s% i_Et_RSP, k) = s% RSP_Et(k)               
             s% xh(s% i_v, k) = s% v(k)            
          end do
       end subroutine set_star_vars
@@ -598,7 +598,7 @@
             call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
-            s% RSP_Et(k) = s% xh(s% i_etrb_RSP,k)
+            s% RSP_Et(k) = s% xh(s% i_Et_RSP,k)
             s% RSP_w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
             s% v(k) = s% xh(s% i_v,k)
@@ -803,8 +803,8 @@
             
             ! sqrt(w**2) /= original w, so need to redo
             s% RSP_Et(k) = s% RSP_w(k)**2
-            s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
-            s% RSP_w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
+            s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
+            s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
             
             ! exp(log(r)) /= original r, so need to redo
             call store_r_in_xh(s, k, s% r(k))

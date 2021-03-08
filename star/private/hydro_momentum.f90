@@ -159,14 +159,20 @@
          resid1_ad = residual_sum_ad ! convert back to auto_diff_real_star_order1
          resid_ad = resid1_ad*iPtotavg_ad ! scaling
          residual = resid_ad%val
-         s% equ(i_dv_dt, k) = residual      
+         s% equ(i_dv_dt, k) = residual     
          
-         !s% xtra1_array(k) = accel_ad%val
-         !s% xtra2_array(k) = safe_log10(-dPtot_ad%val/dm_div_A_ad%val)
-         !s% xtra3_array(k) = safe_log10(-grav_ad%val)
-         !s% xtra4_array(k) = Uq_ad%val
-         !s% xtra5_array(k) = s% Chi(k)
-
+         s% xtra1_array(k) = s% Peos(k)
+         s% xtra2_array(k) = 1d0/s% rho(k)
+         s% xtra3_array(k) = s% T(k)
+         s% xtra4_array(k) = s% v(k)
+         s% xtra5_array(k) = s% etrb(k)
+         s% xtra6_array(k) = s% r(k)
+         
+         if (k==-30) then
+            write(*,2) 'TDC', k, s% xtra1_array(k), s% xtra2_array(k), s% xtra3_array(k), &
+               s% xtra4_array(k), s% xtra5_array(k), s% xtra6_array(k)
+         end if
+         
          if (is_bad(residual)) then
 !$omp critical (hydro_momentum_crit1)
             write(*,2) 'momentum eqn residual', k, residual

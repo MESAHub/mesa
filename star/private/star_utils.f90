@@ -545,10 +545,10 @@
       end subroutine store_lnd_in_xh
       
       
-      subroutine store_w_in_xh(s, k, w, xh_in)
+      subroutine store_etrb_in_xh(s, k, etrb, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: w
+         real(dp), intent(in) :: etrb
          real(dp), intent(in), pointer, optional :: xh_in(:,:)
          real(dp), pointer :: xh(:,:)
          if (present(xh_in)) then
@@ -556,8 +556,8 @@
          else
             xh => s% xh
          end if
-         xh(s% i_w,k) = w
-      end subroutine store_w_in_xh
+         xh(s% i_etrb,k) = etrb
+      end subroutine store_etrb_in_xh
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)
@@ -1661,7 +1661,7 @@
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
             s% opacity_start(k) = -1d99
-            s% w_start(k) = -1d99
+            s% etrb_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do
       end subroutine reset_starting_vectors
@@ -1708,7 +1708,7 @@
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, dxtra3_m1, dxtra3_00, dxtra3_p1, &
+            detrb_m1, detrb_00, detrb_p1, dxtra3_m1, dxtra3_00, dxtra3_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -1719,7 +1719,7 @@
 
          call unwrap(residual, val, &
             dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1, &
@@ -1732,7 +1732,7 @@
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
-         if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
+         if (s% i_etrb /= 0) call unpack1(s% i_etrb, detrb_m1, detrb_00, detrb_p1)
          
          contains
          
@@ -2449,7 +2449,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% TDC_flag) cell_total = cell_total + pow2(s% w(k))
+         if (s% TDC_flag) cell_total = cell_total + s% etrb(k)
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2533,7 +2533,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% TDC_flag) then
-               cell1 = dm*pow2(s% w(k))
+               cell1 = dm*s% etrb(k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2582,7 +2582,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% TDC_flag) then
-               cell1 = dm*pow2(s% w(k))
+               cell1 = dm*s% etrb(k)
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -3428,7 +3428,7 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: Ptrb
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: w, rho
+         type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Ptrb_start
          logical :: time_center, test_partials
          include 'formats'
@@ -3438,12 +3438,12 @@
             return
          end if
          rho = wrap_d_00(s,k)
-         w = wrap_w_00(s,k)
-         Ptrb = s% TDC_alfap*pow2(w)*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
+         etrb = wrap_etrb_00(s,k)
+         Ptrb = s% TDC_alfap*etrb*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% TDC_alfap*pow2(s% w_start(k))*s% rho_start(k)
+            Ptrb_start = s% TDC_alfap*s% etrb_start(k)*s% rho_start(k)
             Ptrb = 0.5d0*(Ptrb + Ptrb_start)
          end if
 

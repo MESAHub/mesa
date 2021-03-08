@@ -1,18 +1,18 @@
-! Candidate for a double-mode delta Scuti variable:
-! 2 Msol star leaving the main-sequence phase through
-! the upper part of the S-bend on its HR track.
-! Both F (0.171 d) and O1 (0.127 d) modes are linearly overstable  
-! with very small growth rates (of the order of 10**-5).
-! It takes more than 10**4 star-days for the pulsations to saturate. 
-! 
-! original test case contributed by Alfred Gautschy.
+! type-II Cepheid of BL Her type  0.55Ms, 136Ls, 6410K, X=0.76, Z=0.0001
+! convective parameters are such, that it should show deterministic chaos
+! - lots of struggling between low and high amplitudes. 
+! Growth rates are high, so only after ~20-40 cycles the attractor is approached. 
+! A model motivated by: http://adsabs.harvard.edu/abs/2014MNRAS.441..101S.
+! You can increase the alfa_m (eddy viscosity) to e.g. 0.25. Then it should pulsate regularly.
+
+! original test case contributed by Radek Smolec.
 
 &star_job
-   saved_model_name = 'Delta_Scuti.mod'
+   saved_model_name = 'Type_II_Cepheid.mod'
    
    set_initial_dt = .true.
-   seconds_for_initial_dt = 15 ! for debugging
-   
+   seconds_for_initial_dt = 100 ! for debugging
+
 / ! end of star_job namelist
 
 &eos
@@ -20,27 +20,33 @@
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.02d0
+   Zbase = 0.0001d0
    kap_file_prefix = 'a09'
    kap_lowT_prefix = 'lowT_fa05_a09p'
    kap_CO_prefix = 'a09_co'
 / ! end of kap namelist
    
 &controls  
-   initial_z = 0.02d0
-   initial_mass = 2.0d0
+   initial_z = 0.0001d0
+   initial_mass = 0.55d0
+
+   !max_timestep = 119.83 ! seconds
+   !max_age_in_days = 18.291
    
-   RSP_max_dt = 15 ! for debugging
-   max_timestep = 15 ! for debugging
-   force_timestep_min = 15 ! for debugging
+   RSP_max_dt = 100 ! for debugging
+   max_timestep = 100 ! for debugging
+   force_timestep_min = 100 ! for debugging
+   
 
 ! TDC
 
-   TDC_alfa  =     1.2d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
    TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
    TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
-   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
    TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
+
+   !TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+   TDC_alfam =     0.05d0        ! "lots of struggling"
 
    TDC_num_outermost_cells_forced_nonturbulent = 1
    TDC_num_innermost_cells_forced_nonturbulent = 5
@@ -48,23 +54,28 @@
 ! RSP
 
    !x_integer_ctrl(1) = 10 ! which period to check
-   !x_ctrl(1) = 0.14715d0 ! expected period (in days) 
+   !x_ctrl(1) = 1.58915d0 ! expected period (in days) 
 
-   RSP_mass =    2.0d0
-   RSP_Teff =   6900d0
-   RSP_L    =     30d0   
-   RSP_X    =    0.7d0
-   RSP_Z    =   0.02d0
-      
+   RSP_mass = 0.55d0
+   RSP_Teff = 6410d0
+   RSP_L = 136d0
+   RSP_X = 0.76d0
+   RSP_Z = 0.0001d0
+   
    ! parameters for equations
-   RSP_alfam = 0.25d0 ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   RSP_alfa  = 1.2d0  ! mixing length; alfa = 0: purely radiative model.
+   RSP_alfa   = 1.5d0
+   RSP_alfap  = 0.0d0
+   RSP_alfat  = 0.0d0
+   RSP_gammar = 0d0
+
+   !RSP_alfam  = 0.25d0 ! standard value        change TDC_alfam to match
+   RSP_alfam  = 0.05d0
 
 / ! end of controls namelist
 
 
 &pgstar
-   Grid2_title = 'Delta_Scuti'
+   Grid2_title = 'Type_II_Cepheid'
 / ! end of pgstar namelist
    
 

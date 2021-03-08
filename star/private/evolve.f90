@@ -452,8 +452,9 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if (s% steps_before_use_velocity_time_centering >= 0 .and. &
-                s% model_number > s% steps_before_use_velocity_time_centering) &
+            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
+                (s% steps_before_use_velocity_time_centering > 0 .and. &
+                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
                s% using_velocity_time_centering = .true.
          end if
          

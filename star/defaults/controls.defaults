@@ -4424,16 +4424,6 @@
     use_zero_Pgas_outer_BC = .false.
 
 
-      ! use_zero_dLdm_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! use L(1) = L(2) for T outer BC
-
-      ! ::
-
-    use_zero_dLdm_outer_BC = .false.
-
-
       ! use_fixed_vsurf_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! fixed_vsurf

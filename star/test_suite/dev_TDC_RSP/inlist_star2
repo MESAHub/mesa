@@ -49,6 +49,11 @@
       !history_interval = 1
       terminal_interval = 50
 
+      !photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
+
       !fill_arrays_with_NaNs = .true.
 
 ! FOR DEBUGGING
@@ -122,7 +127,7 @@
 
    !pause = .true.
    !pause_interval = 100
-   pgstar_interval = 10
+   pgstar_interval = 2 ! 10
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
@@ -130,6 +135,6 @@
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
    
    Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = 140 ! -101D0
+   Profile_Panels1_xmax = -101D0
 
 / ! end of pgstar namelist

@@ -25,7 +25,7 @@
 
    max_number_retries = 100
 
-
+   use_momentum_outer_BC = .true.
    
    RSP_max_dt = 300 ! for debugging
    max_timestep = 300 ! for debugging

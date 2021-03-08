@@ -519,6 +519,7 @@
    Profile_Panels1_other_yaxis_name(3) = 'Y_face_R'
    Profile_Panels1_same_yaxis_range(3) = .true.
 
+
 ! debugging output
 
       Profile_Panels1_yaxis_name(4) = 'xtr1'
@@ -543,32 +544,6 @@
             
       Profile_Panels1_yaxis_name(9) = 'xtr6' 
       Profile_Panels1_other_yaxis_name(9) = 'xtr6_R' 
-      Profile_Panels1_same_yaxis_range(9) = .true.
-
-! rel error debugging output
-
-      Profile_Panels1_yaxis_name(4) = 'diff_rho'
-      Profile_Panels1_other_yaxis_name(4) = 'xtr1_R' 
-      Profile_Panels1_same_yaxis_range(4) = .true.
-            
-      Profile_Panels1_yaxis_name(5) = 'diff_T' 
-      Profile_Panels1_other_yaxis_name(5) = 'xtr2_R' 
-      Profile_Panels1_same_yaxis_range(5) = .true.
-            
-      Profile_Panels1_yaxis_name(6) = 'diff_w'
-      Profile_Panels1_other_yaxis_name(6) = 'xtr3_R' 
-      Profile_Panels1_same_yaxis_range(6) = .true.
-            
-      Profile_Panels1_yaxis_name(7) = 'diff_v' 
-      Profile_Panels1_other_yaxis_name(7) = 'xtr4_R' 
-      Profile_Panels1_same_yaxis_range(7) = .true.
-            
-      Profile_Panels1_yaxis_name(8) = 'diff_r' 
-      Profile_Panels1_other_yaxis_name(8) = 'xtr5_R' 
-      Profile_Panels1_same_yaxis_range(8) = .true.
-            
-      Profile_Panels1_yaxis_name(9) = '' 
-      Profile_Panels1_other_yaxis_name(9) = '' 
       Profile_Panels1_same_yaxis_range(9) = .true.
 
 ! standard output

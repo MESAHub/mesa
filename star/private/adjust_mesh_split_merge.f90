@@ -581,7 +581,7 @@
          
          if (s% TDC_flag) then
             cell_etrb = Etrb_i + Etrb_ip
-            s% w(i) = sqrt(cell_etrb/dm)
+            s% etrb(i) = cell_etrb/dm
          end if
 
          if (s% rotation_flag) then
@@ -612,7 +612,7 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% TDC_flag) s% w(im) = s% w(i0)
+            if (s% TDC_flag) s% etrb(im) = s% etrb(i0)
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
@@ -640,7 +640,7 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% TDC_flag) s% xh(s% i_w,i) = s% w(i)
+         if (s% TDC_flag) s% xh(s% i_etrb,i) = s% etrb(i)
          
          if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
 
@@ -720,7 +720,7 @@
          end if
          IE = s% energy(k)*dm
          if (s% TDC_flag) then
-            Etrb = pow2(s% w(k))*dm
+            Etrb = s% etrb(k)*dm
          else
             Etrb = 0d0
          end if
@@ -870,7 +870,7 @@
          v2 = v*v
          
          energy = s% energy(i)
-         if (s% TDC_flag) etrb = pow2(s% w(i))
+         if (s% TDC_flag) etrb = s% etrb(i)
             
          ! estimate values of energy and velocity^2 at cell boundaries
 
@@ -928,9 +928,9 @@
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
          
          if (s% TDC_flag) then
-            etrb_R = pow2(s% w(iR))
-            etrb_C = pow2(s% w(iC))
-            etrb_L = pow2(s% w(iL))
+            etrb_R = s% etrb(iR)
+            etrb_C = s% etrb(iC)
+            etrb_L = s% etrb(iL)
             grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
          end if
          
@@ -1100,8 +1100,8 @@
                etrb_R = etrb
                etrb_L = etrb
             end if
-            s% w(i) = sqrt(max(0d0,etrb_R))
-            s% w(ip) = sqrt(max(0d0,etrb_L))
+            s% etrb(i) = etrb_R
+            s% etrb(ip) = etrb_L
          end if
 
          if (s% u_flag) then

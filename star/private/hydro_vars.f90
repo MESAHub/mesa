@@ -220,8 +220,8 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer :: i_lnd, i_lnT, i_lnR, i_w, &
-            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_etrb_RSP, &
+         integer :: i_lnd, i_lnT, i_lnR, i_etrb, &
+            i_lum, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, i_Et_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          real(dp) :: dt_inv
 
@@ -236,11 +236,11 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_w = s% i_w
+         i_etrb = s% i_etrb
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
-         i_etrb_RSP = s% i_etrb_RSP
+         i_Et_RSP = s% i_Et_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
 
          if (s% doing_finish_load_model .or. .not. s% RSP_flag) then
@@ -307,10 +307,10 @@
                      s% r(k) = exp(s% lnR(k))
                   end do
                   s% dxh_lnR(1:nz) = 0d0
-               else if (j == i_w) then
+               else if (j == i_etrb) then
                   do k=1,nz
-                     s% w(k) = s% xh(i_w, k)
-                     s% dxh_w(k) = 0d0
+                     s% etrb(k) = s% xh(i_etrb, k)
+                     s% dxh_etrb(k) = 0d0
                   end do
                else if (j == i_lum) then
                   do k=1,nz
@@ -331,9 +331,9 @@
                      s% alpha_RTI(k) = max(0d0, s% xh(i_alpha_RTI,k))
                      s% dxh_alpha_RTI(k) = 0d0
                   end do
-               else if (j == i_etrb_RSP) then
+               else if (j == i_Et_RSP) then
                   do k=1,nz
-                     s% RSP_Et(k) = max(0d0,s% xh(i_etrb_RSP,k))
+                     s% RSP_Et(k) = max(0d0,s% xh(i_Et_RSP,k))
                   end do
                else if (j == i_ln_cvpv0) then
                   do k=1,nz
@@ -349,7 +349,7 @@
 
             if (i_u == 0) s% u(1:nz) = 0d0
 
-            if (i_w == 0) s% w(1:nz) = 0d0
+            if (i_etrb == 0) s% etrb(1:nz) = 0d0
 
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
