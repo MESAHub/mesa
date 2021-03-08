@@ -141,7 +141,7 @@ module skye_coulomb_solid
    !! @param Z ion charge
    !! @param mi ion mass in grams
    !! @param ge electron interaction parameter
-   !! @param rs non-dimensionalized elcetron radius
+   !! @param rs non-dimensionalized electron radius
    !! @param F non-ideal free energy
    function ocp_solid_screening_free_energy_correction(Z, mi, ge, rs) result(F)
          use skye_coulomb_liquid
