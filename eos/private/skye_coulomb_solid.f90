@@ -149,7 +149,7 @@ module skye_coulomb_solid
          real(dp) :: s, b1, b2, b3, b4
          real(dp), parameter :: aTF = 0.00352d0
 
-         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, asym, alpha, Fliq, gr, switch
+         type(auto_diff_real_2var_order3) :: x, f_inf, A, Q, xr, eta, rs, supp, ge, alpha, Fliq, gr, switch
          type(auto_diff_real_2var_order3) :: F
 
          s = 1d0 / (1d0 + 1d-2 * pow(log(Z), 1.5d0) + 0.097d0 / pow2(Z))
@@ -176,16 +176,8 @@ module skye_coulomb_solid
 
          Fliq = ocp_liquid_screening_free_energy_correction(Z, mi, g, TPT)
 
-
-!         w = -(aTF / xr) * b1 * sqrt(b2) * pow(Z, 7d0/3d0) * sqrt(3 / ge)
-!         w = w / (pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))
-!         w = w * (1d0 + A * pow(Q / g, s))
-
          switch = pow3(tanh(2d0*alpha))
          F = switch * Fliq + (1d0 - switch) * F
-!         asym = switch / w + (1-switch) ! Transitions from the Thomas-Fermi scaling to the Debye-Huckel scaling.
-!         write(*,*) g%val, TPT%val, rs%val, alpha%val, w%val, asym%val, F%val*asym%val/(pow(ge%val,1.5d0))/(pow(Z,1.5d0) + 1 - pow(1d0 + Z, 1.5d0))/(1d0/sqrt(3d0))
-!         F = F * asym
 
    end function ocp_solid_screening_free_energy_correction
 
