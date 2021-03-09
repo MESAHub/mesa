@@ -133,10 +133,10 @@
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          skip = .false.
 
-         ! zero phase information
-         res(i_phase:i_latent_ddlnRho) = 0d0
-         d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
-         d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
+         ! zero latent heat information
+         res(i_latent_ddlnT:i_latent_ddlnRho) = 0d0
+         d_dlnT(i_latent_ddlnT:i_latent_ddlnRho) = 0d0
+         d_dlnd(i_latent_ddlnT:i_latent_ddlnRho) = 0d0
 
          ! zero all components
          res(i_frac:i_frac+num_eos_frac_results-1) = 0.0
@@ -215,6 +215,7 @@
                DENS,GAMI,CHI,TPT,GAMImean,TEMP, &
                PnkT,UNkT,SNk,CVNkt,CV,CHIR,CHIT,Tnk,P,Cp,gamma1,gamma3,grad_ad, N, &
                Prad,Pgas,PRADnkT,dE_dRho,dS_dT,dS_dRho,mu,lnfree_e, lnPgas, lnE, lnS, RHO, T
+            type(auto_diff_real_2var_order1) :: phase
             real(dp) :: Zmean,CMImean,Z2mean
             real(dp), parameter :: UN_T6=0.3157746d0
 
@@ -246,6 +247,15 @@
                start_crystal,full_crystal,PRADnkT, &
                DENS,Zmean,CMImean,Z2mean,GAMImean,CHI,TPT,LIQSOL, &
                PnkT,UNkT,SNk,CVNkt,CHIR,CHIT,ierr)
+
+            ! calculate phase information
+            if (GAMImean.lt.start_crystal) then ! liquid
+               phase = 0d0
+            else if (GAMImean.gt.full_crystal) then ! solid
+               phase = 1d0
+            else ! blend of liquid and solid
+               phase = (GAMImean - start_crystal)/(full_crystal - start_crystal) ! 1 for solid, 0 for liquid
+            end if
             
             if (ierr /= 0) then
                return
@@ -319,7 +329,7 @@
             res(i_gamma1) = gamma1 % val
             res(i_gamma3) = gamma3 % val
             res(i_eta) = CHI % val
-
+            res(i_phase) = phase % val
 
             d_dlnT_c_Rho(i_lnPgas) = lnPgas % d1val1 * T % val
             d_dlnT_c_Rho(i_lnE) = lnE % d1val1 * T % val
@@ -337,7 +347,7 @@
             d_dlnT_c_Rho(i_gamma1) = gamma1 % d1val1 * T % val
             d_dlnT_c_Rho(i_gamma3) = gamma3 % d1val1 * T % val
             d_dlnT_c_Rho(i_eta) = CHI % d1val1 * T % val
-
+            d_dlnT_c_Rho(i_phase) = phase % d1val1 * T % val
 
             d_dlnRho_c_T(i_lnPgas) = lnPgas % d1val2 * RHO % val
             d_dlnRho_c_T(i_lnE) = lnE % d1val2 * RHO % val
@@ -355,6 +365,7 @@
             d_dlnRho_c_T(i_gamma1) = gamma1 % d1val2 * RHO % val
             d_dlnRho_c_T(i_gamma3) = gamma3 % d1val2 * RHO % val
             d_dlnRho_c_T(i_eta) = CHI % d1val2 * RHO % val
+            d_dlnRho_c_T(i_phase) = phase % d1val2 * RHO % val
 
          end subroutine do1
      
