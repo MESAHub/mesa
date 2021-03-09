@@ -8,7 +8,7 @@
 
 
       ! mesa_dir
-      ! ~~~~~~~~~
+      ! ~~~~~~~~
 
       ! if set to the empty string, '', then it defaults to using
       ! environment variable ``$(MESA_DIR)``
@@ -173,9 +173,9 @@
 
 
       ! clear_initial_pgstar_history
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! clear_pgstar_history
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -643,9 +643,9 @@
 
 
       ! set_initial_number_retries
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! initial_number_retries
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, set initial number of retries
       ! if false, number of retries set from initial model info
@@ -1008,11 +1008,11 @@
 
 
       ! relax_mass_to_remove_H_env
-      ! ~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_initial_mass_to_remove_H_env
-      ! ~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! extra_mass_retained_by_remove_H_env
-      ! ~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Gradually reduce total mass by a wind to remove the H envelope.
       ! Equivalent to relax_mass with new_mass = He_core_mass + extra_mass.
@@ -2210,7 +2210,7 @@
       ! remove_initial_surface_at_cell_k
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_at_he_core_boundary
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_optical_depth
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_initial_surface_by_density
@@ -2256,7 +2256,7 @@
       ! remove_surface_at_cell_k
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_at_he_core_boundary
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_optical_depth
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remove_surface_by_density
@@ -2280,9 +2280,9 @@
       ! remove_surface_by_v_surf_div_v_escape
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_q_for_remove_surface_by_v_surf_div_v_escape
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_q_for_remove_surface_by_v_surf_div_v_escape
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! allows the outer envelope to be removed. ignored if <= 0
 
