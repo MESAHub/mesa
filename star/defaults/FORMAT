@@ -8,6 +8,15 @@
    ! reStructuredText (reST) so that it can rendered in the Sphinx docs.
    ! This file is written in the format it describes.
 
+   ! The stripping procedure is performed via a custom Sphinx
+   ! extension ``defaults2rst`` (located in ``docs/source/_ext``) and
+   ! occurs when the files are read from disk (using the Sphinx
+   ! ``source-read`` hook).  The defaults files in MESA modules should
+   ! be symlinked into the ``docs`` tree in an appropriate location.
+   ! The Sphinx docnames that should undergo this transformation are
+   ! specified in defaults2rst.py.  When a new defaults file is added,
+   ! it must be added to that list.
+
 
 ! Comments
 ! ========
