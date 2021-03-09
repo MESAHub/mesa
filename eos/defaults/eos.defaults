@@ -185,7 +185,7 @@
    mass_fraction_limit_for_Skye = 1d-4
 
    ! Skye Gamma Limits
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~
    ! The one-component plasma fits in Skye are only valid in certain ranges of the ion interaction parameter Gamma.
    ! Beyond these, Skye employs thermodynamic extrapolation.
    ! The default limits are set to the edges of the data that went into the fits.

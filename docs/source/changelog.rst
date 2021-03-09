@@ -396,11 +396,13 @@ revised.  We recommend that users use the ``mixing_type`` variables
 rather than the corresponding integers in their own code. e.g. rather
 than writing
 ::
-   if (mixing_type == 1) then
+
+    if (mixing_type == 1) then
 
 use
 ::
-   if (mixing_type == convective_mixing) then
+
+    if (mixing_type == convective_mixing) then
 
 assuming ``use const_def`` appears somewhere, as in the default
 ``run_star_extras.f90``.
@@ -463,6 +465,7 @@ be replicated using the system tools available through
 in ``run_star_extras.f90`` moves the best profile and FGONG file
 to ``outputs/sample_#.{profile,fgong}``.
 ::
+
       subroutine extras_after_evolve(id, ierr)
          use astero_def
          use utils_lib, only: mv

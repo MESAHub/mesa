@@ -282,7 +282,7 @@
 
       ! pgstar_profile_line_style for profile panels plot (the left side one, not the "other" one on the right)
       ! pgstar_history_line_style for history panels plot (the left side one, not the "other" one on the right)
-      ! ~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! :: 1 (full line), 2 (dashed), 3 (dot-dash-dot-dash), 4 (dotted), 5 (dash-dot-dot-dot)
 
