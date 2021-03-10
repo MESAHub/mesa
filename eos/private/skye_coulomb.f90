@@ -271,7 +271,7 @@ module skye_coulomb
 
       GAMI = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
       COTPT=sqrt(3d0 * me_in_amu / CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
-      TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
+      TPT=GAMI*COTPT/sqrt(RS)                   ! T_p/T
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
          ! No extrapolation needed
@@ -300,7 +300,7 @@ module skye_coulomb
 
          ! Compute new (differentiable) Gamma and TPT at the boundary
          g = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp_boundary * RS) ! ion Coulomb parameter Gamma_i
-         tp=g/sqrt(RS)*COTPT                   ! T_p/T
+         tp=g*COTPT/sqrt(RS)                  ! T_p/T
 
          ! Compute boundary free energy
          F = ocp_free_energy(LIQSOL, Zion, CMI, g, tp)
