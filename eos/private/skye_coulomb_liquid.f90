@@ -5,6 +5,8 @@ module skye_coulomb_liquid
 
    implicit none
 
+   real(dp), parameter :: AUM = amu / me
+
    contains
 
    !> Calculates the free energy of a classical one-component
@@ -66,7 +68,7 @@ module skye_coulomb_liquid
    !! of a one-component plasma in the liquid phase using the fits of Potekhin & Chabrier 2013.
    !!
    !! @param Z ion charge
-   !! @param mi ion mass in grams
+   !! @param mi ion mass in amu
    !! @param ge electron interaction parameter
    !! @param rs non-dimensionalized electron radius
    !! @param F non-ideal free energy
@@ -86,7 +88,7 @@ module skye_coulomb_liquid
          cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pow(Z, 7d0/3d0) * (1d0 - pow(Z, -1d0/3d0) + 0.2d0 * pow(Z, -0.5d0))
 
          g = ge * pow(Z, 5d0/3d0)
-         COTPT = sqrt(3d0 * me / mi) / pow(Z, 7d0/6d0)
+         COTPT = sqrt(3d0 * aum / mi) / pow(Z, 7d0/6d0)
          TPT = g / sqrt(rs) * COTPT
 
          xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs

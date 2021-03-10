@@ -7,7 +7,6 @@ module skye_coulomb
 
    implicit none
 
-   real(dp), parameter :: AUM = amu / me
    logical, parameter :: dbg = .false.
    !logical, parameter :: dbg = .true.
 
@@ -227,9 +226,9 @@ module skye_coulomb
             ! Add up non-ideal corrections
             f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i), min_gamma_for_solid, max_gamma_for_liquid)
             if (LIQSOL == 0) then
-               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAME, RS) ! screening corrections
+               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
             else
-               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAME, RS) ! screening corrections
+               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
             end if               
             dF = dF + AY(i) * f
 

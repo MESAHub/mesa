@@ -5,6 +5,8 @@ module skye_coulomb_solid
 
    implicit none
 
+   real(dp), parameter :: AUM = amu / me
+   
    contains
 
    !> Computes the classical and quantum anharmonic non-ideal
@@ -139,7 +141,7 @@ module skye_coulomb_solid
    !! free energy, which is just an easy way to ensure we reproduce the Debye-Huckel limit.
    !!
    !! @param Z ion charge
-   !! @param mi ion mass in grams
+   !! @param mi ion mass in amu
    !! @param ge electron interaction parameter
    !! @param rs non-dimensionalized electron radius
    !! @param F non-ideal free energy
@@ -162,7 +164,7 @@ module skye_coulomb_solid
 
          g = ge * pow(Z, 5d0/3d0)
 
-         COTPT = sqrt(3d0 * me / mi) / pow(Z, 7d0/6d0)
+         COTPT = sqrt(3d0 * aum / mi) / pow(Z, 7d0/6d0)
          TPT = g / sqrt(RS) * COTPT
          supp = safe_exp(-pow2(0.205d0 * TPT))
          Q = sqrt((pow2(0.205d0 * TPT) + log(1d0 + supp)) / log(eulernum - (eulernum - 2d0) * supp))
