@@ -76,9 +76,6 @@
       diffusion_use_full_net = .true.
       do_WD_sedimentation_heating = .true.
       do_diffusion_heating = .false.
-      diffusion_gamma_full_on = 174d0
-      diffusion_gamma_full_off = 176d0
-
 
       mesh_delta_coeff = 0.75
       
