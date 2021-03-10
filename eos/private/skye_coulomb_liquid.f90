@@ -89,7 +89,7 @@ module skye_coulomb_liquid
 
          g = ge * pow(Z, 5d0/3d0)
          COTPT = sqrt(3d0 * me_in_amu / mi) / pow(Z, 7d0/6d0)
-         TPT = g / sqrt(rs) * COTPT
+         TPT = g * COTPT / sqrt(rs)
 
          xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs
          gr = sqrt(1d0 + pow2(xr))

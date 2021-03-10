@@ -163,7 +163,7 @@ module skye_coulomb_solid
          g = ge * pow(Z, 5d0/3d0)
 
          COTPT = sqrt(3d0 * me_in_amu / mi) / pow(Z, 7d0/6d0)
-         TPT = g / sqrt(RS) * COTPT
+         TPT = g * COTPT / sqrt(RS)
          supp = safe_exp(-pow2(0.205d0 * TPT))
          Q = sqrt((pow2(0.205d0 * TPT) + log(1d0 + supp)) / log(eulernum - (eulernum - 2d0) * supp))
 
