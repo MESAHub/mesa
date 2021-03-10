@@ -130,11 +130,11 @@
       ! terminal_show_age_units
       ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! terminal_show_timestep_units
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! terminal_show_log_dt
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! terminal_show_log_age
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! options are 'years', 'yrs', 'days', 'secs', or 'seconds'
       ! this replaces the old controls terminal_show_age_in_years & terminal_show_age_in_days
@@ -837,7 +837,7 @@
 
 
       ! co_core_boundary_he4_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If fraction >= 0, boundary is outermost location where he4 mass fraction is <= this value,
       ! and c12+o16 mass fraction >= ``min_boundary_fraction`` (see below).
@@ -849,7 +849,7 @@
 
 
       ! one_core_boundary_he4_c12_fraction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If fraction >= 0, boundary is outermost location where combine he4+c12 mass fraction is <= this value,
       ! and o16+ne20 mass fraction >= ``min_boundary_fraction`` (see below).
@@ -944,7 +944,7 @@
       ! max_age
       ! ~~~~~~~
       ! max_age_in_days
-      ! ~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~
       ! max_age_in_seconds
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -1271,9 +1271,9 @@
     star_mass_max_limit = 0
 
       ! remnant_mass_min_limit
-      ! ~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! ejecta_mass_max_limit
-      ! ~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Stop when remnant mass in Msun units is < this.  <= 0 means no limit.
       ! remnant_mass = star_mass - ejecta_mass
@@ -1378,7 +1378,7 @@
 
 
       ! co_core_mass_limit
-      ! ~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! stop when CO core reaches this mass, in Msun units
 
@@ -1388,7 +1388,7 @@
 
 
       ! one_core_mass_limit
-      ! ~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~
 
       ! stop when ONe core reaches this mass, in Msun units
 
@@ -1808,7 +1808,7 @@
 
 
       ! non_fe_core_rebound_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop if max rebound speed (outward) at any location interior to ``he_core_mass``. in cm/s
 
@@ -1898,31 +1898,31 @@
     
     
       ! stop_at_phase_PreMS
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_ZAMS
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_IAMS
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_TAMS
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_He_Burn
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_ZACHeB
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_TACHeB
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_TP_AGB
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_C_Burn
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_Ne_Burn
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_O_Burn
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_Si_Burn
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_WDCS
-      ! ~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! if true, when phase of evolution reaches this point.
 
@@ -1964,7 +1964,7 @@
 
 
       ! gamma1_limit
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~
 
       ! stop if min gamma1 < this limit in a cell with ``q <= gamma1_limit_max_q``
 
@@ -1974,7 +1974,7 @@
 
 
       ! gamma1_limit_max_q
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
 
       ! stop if gamma1 < this limit at any location with ``q <= gamma1_limit_max_q``
       ! values near unity skip the outer envelope
@@ -1985,7 +1985,7 @@
 
 
       ! gamma1_limit_max_v_div_vesc
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop if gamma1 < this limit at any location with ``v_div_vesc <= gamma1_limit_max_v_div_vesc``
 
@@ -6250,7 +6250,7 @@
       ! split_merge_amr_log_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_hybrid_zoning
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if split_merge_amr_logtau_zoning, target is even grid spacing in logtau
       ! else if split_merge_amr_log_zoning, target is even grid spacing in logr
@@ -6267,9 +6267,9 @@
       ! split_merge_amr_nz_baseline
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_nz_r_core
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_mesh_delta_coeff
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -6281,7 +6281,7 @@
       ! split_merge_amr_MaxLong
       ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_MaxShort
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! split cell if ratio of actual/desired size is > split_merge_amr_MaxLong; ignore if <= 0
       ! merge cell if ratio of desired/actual size is < split_merge_amr_MaxShort; ignore if <= 0
@@ -6951,13 +6951,13 @@
 
 
       ! D_mix_zero_region_bottom_q
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! D_mix_zero_region_top_q
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! dq_D_mix_zero_at_H_He_crossover
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! dq_D_mix_zero_at_H_C_crossover
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -7480,7 +7480,7 @@
 
 
       ! calculate_Brunt_B
-      ! ~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~
       ! calculate_Brunt_N2
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -7928,13 +7928,13 @@
 
 
       ! steps_before_use_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_P_in_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_Fraley_PdV_work_when_time_centering_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -8194,19 +8194,19 @@
       ! relax_tol_correction_norm
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_max_correction
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_residual_norm1
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_max_residual1
       ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_iter_for_resid_tol2
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_residual_norm2
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_max_residual2
       ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_iter_for_resid_tol3
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_residual_norm3
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! relax_tol_max_residual3
@@ -8392,7 +8392,7 @@
     trace_solver_damping = .false.
 
       ! do_normalize_dqs_as_part_of_set_qs
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
       ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
       ! ok for create pre ms etc., but not for read model
@@ -8738,7 +8738,7 @@
       ! gold_tol_residual_norm3
       ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! gold_tol_max_residual3
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -8790,7 +8790,7 @@
       ! gold2_tol_residual_norm3
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! gold2_tol_max_residual3
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
 
@@ -9198,7 +9198,7 @@
 
 
       ! never_skip_hard_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, then don't skip hard limits even immediately after a retry.
 
@@ -10238,15 +10238,15 @@
 
 
       ! delta_lgL_power_photo_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! delta_lgL_power_photo_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! min_lgT_for_lgL_power_photo_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! delta_lgL_power_photo_hard_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! min_lgT_for_lgL_power_photo_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! lgL_power_photo_burn_min
-      ! ~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! lgL_power_photo_drop_factor
-      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Limit for magnitude of change in ``lgL_photo``.
       ! If max delta is greater than ``delta_lgL_power_photo_hard_limit``,
@@ -10315,9 +10315,9 @@
 
 
       ! dt_div_dt_cell_collapse_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! dt_div_dt_cell_collapse_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! limit for dt compared to cell_collapse timescale (negative means no limit)
 
@@ -10442,7 +10442,7 @@
       ! delta_lgT_cntr_hard_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
       ! delta_lgT_cntr_limit_only_after_near_zams
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! limit for magnitude of change in log10 temperature at center
 
@@ -10663,7 +10663,7 @@
 
 
       ! delta_lg_XNe_cntr_min
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Ignore changes in ``lg_XNe_cntr`` if value is less than this.
 
@@ -10673,7 +10673,7 @@
 
 
       ! delta_lg_XNe_cntr_max
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Ignore changes in ``lg_XNe_cntr`` if value is more than this.
 
@@ -10683,7 +10683,7 @@
 
 
       ! delta_lg_XNe_cntr_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If max delta is greater than ``delta_lg_XNe_cntr_limit``,
       ! reduce the next timestep by ``delta_lg_XNe_cntr_limit``/``max_delta``.
@@ -10694,7 +10694,7 @@
 
 
       ! delta_lg_XNe_cntr_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If max delta is greater than ``delta_lg_XNe_cntr_hard_limit``,
       ! retry with smaller timestep.
@@ -10746,7 +10746,7 @@
     delta_lg_XO_cntr_hard_limit = -1
 
       ! delta_lg_XSi_cntr_min
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Ignore changes in ``lg_XSi_cntr`` if value is less than this.
 
@@ -10756,7 +10756,7 @@
 
 
       ! delta_lg_XSi_cntr_max
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Ignore changes in ``lg_XSi_cntr`` if value is more than this.
 
@@ -10766,7 +10766,7 @@
 
 
       ! delta_lg_XSi_cntr_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If max delta is greater than ``delta_lg_XSi_cntr_limit``,
       ! reduce the next timestep by ``delta_lg_XSi_cntr_limit``/``max_delta``.
@@ -10777,7 +10777,7 @@
 
 
       ! delta_lg_XSi_cntr_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If max delta is greater than ``delta_lg_XSi_cntr_hard_limit``,
       ! retry with smaller timestep.
@@ -10921,31 +10921,31 @@
 
 
       ! delta_dX_div_X_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! delta_lg_XH_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
       ! delta_lg_XHe_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! delta_lg_XC_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
       ! delta_lg_XNe_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! delta_lg_XO_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~
       ! delta_lg_XSi_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~
       ! delta_XH_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
       ! delta_XHe_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~
       ! delta_XC_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
       ! delta_XNe_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~
       ! delta_XO_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~
       ! delta_XSi_drop_only
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~
          
 
       ! If true, then only limit drops in abundance. 
@@ -11053,7 +11053,7 @@
 
 
       ! report_dt_hard_limit_retries
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, produce terminal output about choice of timestep.
 
