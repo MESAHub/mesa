@@ -664,11 +664,11 @@
             ! assuming cgs routine.
             do i=1,nc
                do j=1,nc
-                  sigma_lnC(j,i) = -diffusion_factor(i)*boltzm*T*AX(j,i)
+                  sigma_lnC(j,i) = -limit_coeff*diffusion_factor(i)*boltzm*T*AX(j,i)
                end do
-               vlnP(i) = AP(i)*amu*grav*diffusion_factor(i)
-               vlnT(i) = AT(i)*boltzm*T*dlnT_dr*diffusion_factor(i)
-               vrad(i) = AR(i)*diffusion_factor(i) ! AR already contains all constants.
+               vlnP(i) = AP(i)*amu*grav*diffusion_factor(i)*limit_coeff
+               vlnT(i) = AT(i)*boltzm*T*dlnT_dr*diffusion_factor(i)*limit_coeff
+               vrad(i) = AR(i)*diffusion_factor(i)*limit_coeff ! AR already contains all constants.
                vgt(i) = vlnP(i) + vlnT(i) + vrad(i)
             end do
             
