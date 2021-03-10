@@ -5,8 +5,8 @@ module skye_coulomb_liquid
 
    implicit none
 
-   real(dp), parameter :: AUM = amu / me
-
+   real(dp), parameter :: me_in_amu = me / amu
+   
    contains
 
    !> Calculates the free energy of a classical one-component
@@ -88,7 +88,7 @@ module skye_coulomb_liquid
          cTF = (18d0 / 175d0) * pow(12d0 / pi, 2d0/3d0) * pow(Z, 7d0/3d0) * (1d0 - pow(Z, -1d0/3d0) + 0.2d0 * pow(Z, -0.5d0))
 
          g = ge * pow(Z, 5d0/3d0)
-         COTPT = sqrt(3d0 * aum / mi) / pow(Z, 7d0/6d0)
+         COTPT = sqrt(3d0 * me_in_amu / mi) / pow(Z, 7d0/6d0)
          TPT = g / sqrt(rs) * COTPT
 
          xr = pow(9d0 * pi / 4d0, 1d0/3d0) * fine / rs

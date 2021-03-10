@@ -270,7 +270,7 @@ module skye_coulomb
       type(auto_diff_real_2var_order3) :: F
 
       GAMI = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
-      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
+      COTPT=sqrt(3d0 * me_in_amu / CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
       TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then

@@ -144,7 +144,7 @@ module skye_coulomb_solid
    !! @param rs non-dimensionalized electron radius
    !! @param F non-ideal free energy
    function ocp_solid_screening_free_energy_correction(Z, mi, ge, rs) result(F)
-         use skye_coulomb_liquid, only: aum, ocp_liquid_screening_free_energy_correction
+         use skye_coulomb_liquid, only: me_in_amu, ocp_liquid_screening_free_energy_correction
          real(dp), intent(in) :: Z, mi
          type(auto_diff_real_2var_order3), intent(in) :: ge, rs
 
@@ -162,7 +162,7 @@ module skye_coulomb_solid
 
          g = ge * pow(Z, 5d0/3d0)
 
-         COTPT = sqrt(3d0 * aum / mi) / pow(Z, 7d0/6d0)
+         COTPT = sqrt(3d0 * me_in_amu / mi) / pow(Z, 7d0/6d0)
          TPT = g / sqrt(RS) * COTPT
          supp = safe_exp(-pow2(0.205d0 * TPT))
          Q = sqrt((pow2(0.205d0 * TPT) + log(1d0 + supp)) / log(eulernum - (eulernum - 2d0) * supp))
