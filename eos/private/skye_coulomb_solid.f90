@@ -5,8 +5,6 @@ module skye_coulomb_solid
 
    implicit none
 
-   real(dp), parameter :: AUM = amu / me
-   
    contains
 
    !> Computes the classical and quantum anharmonic non-ideal
@@ -146,7 +144,7 @@ module skye_coulomb_solid
    !! @param rs non-dimensionalized electron radius
    !! @param F non-ideal free energy
    function ocp_solid_screening_free_energy_correction(Z, mi, ge, rs) result(F)
-         use skye_coulomb_liquid
+         use skye_coulomb_liquid, only: aum, ocp_liquid_screening_free_energy_correction
          real(dp), intent(in) :: Z, mi
          type(auto_diff_real_2var_order3), intent(in) :: ge, rs
 
