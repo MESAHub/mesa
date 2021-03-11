@@ -94,14 +94,14 @@
    photo_directory = 'photos2'
    log_directory = 'LOGS2'  
       
-      !photo_interval = 10
+      photo_interval = 1
       !profile_interval = 1
       !history_interval = 1
-      !terminal_interval = 1
+      terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
+      report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.
@@ -172,7 +172,7 @@
    !Profile_Panels1_xmin = 25 ! -101D0
    !Profile_Panels1_xmax = 65 ! -101D0
 
-   Grid2_title = 'TDC twin study'
+   Grid2_title = 'TDC solar twin study'
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
