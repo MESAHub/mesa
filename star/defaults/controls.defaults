@@ -6850,8 +6850,8 @@
 
       ! ::
 
-    diffusion_gamma_full_off = 175
-    diffusion_gamma_full_on = 150
+    diffusion_gamma_full_off = 1d99
+    diffusion_gamma_full_on = 1d99
 
 
       ! diffusion_T_full_on
