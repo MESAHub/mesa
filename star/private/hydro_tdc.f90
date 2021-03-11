@@ -70,6 +70,10 @@
             x = compute_L_face(s, k, ierr) ! sets Lr, Lt, Lc
             if (ierr /= 0) return
          end do
+         s% Y_face(1) = 0d0
+         s% PII(1) = 0d0
+         s% Lc(1) = 0d0
+         s% Lt(1) = 0d0
       end subroutine set_TDC_vars
       
 
@@ -458,6 +462,7 @@
                k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
             PII_face = 0d0
             s% PII(k) = 0d0
+            s% Y_face(k) = 0d0
             return
          end if
          Y_face = compute_Y_face(s, k, ierr)
