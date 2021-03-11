@@ -73,7 +73,7 @@
          thermohaline_coeff = 2  
          thermohaline_option = 'Kippenhahn'
 
-         !varcontrol_target = 3d-4
+         varcontrol_target = 1d-4
 
          dX_mix_dist_limit = 1d-4 
          
@@ -97,8 +97,8 @@
          
          xa_scale = 1d-5
          
-         use_gold2_tolerances = .false.
-         use_gold_tolerances = .false.
+         !use_gold2_tolerances = .false.
+         !use_gold_tolerances = .false.
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)

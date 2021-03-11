@@ -165,7 +165,6 @@
    
       ! for read_model/write_model
          logical :: have_previous_conv_vel
-         logical :: have_previous_L_conv
    
       ! experimental work in progress.
       

@@ -44,7 +44,7 @@
       integer, parameter :: bit_for_am_nu_rot = 11
       integer, parameter :: bit_for_j_rot = 12
       integer, parameter :: bit_for_conv_vel_var = 13
-      integer, parameter :: bit_for_L_conv = 14 ! for saving the data, but not using as variable
+      !integer, parameter ::   = 14 ! UNUSED
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
@@ -56,7 +56,6 @@
       integer, parameter :: increment_for_RTI_flag = 1
       integer, parameter :: increment_for_RSP_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
-      integer, parameter :: increment_for_L_conv = 1
       
       integer, parameter :: max_increment = increment_for_i_etrb &
                                           + increment_for_rotation_flag &
@@ -65,8 +64,7 @@
                                           + increment_for_am_nu_rot_flag &
                                           + increment_for_RTI_flag &
                                           + increment_for_RSP_flag &
-                                          + increment_for_conv_vel_flag &
-                                          + increment_for_L_conv
+                                          + increment_for_conv_vel_flag
 
       integer, parameter :: mesa_zams_file_type = 2**bit_for_zams_file
 
@@ -384,7 +382,6 @@
          end if
 
          s% have_previous_conv_vel = BTEST(file_type, bit_for_conv_vel)
-         s% have_previous_L_conv = BTEST(file_type, bit_for_L_conv)
          s% initial_z = initial_z
 
          s% mstar = initial_mass*Msun
@@ -596,7 +593,6 @@
          if (s% RTI_flag) n = n+increment_for_RTI_flag ! read alpha_RTI
          if (is_RSP_model) n = n+increment_for_RSP_flag ! read RSP_et, erad, Fr
          if (s% conv_vel_flag .or. s% have_previous_conv_vel) n = n+increment_for_conv_vel_flag ! read conv_vel
-         if (s% have_previous_L_conv) n = n+increment_for_L_conv ! read L_conv
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -676,9 +672,6 @@
                else
                   s% conv_vel(k) = vec(j)
                end if
-            end if
-            if (s% have_previous_L_conv) then
-               j=j+1; s% L_conv(k) = vec(j)
             end if
             if (j+species > nvec) then
                ierr = -1

@@ -2161,7 +2161,7 @@
             get_Lconv = 0d0
             return
          end if
-         if (s% TDC_flag) then
+         if (s% TDC_flag .or. s% RSP_flag) then
             get_Lconv = s% Lc(k)
          else
             get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt

@@ -964,7 +964,7 @@
          if (s% TDC_alfa == 0d0) return ! no convection
          nz = s% nz
          if (s% have_previous_conv_vel) then
-            write(*,*) 'initial w_face set using L_conv from file or from MLT'
+            write(*,*) 'initial w_face set using conv_vel from file or from MLT'
          else
             write(*,*) 'need conv_vel from file or from MLT in order to set initial w_face'
             stop 'reset_etrb_using_L'

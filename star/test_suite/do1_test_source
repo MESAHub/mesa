@@ -1,6 +1,4 @@
 
-
-
 # move twin_studies to start of list so that for [ci split] it will go to cannon instead of helios (until helios is fixed)
 do_one twin_studies "stars have reached stopping age" skip skip
 
@@ -67,15 +65,15 @@ do_one other_physics_hooks "stop because have dropped below central lower limit 
 do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
-do_one rsp_BEP "good match for period" "final.mod" auto   
-do_one rsp_BLAP "good match for period" "final.mod" auto 
-do_one rsp_Cepheid "good match for period" "final.mod" auto   
+do_one rsp_BEP "good match for period" "final.mod" skip   
+do_one rsp_BLAP "good match for period" "final.mod" skip 
+do_one rsp_Cepheid "good match for period" "final.mod" skip   
 do_one rsp_check_2nd_crossing "Teff_red_edge     5" skip skip
-do_one rsp_Delta_Scuti "good match for period" "final.mod" auto 
+do_one rsp_Delta_Scuti "good match for period" "final.mod" skip 
 do_one rsp_gyre "good match for period" skip skip
-do_one rsp_RR_Lyrae "good match for period" "final.mod" auto   
+do_one rsp_RR_Lyrae "good match for period" "final.mod" skip   
 do_one rsp_save_and_load_file "good match for period" "final.mod" skip   
-do_one rsp_Type_II_Cepheid "good match for period" "final.mod" auto   
+do_one rsp_Type_II_Cepheid "good match for period" "final.mod" skip   
 do_one semiconvection "all values are within tolerances" "final.mod" auto  
 do_one simplex_solar_calibration "solar_cs_rms        0.000" "s1.mod" skip
 do_one T_tau_gradr "all values are within tolerance" "final.mod" skip
