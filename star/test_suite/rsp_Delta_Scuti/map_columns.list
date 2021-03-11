@@ -16,7 +16,7 @@
    rsp_Eq
    rsp_src_snk
    rsp_Uq
-   rsp_avQ
+   rsp_Pvsc
    vel_km_per_s
    v_div_csound
    xq

@@ -73,8 +73,8 @@
 
    set_rho_to_dm_div_dV = .false.
    
-   avQ_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   avQ_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
    
 ! output
    terminal_show_age_units = 'days'
@@ -120,7 +120,7 @@
    RSP_theta =      0.5d0        ! Pgas and Prad
    RSP_thetat =     0.5d0        ! Pturb
    RSP_thetae =     0.5d0        ! erad in terms using f_Edd
-   RSP_thetaq =     1.0d0        ! avQ
+   RSP_thetaq =     1.0d0        ! Pvsc
    RSP_thetau =     1.0d0        ! Eq and Uq
    RSP_wtr =        0.6667d0     ! Lr
    RSP_wtc =        0.6667d0     ! Lc
@@ -348,7 +348,7 @@
 
    Grid2_win_flag = .true.
 
-   Grid2_win_width = 16
+   Grid2_win_width = 10
    Grid2_win_aspect_ratio = 0.667 ! aspect_ratio = height/width
    Grid2_num_cols = 4 ! divide plotting region into this many equal width cols
    Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
@@ -519,6 +519,7 @@
    Profile_Panels1_other_yaxis_name(3) = 'Y_face_R'
    Profile_Panels1_same_yaxis_range(3) = .true.
 
+
 ! debugging output
 
       Profile_Panels1_yaxis_name(4) = 'xtr1'
@@ -545,32 +546,6 @@
       Profile_Panels1_other_yaxis_name(9) = 'xtr6_R' 
       Profile_Panels1_same_yaxis_range(9) = .true.
 
-! rel error debugging output
-
-      Profile_Panels1_yaxis_name(4) = 'diff_rho'
-      Profile_Panels1_other_yaxis_name(4) = 'xtr1_R' 
-      Profile_Panels1_same_yaxis_range(4) = .true.
-            
-      Profile_Panels1_yaxis_name(5) = 'diff_T' 
-      Profile_Panels1_other_yaxis_name(5) = 'xtr2_R' 
-      Profile_Panels1_same_yaxis_range(5) = .true.
-            
-      Profile_Panels1_yaxis_name(6) = 'diff_w'
-      Profile_Panels1_other_yaxis_name(6) = 'xtr3_R' 
-      Profile_Panels1_same_yaxis_range(6) = .true.
-            
-      Profile_Panels1_yaxis_name(7) = 'diff_v' 
-      Profile_Panels1_other_yaxis_name(7) = 'xtr4_R' 
-      Profile_Panels1_same_yaxis_range(7) = .true.
-            
-      Profile_Panels1_yaxis_name(8) = 'diff_r' 
-      Profile_Panels1_other_yaxis_name(8) = 'xtr5_R' 
-      Profile_Panels1_same_yaxis_range(8) = .true.
-            
-      Profile_Panels1_yaxis_name(9) = '' 
-      Profile_Panels1_other_yaxis_name(9) = '' 
-      Profile_Panels1_same_yaxis_range(9) = .true.
-
 ! standard output
 
       Profile_Panels1_yaxis_name(4) = 'Lr_div_L'
@@ -593,8 +568,8 @@
       Profile_Panels1_other_yaxis_name(8) = 'Uq_R' 
       Profile_Panels1_same_yaxis_range(8) = .true.
 
-      Profile_Panels1_yaxis_name(9) = 'avQ'
-      Profile_Panels1_other_yaxis_name(9) = 'avQ_R' 
+      Profile_Panels1_yaxis_name(9) = 'Pvsc'
+      Profile_Panels1_other_yaxis_name(9) = 'Pvsc_R' 
       Profile_Panels1_same_yaxis_range(9) = .true.
 
    
@@ -611,13 +586,13 @@
    Text_Summary1_name(1,1) = 'model_number'
    Text_Summary1_name(2,1) = 'star_age_day'
    Text_Summary1_name(3,1) = 'time_step_sec'
-   Text_Summary1_name(4,1) = 'rsp_num_periods'
+   Text_Summary1_name(4,1) = ''
    Text_Summary1_name(5,1) = ''
    
    Text_Summary1_name(1,2) = 'v_surf_km_s'
    Text_Summary1_name(2,2) = 'radius'
    Text_Summary1_name(3,2) = 'log_R'
-   Text_Summary1_name(4,2) = 'rsp_period_in_days'
+   Text_Summary1_name(4,2) = ''
    Text_Summary1_name(5,2) = ''
    
    Text_Summary1_name(1,3) = 'effective_T'

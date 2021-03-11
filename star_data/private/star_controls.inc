@@ -394,11 +394,9 @@
          real(dp) :: atm_irradiated_P_surf
          integer :: atm_irradiated_max_iters
 
-         logical :: use_atm_PT_at_center_of_surface_cell
          logical :: use_compression_outer_BC
          logical :: use_momentum_outer_BC
          logical :: use_zero_Pgas_outer_BC
-         logical :: use_zero_dLdm_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          real(dp) :: fixed_vsurf
          logical :: use_fixed_Psurf_outer_BC
@@ -801,13 +799,14 @@
 
          logical :: use_mass_corrections, use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
+            use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
             use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
             always_use_eps_grav_form_of_energy_eqn, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
-            use_Fraley_PdV_work_when_time_centering_velocity, &
+            use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, &
             use_time_centered_eps_grav
             
          integer :: steps_before_always_use_dedt_form_of_energy_eqn, &
@@ -950,8 +949,8 @@
 
          integer :: retry_limit, redo_limit
 
-         logical :: use_avQ_art_visc
-         real(dp) :: avQ_cq, avQ_zsh
+         logical :: use_Pvsc_art_visc
+         real(dp) :: Pvsc_cq, Pvsc_zsh
 
          real(dp) :: sig_term_limit, sig_min_factor_for_high_Tcenter, &
             Tcenter_min_for_sig_min_factor_full_on, &
@@ -1075,8 +1074,8 @@
          real(dp) :: timestep_dt_factor
          logical :: use_dt_low_pass_controller
          
-         real(dp) :: force_timestep_min, &
-            force_timestep_min_years, force_timestep_min_factor
+         real(dp) :: force_timestep_min, force_timestep_min_years, force_timestep_min_factor, &
+            force_timestep, force_timestep_years
 
          real(dp) :: varcontrol_target, varcontrol_dt_limit_ratio_hard_max, &
             min_allowed_varcontrol_target

@@ -1,0 +1,50 @@
+
+&star_job
+
+/ ! end of star_job namelist
+
+&eos
+/ ! end of eos namelist
+
+&kap
+/ ! end of kap namelist
+
+&controls  
+
+! starting specifications
+
+! when to stop
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+   mlt_make_surface_no_mixing = .true.
+   
+! mixing
+
+! timesteps
+
+! mesh
+
+! solver
+   
+   use_dPrad_dm_form_of_T_gradient_eqn = .true.
+
+   use_momentum_outer_BC = .true.
+
+! output
+
+   photo_directory = 'photos1'
+   log_directory = 'LOGS1'
+
+/ ! end of controls namelist
+
+
+&pgstar
+/ ! end of pgstar namelist

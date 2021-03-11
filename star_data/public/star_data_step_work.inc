@@ -39,7 +39,7 @@
       real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
       real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
       real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
-      real(dp), pointer :: etrb(:) ! specific turbulent energy.  only used when TDC_flag is true
+      real(dp), pointer :: etrb(:) ! turbulent energy.  only used when TDC_flag is true
       real(dp), pointer :: Hp_face(:) ! pressure scale height.  only used for TDC or RSP
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
@@ -79,14 +79,14 @@
       real(dp), pointer :: erad(:) ! specific radiation energy (erg/g)
       real(dp), pointer :: Pgas(:) ! gas pressure (Pgas = Pion + Pelec)
       real(dp), pointer :: Prad(:) ! radiation pressure
-      real(dp), pointer :: P(:) ! total pressure (P = Prad + Pgas)
-      real(dp), pointer :: lnP(:) ! log(P)
+      real(dp), pointer :: Peos(:) ! eos pressure (Peos = Prad + Pgas)
+      real(dp), pointer :: lnPeos(:) ! log(Peos)
       real(dp), pointer :: grada(:)   ! d ln T / d ln P | adiabatic
       real(dp), pointer :: dE_dRho(:) ! dE_dRho at constant T&abundances
       real(dp), pointer :: Cv(:)   ! dE/dT at constant density&abundances
-      real(dp), pointer :: Cp(:)         ! heat capacity at constant pressure&abundances
-         ! Cp := dh_dT at constant P, specific heat at constant pressure
-         ! where h is enthalpy, h = E + P/Rho
+      real(dp), pointer :: Cp(:)         ! heat capacity at constant Peos&abundances
+         ! Cp := dh_dT at constant Peos, specific heat at constant pressure
+         ! where h is enthalpy, h = E + Peos/Rho
       real(dp), pointer :: lnS(:)   ! log(specific entropy)
       real(dp), pointer :: gamma1(:)      ! adiabatic coefficient.
          ! (d_ln(p)/d_ln(rho)) at constant entropy.
@@ -99,8 +99,8 @@
       real(dp), pointer :: phase(:) ! phase (0 for liquid, 1 for solid, in-between for blend)
       real(dp), pointer :: latent_ddlnT(:) ! latent heat of phase transition per unit lnT (erg/g) because we blur the transition
       real(dp), pointer :: latent_ddlnRho(:) ! latent heat of phase transition per unit lnRho (erg/g) because we blur the transition
-      real(dp), pointer :: chiRho(:) ! dlnP_dlnRho at constant T
-      real(dp), pointer :: chiT(:) ! dlnP_dlnT at constant Rho
+      real(dp), pointer :: chiRho(:) ! dlnPeos_dlnRho at constant T
+      real(dp), pointer :: chiT(:) ! dlnPeos_dlnT at constant Rho
       real(dp), pointer :: QQ(:) ! thermal expansion coefficient
       real(dp), pointer :: d_QQ_dlnd(:)
       real(dp), pointer :: d_QQ_dlnT(:)
@@ -130,7 +130,7 @@
       real(dp), pointer :: dS_dRho_for_partials(:)
       real(dp), pointer :: dS_dT_for_partials(:)
       real(dp), pointer :: dlnE_dxa_for_partials(:,:) ! (species,nz)
-      real(dp), pointer :: dlnP_dxa_for_partials(:,:) ! (species,nz)
+      real(dp), pointer :: dlnPeos_dxa_for_partials(:,:) ! (species,nz)
       
       real(dp), pointer :: csound(:) ! at cell center -- set when call eos
       real(dp), pointer :: csound_face(:) ! interpolated 
@@ -458,7 +458,7 @@
       ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
-            w, w_start, Pt, Eq, Uq, avQ, avQ_start, &
+            Ptrb, Eq, Uq, Pvsc, Pvsc_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
 
          integer :: TDC_num_periods
@@ -469,7 +469,7 @@
 
          real(dp), pointer, dimension(:) :: &
             Vol, Vol_start, RSP_w, RSP_w_start, RSP_Et, COUPL_start, &
-            Fr, Fr_start, Lc_start, Pt_start, d_Pt_dV_00, d_Pt_dw_00, &               
+            Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &               
             d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
             Y_face, d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
@@ -1012,8 +1012,8 @@
          real(dp), pointer :: xa_start(:,:) ! (species,nz)         
          real(dp), pointer :: xa_sub_xa_start(:,:) ! (species,nz)          
          real(dp), pointer :: lnd_start(:) ! (nz)
-         real(dp), pointer :: lnP_start(:) ! (nz)
-         real(dp), pointer :: P_start(:) ! (nz)
+         real(dp), pointer :: lnPeos_start(:) ! (nz)
+         real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
          real(dp), pointer :: lnE_start(:) ! (nz)

@@ -37,7 +37,7 @@
          eval_vars, eval_eqns, calc_equations, save_start_vars, &
          do1_eos_and_kap, calc_Fr, do1_specific_volume, get_Psurf, &
          set_f_Edd, calc_Prad, calc_Hp_face, calc_Y_face, &
-         calc_PII_face, calc_avQ, calc_Pturb, calc_Chi, calc_Eq, &
+         calc_PII_face, calc_Pvsc, calc_Pturb, calc_Chi, calc_Eq, &
          calc_source_sink, acceleration_eqn, calc_cell_equations, &
          T_form_of_calc_Fr, calc_Lc, calc_Lt, check_omega, rsp_set_Teff
       
@@ -263,6 +263,7 @@
          end if
          if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &
             s% dt = s% force_timestep_min
+         if (s% force_timestep > 0) s% dt = s% force_timestep
 
          retry_loop: do num_tries = 1, max_retries+1
 
@@ -582,7 +583,7 @@
          type (star_info), pointer :: s
          real(dp) :: EH1,EHJT
          integer :: k
-         include 'formats'
+         include 'formats'         
          EHJT = 1.d0
          do k = 1,NZN
             if (k /= NZN) then
@@ -648,28 +649,20 @@
             s% r_start(k) = s% r(k)
             s% Pgas_start(k) = s% Pgas(k)
             s% Prad_start(k) = s% Prad(k)
-            s% avQ_start(k) = s% avQ(k)
+            s% Pvsc_start(k) = s% Pvsc(k)
             s% Vol_start(k) = s% Vol(k)
             s% csound_start(k) = s% csound(k)
             s% opacity_start(k) = s% opacity(k)
             s% egas_start(k) = s% egas(k)
             s% erad_start(k) = s% erad(k)
             s% RSP_w_start(k) = s% RSP_w(k)
-            s% Pt_start(k) = s% Pt(k)
+            s% Ptrb_start(k) = s% Ptrb(k)
             s% Chi_start(k) = s% Chi(k)
             s% v_start(k) = s% v(k)
             s% Fr_start(k) = s% Fr(k)
             s% Lc_start(k) = s% Lc(k)
             s% Lt_start(k) = s% Lt(k)
             s% COUPL_start(k) = s% COUPL(k)
-            
-            ! for debugging
-            !s% xtra1_array(k) = 1d0/s% Vol(k)
-            !s% xtra2_array(k) = s% T(k)
-            !s% xtra3_array(k) = abs(s% RSP_w(k)) + 1d0
-            !s% xtra4_array(k) = abs(s% v(k)) + 1d0
-            !s% xtra5_array(k) = s% r(k)
-
          end do
       end subroutine save_start_vars
       
@@ -683,14 +676,14 @@
             s% r(k) = s% r_start(k)
             s% Pgas(k) = s% Pgas_start(k)
             s% Prad(k) = s% Prad_start(k)
-            s% avQ(k) = s% avQ_start(k)
+            s% Pvsc(k) = s% Pvsc_start(k)
             s% Vol(k) = s% Vol_start(k)
             s% csound(k) = s% csound_start(k)
             s% opacity(k) = s% opacity_start(k)
             s% egas(k) = s% egas_start(k)
             s% erad(k) = s% erad_start(k)
             s% RSP_w(k) = s% RSP_w_start(k)
-            s% Pt(k) = s% Pt_start(k)
+            s% Ptrb(k) = s% Ptrb_start(k)
             s% Chi(k) = s% Chi_start(k)
             s% v(k) = s% v_start(k)
             s% L(k) = s% L_start(k)
@@ -728,7 +721,7 @@
             call calc_Hp_face(s,i)
             call calc_Y_face(s,i)
             call calc_PII_face(s,i)
-            call calc_avQ(s,i)
+            call calc_Pvsc(s,i)
          end do
          !$OMP END PARALLEL DO
          if (iter == 1) then
@@ -1429,7 +1422,7 @@
       end subroutine calc_PII_face
       
       
-      subroutine calc_avQ(s,i)
+      subroutine calc_Pvsc(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: I      
          real(dp) :: &
@@ -1443,12 +1436,12 @@
          include 'formats'
          k = NZN+1-i
          if (CQ == 0d0) then
-            s% avQ(k) = 0d0
-            d_avQ_dVol(i) = 0d0
-            d_avQ_dT(i) = 0d0
-            d_avQ_der(i) = 0d0
-            d_avQ_dr_in(i) = 0d0
-            d_avQ_dr_00(i) = 0d0
+            s% Pvsc(k) = 0d0
+            d_Pvsc_dVol(i) = 0d0
+            d_Pvsc_dT(i) = 0d0
+            d_Pvsc_der(i) = 0d0
+            d_Pvsc_dr_in(i) = 0d0
+            d_Pvsc_dr_00(i) = 0d0
             return
          end if
          if (I > 1) then
@@ -1465,12 +1458,12 @@
          V = s% Vol(k)
          sqrt_PV = sqrt(P*V)
          if (dv <= ZSH*sqrt_PV) then
-            s% avQ(k) = 0d0
-            d_avQ_dVol(i) = 0d0
-            d_avQ_dT(i) = 0d0
-            d_avQ_der(i) = 0d0
-            d_avQ_dr_in(i) = 0d0
-            d_avQ_dr_00(i) = 0d0
+            s% Pvsc(k) = 0d0
+            d_Pvsc_dVol(i) = 0d0
+            d_Pvsc_dT(i) = 0d0
+            d_Pvsc_der(i) = 0d0
+            d_Pvsc_dr_in(i) = 0d0
+            d_Pvsc_dr_00(i) = 0d0
             return
          end if
 
@@ -1496,27 +1489,27 @@
          d_dv_dr_in = 2d0/s% dt - ZSH*d_sqrt_PV_dr_in ! not used if I == 1
          d_dv_dr_00 = -2d0/s% dt - ZSH*d_sqrt_PV_dr_00
          
-         ! avQ = CQ*P*(dv1/sqrt_PV - cut)^2  eqn 3.60
+         ! Pvsc = CQ*P*(dv1/sqrt_PV - cut)^2  eqn 3.60
          !     = CQ*P*((dv1 - cut*sqrt_PV)/sqrt_PV)^2
          !     = CQ*P/(P*V)*dv^2
          !     = CQ/V*dv^2
          
-         s% avQ(k) = CQ/V*dv**2
-         d_avQ_dVol(i) = -s% avQ(k)/V + 2d0*d_dv_dVol*CQ/V*dv
-         d_avQ_dT(i) = CQ/V*2d0*dv*d_dv_dT
-         d_avQ_der(i) = CQ/V*2d0*dv*d_dv_der
-         d_avQ_dr_in(i) = CQ/V*2d0*dv*d_dv_dr_in - CQ*dv**2*dVol_dr_in(I)/V**2
-         d_avQ_dr_00(i) = CQ/V*2d0*dv*d_dv_dr_00 - CQ*dv**2*dVol_dr_00(I)/V**2
+         s% Pvsc(k) = CQ/V*dv**2
+         d_Pvsc_dVol(i) = -s% Pvsc(k)/V + 2d0*d_dv_dVol*CQ/V*dv
+         d_Pvsc_dT(i) = CQ/V*2d0*dv*d_dv_dT
+         d_Pvsc_der(i) = CQ/V*2d0*dv*d_dv_der
+         d_Pvsc_dr_in(i) = CQ/V*2d0*dv*d_dv_dr_in - CQ*dv**2*dVol_dr_in(I)/V**2
+         d_Pvsc_dr_00(i) = CQ/V*2d0*dv*d_dv_dr_00 - CQ*dv**2*dVol_dr_00(I)/V**2
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
-            s% solver_test_partials_val = s% avQ(k)
+            s% solver_test_partials_val = s% Pvsc(k)
             s% solver_test_partials_var = i_var_T
-            s% solver_test_partials_dval_dx = d_avQ_dT(i)
-            write(*,*) 'calc_avQ', s% solver_test_partials_var
+            s% solver_test_partials_dval_dx = d_Pvsc_dT(i)
+            write(*,*) 'calc_Pvsc', s% solver_test_partials_var
          end if
-      end subroutine calc_avQ
+      end subroutine calc_Pvsc
 
       
       subroutine check_omega(s,i) ! needs cleanup
@@ -1554,19 +1547,19 @@
          k = NZN+1-i
          if (ALFA == 0d0 .or. ALFAP == 0d0 .or. &
              I <= IBOTOM .or. I >= NZN) then
-            s% Pt(k) = 0.d0
-            dPt_dVol_00(I) = 0.d0
-            dPt_dw_00(I) = 0.d0
-            dPt_dr_00(I) = 0.d0
-            dPt_dr_in(I) = 0.d0
+            s% Ptrb(k) = 0.d0
+            dPtrb_dVol_00(I) = 0.d0
+            dPtrb_dw_00(I) = 0.d0
+            dPtrb_dr_00(I) = 0.d0
+            dPtrb_dr_in(I) = 0.d0
          else
             Vol = s% Vol(k)
-            s% Pt(k) = ALFAP*s% RSP_w(k)**2/Vol
-            dPt_dVol_00(I) = -s% Pt(k)/Vol
-            dPt_dw_00(I) = 2.d0*ALFAP*s% RSP_w(k)/Vol
+            s% Ptrb(k) = ALFAP*s% RSP_w(k)**2/Vol
+            dPtrb_dVol_00(I) = -s% Ptrb(k)/Vol
+            dPtrb_dw_00(I) = 2.d0*ALFAP*s% RSP_w(k)/Vol
             TEM1 = - ALFAP*s% RSP_w(k)**2/Vol**2
-            dPt_dr_00(I) = TEM1*dVol_dr_00(I)
-            dPt_dr_in(I) = TEM1*dVol_dr_in(I)
+            dPtrb_dr_00(I) = TEM1*dVol_dr_00(I)
+            dPtrb_dr_in(I) = TEM1*dVol_dr_in(I)
          end if
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -1616,23 +1609,7 @@
             POMT2 = POM*POM1*POM3*POM4
             POMT4 = POM*POM1*POM2*POM3
 
-            !s% profile_extra(k,2) = POMT3
-            !s% profile_extra(k,3) = POM3
-            !s% profile_extra(k,4) = POMT3*POM3
-
             s% Chi(k) = POMT1*POM1
-         
-            !s% xtra1_array(k) = POM
-            !s% xtra2_array(k) = safe_log10(POM1)
-            !s% xtra3_array(k) = safe_log10(POM2)
-            !s% xtra4_array(k) = POM3
-            !s% xtra5_array(k) = POM4
-         
-            !s% xtra1_array(k) = s% v(k)
-            !s% xtra2_array(k) = s% r(k)
-            !s% xtra3_array(k) = POM3
-            !s% xtra4_array(k) = 1
-            !s% xtra5_array(k) = 1
             
             if (call_is_bad) then
                if (is_bad(s% Chi(k))) then
@@ -1824,12 +1801,6 @@
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
             POM3 = s% RSP_w(k)            
             s% SOURCE(k) = POM*POM2*POM3
-         
-            !s% xtra1_array(k) = POM
-            !s% xtra2_array(k) = s% PII(k)
-            !s% xtra3_array(k) = s% Hp_face(k)
-            !s% xtra4_array(k) = POM3
-            !s% xtra5_array(k) = s% QQ(k)
       
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
@@ -2074,10 +2045,10 @@
             dC_dT_00(I) = 0.d0
             dC_dT_out(I) = 0.d0
             dC_dw_00(I) = 0.d0! - 
-            s% Pt(k) = 0.d0
-            dPt_dr_00(I) = 0.d0 
-            dPt_dr_in(I) = 0.d0
-            dPt_dw_00(I) = 0.d0! - 
+            s% Ptrb(k) = 0.d0
+            dPtrb_dr_00(I) = 0.d0 
+            dPtrb_dr_in(I) = 0.d0
+            dPtrb_dw_00(I) = 0.d0! - 
          end do
          do I = NZN,NZN
             k = NZN+1-i
@@ -2108,10 +2079,10 @@
             dC_dT_00(I) = 0.d0
             dC_dT_out(I) = 0.d0
             dC_dw_00(I) = 0.d0! - 
-            s% Pt(k) = 0.d0
-            dPt_dr_00(I) = 0.d0
-            dPt_dr_in(I) = 0.d0
-            dPt_dw_00(I) = 0.d0! - 
+            s% Ptrb(k) = 0.d0
+            dPtrb_dr_00(I) = 0.d0
+            dPtrb_dr_in(I) = 0.d0
+            dPtrb_dw_00(I) = 0.d0! - 
          end do
       end subroutine zero_boundaries
 
@@ -2517,26 +2488,24 @@
          end if
          
          XP = THETA*(s% Pgas(k) + Prad_factor*s% Prad(k)) &
-            + THETAQ*s% avQ(k) &
-            + THETAT*s% Pt(k) &
             + THETA1*(s% Pgas_start(k) + Prad_factor*s% Prad_start(k)) &
-            + THETAQ1*s% avQ_start(k) &
-            + THETAT1*s% Pt_start(k)
+            + THETAQ*s% Pvsc(k) + THETAQ1*s% Pvsc_start(k) &
+            + THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k)
          d_XP_dVol_00 = &
               THETA*(d_Pg_dVol(i) + Prad_factor*d_Pr_dVol(i)) &
-            + THETAQ*d_avQ_dVol(i) &
-            + THETAT*dPt_dVol_00(i)
-         d_XP_dT_00 = THETA*d_Pg_dT(i) + THETAQ*d_avQ_dT(i) ! 
+            + THETAQ*d_Pvsc_dVol(i) &
+            + THETAT*dPtrb_dVol_00(i)
+         d_XP_dT_00 = THETA*d_Pg_dT(i) + THETAQ*d_Pvsc_dT(i) ! 
          d_XP_der_00 = THETA*Prad_factor*d_Pr_der(i) ! 
-         d_XP_dw_00 = THETAT*dPt_dw_00(i) ! 
+         d_XP_dw_00 = THETAT*dPtrb_dw_00(i) ! 
          d_XP_dr_in = & ! 
               THETA*(d_Pg_dr_in(i) + Prad_factor*d_Pr_dr_in(i)) &
-            + THETAQ*d_avQ_dr_in(i) &
-            + THETAT*dPt_dr_in(i)
+            + THETAQ*d_Pvsc_dr_in(i) &
+            + THETAT*dPtrb_dr_in(i)
          d_XP_dr_00 = & ! 
               THETA*(d_Pg_dr_00(i) + Prad_factor*d_Pr_dr_00(i)) &
-            + THETAQ*d_avQ_dr_00(i) &
-            + THETAT*dPt_dr_00(i)
+            + THETAQ*d_Pvsc_dr_00(i) &
+            + THETAT*dPtrb_dr_00(i)
             
          if (call_is_bad) then
             if (is_bad(XP)) then
@@ -2544,8 +2513,8 @@
                write(*,2) 'XP', k, XP
                write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                write(*,2) 's% Prad(k)', k, s% Prad(k)
-               write(*,2) 's% avQ(k)', k, s% avQ(k)
-               write(*,2) 's% Pt(k)', k, s% Pt(k)
+               write(*,2) 's% Pvsc(k)', k, s% Pvsc(k)
+               write(*,2) 's% Ptrb(k)', k, s% Ptrb(k)
                write(*,2) 'THETA', k, THETA
                write(*,2) 'THETAQ', k, THETAQ
                write(*,2) 'THETAT', k, THETAT
@@ -2855,11 +2824,12 @@
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
          
-         !s% xtra1_array(k) = dvdt_factor*(s% v(k) - s% v_start(k))/dt
-         !s% xtra2_array(k) = safe_log10(-area*dXP_dm)
-         !s% xtra3_array(k) = safe_log10(-grav)
-         !s% xtra4_array(k) = s% Uq(k)
-         !s% xtra5_array(k) = s% Chi(k)
+         !s% xtra1_array(k) = s% Pgas(k) + s% Prad(k)
+         !s% xtra2_array(k) = s% Vol(k)
+         !s% xtra3_array(k) = s% T(k)
+         !s% xtra4_array(k) = s% v(k)
+         !s% xtra5_array(k) = s% RSP_w(k)**2
+         !s% xtra6_array(k) = s% r(k)
             
          HD(i_r_dFr_00,IR) = - d_Fr_term_dFr_00
 
@@ -3399,7 +3369,7 @@
             dLt_in_der_in, dLt_in_der_00, &
             dLt_in_dw_in, dLt_in_dw_00
          integer :: IW, k
-         real(dp) :: dt, dm, residual, Pt_tw, DV, dt_div_dm, L_00, L_in
+         real(dp) :: dt, dm, residual, Ptrb_tw, DV, dt_div_dm, L_00, L_in
          logical :: test_partials
 
          include 'formats'
@@ -3422,12 +3392,12 @@
          dm = s% dm(k)
          dt_div_dm = dt/dm
          DV = s% Vol(k) - s% Vol_start(k)
-         Pt_tw = THETAT*s% Pt(k) + THETAT1*s% Pt_start(k)
+         Ptrb_tw = THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k)
 
          residual = &
             (s% RSP_w(k)**2 - s% RSP_w_start(k)**2) &
             + dt_div_dm*(L_00 - L_in) &
-            + DV*Pt_tw &
+            + DV*Ptrb_tw &
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
          HR(IW) = -residual
          
@@ -3438,7 +3408,7 @@
             - dt*GAM*dC_dw_00(I) &
             - dt*dEq_dw_00(I) &
             + dt_div_dm*WTT*(dLt_00_dw_00 - dLt_in_dw_00) &
-            + DV*THETAT*dPt_dw_00(I)
+            + DV*THETAT*dPtrb_dw_00(I)
          HD(i_w_dw_out,IW) = dt_div_dm*WTT*dLt_00_dw_out  
          HD(i_w_dw_out2,IW) = 0.d0           
 
@@ -3450,14 +3420,14 @@
             - dt*GAM*dC_dr_in(I) &  
             - dt*dEq_dr_in(I) &
             + dt_div_dm*WTT*(dLt_00_dr_in - dLt_in_dr_in) &
-            + DV*THETAT*dPt_dr_in(I) &
-            + (THETAT*s% Pt(k) + THETAT1*s% Pt_start(k))*dVol_dr_in(I)
+            + DV*THETAT*dPtrb_dr_in(I) &
+            + (THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k))*dVol_dr_in(I)
          HD(i_w_dr_00,IW) = &
             - dt*GAM*dC_dr_00(I) & 
             - dt*dEq_dr_00(I) &
             + dt_div_dm*WTT*(dLt_00_dr_00 - dLt_in_dr_00) &
-            + DV*THETAT*dPt_dr_00(I) &
-            + (THETAT*s% Pt(k) + THETAT1*s% Pt_start(k))*dVol_dr_00(I)
+            + DV*THETAT*dPtrb_dr_00(I) &
+            + (THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k))*dVol_dr_00(I)
          HD(i_w_dr_out,IW) = &
             - dt*GAM*dC_dr_out(I) &   
             + dt_div_dm*WTT*dLt_00_dr_out &

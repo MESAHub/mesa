@@ -170,7 +170,7 @@
          DLCYP,DLCZ0,DLCZP, &
          DLTXM,DLTX0,DLTXP,DLTY0, &
          DLTYP,DLTZ0,DLTZP,Lt, &
-         PTURB,dPt_dw_00,dPt_dr_00,dPt_dr_in
+         PTURB,dPtrb_dw_00,dPtrb_dr_00,dPtrb_dr_in
       
       real(dp) :: T1,DLR,DLRP,DLRM,DLT,DLTP,DLMR,DLMRP,DLMRM,DLMT,DLMTP
       real(dp) :: W_00,W_out,BW,BK,T2,T3,DLK,DLKP,SVEL,T_0
@@ -239,7 +239,7 @@
          DLCYP(n),DLCZ0(n),DLCZP(n), &
          DLTXM(n),DLTX0(n),DLTXP(n),DLTY0(n), &
          DLTYP(n),DLTZ0(n),DLTZP(n),Lt(n), &
-         PTURB(n),dPt_dw_00(n),dPt_dr_00(n),dPt_dr_in(n))
+         PTURB(n),dPtrb_dw_00(n),dPtrb_dr_00(n),dPtrb_dr_in(n))
 
 !     STORE SOME VALUES FOR FURTHER COMPARISON
       MSTAR  = M(NZN)
@@ -911,23 +911,23 @@
       do I=IBOTOM+1,NZN-1
          if(ALFAP.eq.0.d0)then
             PTURB(I) = 0.d0
-            dPt_dw_00(I) = 0.d0
-            dPt_dr_00(I) = 0.d0
-            dPt_dr_in(I) = 0.d0
+            dPtrb_dw_00(I) = 0.d0
+            dPtrb_dr_00(I) = 0.d0
+            dPtrb_dr_in(I) = 0.d0
          else
             PTURB(I) =  ALFAP*Et(I)/Vol(I)
-            dPt_dw_00(I) =  ALFAP/Vol(I)
+            dPtrb_dw_00(I) =  ALFAP/Vol(I)
             TEM1=-ALFAP*Et(I)/Vol(I)**2
-            dPt_dr_00(I) = TEM1*DVR(I)
-            dPt_dr_in(I) = TEM1*DVRM(I)
+            dPtrb_dr_00(I) = TEM1*DVR(I)
+            dPtrb_dr_in(I) = TEM1*DVRM(I)
          endif
       enddo
 
       do I=1,IBOTOM
          PTURB(I)= 0.d0
-         dPt_dw_00(I)= 0.d0
-         dPt_dr_00(I)= 0.d0
-         dPt_dr_in(I)= 0.d0
+         dPtrb_dw_00(I)= 0.d0
+         dPtrb_dr_00(I)= 0.d0
+         dPtrb_dr_in(I)= 0.d0
          dC_dr_00(I) = 0.d0
          dC_dr_out(I) = 0.d0
          dC_dr_in(I) = 0.d0
@@ -954,9 +954,9 @@
          DLTZP(I)= 0.d0
       enddo
       PTURB(NZN)= 0.d0
-      dPt_dw_00(NZN)= 0.d0
-      dPt_dr_00(NZN)= 0.d0
-      dPt_dr_in(NZN)= 0.d0
+      dPtrb_dw_00(NZN)= 0.d0
+      dPtrb_dr_00(NZN)= 0.d0
+      dPtrb_dr_in(NZN)= 0.d0
       DLCX0(NZN)= 0.d0
       DLCXM(NZN)= 0.d0
       DLCXP(NZN)= 0.d0
@@ -1072,18 +1072,18 @@
             HR(IR)=-T1*(P(I+1)-P(I)+PTURB(I+1)-PTURB(I))+G*M(I)/R(I)**2
          end if
          !write(*,*) 'momentum', I, HR(IR)
-         HD(3,IR) = +T1*(-dP_dr_in(I)-dPt_dr_in(I))  !X(i-1)
+         HD(3,IR) = +T1*(-dP_dr_in(I)-dPtrb_dr_in(I))  !X(i-1)
          HD(4,IR) = +T1*(-dP_dT_00(I))            !Y(i)
 
          HD(2,IR) = 0.d0                     !Z(i-1)
-         HD(5,IR) = +T1*(-dPt_dw_00(I))          !Z(i)
-         HD(8,IR) = +T1*(dPt_dw_00(I+1))         !Z(i+1)
+         HD(5,IR) = +T1*(-dPtrb_dw_00(I))          !Z(i)
+         HD(8,IR) = +T1*(dPtrb_dw_00(I+1))         !Z(i+1)
 
          if(I.eq.NZN) goto 111
-         HD(6,IR) = +T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPt_dr_in(I+1)-dPt_dr_00(I))+ &
+         HD(6,IR) = +T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))+ &
                     4.d0*G*M(I)/(R(I)**3)    !X(i)
          HD(7,IR) = +T1*(dP_dT_00(I+1))           !Y(i+1)
-         HD(9,IR) = +T1*(dP_dr_00(I+1)+dPt_dr_00(I+1))!X(i+1)
+         HD(9,IR) = +T1*(dP_dr_00(I+1)+dPtrb_dr_00(I+1))!X(i+1)
          goto 112
  111     HD(7,IR)=  0.d0
          HD(9,IR)=  0.d0

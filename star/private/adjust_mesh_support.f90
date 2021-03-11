@@ -105,7 +105,7 @@
             if (s% mesh_Pgas_div_P_exponent /= 0) then
                P_exp = s% mesh_Pgas_div_P_exponent
                do k=1,nz
-                  beta = s% Pgas(k)/s% P(k)
+                  beta = s% Pgas(k)/s% Peos(k)
                   delta_gval_max(k) = delta_gval_max(k)*pow(beta,P_exp)
                end do
             end if
@@ -203,7 +203,7 @@
             do k=2, nz
                if (s% xa(j,k) < X_min_for_extra .or. s% xa(j,k-1) < X_min_for_extra) cycle
                dlogX = abs(log10(s% xa(j,k)/s% xa(j,k-1)))
-               dlogP = max(1d-10, abs(s% lnP(k) - s% lnP(k-1))*ln10)
+               dlogP = max(1d-10, abs(s% lnPeos(k) - s% lnPeos(k-1))*ln10)
                dlogX_dlogP = dlogX/dlogP
                if (dlogX_dlogP <= dlogX_dlogP_full_off) cycle
                if (dlogX_dlogP >= dlogX_dlogP_full_on) then
@@ -244,7 +244,7 @@
                maxv = maxval(s% eps_nuc_categories(:,k))
                if (maxv /= eps) cycle
 
-               dlogP = (s% lnP(k) - s% lnP(k-1))/ln10
+               dlogP = (s% lnPeos(k) - s% lnPeos(k-1))/ln10
                if (abs(dlogP) < 1d-50) cycle
 
                dlog_eps = abs(log10(eps/epsm1))

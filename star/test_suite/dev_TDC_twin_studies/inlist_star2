@@ -1,13 +1,9 @@
 
 &star_job
 
-   load_saved_model = .true.
    change_initial_TDC_flag = .true.
    new_TDC_flag = .true.
    
-   save_model_when_terminate = .true.
-   save_model_filename = 'tdc_final.mod'
-
    pgstar_flag = .true.
 
 / ! end of star_job namelist
@@ -19,29 +15,92 @@
 / ! end of kap namelist
 
 &controls  
+   
+   max_number_retries = 100
 
-   max_number_retries = 0
+! TDC
+
+   ! for consistency with MLT, use same alfa and set TDC_alfap and TDC_alfar to 0.
+
+   TDC_alfa  =     1.8d0         ! mixing length; alfa = 0 gives a purely radiative model.
    
-! solver      
+   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+   TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
    
+   TDC_alfat =     0.00d0        ! turbulent flux; Lt ~ TDC_alfat
+   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
+
+   TDC_num_outermost_cells_forced_nonturbulent = 0 ! 1
+   TDC_num_innermost_cells_forced_nonturbulent = 0 ! 5
+
+   TDC_use_RSP_eqn_for_Y_face = .false.
+   TDC_use_mass_interp_face_values = .true.
+   TDC_source_seed = 1d-2
+
+   TDC_Lsurf_factor = 0.25d0
+   
+   Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+   Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+
+! starting specifications
+
+! when to stop
+
+! wind
+
+! atmosphere
+
+! rotation
+
+! element diffusion
+
+! mlt
+
+! mixing
+
+! timesteps
+
+! mesh
+
+! solver
+   steps_before_use_gold2_tolerances = 10
+   steps_before_use_gold_tolerances = 10
+   use_gold2_tolerances = .false.
+   use_gold_tolerances = .false.
+   
+   !steps_before_use_velocity_time_centering = 0
+   !include_P_in_velocity_time_centering = .true.
+   !include_L_in_velocity_time_centering = .true.
+   !use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .true.
+   
+   !use_fixed_Psurf_outer_BC = .true.
+   !fixed_Psurf = 0
+
+   use_momentum_outer_BC = .true.
+   
+   !TDC_use_Stellingwerf_Lr = .false.
+   
+   !alt_scale_height_flag = .false.
+   alt_scale_height_flag = .true.
+
 ! output
-   photo_interval = 1000
-   !profile_interval = 1
-   !history_interval = 1
-   terminal_interval = 100
 
-   photo_interval = 500
-   !profile_interval = 1
-   !history_interval = 1
-   terminal_interval = 50
-
-   !fill_arrays_with_NaNs = .true.
+   photo_directory = 'photos2'
+   log_directory = 'LOGS2'
+      
+      
+      !photo_interval = 1
+      !profile_interval = 1
+      !history_interval = 1
+      !terminal_interval = 1
 
 ! FOR DEBUGGING
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
+      !trace_evolve = .true.
+      !fill_arrays_with_NaNs = .true.
 
       !solver_save_photo_call_number = 0
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
@@ -70,10 +129,9 @@
       
       !solver_test_eos_partials = .true.
       !solver_test_kap_partials = .true.
-      !solver_test_nTDC_partials = .true.
+      !solver_test_net_partials = .true.
       !solver_test_atm_partials = .true.
 
-      !report_why_dt_limits = .true.
       !report_all_dt_limits = .true.
       !report_solver_dt_info = .true.
       
@@ -83,12 +141,9 @@
       
       !energy_conservation_dump_model_number = -1
       
-      !trace_evolve = .true.
-      
       !use_DGESVX_in_bcyclic = .true.
       !use_equilibration_in_DGESVX = .true.
       !report_min_rcond_from_DGESXV = .true.
-
 
       ! solver debugging
       !solver_check_everything = .true.
@@ -106,15 +161,17 @@
 &pgstar
 
    !pause = .true.
-   !pause_interval = 100
-   pgstar_interval = 10 ! 20
+   !pause_interval = 10
+   pgstar_interval = 2
+
+   !Profile_Panels1_xmin = 25 ! -101D0
+   !Profile_Panels1_xmax = 65 ! -101D0
+
+   Grid2_title = 'TDC twin study'
    
    !Grid2_file_flag = .true.
    Grid2_file_dir = 'png2'
-   Grid2_file_prefix = 'TDC'
+   Grid2_file_prefix = 'star2'
    Grid2_file_interval = 10 ! output when mod(model_number,Grid2_file_interval)==0
-   
-   Profile_Panels1_xmin = -101D0
-   Profile_Panels1_xmax = 140 ! -101D0
 
 / ! end of pgstar namelist

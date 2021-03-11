@@ -1250,7 +1250,7 @@
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var_xa_index > 0) then 
-               dvardx0_00 = s% Pgas(k)/s% P(k) * &
+               dvardx0_00 = s% Pgas(k)/s% Peos(k) * &
                   (s% d_eos_dxa(i_lnPgas,i_var_xa_index,k) - s% d_eos_dxa(i_lnPgas,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% chiRho_for_partials(k)
@@ -1597,7 +1597,7 @@
             else if (i_equ == -3) then
                val = s% opacity(k)
             else if (i_equ == -4) then
-               val = s% lnP(k)
+               val = s% lnPeos(k)
             else if (i_equ == -5) then
                val = s% non_nuc_neu(k)
             else if (i_equ == -6) then

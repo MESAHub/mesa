@@ -1933,7 +1933,7 @@
                val = if_rot(s% rotational_mdot_boost)
 
             case(h_min_Pgas_div_P)
-               val = minval(s% Pgas(1:nz)/s% P(1:nz))
+               val = minval(s% Pgas(1:nz)/s% Peos(1:nz))
 
             case(h_center_degeneracy)
                val = s% center_degeneracy
@@ -2382,9 +2382,9 @@
             case(h_surface_cell_entropy)
                val = s% entropy(1)
             case(h_log_surf_cell_P)
-               val = s% lnP(1)/ln10
+               val = s% lnPeos(1)/ln10
             case(h_log_surf_cell_pressure)
-               val = s% lnP(1)/ln10
+               val = s% lnPeos(1)/ln10
             case(h_log_surf_cell_z)
                val = 0
                if (s% net_iso(ih1) /= 0) val = val + s% xa(s% net_iso(ih1),1)
@@ -2479,7 +2479,7 @@
             case(h_cz_logP)
                if (s% largest_conv_mixing_region /= 0) then
                   k = s% mixing_region_bottom(s% largest_conv_mixing_region)
-                  val = s% lnP(k)/ln10
+                  val = s% lnPeos(k)/ln10
                end if
             case(h_cz_log_column_depth)
                if (s% largest_conv_mixing_region /= 0) then
@@ -2605,7 +2605,7 @@
             case(h_cz_top_logP)
                if (s% largest_conv_mixing_region /= 0) then
                   k = s% mixing_region_top(s% largest_conv_mixing_region)
-                  val = s% lnP(k)/ln10
+                  val = s% lnPeos(k)/ln10
                end if
             case(h_cz_top_log_column_depth)
                if (s% largest_conv_mixing_region /= 0) then

@@ -459,22 +459,14 @@
             end if
 
             if (do_etrb) then
-               s% etrb(k) = max(x(i_etrb),0d0)
+               s% etrb(k) = x(i_etrb)
                s% dxh_etrb(k) = s% solver_dx(i_etrb,k)
-               s% w(k) = sqrt(s% etrb(k))
-               if (is_bad_num(s% w(k))) then
-                  s% retry_message = 'bad num for w'
-                  if (report) write(*,2) 'bad num w', k, s% w(k)
+               if (is_bad_num(s% etrb(k))) then
+                  s% retry_message = 'bad num for etrb'
                   ierr = -1
                   if (s% stop_for_bad_nums) then
-!$omp critical (set_vars_for_solver_crit1)
-                     write(*,2) 'set_vars_for_solver w', k, s% w(k)
                      write(*,2) 'set_vars_for_solver etrb', k, s% etrb(k)
-                     write(*,2) 'set_vars_for_solver etrb_start', k, s% etrb_start(k)
-                     write(*,2) 'set_vars_for_solver xh_start', k, xh_start(i_etrb,k)
-                     write(*,2) 'set_vars_for_solver dx', k, s% solver_dx(i_etrb,k)
                      stop 'set_vars_for_solver'
-!$omp end critical (set_vars_for_solver_crit1)
                   end if
                   if (report) write(*,2) 'bad num etrb', k, s% etrb(k)
                end if

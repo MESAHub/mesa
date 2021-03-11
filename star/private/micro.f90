@@ -99,13 +99,13 @@ contains
     do k=nzlo, nzhi
        if (k == 1) then
           s% rho_face(k) = s% rho(k)
-          if (.not. s% u_flag) s% P_face_ad(k)%val = s% P(k)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = s% Peos(k)
           s% csound_face(1) = s% csound(1)
        else
           alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
           beta = 1 - alfa
           s% rho_face(k) = alfa*s% rho(k) + beta*s% rho(k-1)
-          if (.not. s% u_flag) s% P_face_ad(k)%val = alfa*s% P(k) + beta*s% P(k-1)
+          if (.not. s% u_flag) s% P_face_ad(k)%val = alfa*s% Peos(k) + beta*s% Peos(k-1)
           s% csound_face(k) = alfa*s% csound(k) + beta*s% csound(k-1)
        end if
     end do
@@ -426,8 +426,8 @@ contains
        return
     end if
     s% Prad(k) = crad * T*T*T*T / 3
-    s% P(k) = s% Prad(k) + s% Pgas(k)
-    s% lnP(k) = log(s% P(k))
+    s% Peos(k) = s% Prad(k) + s% Pgas(k)
+    s% lnPeos(k) = log(s% Peos(k))
     s% lnS(k) = res(i_lnS)
     s% lnE(k) = res(i_lnE)
     s% energy(k) = exp(s% lnE(k))
@@ -457,15 +457,15 @@ contains
     s% eos_frac_FreeEOS(k) = res(i_frac_FreeEOS)
     s% eos_frac_CMS(k) = res(i_frac_CMS)
 
-    s% chiRho_for_partials(k) = s% Pgas(k)*d_dlnd(i_lnPgas)/s% P(k)
-    s% chiT_for_partials(k) = (s% Pgas(k)*d_dlnT(i_lnPgas) + 4d0*s% Prad(k))/s% P(k)
+    s% chiRho_for_partials(k) = s% Pgas(k)*d_dlnd(i_lnPgas)/s% Peos(k)
+    s% chiT_for_partials(k) = (s% Pgas(k)*d_dlnT(i_lnPgas) + 4d0*s% Prad(k))/s% Peos(k)
     s% dE_drho_for_partials(k) = d_dlnd(i_lnE)*s% energy(k)/s% rho(k)
     s% Cv_for_partials(k) = d_dlnT(i_lnE)*s% energy(k)/s% T(k)
     s% dS_drho_for_partials(k) = d_dlnd(i_lnS)*s% entropy(k)/s% rho(k)
     s% dS_dT_for_partials(k) = d_dlnT(i_lnS)*s% entropy(k)/s% T(k)
     do j=1, s% species
        s% dlnE_dxa_for_partials(j,k) = d_dxa(i_lnE,j)
-       s% dlnP_dxa_for_partials(j,k) = s% Pgas(k)*d_dxa(i_lnPgas,j)/s% P(k)
+       s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*d_dxa(i_lnPgas,j)/s% Peos(k)
     end do
     
     s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
@@ -489,9 +489,9 @@ contains
           !$OMP critical (micro_crit1)
           write(*,2) 's% cp(k)', k, s% cp(k)
           write(*,2) 's% csound(k)', k, s% csound(k)
-          write(*,2) 's% lnP(k)', k, s% lnP(k)
+          write(*,2) 's% lnPeos(k)', k, s% lnPeos(k)
           write(*,2) 's% gam(k)', k, s% gam(k)
-          write(*,2) 's% P(k)', k, s% P(k)
+          write(*,2) 's% Peos(k)', k, s% Peos(k)
           write(*,2) 's% Pgas(k)', k, s% Pgas(k)
           write(*,2) 's% rho(k)', k, s% rho(k)
           write(*,2) 's% T(k)', k, s% T(k)

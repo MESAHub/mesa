@@ -2998,7 +2998,7 @@
       !   RSP_theta =      0.5d0        ! Pgas and Prad
       !   RSP_thetat =     0.5d0        ! Pturb
       !   RSP_thetae =     0.5d0        ! erad in terms using f_Edd
-      !   RSP_thetaq =     1.0d0        ! avQ
+      !   RSP_thetaq =     1.0d0        ! Pvsc
       !   RSP_thetau =     1.0d0        ! Eq and Uq
       !   RSP_wtr =        0.6667d0     ! Lr
       !   RSP_wtc =        0.6667d0     ! Lc
@@ -4098,21 +4098,6 @@
       ! See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       ! ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       ! ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
-      ! + ``'fixed_Teff'`` :
-      ! set Tsurf from Eddington T(tau) relation
-      !     for current surface tau and Teff = ``atm_fixed_Teff``.
-      ! set Psurf = Radiation_Pressure(Tsurf)
-      ! + ``'fixed_Tsurf'`` :
-      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
-      ! set Teff from Eddington T(tau) relation for given Tsurf and tau=2/3
-      ! set Psurf = Radiation_Pressure(Tsurf)
-      ! + ``'fixed_Psurf'`` :
-      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
-      ! set Tsurf from L and R using ``L = 4*pi*R^2*boltz_sigma*T^4``.
-      ! set Teff using Eddington T(tau) relation for tau=2/3 and T=Tsurf.
-      ! + ``'fixed_Psurf_and_Tsurf'`` :
-      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
-      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
 
       ! ::
 
@@ -4399,30 +4384,6 @@
     atm_irradiated_P_surf = 1d6
 
 
-      ! use_atm_PT_at_center_of_surface_cell
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! The surface boundary conditions for pressure and temperature,
-      ! compare the model values at the center of the surface cell to
-      ! values derived from the P and T returned by the atm module.
-      ! If this flag is true, then the atm values are directly used.
-      ! If false, then the values from the atm are treated as being
-      ! for the outer boundary of the surface cell, and those values
-      ! are used to estimate corresponding values for the cell center
-      ! for comparison to the model values at the cell center.
-
-      ! Most cases will have this flag false.
-      ! An example that sets this flag true is a case in which are
-      ! using a special boundary condition (BC) routine to force
-      ! a certain entropy for the surface cell.  In that situation,
-      ! it is better to have the special BC directly return P and T
-      ! for the center of cell 1 to produce the desired entropy.
-
-      ! ::
-
-    use_atm_PT_at_center_of_surface_cell = .false.
-
-
       ! use_compression_outer_BC
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4461,16 +4422,6 @@
       ! ::
 
     use_zero_Pgas_outer_BC = .false.
-
-
-      ! use_zero_dLdm_outer_BC
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! use L(1) = L(2) for T outer BC
-
-      ! ::
-
-    use_zero_dLdm_outer_BC = .false.
 
 
       ! use_fixed_vsurf_outer_BC
@@ -7932,9 +7883,9 @@
       ! include_P_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! use_Fraley_PdV_work_when_time_centering_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -7949,10 +7900,12 @@
     steps_before_use_velocity_time_centering = -1
     include_P_in_velocity_time_centering = .false.
     include_L_in_velocity_time_centering = .false.
-    use_Fraley_PdV_work_when_time_centering_velocity = .false.
+    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
 
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! These are for alternatives ways to determine the T gradient.
@@ -7970,6 +7923,11 @@
       ! The alternatives forms are for dynamic situations where
       ! the use of hydrostatic dP/dm is inappropriate.
       ! In order of priority,
+      
+      ! ::
+      !     if (use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn)
+      !        equation is gradT(k)*(lnPeos(k-1) - lnPeos(k)) = lnT(k-1) - lnT(k)
+      !     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
 
       ! ::
 
@@ -7988,6 +7946,11 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+    
+    
+    
+    
 
       ! for hydro comparison tests (e.g., Sedov)
 
@@ -8829,14 +8792,14 @@
       ! artificial viscosity
 
 
-      ! use_avQ_art_visc
+      ! use_Pvsc_art_visc
       ! ~~~~~~~~~~~~~~~~
-      ! avQ_cq
+      ! Pvsc_cq
       ! ~~~~~~
-      ! avQ_zsh
+      ! Pvsc_zsh
       ! ~~~~~~~
 
-      ! avQ is artificial pressure to push back against compression
+      ! Pvsc is artificial pressure to push back against compression
       ! this is the form of artificial viscosity used in RSP
       ! if using this, do not set use_artificial_viscosity true.
 
@@ -8853,15 +8816,15 @@
 
       ! ::
 
-    use_avQ_art_visc = .false.
-    avQ_cq = 4.0d0
-    avQ_zsh = 0.1d0
+    use_Pvsc_art_visc = .false.
+    Pvsc_cq = 4.0d0
+    Pvsc_zsh = 0.1d0
 
 
       ! use_artificial_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! use_artificial_viscosity has been replaced by use_avQ_art_visc.
+      ! use_artificial_viscosity has been replaced by use_Pvsc_art_visc.
 
 ! split burn
 ! ==========
@@ -9057,6 +9020,29 @@
     min_timestep_factor = 0.8d0
 
 
+      ! force_timestep
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! In seconds.  ``force_timestep <= 0`` means no forced timestep.
+
+      ! ::
+
+    force_timestep = 0
+
+
+      ! force_timestep_years
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Note: ``force_timestep`` is the control that is used by most of the code.
+      ! ``force_timestep_years`` is just provided as a convenience.
+      ! At the start of each step, the evolve routine checks if ``force_timestep_years > 0``,
+      ! and if so, it sets ``force_timestep = force_timestep_years*secyer``.
+
+      ! ::
+
+    force_timestep_years = 0
+
+
       ! force_timestep_min
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -9070,7 +9056,6 @@
       ! force_timestep_min_years
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! ``force_timestep_min_years <= 0`` means no forced lower limit.
       ! Note: ``force_timestep_min`` is the control that is used by most of the code.
       ! ``force_timestep_min_years`` is just provided as a convenience.
       ! At the start of each step, the evolve routine checks if ``force_timestep_min_years > 0``,

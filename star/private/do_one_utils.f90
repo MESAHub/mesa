@@ -695,7 +695,7 @@
          min_pgas_div_p = 1d99
          do k = s% nz, 1, -1
             if (s% q(k) > s% Pgas_div_P_limit_max_q) exit
-            if (s% pgas(k)/s% p(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% p(k)
+            if (s% pgas(k)/s% Peos(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% Peos(k)
          end do
          
          max_omega_div_omega_crit = 0; k_omega = 0

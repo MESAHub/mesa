@@ -81,11 +81,11 @@ contains
        grad_mu(1) = 0d0
 
        do k = 2, s%nz-1
-          grad_mu(k) = log(s%mu(k)/s%mu(k-1))/log(s%P(k)/s%P(k-1))
+          grad_mu(k) = log(s%mu(k)/s%mu(k-1))/log(s%Peos(k)/s%Peos(k-1))
        end do
 
        if (include_last_face) then
-          grad_mu(k) = log(s%mu(s%nz)/s%mu(s%nz-1))/log(s%P(s%nz)/s%P(s%nz-1))
+          grad_mu(k) = log(s%mu(s%nz)/s%mu(s%nz-1))/log(s%Peos(s%nz)/s%Peos(s%nz-1))
        else
           grad_mu(k) = 0d0
        endif

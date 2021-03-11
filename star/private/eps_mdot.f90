@@ -554,7 +554,7 @@
          !$OMP PARALLEL DO
          do j=1,nz+1
             ! We use the previous mesh for interpolation because that's the one for which our derivatives were calculated.
-            p_bar(j) = interpolate_onto_faces(s%p, prev_mesh_dm, nz, j) 
+            p_bar(j) = interpolate_onto_faces(s%Peos, prev_mesh_dm, nz, j) 
             rho_bar(j) = interpolate_onto_faces(s%rho, prev_mesh_dm, nz, j) 
             te_bar(j) = interpolate_onto_faces(te, prev_mesh_dm, nz, j) 
          end do

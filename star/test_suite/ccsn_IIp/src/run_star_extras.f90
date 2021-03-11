@@ -764,7 +764,7 @@
                logP_tol = 1d-8
                k = kk
                write(*,*)
-               write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% P(k), &
+               write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% Peos(k), &
                   log10(s% r(k)/Rsun), s% u(k)
                do k = kk-1, 1, -1
                   r = s% r(k+1) + 0.5d0*(s% r(k+1) - s% r(k+2))
@@ -789,7 +789,7 @@
          
                   if (.true.) then ! set T to give P for HSE
                      r = s% r(k+1)
-                     P_hse = s% P(k+1) - &
+                     P_hse = s% Peos(k+1) - &
                         s% cgrav(k+1)*s% m(k+1)*(s% dm(k+1)+s% dm(k))/(8*pi*r*r*r*r)
                      Z = max(0d0, min(1d0, 1d0 - (s% X(k) + s% Y(k))))
                      logT_guess = s% lnT(k+1)/ln10
@@ -821,7 +821,7 @@
                   end if
                   s% xh(s% i_lum,k) = s% L(k)
 
-                  write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% P(k), &
+                  write(*,2) 'T rho P logR u', k, s% T(k), s% rho(k), s% Peos(k), &
                      log10(s% r(k)/Rsun), s% u(k)
                end do
                write(*,*)

@@ -195,7 +195,7 @@
       rsp_dampR
       rsp_Hp_face
       rsp_Y_face
-      rsp_avQ
+      rsp_Pvsc
       !rsp_gvisc
       !rsp_gvisc_div_g
       rsp_Chi

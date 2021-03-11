@@ -452,8 +452,9 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if (s% steps_before_use_velocity_time_centering >= 0 .and. &
-                s% model_number > s% steps_before_use_velocity_time_centering) &
+            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
+                (s% steps_before_use_velocity_time_centering > 0 .and. &
+                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
                s% using_velocity_time_centering = .true.
          end if
          
@@ -1138,7 +1139,7 @@
             grada = alfa*s% grada(k) + beta*s% grada(k-1)
             Pgas = alfa*s% Pgas(k) + beta*s% Pgas(k-1)
             Prad = alfa*s% Prad(k) + beta*s% Prad(k-1)
-            P = alfa*s% P(k) + beta*s% P(k-1)
+            P = alfa*s% Peos(k) + beta*s% Peos(k-1)
             opacity = alfa*s% opacity(k) + beta*s% opacity(k-1)
 
             write(*,2) 'at end of step', s% model_number
@@ -1235,7 +1236,7 @@
                s% total_eps_mdot = dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             end if
                
-            virial = 3*sum(s% dm(1:nz)*s% P(1:nz)/s% rho(1:nz))
+            virial = 3*sum(s% dm(1:nz)*s% Peos(1:nz)/s% rho(1:nz))
             s% virial_thm_P_avg = virial
 
             s% total_eps_grav = dt*dot_product(s% dm(1:nz), s% eps_grav(1:nz))
@@ -1859,7 +1860,8 @@
          type (star_info), pointer :: s
 
          integer :: ierr, k, j, k0_old, k1_old, k0_new, k1_new
-         real(dp) :: total_energy, force_timestep_min, delta_E, sum_delta_E, total_radiation
+         real(dp) :: total_energy, force_timestep_min, delta_E, sum_delta_E, &
+            force_timestep, total_radiation
          real(dp), pointer :: energy_profile_after_remesh(:)
          logical :: trace
 
@@ -1922,7 +1924,7 @@
          
          call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
          if (failed('set_vars_if_needed ierr')) return
-         call set_phot_info(s)
+         call set_phot_info(s) ! this sets Teff and other stuff
          
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
@@ -1945,6 +1947,7 @@
          end if
          
          s% dt = s% dt_next
+            
          force_timestep_min = s% force_timestep_min
          if (force_timestep_min == 0) &
             force_timestep_min = secyer*s% force_timestep_min_years
@@ -1952,6 +1955,12 @@
             s% dt = min(s% dt*s% force_timestep_min_factor, force_timestep_min)
             write(*,2) 'force increase in timestep', s% model_number, s% dt
          end if
+         
+         force_timestep = s% force_timestep
+         if (force_timestep == 0) &
+            force_timestep = secyer*s% force_timestep_years
+         if (force_timestep > 0) s% dt = force_timestep
+         
          s% dt_start = s% dt
          
          if (is_bad(s% dt)) then

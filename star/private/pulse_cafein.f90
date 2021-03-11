@@ -127,7 +127,7 @@ contains
     M_star = s%m_grav(1)
     R_star = Rsun*s%photosphere_r
 
-    P_c = eval_center(s%rmid, s%P, 1, s%nz)
+    P_c = eval_center(s%rmid, s%Peos, 1, s%nz)
     T_c = eval_center(s%rmid, s%T, 1, s%nz)
     rho_c = eval_center(s%rmid, s%rho, 1, s%nz)
 
@@ -460,7 +460,7 @@ contains
         else
            rho = eval_face_rho(s, k, 1, s%nz)
         end if
-        P = eval_face(s%dq, s%P, k, 1, s%nz)
+        P = eval_face(s%dq, s%Peos, k, 1, s%nz)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
 
         logrho = log10(rho)
@@ -578,7 +578,7 @@ contains
         else
            rho = eval_center_rho(s, s%nz)
         end if
-        P = eval_center(s%rmid, s%P, 1, s%nz)
+        P = eval_center(s%rmid, s%Peos, 1, s%nz)
         T = eval_center(s%rmid, s%T, 1, s%nz)
 
         logrho = log10(rho)
