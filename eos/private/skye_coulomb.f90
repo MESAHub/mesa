@@ -7,7 +7,6 @@ module skye_coulomb
 
    implicit none
 
-   real(dp), parameter :: AUM = amu / me
    logical, parameter :: dbg = .false.
    !logical, parameter :: dbg = .true.
 
@@ -212,7 +211,7 @@ module skye_coulomb
 
       ! Intermediates and constants
       integer :: i,j
-      type(auto_diff_real_2var_order3) :: GAMI, COTPT, TPT, FMIX, f
+      type(auto_diff_real_2var_order3) :: FMIX, f
       real(dp), parameter :: TINY=1.d-7
 
       ! Output
@@ -224,16 +223,12 @@ module skye_coulomb
       do i=1,nmix
          if (AY(i) > TINY .and. AZion(i) /= 0d0) then ! skip low-abundance species and neutrons
 
-            GAMI = pow(AZion(i),5d0/3d0) * GAME
-            COTPT=sqrt(3d0/AUM/ACMI(i))/pow(AZion(i),7d0/6d0) ! auxiliary coefficient
-            TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
-
             ! Add up non-ideal corrections
             f = extrapolate_free_energy(LIQSOL, temp, RS, AZion(i), ACMI(i), min_gamma_for_solid, max_gamma_for_liquid)
             if (LIQSOL == 0) then
-               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAMI, TPT) ! screening corrections
+               f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
             else
-               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i)*AMU, GAMI, TPT) ! screening corrections
+               f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
             end if               
             dF = dF + AY(i) * f
 
@@ -275,8 +270,8 @@ module skye_coulomb
       type(auto_diff_real_2var_order3) :: F
 
       GAMI = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp * RS) ! ion Coulomb parameter Gamma_i
-      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
-      TPT=GAMI/sqrt(RS)*COTPT                   ! T_p/T
+      COTPT=sqrt(3d0 * me_in_amu / CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
+      TPT=GAMI*COTPT/sqrt(RS)                   ! T_p/T
 
       if ((LIQSOL == 0 .and. GAMI < max_gamma_for_liquid) .or. (LIQSOL == 1 .and. GAMI > min_gamma_for_solid)) then
          ! No extrapolation needed
@@ -305,7 +300,7 @@ module skye_coulomb
 
          ! Compute new (differentiable) Gamma and TPT at the boundary
          g = pow(Zion,5d0/3d0) * qe * qe / (rbohr * boltzm * temp_boundary * RS) ! ion Coulomb parameter Gamma_i
-         tp=g/sqrt(RS)*COTPT                   ! T_p/T
+         tp=g*COTPT/sqrt(RS)                  ! T_p/T
 
          ! Compute boundary free energy
          F = ocp_free_energy(LIQSOL, Zion, CMI, g, tp)
@@ -364,24 +359,15 @@ module skye_coulomb
       integer, intent(in) :: LIQSOL
       type(auto_diff_real_2var_order3), intent(in) :: GAMI, TPT
 
-      ! Intermediates
-      type(auto_diff_real_2var_order3) :: RS, COTPT
-
       ! Output
       type(auto_diff_real_2var_order3) :: F
-
-      COTPT=sqrt(3d0/AUM/CMI)/pow(Zion,7d0/6d0) ! auxiliary coefficient
-      RS = GAMI * COTPT / TPT ! Electron sphere radius / Bohr radius
-
 
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
-         !F = F + screening_factor * ocp_liquid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       else     
          F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
-         !F = F + screening_factor * ocp_solid_screening_free_energy_correction(Zion, CMI*AMU, GAMI, TPT) ! screening corrections
       endif
 
    end function ocp_free_energy
@@ -403,7 +389,7 @@ module skye_coulomb
       type(auto_diff_real_2var_order3) :: CHT1, SHT1, CHT2, SHT2
       type(auto_diff_real_2var_order3) :: T1, T2
       type(auto_diff_real_2var_order3) :: A0, A1, A, B0, B1, B
-      type(auto_diff_real_2var_order3) :: C, CDH, CDHH, C3, C3DH, C3DHH
+      type(auto_diff_real_2var_order3) :: C, C3
       type(auto_diff_real_2var_order3) :: D0, D1, D, E0, E1, E
       type(auto_diff_real_2var_order3) :: DISCR, SQGE
       type(auto_diff_real_2var_order3) :: B2, B3, R3, S1, S2, S3, B4, C4
