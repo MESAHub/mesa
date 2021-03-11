@@ -176,7 +176,7 @@ module skye_coulomb_solid
          gr = sqrt(1d0 + pow2(xr))
          alpha = 3d0 * pow(4d0 / (9d0 * pi), 2d0/3d0) * (rs / ge) * gr
 
-         Fliq = ocp_liquid_screening_free_energy_correction(Z, mi, g, TPT)
+         Fliq = ocp_liquid_screening_free_energy_correction(Z, mi, ge, rs)
 
          switch = pow3(tanh(2d0*alpha))
          F = switch * Fliq + (1d0 - switch) * F
