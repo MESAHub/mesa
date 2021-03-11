@@ -342,7 +342,7 @@
     include_composition_in_eps_grav, max_eta_for_dedt_form_of_energy_eqn, no_dedt_form_during_relax, &
     max_abs_rel_change_surf_lnS, always_use_eps_grav_form_of_energy_eqn, &
     max_num_surf_revisions, Gamma_lnS_eps_grav_full_off, Gamma_lnS_eps_grav_full_on, &
-    use_dPrad_dm_form_of_T_gradient_eqn, dedt_eqn_r_scale, &
+    use_dPrad_dm_form_of_T_gradient_eqn, use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, dedt_eqn_r_scale, &
     RTI_A, RTI_B, RTI_C, RTI_D, RTI_max_alpha, RTI_C_X_factor, RTI_C_X0_frac, steps_before_use_velocity_time_centering, &
     RTI_dm_for_center_eta_nondecreasing, RTI_min_dm_behind_shock_for_full_on, RTI_energy_floor, &
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
@@ -385,13 +385,13 @@
     op_split_burn_min_T_for_variable_T_solver, solver_test_partials_show_dx_var_name, &
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
     scale_max_correction, ignore_min_corr_coeff_for_scale_max_correction, ignore_too_large_correction, ignore_species_in_max_correction, &
-    corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, &
+    corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, TDC_use_mass_interp_face_values, &
     corr_coeff_limit, tiny_corr_factor, solver_test_partials_call_number, solver_test_partials_iter_number, &
     max_tries1, solver_max_tries_before_reject, max_tries_for_retry, max_tries_after_5_retries, solver_test_partials_sink_name, &
     max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_Pvsc_art_visc, Pvsc_cq, Pvsc_zsh, &
     min_xa_hard_limit, min_xa_hard_limit_for_highT, logT_max_for_min_xa_hard_limit, logT_min_for_min_xa_hard_limit_for_highT, &
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
-    xa_clip_limit, report_solver_progress, solver_test_partials_k_high, TDC_use_L_eqn_at_surface, &
+    xa_clip_limit, report_solver_progress, solver_test_partials_k_high, TDC_use_L_eqn_at_surface, TDC_use_RSP_eqn_for_Y_face, &
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
@@ -401,7 +401,7 @@
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
-    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_etrb_xscale_min, &
+    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_source_seed, &
     TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
     TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
     TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
@@ -410,7 +410,7 @@
     ! timestep
     time_delta_coeff, min_timestep_factor, max_timestep_factor, timestep_factor_for_retries, retry_hold, &
     neg_mass_fraction_hold, timestep_dt_factor, use_dt_low_pass_controller, &
-    force_timestep_min, force_timestep_min_years, force_timestep_min_factor, &
+    force_timestep_min, force_timestep_min_years, force_timestep_min_factor, force_timestep, force_timestep_years, &
     varcontrol_target, min_allowed_varcontrol_target, varcontrol_dt_limit_ratio_hard_max, xa_scale, &
     solver_iters_timestep_limit, burn_steps_limit, burn_steps_hard_limit, &
     diffusion_steps_limit, diffusion_steps_hard_limit, diffusion_iters_limit, diffusion_iters_hard_limit, &
@@ -1838,6 +1838,7 @@
  s% Gamma_lnS_eps_grav_full_on = Gamma_lnS_eps_grav_full_on
 
  s% use_dPrad_dm_form_of_T_gradient_eqn = use_dPrad_dm_form_of_T_gradient_eqn
+ s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
  s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
  s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
@@ -2062,8 +2063,10 @@
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
  s% TDC_use_L_eqn_at_surface = TDC_use_L_eqn_at_surface
+ s% TDC_use_RSP_eqn_for_Y_face = TDC_use_RSP_eqn_for_Y_face
+ s% TDC_use_mass_interp_face_values = TDC_use_mass_interp_face_values
  s% TDC_w_min_for_damping = TDC_w_min_for_damping
- s% TDC_etrb_xscale_min = TDC_etrb_xscale_min
+ s% TDC_source_seed = TDC_source_seed
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_target_steps_per_cycle = TDC_target_steps_per_cycle
@@ -2102,6 +2105,8 @@
  s% force_timestep_min = force_timestep_min
  s% force_timestep_min_years = force_timestep_min_years
  s% force_timestep_min_factor = force_timestep_min_factor
+ s% force_timestep = force_timestep
+ s% force_timestep_years = force_timestep_years
 
  s% varcontrol_target = varcontrol_target
  s% min_allowed_varcontrol_target = min_allowed_varcontrol_target
@@ -3483,6 +3488,7 @@
  Gamma_lnS_eps_grav_full_on = s% Gamma_lnS_eps_grav_full_on
 
  use_dPrad_dm_form_of_T_gradient_eqn = s% use_dPrad_dm_form_of_T_gradient_eqn
+ use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
  steps_before_use_velocity_time_centering = s% steps_before_use_velocity_time_centering
  include_P_in_velocity_time_centering = s% include_P_in_velocity_time_centering
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
@@ -3707,8 +3713,10 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
  TDC_use_L_eqn_at_surface = s% TDC_use_L_eqn_at_surface
+ TDC_use_RSP_eqn_for_Y_face = s% TDC_use_RSP_eqn_for_Y_face
+ TDC_use_mass_interp_face_values = s% TDC_use_mass_interp_face_values
  TDC_w_min_for_damping = s% TDC_w_min_for_damping
- TDC_etrb_xscale_min = s% TDC_etrb_xscale_min
+ TDC_source_seed = s% TDC_source_seed
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_target_steps_per_cycle = s% TDC_target_steps_per_cycle
@@ -3747,6 +3755,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  force_timestep_min = s% force_timestep_min
  force_timestep_min_years = s% force_timestep_min_years
  force_timestep_min_factor = s% force_timestep_min_factor
+ force_timestep = s% force_timestep
+ force_timestep_years = s% force_timestep_years
 
  varcontrol_target = s% varcontrol_target
  min_allowed_varcontrol_target = s% min_allowed_varcontrol_target

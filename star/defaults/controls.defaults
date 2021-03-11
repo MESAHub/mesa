@@ -7905,6 +7905,8 @@
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
@@ -7921,6 +7923,11 @@
       ! The alternatives forms are for dynamic situations where
       ! the use of hydrostatic dP/dm is inappropriate.
       ! In order of priority,
+      
+      ! ::
+      !     if (use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn)
+      !        equation is gradT(k)*(lnPeos(k-1) - lnPeos(k)) = lnT(k-1) - lnT(k)
+      !     recall that gradT(k) is expected dlnT/dlnPeos at face k from MLT.
 
       ! ::
 
@@ -7939,6 +7946,11 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+    
+    
+    
+    
 
       ! for hydro comparison tests (e.g., Sedov)
 
@@ -9008,6 +9020,29 @@
     min_timestep_factor = 0.8d0
 
 
+      ! force_timestep
+      ! ~~~~~~~~~~~~~~~~~~
+
+      ! In seconds.  ``force_timestep <= 0`` means no forced timestep.
+
+      ! ::
+
+    force_timestep = 0
+
+
+      ! force_timestep_years
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Note: ``force_timestep`` is the control that is used by most of the code.
+      ! ``force_timestep_years`` is just provided as a convenience.
+      ! At the start of each step, the evolve routine checks if ``force_timestep_years > 0``,
+      ! and if so, it sets ``force_timestep = force_timestep_years*secyer``.
+
+      ! ::
+
+    force_timestep_years = 0
+
+
       ! force_timestep_min
       ! ~~~~~~~~~~~~~~~~~~
 
@@ -9021,7 +9056,6 @@
       ! force_timestep_min_years
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! ``force_timestep_min_years <= 0`` means no forced lower limit.
       ! Note: ``force_timestep_min`` is the control that is used by most of the code.
       ! ``force_timestep_min_years`` is just provided as a convenience.
       ! At the start of each step, the evolve routine checks if ``force_timestep_min_years > 0``,

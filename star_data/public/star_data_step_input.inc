@@ -163,6 +163,9 @@
          real(dp) :: power_z_burn
          real(dp) :: power_photo
    
+      ! for read_model/write_model
+         logical :: have_previous_conv_vel
+         logical :: have_previous_L_conv
    
       ! experimental work in progress.
       
@@ -177,7 +180,5 @@
          integer :: i_dln_cvpv0_dt ! equation for convection velocities
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
-
-         logical :: have_previous_conv_vel ! only needed when set conv_vel_flag true
 
 

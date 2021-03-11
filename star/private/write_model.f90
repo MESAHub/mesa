@@ -49,8 +49,8 @@
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
-            TDC_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
-            rsp_flag, no_L
+            TDC_flag, u_flag, prev_flag, rotation_flag, &
+            write_conv_vel, write_L_conv, rsp_flag, no_L
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
@@ -72,7 +72,9 @@
          conv_vel_flag = s% conv_vel_flag
          rotation_flag = s% rotation_flag
          rsp_flag = s% rsp_flag
-         write_conv_vel = s% have_mixing_info .and. s% have_previous_conv_vel
+         write_conv_vel = s% have_mixing_info
+         write_L_conv = write_conv_vel
+         
          species = s% species
          
          open(newunit=iounit, file=trim(filename), action='write', status='replace')
@@ -90,6 +92,7 @@
          if (rotation_flag) file_type = file_type + 2**bit_for_j_rot
          if (rsp_flag) file_type = file_type + 2**bit_for_RSP
          if (write_conv_vel) file_type = file_type + 2**bit_for_conv_vel
+         if (write_L_conv) file_type = file_type + 2**bit_for_L_conv
          
          no_L = (s% rsp_flag .or. s% TDC_flag)
          if (no_L) file_type = file_type + 2**bit_for_no_L_basic_variable
@@ -111,7 +114,9 @@
          if (BTEST(file_type, bit_for_RTI)) &
             write(iounit,'(a)',advance='no') ', Rayleigh-Taylor instabilities (alpha_RTI)'
          if (BTEST(file_type, bit_for_conv_vel)) &
-            write(iounit,'(a)',advance='no') ', saved convection velocity - not a solver variable (conv_vel)'
+            write(iounit,'(a)',advance='no') ', convection velocity - not a solver variable (conv_vel)'
+         if (BTEST(file_type, bit_for_L_conv)) &
+            write(iounit,'(a)',advance='no') ', convective luminosity - not a solver variable (L_conv)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
             write(iounit,'(a)',advance='no') ', convection velocity as solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
@@ -220,6 +225,9 @@
             if (write_conv_vel .or. conv_vel_flag) then
                call write1(s% conv_vel(k),ierr); if (ierr /= 0) exit
             end if
+            if (write_L_conv) then
+               call write1(s% L_conv(k),ierr); if (ierr /= 0) exit
+            end if
             do i=1, species
                call write1(s% xa(i,k),ierr); if (ierr /= 0) exit
             end do
@@ -283,6 +291,8 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'alpha_RTI'
             if (write_conv_vel .or. conv_vel_flag) &
                write(iounit, fmt='(a26, 1x)', advance='no') 'conv_vel'
+            if (write_L_conv) &
+               write(iounit, fmt='(a26, 1x)', advance='no') 'L_conv'
             do i=1, species
                write(iounit, fmt='(a26, 1x)', advance='no') chem_isos% name(chem_id(i))
             end do

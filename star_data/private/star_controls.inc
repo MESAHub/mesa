@@ -799,6 +799,7 @@
 
          logical :: use_mass_corrections, use_gravity_rotation_correction, &
             use_dPrad_dm_form_of_T_gradient_eqn, &
+            use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
             use_dedt_form_of_energy_eqn, &
             no_dedt_form_during_relax, &
             always_use_dedt_form_of_energy_eqn, &
@@ -1073,8 +1074,8 @@
          real(dp) :: timestep_dt_factor
          logical :: use_dt_low_pass_controller
          
-         real(dp) :: force_timestep_min, &
-            force_timestep_min_years, force_timestep_min_factor
+         real(dp) :: force_timestep_min, force_timestep_min_years, force_timestep_min_factor, &
+            force_timestep, force_timestep_years
 
          real(dp) :: varcontrol_target, varcontrol_dt_limit_ratio_hard_max, &
             min_allowed_varcontrol_target

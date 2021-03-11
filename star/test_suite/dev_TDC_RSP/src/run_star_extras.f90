@@ -133,8 +133,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         s% dt_next = s% max_timestep
-         s% force_timestep_min = s% max_timestep
          extras_finish_step = keep_going
          call report(s)
          if (s% x_integer_ctrl(1) <= 0) return

@@ -689,6 +689,7 @@
          s% dt = 0
 
          s% have_previous_conv_vel = .false.
+         s% have_previous_L_conv = .false.
 
          s% net_name = ''
 

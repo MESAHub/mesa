@@ -30,9 +30,7 @@
    initial_z = 0.01d0
    initial_mass = 0.26d0
    
-   RSP_max_dt = 50 ! for debugging
-   max_timestep = 50 ! for debugging
-   force_timestep_min = 50 ! for debugging
+   force_timestep = 50 ! for debugging
 
 ! TDC
 

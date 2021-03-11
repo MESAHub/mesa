@@ -2150,12 +2150,23 @@
       real(dp) function get_Lrad(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
+         get_Lrad = s% L(k) - get_Lconv(s,k)
+      end function get_Lrad
+
+
+      real(dp) function get_Lconv(s,k)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
          if (k == 1) then
-            get_Lrad = s% L(k)
+            get_Lconv = 0d0
             return
          end if
-         get_Lrad = s% L(k) - s% L_conv(k) ! L_conv set by last call on mlt
-      end function get_Lrad
+         if (s% TDC_flag) then
+            get_Lconv = s% Lc(k)
+         else
+            get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt
+         end if
+      end function get_Lconv
 
 
       real(dp) function get_Ladv(s,k)

@@ -342,11 +342,13 @@
                int_val = k
                int_flag = .true.
             case (p_conv_L_div_L)
-               if (s% L(k) > 0d0) val = s% L_conv(k)/s% L(k)
+               if (s% L(k) > 0d0) val = get_Lconv(s,k)/s% L(k)
             case (p_log_conv_L_div_L)
-               if (s% L(k) > 0d0) val = safe_log10(s% L_conv(k)/s% L(k))
+               if (s% L(k) > 0d0) val = safe_log10(get_Lconv(s,k)/s% L(k))
             case (p_lum_erg_s)
                val = s% L(k)
+            case (p_L)
+               val = s% L(k)/Lsun
             case (p_luminosity)
                val = s% L(k)/Lsun
             case (p_log_abs_lum_erg_s)
@@ -359,10 +361,8 @@
                L_rad = get_Lrad(s,k)
                val = L_rad/Lsun
             case (p_lum_conv)
-               L_rad = get_Lrad(s,k)
-               val = (s% L(k) - L_rad)/Lsun
+               val = get_Lconv(s,k)/Lsun
             case (p_lum_conv_MLT)
-               L_rad = get_Lrad(s,k)
                val = s% L_conv(k)/Lsun
 
             !case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
@@ -782,6 +782,8 @@
                val = s% kap_frac_Compton(k)
             case (p_kap_frac_op_mono)
                val = s% kap_frac_op_mono(k)
+            case (p_log_kap)
+               val = safe_log10(s% opacity(k))
             case (p_log_opacity)
                val = safe_log10(s% opacity(k))
             case (p_extra_opacity_factor)

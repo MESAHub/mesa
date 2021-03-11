@@ -1,24 +1,42 @@
 
 &star_job
-   mesa_dir = '../../..'
-   read_extra_star_job_inlist2 = .true.
-   extra_star_job_inlist2_name = 'inlist_for_test'
+
+      mesa_dir = '../../..'
+
+      read_extra_star_job_inlist2 = .true.
+      extra_star_job_inlist2_name = 'inlist_pre_ms_with_convective_core'
+
 / ! end of star_job namelist
 
+
 &eos
-   read_extra_eos_inlist1 = .true.
-   extra_eos_inlist1_name = 'inlist_for_test'
+
+      read_extra_eos_inlist1 = .true.
+      extra_eos_inlist1_name = 'inlist_pre_ms_with_convective_core'
+
 / ! end of eos namelist
 
+
 &kap
-   read_extra_kap_inlist1 = .true.
-   extra_kap_inlist1_name = 'inlist_for_test'
+
+      read_extra_kap_inlist1 = .true.
+      extra_kap_inlist1_name = 'inlist_pre_ms_with_convective_core'
+
 / ! end of kap namelist
 
+
+
 &controls
-   read_extra_controls_inlist1 = .true.
-   extra_controls_inlist1_name = 'inlist_for_test'
+
+      read_extra_controls_inlist1 = .true.
+      extra_controls_inlist1_name = 'inlist_pre_ms_with_convective_core'
+
 / ! end of controls namelist
 
+
 &pgstar
+
+      read_extra_pgstar_inlist1 = .true.
+      extra_pgstar_inlist1_name = 'inlist_pre_ms_with_convective_core'
+
 / ! end of pgstar namelist

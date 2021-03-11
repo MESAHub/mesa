@@ -669,6 +669,43 @@
          end if   
       end function wrap_Cp_p1
 
+      function wrap_grad_ad_m1(s, k) result(grad_ad_m1)
+         use eos_def, only: i_grad_ad
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: grad_ad_m1
+         integer, intent(in) :: k
+         grad_ad_m1 = 0d0 
+         if (k > 1) then
+            grad_ad_m1%val = s% grada(k-1)
+            grad_ad_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_grad_ad,k-1)
+            grad_ad_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_grad_ad,k-1)
+         end if   
+      end function wrap_grad_ad_m1
+
+      function wrap_grad_ad_00(s, k) result(grad_ad_00)
+         use eos_def, only: i_grad_ad
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: grad_ad_00
+         integer, intent(in) :: k
+         grad_ad_00 = 0d0 
+         grad_ad_00%val = s% grada(k)
+         grad_ad_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_grad_ad,k)
+         grad_ad_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_grad_ad,k)
+      end function wrap_grad_ad_00
+
+      function wrap_grad_ad_p1(s, k) result(grad_ad_p1)
+         use eos_def, only: i_grad_ad
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: grad_ad_p1
+         integer, intent(in) :: k
+         grad_ad_p1 = 0d0 
+         if (k < s% nz) then
+            grad_ad_p1%val = s% grada(k+1)
+            grad_ad_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_grad_ad,k+1)
+            grad_ad_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_grad_ad,k+1)
+         end if   
+      end function wrap_grad_ad_p1
+
       function wrap_gamma1_m1(s, k) result(gamma1_m1)
          use eos_def, only: i_gamma1
          type (star_info), pointer :: s

@@ -1860,7 +1860,8 @@
          type (star_info), pointer :: s
 
          integer :: ierr, k, j, k0_old, k1_old, k0_new, k1_new
-         real(dp) :: total_energy, force_timestep_min, delta_E, sum_delta_E, total_radiation
+         real(dp) :: total_energy, force_timestep_min, delta_E, sum_delta_E, &
+            force_timestep, total_radiation
          real(dp), pointer :: energy_profile_after_remesh(:)
          logical :: trace
 
@@ -1946,6 +1947,7 @@
          end if
          
          s% dt = s% dt_next
+            
          force_timestep_min = s% force_timestep_min
          if (force_timestep_min == 0) &
             force_timestep_min = secyer*s% force_timestep_min_years
@@ -1953,6 +1955,12 @@
             s% dt = min(s% dt*s% force_timestep_min_factor, force_timestep_min)
             write(*,2) 'force increase in timestep', s% model_number, s% dt
          end if
+         
+         force_timestep = s% force_timestep
+         if (force_timestep == 0) &
+            force_timestep = secyer*s% force_timestep_years
+         if (force_timestep > 0) s% dt = force_timestep
+         
          s% dt_start = s% dt
          
          if (is_bad(s% dt)) then

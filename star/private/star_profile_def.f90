@@ -57,7 +57,8 @@
       integer, parameter :: p_lum_rad = p_lum_adv + 1
       integer, parameter :: p_log_abs_lum_erg_s = p_lum_rad + 1
       integer, parameter :: p_lum_erg_s = p_log_abs_lum_erg_s + 1
-      integer, parameter :: p_luminosity = p_lum_erg_s + 1
+      integer, parameter :: p_L = p_lum_erg_s + 1
+      integer, parameter :: p_luminosity = p_L + 1
       integer, parameter :: p_log_g = p_luminosity + 1
       integer, parameter :: p_grav = p_log_g + 1
       integer, parameter :: p_r_div_g = p_grav + 1
@@ -185,7 +186,8 @@
       integer, parameter :: p_kap_frac_op_mono = p_kap_frac_Compton + 1
       integer, parameter :: p_extra_opacity_factor = p_kap_frac_op_mono + 1
       integer, parameter :: p_log_kap_times_factor = p_extra_opacity_factor + 1
-      integer, parameter :: p_log_opacity = p_log_kap_times_factor + 1
+      integer, parameter :: p_log_kap = p_log_kap_times_factor + 1
+      integer, parameter :: p_log_opacity = p_log_kap + 1
       integer, parameter :: p_energy = p_log_opacity + 1
       integer, parameter :: p_logM = p_energy + 1
       integer, parameter :: p_logtau_sub_xlogtau = p_logM + 1
@@ -744,6 +746,7 @@
 
          profile_column_name(p_zone) = 'zone'
          profile_column_name(p_k) = 'k'
+         profile_column_name(p_L) = 'L'
          profile_column_name(p_luminosity) = 'luminosity'
          profile_column_name(p_lum_erg_s) = 'lum_erg_s'
          profile_column_name(p_log_abs_lum_erg_s) = 'log_abs_lum_erg_s'
@@ -889,6 +892,7 @@
          profile_column_name(p_tau) = 'tau'
          profile_column_name(p_extra_opacity_factor) = 'extra_opacity_factor'
          profile_column_name(p_log_kap_times_factor) = 'log_kap_times_factor'
+         profile_column_name(p_log_kap) = 'log_kap'
          profile_column_name(p_log_opacity) = 'log_opacity'
          profile_column_name(p_kap_frac_lowT) = 'kap_frac_lowT'
          profile_column_name(p_kap_frac_highT) = 'kap_frac_highT'

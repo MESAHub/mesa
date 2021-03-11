@@ -581,7 +581,7 @@
 
          end if
          
-         if (.not. skip_mlt .and. .not. s% RSP_flag .and. .not. s% TDC_flag) then
+         if (.not. skip_mlt .and. .not. s% RSP_flag) then !  .and. .not. s% TDC_flag) then            ! TESTING MLT vs. TDC
          
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) &

@@ -263,6 +263,7 @@
          end if
          if (s% dt < s% force_timestep_min .and. s% force_timestep_min > 0) &
             s% dt = s% force_timestep_min
+         if (s% force_timestep > 0) s% dt = s% force_timestep
 
          retry_loop: do num_tries = 1, max_retries+1
 

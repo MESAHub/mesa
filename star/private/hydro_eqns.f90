@@ -745,6 +745,17 @@
          P_rad_00 = (crad/3d0)*T4_00
          d_P_rad_actual_ad = P_rad_m1 - P_rad_00
          
+         !s% xtra1_array(k) = s% T_start(k)
+         !s% xtra2_array(k) = T4_m1%val - T4_00%val
+         !s% xtra3_array(k) = kap_face%val
+         !s% xtra4_array(k) = (T4_m1%val - T4_00%val)/kap_face%val
+         !if (k == 1) then
+         !   s% xtra5_array(k) = s% L(k)/Lsun
+         !else
+         !   s% xtra5_array(k) = s% L(k)*s% gradT(k)/s% gradr(k)/Lsun
+         !end if
+         !s% xtra6_array(k) = s% xtra5_array(k)/(Lrad_ad%val/Lsun)
+         
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale 
          s% equ(i_equL, k) = resid%val
@@ -786,6 +797,58 @@
       end subroutine do1_alt_dlnT_dm_eqn
 
 
+      subroutine do1_gradT_eqn(s, k, skip_partials, nvar, ierr)
+         use eos_def
+         use star_utils, only: save_eqn_residual_info
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_star_order1) :: &
+            resid, gradT, dlnT, dlnP
+         integer :: i_equL
+         logical :: test_partials
+
+         include 'formats'
+         ierr = 0
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         i_equL = s% i_equL
+         if (i_equL == 0) return
+
+         gradT = s% gradT_ad(k)
+         dlnT = wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)
+         dlnP = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+
+         resid = gradT*dlnP - dlnT
+         s% equ(i_equL, k) = resid%val
+
+         if (is_bad(s% equ(i_equL, k))) then
+            ierr = -1
+            if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            if (s% stop_for_bad_nums) stop 'do1_gradT_eqn'
+            return
+            write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            write(*,2) 'gradT', k, gradT
+            write(*,2) 'dlnT', k, dlnT
+            write(*,2) 'dlnP', k, dlnP
+            stop 'do1_gradT_eqn'
+         end if
+
+         if (test_partials) then
+            s% solver_test_partials_val = s% equ(i_equL,k)
+         end if
+
+         if (skip_partials) return
+         call save_eqn_residual_info( &
+            s, k, nvar, i_equL, resid, 'do1_gradT_eqn', ierr)
+         
+      end subroutine do1_gradT_eqn
+
+
       subroutine do1_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)
          use eos_def
          use star_utils, only: save_eqn_residual_info
@@ -808,6 +871,11 @@
 
          i_equL = s% i_equL
          if (i_equL == 0) return
+         
+         if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
+            call do1_gradT_eqn(s, k, skip_partials, nvar, ierr)            
+            return
+         end if
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
             call do1_alt_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)            

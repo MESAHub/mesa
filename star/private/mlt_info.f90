@@ -951,7 +951,7 @@
             s% mlt_mixing_length(k) = 0d0
             s% mlt_vc(k) = 0d0
             s% mlt_Gamma(k) = 0d0
-            s% grada_face(k) = 0d0
+            s% grada_face(k) = grada_face
             s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0

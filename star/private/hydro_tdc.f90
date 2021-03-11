@@ -279,6 +279,22 @@
       end function compute_Hp_cell
       
       
+      subroutine get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: alfa, beta
+         ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
+         if (k == 1) stop 'bad k==1 for get_TDC_alfa_beta_face_weights'
+         if (s% TDC_use_mass_interp_face_values) then
+            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+            beta = 1d0 - alfa
+         else
+            alfa = 0.5d0
+            beta = 0.5d0
+         end if
+      end subroutine get_TDC_alfa_beta_face_weights
+      
+      
       function compute_Hp_face(s, k, ierr) result(Hp_face) ! cm
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -286,7 +302,8 @@
          type(auto_diff_real_star_order1) :: Hp_face
          type(auto_diff_real_star_order1) :: &
             r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
-            d_face, Peos_face, alt_Hp_face, alfa
+            d_face, Peos_face, alt_Hp_face, A
+         real(dp) :: alfa, beta
          integer :: j
          include 'formats'
          ierr = 0
@@ -303,16 +320,17 @@
             else
                d_m1 = wrap_d_m1(s, k)
                Peos_m1 = wrap_Peos_m1(s, k)
-               Peos_div_rho = 0.5d0*(Peos_00/d_00 + Peos_m1/d_m1)
+               call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+               Peos_div_rho = alfa*Peos_00/d_00 + beta*Peos_m1/d_m1
                Hp_face = pow2(r_00)*Peos_div_rho/(s% cgrav(k)*s% m(k))
                if (s% alt_scale_height_flag) then
                   ! consider sound speed*hydro time scale as an alternative scale height
-                  d_face = 0.5d0*(d_00 + d_m1)
-                  Peos_face = 0.5d0*(Peos_00 + Peos_m1)
+                  d_face = alfa*d_00 + beta*d_m1
+                  Peos_face = alfa*Peos_00 + beta*Peos_m1
                   alt_Hp_face = sqrt(Peos_face/s% cgrav(k))/d_face
                   if (alt_Hp_face%val < Hp_face%val) then ! blend
-                     alfa = pow2(alt_Hp_face/Hp_face) ! 0 <= alfa%val < 1
-                     Hp_face = alfa*Hp_face + (1d0 - alfa)*alt_Hp_face
+                     A = pow2(alt_Hp_face/Hp_face) ! 0 <= A%val < 1
+                     Hp_face = A*Hp_face + (1d0 - A)*alt_Hp_face
                   end if
                end if
             end if
@@ -329,60 +347,95 @@
          type(auto_diff_real_star_order1) :: Y_face
          type(auto_diff_real_star_order1) :: Hp_face, Y1, Y2, QQ_div_Cp_face, &
             r_00, d_00, Peos_00, Cp_00, T_00, chiT_00, chiRho_00, QQ_00, lnT_00, &
-            r_m1, d_m1, Peos_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1
-         real(dp) :: dm_bar
+            r_m1, d_m1, Peos_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1, &
+            grad_ad_00, grad_ad_m1, grad_ad_face, dlnT, dlnP, alt_Y_face
+         real(dp) :: dm_bar, alfa, beta
          include 'formats'
          ierr = 0
+         
          if (k > s% nz) then
             Y_face = 0d0
             return
          end if
+         
          if (k == 1 .or. s% TDC_alfa == 0d0) then
             Y_face = 0d0
             s% Y_face(k) = 0d0
             return
          end if
          
-         dm_bar = s% dm_bar(k)
-         Hp_face = compute_Hp_face(s,k,ierr)
-         if (ierr /= 0) return
+         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
          
-         r_00 = wrap_opt_time_center_r_00(s, k)
-         d_00 = wrap_d_00(s, k)
-         Peos_00 = wrap_Peos_00(s, k)
-         Cp_00 = wrap_Cp_00(s, k)
-         T_00 = wrap_T_00(s, k)
-         chiT_00 = wrap_chiT_00(s, k)
-         chiRho_00 = wrap_chiRho_00(s, k)
-         QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
-         lnT_00 = wrap_lnT_00(s,k)
+         if (s% TDC_use_RSP_eqn_for_Y_face) then
+      
+            dm_bar = s% dm_bar(k)
+            Hp_face = compute_Hp_face(s,k,ierr)
+            if (ierr /= 0) return
+      
+            r_00 = wrap_opt_time_center_r_00(s, k)
+            d_00 = wrap_d_00(s, k)
+            Peos_00 = wrap_Peos_00(s, k)
+            Cp_00 = wrap_Cp_00(s, k)
+            T_00 = wrap_T_00(s, k)
+            chiT_00 = wrap_chiT_00(s, k)
+            chiRho_00 = wrap_chiRho_00(s, k)
+            QQ_00 = chiT_00/(d_00*T_00*chiRho_00)
+            lnT_00 = wrap_lnT_00(s,k)
+      
+            r_m1 = wrap_opt_time_center_r_m1(s, k)
+            d_m1 = wrap_d_m1(s, k)
+            Peos_m1 = wrap_Peos_m1(s, k)
+            Cp_m1 = wrap_Cp_m1(s, k)
+            T_m1 = wrap_T_m1(s, k)
+            chiT_m1 = wrap_chiT_m1(s, k)
+            chiRho_m1 = wrap_chiRho_m1(s, k)
+            QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1)
+            lnT_m1 = wrap_lnT_m1(s,k)
+            QQ_div_Cp_face = alfa*QQ_00/Cp_00 + beta*QQ_m1/Cp_m1
+            ! QQ units (g cm^-3 K)^-1 = g^-1 cm^3 K^-1
+            ! Cp units erg g^-1 K^-1 = g cm^2 s^-2 g^-1 K^-1 = cm^2 s^-2 K^-1
+            ! QQ/Cp units = (g^-1 cm^3 K^-1)/(cm^2 s^-2 K^-1)
+            !  = g^-1 cm^3 K^-1 cm^-2 s^2 K
+            !  = g^-1 cm s^2
+            ! P units = erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
+            ! QQ/Cp*P is unitless.
          
-         r_m1 = wrap_opt_time_center_r_m1(s, k)
-         d_m1 = wrap_d_m1(s, k)
-         Peos_m1 = wrap_Peos_m1(s, k)
-         Cp_m1 = wrap_Cp_m1(s, k)
-         T_m1 = wrap_T_m1(s, k)
-         chiT_m1 = wrap_chiT_m1(s, k)
-         chiRho_m1 = wrap_chiRho_m1(s, k)
-         QQ_m1 = chiT_m1/(d_m1*T_m1*chiRho_m1)
-         lnT_m1 = wrap_lnT_m1(s,k)
-         QQ_div_Cp_face = 0.5d0*(QQ_00/Cp_00 + QQ_m1/Cp_m1)
-         ! QQ units (g cm^-3 K)^-1 = g^-1 cm^3 K^-1
-         ! Cp units erg g^-1 K^-1 = g cm^2 s^-2 g^-1 K^-1 = cm^2 s^-2 K^-1
-         ! QQ/Cp units = (g^-1 cm^3 K^-1)/(cm^2 s^-2 K^-1)
-         !  = g^-1 cm^3 K^-1 cm^-2 s^2 K
-         !  = g^-1 cm s^2
-         ! P units = erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
-         ! QQ/Cp*P is unitless.
+            Y1 = QQ_div_Cp_face*(Peos_m1 - Peos_00) - (lnT_m1 - lnT_00)
+            ! Y1 unitless
          
-         Y1 = QQ_div_Cp_face*(Peos_m1 - Peos_00) - (lnT_m1 - lnT_00)
-         ! Y1 unitless
+            Y2 = 4d0*pi*pow2(r_00)*Hp_face*2d0/(1/d_00 + 1/d_m1)/dm_bar
+            ! units = cm^2 cm / (cm^3 g^-1) / g
+            !       = cm^2 cm cm^-3 g g^-1 = unitless
          
-         Y2 = 4d0*pi*pow2(r_00)*Hp_face*2d0/(1/d_00 + 1/d_m1)/dm_bar
-         ! units = cm^2 cm / (cm^3 g^-1) / g
-         !       = cm^2 cm cm^-3 g g^-1 = unitless
+            Y_face = Y1*Y2 ! unitless
          
-         Y_face = Y1*Y2 ! unitless
+         else
+         
+            grad_ad_00 = wrap_grad_ad_00(s,k)
+            grad_ad_m1 = wrap_grad_ad_m1(s,k)
+            grad_ad_face = alfa*grad_ad_00 + beta*grad_ad_m1
+            dlnT = wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)
+            dlnP = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+            if (abs(dlnP%val) < 1d-20) then
+               alt_Y_face = 0d0
+            else
+               alt_Y_face = dlnT/dlnP - grad_ad_face
+               if (is_bad(alt_Y_face%val)) alt_Y_face = 0
+            end if
+            if (.false.) then
+               if (Y_face%val * alt_Y_face%val < 0d0) then
+                  write(*,'(a9)', advance = 'no') '>>>> '
+               else
+                  write(*,'(9x)', advance = 'no') 
+               end if
+               write(*,'(i8,99(1pd18.8))') k, alt_Y_face%val/Y_face%val - 1d0, &
+                  Y_face%val - alt_Y_face%val, Y_face%val, alt_Y_face%val, &
+                  alfa*s% T(k) + beta*s% T(k-1), alfa*s% Peos(k) + beta*s% Peos(k-1), &
+                  Hp_face%val/(s% rmid(k-1) - s% rmid(k)), Hp_face%val, (s% rmid(k-1) - s% rmid(k))
+            end if
+            Y_face = alt_Y_face
+            
+         end if
          s% Y_face(k) = Y_face%val
 
       end function compute_Y_face
@@ -394,7 +447,7 @@
          type(auto_diff_real_star_order1) :: PII_face
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Cp_00, Cp_m1, Cp_face, Y_face
-         real(dp) :: ALFAS, ALFA
+         real(dp) :: ALFAS_ALFA, alfa, beta
          include 'formats'
          ierr = 0
          if (k > s% nz) then
@@ -411,10 +464,10 @@
          if (ierr /= 0) return
          Cp_00 = wrap_Cp_00(s, k)
          Cp_m1 = wrap_Cp_m1(s, k)
-         Cp_face = 0.5d0*(Cp_00 + Cp_m1) ! ergs g^-1 K^-1
-         ALFAS = x_ALFAS
-         ALFA = s% TDC_alfa
-         PII_face = ALFAS*ALFA*Cp_face*Y_face
+         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         Cp_face = alfa*Cp_00 + beta*Cp_m1 ! ergs g^-1 K^-1
+         ALFAS_ALFA = x_ALFAS*s% TDC_alfa
+         PII_face = ALFAS_ALFA*Cp_face*Y_face
          s% PII(k) = PII_face%val
          if (k == -2 .and. s% PII(k) < 0d0) then
             write(*,2) 's% PII(k)', k, s% PII(k)
@@ -539,7 +592,8 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, Peos_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
-            Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, fac
+            Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, &
+            grad_ad_00, fac
          include 'formats'
          ierr = 0
          w_00 = safe_wrap_w_00(s, k)
@@ -566,7 +620,10 @@
             PII_div_Hp_cell = 0.5d0*(PII_face_00/Hp_face_00 + PII_face_p1/Hp_face_p1)
          end if
          
-         fac = w_00*T_00*Peos_00*QQ_00/Cp_00  ! create separate term just for debugging
+         !fac = w_00*T_00*(Peos_00*QQ_00/Cp_00)  ! create separate term just for debugging
+         ! Peos_00*QQ_00/Cp_00 = grad_ad
+         grad_ad_00 = wrap_grad_ad_00(s, k)
+         fac = (w_00 + s% TDC_source_seed)*T_00*grad_ad_00
 
          Source = PII_div_Hp_cell*fac
          
@@ -574,7 +631,16 @@
          ! P*QQ/Cp is unitless (see Y_face)
          ! Source units = (erg g^-1 K^-1) cm^-1 cm s^-1 K
          !     = erg g^-1 s^-1
-
+         
+         if (k == -49) then
+            write(*,2) 'Source%val', k, Source%val
+            write(*,2) 'w_00%val', k, w_00%val
+            write(*,2) 'grad_ad_00%val', k, grad_ad_00%val
+            write(*,2) 'PII_face_00%val', k, PII_face_00%val
+            write(*,2) 'PII_face_p1%val', k, PII_face_p1%val
+            write(*,*)
+            !stop 'compute_Source'
+         end if
          s% SOURCE(k) = Source%val
 
       end function compute_Source
@@ -733,6 +799,7 @@
             kap_m1 = wrap_kap_m1(s,k)
             kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
             diff_T4_div_kap = (T4m1 - T400)/kap_face
+
             if (s% TDC_use_Stellingwerf_Lr) then ! RSP style
                BW = log(T4m1/T400)
                if (abs(BW%val) > 1d-20) then
@@ -744,6 +811,14 @@
             end if
             Lr = -crad*clight/3d0*diff_T4_div_kap*pow2(area)/s% dm_bar(k)       
             ! units (erg cm^-3 K^-4) (cm s^-1) (K^4 cm^-2 g cm^4) g^-1 = erg s^-1  
+         
+            !s% xtra1_array(k) = s% T_start(k)
+            !s% xtra2_array(k) = T4m1%val - T400%val
+            !s% xtra3_array(k) = kap_face%val
+            !s% xtra4_array(k) = diff_T4_div_kap%val
+            !s% xtra5_array(k) = Lr%val/Lsun   
+            !s% xtra6_array(k) = 1
+
          end if
          s% Lr(k) = Lr%val
       end function compute_Lr
@@ -767,7 +842,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: r_00, area, &
             T_m1, T_00, d_m1, d_00, w_m1, w_00, T_rho_face, PII_face, w_face
-         real(dp) :: ALFAC, ALFAS
+         real(dp) :: ALFAC, ALFAS, alfa, beta
          include 'formats'
          ierr = 0
          if (k > s% nz .or. k == 1) then
@@ -783,16 +858,17 @@
          d_00 = wrap_d_00(s, k)
          w_m1 = safe_wrap_w_m1(s, k)
          w_00 = safe_wrap_w_00(s, k)
-         T_rho_face = 0.5d0*(T_m1*d_m1 + T_00*d_00)
+         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         T_rho_face = alfa*T_00*d_00 + beta*T_m1*d_m1
          PII_face = compute_PII_face(s, k, ierr)
-         w_face = 0.5d0*(w_m1 + w_00)
+         w_face = alfa*w_00 + beta*w_m1
          ALFAC = x_ALFAC
          ALFAS = x_ALFAS
          Lc_w_face_factor = area*(ALFAC/ALFAS)*T_rho_face*PII_face
          ! units = cm^2 K g cm^-3 ergs g^-1 K^-1 = ergs cm^-1
          Lc = w_face*Lc_w_face_factor
          ! units = cm s^-1 ergs cm^-1 = ergs s^-1
-         if (k == -2 .and. Lc_w_face_factor < 0d0) then
+         if (k == -458) then
             write(*,2) 'Lc%val', k, Lc%val
             write(*,2) 'w_face%val', k, w_face%val
             write(*,2) 'Lc_w_face_factor', k, Lc_w_face_factor%val
@@ -810,31 +886,43 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Lt
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: &
-            r_00, area2, d_m1, d_00, rho2_face, Hp_face, w_m1, w_00
-         real(dp) :: alpha, alpha_t
+         type(auto_diff_real_star_order1) :: r_00, area2, d_m1, d_00, &
+            rho2_face, Hp_face, w_m1, w_00, w_face, etrb_m1, etrb_00
+         real(dp) :: alpha_alpha_t, alfa, beta
          include 'formats'
          ierr = 0
-         if (k > s% nz .or. k == 1) then
+         if (k > s% nz) then
+            Lt = 0d0
+            return
+         end if 
+         alpha_alpha_t = s% TDC_alfa*s% TDC_alfat
+         if (k == 1 .or. alpha_alpha_t == 0d0) then
             Lt = 0d0
             s% Lt(k) = 0d0
             return
          end if
-         alpha = s% TDC_alfa
-         alpha_t = s% TDC_alfat
          r_00 = wrap_r_00(s,k) ! not time centered     
          area2 = (4d0*pi)**2*pow4(r_00)
          d_m1 = wrap_d_m1(s,k)
          d_00 = wrap_d_00(s,k)
-         rho2_face = 0.5d0*(pow2(d_00) + pow2(d_m1))
+         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+         rho2_face = alfa*pow2(d_00) + beta*pow2(d_m1)
          w_m1 = safe_wrap_w_m1(s,k)
          w_00 = safe_wrap_w_00(s,k)
+         w_face = alfa*w_00 + beta*w_m1
+         etrb_m1 = wrap_etrb_m1(s,k)
+         etrb_00 = wrap_etrb_00(s,k)
          Hp_face = compute_Hp_face(s,k,ierr)
-         if (ierr /= 0) return
-         Lt = -2d0/3d0*alpha*alpha_t * area2 * Hp_face * rho2_face * &
-            (pow3(w_m1) - pow3(w_00))/s% dm_bar(k)         
-         ! units = cm^4 cm g^2 cm^-6 cm^3 s^-3 g^-1 = g cm^2 s^-3 = erg s^-1
-         s% Lt(k) = Lt%val
+         if (ierr /= 0) return         
+         ! Ft = - alpha_t * rho_face * alpha * Hp_face * w_face * detrb/dr (thesis eqn 2.44)
+         ! replace dr by dm_bar/(area*rho_face)
+         ! Ft = - alpha_alpha_t * rho_face * Hp_face * w_face * (area*rho_face) * detrb/dm_bar
+         ! Lt = area * Ft
+         ! Lt = -alpha_alpha_t * (area*rho_face)**2 * Hp_face * w_face * (etrb(k-1) - etrb(k))/dm_bar
+         Lt = - alpha_alpha_t * area2 * rho2_face * Hp_face * w_face * (etrb_m1 - etrb_00) / s% dm_bar(k)  
+         ! this is slightly rewritten from the RSP form to use the TDC etrb variable
+         ! units = (cm^4) (g^2 cm^-6) (cm) (cm s^-1) (ergs g^-1) g^-1 = erg s^-1
+         s% Lt(k) = Lt%val      
       end function compute_Lt
 
 
@@ -858,53 +946,304 @@
          use star_utils, only: store_etrb_in_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr   
-         integer :: k, nz
-         real(dp) :: Lc_val, w_00
+         integer :: k, nz, j, k_maxerr
+         real(dp) :: Lc_val, w_00, maxerr, dlnP, dlnT, gradT_actual, &
+            super_ad_actual, super_ad_expected
          type(auto_diff_real_star_order1) :: &
-            Lc_w_face_factor, L, Lr, Lc, Lt
-         real(dp), allocatable :: w_face(:)
+            Lc_w_face_factor, L, Lr, Lc, Lt, Y_face
+         real(dp), allocatable :: w_face(:), target_Lc(:)
+         real(dp), parameter :: atol = 1-6d0, rtol = 1d-9
          logical, parameter :: dbg = .false.
          include 'formats'
          ierr = 0
          if (s% TDC_alfa == 0d0) return ! no convection
          nz = s% nz
-         allocate(w_face(nz))
-         w_face(1) = 0d0
-         do k=2, nz
+         if (s% have_previous_conv_vel) then
+            write(*,*) 'initial w_face set to conv_vel from file or from MLT'
+         else
+            write(*,*) 'need conv_vel from file or from MLT in order to set initial w_face'
+            stop 'reset_etrb_using_L'
+         end if
+         allocate(w_face(nz), target_Lc(nz))
+
+
+
+         if (.false.) then
+            write(*,*) 'Compare standard and alternative forms of Y_face'
+            write(*,'(9x,a8,99(a18))') 'k', 'Y_face alt/std-1', &
+               'Y_face std-alt', 'Y_face std', 'Y_face alt', 'T_face', 'P_face', &
+               'Hp/drmid', 'Hp_face', 'drmid_face'
+            do k=2,nz
+               Y_face = compute_Y_face(s, k, ierr)
+            end do
+            stop 'reset_etrb_using_L'
+         end if
+
+         if (.false.) then
+            do k=2,nz
+               dlnT = s% lnT(k-1)-s% lnT(k)
+               dlnP = s% lnPeos(k-1)-s% lnPeos(k)
+               gradT_actual = dlnT/dlnP
+               super_ad_actual = gradT_actual - s% grada_face(k)
+               super_ad_expected = s% gradT(k) - s% grada_face(k)
+               if (sign(1d0,super_ad_actual*super_ad_expected) < 0d0) &
+                  write(*,'(a)',advance='no') '!!!!'
+               write(*,2) 'super_ad_actual super_ad_expected', k, &
+                  sign(1d0,super_ad_actual*super_ad_expected), &
+                  (super_ad_actual - super_ad_expected)/super_ad_actual, &
+                  super_ad_actual, super_ad_expected
+            end do
+            stop 'reset_etrb_using_L'
+         end if
+
+
+
+         do k=1, nz
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'
-            ! filter out negative Lc
-            if (s% L(k) < Lr%val) then
-               Lc = 0 
-               Lc_val = 0
-               Lc_w_face_factor = 1
+            Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+            if (ierr /= 0) stop 'failed in compute_Lc_terms'
+            target_Lc(k) = s% L(k) - Lr%val
+            Lc_val = target_Lc(k) ! assume Lt = 0 for this
+            if (abs(Lc_w_face_factor%val) < 1d-20) then
                w_face(k) = 0d0
-            else
-               Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
-               if (ierr /= 0) stop 'failed in compute_Lc_terms'
-               Lc_val = s% L(k) - Lr%val ! assume Lt = 0 for this
-               if (Lc_w_face_factor%val < 1d-20) then
-                  w_face(k) = 0d0
-               else
-                  w_face(k) = Lc_val/Lc_w_face_factor%val
-               end if
+            else ! filter out negative guesses for w_face
+               w_face(k) = max(0d0, Lc_val/Lc_w_face_factor%val)
             end if
-            if (dbg) write(*,2) 'new w_face Lc w_factor', k, &
-               w_face(k), Lc_val, Lc_w_face_factor%val
+            if (is_bad(w_face(k))) then
+               write(*,2) 'bad w_face', k, w_face(k)
+               stop 'reset_etrb_using_L'
+               w_face(k) = 0d0
+            end if
+            if ((w_face(k) == 0d0 .and. s% conv_vel(k) > 0d0) .or. &
+                (w_face(k) > 0d0 .and. s% conv_vel(k) == 0d0)) &
+               w_face(k) = s% conv_vel(k)
+            !if (k >= 25 .and. k <= 65) &
+            !   write(*,2) 'w_face conv_vel', k, w_face(k), s% conv_vel(k)
+            !if (abs(w_face(k)) > 1d2*s% csound_face(k)) w_face(k) = 0d0
          end do
+         !stop 'reset_etrb_using_L'
+         
          do k=1, nz
             if (k < nz) then
                w_00 = 0.5d0*(w_face(k) + w_face(k+1))
             else ! w_center = 0
                w_00 = 0.5d0*w_face(k)
             end if
-            call store_etrb_in_xh(s,k,pow2(w_00))
-            if (dbg) write(*,2) 'new w', k, w_00
-            call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! redo with new etrb(k)
-            if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
+            s% etrb(k) = pow2(w_00)
+            call store_etrb_in_xh(s,k,s% etrb(k))
          end do
+         
+         if (.false.) then ! adjust etrb to match target L_conv
+            !do k = 1, nz
+            !   write(*,3) 'target_Lc mlt_mix', k, s% mlt_mixing_type(k), target_Lc(k)
+            !end do
+            do j = 1, 3
+               call revise_etrb(s, target_Lc, atol, rtol, maxerr, k_maxerr, ierr)
+               if (ierr /= 0) stop 'got ierr from revise_etrb'
+               write(*,3) 'maxerr', j, k_maxerr, maxerr
+            end do
+            stop 'reset_etrb_using_L'
+         end if
+         
+         if (.false.) then
+            do k=2, nz
+               Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+               !if (Lc%val < 0d0) then
+                  w_00 = sqrt(s% etrb(k))
+                  write(*,3) 'Y_face gradT-grada', k, s% mlt_mixing_type(k), &
+                     s% Y_face(k), s% gradT(k) - s% grada_face(k)
+                  !write(*,2) 'target_Lc Lc w w_factor PII Y_face', k, & 
+                  !   target_Lc(k), Lc%val, w_00, Lc_w_face_factor%val, s% PII(k), s% Y_face(k)
+               !end if
+            end do
+            stop 'reset_etrb_using_L'
+         end if
+
+
+
+         if (.false.) then
+            write(*,'(5x,a5,99a20)') 'k', 'rel diff', 'Lc/L', 'Y_face', 'actual', 'dlnT/dlnP', 'grada_face'
+            do k=2,nz
+               Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+               dlnT = s% lnT(k-1)-s% lnT(k)
+               dlnP = s% lnPeos(k-1)-s% lnPeos(k)
+               gradT_actual = dlnT/dlnP
+               super_ad_actual = gradT_actual - s% grada_face(k)
+               Y_face = compute_Y_face(s, k, ierr)
+               if (ierr /= 0) stop 'bad Y_face'
+               if (sign(1d0,super_ad_actual*Y_face%val) < 0d0) then
+                  write(*,'(a)',advance='no') '>>>> '
+               else
+                  write(*,'(a)',advance='no') '     '
+               end if
+               write(*,'(i5,1p,99e20.11)') k, (super_ad_actual - Y_face%val)/Y_face%val, &
+                  Lc%val/s% L(k), Y_face%val, super_ad_actual, gradT_actual, s% grada_face(k)
+            end do
+            stop 'reset_etrb_using_L'
+         end if
+
+
+         if (.false.) then
+            do k=2, nz
+               call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! reset with new etrb(k)
+               if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
+               !if (dbg) write(*,2) 'Lold, Lnew, Lconv_old, Lconv_new, Lrad_old, Lrad_new', k, &
+               !   s% L(k), L%val, s% L_conv(k), Lc%val, s% L(k) - s% L_conv(k), Lr%val
+               !if (dbg) write(*,2) 'Lnew/Lold-1, Lconv_new/Lconv_old-1, Lrad_new/Lrad_old-1', k, &
+               !   L%val/s% L(k)-1d0, Lc%val/max(1d0,s% L_conv(k))-1d0, Lr%val/max(1d0,(s% L(k) - s% L_conv(k)))-1d0
+               if (Lc%val*s% L_conv(k) < 0) then
+                  write(*,'(a6)',advance='no') '>>>>  '
+               else
+                  write(*,'(6x)',advance='no') 
+               end if
+               write(*,2) 'Lc_new/Lc_file-1 Lc_new/L Lc_file/L Lc_new Lc_file w_face', k, &
+                  Lc%val/max(1d0,s% L_conv(k))-1d0, Lc%val/s%L(k), s% L_conv(k)/s%L(k), Lc%val, &
+                  s% L_conv(k), w_face(k)
+            end do
+            stop 'reset_etrb_using_L'
+         end if
+         
+         
          if (dbg) stop 'reset_etrb_using_L'
       end subroutine reset_etrb_using_L
+      
+      
+      subroutine revise_etrb(s, target_Lc, atol, rtol, maxerr, k_maxerr, ierr)
+         use star_utils, only: store_etrb_in_xh
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: atol, rtol, target_Lc(:)
+         real(dp), intent(out) :: maxerr
+         integer, intent(out) :: k_maxerr, ierr   
+         real(qp), allocatable, dimension(:) :: &
+            sub, diag, sup, rhs, x, xp, bp, vp
+         real(dp) :: resid, d_detrb_m1, d_detrb_00, d_detrb_p1, &
+            etrb_old, etrb_new, detrb, err
+         integer :: nz, k
+         include 'formats'
+         ierr = 0
+         nz = s% nz
+         allocate(sub(nz), diag(nz), sup(nz), rhs(nz), x(nz), xp(nz), bp(nz), vp(nz))
+         do k=1,nz
+            !if (target_Lc(k) > 0) &
+            !   write(*,2) 'revise_etrb L_conv/target_Lc-1', k, s% L_conv(k)/target_Lc(k) - 1d0
+            call L_conv_eqn(s, k, target_Lc(k), &
+               resid, d_detrb_m1, d_detrb_00, d_detrb_p1, ierr)
+            !call L_conv_eqn(s, k, s% L_conv(k), &
+            !   resid, d_detrb_m1, d_detrb_00, d_detrb_p1, ierr)
+            if (ierr /= 0) return
+            !write(*,2) 'etrb, resid, d_detrb_m1, d_detrb_00, d_detrb_p1', k, &
+            !   s% etrb(k), resid, d_detrb_m1, d_detrb_00, d_detrb_p1
+            if (resid == 0d0) then
+               rhs(k) = 0d0
+               if (k > 1) sub(k-1) = 0d0
+               diag(k) = 1d0
+               sup(k) = 0d0
+            else
+               rhs(k) = -resid
+               if (k > 1) sub(k-1) = d_detrb_m1
+               diag(k) = d_detrb_00
+               if (abs(diag(k)) < 1d-50) then
+                  write(*,2) 'resid sub diag sup', k, resid, d_detrb_m1, d_detrb_00, d_detrb_p1
+               end if
+               sup(k) = d_detrb_p1
+            end if
+         end do
+         call solve_tridiag(sub, diag, sup, rhs, x, xp, bp, vp, nz, ierr)
+         if (ierr /= 0) return
+         maxerr = 0
+         k_maxerr = 0
+         do k=1,nz
+            etrb_old = s% etrb(k)
+            detrb = dble(x(k))
+            if (is_bad(detrb)) then
+               write(*,2) 'detrb', 2, detrb
+               stop 'revise_etrb'
+            end if
+            etrb_new = etrb_old + detrb
+            err = abs(detrb)/(atol + rtol*abs(etrb_old))
+            if (err > maxerr) then
+               maxerr = err; k_maxerr = k
+            end if
+            !write(*,2) 'err, abs(detrb), atol + rtol*abs(etrb_old)', k, &
+            !   err, abs(detrb), atol + rtol*abs(etrb_old)
+            !write(*,2) 'detrb, err, etrb_old, etrb_new', k, detrb, err, etrb_old, etrb_new
+            s% etrb(k) = etrb_new
+            call store_etrb_in_xh(s,k,s% etrb(k))            
+         end do
+         !stop 'revise_etrb'
+      end subroutine revise_etrb
+      
+      
+      subroutine L_conv_eqn(s, k, Lc_target, &
+            resid, d_detrb_m1, d_detrb_00, d_detrb_p1, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k   
+         real(dp), intent(in) :: Lc_target
+         real(dp), intent(out) :: resid, d_detrb_m1, d_detrb_00, d_detrb_p1
+         integer, intent(out) :: ierr   
+         type(auto_diff_real_star_order1) :: Lc, Lc_w_face_factor, res
+         include 'formats'
+         ierr = 0
+         if (k == 1) then ! eqn forces etrb(1) to zero
+            resid = s% etrb(1)
+            d_detrb_m1 = 0
+            d_detrb_00 = 1
+            d_detrb_p1 = 0
+            return
+         end if
+         if (s% mlt_mixing_type(k) == 0) then 
+            res = 0.5d0*(wrap_etrb_m1(s,k) + wrap_etrb_00(s,k)) ! make etrb_face = 0
+         else
+            Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+            if (ierr /= 0) return
+            res = Lc/Lc_target - 1d0
+         end if
+         resid = res%val
+         !write(*,2) 'resid Lc L_conv Lc_w_face_factor', k, &
+         !   resid, Lc%val, s% L_conv(k), Lc_w_face_factor%val
+         d_detrb_m1 = res%d1Array(i_etrb_m1)
+         d_detrb_00 = res%d1Array(i_etrb_00)
+         d_detrb_p1 = res%d1Array(i_etrb_p1)
+      end subroutine L_conv_eqn
+
+
+      subroutine solve_tridiag(sub, diag, sup, rhs, x, xp, bp, vp, n, ierr)
+         !      sub - sub-diagonal
+         !      diag - the main diagonal
+         !      sup - sup-diagonal
+         !      rhs - right hand side
+         !      x - the answer
+         !      n - number of equations
+         integer, intent(in) :: n
+         real(qp), dimension(:), intent(in) :: sup, diag, sub
+         real(qp), dimension(:), intent(in) :: rhs
+         real(qp), dimension(:), intent(out) :: x
+         real(qp), dimension(:), intent(out) :: xp, bp, vp ! work arrays
+         integer, intent(out) :: ierr
+
+         real(qp) :: m
+         integer i
+
+         ierr = 0
+
+         bp(1) = diag(1)
+         vp(1) = rhs(1)
+
+         do i = 2,n
+            m = sub(i-1)/bp(i-1)
+            bp(i) = diag(i) - m*sup(i-1)
+            vp(i) = rhs(i) - m*vp(i-1)
+         end do
+
+         xp(n) = vp(n)/bp(n)
+         x(n) = xp(n)
+         do i = n-1, 1, -1
+            xp(i) = (vp(i) - sup(i)*xp(i+1))/bp(i)
+            x(i) = xp(i)
+         end do
+
+      end subroutine solve_tridiag
 
 
       end module hydro_tdc

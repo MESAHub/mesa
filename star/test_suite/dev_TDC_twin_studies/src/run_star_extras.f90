@@ -62,10 +62,6 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% max_timestep > 0) then
-            s% dt_next = s% max_timestep
-            s% force_timestep_min = s% max_timestep
-         end if
          extras_finish_step = keep_going
          if (s% x_integer_ctrl(1) <= 0) return
          if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
@@ -231,15 +227,15 @@
          end if
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
-         names(1) = 'v_1'
-         names(2) = 'super_ad_1'
-         names(3) = 'cv_1'
-         names(4) = 'Lr_div_L_1'
+         names(1) = 'v_kms_1'
+         names(2) = 'gT_sub_ga'
+         names(3) = 'lgcv2_1'
+         names(4) = 'L_1'
          names(5) = 'logT_1'
          names(6) = 'logRho_1'
-         names(7) = 'log_kap_1'
-         names(8) = 'logtau_1'
-         names(9) = 'logR_1'
+         names(7) = 'Lc_1'
+         names(8) = 'Lr_1'
+         names(9) = 'mix_typ_1'
          
          names(10) = 'xtr1'
          names(11) = 'xtr1_1'
@@ -261,33 +257,59 @@
                vals(k,1) = s_other% v(k)*1d-5
                if (s_other% TDC_flag) then
                   vals(k,2) = s_other% Y_face(k)
+               else if (k == 1) then ! special case since Y_face = 0 for surface
+                  vals(k,2) = 0d0
                else
-                  vals(k,2) = s_other% grada_face(k) - s_other% gradr(k)
+                  vals(k,2) = s_other% gradT(k) - s_other% grada_face(k)
                end if
                if (s_other% TDC_flag) then
                   vals(k,3) = sqrt(max(0d0,s_other% etrb(k)))
                else
-                  vals(k,3) = s_other% conv_vel(k)
+                  vals(k,3) = safe_log10(pow2(s_other% conv_vel(k)))
                end if
-               vals(k,4) = s_other% Lr(k)/s_other% L(k)               
+               vals(k,4) = s_other%L(k)/Lsun
                vals(k,5) = s_other% lnT(k)/ln10
                vals(k,6) = s_other% lnd(k)/ln10 
-               vals(k,7) = safe_log10(s_other% opacity(k))
-               vals(k,8) = s_other% lntau(k)/ln10
-               vals(k,9) = safe_log10(s_other% r(k)/Rsun)
+               if (k == 1) then
+                  vals(k,7) = 0d0
+               else
+                  vals(k,7) = s_other% L_conv(k)/Lsun 
+               end if
+               if (k == 1) then
+                  vals(k,8) = s_other% L(k)/Lsun
+               else
+                  vals(k,8) = s_other% L(k)/Lsun - s_other% L_conv(k)/Lsun 
+               end if
+               vals(k,9) = dble(s_other% mixing_type(k))
                
-               vals(k,10) = s% xtra1_array(k)
-               vals(k,11) = s_other% xtra1_array(k)
-               vals(k,12) = s% xtra2_array(k)
-               vals(k,13) = s_other% xtra2_array(k)
-               vals(k,14) = s% xtra3_array(k)
-               vals(k,15) = s_other% xtra3_array(k)
-               vals(k,16) = s% xtra4_array(k)
-               vals(k,17) = s_other% xtra4_array(k)
-               vals(k,18) = s% xtra5_array(k)
-               vals(k,19) = s_other% xtra5_array(k)
-               vals(k,20) = s% xtra6_array(k)
-               vals(k,21) = s_other% xtra6_array(k)
+               ! debugging stuff
+               vals(k,10) = s% PII(k) ! s% xtra1_array(k)
+               vals(k,11) = 0 ! s_other% xtra1_array(k)
+               vals(k,12) = s% SOURCE(k) ! s% xtra2_array(k)
+               vals(k,13) = 0 ! s_other% xtra2_array(k)
+               vals(k,14) = s% DAMP(k) ! s% xtra3_array(k)
+               vals(k,15) = 0 ! s_other% xtra3_array(k)
+               vals(k,16) = s% Hp_face(k) ! s% xtra4_array(k)
+               vals(k,17) = 0 ! s_other% xtra4_array(k)
+               vals(k,18) = 0 ! s% (k) ! s% xtra5_array(k)
+               vals(k,19) = 0 ! s_other% xtra5_array(k)
+               vals(k,20) = 0 ! s% xtra6_array(k)
+               vals(k,21) = 0 ! s_other% xtra6_array(k)
+               
+               if (.false.) then ! xtra arrays
+                  vals(k,10) = s% xtra1_array(k)
+                  vals(k,11) = s_other% xtra1_array(k)
+                  vals(k,12) = s% xtra2_array(k)
+                  vals(k,13) = s_other% xtra2_array(k)
+                  vals(k,14) = s% xtra3_array(k)
+                  vals(k,15) = s_other% xtra3_array(k)
+                  vals(k,16) = s% xtra4_array(k)
+                  vals(k,17) = s_other% xtra4_array(k)
+                  vals(k,18) = s% xtra5_array(k)
+                  vals(k,19) = s_other% xtra5_array(k)
+                  vals(k,20) = s% xtra6_array(k)
+                  vals(k,21) = s_other% xtra6_array(k)
+               end if
                
                if (.false.) then ! debugging xtra differences
                   vals(k,10) = 100d0*(s% xtra1_array(k) - s_other% xtra1_array(k))
