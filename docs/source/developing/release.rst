@@ -28,8 +28,6 @@ Documentation
 
 - A release notes document should be written
 
-- Sync the reST reference documentation with the {star, binary, astero} defaults files by running the script ``defaults2rst`` (in ``/docs``) and committing the changes
-
 
 Testing
 -------

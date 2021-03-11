@@ -9,6 +9,10 @@ Here is a link to a `reStructured Text primer`_.
 
 Click "View page source" in the upper right to see the rst file corresponding to this page.
 
+The :ref:`Format for MESA defaults files` page has additional
+information on ReST formatting from the perspective of writing
+defaults files.
+
 Names
 -----
 
