@@ -228,7 +228,7 @@
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
          names(1) = 'v_kms_1'
-         names(2) = 'gT_sub_ga'
+         names(2) = 'spr_ad_1'
          names(3) = 'lgcv2_1'
          names(4) = 'L_1'
          names(5) = 'logT_1'
@@ -260,7 +260,10 @@
                else if (k == 1) then ! special case since Y_face = 0 for surface
                   vals(k,2) = 0d0
                else
-                  vals(k,2) = s_other% gradT(k) - s_other% grada_face(k)
+                  vals(k,2) = &
+                     (s_other% lnT(k-1) - s_other% lnT(k))/ &
+                        (s_other% lnPeos(k-1) - s_other% lnPeos(k)) &
+                      - s_other% grada_face(k)
                end if
                if (s_other% TDC_flag) then
                   vals(k,3) = sqrt(max(0d0,s_other% etrb(k)))

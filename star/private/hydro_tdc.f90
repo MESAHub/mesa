@@ -964,14 +964,12 @@
          if (s% TDC_alfa == 0d0) return ! no convection
          nz = s% nz
          if (s% have_previous_conv_vel) then
-            write(*,*) 'initial w_face set to conv_vel from file or from MLT'
+            write(*,*) 'initial w_face set using L_conv from file or from MLT'
          else
             write(*,*) 'need conv_vel from file or from MLT in order to set initial w_face'
             stop 'reset_etrb_using_L'
          end if
          allocate(w_face(nz), target_Lc(nz))
-
-
 
          if (.false.) then
             write(*,*) 'Compare standard and alternative forms of Y_face'
@@ -983,25 +981,6 @@
             end do
             stop 'reset_etrb_using_L'
          end if
-
-         if (.false.) then
-            do k=2,nz
-               dlnT = s% lnT(k-1)-s% lnT(k)
-               dlnP = s% lnPeos(k-1)-s% lnPeos(k)
-               gradT_actual = dlnT/dlnP
-               super_ad_actual = gradT_actual - s% grada_face(k)
-               super_ad_expected = s% gradT(k) - s% grada_face(k)
-               if (sign(1d0,super_ad_actual*super_ad_expected) < 0d0) &
-                  write(*,'(a)',advance='no') '!!!!'
-               write(*,2) 'super_ad_actual super_ad_expected', k, &
-                  sign(1d0,super_ad_actual*super_ad_expected), &
-                  (super_ad_actual - super_ad_expected)/super_ad_actual, &
-                  super_ad_actual, super_ad_expected
-            end do
-            stop 'reset_etrb_using_L'
-         end if
-
-
 
          do k=1, nz
             Lr = compute_Lr(s, k, ierr)
@@ -1023,11 +1002,7 @@
             if ((w_face(k) == 0d0 .and. s% conv_vel(k) > 0d0) .or. &
                 (w_face(k) > 0d0 .and. s% conv_vel(k) == 0d0)) &
                w_face(k) = s% conv_vel(k)
-            !if (k >= 25 .and. k <= 65) &
-            !   write(*,2) 'w_face conv_vel', k, w_face(k), s% conv_vel(k)
-            !if (abs(w_face(k)) > 1d2*s% csound_face(k)) w_face(k) = 0d0
          end do
-         !stop 'reset_etrb_using_L'
          
          do k=1, nz
             if (k < nz) then
@@ -1039,216 +1014,8 @@
             call store_etrb_in_xh(s,k,s% etrb(k))
          end do
          
-         if (.false.) then ! adjust etrb to match target L_conv
-            !do k = 1, nz
-            !   write(*,3) 'target_Lc mlt_mix', k, s% mlt_mixing_type(k), target_Lc(k)
-            !end do
-            do j = 1, 3
-               call revise_etrb(s, target_Lc, atol, rtol, maxerr, k_maxerr, ierr)
-               if (ierr /= 0) stop 'got ierr from revise_etrb'
-               write(*,3) 'maxerr', j, k_maxerr, maxerr
-            end do
-            stop 'reset_etrb_using_L'
-         end if
-         
-         if (.false.) then
-            do k=2, nz
-               Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
-               !if (Lc%val < 0d0) then
-                  w_00 = sqrt(s% etrb(k))
-                  write(*,3) 'Y_face gradT-grada', k, s% mlt_mixing_type(k), &
-                     s% Y_face(k), s% gradT(k) - s% grada_face(k)
-                  !write(*,2) 'target_Lc Lc w w_factor PII Y_face', k, & 
-                  !   target_Lc(k), Lc%val, w_00, Lc_w_face_factor%val, s% PII(k), s% Y_face(k)
-               !end if
-            end do
-            stop 'reset_etrb_using_L'
-         end if
-
-
-
-         if (.false.) then
-            write(*,'(5x,a5,99a20)') 'k', 'rel diff', 'Lc/L', 'Y_face', 'actual', 'dlnT/dlnP', 'grada_face'
-            do k=2,nz
-               Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
-               dlnT = s% lnT(k-1)-s% lnT(k)
-               dlnP = s% lnPeos(k-1)-s% lnPeos(k)
-               gradT_actual = dlnT/dlnP
-               super_ad_actual = gradT_actual - s% grada_face(k)
-               Y_face = compute_Y_face(s, k, ierr)
-               if (ierr /= 0) stop 'bad Y_face'
-               if (sign(1d0,super_ad_actual*Y_face%val) < 0d0) then
-                  write(*,'(a)',advance='no') '>>>> '
-               else
-                  write(*,'(a)',advance='no') '     '
-               end if
-               write(*,'(i5,1p,99e20.11)') k, (super_ad_actual - Y_face%val)/Y_face%val, &
-                  Lc%val/s% L(k), Y_face%val, super_ad_actual, gradT_actual, s% grada_face(k)
-            end do
-            stop 'reset_etrb_using_L'
-         end if
-
-
-         if (.false.) then
-            do k=2, nz
-               call compute_L_terms(s, k, L, Lr, Lc, Lt, ierr) ! reset with new etrb(k)
-               if (ierr /= 0) stop 'failed in compute_L reset_wturb_using_L'
-               !if (dbg) write(*,2) 'Lold, Lnew, Lconv_old, Lconv_new, Lrad_old, Lrad_new', k, &
-               !   s% L(k), L%val, s% L_conv(k), Lc%val, s% L(k) - s% L_conv(k), Lr%val
-               !if (dbg) write(*,2) 'Lnew/Lold-1, Lconv_new/Lconv_old-1, Lrad_new/Lrad_old-1', k, &
-               !   L%val/s% L(k)-1d0, Lc%val/max(1d0,s% L_conv(k))-1d0, Lr%val/max(1d0,(s% L(k) - s% L_conv(k)))-1d0
-               if (Lc%val*s% L_conv(k) < 0) then
-                  write(*,'(a6)',advance='no') '>>>>  '
-               else
-                  write(*,'(6x)',advance='no') 
-               end if
-               write(*,2) 'Lc_new/Lc_file-1 Lc_new/L Lc_file/L Lc_new Lc_file w_face', k, &
-                  Lc%val/max(1d0,s% L_conv(k))-1d0, Lc%val/s%L(k), s% L_conv(k)/s%L(k), Lc%val, &
-                  s% L_conv(k), w_face(k)
-            end do
-            stop 'reset_etrb_using_L'
-         end if
-         
-         
          if (dbg) stop 'reset_etrb_using_L'
       end subroutine reset_etrb_using_L
-      
-      
-      subroutine revise_etrb(s, target_Lc, atol, rtol, maxerr, k_maxerr, ierr)
-         use star_utils, only: store_etrb_in_xh
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: atol, rtol, target_Lc(:)
-         real(dp), intent(out) :: maxerr
-         integer, intent(out) :: k_maxerr, ierr   
-         real(qp), allocatable, dimension(:) :: &
-            sub, diag, sup, rhs, x, xp, bp, vp
-         real(dp) :: resid, d_detrb_m1, d_detrb_00, d_detrb_p1, &
-            etrb_old, etrb_new, detrb, err
-         integer :: nz, k
-         include 'formats'
-         ierr = 0
-         nz = s% nz
-         allocate(sub(nz), diag(nz), sup(nz), rhs(nz), x(nz), xp(nz), bp(nz), vp(nz))
-         do k=1,nz
-            !if (target_Lc(k) > 0) &
-            !   write(*,2) 'revise_etrb L_conv/target_Lc-1', k, s% L_conv(k)/target_Lc(k) - 1d0
-            call L_conv_eqn(s, k, target_Lc(k), &
-               resid, d_detrb_m1, d_detrb_00, d_detrb_p1, ierr)
-            !call L_conv_eqn(s, k, s% L_conv(k), &
-            !   resid, d_detrb_m1, d_detrb_00, d_detrb_p1, ierr)
-            if (ierr /= 0) return
-            !write(*,2) 'etrb, resid, d_detrb_m1, d_detrb_00, d_detrb_p1', k, &
-            !   s% etrb(k), resid, d_detrb_m1, d_detrb_00, d_detrb_p1
-            if (resid == 0d0) then
-               rhs(k) = 0d0
-               if (k > 1) sub(k-1) = 0d0
-               diag(k) = 1d0
-               sup(k) = 0d0
-            else
-               rhs(k) = -resid
-               if (k > 1) sub(k-1) = d_detrb_m1
-               diag(k) = d_detrb_00
-               if (abs(diag(k)) < 1d-50) then
-                  write(*,2) 'resid sub diag sup', k, resid, d_detrb_m1, d_detrb_00, d_detrb_p1
-               end if
-               sup(k) = d_detrb_p1
-            end if
-         end do
-         call solve_tridiag(sub, diag, sup, rhs, x, xp, bp, vp, nz, ierr)
-         if (ierr /= 0) return
-         maxerr = 0
-         k_maxerr = 0
-         do k=1,nz
-            etrb_old = s% etrb(k)
-            detrb = dble(x(k))
-            if (is_bad(detrb)) then
-               write(*,2) 'detrb', 2, detrb
-               stop 'revise_etrb'
-            end if
-            etrb_new = etrb_old + detrb
-            err = abs(detrb)/(atol + rtol*abs(etrb_old))
-            if (err > maxerr) then
-               maxerr = err; k_maxerr = k
-            end if
-            !write(*,2) 'err, abs(detrb), atol + rtol*abs(etrb_old)', k, &
-            !   err, abs(detrb), atol + rtol*abs(etrb_old)
-            !write(*,2) 'detrb, err, etrb_old, etrb_new', k, detrb, err, etrb_old, etrb_new
-            s% etrb(k) = etrb_new
-            call store_etrb_in_xh(s,k,s% etrb(k))            
-         end do
-         !stop 'revise_etrb'
-      end subroutine revise_etrb
-      
-      
-      subroutine L_conv_eqn(s, k, Lc_target, &
-            resid, d_detrb_m1, d_detrb_00, d_detrb_p1, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k   
-         real(dp), intent(in) :: Lc_target
-         real(dp), intent(out) :: resid, d_detrb_m1, d_detrb_00, d_detrb_p1
-         integer, intent(out) :: ierr   
-         type(auto_diff_real_star_order1) :: Lc, Lc_w_face_factor, res
-         include 'formats'
-         ierr = 0
-         if (k == 1) then ! eqn forces etrb(1) to zero
-            resid = s% etrb(1)
-            d_detrb_m1 = 0
-            d_detrb_00 = 1
-            d_detrb_p1 = 0
-            return
-         end if
-         if (s% mlt_mixing_type(k) == 0) then 
-            res = 0.5d0*(wrap_etrb_m1(s,k) + wrap_etrb_00(s,k)) ! make etrb_face = 0
-         else
-            Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
-            if (ierr /= 0) return
-            res = Lc/Lc_target - 1d0
-         end if
-         resid = res%val
-         !write(*,2) 'resid Lc L_conv Lc_w_face_factor', k, &
-         !   resid, Lc%val, s% L_conv(k), Lc_w_face_factor%val
-         d_detrb_m1 = res%d1Array(i_etrb_m1)
-         d_detrb_00 = res%d1Array(i_etrb_00)
-         d_detrb_p1 = res%d1Array(i_etrb_p1)
-      end subroutine L_conv_eqn
-
-
-      subroutine solve_tridiag(sub, diag, sup, rhs, x, xp, bp, vp, n, ierr)
-         !      sub - sub-diagonal
-         !      diag - the main diagonal
-         !      sup - sup-diagonal
-         !      rhs - right hand side
-         !      x - the answer
-         !      n - number of equations
-         integer, intent(in) :: n
-         real(qp), dimension(:), intent(in) :: sup, diag, sub
-         real(qp), dimension(:), intent(in) :: rhs
-         real(qp), dimension(:), intent(out) :: x
-         real(qp), dimension(:), intent(out) :: xp, bp, vp ! work arrays
-         integer, intent(out) :: ierr
-
-         real(qp) :: m
-         integer i
-
-         ierr = 0
-
-         bp(1) = diag(1)
-         vp(1) = rhs(1)
-
-         do i = 2,n
-            m = sub(i-1)/bp(i-1)
-            bp(i) = diag(i) - m*sup(i-1)
-            vp(i) = rhs(i) - m*vp(i-1)
-         end do
-
-         xp(n) = vp(n)/bp(n)
-         x(n) = xp(n)
-         do i = n-1, 1, -1
-            xp(i) = (vp(i) - sup(i)*xp(i+1))/bp(i)
-            x(i) = xp(i)
-         end do
-
-      end subroutine solve_tridiag
 
 
       end module hydro_tdc

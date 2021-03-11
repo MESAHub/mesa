@@ -162,7 +162,7 @@
 
    !pause = .true.
    !pause_interval = 10
-   pgstar_interval = 1
+   pgstar_interval = 2
 
    !Profile_Panels1_xmin = 25 ! -101D0
    !Profile_Panels1_xmax = 65 ! -101D0

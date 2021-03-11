@@ -23,7 +23,7 @@
 / ! end of kap namelist
 
 &controls
-   max_timestep = 1d8
+   max_timestep = 1d7
    !force_timestep = 1d6 ! synch twins
 
 ! starting specifications
@@ -67,7 +67,7 @@
    photo_interval = 100
    profile_interval = 100
    !history_interval = 1
-   terminal_interval = 1
+   terminal_interval = 10
 
 / ! end of controls namelist
 
@@ -227,7 +227,7 @@
    Profile_Panels1_other_ymin(2) = -1       
             
    Profile_Panels1_yaxis_name(3) = 'Y_face'
-   Profile_Panels1_other_yaxis_name(3) = 'gT_sub_ga'
+   Profile_Panels1_other_yaxis_name(3) = 'spr_ad_1'
    Profile_Panels1_same_yaxis_range(3) = .true.
 
 ! debugging output
