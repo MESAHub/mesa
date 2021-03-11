@@ -609,8 +609,6 @@
             if (failed('u')) exit
             call do1(s% alpha_RTI, c% alpha_RTI)
             if (failed('alpha_RTI')) exit
-            call do1(s% w, c% w)
-            if (failed('w')) exit
             call do1(s% etrb, c% etrb)
             if (failed('etrb')) exit
             call do1(s% etrb_start, c% etrb_start)
@@ -678,10 +676,10 @@
             call do1(s% m_grav, c% m_grav)
             if (failed('m_grav')) exit
 
-            call do1(s% P, c% P)
-            if (failed('P')) exit
-            call do1(s% lnP, c% lnP)
-            if (failed('lnP')) exit
+            call do1(s% Peos, c% Peos)
+            if (failed('Peos')) exit
+            call do1(s% lnPeos, c% lnPeos)
+            if (failed('lnPeos')) exit
             call do1(s% lnPgas, c% lnPgas)
             if (failed('lnPgas')) exit
             call do1(s% Pgas, c% Pgas)
@@ -779,8 +777,8 @@
             if (failed('dS_dT_for_partials')) exit
             call do2(s% dlnE_dxa_for_partials, c% dlnE_dxa_for_partials, species, null_str)
             if (failed('dlnE_dxa_for_partials')) exit
-            call do2(s% dlnP_dxa_for_partials, c% dlnP_dxa_for_partials, species, null_str)
-            if (failed('dlnP_dxa_for_partials')) exit
+            call do2(s% dlnPeos_dxa_for_partials, c% dlnPeos_dxa_for_partials, species, null_str)
+            if (failed('dlnPeos_dxa_for_partials')) exit
 
             ! other model variables
             call do1(s% csound, c% csound)
@@ -1340,10 +1338,10 @@
             if (failed('lnd_start')) exit
             call do1(s% lnPgas_start, c% lnPgas_start)
             if (failed('lnPgas_start')) exit
-            call do1(s% lnP_start, c% lnP_start)
-            if (failed('lnP_start')) exit
-            call do1(s% P_start, c% P_start)
-            if (failed('P_start')) exit
+            call do1(s% lnPeos_start, c% lnPeos_start)
+            if (failed('lnPeos_start')) exit
+            call do1(s% Peos_start, c% Peos_start)
+            if (failed('Peos_start')) exit
             call do1(s% lnT_start, c% lnT_start)
             if (failed('lnT_start')) exit
             call do1(s% lnE_start, c% lnE_start)
@@ -1549,12 +1547,12 @@
             
             call do1(s% Fr, c% Fr); if (failed('Fr')) exit
             call do1(s% Fr_start, c% Fr_start); if (failed('Fr_start')) exit
-            call do1(s% avQ, c% avQ); if (failed('avQ')) exit
-            call do1(s% avQ_start, c% avQ_start); if (failed('avQ_start')) exit
-            call do1(s% Pt, c% Pt); if (failed('Pt')) exit
-            call do1(s% Pt_start, c% Pt_start); if (failed('Pt_start')) exit
-            call do1(s% d_Pt_dV_00, c% d_Pt_dV_00); if (failed('d_Pt_dV_00')) exit
-            call do1(s% d_Pt_dw_00, c% d_Pt_dw_00); if (failed('d_Pt_dw_00')) exit
+            call do1(s% Pvsc, c% Pvsc); if (failed('Pvsc')) exit
+            call do1(s% Pvsc_start, c% Pvsc_start); if (failed('Pvsc_start')) exit
+            call do1(s% Ptrb, c% Ptrb); if (failed('Ptrb')) exit
+            call do1(s% Ptrb_start, c% Ptrb_start); if (failed('Ptrb_start')) exit
+            call do1(s% d_Ptrb_dV_00, c% d_Ptrb_dV_00); if (failed('d_Ptrb_dV_00')) exit
+            call do1(s% d_Ptrb_dw_00, c% d_Ptrb_dw_00); if (failed('d_Ptrb_dw_00')) exit
             call do1(s% Eq, c% Eq); if (failed('Eq')) exit
             call do1(s% SOURCE, c% SOURCE); if (failed('SOURCE')) exit
             call do1(s% DAMP, c% DAMP); if (failed('DAMP')) exit
@@ -2560,11 +2558,11 @@
          end if
 
          if (s% RSP_flag) then
-            i = i+1; s% i_etrb_RSP = i
+            i = i+1; s% i_Et_RSP = i
             i = i+1; s% i_erad_RSP = i
             i = i+1; s% i_Fr_RSP = i
          else
-            s% i_etrb_RSP = 0
+            s% i_Et_RSP = 0
             s% i_erad_RSP = 0
             s% i_Fr_RSP = 0
          end if
@@ -2612,7 +2610,7 @@
       
          s% i_detrb_dt = s% i_etrb
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
-         s% i_detrb_RSP_dt = s% i_etrb_RSP
+         s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
          s% i_dFr_RSP_dt = s% i_Fr_RSP
          s% i_dln_cvpv0_dt = s% i_ln_cvpv0
@@ -2634,7 +2632,7 @@
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
          if (s% i_etrb /= 0) s% nameofvar(s% i_etrb) = 'etrb'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
-         if (s% i_etrb_RSP /= 0) s% nameofvar(s% i_etrb_RSP) = 'etrb_RSP'
+         if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
          if (s% i_ln_cvpv0 /= 0) s% nameofvar(s% i_ln_cvpv0) = 'ln_cvpv0'
@@ -2650,7 +2648,7 @@
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
-         if (s% i_detrb_RSP_dt /= 0) s% nameofequ(s% i_detrb_RSP_dt) = 'detrb_RSP_dt'
+         if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'
          if (s% i_dFr_RSP_dt /= 0) s% nameofequ(s% i_dFr_RSP_dt) = 'dFr_RSP_dt'
          if (s% i_dln_cvpv0_dt /= 0) s% nameofequ(s% i_dln_cvpv0_dt) = 'dln_cvpv0_dt'
@@ -3118,7 +3116,7 @@
          if (.not. RSP_flag) then
             call remove1(s% i_Fr_RSP)
             call remove1(s% i_erad_RSP)
-            call remove1(s% i_etrb_RSP)
+            call remove1(s% i_Et_RSP)
          else if (s% i_lum /= 0) then
             call remove1(s% i_lum)
          end if
@@ -3133,7 +3131,7 @@
          if (ierr /= 0) return
 
          if (RSP_flag) then
-            call insert1(s% i_etrb_RSP)
+            call insert1(s% i_Et_RSP)
             call insert1(s% i_erad_RSP)
             call insert1(s% i_Fr_RSP)
          else

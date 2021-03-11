@@ -55,7 +55,7 @@
             s, nz, nz_old, xh_old, xa_old, &
             energy_old, eta_old, lnd_old, lnPgas_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, &
-            conv_vel_old, lnT_old, et_old, specific_PE_old, specific_KE_old, &
+            conv_vel_old, lnT_old, etrb_old, specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
          use interp_1d_def
@@ -65,7 +65,7 @@
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, conv_vel_old, lnT_old, et_old, &
+            lnd_old, lnPgas_old, conv_vel_old, lnT_old, etrb_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, D_mix_old
@@ -319,7 +319,7 @@
                s, nz_old, k, species, cell_type, comes_from, &
                xa, xh, xh_old, &
                xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
-               specific_PE_old, specific_KE_old, et_old, &
+               specific_PE_old, specific_KE_old, etrb_old, &
                density_new, energy_new, op_err)
             if (op_err /= 0) then
                write(*,2) 'failed for do1_lnT', k
@@ -1355,7 +1355,7 @@
             species, cell_type, comes_from, &
             xa, xh, xh_old, &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
-            specific_PE_old, specific_KE_old, et_old, &
+            specific_PE_old, specific_KE_old, etrb_old, &
             density_new, energy_new, ierr)
          use eos_def
          use star_utils, only: set_rmid, cell_specific_PE, cell_specific_KE
@@ -1364,7 +1364,7 @@
          real(dp), dimension(:,:), pointer :: xa, xh, xh_old
          real(dp), dimension(:) :: &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
-            specific_PE_old, specific_KE_old, et_old, density_new, energy_new
+            specific_PE_old, specific_KE_old, etrb_old, density_new, energy_new
          integer, intent(out) :: ierr
 
          integer :: k_old, k_old_last, lnT_order, energy_order
@@ -1507,7 +1507,7 @@
                if (s% show_mesh_changes) &
                   write(*,2) 'remesh: delta_energy too large to fix completely', k, &
                      delta_energy, max_delta_energy, &
-                     specific_PE_old(k_old), specific_KE_old(k_old), et_old(k_old)
+                     specific_PE_old(k_old), specific_KE_old(k_old), etrb_old(k_old)
                delta_energy = sign(max_delta_energy,delta_energy)
             end if
             energy_new(k) = avg_energy + delta_energy
@@ -2666,7 +2666,7 @@
 
          old_eturb_tot = 0d0
          do k=1,nz_old
-            old_eturb(k) = old_dq(k)*xh_old(i_etrb,k)*xh_old(i_etrb,k)
+            old_eturb(k) = old_dq(k)*xh_old(i_etrb,k)
             old_eturb_tot = old_eturb_tot + old_eturb(k)
          end do
 

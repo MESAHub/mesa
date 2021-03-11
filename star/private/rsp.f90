@@ -165,7 +165,7 @@
             call store_rho_in_xh(s, k, 1d0/s% Vol(k))
             call store_T_in_xh(s, k, s% T(k))
             call store_r_in_xh(s, k, s% r(k))
-            s% xh(s% i_etrb_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
+            s% xh(s% i_Et_RSP,k) = s% RSP_w(k)*s% RSP_w(k)
             do j=1,s% species
                s% xa(j,k) = xa(j)
             end do
@@ -336,7 +336,7 @@
             if (ALFAC == 0d0 .or. ALFAS == 0d0) then
                s% RSP_w(1:nz) = 0d0
                s% RSP_Et(1:nz) = 0d0
-               s% xh(s% i_etrb_RSP,1:nz) = 0d0
+               s% xh(s% i_Et_RSP,1:nz) = 0d0
             else
                !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
                do i = 1,nz
@@ -358,8 +358,8 @@
                   s% RSP_w(k) = 0.5d0*(w_avg(k) + w_avg(k+1))
                   if (s% RSP_w(k) < 0d0) s% RSP_w(k) = 0d0
                   s% RSP_Et(k) = s% RSP_w(k)**2
-                  s% xh(s% i_etrb_RSP,k) = s% RSP_Et(k)               
-                  s% RSP_w(k) = sqrt(s% xh(s% i_etrb_RSP,k))
+                  s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
+                  s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
                end do   
             end if         
          end if
@@ -379,7 +379,7 @@
          end if
          if (s% use_other_rsp_build_model .and. &
                s% set_RSP_Psurf_to_multiple_of_initial_P1 > 0d0) then
-            s% RSP_Psurf = s% P(1)*s% set_RSP_Psurf_to_multiple_of_initial_P1
+            s% RSP_Psurf = s% Peos(1)*s% set_RSP_Psurf_to_multiple_of_initial_P1
             write(*,1) 'rsp_setup_part2 set RSP_Psurf', s% RSP_Psurf
          end if
       end subroutine rsp_setup_part2
@@ -473,7 +473,7 @@
             k_max_abs_rel_hse_err = 0
             do k=2,s% nz
                hse_err = &
-                  (s% P(k-1) - s% P(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*s% r(k)**4)) - 1d0
+                  (s% Peos(k-1) - s% Peos(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*s% r(k)**4)) - 1d0
                if (abs(hse_err) >= max_abs_rel_hse_err) then
                   max_abs_rel_hse_err = abs(hse_err)
                   k_max_abs_rel_hse_err = k
@@ -850,10 +850,10 @@
             k = NZN+1-i
             WORK(I)=  WORK(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
                  (THETA*(PPP0(I)+PPQ0(I))+ &
-                 THETA1*((s% Pgas(k)+s% Prad(k))+s% avQ(k))) &
+                 THETA1*((s% Pgas(k)+s% Prad(k))+s% Pvsc(k))) &
                  -s% dt*s% dm(k)*s% Eq(k)
             WORKQ(I)=  WORKQ(I)+(VV0(I)-s% Vol(k))*s% dm(k)* &
-                 (THETA*PPQ0(I)+THETA1*s% avQ(k))
+                 (THETA*PPQ0(I)+THETA1*s% Pvsc(k))
             PDVWORK=PDVWORK+WORK(i)
          enddo
          s% rsp_GRPDV=PDVWORK/EKDEL
@@ -906,7 +906,7 @@
       subroutine calculate_work_integrals(s)
          type (star_info), pointer :: s
          integer :: i, k
-         real(dp) :: dt, dm, dVol, P_tw, avQ_tw, Pt_tw
+         real(dp) :: dt, dm, dVol, P_tw, Pvsc_tw, Ptrb_tw
          character (len=256) :: fname
          dt = s% dt
          ! LAST STEP OF PdV
@@ -918,13 +918,13 @@
                dVol = VV0(I) - s% Vol_start(k)
                P_tw = THETA*PPP0(I) + &
                   THETA1*(s% Pgas_start(k) + s% Prad_start(k))
-               avQ_tw = THETA*PPQ0(I) + THETA1*s% avQ_start(k)
-               Pt_tw = THETAT*PPT0(I) + THETAT1*s% Pt_start(k)
+               Pvsc_tw = THETA*PPQ0(I) + THETA1*s% Pvsc_start(k)
+               Ptrb_tw = THETAT*PPT0(I) + THETAT1*s% Ptrb_start(k)
                WORK(I) = WORK(I) + &
-                    dVol*s% dm(k)*(P_tw + avQ_tw + Pt_tw) &
+                    dVol*s% dm(k)*(P_tw + Pvsc_tw + Ptrb_tw) &
                   - dt*dm*s% Eq(k)
-               WORKQ(I) = WORKQ(I) + dVol*dm*avQ_tw
-               WORKT(I) = WORKT(I) + dVol*dm*Pt_tw
+               WORKQ(I) = WORKQ(I) + dVol*dm*Pvsc_tw
+               WORKT(I) = WORKT(I) + dVol*dm*Ptrb_tw
                WORKC(I) = WORKC(I) - dt*dm*s% Eq(k)
             enddo
             if (s% rsp_num_periods == s% RSP_work_period) then
@@ -960,8 +960,8 @@
                k = NZN+1-i
                VV0(I) = s% Vol_start(k)
                PPP0(I) = s% Pgas_start(k) + s% Prad_start(k)
-               PPQ0(I) = s% avQ_start(k)
-               PPT0(I) = s% Pt_start(k)
+               PPQ0(I) = s% Pvsc_start(k)
+               PPT0(I) = s% Ptrb_start(k)
                PPC0(I) = s% Chi_start(k)
             enddo      
          endif
@@ -974,12 +974,12 @@
                dVol = s% Vol(k) - s% Vol_start(k)
                P_tw = THETA*(s% Pgas(k) + s% Prad(k)) &
                   + THETA1*(s% Pgas_start(k) + s% Prad_start(k))
-               avQ_tw = THETA*s% avQ(k) + THETA1*s% avQ_start(k)
-               Pt_tw = THETAT*s% Pt(k) + THETAT1*s% Pt_start(k)
+               Pvsc_tw = THETA*s% Pvsc(k) + THETA1*s% Pvsc_start(k)
+               Ptrb_tw = THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k)
                WORK(I) = WORK(I) + &
-                  dm*(dVol*(P_tw + avQ_tw + Pt_tw) - dt*s% Eq(k))
-               WORKQ(I)=  WORKQ(I) + dm*dVol*avQ_tw
-               WORKT(I)=  WORKT(I) + dm*dVol*Pt_tw
+                  dm*(dVol*(P_tw + Pvsc_tw + Ptrb_tw) - dt*s% Eq(k))
+               WORKQ(I)=  WORKQ(I) + dm*dVol*Pvsc_tw
+               WORKT(I)=  WORKT(I) + dm*dVol*Ptrb_tw
                WORKC(I)=  WORKC(I) - dt*dm*s% Eq(k)
             enddo       
          endif

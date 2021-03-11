@@ -93,7 +93,7 @@
             call star_ptr(star_ids(i), s, ierr)
             if (failed('star_ptr',ierr)) return
             
-            s% result_reason = result_reason_normal
+            s% result_reason = forced_stop
 
             call after_evolve_loop(star_ids(i), do_free_star, ierr)
             if (failed('after_evolve_loop',ierr)) return

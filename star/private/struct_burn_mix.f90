@@ -301,8 +301,8 @@
             !s% rmid_start(k) set elsewhere
             !s% v_start(k) set elsewhere
             !s% csound_start(k) set elsewhere
-            s% lnP_start(k) = s% lnP(k)
-            s% P_start(k) = s% P(k)
+            s% lnPeos_start(k) = s% lnPeos(k)
+            s% Peos_start(k) = s% Peos(k)
             s% lnPgas_start(k) = s% lnPgas(k)
             s% lnE_start(k) = s% lnE(k)
             s% energy_start(k) = s% energy(k)
@@ -320,8 +320,8 @@
             s% eps_nuc_start(k) = s% eps_nuc(k)
             s% non_nuc_neu_start(k) = s% non_nuc_neu(k)
             s% mass_correction_start(k) = s% mass_correction(k)
-            s% P_div_rho_start(k) = s% P(k)/s% rho(k)
-            s% avQ_start(k) = -1d99
+            s% P_div_rho_start(k) = s% Peos(k)/s% rho(k)
+            s% Pvsc_start(k) = -1d99
             s% scale_height_start(k) = s% scale_height(k)
             s% gradT_start(k) = s% gradT(k)
             s% gradL_start(k) = s% gradL(k)

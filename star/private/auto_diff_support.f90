@@ -352,36 +352,41 @@
          dxh_etrb % d1Array(i_etrb_00) = 1d0
       end function wrap_dxh_etrb
 
-      function wrap_w_m1(s, k) result(w_m1)
+      function safe_wrap_w_m1(s, k) result(w_m1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: w_m1
+         type(auto_diff_real_star_order1) :: w_m1, etrb_m1
          integer, intent(in) :: k
-         w_m1 = 0d0 
-         if (k > 1) then
-            w_m1 % val = s%w(k-1)
-            w_m1 % d1Array(i_etrb_m1) = 0.5d0/s%w(k-1)
+         etrb_m1 = wrap_etrb_m1(s,k)
+         if (etrb_m1%val <= 0) then
+            w_m1 = 0
+         else
+            w_m1 = sqrt(etrb_m1)
          end if            
-      end function wrap_w_m1
+      end function safe_wrap_w_m1
 
-      function wrap_w_00(s, k) result(w_00)
+      function safe_wrap_w_00(s, k) result(w_00)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: w_00
+         type(auto_diff_real_star_order1) :: w_00, etrb_00
          integer, intent(in) :: k
-         w_00 = 0d0 
-         w_00 % val = s%w(k)
-         w_00 % d1Array(i_etrb_00) = 0.5d0/s%w(k)
-      end function wrap_w_00
+         etrb_00 = wrap_etrb_00(s,k) 
+         if (etrb_00%val <= 0) then
+            w_00 = 0
+         else
+            w_00 = sqrt(etrb_00)
+         end if            
+      end function safe_wrap_w_00
 
-      function wrap_w_p1(s, k) result(w_p1)
+      function safe_wrap_w_p1(s, k) result(w_p1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: w_p1
+         type(auto_diff_real_star_order1) :: w_p1, etrb_p1
          integer, intent(in) :: k
-         w_p1 = 0d0 
-         if (k < s%nz) then
-            w_p1 % val = s%w(k+1)
-            w_p1 % d1Array(i_etrb_p1) = 0.5d0/s%w(k+1)
-         end if
-      end function wrap_w_p1
+         etrb_p1 = wrap_etrb_p1(s,k)  
+         if (etrb_p1%val <= 0) then
+            w_p1 = 0
+         else
+            w_p1 = sqrt(etrb_p1)
+         end if            
+      end function safe_wrap_w_p1
 
       function wrap_kap_m1(s, k) result(kap_m1)
          type (star_info), pointer :: s
@@ -485,73 +490,73 @@
          end if
       end function wrap_e_p1
 
-      function wrap_p_m1(s, k) result(p_m1)
+      function wrap_Peos_m1(s, k) result(Peos_m1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: p_m1
+         type(auto_diff_real_star_order1) :: Peos_m1
          integer, intent(in) :: k
-         p_m1 = 0d0 
+         Peos_m1 = 0d0 
          if (k > 1) then
-            p_m1%val = s% P(k-1)
-            p_m1%d1Array(i_lnd_m1) = s%P(k-1) * s% chiRho_for_partials(k-1)
-            p_m1%d1Array(i_lnT_m1) = s%P(k-1) * s% chiT_for_partials(k-1)
+            Peos_m1%val = s% Peos(k-1)
+            Peos_m1%d1Array(i_lnd_m1) = s%Peos(k-1) * s% chiRho_for_partials(k-1)
+            Peos_m1%d1Array(i_lnT_m1) = s%Peos(k-1) * s% chiT_for_partials(k-1)
          end if   
-      end function wrap_p_m1
+      end function wrap_Peos_m1
 
-      function wrap_p_00(s, k) result(p_00)
+      function wrap_Peos_00(s, k) result(Peos_00)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: p_00
+         type(auto_diff_real_star_order1) :: Peos_00
          integer, intent(in) :: k
-         p_00 = 0d0 
-         p_00%val = s% P(k)
-         p_00%d1Array(i_lnd_00) = s%P(k) * s% chiRho_for_partials(k)
-         p_00%d1Array(i_lnT_00) = s%P(k) * s% chiT_for_partials(k)
-      end function wrap_p_00
+         Peos_00 = 0d0 
+         Peos_00%val = s% Peos(k)
+         Peos_00%d1Array(i_lnd_00) = s%Peos(k) * s% chiRho_for_partials(k)
+         Peos_00%d1Array(i_lnT_00) = s%Peos(k) * s% chiT_for_partials(k)
+      end function wrap_Peos_00
 
-      function wrap_p_p1(s, k) result(p_p1)
+      function wrap_Peos_p1(s, k) result(Peos_p1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: p_p1
+         type(auto_diff_real_star_order1) :: Peos_p1
          integer, intent(in) :: k
-         p_p1 = 0d0 
+         Peos_p1 = 0d0 
          if (k < s%nz) then
-            p_p1%val = s% P(k+1)
-            p_p1%d1Array(i_lnd_p1) = s%P(k+1) * s% chiRho_for_partials(k+1)
-            p_p1%d1Array(i_lnT_p1) = s%P(k+1) * s% chiT_for_partials(k+1)
+            Peos_p1%val = s% Peos(k+1)
+            Peos_p1%d1Array(i_lnd_p1) = s%Peos(k+1) * s% chiRho_for_partials(k+1)
+            Peos_p1%d1Array(i_lnT_p1) = s%Peos(k+1) * s% chiT_for_partials(k+1)
          end if   
-      end function wrap_p_p1
+      end function wrap_Peos_p1
 
-      function wrap_lnP_m1(s, k) result(lnP_m1)
+      function wrap_lnPeos_m1(s, k) result(lnPeos_m1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: lnP_m1
+         type(auto_diff_real_star_order1) :: lnPeos_m1
          integer, intent(in) :: k
-         lnP_m1 = 0d0 
+         lnPeos_m1 = 0d0 
          if (k > 1) then
-            lnP_m1%val = s% lnP(k-1)
-            lnP_m1%d1Array(i_lnd_m1) = s% chiRho_for_partials(k-1)
-            lnP_m1%d1Array(i_lnT_m1) = s% chiT_for_partials(k-1)
+            lnPeos_m1%val = s% lnPeos(k-1)
+            lnPeos_m1%d1Array(i_lnd_m1) = s% chiRho_for_partials(k-1)
+            lnPeos_m1%d1Array(i_lnT_m1) = s% chiT_for_partials(k-1)
          end if   
-      end function wrap_lnP_m1
+      end function wrap_lnPeos_m1
 
-      function wrap_lnP_00(s, k) result(lnP_00)
+      function wrap_lnPeos_00(s, k) result(lnPeos_00)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: lnP_00
+         type(auto_diff_real_star_order1) :: lnPeos_00
          integer, intent(in) :: k
-         lnP_00 = 0d0 
-         lnP_00%val = s% lnP(k)
-         lnP_00%d1Array(i_lnd_00) = s% chiRho_for_partials(k)
-         lnP_00%d1Array(i_lnT_00) = s% chiT_for_partials(k)
-      end function wrap_lnP_00
+         lnPeos_00 = 0d0 
+         lnPeos_00%val = s% lnPeos(k)
+         lnPeos_00%d1Array(i_lnd_00) = s% chiRho_for_partials(k)
+         lnPeos_00%d1Array(i_lnT_00) = s% chiT_for_partials(k)
+      end function wrap_lnPeos_00
 
-      function wrap_lnP_p1(s, k) result(lnP_p1)
+      function wrap_lnPeos_p1(s, k) result(lnPeos_p1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: lnP_p1
+         type(auto_diff_real_star_order1) :: lnPeos_p1
          integer, intent(in) :: k
-         lnP_p1 = 0d0 
+         lnPeos_p1 = 0d0 
          if (k < s%nz) then
-            lnP_p1%val = s% lnP(k+1)
-            lnP_p1%d1Array(i_lnd_p1) = s% chiRho_for_partials(k+1)
-            lnP_p1%d1Array(i_lnT_p1) = s% chiT_for_partials(k+1)
+            lnPeos_p1%val = s% lnPeos(k+1)
+            lnPeos_p1%d1Array(i_lnd_p1) = s% chiRho_for_partials(k+1)
+            lnPeos_p1%d1Array(i_lnT_p1) = s% chiT_for_partials(k+1)
          end if   
-      end function wrap_lnP_p1
+      end function wrap_lnPeos_p1
 
       function wrap_ChiRho_m1(s, k) result(ChiRho_m1)
          use eos_def, only: i_ChiRho
@@ -663,6 +668,43 @@
             Cp_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_Cp,k+1)
          end if   
       end function wrap_Cp_p1
+
+      function wrap_grad_ad_m1(s, k) result(grad_ad_m1)
+         use eos_def, only: i_grad_ad
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: grad_ad_m1
+         integer, intent(in) :: k
+         grad_ad_m1 = 0d0 
+         if (k > 1) then
+            grad_ad_m1%val = s% grada(k-1)
+            grad_ad_m1%d1Array(i_lnd_m1) = s% d_eos_dlnd(i_grad_ad,k-1)
+            grad_ad_m1%d1Array(i_lnT_m1) = s% d_eos_dlnT(i_grad_ad,k-1)
+         end if   
+      end function wrap_grad_ad_m1
+
+      function wrap_grad_ad_00(s, k) result(grad_ad_00)
+         use eos_def, only: i_grad_ad
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: grad_ad_00
+         integer, intent(in) :: k
+         grad_ad_00 = 0d0 
+         grad_ad_00%val = s% grada(k)
+         grad_ad_00%d1Array(i_lnd_00) = s% d_eos_dlnd(i_grad_ad,k)
+         grad_ad_00%d1Array(i_lnT_00) = s% d_eos_dlnT(i_grad_ad,k)
+      end function wrap_grad_ad_00
+
+      function wrap_grad_ad_p1(s, k) result(grad_ad_p1)
+         use eos_def, only: i_grad_ad
+         type (star_info), pointer :: s
+         type(auto_diff_real_star_order1) :: grad_ad_p1
+         integer, intent(in) :: k
+         grad_ad_p1 = 0d0 
+         if (k < s% nz) then
+            grad_ad_p1%val = s% grada(k+1)
+            grad_ad_p1%d1Array(i_lnd_p1) = s% d_eos_dlnd(i_grad_ad,k+1)
+            grad_ad_p1%d1Array(i_lnT_p1) = s% d_eos_dlnT(i_grad_ad,k+1)
+         end if   
+      end function wrap_grad_ad_p1
 
       function wrap_gamma1_m1(s, k) result(gamma1_m1)
          use eos_def, only: i_gamma1
@@ -1003,7 +1045,8 @@
          type(auto_diff_real_star_order1) :: xtra1_m1
          integer, intent(in) :: k
          xtra1_m1 = 0d0 
-         if (k > 1) then ! s%w(k-1)
+         if (k > 1) then 
+            xtra1_m1% val = s% xtra1_array(k)
             xtra1_m1 % d1Array(i_xtra1_m1) = 1d0
          end if            
       end function wrap_xtra1_m1

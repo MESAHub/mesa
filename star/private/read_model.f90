@@ -96,7 +96,7 @@
          ierr = 0
          nz = s% nz
          s% brunt_B(1:nz) = 0 ! temporary brunt_B for set_vars
-
+         
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model failed in set_qs'
@@ -558,7 +558,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_etrb_RSP, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_Et_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -580,12 +580,12 @@
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
-         i_etrb_RSP = s% i_etrb_RSP
+         i_Et_RSP = s% i_Et_RSP
          i_erad_RSP = s% i_erad_RSP
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_etrb /= 0) n = n+increment_for_i_etrb ! read etrb
+         if (i_etrb /= 0) n = n+increment_for_i_etrb
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
@@ -624,18 +624,20 @@
             j=j+1; xh(i_lnR,k) = vec(j)
             if (is_RSP_model) then
                if (want_RSP_model) then
-                  j=j+1; xh(i_etrb_RSP,k) = vec(j)
+                  j=j+1; xh(i_Et_RSP,k) = vec(j)
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
                else if (i_etrb /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_etrb,k) = max(0d0,vec(j))
+                  j=j+1; xh(i_etrb,k) = vec(j)
                   j=j+1; ! discard
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,k) = vec(j)
+                  ! attempt to compensate for exp(log(r)) /= r
+                  xh(i_lnR,k) = log(exp(xh(i_lnR,k)))
                end if
             else if (i_etrb /= 0) then
-               j=j+1; xh(i_etrb,k) = max(vec(j),0d0)
+               j=j+1; xh(i_etrb,k) = vec(j)
                j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,k) = vec(j)
@@ -700,7 +702,7 @@
          
          if (want_RSP_model .and. .not. is_RSP_model) then
             ! proper values for these will be set in rsp_setup_part2
-            s% xh(i_etrb_RSP,1:nz) = 0d0 
+            s% xh(i_Et_RSP,1:nz) = 0d0 
             s% xh(i_erad_RSP,1:nz) = 0d0 
             s% xh(i_Fr_RSP,1:nz) = 0d0 
          end if

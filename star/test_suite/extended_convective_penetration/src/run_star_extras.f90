@@ -440,7 +440,7 @@
         real(dp) :: P, rho
         ierr = 0
 
-        P = exp(s%lnP(k))
+        P = exp(s%lnPeos(k))
         rho = exp(s%lnd(k))
         Hp = P/(rho*s%cgrav(k)* (s%M_center + s%xmstar*s%q(k))/(r*r))
 

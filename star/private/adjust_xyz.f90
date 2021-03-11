@@ -114,7 +114,7 @@
 
          call realloc(s% d_eps_grav_dX); if (ierr /= 0) return
          call realloc(s% dlnE_dxa_for_partials); if (ierr /= 0) return
-         call realloc(s% dlnP_dxa_for_partials); if (ierr /= 0) return
+         call realloc(s% dlnPeos_dxa_for_partials); if (ierr /= 0) return
 
          call realloc(s% extra_diffusion_factor); if (ierr /= 0) return
          call realloc(s% edv); if (ierr /= 0) return

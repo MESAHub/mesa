@@ -351,7 +351,7 @@
          gradL_composition_term = gradL_composition_term_in      
          rho_00 = s% rho(k)
          T_00 = s% T(k)
-         P_00 = s% P(k)
+         P_00 = s% Peos(k)
          chiRho_00 = s% chiRho(k)
          chiT_00 = s% chiT(k)
          chiRho_for_partials_00 = s% chiRho_for_partials(k)
@@ -389,7 +389,7 @@
          
             rho_m1 = s% rho(k-1)
             T_m1 = s% T(k-1)
-            P_m1 = s% P(k-1)
+            P_m1 = s% Peos(k-1)
             chiRho_m1 = s% chiRho(k-1)
             chiT_m1 = s% chiT(k-1)
             chiRho_for_partials_m1 = s% chiRho_for_partials(k-1)
@@ -696,14 +696,14 @@
             Q_face = chiT_face/(T_face*chiRho_face)
             s% grad_superad(k) = &
                pi4*r*r*s% scale_height(k)*rho_face* &
-                  (Q_face/Cp_face*(s% P(k-1)-s% P(k)) - (s% lnT(k-1)-s% lnT(k)))/s% dm_bar(k)
+                  (Q_face/Cp_face*(s% Peos(k-1)-s% Peos(k)) - (s% lnT(k-1)-s% lnT(k)))/s% dm_bar(k)
             ! grad_superad = area*Hp_face*rho_face*(Q_face/Cp_face*dP - dlogT)/dmbar
             ! Q_face = chiT_face/(T_face*chiRho_face)
-            if (abs(s% lnP(k-1)-s% lnP(k)) < 1d-10) then
+            if (abs(s% lnPeos(k-1)-s% lnPeos(k)) < 1d-10) then
                s% grad_superad_actual(k) = 0
             else
                s% grad_superad_actual(k) = &
-                  (s% lnT(k-1)-s% lnT(k))/(s% lnP(k-1)-s% lnP(k)) - grada_face
+                  (s% lnT(k-1)-s% lnT(k))/(s% lnPeos(k-1)-s% lnPeos(k)) - grada_face
             end if
          end if
 
@@ -951,7 +951,7 @@
             s% mlt_mixing_length(k) = 0d0
             s% mlt_vc(k) = 0d0
             s% mlt_Gamma(k) = 0d0
-            s% grada_face(k) = 0d0
+            s% grada_face(k) = grada_face
             s% scale_height(k) = P_face*r*r/(s% cgrav(k)*m*rho_face)
             s% gradL(k) = 0d0
             s% L_conv(k) = 0d0
@@ -1168,7 +1168,7 @@
          if (ierr /= 0) return
 
          do k = 2, nz
-            dlnP(k) = s% lnP(k-1) - s% lnP(k)
+            dlnP(k) = s% lnPeos(k-1) - s% lnPeos(k)
             dlnd(k) = s% lnd(k-1) - s% lnd(k)
             dlnT(k) = s% lnT(k-1) - s% lnT(k)
          end do

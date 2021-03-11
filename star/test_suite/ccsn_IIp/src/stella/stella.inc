@@ -232,7 +232,7 @@
             tau_mod(k) = taumid(j)
             u_mod(k) = s% u(j)
             rho_mod(k) = s% rho(j)
-            pressure_mod(k) = s% P(j)
+            pressure_mod(k) = s% Peos(j)
             temperature_mod(k) = s% T(j)
             energy_mod(k) = s% energy(j)
             entropy_mod(k) = s% entropy(j)

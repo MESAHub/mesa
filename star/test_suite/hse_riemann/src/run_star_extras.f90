@@ -144,18 +144,18 @@
          names(11) = 'Pmax_r_div_t'
          names(12) = 'Pmax_m_div_Msun'
          
-         k = maxloc(s% P(1:s% nz), dim=1)
+         k = maxloc(s% Peos(1:s% nz), dim=1)
          if (k == s% nz) k = s% nz-1
          t = s% time
          
          !write(*,2) 'Pmax k r*1d-13', k, 0.5d0*(s% r(k)+s% r(k+1))*1d-13
                   
-         vals(1) = s% P(k) ! Pmax_P
+         vals(1) = s% Peos(k) ! Pmax_P
          vals(2) = 0.5d0*(s% r(k)+s% r(k+1))*1d-13 ! Pmax_r_1m13
          vals(3) = 0.5d0*(s% v(k)+s% v(k+1)) ! Pmax_v
          vals(4) = s% rho(k) ! Pmax_rho
          vals(5) = s% T(k) ! Pmax_T
-         vals(6) = log10(s% P(k)) ! Pmax_P
+         vals(6) = log10(s% Peos(k)) ! Pmax_P
          vals(7) = log10(0.5d0*(s% r(k)+s% r(k+1))) ! Pmax_r
          vals(8) = log10(0.5d0*(s% v(k)+s% v(k+1))) ! Pmax_v
          vals(9) = log10(s% rho(k)) ! Pmax_rho

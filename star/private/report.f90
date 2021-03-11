@@ -259,7 +259,7 @@
          co56 = net_iso(ico56)
          ni56 = net_iso(ini56)
          
-         s% log_P_center = s% lnP(nz)/ln10
+         s% log_P_center = s% lnPeos(nz)/ln10
 
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)
@@ -267,7 +267,7 @@
          s% log_center_density = center_value(s, s% lnd)/ln10
          s% log_max_temperature = maxval(s% lnT(1:nz))/ln10
          s% log_center_temperature = center_value(s, s% lnT)/ln10
-         s% log_center_pressure = center_value(s, s% lnP)/ln10
+         s% log_center_pressure = center_value(s, s% lnPeos)/ln10
          s% center_degeneracy = center_value(s, s% eta)
 
          s% center_eps_nuc = center_value(s, s% eps_nuc)
@@ -294,7 +294,7 @@
          end if
 
          s% log_surface_temperature = s% lnT(1)/ln10 ! log10(temperature at surface)
-         s% log_surface_pressure = s% lnP(1)/ln10 ! log10(pressure at surface)
+         s% log_surface_pressure = s% lnPeos(1)/ln10 ! log10(eos pressure at surface)
          s% log_surface_density = s% lnd(1)/ln10 ! log10(density at surface)
          s% log_surface_gravity = safe_log10(s% cgrav(1)*s% m(1)/(s% r(1)*s% r(1))) ! log10(gravity at surface)
          
@@ -465,7 +465,7 @@
          s% nu_max = s% nu_max_sun*s% star_mass/ &
             (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
          s% acoustic_cutoff = &
-            0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% P(1))
+            0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
          if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
          call get_delta_Pg(s, nu_for_delta_Pg, s% delta_Pg)
@@ -635,7 +635,7 @@
                return
             end if
 
-            tau_lgP = (s% lnP(k) + (s% lnP(k+1)-s% lnP(k))*frac)/ln10
+            tau_lgP = (s% lnPeos(k) + (s% lnPeos(k+1)-s% lnPeos(k))*frac)/ln10
             tau_lgT = (s% lnT(k) + (s% lnT(k+1)-s% lnT(k))*frac)/ln10
             tau_lgd = (s% lnd(k) + (s% lnd(k+1)-s% lnd(k))*frac)/ln10
 
@@ -1075,7 +1075,7 @@
          k = maxloc(s% lnT(1:s% nz),dim=1)
          s% max_T_lgT = s% lnT(k)/ln10
          s% max_T_lgRho = s% lnd(k)/ln10
-         s% max_T_lgP = s% lnP(k)/ln10
+         s% max_T_lgP = s% lnPeos(k)/ln10
          if (k == s% nz) then
             s% max_T_mass = s% M_center/Msun ! (Msun)
             s% max_T_radius = s% R_center/Rsun ! (Rsun)
@@ -1097,14 +1097,14 @@
                do kk = 1, k
                   s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
                      s% dm(kk)*(s% energy(kk) + &
-                           s% P(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk) + &
+                           s% Peos(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk) + &
                            0.5d0*s% v(kk)*s% v(kk))
                end do
             else
                do kk = 1, k
                   s% max_T_shell_binding_energy = s% max_T_shell_binding_energy + &
                      s% dm(kk)*(s% energy(kk) + &
-                           s% P(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk))
+                           s% Peos(kk)/s% rho(kk) - s% cgrav(k)*s% m_grav(kk)/s% r(kk))
                end do
             end if
          end if
@@ -1135,7 +1135,7 @@
          s% max_abs_v_v_div_cs = s% max_abs_v_velocity/s% csound_face(k)
          s% max_abs_v_lgT = s% lnT(k)/ln10
          s% max_abs_v_lgRho = s% lnd(k)/ln10
-         s% max_abs_v_lgP = s% lnP(k)/ln10
+         s% max_abs_v_lgP = s% lnPeos(k)/ln10
          s% max_abs_v_mass = s% m(k)/Msun ! (Msun)
          s% max_abs_v_radius = s% r(k)/Rsun ! (Rsun)
          s% max_abs_v_L = s% L(k)/Lsun! (Lsun)
@@ -1408,7 +1408,7 @@
          mach1_csound = s% csound(k)
          mach1_lgT = s% lnT(k)/ln10
          mach1_lgRho = s% lnd(k)/ln10
-         mach1_lgP = s% lnP(k)/ln10
+         mach1_lgP = s% lnPeos(k)/ln10
          mach1_gamma1 = s% gamma1(k)
          mach1_entropy = s% entropy(k)
          mach1_tau = s% tau(k)
@@ -1692,7 +1692,7 @@
             else if (s% v_flag) then
                bdy_v = s% v(1)
             end if
-            bdy_lgP = s% lnP(1)/ln10
+            bdy_lgP = s% lnPeos(1)/ln10
             bdy_g = s% grav(1)
             bdy_X = s% X(1)
             bdy_Y = s% Y(1)
@@ -1728,7 +1728,7 @@
 
          bdy_lgT = interp3(s% lnT(k-1), s% lnT(k), s% lnT(k+1))/ln10
          bdy_lgRho = interp3(s% lnd(k-1), s% lnd(k), s% lnd(k+1))/ln10
-         bdy_lgP = interp3(s% lnP(k-1), s% lnP(k), s% lnP(k+1))/ln10
+         bdy_lgP = interp3(s% lnPeos(k-1), s% lnPeos(k), s% lnPeos(k+1))/ln10
          bdy_X = interp3(s% X(k-1), s% X(k), s% X(k+1))
          bdy_Y = interp3(s% Y(k-1), s% Y(k), s% Y(k+1))
 

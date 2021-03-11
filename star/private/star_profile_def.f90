@@ -57,7 +57,8 @@
       integer, parameter :: p_lum_rad = p_lum_adv + 1
       integer, parameter :: p_log_abs_lum_erg_s = p_lum_rad + 1
       integer, parameter :: p_lum_erg_s = p_log_abs_lum_erg_s + 1
-      integer, parameter :: p_luminosity = p_lum_erg_s + 1
+      integer, parameter :: p_L = p_lum_erg_s + 1
+      integer, parameter :: p_luminosity = p_L + 1
       integer, parameter :: p_log_g = p_luminosity + 1
       integer, parameter :: p_grav = p_log_g + 1
       integer, parameter :: p_r_div_g = p_grav + 1
@@ -185,7 +186,8 @@
       integer, parameter :: p_kap_frac_op_mono = p_kap_frac_Compton + 1
       integer, parameter :: p_extra_opacity_factor = p_kap_frac_op_mono + 1
       integer, parameter :: p_log_kap_times_factor = p_extra_opacity_factor + 1
-      integer, parameter :: p_log_opacity = p_log_kap_times_factor + 1
+      integer, parameter :: p_log_kap = p_log_kap_times_factor + 1
+      integer, parameter :: p_log_opacity = p_log_kap + 1
       integer, parameter :: p_energy = p_log_opacity + 1
       integer, parameter :: p_logM = p_energy + 1
       integer, parameter :: p_logtau_sub_xlogtau = p_logM + 1
@@ -390,10 +392,7 @@
 
       integer, parameter :: p_log_P_face = p_P_face + 1
 
-      integer, parameter :: p_hse_ratio = p_log_P_face + 1
-      integer, parameter :: p_hse_ratio_gyre = p_hse_ratio + 1
-
-      integer, parameter :: p_dvdt_RTI_diffusion = p_hse_ratio_gyre + 1
+      integer, parameter :: p_dvdt_RTI_diffusion = p_log_P_face + 1
       integer, parameter :: p_dlnddt_RTI_diffusion = p_dvdt_RTI_diffusion + 1
 
       integer, parameter :: p_dlnP_dlnR = p_dlnddt_RTI_diffusion + 1
@@ -589,14 +588,14 @@
       integer, parameter :: p_total_energy_sign = p_total_energy_integral + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
       
-      integer, parameter :: p_Pturb = p_total_energy + 1
-      integer, parameter :: p_log_Pturb = p_Pturb + 1
-      integer, parameter :: p_log_w = p_log_Pturb + 1
+      integer, parameter :: p_Ptrb = p_total_energy + 1
+      integer, parameter :: p_log_Ptrb = p_Ptrb + 1
+      integer, parameter :: p_log_w = p_log_Ptrb + 1
       integer, parameter :: p_w = p_log_w + 1
       integer, parameter :: p_etrb = p_w + 1
       integer, parameter :: p_log_etrb = p_etrb + 1
-      integer, parameter :: p_avQ = p_log_etrb + 1
-      integer, parameter :: p_Hp_face = p_avQ + 1
+      integer, parameter :: p_Pvsc = p_log_etrb + 1
+      integer, parameter :: p_Hp_face = p_Pvsc + 1
       integer, parameter :: p_Y_face = p_Hp_face + 1
       integer, parameter :: p_PII_face = p_Y_face + 1
       integer, parameter :: p_Chi = p_PII_face + 1
@@ -636,8 +635,8 @@
       integer, parameter :: p_rsp_log_heat_exchange_timescale = p_rsp_Y_face + 1
       integer, parameter :: p_rsp_log_dt_div_heat_exchange_timescale = p_rsp_log_heat_exchange_timescale + 1
       integer, parameter :: p_rsp_heat_exchange_timescale = p_rsp_log_dt_div_heat_exchange_timescale + 1
-      integer, parameter :: p_rsp_avQ = p_rsp_heat_exchange_timescale + 1
-      integer, parameter :: p_rsp_Chi = p_rsp_avQ + 1
+      integer, parameter :: p_rsp_Pvsc = p_rsp_heat_exchange_timescale + 1
+      integer, parameter :: p_rsp_Chi = p_rsp_Pvsc + 1
       integer, parameter :: p_rsp_gradT = p_rsp_Chi + 1
       integer, parameter :: p_rsp_Lr_div_L = p_rsp_gradT + 1
       integer, parameter :: p_rsp_Lc_div_L = p_rsp_Lr_div_L + 1
@@ -747,6 +746,7 @@
 
          profile_column_name(p_zone) = 'zone'
          profile_column_name(p_k) = 'k'
+         profile_column_name(p_L) = 'L'
          profile_column_name(p_luminosity) = 'luminosity'
          profile_column_name(p_lum_erg_s) = 'lum_erg_s'
          profile_column_name(p_log_abs_lum_erg_s) = 'log_abs_lum_erg_s'
@@ -892,6 +892,7 @@
          profile_column_name(p_tau) = 'tau'
          profile_column_name(p_extra_opacity_factor) = 'extra_opacity_factor'
          profile_column_name(p_log_kap_times_factor) = 'log_kap_times_factor'
+         profile_column_name(p_log_kap) = 'log_kap'
          profile_column_name(p_log_opacity) = 'log_opacity'
          profile_column_name(p_kap_frac_lowT) = 'kap_frac_lowT'
          profile_column_name(p_kap_frac_highT) = 'kap_frac_highT'
@@ -1094,9 +1095,6 @@
          profile_column_name(p_P_face) = 'P_face'
          profile_column_name(p_log_P_face) = 'log_P_face'
 
-         profile_column_name(p_hse_ratio) = 'hse_ratio'
-         profile_column_name(p_hse_ratio_gyre) = 'hse_ratio_gyre'
-
          profile_column_name(p_dlnP_dlnR) = 'dlnP_dlnR'
          profile_column_name(p_dlnRho_dlnR) = 'dlnRho_dlnR'
          profile_column_name(p_gradP_div_rho) = 'gradP_div_rho'
@@ -1274,13 +1272,13 @@
          profile_column_name(p_total_energy_integral_outward) = 'total_energy_integral_outward'
          profile_column_name(p_total_energy_integral) = 'total_energy_integral'
 
-         profile_column_name(p_Pturb) = 'Pturb'
-         profile_column_name(p_log_Pturb) = 'log_Pturb'
+         profile_column_name(p_Ptrb) = 'Ptrb'
+         profile_column_name(p_log_Ptrb) = 'log_Ptrb'
          profile_column_name(p_w) = 'w'
          profile_column_name(p_log_w) = 'log_w'
          profile_column_name(p_etrb) = 'etrb'
          profile_column_name(p_log_etrb) = 'log_etrb'
-         profile_column_name(p_avQ) = 'avQ'
+         profile_column_name(p_Pvsc) = 'Pvsc'
          profile_column_name(p_Hp_face) = 'Hp_face'
          profile_column_name(p_Y_face) = 'Y_face'
          profile_column_name(p_PII_face) = 'PII_face'
@@ -1322,7 +1320,7 @@
          profile_column_name(p_rsp_heat_exchange_timescale) = 'rsp_heat_exchange_timescale'
          profile_column_name(p_rsp_log_dt_div_heat_exchange_timescale) = 'rsp_log_dt_div_heat_exchange_timescale'
          profile_column_name(p_rsp_log_heat_exchange_timescale) = 'rsp_log_heat_exchange_timescale'
-         profile_column_name(p_rsp_avQ) = 'rsp_avQ'
+         profile_column_name(p_rsp_Pvsc) = 'rsp_Pvsc'
          profile_column_name(p_rsp_gradT) = 'rsp_gradT'
          profile_column_name(p_rsp_Lr_div_L) = 'rsp_Lr_div_L'
          profile_column_name(p_rsp_Lc_div_L) = 'rsp_Lc_div_L'

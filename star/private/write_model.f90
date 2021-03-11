@@ -49,8 +49,8 @@
          integer, pointer :: chem_id(:)
          type (star_info), pointer :: s
          logical :: v_flag, RTI_flag, conv_vel_flag, &
-            TDC_flag, u_flag, prev_flag, rotation_flag, write_conv_vel, &
-            rsp_flag, no_L
+            TDC_flag, u_flag, prev_flag, rotation_flag, &
+            write_conv_vel, rsp_flag, no_L
 
          1 format(a32, 2x, 1pd26.16)
          11 format(a32, 2x, 1pd26.16, 2x, a, 2x, 99(1pd26.16))
@@ -72,7 +72,8 @@
          conv_vel_flag = s% conv_vel_flag
          rotation_flag = s% rotation_flag
          rsp_flag = s% rsp_flag
-         write_conv_vel = s% have_mixing_info .and. s% have_previous_conv_vel
+         write_conv_vel = s% have_mixing_info
+         
          species = s% species
          
          open(newunit=iounit, file=trim(filename), action='write', status='replace')
@@ -111,13 +112,13 @@
          if (BTEST(file_type, bit_for_RTI)) &
             write(iounit,'(a)',advance='no') ', Rayleigh-Taylor instabilities (alpha_RTI)'
          if (BTEST(file_type, bit_for_conv_vel)) &
-            write(iounit,'(a)',advance='no') ', saved convection velocity - not a solver variable (conv_vel)'
+            write(iounit,'(a)',advance='no') ', convection velocity - not a solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_conv_vel_var)) &
             write(iounit,'(a)',advance='no') ', convection velocity as solver variable (conv_vel)'
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP values for luminosity (L), turbulent energy (et_rsp), and radiative flux (erad_rsp)'
          if (BTEST(file_type, bit_for_etrb)) &
-            write(iounit,'(a)',advance='no') ', turbulent energy for cell (etrb)'
+            write(iounit,'(a)',advance='no') ', turbulent energy for cell (i_etrb)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (.not. no_L) then

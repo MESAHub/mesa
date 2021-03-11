@@ -90,7 +90,7 @@
          DLCYP,DLCZ0,DLCZP, &
          DLTXM,DLTX0,DLTXP,DLTY0, &
          DLTYP,DLTZ0,DLTZP,Lt, &
-         PTURB,dPt_dw_00,dPt_dr_00,dPt_dr_in,XXL
+         PTURB,dPtrb_dw_00,dPtrb_dr_00,dPtrb_dr_in,XXL
       real(dp), allocatable, dimension(:,:) :: &
          QWK,QWKEV,PHR,PHT,PHL,PHU,PHC,ZZZ
       complex(8), allocatable, dimension(:,:) :: &
@@ -178,7 +178,7 @@
          DLCYP(n),DLCZ0(n),DLCZP(n), &
          DLTXM(n),DLTX0(n),DLTXP(n),DLTY0(n), &
          DLTYP(n),DLTZ0(n),DLTZP(n),Lt(n), &
-         PTURB(n),dPt_dw_00(n),dPt_dr_00(n),dPt_dr_in(n), &
+         PTURB(n),dPtrb_dw_00(n),dPtrb_dr_00(n),dPtrb_dr_in(n), &
          QWK(n,15),QWKEV(n,15),VRU(n,15), &
          VRR(n,15), VRT(n,15), VRL(n,15), VRC(n,15), &
          DVRR(n,15),DVRT(n,15),DVRL(n,15),DVRC(n,15), &
@@ -212,9 +212,9 @@
             EVUU0(I)= 0.d0
             EVUUM(I)= 0.d0
             PTURB(I)= 0.d0
-            dPt_dr_00(I)= 0.d0
-            dPt_dr_in(I)= 0.d0
-            dPt_dw_00(I)= 0.d0
+            dPtrb_dr_00(I)= 0.d0
+            dPtrb_dr_in(I)= 0.d0
+            dPtrb_dw_00(I)= 0.d0
             dC_dr_00(I) = 0.d0
             dC_dr_out(I) = 0.d0
             dC_dr_in(I) = 0.d0
@@ -582,15 +582,15 @@
       do I=IBOTOM+1,NZN-1
          if(ALFAP.eq.0.d0)then
             PTURB(I) = 0.d0
-            dPt_dw_00(I) = 0.d0
-            dPt_dr_00(I) = 0.d0
-            dPt_dr_in(I) = 0.d0
+            dPtrb_dw_00(I) = 0.d0
+            dPtrb_dr_00(I) = 0.d0
+            dPtrb_dr_in(I) = 0.d0
          else
             PTURB(I) =  ALFAP*Et(I)/Vol(I)
-            dPt_dw_00(I) =  ALFAP/Vol(I)
+            dPtrb_dw_00(I) =  ALFAP/Vol(I)
             TEM1=-ALFAP*Et(I)/Vol(I)**2
-            dPt_dr_00(I) = TEM1*DVR(I)
-            dPt_dr_in(I) = TEM1*DVRM(I)
+            dPtrb_dr_00(I) = TEM1*DVR(I)
+            dPtrb_dr_in(I) = TEM1*DVRM(I)
          endif
       enddo
 
@@ -617,9 +617,9 @@
          Lc(I)= 0.d0
          Lt(I)= 0.d0
          PTURB(I)= 0.d0
-         dPt_dw_00(I)= 0.d0
-         dPt_dr_00(I)= 0.d0
-         dPt_dr_in(I)= 0.d0
+         dPtrb_dw_00(I)= 0.d0
+         dPtrb_dr_00(I)= 0.d0
+         dPtrb_dr_in(I)= 0.d0
          dC_dr_00(I) = 0.d0
          dC_dr_out(I) = 0.d0
          dC_dr_in(I) = 0.d0
@@ -650,9 +650,9 @@
       Lc(NZN)= 0.d0
       Lt(NZN)= 0.d0
       PTURB(NZN)= 0.d0
-      dPt_dw_00(NZN)= 0.d0
-      dPt_dr_00(NZN)= 0.d0
-      dPt_dr_in(NZN)= 0.d0
+      dPtrb_dw_00(NZN)= 0.d0
+      dPtrb_dr_00(NZN)= 0.d0
+      dPtrb_dr_in(NZN)= 0.d0
       DLCX0(NZN)= 0.d0
       DLCXM(NZN)= 0.d0
       DLCXP(NZN)= 0.d0
@@ -820,17 +820,17 @@
          if(ALFAM.ge.0.d0) T4=P4/(dm_bar(I)*R(I))
          if(ALFAM.lt.0.d0) T4=-T1
          MU10(I) =  T4*(-EVUUM(I))
-         MZ00(I) = -T1*(-dPt_dw_00(I))
-         MX10(I) = -T1*(-dP_dr_in(I)-dPt_dr_in(I))
+         MZ00(I) = -T1*(-dPtrb_dw_00(I))
+         MX10(I) = -T1*(-dP_dr_in(I)-dPtrb_dr_in(I))
          MY00(I) = -T1*(-dP_dT_00(I))
          if(I.ne.NZN)then
             MX00(I) =  4.d0*G*M(I)/R(I)**3 &
-                      -T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPt_dr_in(I+1)-dPt_dr_00(I))
-            MX01(I) = -T1*(dP_dr_00(I+1)        +dPt_dr_00(I+1))
+                      -T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))
+            MX01(I) = -T1*(dP_dr_00(I+1)        +dPtrb_dr_00(I+1))
             MY01(I) = -T1*(dP_dT_00(I+1))
             MU00(I) =  T4*(EVUUM(I+1)-EVUU0(I))
             MU01(I) =  T4*(EVUU0(I+1))
-            MZ01(I) = -T1*(dPt_dw_00(I+1))
+            MZ01(I) = -T1*(dPtrb_dw_00(I+1))
          else
             MX00(I) = 4.d0*G*M(I)/R(I)**3 &
                      -T1*(-dP_dr_00(I))
@@ -1059,9 +1059,9 @@
             if(I.ge.2)DPEV=DPEV+EVUUM(I)*VRU(I-1,J)
             DPEV=DPEV*SCALE(J)
 
-            dP_dT_00URB=dPt_dr_00(I)*VRR(I,J)
-            if(I.ge.2) dP_dT_00URB=dP_dT_00URB+dPt_dr_in(I)*VRR(I-1,J)
-            dP_dT_00URB=dP_dT_00URB+dPt_dw_00(I)*VRC(I,J)
+            dP_dT_00URB=dPtrb_dr_00(I)*VRR(I,J)
+            if(I.ge.2) dP_dT_00URB=dP_dT_00URB+dPtrb_dr_in(I)*VRR(I-1,J)
+            dP_dT_00URB=dP_dT_00URB+dPtrb_dw_00(I)*VRC(I,J)
             dP_dT_00URB=dP_dT_00URB*SCALE(J)
 
             QWK(I,J)=-PI*dm(I)*aimag(conjg(DP_0)*DV_0) 

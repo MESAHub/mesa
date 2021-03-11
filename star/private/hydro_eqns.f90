@@ -257,7 +257,7 @@
                end if
             end if
             if (do_equL) then
-               if (s% TDC_flag) then
+               if (s% TDC_flag .and. (k > 1 .or. s% TDC_use_L_eqn_at_surface)) then
                   call do1_tdc_L_eqn(s, k, skip_partials, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_tdc_L_eqn', k
@@ -352,7 +352,7 @@
             lnT => s% lnT
             lnR => s% lnR
             L => s% L
-            lnP => s% lnP
+            lnP => s% lnPeos
             energy => s% energy
 
             i_dv_dt = s% i_dv_dt
@@ -481,7 +481,7 @@
                         
                         ! punt silently for now
                         s% dlnE_dxa_for_partials(:,k) = 0d0
-                        s% dlnP_dxa_for_partials(:,k) = 0d0
+                        s% dlnPeos_dxa_for_partials(:,k) = 0d0
                         ierr = 0
                         return
                         
@@ -498,12 +498,12 @@
                         frac_without_dxa * (res(i_lnE) - lnE_with_xa_start) / dxa
                      if (checking) call check_dxa(j,k,s% dlnE_dxa_for_partials(j,k),'dlnE_dxa_for_partials')
 
-                     s% dlnP_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% P(k) + &
-                        frac_without_dxa * (s% Pgas(k)/s% P(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
-                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnP_dxa_for_partials(j,k))) then
+                     s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*dres_dxa(i_lnPgas,j)/s% Peos(k) + &
+                        frac_without_dxa * (s% Pgas(k)/s% Peos(k)) * (res(i_lnPgas) - lnPgas_with_xa_start) / dxa
+                     if (.false. .and. s% model_number == 1100 .and. k == 151 .and. j == 1 .and. is_bad(s% dlnPeos_dxa_for_partials(j,k))) then
                         write(*,2) 's% Pgas(k)', k, s% Pgas(k)
                         write(*,2) 'dres_dxa(i_lnPgas,j)', k, dres_dxa(i_lnPgas,j)
-                        write(*,2) 's% P(k)', k, s% P(k)
+                        write(*,2) 's% Peos(k)', k, s% Peos(k)
                         write(*,2) 'frac_without_dxa', k, frac_without_dxa
                         write(*,2) 'res(i_lnPgas)', k, res(i_lnPgas)
                         write(*,2) 'lnPgas_with_xa_start', k, lnPgas_with_xa_start
@@ -514,7 +514,7 @@
                         write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
                         write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
                      end if
-                     if (checking) call check_dxa(j,k,s% dlnP_dxa_for_partials(j,k),'dlnP_dxa_for_partials')
+                     if (checking) call check_dxa(j,k,s% dlnPeos_dxa_for_partials(j,k),'dlnPeos_dxa_for_partials')
 
                   else
 
@@ -745,6 +745,17 @@
          P_rad_00 = (crad/3d0)*T4_00
          d_P_rad_actual_ad = P_rad_m1 - P_rad_00
          
+         !s% xtra1_array(k) = s% T_start(k)
+         !s% xtra2_array(k) = T4_m1%val - T4_00%val
+         !s% xtra3_array(k) = kap_face%val
+         !s% xtra4_array(k) = (T4_m1%val - T4_00%val)/kap_face%val
+         !if (k == 1) then
+         !   s% xtra5_array(k) = s% L(k)/Lsun
+         !else
+         !   s% xtra5_array(k) = s% L(k)*s% gradT(k)/s% gradr(k)/Lsun
+         !end if
+         !s% xtra6_array(k) = s% xtra5_array(k)/(Lrad_ad%val/Lsun)
+         
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale 
          s% equ(i_equL, k) = resid%val
@@ -786,6 +797,58 @@
       end subroutine do1_alt_dlnT_dm_eqn
 
 
+      subroutine do1_gradT_eqn(s, k, skip_partials, nvar, ierr)
+         use eos_def
+         use star_utils, only: save_eqn_residual_info
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         logical, intent(in) :: skip_partials
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_star_order1) :: &
+            resid, gradT, dlnT, dlnP
+         integer :: i_equL
+         logical :: test_partials
+
+         include 'formats'
+         ierr = 0
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         i_equL = s% i_equL
+         if (i_equL == 0) return
+
+         gradT = s% gradT_ad(k)
+         dlnT = wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)
+         dlnP = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+
+         resid = gradT*dlnP - dlnT
+         s% equ(i_equL, k) = resid%val
+
+         if (is_bad(s% equ(i_equL, k))) then
+            ierr = -1
+            if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            if (s% stop_for_bad_nums) stop 'do1_gradT_eqn'
+            return
+            write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            write(*,2) 'gradT', k, gradT
+            write(*,2) 'dlnT', k, dlnT
+            write(*,2) 'dlnP', k, dlnP
+            stop 'do1_gradT_eqn'
+         end if
+
+         if (test_partials) then
+            s% solver_test_partials_val = s% equ(i_equL,k)
+         end if
+
+         if (skip_partials) return
+         call save_eqn_residual_info( &
+            s, k, nvar, i_equL, resid, 'do1_gradT_eqn', ierr)
+         
+      end subroutine do1_gradT_eqn
+
+
       subroutine do1_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)
          use eos_def
          use star_utils, only: save_eqn_residual_info
@@ -808,6 +871,11 @@
 
          i_equL = s% i_equL
          if (i_equL == 0) return
+         
+         if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
+            call do1_gradT_eqn(s, k, skip_partials, nvar, ierr)            
+            return
+         end if
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn .or. s% conv_vel_flag) then
             call do1_alt_dlnT_dm_eqn(s, k, skip_partials, nvar, ierr)            
@@ -875,8 +943,9 @@
 
          type(auto_diff_real_star_order1) :: &
             P_bc_ad, T_bc_ad, lnP_bc_ad, lnT_bc_ad, resid_ad
-         integer :: i_P_eqn, i_T_eqn
-         logical :: need_P_surf, need_T_surf, test_partials
+         integer :: i_P_eqn
+         logical :: offset_T_to_cell_center, offset_P_to_cell_center, &
+            need_P_surf, need_T_surf, test_partials
 
          include 'formats'
 
@@ -885,10 +954,9 @@
          ierr = 0
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
-         else
+         else ! use this even if not v_flag
             i_P_eqn = s% i_dv_dt
          end if
-         i_T_eqn = s% i_equL
 
          need_P_surf = .false.
          if (s% use_compression_outer_BC) then
@@ -907,25 +975,22 @@
          if (ierr /= 0) return
 
          need_T_surf = .false.
-         if (s% TDC_flag .or. .not. do_equL) then 
+         if ((.not. do_equL) .or. &
+               (s% TDC_flag .and. s% TDC_use_L_eqn_at_surface)) then 
             ! no Tsurf BC
-         else if (s% use_zero_dLdm_outer_BC) then
-            call set_zero_dL_dm_BC(ierr)
          else
             need_T_surf = .true.
          end if
          if (ierr /= 0) return
          
-         if (need_P_surf .or. need_T_surf) then
-            call get_PT_bc_ad(ierr) 
-            if (ierr /= 0) return
-         else
-            s% P_surf = s% P(1)
-            s% T_surf = s% T(1)
-            return
-         end if
+         offset_P_to_cell_center = .not. s% use_momentum_outer_BC
          
-         ! use P_bc_ad and T_bc_ad
+         offset_T_to_cell_center = .true.
+         if (s% use_other_surface_PT .or. s% TDC_flag) &
+            offset_T_to_cell_center = .false.
+
+         call get_PT_bc_ad(ierr) ! has important side-effect of setting Teff for current model
+         if (ierr /= 0) return
          
          if (need_P_surf) then
             if (s% use_momentum_outer_BC) then
@@ -977,7 +1042,8 @@
             include 'formats'
             ierr = 0
          
-            call set_Teff_info_for_eqns(s, skip_partials, r, L, Teff, &
+            call set_Teff_info_for_eqns(s, skip_partials, &
+               need_P_surf, need_T_surf, r, L, Teff, &
                lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
                lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, &
                ierr)
@@ -995,17 +1061,12 @@
             s% P_surf = P_surf
             s% T_surf = T_surf
 
-            if (s% use_atm_PT_at_center_of_surface_cell .or. r <= 0d0) then
-               dP0 = 0
-               dT0 = 0
-            else
-               if (s% use_momentum_outer_BC) then
-                  dP0 = 0
-               else
-                  dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*r*r*r*r)
-               end if
-               dT0 = dP0*s% gradT(1)*s% T(1)/s% P(1)
-            end if
+            dP0 = 0
+            dT0 = 0
+            if (offset_P_to_cell_center) &
+               dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(r))
+            if (offset_T_to_cell_center) &
+               dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
          
             P_bc = P_surf + dP0
             T_bc = T_surf + dT0
@@ -1021,37 +1082,41 @@
                write(*,1) 'lnP_surf', lnP_surf
                stop 'bc'
             end if
-
-            if (s% use_atm_PT_at_center_of_surface_cell .or. r <= 0d0) then
-
-               dP0_dlnR = 0
-               dT0_dlnR = 0
-               dT0_dlnT = 0
-               dT0_dlnd = 0
-               dT0_dL = 0
-
-            else
          
+            if (is_bad(T_bc)) then
+               write(*,1) 'lnT_bc', lnT_bc
+               write(*,1) 'T_bc', T_bc
+               write(*,1) 'T_surf', T_surf
+               write(*,1) 'dP0', dP0
+               write(*,1) 'lnT_surf', lnT_surf
+               stop 'bc'
+            end if
+            
+            dP0_dlnR = 0
+            if (offset_P_to_cell_center) then ! include partials of dP0
+               dP0_dlnR = -4*dP0
+            end if
+            
+            dT0_dlnR = 0
+            dT0_dlnT = 0
+            dT0_dlnd = 0
+            dT0_dL = 0
+            if (offset_T_to_cell_center) then ! include partials of dT0         
                d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
                d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
                d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
                d_gradT_dL = s% gradT_ad(1)%d1Array(i_L_00)
-
-               dP0_dlnR = -4*dP0
-               dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% P(1)
-
-               dPinv_dlnT = -s% chiT_for_partials(1)/s% P(1)
+               dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% Peos(1)
+               dPinv_dlnT = -s% chiT_for_partials(1)/s% Peos(1)
                dT0_dlnT = &
                     dT0 + &
-                    dP0*d_gradT_dlnT00*s% T(1)/s% P(1) + &
+                    dP0*d_gradT_dlnT00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnT
-               dPinv_dlnd = -s% chiRho_for_partials(1)/s% P(1)
+               dPinv_dlnd = -s% chiRho_for_partials(1)/s% Peos(1)
                dT0_dlnd = &
-                    dP0*d_gradT_dlnd00*s% T(1)/s% P(1) + &
+                    dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
                     dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
-
-               dT0_dL = dP0*d_gradT_dL*s% T(1)/s% P(1)
-
+               dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
             endif
 
             dlnP_bc_dP0 = 1/P_bc
@@ -1135,20 +1200,38 @@
          subroutine set_Tsurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
-            type(auto_diff_real_star_order1) :: lnT1_ad
+            type(auto_diff_real_star_order1) :: &
+               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected
+            real(dp) :: residual
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
-            ierr = 0           
-            lnT1_ad = wrap_lnT_00(s,1)            
-            resid_ad = lnT_bc_ad/lnT1_ad - 1d0
-            s% equ(i_T_eqn, 1) = resid_ad%val
+            ierr = 0  
+            if (s% TDC_flag) then ! interpolate lnT by mass
+               T4_p1 = pow4(wrap_T_p1(s,1))
+               T4_surf = pow4(T_bc_ad)
+               dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
+               T4_00_expected = T4_surf - 0.5d0*s% dm(1)*dT4_dm
+               T4_00_actual = pow4(wrap_T_00(s,1))
+               resid_ad = T4_00_expected/T4_00_actual - 1d0
+            else
+               lnT1_ad = wrap_lnT_00(s,1)            
+               resid_ad = lnT_bc_ad/lnT1_ad - 1d0
+            end if
+            residual = resid_ad%val
+            s% equ(s% i_equL, 1) = residual
+            if (is_bad(residual)) then
+               write(*,1) 'set_Tsurf_BC residual', residual
+               write(*,1) 'lnT1_ad%val', lnT1_ad%val
+               write(*,1) 'lnT_bc_ad%val', lnT_bc_ad%val
+               stop 'set_Tsurf_BC'
+            end if
             if (test_partials) then
                s% solver_test_partials_val = 0
             end if
             if (skip_partials) return
             call save_eqn_residual_info( &
-               s, 1, nvar, i_T_eqn, resid_ad, 'set_Tsurf_BC', ierr)           
+               s, 1, nvar, s% i_equL, resid_ad, 'set_Tsurf_BC', ierr)           
             if (test_partials) then
                s% solver_test_partials_var = 0
                s% solver_test_partials_dval_dx = 0
@@ -1165,7 +1248,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0           
-            lnP1_ad = wrap_lnP_00(s,1)            
+            lnP1_ad = wrap_lnPeos_00(s,1)            
             resid_ad = lnP_bc_ad/lnP1_ad - 1d0
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
@@ -1240,21 +1323,6 @@
          end subroutine set_fixed_vsurf_outer_BC
 
 
-         subroutine set_zero_dL_dm_BC(ierr)
-            integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: L1, L2
-            include 'formats'
-            ierr = 0
-            L1 = wrap_L_00(s,1)
-            L2 = wrap_L_p1(s,1)
-            resid_ad = L2/L1 - 1d0
-            s% equ(i_T_eqn,1) = resid_ad%val
-            if (skip_partials) return
-            call save_eqn_residual_info( &
-               s, 1, nvar, i_T_eqn, resid_ad, 'set_zero_dL_dm_BC', ierr)           
-         end subroutine set_zero_dL_dm_BC
-
-
       end subroutine PT_eqns_surf
 
 
@@ -1281,14 +1349,14 @@
          call expected_HSE_grav_term(s, k, grav, area, ierr)
          if (ierr /= 0) return
          
-         P00 = wrap_p_00(s,k)
-         if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% P_start(k))
+         P00 = wrap_Peos_00(s,k)
+         if (s% using_velocity_time_centering) P00 = 0.5d0*(P00 + s% Peos_start(k))
          
          if (k == 1) then
             Pm1 = 0d0
             Ppoint = P00
          else
-            Pm1 = wrap_p_m1(s,k)
+            Pm1 = wrap_Peos_m1(s,k)
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             Ppoint = alfa*P00 + (1d0-alfa)*Pm1
          end if

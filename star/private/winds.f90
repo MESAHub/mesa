@@ -652,7 +652,7 @@
          if (Teff > s% rlo_wind_max_Teff) return
          scale_height = s% rlo_wind_scale_height
          if (scale_height <= 0) then
-            scale_height = s% P(1) / (s% cgrav(1)*s% m(1)*s% rho(1) / (s% r(1)**2)) / Rsun
+            scale_height = s% Peos(1) / (s% cgrav(1)*s% m(1)*s% rho(1) / (s% r(1)**2)) / Rsun
          end if 
          roche_lobe_radius = s% rlo_wind_roche_lobe_radius
          ratio = R/roche_lobe_radius

@@ -686,7 +686,7 @@
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
 
          rho = b% s_donor% rho(1) ! density at surface in g/cm^3
-         p = b% s_donor% p(1) ! pressure at surface in dynes/cm^2
+         p = b% s_donor% Peos(1) ! pressure at surface in dynes/cm^2
          grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
          hp = p/(grav*rho) ! pressure scale height
          v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1)))
@@ -738,13 +738,13 @@
             G1 = b% s_donor% gamma1(i)
             F3 = sqrt(G1) * pow(2d0/(G1+1d0), (G1+1d0)/(2d0*G1-2d0))
             mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / &
-               (mp * b% s_donor% mu(i)))*(b% s_donor% P(i+1)-b% s_donor% P(i))
+               (mp * b% s_donor% mu(i)))*(b% s_donor% Peos(i+1)-b% s_donor% Peos(i))
          end do
          ! only take a fraction of dP for last cell 
          G1 = b% s_donor% gamma1(i)
          F3 = sqrt(G1) * pow(2d0/(G1+1d0), (G1+1d0)/(2d0*G1-2d0))
          dP = (b% s_donor% r(indexR) - rl_d) / &
-            (b% s_donor% r(indexR) - b% s_donor% r(indexR+1)) * (b% s_donor% P(i+1)-b% s_donor% P(i))
+            (b% s_donor% r(indexR) - b% s_donor% r(indexR+1)) * (b% s_donor% Peos(i+1)-b% s_donor% Peos(i))
          mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / (mp*b% s_donor% mu(i)))*dP
 
          q = b% m(b% a_i)/b% m(b% d_i) ! Mass ratio, as defined in Ritter 1988
@@ -795,7 +795,7 @@
          ! Ritter 1988 but with better fits for the various formulas that work at extreme q
 
          rho = b% s_donor% rho(1) ! density at surface in g/cm^3
-         p = b% s_donor% p(1) ! pressure at surface in dynes/cm^2
+         p = b% s_donor% Peos(1) ! pressure at surface in dynes/cm^2
          grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
          hp = p/(grav*rho) ! pressure scale height
          v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1)))
@@ -838,7 +838,7 @@
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
 
          rho = b% s_donor% rho(1) ! density at surface in g/cm^3
-         p = b% s_donor% p(1) ! pressure at surface in dynes/cm^2
+         p = b% s_donor% Peos(1) ! pressure at surface in dynes/cm^2
          grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
          hp = p/(grav*rho) ! pressure scale height
          v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1))) ! kerg = Boltzmann's constant

@@ -361,11 +361,11 @@
          end if         
          lnP_limit = logP_limit*ln10
          k = s% nz
-         if (s% lnP(k) > lnP_limit) then
+         if (s% lnPeos(k) > lnP_limit) then
             call do_remove_inner_fraction_q(id, s% q(k), ierr)
             if (ierr == 0) &
                write(*,3)' remove center for logP_limit', &
-                  k, s% nz, s% m(k)/Msun, s% lnP(k)/ln10, logP_limit
+                  k, s% nz, s% m(k)/Msun, s% lnPeos(k)/ln10, logP_limit
          end if
       end subroutine do_limit_center_logP
 
@@ -838,9 +838,9 @@
             write(*,*) 'do_remove_surface_by_pressure: get_star_ptr ierr', ierr
             return
          end if
-         if (pressure <= s% P(1)) return
+         if (pressure <= s% Peos(1)) return
          do k=1,s% nz
-            if (s% P(k) >= pressure) then
+            if (s% Peos(k) >= pressure) then
                call do_remove_surface(id, k, ierr)
                return
             end if
@@ -996,7 +996,7 @@
          rmid = s% rmid(1+skip)
          Lmid = (s% L(1+skip) + s% L(2+skip))/2
          T = s% T(1+skip)
-         P = s% P(1+skip)
+         P = s% Peos(1+skip)
 
          if (.not. associated(s% other_star_info)) then
             allocate(s% other_star_info)

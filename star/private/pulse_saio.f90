@@ -284,7 +284,7 @@ contains
         else
            rho = eval_face_rho(s, k, k_a, k_b)
         end if
-        P = eval_face(s%dq, s%P, k, 1, s%nz)
+        P = eval_face(s%dq, s%Peos, k, 1, s%nz)
         eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav, k, k_a, k_b)
         c_V = eval_face(s%dq, s%Cv, k, k_a, k_b)
         chi_rho = eval_face(s%dq, s%chiRho, k, k_a, k_b)

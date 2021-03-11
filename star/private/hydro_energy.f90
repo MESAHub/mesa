@@ -115,7 +115,7 @@
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad + eps_grav_ad
          else if (s% using_velocity_time_centering .and. &
-                s% use_Fraley_PdV_work_when_time_centering_velocity) then
+                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - de_dt_ad
          else
@@ -127,13 +127,7 @@
          resid_ad = scal*resid_ad
          residual = resid_ad%val
          s% equ(i_dlnE_dt, k) = residual
-
-         if (is_bad(residual)) then
-!$omp critical (hydro_equ_l_crit1)
-            write(*,2) 'energy eqn residual', k, residual
-            stop 'get1_energy_eqn'
-!$omp end critical (hydro_equ_l_crit1)
-         end if
+         
          if (test_partials) then
             s% solver_test_partials_val = residual
          end if
@@ -187,7 +181,7 @@
             ierr = 0
             skip_P = eps_grav_form
             if (s% using_velocity_time_centering .and. &
-                s% use_Fraley_PdV_work_when_time_centering_velocity) then
+                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
                call eval_Fraley_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr) 
                d_dwork_dxam1 = 0
@@ -342,9 +336,10 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            d_turbulent_energy_dt_ad = 0d0
-            if (s% TDC_flag) then ! dxh_etrb = etrb - etrb_start
+            if (s% TDC_flag) then
                d_turbulent_energy_dt_ad = wrap_dxh_etrb(s,k)/dt
+            else
+               d_turbulent_energy_dt_ad = 0d0
             end if
             s% detrbdt(k) = d_turbulent_energy_dt_ad%val
          end subroutine setup_d_turbulent_energy_dt
@@ -539,7 +534,7 @@
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr) 
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
-         use star_utils, only: calc_XP_ad_tw
+         use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          logical, intent(in) :: skip_P
@@ -552,9 +547,9 @@
          real(dp) :: work_00, work_p1, dm, dV
          real(dp), dimension(s% species) :: &
             d_work_00_dxa00, d_work_00_dxam1, &
-            d_work_p1_dxap1, d_work_p1_dxa00, d_XP_dxa
+            d_work_p1_dxap1, d_work_p1_dxa00, d_Ptot_dxa
          type(auto_diff_real_star_order1) :: work_00_ad, work_p1_ad, &
-            XP_ad, dV_ad, rho_ad
+            Ptot_ad, dV_ad, rho_ad
          logical :: test_partials
          integer :: j
          include 'formats'
@@ -589,43 +584,43 @@
       
 
       ! ergs/s at face(k)
-      subroutine eval1_work(s, k, skip_P, &
+      subroutine eval1_work(s, k, skip_Peos, &
             work_ad, work, d_work_dxa00, d_work_dxam1, ierr)
-         use star_utils, only: get_avQ_ad, calc_Pt_ad_tw
+         use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s 
          integer, intent(in) :: k
-         logical, intent(in) :: skip_P
+         logical, intent(in) :: skip_Peos
          type(auto_diff_real_star_order1), intent(out) :: work_ad
          real(dp), intent(out) :: work
          real(dp), dimension(s% species), intent(out) :: &
             d_work_dxa00, d_work_dxam1
          integer, intent(out) :: ierr
-         real(dp) :: alfa, beta, P_theta, extra_P, P_face, Av_face
+         real(dp) :: alfa, beta, P_theta, extra_P, Peos_face, Av_face
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
-            P_face_ad, Av_face_ad, mlt_Pturb_ad, &
-            PtR_ad, PtL_ad, avQL_ad, avQR_ad, PL_ad, PR_ad, &
-            P_ad, Pt_ad, avQ_ad, inv_R2
+            P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
+            PtrbR_ad, PtrbL_ad, PvscL_ad, PvscR_ad, PL_ad, PR_ad, &
+            Peos_ad, Ptrb_ad, Pvsc_ad, inv_R2
          logical :: test_partials
          integer :: j
          include 'formats'
          ierr = 0
 
+         d_work_dxa00 = 0d0
+         d_work_dxam1 = 0d0
          if (k > s% nz .or. (s% dt <= 0d0 .and. .not. (s% v_flag .or. s% u_flag))) then
             work_ad = 0d0
             if (k == s% nz+1) then
-               work = pi4*s% r_center*s% r_center*s% P_start(s% nz)*s% v_center
+               work = pi4*s% r_center*s% r_center*s% Peos_start(s% nz)*s% v_center
                s% work_inward_at_center = work
             end if
             work_ad%val = work
-            d_work_dxa00 = 0d0
-            d_work_dxam1 = 0d0
             return    
          end if
          
-         call eval1_Av_face_ad(s, k, Av_face_ad, ierr)
+         call eval1_A_times_v_face_ad(s, k, A_times_v_face_ad, ierr)
          if (ierr /= 0) return
 
          if (k > 1) then         
@@ -635,125 +630,122 @@
          end if
          beta = 1d0 - alfa
 
-         ! set P_ad
-         d_Pface_dxa00 = 0d0
-         d_Pface_dxam1 = 0d0
-         if (skip_P) then
-            P_ad = 0d0
-         else if (s% u_flag) then
-            P_ad = s% P_face_ad(k)
+         if (s% u_flag) then
+            P_face_ad = s% P_face_ad(k)
             if (s% using_velocity_time_centering .and. &
                      s% include_P_in_velocity_time_centering) &
-               P_ad = 0.5d0*(P_ad + s% P_face_start(k))
-         else
-            if (k > 1) then 
-               PR_ad = wrap_p_m1(s,k)
+               P_face_ad = 0.5d0*(P_face_ad + s% P_face_start(k))
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
+         else ! set P_ad
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
+            if (skip_Peos) then
+               Peos_ad = 0d0
+            else
+               if (k > 1) then 
+                  PR_ad = wrap_Peos_m1(s,k)
+                  if (s% using_velocity_time_centering .and. &
+                           s% include_P_in_velocity_time_centering) &
+                     PR_ad = 0.5d0*(PR_ad + s% Peos_start(k-1))
+               else
+                  PR_ad = 0d0
+               end if
+               PL_ad = wrap_Peos_00(s,k)
                if (s% using_velocity_time_centering .and. &
                         s% include_P_in_velocity_time_centering) &
-                  PR_ad = 0.5d0*(PR_ad + s% P_start(k-1))
-            else
-               PR_ad = 0d0
+                  PL_ad = 0.5d0*(PL_ad + s% Peos_start(k))
+               Peos_ad = alfa*PL_ad + beta*PR_ad
+               if (s% using_velocity_time_centering .and. &
+                        s% include_P_in_velocity_time_centering) then
+                  P_theta = 0.5d0
+               else
+                  P_theta = 1d0
+               end if
+               if (k > 1) then         
+                  do j=1,s% species
+                     d_Pface_dxa00(j) = &
+                        alfa*s% dlnPeos_dxa_for_partials(j,k)*P_theta*s% Peos(k)
+                  end do
+                  do j=1,s% species
+                     d_Pface_dxam1(j) = &
+                        beta*s% dlnPeos_dxa_for_partials(j,k-1)*P_theta*s% Peos(k-1)
+                  end do
+               else ! k == 1
+                  do j=1,s% species
+                     d_Pface_dxa00(j) = &
+                        s% dlnPeos_dxa_for_partials(j,k)*P_theta*s% Peos(k)
+                  end do
+               end if
             end if
-            PL_ad = wrap_p_00(s,k)
-            if (s% using_velocity_time_centering .and. &
-                     s% include_P_in_velocity_time_centering) &
-               PL_ad = 0.5d0*(PL_ad + s% P_start(k))
-            P_ad = alfa*PL_ad + beta*PR_ad
-            if (s% using_velocity_time_centering .and. &
-                     s% include_P_in_velocity_time_centering) then
-               P_theta = 0.5d0
-            else
-               P_theta = 1d0
-            end if
-            if (k > 1) then         
-               do j=1,s% species
-                  d_Pface_dxa00(j) = &
-                     alfa*s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
-               end do
-               do j=1,s% species
-                  d_Pface_dxam1(j) = &
-                     beta*s% dlnP_dxa_for_partials(j,k-1)*P_theta*s% P(k-1)
-               end do
-            else ! k == 1
-               do j=1,s% species
-                  d_Pface_dxa00(j) = &
-                     s% dlnP_dxa_for_partials(j,k)*P_theta*s% P(k)
-               end do
-            end if
-         end if
          
-         ! set avQ_ad
-         if (.not. s% use_avQ_art_visc) then
-            avQ_ad = 0d0
-         else
-            if (k > 1) then 
-               call get_avQ_ad(s, k-1, avQR_ad, ierr)
+            ! set Pvsc_ad
+            if (.not. s% use_Pvsc_art_visc) then
+               Pvsc_ad = 0d0
+            else
+               if (k > 1) then 
+                  call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
+                  if (ierr /= 0) return
+                  PvscR_ad = shift_m1(PvscR_ad)
+                  ! always time center
+                  PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
+               else
+                  PvscR_ad = 0d0
+               end if
+               call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               avQR_ad = shift_m1(avQR_ad)
                ! always time center
-               avQR_ad = 0.5d0*(avQR_ad + s% avQ_start(k-1))
-            else
-               avQR_ad = 0d0
+               PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
+               Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
-            call get_avQ_ad(s, k, avQL_ad, ierr)
-            if (ierr /= 0) return
-            ! always time center
-            avQL_ad = 0.5d0*(avQL_ad + s% avQ_start(k))
-            avQ_ad = alfa*avQL_ad + beta*avQR_ad
-         end if
          
-         ! set Pt_ad
-         if (.not. s% TDC_flag) then
-            Pt_ad = 0d0
-         else
-            if (k > 1) then 
-               call calc_Pt_ad_tw(s, k-1, PtR_ad, ierr)
+            ! set Ptrb_ad
+            if (.not. s% TDC_flag) then
+               Ptrb_ad = 0d0
+            else
+               if (k > 1) then 
+                  call calc_Ptrb_ad_tw(s, k-1, PtrbR_ad, ierr)
+                  if (ierr /= 0) return
+                  PtrbR_ad = shift_m1(PtrbR_ad)
+               else
+                  PtrbR_ad = 0d0
+               end if
+               call calc_Ptrb_ad_tw(s, k, PtrbL_ad, ierr)
                if (ierr /= 0) return
-               PtR_ad = shift_m1(PtR_ad)
-            else
-               PtR_ad = 0d0
+               Ptrb_ad = alfa*PtrbL_ad + beta*PtrbR_ad
             end if
-            call calc_Pt_ad_tw(s, k, PtL_ad, ierr)
-            if (ierr /= 0) return
-            Pt_ad = alfa*PtL_ad + beta*PtR_ad
+         
+            ! set extra_P
+            if (.not. s% use_other_pressure) then
+               extra_P = 0d0
+            else if (k > 1) then 
+               extra_P = alfa*s% extra_pressure(k) + beta*s% extra_pressure(k-1) 
+            else
+               extra_P = s% extra_pressure(k)
+            end if
+         
+            ! set mlt_Pturb_ad
+            mlt_Pturb_ad = 0d0
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
+               mlt_Pturb_ad%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
+               mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
+               mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
+            end if            
+         
+            P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
+         
          end if
          
-         ! set extra_P
-         if (.not. s% use_other_pressure) then
-            extra_P = 0d0
-         else if (k > 1) then 
-            extra_P = alfa*s% extra_pressure(k) + beta*s% extra_pressure(k-1) 
-         else
-            extra_P = s% extra_pressure(k)
-         end if
-         
-         ! set mlt_Pturb_ad
-         mlt_Pturb_ad = 0d0
-         if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_start(k) > 0d0 .and. k > 1) then
-            mlt_Pturb_ad%val = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*(s% rho(k-1) + s% rho(k))/6d0
-            mlt_Pturb_ad%d1Array(i_lnd_m1) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k-1)/6d0
-            mlt_Pturb_ad%d1Array(i_lnd_00) = s% mlt_Pturb_factor*s% mlt_vc_start(k)**2*s% rho(k)/6d0
-         end if            
-         
-         P_face_ad = P_ad + avQ_ad + Pt_ad + mlt_Pturb_ad + extra_P
-         
-         work_ad = Av_face_ad*P_face_ad
+         work_ad = A_times_v_face_ad*P_face_ad
          work = work_ad%val
          
          if (k == 1) s% work_outward_at_surface = work
          
-         Av_face = Av_face_ad%val
+         Av_face = A_times_v_face_ad%val
          do j=1,s% species
             d_work_dxa00(j) = Av_face*d_Pface_dxa00(j)
             d_work_dxam1(j) = Av_face*d_Pface_dxam1(j)
          end do
-
-         if (is_bad(work)) then
-!$omp critical (hydro_equ_l_crit2)
-            write(*,2) 'work', k, work
-            stop 'eval1_work'
-!$omp end critical (hydro_equ_l_crit2)
-         end if
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -768,11 +760,11 @@
       end subroutine eval1_work
       
       
-      subroutine eval1_Av_face_ad(s, k, Av_face_ad, ierr)
+      subroutine eval1_A_times_v_face_ad(s, k, A_times_v_face_ad, ierr)
          use star_utils, only: get_area_info
          type (star_info), pointer :: s 
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: Av_face_ad
+         type(auto_diff_real_star_order1), intent(out) :: A_times_v_face_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: A_ad, inv_R2, u_face_ad
          include 'formats'
@@ -797,16 +789,16 @@
             u_face_ad%d1Array(i_lnR_00) = s% r(k)/s% dt
          end if
          
-         Av_face_ad = A_ad*u_face_ad
+         A_times_v_face_ad = A_ad*u_face_ad
       
-      end subroutine eval1_Av_face_ad
+      end subroutine eval1_A_times_v_face_ad
 
 
       subroutine eval_Fraley_PdV_work( &
             s, k, skip_P, dwork_ad, dwork, d_dwork_dxa00, ierr) 
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
-         use star_utils, only: calc_XP_ad_tw
+         use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s 
          integer, intent(in) :: k
          logical, intent(in) :: skip_P
@@ -816,8 +808,8 @@
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
-            Av_face00_ad, Av_facep1_ad, XP_ad, dV
-         real(dp), dimension(s% species) :: d_XP_dxa
+            Av_face00_ad, Av_facep1_ad, Ptot_ad, dV
+         real(dp), dimension(s% species) :: d_Ptot_dxa
          real(dp) :: Av_face00, Av_facep1
          logical :: include_mlt_Pturb
          integer :: j
@@ -826,10 +818,10 @@
          ierr = 0
          
          ! dV = 1/rho - 1/rho_start 
-         call eval1_Av_face_ad(s, k, Av_face00_ad, ierr)
+         call eval1_A_times_v_face_ad(s, k, Av_face00_ad, ierr)
          if (ierr /= 0) return
          if (k < s% nz) then
-            call eval1_Av_face_ad(s, k+1, Av_facep1_ad, ierr)
+            call eval1_A_times_v_face_ad(s, k+1, Av_facep1_ad, ierr)
             if (ierr /= 0) return
             Av_facep1_ad = shift_p1(Av_facep1_ad)
          else
@@ -843,16 +835,16 @@
          include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
             .and. s% mlt_vc_start(k) > 0d0 .and. k > 1
          
-         call calc_XP_ad_tw( &
-            s, k, skip_P, .not. include_mlt_Pturb, XP_ad, d_XP_dxa, ierr)
+         call calc_Ptot_ad_tw( &
+            s, k, skip_P, .not. include_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
          if (ierr /= 0) return
          
          do j=1,s% species
-            d_dwork_dxa00(j) = d_XP_dxa(j)*(Av_face00 - Av_facep1)
+            d_dwork_dxa00(j) = d_Ptot_dxa(j)*(Av_face00 - Av_facep1)
          end do
-         if (k == 1) s% work_outward_at_surface = XP_ad%val*Av_face00
+         if (k == 1) s% work_outward_at_surface = Ptot_ad%val*Av_face00
          
-         dwork_ad = XP_ad*dV
+         dwork_ad = Ptot_ad*dV
          dwork = dwork_ad%val
 
       end subroutine eval_Fraley_PdV_work

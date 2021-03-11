@@ -342,11 +342,13 @@
                int_val = k
                int_flag = .true.
             case (p_conv_L_div_L)
-               if (s% L(k) > 0d0) val = s% L_conv(k)/s% L(k)
+               if (s% L(k) > 0d0) val = get_Lconv(s,k)/s% L(k)
             case (p_log_conv_L_div_L)
-               if (s% L(k) > 0d0) val = safe_log10(s% L_conv(k)/s% L(k))
+               if (s% L(k) > 0d0) val = safe_log10(get_Lconv(s,k)/s% L(k))
             case (p_lum_erg_s)
                val = s% L(k)
+            case (p_L)
+               val = s% L(k)/Lsun
             case (p_luminosity)
                val = s% L(k)/Lsun
             case (p_log_abs_lum_erg_s)
@@ -359,14 +361,12 @@
                L_rad = get_Lrad(s,k)
                val = L_rad/Lsun
             case (p_lum_conv)
-               L_rad = get_Lrad(s,k)
-               val = (s% L(k) - L_rad)/Lsun
+               val = get_Lconv(s,k)/Lsun
             case (p_lum_conv_MLT)
-               L_rad = get_Lrad(s,k)
                val = s% L_conv(k)/Lsun
 
             !case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
-            !   val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% P(k)*s% chiT(k))
+            !   val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
             case (p_lum_rad_div_L_Edd)
                val = get_Lrad_div_Ledd(s,k)
             case (p_lum_conv_div_lum_Edd)
@@ -703,13 +703,13 @@
                val = safe_log10(val/s% csound(k)/secyer)
 
             case (p_pgas_div_ptotal)
-               val = s% Pgas(k)/s% P(k)
+               val = s% Pgas(k)/s% Peos(k)
             case (p_prad_div_pgas)
                val = s% Prad(k)/s% Pgas(k)
             case(p_prad_div_pgas_div_L_div_Ledd)
                val = (s% Prad(k)/s% Pgas(k))/max(1d-12,s% L(k)/get_Ledd(s,k))
             case (p_pgas_div_p)
-               val = s% Pgas(k)/s% P(k)
+               val = s% Pgas(k)/s% Peos(k)
 
             case (p_cell_collapse_time)
                if (s% v_flag) then
@@ -782,6 +782,8 @@
                val = s% kap_frac_Compton(k)
             case (p_kap_frac_op_mono)
                val = s% kap_frac_op_mono(k)
+            case (p_log_kap)
+               val = safe_log10(s% opacity(k))
             case (p_log_opacity)
                val = safe_log10(s% opacity(k))
             case (p_extra_opacity_factor)
@@ -830,9 +832,9 @@
             case (p_prad)
                val = s% Prad(k)
             case (p_pressure)
-               val = s% P(k)
+               val = s% Peos(k)
             case (p_logP)
-               val = s% lnP(k)/ln10
+               val = s% lnPeos(k)/ln10
             case (p_logE)
                val = s% lnE(k)/ln10
             case (p_grada)
@@ -1104,26 +1106,13 @@
             case(p_log_P_face)
                if (s% u_flag) val = safe_log10(s% P_face_ad(k)%val)
 
-            case (p_hse_ratio)
-               if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0) then
-                  val = (s% P(k-1) - s% P(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(pi4*pow4(s% r(k)))) - 1d0
-               end if
-            case (p_hse_ratio_gyre)
-               if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0) then
-                  Pbar_00 = (s% P(k-1)*s% dm(k) + s% P(k)*s% dm(k-1))/(s% dm(k) + s% dm(k-1))
-                  Pbar_p1 = (s% P(k)*s% dm(k+1) + s% P(k+1)*s% dm(k))/(s% dm(k+1) + s% dm(k))
-                  val = (Pbar_00 - Pbar_p1)/(-0.5d0*s% dm(k)*( &
-                     s% cgrav(k)*s% m(k)/(pi4*pow4(s% r(k))) + &
-                     s% cgrav(k+1)*s% m(k+1)/(pi4*pow4(s% r(k+1))))) - 1d0
-               end if
-
             case (p_dPdr_div_grav)
                if (k > 1 .and. k < nz .and. s% cgrav(k) > 0d0 .and. s% RTI_flag) then
                   val = s% dPdr_info(k)/s% rho_face(k)
                end if
 
             case (p_gradP_div_rho)
-               if (k > 1) val = pi4*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
+               if (k > 1) val = pi4*s% r(k)*s% r(k)*(s% Peos(k-1) - s% Peos(k))/s% dm_bar(k)
             case (p_dlnP_dlnR)
                if (k > 1) val = log(s% P_face_ad(k-1)%val/s% P_face_ad(k)%val) / (s% lnR(k-1) - s% lnR(k))
             case (p_dlnRho_dlnR)
@@ -1132,7 +1121,7 @@
             case (p_dvdt_grav)
                val = -s% cgrav(k)*s% m(k)/(s% r(k)*s% r(k))
             case (p_dvdt_dPdm)
-               if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% P(k-1) - s% P(k))/s% dm_bar(k)
+               if (k > 1) val = -pi4*s% r(k)*s% r(k)*(s% Peos(k-1) - s% Peos(k))/s% dm_bar(k)
 
             case (p_dm_eps_grav)
                val = s% eps_grav(k)*s% dm(k)
@@ -1146,7 +1135,7 @@
 
             case (p_env_eps_grav)
                val = -s% gradT_sub_grada(k)*s% grav(k)*s% mstar_dot*s% Cp(k)*s% T(k) / &
-                        (pi4*s% r(k)*s% r(k)*s% P(k))
+                        (pi4*s% r(k)*s% r(k)*s% Peos(k))
 
             case (p_mlt_mixing_type)
                int_val = s% mlt_mixing_type(k)
@@ -1359,13 +1348,13 @@
                val = safe_log10(s% Cp(k)*s% T(k)*(s% m(1) - s% m(k))/s% L(k))
             case (p_log_cp_T_div_t_sound)
                val = safe_log10( &
-                  s% Cp(k)*s% T(k)/(s% P(k)/(s% rho(k)*s% grav(k))/s% csound(k)))
+                  s% Cp(k)*s% T(k)/(s% Peos(k)/(s% rho(k)*s% grav(k))/s% csound(k)))
             case (p_log_t_sound)
-               val = safe_log10(s% P(k)/(s% rho(k)*s% grav(k))/s% csound(k))
+               val = safe_log10(s% Peos(k)/(s% rho(k)*s% grav(k))/s% csound(k))
             case (p_pressure_scale_height)
-               val = s% P(k)/(s% rho(k)*s% grav(k))/Rsun
+               val = s% Peos(k)/(s% rho(k)*s% grav(k))/Rsun
             case (p_pressure_scale_height_cm)
-               val = s% P(k)/(s% rho(k)*s% grav(k))
+               val = s% Peos(k)/(s% rho(k)*s% grav(k))
             case (p_actual_gradT)
                val = s% actual_gradT(k)
             case (p_gradT_sub_actual_gradT)
@@ -1617,7 +1606,7 @@
                
             case (p_gradT_rel_err)
                if (k > 1) then
-                  val = (s% lnT(k-1) - s% lnT(k))/(s% lnP(k-1) - s% lnP(k))
+                  val = (s% lnT(k-1) - s% lnT(k))/(s% lnPeos(k-1) - s% lnPeos(k))
                   val = (s% gradT(k) - val)/s% gradT(k)
                end if
 
@@ -1786,13 +1775,13 @@
                if (s% u_flag .and. k > 1) &
                   val = s% u(k-1)/s% rmid_start(k-1) - s% u(k)/s% rmid_start(k)
 
-            case(p_Pturb)
+            case(p_Ptrb)
                if (s% TDC_flag) then
                   val = s% etrb(k)*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
-            case(p_log_Pturb)
+            case(p_log_Ptrb)
                if (s% TDC_flag) then
                   val = safe_log10(s% etrb(k)*s% rho(k))
                else if (s% RSP_flag) then
@@ -1800,13 +1789,13 @@
                end if
             case(p_w)
                if (s% TDC_flag) then
-                  val = s% w(k)
+                  val = sqrt(max(0d0,s% etrb(k)))
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if               
             case(p_log_w)
                if (s% TDC_flag) then
-                  val = s% w(k)
+                  val = sqrt(max(0d0,s% etrb(k)))
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if    
@@ -1823,8 +1812,8 @@
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if
-            case(p_avQ)
-               if (s% use_avQ_art_visc .or. s% RSP_flag) val = s% avQ(k)
+            case(p_Pvsc)
+               if (s% use_Pvsc_art_visc .or. s% RSP_flag) val = s% Pvsc(k)
             case(p_Hp_face)
                if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
@@ -1864,7 +1853,7 @@
                if (s% rsp_flag) &
                   val = safe_log10(s% RSP_Et(k))
             case(p_rsp_Pt)
-               if (s% rsp_flag) val = s% Pt(k)
+               if (s% rsp_flag) val = s% Ptrb(k)
             case(p_rsp_Eq)
                if (s% rsp_flag) val = s% Eq(k)
             case(p_rsp_PII_face)
@@ -1883,8 +1872,8 @@
                if (s% rsp_flag) val = s% Hp_face(k)
             case(p_rsp_Chi)
                if (s% rsp_flag) val = s% Chi(k)
-            case(p_rsp_avQ)
-               if (s% rsp_flag) val = s% avQ(k)
+            case(p_rsp_Pvsc)
+               if (s% rsp_flag) val = s% Pvsc(k)
             case(p_rsp_erad)
                if (s% rsp_flag) val = s% erad(k)
             case(p_rsp_log_erad)
@@ -2332,7 +2321,7 @@
             x00 = s% xa(i,ii)
             xm1 = s% xa(i,ii-1)
             if (x00 < 1d-20 .or. xm1 < 1d-20) return
-            dlogP = (s% lnP(ii) - s% lnP(ii-1))/ln10
+            dlogP = (s% lnPeos(ii) - s% lnPeos(ii-1))/ln10
             if (dlogP <= 0d0) return
             dlogX = log10(x00/xm1)
             get_dlogX_dlogP = dlogX/dlogP
@@ -2352,7 +2341,7 @@
             eps = s% eps_nuc_categories(cat,ii)
             epsm1 = s% eps_nuc_categories(cat,ii-1)
             if (eps < 1d-3 .or. epsm1 < 1d-3) return
-            dlogP = (s% lnP(ii) - s% lnP(ii-1))/ln10
+            dlogP = (s% lnPeos(ii) - s% lnPeos(ii-1))/ln10
             if (dlogP <= 0d0) return
             dlog_eps = log10(eps/epsm1)
             get_dlog_eps_dlogP = dlog_eps/dlogP

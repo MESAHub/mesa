@@ -3306,6 +3306,7 @@
          integer, parameter ::  lipar=1, lrpar=1
          integer :: max_model_number, model_number
          real(dp) :: save_max_timestep, save_max_years_for_timestep
+         logical :: save_use_gradT
          type (star_info), pointer :: s
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
@@ -3335,6 +3336,8 @@
          model_number = s% model_number
          save_max_timestep = s% max_timestep
          save_max_years_for_timestep = s% max_years_for_timestep
+         save_use_gradT = s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
+         s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
          s% model_number = 0
          call do_internal_evolve( &
                id, before_evolve_relax_num_steps, &
@@ -3344,6 +3347,7 @@
          s% model_number = model_number
          s% max_timestep = save_max_timestep
          s% max_years_for_timestep = save_max_years_for_timestep
+         s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = save_use_gradT
          call error_check('relax num steps',ierr)
 
       end subroutine do_relax_num_steps

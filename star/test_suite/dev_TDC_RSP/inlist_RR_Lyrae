@@ -25,12 +25,7 @@
    initial_z = 0.0004d0
    initial_mass = 0.65d0
 
-   !max_timestep = 100.18 ! seconds
-   !max_age_in_days = 7.8764
-   
-   RSP_max_dt = 90 ! for debugging
-   max_timestep = 90 ! for debugging
-   force_timestep_min = 90 ! for debugging
+   force_timestep = 90 ! for debugging
    
 
 ! TDC

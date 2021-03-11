@@ -97,8 +97,7 @@
             area_00, area_p1, inv_R2_00, inv_R2_p1, &
             dudt_expected_ad, dudt_actual_ad, resid_ad
          type(accurate_auto_diff_real_star_order1) :: sum_ad       
-         real(dp) :: dt, dm, ie_plus_ke, scal, &
-            d_momflux00_dw_div_wc00, d_momfluxp1_dw_div_wcp1, residual
+         real(dp) :: dt, dm, ie_plus_ke, scal, residual
          logical :: dbg, do_diffusion, test_partials
 
          include 'formats'
@@ -130,7 +129,7 @@
          end if
 
          call setup_momentum_flux
-         call setup_geometry_source
+         call setup_geometry_source(ierr); if (ierr /= 0) return
          call setup_gravity_source
          call setup_diffusion_source
 
@@ -178,29 +177,27 @@
          
          subroutine setup_momentum_flux
             if (k == 1) then
-               call eval_surf_momentum_flux_ad(s, P_surf_ad, &
-                  flux_out_ad, d_momflux00_dw_div_wc00, ierr)   
-               if (ierr /= 0) return
+               flux_out_ad = P_surf_ad*area_00
             else
-               call eval1_momentum_flux_ad(s, k, &
-                  flux_out_ad, d_momflux00_dw_div_wc00,ierr)   
-               if (ierr /= 0) return
+               flux_out_ad = s% P_face_ad(k)*area_00
             end if
-            flux_out_ad%d1Array(i_L_00) = d_momflux00_dw_div_wc00
             if (k < nz) then
-               call eval1_momentum_flux_ad(s, k+1, &
-                  flux_in_ad, d_momfluxp1_dw_div_wcp1, ierr)   
-               if (ierr /= 0) return
-               flux_in_ad = shift_p1(flux_in_ad)
-               flux_in_ad%d1Array(i_L_p1) = d_momfluxp1_dw_div_wcp1
+               flux_in_ad = shift_p1(s% P_face_ad(k+1))*area_p1
             else
                flux_in_ad = 0d0
             end if                  
          end subroutine setup_momentum_flux
 
-         subroutine setup_geometry_source
+         subroutine setup_geometry_source(ierr)
+            use star_utils, only: calc_Ptot_ad_tw
+            integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: P
-            P = wrap_p_00(s,k)
+            real(dp), dimension(s% species) :: d_Ptot_dxa
+            logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
+            ierr = 0
+            ! use same P here as the cell pressure in P_face calculation
+            call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_Ptot_dxa, ierr)
+            if (ierr /= 0) return
             if (k == nz) then 
                ! no flux in from left, so only have geometry source on right
                ! this matters for cases with R_center > 0.
@@ -269,63 +266,6 @@
          end subroutine setup_diffusion_source
          
       end subroutine do1_dudt_eqn
-
-      
-      ! (g cm/s)/s from cell(k) to cell(k-1)
-      subroutine eval1_momentum_flux_ad(s, k, momflux_ad, d_momflux_dw_div_wc, ierr)
-         use star_utils, only: get_area_info
-         type (star_info), pointer :: s 
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: momflux_ad
-         real(dp), intent(out) :: d_momflux_dw_div_wc
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: area, inv_R2
-         integer :: nz
-         logical :: test_partials
-         include 'formats'
-         
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-         ierr = 0
-         d_momflux_dw_div_wc = 0 
-         nz = s% nz
-         if (k > nz) then
-            momflux_ad = 0d0
-            return    
-         end if
-         
-         call get_area_info(s, k, area, inv_R2, ierr)
-         if (ierr /= 0) return
-         
-         momflux_ad = area*s% P_face_ad(k)     
-         d_momflux_dw_div_wc = area%val*s% d_Pface_domega(k)
-              
-         if (test_partials) then
-            s% solver_test_partials_val = momflux_ad%val
-            s% solver_test_partials_var = s% i_lnr
-            s% solver_test_partials_dval_dx = momflux_ad%d1Array(i_lnr_00)
-            write(*,*) 'eval1_momentum_flux_ad', s% solver_test_partials_var
-         end if
-         
-      end subroutine eval1_momentum_flux_ad
-      
-      
-      subroutine eval_surf_momentum_flux_ad(s, P_surf_ad, &
-            momflux_ad, d_momflux_dw, ierr)
-         use star_utils, only: get_area_info
-         type (star_info), pointer :: s 
-         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
-         type(auto_diff_real_star_order1), intent(out) :: momflux_ad
-         real(dp), intent(out) :: d_momflux_dw
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: area, inv_R2
-         include 'formats'
-         ierr = 0
-         call get_area_info(s, 1, area, inv_R2, ierr)
-         if (ierr /= 0) return
-         momflux_ad = area*P_surf_ad
-         d_momflux_dw = 0
-      end subroutine eval_surf_momentum_flux_ad
       
 
       subroutine do_uface_and_Pface(s, ierr)
@@ -365,6 +305,7 @@
       
       subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
+         use star_utils, only: calc_Ptot_ad_tw
          use hydro_tdc, only: compute_Uq_face
          type (star_info), pointer :: s 
          integer, intent(in) :: k
@@ -376,7 +317,8 @@
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
             Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
-         ! use d1Array(i_L_00) for w_00
+         real(dp), dimension(s% species) :: d_Ptot_dxa ! skip this
+         logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
          real(dp) :: dG_dw_div_wc, delta_m, f
             
          include 'formats'
@@ -391,15 +333,18 @@
                             
          if (k == 1) then
             s% u_face_ad(k) = wrap_u_00(s,k)
-            s% P_face_ad(k) = wrap_p_00(s,k)
+            s% P_face_ad(k) = wrap_Peos_00(s,k)
             return            
          end if
       
          r_ad = wrap_r_00(s,k)
          A_ad = 4d0*pi*pow2(r_ad)
          
-         PL_ad = wrap_p_00(s,k)
-         PR_ad = wrap_p_m1(s,k)
+         call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr)
+         if (ierr /= 0) return
+         call calc_Ptot_ad_tw(s, k-1, skip_Peos, skip_mlt_Pturb, PR_ad, d_Ptot_dxa, ierr)
+         if (ierr /= 0) return
+         PR_ad = shift_m1(PR_ad)
 
          uL_ad = wrap_u_00(s,k)
          uR_ad = wrap_u_m1(s,k)

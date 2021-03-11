@@ -264,12 +264,12 @@
          
          if ((s% use_gold2_tolerances .and. s% steps_before_use_gold2_tolerances < 0) .or. &
              (s% steps_before_use_gold2_tolerances >= 0 .and. &
-                s% model_number > s% steps_before_use_gold2_tolerances + s% init_model_number)) then
+                s% model_number > s% steps_before_use_gold2_tolerances + max(0,s% init_model_number))) then
             s% using_gold_tolerances = .true.
             gold_tolerances_level = 2
          else if ((s% use_gold_tolerances .and. s% steps_before_use_gold_tolerances < 0) .or. &
              (s% steps_before_use_gold_tolerances >= 0 .and. &
-                s% model_number > s% steps_before_use_gold_tolerances + s% init_model_number)) then
+                s% model_number > s% steps_before_use_gold_tolerances + max(0,s% init_model_number))) then
             if (s% maxT_for_gold_tolerances > 0) then
                maxT = maxval(s% T(1:nz))
             else
