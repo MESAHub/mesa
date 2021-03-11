@@ -1023,7 +1023,7 @@
                T_term = (T_full_off - T_min) / (T_full_off - T_full_on)
             end if
 
-            lim = gamma_term*T_term
+            lim = gamma_term*T_term*(1d0 - s% phase(k))
             if (lim <= 0d0) then
                limit_coeffs_face(k) = 0d0
                k_max = k-1
