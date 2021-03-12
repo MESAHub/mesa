@@ -253,7 +253,6 @@
       Profile_Panels1_other_yaxis_name(9) = 'xtr6_1' 
       Profile_Panels1_same_yaxis_range(9) = .true.
 
-
 ! standard output
 
       Profile_Panels1_yaxis_name(4) = 'L'
@@ -282,7 +281,6 @@
       Profile_Panels1_other_yaxis_name(9) = 'mix_typ_1' 
       Profile_Panels1_same_yaxis_range(9) = .true.
 
-   
 
    Profile_Panels1_file_flag = .false.
    Profile_Panels1_file_dir = 'png'

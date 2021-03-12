@@ -170,7 +170,7 @@
    pgstar_interval = 1
 
    !Profile_Panels1_xmin = 25 ! -101D0
-   !Profile_Panels1_xmax = 65 ! -101D0
+   !Profile_Panels1_xmax = 100 ! -101D0
 
    Grid2_title = 'TDC twin study'
    

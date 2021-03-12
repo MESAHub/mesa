@@ -745,17 +745,6 @@
          P_rad_00 = (crad/3d0)*T4_00
          d_P_rad_actual_ad = P_rad_m1 - P_rad_00
          
-         !s% xtra1_array(k) = s% T_start(k)
-         !s% xtra2_array(k) = T4_m1%val - T4_00%val
-         !s% xtra3_array(k) = kap_face%val
-         !s% xtra4_array(k) = (T4_m1%val - T4_00%val)/kap_face%val
-         !if (k == 1) then
-         !   s% xtra5_array(k) = s% L(k)/Lsun
-         !else
-         !   s% xtra5_array(k) = s% L(k)*s% gradT(k)/s% gradr(k)/Lsun
-         !end if
-         !s% xtra6_array(k) = s% xtra5_array(k)/(Lrad_ad%val/Lsun)
-         
          ! residual
          resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale 
          s% equ(i_equL, k) = resid%val
@@ -845,6 +834,32 @@
          if (skip_partials) return
          call save_eqn_residual_info( &
             s, k, nvar, i_equL, resid, 'do1_gradT_eqn', ierr)
+         
+         !call set_xtras
+            
+         contains
+         
+         subroutine set_xtras
+            use auto_diff_support
+            use star_utils, only: get_Lrad
+            type(auto_diff_real_star_order1) :: &
+               T4m1, T400, kap_m1, kap_00, alfa, beta, kap_face, &
+               diff_T4_div_kap
+            T4m1 = pow4(wrap_T_m1(s,k))
+            T400 = pow4(wrap_T_00(s,k))
+            kap_m1 = wrap_kap_m1(s,k)
+            kap_00 = wrap_kap_00(s,k)
+            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+            beta = 1d0 - alfa
+            kap_face = alfa*kap_00 + beta*kap_m1
+            diff_T4_div_kap = (T4m1 - T400)/kap_face
+            s% xtra1_array(k) = s% T_start(k)
+            s% xtra2_array(k) = T4m1%val - T400%val
+            s% xtra3_array(k) = kap_face%val
+            s% xtra4_array(k) = diff_T4_div_kap%val
+            s% xtra5_array(k) = get_Lrad(s,k) 
+            s% xtra6_array(k) = 1
+         end subroutine set_xtras
          
       end subroutine do1_gradT_eqn
 
