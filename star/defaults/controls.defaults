@@ -2488,6 +2488,13 @@
       ! The overshooting parameter values corresponding to the first set of matching criteria will be used.
       ! Therefore, narrower criteria should precede more general ones (i.e have lower array indices).
 
+      ! The permitted values are the following:
+
+      ! * ``overshoot_scheme = exponential, step``
+      ! * ``overshoot_zone_type = burn_H, burn_He, burn_Z, nonburn, any``
+      ! * ``overshoot_zone_loc = core, shell, any``
+      ! * ``overshoot_bdy_loc = bottom, top, any``
+
       ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
       ! ````star_data/public/star_data_def.inc```` (currently 16)
 
