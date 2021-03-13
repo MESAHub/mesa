@@ -516,53 +516,6 @@
          get_ecapture_info_list_id = i
       end function get_ecapture_info_list_id
 
-      subroutine psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
-             I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
-
-         use eval_psi, only : do_psi_Iec_and_Jec
-
-         ! calulate the phase space integral for electron capture
-
-         implicit none
-
-         real(dp), intent(in) :: beta   ! mec2 / kT
-         real(dp), intent(in) :: zeta   ! Q_n / kT
-         real(dp), intent(in) :: eta    ! chemical potential / kT
-         real(dp), intent(in) :: deta_dlnT, deta_dlnRho ! and derivs
-
-         real(dp), intent(out) :: I, J    ! phase space integral
-         real(dp), intent(out) :: dI_dlnT, dI_dlnRho ! and derivatives
-         real(dp), intent(out) :: dJ_dlnT, dJ_dlnRho ! and derivatives
-
-         call do_psi_Iec_and_Jec(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
-                I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
-
-      end subroutine psi_Iec_and_Jec
-
-      subroutine psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
-             I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
-
-         use eval_psi, only : do_psi_Iee_and_Jee
-
-         ! calulate the phase space integral for electron emission (beta-decay)
-
-         implicit none
-
-         real(dp), intent(in) :: beta   ! mec2 / kT
-         real(dp), intent(in) :: zeta   ! Q_n / kT
-         real(dp), intent(in) :: eta    ! chemical potential / kT
-         real(dp), intent(in) :: deta_dlnT, deta_dlnRho ! and derivs
-
-         real(dp), intent(out) :: I, J    ! phase space integral
-         real(dp), intent(out) :: dI_dlnT, dI_dlnRho ! and derivatives
-         real(dp), intent(out) :: dJ_dlnT, dJ_dlnRho ! and derivatives
-
-         call do_psi_Iee_and_Jee(beta, zeta, eta, deta_dlnT, deta_dlnRho, &
-                I, dI_dlnT, dI_dlnRho, J, dJ_dlnT, dJ_dlnRho)
-
-      end subroutine psi_Iee_and_Jee
-      
-      
       ! reaclib
       
       subroutine reaclib_parse_handle(handle, num_in, num_out, iso_ids, op, ierr)
@@ -973,19 +926,14 @@
       ! call this once before calling eval_ecapture
       ! sets info that depends only on temp, den, and overall composition         
       subroutine coulomb_set_context( &
-            cc, temp, den, logT, logRho, zbar, abar, z2bar,  &
-             num_isos, y, iso_z52)
+            cc, temp, den, logT, logRho, zbar, abar, z2bar)
          use rates_def, only: Coulomb_Info
          use coulomb, only: do_coulomb_set_context
          type (Coulomb_Info), pointer :: cc
-         integer, intent(in) :: num_isos
          real(dp), intent(in) ::  &
-               temp, den, logT, logRho, zbar, abar, z2bar, y(:), iso_z52(:)
-            ! y(:) = x(:)/chem_A(chem_id(:))
-            ! iso_z52(:) = chem_Z(chem_id(:))**5/2
+               temp, den, logT, logRho, zbar, abar, z2bar
          call do_coulomb_set_context( &
-            cc, temp, den, logT, logRho, zbar, abar, z2bar, &
-            num_isos, y, iso_z52)
+            cc, temp, den, logT, logRho, zbar, abar, z2bar)
       end subroutine coulomb_set_context
 
 
