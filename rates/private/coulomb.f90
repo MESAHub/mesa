@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2014-2019  Josiah Schwab, Bill Paxton & The MESA Team
+!   Copyright (C) 2014-2021  Josiah Schwab, Bill Paxton & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -29,61 +29,47 @@ module coulomb
   use rates_def
   use math_lib
   use utils_lib, only: is_bad
+  use auto_diff
 
   implicit none
 
 contains
 
   subroutine do_coulomb_set_context( &
-       cc, temp, den, logT, logRho, zbar, abar, z2bar,  &
-       num_isos, y, iso_z52)
+       cc, temp_in, den_in, logT_in, logRho_in, zbar, abar, z2bar)
     type (Coulomb_Info), pointer :: cc
-    integer, intent(in) :: num_isos
     real(dp), intent(in) ::  &
-         temp, den, logT, logRho, zbar, abar, z2bar, &
-         y(:), iso_z52(:) ! Z to the power of 5/2
+       temp_in, den_in, logT_in, logRho_in, zbar, abar, z2bar
+    real(dp) :: ye
+    type(auto_diff_real_2var_order1) :: temp, den
 
-    real(dp), parameter :: x13   = 1.0d0/3.0d0 
-    real(dp), parameter :: x52   = 5.0d0/2.0d0
-    real(dp) :: qq
-    integer :: j
-    
     include 'formats'
 
-    cc% temp  = temp
-    cc% den   = den
-    cc% logT  = logT
-    cc% logRho = logRho
+    ! auto_diff variables have
+    ! var1: lnT
+    ! var2: lnRho
+
+    temp = temp_in
+    temp% d1val1 = temp_in
+    temp% d1val2 = 0d0
+
+    den = den_in
+    den% d1val1 = 0d0
+    den% d1val2 = den_in
+
+    cc% temp  = temp_in
+    cc% den   = den_in
+    cc% logT  = logT_in
+    cc% logRho = logRho_in
     cc% zbar  = zbar
     cc% abar  = abar
     cc% z2bar = z2bar
 
-    ! get the info that depends only on temp, den, and overall composition         
+    ye = zbar / abar
 
-    cc% abari    = 1.0d0/abar
-    cc% rr       = den * cc% abari
-    cc% tempi    = 1.0d0/temp
-    cc% dtempi   = -cc% tempi * cc% tempi
-    cc% deni     = 1.0d0/den
-    cc% ye       = cc% zbar * cc% abari
-
-    ! calculate the other powers <z^?> that we need
-    qq = 0d0
-    do j=1,num_isos
-      qq = qq + iso_z52(j) * y(j)
-      if (is_bad(qq)) then
-         write(*,2) 'qq', j, qq, iso_z52(j), x52, y(j)
-         stop 'do_coulomb_set_context'
-      end if
-    end do
-    cc% z52bar = abar * qq
-
-    ! calculate powers of zbar
-    cc% zbar13   = pow(zbar,x13)
-
-    ! calculate more complicated, but useful quantities
-    cc% gamma_e = 2.275d5 * pow(cc% ye * cc% den, x13) * cc% tempi
-    cc% rs = 1.388_dp * pow(cc% ye * cc% den, -x13)
+    ! calculate key plasma paramters
+    cc% gamma_e = 2.275d5 * pow(ye * den, one_third) / temp
+    cc% rs = 1.388_dp * pow(ye * den, -one_third)
 
   end subroutine do_coulomb_set_context
 
