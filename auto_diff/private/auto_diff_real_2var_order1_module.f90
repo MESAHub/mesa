@@ -16,6 +16,7 @@ module auto_diff_real_2var_order1_module
       operator(.ge.), &
       make_unop, &
       make_binop, &
+      safe_sqrt, &
       operator(-), &
       exp, &
       expm1, &
@@ -130,6 +131,10 @@ module auto_diff_real_2var_order1_module
    interface make_binop
       module procedure make_binary_operator
    end interface make_binop
+   
+   interface safe_sqrt
+      module procedure safe_sqrt_self
+   end interface safe_sqrt
    
    interface operator(-)
       module procedure unary_minus_self
@@ -612,6 +617,18 @@ module auto_diff_real_2var_order1_module
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
       binary%d1val2 = x%d1val2*z_d1x + y%d1val2*z_d1y
    end function make_binary_operator
+   
+   function safe_sqrt_self(x) result(unary)
+      type(auto_diff_real_2var_order1), intent(in) :: x
+      type(auto_diff_real_2var_order1) :: unary
+      real(dp) :: q1
+      real(dp) :: q0
+      q0 = sqrt(x%val*Heaviside(x%val))
+      q1 = 0.5_dp*q0*powm1(x%val)
+      unary%val = q0
+      unary%d1val1 = q1*x%d1val1
+      unary%d1val2 = q1*x%d1val2
+   end function safe_sqrt_self
    
    function unary_minus_self(x) result(unary)
       type(auto_diff_real_2var_order1), intent(in) :: x
