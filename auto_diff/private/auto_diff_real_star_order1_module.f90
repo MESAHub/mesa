@@ -6,10 +6,6 @@ module auto_diff_real_star_order1_module
    
       implicit none
 
-     integer, parameter :: auto_diff_star_num_vars = 27 ! for 9 solver vars at 3 cells each
-      public :: auto_diff_star_num_vars
-
-
       private
    public :: auto_diff_real_star_order1, &
       assignment(=), &
