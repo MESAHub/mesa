@@ -30,7 +30,10 @@
       use auto_diff
 
       implicit none
-      
+ 
+      integer, parameter :: auto_diff_star_num_vars = 27 ! for 9 solver vars at 3 cells each
+      public :: auto_diff_star_num_vars
+     
       ! current use of xtra's
       ! xtra1 is ln_cvpv0
       ! xtra2 is w_div_wc
