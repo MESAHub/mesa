@@ -460,7 +460,6 @@
          real(dp), pointer, dimension(:) :: &
             Ptrb, Eq, Uq, Pvsc, Pvsc_start, &
             Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
-
          integer :: TDC_num_periods
          real(dp) :: TDC_period, &
             TDC_DeltaR, TDC_DeltaMag, TDC_GRPDV, TDC_GREKM, TDC_GREKM_avg_abs

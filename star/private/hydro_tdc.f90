@@ -59,7 +59,7 @@
       contains
       
       
-      subroutine set_TDC_vars(s,ierr) ! for now, just Hp_face, Lr, Lt, Lc
+      subroutine set_TDC_vars(s,ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
@@ -352,7 +352,7 @@
          type(auto_diff_real_star_order1) :: Hp_face, Y1, Y2, QQ_div_Cp_face, &
             r_00, d_00, Peos_00, Cp_00, T_00, chiT_00, chiRho_00, QQ_00, lnT_00, &
             r_m1, d_m1, Peos_m1, Cp_m1, T_m1, chiT_m1, chiRho_m1, QQ_m1, lnT_m1, &
-            grad_ad_00, grad_ad_m1, grad_ad_face, dlnT, dlnP, alt_Y_face
+            dlnT_dlnP, grad_ad_00, grad_ad_m1, grad_ad_face, dlnT, dlnP, alt_Y_face
          real(dp) :: dm_bar, alfa, beta
          include 'formats'
          ierr = 0
@@ -420,22 +420,12 @@
             grad_ad_face = alfa*grad_ad_00 + beta*grad_ad_m1
             dlnT = wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)
             dlnP = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
-            if (abs(dlnP%val) < 1d-20) then
+            dlnT_dlnP = dlnT/dlnP
+            if (is_bad(dlnT_dlnP%val)) then
                alt_Y_face = 0d0
             else
-               alt_Y_face = dlnT/dlnP - grad_ad_face
+               alt_Y_face = dlnT_dlnP - grad_ad_face
                if (is_bad(alt_Y_face%val)) alt_Y_face = 0
-            end if
-            if (.false.) then
-               if (Y_face%val * alt_Y_face%val < 0d0) then
-                  write(*,'(a9)', advance = 'no') '>>>> '
-               else
-                  write(*,'(9x)', advance = 'no') 
-               end if
-               write(*,'(i8,99(1pd18.8))') k, alt_Y_face%val/Y_face%val - 1d0, &
-                  Y_face%val - alt_Y_face%val, Y_face%val, alt_Y_face%val, &
-                  alfa*s% T(k) + beta*s% T(k-1), alfa*s% Peos(k) + beta*s% Peos(k-1), &
-                  Hp_face%val/(s% rmid(k-1) - s% rmid(k)), Hp_face%val, (s% rmid(k-1) - s% rmid(k))
             end if
             Y_face = alt_Y_face
             
