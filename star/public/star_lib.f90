@@ -46,7 +46,7 @@
             wrap_lnT_m1, wrap_lnT_00, wrap_lnT_p1, & ! for s% lnT
             wrap_d_m1, wrap_d_00, wrap_d_p1, & !  ! values from s% rho
             wrap_lnd_m1, wrap_lnd_00, wrap_lnd_p1, & ! values from s% lnd
-            wrap_etrb_m1, wrap_etrb_00, wrap_etrb_p1, & ! values from s% etrb
+            wrap_w_m1, wrap_w_00, wrap_w_p1, & ! values from s% w
             wrap_kap_m1, wrap_kap_00, wrap_kap_p1, & ! values from s% opacity
             wrap_s_m1, wrap_s_00, wrap_s_p1, & ! values from s% entropy
             wrap_e_m1, wrap_e_00, wrap_e_p1, & ! values from s% energy
@@ -63,9 +63,7 @@
             wrap_u_m1, wrap_u_00, wrap_u_p1, & ! Riemann cell velocity s% u
             ! the following check the flag using_velocity_time_centering
             wrap_opt_time_center_r_m1, wrap_opt_time_center_r_00, wrap_opt_time_center_r_p1, &
-            wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1, &
-            ! "safe" w routines take care of w=sqrt(etrb) for etrb=0 by directly setting w=0 instead of sqrt(0)
-            safe_wrap_w_m1, safe_wrap_w_00, safe_wrap_w_p1 ! from sqrt(s% etrb)
+            wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1
 
 
       implicit none

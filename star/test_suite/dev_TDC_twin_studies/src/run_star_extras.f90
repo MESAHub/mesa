@@ -266,7 +266,7 @@
                       - s_other% grada_face(k)
                end if
                if (s_other% TDC_flag) then
-                  vals(k,3) = sqrt(max(0d0,s_other% etrb(k)))
+                  vals(k,3) = pow2(s_other% w(k))
                else
                   vals(k,3) = safe_log10(pow2(s_other% conv_vel(k)))
                end if

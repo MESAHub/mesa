@@ -327,7 +327,7 @@
          integer, intent(out) :: max_zone, max_var, ierr
 
          integer :: k, i, nz, num_terms, j, n, nvar_hydro, jmax, num_xa_terms, &
-            skip1, skip2, skip3, skip4, skip5, i_alpha_RTI, i_ln_cvpv0, i_etrb
+            skip1, skip2, skip3, skip4, skip5, i_alpha_RTI, i_ln_cvpv0, i_w
          real(dp) :: abs_corr, sum_corr, sum_xa_corr, x_limit, &
             max_abs_correction, max_abs_correction_cv, max_abs_corr_for_k, max_abs_xa_corr_for_k
          logical :: found_NaN, found_bad_num, report
@@ -368,7 +368,7 @@
          
          i_alpha_RTI = s% i_alpha_RTI
          i_ln_cvpv0 = s% i_ln_cvpv0
-         i_etrb= s% i_etrb
+         i_w= s% i_w
 
          max_zone = 0
          max_var = 0
@@ -397,7 +397,7 @@
                    j == skip3 .or. &
                    j == skip4 .or. &
                    j == skip5 .or. &
-                   j == i_etrb .or. &
+                   j == i_w .or. &
                    j == i_alpha_RTI) cycle
                if (check_for_bad_nums) then
                   if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
@@ -629,6 +629,9 @@
          ierr = 0
          min_alpha = 1d0
          nz = s% nz
+
+         if (s% TDC_flag) & ! clip change in w to maintain non-negativity.
+            call clip_so_non_negative(s% i_w, 0d0)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)

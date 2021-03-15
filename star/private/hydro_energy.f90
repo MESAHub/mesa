@@ -337,7 +337,7 @@
             include 'formats'
             ierr = 0
             if (s% TDC_flag) then
-               d_turbulent_energy_dt_ad = wrap_dxh_etrb(s,k)/dt
+               d_turbulent_energy_dt_ad = (wrap_etrb_00(s,k) - get_etrb_start(s,k))/dt
             else
                d_turbulent_energy_dt_ad = 0d0
             end if

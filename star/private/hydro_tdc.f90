@@ -113,8 +113,8 @@
          if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = s% i_etrb
-            s% solver_test_partials_dval_dx = resid%d1Array(i_etrb_00)
+            s% solver_test_partials_var = s% i_w
+            s% solver_test_partials_dval_dx = resid%d1Array(i_w_00)
             write(*,4) 'do1_tdc_L_eqn', s% solver_test_partials_var, k, s% nz, &
                L_actual%val, L_expected%val, 1d0/scale, s% T(k-1), s% T(k)
          end if      
@@ -187,7 +187,7 @@
          subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
             integer, intent(out) :: ierr
             ierr = 0
-            d_turbulent_energy_ad = wrap_dxh_etrb(s,k)
+            d_turbulent_energy_ad = wrap_etrb_00(s,k) - get_etrb_start(s,k)
          end subroutine setup_d_turbulent_energy
          
          ! Ptrb_dV_ad = Ptrb_ad*dV_ad
@@ -524,7 +524,7 @@
             if (ierr /= 0) return
             d_v_div_r = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
-            w_00 = safe_wrap_w_00(s,k)
+            w_00 = wrap_w_00(s,k)
             d_00 = wrap_d_00(s,k)
             f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
             w_rho2 = w_00*pow2(d_00)
@@ -601,7 +601,7 @@
             grad_ad_00, fac
          include 'formats'
          ierr = 0
-         w_00 = safe_wrap_w_00(s, k)
+         w_00 = wrap_w_00(s, k)
          T_00 = wrap_T_00(s, k)                  
          d_00 = wrap_d_00(s, k)         
          Peos_00 = wrap_Peos_00(s, k)         
@@ -663,7 +663,7 @@
          alpha = s% TDC_alfa
          Hp_cell = compute_Hp_cell(s,k,ierr)
          if (ierr /= 0) return
-         w_00 = safe_wrap_w_00(s,k)
+         w_00 = wrap_w_00(s,k)
          dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
          D = (x_CEDE/alpha)*dw3/Hp_cell
          ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
@@ -688,7 +688,7 @@
             s% DAMPR(k) = 0d0
             return
          end if
-         w_00 = safe_wrap_w_00(s,k)
+         w_00 = wrap_w_00(s,k)
          T_00 = wrap_T_00(s,k)
          d_00 = wrap_d_00(s,k)
          Cp_00 = wrap_Cp_00(s,k)
@@ -861,8 +861,8 @@
          T_00 = wrap_T_00(s, k)         
          d_m1 = wrap_d_m1(s, k)
          d_00 = wrap_d_00(s, k)
-         w_m1 = safe_wrap_w_m1(s, k)
-         w_00 = safe_wrap_w_00(s, k)
+         w_m1 = wrap_w_m1(s, k)
+         w_00 = wrap_w_00(s, k)
          call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
          T_rho_face = alfa*T_00*d_00 + beta*T_m1*d_m1
          PII_face = compute_PII_face(s, k, ierr)
@@ -912,8 +912,8 @@
          d_00 = wrap_d_00(s,k)
          call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
          rho2_face = alfa*pow2(d_00) + beta*pow2(d_m1)
-         w_m1 = safe_wrap_w_m1(s,k)
-         w_00 = safe_wrap_w_00(s,k)
+         w_m1 = wrap_w_m1(s,k)
+         w_00 = wrap_w_00(s,k)
          w_face = alfa*w_00 + beta*w_m1
          etrb_m1 = wrap_etrb_m1(s,k)
          etrb_00 = wrap_etrb_00(s,k)
@@ -942,7 +942,7 @@
             Lt = compute_Lt(s, k, ierr)
             if (ierr /= 0) return
             s% Lt_start(k) = Lt%val  
-            s% etrb_start(k) = s% etrb(k)
+            s% w_start(k) = s% w(k)
          end do         
       end subroutine set_etrb_start_vars
       
@@ -1010,8 +1010,8 @@
             else ! w_center = 0
                w_00 = 0.5d0*w_face(k)
             end if
-            s% etrb(k) = pow2(w_00)
-            call store_etrb_in_xh(s,k,s% etrb(k))
+            s% w(k) = w_00
+            s% xh(s% i_w,k) = s% w(k)
          end do
          
          if (dbg) stop 'reset_etrb_using_L'
