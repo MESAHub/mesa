@@ -125,7 +125,8 @@
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs, i_rate, &
             star_debugging_rates_flag, rates_test_partials_val, rates_test_partials_dval_dx
          use net_def, only: Net_Info, net_test_partials, &
-            net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i
+            net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i, &
+            net_test_partials_iother
          use net_lib, only: net_get
          use star_utils, only: lookup_nameofvar
          use chem_def, only: chem_isos, category_name, i_ni56_co56, i_co56_fe56, &
@@ -222,6 +223,7 @@
                 s% solver_test_partials_dx_sink = 0
              end if
              net_test_partials_i = i_var - s% nvar_hydro ! index in xa for var
+             net_test_partials_iother = i_var_sink - s% nvar_hydro ! index in xa for var
          end if
          
          if (s% use_other_net_get) then

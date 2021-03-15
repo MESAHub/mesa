@@ -406,7 +406,7 @@
 
             ! these vars are for faking composition derivatives
             real(dp), dimension(num_eos_basic_results) :: &
-               res, dres_dlnd, dres_dlnT, dres_dabar, dres_dzbar
+               res, dres_dlnd, dres_dlnT
             real(dp) :: dres_dxa(num_eos_d_dxa_results, s% species)
             real(dp) :: dxa
             real(dp) :: xa_start_1(s% species)
