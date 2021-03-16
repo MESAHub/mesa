@@ -290,3 +290,33 @@ which results in the additional output
             -     3.3303926652486070E-05
             -     7.2015481753889745E-05
 
+Continuous integration testing
+------------------------------
+
+Multiple developers have set up their machines to enable continuous integration testing. These machines will
+automatically pull the changes in the repository, run the test suite, and report back to testhub.
+To make more efficient the usage of these machines they will respond to certain keywords if found in the
+commit message.
+
+.. note ::
+    It is up to each person providing the computing resources to implement each keyword. Thus some 
+    machines will ignore these keywords and run the test suite normally. Therefore these are only
+    "requests" for the computing machines, not "orders".
+
+The message (with brackets) may appear anywhere in the commit message. 
+
+
+[ci skip]
+^^^^^^^^^
+
+Compile MESA but do not run the test suite. Useful when changes only touch documentation or the changes can not affect the final result.
+
+[ci split]
+^^^^^^^^^^
+
+Splits the running of the test suite between machines. Current, if set, cannon will run the first half of the test cases while helios will run the second half.
+
+[ci optional]
+^^^^^^^^^^^^^
+
+Runs MESA with ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
