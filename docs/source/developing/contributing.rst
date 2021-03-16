@@ -309,13 +309,6 @@ Git testing tips
 
 Fetches all commits over all branches
 
-Adding:
-::
-
-  fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
-
-To your ``.git/config`` in the ``[remote "origin"]`` section enables fetching pull requests
-
 ::
 
   $(git log -1) == *'[ci skip]'*
