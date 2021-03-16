@@ -963,9 +963,7 @@
 
          if (.false.) then
             write(*,*) 'Compare standard and alternative forms of Y_face'
-            write(*,'(9x,a8,99(a18))') 'k', 'Y_face alt/std-1', &
-               'Y_face std-alt', 'Y_face std', 'Y_face alt', 'T_face', 'P_face', &
-               'Hp/drmid', 'Hp_face', 'drmid_face'
+            write(*,'(a8,99(a18))') 'k', 'Y_face', 'old_Y_face/Y_face', 'new_Y_face/Y_face'
             do k=2,nz
                Y_face = compute_Y_face(s, k, ierr)
             end do
