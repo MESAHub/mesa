@@ -33,8 +33,8 @@
       max_model_number = 100000      
       !max_number_retries = 30
       
-      log_Rsurf_upper_limit = 4d0 ! for higher masses
-      fe_core_infall_limit = 1d7 ! for lower masses
+      log_Rsurf_upper_limit = 5d0 ! for higher masses
+      fe_core_infall_limit = 3d7 ! for lower masses
       remnant_mass_min_limit = 20d0 ! for completely unbound cases
 
 ! wind

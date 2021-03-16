@@ -925,10 +925,13 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
          integer :: k, op_err
-         type(auto_diff_real_star_order1) :: Lt
+         type(auto_diff_real_star_order1) :: Y_face, Lt
          include 'formats'
          ierr = 0
          do k=1,s%nz
+            Y_face = compute_Y_face(s, k, ierr)
+            if (ierr /= 0) return
+            s% Y_face_start(k) = Y_face%val  
             Lt = compute_Lt(s, k, ierr)
             if (ierr /= 0) return
             s% Lt_start(k) = Lt%val  
