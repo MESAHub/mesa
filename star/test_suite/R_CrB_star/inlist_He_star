@@ -3,7 +3,8 @@
       create_pre_main_sequence_model = .true.
       pre_ms_relax_to_start_radiative_core = .false.
       pre_ms_relax_num_steps = 100
-      
+      pre_ms_T_c = 9d5
+
       save_model_when_terminate = .true.
       save_model_filename = 'He_star.mod'
       required_termination_code_string = 'he_layer_mass_lower_limit'
