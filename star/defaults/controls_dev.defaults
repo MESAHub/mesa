@@ -39,6 +39,7 @@
     TDC_Lsurf_factor = 0.5d0
     
     TDC_use_L_eqn_at_surface = .true.
+    TDC_assume_HSE = .true.
     TDC_use_RSP_eqn_for_Y_face = .true.
     TDC_use_mass_interp_face_values = .false.
     TDC_use_Stellingwerf_Lr = .true.

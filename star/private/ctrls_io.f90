@@ -393,7 +393,7 @@
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
     xa_clip_limit, report_solver_progress, solver_test_partials_k_high, TDC_use_L_eqn_at_surface, TDC_use_RSP_eqn_for_Y_face, &
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
-    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
+    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, TDC_assume_HSE, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
     solver_test_partials_write_eos_call_info, solver_save_photo_call_number, TDC_min_Lc_div_L_for_convective_mixing_type, &
     solver_test_partials_var_name, solver_test_partials_equ_name, TDC_min_Lt_div_L_for_overshooting_mixing_type, &
@@ -2063,6 +2063,7 @@
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
  s% TDC_use_L_eqn_at_surface = TDC_use_L_eqn_at_surface
+ s% TDC_assume_HSE = TDC_assume_HSE
  s% TDC_use_RSP_eqn_for_Y_face = TDC_use_RSP_eqn_for_Y_face
  s% TDC_use_mass_interp_face_values = TDC_use_mass_interp_face_values
  s% TDC_w_min_for_damping = TDC_w_min_for_damping
@@ -3713,6 +3714,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
  TDC_use_L_eqn_at_surface = s% TDC_use_L_eqn_at_surface
+ TDC_assume_HSE = s% TDC_assume_HSE
  TDC_use_RSP_eqn_for_Y_face = s% TDC_use_RSP_eqn_for_Y_face
  TDC_use_mass_interp_face_values = s% TDC_use_mass_interp_face_values
  TDC_w_min_for_damping = s% TDC_w_min_for_damping

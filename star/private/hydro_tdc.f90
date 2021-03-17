@@ -305,6 +305,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face
          type(auto_diff_real_star_order1) :: &
+            rho_face, area, dlnPeos, &
             r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
             d_face, Peos_face, alt_Hp_face, A
          real(dp) :: alfa, beta
@@ -313,7 +314,15 @@
          ierr = 0
          if (k > s% nz) then
             Hp_face = 1d0 ! not used
-            if (ierr /= 0) return
+            s% Hp_face(k) = Hp_face%val
+            return
+         end if
+         if (k > 1 .and. .not. s% TDC_assume_HSE) then
+            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+            rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
+            area = 4d0*pi*pow2(wrap_r_00(s,k))
+            dlnPeos = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+            Hp_face = -s% dm_bar(k)/(area*rho_face*dlnPeos)
          else
             r_00 = wrap_opt_time_center_r_00(s, k)
             d_00 = wrap_d_00(s, k)
@@ -529,6 +538,47 @@
          s% Chi(k) = Chi_cell%val
 
       end function compute_Chi_cell
+      
+      
+      function compute_dChi_dm_bar_face(s,k,ierr) result(dChi_dm_bar)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: dChi_dm_bar
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: &
+            d_v_div_r_00, w_rho2_00, f_00, Chi_00_div_r6_Hp, &
+            d_v_div_r_m1, w_rho2_m1, f_m1, Chi_m1_div_r6_Hp, &
+            Hp_face, r6_face, Chi_00, Chi_out
+         real(dp) :: alfa, beta, ALFAM_ALFA
+         if (k > 1 .and. .not. s% TDC_assume_HSE) then
+            ! complexity needed to keep to block tridiagonal.
+            ALFAM_ALFA = s% TDC_alfam*s% TDC_alfa
+            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+            d_v_div_r_00 = compute_d_v_div_r(s, k, ierr)
+            if (ierr /= 0) return
+            w_rho2_00 = wrap_w_00(s,k)*pow2(wrap_d_00(s,k))
+            f_00 = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
+            Chi_00_div_r6_Hp = f_00*w_rho2_00*d_v_div_r_00
+            d_v_div_r_m1 = shift_m1(compute_d_v_div_r(s, k-1, ierr))
+            if (ierr /= 0) return
+            w_rho2_m1 = wrap_w_m1(s,k)*pow2(wrap_d_m1(s,k))
+            f_m1 = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k-1)  
+            Chi_m1_div_r6_Hp = f_m1*w_rho2_m1*d_v_div_r_m1
+            Hp_face = compute_Hp_face(s,k,ierr)
+            if (ierr /= 0) return            
+            r6_face = pow6(wrap_r_00(s,k))
+            dChi_dm_bar = (Chi_m1_div_r6_Hp - Chi_00_div_r6_Hp)*r6_face*Hp_face
+         else
+            Chi_00 = compute_Chi_cell(s,k,ierr)
+            if (k > 1) then
+               Chi_out = shift_m1(compute_Chi_cell(s,k-1,ierr))
+               if (ierr /= 0) return
+            else
+               Chi_out = 0d0
+            end if
+            dChi_dm_bar = (Chi_out - Chi_00)/s% dm_bar(k)
+         end if
+      end function compute_dChi_dm_bar_face
 
       
       function compute_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
@@ -558,27 +608,22 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Uq_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Chi_00, Chi_out, r_00
+         type(auto_diff_real_star_order1) :: dChi_dm_bar, r_00
          include 'formats'
          ierr = 0         
          if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
              k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
             Uq_face = 0d0
          else
-            Chi_00 = compute_Chi_cell(s,k,ierr)
-            if (k > 1) then
-               Chi_out = shift_m1(compute_Chi_cell(s,k-1,ierr))
-               if (ierr /= 0) return
-            else
-               Chi_out = 0d0
-            end if
             r_00 = wrap_opt_time_center_r_00(s,k)
-            Uq_face = 4d0*pi*(Chi_out - Chi_00)/(s% dm_bar(k)*r_00)   
+            dChi_dm_bar = compute_dChi_dm_bar_face(s,k,ierr)
+            if (ierr /= 0) return
+            Uq_face = 4d0*pi*dChi_dm_bar/r_00
          end if
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
          s% Uq(k) = Uq_face%val
       end function compute_Uq_face
-
+      
 
       function compute_Source(s, k, ierr) result(Source) ! erg g^-1 s^-1
          type (star_info), pointer :: s
