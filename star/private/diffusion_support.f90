@@ -1465,6 +1465,8 @@
         real(dp) :: lambda ! The screening length
         integer :: i,j,k,facmo,no,mo ! Last two are used for different orders of collisions.
 
+        real(dp) :: lgp, gp1, gp2, gp3, gp4, gp5, kbT32, tmp
+
         ! Initialize all to 0, since some entries never get set or used.
         a1(:,:) = 0d0
         a2(:,:) = 0d0
@@ -1541,6 +1543,13 @@
         ! Calculate Keff using Eqns (C22-C24)
         do i=1,nc
            do j=1,nc
+              ! cache g powers
+              lgp = safe_log(g_plasma(i,j))
+              gp1 = g_plasma(i,j)
+              gp2 = pow2(gp1)
+              gp3 = pow3(gp1)
+              gp4 = pow4(gp1)
+              gp5 = pow5(gp1)
               if( g_plasma(i,j) < 0d0) then ! Don't calculate for attractive potentials, set to 0
                  Keff(i,j,:,:) = 0d0
               else if( g_plasma(i,j) < 1d0) then ! Use eqn C23 for weakly coupled
@@ -1552,20 +1561,19 @@
                           facmo = 1 ! (1-1)! and (2-1)!
                        end if
                        Keff(i,j,no,mo) = (-1d0*no/4d0)*facmo*safe_log( &
-                            a1(no,mo)*g_plasma(i,j) &
-                            + a2(no,mo)*pow2(g_plasma(i,j)) &
-                            + a3(no,mo)*pow3(g_plasma(i,j)) &
-                            + a4(no,mo)*pow4(g_plasma(i,j)) &
-                            + a5(no,mo)*pow5(g_plasma(i,j)) )
+                            a1(no,mo)*gp1 &
+                            + a2(no,mo)*gp2 &
+                            + a3(no,mo)*gp3 &
+                            + a4(no,mo)*gp4 &
+                            + a5(no,mo)*gp5)
                     end do
                  end do
               else ! Use eqn C24 for strongly coupled
                  do no=1,2
                     do mo=1,3
                        Keff(i,j,no,mo) = &
-                            (b0(no,mo) + b1(no,mo)*safe_log(g_plasma(i,j)) &
-                            + b2(no,mo)*pow2(safe_log(g_plasma(i,j))) ) / &
-                            (1d0 + b3(no,mo)*g_plasma(i,j) + b4(no,mo)*pow2(g_plasma(i,j)) )
+                            (b0(no,mo) + b1(no,mo)*lgp + b2(no,mo)*pow2(lgp) ) / &
+                            (1d0 + b3(no,mo)*gp1 + b4(no,mo)*gp2 )
                     end do
                  end do
               end if
@@ -1573,15 +1581,14 @@
         end do
 
         ! Calculate the collision integrals using (C19)
+        kBT32 = pow(boltzm*T,1.5d0)
         do i=1,nc
            do j=1,nc
               mu(i,j) = amu*A(i)*A(j)/(A(i) + A(j)) ! Reduced mass for collision
+              tmp = sqrt(2d0*pi/(mu(i,j))) * (pow2(Z(i)*Z(j)*qe*qe)/kBT32)
               do no=1,2
                  do mo=1,3
-                    Omega(i,j,no,mo) = &
-                         sqrt(2d0*pi/(mu(i,j))) * &
-                         (pow2(Z(i)*Z(j)*qe*qe)/pow(boltzm*T,1.5d0)) * &
-                         Keff(i,j,no,mo)
+                    Omega(i,j,no,mo) = tmp * Keff(i,j,no,mo)
                  end do
               end do
            end do
