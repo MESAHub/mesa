@@ -300,8 +300,8 @@ commit message.
 
 .. note ::
     It is up to each person providing the computing resources to implement each keyword. Thus some 
-    machines will ignore these keywords and run the test suite normally. Therefore these are only
-    "requests" for the computing machines, not "orders".
+    machines will ignore these keywords and run the test suite normally. Therefore, these are only
+    "requests" for the computing machines not "orders".
 
 The message (with brackets) may appear anywhere in the commit message. 
 
@@ -309,7 +309,7 @@ The message (with brackets) may appear anywhere in the commit message.
 [ci skip]
 ^^^^^^^^^
 
-Compile MESA but do not run the test suite. Useful when changes only touch documentation or the changes can not affect the final result.
+Compile ``MESA`` but do not run the test suite. Useful when changes only touch documentation or the changes can not affect the final result.
 
 [ci split]
 ^^^^^^^^^^
@@ -319,4 +319,9 @@ Splits the running of the test suite between machines. Current, if set, cannon w
 [ci optional]
 ^^^^^^^^^^^^^
 
-Runs MESA with ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
+Runs ``MESA`` with the environment variable ``MESA_RUN_OPTIONAL=t`` set. This requests that the slower optional parts of each test case be ran.
+
+[ci optional n]
+^^^^^^^^^^^^^^^
+
+Where ``n`` is an integer. Same as ``[ci optional]`` but only run the first ``n`` test cases.
