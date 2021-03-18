@@ -252,7 +252,7 @@
             weak_lhs_nuclide_name=>NULL(), weak_rhs_nuclide_name=>NULL() ! (num_weak_reactions)
          type (integer_dict), pointer :: weak_reactions_dict=>NULL()
 
-         logical :: weak_bicubic = .false.  
+         logical :: weak_bicubic = .true.
             ! true means do bicubic splines for interpolation
             ! false means just do bilinear
             ! bilinear is safe; bicubic can overshoot near jumps
