@@ -75,15 +75,88 @@ contains
     allocate(new_suzuki_rate_table% lYeRhos(new_suzuki_rate_table% num_lYeRho))
     new_suzuki_rate_table% lYeRhos = lYeRhos
 
-    allocate(new_suzuki_rate_table% data(1, new_suzuki_rate_table% num_T, new_suzuki_rate_table% num_lYeRho, 12))
+    if (weak_bicubic) then
+       allocate(new_suzuki_rate_table% data(4, new_suzuki_rate_table% num_T, new_suzuki_rate_table% num_lYeRho, 12))
+    else
+       allocate(new_suzuki_rate_table% data(1, new_suzuki_rate_table% num_T, new_suzuki_rate_table% num_lYeRho, 12))
+    end if
   end function new_suzuki_rate_table
 
 
   subroutine setup_suzuki_table(table, ierr)
-    class(suzuki_rate_table), intent(inout) :: table
-    integer, intent(out) :: ierr
+     class(suzuki_rate_table), intent(inout) :: table
+     integer, intent(out) :: ierr
+     integer :: ii
 
-    ierr = 0
+     ierr = 0
+
+     do ii = 1, size(table% data, dim=4)
+        if (weak_bicubic) then
+           call create_bicubic_interpolant(table,ii,ierr)
+        end if
+     end do
+
+  contains
+
+     subroutine create_bicubic_interpolant(table,ii,ierr)
+        use interp_2d_lib_db
+        class(suzuki_rate_table), intent(inout) :: table
+        integer, intent(in) :: ii
+        integer, intent(out) :: ierr
+        integer :: ibcxmin                   ! bc flag for x=xmin
+        real(dp), allocatable :: bcxmin(:)   ! bc data vs. y at x=xmin
+        integer :: ibcxmax                   ! bc flag for x=xmax
+        real(dp), allocatable :: bcxmax(:)   ! bc data vs. y at x=xmax
+        integer :: ibcymin                   ! bc flag for y=ymin
+        real(dp), allocatable :: bcymin(:)   ! bc data vs. x at y=ymin
+        integer :: ibcymax                   ! bc flag for y=ymax
+        real(dp), allocatable :: bcymax(:)   ! bc data vs. x at y=ymax
+        integer :: il1, il2, j, k, m
+
+        integer :: num_T, num_lYeRho
+        real(dp), pointer :: f1(:), f3(:,:,:)
+
+        num_T = table % num_T
+        num_lYeRho = table % num_lYeRho
+
+        allocate(bcxmin(num_lYeRho), bcxmax(num_lYeRho))
+        allocate(bcymin(num_T), bcymax(num_T))
+
+        ! just use "not a knot" bc's at edges of tables
+        ibcxmin = 0; bcxmin(:) = 0
+        ibcxmax = 0; bcxmax(:) = 0
+        ibcymin = 0; bcymin(:) = 0
+        ibcymax = 0; bcymax(:) = 0
+
+        allocate(f1(4*num_T*num_lYeRho))
+
+        f3(1:4,1:num_T,1:num_lYeRho) => f1(1:4*num_T*num_lYeRho)
+        do k = 1,num_T
+           do j = 1,4
+              do m = 1,num_lYeRho
+                 f3(j,k,m) = table % data(j,k,m,ii)
+              end do
+           end do
+        end do
+        call interp_mkbicub_db( &
+           table % logTs, num_T, &
+           table % lYeRhos, num_lYeRho, &
+           f1, num_T, &
+           ibcxmin, bcxmin, ibcxmax, bcxmax, &
+           ibcymin, bcymin, ibcymax, bcymax, &
+           il1, il2, ierr)
+        do k = 1,num_T
+           do j = 1,4
+              do m = 1,num_lYeRho
+                 table % data(j,k,m,ii) = f3(j,k,m)
+              end do
+           end do
+        end do
+        deallocate(f1, bcxmin, bcxmax, bcymin, bcymax)
+
+     end subroutine create_bicubic_interpolant
+
+
   end subroutine setup_suzuki_table
 
   subroutine interpolate_suzuki_table(table, T9, lYeRho, &
@@ -101,6 +174,8 @@ contains
     integer :: ix, jy          ! target cell in the spline data
     real(dp) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(ix), x1 = xs(ix+1)
     real(dp) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(jy), y1 = ys(jy+1)
+    real(dp) :: xp, xpi, xp2, xpi2, cx, cxi, hx2, cxd, cxdi, hx, hxi
+    real(dp) :: yp, ypi, yp2, ypi2, cy, cyi, hy2, cyd, cydi, hy, hyi
 
     real(dp) :: logT
 
@@ -122,8 +197,8 @@ contains
 
     logT = log10(T9) + 9d0
 
-    ! xget = logT
-    ! yget = lYeRho
+    xget = logT
+    yget = lYeRho
 
     ierr = 0
 
@@ -141,12 +216,22 @@ contains
 
     if (ierr /=0) return
 
-    call setup_for_linear_interp
+    if (weak_bicubic) then
+       call setup_for_bicubic_interpolations
+    else
+       call setup_for_linear_interp
+    end if
 
     if (table % has_decay_data) then
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_rate), &
-            ldecay, d_ldecay_dlogT, d_ldecay_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_decay_rate), &
+             ldecay, d_ldecay_dlogT, d_ldecay_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_rate), &
+             ldecay, d_ldecay_dlogT, d_ldecay_dlYeRho, ierr)
+       end if
        decay = exp10(ldecay)
     else
        decay = 0d0
@@ -156,9 +241,15 @@ contains
 
 
     if (table % has_capture_data) then
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_rate), &
-            lcapture, d_lcapture_dlogT, d_lcapture_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_capture_rate), &
+             lcapture, d_lcapture_dlogT, d_lcapture_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_rate), &
+             lcapture, d_lcapture_dlogT, d_lcapture_dlYeRho, ierr)
+       end if
        capture = exp10(lcapture)
     else
        capture = 0d0
@@ -174,9 +265,15 @@ contains
 
 
     if (table % has_decay_data) then
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_nu), &
-            ldecay_nu, d_ldecay_nu_dlogT, d_ldecay_nu_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_decay_nu), &
+             ldecay_nu, d_ldecay_nu_dlogT, d_ldecay_nu_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_nu), &
+             ldecay_nu, d_ldecay_nu_dlogT, d_ldecay_nu_dlYeRho, ierr)
+       end if
        decay_nu = exp10(ldecay_nu)
     else
        decay_nu = 0
@@ -185,9 +282,15 @@ contains
     end if
 
     if (table % has_capture_data) then
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_nu), &
-            lcapture_nu, d_lcapture_nu_dlogT, d_lcapture_nu_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_capture_nu), &
+             lcapture_nu, d_lcapture_nu_dlogT, d_lcapture_nu_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_nu), &
+             lcapture_nu, d_lcapture_nu_dlogT, d_lcapture_nu_dlYeRho, ierr)
+       end if
        capture_nu = exp10(lcapture_nu)
     else
        capture_nu = 0d0
@@ -238,13 +341,25 @@ contains
 
     if (table % has_capture_data) then
 
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_dQ), &
-            capture_dQ, d_capture_dQ_dlogT, d_capture_dQ_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_capture_dQ), &
+             capture_dQ, d_capture_dQ_dlogT, d_capture_dQ_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_dQ), &
+             capture_dQ, d_capture_dQ_dlogT, d_capture_dQ_dlYeRho, ierr)
+       end if
 
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_Vs), &
-            capture_Vs, d_capture_Vs_dlogT, d_capture_Vs_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_capture_Vs), &
+             capture_Vs, d_capture_Vs_dlogT, d_capture_Vs_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_capture_Vs), &
+             capture_Vs, d_capture_Vs_dlogT, d_capture_Vs_dlYeRho, ierr)
+       end if
 
     else
 
@@ -256,13 +371,25 @@ contains
 
     if (table % has_decay_data) then
 
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_dQ), &
-            decay_dQ, d_decay_dQ_dlogT, d_decay_dQ_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_decay_dQ), &
+             decay_dQ, d_decay_dQ_dlogT, d_decay_dQ_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_dQ), &
+             decay_dQ, d_decay_dQ_dlogT, d_decay_dQ_dlYeRho, ierr)
+       end if
 
-       call do_linear_interp( &
-            table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_Vs), &
-            decay_Vs, d_decay_Vs_dlogT, d_decay_Vs_dlYeRho, ierr)
+       if (weak_bicubic) then
+          call do_bicubic_interpolations( &
+             table % data(1:4,1:table%num_T,1:table%num_lYeRho,table%i_decay_Vs), &
+             decay_Vs, d_decay_Vs_dlogT, d_decay_Vs_dlYeRho, ierr)
+       else
+          call do_linear_interp( &
+             table % data(:,1:table%num_T,1:table%num_lYeRho,table%i_decay_Vs), &
+             decay_Vs, d_decay_Vs_dlogT, d_decay_Vs_dlYeRho, ierr)
+       end if
 
     else
 
@@ -426,7 +553,123 @@ contains
 
     end subroutine do_linear_interp
 
-  end subroutine interpolate_suzuki_table
+    subroutine setup_for_bicubic_interpolations
+      integer i, j
+      real(dp) :: del
+
+      include 'formats'
+
+      call find_location
+
+      ! set factors for interpolation
+
+      hx=x1-x0
+      hxi=1.0d0/hx
+      hx2=hx*hx
+
+      xp=(xget-x0)*hxi
+      xpi=1.0d0-xp
+      xp2=xp*xp
+      xpi2=xpi*xpi
+
+      cx=xp*(xp2-1.0d0)
+      cxi=xpi*(xpi2-1.0d0)
+      cxd=3.0d0*xp2-1.0d0
+      cxdi=-3.0d0*xpi2+1.0d0
+
+      hy=y1-y0
+      hyi=1.0d0/hy
+      hy2=hy*hy
+
+      yp=(yget-y0)*hyi
+      ypi=1.0d0-yp
+      yp2=yp*yp
+      ypi2=ypi*ypi
+
+      cy=yp*(yp2-1.0d0)
+      cyi=ypi*(ypi2-1.0d0)
+      cyd=3.0d0*yp2-1.0d0
+      cydi=-3.0d0*ypi2+1.0d0
+
+      if (dbg) then
+         write(*,2) 'logT', ix, x0, logT, x1
+         write(*,2) 'lYeRho', jy, y0, lYeRho, y1
+         write(*,1) 'xpi', xpi
+         write(*,1) 'ypi', ypi
+         write(*,*)
+      end if
+
+    end subroutine setup_for_bicubic_interpolations
+
+    subroutine do_bicubic_interpolations(fin, fval, df_dx, df_dy, ierr)
+       ! derived from routines in the PSPLINE package written by Doug McCune 
+       real(dp), dimension(:,:,:) :: fin ! the spline data array, dimensions (4, nx, ny)
+       real(dp), intent(out) :: fval, df_dx, df_dy
+       integer, intent(out) :: ierr
+
+       real(dp), parameter :: one_sixth = 1d0/6d0
+       real(dp), parameter :: z36th = 1d0/36d0
+
+       ierr = 0
+
+       ! bicubic spline interpolation
+       fval = &
+          xpi*( &
+          ypi*fin(1,ix,jy)  +yp*fin(1,ix,jy+1)) &
+          +xp*(ypi*fin(1,ix+1,jy)+yp*fin(1,ix+1,jy+1)) &
+          +one_sixth*hx2*( &
+          cxi*(ypi*fin(2,ix,jy) +yp*fin(2,ix,jy+1))+ &
+          cx*(ypi*fin(2,ix+1,jy)+yp*fin(2,ix+1,jy+1))) &
+          +one_sixth*hy2*( &
+          xpi*(cyi*fin(3,ix,jy) +cy*fin(3,ix,jy+1))+ &
+          xp*(cyi*fin(3,ix+1,jy)+cy*fin(3,ix+1,jy+1))) &
+          +z36th*hx2*hy2*( &
+          cxi*(cyi*fin(4,ix,jy) +cy*fin(4,ix,jy+1))+ &
+          cx*(cyi*fin(4,ix+1,jy)+cy*fin(4,ix+1,jy+1)))
+
+       include 'formats'
+       if (dbg) then
+          write(*,1) 'fin(1,ix,jy)', fin(1,ix,jy)
+          write(*,1) 'fin(1,ix,jy+1)', fin(1,ix,jy+1)
+          write(*,1) 'fin(1,ix+1,jy)', fin(1,ix+1,jy)
+          write(*,1) 'fin(1,ix+1,jy+1)', fin(1,ix+1,jy+1)
+          write(*,1) 'fval', fval
+
+          write(*,*)
+          stop 'debug: do_bicubic_interpolations'
+       end if
+
+       ! derivatives of bicubic splines
+       df_dx = &
+          hxi*( &
+          -(ypi*fin(1,ix,jy)  +yp*fin(1,ix,jy+1)) &
+          +(ypi*fin(1,ix+1,jy)+yp*fin(1,ix+1,jy+1))) &
+          +one_sixth*hx*( &
+          cxdi*(ypi*fin(2,ix,jy) +yp*fin(2,ix,jy+1))+ &
+          cxd*(ypi*fin(2,ix+1,jy)+yp*fin(2,ix+1,jy+1))) &
+          +one_sixth*hxi*hy2*( &
+          -(cyi*fin(3,ix,jy)  +cy*fin(3,ix,jy+1)) &
+          +(cyi*fin(3,ix+1,jy)+cy*fin(3,ix+1,jy+1))) &
+          +z36th*hx*hy2*( &
+          cxdi*(cyi*fin(4,ix,jy) +cy*fin(4,ix,jy+1))+ &
+          cxd*(cyi*fin(4,ix+1,jy)+cy*fin(4,ix+1,jy+1)))
+
+       df_dy = &
+          hyi*( &
+          xpi*(-fin(1,ix,jy) +fin(1,ix,jy+1))+ &
+          xp*(-fin(1,ix+1,jy)+fin(1,ix+1,jy+1))) &
+          +one_sixth*hx2*hyi*( &
+          cxi*(-fin(2,ix,jy) +fin(2,ix,jy+1))+ &
+          cx*(-fin(2,ix+1,jy)+fin(2,ix+1,jy+1))) &
+          +one_sixth*hy*( &
+          xpi*(cydi*fin(3,ix,jy) +cyd*fin(3,ix,jy+1))+ &
+          xp*(cydi*fin(3,ix+1,jy)+cyd*fin(3,ix+1,jy+1))) &
+          +z36th*hx2*hy*( &
+          cxi*(cydi*fin(4,ix,jy) +cyd*fin(4,ix,jy+1))+ &
+          cx*(cydi*fin(4,ix+1,jy)+cyd*fin(4,ix+1,jy+1)))
+
+    end subroutine do_bicubic_interpolations
+ end subroutine interpolate_suzuki_table
 
 
   subroutine private_load_suzuki_tables(ierr)
