@@ -101,7 +101,7 @@
 ! mesh controls
 
 ! timestep controls   
-      varcontrol_target = 5d-4
+      varcontrol_target = 1d-4
 
 ! output controls
 
