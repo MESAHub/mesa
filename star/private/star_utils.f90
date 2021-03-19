@@ -3456,6 +3456,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Ptrb_start
+         real(dp), parameter :: x_ALFAP = 2.d0/3.d0
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
@@ -3465,7 +3466,7 @@
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb = s% TDC_alfap*etrb*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
+         Ptrb = s% TDC_alfap*x_ALFAP*etrb*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
@@ -3810,6 +3811,21 @@
          end if
          scal = scal*s% dt/s% energy_start(k)
       end subroutine set_energy_eqn_scal
+      
+      
+      real(dp) function conv_time_scale(s,k,ierr) result(tau_conv)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         ierr = 0
+         if (s% calculate_Brunt_N2 .and. s% brunt_N2(k) /= 0d0) then
+            tau_conv = 1d0/sqrt(abs(s% brunt_N2(k)))
+         else if (s% conv_vel(k) > 0d0) then
+            tau_conv = s% mixing_length(k)/s% conv_vel(k)
+         else
+            tau_conv = 0d0
+         end if
+      end function conv_time_scale
 
 
       end module star_utils

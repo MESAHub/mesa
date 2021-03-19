@@ -401,7 +401,7 @@
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
-    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_source_seed, &
+    TDC_alfad, TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_source_seed, &
     TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
     TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
     TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
@@ -2055,6 +2055,7 @@
 
  s% TDC_alfa = TDC_alfa
  s% TDC_alfap = TDC_alfap
+ s% TDC_alfad = TDC_alfad
  s% TDC_alfat = TDC_alfat 
  s% TDC_alfam = TDC_alfam
  s% TDC_alfar = TDC_alfar
@@ -3706,6 +3707,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
 
  TDC_alfa= s% TDC_alfa
  TDC_alfap= s% TDC_alfap
+ TDC_alfad = s% TDC_alfad
  TDC_alfat= s% TDC_alfat 
  TDC_alfam= s% TDC_alfam
  TDC_alfar= s% TDC_alfar

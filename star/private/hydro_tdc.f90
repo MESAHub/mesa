@@ -40,11 +40,11 @@
          compute_Uq_face, set_TDC_vars, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
-         x_ALFAP = 2.d0/3.d0, &
-         x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
-         x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
-         x_CEDE  = (8.d0/3.d0)*sqrt(2.d0/3.d0), &
-         x_GAMMAR = 2.d0*sqrt(3.d0)
+         x_ALFAP = 2.d0/3.d0, & ! this is used by calc_Ptrb_ad_tw in star_utils
+         x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), & ! used by PII_face and Lc
+         x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), & ! used by Lc
+         x_CEDE  = (8.d0/3.d0)*sqrt(2.d0/3.d0), & ! used by DAMP
+         x_GAMMAR = 2.d0*sqrt(3.d0) ! used by DAMPR
 
 !         RSP       TDC
 !         ALFA  =>  TDC_alfa
@@ -693,15 +693,17 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell, w_00, dw3
          include 'formats'
-         real(dp) :: alpha
          ierr = 0
-         alpha = s% TDC_alfa
-         Hp_cell = compute_Hp_cell(s,k,ierr)
-         if (ierr /= 0) return
-         w_00 = wrap_w_00(s,k)
-         dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
-         D = (x_CEDE/alpha)*dw3/Hp_cell
-         ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
+         if (s% TDC_alfa == 0d0) then
+            D = 0d0
+         else
+            Hp_cell = compute_Hp_cell(s,k,ierr)
+            if (ierr /= 0) return
+            w_00 = wrap_w_00(s,k)
+            dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
+            D = (s% TDC_alfad*x_CEDE/s% TDC_alfa)*dw3/Hp_cell
+            ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
+         end if
          s% DAMP(k) = D%val
       end function compute_D
 

@@ -51,7 +51,7 @@
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
-         use auto_diff_support, only: get_w
+         use auto_diff_support, only: get_TDC_conv_velocity
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -128,7 +128,7 @@
             end do
          else if (s% TDC_flag) then
             do k = 1, nz
-               s% conv_vel(k) = get_w(s,k)
+               s% conv_vel(k) = get_TDC_conv_velocity(s,k)
                s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))

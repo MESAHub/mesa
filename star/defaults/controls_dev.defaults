@@ -11,6 +11,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          
       !   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      !   TDC_alfad =     1.0d0         ! turbulent dissipation; damp ~ TDC_alfad    
       !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
       !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
       !   TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
@@ -28,6 +29,7 @@
       ! ::
 
     TDC_alfa  = 1.5d0
+    TDC_alfad = 1.0d0
     TDC_alfap = 0.0d0
     TDC_alfat = 0.0d0
     TDC_alfam = 0.25d0

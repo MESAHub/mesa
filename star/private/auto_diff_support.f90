@@ -364,6 +364,19 @@
          get_etrb_start = pow2(s% w_start(k))
       end function get_etrb_start
       
+      real(dp) function get_TDC_conv_velocity(s,k) result (cv) ! at face k
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: alfa, beta
+         if (k == 1) then
+            cv = 0d0
+         else
+            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+            beta = 1d0 - alfa
+            cv = sqrt(2.d0/3.d0)*(alfa*s% w(k) + beta*s% w(k-1))
+         end if
+      end function get_TDC_conv_velocity
+      
       real(dp) function get_w(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -873,8 +886,7 @@
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_00
          integer, intent(in) :: k
-         v_00 = 0
-         if (k > 1) v_00 = s% u_face_ad(k)
+         v_00 = s% u_face_ad(k)
       end function wrap_u_face_00
 
       function wrap_u_face_p1(s, k) result(v_p1)

@@ -1317,8 +1317,6 @@
             case (p_conv_vel_div_mlt_vc)
                if (s% mlt_vc(k) > 0d0) val = s% conv_vel(k)/s% mlt_vc(k)
                
-            case (p_conv_vel)
-               val = s% conv_vel(k)
             case (p_dt_times_conv_vel_div_mixing_length)
                val = s% dt*s% conv_vel(k)/s% mlt_mixing_length(k)
             case (p_log_dt_times_conv_vel_div_mixing_length)

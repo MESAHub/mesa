@@ -4,6 +4,7 @@
          real(dp) :: TDC_alfat
          real(dp) :: TDC_alfam
          real(dp) :: TDC_alfar
+         real(dp) :: TDC_alfad
          
          real(dp) :: TDC_min_Lt_div_L_for_overshooting_mixing_type
          real(dp) :: TDC_min_Lc_div_L_for_convective_mixing_type
