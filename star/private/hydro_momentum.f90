@@ -584,6 +584,7 @@
                s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)                  
          if (force_zero_v) then
             if (s% u_flag) then
+               stop 'do not support force_zero_v with u_face.  do1_radius_eqn'
                v00 = wrap_u_00(s,k)
             else
                v00 = wrap_v_00(s,k)
@@ -595,12 +596,12 @@
             return
          end if
          
-!         v00 = wrap_opt_time_center_v_00(s,k)
-         if (s% u_flag) then  ! wrong, but it should avoid the bug until it is fixed
-            v00 = wrap_u_00(s,k)
-         else
+         !if (s% u_flag) then
+            !v00 = wrap_u_00(s,k)  ! this works, but is wrong.
+            !v00 = s% u_face_ad(k)
+         !else
             v00 = wrap_opt_time_center_v_00(s,k)
-         end if
+         !end if
          
          ! dr = r - r0 = v00*dt
          ! eqn: dr/r0 = v00*dt/r0

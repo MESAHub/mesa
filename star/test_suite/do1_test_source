@@ -1,13 +1,3 @@
-do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
-do_one wd_c_core_ignition "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto
-do_one ccsn_IIp "mach1 has reached target location    1" "shock_part5.mod" auto              
-do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
-
-
-return
-
-
-
 # move twin_studies to start of list so that for [ci split] it will go to cannon instead of helios (until helios is fixed)
 do_one twin_studies "stars have reached stopping age" skip skip
 

@@ -716,7 +716,7 @@
       integer, parameter :: p_mtx_solve = p_num_steps + 1
       integer, parameter :: p_mtx_factor = p_mtx_solve + 1
 
-      integer, parameter :: p_tau_conv = p_mtx_solve + 1
+      integer, parameter :: p_tau_conv = p_mtx_factor + 1
       integer, parameter :: p_tau_qhse = p_tau_conv + 1
       integer, parameter :: p_tau_epsnuc = p_tau_qhse + 1
       integer, parameter :: p_tau_cool = p_tau_epsnuc + 1
