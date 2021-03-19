@@ -715,8 +715,13 @@
       integer, parameter :: p_num_steps = p_k_r_integral + 1
       integer, parameter :: p_mtx_solve = p_num_steps + 1
       integer, parameter :: p_mtx_factor = p_mtx_solve + 1
+
+      integer, parameter :: p_tau_conv = p_mtx_solve + 1
+      integer, parameter :: p_tau_qhse = p_tau_conv + 1
+      integer, parameter :: p_tau_epsnuc = p_tau_qhse + 1
+      integer, parameter :: p_tau_cool = p_tau_epsnuc + 1
       
-      integer, parameter :: p_max_abs_xa_corr = p_mtx_factor + 1
+      integer, parameter :: p_max_abs_xa_corr = p_tau_cool + 1
       integer, parameter :: p_log_zFe = p_max_abs_xa_corr + 1
       integer, parameter :: p_zFe = p_log_zFe + 1
       integer, parameter :: p_u = p_zFe + 1
@@ -1423,6 +1428,11 @@
          profile_column_name(p_RTI_du_diffusion_kick) = 'RTI_du_diffusion_kick'
          profile_column_name(p_log_du_kick_div_du) = 'log_du_kick_div_du'
          profile_column_name(p_max_abs_xa_corr) = 'max_abs_xa_corr'
+
+         profile_column_name(p_tau_conv) = 'tau_conv'
+         profile_column_name(p_tau_qhse) = 'tau_qhse'
+         profile_column_name(p_tau_epsnuc) = 'tau_epsnuc'
+         profile_column_name(p_tau_cool) = 'tau_cool'
 
          cnt = 0
          do i=1,p_col_id_max

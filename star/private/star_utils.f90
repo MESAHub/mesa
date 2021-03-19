@@ -3813,19 +3813,48 @@
       end subroutine set_energy_eqn_scal
       
       
-      real(dp) function conv_time_scale(s,k,ierr) result(tau_conv)
+      real(dp) function conv_time_scale(s,k) result(tau_conv)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         ierr = 0
          if (s% calculate_Brunt_N2 .and. s% brunt_N2(k) /= 0d0) then
             tau_conv = 1d0/sqrt(abs(s% brunt_N2(k)))
          else if (s% conv_vel(k) > 0d0) then
-            tau_conv = s% mixing_length(k)/s% conv_vel(k)
+            tau_conv = s% scale_height(k)/s% conv_vel(k)
          else
             tau_conv = 0d0
          end if
       end function conv_time_scale
+      
+      
+      real(dp) function QHSE_time_scale(s,k) result(tau_qhse)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: abs_dv
+         if (s% v_flag) then
+            abs_dv = abs(s% v(k) - s% v_start(k))
+         else if (s% u_flag) then
+            abs_dv = abs(s% u_face_ad(k)%val - s% u_face_start(k))
+         else
+            abs_dv = 0d0
+         end if
+         tau_qhse = abs_dv/(s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)))
+      end function QHSE_time_scale
+      
+      
+      real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         tau_epsnuc = s% Cp(k)*s% T(k)/max(1d-10,abs(s% eps_nuc(k)))
+      end function eps_nuc_time_scale
+      
+      
+      real(dp) function cooling_time_scale(s,k) result(tau_cool)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: thermal_conductivity
+         thermal_conductivity = (4d0*crad*clight*pow3(s% T(k)))/(3d0*s% opacity(k)*s% rho(k)*s% Cp(k))
+         tau_cool = pow2(s% scale_height(k)) / thermal_conductivity
+      end function cooling_time_scale
 
 
       end module star_utils

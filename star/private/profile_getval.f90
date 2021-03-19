@@ -2168,6 +2168,15 @@
                      val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_ad(k)%val))
                end if
                
+            case(p_tau_conv)
+               val = conv_time_scale(s,k)
+            case(p_tau_qhse)
+               val = QHSE_time_scale(s,k)
+            case(p_tau_epsnuc)
+               val = eps_nuc_time_scale(s,k)
+            case(p_tau_cool)
+               val = cooling_time_scale(s,k)
+               
             case(p_max_abs_xa_corr)
                val = s% max_abs_xa_corr(k)
 
