@@ -867,8 +867,7 @@
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: v_00
          integer, intent(in) :: k
-         v_00 = 0
-         if (k > 1) v_00 = s% u_face_ad(k)
+         v_00 = s% u_face_ad(k)
       end function wrap_u_face_00
 
       function wrap_u_face_p1(s, k) result(v_p1)
