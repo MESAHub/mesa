@@ -2443,7 +2443,11 @@
             sumterm(j) = sumterm(j) + sumj
             k = nz-1
             sumj = abs(sum(s% xh(j,k-1:k+1)) - sum(s% xh_old(j,k-1:k+1)))/3
-
+            
+            if (j == s% i_lnd) then
+               sumterm(j) = sumterm(j)/3 ! Seems to help. from Eggleton.
+            end if
+            
             sumvar = sumvar + sumterm(j)
             sumscales = sumscales + max(xscale_min, abs(s% xh_old(j,1)))
 
