@@ -212,6 +212,34 @@ right click on its name to open it properties, go to ``Advanced`` and unclick ``
 `More information can be found here <https://github.com/microsoft/WSL/issues/4299>`__
 
 
+Why do I get an error "#000: H5F.c line 444 in H5Fcreate(): unable to create file"?
+-----------------------------------------------------------------------------------
+
+You need to turn off HDF5 file locking:
+
+::
+
+   export HDF5_USE_FILE_LOCKING='FALSE'
+
+
+Why do I get an error like "is smaller than expected for a file tracked by git LFS"?
+------------------------------------------------------------------------------------
+
+First check that you have git lfs installed and then try running:
+
+::
+
+   git lfs pull
+
+If you are checking out MESA on a network file system you may find setting a short delay duirng the
+install step to give time for the files transfered by git lfs to properly sync.
+
+::
+
+   export MESA_GIT_LFS_SLEEP=10
+
+
+
 Installing Older Versions of MESA
 =================================
 
