@@ -40,25 +40,11 @@
          compute_Uq_face, set_TDC_vars, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
-         x_ALFAP = 2.d0/3.d0, &
-         x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
-         x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), &
-         x_CEDE  = 1.3d0 * (8.d0/3.d0)*sqrt(2.d0/3.d0), &
-            ! 1.3 - Reproduces ML1 vc and Lc
-            ! 1.5 - Get something smaller than ML1
-            ! 1.1 - Run dies < 20 steps (no idea why)
-            ! NOTE TO BILL: Please add this fudge as an inlist option.
-         x_GAMMAR = 2.d0*sqrt(3.d0)
-
-!         RSP       TDC
-!         ALFA  =>  TDC_alfa
-!         ALFAP =>  TDC_alfap*x_ALFAP
-!         ALFAM =>  TDC_alfam
-!         ALFAT =>  TDC_alfat
-!         ALFAS =>  x_ALFAS
-!         ALFAC =>  x_ALFAC
-!         CEDE  =>  x_CEDE
-!         GAMMAR => TDC_alfar*x_GAMMAR
+         x_ALFAP = 2.d0/3.d0, & ! Ptrb
+         x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), & ! PII_face and Lc
+         x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), & ! Lc
+         x_CEDE  = (8.d0/3.d0)*sqrt(2.d0/3.d0), & ! DAMP
+         x_GAMMAR = 2.d0*sqrt(3.d0) ! DAMPR
 
       contains
       
@@ -133,7 +119,7 @@
          ! Intermediates
          integer :: ierr
          real(dp) :: gammar, alpha, POM, ALFAM_ALFA
-         type(auto_diff_real_star_order1) :: w_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
+         type(auto_diff_real_star_order1) :: tst, w_00, T_00, d_00, Cp_00, kap_00, Hp_cell, POM2
          type(auto_diff_real_star_order1) :: Peos_00, chiT_00, chiRho_00, QQ_00, grad_ad_00, fac
          type(auto_diff_real_star_order1) :: Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell
          type(auto_diff_real_star_order1) :: Chi_div_w_cell, d_v_div_r, r_00, r_p1, f, r6_cell
@@ -141,6 +127,12 @@
 
          ! Outputs
          type(auto_diff_real_star_order1) :: xi0, xi1, xi2
+
+         logical :: test_partials
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
 
          ! Wrap and store basic variables
          alpha = s% TDC_alfa
@@ -213,12 +205,20 @@
          xi1 = -(DR0 + Pt0 * dV)
 
          ! Evaluate xi2
-         D0 = (x_CEDE/alpha) / Hp_cell ! (D / w^3)
+         D0 = (s% TDC_alfad*x_CEDE/alpha) / Hp_cell ! (D / w^3)
          xi2 = -D0
          ! units = (1/cm)
 
          if (k < -60 .and. k > 30) then
             write(*,*) D0%val, Eq0%val, S0%val
+         end if
+         
+         if (test_partials) then
+            tst = xi0
+            s% solver_test_partials_val = tst%val
+            s% solver_test_partials_var = s% i_lnd
+            s% solver_test_partials_dval_dx = tst%d1Array(i_lnd_00)
+            write(*,*) 'eval_xis', s% solver_test_partials_var, s% lnd(k)/ln10, tst%val
          end if
 
       end subroutine eval_xis
@@ -236,16 +236,24 @@
          end if
       end function two_var_pos_atan
 
-      subroutine eval_Af_from_A0(xi0, xi1, xi2, A0, Af, dt, i)
+      subroutine eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, dt, i)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
          real(dp), intent(in) :: dt
          integer, intent(in) :: i
          type(auto_diff_real_star_order1), intent(in) :: xi0, xi1, xi2, A0
          type(auto_diff_real_star_order1), intent(out) :: Af
          
          integer :: l
-         type(auto_diff_real_star_order1) :: J2, J, Jt, em1, ep1, num, den, root, y
+         type(auto_diff_real_star_order1) :: J2, J, Jt, em1, ep1, num, den, root, y, tst
+         logical :: test_partials
+         include 'formats'
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
 
          J2 = pow2(xi1) - 4d0 * xi0 * xi2
+         !if (test_partials) write(*,2) 'J2', k, J2%val, pow2(xi1%val), 4d0 * xi0%val * xi2%val
 
          if (J2 > 0d0) then
             ! Hyperbolic branch
@@ -262,6 +270,15 @@
             Af = num / den
             if (Af < 0d0) then
                Af = -Af
+            end if
+
+            if (test_partials) then
+               tst = Af
+               s% solver_test_partials_val = tst%val
+               s% solver_test_partials_var = s% i_lnd
+               s% solver_test_partials_dval_dx = tst%d1Array(i_lnd_00)
+               write(*,*) 'eval_Af_from_A0', s% solver_test_partials_var, &
+                  s% lnd(k)/ln10, tst%val, J2%val
             end if
 
             if (i > 30 .and. i < -60) then
@@ -355,7 +372,7 @@
          real(dp) :: scal, residual
          integer :: j
          type(auto_diff_real_star_order1) :: xi0, xi1, xi2, A0, Af, w_00, LHS, RHS
-         type(auto_diff_real_star_order1) :: resid_ad, &
+         type(auto_diff_real_star_order1) :: tst, resid_ad, &
             d_turbulent_energy_ad, Ptrb_dV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, test_partials
@@ -387,7 +404,7 @@
             call eval_xis(s, k, xi0, xi1, xi2)
 
             A0 = sqrt(max(0d0, get_etrb_start(s,k)))
-            call eval_Af_from_A0(xi0, xi1, xi2, A0, Af, s%dt, k)
+            call eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, s%dt, k)
 
             ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
             ! 2*w*(w - A) = 2*w*B*(xi1 + (2*A+B)*xi2) - 2*w*Lambda
@@ -407,8 +424,11 @@
             write(*,*) k,resid_ad%val, w_00%val, Af%val, xi0%val, xi1%val, xi2%val, sqrt(abs(xi0%val/xi2%val)), dt_dLt_dm_ad%val, A0%val
          end if
 
-            scal = s%csound(k)
-            resid_ad = resid_ad / scal ! to make residual unitless, must cancel out the dt in scal 
+            scal = 1d0/s%csound_start(k)
+            !scal = sqrt(scal/s%dt) 
+               ! scal/dt -> 1/(erg g^-1 s^-1)*s^-1 = 1/(erg g^-1) = 1/(g cm^2 sec^-2 g^-1) = sec^2 cm^-2
+               ! sqrt(scal/dt) => sec/cm = 1 / (cm/sec).   resid units are cm/sec.
+            resid_ad = resid_ad*scal
 
             do j=1,27
                if (is_bad(resid_ad%d1Array(j))) then
@@ -436,7 +456,10 @@
          s% equ(s% i_detrb_dt, k) = residual
 
          if (test_partials) then
-            s% solver_test_partials_val = residual
+            tst = xi0
+            s% solver_test_partials_val = tst%val
+            if (s% solver_iter == 12) &
+               write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
          end if
          
          if (skip_partials) return
@@ -444,9 +467,9 @@
          if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = 0
-            s% solver_test_partials_dval_dx = 0
-            write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var
+            s% solver_test_partials_var = s% i_lnd
+            s% solver_test_partials_dval_dx = tst%d1Array(i_lnd_00)     ! xi0 good , xi1 partial 0, xi2 good.  Af horrible.'
+            write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k)/ln10, tst%val
          end if      
 
          contains
@@ -572,6 +595,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_face
          type(auto_diff_real_star_order1) :: &
+            rho_face, area, dlnPeos, &
             r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
             d_face, Peos_face, alt_Hp_face, A
          real(dp) :: alfa, beta
@@ -580,7 +604,15 @@
          ierr = 0
          if (k > s% nz) then
             Hp_face = 1d0 ! not used
-            if (ierr /= 0) return
+            s% Hp_face(k) = Hp_face%val
+            return
+         end if
+         if (k > 1 .and. .not. s% TDC_assume_HSE) then
+            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+            rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
+            area = 4d0*pi*pow2(wrap_r_00(s,k))
+            dlnPeos = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+            Hp_face = -s% dm_bar(k)/(area*rho_face*dlnPeos)
          else
             r_00 = wrap_opt_time_center_r_00(s, k)
             d_00 = wrap_d_00(s, k)
@@ -796,6 +828,47 @@
          s% Chi(k) = Chi_cell%val
 
       end function compute_Chi_cell
+      
+      
+      function compute_dChi_dm_bar_face(s,k,ierr) result(dChi_dm_bar)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: dChi_dm_bar
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: &
+            d_v_div_r_00, w_rho2_00, f_00, Chi_00_div_r6_Hp, &
+            d_v_div_r_m1, w_rho2_m1, f_m1, Chi_m1_div_r6_Hp, &
+            Hp_face, r6_face, Chi_00, Chi_out
+         real(dp) :: alfa, beta, ALFAM_ALFA
+         if (k > 1 .and. .not. s% TDC_assume_HSE) then
+            ! complexity needed to keep to block tridiagonal.
+            ALFAM_ALFA = s% TDC_alfam*s% TDC_alfa
+            call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
+            d_v_div_r_00 = compute_d_v_div_r(s, k, ierr)
+            if (ierr /= 0) return
+            w_rho2_00 = wrap_w_00(s,k)*pow2(wrap_d_00(s,k))
+            f_00 = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
+            Chi_00_div_r6_Hp = f_00*w_rho2_00*d_v_div_r_00
+            d_v_div_r_m1 = shift_m1(compute_d_v_div_r(s, k-1, ierr))
+            if (ierr /= 0) return
+            w_rho2_m1 = wrap_w_m1(s,k)*pow2(wrap_d_m1(s,k))
+            f_m1 = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k-1)  
+            Chi_m1_div_r6_Hp = f_m1*w_rho2_m1*d_v_div_r_m1
+            Hp_face = compute_Hp_face(s,k,ierr)
+            if (ierr /= 0) return            
+            r6_face = pow6(wrap_r_00(s,k))
+            dChi_dm_bar = (Chi_m1_div_r6_Hp - Chi_00_div_r6_Hp)*r6_face*Hp_face
+         else
+            Chi_00 = compute_Chi_cell(s,k,ierr)
+            if (k > 1) then
+               Chi_out = shift_m1(compute_Chi_cell(s,k-1,ierr))
+               if (ierr /= 0) return
+            else
+               Chi_out = 0d0
+            end if
+            dChi_dm_bar = (Chi_out - Chi_00)/s% dm_bar(k)
+         end if
+      end function compute_dChi_dm_bar_face
 
       
       function compute_Eq_cell(s, k, ierr) result(Eq_cell) ! erg g^-1 s^-1
@@ -825,22 +898,17 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Uq_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Chi_00, Chi_out, r_00
+         type(auto_diff_real_star_order1) :: dChi_dm_bar, r_00
          include 'formats'
          ierr = 0         
          if (k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
              k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
             Uq_face = 0d0
          else
-            Chi_00 = compute_Chi_cell(s,k,ierr)
-            if (k > 1) then
-               Chi_out = shift_m1(compute_Chi_cell(s,k-1,ierr))
-               if (ierr /= 0) return
-            else
-               Chi_out = 0d0
-            end if
             r_00 = wrap_opt_time_center_r_00(s,k)
-            Uq_face = 4d0*pi*(Chi_out - Chi_00)/(s% dm_bar(k)*r_00)   
+            dChi_dm_bar = compute_dChi_dm_bar_face(s,k,ierr)
+            if (ierr /= 0) return
+            Uq_face = 4d0*pi*dChi_dm_bar/r_00
          end if
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration
          s% Uq(k) = Uq_face%val
@@ -915,15 +983,17 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell, w_00, dw3
          include 'formats'
-         real(dp) :: alpha
          ierr = 0
-         alpha = s% TDC_alfa
-         Hp_cell = compute_Hp_cell(s,k,ierr)
-         if (ierr /= 0) return
-         w_00 = wrap_w_00(s,k)
-         dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
-         D = (x_CEDE/alpha)*dw3/Hp_cell
-         ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
+         if (s% TDC_alfa == 0d0) then
+            D = 0d0
+         else
+            Hp_cell = compute_Hp_cell(s,k,ierr)
+            if (ierr /= 0) return
+            w_00 = wrap_w_00(s,k)
+            dw3 = pow3(w_00) - pow3(s% TDC_w_min_for_damping)
+            D = (s% TDC_alfad*x_CEDE/s% TDC_alfa)*dw3/Hp_cell
+            ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
+         end if
          s% DAMP(k) = D%val
       end function compute_D
 

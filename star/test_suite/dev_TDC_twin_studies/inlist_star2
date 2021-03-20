@@ -19,7 +19,7 @@
 
 &controls  
    
-   max_number_retries = 100
+   max_number_retries = 0 ! 100
 
 ! TDC
 
@@ -38,7 +38,16 @@
 
    TDC_use_RSP_eqn_for_Y_face = .false.
    TDC_use_mass_interp_face_values = .true.
-   TDC_source_seed = 1d-2
+   TDC_source_seed = 0d0 ! 1d-2
+   
+   TDC_use_Stellingwerf_Lr = .false.
+   
+   !TDC_assume_HSE = .false.  
+   !alt_scale_height_flag = .false.
+   alt_scale_height_flag = .true.
+   
+   TDC_min_Lc_div_L_for_convective_mixing_type = 1d-4
+   TDC_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
 
    TDC_Lsurf_factor = 0.25d0
    
@@ -81,23 +90,16 @@
 
    use_momentum_outer_BC = .true.
    
-   TDC_use_Stellingwerf_Lr = .false.
-   
-   !alt_scale_height_flag = .false.
-   alt_scale_height_flag = .true.
-   
-   TDC_min_Lc_div_L_for_convective_mixing_type = 1d-4
-   TDC_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
-   
 ! output
 
    photo_directory = 'photos2'
    log_directory = 'LOGS2'  
-      
-      !photo_interval = 10
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+       
+   ! set these by inlist_common so apply to both stars     
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
 
 ! FOR DEBUGGING
 
@@ -111,12 +113,12 @@
          ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
          ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 4142
-      !solver_test_partials_k = 2616
-      !solver_test_partials_iter_number = 4
-      !solver_test_partials_dx_0 = 1d-6
-      !solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
+      !solver_test_partials_call_number = 125
+      !solver_test_partials_k = 573
+      !solver_test_partials_iter_number = 12
+      !solver_test_partials_dx_0 = 1d-12
+      !solver_test_partials_var_name = 'lnd' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
+      !solver_test_partials_equ_name = 'detrb_dt' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
       !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
       !solver_test_partials_show_dx_var_name = 'h1'
 
@@ -165,11 +167,11 @@
 
 &pgstar
 
-   !pause = .true.
+   pause = .true.
    !pause_interval = 10
    pgstar_interval = 1
 
-   !Profile_Panels1_xmin = 25 ! -101D0
+   Profile_Panels1_xmin = 485 ! -101D0
    !Profile_Panels1_xmax = 100 ! -101D0
 
    Grid2_title = 'TDC twin study'

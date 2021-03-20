@@ -29,7 +29,7 @@
       ! ::
 
     TDC_alfa  = 1.5d0
-    TDC_alfad = 1.0d0
+    TDC_alfad = 1.3d0  ! 1.0d0 is RSP standard.  1.3 does better matching mesa MLT.
     TDC_alfap = 0.0d0
     TDC_alfat = 0.0d0
     TDC_alfam = 0.25d0

@@ -2131,6 +2131,8 @@
                val = s% kh_timescale
             case(h_nuc_timescale)
                val = s% nuc_timescale
+            case(h_conv_timescale)
+               val = s% max_conv_time_scale
             case(h_eps_grav_integral)
                val = dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun
             case(h_extra_L)

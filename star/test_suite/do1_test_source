@@ -61,7 +61,7 @@ do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.m
 do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto   
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
-do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
+#   Josiah says skip this one for now   do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
 do_one rsp_BEP "good match for period" "final.mod" skip   

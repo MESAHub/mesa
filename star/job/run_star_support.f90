@@ -857,10 +857,8 @@
          end if
          
          if (s% result_reason /= result_reason_normal) then
-            write(*, *) 
             write(*, '(a)') 'terminated evolution: ' // &
                trim(result_reason_str(s% result_reason))
-            write(*, *)
          end if
          
          if (s% termination_code > 0 .and. s% termination_code <= num_termination_codes) then

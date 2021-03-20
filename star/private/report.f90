@@ -234,7 +234,7 @@
 
          integer :: k, i, j, ic, nz, kcore, &
             h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
-         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, &
+         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
             twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
             prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
             prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum
@@ -332,6 +332,13 @@
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
+         
+         s% max_conv_time_scale = 0d0
+         do k=1,s%nz
+            tau_conv = conv_time_scale(s,k)
+            if (tau_conv > s% max_conv_time_scale) &
+               s% max_conv_time_scale = tau_conv
+         end do
          
          if (is_bad(s% kh_timescale)) then
             write(*,1) 's% kh_timescale', s% kh_timescale

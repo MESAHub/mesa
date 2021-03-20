@@ -9,6 +9,8 @@
       star_age_day ! elapsed simulated time in days since the start of the run
       log_dt_sec ! log10 time_step in seconds
       !num_zones ! number of zones in the model
+      
+      conv_timescale
    
    ! conditions near surface
       radius

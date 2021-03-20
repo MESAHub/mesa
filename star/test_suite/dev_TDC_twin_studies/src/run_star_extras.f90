@@ -201,7 +201,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 21
+         how_many_extra_profile_columns = 25
       end function how_many_extra_profile_columns
       
       
@@ -250,6 +250,11 @@
          names(20) = 'xtr6'
          names(21) = 'xtr6_1'
 
+         names(22) = 'conv_dt'
+         names(23) = 'qhse_dt'
+         names(24) = 'nuc_dt'
+         names(25) = 'cool_dt'
+
          if (s_other% nz /= nz) then
             vals(1:nz,:) = 0d0
          else
@@ -261,9 +266,9 @@
                   vals(k,2) = 0d0
                else
                   vals(k,2) = &
-                     (s_other% lnT(k-1) - s_other% lnT(k))/ &
-                        (s_other% lnPeos(k-1) - s_other% lnPeos(k)) &
-                      - s_other% grada_face(k)
+                     !(s_other% lnT(k-1) - s_other% lnT(k))/ &
+                     !   (s_other% lnPeos(k-1) - s_other% lnPeos(k)) &
+                     s_other% gradT(k) - s_other% grada_face(k)
                end if
                if (s_other% TDC_flag) then
                   vals(k,3) = pow2(s_other% w(k))
@@ -343,6 +348,11 @@
                   vals(k,20) = fix_if_bad(err(s% xtra6_array(k),s_other% xtra6_array(k)))
                   vals(k,21) = 0
                end if
+
+               vals(k,22) = safe_log10(star_conv_time_scale(s,k) / s% dt)
+               vals(k,23) = safe_log10(star_QHSE_time_scale(s,k) / s% dt)
+               vals(k,24) = safe_log10(star_eps_nuc_time_scale(s,k) / s% dt)
+               vals(k,25) = safe_log10(star_cooling_time_scale(s,k) / s% dt)
                
             end do
          end if

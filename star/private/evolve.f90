@@ -2381,9 +2381,7 @@
       subroutine report_problems(s,str)
          type (star_info), pointer :: s
          character (len=*), intent(in) :: str
-         write(*,*)
          write(*,*) 'stopping because of problems ' // trim(str)
-         write(*,*)
       end subroutine report_problems
 
 
