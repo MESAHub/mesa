@@ -220,7 +220,7 @@
             if (failed('do_u')) return
          end if
 
-         if (s% TDC_flag) then ! calculate new etrb to conserve turbulent energy
+         if (s% using_TDC) then ! calculate new etrb to conserve turbulent energy
             if (dbg) write(*,*) 'call do_etrb'
             call do_etrb( &
                s, nz, nz_old, cell_type, comes_from, &

@@ -447,7 +447,7 @@
          end if ! v_flag
 
          Uq_ad = 0d0
-         if (s% TDC_flag) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% using_TDC) then ! Uq(k) is turbulent viscosity drag at face k
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
          end if
@@ -574,17 +574,11 @@
          ierr = 0         
          if (.not. (s% u_flag .or. s% v_flag)) stop 'must have either v or u for do1_radius_eqn'
          
-         if (.false. .and. s% u_flag) then
-            call do1_Riemann_dlnRdt_eqn(s, k, skip_partials, nvar, ierr)
-            return
-         end if
-         
          force_zero_v = (s% q(k) > s% velocity_q_upper_bound) .or. &
             (s% lnT_start(k)/ln10 < s% velocity_logT_lower_bound .and. &
                s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)                  
          if (force_zero_v) then
             if (s% u_flag) then
-               stop 'do not support force_zero_v with u_face.  do1_radius_eqn'
                v00 = wrap_u_00(s,k)
             else
                v00 = wrap_v_00(s,k)
@@ -595,14 +589,7 @@
                s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
             return
          end if
-         
-         !if (s% u_flag) then
-            !v00 = wrap_u_00(s,k)  ! this works, but is wrong.
-            !v00 = s% u_face_ad(k)
-         !else
-            v00 = wrap_opt_time_center_v_00(s,k)
-         !end if
-         
+                  
          ! dr = r - r0 = v00*dt
          ! eqn: dr/r0 = v00*dt/r0
          ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
@@ -610,6 +597,8 @@
          ! eqn becomes: v00*dt/r0 = expm1(dlnR)
          dxh_lnR = wrap_dxh_lnR(s,k) ! lnR - lnR_start
          dr_div_r0_actual = expm1(dxh_lnR) ! expm1(x) = E^x - 1
+         
+         v00 = wrap_opt_time_center_v_00(s,k)
          dr_div_r0_expected = v00*s% dt/s% r_start(k)
          resid_ad = dr_div_r0_expected - dr_div_r0_actual
          
@@ -627,109 +616,6 @@
             write(*,*) 'do1_radius_eqn', s% solver_test_partials_var
          end if
       end subroutine do1_radius_eqn
-         
-         
-      subroutine do1_Riemann_dlnRdt_eqn( &
-!            s, k, xscale, equ, skip_partials, nvar, ierr)
-            s, k, skip_partials, nvar, ierr)
-         type (star_info), pointer :: s         
-         integer, intent(in) :: k, nvar
-         !real(dp), pointer :: xscale(:,:)
-         !real(dp), pointer :: equ(:,:)
-         logical, intent(in) :: skip_partials
-         integer, intent(out) :: ierr
-         
-         integer :: nz, i_dlnR_dt, i_u, i_lnR, i_w_div_wc
-         real(dp) :: r, r0, r_div_r0, u_expected, u_factor, c_factor, &
-            dr_div_r0_actual, dr_div_r0_expected, dt, alpha, uc_factor
-
-         logical :: test_partials
-         
-         include 'formats'
-
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-
-         ierr = 0
-         dt = s% dt
-         nz = s% nz
-         i_dlnR_dt = s% i_dlnR_dt
-         i_u = s% i_u
-         i_lnR = s% i_lnR
-         i_w_div_wc = s% i_w_div_wc
-         
-         r = s% r(k)
-         r0 = s% r_start(k)
-         r_div_r0 = r/r0
-
-!         u_expected = s% u_face(k)
-!         u_factor = 1d0
-!
-!         ! dr = r - r0 = u_expected*dt
-!         ! eqn: dr/r0 = u_expected*dt/r0
-!         ! write dr/r0 using dlnR = dlnR_dt*dt 
-!         ! dr/r0 = (r - r0)/r0 = r/r0 - 1
-!         !        = exp(lnR)/exp(lnR_start) - 1
-!         !        = exp(lnR - lnR_start) - 1
-!         !        = exp(dlnR) - 1 = exp(dlnR_dt*dt) - 1
-!         ! eqn becomes: u_expected*dt/r0 = expm1(dlnR)
-!         dr_div_r0_actual = expm1(s% dlnR_dt(k)*dt) ! expm1(x) = E^x - 1
-!
-!         c_factor = dt/r0 ! factor to convert dr_dt to dr_div_r0
-!         dr_div_r0_expected = u_expected*c_factor
-!
-!         equ(i_dlnR_dt, k) = dr_div_r0_expected - dr_div_r0_actual         
-!         s% lnR_residual(k) = equ(i_dlnR_dt, k)
-!         
-!         if (is_bad(equ(i_dlnR_dt, k))) then
-!            ierr = -1
-!            if (.not. s% report_ierr) return
-!!$omp critical (do1_Riemann_dlnRdt_eqn_omp)
-!            write(*,2) 'equ(i_dlnR_dt, k)', k, equ(i_dlnR_dt, k)
-!            write(*,2) 'dr_div_r0_expected', k, dr_div_r0_expected
-!            write(*,2) 'dr_div_r0_actual', k, dr_div_r0_actual
-!            write(*,2) 'u_expected', k, u_expected
-!            write(*,2) 's% u_face(k)', k, s% u_face(k)
-!            write(*,2) 'dt/r0', k, dt/r0
-!            stop 'do1_Riemann_dlnRdt_eqn'
-!!$omp end critical (do1_Riemann_dlnRdt_eqn_omp)
-!         end if
-!
-!         if (test_partials) then
-!            s% solver_test_partials_val = equ(i_dlnR_dt, k) 
-!         end if
-!     
-!         if (skip_partials) return
-!         
-!         ! partial of -dr_div_r0_actual
-!         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, -r_div_r0)
-!         
-!         ! partials of dr_div_r0_expected = u_face*f
-!         uc_factor = u_factor*c_factor
-!         call e00(s, xscale, i_dlnR_dt, i_lnR, k, nvar, uc_factor*s% d_uface_dlnR(k))
-!         call e00(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*s% d_uface_du00(k))
-!         
-!         call e00(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*s% d_uface_dlnd00(k))
-!         if (s% do_struct_thermo) &
-!            call e00(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*s% d_uface_dlnT00(k))
-!         
-!         if (k > 1) then
-!            call em1(s, xscale, i_dlnR_dt, i_u, k, nvar, uc_factor*s% d_uface_dum1(k))            
-!            call em1(s, xscale, i_dlnR_dt, s% i_lnd, k, nvar, uc_factor*s% d_uface_dlndm1(k))
-!            if (s% do_struct_thermo) &
-!               call em1(s, xscale, i_dlnR_dt, s% i_lnT, k, nvar, uc_factor*s% d_uface_dlnTm1(k))
-!         end if
-!
-!         if (s% w_div_wc_flag) then
-!            call e00(s, xscale, i_dlnR_dt, i_w_div_wc, k, nvar, uc_factor*s% d_uface_dw(k))
-!         end if
-!
-!         if (test_partials) then   
-!            s% solver_test_partials_var = i_w_div_wc
-!            s% solver_test_partials_dval_dx = uc_factor*s% d_uface_dw(k)
-!         end if
-            
-      end subroutine do1_Riemann_dlnRdt_eqn
 
 
       end module hydro_momentum

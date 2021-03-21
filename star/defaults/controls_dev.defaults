@@ -50,6 +50,12 @@
     TDC_source_seed = 0d0
     TDC_num_outermost_cells_forced_nonturbulent = 0
     TDC_num_innermost_cells_forced_nonturbulent = 0
+    
+    TDC_min_dt_div_tau_conv_switch_to_MLT = -1
+    TDC_min_dt_years_switch_to_MLT = 20d0
+    
+    max_q_for_conv_timescale = 1d0
+    min_q_for_conv_timescale = 0d0
 
       ! period controls
 

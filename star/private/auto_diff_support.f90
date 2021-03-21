@@ -373,7 +373,7 @@
          else
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1d0 - alfa
-            cv = sqrt(2.d0/3.d0)*(alfa*s% w(k) + beta*s% w(k-1))
+            cv = sqrt_2_div_3*(alfa*s% w(k) + beta*s% w(k-1))
          end if
       end function get_TDC_conv_velocity
       

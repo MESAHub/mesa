@@ -427,7 +427,7 @@
              end if
          end if
          
-         if (s% TDC_flag) then ! include Uq in u_face
+         if (s% using_TDC) then ! include Uq in u_face
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad

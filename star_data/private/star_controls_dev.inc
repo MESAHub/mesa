@@ -9,6 +9,11 @@
          real(dp) :: TDC_min_Lt_div_L_for_overshooting_mixing_type
          real(dp) :: TDC_min_Lc_div_L_for_convective_mixing_type
          
+         real(dp) :: TDC_min_dt_div_tau_conv_switch_to_MLT
+         real(dp) :: TDC_min_dt_years_switch_to_MLT
+         
+         real(dp) :: max_q_for_conv_timescale, min_q_for_conv_timescale
+         
          logical :: TDC_use_L_eqn_at_surface, TDC_assume_HSE
          logical :: TDC_use_RSP_eqn_for_Y_face
          logical :: TDC_use_mass_interp_face_values

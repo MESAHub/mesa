@@ -349,15 +349,8 @@
             s% mlt_Gamma_start(k) = s% mlt_Gamma(k)
          end do
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             call set_etrb_start_vars(s,ierr)
-            !do k=1,s% nz ! DEBUGGING INFO
-            !   s% xtra1_array(k) = s% rho(k)
-            !   s% xtra2_array(k) = s% T(k)
-            !   s% xtra3_array(k) = abs(s% w(k)) + 1d0
-            !   s% xtra4_array(k) = abs(s% v(k)) + 1d0
-            !   s% xtra5_array(k) = s% r(k)
-            !end do
          end if
 
          do k=1,s% nz

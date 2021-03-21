@@ -2131,8 +2131,8 @@
                val = s% kh_timescale
             case(h_nuc_timescale)
                val = s% nuc_timescale
-            case(h_conv_timescale)
-               val = s% max_conv_time_scale
+            case(h_tau_conv_yrs)
+               val = s% max_conv_time_scale/secyer
             case(h_eps_grav_integral)
                val = dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun
             case(h_extra_L)
@@ -3005,6 +3005,14 @@
 
             case(h_retries)
                int_val = s% num_retries
+               is_int_val = .true.
+
+            case(h_using_TDC)
+               if (s% using_TDC) then
+                  int_val = 1
+               else
+                  int_val = 0
+               end if
                is_int_val = .true.
                
             case default

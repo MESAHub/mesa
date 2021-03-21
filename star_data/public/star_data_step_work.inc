@@ -1117,7 +1117,7 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_just_set_velocities, &
+            RSP_just_set_velocities, previous_step_was_using_TDC, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
          

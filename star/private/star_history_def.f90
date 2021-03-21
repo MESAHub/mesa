@@ -345,8 +345,8 @@
       integer, parameter :: h_dynamic_timescale = h_tau100_L + 1
       integer, parameter :: h_kh_timescale = h_dynamic_timescale + 1
       integer, parameter :: h_nuc_timescale = h_kh_timescale + 1
-      integer, parameter :: h_conv_timescale = h_nuc_timescale + 1
-      integer, parameter :: h_log_abs_Lgrav = h_conv_timescale + 1
+      integer, parameter :: h_tau_conv_yrs = h_nuc_timescale + 1
+      integer, parameter :: h_log_abs_Lgrav = h_tau_conv_yrs + 1
       integer, parameter :: h_eps_grav_integral = h_log_abs_Lgrav + 1
       integer, parameter :: h_log_extra_L = h_eps_grav_integral + 1
       integer, parameter :: h_extra_L = h_log_extra_L + 1
@@ -752,7 +752,8 @@
       integer, parameter :: h_zones = h_v_div_cs + 1
       integer, parameter :: h_lg_Dsurf = h_zones + 1
       integer, parameter :: h_C_cntr = h_lg_Dsurf + 1
-      integer, parameter :: h_retries = h_C_cntr + 1
+      integer, parameter :: h_using_TDC = h_C_cntr + 1
+      integer, parameter :: h_retries = h_using_TDC + 1
 
       integer, parameter :: h_col_id_max = h_retries
 
@@ -1156,7 +1157,7 @@
          history_column_name(h_dlnR_dlnM) = 'dlnR_dlnM'
          history_column_name(h_kh_timescale) = 'kh_timescale'
          history_column_name(h_nuc_timescale) = 'nuc_timescale'
-         history_column_name(h_conv_timescale) = 'conv_timescale'
+         history_column_name(h_tau_conv_yrs) = 'tau_conv_yrs'
          history_column_name(h_log_abs_Lgrav) = 'log_abs_Lgrav'
          history_column_name(h_eps_grav_integral) = 'eps_grav_integral'
          history_column_name(h_extra_L) = 'extra_L'
@@ -1515,6 +1516,7 @@
          history_column_name(h_lg_Dsurf) = 'lg_Dsurf'
          history_column_name(h_C_cntr) = 'C_cntr'
          history_column_name(h_retries) = 'retries'
+         history_column_name(h_using_TDC) = 'using_TDC'
 
          cnt = 0
          do i=1,h_col_id_max

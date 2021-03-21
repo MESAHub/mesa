@@ -333,13 +333,6 @@
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
          
-         s% max_conv_time_scale = 0d0
-         do k=1,s%nz
-            tau_conv = conv_time_scale(s,k)
-            if (tau_conv > s% max_conv_time_scale) &
-               s% max_conv_time_scale = tau_conv
-         end do
-         
          if (is_bad(s% kh_timescale)) then
             write(*,1) 's% kh_timescale', s% kh_timescale
             write(*,1) 's% cgrav(1)', s% cgrav(1)

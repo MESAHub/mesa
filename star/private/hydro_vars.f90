@@ -343,7 +343,7 @@
                end if
             end do
 
-            if (i_lum == 0 .and. .not. (s% RSP_flag .or. s% TDC_flag)) s% L(1:nz) = 0d0
+            if (i_lum == 0 .and. .not. s% RSP_flag) s% L(1:nz) = 0d0
 
             if (i_v == 0) s% v(1:nz) = 0d0
 
@@ -496,9 +496,9 @@
          use mlt_info, only: set_mlt_vars, check_for_redo_MLT, set_grads
          use star_utils, only: start_time, update_time, &
             set_m_grav_and_grav, set_scale_height, get_tau, &
-            set_abs_du_div_cs
+            set_abs_du_div_cs, set_max_conv_time_scale
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: reset_etrb_using_L, set_TDC_vars
+         use hydro_tdc, only: reset_etrb_using_L, set_TDC_vars, set_using_TDC
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 
@@ -566,22 +566,19 @@
             if (failed('set_grads')) return
          end if
 
-         if (.not. skip_mixing_info) then
-         
-            if (.not. s% TDC_flag) then
+         if (.not. skip_mixing_info) then         
+            if (.not. s% using_TDC) then
                if (dbg) write(*,*) 'call other_adjust_mlt_gradT_fraction'
                call s% other_adjust_mlt_gradT_fraction(s% id,ierr)
                if (failed('other_adjust_mlt_gradT_fraction')) return
-            end if
-         
+            end if         
             if (s% u_flag) then
                if (dbg) write(*,*) 'call set_abs_du_div_cs'
                call set_abs_du_div_cs(s)
             end if
-
          end if
          
-         if (.not. skip_mlt .and. .not. s% RSP_flag) then !  .and. .not. s% TDC_flag) then            ! TESTING MLT vs. TDC
+         if (.not. skip_mlt .and. .not. s% RSP_flag) then
          
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) &
@@ -624,22 +621,20 @@
             if (failed('check_for_redo_MLT')) return
             
          end if
-         
-         if (s% need_to_reset_w) then
-            call reset_etrb_using_L(s,ierr)
-            if (failed('reset_etrb_using_L')) return
-            s% need_to_reset_w = .false.
-         end if
 
-         if (.not. skip_brunt) then
+         if (.not. skip_brunt) then ! skip_brunt during solver iterations
             if (dbg) write(*,*) 'call do_brunt_N2'
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
+            call set_max_conv_time_scale(s) ! max(1/sqrt(abs(N2)))
+            call set_using_TDC(s)
+            s% need_to_reset_w = s% using_TDC .and. .not. s% previous_step_was_using_TDC
          end if
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             call set_TDC_vars(s,ierr)
             if (failed('set_TDC_vars')) return
+            s% previous_step_was_using_TDC = .true.
          end if
 
          if (.not. skip_mixing_info) then

@@ -10,7 +10,8 @@
       log_dt_sec ! log10 time_step in seconds
       !num_zones ! number of zones in the model
       
-      conv_timescale
+      tau_conv_yrs
+      using_TDC
    
    ! conditions near surface
       radius

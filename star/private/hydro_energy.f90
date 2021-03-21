@@ -275,7 +275,7 @@
                others_ad%val = others_ad%val + s% eps_pre_mix(k)
             
             Eq_ad = 0d0
-            if (s% TDC_flag) then             
+            if (s% using_TDC) then             
                Eq_ad = compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if   
@@ -336,7 +336,7 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            if (s% TDC_flag) then
+            if (s% using_TDC) then
                d_turbulent_energy_dt_ad = (wrap_etrb_00(s,k) - get_etrb_start(s,k))/dt
             else
                d_turbulent_energy_dt_ad = 0d0
@@ -376,7 +376,7 @@
             end if
 
             if (eps_grav_form) then
-               if (s% TDC_flag) then
+               if (s% using_TDC) then
                   stop 'cannot use eps_grav with et yet.  fix energy eqn.'
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
@@ -700,7 +700,7 @@
             end if
          
             ! set Ptrb_ad
-            if (.not. s% TDC_flag) then
+            if (.not. s% using_TDC) then
                Ptrb_ad = 0d0
             else
                if (k > 1) then 

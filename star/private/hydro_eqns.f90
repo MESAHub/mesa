@@ -258,7 +258,7 @@
                end if
             end if
             if (do_equL) then
-               if (s% TDC_flag .and. (k > 1 .or. s% TDC_use_L_eqn_at_surface)) then
+               if (s% using_TDC .and. (k > 1 .or. s% TDC_use_L_eqn_at_surface)) then
                   call do1_tdc_L_eqn(s, k, skip_partials, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_tdc_L_eqn', k
@@ -718,7 +718,7 @@
 
          need_T_surf = .false.
          if ((.not. do_equL) .or. &
-               (s% TDC_flag .and. s% TDC_use_L_eqn_at_surface)) then 
+               (s% using_TDC .and. s% TDC_use_L_eqn_at_surface)) then 
             ! no Tsurf BC
          else
             need_T_surf = .true.
@@ -728,7 +728,7 @@
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
          
          offset_T_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% TDC_flag) &
+         if (s% use_other_surface_PT .or. s% using_TDC) &
             offset_T_to_cell_center = .false.
 
          call get_PT_bc_ad(ierr) ! has important side-effect of setting Teff for current model
@@ -949,7 +949,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0  
-            if (s% TDC_flag) then ! interpolate lnT by mass
+            if (s% using_TDC) then ! interpolate lnT by mass
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
                dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))

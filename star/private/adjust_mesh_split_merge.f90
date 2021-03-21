@@ -580,7 +580,7 @@
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             cell_etrb = Etrb_i + Etrb_ip
             s% w(i) = sqrt(cell_etrb/dm)
          end if
@@ -613,7 +613,7 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% TDC_flag) s% w(im) = s% w(i0)
+            if (s% using_TDC) s% w(im) = s% w(i0)
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
@@ -641,7 +641,7 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% TDC_flag) s% xh(s% i_w,i) = s% w(i)
+         if (s% using_TDC) s% xh(s% i_w,i) = s% w(i)
          
          if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
 
@@ -720,7 +720,7 @@
             KE = 0.25d0*dm*(v0**2 + v1**2)
          end if
          IE = s% energy(k)*dm
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             Etrb = pow2(s% w(k))*dm
          else
             Etrb = 0d0
@@ -871,7 +871,7 @@
          v2 = v*v
          
          energy = s% energy(i)
-         if (s% TDC_flag) etrb = get_etrb(s,i)
+         if (s% using_TDC) etrb = get_etrb(s,i)
             
          ! estimate values of energy and velocity^2 at cell boundaries
 
@@ -928,7 +928,7 @@
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             etrb_R = get_etrb(s,iR)
             etrb_C = get_etrb(s,iC)
             etrb_L = get_etrb(s,iL)
@@ -1094,7 +1094,7 @@
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             etrb_R = etrb + grad_etrb*dr/4
             etrb_L = (dm*etrb - dmR*etrb_R)/dmL
             if (etrb_R < 0d0 .or. etrb_L < 0d0) then

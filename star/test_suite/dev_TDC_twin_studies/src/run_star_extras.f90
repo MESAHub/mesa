@@ -229,7 +229,7 @@
          if (ierr /= 0) return
          names(1) = 'v_kms_1'
          names(2) = 'spr_ad_1'
-         names(3) = 'lgcv2_1'
+         names(3) = 'lg_w_1'
          names(4) = 'L_1'
          names(5) = 'logT_1'
          names(6) = 'logRho_1'
@@ -253,7 +253,7 @@
          names(22) = 'conv_dt'
          names(23) = 'qhse_dt'
          names(24) = 'nuc_dt'
-         names(25) = 'cool_dt'
+         names(25) = 'lg_gamma'
 
          if (s_other% nz /= nz) then
             vals(1:nz,:) = 0d0
@@ -271,9 +271,9 @@
                      s_other% gradT(k) - s_other% grada_face(k)
                end if
                if (s_other% TDC_flag) then
-                  vals(k,3) = pow2(s_other% w(k))
-               else
-                  vals(k,3) = safe_log10(pow2(s_other% conv_vel(k)))
+                  vals(k,3) = safe_log10(s_other% w(k))
+               else ! vc_mlt = sqrt(2/3)*w
+                  vals(k,3) = safe_log10(s_other% conv_vel(k)/sqrt_2_div_3)
                end if
                vals(k,4) = s_other%L(k)/Lsun
                vals(k,5) = s_other% lnT(k)/ln10
@@ -352,7 +352,7 @@
                vals(k,22) = safe_log10(star_conv_time_scale(s,k) / s% dt)
                vals(k,23) = safe_log10(star_QHSE_time_scale(s,k) / s% dt)
                vals(k,24) = safe_log10(star_eps_nuc_time_scale(s,k) / s% dt)
-               vals(k,25) = safe_log10(star_cooling_time_scale(s,k) / s% dt)
+               vals(k,25) = safe_log10(s% mlt_gamma(k))
                
             end do
          end if

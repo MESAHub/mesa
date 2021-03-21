@@ -37,16 +37,64 @@
 
       private
       public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
-         compute_Uq_face, set_TDC_vars, set_etrb_start_vars, reset_etrb_using_L
+         compute_Uq_face, set_TDC_vars, &
+         set_using_TDC, set_etrb_start_vars, reset_etrb_using_L
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
-         x_ALFAS = (1.d0/2.d0)*sqrt(2.d0/3.d0), & ! PII_face and Lc
-         x_ALFAC = (1.d0/2.d0)*sqrt(2.d0/3.d0), & ! Lc
-         x_CEDE  = (8.d0/3.d0)*sqrt(2.d0/3.d0), & ! DAMP
+         x_ALFAS = (1.d0/2.d0)*sqrt_2_div_3, & ! PII_face and Lc
+         x_ALFAC = (1.d0/2.d0)*sqrt_2_div_3, & ! Lc
+         x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3, & ! DAMP
          x_GAMMAR = 2.d0*sqrt(3.d0) ! DAMPR
 
       contains
+      
+      
+      subroutine set_using_TDC(s)
+         type (star_info), pointer :: s      
+         real(dp) :: alfa, beta
+         call get_TDC_frac(s, alfa, beta)
+         s% using_TDC = (alfa > 0d0)
+      end subroutine set_using_TDC
+      
+      
+      subroutine get_TDC_frac(s, alfa, beta)
+         type (star_info), pointer :: s
+         real(dp), intent(out) :: alfa, beta
+         real(dp) :: dt, switch
+         include 'formats'
+         if (.not. s% TDC_flag) then
+            alfa = 0d0; beta = 1d0
+            return
+         end if
+         dt = s% dt
+         if (s% TDC_min_dt_div_tau_conv_switch_to_MLT > 0) then
+            switch = s% max_conv_time_scale*s% TDC_min_dt_div_tau_conv_switch_to_MLT
+         else if (s% TDC_min_dt_years_switch_to_MLT > 0) then
+            switch = s% TDC_min_dt_years_switch_to_MLT*secyer
+         else
+            switch = 0d0
+         end if
+         
+         if (.false.) then ! blending
+            !if (dt >= s% TDC_dt_seconds_etrb_all_MLT) then
+            !   alfa = 0d0 ! all MLT, no TDC
+            !else if (dt <= s% TDC_dt_seconds_etrb_no_MLT) then
+            !   alfa = 1d0 ! no MLT, all TDC
+            !else ! blend 0 < alfa < 1 = fraction TDC, beta = 1 - alfa = fraction MLT
+            !   alfa = (s% TDC_dt_seconds_etrb_all_MLT - dt)/ &
+            !       (s% TDC_dt_seconds_etrb_all_MLT - s% TDC_dt_seconds_etrb_no_MLT)
+            !end if
+         else
+            if (dt >= switch) then
+               alfa = 0d0 ! all MLT, no TDC
+            else
+               alfa = 1d0 ! no MLT, all TDC
+            end if
+         end if
+         
+         beta = 1d0 - alfa
+      end subroutine get_TDC_frac
       
       
       subroutine set_TDC_vars(s,ierr)
@@ -54,6 +102,17 @@
          integer, intent(out) :: ierr    
          type(auto_diff_real_star_order1) :: x
          integer :: k
+         include 'formats'
+         ierr = 0
+         if (s% need_to_reset_w) then
+            write(*,2) 'reset_etrb_using_L', s% model_number
+            call reset_etrb_using_L(s,ierr)
+            if (ierr /= 0) then
+               stop 'failed in reset_etrb_using_L'
+               return
+            end if
+            s% need_to_reset_w = .false.
+         end if
          do k=1,s%nz
             x = compute_Hp_face(s, k, ierr) ! sets Hp_face
             if (ierr /= 0) return
@@ -73,13 +132,19 @@
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
-         type(auto_diff_real_star_order1) :: L_expected, L_actual, resid
+         type(auto_diff_real_star_order1) ::  &
+            L_expected, L_actual,resid
          real(dp) :: scale, residual, L_start_max
          logical :: test_partials
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
+         
+         if (.not. s% using_TDC) then
+            ierr = -1
+            return
+         end if
 
          ierr = 0
          L_expected = compute_L_face(s, k, ierr)
@@ -92,6 +157,7 @@
             stop 'do1_tdc_L_eqn'
          end if
          resid = (L_expected - L_actual)*scale         
+      
          residual = resid%val
          s% equ(s% i_equL, k) = residual         
          if (test_partials) then
@@ -103,10 +169,9 @@
          if (ierr /= 0) return
 
          if (test_partials) then
-            s% solver_test_partials_var = s% i_w
-            s% solver_test_partials_dval_dx = resid%d1Array(i_w_00)
-            write(*,4) 'do1_tdc_L_eqn', s% solver_test_partials_var, k, s% nz, &
-               L_actual%val, L_expected%val, 1d0/scale, s% T(k-1), s% T(k)
+            s% solver_test_partials_var = s% i_lnR
+            s% solver_test_partials_dval_dx = resid%d1Array(i_lnR_00)
+            write(*,4) 'do1_tdc_L_eqn', s% solver_test_partials_var
          end if      
       end subroutine do1_tdc_L_eqn
 
@@ -292,6 +357,7 @@
 
             do l=1,27
                if (is_bad(Af%d1Array(l))) then
+                  !$omp critical (eval_Af_crit)
                   write(*,*) 'Bad partial in Af in Hyperbolic branch.'
                   write(*,*) 'Partial      ',l
                   write(*,*) 'Af           ',Af%val
@@ -306,6 +372,8 @@
                   write(*,*) 'num Partial  ',num%d1Array(l)
                   write(*,*) 'den          ',den%val
                   write(*,*) 'den Partial  ',den%d1Array(l)
+                  stop 'eval_Af_from_A0'
+                  !$omp end critical (eval_Af_crit)
                   end if
             end do
 
@@ -337,7 +405,8 @@
             end if
 
             do l=1,27
-               if (is_bad(Af%d1Array(i))) then
+               if (is_bad(Af%d1Array(l))) then
+                  !$omp critical (eval_Af_crit)
                   write(*,*) 'Bad partial in Af in Trigonometric branch.'
                   write(*,*) 'Partial      ',l
                   write(*,*) 'Af           ',Af%val
@@ -354,6 +423,8 @@
                   write(*,*) 'num Partial  ',num%d1Array(l)
                   write(*,*) 'den          ',den%val
                   write(*,*) 'den Partial  ',den%d1Array(l)
+                  stop 'eval_Af_from_A0'
+                  !$omp end critical (eval_Af_crit)
                   end if
             end do
 
@@ -369,13 +440,14 @@
          integer, intent(in) :: k, nvar
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
-         real(dp) :: scal, residual
          integer :: j
          type(auto_diff_real_star_order1) :: xi0, xi1, xi2, A0, Af, w_00, LHS, RHS
          type(auto_diff_real_star_order1) :: tst, resid_ad, &
-            d_turbulent_energy_ad, Ptrb_dV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad
+            d_turbulent_energy_ad, Ptrb_dV_ad, dt_dLt_dm_ad, dt_C_ad, dt_Eq_ad, &
+            etrb_mlt_cell, esum_mlt, esum_tdc
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, test_partials
+         real(dp) :: scal, residual, alfa, beta
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -388,19 +460,45 @@
             k <= s% TDC_num_outermost_cells_forced_nonturbulent .or. &
             k > s% nz - s% TDC_num_innermost_cells_forced_nonturbulent
          
-         if (non_turbulent_cell) then
+         if (.not. s% using_TDC) then
              
-            resid_ad = wrap_etrb_00(s,k) ! make etrb = 0
+            resid_ad = wrap_w_00(s,k) - s% w_start(k)
+
+         else if (non_turbulent_cell) then
+
+            resid_ad = wrap_w_00(s,k)/(1d2*s% csound_start(k)) ! make w = 0
             
          else
          
-            call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
-            call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
-            call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
-            call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
-            call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
-            call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
+            call get_TDC_frac(s, alfa, beta) ! alfa is frac TDC, beta is frac MLT
 
+            ! always compute etrb_mlt_cell.  for debugging
+            !if (beta > 0d0) then
+               etrb_mlt_cell = compute_etrb_mlt_cell(s, k, ierr); if (ierr /= 0) return ! erg g^-1
+               esum_mlt = etrb_mlt_cell - wrap_etrb_00(s,k)
+            !else
+            !   etrb_mlt_cell = 0d0
+            !   esum_mlt = 0d0
+            !end if
+            
+         ! OLD WAY
+            !if (alfa > 0d0) then
+               call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
+               call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
+               call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
+               call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
+               call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
+               call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)         
+               ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
+               esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
+               esum_tdc = esum_ad ! convert back to auto_diff_real_star_order1
+            !else
+            !   esum_tdc = 0d0
+            !end if
+            resid_ad = alfa*esum_tdc + beta*esum_mlt
+            resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
+
+         ! NEW WAY
             call eval_xis(s, k, xi0, xi1, xi2)
 
             A0 = sqrt(max(0d0, get_etrb_start(s,k)))
@@ -416,16 +514,21 @@
             ! -2*w*Lambda = -dt_dLt_dm_ad
 
             w_00 = wrap_w_00(s,k)
-            esum_ad = (w_00 - Af) * (1d0 - s%dt * (xi1 + (w_00 + Af) * xi2)) + dt_dLt_dm_ad / (2d0 * (1d3 + w_00))
+            if (.false. .and. s% TDC_alfat == 0d0) then
+               esum_ad = w_00 - Af
+            else
+               esum_ad = (w_00 - Af) * (1d0 - s%dt * (xi1 + (w_00 + Af) * xi2)) + dt_dLt_dm_ad / (2d0 * (1d3 + w_00))
+            end if
             resid_ad = esum_ad
-         !   esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
 
-         if (k > 30 .and. k < -60) then
-            write(*,*) k,resid_ad%val, w_00%val, Af%val, xi0%val, xi1%val, xi2%val, sqrt(abs(xi0%val/xi2%val)), dt_dLt_dm_ad%val, A0%val
-         end if
+            if (k > 30 .and. k < -60) then
+               write(*,*) k,resid_ad%val, w_00%val, Af%val, xi0%val, xi1%val, xi2%val, sqrt(abs(xi0%val/xi2%val)), dt_dLt_dm_ad%val, A0%val
+            end if
 
-            scal = 1d0/s%csound_start(k)
+            !scal = 1d0/s%csound_start(k)
+            !scal = 1d0/(1d3 + s%csound_start(k) + maxval(s% w_start(1:s%nz)))
             !scal = sqrt(scal/s%dt) 
+            scal = 1d0/(1d4 + s% dt)
                ! scal/dt -> 1/(erg g^-1 s^-1)*s^-1 = 1/(erg g^-1) = 1/(g cm^2 sec^-2 g^-1) = sec^2 cm^-2
                ! sqrt(scal/dt) => sec/cm = 1 / (cm/sec).   resid units are cm/sec.
             resid_ad = resid_ad*scal
@@ -456,7 +559,7 @@
          s% equ(s% i_detrb_dt, k) = residual
 
          if (test_partials) then
-            tst = xi0
+            tst = residual
             s% solver_test_partials_val = tst%val
             if (s% solver_iter == 12) &
                write(*,*) 'do1_turbulent_energy_eqn', s% solver_test_partials_var, s% lnd(k), tst%val
@@ -532,6 +635,30 @@
          end subroutine setup_dt_Eq_ad
       
       end subroutine do1_turbulent_energy_eqn
+
+
+      function compute_etrb_mlt_cell(s, k, ierr) result(etrb_mlt) ! erg g^-1
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: etrb_mlt
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: mlt_vc_00, mlt_vc_p1, vc_cell_mlt
+         include 'formats'
+         ierr = 0
+         if (k > 1) then
+            mlt_vc_00 = s% mlt_vc_ad(k)
+         else
+            mlt_vc_00 = 0d0
+         end if
+         if (k < s% nz) then
+            mlt_vc_p1 = shift_p1(s% mlt_vc_ad(k+1))
+         else
+            mlt_vc_p1 = 0d0
+         end if
+         vc_cell_mlt = 0.5d0*(mlt_vc_00 + mlt_vc_p1)
+         ! vc_mlt = sqrt(2/3)*w   
+         etrb_mlt = 1.5d0*pow2(vc_cell_mlt)
+      end function compute_etrb_mlt_cell
       
       
       function compute_Hp_cell(s, k, ierr) result(Hp_cell) ! cm
@@ -722,10 +849,13 @@
             dlnT_dlnP = dlnT/dlnP
             if (is_bad(dlnT_dlnP%val)) then
                alt_Y_face = 0d0
+            else if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
+               ! gradL = grada + gradL_composition_term
+               alt_Y_face = dlnT_dlnP - (grad_ad_face + s% gradL_composition_term(k))
             else
                alt_Y_face = dlnT_dlnP - grad_ad_face
-               if (is_bad(alt_Y_face%val)) alt_Y_face = 0
             end if
+            if (is_bad(alt_Y_face%val)) alt_Y_face = 0
             Y_face = alt_Y_face
             
          end if
@@ -1287,11 +1417,20 @@
          type(auto_diff_real_star_order1) :: &
             Lc_w_face_factor, L, Lr, Lc, Lt, Y_face
          real(dp), allocatable :: w_face(:), target_Lc(:)
+         real(dp) :: alfa, beta
          real(dp), parameter :: atol = 1-6d0, rtol = 1d-9
          logical, parameter :: dbg = .false.
          include 'formats'
          ierr = 0
          if (s% TDC_alfa == 0d0) return ! no convection
+         
+         ! s% dt hasn't been set, so don't check it against TDC limits
+         !call get_TDC_frac(s, alfa, beta)
+         !s% using_TDC = (alfa > 0d0)
+         !write(*,*) 'get_TDC_frac alfa TDC_flag', alfa, s% TDC_flag
+         !stop 'reset_etrb_using_L'
+         !if (.not. s% using_TDC) return
+         
          nz = s% nz
          if (s% have_previous_conv_vel) then
             write(*,*) 'initial w_face set using conv_vel from file or from MLT'
@@ -1327,6 +1466,8 @@
                stop 'reset_etrb_using_L'
                w_face(k) = 0d0
             end if
+            ! CAUTION: using conv_vel is dangerous.
+            !  better if can stick to L.  but problems with that too.
             if ((w_face(k) == 0d0 .and. s% conv_vel(k) > 0d0) .or. &
                 (w_face(k) > 0d0 .and. s% conv_vel(k) == 0d0)) &
                w_face(k) = s% conv_vel(k)

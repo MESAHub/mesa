@@ -16,7 +16,7 @@ pgstar_show_age = .false.
 !------------------------------------------------------------------------------------
 
 Grid1_win_flag = .true.
-Grid1_win_width = 12
+Grid1_win_width = 10
 Grid1_win_aspect_ratio = 0.666
 
 ! file output
@@ -344,6 +344,11 @@ Text_Summary1_name(6,5) = 'retries'
  History_Panels2_xaxis_reversed = .false.
  History_Panels2_xaxis_log = .false.
  History_Panels2_xmargin = 0.0
+ 
+ History_Panels2_xaxis_name = 'model_number'
+ !History_Panels2_xaxis_name = 'star_age'
+ History_Panels2_xmin = -101d0
+ History_Panels2_xmax = -101d0
 
  History_Panels2_num_panels = 3
 

@@ -405,6 +405,7 @@
     TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
     TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
     TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
+    TDC_min_dt_div_tau_conv_switch_to_MLT, TDC_min_dt_years_switch_to_MLT, max_q_for_conv_timescale, min_q_for_conv_timescale, &
     
     
     ! timestep
@@ -2071,6 +2072,8 @@
  s% TDC_source_seed = TDC_source_seed
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
+ s% TDC_min_dt_div_tau_conv_switch_to_MLT = TDC_min_dt_div_tau_conv_switch_to_MLT
+ s% TDC_min_dt_years_switch_to_MLT = TDC_min_dt_years_switch_to_MLT
  s% TDC_target_steps_per_cycle = TDC_target_steps_per_cycle
  s% TDC_max_num_periods = TDC_max_num_periods
  s% TDC_work_period = TDC_work_period
@@ -2085,6 +2088,9 @@
  s% TDC_map_filename = TDC_map_filename
  s% TDC_map_history_filename = TDC_map_history_filename
  s% TDC_write_map = TDC_write_map
+ 
+ s% max_q_for_conv_timescale = max_q_for_conv_timescale
+ s% min_q_for_conv_timescale = min_q_for_conv_timescale
 
  ! timestep
  s% max_timestep = max_timestep
@@ -3723,6 +3729,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_source_seed = s% TDC_source_seed
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
+ TDC_min_dt_div_tau_conv_switch_to_MLT = s% TDC_min_dt_div_tau_conv_switch_to_MLT
+ TDC_min_dt_years_switch_to_MLT = s% TDC_min_dt_years_switch_to_MLT
  TDC_target_steps_per_cycle = s% TDC_target_steps_per_cycle
  TDC_max_num_periods = s% TDC_max_num_periods
  TDC_work_period = s% TDC_work_period
@@ -3737,6 +3745,9 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_map_filename = s% TDC_map_filename
  TDC_map_history_filename = s% TDC_map_history_filename
  TDC_write_map = s% TDC_write_map
+ 
+ max_q_for_conv_timescale = s% max_q_for_conv_timescale
+ min_q_for_conv_timescale = s% min_q_for_conv_timescale
 
  ! timestep
  max_timestep = s% max_timestep

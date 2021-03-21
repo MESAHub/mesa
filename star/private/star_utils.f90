@@ -2176,7 +2176,7 @@
             get_Lconv = 0d0
             return
          end if
-         if (s% TDC_flag .or. s% RSP_flag) then
+         if (s% using_TDC .or. s% RSP_flag) then
             get_Lconv = s% Lc(k)
          else
             get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt
@@ -2475,7 +2475,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% TDC_flag) cell_total = cell_total + pow2(s% w(k))
+         if (s% using_TDC) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2558,7 +2558,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% TDC_flag) then
+            if (s% using_TDC) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
@@ -2607,7 +2607,7 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% TDC_flag) then
+            if (s% using_TDC) then
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
             end if
@@ -3533,7 +3533,7 @@
          end if
          
          Ptrb_ad = 0d0
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             call calc_Ptrb_ad_tw(s, k, Ptrb_ad, ierr) 
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
@@ -3813,9 +3813,11 @@
       end subroutine set_energy_eqn_scal
       
       
-      real(dp) function conv_time_scale(s,k) result(tau_conv)
+      real(dp) function conv_time_scale(s,k_in) result(tau_conv)
          type (star_info), pointer :: s
-         integer, intent(in) :: k
+         integer, intent(in) :: k_in
+         integer :: k
+         k = max(2,k_in)
          if (s% calculate_Brunt_N2 .and. s% brunt_N2(k) /= 0d0) then
             tau_conv = 1d0/sqrt(abs(s% brunt_N2(k)))
          else if (s% conv_vel(k) > 0d0) then
@@ -3824,6 +3826,21 @@
             tau_conv = 0d0
          end if
       end function conv_time_scale
+      
+      
+      subroutine set_max_conv_time_scale(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: tau_conv
+         s% max_conv_time_scale = 0d0
+         do k=1,s%nz
+            if (s% q(k) > s% max_q_for_conv_timescale) cycle
+            if (s% q(k) < s% min_q_for_conv_timescale) exit
+            tau_conv = conv_time_scale(s,k)
+            if (tau_conv > s% max_conv_time_scale) &
+               s% max_conv_time_scale = tau_conv
+         end do
+      end subroutine set_max_conv_time_scale
       
       
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)

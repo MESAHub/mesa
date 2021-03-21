@@ -199,7 +199,12 @@
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
                call write1(s% L(k),ierr); if (ierr /= 0) exit
             else if (TDC_flag) then
-               call write1(s% w(k),ierr); if (ierr /= 0) exit
+               if (s% using_TDC) then
+                  call write1(s% w(k),ierr)
+               else ! cv = sqrt_2_div_3*w
+                  call write1(s% conv_vel(k)/sqrt_2_div_3,ierr)
+               end if
+               if (ierr /= 0) exit
             end if            
             if (.not. no_L) then
                call write1(s% L(k),ierr); if (ierr /= 0) exit

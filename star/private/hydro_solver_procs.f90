@@ -630,7 +630,7 @@
          min_alpha = 1d0
          nz = s% nz
 
-         if (s% TDC_flag) & ! clip change in w to maintain non-negativity.
+         if (s% using_TDC) & ! clip change in w to maintain non-negativity.
             call clip_so_non_negative(s% i_w, 0d0)
 
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
