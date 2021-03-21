@@ -10,7 +10,6 @@
       ! TDC parameters
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          
-      !   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
       !   TDC_alfad =     1.0d0         ! turbulent dissipation; damp ~ TDC_alfad    
       !   TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
       !   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
@@ -28,7 +27,6 @@
 
       ! ::
 
-    TDC_alfa  = 1.5d0
     TDC_alfad = 1.3d0  ! 1.0d0 is RSP standard.  1.3 does better matching mesa MLT.
     TDC_alfap = 0.0d0
     TDC_alfat = 0.0d0
@@ -46,16 +44,11 @@
     TDC_use_mass_interp_face_values = .false.
     TDC_use_Stellingwerf_Lr = .true.
     
-    TDC_w_min_for_damping = 1d2
-    TDC_source_seed = 0d0
     TDC_num_outermost_cells_forced_nonturbulent = 0
     TDC_num_innermost_cells_forced_nonturbulent = 0
     
     TDC_min_dt_div_tau_conv_switch_to_MLT = -1
     TDC_min_dt_years_switch_to_MLT = 20d0
-    
-    max_q_for_conv_timescale = 1d0
-    min_q_for_conv_timescale = 0d0
 
       ! period controls
 

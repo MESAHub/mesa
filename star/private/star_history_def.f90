@@ -345,7 +345,8 @@
       integer, parameter :: h_dynamic_timescale = h_tau100_L + 1
       integer, parameter :: h_kh_timescale = h_dynamic_timescale + 1
       integer, parameter :: h_nuc_timescale = h_kh_timescale + 1
-      integer, parameter :: h_tau_conv_yrs = h_nuc_timescale + 1
+      integer, parameter :: h_tau_QHSE_yrs = h_nuc_timescale + 1
+      integer, parameter :: h_tau_conv_yrs = h_tau_QHSE_yrs + 1
       integer, parameter :: h_log_abs_Lgrav = h_tau_conv_yrs + 1
       integer, parameter :: h_eps_grav_integral = h_log_abs_Lgrav + 1
       integer, parameter :: h_log_extra_L = h_eps_grav_integral + 1
@@ -1158,6 +1159,7 @@
          history_column_name(h_kh_timescale) = 'kh_timescale'
          history_column_name(h_nuc_timescale) = 'nuc_timescale'
          history_column_name(h_tau_conv_yrs) = 'tau_conv_yrs'
+         history_column_name(h_tau_QHSE_yrs) = 'tau_QHSE_yrs'
          history_column_name(h_log_abs_Lgrav) = 'log_abs_Lgrav'
          history_column_name(h_eps_grav_integral) = 'eps_grav_integral'
          history_column_name(h_extra_L) = 'extra_L'

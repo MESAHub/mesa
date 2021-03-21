@@ -1,5 +1,4 @@
          real(dp) :: TDC_Lsurf_factor
-         real(dp) :: TDC_alfa
          real(dp) :: TDC_alfap
          real(dp) :: TDC_alfat
          real(dp) :: TDC_alfam
@@ -12,13 +11,10 @@
          real(dp) :: TDC_min_dt_div_tau_conv_switch_to_MLT
          real(dp) :: TDC_min_dt_years_switch_to_MLT
          
-         real(dp) :: max_q_for_conv_timescale, min_q_for_conv_timescale
-         
          logical :: TDC_use_L_eqn_at_surface, TDC_assume_HSE
          logical :: TDC_use_RSP_eqn_for_Y_face, include_w_in_correction_limits
          logical :: TDC_use_mass_interp_face_values
          logical :: TDC_use_Stellingwerf_Lr
-         real(dp) :: TDC_w_min_for_damping, TDC_source_seed
          integer :: TDC_num_outermost_cells_forced_nonturbulent, &
             TDC_num_innermost_cells_forced_nonturbulent
 

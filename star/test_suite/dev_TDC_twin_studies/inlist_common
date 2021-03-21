@@ -20,8 +20,8 @@
 / ! end of kap namelist
 
 &controls
-   TDC_min_dt_div_tau_conv_switch_to_MLT = -1 ! 1d-9 ! 100 ! takes priority if > 0
-   TDC_min_dt_years_switch_to_MLT = 1 ! 20d0
+   TDC_min_dt_div_tau_conv_switch_to_MLT = 10d0 ! takes priority if > 0
+   TDC_min_dt_years_switch_to_MLT = 20d0
 
 ! mesh
    okay_to_remesh = .false.

@@ -3447,12 +3447,14 @@
       end subroutine get1_lpp
 
  
-      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
+      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, Ptrb_div_etrb, ierr) 
+         ! note: Ptrb_div_etrb is not time weighted
+         ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: Ptrb
+         type(auto_diff_real_star_order1), intent(out) :: Ptrb, Ptrb_div_etrb
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Ptrb_start
@@ -3460,13 +3462,15 @@
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% TDC_alfap == 0 .or. s% TDC_alfa == 0) then
+         if (s% TDC_alfap == 0 .or. s% mixing_length_alpha  == 0) then
+            Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb = s% TDC_alfap*x_ALFAP*etrb*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
+         Ptrb_div_etrb = s% TDC_alfap*x_ALFAP*etrb*rho
+         Ptrb = Ptrb_div_etrb*etrb ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
@@ -3505,7 +3509,7 @@
          integer :: j
          real(dp) :: mlt_Pturb_start
          type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
-            Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad
+            Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
          logical :: time_center
          include 'formats'
          
@@ -3534,7 +3538,7 @@
          
          Ptrb_ad = 0d0
          if (s% using_TDC) then
-            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, ierr) 
+            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr) 
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
          end if
@@ -3856,6 +3860,21 @@
          end if
          tau_qhse = abs_dv/(s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)))
       end function QHSE_time_scale
+      
+      
+      subroutine set_max_QHSE_time_scale(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: tau_QHSE
+         s% max_QHSE_time_scale = 0d0
+         do k=1,s%nz
+            if (s% q(k) > s% max_q_for_QHSE_timescale) cycle
+            if (s% q(k) < s% min_q_for_QHSE_timescale) exit
+            tau_QHSE = QHSE_time_scale(s,k)
+            if (tau_QHSE > s% max_QHSE_time_scale) &
+               s% max_QHSE_time_scale = tau_QHSE
+         end do
+      end subroutine set_max_QHSE_time_scale
       
       
       real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)

@@ -8226,6 +8226,24 @@
     include_w_in_correction_limits = .true.
 
 
+
+      ! max_q_for_conv_timescale
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! min_q_for_conv_timescale
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! max_q_for_QHSE_timescale
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! min_q_for_QHSE_timescale
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+    
+    max_q_for_conv_timescale = 1d0
+    min_q_for_conv_timescale = 0d0
+    max_q_for_QHSE_timescale = 1d0
+    min_q_for_QHSE_timescale = 0d0
+
+
       ! correction_xa_limit
       ! ~~~~~~~~~~~~~~~~~~~
 

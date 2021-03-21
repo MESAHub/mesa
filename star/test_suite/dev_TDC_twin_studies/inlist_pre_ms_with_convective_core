@@ -33,8 +33,6 @@
       
 ! CHANGE FOR dev_TDC_twin_studies
       !max_model_number = 101
-      
-      max_number_retries = 0
 
       mixing_length_alpha = 1.8
       mlt_make_surface_no_mixing = .true.

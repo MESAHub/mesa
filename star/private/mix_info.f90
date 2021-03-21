@@ -129,7 +129,7 @@
          else if (s% using_TDC) then
             do k = 1, nz
                s% conv_vel(k) = get_TDC_conv_velocity(s,k)
-               s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
+               s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
                if (abs(s% Lt(k)) > &

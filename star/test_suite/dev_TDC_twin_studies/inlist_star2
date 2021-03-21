@@ -23,14 +23,12 @@
 
 ! TDC
 
-   ! for consistency with MLT, use same alfa and set TDC_alfap and TDC_alfar to 0.
-
-   TDC_alfa  =     1.8d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   ! for consistency with MLT, set TDC_alfap, TDC_alfar, and TDC_alfat to 0.
    
    TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
    TDC_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ TDC_alfar   
+   TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
    
-   TDC_alfat =     0.00d0        ! turbulent flux; Lt ~ TDC_alfat
    TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
 
    TDC_num_outermost_cells_forced_nonturbulent = 0 ! 1
@@ -38,7 +36,6 @@
 
    TDC_use_RSP_eqn_for_Y_face = .false.
    TDC_use_mass_interp_face_values = .true.
-   TDC_source_seed = 0d0 ! 1d-2
    
    TDC_use_Stellingwerf_Lr = .false.
    

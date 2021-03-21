@@ -2133,6 +2133,8 @@
                val = s% nuc_timescale
             case(h_tau_conv_yrs)
                val = s% max_conv_time_scale/secyer
+            case(h_tau_QHSE_yrs)
+               val = s% max_QHSE_time_scale/secyer
             case(h_eps_grav_integral)
                val = dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun
             case(h_extra_L)

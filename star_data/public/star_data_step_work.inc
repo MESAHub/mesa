@@ -1136,7 +1136,7 @@
          real(dp) :: initial_v_center
          real(dp) :: tau_center  
          real(dp) :: super_eddington_wind_mdot
-         real(dp) :: max_conv_time_scale
+         real(dp) :: max_conv_time_scale, max_QHSE_time_scale
          
          integer :: init_model_number
          integer :: start_H_envelope_base_k

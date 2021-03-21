@@ -402,12 +402,13 @@
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
-    TDC_alfad, TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_source_seed, &
+    TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, &
+    TDC_alfad, TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, &
     TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
     TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
     TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
-    TDC_min_dt_div_tau_conv_switch_to_MLT, TDC_min_dt_years_switch_to_MLT, max_q_for_conv_timescale, min_q_for_conv_timescale, &
+    TDC_min_dt_div_tau_conv_switch_to_MLT, TDC_min_dt_years_switch_to_MLT, &
+    max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
     
     ! timestep
@@ -2057,7 +2058,6 @@
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% TDC_alfa = TDC_alfa
  s% TDC_alfap = TDC_alfap
  s% TDC_alfad = TDC_alfad
  s% TDC_alfat = TDC_alfat 
@@ -2071,8 +2071,6 @@
  s% TDC_assume_HSE = TDC_assume_HSE
  s% TDC_use_RSP_eqn_for_Y_face = TDC_use_RSP_eqn_for_Y_face
  s% TDC_use_mass_interp_face_values = TDC_use_mass_interp_face_values
- s% TDC_w_min_for_damping = TDC_w_min_for_damping
- s% TDC_source_seed = TDC_source_seed
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_min_dt_div_tau_conv_switch_to_MLT = TDC_min_dt_div_tau_conv_switch_to_MLT
@@ -2094,6 +2092,8 @@
  
  s% max_q_for_conv_timescale = max_q_for_conv_timescale
  s% min_q_for_conv_timescale = min_q_for_conv_timescale
+ s% max_q_for_QHSE_timescale = max_q_for_QHSE_timescale
+ s% min_q_for_QHSE_timescale = min_q_for_QHSE_timescale
 
  ! timestep
  s% max_timestep = max_timestep
@@ -3715,7 +3715,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- TDC_alfa= s% TDC_alfa
  TDC_alfap= s% TDC_alfap
  TDC_alfad = s% TDC_alfad
  TDC_alfat= s% TDC_alfat 
@@ -3729,8 +3728,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_assume_HSE = s% TDC_assume_HSE
  TDC_use_RSP_eqn_for_Y_face = s% TDC_use_RSP_eqn_for_Y_face
  TDC_use_mass_interp_face_values = s% TDC_use_mass_interp_face_values
- TDC_w_min_for_damping = s% TDC_w_min_for_damping
- TDC_source_seed = s% TDC_source_seed
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_min_dt_div_tau_conv_switch_to_MLT = s% TDC_min_dt_div_tau_conv_switch_to_MLT
@@ -3752,6 +3749,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  
  max_q_for_conv_timescale = s% max_q_for_conv_timescale
  min_q_for_conv_timescale = s% min_q_for_conv_timescale
+ max_q_for_QHSE_timescale = s% max_q_for_QHSE_timescale
+ min_q_for_QHSE_timescale = s% min_q_for_QHSE_timescale
 
  ! timestep
  max_timestep = s% max_timestep
