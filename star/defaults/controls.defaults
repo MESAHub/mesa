@@ -8207,20 +8207,20 @@
     relax_maxT_for_gold_tolerances = -1d0
 
 
-      ! include_L_in_error_est
+      ! include_L_in_correction_limits
       ! ~~~~~~~~~~~~~~~~~~~~~~
-      ! include_v_in_error_est
+      ! include_v_in_correction_limits
       ! ~~~~~~~~~~~~~~~~~~~~~~
-      ! include_u_in_error_est
+      ! include_u_in_correction_limits
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! Some variables can be excluded from calculation of correction norm and max.
 
       ! ::
 
-    include_L_in_error_est = .false.
-    include_v_in_error_est = .false.
-    include_u_in_error_est = .false.
+    include_L_in_correction_limits = .false.
+    include_v_in_correction_limits = .false.
+    include_u_in_correction_limits = .false.
 
 
       ! correction_xa_limit

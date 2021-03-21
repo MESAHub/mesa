@@ -328,7 +328,9 @@
     use_simple_es_for_kap, use_starting_composition_for_kap, &
     min_kap_for_dPrad_dm_eqn, low_logT_op_mono_full_off, low_logT_op_mono_full_on, high_logT_op_mono_full_off, &
     high_logT_op_mono_full_on, op_mono_min_X_to_include, use_op_mono_alt_get_kap, &
-    include_L_in_error_est, include_v_in_error_est, include_u_in_error_est, &
+    
+    
+    include_L_in_correction_limits, include_v_in_correction_limits, include_u_in_correction_limits, include_w_in_correction_limits, &
     
     ! asteroseismology controls
     get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq, &
@@ -1796,9 +1798,10 @@
  s% op_mono_min_X_to_include = op_mono_min_X_to_include
  s% use_op_mono_alt_get_kap = use_op_mono_alt_get_kap
   
- s% include_L_in_error_est = include_L_in_error_est
- s% include_v_in_error_est = include_v_in_error_est
- s% include_u_in_error_est = include_u_in_error_est
+ s% include_L_in_correction_limits = include_L_in_correction_limits
+ s% include_v_in_correction_limits = include_v_in_correction_limits
+ s% include_u_in_correction_limits = include_u_in_correction_limits
+ s% include_w_in_correction_limits = include_w_in_correction_limits
 
  ! asteroseismology controls
 
@@ -3455,9 +3458,10 @@
  op_mono_min_X_to_include = s% op_mono_min_X_to_include
  use_op_mono_alt_get_kap = s% use_op_mono_alt_get_kap
 
- include_L_in_error_est = s% include_L_in_error_est
- include_v_in_error_est = s% include_v_in_error_est
- include_u_in_error_est = s% include_u_in_error_est
+ include_L_in_correction_limits = s% include_L_in_correction_limits
+ include_v_in_correction_limits = s% include_v_in_correction_limits
+ include_u_in_correction_limits = s% include_u_in_correction_limits
+ include_w_in_correction_limits = s% include_w_in_correction_limits
 
  ! asteroseismology controls
 

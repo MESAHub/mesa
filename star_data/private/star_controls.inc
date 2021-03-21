@@ -830,8 +830,8 @@
          real(dp) :: op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
             op_split_burn_min_T_for_variable_T_solver
 
-         logical :: include_L_in_error_est, &
-            include_v_in_error_est, include_u_in_error_est
+         logical :: include_L_in_correction_limits, &
+            include_v_in_correction_limits, include_u_in_correction_limits
 
          logical :: use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX
          logical :: report_min_rcond_from_DGESXV

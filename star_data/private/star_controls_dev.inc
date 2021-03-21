@@ -15,7 +15,7 @@
          real(dp) :: max_q_for_conv_timescale, min_q_for_conv_timescale
          
          logical :: TDC_use_L_eqn_at_surface, TDC_assume_HSE
-         logical :: TDC_use_RSP_eqn_for_Y_face
+         logical :: TDC_use_RSP_eqn_for_Y_face, include_w_in_correction_limits
          logical :: TDC_use_mass_interp_face_values
          logical :: TDC_use_Stellingwerf_Lr
          real(dp) :: TDC_w_min_for_damping, TDC_source_seed

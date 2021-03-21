@@ -327,7 +327,7 @@
          integer, intent(out) :: max_zone, max_var, ierr
 
          integer :: k, i, nz, num_terms, j, n, nvar_hydro, jmax, num_xa_terms, &
-            skip1, skip2, skip3, skip4, skip5, i_alpha_RTI, i_ln_cvpv0, i_w
+            skip1, skip2, skip3, skip4, skip5, i_alpha_RTI, i_ln_cvpv0
          real(dp) :: abs_corr, sum_corr, sum_xa_corr, x_limit, &
             max_abs_correction, max_abs_correction_cv, max_abs_corr_for_k, max_abs_xa_corr_for_k
          logical :: found_NaN, found_bad_num, report
@@ -344,23 +344,39 @@
          n = nz
          nvar_hydro = min(nvar, s% nvar_hydro)
 
-         if (s% include_L_in_error_est) then
+         if (s% include_L_in_correction_limits) then
             skip1 = 0
+            do k=1,nz
+               s% correction_weight(s% i_lum,k) = 1d0/(1d2 + abs(s% L(k)))
+            end do
          else
             skip1 = s% i_lum
          end if
 
-         if (s% include_v_in_error_est) then
+         if (s% u_flag .and. s% include_u_in_correction_limits) then
             skip2 = 0
+            do k=1,nz
+               s% correction_weight(s% i_u,k) = 1d0/(1d2 + abs(s% u(k)))
+            end do
+         else if (s% v_flag .and. s% include_v_in_correction_limits) then
+            skip2 = 0
+            do k=1,nz
+               s% correction_weight(s% i_v,k) = 1d0/(1d2 + abs(s% v(k)))
+            end do
+         else if (s% u_flag) then
+            skip2 = s% i_u
          else
             skip2 = s% i_v
          end if
 
-         if (skip2 == 0 .and. .not. s% include_u_in_error_est) then
-            skip2 = s% i_u
+         if (s% using_TDC .and. s% include_w_in_correction_limits) then
+            skip3 = 0
+            do k=1,nz
+               s% correction_weight(s% i_w,k) = 1d0/(1d2 + abs(s% w(k)))
+            end do
+         else
+            skip3 = s% i_w
          end if
-         
-         skip3 = 0
          
          skip4 = 0
          
@@ -368,7 +384,6 @@
          
          i_alpha_RTI = s% i_alpha_RTI
          i_ln_cvpv0 = s% i_ln_cvpv0
-         i_w= s% i_w
 
          max_zone = 0
          max_var = 0
@@ -397,7 +412,7 @@
                    j == skip3 .or. &
                    j == skip4 .or. &
                    j == skip5 .or. &
-                   j == i_w .or. &
+                   !j == i_w .or. &
                    j == i_alpha_RTI) cycle
                if (check_for_bad_nums) then
                   if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then

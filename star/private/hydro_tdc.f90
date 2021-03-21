@@ -481,7 +481,6 @@
             !   esum_mlt = 0d0
             !end if
             
-         ! OLD WAY
             !if (alfa > 0d0) then
                call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
                call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
@@ -498,37 +497,41 @@
             resid_ad = alfa*esum_tdc + beta*esum_mlt
             resid_ad = resid_ad*scal/s%dt ! to make residual unitless, must cancel out the dt in scal
 
-         ! NEW WAY
-            call eval_xis(s, k, xi0, xi1, xi2)
+       
+            if (.true.) then ! NEW WAY
+            
+               call eval_xis(s, k, xi0, xi1, xi2)
 
-            A0 = sqrt(max(0d0, get_etrb_start(s,k)))
-            call eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, s%dt, k)
+               A0 = sqrt(max(0d0, get_etrb_start(s,k)))
+               call eval_Af_from_A0(s, k, xi0, xi1, xi2, A0, Af, s%dt, k)
 
-            ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
-            ! 2*w*(w - A) = 2*w*B*(xi1 + (2*A+B)*xi2) - 2*w*Lambda
-            !
-            ! B = (w-A) so
-            !
-            ! 2*w*(w - A) = 2*w*(w-A)*(xi1 + (w+A)*xi2) - 2*w*Lambda
-            !
-            ! -2*w*Lambda = -dt_dLt_dm_ad
+               ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
+               ! 2*w*(w - A) = 2*w*B*(xi1 + (2*A+B)*xi2) - 2*w*Lambda
+               !
+               ! B = (w-A) so
+               !
+               ! 2*w*(w - A) = 2*w*(w-A)*(xi1 + (w+A)*xi2) - 2*w*Lambda
+               !
+               ! -2*w*Lambda = -dt_dLt_dm_ad
 
-            w_00 = wrap_w_00(s,k)
-            if (.false. .and. s% TDC_alfat == 0d0) then
-               esum_ad = w_00 - Af
-            else
-               esum_ad = (w_00 - Af) * (1d0 - s%dt * (xi1 + (w_00 + Af) * xi2)) + dt_dLt_dm_ad / (2d0 * (1d3 + w_00))
+               w_00 = wrap_w_00(s,k)
+               if (.false. .and. s% TDC_alfat == 0d0) then
+                  esum_ad = w_00 - Af
+               else
+                  esum_ad = (w_00 - Af) * (1d0 - s%dt * (xi1 + (w_00 + Af) * xi2)) + dt_dLt_dm_ad / (2d0 * (1d3 + w_00))
+               end if
+               resid_ad = esum_ad
+            
             end if
-            resid_ad = esum_ad
 
             if (k > 30 .and. k < -60) then
                write(*,*) k,resid_ad%val, w_00%val, Af%val, xi0%val, xi1%val, xi2%val, sqrt(abs(xi0%val/xi2%val)), dt_dLt_dm_ad%val, A0%val
             end if
 
-            !scal = 1d0/s%csound_start(k)
+            scal = 1d0/s%csound_start(k)
             !scal = 1d0/(1d3 + s%csound_start(k) + maxval(s% w_start(1:s%nz)))
             !scal = sqrt(scal/s%dt) 
-            scal = 1d0/(1d4 + s% dt)
+            !scal = 1d0/(1d4 + s% dt + pow(4d0,s% solver_iter))
                ! scal/dt -> 1/(erg g^-1 s^-1)*s^-1 = 1/(erg g^-1) = 1/(g cm^2 sec^-2 g^-1) = sec^2 cm^-2
                ! sqrt(scal/dt) => sec/cm = 1 / (cm/sec).   resid units are cm/sec.
             resid_ad = resid_ad*scal
