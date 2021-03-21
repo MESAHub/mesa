@@ -45,7 +45,6 @@
     TDC_use_RSP_eqn_for_Y_face = .true.
     TDC_use_mass_interp_face_values = .false.
     TDC_use_Stellingwerf_Lr = .true.
-    include_w_in_correction_limits = .false.
     
     TDC_w_min_for_damping = 1d2
     TDC_source_seed = 0d0

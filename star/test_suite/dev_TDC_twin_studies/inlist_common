@@ -9,7 +9,7 @@
    initial_model_number = 0
 
    set_initial_dt = .true.
-   seconds_for_initial_dt = 1d-2
+   seconds_for_initial_dt = 1d4
 
 / ! end of star_job namelist
 
@@ -53,7 +53,7 @@
    !history_interval = 1
    terminal_interval = 10
             
-   photo_interval = 1
+   photo_interval = 10
    !profile_interval = 1
    !history_interval = 1
    terminal_interval = 1
@@ -195,11 +195,10 @@
    !Profile_Panels1_xmax = -101D0
    !Profile_Panels1_show_mix_regions_on_xaxis = .true.
    
-   Profile_Panels1_xaxis_name = 'mass'
-   Profile_Panels1_xaxis_reversed = .false.
-   
-   !Profile_Panels1_xaxis_name = 'zone'
-   !Profile_Panels1_xaxis_reversed = .true.
+   !Profile_Panels1_xaxis_name = 'mass'
+   !Profile_Panels1_xaxis_reversed = .false.
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xaxis_reversed = .true.
    
    Profile_Panels1_xmin = -101D0
    Profile_Panels1_xmax = -101D0

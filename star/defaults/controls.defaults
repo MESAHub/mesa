@@ -8213,14 +8213,17 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
       ! include_u_in_correction_limits
       ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! include_w_in_correction_limits
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Some variables can be excluded from calculation of correction norm and max.
+      ! These variables can be excluded from calculation of correction norm and max.
 
       ! ::
 
-    include_L_in_correction_limits = .false.
-    include_v_in_correction_limits = .false.
-    include_u_in_correction_limits = .false.
+    include_L_in_correction_limits = .true.
+    include_v_in_correction_limits = .true.
+    include_u_in_correction_limits = .true.
+    include_w_in_correction_limits = .true.
 
 
       ! correction_xa_limit

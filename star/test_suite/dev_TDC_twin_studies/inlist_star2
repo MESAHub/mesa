@@ -55,7 +55,10 @@
    Pvsc_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
    
    
-   include_w_in_error_est = .true.
+   include_L_in_correction_limits = .true.
+   include_v_in_correction_limits = .true.
+   include_u_in_correction_limits = .true.
+   include_w_in_correction_limits = .true.
    
 
 ! starting specifications
@@ -107,7 +110,7 @@
 
 ! FOR DEBUGGING
 
-      report_solver_progress = .true. ! set true to see info about solver iterations
+      !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
       !stop_for_bad_nums = .true.
       !trace_evolve = .true.
