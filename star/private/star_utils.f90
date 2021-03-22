@@ -543,6 +543,21 @@
          end if
          xh(s% i_lnd,k) = lnd
       end subroutine store_lnd_in_xh
+
+
+      subroutine store_w_in_xh(s, k, w, xh_in)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: w
+         real(dp), intent(in), pointer, optional :: xh_in(:,:)
+         real(dp), pointer :: xh(:,:)
+         if (present(xh_in)) then
+            xh => xh_in
+         else
+            xh => s% xh
+         end if
+         xh(s% i_w,k) = w
+      end subroutine store_w_in_xh
       
       
       subroutine store_etrb_in_xh(s, k, etrb, xh_in)
@@ -556,7 +571,7 @@
          else
             xh => s% xh
          end if
-         xh(s% i_etrb,k) = etrb
+         xh(s% i_w,k) = sqrt(max(0d0,etrb))
       end subroutine store_etrb_in_xh
 
 
@@ -1661,7 +1676,7 @@
             s% erad_start(k) = -1d99
             s% alpha_RTI_start(k) = -1d99
             s% opacity_start(k) = -1d99
-            s% etrb_start(k) = -1d99
+            s% w_start(k) = -1d99
             s% dPdr_dRhodr_info(k) = -1d99
          end do
       end subroutine reset_starting_vectors
@@ -1708,7 +1723,7 @@
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
          
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            detrb_m1, detrb_00, detrb_p1, dxtra3_m1, dxtra3_00, dxtra3_p1, &
+            dw_m1, dw_00, dw_p1, dxtra3_m1, dxtra3_00, dxtra3_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -1719,7 +1734,7 @@
 
          call unwrap(residual, val, &
             dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
-            detrb_m1, detrb_00, detrb_p1, dlnR_m1, dlnR_00, dlnR_p1, &
+            dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1, &
@@ -1732,7 +1747,7 @@
          if (s% i_v /= 0) call unpack1(s% i_v, dv_m1, dv_00, dv_p1)
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
-         if (s% i_etrb /= 0) call unpack1(s% i_etrb, detrb_m1, detrb_00, detrb_p1)
+         if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
          
          contains
          
@@ -2161,7 +2176,7 @@
             get_Lconv = 0d0
             return
          end if
-         if (s% TDC_flag .or. s% RSP_flag) then
+         if (s% using_TDC .or. s% RSP_flag) then
             get_Lconv = s% Lc(k)
          else
             get_Lconv = s% L_conv(k) ! L_conv set by last call on mlt
@@ -2460,7 +2475,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% TDC_flag) cell_total = cell_total + s% etrb(k)
+         if (s% using_TDC) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
       
@@ -2543,8 +2558,8 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% TDC_flag) then
-               cell1 = dm*s% etrb(k)
+            if (s% using_TDC) then
+               cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2592,8 +2607,8 @@
                if (s% include_rotation_in_total_energy) &
                   cell_total = cell_total + cell1
             end if
-            if (s% TDC_flag) then
-               cell1 = dm*s% etrb(k)
+            if (s% using_TDC) then
+               cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
             end if
             if (s% rsp_flag) then
@@ -3432,29 +3447,34 @@
       end subroutine get1_lpp
 
  
-      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, ierr) ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
+      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, Ptrb_div_etrb, ierr) 
+         ! note: Ptrb_div_etrb is not time weighted
+         ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: Ptrb
+         type(auto_diff_real_star_order1), intent(out) :: Ptrb, Ptrb_div_etrb
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Ptrb_start
+         real(dp), parameter :: x_ALFAP = 2.d0/3.d0
          logical :: time_center, test_partials
          include 'formats'
          ierr = 0
-         if (s% TDC_alfap == 0 .or. s% TDC_alfa == 0) then
+         if (s% TDC_alfap == 0 .or. s% mixing_length_alpha  == 0) then
+            Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb = s% TDC_alfap*etrb*rho ! cm^2 s^-2 g cm^-3 = erg cm^-3
+         Ptrb_div_etrb = s% TDC_alfap*x_ALFAP*etrb*rho
+         Ptrb = Ptrb_div_etrb*etrb ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% TDC_alfap*s% etrb_start(k)*s% rho_start(k)
+            Ptrb_start = s% TDC_alfap*get_etrb_start(s,k)*s% rho_start(k)
             Ptrb = 0.5d0*(Ptrb + Ptrb_start)
          end if
 
@@ -3489,7 +3509,7 @@
          integer :: j
          real(dp) :: mlt_Pturb_start
          type(auto_diff_real_star_order1) :: rho_m1, rho_00, &
-            Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad
+            Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
          logical :: time_center
          include 'formats'
          
@@ -3517,8 +3537,8 @@
          end if
          
          Ptrb_ad = 0d0
-         if (s% TDC_flag) then
-            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, ierr) 
+         if (s% using_TDC) then
+            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr) 
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
          end if
@@ -3795,6 +3815,82 @@
          end if
          scal = scal*s% dt/s% energy_start(k)
       end subroutine set_energy_eqn_scal
+      
+      
+      real(dp) function conv_time_scale(s,k_in) result(tau_conv)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k_in
+         integer :: k
+         k = max(2,k_in)
+         if (s% calculate_Brunt_N2 .and. s% brunt_N2(k) /= 0d0) then
+            tau_conv = 1d0/sqrt(abs(s% brunt_N2(k)))
+         else if (s% conv_vel(k) > 0d0) then
+            tau_conv = s% scale_height(k)/s% conv_vel(k)
+         else
+            tau_conv = 0d0
+         end if
+      end function conv_time_scale
+      
+      
+      subroutine set_max_conv_time_scale(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: tau_conv
+         s% max_conv_time_scale = 0d0
+         do k=1,s%nz
+            if (s% q(k) > s% max_q_for_conv_timescale) cycle
+            if (s% q(k) < s% min_q_for_conv_timescale) exit
+            tau_conv = conv_time_scale(s,k)
+            if (tau_conv > s% max_conv_time_scale) &
+               s% max_conv_time_scale = tau_conv
+         end do
+      end subroutine set_max_conv_time_scale
+      
+      
+      real(dp) function QHSE_time_scale(s,k) result(tau_qhse)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: abs_dv
+         if (s% v_flag) then
+            abs_dv = abs(s% v(k) - s% v_start(k))
+         else if (s% u_flag) then
+            abs_dv = abs(s% u_face_ad(k)%val - s% u_face_start(k))
+         else
+            abs_dv = 0d0
+         end if
+         tau_qhse = abs_dv/(s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)))
+      end function QHSE_time_scale
+      
+      
+      subroutine set_max_QHSE_time_scale(s)
+         type (star_info), pointer :: s
+         integer :: k
+         real(dp) :: tau_QHSE
+         s% max_QHSE_time_scale = 0d0
+         do k=1,s%nz
+            if (s% q(k) > s% max_q_for_QHSE_timescale) cycle
+            if (s% q(k) < s% min_q_for_QHSE_timescale) exit
+            tau_QHSE = QHSE_time_scale(s,k)
+            if (tau_QHSE > s% max_QHSE_time_scale) &
+               s% max_QHSE_time_scale = tau_QHSE
+         end do
+      end subroutine set_max_QHSE_time_scale
+      
+      
+      real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         tau_epsnuc = s% Cp(k)*s% T(k)/max(1d-10,abs(s% eps_nuc(k)))
+      end function eps_nuc_time_scale
+      
+      
+      real(dp) function cooling_time_scale(s,k) result(tau_cool)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: thermal_conductivity
+         thermal_conductivity = (4d0*crad*clight*pow3(s% T(k)))/(3d0*s% opacity(k)*s% rho(k)*s% Cp(k))
+         tau_cool = pow2(s% scale_height(k)) / thermal_conductivity
+      end function cooling_time_scale
 
 
       end module star_utils

@@ -264,9 +264,9 @@
       integer, parameter :: i_lnT_m1 = 4
       integer, parameter :: i_lnT_00 = 5
       integer, parameter :: i_lnT_p1 = 6
-      integer, parameter :: i_etrb_m1 = 7
-      integer, parameter :: i_etrb_00 = 8
-      integer, parameter :: i_etrb_p1 = 9
+      integer, parameter :: i_w_m1 = 7
+      integer, parameter :: i_w_00 = 8
+      integer, parameter :: i_w_p1 = 9
       integer, parameter :: i_lnR_m1 = 10
       integer, parameter :: i_lnR_00 = 11
       integer, parameter :: i_lnR_p1 = 12
@@ -390,12 +390,12 @@
 
       integer, parameter :: max_Abundance_num_isos_to_show = 1000
       
-      integer, parameter :: max_num_Profile_Panels = 10
-      integer, parameter :: max_num_History_Panels = 10
-      integer, parameter :: max_num_Color_Magnitude = 10
+      integer, parameter :: max_num_Profile_Panels = 16
+      integer, parameter :: max_num_History_Panels = 16
+      integer, parameter :: max_num_Color_Magnitude = 16
       integer, parameter :: max_num_Summary_Profile_Lines = 16
       integer, parameter :: max_num_Summary_History_Lines = 16
-      integer, parameter :: max_num_Other_plots = 10
+      integer, parameter :: max_num_Other_plots = 16
       
       integer, parameter :: i_TRho_Profile = 1
       integer, parameter :: i_logg_logT = i_TRho_Profile + 1

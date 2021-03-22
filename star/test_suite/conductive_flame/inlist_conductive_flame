@@ -95,6 +95,9 @@
 
     ! we know rates are truncated above 1e10 K, so turn off warnings
       warn_rates_for_high_temp = .false.
+   
+    ! cannot include L corrections
+      include_L_in_correction_limits = .false.
 
       terminal_show_age_units = 'seconds'
 

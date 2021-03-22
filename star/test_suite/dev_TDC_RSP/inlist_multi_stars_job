@@ -17,6 +17,6 @@
    
    stopping_age = 1.015e7
    
-   stop_when_1st_finishes = .false.
+   stop_when_1st_finishes = .true.
 
 / ! end of multi_stars_job namelist

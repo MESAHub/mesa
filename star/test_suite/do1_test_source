@@ -1,4 +1,3 @@
-
 # move twin_studies to start of list so that for [ci split] it will go to cannon instead of helios (until helios is fixed)
 do_one twin_studies "stars have reached stopping age" skip skip
 
@@ -28,7 +27,8 @@ do_one custom_rates "stop because log_center_temperature >= log_center_temp_limi
 #   needs work, on in stale_tests branch    do_one dev_ppisn "Successful test: evolved 10 days past first relax" "final.mod" auto 
 do_one dev_pre_ms_to_cc_12_20 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
 do_one dev_pre_ms_to_cc_20_80 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
-do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" auto
+do_one dev_pre_ms_to_pulses_80_800 "stop because fe_core_infall > fe_core_infall_limit" "final.mod" skip
+do_one dev_TDC_RSP "TDC good match for period" "tdc_final.mod" skip
 do_one dev_split_burn_big_net "stop because have dropped below central lower limit for si28" "final.mod" skip
 #   under construction.   do_one dev_TDC "stop because model_number >= max_model_number" "final.mod" skip                 
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
@@ -62,7 +62,7 @@ do_one ns_c "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.m
 do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto   
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
-do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
+#   Josiah says skip this one for now   do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
 do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
 do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
 do_one rsp_BEP "good match for period" "final.mod" skip   

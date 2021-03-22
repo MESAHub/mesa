@@ -388,6 +388,7 @@
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% generations = 1
+         s% previous_step_was_using_TDC = s% using_TDC
          
          if (s% timestep_hold > s% model_number + 10000) then 
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -1808,7 +1809,7 @@
          if (.not. s% RSP_flag) then
             call set_vars_if_needed(s, s% dt, str, ierr)
             if (failed('set_vars_if_needed')) return     
-            s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
+            !s% edv(1:s% species, 1:s% nz) = 0 ! edv is used by do_report
             call set_luminosity_by_category(s)
             s% total_angular_momentum = total_angular_momentum(s)
             call do_report(s, ierr)
@@ -1829,7 +1830,7 @@
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
          
-         if (.not. (s% RSP_flag .or. s% TDC_flag)) then
+         if (.not. s% RSP_flag) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
          end if
@@ -2381,9 +2382,7 @@
       subroutine report_problems(s,str)
          type (star_info), pointer :: s
          character (len=*), intent(in) :: str
-         write(*,*)
          write(*,*) 'stopping because of problems ' // trim(str)
-         write(*,*)
       end subroutine report_problems
 
 

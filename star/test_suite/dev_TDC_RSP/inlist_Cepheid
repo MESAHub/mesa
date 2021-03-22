@@ -34,7 +34,10 @@
 
 ! TDC
 
-   TDC_alfa  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+   x_integer_ctrl(1) = 1 ! which period to check for test_suite
+   x_ctrl(1) = 3.85 ! expected period (in days) 
+
+   mixing_length_alpha  =     1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
    TDC_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
    TDC_alfat =     0.0d0         ! turbulent flux; Lt ~ TDC_alfat
    TDC_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ TDC_alfam
@@ -44,9 +47,6 @@
    TDC_num_innermost_cells_forced_nonturbulent = 5
 
 ! RSP
-
-   !x_integer_ctrl(1) = 10 ! which period to check
-   !x_ctrl(1) = 1.58915d0 ! expected period (in days) 
 
    RSP_mass = 4.165d0
    RSP_Teff = 6050

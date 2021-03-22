@@ -32,82 +32,14 @@
       
       include 'test_suite_extras_def.inc'
       include 'multi_stars_extras_def.inc'
-      
+
+      integer :: TDC_num_periods
+      real(dp) :: TDC_period, time_started
+            
       contains
 
       include 'test_suite_extras.inc'
       include 'multi_stars_extras.inc'
-      
-      
-      subroutine report(s)
-         type (star_info), pointer :: s
-         character (len=128) :: filename
-         integer :: id, ierr, k, iounit
-         include 'formats'
-         return
-         if (s% model_number < 1) return
-         id = s% id
-         if (id == 1) then
-            filename = 'l1'
-         else
-            filename = 'l2'
-         end if
-         if (s% TDC_flag) then
-            write(*,*) 'write TDC results to ' // trim(filename), id
-         else if (s% RSP_flag) then
-            write(*,*) 'write RSP results to ' // trim(filename), id
-         else
-            return
-         end if
-         open(newunit=iounit, file=trim(filename), action='write', status='replace', iostat=ierr)
-         if (ierr /= 0) stop 'failed in open'
-         if (s% TDC_flag) then 
-            write(iounit,*) 'TDC'
-         else if (s% RSP_flag) then
-            write(iounit,*) 'RSP'
-         end if
-         do k=1,s% nz
-            write(iounit,2) 'm', k, s% m(k)
-            write(iounit,2) 'dm', k, s% dm(k)
-            write(iounit,2) 'dm_bar', k, s% dm_bar(k)
-            write(iounit,2) 'logR', k, s% lnR(k)/ln10
-            write(iounit,2) 'logT', k, s% lnT(k)/ln10
-            write(iounit,2) 'logRho', k, s% lnd(k)/ln10
-            write(iounit,2) 'v', k, s% v(k)
-            write(iounit,2) 'L', k, s% L(k)
-            write(iounit,2) 'Lr', k, s% Lr(k)
-            write(iounit,2) 'Lc', k, s% Lc(k)
-            write(iounit,2) 'Lt', k, s% Lt(k)
-            write(iounit,2) 'COUPL', k, s% COUPL(k)
-            write(iounit,2) 'SOURCE', k, s% SOURCE(k)
-            write(iounit,2) 'DAMP', k, s% DAMP(k)
-            write(iounit,2) 'DAMPR', k, s% DAMPR(k)
-            write(iounit,2) 'Eq', k, s% Eq(k)
-            write(iounit,2) 'Uq', k, s% Uq(k)
-            write(iounit,2) 'Hp_face', k, s% Hp_face(k)
-            write(iounit,2) 'Chi', k, s% Chi(k)
-            write(iounit,2) 'Y_face', k, s% Y_face(k)
-            write(iounit,2) 'PII', k, s% PII(k)
-            if (s% TDC_flag) then 
-               write(iounit,2) 'eturb', k, s% etrb(k)
-            else if (s% RSP_flag) then
-               write(iounit,2) 'eturb', k, s% RSP_Et(k)
-            end if
-         end do
-         write(iounit,1) 'L_center', s% L_center
-         write(iounit,1) 'm_center', s% m_center
-         write(iounit,1) 'R_center', s% R_center
-         write(iounit,1) 'v_center', s% v_center
-         if (s% TDC_flag) then 
-            write(iounit,*) 'TDC'
-         else if (s% RSP_flag) then
-            write(iounit,*) 'RSP'
-         end if
-         close(iounit)
-         write(*,*)
-         
-         if (id == 2) stop 'terminate test after report for star2'
-      end subroutine report
 
 
       integer function extras_start_step(id)
@@ -121,12 +53,12 @@
          if (ierr /= 0) return
       end function extras_start_step
       
-
+      
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
          integer :: ierr
-         real(dp) :: target_period, rel_run_E_err
+         real(dp) :: target_period, rel_run_E_err, time_ended
          type (star_info), pointer :: s, s_other
          integer :: id_other
          include 'formats'
@@ -134,24 +66,41 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         call report(s)
+         if (.not. s% TDC_flag) return
          if (s% x_integer_ctrl(1) <= 0) return
-         if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
+         ! check_cycle_completed when v(1) goes from positive to negative
+         if (s% v(1)*s% v_start(1) > 0d0 .or. s% v(1) > 0d0) return
+         ! at max radius
+         ! either start of 1st cycle, or end of current
+         if (time_started == 0) then
+            time_started = s% time
+            write(*,*) 'TDC first maximum radius, period calculations start at model, day', &
+               s% model_number, s% time/(24*3600)
+            return
+         end if
+         TDC_num_periods = TDC_num_periods + 1
+         time_ended = s% time
+         !if (abs(s% v(1)-s% v_start(1)).gt.1.0d-10) & ! tweak the end time
+         !   time_ended = time_started + (s% time - time_started)*s% v_start(1)/(s% v_start(1) - s% v(1))
+         TDC_period = time_ended - time_started
+         write(*,*) 'TDC period', TDC_num_periods, TDC_period/(24*3600)
+         time_started = time_ended
+         if (TDC_num_periods < s% x_integer_ctrl(1)) return
          write(*,*)
          write(*,*)
          write(*,*)
          target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
-         write(*,*) 'rel_run_E_err', rel_run_E_err
+         write(*,*) 'TDC rel_run_E_err', rel_run_E_err
          if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then
-            write(*,*) '*** BAD rel_run_E_error ***', &
+            write(*,*) '*** TDC BAD rel_run_E_error ***', &
             s% cumulative_energy_error/s% total_energy
-         else if (abs(s% rsp_period/(24*3600) - target_period) > 1d-2) then
-            write(*,*) '*** BAD ***', s% rsp_period/(24*3600) - target_period, &
-               s% rsp_period/(24*3600), target_period
+         else if (abs(TDC_period/(24*3600) - target_period) > 1d-2) then
+            write(*,*) '*** TDC BAD period ***', TDC_period/(24*3600) - target_period, &
+               TDC_period/(24*3600), target_period
          else
-            write(*,*) 'good match for period', &
-               s% rsp_period/(24*3600), target_period
+            write(*,*) 'TDC good match for period', &
+               TDC_period/(24*3600), target_period
          end if
          write(*,*)
          write(*,*)
@@ -199,6 +148,10 @@
             stop 'extras_startup'
          end if
          
+         TDC_num_periods = 0
+         TDC_period = 0
+         time_started = 0
+
       end subroutine extras_startup
       
       
@@ -353,7 +306,7 @@
                vals(k,1) = s_other% v(k)*1d-5
                vals(k,2) = s_other% Y_face(k)
                if (s_other% TDC_flag) then
-                  vals(k,3) = s_other% etrb(k)
+                  vals(k,3) = pow2(s_other% w(k))
                else if (s_other% RSP_flag) then
                   vals(k,3) = s_other% RSP_w(k)
                else

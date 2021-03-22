@@ -49,9 +49,7 @@ for example, to track a problem in Source
    
    for super-fine-grain comparisons, try using the "debugging xtra ratios" option in run_star_extras.
    or add new things as you wish.
-   
-   don't forget to remove your debugging changes to the code when you are done.
-   
+      
 
 
 

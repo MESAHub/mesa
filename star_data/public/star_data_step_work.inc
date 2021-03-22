@@ -39,8 +39,7 @@
       real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
       real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
       real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
-      real(dp), pointer :: etrb(:) ! turbulent energy.  only used when TDC_flag is true
-      real(dp), pointer :: Hp_face(:) ! pressure scale height.  only used for TDC or RSP
+      real(dp), pointer :: w(:) ! cell turbulent velocity.  only used when TDC_flag is true
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -458,9 +457,8 @@
       ! Convective turbulent velocity w -- when TDC_flag is true
          
          real(dp), pointer, dimension(:) :: &
-            Ptrb, Eq, Uq, Pvsc, Pvsc_start, &
-            Lr, Lc, Lt, Lt_start, COUPL, SOURCE, DAMP, DAMPR
-
+            Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
+            SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start
          integer :: TDC_num_periods
          real(dp) :: TDC_period, &
             TDC_DeltaR, TDC_DeltaMag, TDC_GRPDV, TDC_GREKM, TDC_GREKM_avg_abs
@@ -472,11 +470,11 @@
             Fr, Fr_start, Lc_start, Ptrb_start, d_Ptrb_dV_00, d_Ptrb_dw_00, &               
             d_Hp_face_dlnR, d_Hp_face_dlnd00, d_Hp_face_dlnT00, &
                d_Hp_face_dlndm1, d_Hp_face_dlnTm1, &
-            Y_face, d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
+            d_Y_face_dlnR, d_Y_face_dlnd00, d_Y_face_dlnT00, &
                d_Y_face_dlndm1, d_Y_face_dlnTm1, &
-            PII, d_PII_dlnR, d_PII_dlnd00, d_PII_dlnT00, &
+            d_PII_dlnR, d_PII_dlnd00, d_PII_dlnT00, &
                d_PII_dlndm1, d_PII_dlnTm1, &
-            Chi, Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
+            Chi_start, d_Chi_dwturb, d_Chi_dlnd, d_Chi_dlnT, &
                d_Chi_dv00, d_Chi_dvp1, d_Chi_dlnR00, d_Chi_dlnRp1, &
             f_Edd
          integer :: RSP_num_periods
@@ -607,7 +605,7 @@
          real(dp), pointer :: dxh_lnT(:) ! lnT(k) = dxh_lnT(k) + lnT_start(k); dxh_lnT from solver.
          real(dp), pointer :: dxh_v(:) ! v(k) = dxh_v(k) + v_start(k); dxh_v from solver.
          real(dp), pointer :: dxh_u(:) ! u(k) = dxh_u(k) + u_start(k); dxh_u from solver.
-         real(dp), pointer :: dxh_etrb(:) ! etrb(k) = dxh_etrb(k) + etrb_start(k); dxh_etrb from solver.
+         real(dp), pointer :: dxh_w(:) ! w(k) = dxh_w(k) + w_start(k); dxh_etrb from solver.
          real(dp), pointer :: dxh_alpha_RTI(:) ! alpha_RTI(k) = dxh_alpha_RTI(k) + alpha_RTI_start(k); dxh_alpha_RTI from solver.
          real(dp), pointer :: dxh_ln_cvpv0(:) ! ln_cvpv0(k) = dxh_ln_cvpv0(k) + ln_cvpv0_start(k); dxh_ln_cvpv0 from solver.
         
@@ -1024,7 +1022,7 @@
          real(dp), pointer :: Pgas_start(:) ! (nz)
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
-         real(dp), pointer :: etrb_start(:) ! (nz)
+         real(dp), pointer :: w_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: uface_start(:) ! (nz)
@@ -1119,9 +1117,9 @@
          real(dp), pointer :: total_energy_integral_surface(:), total_energy_integral_center(:)
 
          logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
-            RSP_just_set_velocities, &
+            RSP_just_set_velocities, previous_step_was_using_TDC, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
-            need_to_reset_etrb, using_velocity_time_centering, okay_to_set_mixing_info
+            need_to_reset_w, using_velocity_time_centering, okay_to_set_mixing_info
          
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass
@@ -1138,6 +1136,7 @@
          real(dp) :: initial_v_center
          real(dp) :: tau_center  
          real(dp) :: super_eddington_wind_mdot
+         real(dp) :: max_conv_time_scale, max_QHSE_time_scale
          
          integer :: init_model_number
          integer :: start_H_envelope_base_k

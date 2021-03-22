@@ -234,7 +234,7 @@
 
          integer :: k, i, j, ic, nz, kcore, &
             h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
-         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, &
+         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
             twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
             prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
             prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum

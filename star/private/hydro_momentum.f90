@@ -447,7 +447,7 @@
          end if ! v_flag
 
          Uq_ad = 0d0
-         if (s% TDC_flag) then ! Uq(k) is turbulent viscosity drag at face k
+         if (s% using_TDC) then ! Uq(k) is turbulent viscosity drag at face k
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
          end if
@@ -589,9 +589,7 @@
                s, k, nvar, s% i_dlnR_dt, resid_ad, 'do1_radius_eqn', ierr)           
             return
          end if
-         
-         v00 = wrap_opt_time_center_v_00(s,k)
-         
+                  
          ! dr = r - r0 = v00*dt
          ! eqn: dr/r0 = v00*dt/r0
          ! (r - r0)/r0 = r/r0 - 1 = exp(lnR)/exp(lnR0) - 1
@@ -599,6 +597,8 @@
          ! eqn becomes: v00*dt/r0 = expm1(dlnR)
          dxh_lnR = wrap_dxh_lnR(s,k) ! lnR - lnR_start
          dr_div_r0_actual = expm1(dxh_lnR) ! expm1(x) = E^x - 1
+         
+         v00 = wrap_opt_time_center_v_00(s,k)
          dr_div_r0_expected = v00*s% dt/s% r_start(k)
          resid_ad = dr_div_r0_expected - dr_div_r0_actual
          

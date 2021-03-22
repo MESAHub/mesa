@@ -43,11 +43,12 @@
 
    photo_directory = 'photos1'
    log_directory = 'LOGS1'
-            
-      !photo_interval = 10
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+   
+   ! set these by inlist_common so apply to both stars     
+   !photo_interval = 10
+   !profile_interval = 1
+   !history_interval = 1
+   !terminal_interval = 1
 
 ! FOR DEBUGGING
 

@@ -30,6 +30,7 @@
       use const_def
       use star_utils
       use utils_lib
+      use auto_diff_support, only: get_w, get_etrb
 
       implicit none
 
@@ -264,7 +265,7 @@
          ionization_k = 0
 
          int_flag = .false.
-         rsp_or_w = s% RSP_flag .or. s% TDC_flag
+         rsp_or_w = s% RSP_flag .or. s% using_TDC
 
          if (c > extra_offset) then
             i = c - extra_offset
@@ -1776,39 +1777,39 @@
                   val = s% u(k-1)/s% rmid_start(k-1) - s% u(k)/s% rmid_start(k)
 
             case(p_Ptrb)
-               if (s% TDC_flag) then
-                  val = s% etrb(k)*s% rho(k)
+               if (s% using_TDC) then
+                  val = get_etrb(s,k)*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Ptrb)
-               if (s% TDC_flag) then
-                  val = safe_log10(s% etrb(k)*s% rho(k))
+               if (s% using_TDC) then
+                  val = safe_log10(get_etrb(s,k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
             case(p_w)
-               if (s% TDC_flag) then
-                  val = sqrt(max(0d0,s% etrb(k)))
+               if (s% using_TDC) then
+                  val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if               
             case(p_log_w)
-               if (s% TDC_flag) then
-                  val = sqrt(max(0d0,s% etrb(k)))
+               if (s% using_TDC) then
+                  val = get_w(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_w(k)
                end if    
                val = safe_log10(val)           
             case(p_etrb)
-               if (s% TDC_flag) then
-                  val = s% etrb(k)
+               if (s% using_TDC) then
+                  val = get_etrb(s,k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)
                end if               
             case(p_log_etrb)
-               if (s% TDC_flag) then
-                  val = safe_log10(s% etrb(k))
+               if (s% using_TDC) then
+                  val = safe_log10(get_etrb(s,k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k))
                end if
@@ -2168,6 +2169,15 @@
                   if (abs(s% u_face_ad(k)%val) > 1d0) &
                      val = safe_log10(abs(s% RTI_du_diffusion_kick(k)/s% u_face_ad(k)%val))
                end if
+               
+            case(p_tau_conv)
+               val = conv_time_scale(s,k)
+            case(p_tau_qhse)
+               val = QHSE_time_scale(s,k)
+            case(p_tau_epsnuc)
+               val = eps_nuc_time_scale(s,k)
+            case(p_tau_cool)
+               val = cooling_time_scale(s,k)
                
             case(p_max_abs_xa_corr)
                val = s% max_abs_xa_corr(k)
