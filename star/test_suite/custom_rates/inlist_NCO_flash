@@ -52,7 +52,6 @@
 &controls
 
       use_dedt_form_of_energy_eqn = .true.
-      use_gold2_tolerances = .false.
       use_d_eos_dxa = .true.
 
       num_trace_history_values = 2
@@ -78,12 +77,12 @@
       ! A few broad resolution controls
       mesh_delta_coeff = 0.4 !1.2
       max_allowed_nz = 12000
-      !varcontrol_target = 1d-4
 
-      ! limit timestep based on T and eps_nuc
+      ! limit timestep based on T, Rho, and eps_nuc
       ! this helps prevent retries during the runaway
       delta_log_eps_nuc_limit = 0.03
       delta_lgT_cntr_limit = 0.001
+      delta_lgRho_cntr_limit = 0.003
 
       ! limit timestep based on E_err
       limit_for_rel_error_in_energy_conservation = 1d-5
