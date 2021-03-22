@@ -2352,58 +2352,16 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: j, nterms, nvar_hydro, nz, k, kk, iounit, &
-            skip1, skip2, skip3, skip4, skip5, skip6, &
-            i_alpha_RTI, i_Et_RSP, i_etrb
+         integer :: j, nterms, nvar_hydro, nz, k, kk
          real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
-         real(dp), pointer :: vc_data(:,:)
-         logical :: dbg
          real(dp), parameter :: xscale_min = 1
 
-         vc_data => null()
-
          include 'formats'
-
          ierr = 0
 
          varcontrol = 1d99
-         dbg = .false.
          nvar_hydro = s% nvar_hydro
          nz = s% nz
-
-         if (dbg) then
-            allocate(vc_data(nvar_hydro,nz),stat=ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed in alloca in eval_varcontrol'
-               return
-            end if
-         end if
-         
-         if (s% include_L_in_error_est) then
-            skip1 = 0
-         else
-            skip1 = s% i_lum
-         end if
-
-         if (s% include_v_in_error_est) then
-            skip2 = 0
-         else
-            skip2 = s% i_v
-         end if
-
-         if (s% include_u_in_error_est) then
-            skip3 = 0
-         else
-            skip3 = s% i_u
-         end if
-
-         skip4 = 0
-         skip5 = 0
-         skip6 = 0
-
-         i_alpha_RTI = s% i_alpha_RTI
-         i_Et_RSP = s% i_Et_RSP
-         i_etrb = s% i_etrb
 
          nterms = 0
          sumvar = 0
@@ -2417,18 +2375,15 @@
          ! use differences in smoothed old and new to filter out high frequency noise.
          do j = 1, nvar_hydro
 
-            if (j == skip1 .or. &
-                j == skip2 .or. &
-                j == skip3 .or. &
-                j == skip4 .or. &
-                j == skip5 .or. &
-                j == skip6 .or. &
+            if (j == s% i_lum .or. &
+                j == s% i_u .or. &
+                j == s% i_v .or. &
+                j == s% i_w .or. &
                 j == s% i_ln_cvpv0 .or. &
                 j == s% i_j_rot .or. &
                 j == s% i_w_div_wc .or. & ! TODO: check why not including this makes restart varcontrol inconsistent
-                j == i_alpha_RTI .or. &
-                j == i_etrb .or. &
-                j == i_Et_RSP) cycle
+                j == s% i_alpha_RTI .or. &
+                j == s% i_Et_RSP) cycle
 
             nterms = nterms + nz
             do k = 3, nz-2
@@ -2456,39 +2411,7 @@
          sumterm(:) = sumterm(:)/sumscales
          sumvar = sumvar/sumscales
 
-         if (dbg) then
-            call show_info
-            deallocate(vc_data)
-            !stop 'debug: timestep'
-         end if
-
          varcontrol = sumvar/nterms
-
-         contains
-
-         subroutine show_info
-            character (len=64) :: filename
-            real(dp) :: newterm
-            write(*,*)
-            write(*, *) 'sumvar', sumvar
-            write(*, *) 'nterms', nterms
-            write(*, *) 'sumvar/nterms', sumvar/nterms
-            write(*,*)
-            do j=1, nvar_hydro
-               if (j == skip1 .or. &
-                   j == skip2) cycle
-               write(*, '(a40, d26.16)') &
-                  'varcontrol fraction for ' // trim(s% nameofvar(j)) // ' = ', sumterm(j)/sumvar
-            end do
-            write(*,*)
-            do j=1, s% species
-               if (sumterm(nvar_hydro + j) /= 0) &
-                  write(*, '(a40, d26.16)') 'varcontrol fraction for ' // &
-                        trim(chem_isos% name(s% chem_id(j))) // ' = ', &
-                        sumterm(nvar_hydro + j)/sumvar
-            end do
-         end subroutine show_info
-
 
       end function eval_varcontrol
 

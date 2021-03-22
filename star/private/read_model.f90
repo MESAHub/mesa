@@ -36,7 +36,7 @@
       integer, parameter :: bit_for_velocity = 3
       integer, parameter :: bit_for_rotation = 4
       integer, parameter :: bit_for_conv_vel = 5 ! for saving the data, but not using as variable
-      integer, parameter :: bit_for_etrb = 6
+      integer, parameter :: bit_for_w = 6
       integer, parameter :: bit_for_RTI = 7
       !integer, parameter ::  = 8 ! UNUSED
       integer, parameter :: bit_for_u = 9
@@ -48,7 +48,7 @@
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
 
-      integer, parameter :: increment_for_i_etrb = 1
+      integer, parameter :: increment_for_i_w = 1
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
       integer, parameter :: increment_for_D_omega_flag = 1
@@ -57,7 +57,7 @@
       integer, parameter :: increment_for_RSP_flag = 3
       integer, parameter :: increment_for_conv_vel_flag = 1
       
-      integer, parameter :: max_increment = increment_for_i_etrb &
+      integer, parameter :: max_increment = increment_for_i_w &
                                           + increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
                                           + increment_for_D_omega_flag &
@@ -335,7 +335,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% TDC_flag = BTEST(file_type, bit_for_etrb)
+         s% TDC_flag = BTEST(file_type, bit_for_w)
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -364,13 +364,12 @@
          end if
          
          if (is_RSP_model .and. .not. want_RSP_model) then
-            write(*,*) 'automatically converting to TDC form'
+            write(*,*) 'automatically converting from RSP to TDC form'
             s% RSP_flag = .false.
-            if (.not. s% TDC_flag) then
-               write(*,*) 'and setting TDC_flag to .true.'
-               s% TDC_flag = .true.
-               s% need_to_reset_etrb = .false.
-            end if
+            s% TDC_flag = .true.
+            s% using_TDC = .true.
+            s% previous_step_was_using_TDC = .true.
+            s% need_to_reset_w = .false.
          end if
          
          if (no_L .and. s% i_lum /= 0) then
@@ -558,7 +557,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_etrb, i_Et_RSP, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Et_RSP, &
             i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, i_ln_cvpv0, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -576,7 +575,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          no_L = (i_lum == 0)
-         i_etrb = s% i_etrb
+         i_w = s% i_w
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -585,7 +584,7 @@
          i_Fr_RSP = s% i_Fr_RSP
          i_ln_cvpv0 = s% i_ln_cvpv0
          n = species + nvar_hydro + 1 ! + 1 is for dq
-         if (i_etrb /= 0) n = n+increment_for_i_etrb
+         if (i_w /= 0) n = n+increment_for_i_w
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
          if (s% D_omega_flag) n = n+increment_for_D_omega_flag ! read D_omega
@@ -628,16 +627,16 @@
                   j=j+1; xh(i_erad_RSP,k) = vec(j)
                   j=j+1; xh(i_Fr_RSP,k) = vec(j)
                   j=j+1; ! discard
-               else if (i_etrb /= 0) then ! convert from RSP to TDC
-                  j=j+1; xh(i_etrb,k) = vec(j)
+               else if (i_w /= 0) then ! convert Et from RSP to w in TDC
+                  j=j+1; xh(i_w,k) = sqrt(max(0d0,vec(j)))
                   j=j+1; ! discard
                   j=j+1; ! discard
                   j=j+1; xh(i_lum,k) = vec(j)
                   ! attempt to compensate for exp(log(r)) /= r
                   xh(i_lnR,k) = log(exp(xh(i_lnR,k)))
                end if
-            else if (i_etrb /= 0) then
-               j=j+1; xh(i_etrb,k) = vec(j)
+            else if (i_w /= 0) then
+               j=j+1; xh(i_w,k) = vec(j)
                j=j+1; xh(i_lum,k) = vec(j)
             else if (.not. no_L) then
                j=j+1; xh(i_lum,k) = vec(j)

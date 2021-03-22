@@ -46,27 +46,19 @@
       contains
 
 
-      subroutine do_get_data_for_history_columns( &
-            s, &
-            ierr)
+      subroutine do_get_data_for_history_columns(s, ierr)
          type (star_info), pointer :: s
-
          integer, intent(out) :: ierr
          logical, parameter :: write_flag = .false.
-         call do_history_info( &
-            s, &
-            write_flag, ierr)
+         call do_history_info(s, write_flag, ierr)
       end subroutine do_get_data_for_history_columns
 
 
       subroutine write_history_info(s, ierr)
          type (star_info), pointer :: s
-
          integer, intent(out) :: ierr
          logical, parameter :: write_flag = .true.
-         call do_history_info( &
-            s, &
-            write_flag, ierr)
+         call do_history_info(s, write_flag, ierr)
       end subroutine write_history_info
 
 
@@ -2139,6 +2131,10 @@
                val = s% kh_timescale
             case(h_nuc_timescale)
                val = s% nuc_timescale
+            case(h_tau_conv_yrs)
+               val = s% max_conv_time_scale/secyer
+            case(h_tau_QHSE_yrs)
+               val = s% max_QHSE_time_scale/secyer
             case(h_eps_grav_integral)
                val = dot_product(s% dm(1:nz), s% eps_grav(1:nz))/Lsun
             case(h_extra_L)
@@ -3012,6 +3008,14 @@
             case(h_retries)
                int_val = s% num_retries
                is_int_val = .true.
+
+            case(h_using_TDC)
+               if (s% using_TDC) then
+                  int_val = 1
+               else
+                  int_val = 0
+               end if
+               is_int_val = .true.
                
             case default
                ierr = -1
@@ -3286,6 +3290,7 @@
          include 'formats'
 
          get1_hist_value = .false.
+
          call integer_dict_lookup(s% history_names_dict, name, i, ierr)
          if (ierr /= 0 .or. i <= 0) return ! didn't find it
          if (associated(s% pgstar_hist)) then
@@ -3298,7 +3303,7 @@
             end if
          end if
 
-         ! try extras
+         ! try extras 1st
          if (associated(s% how_many_extra_history_columns) .and. &
              associated(s% data_for_extra_history_columns)) then
             num_extra_cols = s% how_many_extra_history_columns(s% id)

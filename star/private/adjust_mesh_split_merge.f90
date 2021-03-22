@@ -29,6 +29,7 @@
       use const_def
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
+      use auto_diff_support
 
       implicit none
 
@@ -579,9 +580,9 @@
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             cell_etrb = Etrb_i + Etrb_ip
-            s% etrb(i) = cell_etrb/dm
+            s% w(i) = sqrt(cell_etrb/dm)
          end if
 
          if (s% rotation_flag) then
@@ -612,7 +613,7 @@
             else if (s% v_flag) then
                s% v(im) = s% v(i0)
             end if
-            if (s% TDC_flag) s% etrb(im) = s% etrb(i0)
+            if (s% using_TDC) s% w(im) = s% w(i0)
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
             s% cgrav(im) = s% cgrav(i0)
@@ -640,7 +641,7 @@
          
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
          
-         if (s% TDC_flag) s% xh(s% i_etrb,i) = s% etrb(i)
+         if (s% using_TDC) s% xh(s% i_w,i) = s% w(i)
          
          if (s% conv_vel_flag) s% xh(s% i_ln_cvpv0,i) = log(s% conv_vel(i)+s% conv_vel_v0)
 
@@ -719,8 +720,8 @@
             KE = 0.25d0*dm*(v0**2 + v1**2)
          end if
          IE = s% energy(k)*dm
-         if (s% TDC_flag) then
-            Etrb = s% etrb(k)*dm
+         if (s% using_TDC) then
+            Etrb = pow2(s% w(k))*dm
          else
             Etrb = 0d0
          end if
@@ -870,7 +871,7 @@
          v2 = v*v
          
          energy = s% energy(i)
-         if (s% TDC_flag) etrb = s% etrb(i)
+         if (s% using_TDC) etrb = get_etrb(s,i)
             
          ! estimate values of energy and velocity^2 at cell boundaries
 
@@ -927,10 +928,10 @@
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
          
-         if (s% TDC_flag) then
-            etrb_R = s% etrb(iR)
-            etrb_C = s% etrb(iC)
-            etrb_L = s% etrb(iL)
+         if (s% using_TDC) then
+            etrb_R = get_etrb(s,iR)
+            etrb_C = get_etrb(s,iC)
+            etrb_L = get_etrb(s,iL)
             grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
          end if
          
@@ -1093,15 +1094,15 @@
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
          
-         if (s% TDC_flag) then
+         if (s% using_TDC) then
             etrb_R = etrb + grad_etrb*dr/4
             etrb_L = (dm*etrb - dmR*etrb_R)/dmL
             if (etrb_R < 0d0 .or. etrb_L < 0d0) then
                etrb_R = etrb
                etrb_L = etrb
             end if
-            s% etrb(i) = etrb_R
-            s% etrb(ip) = etrb_L
+            s% w(i) = sqrt(max(0d0,etrb_R))
+            s% w(ip) = sqrt(max(0d0,etrb_L))
          end if
 
          if (s% u_flag) then

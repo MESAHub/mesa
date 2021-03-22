@@ -62,7 +62,7 @@
          integer :: i_u ! Lagrangian velocity at center of cell
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
          integer :: i_Et_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
-         integer :: i_etrb ! cell turbulent energy. only when TDC_flag is true.
+         integer :: i_w ! cell turbulent velocity. only when TDC_flag is true.
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r
@@ -145,6 +145,7 @@
          logical :: am_nu_rot_flag ! smooth am_nu_rot like D_omega
          logical :: was_in_implicit_wind_limit
          logical :: rsp_have_set_velocities
+         logical :: using_TDC ! at start of step, this refers to the previous step
          
          integer :: total_num_solver_iterations, total_num_solver_relax_iterations
          integer :: total_num_solver_calls_made, total_num_solver_relax_calls_made

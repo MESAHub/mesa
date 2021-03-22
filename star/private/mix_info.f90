@@ -51,6 +51,7 @@
          use star_utils, only: start_time, update_time
          use overshoot, only: add_overshooting
          use predictive_mix, only: add_predictive_mixing
+         use auto_diff_support, only: get_TDC_conv_velocity
          type (star_info), pointer :: s
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
@@ -72,7 +73,7 @@
          
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
          
-         TDC_or_RSP = s% RSP_flag .or. s% TDC_flag
+         TDC_or_RSP = s% RSP_flag .or. s% using_TDC
 
          if (s% doing_timing) call start_time(s, time0, total)
          
@@ -125,10 +126,10 @@
                s% cdc(k) = 0d0
                s% conv_vel(k) = 0d0
             end do
-         else if (s% TDC_flag) then
+         else if (s% using_TDC) then
             do k = 1, nz
-               s% conv_vel(k) = sqrt(abs(s% etrb(k)))
-               s% D_mix(k) = s% conv_vel(k)*s% TDC_alfa*s% Hp_face(k)/3d0
+               s% conv_vel(k) = get_TDC_conv_velocity(s,k)
+               s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
                if (abs(s% Lt(k)) > &

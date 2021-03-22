@@ -217,7 +217,7 @@
             use hydro_tdc, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
+               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_div_w, RTI_diffusion_ad
             real(dp) :: d_extra_heat_dlnR00, d_extra_heat_dlnRp1, &
                d_extra_heat_dlnTm1, d_extra_heat_dlnT00, d_extra_heat_dlnTp1, &
                d_extra_heat_dlndm1, d_extra_heat_dlnd00, d_extra_heat_dlndp1
@@ -275,8 +275,8 @@
                others_ad%val = others_ad%val + s% eps_pre_mix(k)
             
             Eq_ad = 0d0
-            if (s% TDC_flag) then             
-               Eq_ad = compute_Eq_cell(s, k, ierr)
+            if (s% using_TDC) then             
+               Eq_ad = compute_Eq_cell(s, k, Eq_div_w, ierr)
                if (ierr /= 0) return
             end if   
             
@@ -336,8 +336,8 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
-            if (s% TDC_flag) then
-               d_turbulent_energy_dt_ad = wrap_dxh_etrb(s,k)/dt
+            if (s% using_TDC) then
+               d_turbulent_energy_dt_ad = (wrap_etrb_00(s,k) - get_etrb_start(s,k))/dt
             else
                d_turbulent_energy_dt_ad = 0d0
             end if
@@ -376,7 +376,7 @@
             end if
 
             if (eps_grav_form) then
-               if (s% TDC_flag) then
+               if (s% using_TDC) then
                   stop 'cannot use eps_grav with et yet.  fix energy eqn.'
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
@@ -601,7 +601,7 @@
          real(dp), dimension(s% species) :: d_Pface_dxa00, d_Pface_dxam1
          type(auto_diff_real_star_order1) :: &
             P_face_ad, A_times_v_face_ad, mlt_Pturb_ad, &
-            PtrbR_ad, PtrbL_ad, PvscL_ad, PvscR_ad, PL_ad, PR_ad, &
+            PtrbR_ad, PtrbL_ad, PvscL_ad, PvscR_ad, Ptrb_div_etrb, PL_ad, PR_ad, &
             Peos_ad, Ptrb_ad, Pvsc_ad, inv_R2
          logical :: test_partials
          integer :: j
@@ -700,17 +700,17 @@
             end if
          
             ! set Ptrb_ad
-            if (.not. s% TDC_flag) then
+            if (.not. s% using_TDC) then
                Ptrb_ad = 0d0
             else
                if (k > 1) then 
-                  call calc_Ptrb_ad_tw(s, k-1, PtrbR_ad, ierr)
+                  call calc_Ptrb_ad_tw(s, k-1, PtrbR_ad, Ptrb_div_etrb, ierr)
                   if (ierr /= 0) return
                   PtrbR_ad = shift_m1(PtrbR_ad)
                else
                   PtrbR_ad = 0d0
                end if
-               call calc_Ptrb_ad_tw(s, k, PtrbL_ad, ierr)
+               call calc_Ptrb_ad_tw(s, k, PtrbL_ad, Ptrb_div_etrb, ierr)
                if (ierr /= 0) return
                Ptrb_ad = alfa*PtrbL_ad + beta*PtrbR_ad
             end if

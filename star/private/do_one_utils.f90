@@ -466,7 +466,8 @@
 
          
          subroutine show_trace_history_values(num)
-            use history, only: get_history_specs, get_history_values, get1_hist_value
+            use history, only: do_get_data_for_history_columns, &
+               get_history_specs, get_history_values, get1_hist_value
             integer, intent(in) :: num
             real(dp) :: values(num)
             integer :: int_values(num), specs(num)
@@ -475,12 +476,16 @@
             real(dp) :: val
             integer :: i
             include 'formats'
+            if (num == 0) return
+            call do_get_data_for_history_columns(s, ierr)
+            if (ierr /= 0) return
             call get_history_specs(s, num, s% trace_history_value_name, specs, .false.)
             call get_history_values( &
                s, num, specs, is_int_value, int_values, values, failed_to_find_value)
             do i = 1, num
                if (failed_to_find_value(i)) then
                   if (.not. get1_hist_value(s, s% trace_history_value_name(i), val)) then
+                     write(*,*) 'failed to find history value ' // trim(s% trace_history_value_name(i))
                      cycle
                   end if
                   values(i) = val

@@ -328,7 +328,9 @@
     use_simple_es_for_kap, use_starting_composition_for_kap, &
     min_kap_for_dPrad_dm_eqn, low_logT_op_mono_full_off, low_logT_op_mono_full_on, high_logT_op_mono_full_off, &
     high_logT_op_mono_full_on, op_mono_min_X_to_include, use_op_mono_alt_get_kap, &
-    include_L_in_error_est, include_v_in_error_est, include_u_in_error_est, &
+    
+    
+    include_L_in_correction_limits, include_v_in_correction_limits, include_u_in_correction_limits, include_w_in_correction_limits, &
     
     ! asteroseismology controls
     get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq, &
@@ -393,18 +395,21 @@
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
     xa_clip_limit, report_solver_progress, solver_test_partials_k_high, TDC_use_L_eqn_at_surface, TDC_use_RSP_eqn_for_Y_face, &
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
-    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
+    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, TDC_assume_HSE, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
     solver_test_partials_write_eos_call_info, solver_save_photo_call_number, TDC_min_Lc_div_L_for_convective_mixing_type, &
     solver_test_partials_var_name, solver_test_partials_equ_name, TDC_min_Lt_div_L_for_overshooting_mixing_type, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
-    TDC_alfa, TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, TDC_w_min_for_damping, &
-    TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, TDC_source_seed, &
+    TDC_alfap, TDC_alfat, TDC_alfam, TDC_alfar, TDC_Lsurf_factor, TDC_use_Stellingwerf_Lr, &
+    TDC_alfad, TDC_num_outermost_cells_forced_nonturbulent, TDC_num_innermost_cells_forced_nonturbulent, &
     TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
     TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
     TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
+    TDC_min_dt_div_tau_conv_switch_to_MLT, TDC_min_dt_years_switch_to_MLT, TDC_use_RSP_form_of_etrb_eqn, &
+    TDC_w_min_for_damping, TDC_source_seed, &
+    max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
     
     ! timestep
@@ -1795,9 +1800,10 @@
  s% op_mono_min_X_to_include = op_mono_min_X_to_include
  s% use_op_mono_alt_get_kap = use_op_mono_alt_get_kap
   
- s% include_L_in_error_est = include_L_in_error_est
- s% include_v_in_error_est = include_v_in_error_est
- s% include_u_in_error_est = include_u_in_error_est
+ s% include_L_in_correction_limits = include_L_in_correction_limits
+ s% include_v_in_correction_limits = include_v_in_correction_limits
+ s% include_u_in_correction_limits = include_u_in_correction_limits
+ s% include_w_in_correction_limits = include_w_in_correction_limits
 
  ! asteroseismology controls
 
@@ -2053,8 +2059,8 @@
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
 
- s% TDC_alfa = TDC_alfa
  s% TDC_alfap = TDC_alfap
+ s% TDC_alfad = TDC_alfad
  s% TDC_alfat = TDC_alfat 
  s% TDC_alfam = TDC_alfam
  s% TDC_alfar = TDC_alfar
@@ -2063,12 +2069,13 @@
  s% TDC_Lsurf_factor = TDC_Lsurf_factor
  s% TDC_use_Stellingwerf_Lr = TDC_use_Stellingwerf_Lr
  s% TDC_use_L_eqn_at_surface = TDC_use_L_eqn_at_surface
+ s% TDC_assume_HSE = TDC_assume_HSE
  s% TDC_use_RSP_eqn_for_Y_face = TDC_use_RSP_eqn_for_Y_face
  s% TDC_use_mass_interp_face_values = TDC_use_mass_interp_face_values
- s% TDC_w_min_for_damping = TDC_w_min_for_damping
- s% TDC_source_seed = TDC_source_seed
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
+ s% TDC_min_dt_div_tau_conv_switch_to_MLT = TDC_min_dt_div_tau_conv_switch_to_MLT
+ s% TDC_min_dt_years_switch_to_MLT = TDC_min_dt_years_switch_to_MLT
  s% TDC_target_steps_per_cycle = TDC_target_steps_per_cycle
  s% TDC_max_num_periods = TDC_max_num_periods
  s% TDC_work_period = TDC_work_period
@@ -2083,6 +2090,14 @@
  s% TDC_map_filename = TDC_map_filename
  s% TDC_map_history_filename = TDC_map_history_filename
  s% TDC_write_map = TDC_write_map
+ s% TDC_use_RSP_form_of_etrb_eqn = TDC_use_RSP_form_of_etrb_eqn
+ s% TDC_w_min_for_damping = TDC_w_min_for_damping
+ s% TDC_source_seed = TDC_source_seed
+ 
+ s% max_q_for_conv_timescale = max_q_for_conv_timescale
+ s% min_q_for_conv_timescale = min_q_for_conv_timescale
+ s% max_q_for_QHSE_timescale = max_q_for_QHSE_timescale
+ s% min_q_for_QHSE_timescale = min_q_for_QHSE_timescale
 
  ! timestep
  s% max_timestep = max_timestep
@@ -3447,9 +3462,10 @@
  op_mono_min_X_to_include = s% op_mono_min_X_to_include
  use_op_mono_alt_get_kap = s% use_op_mono_alt_get_kap
 
- include_L_in_error_est = s% include_L_in_error_est
- include_v_in_error_est = s% include_v_in_error_est
- include_u_in_error_est = s% include_u_in_error_est
+ include_L_in_correction_limits = s% include_L_in_correction_limits
+ include_v_in_correction_limits = s% include_v_in_correction_limits
+ include_u_in_correction_limits = s% include_u_in_correction_limits
+ include_w_in_correction_limits = s% include_w_in_correction_limits
 
  ! asteroseismology controls
 
@@ -3703,8 +3719,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
 
- TDC_alfa= s% TDC_alfa
  TDC_alfap= s% TDC_alfap
+ TDC_alfad = s% TDC_alfad
  TDC_alfat= s% TDC_alfat 
  TDC_alfam= s% TDC_alfam
  TDC_alfar= s% TDC_alfar
@@ -3713,12 +3729,13 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_Lsurf_factor= s% TDC_Lsurf_factor
  TDC_use_Stellingwerf_Lr = s% TDC_use_Stellingwerf_Lr
  TDC_use_L_eqn_at_surface = s% TDC_use_L_eqn_at_surface
+ TDC_assume_HSE = s% TDC_assume_HSE
  TDC_use_RSP_eqn_for_Y_face = s% TDC_use_RSP_eqn_for_Y_face
  TDC_use_mass_interp_face_values = s% TDC_use_mass_interp_face_values
- TDC_w_min_for_damping = s% TDC_w_min_for_damping
- TDC_source_seed = s% TDC_source_seed
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
+ TDC_min_dt_div_tau_conv_switch_to_MLT = s% TDC_min_dt_div_tau_conv_switch_to_MLT
+ TDC_min_dt_years_switch_to_MLT = s% TDC_min_dt_years_switch_to_MLT
  TDC_target_steps_per_cycle = s% TDC_target_steps_per_cycle
  TDC_max_num_periods = s% TDC_max_num_periods
  TDC_work_period = s% TDC_work_period
@@ -3733,6 +3750,14 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_map_filename = s% TDC_map_filename
  TDC_map_history_filename = s% TDC_map_history_filename
  TDC_write_map = s% TDC_write_map
+ TDC_use_RSP_form_of_etrb_eqn = s% TDC_use_RSP_form_of_etrb_eqn
+ TDC_w_min_for_damping = s% TDC_w_min_for_damping
+ TDC_source_seed = s% TDC_source_seed
+
+ max_q_for_conv_timescale = s% max_q_for_conv_timescale
+ min_q_for_conv_timescale = s% min_q_for_conv_timescale
+ max_q_for_QHSE_timescale = s% max_q_for_QHSE_timescale
+ min_q_for_QHSE_timescale = s% min_q_for_QHSE_timescale
 
  ! timestep
  max_timestep = s% max_timestep
