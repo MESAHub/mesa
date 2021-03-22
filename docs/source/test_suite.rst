@@ -188,3 +188,15 @@ surface_effects
 
 Tests the implementation of the various surface effect corrections
 available in MESA.
+
+
+Test Index
+----------
+
+This index only includes tests that are documented via a ``README.rst``.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   test_suite/*

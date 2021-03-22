@@ -1,7 +1,1 @@
-.. _ppisn:
-
-******
-ppisn
-******
-
-.. include:: ../../../star/test_suite/ppisn/README.rst
+../../../star/test_suite/dev_ppisn/README.rst

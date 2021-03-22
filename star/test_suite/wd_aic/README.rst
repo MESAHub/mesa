@@ -1,3 +1,9 @@
+.. _wd_aic:
+
+******
+wd_aic
+******
+
 This test case evolves an accreting ONeMg WD up to the point of
 thermal runaway in the core (see |Schwab2015|).
 
