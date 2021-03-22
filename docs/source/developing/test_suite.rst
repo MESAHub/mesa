@@ -127,11 +127,13 @@ In the test case directory
 In the docs directory
 ^^^^^^^^^^^^^^^^^^^^^
 
-Once the ``README.rst`` file is created, a file in
-``docs/source/test_suite`` should be created.  This is the location of
-the include directive that incorporates the contents of the
-``README.rst`` file.  This also includes the anchor to the test suite
-for use in cross-references.
+Once the ``README.rst`` file is created, a link in ``docs/source/test_suite`` should be created.
+
+.. code-block:: sh
+
+  ln -s ../../../star/test_suite/test_case/README.rst test_case.rst
+
+This instructs Sphinx to incorporate the contents of the ``README.rst`` file.
 
 An entry linking to the test case page should be included in
 ``docs/source/test_suite.rst``.  This page will eventually list all

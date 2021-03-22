@@ -1,3 +1,9 @@
+.. _test_case_template:
+
+******************
+test_case_template
+******************
+
 Test suite cases should have a ``README.rst`` file that contains a
 brief description of the test and its purpose.
 

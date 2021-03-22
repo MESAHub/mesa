@@ -1,3 +1,9 @@
+.. _wd_acc_small_dm:
+
+***************
+wd_acc_small_dm
+***************
+
 This test checks accretion in MESA with small timesteps, such that the
 mass added in the step is similar to the mass of the outer zone.  The
 accreted material has a different composition (H/He mixture) than the
