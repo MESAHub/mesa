@@ -1219,16 +1219,16 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Lc
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Lc_w_face_factor
-         Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+         type(auto_diff_real_star_order1) :: Lc_div_w_face
+         Lc = compute_Lc_terms(s, k, Lc_div_w_face, ierr)
          s% Lc(k) = Lc%val
       end function compute_Lc
 
 
-      function compute_Lc_terms(s, k, Lc_w_face_factor, ierr) result(Lc)
+      function compute_Lc_terms(s, k, Lc_div_w_face, ierr) result(Lc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Lc, Lc_w_face_factor
+         type(auto_diff_real_star_order1) :: Lc, Lc_div_w_face
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: r_00, area, &
             T_m1, T_00, d_m1, d_00, w_m1, w_00, T_rho_face, PII_face, w_face
@@ -1237,7 +1237,7 @@
          ierr = 0
          if (k > s% nz .or. k == 1) then
             Lc = 0d0
-            Lc_w_face_factor = 1
+            Lc_div_w_face = 1
             return
          end if
          r_00 = wrap_r_00(s, k) ! not time centered
@@ -1254,14 +1254,14 @@
          w_face = alfa*w_00 + beta*w_m1
          ALFAC = x_ALFAC
          ALFAS = x_ALFAS
-         Lc_w_face_factor = area*(ALFAC/ALFAS)*T_rho_face*PII_face
+         Lc_div_w_face = area*(ALFAC/ALFAS)*T_rho_face*PII_face
          ! units = cm^2 K g cm^-3 ergs g^-1 K^-1 = ergs cm^-1
-         Lc = w_face*Lc_w_face_factor
+         Lc = w_face*Lc_div_w_face
          ! units = cm s^-1 ergs cm^-1 = ergs s^-1
          if (k == -458) then
             write(*,2) 'Lc%val', k, Lc%val
             write(*,2) 'w_face%val', k, w_face%val
-            write(*,2) 'Lc_w_face_factor', k, Lc_w_face_factor%val
+            write(*,2) 'Lc_div_w_face', k, Lc_div_w_face%val
             write(*,2) 'PII_face%val', k, PII_face%val
             write(*,2) 'T_rho_face%val', k, T_rho_face%val
             !write(*,2) '', k, 
@@ -1343,75 +1343,45 @@
          real(dp) :: Lc_val, w_00, maxerr, dlnP, dlnT, gradT_actual, &
             super_ad_actual, super_ad_expected
          type(auto_diff_real_star_order1) :: &
-            Lc_w_face_factor, L, Lr, Lc, Lt, Y_face
+            Lc_div_w_face, L, Lr, Lc, Lt, Y_face
          real(dp), allocatable :: w_face(:), target_Lc(:)
          real(dp) :: alfa, beta
          real(dp), parameter :: atol = 1-6d0, rtol = 1d-9
-         logical, parameter :: dbg = .false.
          include 'formats'
          ierr = 0
-         if (s% mixing_length_alpha == 0d0) return ! no convection
-         
-         ! s% dt hasn't been set, so don't check it against TDC limits
-         !call get_TDC_frac(s, alfa, beta)
-         !s% using_TDC = (alfa > 0d0)
-         !write(*,*) 'get_TDC_frac alfa TDC_flag', alfa, s% TDC_flag
-         !stop 'reset_etrb_using_L'
-         !if (.not. s% using_TDC) return
-         
+         if (s% mixing_length_alpha == 0d0) return ! no convection         
          nz = s% nz
-         if (s% have_previous_conv_vel) then
-            write(*,*) 'initial w_face set using conv_vel from file or from MLT'
-         else
-            write(*,*) 'need conv_vel from file or from MLT in order to set initial w_face'
-            stop 'reset_etrb_using_L'
-         end if
          allocate(w_face(nz), target_Lc(nz))
-
-         if (.false.) then
-            write(*,*) 'Compare standard and alternative forms of Y_face'
-            write(*,'(a8,99(a18))') 'k', 'Y_face', 'old_Y_face/Y_face', 'new_Y_face/Y_face'
-            do k=2,nz
-               Y_face = compute_Y_face(s, k, ierr)
-            end do
-            stop 'reset_etrb_using_L'
-         end if
 
          do k=1, nz
             Lr = compute_Lr(s, k, ierr)
             if (ierr /= 0) stop 'failed in compute_Lr'
-            Lc = compute_Lc_terms(s, k, Lc_w_face_factor, ierr)
+            Lc = compute_Lc_terms(s, k, Lc_div_w_face, ierr)
             if (ierr /= 0) stop 'failed in compute_Lc_terms'
             target_Lc(k) = s% L(k) - Lr%val
             Lc_val = target_Lc(k) ! assume Lt = 0 for this
-            if (abs(Lc_w_face_factor%val) < 1d-20) then
+            if (abs(Lc_div_w_face%val) < 1d-20) then
                w_face(k) = 0d0
-            else ! filter out negative guesses for w_face
-               w_face(k) = max(0d0, Lc_val/Lc_w_face_factor%val)
+            else
+               w_face(k) = max(0d0, Lc_val/Lc_div_w_face%val)
             end if
             if (is_bad(w_face(k))) then
                write(*,2) 'bad w_face', k, w_face(k)
                stop 'reset_etrb_using_L'
                w_face(k) = 0d0
             end if
-            ! CAUTION: using conv_vel is dangerous.
-            !  better if can stick to L.  but problems with that too.
-            if ((w_face(k) == 0d0 .and. s% conv_vel(k) > 0d0) .or. &
-                (w_face(k) > 0d0 .and. s% conv_vel(k) == 0d0)) &
-               w_face(k) = s% conv_vel(k)
          end do
          
          do k=1, nz
             if (k < nz) then
                w_00 = 0.5d0*(w_face(k) + w_face(k+1))
-            else ! w_center = 0
-               w_00 = 0.5d0*w_face(k)
+            else
+               w_00 = w_face(k)
             end if
             s% w(k) = w_00
             s% xh(s% i_w,k) = s% w(k)
          end do
          
-         if (dbg) stop 'reset_etrb_using_L'
       end subroutine reset_etrb_using_L
 
 

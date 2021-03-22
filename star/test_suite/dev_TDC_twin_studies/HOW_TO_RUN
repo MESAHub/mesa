@@ -1,3 +1,34 @@
+
+
+edit inlist_for_test_header to select a case
+
+NOTE: starting models must be created with 
+  use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
+  set_rho_to_dm_div_dV = .false.
+  mlt_make_surface_no_mixing = .true.
+
+  inlist should set mixing_length_alpha
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------
+
 RECORD THE ZOOM
 
 
