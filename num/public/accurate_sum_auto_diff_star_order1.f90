@@ -39,12 +39,16 @@
          procedure mult_acc_adr
          procedure mult_adr_acc
          procedure mult_acc_acc
+         procedure mult_acc_rdp
+         procedure mult_rdp_acc
       end interface operator(*)
 
       interface operator(/)
          procedure div_acc_adr
          procedure div_adr_acc
          procedure div_acc_acc
+         procedure div_acc_rdp
+         procedure div_rdp_acc
       end interface operator(/)
 
 
@@ -132,6 +136,24 @@
 
       end function mult_adr_acc
 
+      type(accurate_auto_diff_real_star_order1) function mult_acc_rdp(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         real(dp), intent(in) :: op2
+         
+         ret%sum = op1%sum * op1
+         ret%compensator = op1%compensator * op1
+
+      end function mult_acc_rdp
+
+      type(accurate_auto_diff_real_star_order1) function mult_rdp_acc(op1, op2) result (ret)
+         real(dp), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
+         
+         ret%sum = op2%sum * op1
+         ret%compensator = op2%compensator * op1
+
+      end function mult_rdp_acc
+
       ! ///////////
       type(accurate_auto_diff_real_star_order1) function div_acc_acc(op1, op2) result (ret)
          type(accurate_auto_diff_real_star_order1), intent(in) :: op1
@@ -159,6 +181,24 @@
          ret%compensator = 0
 
       end function div_adr_acc
+
+      type(accurate_auto_diff_real_star_order1) function div_acc_rdp(op1, op2) result (ret)
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op1
+         real(dp), intent(in) :: op2
+
+         ret%sum = op1%sum / op2
+         ret%compensator = op1%compensator / op2
+
+      end function div_acc_rdp
+
+      type(accurate_auto_diff_real_star_order1) function div_rdp_acc(op1, op2) result (ret)
+         real(dp), intent(in) :: op1
+         type(accurate_auto_diff_real_star_order1), intent(in) :: op2
+
+         ret%sum = op1 / op2%value()
+         ret%compensator = 0
+
+      end function div_rdp_acc
 
       ! ============
       subroutine set_acc_adr(this, new)
