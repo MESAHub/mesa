@@ -210,10 +210,24 @@ contains
     if (lambda .gt. 1d-30) then
        nu = capture_nu + decay_nu
        Qneu = nu / lambda
-       dQneu_dlnT = Qneu * ((capture_nu/nu)*d_lcapture_nu_dlogT + (decay_nu/nu)*d_ldecay_nu_dlogT &
-            - (capture/lambda)*d_lcapture_dlogT - (decay/lambda)*d_ldecay_dlogT)
-       dQneu_dlnRho = Qneu * ((capture_nu/nu)*d_lcapture_nu_dlYeRho + (decay_nu/nu)*d_ldecay_nu_dlYeRho - &
-            (capture/lambda)*d_lcapture_dlYeRho - (decay/lambda)*d_ldecay_dlYeRho)
+
+       dQneu_dlnT = 0d0
+       dQneu_dlnRho = 0d0
+
+       if (nu .gt. 1d-30) then
+
+          if (table % has_decay_data) then
+             dQneu_dlnT = dQneu_dlnT + Qneu * ((decay_nu/nu)*d_ldecay_nu_dlogT - (decay/lambda)*d_ldecay_dlogT)
+             dQneu_dlnRho = dQneu_dlnRho + Qneu * ((decay_nu/nu)*d_ldecay_nu_dlYeRho - (decay/lambda)*d_ldecay_dlYeRho)
+          end if
+
+          if (table % has_capture_data) then
+             dQneu_dlnT = dQneu_dlnT + Qneu * ((capture_nu/nu)*d_lcapture_nu_dlogT - (capture/lambda)*d_lcapture_dlogT)
+             dQneu_dlnRho = dQneu_dlnRho + Qneu * ((capture_nu/nu)*d_lcapture_nu_dlYeRho - (capture/lambda)*d_lcapture_dlYeRho)
+          end if
+
+       end if
+
     else
        Qneu = 0d0
        dQneu_dlnT = 0d0

@@ -4,7 +4,7 @@ Running MESA
 ============
 
 This page has information about how to use MESA to evolve a single
-star.  It assumes you have already installed MESA (see :doc:`installation`).
+star.  It assumes you have already installed MESA (see :ref:`Installing MESA`).
 
 The ``$MESA_DIR`` directory has lots of subdirectories.  Most of these
 subdirectories are modules (the "M" in MESA) that provides some

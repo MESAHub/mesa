@@ -7249,14 +7249,13 @@
       ! as modified by Haili Hu.  Since the tar.gz file is large (656 MB),
       ! it is not included in the standard mesa download.
 
-      ! You can get ``OP4STARS_1.3.tar.gz`` [here](http://sourceforge.net/projects/mesa/files)
+      ! You can get ``OP4STARS_1.3.tar.xz`` [here](http://sourceforge.net/projects/mesa/files)
 
       ! Put it any place you want on your disk.
 
       ! ::
 
-      !     gunzip OP4STARS_1.3.tar.gz
-      !     tar -xvf OP4STARS_1.3.tar
+      !     tar -xf OP4STARS_1.3.tar.xz
 
       ! Set the inlist controls for the "mono" directory with the data files.
       ! For example, in my case it looks like the following, but you can put

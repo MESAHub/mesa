@@ -706,8 +706,7 @@
             cc => cc_info
 
             call coulomb_set_context( &
-               cc, temp, rho, logtemp, logrho, zbar, abar, z2bar,  &
-               num_isos, n% y, g% z52)
+               cc, temp, rho, logtemp, logrho, zbar, abar, z2bar)
             
             call eval_weak_reaction_info( &
                num_wk_reactions, &

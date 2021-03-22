@@ -51,6 +51,10 @@ module math_lib
 
   ! Interfaces
 
+  interface safe_sqrt
+     module procedure safe_sqrt_
+  end interface safe_sqrt
+
   interface safe_log
      module procedure safe_log_
   end interface safe_log
@@ -75,6 +79,7 @@ module math_lib
   public :: MATH_BACKEND
 
   public :: math_init
+  public :: safe_sqrt
   public :: log
   public :: safe_log
   public :: log10
@@ -127,6 +132,17 @@ contains
 
   end subroutine math_init
 
+  !****
+
+  elemental function safe_sqrt_ (x) result (sqrt_x)
+
+    real(dp), intent(in) :: x
+    real(dp)             :: sqrt_x
+
+    sqrt_x = SQRT(MAX(x, 0._dp))
+
+  end function safe_sqrt_
+  
   !****
 
   elemental function safe_log_ (x) result (log_x)

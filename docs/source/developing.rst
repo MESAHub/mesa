@@ -7,7 +7,7 @@ Developing MESA
 
    developing/collaboration
    developing/contributing
-   developing/docs_style
+   developing/documentation
    developing/code_style
    developing/debugging
    developing/plotters

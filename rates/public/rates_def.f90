@@ -27,6 +27,7 @@
       use utils_def, only: integer_dict
       use const_def, only: dp
       use chem_def, only: iso_name_length, nuclide_data, npart
+      use auto_diff
       
       implicit none
 
@@ -875,16 +876,8 @@
          real(dp) :: abar
          real(dp) :: z2bar
          real(dp) :: ye
-         real(dp) :: z52bar
-         real(dp) :: zbar13
-         real(dp) :: abari
-         real(dp) :: rr
-         real(dp) :: tempi
-         real(dp) :: dtempi
-         real(dp) :: deni
-         real(dp) :: pp
-         real(dp) :: rs
-         real(dp) :: gamma_e
+         type(auto_diff_real_2var_order1) :: rs
+         type(auto_diff_real_2var_order1) :: gamma_e
       end type Coulomb_Info
       
       

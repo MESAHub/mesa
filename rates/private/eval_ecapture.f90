@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013-2019  Josiah Schwab, Bill Paxton & The MESA Team
+!   Copyright (C) 2013-2021  Josiah Schwab, Bill Paxton & The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -28,6 +28,7 @@ module eval_ecapture
   use rates_def
   use const_def, only: dp, ln2
   use math_lib
+  use auto_diff
 
   implicit none
 
@@ -44,8 +45,7 @@ contains
     use rates_def, only: Coulomb_Info
     use eval_psi
     use eval_coulomb
-    use const_def, only: ln10, kerg, mev_to_ergs, keV, me, clight, ev2erg, fine
-    use const_def, only: const_pi => pi
+    use const_def, only: ln10, kerg, mev_to_ergs, keV, me, clight, ev2erg, fine, pi
     use chem_def
     use utils_lib, only: is_bad, &
       integer_dict_lookup, integer_dict_size
@@ -66,20 +66,20 @@ contains
     integer :: offset_lhs, nstates_lhs, lo_lhs, hi_lhs
     integer :: offset_rhs, nstates_rhs, lo_rhs, hi_rhs
 
-    real(dp) :: mue, dmue_dlnRho, dmue_dlnT ! chem pot and derivatives
+    type(auto_diff_real_2var_order1) :: mue, eta, beta, kT
 
     character(len=iso_name_length) :: ecapture_lhs, ecapture_rhs
 
-    real(dp) :: Qx, T, beta, kT, mec2, Z, Eavg, Ei, Ef, G_GM
-    real(dp) :: eta, deta_dlnT, deta_dlnRho
+    real(dp) :: Qx, mec2, Z, Eavg, Ei, Ef, G_GM
 
     real(dp), dimension(max_num_ecapture_states) :: E_lhs, E_rhs, J_lhs, J_rhs
-    real(dp), dimension(max_num_ecapture_states) :: bf, Pi, dPi_dlnT
+    real(dp), dimension(max_num_ecapture_states) :: bf, PPi, dPPi_dlnT
 
     integer, dimension(max_num_ecapture_transitions) :: Si, Sf
     real(dp), dimension(max_num_ecapture_transitions) :: logft
 
-    real(dp), dimension(max_num_ecapture_transitions) :: zeta
+    type(auto_diff_real_2var_order1), dimension(max_num_ecapture_transitions) :: zeta
+    type(auto_diff_real_2var_order1) :: Ie_ad, Je_ad
     real(dp), dimension(max_num_ecapture_transitions) :: Ie, dIe_dlnT, dIe_dlnRho
     real(dp), dimension(max_num_ecapture_transitions) :: Je, dJe_dlnT, dJe_dlnRho
     real(dp), dimension(max_num_ecapture_transitions) :: Pj, dPj_dlnT
@@ -87,10 +87,10 @@ contains
     real(dp), dimension(max_num_ecapture_transitions) :: lambdaj, lambdaj_neu
 
     ! for coulomb corrections
-    real(dp) :: Z_lhs, Z_rhs, muI_lhs, muI_rhs, delta_muI, delta_Q, Vs, f_muE
+    real(dp) :: Z_lhs, Z_rhs
+    type(auto_diff_real_2var_order1) :: muI_lhs, muI_rhs, delta_muI, delta_Q, Vs, f_muE
 
-    real(dp) :: neutrino, dneutrino_dlnT, dneutrino_dlnRho, &
-         gammaray, dgammaray_dlnT, dgammaray_dlnRho, lambdam1
+    real(dp) :: neutrino, dneutrino_dlnT, dneutrino_dlnRho, lambdam1
     character(len=2*iso_name_length+1) :: key
 
     integer :: rxn_type, ii
@@ -100,26 +100,31 @@ contains
 
     ierr = 0
 
+    ! auto_diff variables have
+    ! var1: lnT
+    ! var2: lnRho
+
     ! first, translate the density, temperature, etc into appropriate units
 
     kT = 1d3 * keV * T9 ! in MeV
+    kT% d1val1 = kT% val
+    kT% d1val2 = 0d0
+    
     mec2 = me * clight*clight / mev_to_ergs ! in MeV
     beta = mec2/kT ! dimesionless
 
     ! the chemical potentials from the equation of state are kinetic
     ! so add in the rest mass terms
 
-    eta = etak + beta
-    deta_dlnT = d_etak_dlnT - beta
-    deta_dlnRho = d_etak_dlnRho
+    eta% val = etak + beta% val
+    eta% d1val1 = d_etak_dlnT + beta % d1val1
+    eta% d1val2 = d_etak_dlnRho + beta % d1val2
 
     ! only evaluate this for really degenerate stuff
     if (eta .lt. 2*beta) return
 
     ! also need chemical potential in MeV
     mue = eta * kT
-    dmue_dlnRho = deta_dlnRho * kT
-    dmue_dlnT = deta_dlnT * kT + mue
 
     do i = 1, n ! loop over reactions
 
@@ -167,12 +172,12 @@ contains
        case(rxn_ecapture)
           ! use the *atomic* isotope data to get the *nuclear* mass excess
           Qx = chem_isos% mass_excess(lhs) - chem_isos% mass_excess(rhs) - mec2
-          G_GM = exp(const_pi* fine * Z_lhs)
+          G_GM = exp(pi* fine * Z_lhs)
           if (dbg) write(*,*) "ecapture ", key
        case(rxn_betadecay)
           ! use the *atomic* isotope data to get the *nuclear* mass excess
           Qx = chem_isos% mass_excess(lhs) - chem_isos% mass_excess(rhs) + mec2
-          G_GM = exp(const_pi * fine * Z_rhs)
+          G_GM = exp(pi * fine * Z_rhs)
           if (dbg) write(*,*) "betadecay ", key
        end select
 
@@ -218,19 +223,19 @@ contains
 
        ! calculate boltzmann factor (bf), partition function (Z), and <E>
        do ii=1,nstates_lhs
-         bf(ii) = (2 * J_lhs(ii) + 1) * exp(-E_lhs(ii)/ kT)
+         bf(ii) = (2 * J_lhs(ii) + 1) * exp(-E_lhs(ii)/ kT%val)
        end do
        Z = sum(bf(1:nstates_lhs))
        Eavg = sum(bf(1:nstates_lhs)* E_lhs(1:nstates_lhs))/ Z
 
        ! occupation probability (& derivative)
-       Pi(1:nstates_lhs) = bf(1:nstates_lhs)/Z
-       dPi_dlnT(1:nstates_lhs) = Pi(1:nstates_lhs) * (E_lhs(1:nstates_lhs) - Eavg) / kT
+       PPi(1:nstates_lhs) = bf(1:nstates_lhs)/Z
+       dPPi_dlnT(1:nstates_lhs) = PPi(1:nstates_lhs) * (E_lhs(1:nstates_lhs) - Eavg) / kT% val
 
        ! now rearrange these rates to they apply to the transitions
        do j = 1, ntrans
-          Pj(j) = Pi(Si(j))
-          dPj_dlnT(j) = dPi_dlnT(Si(j))
+          Pj(j) = PPi(Si(j))
+          dPj_dlnT(j) = dPPi_dlnT(Si(j))
        end do
 
        if (dbg) then
@@ -267,14 +272,18 @@ contains
 
           select case(rxn_type)
           case(rxn_ecapture)
-             call do_psi_Iec_and_Jec(beta, zeta(j), &
-                  f_muE * eta, f_muE * deta_dlnT, f_muE * deta_dlnRho, &
-                  Ie(j), dIe_dlnT(j), dIe_dlnRho(j), Je(j), dJe_dlnT(j), dJe_dlnRho(j))
+             call do_psi_Iec_and_Jec(beta, zeta(j), f_muE*eta, Ie_ad, Je_ad)
           case(rxn_betadecay)
-             call do_psi_Iee_and_Jee(beta, zeta(j), &
-                  f_muE * eta, f_muE * deta_dlnT, f_muE * deta_dlnRho, &
-                  Ie(j), dIe_dlnT(j), dIe_dlnRho(j), Je(j), dJe_dlnT(j), dJe_dlnRho(j))
+             call do_psi_Iee_and_Jee(beta, zeta(j), f_muE*eta, Ie_ad, Je_ad)
           end select
+
+          ! unpack from auto_diff
+          Ie(j) = Ie_ad % val
+          dIe_dlnT(j) = Ie_ad % d1val1
+          dIe_dlnRho(j) = Ie_ad % d1val2
+          Je(j) = Je_ad% val
+          dJe_dlnT(j) = Je_ad% d1val1
+          dJe_dlnRho(j) = Je_ad% d1val2
 
        end do
 
