@@ -1,3 +1,9 @@
+.. _T_tau_gradr:
+
+***********
+T_tau_gradr
+***********
+
 .. |Ttau| replace:: :math:`T(\tau)`
 .. |tau| replace:: :math:`\tau`
 
