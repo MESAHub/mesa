@@ -407,7 +407,8 @@
     TDC_target_steps_per_cycle, TDC_max_num_periods, TDC_work_period, TDC_map_first_period, TDC_map_last_period, &
     TDC_min_max_R_for_periods, TDC_GREKM_avg_abs_frac_new, TDC_GREKM_avg_abs_limit, TDC_map_zone_interval, &
     TDC_work_filename, TDC_map_columns_filename, TDC_map_filename, TDC_map_history_filename, TDC_write_map, &
-    TDC_min_dt_div_tau_conv_switch_to_MLT, TDC_min_dt_years_switch_to_MLT, &
+    TDC_min_dt_div_tau_conv_switch_to_MLT, TDC_min_dt_years_switch_to_MLT, TDC_use_RSP_form_of_etrb_eqn, &
+    TDC_w_min_for_damping, TDC_source_seed, &
     max_q_for_conv_timescale, min_q_for_conv_timescale, max_q_for_QHSE_timescale, min_q_for_QHSE_timescale, &
     
     
@@ -2089,6 +2090,9 @@
  s% TDC_map_filename = TDC_map_filename
  s% TDC_map_history_filename = TDC_map_history_filename
  s% TDC_write_map = TDC_write_map
+ s% TDC_use_RSP_form_of_etrb_eqn = TDC_use_RSP_form_of_etrb_eqn
+ s% TDC_w_min_for_damping = TDC_w_min_for_damping
+ s% TDC_source_seed = TDC_source_seed
  
  s% max_q_for_conv_timescale = max_q_for_conv_timescale
  s% min_q_for_conv_timescale = min_q_for_conv_timescale
@@ -3746,7 +3750,10 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_map_filename = s% TDC_map_filename
  TDC_map_history_filename = s% TDC_map_history_filename
  TDC_write_map = s% TDC_write_map
- 
+ TDC_use_RSP_form_of_etrb_eqn = s% TDC_use_RSP_form_of_etrb_eqn
+ TDC_w_min_for_damping = s% TDC_w_min_for_damping
+ TDC_source_seed = s% TDC_source_seed
+
  max_q_for_conv_timescale = s% max_q_for_conv_timescale
  min_q_for_conv_timescale = s% min_q_for_conv_timescale
  max_q_for_QHSE_timescale = s% max_q_for_QHSE_timescale

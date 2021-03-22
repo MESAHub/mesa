@@ -3,17 +3,8 @@
 
       show_log_description_at_start = .false. 
 
-! CHANGE FOR dev_TDC_twin_studies
-      !create_pre_main_sequence_model = .true.
-      !pre_ms_relax_to_start_radiative_core = .false.
-      !pre_ms_relax_num_steps = 100
       load_saved_model = .true.
       saved_model_name = 'pre_ms_with_convective_core.mod'
-
-! CHANGE FOR dev_TDC_twin_studies
-      !save_model_when_terminate = .true.
-      !save_model_filename = 'pre_ms_with_convective_core.mod'
-      !required_termination_code_string = 'max_model_number'
 
 / ! end of star_job namelist
 
@@ -30,14 +21,10 @@
 
       initial_mass = 1
       initial_z = 0.02d0
-      
-! CHANGE FOR dev_TDC_twin_studies
-      !max_model_number = 101
 
       mixing_length_alpha = 1.8
       mlt_make_surface_no_mixing = .true.
       
-      !use_dPrad_dm_form_of_T_gradient_eqn = .true.
       use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
 
 / ! end of controls namelist

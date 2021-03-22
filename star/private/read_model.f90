@@ -364,13 +364,12 @@
          end if
          
          if (is_RSP_model .and. .not. want_RSP_model) then
-            write(*,*) 'automatically converting to TDC form'
+            write(*,*) 'automatically converting from RSP to TDC form'
             s% RSP_flag = .false.
-            if (.not. s% TDC_flag) then
-               write(*,*) 'and setting TDC_flag to .true.'
-               s% TDC_flag = .true.
-               s% need_to_reset_w = .false.
-            end if
+            s% TDC_flag = .true.
+            s% using_TDC = .true.
+            s% previous_step_was_using_TDC = .true.
+            s% need_to_reset_w = .false.
          end if
          
          if (no_L .and. s% i_lum /= 0) then

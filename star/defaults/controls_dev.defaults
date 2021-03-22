@@ -27,7 +27,7 @@
 
       ! ::
 
-    TDC_alfad = 1.3d0  ! 1.0d0 is RSP standard.  1.3 does better matching mesa MLT.
+    TDC_alfad = 1.0d0  ! RSP standard.  1.3 does better matching mesa MLT.
     TDC_alfap = 0.0d0
     TDC_alfat = 0.0d0
     TDC_alfam = 0.25d0
@@ -43,12 +43,16 @@
     TDC_use_RSP_eqn_for_Y_face = .true.
     TDC_use_mass_interp_face_values = .false.
     TDC_use_Stellingwerf_Lr = .true.
+    TDC_use_RSP_form_of_etrb_eqn = .true.
     
     TDC_num_outermost_cells_forced_nonturbulent = 0
     TDC_num_innermost_cells_forced_nonturbulent = 0
     
     TDC_min_dt_div_tau_conv_switch_to_MLT = -1
     TDC_min_dt_years_switch_to_MLT = 20d0
+
+     TDC_w_min_for_damping = 1d2
+     TDC_source_seed = 0d0
 
       ! period controls
 

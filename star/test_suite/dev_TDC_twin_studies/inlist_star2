@@ -46,6 +46,9 @@
    TDC_min_Lc_div_L_for_convective_mixing_type = 1d-4
    TDC_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
 
+   TDC_w_min_for_damping = 0d0
+   TDC_source_seed = 0d0
+
    TDC_Lsurf_factor = 0.25d0
    
    Pvsc_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)

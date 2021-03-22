@@ -1,10 +1,19 @@
+! inlist_1M_TDC, inlist_to_end_core_he_burn_TDC, inlist_pre_ms_with_convective_core
+
+! NOTE: starting models must be created with 
+!  use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
+!  set_rho_to_dm_div_dV = .false.
+!  mlt_make_surface_no_mixing = .true.
+!
+!  inlist should set mixing_length_alpha
+
 
 &star_job
 
       mesa_dir = '../../..'
 
       read_extra_star_job_inlist2 = .true.
-      extra_star_job_inlist2_name = 'inlist_to_end_core_he_burn_TDC' ! or inlist_pre_ms_with_convective_core
+      extra_star_job_inlist2_name = 'inlist_1M_TDC'
 
 / ! end of star_job namelist
 
@@ -12,7 +21,7 @@
 &eos
 
       read_extra_eos_inlist1 = .true.
-      extra_eos_inlist1_name = 'inlist_to_end_core_he_burn_TDC'
+      extra_eos_inlist1_name = 'inlist_1M_TDC'
 
 / ! end of eos namelist
 
@@ -20,7 +29,7 @@
 &kap
 
       read_extra_kap_inlist1 = .true.
-      extra_kap_inlist1_name = 'inlist_to_end_core_he_burn_TDC'
+      extra_kap_inlist1_name = 'inlist_1M_TDC'
 
 / ! end of kap namelist
 
@@ -29,7 +38,7 @@
 &controls
 
       read_extra_controls_inlist1 = .true.
-      extra_controls_inlist1_name = 'inlist_to_end_core_he_burn_TDC'
+      extra_controls_inlist1_name = 'inlist_1M_TDC'
 
 / ! end of controls namelist
 
@@ -37,6 +46,6 @@
 &pgstar
 
       read_extra_pgstar_inlist1 = .true.
-      extra_pgstar_inlist1_name = 'inlist_to_end_core_he_burn_TDC'
+      extra_pgstar_inlist1_name = 'inlist_1M_TDC'
 
 / ! end of pgstar namelist

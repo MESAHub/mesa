@@ -498,7 +498,7 @@
             set_m_grav_and_grav, set_scale_height, get_tau, &
             set_abs_du_div_cs, set_max_conv_time_scale
          use hydro_rotation, only: set_rotation_info, compute_j_fluxes_and_extra_jdot
-         use hydro_tdc, only: reset_etrb_using_L, set_TDC_vars, set_using_TDC
+         use hydro_tdc, only: set_TDC_vars, set_using_TDC
          use brunt, only: do_brunt_B, do_brunt_N2
          use mix_info, only: set_mixing_info
 

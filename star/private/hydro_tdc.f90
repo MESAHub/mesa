@@ -38,7 +38,7 @@
       private
       public :: do1_tdc_L_eqn, do1_turbulent_energy_eqn, compute_Eq_cell, &
          compute_Uq_face, set_TDC_vars, &
-         set_using_TDC, set_etrb_start_vars, reset_etrb_using_L
+         set_using_TDC, set_etrb_start_vars
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -395,11 +395,14 @@
          logical, intent(in) :: skip_partials
          integer, intent(out) :: ierr         
          integer :: j
+         ! for OLD WAY
+         type(auto_diff_real_star_order1) :: &
+            d_turbulent_energy_ad, Ptrb_dV_ad, dt_C_ad, dt_Eq_ad
          type(auto_diff_real_star_order1) :: xi0, xi1, xi2, A0, Af, w_00
          type(auto_diff_real_star_order1) :: tst, resid_ad, scal, dt_dLt_dm_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, test_partials
-         real(dp) :: residual, atol, rtol
+         real(dp) :: residual, atol, rtol, old_scal
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -421,6 +424,19 @@
 
             resid_ad = w_00/s% csound(k) ! make w = 0
             
+         else if (s% TDC_use_RSP_form_of_etrb_eqn) then          ! OLD WAY
+
+            call setup_d_turbulent_energy(ierr); if (ierr /= 0) return ! erg g^-1 = cm^2 s^-2
+            call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_dLt_dm_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_C_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call setup_dt_Eq_ad(ierr); if (ierr /= 0) return ! erg g^-1
+            call set_energy_eqn_scal(s, k, old_scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)         
+            ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
+            esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad ! erg g^-1
+            resid_ad = esum_ad
+            resid_ad = resid_ad*old_scal/s%dt ! to make residual unitless, must cancel out the dt in scal
+
          else
          
             call eval_xis(s, k, xi0, xi1, xi2, ierr)
@@ -477,6 +493,24 @@
          end if      
 
          contains
+         
+         subroutine setup_d_turbulent_energy(ierr) ! erg g^-1
+            integer, intent(out) :: ierr
+            ierr = 0
+            d_turbulent_energy_ad = wrap_etrb_00(s,k) - get_etrb_start(s,k)
+         end subroutine setup_d_turbulent_energy
+         
+         ! Ptrb_dV_ad = Ptrb_ad*dV_ad
+         subroutine setup_Ptrb_dV_ad(ierr) ! erg g^-1
+            use star_utils, only: calc_Ptrb_ad_tw
+            integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: Ptrb_ad, PT0, dV_ad, d_00
+            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, PT0, ierr)
+            if (ierr /= 0) return
+            d_00 = wrap_d_00(s,k)
+            dV_ad = 1d0/d_00 - 1d0/s% rho_start(k)
+            Ptrb_dV_ad = Ptrb_ad*dV_ad ! erg cm^-3 cm^-3 g^-1 = erg g^-1
+         end subroutine setup_Ptrb_dV_ad
 
          subroutine setup_dt_dLt_dm_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr            
@@ -500,6 +534,22 @@
             end if
             dt_dLt_dm_ad = (Lt_00 - Lt_p1)*s%dt/s%dm(k)
          end subroutine setup_dt_dLt_dm_ad
+         
+         subroutine setup_dt_C_ad(ierr) ! erg g^-1
+            integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: C
+            C = compute_C(s, k, ierr) ! erg g^-1 s^-1
+            if (ierr /= 0) return
+            dt_C_ad = s%dt*C
+         end subroutine setup_dt_C_ad
+                  
+         subroutine setup_dt_Eq_ad(ierr) ! erg g^-1
+            integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: Eq_cell, Eq_div_w
+            Eq_cell = compute_Eq_cell(s, k, Eq_div_w, ierr) ! erg g^-1 s^-1
+            if (ierr /= 0) return
+            dt_Eq_ad = s%dt*Eq_cell
+         end subroutine setup_dt_Eq_ad
       
       end subroutine do1_turbulent_energy_eqn
 
@@ -921,6 +971,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Source, source_div_w
+         ! source_div_w assumes TDC_source_seed == 0
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, Peos_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
@@ -955,7 +1006,8 @@
          ! Peos_00*QQ_00/Cp_00 = grad_ad
          grad_ad_00 = wrap_grad_ad_00(s, k)
          source_div_w = PII_div_Hp_cell*T_00*grad_ad_00
-         Source = w_00*source_div_w
+         ! new analytic TDC requires s% TDC_source_seed == 0 for this
+         Source = (w_00 + s% TDC_source_seed)*source_div_w
          
          ! PII units same as Cp = erg g^-1 K^-1
          ! P*QQ/Cp is unitless (see Y_face)
@@ -976,22 +1028,25 @@
       end function compute_Source
 
 
-      function compute_D(s, k, D_div_w3, ierr) result(D) ! erg g^-1 s^-1
+      function compute_D(s, k, D_div_dw3, ierr) result(D) ! erg g^-1 s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: D, D_div_w3
+         type(auto_diff_real_star_order1) :: D, dw3, D_div_dw3
+         ! D_div_dw3 assumes TDC_w_min_for_damping == 0d0
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
          include 'formats'
          ierr = 0
          if (s% mixing_length_alpha == 0d0) then
-            D_div_w3 = 0d0
+            D_div_dw3 = 0d0
             D = 0d0
          else
             Hp_cell = compute_Hp_cell(s,k,ierr)
             if (ierr /= 0) return
-            D_div_w3 = (s% TDC_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell
-            D = D_div_w3*pow3(wrap_w_00(s,k))
+            ! analytic TDC requires TDC_w_min_for_damping == 0d0 for this
+            dw3 = pow3(wrap_w_00(s,k)) - pow3(s% TDC_w_min_for_damping)
+            D_div_dw3 = (s% TDC_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell
+            D = D_div_dw3*dw3
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          end if
          s% DAMP(k) = D%val

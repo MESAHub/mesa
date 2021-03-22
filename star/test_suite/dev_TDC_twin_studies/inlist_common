@@ -8,8 +8,8 @@
    set_initial_model_number = .true.
    initial_model_number = 0
 
-   set_initial_dt = .true.
-   seconds_for_initial_dt = 1d4
+!   set_initial_dt = .true.
+!   seconds_for_initial_dt = 1d4
 
 / ! end of star_job namelist
 
@@ -22,6 +22,7 @@
 &controls
    TDC_min_dt_div_tau_conv_switch_to_MLT = 10d0 ! takes priority if > 0
    TDC_min_dt_years_switch_to_MLT = 20d0
+   TDC_alfad = 1.3d0  ! 1.0d0 is RSP standard.  1.3 does better matching mesa MLT.
 
 ! mesh
    okay_to_remesh = .false.
