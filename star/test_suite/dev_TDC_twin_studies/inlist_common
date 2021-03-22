@@ -24,6 +24,8 @@
    TDC_min_dt_years_switch_to_MLT = 20d0
    
    TDC_alfad = 1.3d0  ! 1.0d0 is RSP standard.  1.3 does better matching mesa MLT.
+
+   TDC_use_RSP_form_of_etrb_eqn = .false.
    
    !max_years_for_timestep = 0.1
    

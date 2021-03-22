@@ -190,6 +190,9 @@
          type(auto_diff_real_star_order1) :: &
             tst, Source, S0, Eq, Eq0, DAMP, D0, DAMPR, DR0, Ptrb, Pt0, dV
          logical :: test_partials
+
+         !type(accurate_auto_diff_real_star_order1) :: esum_ad
+
          include 'formats'
 
          !test_partials = (k == s% solver_test_partials_k)
