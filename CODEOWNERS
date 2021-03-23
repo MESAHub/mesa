@@ -58,9 +58,9 @@ star/test_suite/8.8M_urca/ @jschwab
 #star/test_suite/accreted_material_j/ 
 star/test_suite/adjust_net/ @rjfarmer
 star/test_suite/black_hole/ @rjfarmer
-#star/test_suite/c13_pocket/ 
-#star/test_suite/carbon_acc/
-#star/test_suite/carbon_kh/
+#star/test_suite/c13_pocket/ @jschwab
+#star/test_suite/carbon_acc/ @jschwab
+#star/test_suite/carbon_kh/ @jschwab
 star/test_suite/cburn_inward/ @rjfarmer @fxt
 star/test_suite/ccsn_IIp/ @rjfarmer @fxt
 #star/test_suite/check_redo/ 
@@ -118,7 +118,7 @@ star/test_suite/test_case_template/ @bill-paxton
 star/test_suite/test_memory/ @rjfarmer
 star/test_suite/timing/ @rjfarmer
 star/test_suite/T_tau_gradr/ @warrickball
-star/test_suite/wd_acc_small_dm/ 
+star/test_suite/wd_acc_small_dm/ @jschwab
 star/test_suite/wd_aic/ @jschwab
 #star/test_suite/wd_c_core_ignition/
 star/test_suite/wd_cool_0.6M/ @evbauer @fxt
