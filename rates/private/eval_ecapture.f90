@@ -70,27 +70,23 @@ contains
 
     character(len=iso_name_length) :: ecapture_lhs, ecapture_rhs
 
-    real(dp) :: Qx, mec2, Z, Eavg, Ei, Ef, G_GM
+    real(dp) :: Qx, mec2, Ei, Ef, G_GM, ln2ft
 
     real(dp), dimension(max_num_ecapture_states) :: E_lhs, E_rhs, J_lhs, J_rhs
-    real(dp), dimension(max_num_ecapture_states) :: bf, PPi, dPPi_dlnT
+    type(auto_diff_real_2var_order1), dimension(max_num_ecapture_states) :: bf, PPi
+    type(auto_diff_real_2var_order1) :: Z, Eavg
 
     integer, dimension(max_num_ecapture_transitions) :: Si, Sf
     real(dp), dimension(max_num_ecapture_transitions) :: logft
 
     type(auto_diff_real_2var_order1), dimension(max_num_ecapture_transitions) :: zeta
-    type(auto_diff_real_2var_order1) :: Ie_ad, Je_ad
-    real(dp), dimension(max_num_ecapture_transitions) :: Ie, dIe_dlnT, dIe_dlnRho
-    real(dp), dimension(max_num_ecapture_transitions) :: Je, dJe_dlnT, dJe_dlnRho
-    real(dp), dimension(max_num_ecapture_transitions) :: Pj, dPj_dlnT
-
-    real(dp), dimension(max_num_ecapture_transitions) :: lambdaj, lambdaj_neu
+    type(auto_diff_real_2var_order1) :: Ie_ad, Je_ad, lambda_ad, neutrino_ad, Qneu_ad
+    type(auto_diff_real_2var_order1), dimension(max_num_ecapture_transitions) :: Pj
 
     ! for coulomb corrections
     real(dp) :: Z_lhs, Z_rhs
     type(auto_diff_real_2var_order1) :: muI_lhs, muI_rhs, delta_muI, delta_Q, Vs, f_muE
 
-    real(dp) :: neutrino, dneutrino_dlnT, dneutrino_dlnRho, lambdam1
     character(len=2*iso_name_length+1) :: key
 
     integer :: rxn_type, ii
@@ -222,20 +218,23 @@ contains
        ! we assume the left hand side states have thermal occupation fractions
 
        ! calculate boltzmann factor (bf), partition function (Z), and <E>
+       Z = 0d0
+       Eavg = 0d0
        do ii=1,nstates_lhs
-         bf(ii) = (2 * J_lhs(ii) + 1) * exp(-E_lhs(ii)/ kT%val)
+         bf(ii) = (2 * J_lhs(ii) + 1) * exp(-E_lhs(ii)/ kT)
+         Z = Z + bf(ii)
+         Eavg = Eavg + bf(ii) * E_lhs(ii)
        end do
-       Z = sum(bf(1:nstates_lhs))
-       Eavg = sum(bf(1:nstates_lhs)* E_lhs(1:nstates_lhs))/ Z
+       Eavg = Eavg / Z
 
-       ! occupation probability (& derivative)
-       PPi(1:nstates_lhs) = bf(1:nstates_lhs)/Z
-       dPPi_dlnT(1:nstates_lhs) = PPi(1:nstates_lhs) * (E_lhs(1:nstates_lhs) - Eavg) / kT% val
+       ! occupation probability
+       do ii=1,nstates_lhs
+          PPi(ii) = bf(ii)/Z
+       end do
 
-       ! now rearrange these rates to they apply to the transitions
+       ! now rearrange these rates so they apply to the transitions
        do j = 1, ntrans
           Pj(j) = PPi(Si(j))
-          dPj_dlnT(j) = dPPi_dlnT(Si(j))
        end do
 
        if (dbg) then
@@ -261,6 +260,9 @@ contains
 
        if (dbg) write(*,*) eta, muI_lhs, muI_rhs, delta_muI, Vs
 
+       lambda_ad = 0d0
+       neutrino_ad = 0d0
+
        ! do the phase space integrals
        do j = 1, ntrans
 
@@ -277,60 +279,34 @@ contains
              call do_psi_Iee_and_Jee(beta, zeta(j), f_muE*eta, Ie_ad, Je_ad)
           end select
 
-          ! unpack from auto_diff
-          Ie(j) = Ie_ad % val
-          dIe_dlnT(j) = Ie_ad % d1val1
-          dIe_dlnRho(j) = Ie_ad % d1val2
-          Je(j) = Je_ad% val
-          dJe_dlnT(j) = Je_ad% d1val1
-          dJe_dlnRho(j) = Je_ad% d1val2
+          ! apply fermi-function correction factor
+          Ie_ad = G_GM * Ie_ad
+          Je_ad = G_GM * Je_ad
+
+          ! convert to rates
+          ln2ft = ln2 * exp10(-logft(j))
+          ! protect against 0s
+          if ((Ie_ad .gt. 0) .and. (Je_ad .gt. 0)) then
+             lambda_ad = lambda_ad + Ie_ad * ln2ft * Pj(j)
+             neutrino_ad = neutrino_ad + mec2 * Je_ad * ln2ft * Pj(j)
+          end if
 
        end do
 
-       ! apply fermi-function correction factor
-       Ie(1:ntrans) = G_GM * Ie(1:ntrans)
-       dIe_dlnT(1:ntrans) = G_GM * dIe_dlnT(1:ntrans)
-       dIe_dlnRho(1:ntrans) = G_GM * dIe_dlnRho(1:ntrans)
-
-       Je(1:ntrans) = G_GM * Je(1:ntrans)
-       dJe_dlnT(1:ntrans) = G_GM * dJe_dlnT(1:ntrans)
-       dJe_dlnRho(1:ntrans) = G_GM * dJe_dlnRho(1:ntrans)
-
-       ! add approximate fermi-function corrections
-
-       do j=1,ntrans
-         lambdaj(j) =  Ie(j) * exp10(-logft(j)) * ln2
-         lambdaj_neu(j) = Je(j) * exp10(-logft(j)) * ln2
-       end do
-
-       ! masked arrays prevent dividing by zero in derivatives
-       ! if Ie is 0, we also expect dIe_dlnT, dIe_dlnRho is 0
-
-       lambda(i) = sum(lambdaj(1:ntrans) * Pj(1:ntrans))
-       dlambda_dlnT(i) = sum(lambdaj(1:ntrans) *  &
-            ( dPj_dlnT(1:ntrans) + Pj(1:ntrans) * dIe_dlnT(1:ntrans)/Ie(1:ntrans)), &
-            MASK=(Ie(1:ntrans).ne.0))
-       dlambda_dlnRho(i) = sum(lambdaj(1:ntrans) * &
-            Pj(1:ntrans) * dIe_dlnRho(1:ntrans)/Ie(1:ntrans), &
-            MASK=(Ie(1:ntrans).ne.0))
-
-       neutrino = mec2 * sum(lambdaj_neu(1:ntrans) * Pj(1:ntrans))
-       dneutrino_dlnT = mec2 * sum(lambdaj_neu(1:ntrans) * &
-            ( dPj_dlnT(1:ntrans) + Pj(1:ntrans) * dJe_dlnT(1:ntrans)/Je(1:ntrans)), &
-            MASK=(Je(1:ntrans).ne.0))
-       dneutrino_dlnRho = mec2 * sum(lambdaj_neu(1:ntrans) * &
-            Pj(1:ntrans) * dJe_dlnRho(1:ntrans)/Je(1:ntrans), &
-            MASK=(Je(1:ntrans).ne.0))
-
-       if (lambda(i) .gt. 1d-30) then
-          lambdam1 = 1.0_dp / lambda(i)
+       if (lambda_ad .gt. 1d-30) then
+          Qneu_ad = neutrino_ad / lambda_ad
        else
-          lambdam1 = 0
+          Qneu_ad = 0d0
        end if
 
-       Qneu(i) = neutrino * lambdam1
-       dQneu_dlnT(i) = (dneutrino_dlnT - dlambda_dlnT(i) * Qneu(i)) * lambdam1
-       dQneu_dlnRho(i) = (dneutrino_dlnRho - dlambda_dlnRho(i) * Qneu(i)) * lambdam1
+       ! unpack from auto_diff
+       lambda(i) = lambda_ad % val
+       dlambda_dlnT(i) = lambda_ad % d1val1
+       dlambda_dlnRho(i) = lambda_ad % d1val2
+
+       Qneu(i) = Qneu_ad% val
+       dQneu_dlnT(i) = Qneu_ad% d1val1
+       dQneu_dlnRho(i) = Qneu_ad% d1val2
 
        ! this is the *total* energy per decay (neu losses are subtracted later)
 
