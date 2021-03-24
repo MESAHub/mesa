@@ -2971,14 +2971,14 @@
       ! http://adsabs.harvard.edu/abs/2008AcA....58..193S
       ! for standard values and the description of the parameters.
          
-      !   RSP_alfa =      1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-      !   RSP_alfac =     1.0d0         ! convective flux; Lc ~ RSP_alfac
-      !   RSP_alfas =     1.0d0         ! turbulent source; Lc ~ 1/ALFAS; PII ~ RSP_alfas
-      !   RSP_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP_alfad
-      !   RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !   RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-      !   RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-      !   RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
+      ! | RSP_alfa =      1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+      ! | RSP_alfac =     1.0d0         ! convective flux; Lc ~ RSP_alfac
+      ! | RSP_alfas =     1.0d0         ! turbulent source; Lc ~ 1/ALFAS; PII ~ RSP_alfas
+      ! | RSP_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP_alfad
+      ! | RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+      ! | RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
+      ! | RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
+      ! | RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
 
       ! ::
 
@@ -2997,15 +2997,15 @@
       ! do not use values less than 0.5.  strongly recommend 0.5 for theta and thetat.
       ! don't mess with any of these unless you know what you are doing or like to watch the code crash.
       
-      !   RSP_theta =      0.5d0        ! Pgas and Prad
-      !   RSP_thetat =     0.5d0        ! Pturb
-      !   RSP_thetae =     0.5d0        ! erad in terms using f_Edd
-      !   RSP_thetaq =     1.0d0        ! Pvsc
-      !   RSP_thetau =     1.0d0        ! Eq and Uq
-      !   RSP_wtr =        0.6667d0     ! Lr
-      !   RSP_wtc =        0.6667d0     ! Lc
-      !   RSP_wtt =        0.6667d0     ! Lt
-      !   RSP_gam =        1.0d0        ! Et src_snk
+      ! | RSP_theta =      0.5d0        ! Pgas and Prad
+      ! | RSP_thetat =     0.5d0        ! Pturb
+      ! | RSP_thetae =     0.5d0        ! erad in terms using f_Edd
+      ! | RSP_thetaq =     1.0d0        ! Pvsc
+      ! | RSP_thetau =     1.0d0        ! Eq and Uq
+      ! | RSP_wtr =        0.6667d0     ! Lr
+      ! | RSP_wtc =        0.6667d0     ! Lc
+      ! | RSP_wtt =        0.6667d0     ! Lt
+      ! | RSP_gam =        1.0d0        ! Et src_snk
 
       ! ::
 
