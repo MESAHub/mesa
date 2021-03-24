@@ -2484,12 +2484,12 @@
       ! Overshooting depends on the classification of the convective zone and can be different at the top and the bottom of the zone.
 
       ! The overshooting controls are based on convection-zone and convection-boundary matching criteria.
-      ! These criteria are ````overshoot_zone_type````, ````overshoot_zone_loc```` and ````overshoot_bdy_loc````.
+      ! These criteria are ``overshoot_zone_type``, ``overshoot_zone_loc`` and ``overshoot_bdy_loc``.
       ! The overshooting parameter values corresponding to the first set of matching criteria will be used.
       ! Therefore, narrower criteria should precede more general ones (i.e have lower array indices).
 
-      ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
-      ! ````star_data/public/star_data_def.inc```` (currently 16)
+      ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
+      ! ``star_data/public/star_data_def.inc`` (currently 16)
 
       ! ::
 
@@ -2499,8 +2499,8 @@
     overshoot_bdy_loc(:) = '' ! ``bottom``, ``top``, ``any``
 
       ! Amount of overshooting from edge of convective zone
-      ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
-      ! ````star_data/public/star_data_def.inc```` (currently 16)
+      ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
+      ! ``star_data/public/star_data_def.inc`` (currently 16)
 
       ! ::
 
@@ -2527,8 +2527,8 @@
       ! For step overshoot: overshooting extends a distance overshoot_f*Hp0 from r0 with constant diffusion coefficient
       ! D = overshoot_D0 + overshoot_Delta0*D_ob
       ! where D_ob is the convective diffusivity at the bottom (top) of the step overshoot region for outward (inward) overshooting.
-      ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
-      ! ````star_data/public/star_data_def.inc```` (currently 16)
+      ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
+      ! ``star_data/public/star_data_def.inc`` (currently 16)
 
       ! ::
 
@@ -2538,8 +2538,8 @@
       ! You can specify a range of star masses over which overshooting
       ! above H burning zones is gradually enabled.
       ! Do specified overshooting above H burning zone if ``star_mass`` >= this (Msun).
-      ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
-      ! ````star_data/public/star_data_def.inc```` (currently 16)
+      ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
+      ! ``star_data/public/star_data_def.inc`` (currently 16)
 
       ! ::
 
@@ -2548,8 +2548,8 @@
       ! You can specify a range of star masses over which overshooting
       ! above H burning zones is gradually enabled.
       ! No overshooting above H burning zone if ``star_mass`` <= this  (Msun).
-      ! These are arrays of size ````NUM_OVERSHOOT_PARAM_SETS```` which is defined in
-      ! ````star_data/public/star_data_def.inc```` (currently 16)
+      ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
+      ! ``star_data/public/star_data_def.inc`` (currently 16)
 
       ! ::
 
