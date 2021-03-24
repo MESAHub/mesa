@@ -2851,7 +2851,8 @@
 
     conv_premix_time_factor = 0.0
 
-      ! ### conv_premix_fix_pgas
+      ! conv_premix_fix_pgas
+      ! ~~~~~~~~~~~~~~~~~~~~
 
       ! Flag to decide whether gas pressure is kept constant during premixing (.true.), or instead
       ! density is kept constant (.false.). In both cases, temperature is kept constant.
@@ -2860,7 +2861,8 @@
 
     conv_premix_fix_pgas = .true.
 
-      ! ### conv_premix_dump_snapshots
+      ! conv_premix_dump_snapshots
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Flag to write out snapshots of the intermediate stages during the convective premixing iterations.
       ! Refer to the dump_snapshot_ routine in star/private/conv_premix.f90 to see what's written out. Note
