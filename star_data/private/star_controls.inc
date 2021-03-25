@@ -916,17 +916,14 @@
          real(dp) :: &
             hydro_mtx_max_allowed_abs_dlogT, &
             hydro_mtx_max_allowed_abs_dlogRho, &
-            hydro_mtx_max_allowed_abs_dlogPgas, &
             min_logT_for_hydro_mtx_max_allowed, &
             hydro_mtx_max_allowed_logT, &
             hydro_mtx_max_allowed_logRho, &
-            hydro_mtx_max_allowed_logPgas, &
             hydro_mtx_min_allowed_logT, &
             hydro_mtx_min_allowed_logRho, &
             solver_reduced_min_corr_coeff, &
             solver_clip_dlogT, &
             solver_clip_dlogRho, &
-            solver_clip_dlogPgas, &
             solver_clip_dlogR
 
          character (len=32) :: hydro_solver_name

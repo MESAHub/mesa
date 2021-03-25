@@ -8661,21 +8661,19 @@
     min_chem_eqn_scale = 1d0
 
 
-      ! hydro_mtx_max_allowed_{abs}{dlogT  | dlogRho | dlogPgas | logT | logRho | logPgas}
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! hydro_mtx_max_allowed_{abs}{dlogT | dlogRho | logT | logRho}
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Force retry with smaller timestep if hydro solves change T, Rho, or Pgas by too much
+      ! Force retry with smaller timestep if hydro solves change T or Rho by too much
       ! or make them too large.
 
       ! ::
 
     hydro_mtx_max_allowed_abs_dlogT = 99d0
     hydro_mtx_max_allowed_abs_dlogRho = 99d0
-    hydro_mtx_max_allowed_abs_dlogPgas = 99d0
     min_logT_for_hydro_mtx_max_allowed = -1d99
     hydro_mtx_max_allowed_logT = 12d0
     hydro_mtx_max_allowed_logRho = 12d0
-    hydro_mtx_max_allowed_logPgas = 99d0
 
       ! ::
 
@@ -8687,8 +8685,6 @@
       ! ~~~~~~~~~~~~~~~~~
       ! solver_clip_dlogRho
       ! ~~~~~~~~~~~~~~~~~~~
-      ! solver_clip_dlogPgas
-      ! ~~~~~~~~~~~~~~~~~~~~
       ! solver_clip_dlogR
       ! ~~~~~~~~~~~~~~~~~
 
@@ -8699,7 +8695,6 @@
 
     solver_clip_dlogT = -1d0
     solver_clip_dlogRho = -1d0
-    solver_clip_dlogPgas = -1d0
     solver_clip_dlogR = -1d0
 
       ! level 1 of gold tolerances for solver solver
