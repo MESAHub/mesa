@@ -1059,18 +1059,6 @@
             if (failed('d_eps_grav_dlnT00')) exit
             call do1(s% d_eps_grav_dlnTp1, c% d_eps_grav_dlnTp1)
             if (failed('d_eps_grav_dlnTp1')) exit
-            call do1(s% d_eps_grav_dlnPgasm1_const_T, c% d_eps_grav_dlnPgasm1_const_T)
-            if (failed('d_eps_grav_dlnPgasm1_const_T')) exit
-            call do1(s% d_eps_grav_dlnPgas00_const_T, c% d_eps_grav_dlnPgas00_const_T)
-            if (failed('d_eps_grav_dlnPgas00_const_T')) exit
-            call do1(s% d_eps_grav_dlnPgasp1_const_T, c% d_eps_grav_dlnPgasp1_const_T)
-            if (failed('d_eps_grav_dlnPgasp1_const_T')) exit
-            call do1(s% d_eps_grav_dlnTm1_const_Pgas, c% d_eps_grav_dlnTm1_const_Pgas)
-            if (failed('d_eps_grav_dlnTm1_const_Pgas')) exit
-            call do1(s% d_eps_grav_dlnT00_const_Pgas, c% d_eps_grav_dlnT00_const_Pgas)
-            if (failed('d_eps_grav_dlnT00_const_Pgas')) exit
-            call do1(s% d_eps_grav_dlnTp1_const_Pgas, c% d_eps_grav_dlnTp1_const_Pgas)
-            if (failed('d_eps_grav_dlnTp1_const_Pgas')) exit
 
             call do1(s% d_eps_grav_dlnR00, c% d_eps_grav_dlnR00)
             if (failed('d_eps_grav_dlnR00')) exit

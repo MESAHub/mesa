@@ -337,14 +337,6 @@
       real(dp), pointer, dimension(:) :: &
          d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1
       real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlnPgasm1_const_T, &
-         d_eps_grav_dlnPgas00_const_T, &
-         d_eps_grav_dlnPgasp1_const_T
-      real(dp), pointer, dimension(:) :: &
-         d_eps_grav_dlnTm1_const_Pgas, &
-         d_eps_grav_dlnT00_const_Pgas, &
-         d_eps_grav_dlnTp1_const_Pgas
-      real(dp), pointer, dimension(:) :: &
          d_eps_grav_dlnR00, d_eps_grav_dlnRp1, &
          d_eps_grav_dL00, d_eps_grav_dLp1, &
          d_eps_grav_dv00, d_eps_grav_dvp1
