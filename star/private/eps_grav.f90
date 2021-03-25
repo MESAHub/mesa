@@ -79,12 +79,6 @@
             s% d_eps_grav_dlnR00(k) = f*s% d_eps_grav_dlnR00(k)
             s% d_eps_grav_dL00(k) = f*s% d_eps_grav_dL00(k)
             s% d_eps_grav_dLp1(k) = f*s% d_eps_grav_dLp1(k)
-            s% d_eps_grav_dlnPgas00_const_T(k) = f*s% d_eps_grav_dlnPgas00_const_T(k)
-            s% d_eps_grav_dlnPgasm1_const_T(k) = f*s% d_eps_grav_dlnPgasm1_const_T(k)
-            s% d_eps_grav_dlnPgasp1_const_T(k) = f*s% d_eps_grav_dlnPgasp1_const_T(k)
-            s% d_eps_grav_dlnTm1_const_Pgas(k) = f*s% d_eps_grav_dlnTm1_const_Pgas(k)
-            s% d_eps_grav_dlnT00_const_Pgas(k) = f*s% d_eps_grav_dlnT00_const_Pgas(k)
-            s% d_eps_grav_dlnTp1_const_Pgas(k) = f*s% d_eps_grav_dlnTp1_const_Pgas(k)
             s% d_eps_grav_dlnRp1(k) = f*s% d_eps_grav_dlnRp1(k)
             s% d_eps_grav_dv00(k) = f*s% d_eps_grav_dv00(k)
             s% d_eps_grav_dvp1(k) = f*s% d_eps_grav_dvp1(k)
@@ -430,10 +424,7 @@
             eps_grav, d_eps_grav_dlndm1, d_eps_grav_dlnd00, d_eps_grav_dlndp1, &
             d_eps_grav_dlnTm1, d_eps_grav_dlnT00, d_eps_grav_dlnTp1, &
             d_eps_grav_dlnR00, d_eps_grav_dlnRp1, d_eps_grav_dL00, d_eps_grav_dLp1, &
-            d_eps_grav_dlnPgas00_const_T, &
-            d_eps_grav_dlnPgasm1_const_T, d_eps_grav_dlnPgasp1_const_T, &
-            d_eps_grav_dlnTm1_const_Pgas, d_eps_grav_dlnT00_const_Pgas, &
-            d_eps_grav_dlnTp1_const_Pgas, d_eps_grav_dv00, d_eps_grav_dvp1
+            d_eps_grav_dv00, d_eps_grav_dvp1
 
          include 'formats'
          ierr = 0
@@ -467,12 +458,6 @@
             d_eps_grav_dlnRp1 = s% d_eps_grav_dlnRp1(k)
             d_eps_grav_dL00 = s% d_eps_grav_dL00(k)
             d_eps_grav_dLp1 = s% d_eps_grav_dLp1(k)
-            d_eps_grav_dlnPgas00_const_T = s% d_eps_grav_dlnPgas00_const_T(k)
-            d_eps_grav_dlnPgasm1_const_T = s% d_eps_grav_dlnPgasm1_const_T(k)
-            d_eps_grav_dlnPgasp1_const_T = s% d_eps_grav_dlnPgasp1_const_T(k)
-            d_eps_grav_dlnTm1_const_Pgas = s% d_eps_grav_dlnTm1_const_Pgas(k)
-            d_eps_grav_dlnT00_const_Pgas = s% d_eps_grav_dlnT00_const_Pgas(k)
-            d_eps_grav_dlnTp1_const_Pgas = s% d_eps_grav_dlnTp1_const_Pgas(k)
             d_eps_grav_dv00 = s% d_eps_grav_dv00(k)
             d_eps_grav_dvp1 = s% d_eps_grav_dvp1(k)
          else ! not needed, but to keep the compiler happy we set these to 0
@@ -487,12 +472,6 @@
             d_eps_grav_dlnRp1 = 0
             d_eps_grav_dL00 = 0
             d_eps_grav_dLp1 = 0
-            d_eps_grav_dlnPgas00_const_T = 0
-            d_eps_grav_dlnPgasm1_const_T = 0
-            d_eps_grav_dlnPgasp1_const_T = 0
-            d_eps_grav_dlnTm1_const_Pgas = 0
-            d_eps_grav_dlnT00_const_Pgas = 0
-            d_eps_grav_dlnTp1_const_Pgas = 0
             d_eps_grav_dv00 = 0
             d_eps_grav_dvp1 = 0
          end if
@@ -511,20 +490,6 @@
          s% d_eps_grav_dlnTm1(k) = alfa*d_eps_grav_dlnTm1 + beta*s% d_eps_grav_dlnTm1(k)
          s% d_eps_grav_dlnT00(k) = alfa*d_eps_grav_dlnT00 + beta*s% d_eps_grav_dlnT00(k)
          s% d_eps_grav_dlnTp1(k) = alfa*d_eps_grav_dlnTp1 + beta*s% d_eps_grav_dlnTp1(k)
-
-         s% d_eps_grav_dlnPgas00_const_T(k) = &
-            alfa*d_eps_grav_dlnPgas00_const_T + beta*s% d_eps_grav_dlnPgas00_const_T(k)
-         s% d_eps_grav_dlnPgasm1_const_T(k) = &
-            alfa*d_eps_grav_dlnPgasm1_const_T + beta*s% d_eps_grav_dlnPgasm1_const_T(k)
-         s% d_eps_grav_dlnPgasp1_const_T(k) = &
-            alfa*d_eps_grav_dlnPgasp1_const_T + beta*s% d_eps_grav_dlnPgasp1_const_T(k)
-
-         s% d_eps_grav_dlnTm1_const_Pgas(k) = &
-            alfa*d_eps_grav_dlnTm1_const_Pgas + beta*s% d_eps_grav_dlnTm1_const_Pgas(k)
-         s% d_eps_grav_dlnT00_const_Pgas(k) = &
-            alfa*d_eps_grav_dlnT00_const_Pgas + beta*s% d_eps_grav_dlnT00_const_Pgas(k)
-         s% d_eps_grav_dlnTp1_const_Pgas(k) = &
-            alfa*d_eps_grav_dlnTp1_const_Pgas + beta*s% d_eps_grav_dlnTp1_const_Pgas(k)
 
          s% d_eps_grav_dlnR00(k) = alfa*d_eps_grav_dlnR00 + beta*s% d_eps_grav_dlnR00(k)
          s% d_eps_grav_dlnRp1(k) = alfa*d_eps_grav_dlnRp1 + beta*s% d_eps_grav_dlnRp1(k)
@@ -545,7 +510,7 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: Rho, logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
+         real(dp) :: Rho, logRho, &
             e, e_start, de, d_de_dlnd, d_de_dlnT, &
             e_with_xa_start, d_e_with_xa_start_dlnd, d_e_with_xa_start_dlnT, &
             e_with_DT_start, d_e_with_DT_start_dlnd, d_e_with_DT_start_dlnT
@@ -679,12 +644,6 @@
          s% d_eps_grav_dlnTm1(k) = 0
          s% d_eps_grav_dlnT00(k) = 0
          s% d_eps_grav_dlnTp1(k) = 0
-         s% d_eps_grav_dlnPgasm1_const_T(k) = 0
-         s% d_eps_grav_dlnPgas00_const_T(k) = 0
-         s% d_eps_grav_dlnPgasp1_const_T(k) = 0
-         s% d_eps_grav_dlnTm1_const_Pgas(k) = 0
-         s% d_eps_grav_dlnT00_const_Pgas(k) = 0
-         s% d_eps_grav_dlnTp1_const_Pgas(k) = 0
          s% d_eps_grav_dlnR00(k) = 0
          s% d_eps_grav_dlnRp1(k) = 0
          s% d_eps_grav_dL00(k) = 0
