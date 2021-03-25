@@ -151,27 +151,17 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         real(dp) :: alfa
+         real(dp) :: dlnd_dt, dlnT_dt
          include 'formats'
 
-         call do_eps_grav_with_lnd_Lagrangian(s, k, ierr)
+         dlnd_dt = s% dxh_lnd(k)/s% dt
+         dlnT_dt = s% dxh_lnT(k)/s% dt
+         call do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
          if (ierr /= 0) return
 
          if (s% include_composition_in_eps_grav) call include_composition_in_eps_grav(s, k)
          
       end subroutine do_eps_grav_with_lnd
-      
-      
-      subroutine do_eps_grav_with_lnd_Lagrangian(s, k, ierr)
-         use eos_def, only: i_Cp, i_grad_ad, i_chiRho, i_chiT
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         real(dp) :: dlnd_dt, dlnT_dt
-         dlnd_dt = s% dxh_lnd(k)/s% dt
-         dlnT_dt = s% dxh_lnT(k)/s% dt
-         call do_lnd_eps_grav(s, k, dlnd_dt, dlnT_dt, ierr)
-      end subroutine do_eps_grav_with_lnd_Lagrangian
 
 
       ! this uses the given args to calculate -T*ds/dt
@@ -318,25 +308,14 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         real(dp) :: alfa
          include 'formats'
 
-         call do_eps_grav_with_lnS_Lagrangian(s, k, ierr)
+         call do_lnS_eps_grav(s, k, s% lnS_start(k), ierr)
          if (ierr /= 0) return
 
          if (s% include_composition_in_eps_grav) call include_composition_in_eps_grav(s, k)
 
       end subroutine do_eps_grav_with_lnS
-
-
-      subroutine do_eps_grav_with_lnS_Lagrangian(s, k, ierr)
-         use eos_def, only: i_Cp, i_grad_ad, i_chiRho, i_chiT
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         integer, intent(out) :: ierr
-         include 'formats'
-         call do_lnS_eps_grav(s, k, s% lnS_start(k), ierr)
-      end subroutine do_eps_grav_with_lnS_Lagrangian
 
 
       subroutine do_lnS_eps_grav(s, k, lnS_start, ierr)
