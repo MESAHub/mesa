@@ -7691,18 +7691,9 @@
       ! but they can be very different numerically depending on the situation.
 
       ! The standard default forms are used if you don't set any of the following flags.
-      ! The default when using lnd instead of lnPgas as primary variable is
-
       ! ::
 
       !     eps_grav = -T*cp*((1-grada)*chiT*dlnT_dt - grada*chiRho*dlnd_dt)
-
-      ! When using lnPgas instead of lnd, the default is
-
-      ! ::
-
-      !     eps_grav = -T*cp((1-grada*4*Prad/P)*dlnT_dt - grada*Pgas/P*dlnPgas_dt)
-
 
       ! include_composition_in_eps_grav
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
