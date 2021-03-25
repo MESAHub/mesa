@@ -7887,9 +7887,9 @@
       ! include_P_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
@@ -7910,7 +7910,7 @@
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! These are for alternatives ways to determine the T gradient.
       ! The standard form of the equation is
@@ -8212,13 +8212,13 @@
 
 
       ! include_L_in_correction_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_v_in_correction_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_u_in_correction_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_w_in_correction_limits
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! These variables can be excluded from calculation of correction norm and max.
 
@@ -8232,13 +8232,13 @@
 
 
       ! max_q_for_conv_timescale
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_q_for_conv_timescale
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! max_q_for_QHSE_timescale
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_q_for_QHSE_timescale
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
     
@@ -8813,11 +8813,11 @@
 
 
       ! use_Pvsc_art_visc
-      ! ~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~
       ! Pvsc_cq
-      ! ~~~~~~
-      ! Pvsc_zsh
       ! ~~~~~~~
+      ! Pvsc_zsh
+      ! ~~~~~~~~
 
       ! Pvsc is artificial pressure to push back against compression
       ! this is the form of artificial viscosity used in RSP
@@ -9041,7 +9041,7 @@
 
 
       ! force_timestep
-      ! ~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~
 
       ! In seconds.  ``force_timestep <= 0`` means no forced timestep.
 
@@ -9051,7 +9051,7 @@
 
 
       ! force_timestep_years
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~
 
       ! Note: ``force_timestep`` is the control that is used by most of the code.
       ! ``force_timestep_years`` is just provided as a convenience.
