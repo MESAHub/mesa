@@ -379,10 +379,10 @@
     solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
     solver_reduced_min_corr_coeff, do_solver_damping_for_neg_xa, &
     hydro_mtx_max_allowed_abs_dlogT, hydro_mtx_max_allowed_abs_dlogRho, &
-    hydro_mtx_max_allowed_abs_dlogPgas, min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
-    hydro_mtx_max_allowed_logRho, hydro_mtx_max_allowed_logPgas, report_min_rcond_from_DGESXV, &
+    min_logT_for_hydro_mtx_max_allowed, hydro_mtx_max_allowed_logT, &
+    hydro_mtx_max_allowed_logRho, report_min_rcond_from_DGESXV, &
     hydro_mtx_min_allowed_logT, hydro_mtx_min_allowed_logRho, use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX, &
-    solver_clip_dlogT, solver_clip_dlogRho, solver_clip_dlogPgas, solver_clip_dlogR, &
+    solver_clip_dlogT, solver_clip_dlogRho, solver_clip_dlogR, &
     op_split_burn, op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
     op_split_burn_min_T_for_variable_T_solver, solver_test_partials_show_dx_var_name, &
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
@@ -1960,17 +1960,14 @@
  s% do_solver_damping_for_neg_xa = do_solver_damping_for_neg_xa
  s% hydro_mtx_max_allowed_abs_dlogT = hydro_mtx_max_allowed_abs_dlogT
  s% hydro_mtx_max_allowed_abs_dlogRho = hydro_mtx_max_allowed_abs_dlogRho
- s% hydro_mtx_max_allowed_abs_dlogPgas = hydro_mtx_max_allowed_abs_dlogPgas
  s% min_logT_for_hydro_mtx_max_allowed = min_logT_for_hydro_mtx_max_allowed
  s% hydro_mtx_max_allowed_logT = hydro_mtx_max_allowed_logT
  s% hydro_mtx_max_allowed_logRho = hydro_mtx_max_allowed_logRho
- s% hydro_mtx_max_allowed_logPgas = hydro_mtx_max_allowed_logPgas
  s% hydro_mtx_min_allowed_logT = hydro_mtx_min_allowed_logT
  s% hydro_mtx_min_allowed_logRho = hydro_mtx_min_allowed_logRho
 
  s% solver_clip_dlogT = solver_clip_dlogT
  s% solver_clip_dlogRho = solver_clip_dlogRho
- s% solver_clip_dlogPgas = solver_clip_dlogPgas
  s% solver_clip_dlogR = solver_clip_dlogR
  
  s% use_DGESVX_in_bcyclic = use_DGESVX_in_bcyclic
@@ -3620,17 +3617,14 @@
  do_solver_damping_for_neg_xa = s% do_solver_damping_for_neg_xa
  hydro_mtx_max_allowed_abs_dlogT = s% hydro_mtx_max_allowed_abs_dlogT
  hydro_mtx_max_allowed_abs_dlogRho = s% hydro_mtx_max_allowed_abs_dlogRho
- hydro_mtx_max_allowed_abs_dlogPgas = s% hydro_mtx_max_allowed_abs_dlogPgas
  min_logT_for_hydro_mtx_max_allowed = s% min_logT_for_hydro_mtx_max_allowed
  hydro_mtx_max_allowed_logT = s% hydro_mtx_max_allowed_logT
  hydro_mtx_max_allowed_logRho = s% hydro_mtx_max_allowed_logRho
- hydro_mtx_max_allowed_logPgas = s% hydro_mtx_max_allowed_logPgas
  hydro_mtx_min_allowed_logT = s% hydro_mtx_min_allowed_logT
  hydro_mtx_min_allowed_logRho = s% hydro_mtx_min_allowed_logRho
 
  solver_clip_dlogT = s% solver_clip_dlogT
  solver_clip_dlogRho = s% solver_clip_dlogRho
- solver_clip_dlogPgas = s% solver_clip_dlogPgas
  solver_clip_dlogR = s% solver_clip_dlogR
  
  use_DGESVX_in_bcyclic = s% use_DGESVX_in_bcyclic
