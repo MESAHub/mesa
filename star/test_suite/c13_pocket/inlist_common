@@ -7,6 +7,10 @@
 ! opacities
       initial_zfracs = 6
 
+! timing
+      first_model_for_timing = 1
+
+
 / !end of star_job namelist
 
 &eos
