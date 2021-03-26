@@ -16,14 +16,14 @@
 
 ! temporally resolve the thermal pulse (and interpulse)
 
-      delta_lgL_He_limit = 0.01
+      delta_lgL_He_limit = 0.0125
       lgL_He_burn_min = 2.0
 
       dH_limit_min_H = 1d-2
       dH_limit = 0.1
 
-      dH_div_H_limit_min_H = 1d-5
-      dH_div_H_limit = 0.5
+      dH_div_H_limit_min_H = 5d-4
+      dH_div_H_limit = 0.7
 
 ! overshooting
 ! first match will be applied
