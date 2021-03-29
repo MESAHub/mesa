@@ -258,6 +258,7 @@ ifeq ($(FC),ifort)
 	@$(CP_IF_NEWER) overshoot_utils.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) auto_diff_support.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) star_private_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) star_utils.mod $(MESA_DIR)/include
 endif
 	@$(CP_IF_NEWER) ../job/*.inc $(MESA_DIR)/include
 	@$(CP_IF_NEWER) ../job/*.dek $(MESA_DIR)/include
