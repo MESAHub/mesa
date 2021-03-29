@@ -585,8 +585,9 @@
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
-         integer :: ierr, time0, clock_rate, &
+         integer :: ierr, &
             j, k, j_cnt, mdot_redo_cnt, max_mdot_redo_cnt, cnt, max_cnt, nz
+         integer(8) :: time0, clock_rate
          logical :: okay, trace, skip_global_corr_coeff_limit, &
             have_too_large_wind_mdot, have_too_small_wind_mdot, &
             ignored_first_step, was_in_implicit_wind_limit

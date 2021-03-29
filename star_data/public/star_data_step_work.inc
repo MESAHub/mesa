@@ -1410,9 +1410,9 @@
          real(dp), pointer :: extra_profile_col_vals(:,:) ! (nz,num_extra)
 
       ! system clock 
-         integer :: starting_system_clock_time
-         integer :: current_system_clock_time
-         integer :: system_clock_rate
+         integer(8) :: starting_system_clock_time
+         integer(8) :: current_system_clock_time
+         integer(8) :: system_clock_rate
          real(dp) :: total_elapsed_time ! (current - starting)/rate
          integer(8) :: system_clock_at_start_of_step
          
