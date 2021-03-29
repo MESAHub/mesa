@@ -1,5 +1,6 @@
 June, 2010 - Aaron Dotter
 updated April-May, 2020
+bug fix March 2021
 
 The eosFreeEOS_builder creates EOS tables using the FreeEOS
 code in the MESA/eos format.  If FreeEOS fails to provide

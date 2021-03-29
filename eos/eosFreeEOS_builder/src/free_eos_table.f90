@@ -163,7 +163,7 @@ contains
       result(i_dS_dT)  = entropy(3)/T !(1/T)*dS/dlnT
       result(i_dS_dRho)= entropy(2)/Rho !(1/Rho)*dS/dlnRho
       result(i_mu)     = 1_dp/xmu1
-      result(i_lnfree_e)= log(xmu3)
+      result(i_lnfree_e)= log10(xmu3)
       result(i_gamma1) = gamma1
       result(i_gamma3) = gamma3
       result(i_eta)    = eta
@@ -187,7 +187,7 @@ program make_free_eos_table
 
    character(len=64) :: eosDT_file, mass_list, data_dir, table_file, arg
    integer :: io, num_logQs, num_logTs, num_logWs, table_version, i
-   integer :: eos_version, ierr, num_DT, num_PT, num_PTEH
+   integer :: eos_version, ierr, num_DT, num_FreeEOS
    real(dp) :: log10T, log10Rho, logT, logRho, mass_frac(Neps)
    real(dp) :: dlog10T, dlog10Q, log10Qmin, log10Qmax, log10Tmin, log10Tmax
    real(dp) :: log10Pgas, logPgas, X, Y, Z
@@ -242,12 +242,11 @@ program make_free_eos_table
    close(io)
 
    !final check
-   call num_eos_files_loaded(num_DT, num_PT, num_PTEH)
+   call num_eos_files_loaded(num_DT, num_FreeEOS)
 
    write(*,*) ' final counts: '
    write(*,*) ' num DT tables loaded = ', num_DT
-   write(*,*) ' num PT tables loaded = ', num_PT
-   write(*,*) ' num PTEH tables loaded = ', num_PTEH
+   write(*,*) ' num FreeEOS tables loaded = ', num_FreeEOS
    
 contains
 
