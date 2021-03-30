@@ -287,7 +287,7 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
          !write(*,1) 't_spindown/s% dt', t_spindown/s% dt
-         if (s% dt > 0) then
+         if (s% use_other_torque .and. s% dt > 0) then
             if ((t_spindown / s% dt) .lt. 10) then
                s% dt_next = s% dt * 0.5d0
                write(*,1) "Warning: Torque too large. Decreasing timestep to ", s% dt_next
