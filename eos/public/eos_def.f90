@@ -151,7 +151,6 @@
       type (DT_XZ_Info), target :: eosDT_XZ_struct, FreeEOS_XZ_struct
 
       integer, parameter :: sz_per_eos_point = 4 ! for bicubic spline interpolation
-      integer, parameter :: num_2nd_ds = 3
 
       type EoS_General_Info
 
