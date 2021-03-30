@@ -1379,11 +1379,9 @@
             total_WD_sedimentation_heating, &
             total_energy_from_diffusion, &
             total_extra_heating, &
-            error_in_energy_conservation, &
-            log_P_center
+            error_in_energy_conservation
          
          real(dp) :: &
-            log_P_center_old, &
             cumulative_energy_error_old, &
             cumulative_extra_heating_old
             
