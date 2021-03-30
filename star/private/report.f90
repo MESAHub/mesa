@@ -259,8 +259,6 @@
          co56 = net_iso(ico56)
          ni56 = net_iso(ini56)
          
-         s% log_P_center = s% lnPeos(nz)/ln10
-
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)
             ! log10(stellar radius in solar units)

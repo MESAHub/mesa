@@ -208,8 +208,6 @@
             call set_to_NaN(s% initial_timestep)   
             call set_to_NaN(s% initial_v_center)
             call set_to_NaN(s% log_L_surf)
-            call set_to_NaN(s% log_P_center)
-            call set_to_NaN(s% log_P_center_old)
             call set_to_NaN(s% max_fixup_for_mix)
             call set_to_NaN(s% max_residual)
             call set_to_NaN(s% mdot_acoustic_surface)
