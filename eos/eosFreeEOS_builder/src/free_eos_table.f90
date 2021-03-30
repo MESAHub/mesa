@@ -163,7 +163,7 @@ contains
       result(i_dS_dT)  = entropy(3)/T !(1/T)*dS/dlnT
       result(i_dS_dRho)= entropy(2)/Rho !(1/Rho)*dS/dlnRho
       result(i_mu)     = 1_dp/xmu1
-      result(i_lnfree_e)= log10(xmu3)
+      result(i_lnfree_e)= log(xmu3)
       result(i_gamma1) = gamma1
       result(i_gamma3) = gamma3
       result(i_eta)    = eta
@@ -360,7 +360,7 @@ contains
          !original  '(99(a40,1x))'
          write(io_unit,'(99(a22))') 'logT', &
             'logPgas', 'logE', 'logS', 'chiRho', 'chiT', 'Cp', 'Cv', 'dE_dRho', &
-            'dS_dT', 'dS_dRho', 'mu', 'log_free_e', 'gamma1', 'gamma3', 'grad_ad', &
+            'dS_dT', 'dS_dRho', 'mu', 'log10_free_e', 'gamma1', 'gamma3', 'grad_ad', &
             'eta', 'MESA', 'logRho', 'dpe', 'dsp', 'dse'
          
          do while (log10T >= log10Tmin)
@@ -419,10 +419,10 @@ contains
                results(i_dS_dT,iT),    &
                results(i_dS_dRho,iT),  &
                results(i_mu,iT),       &
-               results(i_lnfree_e,iT), &
-               results(i_gamma1,iT),   &
-               results(i_gamma3,iT),   &
-               results(i_grad_ad,iT),  &
+               results(i_lnfree_e,iT)/ln10, &  !MESA tables are based on OPAL tables, which
+               results(i_gamma1,iT),        &  !list  log10(free_e) rather than ln(free_e)
+               results(i_gamma3,iT),        & 
+               results(i_grad_ad,iT),  &       
                results(i_eta,iT),      &
                mesa_fracs(iT),         &
                logRhos(iT),            &
@@ -575,6 +575,8 @@ contains
       eos_result(i_dpe) = 0._dp
       eos_result(i_dsp) = 0._dp
       eos_result(i_dse) = 0._dp
+
+      eos_result(i_lnfree_e) = res(i_lnfree_e)/ln10
    end subroutine mesa_eos_eval
 
 end program make_free_eos_table
