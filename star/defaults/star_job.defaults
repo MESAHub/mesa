@@ -314,17 +314,6 @@
     save_pulse_data_filename = 'undefined'
 
 
-      ! internals_num
-      ! ~~~~~~~~~~~~~
-
-      ! write internals -- for debugging
-      ! only write if >= 0
-
-      ! ::
-
-    internals_num = -1
-
-
       ! report_retries
       ! ~~~~~~~~~~~~~~
 

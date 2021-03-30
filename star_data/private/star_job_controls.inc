@@ -339,8 +339,6 @@
       logical :: profile_starting_model
       integer :: profile_model_number
 
-      integer :: internals_num
-
       logical :: report_retries
 
       character (len=strlen) :: net_reaction_filename, jina_reaclib_filename

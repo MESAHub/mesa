@@ -1695,29 +1695,6 @@
       end subroutine star_set_uniform_omega
 
       
-      ! write "internals" data file (for debugging)
-      
-      ! this routine outputs columns of data for the current model
-      subroutine write_internals(id, filename, ierr)
-         use report, only: write_internals_to_file
-         integer, intent(in) :: id
-         character (len=*), intent(in) :: filename
-         integer, intent(out) :: ierr
-         call write_internals_to_file(id, filename, ierr)
-      end subroutine write_internals
-      
-      
-      ! this creates a filename and then calls write_internals.
-      ! e.g., if num = 0, the filename is 'plot_data/internals0.data'
-      subroutine std_write_internals(id, num)
-         use report, only: std_write_internals_to_file
-         integer, intent(in) :: id
-         integer, intent(in) :: num ! mod(num, 10) is used for the filename.
-         call std_write_internals_to_file(id, num)
-      end subroutine std_write_internals
-      
-      
-      
       ! a few miscellaneous extra routines for special jobs
 
       
