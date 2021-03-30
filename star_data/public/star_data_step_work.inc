@@ -572,7 +572,7 @@
       real(dp) :: delta_Pg ! g-mode period spacing for l=1 (seconds)
          ! sqrt(2)*pi^2/(integral of brunt_N/r dr)
       real(dp) :: nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       real(dp) :: acoustic_cutoff ! 1e6*0.5*g*sqrt(gamma1*rho/P) at surface (micro Hz)
       ! asteroseismology
