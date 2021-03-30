@@ -181,7 +181,6 @@
          integer, intent(out) :: ierr ! 0 means AOK.
          
          type (EoS_General_Info), pointer :: rq
-         real(dp) :: Pgas, Prad, energy, entropy
          
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0) then
@@ -193,8 +192,7 @@
                rq, Z, X, abar, zbar, &
                species, chem_id, net_iso, xa, &
                Rho, log10Rho, T, log10T, &
-               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa, &
-               Pgas, Prad, energy, entropy, ierr)
+               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa, ierr)
          d_dzbar_const_TRho = 0
          d_dabar_const_TRho = 0
          
@@ -222,8 +220,7 @@
          integer, intent(out) :: ierr ! 0 means AOK.
          real(dp) :: d_dxa_eos(num_eos_basic_results,species) ! eos internally returns derivs of all quantities
          type (EoS_General_Info), pointer :: rq
-         real(dp) :: Pgas, Prad, energy, entropy, Y, Z, X, abar, zbar, &
-            z2bar, z53bar, ye, mass_correction, sumx
+         real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0) then
             write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
@@ -237,8 +234,7 @@
             rq, Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             Rho, logRho, T, logT, &
-            res, d_dlnd, d_dlnT, d_dxa_eos, &
-            Pgas, Prad, energy, entropy, ierr)
+            res, d_dlnd, d_dlnT, d_dxa_eos, ierr)
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
       end subroutine eosDT_get
