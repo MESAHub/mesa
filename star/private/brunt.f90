@@ -237,7 +237,7 @@
          real(dp) :: lnP1, lnP2, logRho_face, logT_face, Prad_face, &
             alfa, Ppoint, dlnP_dm, delta_lnP
          real(dp), dimension(num_eos_basic_results) :: &
-            res, d_eos_dlnd, d_eos_dlnT, d_eos_dabar, d_eos_dzbar
+            res, d_eos_dlnd, d_eos_dlnT
          real(dp) :: d_eos_dxa(num_eos_d_dxa_results,species)
 
          logical, parameter :: dbg = .false.
