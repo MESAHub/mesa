@@ -547,7 +547,7 @@
          ! sqrt(2) pi^2/(integral of brunt_N/r dr)
       !log_delta_Pg
       !nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       !nu_max_3_4th_div_delta_nu ! nu_max^0.75/delta_nu
       !acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface

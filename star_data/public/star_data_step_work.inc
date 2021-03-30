@@ -115,10 +115,6 @@
       real(dp), pointer :: d_eos_dlnd(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dlnT(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz)
-      real(dp), pointer :: d_eos_dabar(:,:) ! (num_eos_basic_results,nz)
-      real(dp), pointer :: d_eos_dzbar(:,:) ! (num_eos_basic_results,nz)
-      real(dp), pointer :: dlnRho_dlnPgas_const_T(:)    
-      real(dp), pointer :: dlnRho_dlnT_const_Pgas(:)  
 
       ! eos partials for use in calculating equation partials for Jacobian matrix
       ! calculated using partials of interpolating polynomials of lnPgas, lnE, lnS where appropriate
@@ -576,7 +572,7 @@
       real(dp) :: delta_Pg ! g-mode period spacing for l=1 (seconds)
          ! sqrt(2)*pi^2/(integral of brunt_N/r dr)
       real(dp) :: nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^3 (Teff/Teff_sun)^0.5)
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
          ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
       real(dp) :: acoustic_cutoff ! 1e6*0.5*g*sqrt(gamma1*rho/P) at surface (micro Hz)
       ! asteroseismology
@@ -1379,11 +1375,9 @@
             total_WD_sedimentation_heating, &
             total_energy_from_diffusion, &
             total_extra_heating, &
-            error_in_energy_conservation, &
-            log_P_center
+            error_in_energy_conservation
          
          real(dp) :: &
-            log_P_center_old, &
             cumulative_energy_error_old, &
             cumulative_extra_heating_old
             
@@ -1410,9 +1404,9 @@
          real(dp), pointer :: extra_profile_col_vals(:,:) ! (nz,num_extra)
 
       ! system clock 
-         integer :: starting_system_clock_time
-         integer :: current_system_clock_time
-         integer :: system_clock_rate
+         integer(8) :: starting_system_clock_time
+         integer(8) :: current_system_clock_time
+         integer(8) :: system_clock_rate
          real(dp) :: total_elapsed_time ! (current - starting)/rate
          integer(8) :: system_clock_at_start_of_step
          

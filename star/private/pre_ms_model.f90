@@ -405,8 +405,7 @@
             P_surf_limit, y, dlogPgas, logPgas, Prad, Pgas, try_dlogPgas, logPgas0, &
             res(num_eos_basic_results), eps_grav, P_c, logP, m, &
             d_eos_dlnd(num_eos_basic_results), d_eos_dlnT(num_eos_basic_results), &
-            d_eos_dabar(num_eos_basic_results), d_eos_dzbar(num_eos_basic_results), &
-            dres_dxa(num_eos_basic_results,s% species), &
+            d_eos_dxa(num_eos_basic_results,s% species), &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
             cgrav, r, rmid, rho, logRho, T, lnT, L, P, P0, dm, m0, L0, r0, lnT0, T0, &
@@ -446,7 +445,7 @@
                s, 0, xa, &
                rho_c, log10(rho_c), T_c, log10(T_c), &
                res, d_eos_dlnd, d_eos_dlnT, &
-               dres_dxa, ierr)
+               d_eos_dxa, ierr)
          if (ierr /= 0) return
          call unpack_eos_results
          
@@ -472,7 +471,7 @@
          call solve_eos_given_PgasT_auto( &
               s, 0, xa, &
               lnT/ln10, log10(Pgas), LOGRHO_TOL, LOGPGAS_TOL, &
-              logRho, res, d_eos_dlnd, d_eos_dlnT, dres_dxa, &
+              logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, &
               ierr)
          if (ierr /= 0) return
          rho = exp10(logRho)
@@ -591,7 +590,7 @@
                   call solve_eos_given_PgasT_auto( &
                        s, 0, xa, &
                        lnT/ln10, logPgas, LOGRHO_TOL, LOGPGAS_TOL, &
-                       logRho, res, d_eos_dlnd, d_eos_dlnT, dres_dxa, &
+                       logRho, res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, &
                        ierr)
                   rho = exp10(logRho)
                   if (ierr /= 0) return
