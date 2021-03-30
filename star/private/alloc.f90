@@ -754,10 +754,6 @@
             if (failed('d_eos_dlnT')) exit
             call do3(s% d_eos_dxa, c% d_eos_dxa, num_eos_d_dxa_results, species)
             if (failed('d_eos_dxa')) exit
-            call do1(s% dlnRho_dlnPgas_const_T, c% dlnRho_dlnPgas_const_T)
-            if (failed('dlnRho_dlnPgas_const_T')) exit
-            call do1(s% dlnRho_dlnT_const_Pgas, c% dlnRho_dlnT_const_Pgas)
-            if (failed('dlnRho_dlnT_const_Pgas')) exit
 
             call do1(s% chiRho_for_partials, c% chiRho_for_partials)
             if (failed('chiRho_for_partials')) exit

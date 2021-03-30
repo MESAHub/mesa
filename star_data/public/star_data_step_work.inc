@@ -115,8 +115,6 @@
       real(dp), pointer :: d_eos_dlnd(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dlnT(:,:) ! (num_eos_basic_results,nz)
       real(dp), pointer :: d_eos_dxa(:,:,:) ! (num_eos_d_dxa_results,species,nz)
-      real(dp), pointer :: dlnRho_dlnPgas_const_T(:)    
-      real(dp), pointer :: dlnRho_dlnT_const_Pgas(:)  
 
       ! eos partials for use in calculating equation partials for Jacobian matrix
       ! calculated using partials of interpolating polynomials of lnPgas, lnE, lnS where appropriate
