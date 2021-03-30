@@ -1297,12 +1297,6 @@
             if (failed('save_profile',ierr)) return
          end if
          
-         if (s% job% internals_num >= 0) then
-            write(*, '(a, i7)') 'write internals for model number', s% model_number
-            call std_write_internals(id, s% job% internals_num)
-            stop 'finished std_write_internals'
-         end if
-         
       end subroutine do_saves
 
                   

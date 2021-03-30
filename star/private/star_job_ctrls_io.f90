@@ -496,7 +496,6 @@
          required_termination_code_string, &
          profile_starting_model, &
          profile_model_number, &
-         internals_num, &
          report_retries, &
 
          net_reaction_filename, &
@@ -1143,7 +1142,6 @@
          s% job% required_termination_code_string = required_termination_code_string
          s% job% profile_starting_model = profile_starting_model
          s% job% profile_model_number = profile_model_number
-         s% job% internals_num = internals_num
          s% job% report_retries = report_retries
 
          s% job% net_reaction_filename = net_reaction_filename
@@ -1717,7 +1715,6 @@
          required_termination_code_string = s% job% required_termination_code_string
          profile_starting_model = s% job% profile_starting_model
          profile_model_number = s% job% profile_model_number
-         internals_num = s% job% internals_num
          report_retries = s% job% report_retries
 
          net_reaction_filename = s% job% net_reaction_filename

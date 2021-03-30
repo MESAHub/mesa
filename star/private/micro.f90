@@ -281,7 +281,7 @@ contains
     integer, intent(out) :: ierr
 
     real(dp), dimension(num_eos_basic_results) :: &
-         res, res_a, res_b, d_dlnd, d_dlnT, d_eos_dabar, d_eos_dzbar
+         res, res_a, res_b, d_dlnd, d_dlnT
     real(dp) :: &
          sumx, dx, dxh_a, dxh_b, &
          Rho, logRho, lnd, lnE, logT, T, energy, logQ, frac

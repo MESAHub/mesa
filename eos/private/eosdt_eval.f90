@@ -204,8 +204,7 @@
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             arho, alogrho, atemp, alogtemp, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            Pgas, Prad, energy, entropy, ierr)
+            res, d_dlnd, d_dlnT, d_dxa, ierr)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X, abar, zbar          
          integer, intent(in) :: species
@@ -214,7 +213,6 @@
          real(dp), intent(in) :: arho, alogrho, atemp, alogtemp
          real(dp), intent(inout), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
-         real(dp), intent(out) :: Pgas, Prad, energy, entropy
          integer, intent(out) :: ierr
          
          real(dp) :: rho, logRho, T, logT
@@ -266,11 +264,6 @@
             skip, ierr)
          if (skip) ierr = -1
          if (ierr /= 0) return
-         
-         Pgas = exp(res(i_lnPgas))
-         Prad = crad*T*T*T*T/3d0
-         energy = exp(res(i_lnE))
-         entropy = exp(res(i_lnS))
          
          if (eos_test_partials) then   
             eos_test_partials_val = abar
@@ -2411,8 +2404,13 @@
             call Get_eosDT_Results(rq, Z, XH1, abar, zbar, &
                   species, chem_id, net_iso, xa, &
                   rho, logRho, T, logT, &
-                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, &
-                  Pgas, Prad, energy, entropy, ierr)
+                  res, d_dlnRho_c_T, d_dlnT_c_Rho, d_dxa, ierr)
+
+            Pgas = exp(res(i_lnPgas))
+            Prad = crad*T*T*T*T/3d0
+            energy = exp(res(i_lnE))
+            entropy = exp(res(i_lnS))
+
             if (ierr /= 0) then
                if (.false.) then
                   write(*,*) 'Get_eosDT_Results returned ierr', ierr
