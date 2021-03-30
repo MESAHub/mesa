@@ -31,7 +31,7 @@
       new_cumulative_energy_error = 0d0
 
       set_initial_dt = .true.
-      years_for_initial_dt = 1e2
+      years_for_initial_dt = 1e4
 
       pgstar_flag = .false.
       
