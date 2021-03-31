@@ -115,6 +115,7 @@ SRCS = \
    other_eval_fp_ft.f90 \
    other_eval_i_rot.f90 \
    other_timestep_limit.f90 \
+   other_screening.f90 \
    star_utils.f90 \
    ctrls_io.f90 \
    alloc.f90 \
