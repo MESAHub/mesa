@@ -11377,6 +11377,7 @@
     use_other_gradr_factor = .false.
     use_other_eval_fp_ft = .false.
     use_other_torque = .false.
+    use_other_screening = .false.
 
       ! ::
 
