@@ -12,9 +12,9 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-TEST_SRCS = sample.f
+TEST_SRCS = sample.f90
 
-EOS_CORR_SRCS = eos_correction.f
+EOS_CORR_SRCS = eos_correction.f90
 
 #################################################################
 #
@@ -70,7 +70,7 @@ install:
 
 MY_FC_FLAGS = $(FCfree)
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo FC $<
 	@$(FC) $(FCbasic) $(MY_FC_FLAGS) -I$(MESA_INCLUDE_DIR) -c $<
@@ -84,7 +84,7 @@ endif
 
 SRC_PATH = ../src
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(MESA_DIR)/include
 

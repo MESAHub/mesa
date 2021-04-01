@@ -4,7 +4,7 @@ Then do the following:
 
 1) edit make/makefile to set MESA_DIR to the path to your mesa directory.
 
-2) edit src/sample.f to set 'data_dir' to be the path to the mesa data directory.
+2) edit src/sample.f90 to set 'data_dir' to be the path to the mesa data directory.
 
 3) run the 'mk' script to make.
 
