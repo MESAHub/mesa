@@ -646,8 +646,11 @@
          integer, intent(out) :: ierr
          character (len=64) :: option
          ierr = 0
-         option = StrLowCase(which_screening_option)         
-         if (option == 'no_screening' .or. len_trim(option) == 0) then
+
+         option = StrLowCase(which_screening_option)  
+         if (associated(rates_other_screening)) then
+            screening_option = other_screening
+         else if (option == 'no_screening' .or. len_trim(option) == 0) then
             screening_option = no_screening                   
          else if (option == 'extended') then
             screening_option = extended_screening           
@@ -666,8 +669,11 @@
          integer, intent(in) :: which_screening_option
          character (len=*), intent(out) :: screening_option
          integer, intent(out) :: ierr
-         ierr = 0         
-         if (which_screening_option == no_screening) then
+         ierr = 0    
+         
+         if (which_screening_option == other_screening) then
+            screening_option = 'other_screening'
+         else if (which_screening_option == no_screening) then
             screening_option = 'no_screening'                    
          else if (which_screening_option == extended_screening) then
             screening_option = 'extended'            
@@ -847,7 +853,9 @@
             return
          end if
 
-         if (screening_mode == extended_screening) then
+         if(screening_mode == other_screening) then
+            call rates_other_screening(sc, z1, z2, a1, a2, scor, scordt, scordd, ierr)
+         else if (screening_mode == extended_screening) then
             call fxt_screen5( &
                sc, zs13, zhat, zhat2, lzav, aznut, zs13inv,  &
                a1, z1, a2, z2, scor, scordt, scordd, ierr)

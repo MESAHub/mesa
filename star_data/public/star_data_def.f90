@@ -26,7 +26,7 @@
 
       module star_data_def
 
-      use rates_def, only: rates_reaction_id_max
+      use rates_def, only: rates_reaction_id_max, other_screening_interface
       use utils_def, only: integer_dict
       use chem_def, only: num_categories, iso_name_length
       use const_def, only: sp, dp, qp, strlen

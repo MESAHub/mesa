@@ -43,6 +43,7 @@
       subroutine do_net(s, nzlo, nzhi, reuse_given_rates, ierr)
          use star_utils, only: start_time, update_time
          use net_lib, only: net_work_size
+         use rates_def, only: rates_other_screening
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
@@ -80,6 +81,11 @@
                end if
             end do
             return
+         end if
+
+         rates_other_screening => null()
+         if(s% use_other_screening) then
+            rates_other_screening => s% other_screening
          end if
 
          net_lwork = net_work_size(s% net_handle, ierr)

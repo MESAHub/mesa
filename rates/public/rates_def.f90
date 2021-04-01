@@ -723,6 +723,7 @@
       ! screening
       
       integer, parameter :: no_screening = 0
+      ! 1 was graboske screening so leave undefined so its an error if people keep trying to use it
       integer, parameter :: extended_screening = 2
          ! based on code from Frank Timmes
          ! extends the Graboske method using results from Alastuey and Jancovici (1978),
@@ -733,6 +734,7 @@
       integer, parameter :: chugunov_screening = 4
         ! based on code from Sam Jones
         ! Implements screening from Chugunov et al (2007) 
+      integer, parameter :: other_screening = 5 ! User defined screening
 
       type Screen_Info
          real(dp) :: temp
@@ -765,6 +767,23 @@
          real(dp) :: ntot, a_e
          integer :: num_calls, num_cache_hits
       end type Screen_Info
+
+
+      interface
+         subroutine other_screening_interface(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
+            import dp, screen_info
+            implicit none
+      
+            type (Screen_Info), pointer :: sc ! See rates_def
+            real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
+            real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
+            real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction
+            real(dp),intent(out) ::   dscreendt     !< on return, temperature derivative of the screening factor
+            real(dp),intent(out) ::   dscreendd    !< on return, density derivative of the screening factor
+            integer, intent(out) ::   ierr
+         
+         end subroutine other_screening_interface
+      end interface
       
       
       real(dp) :: reaclib_min_T9 ! for T9 < this, return 0 for reaclib strong rates
@@ -774,7 +793,8 @@
       logical :: have_finished_initialization = .false.
       logical :: rates_use_cache = .true.
 
-      
+      procedure (other_screening_interface), pointer :: &
+         rates_other_screening => null()
 
 
       ! choices for various rates
