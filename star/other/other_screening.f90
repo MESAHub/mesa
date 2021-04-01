@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2021  Bill Paxton & tThe MESA team
+!   Copyright (C) 2021  Bill Paxton & The MESA team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
