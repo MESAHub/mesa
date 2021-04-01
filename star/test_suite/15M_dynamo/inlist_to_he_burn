@@ -1,4 +1,5 @@
-! inlist_zams - stops when reach Lnuc_div_L_zams_limit
+
+! inlist_to_he_burn - stops when reach power_he_burn_upper_limit 
 
 &star_job
 
@@ -37,60 +38,43 @@
 
 / ! end of star_job namelist
 
-&kap
-      Zbase = 0.02
+&eos
 
-      kap_file_prefix = 'gs98'
+/ ! end of kap namelist
+
+&kap
 
 / ! end of kap namelist
 
 &controls
 
-      initial_mass = 15
-      initial_z = 0.02
-
+   ! stopping condition
       power_he_burn_upper_limit = 10d0
 
-         hot_wind_scheme = 'Dutch'
-         hot_wind_full_on_T = 1d0
-         cool_wind_full_on_T = 0d0
-         Dutch_scaling_factor = 0.8
-
-         am_nu_visc_factor = 0
-         am_D_mix_factor = 0.0333333333333333d00
-         
-         D_DSI_factor = 0
-         D_SH_factor = 1
-         D_SSI_factor = 1
-         D_ES_factor = 1
-         D_GSF_factor = 1
-         D_ST_factor = 1
-
-         am_nu_ST_factor = 10
-         
-         use_Ledoux_criterion = .true.
-   
-         alpha_semiconvection = 4d-2
-         thermohaline_coeff = 2  
-
-         omega_function_weight = 20
-
-         mdot_omega_power = 0.43
-
-         clip_D_limit = 10
-         
-         xa_scale = 1d-5
-
-         mixing_length_alpha = 1.6
-      
       ! limit max_model_number as part of test_suite
-      max_model_number = 10000
-      
-      photo_interval = 100
-      profile_interval = 100
-      history_interval = 5
-      terminal_interval = 50
-   
+      max_model_number = 500
+
+   ! timestep limits
+      delta_lgRho_cntr_limit = 0.01
+      delta_lgRho_cntr_hard_limit = 0.02
+
+      delta_lgT_cntr_limit = 0.01
+      delta_lgT_cntr_hard_limit = 0.02
+
+      delta_lgTeff_limit = 0.01
+      delta_lgTeff_hard_limit = 0.02
+
+      delta_lgL_limit = 0.1
+      delta_lgL_hard_limit = 0.2
+
+      delta_XH_cntr_limit = 0.005d0
+      delta_XH_cntr_hard_limit = 0.01d0
+
+      delta_XHe_cntr_limit = 0.005d0
+      delta_XHe_cntr_hard_limit = 0.01d0
+
+      delta_lgL_nuc_limit = 0.1
+      delta_lgL_nuc_hard_limit = 0.2
 
 / ! end of controls namelist
 
