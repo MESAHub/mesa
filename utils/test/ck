@@ -1,1 +1,10 @@
-./../../utils/test/ck6
+#!/bin/bash
+
+if ./rn >& tmp.txt; then
+    diff -b tmp.txt test_output
+else
+    echo
+    echo "FAILED"
+    echo
+    exit 1
+fi
