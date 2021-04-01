@@ -7,9 +7,9 @@ environment, we ask that participants in the MESA project (whether
 developers, contributors, or users) commit to the following standards
 of behavior:
 
-* Participants will conduct themselves in a professional manner that  
-is welcoming, inclusive, and free from any form of disrespect,
-intimidation, bullying, discrimination, harassment, and retaliation.
+* Participants will conduct themselves in a professional manner that is 
+  welcoming, inclusive, and free from any form of disrespect, intimidation, 
+  bullying, discrimination, harassment, and retaliation.
 
 * Participants will treat each other with civility and respect to
 create a collegial and professional environment where all voices and  
