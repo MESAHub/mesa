@@ -25,10 +25,10 @@ TEST = tester
 $(TEST) : $(TEST_OBJS)
 	$(LOADER) $(FCopenmp) -o $(TEST_DIR)/$(TEST) $(TEST_OBJS) \
 	$(LOAD_LOCAL) $(LOAD_OTHER) $(LD_FLAGS)
-	
+
 #################################################################
 
-%.o: $(TEST_SRC_DIR)/%.f
+%.o: $(TEST_SRC_DIR)/%.f90
 	$(TEST_COMPILE) $(FCfree) $<
 
 clean:
