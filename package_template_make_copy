@@ -16,8 +16,8 @@ cp export ../pkg
 cp install ../pkg
 cp mk ../pkg
 cp make/makefile ../pkg/make
-cp private/*.f ../pkg/private
-cp public/*.f ../pkg/public
+cp private/*.f90 ../pkg/private
+cp public/*.f90 ../pkg/public
 cd test
 cp ck ../../pkg/test
 cp clean ../../pkg/test
@@ -26,6 +26,6 @@ cp export ../../pkg/test
 cp mk ../../pkg/test
 cp rn ../../pkg/test
 cp make/makefile ../../pkg/test/make
-cp src/*.f ../../pkg/test/src
+cp src/*.f90 ../../pkg/test/src
 
 echo 'done - rename "pkg" to be whatever you want.'
