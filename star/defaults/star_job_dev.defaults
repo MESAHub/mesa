@@ -150,4 +150,4 @@
 
       ! ::
 
-    mx_butterfly = .false.
+    mx_butterfly = .true.
