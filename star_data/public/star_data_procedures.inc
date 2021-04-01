@@ -115,6 +115,8 @@
             other_after_set_mixing_info => null()
          procedure (other_diffusion_interface), pointer, nopass :: &
             other_diffusion => null()
+         procedure (other_screening_interface), pointer, nopass :: &
+            other_screening => null()
 
          procedure (other_surface_PT_interface), pointer, nopass :: &
             other_surface_PT => null()

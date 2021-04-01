@@ -1367,6 +1367,7 @@
          logical :: use_other_astero_freq_corr
          logical :: use_other_timestep_limit
          logical :: use_other_set_pgstar_controls
+         logical :: use_other_screening
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

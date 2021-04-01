@@ -68,6 +68,9 @@
          s% other_eosDT_get => my_eosDT_get
          s% other_eosDT_get_T => my_eosDT_get_T
          s% other_eosDT_get_Rho => my_eosDT_get_Rho
+
+         s% use_other_screening = .true.
+         s% other_screening => my_screening
          
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
@@ -415,6 +418,28 @@
             kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
 
       end subroutine my_kap_get
+
+
+      subroutine my_screening(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
+         use rates_def
+   
+         implicit none
+   
+         type (Screen_Info), pointer :: sc ! See rates_def
+         ! This contains lots of useful things like temperature, density etc as well as some precomputed
+         ! terms that are useful for screening calculations. The derived type is set in do_screen_set_context (screen.f90)
+         real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants
+         real(dp),intent(in) ::    a1, a2     !< mass numbers of reactants
+         real(dp),intent(out) ::   screen     !< on return, screening factor for this reaction
+         real(dp),intent(out) ::   dscreendt     !< on return, temperature derivative of the screening factor
+         real(dp),intent(out) ::   dscreendd    !< on return, density derivative of the screening factor
+         integer, intent(out) ::   ierr
+   
+         screen = 1d0
+         dscreendt = 0d0
+         dscreendd = 0d0
+         ierr = 0
+      end subroutine my_screening
 
 
       end module run_star_extras
