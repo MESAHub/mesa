@@ -345,6 +345,14 @@
          integer, intent(out) :: id, ierr
 
          type (star_info), pointer :: s         
+
+         ! for resolution randomization
+         real(dp), parameter :: fmin = 0.95d0
+         real(dp), parameter :: fmax = 1.05d0
+         real(dp) :: frand
+         integer :: i, l, m, n
+         integer, allocatable :: seed(:)
+
          
          include 'formats'
          
@@ -453,6 +461,29 @@
 
          write(*,*)
          write(*,*)
+
+         ! a butterfly flaps its wings
+         if (s% job% mx_butterfly) then
+            ! base seed on version number
+            call random_seed(size=n)
+            allocate(seed(n))
+            l = len(trim(version_number))
+            do i = 1, n
+               m = mod(i, l) + 1
+               seed(i) = iachar(version_number(m:m))
+            end do
+            call random_seed(put=seed)
+            write(*,*) 'Butterfly mode active'
+            write(*,*) '  Resolution is scaled by a random, near-unity factor'
+            call random_number(frand)
+            frand = fmin + (fmax-fmin)*frand
+            s% mesh_delta_coeff = frand * s% mesh_delta_coeff
+            write(*,*) '    mesh: ', frand
+            call random_number(frand)
+            frand = fmin + (fmax-fmin)*frand
+            s% time_delta_coeff = frand * s% time_delta_coeff
+            write(*,*) '    time: ', frand
+         end if
          
          if (.not. restart) then
             if (dbg) write(*,*) 'call before_evolve'

@@ -20,4 +20,6 @@
       integer :: save_photo_number
       character (len=strlen) :: save_photo_filename
       !save_photo_when_terminate = .true.
-      
+
+      ! control random perturbations
+      logical :: mx_butterfly

@@ -551,7 +551,9 @@
          warn_run_star_extras, &
          
          report_garbage_collection, &
-         num_steps_for_garbage_collection
+         num_steps_for_garbage_collection, &
+
+         mx_butterfly
 
       contains
 
@@ -1201,6 +1203,8 @@
          s% job% report_garbage_collection = report_garbage_collection
          s% job% num_steps_for_garbage_collection = num_steps_for_garbage_collection
 
+         s% job% mx_butterfly = mx_butterfly
+         
       end subroutine store_star_job_controls
 
 
@@ -1773,6 +1777,8 @@
          warn_run_star_extras = s% job% warn_run_star_extras
          report_garbage_collection = s% job% report_garbage_collection
          num_steps_for_garbage_collection = s% job% num_steps_for_garbage_collection
+
+         mx_butterfly = s% job% mx_butterfly
 
       end subroutine set_star_job_controls_for_writing
 
