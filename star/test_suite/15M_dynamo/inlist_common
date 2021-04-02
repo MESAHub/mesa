@@ -1,0 +1,75 @@
+&star_job
+
+/ ! end of star_job namelist
+
+
+&eos
+
+/ ! end of eos namelist
+
+
+&kap
+
+      use_type2_opacities = .true.
+      Zbase = 0.02
+
+/ ! end of kap namelist
+
+
+&controls
+
+   ! initial model
+
+      initial_mass = 15
+      initial_z = 0.02
+
+   ! rotation / rotational mixing
+
+      omega_function_weight = 20
+
+      am_nu_visc_factor = 0
+      am_D_mix_factor = 0.0333333333333333d00
+
+      D_DSI_factor = 0
+      D_SH_factor = 1
+      D_SSI_factor = 1
+      D_ES_factor = 1
+      D_GSF_factor = 1
+      D_ST_factor = 1
+
+      am_nu_ST_factor = 10
+
+      clip_D_limit = 10
+
+
+    ! mass loss
+
+      hot_wind_scheme = 'Dutch'
+      hot_wind_full_on_T = 1d0
+      cool_wind_full_on_T = 0d0
+      Dutch_scaling_factor = 0.8
+
+      mdot_omega_power = 0.43
+
+
+    ! convection
+
+      mixing_length_alpha = 1.6
+      use_Ledoux_criterion = .true.
+      alpha_semiconvection = 4d-2
+      thermohaline_coeff = 2
+
+
+    ! output
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+      photo_interval = 100
+      profile_interval = 100
+      history_interval = 5
+      terminal_interval = 50
+
+
+/ ! end of controls namelist
