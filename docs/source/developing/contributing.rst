@@ -207,7 +207,7 @@ If you decided to make a new branch this can be done with::
 
 or::
 
-  git switch -b mynewbranch
+  git switch -c mynewbranch
 
 Any changes you now make will not apply to ``main`` but instead to ``mynewbranch``.
 
