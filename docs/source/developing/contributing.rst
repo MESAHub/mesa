@@ -239,11 +239,13 @@ or pull additional changes from others on this branch::
 When you are ready to merge the changes from ``mynewbranch`` into ``main`` then push ``mynewbranch`` to GitHub and make a pull request.
 
 
-If someone else has created a new branch, you can switch to it with::
-  
-    git switch -c theirnewbranch origin/theirnewbranch
+If someone else has created a new branch and pushed it to GitHub, you can switch to it with::
 
-This will check out the branch ``theirnewbranch`` and associate it with the remote branch.
+    git checkout theirnewbranch
+
+That shortcut command works when ``theirnewbranch`` does not exist locally, but there does exist a tracking branch with that name in exactly one remote (i.e., in `origin`).  This will check out the branch ``theirnewbranch`` and associate it with the remote branch.  This is equivalent to::
+
+    git switch -c theirnewbranch --track origin/theirnewbranch
 
 
 Stashing changes
