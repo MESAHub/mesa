@@ -122,6 +122,7 @@ In the test case directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: ../../../star/test_suite/test_case_template/README.rst
+    :start-line: 6
 
 
 In the docs directory
