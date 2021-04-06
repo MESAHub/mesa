@@ -28,8 +28,8 @@ You can run an individual test by specifying a single integer, corresponding to 
 
   ./each_test_run <N>
 
-After a test runs, the file ``out.txt`` will contain the concatenated
-output from stdout and stderr.
+After a test runs, the files ``out.txt`` and ``err.txt`` will contain
+the output from stdout and stderr respectively.
 
 
 Anatomy of a test
