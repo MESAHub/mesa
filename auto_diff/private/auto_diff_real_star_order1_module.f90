@@ -5,7 +5,6 @@ module auto_diff_real_star_order1_module
       use math_lib
    
       implicit none
-
       private
    public :: auto_diff_real_star_order1, &
       assignment(=), &
