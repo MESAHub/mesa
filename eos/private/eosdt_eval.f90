@@ -303,11 +303,17 @@
          ierr = 0
          rq => eos_handles(handle)
 
-         call Get_CMS_alfa( & 
-            rq, logRho, logT, Z, abar, zbar, &
-            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-            ierr)
-         if (ierr /= 0) return
+         if (rq% use_CMS) then
+            call Get_CMS_alfa( &
+               rq, logRho, logT, Z, abar, zbar, &
+               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+               ierr)
+            if (ierr /= 0) return
+         else
+            alfa = 1d0 ! no CMS
+            d_alfa_dlogT = 0d0
+            d_alfa_dlogRho = 0d0
+         end if
          
          if (dbg) write(*,1) 'CMS', (1d0 - alfa)*remaining_fraction
          
