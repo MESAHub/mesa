@@ -441,36 +441,6 @@
       end function do_alloc_eos
 
 
-      subroutine get_result_names(names)
-         character (len=eos_name_length) :: names(nv)
-         names(i_lnPgas) = 'lnPgas'  
-         names(i_lnE) = 'lnE' ! internal energy per gram
-         names(i_lnS) = 'lnS' ! entropy per gram
-         names(i_mu) = 'mu'  
-         names(i_lnfree_e) = 'lnfree_e'   
-         names(i_eta) = 'eta'    
-         names(i_grad_ad) = 'grad_ad' ! dlnT_dlnP at constant S
-         names(i_chiRho) = 'chiRho' ! dlnP_dlnRho at constant T      
-         names(i_chiT) = 'chiT' ! dlnP_dlnT at constant Rho      
-         names(i_Cp) = 'Cp' ! dE_dT at constant P, specific heat at constant pressure     
-         names(i_Cv) = 'Cv' ! dE_dT at constant Rho, specific heat at constant volume
-         names(i_dE_dRho) = 'dE_dRho' ! at constant T      
-         names(i_dS_dT) = 'dS_dT' ! at constant Rho      
-         names(i_dS_dRho) = 'dS_dRho'  ! at constant T            
-         names(i_gamma1) = 'gamma1'  ! dlnP_dlnRho at constant S      
-         names(i_gamma3) = 'gamma3'  ! gamma3 - 1) = '' dlnT_dlnRho at constant S   
-         names(i_phase) = 'phase'
-         names(i_latent_ddlnT) = 'latdlnT'
-         names(i_latent_ddlnRho) = 'latdlnRh'        
-         names(i_frac_OPAL_SCVH) = 'OPAL/SCVH'
-         names(i_frac_HELM) = 'HELM'
-         names(i_frac_Skye) = 'Skye'
-         names(i_frac_PC) = 'PC'
-         names(i_frac_FreeEOS) = 'FreeEOS'
-         names(i_frac_CMS) = 'CMS'
-      end subroutine get_result_names
-      
-      
       subroutine init_eos_handle_data(handle)
          use math_lib
          integer, intent(in) :: handle

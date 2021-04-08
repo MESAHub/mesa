@@ -174,8 +174,8 @@
          write(*,1) 'logT', logT
          write(*,1) 'logPgas', logPgas
          write(*,*)
-     
-         call eos_result_names(names)
+
+         names = eosDT_result_names
          
          if (.not. do_compare) then ! simple form of output
             write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
@@ -388,7 +388,8 @@
          write(*,1) 'logT', logT
          write(*,*)
      
-         call eos_result_names(names)
+         names = eosDT_result_names
+
          logPgas = res(i_lnPgas)/ln10
          if (.not. do_compare) then ! simple form of output
             write(*,1) 'logPgas', res(i_lnPgas)/ln10
