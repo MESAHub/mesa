@@ -547,7 +547,7 @@ contains
          if (i_eos == 0) then
             call eosDT_get( &
             handle, species, chem_id, net_iso, xa, &
-            Rho, log10Rho, T, logT, &
+            Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
          else
             call eosDT_get_component( &
