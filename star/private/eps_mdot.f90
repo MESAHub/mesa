@@ -127,10 +127,10 @@
 
       end function interpolate_onto_faces
 
-      subroutine set_leak_frac(nz, L, dm, dt, specific_entropy, grad_r_sub_grad_a, mass_flux, leak_frac, eps_mdot_leak_frac_factor)
+      subroutine set_leak_frac(nz, L, dm, dt, thermal_energy, grad_r_sub_grad_a, mass_flux, leak_frac, eps_mdot_leak_frac_factor)
          ! Inputs
          real(qp), dimension(:) :: mass_flux, dm
-         real(dp), dimension(:) :: L, grad_r_sub_grad_a, specific_entropy, leak_frac
+         real(dp), dimension(:) :: L, grad_r_sub_grad_a, thermal_energy, leak_frac
          real(dp) eps_mdot_leak_frac_factor
          real(dp) dt
          integer nz
@@ -154,7 +154,7 @@
          ! This is the thermal time-scale of the fluid element. By comparison, in time dm*dt/mass_flux the
          ! element will no longer be in the same cell, so while in this cell a fraction L*dt/(TS mass_flux)
          ! of this perturbation can leak out. The fraction which leaks out cannot exceed one, and so
-         ! we obtain the expression below.
+         ! we obtain the expression below. Note that we approximate TS by the specific thermal energy Cp*T.
 
          do k=1,nz
             if (k == 1) then
@@ -167,7 +167,7 @@
                leak_frac(k) = 1.0d0
             else
                leak_frac(k) = eps_mdot_leak_frac_factor *&
-                   abs(L(k) * dt / (grad_r_sub_grad_a(k) * specific_entropy(k) * mass_flux_bar))
+                   abs(L(k) * dt / (grad_r_sub_grad_a(k) * thermal_energy(k) * mass_flux_bar))
                leak_frac(k) = min(1.0d0, leak_frac(k))
             end if
          end do
