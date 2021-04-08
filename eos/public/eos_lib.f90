@@ -91,13 +91,6 @@
          integer, intent(out):: ierr
          call get_eos_ptr(handle,rq,ierr)
       end subroutine eos_ptr
-            
-      
-      subroutine eos_result_names(names)      
-         use eos_def, only : get_result_names, num_eos_basic_results, eos_name_length
-         character (len=eos_name_length) :: names(num_eos_basic_results)         
-         call get_result_names(names)      
-      end subroutine eos_result_names
 
       
       ! as a convenience

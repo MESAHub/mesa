@@ -136,7 +136,7 @@
             write(*,*) 'failed in eos_init'
             stop 1
          end if
-         call eos_result_names(eos_names)
+         eos_names = eosDT_result_names
 
          handle = alloc_eos_handle_using_inlist('inlist', info)
          if (info /= 0) then
