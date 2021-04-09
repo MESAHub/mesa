@@ -206,6 +206,14 @@
 
    Skye_solid_mixing_rule = "PC"
 
+   ! Skye Blending
+   ! ::
+   ! replace the polygon blend with simple Rho/T blends
+   use_simple_Skye_blends = .false.
+   logRho_min_for_any_Skye = 1.8
+   logRho_min_for_all_Skye = 2.0
+   logT_min_for_any_Skye = 6.8
+   logT_min_for_all_Skye = 7.0
 
 
 ! CMS controls
