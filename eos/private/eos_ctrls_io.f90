@@ -109,7 +109,10 @@
    real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
    real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
    character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
-   
+
+   logical :: use_simple_Skye_blends
+   real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
+   real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
 
    ! misc
    logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
@@ -231,6 +234,12 @@
       Skye_min_gamma_for_solid, & ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
       Skye_max_gamma_for_liquid, & ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
       Skye_solid_mixing_rule, &
+
+      use_simple_Skye_blends, &
+      logRho_min_for_any_Skye, &
+      logRho_min_for_all_Skye, &
+      logT_min_for_any_Skye, &
+      logT_min_for_all_Skye, &
 
       ! misc
       include_radiation, &
@@ -479,6 +488,12 @@
       rq%Skye_min_gamma_for_solid = Skye_min_gamma_for_solid
       rq%Skye_max_gamma_for_liquid = Skye_max_gamma_for_liquid
       rq%Skye_solid_mixing_rule = Skye_solid_mixing_rule
+      rq% use_simple_Skye_blends = use_simple_Skye_blends
+      rq% logRho_min_for_any_Skye = logRho_min_for_any_Skye
+      rq% logRho_min_for_all_Skye = logRho_min_for_all_Skye
+      rq% logT_min_for_any_Skye = logT_min_for_any_Skye
+      rq% logT_min_for_all_Skye = logT_min_for_all_Skye
+
       ! misc
       rq% include_radiation = include_radiation
       rq% always_skip_elec_pos = always_skip_elec_pos
@@ -605,7 +620,13 @@
       mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye   
       Skye_min_gamma_for_solid = rq% Skye_min_gamma_for_solid
       Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid  
-      Skye_solid_mixing_rule = rq% Skye_solid_mixing_rule 
+      Skye_solid_mixing_rule = rq% Skye_solid_mixing_rule
+      use_simple_Skye_blends = rq% use_simple_Skye_blends
+      logRho_min_for_any_Skye = rq% logRho_min_for_any_Skye
+      logRho_min_for_all_Skye = rq% logRho_min_for_all_Skye
+      logT_min_for_any_Skye = rq% logT_min_for_any_Skye
+      logT_min_for_all_Skye = rq% logT_min_for_all_Skye
+
       ! misc
       include_radiation = rq% include_radiation
       always_skip_elec_pos = rq% always_skip_elec_pos

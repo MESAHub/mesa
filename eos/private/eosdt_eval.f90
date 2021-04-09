@@ -32,7 +32,7 @@
       use eosDT_load_tables, only: load_single_eosDT_table_by_id
       use eos_HELM_eval
       use eoscms_eval, only: Get_CMS_alfa, get_CMS_for_eosdt
-      use skye, only: get_Skye_for_eosdt, get_Skye_alfa
+      use skye, only: get_Skye_for_eosdt, get_Skye_alfa, get_Skye_alfa_simple
 
 
       implicit none
@@ -364,10 +364,17 @@
          rq => eos_handles(handle)
 
          if (rq% use_Skye) then
-            call Get_Skye_alfa( & 
-               rq, logRho, logT, Z, abar, zbar, &
-               alfa, d_alfa_dlogT, d_alfa_dlogRho, &
-               ierr)
+            if (rq% use_simple_Skye_blends) then
+               call Get_Skye_alfa_simple( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr)
+            else
+               call Get_Skye_alfa( &
+                  rq, logRho, logT, Z, abar, zbar, &
+                  alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+                  ierr)
+            end if
             if (ierr /= 0) return               
          else
             alfa = 1d0 ! no Skye

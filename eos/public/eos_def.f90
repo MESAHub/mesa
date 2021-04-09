@@ -231,6 +231,10 @@
          real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
          character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
 
+         logical :: use_simple_Skye_blends
+         real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
+         real(dp) :: logT_min_for_any_Skye, logT_min_for_all_Skye
+
          ! misc
          logical :: include_radiation, always_skip_elec_pos, always_include_elec_pos
          logical :: eosDT_use_linear_interp_for_X

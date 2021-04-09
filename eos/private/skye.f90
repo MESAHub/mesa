@@ -11,7 +11,7 @@ module skye
       
       
       private
-      public :: Get_Skye_EOS_Results, Get_Skye_alfa, get_Skye_for_eosdt
+      public :: Get_Skye_EOS_Results, Get_Skye_alfa, Get_Skye_alfa_simple, get_Skye_for_eosdt
 
       contains
 
@@ -88,6 +88,63 @@ module skye
          d_alfa_dlogT = blend%d1val2
 
       end subroutine Get_Skye_alfa
+
+
+      subroutine Get_Skye_alfa_simple( &
+            rq, logRho, logT, Z, abar, zbar, &
+            alfa, d_alfa_dlogT, d_alfa_dlogRho, &
+            ierr)
+         use const_def
+         use eos_blend
+         type (EoS_General_Info), pointer :: rq
+         real(dp), intent(in) :: logRho, logT, Z, abar, zbar
+         real(dp), intent(out) :: alfa, d_alfa_dlogT, d_alfa_dlogRho
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_2var_order1) :: logT_auto, logRho_auto
+         type(auto_diff_real_2var_order1) :: blend, blend_logT, blend_logRho
+
+         include 'formats'
+
+         ierr = 0
+
+         ! logRho is val1
+         logRho_auto% val = logRho
+         logRho_auto% d1val1 = 1d0
+         logRho_auto% d1val2 = 0d0
+
+         ! logT is val2
+         logT_auto% val = logT
+         logT_auto% d1val1 = 0d0
+         logT_auto% d1val2 = 1d0
+
+         ! logT blend
+         if (logT_auto < rq% logT_min_for_any_Skye) then
+            blend_logT = 0d0
+         else if (logT_auto <= rq% logT_min_for_all_Skye) then
+            blend_logT = (logT_auto - rQ% logT_min_for_any_Skye) / (rq% logT_min_for_all_Skye - rq% logT_min_for_any_Skye)
+         else if (logT_auto > rq% logT_min_for_all_Skye) then
+            blend_logT = 1d0
+         end if
+
+
+         ! logRho blend
+         if (logRho_auto < rq% logRho_min_for_any_Skye) then
+            blend_logRho = 0d0
+         else if (logRho_auto <= rq% logRho_min_for_all_Skye) then
+            blend_logRho = (logRho_auto - rQ% logRho_min_for_any_Skye) / (rq% logRho_min_for_all_Skye - rq% logRho_min_for_any_Skye)
+         else if (logRho_auto > rq% logRho_min_for_all_Skye) then
+            blend_logRho = 1d0
+         end if
+
+         ! combine blends
+         blend = (1d0 - blend_logRho) * (1d0 - blend_logT)
+
+         alfa = blend% val
+         d_alfa_dlogRho = blend% d1val1
+         d_alfa_dlogT = blend% d1val2
+
+      end subroutine get_Skye_alfa_simple
 
 
       subroutine get_Skye_for_eosdt(handle, dbg, Z, X, abar, zbar, species, chem_id, net_iso, xa, &
