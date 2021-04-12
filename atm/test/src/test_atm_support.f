@@ -306,6 +306,7 @@ contains
   subroutine test_irradiated()
 
     real(dp) :: errtol
+    type (Kap_General_Info), pointer :: rq
 
     include 'formats'
 
@@ -323,6 +324,15 @@ contains
     XO = 8.8218000000000601d-03
 
     call set_composition()
+
+    ! at these conditions, the appropriate lowT opacity table is Freedman11
+    ! this is around logR = 3.5, way off the default tables (max logR = 1)
+    call kap_ptr(kap_handle,rq,ierr)
+    if (ierr /= 0) return
+    rq% kap_lowT_option = kap_lowT_Freedman11
+
+    ! must set up tables again after changing options
+    call kap_setup_tables(kap_handle, ierr)
 
     errtol = 1.E-6_dp
     max_iters = 30
