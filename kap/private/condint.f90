@@ -116,11 +116,12 @@
             write(*,*)
             call mesa_error(__FILE__,__LINE__)
          end if
-         ! just use "not a knot" bc's at edges of tables
-         ibcxmin = 0; bcxmin(1:num_logTs) = 0d0
-         ibcxmax = 0; bcxmax(1:num_logTs) = 0d0
-         ibcymin = 0; bcymin(1:num_logRhos) = 0d0
-         ibcymax = 0; bcymax(1:num_logRhos) = 0d0
+         ! boundary condition is slope=0 at edges of tables
+         ! this ensures continuous derivatives when we clip
+         ibcxmin = 3; bcxmin(1:num_logTs) = 0d0
+         ibcxmax = 3; bcxmax(1:num_logTs) = 0d0
+         ibcymin = 3; bcymin(1:num_logRhos) = 0d0
+         ibcymax = 3; bcymax(1:num_logRhos) = 0d0
          do iz = 1, num_logzs
             f1(1:shift) => f_ary(1+(iz-1)*shift:iz*shift) 
             call interp_mkbicub_db( &
@@ -145,25 +146,50 @@
       
       
       subroutine do_electron_conduction( &
-            zbar, logRho_in, logT_in, kap, dlogK_dlogRho, dlogK_dlogT, ierr)
+            zbar, logRho_in, logT_in, kap, dlogkap_dlogRho, dlogkap_dlogT, ierr)
+
+         use const_def, only: boltz_sigma
          real(dp), intent(in) :: zbar, logRho_in, logT_in
-         real(dp), intent(out) :: kap, dlogK_dlogRho, dlogK_dlogT
+         real(dp), intent(out) :: kap, dlogkap_dlogRho, dlogkap_dlogT
          integer, intent(out) :: ierr
          
          integer :: iz, iz1, iz2, shift
          real(dp) :: zlog, logRho, logT
-         real(dp) :: alfa, beta, logK, &
+         real(dp) :: alfa, beta, &
             logK1, kap1, dlogK1_dlogRho, dlogK1_dlogT, &
-            logK2, kap2, dlogK2_dlogRho, dlogK2_dlogT
+            logK2, kap2, dlogK2_dlogRho, dlogK2_dlogT, &
+            logK, logkap, dlogK_dlogRho, dlogK_dlogT
          real(dp), pointer :: f1(:)
-            
+
+         logical :: clipped_logRho, clipped_logT
+
          include 'formats'
          
          ierr = 0
          shift = 4*num_logRhos*num_logTs
 
-         logRho = max(logRhos(1),min(logRhos(num_logRhos),logRho_in))
-         logT = max(logTs(1),min(logTs(num_logTs),logT_in))
+         if (logRho_in .lt. logRhos(1)) then
+            logRho = logRhos(1)
+            clipped_logRho = .true.
+         else if (logRho_in .gt. logRhos(num_logRhos)) then
+            logRho = logRhos(num_logRhos)
+            clipped_logRho = .true.
+         else
+            logRho = logRho_in
+            clipped_logRho = .false.
+         end if
+
+         if (logT_in .lt. logTs(1)) then
+            logT = logTs(1)
+            clipped_logT = .true.
+         else if (logT_in .gt. logTs(num_logTs)) then
+            logT = logTs(num_logTs)
+            clipped_logT = .true.
+         else
+            logT = logT_in
+            clipped_logT = .false.
+         end if
+
          zlog = max(logzs(1),min(logzs(num_logzs),log10(max(1d-30,zbar))))
          
          if (zlog <= logzs(1)) then ! use 1st
@@ -210,18 +236,32 @@
          alfa = (zlog - logzs(iz1)) / (logzs(iz2) - logzs(iz1))
          beta = 1d0-alfa
          logK = alfa*logK2 + beta*logK1
-         dlogK_dlogRho = alfa*dlogK2_dlogRho + beta*dlogK1_dlogRho
-         dlogK_dlogT = alfa*dlogK2_dlogT + beta*dlogK1_dlogT
+         if (clipped_logRho) then
+            dlogK_dlogRho = 0
+         else
+            dlogK_dlogRho = alfa*dlogK2_dlogRho + beta*dlogK1_dlogRho
+         end if
+         if (clipped_logT) then
+            dlogK_dlogT = 0
+         else
+            dlogK_dlogT = alfa*dlogK2_dlogT + beta*dlogK1_dlogT
+         end if
 
-         kap = exp10(logK)
+         ! chi = thermal conductivity, = 10**logK (cgs units)
+         ! conduction opacity kappa = 16*boltz_sigma*T^3 / (3*rho*chi)
+         ! logkap = 3*logT - logRho - logK + log10(16*boltz_sigma/3)
+
+         logkap = 3d0*logT_in - logRho_in - logK + log10(16d0 * boltz_sigma / 3d0)
          
-         
+         kap = exp10(logkap)
+         dlogkap_dlogRho = -1d0 - dlogK_dlogRho
+         dlogkap_dlogT = 3d0 - dlogK_dlogT
+
          contains
          
          
          subroutine get1(iz, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             use kap_eval_support, only: Do_Kap_Interpolations
-            use const_def
             integer, intent(in) :: iz
             real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
             integer, intent(out) :: ierr
@@ -261,17 +301,8 @@
             
             call Do_Kap_Interpolations( &
                f1, num_logRhos, num_logTs, i_logRho, j_logT, logRho0, &
-               logRho, logRho1, logT0, logT, logT1, fval, df_dx, df_dy)
+               logRho, logRho1, logT0, logT, logT1, logK, dlogK_dlogRho, dlogK_dlogT)
             if (ierr /= 0) return
-            
-            ! fval(1) = CK; fval(2) = DRK = dCK/dlogRho; fval(3) = DTK = dCK/dlogT
-            ! chi = thermal conductivity, = 10**CK (cgs units)
-            ! conduction opacity kappa = 16*boltz_sigma*T^3 / (3*rho*chi)
-            ! logK = 3*logT - logRho - CK + log10(16*boltz_sigma/3)
-            logK = 3d0*logT - logRho - fval + log10(16d0 * boltz_sigma / 3d0)
-            if (dbg) write(*,2) 'do_electron_conduction', iz, logK
-            dlogK_dlogRho = -1d0 - df_dx
-            dlogK_dlogT = 3d0 - df_dy   
             
          end subroutine get1
 
