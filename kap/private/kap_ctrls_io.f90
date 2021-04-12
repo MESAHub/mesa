@@ -424,10 +424,6 @@
       end if
       rq% kap_lowT_option = kap_lowT_option
 
-
-      ! this parameter needs to be removed
-      rq% min_logT_for_logR_gt_1 = 3.3d0
-
       rq% show_info = show_info
 
       rq% use_other_elect_cond_opacity = use_other_elect_cond_opacity
