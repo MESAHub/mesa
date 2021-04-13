@@ -1674,10 +1674,12 @@
          type (star_info), pointer :: s
          integer :: j, i, ir
          integer, pointer :: net_reaction_ptr(:) 
+         logical :: error
          
          include 'formats'
          
          ierr = 0
+         error = .false.
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
@@ -1692,12 +1694,20 @@
             ir = rates_reaction_id(s% job% reaction_for_special_factor(i))
             j = 0
             if (ir > 0) j = net_reaction_ptr(ir)
-            if (j <= 0) cycle
+            if (j <= 0) then
+               write(*,2) 'Failed to find reaction_for_special_factor ' // &
+               trim(s% job% reaction_for_special_factor(i)), &
+               j, s% job% special_rate_factor(i)
+               error = .true.
+               cycle
+            end if
             s% rate_factors(j) = s% job% special_rate_factor(i)
             write(*,2) 'set special rate factor for ' // &
                   trim(s% job% reaction_for_special_factor(i)), &
                   j, s% job% special_rate_factor(i)
          end do
+
+         if(error) call mesa_error(__FILE__,__LINE__)
          
       end subroutine set_rate_factors
 
