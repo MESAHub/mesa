@@ -403,9 +403,8 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9_in, &
             rate_tables_dir, rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
+            kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use iso_fortran_env
@@ -427,9 +426,8 @@
             jina_reaclib_filename, rate_tables_dir, &
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
-            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            ionization_cache_dir, kap_cache_dir, rates_cache_dir
+            kap_cache_dir, rates_cache_dir
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
          integer , intent(in):: color_num_colors(:)

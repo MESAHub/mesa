@@ -4,7 +4,6 @@
 
       character (len=1000) :: mesa_dir, &
          eosDT_cache_dir, &
-         ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir
 
@@ -368,7 +367,6 @@
       character (len=strlen) :: chem_isotopes_filename
 
       character(len=strlen) :: eos_file_prefix
-      character(len=strlen) :: ionization_file_prefix, ionization_Z1_suffix
 
       integer :: extras_lipar, extras_lrpar, extras_lcpar, extras_llpar
       integer :: extras_ipar(max_extras_params)
