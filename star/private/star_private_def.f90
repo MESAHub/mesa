@@ -415,7 +415,6 @@
          use rates_lib, only: rates_init
          use rates_def, only: reaclib_min_T9
          use net_lib, only: net_init
-         use ionization_lib, only: ionization_init
          use atm_lib
          use chem_lib
          use const_lib
@@ -521,12 +520,6 @@
 
          if (dbg) write(*,*) 'call atm_init'
          call atm_init(use_cache, ierr)
-         if (ierr /= 0) return
-
-         if (dbg) write(*,*) 'call ionization_init'
-         call ionization_init( &
-            ionization_file_prefix, ionization_Z1_suffix, &
-            ionization_cache_dir, use_cache, ierr)
          if (ierr /= 0) return
 
          version_number = ''
